@@ -71,7 +71,7 @@ const createMediaContainer = async (imageUrl: string, caption: string) => {
       body: JSON.stringify({
         image_url: imageUrl,
         caption,
-        access_token: process.env.INSTAGRAM_ACCESS_TOKEN,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
       }),
     },
   );
@@ -93,7 +93,7 @@ const publishMedia = async (creationId: string) => {
       },
       body: JSON.stringify({
         creation_id: creationId,
-        access_token: process.env.INSTAGRAM_ACCESS_TOKEN,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
       }),
     },
   );
@@ -111,7 +111,7 @@ const handleRequest = async () => {
   try {
     if (
       !process.env.INSTAGRAM_ACCOUNT_ID ||
-      !process.env.INSTAGRAM_ACCESS_TOKEN
+      !process.env.FACEBOOK_ACCESS_TOKEN
     ) {
       throw new Error('instagram credentials not configured');
     }

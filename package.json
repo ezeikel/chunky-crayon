@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm prisma:generate && next dev --turbopack",
+    "dev": "pnpm db:generate && next dev --turbopack",
     "build": "prisma generate && next build",
     "start": "next start",
     "email": "email dev --port 3005",
