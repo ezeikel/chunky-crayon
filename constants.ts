@@ -96,7 +96,38 @@ export const UNLEASH_STRINGS = [
   'excitement',
 ];
 
-export const SETTINGS = ['forest', 'beach', 'city', 'mountain', 'space'];
+export const SETTINGS = [
+  'forest',
+  'beach',
+  'city',
+  'mountain',
+  'space',
+  'underwater reef',
+  'desert oasis',
+  'tropical jungle',
+  'snowy tundra',
+  'haunted castle',
+  'fairy glade',
+  'ancient ruins',
+  'volcanic island',
+  'wild west town',
+  'floating sky island',
+  'enchanted garden',
+  'steampunk factory',
+  'medieval village',
+  'circus big top',
+  'pirate ship deck',
+  'alien planet',
+  'magical library',
+  'sunflower field',
+  'frozen lake',
+  'rainbow bridge',
+  'toy workshop',
+  'crystal cave',
+  'cloud kingdom',
+  'robot city',
+  'giant treehouse',
+] as const;
 
 export const CHARACTERS = [
   'dragon',
@@ -104,7 +135,32 @@ export const CHARACTERS = [
   'knight',
   'astronaut',
   'pirate',
-];
+  'mermaid',
+  'wizard',
+  'fairy',
+  'robot',
+  'alien',
+  'princess',
+  'superhero',
+  'detective',
+  'cowboy',
+  'samurai',
+  'vampire',
+  'werewolf',
+  'elf',
+  'giant',
+  'goblin',
+  'penguin',
+  'polar bear',
+  'fox',
+  'panda',
+  'lion',
+  'frog prince',
+  'genie',
+  'time traveler',
+  'ninja',
+  'inventor',
+] as const;
 
 export const ACTIVITIES = [
   'dancing',
@@ -112,9 +168,221 @@ export const ACTIVITIES = [
   'playing',
   'exploring',
   'fighting',
-];
+  'painting',
+  'building',
+  'flying',
+  'swimming',
+  'singing',
+  'gardening',
+  'cooking',
+  'camping',
+  'treasure hunting',
+  'ice skating',
+  'surfing',
+  'skateboarding',
+  'rock climbing',
+  'casting spells',
+  'time traveling',
+  'racing',
+  'juggling',
+  'drawing',
+  'training a pet',
+  'rescuing someone',
+  'performing magic tricks',
+  'sewing',
+  'conducting science experiments',
+  'storytelling',
+  'exploring a maze',
+] as const;
 
-export const LOCATIONS = ['castle', 'ship', 'cave', 'alien planet', 'desert'];
+export const LOCATIONS = [
+  'a magical forest',
+  'a sunny beach',
+  'a busy marketplace',
+  'the moon’s surface',
+  'a coral reef',
+  'a desert canyon',
+  'a crystal palace',
+  'a carnival',
+  'a jungle temple',
+  'a mountain peak',
+  'a spooky graveyard',
+  'a royal throne room',
+  'a dragon’s cave',
+  'a secret garden',
+  'a futuristic city',
+  'a candy land',
+  'a wizard’s tower',
+  'a spaceship',
+  'a giant mushroom field',
+  'a floating castle',
+  'a snow-covered village',
+  'a pirate cove',
+  'a maze of mirrors',
+  'a medieval fair',
+  'a lava river',
+  'a rainbow waterfall',
+  'a hedge maze',
+  'a hidden underwater city',
+  'a golden desert',
+  'a huge toy store',
+] as const;
+
+// theme aware map
+export type ThemeMap = Record<
+  string,
+  {
+    characters: string[];
+    activities: string[];
+    locations: string[];
+  }
+>;
+
+export const THEME_MAP: ThemeMap = {
+  forest: {
+    characters: ['elf', 'fairy', 'fox', 'unicorn', 'goblin', 'dragon'],
+    activities: [
+      'exploring',
+      'gardening',
+      'building',
+      'storytelling',
+      'treasure hunting',
+    ],
+    locations: [
+      'a magical forest',
+      'a treehouse',
+      'a hidden waterfall',
+      'a woodland clearing',
+    ],
+  },
+  beach: {
+    characters: ['pirate', 'mermaid', 'surfer', 'dolphin', 'explorer', 'crab'],
+    activities: [
+      'surfing',
+      'swimming',
+      'building',
+      'treasure hunting',
+      'playing',
+    ],
+    locations: [
+      'a sunny beach',
+      'a tropical island',
+      'a coral reef',
+      'a lighthouse shore',
+    ],
+  },
+  city: {
+    characters: [
+      'superhero',
+      'detective',
+      'robot',
+      'inventor',
+      'artist',
+      'street performer',
+    ],
+    activities: [
+      'skateboarding',
+      'painting',
+      'performing magic tricks',
+      'playing',
+      'reading',
+    ],
+    locations: [
+      'a busy marketplace',
+      'a rooftop garden',
+      'a subway station',
+      'a bustling plaza',
+    ],
+  },
+  mountain: {
+    characters: ['knight', 'wizard', 'yeti', 'eagle', 'mountaineer', 'goat'],
+    activities: [
+      'rock climbing',
+      'camping',
+      'exploring',
+      'skiing',
+      'storytelling',
+    ],
+    locations: [
+      'a mountain peak',
+      'a snowy peak',
+      'a rocky trail',
+      'a hidden cave',
+    ],
+  },
+  space: {
+    characters: [
+      'astronaut',
+      'alien',
+      'robot',
+      'space pirate',
+      'time traveler',
+    ],
+    activities: [
+      'spacewalking',
+      'exploring',
+      'flying',
+      'collecting stardust',
+      'moon jumping',
+    ],
+    locations: [
+      'the moon’s surface',
+      'a space station',
+      'a distant galaxy',
+      'a meteor field',
+      'a spaceship',
+    ],
+  },
+  'underwater reef': {
+    characters: ['mermaid', 'dolphin', 'pirate', 'alien'],
+    activities: ['swimming', 'treasure hunting', 'exploring'],
+    locations: ['a coral reef', 'a hidden underwater city'],
+  },
+  'desert oasis': {
+    characters: ['genie', 'cowboy', 'camel', 'explorer', 'pirate'],
+    activities: ['treasure hunting', 'storytelling', 'camping'],
+    locations: ['a golden desert', 'a desert canyon'],
+  },
+  'tropical jungle': {
+    characters: ['explorer', 'monkey', 'parrot', 'lion', 'fairy'],
+    activities: ['exploring', 'treasure hunting', 'building'],
+    locations: ['a jungle temple', 'a secret garden'],
+  },
+  'haunted castle': {
+    characters: ['vampire', 'werewolf', 'wizard', 'ghost', 'knight'],
+    activities: ['exploring', 'storytelling', 'performing magic tricks'],
+    locations: [
+      'a spooky graveyard',
+      'a crystal palace',
+      'a royal throne room',
+    ],
+  },
+  'wild west town': {
+    characters: ['cowboy', 'horse', 'inventor'],
+    activities: ['racing', 'treasure hunting', 'performing magic tricks'],
+    locations: ['a busy marketplace', 'a desert canyon'],
+  },
+  'pirate ship deck': {
+    characters: ['pirate', 'mermaid', 'dolphin', 'dragon'],
+    activities: ['treasure hunting', 'sailing', 'storytelling'],
+    locations: ['a pirate cove', 'a sunny beach'],
+  },
+  'magical library': {
+    characters: ['wizard', 'princess', 'inventor', 'dragon'],
+    activities: ['reading', 'casting spells', 'storytelling'],
+    locations: ['a magical forest', 'a wizard’s tower'],
+  },
+  'steampunk factory': {
+    characters: ['inventor', 'robot', 'detective', 'time traveler'],
+    activities: ['building', 'conducting science experiments'],
+    locations: ['a futuristic city', 'a busy marketplace'],
+  },
+  'cloud kingdom': {
+    characters: ['unicorn', 'fairy', 'princess', 'dragon'],
+    activities: ['flying', 'storytelling', 'playing'],
+    locations: ['a floating castle', 'a rainbow bridge'],
+  },
+};
 
 export const OPENAI_MODEL_GPT_4O = 'gpt-4o';
 export const OPENAI_MODEL_DALL_E_3 = 'dall-e-3';

@@ -21,7 +21,7 @@ import {
   GenerationType,
   CreditTransactionType,
 } from '@prisma/client';
-import { getRandomDescription } from '@/utils/random';
+import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
 import generatePDFNode from '@/utils/generatePDFNode';
 import streamToBuffer from '@/utils/streamToBuffer';
 import fetchSvg from '@/utils/fetchSvg';
