@@ -1,20 +1,28 @@
 {
   "crons": [
     {
-      "path": "/api/email-list/send-daily",
+      "path": "/api/coloring-image/generate",
       "schedule": "0 8 * * *"
     },
     {
-      "path": "/api/instagram/post",
+      "path": "/api/email-list/send-latest",
+      "schedule": "10 8 * * *"
+    },
+    {
+      "path": "/api/social/post",
       "schedule": "0 16 * * 1-5"
     },
     {
-      "path": "/api/instagram/post",
+      "path": "/api/social/post",
       "schedule": "0 15 * * 0,6"
     },
     {
       "path": "/api/utils/blob/backup",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/admin/tokens",
+      "schedule": "0 8 * * 1"
     }
   ]
 }

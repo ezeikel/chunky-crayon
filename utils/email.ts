@@ -1,11 +1,29 @@
 import { Resend } from 'resend';
 import { GenerationType } from '@prisma/client';
+import nodemailer from 'nodemailer';
+
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
+const mailtrapTransporter = isDevelopment
+  ? nodemailer.createTransport({
+      host: 'sandbox.smtp.mailtrap.io',
+      port: 2525,
+      auth: {
+        user: process.env.MAILTRAP_USER,
+        pass: process.env.MAILTRAP_PASS,
+      },
+    })
+  : null;
+
 // Resend's default rate limit is 2 requests per second
-const RATE_LIMIT_PER_SECOND = 2;
-const RATE_LIMIT_DELAY = 1000 / RATE_LIMIT_PER_SECOND;
+const RESEND_RATE_LIMIT_PER_SECOND = 2;
+const RESEND_RATE_LIMIT_DELAY = 1000 / RESEND_RATE_LIMIT_PER_SECOND;
+
+// Mailtrap free plan is more restrictive - 1 email per 2 seconds to be safe
+const MAILTRAP_RATE_LIMIT_PER_SECOND = 0.5;
+const MAILTRAP_RATE_LIMIT_DELAY = 1000 / MAILTRAP_RATE_LIMIT_PER_SECOND;
 
 type EmailData = {
   to: string | string[];
@@ -55,8 +73,31 @@ const sendSingleEmail = async (
   subject: string,
   filename: string,
   coloringImagePdf: Buffer,
-) =>
-  resend.emails.send({
+) => {
+  if (isDevelopment && mailtrapTransporter) {
+    console.log(`📧 [MAILTRAP] Sending email to: ${to}`);
+
+    return mailtrapTransporter.sendMail({
+      from: 'Chunky Crayon <no-reply@chunkycrayon.com>',
+      to,
+      subject,
+      html: `
+        <h2>🎨 ${subject}</h2>
+        <p>Here's your latest coloring page!</p>
+        <p>Happy coloring! 🖍️</p>
+        <p>Visit <a href="https://chunkycrayon.com">chunkycrayon.com</a> for more coloring pages.</p>
+      `,
+      attachments: [
+        {
+          filename,
+          content: coloringImagePdf,
+          contentType: 'application/pdf',
+        },
+      ],
+    });
+  }
+
+  return resend.emails.send({
     from: 'Chunky Crayon <no-reply@chunkycrayon.com>',
     to,
     subject,
@@ -68,6 +109,7 @@ const sendSingleEmail = async (
       },
     ],
   });
+};
 
 // eslint-disable-next-line import-x/prefer-default-export
 export const sendEmail = async ({
@@ -83,13 +125,18 @@ export const sendEmail = async ({
     return sendSingleEmail(to, subject, filename, coloringImagePdf);
   }
 
+  // apply rate limiting based on the email service being used
+  const rateLimit = isDevelopment
+    ? MAILTRAP_RATE_LIMIT_DELAY
+    : RESEND_RATE_LIMIT_DELAY;
+
   // WORKAROUND: Resend's batch API doesn't support attachments yet
   // https://resend.com/docs/dashboard/emails/attachments
   // Once they add support, we can switch to using resend.batch.send
   return to.reduce<Promise<unknown[]>>(async (promise, recipient, index) => {
     const results = await promise;
     if (index > 0) {
-      await sleep(RATE_LIMIT_DELAY);
+      await sleep(rateLimit);
     }
     const result = await sendSingleEmail(
       recipient,

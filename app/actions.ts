@@ -13,6 +13,7 @@ import {
   OPENAI_MODEL_GPT_IMAGE_OPTIONS,
   REFERENCE_IMAGES,
   INSTAGRAM_CAPTION_PROMPT,
+  FACEBOOK_CAPTION_PROMPT,
   ACTIONS,
 } from '@/constants';
 import { db } from '@/lib/prisma';
@@ -442,7 +443,7 @@ export const getMailchimpAudienceMembers = async () => {
   throw new Error('Failed to get Mailchimp audience members');
 };
 
-export const generateRandomColoringImage = async (
+export const generateColoringImageOnly = async (
   generationType: GenerationType,
 ): Promise<Partial<ColoringImage>> => {
   const description = getRandomDescription();
@@ -461,19 +462,39 @@ export const generateRandomColoringImage = async (
     );
   }
 
-  const imageSvg = await fetchSvg(coloringImage.svgUrl as string);
-  const qrCodeSvg = await fetchSvg(coloringImage.qrCodeUrl as string);
+  return coloringImage;
+};
+
+// Separate function to send email for a specific coloring image
+export const sendColoringImageEmail = async (
+  coloringImage: Partial<ColoringImage>,
+  generationType: GenerationType,
+  customEmails?: string[],
+): Promise<void> => {
+  if (!coloringImage.svgUrl || !coloringImage.qrCodeUrl) {
+    throw new Error('Coloring image URLs are required for email sending');
+  }
+
+  const imageSvg = await fetchSvg(coloringImage.svgUrl);
+  const qrCodeSvg = await fetchSvg(coloringImage.qrCodeUrl);
 
   const pdfStream = await generatePDFNode(coloringImage, imageSvg, qrCodeSvg);
 
   // convert PDF stream to buffer
   const pdfBuffer = await streamToBuffer(pdfStream as Readable);
 
-  // get list of emails from mailchimp
-  const members = await getMailchimpAudienceMembers();
-  const emails: string[] = members.map(
-    (member: { email_address: string }) => member.email_address,
-  );
+  // use custom emails if provided, otherwise get from mailchimp
+  let emails: string[];
+
+  if (customEmails) {
+    emails = customEmails;
+  } else {
+    // get list of emails from mailchimp
+    const members = await getMailchimpAudienceMembers();
+    emails = members.map(
+      (member: { email_address: string }) => member.email_address,
+    );
+  }
 
   // send email to all emails in the list with the coloring image as an attachment pdf
   await sendEmail({
@@ -481,18 +502,7 @@ export const generateRandomColoringImage = async (
     coloringImagePdf: pdfBuffer,
     generationType,
   });
-
-  return coloringImage;
 };
-
-export const generateColoringImageOfTheDay = async () =>
-  generateRandomColoringImage(GenerationType.DAILY);
-
-export const generateColoringImageOfTheWeek = async () =>
-  generateRandomColoringImage(GenerationType.WEEKLY);
-
-export const generateColoringImageOfTheMonth = async () =>
-  generateRandomColoringImage(GenerationType.MONTHLY);
 
 export const generateInstagramCaption = async (
   coloringImage: ColoringImage,
@@ -510,6 +520,29 @@ export const generateInstagramCaption = async (
 Title: ${coloringImage.title}
 Description: ${coloringImage.description}
 Tags: ${coloringImage.tags?.join(', ')}`,
+      },
+    ],
+  });
+
+  return response.choices[0].message.content;
+};
+
+export const generateFacebookCaption = async (coloringImage: ColoringImage) => {
+  const response = await openai.chat.completions.create({
+    model: OPENAI_MODEL_GPT_4O,
+    messages: [
+      {
+        role: 'system',
+        content: FACEBOOK_CAPTION_PROMPT,
+      },
+      {
+        role: 'user',
+        content: `Generate a Facebook post for this coloring page:
+Title: ${coloringImage.title}
+Description: ${coloringImage.description}
+Tags: ${coloringImage.tags?.join(', ')}
+
+Website: https://chunkycrayon.com`,
       },
     ],
   });

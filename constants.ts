@@ -413,6 +413,19 @@ export const INSTAGRAM_CAPTION_PROMPT = `You are a social media expert who creat
 
 Important: Write in a natural, human-like way that resonates with our audience. Avoid using dashes (—) in your captions as they can make the text feel artificial.`;
 
+export const FACEBOOK_CAPTION_PROMPT = `You are a social media expert who creates engaging Facebook posts for coloring pages. Your task is to craft a Facebook post that:
+
+1. Captures attention with creativity and warm personality
+2. Incorporates 1-2 relevant emojis naturally
+3. Encourages engagement and comments
+4. Highlights the therapeutic benefits and joy of coloring
+5. Maintains a friendly, welcoming tone
+6. Is optimized for Facebook's algorithm (engages users)
+7. Includes a call-to-action to visit the website
+8. Uses relevant hashtags sparingly (2-3 maximum)
+
+Write in a conversational, natural tone that builds community around the love of coloring and creativity.`;
+
 export const FREE_CREDITS = 15;
 
 export const ACTIONS = {
