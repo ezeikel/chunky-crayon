@@ -142,7 +142,7 @@ const postToFacebookPage = async (imageUrl: string, message: string) => {
   return data.id;
 };
 
-const handleRequest = async () => {
+const handleRequest = async (request: Request) => {
   const tempFiles: string[] = [];
 
   try {
@@ -154,15 +154,43 @@ const handleRequest = async () => {
       throw new Error('social media credentials not configured');
     }
 
-    // get the most recent daily coloring image
-    const coloringImage = await db.coloringImage.findFirst({
-      where: {
-        generationType: GenerationType.DAILY,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const url = new URL(request.url);
+    let coloringImageId = url.searchParams.get('coloring_image_id');
+
+    // if POST request, also check request body
+    if (!coloringImageId && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        coloringImageId = body.coloringImageId;
+      } catch {
+        // if body parsing fails, continue with query param value
+      }
+    }
+
+    let coloringImage;
+
+    if (coloringImageId) {
+      // get specific coloring image by ID
+      coloringImage = await db.coloringImage.findUnique({
+        where: {
+          id: coloringImageId,
+        },
+      });
+
+      if (!coloringImage) {
+        throw new Error(`Coloring image with ID ${coloringImageId} not found`);
+      }
+    } else {
+      // get the most recent daily coloring image (default behavior)
+      coloringImage = await db.coloringImage.findFirst({
+        where: {
+          generationType: GenerationType.DAILY,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+    }
 
     if (!coloringImage?.svgUrl) {
       throw new Error('no recent coloring image found');
@@ -174,7 +202,7 @@ const handleRequest = async () => {
       errors: [] as string[],
     };
 
-    // Post to Instagram
+    // post to Instagram
     try {
       // convert svg to jpeg for Instagram
       const instagramBuffer = await convertSvgToJpeg(
@@ -212,7 +240,7 @@ const handleRequest = async () => {
       );
     }
 
-    // Post to Facebook
+    // post to Facebook
     try {
       // convert svg to jpeg for Facebook
       const facebookBuffer = await convertSvgToJpeg(
@@ -249,7 +277,7 @@ const handleRequest = async () => {
       );
     }
 
-    // Return results
+    // return results
     const hasSuccess = results.instagram || results.facebook;
 
     return NextResponse.json(
@@ -281,7 +309,7 @@ const handleRequest = async () => {
         .filter((fileName) => fileName)
         .map(async (fileName) => {
           try {
-            // Extract platform from filename path
+            // extract platform from filename path
             const platform = fileName.includes('instagram')
               ? 'instagram'
               : 'facebook';
