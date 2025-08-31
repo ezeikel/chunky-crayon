@@ -1,0 +1,152 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String?
+  emailVerified    DateTime?
+  image            String?
+  stripeCustomerId String? // set after Stripe customer creation
+  credits          Int       @default(15) // initial credits for new users
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  subscriptions      Subscription[]
+  creditTransactions CreditTransaction[]
+  coloringImages     ColoringImage[]
+  // Auth.js relations
+  accounts           Account[]
+  sessions           Session[]
+
+  @@map("users")
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id])
+  stripeSubscriptionId String             @unique
+  planName             PlanName
+  billingPeriod        BillingPeriod
+  status               SubscriptionStatus
+  currentPeriodEnd     DateTime
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@map("subscriptions")
+}
+
+model CreditTransaction {
+  id        String                @id @default(cuid())
+  userId    String
+  user      User                  @relation(fields: [userId], references: [id])
+  amount    Int // positive for credit, negative for usage
+  type      CreditTransactionType
+  reference String? // Stripe payment intent, etc.
+  createdAt DateTime              @default(now())
+
+  @@map("credit_transactions")
+}
+
+model ColoringImage {
+  id             String         @id @default(cuid())
+  title          String
+  description    String
+  alt            String
+  url            String?
+  svgUrl         String?
+  qrCodeUrl      String?
+  tags           String[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  generationType GenerationType @default(USER)
+  User           User?          @relation(fields: [userId], references: [id])
+  userId         String?
+
+  @@map("coloring_images")
+}
+
+// Auth.js models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum GenerationType {
+  USER
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum PlanName {
+  CRAYON
+  RAINBOW
+  MASTERPIECE
+  STUDIO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  INCOMPLETE
+  PAST_DUE
+  UNPAID
+  TRIALING
+}
+
+enum CreditTransactionType {
+  PURCHASE // user bought credits (one-off or via subscription)
+  GENERATION // user spent credits to generate an image
+  BONUS // user received bonus credits (promo, referral, etc.)
+  REFUND // credits refunded to user
+  ADJUSTMENT // manual admin adjustment
+}
+
+enum BillingPeriod {
+  MONTHLY
+  ANNUAL
+}
