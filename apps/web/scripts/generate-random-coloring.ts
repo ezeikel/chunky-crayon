@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { GenerationType } from '@prisma/client';
+import { GenerationType } from '@chunky-crayon/db';
 import { Readable } from 'stream';
 import {
   createColoringImage,

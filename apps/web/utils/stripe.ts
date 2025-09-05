@@ -1,4 +1,8 @@
-import { PlanName, SubscriptionStatus, BillingPeriod } from '@prisma/client';
+import {
+  PlanName,
+  SubscriptionStatus,
+  BillingPeriod,
+} from '@chunky-crayon/db/types';
 
 type PriceMapping = {
   planName: PlanName;

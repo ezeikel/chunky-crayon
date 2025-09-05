@@ -4,7 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import AppleProvider from 'next-auth/providers/apple';
 import Resend from 'next-auth/providers/resend';
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import { db } from './lib/prisma';
+import { db } from '@chunky-crayon/db';
 
 type AppleProfile = Profile & {
   user?: {

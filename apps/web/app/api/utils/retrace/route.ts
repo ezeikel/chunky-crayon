@@ -1,5 +1,5 @@
 import { checkSvgImage, retraceImage } from '@/utils/traceImage';
-import { db } from '@/lib/prisma';
+import { db } from '@chunky-crayon/db';
 
 export const POST = async (req: Request) => {
   const { id } = await req.json();

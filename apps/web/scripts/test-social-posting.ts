@@ -1,8 +1,8 @@
 #!/usr/bin/env tsx
 
 import { config } from 'dotenv';
-import { GenerationType } from '@prisma/client';
-import { db } from '@/lib/prisma';
+import { GenerationType } from '@chunky-crayon/db';
+import { db } from '@chunky-crayon/db';
 
 // Load environment variables from .env.local
 config({ path: '.env.local' });

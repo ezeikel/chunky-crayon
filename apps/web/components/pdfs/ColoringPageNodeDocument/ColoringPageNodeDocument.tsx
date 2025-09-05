@@ -9,7 +9,7 @@ import {
   Font,
 } from '@react-pdf/renderer';
 import SvgToReactPdf from '@/components/SvgToReactPdf/SvgToReactPdf';
-import { ColoringImage } from '@prisma/client';
+import { ColoringImage } from '@chunky-crayon/db/types';
 
 Font.register({
   family: 'Tondo Bold',

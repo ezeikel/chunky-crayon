@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth';
 import { ACTIONS } from '@/constants';
-import { db, Prisma } from '@/lib/prisma';
+import { db, Prisma } from '@chunky-crayon/db';
 
 export const getUserId = async (action?: string) => {
   const session = await auth();

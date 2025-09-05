@@ -2,13 +2,13 @@
 
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { db } from '@/lib/prisma';
+import { db } from '@chunky-crayon/db';
 import { stripe } from '@/lib/stripe';
 import {
   PlanName,
   SubscriptionStatus,
   CreditTransactionType,
-} from '@prisma/client';
+} from '@chunky-crayon/db';
 import {
   calculateDaysRemaining,
   calculateProratedCredits,

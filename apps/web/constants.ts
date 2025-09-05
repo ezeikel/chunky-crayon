@@ -1,4 +1,4 @@
-import { PlanName, BillingPeriod } from '@prisma/client';
+import { PlanName, BillingPeriod } from '@chunky-crayon/db/types';
 import {
   faInstagram,
   faThreads,

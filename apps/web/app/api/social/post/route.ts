@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { GenerationType } from '@prisma/client';
+import { GenerationType } from '@chunky-crayon/db';
 import sharp from 'sharp';
 import { put, del } from '@vercel/blob';
-import { db } from '@/lib/prisma';
+import { db } from '@chunky-crayon/db';
 import {
   generateInstagramCaption,
   generateFacebookCaption,

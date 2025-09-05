@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { ColoringImage } from '@prisma/client';
+import { ColoringImage } from '@chunky-crayon/db/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileArrowDown } from '@fortawesome/pro-regular-svg-icons';
 import { usePDF } from '@react-pdf/renderer';

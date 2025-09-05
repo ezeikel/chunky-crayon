@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { GenerationType } from '@prisma/client';
+import { GenerationType } from '@chunky-crayon/db';
 import nodemailer from 'nodemailer';
 
 const isDevelopment = process.env.NODE_ENV === 'development';

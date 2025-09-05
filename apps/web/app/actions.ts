@@ -16,12 +16,12 @@ import {
   FACEBOOK_CAPTION_PROMPT,
   ACTIONS,
 } from '@/constants';
-import { db } from '@/lib/prisma';
 import {
+  db,
   ColoringImage,
   GenerationType,
   CreditTransactionType,
-} from '@prisma/client';
+} from '@chunky-crayon/db';
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
 import generatePDFNode from '@/utils/generatePDFNode';
 import streamToBuffer from '@/utils/streamToBuffer';

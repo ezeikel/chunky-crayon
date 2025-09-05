@@ -20,7 +20,7 @@ import {
   createCustomerPortalSession,
 } from '@/app/actions/stripe';
 import { format } from 'date-fns';
-import { PlanName, Prisma } from '@prisma/client';
+import { PlanName, Prisma } from '@chunky-crayon/db/types';
 import formatNumber from '@/utils/formatNumber';
 
 // make sure to call `loadStripe` outside of a component's render to avoid

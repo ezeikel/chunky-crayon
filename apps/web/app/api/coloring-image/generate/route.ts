@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GenerationType } from '@prisma/client';
+import { GenerationType } from '@chunky-crayon/db';
 import { generateColoringImageOnly } from '@/app/actions';
 
 export const dynamic = 'force-dynamic';

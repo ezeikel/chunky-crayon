@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getCurrentUser } from '@/app/actions/user';
 import { useRouter } from 'next/navigation';
-import { SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@chunky-crayon/db/types';
 
 type User = {
   id: string;

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { GenerationType } from '@prisma/client';
+import { GenerationType } from '@chunky-crayon/db';
 import { sendColoringImageEmail } from '@/app/actions';
-import { db } from '@/lib/prisma';
+import { db } from '@chunky-crayon/db';
 
 export const dynamic = 'force-dynamic';
 

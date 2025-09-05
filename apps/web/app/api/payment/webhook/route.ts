@@ -1,12 +1,12 @@
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { db } from '@/lib/prisma';
+import { db } from '@chunky-crayon/db';
 import {
   SubscriptionStatus,
   CreditTransactionType,
   Subscription,
-} from '@prisma/client';
+} from '@chunky-crayon/db';
 import { stripe } from '@/lib/stripe';
 import {
   mapStripeStatusToSubscriptionStatus,

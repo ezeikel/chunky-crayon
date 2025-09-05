@@ -1,5 +1,5 @@
 import ReactPDF from '@react-pdf/renderer';
-import { ColoringImage } from '@prisma/client';
+import { ColoringImage } from '@chunky-crayon/db';
 import ColoringPageNodeDocument from '@/components/pdfs/ColoringPageNodeDocument/ColoringPageNodeDocument';
 
 const generatePDFNode = async (

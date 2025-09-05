@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { User } from '@prisma/client';
+import { User } from '@chunky-crayon/db/types';
 import {
   faCoins,
   faCreditCard,

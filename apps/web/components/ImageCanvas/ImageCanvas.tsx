@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { ColoringImage } from '@prisma/client';
+import { ColoringImage } from '@chunky-crayon/db/types';
 import { useColoringContext } from '@/contexts/coloring';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics';
