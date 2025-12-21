@@ -1,16 +1,16 @@
 import { put } from '@vercel/blob';
 import { chromium } from 'playwright';
 import chromiumPkg from '@sparticuz/chromium';
-import OpenAI from 'openai';
-import { z } from 'zod';
-import { zodResponseFormat } from 'openai/helpers/zod';
 import sharp from 'sharp';
 import potrace from 'oslllo-potrace';
 import * as Sentry from '@sentry/nextjs';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import {
+  generateObject,
+  models,
+  svgValidationSchema,
+  CHECK_SVG_IMAGE_SYSTEM,
+  CHECK_SVG_IMAGE_PROMPT,
+} from '@/lib/ai';
 
 type CheckSvgImageResult = {
   isValid: boolean;
@@ -67,40 +67,28 @@ export const checkSvgImage = async (
   const dataUrl = `data:image/png;base64,${base64Screenshot}`;
 
   // check if traced image is blank
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    response_format: zodResponseFormat(
-      z.object({
-        hasBlackLeftWhiteRight: z.boolean(),
-      }),
-      'hasBlackLeftWhiteRight',
-    ),
+  const { object } = await generateObject({
+    model: models.text,
+    schema: svgValidationSchema,
+    system: CHECK_SVG_IMAGE_SYSTEM,
     messages: [
-      {
-        role: 'system',
-        content: `You are a helpful assistant that analyzes images. You check if an image shows a solid black area on the left side and a white strip on the right side.`,
-      },
       {
         role: 'user',
         content: [
           {
             type: 'text',
-            text: 'Does this image show a solid black area on the left and a white strip on the right? Return true if yes, false otherwise.',
+            text: CHECK_SVG_IMAGE_PROMPT,
           },
           {
-            type: 'image_url',
-            image_url: {
-              url: dataUrl,
-            },
+            type: 'image',
+            image: dataUrl,
           },
         ],
       },
     ],
   });
 
-  const { hasBlackLeftWhiteRight } = JSON.parse(
-    response.choices[0].message.content as string,
-  );
+  const { hasBlackLeftWhiteRight } = object;
 
   const isValid = !hasBlackLeftWhiteRight;
 

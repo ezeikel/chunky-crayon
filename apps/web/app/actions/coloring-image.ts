@@ -3,15 +3,21 @@
 import { put, del } from '@vercel/blob';
 import { revalidatePath, cacheLife, cacheTag } from 'next/cache';
 import { after } from 'next/server';
-import OpenAI from 'openai';
 import QRCode from 'qrcode';
 import sharp from 'sharp';
 import {
-  OPENAI_MODEL_GPT_4O,
-  OPENAI_MODEL_GPT_IMAGE_OPTIONS,
-  REFERENCE_IMAGES,
-  ACTIONS,
-} from '@/constants';
+  generateText,
+  generateObject,
+  experimental_generateImage,
+  models,
+  IMAGE_DEFAULTS,
+  createColoringImagePromptDetailed,
+  CLEAN_UP_DESCRIPTION_SYSTEM,
+  IMAGE_METADATA_SYSTEM,
+  IMAGE_METADATA_PROMPT,
+  imageMetadataSchema,
+} from '@/lib/ai';
+import { ACTIONS } from '@/constants';
 import {
   db,
   ColoringImage,
@@ -24,27 +30,25 @@ import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 // generate coloring image from openai based on text/audio/image description
 const generateColoringImage = async (description: string) => {
-  const response = await openai.images.generate({
-    ...OPENAI_MODEL_GPT_IMAGE_OPTIONS,
-    prompt: `${description}. The image should be in cartoon style with thick lines, low detail, no color, no shading, and no fill. Only black lines should be used. Ensure no extraneous elements such as additional shapes or artifacts are included. Refer to the style of the provided reference images: ${REFERENCE_IMAGES.join(', ')}`,
+  const { image } = await experimental_generateImage({
+    model: models.image,
+    prompt: createColoringImagePromptDetailed(description),
+    size: IMAGE_DEFAULTS.size,
+    providerOptions: {
+      openai: {
+        quality: IMAGE_DEFAULTS.quality,
+      },
+    },
   });
 
   // DEBUG:
   // eslint-disable-next-line no-console
-  console.log('generateColoringImage response', response);
-
-  const { b64_json: base64Image } = (
-    response.data as { b64_json: string }[]
-  )[0];
+  console.log('generateColoringImage response', image);
 
   // convert base64 to buffer for storage
-  const imageBuffer = Buffer.from(base64Image, 'base64');
+  const imageBuffer = Buffer.from(image.base64, 'base64');
 
   // generate a unique temporary filename
   const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
@@ -67,26 +71,13 @@ const generateColoringImage = async (description: string) => {
 
 // generate an appropriate prompt for the coloring image
 const cleanUpDescription = async (roughUserDescription: string) => {
-  const response = await openai.chat.completions.create({
-    model: OPENAI_MODEL_GPT_4O,
-    messages: [
-      {
-        role: 'system',
-        content: `You are an assistant that helps clean up and simplify user descriptions for generating coloring book images for children. Ensure the description is suitable for a cartoon-style image with thick lines, low detail, no color, no shading, and no fill. Only black lines should be used. The target age is 3-8 years old. If the user's description does not include a scene or background, add an appropriate one. Consider the attached reference images: ${REFERENCE_IMAGES.join(', ')}. Do not include any extraneous elements in the description.`,
-      },
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: roughUserDescription,
-          },
-        ],
-      },
-    ],
+  const { text } = await generateText({
+    model: models.text,
+    system: CLEAN_UP_DESCRIPTION_SYSTEM,
+    prompt: roughUserDescription,
   });
 
-  return response.choices[0].message.content;
+  return text;
 };
 
 type CreateColoringImageResult =
@@ -122,50 +113,38 @@ const generateColoringImageWithMetadata = async (
     throw new Error('Failed to generate an acceptable image');
   }
 
-  const generateImageMetadataResponse = await openai.chat.completions.create({
-    model: OPENAI_MODEL_GPT_4O,
-    response_format: { type: 'json_object' },
+  const { object: imageMetadata } = await generateObject({
+    model: models.text,
+    schema: imageMetadataSchema,
+    system: IMAGE_METADATA_SYSTEM,
     messages: [
-      {
-        role: 'system',
-        content: `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.`,
-      },
       {
         role: 'user',
         content: [
           {
             type: 'text',
-            text: `Generate a JSON object with properties "title", "description", "alt" and "tags" for the generated image based on the following image:`,
+            text: IMAGE_METADATA_PROMPT,
           },
           {
-            type: 'image_url',
-            image_url: {
-              url: imageUrl,
-            },
+            type: 'image',
+            image: new URL(imageUrl),
           },
         ],
       },
     ],
   });
 
-  const generateImageMetadataResponseContent = JSON.parse(
-    generateImageMetadataResponse.choices[0].message.content as string,
-  );
-
   // DEBUG:
   // eslint-disable-next-line no-console
-  console.log(
-    'generateImageMetadataResponseContent',
-    generateImageMetadataResponseContent,
-  );
+  console.log('imageMetadata', imageMetadata);
 
   // create new coloringImage in db
   const coloringImage = await db.coloringImage.create({
     data: {
-      title: generateImageMetadataResponseContent.title,
-      description: generateImageMetadataResponseContent.description,
-      alt: generateImageMetadataResponseContent.alt,
-      tags: generateImageMetadataResponseContent.tags,
+      title: imageMetadata.title,
+      description: imageMetadata.description,
+      alt: imageMetadata.alt,
+      tags: imageMetadata.tags,
       generationType: generationType || GenerationType.USER,
       userId,
     },
