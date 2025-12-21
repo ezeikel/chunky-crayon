@@ -2,12 +2,12 @@
 
 import { SessionProvider } from 'next-auth/react';
 import { ColoringContextProvider } from '@/contexts/coloring';
-import PostHogIdentify from '@/components/PostHogIdentify/PostHogIdentify';
+import UserIdentify from '@/components/UserIdentify/UserIdentify';
 
 const Providers = ({ children }: { children: React.ReactNode }) => (
   <ColoringContextProvider>
     <SessionProvider>
-      <PostHogIdentify />
+      <UserIdentify />
       {children}
     </SessionProvider>
   </ColoringContextProvider>

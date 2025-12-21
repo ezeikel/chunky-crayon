@@ -2,13 +2,14 @@
 
 import { useSession } from 'next-auth/react';
 import posthog from 'posthog-js';
+import * as Sentry from '@sentry/nextjs';
 import { useRef } from 'react';
 
 /**
- * PostHogIdentify component - Identifies users in PostHog when they are authenticated.
+ * UserIdentify component - Identifies users in PostHog and Sentry when authenticated.
  * This component should be rendered inside the SessionProvider.
  */
-const PostHogIdentify = () => {
+const UserIdentify = () => {
   const { data: session, status } = useSession();
   const hasIdentified = useRef(false);
 
@@ -16,21 +17,32 @@ const PostHogIdentify = () => {
   if (status === 'authenticated' && session?.user && !hasIdentified.current) {
     const userId = session.user.email || session.user.id;
     if (userId) {
+      // Identify in PostHog
       posthog.identify(userId, {
         email: session.user.email,
         name: session.user.name,
       });
+
+      // Identify in Sentry
+      Sentry.setUser({
+        id: session.user.id,
+        email: session.user.email ?? undefined,
+        username: session.user.name ?? undefined,
+      });
+
       hasIdentified.current = true;
     }
   }
 
-  // Reset the identification flag when user logs out
+  // Reset identification when user logs out
   if (status === 'unauthenticated' && hasIdentified.current) {
     posthog.reset();
+    Sentry.setUser(null);
     hasIdentified.current = false;
   }
 
   return null;
 };
 
-export default PostHogIdentify;
+// Keep the old export name for backwards compatibility
+export default UserIdentify;
