@@ -6,11 +6,9 @@ import { db } from '@chunky-crayon/db';
 import {
   generateInstagramCaption,
   generateFacebookCaption,
-} from '@/app/actions';
+} from '@/app/actions/social';
 
 export const maxDuration = 150;
-
-export const dynamic = 'force-dynamic';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

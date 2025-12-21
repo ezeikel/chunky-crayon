@@ -1,4 +1,4 @@
-import { joinColoringPageEmailList } from '@/app/actions';
+import { joinColoringPageEmailList } from '@/app/actions/email';
 
 export const POST = async (request: Request) => {
   const { email } = await request.json();

@@ -10,7 +10,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -32,7 +32,8 @@
     "test/jest.common.ts",
     "test/jest.setup.ts",
     "./test/jest.client.ts",
-    "app/.well-known/vercel/flags/route.ts"
+    "app/.well-known/vercel/flags/route.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

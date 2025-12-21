@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/pro-regular-svg-icons';
-import { signOutAction } from '@/app/actions';
+import { signOutAction } from '@/app/actions/auth';
 import cn from '@/lib/utils';
 import type { MobileNavItem } from './Header';
 

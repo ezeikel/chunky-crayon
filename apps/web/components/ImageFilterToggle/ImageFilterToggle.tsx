@@ -15,9 +15,13 @@ import useUser from '@/hooks/useUser';
 
 type ImageFilterToggleProps = {
   className?: string;
+  showAuthButtons?: boolean;
 };
 
-const ImageFilterToggle = ({ className }: ImageFilterToggleProps) => {
+const ImageFilterToggle = ({
+  className,
+  showAuthButtons = false,
+}: ImageFilterToggleProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const show = searchParams.get('show') || 'all';
@@ -29,7 +33,8 @@ const ImageFilterToggle = ({ className }: ImageFilterToggleProps) => {
     router.push(`?${params.toString()}`);
   };
 
-  if (!user) {
+  // Only show if user is logged in AND flag is enabled
+  if (!user || !showAuthButtons) {
     return null;
   }
 

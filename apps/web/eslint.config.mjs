@@ -1,3 +1,6 @@
+import next from "eslint-config-next";
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import nextTypescript from "eslint-config-next/typescript";
 import path from 'node:path';
 
 import { includeIgnoreFile } from '@eslint/compat';
@@ -94,6 +97,9 @@ const prettierConfig = [
 ];
 
 export default [
+  ...next,
+  ...nextCoreWebVitals,
+  ...nextTypescript,
   // ignore .gitignore files/folder in eslint
   includeIgnoreFile(gitignorePath),
   // javascript config
@@ -104,4 +110,7 @@ export default [
   ...typescriptConfig,
   // prettier config
   ...prettierConfig,
+  {
+    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"]
+  }
 ];

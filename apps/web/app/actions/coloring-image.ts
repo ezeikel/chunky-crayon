@@ -1,19 +1,15 @@
 'use server';
 
 import { put, del } from '@vercel/blob';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, cacheLife, cacheTag } from 'next/cache';
 import { after } from 'next/server';
 import OpenAI from 'openai';
 import QRCode from 'qrcode';
 import sharp from 'sharp';
-import mailchimp from '@mailchimp/mailchimp_marketing';
-import { Readable } from 'stream';
 import {
   OPENAI_MODEL_GPT_4O,
   OPENAI_MODEL_GPT_IMAGE_OPTIONS,
   REFERENCE_IMAGES,
-  INSTAGRAM_CAPTION_PROMPT,
-  FACEBOOK_CAPTION_PROMPT,
   ACTIONS,
 } from '@/constants';
 import {
@@ -23,22 +19,13 @@ import {
   CreditTransactionType,
 } from '@chunky-crayon/db';
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
-import generatePDFNode from '@/utils/generatePDFNode';
-import streamToBuffer from '@/utils/streamToBuffer';
-import fetchSvg from '@/utils/fetchSvg';
-import { sendEmail } from '@/utils/email';
 import { showAuthButtonsFlag } from '@/flags';
+import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
-import { signOut } from '@/auth';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
-
-mailchimp.setConfig({
-  apiKey: process.env.MAILCHIMP_API_KEY,
-  server: process.env.MAILCHIMP_API_SERVER,
 });
 
 // generate coloring image from openai based on text/audio/image description
@@ -348,10 +335,17 @@ export const createColoringImage = async (
   return result;
 };
 
-export const getColoringImage = async (
+// Base cached function for fetching a coloring image by ID
+export const getColoringImageBase = async (
   id: string,
-): Promise<Partial<ColoringImage> | null> =>
-  db.coloringImage.findUnique({
+): Promise<Partial<ColoringImage> | null> => {
+  'use cache';
+
+  // The id parameter is serializable and becomes part of the cache key
+  cacheLife('max');
+  cacheTag('coloring-image', `coloring-image-${id}`);
+
+  return db.coloringImage.findUnique({
     where: {
       id,
     },
@@ -366,11 +360,38 @@ export const getColoringImage = async (
       qrCodeUrl: true,
     },
   });
+};
 
-const getAllColoringImagesBase = async (show = 'all', userId?: string) =>
-  db.coloringImage.findMany({
+// Wrapper for page components that receive params as Promise
+export const getColoringImage = async (
+  params: Promise<{ id: string }>,
+): Promise<Partial<ColoringImage> | null> => {
+  const { id } = await params;
+  return getColoringImageBase(id);
+};
+
+// Export for components that have a plain string ID
+export const getColoringImageById = async (
+  id: string,
+): Promise<Partial<ColoringImage> | null> => {
+  return getColoringImageBase(id);
+};
+
+const getAllColoringImagesBase = async (show = 'all', userId?: string) => {
+  'use cache';
+  cacheLife('max');
+  cacheTag('all-coloring-images');
+
+  return db.coloringImage.findMany({
     where: {
-      OR: [{ userId }, ...(show === 'all' ? [{ userId: null }] : [])],
+      OR:
+        show === 'all'
+          ? userId
+            ? [{ userId }, { userId: null }]
+            : [{ userId: null }]
+          : userId
+            ? [{ userId }]
+            : [{ id: { in: [] } }], // Empty result if filtering by user but no userId
     },
     select: {
       id: true,
@@ -383,64 +404,22 @@ const getAllColoringImagesBase = async (show = 'all', userId?: string) =>
       createdAt: 'desc',
     },
   });
+};
 
-export const getAllColoringImages = async (show = 'all') => {
+export const getAllColoringImages = async (
+  searchParams: Promise<ColoringImageSearchParams>,
+) => {
+  const { show = 'all' } = await searchParams;
+
   const userId = await getUserId(ACTIONS.GET_ALL_COLORING_IMAGES);
   return getAllColoringImagesBase(show, userId || undefined);
 };
 
-export const getAllColoringImagesStatic = async (show = 'all') =>
-  getAllColoringImagesBase(show);
-
-type JoinColoringPageEmailListState = {
-  success: boolean;
-  error?: unknown;
-  email?: string;
-};
-
-export const joinColoringPageEmailList = async (
-  previousState: JoinColoringPageEmailListState,
-  formData: FormData,
-): Promise<JoinColoringPageEmailListState> => {
-  const rawFormData = {
-    email: (formData.get('email') as string) || '',
-  };
-
-  try {
-    await mailchimp.lists.addListMember(
-      // process.env.MAILCHIMP_AUDIENCE_ID as string,
-      '52c8855495',
-      {
-        email_address: rawFormData.email,
-        status: 'subscribed',
-      },
-    );
-
-    return {
-      success: true,
-      email: rawFormData.email,
-    };
-  } catch (error) {
-    console.error({ mailchimpError: error });
-
-    return {
-      error: 'Failed to add email to mailchimp list',
-      success: false,
-    };
-  }
-};
-
-export const getMailchimpAudienceMembers = async () => {
-  const response = await mailchimp.lists.getListMembersInfo(
-    // process.env.MAILCHIMP_AUDIENCE_ID as string,
-    '52c8855495',
-  );
-
-  if ('members' in response) {
-    return response.members;
-  }
-
-  throw new Error('Failed to get Mailchimp audience members');
+// Static version for generateStaticParams - no user context needed
+export const getAllColoringImagesStatic = async () => {
+  // Return all public images for static generation
+  // No userId needed since this runs at build time
+  return getAllColoringImagesBase('all', undefined);
 };
 
 export const generateColoringImageOnly = async (
@@ -463,93 +442,4 @@ export const generateColoringImageOnly = async (
   }
 
   return coloringImage;
-};
-
-// Separate function to send email for a specific coloring image
-export const sendColoringImageEmail = async (
-  coloringImage: Partial<ColoringImage>,
-  generationType: GenerationType,
-  customEmails?: string[],
-): Promise<void> => {
-  if (!coloringImage.svgUrl || !coloringImage.qrCodeUrl) {
-    throw new Error('Coloring image URLs are required for email sending');
-  }
-
-  const imageSvg = await fetchSvg(coloringImage.svgUrl);
-  const qrCodeSvg = await fetchSvg(coloringImage.qrCodeUrl);
-
-  const pdfStream = await generatePDFNode(coloringImage, imageSvg, qrCodeSvg);
-
-  // convert PDF stream to buffer
-  const pdfBuffer = await streamToBuffer(pdfStream as Readable);
-
-  // use custom emails if provided, otherwise get from mailchimp
-  let emails: string[];
-
-  if (customEmails) {
-    emails = customEmails;
-  } else {
-    // get list of emails from mailchimp
-    const members = await getMailchimpAudienceMembers();
-    emails = members.map(
-      (member: { email_address: string }) => member.email_address,
-    );
-  }
-
-  // send email to all emails in the list with the coloring image as an attachment pdf
-  await sendEmail({
-    to: emails,
-    coloringImagePdf: pdfBuffer,
-    generationType,
-  });
-};
-
-export const generateInstagramCaption = async (
-  coloringImage: ColoringImage,
-) => {
-  const response = await openai.chat.completions.create({
-    model: OPENAI_MODEL_GPT_4O,
-    messages: [
-      {
-        role: 'system',
-        content: INSTAGRAM_CAPTION_PROMPT,
-      },
-      {
-        role: 'user',
-        content: `Generate an Instagram caption for this coloring page:
-Title: ${coloringImage.title}
-Description: ${coloringImage.description}
-Tags: ${coloringImage.tags?.join(', ')}`,
-      },
-    ],
-  });
-
-  return response.choices[0].message.content;
-};
-
-export const generateFacebookCaption = async (coloringImage: ColoringImage) => {
-  const response = await openai.chat.completions.create({
-    model: OPENAI_MODEL_GPT_4O,
-    messages: [
-      {
-        role: 'system',
-        content: FACEBOOK_CAPTION_PROMPT,
-      },
-      {
-        role: 'user',
-        content: `Generate a Facebook post for this coloring page:
-Title: ${coloringImage.title}
-Description: ${coloringImage.description}
-Tags: ${coloringImage.tags?.join(', ')}
-
-Website: https://chunkycrayon.com`,
-      },
-    ],
-  });
-
-  return response.choices[0].message.content;
-};
-
-export const signOutAction = async () => {
-  await signOut();
 };

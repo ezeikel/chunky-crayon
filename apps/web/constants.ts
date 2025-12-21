@@ -622,7 +622,7 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
   ],
 };
 
-export const STRIPE_API_VERSION = '2025-04-30.basil';
+export const STRIPE_API_VERSION = '2025-08-27.basil';
 
 export type CreditPack = {
   key: keyof typeof CREDIT_PACK_AMOUNTS;

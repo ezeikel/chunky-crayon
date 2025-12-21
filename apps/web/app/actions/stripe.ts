@@ -19,6 +19,24 @@ import { PLAN_CREDITS } from '@/constants';
 import Stripe from 'stripe';
 import { getUserId } from './user';
 
+// Cacheable Stripe functions that don't require headers/cookies
+// These can be used in cached pages without causing prerendering issues
+export const getStripeSession = async (sessionId: string) => {
+  'use cache';
+
+  if (!sessionId) return null;
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    return {
+      amount_total: session.amount_total,
+      currency: session.currency,
+    };
+  } catch (error) {
+    console.error('Error fetching Stripe session:', error);
+    return null;
+  }
+};
+
 export const createCheckoutSession = async (
   priceId: string,
   mode: 'payment' | 'subscription',
@@ -308,20 +326,6 @@ export const changeSubscription = async ({
     };
   } catch (error) {
     console.error('Error updating subscription:', error);
-    return null;
-  }
-};
-
-export const getStripeSession = async (sessionId: string) => {
-  if (!sessionId) return null;
-  try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-    return {
-      amount_total: session.amount_total,
-      currency: session.currency,
-    };
-  } catch (error) {
-    console.error('Error fetching Stripe session:', error);
     return null;
   }
 };

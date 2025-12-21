@@ -1,14 +1,11 @@
-import { getColoringImage } from '@/app/actions';
+import { getColoringImage } from '@/app/data/coloring-image';
 
 export const GET = async (
   request: Request,
   props: { params: Promise<{ id: string }> },
 ) => {
-  const params = await props.params;
-  const { id } = params;
-
   return Response.json(
-    { coloringImage: await getColoringImage(id) },
+    { coloringImage: await getColoringImage(props.params) },
     {
       headers: {
         'Access-Control-Allow-Origin': '*',

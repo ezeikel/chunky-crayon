@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import SubmitButton from '@/components/buttons/SubmitButton/SubmitButton';
 import cn from '@/utils/cn';
 import { Input } from '@/components/ui/input';
-import { joinColoringPageEmailList } from '@/app/actions';
+import { joinColoringPageEmailList } from '@/app/actions/email';
 import { trackEvent } from '@/utils/analytics';
 import { ANALYTICS_EVENTS } from '@/constants';
 

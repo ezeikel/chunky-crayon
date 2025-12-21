@@ -1,4 +1,9 @@
-import { getAllColoringImagesStatic, getColoringImage } from '@/app/actions';
+// import { Metadata } from 'next'; // TODO: Re-enable when generateMetadata is restored
+import { notFound } from 'next/navigation';
+import {
+  getColoringImageById,
+  getAllColoringImagesStatic,
+} from '@/app/data/coloring-image';
 import ColorPalette from '@/components/ColorPalette/ColorPalette';
 import ImageCanvas from '@/components/ImageCanvas/ImageCanvas';
 import PageWrap from '@/components/PageWrap/PageWrap';
@@ -10,30 +15,35 @@ type ColoringImagePageProps = {
   }>;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const experimental_ppr = true;
-
+// Static generation - all coloring image pages are pre-rendered at build time
+// Uses WebSocket connections to Neon (not HTTP fetch) which works with prerender
 export const generateStaticParams = async () => {
   const images = await getAllColoringImagesStatic();
 
   return images.map((image) => ({
-    params: {
-      id: image.id,
-    },
+    id: image.id,
   }));
 };
 
-// revalidate every hour
-export const revalidate = 3600;
+// TODO: Re-enable generateMetadata once Sentry issue is resolved
+// Issue: https://github.com/getsentry/sentry-javascript/issues/18392
+// generateMetadata breaks cacheComponents when using Turbopack with Sentry
+/*
+export const generateMetadata = async ({ params }: ColoringImagePageProps): Promise<Metadata | null> => {
+  // const coloringImage = await getColoringImage(params);
 
-export const generateMetadata = async (props: ColoringImagePageProps) => {
-  const params = await props.params;
-  const { id } = params;
-  const coloringImage = await getColoringImage(id);
+  // if (!coloringImage) {
+  //   return null;
+  // }
 
-  if (!coloringImage) {
-    return null;
-  }
+  // dummy coloring image data
+  const coloringImage = {
+    title: 'Coloring Image',
+    description: 'A coloring image',
+    tags: ['coloring', 'image'],
+    url: 'https://chunkycrayon.com/images/og-image.jpg',
+    alt: 'Coloring Image',
+  };
 
   const title = `${coloringImage.title} - Chunky Crayon`;
   const description =
@@ -81,25 +91,24 @@ export const generateMetadata = async (props: ColoringImagePageProps) => {
     },
   };
 };
+*/
 
-const ColoringImagePage = async (props: ColoringImagePageProps) => {
-  const { params } = props;
+const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
   const { id } = await params;
-
-  const coloringImage = await getColoringImage(id);
+  const coloringImage = await getColoringImageById(id);
 
   if (!coloringImage) {
-    return null;
+    notFound();
   }
 
   return (
-    <PageWrap className='bg-gradient-to-br from-[#FFF2E6] to-[#FFE6CC]" justify-center items-center gap-y-32'>
+    <PageWrap className="bg-gradient-to-br from-[#FFF2E6] to-[#FFE6CC] flex justify-center items-center gap-y-32">
       <div className="max-w-3xl w-full p-8 bg-[#FF8A65] rounded-lg shadow-lg">
         <div className="flex flex-col items-center text-center mb-8">
           <h1 className="font-dyna-puff text-5xl font-bold mb-2 text-white">
             {coloringImage.title}
           </h1>
-          <div className="flex items-center gap-x-2 text-lg text-white font-mediu">
+          <div className="flex items-center gap-x-2 text-lg text-white font-medium">
             by Chunky Crayon
           </div>
         </div>

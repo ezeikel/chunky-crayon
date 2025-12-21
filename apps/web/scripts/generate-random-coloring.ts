@@ -2,10 +2,8 @@
 
 import { GenerationType } from '@chunky-crayon/db';
 import { Readable } from 'stream';
-import {
-  createColoringImage,
-  getMailchimpAudienceMembers,
-} from '@/app/actions';
+import { createColoringImage } from '@/app/actions/coloring-image';
+import { getMailchimpAudienceMembers } from '@/app/actions/email';
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
 import fetchSvg from '@/utils/fetchSvg';
 import generatePDFNode from '@/utils/generatePDFNode';

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
-import { generateColoringImageOnly } from '@/app/actions';
-
-export const dynamic = 'force-dynamic';
+import { generateColoringImageOnly } from '@/app/actions/coloring-image';
 
 export const maxDuration = 150;
 

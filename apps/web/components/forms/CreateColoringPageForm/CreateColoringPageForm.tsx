@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { createColoringImage } from '@/app/actions';
+import { createColoringImage } from '@/app/actions/coloring-image';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics';
 import { ANALYTICS_EVENTS } from '@/constants';

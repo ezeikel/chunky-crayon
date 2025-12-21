@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAllTokens } from '@/lib/social-tokens';
+import { connection } from 'next/server';
 
 export const maxDuration = 60;
 
 export const GET = async (request: NextRequest) => {
+  await connection();
+
   try {
     // Basic auth check using CRON_SECRET as admin token
     const authHeader = request.headers.get('authorization');

@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
-import { sendColoringImageEmail } from '@/app/actions';
+import { sendColoringImageEmail } from '@/app/actions/email';
 import { db } from '@chunky-crayon/db';
-
-export const dynamic = 'force-dynamic';
 
 export const maxDuration = 150;
 

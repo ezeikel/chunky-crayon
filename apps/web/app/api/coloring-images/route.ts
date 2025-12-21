@@ -1,10 +1,11 @@
-import { getAllColoringImages, createColoringImage } from '@/app/actions';
+import { getAllColoringImagesStatic } from '@/app/data/coloring-image';
+import { createColoringImage } from '@/app/actions/coloring-image';
 
 export const maxDuration = 150;
 
 export const GET = async () =>
   Response.json(
-    { coloringImages: await getAllColoringImages() },
+    { coloringImages: await getAllColoringImagesStatic() },
     {
       headers: {
         'Access-Control-Allow-Origin': '*',

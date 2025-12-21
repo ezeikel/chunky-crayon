@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-import { ColoringImage } from '@chunky-crayon/db/types';
 import {
   Document,
   Page,
@@ -10,7 +8,6 @@ import {
   Font,
 } from '@react-pdf/renderer';
 import SvgToReactPdf from '@/components/SvgToReactPdf/SvgToReactPdf';
-import fetchSvg from '@/utils/fetchSvg';
 
 Font.register({
   family: 'Tondo Bold',
@@ -67,39 +64,20 @@ const styles = StyleSheet.create({
   },
 });
 
+// IMPORTANT: This component must NOT use React hooks (useState, useEffect, etc.)
+// @react-pdf/renderer uses its own React reconciler which doesn't support hooks.
+// All data must be passed as props from the parent component.
 type ColoringPageDocumentProps = {
-  coloringImage: Partial<ColoringImage>;
+  imageSvg: string;
+  qrCodeSvg: string;
+  coloringImageId: string;
 };
 
-const ColoringPageDocument = ({ coloringImage }: ColoringPageDocumentProps) => {
-  const [imageSvg, setImageSvg] = useState<string>();
-  const [qrCodeSvg, setQrCodeSvg] = useState<string>();
-
-  useEffect(() => {
-    if (!coloringImage.svgUrl) return;
-
-    fetchSvg(coloringImage.svgUrl).then((imageSvgString) => {
-      setImageSvg(imageSvgString);
-    });
-  }, [coloringImage.svgUrl]);
-
-  useEffect(() => {
-    if (!coloringImage.qrCodeUrl) return;
-
-    fetchSvg(coloringImage.qrCodeUrl).then((qrCodeSvgString) => {
-      setQrCodeSvg(qrCodeSvgString);
-    });
-  }, [coloringImage.qrCodeUrl]);
-
-  if (
-    !coloringImage.svgUrl ||
-    !imageSvg ||
-    !coloringImage.qrCodeUrl ||
-    !qrCodeSvg
-  ) {
-    return null;
-  }
-
+const ColoringPageDocument = ({
+  imageSvg,
+  qrCodeSvg,
+  coloringImageId,
+}: ColoringPageDocumentProps) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -113,7 +91,7 @@ const ColoringPageDocument = ({ coloringImage }: ColoringPageDocumentProps) => {
               Scan the QR code to discover more coloring pages!
             </Text>
             <Link
-              src={`https://chunkycrayon.com?utm_source=${coloringImage.id}&utm_medium=pdf-link&utm_campaign=coloring-image-pdf`}
+              src={`https://chunkycrayon.com?utm_source=${coloringImageId}&utm_medium=pdf-link&utm_campaign=coloring-image-pdf`}
               style={styles.ctaLink}
             >
               www.chunkycrayon.com

@@ -2,9 +2,22 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cn from '@/utils/cn';
 import { SOCIAL_LINKS } from '@/constants';
+import { cacheLife, cacheTag } from 'next/cache';
 
 type FooterProps = {
   className?: string;
+};
+
+const CachedCopyright = async () => {
+  'use cache';
+  cacheLife('weeks');
+  cacheTag('footer-copyright');
+
+  return (
+    <span>
+      &copy; {new Date().getFullYear()} Chunky Crayon. All rights reserved.
+    </span>
+  );
 };
 
 const Footer = ({ className }: FooterProps) => (
@@ -67,9 +80,7 @@ const Footer = ({ className }: FooterProps) => (
     </div>
     <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mt-12 pt-6 text-gray-400 text-sm gap-2">
       <div className="flex flex-col md:flex-row items-center gap-4">
-        <span>
-          &copy; {new Date().getFullYear()} Chunky Crayon. All rights reserved.
-        </span>
+        <CachedCopyright />
         <div className="flex gap-4">
           <Link href="/privacy" className="hover:text-white transition-colors">
             Privacy Policy

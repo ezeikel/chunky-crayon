@@ -4,6 +4,7 @@ import type { NextConfig } from 'next';
 import withVercelToolbar from '@vercel/toolbar/plugins/next';
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
   images: {
     remotePatterns: [
       {
@@ -19,9 +20,6 @@ const nextConfig: NextConfig = {
     ],
   },
   serverExternalPackages: ['@react-pdf/renderer', 'playwright'],
-  experimental: {
-    ppr: true,
-  },
 };
 
 // sentry configuration options

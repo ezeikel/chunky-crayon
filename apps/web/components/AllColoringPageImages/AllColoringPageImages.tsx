@@ -1,39 +1,28 @@
-import Link from 'next/link';
-import { getAllColoringImages } from '@/app/actions';
-import ColoringImage from '@/components/ColoringImage/ColoringImage';
-import ImageFilterToggle from '@/components/ImageFilterToggle/ImageFilterToggle';
+import { getAllColoringImages } from '@/app/data/coloring-image';
 import { showAuthButtonsFlag } from '@/flags';
+import type { ColoringImageSearchParams } from '@/types';
+import { AllColoringPageImagesShell } from './AllColoringPageImagesShell';
 
 type AllColoringPageImagesProps = {
-  images: Awaited<ReturnType<typeof getAllColoringImages>>;
+  searchParams: Promise<ColoringImageSearchParams>;
 };
 
+// Dynamic wrapper - reads the flag
 const AllColoringPageImages = async ({
-  images,
+  searchParams,
 }: AllColoringPageImagesProps) => {
-  const showAuthButtons = await showAuthButtonsFlag();
+  // Read the flag in the dynamic wrapper (no "use cache" here)
+  const showAuthButtons = (await showAuthButtonsFlag()) as boolean;
 
+  // Fetch the images
+  const images = await getAllColoringImages(searchParams);
+
+  // Pass both the flag value and images to the cached shell
   return (
-    <div className="flex flex-col gap-8 p-8">
-      {showAuthButtons && (
-        <div className="flex justify-end">
-          <ImageFilterToggle />
-        </div>
-      )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {images.map((coloringImage) => (
-          <Link
-            href={`/coloring-image/${coloringImage.id}`}
-            key={coloringImage.id}
-          >
-            <ColoringImage
-              id={coloringImage.id}
-              className="rounded-lg shadow-lg bg-white"
-            />
-          </Link>
-        ))}
-      </div>
-    </div>
+    <AllColoringPageImagesShell
+      images={images}
+      showAuthButtons={showAuthButtons}
+    />
   );
 };
 

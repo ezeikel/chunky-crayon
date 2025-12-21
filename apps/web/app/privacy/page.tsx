@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import PageWrap from '@/components/PageWrap/PageWrap';
+import CachedLastUpdateDate from '@/components/CachedLastUpdateDate/CachedLastUpdateDate';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy - Chunky Crayon',
@@ -11,7 +12,7 @@ const PrivacyPolicy = () => (
   <PageWrap className="max-w-4xl mx-auto py-12 px-4">
     <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
     <p className="text-gray-600 mb-8">
-      Last updated: {new Date().toLocaleDateString()}
+      Last updated: <CachedLastUpdateDate />
     </p>
 
     <section className="mb-8">

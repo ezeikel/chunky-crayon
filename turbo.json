@@ -12,7 +12,7 @@
         "android/app/build/**",
         "ios/build/**"
       ],
-      "env": ["DATABASE_URL", "DATABASE_URL_UNPOOLED"]
+      "env": ["**"]
     },
     "lint": {
       "dependsOn": ["^lint"]

@@ -1,4 +1,7 @@
 import { getProviderData, createFlagsDiscoveryEndpoint } from 'flags/next';
-import * as flags from '../../../../flags';
+import { showAuthButtonsFlagDefinition } from '../../../../flags';
 
-export const GET = createFlagsDiscoveryEndpoint(() => getProviderData(flags));
+// Only pass flag definitions to discovery endpoint, not wrapper functions
+export const GET = createFlagsDiscoveryEndpoint(() =>
+  getProviderData({ showAuthButtonsFlagDefinition }),
+);

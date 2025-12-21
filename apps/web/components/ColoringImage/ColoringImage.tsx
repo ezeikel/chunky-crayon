@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { getColoringImage } from '@/app/actions';
+import { getColoringImageById } from '@/app/data/coloring-image';
 import cn from '@/utils/cn';
 
 type ColoringImageProps = {
@@ -8,7 +8,7 @@ type ColoringImageProps = {
 };
 
 const ColoringImage = async ({ id, className }: ColoringImageProps) => {
-  const coloringImage = await getColoringImage(id);
+  const coloringImage = await getColoringImageById(id);
 
   if (!coloringImage) {
     return null;
