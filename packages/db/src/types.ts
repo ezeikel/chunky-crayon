@@ -1,9 +1,9 @@
 // Types-only exports that don't import the database client
-// This file is safe to import on the client side
-export * from "../generated/prisma";
+// This file uses browser.ts which is safe to import on the client side
+export * from "./generated/prisma/browser";
 
 // Re-export Prisma types and enums
-export { Prisma } from "../generated/prisma";
+export { Prisma } from "./generated/prisma/browser";
 
 // Re-export specific model types with custom names
 export type {
@@ -13,4 +13,4 @@ export type {
   ColoringImage as DbColoringImageType,
   Account as DbAccountType,
   Session as DbSessionType,
-} from "../generated/prisma";
+} from "./generated/prisma/browser";

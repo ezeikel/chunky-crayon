@@ -1,9 +1,9 @@
 // Re-export the Prisma client
 export { prisma as db } from "./client";
-export * from "../generated/prisma";
+export * from "./generated/prisma/client";
 
 // Re-export Prisma types and enums
-export { Prisma } from "../generated/prisma";
+export { Prisma } from "./generated/prisma/client";
 
 // Re-export specific model types with custom names
 export type {
@@ -13,4 +13,4 @@ export type {
   ColoringImage as DbColoringImageType,
   Account as DbAccountType,
   Session as DbSessionType,
-} from "../generated/prisma";
+} from "./generated/prisma/client";
