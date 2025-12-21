@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
 import { SUBSCRIPTION_PLANS, CREDIT_PACKS } from '@/constants';
@@ -67,6 +68,12 @@ const Billing = ({ user }: BillingProps) => {
 
     setLoadingPlan(plan.planName);
 
+    // PostHog event tracking
+    posthog.capture('subscription_plan_changed', {
+      current_plan: currentSubscription.planName,
+      new_plan: plan.planName,
+    });
+
     try {
       const result = await changeSubscription({
         currentPlanName: currentSubscription.planName,
@@ -92,6 +99,13 @@ const Billing = ({ user }: BillingProps) => {
     }
 
     setLoadingCredits(pack.name);
+
+    // PostHog event tracking
+    posthog.capture('credits_purchased', {
+      pack_name: pack.name,
+      credits: pack.credits,
+      price: pack.price,
+    });
 
     try {
       const stripe = await stripePromise;
@@ -121,6 +135,11 @@ const Billing = ({ user }: BillingProps) => {
   };
 
   const handleManageSubscription = async () => {
+    // PostHog event tracking
+    posthog.capture('manage_subscription_clicked', {
+      current_plan: currentSubscription?.planName,
+    });
+
     try {
       const result = await createCustomerPortalSession();
 

@@ -4,8 +4,8 @@ import { useRef, useEffect, useState } from 'react';
 import { ColoringImage } from '@chunky-crayon/db/types';
 import { useColoringContext } from '@/contexts/coloring';
 import cn from '@/utils/cn';
-import { trackEvent } from '@/utils/analytics';
-import { ANALYTICS_EVENTS } from '@/constants';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 
 type ImageCanvasProps = {
   coloringImage: Partial<ColoringImage>;
@@ -192,7 +192,10 @@ const ImageCanvas = ({ coloringImage, className }: ImageCanvasProps) => {
   };
   const handleMouseUp = () => {
     setIsDrawing(false);
-    trackEvent(ANALYTICS_EVENTS.COLORING_STROKE, { color: selectedColor });
+    trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
+      coloringImageId: coloringImage.id,
+      color: selectedColor,
+    });
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -220,7 +223,10 @@ const ImageCanvas = ({ coloringImage, className }: ImageCanvasProps) => {
 
   const handleTouchEnd = () => {
     setIsDrawing(false);
-    trackEvent(ANALYTICS_EVENTS.COLORING_STROKE, { color: selectedColor });
+    trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
+      coloringImageId: coloringImage.id,
+      color: selectedColor,
+    });
   };
 
   return (

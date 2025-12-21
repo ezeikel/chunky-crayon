@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { PlanInterval, SUBSCRIPTION_PLANS } from '@/constants';
 import {
@@ -32,6 +33,17 @@ const PricingPage = () => {
 
   const handlePurchase = async (plan: any) => {
     setLoadingPlan(plan.name);
+
+    // PostHog event tracking
+    posthog.capture('pricing_plan_selected', {
+      plan_name: plan.name,
+      plan_key: plan.key,
+      plan_price: plan.price,
+      plan_credits: plan.credits,
+      billing_interval: interval,
+      is_most_popular: plan.mostPopular || false,
+    });
+
     try {
       // get stripe.js instance
       const stripe = await stripePromise;

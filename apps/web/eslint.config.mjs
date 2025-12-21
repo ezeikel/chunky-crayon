@@ -1,6 +1,6 @@
-import next from "eslint-config-next";
-import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
-import nextTypescript from "eslint-config-next/typescript";
+import next from 'eslint-config-next';
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
+import nextTypescript from 'eslint-config-next/typescript';
 import path from 'node:path';
 
 import { includeIgnoreFile } from '@eslint/compat';
@@ -111,6 +111,12 @@ export default [
   // prettier config
   ...prettierConfig,
   {
-    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"]
-  }
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      'out/**',
+      'build/**',
+      'next-env.d.ts',
+    ],
+  },
 ];

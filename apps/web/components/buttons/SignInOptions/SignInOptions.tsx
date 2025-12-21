@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import posthog from 'posthog-js';
 import { signIn } from 'next-auth/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faSpinner } from '@fortawesome/pro-regular-svg-icons';
@@ -20,9 +21,30 @@ const SignInOptions = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleGoogleSignIn = () => {
+    posthog.capture('user_signed_in', {
+      provider: 'google',
+    });
+    signIn('google', { callbackUrl: '/' });
+  };
+
+  const handleAppleSignIn = () => {
+    posthog.capture('user_signed_in', {
+      provider: 'apple',
+    });
+    signIn('apple', { callbackUrl: '/' });
+  };
+
   const handleMagicLinkSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    // PostHog event tracking with email identification
+    posthog.capture('user_signed_in', {
+      provider: 'magic_link',
+      email: email,
+    });
+
     try {
       await signIn('resend', { email, callbackUrl: '/' });
     } catch (error) {
@@ -41,7 +63,7 @@ const SignInOptions = () => {
       <CardContent className="grid gap-4">
         <Button
           variant="outline"
-          onClick={() => signIn('google', { callbackUrl: '/' })}
+          onClick={handleGoogleSignIn}
           className="w-full"
         >
           <FontAwesomeIcon icon={faGoogle} className="mr-2 h-4 w-4" />
@@ -49,7 +71,7 @@ const SignInOptions = () => {
         </Button>
         <Button
           variant="outline"
-          onClick={() => signIn('apple', { callbackUrl: '/' })}
+          onClick={handleAppleSignIn}
           className="w-full"
         >
           <FontAwesomeIcon icon={faApple} className="mr-2 h-4 w-4" />

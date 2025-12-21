@@ -4,8 +4,8 @@ import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createColoringImage } from '@/app/actions/coloring-image';
 import cn from '@/utils/cn';
-import { trackEvent } from '@/utils/analytics';
-import { ANALYTICS_EVENTS } from '@/constants';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 import UserInput from './UserInput';
 import UserInputV2 from './UserInputV2';
 
@@ -38,9 +38,10 @@ const CreateColoringPageForm = ({
             description: (formData.get('description') as string) || '',
           };
 
-          trackEvent(ANALYTICS_EVENTS.SUBMITTED_COLORING_IMAGE_DESCRIPTION, {
+          trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
             description: rawFormData.description,
-            type: 'text',
+            inputType: 'text',
+            characterCount: rawFormData.description.length,
           });
 
           const coloringImage = await createColoringImage(formData);

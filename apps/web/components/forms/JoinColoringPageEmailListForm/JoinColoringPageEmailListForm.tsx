@@ -6,8 +6,8 @@ import SubmitButton from '@/components/buttons/SubmitButton/SubmitButton';
 import cn from '@/utils/cn';
 import { Input } from '@/components/ui/input';
 import { joinColoringPageEmailList } from '@/app/actions/email';
-import { trackEvent } from '@/utils/analytics';
-import { ANALYTICS_EVENTS } from '@/constants';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 
 type JoinColoringPageEmailListFormProps = {
   className?: string;
@@ -31,8 +31,8 @@ const JoinColoringPageEmailListForm = ({
         description: 'You have successfully joined the email list!',
       });
 
-      trackEvent(ANALYTICS_EVENTS.SIGNED_UP_TO_COLORING_PAGE_EMAIL_LIST, {
-        email: state.email as string,
+      trackEvent(TRACKING_EVENTS.EMAIL_SIGNUP_COMPLETED, {
+        location: 'coloring_page_footer',
       });
 
       if (emailInputRef.current) {
@@ -41,6 +41,14 @@ const JoinColoringPageEmailListForm = ({
     } else if (state.error) {
       toast.error('Something went wrong 😢', {
         description: 'Failed to join the email list. Please try again.',
+      });
+
+      trackEvent(TRACKING_EVENTS.EMAIL_SIGNUP_FAILED, {
+        location: 'coloring_page_footer',
+        errorMessage:
+          typeof state.error === 'string'
+            ? state.error
+            : 'Unknown error occurred',
       });
 
       console.error({ error: state.error });

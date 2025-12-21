@@ -707,14 +707,83 @@ export const SOCIAL_LINKS = [
   // },
 ];
 
-export const ANALYTICS_EVENTS = {
-  PURCHASE: 'Purchase',
-  SIGNUP: 'Signup',
-  SUBMITTED_COLORING_IMAGE_DESCRIPTION: 'Submitted coloring image description',
-  SIGNED_UP_TO_COLORING_PAGE_EMAIL_LIST:
-    'Signed up to coloring page email list',
-  CLICKED_SAVE_COLORING_IMAGE: 'Clicked save coloring image',
-  CLICKED_PRINT_COLORING_IMAGE: 'Clicked print coloring image',
-  COLOR_SELECTED: 'Color selected',
-  COLORING_STROKE: 'Coloring stroke',
+/**
+ * Comprehensive tracking events for analytics dashboards.
+ * Events are organized by category for easy filtering in PostHog.
+ *
+ * Naming convention: category_action (snake_case)
+ * - Enables filtering by prefix (e.g., all "auth_*" events)
+ * - Consistent with PostHog best practices
+ */
+export const TRACKING_EVENTS = {
+  // ===== AUTHENTICATION & USER LIFECYCLE =====
+  AUTH_SIGN_IN_STARTED: 'auth_sign_in_started', // User clicks sign in
+  AUTH_SIGN_IN_COMPLETED: 'auth_sign_in_completed', // Sign in successful
+  AUTH_SIGN_IN_FAILED: 'auth_sign_in_failed', // Sign in failed
+  AUTH_SIGN_UP_COMPLETED: 'auth_sign_up_completed', // New user registered
+  AUTH_SIGN_OUT: 'auth_sign_out', // User signs out
+
+  // ===== COLORING PAGE CREATION (Core Funnel) =====
+  CREATION_STARTED: 'creation_started', // User starts typing description
+  CREATION_SUBMITTED: 'creation_submitted', // Description submitted
+  CREATION_COMPLETED: 'creation_completed', // Image generated successfully
+  CREATION_FAILED: 'creation_failed', // Generation failed
+  CREATION_RETRIED: 'creation_retried', // User retried after failure
+
+  // ===== COLORING PAGE ENGAGEMENT =====
+  PAGE_VIEWED: 'page_viewed', // Coloring page viewed
+  PAGE_COLORED: 'page_colored', // User started coloring
+  PAGE_COLOR_SELECTED: 'page_color_selected', // Color picked
+  PAGE_STROKE_MADE: 'page_stroke_made', // Drawing stroke completed
+  PAGE_SAVED: 'page_saved', // Saved to gallery
+  PAGE_SHARED: 'page_shared', // Shared via link
+
+  // ===== DOWNLOAD & PRINT (Key Conversions) =====
+  DOWNLOAD_PDF_CLICKED: 'download_pdf_clicked', // PDF download initiated
+  DOWNLOAD_PDF_COMPLETED: 'download_pdf_completed', // PDF download successful
+  PRINT_CLICKED: 'print_clicked', // Print button clicked
+
+  // ===== EMAIL LIST (Lead Generation) =====
+  EMAIL_SIGNUP_STARTED: 'email_signup_started', // Started entering email
+  EMAIL_SIGNUP_COMPLETED: 'email_signup_completed', // Email submitted
+  EMAIL_SIGNUP_FAILED: 'email_signup_failed', // Signup failed
+
+  // ===== PRICING & CONVERSION FUNNEL =====
+  PRICING_PAGE_VIEWED: 'pricing_page_viewed', // Pricing page loaded
+  PRICING_INTERVAL_TOGGLED: 'pricing_interval_toggled', // Monthly/Annual toggle
+  PRICING_PLAN_CLICKED: 'pricing_plan_clicked', // Plan CTA clicked
+  PRICING_CREDITS_CLICKED: 'pricing_credits_clicked', // Credit pack clicked
+
+  // ===== CHECKOUT & PAYMENTS (Revenue) =====
+  CHECKOUT_STARTED: 'checkout_started', // Redirecting to Stripe
+  CHECKOUT_COMPLETED: 'checkout_completed', // Payment successful
+  CHECKOUT_ABANDONED: 'checkout_abandoned', // User returned without paying
+
+  // ===== SUBSCRIPTION MANAGEMENT =====
+  SUBSCRIPTION_STARTED: 'subscription_started', // New subscription
+  SUBSCRIPTION_RENEWED: 'subscription_renewed', // Auto-renewed
+  SUBSCRIPTION_CHANGED: 'subscription_changed', // Plan change
+  SUBSCRIPTION_CANCELLED: 'subscription_cancelled', // Cancelled
+  SUBSCRIPTION_PORTAL_OPENED: 'subscription_portal_opened', // Stripe portal
+
+  // ===== CREDITS =====
+  CREDITS_PURCHASED: 'credits_purchased', // Credit pack bought
+  CREDITS_USED: 'credits_used', // Credit consumed
+  CREDITS_LOW: 'credits_low', // Credits running low (trigger)
+
+  // ===== BILLING & ACCOUNT =====
+  BILLING_PAGE_VIEWED: 'billing_page_viewed', // Billing page visited
+  ACCOUNT_SETTINGS_VIEWED: 'account_settings_viewed', // Account page
+
+  // ===== MARKETING & GROWTH =====
+  CTA_CLICKED: 'cta_clicked', // Any CTA button
+  FEATURE_DISCOVERED: 'feature_discovered', // New feature interaction
+  REFERRAL_SHARED: 'referral_shared', // User shared referral
+  SOCIAL_LINK_CLICKED: 'social_link_clicked', // Social media click
+
+  // ===== ERRORS (for debugging dashboards) =====
+  ERROR_OCCURRED: 'error_occurred', // Any error
+  ERROR_API: 'error_api', // API error
+  ERROR_GENERATION: 'error_generation', // Image gen error
+  ERROR_PAYMENT: 'error_payment', // Payment error
 } as const;

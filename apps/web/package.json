@@ -67,6 +67,8 @@
     "oslllo-potrace": "^4.0.0",
     "p-limit": "^6.2.0",
     "playwright": "^1.52.0",
+    "posthog-js": "^1.309.1",
+    "posthog-node": "^5.17.4",
     "qrcode": "^1.5.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",

@@ -8,8 +8,8 @@ import { faFileArrowDown } from '@fortawesome/pro-regular-svg-icons';
 import { usePDF } from '@react-pdf/renderer';
 import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/ColoringPageDocument';
 import cn from '@/utils/cn';
-import { trackEvent } from '@/utils/analytics';
-import { ANALYTICS_EVENTS } from '@/constants';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 import fetchSvg from '@/utils/fetchSvg';
 
 const formatTitleForFileName = (title: string | undefined): string => {
@@ -77,11 +77,12 @@ const PDFDownloadReady = ({
       href={instance.url || '#'}
       download={formatTitleForFileName(coloringImage.title)}
       className={cn(buttonClassName, className)}
-      onClick={() =>
-        trackEvent(ANALYTICS_EVENTS.CLICKED_SAVE_COLORING_IMAGE, {
-          id: coloringImage.id as string,
-        })
-      }
+      onClick={() => {
+        trackEvent(TRACKING_EVENTS.DOWNLOAD_PDF_CLICKED, {
+          coloringImageId: coloringImage.id as string,
+          title: coloringImage.title,
+        });
+      }}
     >
       Download PDF
       <FontAwesomeIcon icon={faFileArrowDown} className="text-3xl text-black" />
