@@ -1,6 +1,5 @@
 import { put } from '@vercel/blob';
 import { chromium } from 'playwright';
-import chromiumPkg from '@sparticuz/chromium';
 import sharp from 'sharp';
 import potrace from 'oslllo-potrace';
 import * as Sentry from '@sentry/nextjs';
@@ -11,6 +10,25 @@ import {
   CHECK_SVG_IMAGE_SYSTEM,
   CHECK_SVG_IMAGE_PROMPT,
 } from '@/lib/ai';
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Helper to get browser launch options based on environment
+const getBrowserLaunchOptions = async () => {
+  if (isProduction) {
+    // Use @sparticuz/chromium for serverless environments (Vercel)
+    const chromiumPkg = await import('@sparticuz/chromium');
+    return {
+      executablePath: await chromiumPkg.default.executablePath(),
+      headless: true,
+      args: [...chromiumPkg.default.args, '--no-sandbox'],
+    };
+  }
+  // Use regular Playwright for local development
+  return {
+    headless: true,
+  };
+};
 
 type CheckSvgImageResult = {
   isValid: boolean;
@@ -51,11 +69,8 @@ export const checkSvgImage = async (
   svgUrl: string,
 ): Promise<CheckSvgImageResult> => {
   // launch browser and take screenshot
-  const browser = await chromium.launch({
-    executablePath: await chromiumPkg.executablePath(),
-    headless: true,
-    args: [...chromiumPkg.args, '--no-sandbox'],
-  });
+  const launchOptions = await getBrowserLaunchOptions();
+  const browser = await chromium.launch(launchOptions);
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(svgUrl);

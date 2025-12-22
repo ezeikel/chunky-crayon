@@ -27,8 +27,14 @@ export {
 } from 'ai';
 
 // Re-export models
-export { models, MODEL_IDS, IMAGE_DEFAULTS } from './models';
-export type { ModelId } from './models';
+export {
+  models,
+  MODEL_IDS,
+  IMAGE_DEFAULTS,
+  withAITracing,
+  getTracedModels,
+} from './models';
+export type { ModelId, TracingOptions } from './models';
 
 // Re-export prompts
 export * as prompts from './prompts';
@@ -56,9 +62,19 @@ export {
   FACEBOOK_CAPTION_SYSTEM,
   createInstagramCaptionPrompt,
   createFacebookCaptionPrompt,
+  // Analytics prompts
+  IMAGE_ANALYTICS_SYSTEM,
+  IMAGE_ANALYTICS_PROMPT,
 } from './prompts';
 
 // Re-export schemas
 export * as schemas from './schemas';
-export { imageMetadataSchema, svgValidationSchema } from './schemas';
-export type { ImageMetadata, SvgValidation } from './schemas';
+export {
+  imageMetadataSchema,
+  svgValidationSchema,
+  imageAnalyticsSchema,
+} from './schemas';
+export type { ImageMetadata, SvgValidation, ImageAnalytics } from './schemas';
+
+// Re-export analytics functions
+export { analyzeImageForAnalytics } from './analytics';

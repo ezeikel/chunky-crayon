@@ -10,14 +10,17 @@ import {
   generateObject,
   experimental_generateImage,
   models,
+  getTracedModels,
   IMAGE_DEFAULTS,
   createColoringImagePromptDetailed,
   CLEAN_UP_DESCRIPTION_SYSTEM,
   IMAGE_METADATA_SYSTEM,
   IMAGE_METADATA_PROMPT,
   imageMetadataSchema,
+  analyzeImageForAnalytics,
 } from '@/lib/ai';
-import { ACTIONS } from '@/constants';
+import { ACTIONS, TRACKING_EVENTS } from '@/constants';
+import { track, trackWithUser } from '@/utils/analytics-server';
 import {
   db,
   ColoringImage,
@@ -69,17 +72,6 @@ const generateColoringImage = async (description: string) => {
   }
 };
 
-// generate an appropriate prompt for the coloring image
-const cleanUpDescription = async (roughUserDescription: string) => {
-  const { text } = await generateText({
-    model: models.text,
-    system: CLEAN_UP_DESCRIPTION_SYSTEM,
-    prompt: roughUserDescription,
-  });
-
-  return text;
-};
-
 type CreateColoringImageResult =
   | Partial<ColoringImage>
   | { error: string; credits: number };
@@ -97,8 +89,18 @@ const generateColoringImageWithMetadata = async (
   userId?: string,
   generationType?: GenerationType,
 ) => {
+  // Get traced models for observability (latency, tokens, costs)
+  const tracedModels = getTracedModels({
+    userId,
+    properties: { action: 'coloring-image-generation' },
+  });
+
   // clean up the user's description
-  const cleanedUpUserDescription = await cleanUpDescription(description);
+  const { text: cleanedUpUserDescription } = await generateText({
+    model: tracedModels.text,
+    system: CLEAN_UP_DESCRIPTION_SYSTEM,
+    prompt: description,
+  });
 
   // DEBUG:
   // eslint-disable-next-line no-console
@@ -114,7 +116,7 @@ const generateColoringImageWithMetadata = async (
   }
 
   const { object: imageMetadata } = await generateObject({
-    model: models.text,
+    model: tracedModels.text,
     schema: imageMetadataSchema,
     system: IMAGE_METADATA_SYSTEM,
     messages: [
@@ -280,11 +282,27 @@ export const createColoringImage = async (
         return;
       }
 
-      const { isValid } = await checkSvgImage(result.svgUrl);
+      // Run SVG check and analytics in parallel, independently
+      await Promise.allSettled([
+        // Check SVG validity and retrace if needed
+        (async () => {
+          const { isValid } = await checkSvgImage(result.svgUrl!);
+          if (!isValid) {
+            await retraceImage(result.id, result.url!);
+          }
+        })(),
 
-      if (!isValid) {
-        await retraceImage(result.id, result.url);
-      }
+        // Analyze image content for PostHog insights (using Gemini 3 Flash)
+        (async () => {
+          const imageAnalytics = await analyzeImageForAnalytics(result.url!);
+          if (imageAnalytics && userId) {
+            await trackWithUser(userId, TRACKING_EVENTS.CREATION_ANALYZED, {
+              coloringImageId: result.id,
+              ...imageAnalytics,
+            });
+          }
+        })(),
+      ]);
     });
 
     revalidatePath('/');
@@ -303,11 +321,27 @@ export const createColoringImage = async (
       return;
     }
 
-    const { isValid } = await checkSvgImage(result.svgUrl);
+    // Run SVG check and analytics in parallel, independently
+    await Promise.allSettled([
+      // Check SVG validity and retrace if needed
+      (async () => {
+        const { isValid } = await checkSvgImage(result.svgUrl!);
+        if (!isValid) {
+          await retraceImage(result.id, result.url!);
+        }
+      })(),
 
-    if (!isValid) {
-      await retraceImage(result.id, result.url);
-    }
+      // Analyze image content for PostHog insights (using Gemini 3 Flash)
+      (async () => {
+        const imageAnalytics = await analyzeImageForAnalytics(result.url!);
+        if (imageAnalytics) {
+          await track(TRACKING_EVENTS.CREATION_ANALYZED, {
+            coloringImageId: result.id,
+            ...imageAnalytics,
+          });
+        }
+      })(),
+    ]);
   });
 
   revalidatePath('/');

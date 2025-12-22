@@ -53,6 +53,36 @@ export type EventProperties = {
     description: string;
     attemptNumber: number;
   };
+  [TRACKING_EVENTS.CREATION_ANALYZED]: {
+    coloringImageId: string;
+    characters: string[];
+    setting: string | null;
+    activities: string[];
+    themeCategory:
+      | 'fantasy'
+      | 'adventure'
+      | 'nature'
+      | 'animals'
+      | 'vehicles'
+      | 'space'
+      | 'underwater'
+      | 'seasonal'
+      | 'educational'
+      | 'everyday'
+      | 'sports'
+      | 'fairy_tale'
+      | 'other';
+    mood:
+      | 'playful'
+      | 'calm'
+      | 'exciting'
+      | 'magical'
+      | 'educational'
+      | 'neutral';
+    complexity: 'simple' | 'moderate' | 'detailed';
+    hasPersonalization: boolean;
+    ageAppeal: 'toddler' | 'preschool' | 'early_elementary' | 'all_ages';
+  };
 
   // ===== COLORING PAGE ENGAGEMENT =====
   [TRACKING_EVENTS.PAGE_VIEWED]: {

@@ -637,6 +637,7 @@ export const TRACKING_EVENTS = {
   CREATION_COMPLETED: 'creation_completed', // Image generated successfully
   CREATION_FAILED: 'creation_failed', // Generation failed
   CREATION_RETRIED: 'creation_retried', // User retried after failure
+  CREATION_ANALYZED: 'creation_analyzed', // Image content analyzed for insights
 
   // ===== COLORING PAGE ENGAGEMENT =====
   PAGE_VIEWED: 'page_viewed', // Coloring page viewed

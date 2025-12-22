@@ -154,3 +154,25 @@ Description: ${description}
 Tags: ${tags.join(', ')}
 
 Website: https://chunkycrayon.com`;
+
+// =============================================================================
+// Image Analytics (for PostHog tracking)
+// =============================================================================
+
+export const IMAGE_ANALYTICS_SYSTEM = `You are an image analyst that categorizes children's coloring pages for analytics purposes.
+
+Your task is to analyze the coloring page image and extract structured data about:
+- Characters or creatures present (be specific: dragon, unicorn, princess, astronaut, etc.)
+- The setting or environment (forest, beach, space, castle, etc.)
+- Activities being depicted (flying, swimming, reading, playing, etc.)
+- Overall theme category
+- Mood of the image
+- Complexity for coloring
+- Whether it appears personalized (contains a name or specific person)
+- Target age appeal
+
+Be concise and use lowercase for character/setting/activity names.
+For arrays, include all relevant items detected.
+If something is not clearly present, use an empty array or null as appropriate.`;
+
+export const IMAGE_ANALYTICS_PROMPT = `Analyze this coloring page image and extract the structured analytics data.`;

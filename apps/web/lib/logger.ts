@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs';
-import { track as vercelTrack } from '@vercel/analytics';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -17,43 +16,17 @@ export type LogContext = {
   [key: string]: unknown;
 };
 
-// Module-level state
-let posthogInstance: unknown = null;
-
-export const setPostHog = (posthog: unknown) => {
-  posthogInstance = posthog;
-};
-
-// Clean properties for Vercel Analytics (only string, number, boolean, null)
-const cleanVercelProperties = (
-  properties: Record<string, unknown>,
-): Record<string, string | number | boolean | null> =>
-  Object.entries(properties).reduce(
-    (cleaned, [key, value]) => {
-      if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean' ||
-        value === null
-      ) {
-        return { ...cleaned, [key]: value };
-      }
-      if (value !== undefined) {
-        return { ...cleaned, [key]: String(value) };
-      }
-      return cleaned;
-    },
-    {} as Record<string, string | number | boolean | null>,
-  );
-
+/**
+ * Log to console - these are automatically captured by:
+ * - Vercel Logs (server-side)
+ * - Sentry Breadcrumbs (client-side, attached to error reports)
+ */
 const logToConsole = (
   level: LogLevel,
   message: string,
   context?: LogContext,
   err?: Error,
 ) => {
-  if (process.env.NODE_ENV !== 'development') return;
-
   const prefix = `[${level.toUpperCase()}]`;
   const logFn = {
     debug: console.debug,
@@ -65,52 +38,9 @@ const logToConsole = (
   logFn(prefix, message, context ?? '', err ?? '');
 };
 
-const logToPostHog = (
-  level: LogLevel,
-  message: string,
-  context?: LogContext,
-  err?: Error,
-) => {
-  try {
-    let posthog = posthogInstance;
-    if (!posthog && typeof window !== 'undefined') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      posthog = (window as any).posthog;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (posthog && (posthog as any).__loaded) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (posthog as any).capture('log_entry', {
-        log_level: level,
-        log_message: message,
-        log_error: err?.message,
-        ...context,
-      });
-    }
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
-      console.error('Failed to log to PostHog:', error);
-    }
-  }
-};
-
-const logToVercel = (
-  level: LogLevel,
-  message: string,
-  context?: LogContext,
-) => {
-  try {
-    vercelTrack(`log_${level}`, cleanVercelProperties({ message, ...context }));
-  } catch (err) {
-    if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
-      console.error('Failed to log to Vercel:', err);
-    }
-  }
-};
-
+/**
+ * Send error to Sentry as an issue
+ */
 const logToSentry = (message: string, context?: LogContext, err?: Error) => {
   try {
     if (context) {
@@ -126,38 +56,42 @@ const logToSentry = (message: string, context?: LogContext, err?: Error) => {
       Sentry.captureMessage(message, 'error');
     }
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
-      console.error('Failed to log to Sentry:', error);
-    }
+    // eslint-disable-next-line no-console
+    console.error('Failed to log to Sentry:', error);
   }
 };
 
-// Main logging functions - logs go to PostHog and Vercel
+/**
+ * Debug logs - console only
+ * Captured by: Vercel Logs (server), Sentry Breadcrumbs (client)
+ */
 export const debug = (message: string, context?: LogContext) => {
   logToConsole('debug', message, context);
-  logToPostHog('debug', message, context);
-  logToVercel('debug', message, context);
 };
 
+/**
+ * Info logs - console only
+ * Captured by: Vercel Logs (server), Sentry Breadcrumbs (client)
+ */
 export const info = (message: string, context?: LogContext) => {
   logToConsole('info', message, context);
-  logToPostHog('info', message, context);
-  logToVercel('info', message, context);
 };
 
+/**
+ * Warning logs - console only
+ * Captured by: Vercel Logs (server), Sentry Breadcrumbs (client)
+ */
 export const warn = (message: string, context?: LogContext, err?: Error) => {
   logToConsole('warn', message, context, err);
-  logToPostHog('warn', message, context, err);
-  logToVercel('warn', message, context);
 };
 
-// Errors go to all three: PostHog, Vercel, AND Sentry
+/**
+ * Error logs - console + Sentry issue
+ * Creates a Sentry issue for investigation
+ */
 export const error = (message: string, context?: LogContext, err?: Error) => {
   logToConsole('error', message, context, err);
-  logToPostHog('error', message, context, err);
-  logToVercel('error', message, context);
-  logToSentry(message, context, err); // Only errors go to Sentry
+  logToSentry(message, context, err);
 };
 
 // Specialized error logging
