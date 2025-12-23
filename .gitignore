@@ -52,4 +52,4 @@ ios/Pods/
 android/build/
 android/app/build/
 android/.gradle/
-packages/db/generated/
+packages/db/src/generated/
