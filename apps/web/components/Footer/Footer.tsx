@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cn from '@/utils/cn';
 import { SOCIAL_LINKS } from '@/constants';
 import { cacheLife, cacheTag } from 'next/cache';
+import AppStoreButtons from '@/components/AppStoreButtons';
 
 type FooterProps = {
   className?: string;
@@ -58,12 +59,16 @@ const Footer = ({ className }: FooterProps) => (
                   <FontAwesomeIcon
                     icon={icon}
                     size="2x"
-                    className="fill-gray-400 group-hover:text-[#FF8A65] group-hover:transition-colors group-hover:duration-300 group-hover:fill-[#FF8A65] group-hover:ease-in-out"
+                    className="fill-gray-400 group-hover:text-crayon-orange group-hover:transition-colors group-hover:duration-300 group-hover:fill-crayon-orange group-hover:ease-in-out"
                   />
                 </a>
               </li>
             ))}
           </ul>
+        </div>
+        <div className="mt-6">
+          <h3 className="font-bold text-lg mb-2">Get the App</h3>
+          <AppStoreButtons location="footer" />
         </div>
       </div>
       <div className="flex-1 min-w-[220px] flex flex-col gap-8 justify-center md:items-end">
@@ -91,7 +96,8 @@ const Footer = ({ className }: FooterProps) => (
         </div>
       </div>
       <span>
-        Made with <span className="text-[#FF8A65] font-bold text-lg">♡</span> in{' '}
+        Made with{' '}
+        <span className="text-crayon-orange font-bold text-lg">♡</span> in{' '}
         <span className="text-white font-bold">South London</span>
       </span>
     </div>

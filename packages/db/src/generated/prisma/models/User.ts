@@ -42,6 +42,7 @@ export type UserMinAggregateOutputType = {
   image: string | null;
   stripeCustomerId: string | null;
   credits: number | null;
+  showCommunityImages: boolean | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 };
@@ -54,6 +55,7 @@ export type UserMaxAggregateOutputType = {
   image: string | null;
   stripeCustomerId: string | null;
   credits: number | null;
+  showCommunityImages: boolean | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 };
@@ -66,6 +68,7 @@ export type UserCountAggregateOutputType = {
   image: number;
   stripeCustomerId: number;
   credits: number;
+  showCommunityImages: number;
   createdAt: number;
   updatedAt: number;
   _all: number;
@@ -87,6 +90,7 @@ export type UserMinAggregateInputType = {
   image?: true;
   stripeCustomerId?: true;
   credits?: true;
+  showCommunityImages?: true;
   createdAt?: true;
   updatedAt?: true;
 };
@@ -99,6 +103,7 @@ export type UserMaxAggregateInputType = {
   image?: true;
   stripeCustomerId?: true;
   credits?: true;
+  showCommunityImages?: true;
   createdAt?: true;
   updatedAt?: true;
 };
@@ -111,6 +116,7 @@ export type UserCountAggregateInputType = {
   image?: true;
   stripeCustomerId?: true;
   credits?: true;
+  showCommunityImages?: true;
   createdAt?: true;
   updatedAt?: true;
   _all?: true;
@@ -217,6 +223,7 @@ export type UserGroupByOutputType = {
   image: string | null;
   stripeCustomerId: string | null;
   credits: number;
+  showCommunityImages: boolean;
   createdAt: Date;
   updatedAt: Date;
   _count: UserCountAggregateOutputType | null;
@@ -249,6 +256,7 @@ export type UserWhereInput = {
   image?: Prisma.StringNullableFilter<"User"> | string | null;
   stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null;
   credits?: Prisma.IntFilter<"User"> | number;
+  showCommunityImages?: Prisma.BoolFilter<"User"> | boolean;
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
   subscriptions?: Prisma.SubscriptionListRelationFilter;
@@ -266,6 +274,7 @@ export type UserOrderByWithRelationInput = {
   image?: Prisma.SortOrderInput | Prisma.SortOrder;
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder;
   credits?: Prisma.SortOrder;
+  showCommunityImages?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
   subscriptions?: Prisma.SubscriptionOrderByRelationAggregateInput;
@@ -291,6 +300,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
     image?: Prisma.StringNullableFilter<"User"> | string | null;
     stripeCustomerId?: Prisma.StringNullableFilter<"User"> | string | null;
     credits?: Prisma.IntFilter<"User"> | number;
+    showCommunityImages?: Prisma.BoolFilter<"User"> | boolean;
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     subscriptions?: Prisma.SubscriptionListRelationFilter;
@@ -310,6 +320,7 @@ export type UserOrderByWithAggregationInput = {
   image?: Prisma.SortOrderInput | Prisma.SortOrder;
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder;
   credits?: Prisma.SortOrder;
+  showCommunityImages?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
   _count?: Prisma.UserCountOrderByAggregateInput;
@@ -341,6 +352,7 @@ export type UserScalarWhereWithAggregatesInput = {
     | string
     | null;
   credits?: Prisma.IntWithAggregatesFilter<"User"> | number;
+  showCommunityImages?: Prisma.BoolWithAggregatesFilter<"User"> | boolean;
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string;
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string;
 };
@@ -353,6 +365,7 @@ export type UserCreateInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput;
@@ -370,6 +383,7 @@ export type UserUncheckedCreateInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput;
@@ -394,6 +408,7 @@ export type UserUpdateInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput;
@@ -418,6 +433,7 @@ export type UserUncheckedUpdateInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput;
@@ -435,6 +451,7 @@ export type UserCreateManyInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 };
@@ -454,6 +471,7 @@ export type UserUpdateManyMutationInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -473,6 +491,7 @@ export type UserUncheckedUpdateManyInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
 };
@@ -485,6 +504,7 @@ export type UserCountOrderByAggregateInput = {
   image?: Prisma.SortOrder;
   stripeCustomerId?: Prisma.SortOrder;
   credits?: Prisma.SortOrder;
+  showCommunityImages?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
 };
@@ -501,6 +521,7 @@ export type UserMaxOrderByAggregateInput = {
   image?: Prisma.SortOrder;
   stripeCustomerId?: Prisma.SortOrder;
   credits?: Prisma.SortOrder;
+  showCommunityImages?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
 };
@@ -513,6 +534,7 @@ export type UserMinOrderByAggregateInput = {
   image?: Prisma.SortOrder;
   stripeCustomerId?: Prisma.SortOrder;
   credits?: Prisma.SortOrder;
+  showCommunityImages?: Prisma.SortOrder;
   createdAt?: Prisma.SortOrder;
   updatedAt?: Prisma.SortOrder;
 };
@@ -549,6 +571,10 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number;
   multiply?: number;
   divide?: number;
+};
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean;
 };
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -695,6 +721,7 @@ export type UserCreateWithoutSubscriptionsInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   creditTransactions?: Prisma.CreditTransactionCreateNestedManyWithoutUserInput;
@@ -711,6 +738,7 @@ export type UserUncheckedCreateWithoutSubscriptionsInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   creditTransactions?: Prisma.CreditTransactionUncheckedCreateNestedManyWithoutUserInput;
@@ -762,6 +790,7 @@ export type UserUpdateWithoutSubscriptionsInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   creditTransactions?: Prisma.CreditTransactionUpdateManyWithoutUserNestedInput;
@@ -785,6 +814,7 @@ export type UserUncheckedUpdateWithoutSubscriptionsInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   creditTransactions?: Prisma.CreditTransactionUncheckedUpdateManyWithoutUserNestedInput;
@@ -801,6 +831,7 @@ export type UserCreateWithoutCreditTransactionsInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput;
@@ -817,6 +848,7 @@ export type UserUncheckedCreateWithoutCreditTransactionsInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput;
@@ -868,6 +900,7 @@ export type UserUpdateWithoutCreditTransactionsInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput;
@@ -891,6 +924,7 @@ export type UserUncheckedUpdateWithoutCreditTransactionsInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput;
@@ -907,6 +941,7 @@ export type UserCreateWithoutColoringImagesInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput;
@@ -923,6 +958,7 @@ export type UserUncheckedCreateWithoutColoringImagesInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput;
@@ -974,6 +1010,7 @@ export type UserUpdateWithoutColoringImagesInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput;
@@ -997,6 +1034,7 @@ export type UserUncheckedUpdateWithoutColoringImagesInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput;
@@ -1013,6 +1051,7 @@ export type UserCreateWithoutAccountsInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput;
@@ -1029,6 +1068,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput;
@@ -1080,6 +1120,7 @@ export type UserUpdateWithoutAccountsInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput;
@@ -1103,6 +1144,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput;
@@ -1119,6 +1161,7 @@ export type UserCreateWithoutSessionsInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutUserInput;
@@ -1135,6 +1178,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   image?: string | null;
   stripeCustomerId?: string | null;
   credits?: number;
+  showCommunityImages?: boolean;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutUserInput;
@@ -1186,6 +1230,7 @@ export type UserUpdateWithoutSessionsInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutUserNestedInput;
@@ -1209,6 +1254,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
     | string
     | null;
   credits?: Prisma.IntFieldUpdateOperationsInput | number;
+  showCommunityImages?: Prisma.BoolFieldUpdateOperationsInput | boolean;
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutUserNestedInput;
@@ -1315,6 +1361,7 @@ export type UserSelect<
     image?: boolean;
     stripeCustomerId?: boolean;
     credits?: boolean;
+    showCommunityImages?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
     subscriptions?: boolean | Prisma.User$subscriptionsArgs<ExtArgs>;
@@ -1339,6 +1386,7 @@ export type UserSelectCreateManyAndReturn<
     image?: boolean;
     stripeCustomerId?: boolean;
     credits?: boolean;
+    showCommunityImages?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
   },
@@ -1357,6 +1405,7 @@ export type UserSelectUpdateManyAndReturn<
     image?: boolean;
     stripeCustomerId?: boolean;
     credits?: boolean;
+    showCommunityImages?: boolean;
     createdAt?: boolean;
     updatedAt?: boolean;
   },
@@ -1371,6 +1420,7 @@ export type UserSelectScalar = {
   image?: boolean;
   stripeCustomerId?: boolean;
   credits?: boolean;
+  showCommunityImages?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;
 };
@@ -1386,6 +1436,7 @@ export type UserOmit<
   | "image"
   | "stripeCustomerId"
   | "credits"
+  | "showCommunityImages"
   | "createdAt"
   | "updatedAt",
   ExtArgs["result"]["user"]
@@ -1431,6 +1482,7 @@ export type $UserPayload<
       image: string | null;
       stripeCustomerId: string | null;
       credits: number;
+      showCommunityImages: boolean;
       createdAt: Date;
       updatedAt: Date;
     },
@@ -2089,6 +2141,7 @@ export interface UserFieldRefs {
   readonly image: Prisma.FieldRef<"User", "String">;
   readonly stripeCustomerId: Prisma.FieldRef<"User", "String">;
   readonly credits: Prisma.FieldRef<"User", "Int">;
+  readonly showCommunityImages: Prisma.FieldRef<"User", "Boolean">;
   readonly createdAt: Prisma.FieldRef<"User", "DateTime">;
   readonly updatedAt: Prisma.FieldRef<"User", "DateTime">;
 }

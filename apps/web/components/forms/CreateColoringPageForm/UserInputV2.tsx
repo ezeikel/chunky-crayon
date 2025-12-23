@@ -96,12 +96,12 @@ const UserInputV2 = () => {
       {buttonConfig.isSubmit ? (
         <SubmitButton
           text={buttonConfig.text}
-          className="font-tondo text-white bg-[#FF8A65] hover:bg-[#FF7043] focus:outline-none focus:ring-2 focus:ring-[#FF8A65] focus:ring-offset-2"
+          className="font-tondo text-white bg-crayon-orange hover:bg-crayon-orange-dark focus:outline-none focus:ring-2 focus:ring-crayon-orange focus:ring-offset-2"
         />
       ) : (
         <Button
           onClick={buttonConfig.action}
-          className="font-tondo text-white bg-[#FF8A65] hover:bg-[#FF7043] focus:outline-none focus:ring-2 focus:ring-[#FF8A65] focus:ring-offset-2"
+          className="font-tondo text-white bg-crayon-orange hover:bg-crayon-orange-dark focus:outline-none focus:ring-2 focus:ring-crayon-orange focus:ring-offset-2"
           type="button"
         >
           {buttonConfig.text}

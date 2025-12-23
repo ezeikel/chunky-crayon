@@ -14,4 +14,5 @@ export type * from "./models/ColoringImage";
 export type * from "./models/Account";
 export type * from "./models/Session";
 export type * from "./models/VerificationToken";
+export type * from "./models/StripeWebhookEvent";
 export type * from "./commonInputTypes";

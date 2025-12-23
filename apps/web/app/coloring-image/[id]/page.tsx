@@ -103,7 +103,7 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
 
   return (
     <PageWrap className="bg-gradient-to-br from-[#FFF2E6] to-[#FFE6CC] flex justify-center items-center gap-y-32">
-      <div className="max-w-3xl w-full p-8 bg-[#FF8A65] rounded-lg shadow-lg">
+      <div className="max-w-3xl w-full p-8 bg-crayon-orange rounded-lg shadow-lg">
         <div className="flex flex-col items-center text-center mb-8">
           <h1 className="font-dyna-puff text-5xl font-bold mb-2 text-white">
             {coloringImage.title}

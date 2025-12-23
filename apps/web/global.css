@@ -2,67 +2,149 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =============================================================================
+   WARM CANVAS DESIGN SYSTEM
+   A warm, harmonious palette using analogous colors (coral → peach → yellow)
+   All colors sit next to each other on the color wheel for natural harmony
+   ============================================================================= */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* =========================================================================
+       WARM ANALOGOUS PALETTE
+       Coral, peach, yellow, cream - all warm tones that work together
+       ========================================================================= */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Primary - Coral: Warm, friendly, inviting */
+    --crayon-orange: 12 75% 58%;
+    --crayon-orange-light: 12 80% 75%;
+    --crayon-orange-dark: 12 70% 48%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Secondary - Peach: Soft, approachable, gentle */
+    --crayon-teal: 25 80% 72%;
+    --crayon-teal-light: 25 85% 85%;
+    --crayon-teal-dark: 25 75% 58%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Accent - Blush Pink: Warm pink (not magenta), playful */
+    --crayon-pink: 355 65% 72%;
+    --crayon-pink-light: 355 70% 86%;
+    --crayon-pink-dark: 355 60% 58%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Highlight - Sunshine Yellow: Cheerful, bright, happy */
+    --crayon-yellow: 42 95% 62%;
+    --crayon-yellow-light: 42 100% 80%;
+    --crayon-yellow-dark: 42 90% 48%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Success - Sage Green: Warm-toned green, natural */
+    --crayon-green: 85 35% 52%;
+    --crayon-green-light: 85 40% 72%;
+    --crayon-green-dark: 85 35% 40%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Purple - Dusty Rose: Warm purple/mauve for variety */
+    --crayon-purple: 340 30% 65%;
+    --crayon-purple-light: 340 35% 80%;
+    --crayon-purple-dark: 340 30% 50%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Warm Tan - For subtle accents */
+    --crayon-sky: 30 50% 85%;
+    --crayon-sky-light: 30 55% 92%;
+    --crayon-sky-dark: 30 45% 75%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* =========================================================================
+       NEUTRAL PALETTE
+       Warm cream and brown tones - no blue/cool undertones
+       ========================================================================= */
 
-    --radius: 0.5rem;
+    /* Text Colors - Warm charcoal with brown undertones */
+    --text-primary: 20 20% 22%;
+    --text-secondary: 20 12% 40%;
+    --text-muted: 25 10% 55%;
+    --text-inverted: 0 0% 100%;
+
+    /* Background Colors - Warm cream tones */
+    --bg-cream: 38 55% 97%;
+    --bg-cream-dark: 35 40% 93%;
+    --bg-lavender: 30 45% 96%;
+    --bg-white: 40 30% 99%;
+
+    /* Paper texture backgrounds */
+    --paper-sky: 35 45% 94%;
+    --paper-cream: 40 50% 96%;
+
+    /* Border Colors - Warm tones */
+    --border-light: 35 30% 90%;
+    --border-medium: 30 25% 82%;
+
+    /* =========================================================================
+       SHADCN/UI SEMANTIC TOKENS
+       Mapped to our Crayon palette
+       ========================================================================= */
+
+    --background: var(--bg-cream);
+    --foreground: var(--text-primary);
+
+    --card: var(--bg-white);
+    --card-foreground: var(--text-primary);
+
+    --popover: var(--bg-white);
+    --popover-foreground: var(--text-primary);
+
+    --primary: var(--crayon-orange);
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: var(--crayon-teal);
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: var(--bg-cream-dark);
+    --muted-foreground: var(--text-muted);
+
+    --accent: var(--crayon-orange-light);
+    --accent-foreground: var(--text-primary);
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: var(--border-light);
+    --input: var(--border-medium);
+    --ring: var(--crayon-orange);
+
+    /* Increased radius for more playful, rounded feel */
+    --radius: 1rem;
+    --radius-sm: 0.75rem;
+    --radius-lg: 1.5rem;
+    --radius-xl: 2rem;
+    --radius-full: 9999px;
   }
 
+  /* Dark mode - subtle adjustments for evening coloring sessions */
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 240 10% 10%;
+    --foreground: 0 0% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 240 10% 14%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 10% 14%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: var(--crayon-orange);
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: var(--crayon-teal);
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 240 10% 20%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 240 10% 20%;
+    --accent-foreground: 0 0% 95%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 240 10% 20%;
+    --input: 240 10% 25%;
+    --ring: var(--crayon-orange);
   }
 }
 
@@ -70,7 +152,340 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Improve focus states for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-offset-2;
+    --tw-ring-color: hsl(var(--crayon-orange));
+    --tw-ring-offset-color: hsl(var(--background));
+  }
+
+  /* Smooth scrolling for the whole page */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Selection color matching brand */
+  ::selection {
+    background-color: hsl(var(--crayon-orange-light));
+    color: hsl(var(--text-primary));
+  }
+}
+
+/* =============================================================================
+   CUSTOM UTILITY CLASSES
+   ============================================================================= */
+
+@layer utilities {
+  /* Colorful tinted shadows for playful depth */
+  .shadow-crayon {
+    box-shadow:
+      0 4px 6px -1px hsl(var(--crayon-orange) / 0.1),
+      0 2px 4px -2px hsl(var(--crayon-orange) / 0.1);
+  }
+
+  .shadow-crayon-lg {
+    box-shadow:
+      0 10px 15px -3px hsl(var(--crayon-orange) / 0.1),
+      0 4px 6px -4px hsl(var(--crayon-orange) / 0.1);
+  }
+
+  .shadow-crayon-xl {
+    box-shadow:
+      0 20px 25px -5px hsl(var(--crayon-orange) / 0.1),
+      0 8px 10px -6px hsl(var(--crayon-orange) / 0.1);
+  }
+
+  /* Teal shadow variant */
+  .shadow-teal {
+    box-shadow:
+      0 4px 6px -1px hsl(var(--crayon-teal) / 0.15),
+      0 2px 4px -2px hsl(var(--crayon-teal) / 0.1);
+  }
+
+  /* Pink shadow variant */
+  .shadow-pink {
+    box-shadow:
+      0 4px 6px -1px hsl(var(--crayon-pink) / 0.15),
+      0 2px 4px -2px hsl(var(--crayon-pink) / 0.1);
+  }
+
+  /* Paper texture gradient backgrounds */
+  .bg-paper {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--bg-cream)) 0%,
+      hsl(var(--bg-cream-dark)) 100%
+    );
+  }
+
+  .bg-paper-lavender {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--bg-lavender)) 0%,
+      hsl(270 60% 95%) 100%
+    );
+  }
+
+  /* Gradient text for headings */
+  .text-gradient-orange {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--crayon-orange)) 0%,
+      hsl(var(--crayon-orange-dark)) 100%
+    );
+  }
+
+  .text-gradient-rainbow {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--crayon-orange)) 0%,
+      hsl(var(--crayon-pink)) 33%,
+      hsl(var(--crayon-purple)) 66%,
+      hsl(var(--crayon-teal)) 100%
+    );
+  }
+
+  /* Bouncy hover effect for interactive elements */
+  .hover-bounce {
+    @apply transition-transform duration-200 ease-out;
+  }
+  .hover-bounce:hover {
+    @apply scale-105;
+  }
+  .hover-bounce:active {
+    @apply scale-95;
+  }
+
+  /* Wiggle animation for fun interactions */
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
+
+  /* Float animation for decorative elements */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Pulse glow for CTAs */
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+}
+
+/* =============================================================================
+   KEYFRAME ANIMATIONS
+   ============================================================================= */
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+  75% { transform: rotate(-3deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(var(--crayon-orange) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px hsl(var(--crayon-orange) / 0);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =============================================================================
+   COMPONENT STYLES
+   ============================================================================= */
+
+@layer components {
+  /* Card styles with playful shadows */
+  .card-crayon {
+    @apply bg-white rounded-2xl p-6;
+    box-shadow:
+      0 4px 6px -1px hsl(var(--crayon-orange) / 0.08),
+      0 2px 4px -2px hsl(var(--crayon-orange) / 0.06),
+      0 0 0 1px hsl(var(--border-light));
+  }
+
+  .card-crayon:hover {
+    box-shadow:
+      0 10px 15px -3px hsl(var(--crayon-orange) / 0.12),
+      0 4px 6px -4px hsl(var(--crayon-orange) / 0.08),
+      0 0 0 1px hsl(var(--border-medium));
+  }
+
+  /* Button with crayon styling */
+  .btn-crayon {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3;
+    @apply font-tondo font-bold text-lg text-white;
+    @apply rounded-xl transition-all duration-200;
+    @apply hover:scale-105 active:scale-95;
+    background: linear-gradient(
+      135deg,
+      hsl(var(--crayon-orange)) 0%,
+      hsl(var(--crayon-orange-dark)) 100%
+    );
+    box-shadow:
+      0 4px 14px 0 hsl(var(--crayon-orange) / 0.4),
+      inset 0 1px 0 hsl(0 0% 100% / 0.2);
+  }
+
+  .btn-crayon:hover {
+    box-shadow:
+      0 6px 20px 0 hsl(var(--crayon-orange) / 0.5),
+      inset 0 1px 0 hsl(0 0% 100% / 0.25);
+  }
+
+  .btn-crayon:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    @apply hover:scale-100;
+  }
+
+  /* Secondary button variant */
+  .btn-crayon-secondary {
+    @apply btn-crayon;
+    background: linear-gradient(
+      135deg,
+      hsl(var(--crayon-teal)) 0%,
+      hsl(var(--crayon-teal-dark)) 100%
+    );
+    box-shadow:
+      0 4px 14px 0 hsl(var(--crayon-teal) / 0.4),
+      inset 0 1px 0 hsl(0 0% 100% / 0.2);
+  }
+
+  .btn-crayon-secondary:hover {
+    box-shadow:
+      0 6px 20px 0 hsl(var(--crayon-teal) / 0.5),
+      inset 0 1px 0 hsl(0 0% 100% / 0.25);
+  }
+
+  /* Outline button variant */
+  .btn-crayon-outline {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3;
+    @apply font-tondo font-bold text-lg;
+    @apply rounded-xl transition-all duration-200;
+    @apply hover:scale-105 active:scale-95;
+    @apply bg-white border-2;
+    border-color: hsl(var(--crayon-orange));
+    color: hsl(var(--crayon-orange));
+  }
+
+  .btn-crayon-outline:hover {
+    background: hsl(var(--crayon-orange-light) / 0.1);
+  }
+
+  /* Speech bubble for voice/image results */
+  .speech-bubble {
+    @apply relative bg-white rounded-2xl p-5;
+    border: 2px solid hsl(var(--crayon-teal));
+    box-shadow: 0 4px 12px hsl(var(--crayon-teal) / 0.15);
+  }
+
+  .speech-bubble::after {
+    content: '';
+    @apply absolute -bottom-3 left-1/2 -translate-x-1/2;
+    @apply w-5 h-5 bg-white;
+    border-right: 2px solid hsl(var(--crayon-teal));
+    border-bottom: 2px solid hsl(var(--crayon-teal));
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  /* Input fields with playful styling */
+  .input-crayon {
+    @apply w-full px-4 py-3 text-lg rounded-xl;
+    @apply bg-white border-2 transition-all duration-200;
+    @apply font-tondo;
+    border-color: hsl(var(--border-medium));
+  }
+
+  .input-crayon:focus {
+    @apply outline-none;
+    border-color: hsl(var(--crayon-orange));
+    box-shadow: 0 0 0 3px hsl(var(--crayon-orange) / 0.1);
+  }
+
+  .input-crayon::placeholder {
+    color: hsl(var(--text-muted));
+  }
+
+  /* Textarea variant */
+  .textarea-crayon {
+    @apply input-crayon resize-none;
+    min-height: 120px;
+  }
+}
+
+/* =============================================================================
+   FONTAWESOME DUOTONE ICON STYLING
+   ============================================================================= */
+
+/* Default duotone colors - orange primary, teal secondary */
+.fa-duotone {
+  --fa-primary-color: hsl(var(--crayon-orange));
+  --fa-secondary-color: hsl(var(--crayon-teal));
+  --fa-secondary-opacity: 0.8;
+}
+
+/* Teal variant */
+.fa-duotone.icon-teal {
+  --fa-primary-color: hsl(var(--crayon-teal));
+  --fa-secondary-color: hsl(var(--crayon-orange));
+}
+
+/* Pink variant */
+.fa-duotone.icon-pink {
+  --fa-primary-color: hsl(var(--crayon-pink));
+  --fa-secondary-color: hsl(var(--crayon-purple));
+}
+
+/* Success variant */
+.fa-duotone.icon-success {
+  --fa-primary-color: hsl(var(--crayon-green));
+  --fa-secondary-color: hsl(var(--crayon-teal));
+}
+
+/* Muted/disabled variant */
+.fa-duotone.icon-muted {
+  --fa-primary-color: hsl(var(--text-muted));
+  --fa-secondary-color: hsl(var(--text-muted));
+  --fa-secondary-opacity: 0.5;
+}
+
+/* =============================================================================
+   SONNER TOAST OVERRIDES
+   Outside @layer for higher specificity
+   ============================================================================= */
+
+[data-sonner-toast] [data-description] {
+  color: hsl(var(--text-secondary)) !important;
 }

@@ -2,72 +2,103 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faGlobe } from '@fortawesome/pro-regular-svg-icons';
+import { faUser, faUsers } from '@fortawesome/pro-duotone-svg-icons';
 import cn from '@/utils/cn';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import useUser from '@/hooks/useUser';
 
 type ImageFilterToggleProps = {
   className?: string;
-  showAuthButtons?: boolean;
+  showCommunityImages?: boolean;
 };
 
 const ImageFilterToggle = ({
   className,
-  showAuthButtons = false,
+  showCommunityImages = false,
 }: ImageFilterToggleProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const show = searchParams.get('show') || 'all';
   const { user } = useUser();
 
-  const handleValueChange = (value: string) => {
+  const handleSelect = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('show', value);
     router.push(`?${params.toString()}`);
   };
 
-  // Only show if user is logged in AND flag is enabled
-  if (!user || !showAuthButtons) {
+  // Only show if user is logged in AND community images is enabled in settings
+  if (!user || !showCommunityImages) {
     return null;
   }
 
   return (
-    <Select value={show} onValueChange={handleValueChange}>
-      <SelectTrigger className={cn('w-[180px]', className)}>
-        <SelectValue>
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon
-              icon={show === 'all' ? faGlobe : faUser}
-              className="text-gray-600"
-            />
-            <span className="text-gray-700 font-medium">
-              {show === 'all' ? 'All Images' : 'My Images'}
-            </span>
-          </div>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faGlobe} className="text-gray-600" />
-            <span>All Images</span>
-          </div>
-        </SelectItem>
-        <SelectItem value="user">
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon icon={faUser} className="text-gray-600" />
-            <span>My Images</span>
-          </div>
-        </SelectItem>
-      </SelectContent>
-    </Select>
+    <div className={cn('flex gap-2', className)}>
+      {/* Everyone's button */}
+      <button
+        type="button"
+        onClick={() => handleSelect('all')}
+        className={cn(
+          'flex items-center gap-2 px-4 py-2.5 rounded-full font-tondo font-bold text-base',
+          'transition-all duration-200 hover:scale-105 active:scale-95',
+          'border-2',
+          show === 'all'
+            ? 'bg-crayon-teal text-white border-crayon-teal shadow-btn-primary'
+            : 'bg-white text-text-secondary border-paper-cream-dark hover:border-crayon-teal hover:text-crayon-teal',
+        )}
+      >
+        <FontAwesomeIcon
+          icon={faUsers}
+          className="text-lg"
+          style={
+            show === 'all'
+              ? ({
+                  '--fa-primary-color': '#ffffff',
+                  '--fa-secondary-color': '#ffffff',
+                  '--fa-secondary-opacity': '0.7',
+                } as React.CSSProperties)
+              : ({
+                  '--fa-primary-color': 'hsl(var(--crayon-teal))',
+                  '--fa-secondary-color': 'hsl(var(--crayon-orange))',
+                  '--fa-secondary-opacity': '0.8',
+                } as React.CSSProperties)
+          }
+        />
+        Everyone&apos;s
+      </button>
+
+      {/* Mine button */}
+      <button
+        type="button"
+        onClick={() => handleSelect('user')}
+        className={cn(
+          'flex items-center gap-2 px-4 py-2.5 rounded-full font-tondo font-bold text-base',
+          'transition-all duration-200 hover:scale-105 active:scale-95',
+          'border-2',
+          show === 'user'
+            ? 'bg-crayon-orange text-white border-crayon-orange shadow-btn-primary'
+            : 'bg-white text-text-secondary border-paper-cream-dark hover:border-crayon-orange hover:text-crayon-orange',
+        )}
+      >
+        <FontAwesomeIcon
+          icon={faUser}
+          className="text-lg"
+          style={
+            show === 'user'
+              ? ({
+                  '--fa-primary-color': '#ffffff',
+                  '--fa-secondary-color': '#ffffff',
+                  '--fa-secondary-opacity': '0.7',
+                } as React.CSSProperties)
+              : ({
+                  '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                  '--fa-secondary-color': 'hsl(var(--crayon-teal))',
+                  '--fa-secondary-opacity': '0.8',
+                } as React.CSSProperties)
+          }
+        />
+        Mine
+      </button>
+    </div>
   );
 };
 

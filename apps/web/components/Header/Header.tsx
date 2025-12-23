@@ -3,27 +3,18 @@ import { User } from '@chunky-crayon/db/types';
 import {
   faCoins,
   faCreditCard,
-  faHome,
-  faSignOut,
-  faUser,
+  faGear,
+  faHouse,
+  faArrowRightToBracket,
+  faArrowRightFromBracket,
   faTag,
-  faRightToBracket,
   faHeadset,
-} from '@fortawesome/pro-regular-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+} from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
-import cn from '@/lib/utils';
-import { showAuthButtonsFlag } from '@/flags';
 import { signOut } from '@/auth';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
 import formatNumber from '@/utils/formatNumber';
+import HeaderDropdown from './HeaderDropdown';
 import MobileMenu from './MobileMenu';
 
 export type Visibility = 'always' | 'authenticated' | 'unauthenticated';
@@ -43,15 +34,7 @@ export type MobileNavItem = {
   href?: string;
   liClass?: string;
   action?: 'signout';
-};
-
-type DropdownItem = {
-  icon?: typeof faCreditCard;
-  label?: string;
-  href?: string;
-  action?: () => Promise<void>;
-  separator?: boolean;
-  external?: boolean;
+  requiresParentalGate?: boolean;
 };
 
 const handleSignOut = async () => {
@@ -60,132 +43,23 @@ const handleSignOut = async () => {
   await signOut();
 };
 
-const DROPDOWN_ITEMS: DropdownItem[] = [
-  {
-    icon: faCreditCard,
-    label: 'Billing',
-    href: '/account/billing',
-  },
-  {
-    icon: faHeadset,
-    label: 'Support',
-    href: 'mailto:support@chunkycrayon.com',
-    external: true,
-  },
-  {
-    separator: true,
-  },
-  {
-    icon: faSignOut,
-    label: 'Sign out',
-    action: handleSignOut,
-  },
-];
-
-const renderDropdown = (dropdownUser: Partial<User>) => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <button
-        type="button"
-        className="flex items-center gap-2 font-medium px-4 py-2 rounded hover:bg-muted/50 transition-colors"
-      >
-        <FontAwesomeIcon
-          icon={faUser}
-          size="lg"
-          className="text-muted-foreground"
-        />
-        {dropdownUser?.name || 'Account'}
-      </button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="w-48">
-      {DROPDOWN_ITEMS.map((item) => {
-        if (item.separator) {
-          return <DropdownMenuSeparator key="dropdown-separator" />;
-        }
-
-        if (item.href) {
-          return (
-            <DropdownMenuItem key={item.label} asChild>
-              {item.external ? (
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2"
-                >
-                  <FontAwesomeIcon icon={item.icon!} size="lg" />
-                  <span className="text-base">{item.label}</span>
-                </a>
-              ) : (
-                <Link href={item.href} className="flex items-center gap-2">
-                  <FontAwesomeIcon icon={item.icon!} size="lg" />
-                  <span className="text-base">{item.label}</span>
-                </Link>
-              )}
-            </DropdownMenuItem>
-          );
-        }
-
-        return (
-          <DropdownMenuItem key={item.label} asChild>
-            <form action={item.action} className="w-full">
-              <button
-                type="submit"
-                className="w-full text-left flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={item.icon!} size="lg" />
-                <span className="text-base">{item.label}</span>
-              </button>
-            </form>
-          </DropdownMenuItem>
-        );
-      })}
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
-
+// Simplified nav items - text only for navigation
+// Note: Credits are now shown in the Combined Profile Pill (HeaderDropdown)
 const ITEMS: NavItem[] = [
   {
     label: 'Home',
-    icon: <FontAwesomeIcon icon={faHome} size="lg" />,
     href: '/',
     visibility: 'always',
   },
   {
     label: 'Pricing',
-    icon: <FontAwesomeIcon icon={faTag} size="lg" />,
     href: '/pricing',
     visibility: 'unauthenticated',
   },
   {
     label: 'Support',
-    icon: <FontAwesomeIcon icon={faHeadset} size="lg" />,
     href: 'mailto:support@chunkycrayon.com',
     visibility: 'unauthenticated',
-  },
-  {
-    label: 'Credits',
-    component: (user: Partial<User>) => (
-      <span className="flex items-center gap-2 rounded-full bg-amber-100 text-amber-800 font-medium">
-        <FontAwesomeIcon icon={faCoins} className="text-amber-600" size="lg" />
-        {formatNumber(user.credits || 0)} credits
-      </span>
-    ),
-    liClass: 'bg-amber-100 rounded-full',
-    visibility: 'authenticated',
-  },
-  // {
-  //   label: 'Account',
-  //   icon: <FontAwesomeIcon icon={faUser} size="lg" />,
-  //   href: '/account',
-  //   visibility: 'authenticated',
-  // },
-  // Dropdown trigger as last item (for authenticated users)
-  {
-    label: 'UserDropdown',
-    liClass: 'p-0',
-    component: (user: Partial<User>) => renderDropdown(user),
-    visibility: 'authenticated',
   },
 ];
 
@@ -194,38 +68,41 @@ const getMobileItems = (user: Partial<User> | null): MobileNavItem[] => {
   if (user) {
     items.push({
       label: 'Home',
-      iconName: faHome,
+      iconName: faHouse,
       href: '/',
     });
     items.push({
       label: `${formatNumber(user.credits || 0)} credits`,
       iconName: faCoins,
-      liClass: 'bg-amber-100 rounded-full',
+      liClass: 'bg-crayon-yellow-light/30 rounded-full',
     });
-    // items.push({
-    //   label: user.name || 'Account',
-    //   iconName: faUser,
-    //   href: '/account',
-    // });
     items.push({
       label: 'Billing',
       iconName: faCreditCard,
       href: '/account/billing',
+      requiresParentalGate: true,
+    });
+    items.push({
+      label: 'Settings',
+      iconName: faGear,
+      href: '/account/settings',
+      requiresParentalGate: true,
     });
     items.push({
       label: 'Support',
       iconName: faHeadset,
       href: 'mailto:support@chunkycrayon.com',
+      requiresParentalGate: true,
     });
     items.push({
       label: 'Sign out',
-      iconName: faSignOut,
+      iconName: faArrowRightFromBracket,
       action: 'signout',
     });
   } else {
     items.push({
       label: 'Home',
-      iconName: faHome,
+      iconName: faHouse,
       href: '/',
     });
     items.push({
@@ -240,7 +117,7 @@ const getMobileItems = (user: Partial<User> | null): MobileNavItem[] => {
     });
     items.push({
       label: 'Sign in',
-      iconName: faRightToBracket,
+      iconName: faArrowRightToBracket,
       href: '/signin',
     });
   }
@@ -248,15 +125,18 @@ const getMobileItems = (user: Partial<User> | null): MobileNavItem[] => {
 };
 
 const renderNavLink = (item: NavItem, user: Partial<User> | null) => {
+  // Clean text-only nav links (like Bluey's approach)
+  const linkClass =
+    'font-tondo font-bold text-lg text-text-secondary hover:text-crayon-orange transition-colors';
+
   if (item.href?.startsWith('mailto:')) {
     return (
       <a
         href={item.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2"
+        className={linkClass}
       >
-        {item.icon}
         {item.label}
       </a>
     );
@@ -264,31 +144,21 @@ const renderNavLink = (item: NavItem, user: Partial<User> | null) => {
 
   if (item.href) {
     return (
-      <Link href={item.href} className="flex items-center gap-2">
-        {item.icon}
+      <Link href={item.href} className={linkClass}>
         {item.label}
       </Link>
     );
   }
 
-  return (
-    <div className="flex items-center gap-2">
-      {item.icon}
-      {item.component?.(user as Partial<User>)}
-    </div>
-  );
+  // Functional components (Credits, Dropdown) render their own UI
+  return item.component?.(user as Partial<User>);
 };
 
 const Header = async () => {
   const user = await getCurrentUser();
-  const showAuthButtons = await showAuthButtonsFlag();
   const mobileItems = getMobileItems(user);
 
   const renderItems = () => {
-    if (!showAuthButtons) {
-      return null;
-    }
-
     const visibleItems = ITEMS.filter((item) => {
       switch (item.visibility) {
         case 'always':
@@ -304,39 +174,33 @@ const Header = async () => {
 
     if (user) {
       return (
-        <div className="flex items-center gap-4">
-          <ul className="hidden md:flex gap-8">
+        <div className="flex items-center gap-6">
+          <nav className="hidden md:flex gap-8 items-center">
             {visibleItems.map((item) => (
-              <li
-                key={item.href || item.label}
-                className={cn('p-2', item.liClass)}
-              >
+              <div key={item.href || item.label} className={item.liClass}>
                 {renderNavLink(item, user)}
-              </li>
+              </div>
             ))}
-          </ul>
+            <HeaderDropdown user={user} signOutAction={handleSignOut} />
+          </nav>
           <MobileMenu items={mobileItems} />
         </div>
       );
     }
 
     return (
-      <div className="flex items-center gap-4">
-        <ul className="hidden md:flex gap-8">
+      <div className="flex items-center gap-6">
+        <nav className="hidden md:flex gap-8 items-center">
           {visibleItems.map((item) => (
-            <li
-              key={item.href || item.label}
-              className={cn('p-2', item.liClass)}
-            >
+            <div key={item.href || item.label} className={item.liClass}>
               {renderNavLink(item, null)}
-            </li>
+            </div>
           ))}
-        </ul>
+        </nav>
         <Link
           href="/signin"
-          className="hidden md:flex items-center gap-2 font-medium px-4 py-2 rounded hover:bg-muted/50 transition-colors"
+          className="hidden md:flex items-center font-tondo font-bold text-white px-6 py-2.5 rounded-full bg-crayon-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200"
         >
-          <FontAwesomeIcon icon={faRightToBracket} size="lg" />
           Sign in
         </Link>
         <MobileMenu items={mobileItems} />
@@ -345,9 +209,12 @@ const Header = async () => {
   };
 
   return (
-    <header className="flex items-center justify-between p-4 shadow-perfect sticky top-0 z-50 bg-white">
-      <Link href="/">
-        <h1 className="font-tondo text-4xl font-bold text-[#FF8A65] tracking-tight">
+    <header className="flex items-center justify-between px-4 md:px-6 py-3 sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-card border-b border-paper-cream-dark">
+      <Link
+        href="/"
+        className="group flex items-center hover:scale-105 active:scale-95 transition-transform duration-200"
+      >
+        <h1 className="font-tondo text-2xl md:text-3xl font-bold text-gradient-orange tracking-tight">
           Chunky Crayon
         </h1>
       </Link>

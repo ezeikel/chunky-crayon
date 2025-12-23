@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { toast } from 'sonner';
 import { PlanInterval, SUBSCRIPTION_PLANS } from '@/constants';
 import {
   Card,
@@ -57,8 +58,12 @@ const PricingPage = () => {
         'subscription',
       );
 
-      if (!session) {
-        throw new Error('Failed to create checkout session');
+      if (!session || !session.id) {
+        const errorMessage =
+          session?.error || 'Failed to create checkout session';
+        console.error('Checkout session error:', errorMessage);
+        toast.error(errorMessage);
+        return;
       }
 
       const { error } = await stripe.redirectToCheckout({
@@ -67,11 +72,11 @@ const PricingPage = () => {
 
       if (error) {
         console.error('Stripe redirect error:', error);
-        // TODO: show error to user (toast, etc.)
+        toast.error(error.message || 'Failed to redirect to checkout');
       }
     } catch (error) {
       console.error('Error purchasing plan:', error);
-      // TODO: show error to user (toast, etc.)
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setLoadingPlan(null);
     }
@@ -152,9 +157,6 @@ const PricingPage = () => {
                   </li>
                 ))}
               </ul>
-              <div className="text-xs text-orange-600 font-semibold mt-2">
-                {plan.bonus}
-              </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
               <Button

@@ -9,10 +9,11 @@ export const getUserId = async (action?: string) => {
 
   const userId = session?.user.id;
 
-  // if the action is to get the current user, return the user id without checking if the user is logged in
+  // These actions can return null without logging an error (guest-friendly)
   if (
     action === ACTIONS.GET_CURRENT_USER ||
-    action === ACTIONS.GET_ALL_COLORING_IMAGES
+    action === ACTIONS.GET_ALL_COLORING_IMAGES ||
+    action === ACTIONS.CREATE_CHECKOUT_SESSION
   ) {
     return userId;
   }

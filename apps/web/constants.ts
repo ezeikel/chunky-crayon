@@ -338,6 +338,9 @@ export const FREE_CREDITS = 15;
 
 export const ACTIONS = {
   CREATE_COLORING_IMAGE: 'create coloring image',
+  TRANSCRIBE_AUDIO: 'transcribe audio',
+  DESCRIBE_IMAGE: 'describe image',
+  CREATE_CHECKOUT_SESSION: 'create a checkout session',
   GET_CURRENT_USER: 'get the current user',
   GET_USER_CREDITS: 'get the user credits',
   GET_USER_SUBSCRIPTIONS: 'get the user subscriptions',
@@ -362,28 +365,49 @@ export type SubscriptionPlan = {
   price: string; // e.g '£7.99'
   credits: string;
   features: string[];
-  bonus: string;
   audience: string;
   stripePriceEnv: string; // e.g 'NEXT_PUBLIC_STRIPE_PRICE_CRAYON_MONTHLY'
   mostPopular?: boolean;
 };
 
+// Monthly credit allotment per plan (same for monthly and annual billing)
+// Annual subscribers get the same monthly credits via cron job, just billed yearly
+export const PLAN_CREDITS_MONTHLY = {
+  [PlanName.CRAYON]: 250,
+  [PlanName.RAINBOW]: 500,
+  [PlanName.MASTERPIECE]: 1000,
+  [PlanName.STUDIO]: 5000,
+} as const;
+
+// Rollover caps: max credits that can carry over to next month
+// Crayon: no rollover (credits reset each month)
+// Rainbow: 1 month rollover (500 max carryover)
+// Masterpiece: 2 months rollover (2000 max carryover)
+// Studio: 3 months rollover (15000 max carryover)
+export const PLAN_ROLLOVER_CAPS = {
+  [PlanName.CRAYON]: 0,
+  [PlanName.RAINBOW]: 500,
+  [PlanName.MASTERPIECE]: 2000,
+  [PlanName.STUDIO]: 15000,
+} as const;
+
+// Legacy export for backwards compatibility - now uses monthly amounts for both
 export const PLAN_CREDITS = {
   [PlanName.CRAYON]: {
-    [BillingPeriod.MONTHLY]: 250,
-    [BillingPeriod.ANNUAL]: 3000,
+    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.CRAYON],
+    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.CRAYON],
   },
   [PlanName.RAINBOW]: {
-    [BillingPeriod.MONTHLY]: 500,
-    [BillingPeriod.ANNUAL]: 6000,
+    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.RAINBOW],
+    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.RAINBOW],
   },
   [PlanName.MASTERPIECE]: {
-    [BillingPeriod.MONTHLY]: 1000,
-    [BillingPeriod.ANNUAL]: 12000,
+    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.MASTERPIECE],
+    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.MASTERPIECE],
   },
   [PlanName.STUDIO]: {
-    [BillingPeriod.MONTHLY]: 5000,
-    [BillingPeriod.ANNUAL]: 60000,
+    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.STUDIO],
+    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.STUDIO],
   },
 } as const;
 
@@ -407,7 +431,6 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'Adjust color, contrast, and brightness',
         'Turn photos into coloring pages',
       ],
-      bonus: '🎁 Bonus: 25 extra credits for experimenting and retries',
       audience: 'Perfect for casual colorers and young artists',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_CRAYON_MONTHLY as string,
@@ -422,8 +445,8 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'All Crayon Plan features',
         'Advanced editing features',
         'Early access to new models and features',
+        'Credits roll over (up to 1 month)',
       ],
-      bonus: '🎁 Bonus: 50 extra credits for experimenting and retries',
       audience: 'Great for creative families and siblings',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY as string,
@@ -439,8 +462,8 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'All Rainbow Plan features',
         'Bulk generation',
         'Commercial use',
+        'Credits roll over (up to 2 months)',
       ],
-      bonus: '🎁 Bonus: 75 extra credits for experimenting and retries',
       audience: 'Perfect for adults and serious colorers',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_MASTERPIECE_MONTHLY as string,
@@ -453,9 +476,8 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       credits: `${PLAN_CREDITS[PlanName.STUDIO][BillingPeriod.MONTHLY]} credits/month`,
       features: [
         'All Masterpiece Plan features',
-        'Rollover up to 3 months of credits',
+        'Credits roll over (up to 3 months)',
       ],
-      bonus: '🎁 Bonus: 250 extra credits for experimenting and retries',
       audience: 'Best for studios, teachers, and high-volume users',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_STUDIO_MONTHLY as string,
@@ -467,14 +489,13 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       name: 'Crayon Plan',
       tagline: 'Start your coloring adventure',
       price: '£79.99',
-      credits: `${PLAN_CREDITS[PlanName.CRAYON][BillingPeriod.ANNUAL]} credits/year`,
+      credits: `${PLAN_CREDITS[PlanName.CRAYON][BillingPeriod.ANNUAL]} credits/month`,
       features: [
         'Create coloring pages from text prompts',
         'Create coloring pages with words, names, and numbers',
         'Adjust color, contrast, and brightness',
         'Turn photos into coloring pages',
       ],
-      bonus: '🎁 Bonus: 25 extra credits for experimenting and retries',
       audience: 'Perfect for casual colorers and young artists',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_CRAYON_ANNUAL as string,
@@ -484,13 +505,13 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       name: 'Rainbow Plan',
       tagline: 'Fun for the whole family',
       price: '£139.99',
-      credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.ANNUAL]} credits/year`,
+      credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.ANNUAL]} credits/month`,
       features: [
         'All Crayon Plan features',
         'Advanced editing features',
         'Early access to new models and features',
+        'Credits roll over (up to 1 month)',
       ],
-      bonus: '🎁 Bonus: 50 extra credits for experimenting and retries',
       audience: 'Great for creative families and siblings',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL as string,
@@ -501,13 +522,13 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       name: 'Masterpiece Plan',
       tagline: 'For color enthusiasts',
       price: '£249.99',
-      credits: `${PLAN_CREDITS[PlanName.MASTERPIECE][BillingPeriod.ANNUAL]} credits/year`,
+      credits: `${PLAN_CREDITS[PlanName.MASTERPIECE][BillingPeriod.ANNUAL]} credits/month`,
       features: [
         'All Rainbow Plan features',
         'Bulk generation',
         'Commercial use',
+        'Credits roll over (up to 2 months)',
       ],
-      bonus: '🎁 Bonus: 75 extra credits for experimenting and retries',
       audience: 'Perfect for adults and serious colorers',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_MASTERPIECE_ANNUAL as string,
@@ -517,12 +538,11 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       name: 'Studio Plan',
       tagline: 'For super creators and small businesses',
       price: '£599.00',
-      credits: `${PLAN_CREDITS[PlanName.STUDIO][BillingPeriod.ANNUAL]} credits/year`,
+      credits: `${PLAN_CREDITS[PlanName.STUDIO][BillingPeriod.ANNUAL]} credits/month`,
       features: [
         'All Masterpiece Plan features',
-        'Rollover up to 3 months of credits',
+        'Credits roll over (up to 3 months)',
       ],
-      bonus: '🎁 Bonus: 250 extra credits for experimenting and retries',
       audience: 'Best for studios, teachers, and high-volume users',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_STUDIO_ANNUAL as string,
@@ -615,6 +635,28 @@ export const SOCIAL_LINKS = [
   // },
 ];
 
+// Mobile app store links - set to null until apps are published
+// Update these with actual URLs when apps are live
+export const APP_STORE_LINKS = {
+  APPLE: null as string | null, // e.g., 'https://apps.apple.com/gb/app/chunky-crayon/id...'
+  GOOGLE: null as string | null, // e.g., 'https://play.google.com/store/apps/details?id=com.chunkycrayon.app'
+} as const;
+
+export const APP_STORE_IMAGES = {
+  APPLE: {
+    LIGHT: '/images/app-store-light.svg',
+    DARK: '/images/app-store-dark.svg',
+  },
+  GOOGLE: {
+    LIGHT: '/images/play-store-light.svg',
+    DARK: '/images/play-store-dark.svg',
+  },
+} as const;
+
+// Helper to check if mobile apps are available
+export const ARE_MOBILE_APPS_AVAILABLE =
+  APP_STORE_LINKS.APPLE !== null || APP_STORE_LINKS.GOOGLE !== null;
+
 /**
  * Comprehensive tracking events for analytics dashboards.
  * Events are organized by category for easy filtering in PostHog.
@@ -631,6 +673,11 @@ export const TRACKING_EVENTS = {
   AUTH_SIGN_UP_COMPLETED: 'auth_sign_up_completed', // New user registered
   AUTH_SIGN_OUT: 'auth_sign_out', // User signs out
 
+  // ===== GUEST MODE (Anonymous Demo) =====
+  GUEST_GENERATION_USED: 'guest_generation_used', // Guest used a free generation
+  GUEST_LIMIT_REACHED: 'guest_limit_reached', // Guest exhausted free tries
+  GUEST_SIGNUP_CLICKED: 'guest_signup_clicked', // Guest clicked signup CTA
+
   // ===== COLORING PAGE CREATION (Core Funnel) =====
   CREATION_STARTED: 'creation_started', // User starts typing description
   CREATION_SUBMITTED: 'creation_submitted', // Description submitted
@@ -638,6 +685,17 @@ export const TRACKING_EVENTS = {
   CREATION_FAILED: 'creation_failed', // Generation failed
   CREATION_RETRIED: 'creation_retried', // User retried after failure
   CREATION_ANALYZED: 'creation_analyzed', // Image content analyzed for insights
+
+  // ===== INPUT MODE (Voice/Image/Text) =====
+  INPUT_MODE_CHANGED: 'input_mode_changed', // User switches input mode
+  VOICE_INPUT_STARTED: 'voice_input_started', // Started recording
+  VOICE_INPUT_COMPLETED: 'voice_input_completed', // Recording finished & transcribed
+  VOICE_INPUT_FAILED: 'voice_input_failed', // Transcription failed
+  VOICE_INPUT_CANCELLED: 'voice_input_cancelled', // Recording cancelled
+  IMAGE_INPUT_UPLOADED: 'image_input_uploaded', // Image uploaded from file
+  IMAGE_INPUT_CAPTURED: 'image_input_captured', // Photo taken with camera
+  IMAGE_INPUT_PROCESSED: 'image_input_processed', // Image described successfully
+  IMAGE_INPUT_FAILED: 'image_input_failed', // Description failed
 
   // ===== COLORING PAGE ENGAGEMENT =====
   PAGE_VIEWED: 'page_viewed', // Coloring page viewed
@@ -689,6 +747,10 @@ export const TRACKING_EVENTS = {
   FEATURE_DISCOVERED: 'feature_discovered', // New feature interaction
   REFERRAL_SHARED: 'referral_shared', // User shared referral
   SOCIAL_LINK_CLICKED: 'social_link_clicked', // Social media click
+
+  // ===== MOBILE APP =====
+  APP_STORE_CLICKED: 'app_store_clicked', // Apple App Store button clicked
+  PLAY_STORE_CLICKED: 'play_store_clicked', // Google Play Store button clicked
 
   // ===== ERRORS (for debugging dashboards) =====
   ERROR_OCCURRED: 'error_occurred', // Any error

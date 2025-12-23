@@ -65,6 +65,12 @@ export {
   // Analytics prompts
   IMAGE_ANALYTICS_SYSTEM,
   IMAGE_ANALYTICS_PROMPT,
+  // Audio transcription prompts (for voice input)
+  AUDIO_TRANSCRIPTION_SYSTEM,
+  AUDIO_TRANSCRIPTION_PROMPT,
+  // Image description prompts (for image/photo input)
+  IMAGE_DESCRIPTION_SYSTEM,
+  IMAGE_DESCRIPTION_PROMPT,
 } from './prompts';
 
 // Re-export schemas
@@ -73,8 +79,16 @@ export {
   imageMetadataSchema,
   svgValidationSchema,
   imageAnalyticsSchema,
+  audioTranscriptionSchema,
+  imageDescriptionSchema,
 } from './schemas';
-export type { ImageMetadata, SvgValidation, ImageAnalytics } from './schemas';
+export type {
+  ImageMetadata,
+  SvgValidation,
+  ImageAnalytics,
+  AudioTranscription,
+  ImageDescription,
+} from './schemas';
 
 // Re-export analytics functions
 export { analyzeImageForAnalytics } from './analytics';

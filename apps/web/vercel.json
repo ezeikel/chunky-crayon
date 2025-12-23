@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/subscription/credit-drip",
+      "schedule": "0 0 1 * *"
+    },
+    {
       "path": "/api/coloring-image/generate",
       "schedule": "0 8 * * *"
     },

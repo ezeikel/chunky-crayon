@@ -8,6 +8,7 @@ import PlausibleProvider from 'next-plausible';
 import cn from '@/utils/cn';
 import Header from '@/components/Header/Header';
 import { Toaster } from '@/components/ui/sonner';
+import DevToolbar from '@/components/dev/DevToolbar';
 import BasicHeader from '@/components/BasicHeader/BasicHeader';
 import Footer from '@/components/Footer/Footer';
 import { tondo, rooneySans } from '@/fonts';
@@ -130,6 +131,7 @@ export default function RootLayout({
           <Footer />
         </Providers>
         <Toaster />
+        <DevToolbar />
         <Analytics />
       </body>
     </html>

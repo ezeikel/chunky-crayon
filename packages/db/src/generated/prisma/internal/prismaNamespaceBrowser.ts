@@ -61,6 +61,7 @@ export const ModelName = {
   Account: "Account",
   Session: "Session",
   VerificationToken: "VerificationToken",
+  StripeWebhookEvent: "StripeWebhookEvent",
 } as const;
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -87,6 +88,7 @@ export const UserScalarFieldEnum = {
   image: "image",
   stripeCustomerId: "stripeCustomerId",
   credits: "credits",
+  showCommunityImages: "showCommunityImages",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
 } as const;
@@ -175,6 +177,15 @@ export const VerificationTokenScalarFieldEnum = {
 
 export type VerificationTokenScalarFieldEnum =
   (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum];
+
+export const StripeWebhookEventScalarFieldEnum = {
+  id: "id",
+  type: "type",
+  processedAt: "processedAt",
+} as const;
+
+export type StripeWebhookEventScalarFieldEnum =
+  (typeof StripeWebhookEventScalarFieldEnum)[keyof typeof StripeWebhookEventScalarFieldEnum];
 
 export const SortOrder = {
   asc: "asc",

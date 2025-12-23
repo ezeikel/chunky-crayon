@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { getCurrentUser } from '@/app/actions/user';
 import { useRouter } from 'next/navigation';
 import { SubscriptionStatus } from '@chunky-crayon/db/types';
+import { useGuestMode } from './useGuestMode';
 
 type User = {
   id: string;
@@ -21,6 +22,11 @@ const useUser = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  const isSignedIn = !!user;
+
+  // Guest mode for anonymous users
+  const guestMode = useGuestMode(isSignedIn);
 
   const fetchUser = useCallback(async () => {
     try {
@@ -48,13 +54,47 @@ const useUser = () => {
     (sub) => sub.status === SubscriptionStatus.ACTIVE,
   );
 
+  const hasEnoughCredits = user?.credits ? user.credits >= 5 : false;
+
+  // Can generate if:
+  // 1. Signed in with enough credits, OR
+  // 2. Guest with remaining free generations
+  const canGenerate = isSignedIn ? hasEnoughCredits : guestMode.canGenerate;
+
+  // Determine the reason user can't generate (for UI messaging)
+  const getBlockedReason = ():
+    | 'not_signed_in'
+    | 'no_credits'
+    | 'guest_limit_reached'
+    | null => {
+    if (canGenerate) return null;
+
+    if (!isSignedIn) {
+      // Guest who has exhausted free generations
+      return 'guest_limit_reached';
+    }
+
+    // Signed in but no credits
+    return 'no_credits';
+  };
+
   return {
     user,
     isLoading,
-    isSignedIn: !!user,
-    hasEnoughCredits: user?.credits ? user.credits >= 5 : false,
+    isSignedIn,
+    hasEnoughCredits,
     hasActiveSubscription,
     handleAuthAction,
+    // Guest mode properties
+    isGuest: guestMode.isGuest,
+    guestGenerationsRemaining: guestMode.generationsRemaining,
+    guestGenerationsUsed: guestMode.generationsUsed,
+    maxGuestGenerations: guestMode.maxGenerations,
+    incrementGuestGeneration: guestMode.incrementGeneration,
+    resetGuestData: guestMode.resetGuestData,
+    // Combined convenience properties
+    canGenerate,
+    blockedReason: getBlockedReason(),
   };
 };
 

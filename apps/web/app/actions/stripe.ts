@@ -15,7 +15,7 @@ import {
   getDaysInPeriod,
   mapStripeStatusToSubscriptionStatus,
 } from '@/utils/stripe';
-import { PLAN_CREDITS } from '@/constants';
+import { PLAN_CREDITS, ACTIONS } from '@/constants';
 import Stripe from 'stripe';
 import { getUserId } from './user';
 
@@ -42,59 +42,68 @@ export const createCheckoutSession = async (
   mode: 'payment' | 'subscription',
 ): Promise<{
   id: string;
+  error?: string;
 } | null> => {
   const headersList = await headers();
   const origin = headersList.get('origin');
 
-  const userId = await getUserId('create a checkout session');
-
-  if (!userId) {
-    return null;
+  // Validate priceId
+  if (!priceId) {
+    console.error('No priceId provided to createCheckoutSession');
+    return {
+      id: '',
+      error: 'No price ID provided. Please check environment variables.',
+    };
   }
 
-  const user = await db.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      name: true,
-      email: true,
-      stripeCustomerId: true,
-    },
-  });
+  const userId = await getUserId(ACTIONS.CREATE_CHECKOUT_SESSION);
 
-  if (!user) {
-    console.error('User not found.');
-    return null;
+  // For one-time payments (credit packs), require authentication
+  if (mode === 'payment' && !userId) {
+    return { id: '', error: 'You must be logged in to purchase credits.' };
   }
 
-  // TODO: findUnique instead of findFirst
-  const subscription = await db.subscription.findFirst({
-    where: {
-      user: {
-        id: userId,
+  // Get user details if logged in
+  let user = null;
+  let existingSubscription = null;
+
+  if (userId) {
+    user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        name: true,
+        email: true,
+        stripeCustomerId: true,
       },
-    },
-  });
+    });
 
-  const stripeSession = await stripe.checkout.sessions.create({
+    existingSubscription = await db.subscription.findFirst({
+      where: { user: { id: userId } },
+    });
+  }
+
+  // Build checkout session options
+  const sessionOptions: Stripe.Checkout.SessionCreateParams = {
     payment_method_types: ['card'],
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
-      },
-    ],
+    line_items: [{ price: priceId, quantity: 1 }],
     mode,
     success_url: `${origin}/account/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    // cancel_url: `${origin}/account/billing`,
     cancel_url: `${origin}/pricing`,
-    client_reference_id: userId,
+  };
 
-    // send stripe customer id if user already exists in stripe
-    customer: user.stripeCustomerId ?? undefined,
-    customer_email: subscription ? undefined : user.email,
-  });
+  if (userId && user) {
+    // Logged-in user flow
+    sessionOptions.client_reference_id = userId;
+    sessionOptions.customer = user.stripeCustomerId ?? undefined;
+    sessionOptions.customer_email = existingSubscription
+      ? undefined
+      : user.email;
+  }
+  // Guest checkout flow: no client_reference_id or customer set
+  // For subscriptions, Stripe automatically creates a customer and collects email
+  // Webhook will find/create user from the Stripe customer email
+
+  const stripeSession = await stripe.checkout.sessions.create(sessionOptions);
 
   // update relevant paths
   revalidatePath('/account/billing');

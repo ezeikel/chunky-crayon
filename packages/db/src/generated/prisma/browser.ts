@@ -51,3 +51,8 @@ export type Session = Prisma.SessionModel;
  *
  */
 export type VerificationToken = Prisma.VerificationTokenModel;
+/**
+ * Model StripeWebhookEvent
+ *
+ */
+export type StripeWebhookEvent = Prisma.StripeWebhookEventModel;

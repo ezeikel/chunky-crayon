@@ -7,7 +7,7 @@ import { TRACKING_EVENTS } from '@/constants';
 
 const PrintButton = () => (
   <button
-    className="bg-[#FF8A65] size-12 rounded-full flex items-center justify-center"
+    className="bg-crayon-orange size-12 rounded-full flex items-center justify-center"
     type="button"
     aria-label="print"
     onClick={() => {

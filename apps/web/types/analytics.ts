@@ -29,13 +29,28 @@ export type EventProperties = {
   };
   [TRACKING_EVENTS.AUTH_SIGN_OUT]: Record<string, never>;
 
+  // ===== GUEST MODE =====
+  [TRACKING_EVENTS.GUEST_GENERATION_USED]: {
+    generationNumber: number; // 1st or 2nd free generation
+    generationsRemaining: number;
+    inputType: 'text' | 'voice' | 'image';
+  };
+  [TRACKING_EVENTS.GUEST_LIMIT_REACHED]: {
+    totalGenerations: number;
+    lastInputType: 'text' | 'voice' | 'image';
+  };
+  [TRACKING_EVENTS.GUEST_SIGNUP_CLICKED]: {
+    location: 'text_input' | 'voice_input' | 'image_input' | 'modal';
+    generationsUsed: number;
+  };
+
   // ===== COLORING PAGE CREATION =====
   [TRACKING_EVENTS.CREATION_STARTED]: {
     inputLength: number;
   };
   [TRACKING_EVENTS.CREATION_SUBMITTED]: {
     description: string;
-    inputType: 'text' | 'voice';
+    inputType: 'text' | 'voice' | 'image';
     characterCount: number;
   };
   [TRACKING_EVENTS.CREATION_COMPLETED]: {
@@ -82,6 +97,44 @@ export type EventProperties = {
     complexity: 'simple' | 'moderate' | 'detailed';
     hasPersonalization: boolean;
     ageAppeal: 'toddler' | 'preschool' | 'early_elementary' | 'all_ages';
+  };
+
+  // ===== INPUT MODE (Voice/Image/Text) =====
+  [TRACKING_EVENTS.INPUT_MODE_CHANGED]: {
+    fromMode: 'text' | 'voice' | 'image';
+    toMode: 'text' | 'voice' | 'image';
+  };
+  [TRACKING_EVENTS.VOICE_INPUT_STARTED]: {
+    location: string;
+  };
+  [TRACKING_EVENTS.VOICE_INPUT_COMPLETED]: {
+    transcription: string;
+    durationMs: number;
+    confidence: 'high' | 'medium' | 'low';
+  };
+  [TRACKING_EVENTS.VOICE_INPUT_FAILED]: {
+    errorMessage: string;
+    durationMs?: number;
+  };
+  [TRACKING_EVENTS.VOICE_INPUT_CANCELLED]: {
+    durationMs: number;
+    reason: 'user_cancelled' | 'timeout' | 'error';
+  };
+  [TRACKING_EVENTS.IMAGE_INPUT_UPLOADED]: {
+    fileType: string;
+    fileSizeKb: number;
+  };
+  [TRACKING_EVENTS.IMAGE_INPUT_CAPTURED]: {
+    source: 'camera' | 'file_picker';
+  };
+  [TRACKING_EVENTS.IMAGE_INPUT_PROCESSED]: {
+    description: string;
+    subjects: string[];
+    isChildDrawing: boolean;
+  };
+  [TRACKING_EVENTS.IMAGE_INPUT_FAILED]: {
+    errorMessage: string;
+    source: 'camera' | 'file_picker';
   };
 
   // ===== COLORING PAGE ENGAGEMENT =====
@@ -260,5 +313,13 @@ export type EventProperties = {
   [TRACKING_EVENTS.ERROR_PAYMENT]: {
     productType: 'subscription' | 'credits';
     errorMessage: string;
+  };
+
+  // ===== MOBILE APP =====
+  [TRACKING_EVENTS.APP_STORE_CLICKED]: {
+    button_location: 'footer' | 'hero' | 'other';
+  };
+  [TRACKING_EVENTS.PLAY_STORE_CLICKED]: {
+    button_location: 'footer' | 'hero' | 'other';
   };
 };

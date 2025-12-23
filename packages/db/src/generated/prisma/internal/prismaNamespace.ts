@@ -419,6 +419,7 @@ export const ModelName = {
   Account: "Account",
   Session: "Session",
   VerificationToken: "VerificationToken",
+  StripeWebhookEvent: "StripeWebhookEvent",
 } as const;
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
@@ -447,7 +448,8 @@ export type TypeMap<
       | "coloringImage"
       | "account"
       | "session"
-      | "verificationToken";
+      | "verificationToken"
+      | "stripeWebhookEvent";
     txIsolationLevel: TransactionIsolationLevel;
   };
   model: {
@@ -983,6 +985,82 @@ export type TypeMap<
         };
       };
     };
+    StripeWebhookEvent: {
+      payload: Prisma.$StripeWebhookEventPayload<ExtArgs>;
+      fields: Prisma.StripeWebhookEventFieldRefs;
+      operations: {
+        findUnique: {
+          args: Prisma.StripeWebhookEventFindUniqueArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload> | null;
+        };
+        findUniqueOrThrow: {
+          args: Prisma.StripeWebhookEventFindUniqueOrThrowArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>;
+        };
+        findFirst: {
+          args: Prisma.StripeWebhookEventFindFirstArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload> | null;
+        };
+        findFirstOrThrow: {
+          args: Prisma.StripeWebhookEventFindFirstOrThrowArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>;
+        };
+        findMany: {
+          args: Prisma.StripeWebhookEventFindManyArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>[];
+        };
+        create: {
+          args: Prisma.StripeWebhookEventCreateArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>;
+        };
+        createMany: {
+          args: Prisma.StripeWebhookEventCreateManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        createManyAndReturn: {
+          args: Prisma.StripeWebhookEventCreateManyAndReturnArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>[];
+        };
+        delete: {
+          args: Prisma.StripeWebhookEventDeleteArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>;
+        };
+        update: {
+          args: Prisma.StripeWebhookEventUpdateArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>;
+        };
+        deleteMany: {
+          args: Prisma.StripeWebhookEventDeleteManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        updateMany: {
+          args: Prisma.StripeWebhookEventUpdateManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        updateManyAndReturn: {
+          args: Prisma.StripeWebhookEventUpdateManyAndReturnArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>[];
+        };
+        upsert: {
+          args: Prisma.StripeWebhookEventUpsertArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeWebhookEventPayload>;
+        };
+        aggregate: {
+          args: Prisma.StripeWebhookEventAggregateArgs<ExtArgs>;
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStripeWebhookEvent>;
+        };
+        groupBy: {
+          args: Prisma.StripeWebhookEventGroupByArgs<ExtArgs>;
+          result: runtime.Types.Utils.Optional<Prisma.StripeWebhookEventGroupByOutputType>[];
+        };
+        count: {
+          args: Prisma.StripeWebhookEventCountArgs<ExtArgs>;
+          result:
+            | runtime.Types.Utils.Optional<Prisma.StripeWebhookEventCountAggregateOutputType>
+            | number;
+        };
+      };
+    };
   };
 } & {
   other: {
@@ -1030,6 +1108,7 @@ export const UserScalarFieldEnum = {
   image: "image",
   stripeCustomerId: "stripeCustomerId",
   credits: "credits",
+  showCommunityImages: "showCommunityImages",
   createdAt: "createdAt",
   updatedAt: "updatedAt",
 } as const;
@@ -1119,6 +1198,15 @@ export const VerificationTokenScalarFieldEnum = {
 export type VerificationTokenScalarFieldEnum =
   (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum];
 
+export const StripeWebhookEventScalarFieldEnum = {
+  id: "id",
+  type: "type",
+  processedAt: "processedAt",
+} as const;
+
+export type StripeWebhookEventScalarFieldEnum =
+  (typeof StripeWebhookEventScalarFieldEnum)[keyof typeof StripeWebhookEventScalarFieldEnum];
+
 export const SortOrder = {
   asc: "asc",
   desc: "desc",
@@ -1190,6 +1278,14 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<
   $PrismaModel,
   "Int[]"
+>;
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<
+  $PrismaModel,
+  "Boolean"
 >;
 
 /**
@@ -1386,6 +1482,7 @@ export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit;
   session?: Prisma.SessionOmit;
   verificationToken?: Prisma.VerificationTokenOmit;
+  stripeWebhookEvent?: Prisma.StripeWebhookEventOmit;
 };
 
 /* Types for Logging */

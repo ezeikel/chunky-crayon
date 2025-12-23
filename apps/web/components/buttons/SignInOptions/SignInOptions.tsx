@@ -4,7 +4,8 @@ import { useState } from 'react';
 import posthog from 'posthog-js';
 import { signIn } from 'next-auth/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faSpinner } from '@fortawesome/pro-regular-svg-icons';
+import { faEnvelope } from '@fortawesome/pro-regular-svg-icons';
+import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { faGoogle, faApple } from '@fortawesome/free-brands-svg-icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -99,8 +100,15 @@ const SignInOptions = () => {
             {isLoading ? (
               <>
                 <FontAwesomeIcon
-                  icon={faSpinner}
+                  icon={faSpinnerThird}
                   className="mr-2 h-4 w-4 animate-spin"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                      '--fa-secondary-color': 'hsl(var(--crayon-teal))',
+                      '--fa-secondary-opacity': '0.6',
+                    } as React.CSSProperties
+                  }
                 />
                 Sending link...
               </>

@@ -95,3 +95,50 @@ export const imageAnalyticsSchema = z.object({
 });
 
 export type ImageAnalytics = z.infer<typeof imageAnalyticsSchema>;
+
+// =============================================================================
+// Audio Transcription (for voice input)
+// =============================================================================
+
+export const audioTranscriptionSchema = z.object({
+  transcription: z
+    .string()
+    .describe('The transcribed and cleaned-up text from the audio recording'),
+  confidence: z
+    .enum(['high', 'medium', 'low'])
+    .describe('Confidence level of the transcription accuracy'),
+  detectedLanguage: z
+    .string()
+    .nullable()
+    .describe('The detected language of the speech (e.g., "en", "es")'),
+});
+
+export type AudioTranscription = z.infer<typeof audioTranscriptionSchema>;
+
+// =============================================================================
+// Image Description (for image/photo input)
+// =============================================================================
+
+export const imageDescriptionSchema = z.object({
+  description: z
+    .string()
+    .describe(
+      'Simple, child-friendly description of the image content for coloring page generation',
+    ),
+  subjects: z
+    .array(z.string())
+    .describe(
+      'Main subjects detected in the image (e.g., ["cat", "flowers", "tree"])',
+    ),
+  setting: z
+    .string()
+    .nullable()
+    .describe(
+      'The background or setting of the image (e.g., "garden", "beach", "bedroom")',
+    ),
+  isChildDrawing: z
+    .boolean()
+    .describe("Whether the image appears to be a child's drawing or artwork"),
+});
+
+export type ImageDescription = z.infer<typeof imageDescriptionSchema>;

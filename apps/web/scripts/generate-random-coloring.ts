@@ -1,14 +1,9 @@
 #!/usr/bin/env tsx
 
 import { GenerationType } from '@chunky-crayon/db';
-import { Readable } from 'stream';
 import { createColoringImage } from '@/app/actions/coloring-image';
-import { getMailchimpAudienceMembers } from '@/app/actions/email';
+import { sendColoringImageEmail } from '@/app/actions/email';
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
-import fetchSvg from '@/utils/fetchSvg';
-import generatePDFNode from '@/utils/generatePDFNode';
-import streamToBuffer from '@/utils/streamToBuffer';
-import { sendEmail } from '@/utils/email';
 
 type ColoringImageResult = {
   error?: string;
@@ -80,32 +75,9 @@ const main = async () => {
     if (shouldEmail) {
       console.log('📧 Sending email to mailing list...');
 
-      if (!coloringImage.svgUrl || !coloringImage.qrCodeUrl) {
-        throw new Error('Missing SVG URLs required for email');
-      }
+      await sendColoringImageEmail(coloringImage, generationType);
 
-      const imageSvg = await fetchSvg(coloringImage.svgUrl);
-      const qrCodeSvg = await fetchSvg(coloringImage.qrCodeUrl);
-
-      const pdfStream = await generatePDFNode(
-        coloringImage,
-        imageSvg,
-        qrCodeSvg,
-      );
-      const pdfBuffer = await streamToBuffer(pdfStream as Readable);
-
-      const members = await getMailchimpAudienceMembers();
-      const emails: string[] = members.map(
-        (member: { email_address: string }) => member.email_address,
-      );
-
-      await sendEmail({
-        to: emails,
-        coloringImagePdf: pdfBuffer,
-        generationType,
-      });
-
-      console.log(`✅ Email sent to ${emails.length} recipients!`);
+      console.log('✅ Emails sent to mailing list!');
     } else {
       console.log('💡 Use --email flag to send to mailing list');
     }

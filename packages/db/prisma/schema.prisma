@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id               String    @id @default(cuid())
-  email            String    @unique
-  name             String?
-  emailVerified    DateTime?
-  image            String?
-  stripeCustomerId String? // set after Stripe customer creation
-  credits          Int       @default(15) // initial credits for new users
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  name                String?
+  emailVerified       DateTime?
+  image               String?
+  stripeCustomerId    String? // set after Stripe customer creation
+  credits             Int       @default(15) // initial credits for new users
+  showCommunityImages Boolean   @default(false) // parental control for community gallery
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   subscriptions      Subscription[]
   creditTransactions CreditTransaction[]
@@ -111,6 +112,15 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// Track processed Stripe webhook events for idempotency
+model StripeWebhookEvent {
+  id          String   @id // Use Stripe event ID directly
+  type        String // Event type (e.g., "invoice.payment_succeeded")
+  processedAt DateTime @default(now())
+
+  @@map("stripe_webhook_events")
 }
 
 enum GenerationType {

@@ -1,24 +1,16 @@
-import { showAuthButtonsFlag } from '@/flags';
 import CreateColoringPageForm from './CreateColoringPageForm';
 
 type CreateColoringPageFormWrapperProps = {
   className?: string;
+  /** Size variant - 'large' for logged-in dashboard */
+  size?: 'default' | 'large';
 };
 
-// Server component wrapper that reads the flag
-async function CreateColoringPageFormWrapper({
+function CreateColoringPageFormWrapper({
   className,
+  size = 'default',
 }: CreateColoringPageFormWrapperProps) {
-  // Read the flag value (this uses 'use cache: private')
-  const showAuthButtons = await showAuthButtonsFlag();
-
-  // Pass the flag value to the client component
-  return (
-    <CreateColoringPageForm
-      className={className}
-      showAuthButtons={showAuthButtons as boolean}
-    />
-  );
+  return <CreateColoringPageForm className={className} size={size} />;
 }
 
 export default CreateColoringPageFormWrapper;

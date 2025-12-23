@@ -1,48 +1,31 @@
-'use cache';
-
-import Link from 'next/link';
-import { cacheLife, cacheTag } from 'next/cache';
-import ColoringImage from '@/components/ColoringImage/ColoringImage';
 import ImageFilterToggle from '@/components/ImageFilterToggle/ImageFilterToggle';
+import InfiniteScrollGallery from '@/components/InfiniteScrollGallery';
+import type { GalleryImage } from '@/app/data/coloring-image';
 
 type AllColoringPageImagesShellProps = {
-  images: Array<{
-    id: string;
-    title: string;
-    description: string;
-    svgUrl: string | null;
-    userId: string | null;
-  }>;
-  showAuthButtons: boolean;
+  images: GalleryImage[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  showCommunityImages: boolean;
 };
 
-export async function AllColoringPageImagesShell({
+export function AllColoringPageImagesShell({
   images,
-  showAuthButtons,
+  nextCursor,
+  hasMore,
+  showCommunityImages,
 }: AllColoringPageImagesShellProps) {
-  // Configure caching
-  cacheLife('hours');
-  cacheTag('coloring-images');
-
   return (
-    <div className="flex flex-col gap-8 p-8">
-      {/* Pass the flag value to the client component */}
+    <div className="flex flex-col gap-8 p-8 w-full">
+      {/* Only show filter toggle if community images is enabled in settings */}
       <div className="flex justify-end">
-        <ImageFilterToggle showAuthButtons={showAuthButtons} />
+        <ImageFilterToggle showCommunityImages={showCommunityImages} />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {images.map((coloringImage) => (
-          <Link
-            href={`/coloring-image/${coloringImage.id}`}
-            key={coloringImage.id}
-          >
-            <ColoringImage
-              id={coloringImage.id}
-              className="rounded-lg shadow-lg bg-white"
-            />
-          </Link>
-        ))}
-      </div>
+      <InfiniteScrollGallery
+        initialImages={images}
+        initialCursor={nextCursor}
+        initialHasMore={hasMore}
+      />
     </div>
   );
 }

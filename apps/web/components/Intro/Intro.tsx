@@ -3,31 +3,62 @@ import cn from '@/utils/cn';
 import { UNLEASH_STRINGS } from '@/constants';
 import JoinColoringPageEmailListForm from '../forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 import TypedText from '../TypedText/TypedText';
+import AppStoreButtons from '@/components/AppStoreButtons';
 
 type IntroProps = {
   className?: string;
 };
 
 const Intro = ({ className }: IntroProps) => (
-  <div
-    className={cn({
-      [className as string]: !!className,
-    })}
-  >
-    <h2 className="font-tondo font-bold text-[64px] leading-none md:leading-tight text-[#4B4B4B] mb-8 [white-space:pre-wrap] [word-break:break-word]">
+  <div className={cn('relative', className)}>
+    {/* Decorative floating elements - z-0 keeps them behind header (z-50) and form (z-10) */}
+    <div
+      className="absolute -top-8 -left-4 text-4xl animate-float opacity-80 z-0 pointer-events-none"
+      style={{ animationDelay: '0s' }}
+    >
+      🖍️
+    </div>
+    <div
+      className="absolute top-20 -right-2 text-3xl animate-float opacity-70 z-0 pointer-events-none"
+      style={{ animationDelay: '0.5s' }}
+    >
+      ✨
+    </div>
+    <div
+      className="absolute -bottom-4 left-12 text-3xl animate-float opacity-60 z-0 pointer-events-none"
+      style={{ animationDelay: '1s' }}
+    >
+      🎨
+    </div>
+
+    <h2 className="font-tondo font-bold text-4xl sm:text-5xl md:text-6xl lg:text-[64px] leading-tight text-text-primary mb-6 md:mb-8 [white-space:pre-wrap] [word-break:break-word]">
       <Balancer>
         Unleash your child&apos;s
         <br />
-        <TypedText className="text-[#FF8A65]" strings={UNLEASH_STRINGS} />{' '}
+        <TypedText
+          className="text-gradient-orange"
+          strings={UNLEASH_STRINGS}
+        />{' '}
         <br />
         today
       </Balancer>
     </h2>
-    <p className="text-2xl text-[#A6A6A6] mb-8">
+    <p className="font-tondo text-lg sm:text-xl md:text-2xl text-text-secondary leading-relaxed mb-6 md:mb-8 max-w-xl">
       From vibrant colouring pages to imaginative adventures, Chunky Crayon
       transforms creativity into pure joy.
     </p>
-    <JoinColoringPageEmailListForm className="max-w-[429px]" />
+
+    {/* Tagline badge */}
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-crayon-yellow-light/40 border-2 border-crayon-yellow mb-6 md:mb-8">
+      <span className="text-xl">🌈</span>
+      <span className="font-tondo font-bold text-text-primary">
+        Dream. Create. Colour.
+      </span>
+    </div>
+
+    <AppStoreButtons location="hero" className="mb-6 md:mb-8" />
+
+    <JoinColoringPageEmailListForm className="max-w-[429px]" location="hero" />
   </div>
 );
 

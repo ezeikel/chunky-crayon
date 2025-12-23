@@ -37,13 +37,13 @@ export const COLORING_IMAGE_RULES = [
   'No textures, patterns, or gradients. Keep it simple.',
   'Do not duplicate any characters or elements unless specifically asked to do so.',
   'Do not draw any borders around characters or elements unless specifically asked to do so.',
-  `The image must be suitable for children aged ${TARGET_AGE}. Avoid complexity and inappropriate elements, including naked bodies.`,
+  `The image must be suitable for children aged ${TARGET_AGE}. Avoid complexity and keep all content family-friendly and fully clothed.`,
   'Do not include any shadows, shading, or gradients.',
   'Ensure the lines are thick and clear, with no shading, solid fill areas, or fuzzy textures.',
   'If no background is specified, create a relevant one but do not add extra elements.',
   'Avoid adding any borders or elements not part of the main scene.',
   'Any clothing or accessories should follow the same style: line drawing, thick lines, no shading or complex shapes, and no fill.',
-  'Do not depict any shades of skin color or fuzzy textures like fur or hair. All skin and hair should be drawn with simple lines only, with no color or shading.',
+  'All people should be drawn with simple outlines only, no filled areas. Hair should be drawn with simple lines without texture or complex patterns.',
   'Draw hair or fur as simple lines without texture or complex patterns.',
   'The style should be cartoon-like, avoiding fine detail lines and complex patterns.',
   'Ensure high contrast and clear distinctions between elements.',
@@ -176,3 +176,50 @@ For arrays, include all relevant items detected.
 If something is not clearly present, use an empty array or null as appropriate.`;
 
 export const IMAGE_ANALYTICS_PROMPT = `Analyze this coloring page image and extract the structured analytics data.`;
+
+// =============================================================================
+// Audio Transcription (for voice input)
+// =============================================================================
+
+export const AUDIO_TRANSCRIPTION_SYSTEM = `You are a helpful assistant that transcribes children's speech into clear, simple descriptions for generating coloring pages.
+
+The child (aged ${TARGET_AGE}) is describing what they want to see in their coloring page.
+
+Your task:
+1. Transcribe exactly what the child says
+2. Clean up filler words (um, uh, like, so) but preserve the core request
+3. If the speech is unclear or mumbled, provide your best interpretation
+4. Keep the language simple and child-friendly
+5. If the child mentions a character or scene, include those details
+6. Output ONLY the clean description - no explanations or commentary
+
+Examples:
+- Input: "um... I want... I want a big dragon... and he's flying... in the sky with clouds"
+  Output: "a big dragon flying in the sky with clouds"
+- Input: "can I have a... a princess and she has a unicorn?"
+  Output: "a princess with a unicorn"`;
+
+export const AUDIO_TRANSCRIPTION_PROMPT = `Transcribe this audio recording of a child describing what they want in their coloring page. Output only the clean description, nothing else.`;
+
+// =============================================================================
+// Image Description (for image/photo input)
+// =============================================================================
+
+export const IMAGE_DESCRIPTION_SYSTEM = `You are a helpful assistant that describes images in a way suitable for generating coloring pages for children aged ${TARGET_AGE}.
+
+Your task:
+1. Describe the main subject(s) in the image clearly
+2. Note any interesting details that would make good coloring elements
+3. Describe the setting or background if visible
+4. Use simple, child-friendly language
+5. Focus on visual elements that translate well to line drawings
+6. Keep the description concise (1-2 sentences)
+7. Avoid complex, scary, or inappropriate elements
+8. If the image is a child's drawing, describe what they drew
+
+Examples:
+- Photo of a cat: "a fluffy cat sitting on a cushion"
+- Child's drawing of a house: "a house with a sun and flowers in the garden"
+- Photo of the beach: "a sunny beach with waves and a sandcastle"`;
+
+export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would help generate a children's coloring page. Focus on the main subjects, setting, and interesting visual elements. Keep it simple, fun, and suitable for children aged ${TARGET_AGE}.`;

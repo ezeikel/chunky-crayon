@@ -28,16 +28,23 @@ import {
   CreditTransactionType,
 } from '@chunky-crayon/db';
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
-import { showAuthButtonsFlag } from '@/flags';
 import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 
 // generate coloring image from openai based on text/audio/image description
 const generateColoringImage = async (description: string) => {
+  const prompt = createColoringImagePromptDetailed(description);
+
+  // DEBUG: Log the full prompt being sent to OpenAI
+  // eslint-disable-next-line no-console
+  console.log('[ImageGeneration] Full prompt being sent to OpenAI:', prompt);
+  // eslint-disable-next-line no-console
+  console.log('[ImageGeneration] Prompt length:', prompt.length, 'characters');
+
   const { image } = await experimental_generateImage({
     model: models.image,
-    prompt: createColoringImagePromptDetailed(description),
+    prompt,
     size: IMAGE_DEFAULTS.size,
     providerOptions: {
       openai: {
@@ -230,11 +237,10 @@ export const createColoringImage = async (
       (formData.get('generationType') as GenerationType) || undefined,
   };
 
-  // check if auth is enabled and user is authenticated
-  const showAuthButtons = await showAuthButtonsFlag();
   const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
 
-  if (showAuthButtons && userId) {
+  // Check credits for authenticated users
+  if (userId) {
     // get user's credit balance
     const user = await db.user.findUnique({
       where: { id: userId },
@@ -309,7 +315,7 @@ export const createColoringImage = async (
     return result;
   }
 
-  // if auth is not enabled or user is not authenticated, proceed with original flow
+  // Guest users (not authenticated) - no credit check required
   const result = await generateColoringImageWithMetadata(
     rawFormData.description,
     undefined,
