@@ -25,6 +25,7 @@ CREATE TABLE "users" (
     "image" TEXT,
     "stripeCustomerId" TEXT,
     "credits" INTEGER NOT NULL DEFAULT 15,
+    "showCommunityImages" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -109,6 +110,15 @@ CREATE TABLE "verification_tokens" (
     "identifier" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "stripe_webhook_events" (
+    "id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "processedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "stripe_webhook_events_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
