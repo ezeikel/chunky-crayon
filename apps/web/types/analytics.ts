@@ -322,4 +322,37 @@ export type EventProperties = {
   [TRACKING_EVENTS.PLAY_STORE_CLICKED]: {
     button_location: 'footer' | 'hero' | 'other';
   };
+
+  // ===== AI/LLM OBSERVABILITY =====
+  [TRACKING_EVENTS.IMAGE_GENERATION_COMPLETED]: {
+    model: string;
+    provider: 'google' | 'openai' | 'replicate';
+    generationTimeMs: number;
+    promptLength: number;
+    referenceImageCount: number;
+    success: true;
+  };
+  [TRACKING_EVENTS.IMAGE_GENERATION_FAILED]: {
+    model: string;
+    provider: 'google' | 'openai' | 'replicate';
+    generationTimeMs: number;
+    promptLength: number;
+    referenceImageCount: number;
+    success: false;
+    error: string;
+  };
+
+  // ===== LOADING EXPERIENCE (Colo mascot voice) =====
+  [TRACKING_EVENTS.LOADING_AUDIO_GENERATED]: {
+    script: string;
+    durationMs: number;
+    descriptionLength: number;
+  };
+  [TRACKING_EVENTS.LOADING_AUDIO_PLAYED]: {
+    descriptionLength: number;
+  };
+  [TRACKING_EVENTS.LOADING_AUDIO_FAILED]: {
+    error: string;
+    descriptionLength: number;
+  };
 };

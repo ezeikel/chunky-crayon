@@ -38,8 +38,12 @@ type RetraceImageResult = {
   svgUrl: string;
 };
 
-export const traceImage = async (imageBuffer: ArrayBuffer): Promise<string> => {
-  const buffer = Buffer.from(imageBuffer);
+export const traceImage = async (
+  imageBuffer: Buffer | ArrayBuffer,
+): Promise<string> => {
+  const buffer = Buffer.isBuffer(imageBuffer)
+    ? imageBuffer
+    : Buffer.from(imageBuffer);
 
   return new Promise((resolve, reject) => {
     sharp(buffer)

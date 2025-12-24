@@ -1,17 +1,20 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useFormStatus } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faWandMagicSparkles,
   faClock,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { createColoringImage } from '@/app/actions/coloring-image';
+import { generateLoadingAudio } from '@/app/actions/loading-audio';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import useUser from '@/hooks/useUser';
+import { ColoLoading, type AudioState } from '@/components/Loading/ColoLoading';
 import UserInputV2 from './UserInputV2';
 import {
   InputModeProvider,
@@ -31,11 +34,42 @@ type CreateColoringPageFormProps = {
   size?: 'default' | 'large';
 };
 
+// Loading overlay component that uses form status
+const FormLoadingOverlay = ({
+  description,
+  audioUrl,
+  audioState,
+}: {
+  description: string;
+  audioUrl: string | null;
+  audioState: AudioState;
+}) => {
+  const { pending } = useFormStatus();
+
+  const handleAudioComplete = () => {
+    trackEvent(TRACKING_EVENTS.LOADING_AUDIO_PLAYED, {
+      descriptionLength: description.length,
+    });
+  };
+
+  return (
+    <ColoLoading
+      isLoading={pending}
+      audioUrl={audioUrl ?? undefined}
+      audioState={audioState}
+      description={description}
+      onAudioComplete={handleAudioComplete}
+    />
+  );
+};
+
 // Inner form component that uses the input mode context
 const MultiModeForm = ({ className }: { className?: string }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const { mode, description } = useInputMode();
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioState, setAudioState] = useState<AudioState>('idle');
   const {
     isGuest,
     guestGenerationsUsed,
@@ -50,6 +84,33 @@ const MultiModeForm = ({ className }: { className?: string }) => {
         const inputType = formData.get('inputType') as InputMode;
         const desc = formData.get('description') as string;
 
+        // Start audio generation IMMEDIATELY (fire-and-forget, runs in parallel)
+        // This is called synchronously at the start of the action, not via useEffect
+        if (desc) {
+          // Show "preparing" state while audio generates
+          setAudioState('preparing');
+
+          generateLoadingAudio(desc)
+            .then((result) => {
+              setAudioUrl(result.audioUrl);
+              // Note: The ColoLoading component will set its own "playing" state
+              // when it detects the audioUrl and starts playback
+              trackEvent(TRACKING_EVENTS.LOADING_AUDIO_GENERATED, {
+                script: result.script,
+                durationMs: result.durationMs,
+                descriptionLength: desc.length,
+              });
+            })
+            .catch((error) => {
+              console.error('[LoadingAudio] Failed:', error);
+              setAudioState('done'); // Skip to done state on error
+              trackEvent(TRACKING_EVENTS.LOADING_AUDIO_FAILED, {
+                error: error instanceof Error ? error.message : 'Unknown error',
+                descriptionLength: desc.length,
+              });
+            });
+        }
+
         trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
           description: desc,
           inputType: inputType || 'text',
@@ -60,6 +121,8 @@ const MultiModeForm = ({ className }: { className?: string }) => {
 
         if ('error' in coloringImage) {
           console.error(coloringImage.error);
+          setAudioUrl(null);
+          setAudioState('idle');
           return;
         }
 
@@ -86,11 +149,21 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           incrementGuestGeneration();
         }
 
+        // Reset audio state before navigation
+        setAudioUrl(null);
+        setAudioState('idle');
         router.push(`/coloring-image/${coloringImage.id}`);
       }}
       ref={formRef}
       className={cn('flex flex-col gap-y-4', className)}
     >
+      {/* Colo loading overlay with voice - audio URL is managed here */}
+      <FormLoadingOverlay
+        description={description}
+        audioUrl={audioUrl}
+        audioState={audioState}
+      />
+
       {/* Hidden inputs for form submission */}
       <input type="hidden" name="inputType" value={mode} />
       <input type="hidden" name="description" value={description} />
@@ -166,7 +239,7 @@ const CreateColoringPageForm = ({
             }
           />
           <p className="font-tondo text-sm text-text-secondary">
-            Takes about 2 minutes - worth the wait!
+            Ready in about 30 seconds!
           </p>
         </div>
 
@@ -220,7 +293,7 @@ const CreateColoringPageForm = ({
           }
         />
         <p className="font-tondo text-sm text-text-secondary">
-          Takes about 2 minutes - worth the wait!
+          Ready in about 15-30 seconds!
         </p>
       </div>
 

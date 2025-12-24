@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSparkles } from '@fortawesome/pro-duotone-svg-icons';
 
@@ -12,6 +13,23 @@ const DashboardHeader = () => {
 
   return (
     <div className="text-center mb-6 md:mb-8">
+      {/* Colo mascot greeting */}
+      <div className="flex justify-center mb-4">
+        <div className="relative animate-float">
+          <Image
+            src="/images/colo.svg"
+            alt="Colo the friendly crayon mascot"
+            width={80}
+            height={80}
+            className="drop-shadow-md md:w-[100px] md:h-[100px]"
+          />
+          {/* Sparkle */}
+          <span className="absolute -top-1 -right-1 text-lg animate-pulse">
+            ✨
+          </span>
+        </div>
+      </div>
+
       <div className="inline-flex items-center gap-2 mb-3">
         <FontAwesomeIcon
           icon={faSparkles}

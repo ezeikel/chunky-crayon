@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cn from '@/utils/cn';
@@ -95,11 +96,21 @@ const Footer = ({ className }: FooterProps) => (
           </Link>
         </div>
       </div>
-      <span>
-        Made with{' '}
-        <span className="text-crayon-orange font-bold text-lg">♡</span> in{' '}
-        <span className="text-white font-bold">South London</span>
-      </span>
+      <div className="flex items-center gap-3">
+        {/* Colo waving goodbye */}
+        <Image
+          src="/images/colo.svg"
+          alt="Colo the friendly crayon mascot"
+          width={40}
+          height={40}
+          className="opacity-80 hover:opacity-100 transition-opacity"
+        />
+        <span>
+          Made by <span className="text-white font-bold">parents</span> with{' '}
+          <span className="text-crayon-orange font-bold text-lg">♡</span> in{' '}
+          <span className="text-white font-bold">South London</span>
+        </span>
+      </div>
     </div>
   </footer>
 );

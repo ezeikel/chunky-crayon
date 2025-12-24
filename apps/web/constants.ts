@@ -354,6 +354,7 @@ export const ACTIONS = {
   GET_USER_SUBSCRIPTION_STATUS_BY_ID_AND_NAME_AND_STATUS:
     'get the user subscription status by id and name and status',
   GET_ALL_COLORING_IMAGES: 'get all coloring images',
+  GENERATE_LOADING_AUDIO: 'generate loading audio',
 };
 
 export type PlanInterval = 'monthly' | 'annual';
@@ -757,4 +758,13 @@ export const TRACKING_EVENTS = {
   ERROR_API: 'error_api', // API error
   ERROR_GENERATION: 'error_generation', // Image gen error
   ERROR_PAYMENT: 'error_payment', // Payment error
+
+  // ===== AI/LLM OBSERVABILITY =====
+  IMAGE_GENERATION_COMPLETED: 'image_generation_completed', // Image generated with timing
+  IMAGE_GENERATION_FAILED: 'image_generation_failed', // Image generation failed
+
+  // ===== LOADING EXPERIENCE (Colo mascot voice) =====
+  LOADING_AUDIO_GENERATED: 'loading_audio_generated', // Colo voice audio generated
+  LOADING_AUDIO_PLAYED: 'loading_audio_played', // Audio playback started
+  LOADING_AUDIO_FAILED: 'loading_audio_failed', // Audio generation failed
 } as const;

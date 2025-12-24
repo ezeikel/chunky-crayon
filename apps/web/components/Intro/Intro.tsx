@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Balancer from 'react-wrap-balancer';
 import cn from '@/utils/cn';
 import { UNLEASH_STRINGS } from '@/constants';
@@ -11,6 +12,22 @@ type IntroProps = {
 
 const Intro = ({ className }: IntroProps) => (
   <div className={cn('relative', className)}>
+    {/* Colo mascot - friendly greeting for visitors */}
+    <div
+      className="absolute -top-4 -right-8 md:-right-16 lg:-right-24 animate-float z-0 pointer-events-none hidden sm:block"
+      style={{ animationDelay: '0.2s' }}
+    >
+      <Image
+        src="/images/colo.svg"
+        alt="Colo the friendly crayon mascot"
+        width={120}
+        height={120}
+        className="drop-shadow-lg opacity-90 md:w-[140px] md:h-[140px] lg:w-[160px] lg:h-[160px]"
+      />
+      {/* Sparkle near Colo */}
+      <span className="absolute -top-2 -right-2 text-xl animate-pulse">✨</span>
+    </div>
+
     {/* Decorative floating elements - z-0 keeps them behind header (z-50) and form (z-10) */}
     <div
       className="absolute -top-8 -left-4 text-4xl animate-float opacity-80 z-0 pointer-events-none"
@@ -19,7 +36,7 @@ const Intro = ({ className }: IntroProps) => (
       🖍️
     </div>
     <div
-      className="absolute top-20 -right-2 text-3xl animate-float opacity-70 z-0 pointer-events-none"
+      className="absolute top-20 -right-2 text-3xl animate-float opacity-70 z-0 pointer-events-none sm:hidden"
       style={{ animationDelay: '0.5s' }}
     >
       ✨

@@ -68,9 +68,6 @@ export const COLORING_IMAGE_RULES_TEXT = COLORING_IMAGE_RULES.map(
 // Coloring Image Generation - Prompts
 // =============================================================================
 
-/** Brief style suffix for image generation prompts */
-export const COLORING_IMAGE_STYLE_SUFFIX = `The image should be in cartoon style with thick lines, low detail, no color, no shading, and no fill. Only black lines should be used. Ensure no extraneous elements such as additional shapes or artifacts are included. Refer to the style of the provided reference images: ${REFERENCE_IMAGES.join(', ')}`;
-
 /** Full detailed prompt suffix with all rules */
 export const COLORING_IMAGE_DETAILED_SUFFIX = `
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
@@ -81,13 +78,32 @@ These are the rules for the image (please follow them strictly):
 ${COLORING_IMAGE_RULES_TEXT}
 `;
 
-/** Create image generation prompt with brief style instructions */
-export const createColoringImagePrompt = (description: string) =>
-  `${description}. ${COLORING_IMAGE_STYLE_SUFFIX}`;
-
 /** Create image generation prompt with full detailed rules */
-export const createColoringImagePromptDetailed = (description: string) =>
+export const createColoringImagePrompt = (description: string) =>
   `${description}. ${COLORING_IMAGE_DETAILED_SUFFIX}`;
+
+/**
+ * Create a Gemini-specific prompt for image generation with reference images.
+ * This prompt is used with generateText and reference images as actual inputs.
+ */
+export const createGeminiColoringImagePrompt = (description: string) =>
+  `Generate a children's coloring page based on this description: "${description}"
+
+IMPORTANT STYLE REQUIREMENTS:
+- Match the EXACT style of the reference images I've provided
+- Simple line drawing suitable for children aged ${TARGET_AGE}
+- Black and white ONLY - no colors, no shading, no gradients
+- Thick, clear lines that are easy to color within
+- Cartoon-like style with large, simple shapes
+- No textures, patterns, or complex details
+- Family-friendly and approachable characters
+
+${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
+
+Additional rules:
+${COLORING_IMAGE_RULES_TEXT}
+
+Study the reference images carefully and replicate their exact style: thick black outlines, no fill, simple shapes, child-friendly aesthetic.`;
 
 /** System prompt for cleaning up user descriptions */
 export const CLEAN_UP_DESCRIPTION_SYSTEM = `You are an assistant that helps clean up and simplify user descriptions for generating coloring book images for children. Ensure the description is suitable for a cartoon-style image with thick lines, low detail, no color, no shading, and no fill. Only black lines should be used. The target age is ${TARGET_AGE}. If the user's description does not include a scene or background, add an appropriate one. Consider the attached reference images: ${REFERENCE_IMAGES.join(', ')}. Do not include any extraneous elements in the description.
@@ -223,3 +239,35 @@ Examples:
 - Photo of the beach: "a sunny beach with waves and a sandcastle"`;
 
 export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would help generate a children's coloring page. Focus on the main subjects, setting, and interesting visual elements. Keep it simple, fun, and suitable for children aged ${TARGET_AGE}.`;
+
+// =============================================================================
+// Colo Mascot Voice Scripts (for loading screen)
+// =============================================================================
+
+export const COLO_VOICE_SCRIPT_SYSTEM = `You are Colo, a friendly, chunky crayon character who LOVES helping kids color! You're enthusiastic, warm, and speak in a playful, encouraging way.
+
+Your job is to create a short voice line (2-3 sentences MAX) to play while a coloring page is being generated.
+
+Guidelines:
+- Be excited and encouraging about what the child is creating
+- Reference specific elements from their description
+- Use simple words suitable for children aged ${TARGET_AGE}
+- Sound natural and warm, like a friendly cartoon character
+- Keep it under 15 words total for optimal loading time
+- End with something encouraging about coloring
+
+Examples:
+- "Ooh, a dragon! I love dragons! Get your crayons ready!"
+- "Wow, a princess and a unicorn! This is going to be SO pretty!"
+- "A superhero? Awesome! I can't wait to help you color it!"
+
+DO NOT:
+- Use complicated words
+- Be too long-winded
+- Ask questions (they can't respond)
+- Sound robotic or formal`;
+
+export const createColoVoiceScriptPrompt = (description: string) =>
+  `Create a short, excited voice line for Colo to say while generating a coloring page of: "${description}"
+
+Remember: 2-3 short sentences, under 15 words total. Be warm, excited, and kid-friendly!`;

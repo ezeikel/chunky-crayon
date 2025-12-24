@@ -21,7 +21,7 @@
 export {
   generateText,
   generateObject,
-  experimental_generateImage,
+  generateImage,
   streamText,
   streamObject,
 } from 'ai';
@@ -47,10 +47,9 @@ export {
   COLORING_IMAGE_RULES,
   COLORING_IMAGE_RULES_TEXT,
   // Image generation prompts
-  COLORING_IMAGE_STYLE_SUFFIX,
   COLORING_IMAGE_DETAILED_SUFFIX,
   createColoringImagePrompt,
-  createColoringImagePromptDetailed,
+  createGeminiColoringImagePrompt,
   CLEAN_UP_DESCRIPTION_SYSTEM,
   IMAGE_METADATA_SYSTEM,
   IMAGE_METADATA_PROMPT,
@@ -71,6 +70,9 @@ export {
   // Image description prompts (for image/photo input)
   IMAGE_DESCRIPTION_SYSTEM,
   IMAGE_DESCRIPTION_PROMPT,
+  // Colo mascot voice prompts (for loading screen)
+  COLO_VOICE_SCRIPT_SYSTEM,
+  createColoVoiceScriptPrompt,
 } from './prompts';
 
 // Re-export schemas
@@ -92,3 +94,15 @@ export type {
 
 // Re-export analytics functions
 export { analyzeImageForAnalytics } from './analytics';
+
+// Re-export image provider abstraction
+export {
+  generateColoringPageImage,
+  getCurrentProviderConfig,
+  getAvailableProviders,
+} from './image-providers';
+export type {
+  ImageProvider,
+  GenerationResult,
+  ProviderConfig,
+} from './image-providers';

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
 import { generateColoringImageOnly } from '@/app/actions/coloring-image';
 
-export const maxDuration = 150;
+export const maxDuration = 120; // Gemini typically takes 10-30s per generation
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

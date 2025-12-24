@@ -188,6 +188,10 @@ const config = {
           '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
           '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
         },
+        'sound-wave': {
+          '0%, 100%': { transform: 'scaleY(0.5)', opacity: '0.5' },
+          '50%': { transform: 'scaleY(1)', opacity: '1' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -201,6 +205,7 @@ const config = {
         'slide-in-right': 'slide-in-right 0.3s ease-out',
         'fade-in': 'fade-in 0.3s ease-out',
         shake: 'shake 0.5s ease-in-out',
+        'sound-wave': 'sound-wave 0.6s ease-in-out infinite',
       },
       boxShadow: {
         // Legacy shadow (keeping for backwards compatibility)

@@ -1,23 +1,21 @@
 'use server';
 
 import { put, del } from '@vercel/blob';
-import { revalidatePath, cacheLife, cacheTag } from 'next/cache';
+import { revalidatePath, updateTag, cacheLife, cacheTag } from 'next/cache';
 import { after } from 'next/server';
 import QRCode from 'qrcode';
 import sharp from 'sharp';
 import {
   generateText,
   generateObject,
-  experimental_generateImage,
-  models,
   getTracedModels,
-  IMAGE_DEFAULTS,
-  createColoringImagePromptDetailed,
   CLEAN_UP_DESCRIPTION_SYSTEM,
   IMAGE_METADATA_SYSTEM,
   IMAGE_METADATA_PROMPT,
   imageMetadataSchema,
   analyzeImageForAnalytics,
+  generateColoringPageImage,
+  getCurrentProviderConfig,
 } from '@/lib/ai';
 import { ACTIONS, TRACKING_EVENTS } from '@/constants';
 import { track, trackWithUser } from '@/utils/analytics-server';
@@ -32,49 +30,70 @@ import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 
-// generate coloring image from openai based on text/audio/image description
-const generateColoringImage = async (description: string) => {
-  const prompt = createColoringImagePromptDetailed(description);
-
-  // DEBUG: Log the full prompt being sent to OpenAI
-  // eslint-disable-next-line no-console
-  console.log('[ImageGeneration] Full prompt being sent to OpenAI:', prompt);
-  // eslint-disable-next-line no-console
-  console.log('[ImageGeneration] Prompt length:', prompt.length, 'characters');
-
-  const { image } = await experimental_generateImage({
-    model: models.image,
-    prompt,
-    size: IMAGE_DEFAULTS.size,
-    providerOptions: {
-      openai: {
-        quality: IMAGE_DEFAULTS.quality,
-      },
-    },
-  });
-
-  // DEBUG:
-  // eslint-disable-next-line no-console
-  console.log('generateColoringImage response', image);
-
-  // convert base64 to buffer for storage
-  const imageBuffer = Buffer.from(image.base64, 'base64');
-
-  // generate a unique temporary filename
-  const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
+/**
+ * Generate coloring image with provider abstraction and tracking
+ *
+ * Uses the provider abstraction layer which:
+ * - Defaults to OpenAI (cheaper) with Gemini fallback
+ * - Can be switched via IMAGE_PROVIDER env var
+ * - Automatically falls back on provider failures
+ */
+const generateColoringImage = async (description: string, userId?: string) => {
+  const providerConfig = getCurrentProviderConfig();
 
   try {
-    // save the image to blob storage temporarily
-    const { url } = await put(tempFileName, imageBuffer, {
-      access: 'public',
-    });
+    const result = await generateColoringPageImage(description);
+
+    // Track successful generation with timing
+    const trackingData = {
+      model: result.model,
+      provider: result.provider,
+      generationTimeMs: result.generationTimeMs,
+      promptLength: description.length,
+      referenceImageCount: providerConfig.supportsReferenceImages ? 8 : 0,
+      success: true as const,
+    };
+
+    if (userId) {
+      await trackWithUser(
+        userId,
+        TRACKING_EVENTS.IMAGE_GENERATION_COMPLETED,
+        trackingData,
+      );
+    } else {
+      await track(TRACKING_EVENTS.IMAGE_GENERATION_COMPLETED, trackingData);
+    }
 
     return {
-      url,
-      tempFileName,
+      url: result.url,
+      tempFileName: result.tempFileName,
+      generationTimeMs: result.generationTimeMs,
+      imageBuffer: result.imageBuffer,
     };
   } catch (error) {
-    console.error('Error saving temporary image:', error);
+    // Track failed generation
+    const trackingData = {
+      model: providerConfig.id,
+      provider: providerConfig.provider,
+      generationTimeMs: 0, // We don't have timing on complete failure
+      promptLength: description.length,
+      referenceImageCount: providerConfig.supportsReferenceImages ? 8 : 0,
+      success: false as const,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+
+    if (userId) {
+      await trackWithUser(
+        userId,
+        TRACKING_EVENTS.IMAGE_GENERATION_FAILED,
+        trackingData,
+      );
+    } else {
+      await track(TRACKING_EVENTS.IMAGE_GENERATION_FAILED, trackingData);
+    }
+
+    // eslint-disable-next-line no-console
+    console.error('Error generating image:', error);
     throw error;
   }
 };
@@ -102,52 +121,63 @@ const generateColoringImageWithMetadata = async (
     properties: { action: 'coloring-image-generation' },
   });
 
-  // clean up the user's description
+  // Step 1: Clean up the user's description
   const { text: cleanedUpUserDescription } = await generateText({
     model: tracedModels.text,
     system: CLEAN_UP_DESCRIPTION_SYSTEM,
     prompt: description,
   });
 
-  // DEBUG:
   // eslint-disable-next-line no-console
-  console.log('cleanedUpUserDescription', cleanedUpUserDescription);
+  console.log('[Pipeline] Description cleaned:', cleanedUpUserDescription);
 
-  // generate the coloring image
-  const { url: imageUrl, tempFileName } = await generateColoringImage(
-    cleanedUpUserDescription as string,
-  );
+  // Step 2: Generate the coloring image (returns buffer to avoid re-fetching)
+  const {
+    url: imageUrl,
+    tempFileName,
+    imageBuffer,
+  } = await generateColoringImage(cleanedUpUserDescription as string, userId);
 
-  if (!imageUrl) {
+  if (!imageUrl || !imageBuffer) {
     throw new Error('Failed to generate an acceptable image');
   }
 
-  const { object: imageMetadata } = await generateObject({
-    model: tracedModels.text,
-    schema: imageMetadataSchema,
-    system: IMAGE_METADATA_SYSTEM,
-    messages: [
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: IMAGE_METADATA_PROMPT,
-          },
-          {
-            type: 'image',
-            image: new URL(imageUrl),
-          },
-        ],
-      },
-    ],
+  // Step 3: Run metadata, SVG trace, and WebP conversion in PARALLEL
+  // This saves ~2-3 seconds compared to sequential execution
+  const [metadataResult, svg, webpBuffer] = await Promise.all([
+    // A) Generate metadata using faster model (GPT-4o-mini)
+    generateObject({
+      model: tracedModels.textFast,
+      schema: imageMetadataSchema,
+      system: IMAGE_METADATA_SYSTEM,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: IMAGE_METADATA_PROMPT },
+            { type: 'image', image: new URL(imageUrl) },
+          ],
+        },
+      ],
+    }),
+
+    // B) Trace image to SVG (CPU-intensive)
+    traceImage(imageBuffer),
+
+    // C) Convert to WebP (CPU-intensive)
+    sharp(imageBuffer).webp().toBuffer(),
+  ]);
+
+  const imageMetadata = metadataResult.object;
+
+  // eslint-disable-next-line no-console
+  console.log('[Pipeline] Parallel processing complete:', {
+    title: imageMetadata.title,
+    svgLength: svg.length,
+    webpSize: webpBuffer.length,
   });
 
-  // DEBUG:
-  // eslint-disable-next-line no-console
-  console.log('imageMetadata', imageMetadata);
-
-  // create new coloringImage in db
+  // Step 4: Create DB record (needs metadata)
   const coloringImage = await db.coloringImage.create({
     data: {
       title: imageMetadata.title,
@@ -159,33 +189,18 @@ const generateColoringImageWithMetadata = async (
     },
   });
 
-  // generate QR code for the coloring image
+  // Step 5: Generate QR code (needs coloringImage.id, but very fast ~50ms)
   const qrCodeSvg = await QRCode.toString(
     `https://chunkycrayon.com?utm_source=${coloringImage.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
-    {
-      type: 'svg',
-    },
+    { type: 'svg' },
   );
 
   const qrCodeSvgBuffer = Buffer.from(qrCodeSvg);
-
-  // fetch image from url in a format suitable for saving in blob storage
-  const response = await fetch(imageUrl);
-  const imageBuffer = await response.arrayBuffer();
-
-  const svg = await traceImage(imageBuffer);
   const imageSvgBuffer = Buffer.from(svg);
 
-  // save image webp to blob storage
+  // Step 6: Upload all files in parallel
   const imageFileName = `uploads/coloring-images/${coloringImage.id}/image.webp`;
-
-  // convert PNG buffer to WebP before uploading
-  const webpBuffer = await sharp(Buffer.from(imageBuffer)).webp().toBuffer();
-
-  // save image svg to blob storage
   const svgFileName = `uploads/coloring-images/${coloringImage.id}/image.svg`;
-
-  // save qr code svg in blob storage
   const qrCodeFileName = `uploads/coloring-images/${coloringImage.id}/qr-code.svg`;
 
   const [
@@ -279,7 +294,7 @@ export const createColoringImage = async (
         );
       },
       {
-        timeout: 120000, // 2 minutes in milliseconds
+        timeout: 120000, // 2 minutes for DALL-E image generation
       },
     );
 
@@ -311,6 +326,8 @@ export const createColoringImage = async (
       ]);
     });
 
+    // Invalidate gallery cache so new image appears immediately
+    updateTag('all-coloring-images');
     revalidatePath('/');
     return result;
   }
@@ -350,6 +367,8 @@ export const createColoringImage = async (
     ]);
   });
 
+  // Invalidate gallery cache so new image appears immediately
+  updateTag('all-coloring-images');
   revalidatePath('/');
   return result;
 };
