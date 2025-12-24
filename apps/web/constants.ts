@@ -768,3 +768,151 @@ export const TRACKING_EVENTS = {
   LOADING_AUDIO_PLAYED: 'loading_audio_played', // Audio playback started
   LOADING_AUDIO_FAILED: 'loading_audio_failed', // Audio generation failed
 } as const;
+
+// ===== SOCIAL PROOF / TESTIMONIALS =====
+
+export type Testimonial = {
+  id: string;
+  name: string;
+  role?: string; // e.g. "Mum of 2", "Primary Teacher"
+  avatar: string; // Path to avatar image (placeholder until AI-generated)
+  quote: string;
+  date?: string; // Optional date for recency
+  rating?: number; // 1-5 stars
+};
+
+// Placeholder testimonials - update avatar paths with AI-generated images later
+export const TESTIMONIALS: Testimonial[] = [
+  {
+    id: 'testimonial-1',
+    name: 'Sarah M.',
+    role: 'Mum of 2',
+    avatar: '/images/testimonials/avatar-1.svg',
+    quote:
+      'My kids absolutely love this! They spend hours creating and colouring their own magical worlds. No more screen time battles!',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-2',
+    name: 'James T.',
+    role: 'Dad of 3',
+    avatar: '/images/testimonials/avatar-2.svg',
+    quote:
+      'Finally, something that combines creativity with technology in a healthy way. My daughter made a unicorn princess castle and it was perfect!',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-3',
+    name: 'Emily R.',
+    role: 'Primary Teacher',
+    avatar: '/images/testimonials/avatar-3.svg',
+    quote:
+      "I use this in my classroom for creative writing prompts. The children describe what they want, then colour their creations. They're so engaged!",
+    rating: 5,
+  },
+  {
+    id: 'testimonial-4',
+    name: 'David K.',
+    role: 'Grandad',
+    avatar: '/images/testimonials/avatar-4.svg',
+    quote:
+      'My grandchildren visit every weekend now just to make new colouring pages together. Such wonderful bonding time!',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-5',
+    name: 'Rachel B.',
+    role: 'Childminder',
+    avatar: '/images/testimonials/avatar-5.svg',
+    quote:
+      "The kids I look after can't get enough. Dragons, fairies, rockets - whatever they imagine comes to life!",
+    rating: 5,
+  },
+  {
+    id: 'testimonial-6',
+    name: 'Michael P.',
+    role: 'Dad & Designer',
+    avatar: '/images/testimonials/avatar-6.svg',
+    quote:
+      'As a designer, I appreciate the quality. As a dad, I appreciate the endless entertainment. Win-win!',
+    rating: 5,
+  },
+];
+
+// Hero social proof stats
+export const SOCIAL_PROOF_STATS = {
+  reviewCount: 183,
+  averageRating: 4.9,
+  totalPagesCreated: 50000, // Will be dynamic later
+} as const;
+
+// ===== FAQ =====
+
+export type FAQItem = {
+  id: string;
+  question: string;
+  answer: string;
+};
+
+export const FAQ_ITEMS: FAQItem[] = [
+  {
+    id: 'faq-1',
+    question: 'What is Chunky Crayon?',
+    answer:
+      'Chunky Crayon is a magical colouring page generator designed for children and families. Simply describe what you want to colour - like "a dragon having a tea party" or "my favourite superhero on the moon" - and we create a unique, printable colouring page in seconds. It\'s perfect for rainy days, quiet time, or sparking your child\'s imagination!',
+  },
+  {
+    id: 'faq-2',
+    question: 'Is it safe and appropriate for children?',
+    answer:
+      'Absolutely! Chunky Crayon is built by parents, for parents. All generated images are designed to be child-friendly with age-appropriate content. Our AI is specially tuned to create wholesome, fun colouring pages suitable for children of all ages.',
+  },
+  {
+    id: 'faq-3',
+    question: 'How do I create a colouring page?',
+    answer:
+      'It\'s as easy as 1-2-3! Just type what you want to colour (e.g., "a unicorn in a magical forest"), click Generate, and wait about 30 seconds. Your unique colouring page will appear ready to download and print. You can also use voice input or upload a photo for inspiration!',
+  },
+  {
+    id: 'faq-4',
+    question: 'How long does it take to generate a page?',
+    answer:
+      'Most colouring pages are ready in about 30 seconds. Our friendly mascot Colo will keep you entertained while you wait! Complex scenes with lots of details might take a tiny bit longer.',
+  },
+  {
+    id: 'faq-5',
+    question: 'Can I print the colouring pages?',
+    answer:
+      'Yes! Every colouring page you create can be downloaded as a high-quality PDF, perfect for printing at home. The pages are optimised for A4 paper and look great with crayons, coloured pencils, or markers.',
+  },
+  {
+    id: 'faq-6',
+    question: "What if my child's request doesn't work?",
+    answer:
+      "Sometimes the AI might not get it quite right on the first try - that's part of the creative adventure! You can simply try again with slightly different words. Tips: be specific about what you want, and describe the scene clearly. If you're stuck, try our voice input - kids often explain things better by talking!",
+  },
+  {
+    id: 'faq-7',
+    question: 'Is Chunky Crayon free to use?',
+    answer:
+      'You can try Chunky Crayon with 2 free generations - no account needed! After that, you can sign up for a free account to get 15 bonus credits, or choose one of our affordable subscription plans for unlimited creative fun.',
+  },
+  {
+    id: 'faq-8',
+    question: "What's included in the subscription plans?",
+    answer:
+      'Our plans range from Crayon (perfect for casual colouring) to Studio (for super-creative families or teachers). All plans include: unlimited colouring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights.',
+  },
+  {
+    id: 'faq-9',
+    question: 'Can I use pages for my classroom or nursery?',
+    answer:
+      "Yes! Teachers and childminders love Chunky Crayon. Our Crayon and Rainbow plans are perfect for personal and educational use. If you're running a business or want to distribute pages commercially, check out our Masterpiece or Studio plans which include commercial licensing.",
+  },
+  {
+    id: 'faq-10',
+    question: 'How do credits work?',
+    answer:
+      'Each colouring page you generate uses 5 credits. Credits refresh monthly with your subscription, and some plans allow unused credits to roll over. You can also purchase credit packs if you need a little extra creativity boost!',
+  },
+];

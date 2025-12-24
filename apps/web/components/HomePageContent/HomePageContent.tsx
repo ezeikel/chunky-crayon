@@ -4,6 +4,8 @@ import { useSession } from 'next-auth/react';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Intro from '@/components/Intro/Intro';
 import Loading from '@/components/Loading/Loading';
+import Testimonials from '@/components/Testimonials';
+import FAQ from '@/components/FAQ';
 import DashboardHeader from './DashboardHeader';
 
 type HomePageContentProps = {
@@ -75,6 +77,12 @@ const HomePageContent = ({
         <Intro className="flex-1 max-w-xl lg:max-w-none lg:flex-shrink" />
         <div className="flex-shrink-0 w-full max-w-lg">{form}</div>
       </div>
+
+      {/* Testimonials section - social proof for logged-out users */}
+      <Testimonials className="relative z-10" />
+
+      {/* FAQ section */}
+      <FAQ className="relative z-10" />
 
       {/* Gallery section */}
       {gallery}
