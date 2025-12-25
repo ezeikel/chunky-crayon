@@ -20,6 +20,7 @@ type ImageCanvasProps = {
   coloringImage: Partial<ColoringImage>;
   className?: string;
   onCanvasReady?: () => void;
+  onFirstInteraction?: () => void;
 };
 
 export type ImageCanvasHandle = {
@@ -31,15 +32,16 @@ export type ImageCanvasHandle = {
 };
 
 const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
-  ({ coloringImage, className, onCanvasReady }, ref) => {
+  ({ coloringImage, className, onCanvasReady, onFirstInteraction }, ref) => {
     const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
     const imageCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const offScreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    const hasInteractedRef = useRef(false);
 
     const { selectedColor, brushSize, brushType, activeTool, pushToHistory } =
       useColoringContext();
-    const { playSound } = useSound();
+    const { playSound, initSounds } = useSound();
 
     const [ratio, setRatio] = useState<number>(1);
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -303,6 +305,18 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       };
     }, []);
 
+    // Handle first interaction - initialize sounds and notify parent
+    const handleFirstInteraction = useCallback(async () => {
+      if (hasInteractedRef.current) return;
+      hasInteractedRef.current = true;
+
+      // Initialize sounds (required for Web Audio API due to browser autoplay policy)
+      await initSounds();
+
+      // Notify parent so it can start ambient sound
+      onFirstInteraction?.();
+    }, [initSounds, onFirstInteraction]);
+
     const getRadius = () => {
       return BRUSH_SIZES[brushSize].radius;
     };
@@ -440,6 +454,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     };
 
     const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
+      // Initialize sounds on first interaction (required for Web Audio API)
+      handleFirstInteraction();
+
       if (activeTool === 'fill') {
         handleFill(event.clientX, event.clientY);
         return;
@@ -483,6 +500,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
     const handleTouchStart = (event: React.TouchEvent<HTMLCanvasElement>) => {
       event.preventDefault(); // Prevent scroll
+
+      // Initialize sounds on first interaction (required for Web Audio API)
+      handleFirstInteraction();
 
       if (activeTool === 'fill') {
         const touch = event.touches[0];

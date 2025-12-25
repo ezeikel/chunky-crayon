@@ -36,10 +36,33 @@ const ColoringArea = ({
   const canvasReadyRef = useRef(false);
   // Debounce timer for auto-save
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Track if ambient sound has been initialized
+  const ambientInitializedRef = useRef(false);
 
   const { hasUnsavedChanges, setHasUnsavedChanges, clearHistory } =
     useColoringContext();
-  const { playSound } = useSound();
+  const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
+
+  // Handle first canvas interaction - load and play ambient sound
+  // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
+  // TODO: Trigger ambient sound on ANY page interaction (color pick, button click), not just canvas stroke
+  // TODO: Improve ElevenLabs ambient sound prompts - current sounds are low quality/not fitting
+  const handleFirstInteraction = useCallback(async () => {
+    if (coloringImage.ambientSoundUrl && !ambientInitializedRef.current) {
+      ambientInitializedRef.current = true;
+      await loadAmbient(coloringImage.ambientSoundUrl);
+      playAmbient();
+    }
+  }, [coloringImage.ambientSoundUrl, loadAmbient, playAmbient]);
+
+  // Cleanup: stop ambient sound when component unmounts
+  useEffect(() => {
+    return () => {
+      if (ambientInitializedRef.current) {
+        stopAmbient();
+      }
+    };
+  }, [stopAmbient]);
 
   // Get canvas data URL for saving to gallery
   const getCanvasDataUrl = useCallback(() => {
@@ -169,6 +192,7 @@ const ColoringArea = ({
         coloringImage={coloringImage}
         className="rounded-lg shadow-lg bg-white overflow-hidden"
         onCanvasReady={handleCanvasReady}
+        onFirstInteraction={handleFirstInteraction}
       />
       <div className="flex flex-wrap items-center justify-center gap-3">
         <StartOverButton onStartOver={handleStartOver} />

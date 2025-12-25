@@ -8,7 +8,7 @@ import { useColoringContext } from '@/contexts/coloring';
  * Hook for playing sounds in the coloring experience
  *
  * Usage:
- * const { playSound, initSounds } = useSound();
+ * const { playSound, initSounds, loadAmbient, playAmbient } = useSound();
  *
  * // Initialize on first user interaction
  * <button onClick={() => { initSounds(); doSomething(); }}>
@@ -16,6 +16,11 @@ import { useColoringContext } from '@/contexts/coloring';
  * // Play sounds
  * playSound('tap');
  * playSound('sparkle');
+ *
+ * // Ambient sound (for coloring experience)
+ * await loadAmbient('https://...ambient.mp3');
+ * playAmbient(); // Loops in background
+ * stopAmbient(); // Fades out
  */
 export const useSound = () => {
   const { isMuted, setIsMuted } = useColoringContext();
@@ -59,13 +64,51 @@ export const useSound = () => {
     setIsMuted((prev) => !prev);
   }, [setIsMuted]);
 
+  // Load ambient sound from URL
+  const loadAmbient = useCallback(async (url: string) => {
+    const soundManager = getSoundManager();
+    await soundManager.loadAmbient(url);
+  }, []);
+
+  // Play ambient sound (loops)
+  const playAmbient = useCallback(() => {
+    const soundManager = getSoundManager();
+    soundManager.playAmbient();
+  }, []);
+
+  // Stop ambient sound (fades out)
+  const stopAmbient = useCallback(() => {
+    const soundManager = getSoundManager();
+    soundManager.stopAmbient();
+  }, []);
+
+  // Check if ambient is playing
+  const isAmbientPlaying = useCallback(() => {
+    const soundManager = getSoundManager();
+    return soundManager.getAmbientPlaying();
+  }, []);
+
+  // Set ambient volume
+  const setAmbientVolume = useCallback((volume: number) => {
+    const soundManager = getSoundManager();
+    soundManager.setAmbientVolume(volume);
+  }, []);
+
   return {
+    // Sound effects
     playSound,
     stopSound,
     stopAllSounds,
     initSounds,
+    // Mute control
     isMuted,
     toggleMute,
+    // Ambient sound
+    loadAmbient,
+    playAmbient,
+    stopAmbient,
+    isAmbientPlaying,
+    setAmbientVolume,
   };
 };
 

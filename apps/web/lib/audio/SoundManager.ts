@@ -44,6 +44,14 @@ class SoundManager {
   private isInitialized: boolean = false;
   private masterVolume: number = 1.0;
 
+  // Ambient sound state
+  private ambientSource: AudioBufferSourceNode | null = null;
+  private ambientGainNode: GainNode | null = null;
+  private ambientBuffer: AudioBuffer | null = null;
+  private ambientUrl: string | null = null;
+  private isAmbientPlaying: boolean = false;
+  private ambientVolume: number = 0.3; // Lower volume for background ambient
+
   constructor() {
     // Initialize on first user interaction
     if (typeof window !== 'undefined') {
@@ -193,11 +201,16 @@ class SoundManager {
    * Set mute state
    */
   setMuted(muted: boolean): void {
+    const wasMuted = this.isMuted;
     this.isMuted = muted;
     this.saveMutePreference();
 
     if (muted) {
       this.stopAll();
+      this.stopAmbient();
+    } else if (wasMuted && this.ambientBuffer) {
+      // Resume ambient if it was loaded when muting
+      this.playAmbient();
     }
   }
 
@@ -249,16 +262,155 @@ class SoundManager {
   }
 
   /**
+   * Load an ambient sound from a URL
+   * Does not start playing automatically
+   */
+  async loadAmbient(url: string): Promise<void> {
+    if (!this.audioContext || !this.isInitialized) {
+      return;
+    }
+
+    // Skip if already loaded
+    if (this.ambientUrl === url && this.ambientBuffer) {
+      return;
+    }
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.warn(`SoundManager: Failed to fetch ambient sound: ${url}`);
+        return;
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      this.ambientBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      this.ambientUrl = url;
+    } catch (error) {
+      console.warn('SoundManager: Failed to load ambient sound', error);
+    }
+  }
+
+  /**
+   * Start playing the ambient sound in a loop
+   * Fades in smoothly for a pleasant experience
+   */
+  playAmbient(): void {
+    if (this.isMuted || !this.audioContext || !this.ambientBuffer) {
+      return;
+    }
+
+    // Already playing
+    if (this.isAmbientPlaying) {
+      return;
+    }
+
+    try {
+      // Create source node
+      this.ambientSource = this.audioContext.createBufferSource();
+      this.ambientSource.buffer = this.ambientBuffer;
+      this.ambientSource.loop = true; // Loop the ambient sound
+
+      // Create gain node for volume control and fade
+      this.ambientGainNode = this.audioContext.createGain();
+      this.ambientGainNode.gain.value = 0; // Start silent
+
+      // Connect: source -> gain -> destination
+      this.ambientSource.connect(this.ambientGainNode);
+      this.ambientGainNode.connect(this.audioContext.destination);
+
+      // Start playing
+      this.ambientSource.start(0);
+      this.isAmbientPlaying = true;
+
+      // Fade in over 1 second
+      this.ambientGainNode.gain.linearRampToValueAtTime(
+        this.ambientVolume * this.masterVolume,
+        this.audioContext.currentTime + 1,
+      );
+
+      // Handle when source ends (shouldn't happen with loop, but safety)
+      this.ambientSource.onended = () => {
+        this.isAmbientPlaying = false;
+        this.ambientSource = null;
+        this.ambientGainNode = null;
+      };
+    } catch (error) {
+      console.warn('SoundManager: Failed to play ambient sound', error);
+      this.isAmbientPlaying = false;
+    }
+  }
+
+  /**
+   * Stop the ambient sound with a fade out
+   */
+  stopAmbient(): void {
+    if (!this.ambientSource || !this.ambientGainNode || !this.audioContext) {
+      this.isAmbientPlaying = false;
+      return;
+    }
+
+    try {
+      // Fade out over 0.5 seconds
+      this.ambientGainNode.gain.linearRampToValueAtTime(
+        0,
+        this.audioContext.currentTime + 0.5,
+      );
+
+      // Stop the source after fade out
+      const source = this.ambientSource;
+      setTimeout(() => {
+        try {
+          source.stop();
+        } catch {
+          // Ignore errors from already stopped sources
+        }
+      }, 500);
+
+      this.isAmbientPlaying = false;
+      this.ambientSource = null;
+      this.ambientGainNode = null;
+    } catch (error) {
+      console.warn('SoundManager: Failed to stop ambient sound', error);
+      this.isAmbientPlaying = false;
+    }
+  }
+
+  /**
+   * Check if ambient sound is currently playing
+   */
+  getAmbientPlaying(): boolean {
+    return this.isAmbientPlaying;
+  }
+
+  /**
+   * Set ambient volume (0.0 to 1.0)
+   */
+  setAmbientVolume(volume: number): void {
+    this.ambientVolume = Math.max(0, Math.min(1, volume));
+
+    // Update current playing ambient if any
+    if (this.ambientGainNode && this.audioContext && this.isAmbientPlaying) {
+      this.ambientGainNode.gain.linearRampToValueAtTime(
+        this.ambientVolume * this.masterVolume,
+        this.audioContext.currentTime + 0.1,
+      );
+    }
+  }
+
+  /**
    * Cleanup resources
    */
   dispose(): void {
     this.stopAll();
+    this.stopAmbient();
     if (this.audioContext) {
       this.audioContext.close();
       this.audioContext = null;
     }
     this.audioBuffers.clear();
     this.activeSources.clear();
+    this.ambientBuffer = null;
+    this.ambientUrl = null;
     this.isInitialized = false;
   }
 }

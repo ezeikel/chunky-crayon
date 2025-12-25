@@ -60,23 +60,24 @@ model CreditTransaction {
 }
 
 model ColoringImage {
-  id             String         @id @default(cuid())
-  title          String
-  description    String
-  alt            String
-  url            String?
-  svgUrl         String?
-  qrCodeUrl      String?
-  tags           String[]
-  difficulty     Difficulty? // Optional: BEGINNER, INTERMEDIATE, ADVANCED, EXPERT
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  generationType GenerationType @default(USER)
-  User           User?          @relation(fields: [userId], references: [id])
-  userId         String?
-  profile        Profile?       @relation(fields: [profileId], references: [id])
-  profileId      String? // Which profile created this image
-  savedArtworks  SavedArtwork[] // Colored versions saved by users
+  id              String         @id @default(cuid())
+  title           String
+  description     String
+  alt             String
+  url             String?
+  svgUrl          String?
+  qrCodeUrl       String?
+  ambientSoundUrl String? // ElevenLabs generated ambient sound for coloring experience
+  tags            String[]
+  difficulty      Difficulty? // Optional: BEGINNER, INTERMEDIATE, ADVANCED, EXPERT
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  generationType  GenerationType @default(USER)
+  User            User?          @relation(fields: [userId], references: [id])
+  userId          String?
+  profile         Profile?       @relation(fields: [profileId], references: [id])
+  profileId       String? // Which profile created this image
+  savedArtworks   SavedArtwork[] // Colored versions saved by users
 
   @@map("coloring_images")
 }
