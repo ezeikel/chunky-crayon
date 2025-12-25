@@ -355,6 +355,13 @@ export const ACTIONS = {
     'get the user subscription status by id and name and status',
   GET_ALL_COLORING_IMAGES: 'get all coloring images',
   GENERATE_LOADING_AUDIO: 'generate loading audio',
+  // Profile actions
+  GET_PROFILES: 'get profiles',
+  CREATE_PROFILE: 'create profile',
+  UPDATE_PROFILE: 'update profile',
+  DELETE_PROFILE: 'delete profile',
+  SET_ACTIVE_PROFILE: 'set active profile',
+  GET_ACTIVE_PROFILE: 'get active profile',
 };
 
 export type PlanInterval = 'monthly' | 'annual';

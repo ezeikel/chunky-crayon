@@ -1,0 +1,57 @@
+name: Backfill Orphaned Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run against'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - production
+      dry_run:
+        description: 'Dry run (log only, no changes)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    name: Backfill Orphaned Images
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        env:
+          DATABASE_URL: ${{ inputs.environment == 'production' && secrets.DATABASE_URL_PRODUCTION || secrets.DATABASE_URL }}
+        working-directory: ./packages/db
+        run: pnpm prisma generate
+
+      - name: Run backfill script
+        env:
+          DATABASE_URL: ${{ inputs.environment == 'production' && secrets.DATABASE_URL_PRODUCTION || secrets.DATABASE_URL }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        working-directory: ./packages/db
+        run: pnpm tsx scripts/backfill-orphaned-images.ts

@@ -3,6 +3,7 @@ import { db, ColoringImage } from '@chunky-crayon/db';
 import { ACTIONS } from '@/constants';
 import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
+import { getActiveProfile } from '@/app/actions/profiles';
 
 // Cached data fetching for coloring images using Next.js 16 Cache Components
 // Uses 'use cache' directive with cacheLife and cacheTag for:
@@ -90,6 +91,7 @@ export const getColoringImagesByIds = async (
 
 const getAllColoringImagesBase = async (
   userId?: string,
+  profileId?: string,
   showCommunityImages?: boolean,
 ) => {
   'use cache';
@@ -103,11 +105,13 @@ const getAllColoringImagesBase = async (
     // Logged out: show all community images (userId: null)
     whereClause = { userId: null };
   } else if (showCommunityImages) {
-    // Logged in + community enabled: show user's images + community images
-    whereClause = { OR: [{ userId }, { userId: null }] };
+    // Logged in + community enabled: show user's images (filtered by profile) + community images
+    whereClause = {
+      OR: [{ userId, ...(profileId ? { profileId } : {}) }, { userId: null }],
+    };
   } else {
-    // Logged in + community disabled (default): show only user's images
-    whereClause = { userId };
+    // Logged in + community disabled (default): show only user's images for active profile
+    whereClause = { userId, ...(profileId ? { profileId } : {}) };
   }
 
   return db.coloringImage.findMany({
@@ -132,14 +136,20 @@ export const getAllColoringImages = async (
 
   const userId = await getUserId(ACTIONS.GET_ALL_COLORING_IMAGES);
 
-  // Get user's showCommunityImages preference if logged in
+  // Get user's showCommunityImages preference and active profile if logged in
   let showCommunityImages = false;
+  let profileId: string | undefined;
+
   if (userId) {
-    const user = await db.user.findUnique({
-      where: { id: userId },
-      select: { showCommunityImages: true },
-    });
+    const [user, activeProfile] = await Promise.all([
+      db.user.findUnique({
+        where: { id: userId },
+        select: { showCommunityImages: true },
+      }),
+      getActiveProfile(),
+    ]);
     showCommunityImages = user?.showCommunityImages ?? false;
+    profileId = activeProfile?.id;
   }
 
   // Use URL param to determine filter:
@@ -149,7 +159,11 @@ export const getAllColoringImages = async (
   const effectiveShowCommunity =
     show === 'user' ? false : show === 'all' || showCommunityImages;
 
-  return getAllColoringImagesBase(userId || undefined, effectiveShowCommunity);
+  return getAllColoringImagesBase(
+    userId || undefined,
+    profileId,
+    effectiveShowCommunity,
+  );
 };
 
 // Static version for generateStaticParams - no caching, direct DB query
@@ -190,6 +204,7 @@ export const IMAGES_PER_PAGE = 12;
 // Paginated version for infinite scroll
 const getColoringImagesPaginatedBase = async (
   userId?: string,
+  profileId?: string,
   showCommunityImages?: boolean,
   cursor?: string,
   limit: number = IMAGES_PER_PAGE,
@@ -205,11 +220,13 @@ const getColoringImagesPaginatedBase = async (
     // Logged out: show all community images (userId: null)
     whereClause = { userId: null };
   } else if (showCommunityImages) {
-    // Logged in + community enabled: show user's images + community images
-    whereClause = { OR: [{ userId }, { userId: null }] };
+    // Logged in + community enabled: show user's images (filtered by profile) + community images
+    whereClause = {
+      OR: [{ userId, ...(profileId ? { profileId } : {}) }, { userId: null }],
+    };
   } else {
-    // Logged in + community disabled (default): show only user's images
-    whereClause = { userId };
+    // Logged in + community disabled (default): show only user's images for active profile
+    whereClause = { userId, ...(profileId ? { profileId } : {}) };
   }
 
   // Fetch one extra to determine if there are more pages
@@ -248,12 +265,14 @@ const getColoringImagesPaginatedBase = async (
 // Export for use in server actions
 export const getColoringImagesPaginated = async (
   userId?: string,
+  profileId?: string,
   showCommunityImages?: boolean,
   cursor?: string,
   limit?: number,
 ): Promise<PaginatedImagesResponse> => {
   return getColoringImagesPaginatedBase(
     userId,
+    profileId,
     showCommunityImages,
     cursor,
     limit,

@@ -28,6 +28,7 @@ import {
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
 import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
+import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 
 /**
@@ -178,6 +179,9 @@ const generateColoringImageWithMetadata = async (
   });
 
   // Step 4: Create DB record (needs metadata)
+  // Get active profile to associate the image with
+  const activeProfile = await getActiveProfile();
+
   const coloringImage = await db.coloringImage.create({
     data: {
       title: imageMetadata.title,
@@ -186,6 +190,7 @@ const generateColoringImageWithMetadata = async (
       tags: imageMetadata.tags,
       generationType: generationType || GenerationType.USER,
       userId,
+      profileId: activeProfile?.id,
     },
   });
 
@@ -415,22 +420,40 @@ export const getColoringImageById = async (
   return getColoringImageBase(id);
 };
 
-const getAllColoringImagesBase = async (show = 'all', userId?: string) => {
+const getAllColoringImagesBase = async (
+  show = 'all',
+  userId?: string,
+  profileId?: string,
+) => {
   'use cache';
   cacheLife('max');
   cacheTag('all-coloring-images');
 
+  // Build where clause based on show mode and profile
+  let whereClause;
+
+  if (show === 'all') {
+    if (userId) {
+      // Show user's images (filtered by profile if available) + community images
+      whereClause = {
+        OR: [{ userId, ...(profileId ? { profileId } : {}) }, { userId: null }],
+      };
+    } else {
+      // Logged out - show community images only
+      whereClause = { userId: null };
+    }
+  } else {
+    // show === 'user' - only user's images
+    if (userId) {
+      whereClause = { userId, ...(profileId ? { profileId } : {}) };
+    } else {
+      // No userId but trying to show user's images - return empty
+      whereClause = { id: { in: [] } };
+    }
+  }
+
   return db.coloringImage.findMany({
-    where: {
-      OR:
-        show === 'all'
-          ? userId
-            ? [{ userId }, { userId: null }]
-            : [{ userId: null }]
-          : userId
-            ? [{ userId }]
-            : [{ id: { in: [] } }], // Empty result if filtering by user but no userId
-    },
+    where: whereClause,
     select: {
       id: true,
       svgUrl: true,
@@ -450,7 +473,15 @@ export const getAllColoringImages = async (
   const { show = 'all' } = await searchParams;
 
   const userId = await getUserId(ACTIONS.GET_ALL_COLORING_IMAGES);
-  return getAllColoringImagesBase(show, userId || undefined);
+
+  // Get active profile for filtering
+  let profileId: string | undefined;
+  if (userId) {
+    const activeProfile = await getActiveProfile();
+    profileId = activeProfile?.id;
+  }
+
+  return getAllColoringImagesBase(show, userId || undefined, profileId);
 };
 
 // Static version for generateStaticParams - no user context needed

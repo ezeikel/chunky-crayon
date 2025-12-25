@@ -13,4 +13,5 @@ export type {
   ColoringImage as DbColoringImageType,
   Account as DbAccountType,
   Session as DbSessionType,
+  Profile as DbProfileType,
 } from "./generated/prisma/browser";

@@ -14,9 +14,11 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
+import { getProfiles, getActiveProfile } from '@/app/actions/profiles';
 import { signOut } from '@/auth';
 import formatNumber from '@/utils/formatNumber';
 import HeaderDropdown from './HeaderDropdown';
+import HeaderProfileIndicator from './HeaderProfileIndicator';
 import MobileMenu from './MobileMenu';
 
 export type Visibility = 'always' | 'authenticated' | 'unauthenticated';
@@ -190,6 +192,10 @@ const Header = async () => {
   const user = await getCurrentUser();
   const mobileItems = getMobileItems(user);
 
+  // Fetch profiles for authenticated users
+  const profiles = user ? (await getProfiles()) || [] : [];
+  const activeProfile = user ? await getActiveProfile() : null;
+
   const renderItems = () => {
     const visibleItems = ITEMS.filter((item) => {
       switch (item.visibility) {
@@ -213,6 +219,11 @@ const Header = async () => {
                 {renderNavLink(item, user)}
               </div>
             ))}
+            {/* Profile indicator for multi-profile support */}
+            <HeaderProfileIndicator
+              profiles={profiles}
+              activeProfile={activeProfile}
+            />
             <HeaderDropdown user={user} signOutAction={handleSignOut} />
           </nav>
           <MobileMenu items={mobileItems} />

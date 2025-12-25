@@ -16,12 +16,14 @@ model User {
   stripeCustomerId    String? // set after Stripe customer creation
   credits             Int       @default(15) // initial credits for new users
   showCommunityImages Boolean   @default(false) // parental control for community gallery
+  activeProfileId     String? // Currently selected profile
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
   subscriptions      Subscription[]
   creditTransactions CreditTransaction[]
   coloringImages     ColoringImage[]
+  profiles           Profile[] // Multi-profile support for families
   // Auth.js relations
   accounts           Account[]
   sessions           Session[]
@@ -71,6 +73,8 @@ model ColoringImage {
   generationType GenerationType @default(USER)
   User           User?          @relation(fields: [userId], references: [id])
   userId         String?
+  profile        Profile?       @relation(fields: [profileId], references: [id])
+  profileId      String? // Which profile created this image
 
   @@map("coloring_images")
 }
@@ -124,6 +128,24 @@ model StripeWebhookEvent {
   @@map("stripe_webhook_events")
 }
 
+// Profile for multi-child accounts (parents can create profiles for each child)
+model Profile {
+  id         String     @id @default(cuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String // "Emma", "Jack", etc.
+  avatarId   String     @default("default") // References avatar SVG
+  ageGroup   AgeGroup   @default(CHILD)
+  difficulty Difficulty @default(BEGINNER) // Can be overridden in settings
+  isDefault  Boolean    @default(false) // First profile is default
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  coloringImages ColoringImage[]
+
+  @@map("profiles")
+}
+
 enum GenerationType {
   USER
   DAILY
@@ -136,6 +158,14 @@ enum Difficulty {
   INTERMEDIATE // Moderate detail - suitable for kids
   ADVANCED // Detailed designs - suitable for teens/experienced
   EXPERT // Intricate patterns - suitable for adults
+}
+
+enum AgeGroup {
+  TODDLER // 2-4 years
+  CHILD // 5-8 years
+  TWEEN // 9-12 years
+  TEEN // 13-17 years
+  ADULT // 18+
 }
 
 enum PlanName {
