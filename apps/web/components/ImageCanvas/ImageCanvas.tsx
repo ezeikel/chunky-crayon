@@ -15,6 +15,7 @@ import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS, BRUSH_SIZES } from '@/constants';
 import { scanlineFill, hexToRGBA } from '@/utils/floodFill';
+import { drawTexturedStroke } from '@/utils/brushTextures';
 
 type ImageCanvasProps = {
   coloringImage: Partial<ColoringImage>;
@@ -330,70 +331,39 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         const x = clientX - rect.left;
         const y = clientY - rect.top;
         const radius = getRadius();
+        const lastX = lastPosRef.current?.x ?? null;
+        const lastY = lastPosRef.current?.y ?? null;
 
-        // Handle eraser
-        if (brushType === 'eraser') {
-          drawingCtx.globalCompositeOperation = 'destination-out';
-        } else {
-          drawingCtx.globalCompositeOperation = 'source-over';
-        }
+        // Draw textured stroke on visible canvas
+        drawTexturedStroke({
+          ctx: drawingCtx,
+          x,
+          y,
+          lastX,
+          lastY,
+          color: selectedColor,
+          radius,
+          brushType,
+        });
 
-        // Draw smooth line between last position and current
-        if (lastPosRef.current) {
-          drawingCtx.beginPath();
-          drawingCtx.strokeStyle = selectedColor;
-          drawingCtx.lineWidth = radius * 2;
-          drawingCtx.lineCap = 'round';
-          drawingCtx.lineJoin = 'round';
-          drawingCtx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
-          drawingCtx.lineTo(x, y);
-          drawingCtx.stroke();
-        }
-
-        // Always draw a circle at current position
-        drawingCtx.beginPath();
-        drawingCtx.arc(x, y, radius, 0, 2 * Math.PI);
-        drawingCtx.fillStyle = selectedColor;
-        drawingCtx.fill();
-
-        // Update offscreen canvas
+        // Update offscreen canvas with same stroke
         if (offScreenCanvasRef.current) {
           const offScreenCtx = offScreenCanvasRef.current.getContext('2d');
           if (offScreenCtx) {
-            if (brushType === 'eraser') {
-              offScreenCtx.globalCompositeOperation = 'destination-out';
-            } else {
-              offScreenCtx.globalCompositeOperation = 'source-over';
-            }
-
-            if (lastPosRef.current) {
-              offScreenCtx.beginPath();
-              offScreenCtx.strokeStyle = selectedColor;
-              offScreenCtx.lineWidth = radius * 2;
-              offScreenCtx.lineCap = 'round';
-              offScreenCtx.lineJoin = 'round';
-              offScreenCtx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
-              offScreenCtx.lineTo(x, y);
-              offScreenCtx.stroke();
-            }
-
-            offScreenCtx.beginPath();
-            offScreenCtx.arc(x, y, radius, 0, 2 * Math.PI);
-            offScreenCtx.fillStyle = selectedColor;
-            offScreenCtx.fill();
+            drawTexturedStroke({
+              ctx: offScreenCtx,
+              x,
+              y,
+              lastX,
+              lastY,
+              color: selectedColor,
+              radius,
+              brushType,
+            });
           }
         }
 
         lastPosRef.current = { x, y };
-
-        // Reset composite operation
-        drawingCtx.globalCompositeOperation = 'source-over';
-        if (offScreenCanvasRef.current) {
-          const offScreenCtx = offScreenCanvasRef.current.getContext('2d');
-          if (offScreenCtx) {
-            offScreenCtx.globalCompositeOperation = 'source-over';
-          }
-        }
       }
     };
 

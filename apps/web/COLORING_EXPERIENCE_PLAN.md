@@ -618,7 +618,7 @@ interface ColoringActions {
 ### Week 3: Tools & Polish
 
 - [x] Add eraser tool
-- [ ] Implement crayon vs marker brush textures
+- [x] Implement crayon vs marker brush textures
 - [x] Add visual feedback animations (confetti, progress indicator)
 - [x] Create responsive toolbar layout
 - [ ] Test on iOS Safari, Chrome, Firefox
@@ -629,7 +629,11 @@ interface ColoringActions {
 - [x] Pre-generate all UI sounds (placeholder sounds - need refinement)
 - [x] Implement SoundManager class
 - [x] Add mute toggle with preference persistence
-- [ ] Integrate ambient background music option
+- [x] Integrate ambient background music option
+  - Note: Currently triggers on first canvas stroke due to browser autoplay
+    policy
+  - TODO: Trigger on ANY user interaction (color pick, button click, etc.)
+  - TODO: Improve ElevenLabs prompts - current ambient sounds are low quality
 
 ### Week 5: Persistence & Celebration
 

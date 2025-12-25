@@ -1,6 +1,5 @@
 'use client';
 
-import { ColoringTool, BrushType } from '@/constants';
 import { useColoringContext } from '@/contexts/coloring';
 import { useSound } from '@/hooks/useSound';
 import cn from '@/utils/cn';
@@ -10,18 +9,51 @@ type ToolSelectorProps = {
 };
 
 // SVG icons for tools
-const BrushIcon = ({ className }: { className?: string }) => (
+const CrayonIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    {/* Crayon shape - chunky rounded tip */}
+    <path d="M5.5 2C4.67 2 4 2.67 4 3.5v17C4 21.33 4.67 22 5.5 22h3c.83 0 1.5-.67 1.5-1.5v-17C10 2.67 9.33 2 8.5 2h-3zm1.5 2h1v2h-1V4z" />
+    <path d="M7 7v13h0V7z" opacity="0.3" />
+    {/* Crayon wrapper lines */}
+    <path
+      d="M4.5 8h5M4.5 10h5"
+      stroke="currentColor"
+      strokeWidth="0.5"
+      opacity="0.5"
+    />
+    {/* Second crayon (offset) */}
+    <path d="M14.5 2c-.83 0-1.5.67-1.5 1.5v17c0 .83.67 1.5 1.5 1.5h3c.83 0 1.5-.67 1.5-1.5v-17c0-.83-.67-1.5-1.5-1.5h-3zm1.5 2h1v2h-1V4z" />
+    <path
+      d="M13.5 8h5M13.5 10h5"
+      stroke="currentColor"
+      strokeWidth="0.5"
+      opacity="0.5"
+    />
+  </svg>
+);
+
+const MarkerIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
   >
-    <path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08" />
-    <path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z" />
+    {/* Marker body */}
+    <rect x="7" y="2" width="10" height="14" rx="2" fill="currentColor" />
+    {/* Marker tip */}
+    <path d="M9 16h6l-1 6h-4l-1-6z" fill="currentColor" />
+    {/* Marker cap line */}
+    <line
+      x1="7"
+      y1="6"
+      x2="17"
+      y2="6"
+      stroke="currentColor"
+      strokeWidth="1"
+      opacity="0.5"
+    />
   </svg>
 );
 
@@ -57,13 +89,14 @@ const EraserIcon = ({ className }: { className?: string }) => (
 );
 
 type ToolConfig = {
-  id: ColoringTool | 'eraser';
+  id: 'crayon' | 'marker' | 'fill' | 'eraser';
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 };
 
 const tools: ToolConfig[] = [
-  { id: 'brush', label: 'Brush', icon: BrushIcon },
+  { id: 'crayon', label: 'Crayon', icon: CrayonIcon },
+  { id: 'marker', label: 'Marker', icon: MarkerIcon },
   { id: 'fill', label: 'Fill', icon: FillIcon },
   { id: 'eraser', label: 'Eraser', icon: EraserIcon },
 ];
@@ -73,24 +106,34 @@ const ToolSelector = ({ className }: ToolSelectorProps) => {
     useColoringContext();
   const { playSound } = useSound();
 
-  const handleToolSelect = (toolId: ColoringTool | 'eraser') => {
-    if (toolId === 'eraser') {
-      setActiveTool('brush');
-      setBrushType('eraser');
-    } else {
-      setActiveTool(toolId);
-      if (brushType === 'eraser') {
+  const handleToolSelect = (toolId: ToolConfig['id']) => {
+    switch (toolId) {
+      case 'crayon':
+        setActiveTool('brush');
         setBrushType('crayon');
-      }
+        break;
+      case 'marker':
+        setActiveTool('brush');
+        setBrushType('marker');
+        break;
+      case 'eraser':
+        setActiveTool('brush');
+        setBrushType('eraser');
+        break;
+      case 'fill':
+        setActiveTool('fill');
+        // Keep current brush type for when user switches back
+        break;
     }
     playSound('pop');
   };
 
-  const isToolActive = (toolId: ColoringTool | 'eraser') => {
-    if (toolId === 'eraser') {
-      return activeTool === 'brush' && brushType === 'eraser';
+  const isToolActive = (toolId: ToolConfig['id']) => {
+    if (toolId === 'fill') {
+      return activeTool === 'fill';
     }
-    return activeTool === toolId && brushType !== 'eraser';
+    // For brush-based tools, check both activeTool and brushType
+    return activeTool === 'brush' && brushType === toolId;
   };
 
   return (
