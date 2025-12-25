@@ -4,7 +4,9 @@ import { models, MODEL_IDS } from './models';
 import {
   createColoringImagePrompt,
   createGeminiColoringImagePrompt,
+  createDifficultyAwarePrompt,
   REFERENCE_IMAGES,
+  DIFFICULTY_MODIFIERS,
 } from './prompts';
 import { openai } from '@ai-sdk/openai';
 
@@ -26,13 +28,18 @@ export type GenerationResult = {
   imageBuffer: Buffer; // Raw image data to avoid re-fetching
 };
 
+export type Difficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT';
+
 export type ProviderConfig = {
   id: string;
   name: string;
   provider: ImageProvider;
   costPerImage: number; // Approximate USD
   supportsReferenceImages: boolean;
-  generate: (description: string) => Promise<{
+  generate: (
+    description: string,
+    difficulty?: Difficulty,
+  ) => Promise<{
     imageBuffer: Buffer;
     generationTimeMs: number;
   }>;
@@ -45,11 +52,14 @@ const openaiProvider: ProviderConfig = {
   provider: 'openai',
   costPerImage: 0.08, // ~$0.04-0.17, using middle estimate
   supportsReferenceImages: false,
-  generate: async (description: string) => {
+  generate: async (description: string, difficulty?: Difficulty) => {
     const startTime = Date.now();
 
-    // Use detailed prompt with all 26 rules + reference image URLs
-    const prompt = createColoringImagePrompt(description);
+    // Use difficulty-aware prompt if difficulty is provided, otherwise use default
+    const prompt =
+      difficulty && difficulty !== 'BEGINNER'
+        ? createDifficultyAwarePrompt(description, difficulty)
+        : createColoringImagePrompt(description);
 
     const result = await generateImage({
       model: openai.image(MODEL_IDS.GPT_IMAGE_1_5),
@@ -83,10 +93,30 @@ const geminiProvider: ProviderConfig = {
   provider: 'google',
   costPerImage: 0.18, // ~$0.13-0.24, using middle estimate
   supportsReferenceImages: true,
-  generate: async (description: string) => {
+  generate: async (description: string, difficulty?: Difficulty) => {
     const startTime = Date.now();
 
-    const prompt = createGeminiColoringImagePrompt(description);
+    // Use difficulty-aware prompt for non-beginner levels
+    // Gemini uses reference images, so we add difficulty context to the Gemini prompt
+    let prompt = createGeminiColoringImagePrompt(description);
+    if (difficulty && difficulty !== 'BEGINNER') {
+      const config = DIFFICULTY_MODIFIERS[difficulty];
+      const difficultyContext = `
+DIFFICULTY LEVEL: ${difficulty}
+Target audience: ${config.targetAge}
+
+Complexity requirements:
+- Shape sizes: ${config.shapeSize}
+- Line thickness: ${config.lineThickness}
+- Detail level: ${config.detailLevel}
+- Background: ${config.background}
+- Overall complexity: ${config.complexity}
+
+Additional requirements:
+${config.additionalRules.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
+`;
+      prompt = `${difficultyContext}\n\n${prompt}`;
+    }
 
     // Build message content with reference images as actual inputs
     const messageContent: Array<
@@ -175,20 +205,26 @@ function shouldFallback(error: unknown): boolean {
  * Generate a coloring page image with automatic fallback
  *
  * @param description - The user's description of what to generate
+ * @param difficulty - Optional difficulty level for age-appropriate generation
  * @returns The generated image URL and metadata
  */
 export async function generateColoringPageImage(
   description: string,
+  difficulty?: Difficulty,
 ): Promise<GenerationResult> {
   const primaryConfig = PROVIDERS[PRIMARY_PROVIDER];
   const fallbackConfig = PROVIDERS[FALLBACK_PROVIDER];
 
   // eslint-disable-next-line no-console
-  console.log(`[ImageGeneration] Using ${primaryConfig.name} (primary)`);
+  console.log(
+    `[ImageGeneration] Using ${primaryConfig.name} (primary)${difficulty ? ` with difficulty: ${difficulty}` : ''}`,
+  );
 
   try {
-    const { imageBuffer, generationTimeMs } =
-      await primaryConfig.generate(description);
+    const { imageBuffer, generationTimeMs } = await primaryConfig.generate(
+      description,
+      difficulty,
+    );
 
     // Save to blob storage
     const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
@@ -218,8 +254,10 @@ export async function generateColoringPageImage(
     console.log(`[ImageGeneration] Falling back to ${fallbackConfig.name}`);
 
     try {
-      const { imageBuffer, generationTimeMs } =
-        await fallbackConfig.generate(description);
+      const { imageBuffer, generationTimeMs } = await fallbackConfig.generate(
+        description,
+        difficulty,
+      );
 
       // Save to blob storage
       const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;

@@ -38,12 +38,17 @@ import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
  * - Defaults to OpenAI (cheaper) with Gemini fallback
  * - Can be switched via IMAGE_PROVIDER env var
  * - Automatically falls back on provider failures
+ * - Uses difficulty level from profile for age-appropriate generation
  */
-const generateColoringImage = async (description: string, userId?: string) => {
+const generateColoringImage = async (
+  description: string,
+  userId?: string,
+  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT',
+) => {
   const providerConfig = getCurrentProviderConfig();
 
   try {
-    const result = await generateColoringPageImage(description);
+    const result = await generateColoringPageImage(description, difficulty);
 
     // Track successful generation with timing
     const trackingData = {
@@ -116,10 +121,14 @@ const generateColoringImageWithMetadata = async (
   userId?: string,
   generationType?: GenerationType,
 ) => {
+  // Get active profile early to use its difficulty setting for generation
+  const activeProfile = await getActiveProfile();
+  const difficulty = activeProfile?.difficulty;
+
   // Get traced models for observability (latency, tokens, costs)
   const tracedModels = getTracedModels({
     userId,
-    properties: { action: 'coloring-image-generation' },
+    properties: { action: 'coloring-image-generation', difficulty },
   });
 
   // Step 1: Clean up the user's description
@@ -133,11 +142,16 @@ const generateColoringImageWithMetadata = async (
   console.log('[Pipeline] Description cleaned:', cleanedUpUserDescription);
 
   // Step 2: Generate the coloring image (returns buffer to avoid re-fetching)
+  // Uses difficulty from active profile for age-appropriate generation
   const {
     url: imageUrl,
     tempFileName,
     imageBuffer,
-  } = await generateColoringImage(cleanedUpUserDescription as string, userId);
+  } = await generateColoringImage(
+    cleanedUpUserDescription as string,
+    userId,
+    difficulty,
+  );
 
   if (!imageUrl || !imageBuffer) {
     throw new Error('Failed to generate an acceptable image');
@@ -179,9 +193,7 @@ const generateColoringImageWithMetadata = async (
   });
 
   // Step 4: Create DB record (needs metadata)
-  // Get active profile to associate the image with
-  const activeProfile = await getActiveProfile();
-
+  // Uses activeProfile fetched at start of function
   const coloringImage = await db.coloringImage.create({
     data: {
       title: imageMetadata.title,

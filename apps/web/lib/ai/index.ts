@@ -41,6 +41,10 @@ export * as prompts from './prompts';
 export {
   // Reference assets
   REFERENCE_IMAGES,
+  // Difficulty modifiers
+  DIFFICULTY_MODIFIERS,
+  getTargetAgeForDifficulty,
+  createDifficultyAwarePrompt,
   // Core rules
   TARGET_AGE,
   COPYRIGHTED_CHARACTER_INSTRUCTIONS,

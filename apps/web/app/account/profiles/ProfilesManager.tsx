@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { ProfileProvider } from '@/contexts/ProfileContext';
 import ProfileCard from '@/components/ProfileCard/ProfileCard';
@@ -81,6 +82,28 @@ const ProfilesManager = ({ profiles, activeProfile }: ProfilesManagerProps) => {
                 isActive={profile.id === activeProfile?.id}
                 onClick={() => handleSwitchProfile(profile.id)}
               />
+
+              {/* Edit button (shown on hover) */}
+              <Link
+                href={`/account/profiles/${profile.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-2 left-2 w-8 h-8 rounded-full bg-crayon-blue text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-crayon-blue/80"
+                aria-label={`Edit ${profile.name}`}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
+                </svg>
+              </Link>
 
               {/* Delete button (shown on hover, not for default profile if it's the only one) */}
               {(profiles.length > 1 || !profile.isDefault) && (

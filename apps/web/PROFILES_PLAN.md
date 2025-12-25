@@ -214,7 +214,7 @@ Small avatar in header showing active profile with dropdown:
 
 ---
 
-## Phase 3: Difficulty-Driven Prompt Generation
+## Phase 3: Difficulty-Driven Prompt Generation ✅ COMPLETED
 
 ### 3.1 Prompt Strategy
 
@@ -381,63 +381,69 @@ export async function generateColoringImage(
 
 ---
 
-## Phase 4: Settings & Account Management
+## Phase 4: Settings & Account Management ✅ COMPLETED
 
-### 4.1 Profile Settings Page
+### 4.1 Profile Settings Page ✅
 
-`/settings/profiles` or `/settings/profiles/[id]`
+> **Implemented in:** `app/account/profiles/[id]/page.tsx`
 
-**Settings per profile:**
+Route: `/account/profiles/[id]`
+
+**Settings per profile (all implemented):**
 
 - Profile name
-- Avatar selection
-- Age group (dropdown with descriptions)
+- Avatar selection (visual picker with colored crayons)
+- Age group (visual buttons with emoji)
 - Difficulty override slider
   - "Use age-appropriate (recommended)" toggle
-  - Manual slider: BEGINNER ← → EXPERT
-- Delete profile (with confirmation)
+  - Manual button selector: BEGINNER → INTERMEDIATE → ADVANCED → EXPERT
+- Delete profile (with confirmation dialog)
 
-### 4.2 Difficulty Slider Component
+### 4.2 Difficulty Slider Component ✅
+
+> **Implemented in:** `components/DifficultySlider/DifficultySlider.tsx`
 
 ```tsx
 // components/DifficultySlider/DifficultySlider.tsx
-const DifficultySlider = ({ value, onChange, ageGroup }: Props) => {
-  const recommendedDifficulty = AGE_GROUP_DEFAULTS[ageGroup];
+type DifficultySliderProps = {
+  value: Difficulty;
+  onChange: (difficulty: Difficulty) => void;
+  ageGroup: AgeGroup;
+  useRecommended: boolean;
+  onUseRecommendedChange: (value: boolean) => void;
+  disabled?: boolean;
+};
 
-  return (
-    <div>
-      <label className="flex items-center gap-2 mb-4">
-        <Switch checked={useRecommended} onChange={setUseRecommended} />
-        <span>Use age-appropriate difficulty (recommended)</span>
-      </label>
-
-      {!useRecommended && (
-        <Slider
-          min={0}
-          max={3}
-          step={1}
-          value={DIFFICULTY_VALUES.indexOf(value)}
-          onChange={(v) => onChange(DIFFICULTY_VALUES[v])}
-          labels={['Beginner', 'Intermediate', 'Advanced', 'Expert']}
-        />
-      )}
-
-      <p className="text-sm text-text-tertiary mt-2">
-        {DIFFICULTY_DESCRIPTIONS[value]}
-      </p>
-    </div>
-  );
+const DifficultySlider = ({
+  value,
+  onChange,
+  ageGroup,
+  useRecommended,
+  onUseRecommendedChange,
+  disabled = false,
+}: DifficultySliderProps) => {
+  // Shows toggle for "Use age-appropriate difficulty"
+  // When disabled, shows visual button selector for 4 difficulty levels
+  // Includes description panel for selected difficulty
 };
 ```
 
-### 4.3 Account Overview Updates
+### 4.3 Profile Edit Form ✅
 
-Show in account settings:
+> **Implemented in:** `app/account/profiles/[id]/ProfileEditForm.tsx`
 
-- Total credits (account level)
-- Active profiles count
-- "Manage Profiles" link
-- Per-profile usage stats (optional)
+- Full profile editing form with all fields
+- Change tracking (Save button disabled when no changes)
+- Delete confirmation with profile preview
+- Integrated DifficultySlider component
+
+### 4.4 ProfilesManager Edit Button ✅
+
+> **Updated in:** `app/account/profiles/ProfilesManager.tsx`
+
+- Added edit button (pencil icon) on hover for each profile card
+- Links to `/account/profiles/[id]` for editing
+- Positioned in top-left corner (delete button in top-right)
 
 ---
 
@@ -678,16 +684,16 @@ Credits remain on User model (account level):
 
 ---
 
-_Created: December 25, 2024_ _Status: In Progress - Phase 1 & 2 Complete_
+_Created: December 25, 2024_ _Status: Phases 1-4 Complete_
 
 ---
 
 ## Implementation Progress
 
-| Phase                       | Status      | Notes                                                      |
-| --------------------------- | ----------- | ---------------------------------------------------------- |
-| Phase 1: Database & API     | ✅ Complete | Prisma models, server actions in `app/actions/profiles.ts` |
-| Phase 2: Profile UI         | ✅ Complete | All components created, Header integration done            |
-| Phase 3: Difficulty Prompts | ⏳ Pending  | Next up                                                    |
-| Phase 4: Settings           | ⏳ Pending  | Profile management page                                    |
-| Phase 5: B2B/Education      | 📋 Future   | Not planned for now                                        |
+| Phase                       | Status      | Notes                                                                            |
+| --------------------------- | ----------- | -------------------------------------------------------------------------------- |
+| Phase 1: Database & API     | ✅ Complete | Prisma models, server actions in `app/actions/profiles.ts`                       |
+| Phase 2: Profile UI         | ✅ Complete | All components created, Header integration done                                  |
+| Phase 3: Difficulty Prompts | ✅ Complete | DIFFICULTY_MODIFIERS, createDifficultyAwarePrompt, generation flow updated       |
+| Phase 4: Settings           | ✅ Complete | DifficultySlider, Profile edit page at `/account/profiles/[id]`, ProfileEditForm |
+| Phase 5: B2B/Education      | 📋 Future   | Not planned for now                                                              |

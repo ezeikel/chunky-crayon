@@ -226,7 +226,11 @@ const Header = async () => {
             />
             <HeaderDropdown user={user} signOutAction={handleSignOut} />
           </nav>
-          <MobileMenu items={mobileItems} />
+          <MobileMenu
+            items={mobileItems}
+            profiles={profiles}
+            activeProfile={activeProfile}
+          />
         </div>
       );
     }

@@ -21,10 +21,107 @@ export const REFERENCE_IMAGES = [
 ] as const;
 
 // =============================================================================
+// Difficulty-Based Prompt Modifiers
+// =============================================================================
+
+/**
+ * Difficulty configuration for generating age-appropriate coloring pages.
+ * Each profile has a difficulty setting that affects prompt generation.
+ */
+export type DifficultyConfig = {
+  targetAge: string;
+  shapeSize: string;
+  lineThickness: string;
+  detailLevel: string;
+  background: string;
+  complexity: string;
+  additionalRules: string[];
+};
+
+/**
+ * Difficulty modifiers for each level.
+ * BEGINNER = Current default (toddler/child friendly)
+ * INTERMEDIATE = Tweens (9-12)
+ * ADVANCED = Teens (13-17)
+ * EXPERT = Adults (18+)
+ */
+export const DIFFICULTY_MODIFIERS: Record<string, DifficultyConfig> = {
+  BEGINNER: {
+    targetAge: '2-8 years old',
+    shapeSize: 'extra large, simple',
+    lineThickness: 'very thick (4-5px equivalent)',
+    detailLevel: 'minimal - only essential features',
+    background: 'simple or none',
+    complexity: 'very low - big areas easy for small hands to color',
+    additionalRules: [
+      'All shapes should be large enough for toddler crayons',
+      'No small details or fine lines anywhere',
+      'Maximum of 5-7 distinct colorable areas',
+      'Characters should be cute and non-threatening',
+    ],
+  },
+  INTERMEDIATE: {
+    targetAge: '9-12 years old',
+    shapeSize: 'medium to large',
+    lineThickness: 'thick (3-4px equivalent)',
+    detailLevel: 'moderate - include interesting features',
+    background: 'simple scene elements allowed',
+    complexity: 'medium - more areas to color, some smaller sections',
+    additionalRules: [
+      'Can include more character details (clothing patterns, accessories)',
+      'Background can have 2-3 simple elements',
+      'Around 10-15 distinct colorable areas',
+      'Can include more dynamic poses',
+    ],
+  },
+  ADVANCED: {
+    targetAge: '13-17 years old',
+    shapeSize: 'varied sizes',
+    lineThickness: 'medium (2-3px equivalent)',
+    detailLevel: 'detailed - include textures and patterns',
+    background: 'full scene with multiple elements',
+    complexity: 'higher - many areas, varied sizes',
+    additionalRules: [
+      'Can include pattern details in clothing, objects',
+      'Hair and fur can have more texture lines',
+      'Background can be a full scene',
+      '20-30 distinct colorable areas',
+      'Can include more sophisticated poses and expressions',
+    ],
+  },
+  EXPERT: {
+    targetAge: '18+ years old',
+    shapeSize: 'all sizes including fine details',
+    lineThickness: 'varied (1-3px equivalent)',
+    detailLevel: 'intricate - rich in detail and patterns',
+    background: 'complex, detailed scenes',
+    complexity: 'high - intricate areas suitable for adult colorists',
+    additionalRules: [
+      'Mandala-style patterns welcome',
+      'Intricate details encouraged',
+      'Complex backgrounds with many elements',
+      '40+ distinct colorable areas',
+      'Can include zentangle-style patterns',
+      'Fine details and small sections allowed',
+    ],
+  },
+};
+
+/**
+ * Get the target age string for a given difficulty level.
+ * Used to customize prompts based on profile difficulty.
+ */
+export const getTargetAgeForDifficulty = (
+  difficulty: string = 'BEGINNER',
+): string => {
+  return DIFFICULTY_MODIFIERS[difficulty]?.targetAge ?? '3-8 years old';
+};
+
+// =============================================================================
 // Coloring Image Generation - Core Rules
 // =============================================================================
 
-/** Target audience for coloring pages */
+/** Default target audience for coloring pages (BEGINNER level) */
 export const TARGET_AGE = '3-8 years old';
 
 /** Instructions for handling copyrighted characters */
@@ -81,6 +178,43 @@ ${COLORING_IMAGE_RULES_TEXT}
 /** Create image generation prompt with full detailed rules */
 export const createColoringImagePrompt = (description: string) =>
   `${description}. ${COLORING_IMAGE_DETAILED_SUFFIX}`;
+
+/**
+ * Create a difficulty-aware prompt for coloring image generation.
+ * Uses the profile's difficulty setting to generate age-appropriate images.
+ *
+ * @param description - The user's description of what they want
+ * @param difficulty - The difficulty level from the profile (BEGINNER, INTERMEDIATE, ADVANCED, EXPERT)
+ * @returns A prompt with difficulty-specific modifiers
+ */
+export const createDifficultyAwarePrompt = (
+  description: string,
+  difficulty: string = 'BEGINNER',
+): string => {
+  const config =
+    DIFFICULTY_MODIFIERS[difficulty] ?? DIFFICULTY_MODIFIERS.BEGINNER;
+
+  const difficultyRules = config.additionalRules
+    .map((rule, i) => `${i + 1}. ${rule}`)
+    .join('\n');
+
+  return `${description}
+
+DIFFICULTY LEVEL: ${difficulty}
+Target audience: ${config.targetAge}
+
+Complexity requirements for this difficulty:
+- Shape sizes: ${config.shapeSize}
+- Line thickness: ${config.lineThickness}
+- Detail level: ${config.detailLevel}
+- Background: ${config.background}
+- Overall complexity: ${config.complexity}
+
+Difficulty-specific rules:
+${difficultyRules}
+
+${COLORING_IMAGE_DETAILED_SUFFIX}`;
+};
 
 /**
  * Create a Gemini-specific prompt for image generation with reference images.
