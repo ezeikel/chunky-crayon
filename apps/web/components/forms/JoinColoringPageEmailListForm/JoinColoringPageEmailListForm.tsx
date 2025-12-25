@@ -111,12 +111,12 @@ const JoinColoringPageEmailListForm = ({
             }
           />
           <h3 className="font-tondo font-bold text-lg text-gradient-orange">
-            Free Daily Colouring!
+            Free Daily Coloring!
           </h3>
         </div>
         <p className="font-tondo text-sm text-text-secondary">
           Get a <span className="font-bold text-crayon-orange">free</span>{' '}
-          colouring page in your inbox every day.
+          coloring page in your inbox every day.
         </p>
       </div>
 

@@ -2,6 +2,9 @@ import type { Viewport } from 'next';
 import { Suspense } from 'react';
 import CreateColoringPageFormWrapper from '@/components/forms/CreateColoringPageForm/CreateColoringPageFormWrapper';
 import AllColoringPageImages from '@/components/AllColoringPageImages/AllColoringPageImages';
+import GalleryPreview from '@/components/GalleryPreview';
+import SocialProofStats from '@/components/SocialProofStats';
+import RecentCreations from '@/components/RecentCreations';
 import Loading from '@/components/Loading/Loading';
 import UnsubscribeToast from '@/components/UnsubscribeToast/UnsubscribeToast';
 import HomePageContent from '@/components/HomePageContent';
@@ -75,6 +78,39 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
               <AllColoringPageImages searchParams={searchParams} />
             </Suspense>
           }
+          galleryPreview={
+            <Suspense
+              fallback={
+                <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-48 bg-paper-cream rounded-3xl animate-pulse"
+                    />
+                  ))}
+                </div>
+              }
+            >
+              <GalleryPreview />
+            </Suspense>
+          }
+          socialProofStats={
+            <Suspense
+              fallback={
+                <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-32 bg-paper-cream rounded-2xl animate-pulse"
+                    />
+                  ))}
+                </div>
+              }
+            >
+              <SocialProofStats />
+            </Suspense>
+          }
+          recentCreations={<RecentCreations />}
         />
       </Suspense>
     </>

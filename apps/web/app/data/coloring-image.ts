@@ -53,6 +53,41 @@ export const getColoringImageById = async (
   return getColoringImageBase(id);
 };
 
+// Fetch multiple images by IDs (for recent creations, etc.)
+export const getColoringImagesByIds = async (
+  ids: string[],
+): Promise<GalleryImage[]> => {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('coloring-images-by-ids');
+
+  if (ids.length === 0) return [];
+
+  const images = await db.coloringImage.findMany({
+    where: {
+      id: { in: ids },
+    },
+    select: {
+      id: true,
+      svgUrl: true,
+      title: true,
+      description: true,
+      userId: true,
+    },
+  });
+
+  // Maintain the order of the input IDs
+  const imageMap = new Map(images.map((img) => [img.id, img]));
+  return ids
+    .map((id) => imageMap.get(id))
+    .filter((img): img is NonNullable<typeof img> => img !== undefined)
+    .map((img) => ({
+      ...img,
+      title: img.title || null,
+      description: img.description || null,
+    }));
+};
+
 const getAllColoringImagesBase = async (
   userId?: string,
   showCommunityImages?: boolean,

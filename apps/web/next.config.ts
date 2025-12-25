@@ -5,6 +5,50 @@ import withVercelToolbar from '@vercel/toolbar/plugins/next';
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  cacheLife: {
+    // Blog list - updates daily via cron, but use webhook for immediate invalidation
+    'blog-list': {
+      stale: 60 * 60, // 1 hour - serve stale while revalidating
+      revalidate: 60 * 60 * 24, // 24 hours - daily background revalidation
+      expire: 60 * 60 * 24 * 30, // 30 days max
+    },
+    // Individual blog posts - rarely change, rely on webhook for updates
+    'blog-post': {
+      stale: 60 * 60 * 24, // 1 day - serve stale while revalidating
+      revalidate: 60 * 60 * 24 * 7, // 7 days - weekly background revalidation
+      expire: 60 * 60 * 24 * 90, // 90 days max
+    },
+    // Gallery category pages - SEO pages that change when new images added
+    'gallery-category': {
+      stale: 60 * 60 * 6, // 6 hours - serve stale while revalidating
+      revalidate: 60 * 60 * 24, // 24 hours - daily background revalidation
+      expire: 60 * 60 * 24 * 30, // 30 days max
+    },
+    // Gallery community/featured - updates frequently with new user images
+    'gallery-community': {
+      stale: 60 * 60, // 1 hour - serve stale while revalidating
+      revalidate: 60 * 60 * 6, // 6 hours - revalidate 4x daily
+      expire: 60 * 60 * 24 * 7, // 7 days max
+    },
+    // Daily gallery - updates once per day
+    'gallery-daily': {
+      stale: 60 * 60, // 1 hour - serve stale while revalidating
+      revalidate: 60 * 60 * 24, // 24 hours - daily revalidation
+      expire: 60 * 60 * 24 * 7, // 7 days max
+    },
+    // Gallery stats - cached longer, less critical
+    'gallery-stats': {
+      stale: 60 * 60 * 12, // 12 hours
+      revalidate: 60 * 60 * 24, // 24 hours
+      expire: 60 * 60 * 24 * 7, // 7 days max
+    },
+    // Gallery difficulty filtering - SEO pages that change when new images added
+    'gallery-difficulty': {
+      stale: 60 * 60 * 6, // 6 hours - serve stale while revalidating
+      revalidate: 60 * 60 * 24, // 24 hours - daily background revalidation
+      expire: 60 * 60 * 24 * 30, // 30 days max
+    },
+  },
   images: {
     remotePatterns: [
       {
@@ -15,6 +59,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'x0odfckl5uaoyscm.public.blob.vercel-storage.com',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
         pathname: '**',
       },
     ],

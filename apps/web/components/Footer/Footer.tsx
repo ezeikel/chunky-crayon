@@ -41,8 +41,8 @@ const Footer = ({ className }: FooterProps) => (
           <h3 className="font-bold text-lg mb-2">About</h3>
           <p className="text-gray-300 text-base max-w-xs">
             Where imagination comes to life! Turn your wildest ideas into
-            magical colouring pages.{' '}
-            <span className="font-bold text-white">Dream. Create. Colour.</span>
+            magical coloring pages.{' '}
+            <span className="font-bold text-white">Dream. Create. Color.</span>
           </p>
         </div>
         <div className="mt-6">

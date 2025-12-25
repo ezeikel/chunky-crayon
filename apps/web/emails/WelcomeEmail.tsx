@@ -20,7 +20,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 const WelcomeEmail = ({ unsubscribeUrl }: WelcomeEmailProps) => (
   <Html>
     <Head />
-    <Preview>Welcome to Chunky Crayon - Free daily colouring pages!</Preview>
+    <Preview>Welcome to Chunky Crayon - Free daily coloring pages!</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header */}
@@ -33,14 +33,14 @@ const WelcomeEmail = ({ unsubscribeUrl }: WelcomeEmailProps) => (
         {/* Hero */}
         <Section style={hero}>
           <Text style={welcomeEmoji}>🎨</Text>
-          <Heading style={heroTitle}>Welcome to the Colouring Club!</Heading>
+          <Heading style={heroTitle}>Welcome to the Coloring Club!</Heading>
         </Section>
 
         {/* Main Content */}
         <Section style={content}>
           <Text style={paragraph}>
-            You&apos;re all set to receive a{' '}
-            <strong>free colouring page</strong> in your inbox every day!
+            You&apos;re all set to receive a <strong>free coloring page</strong>{' '}
+            in your inbox every day!
           </Text>
           <Text style={paragraph}>
             Each page is uniquely generated just for you - no two are ever the
@@ -54,7 +54,7 @@ const WelcomeEmail = ({ unsubscribeUrl }: WelcomeEmailProps) => (
             What to Expect
           </Heading>
           <Text style={expectItem}>
-            <span style={checkmark}>✓</span> Daily colouring page delivered to
+            <span style={checkmark}>✓</span> Daily coloring page delivered to
             your inbox
           </Text>
           <Text style={expectItem}>

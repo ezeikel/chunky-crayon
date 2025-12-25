@@ -18,7 +18,7 @@ const UserInputV2 = () => {
     if (!isSignedIn) {
       return {
         disabled: true,
-        placeholder: 'Sign in to start creating magical colouring pages!',
+        placeholder: 'Sign in to start creating magical coloring pages!',
       };
     }
 
@@ -71,7 +71,7 @@ const UserInputV2 = () => {
     }
 
     return {
-      text: 'Generate colouring page',
+      text: 'Generate coloring page',
       isSubmit: true,
     };
   };

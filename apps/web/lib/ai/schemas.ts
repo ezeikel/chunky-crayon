@@ -142,3 +142,36 @@ export const imageDescriptionSchema = z.object({
 });
 
 export type ImageDescription = z.infer<typeof imageDescriptionSchema>;
+
+// =============================================================================
+// Blog Post Generation (for automated SEO content)
+// =============================================================================
+
+export const blogMetaSchema = z.object({
+  title: z
+    .string()
+    .describe('SEO-optimized blog post title (50-60 characters)'),
+  slug: z
+    .string()
+    .describe('URL-friendly slug (lowercase, hyphenated, 3-6 words)'),
+  excerpt: z.string().describe('Meta description for SEO (150-160 characters)'),
+  estimatedReadTime: z.number().describe('Estimated read time in minutes'),
+});
+
+export type BlogMeta = z.infer<typeof blogMetaSchema>;
+
+export const blogPostSchema = z.object({
+  content: z.string().describe('Full markdown content of the blog post'),
+  wordCount: z.number().describe('Word count of the post content'),
+});
+
+export type BlogPost = z.infer<typeof blogPostSchema>;
+
+export const blogImagePromptSchema = z.object({
+  imagePrompt: z
+    .string()
+    .describe('Prompt for generating the featured coloring page image'),
+  altText: z.string().describe('Alt text for the generated image'),
+});
+
+export type BlogImagePrompt = z.infer<typeof blogImagePromptSchema>;

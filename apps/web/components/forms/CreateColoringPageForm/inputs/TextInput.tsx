@@ -64,7 +64,7 @@ const TextInput = ({ className }: TextInputProps) => {
     // Fallback (shouldn't reach here)
     return {
       disabled: true,
-      placeholder: 'Sign in to start creating magical colouring pages!',
+      placeholder: 'Sign in to start creating magical coloring pages!',
     };
   };
 
@@ -79,7 +79,7 @@ const TextInput = ({ className }: TextInputProps) => {
         };
       }
       return {
-        text: 'Generate colouring page',
+        text: 'Generate coloring page',
         isSubmit: true,
       };
     }

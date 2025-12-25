@@ -166,7 +166,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
         };
       }
       return {
-        text: 'Generate colouring page',
+        text: 'Generate coloring page',
         isSubmit: true,
       };
     }
@@ -355,7 +355,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           {buttonConfig.isSubmit ? (
             <SubmitButton
               ref={submitButtonRef}
-              text="🎨 Make my colouring page!"
+              text="🎨 Make my coloring page!"
               className="font-tondo font-bold text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover px-8 py-6 rounded-xl hover:scale-105 active:scale-95 transition-all duration-200"
               disabled={!isDescriptionReady}
             />
@@ -525,7 +525,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
       )}
 
       <p className="font-tondo text-sm text-text-muted text-center">
-        Share a drawing or any picture you want to colour!
+        Share a drawing or any picture you want to color!
       </p>
 
       {!canInteract && (

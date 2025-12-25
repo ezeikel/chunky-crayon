@@ -10,7 +10,7 @@ const UserInput = () => (
       required
     />
     <SubmitButton
-      text="Generate colouring page"
+      text="Generate coloring page"
       className="font-tondo text-white bg-crayon-orange hover:bg-crayon-orange-dark focus:outline-none focus:ring-2 focus:ring-crayon-orange focus:ring-offset-2"
     />
   </>

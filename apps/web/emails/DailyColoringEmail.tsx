@@ -52,7 +52,7 @@ const DailyColoringEmail = ({
           {/* Main Content */}
           <Section style={content}>
             <Text style={paragraph}>
-              Your daily colouring page is attached to this email as a PDF.
+              Your daily coloring page is attached to this email as a PDF.
             </Text>
             <Text style={paragraph}>
               Print it out and let your creativity shine!
@@ -62,24 +62,24 @@ const DailyColoringEmail = ({
           {/* Tips Section */}
           <Section style={tipsSection}>
             <Heading as="h2" style={tipsTitle}>
-              Colouring Tips
+              Coloring Tips
             </Heading>
             <Text style={tipItem}>
-              <span style={tipEmoji}>1.</span> Use crayons, coloured pencils, or
+              <span style={tipEmoji}>1.</span> Use crayons, colored pencils, or
               markers
             </Text>
             <Text style={tipItem}>
-              <span style={tipEmoji}>2.</span> Try mixing different colours
+              <span style={tipEmoji}>2.</span> Try mixing different colors
             </Text>
             <Text style={tipItem}>
               <span style={tipEmoji}>3.</span> Have fun - there are no wrong
-              colours!
+              colors!
             </Text>
           </Section>
 
           {/* CTA */}
           <Section style={ctaSection}>
-            <Text style={ctaText}>Want more colouring pages?</Text>
+            <Text style={ctaText}>Want more coloring pages?</Text>
             <Link href={baseUrl} style={ctaButton}>
               Visit Chunky Crayon
             </Link>

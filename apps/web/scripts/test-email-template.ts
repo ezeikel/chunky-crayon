@@ -41,7 +41,7 @@ async function main() {
 
   if (template === 'daily') {
     html = await render(DailyColoringEmail({ unsubscribeUrl }));
-    subject = 'Test: Daily Colouring Page 🎨';
+    subject = 'Test: Daily Coloring Page 🎨';
   } else {
     html = await render(WelcomeEmail({ unsubscribeUrl }));
     subject = 'Test: Welcome to Chunky Crayon! 🎨';

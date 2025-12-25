@@ -9,6 +9,8 @@ import {
   faArrowRightFromBracket,
   faTag,
   faHeadset,
+  faNewspaper,
+  faImages,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
@@ -52,6 +54,16 @@ const ITEMS: NavItem[] = [
     visibility: 'always',
   },
   {
+    label: 'Gallery',
+    href: '/gallery',
+    visibility: 'always',
+  },
+  {
+    label: 'Blog',
+    href: '/blog',
+    visibility: 'always',
+  },
+  {
     label: 'Pricing',
     href: '/pricing',
     visibility: 'unauthenticated',
@@ -70,6 +82,16 @@ const getMobileItems = (user: Partial<User> | null): MobileNavItem[] => {
       label: 'Home',
       iconName: faHouse,
       href: '/',
+    });
+    items.push({
+      label: 'Gallery',
+      iconName: faImages,
+      href: '/gallery',
+    });
+    items.push({
+      label: 'Blog',
+      iconName: faNewspaper,
+      href: '/blog',
     });
     items.push({
       label: `${formatNumber(user.credits || 0)} credits`,
@@ -104,6 +126,16 @@ const getMobileItems = (user: Partial<User> | null): MobileNavItem[] => {
       label: 'Home',
       iconName: faHouse,
       href: '/',
+    });
+    items.push({
+      label: 'Gallery',
+      iconName: faImages,
+      href: '/gallery',
+    });
+    items.push({
+      label: 'Blog',
+      iconName: faNewspaper,
+      href: '/blog',
     });
     items.push({
       label: 'Pricing',

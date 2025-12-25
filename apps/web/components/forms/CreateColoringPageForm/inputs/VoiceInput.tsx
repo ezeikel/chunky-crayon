@@ -200,7 +200,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
         };
       }
       return {
-        text: 'Generate colouring page',
+        text: 'Generate coloring page',
         isSubmit: true,
       };
     }
@@ -320,7 +320,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
         >
           {isSilenceDetected
             ? `All done? Tap the button or I'll finish in ${autoStopCountdown}...`
-            : "I'm listening! Tell me what you want to colour!"}
+            : "I'm listening! Tell me what you want to color!"}
         </p>
 
         <AudioLevelIndicator level={audioLevel} />
@@ -410,7 +410,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
           {buttonConfig.isSubmit ? (
             <SubmitButton
               ref={submitButtonRef}
-              text="🎨 Make my colouring page!"
+              text="🎨 Make my coloring page!"
               className="font-tondo font-bold text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover px-8 py-6 rounded-xl hover:scale-105 active:scale-95 transition-all duration-200"
               disabled={!isDescriptionReady}
             />
@@ -453,7 +453,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     >
       <p className="text-center text-text-primary font-tondo font-bold text-lg">
         {canRecord
-          ? 'Tap the microphone and tell me what you want to colour!'
+          ? 'Tap the microphone and tell me what you want to color!'
           : blockedReason === 'guest_limit_reached'
             ? `You've used your ${maxGuestGenerations} free tries! Sign up to continue.`
             : blockedReason === 'no_credits'

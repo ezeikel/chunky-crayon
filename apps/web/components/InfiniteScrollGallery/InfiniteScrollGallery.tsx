@@ -4,6 +4,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { loadMoreImages } from '@/app/actions/load-more-images';
+import {
+  loadGalleryImages,
+  type GalleryType,
+} from '@/app/actions/load-gallery-images';
 import type { GalleryImage } from '@/app/data/coloring-image';
 import ColoringImageSkeleton from '@/components/ColoringImage/ColoringImageSkeleton';
 import cn from '@/utils/cn';
@@ -12,6 +16,9 @@ type InfiniteScrollGalleryProps = {
   initialImages: GalleryImage[];
   initialCursor: string | null;
   initialHasMore: boolean;
+  galleryType?: GalleryType;
+  categorySlug?: string;
+  difficultySlug?: string;
 };
 
 // TODO: Add emoji tag filtering in the future
@@ -23,6 +30,9 @@ const InfiniteScrollGallery = ({
   initialImages,
   initialCursor,
   initialHasMore,
+  galleryType,
+  categorySlug,
+  difficultySlug,
 }: InfiniteScrollGalleryProps) => {
   const [images, setImages] = useState<GalleryImage[]>(initialImages);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
@@ -39,7 +49,15 @@ const InfiniteScrollGallery = ({
     setIsLoading(true);
 
     try {
-      const result = await loadMoreImages(cursor);
+      // Use gallery-specific loader if galleryType is provided
+      const result = galleryType
+        ? await loadGalleryImages(
+            galleryType,
+            cursor,
+            categorySlug,
+            difficultySlug,
+          )
+        : await loadMoreImages(cursor);
       setImages((prev) => [...prev, ...result.images]);
       setCursor(result.nextCursor);
       setHasMore(result.hasMore);
@@ -48,7 +66,7 @@ const InfiniteScrollGallery = ({
     } finally {
       setIsLoading(false);
     }
-  }, [cursor, hasMore, isLoading]);
+  }, [cursor, hasMore, isLoading, galleryType, categorySlug, difficultySlug]);
 
   // Set up Intersection Observer
   useEffect(() => {

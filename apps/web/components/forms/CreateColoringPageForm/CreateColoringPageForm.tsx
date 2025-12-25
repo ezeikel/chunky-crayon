@@ -14,6 +14,7 @@ import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import useUser from '@/hooks/useUser';
+import useRecentCreations from '@/hooks/useRecentCreations';
 import { ColoLoading, type AudioState } from '@/components/Loading/ColoLoading';
 import UserInputV2 from './UserInputV2';
 import {
@@ -76,6 +77,7 @@ const MultiModeForm = ({ className }: { className?: string }) => {
     guestGenerationsRemaining,
     incrementGuestGeneration,
   } = useUser();
+  const { addCreation } = useRecentCreations();
 
   return (
     <form
@@ -149,10 +151,17 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           incrementGuestGeneration();
         }
 
+        // Store in recent creations for guests to find later
+        if (isGuest && coloringImage.id) {
+          addCreation(coloringImage.id);
+        }
+
         // Reset audio state before navigation
         setAudioUrl(null);
         setAudioState('idle');
-        router.push(`/coloring-image/${coloringImage.id}`);
+        if (coloringImage.id) {
+          router.push(`/coloring-image/${coloringImage.id}`);
+        }
       }}
       ref={formRef}
       className={cn('flex flex-col gap-y-4', className)}
@@ -186,6 +195,8 @@ const CreateColoringPageForm = ({
 }: CreateColoringPageFormProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+  const { isGuest } = useUser();
+  const { addCreation } = useRecentCreations();
 
   const isLarge = size === 'large';
 
@@ -316,7 +327,14 @@ const CreateColoringPageForm = ({
             return;
           }
 
-          router.push(`/coloring-image/${coloringImage.id}`);
+          // Store in recent creations for guests to find later
+          if (isGuest && coloringImage.id) {
+            addCreation(coloringImage.id);
+          }
+
+          if (coloringImage.id) {
+            router.push(`/coloring-image/${coloringImage.id}`);
+          }
         }}
         ref={formRef}
         className={cn('flex flex-col gap-y-4 relative z-10', className)}

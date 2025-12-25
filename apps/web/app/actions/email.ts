@@ -134,7 +134,7 @@ const getEmailSubject = (generationType: GenerationType) => {
     [GenerationType.USER]: 'Custom',
   };
 
-  return `${typeMap[generationType]} Colouring Page for ${dayName} ${day} ${month} 🎨`;
+  return `${typeMap[generationType]} Coloring Page for ${dayName} ${day} ${month} 🎨`;
 };
 
 const getEmailFilename = (generationType: GenerationType) => {
@@ -150,7 +150,7 @@ const getEmailFilename = (generationType: GenerationType) => {
     [GenerationType.USER]: 'Custom',
   };
 
-  return `${typeMap[generationType].toLowerCase()}-colouring-page-${dayName}-${day}-${month}.pdf`;
+  return `${typeMap[generationType].toLowerCase()}-coloring-page-${dayName}-${day}-${month}.pdf`;
 };
 
 const sendSingleColoringEmail = async (

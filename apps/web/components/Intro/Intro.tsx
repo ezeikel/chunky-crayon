@@ -61,7 +61,7 @@ const Intro = ({ className }: IntroProps) => (
       </Balancer>
     </h2>
     <p className="font-tondo text-lg sm:text-xl md:text-2xl text-text-secondary leading-relaxed mb-6 md:mb-8 max-w-xl">
-      From vibrant colouring pages to imaginative adventures, Chunky Crayon
+      From vibrant coloring pages to imaginative adventures, Chunky Crayon
       transforms creativity into pure joy.
     </p>
 
@@ -69,7 +69,7 @@ const Intro = ({ className }: IntroProps) => (
     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-crayon-yellow-light/40 border-2 border-crayon-yellow mb-6 md:mb-8">
       <span className="text-xl">🌈</span>
       <span className="font-tondo font-bold text-text-primary">
-        Dream. Create. Colour.
+        Dream. Create. Color.
       </span>
     </div>
 

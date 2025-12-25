@@ -41,3 +41,4 @@ next-env.d.ts
 
 # Apple auth key
 *.p8
+.playwright-mcp/

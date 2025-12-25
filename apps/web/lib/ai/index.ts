@@ -73,6 +73,13 @@ export {
   // Colo mascot voice prompts (for loading screen)
   COLO_VOICE_SCRIPT_SYSTEM,
   createColoVoiceScriptPrompt,
+  // Blog post generation prompts (for automated SEO)
+  BLOG_POST_SYSTEM,
+  createBlogPostPrompt,
+  BLOG_META_SYSTEM,
+  createBlogMetaPrompt,
+  BLOG_IMAGE_PROMPT_SYSTEM,
+  createBlogImagePromptPrompt,
 } from './prompts';
 
 // Re-export schemas
@@ -83,6 +90,9 @@ export {
   imageAnalyticsSchema,
   audioTranscriptionSchema,
   imageDescriptionSchema,
+  blogMetaSchema,
+  blogPostSchema,
+  blogImagePromptSchema,
 } from './schemas';
 export type {
   ImageMetadata,
@@ -90,6 +100,9 @@ export type {
   ImageAnalytics,
   AudioTranscription,
   ImageDescription,
+  BlogMeta,
+  BlogPost,
+  BlogImagePrompt,
 } from './schemas';
 
 // Re-export analytics functions

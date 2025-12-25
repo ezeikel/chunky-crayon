@@ -23,14 +23,14 @@ export const metadata: Metadata = {
   description:
     'Chunky Crayon is a vibrant and interactive app designed for kids and parents to generate unique, personalized coloring book pages and fun educational worksheets. Transform text, voice, and image prompts into printable coloring pages, or enjoy digital coloring on our web, iOS, and Android apps. Expand your child’s creativity and learning with engaging activities like connect the dots, hangman, and more. Chunky Crayon makes learning and creativity a delightful experience for kids at home or in school.',
   keywords:
-    'colouring book pages, creative app for kids, personalized coloring pages, educational worksheets, fun learning activities, kids creativity app, interactive coloring app, digital coloring, printable coloring pages, connect the dots, hangman, kids educational games, math worksheets, English worksheets, kids learning tools, creative learning, kids drawing activities, home learning, school learning, web app for kids, iOS app for kids, Android app for kids, Chunky Crayon, fun educational app',
+    'coloring book pages, creative app for kids, personalized coloring pages, educational worksheets, fun learning activities, kids creativity app, interactive coloring app, digital coloring, printable coloring pages, connect the dots, hangman, kids educational games, math worksheets, English worksheets, kids learning tools, creative learning, kids drawing activities, home learning, school learning, web app for kids, iOS app for kids, Android app for kids, Chunky Crayon, fun educational app',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-16x16.png',
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
-    title: 'Chunky Crayon - Creative Colouring & Learning Fun',
+    title: 'Chunky Crayon - Creative Coloring & Learning Fun',
     description:
       'Chunky Crayon is a vibrant and interactive app designed for kids and parents to generate unique, personalized coloring book pages and fun educational worksheets. Transform text, voice, and image prompts into printable coloring pages, or enjoy digital coloring on our web, iOS, and Android apps. Expand your child’s creativity and learning with engaging activities like connect the dots, hangman, and more. Chunky Crayon makes learning and creativity a delightful experience for kids at home or in school.',
     url: 'https://chunkycrayon.com',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         url: 'https://chunkycrayon.com/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Chunky Crayon AI-Generated Colouring Book Pages',
+        alt: 'Chunky Crayon AI-Generated Coloring Book Pages',
       },
     ],
     locale: 'en-GB',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chunky Crayon - Creative Colouring & Learning Fun',
+    title: 'Chunky Crayon - Creative Coloring & Learning Fun',
     description:
       'Chunky Crayon is a vibrant and interactive app designed for kids and parents to generate unique, personalized coloring book pages and fun educational worksheets. Transform text, voice, and image prompts into printable coloring pages, or enjoy digital coloring on our web, iOS, and Android apps. Expand your child’s creativity and learning with engaging activities like connect the dots, hangman, and more. Chunky Crayon makes learning and creativity a delightful experience for kids at home or in school.',
     images: ['https://chunkycrayon.com/images/og-image.jpg'],
@@ -112,6 +112,60 @@ export default function RootLayout({
             src="https://ct.pinterest.com/v3/?event=init&tid=2612545195225&pd[em]=<hashed_email_address>&noscript=1"
           />
         </noscript>
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'WebSite',
+                  '@id': 'https://chunkycrayon.com/#website',
+                  url: 'https://chunkycrayon.com',
+                  name: 'Chunky Crayon',
+                  description:
+                    'Create personalized coloring pages with AI. Free printable coloring pages for kids and adults.',
+                  publisher: {
+                    '@id': 'https://chunkycrayon.com/#organization',
+                  },
+                  potentialAction: {
+                    '@type': 'SearchAction',
+                    target: {
+                      '@type': 'EntryPoint',
+                      urlTemplate:
+                        'https://chunkycrayon.com/gallery?search={search_term_string}',
+                    },
+                    'query-input': 'required name=search_term_string',
+                  },
+                },
+                {
+                  '@type': 'Organization',
+                  '@id': 'https://chunkycrayon.com/#organization',
+                  name: 'Chunky Crayon',
+                  url: 'https://chunkycrayon.com',
+                  logo: {
+                    '@type': 'ImageObject',
+                    url: 'https://chunkycrayon.com/images/logo.png',
+                    width: 512,
+                    height: 512,
+                  },
+                  sameAs: [
+                    'https://www.facebook.com/chunkycrayon',
+                    'https://twitter.com/chunkycrayon',
+                    'https://www.pinterest.com/chunkycrayon',
+                    'https://www.instagram.com/chunkycrayon',
+                  ],
+                  contactPoint: {
+                    '@type': 'ContactPoint',
+                    contactType: 'customer service',
+                    email: 'hello@chunkycrayon.com',
+                  },
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body
         className={cn(

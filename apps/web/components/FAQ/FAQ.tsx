@@ -66,8 +66,27 @@ const FAQ = ({ className }: FAQProps) => {
     setOpenId(openId === id ? null : id);
   };
 
+  // JSON-LD structured data for FAQPage schema
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_ITEMS.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <section className={cn('w-full py-12 md:py-16', className)}>
+      {/* FAQPage Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {/* Header */}
       <div className="text-center mb-10 md:mb-12">
         <div className="inline-flex items-center gap-3 mb-4">
@@ -81,8 +100,8 @@ const FAQ = ({ className }: FAQProps) => {
           </h2>
         </div>
         <p className="text-text-secondary max-w-2xl mx-auto">
-          Everything you need to know about creating magical colouring pages
-          with Chunky Crayon
+          Everything you need to know about creating magical coloring pages with
+          Chunky Crayon
         </p>
       </div>
 

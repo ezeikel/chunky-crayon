@@ -15,12 +15,21 @@ type HomePageContentProps = {
   formLarge?: React.ReactNode;
   /** Gallery component */
   gallery: React.ReactNode;
+  /** Gallery preview for logged-out users - shows free library snippets with CTAs */
+  galleryPreview?: React.ReactNode;
+  /** Social proof stats for logged-out users - shows total pages, daily pages, etc. */
+  socialProofStats?: React.ReactNode;
+  /** Recent creations for logged-out guests - shows images they've created */
+  recentCreations?: React.ReactNode;
 };
 
 const HomePageContent = ({
   form,
   formLarge,
   gallery,
+  galleryPreview,
+  socialProofStats,
+  recentCreations,
 }: HomePageContentProps) => {
   const { status } = useSession();
   const isLoggedIn = status === 'authenticated';
@@ -78,14 +87,26 @@ const HomePageContent = ({
         <div className="flex-shrink-0 w-full max-w-lg">{form}</div>
       </div>
 
+      {/* Recent creations - shows images guests have created */}
+      {recentCreations && (
+        <div className="w-full relative z-10">{recentCreations}</div>
+      )}
+
+      {/* Social proof stats - show total pages created, etc. */}
+      {socialProofStats && (
+        <div className="w-full relative z-10">{socialProofStats}</div>
+      )}
+
       {/* Testimonials section - social proof for logged-out users */}
       <Testimonials className="relative z-10" />
 
+      {/* Gallery preview - free coloring pages library with CTAs */}
+      {galleryPreview && (
+        <div className="w-full relative z-10">{galleryPreview}</div>
+      )}
+
       {/* FAQ section */}
       <FAQ className="relative z-10" />
-
-      {/* Gallery section */}
-      {gallery}
     </PageWrap>
   );
 };

@@ -789,7 +789,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: 'Mum of 2',
     avatar: '/images/testimonials/avatar-1.svg',
     quote:
-      'My kids absolutely love this! They spend hours creating and colouring their own magical worlds. No more screen time battles!',
+      'My kids absolutely love this! They spend hours creating and coloring their own magical worlds. No more screen time battles!',
     rating: 5,
   },
   {
@@ -807,7 +807,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: 'Primary Teacher',
     avatar: '/images/testimonials/avatar-3.svg',
     quote:
-      "I use this in my classroom for creative writing prompts. The children describe what they want, then colour their creations. They're so engaged!",
+      "I use this in my classroom for creative writing prompts. The children describe what they want, then color their creations. They're so engaged!",
     rating: 5,
   },
   {
@@ -816,7 +816,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: 'Grandad',
     avatar: '/images/testimonials/avatar-4.svg',
     quote:
-      'My grandchildren visit every weekend now just to make new colouring pages together. Such wonderful bonding time!',
+      'My grandchildren visit every weekend now just to make new coloring pages together. Such wonderful bonding time!',
     rating: 5,
   },
   {
@@ -859,31 +859,31 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'faq-1',
     question: 'What is Chunky Crayon?',
     answer:
-      'Chunky Crayon is a magical colouring page generator designed for children and families. Simply describe what you want to colour - like "a dragon having a tea party" or "my favourite superhero on the moon" - and we create a unique, printable colouring page in seconds. It\'s perfect for rainy days, quiet time, or sparking your child\'s imagination!',
+      'Chunky Crayon is a magical coloring page generator designed for children and families. Simply describe what you want to color - like "a dragon having a tea party" or "my favourite superhero on the moon" - and we create a unique, printable coloring page in seconds. It\'s perfect for rainy days, quiet time, or sparking your child\'s imagination!',
   },
   {
     id: 'faq-2',
     question: 'Is it safe and appropriate for children?',
     answer:
-      'Absolutely! Chunky Crayon is built by parents, for parents. All generated images are designed to be child-friendly with age-appropriate content. Our AI is specially tuned to create wholesome, fun colouring pages suitable for children of all ages.',
+      'Absolutely! Chunky Crayon is built by parents, for parents. All generated images are designed to be child-friendly with age-appropriate content. Our AI is specially tuned to create wholesome, fun coloring pages suitable for children of all ages.',
   },
   {
     id: 'faq-3',
-    question: 'How do I create a colouring page?',
+    question: 'How do I create a coloring page?',
     answer:
-      'It\'s as easy as 1-2-3! Just type what you want to colour (e.g., "a unicorn in a magical forest"), click Generate, and wait about 30 seconds. Your unique colouring page will appear ready to download and print. You can also use voice input or upload a photo for inspiration!',
+      'It\'s as easy as 1-2-3! Just type what you want to color (e.g., "a unicorn in a magical forest"), click Generate, and wait about 30 seconds. Your unique coloring page will appear ready to download and print. You can also use voice input or upload a photo for inspiration!',
   },
   {
     id: 'faq-4',
     question: 'How long does it take to generate a page?',
     answer:
-      'Most colouring pages are ready in about 30 seconds. Our friendly mascot Colo will keep you entertained while you wait! Complex scenes with lots of details might take a tiny bit longer.',
+      'Most coloring pages are ready in about 30 seconds. Our friendly mascot Colo will keep you entertained while you wait! Complex scenes with lots of details might take a tiny bit longer.',
   },
   {
     id: 'faq-5',
-    question: 'Can I print the colouring pages?',
+    question: 'Can I print the coloring pages?',
     answer:
-      'Yes! Every colouring page you create can be downloaded as a high-quality PDF, perfect for printing at home. The pages are optimised for A4 paper and look great with crayons, coloured pencils, or markers.',
+      'Yes! Every coloring page you create can be downloaded as a high-quality PDF, perfect for printing at home. The pages are optimised for A4 paper and look great with crayons, colored pencils, or markers.',
   },
   {
     id: 'faq-6',
@@ -901,7 +901,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'faq-8',
     question: "What's included in the subscription plans?",
     answer:
-      'Our plans range from Crayon (perfect for casual colouring) to Studio (for super-creative families or teachers). All plans include: unlimited colouring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights.',
+      'Our plans range from Crayon (perfect for casual coloring) to Studio (for super-creative families or teachers). All plans include: unlimited coloring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights.',
   },
   {
     id: 'faq-9',
@@ -913,6 +913,932 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'faq-10',
     question: 'How do credits work?',
     answer:
-      'Each colouring page you generate uses 5 credits. Credits refresh monthly with your subscription, and some plans allow unused credits to roll over. You can also purchase credit packs if you need a little extra creativity boost!',
+      'Each coloring page you generate uses 5 credits. Credits refresh monthly with your subscription, and some plans allow unused credits to roll over. You can also purchase credit packs if you need a little extra creativity boost!',
+  },
+];
+
+// ===== BLOG TOPICS (for automated SEO content generation) =====
+
+export type BlogCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+};
+
+export const BLOG_CATEGORIES: BlogCategory[] = [
+  {
+    id: 'parenting',
+    name: 'Parenting & Family',
+    slug: 'parenting',
+    description: 'Tips for creative family time and child development',
+  },
+  {
+    id: 'educational',
+    name: 'Educational Activities',
+    slug: 'educational',
+    description: 'Learning through coloring and creativity',
+  },
+  {
+    id: 'seasonal',
+    name: 'Seasonal & Holidays',
+    slug: 'seasonal',
+    description: 'Holiday-themed coloring activities',
+  },
+  {
+    id: 'adult-coloring',
+    name: 'Adult Coloring',
+    slug: 'adult-coloring',
+    description: 'Mindfulness, relaxation, and art therapy',
+  },
+  {
+    id: 'themes',
+    name: 'Popular Themes',
+    slug: 'themes',
+    description: 'Trending characters and themes kids love',
+  },
+  {
+    id: 'techniques',
+    name: 'Coloring Techniques',
+    slug: 'techniques',
+    description: 'Tips for better coloring results',
+  },
+];
+
+export type BlogTopic = {
+  topic: string;
+  category: string;
+  keywords: string[];
+};
+
+// Comprehensive blog topics for SEO - targeting parents AND adults
+export const BLOG_TOPICS: BlogTopic[] = [
+  // ===== PARENTING & FAMILY (Target: Parents) =====
+  {
+    topic: 'Benefits of coloring for child development',
+    category: 'parenting',
+    keywords: ['child development', 'motor skills', 'creativity', 'learning'],
+  },
+  {
+    topic: 'Screen-free activities for kids',
+    category: 'parenting',
+    keywords: ['screen time', 'offline activities', 'creative play'],
+  },
+  {
+    topic: 'Rainy day coloring activities for kids',
+    category: 'parenting',
+    keywords: ['rainy day', 'indoor activities', 'kids activities'],
+  },
+  {
+    topic: 'How coloring helps with anxiety in children',
+    category: 'parenting',
+    keywords: ['anxiety', 'calm', 'emotional regulation'],
+  },
+  {
+    topic: 'Family coloring night ideas',
+    category: 'parenting',
+    keywords: ['family activities', 'bonding', 'quality time'],
+  },
+  {
+    topic: 'Best coloring supplies for toddlers',
+    category: 'parenting',
+    keywords: ['toddler', 'crayons', 'supplies', 'art materials'],
+  },
+  {
+    topic: 'Teaching patience through coloring',
+    category: 'parenting',
+    keywords: ['patience', 'focus', 'concentration'],
+  },
+  {
+    topic: 'Coloring activities for long car journeys',
+    category: 'parenting',
+    keywords: ['car journey', 'travel activities', 'road trip'],
+  },
+  {
+    topic: 'Why personalised coloring pages engage kids more',
+    category: 'parenting',
+    keywords: ['personalised', 'engagement', 'creativity'],
+  },
+  {
+    topic: 'Coloring activities for children with ADHD',
+    category: 'parenting',
+    keywords: ['ADHD', 'focus', 'calming activities'],
+  },
+  {
+    topic: 'How to encourage reluctant artists',
+    category: 'parenting',
+    keywords: ['reluctant artist', 'encouragement', 'creativity'],
+  },
+  {
+    topic: 'Grandparent and grandchild coloring activities',
+    category: 'parenting',
+    keywords: ['grandparents', 'bonding', 'intergenerational'],
+  },
+  {
+    topic: 'Coloring for children with special needs',
+    category: 'parenting',
+    keywords: ['special needs', 'inclusive', 'accessibility'],
+  },
+  {
+    topic: 'Birthday party coloring activities',
+    category: 'parenting',
+    keywords: ['birthday party', 'party activities', 'kids party'],
+  },
+  {
+    topic: 'Sibling coloring activities to reduce rivalry',
+    category: 'parenting',
+    keywords: ['siblings', 'rivalry', 'cooperative play'],
+  },
+
+  // ===== EDUCATIONAL (Target: Parents & Teachers) =====
+  {
+    topic: 'Using coloring pages to teach letters and numbers',
+    category: 'educational',
+    keywords: ['letters', 'numbers', 'alphabet', 'learning'],
+  },
+  {
+    topic: 'Color recognition activities for preschoolers',
+    category: 'educational',
+    keywords: ['preschool', 'colors', 'early learning'],
+  },
+  {
+    topic: 'Coloring pages for learning about animals',
+    category: 'educational',
+    keywords: ['animals', 'wildlife', 'nature', 'learning'],
+  },
+  {
+    topic: 'Geography coloring activities for kids',
+    category: 'educational',
+    keywords: ['geography', 'maps', 'countries', 'world'],
+  },
+  {
+    topic: 'Science-themed coloring pages for curious kids',
+    category: 'educational',
+    keywords: ['science', 'STEM', 'space', 'dinosaurs'],
+  },
+  {
+    topic: 'History through coloring pages',
+    category: 'educational',
+    keywords: ['history', 'ancient', 'historical figures'],
+  },
+  {
+    topic: 'Coloring activities for vocabulary building',
+    category: 'educational',
+    keywords: ['vocabulary', 'words', 'language'],
+  },
+  {
+    topic: 'Maths-themed coloring activities',
+    category: 'educational',
+    keywords: ['maths', 'counting', 'shapes'],
+  },
+  {
+    topic: 'Coloring pages for learning about emotions',
+    category: 'educational',
+    keywords: ['emotions', 'feelings', 'social skills'],
+  },
+  {
+    topic: 'Seasonal learning with themed coloring pages',
+    category: 'educational',
+    keywords: ['seasons', 'weather', 'nature'],
+  },
+  {
+    topic: 'Music and instrument coloring activities',
+    category: 'educational',
+    keywords: ['music', 'instruments', 'musical'],
+  },
+  {
+    topic: 'Coloring activities for teaching kindness',
+    category: 'educational',
+    keywords: ['kindness', 'empathy', 'values'],
+  },
+  {
+    topic: 'Environmental awareness through coloring',
+    category: 'educational',
+    keywords: ['environment', 'recycling', 'planet'],
+  },
+  {
+    topic: 'Cultural diversity coloring pages',
+    category: 'educational',
+    keywords: ['culture', 'diversity', 'world cultures'],
+  },
+  {
+    topic: 'Safety lessons through coloring activities',
+    category: 'educational',
+    keywords: ['safety', 'road safety', 'fire safety'],
+  },
+
+  // ===== SEASONAL & HOLIDAYS (Target: Parents) =====
+  {
+    topic: 'Christmas coloring activities for kids',
+    category: 'seasonal',
+    keywords: ['Christmas', 'holiday', 'Santa', 'festive'],
+  },
+  {
+    topic: 'Easter coloring page ideas',
+    category: 'seasonal',
+    keywords: ['Easter', 'bunny', 'eggs', 'spring'],
+  },
+  {
+    topic: 'Halloween coloring pages that are not too scary',
+    category: 'seasonal',
+    keywords: ['Halloween', 'pumpkin', 'spooky', 'costumes'],
+  },
+  {
+    topic: 'Summer holiday coloring activities',
+    category: 'seasonal',
+    keywords: ['summer', 'beach', 'holiday', 'vacation'],
+  },
+  {
+    topic: 'Back to school coloring pages',
+    category: 'seasonal',
+    keywords: ['school', 'back to school', 'September'],
+  },
+  {
+    topic: 'Winter wonderland coloring ideas',
+    category: 'seasonal',
+    keywords: ['winter', 'snow', 'snowman', 'cold'],
+  },
+  {
+    topic: 'Spring flower coloring activities',
+    category: 'seasonal',
+    keywords: ['spring', 'flowers', 'garden', 'nature'],
+  },
+  {
+    topic: "Valentine's Day coloring pages for kids",
+    category: 'seasonal',
+    keywords: ['Valentine', 'hearts', 'love', 'friendship'],
+  },
+  {
+    topic: "Mother's Day coloring gift ideas",
+    category: 'seasonal',
+    keywords: ['Mother Day', 'mum', 'gift', 'family'],
+  },
+  {
+    topic: "Father's Day coloring activities",
+    category: 'seasonal',
+    keywords: ['Father Day', 'dad', 'gift', 'family'],
+  },
+  {
+    topic: 'Diwali festival of lights coloring pages',
+    category: 'seasonal',
+    keywords: ['Diwali', 'festival', 'lights', 'celebration'],
+  },
+  {
+    topic: 'Chinese New Year coloring activities',
+    category: 'seasonal',
+    keywords: ['Chinese New Year', 'lunar', 'dragon', 'celebration'],
+  },
+  {
+    topic: 'Hanukkah coloring page ideas',
+    category: 'seasonal',
+    keywords: ['Hanukkah', 'menorah', 'holiday'],
+  },
+  {
+    topic: 'Eid celebration coloring pages',
+    category: 'seasonal',
+    keywords: ['Eid', 'celebration', 'festival'],
+  },
+  {
+    topic: 'Autumn leaves and harvest coloring',
+    category: 'seasonal',
+    keywords: ['autumn', 'fall', 'leaves', 'harvest'],
+  },
+
+  // ===== ADULT COLOURING (Target: Adults) =====
+  {
+    topic: 'Benefits of adult coloring for stress relief',
+    category: 'adult-coloring',
+    keywords: ['stress relief', 'relaxation', 'mindfulness'],
+  },
+  {
+    topic: 'Mandala coloring for meditation',
+    category: 'adult-coloring',
+    keywords: ['mandala', 'meditation', 'zen', 'mindfulness'],
+  },
+  {
+    topic: 'Art therapy through coloring',
+    category: 'adult-coloring',
+    keywords: ['art therapy', 'mental health', 'healing'],
+  },
+  {
+    topic: 'Coloring for anxiety and depression',
+    category: 'adult-coloring',
+    keywords: ['anxiety', 'depression', 'mental wellness'],
+  },
+  {
+    topic: 'Nature patterns coloring for adults',
+    category: 'adult-coloring',
+    keywords: ['nature', 'botanical', 'floral', 'patterns'],
+  },
+  {
+    topic: 'Geometric patterns coloring therapy',
+    category: 'adult-coloring',
+    keywords: ['geometric', 'patterns', 'abstract'],
+  },
+  {
+    topic: 'Coloring as a hobby for busy adults',
+    category: 'adult-coloring',
+    keywords: ['hobby', 'relaxation', 'self-care'],
+  },
+  {
+    topic: 'Creating a coloring routine for wellbeing',
+    category: 'adult-coloring',
+    keywords: ['routine', 'wellbeing', 'self-care'],
+  },
+  {
+    topic: 'Best colored pencils for adult coloring',
+    category: 'adult-coloring',
+    keywords: ['pencils', 'supplies', 'art materials'],
+  },
+  {
+    topic: 'Coloring for insomnia and better sleep',
+    category: 'adult-coloring',
+    keywords: ['insomnia', 'sleep', 'bedtime routine'],
+  },
+  {
+    topic: 'Workplace coloring breaks for productivity',
+    category: 'adult-coloring',
+    keywords: ['workplace', 'productivity', 'breaks'],
+  },
+  {
+    topic: 'Coloring for seniors and cognitive health',
+    category: 'adult-coloring',
+    keywords: ['seniors', 'elderly', 'cognitive health'],
+  },
+  {
+    topic: 'Couples coloring activities for date night',
+    category: 'adult-coloring',
+    keywords: ['couples', 'date night', 'bonding'],
+  },
+  {
+    topic: 'Coloring communities and social groups',
+    category: 'adult-coloring',
+    keywords: ['community', 'social', 'groups', 'clubs'],
+  },
+  {
+    topic: 'The science behind why coloring is calming',
+    category: 'adult-coloring',
+    keywords: ['science', 'psychology', 'calming'],
+  },
+
+  // ===== POPULAR THEMES (Target: Parents) =====
+  {
+    topic: 'Dinosaur coloring pages kids love',
+    category: 'themes',
+    keywords: ['dinosaurs', 'T-Rex', 'prehistoric'],
+  },
+  {
+    topic: 'Unicorn and rainbow coloring ideas',
+    category: 'themes',
+    keywords: ['unicorn', 'rainbow', 'magical'],
+  },
+  {
+    topic: 'Superhero coloring pages for kids',
+    category: 'themes',
+    keywords: ['superhero', 'hero', 'action'],
+  },
+  {
+    topic: 'Princess and fairy tale coloring pages',
+    category: 'themes',
+    keywords: ['princess', 'fairy tale', 'castle'],
+  },
+  {
+    topic: 'Space and astronaut coloring activities',
+    category: 'themes',
+    keywords: ['space', 'astronaut', 'planets', 'rocket'],
+  },
+  {
+    topic: 'Ocean and sea creatures coloring pages',
+    category: 'themes',
+    keywords: ['ocean', 'sea', 'fish', 'underwater'],
+  },
+  {
+    topic: 'Farm animals coloring for toddlers',
+    category: 'themes',
+    keywords: ['farm', 'animals', 'toddler'],
+  },
+  {
+    topic: 'Dragon and fantasy coloring pages',
+    category: 'themes',
+    keywords: ['dragon', 'fantasy', 'magical'],
+  },
+  {
+    topic: 'Vehicle and transport coloring pages',
+    category: 'themes',
+    keywords: ['vehicles', 'cars', 'trains', 'planes'],
+  },
+  {
+    topic: 'Mermaid coloring page ideas',
+    category: 'themes',
+    keywords: ['mermaid', 'underwater', 'magical'],
+  },
+  {
+    topic: 'Robot and technology coloring pages',
+    category: 'themes',
+    keywords: ['robot', 'technology', 'futuristic'],
+  },
+  {
+    topic: 'Jungle and safari animal coloring',
+    category: 'themes',
+    keywords: ['jungle', 'safari', 'lion', 'elephant'],
+  },
+  {
+    topic: 'Pirate adventure coloring pages',
+    category: 'themes',
+    keywords: ['pirate', 'treasure', 'adventure'],
+  },
+  {
+    topic: 'Sports-themed coloring activities',
+    category: 'themes',
+    keywords: ['sports', 'football', 'games'],
+  },
+  {
+    topic: 'Fairy garden coloring pages',
+    category: 'themes',
+    keywords: ['fairy', 'garden', 'magical', 'nature'],
+  },
+
+  // ===== TECHNIQUES (Target: Parents & Adults) =====
+  {
+    topic: 'Blending techniques for colored pencils',
+    category: 'techniques',
+    keywords: ['blending', 'pencils', 'technique'],
+  },
+  {
+    topic: 'Choosing the right colors for coloring pages',
+    category: 'techniques',
+    keywords: ['colors', 'color theory', 'palette'],
+  },
+  {
+    topic: 'How to color within the lines tips',
+    category: 'techniques',
+    keywords: ['lines', 'control', 'beginners'],
+  },
+  {
+    topic: 'Adding shading to coloring pages',
+    category: 'techniques',
+    keywords: ['shading', 'depth', '3D effect'],
+  },
+  {
+    topic: 'Watercolor techniques for coloring pages',
+    category: 'techniques',
+    keywords: ['watercolor', 'painting', 'technique'],
+  },
+  {
+    topic: 'Marker techniques for bold coloring',
+    category: 'techniques',
+    keywords: ['markers', 'bold', 'vibrant'],
+  },
+  {
+    topic: 'Creating gradient effects in coloring',
+    category: 'techniques',
+    keywords: ['gradient', 'ombre', 'blending'],
+  },
+  {
+    topic: 'Tips for coloring large detailed pages',
+    category: 'techniques',
+    keywords: ['detailed', 'intricate', 'patience'],
+  },
+  {
+    topic: 'Mixing media in coloring projects',
+    category: 'techniques',
+    keywords: ['mixed media', 'creative', 'experiment'],
+  },
+  {
+    topic: 'Displaying and framing finished coloring pages',
+    category: 'techniques',
+    keywords: ['display', 'frame', 'art'],
+  },
+  {
+    topic: 'Digital coloring tips for beginners',
+    category: 'techniques',
+    keywords: ['digital', 'tablet', 'apps'],
+  },
+  {
+    topic: 'How to fix coloring mistakes',
+    category: 'techniques',
+    keywords: ['mistakes', 'corrections', 'tips'],
+  },
+  {
+    topic: 'Creating texture effects in coloring',
+    category: 'techniques',
+    keywords: ['texture', 'effects', 'technique'],
+  },
+  {
+    topic: 'Metallic and gel pen effects',
+    category: 'techniques',
+    keywords: ['metallic', 'gel pen', 'special effects'],
+  },
+  {
+    topic: 'Background coloring techniques',
+    category: 'techniques',
+    keywords: ['background', 'composition', 'technique'],
+  },
+];
+
+// ===== GALLERY CATEGORIES (for SEO landing pages) =====
+
+export type GalleryCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  keywords: string[]; // SEO keywords this category targets
+  tags: string[]; // Tags from AI-generated metadata that map to this category
+  emoji: string;
+};
+
+// SEO-optimized gallery categories targeting popular search terms
+// Maps to tags[] field in ColoringImage model
+export const GALLERY_CATEGORIES: GalleryCategory[] = [
+  {
+    id: 'animals',
+    name: 'Animals',
+    slug: 'animals',
+    description: 'Cute and wild animal coloring pages for kids and adults',
+    keywords: [
+      'animal coloring pages',
+      'zoo animals',
+      'pet coloring',
+      'wildlife coloring',
+    ],
+    tags: [
+      'animal',
+      'animals',
+      'zoo',
+      'pet',
+      'wildlife',
+      'dog',
+      'cat',
+      'lion',
+      'elephant',
+      'bear',
+      'fox',
+      'panda',
+      'penguin',
+      'bird',
+      'fish',
+    ],
+    emoji: '🐾',
+  },
+  {
+    id: 'fantasy',
+    name: 'Fantasy & Magic',
+    slug: 'fantasy',
+    description: 'Magical creatures and fantasy world coloring pages',
+    keywords: [
+      'fantasy coloring pages',
+      'magical coloring',
+      'mythical creatures',
+    ],
+    tags: [
+      'fantasy',
+      'magic',
+      'magical',
+      'mythical',
+      'fairy',
+      'wizard',
+      'witch',
+      'elf',
+      'goblin',
+      'giant',
+      'genie',
+    ],
+    emoji: '✨',
+  },
+  {
+    id: 'dragons',
+    name: 'Dragons',
+    slug: 'dragons',
+    description: 'Epic dragon coloring pages from cute to fierce',
+    keywords: [
+      'dragon coloring pages',
+      'fire breathing dragon',
+      'baby dragon coloring',
+    ],
+    tags: ['dragon', 'dragons', 'fire-breathing', 'mythical'],
+    emoji: '🐉',
+  },
+  {
+    id: 'unicorns',
+    name: 'Unicorns',
+    slug: 'unicorns',
+    description: 'Beautiful unicorn and rainbow coloring pages',
+    keywords: ['unicorn coloring pages', 'rainbow unicorn', 'magical horse'],
+    tags: ['unicorn', 'unicorns', 'rainbow', 'magical horse', 'pegasus'],
+    emoji: '🦄',
+  },
+  {
+    id: 'princesses',
+    name: 'Princesses & Royalty',
+    slug: 'princesses',
+    description: 'Princess, prince, and castle coloring pages',
+    keywords: [
+      'princess coloring pages',
+      'castle coloring',
+      'royalty coloring',
+    ],
+    tags: [
+      'princess',
+      'prince',
+      'queen',
+      'king',
+      'royalty',
+      'castle',
+      'crown',
+      'throne',
+    ],
+    emoji: '👑',
+  },
+  {
+    id: 'superheroes',
+    name: 'Superheroes',
+    slug: 'superheroes',
+    description: 'Action-packed superhero coloring pages',
+    keywords: ['superhero coloring pages', 'hero coloring', 'comic coloring'],
+    tags: [
+      'superhero',
+      'hero',
+      'superheroes',
+      'action',
+      'comic',
+      'cape',
+      'mask',
+    ],
+    emoji: '🦸',
+  },
+  {
+    id: 'dinosaurs',
+    name: 'Dinosaurs',
+    slug: 'dinosaurs',
+    description: 'Prehistoric dinosaur coloring pages for all ages',
+    keywords: [
+      'dinosaur coloring pages',
+      't-rex coloring',
+      'prehistoric coloring',
+    ],
+    tags: [
+      'dinosaur',
+      'dinosaurs',
+      'prehistoric',
+      't-rex',
+      'trex',
+      'raptor',
+      'brontosaurus',
+      'pterodactyl',
+    ],
+    emoji: '🦕',
+  },
+  {
+    id: 'space',
+    name: 'Space & Astronauts',
+    slug: 'space',
+    description: 'Outer space, rockets, and astronaut coloring pages',
+    keywords: [
+      'space coloring pages',
+      'astronaut coloring',
+      'rocket coloring',
+      'planet coloring',
+    ],
+    tags: [
+      'space',
+      'astronaut',
+      'rocket',
+      'planet',
+      'moon',
+      'star',
+      'galaxy',
+      'alien',
+      'spaceship',
+      'ufo',
+    ],
+    emoji: '🚀',
+  },
+  {
+    id: 'underwater',
+    name: 'Underwater & Ocean',
+    slug: 'underwater',
+    description: 'Ocean life and underwater adventure coloring pages',
+    keywords: [
+      'ocean coloring pages',
+      'underwater coloring',
+      'sea creature coloring',
+      'mermaid coloring',
+    ],
+    tags: [
+      'underwater',
+      'ocean',
+      'sea',
+      'mermaid',
+      'fish',
+      'whale',
+      'dolphin',
+      'shark',
+      'coral',
+      'reef',
+    ],
+    emoji: '🌊',
+  },
+  {
+    id: 'vehicles',
+    name: 'Vehicles & Transport',
+    slug: 'vehicles',
+    description: 'Cars, trucks, planes, and train coloring pages',
+    keywords: [
+      'vehicle coloring pages',
+      'car coloring',
+      'truck coloring',
+      'plane coloring',
+    ],
+    tags: [
+      'vehicle',
+      'car',
+      'truck',
+      'plane',
+      'train',
+      'boat',
+      'ship',
+      'helicopter',
+      'motorcycle',
+      'bus',
+      'transport',
+    ],
+    emoji: '🚗',
+  },
+  {
+    id: 'pirates',
+    name: 'Pirates',
+    slug: 'pirates',
+    description: 'Swashbuckling pirate adventure coloring pages',
+    keywords: [
+      'pirate coloring pages',
+      'treasure coloring',
+      'pirate ship coloring',
+    ],
+    tags: [
+      'pirate',
+      'pirates',
+      'treasure',
+      'ship',
+      'island',
+      'parrot',
+      'skull',
+    ],
+    emoji: '🏴‍☠️',
+  },
+  {
+    id: 'nature',
+    name: 'Nature & Flowers',
+    slug: 'nature',
+    description: 'Beautiful nature scenes and flower coloring pages',
+    keywords: [
+      'nature coloring pages',
+      'flower coloring',
+      'garden coloring',
+      'tree coloring',
+    ],
+    tags: [
+      'nature',
+      'flower',
+      'flowers',
+      'garden',
+      'tree',
+      'forest',
+      'landscape',
+      'plant',
+      'botanical',
+    ],
+    emoji: '🌸',
+  },
+  {
+    id: 'holidays',
+    name: 'Holidays & Seasons',
+    slug: 'holidays',
+    description: 'Christmas, Easter, Halloween and seasonal coloring pages',
+    keywords: [
+      'holiday coloring pages',
+      'christmas coloring',
+      'easter coloring',
+      'halloween coloring',
+    ],
+    tags: [
+      'holiday',
+      'christmas',
+      'easter',
+      'halloween',
+      'thanksgiving',
+      'winter',
+      'summer',
+      'spring',
+      'autumn',
+      'snow',
+      'santa',
+    ],
+    emoji: '🎄',
+  },
+  {
+    id: 'robots',
+    name: 'Robots & Technology',
+    slug: 'robots',
+    description: 'Futuristic robot and technology coloring pages',
+    keywords: [
+      'robot coloring pages',
+      'technology coloring',
+      'futuristic coloring',
+    ],
+    tags: [
+      'robot',
+      'robots',
+      'technology',
+      'machine',
+      'futuristic',
+      'cyborg',
+      'android',
+    ],
+    emoji: '🤖',
+  },
+  {
+    id: 'food',
+    name: 'Food & Sweets',
+    slug: 'food',
+    description: 'Delicious food, candy, and dessert coloring pages',
+    keywords: [
+      'food coloring pages',
+      'candy coloring',
+      'dessert coloring',
+      'fruit coloring',
+    ],
+    tags: [
+      'food',
+      'candy',
+      'cake',
+      'dessert',
+      'fruit',
+      'ice cream',
+      'pizza',
+      'sweet',
+      'cupcake',
+    ],
+    emoji: '🍕',
+  },
+];
+
+// Helper to find category by slug
+export const getCategoryBySlug = (slug: string): GalleryCategory | undefined =>
+  GALLERY_CATEGORIES.find((cat) => cat.slug === slug);
+
+// Helper to find categories that match a tag
+export const getCategoriesForTag = (tag: string): GalleryCategory[] =>
+  GALLERY_CATEGORIES.filter((cat) =>
+    cat.tags.some((t) => tag.toLowerCase().includes(t.toLowerCase())),
+  );
+
+// Authors for generated blog posts
+export type BlogAuthor = {
+  name: string;
+  title: string;
+  bio: string;
+};
+
+export const BLOG_AUTHORS: BlogAuthor[] = [
+  {
+    name: 'Sophie Chen',
+    title: 'Child Development Specialist',
+    bio: 'Sophie is a child psychologist with over 15 years of experience in early childhood development and creative education.',
+  },
+  {
+    name: 'James Fletcher',
+    title: 'Art Therapy Practitioner',
+    bio: 'James is a certified art therapist who works with both children and adults, using creative activities to promote mental wellbeing.',
+  },
+  {
+    name: 'Emily Rodriguez',
+    title: 'Primary School Teacher',
+    bio: 'Emily has been teaching for 12 years and loves incorporating creative activities into her classroom curriculum.',
+  },
+  {
+    name: 'David Park',
+    title: 'Parenting Writer',
+    bio: 'David is a father of three and writes about creative ways to engage children away from screens.',
+  },
+  {
+    name: 'Rachel Thompson',
+    title: 'Mindfulness Coach',
+    bio: 'Rachel specialises in using creative activities for stress relief and meditation practices.',
+  },
+  {
+    name: "Michael O'Brien",
+    title: 'Illustrator & Art Educator',
+    bio: 'Michael is a professional illustrator who teaches art techniques to all ages, from toddlers to adults.',
+  },
+  {
+    name: 'Aisha Patel',
+    title: 'Early Years Educator',
+    bio: 'Aisha works in early years education and is passionate about play-based learning and creative development.',
+  },
+  {
+    name: 'Tom Williams',
+    title: 'Family Activities Writer',
+    bio: 'Tom is a dad blogger and freelance writer who shares practical tips for fun family activities.',
   },
 ];
