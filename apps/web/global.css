@@ -50,6 +50,10 @@
     --crayon-sky-light: 30 55% 92%;
     --crayon-sky-dark: 30 45% 75%;
 
+    /* Social Media Blue - Exception for Facebook brand color */
+    --social-facebook: 214 89% 52%;
+    --social-facebook-dark: 214 89% 42%;
+
     /* =========================================================================
        NEUTRAL PALETTE
        Warm cream and brown tones - no blue/cool undertones

@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { ColoringImage } from '@chunky-crayon/db/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileArrowDown } from '@fortawesome/pro-regular-svg-icons';
+import { faPrint } from '@fortawesome/pro-solid-svg-icons';
 import { usePDF } from '@react-pdf/renderer';
 import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/ColoringPageDocument';
 import cn from '@/utils/cn';
@@ -25,8 +25,9 @@ type SaveButtonProps = {
   className?: string;
 };
 
+// Kid-friendly button: big, colorful, clear language
 const buttonClassName =
-  'flex items-center justify-center gap-x-4 text-black font-normal px-4 py-2 rounded-lg shadow-lg bg-white';
+  'flex items-center justify-center gap-x-3 text-white font-bold text-lg px-8 py-4 rounded-full shadow-lg bg-crayon-orange hover:bg-crayon-orange-dark active:scale-95 transition-all duration-150';
 
 // Inner component that renders the PDF once all data is ready
 // This avoids the "Cannot read properties of null" error by only calling usePDF
@@ -58,7 +59,12 @@ const PDFDownloadReady = ({
 
   if (instance.loading) {
     return (
-      <button className={cn(buttonClassName, className)} disabled type="button">
+      <button
+        className={cn(buttonClassName, 'opacity-60 cursor-wait', className)}
+        disabled
+        type="button"
+      >
+        <FontAwesomeIcon icon={faPrint} className="text-2xl animate-pulse" />
         Loading...
       </button>
     );
@@ -66,8 +72,17 @@ const PDFDownloadReady = ({
 
   if (instance.error) {
     return (
-      <button className={cn(buttonClassName, className)} disabled type="button">
-        Error
+      <button
+        className={cn(
+          buttonClassName,
+          'opacity-60 cursor-not-allowed',
+          className,
+        )}
+        disabled
+        type="button"
+      >
+        <FontAwesomeIcon icon={faPrint} className="text-2xl" />
+        Oops!
       </button>
     );
   }
@@ -84,8 +99,8 @@ const PDFDownloadReady = ({
         });
       }}
     >
-      Download PDF
-      <FontAwesomeIcon icon={faFileArrowDown} className="text-3xl text-black" />
+      <FontAwesomeIcon icon={faPrint} className="text-2xl" />
+      Print
     </a>
   );
 };
@@ -131,7 +146,12 @@ const DownloadPDFButtonContent = ({
 
   if (isLoading) {
     return (
-      <button className={cn(buttonClassName, className)} disabled type="button">
+      <button
+        className={cn(buttonClassName, 'opacity-60 cursor-wait', className)}
+        disabled
+        type="button"
+      >
+        <FontAwesomeIcon icon={faPrint} className="text-2xl animate-pulse" />
         Loading...
       </button>
     );
@@ -139,8 +159,17 @@ const DownloadPDFButtonContent = ({
 
   if (error || !imageSvg || !qrCodeSvg) {
     return (
-      <button className={cn(buttonClassName, className)} disabled type="button">
-        Error
+      <button
+        className={cn(
+          buttonClassName,
+          'opacity-60 cursor-not-allowed',
+          className,
+        )}
+        disabled
+        type="button"
+      >
+        <FontAwesomeIcon icon={faPrint} className="text-2xl" />
+        Oops!
       </button>
     );
   }

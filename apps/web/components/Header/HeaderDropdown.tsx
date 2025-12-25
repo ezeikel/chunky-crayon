@@ -10,6 +10,7 @@ import {
   faCircleUser,
   faHeadset,
   faCoins,
+  faNewspaper,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -44,6 +45,11 @@ const DROPDOWN_ITEMS: DropdownItemConfig[] = [
     label: 'Settings',
     href: '/account/settings',
     requiresParentalGate: true,
+  },
+  {
+    icon: faNewspaper,
+    label: 'Blog',
+    href: '/blog',
   },
   {
     icon: faHeadset,

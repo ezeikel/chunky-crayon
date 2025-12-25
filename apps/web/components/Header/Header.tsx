@@ -11,6 +11,7 @@ import {
   faHeadset,
   faNewspaper,
   faImages,
+  faHeart,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
@@ -61,9 +62,14 @@ const ITEMS: NavItem[] = [
     visibility: 'always',
   },
   {
+    label: 'My Artwork',
+    href: '/account/my-artwork',
+    visibility: 'authenticated',
+  },
+  {
     label: 'Blog',
     href: '/blog',
-    visibility: 'always',
+    visibility: 'unauthenticated',
   },
   {
     label: 'Pricing',
@@ -94,6 +100,11 @@ const getMobileItems = (user: Partial<User> | null): MobileNavItem[] => {
       label: 'Blog',
       iconName: faNewspaper,
       href: '/blog',
+    });
+    items.push({
+      label: 'My Artwork',
+      iconName: faHeart,
+      href: '/account/my-artwork',
     });
     items.push({
       label: `${formatNumber(user.credits || 0)} credits`,

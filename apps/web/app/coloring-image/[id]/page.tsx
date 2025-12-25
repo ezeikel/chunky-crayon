@@ -4,12 +4,10 @@ import {
   getColoringImageById,
   getAllColoringImagesStatic,
 } from '@/app/data/coloring-image';
-import ColorPalette from '@/components/ColorPalette/ColorPalette';
-import ImageCanvas from '@/components/ImageCanvas/ImageCanvas';
+import { auth } from '@/auth';
+import ColoringArea from '@/components/ColoringArea/ColoringArea';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import SocialShare from '@/components/SocialShare';
-import DownloadPDFButton from '@/components/buttons/DownloadPDFButton/DownloadPDFButton';
 
 type ColoringImagePageProps = {
   params: Promise<{
@@ -97,11 +95,16 @@ export const generateMetadata = async ({ params }: ColoringImagePageProps): Prom
 
 const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
   const { id } = await params;
-  const coloringImage = await getColoringImageById(id);
+  const [coloringImage, session] = await Promise.all([
+    getColoringImageById(id),
+    auth(),
+  ]);
 
   if (!coloringImage) {
     notFound();
   }
+
+  const isAuthenticated = !!session?.user?.id;
 
   // JSON-LD ImageObject schema for SEO
   const imageSchema = {
@@ -131,7 +134,7 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
   };
 
   return (
-    <PageWrap className="bg-gradient-to-br from-[#FFF2E6] to-[#FFE6CC] flex flex-col gap-y-8">
+    <PageWrap className="flex flex-col gap-y-6">
       {/* ImageObject Schema */}
       <script
         type="application/ld+json"
@@ -147,34 +150,17 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
         ]}
       />
 
-      <div className="max-w-3xl w-full p-8 bg-crayon-orange rounded-lg shadow-lg self-center">
-        <div className="flex flex-col items-center text-center mb-8">
-          <h1 className="font-dyna-puff text-5xl font-bold mb-2 text-white">
-            {coloringImage.title}
-          </h1>
-          <div className="flex items-center gap-x-2 text-lg text-white font-medium mb-4">
-            by Chunky Crayon
-          </div>
-          <SocialShare
-            url={`https://chunkycrayon.com/coloring-image/${id}`}
-            title={coloringImage.title || 'Coloring Page'}
-            description={
-              coloringImage.description ||
-              'Free printable coloring page from Chunky Crayon'
-            }
-            imageUrl={coloringImage.svgUrl || coloringImage.url || undefined}
-            className="bg-white/20 px-4 py-2 rounded-full"
-          />
-        </div>
-        <div className="flex flex-col gap-y-4">
-          <ColorPalette className="self-center" />
-          <ImageCanvas
+      {/* Title - clean and minimal */}
+      <h1 className="font-tondo font-bold text-2xl md:text-3xl text-text-primary text-center">
+        {coloringImage.title}
+      </h1>
+
+      {/* Coloring Area - clean white card matching gallery aesthetic */}
+      <div className="max-w-3xl w-full mx-auto">
+        <div className="bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 shadow-sm">
+          <ColoringArea
             coloringImage={coloringImage}
-            className="rounded-lg shadow-lg bg-white overflow-hidden"
-          />
-          <DownloadPDFButton
-            coloringImage={coloringImage}
-            className="self-center"
+            isAuthenticated={isAuthenticated}
           />
         </div>
       </div>

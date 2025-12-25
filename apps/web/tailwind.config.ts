@@ -121,6 +121,14 @@ const config = {
 
         // Legacy support - now uses CSS variable for consistency
         orange: 'hsl(var(--crayon-orange))',
+
+        // Social Media brand colors
+        social: {
+          facebook: {
+            DEFAULT: 'hsl(var(--social-facebook))',
+            dark: 'hsl(var(--social-facebook-dark))',
+          },
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -7,7 +7,7 @@ import {
   faXTwitter,
   faPinterestP,
 } from '@fortawesome/free-brands-svg-icons';
-import { faLink, faCheck } from '@fortawesome/pro-duotone-svg-icons';
+import { faLink, faCheck } from '@fortawesome/pro-solid-svg-icons';
 import cn from '@/utils/cn';
 
 type SocialShareProps = {
@@ -17,6 +17,10 @@ type SocialShareProps = {
   imageUrl?: string;
   className?: string;
 };
+
+// Kid-friendly crayon button style
+const buttonBaseClass =
+  'flex items-center justify-center w-12 h-12 rounded-full shadow-md transition-all duration-150 hover:scale-110 active:scale-95 text-white font-bold';
 
 const SocialShare = ({
   url,
@@ -56,81 +60,74 @@ const SocialShare = ({
     );
   };
 
-  const buttonBaseClass =
-    'flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 hover:scale-110 active:scale-95';
-
   return (
-    <div className={cn('flex items-center gap-3', className)}>
-      <span className="text-sm font-medium text-text-secondary mr-1">
-        Share:
+    <div className={cn('flex flex-col items-center gap-4', className)}>
+      <span className="font-tondo font-bold text-lg text-text-primary">
+        Share your creation!
       </span>
 
-      {/* Facebook */}
-      <button
-        type="button"
-        onClick={() => handleShare('facebook')}
-        className={cn(
-          buttonBaseClass,
-          'bg-[#1877F2] text-white hover:bg-[#166FE5]',
-        )}
-        aria-label="Share on Facebook"
-        title="Share on Facebook"
-      >
-        <FontAwesomeIcon icon={faFacebookF} className="text-sm" />
-      </button>
+      <div className="flex items-center gap-4">
+        {/* Facebook - Brand Blue */}
+        <button
+          type="button"
+          onClick={() => handleShare('facebook')}
+          className={cn(
+            buttonBaseClass,
+            'bg-social-facebook hover:bg-social-facebook-dark',
+          )}
+          aria-label="Share on Facebook"
+          title="Share on Facebook"
+        >
+          <FontAwesomeIcon icon={faFacebookF} className="text-xl" />
+        </button>
 
-      {/* Twitter/X */}
-      <button
-        type="button"
-        onClick={() => handleShare('twitter')}
-        className={cn(buttonBaseClass, 'bg-black text-white hover:bg-gray-800')}
-        aria-label="Share on X (Twitter)"
-        title="Share on X (Twitter)"
-      >
-        <FontAwesomeIcon icon={faXTwitter} className="text-sm" />
-      </button>
+        {/* Twitter/X - Purple */}
+        <button
+          type="button"
+          onClick={() => handleShare('twitter')}
+          className={cn(
+            buttonBaseClass,
+            'bg-crayon-purple hover:bg-crayon-purple-dark',
+          )}
+          aria-label="Share on X (Twitter)"
+          title="Share on X (Twitter)"
+        >
+          <FontAwesomeIcon icon={faXTwitter} className="text-xl" />
+        </button>
 
-      {/* Pinterest */}
-      <button
-        type="button"
-        onClick={() => handleShare('pinterest')}
-        className={cn(
-          buttonBaseClass,
-          'bg-[#E60023] text-white hover:bg-[#C70020]',
-        )}
-        aria-label="Share on Pinterest"
-        title="Share on Pinterest"
-      >
-        <FontAwesomeIcon icon={faPinterestP} className="text-sm" />
-      </button>
+        {/* Pinterest - Pink */}
+        <button
+          type="button"
+          onClick={() => handleShare('pinterest')}
+          className={cn(
+            buttonBaseClass,
+            'bg-crayon-pink hover:bg-crayon-pink-dark',
+          )}
+          aria-label="Share on Pinterest"
+          title="Share on Pinterest"
+        >
+          <FontAwesomeIcon icon={faPinterestP} className="text-xl" />
+        </button>
 
-      {/* Copy Link */}
-      <button
-        type="button"
-        onClick={handleCopyLink}
-        className={cn(
-          buttonBaseClass,
-          copied
-            ? 'bg-green-500 text-white'
-            : 'bg-paper-cream border-2 border-paper-cream-dark text-text-secondary hover:border-crayon-orange hover:text-crayon-orange',
-        )}
-        aria-label={copied ? 'Link copied!' : 'Copy link'}
-        title={copied ? 'Link copied!' : 'Copy link'}
-      >
-        <FontAwesomeIcon
-          icon={copied ? faCheck : faLink}
-          className="text-sm"
-          style={
-            !copied
-              ? ({
-                  '--fa-primary-color': 'currentColor',
-                  '--fa-secondary-color': 'currentColor',
-                  '--fa-secondary-opacity': '0.4',
-                } as React.CSSProperties)
-              : undefined
-          }
-        />
-      </button>
+        {/* Copy Link - Orange or Green when copied */}
+        <button
+          type="button"
+          onClick={handleCopyLink}
+          className={cn(
+            buttonBaseClass,
+            copied
+              ? 'bg-crayon-green hover:bg-crayon-green-dark'
+              : 'bg-crayon-orange hover:bg-crayon-orange-dark',
+          )}
+          aria-label={copied ? 'Link copied!' : 'Copy link'}
+          title={copied ? 'Link copied!' : 'Copy link'}
+        >
+          <FontAwesomeIcon
+            icon={copied ? faCheck : faLink}
+            className="text-xl"
+          />
+        </button>
+      </div>
     </div>
   );
 };

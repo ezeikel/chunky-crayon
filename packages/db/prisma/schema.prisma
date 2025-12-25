@@ -23,6 +23,7 @@ model User {
   subscriptions      Subscription[]
   creditTransactions CreditTransaction[]
   coloringImages     ColoringImage[]
+  savedArtworks      SavedArtwork[] // User's saved colored artwork
   profiles           Profile[] // Multi-profile support for families
   // Auth.js relations
   accounts           Account[]
@@ -75,6 +76,7 @@ model ColoringImage {
   userId         String?
   profile        Profile?       @relation(fields: [profileId], references: [id])
   profileId      String? // Which profile created this image
+  savedArtworks  SavedArtwork[] // Colored versions saved by users
 
   @@map("coloring_images")
 }
@@ -142,8 +144,27 @@ model Profile {
   updatedAt  DateTime   @updatedAt
 
   coloringImages ColoringImage[]
+  savedArtworks  SavedArtwork[] // Saved colored artwork for this profile
 
   @@map("profiles")
+}
+
+// Saved colored artwork - when users color an image and save it to their gallery
+model SavedArtwork {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profileId       String?
+  profile         Profile?      @relation(fields: [profileId], references: [id])
+  coloringImageId String
+  coloringImage   ColoringImage @relation(fields: [coloringImageId], references: [id])
+  title           String? // Optional custom title (defaults to original image title)
+  imageUrl        String // URL of the saved colored artwork (uploaded to cloud storage)
+  thumbnailUrl    String? // Optional smaller preview for gallery listing
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("saved_artworks")
 }
 
 enum GenerationType {

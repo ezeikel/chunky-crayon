@@ -149,12 +149,16 @@ export type EventProperties = {
   [TRACKING_EVENTS.PAGE_COLOR_SELECTED]: {
     coloringImageId?: string; // Optional when color palette is used outside image context
     color: string;
+    colorName?: string;
     colorIndex?: number;
+    tool?: 'brush' | 'fill';
   };
   [TRACKING_EVENTS.PAGE_STROKE_MADE]: {
     coloringImageId?: string;
     color: string;
     strokeCount?: number;
+    brushSize?: string;
+    brushType?: string;
   };
   [TRACKING_EVENTS.PAGE_SAVED]: {
     coloringImageId: string;

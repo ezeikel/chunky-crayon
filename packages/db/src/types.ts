@@ -14,4 +14,5 @@ export type {
   Account as DbAccountType,
   Session as DbSessionType,
   Profile as DbProfileType,
+  SavedArtwork as DbSavedArtworkType,
 } from "./generated/prisma/browser";

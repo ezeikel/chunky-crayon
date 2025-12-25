@@ -10,6 +10,7 @@ import {
 
 export const MAX_IMAGE_GENERATION_ATTEMPTS = 3;
 
+// Legacy colors - kept for backwards compatibility
 export const COLORS = [
   '#FF0000',
   '#00FF00',
@@ -20,6 +21,66 @@ export const COLORS = [
   '#000000',
   '#FFFFFF',
 ];
+
+// Enhanced 24-color kid-friendly palette for coloring experience
+export const COLORING_PALETTE = {
+  // Primary colors (8) - Large buttons, most used
+  primary: [
+    { name: 'Cherry Red', hex: '#E53935' },
+    { name: 'Sunset Orange', hex: '#FB8C00' },
+    { name: 'Sunshine Yellow', hex: '#FDD835' },
+    { name: 'Grass Green', hex: '#43A047' },
+    { name: 'Sky Blue', hex: '#1E88E5' },
+    { name: 'Grape Purple', hex: '#8E24AA' },
+    { name: 'Bubblegum Pink', hex: '#EC407A' },
+    { name: 'Chocolate Brown', hex: '#6D4C41' },
+  ],
+  // Secondary colors (8) - Medium buttons
+  secondary: [
+    { name: 'Coral', hex: '#FF7043' },
+    { name: 'Mint', hex: '#26A69A' },
+    { name: 'Lavender', hex: '#AB47BC' },
+    { name: 'Peach', hex: '#FFAB91' },
+    { name: 'Navy', hex: '#3949AB' },
+    { name: 'Forest', hex: '#2E7D32' },
+    { name: 'Gold', hex: '#FFD54F' },
+    { name: 'Rose', hex: '#F48FB1' },
+  ],
+  // Essentials (4) - Always visible
+  essentials: [
+    { name: 'Black', hex: '#212121' },
+    { name: 'White', hex: '#FFFFFF' },
+    { name: 'Gray', hex: '#9E9E9E' },
+    { name: 'Skin Tone', hex: '#FFCC80' },
+  ],
+  // Skin tones (6) - Accessible via long-press on Skin Tone
+  skinTones: [
+    { name: 'Light', hex: '#FFE0B2' },
+    { name: 'Medium Light', hex: '#FFCC80' },
+    { name: 'Medium', hex: '#DEB887' },
+    { name: 'Medium Dark', hex: '#A0522D' },
+    { name: 'Dark', hex: '#8B4513' },
+    { name: 'Deep', hex: '#5D4037' },
+  ],
+} as const;
+
+// Flat array of all coloring palette colors for easy iteration
+export const ALL_COLORING_COLORS = [
+  ...COLORING_PALETTE.primary,
+  ...COLORING_PALETTE.secondary,
+  ...COLORING_PALETTE.essentials,
+];
+
+// Brush size configuration optimized for children's motor skills
+export const BRUSH_SIZES = {
+  small: { radius: 4, name: 'Fine', icon: '•' },
+  medium: { radius: 12, name: 'Regular', icon: '●' },
+  large: { radius: 24, name: 'Chunky', icon: '⬤' },
+} as const;
+
+export type BrushSize = keyof typeof BRUSH_SIZES;
+export type BrushType = 'crayon' | 'marker' | 'eraser';
+export type ColoringTool = 'brush' | 'fill';
 
 export const NUMBER_OF_CONCURRENT_IMAGE_GENERATION_REQUESTS = 1;
 
