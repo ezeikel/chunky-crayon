@@ -47,7 +47,7 @@ const UserInputV2 = () => {
       return {
         text: 'Get started for free',
         action: () => handleAuthAction('signin'),
-        subtext: "You'll get 15 free credits — enough to generate 3 pages!",
+        subtext: "You'll get 15 free credits — enough to create 3 pages!",
         isSubmit: false,
       };
     }
@@ -71,7 +71,7 @@ const UserInputV2 = () => {
     }
 
     return {
-      text: 'Generate coloring page',
+      text: 'Create coloring page',
       isSubmit: true,
     };
   };

@@ -74,12 +74,12 @@ const TextInput = ({ className }: TextInputProps) => {
       // Show remaining generations for guests
       if (isGuest) {
         return {
-          text: `Generate (${guestGenerationsRemaining} free ${guestGenerationsRemaining === 1 ? 'try' : 'tries'} left)`,
+          text: `Create (${guestGenerationsRemaining} free ${guestGenerationsRemaining === 1 ? 'try' : 'tries'} left)`,
           isSubmit: true,
         };
       }
       return {
-        text: 'Generate coloring page',
+        text: 'Create coloring page',
         isSubmit: true,
       };
     }
@@ -116,7 +116,7 @@ const TextInput = ({ className }: TextInputProps) => {
     return {
       text: 'Get started for free',
       action: () => handleAuthAction('signin'),
-      subtext: "You'll get 15 free credits — enough to generate 3 pages!",
+      subtext: "You'll get 15 free credits — enough to create 3 pages!",
       isSubmit: false,
     };
   };

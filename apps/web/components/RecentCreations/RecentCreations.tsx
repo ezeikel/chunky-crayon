@@ -125,7 +125,7 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
             />
             <p className="font-tondo text-sm md:text-base text-text-secondary">
               <span className="font-semibold text-text-primary">
-                Sign up free
+                Start free
               </span>{' '}
               to keep your creations forever and unlock more!
             </p>
@@ -134,7 +134,7 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
             href="/sign-up"
             className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange hover:bg-crayon-orange-dark text-white font-tondo font-bold rounded-xl shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 whitespace-nowrap"
           >
-            Sign Up Free
+            Start Free
             <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
           </Link>
         </div>
