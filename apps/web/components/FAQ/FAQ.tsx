@@ -6,6 +6,7 @@ import { faChevronDown } from '@fortawesome/pro-solid-svg-icons';
 import { faCircleQuestion } from '@fortawesome/pro-duotone-svg-icons';
 import cn from '@/utils/cn';
 import { FAQ_ITEMS, type FAQItem } from '@/constants';
+import { FadeIn, StaggerChildren, StaggerItem } from '@/components/motion';
 
 type FAQProps = {
   className?: string;
@@ -20,7 +21,7 @@ const FAQAccordionItem = ({
   isOpen: boolean;
   onToggle: () => void;
 }) => (
-  <div className="border-2 border-paper-cream-dark rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+  <StaggerItem className="border-2 border-paper-cream-dark rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
     <button
       type="button"
       onClick={onToggle}
@@ -50,7 +51,7 @@ const FAQAccordionItem = ({
         </div>
       </div>
     </div>
-  </div>
+  </StaggerItem>
 );
 
 const FAQ = ({ className }: FAQProps) => {
@@ -88,25 +89,30 @@ const FAQ = ({ className }: FAQProps) => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       {/* Header */}
-      <div className="text-center mb-10 md:mb-12">
-        <div className="inline-flex items-center gap-3 mb-4">
-          <FontAwesomeIcon
-            icon={faCircleQuestion}
-            className="text-3xl md:text-4xl"
-            style={iconStyle}
-          />
-          <h2 className="font-tondo font-bold text-2xl md:text-3xl lg:text-4xl text-text-primary">
-            Frequently Asked Questions
-          </h2>
+      <FadeIn>
+        <div className="text-center mb-10 md:mb-12">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <FontAwesomeIcon
+              icon={faCircleQuestion}
+              className="text-3xl md:text-4xl"
+              style={iconStyle}
+            />
+            <h2 className="font-tondo font-bold text-2xl md:text-3xl lg:text-4xl text-text-primary">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <p className="text-text-secondary max-w-2xl mx-auto">
+            Everything you need to know about creating magical coloring pages
+            with Chunky Crayon
+          </p>
         </div>
-        <p className="text-text-secondary max-w-2xl mx-auto">
-          Everything you need to know about creating magical coloring pages with
-          Chunky Crayon
-        </p>
-      </div>
+      </FadeIn>
 
       {/* Accordion grid - 2 columns on larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <StaggerChildren
+        staggerDelay={0.08}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+      >
         {FAQ_ITEMS.map((item) => (
           <FAQAccordionItem
             key={item.id}
@@ -115,7 +121,7 @@ const FAQ = ({ className }: FAQProps) => {
             onToggle={() => handleToggle(item.id)}
           />
         ))}
-      </div>
+      </StaggerChildren>
     </section>
   );
 };

@@ -11,6 +11,10 @@ import {
 import { getTodaysDailyImage, getFeaturedImages } from '@/app/data/gallery';
 import { GALLERY_CATEGORIES } from '@/constants';
 import DailyImageHeading from './DailyImageHeading';
+import AnimatedGalleryHeader from './AnimatedGalleryHeader';
+import AnimatedGalleryGrid, {
+  AnimatedPreviewCard,
+} from './AnimatedGalleryGrid';
 
 const DailyImagePreview = async () => {
   const dailyImage = await getTodaysDailyImage();
@@ -176,23 +180,18 @@ const CategoryPreview = () => {
 const GalleryPreview = async () => {
   return (
     <section className="w-full">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-tondo font-bold text-2xl text-text-primary">
-          Free Coloring Pages
-        </h2>
-        <Link
-          href="/gallery"
-          className="text-sm font-semibold text-crayon-orange hover:text-crayon-orange-dark transition-colors flex items-center gap-1"
-        >
-          Explore Gallery
-          <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
-        </Link>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <DailyImagePreview />
-        <CommunityPreview />
-        <CategoryPreview />
-      </div>
+      <AnimatedGalleryHeader />
+      <AnimatedGalleryGrid>
+        <AnimatedPreviewCard>
+          <DailyImagePreview />
+        </AnimatedPreviewCard>
+        <AnimatedPreviewCard>
+          <CommunityPreview />
+        </AnimatedPreviewCard>
+        <AnimatedPreviewCard>
+          <CategoryPreview />
+        </AnimatedPreviewCard>
+      </AnimatedGalleryGrid>
     </section>
   );
 };

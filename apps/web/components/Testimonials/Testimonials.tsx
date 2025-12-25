@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from '@fortawesome/pro-solid-svg-icons';
@@ -8,6 +10,7 @@ import {
   SOCIAL_PROOF_STATS,
   type Testimonial,
 } from '@/constants';
+import { FadeIn, StaggerChildren, StaggerItem } from '@/components/motion';
 
 type TestimonialsProps = {
   className?: string;
@@ -41,7 +44,7 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
-  <div className="bg-white rounded-2xl p-6 shadow-card border-2 border-paper-cream-dark hover:shadow-lg hover:border-crayon-orange/30 transition-all duration-300 group">
+  <StaggerItem className="bg-white rounded-2xl p-6 shadow-card border-2 border-paper-cream-dark hover:shadow-lg hover:border-crayon-orange/30 transition-all duration-300 group">
     {/* Quote icon */}
     <FontAwesomeIcon
       icon={faQuoteLeft}
@@ -73,7 +76,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
       </div>
       {testimonial.rating && <StarRating rating={testimonial.rating} />}
     </div>
-  </div>
+  </StaggerItem>
 );
 
 const SocialProofHeader = () => {
@@ -139,14 +142,19 @@ const SocialProofHeader = () => {
 
 const Testimonials = ({ className }: TestimonialsProps) => (
   <section className={cn('w-full py-12 md:py-16', className)}>
-    <SocialProofHeader />
+    <FadeIn>
+      <SocialProofHeader />
+    </FadeIn>
 
     {/* Testimonial grid - responsive columns */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <StaggerChildren
+      staggerDelay={0.1}
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
       {TESTIMONIALS.map((testimonial) => (
         <TestimonialCard key={testimonial.id} testimonial={testimonial} />
       ))}
-    </div>
+    </StaggerChildren>
   </section>
 );
 

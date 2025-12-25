@@ -1,4 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faImages,
   faCalendarStar,
@@ -6,6 +5,8 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import { getGalleryStats } from '@/app/data/gallery';
 import cn from '@/utils/cn';
+import AnimatedStatCard from './AnimatedStatCard';
+import AnimatedStatsContainer from './AnimatedStatsContainer';
 
 type SocialProofStatsProps = {
   className?: string;
@@ -14,52 +15,37 @@ type SocialProofStatsProps = {
 const SocialProofStats = async ({ className }: SocialProofStatsProps) => {
   const stats = await getGalleryStats();
 
-  const iconStyle = {
-    '--fa-primary-color': 'hsl(var(--crayon-orange))',
-    '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-    '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
-
   const statItems = [
     {
       icon: faImages,
-      value: stats.totalImages.toLocaleString(),
+      value: stats.totalImages,
       label: 'Coloring Pages Created',
     },
     {
       icon: faCalendarStar,
-      value: stats.dailyImages.toLocaleString(),
+      value: stats.dailyImages,
       label: 'Daily Pages',
     },
     {
       icon: faUsers,
-      value: stats.communityImages.toLocaleString(),
+      value: stats.communityImages,
       label: 'Free Library Pages',
     },
   ];
 
   return (
     <section className={cn('w-full py-8 md:py-10', className)}>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
-        {statItems.map((stat) => (
-          <div
+      <AnimatedStatsContainer className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8">
+        {statItems.map((stat, index) => (
+          <AnimatedStatCard
             key={stat.label}
-            className="flex flex-col items-center text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-paper-cream-dark shadow-sm hover:shadow-md transition-shadow"
-          >
-            <FontAwesomeIcon
-              icon={stat.icon}
-              className="text-3xl md:text-4xl mb-3"
-              style={iconStyle}
-            />
-            <span className="font-tondo font-bold text-3xl md:text-4xl text-text-primary mb-1">
-              {stat.value}+
-            </span>
-            <span className="text-text-secondary text-sm md:text-base">
-              {stat.label}
-            </span>
-          </div>
+            icon={stat.icon}
+            value={stat.value}
+            label={stat.label}
+            index={index}
+          />
         ))}
-      </div>
+      </AnimatedStatsContainer>
     </section>
   );
 };
