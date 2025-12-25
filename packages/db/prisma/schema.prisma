@@ -65,7 +65,7 @@ model ColoringImage {
   svgUrl         String?
   qrCodeUrl      String?
   tags           String[]
-  difficulty     Difficulty?    // Optional: BEGINNER, INTERMEDIATE, ADVANCED, EXPERT
+  difficulty     Difficulty? // Optional: BEGINNER, INTERMEDIATE, ADVANCED, EXPERT
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   generationType GenerationType @default(USER)
