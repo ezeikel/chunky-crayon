@@ -170,7 +170,24 @@ model SavedArtwork {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
+  // Shares for this artwork
+  shares ArtworkShare[]
+
   @@map("saved_artworks")
+}
+
+// Shareable link for artwork - allows viewing without authentication
+model ArtworkShare {
+  id           String       @id @default(cuid())
+  artworkId    String
+  artwork      SavedArtwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  shareCode    String       @unique // URL-safe random code for sharing
+  expiresAt    DateTime? // Optional expiration (null = never expires)
+  viewCount    Int          @default(0)
+  isActive     Boolean      @default(true) // Can be deactivated by parent
+  createdAt    DateTime     @default(now())
+
+  @@map("artwork_shares")
 }
 
 // User's collected stickers - unlocked through coloring achievements

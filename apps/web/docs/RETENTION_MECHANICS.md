@@ -1,7 +1,8 @@
 # Retention Mechanics - Full Implementation Plan
 
 **Last Updated:** December 26, 2024 **Status:** Phase 1 Complete (Stickers) |
-Phase 2 Complete (Colo Evolution) | Phase 3 Complete (Weekly Challenges)
+Phase 2 Complete (Colo Evolution) | Phase 3 Complete (Weekly Challenges) | Phase
+4 Complete (Shareable Galleries)
 
 ---
 
@@ -364,7 +365,8 @@ enum ChallengeType {
 
 ## 4. Shareable Galleries (Social Features)
 
-**Status: NOT STARTED**
+**Status: COMPLETE** ✅ (Single artwork sharing implemented; Family/Friends
+galleries planned for future)
 
 ### Concept
 
@@ -380,14 +382,15 @@ safety in mind.
 
 ### Features
 
-#### Share Single Artwork
+#### Share Single Artwork ✅ Implemented
 
 - Generate shareable link for one artwork
 - Parent-controlled (require confirmation via AdultGate)
-- Link expires after 30 days (or never, parent choice)
+- Link expires after 30 days by default
 - Receiver can view but not interact
+- URL-safe share codes using nanoid
 
-#### Family Gallery
+#### Family Gallery (Future)
 
 - Connect family accounts
 - See siblings'/cousins' artwork
@@ -401,44 +404,49 @@ safety in mind.
 - No direct messaging between kids
 - Moderated/monitored
 
-### Database Schema
+### Database Schema (Implemented)
 
 ```prisma
 model ArtworkShare {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   artworkId   String
-  artwork     SavedArtwork @relation(...)
-  shareCode   String   @unique // random URL-safe code
-  expiresAt   DateTime?
-  viewCount   Int      @default(0)
-  createdAt   DateTime @default(now())
-}
-
-model FamilyConnection {
-  id          String   @id @default(cuid())
-  requesterId String
-  requester   User     @relation(...)
-  accepterId  String
-  accepter    User     @relation(...)
-  status      ConnectionStatus
-  createdAt   DateTime @default(now())
-}
-
-enum ConnectionStatus {
-  PENDING
-  ACCEPTED
-  DECLINED
+  artwork     SavedArtwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  shareCode   String       @unique // URL-safe nanoid code
+  expiresAt   DateTime?    // null = never expires
+  viewCount   Int          @default(0)
+  createdAt   DateTime     @default(now())
 }
 ```
 
-### Implementation Tasks
+### Implementation Status
 
-- [ ] Design share flow with parent confirmation
-- [ ] Create shareable link generation
-- [ ] Build shared artwork view page
-- [ ] Add share button to saved artwork
-- [ ] Family connection system (future)
-- [ ] Friends gallery groups (future)
+- [x] ArtworkShare database model (`prisma/schema.prisma`)
+- [x] Share service with link generation (`lib/share/service.ts`)
+- [x] Server actions for sharing (`app/actions/share.ts`)
+- [x] ShareArtworkModal component with copy/share functionality
+      (`components/ShareArtworkModal/`)
+- [x] Share button with AdultGate on my-artwork page
+      (`app/account/my-artwork/ShareArtworkButton.tsx`)
+- [x] Public shared artwork page (`app/shared/[code]/page.tsx`)
+- [x] Not-found page for invalid/expired shares
+      (`app/shared/[code]/not-found.tsx`)
+- [x] View count tracking (increments on each view)
+- [x] Open Graph/Twitter metadata for social previews
+- [ ] Family connection system (future phase)
+- [ ] Friends gallery groups (future phase)
+
+### Key Files
+
+| File                                        | Purpose                                    |
+| ------------------------------------------- | ------------------------------------------ |
+| `lib/share/types.ts`                        | Type definitions for share data            |
+| `lib/share/service.ts`                      | Share code generation, expiration logic    |
+| `app/actions/share.ts`                      | Server actions for create/get shares       |
+| `components/ShareArtworkModal/`             | Modal with share link + copy/share buttons |
+| `app/account/my-artwork/ShareArtworkButton` | AdultGate-protected share trigger          |
+| `app/shared/[code]/page.tsx`                | Public view page for shared artwork        |
+| `app/shared/[code]/not-found.tsx`           | Friendly error for invalid shares          |
+| `app/shared/[code]/FormattedDate.tsx`       | Client component for date display          |
 
 ---
 
@@ -505,14 +513,18 @@ Focus: Gentle engagement mechanics.
 7. ~~Header navigation~~ ✅ (text link + progress indicator)
 8. Admin tools - using database seeding for now
 
-### Phase 4: Sharing
+### Phase 4: Sharing ✅ COMPLETE
 
 Focus: Safe social features for families.
 
-1. Single artwork sharing
-2. Share link generation
-3. Public view page
-4. Family connections (future)
+1. ~~ArtworkShare database model~~ ✅
+2. ~~Share service with link generation~~ ✅ (nanoid for URL-safe codes)
+3. ~~Server actions for sharing~~ ✅ (`app/actions/share.ts`)
+4. ~~ShareArtworkModal component~~ ✅ (copy link, Web Share API, QR code future)
+5. ~~Share button with AdultGate~~ ✅ (COPPA-compliant parent confirmation)
+6. ~~Public shared artwork page~~ ✅ (`/shared/[code]` with OG/Twitter metadata)
+7. ~~View count tracking~~ ✅
+8. Family connections - planned for future phase
 
 ### Phase 5: Animated Artwork
 

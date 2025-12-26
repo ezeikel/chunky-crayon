@@ -36,6 +36,7 @@ import { getUserSavedArtwork } from '@/app/actions/saved-artwork';
 import { getMyStickerStats } from '@/app/actions/stickers';
 import { getMyCurrentChallenge } from '@/app/actions/challenges';
 import DeleteArtworkButton from './DeleteArtworkButton';
+import ShareArtworkButton from './ShareArtworkButton';
 
 export const metadata: Metadata = {
   title: 'My Artwork - Chunky Crayon',
@@ -198,18 +199,23 @@ const ArtworkGrid = async () => {
 
           {/* Big Action Buttons - always visible on mobile, hover-reveal on desktop */}
           <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/0 md:bg-black/0 md:opacity-0 md:group-hover:opacity-100 md:group-hover:bg-black/20 transition-all duration-200 pointer-events-none">
-            <div className="flex items-center gap-3 pointer-events-auto">
+            <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
               {/* Color Again Button - big circular */}
               <Link
                 href={`/coloring-image/${artwork.coloringImageId}`}
-                className="flex items-center justify-center size-11 md:size-14 rounded-full bg-crayon-teal text-white shadow-lg hover:bg-crayon-teal-dark hover:scale-110 active:scale-95 transition-all duration-200"
+                className="flex items-center justify-center size-10 md:size-14 rounded-full bg-crayon-teal text-white shadow-lg hover:bg-crayon-teal-dark hover:scale-110 active:scale-95 transition-all duration-200"
                 title="Color again"
               >
                 <FontAwesomeIcon
                   icon={faPaintbrush}
-                  className="text-base md:text-lg"
+                  className="text-sm md:text-lg"
                 />
               </Link>
+              {/* Share Button - big circular */}
+              <ShareArtworkButton
+                artworkId={artwork.id}
+                artworkTitle={artwork.title || 'My Artwork'}
+              />
               {/* Delete Button - big circular */}
               <DeleteArtworkButton artworkId={artwork.id} />
             </div>
