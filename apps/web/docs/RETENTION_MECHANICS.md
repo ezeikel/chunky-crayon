@@ -1,7 +1,7 @@
 # Retention Mechanics - Full Implementation Plan
 
 **Last Updated:** December 26, 2024 **Status:** Phase 1 Complete (Stickers) |
-Phase 2 In Progress (Colo Evolution)
+Phase 2 Complete (Colo Evolution) | Phase 3 Complete (Weekly Challenges)
 
 ---
 
@@ -137,7 +137,8 @@ permanent rewards that can't be lost.
 
 ## 2. Colo Evolution (Mascot Growth)
 
-**Status: IN PROGRESS** (Infrastructure complete, SVGs needed)
+**Status: COMPLETE** ✅ (Infrastructure complete, using gradient placeholders -
+SVGs can be added later)
 
 ### Why This Works (Tamagotchi Research)
 
@@ -247,7 +248,7 @@ each child profile to have their own Colo evolution journey.
 
 ## 3. Weekly Challenges (Gentle Goals)
 
-**Status: NOT STARTED**
+**Status: COMPLETE** ✅
 
 ### Why Weekly, Not Daily (Research-Backed)
 
@@ -333,15 +334,31 @@ enum ChallengeType {
 }
 ```
 
-### Implementation Tasks
+### Implementation Status
 
-- [ ] Design challenge system schema
-- [ ] Create weekly challenge catalog
-- [ ] Build challenge progress tracking
-- [ ] Create ChallengeCard component
-- [ ] Add challenges to home/dashboard
-- [ ] Create completion celebration
-- [ ] Admin tool to create new challenges
+- [x] Design challenge system schema (`prisma/schema.prisma` - WeeklyChallenge,
+      UserChallengeProgress)
+- [x] Create weekly challenge catalog (`lib/challenges/catalog.ts`)
+- [x] Build challenge progress tracking (`lib/challenges/service.ts`)
+- [x] Create ChallengeCard component (`components/ChallengeCard/`)
+- [x] Add challenges to navigation (header link + HeaderChallengeIndicator)
+- [x] Create challenges page (`/account/challenges`)
+- [x] Create completion celebration with reward claiming
+- [x] Integrate with save artwork flow (auto-increment progress)
+- [x] Sound effects integration (challenge completion sounds)
+- [ ] Admin tool to create new challenges (using database seeding for now)
+
+### Key Files
+
+| File                                         | Purpose                                            |
+| -------------------------------------------- | -------------------------------------------------- |
+| `lib/challenges/types.ts`                    | Type definitions for challenges, progress          |
+| `lib/challenges/catalog.ts`                  | Challenge templates for seeding                    |
+| `lib/challenges/service.ts`                  | Progress tracking, completion logic                |
+| `app/actions/challenges.ts`                  | Server actions for challenge operations            |
+| `components/ChallengeCard/`                  | Challenge display with progress ring               |
+| `components/Header/HeaderChallengeIndicator` | Header indicator showing active challenge progress |
+| `app/account/challenges/page.tsx`            | Challenge hub page                                 |
 
 ---
 
@@ -457,7 +474,7 @@ Focus: Complete the sticker system first as it's the foundation.
 8. ~~Sticker book page~~ ✅ (`/account/profiles/stickers`)
 9. Sticker art (Colo SVGs) - using placeholders, needs design
 
-### Phase 2: Colo Evolution ⏳ IN PROGRESS (Infrastructure Complete)
+### Phase 2: Colo Evolution ✅ COMPLETE
 
 Focus: Add visual progression that creates emotional attachment.
 
@@ -473,17 +490,20 @@ Focus: Add visual progression that creates emotional attachment.
    ColoAvatar, progress, encouragement)
 10. ~~Add Colo to loading/coloring screens~~ ✅ (route loading + ColoLoading for
     generation)
-11. Create Colo SVG variants (6 stages) - awaiting design
+11. Create Colo SVG variants (6 stages) - using placeholders, design optional
 
-### Phase 3: Weekly Challenges
+### Phase 3: Weekly Challenges ✅ COMPLETE
 
 Focus: Gentle engagement mechanics.
 
-1. Challenge schema and catalog
-2. Progress tracking
-3. Challenge UI components
-4. Completion rewards
-5. Admin tools
+1. ~~Challenge schema and catalog~~ ✅ (`lib/challenges/`)
+2. ~~Progress tracking~~ ✅ (`lib/challenges/service.ts`)
+3. ~~Challenge UI components~~ ✅ (ChallengeCard, HeaderChallengeIndicator)
+4. ~~Challenges page~~ ✅ (`/account/challenges`)
+5. ~~Completion rewards~~ ✅ (stickers/accessories with claim flow)
+6. ~~Integration with save artwork flow~~ ✅
+7. ~~Header navigation~~ ✅ (text link + progress indicator)
+8. Admin tools - using database seeding for now
 
 ### Phase 4: Sharing
 

@@ -191,12 +191,12 @@ model UserSticker {
 
 // Weekly challenge schedule - which challenge is active for which week
 model WeeklyChallenge {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   challengeId String // References challenge ID from catalog (static)
   startDate   DateTime // When the challenge starts
   endDate     DateTime // When the challenge ends
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
 
   // Challenge progress for all profiles
   progress ProfileChallengeProgress[]
