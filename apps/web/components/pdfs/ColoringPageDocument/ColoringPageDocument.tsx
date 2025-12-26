@@ -3,6 +3,7 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
   Link,
   Font,
@@ -28,6 +29,9 @@ const styles = StyleSheet.create({
   },
   main: {
     flexGrow: 1,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   body: {
     fontSize: 12,
@@ -36,6 +40,11 @@ const styles = StyleSheet.create({
   coloringImage: {
     width: '100%', // ensure the SVG fills the available width
     height: 'auto', // maintain the aspect ratio
+  },
+  coloredImage: {
+    maxWidth: '100%',
+    maxHeight: '100%',
+    objectFit: 'contain',
   },
   footer: {
     display: 'flex',
@@ -71,18 +80,26 @@ type ColoringPageDocumentProps = {
   imageSvg: string;
   qrCodeSvg: string;
   coloringImageId: string;
+  coloredImageDataUrl?: string | null; // User's colored artwork as data URL
 };
 
 const ColoringPageDocument = ({
   imageSvg,
   qrCodeSvg,
   coloringImageId,
+  coloredImageDataUrl,
 }: ColoringPageDocumentProps) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.main}>
-          <SvgToReactPdf svgString={imageSvg} style={styles.coloringImage} />
+          {coloredImageDataUrl ? (
+            // Show user's colored artwork if available
+            <Image src={coloredImageDataUrl} style={styles.coloredImage} />
+          ) : (
+            // Fall back to original SVG if no coloring
+            <SvgToReactPdf svgString={imageSvg} style={styles.coloringImage} />
+          )}
         </View>
         <View style={styles.footer}>
           <SvgToReactPdf svgString={qrCodeSvg} style={styles.qrCodeImage} />

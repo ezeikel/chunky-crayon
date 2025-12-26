@@ -67,8 +67,9 @@ const ColoringArea = ({
   }, [stopAmbient]);
 
   // Get canvas data URL for saving to gallery
+  // Uses composite canvas that merges user's colors with line art
   const getCanvasDataUrl = useCallback(() => {
-    const canvas = canvasRef.current?.getCanvas();
+    const canvas = canvasRef.current?.getCompositeCanvas();
     if (!canvas) return null;
     return canvas.toDataURL('image/png');
   }, []);
@@ -217,7 +218,10 @@ const ColoringArea = ({
       {/* Action buttons - Desktop style */}
       <div className="hidden md:flex flex-wrap items-center justify-center gap-3">
         <StartOverButton onStartOver={handleStartOver} />
-        <DownloadPDFButton coloringImage={coloringImage} />
+        <DownloadPDFButton
+          coloringImage={coloringImage}
+          getCanvasDataUrl={getCanvasDataUrl}
+        />
         <ShareButton
           url={typeof window !== 'undefined' ? window.location.href : ''}
           title={coloringImage.title || 'Coloring Page'}
@@ -236,7 +240,10 @@ const ColoringArea = ({
       {/* Mobile Action buttons - Compact row with icon-only buttons */}
       <div className="md:hidden flex items-center justify-center gap-3 py-2 px-2 mb-36">
         <StartOverButton onStartOver={handleStartOver} />
-        <DownloadPDFButton coloringImage={coloringImage} />
+        <DownloadPDFButton
+          coloringImage={coloringImage}
+          getCanvasDataUrl={getCanvasDataUrl}
+        />
         <ShareButton
           url={typeof window !== 'undefined' ? window.location.href : ''}
           title={coloringImage.title || 'Coloring Page'}

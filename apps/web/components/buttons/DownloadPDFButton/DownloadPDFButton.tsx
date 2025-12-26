@@ -22,6 +22,7 @@ const formatTitleForFileName = (title: string | undefined): string => {
 
 type SaveButtonProps = {
   coloringImage: Partial<ColoringImage>;
+  getCanvasDataUrl?: () => string | null;
   className?: string;
 };
 
@@ -37,11 +38,13 @@ const PDFDownloadReady = ({
   imageSvg,
   qrCodeSvg,
   coloringImage,
+  coloredImageDataUrl,
   className,
 }: {
   imageSvg: string;
   qrCodeSvg: string;
   coloringImage: Partial<ColoringImage>;
+  coloredImageDataUrl?: string | null;
   className?: string;
 }) => {
   // Memoize the document to prevent unnecessary re-renders
@@ -51,9 +54,10 @@ const PDFDownloadReady = ({
         imageSvg={imageSvg}
         qrCodeSvg={qrCodeSvg}
         coloringImageId={coloringImage.id || ''}
+        coloredImageDataUrl={coloredImageDataUrl}
       />
     ),
-    [imageSvg, qrCodeSvg, coloringImage.id],
+    [imageSvg, qrCodeSvg, coloringImage.id, coloredImageDataUrl],
   );
 
   const [instance] = usePDF({ document });
@@ -111,12 +115,16 @@ const PDFDownloadReady = ({
 
 const DownloadPDFButtonContent = ({
   coloringImage,
+  getCanvasDataUrl,
   className,
 }: SaveButtonProps) => {
   const [imageSvg, setImageSvg] = useState<string | null>(null);
   const [qrCodeSvg, setQrCodeSvg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Get the user's colored canvas as a data URL for the PDF
+  const coloredImageDataUrl = getCanvasDataUrl?.() || null;
 
   // Fetch SVG data in the parent component (where hooks are supported)
   useEffect(() => {
@@ -187,6 +195,7 @@ const DownloadPDFButtonContent = ({
       imageSvg={imageSvg}
       qrCodeSvg={qrCodeSvg}
       coloringImage={coloringImage}
+      coloredImageDataUrl={coloredImageDataUrl}
       className={className}
     />
   );

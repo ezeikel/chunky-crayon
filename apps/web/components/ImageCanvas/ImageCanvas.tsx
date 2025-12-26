@@ -31,6 +31,7 @@ export type ImageCanvasHandle = {
   captureCanvasState: () => ImageData | null;
   clearCanvas: () => void;
   getCanvas: () => HTMLCanvasElement | null;
+  getCompositeCanvas: () => HTMLCanvasElement | null;
 };
 
 const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
@@ -105,14 +106,25 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       const ctx = canvas?.getContext('2d');
       if (!canvas || !ctx) return;
 
-      // Draw the saved image onto the canvas
-      ctx.drawImage(img, 0, 0);
+      // The context is scaled by DPR, so we need to draw at CSS dimensions
+      // (not the natural image dimensions) to avoid double-scaling
+      const cssWidth = parseFloat(canvas.style.width) || canvas.width;
+      const cssHeight = parseFloat(canvas.style.height) || canvas.height;
 
-      // Also update offscreen canvas
+      // Draw the saved image scaled to CSS dimensions
+      ctx.drawImage(img, 0, 0, cssWidth, cssHeight);
+
+      // Also update offscreen canvas (uses actual pixel dimensions, not CSS)
       if (offScreenCanvasRef.current) {
         const offCtx = offScreenCanvasRef.current.getContext('2d');
         if (offCtx) {
-          offCtx.drawImage(img, 0, 0);
+          offCtx.drawImage(
+            img,
+            0,
+            0,
+            offScreenCanvasRef.current.width,
+            offScreenCanvasRef.current.height,
+          );
         }
       }
     }, []);
@@ -144,6 +156,42 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       return drawingCanvasRef.current;
     }, []);
 
+    // Get a composite canvas with both drawing layer and line art merged
+    // This is used for saving artwork to gallery where we need the complete image
+    const getCompositeCanvas = useCallback(() => {
+      const drawingCanvas = drawingCanvasRef.current;
+      const imageCanvas = imageCanvasRef.current;
+      if (!drawingCanvas || !imageCanvas) return null;
+
+      // Create a composite canvas with same dimensions
+      const compositeCanvas = document.createElement('canvas');
+      compositeCanvas.width = drawingCanvas.width;
+      compositeCanvas.height = drawingCanvas.height;
+      const compositeCtx = compositeCanvas.getContext('2d');
+      if (!compositeCtx) return null;
+
+      // First, fill with white background (otherwise transparent areas cause issues)
+      compositeCtx.fillStyle = '#FFFFFF';
+      compositeCtx.fillRect(
+        0,
+        0,
+        compositeCanvas.width,
+        compositeCanvas.height,
+      );
+
+      // Draw the user's colors first
+      compositeCtx.drawImage(drawingCanvas, 0, 0);
+
+      // Draw the line art on top with multiply blend (same as how it's displayed)
+      compositeCtx.globalCompositeOperation = 'multiply';
+      compositeCtx.drawImage(imageCanvas, 0, 0);
+
+      // Reset composite operation
+      compositeCtx.globalCompositeOperation = 'source-over';
+
+      return compositeCanvas;
+    }, []);
+
     // Expose methods to parent via ref
     useImperativeHandle(
       ref,
@@ -153,6 +201,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         captureCanvasState,
         clearCanvas,
         getCanvas,
+        getCompositeCanvas,
       }),
       [
         restoreCanvasState,
@@ -160,6 +209,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         captureCanvasState,
         clearCanvas,
         getCanvas,
+        getCompositeCanvas,
       ],
     );
 
