@@ -196,21 +196,6 @@ const ColoLoading = ({
             </div>
           </div>
         )}
-
-        {/* "Colo is waking up" indicator */}
-        {audioState === 'preparing' && !isPlaying && (
-          <div className="absolute -top-2 left-1/2 -translate-x-1/2">
-            <div className="flex gap-1">
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="w-2 h-2 bg-crayon-orange rounded-full animate-bounce"
-                  style={{ animationDelay: `${i * 0.15}s` }}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Speech bubble when Colo is speaking */}
@@ -239,19 +224,6 @@ const ColoLoading = ({
             {description.length > 60 ? '...' : ''}&rdquo;
           </p>
         )}
-      </div>
-
-      {/* Progress dots */}
-      <div className="flex gap-2 mt-8">
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={cn(
-              'w-3 h-3 rounded-full bg-crayon-orange animate-bounce',
-            )}
-            style={{ animationDelay: `${i * 0.2}s` }}
-          />
-        ))}
       </div>
     </div>
   );

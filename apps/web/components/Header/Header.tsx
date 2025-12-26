@@ -12,14 +12,22 @@ import {
   faNewspaper,
   faImages,
   faHeart,
+  faBookOpen,
+  faTrophy,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
 import { getProfiles, getActiveProfile } from '@/app/actions/profiles';
+import { getMyStickerStats } from '@/app/actions/stickers';
+import { getMyColoState } from '@/app/actions/colo';
+import { getMyCurrentChallenge } from '@/app/actions/challenges';
 import { signOut } from '@/auth';
 import formatNumber from '@/utils/formatNumber';
 import HeaderDropdown from './HeaderDropdown';
 import HeaderProfileIndicator from './HeaderProfileIndicator';
+import HeaderStickerIndicator from './HeaderStickerIndicator';
+import HeaderChallengeIndicator from './HeaderChallengeIndicator';
+import HeaderColoIndicator from './HeaderColoIndicator';
 import MobileMenu from './MobileMenu';
 
 export type Visibility = 'always' | 'authenticated' | 'unauthenticated';
@@ -67,6 +75,11 @@ const ITEMS: NavItem[] = [
     visibility: 'authenticated',
   },
   {
+    label: 'Challenges',
+    href: '/account/challenges',
+    visibility: 'authenticated',
+  },
+  {
     label: 'Blog',
     href: '/blog',
     visibility: 'unauthenticated',
@@ -105,6 +118,16 @@ const getMobileItems = (user: Partial<User> | null): MobileNavItem[] => {
       label: 'My Artwork',
       iconName: faHeart,
       href: '/account/my-artwork',
+    });
+    items.push({
+      label: 'Sticker Book',
+      iconName: faBookOpen,
+      href: '/account/profiles/stickers',
+    });
+    items.push({
+      label: 'Challenges',
+      iconName: faTrophy,
+      href: '/account/challenges',
     });
     items.push({
       label: `${formatNumber(user.credits || 0)} credits`,
@@ -203,9 +226,12 @@ const Header = async () => {
   const user = await getCurrentUser();
   const mobileItems = getMobileItems(user);
 
-  // Fetch profiles for authenticated users
+  // Fetch profiles, sticker stats, challenge, and Colo state for authenticated users
   const profiles = user ? (await getProfiles()) || [] : [];
   const activeProfile = user ? await getActiveProfile() : null;
+  const stickerStats = user ? await getMyStickerStats() : null;
+  const coloState = user ? await getMyColoState() : null;
+  const currentChallenge = user ? await getMyCurrentChallenge() : null;
 
   const renderItems = () => {
     const visibleItems = ITEMS.filter((item) => {
@@ -223,8 +249,9 @@ const Header = async () => {
 
     if (user) {
       return (
-        <div className="flex items-center gap-6">
-          <nav className="hidden md:flex gap-8 items-center">
+        <div className="flex items-center gap-3 md:gap-6">
+          {/* Desktop nav - text links and profile/dropdown */}
+          <nav className="hidden md:flex gap-6 items-center">
             {visibleItems.map((item) => (
               <div key={item.href || item.label} className={item.liClass}>
                 {renderNavLink(item, user)}
@@ -237,6 +264,22 @@ const Header = async () => {
             />
             <HeaderDropdown user={user} signOutAction={handleSignOut} />
           </nav>
+
+          {/* Kid-facing items - ALWAYS visible for 3-8 year olds */}
+          <div className="flex items-center gap-2">
+            {/* Challenge indicator */}
+            <HeaderChallengeIndicator challengeData={currentChallenge} />
+            {/* Colo mascot indicator */}
+            {coloState && <HeaderColoIndicator coloState={coloState} />}
+            {/* Sticker indicator */}
+            {stickerStats && (
+              <HeaderStickerIndicator
+                totalUnlocked={stickerStats.totalUnlocked}
+                newCount={stickerStats.newCount}
+              />
+            )}
+          </div>
+
           <MobileMenu
             items={mobileItems}
             profiles={profiles}

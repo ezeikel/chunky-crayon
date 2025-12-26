@@ -6,9 +6,19 @@ import { db } from '@chunky-crayon/db';
 import { auth } from '@/auth';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
+import { checkAndAwardStickers } from '@/lib/stickers/service';
+import { checkAndUpdateColoEvolution } from '@/app/actions/colo';
+import type { Sticker } from '@/lib/stickers/types';
+import type { EvolutionResult } from '@/lib/colo';
 
 type SaveArtworkResult =
-  | { success: true; artworkId: string; imageUrl: string }
+  | {
+      success: true;
+      artworkId: string;
+      imageUrl: string;
+      newStickers: Sticker[];
+      evolutionResult: EvolutionResult | null;
+    }
   | { success: false; error: string };
 
 /**
@@ -71,6 +81,17 @@ export async function saveArtworkToGallery(
       },
     });
 
+    // Check for sticker unlocks after saving artwork
+    const { newStickers } = await checkAndAwardStickers(
+      userId,
+      activeProfile?.id,
+    );
+
+    // Check for Colo evolution after saving artwork
+    const evolutionResult = activeProfile?.id
+      ? await checkAndUpdateColoEvolution(activeProfile.id)
+      : null;
+
     // Revalidate the gallery page
     revalidatePath('/gallery');
     revalidatePath('/my-artwork');
@@ -79,6 +100,8 @@ export async function saveArtworkToGallery(
       success: true,
       artworkId: savedArtwork.id,
       imageUrl,
+      newStickers,
+      evolutionResult,
     };
   } catch (error) {
     console.error('Error saving artwork:', error);

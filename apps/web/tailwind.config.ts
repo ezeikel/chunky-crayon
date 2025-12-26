@@ -210,6 +210,23 @@ const config = {
           '30%': { transform: 'translateY(-4px)' },
           '60%': { transform: 'translateY(-2px)' },
         },
+        // Squish effect for button press
+        squish: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(0.9) rotate(-2deg)' },
+        },
+        // Happy jump animation
+        'happy-jump': {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '25%': { transform: 'translateY(-12px) rotate(-5deg)' },
+          '50%': { transform: 'translateY(0) rotate(0deg)' },
+          '75%': { transform: 'translateY(-8px) rotate(5deg)' },
+        },
+        // Reaction particle float up and fade
+        'reaction-float': {
+          '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+          '100%': { opacity: '0', transform: 'translateY(-40px) scale(1.5)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -226,6 +243,9 @@ const config = {
         shake: 'shake 0.5s ease-in-out',
         'sound-wave': 'sound-wave 0.6s ease-in-out infinite',
         'bounce-subtle': 'bounce-subtle 0.3s ease-out',
+        squish: 'squish 0.3s ease-out',
+        'happy-jump': 'happy-jump 0.6s ease-out',
+        'reaction-float': 'reaction-float 0.8s ease-out forwards',
       },
       boxShadow: {
         // Legacy shadow (keeping for backwards compatibility)

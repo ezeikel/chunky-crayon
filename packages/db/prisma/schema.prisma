@@ -25,6 +25,7 @@ model User {
   coloringImages     ColoringImage[]
   savedArtworks      SavedArtwork[] // User's saved colored artwork
   profiles           Profile[] // Multi-profile support for families
+  userStickers       UserSticker[] // Collected stickers
   // Auth.js relations
   accounts           Account[]
   sessions           Session[]
@@ -133,19 +134,23 @@ model StripeWebhookEvent {
 
 // Profile for multi-child accounts (parents can create profiles for each child)
 model Profile {
-  id         String     @id @default(cuid())
-  userId     String
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name       String // "Emma", "Jack", etc.
-  avatarId   String     @default("default") // References avatar SVG
-  ageGroup   AgeGroup   @default(CHILD)
-  difficulty Difficulty @default(BEGINNER) // Can be overridden in settings
-  isDefault  Boolean    @default(false) // First profile is default
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id              String     @id @default(cuid())
+  userId          String
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String // "Emma", "Jack", etc.
+  avatarId        String     @default("default") // References avatar SVG
+  ageGroup        AgeGroup   @default(CHILD)
+  difficulty      Difficulty @default(BEGINNER) // Can be overridden in settings
+  isDefault       Boolean    @default(false) // First profile is default
+  coloStage       Int        @default(1) // Colo evolution stage (1-6)
+  coloAccessories String[]   @default([]) // Unlocked Colo accessories ["astronaut-helmet", "crown"]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
-  coloringImages ColoringImage[]
-  savedArtworks  SavedArtwork[] // Saved colored artwork for this profile
+  coloringImages    ColoringImage[]
+  savedArtworks     SavedArtwork[] // Saved colored artwork for this profile
+  userStickers      UserSticker[] // Stickers earned by this profile
+  challengeProgress ProfileChallengeProgress[] // Weekly challenge progress
 
   @@map("profiles")
 }
@@ -166,6 +171,56 @@ model SavedArtwork {
   updatedAt       DateTime      @updatedAt
 
   @@map("saved_artworks")
+}
+
+// User's collected stickers - unlocked through coloring achievements
+model UserSticker {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profileId  String? // Which profile earned this sticker (optional)
+  profile    Profile? @relation(fields: [profileId], references: [id])
+  stickerId  String // References sticker ID from catalog (not a foreign key - stickers are static)
+  isNew      Boolean  @default(true) // Shows "NEW!" badge until viewed
+  unlockedAt DateTime @default(now())
+
+  // Prevent duplicate stickers per user
+  @@unique([userId, stickerId])
+  @@map("user_stickers")
+}
+
+// Weekly challenge schedule - which challenge is active for which week
+model WeeklyChallenge {
+  id          String    @id @default(cuid())
+  challengeId String // References challenge ID from catalog (static)
+  startDate   DateTime // When the challenge starts
+  endDate     DateTime // When the challenge ends
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  // Challenge progress for all profiles
+  progress ProfileChallengeProgress[]
+
+  @@map("weekly_challenges")
+}
+
+// Profile's progress on a weekly challenge
+model ProfileChallengeProgress {
+  id                String          @id @default(cuid())
+  profileId         String
+  profile           Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  weeklyChallengeId String
+  weeklyChallenge   WeeklyChallenge @relation(fields: [weeklyChallengeId], references: [id], onDelete: Cascade)
+  progress          Int             @default(0) // Current progress count
+  completed         Boolean         @default(false)
+  completedAt       DateTime?
+  rewardClaimed     Boolean         @default(false) // Has the reward been given?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // One progress record per profile per challenge
+  @@unique([profileId, weeklyChallengeId])
+  @@map("profile_challenge_progress")
 }
 
 enum GenerationType {

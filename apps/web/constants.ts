@@ -454,6 +454,14 @@ export const ACTIONS = {
   DELETE_PROFILE: 'delete profile',
   SET_ACTIVE_PROFILE: 'set active profile',
   GET_ACTIVE_PROFILE: 'get active profile',
+  // Colo evolution actions
+  GET_COLO_STATE: 'get colo state',
+  CHECK_COLO_EVOLUTION: 'check colo evolution',
+  // Challenge actions
+  GET_CURRENT_CHALLENGE: 'get current challenge',
+  GET_CHALLENGE_HISTORY: 'get challenge history',
+  UPDATE_CHALLENGE_PROGRESS: 'update challenge progress',
+  CLAIM_CHALLENGE_REWARD: 'claim challenge reward',
 };
 
 export type PlanInterval = 'monthly' | 'annual';

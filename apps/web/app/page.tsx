@@ -8,7 +8,10 @@ import RecentCreations from '@/components/RecentCreations';
 import Loading from '@/components/Loading/Loading';
 import UnsubscribeToast from '@/components/UnsubscribeToast/UnsubscribeToast';
 import HomePageContent from '@/components/HomePageContent';
+import { getMyColoState } from '@/app/actions/colo';
+import { getActiveProfile } from '@/app/actions/profiles';
 import type { ColoringImageSearchParams } from '@/types';
+import type { ColoState } from '@/lib/colo';
 
 export const maxDuration = 150;
 
@@ -25,6 +28,45 @@ type HomePageProps = {
   searchParams: Promise<ColoringImageSearchParams>;
 };
 
+// Async component to fetch Colo state inside Suspense boundary
+const ColoStateLoader = async (): Promise<ColoState | null> => {
+  const activeProfile = await getActiveProfile();
+  return activeProfile ? await getMyColoState() : null;
+};
+
+// Wrapper component that passes coloState to HomePageContent
+const HomePageWithColoState = async ({
+  searchParams,
+  form,
+  formLarge,
+  gallery,
+  galleryPreview,
+  socialProofStats,
+  recentCreations,
+}: {
+  searchParams: Promise<ColoringImageSearchParams>;
+  form: React.ReactNode;
+  formLarge: React.ReactNode;
+  gallery: React.ReactNode;
+  galleryPreview: React.ReactNode;
+  socialProofStats: React.ReactNode;
+  recentCreations: React.ReactNode;
+}) => {
+  const coloState = await ColoStateLoader();
+
+  return (
+    <HomePageContent
+      coloState={coloState}
+      form={form}
+      formLarge={formLarge}
+      gallery={gallery}
+      galleryPreview={galleryPreview}
+      socialProofStats={socialProofStats}
+      recentCreations={recentCreations}
+    />
+  );
+};
+
 // Main page - static shell with client-side auth-aware layout
 // Uses PPR: static page with dynamic pockets in Suspense boundaries
 const HomePage = async ({ searchParams }: HomePageProps) => {
@@ -37,6 +79,7 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
 
       {/* Client component handles auth-based layout switching */}
       {/* Form and gallery are server-rendered and passed as slots */}
+      {/* Wrapped in Suspense so coloState fetching doesn't block static generation */}
       <Suspense
         fallback={
           <div className="flex items-center justify-center min-h-[60vh]">
@@ -44,7 +87,8 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
           </div>
         }
       >
-        <HomePageContent
+        <HomePageWithColoState
+          searchParams={searchParams}
           form={
             <Suspense
               fallback={

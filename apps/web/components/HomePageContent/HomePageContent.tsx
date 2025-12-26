@@ -7,8 +7,11 @@ import Loading from '@/components/Loading/Loading';
 import Testimonials from '@/components/Testimonials';
 import FAQ from '@/components/FAQ';
 import DashboardHeader from './DashboardHeader';
+import type { ColoState } from '@/lib/colo';
 
 type HomePageContentProps = {
+  /** Colo mascot state for authenticated users */
+  coloState?: ColoState | null;
   /** Form for logged-out users (default size) */
   form: React.ReactNode;
   /** Form for logged-in users (large size) - optional, falls back to form */
@@ -24,6 +27,7 @@ type HomePageContentProps = {
 };
 
 const HomePageContent = ({
+  coloState,
   form,
   formLarge,
   gallery,
@@ -58,7 +62,7 @@ const HomePageContent = ({
         {/* Hero section - centered and focused */}
         <div className="flex flex-col items-center w-full max-w-2xl relative z-10">
           {/* Simple, playful greeting with sparkles */}
-          <DashboardHeader />
+          <DashboardHeader coloState={coloState} />
 
           {/* Centered, larger form */}
           <div className="w-full">{formLarge || form}</div>
