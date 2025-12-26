@@ -204,6 +204,12 @@ const config = {
           '0%, 100%': { transform: 'scaleY(0.5)', opacity: '0.5' },
           '50%': { transform: 'scaleY(1)', opacity: '1' },
         },
+        // Subtle bounce for zoom indicator - playful but not distracting
+        'bounce-subtle': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '30%': { transform: 'translateY(-4px)' },
+          '60%': { transform: 'translateY(-2px)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -219,6 +225,7 @@ const config = {
         'fade-in': 'fade-in 0.3s ease-out',
         shake: 'shake 0.5s ease-in-out',
         'sound-wave': 'sound-wave 0.6s ease-in-out infinite',
+        'bounce-subtle': 'bounce-subtle 0.3s ease-out',
       },
       boxShadow: {
         // Legacy shadow (keeping for backwards compatibility)

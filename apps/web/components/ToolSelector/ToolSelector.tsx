@@ -88,23 +88,47 @@ const EraserIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const PanIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {/* Hand/move icon - open palm */}
+    <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v0" />
+    <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+    <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+    <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2a8 8 0 0 1-8-8 2 2 0 1 1 4 0" />
+  </svg>
+);
+
 type ToolConfig = {
-  id: 'crayon' | 'marker' | 'fill' | 'eraser';
+  id: 'crayon' | 'marker' | 'fill' | 'eraser' | 'pan';
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 };
 
-const tools: ToolConfig[] = [
+const baseTools: ToolConfig[] = [
   { id: 'crayon', label: 'Crayon', icon: CrayonIcon },
   { id: 'marker', label: 'Marker', icon: MarkerIcon },
   { id: 'fill', label: 'Fill', icon: FillIcon },
   { id: 'eraser', label: 'Eraser', icon: EraserIcon },
 ];
 
+const panTool: ToolConfig = { id: 'pan', label: 'Move', icon: PanIcon };
+
 const ToolSelector = ({ className }: ToolSelectorProps) => {
-  const { activeTool, setActiveTool, brushType, setBrushType } =
+  const { activeTool, setActiveTool, brushType, setBrushType, zoom } =
     useColoringContext();
   const { playSound } = useSound();
+
+  // Show pan tool when zoomed in
+  const isZoomed = zoom > 1;
+  const tools = isZoomed ? [...baseTools, panTool] : baseTools;
 
   const handleToolSelect = (toolId: ToolConfig['id']) => {
     switch (toolId) {
@@ -124,6 +148,9 @@ const ToolSelector = ({ className }: ToolSelectorProps) => {
         setActiveTool('fill');
         // Keep current brush type for when user switches back
         break;
+      case 'pan':
+        setActiveTool('pan');
+        break;
     }
     playSound('pop');
   };
@@ -131,6 +158,9 @@ const ToolSelector = ({ className }: ToolSelectorProps) => {
   const isToolActive = (toolId: ToolConfig['id']) => {
     if (toolId === 'fill') {
       return activeTool === 'fill';
+    }
+    if (toolId === 'pan') {
+      return activeTool === 'pan';
     }
     // For brush-based tools, check both activeTool and brushType
     return activeTool === 'brush' && brushType === toolId;

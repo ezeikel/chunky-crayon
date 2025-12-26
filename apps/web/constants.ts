@@ -80,7 +80,38 @@ export const BRUSH_SIZES = {
 
 export type BrushSize = keyof typeof BRUSH_SIZES;
 export type BrushType = 'crayon' | 'marker' | 'eraser';
-export type ColoringTool = 'brush' | 'fill';
+export type ColoringTool = 'brush' | 'fill' | 'pan';
+
+// Fill pattern types for the fill tool
+export type FillPattern =
+  | 'solid'
+  | 'dots'
+  | 'stripes'
+  | 'stripes-diagonal'
+  | 'checkerboard'
+  | 'hearts'
+  | 'stars'
+  | 'zigzag';
+
+// Fill pattern configuration with kid-friendly names and icons
+export const FILL_PATTERNS = {
+  solid: { name: 'Solid', icon: '⬤', description: 'Fill with solid color' },
+  dots: { name: 'Polka Dots', icon: '⚬', description: 'Fun polka dot pattern' },
+  stripes: { name: 'Stripes', icon: '≡', description: 'Horizontal stripes' },
+  'stripes-diagonal': {
+    name: 'Diagonal',
+    icon: '⟋',
+    description: 'Diagonal stripes',
+  },
+  checkerboard: {
+    name: 'Checkers',
+    icon: '▦',
+    description: 'Checkerboard pattern',
+  },
+  hearts: { name: 'Hearts', icon: '♥', description: 'Lovely heart pattern' },
+  stars: { name: 'Stars', icon: '★', description: 'Sparkly star pattern' },
+  zigzag: { name: 'Zigzag', icon: '⚡', description: 'Zigzag waves' },
+} as const;
 
 export const NUMBER_OF_CONCURRENT_IMAGE_GENERATION_REQUESTS = 1;
 

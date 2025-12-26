@@ -3,7 +3,9 @@
 import ColorPalette from '@/components/ColorPalette/ColorPalette';
 import BrushSizeSelector from '@/components/BrushSizeSelector/BrushSizeSelector';
 import ToolSelector from '@/components/ToolSelector/ToolSelector';
+import PatternSelector from '@/components/PatternSelector/PatternSelector';
 import UndoRedoButtons from '@/components/UndoRedoButtons/UndoRedoButtons';
+import ZoomControls from '@/components/ZoomControls/ZoomControls';
 import { CanvasAction } from '@/contexts/coloring';
 import cn from '@/utils/cn';
 
@@ -28,6 +30,9 @@ const ColoringToolbar = ({
         {/* Tool Selector (Brush/Fill/Eraser) */}
         <ToolSelector className="shadow-lg" />
 
+        {/* Pattern Selector - shows only when fill tool is active */}
+        <PatternSelector className="shadow-lg" />
+
         {/* Brush Size Selector */}
         <BrushSizeSelector className="shadow-lg" />
 
@@ -37,6 +42,9 @@ const ColoringToolbar = ({
           onUndo={onUndo}
           onRedo={onRedo}
         />
+
+        {/* Zoom Controls */}
+        <ZoomControls className="shadow-lg" />
       </div>
     </div>
   );

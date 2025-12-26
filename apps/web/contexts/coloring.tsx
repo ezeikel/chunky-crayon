@@ -9,7 +9,17 @@ import {
   useCallback,
   useMemo,
 } from 'react';
-import type { BrushSize, BrushType, ColoringTool } from '@/constants';
+import type {
+  BrushSize,
+  BrushType,
+  ColoringTool,
+  FillPattern,
+} from '@/constants';
+
+// Zoom/Pan constants
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 4;
+const DEFAULT_ZOOM = 1;
 
 // Canvas action for undo/redo history
 export type CanvasAction = {
@@ -17,6 +27,8 @@ export type CanvasAction = {
   imageData: ImageData;
   timestamp: number;
 };
+
+type PanOffset = { x: number; y: number };
 
 type ColoringContextArgs = {
   // Color state
@@ -32,6 +44,19 @@ type ColoringContextArgs = {
   // Tool state
   activeTool: ColoringTool;
   setActiveTool: Dispatch<SetStateAction<ColoringTool>>;
+
+  // Fill pattern state
+  selectedPattern: FillPattern;
+  setSelectedPattern: Dispatch<SetStateAction<FillPattern>>;
+
+  // Zoom/Pan state
+  zoom: number;
+  panOffset: PanOffset;
+  setZoom: (zoom: number) => void;
+  setPanOffset: (offset: PanOffset) => void;
+  resetView: () => void;
+  minZoom: number;
+  maxZoom: number;
 
   // History state
   canUndo: boolean;
@@ -67,6 +92,15 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setBrushType: () => {},
   activeTool: 'brush',
   setActiveTool: () => {},
+  selectedPattern: 'solid',
+  setSelectedPattern: () => {},
+  zoom: DEFAULT_ZOOM,
+  panOffset: { x: 0, y: 0 },
+  setZoom: () => {},
+  setPanOffset: () => {},
+  resetView: () => {},
+  minZoom: MIN_ZOOM,
+  maxZoom: MAX_ZOOM,
   canUndo: false,
   canRedo: false,
   undoStack: [],
@@ -93,6 +127,13 @@ export const ColoringContextProvider = ({
 
   // Tool state
   const [activeTool, setActiveTool] = useState<ColoringTool>('brush');
+
+  // Fill pattern state
+  const [selectedPattern, setSelectedPattern] = useState<FillPattern>('solid');
+
+  // Zoom/Pan state
+  const [zoom, setZoomState] = useState(DEFAULT_ZOOM);
+  const [panOffset, setPanOffsetState] = useState<PanOffset>({ x: 0, y: 0 });
 
   // History state for undo/redo
   const [undoStack, setUndoStack] = useState<CanvasAction[]>([]);
@@ -148,6 +189,22 @@ export const ColoringContextProvider = ({
     setRedoStack([]);
   }, []);
 
+  // Zoom/Pan functions
+  const setZoom = useCallback((newZoom: number) => {
+    // Clamp zoom between min and max
+    const clampedZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
+    setZoomState(clampedZoom);
+  }, []);
+
+  const setPanOffset = useCallback((offset: PanOffset) => {
+    setPanOffsetState(offset);
+  }, []);
+
+  const resetView = useCallback(() => {
+    setZoomState(DEFAULT_ZOOM);
+    setPanOffsetState({ x: 0, y: 0 });
+  }, []);
+
   const value = useMemo(
     () => ({
       selectedColor,
@@ -158,6 +215,15 @@ export const ColoringContextProvider = ({
       setBrushType,
       activeTool,
       setActiveTool,
+      selectedPattern,
+      setSelectedPattern,
+      zoom,
+      panOffset,
+      setZoom,
+      setPanOffset,
+      resetView,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
       canUndo,
       canRedo,
       undoStack,
@@ -176,6 +242,12 @@ export const ColoringContextProvider = ({
       brushSize,
       brushType,
       activeTool,
+      selectedPattern,
+      zoom,
+      panOffset,
+      setZoom,
+      setPanOffset,
+      resetView,
       canUndo,
       canRedo,
       undoStack,

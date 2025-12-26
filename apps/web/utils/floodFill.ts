@@ -1,6 +1,9 @@
 /**
  * Queue-based flood fill algorithm for canvas
  * Uses a queue instead of recursion to prevent stack overflow on large areas
+ *
+ * Supports boundary-aware filling where boundaries are detected from a separate
+ * reference canvas (e.g., SVG lines) while filling is applied to the drawing canvas.
  */
 
 type RGBAColor = {
@@ -15,6 +18,18 @@ type FloodFillOptions = {
   y: number;
   fillColor: RGBAColor;
   tolerance?: number; // 0-255, handles anti-aliased edges
+  /**
+   * Optional boundary image data from a reference canvas (e.g., SVG lines + current drawing).
+   * When provided, the algorithm checks boundaries against this data instead of the fill canvas.
+   * This enables filling regions bounded by lines that exist on a separate canvas layer.
+   */
+  boundaryImageData?: ImageData;
+  /**
+   * Tolerance for detecting boundary pixels (darker pixels = boundaries).
+   * Pixels with luminance below this threshold are treated as boundaries.
+   * Default: 200 (treats dark lines as boundaries)
+   */
+  boundaryThreshold?: number;
 };
 
 /**
@@ -72,6 +87,35 @@ function setPixelColor(
   imageData.data[index + 1] = color.g;
   imageData.data[index + 2] = color.b;
   imageData.data[index + 3] = color.a;
+}
+
+/**
+ * Check if a pixel is a boundary (dark line) in the boundary image data.
+ * Uses luminance calculation to detect dark pixels that represent lines.
+ */
+function isBoundaryPixel(
+  boundaryImageData: ImageData,
+  x: number,
+  y: number,
+  threshold: number,
+): boolean {
+  const index = (y * boundaryImageData.width + x) * 4;
+  const r = boundaryImageData.data[index];
+  const g = boundaryImageData.data[index + 1];
+  const b = boundaryImageData.data[index + 2];
+  const a = boundaryImageData.data[index + 3];
+
+  // If pixel is transparent, it's not a boundary
+  if (a < 128) {
+    return false;
+  }
+
+  // Calculate luminance (perceived brightness)
+  // Using standard luminance formula: 0.299*R + 0.587*G + 0.114*B
+  const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+  // Pixel is a boundary if it's dark enough (below threshold)
+  return luminance < threshold;
 }
 
 /**
@@ -157,12 +201,22 @@ export function floodFill(
 /**
  * Optimized scanline flood fill - faster for large areas
  * Uses horizontal scanlines to reduce queue operations
+ *
+ * When boundaryImageData is provided, the algorithm checks for dark line boundaries
+ * in that image data, enabling filling of regions bounded by lines on separate canvas layers.
  */
 export function scanlineFill(
   ctx: CanvasRenderingContext2D,
   options: FloodFillOptions,
 ): boolean {
-  const { x, y, fillColor, tolerance = 32 } = options;
+  const {
+    x,
+    y,
+    fillColor,
+    tolerance = 32,
+    boundaryImageData,
+    boundaryThreshold = 200,
+  } = options;
   const canvas = ctx.canvas;
   const width = canvas.width;
   const height = canvas.height;
@@ -174,6 +228,14 @@ export function scanlineFill(
     return false;
   }
 
+  // If we have boundary data, check if we clicked on a boundary line
+  if (boundaryImageData) {
+    if (isBoundaryPixel(boundaryImageData, pixelX, pixelY, boundaryThreshold)) {
+      // Clicked on a line, don't fill
+      return false;
+    }
+  }
+
   const imageData = ctx.getImageData(0, 0, width, height);
   const targetColor = getPixelColor(imageData, pixelX, pixelY);
 
@@ -181,21 +243,40 @@ export function scanlineFill(
     return false;
   }
 
+  // Helper to check if a pixel can be filled
+  // Must match target color AND not be a boundary in the boundary image
+  const canFillPixel = (px: number, py: number): boolean => {
+    // First check if it matches the target color in the drawing canvas
+    if (
+      !colorsMatch(getPixelColor(imageData, px, py), targetColor, tolerance)
+    ) {
+      return false;
+    }
+    // If we have boundary data, also check it's not a boundary pixel
+    if (boundaryImageData) {
+      if (isBoundaryPixel(boundaryImageData, px, py, boundaryThreshold)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const stack: [number, number][] = [[pixelX, pixelY]];
+  // Use a Set for visited pixels to prevent re-processing
+  const visited = new Set<number>();
   let pixelsFilled = 0;
 
   while (stack.length > 0) {
     let [currentX, currentY] = stack.pop()!;
 
-    // Move left to find start of scanline
-    while (
-      currentX > 0 &&
-      colorsMatch(
-        getPixelColor(imageData, currentX - 1, currentY),
-        targetColor,
-        tolerance,
-      )
-    ) {
+    // Skip if already visited
+    const startKey = currentY * width + currentX;
+    if (visited.has(startKey)) {
+      continue;
+    }
+
+    // Move left to find start of scanline, checking boundaries
+    while (currentX > 0 && canFillPixel(currentX - 1, currentY)) {
       currentX--;
     }
 
@@ -203,43 +284,36 @@ export function scanlineFill(
     let spanBelow = false;
 
     // Fill the scanline from left to right
-    while (
-      currentX < width &&
-      colorsMatch(
-        getPixelColor(imageData, currentX, currentY),
-        targetColor,
-        tolerance,
-      )
-    ) {
-      setPixelColor(imageData, currentX, currentY, fillColor);
-      pixelsFilled++;
+    while (currentX < width && canFillPixel(currentX, currentY)) {
+      const pixelKey = currentY * width + currentX;
+      if (!visited.has(pixelKey)) {
+        visited.add(pixelKey);
+        setPixelColor(imageData, currentX, currentY, fillColor);
+        pixelsFilled++;
+      }
 
       // Check pixel above
       if (currentY > 0) {
-        const aboveMatches = colorsMatch(
-          getPixelColor(imageData, currentX, currentY - 1),
-          targetColor,
-          tolerance,
-        );
-        if (!spanAbove && aboveMatches) {
+        const aboveKey = (currentY - 1) * width + currentX;
+        const aboveCanFill =
+          !visited.has(aboveKey) && canFillPixel(currentX, currentY - 1);
+        if (!spanAbove && aboveCanFill) {
           stack.push([currentX, currentY - 1]);
           spanAbove = true;
-        } else if (spanAbove && !aboveMatches) {
+        } else if (spanAbove && !aboveCanFill) {
           spanAbove = false;
         }
       }
 
       // Check pixel below
       if (currentY < height - 1) {
-        const belowMatches = colorsMatch(
-          getPixelColor(imageData, currentX, currentY + 1),
-          targetColor,
-          tolerance,
-        );
-        if (!spanBelow && belowMatches) {
+        const belowKey = (currentY + 1) * width + currentX;
+        const belowCanFill =
+          !visited.has(belowKey) && canFillPixel(currentX, currentY + 1);
+        if (!spanBelow && belowCanFill) {
           stack.push([currentX, currentY + 1]);
           spanBelow = true;
-        } else if (spanBelow && !belowMatches) {
+        } else if (spanBelow && !belowCanFill) {
           spanBelow = false;
         }
       }
