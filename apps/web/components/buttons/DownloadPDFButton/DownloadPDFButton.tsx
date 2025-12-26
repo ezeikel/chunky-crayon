@@ -26,8 +26,9 @@ type SaveButtonProps = {
 };
 
 // Kid-friendly button: big, colorful, clear language
+// Responsive: icon-only on mobile (44px touch target), icon+text on desktop
 const buttonClassName =
-  'flex items-center justify-center gap-x-3 text-white font-bold text-lg px-8 py-4 rounded-full shadow-lg bg-crayon-orange hover:bg-crayon-orange-dark active:scale-95 transition-all duration-150';
+  'flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-crayon-orange hover:bg-crayon-orange-dark active:scale-95 transition-all duration-150';
 
 // Inner component that renders the PDF once all data is ready
 // This avoids the "Cannot read properties of null" error by only calling usePDF
@@ -64,8 +65,11 @@ const PDFDownloadReady = ({
         disabled
         type="button"
       >
-        <FontAwesomeIcon icon={faPrint} className="text-2xl animate-pulse" />
-        Loading...
+        <FontAwesomeIcon
+          icon={faPrint}
+          className="text-xl md:text-2xl animate-pulse"
+        />
+        <span className="hidden md:inline">Loading...</span>
       </button>
     );
   }
@@ -81,8 +85,8 @@ const PDFDownloadReady = ({
         disabled
         type="button"
       >
-        <FontAwesomeIcon icon={faPrint} className="text-2xl" />
-        Oops!
+        <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
+        <span className="hidden md:inline">Oops!</span>
       </button>
     );
   }
@@ -99,8 +103,8 @@ const PDFDownloadReady = ({
         });
       }}
     >
-      <FontAwesomeIcon icon={faPrint} className="text-2xl" />
-      Print
+      <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
+      <span className="hidden md:inline">Print</span>
     </a>
   );
 };
@@ -151,8 +155,11 @@ const DownloadPDFButtonContent = ({
         disabled
         type="button"
       >
-        <FontAwesomeIcon icon={faPrint} className="text-2xl animate-pulse" />
-        Loading...
+        <FontAwesomeIcon
+          icon={faPrint}
+          className="text-xl md:text-2xl animate-pulse"
+        />
+        <span className="hidden md:inline">Loading...</span>
       </button>
     );
   }
@@ -168,8 +175,8 @@ const DownloadPDFButtonContent = ({
         disabled
         type="button"
       >
-        <FontAwesomeIcon icon={faPrint} className="text-2xl" />
-        Oops!
+        <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
+        <span className="hidden md:inline">Oops!</span>
       </button>
     );
   }

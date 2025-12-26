@@ -20,8 +20,9 @@ type ShareButtonProps = {
 type ShareState = 'idle' | 'gate' | 'uploading' | 'sharing';
 
 // Kid-friendly button style (matches Start Over button)
+// Responsive: icon-only on mobile (44px touch target), icon+text on desktop
 const buttonClassName =
-  'flex items-center justify-center gap-x-3 text-white font-bold text-lg px-8 py-4 rounded-full shadow-lg bg-crayon-purple hover:bg-crayon-purple-dark active:scale-95 transition-all duration-150';
+  'flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-crayon-purple hover:bg-crayon-purple-dark active:scale-95 transition-all duration-150';
 
 const ShareButton = ({
   url,
@@ -96,29 +97,41 @@ const ShareButton = ({
         disabled
         className={cn(buttonClassName, 'cursor-wait opacity-80', className)}
       >
-        <FontAwesomeIcon icon={faSpinner} className="text-2xl animate-spin" />
-        Preparing...
+        <FontAwesomeIcon
+          icon={faSpinner}
+          className="text-xl md:text-2xl animate-spin"
+        />
+        <span className="hidden md:inline">Preparing...</span>
       </button>
     );
   }
 
-  // Show social share options after gate passed
+  // Show social share options after gate passed - as modal overlay
   if (state === 'sharing') {
     return (
-      <div className={cn('flex flex-col items-center gap-3', className)}>
-        <SocialShare
-          url={url}
-          title={title}
-          description={description}
-          imageUrl={shareImageUrl}
-        />
-        <button
-          type="button"
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           onClick={handleClose}
-          className="text-sm text-text-secondary hover:text-text-primary underline"
-        >
-          Done sharing
-        </button>
+          aria-hidden="true"
+        />
+        {/* Share panel */}
+        <div className="relative z-10 bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full">
+          <SocialShare
+            url={url}
+            title={title}
+            description={description}
+            imageUrl={shareImageUrl}
+          />
+          <button
+            type="button"
+            onClick={handleClose}
+            className="mt-4 w-full text-center text-sm text-text-secondary hover:text-text-primary underline"
+          >
+            Done sharing
+          </button>
+        </div>
       </div>
     );
   }
@@ -130,8 +143,8 @@ const ShareButton = ({
       onClick={handleShareClick}
       className={cn(buttonClassName, className)}
     >
-      <FontAwesomeIcon icon={faShare} className="text-2xl" />
-      Share
+      <FontAwesomeIcon icon={faShare} className="text-xl md:text-2xl" />
+      <span className="hidden md:inline">Share</span>
     </button>
   );
 };

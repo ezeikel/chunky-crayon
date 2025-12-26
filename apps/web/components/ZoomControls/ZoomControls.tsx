@@ -86,7 +86,7 @@ const ZoomIndicator = ({
   return (
     <div
       className={cn(
-        'flex items-center gap-1.5 px-2',
+        'hidden sm:flex items-center gap-1.5 px-2',
         isAnimating && 'animate-bounce-subtle',
       )}
       aria-label={`Zoom level: ${Math.round(zoom * 100)}%`}
@@ -148,7 +148,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         onClick={handleZoomOut}
         disabled={isAtMinZoom}
         className={cn(
-          'flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150',
+          'flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150',
           'hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
           {
             'opacity-50 cursor-not-allowed hover:bg-transparent': isAtMinZoom,
@@ -157,7 +157,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         aria-label="Zoom out (see more)"
         title="Zoom out"
       >
-        <ZoomOutIcon className="size-5 sm:size-6" />
+        <ZoomOutIcon className="size-4 sm:size-5 md:size-6" />
       </button>
 
       {/* Visual Zoom Level Indicator */}
@@ -169,7 +169,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         onClick={handleZoomIn}
         disabled={isAtMaxZoom}
         className={cn(
-          'flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150',
+          'flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150',
           'hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
           {
             'opacity-50 cursor-not-allowed hover:bg-transparent': isAtMaxZoom,
@@ -178,7 +178,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         aria-label="Zoom in (see closer)"
         title="Zoom in"
       >
-        <ZoomInIcon className="size-5 sm:size-6" />
+        <ZoomInIcon className="size-4 sm:size-5 md:size-6" />
       </button>
 
       {/* Reset View - only show when zoomed */}
@@ -188,13 +188,13 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
           onClick={handleResetView}
           disabled={isAtDefaultView}
           className={cn(
-            'flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150',
+            'flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150',
             'bg-crayon-orange/10 hover:bg-crayon-orange/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
           )}
           aria-label="Go back to full picture"
           title="See whole picture"
         >
-          <HomeIcon className="size-5 sm:size-6 text-crayon-orange" />
+          <HomeIcon className="size-4 sm:size-5 md:size-6 text-crayon-orange" />
         </button>
       )}
     </div>

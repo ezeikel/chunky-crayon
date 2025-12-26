@@ -17,8 +17,9 @@ type SaveToGalleryButtonProps = {
 type SaveState = 'idle' | 'saving' | 'success' | 'error';
 
 // Kid-friendly button style
+// Responsive: icon-only on mobile (44px touch target), icon+text on desktop
 const buttonClassName =
-  'flex items-center justify-center gap-x-3 text-white font-bold text-lg px-8 py-4 rounded-full shadow-lg transition-all duration-150';
+  'flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg transition-all duration-150';
 
 const SaveToGalleryButton = ({
   coloringImageId,
@@ -80,8 +81,11 @@ const SaveToGalleryButton = ({
             className,
           )}
         >
-          <FontAwesomeIcon icon={faSpinner} className="text-2xl animate-spin" />
-          Saving...
+          <FontAwesomeIcon
+            icon={faSpinner}
+            className="text-xl md:text-2xl animate-spin"
+          />
+          <span className="hidden md:inline">Saving...</span>
         </button>
       );
     }
@@ -98,8 +102,8 @@ const SaveToGalleryButton = ({
             className,
           )}
         >
-          <FontAwesomeIcon icon={faCheck} className="text-2xl" />
-          Saved!
+          <FontAwesomeIcon icon={faCheck} className="text-xl md:text-2xl" />
+          <span className="hidden md:inline">Saved!</span>
         </button>
       );
     }
@@ -116,8 +120,8 @@ const SaveToGalleryButton = ({
               'bg-crayon-pink hover:bg-crayon-pink-dark active:scale-95',
             )}
           >
-            <FontAwesomeIcon icon={faHeart} className="text-2xl" />
-            Try Again
+            <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
+            <span className="hidden md:inline">Try Again</span>
           </button>
           {errorMessage && (
             <p className="text-sm text-crayon-pink">{errorMessage}</p>
@@ -137,8 +141,8 @@ const SaveToGalleryButton = ({
           className,
         )}
       >
-        <FontAwesomeIcon icon={faHeart} className="text-2xl" />
-        Save to Gallery
+        <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
+        <span className="hidden md:inline">Save to Gallery</span>
       </button>
     );
   };

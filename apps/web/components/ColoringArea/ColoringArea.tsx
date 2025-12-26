@@ -6,8 +6,10 @@ import ImageCanvas, {
   ImageCanvasHandle,
 } from '@/components/ImageCanvas/ImageCanvas';
 import ColoringToolbar from '@/components/ColoringToolbar/ColoringToolbar';
+import MobileColoringToolbar from '@/components/MobileColoringToolbar/MobileColoringToolbar';
 import ProgressIndicator from '@/components/ProgressIndicator';
 import MuteToggle from '@/components/MuteToggle';
+import ZoomControls from '@/components/ZoomControls/ZoomControls';
 import DownloadPDFButton from '@/components/buttons/DownloadPDFButton/DownloadPDFButton';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
 import ShareButton from '@/components/buttons/ShareButton';
@@ -175,26 +177,45 @@ const ColoringArea = ({
   }, [coloringImage.id, clearHistory, setHasUnsavedChanges, playSound]);
 
   return (
-    <div className="flex flex-col gap-y-4">
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+    <div className="flex flex-col gap-y-2 md:gap-y-3">
+      {/* Desktop Toolbar (md and up) - Traditional top toolbar */}
+      <div className="hidden md:flex flex-wrap items-center justify-center gap-3">
         <ColoringToolbar
           className="self-center"
           onUndo={handleUndo}
           onRedo={handleRedo}
         />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <ProgressIndicator getCanvas={getCanvas} className="relative" />
           <MuteToggle />
         </div>
       </div>
-      <ImageCanvas
-        ref={canvasRef}
-        coloringImage={coloringImage}
-        className="rounded-lg shadow-lg bg-white overflow-hidden"
-        onCanvasReady={handleCanvasReady}
-        onFirstInteraction={handleFirstInteraction}
-      />
-      <div className="flex flex-wrap items-center justify-center gap-3">
+
+      {/* Mobile Top Bar - Minimal with progress, mute, and zoom */}
+      <div className="md:hidden flex items-center justify-between px-1">
+        <div className="flex items-center gap-1.5">
+          <ProgressIndicator
+            getCanvas={getCanvas}
+            className="relative scale-90 origin-left"
+          />
+          <MuteToggle />
+        </div>
+        <ZoomControls className="shadow-sm" />
+      </div>
+
+      {/* Canvas - Shared between mobile and desktop */}
+      <div className="flex-1 flex items-center justify-center md:block">
+        <ImageCanvas
+          ref={canvasRef}
+          coloringImage={coloringImage}
+          className="rounded-lg shadow-lg bg-white overflow-hidden"
+          onCanvasReady={handleCanvasReady}
+          onFirstInteraction={handleFirstInteraction}
+        />
+      </div>
+
+      {/* Action buttons - Desktop style */}
+      <div className="hidden md:flex flex-wrap items-center justify-center gap-3">
         <StartOverButton onStartOver={handleStartOver} />
         <DownloadPDFButton coloringImage={coloringImage} />
         <ShareButton
@@ -211,6 +232,32 @@ const ColoringArea = ({
           />
         )}
       </div>
+
+      {/* Mobile Action buttons - Compact row with icon-only buttons */}
+      <div className="md:hidden flex items-center justify-center gap-3 py-2 px-2 mb-36">
+        <StartOverButton onStartOver={handleStartOver} />
+        <DownloadPDFButton coloringImage={coloringImage} />
+        <ShareButton
+          url={typeof window !== 'undefined' ? window.location.href : ''}
+          title={coloringImage.title || 'Coloring Page'}
+          description={`Color this ${coloringImage.title || 'fun coloring page'} on Chunky Crayon!`}
+          imageUrl={coloringImage.url || undefined}
+          getCanvasDataUrl={getCanvasDataUrl}
+        />
+        {isAuthenticated && coloringImage.id && (
+          <SaveToGalleryButton
+            coloringImageId={coloringImage.id}
+            getCanvasDataUrl={getCanvasDataUrl}
+          />
+        )}
+      </div>
+
+      {/* Fixed bottom toolbar for mobile */}
+      <MobileColoringToolbar
+        className="md:hidden"
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+      />
     </div>
   );
 };
