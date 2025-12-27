@@ -5,7 +5,7 @@ import {
   getAllColoringImagesStatic,
 } from '@/app/data/coloring-image';
 import { auth } from '@/auth';
-import ColoringArea from '@/components/ColoringArea/ColoringArea';
+import ColoringPageContent from '@/components/ColoringPageContent/ColoringPageContent';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
@@ -150,20 +150,12 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
         ]}
       />
 
-      {/* Title - clean and minimal */}
-      <h1 className="font-tondo font-bold text-2xl md:text-3xl text-text-primary text-center">
-        {coloringImage.title}
-      </h1>
-
-      {/* Coloring Area - clean white card matching gallery aesthetic */}
-      <div className="max-w-3xl w-full mx-auto">
-        <div className="bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 shadow-sm">
-          <ColoringArea
-            coloringImage={coloringImage}
-            isAuthenticated={isAuthenticated}
-          />
-        </div>
-      </div>
+      {/* Coloring Page Content - includes title with progress/mute on desktop */}
+      <ColoringPageContent
+        coloringImage={coloringImage}
+        isAuthenticated={isAuthenticated}
+        title={coloringImage.title || 'Coloring Page'}
+      />
     </PageWrap>
   );
 };

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHand } from '@fortawesome/pro-duotone-svg-icons';
 import { useColoringContext } from '@/contexts/coloring';
 import { useSound } from '@/hooks/useSound';
 import cn from '@/utils/cn';
@@ -109,7 +111,15 @@ const ZoomIndicator = ({
 const ZOOM_STEP = 0.5;
 
 const ZoomControls = ({ className }: ZoomControlsProps) => {
-  const { zoom, setZoom, resetView, minZoom, maxZoom } = useColoringContext();
+  const {
+    zoom,
+    setZoom,
+    resetView,
+    minZoom,
+    maxZoom,
+    activeTool,
+    setActiveTool,
+  } = useColoringContext();
   const { playSound } = useSound();
 
   const handleZoomIn = () => {
@@ -129,10 +139,21 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
     playSound('pop');
   };
 
+  const handlePanToggle = () => {
+    if (activeTool === 'pan') {
+      // Switch back to brush when pan is deselected
+      setActiveTool('brush');
+    } else {
+      setActiveTool('pan');
+    }
+    playSound('pop');
+  };
+
   const isAtMinZoom = zoom <= minZoom;
   const isAtMaxZoom = zoom >= maxZoom;
   const isAtDefaultView = zoom === 1;
   const isZoomed = zoom > 1;
+  const isPanActive = activeTool === 'pan';
 
   return (
     <div
@@ -180,6 +201,28 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
       >
         <ZoomInIcon className="size-4 sm:size-5 md:size-6" />
       </button>
+
+      {/* Pan/Move Tool - only show when zoomed */}
+      {isZoomed && (
+        <button
+          type="button"
+          onClick={handlePanToggle}
+          className={cn(
+            'flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150',
+            'hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
+            isPanActive &&
+              'bg-crayon-orange text-white hover:bg-crayon-orange/90',
+          )}
+          aria-label="Move around the picture"
+          title="Move"
+          aria-pressed={isPanActive}
+        >
+          <FontAwesomeIcon
+            icon={faHand}
+            className="size-4 sm:size-5 md:size-6"
+          />
+        </button>
+      )}
 
       {/* Reset View - only show when zoomed */}
       {isZoomed && (
