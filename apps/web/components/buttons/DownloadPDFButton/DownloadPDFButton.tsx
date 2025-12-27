@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { ColoringImage } from '@chunky-crayon/db/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPrint } from '@fortawesome/pro-solid-svg-icons';
-import { usePDF } from '@react-pdf/renderer';
+import { pdf } from '@react-pdf/renderer';
 import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/ColoringPageDocument';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
@@ -31,87 +31,7 @@ type SaveButtonProps = {
 const buttonClassName =
   'flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-crayon-orange hover:bg-crayon-orange-dark active:scale-95 transition-all duration-150';
 
-// Inner component that renders the PDF once all data is ready
-// This avoids the "Cannot read properties of null" error by only calling usePDF
-// when we have a valid document to render
-const PDFDownloadReady = ({
-  imageSvg,
-  qrCodeSvg,
-  coloringImage,
-  coloredImageDataUrl,
-  className,
-}: {
-  imageSvg: string;
-  qrCodeSvg: string;
-  coloringImage: Partial<ColoringImage>;
-  coloredImageDataUrl?: string | null;
-  className?: string;
-}) => {
-  // Memoize the document to prevent unnecessary re-renders
-  const document = useMemo(
-    () => (
-      <ColoringPageDocument
-        imageSvg={imageSvg}
-        qrCodeSvg={qrCodeSvg}
-        coloringImageId={coloringImage.id || ''}
-        coloredImageDataUrl={coloredImageDataUrl}
-      />
-    ),
-    [imageSvg, qrCodeSvg, coloringImage.id, coloredImageDataUrl],
-  );
-
-  const [instance] = usePDF({ document });
-
-  if (instance.loading) {
-    return (
-      <button
-        className={cn(buttonClassName, 'opacity-60 cursor-wait', className)}
-        disabled
-        type="button"
-      >
-        <FontAwesomeIcon
-          icon={faPrint}
-          className="text-xl md:text-2xl animate-pulse"
-        />
-        <span className="hidden md:inline">Loading...</span>
-      </button>
-    );
-  }
-
-  if (instance.error) {
-    return (
-      <button
-        className={cn(
-          buttonClassName,
-          'opacity-60 cursor-not-allowed',
-          className,
-        )}
-        disabled
-        type="button"
-      >
-        <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
-        <span className="hidden md:inline">Oops!</span>
-      </button>
-    );
-  }
-
-  return (
-    <a
-      href={instance.url || '#'}
-      download={formatTitleForFileName(coloringImage.title)}
-      className={cn(buttonClassName, className)}
-      onClick={() => {
-        trackEvent(TRACKING_EVENTS.DOWNLOAD_PDF_CLICKED, {
-          coloringImageId: coloringImage.id as string,
-          title: coloringImage.title,
-        });
-      }}
-    >
-      <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
-      <span className="hidden md:inline">Print</span>
-    </a>
-  );
-};
+type GeneratingState = 'idle' | 'generating' | 'error';
 
 const DownloadPDFButtonContent = ({
   coloringImage,
@@ -122,9 +42,8 @@ const DownloadPDFButtonContent = ({
   const [qrCodeSvg, setQrCodeSvg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Get the user's colored canvas as a data URL for the PDF
-  const coloredImageDataUrl = getCanvasDataUrl?.() || null;
+  const [generatingState, setGeneratingState] =
+    useState<GeneratingState>('idle');
 
   // Fetch SVG data in the parent component (where hooks are supported)
   useEffect(() => {
@@ -151,6 +70,56 @@ const DownloadPDFButtonContent = ({
 
     loadSvgs();
   }, [coloringImage?.svgUrl, coloringImage?.qrCodeUrl]);
+
+  // Generate PDF on-demand when clicked (captures fresh canvas data at click time)
+  const handlePrint = useCallback(async () => {
+    if (!imageSvg || !qrCodeSvg) return;
+
+    setGeneratingState('generating');
+
+    try {
+      // Capture fresh canvas data at click time (not at render time!)
+      // This is the key fix - getCanvasDataUrl is called when user clicks,
+      // so we get the current colored state, not stale/empty data
+      const coloredImageDataUrl = getCanvasDataUrl?.() || null;
+
+      trackEvent(TRACKING_EVENTS.DOWNLOAD_PDF_CLICKED, {
+        coloringImageId: coloringImage.id as string,
+        title: coloringImage.title,
+      });
+
+      // Create PDF document with current canvas state
+      const doc = (
+        <ColoringPageDocument
+          imageSvg={imageSvg}
+          qrCodeSvg={qrCodeSvg}
+          coloringImageId={coloringImage.id || ''}
+          coloredImageDataUrl={coloredImageDataUrl}
+        />
+      );
+
+      // Generate PDF blob on-demand
+      const blob = await pdf(doc).toBlob();
+      const url = URL.createObjectURL(blob);
+
+      // Trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = formatTitleForFileName(coloringImage.title);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up blob URL
+      URL.revokeObjectURL(url);
+      setGeneratingState('idle');
+    } catch (err) {
+      console.error('Failed to generate PDF:', err);
+      setGeneratingState('error');
+      // Reset error state after 2 seconds
+      setTimeout(() => setGeneratingState('idle'), 2000);
+    }
+  }, [imageSvg, qrCodeSvg, coloringImage, getCanvasDataUrl]);
 
   if (!coloringImage) {
     return null;
@@ -189,15 +158,48 @@ const DownloadPDFButtonContent = ({
     );
   }
 
-  // Only render the PDF component when all data is ready
+  if (generatingState === 'generating') {
+    return (
+      <button
+        className={cn(buttonClassName, 'opacity-60 cursor-wait', className)}
+        disabled
+        type="button"
+      >
+        <FontAwesomeIcon
+          icon={faPrint}
+          className="text-xl md:text-2xl animate-pulse"
+        />
+        <span className="hidden md:inline">Creating...</span>
+      </button>
+    );
+  }
+
+  if (generatingState === 'error') {
+    return (
+      <button
+        className={cn(
+          buttonClassName,
+          'opacity-60 cursor-not-allowed',
+          className,
+        )}
+        disabled
+        type="button"
+      >
+        <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
+        <span className="hidden md:inline">Oops!</span>
+      </button>
+    );
+  }
+
   return (
-    <PDFDownloadReady
-      imageSvg={imageSvg}
-      qrCodeSvg={qrCodeSvg}
-      coloringImage={coloringImage}
-      coloredImageDataUrl={coloredImageDataUrl}
-      className={className}
-    />
+    <button
+      type="button"
+      onClick={handlePrint}
+      className={cn(buttonClassName, className)}
+    >
+      <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
+      <span className="hidden md:inline">Print</span>
+    </button>
   );
 };
 
