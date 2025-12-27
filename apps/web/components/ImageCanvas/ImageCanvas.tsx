@@ -439,30 +439,102 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           const devicePixelRatio = window.devicePixelRatio || 1;
           setDpr(devicePixelRatio);
 
-          drawingCanvas.width = newWidth * devicePixelRatio;
-          drawingCanvas.height = newHeight * devicePixelRatio;
-          imageCanvas.width = newWidth * devicePixelRatio;
-          imageCanvas.height = newHeight * devicePixelRatio;
+          // Capture existing drawing BEFORE resizing canvases
+          // We need to save it at the current resolution to scale it properly
+          let savedDrawing: ImageData | null = null;
+          const oldOffScreen = offScreenCanvasRef.current;
+          if (
+            oldOffScreen &&
+            oldOffScreen.width > 0 &&
+            oldOffScreen.height > 0
+          ) {
+            const oldCtx = oldOffScreen.getContext('2d');
+            if (oldCtx) {
+              savedDrawing = oldCtx.getImageData(
+                0,
+                0,
+                oldOffScreen.width,
+                oldOffScreen.height,
+              );
+            }
+          }
+          const oldWidth = oldOffScreen?.width || 0;
+          const oldHeight = oldOffScreen?.height || 0;
+
+          // Resize canvases to new dimensions
+          const newCanvasWidth = newWidth * devicePixelRatio;
+          const newCanvasHeight = newHeight * devicePixelRatio;
+
+          drawingCanvas.width = newCanvasWidth;
+          drawingCanvas.height = newCanvasHeight;
+          imageCanvas.width = newCanvasWidth;
+          imageCanvas.height = newCanvasHeight;
 
           drawingCanvas.style.width = `${newWidth}px`;
           drawingCanvas.style.height = `${newHeight}px`;
           imageCanvas.style.width = `${newWidth}px`;
           imageCanvas.style.height = `${newHeight}px`;
 
-          drawingCtx.scale(devicePixelRatio, devicePixelRatio);
-          imageCtx.scale(devicePixelRatio, devicePixelRatio);
+          // IMPORTANT: Reset transform before applying new scale
+          // Setting canvas.width resets the context, but we need explicit scale
+          drawingCtx.setTransform(
+            devicePixelRatio,
+            0,
+            0,
+            devicePixelRatio,
+            0,
+            0,
+          );
+          imageCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
 
+          // Redraw SVG on image canvas
           drawImageOnCanvas(svgImage, imageCtx, newWidth, newHeight);
 
+          // Resize offscreen canvas and restore drawing at new resolution
           if (offScreenCanvasRef.current) {
-            const offScreenCtx = offScreenCanvasRef.current?.getContext('2d');
+            // Create temp canvas with old content for scaling
+            const tempCanvas = document.createElement('canvas');
+            if (savedDrawing && oldWidth > 0 && oldHeight > 0) {
+              tempCanvas.width = oldWidth;
+              tempCanvas.height = oldHeight;
+              const tempCtx = tempCanvas.getContext('2d');
+              if (tempCtx) {
+                tempCtx.putImageData(savedDrawing, 0, 0);
+              }
+            }
 
-            if (offScreenCtx) {
-              redrawDrawingCanvas(
-                drawingCtx,
-                offScreenCtx,
-                newWidth * devicePixelRatio,
-                newHeight * devicePixelRatio,
+            // Resize offscreen canvas to new dimensions
+            offScreenCanvasRef.current.width = newCanvasWidth;
+            offScreenCanvasRef.current.height = newCanvasHeight;
+            const offScreenCtx = offScreenCanvasRef.current.getContext('2d');
+
+            if (offScreenCtx && savedDrawing && oldWidth > 0 && oldHeight > 0) {
+              // Scale old drawing to new canvas size
+              // This preserves the visual appearance across resize
+              offScreenCtx.drawImage(
+                tempCanvas,
+                0,
+                0,
+                oldWidth,
+                oldHeight,
+                0,
+                0,
+                newCanvasWidth,
+                newCanvasHeight,
+              );
+
+              // Also draw scaled content to visible canvas
+              // Use CSS coordinates since context is scaled by DPR
+              drawingCtx.drawImage(
+                tempCanvas,
+                0,
+                0,
+                oldWidth,
+                oldHeight,
+                0,
+                0,
+                newWidth,
+                newHeight,
               );
             }
           }

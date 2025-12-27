@@ -42,26 +42,21 @@ const StartOverButton = ({
 
   if (showConfirm) {
     return (
-      <div className={cn('flex items-center gap-x-1.5 md:gap-x-2', className)}>
+      <div className={cn('flex flex-col gap-2', className)}>
         <button
           type="button"
           onClick={handleClick}
-          className="flex items-center justify-center gap-x-1.5 text-white font-bold text-sm md:text-base px-3 py-2 md:px-6 md:py-3 rounded-full shadow-lg bg-crayon-pink hover:bg-crayon-pink-dark active:scale-95 transition-all duration-150"
+          className="flex items-center justify-center gap-x-2 text-white font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-crayon-pink hover:bg-crayon-pink-dark active:scale-95 transition-all duration-150"
         >
-          <FontAwesomeIcon
-            icon={faArrowRotateLeft}
-            className="text-base md:text-xl"
-          />
-          <span className="hidden md:inline">Yes, Start Over</span>
-          <span className="md:hidden">Yes</span>
+          <FontAwesomeIcon icon={faArrowRotateLeft} className="text-base" />
+          <span>Yes, Start Over</span>
         </button>
         <button
           type="button"
           onClick={handleCancel}
-          className="flex items-center justify-center text-text-secondary font-bold text-sm md:text-base px-3 py-2 md:px-6 md:py-3 rounded-full shadow-lg bg-white hover:bg-paper-cream active:scale-95 transition-all duration-150 border-2 border-paper-cream-dark"
+          className="flex items-center justify-center text-text-secondary font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-white hover:bg-paper-cream active:scale-95 transition-all duration-150 border-2 border-paper-cream-dark"
         >
-          <span className="hidden md:inline">Keep Coloring</span>
-          <span className="md:hidden">No</span>
+          Keep Coloring
         </button>
       </div>
     );

@@ -38,6 +38,11 @@ type ColoringAreaProps = {
 
 export type ColoringAreaHandle = {
   getCanvas: () => HTMLCanvasElement | null;
+  getCanvasDataUrl: () => string | null;
+  handleUndo: (action: CanvasAction) => void;
+  handleRedo: (action: CanvasAction) => void;
+  handleStartOver: () => void;
+  openStickerSelector: () => void;
 };
 
 const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
@@ -169,10 +174,98 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       return canvasRef.current?.getCanvas() || null;
     }, []);
 
-    // Expose getCanvas to parent via ref
-    useImperativeHandle(ref, () => ({
-      getCanvas,
-    }));
+    // Handle undo by restoring the canvas to the state before the action
+    const handleUndo = useCallback(
+      (action: CanvasAction) => {
+        if (canvasRef.current) {
+          // Capture current state (the "after" state) before restoring
+          // This is needed for redo to work properly
+          const currentState = canvasRef.current.captureCanvasState();
+          if (currentState) {
+            redoStatesRef.current.set(action.timestamp, currentState);
+          }
+
+          // The action's imageData is the state BEFORE the action was performed
+          // Restoring to it effectively "undoes" the action
+          canvasRef.current.restoreCanvasState(action.imageData);
+          playSound('undo');
+        }
+      },
+      [playSound],
+    );
+
+    // Handle redo by restoring to the "after" state we captured during undo
+    const handleRedo = useCallback(
+      (action: CanvasAction) => {
+        if (canvasRef.current) {
+          // Look up the "after" state we saved during undo
+          const afterState = redoStatesRef.current.get(action.timestamp);
+          if (afterState) {
+            canvasRef.current.restoreCanvasState(afterState);
+            // Clean up - remove from map since it's been used
+            redoStatesRef.current.delete(action.timestamp);
+            playSound('redo');
+          }
+        }
+      },
+      [playSound],
+    );
+
+    // Handle sticker tool selection - opens the sticker selector modal
+    const openStickerSelector = useCallback(() => {
+      setIsStickerSelectorOpen(true);
+    }, []);
+
+    // Handle start over - clear canvas and saved progress
+    const handleStartOver = useCallback(() => {
+      if (!canvasRef.current || !coloringImage.id) return;
+
+      // Clear the canvas
+      canvasRef.current.clearCanvas();
+
+      // Clear saved progress from localStorage
+      clearColoringProgress(coloringImage.id);
+
+      // Clear undo/redo history
+      clearHistory();
+      redoStatesRef.current.clear();
+
+      // Reset magic color map (so it re-generates if magic tool is active)
+      resetMagicColorMap();
+
+      // Reset unsaved changes flag
+      setHasUnsavedChanges(false);
+
+      // Play sparkle sound for fresh start
+      playSound('sparkle');
+    }, [
+      coloringImage.id,
+      clearHistory,
+      resetMagicColorMap,
+      setHasUnsavedChanges,
+      playSound,
+    ]);
+
+    // Expose methods to parent via ref
+    useImperativeHandle(
+      ref,
+      () => ({
+        getCanvas,
+        getCanvasDataUrl,
+        handleUndo,
+        handleRedo,
+        handleStartOver,
+        openStickerSelector,
+      }),
+      [
+        getCanvas,
+        getCanvasDataUrl,
+        handleUndo,
+        handleRedo,
+        handleStartOver,
+        openStickerSelector,
+      ],
+    );
 
     // Auto-save when changes are made (debounced)
     useEffect(() => {
@@ -214,78 +307,6 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }
     }, [coloringImage.id]);
 
-    // Handle undo by restoring the canvas to the state before the action
-    const handleUndo = useCallback(
-      (action: CanvasAction) => {
-        if (canvasRef.current) {
-          // Capture current state (the "after" state) before restoring
-          // This is needed for redo to work properly
-          const currentState = canvasRef.current.captureCanvasState();
-          if (currentState) {
-            redoStatesRef.current.set(action.timestamp, currentState);
-          }
-
-          // The action's imageData is the state BEFORE the action was performed
-          // Restoring to it effectively "undoes" the action
-          canvasRef.current.restoreCanvasState(action.imageData);
-          playSound('undo');
-        }
-      },
-      [playSound],
-    );
-
-    // Handle redo by restoring to the "after" state we captured during undo
-    const handleRedo = useCallback(
-      (action: CanvasAction) => {
-        if (canvasRef.current) {
-          // Look up the "after" state we saved during undo
-          const afterState = redoStatesRef.current.get(action.timestamp);
-          if (afterState) {
-            canvasRef.current.restoreCanvasState(afterState);
-            // Clean up - remove from map since it's been used
-            redoStatesRef.current.delete(action.timestamp);
-            playSound('redo');
-          }
-        }
-      },
-      [playSound],
-    );
-
-    // Handle start over - clear canvas and saved progress
-    const handleStartOver = useCallback(() => {
-      if (!canvasRef.current || !coloringImage.id) return;
-
-      // Clear the canvas
-      canvasRef.current.clearCanvas();
-
-      // Clear saved progress from localStorage
-      clearColoringProgress(coloringImage.id);
-
-      // Clear undo/redo history
-      clearHistory();
-      redoStatesRef.current.clear();
-
-      // Reset magic color map (so it re-generates if magic tool is active)
-      resetMagicColorMap();
-
-      // Reset unsaved changes flag
-      setHasUnsavedChanges(false);
-
-      // Play sparkle sound for fresh start
-      playSound('sparkle');
-    }, [
-      coloringImage.id,
-      clearHistory,
-      resetMagicColorMap,
-      setHasUnsavedChanges,
-      playSound,
-    ]);
-
-    // Handle sticker tool selection - opens the sticker selector modal
-    const handleStickerToolSelect = useCallback(() => {
-      setIsStickerSelectorOpen(true);
-    }, []);
-
     // Handle region revealed by magic brush
     const handleRegionRevealed = useCallback(
       (regionId: number) => {
@@ -297,26 +318,28 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
     return (
       <div className="flex flex-col gap-y-2 md:gap-y-3">
-        {/* Desktop Toolbar (md and up) - Traditional top toolbar */}
+        {/* Desktop Toolbar (md-lg only) - Traditional top toolbar */}
+        {/* Hidden on xl+ where sidebar controls are used instead */}
         {/* Note: Progress/Mute moved to page header on desktop for cleaner canvas area */}
-        <div className="hidden md:block">
+        <div className="hidden md:block xl:hidden">
           <ColoringToolbar
             onUndo={handleUndo}
             onRedo={handleRedo}
-            onStickerToolSelect={handleStickerToolSelect}
+            onStickerToolSelect={openStickerSelector}
           />
         </div>
 
         {/* Mobile Top Bar - Minimal with progress, mute, and zoom */}
-        <div className="md:hidden flex items-center justify-between px-1">
-          <div className="flex items-center gap-1.5">
+        <div className="md:hidden flex items-center justify-between gap-3 px-1">
+          {/* Left side: Progress bar needs flex-1 to expand and give ProgressIndicator width */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
             <ProgressIndicator
               getCanvas={getCanvas}
-              className="relative scale-90 origin-left"
+              className="flex-1 min-w-0"
             />
             <MuteToggle />
           </div>
-          <ZoomControls className="shadow-sm" />
+          <ZoomControls className="shadow-sm shrink-0" />
         </div>
 
         {/* Canvas - Shared between mobile and desktop */}
@@ -371,8 +394,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           )}
         </div>
 
-        {/* Action buttons - Desktop style */}
-        <div className="hidden md:flex flex-wrap items-center justify-center gap-3">
+        {/* Action buttons - Desktop style (md-lg only, hidden on xl+ where sidebar has them) */}
+        <div className="hidden md:flex xl:hidden flex-wrap items-center justify-center gap-3">
           <StartOverButton onStartOver={handleStartOver} />
           <DownloadPDFButton
             coloringImage={coloringImage}
@@ -420,7 +443,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           className="md:hidden"
           onUndo={handleUndo}
           onRedo={handleRedo}
-          onStickerToolSelect={handleStickerToolSelect}
+          onStickerToolSelect={openStickerSelector}
         />
 
         {/* Sticker selector modal */}
