@@ -178,14 +178,14 @@ model SavedArtwork {
 
 // Shareable link for artwork - allows viewing without authentication
 model ArtworkShare {
-  id           String       @id @default(cuid())
-  artworkId    String
-  artwork      SavedArtwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
-  shareCode    String       @unique // URL-safe random code for sharing
-  expiresAt    DateTime? // Optional expiration (null = never expires)
-  viewCount    Int          @default(0)
-  isActive     Boolean      @default(true) // Can be deactivated by parent
-  createdAt    DateTime     @default(now())
+  id        String       @id @default(cuid())
+  artworkId String
+  artwork   SavedArtwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  shareCode String       @unique // URL-safe random code for sharing
+  expiresAt DateTime? // Optional expiration (null = never expires)
+  viewCount Int          @default(0)
+  isActive  Boolean      @default(true) // Can be deactivated by parent
+  createdAt DateTime     @default(now())
 
   @@map("artwork_shares")
 }
