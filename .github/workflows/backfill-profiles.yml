@@ -45,13 +45,13 @@ jobs:
 
       - name: Generate Prisma client
         env:
-          DATABASE_URL: ${{ inputs.environment == 'production' && secrets.DATABASE_URL_PRODUCTION || secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         working-directory: ./packages/db
         run: pnpm prisma generate
 
       - name: Run backfill script
         env:
-          DATABASE_URL: ${{ inputs.environment == 'production' && secrets.DATABASE_URL_PRODUCTION || secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DRY_RUN: ${{ inputs.dry_run }}
         working-directory: ./packages/db
         run: pnpm tsx scripts/backfill-profiles.ts
