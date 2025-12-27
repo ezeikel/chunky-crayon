@@ -14,6 +14,7 @@ import type {
   BrushType,
   ColoringTool,
   FillPattern,
+  Sticker,
 } from '@/constants';
 
 // Zoom/Pan constants
@@ -48,6 +49,10 @@ type ColoringContextArgs = {
   // Fill pattern state
   selectedPattern: FillPattern;
   setSelectedPattern: Dispatch<SetStateAction<FillPattern>>;
+
+  // Sticker state
+  selectedSticker: Sticker | null;
+  setSelectedSticker: Dispatch<SetStateAction<Sticker | null>>;
 
   // Zoom/Pan state
   zoom: number;
@@ -94,6 +99,8 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setActiveTool: () => {},
   selectedPattern: 'solid',
   setSelectedPattern: () => {},
+  selectedSticker: null,
+  setSelectedSticker: () => {},
   zoom: DEFAULT_ZOOM,
   panOffset: { x: 0, y: 0 },
   setZoom: () => {},
@@ -130,6 +137,9 @@ export const ColoringContextProvider = ({
 
   // Fill pattern state
   const [selectedPattern, setSelectedPattern] = useState<FillPattern>('solid');
+
+  // Sticker state
+  const [selectedSticker, setSelectedSticker] = useState<Sticker | null>(null);
 
   // Zoom/Pan state
   const [zoom, setZoomState] = useState(DEFAULT_ZOOM);
@@ -217,6 +227,8 @@ export const ColoringContextProvider = ({
       setActiveTool,
       selectedPattern,
       setSelectedPattern,
+      selectedSticker,
+      setSelectedSticker,
       zoom,
       panOffset,
       setZoom,
@@ -243,6 +255,7 @@ export const ColoringContextProvider = ({
       brushType,
       activeTool,
       selectedPattern,
+      selectedSticker,
       zoom,
       panOffset,
       setZoom,

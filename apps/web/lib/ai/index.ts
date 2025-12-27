@@ -84,7 +84,14 @@ export {
   createBlogMetaPrompt,
   BLOG_IMAGE_PROMPT_SYSTEM,
   createBlogImagePromptPrompt,
+  // Magic color prompts (for AI-powered color suggestions)
+  MAGIC_COLOR_SYSTEM,
+  createMagicColorPrompt,
+  // Region-first prompts (1:1 mapping guaranteed)
+  REGION_FIRST_COLOR_SYSTEM,
+  createRegionFirstColorPrompt,
 } from './prompts';
+export type { MagicColorMode } from './prompts';
 
 // Re-export schemas
 export * as schemas from './schemas';
@@ -97,6 +104,12 @@ export {
   blogMetaSchema,
   blogPostSchema,
   blogImagePromptSchema,
+  magicColorSuggestionSchema,
+  magicColorResponseSchema,
+  // Region-first approach (1:1 mapping guaranteed)
+  detectedRegionInputSchema,
+  regionColorAssignmentSchema,
+  regionFirstColorResponseSchema,
 } from './schemas';
 export type {
   ImageMetadata,
@@ -107,6 +120,12 @@ export type {
   BlogMeta,
   BlogPost,
   BlogImagePrompt,
+  MagicColorSuggestion,
+  MagicColorResponse,
+  // Region-first types
+  DetectedRegionInput,
+  RegionColorAssignment,
+  RegionFirstColorResponse,
 } from './schemas';
 
 // Re-export analytics functions

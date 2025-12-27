@@ -408,36 +408,76 @@ colorSuggestions?: {
 - [x] Test on various devices
 - [x] Kid-friendly UX improvements (larger dots, bounce animation, Home icon)
 
-### Sprint 2: Pattern Fills (3-4 days)
+### Sprint 2: Pattern Fills (3-4 days) ✅ COMPLETED
 
-- [ ] Create pattern generation utilities
-- [ ] Build PatternSelector component
-- [ ] Integrate with flood fill
-- [ ] Add to toolbar (conditional on fill tool)
+- [x] Create pattern generation utilities (fillPatterns.ts)
+- [x] Build PatternSelector component
+- [x] Integrate with flood fill (two-step marker color approach)
+- [x] Add to toolbar (conditional on fill tool)
+- [x] Add pattern state to ColoringContext
+- [x] Test with Playwright (Polka Dots, Hearts, Stars verified)
 
-### Sprint 3: Stickers (1.5 weeks)
+**Notes:** 8 patterns implemented: Solid, Polka Dots, Stripes, Diagonal Stripes,
+Checkerboard, Hearts, Stars, Zigzag. Uses a two-step fill approach with marker
+color to identify region, then applies pattern to marked pixels.
 
-- [ ] Design and create sticker SVGs (or source from library)
-- [ ] Build StickerPicker component
-- [ ] Implement sticker placement on canvas
-- [ ] Add resize/rotate handles
-- [ ] Integrate with undo/redo history
-- [ ] Update save/export to include stickers
+### Sprint 3: Stickers (1.5 weeks) ✅ COMPLETED (MVP)
 
-### Sprint 4: Glitter Effects (1 week)
+- [x] Add sticker tool type to ToolSelector
+- [x] Build StickerSelector component (emoji-based for MVP)
+- [x] Implement sticker placement on canvas (tap to place)
+- [x] Integrate with analytics tracking (PAGE_STROKE_MADE event)
+- [x] Add to both desktop and mobile toolbars
+- [ ] Design and create sticker SVGs (future enhancement - using emojis for now)
+- [ ] Add resize/rotate handles (future enhancement)
+- [ ] Integrate with undo/redo history (future enhancement)
+- [ ] Update save/export to include stickers (future enhancement)
 
-- [ ] Implement glitter brush texture
-- [ ] Implement rainbow brush
-- [ ] Implement glow/neon effects
-- [ ] Add to ToolSelector UI
-- [ ] Performance optimization
+**Notes:** MVP uses emoji stamps (sparkle star, rainbow, heart, fire, party,
+unicorn, crown, butterfly, sun, moon, rocket, flower, soccer ball, ice cream,
+birthday cake). Future versions could add custom SVG stickers with resize/rotate
+handles.
 
-### Sprint 5: Magic Colors (1 week)
+### Sprint 4: Glitter & Sparkle Effects (1 week) ✅ COMPLETED
 
-- [ ] Design suggestion generation prompt
-- [ ] Add API endpoint for suggestions
-- [ ] Build MagicColorButton and tooltip
-- [ ] Integrate with existing coloring pages
+- [x] Implement glitter brush texture (shimmering particles with color
+      variations)
+- [x] Implement sparkle brush (4-pointed star shapes along stroke)
+- [x] Add to ToolSelector UI (both desktop and mobile)
+- [x] Integrate with brushTextures.ts routing
+- [x] Implement rainbow brush (color-cycling HSL effect)
+- [x] Implement glow brush (radial gradient soft glow)
+- [x] Implement neon brush (5-layer stroke with outer glow and white center)
+- [ ] Performance optimization (shimmer animation)
+
+**Notes:** Glitter brush creates multi-colored particles with white highlights.
+Sparkle brush draws 4-pointed gradient stars along the stroke path. Rainbow
+brush cycles through HSL hues as you draw with white highlight center. Glow
+brush creates radial gradient dabs with soft transparent outer glow. Neon brush
+draws 5 layers: outer glow → medium glow → core color → lighter inner → white
+center. All tested and working via Playwright.
+
+### Sprint 5: Magic Colors (1 week) ✅ COMPLETED
+
+- [x] Design suggestion generation prompt (see MAGIC_BRUSH_PLAN.md)
+- [x] Implement V3 Region-First approach (1:1 region→color mapping)
+- [x] Create `useMagicColorMap` hook for color map management
+- [x] Create server action `assignColorsToRegions()` with Gemini
+- [x] Build Magic Reveal tool (tap to reveal AI colors)
+- [x] Build Magic Auto tool (one-click fill all regions)
+- [x] Integrate with ToolSelector (both desktop and mobile)
+- [x] Add loading overlay and error states
+- [x] Integrate with existing sound effects
+
+**Notes:** V3 Region-First approach implemented and working. Uses 5x5 grid
+positioning for accurate region-to-color mapping. Achieves 100% match rate in
+testing (58 regions).
+
+**TODO:** Prompt tuning needed - AI color assignments could be improved with:
+
+- Better scene understanding
+- Adjacency-aware color contrast
+- Common element recognition (sky, grass, etc.)
 
 ---
 
@@ -506,6 +546,13 @@ colorSuggestions?: {
 1. ~~**Approve plan** - Review with stakeholders~~ ✅
 2. ~~**Start Phase 1** - Zoom/pan is highest impact, unblocks tablet usage~~ ✅
    COMPLETED
-3. **Start Phase 1.2** - Pattern Fills (next priority)
-4. **Source stickers** - Begin asset creation in parallel for Phase 2.1
-5. **Set up analytics** - Track feature usage from day 1
+3. ~~**Stickers MVP** - Emoji-based stickers implemented~~ ✅ COMPLETED
+4. ~~**Glitter & Sparkle brushes** - Special brush effects~~ ✅ COMPLETED
+5. ~~**Magic Color plan** - Design doc created~~ ✅ COMPLETED
+6. ~~**Rainbow/Glow/Neon** - Complete remaining special brush effects~~ ✅
+   COMPLETED
+7. ~~**Start Phase 1.2** - Pattern Fills (next priority)~~ ✅ COMPLETED
+8. ~~**Implement Magic Color** - Build API endpoint and UI per
+   MAGIC_BRUSH_PLAN.md~~ ✅ COMPLETED
+9. **Improve Magic Color prompts** - Better AI color assignments (TODO)
+10. **Stickers v2** - Add SVG stickers with resize/rotate handles

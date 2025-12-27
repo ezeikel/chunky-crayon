@@ -101,6 +101,11 @@ export const models = {
   // Pricing: $0.50/1M input, $3/1M output tokens
   analytics: google(MODEL_IDS.GEMINI_3_FLASH),
 
+  // High-quality vision model for detailed analysis (Gemini 3 Pro)
+  // Best for: complex scene understanding, nuanced color assignment
+  // Use when quality matters more than latency (e.g., pipeline integration)
+  analyticsQuality: google(MODEL_IDS.GEMINI_3_PRO_IMAGE),
+
   // Gemini image generation model (uses generateText, not generateImage)
   // Supports reference images as actual inputs for style matching
   // Gemini 3 Pro Image: highest quality, requires billing enabled
@@ -149,11 +154,12 @@ export function withAITracing(
 
   // Type assertion needed: @posthog/ai uses LanguageModelV2 types but
   // AI SDK 6 provides LanguageModelV3. Runtime API is compatible.
+  // Note: posthogProperties must be an object, not undefined (library calls Object.entries on it)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return withTracing(model as any, posthog, {
     posthogDistinctId: options.userId || 'anonymous',
     posthogTraceId: options.traceId,
-    posthogProperties: options.properties,
+    posthogProperties: options.properties ?? {},
   }) as unknown as LanguageModelV3;
 }
 
@@ -169,6 +175,7 @@ export function getTracedModels(options: TracingOptions = {}) {
     text: withAITracing(models.text, options),
     textFast: withAITracing(models.textFast, options),
     analytics: withAITracing(models.analytics, options),
+    analyticsQuality: withAITracing(models.analyticsQuality, options),
     // Note: Image models use a different API and don't support withTracing
   };
 }

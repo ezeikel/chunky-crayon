@@ -1,12 +1,13 @@
 'use client';
 
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import { ColoringImage } from '@chunky-crayon/db/types';
 import ImageCanvas, {
   ImageCanvasHandle,
 } from '@/components/ImageCanvas/ImageCanvas';
 import ColoringToolbar from '@/components/ColoringToolbar/ColoringToolbar';
 import MobileColoringToolbar from '@/components/MobileColoringToolbar/MobileColoringToolbar';
+import StickerSelector from '@/components/StickerSelector';
 import ProgressIndicator from '@/components/ProgressIndicator';
 import MuteToggle from '@/components/MuteToggle';
 import ZoomControls from '@/components/ZoomControls/ZoomControls';
@@ -16,6 +17,7 @@ import ShareButton from '@/components/buttons/ShareButton';
 import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton';
 import { CanvasAction, useColoringContext } from '@/contexts/coloring';
 import { useSound } from '@/hooks/useSound';
+import { useMagicColorMap } from '@/hooks/useMagicColorMap';
 import {
   saveColoringProgress,
   loadColoringProgress,
@@ -41,9 +43,23 @@ const ColoringArea = ({
   // Track if ambient sound has been initialized
   const ambientInitializedRef = useRef(false);
 
-  const { hasUnsavedChanges, setHasUnsavedChanges, clearHistory } =
+  // Sticker selector modal state
+  const [isStickerSelectorOpen, setIsStickerSelectorOpen] = useState(false);
+
+  const { hasUnsavedChanges, setHasUnsavedChanges, clearHistory, activeTool } =
     useColoringContext();
   const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
+
+  // Magic Color Map for reveal mode and auto-color
+  const {
+    state: magicColorMapState,
+    generateColorMap,
+    getColorAtPoint,
+    getRegionIdAtPoint,
+    markRegionColored,
+    getAllColorsForAutoFill,
+    reset: resetMagicColorMap,
+  } = useMagicColorMap();
 
   // Handle first canvas interaction - load and play ambient sound
   // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
@@ -65,6 +81,67 @@ const ColoringArea = ({
       }
     };
   }, [stopAmbient]);
+
+  // Generate color map when any magic tool is selected
+  const isMagicToolActive =
+    activeTool === 'magic-reveal' || activeTool === 'magic-auto';
+
+  useEffect(() => {
+    if (!isMagicToolActive || !canvasReadyRef.current) return;
+
+    // Skip if already ready or loading
+    if (magicColorMapState.isReady || magicColorMapState.isLoading) return;
+
+    const drawingCanvas = canvasRef.current?.getCanvas();
+    const boundaryCanvas = canvasRef.current?.getBoundaryCanvas();
+
+    if (!drawingCanvas || !boundaryCanvas) return;
+
+    generateColorMap(drawingCanvas, boundaryCanvas);
+  }, [
+    isMagicToolActive,
+    magicColorMapState.isReady,
+    magicColorMapState.isLoading,
+    generateColorMap,
+  ]);
+
+  // Handle auto-color - fill all remaining regions at once
+  const handleAutoColor = useCallback(() => {
+    const regionsToFill = getAllColorsForAutoFill();
+
+    if (regionsToFill.length === 0) return;
+
+    // Fill each region with its assigned color
+    // Note: centroids are in canvas pixel coordinates (DPR-scaled), so we pass isCanvasPixels=true
+    for (const { regionId, color, centroid } of regionsToFill) {
+      const success = canvasRef.current?.fillRegionAtPoint(
+        Math.round(centroid.x),
+        Math.round(centroid.y),
+        color,
+        true, // isCanvasPixels - centroids from region detection are in canvas pixels
+      );
+
+      if (success) {
+        markRegionColored(regionId);
+      }
+    }
+
+    // Play celebration sound
+    playSound('sparkle');
+    setHasUnsavedChanges(true);
+  }, [
+    getAllColorsForAutoFill,
+    markRegionColored,
+    playSound,
+    setHasUnsavedChanges,
+  ]);
+
+  // Trigger auto-fill when magic-auto tool is selected and color map is ready
+  useEffect(() => {
+    if (activeTool === 'magic-auto' && magicColorMapState.isReady) {
+      handleAutoColor();
+    }
+  }, [activeTool, magicColorMapState.isReady, handleAutoColor]);
 
   // Get canvas data URL for saving to gallery
   // Uses composite canvas that merges user's colors with line art
@@ -170,12 +247,35 @@ const ColoringArea = ({
     clearHistory();
     redoStatesRef.current.clear();
 
+    // Reset magic color map (so it re-generates if magic tool is active)
+    resetMagicColorMap();
+
     // Reset unsaved changes flag
     setHasUnsavedChanges(false);
 
     // Play sparkle sound for fresh start
     playSound('sparkle');
-  }, [coloringImage.id, clearHistory, setHasUnsavedChanges, playSound]);
+  }, [
+    coloringImage.id,
+    clearHistory,
+    resetMagicColorMap,
+    setHasUnsavedChanges,
+    playSound,
+  ]);
+
+  // Handle sticker tool selection - opens the sticker selector modal
+  const handleStickerToolSelect = useCallback(() => {
+    setIsStickerSelectorOpen(true);
+  }, []);
+
+  // Handle region revealed by magic brush
+  const handleRegionRevealed = useCallback(
+    (regionId: number) => {
+      markRegionColored(regionId);
+      setHasUnsavedChanges(true);
+    },
+    [markRegionColored, setHasUnsavedChanges],
+  );
 
   return (
     <div className="flex flex-col gap-y-2 md:gap-y-3">
@@ -185,6 +285,7 @@ const ColoringArea = ({
           className="self-center"
           onUndo={handleUndo}
           onRedo={handleRedo}
+          onStickerToolSelect={handleStickerToolSelect}
         />
         <div className="flex items-center gap-2">
           <ProgressIndicator getCanvas={getCanvas} className="relative" />
@@ -205,14 +306,55 @@ const ColoringArea = ({
       </div>
 
       {/* Canvas - Shared between mobile and desktop */}
-      <div className="flex-1 flex items-center justify-center md:block">
+      <div className="relative flex-1 flex items-center justify-center md:block">
         <ImageCanvas
           ref={canvasRef}
           coloringImage={coloringImage}
           className="rounded-lg shadow-lg bg-white overflow-hidden"
           onCanvasReady={handleCanvasReady}
           onFirstInteraction={handleFirstInteraction}
+          getRevealColor={getColorAtPoint}
+          getRevealRegionId={getRegionIdAtPoint}
+          onRegionRevealed={handleRegionRevealed}
+          isMagicRevealReady={magicColorMapState.isReady}
         />
+
+        {/* Magic Loading Overlay - Shows when magic tools are analyzing the image */}
+        {isMagicToolActive && magicColorMapState.isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
+            <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 border-2 border-crayon-purple/20 shadow-lg">
+              <div className="relative">
+                <div className="size-12 border-4 border-crayon-purple/30 border-t-crayon-purple rounded-full animate-spin" />
+                <span className="absolute inset-0 flex items-center justify-center text-2xl">
+                  ✨
+                </span>
+              </div>
+              <p className="text-sm font-bold text-crayon-purple text-center max-w-[200px]">
+                {magicColorMapState.loadingMessage ||
+                  'Preparing magic colors...'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Magic Error Overlay - Shows if magic analysis fails */}
+        {isMagicToolActive && magicColorMapState.error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
+            <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-crayon-pink/10 border-2 border-crayon-pink/30 shadow-lg">
+              <span className="text-3xl">😕</span>
+              <p className="text-sm font-bold text-crayon-pink text-center max-w-[200px]">
+                {magicColorMapState.error}
+              </p>
+              <button
+                type="button"
+                onClick={() => resetMagicColorMap()}
+                className="px-4 py-2 text-sm font-bold text-white bg-crayon-purple rounded-full hover:bg-crayon-purple/90 active:scale-95 transition-all"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action buttons - Desktop style */}
@@ -238,7 +380,7 @@ const ColoringArea = ({
       </div>
 
       {/* Mobile Action buttons - Compact row with icon-only buttons */}
-      <div className="md:hidden flex items-center justify-center gap-3 py-2 px-2 mb-36">
+      <div className="md:hidden flex items-center justify-center gap-3 py-2 px-2">
         <StartOverButton onStartOver={handleStartOver} />
         <DownloadPDFButton
           coloringImage={coloringImage}
@@ -264,6 +406,13 @@ const ColoringArea = ({
         className="md:hidden"
         onUndo={handleUndo}
         onRedo={handleRedo}
+        onStickerToolSelect={handleStickerToolSelect}
+      />
+
+      {/* Sticker selector modal */}
+      <StickerSelector
+        isOpen={isStickerSelectorOpen}
+        onClose={() => setIsStickerSelectorOpen(false)}
       />
     </div>
   );

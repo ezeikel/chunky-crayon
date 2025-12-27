@@ -23,6 +23,14 @@ type ImageCanvasProps = {
   className?: string;
   onCanvasReady?: () => void;
   onFirstInteraction?: () => void;
+  /** Magic brush reveal mode: get color at canvas coordinates */
+  getRevealColor?: (x: number, y: number) => string | null;
+  /** Magic brush reveal mode: get region ID at canvas coordinates */
+  getRevealRegionId?: (x: number, y: number) => number;
+  /** Magic brush reveal mode: callback when a region is revealed/colored */
+  onRegionRevealed?: (regionId: number) => void;
+  /** Whether magic brush reveal mode is ready */
+  isMagicRevealReady?: boolean;
 };
 
 export type ImageCanvasHandle = {
@@ -32,10 +40,36 @@ export type ImageCanvasHandle = {
   clearCanvas: () => void;
   getCanvas: () => HTMLCanvasElement | null;
   getCompositeCanvas: () => HTMLCanvasElement | null;
+  /** Get the boundary canvas (line art) for region detection */
+  getBoundaryCanvas: () => HTMLCanvasElement | null;
+  /** Fill a region at coordinates with a specific color (for auto-color)
+   * @param x - X coordinate
+   * @param y - Y coordinate
+   * @param color - Hex color to fill
+   * @param isCanvasPixels - If true, coordinates are already in canvas pixels (DPR-scaled). Default false (CSS pixels).
+   */
+  fillRegionAtPoint: (
+    x: number,
+    y: number,
+    color: string,
+    isCanvasPixels?: boolean,
+  ) => boolean;
 };
 
 const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
-  ({ coloringImage, className, onCanvasReady, onFirstInteraction }, ref) => {
+  (
+    {
+      coloringImage,
+      className,
+      onCanvasReady,
+      onFirstInteraction,
+      getRevealColor,
+      getRevealRegionId,
+      onRegionRevealed,
+      isMagicRevealReady,
+    },
+    ref,
+  ) => {
     const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
     const imageCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -48,6 +82,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       brushType,
       activeTool,
       selectedPattern,
+      selectedSticker,
       pushToHistory,
       zoom,
       panOffset,
@@ -156,6 +191,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       return drawingCanvasRef.current;
     }, []);
 
+    // Get the boundary (line art) canvas
+    const getBoundaryCanvas = useCallback(() => {
+      return imageCanvasRef.current;
+    }, []);
+
     // Get a composite canvas with both drawing layer and line art merged
     // This is used for saving artwork to gallery where we need the complete image
     const getCompositeCanvas = useCallback(() => {
@@ -192,6 +232,81 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       return compositeCanvas;
     }, []);
 
+    // Fill a specific region at given coordinates with a color (for auto-color)
+    const fillRegionAtPoint = useCallback(
+      (
+        x: number,
+        y: number,
+        color: string,
+        isCanvasPixels: boolean = false,
+      ): boolean => {
+        const drawingCanvas = drawingCanvasRef.current;
+        const imageCanvas = imageCanvasRef.current;
+        const drawingCtx = drawingCanvas?.getContext('2d');
+
+        if (!drawingCanvas || !drawingCtx || !imageCanvas) {
+          return false;
+        }
+
+        // Scale coordinates for the actual canvas dimensions
+        // If isCanvasPixels is true, coordinates are already in canvas pixels (DPR-scaled)
+        const scaledX = isCanvasPixels ? x : x * dpr;
+        const scaledY = isCanvasPixels ? y : y * dpr;
+
+        // Create a composite boundary canvas
+        const boundaryCanvas = document.createElement('canvas');
+        boundaryCanvas.width = drawingCanvas.width;
+        boundaryCanvas.height = drawingCanvas.height;
+        const boundaryCtx = boundaryCanvas.getContext('2d');
+
+        if (!boundaryCtx) return false;
+
+        // Draw the SVG outline layer
+        boundaryCtx.drawImage(imageCanvas, 0, 0);
+
+        // Also draw any existing coloring
+        boundaryCtx.drawImage(drawingCanvas, 0, 0);
+
+        // Get the boundary image data
+        const boundaryImageData = boundaryCtx.getImageData(
+          0,
+          0,
+          boundaryCanvas.width,
+          boundaryCanvas.height,
+        );
+
+        // Perform the fill
+        const fillColor = hexToRGBA(color);
+        const filled = scanlineFill(drawingCtx, {
+          x: scaledX,
+          y: scaledY,
+          fillColor,
+          tolerance: 48,
+          boundaryImageData,
+          boundaryThreshold: 180,
+        });
+
+        if (filled) {
+          // Update offscreen canvas
+          if (offScreenCanvasRef.current) {
+            const offScreenCtx = offScreenCanvasRef.current.getContext('2d');
+            if (offScreenCtx) {
+              const imageData = drawingCtx.getImageData(
+                0,
+                0,
+                drawingCanvas.width,
+                drawingCanvas.height,
+              );
+              offScreenCtx.putImageData(imageData, 0, 0);
+            }
+          }
+        }
+
+        return filled;
+      },
+      [dpr],
+    );
+
     // Expose methods to parent via ref
     useImperativeHandle(
       ref,
@@ -202,6 +317,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         clearCanvas,
         getCanvas,
         getCompositeCanvas,
+        getBoundaryCanvas,
+        fillRegionAtPoint,
       }),
       [
         restoreCanvasState,
@@ -210,6 +327,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         clearCanvas,
         getCanvas,
         getCompositeCanvas,
+        getBoundaryCanvas,
+        fillRegionAtPoint,
       ],
     );
 
@@ -479,6 +598,40 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         const lastX = lastPosRef.current?.x ?? null;
         const lastY = lastPosRef.current?.y ?? null;
 
+        // For magic-reveal, dynamically look up the color at this position
+        let strokeColor = selectedColor;
+        let strokeBrushType = brushType;
+
+        if (
+          activeTool === 'magic-reveal' &&
+          getRevealColor &&
+          getRevealRegionId
+        ) {
+          // Scale coordinates to match regionMap dimensions (which use DPR-scaled pixels)
+          // The regionMap was created with canvas.width/height which are DPR-scaled
+          // But x,y from screenToCanvas are CSS coordinates (not DPR-scaled)
+          const scaledX = Math.floor(x * dpr);
+          const scaledY = Math.floor(y * dpr);
+
+          const regionId = getRevealRegionId(scaledX, scaledY);
+          const revealColor = getRevealColor(scaledX, scaledY);
+
+          if (revealColor) {
+            strokeColor = revealColor;
+            // Use marker brush for magic reveal (clean, visible strokes)
+            strokeBrushType = 'marker';
+            // Track which region is being colored
+            if (regionId > 0 && onRegionRevealed) {
+              onRegionRevealed(regionId);
+            }
+          } else {
+            // No color available (boundary or already colored area) - don't draw
+            // This prevents the palette color from leaking into magic brush strokes
+            lastPosRef.current = { x, y };
+            return;
+          }
+        }
+
         // Draw textured stroke on visible canvas
         drawTexturedStroke({
           ctx: drawingCtx,
@@ -486,9 +639,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           y,
           lastX,
           lastY,
-          color: selectedColor,
+          color: strokeColor,
           radius,
-          brushType,
+          brushType: strokeBrushType,
         });
 
         // Update offscreen canvas with same stroke
@@ -501,9 +654,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               y,
               lastX,
               lastY,
-              color: selectedColor,
+              color: strokeColor,
               radius,
-              brushType,
+              brushType: strokeBrushType,
             });
           }
         }
@@ -704,6 +857,76 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       }
     };
 
+    const handleStickerPlace = (clientX: number, clientY: number) => {
+      if (!selectedSticker) return;
+
+      const drawingCanvas = drawingCanvasRef.current;
+      const drawingCtx = drawingCanvas?.getContext('2d');
+
+      if (!drawingCanvas || !drawingCtx) return;
+
+      // Capture state before placing sticker for undo
+      const beforeState = captureCanvasState();
+
+      // Convert screen coordinates to canvas coordinates (accounting for zoom/pan)
+      const { x, y } = screenToCanvas(clientX, clientY);
+
+      // Calculate sticker size based on brush size for consistency
+      const stickerSizes: Record<string, number> = {
+        small: 32,
+        medium: 48,
+        large: 64,
+      };
+      const stickerSize = stickerSizes[brushSize] || 48;
+
+      // Save current context state
+      drawingCtx.save();
+
+      // Set up text properties for emoji drawing
+      drawingCtx.font = `${stickerSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+      drawingCtx.textAlign = 'center';
+      drawingCtx.textBaseline = 'middle';
+
+      // Draw the sticker emoji at the click position
+      drawingCtx.fillText(selectedSticker.emoji, x, y);
+
+      // Restore context state
+      drawingCtx.restore();
+
+      // Update offscreen canvas with same sticker
+      if (offScreenCanvasRef.current) {
+        const offScreenCtx = offScreenCanvasRef.current.getContext('2d');
+        if (offScreenCtx) {
+          offScreenCtx.save();
+          offScreenCtx.font = `${stickerSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+          offScreenCtx.textAlign = 'center';
+          offScreenCtx.textBaseline = 'middle';
+          offScreenCtx.fillText(selectedSticker.emoji, x, y);
+          offScreenCtx.restore();
+        }
+      }
+
+      // Push to history for undo
+      if (beforeState) {
+        pushToHistory({
+          type: 'stroke', // Using 'stroke' type for stickers as they're similar in behavior
+          imageData: beforeState,
+          timestamp: Date.now(),
+        });
+      }
+
+      // Play pop sound for sticker placement
+      playSound('pop');
+
+      trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
+        coloringImageId: coloringImage.id,
+        color: selectedSticker.emoji, // Use emoji as "color" for stickers
+        tool: 'sticker',
+        stickerId: selectedSticker.id,
+        stickerName: selectedSticker.name,
+      });
+    };
+
     const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
       // Initialize sounds on first interaction (required for Web Audio API)
       handleFirstInteraction();
@@ -717,6 +940,36 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
       if (activeTool === 'fill') {
         handleFill(event.clientX, event.clientY);
+        return;
+      }
+
+      // Sticker tool - place sticker on click
+      if (activeTool === 'sticker') {
+        handleStickerPlace(event.clientX, event.clientY);
+        return;
+      }
+
+      // Magic brush tool - stroke-based reveal with AI colors
+      // Unlike other tools, magic-reveal uses the same drawing flow as brush
+      // but dynamically looks up the color for each point from the color map
+      if (activeTool === 'magic-reveal') {
+        if (!isMagicRevealReady) {
+          // Color map not ready yet - don't start drawing
+          return;
+        }
+        // Start drawing session (same as regular brush)
+        const beforeState = captureCanvasState();
+        if (beforeState) {
+          pushToHistory({
+            type: 'stroke',
+            imageData: beforeState,
+            timestamp: Date.now(),
+          });
+        }
+        setIsDrawing(true);
+        lastPosRef.current = null;
+        colorAtPosition(event.clientX, event.clientY);
+        playSound('draw');
         return;
       }
 
@@ -769,7 +1022,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         return;
       }
 
-      if (!isDrawing || activeTool !== 'brush') {
+      // Allow drawing for brush tools and magic-reveal (stroke-based reveal)
+      if (
+        !isDrawing ||
+        (activeTool !== 'brush' && activeTool !== 'magic-reveal')
+      ) {
         return;
       }
 
@@ -792,7 +1049,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         return;
       }
 
-      // Single touch - pan tool, drawing, or fill
+      // Single touch - pan tool, sticker, drawing, or fill
       if (event.touches.length === 1) {
         const touch = event.touches[0];
 
@@ -805,6 +1062,34 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
         if (activeTool === 'fill') {
           handleFill(touch.clientX, touch.clientY);
+          return;
+        }
+
+        // Sticker tool - place sticker on tap
+        if (activeTool === 'sticker') {
+          handleStickerPlace(touch.clientX, touch.clientY);
+          return;
+        }
+
+        // Magic brush tool - stroke-based reveal with AI colors
+        if (activeTool === 'magic-reveal') {
+          if (!isMagicRevealReady) {
+            // Color map not ready yet - don't start drawing
+            return;
+          }
+          // Start drawing session (same as regular brush)
+          const beforeState = captureCanvasState();
+          if (beforeState) {
+            pushToHistory({
+              type: 'stroke',
+              imageData: beforeState,
+              timestamp: Date.now(),
+            });
+          }
+          setIsDrawing(true);
+          lastPosRef.current = null;
+          colorAtPosition(touch.clientX, touch.clientY);
+          playSound('draw');
           return;
         }
 
@@ -876,8 +1161,12 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         return;
       }
 
-      // Single-finger drawing
-      if (!isDrawing || activeTool !== 'brush' || isPinchingRef.current) {
+      // Single-finger drawing (brush or magic-reveal)
+      if (
+        !isDrawing ||
+        (activeTool !== 'brush' && activeTool !== 'magic-reveal') ||
+        isPinchingRef.current
+      ) {
         return;
       }
 
@@ -940,7 +1229,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
                   ? 'grab'
                   : activeTool === 'fill'
                     ? 'crosshair'
-                    : 'default',
+                    : activeTool === 'sticker'
+                      ? 'pointer'
+                      : 'default',
             }}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}

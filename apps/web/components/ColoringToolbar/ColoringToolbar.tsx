@@ -13,12 +13,14 @@ type ColoringToolbarProps = {
   className?: string;
   onUndo?: (action: CanvasAction) => void;
   onRedo?: (action: CanvasAction) => void;
+  onStickerToolSelect?: () => void;
 };
 
 const ColoringToolbar = ({
   className,
   onUndo,
   onRedo,
+  onStickerToolSelect,
 }: ColoringToolbarProps) => {
   return (
     <div className={cn('flex flex-col gap-3 w-full', className)}>
@@ -27,8 +29,11 @@ const ColoringToolbar = ({
 
       {/* Tools Row - Responsive layout */}
       <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-        {/* Tool Selector (Brush/Fill/Eraser) */}
-        <ToolSelector className="shadow-lg" />
+        {/* Tool Selector (Brush/Fill/Eraser/Sticker) */}
+        <ToolSelector
+          className="shadow-lg"
+          onStickerToolSelect={onStickerToolSelect}
+        />
 
         {/* Pattern Selector - shows only when fill tool is active */}
         <PatternSelector className="shadow-lg" />

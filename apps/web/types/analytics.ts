@@ -151,7 +151,8 @@ export type EventProperties = {
     color: string;
     colorName?: string;
     colorIndex?: number;
-    tool?: 'brush' | 'fill';
+    tool?: 'brush' | 'fill' | 'magic-reveal' | 'magic-auto';
+    regionId?: number; // For magic brush reveal
   };
   [TRACKING_EVENTS.PAGE_STROKE_MADE]: {
     coloringImageId?: string;
@@ -159,6 +160,12 @@ export type EventProperties = {
     strokeCount?: number;
     brushSize?: string;
     brushType?: string;
+    // Sticker-specific properties (when tool is 'sticker')
+    // Magic brush properties (when tool is 'magic-reveal' or 'magic-auto')
+    tool?: 'brush' | 'fill' | 'sticker' | 'magic-reveal' | 'magic-auto';
+    stickerId?: string;
+    stickerName?: string;
+    regionId?: number; // For magic brush reveal
   };
   [TRACKING_EVENTS.PAGE_SAVED]: {
     coloringImageId: string;

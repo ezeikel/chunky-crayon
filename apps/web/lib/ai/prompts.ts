@@ -481,3 +481,144 @@ Title: ${postTitle}
 The prompt should describe a single scene that visually represents the blog topic.
 Keep it simple and suitable for a children's coloring page.
 Output only the image generation prompt, nothing else.`;
+
+// =============================================================================
+// Magic Color Suggestions (AI-powered color recommendations)
+// =============================================================================
+
+export const MAGIC_COLOR_SYSTEM = `You are helping a child color their coloring page. You're warm, encouraging, and use simple kid-friendly language.
+
+Your task is to analyze a coloring page image and suggest contextually appropriate colors for the region the child is touching.
+
+Guidelines:
+- Suggest 3-5 colors that would look good in the touched area
+- Use fun, kid-friendly color names (e.g., "Sky Blue" instead of "Cerulean")
+- Give short, encouraging reasons (e.g., "Perfect for the sky!")
+- Consider what the element typically looks like in real life
+- Also consider creative alternatives that could be fun
+- Keep reasons to 5-7 words maximum
+
+For each suggestion, provide:
+1. Hex color code
+2. Kid-friendly name
+3. Short encouraging reason
+4. Confidence score (0-1) for how appropriate the color is`;
+
+export type MagicColorMode = 'accurate' | 'creative' | 'surprise';
+
+export const createMagicColorPrompt = (
+  touchX: number,
+  touchY: number,
+  mode: MagicColorMode = 'accurate',
+  imageDescription?: string,
+) => {
+  const modeInstructions = {
+    accurate:
+      'Suggest realistic, natural colors (sky = blue, grass = green, sun = yellow)',
+    creative:
+      'Allow some creative freedom while staying appropriate (pink trees, purple clouds are ok)',
+    surprise:
+      'Suggest unexpected but fun color combinations (rainbow sun, sparkly everything)',
+  };
+
+  return `Analyze this coloring page image. The child touched at position (${(touchX * 100).toFixed(0)}%, ${(touchY * 100).toFixed(0)}%) from the top-left.
+
+${imageDescription ? `Context about the image: ${imageDescription}` : ''}
+
+Mode: ${mode.toUpperCase()}
+${modeInstructions[mode]}
+
+1. Identify what element/object they're touching
+2. Suggest 3-5 appropriate colors for that element
+3. Provide a kid-friendly name and short reason for each
+
+Remember: Be encouraging and fun!`;
+};
+
+// =============================================================================
+// Region-First Color Assignment (for guaranteed 1:1 mapping)
+// AI receives pre-detected region positions and assigns colors to each one
+// =============================================================================
+
+// TODO: Improve Magic Fill prompts - the AI color assignments could be better.
+// Ideas to explore:
+// - Better scene understanding before assigning colors
+// - More context about common coloring page elements (teddy bears, flowers, etc.)
+// - Consider region adjacency when assigning contrasting colors
+// - Fine-tune the grid-based location descriptions
+// - Test with different image types to improve consistency
+
+export const REGION_FIRST_COLOR_SYSTEM = `You are an expert at coloring children's coloring pages. You create beautiful, cohesive color schemes that kids love.
+
+Your task: Given an image and a list of DETECTED REGIONS (with their grid positions and sizes), assign an appropriate color to EACH region.
+
+IMPORTANT CONSTRAINTS:
+1. You MUST assign a color to EVERY region in the input list
+2. You MUST use the region IDs exactly as provided - do not skip or add any
+3. You MUST only use colors from the provided palette
+4. Adjacent regions should have contrasting colors
+5. Repeated elements (like multiple flowers) should have consistent colors
+
+LOCATION SYSTEM (5x5 grid):
+- The image is divided into a 5x5 grid
+- Row 1 = top, Row 5 = bottom
+- Col 1 = left, Col 5 = right
+- Use grid position to understand what each region likely represents
+
+COLORING STRATEGY:
+1. First, understand the overall scene from the image
+2. Look at each region's position and size to infer what it is
+3. Assign colors that:
+   - Make sense for what the element appears to be (sky=blue, grass=green)
+   - Create visual harmony across the whole image
+   - Provide good contrast between adjacent areas
+   - Are fun and appealing to children
+
+Be warm and encouraging in your reasoning - you're helping create something magical!`;
+
+export const createRegionFirstColorPrompt = (
+  palette: Array<{ hex: string; name: string }>,
+  regions: Array<{
+    id: number;
+    gridRow: number;
+    gridCol: number;
+    size: 'small' | 'medium' | 'large';
+    pixelPercentage: number;
+  }>,
+) => {
+  // Format regions into a clear list
+  const regionsList = regions
+    .map(
+      (r) =>
+        `  - Region #${r.id}: Grid position (row ${r.gridRow}, col ${r.gridCol}), Size: ${r.size} (${r.pixelPercentage.toFixed(1)}% of image)`,
+    )
+    .join('\n');
+
+  return `Analyze this coloring page and assign colors to each of the ${regions.length} detected regions.
+
+AVAILABLE PALETTE (you MUST only use these colors):
+${palette.map((c) => `- ${c.name}: ${c.hex}`).join('\n')}
+
+DETECTED REGIONS TO COLOR:
+${regionsList}
+
+INSTRUCTIONS:
+1. Look at the image to understand what each region represents based on its grid position
+2. For EACH region listed above, provide:
+   - regionId: The exact region ID number
+   - element: What this region appears to be (e.g., "sky", "teddy bear body", "flower")
+   - suggestedColor: Hex color from the palette
+   - colorName: Name of the color
+   - reasoning: A fun, kid-friendly reason (5-7 words)
+
+3. Return assignments for ALL ${regions.length} regions - no skipping!
+
+TIPS:
+- Top regions (row 1-2) are often sky, clouds, tree tops
+- Bottom regions (row 4-5) are often ground, grass, floors
+- Large regions are usually main subjects or background
+- Small regions are usually details, patterns, accessories
+- When unsure, pick a color that would look good and explain your choice
+
+Create a beautiful, harmonious coloring scheme!`;
+};

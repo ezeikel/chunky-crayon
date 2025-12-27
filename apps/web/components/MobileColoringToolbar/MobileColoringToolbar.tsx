@@ -13,6 +13,7 @@ type MobileColoringToolbarProps = {
   className?: string;
   onUndo?: (action: CanvasAction) => void;
   onRedo?: (action: CanvasAction) => void;
+  onStickerToolSelect?: () => void;
 };
 
 // Chevron icon for expand/collapse
@@ -52,6 +53,7 @@ const MobileColoringToolbar = ({
   className,
   onUndo,
   onRedo,
+  onStickerToolSelect,
 }: MobileColoringToolbarProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { activeTool, selectedColor } = useColoringContext();
@@ -133,8 +135,11 @@ const MobileColoringToolbar = ({
 
       {/* Main toolbar row - always visible */}
       <div className="flex items-center gap-2 px-2 pb-2">
-        {/* Tools (Crayon, Marker, Fill, Eraser) */}
-        <ToolSelector className="shadow-sm flex-shrink-0" />
+        {/* Tools (Crayon, Marker, Fill, Eraser, Sticker, etc.) */}
+        <ToolSelector
+          className="shadow-sm flex-shrink-0"
+          onStickerToolSelect={onStickerToolSelect}
+        />
 
         {/* Scrollable color strip */}
         <ColorStrip className="flex-1 shadow-sm" />
