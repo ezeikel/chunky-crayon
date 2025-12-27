@@ -224,14 +224,31 @@ export function scanlineFill(
   const pixelX = Math.floor(x);
   const pixelY = Math.floor(y);
 
+  console.log('[FloodFill] Starting fill at:', {
+    pixelX,
+    pixelY,
+    fillColor,
+    tolerance,
+    boundaryThreshold,
+  });
+
   if (pixelX < 0 || pixelX >= width || pixelY < 0 || pixelY >= height) {
+    console.log('[FloodFill] Out of bounds');
     return false;
   }
 
   // If we have boundary data, check if we clicked on a boundary line
   if (boundaryImageData) {
-    if (isBoundaryPixel(boundaryImageData, pixelX, pixelY, boundaryThreshold)) {
+    const isBoundary = isBoundaryPixel(
+      boundaryImageData,
+      pixelX,
+      pixelY,
+      boundaryThreshold,
+    );
+    console.log('[FloodFill] Boundary check at click point:', { isBoundary });
+    if (isBoundary) {
       // Clicked on a line, don't fill
+      console.log('[FloodFill] Clicked on boundary line, not filling');
       return false;
     }
   }
@@ -239,7 +256,15 @@ export function scanlineFill(
   const imageData = ctx.getImageData(0, 0, width, height);
   const targetColor = getPixelColor(imageData, pixelX, pixelY);
 
+  console.log('[FloodFill] Target color (color being replaced):', targetColor);
+  console.log('[FloodFill] Fill color (new color):', fillColor);
+  console.log(
+    '[FloodFill] Colors match?:',
+    colorsMatch(targetColor, fillColor, tolerance),
+  );
+
   if (colorsMatch(targetColor, fillColor, tolerance)) {
+    console.log('[FloodFill] Target and fill colors match - nothing to do');
     return false;
   }
 
@@ -323,9 +348,11 @@ export function scanlineFill(
   }
 
   if (pixelsFilled > 0) {
+    console.log('[FloodFill] Filled', pixelsFilled, 'pixels');
     ctx.putImageData(imageData, 0, 0);
     return true;
   }
 
+  console.log('[FloodFill] No pixels filled');
   return false;
 }

@@ -253,7 +253,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         const scaledX = isCanvasPixels ? x : x * dpr;
         const scaledY = isCanvasPixels ? y : y * dpr;
 
-        // Create a composite boundary canvas
+        // Create a boundary canvas from SVG outlines ONLY
+        // We don't include existing coloring because:
+        // 1. Many colors (red, blue, green) have low luminance and would be detected as boundaries
+        // 2. This would prevent re-filling already colored regions
+        // The targetColor matching already handles not filling over different colors
         const boundaryCanvas = document.createElement('canvas');
         boundaryCanvas.width = drawingCanvas.width;
         boundaryCanvas.height = drawingCanvas.height;
@@ -261,11 +265,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
         if (!boundaryCtx) return false;
 
-        // Draw the SVG outline layer
+        // Only use SVG outline layer for boundary detection (black lines)
         boundaryCtx.drawImage(imageCanvas, 0, 0);
-
-        // Also draw any existing coloring
-        boundaryCtx.drawImage(drawingCanvas, 0, 0);
 
         // Get the boundary image data
         const boundaryImageData = boundaryCtx.getImageData(
@@ -755,8 +756,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       const x = canvasCoords.x * dpr;
       const y = canvasCoords.y * dpr;
 
-      // Create a composite boundary canvas that combines SVG lines + current drawing
-      // This allows the flood fill to "see" the SVG line boundaries
+      // Create a boundary canvas from SVG outlines ONLY
+      // We don't include existing coloring because:
+      // 1. Many colors (red, blue, green) have low luminance and would be detected as boundaries
+      // 2. This would prevent re-filling already colored regions with different colors
+      // The scanlineFill's targetColor matching handles filling only matching pixels
       const boundaryCanvas = document.createElement('canvas');
       boundaryCanvas.width = drawingCanvas.width;
       boundaryCanvas.height = drawingCanvas.height;
@@ -764,11 +768,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
       if (!boundaryCtx) return;
 
-      // Draw the SVG outline layer (the lines that define regions)
+      // Only use SVG outline layer for boundary detection (black lines)
       boundaryCtx.drawImage(imageCanvas, 0, 0);
-
-      // Also draw any existing coloring (so we respect previously filled regions)
-      boundaryCtx.drawImage(drawingCanvas, 0, 0);
 
       // Get the boundary image data for the flood fill to check against
       const boundaryImageData = boundaryCtx.getImageData(
