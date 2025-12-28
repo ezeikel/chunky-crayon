@@ -494,8 +494,8 @@
     "perMonth": "/월",
     "creditsPerMonth": "크레딧/월",
     "plans": {
-      "crayon": {
-        "name": "크레용 플랜",
+      "splash": {
+        "name": "스플래시 플랜",
         "tagline": "색칠 모험을 시작해요",
         "audience": "가볍게 즐기는 분과 꼬마 작가에게 딱!"
       },
@@ -504,15 +504,10 @@
         "tagline": "온 가족이 함께 즐겨요",
         "audience": "창의적인 가족과 형제자매에게 좋아요"
       },
-      "masterpiece": {
-        "name": "마스터피스 플랜",
+      "sparkle": {
+        "name": "스파클 플랜",
         "tagline": "색칠을 사랑하는 당신에게",
-        "audience": "어른과 진지하게 즐기는 분에게 딱!"
-      },
-      "studio": {
-        "name": "스튜디오 플랜",
-        "tagline": "슈퍼 크리에이터와 소규모 비즈니스용",
-        "audience": "스튜디오, 선생님, 대량 사용에 최고예요"
+        "audience": "색칠을 사랑하는 창의적인 가족에게 딱!"
       }
     },
     "features": {
@@ -520,16 +515,14 @@
       "wordsNumbers": "단어, 이름, 숫자로 색칠 페이지 만들기",
       "adjustments": "색상, 대비, 밝기 조절",
       "photoToColoring": "사진을 색칠 페이지로 바꾸기",
-      "allCrayonFeatures": "크레용 플랜의 모든 기능",
+      "allSplashFeatures": "스플래시 플랜의 모든 기능",
       "advancedEditing": "고급 편집 기능",
       "earlyAccess": "새 모델과 기능을 먼저 사용",
       "rollover1Month": "크레딧 이월 (최대 1개월)",
       "allRainbowFeatures": "레인보우 플랜의 모든 기능",
       "bulkGeneration": "일괄 생성",
       "commercialUse": "상업적 사용",
-      "rollover2Months": "크레딧 이월 (최대 2개월)",
-      "allMasterpieceFeatures": "마스터피스 플랜의 모든 기능",
-      "rollover3Months": "크레딧 이월 (최대 3개월)"
+      "rollover2Months": "크레딧 이월 (최대 2개월)"
     },
     "creditPacks": {
       "title": "크레딧이 더 필요하신가요?",

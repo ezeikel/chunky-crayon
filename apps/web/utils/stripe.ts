@@ -32,13 +32,13 @@ export const mapStripeStatusToSubscriptionStatus = (
 
 export const mapStripePriceToPlanName = (priceId: string): PriceMapping => {
   switch (priceId) {
-    case process.env.NEXT_PUBLIC_STRIPE_PRICE_CRAYON_MONTHLY:
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY:
       return {
-        planName: PlanName.CRAYON,
+        planName: PlanName.SPLASH,
         billingPeriod: BillingPeriod.MONTHLY,
       };
-    case process.env.NEXT_PUBLIC_STRIPE_PRICE_CRAYON_ANNUAL:
-      return { planName: PlanName.CRAYON, billingPeriod: BillingPeriod.ANNUAL };
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL:
+      return { planName: PlanName.SPLASH, billingPeriod: BillingPeriod.ANNUAL };
     case process.env.NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY:
       return {
         planName: PlanName.RAINBOW,
@@ -49,23 +49,16 @@ export const mapStripePriceToPlanName = (priceId: string): PriceMapping => {
         planName: PlanName.RAINBOW,
         billingPeriod: BillingPeriod.ANNUAL,
       };
-    case process.env.NEXT_PUBLIC_STRIPE_PRICE_MASTERPIECE_MONTHLY:
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY:
       return {
-        planName: PlanName.MASTERPIECE,
+        planName: PlanName.SPARKLE,
         billingPeriod: BillingPeriod.MONTHLY,
       };
-    case process.env.NEXT_PUBLIC_STRIPE_PRICE_MASTERPIECE_ANNUAL:
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL:
       return {
-        planName: PlanName.MASTERPIECE,
+        planName: PlanName.SPARKLE,
         billingPeriod: BillingPeriod.ANNUAL,
       };
-    case process.env.NEXT_PUBLIC_STRIPE_PRICE_STUDIO_MONTHLY:
-      return {
-        planName: PlanName.STUDIO,
-        billingPeriod: BillingPeriod.MONTHLY,
-      };
-    case process.env.NEXT_PUBLIC_STRIPE_PRICE_STUDIO_ANNUAL:
-      return { planName: PlanName.STUDIO, billingPeriod: BillingPeriod.ANNUAL };
     default:
       throw new Error(`Unknown price ID: ${priceId}`);
   }
@@ -88,14 +81,12 @@ export const getCreditAmountFromPriceId = (priceId?: string): number | null => {
 
 export const getCreditAmountFromPlanName = (planName: PlanName): number => {
   switch (planName) {
-    case PlanName.CRAYON:
+    case PlanName.SPLASH:
       return 250;
     case PlanName.RAINBOW:
       return 500;
-    case PlanName.MASTERPIECE:
+    case PlanName.SPARKLE:
       return 1000;
-    case PlanName.STUDIO:
-      return 5000;
     default:
       throw new Error(`Unknown plan name: ${planName}`);
   }

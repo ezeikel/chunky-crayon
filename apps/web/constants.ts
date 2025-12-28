@@ -577,41 +577,34 @@ export type SubscriptionPlan = {
 // Monthly credit allotment per plan (same for monthly and annual billing)
 // Annual subscribers get the same monthly credits via cron job, just billed yearly
 export const PLAN_CREDITS_MONTHLY = {
-  [PlanName.CRAYON]: 250,
+  [PlanName.SPLASH]: 250,
   [PlanName.RAINBOW]: 500,
-  [PlanName.MASTERPIECE]: 1000,
-  [PlanName.STUDIO]: 5000,
+  [PlanName.SPARKLE]: 1000,
 } as const;
 
 // Rollover caps: max credits that can carry over to next month
-// Crayon: no rollover (credits reset each month)
+// Splash: no rollover (credits reset each month)
 // Rainbow: 1 month rollover (500 max carryover)
-// Masterpiece: 2 months rollover (2000 max carryover)
-// Studio: 3 months rollover (15000 max carryover)
+// Sparkle: 2 months rollover (2000 max carryover)
 export const PLAN_ROLLOVER_CAPS = {
-  [PlanName.CRAYON]: 0,
+  [PlanName.SPLASH]: 0,
   [PlanName.RAINBOW]: 500,
-  [PlanName.MASTERPIECE]: 2000,
-  [PlanName.STUDIO]: 15000,
+  [PlanName.SPARKLE]: 2000,
 } as const;
 
 // Legacy export for backwards compatibility - now uses monthly amounts for both
 export const PLAN_CREDITS = {
-  [PlanName.CRAYON]: {
-    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.CRAYON],
-    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.CRAYON],
+  [PlanName.SPLASH]: {
+    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.SPLASH],
+    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.SPLASH],
   },
   [PlanName.RAINBOW]: {
     [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.RAINBOW],
     [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.RAINBOW],
   },
-  [PlanName.MASTERPIECE]: {
-    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.MASTERPIECE],
-    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.MASTERPIECE],
-  },
-  [PlanName.STUDIO]: {
-    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.STUDIO],
-    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.STUDIO],
+  [PlanName.SPARKLE]: {
+    [BillingPeriod.MONTHLY]: PLAN_CREDITS_MONTHLY[PlanName.SPARKLE],
+    [BillingPeriod.ANNUAL]: PLAN_CREDITS_MONTHLY[PlanName.SPARKLE],
   },
 } as const;
 
@@ -624,9 +617,9 @@ export const CREDIT_PACK_AMOUNTS = {
 export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
   monthly: [
     {
-      key: PlanName.CRAYON,
+      key: PlanName.SPLASH,
       price: '£7.99',
-      credits: `${PLAN_CREDITS[PlanName.CRAYON][BillingPeriod.MONTHLY]} credits/month`,
+      credits: `${PLAN_CREDITS[PlanName.SPLASH][BillingPeriod.MONTHLY]} credits/month`,
       featureKeys: [
         'textPrompts',
         'wordsNumbers',
@@ -634,14 +627,14 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'photoToColoring',
       ],
       stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_CRAYON_MONTHLY as string,
+        .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY as string,
     },
     {
       key: PlanName.RAINBOW,
       price: '£13.99',
       credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.MONTHLY]} credits/month`,
       featureKeys: [
-        'allCrayonFeatures',
+        'allSplashFeatures',
         'advancedEditing',
         'earlyAccess',
         'rollover1Month',
@@ -651,9 +644,9 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       mostPopular: true,
     },
     {
-      key: PlanName.MASTERPIECE,
+      key: PlanName.SPARKLE,
       price: '£24.99',
-      credits: `${PLAN_CREDITS[PlanName.MASTERPIECE][BillingPeriod.MONTHLY]} credits/month`,
+      credits: `${PLAN_CREDITS[PlanName.SPARKLE][BillingPeriod.MONTHLY]} credits/month`,
       featureKeys: [
         'allRainbowFeatures',
         'bulkGeneration',
@@ -661,22 +654,14 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'rollover2Months',
       ],
       stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_MASTERPIECE_MONTHLY as string,
-    },
-    {
-      key: PlanName.STUDIO,
-      price: '£59.99',
-      credits: `${PLAN_CREDITS[PlanName.STUDIO][BillingPeriod.MONTHLY]} credits/month`,
-      featureKeys: ['allMasterpieceFeatures', 'rollover3Months'],
-      stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_STUDIO_MONTHLY as string,
+        .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY as string,
     },
   ],
   annual: [
     {
-      key: PlanName.CRAYON,
+      key: PlanName.SPLASH,
       price: '£79.99',
-      credits: `${PLAN_CREDITS[PlanName.CRAYON][BillingPeriod.ANNUAL]} credits/month`,
+      credits: `${PLAN_CREDITS[PlanName.SPLASH][BillingPeriod.ANNUAL]} credits/month`,
       featureKeys: [
         'textPrompts',
         'wordsNumbers',
@@ -684,14 +669,14 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'photoToColoring',
       ],
       stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_CRAYON_ANNUAL as string,
+        .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL as string,
     },
     {
       key: PlanName.RAINBOW,
       price: '£139.99',
       credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.ANNUAL]} credits/month`,
       featureKeys: [
-        'allCrayonFeatures',
+        'allSplashFeatures',
         'advancedEditing',
         'earlyAccess',
         'rollover1Month',
@@ -701,9 +686,9 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       mostPopular: true,
     },
     {
-      key: PlanName.MASTERPIECE,
+      key: PlanName.SPARKLE,
       price: '£249.99',
-      credits: `${PLAN_CREDITS[PlanName.MASTERPIECE][BillingPeriod.ANNUAL]} credits/month`,
+      credits: `${PLAN_CREDITS[PlanName.SPARKLE][BillingPeriod.ANNUAL]} credits/month`,
       featureKeys: [
         'allRainbowFeatures',
         'bulkGeneration',
@@ -711,15 +696,7 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'rollover2Months',
       ],
       stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_MASTERPIECE_ANNUAL as string,
-    },
-    {
-      key: PlanName.STUDIO,
-      price: '£599.00',
-      credits: `${PLAN_CREDITS[PlanName.STUDIO][BillingPeriod.ANNUAL]} credits/month`,
-      featureKeys: ['allMasterpieceFeatures', 'rollover3Months'],
-      stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_STUDIO_ANNUAL as string,
+        .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL as string,
     },
   ],
 };

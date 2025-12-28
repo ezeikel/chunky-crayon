@@ -26,10 +26,9 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
 
 // Map PlanName enum to translation keys
 const planKeyMap: Record<PlanName, string> = {
-  [PlanName.CRAYON]: 'crayon',
+  [PlanName.SPLASH]: 'splash',
   [PlanName.RAINBOW]: 'rainbow',
-  [PlanName.MASTERPIECE]: 'masterpiece',
-  [PlanName.STUDIO]: 'studio',
+  [PlanName.SPARKLE]: 'sparkle',
 };
 
 const PricingPage = () => {

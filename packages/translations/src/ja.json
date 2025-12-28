@@ -494,8 +494,8 @@
     "perMonth": "/月",
     "creditsPerMonth": "クレジット/月",
     "plans": {
-      "crayon": {
-        "name": "クレヨンプラン",
+      "splash": {
+        "name": "スプラッシュプラン",
         "tagline": "ぬりえの冒険を始めよう",
         "audience": "気軽に楽しみたい人や小さなアーティストにぴったり"
       },
@@ -504,15 +504,10 @@
         "tagline": "家族みんなで楽しい",
         "audience": "クリエイティブな家族やきょうだいにおすすめ"
       },
-      "masterpiece": {
-        "name": "マスターピースプラン",
+      "sparkle": {
+        "name": "スパークルプラン",
         "tagline": "ぬりえ好きのあなたへ",
-        "audience": "大人や本格派のぬりえ好きにぴったり"
-      },
-      "studio": {
-        "name": "スタジオプラン",
-        "tagline": "すごいクリエイター＆小さなお店向け",
-        "audience": "スタジオ、先生、大量に使う方に最適"
+        "audience": "ぬりえが大好きなご家族にぴったり"
       }
     },
     "features": {
@@ -520,16 +515,14 @@
       "wordsNumbers": "言葉・名前・数字入りのぬりえを作れる",
       "adjustments": "色・コントラスト・明るさを調整",
       "photoToColoring": "写真をぬりえに変換",
-      "allCrayonFeatures": "クレヨンプランの全機能",
+      "allSplashFeatures": "スプラッシュプランの全機能",
       "advancedEditing": "高度な編集機能",
       "earlyAccess": "新しいモデル＆機能を先行体験",
       "rollover1Month": "クレジット繰り越し（最大1か月）",
       "allRainbowFeatures": "レインボープランの全機能",
       "bulkGeneration": "まとめて生成",
       "commercialUse": "商用利用OK",
-      "rollover2Months": "クレジット繰り越し（最大2か月）",
-      "allMasterpieceFeatures": "マスターピースプランの全機能",
-      "rollover3Months": "クレジット繰り越し（最大3か月）"
+      "rollover2Months": "クレジット繰り越し（最大2か月）"
     },
     "creditPacks": {
       "title": "クレジットを追加しますか？",

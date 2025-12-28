@@ -250,11 +250,11 @@
         },
         "8": {
           "question": "What's included in the subscription plans?",
-          "answer": "Our plans range from Crayon (perfect for casual coloring) to Studio (for super-creative families or teachers). All plans include: unlimited coloring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights."
+          "answer": "Our plans range from Splash (perfect for casual coloring) to Sparkle (for super-creative families). All plans include: coloring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights."
         },
         "9": {
           "question": "Can I use pages for my classroom or nursery?",
-          "answer": "Yes! Teachers and childminders love Chunky Crayon. Our Crayon and Rainbow plans are perfect for personal and educational use. If you're running a business or want to distribute pages commercially, check out our Masterpiece or Studio plans which include commercial licensing."
+          "answer": "Yes! Teachers and childminders love Chunky Crayon. Our Splash and Rainbow plans are perfect for personal and educational use. If you're running a business or want to distribute pages commercially, check out our Sparkle plan which includes commercial licensing."
         },
         "10": {
           "question": "How do credits work?",
@@ -494,8 +494,8 @@
     "perMonth": "/mo",
     "creditsPerMonth": "credits/month",
     "plans": {
-      "crayon": {
-        "name": "Crayon Plan",
+      "splash": {
+        "name": "Splash Plan",
         "tagline": "Start your coloring adventure",
         "audience": "Perfect for casual colorers and young artists"
       },
@@ -504,15 +504,10 @@
         "tagline": "Fun for the whole family",
         "audience": "Great for creative families and siblings"
       },
-      "masterpiece": {
-        "name": "Masterpiece Plan",
+      "sparkle": {
+        "name": "Sparkle Plan",
         "tagline": "For color enthusiasts",
-        "audience": "Perfect for adults and serious colorers"
-      },
-      "studio": {
-        "name": "Studio Plan",
-        "tagline": "For super creators and small businesses",
-        "audience": "Best for studios, teachers, and high-volume users"
+        "audience": "Perfect for creative families who love to color"
       }
     },
     "features": {
@@ -520,16 +515,14 @@
       "wordsNumbers": "Create coloring pages with words, names, and numbers",
       "adjustments": "Adjust color, contrast, and brightness",
       "photoToColoring": "Turn photos into coloring pages",
-      "allCrayonFeatures": "All Crayon Plan features",
+      "allSplashFeatures": "All Splash Plan features",
       "advancedEditing": "Advanced editing features",
       "earlyAccess": "Early access to new models and features",
       "rollover1Month": "Credits roll over (up to 1 month)",
       "allRainbowFeatures": "All Rainbow Plan features",
       "bulkGeneration": "Bulk generation",
       "commercialUse": "Commercial use",
-      "rollover2Months": "Credits roll over (up to 2 months)",
-      "allMasterpieceFeatures": "All Masterpiece Plan features",
-      "rollover3Months": "Credits roll over (up to 3 months)"
+      "rollover2Months": "Credits roll over (up to 2 months)"
     },
     "creditPacks": {
       "title": "Need extra credits?",
