@@ -11,38 +11,36 @@
  * Usage: pnpm tsx scripts/audit-translations.ts
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const LOCALES = ['en', 'es', 'fr', 'de', 'ja', 'ko'] as const;
-const SOURCE_LOCALE = 'en';
-const SRC_DIR = path.join(__dirname, '..', 'src');
+// Import locales from central config
+import { ALL_LOCALE_CODES, SOURCE_LOCALE } from "../src/locales.js";
+
+const SRC_DIR = path.join(__dirname, "..", "src");
 
 type TranslationValue = string | Record<string, unknown>;
 type TranslationObject = Record<string, TranslationValue>;
 
 function loadTranslations(locale: string): TranslationObject {
   const filePath = path.join(SRC_DIR, `${locale}.json`);
-  const content = fs.readFileSync(filePath, 'utf-8');
+  const content = fs.readFileSync(filePath, "utf-8");
   return JSON.parse(content);
 }
 
-function flattenKeys(
-  obj: TranslationObject,
-  prefix = '',
-): Map<string, string> {
+function flattenKeys(obj: TranslationObject, prefix = ""): Map<string, string> {
   const result = new Map<string, string>();
 
   for (const [key, value] of Object.entries(obj)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
 
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       result.set(fullKey, value);
-    } else if (typeof value === 'object' && value !== null) {
+    } else if (typeof value === "object" && value !== null) {
       const nested = flattenKeys(value as TranslationObject, fullKey);
       for (const [nestedKey, nestedValue] of nested) {
         result.set(nestedKey, nestedValue);
@@ -76,8 +74,8 @@ function compareTranslations(
       // Skip if it's a technical value (URLs, numbers, etc.)
       if (
         sourceValue === targetValue &&
-        !sourceValue.startsWith('http') &&
-        !sourceValue.startsWith('/') &&
+        !sourceValue.startsWith("http") &&
+        !sourceValue.startsWith("/") &&
         !/^\d+$/.test(sourceValue) &&
         sourceValue.length > 3 // Skip short strings like "OK", "PDF"
       ) {
@@ -104,12 +102,12 @@ function printResults(
     untranslated: string[];
   },
 ): void {
-  console.log(`\n${'='.repeat(60)}`);
+  console.log(`\n${"=".repeat(60)}`);
   console.log(`LOCALE: ${locale.toUpperCase()}`);
-  console.log('='.repeat(60));
+  console.log("=".repeat(60));
 
   if (results.missing.length === 0 && results.extra.length === 0) {
-    console.log('All keys are present.');
+    console.log("All keys are present.");
   }
 
   if (results.missing.length > 0) {
@@ -130,8 +128,10 @@ function printResults(
 
   if (results.untranslated.length > 0) {
     console.log(`\nPOTENTIALLY UNTRANSLATED (${results.untranslated.length}):`);
-    console.log('  (These match English exactly - may need review)');
-    results.untranslated.slice(0, 10).forEach((key) => console.log(`  - ${key}`));
+    console.log("  (These match English exactly - may need review)");
+    results.untranslated
+      .slice(0, 10)
+      .forEach((key) => console.log(`  - ${key}`));
     if (results.untranslated.length > 10) {
       console.log(`  ... and ${results.untranslated.length - 10} more`);
     }
@@ -139,10 +139,12 @@ function printResults(
 }
 
 function main(): void {
-  console.log('Translation Audit Report');
-  console.log('========================\n');
+  console.log("Translation Audit Report");
+  console.log("========================\n");
   console.log(`Source locale: ${SOURCE_LOCALE}`);
-  console.log(`Target locales: ${LOCALES.filter((l) => l !== SOURCE_LOCALE).join(', ')}`);
+  console.log(
+    `Target locales: ${ALL_LOCALE_CODES.filter((l) => l !== SOURCE_LOCALE).join(", ")}`,
+  );
 
   const sourceTranslations = loadTranslations(SOURCE_LOCALE);
   const sourceKeys = flattenKeys(sourceTranslations);
@@ -152,7 +154,7 @@ function main(): void {
   let totalExtra = 0;
   let totalUntranslated = 0;
 
-  for (const locale of LOCALES) {
+  for (const locale of ALL_LOCALE_CODES) {
     if (locale === SOURCE_LOCALE) continue;
 
     try {
@@ -170,18 +172,18 @@ function main(): void {
     }
   }
 
-  console.log(`\n${'='.repeat(60)}`);
-  console.log('SUMMARY');
-  console.log('='.repeat(60));
+  console.log(`\n${"=".repeat(60)}`);
+  console.log("SUMMARY");
+  console.log("=".repeat(60));
   console.log(`Total missing keys across all locales: ${totalMissing}`);
   console.log(`Total extra keys across all locales: ${totalExtra}`);
   console.log(`Total potentially untranslated: ${totalUntranslated}`);
 
   if (totalMissing > 0) {
-    console.log('\nAction required: Add missing translations.');
+    console.log("\nAction required: Add missing translations.");
     process.exit(1);
   } else {
-    console.log('\nAll translations are in sync!');
+    console.log("\nAll translations are in sync!");
   }
 }
 

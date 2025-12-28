@@ -14,33 +14,27 @@
  * Requires: OPENAI_API_KEY environment variable
  */
 
-import * as dotenv from 'dotenv';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import * as dotenv from "dotenv";
+import * as path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env.local in apps/web
-dotenv.config({ path: path.join(__dirname, '..', '..', '..', 'apps', 'web', '.env.local') });
+dotenv.config({
+  path: path.join(__dirname, "..", "..", "..", "apps", "web", ".env.local"),
+});
 
-import { generateObject } from 'ai';
-import { openai } from '@ai-sdk/openai';
-import * as fs from 'fs/promises';
+import { generateObject } from "ai";
+import { openai } from "@ai-sdk/openai";
+import * as fs from "fs/promises";
 
-// Translation target locales
-const LOCALES = [
-  { code: 'ja', name: 'Japanese', nativeName: '日本語' },
-  { code: 'ko', name: 'Korean', nativeName: '한국어' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch' },
-  { code: 'fr', name: 'French', nativeName: 'Français' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español' },
-] as const;
-
-type LocaleCode = (typeof LOCALES)[number]['code'];
+// Import locales from central config
+import { LOCALES, type LocaleCode } from "../src/locales.js";
 
 // Path to translation files
-const SRC_DIR = path.join(__dirname, '..', 'src');
+const SRC_DIR = path.join(__dirname, "..", "src");
 
 const TRANSLATION_PROMPT = `You are a professional translator for a children's coloring app called "Chunky Crayon".
 
@@ -74,7 +68,7 @@ function validateTranslationKeys(
   source: Record<string, unknown>,
   translated: Record<string, unknown>,
   locale: string,
-  keyPath = '',
+  keyPath = "",
 ): string[] {
   const errors: string[] = [];
 
@@ -102,9 +96,9 @@ function validateTranslationKeys(
       const translatedValue = translated[key];
 
       if (
-        typeof sourceValue === 'object' &&
+        typeof sourceValue === "object" &&
         sourceValue !== null &&
-        typeof translatedValue === 'object' &&
+        typeof translatedValue === "object" &&
         translatedValue !== null
       ) {
         errors.push(
@@ -132,16 +126,19 @@ async function translateChunk(
   nativeName: string,
   model: string,
 ): Promise<Record<string, unknown>> {
-  const prompt = TRANSLATION_PROMPT.replace(/\{\{TARGET_LANGUAGE\}\}/g, targetLanguage)
+  const prompt = TRANSLATION_PROMPT.replace(
+    /\{\{TARGET_LANGUAGE\}\}/g,
+    targetLanguage,
+  )
     .replace(/\{\{NATIVE_NAME\}\}/g, nativeName)
-    .replace('{{JSON_CONTENT}}', JSON.stringify(chunk, null, 2));
+    .replace("{{JSON_CONTENT}}", JSON.stringify(chunk, null, 2));
 
   // Use generateObject with 'json' output mode for structured JSON response
   // This ensures we always get valid JSON back without needing to parse text
   const { object } = await generateObject({
     model: openai(model, { structuredOutputs: true }),
     prompt,
-    output: 'no-schema', // JSON mode without strict schema - mirrors input structure
+    output: "no-schema", // JSON mode without strict schema - mirrors input structure
     maxOutputTokens: 16000,
     temperature: 0.3, // Lower temperature for more consistent translations
   });
@@ -199,27 +196,29 @@ async function translateToLocale(
  */
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  const dryRun = args.includes('--dry-run');
-  const singleLocale = args.find((a) => a.startsWith('--locale='))?.split('=')[1] as
-    | LocaleCode
-    | undefined;
+  const dryRun = args.includes("--dry-run");
+  const singleLocale = args
+    .find((a) => a.startsWith("--locale="))
+    ?.split("=")[1] as LocaleCode | undefined;
 
   // Model selection - GPT-5.2 is the latest flagship model
-  const model = process.env.TRANSLATION_MODEL || 'gpt-5.2';
+  const model = process.env.TRANSLATION_MODEL || "gpt-5.2";
 
-  console.log('🖍️  Chunky Crayon Translation Script');
-  console.log('=====================================\n');
+  console.log("🖍️  Chunky Crayon Translation Script");
+  console.log("=====================================\n");
 
   if (dryRun) {
-    console.log('🔍 DRY RUN MODE - no files will be saved\n');
+    console.log("🔍 DRY RUN MODE - no files will be saved\n");
   }
 
   // Load English source
-  const enPath = path.join(SRC_DIR, 'en.json');
-  const enContent = await fs.readFile(enPath, 'utf-8');
+  const enPath = path.join(SRC_DIR, "en.json");
+  const enContent = await fs.readFile(enPath, "utf-8");
   const enStrings = JSON.parse(enContent);
 
-  console.log(`📖 Loaded English source: ${Object.keys(enStrings).length} namespaces`);
+  console.log(
+    `📖 Loaded English source: ${Object.keys(enStrings).length} namespaces`,
+  );
 
   // Filter locales if single locale specified
   const localesToTranslate = singleLocale
@@ -243,7 +242,11 @@ async function main(): Promise<void> {
       );
 
       // Validate structure
-      const errors = validateTranslationKeys(enStrings, translated, locale.code);
+      const errors = validateTranslationKeys(
+        enStrings,
+        translated,
+        locale.code,
+      );
       if (errors.length > 0) {
         console.warn(`   ⚠️  Validation warnings for ${locale.code}:`);
         errors.forEach((e) => console.warn(`      - ${e}`));
@@ -252,7 +255,10 @@ async function main(): Promise<void> {
       // Save translation
       if (!dryRun) {
         const outputPath = path.join(SRC_DIR, `${locale.code}.json`);
-        await fs.writeFile(outputPath, JSON.stringify(translated, null, 2) + '\n');
+        await fs.writeFile(
+          outputPath,
+          JSON.stringify(translated, null, 2) + "\n",
+        );
         console.log(`   💾 Saved to ${outputPath}`);
       } else {
         console.log(`   📋 Would save to ${locale.code}.json (dry run)`);
@@ -263,11 +269,11 @@ async function main(): Promise<void> {
     }
   }
 
-  console.log('\n✨ Translation complete!');
-  console.log('\nNext steps:');
-  console.log('  1. Review translations for quality');
-  console.log('  2. Run: pnpm tsx scripts/audit-translations.ts');
-  console.log('  3. Commit the changes');
+  console.log("\n✨ Translation complete!");
+  console.log("\nNext steps:");
+  console.log("  1. Review translations for quality");
+  console.log("  2. Run: pnpm tsx scripts/audit-translations.ts");
+  console.log("  3. Commit the changes");
 }
 
 main().catch(console.error);

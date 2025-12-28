@@ -29,16 +29,8 @@ import { generateObject } from "ai";
 import { openai } from "@ai-sdk/openai";
 import * as fs from "fs/promises";
 
-// Translation target locales
-const LOCALES = [
-  { code: "ja", name: "Japanese", nativeName: "日本語" },
-  { code: "ko", name: "Korean", nativeName: "한국어" },
-  { code: "de", name: "German", nativeName: "Deutsch" },
-  { code: "fr", name: "French", nativeName: "Français" },
-  { code: "es", name: "Spanish", nativeName: "Español" },
-] as const;
-
-type LocaleCode = (typeof LOCALES)[number]["code"];
+// Import locales from central config
+import { LOCALES } from "../src/locales.js";
 
 // Path to translation files
 const SRC_DIR = path.join(__dirname, "..", "src");

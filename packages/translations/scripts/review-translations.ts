@@ -34,18 +34,10 @@ dotenv.config({
 import Anthropic from "@anthropic-ai/sdk";
 import * as fs from "fs/promises";
 
+// Import locales from central config
+import { LOCALES, type LocaleCode } from "../src/locales.js";
+
 const anthropic = new Anthropic();
-
-// Locales to review
-const LOCALES = [
-  { code: "ja", name: "Japanese", nativeName: "日本語" },
-  { code: "ko", name: "Korean", nativeName: "한국어" },
-  { code: "de", name: "German", nativeName: "Deutsch" },
-  { code: "fr", name: "French", nativeName: "Français" },
-  { code: "es", name: "Spanish", nativeName: "Español" },
-] as const;
-
-type LocaleCode = (typeof LOCALES)[number]["code"];
 
 const SRC_DIR = path.join(__dirname, "..", "src");
 

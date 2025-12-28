@@ -4,12 +4,15 @@
 
 ## Executive Summary
 
-This document outlines the internationalization (i18n) strategy for Chunky Crayon, a SaaS kids coloring app targeting parents of children aged 3-8. Based on market research and technical analysis, we will implement a phased rollout prioritizing high-value markets with proven willingness to pay for premium children's educational apps.
+This document outlines the internationalization (i18n) strategy for Chunky
+Crayon, a SaaS kids coloring app targeting parents of children aged 3-8. Based
+on market research and technical analysis, we will implement a phased rollout
+prioritizing high-value markets with proven willingness to pay for premium
+children's educational apps.
 
-**Current State:** English-only (en-GB)
-**Target:** 6 languages across 3 phases
-**Expected MRR Impact:** 40-60% revenue increase within 18 months
-**Technical Approach:** next-intl with Next.js 16 cache components
+**Current State:** English-only (en-GB) **Target:** 6 languages across 3 phases
+**Expected MRR Impact:** 40-60% revenue increase within 18 months **Technical
+Approach:** next-intl with Next.js 16 cache components
 
 ---
 
@@ -19,35 +22,42 @@ This document outlines the internationalization (i18n) strategy for Chunky Crayo
 
 #### 1. Japanese (日本語)
 
-| Metric | Value |
-|--------|-------|
-| Market Size | $70M+ kids app market |
-| ARPU Potential | ⭐⭐⭐⭐⭐ |
-| Cultural Fit | ⭐⭐⭐⭐⭐ |
+| Metric              | Value                   |
+| ------------------- | ----------------------- |
+| Market Size         | $70M+ kids app market   |
+| ARPU Potential      | ⭐⭐⭐⭐⭐              |
+| Cultural Fit        | ⭐⭐⭐⭐⭐              |
 | Expected MRR Impact | 15-20% of total revenue |
 
 **Why Japanese is #1:**
+
 - 14-15% of Asia-Pacific kids app market
-- Proven high willingness to pay for premium subscriptions (Speak language app hit $1B valuation largely from Japan/Korea)
-- Deep cultural appreciation for illustration, manga art, and creative activities
+- Proven high willingness to pay for premium subscriptions (Speak language app
+  hit $1B valuation largely from Japan/Korea)
+- Deep cultural appreciation for illustration, manga art, and creative
+  activities
 - High iOS penetration = higher ARPU
-- Average education app subscription: $8.13/month (our £7.99 Crayon tier is well-positioned)
+- Average education app subscription: $8.13/month (our £7.99 Crayon tier is
+  well-positioned)
 
 **Localization Notes:**
-- Need culturally appropriate imagery (anime-style characters, kawaii aesthetics)
+
+- Need culturally appropriate imagery (anime-style characters, kawaii
+  aesthetics)
 - Voice input must work flawlessly with Japanese speech recognition
 - Consider LINE Pay integration for payments
 
 #### 2. Korean (한국어)
 
-| Metric | Value |
-|--------|-------|
-| Market Size | Significant edtech market |
-| ARPU Potential | ⭐⭐⭐⭐⭐ |
-| Cultural Fit | ⭐⭐⭐⭐⭐ |
-| Expected MRR Impact | 10-15% of total revenue |
+| Metric              | Value                     |
+| ------------------- | ------------------------- |
+| Market Size         | Significant edtech market |
+| ARPU Potential      | ⭐⭐⭐⭐⭐                |
+| Cultural Fit        | ⭐⭐⭐⭐⭐                |
+| Expected MRR Impact | 10-15% of total revenue   |
 
 **Why Korean is #2:**
+
 - Highest digital literacy globally with government-backed edtech initiatives
 - Proven alongside Japan for premium app subscriptions
 - Extremely high expectations for children's educational tools
@@ -55,6 +65,7 @@ This document outlines the internationalization (i18n) strategy for Chunky Crayo
 - High smartphone penetration with premium price tolerance
 
 **Localization Notes:**
+
 - K-style illustrations may resonate better
 - Parents expect polished, professional UX
 - Consider Kakao Pay integration
@@ -63,14 +74,15 @@ This document outlines the internationalization (i18n) strategy for Chunky Crayo
 
 #### 3. German (Deutsch)
 
-| Metric | Value |
-|--------|-------|
-| Market Size | 9% of European market ($190M) |
-| ARPU Potential | ⭐⭐⭐⭐⭐ |
-| Cultural Fit | ⭐⭐⭐⭐ |
-| Expected MRR Impact | 12-18% of total revenue |
+| Metric              | Value                         |
+| ------------------- | ----------------------------- |
+| Market Size         | 9% of European market ($190M) |
+| ARPU Potential      | ⭐⭐⭐⭐⭐                    |
+| Cultural Fit        | ⭐⭐⭐⭐                      |
+| Expected MRR Impact | 12-18% of total revenue       |
 
 **Why German:**
+
 - Highest purchasing power in Europe
 - Cultural value on quality educational tools
 - 28% global market share for kids apps in Europe
@@ -78,20 +90,22 @@ This document outlines the internationalization (i18n) strategy for Chunky Crayo
 - Germans research thoroughly before buying, but are loyal subscribers
 
 **Localization Notes:**
+
 - Detailed product descriptions expected
 - Privacy/GDPR compliance crucial
 - Quality over flashiness in messaging
 
 #### 4. French (Français)
 
-| Metric | Value |
-|--------|-------|
-| Market Reach | France + Canada + Belgium + Switzerland |
-| ARPU Potential | ⭐⭐⭐⭐ |
-| Cultural Fit | ⭐⭐⭐⭐ |
-| Expected MRR Impact | 8-12% of total revenue |
+| Metric              | Value                                   |
+| ------------------- | --------------------------------------- |
+| Market Reach        | France + Canada + Belgium + Switzerland |
+| ARPU Potential      | ⭐⭐⭐⭐                                |
+| Cultural Fit        | ⭐⭐⭐⭐                                |
+| Expected MRR Impact | 8-12% of total revenue                  |
 
 **Why French:**
+
 - Multi-market reach with single translation investment
 - Canada shows 8% of North American market with strong bilingual demand
 - France is developed European market with high purchasing power
@@ -101,16 +115,18 @@ This document outlines the internationalization (i18n) strategy for Chunky Crayo
 
 #### 5. Spanish (Español)
 
-| Metric | Value |
-|--------|-------|
-| Market Size | Massive addressable population |
-| ARPU Potential | ⭐⭐⭐ |
-| Cultural Fit | ⭐⭐⭐⭐ |
-| Expected MRR Impact | 5-10% of total revenue |
+| Metric              | Value                          |
+| ------------------- | ------------------------------ |
+| Market Size         | Massive addressable population |
+| ARPU Potential      | ⭐⭐⭐                         |
+| Cultural Fit        | ⭐⭐⭐⭐                       |
+| Expected MRR Impact | 5-10% of total revenue         |
 
 **Strategy:**
+
 - Launch in Spain first (European pricing tolerance)
-- Selectively expand to high-income Latin American markets (Mexico, Chile, Argentina)
+- Selectively expand to high-income Latin American markets (Mexico, Chile,
+  Argentina)
 - May need 30-50% pricing discount for LATAM
 
 #### 6. Nordic Languages (Future Consideration)
@@ -137,6 +153,7 @@ Payments: Stripe
 ### i18n Library Selection: next-intl
 
 **Why next-intl:**
+
 - Official Next.js ecosystem library
 - Full App Router support with Server Components
 - Compatible with Next.js 16 caching (`cacheLife`, `cacheTag`)
@@ -175,8 +192,13 @@ Payments: Stripe
 
 ```
 chunky-crayon/
+├── .github/
+│   └── workflows/
+│       ├── translate.yml           # Auto-translate on en.json changes
+│       └── translation-review.yml  # Weekly agentic review with Claude
+│
 ├── packages/
-│   └── translations/              # NEW: Shared translations package
+│   └── translations/              # Shared translations package
 │       ├── src/
 │       │   ├── en.json           # English (base)
 │       │   ├── ja.json           # Japanese
@@ -185,6 +207,13 @@ chunky-crayon/
 │       │   ├── fr.json           # French
 │       │   ├── es.json           # Spanish
 │       │   └── index.ts          # Exports with types
+│       ├── scripts/
+│       │   ├── translate.ts      # Full translation script
+│       │   ├── translate-diff.ts # Incremental translation
+│       │   ├── review-translations.ts # Agentic Claude review
+│       │   └── audit-translations.ts  # Audit for missing/extra keys
+│       ├── reports/              # Generated review reports
+│       │   └── review-YYYY-MM-DD.md
 │       └── package.json
 │
 ├── apps/web/
@@ -228,7 +257,8 @@ const nextConfig = {
 };
 ```
 
-**Key Insight:** With `app/[locale]/` structure, Next.js automatically creates separate cache entries per locale. No additional configuration needed.
+**Key Insight:** With `app/[locale]/` structure, Next.js automatically creates
+separate cache entries per locale. No additional configuration needed.
 
 ### Static Generation with Locales
 
@@ -244,15 +274,17 @@ export async function generateStaticParams() {
     categories.map((category) => ({
       locale,
       category: category.slug,
-    }))
+    })),
   );
 }
 ```
 
 **Build Impact:**
+
 - Current: ~500 static pages
 - With 6 locales: ~3,000 static pages
-- Mitigation: Use ISR for less-critical pages, prioritize en/ja/ko for initial static generation
+- Mitigation: Use ISR for less-critical pages, prioritize en/ja/ko for initial
+  static generation
 
 ---
 
@@ -260,17 +292,17 @@ export async function generateStaticParams() {
 
 ### Content Categories
 
-| Category | Items | Priority | Notes |
-|----------|-------|----------|-------|
-| UI Strings | ~500 keys | P0 | Navigation, buttons, forms |
-| Gallery Categories | 40+ | P0 | Category names, descriptions |
-| Pricing/Plans | 3 tiers | P0 | Plan names, features, CTAs |
-| Error Messages | ~50 | P0 | User-facing errors |
-| SEO Metadata | ~30 pages | P0 | Titles, descriptions, OG tags |
-| Blog Content | Dynamic | P1 | Via Sanity i18n fields |
-| Legal Pages | 2 | P1 | Privacy policy, terms |
-| Email Templates | ~10 | P2 | Transactional emails |
-| AI Prompts | ~20 | P2 | Default generation prompts |
+| Category           | Items     | Priority | Notes                         |
+| ------------------ | --------- | -------- | ----------------------------- |
+| UI Strings         | ~500 keys | P0       | Navigation, buttons, forms    |
+| Gallery Categories | 40+       | P0       | Category names, descriptions  |
+| Pricing/Plans      | 3 tiers   | P0       | Plan names, features, CTAs    |
+| Error Messages     | ~50       | P0       | User-facing errors            |
+| SEO Metadata       | ~30 pages | P0       | Titles, descriptions, OG tags |
+| Blog Content       | Dynamic   | P1       | Via Sanity i18n fields        |
+| Legal Pages        | 2         | P1       | Privacy policy, terms         |
+| Email Templates    | ~10       | P2       | Transactional emails          |
+| AI Prompts         | ~20       | P2       | Default generation prompts    |
 
 ### Translation File Structure
 
@@ -403,13 +435,16 @@ export async function generateStaticParams() {
 **Goal:** Set up i18n infrastructure with English as the base
 
 #### Week 1-2: Core Infrastructure
+
 - [x] Create `packages/translations` workspace ✅
 - [x] Install and configure `next-intl` ✅
-- [x] Create `proxy.ts` for locale routing (Next.js 16 uses proxy instead of middleware) ✅
+- [x] Create `proxy.ts` for locale routing (Next.js 16 uses proxy instead of
+      middleware) ✅
 - [x] Set up `i18n/routing.ts` and `i18n/request.ts` ✅
 - [x] Restructure app to `app/[locale]/...` ✅
 
 #### Week 3-4: String Extraction
+
 - [x] Extract all hardcoded strings from components ✅
 - [x] Create `en.json` with proper namespacing ✅ (568 lines, comprehensive)
 - [x] Update components to use `useTranslations()` hook ✅ (13+ components)
@@ -425,18 +460,25 @@ export async function generateStaticParams() {
 **Status:** 🚧 IN PROGRESS
 
 #### Week 5-6: Translation
-- [x] AI translation of all strings to Japanese (Claude) ✅
-- [x] AI translation of all strings to Korean (Claude) ✅
+
+- [x] AI translation of all strings to Japanese ✅
+- [x] AI translation of all strings to Korean ✅
+- [x] AI translation of all strings to German ✅
+- [x] AI translation of all strings to French ✅
+- [x] AI translation of all strings to Spanish ✅
+- [x] Agentic translation review system with Claude ✅
 - [ ] Native speaker review for quality assurance
 - [ ] Adjust AI prompt defaults for each locale
 
 #### Week 7-8: Localization
+
 - [ ] Add Japanese/Korean fonts (Noto Sans JP/KR)
 - [ ] Test voice input in Japanese/Korean
 - [ ] Localize date/number formatting
 - [ ] Create locale-specific OG images
 
 #### Week 9-10: Testing & Launch
+
 - [ ] QA testing in both languages
 - [ ] Performance testing with additional locales
 - [ ] Soft launch to beta users
@@ -497,6 +539,7 @@ model ColoringImage {
 ## SEO Strategy
 
 ### URL Structure
+
 ```
 https://chunkycrayon.com/en/gallery
 https://chunkycrayon.com/ja/gallery
@@ -505,6 +548,7 @@ https://chunkycrayon.com/de/gallery
 ```
 
 ### Hreflang Implementation
+
 ```typescript
 // In generateMetadata()
 alternates: {
@@ -522,7 +566,9 @@ alternates: {
 ```
 
 ### Locale-Specific Metadata
+
 Each page generates unique metadata per locale including:
+
 - Title and description in local language
 - Locale-appropriate keywords
 - OG images with localized text (Phase 2)
@@ -532,6 +578,7 @@ Each page generates unique metadata per locale including:
 ## Analytics & Tracking
 
 ### PostHog Events
+
 ```typescript
 // Track language preferences
 posthog.capture('language_changed', {
@@ -546,6 +593,7 @@ posthog.capture('page_view', {
 ```
 
 ### Key Metrics to Track
+
 - Conversion rate by locale
 - Subscription rate by locale
 - Feature usage by locale
@@ -557,28 +605,40 @@ posthog.capture('page_view', {
 ## Risk Mitigation
 
 ### Build Time Concerns
+
 **Risk:** 6x increase in static pages could slow builds significantly
 
 **Mitigation:**
+
 1. Use ISR for less-critical pages
 2. Implement incremental static regeneration
 3. Consider on-demand revalidation
 4. Phase locale rollout to manage complexity
 
 ### Translation Quality
+
 **Risk:** Poor translations damage brand perception
 
 **Mitigation:**
-1. Use AI translation (Claude/GPT-4) with proper context and prompting
-2. Native speaker review for each language (can use Fiverr/Upwork for cost-effective review)
-3. Establish glossary of key terms to maintain consistency
-4. Implement in-app feedback mechanism for translation issues
-5. Iterative improvement based on user feedback
+
+1. **Cross-model review:** GPT-5.2 translates, Claude Sonnet reviews (catches
+   blind spots that single-model approaches miss)
+2. **Agentic auto-fixing:** Claude automatically fixes issues, not just reports
+   them
+3. **Weekly automated reviews:** GitHub Action runs every Monday, creates
+   per-language PRs
+4. Native speaker review for each language (can use Fiverr/Upwork for
+   cost-effective review)
+5. Establish glossary of key terms to maintain consistency
+6. Implement in-app feedback mechanism for translation issues
+7. Iterative improvement based on feedback
 
 ### Cultural Appropriateness
+
 **Risk:** AI-generated content may not be culturally appropriate
 
 **Mitigation:**
+
 1. Review AI prompt defaults per locale
 2. Curate locale-specific starter galleries
 3. Partner with local content reviewers
@@ -590,17 +650,18 @@ posthog.capture('page_view', {
 
 ### AI Translation Approach (Recommended)
 
-| Item | Estimated Cost | Notes |
-|------|---------------|-------|
-| AI Translation (all 5 langs) | ~$50-100 | Claude/GPT-4 API costs for ~10,000 words × 5 |
-| Native Speaker Review (JP) | $100-200 | Fiverr/Upwork reviewer |
-| Native Speaker Review (KR) | $100-200 | Fiverr/Upwork reviewer |
-| Native Speaker Review (DE) | $100-200 | Fiverr/Upwork reviewer |
-| Native Speaker Review (FR) | $100-200 | Fiverr/Upwork reviewer |
-| Native Speaker Review (ES) | $100-200 | Fiverr/Upwork reviewer |
-| Additional Build Infra | $50-100/month | CI/CD capacity |
-| **Total Initial** | **$600-1,100** | One-time |
-| Ongoing Maintenance | $50-100/month | AI translation + occasional reviews |
+| Item                         | Estimated Cost | Notes                                    |
+| ---------------------------- | -------------- | ---------------------------------------- |
+| AI Translation (all 5 langs) | ~$50-100       | GPT-5.2 API costs for ~10,000 words × 5  |
+| AI Review (all 5 langs)      | ~$20-50/week   | Claude Sonnet for weekly quality reviews |
+| Native Speaker Review (JP)   | $100-200       | Fiverr/Upwork reviewer                   |
+| Native Speaker Review (KR)   | $100-200       | Fiverr/Upwork reviewer                   |
+| Native Speaker Review (DE)   | $100-200       | Fiverr/Upwork reviewer                   |
+| Native Speaker Review (FR)   | $100-200       | Fiverr/Upwork reviewer                   |
+| Native Speaker Review (ES)   | $100-200       | Fiverr/Upwork reviewer                   |
+| Additional Build Infra       | $50-100/month  | CI/CD capacity                           |
+| **Total Initial**            | **$600-1,100** | One-time                                 |
+| Ongoing Maintenance          | $70-150/month  | AI translation + weekly Claude reviews   |
 
 ### AI Translation Benefits
 
@@ -609,28 +670,45 @@ posthog.capture('page_view', {
 3. **Consistency:** AI maintains terminology consistency across all strings
 4. **Iterative:** Easy to re-translate with improved prompts
 5. **Context-Aware:** Can provide app context for better translations
+6. **Cross-Model Review:** Using different models (GPT for translation, Claude
+   for review) catches blind spots that single-model approaches miss
+7. **Agentic Auto-Fix:** Claude doesn't just report issues—it fixes them
+   automatically, reducing manual work
 
 ### AI SDK Translation Implementation
 
-Since we already use Vercel AI SDK (`@ai-sdk/openai`, `@ai-sdk/google`), we can build a translation script:
+Since we already use Vercel AI SDK (`@ai-sdk/openai`, `@ai-sdk/google`), we can
+build a translation script:
 
-**Recommended Model:** `gpt-4.1` or `claude-opus-4-5` - Prioritizing translation quality over speed
+**Recommended Model:** `gpt-4.1` or `claude-opus-4-5` - Prioritizing translation
+quality over speed
 
-| Model | Translation Quality | Speed | Context | Notes |
-|-------|-------------------|-------|---------|-------|
-| GPT-4.1 | ⭐ Best | Fast | 1M tokens | Excellent instruction following, supports JSON mode |
-| Claude Opus 4.5 | ⭐ Best | Medium | 200K | Exceptional reasoning, maintains brand voice |
-| o3 / o4-mini | Excellent | Medium | 128K | Reasoning models, best for complex tasks |
-| GPT-4o | Good | Fast | 128K | Legacy fallback |
+| Model           | Translation Quality | Speed  | Context   | Notes                                               |
+| --------------- | ------------------- | ------ | --------- | --------------------------------------------------- |
+| GPT-4.1         | ⭐ Best             | Fast   | 1M tokens | Excellent instruction following, supports JSON mode |
+| Claude Opus 4.5 | ⭐ Best             | Medium | 200K      | Exceptional reasoning, maintains brand voice        |
+| o3 / o4-mini    | Excellent           | Medium | 128K      | Reasoning models, best for complex tasks            |
+| GPT-4o          | Good                | Fast   | 128K      | Legacy fallback                                     |
 
 > **Latest Models (Dec 2025):**
-> - [GPT-4.1](https://openai.com/index/gpt-4-1/) - Improved instruction following, 1M token context, lower cost than GPT-4.5
-> - [o3 / o4-mini](https://openai.com/index/introducing-o3-and-o4-mini/) - Latest reasoning models for math, science, coding
+>
+> - [GPT-4.1](https://openai.com/index/gpt-4-1/) - Improved instruction
+>   following, 1M token context, lower cost than GPT-4.5
+> - [o3 / o4-mini](https://openai.com/index/introducing-o3-and-o4-mini/) -
+>   Latest reasoning models for math, science, coding
 
-**Add @ai-sdk/anthropic for Claude (optional, excellent quality):**
-```bash
-pnpm add @ai-sdk/anthropic
+**Dependencies in `packages/translations`:**
+
+```json
+{
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2" // For Claude review script
+  }
+}
 ```
+
+> **Note:** The review script uses the Anthropic SDK directly (not AI SDK) for
+> more control over Claude's structured output.
 
 ### Translation Scripts
 
@@ -641,21 +719,67 @@ We have translation scripts in `packages/translations/scripts/`:
 **Location:** `packages/translations/scripts/translate.ts`
 
 **Features:**
-- Uses OpenAI SDK with **structured JSON output** (`response_format: { type: 'json_object' }`) for reliable parsing
-- Only translates **missing keys** (incremental translation - doesn't re-translate existing strings)
+
+- Uses OpenAI SDK with **structured JSON output**
+  (`response_format: { type: 'json_object' }`) for reliable parsing
+- Only translates **missing keys** (incremental translation - doesn't
+  re-translate existing strings)
 - Batches translations (50 keys per API call) to avoid token limits
 - Preserves ICU plural syntax and placeholders
 
 **Usage:**
+
 ```bash
 # Translate all missing keys for all locales
-pnpm tsx packages/translations/scripts/translate.ts
+pnpm translate
 
-# Translate specific locales only
-pnpm tsx packages/translations/scripts/translate.ts es fr
+# Dry run (preview without saving)
+pnpm translate:dry-run
+```
 
-# Requires OPENAI_API_KEY environment variable
-export OPENAI_API_KEY=your-api-key
+#### translate-diff.ts - Incremental Translation
+
+**Location:** `packages/translations/scripts/translate-diff.ts`
+
+**Features:**
+
+- Translates only missing or changed keys (faster than full translation)
+- Groups keys by namespace for better context
+- Uses GPT-5.2 with structured JSON output
+
+**Usage:**
+
+```bash
+# Translate missing keys
+pnpm translate:diff
+
+# Dry run (preview without saving)
+pnpm translate:diff:dry-run
+```
+
+#### review-translations.ts - Agentic Quality Review (Claude)
+
+**Location:** `packages/translations/scripts/review-translations.ts`
+
+**Features:**
+
+- **Cross-model review:** GPT-5.2 translates, Claude Sonnet reviews (catches
+  blind spots)
+- **Agentic auto-fixing:** Automatically fixes issues (not just reports them)
+- **Severity tiers:** Critical (needs human review), Warning/Suggestion
+  (auto-fix)
+- Samples 100 keys per locale, prioritizing user-facing namespaces
+- Generates markdown reports in `packages/translations/reports/`
+- All "Why" explanations are in English so developers can understand
+
+**Usage:**
+
+```bash
+# Review all locales
+pnpm review
+
+# Review specific locale
+pnpm review --locale=ja
 ```
 
 #### audit-translations.ts - Translation Audit
@@ -663,21 +787,24 @@ export OPENAI_API_KEY=your-api-key
 **Location:** `packages/translations/scripts/audit-translations.ts`
 
 **Features:**
+
 - Compares translation files across all locales
 - Finds missing keys (in target but not in English)
 - Finds extra keys (in target but not in English)
 - Detects potentially untranslated strings (values matching English exactly)
 
 **Usage:**
+
 ```bash
-pnpm tsx packages/translations/scripts/audit-translations.ts
+pnpm audit
 ```
 
 #### Why Structured JSON Output?
 
-The translation script uses OpenAI's `response_format: { type: 'json_object' }` instead of manually parsing markdown:
+The translation script uses OpenAI's `response_format: { type: 'json_object' }`
+instead of manually parsing markdown:
 
-```typescript
+````typescript
 // ✅ Reliable - structured JSON output
 const response = await openai.chat.completions.create({
   model: 'gpt-4o',
@@ -690,9 +817,10 @@ const translatedObj = JSON.parse(response.choices[0]?.message?.content);
 // ❌ Fragile - manual markdown cleaning
 const { text } = await generateText({ model: openai('gpt-4o'), prompt });
 let cleaned = text.replace(/```json/g, '').replace(/```/g, '');  // Can fail
-```
+````
 
 **Translation Workflow:**
+
 ```bash
 # 1. Add new English strings to en.json
 # 2. Run translation script
@@ -710,27 +838,76 @@ pnpm build --filter=@chunky-crayon/translations
 ### Quality Assurance Process
 
 1. **AI Translation:** Generate initial translations with context-rich prompts
-2. **Automated Checks:** Validate JSON structure, check for missing keys
-3. **Native Review:** Fiverr/Upwork reviewer checks for naturalness and cultural fit
-4. **In-App Testing:** Test strings in context within the actual UI
-5. **User Feedback:** Implement "Report translation issue" feature
-6. **Iterate:** Improve translations based on feedback
+   (GPT-5.2)
+2. **Agentic Review:** Claude Sonnet reviews GPT translations and auto-fixes
+   issues
+3. **Automated Checks:** Validate JSON structure, check for missing keys
+4. **Native Review:** Fiverr/Upwork reviewer checks for naturalness and cultural
+   fit
+5. **In-App Testing:** Test strings in context within the actual UI
+6. **User Feedback:** Implement "Report translation issue" feature
+7. **Iterate:** Improve translations based on feedback
+
+### GitHub Actions Automation
+
+#### Weekly Translation Review (`.github/workflows/translation-review.yml`)
+
+**Schedule:** Every Monday at 9am UTC (or manual trigger)
+
+**Features:**
+
+- Uses matrix strategy to run 5 parallel jobs (ja, ko, de, fr, es)
+- Each locale creates its own PR with language-specific label (`lang:ja`, etc.)
+- PR body includes the review report with Before/After/Why for each fix
+- Critical issues that can't be auto-fixed create GitHub Issues
+- Reports uploaded as artifacts (90 days retention)
+
+**Workflow:**
+
+```yaml
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Weekly on Monday
+  workflow_dispatch: # Manual trigger with optional locale filter
+    inputs:
+      locale:
+        description: 'Specific locale to review (leave empty for all)'
+```
+
+**PR Format:**
+
+- Title: `🌍 Japanese Translation Fixes - 2025-12-28`
+- Branch: `i18n/review-ja-2025-12-28`
+- Labels: `i18n`, `quality`, `automated`, `lang:ja`
+
+#### Auto-Translation on Push (`.github/workflows/translate.yml`)
+
+**Trigger:** Push to main that modifies `packages/translations/src/en.json`
+
+**Features:**
+
+- Automatically translates new/changed English strings to all locales
+- Creates PR with translation updates
+- Only runs when English source file changes
 
 ---
 
 ## Success Metrics
 
 ### Phase 1 (Foundation)
+
 - [ ] Zero regressions in English experience
 - [ ] Build time < 2x current
 - [ ] All pages render correctly with locale prefix
 
 ### Phase 2 (Japanese & Korean)
+
 - [ ] 100+ signups from Japan/Korea in first month
 - [ ] Conversion rate within 80% of English baseline
 - [ ] < 5% increase in support tickets related to localization
 
 ### Phase 3+ (Full Rollout)
+
 - [ ] 30-40% of MRR from non-English markets within 12 months
 - [ ] Customer satisfaction scores consistent across languages
 - [ ] Organic traffic growth in target markets
@@ -758,21 +935,31 @@ In Next.js 16, `middleware.ts` has been renamed to `proxy.ts`. Key differences:
 
 ```typescript
 // proxy.ts (Next.js 16+)
-import createProxy from "next-intl/proxy"; // Note: next-intl may need updates
-import { routing } from "./i18n/routing";
+import createProxy from 'next-intl/proxy'; // Note: next-intl may need updates
+import { routing } from './i18n/routing';
 
 export function proxy(request: NextRequest) {
   // Locale detection and routing logic
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
 ```
 
-> **Note:** Verify next-intl compatibility with Next.js 16 proxy.ts before implementation. The library may need updates or have a migration guide.
+> **Note:** Verify next-intl compatibility with Next.js 16 proxy.ts before
+> implementation. The library may need updates or have a migration guide.
 
 ---
 
-*Last Updated: December 2025*
-*Owner: Chunky Crayon Team*
+_Last Updated: December 28, 2025_ _Owner: Chunky Crayon Team_
+
+## Changelog
+
+### 2025-12-28
+
+- Added agentic translation review system with Claude Sonnet
+- Added cross-model review approach (GPT translates → Claude reviews)
+- Added weekly GitHub Action for automated translation review
+- Updated directory structure with new scripts and reports
+- All 5 target locales now have translations (ja, ko, de, fr, es)
