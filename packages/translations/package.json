@@ -41,6 +41,8 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "translate": "tsx scripts/translate.ts",
     "translate:dry-run": "tsx scripts/translate.ts --dry-run",
+    "translate:diff": "tsx scripts/translate-diff.ts",
+    "translate:diff:dry-run": "tsx scripts/translate-diff.ts --dry-run",
     "audit": "tsx scripts/audit-translations.ts"
   },
   "devDependencies": {

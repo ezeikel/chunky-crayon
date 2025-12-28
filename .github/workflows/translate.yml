@@ -1,0 +1,59 @@
+name: Auto-translate missing keys
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/translations/src/en.json'
+
+jobs:
+  translate:
+    # Skip if commit was made by this action
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run audit to check for missing translations
+        id: audit
+        working-directory: packages/translations
+        run: |
+          if pnpm audit 2>&1 | grep -q "Missing keys"; then
+            echo "needs_translation=true" >> $GITHUB_OUTPUT
+          else
+            echo "needs_translation=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Translate missing keys
+        if: steps.audit.outputs.needs_translation == 'true'
+        working-directory: packages/translations
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: pnpm translate:diff
+
+      - name: Commit translations
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(i18n): auto-translate missing keys [skip ci]"
+          file_pattern: "packages/translations/src/*.json"
+          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
