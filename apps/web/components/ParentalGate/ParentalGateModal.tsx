@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faCalculator } from '@fortawesome/pro-duotone-svg-icons';
 import {
@@ -16,43 +17,26 @@ import cn from '@/utils/cn';
 type MathProblem = {
   num1: number;
   num2: number;
-  operator: '+' | '-' | '×';
+  operator: '×';
   answer: number;
 };
 
-const generateMathProblem = (): MathProblem => {
-  // Generate problems that are challenging enough for adults but not impossible
-  // Kids typically can't quickly solve: multiplication, larger additions, or subtraction with larger numbers
-  const operators: Array<'+' | '-' | '×'> = ['+', '-', '×'];
-  const operator = operators[Math.floor(Math.random() * operators.length)];
+// UK Year 4 level multiplication - easy for adults, challenging for ages 3-8
+const SIMPLE_PROBLEMS: MathProblem[] = [
+  { num1: 7, num2: 8, operator: '×', answer: 56 },
+  { num1: 9, num2: 6, operator: '×', answer: 54 },
+  { num1: 8, num2: 7, operator: '×', answer: 56 },
+  { num1: 6, num2: 9, operator: '×', answer: 54 },
+  { num1: 8, num2: 6, operator: '×', answer: 48 },
+  { num1: 7, num2: 9, operator: '×', answer: 63 },
+  { num1: 9, num2: 8, operator: '×', answer: 72 },
+  { num1: 6, num2: 7, operator: '×', answer: 42 },
+  { num1: 8, num2: 9, operator: '×', answer: 72 },
+  { num1: 7, num2: 6, operator: '×', answer: 42 },
+];
 
-  let num1: number;
-  let num2: number;
-  let answer: number;
-
-  switch (operator) {
-    case '×':
-      // Multiplication: 3-9 × 3-9 (e.g., 7 × 8 = 56)
-      num1 = Math.floor(Math.random() * 7) + 3;
-      num2 = Math.floor(Math.random() * 7) + 3;
-      answer = num1 * num2;
-      break;
-    case '-':
-      // Subtraction: larger number minus smaller, result between 10-50
-      num1 = Math.floor(Math.random() * 50) + 30; // 30-79
-      num2 = Math.floor(Math.random() * 20) + 10; // 10-29
-      answer = num1 - num2;
-      break;
-    case '+':
-    default:
-      // Addition: two numbers that sum to 30-80
-      num1 = Math.floor(Math.random() * 30) + 20; // 20-49
-      num2 = Math.floor(Math.random() * 30) + 15; // 15-44
-      answer = num1 + num2;
-      break;
-  }
-
-  return { num1, num2, operator, answer };
+const getRandomProblem = (): MathProblem => {
+  return SIMPLE_PROBLEMS[Math.floor(Math.random() * SIMPLE_PROBLEMS.length)];
 };
 
 type ParentalGateModalProps = {
@@ -62,18 +46,14 @@ type ParentalGateModalProps = {
 };
 
 // Default problem to avoid Math.random() during SSR
-const DEFAULT_PROBLEM: MathProblem = {
-  num1: 12,
-  num2: 8,
-  operator: '+',
-  answer: 20,
-};
+const DEFAULT_PROBLEM: MathProblem = SIMPLE_PROBLEMS[0];
 
 const ParentalGateModal = ({
   open,
   onOpenChange,
   targetPath,
 }: ParentalGateModalProps) => {
+  const t = useTranslations('parentalGate');
   const router = useRouter();
   const [problem, setProblem] = useState<MathProblem>(DEFAULT_PROBLEM);
   const [userAnswer, setUserAnswer] = useState('');
@@ -83,7 +63,7 @@ const ParentalGateModal = ({
   // Generate a new problem when modal opens (client-side only)
   useEffect(() => {
     if (open) {
-      setProblem(generateMathProblem());
+      setProblem(getRandomProblem());
       setUserAnswer('');
       setError(false);
     }
@@ -120,7 +100,7 @@ const ParentalGateModal = ({
 
         // Generate a new problem after a short delay
         setTimeout(() => {
-          setProblem(generateMathProblem());
+          setProblem(getRandomProblem());
           setError(false);
         }, 1500);
       }
@@ -150,9 +130,9 @@ const ParentalGateModal = ({
               />
             </div>
           </div>
-          <DialogTitle className="text-2xl">Grown-ups only!</DialogTitle>
+          <DialogTitle className="text-2xl">{t('title')}</DialogTitle>
           <DialogDescription className="text-base">
-            Solve this math problem to continue
+            {t('subtitle')}
           </DialogDescription>
         </DialogHeader>
 
@@ -177,7 +157,7 @@ const ParentalGateModal = ({
               pattern="[0-9]*"
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
-              placeholder="Your answer"
+              placeholder={t('placeholder')}
               className={cn(
                 'w-full px-6 py-4 text-center text-2xl font-tondo font-bold',
                 'rounded-2xl border-3 transition-all duration-200',
@@ -190,7 +170,7 @@ const ParentalGateModal = ({
             />
             {error && (
               <p className="text-center text-red-500 font-tondo font-medium animate-in fade-in">
-                Not quite right! Try another one...
+                {t('error')}
               </p>
             )}
           </div>
@@ -206,7 +186,7 @@ const ParentalGateModal = ({
               'bg-crayon-orange shadow-btn-primary hover:shadow-btn-primary-hover',
             )}
           >
-            Check Answer
+            {t('submit')}
           </button>
         </form>
       </DialogContent>

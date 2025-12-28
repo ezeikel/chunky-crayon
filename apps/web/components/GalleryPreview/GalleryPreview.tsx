@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendarStar,
@@ -17,6 +18,7 @@ import AnimatedGalleryGrid, {
 } from './AnimatedGalleryGrid';
 
 const DailyImagePreview = async () => {
+  const t = await getTranslations('homepage.galleryPreview');
   const dailyImage = await getTodaysDailyImage();
 
   if (!dailyImage || !dailyImage.svgUrl) return null;
@@ -42,7 +44,7 @@ const DailyImagePreview = async () => {
           href="/gallery/daily"
           className="text-sm text-crayon-orange hover:text-crayon-orange-dark transition-colors flex items-center gap-1"
         >
-          See all
+          {t('seeAll')}
           <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
         </Link>
       </div>
@@ -53,21 +55,21 @@ const DailyImagePreview = async () => {
         >
           <Image
             src={dailyImage.svgUrl}
-            alt={dailyImage.title || 'Daily coloring page'}
+            alt={dailyImage.title || t('dailyColoringPageAlt')}
             fill
             className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
           />
         </Link>
         <div className="flex-1 min-w-0">
           <h4 className="font-tondo font-semibold text-text-primary truncate mb-2">
-            {dailyImage.title || 'Daily Coloring Page'}
+            {dailyImage.title || t('latestDailyPage')}
           </h4>
           <Link
             href={`/coloring-image/${dailyImage.id}`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-crayon-orange text-white text-sm font-semibold rounded-full hover:bg-crayon-orange-dark transition-colors"
           >
             <FontAwesomeIcon icon={faSparkles} className="text-xs" />
-            Color Now
+            {t('colorNow')}
           </Link>
         </div>
       </div>
@@ -76,6 +78,7 @@ const DailyImagePreview = async () => {
 };
 
 const CommunityPreview = async () => {
+  const t = await getTranslations('homepage.galleryPreview');
   const allImages = await getFeaturedImages(4);
   const images = allImages.filter((img) => img.svgUrl);
 
@@ -97,14 +100,14 @@ const CommunityPreview = async () => {
             style={iconStyle}
           />
           <h3 className="font-tondo font-bold text-lg text-text-primary">
-            Community Pages
+            {t('communityPages')}
           </h3>
         </div>
         <Link
           href="/gallery/community"
           className="text-sm text-crayon-purple hover:text-crayon-purple-dark transition-colors flex items-center gap-1"
         >
-          See all
+          {t('seeAll')}
           <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
         </Link>
       </div>
@@ -117,7 +120,7 @@ const CommunityPreview = async () => {
           >
             <Image
               src={image.svgUrl as string}
-              alt={image.title || 'Coloring page'}
+              alt={image.title || t('coloringPageAlt')}
               fill
               className="object-contain p-1 group-hover:scale-105 transition-transform duration-300"
             />
@@ -128,7 +131,9 @@ const CommunityPreview = async () => {
   );
 };
 
-const CategoryPreview = () => {
+const CategoryPreview = async () => {
+  const t = await getTranslations('homepage.galleryPreview');
+  const categoryT = await getTranslations('gallery.categories');
   // Show a subset of categories
   const featuredCategories = GALLERY_CATEGORIES.slice(0, 6);
 
@@ -148,14 +153,14 @@ const CategoryPreview = () => {
             style={iconStyle}
           />
           <h3 className="font-tondo font-bold text-lg text-text-primary">
-            Browse Categories
+            {t('browseCategories')}
           </h3>
         </div>
         <Link
           href="/gallery"
           className="text-sm text-crayon-blue hover:text-crayon-blue-dark transition-colors flex items-center gap-1"
         >
-          View all
+          {t('viewAll')}
           <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
         </Link>
       </div>
@@ -168,7 +173,7 @@ const CategoryPreview = () => {
           >
             <span>{category.emoji}</span>
             <span className="font-medium text-text-primary">
-              {category.name}
+              {categoryT(category.id)}
             </span>
           </Link>
         ))}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMicrophoneLines,
@@ -91,6 +92,7 @@ const CountdownTimer = ({
 // =============================================================================
 
 const VoiceInput = ({ className }: VoiceInputProps) => {
+  const t = useTranslations('createForm');
   const {
     canGenerate,
     blockedReason,
@@ -195,12 +197,12 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
       // Show remaining generations for guests
       if (isGuest) {
         return {
-          text: `Create (${guestGenerationsRemaining} free ${guestGenerationsRemaining === 1 ? 'try' : 'tries'} left)`,
+          text: t('buttonCreateGuest', { remaining: guestGenerationsRemaining }),
           isSubmit: true,
         };
       }
       return {
-        text: 'Create coloring page',
+        text: t('buttonCreate'),
         isSubmit: true,
       };
     }
@@ -208,9 +210,9 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     // Blocked - show appropriate CTA
     if (blockedReason === 'guest_limit_reached') {
       return {
-        text: 'Sign up for 15 free credits',
+        text: t('buttonSignUp'),
         action: () => handleAuthAction('signin'),
-        subtext: "You've seen the magic! Sign up to keep creating.",
+        subtext: t('subtextGuestLimit'),
         isSubmit: false,
       };
     }
@@ -218,26 +220,25 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     if (blockedReason === 'no_credits') {
       if (hasActiveSubscription) {
         return {
-          text: 'Buy more credits',
+          text: t('buttonBuyCredits'),
           action: () => handleAuthAction('billing'),
-          subtext:
-            'Need more magic? Top up or upgrade to keep the creativity going!',
+          subtext: t('subtextNoCreditsSubscribed'),
           isSubmit: false,
         };
       }
       return {
-        text: 'View plans',
+        text: t('buttonViewPlans'),
         action: () => handleAuthAction('billing'),
-        subtext: 'Choose a subscription to unlock more creations',
+        subtext: t('subtextNoCreditsNoSubscription'),
         isSubmit: false,
       };
     }
 
     // Fallback
     return {
-      text: 'Get started for free',
+      text: t('buttonGetStarted'),
       action: () => handleAuthAction('signin'),
-      subtext: "You'll get 15 free credits — enough to create 3 pages!",
+      subtext: t('subtextFallback'),
       isSubmit: false,
     };
   };
@@ -255,10 +256,10 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
       >
         <div className="text-5xl mb-2">🎤</div>
         <p className="text-center text-text-secondary font-tondo font-bold">
-          Oops! Your browser doesn&apos;t support voice recording.
+          {t('voiceInput.notSupported')}
         </p>
         <p className="text-center text-sm text-text-muted">
-          Try using Chrome, Safari, or Firefox on a device with a microphone.
+          {t('voiceInput.notSupportedHint')}
         </p>
       </div>
     );
@@ -266,15 +267,15 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
 
   // Error state
   if (state === 'error') {
-    const errorMessages: Record<string, string> = {
-      permission_denied:
-        "I couldn't access your microphone. Please allow microphone access and try again!",
-      not_supported:
-        "Oops! Your browser doesn't support voice recording. Try Chrome or Safari!",
-      transcription_failed: "Hmm, I couldn't understand that. Let's try again!",
-      recording_failed: 'Something went wrong with the recording. Try again!',
-      timeout: 'The recording was too long. Try a shorter message!',
+    const errorMessageKeys: Record<string, string> = {
+      permission_denied: 'voiceInput.errors.permissionDenied',
+      not_supported: 'voiceInput.errors.notSupported',
+      transcription_failed: 'voiceInput.errors.transcriptionFailed',
+      recording_failed: 'voiceInput.errors.recordingFailed',
+      timeout: 'voiceInput.errors.timeout',
     };
+
+    const errorKey = errorMessageKeys[error || 'recording_failed'];
 
     return (
       <div
@@ -285,14 +286,14 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
       >
         <div className="text-6xl mb-2">😅</div>
         <p className="text-center text-text-primary font-tondo font-bold">
-          {errorMessages[error || 'recording_failed']}
+          {t(errorKey)}
         </p>
         <Button
           onClick={handleRetry}
           className="font-tondo font-bold text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-xl"
         >
           <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
-          Try again
+          {t('voiceInput.tryAgain')}
         </Button>
       </div>
     );
@@ -319,8 +320,8 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
           )}
         >
           {isSilenceDetected
-            ? `All done? Tap the button or I'll finish in ${autoStopCountdown}...`
-            : "I'm listening! Tell me what you want to color!"}
+            ? t('voiceInput.allDone', { countdown: autoStopCountdown ?? 0 })
+            : t('voiceInput.listening')}
         </p>
 
         <AudioLevelIndicator level={audioLevel} />
@@ -333,7 +334,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
             variant="outline"
             className="font-tondo font-bold border-2 border-paper-cream-dark text-text-primary hover:bg-paper-cream rounded-xl"
           >
-            Cancel
+            {t('voiceInput.cancel')}
           </Button>
           <Button
             onClick={handleStopRecording}
@@ -345,7 +346,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
             )}
           >
             <FontAwesomeIcon icon={faStop} className="mr-2" />
-            {isSilenceDetected ? "I'm done!" : 'Done talking'}
+            {isSilenceDetected ? t('voiceInput.imDone') : t('voiceInput.doneTalking')}
           </Button>
         </div>
       </div>
@@ -374,8 +375,8 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
         />
         <p className="text-center text-text-primary font-tondo font-bold">
           {state === 'requesting_permission'
-            ? 'Getting your microphone ready...'
-            : 'Understanding what you said...'}
+            ? t('voiceInput.gettingMicReady')
+            : t('voiceInput.understanding')}
         </p>
       </div>
     );
@@ -410,7 +411,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
           {buttonConfig.isSubmit ? (
             <SubmitButton
               ref={submitButtonRef}
-              text="🎨 Make my coloring page!"
+              text={t('voiceInput.makeMyColoringPage')}
               className="font-tondo font-bold text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover px-8 py-6 rounded-xl hover:scale-105 active:scale-95 transition-all duration-200"
               disabled={!isDescriptionReady}
             />
@@ -436,7 +437,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
             onClick={handleRetry}
             className="font-tondo text-sm text-text-muted hover:text-text-primary underline underline-offset-2 transition-colors"
           >
-            Not quite right? Try again
+            {t('voiceInput.notQuiteRight')}
           </button>
         </div>
       </div>
@@ -453,12 +454,12 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     >
       <p className="text-center text-text-primary font-tondo font-bold text-lg">
         {canRecord
-          ? 'Tap the microphone and tell me what you want to color!'
+          ? t('voiceInput.tapToRecord')
           : blockedReason === 'guest_limit_reached'
-            ? `You've used your ${maxGuestGenerations} free tries! Sign up to continue.`
+            ? t('subtextGuestLimit')
             : blockedReason === 'no_credits'
-              ? "You're out of credits — top up or upgrade!"
-              : 'Sign in to start recording!'}
+              ? t('subtextNoCredits')
+              : t('voiceInput.signInToRecord')}
       </p>
 
       <button
@@ -484,7 +485,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
             '--fa-secondary-opacity': '1',
           } as React.CSSProperties
         }
-        aria-label="Start recording"
+        aria-label={t('voiceInput.startRecording')}
       >
         <FontAwesomeIcon
           icon={faMicrophoneLines}
@@ -493,7 +494,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
       </button>
 
       <p className="font-tondo text-sm text-text-muted text-center">
-        Up to {maxDuration} seconds
+        {t('voiceInput.maxDuration', { seconds: maxDuration })}
       </p>
 
       {!canRecord && (

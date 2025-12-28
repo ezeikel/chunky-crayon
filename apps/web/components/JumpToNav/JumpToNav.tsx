@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChevronDown,
@@ -21,6 +22,7 @@ type JumpToNavProps = {
 };
 
 const JumpToNav = ({ sections, className }: JumpToNavProps) => {
+  const t = useTranslations('gallery.jumpToNav');
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -87,12 +89,12 @@ const JumpToNav = ({ sections, className }: JumpToNavProps) => {
         aria-controls="jump-to-menu"
       >
         <span className="flex items-center gap-2">
-          <span className="text-text-tertiary">Jump to:</span>
+          <span className="text-text-tertiary">{t('jumpTo')}</span>
           <span>
             {activeSection
               ? sections.find((s) => s.id === activeSection)?.label ||
-                'Select section'
-              : 'Select section'}
+                t('selectSection')
+              : t('selectSection')}
           </span>
         </span>
         <FontAwesomeIcon
@@ -136,7 +138,7 @@ const JumpToNav = ({ sections, className }: JumpToNavProps) => {
         aria-label="Jump to section"
       >
         <span className="text-sm text-text-tertiary font-medium mr-2">
-          Jump to:
+          {t('jumpTo')}
         </span>
         {sections.map((section) => (
           <button
@@ -170,7 +172,7 @@ const JumpToNav = ({ sections, className }: JumpToNavProps) => {
             'hover:bg-crayon-orange-dark transition-colors',
             'animate-in fade-in slide-in-from-bottom-4 duration-300',
           )}
-          aria-label="Back to top"
+          aria-label={t('backToTop')}
         >
           <FontAwesomeIcon icon={faArrowUp} className="text-lg" />
         </button>

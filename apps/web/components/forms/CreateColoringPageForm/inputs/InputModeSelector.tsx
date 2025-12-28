@@ -7,6 +7,7 @@ import {
   faCameraRetro,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { useTranslations } from 'next-intl';
 import { useInputMode, type InputMode } from './InputModeContext';
 import cn from '@/utils/cn';
 
@@ -16,9 +17,8 @@ import cn from '@/utils/cn';
 
 type InputOption = {
   mode: InputMode;
-  label: string;
+  labelKey: 'type' | 'talk' | 'photo';
   icon: IconDefinition;
-  description: string;
 };
 
 // =============================================================================
@@ -28,21 +28,18 @@ type InputOption = {
 const INPUT_OPTIONS: InputOption[] = [
   {
     mode: 'text',
-    label: 'Type',
+    labelKey: 'type',
     icon: faPencil,
-    description: 'Write what you want',
   },
   {
     mode: 'voice',
-    label: 'Talk',
+    labelKey: 'talk',
     icon: faMicrophoneLines,
-    description: 'Say it out loud',
   },
   {
     mode: 'image',
-    label: 'Photo',
+    labelKey: 'photo',
     icon: faCameraRetro,
-    description: 'Show us a picture',
   },
 ];
 
@@ -58,6 +55,7 @@ type InputModeSelectorProps = {
 
 const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
   const { mode: currentMode, setMode, isProcessing } = useInputMode();
+  const t = useTranslations('createForm.inputModes');
 
   const handleModeChange = (mode: InputMode) => {
     if (disabled || isProcessing) return;
@@ -68,7 +66,7 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
     <div
       className={cn('flex gap-3 justify-center items-center', className)}
       role="tablist"
-      aria-label="Input mode selection"
+      aria-label={t('ariaLabel')}
     >
       {INPUT_OPTIONS.map((option) => {
         const isActive = option.mode === currentMode;
@@ -124,7 +122,7 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
               )}
             />
             <span className="text-xs md:text-sm font-tondo font-bold">
-              {option.label}
+              {t(option.labelKey)}
             </span>
           </button>
         );

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelopeOpenText } from '@fortawesome/pro-duotone-svg-icons';
 import posthog from 'posthog-js';
+import { useTranslations } from 'next-intl';
 import SubmitButton from '@/components/buttons/SubmitButton/SubmitButton';
 import cn from '@/utils/cn';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ const JoinColoringPageEmailListForm = ({
   className,
   location = 'hero',
 }: JoinColoringPageEmailListFormProps) => {
+  const t = useTranslations('email');
   const emailInputRef = useRef<HTMLInputElement>(null);
   const [hasTrackedStart, setHasTrackedStart] = useState(false);
   const [state, joinColoringPageEmailListAction] = useActionState(
@@ -32,8 +34,8 @@ const JoinColoringPageEmailListForm = ({
 
   useEffect(() => {
     if (state.success) {
-      toast('Success!', {
-        description: 'You have successfully joined the email list!',
+      toast(t('signup.success'), {
+        description: t('signup.successDescription'),
       });
 
       // Identify user in PostHog with their email for journey tracking
@@ -59,8 +61,8 @@ const JoinColoringPageEmailListForm = ({
       // Reset for next potential signup attempt
       setHasTrackedStart(false);
     } else if (state.error) {
-      toast.error('Something went wrong', {
-        description: 'Failed to join the email list. Please try again.',
+      toast.error(t('signup.error'), {
+        description: t('signup.errorDescription'),
       });
 
       trackEvent(TRACKING_EVENTS.EMAIL_SIGNUP_FAILED, {
@@ -111,12 +113,15 @@ const JoinColoringPageEmailListForm = ({
             }
           />
           <h3 className="font-tondo font-bold text-lg text-gradient-orange">
-            Free Daily Coloring!
+            {t('signup.title')}
           </h3>
         </div>
         <p className="font-tondo text-sm text-text-secondary">
-          Get a <span className="font-bold text-crayon-orange">free</span>{' '}
-          coloring page in your inbox every day.
+          {t.rich('signup.subtitle', {
+            free: (chunks) => (
+              <span className="font-bold text-crayon-orange">{chunks}</span>
+            ),
+          })}
         </p>
       </div>
 
@@ -129,13 +134,13 @@ const JoinColoringPageEmailListForm = ({
           type="email"
           name="email"
           className="flex-1 font-tondo border-2 border-paper-cream-dark rounded-xl px-4 py-2.5 focus:border-crayon-orange focus:ring-2 focus:ring-crayon-orange/20 placeholder:text-text-muted"
-          placeholder="parent@example.com"
+          placeholder={t('signup.placeholder')}
           ref={emailInputRef}
           onFocus={handleInputFocus}
           required
         />
         <SubmitButton
-          text="Join"
+          text={t('signup.join')}
           className="font-tondo font-bold text-white bg-crayon-orange hover:bg-crayon-orange-dark px-6 py-2.5 rounded-xl shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200"
         />
       </form>

@@ -2,7 +2,6 @@
 
 import { useSession } from 'next-auth/react';
 import PageWrap from '@/components/PageWrap/PageWrap';
-import Intro from '@/components/Intro/Intro';
 import Loading from '@/components/Loading/Loading';
 import Testimonials from '@/components/Testimonials';
 import FAQ from '@/components/FAQ';
@@ -24,6 +23,8 @@ type HomePageContentProps = {
   socialProofStats?: React.ReactNode;
   /** Recent creations for logged-out guests - shows images they've created */
   recentCreations?: React.ReactNode;
+  /** Intro section for logged-out users - server component passed as prop */
+  intro?: React.ReactNode;
 };
 
 const HomePageContent = ({
@@ -34,6 +35,7 @@ const HomePageContent = ({
   galleryPreview,
   socialProofStats,
   recentCreations,
+  intro,
 }: HomePageContentProps) => {
   const { status } = useSession();
   const isLoggedIn = status === 'authenticated';
@@ -87,7 +89,7 @@ const HomePageContent = ({
 
       {/* Hero section */}
       <div className="flex flex-col lg:flex-row gap-10 md:gap-12 lg:gap-16 w-full items-center lg:items-start lg:justify-between relative z-10">
-        <Intro className="flex-1 max-w-xl lg:max-w-none lg:flex-shrink" />
+        <div className="flex-1 max-w-xl lg:max-w-none lg:flex-shrink">{intro}</div>
         <div className="flex-shrink-0 w-full max-w-lg">{form}</div>
       </div>
 

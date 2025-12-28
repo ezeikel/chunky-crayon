@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faWandMagicSparkles,
@@ -197,6 +198,7 @@ const CreateColoringPageForm = ({
   const router = useRouter();
   const { isGuest } = useUser();
   const { addCreation } = useRecentCreations();
+  const t = useTranslations('createForm');
 
   const isLarge = size === 'large';
 
@@ -228,11 +230,11 @@ const CreateColoringPageForm = ({
               }
             />
             <h3 className="font-tondo font-bold text-xl md:text-2xl text-gradient-orange">
-              Create Magic!
+              {t('title')}
             </h3>
           </div>
           <p className="font-tondo font-medium text-base md:text-lg text-text-primary">
-            Type, talk, or snap a photo!
+            {t('tagline')}
           </p>
         </div>
 
@@ -250,7 +252,7 @@ const CreateColoringPageForm = ({
             }
           />
           <p className="font-tondo text-sm text-text-secondary">
-            Ready in about 30 seconds!
+            {t('generatingMessage')}
           </p>
         </div>
 
@@ -282,11 +284,11 @@ const CreateColoringPageForm = ({
             }
           />
           <h3 className="font-tondo font-bold text-xl md:text-2xl text-gradient-orange">
-            Create Magic!
+            {t('title')}
           </h3>
         </div>
         <p className="font-tondo font-medium text-base text-text-primary">
-          Describe a scene and watch it come to life!
+          {t('tagline')}
         </p>
       </div>
 
@@ -304,7 +306,7 @@ const CreateColoringPageForm = ({
           }
         />
         <p className="font-tondo text-sm text-text-secondary">
-          Ready in about 15-30 seconds!
+          {t('generatingMessage')}
         </p>
       </div>
 

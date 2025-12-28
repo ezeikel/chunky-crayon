@@ -7,6 +7,7 @@ import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPalette } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
 
 type DesktopColorPaletteProps = {
   className?: string;
@@ -17,6 +18,7 @@ type DesktopColorPaletteProps = {
  * Displays colors in a 4-column grid optimized for sidebar width
  */
 const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
+  const t = useTranslations('coloringPage');
   const { selectedColor, setSelectedColor, activeTool } = useColoringContext();
   const { playSound } = useSound();
 
@@ -38,7 +40,7 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
           className="size-5 text-crayon-orange"
         />
         <h3 className="font-tondo font-bold text-sm text-text-primary">
-          Colors
+          {t('sidebar.colors')}
         </h3>
       </div>
 
@@ -51,11 +53,7 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
           isMagicToolActive && 'opacity-40 pointer-events-none',
         )}
         aria-disabled={isMagicToolActive}
-        title={
-          isMagicToolActive
-            ? 'Colors are chosen automatically with Magic tools'
-            : undefined
-        }
+        title={isMagicToolActive ? t('colorPalette.magicToolsMessage') : undefined}
       >
         {ALL_COLORING_COLORS.map((color, index) => {
           const isSelected = selectedColor === color.hex;
@@ -87,10 +85,10 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
                 playSound('tap');
               }}
               disabled={isMagicToolActive}
-              aria-label={`Select ${color.name} color`}
+              aria-label={t('colorPalette.selectColor', { color: color.name })}
               title={
                 isMagicToolActive
-                  ? 'Colors are chosen automatically with Magic tools'
+                  ? t('colorPalette.magicToolsMessage')
                   : color.name
               }
               key={color.hex}

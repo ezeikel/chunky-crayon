@@ -1,0 +1,1392 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "もう一度",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "done": "完了",
+    "copy": "コピー",
+    "copied": "コピーしたよ！",
+    "credits": "クレジット",
+    "creditsWithCount": "{count} クレジット"
+  },
+  "coloLoading": {
+    "title": "ページを作ってるよ！",
+    "titleSpeaking": "すっごくワクワク！",
+    "coloSpeaking": "Coloがおしゃべり中！きいてね！",
+    "audioStates": {
+      "idle": "じゅんび中…",
+      "preparing": "Coloが目をさましたよ！",
+      "done": "絵をかいてるよ…"
+    },
+    "messages": {
+      "sharpeningCrayons": "クレヨンをとがらせてるよ…",
+      "mixingColors": "色をまぜまぜ…",
+      "drawingLines": "線をかいてるよ…",
+      "addingSparkles": "まほうのキラキラを追加中…",
+      "almostThere": "もうすぐだよ…",
+      "creatingMasterpiece": "すてきな作品を作ってるよ…",
+      "wavingWand": "まほうのつえをフリフリ…",
+      "coloringOutsideLines": "線からはみ出しちゃった（てへっ）…"
+    },
+    "pageLoading": "クレヨンのじゅんび中！"
+  },
+  "colo": {
+    "dashboard": {
+      "greeting": "今日はなにをぬりえする？",
+      "wantsToGrow": "{stageName}がもっと大きくなりたいよ！あと{count}枚保存して進化しよう！",
+      "proudOfYou": "{stageName}はあなたのことをとってもほこりに思ってるよ！"
+    },
+    "indicator": {
+      "next": "つぎ：{stageName}",
+      "saveToEvolve": "あと{count}枚保存して進化しよう！",
+      "maxStage": "さいこうステージにとうたつ！",
+      "accessories": "アクセサリー（{count}）"
+    },
+    "avatar": {
+      "tapMe": "タップしてね！",
+      "artworks": "さくひん"
+    },
+    "stages": {
+      "1": {
+        "name": "ベビー・コロ",
+        "description": "ぬりえのぼうけん、はじまりだよ！"
+      },
+      "2": {
+        "name": "ちびコロ",
+        "description": "さくひんがふえるたびに大きくなるよ！"
+      },
+      "3": {
+        "name": "すくすくコロ",
+        "description": "コロ、こんなに大きくなったよ！"
+      },
+      "4": {
+        "name": "にこにこコロ",
+        "description": "すてきなアートでにこにこ！"
+      },
+      "5": {
+        "name": "アーティスト・コロ",
+        "description": "りっぱなアーティストになりそう！"
+      },
+      "6": {
+        "name": "マスター・コロ",
+        "description": "さいきょうのぬりえマスター！"
+      }
+    }
+  },
+  "navigation": {
+    "home": "ホーム",
+    "gallery": "ギャラリー",
+    "myArtwork": "わたしの作品",
+    "challenges": "チャレンジ",
+    "blog": "ブログ",
+    "pricing": "料金",
+    "support": "サポート",
+    "signIn": "ログイン",
+    "signOut": "ログアウト",
+    "billing": "お支払い",
+    "settings": "設定",
+    "stickerBook": "ステッカーブック",
+    "account": "アカウント",
+    "menu": "メニュー",
+    "currentlyActive": "いま使っているプロフィール",
+    "switchTo": "切り替え",
+    "selectProfile": "プロフィールを選ぶ",
+    "manageProfiles": "プロフィール管理",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる",
+    "navigationMenu": "ナビゲーションメニュー"
+  },
+  "footer": {
+    "brand": "Chunky Crayon",
+    "tagline": "ゆめをえがいて。つくって。ぬろう。",
+    "aboutText": "想像の世界が動き出す！思いつきが魔法のぬりえになるよ。",
+    "madeBy": "南ロンドンのパパ・ママが愛をこめて作りました",
+    "copyright": "© {year} Chunky Crayon. 無断転載禁止。",
+    "sections": {
+      "about": "このアプリについて",
+      "connect": "つながる",
+      "getTheApp": "アプリを入手",
+      "support": "サポート"
+    },
+    "links": {
+      "privacyPolicy": "プライバシーポリシー",
+      "termsOfService": "利用規約"
+    },
+    "appStore": {
+      "downloadOnAppStore": "App Storeでダウンロード",
+      "getOnGooglePlay": "Google Playで手に入れよう",
+      "comingSoon": "もうすぐ！",
+      "iosComingSoon": "iOSアプリ準備中。お楽しみに！",
+      "androidComingSoon": "Androidアプリ準備中。お楽しみに！"
+    }
+  },
+  "homepage": {
+    "heroTitle": "お子さまの",
+    "heroTitleSuffix": "創造力を今日解き放とう",
+    "heroSubtitle": "わくわくのぬりえから想像の冒険まで。Chunky Crayonで、創造がまっすぐな喜びに変わります。",
+    "cta": "作ってみる",
+    "stats": {
+      "coloringPagesCreated": "作成したぬりえ",
+      "dailyPages": "毎日のページ",
+      "freeLibraryPages": "無料ライブラリ"
+    },
+    "galleryPreview": {
+      "freeColoringPages": "無料ぬりえ",
+      "exploreGallery": "ギャラリーを見る",
+      "todaysDailyPage": "今日のデイリー",
+      "latestDailyPage": "最新のデイリー",
+      "seeAll": "すべて見る",
+      "communityPages": "みんなの作品",
+      "colorNow": "今すぐぬる",
+      "browseCategories": "カテゴリを見る",
+      "viewAll": "全部見る",
+      "dailyColoringPageAlt": "デイリーぬりえ",
+      "coloringPageAlt": "ぬりえ"
+    },
+    "recentCreations": {
+      "title": "最近作った作品",
+      "ctaHighlight": "無料ではじめて",
+      "ctaText": "作品をずっと保存して、もっと楽しもう！",
+      "ctaButton": "無料ではじめる"
+    },
+    "unleashWords": {
+      "creativity": "創造力",
+      "imagination": "想像力",
+      "fun": "たのしさ",
+      "adventure": "冒険",
+      "discovery": "発見",
+      "exploration": "探検",
+      "inspiration": "ひらめき",
+      "art": "アート",
+      "joy": "よろこび",
+      "learning": "学び",
+      "wonder": "ふしぎ",
+      "dreams": "ゆめ",
+      "playtime": "あそび時間",
+      "innovation": "ひらめき",
+      "magic": "まほう",
+      "curiosity": "好奇心",
+      "expression": "表現",
+      "fantasy": "ファンタジー",
+      "stories": "物語",
+      "excitement": "わくわく"
+    },
+    "testimonials": {
+      "title": "家族みんなに大人気",
+      "fromReviews": "{count}件のレビューより",
+      "items": {
+        "1": {
+          "name": "Sarah M.",
+          "role": "2児のママ",
+          "quote": "子どもたちが本当に大好き！自分だけの魔法の世界を作って、何時間でもぬっています。もうスクリーン時間でケンカしなくなりました！",
+          "avatar": "/images/testimonials/en/avatar-1.jpg"
+        },
+        "2": {
+          "name": "James T.",
+          "role": "3児のパパ",
+          "quote": "やっと、創造力とテクノロジーを健やかに組み合わせたものに出会えました。娘が「ユニコーンのプリンセスのお城」を作って、完璧でした！",
+          "avatar": "/images/testimonials/en/avatar-2.jpg"
+        },
+        "3": {
+          "name": "Emily R.",
+          "role": "小学校の先生",
+          "quote": "授業で創作作文のお題に使っています。子どもが欲しいものを言葉で伝えて、それをぬりえに。みんな夢中です！",
+          "avatar": "/images/testimonials/en/avatar-3.jpg"
+        },
+        "4": {
+          "name": "David K.",
+          "role": "おじいちゃん",
+          "quote": "孫たちが、いっしょに新しいぬりえを作るために毎週末遊びに来るように。最高のふれあい時間です！",
+          "avatar": "/images/testimonials/en/avatar-4.jpg"
+        },
+        "5": {
+          "name": "Rachel B.",
+          "role": "チャイルドマインダー",
+          "quote": "見ている子どもたちが夢中です。ドラゴン、妖精、ロケット…想像したものがなんでも形になります！",
+          "avatar": "/images/testimonials/en/avatar-5.jpg"
+        },
+        "6": {
+          "name": "Michael P.",
+          "role": "パパ＆デザイナー",
+          "quote": "デザイナーとして品質に感動。パパとしては、息子のアイデアがぬりえになって笑顔になるのを見るのが大好きです！",
+          "avatar": "/images/testimonials/en/avatar-6.jpg"
+        }
+      }
+    },
+    "faq": {
+      "title": "よくある質問",
+      "subtitle": "Chunky Crayonで、魔法みたいなぬりえを作るための基本がわかります",
+      "items": {
+        "1": {
+          "question": "Chunky Crayonって何？",
+          "answer": "Chunky Crayonは、子どもと家族のための、魔法みたいなぬりえ自動生成アプリです。「お茶会をしているドラゴン」や「月にいる大好きなヒーロー」みたいに、ぬりたいものを言葉で伝えるだけ。数秒で、世界にひとつの印刷できるぬりえが完成します。雨の日やおうち時間、想像力のスイッチにもぴったり！"
+        },
+        "2": {
+          "question": "子どもが使っても安全？",
+          "answer": "もちろんです！Chunky Crayonは親が親のために作りました。生成される画像は年齢に合った、子ども向けの内容になるよう設計されています。AIも子どもにやさしい、楽しくて安心なぬりえを作れるよう調整しています。"
+        },
+        "3": {
+          "question": "ぬりえはどうやって作るの？",
+          "answer": "かんたん3ステップ！ぬりたいもの（例：「魔法の森のユニコーン」）を入力して「生成」をタップ。約30秒待つだけで、ダウンロード＆印刷できる、あなただけのぬりえが表示されます。音声入力や、写真をアップしてアイデアにすることもできます！"
+        },
+        "4": {
+          "question": "生成にはどれくらい時間がかかる？",
+          "answer": "ほとんどのぬりえは約30秒で完成します。待っている間は、かわいいマスコットのColoがいっしょに楽しませてくれます！細かいシーンは、もう少しだけ時間がかかることがあります。"
+        },
+        "5": {
+          "question": "ぬりえは印刷できる？",
+          "answer": "はい！作ったぬりえは高画質PDFでダウンロードでき、おうち印刷にぴったりです。A4用紙に最適化されていて、クレヨン、色えんぴつ、マーカーでもきれいにぬれます。"
+        },
+        "6": {
+          "question": "うまく生成されないときは？",
+          "answer": "AIが最初から完ぺきに理解できないこともあります。それも創作の冒険の一部！言い方を少し変えて、もう一度試してみてください。コツ：欲しいものを具体的に、場面が伝わるように書くこと。迷ったら音声入力もおすすめです。子どもは話すほうが上手に説明できることが多いですよ！"
+        },
+        "7": {
+          "question": "Chunky Crayonは無料で使える？",
+          "answer": "はい！アカウント不要で、無料で2回生成をお試しできます。その後は無料アカウント登録でボーナス15クレジット、またはお手頃なサブスクで無制限の創作を楽しめます。"
+        },
+        "8": {
+          "question": "サブスクには何が含まれる？",
+          "answer": "プランはCrayon（気軽にぬりえ）からStudio（とことん創作したい家族や先生向け）まで。全プラン共通：ぬりえ生成し放題、高画質PDFダウンロード、音声＆写真入力、新機能へのアクセス。上位プランにはクレジット繰り越しや商用利用権も含まれます。"
+        },
+        "9": {
+          "question": "教室や保育で使える？",
+          "answer": "はい！先生やチャイルドマインダーにも大人気です。CrayonとRainbowプランは、個人・教育目的にぴったり。事業での利用や配布など商用で使う場合は、商用ライセンス付きのMasterpieceまたはStudioプランをご確認ください。"
+        },
+        "10": {
+          "question": "クレジットはどう使うの？",
+          "answer": "ぬりえを1枚生成するごとに5クレジット使います。クレジットはサブスクに合わせて毎月更新され、プランによっては未使用分の繰り越しも可能です。もっと作りたいときは、クレジットパックの購入もできます！"
+        }
+      }
+    }
+  },
+  "gallery": {
+    "pageTitle": "無料ぬりえギャラリー - Chunky Crayon",
+    "pageDescription": "無料のぬりえをたっぷり掲載。どうぶつ、ドラゴン、ユニコーン、プリンセスなど。毎日新作追加！",
+    "heroTitle": "無料ぬりえ",
+    "heroSubtitle": "無料で印刷できるぬりえがたくさん。かわいいどうぶつから魔法のドラゴンまで、オンラインでもおうち印刷でも楽しめる1枚が見つかるよ。",
+    "browseByCategory": "カテゴリで探す",
+    "browseByDifficulty": "むずかしさで探す",
+    "browseByAge": "年齢で探す",
+    "dailyPage": "今日のデイリーぬりえ",
+    "viewAllDaily": "デイリーを全部見る",
+    "communityCreations": "みんなの作品",
+    "viewAllCommunity": "みんなのページを全部見る",
+    "startColoring": "ぬりえをはじめる",
+    "stats": {
+      "totalPages": "合計ページ",
+      "communityPages": "コミュニティ",
+      "dailyPages": "デイリー",
+      "pagesSuffix": "ページ"
+    },
+    "ageGroups": {
+      "toddlers": {
+        "title": "幼児向け",
+        "ages": "2〜4歳",
+        "description": "かんたん、太い線"
+      },
+      "kids": {
+        "title": "子ども向け",
+        "ages": "4〜12歳",
+        "description": "たのしく夢中に"
+      },
+      "teens": {
+        "title": "ティーン向け",
+        "ages": "13〜17歳",
+        "description": "かっこいい細かめ"
+      },
+      "adults": {
+        "title": "大人向け",
+        "ages": "18歳〜",
+        "description": "癒し＆繊細"
+      }
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "初級",
+        "description": "かんたん、太い線"
+      },
+      "intermediate": {
+        "title": "中級",
+        "description": "ほどよい細かさ"
+      },
+      "advanced": {
+        "title": "上級",
+        "description": "細かいデザイン"
+      },
+      "expert": {
+        "title": "達人",
+        "description": "とても細かい模様"
+      }
+    },
+    "categories": {
+      "animals": "どうぶつ",
+      "fantasy": "ファンタジー＆まほう",
+      "dragons": "ドラゴン",
+      "unicorns": "ユニコーン",
+      "princesses": "プリンセス＆おしろ",
+      "superheroes": "スーパーヒーロー",
+      "dinosaurs": "きょうりゅう",
+      "space": "うちゅう＆宇宙飛行士",
+      "underwater": "うみのなか＆海",
+      "vehicles": "のりもの",
+      "pirates": "かいぞく",
+      "nature": "しぜん＆おはな",
+      "holidays": "イベント＆季節",
+      "robots": "ロボット＆テクノロジー",
+      "food": "たべもの＆スイーツ"
+    },
+    "seo": {
+      "aboutTitle": "無料ぬりえについて",
+      "aboutParagraph1": "Chunky Crayonの無料ぬりえギャラリーへようこそ！子どもから大人まで楽しめる、印刷できるぬりえをどんどん追加中。AIツールで、いろんなカテゴリのユニークで楽しいぬりえを作れます。",
+      "aboutParagraph2": "毎日「デイリーぬりえ」を追加。デジタルツールでオンラインぬりえも、ダウンロードして印刷して楽しむのもOK。コミュニティのみんなのアイデア投稿も加わって、さらにバリエーション豊富です。",
+      "aboutParagraph3": "カテゴリから探せば、欲しいぬりえがすぐ見つかるよ。かわいいどうぶつ、ドラゴンやユニコーンなどのファンタジー、季節やイベントのテーマまで。どのページもぬりやすいキレイな線で作られています。"
+    },
+    "jumpToNav": {
+      "jumpTo": "移動先：",
+      "selectSection": "セクションを選ぶ",
+      "backToTop": "トップへ",
+      "filters": "絞り込み",
+      "gallery": "ギャラリー",
+      "related": "関連",
+      "about": "紹介"
+    },
+    "difficultyFilter": {
+      "all": "すべて",
+      "beginner": "初級",
+      "intermediate": "中級",
+      "advanced": "上級",
+      "expert": "達人",
+      "easy": "かんたん",
+      "medium": "ふつう",
+      "hard": "むずかしい",
+      "filterByDifficulty": "むずかしさで絞り込み"
+    },
+    "categoryPage": {
+      "coloringPages": "{category}のぬりえ",
+      "relatedCategories": "関連カテゴリ",
+      "noPagesYet": "{category}のページはまだありません",
+      "beTheFirst": "最初の{category}ぬりえを作ってみよう！",
+      "createAPage": "ページを作る",
+      "freeColoringPages": "無料{category}ぬりえ",
+      "lookingFor": "ぴったりの{category}ぬりえを探してる？ここなら見つかるよ！子どもも大人も楽しめる{category}デザインがいっぱい。",
+      "eachPageDescription": "各ぬりえは、デジタルツールでオンラインぬりえも、ダウンロードして印刷してクレヨン・色えんぴつ・マーカーで楽しむのもOK。AIが作るデザインは線がきれいで、ぬるのが楽しくリラックスできます。",
+      "popularThemes": "人気の{category}テーマ",
+      "includesPopular": "{category}カテゴリの人気検索はこちら："
+    },
+    "categoryDescriptions": {
+      "animals": "子どもも大人も楽しい、かわいい＆ワイルドなどうぶつぬりえ",
+      "fantasy": "魔法の生き物と、ふしぎな世界をぬろう",
+      "dragons": "炎のディテールがかっこいいドラゴンぬりえ",
+      "unicorns": "にじとキラキラのユニコーンぬりえ",
+      "princesses": "プリンセスとおしろのぬりえ",
+      "superheroes": "ドキドキのヒーローぬりえ",
+      "dinosaurs": "大むかしのきょうりゅうぬりえ",
+      "space": "宇宙の冒険＆宇宙飛行士のぬりえ",
+      "underwater": "海のいきもの＆海の中の世界をぬろう",
+      "vehicles": "くるま、トラック、ひこうきなどののりものぬりえ",
+      "pirates": "わくわく海賊アドベンチャーぬりえ",
+      "nature": "うつくしい自然とお花のぬりえ",
+      "holidays": "イベントや季節のぬりえ",
+      "robots": "未来っぽいロボット＆テクノロジーぬりえ",
+      "food": "おいしそうなたべもの＆あまいスイーツぬりえ"
+    },
+    "infiniteScroll": {
+      "allPagesViewed": "ぜんぶのぬりえを見たよ！"
+    },
+    "ageGroupPages": {
+      "common": {
+        "moreAgeGroups": "ほかの年齢も見る",
+        "createSimplePages": "かんたんページを作る",
+        "createYourOwn": "じぶんで作る",
+        "createYourDesign": "デザインを作る"
+      },
+      "toddlers": {
+        "pageTitle": "幼児向けぬりえ",
+        "featuredSection": "かんたん幼児ぬりえ",
+        "categoriesSection": "幼児にやさしいカテゴリ",
+        "heroDescription": "小さな手でもぬりやすい、かんたんページ！大きな形、くっきり太い線、よく知っているものがいっぱい。2〜4歳にぴったりで、手先の練習にも◎",
+        "whyTitle": "ちいさなアーティストにぴったり",
+        "why1Title": "太くてくっきり",
+        "why1Description": "線が太いから、はみ出しにくいよ！",
+        "why2Title": "かんたんな形",
+        "why2Description": "幼児が知っていて大好きなものを集めたよ。",
+        "why3Title": "いろをおぼえる",
+        "why3Description": "色を学びながら、想像力もぐんぐん！",
+        "seoTitle": "幼児向け無料ぬりえ",
+        "seoParagraph1": "はじめてのぬりえにぴったり！2〜4歳向けのかんたんぬりえを集めました。大きくぬれる面と太い線で、手先の器用さを育てやすいデザインです。",
+        "seoParagraph2": "かわいいどうぶつ、おいしそうなたべもの、カラフルなのりもの、きれいな自然など、子どもが大好きなモチーフ中心。シンプルだからイライラしにくく、楽しく続けられます。",
+        "seoParagraph3": "A4用紙に印刷しても、使いやすいデジタルツールでオンラインでもOK。おうち時間、雨の日、園やおうちでの学びにもぴったりです。",
+        "benefitsTitle": "幼児のぬりえのうれしい効果",
+        "benefitsDescription": "ぬりえは、手と目の協調、色の理解、握る力、集中力、表現力などを育てます。まずは一番かんたんなデザインから、成長を見守ってね！"
+      },
+      "kids": {
+        "pageTitle": "子ども向けぬりえ",
+        "featuredSection": "人気の子どもぬりえ",
+        "categoriesSection": "子ども向けカテゴリ",
+        "heroDescription": "4〜12歳にぴったりの、たのしく夢中になれるぬりえ！きょうりゅう、ユニコーン、ヒーローなどいろいろ。オンラインでも、おうち印刷でもずっと楽しめるよ。",
+        "whyTitle": "子どもがChunky Crayonを好きな理由",
+        "why1Title": "なんでも作れる",
+        "why1Description": "やりたいことを言葉で伝えると、ぬりえになって出てくるよ！",
+        "why2Title": "印刷してぬる",
+        "why2Description": "A4で印刷できる高画質PDFをダウンロード。",
+        "why3Title": "オンラインでぬる",
+        "why3Description": "ブラウザでそのままデジタルぬりえ！",
+        "seoTitle": "子ども向け無料ぬりえ",
+        "seoParagraph1": "子どもにぴったりのぬりえを探してる？Chunky Crayonには、4〜12歳向けの無料・印刷できるぬりえがたくさん。かわいいどうぶつから迫力のヒーローまで、きっとお気に入りが見つかります。",
+        "seoParagraph2": "はっきりした線で、小さな手でもぬりやすいデザイン。クレヨン、色えんぴつ、マーカー、どれでもきれいに仕上がるよ。オンラインぬりえツールで画面でも楽しめます。",
+        "seoParagraph3": "さらに、子ども自身がオリジナルぬりえも作れる！「サッカーするドラゴン？」「宇宙のユニコーン？」想像したことが、数秒で本当にぬりえになります。",
+        "popularTitle": "子どもに人気のカテゴリ",
+        "popularDescription": "人気カテゴリは、きょうりゅう、ユニコーン、スーパーヒーロー、どうぶつ、うちゅう＆ロケット、のりものなど。どれも子どもに合ったデザインがいっぱいです。"
+      },
+      "teens": {
+        "pageTitle": "ティーン向けぬりえ",
+        "featuredSection": "人気のティーンぬりえ",
+        "categoriesSection": "ティーンカテゴリ",
+        "heroDescription": "ティーン向けの、かっこよくて細かいぬりえ！アニメ、ゲーム、ファンタジー、SFまで、好みに合わせて表現しよう。気分転換やストレスケアにも◎",
+        "whyTitle": "創作好きティーンのために",
+        "why1Title": "かっこいいテーマ",
+        "why1Description": "アニメ、ゲーム、ファンタジー、SFなど、好きが見つかる！",
+        "why2Title": "細かいアート",
+        "why2Description": "ぬりごたえたっぷり。完成したら超いい感じ！",
+        "why3Title": "気分リセット",
+        "why3Description": "画面からちょっと離れて、ぬりえでリラックス。",
+        "seoTitle": "ティーン向け無料ぬりえ",
+        "seoParagraph1": "「子どもっぽいのはイヤ…」という人にも。13〜17歳向けの、かっこよくて細かいデザインを集めました。アニメ風キャラ、ゲームっぽい世界観、ファンタジー、抽象模様まで幅広くあります。",
+        "seoParagraph2": "弟や妹のぬりえとはひと味ちがう。細かい描写や動きのある構図、ティーンの好みに刺さるテーマで、表現にも気分転換にもぴったりです。",
+        "seoParagraph3": "欲しいイメージを言葉で伝えれば、オリジナルぬりえも作れる！「宇宙でロボットと戦うドラゴン」「アニメ風のポートレート」「好きなマーク入りの細かいマンダラ」など、AIが形にします。",
+        "popularTitle": "人気のティーンテーマ",
+        "popularDescription": "人気は、アニメ・マンガ、ファンタジー生き物、ヒーローのアクション、ゲーム風アート、宇宙＆SF、細かい模様など。どのカテゴリも、ぬりごたえのあるデザインがそろっています。"
+      },
+      "adults": {
+        "pageTitle": "大人向けぬりえ",
+        "featuredSection": "人気の大人ぬりえ",
+        "categoriesSection": "大人向けカテゴリ",
+        "heroDescription": "大人のぬりえで、ほっと一息。繊細なマンダラ、自然の風景、細かな模様など、リラックスとマインドフルネスのためのデザインがそろっています。忙しい日のストレスケアにも。",
+        "whyTitle": "大人のぬりえの効果",
+        "why1Title": "ストレス軽減",
+        "why1Description": "ぬりえで気持ちが落ち着き、不安をやわらげます。",
+        "why2Title": "マインドフルネス",
+        "why2Description": "今この瞬間に集中できる、画面なしの時間に。",
+        "why3Title": "創造力",
+        "why3Description": "色選びで自分らしさを表現して、素敵な作品に。",
+        "seoTitle": "大人向け無料ぬりえ",
+        "seoParagraph1": "大人のぬりえは、人気のウェルネス習慣。ぬりえには、不安の軽減、集中力アップ、画面疲れのリセットなどが期待できるという研究もあります。大人向けの美しく繊細なデザインをそろえました。",
+        "seoParagraph2": "マインドフルネスに役立つマンダラ、静かな自然の風景、上品な模様など、じっくり楽しめるページばかり。少し良い紙に印刷して、色えんぴつ、マーカー、ジェルペンなどお好みでどうぞ。",
+        "seoParagraph3": "もっと特別な1枚が欲しい？オリジナルぬりえを作ろう。理想の癒しの景色（枯山水、アール・ヌーヴォー風の模様、細密な植物画など）を説明するだけで、AIが形にします。",
+        "popularTitle": "人気の大人向けテーマ",
+        "popularDescription": "人気カテゴリは、瞑想にぴったりのマンダラ、細密な自然＆ボタニカル、幾何学模様、アール・デコ／アール・ヌーヴォー風、ゼンタングル風、静かな風景など。どれもリラックスへの近道です。"
+      }
+    }
+  },
+  "pricing": {
+    "pageTitle": "料金 - Chunky Crayon",
+    "heroTitle": "どんなぬりえの冒険にもぴったりのプラン！",
+    "heroSubtitle": "保護者の方も、小さなアーティストも、ぬりえが大好きな大人も。あなたにぴったりのChunky Crayonプランがあります。アカウントなしですぐ始められます！",
+    "monthly": "月額",
+    "annual": "年額（15%おトク）",
+    "mostPopular": "いちばん人気",
+    "buyNow": "今すぐ購入",
+    "noCommitment": "縛りなし。いつでも解約OK。",
+    "perMonth": "/月",
+    "creditsPerMonth": "クレジット/月",
+    "plans": {
+      "crayon": {
+        "name": "クレヨンプラン",
+        "tagline": "ぬりえの冒険を始めよう",
+        "audience": "気軽に楽しみたい人や小さなアーティストにぴったり"
+      },
+      "rainbow": {
+        "name": "レインボープラン",
+        "tagline": "家族みんなで楽しい",
+        "audience": "クリエイティブな家族やきょうだいにおすすめ"
+      },
+      "masterpiece": {
+        "name": "マスターピースプラン",
+        "tagline": "ぬりえ好きのあなたへ",
+        "audience": "大人や本格派のぬりえ好きにぴったり"
+      },
+      "studio": {
+        "name": "スタジオプラン",
+        "tagline": "すごいクリエイター＆小さなお店向け",
+        "audience": "スタジオ、先生、大量に使う方に最適"
+      }
+    },
+    "features": {
+      "textPrompts": "文章からぬりえを作れる",
+      "wordsNumbers": "言葉・名前・数字入りのぬりえを作れる",
+      "adjustments": "色・コントラスト・明るさを調整",
+      "photoToColoring": "写真をぬりえに変換",
+      "allCrayonFeatures": "クレヨンプランの全機能",
+      "advancedEditing": "高度な編集機能",
+      "earlyAccess": "新しいモデル＆機能を先行体験",
+      "rollover1Month": "クレジット繰り越し（最大1か月）",
+      "allRainbowFeatures": "レインボープランの全機能",
+      "bulkGeneration": "まとめて生成",
+      "commercialUse": "商用利用OK",
+      "rollover2Months": "クレジット繰り越し（最大2か月）",
+      "allMasterpieceFeatures": "マスターピースプランの全機能",
+      "rollover3Months": "クレジット繰り越し（最大3か月）"
+    },
+    "creditPacks": {
+      "title": "クレジットを追加しますか？",
+      "pack100": "100クレジットパック",
+      "pack500": "500クレジットパック",
+      "pack1000": "1,000クレジットパック"
+    },
+    "faq": {
+      "title": "よくあるご質問",
+      "cancelAnytime": {
+        "question": "いつでも解約できますか？",
+        "answer": "はい！いつでも解約できます。理由は不要です。"
+      },
+      "rollover": {
+        "question": "クレジットは繰り越せますか？",
+        "answer": "一部のプランでは未使用クレジットを繰り越せます。詳しくは各プランをご確認ください。"
+      },
+      "audience": {
+        "question": "子ども向け？大人向け？",
+        "answer": "どちらもOK！Chunky Crayonは家族みんな、子どもも、大人のぬりえ好きも楽しめます。"
+      },
+      "gettingStarted": {
+        "question": "どうやって始めるの？",
+        "answer": "プランを選ぶだけで、すぐにぬりえ作りを始められます！"
+      }
+    }
+  },
+  "blog": {
+    "title": "Chunky Crayonブログ",
+    "subtitle": "ぬりえがもっと楽しくなるヒントやアイデア、ひらめき",
+    "allPosts": "すべての記事",
+    "byAuthor": "{author}より",
+    "categories": {
+      "colouringTips": "ぬりえのコツ",
+      "mindfulnessRelaxation": "マインドフルネス＆リラックス",
+      "artEducation": "アート教育",
+      "activitiesForKids": "子ども向け遊び",
+      "seasonalHolidays": "季節＆イベント"
+    }
+  },
+  "coloringPage": {
+    "title": "ぬりえ",
+    "defaultDescription": "Chunky Crayonの無料で印刷できるぬりえ",
+    "progress": {
+      "colored": "ぬれたよ",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "いいスタート！",
+        "50": "半分できた！",
+        "75": "もうすぐ完成！",
+        "100": "すごい！"
+      }
+    },
+    "sidebar": {
+      "colors": "いろ",
+      "tools": "どうぐ",
+      "size": "太さ",
+      "history": "りれき",
+      "zoom": "ズーム",
+      "actions": "メニュー"
+    },
+    "tools": {
+      "pan": "うごかす",
+      "fill": "ぬりつぶし",
+      "brush": "ブラシ",
+      "sticker": "シール",
+      "magicReveal": "まほうでひらく",
+      "magicAuto": "まほうおまかせ",
+      "magicBrush": "まほうブラシ",
+      "magicFill": "まほうぬりつぶし",
+      "autoColor": "おまかせぬり",
+      "magic": "まほう"
+    },
+    "brushTypes": {
+      "crayon": "クレヨン",
+      "marker": "マーカー",
+      "eraser": "けしゴム",
+      "glitter": "ラメ",
+      "sparkle": "キラキラ",
+      "rainbow": "にじいろ",
+      "glow": "ひかる",
+      "neon": "ネオン"
+    },
+    "brushSizes": {
+      "small": "ほそい",
+      "medium": "ふつう",
+      "large": "ぶっとい"
+    },
+    "fillPatterns": {
+      "solid": "ベタ",
+      "dots": "みずたま",
+      "stripes": "しましま",
+      "diagonal": "ななめ",
+      "checkerboard": "チェック",
+      "hearts": "ハート",
+      "stars": "おほしさま",
+      "zigzag": "ジグザグ"
+    },
+    "actions": {
+      "save": "ほぞん",
+      "download": "ダウンロード",
+      "share": "シェア",
+      "print": "いんさつ",
+      "preparing": "じゅんび中...",
+      "doneSharing": "シェアしたよ",
+      "colorAgain": "もう一回ぬる",
+      "startOver": "はじめから"
+    },
+    "toolbar": {
+      "expand": "ツールバーをひらく",
+      "collapse": "ツールバーをたたむ",
+      "moreTools": "もっとどうぐ",
+      "less": "少なく"
+    },
+    "undoRedo": {
+      "undo": "もどす",
+      "undoShortcut": "もどす (Ctrl+Z)",
+      "redo": "やりなおす",
+      "redoShortcut": "やりなおす (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "{color} をえらぶ",
+      "magicToolsMessage": "まほうのどうぐは色をじどうでえらぶよ"
+    },
+    "patternSelector": {
+      "label": "もよう:"
+    },
+    "zoomControls": {
+      "zoomLevel": "ズーム: {level}%",
+      "zoomOut": "ちいさく",
+      "zoomOutAria": "ちいさくする（もっと見る）",
+      "zoomIn": "おおきく",
+      "zoomInAria": "おおきくする（もっと近く）",
+      "pan": "うごかす",
+      "panAria": "えのまわりをうごかす",
+      "reset": "ぜんたいを見る",
+      "resetAria": "ぜんたいにもどす"
+    },
+    "muteToggle": {
+      "mute": "おとを消す",
+      "unmute": "おとを出す",
+      "turnOn": "おとをオン",
+      "turnOff": "おとをオフ"
+    }
+  },
+  "shareModal": {
+    "title": "作品をシェア",
+    "privacyNote": "このリンクを知っている人なら誰でも見られます。個人情報は共有されません。",
+    "expiresIn": "リンクの有効期限：",
+    "expiration": {
+      "7days": "7日",
+      "30days": "30日",
+      "never": "期限なし"
+    },
+    "createLink": "シェアリンクを作る",
+    "creating": "シェアリンクを作成中...",
+    "success": {
+      "title": "リンクができたよ！",
+      "subtitle": "家族やお友だちにこのリンクを送ってね"
+    },
+    "done": "完了"
+  },
+  "adultGate": {
+    "title": "保護者の方ですか？",
+    "subtitle": "ここは保護者向けのページです",
+    "instructions": "続けるには、かんたんな計算を解いてください：",
+    "placeholder": "答えを入力",
+    "submit": "つづける",
+    "error": "ちょっと違うみたい。もう一度！",
+    "cancel": "もどる"
+  },
+  "saveToGallery": {
+    "idle": "ギャラリーに保存",
+    "saving": "保存中...",
+    "saved": "保存したよ！",
+    "tryAgain": "もう一度",
+    "errors": {
+      "captureArtwork": "作品を保存できなかったよ",
+      "generic": "うまくいかなかったよ。もう一度ためしてね。"
+    }
+  },
+  "shareButton": {
+    "idle": "シェア",
+    "preparing": "準備中…",
+    "doneSharing": "シェア完了"
+  },
+  "colors": {
+    "primary": {
+      "cherryRed": "さくらんぼレッド",
+      "sunsetOrange": "ゆうやけオレンジ",
+      "sunshineYellow": "おひさまイエロー",
+      "grassGreen": "くさむらグリーン",
+      "skyBlue": "そらいろブルー",
+      "grapePurple": "ぶどうパープル",
+      "bubblegumPink": "バブルガムピンク",
+      "chocolateBrown": "チョコレートブラウン"
+    },
+    "secondary": {
+      "coral": "コーラル",
+      "mint": "ミント",
+      "lavender": "ラベンダー",
+      "peach": "ピーチ",
+      "navy": "ネイビー",
+      "forest": "フォレストグリーン",
+      "gold": "ゴールド",
+      "rose": "ローズ"
+    },
+    "essentials": {
+      "black": "くろ",
+      "white": "しろ",
+      "gray": "はいいろ",
+      "skinTone": "はだいろ"
+    },
+    "skinTones": {
+      "light": "あかるめ",
+      "mediumLight": "ややあかるめ",
+      "medium": "ふつう",
+      "mediumDark": "ややこいめ",
+      "dark": "こいめ",
+      "deep": "とてもこいめ"
+    }
+  },
+  "stickers": {
+    "categories": {
+      "stars": "おほしさま",
+      "hearts": "ハート",
+      "shapes": "かたち",
+      "nature": "しぜん",
+      "emojis": "えもじ",
+      "fun": "たのしい"
+    },
+    "items": {
+      "yellowStar": "きいろいおほしさま",
+      "sparkleStar": "きらきらおほしさま",
+      "glowingStar": "ぴかぴかおほしさま",
+      "shootingStar": "ながれぼし",
+      "redHeart": "あかいハート",
+      "pinkHeart": "ピンクのハート",
+      "sparkleHeart": "きらきらハート",
+      "rainbowHeart": "にじいろハート",
+      "circle": "まる",
+      "square": "しかく",
+      "triangle": "さんかく",
+      "diamond": "ひしがた",
+      "flower": "おはな",
+      "sun": "おひさま",
+      "rainbow": "にじ",
+      "cloud": "くも",
+      "butterfly": "ちょうちょ",
+      "leaf": "はっぱ",
+      "smile": "にこにこ",
+      "loveEyes": "ハートのめ",
+      "cool": "クール",
+      "wink": "ウインク",
+      "crown": "おうかん",
+      "unicorn": "ユニコーン",
+      "rocket": "ロケット",
+      "balloon": "ふうせん",
+      "gift": "プレゼント",
+      "cake": "ケーキ"
+    }
+  },
+  "stickerBook": {
+    "title": "ステッカーブック",
+    "subtitle": "ぬりえでステッカーを集めよう！",
+    "pageTitle": "ステッカーブック - Chunky Crayon",
+    "pageDescription": "集めたステッカーを見て、どれがアンロックできるかチェックしよう！",
+    "loadError": "ステッカーを読み込めませんでした。もう一度ためしてね。",
+    "filters": {
+      "all": "すべて",
+      "milestones": "マイルストーン",
+      "categories": "カテゴリ",
+      "explore": "たんけん",
+      "special": "スペシャル"
+    },
+    "emptyState": "このカテゴリにはまだステッカーがないよ。",
+    "countFormat": "{count}/{total}",
+    "newBadge": "NEW {count}",
+    "progress": {
+      "label": "ステッカーコレクション",
+      "complete": "すごい！ぜんぶ集まったよ！",
+      "almostThere": "あと少し！とってもいいよ！",
+      "halfway": "半分まできたよ！つづけてね！",
+      "greatStart": "いいスタート！"
+    },
+    "detail": {
+      "lockedName": "???",
+      "lockedDescription": "このステッカーはまだロック中だよ！",
+      "unlockedOn": "{date}にアンロック",
+      "howToUnlock": "アンロック方法：",
+      "rarity": {
+        "common": "ふつう",
+        "uncommon": "ちょっとレア",
+        "rare": "レア",
+        "legendary": "でんせつ"
+      },
+      "unlockConditions": {
+        "artworkCount": "ギャラリーに作品を{count}枚保存する",
+        "firstCategory": "はじめての{category}ページをぬる",
+        "categoryCount": "{category}ページを{count}枚ぬる",
+        "special": "ちがうカテゴリを{count}つたんけんする"
+      }
+    }
+  },
+  "stickerCatalog": {
+    "first-steps": {
+      "name": "はじめのいっぽ",
+      "description": "はじめてのぬりえを保存しよう！",
+      "unlockMessage": "やったね！はじめてのさくひんを保存したよ！"
+    },
+    "getting-started": {
+      "name": "スタートダッシュ",
+      "description": "いい調子！さくひんを5こ保存しよう。",
+      "unlockMessage": "さくひん5こ！アーティストになってきたね！"
+    },
+    "high-five": {
+      "name": "ハイタッチ",
+      "description": "すてきなさくひんを10こギャラリーに保存しよう。",
+      "unlockMessage": "ハイタッチ！すごいさくひんが10こ！"
+    },
+    "perfect-ten": {
+      "name": "パーフェクト10",
+      "description": "ほんもののアーティスト！さくひんを25こ保存しよう。",
+      "unlockMessage": "さくひん25こ！ぬりえスターだね！"
+    },
+    "super-artist": {
+      "name": "スーパーアーティスト",
+      "description": "がんばったね！さくひんを50こ保存しよう。",
+      "unlockMessage": "名作50こ！きみはスーパーアーティスト！"
+    },
+    "master-creator": {
+      "name": "マスタークリエイター",
+      "description": "でんせつレベル！さくひんを75こ保存しよう。",
+      "unlockMessage": "さくひん75こ！ほんもののマスタークリエイター！"
+    },
+    "century-club": {
+      "name": "100クラブ",
+      "description": "さいこうのたっせい！さくひんを100こ保存しよう。",
+      "unlockMessage": "さくひん100こ！100クラブへようこそ！"
+    },
+    "animal-friend": {
+      "name": "どうぶつフレンド",
+      "description": "はじめてのどうぶつページをぬろう！",
+      "unlockMessage": "あたらしいどうぶつのおともだちができたよ！"
+    },
+    "fantasy-dreamer": {
+      "name": "ファンタジーのゆめみさん",
+      "description": "はじめてのファンタジーページをぬろう！",
+      "unlockMessage": "ファンタジーのせかいへようこそ！"
+    },
+    "space-explorer": {
+      "name": "うちゅうたんけんたい",
+      "description": "はじめてのうちゅうページをぬろう！",
+      "unlockMessage": "3、2、1…はっしゃ！うちゅうをたんけんしたよ！"
+    },
+    "nature-lover": {
+      "name": "しぜんだいすき",
+      "description": "はじめてのしぜんページをぬろう！",
+      "unlockMessage": "しぜんってきれい！きみのアートみたい！"
+    },
+    "vehicle-driver": {
+      "name": "のりものドライバー",
+      "description": "はじめてののりものページをぬろう！",
+      "unlockMessage": "ブーブー！かっこいいタイヤ！"
+    },
+    "dino-hunter": {
+      "name": "きょうりゅうはっけん",
+      "description": "はじめてのきょうりゅうページをぬろう！",
+      "unlockMessage": "ガオー！きょうりゅうをみつけたよ！"
+    },
+    "ocean-diver": {
+      "name": "うみのダイバー",
+      "description": "はじめてのうみのいきものページをぬろう！",
+      "unlockMessage": "ざぶーん！うみのそこのぼうけん！"
+    },
+    "food-lover": {
+      "name": "たべものだいすき",
+      "description": "はじめてのたべものページをぬろう！",
+      "unlockMessage": "おいしそう！とってもおいしそう！"
+    },
+    "sports-star": {
+      "name": "スポーツスター",
+      "description": "はじめてのスポーツページをぬろう！",
+      "unlockMessage": "ゴール！きみはスポーツスター！"
+    },
+    "holiday-spirit": {
+      "name": "ホリデーきぶん",
+      "description": "はじめてのホリデーページをぬろう！",
+      "unlockMessage": "おいわいしよう！ホリデーきぶんゲット！"
+    },
+    "animal-master": {
+      "name": "どうぶつマスター",
+      "description": "どうぶつページを10まいぬって、どうぶつはかせになろう！",
+      "unlockMessage": "きみはさいきょうのどうぶつフレンド！"
+    },
+    "fantasy-master": {
+      "name": "ファンタジーマスター",
+      "description": "ファンタジーページを10まいぬって、まほうのちからをひらこう！",
+      "unlockMessage": "きみのファンタジーパワーはでんせつ！"
+    },
+    "space-master": {
+      "name": "うちゅうマスター",
+      "description": "うちゅうページを10まいぬって、うちゅうひこうしになろう！",
+      "unlockMessage": "きみはみとめられたうちゅうたんけんか！"
+    },
+    "category-explorer": {
+      "name": "カテゴリたんけんたい",
+      "description": "あたらしいことにチャレンジ！ちがうカテゴリを3つぬろう。",
+      "unlockMessage": "いろいろぬると、アートはもっとたのしい！"
+    },
+    "world-traveler": {
+      "name": "せかいたびびと",
+      "description": "ちがうカテゴリを5つぬろう！",
+      "unlockMessage": "ぬりえのせかいをたくさんたびしたね！"
+    }
+  },
+  "stickerSelector": {
+    "title": "ステッカーをえらぼう",
+    "close": "とじる",
+    "selected": "えらんだもの：",
+    "helpText": "キャンバスをタップしてステッカーをはろう"
+  },
+  "shareArtwork": {
+    "title": "作品をシェア",
+    "linkCreated": "リンクを作ったよ！",
+    "sharePrompt": "このリンクを家族やお友だちに送ってね",
+    "privacyNotice": "このリンクを持っている人はだれでも作品を見られます。個人情報は共有されません。",
+    "expiresIn": "リンクの有効期限：",
+    "expiration": {
+      "7days": "7日",
+      "30days": "30日",
+      "never": "期限なし"
+    },
+    "createLink": "シェアリンクを作る",
+    "creating": "シェアリンクを作成中…",
+    "close": "閉じる",
+    "copy": "コピー",
+    "copied": "コピーしたよ！",
+    "done": "完了",
+    "error": "シェアリンクを作れませんでした"
+  },
+  "account": {
+    "profiles": "プロフィール",
+    "billing": "お支払い",
+    "settings": "設定",
+    "myArtwork": "わたしの作品"
+  },
+  "profiles": {
+    "pageTitle": "プロフィール管理",
+    "pageSubtitle": "家族のプロフィールを作成・管理できます",
+    "editTitle": "プロフィールを編集",
+    "switcher": {
+      "close": "プロフィール切り替えを閉じる"
+    },
+    "ageGroups": {
+      "toddler": "幼児",
+      "toddlerDescription": "2〜4歳",
+      "child": "こども",
+      "childDescription": "5〜8歳",
+      "tween": "プレティーン",
+      "tweenDescription": "9〜12歳",
+      "teen": "ティーン",
+      "teenDescription": "13〜17歳",
+      "adult": "大人",
+      "adultDescription": "18歳以上"
+    },
+    "form": {
+      "name": "名前",
+      "namePlaceholder": "例：エマ",
+      "nameRequired": "名前を入力してください",
+      "ageGroup": "年齢",
+      "avatar": "アバター",
+      "difficultyLevel": "むずかしさ",
+      "saveChanges": "変更を保存",
+      "saving": "保存中...",
+      "cancel": "キャンセル",
+      "profileUpdated": "プロフィールを更新しました！",
+      "profileSwitched": "プロフィールを切り替えました！",
+      "unnamed": "ななし"
+    },
+    "delete": {
+      "title": "プロフィールを削除しますか？",
+      "dangerZone": "注意",
+      "warning": "このプロフィールを削除すると元に戻せません。このプロフィールで作ったぬりえはアカウントに残ります。",
+      "confirmText": "プロフィールは完全に削除され、元に戻せません。このプロフィールで作ったぬりえはアカウントに残ります。",
+      "deleteProfile": "プロフィールを削除",
+      "deleting": "削除中...",
+      "deleted": "「{name}」を削除しました",
+      "coloringPages": "{count, plural, =1 {ぬりえ1枚} other {ぬりえ#枚}}"
+    },
+    "manager": {
+      "aboutProfiles": "プロフィールについて",
+      "ownCollection": "プロフィールごとにぬりえコレクションがあります",
+      "personalizedDifficulty": "むずかしさ設定はプロフィールごとです",
+      "maxProfiles": "1つのアカウントで最大{max}個のプロフィールを作れます",
+      "switchAnytime": "上のメニューからいつでも切り替えられます",
+      "profilesUsed": "{max}個中{count}個使用中",
+      "colorings": "{count, plural, =1 {ぬりえ1つ} other {ぬりえ#つ}}",
+      "edit": "{name}を編集",
+      "delete": "{name}を削除"
+    },
+    "create": {
+      "title": "プロフィールを作成",
+      "subtitle": "家族に新しいアーティストを追加しよう",
+      "button": "プロフィールを作成",
+      "creating": "作成中...",
+      "success": "プロフィールを作成しました！",
+      "addProfile": "プロフィールを追加",
+      "maxReached": "プロフィール数の上限です",
+      "maxReachedDescription": "プロフィールは最大{max}個までです。追加するには、既存のプロフィールを削除してください。",
+      "nameLabel": "名前",
+      "namePlaceholder": "例：エマ",
+      "nameError": "名前を入力してください",
+      "ageGroupLabel": "年齢",
+      "avatarLabel": "アバター"
+    }
+  },
+  "settings": {
+    "pageTitle": "設定",
+    "pageSubtitle": "アカウントの設定を管理します",
+    "parentalControls": {
+      "title": "ペアレンタルコントロール",
+      "description": "アプリで表示される内容をコントロールします"
+    },
+    "communityImages": {
+      "label": "みんなの作品を表示",
+      "description": "オンにすると、ギャラリーでほかのユーザーが作ったぬりえが見られます。オフにすると、自分の作品だけが表示されます。",
+      "enabled": "みんなの作品：オン",
+      "disabled": "みんなの作品：オフ"
+    },
+    "languagePreference": {
+      "title": "言語",
+      "description": "アプリで使う言語を選びます"
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "毎日無料ぬりえ！",
+      "subtitle": "毎日、受信箱に<free>無料</free>ぬりえをお届けします。",
+      "placeholder": "parent@example.com",
+      "join": "登録",
+      "success": "完了！",
+      "successDescription": "メール配信に登録できました！",
+      "error": "エラーが発生しました",
+      "errorDescription": "メール配信に登録できませんでした。もう一度お試しください。"
+    },
+    "unsubscribe": {
+      "success": "配信停止しました",
+      "successDescription": "メーリングリストから削除しました。さみしいけれど、またね！",
+      "invalid": "無効なリンク",
+      "invalidDescription": "この配信停止リンクは無効か、期限切れです。"
+    }
+  },
+  "billing": {
+    "pageTitle": "お支払い・サブスク",
+    "pageSubtitle": "サブスクの管理や、追加クレジットの購入で、すてきなぬりえをどんどん作ろう！",
+    "currentPlan": "現在のプラン",
+    "currentCredits": "現在のクレジット: {count}",
+    "renewsOn": "サブスク更新日: {date}",
+    "manageSubscription": "サブスクを管理",
+    "noActiveSubscription": "有効なサブスクがありません",
+    "noSubscriptionDescription": "プランを選んで、すてきなぬりえ作りを始めよう！",
+    "viewPlans": "プランを見る",
+    "buyMoreCredits": "クレジットを追加",
+    "credits": "{count} クレジット",
+    "buyNow": "今すぐ買う",
+    "loading": "読み込み中...",
+    "availablePlans": "利用できるプラン",
+    "changePlan": "プラン変更",
+    "currentPlanBadge": "現在のプラン",
+    "manageInPortal": "お客様ポータルでサブスクを管理",
+    "noCommitment": "縛りなし。いつでも解約OK。",
+    "perMonth": "/月",
+    "noSubscriptionForCredits": "クレジット購入には有効なサブスクが必要です",
+    "noSubscriptionFound": "有効なサブスクが見つかりません",
+    "failedToChangeSubscription": "サブスクの変更に失敗しました",
+    "failedToCheckout": "チェックアウトに移動できませんでした",
+    "failedToPurchaseCredits": "クレジットの購入に失敗しました",
+    "failedToOpenPortal": "お客様ポータルを開けませんでした"
+  },
+  "auth": {
+    "signIn": "ログイン",
+    "signUp": "新規登録",
+    "signOut": "ログアウト",
+    "continueWithGoogle": "Googleで続ける",
+    "continueWithApple": "Appleで続ける",
+    "signInWithEmail": "メールでログイン",
+    "sendingLink": "リンクを送信中…",
+    "chooseMethod": "ログイン方法をえらんでね",
+    "orContinueWith": "または",
+    "emailPlaceholder": "name@example.com",
+    "termsAgreement": "続けると、利用規約とプライバシーポリシーに同意したことになります。"
+  },
+  "errors": {
+    "generic": "うまくいきませんでした。もう一度ためしてね。",
+    "notFound": "ページが見つかりません",
+    "sharedArtworkNotFound": {
+      "title": "作品が見つかりません",
+      "description": "この共有リンクは期限切れか、削除されたみたい。作った人に新しいリンクを聞いてね！",
+      "cta": "ぬりえをさがす"
+    },
+    "unauthorized": "続けるにはサインインしてね",
+    "stripeLoadFailed": "Stripeの読み込みに失敗しました",
+    "checkoutFailed": "お支払いの準備に失敗しました",
+    "unexpectedError": "予期しないエラーが発生しました。もう一度ためしてね。",
+    "redirectFailed": "お支払い画面へ移動できませんでした"
+  },
+  "breadcrumbs": {
+    "home": "ホーム",
+    "gallery": "ギャラリー",
+    "forToddlers": "幼児向け",
+    "forKids": "子ども向け",
+    "forTeens": "ティーン向け",
+    "forAdults": "大人向け",
+    "ariaLabel": "パンくずリスト"
+  },
+  "jumpToNav": {
+    "jumpToSection": "セクションへジャンプ",
+    "backToTop": "トップへ戻る"
+  },
+  "social": {
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "tiktok": "TikTok",
+    "pinterest": "Pinterest",
+    "x": "X",
+    "threads": "Threads"
+  },
+  "socialShare": {
+    "shareOn": "{platform}でシェア",
+    "download": "作品をダウンロード",
+    "downloadAria": "ぬりえ作品をダウンロード",
+    "facebookAria": "Facebookでシェア",
+    "xAria": "X（Twitter）でシェア",
+    "pinterestAria": "Pinterestにピンする",
+    "whatsappAria": "WhatsAppでシェア"
+  },
+  "parentalGate": {
+    "title": "おとなだけ！",
+    "subtitle": "つづけるには、このけいさんをしてね",
+    "description": "おとなのひとがいっしょにいるか、かくにんするために、つぎのもんだいにこたえてね：",
+    "question": "{num1} + {num2} はいくつ？",
+    "placeholder": "こたえ",
+    "submit": "こたえをチェック",
+    "cancel": "キャンセル",
+    "error": "ちょっとちがうよ！べつのもんだいにしてみて…",
+    "incorrect": "ちがうよ。もういちどためしてね。",
+    "hint": "おうちのひとにてつだってもらってね！"
+  },
+  "stickerReward": {
+    "congratulations": "おめでとう！",
+    "youEarned": "ステッカーをゲットしたよ！",
+    "stickerName": "{name}",
+    "tapToContinue": "タップしてつづける",
+    "addedToBook": "ステッカーブックに追加したよ！",
+    "viewStickerBook": "ステッカーブックを見る",
+    "keepColoring": "ぬりえをつづける",
+    "previousSticker": "前のステッカー",
+    "nextSticker": "次のステッカー",
+    "newSticker": "新しいステッカー！",
+    "newStickers": "新しいステッカー！",
+    "ofCount": "{current} / {total}",
+    "addToStickerBook": "ステッカーブックに追加",
+    "goToSticker": "ステッカー{number}へ",
+    "rarity": {
+      "common": "ふつう",
+      "uncommon": "すこしレア",
+      "rare": "レア",
+      "legendary": "でんせつ"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Chunky Crayon - ぬりえで創造力＆学びを楽しく",
+      "description": "Chunky Crayonは、子どもと保護者のための明るく楽しいアプリ。世界にひとつのオリジナルぬりえや、学べるワークシートを作れます。テキスト・音声・画像のヒントから印刷できるぬりえを生成したり、Web/iOS/Androidでデジタルぬりえも楽しめます。"
+    },
+    "gallery": {
+      "title": "無料ぬりえギャラリー - Chunky Crayon",
+      "description": "印刷できる無料ぬりえをたっぷり掲載。どうぶつ、ドラゴン、ユニコーン、おひめさまなど。毎日新しいページを追加！"
+    }
+  },
+  "altText": {
+    "mascot": "やさしいクレヨンのマスコット、コロ",
+    "dailyPage": "今日のぬりえ",
+    "coloringPage": "ぬりえ",
+    "ogImage": "Chunky Crayon AIで作ったぬりえページ"
+  },
+  "metadata": {
+    "keywords": "ぬりえ, 子ども向けクリエイティブアプリ, オリジナルぬりえ, 学習プリント, 楽しい学びあそび, 子どもの創造力アプリ, インタラクティブぬりえアプリ, デジタルぬりえ, 印刷できるぬりえ"
+  },
+  "myArtwork": {
+    "pageTitle": "わたしのアート",
+    "pageSubtitle": "保存したぬりえがここに集合！どれでもタップして、もう一度ぬったり新しく作ったりできるよ。",
+    "emptyState": {
+      "title": "まだ保存されたアートがないよ！",
+      "description": "ぬりえを始めて、できた作品を保存するとここに出てくるよ。作品はずっと保存されるよ！",
+      "cta": "ぬりえページを見る"
+    },
+    "grid": {
+      "coloredBy": "{name}がぬったよ",
+      "viewArtwork": "作品を見る",
+      "deleteArtwork": "作品を削除",
+      "shareArtwork": "作品をシェア",
+      "shareWithFamily": "家族にシェア",
+      "colorAgain": "もう一度ぬる",
+      "savedArtwork": "保存した作品"
+    },
+    "filters": {
+      "all": "すべて",
+      "recent": "最近",
+      "favorites": "お気に入り"
+    },
+    "sort": {
+      "newest": "新しい順",
+      "oldest": "古い順"
+    },
+    "stickerCard": {
+      "title": "ステッカーブック",
+      "newBadge": "{count} NEW",
+      "stickersCollected": "ステッカー {total}枚中{collected}枚 集めたよ"
+    },
+    "deleteDialog": {
+      "title": "作品を削除する？",
+      "description": "この作品を削除していい？元に戻せないよ！",
+      "confirm": "はい、削除",
+      "cancel": "いいえ、残す"
+    }
+  },
+  "time": {
+    "today": "今日",
+    "yesterday": "昨日",
+    "daysAgo": "{count}日前",
+    "lastWeek": "先週",
+    "weeksAgo": "{count}週間前",
+    "monthsAgo": "{count}か月前",
+    "justNow": "たった今",
+    "minutesAgo": "{count}分前",
+    "hoursAgo": "{count}時間前"
+  },
+  "challenges": {
+    "pageTitle": "ウィークリーチャレンジ",
+    "pageSubtitle": "毎週の楽しいぬりえチャレンジをクリアして、とくべつなステッカーやアクセサリーをColoにゲットしよう！",
+    "breadcrumbs": {
+      "home": "ホーム",
+      "account": "アカウント",
+      "challenges": "チャレンジ"
+    },
+    "currentChallenge": {
+      "title": "今週のチャレンジ"
+    },
+    "noActive": {
+      "title": "チャレンジは準備中",
+      "description": "次のウィークリーチャレンジをお楽しみに！"
+    },
+    "history": {
+      "title": "これまでのチャレンジ",
+      "completed": "達成",
+      "expired": "期限切れ",
+      "progress": "{progress} / {requirement} 完了"
+    },
+    "reward": {
+      "claimed": "ごほうびを受け取ったよ！",
+      "stickerAdded": "新しいステッカーがステッカーブックに追加されたよ！",
+      "accessoryAdded": "新しいアクセサリーがColoに追加されたよ！"
+    }
+  },
+  "recentCreations": {
+    "title": "最近の作品",
+    "imageAlt": "あなたのぬりえ",
+    "ctaHighlight": "無料でスタート",
+    "ctaMessage": "して、作品をずっと保存＆もっと解放しよう！",
+    "ctaButton": "無料でスタート"
+  },
+  "createForm": {
+    "title": "まほうをつくろう！",
+    "tagline": "入力・おしゃべり・写真でOK！",
+    "generatingMessage": "約30秒でできるよ！",
+    "inputModes": {
+      "type": "入力",
+      "talk": "おしゃべり",
+      "photo": "写真",
+      "ariaLabel": "入力方法の選択"
+    },
+    "voiceInput": {
+      "startRecording": "録音を開始",
+      "stopRecording": "録音を停止",
+      "tapToRecord": "マイクをタップして、ぬりえにしたいものを教えてね！",
+      "signInToRecord": "録音するにはサインインしてね！",
+      "notSupported": "おっと！このブラウザは音声録音に対応していないよ。",
+      "notSupportedHint": "マイク付きの端末で、Chrome・Safari・Firefoxを試してね。",
+      "tryAgain": "もう一度",
+      "listening": "きいてるよ！ぬりえにしたいものを教えてね！",
+      "allDone": "おわった？ボタンをタップしてね。{countdown}で自動で終わるよ…",
+      "cancel": "キャンセル",
+      "doneTalking": "おしゃべり完了",
+      "imDone": "おわった！",
+      "gettingMicReady": "マイクを準備しているよ…",
+      "understanding": "お話を理解しているよ…",
+      "makeMyColoringPage": "🎨 ぬりえをつくって！",
+      "notQuiteRight": "ちょっとちがう？もう一度",
+      "maxDuration": "最大{seconds}秒",
+      "errors": {
+        "permissionDenied": "マイクにアクセスできなかったよ。マイクの許可をオンにして、もう一度ためしてね！",
+        "notSupported": "おっと！このブラウザは音声録音に対応していないよ。ChromeかSafariを試してね！",
+        "transcriptionFailed": "うーん、うまく聞き取れなかったよ。もう一度やってみよう！",
+        "recordingFailed": "録音でエラーが起きたよ。もう一度ためしてね！",
+        "timeout": "録音が長すぎたよ。もう少し短くしてね！"
+      }
+    },
+    "imageInput": {
+      "takePhotoOrUpload": "写真を撮るか、画像をアップしてね！",
+      "signInToUpload": "画像をアップするにはサインインしてね！",
+      "camera": "カメラ",
+      "upload": "アップ",
+      "takePhoto": "写真を撮る",
+      "uploadImage": "画像をアップ",
+      "dropHere": "ここにドロップ！",
+      "dragAndDrop": "または、ここに画像をドラッグ＆ドロップ",
+      "shareDrawing": "おえかきでも写真でも、ぬりえにしたい画像を見せてね！",
+      "greatPicture": "いい写真！これでいい？",
+      "pickAnother": "別のを選ぶ",
+      "useThis": "これにする！",
+      "iSee": "みえたよ：",
+      "makeMyColoringPage": "🎨 ぬりえをつくって！",
+      "notQuiteRight": "ちょっとちがう？もう一度",
+      "capturing": "写真を準備しているよ…",
+      "processing": "画像を見ているよ…",
+      "tryAgain": "もう一度",
+      "altImagePreview": "選んだ画像のプレビュー",
+      "altUploadedImage": "アップした画像",
+      "errors": {
+        "fileTooLarge": "画像が大きすぎるよ！10MBより小さいものを試してね。",
+        "invalidType": "そのファイル形式は読めないよ。JPEG、PNG、WebPを試してね！",
+        "processingFailed": "うーん、この画像はうまくわからなかったよ。別のにしてみよう！",
+        "cameraFailed": "カメラでエラーが起きたよ。もう一度やってみよう！"
+      }
+    },
+    "placeholder": "例：宇宙を進む海賊船 🚀",
+    "placeholderGuestLimit": "{maxTries}回の無料おためしを使い切ったよ！登録して、あと15クレジットをもらおう。",
+    "placeholderNoCreditsSubscribed": "クレジットがないよ — 追加するか、プランをアップグレードしてね！",
+    "placeholderNoCreditsNoSubscription": "無料クレジットを使い切ったよ — つづけるにはプランを選んでね！",
+    "placeholderSignIn": "サインインして、まほうのぬりえを作ろう！",
+    "buttonCreate": "ぬりえを作る",
+    "buttonCreateGuest": "作る（無料あと{remaining}{remaining, plural, =1 {回} other {回}}）",
+    "buttonSignUp": "登録して無料15クレジット",
+    "buttonBuyCredits": "クレジットを追加",
+    "buttonViewPlans": "プランを見る",
+    "buttonGetStarted": "無料ではじめる",
+    "subtextGuestLimit": "まほうを体験できたね！登録して、もっと作ろう。",
+    "subtextNoCredits": "クレジットがないよ — 追加するかアップグレードしてね！",
+    "subtextNoCreditsSubscribed": "もっとまほうがほしい？追加またはアップグレードで、創作をつづけよう！",
+    "subtextNoCreditsNoSubscription": "サブスクを選んで、もっと作れるようにしよう",
+    "subtextFallback": "無料で15クレジットもらえるよ — ぬりえ3枚分！"
+  },
+  "language": {
+    "switchLanguage": "言語を切り替える",
+    "currentLanguage": "現在の言語",
+    "selectLanguage": "言語をえらぶ"
+  }
+}

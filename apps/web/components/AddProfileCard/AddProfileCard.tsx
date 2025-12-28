@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import cn from '@/lib/utils';
 
 type AddProfileCardProps = {
@@ -13,6 +14,8 @@ const AddProfileCard = ({
   disabled = false,
   className,
 }: AddProfileCardProps) => {
+  const t = useTranslations('profiles.manager');
+
   return (
     <button
       type="button"
@@ -25,7 +28,7 @@ const AddProfileCard = ({
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
         className,
       )}
-      aria-label="Add new profile"
+      aria-label={t('addProfile')}
     >
       {/* Plus icon circle */}
       <div
@@ -61,7 +64,7 @@ const AddProfileCard = ({
           'group-hover:text-crayon-orange transition-colors',
         )}
       >
-        Add Profile
+        {t('addProfile')}
       </span>
     </button>
   );

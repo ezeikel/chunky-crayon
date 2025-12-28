@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { PlanName } from '@chunky-crayon/db/types';
-import PurchaseTracking from '@/app/account/billing/PurchaseTracking';
+import PurchaseTracking from '@/app/[locale]/account/billing/PurchaseTracking';
 
 type BillingSuccessProps = {
   amount: number | null;

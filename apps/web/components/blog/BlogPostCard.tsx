@@ -1,6 +1,9 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { useTranslations } from 'next-intl';
 import { urlFor } from '@/lib/sanity';
 import cn from '@/utils/cn';
 
@@ -29,6 +32,7 @@ type BlogPostCardProps = {
 };
 
 const BlogPostCard = ({ post, className }: BlogPostCardProps) => {
+  const t = useTranslations('blog');
   const imageUrl = post.featuredImage
     ? urlFor(post.featuredImage).width(600).height(400).url()
     : null;
@@ -92,7 +96,9 @@ const BlogPostCard = ({ post, className }: BlogPostCardProps) => {
 
           {/* Meta */}
           <div className="flex items-center justify-between text-xs text-text-tertiary">
-            {post.author && <span>By {post.author.name}</span>}
+            {post.author && (
+              <span>{t('byAuthor', { author: post.author.name })}</span>
+            )}
             <time dateTime={post.publishedAt}>
               {format(new Date(post.publishedAt), 'MMM d, yyyy')}
             </time>

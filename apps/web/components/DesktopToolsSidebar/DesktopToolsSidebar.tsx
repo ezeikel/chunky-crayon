@@ -5,6 +5,7 @@ import { useColoringContext, CanvasAction } from '@/contexts/coloring';
 import { useSound } from '@/hooks/useSound';
 import cn from '@/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useTranslations } from 'next-intl';
 import {
   faPencil,
   faPaintbrush,
@@ -174,6 +175,7 @@ const DesktopToolsSidebar = ({
   getCanvasDataUrl,
   isAuthenticated = false,
 }: DesktopToolsSidebarProps) => {
+  const t = useTranslations('coloringPage');
   const {
     activeTool,
     setActiveTool,
@@ -315,14 +317,20 @@ const DesktopToolsSidebar = ({
             className="size-5 text-crayon-orange"
           />
           <h3 className="font-tondo font-bold text-sm text-text-primary">
-            Tools
+            {t('sidebar.tools')}
           </h3>
         </div>
 
         {/* Regular Tool Grid - 4 columns, icons only with tooltips */}
         <div className="grid grid-cols-4 gap-1.5">
-          {regularTools.map(({ id, label, icon }) => {
+          {regularTools.map(({ id, icon }) => {
             const isActive = isToolActive(id);
+            // Get translation key based on tool ID
+            const translationKey =
+              id === 'fill' || id === 'sticker'
+                ? `tools.${id}`
+                : `brushTypes.${id}`;
+            const label = t(translationKey);
 
             return (
               <button
@@ -349,8 +357,12 @@ const DesktopToolsSidebar = ({
 
         {/* Magic Tools - Featured with labels and gradient background */}
         <div className="flex flex-col gap-1.5 mt-1">
-          {magicTools.map(({ id, label, icon }) => {
+          {magicTools.map(({ id, icon }) => {
             const isActive = isToolActive(id);
+            // Get translation key based on tool ID
+            const translationKey =
+              id === 'magic-reveal' ? 'tools.magicBrush' : 'tools.autoColor';
+            const label = t(translationKey);
 
             return (
               <button
@@ -387,7 +399,7 @@ const DesktopToolsSidebar = ({
             className="size-4 text-crayon-orange"
           />
           <h3 className="font-tondo font-bold text-sm text-text-primary">
-            Size
+            {t('sidebar.size')}
           </h3>
         </div>
 
@@ -396,6 +408,7 @@ const DesktopToolsSidebar = ({
             const isSelected = brushSize === size;
             const displayColor =
               brushType === 'eraser' ? '#9E9E9E' : selectedColor;
+            const sizeLabel = t(`brushSizes.${size}`);
 
             return (
               <button
@@ -412,8 +425,8 @@ const DesktopToolsSidebar = ({
                     'bg-gray-200 ring-2 ring-gray-400': isSelected,
                   },
                 )}
-                aria-label={`${config.name} brush size`}
-                title={config.name}
+                aria-label={sizeLabel}
+                title={sizeLabel}
               >
                 <span
                   className="rounded-full transition-colors"
@@ -440,7 +453,7 @@ const DesktopToolsSidebar = ({
             className="size-4 text-crayon-orange"
           />
           <h3 className="font-tondo font-bold text-sm text-text-primary">
-            History
+            {t('sidebar.history')}
           </h3>
         </div>
 
@@ -457,8 +470,8 @@ const DesktopToolsSidebar = ({
                 'text-gray-300 cursor-not-allowed': !canUndo,
               },
             )}
-            aria-label="Undo"
-            title="Undo"
+            aria-label={t('undoRedo.undo')}
+            title={t('undoRedo.undo')}
           >
             <UndoIcon className="size-5" />
           </button>
@@ -475,8 +488,8 @@ const DesktopToolsSidebar = ({
                 'text-gray-300 cursor-not-allowed': !canRedo,
               },
             )}
-            aria-label="Redo"
-            title="Redo"
+            aria-label={t('undoRedo.redo')}
+            title={t('undoRedo.redo')}
           >
             <RedoIcon className="size-5" />
           </button>
@@ -494,7 +507,7 @@ const DesktopToolsSidebar = ({
             className="size-4 text-crayon-orange"
           />
           <h3 className="font-tondo font-bold text-sm text-text-primary">
-            Zoom
+            {t('sidebar.zoom')}
           </h3>
         </div>
 
@@ -511,8 +524,8 @@ const DesktopToolsSidebar = ({
                   zoom <= minZoom,
               },
             )}
-            aria-label="Zoom out"
-            title="Zoom out"
+            aria-label={t('zoomControls.zoomOut')}
+            title={t('zoomControls.zoomOut')}
           >
             <ZoomOutIcon className="size-4" />
           </button>
@@ -529,8 +542,8 @@ const DesktopToolsSidebar = ({
                   zoom >= maxZoom,
               },
             )}
-            aria-label="Zoom in"
-            title="Zoom in"
+            aria-label={t('zoomControls.zoomIn')}
+            title={t('zoomControls.zoomIn')}
           >
             <ZoomInIcon className="size-4" />
           </button>
@@ -546,8 +559,8 @@ const DesktopToolsSidebar = ({
                   isPanActive &&
                     'bg-crayon-orange text-white hover:bg-crayon-orange/90',
                 )}
-                aria-label="Move"
-                title="Move"
+                aria-label={t('zoomControls.pan')}
+                title={t('zoomControls.pan')}
                 aria-pressed={isPanActive}
               >
                 <FontAwesomeIcon icon={faHand} className="size-4" />
@@ -560,8 +573,8 @@ const DesktopToolsSidebar = ({
                   'flex items-center justify-center size-9 rounded-lg transition-all duration-150',
                   'bg-crayon-orange/10 hover:bg-crayon-orange/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
                 )}
-                aria-label="Reset view"
-                title="Reset view"
+                aria-label={t('zoomControls.reset')}
+                title={t('zoomControls.reset')}
               >
                 <HomeIcon className="size-4 text-crayon-orange" />
               </button>
@@ -586,7 +599,7 @@ const DesktopToolsSidebar = ({
             className="size-4 text-crayon-orange"
           />
           <h3 className="font-tondo font-bold text-sm text-text-primary">
-            Actions
+            {t('sidebar.actions')}
           </h3>
         </div>
 

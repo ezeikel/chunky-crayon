@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Balancer from 'react-wrap-balancer';
+import { getTranslations } from 'next-intl/server';
 import cn from '@/utils/cn';
-import { UNLEASH_STRINGS } from '@/constants';
 import JoinColoringPageEmailListForm from '../forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 import TypedText from '../TypedText/TypedText';
 import AppStoreButtons from '@/components/AppStoreButtons';
@@ -10,7 +10,36 @@ type IntroProps = {
   className?: string;
 };
 
-const Intro = ({ className }: IntroProps) => (
+const Intro = async ({ className }: IntroProps) => {
+  const t = await getTranslations('homepage');
+  const tAlt = await getTranslations('altText');
+  const tFooter = await getTranslations('footer');
+
+  // Get the unleash words from translations
+  const unleashWords = [
+    t('unleashWords.creativity'),
+    t('unleashWords.imagination'),
+    t('unleashWords.fun'),
+    t('unleashWords.adventure'),
+    t('unleashWords.discovery'),
+    t('unleashWords.exploration'),
+    t('unleashWords.inspiration'),
+    t('unleashWords.art'),
+    t('unleashWords.joy'),
+    t('unleashWords.learning'),
+    t('unleashWords.wonder'),
+    t('unleashWords.dreams'),
+    t('unleashWords.playtime'),
+    t('unleashWords.innovation'),
+    t('unleashWords.magic'),
+    t('unleashWords.curiosity'),
+    t('unleashWords.expression'),
+    t('unleashWords.fantasy'),
+    t('unleashWords.stories'),
+    t('unleashWords.excitement'),
+  ];
+
+  return (
   <div className={cn('relative', className)}>
     {/* Colo mascot - friendly greeting for visitors */}
     <div
@@ -19,7 +48,7 @@ const Intro = ({ className }: IntroProps) => (
     >
       <Image
         src="/images/colo.svg"
-        alt="Colo the friendly crayon mascot"
+        alt={tAlt('mascot')}
         width={120}
         height={120}
         className="drop-shadow-lg opacity-90 md:w-[140px] md:h-[140px] lg:w-[160px] lg:h-[160px]"
@@ -50,26 +79,25 @@ const Intro = ({ className }: IntroProps) => (
 
     <h2 className="font-tondo font-bold text-4xl sm:text-5xl md:text-6xl lg:text-[64px] leading-tight text-text-primary mb-6 md:mb-8 [white-space:pre-wrap] [word-break:break-word]">
       <Balancer>
-        Unleash your child&apos;s
+        {t('heroTitle')}
         <br />
         <TypedText
           className="text-gradient-orange"
-          strings={UNLEASH_STRINGS}
+          strings={unleashWords}
         />{' '}
         <br />
-        today
+        {t('heroTitleSuffix')}
       </Balancer>
     </h2>
     <p className="font-tondo text-lg sm:text-xl md:text-2xl text-text-secondary leading-relaxed mb-6 md:mb-8 max-w-xl">
-      From vibrant coloring pages to imaginative adventures, Chunky Crayon
-      transforms creativity into pure joy.
+      {t('heroSubtitle')}
     </p>
 
     {/* Tagline badge */}
     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-crayon-yellow-light/40 border-2 border-crayon-yellow mb-6 md:mb-8">
       <span className="text-xl">🌈</span>
       <span className="font-tondo font-bold text-text-primary">
-        Dream. Create. Color.
+        {tFooter('tagline')}
       </span>
     </div>
 
@@ -77,6 +105,7 @@ const Intro = ({ className }: IntroProps) => (
 
     <JoinColoringPageEmailListForm className="max-w-[429px]" location="hero" />
   </div>
-);
+  );
+};
 
 export default Intro;

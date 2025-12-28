@@ -4,20 +4,27 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/pro-solid-svg-icons';
 import { faCircleQuestion } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
-import { FAQ_ITEMS, type FAQItem } from '@/constants';
 import { FadeIn, StaggerChildren, StaggerItem } from '@/components/motion';
+
+// FAQ item IDs for iteration
+const FAQ_ITEM_IDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] as const;
 
 type FAQProps = {
   className?: string;
 };
 
 const FAQAccordionItem = ({
-  item,
+  id,
+  question,
+  answer,
   isOpen,
   onToggle,
 }: {
-  item: FAQItem;
+  id: string;
+  question: string;
+  answer: string;
   isOpen: boolean;
   onToggle: () => void;
 }) => (
@@ -29,7 +36,7 @@ const FAQAccordionItem = ({
       aria-expanded={isOpen}
     >
       <span className="font-tondo font-bold text-text-primary text-base md:text-lg">
-        {item.question}
+        {question}
       </span>
       <FontAwesomeIcon
         icon={faChevronDown}
@@ -47,7 +54,7 @@ const FAQAccordionItem = ({
     >
       <div className="overflow-hidden">
         <div className="px-5 pb-5 pt-0">
-          <p className="text-text-secondary leading-relaxed">{item.answer}</p>
+          <p className="text-text-secondary leading-relaxed">{answer}</p>
         </div>
       </div>
     </div>
@@ -56,6 +63,7 @@ const FAQAccordionItem = ({
 
 const FAQ = ({ className }: FAQProps) => {
   const [openId, setOpenId] = useState<string | null>(null);
+  const t = useTranslations('homepage');
 
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
@@ -67,11 +75,18 @@ const FAQ = ({ className }: FAQProps) => {
     setOpenId(openId === id ? null : id);
   };
 
+  // Build FAQ items from translations
+  const faqItems = FAQ_ITEM_IDS.map((id) => ({
+    id,
+    question: t(`faq.items.${id}.question`),
+    answer: t(`faq.items.${id}.answer`),
+  }));
+
   // JSON-LD structured data for FAQPage schema
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: FAQ_ITEMS.map((item) => ({
+    mainEntity: faqItems.map((item) => ({
       '@type': 'Question',
       name: item.question,
       acceptedAnswer: {
@@ -98,12 +113,11 @@ const FAQ = ({ className }: FAQProps) => {
               style={iconStyle}
             />
             <h2 className="font-tondo font-bold text-2xl md:text-3xl lg:text-4xl text-text-primary">
-              Frequently Asked Questions
+              {t('faq.title')}
             </h2>
           </div>
           <p className="text-text-secondary max-w-2xl mx-auto">
-            Everything you need to know about creating magical coloring pages
-            with Chunky Crayon
+            {t('faq.subtitle')}
           </p>
         </div>
       </FadeIn>
@@ -113,10 +127,12 @@ const FAQ = ({ className }: FAQProps) => {
         staggerDelay={0.08}
         className="grid grid-cols-1 lg:grid-cols-2 gap-4"
       >
-        {FAQ_ITEMS.map((item) => (
+        {faqItems.map((item) => (
           <FAQAccordionItem
             key={item.id}
-            item={item}
+            id={item.id}
+            question={item.question}
+            answer={item.answer}
             isOpen={openId === item.id}
             onToggle={() => handleToggle(item.id)}
           />

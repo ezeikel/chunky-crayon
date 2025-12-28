@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faClock,
@@ -20,6 +21,7 @@ type RecentCreationsProps = {
 };
 
 const RecentCreations = ({ className }: RecentCreationsProps) => {
+  const t = useTranslations('recentCreations');
   const { recentIds, isLoaded, hasCreations } = useRecentCreations();
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
@@ -72,7 +74,7 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
               style={iconStyle}
             />
             <h3 className="font-tondo font-bold text-lg md:text-xl text-text-primary">
-              Your Recent Creations
+              {t('title')}
             </h3>
           </div>
         </div>
@@ -98,7 +100,7 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
                 {image.svgUrl ? (
                   <Image
                     src={image.svgUrl}
-                    alt={image.title || 'Your coloring page'}
+                    alt={image.title || t('imageAlt')}
                     fill
                     className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                   />
@@ -125,16 +127,16 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
             />
             <p className="font-tondo text-sm md:text-base text-text-secondary">
               <span className="font-semibold text-text-primary">
-                Start free
+                {t('ctaHighlight')}
               </span>{' '}
-              to keep your creations forever and unlock more!
+              {t('ctaMessage')}
             </p>
           </div>
           <Link
             href="/sign-up"
             className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange hover:bg-crayon-orange-dark text-white font-tondo font-bold rounded-xl shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 whitespace-nowrap"
           >
-            Start Free
+            {t('ctaButton')}
             <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
           </Link>
         </div>

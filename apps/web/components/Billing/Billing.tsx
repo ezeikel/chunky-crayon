@@ -4,6 +4,7 @@ import { useState } from 'react';
 import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { SUBSCRIPTION_PLANS, CREDIT_PACKS } from '@/constants';
 import {
   Card,
@@ -28,6 +29,14 @@ import formatNumber from '@/utils/formatNumber';
 // recreating the `Stripe` object on every render
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
 
+// Map PlanName enum to translation keys
+const planKeyMap: Record<PlanName, string> = {
+  [PlanName.CRAYON]: 'crayon',
+  [PlanName.RAINBOW]: 'rainbow',
+  [PlanName.MASTERPIECE]: 'masterpiece',
+  [PlanName.STUDIO]: 'studio',
+};
+
 type BillingProps = {
   user: Prisma.UserGetPayload<{
     select: {
@@ -48,6 +57,8 @@ type BillingProps = {
 };
 
 const Billing = ({ user }: BillingProps) => {
+  const t = useTranslations('billing');
+  const tPricing = useTranslations('pricing');
   const [loadingPlan, setLoadingPlan] = useState<PlanName | null>(null);
   const [loadingCredits, setLoadingCredits] = useState<string | null>(null);
 
@@ -62,7 +73,7 @@ const Billing = ({ user }: BillingProps) => {
     stripePriceEnv: string;
   }) => {
     if (!currentSubscription) {
-      toast.error('No active subscription found');
+      toast.error(t('noSubscriptionFound'));
       return;
     }
 
@@ -86,7 +97,7 @@ const Billing = ({ user }: BillingProps) => {
       }
     } catch (error) {
       console.error('Error changing subscription:', error);
-      toast.error('Failed to change subscription');
+      toast.error(t('failedToChangeSubscription'));
     } finally {
       setLoadingPlan(null);
     }
@@ -94,7 +105,7 @@ const Billing = ({ user }: BillingProps) => {
 
   const handleCreditPurchase = async (pack: any) => {
     if (!hasActiveSubscription) {
-      toast.error('Active subscription required to purchase credits');
+      toast.error(t('noSubscriptionForCredits'));
       return;
     }
 
@@ -124,11 +135,11 @@ const Billing = ({ user }: BillingProps) => {
 
       if (error) {
         console.error('Stripe redirect error:', error);
-        toast.error('Failed to redirect to checkout');
+        toast.error(t('failedToCheckout'));
       }
     } catch (error) {
       console.error('Error purchasing credits:', error);
-      toast.error('Failed to purchase credits');
+      toast.error(t('failedToPurchaseCredits'));
     } finally {
       setLoadingCredits(null);
     }
@@ -148,46 +159,46 @@ const Billing = ({ user }: BillingProps) => {
       }
     } catch (error) {
       console.error('Error opening customer portal:', error);
-      toast.error('Failed to open customer portal');
+      toast.error(t('failedToOpenPortal'));
     }
   };
 
   const getPlanButtonText = (planName: PlanName) => {
-    if (loadingPlan === planName) return 'Loading...';
-    if (currentSubscription?.planName === planName) return 'Current Plan';
-    return 'Change Plan';
+    if (loadingPlan === planName) return t('loading');
+    if (currentSubscription?.planName === planName) return t('currentPlanBadge');
+    return t('changePlan');
   };
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4">
       <header className="text-center mb-16">
         <h1 className="font-tondo text-4xl font-extrabold mb-2 text-primary">
-          Your Billing & Subscription
+          {t('pageTitle')}
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Manage your subscription and purchase additional credits to keep
-          creating amazing coloring pages.
+          {t('pageSubtitle')}
         </p>
       </header>
 
       {/* Current Subscription */}
       <section className="mb-16">
-        <h2 className="font-tondo text-2xl font-bold mb-6">Current Plan</h2>
+        <h2 className="font-tondo text-2xl font-bold mb-6">{t('currentPlan')}</h2>
         {currentSubscription ? (
           <Card>
             <CardHeader>
               <CardTitle>{currentSubscription.planName}</CardTitle>
               <CardDescription>
-                Your subscription renews on{' '}
-                {format(
-                  new Date(currentSubscription.currentPeriodEnd),
-                  'MMMM d, yyyy',
-                )}
+                {t('renewsOn', {
+                  date: format(
+                    new Date(currentSubscription.currentPeriodEnd),
+                    'MMMM d, yyyy',
+                  ),
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Current credits: {formatNumber(user.credits)}
+                {t('currentCredits', { count: formatNumber(user.credits) })}
               </p>
             </CardContent>
             <CardFooter>
@@ -195,16 +206,16 @@ const Billing = ({ user }: BillingProps) => {
                 onClick={handleManageSubscription}
                 className="bg-orange hover:bg-orange/90 text-white"
               >
-                Manage Subscription
+                {t('manageSubscription')}
               </Button>
             </CardFooter>
           </Card>
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>No Active Subscription</CardTitle>
+              <CardTitle>{t('noActiveSubscription')}</CardTitle>
               <CardDescription>
-                Choose a plan to start creating amazing coloring pages.
+                {t('noSubscriptionDescription')}
               </CardDescription>
             </CardHeader>
             <CardFooter>
@@ -214,7 +225,7 @@ const Billing = ({ user }: BillingProps) => {
                 }}
                 className="bg-orange hover:bg-orange/90 text-white"
               >
-                View Plans
+                {t('viewPlans')}
               </Button>
             </CardFooter>
           </Card>
@@ -225,7 +236,7 @@ const Billing = ({ user }: BillingProps) => {
       {hasActiveSubscription && (
         <section className="mb-16">
           <h2 className="font-tondo text-2xl font-bold mb-6">
-            Buy More Credits
+            {t('buyMoreCredits')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {CREDIT_PACKS.map((pack) => (
@@ -233,7 +244,7 @@ const Billing = ({ user }: BillingProps) => {
                 <CardHeader>
                   <CardTitle>{pack.name}</CardTitle>
                   <CardDescription>
-                    {formatNumber(pack.credits)} credits
+                    {t('credits', { count: formatNumber(pack.credits) })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -247,7 +258,7 @@ const Billing = ({ user }: BillingProps) => {
                     onClick={() => handleCreditPurchase(pack)}
                     disabled={loadingCredits === pack.name}
                   >
-                    {loadingCredits === pack.name ? 'Loading...' : 'Buy Now'}
+                    {loadingCredits === pack.name ? t('loading') : t('buyNow')}
                   </Button>
                 </CardFooter>
               </Card>
@@ -258,76 +269,83 @@ const Billing = ({ user }: BillingProps) => {
 
       {/* Available Plans */}
       <section>
-        <h2 className="font-tondo text-2xl font-bold mb-6">Available Plans</h2>
+        <h2 className="font-tondo text-2xl font-bold mb-6">{t('availablePlans')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {SUBSCRIPTION_PLANS.monthly.map((plan) => (
-            <Card
-              key={plan.name}
-              className={cn(
-                'flex flex-col h-full border-2 transition-shadow',
-                currentSubscription?.planName === plan.key
-                  ? 'border-orange shadow-lg scale-105 relative z-10'
-                  : 'border-border',
-              )}
-            >
-              {currentSubscription?.planName === plan.key && (
-                <span className="absolute -top-4 right-1/2 translate-x-1/2 bg-orange text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                  Current Plan
-                </span>
-              )}
-              <CardHeader>
-                <CardTitle className="flex flex-col gap-1">
-                  <span className="text-center mb-4">
-                    <span className="font-tondo">{plan.name}</span>
+          {SUBSCRIPTION_PLANS.monthly.map((plan) => {
+            const planTranslationKey = planKeyMap[plan.key];
+            const planName = tPricing(`plans.${planTranslationKey}.name`);
+            const planTagline = tPricing(`plans.${planTranslationKey}.tagline`);
+
+            return (
+              <Card
+                key={plan.key}
+                className={cn(
+                  'flex flex-col h-full border-2 transition-shadow',
+                  currentSubscription?.planName === plan.key
+                    ? 'border-orange shadow-lg scale-105 relative z-10'
+                    : 'border-border',
+                )}
+              >
+                {currentSubscription?.planName === plan.key && (
+                  <span className="absolute -top-4 right-1/2 translate-x-1/2 bg-orange text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+                    {t('currentPlanBadge')}
                   </span>
-                  <span className="text-base font-normal text-muted-foreground">
-                    {plan.tagline}
+                )}
+                <CardHeader>
+                  <CardTitle className="flex flex-col gap-1">
+                    <span className="text-center mb-4">
+                      <span className="font-tondo">{planName}</span>
+                    </span>
+                    <span className="text-base font-normal text-muted-foreground">
+                      {planTagline}
+                    </span>
+                  </CardTitle>
+                  <CardDescription className="mt-2 text-lg font-bold text-primary">
+                    {plan.price}{' '}
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {t('perMonth')}
+                    </span>
+                  </CardDescription>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {formatNumber(parseInt(plan.credits, 10))}{' '}
+                    {tPricing('creditsPerMonth')}
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col gap-2">
+                  <ul className="mb-2 space-y-1">
+                    {plan.featureKeys.map((featureKey) => (
+                      <li key={featureKey} className="flex items-center gap-2">
+                        <span className="text-green-600">✓</span>
+                        <span>{tPricing(`features.${featureKey}`)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter className="flex flex-col gap-2">
+                  <Button
+                    className="w-full text-lg py-2 bg-orange hover:bg-orange/90 text-white"
+                    onClick={() =>
+                      handlePlanChange({
+                        planName: plan.key,
+                        stripePriceEnv: plan.stripePriceEnv,
+                      })
+                    }
+                    disabled={
+                      loadingPlan === plan.key ||
+                      currentSubscription?.planName === plan.key
+                    }
+                  >
+                    {getPlanButtonText(plan.key)}
+                  </Button>
+                  <span className="text-xs text-muted-foreground">
+                    {currentSubscription?.planName === plan.key
+                      ? t('manageInPortal')
+                      : t('noCommitment')}
                   </span>
-                </CardTitle>
-                <CardDescription className="mt-2 text-lg font-bold text-primary">
-                  {plan.price}{' '}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    /mo
-                  </span>
-                </CardDescription>
-                <div className="text-sm text-muted-foreground mt-1">
-                  {plan.credits}
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col gap-2">
-                <ul className="mb-2 space-y-1">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2">
-                      <span className="text-green-600">✓</span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter className="flex flex-col gap-2">
-                <Button
-                  className="w-full text-lg py-2 bg-orange hover:bg-orange/90 text-white"
-                  onClick={() =>
-                    handlePlanChange({
-                      planName: plan.key,
-                      stripePriceEnv: plan.stripePriceEnv,
-                    })
-                  }
-                  disabled={
-                    loadingPlan === plan.key ||
-                    currentSubscription?.planName === plan.key
-                  }
-                >
-                  {getPlanButtonText(plan.key)}
-                </Button>
-                <span className="text-xs text-muted-foreground">
-                  {currentSubscription?.planName === plan.key
-                    ? 'Manage your subscription in the customer portal'
-                    : 'No commitment. Cancel anytime.'}
-                </span>
-              </CardFooter>
-            </Card>
-          ))}
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       </section>
     </div>

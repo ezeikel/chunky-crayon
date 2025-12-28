@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark, faCheck } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
 import { signOutAction } from '@/app/actions/auth';
 import cn from '@/lib/utils';
 import { ParentalGateLink } from '@/components/ParentalGate';
 import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
+import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
 import {
   setActiveProfile,
   type ProfileWithStats,
@@ -28,6 +30,7 @@ const MobileMenu = ({
   activeProfile,
 }: MobileMenuProps) => {
   const router = useRouter();
+  const t = useTranslations('navigation');
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -206,26 +209,29 @@ const MobileMenu = ({
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-paper-cream-dark">
               <h2 className="font-tondo font-bold text-xl text-text-primary">
-                Menu
+                {t('menu')}
               </h2>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-paper-cream rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
-                aria-label="Close menu"
-              >
-                <FontAwesomeIcon
-                  icon={faXmark}
-                  className="text-2xl"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                      '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                      '--fa-secondary-opacity': '0.8',
-                    } as React.CSSProperties
-                  }
-                />
-              </button>
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher variant="compact" />
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 hover:bg-paper-cream rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                  aria-label="Close menu"
+                >
+                  <FontAwesomeIcon
+                    icon={faXmark}
+                    className="text-2xl"
+                    style={
+                      {
+                        '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                        '--fa-secondary-color': 'hsl(var(--crayon-teal))',
+                        '--fa-secondary-opacity': '0.8',
+                      } as React.CSSProperties
+                    }
+                  />
+                </button>
+              </div>
             </div>
 
             {/* Profile section */}
@@ -242,7 +248,7 @@ const MobileMenu = ({
                     <p className="font-tondo font-bold text-crayon-orange">
                       {activeProfile.name}
                     </p>
-                    <p className="text-xs text-gray-500">Currently active</p>
+                    <p className="text-xs text-gray-500">{t('currentlyActive')}</p>
                   </div>
                   <FontAwesomeIcon
                     icon={faCheck}
@@ -254,7 +260,7 @@ const MobileMenu = ({
                 {otherProfiles.length > 0 && (
                   <>
                     <p className="text-xs text-gray-400 font-tondo mb-2 px-1">
-                      Switch to
+                      {t('switchTo')}
                     </p>
                     <div className="space-y-2">
                       {otherProfiles.map((profile) => (
@@ -288,7 +294,7 @@ const MobileMenu = ({
                   href="/account/profiles"
                   className="flex items-center justify-center gap-2 mt-3 p-2 text-sm font-tondo text-gray-500 hover:text-crayon-orange transition-colors"
                 >
-                  <span>Manage Profiles</span>
+                  <span>{t('manageProfiles')}</span>
                 </ParentalGateLink>
               </div>
             )}

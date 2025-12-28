@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 
 type Category = {
@@ -21,6 +24,8 @@ const CategoryList = ({
   activeSlug,
   className,
 }: CategoryListProps) => {
+  const t = useTranslations('blog');
+
   if (categories.length === 0) {
     return null;
   }
@@ -36,7 +41,7 @@ const CategoryList = ({
             : 'bg-paper-cream text-text-secondary hover:bg-crayon-orange/10 hover:text-crayon-orange',
         )}
       >
-        All Posts
+        {t('allPosts')}
       </Link>
       {categories.map((category) => (
         <Link

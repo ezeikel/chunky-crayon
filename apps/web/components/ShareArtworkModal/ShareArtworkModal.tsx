@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTimes,
@@ -25,14 +26,16 @@ type ShareArtworkModalProps = {
 
 type ModalState = 'gate' | 'options' | 'generating' | 'success';
 
-const expirationOptions: {
+type ExpirationOption = {
   value: ShareExpiration;
-  label: string;
+  labelKey: '7days' | '30days' | 'never';
   icon: typeof faCalendarDays;
-}[] = [
-  { value: '7days', label: '7 days', icon: faCalendarDays },
-  { value: '30days', label: '30 days', icon: faCalendarDays },
-  { value: 'never', label: 'Never expires', icon: faInfinity },
+};
+
+const EXPIRATION_OPTIONS: ExpirationOption[] = [
+  { value: '7days', labelKey: '7days', icon: faCalendarDays },
+  { value: '30days', labelKey: '30days', icon: faCalendarDays },
+  { value: 'never', labelKey: 'never', icon: faInfinity },
 ];
 
 const ShareArtworkModal = ({
@@ -41,6 +44,8 @@ const ShareArtworkModal = ({
   isOpen,
   onClose,
 }: ShareArtworkModalProps) => {
+  const t = useTranslations('shareModal');
+  const tCommon = useTranslations('common');
   const [state, setState] = useState<ModalState>('gate');
   const [selectedExpiration, setSelectedExpiration] =
     useState<ShareExpiration>('30days');
@@ -133,7 +138,7 @@ const ShareArtworkModal = ({
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-text-primary">
-                    Share Artwork
+                    {t('title')}
                   </h3>
                   <p className="text-sm text-text-secondary truncate max-w-[200px]">
                     {artworkTitle}
@@ -144,7 +149,7 @@ const ShareArtworkModal = ({
                 type="button"
                 onClick={handleCancel}
                 className="p-2 text-text-secondary hover:text-text-primary transition-colors"
-                aria-label="Close"
+                aria-label={tCommon('close')}
               >
                 <FontAwesomeIcon icon={faTimes} />
               </button>
@@ -164,18 +169,17 @@ const ShareArtworkModal = ({
                 }
               />
               <p className="text-sm text-text-secondary">
-                Anyone with this link can view this artwork. No personal
-                information is shared.
+                {t('privacyNote')}
               </p>
             </div>
 
             {/* Expiration options */}
             <div className="mb-4">
               <p className="text-sm font-medium text-text-primary mb-2">
-                Link expires in:
+                {t('expiresIn')}
               </p>
               <div className="grid grid-cols-3 gap-2">
-                {expirationOptions.map((option) => (
+                {EXPIRATION_OPTIONS.map((option) => (
                   <button
                     key={option.value}
                     type="button"
@@ -204,7 +208,7 @@ const ShareArtworkModal = ({
                           : 'text-text-secondary',
                       )}
                     >
-                      {option.label}
+                      {t(`expiration.${option.labelKey}`)}
                     </span>
                   </button>
                 ))}
@@ -225,7 +229,7 @@ const ShareArtworkModal = ({
               className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-white bg-gradient-to-r from-crayon-purple to-crayon-pink hover:opacity-90 active:scale-95 transition-all"
             >
               <FontAwesomeIcon icon={faLink} />
-              Create Share Link
+              {t('createLink')}
             </button>
           </div>
         )}
@@ -237,7 +241,7 @@ const ShareArtworkModal = ({
                 icon={faSpinnerThird}
                 className="text-4xl text-crayon-purple animate-spin mb-4"
               />
-              <p className="text-text-secondary">Creating share link...</p>
+              <p className="text-text-secondary">{t('creating')}</p>
             </div>
           </div>
         )}
@@ -253,10 +257,10 @@ const ShareArtworkModal = ({
                 />
               </div>
               <h3 className="text-xl font-bold text-text-primary">
-                Link Created!
+                {t('success.title')}
               </h3>
               <p className="text-sm text-text-secondary text-center mt-1">
-                Share this link with family and friends
+                {t('success.subtitle')}
               </p>
             </div>
 
@@ -279,7 +283,7 @@ const ShareArtworkModal = ({
                 )}
               >
                 <FontAwesomeIcon icon={copied ? faCheck : faCopy} />
-                {copied ? 'Copied!' : 'Copy'}
+                {copied ? tCommon('copied') : tCommon('copy')}
               </button>
             </div>
 
@@ -289,7 +293,7 @@ const ShareArtworkModal = ({
               onClick={handleDone}
               className="w-full text-center text-sm text-text-secondary hover:text-text-primary underline"
             >
-              Done
+              {t('done')}
             </button>
           </div>
         )}

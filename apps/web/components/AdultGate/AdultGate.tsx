@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faCheck, faTimes } from '@fortawesome/pro-solid-svg-icons';
 import cn from '@/utils/cn';
@@ -22,6 +23,7 @@ const generateMathProblem = () => {
 };
 
 const AdultGate = ({ onSuccess, onCancel, className }: AdultGateProps) => {
+  const t = useTranslations('adultGate');
   const problem = useMemo(() => generateMathProblem(), []);
   const [userAnswer, setUserAnswer] = useState('');
   const [error, setError] = useState(false);
@@ -57,18 +59,18 @@ const AdultGate = ({ onSuccess, onCancel, className }: AdultGateProps) => {
         <div className="w-10 h-10 rounded-full bg-crayon-purple flex items-center justify-center">
           <FontAwesomeIcon icon={faLock} className="text-white text-lg" />
         </div>
-        <h3 className="text-xl font-bold text-text-primary">Grown-Up Check</h3>
+        <h3 className="text-xl font-bold text-text-primary">{t('title')}</h3>
       </div>
 
       {/* Explanation */}
       <p className="text-center text-text-secondary text-sm mb-6">
-        Please ask a grown-up to solve this to continue.
+        {t('explanation')}
       </p>
 
       {/* Math Problem */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="text-center">
-          <p className="text-lg text-text-secondary mb-2">What is:</p>
+          <p className="text-lg text-text-secondary mb-2">{t('whatIs')}</p>
           <p className="text-4xl font-bold text-crayon-purple mb-4">
             {problem.question} = ?
           </p>
@@ -82,7 +84,7 @@ const AdultGate = ({ onSuccess, onCancel, className }: AdultGateProps) => {
             pattern="[0-9]*"
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
-            placeholder="Type the answer"
+            placeholder={t('placeholder')}
             className={cn(
               'w-full px-4 py-3 text-xl text-center font-bold rounded-xl border-2 outline-none transition-colors',
               error
@@ -93,7 +95,7 @@ const AdultGate = ({ onSuccess, onCancel, className }: AdultGateProps) => {
           />
           {error && (
             <p className="text-crayon-pink text-sm text-center mt-2">
-              Oops! Try again{attempts > 1 ? ` (${attempts} attempts)` : ''}.
+              {attempts > 1 ? t('errorWithAttempts', { attempts }) : t('error')}
             </p>
           )}
         </div>
@@ -106,7 +108,7 @@ const AdultGate = ({ onSuccess, onCancel, className }: AdultGateProps) => {
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-full font-bold text-text-secondary bg-paper-cream border-2 border-paper-cream-dark hover:bg-paper-cream-dark transition-colors"
           >
             <FontAwesomeIcon icon={faTimes} />
-            Cancel
+            {t('cancel')}
           </button>
           <button
             type="submit"
@@ -119,7 +121,7 @@ const AdultGate = ({ onSuccess, onCancel, className }: AdultGateProps) => {
             )}
           >
             <FontAwesomeIcon icon={faCheck} />
-            Check
+            {t('check')}
           </button>
         </div>
       </form>

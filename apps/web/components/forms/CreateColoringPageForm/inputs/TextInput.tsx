@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import cn from '@/utils/cn';
 import { useInputMode } from './InputModeContext';
+import { useTranslations } from 'next-intl';
 
 type TextInputProps = {
   className?: string;
@@ -24,6 +25,7 @@ const TextInput = ({ className }: TextInputProps) => {
   } = useUser();
 
   const { description, setDescription } = useInputMode();
+  const t = useTranslations('createForm');
 
   // Sync description changes with form
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -35,7 +37,7 @@ const TextInput = ({ className }: TextInputProps) => {
     if (canGenerate) {
       return {
         disabled: false,
-        placeholder: 'e.g. a pirate ship sailing through space 🚀',
+        placeholder: t('placeholder'),
       };
     }
 
@@ -43,7 +45,7 @@ const TextInput = ({ className }: TextInputProps) => {
     if (blockedReason === 'guest_limit_reached') {
       return {
         disabled: true,
-        placeholder: `You've used your ${maxGuestGenerations} free tries! Sign up for 15 more credits.`,
+        placeholder: t('placeholderGuestLimit', { maxTries: maxGuestGenerations }),
       };
     }
 
@@ -51,20 +53,19 @@ const TextInput = ({ className }: TextInputProps) => {
       if (hasActiveSubscription) {
         return {
           disabled: true,
-          placeholder: "You're out of credits — top up or upgrade your plan!",
+          placeholder: t('placeholderNoCreditsSubscribed'),
         };
       }
       return {
         disabled: true,
-        placeholder:
-          "You've used your free credits — choose a plan to continue creating!",
+        placeholder: t('placeholderNoCreditsNoSubscription'),
       };
     }
 
     // Fallback (shouldn't reach here)
     return {
       disabled: true,
-      placeholder: 'Sign in to start creating magical coloring pages!',
+      placeholder: t('placeholderSignIn'),
     };
   };
 
@@ -74,12 +75,12 @@ const TextInput = ({ className }: TextInputProps) => {
       // Show remaining generations for guests
       if (isGuest) {
         return {
-          text: `Create (${guestGenerationsRemaining} free ${guestGenerationsRemaining === 1 ? 'try' : 'tries'} left)`,
+          text: t('buttonCreateGuest', { remaining: guestGenerationsRemaining }),
           isSubmit: true,
         };
       }
       return {
-        text: 'Create coloring page',
+        text: t('buttonCreate'),
         isSubmit: true,
       };
     }
@@ -87,9 +88,9 @@ const TextInput = ({ className }: TextInputProps) => {
     // Blocked - show appropriate CTA
     if (blockedReason === 'guest_limit_reached') {
       return {
-        text: 'Sign up for 15 free credits',
+        text: t('buttonSignUp'),
         action: () => handleAuthAction('signin'),
-        subtext: "You've seen the magic! Sign up to keep creating.",
+        subtext: t('subtextGuestLimit'),
         isSubmit: false,
       };
     }
@@ -97,26 +98,25 @@ const TextInput = ({ className }: TextInputProps) => {
     if (blockedReason === 'no_credits') {
       if (hasActiveSubscription) {
         return {
-          text: 'Buy more credits',
+          text: t('buttonBuyCredits'),
           action: () => handleAuthAction('billing'),
-          subtext:
-            'Need more magic? Top up or upgrade to keep the creativity going!',
+          subtext: t('subtextNoCreditsSubscribed'),
           isSubmit: false,
         };
       }
       return {
-        text: 'View plans',
+        text: t('buttonViewPlans'),
         action: () => handleAuthAction('billing'),
-        subtext: 'Choose a subscription to unlock more creations',
+        subtext: t('subtextNoCreditsNoSubscription'),
         isSubmit: false,
       };
     }
 
     // Fallback
     return {
-      text: 'Get started for free',
+      text: t('buttonGetStarted'),
       action: () => handleAuthAction('signin'),
-      subtext: "You'll get 15 free credits — enough to create 3 pages!",
+      subtext: t('subtextFallback'),
       isSubmit: false,
     };
   };

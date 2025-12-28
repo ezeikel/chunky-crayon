@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ColoAvatar } from '@/components/ColoAvatar';
 import type { ColoState } from '@/lib/colo';
 import {
@@ -20,6 +21,7 @@ const HeaderColoIndicator = ({
   className,
 }: HeaderColoIndicatorProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const t = useTranslations('colo');
 
   // Don't render if no Colo state
   if (!coloState) {
@@ -37,7 +39,7 @@ const HeaderColoIndicator = ({
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange',
             className,
           )}
-          aria-label={`Colo: ${coloState.stageName}`}
+          aria-label={`Colo: ${t(`stages.${coloState.stage}.name`)}`}
         >
           <ColoAvatar coloState={coloState} size="sm" showProgress />
           {/* Evolution sparkle indicator when close to next stage */}
@@ -58,10 +60,10 @@ const HeaderColoIndicator = ({
           {/* Stage info */}
           <div className="flex-1 min-w-0">
             <h3 className="font-tondo font-bold text-lg text-crayon-orange">
-              {coloState.stageName}
+              {t(`stages.${coloState.stage}.name`)}
             </h3>
             <p className="font-tondo text-sm text-text-muted mt-1">
-              {coloState.stageDescription}
+              {t(`stages.${coloState.stage}.description`)}
             </p>
           </div>
         </div>
@@ -71,7 +73,7 @@ const HeaderColoIndicator = ({
           <div className="mt-4 pt-4 border-t border-gray-100">
             <div className="flex justify-between items-center mb-2">
               <span className="font-tondo text-sm text-text-muted">
-                Next: {coloState.nextStage.name}
+                {t('indicator.next', { stageName: t(`stages.${coloState.nextStage.stage}.name`) })}
               </span>
               <span className="font-tondo text-sm font-bold text-crayon-orange">
                 {coloState.progressToNext.current}/
@@ -86,10 +88,9 @@ const HeaderColoIndicator = ({
               />
             </div>
             <p className="font-tondo text-xs text-text-muted mt-2 text-center">
-              Save{' '}
-              {coloState.progressToNext.required -
-                coloState.progressToNext.current}{' '}
-              more artworks to evolve!
+              {t('indicator.saveToEvolve', {
+                count: coloState.progressToNext.required - coloState.progressToNext.current,
+              })}
             </p>
           </div>
         )}
@@ -99,7 +100,7 @@ const HeaderColoIndicator = ({
           <div className="mt-4 pt-4 border-t border-gray-100 text-center">
             <span className="text-2xl">🏆</span>
             <p className="font-tondo text-sm text-text-muted mt-1">
-              You&apos;ve reached the highest stage!
+              {t('indicator.maxStage')}
             </p>
           </div>
         )}
@@ -108,7 +109,7 @@ const HeaderColoIndicator = ({
         {coloState.accessories.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-100">
             <p className="font-tondo text-xs text-text-muted mb-2">
-              Accessories ({coloState.accessories.length})
+              {t('indicator.accessories', { count: coloState.accessories.length })}
             </p>
             <div className="flex flex-wrap gap-1">
               {coloState.accessories.slice(0, 6).map((accessoryId) => (

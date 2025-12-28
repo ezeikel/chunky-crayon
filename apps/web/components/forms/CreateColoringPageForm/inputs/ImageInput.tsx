@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCameraRetro,
@@ -33,6 +34,7 @@ type ImageInputProps = {
 // =============================================================================
 
 const ImageInput = ({ className }: ImageInputProps) => {
+  const t = useTranslations('createForm');
   const {
     canGenerate,
     blockedReason,
@@ -161,12 +163,12 @@ const ImageInput = ({ className }: ImageInputProps) => {
       // Show remaining generations for guests
       if (isGuest) {
         return {
-          text: `Create (${guestGenerationsRemaining} free ${guestGenerationsRemaining === 1 ? 'try' : 'tries'} left)`,
+          text: t('buttonCreateGuest', { remaining: guestGenerationsRemaining }),
           isSubmit: true,
         };
       }
       return {
-        text: 'Create coloring page',
+        text: t('buttonCreate'),
         isSubmit: true,
       };
     }
@@ -174,9 +176,9 @@ const ImageInput = ({ className }: ImageInputProps) => {
     // Blocked - show appropriate CTA
     if (blockedReason === 'guest_limit_reached') {
       return {
-        text: 'Sign up for 15 free credits',
+        text: t('buttonSignUp'),
         action: () => handleAuthAction('signin'),
-        subtext: "You've seen the magic! Sign up to keep creating.",
+        subtext: t('subtextGuestLimit'),
         isSubmit: false,
       };
     }
@@ -184,26 +186,25 @@ const ImageInput = ({ className }: ImageInputProps) => {
     if (blockedReason === 'no_credits') {
       if (hasActiveSubscription) {
         return {
-          text: 'Buy more credits',
+          text: t('buttonBuyCredits'),
           action: () => handleAuthAction('billing'),
-          subtext:
-            'Need more magic? Top up or upgrade to keep the creativity going!',
+          subtext: t('subtextNoCreditsSubscribed'),
           isSubmit: false,
         };
       }
       return {
-        text: 'View plans',
+        text: t('buttonViewPlans'),
         action: () => handleAuthAction('billing'),
-        subtext: 'Choose a subscription to unlock more creations',
+        subtext: t('subtextNoCreditsNoSubscription'),
         isSubmit: false,
       };
     }
 
     // Fallback
     return {
-      text: 'Get started for free',
+      text: t('buttonGetStarted'),
       action: () => handleAuthAction('signin'),
-      subtext: "You'll get 15 free credits — enough to create 3 pages!",
+      subtext: t('subtextFallback'),
       isSubmit: false,
     };
   };
@@ -212,15 +213,14 @@ const ImageInput = ({ className }: ImageInputProps) => {
 
   // Error state
   if (state === 'error') {
-    const errorMessages: Record<string, string> = {
-      file_too_large:
-        "That image is too big! Try one that's smaller than 10MB.",
-      invalid_type:
-        "I can't read that file type. Try a JPEG, PNG, or WebP image!",
-      processing_failed:
-        "Hmm, I couldn't understand that image. Let's try another one!",
-      camera_failed: "Something went wrong with the camera. Let's try again!",
+    const errorMessageKeys: Record<string, string> = {
+      file_too_large: 'imageInput.errors.fileTooLarge',
+      invalid_type: 'imageInput.errors.invalidType',
+      processing_failed: 'imageInput.errors.processingFailed',
+      camera_failed: 'imageInput.errors.cameraFailed',
     };
+
+    const errorKey = errorMessageKeys[error || 'processing_failed'];
 
     return (
       <div
@@ -231,14 +231,14 @@ const ImageInput = ({ className }: ImageInputProps) => {
       >
         <div className="text-6xl mb-2">😅</div>
         <p className="text-center text-text-primary font-tondo font-bold">
-          {errorMessages[error || 'processing_failed']}
+          {t(errorKey)}
         </p>
         <Button
           onClick={handleRetry}
           className="font-tondo font-bold text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-xl"
         >
           <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
-          Try again
+          {t('imageInput.tryAgain')}
         </Button>
       </div>
     );
@@ -266,8 +266,8 @@ const ImageInput = ({ className }: ImageInputProps) => {
         />
         <p className="text-center text-text-primary font-tondo font-bold">
           {state === 'capturing'
-            ? 'Getting your photo ready...'
-            : 'Looking at your picture...'}
+            ? t('imageInput.capturing')
+            : t('imageInput.processing')}
         </p>
       </div>
     );
@@ -283,13 +283,13 @@ const ImageInput = ({ className }: ImageInputProps) => {
         aria-labelledby="image-mode-tab"
       >
         <p className="text-center text-text-primary font-tondo font-bold">
-          Great picture! Is this the one you want?
+          {t('imageInput.greatPicture')}
         </p>
 
         <div className="relative w-48 h-48 rounded-2xl overflow-hidden shadow-lg border-4 border-crayon-orange">
           <Image
             src={previewUrl}
-            alt="Selected image preview"
+            alt={t('imageInput.altImagePreview')}
             fill
             className="object-cover"
           />
@@ -302,14 +302,14 @@ const ImageInput = ({ className }: ImageInputProps) => {
             className="font-tondo font-bold border-2 border-paper-cream-dark text-text-primary hover:bg-paper-cream rounded-xl"
           >
             <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
-            Pick another
+            {t('imageInput.pickAnother')}
           </Button>
           <Button
             onClick={processImage}
             className="font-tondo font-bold text-white bg-btn-teal shadow-btn-secondary hover:shadow-btn-secondary-hover hover:scale-105 active:scale-95 transition-all duration-200 px-8 rounded-xl"
           >
             <FontAwesomeIcon icon={faCheck} className="mr-2" />
-            Use this!
+            {t('imageInput.useThis')}
           </Button>
         </div>
       </div>
@@ -336,7 +336,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
               <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
                 <Image
                   src={previewUrl}
-                  alt="Your uploaded image"
+                  alt={t('imageInput.altUploadedImage')}
                   fill
                   className="object-cover"
                 />
@@ -345,7 +345,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
             {/* Caption showing AI description */}
             <p className="text-center text-text-primary font-tondo text-base leading-relaxed">
               {isChildDrawing ? '✏️ ' : '📸 '}
-              <span className="font-bold">I see:</span> {aiDescription}
+              <span className="font-bold">{t('imageInput.iSee')}</span> {aiDescription}
             </p>
           </div>
         </div>
@@ -355,7 +355,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           {buttonConfig.isSubmit ? (
             <SubmitButton
               ref={submitButtonRef}
-              text="🎨 Make my coloring page!"
+              text={t('imageInput.makeMyColoringPage')}
               className="font-tondo font-bold text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover px-8 py-6 rounded-xl hover:scale-105 active:scale-95 transition-all duration-200"
               disabled={!isDescriptionReady}
             />
@@ -381,7 +381,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
             onClick={handleRetry}
             className="font-tondo text-sm text-text-muted hover:text-text-primary underline underline-offset-2 transition-colors"
           >
-            Not quite right? Try again
+            {t('imageInput.notQuiteRight')}
           </button>
         </div>
       </div>
@@ -398,12 +398,12 @@ const ImageInput = ({ className }: ImageInputProps) => {
     >
       <p className="text-center text-text-primary font-tondo font-bold text-lg">
         {canInteract
-          ? 'Take a photo or upload a picture!'
+          ? t('imageInput.takePhotoOrUpload')
           : blockedReason === 'guest_limit_reached'
-            ? `You've used your ${maxGuestGenerations} free tries! Sign up to continue.`
+            ? t('subtextGuestLimit')
             : blockedReason === 'no_credits'
-              ? "You're out of credits — top up or upgrade!"
-              : 'Sign in to upload images!'}
+              ? t('subtextNoCredits')
+              : t('imageInput.signInToUpload')}
       </p>
 
       {/* Hidden file inputs */}
@@ -451,10 +451,10 @@ const ImageInput = ({ className }: ImageInputProps) => {
               '--fa-secondary-opacity': '1',
             } as React.CSSProperties
           }
-          aria-label="Take a photo"
+          aria-label={t('imageInput.takePhoto')}
         >
           <FontAwesomeIcon icon={faCameraRetro} className="text-3xl" />
-          <span className="text-sm font-tondo font-bold">Camera</span>
+          <span className="text-sm font-tondo font-bold">{t('imageInput.camera')}</span>
         </button>
 
         <button
@@ -481,10 +481,10 @@ const ImageInput = ({ className }: ImageInputProps) => {
               '--fa-secondary-opacity': '1',
             } as React.CSSProperties
           }
-          aria-label="Upload an image"
+          aria-label={t('imageInput.uploadImage')}
         >
           <FontAwesomeIcon icon={faImages} className="text-3xl" />
-          <span className="text-sm font-tondo font-bold">Upload</span>
+          <span className="text-sm font-tondo font-bold">{t('imageInput.upload')}</span>
         </button>
       </div>
 
@@ -519,13 +519,13 @@ const ImageInput = ({ className }: ImageInputProps) => {
             }
           />
           <p className="font-tondo text-sm text-text-muted text-center">
-            {isDragging ? 'Drop it here!' : 'Or drag and drop an image here'}
+            {isDragging ? t('imageInput.dropHere') : t('imageInput.dragAndDrop')}
           </p>
         </div>
       )}
 
       <p className="font-tondo text-sm text-text-muted text-center">
-        Share a drawing or any picture you want to color!
+        {t('imageInput.shareDrawing')}
       </p>
 
       {!canInteract && (

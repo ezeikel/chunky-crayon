@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faStar,
@@ -31,8 +32,8 @@ type DifficultyFilterProps = {
 const DIFFICULTY_CONFIG: Record<
   Difficulty,
   {
-    label: string;
-    shortLabel: string;
+    labelKey: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    shortLabelKey: 'easy' | 'medium' | 'hard' | 'expert';
     icon: IconDefinition;
     color: string;
     bgColor: string;
@@ -41,8 +42,8 @@ const DIFFICULTY_CONFIG: Record<
   }
 > = {
   [Difficulty.BEGINNER]: {
-    label: 'Beginner',
-    shortLabel: 'Easy',
+    labelKey: 'beginner',
+    shortLabelKey: 'easy',
     icon: faStar,
     color: 'text-crayon-green',
     bgColor: 'bg-crayon-green/10',
@@ -50,8 +51,8 @@ const DIFFICULTY_CONFIG: Record<
     activeBg: 'bg-crayon-green text-white',
   },
   [Difficulty.INTERMEDIATE]: {
-    label: 'Intermediate',
-    shortLabel: 'Medium',
+    labelKey: 'intermediate',
+    shortLabelKey: 'medium',
     icon: faStars,
     color: 'text-crayon-orange',
     bgColor: 'bg-crayon-orange/10',
@@ -59,8 +60,8 @@ const DIFFICULTY_CONFIG: Record<
     activeBg: 'bg-crayon-orange text-white',
   },
   [Difficulty.ADVANCED]: {
-    label: 'Advanced',
-    shortLabel: 'Hard',
+    labelKey: 'advanced',
+    shortLabelKey: 'hard',
     icon: faMedal,
     color: 'text-crayon-blue',
     bgColor: 'bg-crayon-blue/10',
@@ -68,8 +69,8 @@ const DIFFICULTY_CONFIG: Record<
     activeBg: 'bg-crayon-blue text-white',
   },
   [Difficulty.EXPERT]: {
-    label: 'Expert',
-    shortLabel: 'Expert',
+    labelKey: 'expert',
+    shortLabelKey: 'expert',
     icon: faCrown,
     color: 'text-crayon-purple',
     bgColor: 'bg-crayon-purple/10',
@@ -83,6 +84,7 @@ const DifficultyFilter = ({
   counts,
   className,
 }: DifficultyFilterProps) => {
+  const t = useTranslations('gallery.difficultyFilter');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -118,7 +120,7 @@ const DifficultyFilter = ({
             : 'bg-white text-text-secondary hover:bg-paper-cream hover:border-text-tertiary',
         )}
       >
-        All
+        {t('all')}
         {counts && (
           <span className="text-xs opacity-70">
             ({Object.values(counts).reduce((a, b) => a + b, 0)})
@@ -153,8 +155,8 @@ const DifficultyFilter = ({
               icon={config.icon}
               className={cn('text-sm', active ? 'text-white' : config.color)}
             />
-            <span className="hidden sm:inline">{config.label}</span>
-            <span className="sm:hidden">{config.shortLabel}</span>
+            <span className="hidden sm:inline">{t(config.labelKey)}</span>
+            <span className="sm:hidden">{t(config.shortLabelKey)}</span>
             {count > 0 && (
               <span
                 className={cn('text-xs', active ? 'opacity-80' : 'opacity-60')}

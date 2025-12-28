@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import {
   faImages,
   faCalendarStar,
@@ -13,23 +14,24 @@ type SocialProofStatsProps = {
 };
 
 const SocialProofStats = async ({ className }: SocialProofStatsProps) => {
+  const t = await getTranslations('homepage.stats');
   const stats = await getGalleryStats();
 
   const statItems = [
     {
       icon: faImages,
       value: stats.totalImages,
-      label: 'Coloring Pages Created',
+      label: t('coloringPagesCreated'),
     },
     {
       icon: faCalendarStar,
       value: stats.dailyImages,
-      label: 'Daily Pages',
+      label: t('dailyPages'),
     },
     {
       icon: faUsers,
       value: stats.communityImages,
-      label: 'Free Library Pages',
+      label: t('freeLibraryPages'),
     },
   ];
 

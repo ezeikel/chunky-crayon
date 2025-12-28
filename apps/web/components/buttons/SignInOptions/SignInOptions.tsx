@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/pro-regular-svg-icons';
 import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { faGoogle, faApple } from '@fortawesome/free-brands-svg-icons';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -19,6 +20,7 @@ import {
 } from '@/components/ui/card';
 
 const SignInOptions = () => {
+  const t = useTranslations('auth');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,8 +60,8 @@ const SignInOptions = () => {
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle>Sign in</CardTitle>
-        <CardDescription>Choose your preferred sign in method</CardDescription>
+        <CardTitle>{t('signIn')}</CardTitle>
+        <CardDescription>{t('chooseMethod')}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
         <Button
@@ -68,7 +70,7 @@ const SignInOptions = () => {
           className="w-full"
         >
           <FontAwesomeIcon icon={faGoogle} className="mr-2 h-4 w-4" />
-          Continue with Google
+          {t('continueWithGoogle')}
         </Button>
         <Button
           variant="outline"
@@ -76,7 +78,7 @@ const SignInOptions = () => {
           className="w-full"
         >
           <FontAwesomeIcon icon={faApple} className="mr-2 h-4 w-4" />
-          Continue with Apple
+          {t('continueWithApple')}
         </Button>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -84,14 +86,14 @@ const SignInOptions = () => {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
+              {t('orContinueWith')}
             </span>
           </div>
         </div>
         <form onSubmit={handleMagicLinkSignIn} className="grid gap-2">
           <Input
             type="email"
-            placeholder="name@example.com"
+            placeholder={t('emailPlaceholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -110,21 +112,19 @@ const SignInOptions = () => {
                     } as React.CSSProperties
                   }
                 />
-                Sending link...
+                {t('sendingLink')}
               </>
             ) : (
               <>
                 <FontAwesomeIcon icon={faEnvelope} className="mr-2 h-4 w-4" />
-                Sign in with Email
+                {t('signInWithEmail')}
               </>
             )}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col items-center text-sm text-muted-foreground">
-        <p>
-          By continuing, you agree to our Terms of Service and Privacy Policy.
-        </p>
+        <p>{t('termsAgreement')}</p>
       </CardFooter>
     </Card>
   );

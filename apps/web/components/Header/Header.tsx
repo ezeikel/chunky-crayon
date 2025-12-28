@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { User } from '@chunky-crayon/db/types';
 import {
   faCoins,
@@ -29,6 +30,7 @@ import HeaderStickerIndicator from './HeaderStickerIndicator';
 import HeaderChallengeIndicator from './HeaderChallengeIndicator';
 import HeaderColoIndicator from './HeaderColoIndicator';
 import MobileMenu from './MobileMenu';
+import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
 
 export type Visibility = 'always' | 'authenticated' | 'unauthenticated';
 
@@ -58,133 +60,137 @@ const handleSignOut = async () => {
 
 // Simplified nav items - text only for navigation
 // Note: Credits are now shown in the Combined Profile Pill (HeaderDropdown)
-const ITEMS: NavItem[] = [
+const getNavItems = (t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>): NavItem[] => [
   {
-    label: 'Home',
+    label: t('home'),
     href: '/',
     visibility: 'always',
   },
   {
-    label: 'Gallery',
+    label: t('gallery'),
     href: '/gallery',
     visibility: 'always',
   },
   {
-    label: 'My Artwork',
+    label: t('myArtwork'),
     href: '/account/my-artwork',
     visibility: 'authenticated',
   },
   {
-    label: 'Challenges',
+    label: t('challenges'),
     href: '/account/challenges',
     visibility: 'authenticated',
   },
   {
-    label: 'Blog',
+    label: t('blog'),
     href: '/blog',
     visibility: 'unauthenticated',
   },
   {
-    label: 'Pricing',
+    label: t('pricing'),
     href: '/pricing',
     visibility: 'unauthenticated',
   },
   {
-    label: 'Support',
+    label: t('support'),
     href: 'mailto:support@chunkycrayon.com',
     visibility: 'unauthenticated',
   },
 ];
 
-const getMobileItems = (user: Partial<User> | null): MobileNavItem[] => {
+const getMobileItems = (
+  user: Partial<User> | null,
+  t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>,
+  tCommon: Awaited<ReturnType<typeof getTranslations<'common'>>>
+): MobileNavItem[] => {
   const items: MobileNavItem[] = [];
   if (user) {
     items.push({
-      label: 'Home',
+      label: t('home'),
       iconName: faHouse,
       href: '/',
     });
     items.push({
-      label: 'Gallery',
+      label: t('gallery'),
       iconName: faImages,
       href: '/gallery',
     });
     items.push({
-      label: 'Blog',
+      label: t('blog'),
       iconName: faNewspaper,
       href: '/blog',
     });
     items.push({
-      label: 'My Artwork',
+      label: t('myArtwork'),
       iconName: faHeart,
       href: '/account/my-artwork',
     });
     items.push({
-      label: 'Sticker Book',
+      label: t('stickerBook'),
       iconName: faBookOpen,
       href: '/account/profiles/stickers',
     });
     items.push({
-      label: 'Challenges',
+      label: t('challenges'),
       iconName: faTrophy,
       href: '/account/challenges',
     });
     items.push({
-      label: `${formatNumber(user.credits || 0)} credits`,
+      label: tCommon('creditsWithCount', { count: formatNumber(user.credits || 0) }),
       iconName: faCoins,
       liClass: 'bg-crayon-yellow-light/30 rounded-full',
     });
     items.push({
-      label: 'Billing',
+      label: t('billing'),
       iconName: faCreditCard,
       href: '/account/billing',
       requiresParentalGate: true,
     });
     items.push({
-      label: 'Settings',
+      label: t('settings'),
       iconName: faGear,
       href: '/account/settings',
       requiresParentalGate: true,
     });
     items.push({
-      label: 'Support',
+      label: t('support'),
       iconName: faHeadset,
       href: 'mailto:support@chunkycrayon.com',
       requiresParentalGate: true,
     });
     items.push({
-      label: 'Sign out',
+      label: t('signOut'),
       iconName: faArrowRightFromBracket,
       action: 'signout',
     });
   } else {
     items.push({
-      label: 'Home',
+      label: t('home'),
       iconName: faHouse,
       href: '/',
     });
     items.push({
-      label: 'Gallery',
+      label: t('gallery'),
       iconName: faImages,
       href: '/gallery',
     });
     items.push({
-      label: 'Blog',
+      label: t('blog'),
       iconName: faNewspaper,
       href: '/blog',
     });
     items.push({
-      label: 'Pricing',
+      label: t('pricing'),
       iconName: faTag,
       href: '/pricing',
     });
     items.push({
-      label: 'Support',
+      label: t('support'),
       iconName: faHeadset,
       href: 'mailto:support@chunkycrayon.com',
     });
     items.push({
-      label: 'Sign in',
+      label: t('signIn'),
       iconName: faArrowRightToBracket,
       href: '/signin',
     });
@@ -223,8 +229,10 @@ const renderNavLink = (item: NavItem, user: Partial<User> | null) => {
 };
 
 const Header = async () => {
+  const t = await getTranslations('navigation');
+  const tCommon = await getTranslations('common');
   const user = await getCurrentUser();
-  const mobileItems = getMobileItems(user);
+  const mobileItems = getMobileItems(user, t, tCommon);
 
   // Fetch profiles, sticker stats, challenge, and Colo state for authenticated users
   const profiles = user ? (await getProfiles()) || [] : [];
@@ -234,7 +242,8 @@ const Header = async () => {
   const currentChallenge = user ? await getMyCurrentChallenge() : null;
 
   const renderItems = () => {
-    const visibleItems = ITEMS.filter((item) => {
+    const navItems = getNavItems(t);
+    const visibleItems = navItems.filter((item) => {
       switch (item.visibility) {
         case 'always':
           return true;
@@ -297,12 +306,13 @@ const Header = async () => {
               {renderNavLink(item, null)}
             </div>
           ))}
+          <LanguageSwitcher variant="icon" />
         </nav>
         <Link
           href="/signin"
           className="hidden md:flex items-center font-tondo font-bold text-white px-6 py-2.5 rounded-full bg-crayon-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200"
         >
-          Sign in
+          {t('signIn')}
         </Link>
         <MobileMenu items={mobileItems} />
       </div>

@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -31,6 +32,8 @@ const ProfileIndicator = ({
   className,
 }: ProfileIndicatorProps) => {
   const router = useRouter();
+  const t = useTranslations('navigation');
+  const tProfiles = useTranslations('profiles');
   const [isPending, startTransition] = useTransition();
 
   const handleSwitchProfile = (profileId: string) => {
@@ -63,7 +66,7 @@ const ProfileIndicator = ({
             isPending && 'opacity-50 pointer-events-none',
             className,
           )}
-          aria-label={`Current profile: ${activeProfile?.name || 'Select profile'}`}
+          aria-label={`Current profile: ${activeProfile?.name || t('selectProfile')}`}
         >
           {activeProfile ? (
             <>
@@ -78,7 +81,7 @@ const ProfileIndicator = ({
             </>
           ) : (
             <span className="font-tondo font-bold text-sm text-gray-400 px-2">
-              Select Profile
+              {t('selectProfile')}
             </span>
           )}
         </button>
@@ -98,7 +101,7 @@ const ProfileIndicator = ({
                 <p className="font-tondo font-bold text-sm text-crayon-orange">
                   {activeProfile.name}
                 </p>
-                <p className="text-xs text-gray-500">Currently active</p>
+                <p className="text-xs text-gray-500">{t('currentlyActive')}</p>
               </div>
             </div>
           </div>
@@ -108,7 +111,7 @@ const ProfileIndicator = ({
         {otherProfiles.length > 0 && (
           <>
             <p className="px-3 py-1 text-xs text-gray-400 font-tondo">
-              Switch to
+              {t('switchTo')}
             </p>
             {otherProfiles.map((profile) => (
               <DropdownMenuItem
@@ -152,7 +155,7 @@ const ProfileIndicator = ({
               </svg>
             </div>
             <span className="font-tondo font-bold text-sm text-gray-500">
-              Add Profile
+              {tProfiles('create.addProfile')}
             </span>
           </DropdownMenuItem>
         )}
@@ -181,7 +184,7 @@ const ProfileIndicator = ({
               </svg>
             </div>
             <span className="font-tondo font-bold text-sm text-gray-500">
-              Manage Profiles
+              {t('manageProfiles')}
             </span>
           </ParentalGateLink>
         </DropdownMenuItem>

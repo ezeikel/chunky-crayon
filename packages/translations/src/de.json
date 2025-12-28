@@ -1,0 +1,1392 @@
+{
+  "common": {
+    "loading": "Lädt...",
+    "error": "Etwas ist schiefgelaufen",
+    "retry": "Nochmal versuchen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "done": "Fertig",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "credits": "Credits",
+    "creditsWithCount": "{count} Credits"
+  },
+  "coloLoading": {
+    "title": "Deine Seite entsteht!",
+    "titleSpeaking": "Ich bin sooo aufgeregt!",
+    "coloSpeaking": "Colo spricht! Hör mal zu!",
+    "audioStates": {
+      "idle": "Mach mich bereit...",
+      "preparing": "Colo wacht auf!",
+      "done": "Ich zeichne dein Bild..."
+    },
+    "messages": {
+      "sharpeningCrayons": "Buntstifte anspitzen...",
+      "mixingColors": "Farben mischen...",
+      "drawingLines": "Linien zeichnen...",
+      "addingSparkles": "Magische Glitzerfunken dazu...",
+      "almostThere": "Fast geschafft...",
+      "creatingMasterpiece": "Dein Meisterwerk entsteht...",
+      "wavingWand": "Ich schwinge meinen Zauberstab...",
+      "coloringOutsideLines": "Außerhalb der Linien malen (ups!)..."
+    },
+    "pageLoading": "Ich mache deine Buntstifte startklar!"
+  },
+  "colo": {
+    "dashboard": {
+      "greeting": "Was möchtest du heute ausmalen?",
+      "wantsToGrow": "{stageName} möchte wachsen! Speichere noch {count} Bilder, um dich weiterzuentwickeln!",
+      "proudOfYou": "Dein {stageName} ist so stolz auf dich!"
+    },
+    "indicator": {
+      "next": "Als Nächstes: {stageName}",
+      "saveToEvolve": "Speichere noch {count} Bilder, um dich weiterzuentwickeln!",
+      "maxStage": "Du hast die höchste Stufe erreicht!",
+      "accessories": "Accessoires ({count})"
+    },
+    "avatar": {
+      "tapMe": "Tippe auf mich!",
+      "artworks": "Bilder"
+    },
+    "stages": {
+      "1": {
+        "name": "Baby Colo",
+        "description": "Startet gerade erst ins Ausmal-Abenteuer!"
+      },
+      "2": {
+        "name": "Kleiner Colo",
+        "description": "Wird mit jedem Bild ein Stück größer!"
+      },
+      "3": {
+        "name": "Wachsender Colo",
+        "description": "Schau mal, wie sehr Colo gewachsen ist!"
+      },
+      "4": {
+        "name": "Fröhlicher Colo",
+        "description": "So glücklich über all die schönen Kunstwerke!"
+      },
+      "5": {
+        "name": "Künstler Colo",
+        "description": "Ein echter Künstler in Ausbildung!"
+      },
+      "6": {
+        "name": "Meister Colo",
+        "description": "Der ultimative Ausmal-Meister!"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Start",
+    "gallery": "Galerie",
+    "myArtwork": "Meine Kunstwerke",
+    "challenges": "Challenges",
+    "blog": "Blog",
+    "pricing": "Preise",
+    "support": "Hilfe",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "billing": "Abrechnung",
+    "settings": "Einstellungen",
+    "stickerBook": "Stickerbuch",
+    "account": "Konto",
+    "menu": "Menü",
+    "currentlyActive": "Gerade aktiv",
+    "switchTo": "Wechseln zu",
+    "selectProfile": "Profil auswählen",
+    "manageProfiles": "Profile verwalten",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "navigationMenu": "Navigationsmenü"
+  },
+  "footer": {
+    "brand": "Chunky Crayon",
+    "tagline": "Träumen. Gestalten. Ausmalen.",
+    "aboutText": "Wo Fantasie lebendig wird! Mach aus deinen verrücktesten Ideen zauberhafte Malvorlagen.",
+    "madeBy": "Von Eltern mit Liebe in Süd-London gemacht",
+    "copyright": "© {year} Chunky Crayon. Alle Rechte vorbehalten.",
+    "sections": {
+      "about": "Über uns",
+      "connect": "Kontakt",
+      "getTheApp": "App holen",
+      "support": "Hilfe"
+    },
+    "links": {
+      "privacyPolicy": "Datenschutz",
+      "termsOfService": "Nutzungsbedingungen"
+    },
+    "appStore": {
+      "downloadOnAppStore": "Im App Store laden",
+      "getOnGooglePlay": "Bei Google Play holen",
+      "comingSoon": "Bald da!",
+      "iosComingSoon": "Unsere iOS-App kommt bald. Bleib dran!",
+      "androidComingSoon": "Unsere Android-App kommt bald. Bleib dran!"
+    }
+  },
+  "homepage": {
+    "heroTitle": "Entfessle die",
+    "heroTitleSuffix": "deines Kindes – heute",
+    "heroSubtitle": "Von bunten Ausmalbildern bis zu fantasievollen Abenteuern: Chunky Crayon macht Kreativität zu purem Glück.",
+    "cta": "Jetzt loslegen",
+    "stats": {
+      "coloringPagesCreated": "Erstellte Ausmalbilder",
+      "dailyPages": "Tägliche Seiten",
+      "freeLibraryPages": "Gratis-Bibliothek"
+    },
+    "galleryPreview": {
+      "freeColoringPages": "Gratis Ausmalbilder",
+      "exploreGallery": "Galerie entdecken",
+      "todaysDailyPage": "Heutige Tagesseite",
+      "latestDailyPage": "Neueste Tagesseite",
+      "seeAll": "Alle ansehen",
+      "communityPages": "Community-Seiten",
+      "colorNow": "Jetzt ausmalen",
+      "browseCategories": "Kategorien stöbern",
+      "viewAll": "Alles anzeigen",
+      "dailyColoringPageAlt": "Tägliches Ausmalbild",
+      "coloringPageAlt": "Ausmalbild"
+    },
+    "recentCreations": {
+      "title": "Deine letzten Kunstwerke",
+      "ctaHighlight": "Starte gratis",
+      "ctaText": "und behalte deine Kunstwerke für immer – und schalte mehr frei!",
+      "ctaButton": "Gratis starten"
+    },
+    "unleashWords": {
+      "creativity": "Kreativität",
+      "imagination": "Fantasie",
+      "fun": "Spaß",
+      "adventure": "Abenteuer",
+      "discovery": "Entdecken",
+      "exploration": "Erkunden",
+      "inspiration": "Inspiration",
+      "art": "Kunst",
+      "joy": "Freude",
+      "learning": "Lernen",
+      "wonder": "Staunen",
+      "dreams": "Träume",
+      "playtime": "Spielzeit",
+      "innovation": "Ideen",
+      "magic": "Magie",
+      "curiosity": "Neugier",
+      "expression": "Ausdruck",
+      "fantasy": "Fantasiewelt",
+      "stories": "Geschichten",
+      "excitement": "Aufregung"
+    },
+    "testimonials": {
+      "title": "Von Familien überall geliebt",
+      "fromReviews": "aus {count} Bewertungen",
+      "items": {
+        "1": {
+          "name": "Sarah M.",
+          "role": "Mama von 2",
+          "quote": "Meine Kinder lieben das total! Sie verbringen Stunden damit, ihre eigenen magischen Welten zu erfinden und auszumalen. Keine Bildschirmzeit-Diskussionen mehr!",
+          "avatar": "/images/testimonials/en/avatar-1.jpg"
+        },
+        "2": {
+          "name": "James T.",
+          "role": "Papa von 3",
+          "quote": "Endlich etwas, das Kreativität und Technik auf eine gesunde Weise verbindet. Meine Tochter hat ein Einhorn-Prinzessinnen-Schloss gemacht – einfach perfekt!",
+          "avatar": "/images/testimonials/en/avatar-2.jpg"
+        },
+        "3": {
+          "name": "Emily R.",
+          "role": "Grundschullehrerin",
+          "quote": "Ich nutze das im Unterricht für kreative Schreibimpulse. Die Kinder beschreiben, was sie wollen, und malen dann ihre Werke aus. Sie sind total begeistert!",
+          "avatar": "/images/testimonials/en/avatar-3.jpg"
+        },
+        "4": {
+          "name": "David K.",
+          "role": "Opa",
+          "quote": "Meine Enkel kommen jetzt jedes Wochenende vorbei, nur um zusammen neue Ausmalbilder zu machen. So eine schöne gemeinsame Zeit!",
+          "avatar": "/images/testimonials/en/avatar-4.jpg"
+        },
+        "5": {
+          "name": "Rachel B.",
+          "role": "Tagesmutter",
+          "quote": "Die Kinder, die ich betreue, bekommen gar nicht genug davon. Drachen, Feen, Raketen – was sie sich ausdenken, wird lebendig!",
+          "avatar": "/images/testimonials/en/avatar-5.jpg"
+        },
+        "6": {
+          "name": "Michael P.",
+          "role": "Papa & Designer",
+          "quote": "Als Designer schätze ich die Qualität. Als Papa liebe ich es, wenn das Gesicht meines Sohnes strahlt, sobald seine Ideen zu Ausmalbildern werden!",
+          "avatar": "/images/testimonials/en/avatar-6.jpg"
+        }
+      }
+    },
+    "faq": {
+      "title": "Häufige Fragen",
+      "subtitle": "Alles, was du über magische Ausmalbilder mit Chunky Crayon wissen musst",
+      "items": {
+        "1": {
+          "question": "Was ist Chunky Crayon?",
+          "answer": "Chunky Crayon ist ein magischer Ausmalbild-Generator für Kinder und Familien. Beschreibe einfach, was du ausmalen möchtest – z. B. „ein Drache bei einer Teeparty“ oder „mein Lieblings-Superheld auf dem Mond“ – und wir erstellen in Sekunden ein einzigartiges, druckbares Ausmalbild. Perfekt für Regentage, Ruhezeiten oder um die Fantasie deines Kindes zu wecken!"
+        },
+        "2": {
+          "question": "Ist es sicher und für Kinder geeignet?",
+          "answer": "Auf jeden Fall! Chunky Crayon wird von Eltern für Eltern gemacht. Alle generierten Bilder sind kinderfreundlich und altersgerecht. Unsere KI ist speziell darauf abgestimmt, fröhliche, unbedenkliche Ausmalbilder für jedes Alter zu erstellen."
+        },
+        "3": {
+          "question": "Wie erstelle ich ein Ausmalbild?",
+          "answer": "So einfach wie 1-2-3! Tippe ein, was du ausmalen möchtest (z. B. „ein Einhorn in einem magischen Wald“), klicke auf „Generieren“ und warte etwa 30 Sekunden. Dein persönliches Ausmalbild erscheint dann – bereit zum Download und Ausdrucken. Du kannst auch Spracheingabe nutzen oder ein Foto zur Inspiration hochladen!"
+        },
+        "4": {
+          "question": "Wie lange dauert das Erstellen einer Seite?",
+          "answer": "Die meisten Ausmalbilder sind in etwa 30 Sekunden fertig. Unser freundliches Maskottchen Colo hält dich in der Wartezeit bei Laune! Komplexe Szenen mit vielen Details können ein kleines bisschen länger dauern."
+        },
+        "5": {
+          "question": "Kann ich die Ausmalbilder ausdrucken?",
+          "answer": "Ja! Jedes Ausmalbild, das du erstellst, kannst du als hochwertiges PDF herunterladen – perfekt zum Ausdrucken zu Hause. Die Seiten sind für A4 optimiert und sehen toll aus mit Wachsmalern, Buntstiften oder Filzstiften."
+        },
+        "6": {
+          "question": "Was, wenn der Wunsch meines Kindes nicht klappt?",
+          "answer": "Manchmal trifft die KI beim ersten Versuch nicht ganz ins Schwarze – das gehört zum kreativen Abenteuer dazu! Probier es einfach nochmal mit etwas anderen Worten. Tipp: Sei möglichst konkret und beschreibe die Szene klar. Wenn du nicht weiterkommst, nutze die Spracheingabe – Kinder erklären es beim Sprechen oft am besten!"
+        },
+        "7": {
+          "question": "Ist Chunky Crayon kostenlos?",
+          "answer": "Du kannst Chunky Crayon mit 2 kostenlosen Generationen testen – ganz ohne Konto! Danach kannst du dich für ein kostenloses Konto anmelden und 15 Bonus-Credits bekommen oder eines unserer günstigen Abos wählen – für unbegrenzten Kreativspaß."
+        },
+        "8": {
+          "question": "Was ist in den Abo-Plänen enthalten?",
+          "answer": "Unsere Pläne reichen von Crayon (ideal für gelegentliches Ausmalen) bis Studio (für superkreative Familien oder Lehrkräfte). Alle Pläne enthalten: unbegrenzte Ausmalbild-Generierung, hochwertige PDF-Downloads, Sprach- und Fotoeingabe sowie Zugriff auf neue Funktionen, sobald sie erscheinen. Höhere Stufen bieten Credit-Übertrag und Rechte zur kommerziellen Nutzung."
+        },
+        "9": {
+          "question": "Kann ich Seiten für meine Klasse oder Kita nutzen?",
+          "answer": "Ja! Lehrkräfte und Tagesmütter/-väter lieben Chunky Crayon. Unsere Crayon- und Rainbow-Pläne sind perfekt für private und pädagogische Nutzung. Wenn du ein Business betreibst oder Seiten kommerziell verteilen möchtest, schau dir unsere Masterpiece- oder Studio-Pläne an – inklusive kommerzieller Lizenz."
+        },
+        "10": {
+          "question": "Wie funktionieren Credits?",
+          "answer": "Jedes Ausmalbild, das du generierst, kostet 5 Credits. Deine Credits werden mit deinem Abo monatlich aufgefüllt, und bei manchen Plänen können ungenutzte Credits übertragen werden. Du kannst auch Credit-Pakete kaufen, wenn du einen extra Kreativ-Boost brauchst!"
+        }
+      }
+    }
+  },
+  "gallery": {
+    "pageTitle": "Galerie kostenloser Ausmalbilder – Chunky Crayon",
+    "pageDescription": "Stöbere in unserer kostenlosen Sammlung druckbarer Ausmalbilder. Tiere, Drachen, Einhörner, Prinzessinnen und mehr. Täglich neue Seiten!",
+    "heroTitle": "Kostenlose Ausmalbilder",
+    "heroSubtitle": "Entdecke tausende kostenlose, druckbare Ausmalbilder. Von süßen Tieren bis zu magischen Drachen – finde die perfekte Seite zum Online-Ausmalen oder Ausdrucken für zu Hause.",
+    "browseByCategory": "Nach Kategorie stöbern",
+    "browseByDifficulty": "Nach Schwierigkeitsgrad stöbern",
+    "browseByAge": "Nach Altersgruppe stöbern",
+    "dailyPage": "Heutiges Ausmalbild des Tages",
+    "viewAllDaily": "Alle Tagesseiten ansehen",
+    "communityCreations": "Community-Kreationen",
+    "viewAllCommunity": "Alle Community-Seiten ansehen",
+    "startColoring": "Losmalen",
+    "stats": {
+      "totalPages": "Seiten insgesamt",
+      "communityPages": "Community-Seiten",
+      "dailyPages": "Tagesseiten",
+      "pagesSuffix": "Seiten"
+    },
+    "ageGroups": {
+      "toddlers": {
+        "title": "Für Kleinkinder",
+        "ages": "2–4 Jahre",
+        "description": "Einfache Formen, dicke Linien"
+      },
+      "kids": {
+        "title": "Für Kinder",
+        "ages": "4–12 Jahre",
+        "description": "Spaßig und spannend"
+      },
+      "teens": {
+        "title": "Für Teens",
+        "ages": "13–17 Jahre",
+        "description": "Cool, mit vielen Details"
+      },
+      "adults": {
+        "title": "Für Erwachsene",
+        "ages": "18+",
+        "description": "Entspannend & filigran"
+      }
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "Anfänger",
+        "description": "Einfache Formen, dicke Linien"
+      },
+      "intermediate": {
+        "title": "Mittel",
+        "description": "Mäßig viele Details"
+      },
+      "advanced": {
+        "title": "Fortgeschritten",
+        "description": "Detailreiche Motive"
+      },
+      "expert": {
+        "title": "Profi",
+        "description": "Filigrane Muster"
+      }
+    },
+    "categories": {
+      "animals": "Tiere",
+      "fantasy": "Fantasie & Magie",
+      "dragons": "Drachen",
+      "unicorns": "Einhörner",
+      "princesses": "Prinzessinnen & Königreich",
+      "superheroes": "Superhelden",
+      "dinosaurs": "Dinosaurier",
+      "space": "Weltraum & Astronauten",
+      "underwater": "Unterwasser & Ozean",
+      "vehicles": "Fahrzeuge & Transport",
+      "pirates": "Piraten",
+      "nature": "Natur & Blumen",
+      "holidays": "Feiertage & Jahreszeiten",
+      "robots": "Roboter & Technik",
+      "food": "Essen & Süßes"
+    },
+    "seo": {
+      "aboutTitle": "Über unsere kostenlosen Ausmalbilder",
+      "aboutParagraph1": "Willkommen in der kostenlosen Ausmalbild-Galerie von Chunky Crayon! Wir bieten eine wachsende Sammlung druckbarer Ausmalbilder – perfekt für Kinder und Erwachsene. Unsere KI-Tools helfen dabei, einzigartige, spannende Ausmalbilder in vielen Kategorien zu erstellen.",
+      "aboutParagraph2": "Jeden Tag fügen wir ein neues Ausmalbild des Tages hinzu, das du online mit unseren digitalen Werkzeugen ausmalen oder herunterladen und klassisch ausdrucken kannst. Auch unsere Community teilt kreative Ideen – so wird die Sammlung noch vielfältiger.",
+      "aboutParagraph3": "Stöbere nach Kategorien und finde genau das Richtige – ob süße Tier-Ausmalbilder, Fantasywesen wie Drachen und Einhörner oder saisonale Motive. Jede Seite ist mit klaren Linien gestaltet, perfekt zum Ausmalen."
+    },
+    "jumpToNav": {
+      "jumpTo": "Springe zu:",
+      "selectSection": "Bereich wählen",
+      "backToTop": "Nach oben",
+      "filters": "Filter",
+      "gallery": "Galerie",
+      "related": "Ähnliches",
+      "about": "Über"
+    },
+    "difficultyFilter": {
+      "all": "Alle",
+      "beginner": "Anfänger",
+      "intermediate": "Mittel",
+      "advanced": "Fortgeschritten",
+      "expert": "Profi",
+      "easy": "Leicht",
+      "medium": "Mittel",
+      "hard": "Schwer",
+      "filterByDifficulty": "Nach Schwierigkeitsgrad filtern"
+    },
+    "categoryPage": {
+      "coloringPages": "{category} Ausmalbilder",
+      "relatedCategories": "Ähnliche Kategorien",
+      "noPagesYet": "Noch keine {category}-Seiten",
+      "beTheFirst": "Sei die Erste/der Erste und erstelle ein {category}-Ausmalbild!",
+      "createAPage": "Seite erstellen",
+      "freeColoringPages": "Kostenlose {category} Ausmalbilder",
+      "lookingFor": "Du suchst das perfekte {category}-Ausmalbild? Dann bist du hier genau richtig! Unsere Sammlung bietet viele {category}-Motive – für Kinder und Erwachsene.",
+      "eachPageDescription": "Jedes Ausmalbild kannst du online mit unseren digitalen Tools ausmalen oder herunterladen und ausdrucken – ganz klassisch mit Wachsmalern, Buntstiften oder Filzstiften. Unsere KI-Designs haben klare Linien und liebevolle Details – so macht Ausmalen Spaß und entspannt.",
+      "popularThemes": "Beliebte {category}-Themen",
+      "includesPopular": "In unserer Kategorie {category} findest du beliebte Suchen wie:"
+    },
+    "categoryDescriptions": {
+      "animals": "Süße und wilde Tier-Ausmalbilder für Kinder und Erwachsene",
+      "fantasy": "Magische Fantasiewesen und verzauberte Welten zum Ausmalen",
+      "dragons": "Epische Drachen-Ausmalbilder mit feurigen Details",
+      "unicorns": "Magische Einhorn-Ausmalbilder mit Regenbögen und Glitzer",
+      "princesses": "Prinzessinnen- und Schloss-Ausmalbilder",
+      "superheroes": "Actionreiche Superhelden-Ausmalbilder",
+      "dinosaurs": "Ausmalbilder mit Urzeit-Dinosauriern",
+      "space": "Weltraumabenteuer und Astronauten-Ausmalbilder",
+      "underwater": "Meeresbewohner und Unterwasserwelten zum Ausmalen",
+      "vehicles": "Autos, LKWs, Flugzeuge und mehr Fahrzeug-Ausmalbilder",
+      "pirates": "Freche Piratenabenteuer-Ausmalbilder",
+      "nature": "Wunderschöne Natur- und Blumen-Ausmalbilder",
+      "holidays": "Festliche Feiertags- und Jahreszeiten-Ausmalbilder",
+      "robots": "Futuristische Roboter- und Technik-Ausmalbilder",
+      "food": "Leckere Essen- und Nascherei-Ausmalbilder"
+    },
+    "infiniteScroll": {
+      "allPagesViewed": "Du hast alle Ausmalbilder gesehen!"
+    },
+    "ageGroupPages": {
+      "common": {
+        "moreAgeGroups": "Mehr Altersgruppen",
+        "createSimplePages": "Einfache Seiten erstellen",
+        "createYourOwn": "Eigene erstellen",
+        "createYourDesign": "Dein Motiv erstellen"
+      },
+      "toddlers": {
+        "pageTitle": "Ausmalbilder für Kleinkinder",
+        "featuredSection": "Einfache Ausmalbilder für Kleinkinder",
+        "categoriesSection": "Kategorien für Kleinkinder",
+        "heroDescription": "Einfache Seiten für kleine Hände! Große Formen, kräftige Umrisse und bekannte Motive – perfekt für Kinder von 2–4 Jahren. Ideal zum Üben der Feinmotorik.",
+        "whyTitle": "Perfekt für kleine Künstler",
+        "why1Title": "Dicke, klare Linien",
+        "why1Description": "Kräftige Umrisse machen es kleinen Händen leicht, in den Linien zu bleiben!",
+        "why2Title": "Einfache Formen",
+        "why2Description": "Grundformen und bekannte Dinge, die Kleinkinder erkennen und lieben.",
+        "why3Title": "Farben lernen",
+        "why3Description": "Super zum Farbenlernen und für ganz viel Kreativität!",
+        "seoTitle": "Kostenlose Ausmalbilder für Kleinkinder",
+        "seoParagraph1": "Möchtest du dein Kleinkind ans Ausmalen heranführen? Unsere Sammlung einfacher Ausmalbilder ist perfekt für Kinder von 2–4 Jahren. Jedes Motiv hat große, leicht ausmalbare Flächen und kräftige Linien – das unterstützt die Feinmotorik.",
+        "seoParagraph2": "Unsere Kleinkinder-Ausmalbilder zeigen bekannte Dinge, die kleine Kinder lieben: süße Tiere, leckeres Essen, bunte Fahrzeuge und schöne Naturmotive. Die einfachen Designs verhindern Frust und fördern die Kreativität.",
+        "seoParagraph3": "Alle Seiten kannst du auf normalem A4-Papier ausdrucken oder online mit unseren leicht bedienbaren digitalen Tools ausmalen. Perfekt für ruhige Momente, Regentage oder Lernzeiten zu Hause oder in der Kita.",
+        "benefitsTitle": "Vorteile vom Ausmalen für Kleinkinder",
+        "benefitsDescription": "Ausmalen hilft Kleinkindern bei wichtigen Fähigkeiten wie: Hand-Auge-Koordination, Farberkennung, Griffkraft, Fokus und Konzentration sowie kreativem Ausdruck. Starte mit unseren einfachsten Motiven und sieh zu, wie dein Kind wächst!"
+      },
+      "kids": {
+        "pageTitle": "Ausmalbilder für Kinder",
+        "featuredSection": "Beliebte Ausmalbilder für Kinder",
+        "categoriesSection": "Kinder-Kategorien entdecken",
+        "heroDescription": "Spaßige und spannende Ausmalbilder für Kinder von 4–12 Jahren! Dinosaurier, Einhörner, Superhelden und mehr. Einfach online ausmalen oder zu Hause ausdrucken – für endlosen Kreativspaß.",
+        "whyTitle": "Warum Kinder Chunky Crayon lieben",
+        "why1Title": "Alles erfinden",
+        "why1Description": "Kinder beschreiben ihre verrücktesten Ideen – und zack, wird daraus ein Ausmalbild!",
+        "why2Title": "Drucken & ausmalen",
+        "why2Description": "Lade hochwertige PDFs herunter – fertig zum Drucken auf A4.",
+        "why3Title": "Online ausmalen",
+        "why3Description": "Nutze unsere digitalen Malwerkzeuge direkt im Browser!",
+        "seoTitle": "Kostenlose Ausmalbilder für Kinder",
+        "seoParagraph1": "Suchst du die perfekten Ausmalbilder für deine Kinder? Chunky Crayon bietet eine riesige Sammlung kostenloser, druckbarer Ausmalbilder – speziell für Kinder von 4–12 Jahren. Von süßen Tieren bis zu actionreichen Superhelden ist für alle kleinen Künstler etwas dabei.",
+        "seoParagraph2": "Unsere Ausmalbilder haben klare, kräftige Linien – ideal für kleine Hände. Egal ob Wachsmaler, Buntstifte oder Filzstifte: Die Seiten sind so gestaltet, dass sie toll aussehen. Oder nutze unsere Online-Ausmaltools für kreativen Bildschirmspaß.",
+        "seoParagraph3": "Und das Beste: Kinder können ihre eigenen Ausmalbilder erstellen, indem sie einfach beschreiben, was sie ausmalen möchten. Ein Drache beim Fußball? Ein Einhorn im Weltraum? Was auch immer sie sich vorstellen – in Sekunden wird daraus ein echtes Ausmalbild!",
+        "popularTitle": "Beliebte Kategorien für Kinder",
+        "popularDescription": "Zu unseren beliebtesten Kinder-Kategorien gehören: Dinosaurier-Ausmalbilder, Einhorn-Ausmalbilder, Superhelden-Ausmalbilder, Tier-Ausmalbilder, Weltraum- und Raketen-Ausmalbilder sowie Fahrzeug-Ausmalbilder. Jede Kategorie steckt voller altersgerechter Motive."
+      },
+      "teens": {
+        "pageTitle": "Ausmalbilder für Teens",
+        "featuredSection": "Beliebte Ausmalbilder für Teens",
+        "categoriesSection": "Teens-Kategorien",
+        "heroDescription": "Coole, detailreiche Ausmalbilder für Jugendliche! Von Anime und Gaming bis Fantasy und Sci‑Fi: Zeig deine Kreativität mit Motiven, die zu deinem Style passen. Perfekt zum Abschalten und kreativ sein.",
+        "whyTitle": "Für kreative Teens gemacht",
+        "why1Title": "Coole Themen",
+        "why1Description": "Anime-, Gaming-, Fantasy- und Sci‑Fi-Designs, die zu deinen Interessen passen!",
+        "why2Title": "Viele Details",
+        "why2Description": "Filigrane Motive, die dich fordern und fertig richtig beeindruckend aussehen.",
+        "why3Title": "Stress abbauen",
+        "why3Description": "Leg eine Pause ein und entspann dich beim kreativen Ausmalen.",
+        "seoTitle": "Kostenlose Ausmalbilder für Jugendliche",
+        "seoParagraph1": "Suchst du Ausmalbilder, die nicht „zu kindisch“ sind? Unsere Teen-Sammlung bietet coole, detailreiche Motive – perfekt für 13–17 Jahre. Von Anime-Figuren und Gaming-Szenen bis zu Fantasywelten und abstrakten Mustern ist für jeden Stil etwas dabei.",
+        "seoParagraph2": "Das sind keine Ausmalbilder für kleine Geschwister. Unsere Teen-Designs haben viele Details, spannende Kompositionen und Themen, die Teens wirklich feiern. Perfekt für kreativen Ausdruck, zum Stressabbau in Lernpausen oder einfach zum Chillen.",
+        "seoParagraph3": "Erstelle deine eigenen Ausmalbilder, indem du genau beschreibst, was du möchtest. Ein Drache, der im Weltraum gegen einen Roboter kämpft? Ein Anime-Porträt? Ein detailreiches Mandala mit deinen Lieblingssymbolen? Beschreib’s einfach – unsere KI macht es lebendig!",
+        "popularTitle": "Beliebte Teen-Themen",
+        "popularDescription": "Zu unseren beliebtesten Kategorien für Teens gehören: Anime- und Manga-Ausmalbilder, Fantasywesen-Ausmalbilder, Superhelden-Action-Szenen, Gaming-inspirierte Motive, Weltraum- und Sci‑Fi-Designs sowie detailreiche Musterseiten. Jede Kategorie bietet spannende, anspruchsvolle Motive."
+      },
+      "adults": {
+        "pageTitle": "Ausmalbilder für Erwachsene",
+        "featuredSection": "Beliebte Ausmalbilder für Erwachsene",
+        "categoriesSection": "Erwachsenen-Kategorien",
+        "heroDescription": "Entdecke die wohltuende Wirkung des Ausmalens für Erwachsene! Unsere Sammlung bietet filigrane Mandalas, schöne Naturmotive und detailreiche Muster – für Entspannung und Achtsamkeit. Perfekt zum Abschalten nach einem langen Tag.",
+        "whyTitle": "Vorteile vom Ausmalen für Erwachsene",
+        "why1Title": "Stress abbauen",
+        "why1Description": "Ausmalen aktiviert Entspannung, senkt Anspannung und bringt Ruhe.",
+        "why2Title": "Achtsamkeit",
+        "why2Description": "Bleib im Moment und genieße eine meditative Aktivität – ganz ohne Bildschirm.",
+        "why3Title": "Kreativität",
+        "why3Description": "Drück dich über Farben aus und erschaffe wunderschöne Kunstwerke.",
+        "seoTitle": "Kostenlose Ausmalbilder für Erwachsene",
+        "seoParagraph1": "Ausmalen für Erwachsene ist eine beliebte Wohlfühl-Aktivität – und das aus gutem Grund. Studien zeigen, dass Ausmalen Angst reduzieren, die Konzentration verbessern und eine beruhigende Pause vom Bildschirmalltag sein kann. Unsere Sammlung bietet schöne, detailreiche Motive – perfekt für Erwachsene.",
+        "seoParagraph2": "Von detailreichen Mandalas für mehr Achtsamkeit bis zu ruhigen Naturmotiven und eleganten Mustern: Jede Seite ist für stundenlange, entspannte Kreativität gemacht. Drucke auf gutem Papier und nutze deine Lieblingsstifte – Buntstifte, Filzstifte oder Gelstifte funktionieren wunderbar.",
+        "seoParagraph3": "Du willst etwas Einzigartiges? Erstelle deine eigenen Ausmalbilder! Beschreibe deine perfekte Entspannungsszene – einen Zen-Garten, ein Jugendstil-Muster oder eine detailreiche botanische Illustration – und unsere KI bringt deine Idee zum Leben.",
+        "popularTitle": "Beliebte Ausmal-Themen für Erwachsene",
+        "popularDescription": "Entdecke unsere beliebtesten Erwachsenen-Kategorien: Mandala-Ausmalbilder zum Meditieren, filigrane Natur- und Pflanzenmotive, geometrische Muster, Art-déco- und Jugendstil-Designs, zentangle-inspirierte Seiten und ruhige Landschaften. Jede davon bietet einen eigenen Weg zur Entspannung."
+      }
+    }
+  },
+  "pricing": {
+    "pageTitle": "Preise – Chunky Crayon",
+    "heroTitle": "Pläne für jedes Malabenteuer!",
+    "heroSubtitle": "Egal ob du Elternteil, kleiner Künstler oder erwachsen und malbegeistert bist – es gibt einen Chunky Crayon Plan für dich. Kein Konto nötig, um loszulegen!",
+    "monthly": "Monatlich",
+    "annual": "Jährlich (15% sparen)",
+    "mostPopular": "Am beliebtesten",
+    "buyNow": "Jetzt kaufen",
+    "noCommitment": "Keine Bindung. Jederzeit kündbar.",
+    "perMonth": "/Monat",
+    "creditsPerMonth": "Credits/Monat",
+    "plans": {
+      "crayon": {
+        "name": "Crayon Plan",
+        "tagline": "Starte dein Malabenteuer",
+        "audience": "Ideal für Gelegenheitsmaler & kleine Künstler"
+      },
+      "rainbow": {
+        "name": "Rainbow Plan",
+        "tagline": "Spaß für die ganze Familie",
+        "audience": "Super für kreative Familien und Geschwister"
+      },
+      "masterpiece": {
+        "name": "Masterpiece Plan",
+        "tagline": "Für Mal-Fans",
+        "audience": "Perfekt für Erwachsene & Vielmaler"
+      },
+      "studio": {
+        "name": "Studio Plan",
+        "tagline": "Für Super-Kreative & kleine Unternehmen",
+        "audience": "Am besten für Studios, Lehrkräfte & Vielnutzer"
+      }
+    },
+    "features": {
+      "textPrompts": "Malvorlagen aus Textideen erstellen",
+      "wordsNumbers": "Malvorlagen mit Wörtern, Namen & Zahlen erstellen",
+      "adjustments": "Farbe, Kontrast & Helligkeit anpassen",
+      "photoToColoring": "Fotos in Malvorlagen verwandeln",
+      "allCrayonFeatures": "Alle Funktionen aus dem Crayon Plan",
+      "advancedEditing": "Erweiterte Bearbeitungsfunktionen",
+      "earlyAccess": "Früher Zugriff auf neue Modelle & Funktionen",
+      "rollover1Month": "Credits werden übernommen (bis zu 1 Monat)",
+      "allRainbowFeatures": "Alle Funktionen aus dem Rainbow Plan",
+      "bulkGeneration": "Stapelerstellung",
+      "commercialUse": "Kommerzielle Nutzung",
+      "rollover2Months": "Credits werden übernommen (bis zu 2 Monate)",
+      "allMasterpieceFeatures": "Alle Funktionen aus dem Masterpiece Plan",
+      "rollover3Months": "Credits werden übernommen (bis zu 3 Monate)"
+    },
+    "creditPacks": {
+      "title": "Brauchst du extra Credits?",
+      "pack100": "100-Credits-Paket",
+      "pack500": "500-Credits-Paket",
+      "pack1000": "1.000-Credits-Paket"
+    },
+    "faq": {
+      "title": "Häufige Fragen",
+      "cancelAnytime": {
+        "question": "Kann ich jederzeit kündigen?",
+        "answer": "Ja! Du kannst dein Abo jederzeit kündigen – ganz ohne Nachfragen."
+      },
+      "rollover": {
+        "question": "Werden Credits übernommen?",
+        "answer": "Bei manchen Plänen werden ungenutzte Credits übernommen. Details findest du im Plan."
+      },
+      "audience": {
+        "question": "Ist das für Kinder oder Erwachsene?",
+        "answer": "Für beide! Chunky Crayon ist perfekt für Familien, Kinder und Erwachsene, die gern ausmalen."
+      },
+      "gettingStarted": {
+        "question": "Wie lege ich los?",
+        "answer": "Einfach einen Plan wählen und sofort Malvorlagen erstellen!"
+      }
+    }
+  },
+  "blog": {
+    "title": "Der Chunky Crayon Blog",
+    "subtitle": "Tipps, Ideen und Inspiration für kreative Malspaß-Aktionen",
+    "allPosts": "Alle Beiträge",
+    "byAuthor": "Von {author}",
+    "categories": {
+      "colouringTips": "Mal-Tipps",
+      "mindfulnessRelaxation": "Achtsamkeit & Entspannung",
+      "artEducation": "Kunst & Lernen",
+      "activitiesForKids": "Aktivitäten für Kinder",
+      "seasonalHolidays": "Jahreszeiten & Feiertage"
+    }
+  },
+  "coloringPage": {
+    "title": "Ausmalbild",
+    "defaultDescription": "Gratis Ausmalbild zum Ausdrucken von Chunky Crayon",
+    "progress": {
+      "colored": "ausgemalt",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "Toller Start!",
+        "50": "Halb geschafft!",
+        "75": "Fast fertig!",
+        "100": "Wahnsinn!"
+      }
+    },
+    "sidebar": {
+      "colors": "Farben",
+      "tools": "Werkzeuge",
+      "size": "Größe",
+      "history": "Verlauf",
+      "zoom": "Zoom",
+      "actions": "Aktionen"
+    },
+    "tools": {
+      "pan": "Verschieben",
+      "fill": "Füllen",
+      "brush": "Pinsel",
+      "sticker": "Sticker",
+      "magicReveal": "Magisch enthüllen",
+      "magicAuto": "Magie-Auto",
+      "magicBrush": "Magie-Pinsel",
+      "magicFill": "Magie-Füllen",
+      "autoColor": "Auto ausmalen",
+      "magic": "Magie"
+    },
+    "brushTypes": {
+      "crayon": "Wachsmalstift",
+      "marker": "Filzstift",
+      "eraser": "Radierer",
+      "glitter": "Glitzer",
+      "sparkle": "Funkeln",
+      "rainbow": "Regenbogen",
+      "glow": "Leuchten",
+      "neon": "Neon"
+    },
+    "brushSizes": {
+      "small": "Fein",
+      "medium": "Normal",
+      "large": "Chunky"
+    },
+    "fillPatterns": {
+      "solid": "Einfarbig",
+      "dots": "Punkte",
+      "stripes": "Streifen",
+      "diagonal": "Diagonal",
+      "checkerboard": "Karo",
+      "hearts": "Herzen",
+      "stars": "Sterne",
+      "zigzag": "Zickzack"
+    },
+    "actions": {
+      "save": "Speichern",
+      "download": "Herunterladen",
+      "share": "Teilen",
+      "print": "Drucken",
+      "preparing": "Wird vorbereitet...",
+      "doneSharing": "Geteilt",
+      "colorAgain": "Nochmal ausmalen",
+      "startOver": "Neu starten"
+    },
+    "toolbar": {
+      "expand": "Werkzeugleiste öffnen",
+      "collapse": "Werkzeugleiste schließen",
+      "moreTools": "Mehr Werkzeuge",
+      "less": "Weniger"
+    },
+    "undoRedo": {
+      "undo": "Rückgängig",
+      "undoShortcut": "Rückgängig (Strg+Z)",
+      "redo": "Wiederholen",
+      "redoShortcut": "Wiederholen (Strg+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "Farbe {color} auswählen",
+      "magicToolsMessage": "Bei Magie-Werkzeugen werden Farben automatisch gewählt"
+    },
+    "patternSelector": {
+      "label": "Muster:"
+    },
+    "zoomControls": {
+      "zoomLevel": "Zoomstufe: {level}%",
+      "zoomOut": "Rauszoomen",
+      "zoomOutAria": "Rauszoomen (mehr sehen)",
+      "zoomIn": "Reinzoomen",
+      "zoomInAria": "Reinzoomen (näher dran)",
+      "pan": "Bewegen",
+      "panAria": "Im Bild bewegen",
+      "reset": "Ganzes Bild sehen",
+      "resetAria": "Zurück zur Gesamtansicht"
+    },
+    "muteToggle": {
+      "mute": "Töne stumm",
+      "unmute": "Töne an",
+      "turnOn": "Töne einschalten",
+      "turnOff": "Töne ausschalten"
+    }
+  },
+  "shareModal": {
+    "title": "Kunstwerk teilen",
+    "privacyNote": "Jede Person mit diesem Link kann dieses Kunstwerk sehen. Es werden keine persönlichen Daten geteilt.",
+    "expiresIn": "Link läuft ab in:",
+    "expiration": {
+      "7days": "7 Tage",
+      "30days": "30 Tage",
+      "never": "Läuft nie ab"
+    },
+    "createLink": "Teilen-Link erstellen",
+    "creating": "Teilen-Link wird erstellt...",
+    "success": {
+      "title": "Link erstellt!",
+      "subtitle": "Teile diesen Link mit Familie und Freunden"
+    },
+    "done": "Fertig"
+  },
+  "adultGate": {
+    "title": "Bist du erwachsen?",
+    "subtitle": "Dieser Bereich ist für Eltern und Erziehungsberechtigte",
+    "instructions": "Bitte löse diese einfache Rechenaufgabe, um weiterzumachen:",
+    "placeholder": "Antwort eingeben",
+    "submit": "Weiter",
+    "error": "Das stimmt noch nicht ganz. Versuch’s nochmal!",
+    "cancel": "Zurück"
+  },
+  "saveToGallery": {
+    "idle": "In Galerie speichern",
+    "saving": "Speichert...",
+    "saved": "Gespeichert!",
+    "tryAgain": "Nochmal versuchen",
+    "errors": {
+      "captureArtwork": "Dein Bild konnte nicht gespeichert werden",
+      "generic": "Oh nein! Etwas ist schiefgelaufen. Bitte versuch es nochmal."
+    }
+  },
+  "shareButton": {
+    "idle": "Teilen",
+    "preparing": "Wird vorbereitet...",
+    "doneSharing": "Geteilt!"
+  },
+  "colors": {
+    "primary": {
+      "cherryRed": "Kirschrot",
+      "sunsetOrange": "Sonnenuntergangsorange",
+      "sunshineYellow": "Sonnengelb",
+      "grassGreen": "Grasgrün",
+      "skyBlue": "Himmelblau",
+      "grapePurple": "Traubenlila",
+      "bubblegumPink": "Kaugummipink",
+      "chocolateBrown": "Schokobraun"
+    },
+    "secondary": {
+      "coral": "Koralle",
+      "mint": "Minze",
+      "lavender": "Lavendel",
+      "peach": "Pfirsich",
+      "navy": "Navyblau",
+      "forest": "Waldgrün",
+      "gold": "Gold",
+      "rose": "Rosa"
+    },
+    "essentials": {
+      "black": "Schwarz",
+      "white": "Weiß",
+      "gray": "Grau",
+      "skinTone": "Hautfarbe"
+    },
+    "skinTones": {
+      "light": "Hell",
+      "mediumLight": "Mittelhell",
+      "medium": "Mittel",
+      "mediumDark": "Mitteldunkel",
+      "dark": "Dunkel",
+      "deep": "Sehr dunkel"
+    }
+  },
+  "stickers": {
+    "categories": {
+      "stars": "Sterne",
+      "hearts": "Herzen",
+      "shapes": "Formen",
+      "nature": "Natur",
+      "emojis": "Emojis",
+      "fun": "Spaß"
+    },
+    "items": {
+      "yellowStar": "Gelber Stern",
+      "sparkleStar": "Glitzerstern",
+      "glowingStar": "Leuchtender Stern",
+      "shootingStar": "Sternschnuppe",
+      "redHeart": "Rotes Herz",
+      "pinkHeart": "Pinky Herz",
+      "sparkleHeart": "Glitzerherz",
+      "rainbowHeart": "Regenbogenherz",
+      "circle": "Kreis",
+      "square": "Quadrat",
+      "triangle": "Dreieck",
+      "diamond": "Raute",
+      "flower": "Blume",
+      "sun": "Sonne",
+      "rainbow": "Regenbogen",
+      "cloud": "Wolke",
+      "butterfly": "Schmetterling",
+      "leaf": "Blatt",
+      "smile": "Lächeln",
+      "loveEyes": "Herzaugen",
+      "cool": "Cool",
+      "wink": "Zwinkern",
+      "crown": "Krone",
+      "unicorn": "Einhorn",
+      "rocket": "Rakete",
+      "balloon": "Ballon",
+      "gift": "Geschenk",
+      "cake": "Kuchen"
+    }
+  },
+  "stickerBook": {
+    "title": "Stickerbuch",
+    "subtitle": "Sammle Sticker durchs Ausmalen!",
+    "pageTitle": "Stickerbuch – Chunky Crayon",
+    "pageDescription": "Sieh dir deine Sticker-Sammlung an und entdecke, welche Sticker du freischalten kannst!",
+    "loadError": "Sticker konnten nicht geladen werden. Bitte versuch es noch einmal.",
+    "filters": {
+      "all": "Alle",
+      "milestones": "Meilensteine",
+      "categories": "Kategorien",
+      "explore": "Entdecken",
+      "special": "Spezial"
+    },
+    "emptyState": "In dieser Kategorie gibt es noch keine Sticker.",
+    "countFormat": "{count}/{total}",
+    "newBadge": "{count} NEU",
+    "progress": {
+      "label": "Sticker-Sammlung",
+      "complete": "Wow! Alle Sticker gesammelt!",
+      "almostThere": "Fast geschafft! Du machst das super!",
+      "halfway": "Halbzeit! Weiter so!",
+      "greatStart": "Toller Start!"
+    },
+    "detail": {
+      "lockedName": "???",
+      "lockedDescription": "Dieser Sticker ist noch gesperrt!",
+      "unlockedOn": "Freigeschaltet am {date}",
+      "howToUnlock": "So schaltest du ihn frei:",
+      "rarity": {
+        "common": "Häufig",
+        "uncommon": "Ungewöhnlich",
+        "rare": "Selten",
+        "legendary": "Legendär"
+      },
+      "unlockConditions": {
+        "artworkCount": "Speichere {count} Bilder in deiner Galerie",
+        "firstCategory": "Male deine erste {category}-Seite aus",
+        "categoryCount": "Male {count} {category}-Seiten aus",
+        "special": "Entdecke {count} verschiedene Kategorien"
+      }
+    }
+  },
+  "stickerCatalog": {
+    "first-steps": {
+      "name": "Erste Schritte",
+      "description": "Speichere dein allererstes Kunstwerk!",
+      "unlockMessage": "Geschafft! Dein erstes Meisterwerk ist gespeichert!"
+    },
+    "getting-started": {
+      "name": "Los geht’s",
+      "description": "Du bist in Fahrt! Speichere 5 Kunstwerke.",
+      "unlockMessage": "Fünf Kunstwerke! Du wirst zum Künstler!"
+    },
+    "high-five": {
+      "name": "High Five",
+      "description": "Speichere 10 schöne Kunstwerke in deiner Galerie.",
+      "unlockMessage": "High Five! Zehn tolle Kunstwerke!"
+    },
+    "perfect-ten": {
+      "name": "Perfekte Zehn",
+      "description": "Ein echter Künstler! Speichere 25 Kunstwerke.",
+      "unlockMessage": "25 Kunstwerke! Du bist ein Ausmal-Star!"
+    },
+    "super-artist": {
+      "name": "Super-Künstler",
+      "description": "Unglaublich fleißig! Speichere 50 Kunstwerke.",
+      "unlockMessage": "50 Meisterwerke! Du bist ein Super-Künstler!"
+    },
+    "master-creator": {
+      "name": "Meister-Macher",
+      "description": "Legendär! Speichere 75 Kunstwerke.",
+      "unlockMessage": "75 Kunstwerke! Ein echter Meister-Macher!"
+    },
+    "century-club": {
+      "name": "100er-Club",
+      "description": "Das Top-Ziel! Speichere 100 Kunstwerke.",
+      "unlockMessage": "100 Kunstwerke! Willkommen im 100er-Club!"
+    },
+    "animal-friend": {
+      "name": "Tierfreund",
+      "description": "Male dein erstes Tierbild aus!",
+      "unlockMessage": "Du hast einen neuen Tierfreund gefunden!"
+    },
+    "fantasy-dreamer": {
+      "name": "Fantasie-Träumer",
+      "description": "Male dein erstes Fantasiebild aus!",
+      "unlockMessage": "Willkommen in der Welt der Fantasie!"
+    },
+    "space-explorer": {
+      "name": "Weltraum-Entdecker",
+      "description": "Male dein erstes Weltraumbild aus!",
+      "unlockMessage": "3, 2, 1... Start! Weltraum entdeckt!"
+    },
+    "nature-lover": {
+      "name": "Naturfreund",
+      "description": "Male dein erstes Naturbild aus!",
+      "unlockMessage": "Die Natur ist wunderschön – genau wie deine Kunst!"
+    },
+    "vehicle-driver": {
+      "name": "Fahrzeug-Fan",
+      "description": "Male dein erstes Fahrzeugbild aus!",
+      "unlockMessage": "Tuut tuut! Coole Räder!"
+    },
+    "dino-hunter": {
+      "name": "Dino-Entdecker",
+      "description": "Male dein erstes Dinosaurierbild aus!",
+      "unlockMessage": "ROAR! Du hast einen Dino gefunden!"
+    },
+    "ocean-diver": {
+      "name": "Meeres-Taucher",
+      "description": "Male dein erstes Meeresbild aus!",
+      "unlockMessage": "Platsch! Abenteuer unter dem Meer!"
+    },
+    "food-lover": {
+      "name": "Lecker-Schmecker",
+      "description": "Male dein erstes Essensbild aus!",
+      "unlockMessage": "Mmmh! Das sieht lecker aus!"
+    },
+    "sports-star": {
+      "name": "Sport-Star",
+      "description": "Male dein erstes Sportbild aus!",
+      "unlockMessage": "Tor! Du bist ein Sport-Star!"
+    },
+    "holiday-spirit": {
+      "name": "Feiertags-Zauber",
+      "description": "Male dein erstes Feiertagsbild aus!",
+      "unlockMessage": "Juhu! Feiertags-Zauber freigeschaltet!"
+    },
+    "animal-master": {
+      "name": "Tiermeister",
+      "description": "Male 10 Tierbilder aus und werde ein echter Tierexperte!",
+      "unlockMessage": "Du bist der beste Tierfreund!"
+    },
+    "fantasy-master": {
+      "name": "Fantasie-Meister",
+      "description": "Male 10 Fantasiebilder aus und schalte Zauberkräfte frei!",
+      "unlockMessage": "Deine Fantasiekräfte sind legendär!"
+    },
+    "space-master": {
+      "name": "Weltraum-Meister",
+      "description": "Male 10 Weltraumbilder aus und werde Astronaut!",
+      "unlockMessage": "Du bist ein echter Weltraum-Entdecker!"
+    },
+    "category-explorer": {
+      "name": "Kategorie-Entdecker",
+      "description": "Probier was Neues! Male Bilder aus 3 verschiedenen Kategorien aus.",
+      "unlockMessage": "Abwechslung macht Kunst noch bunter!"
+    },
+    "world-traveler": {
+      "name": "Weltentdecker",
+      "description": "Male Bilder aus 5 verschiedenen Kategorien aus!",
+      "unlockMessage": "Du hast alle Ausmal-Welten entdeckt!"
+    }
+  },
+  "stickerSelector": {
+    "title": "Wähle einen Sticker",
+    "close": "Schließen",
+    "selected": "Ausgewählt:",
+    "helpText": "Tippe auf die Malfläche, um deinen Sticker zu platzieren"
+  },
+  "shareArtwork": {
+    "title": "Kunstwerk teilen",
+    "linkCreated": "Link erstellt!",
+    "sharePrompt": "Teile diesen Link mit Familie und Freunden",
+    "privacyNotice": "Jeder mit diesem Link kann das Kunstwerk ansehen. Es werden keine persönlichen Daten geteilt.",
+    "expiresIn": "Link läuft ab in:",
+    "expiration": {
+      "7days": "7 Tage",
+      "30days": "30 Tage",
+      "never": "Läuft nie ab"
+    },
+    "createLink": "Teilen-Link erstellen",
+    "creating": "Teilen-Link wird erstellt...",
+    "close": "Schließen",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "done": "Fertig",
+    "error": "Teilen-Link konnte nicht erstellt werden"
+  },
+  "account": {
+    "profiles": "Profile",
+    "billing": "Zahlung",
+    "settings": "Einstellungen",
+    "myArtwork": "Meine Kunstwerke"
+  },
+  "profiles": {
+    "pageTitle": "Profile verwalten",
+    "pageSubtitle": "Erstelle und verwalte Profile für deine Familie",
+    "editTitle": "Profil bearbeiten",
+    "switcher": {
+      "close": "Profil-Wechsler schließen"
+    },
+    "ageGroups": {
+      "toddler": "Kleinkind",
+      "toddlerDescription": "2–4 Jahre",
+      "child": "Kind",
+      "childDescription": "5–8 Jahre",
+      "tween": "Vor-Teen",
+      "tweenDescription": "9–12 Jahre",
+      "teen": "Teenager",
+      "teenDescription": "13–17 Jahre",
+      "adult": "Erwachsene",
+      "adultDescription": "18+"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "z. B. Emma",
+      "nameRequired": "Bitte gib einen Namen ein",
+      "ageGroup": "Altersgruppe",
+      "avatar": "Avatar",
+      "difficultyLevel": "Schwierigkeitsgrad",
+      "saveChanges": "Änderungen speichern",
+      "saving": "Wird gespeichert...",
+      "cancel": "Abbrechen",
+      "profileUpdated": "Profil aktualisiert!",
+      "profileSwitched": "Profil gewechselt!",
+      "unnamed": "Ohne Namen"
+    },
+    "delete": {
+      "title": "Profil löschen?",
+      "dangerZone": "Gefahrenzone",
+      "warning": "Wenn du dieses Profil löschst, wird es dauerhaft entfernt. Von diesem Profil erstellte Ausmalbilder bleiben in deinem Konto.",
+      "confirmText": "Das Profil wird dauerhaft gelöscht. Von diesem Profil erstellte Ausmalbilder bleiben in deinem Konto.",
+      "deleteProfile": "Profil löschen",
+      "deleting": "Wird gelöscht...",
+      "deleted": "\"{name}\" gelöscht",
+      "coloringPages": "{count, plural, =1 {1 Ausmalbild} other {# Ausmalbilder}}"
+    },
+    "manager": {
+      "aboutProfiles": "Über Profile",
+      "ownCollection": "Jedes Profil hat seine eigene Ausmalbild-Sammlung",
+      "personalizedDifficulty": "Der Schwierigkeitsgrad ist pro Profil individuell",
+      "maxProfiles": "Du kannst bis zu {max} Profile in deinem Konto haben",
+      "switchAnytime": "Wechsle Profile jederzeit im Menü oben",
+      "profilesUsed": "{count} von {max} Profilen genutzt",
+      "colorings": "{count, plural, =1 {1 Ausmalbild} other {# Ausmalbilder}}",
+      "edit": "{name} bearbeiten",
+      "delete": "{name} löschen"
+    },
+    "create": {
+      "title": "Profil erstellen",
+      "subtitle": "Füge deiner Familie einen neuen kleinen Künstler hinzu",
+      "button": "Profil erstellen",
+      "creating": "Wird erstellt...",
+      "success": "Profil erstellt!",
+      "addProfile": "Profil hinzufügen",
+      "maxReached": "Maximale Profile erreicht",
+      "maxReachedDescription": "Du hast das Maximum von {max} Profilen erreicht. Lösche ein vorhandenes Profil, um ein neues hinzuzufügen.",
+      "nameLabel": "Name",
+      "namePlaceholder": "z. B. Emma",
+      "nameError": "Bitte gib einen Namen ein",
+      "ageGroupLabel": "Altersgruppe",
+      "avatarLabel": "Avatar"
+    }
+  },
+  "settings": {
+    "pageTitle": "Einstellungen",
+    "pageSubtitle": "Verwalte deine Kontoeinstellungen",
+    "parentalControls": {
+      "title": "Kindersicherung",
+      "description": "Lege fest, welche Inhalte in der App angezeigt werden"
+    },
+    "communityImages": {
+      "label": "Community-Bilder anzeigen",
+      "description": "Wenn aktiviert, siehst du in der Galerie Ausmalbilder von anderen Nutzer*innen. Wenn deaktiviert, werden nur deine eigenen Werke gezeigt.",
+      "enabled": "Community-Bilder aktiviert",
+      "disabled": "Community-Bilder deaktiviert"
+    },
+    "languagePreference": {
+      "title": "Sprache",
+      "description": "Wähle deine Sprache für die App"
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "Gratis Malspaß täglich!",
+      "subtitle": "Hol dir jeden Tag eine <free>kostenlose</free> Malvorlage in dein Postfach.",
+      "placeholder": "parent@example.com",
+      "join": "Mitmachen",
+      "success": "Geschafft!",
+      "successDescription": "Du bist jetzt in der E-Mail-Liste!",
+      "error": "Etwas ist schiefgelaufen",
+      "errorDescription": "Anmeldung zur E-Mail-Liste fehlgeschlagen. Bitte versuch es noch mal."
+    },
+    "unsubscribe": {
+      "success": "Abgemeldet",
+      "successDescription": "Du wurdest aus unserer Mailingliste entfernt. Schade, dass du gehst!",
+      "invalid": "Ungültiger Link",
+      "invalidDescription": "Dieser Abmeldelink ist ungültig oder abgelaufen."
+    }
+  },
+  "billing": {
+    "pageTitle": "Deine Abrechnung & dein Abo",
+    "pageSubtitle": "Verwalte dein Abo und kaufe extra Credits, um weiter tolle Ausmalbilder zu zaubern.",
+    "currentPlan": "Aktueller Plan",
+    "currentCredits": "Aktuelle Credits: {count}",
+    "renewsOn": "Dein Abo verlängert sich am {date}",
+    "manageSubscription": "Abo verwalten",
+    "noActiveSubscription": "Kein aktives Abo",
+    "noSubscriptionDescription": "Wähle einen Plan, um tolle Ausmalbilder zu erstellen.",
+    "viewPlans": "Pläne ansehen",
+    "buyMoreCredits": "Mehr Credits kaufen",
+    "credits": "{count} Credits",
+    "buyNow": "Jetzt kaufen",
+    "loading": "Wird geladen...",
+    "availablePlans": "Verfügbare Pläne",
+    "changePlan": "Plan wechseln",
+    "currentPlanBadge": "Aktueller Plan",
+    "manageInPortal": "Verwalte dein Abo im Kundenportal",
+    "noCommitment": "Keine Bindung. Jederzeit kündbar.",
+    "perMonth": "/Monat",
+    "noSubscriptionForCredits": "Für den Credit-Kauf ist ein aktives Abo nötig",
+    "noSubscriptionFound": "Kein aktives Abo gefunden",
+    "failedToChangeSubscription": "Abo konnte nicht geändert werden",
+    "failedToCheckout": "Weiterleitung zur Kasse fehlgeschlagen",
+    "failedToPurchaseCredits": "Credits konnten nicht gekauft werden",
+    "failedToOpenPortal": "Kundenportal konnte nicht geöffnet werden"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "signOut": "Abmelden",
+    "continueWithGoogle": "Weiter mit Google",
+    "continueWithApple": "Weiter mit Apple",
+    "signInWithEmail": "Mit E-Mail anmelden",
+    "sendingLink": "Link wird gesendet...",
+    "chooseMethod": "Wähle deine Lieblings-Anmeldemethode",
+    "orContinueWith": "Oder weiter mit",
+    "emailPlaceholder": "name@example.com",
+    "termsAgreement": "Wenn du weitermachst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu."
+  },
+  "errors": {
+    "generic": "Oh nein! Da ist etwas schiefgelaufen. Bitte versuch’s nochmal.",
+    "notFound": "Seite nicht gefunden",
+    "sharedArtworkNotFound": {
+      "title": "Kunstwerk nicht gefunden",
+      "description": "Dieser geteilte Link ist vielleicht abgelaufen oder wurde entfernt. Bitte die Künstlerin oder den Künstler um einen neuen Link!",
+      "cta": "Malvorlagen entdecken"
+    },
+    "unauthorized": "Bitte melde dich an, um weiterzumachen",
+    "stripeLoadFailed": "Stripe konnte nicht geladen werden",
+    "checkoutFailed": "Checkout-Sitzung konnte nicht erstellt werden",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuch’s nochmal.",
+    "redirectFailed": "Weiterleitung zum Checkout fehlgeschlagen"
+  },
+  "breadcrumbs": {
+    "home": "Start",
+    "gallery": "Galerie",
+    "forToddlers": "Für Kleinkinder",
+    "forKids": "Für Kinder",
+    "forTeens": "Für Teenager",
+    "forAdults": "Für Erwachsene",
+    "ariaLabel": "Brotkrümelnavigation"
+  },
+  "jumpToNav": {
+    "jumpToSection": "Zum Abschnitt springen",
+    "backToTop": "Zurück nach oben"
+  },
+  "social": {
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "tiktok": "TikTok",
+    "pinterest": "Pinterest",
+    "x": "X",
+    "threads": "Threads"
+  },
+  "socialShare": {
+    "shareOn": "Teilen auf {platform}",
+    "download": "Kunstwerk herunterladen",
+    "downloadAria": "Dein ausgemaltes Kunstwerk herunterladen",
+    "facebookAria": "Auf Facebook teilen",
+    "xAria": "Auf X (Twitter) teilen",
+    "pinterestAria": "Auf Pinterest pinnen",
+    "whatsappAria": "Auf WhatsApp teilen"
+  },
+  "parentalGate": {
+    "title": "Nur für Erwachsene!",
+    "subtitle": "Löse diese Rechenaufgabe, um weiterzumachen",
+    "description": "Damit wir wissen, dass ein Erwachsener hilft, beantworte bitte diese Frage:",
+    "question": "Was ist {num1} + {num2}?",
+    "placeholder": "Deine Antwort",
+    "submit": "Antwort prüfen",
+    "cancel": "Abbrechen",
+    "error": "Noch nicht ganz! Versuch eine andere...",
+    "incorrect": "Das stimmt nicht. Bitte versuch es nochmal.",
+    "hint": "Frag Mama, Papa oder eine andere Aufsichtsperson um Hilfe!"
+  },
+  "stickerReward": {
+    "congratulations": "Glückwunsch!",
+    "youEarned": "Du hast einen Sticker verdient!",
+    "stickerName": "{name}",
+    "tapToContinue": "Tippe, um weiterzumachen",
+    "addedToBook": "In dein Stickerbuch gelegt!",
+    "viewStickerBook": "Stickerbuch ansehen",
+    "keepColoring": "Weiter ausmalen",
+    "previousSticker": "Vorheriger Sticker",
+    "nextSticker": "Nächster Sticker",
+    "newSticker": "Neuer Sticker!",
+    "newStickers": "Neue Sticker!",
+    "ofCount": "{current} von {total}",
+    "addToStickerBook": "Ins Stickerbuch legen",
+    "goToSticker": "Zu Sticker {number} gehen",
+    "rarity": {
+      "common": "Gewöhnlich",
+      "uncommon": "Ungewöhnlich",
+      "rare": "Selten",
+      "legendary": "Legendär"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Chunky Crayon – Kreativer Mal- & Lernspaß",
+      "description": "Chunky Crayon ist eine bunte, interaktive App für Kinder und Eltern, mit der ihr einzigartige, persönliche Ausmalbilder und tolle Lern-Arbeitsblätter erstellen könnt. Verwandelt Text-, Sprach- und Bildideen in druckbare Ausmalbilder – oder malt digital in unseren Web-, iOS- und Android-Apps."
+    },
+    "gallery": {
+      "title": "Gratis Ausmalbilder-Galerie – Chunky Crayon",
+      "description": "Stöbere in unserer kostenlosen Sammlung druckbarer Ausmalbilder. Entdecke Tiere, Drachen, Einhörner, Prinzessinnen und mehr. Täglich kommen neue Seiten dazu!"
+    }
+  },
+  "altText": {
+    "mascot": "Colo, das freundliche Buntstift-Maskottchen",
+    "dailyPage": "Tägliche Ausmalseite",
+    "coloringPage": "Ausmalseite",
+    "ogImage": "Chunky Crayon KI-generierte Malbuchseiten"
+  },
+  "metadata": {
+    "keywords": "Ausmalbilder, kreative App für Kinder, personalisierte Ausmalbilder, Lernarbeitsblätter, lustige Lernaktivitäten, Kreativ-App für Kinder, interaktive Mal-App, digitales Ausmalen, druckbare Ausmalbilder"
+  },
+  "myArtwork": {
+    "pageTitle": "Meine Kunstwerke",
+    "pageSubtitle": "Alle deine gespeicherten Malkreationen an einem Ort. Tippe auf ein Bild, um es nochmal auszumalen oder eine neue Version zu machen!",
+    "emptyState": {
+      "title": "Noch keine Kunstwerke gespeichert!",
+      "description": "Leg los mit Malen und speichere deine Werke, dann siehst du sie hier. Deine Kunstwerke bleiben für immer gespeichert!",
+      "cta": "Malvorlagen entdecken"
+    },
+    "grid": {
+      "coloredBy": "Ausgemalt von {name}",
+      "viewArtwork": "Kunstwerk ansehen",
+      "deleteArtwork": "Kunstwerk löschen",
+      "shareArtwork": "Kunstwerk teilen",
+      "shareWithFamily": "Mit der Familie teilen",
+      "colorAgain": "Nochmal ausmalen",
+      "savedArtwork": "Gespeichertes Kunstwerk"
+    },
+    "filters": {
+      "all": "Alle",
+      "recent": "Neu",
+      "favorites": "Favoriten"
+    },
+    "sort": {
+      "newest": "Neueste zuerst",
+      "oldest": "Älteste zuerst"
+    },
+    "stickerCard": {
+      "title": "Stickeralbum",
+      "newBadge": "{count} NEU",
+      "stickersCollected": "{collected} von {total} Stickern gesammelt"
+    },
+    "deleteDialog": {
+      "title": "Kunstwerk löschen?",
+      "description": "Möchtest du dieses Kunstwerk wirklich löschen? Das kann nicht rückgängig gemacht werden!",
+      "confirm": "Ja, löschen",
+      "cancel": "Nein, behalten"
+    }
+  },
+  "time": {
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "daysAgo": "vor {count} Tagen",
+    "lastWeek": "Letzte Woche",
+    "weeksAgo": "vor {count} Wochen",
+    "monthsAgo": "vor {count} Monaten",
+    "justNow": "Gerade eben",
+    "minutesAgo": "vor {count} Minuten",
+    "hoursAgo": "vor {count} Stunden"
+  },
+  "challenges": {
+    "pageTitle": "Wöchentliche Challenges",
+    "pageSubtitle": "Meistere jede Woche lustige Mal-Challenges und verdiene exklusive Sticker und Accessoires für deinen Colo!",
+    "breadcrumbs": {
+      "home": "Start",
+      "account": "Konto",
+      "challenges": "Challenges"
+    },
+    "currentChallenge": {
+      "title": "Challenge dieser Woche"
+    },
+    "noActive": {
+      "title": "Keine aktive Challenge",
+      "description": "Schau bald wieder vorbei für die nächste Wochen-Challenge!"
+    },
+    "history": {
+      "title": "Vergangene Challenges",
+      "completed": "Abgeschlossen",
+      "expired": "Abgelaufen",
+      "progress": "{progress} / {requirement} abgeschlossen"
+    },
+    "reward": {
+      "claimed": "Belohnung abgeholt!",
+      "stickerAdded": "Ein neuer Sticker wurde deinem Stickerbuch hinzugefügt!",
+      "accessoryAdded": "Ein neues Accessoire wurde deinem Colo hinzugefügt!"
+    }
+  },
+  "recentCreations": {
+    "title": "Deine neuesten Kunstwerke",
+    "imageAlt": "Deine Malvorlage",
+    "ctaHighlight": "Gratis starten",
+    "ctaMessage": "damit du deine Kunstwerke für immer behältst und mehr freischaltest!",
+    "ctaButton": "Gratis starten"
+  },
+  "createForm": {
+    "title": "Zauber erschaffen!",
+    "tagline": "Tippen, sprechen oder Foto machen!",
+    "generatingMessage": "In ca. 30 Sekunden fertig!",
+    "inputModes": {
+      "type": "Tippen",
+      "talk": "Sprechen",
+      "photo": "Foto",
+      "ariaLabel": "Eingabemodus auswählen"
+    },
+    "voiceInput": {
+      "startRecording": "Aufnahme starten",
+      "stopRecording": "Aufnahme stoppen",
+      "tapToRecord": "Tippe aufs Mikrofon und sag mir, was du ausmalen willst!",
+      "signInToRecord": "Melde dich an, um aufzunehmen!",
+      "notSupported": "Oh nein! Dein Browser unterstützt keine Sprachaufnahme.",
+      "notSupportedHint": "Probiere Chrome, Safari oder Firefox auf einem Gerät mit Mikrofon.",
+      "tryAgain": "Nochmal versuchen",
+      "listening": "Ich höre zu! Sag mir, was du ausmalen willst!",
+      "allDone": "Fertig? Tippe auf den Button oder ich beende in {countdown}...",
+      "cancel": "Abbrechen",
+      "doneTalking": "Fertig gesprochen",
+      "imDone": "Ich bin fertig!",
+      "gettingMicReady": "Mikrofon wird vorbereitet...",
+      "understanding": "Ich versuche zu verstehen, was du gesagt hast...",
+      "makeMyColoringPage": "🎨 Mach meine Ausmalseite!",
+      "notQuiteRight": "Nicht ganz richtig? Nochmal versuchen",
+      "maxDuration": "Bis zu {seconds} Sekunden",
+      "errors": {
+        "permissionDenied": "Ich konnte nicht auf dein Mikrofon zugreifen. Bitte erlaube den Mikrofonzugriff und versuche es nochmal!",
+        "notSupported": "Oh nein! Dein Browser unterstützt keine Sprachaufnahme. Probiere Chrome oder Safari!",
+        "transcriptionFailed": "Hmm, das habe ich nicht verstanden. Lass es uns nochmal versuchen!",
+        "recordingFailed": "Bei der Aufnahme ist etwas schiefgelaufen. Nochmal versuchen!",
+        "timeout": "Die Aufnahme war zu lang. Versuch eine kürzere Nachricht!"
+      }
+    },
+    "imageInput": {
+      "takePhotoOrUpload": "Mach ein Foto oder lade ein Bild hoch!",
+      "signInToUpload": "Melde dich an, um Bilder hochzuladen!",
+      "camera": "Kamera",
+      "upload": "Hochladen",
+      "takePhoto": "Foto machen",
+      "uploadImage": "Bild hochladen",
+      "dropHere": "Hier ablegen!",
+      "dragAndDrop": "Oder zieh ein Bild hierher",
+      "shareDrawing": "Teile eine Zeichnung oder ein Bild, das du ausmalen möchtest!",
+      "greatPicture": "Tolles Bild! Ist es das, was du willst?",
+      "pickAnother": "Anderes auswählen",
+      "useThis": "Das nehme ich!",
+      "iSee": "Ich sehe:",
+      "makeMyColoringPage": "🎨 Mach meine Ausmalseite!",
+      "notQuiteRight": "Nicht ganz richtig? Nochmal versuchen",
+      "capturing": "Dein Foto wird vorbereitet...",
+      "processing": "Ich schaue mir dein Bild an...",
+      "tryAgain": "Nochmal versuchen",
+      "altImagePreview": "Vorschau des ausgewählten Bildes",
+      "altUploadedImage": "Dein hochgeladenes Bild",
+      "errors": {
+        "fileTooLarge": "Dieses Bild ist zu groß! Nimm eins mit weniger als 10 MB.",
+        "invalidType": "Diesen Dateityp kann ich nicht lesen. Probier ein JPEG-, PNG- oder WebP-Bild!",
+        "processingFailed": "Hmm, dieses Bild konnte ich nicht verstehen. Lass uns ein anderes probieren!",
+        "cameraFailed": "Mit der Kamera ist etwas schiefgelaufen. Lass es uns nochmal versuchen!"
+      }
+    },
+    "placeholder": "z.B. ein Piratenschiff, das durch den Weltraum segelt 🚀",
+    "placeholderGuestLimit": "Du hast deine {maxTries} Gratis-Versuche benutzt! Registriere dich für 15 weitere Credits.",
+    "placeholderNoCreditsSubscribed": "Deine Credits sind aufgebraucht — lade auf oder upgrade deinen Plan!",
+    "placeholderNoCreditsNoSubscription": "Du hast deine Gratis-Credits verbraucht — wähle einen Plan, um weiter zu zaubern!",
+    "placeholderSignIn": "Melde dich an, um magische Ausmalseiten zu erstellen!",
+    "buttonCreate": "Ausmalseite erstellen",
+    "buttonCreateGuest": "Erstellen ({remaining} gratis {remaining, plural, =1 {Versuch} other {Versuche}} übrig)",
+    "buttonSignUp": "Registrieren für 15 Gratis-Credits",
+    "buttonBuyCredits": "Mehr Credits kaufen",
+    "buttonViewPlans": "Pläne ansehen",
+    "buttonGetStarted": "Gratis starten",
+    "subtextGuestLimit": "Du hast den Zauber gesehen! Registriere dich und mach weiter.",
+    "subtextNoCredits": "Keine Credits mehr — lade auf oder upgrade!",
+    "subtextNoCreditsSubscribed": "Mehr Zauber gefällig? Lade auf oder upgrade, damit die Kreativität weitergeht!",
+    "subtextNoCreditsNoSubscription": "Wähle ein Abo, um mehr Kreationen freizuschalten",
+    "subtextFallback": "Du bekommst 15 Gratis-Credits — genug für 3 Seiten!"
+  },
+  "language": {
+    "switchLanguage": "Sprache wechseln",
+    "currentLanguage": "Aktuelle Sprache",
+    "selectLanguage": "Sprache auswählen"
+  }
+}

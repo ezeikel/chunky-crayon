@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 
 type ProgressBarProps = {
@@ -10,14 +11,23 @@ type ProgressBarProps = {
 };
 
 const ProgressBar = ({ current, total, className }: ProgressBarProps) => {
+  const t = useTranslations('stickerBook');
   const percentage = Math.round((current / total) * 100);
+
+  // Get progress message based on percentage
+  const getProgressMessage = () => {
+    if (percentage >= 100) return t('progress.complete');
+    if (percentage >= 75) return t('progress.almostThere');
+    if (percentage >= 50) return t('progress.halfway');
+    return t('progress.greatStart');
+  };
 
   return (
     <div className={cn('w-full', className)}>
       {/* Label */}
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium text-text-secondary">
-          Sticker Collection
+          {t('progress.label')}
         </span>
         <span className="text-sm font-bold text-crayon-orange">
           {current} / {total}
@@ -60,13 +70,7 @@ const ProgressBar = ({ current, total, className }: ProgressBarProps) => {
           transition={{ delay: 1 }}
           className="text-center text-xs text-text-muted mt-1"
         >
-          {percentage >= 100
-            ? 'Amazing! All stickers collected!'
-            : percentage >= 75
-              ? "Almost there! You're doing great!"
-              : percentage >= 50
-                ? 'Halfway there! Keep going!'
-                : 'Great start!'}
+          {getProgressMessage()}
         </motion.p>
       )}
     </div>

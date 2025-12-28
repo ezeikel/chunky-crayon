@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 import type { Sticker, StickerRarity } from '@/lib/stickers';
 
@@ -45,6 +46,35 @@ const StickerCard = ({
   isNew,
   onClick,
 }: StickerCardProps) => {
+  const t = useTranslations('stickerBook');
+  const tCatalog = useTranslations('stickerCatalog');
+
+  // Get translated sticker name
+  const stickerName = tCatalog(`${sticker.id}.name`);
+
+  // Get unlock hint text based on condition type
+  const getUnlockHint = () => {
+    const { type, value, category } = sticker.unlockCondition;
+
+    switch (type) {
+      case 'artwork_count':
+        return t('detail.unlockConditions.artworkCount', { count: value });
+      case 'first_category':
+        return t('detail.unlockConditions.firstCategory', {
+          category: category ?? '',
+        });
+      case 'category_count':
+        return t('detail.unlockConditions.categoryCount', {
+          count: value,
+          category: category ?? '',
+        });
+      case 'special':
+        return t('detail.unlockConditions.special', { count: 3 });
+      default:
+        return '';
+    }
+  };
+
   return (
     <motion.button
       onClick={onClick}
@@ -68,8 +98,8 @@ const StickerCard = ({
       )}
       aria-label={
         isUnlocked
-          ? `View ${sticker.name} sticker`
-          : `Locked sticker: ${sticker.name}`
+          ? `View ${stickerName} sticker`
+          : `Locked sticker: ${stickerName}`
       }
     >
       {/* Sticker Image or Locked Placeholder */}
@@ -77,7 +107,7 @@ const StickerCard = ({
         {isUnlocked ? (
           <Image
             src={sticker.imageUrl}
-            alt={sticker.name}
+            alt={stickerName}
             fill
             className="object-contain p-1"
           />
@@ -86,14 +116,7 @@ const StickerCard = ({
           <div className="flex flex-col items-center justify-center gap-1">
             <div className="text-3xl text-gray-300">?</div>
             <span className="text-[10px] text-gray-400 text-center px-1 line-clamp-2">
-              {/* Show hint based on unlock condition */}
-              {sticker.unlockCondition.type === 'artwork_count' &&
-                `Save ${sticker.unlockCondition.value} artworks`}
-              {sticker.unlockCondition.type === 'first_category' &&
-                `Color a ${sticker.unlockCondition.category} page`}
-              {sticker.unlockCondition.type === 'category_count' &&
-                `Color ${sticker.unlockCondition.value} ${sticker.unlockCondition.category} pages`}
-              {sticker.unlockCondition.type === 'special' && 'Keep exploring!'}
+              {getUnlockHint()}
             </span>
           </div>
         )}
@@ -111,7 +134,7 @@ const StickerCard = ({
             'shadow-md animate-pulse',
           )}
         >
-          NEW!
+          {t('newBadge', { count: 1 }).replace('1 ', '')}
         </motion.div>
       )}
 

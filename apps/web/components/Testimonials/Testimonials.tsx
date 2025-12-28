@@ -4,11 +4,12 @@ import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from '@fortawesome/pro-solid-svg-icons';
 import { faStar, faSparkles } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 import {
-  TESTIMONIALS,
+  TESTIMONIAL_META,
   SOCIAL_PROOF_STATS,
-  type Testimonial,
+  type TestimonialMeta,
 } from '@/constants';
 import { FadeIn, StaggerChildren, StaggerItem } from '@/components/motion';
 
@@ -43,7 +44,19 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
+const TestimonialCard = ({
+  testimonial,
+  name,
+  role,
+  quote,
+  avatar,
+}: {
+  testimonial: TestimonialMeta;
+  name: string;
+  role: string;
+  quote: string;
+  avatar: string;
+}) => (
   <StaggerItem className="bg-white rounded-2xl p-6 shadow-card border-2 border-paper-cream-dark hover:shadow-lg hover:border-crayon-orange/30 transition-all duration-300 group">
     {/* Quote icon */}
     <FontAwesomeIcon
@@ -53,26 +66,22 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
 
     {/* Quote text */}
     <p className="text-text-secondary leading-relaxed mb-4 font-tondo">
-      &ldquo;{testimonial.quote}&rdquo;
+      &ldquo;{quote}&rdquo;
     </p>
 
     {/* Author info */}
     <div className="flex items-center gap-3">
       <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-crayon-orange/20">
         <Image
-          src={testimonial.avatar}
-          alt={testimonial.name}
+          src={avatar}
+          alt={name}
           fill
           className="object-cover"
         />
       </div>
       <div className="flex-1">
-        <p className="font-bold text-text-primary font-tondo">
-          {testimonial.name}
-        </p>
-        {testimonial.role && (
-          <p className="text-sm text-text-tertiary">{testimonial.role}</p>
-        )}
+        <p className="font-bold text-text-primary font-tondo">{name}</p>
+        {role && <p className="text-sm text-text-tertiary">{role}</p>}
       </div>
       {testimonial.rating && <StarRating rating={testimonial.rating} />}
     </div>
@@ -80,6 +89,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: Testimonial }) => (
 );
 
 const SocialProofHeader = () => {
+  const t = useTranslations('homepage');
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
@@ -96,7 +106,7 @@ const SocialProofHeader = () => {
           style={iconStyle}
         />
         <h2 className="font-tondo font-bold text-2xl md:text-3xl lg:text-4xl text-text-primary">
-          Loved by families everywhere
+          {t('testimonials.title')}
         </h2>
         <FontAwesomeIcon
           icon={faSparkles}
@@ -109,15 +119,17 @@ const SocialProofHeader = () => {
       <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
         {/* Overlapping avatars */}
         <div className="flex -space-x-3">
-          {TESTIMONIALS.slice(0, 5).map((testimonial, index) => (
+          {TESTIMONIAL_META.slice(0, 5).map((testimonial, index) => (
             <div
               key={testimonial.id}
               className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm"
               style={{ zIndex: 5 - index }}
             >
               <Image
-                src={testimonial.avatar}
-                alt={testimonial.name}
+                src={t(
+                  `testimonials.items.${testimonial.translationKey}.avatar`,
+                )}
+                alt=""
                 fill
                 className="object-cover"
               />
@@ -132,7 +144,9 @@ const SocialProofHeader = () => {
             {SOCIAL_PROOF_STATS.averageRating}
           </span>
           <span className="text-text-tertiary">
-            from {SOCIAL_PROOF_STATS.reviewCount} reviews
+            {t('testimonials.fromReviews', {
+              count: SOCIAL_PROOF_STATS.reviewCount,
+            })}
           </span>
         </div>
       </div>
@@ -140,22 +154,33 @@ const SocialProofHeader = () => {
   );
 };
 
-const Testimonials = ({ className }: TestimonialsProps) => (
-  <section className={cn('w-full py-12 md:py-16', className)}>
-    <FadeIn>
-      <SocialProofHeader />
-    </FadeIn>
+const Testimonials = ({ className }: TestimonialsProps) => {
+  const t = useTranslations('homepage');
 
-    {/* Testimonial grid - responsive columns */}
-    <StaggerChildren
-      staggerDelay={0.1}
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-    >
-      {TESTIMONIALS.map((testimonial) => (
-        <TestimonialCard key={testimonial.id} testimonial={testimonial} />
-      ))}
-    </StaggerChildren>
-  </section>
-);
+  return (
+    <section className={cn('w-full py-12 md:py-16', className)}>
+      <FadeIn>
+        <SocialProofHeader />
+      </FadeIn>
+
+      {/* Testimonial grid - responsive columns */}
+      <StaggerChildren
+        staggerDelay={0.1}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        {TESTIMONIAL_META.map((testimonial) => (
+          <TestimonialCard
+            key={testimonial.id}
+            testimonial={testimonial}
+            name={t(`testimonials.items.${testimonial.translationKey}.name`)}
+            role={t(`testimonials.items.${testimonial.translationKey}.role`)}
+            quote={t(`testimonials.items.${testimonial.translationKey}.quote`)}
+            avatar={t(`testimonials.items.${testimonial.translationKey}.avatar`)}
+          />
+        ))}
+      </StaggerChildren>
+    </section>
+  );
+};
 
 export default Testimonials;

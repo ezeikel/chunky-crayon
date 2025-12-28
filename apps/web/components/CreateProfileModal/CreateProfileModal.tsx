@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { AgeGroup } from '@chunky-crayon/db/types';
 import {
   Dialog,
@@ -23,37 +24,47 @@ type CreateProfileModalProps = {
 
 type AgeGroupOption = {
   value: AgeGroup;
-  label: string;
-  description: string;
+  labelKey: 'toddler' | 'child' | 'tween' | 'teen' | 'adult';
+  descriptionKey:
+    | 'toddlerDescription'
+    | 'childDescription'
+    | 'tweenDescription'
+    | 'teenDescription'
+    | 'adultDescription';
   emoji: string;
 };
 
 const AGE_GROUP_OPTIONS: AgeGroupOption[] = [
   {
     value: AgeGroup.TODDLER,
-    label: 'Toddler',
-    description: '2-4 years',
+    labelKey: 'toddler',
+    descriptionKey: 'toddlerDescription',
     emoji: '👶',
   },
   {
     value: AgeGroup.CHILD,
-    label: 'Child',
-    description: '5-8 years',
+    labelKey: 'child',
+    descriptionKey: 'childDescription',
     emoji: '🧒',
   },
   {
     value: AgeGroup.TWEEN,
-    label: 'Tween',
-    description: '9-12 years',
+    labelKey: 'tween',
+    descriptionKey: 'tweenDescription',
     emoji: '🧑',
   },
   {
     value: AgeGroup.TEEN,
-    label: 'Teen',
-    description: '13-17 years',
+    labelKey: 'teen',
+    descriptionKey: 'teenDescription',
     emoji: '🧑‍🎨',
   },
-  { value: AgeGroup.ADULT, label: 'Adult', description: '18+', emoji: '🎨' },
+  {
+    value: AgeGroup.ADULT,
+    labelKey: 'adult',
+    descriptionKey: 'adultDescription',
+    emoji: '🎨',
+  },
 ];
 
 const CreateProfileModal = ({
@@ -62,6 +73,8 @@ const CreateProfileModal = ({
   onSuccess,
 }: CreateProfileModalProps) => {
   const router = useRouter();
+  const t = useTranslations('profiles');
+  const tAgeGroups = useTranslations('profiles.ageGroups');
   const [isPending, startTransition] = useTransition();
 
   const [name, setName] = useState('');
@@ -75,7 +88,7 @@ const CreateProfileModal = ({
     e.preventDefault();
 
     if (!name.trim()) {
-      setError('Please enter a name');
+      setError(t('create.nameError'));
       return;
     }
 
@@ -119,10 +132,8 @@ const CreateProfileModal = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Profile</DialogTitle>
-          <DialogDescription>
-            Add a new profile for someone in your family
-          </DialogDescription>
+          <DialogTitle>{t('create.title')}</DialogTitle>
+          <DialogDescription>{t('create.subtitle')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
@@ -132,14 +143,14 @@ const CreateProfileModal = ({
               htmlFor="profile-name"
               className="block font-tondo font-bold text-sm text-text-secondary mb-2"
             >
-              Name
+              {t('create.nameLabel')}
             </label>
             <input
               id="profile-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Emma"
+              placeholder={t('create.namePlaceholder')}
               maxLength={20}
               className={cn(
                 'w-full px-4 py-3 rounded-xl',
@@ -156,7 +167,7 @@ const CreateProfileModal = ({
           {/* Age group selector */}
           <div>
             <label className="block font-tondo font-bold text-sm text-text-secondary mb-2">
-              Age Group
+              {t('create.ageGroupLabel')}
             </label>
             <div className="grid grid-cols-5 gap-2">
               {AGE_GROUP_OPTIONS.map((option) => (
@@ -183,20 +194,23 @@ const CreateProfileModal = ({
                         : 'text-text-secondary',
                     )}
                   >
-                    {option.label}
+                    {tAgeGroups(option.labelKey)}
                   </span>
                 </button>
               ))}
             </div>
             <p className="mt-2 text-xs text-gray-500 text-center">
-              {AGE_GROUP_OPTIONS.find((o) => o.value === ageGroup)?.description}
+              {tAgeGroups(
+                AGE_GROUP_OPTIONS.find((o) => o.value === ageGroup)
+                  ?.descriptionKey ?? 'childDescription',
+              )}
             </p>
           </div>
 
           {/* Avatar picker */}
           <div>
             <label className="block font-tondo font-bold text-sm text-text-secondary mb-2">
-              Avatar
+              {t('create.avatarLabel')}
             </label>
             <div className="grid grid-cols-5 gap-3">
               {selectableAvatars.map((avatar) => (
@@ -259,10 +273,10 @@ const CreateProfileModal = ({
             {isPending ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Creating...
+                {t('create.creating')}
               </span>
             ) : (
-              'Create Profile'
+              t('create.button')
             )}
           </button>
         </form>

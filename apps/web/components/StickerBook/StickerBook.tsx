@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookOpen, faStar } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 import { STICKER_CATALOG, TOTAL_STICKERS } from '@/lib/stickers/catalog';
 import type { Sticker, StickerCategory } from '@/lib/stickers/types';
@@ -26,15 +27,17 @@ type StickerBookProps = {
 // Filter tabs - using StickerCategory with 'all' option
 type FilterTab = 'all' | StickerCategory;
 
-const filterTabs: { id: FilterTab; label: string; icon?: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'milestone', label: 'Milestones' },
-  { id: 'category', label: 'Categories' },
-  { id: 'exploration', label: 'Explore' },
-  { id: 'special', label: 'Special' },
+// Translation keys for filter tabs
+const filterTabKeys: { id: FilterTab; translationKey: string }[] = [
+  { id: 'all', translationKey: 'all' },
+  { id: 'milestone', translationKey: 'milestones' },
+  { id: 'category', translationKey: 'categories' },
+  { id: 'exploration', translationKey: 'explore' },
+  { id: 'special', translationKey: 'special' },
 ];
 
 const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
+  const t = useTranslations('stickerBook');
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [selectedSticker, setSelectedSticker] = useState<Sticker | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -114,10 +117,10 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
         />
         <div>
           <h2 className="text-2xl font-bold font-tondo text-text-primary">
-            Sticker Book
+            {t('title')}
           </h2>
           <p className="text-sm text-text-secondary">
-            Collect stickers by coloring!
+            {t('subtitle')}
           </p>
         </div>
         {newCount > 0 && (
@@ -127,7 +130,7 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
             className="ml-auto flex items-center gap-1.5 bg-crayon-orange text-white px-3 py-1 rounded-full"
           >
             <FontAwesomeIcon icon={faStar} className="text-sm" />
-            <span className="text-sm font-bold">{newCount} NEW</span>
+            <span className="text-sm font-bold">{t('newBadge', { count: newCount })}</span>
           </motion.div>
         )}
       </div>
@@ -141,7 +144,7 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
 
       {/* Filter Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {filterTabs.map((tab) => {
+        {filterTabKeys.map((tab) => {
           const isActive = activeFilter === tab.id;
           const count =
             tab.id === 'all'
@@ -172,14 +175,14 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
                   : 'bg-paper-cream text-text-secondary hover:bg-paper-cream-dark',
               )}
             >
-              {tab.label}
+              {t(`filters.${tab.translationKey}`)}
               <span
                 className={cn(
                   'ml-1.5 text-xs',
                   isActive ? 'text-white/80' : 'text-text-muted',
                 )}
               >
-                {count}/{total}
+                {t('countFormat', { count, total })}
               </span>
             </motion.button>
           );
@@ -221,7 +224,7 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
       {/* Empty state for filtered view */}
       {filteredStickers.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-text-muted">No stickers in this category yet.</p>
+          <p className="text-text-muted">{t('emptyState')}</p>
         </div>
       )}
 

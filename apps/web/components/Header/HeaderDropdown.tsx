@@ -13,6 +13,7 @@ import {
   faNewspaper,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { useTranslations } from 'next-intl';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -25,7 +26,7 @@ import formatNumber from '@/utils/formatNumber';
 
 type DropdownItemConfig = {
   icon?: IconDefinition;
-  label?: string;
+  labelKey?: string;
   href?: string;
   separator?: boolean;
   external?: boolean;
@@ -36,24 +37,24 @@ type DropdownItemConfig = {
 const DROPDOWN_ITEMS: DropdownItemConfig[] = [
   {
     icon: faCreditCard,
-    label: 'Billing',
+    labelKey: 'billing',
     href: '/account/billing',
     requiresParentalGate: true,
   },
   {
     icon: faGear,
-    label: 'Settings',
+    labelKey: 'settings',
     href: '/account/settings',
     requiresParentalGate: true,
   },
   {
     icon: faNewspaper,
-    label: 'Blog',
+    labelKey: 'blog',
     href: '/blog',
   },
   {
     icon: faHeadset,
-    label: 'Support',
+    labelKey: 'support',
     href: 'mailto:support@chunkycrayon.com',
     external: true,
     requiresParentalGate: true,
@@ -63,7 +64,7 @@ const DROPDOWN_ITEMS: DropdownItemConfig[] = [
   },
   {
     icon: faArrowRightFromBracket,
-    label: 'Sign out',
+    labelKey: 'signOut',
     isSignOut: true,
   },
 ];
@@ -86,6 +87,8 @@ type HeaderDropdownProps = {
 };
 
 const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
+  const t = useTranslations('navigation');
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -101,7 +104,7 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
               style={iconStyle}
             />
             <span className="text-text-primary">
-              {user?.name?.split(' ')[0] || 'Account'}
+              {user?.name?.split(' ')[0] || t('account')}
             </span>
           </div>
           {/* Divider */}
@@ -125,10 +128,12 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
             return <DropdownMenuSeparator key="dropdown-separator" />;
           }
 
+          const label = item.labelKey ? t(item.labelKey) : '';
+
           // Items that require parental gate
           if (item.requiresParentalGate && item.href) {
             return (
-              <DropdownMenuItem key={item.label} asChild>
+              <DropdownMenuItem key={item.labelKey} asChild>
                 <ParentalGateLink
                   href={item.href}
                   className="flex items-center gap-3 w-full text-left"
@@ -138,7 +143,7 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
                     className="text-lg"
                     style={iconStyle}
                   />
-                  {item.label}
+                  {label}
                 </ParentalGateLink>
               </DropdownMenuItem>
             );
@@ -147,14 +152,14 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
           // External links (like Support mailto)
           if (item.external && item.href) {
             return (
-              <DropdownMenuItem key={item.label} asChild>
+              <DropdownMenuItem key={item.labelKey} asChild>
                 <a href={item.href} target="_blank" rel="noopener noreferrer">
                   <FontAwesomeIcon
                     icon={item.icon!}
                     className="text-lg"
                     style={iconStyle}
                   />
-                  {item.label}
+                  {label}
                 </a>
               </DropdownMenuItem>
             );
@@ -163,14 +168,14 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
           // Regular internal links
           if (item.href) {
             return (
-              <DropdownMenuItem key={item.label} asChild>
+              <DropdownMenuItem key={item.labelKey} asChild>
                 <Link href={item.href}>
                   <FontAwesomeIcon
                     icon={item.icon!}
                     className="text-lg"
                     style={iconStyle}
                   />
-                  {item.label}
+                  {label}
                 </Link>
               </DropdownMenuItem>
             );
@@ -179,7 +184,7 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
           // Sign out action
           if (item.isSignOut) {
             return (
-              <DropdownMenuItem key={item.label} asChild>
+              <DropdownMenuItem key={item.labelKey} asChild>
                 <form action={signOutAction} className="w-full">
                   <button
                     type="submit"
@@ -190,7 +195,7 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
                       className="text-lg"
                       style={iconStyle}
                     />
-                    {item.label}
+                    {label}
                   </button>
                 </form>
               </DropdownMenuItem>

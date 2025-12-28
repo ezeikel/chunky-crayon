@@ -2,6 +2,7 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSparkles } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
 import { ColoAvatar } from '@/components/ColoAvatar';
 import type { ColoState } from '@/lib/colo';
 
@@ -10,6 +11,13 @@ type DashboardHeaderProps = {
 };
 
 const DashboardHeader = ({ coloState }: DashboardHeaderProps) => {
+  const t = useTranslations('colo');
+
+  // Get translated stage name if coloState exists
+  const translatedStageName = coloState
+    ? t(`stages.${coloState.stage}.name`)
+    : '';
+
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
@@ -49,7 +57,7 @@ const DashboardHeader = ({ coloState }: DashboardHeaderProps) => {
           style={iconStyle}
         />
         <h1 className="font-tondo font-bold text-2xl md:text-3xl lg:text-4xl text-text-primary">
-          What do you want to color today?
+          {t('dashboard.greeting')}
         </h1>
         <FontAwesomeIcon
           icon={faSparkles}
@@ -63,15 +71,17 @@ const DashboardHeader = ({ coloState }: DashboardHeaderProps) => {
         <p className="font-tondo text-sm text-text-muted">
           {coloState.progressToNext ? (
             <>
-              {coloState.stageName} wants to grow! Save{' '}
-              <span className="font-bold text-crayon-orange">
-                {coloState.progressToNext.required -
-                  coloState.progressToNext.current}
-              </span>{' '}
-              more artworks to evolve! 🎨
+              {t('dashboard.wantsToGrow', {
+                stageName: translatedStageName,
+                count: coloState.progressToNext.required - coloState.progressToNext.current,
+              })}{' '}
+              🎨
             </>
           ) : (
-            <>Your {coloState.stageName} is so proud of you! 🌟</>
+            <>
+              {t('dashboard.proudOfYou', { stageName: translatedStageName })}{' '}
+              🌟
+            </>
           )}
         </p>
       )}

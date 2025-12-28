@@ -1,0 +1,49 @@
+{
+  "name": "@chunky-crayon/translations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./en": {
+      "import": "./src/en.json",
+      "require": "./src/en.json"
+    },
+    "./ja": {
+      "import": "./src/ja.json",
+      "require": "./src/ja.json"
+    },
+    "./ko": {
+      "import": "./src/ko.json",
+      "require": "./src/ko.json"
+    },
+    "./de": {
+      "import": "./src/de.json",
+      "require": "./src/de.json"
+    },
+    "./fr": {
+      "import": "./src/fr.json",
+      "require": "./src/fr.json"
+    },
+    "./es": {
+      "import": "./src/es.json",
+      "require": "./src/es.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc && cp src/*.json dist/",
+    "dev": "tsc --watch",
+    "clean": "rm -rf .turbo node_modules dist",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "translate": "tsx scripts/translate.ts",
+    "translate:dry-run": "tsx scripts/translate.ts --dry-run",
+    "audit": "tsx scripts/audit-translations.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

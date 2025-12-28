@@ -3,8 +3,10 @@
 import { useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 const UnsubscribeToast = () => {
+  const t = useTranslations('email');
   const searchParams = useSearchParams();
   const router = useRouter();
   const unsubStatus = searchParams.get('unsub');
@@ -13,13 +15,12 @@ const UnsubscribeToast = () => {
     if (!unsubStatus) return;
 
     if (unsubStatus === 'success') {
-      toast('Unsubscribed', {
-        description:
-          "You've been removed from our mailing list. We're sad to see you go!",
+      toast(t('unsubscribe.success'), {
+        description: t('unsubscribe.successDescription'),
       });
     } else if (unsubStatus === 'invalid') {
-      toast.error('Invalid link', {
-        description: 'This unsubscribe link is invalid or has expired.',
+      toast.error(t('unsubscribe.invalid'), {
+        description: t('unsubscribe.invalidDescription'),
       });
     }
 
@@ -27,7 +28,7 @@ const UnsubscribeToast = () => {
     const url = new URL(window.location.href);
     url.searchParams.delete('unsub');
     router.replace(url.pathname, { scroll: false });
-  }, [unsubStatus, router]);
+  }, [unsubStatus, router, t]);
 
   return null;
 };

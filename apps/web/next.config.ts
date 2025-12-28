@@ -2,6 +2,7 @@ import { withSentryConfig } from '@sentry/nextjs';
 import { withPlausibleProxy } from 'next-plausible';
 import type { NextConfig } from 'next';
 import withVercelToolbar from '@vercel/toolbar/plugins/next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -85,7 +86,12 @@ const sentryOptions = {
   automaticVercelMonitors: true,
 };
 
-const configWithSentry = withSentryConfig(nextConfig, sentryOptions);
+// Create the next-intl plugin (points to i18n/request.ts)
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+
+const configWithIntl = withNextIntl(nextConfig);
+
+const configWithSentry = withSentryConfig(configWithIntl, sentryOptions);
 
 const configWithPlausible = withPlausibleProxy()(configWithSentry);
 

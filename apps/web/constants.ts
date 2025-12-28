@@ -567,12 +567,9 @@ export type PlanInterval = 'monthly' | 'annual';
 
 export type SubscriptionPlan = {
   key: PlanName;
-  name: string;
-  tagline: string;
   price: string; // e.g '£7.99'
   credits: string;
-  features: string[];
-  audience: string;
+  featureKeys: string[]; // Translation keys for features (e.g. 'textPrompts', 'advancedEditing')
   stripePriceEnv: string; // e.g 'NEXT_PUBLIC_STRIPE_PRICE_CRAYON_MONTHLY'
   mostPopular?: boolean;
 };
@@ -628,64 +625,49 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
   monthly: [
     {
       key: PlanName.CRAYON,
-      name: 'Crayon Plan',
-      tagline: 'Start your coloring adventure',
       price: '£7.99',
       credits: `${PLAN_CREDITS[PlanName.CRAYON][BillingPeriod.MONTHLY]} credits/month`,
-      features: [
-        'Create coloring pages from text prompts',
-        'Create coloring pages with words, names, and numbers',
-        'Adjust color, contrast, and brightness',
-        'Turn photos into coloring pages',
+      featureKeys: [
+        'textPrompts',
+        'wordsNumbers',
+        'adjustments',
+        'photoToColoring',
       ],
-      audience: 'Perfect for casual colorers and young artists',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_CRAYON_MONTHLY as string,
     },
     {
       key: PlanName.RAINBOW,
-      name: 'Rainbow Plan',
-      tagline: 'Fun for the whole family',
       price: '£13.99',
       credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.MONTHLY]} credits/month`,
-      features: [
-        'All Crayon Plan features',
-        'Advanced editing features',
-        'Early access to new models and features',
-        'Credits roll over (up to 1 month)',
+      featureKeys: [
+        'allCrayonFeatures',
+        'advancedEditing',
+        'earlyAccess',
+        'rollover1Month',
       ],
-      audience: 'Great for creative families and siblings',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY as string,
       mostPopular: true,
     },
     {
       key: PlanName.MASTERPIECE,
-      name: 'Masterpiece Plan',
-      tagline: 'For color enthusiasts',
       price: '£24.99',
       credits: `${PLAN_CREDITS[PlanName.MASTERPIECE][BillingPeriod.MONTHLY]} credits/month`,
-      features: [
-        'All Rainbow Plan features',
-        'Bulk generation',
-        'Commercial use',
-        'Credits roll over (up to 2 months)',
+      featureKeys: [
+        'allRainbowFeatures',
+        'bulkGeneration',
+        'commercialUse',
+        'rollover2Months',
       ],
-      audience: 'Perfect for adults and serious colorers',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_MASTERPIECE_MONTHLY as string,
     },
     {
       key: PlanName.STUDIO,
-      name: 'Studio Plan',
-      tagline: 'For super creators and small businesses',
       price: '£59.99',
       credits: `${PLAN_CREDITS[PlanName.STUDIO][BillingPeriod.MONTHLY]} credits/month`,
-      features: [
-        'All Masterpiece Plan features',
-        'Credits roll over (up to 3 months)',
-      ],
-      audience: 'Best for studios, teachers, and high-volume users',
+      featureKeys: ['allMasterpieceFeatures', 'rollover3Months'],
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_STUDIO_MONTHLY as string,
     },
@@ -693,64 +675,49 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
   annual: [
     {
       key: PlanName.CRAYON,
-      name: 'Crayon Plan',
-      tagline: 'Start your coloring adventure',
       price: '£79.99',
       credits: `${PLAN_CREDITS[PlanName.CRAYON][BillingPeriod.ANNUAL]} credits/month`,
-      features: [
-        'Create coloring pages from text prompts',
-        'Create coloring pages with words, names, and numbers',
-        'Adjust color, contrast, and brightness',
-        'Turn photos into coloring pages',
+      featureKeys: [
+        'textPrompts',
+        'wordsNumbers',
+        'adjustments',
+        'photoToColoring',
       ],
-      audience: 'Perfect for casual colorers and young artists',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_CRAYON_ANNUAL as string,
     },
     {
       key: PlanName.RAINBOW,
-      name: 'Rainbow Plan',
-      tagline: 'Fun for the whole family',
       price: '£139.99',
       credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.ANNUAL]} credits/month`,
-      features: [
-        'All Crayon Plan features',
-        'Advanced editing features',
-        'Early access to new models and features',
-        'Credits roll over (up to 1 month)',
+      featureKeys: [
+        'allCrayonFeatures',
+        'advancedEditing',
+        'earlyAccess',
+        'rollover1Month',
       ],
-      audience: 'Great for creative families and siblings',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL as string,
       mostPopular: true,
     },
     {
       key: PlanName.MASTERPIECE,
-      name: 'Masterpiece Plan',
-      tagline: 'For color enthusiasts',
       price: '£249.99',
       credits: `${PLAN_CREDITS[PlanName.MASTERPIECE][BillingPeriod.ANNUAL]} credits/month`,
-      features: [
-        'All Rainbow Plan features',
-        'Bulk generation',
-        'Commercial use',
-        'Credits roll over (up to 2 months)',
+      featureKeys: [
+        'allRainbowFeatures',
+        'bulkGeneration',
+        'commercialUse',
+        'rollover2Months',
       ],
-      audience: 'Perfect for adults and serious colorers',
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_MASTERPIECE_ANNUAL as string,
     },
     {
       key: PlanName.STUDIO,
-      name: 'Studio Plan',
-      tagline: 'For super creators and small businesses',
       price: '£599.00',
       credits: `${PLAN_CREDITS[PlanName.STUDIO][BillingPeriod.ANNUAL]} credits/month`,
-      features: [
-        'All Masterpiece Plan features',
-        'Credits roll over (up to 3 months)',
-      ],
-      audience: 'Best for studios, teachers, and high-volume users',
+      featureKeys: ['allMasterpieceFeatures', 'rollover3Months'],
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_STUDIO_ANNUAL as string,
     },
@@ -977,6 +944,7 @@ export const TRACKING_EVENTS = {
 
 // ===== SOCIAL PROOF / TESTIMONIALS =====
 
+// Full testimonial type (includes translated content)
 export type Testimonial = {
   id: string;
   name: string;
@@ -987,7 +955,26 @@ export type Testimonial = {
   rating?: number; // 1-5 stars
 };
 
-// Placeholder testimonials - update avatar paths with AI-generated images later
+// Non-translatable testimonial data (rating only)
+// Translatable content (name, role, quote, avatar) comes from translation files
+export type TestimonialMeta = {
+  id: string;
+  translationKey: string; // Key to look up in translations (e.g., "1", "2")
+  rating: number;
+};
+
+// Testimonial metadata - translatable content lives in translation files
+export const TESTIMONIAL_META: TestimonialMeta[] = [
+  { id: 'testimonial-1', translationKey: '1', rating: 5 },
+  { id: 'testimonial-2', translationKey: '2', rating: 5 },
+  { id: 'testimonial-3', translationKey: '3', rating: 5 },
+  { id: 'testimonial-4', translationKey: '4', rating: 5 },
+  { id: 'testimonial-5', translationKey: '5', rating: 5 },
+  { id: 'testimonial-6', translationKey: '6', rating: 5 },
+];
+
+// Legacy TESTIMONIALS export for backwards compatibility
+// Components should migrate to using TESTIMONIAL_META + translations
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: 'testimonial-1',

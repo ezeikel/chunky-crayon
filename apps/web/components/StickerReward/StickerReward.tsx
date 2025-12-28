@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChevronLeft,
@@ -36,12 +37,12 @@ const rarityRingStyles: Record<StickerRarity, string> = {
   legendary: 'ring-crayon-yellow',
 };
 
-// Rarity labels
-const rarityLabels: Record<StickerRarity, string> = {
-  common: 'Common',
-  uncommon: 'Uncommon',
-  rare: 'Rare',
-  legendary: 'Legendary',
+// Rarity keys for translations
+const rarityKeys: Record<StickerRarity, 'common' | 'uncommon' | 'rare' | 'legendary'> = {
+  common: 'common',
+  uncommon: 'uncommon',
+  rare: 'rare',
+  legendary: 'legendary',
 };
 
 const StickerReward = ({
@@ -49,6 +50,7 @@ const StickerReward = ({
   onComplete,
   autoAdvanceDelay = 5000,
 }: StickerRewardProps) => {
+  const t = useTranslations('stickerReward');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showConfetti, setShowConfetti] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
@@ -156,11 +158,11 @@ const StickerReward = ({
                 className="text-center mb-6"
               >
                 <h2 className="text-3xl font-bold font-tondo text-crayon-orange">
-                  {hasMultipleStickers ? 'New Stickers!' : 'New Sticker!'}
+                  {hasMultipleStickers ? t('newStickers') : t('newSticker')}
                 </h2>
                 {hasMultipleStickers && (
                   <p className="text-sm text-text-secondary mt-1">
-                    {currentIndex + 1} of {stickers.length}
+                    {t('ofCount', { current: currentIndex + 1, total: stickers.length })}
                   </p>
                 )}
               </motion.div>
@@ -234,7 +236,7 @@ const StickerReward = ({
                           'bg-gradient-to-r from-crayon-yellow/20 to-crayon-orange/20 text-crayon-orange-dark',
                       )}
                     >
-                      {rarityLabels[currentSticker.rarity]}
+                      {t(`rarity.${rarityKeys[currentSticker.rarity]}`)}
                     </motion.span>
 
                     {/* Unlock Message */}
@@ -264,7 +266,7 @@ const StickerReward = ({
                           ? 'opacity-30 cursor-not-allowed'
                           : 'hover:bg-paper-cream-dark hover:scale-110',
                       )}
-                      aria-label="Previous sticker"
+                      aria-label={t('previousSticker')}
                     >
                       <FontAwesomeIcon
                         icon={faChevronLeft}
@@ -283,7 +285,7 @@ const StickerReward = ({
                           ? 'opacity-30 cursor-not-allowed'
                           : 'hover:bg-paper-cream-dark hover:scale-110',
                       )}
-                      aria-label="Next sticker"
+                      aria-label={t('nextSticker')}
                     >
                       <FontAwesomeIcon
                         icon={faChevronRight}
@@ -307,7 +309,7 @@ const StickerReward = ({
                           ? 'bg-crayon-orange scale-125'
                           : 'bg-paper-cream-dark hover:bg-crayon-orange/50',
                       )}
-                      aria-label={`Go to sticker ${index + 1}`}
+                      aria-label={t('goToSticker', { number: index + 1 })}
                     />
                   ))}
                 </div>
@@ -329,7 +331,7 @@ const StickerReward = ({
                 )}
               >
                 <FontAwesomeIcon icon={faBookOpen} />
-                Add to Sticker Book
+                {t('addToStickerBook')}
               </motion.button>
             </motion.div>
           </motion.div>

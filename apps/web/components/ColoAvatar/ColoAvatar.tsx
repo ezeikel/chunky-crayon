@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useId } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 import type { ColoStage, ColoState } from '@/lib/colo';
 import { COLO_STAGES } from '@/lib/colo';
@@ -153,6 +154,7 @@ const ColoAvatar = ({
   className,
   onClick,
 }: ColoAvatarProps) => {
+  const t = useTranslations('colo');
   const uniqueId = useId();
   const [showTooltipState, setShowTooltipState] = useState(false);
   const [currentAnimation, setCurrentAnimation] = useState<ReactionType | null>(
@@ -292,7 +294,7 @@ const ColoAvatar = ({
         onClick={handleClick}
         onMouseEnter={() => showTooltip && setShowTooltipState(true)}
         onMouseLeave={() => showTooltip && setShowTooltipState(false)}
-        aria-label={`${stageInfo.name} - ${stageInfo.description}${enableTapReactions ? ' - Tap me!' : ''}`}
+        aria-label={`${t(`stages.${stage}.name`)} - ${t(`stages.${stage}.description`)}${enableTapReactions ? ` - ${t('avatar.tapMe')}` : ''}`}
       >
         {showPlaceholder ? (
           /* Placeholder gradient with stage indicator */
@@ -330,7 +332,7 @@ const ColoAvatar = ({
           /* Actual Colo image */
           <Image
             src={imagePath}
-            alt={stageInfo.name}
+            alt={t(`stages.${stage}.name`)}
             fill
             className="object-cover"
             onError={() => setImageError(true)}
@@ -375,16 +377,16 @@ const ColoAvatar = ({
       {showTooltip && showTooltipState && (
         <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-10">
           <div className="bg-gray-900 text-white text-xs font-tondo rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
-            <p className="font-bold">{stageInfo.name}</p>
-            <p className="text-gray-300 text-[10px]">{stageInfo.description}</p>
+            <p className="font-bold">{t(`stages.${stage}.name`)}</p>
+            <p className="text-gray-300 text-[10px]">{t(`stages.${stage}.description`)}</p>
             {coloState?.progressToNext && (
               <p className="text-crayon-orange text-[10px] mt-1">
                 {coloState.progressToNext.current}/
-                {coloState.progressToNext.required} artworks
+                {coloState.progressToNext.required} {t('avatar.artworks')}
               </p>
             )}
             {enableTapReactions && (
-              <p className="text-crayon-yellow text-[10px] mt-1">Tap me! 🎨</p>
+              <p className="text-crayon-yellow text-[10px] mt-1">{t('avatar.tapMe')} 🎨</p>
             )}
             {/* Tooltip arrow */}
             <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />

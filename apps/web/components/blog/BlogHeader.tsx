@@ -1,5 +1,8 @@
+'use client';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenNib } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 
 type BlogHeaderProps = {
@@ -9,10 +12,13 @@ type BlogHeaderProps = {
 };
 
 const BlogHeader = ({
-  title = 'The Chunky Crayon Blog',
-  description = 'Tips, ideas, and inspiration for creative coloring activities',
+  title,
+  description,
   className,
 }: BlogHeaderProps) => {
+  const t = useTranslations('blog');
+  const displayTitle = title || t('title');
+  const displayDescription = description || t('subtitle');
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
@@ -28,10 +34,10 @@ const BlogHeader = ({
           style={iconStyle}
         />
         <h1 className="font-tondo font-bold text-2xl md:text-3xl lg:text-4xl text-text-primary">
-          {title}
+          {displayTitle}
         </h1>
       </div>
-      <p className="text-text-secondary max-w-2xl mx-auto">{description}</p>
+      <p className="text-text-secondary max-w-2xl mx-auto">{displayDescription}</p>
     </header>
   );
 };

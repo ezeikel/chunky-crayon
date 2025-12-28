@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/pro-solid-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 
 type ProgressIndicatorProps = {
@@ -11,13 +12,8 @@ type ProgressIndicatorProps = {
   className?: string;
 };
 
-// Progress milestones for encouragement
-const MILESTONES = [
-  { percent: 25, message: 'Great start!' },
-  { percent: 50, message: 'Halfway there!' },
-  { percent: 75, message: 'Almost done!' },
-  { percent: 100, message: 'Amazing!' },
-];
+// Progress milestone percentages
+const MILESTONE_PERCENTS = [25, 50, 75, 100] as const;
 
 const calculateProgress = (canvas: HTMLCanvasElement): number => {
   const ctx = canvas.getContext('2d');
@@ -52,6 +48,7 @@ const ProgressIndicator = ({
   getCanvas,
   className,
 }: ProgressIndicatorProps) => {
+  const t = useTranslations('coloringPage.progress');
   const [progress, setProgress] = useState(0);
   const [lastMilestone, setLastMilestone] = useState<number | null>(null);
   const [showMilestone, setShowMilestone] = useState(false);
@@ -65,14 +62,14 @@ const ProgressIndicator = ({
     setProgress(newProgress);
 
     // Check for milestone achievements
-    const milestone = MILESTONES.find(
-      (m) =>
-        newProgress >= m.percent &&
-        (lastMilestone === null || m.percent > lastMilestone),
+    const milestone = MILESTONE_PERCENTS.find(
+      (percent) =>
+        newProgress >= percent &&
+        (lastMilestone === null || percent > lastMilestone),
     );
 
-    if (milestone && milestone.percent !== lastMilestone) {
-      setLastMilestone(milestone.percent);
+    if (milestone && milestone !== lastMilestone) {
+      setLastMilestone(milestone);
       setShowMilestone(true);
       setTimeout(() => setShowMilestone(false), 2000);
     }
@@ -105,8 +102,6 @@ const ProgressIndicator = ({
     };
   }, [updateProgress]);
 
-  const currentMilestone = MILESTONES.find((m) => m.percent === lastMilestone);
-
   return (
     <div className={cn('flex items-center gap-3 w-full', className)}>
       {/* Progress bar - flexible width */}
@@ -129,17 +124,17 @@ const ProgressIndicator = ({
 
         {/* Star icons for milestones */}
         <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-1 pointer-events-none">
-          {MILESTONES.map((milestone) => (
+          {MILESTONE_PERCENTS.map((percent) => (
             <motion.div
-              key={milestone.percent}
+              key={percent}
               className={cn(
                 'w-2.5 h-2.5 flex items-center justify-center',
-                progress >= milestone.percent
+                progress >= percent
                   ? 'text-crayon-yellow'
                   : 'text-paper-cream-dark/60',
               )}
               animate={
-                progress >= milestone.percent
+                progress >= percent
                   ? { scale: [1, 1.3, 1], rotate: [0, 15, -15, 0] }
                   : {}
               }
@@ -155,7 +150,7 @@ const ProgressIndicator = ({
 
         {/* Milestone celebration popup */}
         <AnimatePresence>
-          {showMilestone && currentMilestone && (
+          {showMilestone && lastMilestone && (
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -163,7 +158,7 @@ const ProgressIndicator = ({
               className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-crayon-yellow rounded-full shadow-lg z-10"
             >
               <span className="font-tondo font-bold text-sm text-text-primary whitespace-nowrap">
-                {currentMilestone.message}
+                {t(`milestones.${lastMilestone}`)}
               </span>
             </motion.div>
           )}
@@ -175,7 +170,7 @@ const ProgressIndicator = ({
         <span className="font-tondo font-bold text-base text-text-primary">
           {progress}%
         </span>
-        <span className="text-xs text-text-secondary">colored</span>
+        <span className="text-xs text-text-secondary">{t('colored')}</span>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare, faSpinner } from '@fortawesome/pro-solid-svg-icons';
 import AdultGate from '@/components/AdultGate';
@@ -32,6 +33,7 @@ const ShareButton = ({
   getCanvasDataUrl,
   className,
 }: ShareButtonProps) => {
+  const t = useTranslations('shareButton');
   const [state, setState] = useState<ShareState>('idle');
   const [shareImageUrl, setShareImageUrl] = useState<string | undefined>(
     imageUrl,
@@ -101,7 +103,7 @@ const ShareButton = ({
           icon={faSpinner}
           className="text-xl md:text-2xl animate-spin"
         />
-        <span className="hidden md:inline">Preparing...</span>
+        <span className="hidden md:inline">{t('preparing')}</span>
       </button>
     );
   }
@@ -129,7 +131,7 @@ const ShareButton = ({
             onClick={handleClose}
             className="mt-4 w-full text-center text-sm text-text-secondary hover:text-text-primary underline"
           >
-            Done sharing
+            {t('doneSharing')}
           </button>
         </div>
       </div>
@@ -144,7 +146,7 @@ const ShareButton = ({
       className={cn(buttonClassName, className)}
     >
       <FontAwesomeIcon icon={faShare} className="text-xl md:text-2xl" />
-      <span className="hidden md:inline">Share</span>
+      <span className="hidden md:inline">{t('idle')}</span>
     </button>
   );
 };

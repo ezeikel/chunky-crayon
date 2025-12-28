@@ -1,0 +1,1402 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "done": "Done",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "credits": "credits",
+    "creditsWithCount": "{count} credits"
+  },
+  "coloLoading": {
+    "title": "Creating your page!",
+    "titleSpeaking": "I'm so excited!",
+    "coloSpeaking": "Colo is talking! Listen up!",
+    "audioStates": {
+      "idle": "Getting ready...",
+      "preparing": "Colo is waking up!",
+      "done": "Drawing your picture..."
+    },
+    "messages": {
+      "sharpeningCrayons": "Sharpening crayons...",
+      "mixingColors": "Mixing colors...",
+      "drawingLines": "Drawing lines...",
+      "addingSparkles": "Adding magic sparkles...",
+      "almostThere": "Almost there...",
+      "creatingMasterpiece": "Creating your masterpiece...",
+      "wavingWand": "Waving my wand...",
+      "coloringOutsideLines": "Coloring outside the lines (oops!)..."
+    },
+    "pageLoading": "Getting your crayons ready!"
+  },
+  "colo": {
+    "dashboard": {
+      "greeting": "What do you want to color today?",
+      "wantsToGrow": "{stageName} wants to grow! Save {count} more artworks to evolve!",
+      "proudOfYou": "Your {stageName} is so proud of you!"
+    },
+    "indicator": {
+      "next": "Next: {stageName}",
+      "saveToEvolve": "Save {count} more artworks to evolve!",
+      "maxStage": "You've reached the highest stage!",
+      "accessories": "Accessories ({count})"
+    },
+    "avatar": {
+      "tapMe": "Tap me!",
+      "artworks": "artworks"
+    },
+    "stages": {
+      "1": {
+        "name": "Baby Colo",
+        "description": "Just starting the coloring adventure!"
+      },
+      "2": {
+        "name": "Little Colo",
+        "description": "Growing bigger with every artwork!"
+      },
+      "3": {
+        "name": "Growing Colo",
+        "description": "Look how much Colo has grown!"
+      },
+      "4": {
+        "name": "Happy Colo",
+        "description": "So happy with all the beautiful art!"
+      },
+      "5": {
+        "name": "Artist Colo",
+        "description": "A true artist in the making!"
+      },
+      "6": {
+        "name": "Master Colo",
+        "description": "The ultimate coloring master!"
+      }
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "gallery": "Gallery",
+    "myArtwork": "My Artwork",
+    "challenges": "Challenges",
+    "blog": "Blog",
+    "pricing": "Pricing",
+    "support": "Support",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "billing": "Billing",
+    "settings": "Settings",
+    "stickerBook": "Sticker Book",
+    "account": "Account",
+    "menu": "Menu",
+    "currentlyActive": "Currently active",
+    "switchTo": "Switch to",
+    "selectProfile": "Select Profile",
+    "manageProfiles": "Manage Profiles",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "navigationMenu": "Navigation menu"
+  },
+  "footer": {
+    "brand": "Chunky Crayon",
+    "tagline": "Dream. Create. Color.",
+    "aboutText": "Where imagination comes to life! Turn your wildest ideas into magical coloring pages.",
+    "madeBy": "Made by parents with love in South London",
+    "copyright": "© {year} Chunky Crayon. All rights reserved.",
+    "sections": {
+      "about": "About",
+      "connect": "Connect",
+      "getTheApp": "Get the App",
+      "support": "Support"
+    },
+    "links": {
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
+    },
+    "appStore": {
+      "downloadOnAppStore": "Download on the App Store",
+      "getOnGooglePlay": "Get it on Google Play",
+      "comingSoon": "Coming Soon!",
+      "iosComingSoon": "Our iOS app is on the way. Stay tuned!",
+      "androidComingSoon": "Our Android app is on the way. Stay tuned!"
+    }
+  },
+  "homepage": {
+    "heroTitle": "Unleash your child's",
+    "heroTitleSuffix": "today",
+    "heroSubtitle": "From vibrant coloring pages to imaginative adventures, Chunky Crayon transforms creativity into pure joy.",
+    "cta": "Start Creating",
+    "stats": {
+      "coloringPagesCreated": "Coloring Pages Created",
+      "dailyPages": "Daily Pages",
+      "freeLibraryPages": "Free Library Pages"
+    },
+    "galleryPreview": {
+      "freeColoringPages": "Free Coloring Pages",
+      "exploreGallery": "Explore Gallery",
+      "todaysDailyPage": "Today's Daily Page",
+      "latestDailyPage": "Latest Daily Page",
+      "seeAll": "See all",
+      "communityPages": "Community Pages",
+      "colorNow": "Color Now",
+      "browseCategories": "Browse Categories",
+      "viewAll": "View all",
+      "dailyColoringPageAlt": "Daily coloring page",
+      "coloringPageAlt": "Coloring page"
+    },
+    "recentCreations": {
+      "title": "Your Recent Creations",
+      "ctaHighlight": "Start free",
+      "ctaText": "to keep your creations forever and unlock more!",
+      "ctaButton": "Start Free"
+    },
+    "unleashWords": {
+      "creativity": "creativity",
+      "imagination": "imagination",
+      "fun": "fun",
+      "adventure": "adventure",
+      "discovery": "discovery",
+      "exploration": "exploration",
+      "inspiration": "inspiration",
+      "art": "art",
+      "joy": "joy",
+      "learning": "learning",
+      "wonder": "wonder",
+      "dreams": "dreams",
+      "playtime": "playtime",
+      "innovation": "innovation",
+      "magic": "magic",
+      "curiosity": "curiosity",
+      "expression": "expression",
+      "fantasy": "fantasy",
+      "stories": "stories",
+      "excitement": "excitement"
+    },
+    "testimonials": {
+      "title": "Loved by families everywhere",
+      "fromReviews": "from {count} reviews",
+      "items": {
+        "1": {
+          "name": "Sarah M.",
+          "role": "Mum of 2",
+          "quote": "My kids absolutely love this! They spend hours creating and coloring their own magical worlds. No more screen time battles!",
+          "avatar": "/images/testimonials/en/avatar-1.jpg"
+        },
+        "2": {
+          "name": "James T.",
+          "role": "Dad of 3",
+          "quote": "Finally, something that combines creativity with technology in a healthy way. My daughter made a unicorn princess castle and it was perfect!",
+          "avatar": "/images/testimonials/en/avatar-2.jpg"
+        },
+        "3": {
+          "name": "Emily R.",
+          "role": "Primary Teacher",
+          "quote": "I use this in my classroom for creative writing prompts. The children describe what they want, then color their creations. They're so engaged!",
+          "avatar": "/images/testimonials/en/avatar-3.jpg"
+        },
+        "4": {
+          "name": "David K.",
+          "role": "Grandad",
+          "quote": "My grandchildren visit every weekend now just to make new coloring pages together. Such wonderful bonding time!",
+          "avatar": "/images/testimonials/en/avatar-4.jpg"
+        },
+        "5": {
+          "name": "Rachel B.",
+          "role": "Childminder",
+          "quote": "The kids I look after can't get enough. Dragons, fairies, rockets - whatever they imagine comes to life!",
+          "avatar": "/images/testimonials/en/avatar-5.jpg"
+        },
+        "6": {
+          "name": "Michael P.",
+          "role": "Dad & Designer",
+          "quote": "As a designer, I appreciate the quality. As a dad, I love watching my son's face light up when his ideas become coloring pages!",
+          "avatar": "/images/testimonials/en/avatar-6.jpg"
+        }
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about creating magical coloring pages with Chunky Crayon",
+      "items": {
+        "1": {
+          "question": "What is Chunky Crayon?",
+          "answer": "Chunky Crayon is a magical coloring page generator designed for children and families. Simply describe what you want to color - like \"a dragon having a tea party\" or \"my favourite superhero on the moon\" - and we create a unique, printable coloring page in seconds. It's perfect for rainy days, quiet time, or sparking your child's imagination!"
+        },
+        "2": {
+          "question": "Is it safe and appropriate for children?",
+          "answer": "Absolutely! Chunky Crayon is built by parents, for parents. All generated images are designed to be child-friendly with age-appropriate content. Our AI is specially tuned to create wholesome, fun coloring pages suitable for children of all ages."
+        },
+        "3": {
+          "question": "How do I create a coloring page?",
+          "answer": "It's as easy as 1-2-3! Just type what you want to color (e.g., \"a unicorn in a magical forest\"), click Generate, and wait about 30 seconds. Your unique coloring page will appear ready to download and print. You can also use voice input or upload a photo for inspiration!"
+        },
+        "4": {
+          "question": "How long does it take to generate a page?",
+          "answer": "Most coloring pages are ready in about 30 seconds. Our friendly mascot Colo will keep you entertained while you wait! Complex scenes with lots of details might take a tiny bit longer."
+        },
+        "5": {
+          "question": "Can I print the coloring pages?",
+          "answer": "Yes! Every coloring page you create can be downloaded as a high-quality PDF, perfect for printing at home. The pages are optimised for A4 paper and look great with crayons, colored pencils, or markers."
+        },
+        "6": {
+          "question": "What if my child's request doesn't work?",
+          "answer": "Sometimes the AI might not get it quite right on the first try - that's part of the creative adventure! You can simply try again with slightly different words. Tips: be specific about what you want, and describe the scene clearly. If you're stuck, try our voice input - kids often explain things better by talking!"
+        },
+        "7": {
+          "question": "Is Chunky Crayon free to use?",
+          "answer": "You can try Chunky Crayon with 2 free generations - no account needed! After that, you can sign up for a free account to get 15 bonus credits, or choose one of our affordable subscription plans for unlimited creative fun."
+        },
+        "8": {
+          "question": "What's included in the subscription plans?",
+          "answer": "Our plans range from Crayon (perfect for casual coloring) to Studio (for super-creative families or teachers). All plans include: unlimited coloring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights."
+        },
+        "9": {
+          "question": "Can I use pages for my classroom or nursery?",
+          "answer": "Yes! Teachers and childminders love Chunky Crayon. Our Crayon and Rainbow plans are perfect for personal and educational use. If you're running a business or want to distribute pages commercially, check out our Masterpiece or Studio plans which include commercial licensing."
+        },
+        "10": {
+          "question": "How do credits work?",
+          "answer": "Each coloring page you generate uses 5 credits. Credits refresh monthly with your subscription, and some plans allow unused credits to roll over. You can also purchase credit packs if you need a little extra creativity boost!"
+        }
+      }
+    }
+  },
+  "gallery": {
+    "pageTitle": "Free Coloring Pages Gallery - Chunky Crayon",
+    "pageDescription": "Browse our free collection of printable coloring pages. Find animals, dragons, unicorns, princesses, and more. New pages added daily!",
+    "heroTitle": "Free Coloring Pages",
+    "heroSubtitle": "Discover thousands of free printable coloring pages. From cute animals to magical dragons, find the perfect page to color online or print at home.",
+    "browseByCategory": "Browse by Category",
+    "browseByDifficulty": "Browse by Difficulty",
+    "browseByAge": "Browse by Age Group",
+    "dailyPage": "Today's Daily Coloring Page",
+    "viewAllDaily": "View all daily pages",
+    "communityCreations": "Community Creations",
+    "viewAllCommunity": "View all community pages",
+    "startColoring": "Start Coloring",
+    "stats": {
+      "totalPages": "Total Pages",
+      "communityPages": "Community Pages",
+      "dailyPages": "Daily Pages",
+      "pagesSuffix": "pages"
+    },
+    "ageGroups": {
+      "toddlers": {
+        "title": "For Toddlers",
+        "ages": "Ages 2-4",
+        "description": "Simple shapes, big lines"
+      },
+      "kids": {
+        "title": "For Kids",
+        "ages": "Ages 4-12",
+        "description": "Fun and engaging"
+      },
+      "teens": {
+        "title": "For Teens",
+        "ages": "Ages 13-17",
+        "description": "Cool, detailed designs"
+      },
+      "adults": {
+        "title": "For Adults",
+        "ages": "18+",
+        "description": "Relaxing & intricate"
+      }
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "Beginner",
+        "description": "Simple shapes, big lines"
+      },
+      "intermediate": {
+        "title": "Intermediate",
+        "description": "Moderate detail"
+      },
+      "advanced": {
+        "title": "Advanced",
+        "description": "Detailed designs"
+      },
+      "expert": {
+        "title": "Expert",
+        "description": "Intricate patterns"
+      }
+    },
+    "categories": {
+      "animals": "Animals",
+      "fantasy": "Fantasy & Magic",
+      "dragons": "Dragons",
+      "unicorns": "Unicorns",
+      "princesses": "Princesses & Royalty",
+      "superheroes": "Superheroes",
+      "dinosaurs": "Dinosaurs",
+      "space": "Space & Astronauts",
+      "underwater": "Underwater & Ocean",
+      "vehicles": "Vehicles & Transport",
+      "pirates": "Pirates",
+      "nature": "Nature & Flowers",
+      "holidays": "Holidays & Seasons",
+      "robots": "Robots & Technology",
+      "food": "Food & Sweets"
+    },
+    "seo": {
+      "aboutTitle": "About Our Free Coloring Pages",
+      "aboutParagraph1": "Welcome to Chunky Crayon's free coloring page gallery! We offer a growing collection of printable coloring pages perfect for kids and adults alike. Our AI-powered tools help create unique, engaging coloring pages across a wide range of categories.",
+      "aboutParagraph2": "Every day, we add a new daily coloring page that you can color online using our digital tools or download and print for traditional coloring. Our community members also contribute their creative prompts, adding even more variety to our collection.",
+      "aboutParagraph3": "Browse by category to find exactly what you're looking for, whether it's cute animal coloring pages, fantasy creatures like dragons and unicorns, or seasonal holiday themes. Each page is designed with clean lines that are perfect for coloring."
+    },
+    "jumpToNav": {
+      "jumpTo": "Jump to:",
+      "selectSection": "Select section",
+      "backToTop": "Back to top",
+      "filters": "Filters",
+      "gallery": "Gallery",
+      "related": "Related",
+      "about": "About"
+    },
+    "difficultyFilter": {
+      "all": "All",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard",
+      "filterByDifficulty": "Filter by Difficulty"
+    },
+    "categoryPage": {
+      "coloringPages": "{category} Coloring Pages",
+      "relatedCategories": "Related Categories",
+      "noPagesYet": "No {category} pages yet",
+      "beTheFirst": "Be the first to create a {category} coloring page!",
+      "createAPage": "Create a Page",
+      "freeColoringPages": "Free {category} Coloring Pages",
+      "lookingFor": "Looking for the perfect {category} coloring page? You've come to the right place! Our collection features a wide variety of {category} designs perfect for kids and adults alike.",
+      "eachPageDescription": "Each coloring page can be colored online using our digital tools or downloaded and printed for traditional coloring with crayons, colored pencils, or markers. Our AI-generated designs feature clean lines and engaging details that make coloring fun and relaxing.",
+      "popularThemes": "Popular {category} Themes",
+      "includesPopular": "Our {category} category includes popular searches like:"
+    },
+    "categoryDescriptions": {
+      "animals": "Cute and wild animal coloring pages for kids and adults",
+      "fantasy": "Magical fantasy creatures and enchanted worlds to color",
+      "dragons": "Epic dragon coloring pages with fiery details",
+      "unicorns": "Magical unicorn coloring pages with rainbows and sparkles",
+      "princesses": "Royal princess and castle coloring pages",
+      "superheroes": "Action-packed superhero coloring pages",
+      "dinosaurs": "Prehistoric dinosaur coloring pages",
+      "space": "Space adventures and astronaut coloring pages",
+      "underwater": "Ocean creatures and underwater worlds to color",
+      "vehicles": "Cars, trucks, planes and more vehicle coloring pages",
+      "pirates": "Swashbuckling pirate adventure coloring pages",
+      "nature": "Beautiful nature and flower coloring pages",
+      "holidays": "Festive holiday and seasonal coloring pages",
+      "robots": "Futuristic robot and technology coloring pages",
+      "food": "Delicious food and sweet treat coloring pages"
+    },
+    "infiniteScroll": {
+      "allPagesViewed": "You've seen all the coloring pages!"
+    },
+    "ageGroupPages": {
+      "common": {
+        "moreAgeGroups": "More Age Groups",
+        "createSimplePages": "Create Simple Pages",
+        "createYourOwn": "Create Your Own",
+        "createYourDesign": "Create Your Design"
+      },
+      "toddlers": {
+        "pageTitle": "Coloring Pages for Toddlers",
+        "featuredSection": "Simple Toddler Coloring Pages",
+        "categoriesSection": "Toddler-Friendly Categories",
+        "heroDescription": "Simple, easy-to-color pages designed for little hands! Large shapes, bold outlines, and familiar objects make these perfect for children ages 2-4. Great for developing fine motor skills.",
+        "whyTitle": "Perfect for Little Artists",
+        "why1Title": "Big Bold Lines",
+        "why1Description": "Thick outlines make it easy for tiny hands to stay inside the lines!",
+        "why2Title": "Simple Shapes",
+        "why2Description": "Basic shapes and familiar objects that toddlers recognize and love.",
+        "why3Title": "Learn Colors",
+        "why3Description": "Great for learning colors and developing creativity!",
+        "seoTitle": "Free Coloring Pages for Toddlers",
+        "seoParagraph1": "Introducing your toddler to coloring? Our collection of simple coloring pages is perfect for children ages 2-4. Each design features large, easy-to-color areas with bold outlines that help little ones develop their fine motor skills.",
+        "seoParagraph2": "Our toddler coloring pages focus on familiar objects that young children love - cute animals, yummy food, colorful vehicles, and beautiful nature scenes. The simple designs reduce frustration and encourage creativity.",
+        "seoParagraph3": "All pages can be printed on standard A4 paper or colored online with our easy-to-use digital tools. Perfect for quiet time, rainy days, or learning activities at home or in preschool.",
+        "benefitsTitle": "Benefits of Coloring for Toddlers",
+        "benefitsDescription": "Coloring helps toddlers develop important skills including: hand-eye coordination, color recognition, grip strength, focus and concentration, and creative expression. Start with our simplest designs and watch your little one grow!"
+      },
+      "kids": {
+        "pageTitle": "Coloring Pages for Kids",
+        "featuredSection": "Popular Kids Coloring Pages",
+        "categoriesSection": "Browse Kids Categories",
+        "heroDescription": "Fun and engaging coloring pages perfect for children ages 4-12! Dinosaurs, unicorns, superheroes, and more. Easy to color online or print at home for endless creative fun.",
+        "whyTitle": "Why Kids Love Chunky Crayon",
+        "why1Title": "Create Anything",
+        "why1Description": "Kids can describe their wildest ideas and see them become coloring pages!",
+        "why2Title": "Print & Color",
+        "why2Description": "Download high-quality PDFs ready to print on regular A4 paper.",
+        "why3Title": "Color Online",
+        "why3Description": "Use our digital coloring tools right in the browser!",
+        "seoTitle": "Free Coloring Pages for Kids",
+        "seoParagraph1": "Looking for the perfect coloring pages for your children? Chunky Crayon offers a huge collection of free, printable coloring pages designed specifically for kids ages 4-12. From cute animals to action-packed superheroes, there's something for every young artist.",
+        "seoParagraph2": "Our coloring pages feature clean, bold lines that are easy for little hands to color. Whether your child prefers crayons, colored pencils, or markers, these pages are designed to deliver great results. You can also use our online coloring tools for screen-based creativity.",
+        "seoParagraph3": "Best of all, kids can create their own unique coloring pages by describing what they want to color. A dragon playing football? A unicorn in space? Whatever they imagine can become a real coloring page in seconds!",
+        "popularTitle": "Popular Categories for Kids",
+        "popularDescription": "Our most popular kids categories include: dinosaur coloring pages, unicorn coloring pages, superhero coloring pages, animal coloring pages, space and rocket coloring pages, and vehicle coloring pages. Each category is filled with age-appropriate designs perfect for children."
+      },
+      "teens": {
+        "pageTitle": "Coloring Pages for Teens",
+        "featuredSection": "Popular Teen Coloring Pages",
+        "categoriesSection": "Teen Categories",
+        "heroDescription": "Cool, detailed coloring pages designed for teenagers! From anime and gaming to fantasy and sci-fi, express your creativity with designs that match your style. Perfect for stress relief and creative expression.",
+        "whyTitle": "Made for Creative Teens",
+        "why1Title": "Cool Themes",
+        "why1Description": "Anime, gaming, fantasy, and sci-fi designs that match your interests!",
+        "why2Title": "Detailed Art",
+        "why2Description": "Intricate designs that challenge your skills and look amazing when done.",
+        "why3Title": "Stress Relief",
+        "why3Description": "Take a break from screens and unwind with creative coloring.",
+        "seoTitle": "Free Coloring Pages for Teenagers",
+        "seoParagraph1": "Looking for coloring pages that aren't \"too kiddy\"? Our teen collection features cool, detailed designs perfect for ages 13-17. From anime characters and gaming scenes to fantasy worlds and abstract patterns, there's something for every style.",
+        "seoParagraph2": "These aren't your little sibling's coloring pages. Our teenage designs feature intricate details, dynamic compositions, and themes that resonate with teen interests. Perfect for creative expression, stress relief during study breaks, or just chilling.",
+        "seoParagraph3": "Create your own custom coloring pages by describing exactly what you want. Want a dragon fighting a robot in space? An anime-style portrait? A detailed mandala with your favorite symbols? Just describe it and our AI brings it to life!",
+        "popularTitle": "Popular Teen Themes",
+        "popularDescription": "Our most popular categories for teens include: anime and manga coloring pages, fantasy creature coloring pages, superhero action scenes, gaming-inspired art, space and sci-fi designs, and intricate pattern pages. Each category offers detailed, engaging designs."
+      },
+      "adults": {
+        "pageTitle": "Coloring Pages for Adults",
+        "featuredSection": "Popular Adult Coloring Pages",
+        "categoriesSection": "Adult Categories",
+        "heroDescription": "Discover the therapeutic benefits of adult coloring! Our collection features intricate mandalas, beautiful nature scenes, and detailed patterns designed for relaxation and mindfulness. Perfect for stress relief after a long day.",
+        "whyTitle": "Benefits of Adult Coloring",
+        "why1Title": "Stress Relief",
+        "why1Description": "Coloring activates the relaxation response, reducing anxiety and promoting calm.",
+        "why2Title": "Mindfulness",
+        "why2Description": "Focus on the present moment and enjoy a meditative, screen-free activity.",
+        "why3Title": "Creativity",
+        "why3Description": "Express yourself through color choices and create beautiful artwork.",
+        "seoTitle": "Free Coloring Pages for Adults",
+        "seoParagraph1": "Adult coloring has become a popular wellness activity, and for good reason. Studies show that coloring can reduce anxiety, improve focus, and provide a calming break from our screen-filled lives. Our collection offers beautiful, intricate designs perfect for grown-ups.",
+        "seoParagraph2": "From detailed mandalas that promote mindfulness to peaceful nature scenes and elegant patterns, each page is designed to provide hours of relaxing creativity. Print on quality paper and use your favorite coloring tools - colored pencils, markers, or gel pens all work beautifully.",
+        "seoParagraph3": "Want something unique? Create your own custom coloring pages! Describe your perfect relaxation scene - a zen garden, an Art Nouveau pattern, or a detailed botanical illustration - and our AI will bring your vision to life.",
+        "popularTitle": "Popular Adult Coloring Themes",
+        "popularDescription": "Explore our most popular adult categories: mandala coloring pages for meditation, intricate nature and botanical designs, geometric patterns, Art Deco and Art Nouveau styles, zentangle-inspired pages, and peaceful landscape scenes. Each offers a unique path to relaxation."
+      }
+    }
+  },
+  "pricing": {
+    "pageTitle": "Pricing - Chunky Crayon",
+    "heroTitle": "Plans for every coloring adventure!",
+    "heroSubtitle": "Whether you're a parent, a young artist, or a grown-up who loves to color, there's a Chunky Crayon plan for you. No account needed to get started!",
+    "monthly": "Monthly",
+    "annual": "Annual (save 15%)",
+    "mostPopular": "Most Popular",
+    "buyNow": "Buy Now",
+    "noCommitment": "No commitment. Cancel anytime.",
+    "perMonth": "/mo",
+    "creditsPerMonth": "credits/month",
+    "plans": {
+      "crayon": {
+        "name": "Crayon Plan",
+        "tagline": "Start your coloring adventure",
+        "audience": "Perfect for casual colorers and young artists"
+      },
+      "rainbow": {
+        "name": "Rainbow Plan",
+        "tagline": "Fun for the whole family",
+        "audience": "Great for creative families and siblings"
+      },
+      "masterpiece": {
+        "name": "Masterpiece Plan",
+        "tagline": "For color enthusiasts",
+        "audience": "Perfect for adults and serious colorers"
+      },
+      "studio": {
+        "name": "Studio Plan",
+        "tagline": "For super creators and small businesses",
+        "audience": "Best for studios, teachers, and high-volume users"
+      }
+    },
+    "features": {
+      "textPrompts": "Create coloring pages from text prompts",
+      "wordsNumbers": "Create coloring pages with words, names, and numbers",
+      "adjustments": "Adjust color, contrast, and brightness",
+      "photoToColoring": "Turn photos into coloring pages",
+      "allCrayonFeatures": "All Crayon Plan features",
+      "advancedEditing": "Advanced editing features",
+      "earlyAccess": "Early access to new models and features",
+      "rollover1Month": "Credits roll over (up to 1 month)",
+      "allRainbowFeatures": "All Rainbow Plan features",
+      "bulkGeneration": "Bulk generation",
+      "commercialUse": "Commercial use",
+      "rollover2Months": "Credits roll over (up to 2 months)",
+      "allMasterpieceFeatures": "All Masterpiece Plan features",
+      "rollover3Months": "Credits roll over (up to 3 months)"
+    },
+    "creditPacks": {
+      "title": "Need extra credits?",
+      "pack100": "100 Credits Pack",
+      "pack500": "500 Credits Pack",
+      "pack1000": "1,000 Credits Pack"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "cancelAnytime": {
+        "question": "Can I cancel anytime?",
+        "answer": "Yes! You can cancel your subscription at any time, no questions asked."
+      },
+      "rollover": {
+        "question": "Do credits roll over?",
+        "answer": "Some plans allow you to roll over unused credits. See plan details for more info."
+      },
+      "audience": {
+        "question": "Is this for kids or adults?",
+        "answer": "Both! Chunky Crayon is perfect for families, kids, and grown-ups who love to color."
+      },
+      "gettingStarted": {
+        "question": "How do I get started?",
+        "answer": "Just pick a plan and start creating coloring pages instantly!"
+      }
+    }
+  },
+  "blog": {
+    "title": "The Chunky Crayon Blog",
+    "subtitle": "Tips, ideas, and inspiration for creative coloring activities",
+    "allPosts": "All Posts",
+    "byAuthor": "By {author}",
+    "categories": {
+      "colouringTips": "Colouring Tips",
+      "mindfulnessRelaxation": "Mindfulness & Relaxation",
+      "artEducation": "Art Education",
+      "activitiesForKids": "Activities for Kids",
+      "seasonalHolidays": "Seasonal & Holidays"
+    }
+  },
+  "coloringPage": {
+    "title": "Coloring Page",
+    "defaultDescription": "Free printable coloring page from Chunky Crayon",
+    "progress": {
+      "colored": "colored",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "Great start!",
+        "50": "Halfway there!",
+        "75": "Almost done!",
+        "100": "Amazing!"
+      }
+    },
+    "sidebar": {
+      "colors": "Colors",
+      "tools": "Tools",
+      "size": "Size",
+      "history": "History",
+      "zoom": "Zoom",
+      "actions": "Actions"
+    },
+    "tools": {
+      "pan": "Pan",
+      "fill": "Fill",
+      "brush": "Brush",
+      "sticker": "Sticker",
+      "magicReveal": "Magic Reveal",
+      "magicAuto": "Magic Auto",
+      "magicBrush": "Magic Brush",
+      "magicFill": "Magic Fill",
+      "autoColor": "Auto Color",
+      "magic": "Magic"
+    },
+    "brushTypes": {
+      "crayon": "Crayon",
+      "marker": "Marker",
+      "eraser": "Eraser",
+      "glitter": "Glitter",
+      "sparkle": "Sparkle",
+      "rainbow": "Rainbow",
+      "glow": "Glow",
+      "neon": "Neon"
+    },
+    "brushSizes": {
+      "small": "Fine",
+      "medium": "Regular",
+      "large": "Chunky"
+    },
+    "fillPatterns": {
+      "solid": "Solid",
+      "dots": "Polka Dots",
+      "stripes": "Stripes",
+      "diagonal": "Diagonal",
+      "checkerboard": "Checkers",
+      "hearts": "Hearts",
+      "stars": "Stars",
+      "zigzag": "Zigzag"
+    },
+    "actions": {
+      "save": "Save",
+      "download": "Download",
+      "share": "Share",
+      "print": "Print",
+      "preparing": "Preparing...",
+      "doneSharing": "Done sharing",
+      "colorAgain": "Color again",
+      "startOver": "Start Over"
+    },
+    "toolbar": {
+      "expand": "Expand toolbar",
+      "collapse": "Collapse toolbar",
+      "moreTools": "More tools",
+      "less": "Less"
+    },
+    "undoRedo": {
+      "undo": "Undo",
+      "undoShortcut": "Undo (Ctrl+Z)",
+      "redo": "Redo",
+      "redoShortcut": "Redo (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "Select {color} color",
+      "magicToolsMessage": "Colors are chosen automatically with Magic tools"
+    },
+    "patternSelector": {
+      "label": "Pattern:"
+    },
+    "zoomControls": {
+      "zoomLevel": "Zoom level: {level}%",
+      "zoomOut": "Zoom out",
+      "zoomOutAria": "Zoom out (see more)",
+      "zoomIn": "Zoom in",
+      "zoomInAria": "Zoom in (see closer)",
+      "pan": "Move",
+      "panAria": "Move around the picture",
+      "reset": "See whole picture",
+      "resetAria": "Go back to full picture"
+    },
+    "muteToggle": {
+      "mute": "Mute sounds",
+      "unmute": "Unmute sounds",
+      "turnOn": "Turn sounds on",
+      "turnOff": "Turn sounds off"
+    }
+  },
+  "shareModal": {
+    "title": "Share Artwork",
+    "privacyNote": "Anyone with this link can view this artwork. No personal information is shared.",
+    "expiresIn": "Link expires in:",
+    "expiration": {
+      "7days": "7 days",
+      "30days": "30 days",
+      "never": "Never expires"
+    },
+    "createLink": "Create Share Link",
+    "creating": "Creating share link...",
+    "success": {
+      "title": "Link Created!",
+      "subtitle": "Share this link with family and friends"
+    },
+    "done": "Done"
+  },
+  "adultGate": {
+    "title": "Grown-Up Check",
+    "explanation": "Please ask a grown-up to solve this to continue.",
+    "whatIs": "What is:",
+    "placeholder": "Type the answer",
+    "error": "Oops! Try again",
+    "errorWithAttempts": "Oops! Try again ({attempts} attempts)",
+    "cancel": "Cancel",
+    "check": "Check"
+  },
+  "saveToGallery": {
+    "idle": "Save to Gallery",
+    "saving": "Saving...",
+    "saved": "Saved!",
+    "tryAgain": "Try Again",
+    "errors": {
+      "captureArtwork": "Could not capture your artwork",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "shareButton": {
+    "idle": "Share",
+    "preparing": "Preparing...",
+    "doneSharing": "Done sharing"
+  },
+  "colors": {
+    "primary": {
+      "cherryRed": "Cherry Red",
+      "sunsetOrange": "Sunset Orange",
+      "sunshineYellow": "Sunshine Yellow",
+      "grassGreen": "Grass Green",
+      "skyBlue": "Sky Blue",
+      "grapePurple": "Grape Purple",
+      "bubblegumPink": "Bubblegum Pink",
+      "chocolateBrown": "Chocolate Brown"
+    },
+    "secondary": {
+      "coral": "Coral",
+      "mint": "Mint",
+      "lavender": "Lavender",
+      "peach": "Peach",
+      "navy": "Navy",
+      "forest": "Forest",
+      "gold": "Gold",
+      "rose": "Rose"
+    },
+    "essentials": {
+      "black": "Black",
+      "white": "White",
+      "gray": "Gray",
+      "skinTone": "Skin Tone"
+    },
+    "skinTones": {
+      "light": "Light",
+      "mediumLight": "Medium Light",
+      "medium": "Medium",
+      "mediumDark": "Medium Dark",
+      "dark": "Dark",
+      "deep": "Deep"
+    }
+  },
+  "stickers": {
+    "categories": {
+      "stars": "Stars",
+      "hearts": "Hearts",
+      "shapes": "Shapes",
+      "nature": "Nature",
+      "emojis": "Emojis",
+      "fun": "Fun"
+    },
+    "items": {
+      "yellowStar": "Yellow Star",
+      "sparkleStar": "Sparkle Star",
+      "glowingStar": "Glowing Star",
+      "shootingStar": "Shooting Star",
+      "redHeart": "Red Heart",
+      "pinkHeart": "Pink Heart",
+      "sparkleHeart": "Sparkle Heart",
+      "rainbowHeart": "Rainbow Heart",
+      "circle": "Circle",
+      "square": "Square",
+      "triangle": "Triangle",
+      "diamond": "Diamond",
+      "flower": "Flower",
+      "sun": "Sun",
+      "rainbow": "Rainbow",
+      "cloud": "Cloud",
+      "butterfly": "Butterfly",
+      "leaf": "Leaf",
+      "smile": "Smile",
+      "loveEyes": "Love Eyes",
+      "cool": "Cool",
+      "wink": "Wink",
+      "crown": "Crown",
+      "unicorn": "Unicorn",
+      "rocket": "Rocket",
+      "balloon": "Balloon",
+      "gift": "Gift",
+      "cake": "Cake"
+    }
+  },
+  "stickerBook": {
+    "title": "Sticker Book",
+    "subtitle": "Collect stickers by coloring!",
+    "pageTitle": "Sticker Book - Chunky Crayon",
+    "pageDescription": "View your sticker collection and see what stickers you can unlock!",
+    "loadError": "Unable to load stickers. Please try again.",
+    "filters": {
+      "all": "All",
+      "milestones": "Milestones",
+      "categories": "Categories",
+      "explore": "Explore",
+      "special": "Special"
+    },
+    "emptyState": "No stickers in this category yet.",
+    "countFormat": "{count}/{total}",
+    "newBadge": "{count} NEW",
+    "progress": {
+      "label": "Sticker Collection",
+      "complete": "Amazing! All stickers collected!",
+      "almostThere": "Almost there! You're doing great!",
+      "halfway": "Halfway there! Keep going!",
+      "greatStart": "Great start!"
+    },
+    "detail": {
+      "lockedName": "???",
+      "lockedDescription": "This sticker is still locked!",
+      "unlockedOn": "Unlocked on {date}",
+      "howToUnlock": "How to unlock:",
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "legendary": "Legendary"
+      },
+      "unlockConditions": {
+        "artworkCount": "Save {count} artworks to your gallery",
+        "firstCategory": "Color your first {category} page",
+        "categoryCount": "Color {count} {category} pages",
+        "special": "Explore {count} different categories"
+      }
+    }
+  },
+  "stickerCatalog": {
+    "first-steps": {
+      "name": "First Steps",
+      "description": "Save your very first colored artwork!",
+      "unlockMessage": "You did it! Your first masterpiece is saved!"
+    },
+    "getting-started": {
+      "name": "Getting Started",
+      "description": "You're on a roll! Save 5 artworks.",
+      "unlockMessage": "Five artworks! You're becoming an artist!"
+    },
+    "high-five": {
+      "name": "High Five",
+      "description": "Save 10 beautiful artworks to your gallery.",
+      "unlockMessage": "High five! Ten amazing artworks!"
+    },
+    "perfect-ten": {
+      "name": "Perfect Ten",
+      "description": "A true artist! Save 25 artworks.",
+      "unlockMessage": "25 artworks! You're a coloring star!"
+    },
+    "super-artist": {
+      "name": "Super Artist",
+      "description": "Incredible dedication! Save 50 artworks.",
+      "unlockMessage": "50 masterpieces! You're a super artist!"
+    },
+    "master-creator": {
+      "name": "Master Creator",
+      "description": "Legendary status! Save 75 artworks.",
+      "unlockMessage": "75 artworks! A true master creator!"
+    },
+    "century-club": {
+      "name": "Century Club",
+      "description": "The ultimate achievement! Save 100 artworks.",
+      "unlockMessage": "100 artworks! Welcome to the Century Club!"
+    },
+    "animal-friend": {
+      "name": "Animal Friend",
+      "description": "Color your first animal page!",
+      "unlockMessage": "You made a new animal friend!"
+    },
+    "fantasy-dreamer": {
+      "name": "Fantasy Dreamer",
+      "description": "Color your first fantasy page!",
+      "unlockMessage": "Welcome to the world of fantasy!"
+    },
+    "space-explorer": {
+      "name": "Space Explorer",
+      "description": "Color your first space page!",
+      "unlockMessage": "3, 2, 1... Blast off! Space explored!"
+    },
+    "nature-lover": {
+      "name": "Nature Lover",
+      "description": "Color your first nature page!",
+      "unlockMessage": "Nature is beautiful, just like your art!"
+    },
+    "vehicle-driver": {
+      "name": "Vehicle Driver",
+      "description": "Color your first vehicle page!",
+      "unlockMessage": "Beep beep! Nice wheels!"
+    },
+    "dino-hunter": {
+      "name": "Dino Hunter",
+      "description": "Color your first dinosaur page!",
+      "unlockMessage": "ROAR! You found a dinosaur!"
+    },
+    "ocean-diver": {
+      "name": "Ocean Diver",
+      "description": "Color your first sea life page!",
+      "unlockMessage": "Splash! Under the sea adventure!"
+    },
+    "food-lover": {
+      "name": "Food Lover",
+      "description": "Color your first food page!",
+      "unlockMessage": "Yummy! That looks delicious!"
+    },
+    "sports-star": {
+      "name": "Sports Star",
+      "description": "Color your first sports page!",
+      "unlockMessage": "Goal! You're a sports star!"
+    },
+    "holiday-spirit": {
+      "name": "Holiday Spirit",
+      "description": "Color your first holiday page!",
+      "unlockMessage": "Celebrate! Holiday spirit unlocked!"
+    },
+    "animal-master": {
+      "name": "Animal Master",
+      "description": "Color 10 animal pages to become a true animal expert!",
+      "unlockMessage": "You're the ultimate animal friend!"
+    },
+    "fantasy-master": {
+      "name": "Fantasy Master",
+      "description": "Color 10 fantasy pages to unlock magical powers!",
+      "unlockMessage": "Your fantasy powers are legendary!"
+    },
+    "space-master": {
+      "name": "Space Master",
+      "description": "Color 10 space pages to become an astronaut!",
+      "unlockMessage": "You're a certified space explorer!"
+    },
+    "category-explorer": {
+      "name": "Category Explorer",
+      "description": "Try something new! Color pages from 3 different categories.",
+      "unlockMessage": "Variety is the spice of art!"
+    },
+    "world-traveler": {
+      "name": "World Traveler",
+      "description": "Color pages from 5 different categories!",
+      "unlockMessage": "You've explored all the coloring worlds!"
+    }
+  },
+  "stickerSelector": {
+    "title": "Choose a Sticker",
+    "close": "Close",
+    "selected": "Selected:",
+    "helpText": "Tap on the canvas to place your sticker"
+  },
+  "shareArtwork": {
+    "title": "Share Artwork",
+    "linkCreated": "Link Created!",
+    "sharePrompt": "Share this link with family and friends",
+    "privacyNotice": "Anyone with this link can view this artwork. No personal information is shared.",
+    "expiresIn": "Link expires in:",
+    "expiration": {
+      "7days": "7 days",
+      "30days": "30 days",
+      "never": "Never expires"
+    },
+    "createLink": "Create Share Link",
+    "creating": "Creating share link...",
+    "close": "Close",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "done": "Done",
+    "error": "Failed to create share link"
+  },
+  "account": {
+    "profiles": "Profiles",
+    "billing": "Billing",
+    "settings": "Settings",
+    "myArtwork": "My Artwork"
+  },
+  "profiles": {
+    "pageTitle": "Manage Profiles",
+    "pageSubtitle": "Create and manage profiles for your family members",
+    "editTitle": "Edit Profile",
+    "switcher": {
+      "close": "Close profile switcher"
+    },
+    "ageGroups": {
+      "toddler": "Toddler",
+      "toddlerDescription": "2-4 years",
+      "child": "Child",
+      "childDescription": "5-8 years",
+      "tween": "Tween",
+      "tweenDescription": "9-12 years",
+      "teen": "Teen",
+      "teenDescription": "13-17 years",
+      "adult": "Adult",
+      "adultDescription": "18+"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "e.g., Emma",
+      "nameRequired": "Please enter a name",
+      "ageGroup": "Age Group",
+      "avatar": "Avatar",
+      "difficultyLevel": "Difficulty Level",
+      "saveChanges": "Save Changes",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "profileUpdated": "Profile updated!",
+      "profileSwitched": "Profile switched!",
+      "unnamed": "Unnamed"
+    },
+    "delete": {
+      "title": "Delete Profile?",
+      "dangerZone": "Danger Zone",
+      "warning": "Deleting this profile will remove it permanently. Coloring pages created by this profile will remain in your account.",
+      "confirmText": "This will permanently delete the profile. Coloring pages created by this profile will remain in your account.",
+      "deleteProfile": "Delete Profile",
+      "deleting": "Deleting...",
+      "deleted": "\"{name}\" deleted",
+      "coloringPages": "{count, plural, =1 {1 coloring page} other {# coloring pages}}"
+    },
+    "manager": {
+      "aboutProfiles": "About Profiles",
+      "ownCollection": "Each profile has its own coloring page collection",
+      "personalizedDifficulty": "Difficulty settings are personalized per profile",
+      "maxProfiles": "You can have up to {max} profiles on your account",
+      "switchAnytime": "Switch profiles anytime from the header menu",
+      "profilesUsed": "{count} of {max} profiles used",
+      "colorings": "{count, plural, =1 {1 coloring} other {# colorings}}",
+      "edit": "Edit {name}",
+      "delete": "Delete {name}"
+    },
+    "create": {
+      "title": "Create Profile",
+      "subtitle": "Add a new artist to your family",
+      "button": "Create Profile",
+      "creating": "Creating...",
+      "success": "Profile created!",
+      "addProfile": "Add Profile",
+      "maxReached": "Maximum profiles reached",
+      "maxReachedDescription": "You've reached the maximum of {max} profiles. Delete an existing profile to add a new one.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g., Emma",
+      "nameError": "Please enter a name",
+      "ageGroupLabel": "Age Group",
+      "avatarLabel": "Avatar"
+    }
+  },
+  "settings": {
+    "pageTitle": "Settings",
+    "pageSubtitle": "Manage your account preferences",
+    "parentalControls": {
+      "title": "Parental Controls",
+      "description": "Control what content is visible when using the app"
+    },
+    "communityImages": {
+      "label": "Show community images",
+      "description": "When enabled, you'll see coloring pages created by other users in the gallery. When disabled, only your own creations are shown.",
+      "enabled": "Community images enabled",
+      "disabled": "Community images disabled"
+    },
+    "languagePreference": {
+      "title": "Language",
+      "description": "Choose your preferred language for the app"
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "Free Daily Coloring!",
+      "subtitle": "Get a <free>free</free> coloring page in your inbox every day.",
+      "placeholder": "parent@example.com",
+      "join": "Join",
+      "success": "Success!",
+      "successDescription": "You have successfully joined the email list!",
+      "error": "Something went wrong",
+      "errorDescription": "Failed to join the email list. Please try again."
+    },
+    "unsubscribe": {
+      "success": "Unsubscribed",
+      "successDescription": "You've been removed from our mailing list. We're sad to see you go!",
+      "invalid": "Invalid link",
+      "invalidDescription": "This unsubscribe link is invalid or has expired."
+    }
+  },
+  "billing": {
+    "pageTitle": "Your Billing & Subscription",
+    "pageSubtitle": "Manage your subscription and purchase additional credits to keep creating amazing coloring pages.",
+    "currentPlan": "Current Plan",
+    "currentCredits": "Current credits: {count}",
+    "renewsOn": "Your subscription renews on {date}",
+    "manageSubscription": "Manage Subscription",
+    "noActiveSubscription": "No Active Subscription",
+    "noSubscriptionDescription": "Choose a plan to start creating amazing coloring pages.",
+    "viewPlans": "View Plans",
+    "buyMoreCredits": "Buy More Credits",
+    "credits": "{count} credits",
+    "buyNow": "Buy Now",
+    "loading": "Loading...",
+    "availablePlans": "Available Plans",
+    "changePlan": "Change Plan",
+    "currentPlanBadge": "Current Plan",
+    "manageInPortal": "Manage your subscription in the customer portal",
+    "noCommitment": "No commitment. Cancel anytime.",
+    "perMonth": "/mo",
+    "noSubscriptionForCredits": "Active subscription required to purchase credits",
+    "noSubscriptionFound": "No active subscription found",
+    "failedToChangeSubscription": "Failed to change subscription",
+    "failedToCheckout": "Failed to redirect to checkout",
+    "failedToPurchaseCredits": "Failed to purchase credits",
+    "failedToOpenPortal": "Failed to open customer portal"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "signInWithEmail": "Sign in with Email",
+    "sendingLink": "Sending link...",
+    "chooseMethod": "Choose your preferred sign in method",
+    "orContinueWith": "Or continue with",
+    "emailPlaceholder": "name@example.com",
+    "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy."
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "notFound": "Page not found",
+    "sharedArtworkNotFound": {
+      "title": "Artwork Not Found",
+      "description": "This shared artwork link may have expired or been removed. Ask the artist for a new link!",
+      "cta": "Explore Coloring Pages"
+    },
+    "unauthorized": "Please sign in to continue",
+    "stripeLoadFailed": "Stripe failed to load",
+    "checkoutFailed": "Failed to create checkout session",
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "redirectFailed": "Failed to redirect to checkout"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "gallery": "Gallery",
+    "forToddlers": "For Toddlers",
+    "forKids": "For Kids",
+    "forTeens": "For Teens",
+    "forAdults": "For Adults",
+    "ariaLabel": "Breadcrumb"
+  },
+  "jumpToNav": {
+    "jumpToSection": "Jump to section",
+    "backToTop": "Back to top"
+  },
+  "social": {
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "tiktok": "TikTok",
+    "pinterest": "Pinterest",
+    "x": "X",
+    "threads": "Threads"
+  },
+  "socialShare": {
+    "shareOn": "Share on {platform}",
+    "download": "Download artwork",
+    "downloadAria": "Download your colored artwork",
+    "facebookAria": "Share on Facebook",
+    "xAria": "Share on X (Twitter)",
+    "pinterestAria": "Pin on Pinterest",
+    "whatsappAria": "Share on WhatsApp"
+  },
+  "adultGate": {
+    "title": "Are you a grown-up?",
+    "subtitle": "This section is for parents and guardians",
+    "instructions": "Please solve this simple math problem to continue:",
+    "placeholder": "Enter your answer",
+    "submit": "Continue",
+    "error": "That's not quite right. Try again!",
+    "cancel": "Go back"
+  },
+  "parentalGate": {
+    "title": "Grown-ups only!",
+    "subtitle": "Solve this math problem to continue",
+    "description": "To make sure a grown-up is helping, please answer this question:",
+    "question": "What is {num1} + {num2}?",
+    "placeholder": "Your answer",
+    "submit": "Check Answer",
+    "cancel": "Cancel",
+    "error": "Not quite right! Try another one...",
+    "incorrect": "That's not right. Please try again.",
+    "hint": "Ask a parent or guardian for help!"
+  },
+  "stickerReward": {
+    "congratulations": "Congratulations!",
+    "youEarned": "You earned a sticker!",
+    "stickerName": "{name}",
+    "tapToContinue": "Tap to continue",
+    "addedToBook": "Added to your sticker book!",
+    "viewStickerBook": "View Sticker Book",
+    "keepColoring": "Keep Coloring",
+    "previousSticker": "Previous sticker",
+    "nextSticker": "Next sticker",
+    "newSticker": "New Sticker!",
+    "newStickers": "New Stickers!",
+    "ofCount": "{current} of {total}",
+    "addToStickerBook": "Add to Sticker Book",
+    "goToSticker": "Go to sticker {number}",
+    "rarity": {
+      "common": "Common",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "legendary": "Legendary"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Chunky Crayon - Creative Coloring & Learning Fun",
+      "description": "Chunky Crayon is a vibrant and interactive app designed for kids and parents to generate unique, personalized coloring book pages and fun educational worksheets. Transform text, voice, and image prompts into printable coloring pages, or enjoy digital coloring on our web, iOS, and Android apps."
+    },
+    "gallery": {
+      "title": "Free Coloring Pages Gallery - Chunky Crayon",
+      "description": "Browse our free collection of printable coloring pages. Find animals, dragons, unicorns, princesses, and more. New pages added daily!"
+    }
+  },
+  "altText": {
+    "mascot": "Colo the friendly crayon mascot",
+    "dailyPage": "Daily coloring page",
+    "coloringPage": "Coloring page",
+    "ogImage": "Chunky Crayon AI-Generated Coloring Book Pages"
+  },
+  "metadata": {
+    "keywords": "coloring book pages, creative app for kids, personalized coloring pages, educational worksheets, fun learning activities, kids creativity app, interactive coloring app, digital coloring, printable coloring pages"
+  },
+  "myArtwork": {
+    "pageTitle": "My Artwork",
+    "pageSubtitle": "All your saved coloring creations in one place. Click on any artwork to color it again or make a new version!",
+    "emptyState": {
+      "title": "No saved artwork yet!",
+      "description": "Start coloring and save your creations to see them here. Your artwork will be saved forever!",
+      "cta": "Browse Coloring Pages"
+    },
+    "grid": {
+      "coloredBy": "Colored by {name}",
+      "viewArtwork": "View artwork",
+      "deleteArtwork": "Delete artwork",
+      "shareArtwork": "Share artwork",
+      "shareWithFamily": "Share with family",
+      "colorAgain": "Color again",
+      "savedArtwork": "Saved artwork"
+    },
+    "filters": {
+      "all": "All",
+      "recent": "Recent",
+      "favorites": "Favorites"
+    },
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first"
+    },
+    "stickerCard": {
+      "title": "Sticker Book",
+      "newBadge": "{count} NEW",
+      "stickersCollected": "{collected} of {total} stickers collected"
+    },
+    "deleteDialog": {
+      "title": "Delete Artwork?",
+      "description": "Are you sure you want to delete this artwork? This can't be undone!",
+      "confirm": "Yes, Delete",
+      "cancel": "No, Keep It"
+    }
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count} days ago",
+    "lastWeek": "Last week",
+    "weeksAgo": "{count} weeks ago",
+    "monthsAgo": "{count} months ago",
+    "justNow": "Just now",
+    "minutesAgo": "{count} minutes ago",
+    "hoursAgo": "{count} hours ago"
+  },
+  "challenges": {
+    "pageTitle": "Weekly Challenges",
+    "pageSubtitle": "Complete fun coloring challenges each week to earn exclusive stickers and accessories for your Colo!",
+    "breadcrumbs": {
+      "home": "Home",
+      "account": "Account",
+      "challenges": "Challenges"
+    },
+    "currentChallenge": {
+      "title": "This Week's Challenge"
+    },
+    "noActive": {
+      "title": "No Active Challenge",
+      "description": "Check back soon for the next weekly challenge!"
+    },
+    "history": {
+      "title": "Past Challenges",
+      "completed": "Completed",
+      "expired": "Expired",
+      "progress": "{progress} / {requirement} completed"
+    },
+    "reward": {
+      "claimed": "Reward Claimed!",
+      "stickerAdded": "A new sticker has been added to your sticker book!",
+      "accessoryAdded": "A new accessory has been added to your Colo!"
+    }
+  },
+  "recentCreations": {
+    "title": "Your Recent Creations",
+    "imageAlt": "Your coloring page",
+    "ctaHighlight": "Start free",
+    "ctaMessage": "to keep your creations forever and unlock more!",
+    "ctaButton": "Start Free"
+  },
+  "createForm": {
+    "title": "Create Magic!",
+    "tagline": "Type, talk, or snap a photo!",
+    "generatingMessage": "Ready in about 30 seconds!",
+    "inputModes": {
+      "type": "Type",
+      "talk": "Talk",
+      "photo": "Photo",
+      "ariaLabel": "Input mode selection"
+    },
+    "voiceInput": {
+      "startRecording": "Start recording",
+      "stopRecording": "Stop recording",
+      "tapToRecord": "Tap the microphone and tell me what you want to color!",
+      "signInToRecord": "Sign in to start recording!",
+      "notSupported": "Oops! Your browser doesn't support voice recording.",
+      "notSupportedHint": "Try using Chrome, Safari, or Firefox on a device with a microphone.",
+      "tryAgain": "Try again",
+      "listening": "I'm listening! Tell me what you want to color!",
+      "allDone": "All done? Tap the button or I'll finish in {countdown}...",
+      "cancel": "Cancel",
+      "doneTalking": "Done talking",
+      "imDone": "I'm done!",
+      "gettingMicReady": "Getting your microphone ready...",
+      "understanding": "Understanding what you said...",
+      "makeMyColoringPage": "🎨 Make my coloring page!",
+      "notQuiteRight": "Not quite right? Try again",
+      "maxDuration": "Up to {seconds} seconds",
+      "errors": {
+        "permissionDenied": "I couldn't access your microphone. Please allow microphone access and try again!",
+        "notSupported": "Oops! Your browser doesn't support voice recording. Try Chrome or Safari!",
+        "transcriptionFailed": "Hmm, I couldn't understand that. Let's try again!",
+        "recordingFailed": "Something went wrong with the recording. Try again!",
+        "timeout": "The recording was too long. Try a shorter message!"
+      }
+    },
+    "imageInput": {
+      "takePhotoOrUpload": "Take a photo or upload a picture!",
+      "signInToUpload": "Sign in to upload images!",
+      "camera": "Camera",
+      "upload": "Upload",
+      "takePhoto": "Take a photo",
+      "uploadImage": "Upload an image",
+      "dropHere": "Drop it here!",
+      "dragAndDrop": "Or drag and drop an image here",
+      "shareDrawing": "Share a drawing or any picture you want to color!",
+      "greatPicture": "Great picture! Is this the one you want?",
+      "pickAnother": "Pick another",
+      "useThis": "Use this!",
+      "iSee": "I see:",
+      "makeMyColoringPage": "🎨 Make my coloring page!",
+      "notQuiteRight": "Not quite right? Try again",
+      "capturing": "Getting your photo ready...",
+      "processing": "Looking at your picture...",
+      "tryAgain": "Try again",
+      "altImagePreview": "Selected image preview",
+      "altUploadedImage": "Your uploaded image",
+      "errors": {
+        "fileTooLarge": "That image is too big! Try one that's smaller than 10MB.",
+        "invalidType": "I can't read that file type. Try a JPEG, PNG, or WebP image!",
+        "processingFailed": "Hmm, I couldn't understand that image. Let's try another one!",
+        "cameraFailed": "Something went wrong with the camera. Let's try again!"
+      }
+    },
+    "placeholder": "e.g. a pirate ship sailing through space 🚀",
+    "placeholderGuestLimit": "You've used your {maxTries} free tries! Sign up for 15 more credits.",
+    "placeholderNoCreditsSubscribed": "You're out of credits — top up or upgrade your plan!",
+    "placeholderNoCreditsNoSubscription": "You've used your free credits — choose a plan to continue creating!",
+    "placeholderSignIn": "Sign in to start creating magical coloring pages!",
+    "buttonCreate": "Create coloring page",
+    "buttonCreateGuest": "Create ({remaining} free {remaining, plural, =1 {try} other {tries}} left)",
+    "buttonSignUp": "Sign up for 15 free credits",
+    "buttonBuyCredits": "Buy more credits",
+    "buttonViewPlans": "View plans",
+    "buttonGetStarted": "Get started for free",
+    "subtextGuestLimit": "You've seen the magic! Sign up to keep creating.",
+    "subtextNoCredits": "You're out of credits — top up or upgrade!",
+    "subtextNoCreditsSubscribed": "Need more magic? Top up or upgrade to keep the creativity going!",
+    "subtextNoCreditsNoSubscription": "Choose a subscription to unlock more creations",
+    "subtextFallback": "You'll get 15 free credits — enough to create 3 pages!"
+  },
+  "language": {
+    "switchLanguage": "Switch language",
+    "currentLanguage": "Current language",
+    "selectLanguage": "Select language"
+  }
+}

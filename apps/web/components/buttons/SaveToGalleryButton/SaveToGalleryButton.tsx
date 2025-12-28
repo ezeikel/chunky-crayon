@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faSpinner, faCheck } from '@fortawesome/pro-solid-svg-icons';
 import { saveArtworkToGallery } from '@/app/actions/saved-artwork';
@@ -30,6 +31,7 @@ const SaveToGalleryButton = ({
   getCanvasDataUrl,
   className,
 }: SaveToGalleryButtonProps) => {
+  const t = useTranslations('saveToGallery');
   const [state, setState] = useState<SaveState>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -49,7 +51,7 @@ const SaveToGalleryButton = ({
       const dataUrl = getCanvasDataUrl();
       if (!dataUrl) {
         setState('error');
-        setErrorMessage('Could not capture your artwork');
+        setErrorMessage(t('errors.captureArtwork'));
         playSound('error');
         return;
       }
@@ -90,7 +92,7 @@ const SaveToGalleryButton = ({
       }
     } catch {
       setState('error');
-      setErrorMessage('Something went wrong. Please try again.');
+      setErrorMessage(t('errors.generic'));
       playSound('error');
     }
   }, [coloringImageId, getCanvasDataUrl, playSound]);
@@ -137,7 +139,7 @@ const SaveToGalleryButton = ({
             icon={faSpinner}
             className="text-xl md:text-2xl animate-spin"
           />
-          <span className="hidden md:inline">Saving...</span>
+          <span className="hidden md:inline">{t('saving')}</span>
         </button>
       );
     }
@@ -155,7 +157,7 @@ const SaveToGalleryButton = ({
           )}
         >
           <FontAwesomeIcon icon={faCheck} className="text-xl md:text-2xl" />
-          <span className="hidden md:inline">Saved!</span>
+          <span className="hidden md:inline">{t('saved')}</span>
         </button>
       );
     }
@@ -173,7 +175,7 @@ const SaveToGalleryButton = ({
             )}
           >
             <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
-            <span className="hidden md:inline">Try Again</span>
+            <span className="hidden md:inline">{t('tryAgain')}</span>
           </button>
           {errorMessage && (
             <p className="text-sm text-crayon-pink">{errorMessage}</p>
@@ -194,7 +196,7 @@ const SaveToGalleryButton = ({
         )}
       >
         <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
-        <span className="hidden md:inline">Save to Gallery</span>
+        <span className="hidden md:inline">{t('idle')}</span>
       </button>
     );
   };

@@ -1,10 +1,14 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 type DailyImageHeadingProps = {
   createdAt: Date | null;
 };
 
 const DailyImageHeading = ({ createdAt }: DailyImageHeadingProps) => {
+  const t = useTranslations('homepage.galleryPreview');
+
   // Check if it's today's image or a fallback
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -13,7 +17,7 @@ const DailyImageHeading = ({ createdAt }: DailyImageHeadingProps) => {
 
   return (
     <h3 className="font-tondo font-bold text-lg text-text-primary">
-      {isToday ? "Today's Daily Page" : 'Latest Daily Page'}
+      {isToday ? t('todaysDailyPage') : t('latestDailyPage')}
     </h3>
   );
 };

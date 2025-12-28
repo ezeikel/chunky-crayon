@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { loadMoreImages } from '@/app/actions/load-more-images';
 import {
   loadGalleryImages,
@@ -34,6 +35,7 @@ const InfiniteScrollGallery = ({
   categorySlug,
   difficultySlug,
 }: InfiniteScrollGalleryProps) => {
+  const t = useTranslations('gallery.infiniteScroll');
   const [images, setImages] = useState<GalleryImage[]>(initialImages);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -150,9 +152,7 @@ const InfiniteScrollGallery = ({
       {/* End of list indicator */}
       {!hasMore && images.length > 0 && (
         <div className="text-center py-8">
-          <p className="text-sm text-text-muted">
-            You&apos;ve seen all the coloring pages!
-          </p>
+          <p className="text-sm text-text-muted">{t('allPagesViewed')}</p>
         </div>
       )}
     </>
