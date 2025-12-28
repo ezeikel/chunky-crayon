@@ -43,9 +43,14 @@
     "translate:dry-run": "tsx scripts/translate.ts --dry-run",
     "translate:diff": "tsx scripts/translate-diff.ts",
     "translate:diff:dry-run": "tsx scripts/translate-diff.ts --dry-run",
-    "audit": "tsx scripts/audit-translations.ts"
+    "audit": "tsx scripts/audit-translations.ts",
+    "review": "tsx scripts/review-translations.ts",
+    "review:locale": "tsx scripts/review-translations.ts --locale"
   },
   "devDependencies": {
     "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2"
   }
 }

@@ -286,7 +286,7 @@
       "toddlers": {
         "title": "Für Kleinkinder",
         "ages": "2–4 Jahre",
-        "description": "Einfache Formen, dicke Linien"
+        "description": "Einfache Formen, große Linien"
       },
       "kids": {
         "title": "Für Kinder",
@@ -456,7 +456,7 @@
         "why3Description": "Leg eine Pause ein und entspann dich beim kreativen Ausmalen.",
         "seoTitle": "Kostenlose Ausmalbilder für Jugendliche",
         "seoParagraph1": "Suchst du Ausmalbilder, die nicht „zu kindisch“ sind? Unsere Teen-Sammlung bietet coole, detailreiche Motive – perfekt für 13–17 Jahre. Von Anime-Figuren und Gaming-Szenen bis zu Fantasywelten und abstrakten Mustern ist für jeden Stil etwas dabei.",
-        "seoParagraph2": "Das sind keine Ausmalbilder für kleine Geschwister. Unsere Teen-Designs haben viele Details, spannende Kompositionen und Themen, die Teens wirklich feiern. Perfekt für kreativen Ausdruck, zum Stressabbau in Lernpausen oder einfach zum Chillen.",
+        "seoParagraph2": "Das sind nicht die Ausmalbilder deiner kleinen Geschwister.",
         "seoParagraph3": "Erstelle deine eigenen Ausmalbilder, indem du genau beschreibst, was du möchtest. Ein Drache, der im Weltraum gegen einen Roboter kämpft? Ein Anime-Porträt? Ein detailreiches Mandala mit deinen Lieblingssymbolen? Beschreib’s einfach – unsere KI macht es lebendig!",
         "popularTitle": "Beliebte Teen-Themen",
         "popularDescription": "Zu unseren beliebtesten Kategorien für Teens gehören: Anime- und Manga-Ausmalbilder, Fantasywesen-Ausmalbilder, Superhelden-Action-Szenen, Gaming-inspirierte Motive, Weltraum- und Sci‑Fi-Designs sowie detailreiche Musterseiten. Jede Kategorie bietet spannende, anspruchsvolle Motive."
@@ -474,7 +474,7 @@
         "why3Title": "Kreativität",
         "why3Description": "Drück dich über Farben aus und erschaffe wunderschöne Kunstwerke.",
         "seoTitle": "Kostenlose Ausmalbilder für Erwachsene",
-        "seoParagraph1": "Ausmalen für Erwachsene ist eine beliebte Wohlfühl-Aktivität – und das aus gutem Grund. Studien zeigen, dass Ausmalen Angst reduzieren, die Konzentration verbessern und eine beruhigende Pause vom Bildschirmalltag sein kann. Unsere Sammlung bietet schöne, detailreiche Motive – perfekt für Erwachsene.",
+        "seoParagraph1": "Studien zeigen, dass Ausmalen Angst reduzieren, die Konzentration verbessern und eine beruhigende Pause vom bildschirmlastigen Alltag sein kann.",
         "seoParagraph2": "Von detailreichen Mandalas für mehr Achtsamkeit bis zu ruhigen Naturmotiven und eleganten Mustern: Jede Seite ist für stundenlange, entspannte Kreativität gemacht. Drucke auf gutem Papier und nutze deine Lieblingsstifte – Buntstifte, Filzstifte oder Gelstifte funktionieren wunderbar.",
         "seoParagraph3": "Du willst etwas Einzigartiges? Erstelle deine eigenen Ausmalbilder! Beschreibe deine perfekte Entspannungsszene – einen Zen-Garten, ein Jugendstil-Muster oder eine detailreiche botanische Illustration – und unsere KI bringt deine Idee zum Leben.",
         "popularTitle": "Beliebte Ausmal-Themen für Erwachsene",
@@ -634,7 +634,7 @@
       "share": "Teilen",
       "print": "Drucken",
       "preparing": "Wird vorbereitet...",
-      "doneSharing": "Geteilt",
+      "doneSharing": "Fertig geteilt",
       "colorAgain": "Nochmal ausmalen",
       "startOver": "Neu starten"
     },

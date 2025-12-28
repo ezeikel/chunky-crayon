@@ -1,0 +1,220 @@
+name: Weekly Translation Quality Review
+
+on:
+  # Run weekly on Monday at 9am UTC
+  schedule:
+    - cron: '0 9 * * 1'
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      locale:
+        description: 'Specific locale to review (leave empty for all)'
+        required: false
+        type: string
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        locale: [ja, ko, de, fr, es]
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if specific locale requested
+        id: check-locale
+        run: |
+          if [ -n "${{ github.event.inputs.locale }}" ]; then
+            if [ "${{ github.event.inputs.locale }}" != "${{ matrix.locale }}" ]; then
+              echo "skip=true" >> $GITHUB_OUTPUT
+            else
+              echo "skip=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup pnpm
+        if: steps.check-locale.outputs.skip != 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        if: steps.check-locale.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        if: steps.check-locale.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Run translation review for ${{ matrix.locale }}
+        if: steps.check-locale.outputs.skip != 'true'
+        working-directory: packages/translations
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: pnpm review --locale=${{ matrix.locale }}
+
+      - name: Check for changes
+        if: steps.check-locale.outputs.skip != 'true'
+        id: check-changes
+        run: |
+          if git diff --quiet packages/translations/src/${{ matrix.locale }}.json; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get locale name
+        if: steps.check-changes.outputs.has_changes == 'true'
+        id: locale-name
+        run: |
+          case "${{ matrix.locale }}" in
+            ja) echo "name=Japanese" >> $GITHUB_OUTPUT ;;
+            ko) echo "name=Korean" >> $GITHUB_OUTPUT ;;
+            de) echo "name=German" >> $GITHUB_OUTPUT ;;
+            fr) echo "name=French" >> $GITHUB_OUTPUT ;;
+            es) echo "name=Spanish" >> $GITHUB_OUTPUT ;;
+          esac
+
+      - name: Create Pull Request for ${{ matrix.locale }}
+        if: steps.check-changes.outputs.has_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const locale = '${{ matrix.locale }}';
+            const localeName = '${{ steps.locale-name.outputs.name }}';
+            const date = new Date().toISOString().split('T')[0];
+            const branchName = `i18n/review-${locale}-${date}`;
+
+            // Find the latest report
+            const reportsDir = 'packages/translations/reports';
+            const files = fs.readdirSync(reportsDir)
+              .filter(f => f.endsWith('.md'))
+              .sort()
+              .reverse();
+
+            let reportContent = 'No detailed report available.';
+            if (files.length > 0) {
+              const reportPath = path.join(reportsDir, files[0]);
+              const fullReport = fs.readFileSync(reportPath, 'utf8');
+
+              // Extract just this locale's section from the report
+              const localeSection = fullReport.match(
+                new RegExp(`## ${localeName} \\(${locale}\\)[\\s\\S]*?(?=\\n---\\n|$)`)
+              );
+              reportContent = localeSection ? localeSection[0] : fullReport;
+            }
+
+            // Configure git
+            await exec.exec('git', ['config', 'user.name', 'github-actions[bot]']);
+            await exec.exec('git', ['config', 'user.email', 'github-actions[bot]@users.noreply.github.com']);
+
+            // Create branch and commit
+            await exec.exec('git', ['checkout', '-b', branchName]);
+            await exec.exec('git', ['add', `packages/translations/src/${locale}.json`]);
+            await exec.exec('git', ['commit', '-m', `chore(i18n): auto-fix ${localeName} translation issues`]);
+            await exec.exec('git', ['push', 'origin', branchName]);
+
+            // Create PR with locale-specific report
+            const pr = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🌍 ${localeName} Translation Fixes - ${date}`,
+              head: branchName,
+              base: 'main',
+              body: `# ${localeName} Translation Review
+
+This PR contains auto-fixes for ${localeName} translation quality issues.
+
+Each fix includes:
+- **Key**: The translation key that was fixed
+- **Before**: The original translation
+- **After**: The improved translation
+- **Why**: Explanation of why the change was made (in English)
+
+${reportContent}
+
+---
+*Generated by the agentic translation review workflow using Claude Sonnet.*`
+            });
+
+            // Add labels
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.data.number,
+              labels: ['i18n', 'quality', 'automated', `lang:${locale}`]
+            });
+
+            console.log(`Created PR #${pr.data.number}: ${pr.data.html_url}`);
+
+      - name: Upload review report
+        if: steps.check-locale.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: translation-review-${{ matrix.locale }}
+          path: packages/translations/reports/*.md
+          retention-days: 90
+
+      - name: Check for critical issues
+        if: steps.check-locale.outputs.skip != 'true'
+        id: check-issues
+        working-directory: packages/translations
+        run: |
+          REPORT=$(ls -t reports/*.md 2>/dev/null | head -1)
+          if [ -z "$REPORT" ]; then
+            echo "No report found"
+            echo "has_critical=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if grep -q "🔴 Critical" "$REPORT" && grep -q "${{ matrix.locale }}" "$REPORT"; then
+            echo "has_critical=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_critical=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue for critical problems
+        if: steps.check-issues.outputs.has_critical == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const locale = '${{ matrix.locale }}';
+            const localeName = '${{ steps.locale-name.outputs.name }}';
+
+            const reportsDir = 'packages/translations/reports';
+            const files = fs.readdirSync(reportsDir)
+              .filter(f => f.endsWith('.md'))
+              .sort()
+              .reverse();
+
+            if (files.length === 0) return;
+
+            const reportPath = path.join(reportsDir, files[0]);
+            const report = fs.readFileSync(reportPath, 'utf8');
+
+            // Extract critical issues for this locale
+            const criticalMatch = report.match(
+              new RegExp(`## ${localeName}[\\s\\S]*?### 🔴 Needs Human Review[\\s\\S]*?(?=\\n---\\n|\\n## |$)`)
+            );
+            const criticalSection = criticalMatch ? criticalMatch[0] : 'See full report.';
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔴 ${localeName} Translation Issues Need Review - ${new Date().toISOString().split('T')[0]}`,
+              body: `# Critical ${localeName} Translation Issues\n\nThe following issues require human review and cannot be auto-fixed:\n\n${criticalSection}\n\n## Action Required\n\nPlease review and manually fix these translations.\n\n---\n*This issue was automatically created by the translation review workflow.*`,
+              labels: ['i18n', 'quality', 'needs-review', 'critical', `lang:${locale}`]
+            });
