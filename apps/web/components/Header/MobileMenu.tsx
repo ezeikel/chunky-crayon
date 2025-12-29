@@ -11,7 +11,7 @@ import { signOutAction } from '@/app/actions/auth';
 import cn from '@/lib/utils';
 import { ParentalGateLink } from '@/components/ParentalGate';
 import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
-import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
+import MobileLanguageSelector from '@/components/LanguageSwitcher/MobileLanguageSelector';
 import {
   setActiveProfile,
   type ProfileWithStats,
@@ -211,27 +211,24 @@ const MobileMenu = ({
               <h2 className="font-tondo font-bold text-xl text-text-primary">
                 {t('menu')}
               </h2>
-              <div className="flex items-center gap-2">
-                <LanguageSwitcher variant="compact" />
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-paper-cream rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
-                  aria-label="Close menu"
-                >
-                  <FontAwesomeIcon
-                    icon={faXmark}
-                    className="text-2xl"
-                    style={
-                      {
-                        '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                        '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                        '--fa-secondary-opacity': '0.8',
-                      } as React.CSSProperties
-                    }
-                  />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-2 hover:bg-paper-cream rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+                aria-label="Close menu"
+              >
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  className="text-2xl"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                      '--fa-secondary-color': 'hsl(var(--crayon-teal))',
+                      '--fa-secondary-opacity': '0.8',
+                    } as React.CSSProperties
+                  }
+                />
+              </button>
             </div>
 
             {/* Profile section */}
@@ -248,7 +245,9 @@ const MobileMenu = ({
                     <p className="font-tondo font-bold text-crayon-orange">
                       {activeProfile.name}
                     </p>
-                    <p className="text-xs text-gray-500">{t('currentlyActive')}</p>
+                    <p className="text-xs text-gray-500">
+                      {t('currentlyActive')}
+                    </p>
                   </div>
                   <FontAwesomeIcon
                     icon={faCheck}
@@ -312,6 +311,15 @@ const MobileMenu = ({
                 ))}
               </ul>
             </nav>
+
+            {/* Language selector - only for logged out users */}
+            {profiles.length === 0 && (
+              <div className="px-4 py-3 border-t border-paper-cream-dark">
+                <MobileLanguageSelector
+                  onLanguageChange={() => setIsOpen(false)}
+                />
+              </div>
+            )}
 
             {/* Fun decoration at bottom */}
             <div className="p-4 flex justify-center gap-2 opacity-50">

@@ -1408,6 +1408,8 @@
   "language": {
     "switchLanguage": "Switch language",
     "currentLanguage": "Current language",
-    "selectLanguage": "Select language"
+    "selectLanguage": "Select language",
+    "language": "Language",
+    "switchTo": "Switch to"
   }
 }
