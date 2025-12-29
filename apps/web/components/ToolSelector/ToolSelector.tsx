@@ -87,6 +87,7 @@ type ToolConfig = {
     | 'magic-reveal'
     | 'magic-auto';
   label: string;
+  shortLabel?: string;
   icon: React.ComponentType<{ className?: string }>;
   isMagic?: boolean;
 };
@@ -105,10 +106,17 @@ const baseTools: ToolConfig[] = [
   {
     id: 'magic-reveal',
     label: 'Magic Brush',
+    shortLabel: 'Magic',
     icon: MagicRevealIcon,
     isMagic: true,
   },
-  { id: 'magic-auto', label: 'Magic Fill', icon: MagicAutoIcon, isMagic: true },
+  {
+    id: 'magic-auto',
+    label: 'Auto Color',
+    shortLabel: 'Auto',
+    icon: MagicAutoIcon,
+    isMagic: true,
+  },
 ];
 
 const ToolSelector = ({
@@ -195,7 +203,7 @@ const ToolSelector = ({
         className,
       )}
     >
-      {baseTools.map(({ id, label, icon: Icon, isMagic }) => {
+      {baseTools.map(({ id, label, shortLabel, icon: Icon, isMagic }) => {
         const isActive = isToolActive(id);
 
         return (
@@ -221,9 +229,9 @@ const ToolSelector = ({
             <Icon
               className={isMagic ? 'size-4 sm:size-5' : 'size-5 sm:size-6'}
             />
-            {isMagic && (
+            {isMagic && shortLabel && (
               <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wide">
-                Magic
+                {shortLabel}
               </span>
             )}
           </button>
