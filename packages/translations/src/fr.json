@@ -296,7 +296,7 @@
       "teens": {
         "title": "Pour les ados",
         "ages": "13-17 ans",
-        "description": "Dessins cool, très détaillés"
+        "description": "Dessins cool et détaillés"
       },
       "adults": {
         "title": "Pour les adultes",
@@ -373,7 +373,7 @@
       "createAPage": "Créer une page",
       "freeColoringPages": "Coloriages {category} gratuits",
       "lookingFor": "Vous cherchez le coloriage {category} parfait ? Vous êtes au bon endroit ! Notre collection propose plein de dessins {category}, parfaits pour les enfants comme pour les adultes.",
-      "eachPageDescription": "Chaque coloriage peut être colorié en ligne avec nos outils numériques, ou téléchargé et imprimé pour colorier avec des crayons, des crayons de couleur ou des feutres. Nos dessins générés par IA ont des contours propres et des détails amusants, pour un coloriage relaxant et joyeux.",
+      "eachPageDescription": "Chaque coloriage peut être colorié en ligne avec nos outils numériques, ou téléchargé et imprimé pour utiliser des crayons, crayons de couleur ou feutres. Nos dessins générés par IA ont des contours propres et des détails amusants, pour un coloriage relaxant et joyeux.",
       "popularThemes": "Thèmes {category} populaires",
       "includesPopular": "Notre catégorie {category} inclut des recherches populaires comme :"
     },
@@ -452,11 +452,11 @@
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins faits pour vos passions !",
         "why2Title": "Art détaillé",
         "why2Description": "Des dessins minutieux qui challengent vos talents et sont super beaux une fois finis.",
-        "why3Title": "Anti-stress",
+        "why3Title": "Soulagement du stress",
         "why3Description": "Faites une pause et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop bébé » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d’anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
-        "seoParagraph2": "Ici, pas des coloriages pour petits. Nos dessins pour ados ont des détails minutieux, des compositions dynamiques et des thèmes qui parlent aux ados. Parfait pour s’exprimer, décompresser pendant les révisions, ou juste se poser.",
+        "seoParagraph2": "Ce ne sont pas des coloriages pour petits. Nos dessins pour ados ont des détails minutieux, des compositions dynamiques et des thèmes qui parlent aux ados. Parfait pour s'exprimer, décompresser pendant les révisions, ou juste se poser.",
         "seoParagraph3": "Créez vos propres coloriages personnalisés en décrivant exactement ce que vous voulez. Un dragon qui se bat contre un robot dans l’espace ? Un portrait style anime ? Un mandala détaillé avec vos symboles préférés ? Décrivez-le, et notre IA lui donne vie !",
         "popularTitle": "Thèmes ado populaires",
         "popularDescription": "Nos catégories les plus populaires chez les ados : coloriages anime et manga, créatures fantastiques, scènes d’action de super-héros, art inspiré des jeux vidéo, designs espace et sci-fi, et pages de motifs très détaillés. Chaque catégorie propose des dessins captivants."
@@ -467,7 +467,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Anti-stress",
+        "why1Title": "Soulagement du stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
