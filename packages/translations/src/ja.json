@@ -522,7 +522,13 @@
       "allRainbowFeatures": "レインボープランの全機能",
       "bulkGeneration": "まとめて生成",
       "commercialUse": "商用利用OK",
-      "rollover2Months": "クレジット繰り越し（最大2か月）"
+      "rollover2Months": "クレジット繰り越し（最大2か月）",
+      "credits250": "月250クレジット（約50ページ）",
+      "credits500": "月500クレジット（約100ページ）",
+      "credits1000": "月1,000クレジット（約200ページ）",
+      "allFeatures": "すべての機能が使える",
+      "noRollover": "クレジットは毎月リセット",
+      "prioritySupport": "優先サポート"
     },
     "creditPacks": {
       "title": "クレジットを追加しますか？",
@@ -547,7 +553,21 @@
       "gettingStarted": {
         "question": "どうやって始めるの？",
         "answer": "プランを選ぶだけで、すぐにぬりえ作りを始められます！"
+      },
+      "subtitle": "プランについて知りたいこと、ぜんぶ",
+      "creditsPerPage": {
+        "question": "何ページ作れますか？",
+        "answer": "1ページにつき約5クレジットです。Splash＝月約50ページ、Rainbow＝約100、Sparkle＝約200。"
       }
+    },
+    "included": {
+      "title": "どのプランにも含まれるもの",
+      "aiCreation": "AIでぬりえページを作成",
+      "colorOnline": "オンラインでぬる／印刷してぬれる",
+      "saveFavorites": "お気に入りをアカウントに保存",
+      "shareCreations": "作った作品をお友だちとシェア",
+      "collectStickers": "ステッカーを集めてごほうびゲット",
+      "mobileApps": "iOS・Androidアプリ"
     }
   },
   "blog": {
@@ -1113,7 +1133,8 @@
     "failedToChangeSubscription": "サブスクの変更に失敗しました",
     "failedToCheckout": "チェックアウトに移動できませんでした",
     "failedToPurchaseCredits": "クレジットの購入に失敗しました",
-    "failedToOpenPortal": "お客様ポータルを開けませんでした"
+    "failedToOpenPortal": "お客様ポータルを開けませんでした",
+    "subscribe": "サブスク登録"
   },
   "auth": {
     "signIn": "ログイン",
@@ -1406,5 +1427,33 @@
     "loading": "読み込み中…",
     "creating": "作成中…",
     "error": "あれっ！"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "創造力が育つ！ぬりえ＆学びのたのしさ",
+      "features": {
+        "pages": "10,000枚以上",
+        "aiGenerated": "AIで生成",
+        "freePrintables": "無料プリント"
+      }
+    },
+    "coloringImage": {
+      "notFound": "ぬりえが見つかりません"
+    },
+    "blogPost": {
+      "notFound": "ブログ記事が見つかりません",
+      "minRead": "読了目安 {minutes} 分",
+      "blog": "ブログ"
+    },
+    "sharedArtwork": {
+      "notFound": "作品が見つかりません",
+      "createdBy": "作者"
+    },
+    "difficulty": {
+      "beginner": "かんたん",
+      "intermediate": "ふつう",
+      "advanced": "むずかしい",
+      "expert": "とてもむずかしい"
+    }
   }
 }

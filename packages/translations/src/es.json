@@ -522,7 +522,13 @@
       "allRainbowFeatures": "Todas las funciones del Plan Rainbow",
       "bulkGeneration": "Generación en lote",
       "commercialUse": "Uso comercial",
-      "rollover2Months": "Los créditos se acumulan (hasta 2 meses)"
+      "rollover2Months": "Los créditos se acumulan (hasta 2 meses)",
+      "credits250": "250 créditos/mes (~50 páginas)",
+      "credits500": "500 créditos/mes (~100 páginas)",
+      "credits1000": "1.000 créditos/mes (~200 páginas)",
+      "allFeatures": "Todas las funciones de la plataforma",
+      "noRollover": "Los créditos se reinician cada mes",
+      "prioritySupport": "Soporte prioritario"
     },
     "creditPacks": {
       "title": "¿Necesitas créditos extra?",
@@ -547,7 +553,21 @@
       "gettingStarted": {
         "question": "¿Cómo empiezo?",
         "answer": "¡Elige un plan y empieza a crear páginas para colorear al instante!"
+      },
+      "subtitle": "Todo lo que necesitas saber sobre nuestros planes",
+      "creditsPerPage": {
+        "question": "¿Cuántas páginas puedo crear?",
+        "answer": "Cada página cuesta unas 5 créditos. Splash = ~50 páginas/mes, Rainbow = ~100, Sparkle = ~200."
       }
+    },
+    "included": {
+      "title": "Todos los planes incluyen",
+      "aiCreation": "Crea páginas para colorear con IA",
+      "colorOnline": "Colorea online o descarga para imprimir",
+      "saveFavorites": "Guarda tus favoritos en tu cuenta",
+      "shareCreations": "Comparte tus creaciones con amigos",
+      "collectStickers": "Colecciona stickers y gana premios",
+      "mobileApps": "Apps para iOS y Android"
     }
   },
   "blog": {
@@ -1113,7 +1133,8 @@
     "failedToChangeSubscription": "No se pudo cambiar la suscripción",
     "failedToCheckout": "No se pudo ir al pago",
     "failedToPurchaseCredits": "No se pudieron comprar los créditos",
-    "failedToOpenPortal": "No se pudo abrir el portal del cliente"
+    "failedToOpenPortal": "No se pudo abrir el portal del cliente",
+    "subscribe": "Suscribirse"
   },
   "auth": {
     "signIn": "Iniciar sesión",
@@ -1406,5 +1427,33 @@
     "loading": "Cargando...",
     "creating": "Creando...",
     "error": "¡Ups!"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "Diversión creativa para colorear y aprender",
+      "features": {
+        "pages": "Más de 10.000 páginas",
+        "aiGenerated": "Generado por IA",
+        "freePrintables": "Imprimibles gratis"
+      }
+    },
+    "coloringImage": {
+      "notFound": "No se encontró la página para colorear"
+    },
+    "blogPost": {
+      "notFound": "No se encontró la entrada del blog",
+      "minRead": "{minutes} min de lectura",
+      "blog": "Blog"
+    },
+    "sharedArtwork": {
+      "notFound": "No se encontró la obra",
+      "createdBy": "Creado por"
+    },
+    "difficulty": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "expert": "Experto"
+    }
   }
 }

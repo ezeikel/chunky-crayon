@@ -522,7 +522,13 @@
       "allRainbowFeatures": "Alle Funktionen aus dem Rainbow Plan",
       "bulkGeneration": "Stapelerstellung",
       "commercialUse": "Kommerzielle Nutzung",
-      "rollover2Months": "Credits werden übernommen (bis zu 2 Monate)"
+      "rollover2Months": "Credits werden übernommen (bis zu 2 Monate)",
+      "credits250": "250 Credits/Monat (~50 Seiten)",
+      "credits500": "500 Credits/Monat (~100 Seiten)",
+      "credits1000": "1.000 Credits/Monat (~200 Seiten)",
+      "allFeatures": "Alle Plattform-Funktionen",
+      "noRollover": "Credits werden monatlich zurückgesetzt",
+      "prioritySupport": "Prioritäts-Support"
     },
     "creditPacks": {
       "title": "Brauchst du extra Credits?",
@@ -547,7 +553,21 @@
       "gettingStarted": {
         "question": "Wie lege ich los?",
         "answer": "Einfach einen Plan wählen und sofort Malvorlagen erstellen!"
+      },
+      "subtitle": "Alles, was du über unsere Pläne wissen musst",
+      "creditsPerPage": {
+        "question": "Wie viele Seiten kann ich erstellen?",
+        "answer": "Jede Seite kostet etwa 5 Credits. Splash = ~50 Seiten/Monat, Rainbow = ~100, Sparkle = ~200."
       }
+    },
+    "included": {
+      "title": "In jedem Plan enthalten",
+      "aiCreation": "KI-gestützte Ausmalbilder erstellen",
+      "colorOnline": "Online ausmalen oder zum Drucken herunterladen",
+      "saveFavorites": "Favoriten in deinem Konto speichern",
+      "shareCreations": "Kunstwerke mit Freund*innen teilen",
+      "collectStickers": "Sticker sammeln & Belohnungen verdienen",
+      "mobileApps": "Apps für iOS & Android"
     }
   },
   "blog": {
@@ -1113,7 +1133,8 @@
     "failedToChangeSubscription": "Abo konnte nicht geändert werden",
     "failedToCheckout": "Weiterleitung zur Kasse fehlgeschlagen",
     "failedToPurchaseCredits": "Credits konnten nicht gekauft werden",
-    "failedToOpenPortal": "Kundenportal konnte nicht geöffnet werden"
+    "failedToOpenPortal": "Kundenportal konnte nicht geöffnet werden",
+    "subscribe": "Abonnieren"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -1406,5 +1427,33 @@
     "loading": "Lädt...",
     "creating": "Wird erstellt...",
     "error": "Ups!"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "Kreativer Mal- & Lernspaß",
+      "features": {
+        "pages": "10.000+ Seiten",
+        "aiGenerated": "KI-generiert",
+        "freePrintables": "Gratis zum Ausdrucken"
+      }
+    },
+    "coloringImage": {
+      "notFound": "Malvorlage nicht gefunden"
+    },
+    "blogPost": {
+      "notFound": "Blogbeitrag nicht gefunden",
+      "minRead": "{minutes} Min. Lesezeit",
+      "blog": "Blog"
+    },
+    "sharedArtwork": {
+      "notFound": "Kunstwerk nicht gefunden",
+      "createdBy": "Erstellt von"
+    },
+    "difficulty": {
+      "beginner": "Anfänger",
+      "intermediate": "Fortgeschritten",
+      "advanced": "Profi",
+      "expert": "Meister"
+    }
   }
 }

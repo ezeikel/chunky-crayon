@@ -522,7 +522,13 @@
       "allRainbowFeatures": "Toutes les fonctionnalités de la formule Arc-en-ciel",
       "bulkGeneration": "Génération en lot",
       "commercialUse": "Utilisation commerciale",
-      "rollover2Months": "Crédits reportés (jusqu'à 2 mois)"
+      "rollover2Months": "Crédits reportés (jusqu'à 2 mois)",
+      "credits250": "250 crédits/mois (~50 pages)",
+      "credits500": "500 crédits/mois (~100 pages)",
+      "credits1000": "1 000 crédits/mois (~200 pages)",
+      "allFeatures": "Toutes les fonctionnalités",
+      "noRollover": "Crédits réinitialisés chaque mois",
+      "prioritySupport": "Assistance prioritaire"
     },
     "creditPacks": {
       "title": "Besoin de crédits en plus ?",
@@ -547,7 +553,21 @@
       "gettingStarted": {
         "question": "Comment commencer ?",
         "answer": "Choisissez une formule et commencez à créer des coloriages instantanément !"
+      },
+      "subtitle": "Tout ce qu’il faut savoir sur nos formules",
+      "creditsPerPage": {
+        "question": "Combien de pages puis-je créer ?",
+        "answer": "Chaque page coûte environ 5 crédits. Splash = ~50 pages/mois, Rainbow = ~100, Sparkle = ~200."
       }
+    },
+    "included": {
+      "title": "Chaque formule comprend",
+      "aiCreation": "Création de coloriages par IA",
+      "colorOnline": "Colorie en ligne ou télécharge pour imprimer",
+      "saveFavorites": "Enregistre tes favoris sur ton compte",
+      "shareCreations": "Partage tes créations avec tes amis",
+      "collectStickers": "Collectionne des stickers et gagne des récompenses",
+      "mobileApps": "Apps iOS et Android"
     }
   },
   "blog": {
@@ -1113,7 +1133,8 @@
     "failedToChangeSubscription": "Impossible de changer d’abonnement",
     "failedToCheckout": "Redirection vers le paiement impossible",
     "failedToPurchaseCredits": "Impossible d’acheter des crédits",
-    "failedToOpenPortal": "Impossible d’ouvrir le portail client"
+    "failedToOpenPortal": "Impossible d’ouvrir le portail client",
+    "subscribe": "S’abonner"
   },
   "auth": {
     "signIn": "Se connecter",
@@ -1406,5 +1427,33 @@
     "loading": "Chargement...",
     "creating": "Création...",
     "error": "Oups !"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "Coloriage créatif & apprentissage amusant",
+      "features": {
+        "pages": "10 000+ pages",
+        "aiGenerated": "Généré par IA",
+        "freePrintables": "Imprimables gratuits"
+      }
+    },
+    "coloringImage": {
+      "notFound": "Page de coloriage introuvable"
+    },
+    "blogPost": {
+      "notFound": "Article de blog introuvable",
+      "minRead": "{minutes} min de lecture",
+      "blog": "Blog"
+    },
+    "sharedArtwork": {
+      "notFound": "Dessin introuvable",
+      "createdBy": "Créé par"
+    },
+    "difficulty": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé",
+      "expert": "Expert"
+    }
   }
 }
