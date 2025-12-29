@@ -369,7 +369,7 @@
       "coloringPages": "Dibujos para colorear de {category}",
       "relatedCategories": "Categorías relacionadas",
       "noPagesYet": "Aún no hay páginas de {category}",
-      "beTheFirst": "¡Sé el primero en crear un dibujo para colorear de {category}!",
+      "beTheFirst": "¡Sé la primera persona en crear un dibujo para colorear de {category}!",
       "createAPage": "Crear una página",
       "freeColoringPages": "Dibujos para colorear gratis de {category}",
       "lookingFor": "¿Buscas el dibujo perfecto de {category} para colorear? ¡Has llegado al lugar ideal! Nuestra colección tiene una gran variedad de diseños de {category} perfectos para niños y adultos.",
@@ -420,14 +420,14 @@
         "seoParagraph1": "¿Vas a iniciar a tu peque en el coloreado? Nuestra colección de dibujos sencillos es perfecta para niños de 2 a 4 años. Cada diseño tiene zonas grandes y fáciles de colorear, con contornos marcados que ayudan a desarrollar la motricidad fina.",
         "seoParagraph2": "Nuestros dibujos para peques se centran en objetos familiares que les encantan: animalitos adorables, comida rica, vehículos coloridos y bonitas escenas de naturaleza. Los diseños simples reducen la frustración y animan a crear.",
         "seoParagraph3": "Todas las páginas se pueden imprimir en papel A4 o colorear online con nuestras herramientas digitales, súper fáciles de usar. Perfectas para ratitos tranquilos, días de lluvia o actividades en casa o en infantil.",
-        "benefitsTitle": "Beneficios de colorear para peques",
+        "benefitsTitle": "Beneficios de colorear para los más pequeños",
         "benefitsDescription": "Colorear ayuda a desarrollar habilidades importantes como: coordinación mano-ojo, reconocimiento de colores, fuerza de agarre, atención y concentración, y expresión creativa. ¡Empieza con los diseños más sencillos y mira cómo crece tu peque!"
       },
       "kids": {
         "pageTitle": "Dibujos para colorear para niños",
         "featuredSection": "Dibujos populares para niños",
         "categoriesSection": "Explorar categorías infantiles",
-        "heroDescription": "¡Dibujos divertidos y entretenidos para niños de 4 a 12 años! Dinosaurios, unicornios, superhéroes y más. Fáciles de colorear online o imprimir en casa para horas de diversión creativa.",
+        "heroDescription": "¡Dibujos divertidos y entretenidos para niños de 4 a 12 años! Dinosaurios, unicornios, superhéroes y más. Fáciles de colorear online o imprimir en casa para diversión creativa sin límites.",
         "whyTitle": "Por qué a los niños les encanta Chunky Crayon",
         "why1Title": "Crea lo que quieras",
         "why1Description": "Los niños describen sus ideas más locas ¡y se convierten en dibujos para colorear!",
@@ -465,12 +465,12 @@
         "pageTitle": "Dibujos para colorear para adultos",
         "featuredSection": "Dibujos populares para adultos",
         "categoriesSection": "Categorías para adultos",
-        "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas elaborados, preciosas escenas de naturaleza y patrones detallados pensados para relajarte y conectar contigo. Perfecto para aliviar el estrés tras un día largo.",
+        "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas elaborados, preciosas escenas de naturaleza y patrones detallados pensados para relajarte y practicar mindfulness. Perfecto para aliviar el estrés tras un día largo.",
         "whyTitle": "Beneficios de colorear para adultos",
         "why1Title": "Alivio del estrés",
         "why1Description": "Colorear activa la respuesta de relajación, reduce la ansiedad y aporta calma.",
         "why2Title": "Mindfulness",
-        "why2Description": "Conecta con el presente y disfruta de una actividad meditativa y sin pantallas.",
+        "why2Description": "Céntrate en el momento presente y disfruta de una actividad meditativa y sin pantallas.",
         "why3Title": "Creatividad",
         "why3Description": "Exprésate con tus colores y crea obras preciosas.",
         "seoTitle": "Dibujos para colorear gratis para adultos",
@@ -478,7 +478,7 @@
         "seoParagraph2": "Desde mandalas detallados que invitan al mindfulness hasta escenas tranquilas de naturaleza y patrones elegantes, cada página está pensada para darte horas de creatividad relajante. Imprime en papel de buena calidad y usa tus herramientas favoritas: lápices de colores, rotuladores o bolígrafos de gel funcionan perfectamente.",
         "seoParagraph3": "¿Quieres algo único? ¡Crea tus propios dibujos personalizados! Describe tu escena ideal para relajarte: un jardín zen, un patrón Art Nouveau o una ilustración botánica detallada, y nuestra IA dará vida a tu idea.",
         "popularTitle": "Temas populares de coloreado para adultos",
-        "popularDescription": "Explora nuestras categorías más populares para adultos: mandalas para relajarte, diseños elaborados de naturaleza y botánica, patrones geométricos, estilos Art Deco y Art Nouveau, páginas inspiradas en zentangles y paisajes tranquilos. Cada una ofrece un camino único hacia la relajación."
+        "popularDescription": "Explora nuestras categorías más populares para adultos: mandalas para meditar, diseños elaborados de naturaleza y botánica, patrones geométricos, estilos Art Deco y Art Nouveau, páginas inspiradas en zentangles y paisajes tranquilos. Cada una ofrece un camino único hacia la relajación."
       }
     }
   },
@@ -616,7 +616,7 @@
     "brushSizes": {
       "small": "Fino",
       "medium": "Normal",
-      "large": "Grueso"
+      "large": "Gordito"
     },
     "fillPatterns": {
       "solid": "Liso",
