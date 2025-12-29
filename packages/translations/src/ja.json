@@ -1387,6 +1387,19 @@
   "language": {
     "switchLanguage": "言語を切り替える",
     "currentLanguage": "現在の言語",
-    "selectLanguage": "言語をえらぶ"
+    "selectLanguage": "言語をえらぶ",
+    "language": "言語",
+    "switchTo": "切り替える"
+  },
+  "startOverButton": {
+    "idle": "はじめから",
+    "confirm": "うん、はじめから",
+    "cancel": "つづけてぬる"
+  },
+  "downloadPDFButton": {
+    "idle": "印刷",
+    "loading": "読み込み中…",
+    "creating": "作成中…",
+    "error": "あれっ！"
   }
 }

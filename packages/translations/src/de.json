@@ -1387,6 +1387,19 @@
   "language": {
     "switchLanguage": "Sprache wechseln",
     "currentLanguage": "Aktuelle Sprache",
-    "selectLanguage": "Sprache auswählen"
+    "selectLanguage": "Sprache auswählen",
+    "language": "Sprache",
+    "switchTo": "Wechseln zu"
+  },
+  "startOverButton": {
+    "idle": "Neu anfangen",
+    "confirm": "Ja, neu anfangen",
+    "cancel": "Weiter ausmalen"
+  },
+  "downloadPDFButton": {
+    "idle": "Drucken",
+    "loading": "Lädt...",
+    "creating": "Wird erstellt...",
+    "error": "Ups!"
   }
 }

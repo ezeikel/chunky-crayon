@@ -39,7 +39,7 @@ jobs:
         id: audit
         working-directory: packages/translations
         run: |
-          if pnpm audit 2>&1 | grep -q "Missing keys"; then
+          if pnpm run audit 2>&1 | grep -qi "MISSING KEYS"; then
             echo "needs_translation=true" >> $GITHUB_OUTPUT
           else
             echo "needs_translation=false" >> $GITHUB_OUTPUT
