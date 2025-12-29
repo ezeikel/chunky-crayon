@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { connection } from 'next/server';
+import { Suspense } from 'react';
 import { db } from '@chunky-crayon/db';
 import { client, isSanityConfigured } from '@/lib/sanity';
 import ManualTestingSection from './ManualTestingSection';
@@ -10,9 +10,6 @@ export const metadata: Metadata = {
   description: 'Preview and test Open Graph images',
   robots: 'noindex, nofollow',
 };
-
-// Force dynamic rendering - this is a dev/debug page
-export const dynamic = 'force-dynamic';
 
 // Get sample data for preview
 async function getSampleData() {
@@ -45,8 +42,31 @@ async function getSampleData() {
   return { coloringImage, sharedArtwork, blogPost };
 }
 
-export default async function OGPreviewPage() {
-  await connection();
+// Loading skeleton for the OG image grid
+function OGGridSkeleton() {
+  return (
+    <div className="grid gap-8 animate-pulse">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <div className="h-6 bg-gray-200 rounded w-48 mb-2" />
+            <div className="h-4 bg-gray-100 rounded w-72" />
+          </div>
+          <div className="p-6">
+            <div className="aspect-[1200/630] bg-gray-100 rounded-xl mb-4" />
+            <div className="flex gap-3">
+              <div className="h-10 bg-gray-200 rounded-lg w-32" />
+              <div className="h-10 bg-gray-100 rounded-lg w-28" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Async component for the OG image grid that fetches data
+async function OGImageGrid() {
   const { coloringImage, sharedArtwork, blogPost } = await getSampleData();
 
   const ogTypes = [
@@ -86,6 +106,100 @@ export default async function OGPreviewPage() {
     },
   ];
 
+  return (
+    <div className="grid gap-8">
+      {ogTypes.map((og) => (
+        <div
+          key={og.name}
+          className="bg-white rounded-2xl shadow-lg overflow-hidden"
+        >
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="font-tondo font-bold text-xl text-text-primary">
+              {og.name}
+            </h2>
+            <p className="text-text-secondary text-sm mt-1">{og.description}</p>
+            {og.note && (
+              <p className="text-crayon-orange text-sm mt-2 italic">
+                Note: {og.note}
+              </p>
+            )}
+            {og.sampleId && (
+              <p className="text-text-muted text-xs mt-2">
+                Sample ID: {og.sampleId}
+                {og.sampleTitle && ` - "${og.sampleTitle}"`}
+              </p>
+            )}
+            {og.sampleSlug && (
+              <p className="text-text-muted text-xs mt-2">
+                Slug: {og.sampleSlug}
+                {og.sampleTitle && ` - "${og.sampleTitle}"`}
+              </p>
+            )}
+            {og.sampleCode && (
+              <p className="text-text-muted text-xs mt-2">
+                Share Code: {og.sampleCode}
+              </p>
+            )}
+          </div>
+
+          {og.ogPath ? (
+            <div className="p-6">
+              {/* Preview Frame */}
+              <div className="relative bg-gray-100 rounded-xl overflow-hidden mb-4">
+                <div className="aspect-[1200/630]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={og.ogPath}
+                    alt={`${og.name} OG Preview`}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* Links */}
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={og.ogPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-crayon-orange text-white rounded-lg font-medium hover:bg-crayon-orange-dark transition-colors"
+                >
+                  View Full Size
+                </a>
+                {og.path && (
+                  <Link
+                    href={og.path}
+                    className="px-4 py-2 bg-gray-100 text-text-primary rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    View Page
+                  </Link>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="p-6">
+              <div className="bg-gray-50 rounded-xl p-8 text-center">
+                <p className="text-text-muted">
+                  No sample available. Create some content first.
+                </p>
+                {og.path && (
+                  <Link
+                    href={og.path}
+                    className="inline-block mt-4 px-4 py-2 bg-gray-100 text-text-primary rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    Go to {og.name.split(' ')[0]}
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function OGPreviewPage() {
   return (
     <div className="min-h-screen bg-bg-cream p-8">
       <div className="max-w-6xl mx-auto">
@@ -131,98 +245,10 @@ export default async function OGPreviewPage() {
           </div>
         </div>
 
-        {/* OG Image Grid */}
-        <div className="grid gap-8">
-          {ogTypes.map((og) => (
-            <div
-              key={og.name}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden"
-            >
-              <div className="p-6 border-b border-gray-100">
-                <h2 className="font-tondo font-bold text-xl text-text-primary">
-                  {og.name}
-                </h2>
-                <p className="text-text-secondary text-sm mt-1">
-                  {og.description}
-                </p>
-                {og.note && (
-                  <p className="text-crayon-orange text-sm mt-2 italic">
-                    Note: {og.note}
-                  </p>
-                )}
-                {og.sampleId && (
-                  <p className="text-text-muted text-xs mt-2">
-                    Sample ID: {og.sampleId}
-                    {og.sampleTitle && ` - "${og.sampleTitle}"`}
-                  </p>
-                )}
-                {og.sampleSlug && (
-                  <p className="text-text-muted text-xs mt-2">
-                    Slug: {og.sampleSlug}
-                    {og.sampleTitle && ` - "${og.sampleTitle}"`}
-                  </p>
-                )}
-                {og.sampleCode && (
-                  <p className="text-text-muted text-xs mt-2">
-                    Share Code: {og.sampleCode}
-                  </p>
-                )}
-              </div>
-
-              {og.ogPath ? (
-                <div className="p-6">
-                  {/* Preview Frame */}
-                  <div className="relative bg-gray-100 rounded-xl overflow-hidden mb-4">
-                    <div className="aspect-[1200/630]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={og.ogPath}
-                        alt={`${og.name} OG Preview`}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Links */}
-                  <div className="flex flex-wrap gap-3">
-                    <a
-                      href={og.ogPath}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 py-2 bg-crayon-orange text-white rounded-lg font-medium hover:bg-crayon-orange-dark transition-colors"
-                    >
-                      View Full Size
-                    </a>
-                    {og.path && (
-                      <Link
-                        href={og.path}
-                        className="px-4 py-2 bg-gray-100 text-text-primary rounded-lg font-medium hover:bg-gray-200 transition-colors"
-                      >
-                        View Page
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="p-6">
-                  <div className="bg-gray-50 rounded-xl p-8 text-center">
-                    <p className="text-text-muted">
-                      No sample available. Create some content first.
-                    </p>
-                    {og.path && (
-                      <Link
-                        href={og.path}
-                        className="inline-block mt-4 px-4 py-2 bg-gray-100 text-text-primary rounded-lg font-medium hover:bg-gray-200 transition-colors"
-                      >
-                        Go to {og.name.split(' ')[0]}
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* OG Image Grid - wrapped in Suspense for dynamic data */}
+        <Suspense fallback={<OGGridSkeleton />}>
+          <OGImageGrid />
+        </Suspense>
 
         {/* Manual Test Section */}
         <ManualTestingSection />
