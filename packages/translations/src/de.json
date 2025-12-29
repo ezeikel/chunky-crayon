@@ -494,8 +494,8 @@
     "perMonth": "/Monat",
     "creditsPerMonth": "Credits/Monat",
     "plans": {
-      "crayon": {
-        "name": "Crayon Plan",
+      "splash": {
+        "name": "Splash Plan",
         "tagline": "Starte dein Malabenteuer",
         "audience": "Ideal für Gelegenheitsmaler & kleine Künstler"
       },
@@ -504,15 +504,10 @@
         "tagline": "Spaß für die ganze Familie",
         "audience": "Super für kreative Familien und Geschwister"
       },
-      "masterpiece": {
-        "name": "Masterpiece Plan",
+      "sparkle": {
+        "name": "Sparkle Plan",
         "tagline": "Für Mal-Fans",
-        "audience": "Perfekt für Erwachsene & Vielmaler"
-      },
-      "studio": {
-        "name": "Studio Plan",
-        "tagline": "Für Super-Kreative & kleine Unternehmen",
-        "audience": "Am besten für Studios, Lehrkräfte & Vielnutzer"
+        "audience": "Perfekt für kreative Familien, die gerne malen"
       }
     },
     "features": {
@@ -520,16 +515,14 @@
       "wordsNumbers": "Malvorlagen mit Wörtern, Namen & Zahlen erstellen",
       "adjustments": "Farbe, Kontrast & Helligkeit anpassen",
       "photoToColoring": "Fotos in Malvorlagen verwandeln",
-      "allCrayonFeatures": "Alle Funktionen aus dem Crayon Plan",
+      "allSplashFeatures": "Alle Funktionen aus dem Splash Plan",
       "advancedEditing": "Erweiterte Bearbeitungsfunktionen",
       "earlyAccess": "Früher Zugriff auf neue Modelle & Funktionen",
       "rollover1Month": "Credits werden übernommen (bis zu 1 Monat)",
       "allRainbowFeatures": "Alle Funktionen aus dem Rainbow Plan",
       "bulkGeneration": "Stapelerstellung",
       "commercialUse": "Kommerzielle Nutzung",
-      "rollover2Months": "Credits werden übernommen (bis zu 2 Monate)",
-      "allMasterpieceFeatures": "Alle Funktionen aus dem Masterpiece Plan",
-      "rollover3Months": "Credits werden übernommen (bis zu 3 Monate)"
+      "rollover2Months": "Credits werden übernommen (bis zu 2 Monate)"
     },
     "creditPacks": {
       "title": "Brauchst du extra Credits?",

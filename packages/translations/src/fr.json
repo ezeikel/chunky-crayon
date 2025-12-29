@@ -494,8 +494,8 @@
     "perMonth": "/mois",
     "creditsPerMonth": "crédits/mois",
     "plans": {
-      "crayon": {
-        "name": "Formule Crayon",
+      "splash": {
+        "name": "Formule Splash",
         "tagline": "Commencez votre aventure coloriage",
         "audience": "Parfait pour colorier de temps en temps et pour les jeunes artistes"
       },
@@ -504,32 +504,25 @@
         "tagline": "Du fun pour toute la famille",
         "audience": "Idéal pour les familles créatives et les frères et sœurs"
       },
-      "masterpiece": {
-        "name": "Formule Chef-d’œuvre",
+      "sparkle": {
+        "name": "Formule Sparkle",
         "tagline": "Pour les passionnés de coloriage",
-        "audience": "Parfait pour les adultes et les grands fans de coloriage"
-      },
-      "studio": {
-        "name": "Formule Studio",
-        "tagline": "Pour les super créateurs et les petites entreprises",
-        "audience": "Idéal pour les studios, les enseignants et les gros utilisateurs"
+        "audience": "Parfait pour les familles créatives qui adorent colorier"
       }
     },
     "features": {
-      "textPrompts": "Créer des coloriages à partir d’invites texte",
+      "textPrompts": "Créer des coloriages à partir d'invites texte",
       "wordsNumbers": "Créer des coloriages avec des mots, des prénoms et des nombres",
       "adjustments": "Ajuster la couleur, le contraste et la luminosité",
       "photoToColoring": "Transformer des photos en coloriages",
-      "allCrayonFeatures": "Toutes les fonctionnalités de la formule Crayon",
-      "advancedEditing": "Fonctions d’édition avancées",
+      "allSplashFeatures": "Toutes les fonctionnalités de la formule Splash",
+      "advancedEditing": "Fonctions d'édition avancées",
       "earlyAccess": "Accès anticipé aux nouveaux modèles et fonctionnalités",
-      "rollover1Month": "Crédits reportés (jusqu’à 1 mois)",
+      "rollover1Month": "Crédits reportés (jusqu'à 1 mois)",
       "allRainbowFeatures": "Toutes les fonctionnalités de la formule Arc-en-ciel",
       "bulkGeneration": "Génération en lot",
       "commercialUse": "Utilisation commerciale",
-      "rollover2Months": "Crédits reportés (jusqu’à 2 mois)",
-      "allMasterpieceFeatures": "Toutes les fonctionnalités de la formule Chef-d’œuvre",
-      "rollover3Months": "Crédits reportés (jusqu’à 3 mois)"
+      "rollover2Months": "Crédits reportés (jusqu'à 2 mois)"
     },
     "creditPacks": {
       "title": "Besoin de crédits en plus ?",

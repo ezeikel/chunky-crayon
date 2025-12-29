@@ -263,10 +263,9 @@ enum AgeGroup {
 }
 
 enum PlanName {
-  CRAYON
+  SPLASH
   RAINBOW
-  MASTERPIECE
-  STUDIO
+  SPARKLE
 }
 
 enum SubscriptionStatus {

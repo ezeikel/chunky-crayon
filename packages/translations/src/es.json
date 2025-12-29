@@ -494,8 +494,8 @@
     "perMonth": "/mes",
     "creditsPerMonth": "créditos/mes",
     "plans": {
-      "crayon": {
-        "name": "Plan Crayon",
+      "splash": {
+        "name": "Plan Splash",
         "tagline": "Empieza tu aventura de colorear",
         "audience": "Ideal para colorear de vez en cuando y pequeños artistas"
       },
@@ -504,15 +504,10 @@
         "tagline": "Diversión para toda la familia",
         "audience": "Genial para familias creativas y hermanitos"
       },
-      "masterpiece": {
-        "name": "Plan Masterpiece",
+      "sparkle": {
+        "name": "Plan Sparkle",
         "tagline": "Para amantes del color",
-        "audience": "Perfecto para adultos y quienes colorean en serio"
-      },
-      "studio": {
-        "name": "Plan Studio",
-        "tagline": "Para súper creadores y pequeños negocios",
-        "audience": "Ideal para estudios, profes y usuarios intensivos"
+        "audience": "Perfecto para familias creativas que aman colorear"
       }
     },
     "features": {
@@ -520,16 +515,14 @@
       "wordsNumbers": "Crea páginas para colorear con palabras, nombres y números",
       "adjustments": "Ajusta color, contraste y brillo",
       "photoToColoring": "Convierte fotos en páginas para colorear",
-      "allCrayonFeatures": "Todas las funciones del Plan Crayon",
+      "allSplashFeatures": "Todas las funciones del Plan Splash",
       "advancedEditing": "Funciones de edición avanzadas",
       "earlyAccess": "Acceso anticipado a nuevos modelos y funciones",
       "rollover1Month": "Los créditos se acumulan (hasta 1 mes)",
       "allRainbowFeatures": "Todas las funciones del Plan Rainbow",
       "bulkGeneration": "Generación en lote",
       "commercialUse": "Uso comercial",
-      "rollover2Months": "Los créditos se acumulan (hasta 2 meses)",
-      "allMasterpieceFeatures": "Todas las funciones del Plan Masterpiece",
-      "rollover3Months": "Los créditos se acumulan (hasta 3 meses)"
+      "rollover2Months": "Los créditos se acumulan (hasta 2 meses)"
     },
     "creditPacks": {
       "title": "¿Necesitas créditos extra?",
