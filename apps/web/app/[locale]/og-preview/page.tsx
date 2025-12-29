@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { connection } from 'next/server';
 import { db } from '@chunky-crayon/db';
 import { client, isSanityConfigured } from '@/lib/sanity';
 import ManualTestingSection from './ManualTestingSection';
@@ -13,6 +14,9 @@ export const metadata: Metadata = {
 
 // Get sample data for preview
 async function getSampleData() {
+  // Signal dynamic rendering before Prisma uses Date internally
+  await connection();
+
   // Get a sample coloring image
   const coloringImage = await db.coloringImage.findFirst({
     select: { id: true, title: true },

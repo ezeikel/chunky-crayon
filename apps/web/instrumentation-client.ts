@@ -1,4 +1,8 @@
+import * as Sentry from '@sentry/nextjs';
 import posthog from 'posthog-js';
+
+// Required for Sentry to instrument client-side navigations
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
 
 posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
   // Use local proxy to avoid ad blockers (falls back to direct in dev)
