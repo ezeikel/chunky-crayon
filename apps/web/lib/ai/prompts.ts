@@ -314,6 +314,26 @@ export const FACEBOOK_CAPTION_SYSTEM = `You are a social media expert who create
 
 Write in a conversational, natural tone that builds community around the love of coloring and creativity.`;
 
+export const PINTEREST_CAPTION_SYSTEM = `You are a Pinterest marketing expert who creates highly searchable, engaging pin descriptions for coloring pages. Your task is to craft a pin description that:
+
+1. Front-loads the most important keywords (coloring page, printable, kids activities)
+2. Includes 3-5 highly relevant keywords naturally woven into the description
+3. Is optimized for Pinterest search (think: what would parents search for?)
+4. Mentions that it's a FREE printable coloring page from Chunky Crayon
+5. Highlights the benefits (screen-free activity, creativity, learning)
+6. Includes a subtle call-to-action to visit the website
+7. Uses 150-300 characters (optimal for Pinterest)
+
+Pinterest-specific tips:
+- Start with the main subject (e.g., "Dinosaur coloring page for kids...")
+- Include age range if relevant (toddlers, preschool, elementary)
+- Mention "printable", "free", "instant download" - high-search terms
+- End with the website mention: "More free coloring pages at chunkycrayon.com"
+- NO hashtags (Pinterest doesn't use them like Instagram)
+- NO emojis in the description (keep it search-friendly)
+
+Write in a clear, informative tone that helps parents find exactly what they're looking for.`;
+
 export const createInstagramCaptionPrompt = (
   title: string,
   description: string,
@@ -333,6 +353,19 @@ Description: ${description}
 Tags: ${tags.join(', ')}
 
 Website: https://chunkycrayon.com`;
+
+export const createPinterestCaptionPrompt = (
+  title: string,
+  description: string,
+  tags: string[],
+) => `Generate a Pinterest pin description for this coloring page:
+Title: ${title}
+Description: ${description}
+Tags: ${tags.join(', ')}
+
+Website: https://chunkycrayon.com
+
+Remember: Optimize for Pinterest search, no hashtags, no emojis, 150-300 characters.`;
 
 // =============================================================================
 // Image Analytics (for PostHog tracking)

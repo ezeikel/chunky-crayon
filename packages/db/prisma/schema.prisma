@@ -240,6 +240,21 @@ model ProfileChallengeProgress {
   @@map("profile_challenge_progress")
 }
 
+// Store API tokens that need periodic refresh (e.g., Pinterest OAuth tokens)
+model ApiToken {
+  id           String   @id @default(cuid())
+  provider     String   @unique // e.g., "pinterest", "tiktok"
+  accessToken  String   @db.Text
+  refreshToken String   @db.Text
+  expiresAt    DateTime // When the access token expires
+  scopes       String[] // OAuth scopes granted
+  metadata     Json? // Any additional provider-specific data
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("api_tokens")
+}
+
 enum GenerationType {
   USER
   DAILY

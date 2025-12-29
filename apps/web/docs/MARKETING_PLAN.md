@@ -1,15 +1,16 @@
 # Chunky Crayon - Marketing Plan
 
-_Created: December 28, 2025_
-_Last Updated: December 28, 2025_
+_Created: December 28, 2025_ _Last Updated: December 28, 2025_
 
 ---
 
 ## Executive Summary
 
-**Goal:** Reach £3,000-5,000 MRR within 12 months at current pricing (£7.99/month)
+**Goal:** Reach £3,000-5,000 MRR within 12 months at current pricing
+(£7.99/month)
 
-**Strategy:** Product-led growth + targeted acquisition focused on parents and educators
+**Strategy:** Product-led growth + targeted acquisition focused on parents and
+educators
 
 **Key Insight:** Chunky Crayon delivers more value than ColorBliss at comparable
 pricing. The challenge is communicating that value and finding the right
@@ -21,29 +22,30 @@ customers.
 
 ### Already Implemented
 
-| Category           | Status | Notes                                    |
-| ------------------ | ------ | ---------------------------------------- |
-| Blog               | ✅     | Content marketing in progress            |
-| Testimonials       | ✅     | On homepage                              |
-| SEO Foundation     | ✅     | 90% complete (see SEO_PLAN.md)           |
-| Social Sharing     | ✅     | On coloring pages                        |
-| Shareable Galleries| ✅     | Users can share artwork                  |
-| Free Gallery       | ✅     | 15+ categories, SEO goldmine             |
-| Social Proof Stats | ✅     | Pages created counter                    |
-| Schema/Structured Data | ✅ | Full JSON-LD implementation              |
+| Category               | Status | Notes                                 |
+| ---------------------- | ------ | ------------------------------------- |
+| Blog                   | ✅     | Content marketing in progress         |
+| Testimonials           | ✅     | On homepage                           |
+| SEO Foundation         | ✅     | 90% complete (see SEO_PLAN.md)        |
+| Social Sharing         | ✅     | On coloring pages                     |
+| Shareable Galleries    | ✅     | Users can share artwork               |
+| Free Gallery           | ✅     | 15+ categories, SEO goldmine          |
+| Social Proof Stats     | ✅     | Pages created counter                 |
+| Schema/Structured Data | ✅     | Full JSON-LD implementation           |
+| Social Automation      | ✅     | Instagram, Facebook, Pinterest (cron) |
 
 ### Competitive Advantage vs ColorBliss
 
-| Feature            | Chunky Crayon | ColorBliss        |
-| ------------------ | ------------- | ----------------- |
-| Price              | £7.99/mo      | $7/mo (text only) |
-| Voice Input        | ✅            | ❌                |
-| Image Upload       | ✅            | ✅ ($12/mo tier)  |
-| Digital Coloring   | ✅ Full       | ❌ Print only     |
-| Stickers/Effects   | ✅            | ❌                |
-| Magic Fill (AI)    | ✅            | ❌                |
-| Achievements       | ✅            | ❌                |
-| Kid-focused UX     | ✅ Colo       | ❌                |
+| Feature          | Chunky Crayon | ColorBliss        |
+| ---------------- | ------------- | ----------------- |
+| Price            | £7.99/mo      | $7/mo (text only) |
+| Voice Input      | ✅            | ❌                |
+| Image Upload     | ✅            | ✅ ($12/mo tier)  |
+| Digital Coloring | ✅ Full       | ❌ Print only     |
+| Stickers/Effects | ✅            | ❌                |
+| Magic Fill (AI)  | ✅            | ❌                |
+| Achievements     | ✅            | ❌                |
+| Kid-focused UX   | ✅ Colo       | ❌                |
 
 ---
 
@@ -51,16 +53,16 @@ customers.
 
 ### Priority Matrix
 
-| Channel              | Effort | Cost      | Impact | Timeline  | Priority |
-| -------------------- | ------ | --------- | ------ | --------- | -------- |
-| Pinterest            | Medium | Free      | High   | 2-4 weeks | 🔴 HIGH  |
-| Influencer Marketing | Medium | £500-1k/mo| High   | 4-8 weeks | 🔴 HIGH  |
-| Referral Program     | High   | Dev time  | High   | 2-3 weeks | 🔴 HIGH  |
-| Community Building   | Medium | Free      | Medium | Ongoing   | 🟡 MED   |
-| Email Marketing      | Low    | Free      | Medium | 1-2 weeks | 🟡 MED   |
-| Paid Ads (Pinterest) | Low    | £300-500/mo| Medium| 2 weeks  | 🟡 MED   |
-| Paid Ads (Facebook)  | Low    | £500-800/mo| Medium| 2 weeks  | 🟢 LOW   |
-| PR/Press             | High   | Free      | Low    | 4-8 weeks | 🟢 LOW   |
+| Channel              | Effort | Cost        | Impact | Timeline  | Priority |
+| -------------------- | ------ | ----------- | ------ | --------- | -------- |
+| Pinterest            | Medium | Free        | High   | 2-4 weeks | 🔴 HIGH  |
+| Influencer Marketing | Medium | £500-1k/mo  | High   | 4-8 weeks | 🔴 HIGH  |
+| Referral Program     | High   | Dev time    | High   | 2-3 weeks | 🔴 HIGH  |
+| Community Building   | Medium | Free        | Medium | Ongoing   | 🟡 MED   |
+| Email Marketing      | Low    | Free        | Medium | 1-2 weeks | 🟡 MED   |
+| Paid Ads (Pinterest) | Low    | £300-500/mo | Medium | 2 weeks   | 🟡 MED   |
+| Paid Ads (Facebook)  | Low    | £500-800/mo | Medium | 2 weeks   | 🟢 LOW   |
+| PR/Press             | High   | Free        | Low    | 4-8 weeks | 🟢 LOW   |
 
 ---
 
@@ -89,11 +91,14 @@ actively search for printable content. Visual discovery matches product.
 #### Pinterest Content Strategy
 
 **Pin Types:**
-1. **Gallery Images** (80%) - Direct pins of coloring pages with SEO descriptions
+
+1. **Gallery Images** (80%) - Direct pins of coloring pages with SEO
+   descriptions
 2. **Before/After** (10%) - "Child's drawing → AI coloring page"
 3. **Tips & Inspiration** (10%) - "5 ways to use custom coloring pages"
 
 **Pin Description Template:**
+
 ```
 🎨 [Category] Coloring Page - Free to print!
 
@@ -107,6 +112,7 @@ Perfect for [age group]. Create your own custom coloring pages with AI at Chunky
 ```
 
 **Posting Schedule:**
+
 - Daily: 10 pins minimum (mix of gallery + repins)
 - Best times: 8-11pm, 2-4pm (when parents browse)
 - Weekends: Higher volume (parents planning activities)
@@ -161,7 +167,8 @@ REFEREE (New User):
 
 ### 1.3 Email Marketing Setup
 
-**Why Email:** Owned channel, high ROI, retention driver. Parents need reminders.
+**Why Email:** Owned channel, high ROI, retention driver. Parents need
+reminders.
 
 #### Progress Tracker
 
@@ -178,16 +185,19 @@ REFEREE (New User):
 #### Welcome Email Series
 
 **Email 1 (Immediate):** "Welcome to Chunky Crayon!"
+
 - Quick start guide
 - Link to first coloring page
 - Introduce Colo mascot
 
 **Email 2 (Day 2):** "Did you know you can use your voice?"
+
 - Voice input feature highlight
 - Video/GIF demo
 - "Try it: Say 'a dragon wearing a birthday hat'"
 
 **Email 3 (Day 5):** "Your child can earn stickers!"
+
 - Explain achievement system
 - Show sticker album preview
 - "Complete 3 more pages to unlock..."
@@ -215,13 +225,13 @@ engagement. Kids' content performs well on social.
 
 #### Influencer Categories
 
-| Category     | Platform      | Example Search Terms                    |
-| ------------ | ------------- | --------------------------------------- |
-| Parenting    | Instagram, YT | "mom blogger", "parenting tips"         |
-| Homeschool   | Instagram, FB | "homeschool mom", "unschooling"         |
-| Teachers     | TikTok, IG    | "teacher life", "classroom activities"  |
-| Craft/DIY    | Pinterest, YT | "kids crafts", "art activities"         |
-| ADHD/Special | Instagram     | "ADHD parenting", "sensory activities"  |
+| Category     | Platform      | Example Search Terms                   |
+| ------------ | ------------- | -------------------------------------- |
+| Parenting    | Instagram, YT | "mom blogger", "parenting tips"        |
+| Homeschool   | Instagram, FB | "homeschool mom", "unschooling"        |
+| Teachers     | TikTok, IG    | "teacher life", "classroom activities" |
+| Craft/DIY    | Pinterest, YT | "kids crafts", "art activities"        |
+| ADHD/Special | Instagram     | "ADHD parenting", "sensory activities" |
 
 #### Influencer Outreach Template
 
@@ -254,12 +264,12 @@ Best,
 
 #### Partnership Tiers
 
-| Tier     | Offer                        | Expectation                    | Budget   |
-| -------- | ---------------------------- | ------------------------------ | -------- |
-| Seed     | 6-month free subscription    | Honest review if they like it  | £0       |
-| Micro    | Free sub + £100-200          | 1 post/story, unique code      | £100-200 |
-| Standard | Free sub + £300-500          | Video review, 2+ posts, code   | £300-500 |
-| Premium  | Free sub + £500-1000         | Dedicated video, ongoing       | £500-1k  |
+| Tier     | Offer                     | Expectation                   | Budget   |
+| -------- | ------------------------- | ----------------------------- | -------- |
+| Seed     | 6-month free subscription | Honest review if they like it | £0       |
+| Micro    | Free sub + £100-200       | 1 post/story, unique code     | £100-200 |
+| Standard | Free sub + £300-500       | Video review, 2+ posts, code  | £300-500 |
+| Premium  | Free sub + £500-1000      | Dedicated video, ongoing      | £500-1k  |
 
 ---
 
@@ -284,11 +294,13 @@ word of mouth.
 #### Community Content Ideas
 
 **Weekly Themes:**
+
 - "Dinosaur Week" - Share dinosaur creations
 - "Back to School" - Educational coloring pages
 - "Family Favorites" - What your kids request most
 
 **Engagement Tactics:**
+
 - Photo contests with credit prizes
 - "Coloring page of the week" feature
 - Q&A sessions about product features
@@ -323,6 +335,7 @@ Facebook. Visual format matches product.
 #### Pinterest Ad Specs
 
 **Creative Best Practices:**
+
 - 2:3 aspect ratio (1000x1500px)
 - Text overlay < 20% of image
 - Bold, colorful imagery
@@ -330,6 +343,7 @@ Facebook. Visual format matches product.
 - Video: 6-15 seconds, autoplay-friendly
 
 **Target Audiences:**
+
 ```
 Audience 1: Parents of Young Kids
 ├── Interests: Parenting, Kids Activities, Preschool
@@ -376,6 +390,7 @@ Pinterest ROI.
 #### Facebook Ad Copy Templates
 
 **Testimonial Style:**
+
 ```
 "My 5-year-old couldn't believe it. She said 'a unicorn eating pizza'
 and it actually made it!" 🦄🍕
@@ -390,6 +405,7 @@ Try free →
 ```
 
 **Problem/Solution Style:**
+
 ```
 Tired of the same coloring books?
 
@@ -428,12 +444,12 @@ Start free →
 
 #### Blog Content Calendar Template
 
-| Week | Topic                               | Keywords                        | Type     |
-| ---- | ----------------------------------- | ------------------------------- | -------- |
-| 1    | Benefits of coloring for kids       | coloring benefits, child dev    | SEO      |
-| 2    | Voice input for preschoolers        | voice apps for kids, AI kids    | Feature  |
-| 3    | Rainy day activities                | indoor activities, kids bored   | Seasonal |
-| 4    | Custom coloring vs coloring books   | coloring books alternative      | Comparison|
+| Week | Topic                             | Keywords                      | Type       |
+| ---- | --------------------------------- | ----------------------------- | ---------- |
+| 1    | Benefits of coloring for kids     | coloring benefits, child dev  | SEO        |
+| 2    | Voice input for preschoolers      | voice apps for kids, AI kids  | Feature    |
+| 3    | Rainy day activities              | indoor activities, kids bored | Seasonal   |
+| 4    | Custom coloring vs coloring books | coloring books alternative    | Comparison |
 
 ---
 
@@ -441,28 +457,28 @@ Start free →
 
 ### North Star Metrics
 
-| Metric               | Current | 3 Month | 6 Month | 12 Month |
-| -------------------- | ------- | ------- | ------- | -------- |
-| MRR                  | £0      | £400-700| £1,200-2,000 | £3,000-5,000 |
-| Active Subscribers   | 0       | 50-90   | 150-250 | 400-650  |
-| Monthly Traffic      | ?       | 15,000  | 30,000  | 60,000   |
-| Free → Paid Rate     | ?       | 1.5%    | 2.5%    | 3%       |
-| Churn Rate           | ?       | <10%    | <8%     | <6%      |
+| Metric             | Current | 3 Month  | 6 Month      | 12 Month     |
+| ------------------ | ------- | -------- | ------------ | ------------ |
+| MRR                | £0      | £400-700 | £1,200-2,000 | £3,000-5,000 |
+| Active Subscribers | 0       | 50-90    | 150-250      | 400-650      |
+| Monthly Traffic    | ?       | 15,000   | 30,000       | 60,000       |
+| Free → Paid Rate   | ?       | 1.5%     | 2.5%         | 3%           |
+| Churn Rate         | ?       | <10%     | <8%          | <6%          |
 
 ### Channel-Specific Metrics
 
-| Channel     | Metric                  | Goal (Monthly)       |
-| ----------- | ----------------------- | -------------------- |
-| Pinterest   | Impressions             | 100K+ by month 3     |
-| Pinterest   | Saves                   | 1K+                  |
-| Pinterest   | Click-through rate      | 2%+                  |
-| Referrals   | New referral signups    | 50+ by month 3       |
-| Referrals   | Referral conversion     | 20%+                 |
-| Influencers | Collaborations/month    | 5-10                 |
-| Influencers | Referral code usage     | 100+ signups         |
-| Email       | Open rate               | 30%+                 |
-| Email       | Click rate              | 5%+                  |
-| Community   | Group members           | 500+ by month 6      |
+| Channel     | Metric               | Goal (Monthly)   |
+| ----------- | -------------------- | ---------------- |
+| Pinterest   | Impressions          | 100K+ by month 3 |
+| Pinterest   | Saves                | 1K+              |
+| Pinterest   | Click-through rate   | 2%+              |
+| Referrals   | New referral signups | 50+ by month 3   |
+| Referrals   | Referral conversion  | 20%+             |
+| Influencers | Collaborations/month | 5-10             |
+| Influencers | Referral code usage  | 100+ signups     |
+| Email       | Open rate            | 30%+             |
+| Email       | Click rate           | 5%+              |
+| Community   | Group members        | 500+ by month 6  |
 
 ---
 
@@ -470,21 +486,23 @@ Start free →
 
 ### Monthly Marketing Budget Phases
 
-| Phase        | Month  | Pinterest | Influencers | FB/IG | Other | Total    |
-| ------------ | ------ | --------- | ----------- | ----- | ----- | -------- |
-| Foundation   | 1-2    | £0        | £200        | £0    | £0    | £200     |
-| Growth       | 3-4    | £300      | £500        | £0    | £100  | £900     |
-| Scale        | 5-6    | £400      | £600        | £300  | £100  | £1,400   |
-| Optimize     | 7-12   | £500      | £500        | £500  | £100  | £1,600   |
+| Phase      | Month | Pinterest | Influencers | FB/IG | Other | Total  |
+| ---------- | ----- | --------- | ----------- | ----- | ----- | ------ |
+| Foundation | 1-2   | £0        | £200        | £0    | £0    | £200   |
+| Growth     | 3-4   | £300      | £500        | £0    | £100  | £900   |
+| Scale      | 5-6   | £400      | £600        | £300  | £100  | £1,400 |
+| Optimize   | 7-12  | £500      | £500        | £500  | £100  | £1,600 |
 
 ### Expected ROI
 
 **Assumptions:**
+
 - LTV: £40-60 (5-8 month average retention at £7.99/mo)
 - Target CAC: £15-25
 - Break-even: 2-3 months per customer
 
 **At £1,500/mo spend:**
+
 - If CAC = £20, acquire 75 customers/month
 - MRR add: 75 × £7.99 = £599/month
 - Cumulative MRR after 6 months: ~£3,000 (accounting for churn)
@@ -537,7 +555,14 @@ Start free →
 - [x] Testimonials on homepage
 - [x] Social sharing buttons
 - [x] Shareable galleries
-- [ ] Pinterest strategy started
+- [x] **Pinterest API automation complete** (Dec 29)
+  - Pinterest developer app "Chunky Crayon Pin Publisher" (App ID: 1541250)
+    created
+  - Trial access approved
+  - API integration added to social posting cron job (`/api/social/post`)
+  - AI-generated Pinterest-optimized captions (SEO-friendly, no hashtags)
+  - Auto-posts daily coloring pages with link back to site
+  - Env vars needed: `PINTEREST_ACCESS_TOKEN`, `PINTEREST_BOARD_ID`
 - [ ] Referral program designed
 - [ ] Influencer outreach begun
 

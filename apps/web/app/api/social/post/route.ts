@@ -6,6 +6,7 @@ import { db } from '@chunky-crayon/db';
 import {
   generateInstagramCaption,
   generateFacebookCaption,
+  generatePinterestCaption,
 } from '@/app/actions/social';
 
 export const maxDuration = 150;
@@ -140,6 +141,67 @@ const postToFacebookPage = async (imageUrl: string, message: string) => {
   return data.id;
 };
 
+// Get Pinterest access token - tries DB first, falls back to env var
+const getPinterestAccessToken = async (): Promise<string> => {
+  // Try database first (auto-refreshed tokens)
+  const dbToken = await db.apiToken.findUnique({
+    where: { provider: 'pinterest' },
+  });
+
+  if (dbToken) {
+    return dbToken.accessToken;
+  }
+
+  // Fall back to env var
+  if (process.env.PINTEREST_ACCESS_TOKEN) {
+    return process.env.PINTEREST_ACCESS_TOKEN;
+  }
+
+  throw new Error('Pinterest access token not configured');
+};
+
+const postToPinterest = async (
+  imageUrl: string,
+  title: string,
+  description: string,
+  coloringImageId: string,
+) => {
+  if (!process.env.PINTEREST_BOARD_ID) {
+    throw new Error('Pinterest board ID not configured');
+  }
+
+  const accessToken = await getPinterestAccessToken();
+
+  // Pinterest API v5 - Create a pin
+  const response = await fetch('https://api.pinterest.com/v5/pins', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      board_id: process.env.PINTEREST_BOARD_ID,
+      media_source: {
+        source_type: 'image_url',
+        url: imageUrl,
+      },
+      title: title.slice(0, 100), // Pinterest title limit is 100 chars
+      description: description.slice(0, 500), // Pinterest description limit is 500 chars
+      link: `https://chunkycrayon.com/coloring/${coloringImageId}`,
+      alt_text: `${title} - Free printable coloring page from Chunky Crayon`,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error('Pinterest API response:', data);
+    throw new Error(`Failed to post to Pinterest: ${JSON.stringify(data)}`);
+  }
+
+  return data.id;
+};
+
 const handleRequest = async (request: Request) => {
   const tempFiles: string[] = [];
 
@@ -197,6 +259,7 @@ const handleRequest = async (request: Request) => {
     const results = {
       instagram: null as string | null,
       facebook: null as string | null,
+      pinterest: null as string | null,
       errors: [] as string[],
     };
 
@@ -275,8 +338,48 @@ const handleRequest = async (request: Request) => {
       );
     }
 
+    // post to Pinterest
+    try {
+      // convert svg to jpeg for Pinterest (reuse instagram dimensions - square works well)
+      const pinterestBuffer = await convertSvgToJpeg(
+        coloringImage.svgUrl,
+        'instagram', // reuse instagram dimensions for Pinterest (1080x1080 square)
+      );
+
+      // upload to temporary storage
+      const pinterestImageUrl = await uploadToTempStorage(
+        pinterestBuffer,
+        'pinterest',
+      );
+      tempFiles.push(pinterestImageUrl.split('/').pop() || '');
+
+      // generate Pinterest caption (description)
+      const pinterestCaption = await generatePinterestCaption(coloringImage);
+
+      if (!pinterestCaption) {
+        throw new Error('failed to generate Pinterest caption');
+      }
+
+      // post to Pinterest
+      const pinterestPinId = await postToPinterest(
+        pinterestImageUrl,
+        coloringImage.title ?? 'Free Coloring Page',
+        pinterestCaption,
+        coloringImage.id,
+      );
+
+      results.pinterest = pinterestPinId;
+      console.log('Successfully posted to Pinterest:', pinterestPinId);
+    } catch (error) {
+      console.error('Error posting to Pinterest:', error);
+      results.errors.push(
+        `Pinterest: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+
     // return results
-    const hasSuccess = results.instagram || results.facebook;
+    const hasSuccess =
+      results.instagram || results.facebook || results.pinterest;
 
     return NextResponse.json(
       {
@@ -307,10 +410,13 @@ const handleRequest = async (request: Request) => {
         .filter((fileName) => fileName)
         .map(async (fileName) => {
           try {
-            // extract platform from filename path
-            const platform = fileName.includes('instagram')
-              ? 'instagram'
-              : 'facebook';
+            // extract platform from filename path (stored in temp/social/{platform}/)
+            let platform = 'instagram';
+            if (fileName.includes('facebook')) {
+              platform = 'facebook';
+            } else if (fileName.includes('pinterest')) {
+              platform = 'pinterest';
+            }
             await del(`temp/social/${platform}/${fileName}`);
           } catch (error) {
             console.error(

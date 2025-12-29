@@ -64,8 +64,10 @@ export {
   // Social media prompts
   INSTAGRAM_CAPTION_SYSTEM,
   FACEBOOK_CAPTION_SYSTEM,
+  PINTEREST_CAPTION_SYSTEM,
   createInstagramCaptionPrompt,
   createFacebookCaptionPrompt,
+  createPinterestCaptionPrompt,
   // Analytics prompts
   IMAGE_ANALYTICS_SYSTEM,
   IMAGE_ANALYTICS_PROMPT,

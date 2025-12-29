@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/tokens/refresh",
+      "schedule": "0 7 * * 1"
+    },
+    {
       "path": "/api/subscription/credit-drip",
       "schedule": "0 0 1 * *"
     },
