@@ -29,6 +29,8 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Run audit to check for missing translations
