@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'packages/translations/src/en.json'
+  # Allow manual trigger for testing
+  workflow_dispatch:
 
 jobs:
   translate:
