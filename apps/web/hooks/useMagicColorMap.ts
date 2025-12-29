@@ -1,12 +1,10 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { assignColorsToRegions } from '@/app/actions/analyze-coloring-image';
-import type { DetectedRegionInput, RegionFirstColorResponse } from '@/lib/ai';
+import type { GridColorMap } from '@/lib/ai';
 import {
   detectAllRegions,
   getRegionAtPoint,
-  getSizeDescriptor,
   type Region,
   type RegionMap,
 } from '@/utils/regionDetection';
@@ -20,8 +18,8 @@ export type MagicColorMapState = {
   error: string | null;
   /** Loading progress message */
   loadingMessage: string | null;
-  /** The AI analysis result (V3 region-first with 1:1 mapping) */
-  analysis: RegionFirstColorResponse | null;
+  /** The AI analysis result (no longer used - kept for backwards compatibility) */
+  analysis: null;
   /** Region detection results */
   regionMap: RegionMap | null;
   /** Mapping from detected region ID to assigned hex color */
@@ -76,93 +74,31 @@ const initialState: MagicColorMapState = {
 };
 
 /**
- * Convert pixel coordinates to 5x5 grid position (1-5 for rows and cols).
+ * Grid size for color map lookups.
+ * Currently 5x5 (25 cells) which works well for typical children's coloring pages
+ * with large, distinct regions. Can be increased to 7x7 or 10x10 for more detailed
+ * images with many small adjacent elements if accuracy issues arise.
+ */
+const GRID_SIZE = 5;
+
+/**
+ * Convert pixel coordinates to grid position (1-GRID_SIZE for rows and cols).
  */
 function getGridPosition(
   centroid: { x: number; y: number },
   canvasWidth: number,
   canvasHeight: number,
 ): { row: number; col: number } {
-  // Convert to 1-5 grid (1=top/left, 5=bottom/right)
+  // Convert to 1-GRID_SIZE grid (1=top/left, GRID_SIZE=bottom/right)
   const col = Math.min(
-    5,
-    Math.max(1, Math.ceil((centroid.x / canvasWidth) * 5)),
+    GRID_SIZE,
+    Math.max(1, Math.ceil((centroid.x / canvasWidth) * GRID_SIZE)),
   );
   const row = Math.min(
-    5,
-    Math.max(1, Math.ceil((centroid.y / canvasHeight) * 5)),
+    GRID_SIZE,
+    Math.max(1, Math.ceil((centroid.y / canvasHeight) * GRID_SIZE)),
   );
   return { row, col };
-}
-
-/**
- * Convert detected regions to V3 input format for the AI.
- * Each region gets its grid position and size for the AI to understand location.
- */
-function convertToV3Input(
-  regions: Region[],
-  canvasWidth: number,
-  canvasHeight: number,
-): DetectedRegionInput[] {
-  const totalPixels = canvasWidth * canvasHeight;
-
-  return regions.map((region) => {
-    const grid = getGridPosition(region.centroid, canvasWidth, canvasHeight);
-    const pixelPercentage = (region.pixelCount / totalPixels) * 100;
-
-    return {
-      id: region.id,
-      gridRow: grid.row,
-      gridCol: grid.col,
-      size: getSizeDescriptor(region.pixelCount, totalPixels),
-      pixelPercentage,
-    };
-  });
-}
-
-/**
- * Build color maps from V3 AI response (1:1 mapping by region ID).
- * Since V3 guarantees each region ID gets a color assignment, this is simple.
- */
-function buildColorMapsFromV3Response(
-  response: RegionFirstColorResponse,
-  detectedRegions: Region[],
-  canvasWidth: number,
-  canvasHeight: number,
-): {
-  colorMap: Map<number, string>;
-  colorNameMap: Map<number, string>;
-  reasoningMap: Map<number, string>;
-} {
-  const colorMap = new Map<number, string>();
-  const colorNameMap = new Map<number, string>();
-  const reasoningMap = new Map<number, string>();
-
-  // Build lookup from AI assignments (keyed by regionId)
-  const assignmentLookup = new Map(
-    response.assignments.map((a) => [a.regionId, a]),
-  );
-
-  // Map each detected region to its assigned color
-  for (const region of detectedRegions) {
-    const assignment = assignmentLookup.get(region.id);
-
-    if (assignment) {
-      // Direct 1:1 mapping from AI
-      colorMap.set(region.id, assignment.suggestedColor);
-      colorNameMap.set(region.id, assignment.colorName);
-      reasoningMap.set(region.id, assignment.reasoning);
-    } else {
-      // Fallback for any regions AI might have missed (shouldn't happen with V3)
-      const grid = getGridPosition(region.centroid, canvasWidth, canvasHeight);
-      const fallbackColor = getDefaultColorForGrid(grid);
-      colorMap.set(region.id, fallbackColor.hex);
-      colorNameMap.set(region.id, fallbackColor.name);
-      reasoningMap.set(region.id, 'A nice color for this spot!');
-    }
-  }
-
-  return { colorMap, colorNameMap, reasoningMap };
 }
 
 /**
@@ -184,6 +120,53 @@ function getDefaultColorForGrid(grid: { row: number; col: number }): {
     // Middle area - vegetation/nature colors
     return { hex: '#43A047', name: 'Grass Green' };
   }
+}
+
+/**
+ * Build color maps from pre-computed grid color map (instant, no AI call).
+ * Looks up each region's centroid grid position in the pre-computed map.
+ */
+function buildColorMapsFromPreComputed(
+  preComputed: GridColorMap,
+  detectedRegions: Region[],
+  canvasWidth: number,
+  canvasHeight: number,
+): {
+  colorMap: Map<number, string>;
+  colorNameMap: Map<number, string>;
+  reasoningMap: Map<number, string>;
+} {
+  const colorMap = new Map<number, string>();
+  const colorNameMap = new Map<number, string>();
+  const reasoningMap = new Map<number, string>();
+
+  // Build a lookup from grid position to color assignment
+  const gridLookup = new Map<string, (typeof preComputed.gridColors)[0]>();
+  for (const cell of preComputed.gridColors) {
+    const key = `${cell.row}-${cell.col}`;
+    gridLookup.set(key, cell);
+  }
+
+  // Map each detected region to its color based on centroid grid position
+  for (const region of detectedRegions) {
+    const grid = getGridPosition(region.centroid, canvasWidth, canvasHeight);
+    const key = `${grid.row}-${grid.col}`;
+    const assignment = gridLookup.get(key);
+
+    if (assignment) {
+      colorMap.set(region.id, assignment.suggestedColor);
+      colorNameMap.set(region.id, assignment.colorName);
+      reasoningMap.set(region.id, assignment.reasoning);
+    } else {
+      // Fallback if no pre-computed color for this cell (shouldn't happen)
+      const fallbackColor = getDefaultColorForGrid(grid);
+      colorMap.set(region.id, fallbackColor.hex);
+      colorNameMap.set(region.id, fallbackColor.name);
+      reasoningMap.set(region.id, 'A nice color for this spot!');
+    }
+  }
+
+  return { colorMap, colorNameMap, reasoningMap };
 }
 
 /**
@@ -240,11 +223,23 @@ function createPreColoredCanvas(
   return preColoredCanvas;
 }
 
+export type UseMagicColorMapOptions = {
+  /** Pre-computed grid color map from server (for instant color assignment) */
+  preComputedColorMap?: GridColorMap | null;
+};
+
 /**
  * Hook for managing the Magic Brush color map.
  * Pre-analyzes the entire image and assigns colors to all regions.
+ *
+ * Requires `preComputedColorMap` (generated at image creation time) for
+ * instant color assignment via grid lookup. Without pre-computed data,
+ * the magic tools remain disabled.
  */
-export function useMagicColorMap(): UseMagicColorMapReturn {
+export function useMagicColorMap(
+  options: UseMagicColorMapOptions = {},
+): UseMagicColorMapReturn {
+  const { preComputedColorMap } = options;
   const [state, setState] = useState<MagicColorMapState>(initialState);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -284,80 +279,51 @@ export function useMagicColorMap(): UseMagicColorMapReturn {
           return false;
         }
 
-        setState((s) => ({
-          ...s,
-          loadingMessage: `Found ${regionMap.regions.length} areas. Finding perfect colors...`,
-        }));
-
-        // Step 2: Convert detected regions to V3 input format (with grid positions)
-        const v3Regions = convertToV3Input(
-          regionMap.regions,
-          regionMap.width,
-          regionMap.height,
-        );
-
-        // NOTE: Keep these logs for debugging and future prompt improvements
-        console.log('\n========== MAGIC FILL V3: SENDING TO AI ==========');
-        console.log(
-          `Sending ${v3Regions.length} regions to AI for color assignment`,
-        );
-        console.log(
-          'Sample regions:',
-          v3Regions
-            .slice(0, 5)
-            .map(
-              (r) =>
-                `#${r.id} at grid(${r.gridRow},${r.gridCol}) size:${r.size}`,
-            ),
-        );
-        console.log('===================================================\n');
-
-        // Step 3: Get AI color assignments (V3 region-first approach)
-        const imageBase64 = boundaryCanvas.toDataURL('image/png');
-        const result = await assignColorsToRegions(imageBase64, v3Regions);
-
-        if (!result.success) {
+        // Step 2: Get color assignments from pre-computed data
+        // No fallback to AI - if no pre-computed data, buttons should stay disabled
+        if (!preComputedColorMap) {
+          console.log('[MagicColorMap] No pre-computed color map available');
           setState((s) => ({
             ...s,
             isLoading: false,
-            error: result.error,
+            error: null,
             loadingMessage: null,
           }));
           return false;
         }
 
-        // NOTE: Keep these logs for debugging and future prompt improvements
-        console.log('\n========== MAGIC FILL V3: AI RESPONSE ==========');
-        console.log('Scene:', result.response.sceneDescription);
+        // Use pre-computed grid color map (instant)
         console.log(
-          `Assignments returned: ${result.response.assignments.length}`,
+          '\n========== MAGIC FILL: USING PRE-COMPUTED COLORS ==========',
+        );
+        console.log('Scene:', preComputedColorMap.sceneDescription);
+        console.log(
+          `Grid cells available: ${preComputedColorMap.gridColors.length}`,
         );
         console.log(
-          `Match rate: ${((result.response.assignments.length / v3Regions.length) * 100).toFixed(1)}%`,
+          '============================================================\n',
         );
-        console.log('\nSample assignments:');
-        result.response.assignments.slice(0, 10).forEach((a) => {
-          console.log(
-            `  #${a.regionId}: "${a.element}" → ${a.colorName} (${a.suggestedColor})`,
+
+        setState((s) => ({
+          ...s,
+          loadingMessage: `Found ${regionMap.regions.length} areas. Applying colors...`,
+        }));
+
+        // Build color maps from pre-computed grid data (instant lookup)
+        const { colorMap, colorNameMap, reasoningMap } =
+          buildColorMapsFromPreComputed(
+            preComputedColorMap,
+            regionMap.regions,
+            regionMap.width,
+            regionMap.height,
           );
-        });
-        console.log('===================================================\n');
 
         setState((s) => ({
           ...s,
           loadingMessage: 'Creating your magical coloring map...',
         }));
 
-        // Step 4: Build color maps from V3 response (direct 1:1 mapping)
-        const { colorMap, colorNameMap, reasoningMap } =
-          buildColorMapsFromV3Response(
-            result.response,
-            regionMap.regions,
-            regionMap.width,
-            regionMap.height,
-          );
-
-        // Step 5: Create pre-colored canvas
+        // Step 3: Create pre-colored canvas
         const preColoredCanvas = createPreColoredCanvas(
           drawingCanvas,
           regionMap,
@@ -369,7 +335,7 @@ export function useMagicColorMap(): UseMagicColorMapReturn {
           isReady: true,
           error: null,
           loadingMessage: null,
-          analysis: result.response,
+          analysis: null,
           regionMap,
           colorMap,
           colorNameMap,
@@ -390,7 +356,7 @@ export function useMagicColorMap(): UseMagicColorMapReturn {
         return false;
       }
     },
-    [],
+    [preComputedColorMap],
   );
 
   /**

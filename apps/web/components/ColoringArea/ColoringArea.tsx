@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useMemo,
   forwardRef,
   useImperativeHandle,
 } from 'react';
@@ -25,6 +26,7 @@ import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton';
 import { CanvasAction, useColoringContext } from '@/contexts/coloring';
 import { useSound } from '@/hooks/useSound';
 import { useMagicColorMap } from '@/hooks/useMagicColorMap';
+import type { GridColorMap } from '@/lib/ai';
 import {
   saveColoringProgress,
   loadColoringProgress,
@@ -68,7 +70,19 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
+    // Parse pre-computed color map from static page data (generated at image creation time)
+    const preComputedColorMap = useMemo<GridColorMap | null>(() => {
+      if (!coloringImage.colorMapJson) return null;
+      try {
+        return JSON.parse(coloringImage.colorMapJson) as GridColorMap;
+      } catch {
+        console.error('[ColoringArea] Failed to parse colorMapJson');
+        return null;
+      }
+    }, [coloringImage.colorMapJson]);
+
     // Magic Color Map for reveal mode and auto-color
+    // Uses pre-computed data for instant color assignment (no AI call needed)
     const {
       state: magicColorMapState,
       generateColorMap,
@@ -77,16 +91,23 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       markRegionColored,
       getAllColorsForAutoFill,
       reset: resetMagicColorMap,
-    } = useMagicColorMap();
+    } = useMagicColorMap({ preComputedColorMap });
 
     // Handle first canvas interaction - load and play ambient sound
     // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
     // TODO: Trigger ambient sound on ANY page interaction (color pick, button click), not just canvas stroke
     // TODO: Improve ElevenLabs ambient sound prompts - current sounds are low quality/not fitting
     const handleFirstInteraction = useCallback(async () => {
+      console.log('[ColoringArea] handleFirstInteraction called', {
+        hasAmbientUrl: !!coloringImage.ambientSoundUrl,
+        ambientUrl: coloringImage.ambientSoundUrl,
+        alreadyInitialized: ambientInitializedRef.current,
+      });
       if (coloringImage.ambientSoundUrl && !ambientInitializedRef.current) {
         ambientInitializedRef.current = true;
+        console.log('[ColoringArea] Loading ambient sound...');
         await loadAmbient(coloringImage.ambientSoundUrl);
+        console.log('[ColoringArea] Playing ambient sound...');
         playAmbient();
       }
     }, [coloringImage.ambientSoundUrl, loadAmbient, playAmbient]);

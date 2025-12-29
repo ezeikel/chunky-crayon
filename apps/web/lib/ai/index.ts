@@ -94,6 +94,9 @@ export {
   // Region-first prompts (1:1 mapping guaranteed)
   REGION_FIRST_COLOR_SYSTEM,
   createRegionFirstColorPrompt,
+  // Pre-computed grid color map prompts (for instant Magic Fill)
+  GRID_COLOR_MAP_SYSTEM,
+  createGridColorMapPrompt,
 } from './prompts';
 export type { MagicColorMode } from './prompts';
 
@@ -114,6 +117,9 @@ export {
   detectedRegionInputSchema,
   regionColorAssignmentSchema,
   regionFirstColorResponseSchema,
+  // Pre-computed grid color map schemas (for instant Magic Fill)
+  gridCellColorSchema,
+  gridColorMapSchema,
 } from './schemas';
 export type {
   ImageMetadata,
@@ -130,6 +136,9 @@ export type {
   DetectedRegionInput,
   RegionColorAssignment,
   RegionFirstColorResponse,
+  // Pre-computed grid color map types
+  GridCellColor,
+  GridColorMap,
 } from './schemas';
 
 // Re-export analytics functions

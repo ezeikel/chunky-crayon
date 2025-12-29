@@ -30,6 +30,8 @@ import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
+import { generateAmbientSoundForImage } from '@/app/actions/ambient-sound';
+import { generateGridColorMap } from '@/app/actions/generate-color-map';
 
 /**
  * Locale to language mapping for image metadata generation.
@@ -345,7 +347,7 @@ export const createColoringImage = async (
         return;
       }
 
-      // Run SVG check and analytics in parallel, independently
+      // Run all post-processing tasks in parallel, independently
       await Promise.allSettled([
         // Check SVG validity and retrace if needed
         (async () => {
@@ -365,7 +367,37 @@ export const createColoringImage = async (
             });
           }
         })(),
+
+        // Generate pre-computed grid color map for instant Magic Fill
+        (async () => {
+          const colorMapResult = await generateGridColorMap(
+            result.id,
+            result.url!,
+          );
+          if (colorMapResult.success) {
+            console.log(`[Pipeline] Color map generated for ${result.id}`);
+          } else {
+            console.error(
+              `[Pipeline] Failed to generate color map: ${colorMapResult.error}`,
+            );
+          }
+        })(),
+
+        // Generate ambient sound for the coloring experience
+        (async () => {
+          const soundResult = await generateAmbientSoundForImage(result.id);
+          if (soundResult.success) {
+            console.log(`[Pipeline] Ambient sound generated for ${result.id}`);
+          } else {
+            console.error(
+              `[Pipeline] Failed to generate ambient sound: ${soundResult.error}`,
+            );
+          }
+        })(),
       ]);
+
+      // Invalidate cache so new data (color map, ambient sound) is available
+      updateTag(`coloring-image-${result.id}`);
     });
 
     // Invalidate gallery cache so new image appears immediately
@@ -387,7 +419,7 @@ export const createColoringImage = async (
       return;
     }
 
-    // Run SVG check and analytics in parallel, independently
+    // Run all post-processing tasks in parallel, independently
     await Promise.allSettled([
       // Check SVG validity and retrace if needed
       (async () => {
@@ -407,7 +439,37 @@ export const createColoringImage = async (
           });
         }
       })(),
+
+      // Generate pre-computed grid color map for instant Magic Fill
+      (async () => {
+        const colorMapResult = await generateGridColorMap(
+          result.id,
+          result.url!,
+        );
+        if (colorMapResult.success) {
+          console.log(`[Pipeline] Color map generated for ${result.id}`);
+        } else {
+          console.error(
+            `[Pipeline] Failed to generate color map: ${colorMapResult.error}`,
+          );
+        }
+      })(),
+
+      // Generate ambient sound for the coloring experience
+      (async () => {
+        const soundResult = await generateAmbientSoundForImage(result.id);
+        if (soundResult.success) {
+          console.log(`[Pipeline] Ambient sound generated for ${result.id}`);
+        } else {
+          console.error(
+            `[Pipeline] Failed to generate ambient sound: ${soundResult.error}`,
+          );
+        }
+      })(),
     ]);
+
+    // Invalidate cache so new data (color map, ambient sound) is available
+    updateTag(`coloring-image-${result.id}`);
   });
 
   // Invalidate gallery cache so new image appears immediately

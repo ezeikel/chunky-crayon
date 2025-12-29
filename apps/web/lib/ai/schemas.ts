@@ -276,3 +276,49 @@ export const regionFirstColorResponseSchema = z.object({
 export type RegionFirstColorResponse = z.infer<
   typeof regionFirstColorResponseSchema
 >;
+
+// =============================================================================
+// Pre-computed Grid Color Map (for instant Magic Fill without AI call)
+// Server generates this at image creation time, client uses for instant lookup
+// =============================================================================
+
+/**
+ * Color assignment for a single grid cell (5x5 grid = 25 cells)
+ */
+export const gridCellColorSchema = z.object({
+  row: z.number().min(1).max(5).describe('Row in 5x5 grid (1=top, 5=bottom)'),
+  col: z
+    .number()
+    .min(1)
+    .max(5)
+    .describe('Column in 5x5 grid (1=left, 5=right)'),
+  element: z
+    .string()
+    .describe(
+      'What element is primarily in this grid cell (e.g., "sky", "grass", "teddy bear")',
+    ),
+  suggestedColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .describe('Hex color from the palette'),
+  colorName: z.string().describe('Name of the color from the palette'),
+  reasoning: z.string().describe('Brief kid-friendly reason (5-7 words)'),
+});
+
+export type GridCellColor = z.infer<typeof gridCellColorSchema>;
+
+/**
+ * Full grid color map - stored in ColoringImage.colorMapJson
+ */
+export const gridColorMapSchema = z.object({
+  sceneDescription: z
+    .string()
+    .describe('Brief description of the overall scene'),
+  gridColors: z
+    .array(gridCellColorSchema)
+    .min(1)
+    .max(25)
+    .describe('Color assignments for each grid cell (up to 25 cells)'),
+});
+
+export type GridColorMap = z.infer<typeof gridColorMapSchema>;

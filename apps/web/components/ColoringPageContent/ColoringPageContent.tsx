@@ -21,6 +21,13 @@ const ColoringPageContent = ({
   isAuthenticated,
   title,
 }: ColoringPageContentProps) => {
+  console.log('[ColoringPageContent] Received coloringImage:', {
+    id: coloringImage?.id,
+    title: coloringImage?.title,
+    ambientSoundUrl: coloringImage?.ambientSoundUrl,
+    hasAmbientSoundUrl: !!coloringImage?.ambientSoundUrl,
+  });
+
   const coloringAreaRef = useRef<ColoringAreaHandle>(null);
 
   const getCanvas = () => {

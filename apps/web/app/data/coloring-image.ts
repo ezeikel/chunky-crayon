@@ -36,6 +36,7 @@ export const getColoringImageBase = async (
       svgUrl: true,
       qrCodeUrl: true,
       ambientSoundUrl: true,
+      colorMapJson: true,
     },
   });
 };

@@ -53,9 +53,13 @@ class SoundManager {
   private ambientVolume: number = 0.3; // Lower volume for background ambient
 
   constructor() {
+    console.log('[SoundManager] Constructor called');
     // Initialize on first user interaction
     if (typeof window !== 'undefined') {
       this.loadMutePreference();
+      console.log('[SoundManager] After loadMutePreference:', {
+        isMuted: this.isMuted,
+      });
     }
   }
 
@@ -64,6 +68,9 @@ class SoundManager {
    * Must be called after a user interaction (click/touch)
    */
   async init(): Promise<void> {
+    console.log('[SoundManager] init called', {
+      isInitialized: this.isInitialized,
+    });
     if (this.isInitialized) return;
 
     try {
@@ -81,6 +88,7 @@ class SoundManager {
       await this.preloadSounds();
 
       this.isInitialized = true;
+      console.log('[SoundManager] init complete');
     } catch (error) {
       console.warn('SoundManager: Failed to initialize audio context', error);
     }
@@ -201,6 +209,10 @@ class SoundManager {
    * Set mute state
    */
   setMuted(muted: boolean): void {
+    console.log('[SoundManager] setMuted called', {
+      muted,
+      wasMuted: this.isMuted,
+    });
     const wasMuted = this.isMuted;
     this.isMuted = muted;
     this.saveMutePreference();
@@ -266,7 +278,16 @@ class SoundManager {
    * Does not start playing automatically
    */
   async loadAmbient(url: string): Promise<void> {
+    console.log('[SoundManager] loadAmbient called', {
+      url,
+      isInitialized: this.isInitialized,
+      hasAudioContext: !!this.audioContext,
+    });
+
     if (!this.audioContext || !this.isInitialized) {
+      console.warn(
+        '[SoundManager] loadAmbient: not initialized, returning early',
+      );
       return;
     }
 
@@ -285,6 +306,9 @@ class SoundManager {
       const arrayBuffer = await response.arrayBuffer();
       this.ambientBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
       this.ambientUrl = url;
+      console.log(
+        '[SoundManager] loadAmbient: successfully loaded and decoded audio',
+      );
     } catch (error) {
       console.warn('SoundManager: Failed to load ambient sound', error);
     }
@@ -295,7 +319,17 @@ class SoundManager {
    * Fades in smoothly for a pleasant experience
    */
   playAmbient(): void {
+    console.log('[SoundManager] playAmbient called', {
+      isMuted: this.isMuted,
+      hasAudioContext: !!this.audioContext,
+      hasAmbientBuffer: !!this.ambientBuffer,
+      isAmbientPlaying: this.isAmbientPlaying,
+    });
+
     if (this.isMuted || !this.audioContext || !this.ambientBuffer) {
+      console.warn(
+        '[SoundManager] playAmbient: conditions not met, returning early',
+      );
       return;
     }
 

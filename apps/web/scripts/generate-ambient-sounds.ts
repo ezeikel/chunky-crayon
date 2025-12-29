@@ -16,20 +16,11 @@
 import { db } from '@chunky-crayon/db';
 import { put } from '@vercel/blob';
 import { generateAmbientSound } from '../lib/elevenlabs';
+import { createAmbientPrompt } from '../lib/audio/prompts';
 
 // Parse limit from command line args
 const limitArg = process.argv[2];
 const limit = limitArg === '0' ? undefined : parseInt(limitArg || '5', 10);
-
-/**
- * Create an ambient sound prompt based on the coloring image
- */
-function createAmbientPrompt(title: string, tags: string[]): string {
-  const baseQualities =
-    'gentle, calming, peaceful, soft, child-friendly background ambience';
-  const themes = [title.toLowerCase(), ...tags.slice(0, 3)].join(', ');
-  return `${baseQualities}. Ambient soundscape inspired by: ${themes}. Seamless loop, no harsh sounds, no music, just soothing environmental atmosphere.`;
-}
 
 async function generateAmbientSoundsForImages() {
   console.log(`\n🎵 Generating ambient sounds for coloring images...\n`);

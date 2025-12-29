@@ -659,11 +659,19 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
     // Handle first interaction - initialize sounds and notify parent
     const handleFirstInteraction = useCallback(async () => {
+      console.log('[ImageCanvas] handleFirstInteraction called', {
+        hasInteracted: hasInteractedRef.current,
+        hasOnFirstInteraction: !!onFirstInteraction,
+      });
       if (hasInteractedRef.current) return;
       hasInteractedRef.current = true;
 
       // Initialize sounds (required for Web Audio API due to browser autoplay policy)
+      console.log('[ImageCanvas] Initializing sounds...');
       await initSounds();
+      console.log(
+        '[ImageCanvas] Sounds initialized, calling onFirstInteraction',
+      );
 
       // Notify parent so it can start ambient sound
       onFirstInteraction?.();

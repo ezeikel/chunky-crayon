@@ -103,6 +103,13 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
     getTranslations('coloringPage'),
   ]);
 
+  console.log('[ColoringImagePage] coloringImage data:', {
+    id: coloringImage?.id,
+    title: coloringImage?.title,
+    ambientSoundUrl: coloringImage?.ambientSoundUrl,
+    hasAmbientSoundUrl: !!coloringImage?.ambientSoundUrl,
+  });
+
   if (!coloringImage) {
     notFound();
   }

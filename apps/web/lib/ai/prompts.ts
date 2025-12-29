@@ -724,3 +724,58 @@ TIPS:
 
 Create a beautiful, harmonious coloring scheme!`;
 };
+
+// =============================================================================
+// Pre-computed Grid Color Map (for instant Magic Fill)
+// =============================================================================
+// This prompt is used at image generation time to pre-compute colors for a 5x5 grid.
+// The client then looks up colors by grid position instead of calling AI at runtime.
+
+export const GRID_COLOR_MAP_SYSTEM = `You are an expert at coloring children's coloring pages. You analyze images and assign appropriate colors to a 5x5 grid overlay.
+
+Your task: Analyze the coloring page image and assign a color to each cell of a 5x5 grid.
+
+GRID SYSTEM:
+- The image is divided into a 5x5 grid (25 cells total)
+- Row 1 = top of image, Row 5 = bottom
+- Col 1 = left side, Col 5 = right side
+
+FOR EACH GRID CELL:
+1. Identify what element is primarily in that cell (sky, grass, character, etc.)
+2. Assign an appropriate color from the provided palette
+3. Provide a brief, kid-friendly reason
+
+COLORING STRATEGY:
+- Top cells (row 1-2): Usually sky, clouds, treetops, ceilings
+- Middle cells (row 2-4): Usually the main subject/character
+- Bottom cells (row 4-5): Usually ground, grass, floors
+- Be consistent: same element type = same color across cells
+- Create visual harmony with contrasting adjacent colors
+- Pick vibrant, fun colors that children will love
+
+IMPORTANT:
+- Only use colors from the provided palette
+- Include cells even if they're mostly empty/background
+- For empty areas, suggest a light neutral color
+- Be warm and encouraging in your reasoning!`;
+
+export const createGridColorMapPrompt = (
+  palette: Array<{ hex: string; name: string }>,
+) => {
+  return `Analyze this coloring page and assign colors to each cell of a 5x5 grid.
+
+AVAILABLE PALETTE (you MUST only use these colors):
+${palette.map((c) => `- ${c.name}: ${c.hex}`).join('\n')}
+
+FOR EACH OF THE 25 GRID CELLS, provide:
+- row: 1-5 (1=top, 5=bottom)
+- col: 1-5 (1=left, 5=right)
+- element: What's primarily in this cell
+- suggestedColor: Hex color from the palette
+- colorName: Name of the color
+- reasoning: Fun, kid-friendly reason (5-7 words)
+
+Start with a brief scene description, then list all grid cells with their colors.
+
+Create a beautiful, cohesive color scheme for the whole image!`;
+};

@@ -28,17 +28,22 @@ export const useSound = () => {
 
   // Sync mute state with sound manager
   useEffect(() => {
+    console.log('[useSound] Syncing mute state:', { isMuted });
     const soundManager = getSoundManager();
     soundManager.setMuted(isMuted);
   }, [isMuted]);
 
   // Initialize sound manager on first call
   const initSounds = useCallback(async () => {
+    console.log('[useSound] initSounds called', {
+      isInitialized: isInitializedRef.current,
+    });
     if (isInitializedRef.current) return;
 
     const soundManager = getSoundManager();
     await soundManager.init();
     isInitializedRef.current = true;
+    console.log('[useSound] initSounds complete');
   }, []);
 
   // Play a sound
@@ -66,12 +71,15 @@ export const useSound = () => {
 
   // Load ambient sound from URL
   const loadAmbient = useCallback(async (url: string) => {
+    console.log('[useSound] loadAmbient called', { url });
     const soundManager = getSoundManager();
     await soundManager.loadAmbient(url);
+    console.log('[useSound] loadAmbient complete');
   }, []);
 
   // Play ambient sound (loops)
   const playAmbient = useCallback(() => {
+    console.log('[useSound] playAmbient called');
     const soundManager = getSoundManager();
     soundManager.playAmbient();
   }, []);

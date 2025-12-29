@@ -41,7 +41,12 @@ const HeaderColoIndicator = ({
           )}
           aria-label={`Colo: ${t(`stages.${coloState.stage}.name`)}`}
         >
-          <ColoAvatar coloState={coloState} size="sm" showProgress />
+          <ColoAvatar
+            coloState={coloState}
+            size="sm"
+            showProgress
+            enableTapReactions={false}
+          />
           {/* Evolution sparkle indicator when close to next stage */}
           {coloState.progressToNext &&
             coloState.progressToNext.percentage >= 80 && (
@@ -73,7 +78,9 @@ const HeaderColoIndicator = ({
           <div className="mt-4 pt-4 border-t border-gray-100">
             <div className="flex justify-between items-center mb-2">
               <span className="font-tondo text-sm text-text-muted">
-                {t('indicator.next', { stageName: t(`stages.${coloState.nextStage.stage}.name`) })}
+                {t('indicator.next', {
+                  stageName: t(`stages.${coloState.nextStage.stage}.name`),
+                })}
               </span>
               <span className="font-tondo text-sm font-bold text-crayon-orange">
                 {coloState.progressToNext.current}/
@@ -89,7 +96,9 @@ const HeaderColoIndicator = ({
             </div>
             <p className="font-tondo text-xs text-text-muted mt-2 text-center">
               {t('indicator.saveToEvolve', {
-                count: coloState.progressToNext.required - coloState.progressToNext.current,
+                count:
+                  coloState.progressToNext.required -
+                  coloState.progressToNext.current,
               })}
             </p>
           </div>
@@ -109,7 +118,9 @@ const HeaderColoIndicator = ({
         {coloState.accessories.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-100">
             <p className="font-tondo text-xs text-text-muted mb-2">
-              {t('indicator.accessories', { count: coloState.accessories.length })}
+              {t('indicator.accessories', {
+                count: coloState.accessories.length,
+              })}
             </p>
             <div className="flex flex-wrap gap-1">
               {coloState.accessories.slice(0, 6).map((accessoryId) => (

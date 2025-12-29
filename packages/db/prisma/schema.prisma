@@ -80,6 +80,10 @@ model ColoringImage {
   profileId       String? // Which profile created this image
   savedArtworks   SavedArtwork[] // Colored versions saved by users
 
+  // Pre-computed grid-based color map for Magic Brush & Auto Colour (instant reveal)
+  colorMapJson        String?   @db.Text // JSON with 5x5 grid color assignments
+  colorMapGeneratedAt DateTime? // When the color map was generated
+
   @@map("coloring_images")
 }
 
