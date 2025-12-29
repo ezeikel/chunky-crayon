@@ -13,7 +13,8 @@ export const getUserId = async (action?: string) => {
   if (
     action === ACTIONS.GET_CURRENT_USER ||
     action === ACTIONS.GET_ALL_COLORING_IMAGES ||
-    action === ACTIONS.CREATE_CHECKOUT_SESSION
+    action === ACTIONS.CREATE_CHECKOUT_SESSION ||
+    action === ACTIONS.GET_ACTIVE_PROFILE
   ) {
     return userId;
   }
