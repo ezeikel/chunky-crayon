@@ -306,6 +306,13 @@ export type EventProperties = {
       | 'threads';
   };
 
+  // ===== INTERNATIONALIZATION =====
+  [TRACKING_EVENTS.LANGUAGE_CHANGED]: {
+    fromLocale: string;
+    toLocale: string;
+    pathname: string;
+  };
+
   // ===== ERRORS =====
   [TRACKING_EVENTS.ERROR_OCCURRED]: {
     errorType: string;

@@ -44,7 +44,9 @@ const cleanVercelProperties = (
  * });
  * ```
  */
-export const track = async <TEvent extends TrackingEvent>(
+export const track = async <
+  TEvent extends TrackingEvent & keyof EventProperties,
+>(
   event: TEvent,
   properties: EventProperties[TEvent],
 ) => {
@@ -115,7 +117,9 @@ export const track = async <TEvent extends TrackingEvent>(
  * });
  * ```
  */
-export const trackWithUser = async <TEvent extends TrackingEvent>(
+export const trackWithUser = async <
+  TEvent extends TrackingEvent & keyof EventProperties,
+>(
   userId: string,
   event: TEvent,
   properties: EventProperties[TEvent],

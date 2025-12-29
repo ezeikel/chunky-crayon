@@ -57,7 +57,7 @@ export const useAnalytics = () => {
   const { data: session } = useSession();
 
   const track = useCallback(
-    <TEvent extends TrackingEvent>(
+    <TEvent extends TrackingEvent & keyof EventProperties>(
       event: TEvent,
       properties: EventProperties[TEvent],
     ) => {
@@ -114,7 +114,9 @@ export const useAnalytics = () => {
  * });
  * ```
  */
-export const trackEvent = <TEvent extends TrackingEvent>(
+export const trackEvent = <
+  TEvent extends TrackingEvent & keyof EventProperties,
+>(
   event: TEvent,
   properties: EventProperties[TEvent],
 ) => {
