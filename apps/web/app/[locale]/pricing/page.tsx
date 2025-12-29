@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { PlanName } from '@chunky-crayon/db/types';
-import { PlanInterval, SUBSCRIPTION_PLANS } from '@/constants';
+import { PlanName, BillingPeriod } from '@chunky-crayon/db/types';
+import { PlanInterval, SUBSCRIPTION_PLANS, TRACKING_EVENTS } from '@/constants';
+import { trackEvent } from '@/utils/analytics-client';
 import {
   Card,
   CardHeader,
@@ -47,8 +47,11 @@ const PricingPage = () => {
     annual: t('annual'),
   };
 
-  // Track pricing page view for Facebook/Pinterest pixels
+  // Track pricing page view for PostHog and Facebook/Pinterest pixels
   useEffect(() => {
+    trackEvent(TRACKING_EVENTS.PRICING_PAGE_VIEWED, {
+      referrer: typeof document !== 'undefined' ? document.referrer : undefined,
+    });
     trackViewContent({
       contentType: 'pricing',
       contentName: 'Subscription Plans',
@@ -60,14 +63,12 @@ const PricingPage = () => {
     const planName = t(`plans.${planTranslationKey}.name`);
     setLoadingPlan(planName);
 
-    // PostHog event tracking
-    posthog.capture('pricing_plan_selected', {
-      plan_name: planName,
-      plan_key: plan.key,
-      plan_price: plan.price,
-      plan_credits: plan.credits,
-      billing_interval: interval,
-      is_most_popular: plan.mostPopular || false,
+    // Type-safe PostHog event tracking
+    trackEvent(TRACKING_EVENTS.PRICING_PLAN_CLICKED, {
+      planName: plan.key,
+      planInterval:
+        interval === 'monthly' ? BillingPeriod.MONTHLY : BillingPeriod.ANNUAL,
+      price: plan.price,
     });
 
     // Track checkout initiation for Facebook/Pinterest pixels
@@ -137,7 +138,15 @@ const PricingPage = () => {
                     ? 'bg-orange text-white shadow'
                     : 'bg-orange/10 text-orange hover:bg-orange/20',
                 )}
-                onClick={() => setInterval(key)}
+                onClick={() => {
+                  if (interval !== key) {
+                    trackEvent(TRACKING_EVENTS.PRICING_INTERVAL_TOGGLED, {
+                      fromInterval: interval,
+                      toInterval: key,
+                    });
+                    setInterval(key);
+                  }
+                }}
                 aria-pressed={interval === key}
               >
                 {intervalLabels[key]}

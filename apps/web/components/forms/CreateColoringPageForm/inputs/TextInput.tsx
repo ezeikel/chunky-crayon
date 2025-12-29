@@ -1,6 +1,8 @@
 'use client';
 
 import useUser from '@/hooks/useUser';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 import SubmitButton from '@/components/buttons/SubmitButton/SubmitButton';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -93,7 +95,13 @@ const TextInput = ({ className }: TextInputProps) => {
     if (blockedReason === 'guest_limit_reached') {
       return {
         text: t('buttonSignUp'),
-        action: () => handleAuthAction('signin'),
+        action: () => {
+          trackEvent(TRACKING_EVENTS.GUEST_SIGNUP_CLICKED, {
+            location: 'text_input',
+            generationsUsed: maxGuestGenerations - guestGenerationsRemaining,
+          });
+          handleAuthAction('signin');
+        },
         subtext: t('subtextGuestLimit'),
         isSubmit: false,
       };

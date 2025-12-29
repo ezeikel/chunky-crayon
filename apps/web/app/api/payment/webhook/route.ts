@@ -16,8 +16,9 @@ import {
   getCreditAmountFromPriceId,
   getCreditAmountFromPlanName,
 } from '@/utils/stripe';
-import { FREE_CREDITS, PLAN_ROLLOVER_CAPS } from '@/constants';
+import { FREE_CREDITS, PLAN_ROLLOVER_CAPS, TRACKING_EVENTS } from '@/constants';
 import { sendPaymentFailedEmail } from '@/app/actions/email';
+import { trackWithUser } from '@/utils/analytics-server';
 
 // Check if webhook event has already been processed (idempotency)
 const isEventProcessed = async (eventId: string): Promise<boolean> => {
@@ -198,6 +199,14 @@ export const POST = async (req: Request) => {
           data: { credits: { increment: creditAmount } },
         }),
       ]);
+
+      // Track subscription started event
+      const priceAmount = subscription.items.data[0].price.unit_amount || 0;
+      await trackWithUser(user.id, TRACKING_EVENTS.SUBSCRIPTION_STARTED, {
+        planName,
+        planInterval: billingPeriod,
+        value: priceAmount,
+      });
     } else {
       // handle one-time credit purchase
       // verify user has an active subscription
@@ -266,6 +275,13 @@ export const POST = async (req: Request) => {
                 data: { credits: { increment: creditAmount } },
               }),
             ]);
+
+            // Track credits purchased event
+            const priceAmount = item.price?.unit_amount || 0;
+            await trackWithUser(user.id, TRACKING_EVENTS.CREDITS_PURCHASED, {
+              creditAmount,
+              value: priceAmount,
+            });
           }
         }),
       );
@@ -280,6 +296,14 @@ export const POST = async (req: Request) => {
       subscription.items.data[0].price.id,
     );
 
+    // Get previous plan to check if this is a plan change
+    const existingSubscription = await db.subscription.findUnique({
+      where: { stripeSubscriptionId: subscription.id },
+      include: { user: true },
+    });
+
+    const previousPlanName = existingSubscription?.planName;
+
     await db.subscription.updateMany({
       where: { stripeSubscriptionId: subscription.id },
       data: {
@@ -289,8 +313,36 @@ export const POST = async (req: Request) => {
         billingPeriod,
       },
     });
+
+    // Track plan change if the plan actually changed
+    if (
+      existingSubscription &&
+      previousPlanName &&
+      previousPlanName !== planName
+    ) {
+      // Determine if upgrade or downgrade based on credit amounts
+      const previousCredits = getCreditAmountFromPlanName(previousPlanName);
+      const newCredits = getCreditAmountFromPlanName(planName);
+      const changeType = newCredits > previousCredits ? 'upgrade' : 'downgrade';
+
+      await trackWithUser(
+        existingSubscription.userId,
+        TRACKING_EVENTS.SUBSCRIPTION_CHANGED,
+        {
+          fromPlan: previousPlanName,
+          toPlan: planName,
+          changeType,
+        },
+      );
+    }
   } else if (stripeEvent.type === 'customer.subscription.deleted') {
     const subscription = stripeEvent.data.object;
+
+    // Get subscription details before marking as cancelled
+    const existingSubscription = await db.subscription.findUnique({
+      where: { stripeSubscriptionId: subscription.id },
+      include: { user: true },
+    });
 
     await db.subscription.updateMany({
       where: { stripeSubscriptionId: subscription.id },
@@ -298,6 +350,30 @@ export const POST = async (req: Request) => {
         status: SubscriptionStatus.CANCELLED,
       },
     });
+
+    // Track subscription cancelled event
+    if (existingSubscription) {
+      // Calculate subscription age in months
+      const subscriptionAgeMs =
+        Date.now() - existingSubscription.createdAt.getTime();
+      const subscriptionAgeMonths = Math.floor(
+        subscriptionAgeMs / (1000 * 60 * 60 * 24 * 30),
+      );
+
+      // Get cancellation reason from Stripe if available
+      const cancellationReason =
+        subscription.cancellation_details?.reason || undefined;
+
+      await trackWithUser(
+        existingSubscription.userId,
+        TRACKING_EVENTS.SUBSCRIPTION_CANCELLED,
+        {
+          planName: existingSubscription.planName,
+          reason: cancellationReason,
+          subscriptionAgeMonths,
+        },
+      );
+    }
   } else if (stripeEvent.type === 'invoice.payment_succeeded') {
     // Handle subscription renewals - add credits for the new billing period
     // Use type assertion to access invoice properties
@@ -364,6 +440,25 @@ export const POST = async (req: Request) => {
               data: { credits: newBalance },
             }),
           ]);
+
+          // Count renewals to track renewal count
+          const renewalCount = await db.creditTransaction.count({
+            where: {
+              userId: subscription.userId,
+              reference: { startsWith: 'renewal:' },
+            },
+          });
+
+          // Track subscription renewed event
+          await trackWithUser(
+            subscription.userId,
+            TRACKING_EVENTS.SUBSCRIPTION_RENEWED,
+            {
+              planName: subscription.planName,
+              planInterval: subscription.billingPeriod,
+              renewalCount,
+            },
+          );
 
           console.log(
             `Added ${creditAmount} renewal credits for user ${subscription.userId} ` +

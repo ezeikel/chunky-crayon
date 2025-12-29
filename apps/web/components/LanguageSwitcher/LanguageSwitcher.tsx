@@ -11,7 +11,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import posthog from 'posthog-js';
 import cn from '@/utils/cn';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 
 // Language display names in their native form
 const LANGUAGE_NAMES: Record<Locale, string> = {
@@ -51,6 +54,16 @@ const LanguageSwitcher = ({
   const params = useParams();
 
   const handleLocaleChange = (newLocale: Locale) => {
+    // Track language change event
+    trackEvent(TRACKING_EVENTS.LANGUAGE_CHANGED, {
+      fromLocale: locale,
+      toLocale: newLocale,
+      pathname,
+    });
+
+    // Update user property so PostHog always knows current language preference
+    posthog.people.set({ locale: newLocale });
+
     // Pass both pathname and params for dynamic routes like /coloring-image/[id]
     // @ts-expect-error - next-intl router expects specific pathname types but we're using dynamic routes
     router.replace({ pathname, params }, { locale: newLocale });

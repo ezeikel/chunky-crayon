@@ -213,7 +213,13 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     if (blockedReason === 'guest_limit_reached') {
       return {
         text: t('buttonSignUp'),
-        action: () => handleAuthAction('signin'),
+        action: () => {
+          trackEvent(TRACKING_EVENTS.GUEST_SIGNUP_CLICKED, {
+            location: 'voice_input',
+            generationsUsed: maxGuestGenerations - guestGenerationsRemaining,
+          });
+          handleAuthAction('signin');
+        },
         subtext: t('subtextGuestLimit'),
         isSubmit: false,
       };

@@ -917,6 +917,9 @@ export const TRACKING_EVENTS = {
   LOADING_AUDIO_GENERATED: 'loading_audio_generated', // Colo voice audio generated
   LOADING_AUDIO_PLAYED: 'loading_audio_played', // Audio playback started
   LOADING_AUDIO_FAILED: 'loading_audio_failed', // Audio generation failed
+
+  // ===== LOCALIZATION =====
+  LANGUAGE_CHANGED: 'language_changed', // User switches language/locale
 } as const;
 
 // ===== SOCIAL PROOF / TESTIMONIALS =====
