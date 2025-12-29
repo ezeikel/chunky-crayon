@@ -18,6 +18,9 @@
     "**/*.+(js|jsx|json|ts|tsx|html|md)": [
       "prettier --ignore-path .gitignore --write",
       "jest --findRelatedTests --passWithNoTests"
+    ],
+    "**/prisma/schema.prisma": [
+      "pnpm exec prisma format --schema"
     ]
   },
   "devDependencies": {
