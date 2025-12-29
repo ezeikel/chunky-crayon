@@ -296,7 +296,7 @@
       "teens": {
         "title": "Pour les ados",
         "ages": "13-17 ans",
-        "description": "Dessins cool, très détaillés"
+        "description": "Dessins stylés, très détaillés"
       },
       "adults": {
         "title": "Pour les adultes",
@@ -446,17 +446,17 @@
         "pageTitle": "Coloriages pour ados",
         "featuredSection": "Coloriages populaires pour ados",
         "categoriesSection": "Catégories ados",
-        "heroDescription": "Des coloriages cool et détaillés, conçus pour les ados ! De l'anime et du gaming à la fantasy et la science-fiction, exprimez votre créativité avec des dessins qui correspondent à votre style. Parfait pour se détendre et créer.",
+        "heroDescription": "Des coloriages stylés et détaillés, conçus pour les ados !",
         "whyTitle": "Pensé pour les ados créatifs",
-        "why1Title": "Thèmes cool",
+        "why1Title": "Thèmes stylés",
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins faits pour vos passions !",
         "why2Title": "Art détaillé",
         "why2Description": "Des dessins minutieux qui challengent vos talents et sont super beaux une fois finis.",
-        "why3Title": "Anti-stress",
+        "why3Title": "Détente",
         "why3Description": "Faites une pause et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
-        "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop bébé » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d’anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
-        "seoParagraph2": "Ici, pas des coloriages pour petits. Nos dessins pour ados ont des détails minutieux, des compositions dynamiques et des thèmes qui parlent aux ados. Parfait pour s’exprimer, décompresser pendant les révisions, ou juste se poser.",
+        "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop enfantin » ?",
+        "seoParagraph2": "Ce ne sont pas des coloriages pour les petits.",
         "seoParagraph3": "Créez vos propres coloriages personnalisés en décrivant exactement ce que vous voulez. Un dragon qui se bat contre un robot dans l’espace ? Un portrait style anime ? Un mandala détaillé avec vos symboles préférés ? Décrivez-le, et notre IA lui donne vie !",
         "popularTitle": "Thèmes ado populaires",
         "popularDescription": "Nos catégories les plus populaires chez les ados : coloriages anime et manga, créatures fantastiques, scènes d’action de super-héros, art inspiré des jeux vidéo, designs espace et sci-fi, et pages de motifs très détaillés. Chaque catégorie propose des dessins captivants."
@@ -467,7 +467,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Anti-stress",
+        "why1Title": "Gestion du stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
@@ -616,7 +616,7 @@
     "brushSizes": {
       "small": "Fin",
       "medium": "Normal",
-      "large": "Gros"
+      "large": "Épais"
     },
     "fillPatterns": {
       "solid": "Uni",
