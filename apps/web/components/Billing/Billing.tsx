@@ -164,7 +164,8 @@ const Billing = ({ user }: BillingProps) => {
 
   const getPlanButtonText = (planName: PlanName) => {
     if (loadingPlan === planName) return t('loading');
-    if (currentSubscription?.planName === planName) return t('currentPlanBadge');
+    if (currentSubscription?.planName === planName)
+      return t('currentPlanBadge');
     return t('changePlan');
   };
 
@@ -181,7 +182,9 @@ const Billing = ({ user }: BillingProps) => {
 
       {/* Current Subscription */}
       <section className="mb-16">
-        <h2 className="font-tondo text-2xl font-bold mb-6">{t('currentPlan')}</h2>
+        <h2 className="font-tondo text-2xl font-bold mb-6">
+          {t('currentPlan')}
+        </h2>
         {currentSubscription ? (
           <Card>
             <CardHeader>
@@ -268,8 +271,10 @@ const Billing = ({ user }: BillingProps) => {
 
       {/* Available Plans */}
       <section>
-        <h2 className="font-tondo text-2xl font-bold mb-6">{t('availablePlans')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <h2 className="font-tondo text-2xl font-bold mb-6">
+          {t('availablePlans')}
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {SUBSCRIPTION_PLANS.monthly.map((plan) => {
             const planTranslationKey = planKeyMap[plan.key];
             const planName = tPricing(`plans.${planTranslationKey}.name`);

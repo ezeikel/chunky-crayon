@@ -123,7 +123,7 @@ const PricingPage = () => {
           ))}
         </div>
       </header>
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
         {plans.map((plan) => {
           const planTranslationKey = planKeyMap[plan.key];
           const planName = t(`plans.${planTranslationKey}.name`);
@@ -161,7 +161,8 @@ const PricingPage = () => {
                   </span>
                 </CardDescription>
                 <div className="text-sm text-muted-foreground mt-1">
-                  {formatNumber(parseInt(plan.credits, 10))} {t('creditsPerMonth')}
+                  {formatNumber(parseInt(plan.credits, 10))}{' '}
+                  {t('creditsPerMonth')}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
                   {planAudience}
