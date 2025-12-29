@@ -7,16 +7,59 @@ import {
   useCallback,
   forwardRef,
   useImperativeHandle,
+  useMemo,
 } from 'react';
 import { ColoringImage } from '@chunky-crayon/db/types';
 import { useColoringContext } from '@/contexts/coloring';
 import { useSound } from '@/hooks/useSound';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
-import { TRACKING_EVENTS, BRUSH_SIZES } from '@/constants';
+import { TRACKING_EVENTS, BRUSH_SIZES, BrushType } from '@/constants';
 import { scanlineFill, hexToRGBA } from '@/utils/floodFill';
 import { drawTexturedStroke } from '@/utils/brushTextures';
 import { createFillPattern } from '@/utils/fillPatterns';
+import { createIconCursor } from '@/utils/iconCursor';
+import {
+  faPencil,
+  faPaintbrush,
+  faEraser,
+  faSparkles,
+  faWandSparkles,
+  faRainbow,
+  faSun,
+  faBoltLightning,
+  faFillDrip,
+  faBrush,
+  faStar,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+
+// Map brush types to their FontAwesome icons
+const BRUSH_ICONS: Record<BrushType, IconDefinition> = {
+  crayon: faPencil,
+  marker: faPaintbrush,
+  eraser: faEraser,
+  glitter: faSparkles,
+  sparkle: faWandSparkles,
+  rainbow: faRainbow,
+  glow: faSun,
+  neon: faBoltLightning,
+};
+
+// Map tool types to their FontAwesome icons
+const TOOL_ICONS: Record<string, IconDefinition> = {
+  fill: faFillDrip,
+  sticker: faStar,
+  'magic-reveal': faBrush,
+  'magic-auto': faFillDrip,
+};
+
+// Cursor sizes based on brush size
+const CURSOR_SIZES: Record<string, number> = {
+  small: 20,
+  medium: 28,
+  large: 36,
+};
 
 type ImageCanvasProps = {
   coloringImage: Partial<ColoringImage>;
@@ -109,6 +152,50 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     // Pan tool state
     const isPanningRef = useRef(false);
     const lastPanPosRef = useRef<{ x: number; y: number } | null>(null);
+
+    // Generate cursor based on active tool and brush type
+    const toolCursor = useMemo(() => {
+      // Get cursor size based on brush size setting
+      const cursorSize = CURSOR_SIZES[brushSize] || 28;
+
+      // Handle brush tool - use brush type icons
+      if (activeTool === 'brush') {
+        const icon = BRUSH_ICONS[brushType];
+        if (!icon) return 'default';
+
+        // Use the selected color for the cursor, gray for eraser
+        const cursorColor = brushType === 'eraser' ? '#888888' : selectedColor;
+        return createIconCursor(icon, cursorSize, cursorColor);
+      }
+
+      // Handle other tools with icons
+      if (activeTool === 'fill') {
+        return createIconCursor(TOOL_ICONS.fill, cursorSize, selectedColor);
+      }
+
+      if (activeTool === 'sticker') {
+        return createIconCursor(TOOL_ICONS.sticker, cursorSize, selectedColor);
+      }
+
+      if (activeTool === 'magic-reveal') {
+        return createIconCursor(
+          TOOL_ICONS['magic-reveal'],
+          cursorSize,
+          selectedColor,
+        );
+      }
+
+      if (activeTool === 'magic-auto') {
+        return createIconCursor(
+          TOOL_ICONS['magic-auto'],
+          cursorSize,
+          selectedColor,
+        );
+      }
+
+      // Pan tool uses grab cursor (handled separately)
+      return undefined;
+    }, [activeTool, brushType, brushSize, selectedColor]);
 
     // Capture canvas state for history
     const captureCanvasState = useCallback((): ImageData | null => {
@@ -1297,14 +1384,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               touchAction: 'none',
               WebkitUserSelect: 'none',
               userSelect: 'none',
-              cursor:
-                activeTool === 'pan'
-                  ? 'grab'
-                  : activeTool === 'fill'
-                    ? 'crosshair'
-                    : activeTool === 'sticker'
-                      ? 'pointer'
-                      : 'default',
+              cursor: activeTool === 'pan' ? 'grab' : toolCursor || 'default',
             }}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
