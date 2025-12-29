@@ -179,40 +179,40 @@
       "fromReviews": "리뷰 {count}개에서",
       "items": {
         "1": {
-          "name": "Sarah M.",
+          "name": "김지연",
           "role": "두 아이 엄마",
           "quote": "아이들이 정말 좋아해요! 몇 시간이고 자기만의 마법 세계를 만들고 색칠해요. 이제 화면 시간으로 실랑이할 일이 없네요!",
-          "avatar": "/images/testimonials/en/avatar-1.jpg"
+          "avatar": "/images/testimonials/avatar-1.svg"
         },
         "2": {
-          "name": "James T.",
+          "name": "박준호",
           "role": "세 아이 아빠",
           "quote": "드디어 창의력과 기술을 건강하게 잘 섞은 앱을 찾았어요. 딸아이가 유니콘 공주 성을 만들었는데 완벽했어요!",
-          "avatar": "/images/testimonials/en/avatar-2.jpg"
+          "avatar": "/images/testimonials/avatar-2.svg"
         },
         "3": {
-          "name": "Emily R.",
+          "name": "이수진",
           "role": "초등 교사",
           "quote": "교실에서 글쓰기 아이디어로 활용해요. 아이들이 원하는 걸 말하면, 그걸 색칠하죠. 몰입도가 정말 좋아요!",
-          "avatar": "/images/testimonials/en/avatar-3.jpg"
+          "avatar": "/images/testimonials/avatar-3.svg"
         },
         "4": {
-          "name": "David K.",
+          "name": "최영수",
           "role": "할아버지",
           "quote": "손주들이 이제 주말마다 와서 같이 새 색칠 도안을 만들어요. 정말 소중한 교감 시간이랍니다!",
-          "avatar": "/images/testimonials/en/avatar-4.jpg"
+          "avatar": "/images/testimonials/avatar-4.svg"
         },
         "5": {
-          "name": "Rachel B.",
+          "name": "정미영",
           "role": "아이 돌봄 선생님",
           "quote": "제가 돌보는 아이들이 푹 빠졌어요. 용, 요정, 로켓… 상상하는 건 뭐든 살아나요!",
-          "avatar": "/images/testimonials/en/avatar-5.jpg"
+          "avatar": "/images/testimonials/avatar-5.svg"
         },
         "6": {
-          "name": "Michael P.",
+          "name": "한동욱",
           "role": "아빠 & 디자이너",
           "quote": "디자이너로서 퀄리티가 마음에 들어요. 아빠로서는, 아이디어가 색칠 도안이 될 때 아들 얼굴이 반짝이는 걸 보는 게 최고예요!",
-          "avatar": "/images/testimonials/en/avatar-6.jpg"
+          "avatar": "/images/testimonials/avatar-6.svg"
         }
       }
     },

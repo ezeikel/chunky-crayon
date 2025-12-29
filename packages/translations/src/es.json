@@ -179,40 +179,40 @@
       "fromReviews": "de {count} reseñas",
       "items": {
         "1": {
-          "name": "Sarah M.",
+          "name": "María G.",
           "role": "Mamá de 2",
           "quote": "¡A mis peques les encanta! Pasan horas creando y coloreando sus propios mundos mágicos. ¡Se acabaron las peleas por el tiempo de pantalla!",
-          "avatar": "/images/testimonials/en/avatar-1.jpg"
+          "avatar": "/images/testimonials/avatar-1.svg"
         },
         "2": {
-          "name": "James T.",
+          "name": "Carlos R.",
           "role": "Papá de 3",
           "quote": "Por fin algo que combina creatividad y tecnología de forma saludable. Mi hija hizo un castillo de princesa unicornio y ¡quedó perfecto!",
-          "avatar": "/images/testimonials/en/avatar-2.jpg"
+          "avatar": "/images/testimonials/avatar-2.svg"
         },
         "3": {
-          "name": "Emily R.",
+          "name": "Laura M.",
           "role": "Maestra de primaria",
           "quote": "Lo uso en clase como inspiración para escribir. Los niños describen lo que quieren, y luego colorean sus creaciones. ¡Están súper motivados!",
-          "avatar": "/images/testimonials/en/avatar-3.jpg"
+          "avatar": "/images/testimonials/avatar-3.svg"
         },
         "4": {
-          "name": "David K.",
+          "name": "Antonio L.",
           "role": "Abuelo",
           "quote": "Mis nietos vienen todos los fines de semana solo para crear nuevas páginas para colorear juntos. ¡Qué momento tan bonito para compartir!",
-          "avatar": "/images/testimonials/en/avatar-4.jpg"
+          "avatar": "/images/testimonials/avatar-4.svg"
         },
         "5": {
-          "name": "Rachel B.",
+          "name": "Carmen S.",
           "role": "Cuidadora infantil",
           "quote": "Los peques que cuido no se cansan. Dragones, hadas, cohetes... ¡todo lo que imaginan cobra vida!",
-          "avatar": "/images/testimonials/en/avatar-5.jpg"
+          "avatar": "/images/testimonials/avatar-5.svg"
         },
         "6": {
-          "name": "Michael P.",
+          "name": "Pablo F.",
           "role": "Papá y diseñador",
           "quote": "Como diseñador, valoro la calidad. Como papá, me encanta ver la carita de mi hijo iluminarse cuando sus ideas se convierten en páginas para colorear.",
-          "avatar": "/images/testimonials/en/avatar-6.jpg"
+          "avatar": "/images/testimonials/avatar-6.svg"
         }
       }
     },

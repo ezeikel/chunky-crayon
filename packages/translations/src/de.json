@@ -179,40 +179,40 @@
       "fromReviews": "aus {count} Bewertungen",
       "items": {
         "1": {
-          "name": "Sarah M.",
+          "name": "Anna M.",
           "role": "Mama von 2",
           "quote": "Meine Kinder lieben das total! Sie verbringen Stunden damit, ihre eigenen magischen Welten zu erfinden und auszumalen. Keine Bildschirmzeit-Diskussionen mehr!",
-          "avatar": "/images/testimonials/en/avatar-1.jpg"
+          "avatar": "/images/testimonials/avatar-1.svg"
         },
         "2": {
-          "name": "James T.",
+          "name": "Markus S.",
           "role": "Papa von 3",
           "quote": "Endlich etwas, das Kreativität und Technik auf eine gesunde Weise verbindet. Meine Tochter hat ein Einhorn-Prinzessinnen-Schloss gemacht – einfach perfekt!",
-          "avatar": "/images/testimonials/en/avatar-2.jpg"
+          "avatar": "/images/testimonials/avatar-2.svg"
         },
         "3": {
-          "name": "Emily R.",
+          "name": "Julia K.",
           "role": "Grundschullehrerin",
           "quote": "Ich nutze das im Unterricht für kreative Schreibimpulse. Die Kinder beschreiben, was sie wollen, und malen dann ihre Werke aus. Sie sind total begeistert!",
-          "avatar": "/images/testimonials/en/avatar-3.jpg"
+          "avatar": "/images/testimonials/avatar-3.svg"
         },
         "4": {
-          "name": "David K.",
+          "name": "Hans W.",
           "role": "Opa",
           "quote": "Meine Enkel kommen jetzt jedes Wochenende vorbei, nur um zusammen neue Ausmalbilder zu machen. So eine schöne gemeinsame Zeit!",
-          "avatar": "/images/testimonials/en/avatar-4.jpg"
+          "avatar": "/images/testimonials/avatar-4.svg"
         },
         "5": {
-          "name": "Rachel B.",
+          "name": "Sabine B.",
           "role": "Tagesmutter",
           "quote": "Die Kinder, die ich betreue, bekommen gar nicht genug davon. Drachen, Feen, Raketen – was sie sich ausdenken, wird lebendig!",
-          "avatar": "/images/testimonials/en/avatar-5.jpg"
+          "avatar": "/images/testimonials/avatar-5.svg"
         },
         "6": {
-          "name": "Michael P.",
+          "name": "Stefan H.",
           "role": "Papa & Designer",
           "quote": "Als Designer schätze ich die Qualität. Als Papa liebe ich es, wenn das Gesicht meines Sohnes strahlt, sobald seine Ideen zu Ausmalbildern werden!",
-          "avatar": "/images/testimonials/en/avatar-6.jpg"
+          "avatar": "/images/testimonials/avatar-6.svg"
         }
       }
     },

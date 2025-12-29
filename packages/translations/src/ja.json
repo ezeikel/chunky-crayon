@@ -179,40 +179,40 @@
       "fromReviews": "{count}件のレビューより",
       "items": {
         "1": {
-          "name": "Sarah M.",
+          "name": "田中 美咲",
           "role": "2児のママ",
           "quote": "子どもたちが本当に大好き！自分だけの魔法の世界を作って、何時間でもぬっています。もうスクリーン時間でケンカしなくなりました！",
-          "avatar": "/images/testimonials/en/avatar-1.jpg"
+          "avatar": "/images/testimonials/avatar-1.svg"
         },
         "2": {
-          "name": "James T.",
+          "name": "鈴木 健太",
           "role": "3児のパパ",
           "quote": "やっと、創造力とテクノロジーを健やかに組み合わせたものに出会えました。娘が「ユニコーンのプリンセスのお城」を作って、完璧でした！",
-          "avatar": "/images/testimonials/en/avatar-2.jpg"
+          "avatar": "/images/testimonials/avatar-2.svg"
         },
         "3": {
-          "name": "Emily R.",
+          "name": "山田 あゆみ",
           "role": "小学校の先生",
           "quote": "授業で創作作文のお題に使っています。子どもが欲しいものを言葉で伝えて、それをぬりえに。みんな夢中です！",
-          "avatar": "/images/testimonials/en/avatar-3.jpg"
+          "avatar": "/images/testimonials/avatar-3.svg"
         },
         "4": {
-          "name": "David K.",
+          "name": "佐藤 正雄",
           "role": "おじいちゃん",
           "quote": "孫たちが、いっしょに新しいぬりえを作るために毎週末遊びに来るように。最高のふれあい時間です！",
-          "avatar": "/images/testimonials/en/avatar-4.jpg"
+          "avatar": "/images/testimonials/avatar-4.svg"
         },
         "5": {
-          "name": "Rachel B.",
+          "name": "高橋 由美",
           "role": "チャイルドマインダー",
           "quote": "見ている子どもたちが夢中です。ドラゴン、妖精、ロケット…想像したものがなんでも形になります！",
-          "avatar": "/images/testimonials/en/avatar-5.jpg"
+          "avatar": "/images/testimonials/avatar-5.svg"
         },
         "6": {
-          "name": "Michael P.",
+          "name": "伊藤 大輔",
           "role": "パパ＆デザイナー",
           "quote": "デザイナーとして品質に感動。パパとしては、息子のアイデアがぬりえになって笑顔になるのを見るのが大好きです！",
-          "avatar": "/images/testimonials/en/avatar-6.jpg"
+          "avatar": "/images/testimonials/avatar-6.svg"
         }
       }
     },

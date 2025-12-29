@@ -182,37 +182,37 @@
           "name": "Sarah M.",
           "role": "Mum of 2",
           "quote": "My kids absolutely love this! They spend hours creating and coloring their own magical worlds. No more screen time battles!",
-          "avatar": "/images/testimonials/en/avatar-1.jpg"
+          "avatar": "/images/testimonials/avatar-1.svg"
         },
         "2": {
           "name": "James T.",
           "role": "Dad of 3",
           "quote": "Finally, something that combines creativity with technology in a healthy way. My daughter made a unicorn princess castle and it was perfect!",
-          "avatar": "/images/testimonials/en/avatar-2.jpg"
+          "avatar": "/images/testimonials/avatar-2.svg"
         },
         "3": {
           "name": "Emily R.",
           "role": "Primary Teacher",
           "quote": "I use this in my classroom for creative writing prompts. The children describe what they want, then color their creations. They're so engaged!",
-          "avatar": "/images/testimonials/en/avatar-3.jpg"
+          "avatar": "/images/testimonials/avatar-3.svg"
         },
         "4": {
           "name": "David K.",
           "role": "Grandad",
           "quote": "My grandchildren visit every weekend now just to make new coloring pages together. Such wonderful bonding time!",
-          "avatar": "/images/testimonials/en/avatar-4.jpg"
+          "avatar": "/images/testimonials/avatar-4.svg"
         },
         "5": {
           "name": "Rachel B.",
           "role": "Childminder",
           "quote": "The kids I look after can't get enough. Dragons, fairies, rockets - whatever they imagine comes to life!",
-          "avatar": "/images/testimonials/en/avatar-5.jpg"
+          "avatar": "/images/testimonials/avatar-5.svg"
         },
         "6": {
           "name": "Michael P.",
           "role": "Dad & Designer",
           "quote": "As a designer, I appreciate the quality. As a dad, I love watching my son's face light up when his ideas become coloring pages!",
-          "avatar": "/images/testimonials/en/avatar-6.jpg"
+          "avatar": "/images/testimonials/avatar-6.svg"
         }
       }
     },

@@ -176,43 +176,43 @@
     },
     "testimonials": {
       "title": "Adoré par les familles partout",
-      "fromReviews": "d’après {count} avis",
+      "fromReviews": "d'après {count} avis",
       "items": {
         "1": {
-          "name": "Sarah M.",
+          "name": "Sophie M.",
           "role": "Maman de 2",
-          "quote": "Mes enfants adorent ! Ils passent des heures à créer et colorier leurs propres mondes magiques. Fini les batailles de temps d’écran !",
-          "avatar": "/images/testimonials/en/avatar-1.jpg"
+          "quote": "Mes enfants adorent ! Ils passent des heures à créer et colorier leurs propres mondes magiques. Fini les batailles de temps d'écran !",
+          "avatar": "/images/testimonials/avatar-1.svg"
         },
         "2": {
-          "name": "James T.",
+          "name": "Thomas D.",
           "role": "Papa de 3",
-          "quote": "Enfin quelque chose qui mêle créativité et technologie de façon saine. Ma fille a créé un château de princesse licorne, c’était parfait !",
-          "avatar": "/images/testimonials/en/avatar-2.jpg"
+          "quote": "Enfin quelque chose qui mêle créativité et technologie de façon saine. Ma fille a créé un château de princesse licorne, c'était parfait !",
+          "avatar": "/images/testimonials/avatar-2.svg"
         },
         "3": {
-          "name": "Emily R.",
+          "name": "Camille R.",
           "role": "Enseignante en primaire",
-          "quote": "Je l’utilise en classe pour lancer l’écriture créative. Les enfants décrivent ce qu’ils veulent, puis colorient leurs créations. Ils sont à fond !",
-          "avatar": "/images/testimonials/en/avatar-3.jpg"
+          "quote": "Je l'utilise en classe pour lancer l'écriture créative. Les enfants décrivent ce qu'ils veulent, puis colorient leurs créations. Ils sont à fond !",
+          "avatar": "/images/testimonials/avatar-3.svg"
         },
         "4": {
-          "name": "David K.",
+          "name": "Jean-Pierre L.",
           "role": "Grand-père",
           "quote": "Mes petits-enfants viennent tous les week-ends maintenant juste pour créer de nouvelles pages à colorier ensemble. Un vrai moment de complicité !",
-          "avatar": "/images/testimonials/en/avatar-4.jpg"
+          "avatar": "/images/testimonials/avatar-4.svg"
         },
         "5": {
-          "name": "Rachel B.",
+          "name": "Claire B.",
           "role": "Assistante maternelle",
-          "quote": "Les enfants que je garde en redemandent. Dragons, fées, fusées… tout ce qu’ils imaginent prend vie !",
-          "avatar": "/images/testimonials/en/avatar-5.jpg"
+          "quote": "Les enfants que je garde en redemandent. Dragons, fées, fusées… tout ce qu'ils imaginent prend vie !",
+          "avatar": "/images/testimonials/avatar-5.svg"
         },
         "6": {
-          "name": "Michael P.",
+          "name": "Nicolas P.",
           "role": "Papa & designer",
-          "quote": "En tant que designer, j’apprécie la qualité. En tant que papa, j’adore voir le sourire de mon fils quand ses idées deviennent des pages à colorier !",
-          "avatar": "/images/testimonials/en/avatar-6.jpg"
+          "quote": "En tant que designer, j'apprécie la qualité. En tant que papa, j'adore voir le sourire de mon fils quand ses idées deviennent des pages à colorier !",
+          "avatar": "/images/testimonials/avatar-6.svg"
         }
       }
     },
