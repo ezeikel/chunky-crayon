@@ -24,6 +24,7 @@ import {
 import { format } from 'date-fns';
 import { PlanName, Prisma } from '@chunky-crayon/db/types';
 import formatNumber from '@/utils/formatNumber';
+import { trackInitiateCheckout } from '@/utils/pixels';
 
 // make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render
@@ -115,6 +116,15 @@ const Billing = ({ user }: BillingProps) => {
       pack_name: pack.name,
       credits: pack.credits,
       price: pack.price,
+    });
+
+    // Track checkout initiation for Facebook/Pinterest pixels
+    const priceInPence = parseInt(pack.price.replace(/[^0-9]/g, ''), 10) * 100;
+    trackInitiateCheckout({
+      value: priceInPence,
+      currency: 'GBP',
+      productType: 'credits',
+      creditAmount: pack.credits,
     });
 
     try {

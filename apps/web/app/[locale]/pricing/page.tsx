@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
@@ -22,6 +22,7 @@ import { createCheckoutSession } from '@/app/actions/stripe';
 import FadeIn from '@/components/motion/FadeIn';
 import StaggerChildren from '@/components/motion/StaggerChildren';
 import StaggerItem from '@/components/motion/StaggerItem';
+import { trackViewContent, trackInitiateCheckout } from '@/utils/pixels';
 
 // make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render
@@ -46,6 +47,14 @@ const PricingPage = () => {
     annual: t('annual'),
   };
 
+  // Track pricing page view for Facebook/Pinterest pixels
+  useEffect(() => {
+    trackViewContent({
+      contentType: 'pricing',
+      contentName: 'Subscription Plans',
+    });
+  }, []);
+
   const handlePurchase = async (plan: (typeof plans)[0]) => {
     const planTranslationKey = planKeyMap[plan.key];
     const planName = t(`plans.${planTranslationKey}.name`);
@@ -59,6 +68,15 @@ const PricingPage = () => {
       plan_credits: plan.credits,
       billing_interval: interval,
       is_most_popular: plan.mostPopular || false,
+    });
+
+    // Track checkout initiation for Facebook/Pinterest pixels
+    const priceInPence = parseInt(plan.price.replace(/[^0-9]/g, ''), 10) * 100;
+    trackInitiateCheckout({
+      value: priceInPence,
+      currency: 'GBP',
+      productType: 'subscription',
+      planName: plan.key,
     });
 
     try {

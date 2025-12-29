@@ -14,6 +14,7 @@ import { generateLoadingAudio } from '@/app/actions/loading-audio';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
+import { trackLead } from '@/utils/pixels';
 import useUser from '@/hooks/useUser';
 import useRecentCreations from '@/hooks/useRecentCreations';
 import { ColoLoading, type AudioState } from '@/components/Loading/ColoLoading';
@@ -159,6 +160,12 @@ const MultiModeForm = ({ className }: { className?: string }) => {
         if (isGuest && coloringImage.id) {
           addCreation(coloringImage.id);
         }
+
+        // Track Lead event for Facebook/Pinterest pixels (successful content creation)
+        trackLead({
+          contentName: desc || 'Coloring Page',
+          contentCategory: 'coloring_page_creation',
+        });
 
         // Reset audio state before navigation
         setAudioUrl(null);
@@ -338,6 +345,12 @@ const CreateColoringPageForm = ({
           if (isGuest && coloringImage.id) {
             addCreation(coloringImage.id);
           }
+
+          // Track Lead event for Facebook/Pinterest pixels (successful content creation)
+          trackLead({
+            contentName: rawFormData.description || 'Coloring Page',
+            contentCategory: 'coloring_page_creation',
+          });
 
           if (coloringImage.id) {
             router.push(`/coloring-image/${coloringImage.id}`);

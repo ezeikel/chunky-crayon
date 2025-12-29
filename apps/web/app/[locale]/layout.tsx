@@ -72,12 +72,12 @@ export async function generateMetadata({
     alternates: {
       canonical: `https://chunkycrayon.com/${locale}`,
       languages: {
-        'en': 'https://chunkycrayon.com/en',
-        'ja': 'https://chunkycrayon.com/ja',
-        'ko': 'https://chunkycrayon.com/ko',
-        'de': 'https://chunkycrayon.com/de',
-        'fr': 'https://chunkycrayon.com/fr',
-        'es': 'https://chunkycrayon.com/es',
+        en: 'https://chunkycrayon.com/en',
+        ja: 'https://chunkycrayon.com/ja',
+        ko: 'https://chunkycrayon.com/ko',
+        de: 'https://chunkycrayon.com/de',
+        fr: 'https://chunkycrayon.com/fr',
+        es: 'https://chunkycrayon.com/es',
         'x-default': 'https://chunkycrayon.com/en',
       },
     },
@@ -93,7 +93,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
 
   // Validate locale
-  if (!routing.locales.includes(locale as typeof routing.locales[number])) {
+  if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
 
@@ -139,7 +139,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               t=document.createElement("script");t.async=!0,t.src=e;var
               r=document.getElementsByTagName("script")[0];
               r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
-            pintrk('load', '2612545195225', {em: '<user_email_address>'});
+            pintrk('load', '2612545195225');
             pintrk('page');
           `}
         </Script>
@@ -150,7 +150,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             width="1"
             style={{ display: 'none' }}
             alt=""
-            src="https://ct.pinterest.com/v3/?event=init&tid=2612545195225&pd[em]=<hashed_email_address>&noscript=1"
+            src="https://ct.pinterest.com/v3/?event=init&tid=2612545195225&noscript=1"
           />
         </noscript>
         {/* JSON-LD Structured Data */}
