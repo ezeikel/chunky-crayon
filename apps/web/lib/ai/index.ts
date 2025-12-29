@@ -55,6 +55,7 @@ export {
   createColoringImagePrompt,
   createGeminiColoringImagePrompt,
   CLEAN_UP_DESCRIPTION_SYSTEM,
+  createImageMetadataSystemPrompt,
   IMAGE_METADATA_SYSTEM,
   IMAGE_METADATA_PROMPT,
   // Validation prompts
@@ -76,6 +77,7 @@ export {
   IMAGE_DESCRIPTION_PROMPT,
   // Colo mascot voice prompts (for loading screen)
   COLO_VOICE_SCRIPT_SYSTEM,
+  createColoVoiceScriptSystemPrompt,
   createColoVoiceScriptPrompt,
   // Blog post generation prompts (for automated SEO)
   BLOG_POST_SYSTEM,

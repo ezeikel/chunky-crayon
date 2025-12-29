@@ -240,11 +240,40 @@ ${COLORING_IMAGE_RULES_TEXT}
 Study the reference images carefully and replicate their exact style: thick black outlines, no fill, simple shapes, child-friendly aesthetic.`;
 
 /** System prompt for cleaning up user descriptions */
-export const CLEAN_UP_DESCRIPTION_SYSTEM = `You are an assistant that helps clean up and simplify user descriptions for generating coloring book images for children. Ensure the description is suitable for a cartoon-style image with thick lines, low detail, no color, no shading, and no fill. Only black lines should be used. The target age is ${TARGET_AGE}. If the user's description does not include a scene or background, add an appropriate one. Consider the attached reference images: ${REFERENCE_IMAGES.join(', ')}. Do not include any extraneous elements in the description.
+export const CLEAN_UP_DESCRIPTION_SYSTEM = `You are an assistant that helps clean up and simplify user descriptions for generating coloring book images for children. The user may write in ANY language - you MUST translate and output your response in English for optimal image generation.
+
+Ensure the description is suitable for a cartoon-style image with thick lines, low detail, no color, no shading, and no fill. Only black lines should be used. The target age is ${TARGET_AGE}. If the user's description does not include a scene or background, add an appropriate one. Consider the attached reference images: ${REFERENCE_IMAGES.join(', ')}. Do not include any extraneous elements in the description.
+
+IMPORTANT: Always respond in English, regardless of the input language.
 
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}`;
 
-export const IMAGE_METADATA_SYSTEM = `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.`;
+/**
+ * Creates a language-aware system prompt for image metadata generation.
+ * When no language is specified, defaults to English.
+ *
+ * @param targetLanguage - Optional language name (e.g., "Japanese", "Spanish")
+ * @param nativeName - Optional native name of the language (e.g., "日本語", "Español")
+ */
+export const createImageMetadataSystemPrompt = (
+  targetLanguage?: string,
+  nativeName?: string,
+): string => {
+  const languageInstruction =
+    targetLanguage && targetLanguage !== 'English'
+      ? `
+
+IMPORTANT LANGUAGE REQUIREMENT:
+- The "title" field MUST be in ${targetLanguage} (${nativeName}) - use natural, child-friendly expressions
+- The "description", "alt", and "tags" fields MUST remain in English for consistency and filtering
+- Only translate the title, nothing else`
+      : '';
+
+  return `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.${languageInstruction}`;
+};
+
+/** Default English system prompt for backwards compatibility */
+export const IMAGE_METADATA_SYSTEM = createImageMetadataSystemPrompt();
 
 export const IMAGE_METADATA_PROMPT = `Generate metadata for the generated image based on the following image:`;
 
@@ -378,7 +407,27 @@ export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would
 // Colo Mascot Voice Scripts (for loading screen)
 // =============================================================================
 
-export const COLO_VOICE_SCRIPT_SYSTEM = `You are Colo, a friendly, chunky crayon character who LOVES helping kids color! You're enthusiastic, warm, and speak in a playful, encouraging way.
+/**
+ * Creates a language-aware system prompt for Colo's voice scripts.
+ * When no language is specified, defaults to English.
+ *
+ * @param targetLanguage - Optional language name (e.g., "Japanese", "Spanish")
+ * @param nativeName - Optional native name of the language (e.g., "日本語", "Español")
+ */
+export const createColoVoiceScriptSystemPrompt = (
+  targetLanguage?: string,
+  nativeName?: string,
+): string => {
+  const languageInstruction =
+    targetLanguage && targetLanguage !== 'English'
+      ? `
+IMPORTANT: You must respond in ${targetLanguage} (${nativeName}).
+- Use natural, child-friendly ${targetLanguage} expressions
+- Keep the playful, encouraging tone in ${targetLanguage}
+- Do NOT respond in English - your entire response must be in ${targetLanguage}`
+      : '';
+
+  return `You are Colo, a friendly, chunky crayon character who LOVES helping kids color! You're enthusiastic, warm, and speak in a playful, encouraging way.
 
 Your job is to create a short voice line (2-3 sentences MAX) to play while a coloring page is being generated.
 
@@ -390,7 +439,7 @@ Guidelines:
 - Keep it under 15 words total for optimal loading time
 - End with something encouraging about coloring
 
-Examples:
+Examples (in English - adapt to target language):
 - "Ooh, a dragon! I love dragons! Get your crayons ready!"
 - "Wow, a princess and a unicorn! This is going to be SO pretty!"
 - "A superhero? Awesome! I can't wait to help you color it!"
@@ -399,12 +448,32 @@ DO NOT:
 - Use complicated words
 - Be too long-winded
 - Ask questions (they can't respond)
-- Sound robotic or formal`;
+- Sound robotic or formal
+${languageInstruction}`;
+};
 
-export const createColoVoiceScriptPrompt = (description: string) =>
-  `Create a short, excited voice line for Colo to say while generating a coloring page of: "${description}"
+/** Default English system prompt for backwards compatibility */
+export const COLO_VOICE_SCRIPT_SYSTEM = createColoVoiceScriptSystemPrompt();
 
-Remember: 2-3 short sentences, under 15 words total. Be warm, excited, and kid-friendly!`;
+/**
+ * Creates a prompt for Colo's voice script with optional language support.
+ *
+ * @param description - What the child wants to color
+ * @param targetLanguage - Optional language name for the response
+ */
+export const createColoVoiceScriptPrompt = (
+  description: string,
+  targetLanguage?: string,
+) => {
+  const languageNote =
+    targetLanguage && targetLanguage !== 'English'
+      ? `\n\nIMPORTANT: Respond entirely in ${targetLanguage}, not English.`
+      : '';
+
+  return `Create a short, excited voice line for Colo to say while generating a coloring page of: "${description}"
+
+Remember: 2-3 short sentences, under 15 words total. Be warm, excited, and kid-friendly!${languageNote}`;
+};
 
 // =============================================================================
 // Blog Post Generation (for automated SEO content)

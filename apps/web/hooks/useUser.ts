@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/app/actions/user';
 import { useRouter } from 'next/navigation';
 import { SubscriptionStatus } from '@chunky-crayon/db/types';
 import { useGuestMode } from './useGuestMode';
+import { useParentalGateSafe } from '@/components/ParentalGate';
 
 type User = {
   id: string;
@@ -43,11 +44,29 @@ const useUser = () => {
     fetchUser();
   }, [fetchUser]);
 
+  // Parental gate for sensitive routes (billing, pricing)
+  // Uses safe version that returns null if outside ParentalGateProvider
+  const parentalGate = useParentalGateSafe();
+
   const handleAuthAction = useCallback(
-    (action: 'signin' | 'billing') => {
-      router.push(`/${action}`);
+    (action: 'signin' | 'billing' | 'pricing') => {
+      // Map actions to their correct routes
+      const routeMap: Record<typeof action, string> = {
+        signin: '/signin',
+        billing: '/account/billing',
+        pricing: '/pricing',
+      };
+
+      const targetPath = routeMap[action];
+
+      // Only billing needs parental gate (pricing is for logged-out users)
+      if (action === 'billing' && parentalGate) {
+        parentalGate.openGate(targetPath);
+      } else {
+        router.push(targetPath);
+      }
     },
-    [router],
+    [router, parentalGate],
   );
 
   const hasActiveSubscription = user?.subscriptions?.some(

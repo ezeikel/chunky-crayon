@@ -163,7 +163,9 @@ const ImageInput = ({ className }: ImageInputProps) => {
       // Show remaining generations for guests
       if (isGuest) {
         return {
-          text: t('buttonCreateGuest', { remaining: guestGenerationsRemaining }),
+          text: t('buttonCreateGuest', {
+            remaining: guestGenerationsRemaining,
+          }),
           isSubmit: true,
         };
       }
@@ -184,18 +186,16 @@ const ImageInput = ({ className }: ImageInputProps) => {
     }
 
     if (blockedReason === 'no_credits') {
-      if (hasActiveSubscription) {
-        return {
-          text: t('buttonBuyCredits'),
-          action: () => handleAuthAction('billing'),
-          subtext: t('subtextNoCreditsSubscribed'),
-          isSubmit: false,
-        };
-      }
+      // Both cases go to billing - with or without subscription
+      // "View Plans" and "Buy Credits" both route to /account/billing
       return {
-        text: t('buttonViewPlans'),
+        text: hasActiveSubscription
+          ? t('buttonBuyCredits')
+          : t('buttonViewPlans'),
         action: () => handleAuthAction('billing'),
-        subtext: t('subtextNoCreditsNoSubscription'),
+        subtext: hasActiveSubscription
+          ? t('subtextNoCreditsSubscribed')
+          : t('subtextNoCreditsNoSubscription'),
         isSubmit: false,
       };
     }
@@ -345,7 +345,8 @@ const ImageInput = ({ className }: ImageInputProps) => {
             {/* Caption showing AI description */}
             <p className="text-center text-text-primary font-tondo text-base leading-relaxed">
               {isChildDrawing ? '✏️ ' : '📸 '}
-              <span className="font-bold">{t('imageInput.iSee')}</span> {aiDescription}
+              <span className="font-bold">{t('imageInput.iSee')}</span>{' '}
+              {aiDescription}
             </p>
           </div>
         </div>
@@ -454,7 +455,9 @@ const ImageInput = ({ className }: ImageInputProps) => {
           aria-label={t('imageInput.takePhoto')}
         >
           <FontAwesomeIcon icon={faCameraRetro} className="text-3xl" />
-          <span className="text-sm font-tondo font-bold">{t('imageInput.camera')}</span>
+          <span className="text-sm font-tondo font-bold">
+            {t('imageInput.camera')}
+          </span>
         </button>
 
         <button
@@ -484,7 +487,9 @@ const ImageInput = ({ className }: ImageInputProps) => {
           aria-label={t('imageInput.uploadImage')}
         >
           <FontAwesomeIcon icon={faImages} className="text-3xl" />
-          <span className="text-sm font-tondo font-bold">{t('imageInput.upload')}</span>
+          <span className="text-sm font-tondo font-bold">
+            {t('imageInput.upload')}
+          </span>
         </button>
       </div>
 
@@ -519,7 +524,9 @@ const ImageInput = ({ className }: ImageInputProps) => {
             }
           />
           <p className="font-tondo text-sm text-text-muted text-center">
-            {isDragging ? t('imageInput.dropHere') : t('imageInput.dragAndDrop')}
+            {isDragging
+              ? t('imageInput.dropHere')
+              : t('imageInput.dragAndDrop')}
           </p>
         </div>
       )}

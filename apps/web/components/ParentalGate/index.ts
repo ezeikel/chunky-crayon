@@ -1,3 +1,7 @@
 export { default as ParentalGateModal } from './ParentalGateModal';
 export { default as ParentalGateLink } from './ParentalGateLink';
-export { ParentalGateProvider, useParentalGate } from './ParentalGateContext';
+export {
+  ParentalGateProvider,
+  useParentalGate,
+  useParentalGateSafe,
+} from './ParentalGateContext';

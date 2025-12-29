@@ -53,19 +53,14 @@ const UserInputV2 = () => {
     }
 
     if (!hasEnoughCredits) {
-      if (hasActiveSubscription) {
-        return {
-          text: 'Buy more credits',
-          action: () => handleAuthAction('billing'),
-          subtext:
-            'Need more magic? Top up or upgrade to keep the creativity going!',
-          isSubmit: false,
-        };
-      }
+      // Both cases go to billing - with or without subscription
+      // "View Plans" and "Buy Credits" both route to /account/billing
       return {
-        text: 'View plans',
+        text: hasActiveSubscription ? 'Buy more credits' : 'View plans',
         action: () => handleAuthAction('billing'),
-        subtext: 'Choose a subscription to unlock more creations',
+        subtext: hasActiveSubscription
+          ? 'Need more magic? Top up or upgrade to keep the creativity going!'
+          : 'Choose a subscription to unlock more creations',
         isSubmit: false,
       };
     }

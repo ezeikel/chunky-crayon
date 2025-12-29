@@ -197,7 +197,9 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
       // Show remaining generations for guests
       if (isGuest) {
         return {
-          text: t('buttonCreateGuest', { remaining: guestGenerationsRemaining }),
+          text: t('buttonCreateGuest', {
+            remaining: guestGenerationsRemaining,
+          }),
           isSubmit: true,
         };
       }
@@ -218,18 +220,16 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     }
 
     if (blockedReason === 'no_credits') {
-      if (hasActiveSubscription) {
-        return {
-          text: t('buttonBuyCredits'),
-          action: () => handleAuthAction('billing'),
-          subtext: t('subtextNoCreditsSubscribed'),
-          isSubmit: false,
-        };
-      }
+      // Both cases go to billing - with or without subscription
+      // "View Plans" and "Buy Credits" both route to /account/billing
       return {
-        text: t('buttonViewPlans'),
+        text: hasActiveSubscription
+          ? t('buttonBuyCredits')
+          : t('buttonViewPlans'),
         action: () => handleAuthAction('billing'),
-        subtext: t('subtextNoCreditsNoSubscription'),
+        subtext: hasActiveSubscription
+          ? t('subtextNoCreditsSubscribed')
+          : t('subtextNoCreditsNoSubscription'),
         isSubmit: false,
       };
     }
@@ -346,7 +346,9 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
             )}
           >
             <FontAwesomeIcon icon={faStop} className="mr-2" />
-            {isSilenceDetected ? t('voiceInput.imDone') : t('voiceInput.doneTalking')}
+            {isSilenceDetected
+              ? t('voiceInput.imDone')
+              : t('voiceInput.doneTalking')}
           </Button>
         </div>
       </div>

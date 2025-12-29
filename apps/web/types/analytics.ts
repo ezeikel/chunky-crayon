@@ -358,6 +358,7 @@ export type EventProperties = {
     script: string;
     durationMs: number;
     descriptionLength: number;
+    locale: string;
   };
   [TRACKING_EVENTS.LOADING_AUDIO_PLAYED]: {
     descriptionLength: number;
@@ -365,5 +366,6 @@ export type EventProperties = {
   [TRACKING_EVENTS.LOADING_AUDIO_FAILED]: {
     error: string;
     descriptionLength: number;
+    locale: string;
   };
 };

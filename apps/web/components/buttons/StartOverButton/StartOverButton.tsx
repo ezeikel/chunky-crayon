@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRotateLeft } from '@fortawesome/pro-solid-svg-icons';
 import cn from '@/utils/cn';
@@ -21,6 +22,7 @@ const StartOverButton = ({
   className,
   disabled = false,
 }: StartOverButtonProps) => {
+  const t = useTranslations('startOverButton');
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleClick = () => {
@@ -49,14 +51,14 @@ const StartOverButton = ({
           className="flex items-center justify-center gap-x-2 text-white font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-crayon-pink hover:bg-crayon-pink-dark active:scale-95 transition-all duration-150"
         >
           <FontAwesomeIcon icon={faArrowRotateLeft} className="text-base" />
-          <span>Yes, Start Over</span>
+          <span>{t('confirm')}</span>
         </button>
         <button
           type="button"
           onClick={handleCancel}
           className="flex items-center justify-center text-text-secondary font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-white hover:bg-paper-cream active:scale-95 transition-all duration-150 border-2 border-paper-cream-dark"
         >
-          Keep Coloring
+          {t('cancel')}
         </button>
       </div>
     );
@@ -77,7 +79,7 @@ const StartOverButton = ({
         icon={faArrowRotateLeft}
         className="text-xl md:text-2xl"
       />
-      <span className="hidden md:inline">Start Over</span>
+      <span className="hidden md:inline">{t('idle')}</span>
     </button>
   );
 };

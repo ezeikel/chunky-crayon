@@ -2,30 +2,23 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 
 // Audio state for visual feedback
 export type AudioState = 'idle' | 'preparing' | 'playing' | 'done';
 
-// Fun loading messages that cycle while waiting
-const LOADING_MESSAGES = [
-  'Sharpening crayons...',
-  'Mixing colors...',
-  'Drawing lines...',
-  'Adding magic sparkles...',
-  'Almost there...',
-  'Creating your masterpiece...',
-  'Waving my wand...',
-  'Coloring outside the lines (oops!)...',
-];
-
-// Messages for different audio states (kid-friendly!)
-const AUDIO_STATE_MESSAGES: Record<AudioState, string> = {
-  idle: 'Getting ready...',
-  preparing: 'Colo is waking up! 🎨',
-  playing: '', // Don't show text while Colo is speaking
-  done: 'Drawing your picture...',
-};
+// Keys for loading messages - mapped to translations
+const LOADING_MESSAGE_KEYS = [
+  'sharpeningCrayons',
+  'mixingColors',
+  'drawingLines',
+  'addingSparkles',
+  'almostThere',
+  'creatingMasterpiece',
+  'wavingWand',
+  'coloringOutsideLines',
+] as const;
 
 type ColoLoadingProps = {
   /** Audio URL to play (from ElevenLabs) */
@@ -49,6 +42,7 @@ const ColoLoading = ({
   onAudioComplete,
   className,
 }: ColoLoadingProps) => {
+  const t = useTranslations('coloLoading');
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
@@ -70,7 +64,9 @@ const ColoLoading = ({
     if (!isLoading || isPlaying) return;
 
     const interval = setInterval(() => {
-      setCurrentMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+      setCurrentMessageIndex(
+        (prev) => (prev + 1) % LOADING_MESSAGE_KEYS.length,
+      );
     }, 3000);
 
     return () => clearInterval(interval);
@@ -112,10 +108,11 @@ const ColoLoading = ({
     }
     // Show "waking up" message while waiting for audio
     if (audioState === 'preparing') {
-      return AUDIO_STATE_MESSAGES.preparing;
+      return t('audioStates.preparing');
     }
     // After audio finished, cycle through fun messages
-    return LOADING_MESSAGES[currentMessageIndex];
+    const messageKey = LOADING_MESSAGE_KEYS[currentMessageIndex];
+    return t(`messages.${messageKey}`);
   };
 
   if (!isLoading) return null;
@@ -203,7 +200,7 @@ const ColoLoading = ({
         <div className="mb-4 px-6 py-3 bg-white rounded-2xl shadow-lg border-2 border-crayon-orange-light relative">
           <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-l-2 border-t-2 border-crayon-orange-light rotate-45" />
           <p className="font-tondo font-medium text-lg text-crayon-orange text-center">
-            🎨 Colo is talking! Listen up! 🎨
+            🎨 {t('coloSpeaking')} 🎨
           </p>
         </div>
       )}
@@ -211,7 +208,7 @@ const ColoLoading = ({
       {/* Loading message */}
       <div className="text-center max-w-md px-6">
         <h2 className="font-tondo font-bold text-2xl md:text-3xl text-gradient-orange mb-3">
-          {isPlaying ? "I'm so excited!" : 'Creating your page!'}
+          {isPlaying ? t('titleSpeaking') : t('title')}
         </h2>
         {getMessage() && (
           <p className="font-tondo text-lg text-text-primary mb-4 transition-all duration-500">

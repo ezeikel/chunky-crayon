@@ -25,6 +25,11 @@ export const useParentalGate = () => {
   return context;
 };
 
+// Safe version that returns null if used outside provider (for hooks that may run outside)
+export const useParentalGateSafe = () => {
+  return useContext(ParentalGateContext);
+};
+
 type ParentalGateProviderProps = {
   children: ReactNode;
 };

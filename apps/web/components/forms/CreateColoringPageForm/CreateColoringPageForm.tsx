@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faWandMagicSparkles,
@@ -69,6 +69,7 @@ const FormLoadingOverlay = ({
 const MultiModeForm = ({ className }: { className?: string }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+  const locale = useLocale();
   const { mode, description } = useInputMode();
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioState, setAudioState] = useState<AudioState>('idle');
@@ -93,7 +94,7 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           // Show "preparing" state while audio generates
           setAudioState('preparing');
 
-          generateLoadingAudio(desc)
+          generateLoadingAudio(desc, locale)
             .then((result) => {
               setAudioUrl(result.audioUrl);
               // Note: The ColoLoading component will set its own "playing" state
@@ -102,6 +103,7 @@ const MultiModeForm = ({ className }: { className?: string }) => {
                 script: result.script,
                 durationMs: result.durationMs,
                 descriptionLength: desc.length,
+                locale,
               });
             })
             .catch((error) => {
@@ -110,6 +112,7 @@ const MultiModeForm = ({ className }: { className?: string }) => {
               trackEvent(TRACKING_EVENTS.LOADING_AUDIO_FAILED, {
                 error: error instanceof Error ? error.message : 'Unknown error',
                 descriptionLength: desc.length,
+                locale,
               });
             });
         }
@@ -177,6 +180,7 @@ const MultiModeForm = ({ className }: { className?: string }) => {
       {/* Hidden inputs for form submission */}
       <input type="hidden" name="inputType" value={mode} />
       <input type="hidden" name="description" value={description} />
+      <input type="hidden" name="locale" value={locale} />
 
       {/* Input mode selector */}
       <InputModeSelector className="mb-2" />
@@ -196,6 +200,7 @@ const CreateColoringPageForm = ({
 }: CreateColoringPageFormProps) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+  const locale = useLocale();
   const { isGuest } = useUser();
   const { addCreation } = useRecentCreations();
   const t = useTranslations('createForm');
@@ -341,6 +346,7 @@ const CreateColoringPageForm = ({
         ref={formRef}
         className={cn('flex flex-col gap-y-4 relative z-10', className)}
       >
+        <input type="hidden" name="locale" value={locale} />
         <UserInputV2 />
       </form>
     </div>

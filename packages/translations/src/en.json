@@ -717,6 +717,17 @@
     "preparing": "Preparing...",
     "doneSharing": "Done sharing"
   },
+  "startOverButton": {
+    "idle": "Start Over",
+    "confirm": "Yes, Start Over",
+    "cancel": "Keep Coloring"
+  },
+  "downloadPDFButton": {
+    "idle": "Print",
+    "loading": "Loading...",
+    "creating": "Creating...",
+    "error": "Oops!"
+  },
   "colors": {
     "primary": {
       "cherryRed": "Cherry Red",

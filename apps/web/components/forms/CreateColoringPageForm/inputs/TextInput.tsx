@@ -45,7 +45,9 @@ const TextInput = ({ className }: TextInputProps) => {
     if (blockedReason === 'guest_limit_reached') {
       return {
         disabled: true,
-        placeholder: t('placeholderGuestLimit', { maxTries: maxGuestGenerations }),
+        placeholder: t('placeholderGuestLimit', {
+          maxTries: maxGuestGenerations,
+        }),
       };
     }
 
@@ -75,7 +77,9 @@ const TextInput = ({ className }: TextInputProps) => {
       // Show remaining generations for guests
       if (isGuest) {
         return {
-          text: t('buttonCreateGuest', { remaining: guestGenerationsRemaining }),
+          text: t('buttonCreateGuest', {
+            remaining: guestGenerationsRemaining,
+          }),
           isSubmit: true,
         };
       }
@@ -96,18 +100,16 @@ const TextInput = ({ className }: TextInputProps) => {
     }
 
     if (blockedReason === 'no_credits') {
-      if (hasActiveSubscription) {
-        return {
-          text: t('buttonBuyCredits'),
-          action: () => handleAuthAction('billing'),
-          subtext: t('subtextNoCreditsSubscribed'),
-          isSubmit: false,
-        };
-      }
+      // Both cases go to billing - with or without subscription
+      // "View Plans" and "Buy Credits" both route to /account/billing
       return {
-        text: t('buttonViewPlans'),
+        text: hasActiveSubscription
+          ? t('buttonBuyCredits')
+          : t('buttonViewPlans'),
         action: () => handleAuthAction('billing'),
-        subtext: t('subtextNoCreditsNoSubscription'),
+        subtext: hasActiveSubscription
+          ? t('subtextNoCreditsSubscribed')
+          : t('subtextNoCreditsNoSubscription'),
         isSubmit: false,
       };
     }

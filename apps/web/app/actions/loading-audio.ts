@@ -4,7 +4,7 @@ import { put } from '@vercel/blob';
 import {
   generateText,
   getTracedModels,
-  COLO_VOICE_SCRIPT_SYSTEM,
+  createColoVoiceScriptSystemPrompt,
   createColoVoiceScriptPrompt,
 } from '@/lib/ai';
 import { generateColoVoice } from '@/lib/elevenlabs';
@@ -15,6 +15,22 @@ export type LoadingAudioResult = {
   audioUrl: string;
   script: string;
   durationMs: number;
+};
+
+/**
+ * Locale to language mapping for Colo's voice scripts.
+ * Maps locale codes to language names for the AI prompt.
+ */
+const LOCALE_LANGUAGE_MAP: Record<
+  string,
+  { name: string; nativeName: string }
+> = {
+  en: { name: 'English', nativeName: 'English' },
+  ja: { name: 'Japanese', nativeName: '日本語' },
+  ko: { name: 'Korean', nativeName: '한국어' },
+  de: { name: 'German', nativeName: 'Deutsch' },
+  fr: { name: 'French', nativeName: 'Français' },
+  es: { name: 'Spanish', nativeName: 'Español' },
 };
 
 /**
@@ -31,25 +47,33 @@ export type LoadingAudioResult = {
  * Total time: ~2-3s (runs in parallel with 30s image generation)
  *
  * @param description - The user's description of what they want to color
+ * @param locale - Optional locale code for language (defaults to 'en')
  * @returns Audio URL and generated script
  */
 export async function generateLoadingAudio(
   description: string,
+  locale: string = 'en',
 ): Promise<LoadingAudioResult> {
   const startTime = Date.now();
   const userId = await getUserId(ACTIONS.GENERATE_LOADING_AUDIO);
 
+  // Get language info for the locale (default to English if unknown)
+  const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
+
   // Get traced models for observability
   const tracedModels = getTracedModels({
     userId: userId || undefined,
-    properties: { action: 'loading-audio-generation' },
+    properties: { action: 'loading-audio-generation', locale },
   });
 
-  // Step 1: Generate Colo's script using fast model
+  // Step 1: Generate Colo's script using fast model (with language support)
   const { text: script } = await generateText({
     model: tracedModels.textFast,
-    system: COLO_VOICE_SCRIPT_SYSTEM,
-    prompt: createColoVoiceScriptPrompt(description),
+    system: createColoVoiceScriptSystemPrompt(
+      languageInfo.name,
+      languageInfo.nativeName,
+    ),
+    prompt: createColoVoiceScriptPrompt(description, languageInfo.name),
   });
 
   // eslint-disable-next-line no-console
