@@ -5,7 +5,8 @@ import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { SUBSCRIPTION_PLANS, CREDIT_PACKS } from '@/constants';
+import { SUBSCRIPTION_PLANS, CREDIT_PACKS, TRACKING_EVENTS } from '@/constants';
+import { trackEvent } from '@/utils/analytics-client';
 import {
   Card,
   CardHeader,
@@ -22,7 +23,7 @@ import {
   createCustomerPortalSession,
 } from '@/app/actions/stripe';
 import { format } from 'date-fns';
-import { PlanName, Prisma } from '@chunky-crayon/db/types';
+import { PlanName, BillingPeriod, Prisma } from '@chunky-crayon/db/types';
 import formatNumber from '@/utils/formatNumber';
 import { trackInitiateCheckout } from '@/utils/pixels';
 
@@ -103,6 +104,66 @@ const Billing = ({ user }: BillingProps) => {
     }
   };
 
+  const handlePurchase = async (plan: {
+    planName: PlanName;
+    stripePriceEnv: string;
+    price: string;
+  }) => {
+    setLoadingPlan(plan.planName);
+
+    // Type-safe PostHog event tracking
+    trackEvent(TRACKING_EVENTS.PRICING_PLAN_CLICKED, {
+      planName: plan.planName,
+      planInterval: BillingPeriod.MONTHLY,
+      price: plan.price,
+    });
+
+    // Track checkout initiation for Facebook/Pinterest pixels
+    const priceInPence = parseInt(plan.price.replace(/[^0-9]/g, ''), 10) * 100;
+    trackInitiateCheckout({
+      value: priceInPence,
+      currency: 'GBP',
+      productType: 'subscription',
+      planName: plan.planName,
+    });
+
+    try {
+      const stripe = await stripePromise;
+
+      if (!stripe) {
+        throw new Error('Stripe failed to load');
+      }
+
+      const session = await createCheckoutSession(
+        plan.stripePriceEnv,
+        'subscription',
+        '/account/billing',
+      );
+
+      if (!session || !session.id) {
+        const errorMessage =
+          session?.error || 'Failed to create checkout session';
+        console.error('Checkout session error:', errorMessage);
+        toast.error(errorMessage);
+        return;
+      }
+
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
+
+      if (error) {
+        console.error('Stripe redirect error:', error);
+        toast.error(error.message || 'Failed to redirect to checkout');
+      }
+    } catch (error) {
+      console.error('Error purchasing plan:', error);
+      toast.error(t('failedToCheckout'));
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
   const handleCreditPurchase = async (pack: any) => {
     if (!hasActiveSubscription) {
       toast.error(t('noSubscriptionForCredits'));
@@ -176,7 +237,8 @@ const Billing = ({ user }: BillingProps) => {
     if (loadingPlan === planName) return t('loading');
     if (currentSubscription?.planName === planName)
       return t('currentPlanBadge');
-    return t('changePlan');
+    // Show "Subscribe" if no active subscription, "Change Plan" if changing existing
+    return hasActiveSubscription ? t('changePlan') : t('subscribe');
   };
 
   return (
@@ -339,10 +401,16 @@ const Billing = ({ user }: BillingProps) => {
                   <Button
                     className="w-full text-lg py-2 bg-orange hover:bg-orange/90 text-white"
                     onClick={() =>
-                      handlePlanChange({
-                        planName: plan.key,
-                        stripePriceEnv: plan.stripePriceEnv,
-                      })
+                      hasActiveSubscription
+                        ? handlePlanChange({
+                            planName: plan.key,
+                            stripePriceEnv: plan.stripePriceEnv,
+                          })
+                        : handlePurchase({
+                            planName: plan.key,
+                            stripePriceEnv: plan.stripePriceEnv,
+                            price: plan.price,
+                          })
                     }
                     disabled={
                       loadingPlan === plan.key ||

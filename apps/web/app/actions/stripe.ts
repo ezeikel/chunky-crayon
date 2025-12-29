@@ -40,6 +40,7 @@ export const getStripeSession = async (sessionId: string) => {
 export const createCheckoutSession = async (
   priceId: string,
   mode: 'payment' | 'subscription',
+  cancelPath?: string,
 ): Promise<{
   id: string;
   error?: string;
@@ -88,7 +89,7 @@ export const createCheckoutSession = async (
     line_items: [{ price: priceId, quantity: 1 }],
     mode,
     success_url: `${origin}/account/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/pricing`,
+    cancel_url: `${origin}${cancelPath || '/pricing'}`,
   };
 
   if (userId && user) {
