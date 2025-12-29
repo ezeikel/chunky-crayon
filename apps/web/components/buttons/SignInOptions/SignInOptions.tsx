@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import posthog from 'posthog-js';
+import { useFeatureFlagEnabled } from 'posthog-js/react';
 import { signIn } from 'next-auth/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/pro-regular-svg-icons';
@@ -23,6 +24,7 @@ const SignInOptions = () => {
   const t = useTranslations('auth');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const showAppleSignIn = useFeatureFlagEnabled('apple-sign-in');
 
   const handleGoogleSignIn = () => {
     posthog.capture('user_signed_in', {
@@ -72,14 +74,16 @@ const SignInOptions = () => {
           <FontAwesomeIcon icon={faGoogle} className="mr-2 h-4 w-4" />
           {t('continueWithGoogle')}
         </Button>
-        <Button
-          variant="outline"
-          onClick={handleAppleSignIn}
-          className="w-full"
-        >
-          <FontAwesomeIcon icon={faApple} className="mr-2 h-4 w-4" />
-          {t('continueWithApple')}
-        </Button>
+        {showAppleSignIn && (
+          <Button
+            variant="outline"
+            onClick={handleAppleSignIn}
+            className="w-full"
+          >
+            <FontAwesomeIcon icon={faApple} className="mr-2 h-4 w-4" />
+            {t('continueWithApple')}
+          </Button>
+        )}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
