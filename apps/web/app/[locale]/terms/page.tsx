@@ -48,61 +48,98 @@ const TermsOfService = () => (
       <h2 className="text-2xl font-semibold mb-4">3. Subscription Plans</h2>
       <p className="mb-4">We offer the following subscription plans:</p>
 
-      <h3 className="text-xl font-medium mb-2">3.1 Crayon Plan</h3>
+      <h3 className="text-xl font-medium mb-2">3.1 Splash Plan</h3>
       <ul className="list-disc pl-6 mb-4">
-        <li>Monthly: £19.99/month</li>
-        <li>Annual: £79.99/year (save 15%)</li>
+        <li>Monthly: £7.99/month</li>
+        <li>Annual: £79.99/year (save 17%)</li>
         <li>
           Features:
           <ul className="list-disc pl-6 mt-2">
-            <li>Create coloring pages from text prompts</li>
-            <li>Create coloring pages with words, names, and numbers</li>
-            <li>Adjust color, contrast, and brightness</li>
-            <li>Turn photos into coloring pages</li>
+            <li>250 credits/month (~50 pages)</li>
+            <li>All platform features</li>
+            <li>Credits reset monthly</li>
           </ul>
         </li>
       </ul>
 
       <h3 className="text-xl font-medium mb-2">3.2 Rainbow Plan</h3>
       <ul className="list-disc pl-6 mb-4">
-        <li>Monthly: £29.99/month</li>
-        <li>Annual: £139.99/year (save 15%)</li>
+        <li>Monthly: £13.99/month</li>
+        <li>Annual: £139.99/year (save 17%)</li>
         <li>
           Features:
           <ul className="list-disc pl-6 mt-2">
-            <li>All Crayon Plan features</li>
-            <li>Advanced editing features</li>
-            <li>Early access to new models and features</li>
+            <li>500 credits/month (~100 pages)</li>
+            <li>All platform features</li>
+            <li>Unused credits roll over (up to 1 month)</li>
+            <li>Priority support</li>
           </ul>
         </li>
       </ul>
 
-      <h3 className="text-xl font-medium mb-2">3.3 Masterpiece Plan</h3>
+      <h3 className="text-xl font-medium mb-2">3.3 Sparkle Plan</h3>
       <ul className="list-disc pl-6 mb-4">
-        <li>Monthly: £49.99/month</li>
-        <li>Annual: £249.99/year (save 15%)</li>
+        <li>Monthly: £24.99/month</li>
+        <li>Annual: £249.99/year (save 17%)</li>
         <li>
           Features:
           <ul className="list-disc pl-6 mt-2">
-            <li>All Rainbow Plan features</li>
-            <li>Bulk generation</li>
-            <li>Commercial use</li>
+            <li>1,000 credits/month (~200 pages)</li>
+            <li>All platform features</li>
+            <li>Extended rollover (up to 2 months)</li>
+            <li>Commercial use license (see Section 3.4)</li>
           </ul>
         </li>
       </ul>
 
-      <h3 className="text-xl font-medium mb-2">3.4 Studio Plan</h3>
+      <h3 className="text-xl font-medium mb-2">3.4 Commercial Use License</h3>
+      <p className="mb-4">
+        The Sparkle Plan includes a commercial use license, which permits you
+        to:
+      </p>
       <ul className="list-disc pl-6 mb-4">
-        <li>Monthly: £59.99/month</li>
-        <li>Annual: £599.00/year (save 15%)</li>
         <li>
-          Features:
+          Use generated coloring pages for commercial purposes, including but
+          not limited to:
           <ul className="list-disc pl-6 mt-2">
-            <li>All Masterpiece Plan features</li>
-            <li>Rollover up to 3 months of credits</li>
+            <li>Selling printed coloring books or pages</li>
+            <li>
+              Using in products for sale (merchandise, educational materials)
+            </li>
+            <li>
+              Using in marketing and promotional materials for your business
+            </li>
+            <li>Distributing in paid digital products</li>
           </ul>
         </li>
+        <li>Create derivative works based on the generated content</li>
+        <li>Sublicense the content as part of your own products</li>
       </ul>
+      <p className="mb-4">
+        <strong>Commercial use restrictions:</strong>
+      </p>
+      <ul className="list-disc pl-6 mb-4">
+        <li>
+          You may not resell, redistribute, or sublicense the AI model or
+          service itself
+        </li>
+        <li>
+          You may not claim the generated content was created without AI
+          assistance
+        </li>
+        <li>
+          The commercial license is tied to your active Sparkle Plan
+          subscription
+        </li>
+        <li>
+          Content generated during your subscription period remains licensed for
+          commercial use even after cancellation
+        </li>
+      </ul>
+      <p className="mb-4">
+        <strong>Note:</strong> Splash and Rainbow plan subscribers may only use
+        generated content for personal, non-commercial purposes.
+      </p>
     </section>
 
     <section className="mb-8">

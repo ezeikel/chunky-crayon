@@ -8,11 +8,34 @@ import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 import { FadeIn, StaggerChildren, StaggerItem } from '@/components/motion';
 
-// FAQ item IDs for iteration
-const FAQ_ITEM_IDS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] as const;
+// FAQ item IDs for homepage (general FAQ)
+const HOMEPAGE_FAQ_IDS = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+] as const;
+
+// FAQ item IDs for pricing page (pricing-specific FAQ)
+const PRICING_FAQ_IDS = [
+  'cancelAnytime',
+  'rollover',
+  'creditsPerPage',
+  'audience',
+  'gettingStarted',
+] as const;
+
+type FAQNamespace = 'homepage' | 'pricing';
 
 type FAQProps = {
   className?: string;
+  namespace?: FAQNamespace;
 };
 
 const FAQAccordionItem = ({
@@ -61,9 +84,9 @@ const FAQAccordionItem = ({
   </StaggerItem>
 );
 
-const FAQ = ({ className }: FAQProps) => {
+const FAQ = ({ className, namespace = 'homepage' }: FAQProps) => {
   const [openId, setOpenId] = useState<string | null>(null);
-  const t = useTranslations('homepage');
+  const t = useTranslations(namespace);
 
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
@@ -75,11 +98,21 @@ const FAQ = ({ className }: FAQProps) => {
     setOpenId(openId === id ? null : id);
   };
 
+  // Get the appropriate FAQ IDs based on namespace
+  const faqIds = namespace === 'pricing' ? PRICING_FAQ_IDS : HOMEPAGE_FAQ_IDS;
+
   // Build FAQ items from translations
-  const faqItems = FAQ_ITEM_IDS.map((id) => ({
+  // Homepage uses faq.items.{id}, pricing uses faq.{id}
+  const faqItems = faqIds.map((id) => ({
     id,
-    question: t(`faq.items.${id}.question`),
-    answer: t(`faq.items.${id}.answer`),
+    question: t(
+      namespace === 'pricing'
+        ? `faq.${id}.question`
+        : `faq.items.${id}.question`,
+    ),
+    answer: t(
+      namespace === 'pricing' ? `faq.${id}.answer` : `faq.items.${id}.answer`,
+    ),
   }));
 
   // JSON-LD structured data for FAQPage schema

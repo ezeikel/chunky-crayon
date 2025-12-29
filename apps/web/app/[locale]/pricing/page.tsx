@@ -4,6 +4,15 @@ import { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faSparkles,
+  faPalette,
+  faBookmark,
+  faShareNodes,
+  faStar,
+  faMobileScreen,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { PlanName, BillingPeriod } from '@chunky-crayon/db/types';
 import { PlanInterval, SUBSCRIPTION_PLANS, TRACKING_EVENTS } from '@/constants';
 import { trackEvent } from '@/utils/analytics-client';
@@ -23,6 +32,7 @@ import FadeIn from '@/components/motion/FadeIn';
 import StaggerChildren from '@/components/motion/StaggerChildren';
 import StaggerItem from '@/components/motion/StaggerItem';
 import { trackViewContent, trackInitiateCheckout } from '@/utils/pixels';
+import FAQ from '@/components/FAQ/FAQ';
 
 // make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render
@@ -155,6 +165,46 @@ const PricingPage = () => {
           </div>
         </header>
       </FadeIn>
+
+      {/* What's Included Section */}
+      <FadeIn direction="up" delay={0.1} className="mb-12">
+        <section className="text-center">
+          <h2 className="font-tondo text-2xl font-bold mb-6 text-primary">
+            {t('included.title')}
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            {[
+              { icon: faSparkles, key: 'aiCreation' },
+              { icon: faPalette, key: 'colorOnline' },
+              { icon: faBookmark, key: 'saveFavorites' },
+              { icon: faShareNodes, key: 'shareCreations' },
+              { icon: faStar, key: 'collectStickers' },
+              { icon: faMobileScreen, key: 'mobileApps' },
+            ].map(({ icon, key }) => (
+              <div
+                key={key}
+                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-paper-cream/50 border border-paper-cream-dark"
+              >
+                <FontAwesomeIcon
+                  icon={icon}
+                  className="text-2xl text-crayon-orange"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                      '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+                      '--fa-secondary-opacity': '1',
+                    } as React.CSSProperties
+                  }
+                />
+                <span className="text-sm text-text-secondary text-center">
+                  {t(`included.${key}`)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </FadeIn>
+
       <StaggerChildren
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto"
         staggerDelay={0.15}
@@ -231,31 +281,8 @@ const PricingPage = () => {
           );
         })}
       </StaggerChildren>
-      <FadeIn direction="up" delay={0.3} className="mt-16 max-w-3xl mx-auto">
-        <section>
-          <h2 className="font-tondo text-2xl font-bold mb-4 text-center">
-            {t('faq.title')}
-          </h2>
-          <ul className="space-y-4 text-sm text-muted-foreground">
-            <li>
-              <strong>{t('faq.cancelAnytime.question')}</strong>{' '}
-              {t('faq.cancelAnytime.answer')}
-            </li>
-            <li>
-              <strong>{t('faq.rollover.question')}</strong>{' '}
-              {t('faq.rollover.answer')}
-            </li>
-            <li>
-              <strong>{t('faq.audience.question')}</strong>{' '}
-              {t('faq.audience.answer')}
-            </li>
-            <li>
-              <strong>{t('faq.gettingStarted.question')}</strong>{' '}
-              {t('faq.gettingStarted.answer')}
-            </li>
-          </ul>
-        </section>
-      </FadeIn>
+      {/* FAQ Section */}
+      <FAQ namespace="pricing" className="mt-16 max-w-4xl mx-auto" />
     </div>
   );
 };

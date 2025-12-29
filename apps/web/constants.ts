@@ -620,12 +620,7 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       key: PlanName.SPLASH,
       price: '£7.99',
       credits: `${PLAN_CREDITS[PlanName.SPLASH][BillingPeriod.MONTHLY]} credits/month`,
-      featureKeys: [
-        'textPrompts',
-        'wordsNumbers',
-        'adjustments',
-        'photoToColoring',
-      ],
+      featureKeys: ['credits250', 'allFeatures', 'noRollover'],
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY as string,
     },
@@ -634,10 +629,10 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       price: '£13.99',
       credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.MONTHLY]} credits/month`,
       featureKeys: [
-        'allSplashFeatures',
-        'advancedEditing',
-        'earlyAccess',
+        'credits500',
+        'allFeatures',
         'rollover1Month',
+        'prioritySupport',
       ],
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY as string,
@@ -648,10 +643,10 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       price: '£24.99',
       credits: `${PLAN_CREDITS[PlanName.SPARKLE][BillingPeriod.MONTHLY]} credits/month`,
       featureKeys: [
-        'allRainbowFeatures',
-        'bulkGeneration',
-        'commercialUse',
+        'credits1000',
+        'allFeatures',
         'rollover2Months',
+        'commercialUse',
       ],
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY as string,
@@ -662,12 +657,7 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       key: PlanName.SPLASH,
       price: '£79.99',
       credits: `${PLAN_CREDITS[PlanName.SPLASH][BillingPeriod.ANNUAL]} credits/month`,
-      featureKeys: [
-        'textPrompts',
-        'wordsNumbers',
-        'adjustments',
-        'photoToColoring',
-      ],
+      featureKeys: ['credits250', 'allFeatures', 'noRollover'],
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL as string,
     },
@@ -676,10 +666,10 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       price: '£139.99',
       credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.ANNUAL]} credits/month`,
       featureKeys: [
-        'allSplashFeatures',
-        'advancedEditing',
-        'earlyAccess',
+        'credits500',
+        'allFeatures',
         'rollover1Month',
+        'prioritySupport',
       ],
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL as string,
@@ -690,10 +680,10 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
       price: '£249.99',
       credits: `${PLAN_CREDITS[PlanName.SPARKLE][BillingPeriod.ANNUAL]} credits/month`,
       featureKeys: [
-        'allRainbowFeatures',
-        'bulkGeneration',
-        'commercialUse',
+        'credits1000',
+        'allFeatures',
         'rollover2Months',
+        'commercialUse',
       ],
       stripePriceEnv: process.env
         .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL as string,

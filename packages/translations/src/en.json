@@ -484,45 +484,51 @@
   },
   "pricing": {
     "pageTitle": "Pricing - Chunky Crayon",
-    "heroTitle": "Plans for every coloring adventure!",
-    "heroSubtitle": "Whether you're a parent, a young artist, or a grown-up who loves to color, there's a Chunky Crayon plan for you. No account needed to get started!",
+    "heroTitle": "More than just coloring pages",
+    "heroSubtitle": "Create, color online, collect stickers, and share with friends. Pick a plan that fits your family.",
     "monthly": "Monthly",
-    "annual": "Annual (save 15%)",
+    "annual": "Annual (save 17%)",
     "mostPopular": "Most Popular",
     "buyNow": "Buy Now",
     "noCommitment": "No commitment. Cancel anytime.",
     "perMonth": "/mo",
     "creditsPerMonth": "credits/month",
+    "included": {
+      "title": "Every plan includes",
+      "aiCreation": "AI-powered coloring page creation",
+      "colorOnline": "Color online or download to print",
+      "saveFavorites": "Save favorites to your account",
+      "shareCreations": "Share creations with friends",
+      "collectStickers": "Collect stickers & earn rewards",
+      "mobileApps": "iOS & Android apps"
+    },
     "plans": {
       "splash": {
-        "name": "Splash Plan",
-        "tagline": "Start your coloring adventure",
-        "audience": "Perfect for casual colorers and young artists"
+        "name": "Splash",
+        "tagline": "Great for occasional creators",
+        "audience": "Try the full platform at our entry price"
       },
       "rainbow": {
-        "name": "Rainbow Plan",
-        "tagline": "Fun for the whole family",
-        "audience": "Great for creative families and siblings"
+        "name": "Rainbow",
+        "tagline": "Perfect for creative families",
+        "audience": "Our most popular plan for regular use"
       },
       "sparkle": {
-        "name": "Sparkle Plan",
-        "tagline": "For color enthusiasts",
-        "audience": "Perfect for creative families who love to color"
+        "name": "Sparkle",
+        "tagline": "For serious creators",
+        "audience": "Best value for heavy users and small businesses"
       }
     },
     "features": {
-      "textPrompts": "Create coloring pages from text prompts",
-      "wordsNumbers": "Create coloring pages with words, names, and numbers",
-      "adjustments": "Adjust color, contrast, and brightness",
-      "photoToColoring": "Turn photos into coloring pages",
-      "allSplashFeatures": "All Splash Plan features",
-      "advancedEditing": "Advanced editing features",
-      "earlyAccess": "Early access to new models and features",
-      "rollover1Month": "Credits roll over (up to 1 month)",
-      "allRainbowFeatures": "All Rainbow Plan features",
-      "bulkGeneration": "Bulk generation",
-      "commercialUse": "Commercial use",
-      "rollover2Months": "Credits roll over (up to 2 months)"
+      "credits250": "250 credits/month (~50 pages)",
+      "credits500": "500 credits/month (~100 pages)",
+      "credits1000": "1,000 credits/month (~200 pages)",
+      "allFeatures": "All platform features",
+      "noRollover": "Credits reset monthly",
+      "rollover1Month": "Unused credits roll over (1 month)",
+      "rollover2Months": "Extended rollover (2 months)",
+      "prioritySupport": "Priority support",
+      "commercialUse": "Commercial use license"
     },
     "creditPacks": {
       "title": "Need extra credits?",
@@ -532,13 +538,18 @@
     },
     "faq": {
       "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about our plans",
       "cancelAnytime": {
         "question": "Can I cancel anytime?",
-        "answer": "Yes! You can cancel your subscription at any time, no questions asked."
+        "answer": "Yes! Cancel your subscription anytime, no questions asked."
       },
       "rollover": {
         "question": "Do credits roll over?",
-        "answer": "Some plans allow you to roll over unused credits. See plan details for more info."
+        "answer": "Splash credits reset each month. Rainbow rolls over up to 1 month. Sparkle gives you 2 months of rollover."
+      },
+      "creditsPerPage": {
+        "question": "How many pages can I make?",
+        "answer": "Each page costs about 5 credits. Splash = ~50 pages/month, Rainbow = ~100, Sparkle = ~200."
       },
       "audience": {
         "question": "Is this for kids or adults?",
@@ -546,7 +557,7 @@
       },
       "gettingStarted": {
         "question": "How do I get started?",
-        "answer": "Just pick a plan and start creating coloring pages instantly!"
+        "answer": "Pick a plan and start creating coloring pages instantly!"
       }
     }
   },

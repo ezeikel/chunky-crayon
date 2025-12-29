@@ -1,8 +1,6 @@
 # Chunky Crayon Analytics Enhancement Plan
 
-> Created: December 2024
-> Updated: December 2025
-> Status: ✅ Phase 1 Complete
+> Created: December 2024 Updated: December 2025 Status: ✅ Phase 1 Complete
 
 ## Table of Contents
 
@@ -30,7 +28,8 @@
 ### Current Tracking Utilities
 
 - **Client-side**: `useAnalytics()` hook in `utils/analytics-client.ts`
-- **Server-side**: `track()` and `trackWithUser()` in `utils/analytics-server.ts`
+- **Server-side**: `track()` and `trackWithUser()` in
+  `utils/analytics-server.ts`
 - **Pixel utilities**: `utils/pixels.ts` with unified tracking functions
 - **User identification**: `UserIdentify.tsx` component
 
@@ -123,7 +122,8 @@
    - Average time from first visit to conversion?
 
 2. **Attribution**
-   - Which channel drives highest-converting traffic? (Facebook vs Pinterest vs Organic)
+   - Which channel drives highest-converting traffic? (Facebook vs Pinterest vs
+     Organic)
    - What's our CAC per channel?
    - Which campaigns perform best?
 
@@ -260,7 +260,8 @@
 
 #### 3.1 Creation Flow Enhancement
 
-**File**: `apps/web/components/CreateColoringPageForm/CreateColoringPageForm.tsx`
+**File**:
+`apps/web/components/CreateColoringPageForm/CreateColoringPageForm.tsx`
 
 ```typescript
 // Add these events:
@@ -387,13 +388,15 @@ Based on existing dashboards, these are the **gaps** that need new dashboards:
 
 ## Implementation Checklist
 
-> **Note**: 8 dashboards and 53 insights already exist in PostHog. This checklist focuses on **true gaps**.
+> **Note**: 8 dashboards and 53 insights already exist in PostHog. This
+> checklist focuses on **true gaps**.
 
 ### Phase 1: Revenue & Subscription Events (High Priority) ✅ COMPLETE
 
 **Goal**: Add Stripe webhook tracking to enhance existing Revenue dashboard
 
-- [x] Add Stripe webhook event tracking (`apps/web/app/api/payment/webhook/route.ts`)
+- [x] Add Stripe webhook event tracking
+      (`apps/web/app/api/payment/webhook/route.ts`)
   - [x] `SUBSCRIPTION_STARTED` - track new subscriptions
   - [x] `SUBSCRIPTION_RENEWED` - track renewals
   - [x] `SUBSCRIPTION_CHANGED` - track upgrades/downgrades
@@ -404,7 +407,8 @@ Based on existing dashboards, these are the **gaps** that need new dashboards:
   - [x] `PRICING_INTERVAL_TOGGLED` - monthly ↔ annual toggle
   - [x] `PRICING_PLAN_CLICKED` - which plan clicked
 - [x] Add `GUEST_SIGNUP_CLICKED` to signup CTAs
-- [x] **LLM Analytics**: Integrated via `@posthog/ai` with `withTracing()` for automatic observability
+- [x] **LLM Analytics**: Integrated via `@posthog/ai` with `withTracing()` for
+      automatic observability
 
 ### Phase 2: New Feature Tracking (High Priority)
 
@@ -446,9 +450,12 @@ Based on existing dashboards, these are the **gaps** that need new dashboards:
 
 **Goal**: Multi-language performance tracking
 
-- [x] Add `locale` as PostHog user property ✅ **Set on initial load (UserIdentify) and updated on switch (LanguageSwitcher)**
-- [x] `LANGUAGE_CHANGED` - track language switches ✅ **Implemented in LanguageSwitcher component**
-- [x] **Dashboard**: Enhanced existing "Internationalization (i18n) Analytics" dashboard ✅ **Dashboard ID: 471232**
+- [x] Add `locale` as PostHog user property ✅ **Set on initial load
+      (UserIdentify) and updated on switch (LanguageSwitcher)**
+- [x] `LANGUAGE_CHANGED` - track language switches ✅ **Implemented in
+      LanguageSwitcher component**
+- [x] **Dashboard**: Enhanced existing "Internationalization (i18n) Analytics"
+      dashboard ✅ **Dashboard ID: 471232**
   - Top Countries by Usage (world map - existing)
   - Locale Usage Over Time (trend - existing)
   - Creations by Locale (bar chart - existing)
@@ -490,7 +497,7 @@ interface BaseEventProperties {
   utm_campaign?: string;
 
   // Device
-  device: "mobile" | "tablet" | "desktop";
+  device: 'mobile' | 'tablet' | 'desktop';
   browser?: string;
 
   // Page context
@@ -548,9 +555,12 @@ interface BaseEventProperties {
 
 ### 🆕 New Dashboards Needed
 
-1. ~~**Feature Usage** - Profile/tool switching, brush/color usage, stickers~~ ✅ **EXISTS (Dashboard ID: 471230)**
-2. ~~**Content Discovery** - Gallery, blog, categories, search~~ ✅ **EXISTS (Dashboard ID: 471231)**
-3. ~~**Internationalization** - Language distribution, conversion by locale~~ ✅ **ENHANCED (Dashboard ID: 471232)**
+1. ~~**Feature Usage** - Profile/tool switching, brush/color usage, stickers~~
+   ✅ **EXISTS (Dashboard ID: 471230)**
+2. ~~**Content Discovery** - Gallery, blog, categories, search~~ ✅ **EXISTS
+   (Dashboard ID: 471231)**
+3. ~~**Internationalization** - Language distribution, conversion by locale~~ ✅
+   **ENHANCED (Dashboard ID: 471232)**
 
 ### 🔧 Dashboards to Enhance
 
@@ -561,8 +571,10 @@ interface BaseEventProperties {
 
 ## Next Steps
 
-1. ~~**Start with Phase 1** - Revenue events have highest business impact~~ ✅ **COMPLETE**
-2. **Continue with Phase 2** - Feature tracking (profiles, stickers, gallery, blog)
+1. ~~**Start with Phase 1** - Revenue events have highest business impact~~ ✅
+   **COMPLETE**
+2. **Continue with Phase 2** - Feature tracking (profiles, stickers, gallery,
+   blog)
 3. **Create new dashboards** as events are added
 4. **Add locale to all events** for internationalization insights
 5. Consider PostHog feature flags for future A/B testing
@@ -580,7 +592,8 @@ interface BaseEventProperties {
 - ✅ Integrated LLM analytics via `@posthog/ai` with automatic tracing
 - ✅ Added `LANGUAGE_CHANGED` event tracking in LanguageSwitcher component
 - ✅ Added `locale` as PostHog user property (set on load, updated on switch)
-- ✅ **Completed Phase 4: Internationalization** - Enhanced existing dashboard (ID: 471232) with 4 new insights:
+- ✅ **Completed Phase 4: Internationalization** - Enhanced existing dashboard
+  (ID: 471232) with 4 new insights:
   - Users by Language insight (pie chart)
   - Language Switches Over Time insight (trend)
   - Language Switch Destinations insight (toLocale breakdown)
