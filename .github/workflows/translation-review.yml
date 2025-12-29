@@ -15,6 +15,10 @@ on:
 jobs:
   review:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     strategy:
       matrix:
         locale: [ja, ko, de, fr, es]
