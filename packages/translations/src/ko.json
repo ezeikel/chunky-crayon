@@ -103,7 +103,7 @@
     "brand": "Chunky Crayon",
     "tagline": "꿈꾸고. 만들고. 색칠해요.",
     "aboutText": "상상이 살아나는 곳! 반짝이는 아이디어를 마법 같은 색칠놀이로 바꿔요.",
-    "madeBy": "사랑을 담아, 사우스 런던의 부모들이 만들었어요",
+    "madeBy": "<location>South London</location>에서 <heart>♡</heart>를 담아 만들었어요",
     "copyright": "© {year} Chunky Crayon. All rights reserved.",
     "sections": {
       "about": "소개",

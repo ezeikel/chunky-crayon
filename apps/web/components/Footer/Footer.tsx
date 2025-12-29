@@ -27,7 +27,10 @@ const Footer = async ({ className }: FooterProps) => {
 
   return (
     <footer
-      className={cn('bg-[#2f2f2f] text-white pt-12 pb-6 px-4 mt-auto', className)}
+      className={cn(
+        'bg-[#2f2f2f] text-white pt-12 pb-6 px-4 mt-auto',
+        className,
+      )}
     >
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-0">
         <div className="flex-1 min-w-[220px] flex flex-col gap-8">
@@ -70,7 +73,9 @@ const Footer = async ({ className }: FooterProps) => {
             </ul>
           </div>
           <div className="mt-6">
-            <h3 className="font-bold text-lg mb-2">{t('sections.getTheApp')}</h3>
+            <h3 className="font-bold text-lg mb-2">
+              {t('sections.getTheApp')}
+            </h3>
             <AppStoreButtons location="footer" />
           </div>
         </div>
@@ -90,7 +95,10 @@ const Footer = async ({ className }: FooterProps) => {
         <div className="flex flex-col md:flex-row items-center gap-4">
           <span>{t('copyright', { year })}</span>
           <div className="flex gap-4">
-            <Link href="/privacy" className="hover:text-white transition-colors">
+            <Link
+              href="/privacy"
+              className="hover:text-white transition-colors"
+            >
               {t('links.privacyPolicy')}
             </Link>
             <Link href="/terms" className="hover:text-white transition-colors">
@@ -108,7 +116,16 @@ const Footer = async ({ className }: FooterProps) => {
             className="opacity-80 hover:opacity-100 transition-opacity"
           />
           <span>
-            {t('madeBy')}
+            {t.rich('madeBy', {
+              heart: (chunks) => (
+                <span className="text-[#FF8A65] font-bold text-lg">
+                  {chunks}
+                </span>
+              ),
+              location: (chunks) => (
+                <span className="text-white font-bold">{chunks}</span>
+              ),
+            })}
           </span>
         </div>
       </div>
