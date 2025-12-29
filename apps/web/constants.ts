@@ -1071,13 +1071,13 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'faq-8',
     question: "What's included in the subscription plans?",
     answer:
-      'Our plans range from Crayon (perfect for casual coloring) to Studio (for super-creative families or teachers). All plans include: unlimited coloring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights.',
+      'Our plans range from Splash (perfect for casual coloring) to Sparkle (for super-creative families). All plans include: unlimited coloring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights.',
   },
   {
     id: 'faq-9',
     question: 'Can I use pages for my classroom or nursery?',
     answer:
-      "Yes! Teachers and childminders love Chunky Crayon. Our Crayon and Rainbow plans are perfect for personal and educational use. If you're running a business or want to distribute pages commercially, check out our Masterpiece or Studio plans which include commercial licensing.",
+      "Yes! Our Splash and Rainbow plans work great for personal and home-school use. For nurseries, classrooms, and schools, we're launching Chunky Crayon for Education - a dedicated platform with special features for educators. In the meantime, Sparkle includes commercial licensing for personal business use like party supplies or craft fairs.",
   },
   {
     id: 'faq-10',
