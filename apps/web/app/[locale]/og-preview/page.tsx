@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   robots: 'noindex, nofollow',
 };
 
+// Force dynamic rendering - this is a dev/debug page
+export const dynamic = 'force-dynamic';
+
 // Get sample data for preview
 async function getSampleData() {
   // Get a sample coloring image
