@@ -48,6 +48,7 @@
     "review:locale": "tsx scripts/review-translations.ts --locale"
   },
   "devDependencies": {
+    "tsx": "^4.20.4",
     "typescript": "^5.4.5"
   },
   "dependencies": {
