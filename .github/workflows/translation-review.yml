@@ -50,7 +50,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.check-locale.outputs.skip != 'true'
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Run translation review for ${{ matrix.locale }}
         if: steps.check-locale.outputs.skip != 'true'
