@@ -123,6 +123,13 @@ jobs:
             await exec.exec('git', ['config', 'user.name', 'github-actions[bot]']);
             await exec.exec('git', ['config', 'user.email', 'github-actions[bot]@users.noreply.github.com']);
 
+            // Delete remote branch if it exists (ignore errors if it doesn't)
+            try {
+              await exec.exec('git', ['push', 'origin', '--delete', branchName]);
+            } catch (e) {
+              console.log(`Branch ${branchName} does not exist remotely, continuing...`);
+            }
+
             // Create branch and commit
             await exec.exec('git', ['checkout', '-b', branchName]);
             await exec.exec('git', ['add', `packages/translations/src/${locale}.json`]);
