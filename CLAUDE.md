@@ -27,6 +27,11 @@ This project uses Neon PostgreSQL with branch-based development:
 - `apps/web` - Next.js 16 web application
 - `apps/mobile` - React Native mobile app
 - `packages/db` - Prisma database client
+- `packages/translations` - i18n translations (next-intl)
+
+## Translations
+
+Only edit `packages/translations/src/en.json`. A GitHub Action automatically populates all other languages in CI.
 
 ## Key Features
 
