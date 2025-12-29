@@ -10,7 +10,7 @@ import {
   generateObject,
   getTracedModels,
   CLEAN_UP_DESCRIPTION_SYSTEM,
-  IMAGE_METADATA_SYSTEM,
+  createImageMetadataSystemPrompt,
   IMAGE_METADATA_PROMPT,
   imageMetadataSchema,
   analyzeImageForAnalytics,
@@ -30,6 +30,22 @@ import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
+
+/**
+ * Locale to language mapping for image metadata generation.
+ * Maps locale codes to language names for the AI prompt.
+ */
+const LOCALE_LANGUAGE_MAP: Record<
+  string,
+  { name: string; nativeName: string }
+> = {
+  en: { name: 'English', nativeName: 'English' },
+  ja: { name: 'Japanese', nativeName: '日本語' },
+  ko: { name: 'Korean', nativeName: '한국어' },
+  de: { name: 'German', nativeName: 'Deutsch' },
+  fr: { name: 'French', nativeName: 'Français' },
+  es: { name: 'Spanish', nativeName: 'Español' },
+};
 
 /**
  * Generate coloring image with provider abstraction and tracking
@@ -120,7 +136,11 @@ const generateColoringImageWithMetadata = async (
   description: string,
   userId?: string,
   generationType?: GenerationType,
+  locale: string = 'en',
 ) => {
+  // Get language info for the locale (default to English if unknown)
+  const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
+
   // Get active profile early to use its difficulty setting for generation
   const activeProfile = await getActiveProfile();
   const difficulty = activeProfile?.difficulty;
@@ -160,11 +180,14 @@ const generateColoringImageWithMetadata = async (
   // Step 3: Run metadata, SVG trace, and WebP conversion in PARALLEL
   // This saves ~2-3 seconds compared to sequential execution
   const [metadataResult, svg, webpBuffer] = await Promise.all([
-    // A) Generate metadata using faster model (GPT-4o-mini)
+    // A) Generate metadata using faster model (GPT-4o-mini), with language support
     generateObject({
       model: tracedModels.textFast,
       schema: imageMetadataSchema,
-      system: IMAGE_METADATA_SYSTEM,
+      system: createImageMetadataSystemPrompt(
+        languageInfo.name,
+        languageInfo.nativeName,
+      ),
       messages: [
         {
           role: 'user',
@@ -267,6 +290,7 @@ export const createColoringImage = async (
     description: (formData.get('description') as string) || '',
     generationType:
       (formData.get('generationType') as GenerationType) || undefined,
+    locale: (formData.get('locale') as string) || 'en',
   };
 
   const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
@@ -308,6 +332,7 @@ export const createColoringImage = async (
           rawFormData.description,
           userId,
           rawFormData.generationType,
+          rawFormData.locale,
         );
       },
       {
@@ -354,6 +379,7 @@ export const createColoringImage = async (
     rawFormData.description,
     undefined,
     rawFormData.generationType,
+    rawFormData.locale,
   );
 
   after(async () => {
