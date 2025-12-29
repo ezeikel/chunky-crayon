@@ -1415,5 +1415,33 @@
     "selectLanguage": "Select language",
     "language": "Language",
     "switchTo": "Switch to"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "Creative Coloring & Learning Fun",
+      "features": {
+        "pages": "10,000+ Pages",
+        "aiGenerated": "AI-Generated",
+        "freePrintables": "Free Printables"
+      }
+    },
+    "coloringImage": {
+      "notFound": "Coloring Page Not Found"
+    },
+    "blogPost": {
+      "notFound": "Blog Post Not Found",
+      "minRead": "{minutes} min read",
+      "blog": "Blog"
+    },
+    "sharedArtwork": {
+      "notFound": "Artwork Not Found",
+      "createdBy": "Created by"
+    },
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    }
   }
 }

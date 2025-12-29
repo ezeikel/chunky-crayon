@@ -10,6 +10,14 @@ export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
+  // Skip i18n for OG image routes - they should be served directly
+  if (
+    pathname.includes('opengraph-image') ||
+    pathname.includes('twitter-image')
+  ) {
+    return NextResponse.next();
+  }
+
   // Handle PostHog ingest routes first
   if (pathname.startsWith('/ingest')) {
     // Determine the correct PostHog host based on path
@@ -44,8 +52,5 @@ export const config = {
   // - Next.js internals
   // - Static files
   // - PostHog ingest (handled separately above)
-  matcher: [
-    '/((?!api|_next|_vercel|.*\\..*).*)',
-    '/ingest/:path*',
-  ],
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)', '/ingest/:path*'],
 };
