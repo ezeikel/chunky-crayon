@@ -132,7 +132,13 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       setZoom,
       setPanOffset,
     } = useColoringContext();
-    const { playSound, initSounds } = useSound();
+    const {
+      playSound,
+      initSounds,
+      startBrushLoop,
+      stopBrushLoop,
+      isBrushLoopActive,
+    } = useSound();
 
     const [ratio, setRatio] = useState<number>(1);
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
@@ -152,6 +158,51 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     // Pan tool state
     const isPanningRef = useRef(false);
     const lastPanPosRef = useRef<{ x: number; y: number } | null>(null);
+
+    // Brush sound debounce - stop sound after no movement for 150ms
+    const brushSoundTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Cleanup: ensure brush sound stops when isDrawing becomes false or component unmounts
+    useEffect(() => {
+      if (!isDrawing) {
+        // Clear any pending debounce timer
+        if (brushSoundTimeoutRef.current) {
+          clearTimeout(brushSoundTimeoutRef.current);
+          brushSoundTimeoutRef.current = null;
+        }
+        // Ensure brush loop is stopped
+        stopBrushLoop();
+      }
+    }, [isDrawing, stopBrushLoop]);
+
+    // Global pointer up handler to catch cases where pointer leaves canvas
+    // IMPORTANT: This must NOT depend on isDrawing to avoid stale closure issues
+    // Always unconditionally stop the brush loop - it's safe to call when not active
+    useEffect(() => {
+      const handleGlobalPointerUp = () => {
+        console.log('[ImageCanvas] Global pointer up - stopping brush loop');
+        if (brushSoundTimeoutRef.current) {
+          clearTimeout(brushSoundTimeoutRef.current);
+          brushSoundTimeoutRef.current = null;
+        }
+        stopBrushLoop();
+      };
+
+      window.addEventListener('mouseup', handleGlobalPointerUp);
+      window.addEventListener('touchend', handleGlobalPointerUp);
+      window.addEventListener('touchcancel', handleGlobalPointerUp);
+      // Also handle pointer events for better cross-browser support
+      window.addEventListener('pointerup', handleGlobalPointerUp);
+      window.addEventListener('pointercancel', handleGlobalPointerUp);
+
+      return () => {
+        window.removeEventListener('mouseup', handleGlobalPointerUp);
+        window.removeEventListener('touchend', handleGlobalPointerUp);
+        window.removeEventListener('touchcancel', handleGlobalPointerUp);
+        window.removeEventListener('pointerup', handleGlobalPointerUp);
+        window.removeEventListener('pointercancel', handleGlobalPointerUp);
+      };
+    }, [stopBrushLoop]);
 
     // Generate cursor based on active tool and brush type
     const toolCursor = useMemo(() => {
@@ -1137,7 +1188,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         setIsDrawing(true);
         lastPosRef.current = null;
         colorAtPosition(event.clientX, event.clientY);
-        playSound('draw');
+        // Sound will start on first move
         return;
       }
 
@@ -1154,10 +1205,15 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       setIsDrawing(true);
       lastPosRef.current = null;
       colorAtPosition(event.clientX, event.clientY);
-      playSound('draw');
+      // Sound will start on first move
     };
 
     const handleMouseUp = () => {
+      console.log('[ImageCanvas] handleMouseUp', {
+        isDrawing,
+        isPanning: isPanningRef.current,
+      });
+
       // Reset pan state
       if (isPanningRef.current) {
         isPanningRef.current = false;
@@ -1165,9 +1221,18 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         return;
       }
 
+      // Always try to stop brush sound on mouse up, even if not drawing
+      // This handles edge cases where isDrawing state might be stale
+      if (brushSoundTimeoutRef.current) {
+        clearTimeout(brushSoundTimeoutRef.current);
+        brushSoundTimeoutRef.current = null;
+      }
+      stopBrushLoop();
+
       if (!isDrawing) return;
       setIsDrawing(false);
       lastPosRef.current = null;
+
       trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
         coloringImageId: coloringImage.id,
         color: selectedColor,
@@ -1197,6 +1262,21 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       ) {
         return;
       }
+
+      // Start brush sound on move (not on mousedown)
+      const soundType =
+        activeTool === 'magic-reveal' ? 'magic-reveal' : brushType;
+      if (!isBrushLoopActive()) {
+        startBrushLoop(soundType);
+      }
+
+      // Reset debounce timer - stop sound after 150ms of no movement
+      if (brushSoundTimeoutRef.current) {
+        clearTimeout(brushSoundTimeoutRef.current);
+      }
+      brushSoundTimeoutRef.current = setTimeout(() => {
+        stopBrushLoop();
+      }, 150);
 
       colorAtPosition(event.clientX, event.clientY);
     };
@@ -1257,7 +1337,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           setIsDrawing(true);
           lastPosRef.current = null;
           colorAtPosition(touch.clientX, touch.clientY);
-          playSound('draw');
+          // Sound will start on first move
           return;
         }
 
@@ -1274,7 +1354,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         setIsDrawing(true);
         lastPosRef.current = null;
         colorAtPosition(touch.clientX, touch.clientY);
-        playSound('draw');
+        // Sound will start on first move
       }
     };
 
@@ -1338,12 +1418,31 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         return;
       }
 
+      // Start brush sound on move (not on touchstart)
+      const soundType =
+        activeTool === 'magic-reveal' ? 'magic-reveal' : brushType;
+      if (!isBrushLoopActive()) {
+        startBrushLoop(soundType);
+      }
+
+      // Reset debounce timer - stop sound after 150ms of no movement
+      if (brushSoundTimeoutRef.current) {
+        clearTimeout(brushSoundTimeoutRef.current);
+      }
+      brushSoundTimeoutRef.current = setTimeout(() => {
+        stopBrushLoop();
+      }, 150);
+
       const touch = event.touches[0];
       colorAtPosition(touch.clientX, touch.clientY);
     };
 
     const handleTouchEnd = (event: React.TouchEvent<HTMLCanvasElement>) => {
       event.preventDefault();
+      console.log('[ImageCanvas] handleTouchEnd', {
+        isDrawing,
+        touchCount: event.touches.length,
+      });
 
       // Reset pinch state when all fingers are lifted or down to one finger
       if (event.touches.length < 2) {
@@ -1358,9 +1457,18 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         lastPanPosRef.current = null;
       }
 
+      // Always try to stop brush sound on touch end, even if not drawing
+      // This handles edge cases where isDrawing state might be stale
+      if (brushSoundTimeoutRef.current) {
+        clearTimeout(brushSoundTimeoutRef.current);
+        brushSoundTimeoutRef.current = null;
+      }
+      stopBrushLoop();
+
       if (!isDrawing) return;
       setIsDrawing(false);
       lastPosRef.current = null;
+
       trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
         coloringImageId: coloringImage.id,
         color: selectedColor,

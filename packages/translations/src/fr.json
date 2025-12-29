@@ -1055,7 +1055,19 @@
     },
     "languagePreference": {
       "title": "Langue",
-      "description": "Choisissez la langue de l’app"
+      "description": "Choisissez la langue de l'app"
+    },
+    "audio": {
+      "title": "Audio",
+      "description": "Gérez les effets sonores et la musique de fond",
+      "sfx": {
+        "label": "Effets Sonores",
+        "description": "Bruits de pinceaux, de tapotements et autres sons de coloriage"
+      },
+      "ambient": {
+        "label": "Musique de Fond",
+        "description": "Sons d'ambiance relaxants pendant le coloriage"
+      }
     }
   },
   "email": {

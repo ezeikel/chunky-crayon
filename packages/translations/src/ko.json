@@ -1056,6 +1056,18 @@
     "languagePreference": {
       "title": "언어",
       "description": "앱에서 사용할 언어를 선택해요"
+    },
+    "audio": {
+      "title": "오디오",
+      "description": "효과음과 배경음악을 설정해요",
+      "sfx": {
+        "label": "효과음",
+        "description": "붓질, 탭 등 색칠하는 소리"
+      },
+      "ambient": {
+        "label": "배경음악",
+        "description": "색칠하는 동안 편안한 음악"
+      }
     }
   },
   "email": {

@@ -1079,6 +1079,18 @@
     "languagePreference": {
       "title": "Language",
       "description": "Choose your preferred language for the app"
+    },
+    "audio": {
+      "title": "Audio",
+      "description": "Control sound effects and background music",
+      "sfx": {
+        "label": "Sound Effects",
+        "description": "Brush strokes, taps, and other coloring sounds"
+      },
+      "ambient": {
+        "label": "Background Music",
+        "description": "Relaxing ambient sounds while coloring"
+      }
     }
   },
   "email": {

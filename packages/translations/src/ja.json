@@ -1056,6 +1056,18 @@
     "languagePreference": {
       "title": "言語",
       "description": "アプリで使う言語を選びます"
+    },
+    "audio": {
+      "title": "オーディオ",
+      "description": "効果音とBGMを設定します",
+      "sfx": {
+        "label": "効果音",
+        "description": "筆やタップなど、ぬりえの音"
+      },
+      "ambient": {
+        "label": "BGM",
+        "description": "ぬりえ中のリラックスした音楽"
+      }
     }
   },
   "email": {

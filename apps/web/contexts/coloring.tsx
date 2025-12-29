@@ -8,6 +8,7 @@ import {
   useState,
   useCallback,
   useMemo,
+  useEffect,
 } from 'react';
 import type {
   BrushSize,
@@ -76,6 +77,10 @@ type ColoringContextArgs = {
   // Audio state
   isMuted: boolean;
   setIsMuted: Dispatch<SetStateAction<boolean>>;
+  isSfxMuted: boolean;
+  setIsSfxMuted: Dispatch<SetStateAction<boolean>>;
+  isAmbientMuted: boolean;
+  setIsAmbientMuted: Dispatch<SetStateAction<boolean>>;
 
   // Progress state
   hasUnsavedChanges: boolean;
@@ -118,6 +123,10 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   clearHistory: () => {},
   isMuted: false,
   setIsMuted: () => {},
+  isSfxMuted: false,
+  setIsSfxMuted: () => {},
+  isAmbientMuted: false,
+  setIsAmbientMuted: () => {},
   hasUnsavedChanges: false,
   setHasUnsavedChanges: () => {},
 });
@@ -149,8 +158,38 @@ export const ColoringContextProvider = ({
   const [undoStack, setUndoStack] = useState<CanvasAction[]>([]);
   const [redoStack, setRedoStack] = useState<CanvasAction[]>([]);
 
-  // Audio state
-  const [isMuted, setIsMuted] = useState(false);
+  // Audio state - initialize from localStorage
+  const [isMuted, setIsMuted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('chunky-crayon-muted') === 'true';
+    }
+    return false;
+  });
+  const [isSfxMuted, setIsSfxMuted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('chunky-crayon-sfx-muted') === 'true';
+    }
+    return false;
+  });
+  const [isAmbientMuted, setIsAmbientMuted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('chunky-crayon-ambient-muted') === 'true';
+    }
+    return false;
+  });
+
+  // Persist audio settings to localStorage
+  useEffect(() => {
+    localStorage.setItem('chunky-crayon-muted', String(isMuted));
+  }, [isMuted]);
+
+  useEffect(() => {
+    localStorage.setItem('chunky-crayon-sfx-muted', String(isSfxMuted));
+  }, [isSfxMuted]);
+
+  useEffect(() => {
+    localStorage.setItem('chunky-crayon-ambient-muted', String(isAmbientMuted));
+  }, [isAmbientMuted]);
 
   // Progress state
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -246,6 +285,10 @@ export const ColoringContextProvider = ({
       clearHistory,
       isMuted,
       setIsMuted,
+      isSfxMuted,
+      setIsSfxMuted,
+      isAmbientMuted,
+      setIsAmbientMuted,
       hasUnsavedChanges,
       setHasUnsavedChanges,
     }),
@@ -270,6 +313,8 @@ export const ColoringContextProvider = ({
       redo,
       clearHistory,
       isMuted,
+      isSfxMuted,
+      isAmbientMuted,
       hasUnsavedChanges,
     ],
   );

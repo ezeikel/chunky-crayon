@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useRef } from 'react';
-import { getSoundManager, SoundType } from '@/lib/audio';
+import { getSoundManager, SoundType, BrushSoundType } from '@/lib/audio';
 import { useColoringContext } from '@/contexts/coloring';
 
 /**
@@ -23,15 +23,36 @@ import { useColoringContext } from '@/contexts/coloring';
  * stopAmbient(); // Fades out
  */
 export const useSound = () => {
-  const { isMuted, setIsMuted } = useColoringContext();
+  const {
+    isMuted,
+    setIsMuted,
+    isSfxMuted,
+    setIsSfxMuted,
+    isAmbientMuted,
+    setIsAmbientMuted,
+  } = useColoringContext();
   const isInitializedRef = useRef(false);
 
-  // Sync mute state with sound manager
+  // Sync master mute state with sound manager
   useEffect(() => {
-    console.log('[useSound] Syncing mute state:', { isMuted });
+    console.log('[useSound] Syncing master mute state:', { isMuted });
     const soundManager = getSoundManager();
     soundManager.setMuted(isMuted);
   }, [isMuted]);
+
+  // Sync SFX mute state with sound manager
+  useEffect(() => {
+    console.log('[useSound] Syncing SFX mute state:', { isSfxMuted });
+    const soundManager = getSoundManager();
+    soundManager.setSfxMuted(isSfxMuted);
+  }, [isSfxMuted]);
+
+  // Sync ambient mute state with sound manager
+  useEffect(() => {
+    console.log('[useSound] Syncing ambient mute state:', { isAmbientMuted });
+    const soundManager = getSoundManager();
+    soundManager.setAmbientMuted(isAmbientMuted);
+  }, [isAmbientMuted]);
 
   // Initialize sound manager on first call
   const initSounds = useCallback(async () => {
@@ -64,10 +85,38 @@ export const useSound = () => {
     soundManager.stopAll();
   }, []);
 
-  // Toggle mute
+  // Start continuous brush sound (loops while drawing)
+  const startBrushLoop = useCallback((brushType: BrushSoundType) => {
+    const soundManager = getSoundManager();
+    soundManager.startBrushLoop(brushType);
+  }, []);
+
+  // Stop brush sound with fade out
+  const stopBrushLoop = useCallback(() => {
+    const soundManager = getSoundManager();
+    soundManager.stopBrushLoop();
+  }, []);
+
+  // Check if brush loop is active
+  const isBrushLoopActive = useCallback(() => {
+    const soundManager = getSoundManager();
+    return soundManager.isBrushLoopActive();
+  }, []);
+
+  // Toggle master mute
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => !prev);
   }, [setIsMuted]);
+
+  // Toggle SFX mute
+  const toggleSfxMute = useCallback(() => {
+    setIsSfxMuted((prev) => !prev);
+  }, [setIsSfxMuted]);
+
+  // Toggle ambient mute
+  const toggleAmbientMute = useCallback(() => {
+    setIsAmbientMuted((prev) => !prev);
+  }, [setIsAmbientMuted]);
 
   // Load ambient sound from URL
   const loadAmbient = useCallback(async (url: string) => {
@@ -108,9 +157,19 @@ export const useSound = () => {
     stopSound,
     stopAllSounds,
     initSounds,
-    // Mute control
+    // Brush loop (continuous drawing sound)
+    startBrushLoop,
+    stopBrushLoop,
+    isBrushLoopActive,
+    // Master mute control
     isMuted,
     toggleMute,
+    // SFX mute control (brush sounds, UI sounds)
+    isSfxMuted,
+    toggleSfxMute,
+    // Ambient mute control
+    isAmbientMuted,
+    toggleAmbientMute,
     // Ambient sound
     loadAmbient,
     playAmbient,
