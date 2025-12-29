@@ -5,9 +5,6 @@ import { colors, OG_WIDTH, OG_HEIGHT, crayonColors } from '@/lib/og/constants';
 
 export const runtime = 'nodejs';
 
-// Root OG is outside [locale] folder - use English as default
-const t = translations.en.og.homepage;
-
 export const alt = 'Chunky Crayon - Creative Coloring & Learning Fun';
 export const size = {
   width: OG_WIDTH,
@@ -15,7 +12,16 @@ export const size = {
 };
 export const contentType = 'image/png';
 
-export default async function Image() {
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function Image({ params }: Props) {
+  const { locale } = await params;
+  const t = (
+    translations[locale as keyof typeof translations] as typeof translations.en
+  ).og.homepage;
+
   const [tondoBold, rooneySansRegular, rooneySansBold] = await loadOGFonts();
 
   return new ImageResponse(

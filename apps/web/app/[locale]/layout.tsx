@@ -51,14 +51,7 @@ export async function generateMetadata({
         'Chunky Crayon is a vibrant and interactive app designed for kids and parents to generate unique, personalized coloring book pages and fun educational worksheets.',
       url: `https://chunkycrayon.com/${locale}`,
       siteName: 'Chunky Crayon',
-      images: [
-        {
-          url: 'https://chunkycrayon.com/images/og-image.jpg',
-          width: 1200,
-          height: 630,
-          alt: 'Chunky Crayon AI-Generated Coloring Book Pages',
-        },
-      ],
+      // images are auto-generated from opengraph-image.tsx
       locale: locale === 'en' ? 'en_GB' : locale,
       type: 'website',
     },
@@ -67,7 +60,7 @@ export async function generateMetadata({
       title: 'Chunky Crayon - Creative Coloring & Learning Fun',
       description:
         'Chunky Crayon is a vibrant and interactive app designed for kids and parents to generate unique, personalized coloring book pages and fun educational worksheets.',
-      images: ['https://chunkycrayon.com/images/og-image.jpg'],
+      // images are auto-generated from opengraph-image.tsx
     },
     alternates: {
       canonical: `https://chunkycrayon.com/${locale}`,
