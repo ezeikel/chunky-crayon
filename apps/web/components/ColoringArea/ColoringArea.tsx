@@ -67,6 +67,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setHasUnsavedChanges,
       clearHistory,
       activeTool,
+      setActiveTool,
+      setBrushType,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -254,6 +256,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       // Reset magic color map (so it re-generates if magic tool is active)
       resetMagicColorMap();
 
+      // Reset to default crayon brush to prevent magic-auto from re-triggering
+      setActiveTool('brush');
+      setBrushType('crayon');
+
       // Reset unsaved changes flag
       setHasUnsavedChanges(false);
 
@@ -263,6 +269,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       coloringImage.id,
       clearHistory,
       resetMagicColorMap,
+      setActiveTool,
+      setBrushType,
       setHasUnsavedChanges,
       playSound,
     ]);
