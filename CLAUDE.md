@@ -33,6 +33,10 @@ This project uses Neon PostgreSQL with branch-based development:
 
 Only edit `packages/translations/src/en.json`. A GitHub Action automatically populates all other languages in CI.
 
+## Commits
+
+Use semantic commit style (`type(scope): message`). Keep messages as one-liners, succinct but covering work done. Do not attribute Claude in commit messages.
+
 ## Key Features
 
 - Magic Brush/Auto-Color: Uses pre-computed `colorMapJson` for instant color mapping (no AI call at runtime)
