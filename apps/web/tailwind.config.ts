@@ -227,6 +227,11 @@ const config = {
           '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
           '100%': { opacity: '0', transform: 'translateY(-40px) scale(1.5)' },
         },
+        // Slow spin for gradient borders (Vercel-style)
+        'spin-slow': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -246,6 +251,7 @@ const config = {
         squish: 'squish 0.3s ease-out',
         'happy-jump': 'happy-jump 0.6s ease-out',
         'reaction-float': 'reaction-float 0.8s ease-out forwards',
+        'spin-slow': 'spin-slow 4s linear infinite',
       },
       boxShadow: {
         // Legacy shadow (keeping for backwards compatibility)
