@@ -216,6 +216,7 @@ const handleRequest = async (request: Request) => {
 
     const url = new URL(request.url);
     let coloringImageId = url.searchParams.get('coloring_image_id');
+    const platformFilter = url.searchParams.get('platform'); // optional: 'instagram', 'facebook', 'pinterest'
 
     // if POST request, also check request body
     if (!coloringImageId && request.method === 'POST') {
@@ -226,6 +227,9 @@ const handleRequest = async (request: Request) => {
         // if body parsing fails, continue with query param value
       }
     }
+
+    const shouldPost = (platform: string) =>
+      !platformFilter || platformFilter === platform;
 
     let coloringImage;
 
@@ -264,117 +268,123 @@ const handleRequest = async (request: Request) => {
     };
 
     // post to Instagram
-    try {
-      // convert svg to jpeg for Instagram
-      const instagramBuffer = await convertSvgToJpeg(
-        coloringImage.svgUrl,
-        'instagram',
-      );
+    if (shouldPost('instagram')) {
+      try {
+        // convert svg to jpeg for Instagram
+        const instagramBuffer = await convertSvgToJpeg(
+          coloringImage.svgUrl,
+          'instagram',
+        );
 
-      // upload to temporary storage
-      const instagramImageUrl = await uploadToTempStorage(
-        instagramBuffer,
-        'instagram',
-      );
-      tempFiles.push(instagramImageUrl.split('/').pop() || '');
+        // upload to temporary storage
+        const instagramImageUrl = await uploadToTempStorage(
+          instagramBuffer,
+          'instagram',
+        );
+        tempFiles.push(instagramImageUrl.split('/').pop() || '');
 
-      // generate Instagram caption
-      const instagramCaption = await generateInstagramCaption(coloringImage);
+        // generate Instagram caption
+        const instagramCaption = await generateInstagramCaption(coloringImage);
 
-      if (!instagramCaption) {
-        throw new Error('failed to generate Instagram caption');
+        if (!instagramCaption) {
+          throw new Error('failed to generate Instagram caption');
+        }
+
+        // create media container and publish
+        const creationId = await createInstagramMediaContainer(
+          instagramImageUrl,
+          instagramCaption,
+        );
+        const instagramMediaId = await publishInstagramMedia(creationId);
+
+        results.instagram = instagramMediaId;
+        console.log('Successfully posted to Instagram:', instagramMediaId);
+      } catch (error) {
+        console.error('Error posting to Instagram:', error);
+        results.errors.push(
+          `Instagram: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
-
-      // create media container and publish
-      const creationId = await createInstagramMediaContainer(
-        instagramImageUrl,
-        instagramCaption,
-      );
-      const instagramMediaId = await publishInstagramMedia(creationId);
-
-      results.instagram = instagramMediaId;
-      console.log('Successfully posted to Instagram:', instagramMediaId);
-    } catch (error) {
-      console.error('Error posting to Instagram:', error);
-      results.errors.push(
-        `Instagram: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
     }
 
     // post to Facebook
-    try {
-      // convert svg to jpeg for Facebook
-      const facebookBuffer = await convertSvgToJpeg(
-        coloringImage.svgUrl,
-        'facebook',
-      );
+    if (shouldPost('facebook')) {
+      try {
+        // convert svg to jpeg for Facebook
+        const facebookBuffer = await convertSvgToJpeg(
+          coloringImage.svgUrl,
+          'facebook',
+        );
 
-      // upload to temporary storage
-      const facebookImageUrl = await uploadToTempStorage(
-        facebookBuffer,
-        'facebook',
-      );
-      tempFiles.push(facebookImageUrl.split('/').pop() || '');
+        // upload to temporary storage
+        const facebookImageUrl = await uploadToTempStorage(
+          facebookBuffer,
+          'facebook',
+        );
+        tempFiles.push(facebookImageUrl.split('/').pop() || '');
 
-      // generate Facebook caption
-      const facebookCaption = await generateFacebookCaption(coloringImage);
+        // generate Facebook caption
+        const facebookCaption = await generateFacebookCaption(coloringImage);
 
-      if (!facebookCaption) {
-        throw new Error('failed to generate Facebook caption');
+        if (!facebookCaption) {
+          throw new Error('failed to generate Facebook caption');
+        }
+
+        // post to Facebook page
+        const facebookPostId = await postToFacebookPage(
+          facebookImageUrl,
+          facebookCaption,
+        );
+
+        results.facebook = facebookPostId;
+        console.log('Successfully posted to Facebook:', facebookPostId);
+      } catch (error) {
+        console.error('Error posting to Facebook:', error);
+        results.errors.push(
+          `Facebook: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
-
-      // post to Facebook page
-      const facebookPostId = await postToFacebookPage(
-        facebookImageUrl,
-        facebookCaption,
-      );
-
-      results.facebook = facebookPostId;
-      console.log('Successfully posted to Facebook:', facebookPostId);
-    } catch (error) {
-      console.error('Error posting to Facebook:', error);
-      results.errors.push(
-        `Facebook: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
     }
 
     // post to Pinterest
-    try {
-      // convert svg to jpeg for Pinterest (reuse instagram dimensions - square works well)
-      const pinterestBuffer = await convertSvgToJpeg(
-        coloringImage.svgUrl,
-        'instagram', // reuse instagram dimensions for Pinterest (1080x1080 square)
-      );
+    if (shouldPost('pinterest')) {
+      try {
+        // convert svg to jpeg for Pinterest (reuse instagram dimensions - square works well)
+        const pinterestBuffer = await convertSvgToJpeg(
+          coloringImage.svgUrl,
+          'instagram', // reuse instagram dimensions for Pinterest (1080x1080 square)
+        );
 
-      // upload to temporary storage
-      const pinterestImageUrl = await uploadToTempStorage(
-        pinterestBuffer,
-        'pinterest',
-      );
-      tempFiles.push(pinterestImageUrl.split('/').pop() || '');
+        // upload to temporary storage
+        const pinterestImageUrl = await uploadToTempStorage(
+          pinterestBuffer,
+          'pinterest',
+        );
+        tempFiles.push(pinterestImageUrl.split('/').pop() || '');
 
-      // generate Pinterest caption (description)
-      const pinterestCaption = await generatePinterestCaption(coloringImage);
+        // generate Pinterest caption (description)
+        const pinterestCaption = await generatePinterestCaption(coloringImage);
 
-      if (!pinterestCaption) {
-        throw new Error('failed to generate Pinterest caption');
+        if (!pinterestCaption) {
+          throw new Error('failed to generate Pinterest caption');
+        }
+
+        // post to Pinterest
+        const pinterestPinId = await postToPinterest(
+          pinterestImageUrl,
+          coloringImage.title ?? 'Free Coloring Page',
+          pinterestCaption,
+          coloringImage.id,
+        );
+
+        results.pinterest = pinterestPinId;
+        console.log('Successfully posted to Pinterest:', pinterestPinId);
+      } catch (error) {
+        console.error('Error posting to Pinterest:', error);
+        results.errors.push(
+          `Pinterest: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
-
-      // post to Pinterest
-      const pinterestPinId = await postToPinterest(
-        pinterestImageUrl,
-        coloringImage.title ?? 'Free Coloring Page',
-        pinterestCaption,
-        coloringImage.id,
-      );
-
-      results.pinterest = pinterestPinId;
-      console.log('Successfully posted to Pinterest:', pinterestPinId);
-    } catch (error) {
-      console.error('Error posting to Pinterest:', error);
-      results.errors.push(
-        `Pinterest: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
     }
 
     // return results
