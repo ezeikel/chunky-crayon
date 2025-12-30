@@ -39,7 +39,7 @@ export const POST = async (request: Request) => {
           refreshToken: process.env.PINTEREST_REFRESH_TOKEN,
           // Access token expires in 30 days from now (conservative estimate)
           expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          scopes: ['boards:read', 'pins:read', 'pins:write'],
+          scopes: ['boards:read', 'boards:write', 'pins:read', 'pins:write'],
           metadata: {
             boardId: process.env.PINTEREST_BOARD_ID,
             seededAt: new Date().toISOString(),
@@ -49,7 +49,7 @@ export const POST = async (request: Request) => {
           accessToken: process.env.PINTEREST_ACCESS_TOKEN,
           refreshToken: process.env.PINTEREST_REFRESH_TOKEN,
           expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-          scopes: ['boards:read', 'pins:read', 'pins:write'],
+          scopes: ['boards:read', 'boards:write', 'pins:read', 'pins:write'],
           metadata: {
             boardId: process.env.PINTEREST_BOARD_ID,
             seededAt: new Date().toISOString(),
