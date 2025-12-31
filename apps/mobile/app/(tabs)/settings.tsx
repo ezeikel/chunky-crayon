@@ -30,6 +30,7 @@ import Constants from "expo-constants";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import AppHeader from "@/components/AppHeader";
 import ParentalGate from "@/components/ParentalGate";
+import useHeaderData from "@/hooks/useHeaderData";
 
 type SettingsItemProps = {
   icon: IconDefinition;
@@ -113,6 +114,7 @@ const SettingsToggle = ({
 
 const SettingsScreen = () => {
   const appVersion = Constants.expoConfig?.version || "1.0.0";
+  const headerData = useHeaderData();
 
   // Audio preference states
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
@@ -180,11 +182,11 @@ const SettingsScreen = () => {
       <View className="flex-1">
         <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={{ flex: 1 }}>
           <AppHeader
-            credits={50}
-            challengeProgress={40}
-            stickerCount={8}
-            profileName="Artist"
-            coloStage={1}
+            credits={headerData.credits}
+            challengeProgress={headerData.challengeProgress}
+            stickerCount={headerData.stickerCount}
+            profileName={headerData.profileName}
+            coloStage={headerData.coloStage}
           />
           <View style={styles.lockedContainer}>
             <View style={styles.lockedIconContainer}>
@@ -213,11 +215,11 @@ const SettingsScreen = () => {
     <View className="flex-1">
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={{ flex: 1 }}>
         <AppHeader
-          credits={50}
-          challengeProgress={40}
-          stickerCount={8}
-          profileName="Artist"
-          coloStage={1}
+          credits={headerData.credits}
+          challengeProgress={headerData.challengeProgress}
+          stickerCount={headerData.stickerCount}
+          profileName={headerData.profileName}
+          coloStage={headerData.coloStage}
         />
         <ScrollView
           style={{ flex: 1 }}

@@ -19,12 +19,14 @@ import CreateColoringImageForm from "@/components/forms/CreateColoringImageForm/
 import ColoAvatar from "@/components/ColoAvatar";
 import AppHeader from "@/components/AppHeader";
 import { useColoContext } from "@/contexts";
+import useHeaderData from "@/hooks/useHeaderData";
 
 const padding = 20;
 
 const HomeScreen = () => {
   const [screenWidth] = useState(Dimensions.get("window").width);
   const { coloState, isLoading: coloLoading } = useColoContext();
+  const headerData = useHeaderData();
 
   // Float animation for Colo Avatar (matches web's animate-float)
   const floatY = useSharedValue(0);
@@ -45,11 +47,11 @@ const HomeScreen = () => {
     <View className="flex-1">
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={{ flex: 1 }}>
         <AppHeader
-          credits={50}
-          challengeProgress={40}
-          stickerCount={8}
-          profileName="Artist"
-          coloStage={coloState.stage}
+          credits={headerData.credits}
+          challengeProgress={headerData.challengeProgress}
+          stickerCount={headerData.stickerCount}
+          profileName={headerData.profileName}
+          coloStage={headerData.coloStage}
         />
         <ScrollView
           style={{ flex: 1 }}

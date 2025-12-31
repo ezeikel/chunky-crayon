@@ -1,5 +1,9 @@
 import { SkPath } from "@shopify/react-native-skia";
 
+// Enums matching database schema
+export type AgeGroup = "TODDLER" | "CHILD" | "TWEEN" | "TEEN" | "ADULT";
+export type Difficulty = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "EXPERT";
+
 // Grid color map from pre-computed AI analysis (5x5 grid)
 export type GridColorCell = {
   row: number; // 1-5 (1=top, 5=bottom)

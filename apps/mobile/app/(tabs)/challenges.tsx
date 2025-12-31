@@ -3,6 +3,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faTrophy, faLock } from "@fortawesome/pro-solid-svg-icons";
 import AppHeader from "@/components/AppHeader";
+import useHeaderData from "@/hooks/useHeaderData";
+import { useUserContext } from "@/contexts";
 
 type ChallengeCardProps = {
   title: string;
@@ -56,39 +58,45 @@ const ChallengeCard = ({
 );
 
 const ChallengesScreen = () => {
-  // Placeholder challenges - will be replaced with real data from backend
+  const headerData = useHeaderData();
+  const { activeProfile } = useUserContext();
+
+  // Get artwork count from active profile
+  const artworkCount = activeProfile?.artworkCount ?? 0;
+
+  // Dynamic challenges based on user progress
   const challenges = [
     {
       id: "1",
       title: "First Steps",
       description: "Complete your first coloring page",
-      progress: 1,
+      progress: Math.min(artworkCount, 1),
       total: 1,
       isLocked: false,
     },
     {
       id: "2",
-      title: "Color Explorer",
-      description: "Use all colors in the palette",
-      progress: 5,
-      total: 12,
+      title: "Getting Started",
+      description: "Complete 5 coloring pages",
+      progress: Math.min(artworkCount, 5),
+      total: 5,
       isLocked: false,
     },
     {
       id: "3",
-      title: "Weekly Artist",
-      description: "Color 5 pages this week",
-      progress: 2,
-      total: 5,
-      isLocked: false,
+      title: "Dedicated Artist",
+      description: "Complete 10 coloring pages",
+      progress: Math.min(artworkCount, 10),
+      total: 10,
+      isLocked: artworkCount < 5,
     },
     {
       id: "4",
       title: "Master Artist",
       description: "Complete 50 coloring pages",
-      progress: 0,
+      progress: Math.min(artworkCount, 50),
       total: 50,
-      isLocked: true,
+      isLocked: artworkCount < 10,
     },
   ];
 
@@ -96,11 +104,11 @@ const ChallengesScreen = () => {
     <View style={styles.container}>
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={styles.gradient}>
         <AppHeader
-          credits={50}
-          challengeProgress={40}
-          stickerCount={8}
-          profileName="Artist"
-          coloStage={1}
+          credits={headerData.credits}
+          challengeProgress={headerData.challengeProgress}
+          stickerCount={headerData.stickerCount}
+          profileName={headerData.profileName}
+          coloStage={headerData.coloStage}
         />
         <ScrollView
           style={styles.scrollView}
