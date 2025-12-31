@@ -1,10 +1,10 @@
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, StyleSheet } from "react-native";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
-import tw from "twrnc";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faFileArrowDown } from "@fortawesome/pro-regular-svg-icons";
 import { ColoringImage } from "@/types";
+import { useColoContext } from "@/contexts";
 import { perfect } from "@/styles";
 
 type SaveButtonProps = {
@@ -12,6 +12,8 @@ type SaveButtonProps = {
 };
 
 const SaveButton = ({ coloringImage }: SaveButtonProps) => {
+  const { recordArtwork } = useColoContext();
+
   const createPDF = async () => {
     const htmlContent = `
       <html>
@@ -35,9 +37,9 @@ const SaveButton = ({ coloringImage }: SaveButtonProps) => {
               flex-direction: column;
               gap: 4;
               max-width: 50%;
-        
+
             }
-            
+
             p {
               font-size: 18px;
               margin: 0;
@@ -50,12 +52,12 @@ const SaveButton = ({ coloringImage }: SaveButtonProps) => {
           </style>
         </head>
         <body>
-          <svg class="coloring-image" viewBox="0 0 1024 1024">       
-            <image xlink:href="${coloringImage.svgUrl}" />    
+          <svg class="coloring-image" viewBox="0 0 1024 1024">
+            <image xlink:href="${coloringImage.svgUrl}" />
           </svg>
           <footer>
-            <svg class="qr-code" viewBox="0 0 1024 1024" width="120px" height="120px">       
-              <image xlink:href="${coloringImage.qrCodeUrl}" width="100%" height="100%" />    
+            <svg class="qr-code" viewBox="0 0 1024 1024" width="120px" height="120px">
+              <image xlink:href="${coloringImage.qrCodeUrl}" width="100%" height="100%" />
             </svg>
             <div class="cta">
               <div>
@@ -78,6 +80,8 @@ const SaveButton = ({ coloringImage }: SaveButtonProps) => {
       // Optionally, you can share the PDF file
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(uri);
+        // Record artwork for Colo evolution after successful share
+        await recordArtwork();
       }
     } catch (error) {
       console.error(error);
@@ -87,27 +91,23 @@ const SaveButton = ({ coloringImage }: SaveButtonProps) => {
   return (
     <TouchableOpacity
       onPress={createPDF}
-      style={tw.style(
-        `flex-row self-center items-center justify-center gap-x-4 text-black font-semibold p-4 rounded-lg bg-white`,
-        {
-          ...perfect.boxShadow,
-        },
-      )}
+      className="flex-row self-center items-center justify-center gap-x-4 p-4 rounded-lg bg-white"
+      style={perfect.boxShadow}
     >
-      <Text
-        style={tw.style({
-          fontFamily: "TondoTrial-Regular",
-        })}
-      >
-        Download PDF
-      </Text>
-      <FontAwesomeIcon
-        icon={faFileArrowDown}
-        size={20}
-        style={tw`text-3xl text-black`}
-      />
+      <Text style={styles.buttonText}>Download PDF</Text>
+      <FontAwesomeIcon icon={faFileArrowDown} size={20} style={styles.icon} />
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  buttonText: {
+    fontFamily: "TondoTrial-Regular",
+    color: "#000",
+  },
+  icon: {
+    color: "#000",
+  },
+});
 
 export default SaveButton;

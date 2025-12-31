@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+@import 'nativewind/theme';
+
+@theme {
+  /* Fonts - TondoTrial */
+  --font-tondo: 'TondoTrial-Regular';
+  --font-tondo-light: 'TondoTrial-Light';
+  --font-tondo-bold: 'TondoTrial-Bold';
+
+  /* Brand Colors */
+  --color-primary: #E86942;
+  --color-primary-light: #F5A083;
+  --color-primary-dark: #C94E2A;
+
+  /* Background Colors */
+  --color-bg-cream: #FFFDF5;
+  --color-bg-peach: #FFF5EB;
+  --color-canvas: #FAF7F0;
+
+  /* Text Colors */
+  --color-text-primary: #3D2C1E;
+  --color-text-secondary: #7A6855;
+  --color-text-muted: #A69784;
+
+  /* Border Colors */
+  --color-border: #E8E4D9;
+  --color-border-dark: #D4CFC0;
+}

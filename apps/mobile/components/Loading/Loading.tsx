@@ -1,20 +1,19 @@
-import { View } from "react-native";
-import tw from "twrnc";
+import { View, ViewStyle, StyleProp } from "react-native";
 import Spinner from "@/components/Spinner/Spinner";
 
 type LoadingProps = {
-  style?: Record<string, unknown>;
-  spinnerStyle?: Record<string, unknown>;
+  style?: StyleProp<ViewStyle>;
+  spinnerColor?: string;
+  className?: string;
 };
 
-const Loading = ({ style, spinnerStyle }: LoadingProps) => {
+const Loading = ({ style, spinnerColor, className }: LoadingProps) => {
   return (
     <View
-      style={tw.style(`flex-1 items-center justify-center`, {
-        ...style,
-      })}
+      className={`flex-1 items-center justify-center ${className || ""}`}
+      style={style}
     >
-      <Spinner style={spinnerStyle} />
+      <Spinner color={spinnerColor} />
     </View>
   );
 };

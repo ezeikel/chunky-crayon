@@ -1,10 +1,13 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import {
-  GestureResponderEvent,
-  PanResponder,
-  View,
-  useWindowDimensions,
-} from "react-native";
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { View, useWindowDimensions, StyleSheet } from "react-native";
 import {
   Canvas,
   ImageSVG,
@@ -16,11 +19,35 @@ import {
   SkPath,
   Skia,
   Path,
+  Image as SkiaImage,
+  useImage,
+  BlurMask,
+  Text as SkiaText,
 } from "@shopify/react-native-skia";
-import tw from "twrnc";
-import { ColoringImage, Dimension, DrawingPath } from "@/types";
-import { useColoringContext } from "@/contexts/coloring";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+} from "react-native-reanimated";
+import { ColoringImage, Dimension, GridColorCell, GridColorMap } from "@/types";
+import { useCanvasStore, DrawingAction } from "@/stores/canvasStore";
+import { createSimplePaint, getBrushMultiplier } from "@/utils/brushShaders";
+import { getRainbowColor } from "@/utils/colorUtils";
+import { saveCanvasState, loadCanvasState } from "@/utils/canvasPersistence";
+import {
+  generateGlitterParticles,
+  createSparklePath,
+} from "@/utils/glitterUtils";
+import {
+  parseColorMap,
+  getSuggestedColor,
+  isValidColorMap,
+} from "@/utils/magicColorUtils";
+import MagicColorHint from "@/components/MagicColorHint";
 import { perfect } from "@/styles";
+import { tapHeavy, tapMedium, notifySuccess } from "@/utils/haptics";
 
 type ImageCanvasProps = {
   coloringImage: ColoringImage;
@@ -30,13 +57,65 @@ type ImageCanvasProps = {
 
 const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
   const canvasRef = useCanvasRef();
-  const { selectedColor } = useColoringContext();
-  const [paths, setPaths] = useState<DrawingPath[]>([]);
-  const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
   const { width: screenWidth } = useWindowDimensions();
   const svg = useSVG(coloringImage.svgUrl);
 
   const [svgDimensions, setSvgDimensions] = useState<Dimension | null>(null);
+  const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Magic color hint state
+  const [magicHintCell, setMagicHintCell] = useState<GridColorCell | null>(
+    null,
+  );
+  const [magicHintPosition, setMagicHintPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
+  // Parse colorMapJson once
+  const colorMap = useMemo(() => {
+    return parseColorMap(coloringImage.colorMapJson);
+  }, [coloringImage.colorMapJson]);
+
+  // Zustand store
+  const {
+    selectedTool,
+    selectedColor,
+    brushType,
+    brushSize,
+    fillType,
+    selectedPattern,
+    selectedSticker,
+    stickerSize,
+    magicMode,
+    rainbowHue,
+    history,
+    historyIndex,
+    scale,
+    translateX,
+    translateY,
+    addAction,
+    setColor,
+    setTool,
+    setScale,
+    setTranslate,
+    setImageId,
+    setDirty,
+    advanceRainbowHue,
+    setCaptureCanvas,
+  } = useCanvasStore();
+
+  // Gesture shared values
+  const gestureScale = useSharedValue(1);
+  const gestureTranslateX = useSharedValue(0);
+  const gestureTranslateY = useSharedValue(0);
+  const savedScale = useSharedValue(1);
+  const savedTranslateX = useSharedValue(0);
+  const savedTranslateY = useSharedValue(0);
+
+  // Auto-save timer
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (svg) {
@@ -44,7 +123,71 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     }
   }, [svg]);
 
-  const canvasSize = screenWidth;
+  // Register capture function for sharing/saving
+  useEffect(() => {
+    const captureCanvas = () => {
+      if (!canvasRef.current) return null;
+      const image = canvasRef.current.makeImageSnapshot();
+      if (!image) return null;
+      const base64 = image.encodeToBase64();
+      return `data:image/png;base64,${base64}`;
+    };
+
+    setCaptureCanvas(captureCanvas);
+
+    return () => {
+      setCaptureCanvas(null);
+    };
+  }, [setCaptureCanvas]);
+
+  // Initialize canvas with saved state
+  useEffect(() => {
+    const initializeCanvas = async () => {
+      if (!coloringImage.id || isInitialized) return;
+
+      setImageId(coloringImage.id);
+
+      // Load saved state
+      const savedActions = await loadCanvasState(coloringImage.id);
+      if (savedActions && savedActions.length > 0) {
+        // Restore saved actions to the store
+        savedActions.forEach((action) => {
+          addAction(action);
+        });
+      }
+
+      setIsInitialized(true);
+    };
+
+    initializeCanvas();
+  }, [coloringImage.id, isInitialized, setImageId, addAction]);
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    // Debounce auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    autoSaveTimerRef.current = setTimeout(() => {
+      const actionsToSave = history.slice(0, historyIndex + 1);
+      if (actionsToSave.length > 0) {
+        saveCanvasState(coloringImage.id, actionsToSave);
+        setDirty(false);
+      }
+    }, 2000); // Save 2 seconds after last change
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [history, historyIndex, coloringImage.id, isInitialized, setDirty]);
+
+  // Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
+  const canvasSize = screenWidth - 32 - 24;
 
   const src = svgDimensions
     ? rect(0, 0, svgDimensions.width, svgDimensions.height)
@@ -53,141 +196,584 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
 
   const transform = useMemo(() => fitbox("contain", src, dst), [src, dst]);
 
-  // taking into account the padding of the parent View (8px on each side)
-  const canvasSizeWithPadding = canvasSize - 16;
+  // Convert touch coordinates to SVG coordinates
+  const touchToSvgCoords = useCallback(
+    (touchX: number, touchY: number): { x: number; y: number } | null => {
+      if (!svgDimensions) return null;
 
-  const handlePanResponderMove = (event: GestureResponderEvent) => {
-    const touchX = event.nativeEvent.locationX;
-    const touchY = event.nativeEvent.locationY;
-    if (currentPath && svgDimensions) {
-      // calculate the scale factor from fitbox "contain"
       const scaleX = canvasSize / svgDimensions.width;
       const scaleY = canvasSize / svgDimensions.height;
-      const scale = Math.min(scaleX, scaleY);
+      const svgScale = Math.min(scaleX, scaleY);
 
-      // calculate offset to center the scaled SVG
-      const scaledWidth = svgDimensions.width * scale;
-      const scaledHeight = svgDimensions.height * scale;
+      const scaledWidth = svgDimensions.width * svgScale;
+      const scaledHeight = svgDimensions.height * svgScale;
       const offsetX = (canvasSize - scaledWidth) / 2;
       const offsetY = (canvasSize - scaledHeight) / 2;
 
-      // transform touch coordinates to SVG coordinates
-      const svgX = (touchX - offsetX) / scale;
-      const svgY = (touchY - offsetY) / scale;
+      // Account for zoom/pan
+      const adjustedX = (touchX - translateX) / scale;
+      const adjustedY = (touchY - translateY) / scale;
 
-      currentPath.lineTo(svgX, svgY);
-      setCurrentPath(currentPath.copy());
-    }
-  };
+      const svgX = (adjustedX - offsetX) / svgScale;
+      const svgY = (adjustedY - offsetY) / svgScale;
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onStartShouldSetPanResponderCapture: () => true,
-    onMoveShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponderCapture: () => true,
-    onPanResponderGrant: (event) => {
+      return { x: svgX, y: svgY };
+    },
+    [svgDimensions, canvasSize, scale, translateX, translateY],
+  );
+
+  // Handle drawing stroke
+  const handleDrawingStart = useCallback(
+    (x: number, y: number) => {
+      if (selectedTool !== "brush") return;
+
+      const coords = touchToSvgCoords(x, y);
+      if (!coords) return;
+
+      const newPath = Skia.Path.Make();
+      newPath.moveTo(coords.x, coords.y);
+      setCurrentPath(newPath);
       setScroll(false);
+    },
+    [selectedTool, touchToSvgCoords, setScroll],
+  );
 
-      const touchX = event.nativeEvent.locationX;
-      const touchY = event.nativeEvent.locationY;
-      if (svgDimensions) {
-        // calculate the scale factor from fitbox "contain"
-        const scaleX = canvasSize / svgDimensions.width;
-        const scaleY = canvasSize / svgDimensions.height;
-        const scale = Math.min(scaleX, scaleY);
+  const handleDrawingMove = useCallback(
+    (x: number, y: number) => {
+      if (selectedTool !== "brush" || !currentPath) return;
 
-        // calculate offset to center the scaled SVG
-        const scaledWidth = svgDimensions.width * scale;
-        const scaledHeight = svgDimensions.height * scale;
-        const offsetX = (canvasSize - scaledWidth) / 2;
-        const offsetY = (canvasSize - scaledHeight) / 2;
+      const coords = touchToSvgCoords(x, y);
+      if (!coords) return;
 
-        // transform touch coordinates to SVG coordinates
-        const svgX = (touchX - offsetX) / scale;
-        const svgY = (touchY - offsetY) / scale;
+      currentPath.lineTo(coords.x, coords.y);
+      setCurrentPath(currentPath.copy());
+    },
+    [selectedTool, currentPath, touchToSvgCoords],
+  );
 
-        const newPath = Skia.Path.Make();
-        newPath.moveTo(svgX, svgY);
-        setCurrentPath(newPath);
+  const handleDrawingEnd = useCallback(() => {
+    if (currentPath) {
+      const strokeWidth = brushSize * getBrushMultiplier(brushType);
+      // Use rainbow color if rainbow brush is selected
+      const strokeColor =
+        brushType === "rainbow" ? getRainbowColor(rainbowHue) : selectedColor;
+      const action: DrawingAction = {
+        type: "stroke",
+        path: currentPath,
+        color: strokeColor,
+        brushType,
+        strokeWidth,
+        startHue: brushType === "rainbow" ? rainbowHue : undefined,
+      };
+      addAction(action);
+      setCurrentPath(null);
+
+      // Advance rainbow hue for next stroke
+      if (brushType === "rainbow") {
+        advanceRainbowHue(30);
+      }
+    }
+    setScroll(true);
+  }, [
+    currentPath,
+    brushSize,
+    brushType,
+    selectedColor,
+    rainbowHue,
+    addAction,
+    setScroll,
+    advanceRainbowHue,
+  ]);
+
+  // Handle fill tool tap
+  const handleFillTap = useCallback(
+    (x: number, y: number) => {
+      if (selectedTool !== "fill") return;
+
+      const coords = touchToSvgCoords(x, y);
+      if (!coords) return;
+
+      // Haptic feedback for fill action
+      tapHeavy();
+
+      // Add fill action with type and pattern info
+      const action: DrawingAction = {
+        type: "fill",
+        color: selectedColor,
+        fillX: coords.x,
+        fillY: coords.y,
+        fillType: fillType,
+        patternType: fillType === "pattern" ? selectedPattern : undefined,
+      };
+      addAction(action);
+    },
+    [
+      selectedTool,
+      selectedColor,
+      fillType,
+      selectedPattern,
+      touchToSvgCoords,
+      addAction,
+    ],
+  );
+
+  // Handle sticker placement
+  const handleStickerTap = useCallback(
+    (x: number, y: number) => {
+      if (selectedTool !== "sticker") return;
+
+      const coords = touchToSvgCoords(x, y);
+      if (!coords) return;
+
+      // Haptic feedback for sticker placement
+      tapHeavy();
+
+      // Add sticker action
+      const action: DrawingAction = {
+        type: "sticker",
+        color: selectedColor, // Not used but required by type
+        sticker: selectedSticker,
+        stickerX: coords.x,
+        stickerY: coords.y,
+        stickerSize: stickerSize,
+      };
+      addAction(action);
+    },
+    [
+      selectedTool,
+      selectedColor,
+      selectedSticker,
+      stickerSize,
+      touchToSvgCoords,
+      addAction,
+    ],
+  );
+
+  // Handle magic tool tap
+  const handleMagicTap = useCallback(
+    (x: number, y: number) => {
+      if (selectedTool !== "magic") return;
+
+      // Check if color map is available
+      if (!colorMap || !isValidColorMap(colorMap)) {
+        // No color map available - show message or fallback
+        console.warn("No color map available for magic tool");
+        return;
+      }
+
+      const coords = touchToSvgCoords(x, y);
+      if (!coords || !svgDimensions) return;
+
+      tapMedium();
+
+      if (magicMode === "suggest") {
+        // Show color suggestion for the tapped area
+        const suggestedCell = getSuggestedColor(
+          coords.x,
+          coords.y,
+          svgDimensions,
+          colorMap,
+        );
+
+        if (suggestedCell) {
+          setMagicHintCell(suggestedCell);
+          setMagicHintPosition({ x, y });
+        }
+      } else if (magicMode === "auto") {
+        // Auto-fill: Apply all colors from the grid
+        // This is a simplified version - just sets the first/dominant color for now
+        // Full implementation would detect regions and fill them
+        notifySuccess();
+
+        // For now, we'll fill regions based on the grid cells
+        // This creates fill actions for representative points in each grid cell
+        const fills: Array<{ x: number; y: number; color: string }> = [];
+        const cellWidth = svgDimensions.width / 5;
+        const cellHeight = svgDimensions.height / 5;
+
+        colorMap.gridColors.forEach((cell) => {
+          // Calculate center point of each grid cell
+          const centerX = (cell.col - 0.5) * cellWidth;
+          const centerY = (cell.row - 0.5) * cellHeight;
+          fills.push({
+            x: centerX,
+            y: centerY,
+            color: cell.suggestedColor,
+          });
+        });
+
+        // Add a single magic-fill action that contains all fills
+        const action: DrawingAction = {
+          type: "magic-fill",
+          color: colorMap.gridColors[0]?.suggestedColor || "#FFFFFF",
+          magicFills: fills,
+        };
+        addAction(action);
       }
     },
-    onPanResponderMove: (event) => handlePanResponderMove(event),
-    onPanResponderRelease: () => {
-      if (currentPath) {
-        setPaths([...paths, { path: currentPath, color: selectedColor }]);
-        setCurrentPath(null);
-      }
+    [
+      selectedTool,
+      magicMode,
+      colorMap,
+      svgDimensions,
+      touchToSvgCoords,
+      addAction,
+    ],
+  );
 
-      setScroll(true);
+  // Dismiss magic hint
+  const handleDismissMagicHint = useCallback(() => {
+    setMagicHintCell(null);
+    setMagicHintPosition(null);
+  }, []);
+
+  // Use color from magic hint
+  const handleUseMagicColor = useCallback(
+    (color: string) => {
+      setColor(color);
+      setTool("brush");
     },
+    [setColor, setTool],
+  );
+
+  // Pan gesture for drawing or panning
+  const panGesture = Gesture.Pan()
+    .onStart((event) => {
+      if (selectedTool === "brush") {
+        runOnJS(handleDrawingStart)(event.x, event.y);
+      }
+    })
+    .onUpdate((event) => {
+      if (selectedTool === "brush") {
+        runOnJS(handleDrawingMove)(event.x, event.y);
+      } else {
+        // Pan mode
+        gestureTranslateX.value = savedTranslateX.value + event.translationX;
+        gestureTranslateY.value = savedTranslateY.value + event.translationY;
+      }
+    })
+    .onEnd(() => {
+      if (selectedTool === "brush") {
+        runOnJS(handleDrawingEnd)();
+      } else {
+        savedTranslateX.value = gestureTranslateX.value;
+        savedTranslateY.value = gestureTranslateY.value;
+        runOnJS(setTranslate)(gestureTranslateX.value, gestureTranslateY.value);
+      }
+    });
+
+  // Pinch gesture for zooming
+  const pinchGesture = Gesture.Pinch()
+    .onStart(() => {
+      runOnJS(setScroll)(false);
+    })
+    .onUpdate((event) => {
+      gestureScale.value = Math.max(
+        0.5,
+        Math.min(4, savedScale.value * event.scale),
+      );
+    })
+    .onEnd(() => {
+      savedScale.value = gestureScale.value;
+      runOnJS(setScale)(gestureScale.value);
+      runOnJS(setScroll)(true);
+    });
+
+  // Tap gesture for fill, sticker, and magic tools
+  const tapGesture = Gesture.Tap().onEnd((event) => {
+    if (selectedTool === "fill") {
+      runOnJS(handleFillTap)(event.x, event.y);
+    } else if (selectedTool === "sticker") {
+      runOnJS(handleStickerTap)(event.x, event.y);
+    } else if (selectedTool === "magic") {
+      runOnJS(handleMagicTap)(event.x, event.y);
+    }
   });
 
+  // Double tap to reset zoom
+  const doubleTapGesture = Gesture.Tap()
+    .numberOfTaps(2)
+    .onEnd(() => {
+      gestureScale.value = withSpring(1);
+      gestureTranslateX.value = withSpring(0);
+      gestureTranslateY.value = withSpring(0);
+      savedScale.value = 1;
+      savedTranslateX.value = 0;
+      savedTranslateY.value = 0;
+      runOnJS(setScale)(1);
+      runOnJS(setTranslate)(0, 0);
+    });
+
+  // Combine gestures
+  const composedGesture = Gesture.Simultaneous(
+    Gesture.Race(doubleTapGesture, tapGesture),
+    Gesture.Simultaneous(panGesture, pinchGesture),
+  );
+
+  // Animated style for zoom/pan
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: gestureTranslateX.value },
+      { translateY: gestureTranslateY.value },
+      { scale: gestureScale.value },
+    ],
+  }));
+
+  // Get visible actions based on history index (for undo/redo)
+  const visibleActions = useMemo(() => {
+    return history.slice(0, historyIndex + 1);
+  }, [history, historyIndex]);
+
+  // Render stickers
+  const renderStickers = useMemo(() => {
+    return visibleActions
+      .filter((action) => action.type === "sticker" && action.sticker)
+      .map((action, index) => {
+        const size = action.stickerSize || 40;
+        // Center the sticker on the tap point
+        const x = (action.stickerX || 0) - size / 2;
+        const y = (action.stickerY || 0) + size / 3; // Adjust for text baseline
+
+        // Use Skia's default font for emoji rendering
+        const font = Skia.Font(undefined, size);
+
+        return (
+          <SkiaText
+            key={`sticker-${index}`}
+            x={x}
+            y={y}
+            text={action.sticker || ""}
+            font={font}
+          />
+        );
+      });
+  }, [visibleActions]);
+
+  // Render drawing paths
+  const renderPaths = useMemo(() => {
+    return visibleActions
+      .filter((action) => action.type === "stroke" && action.path)
+      .map((action, index) => {
+        const strokeWidth =
+          action.strokeWidth ||
+          brushSize * getBrushMultiplier(action.brushType || "crayon");
+
+        // Apply brush-specific rendering
+        let alpha = 1.0;
+        if (action.brushType === "crayon") {
+          alpha = 0.85;
+        } else if (action.brushType === "marker") {
+          alpha = 0.75;
+        } else if (action.brushType === "glow") {
+          alpha = 0.7;
+        }
+
+        // Glow and neon effects need blur
+        if (action.brushType === "glow") {
+          return (
+            <Group key={`path-${index}`}>
+              <Path
+                path={action.path!}
+                color={action.color}
+                style="stroke"
+                strokeWidth={strokeWidth}
+                strokeCap="round"
+                strokeJoin="round"
+                opacity={alpha}
+              >
+                <BlurMask blur={8} style="normal" />
+              </Path>
+            </Group>
+          );
+        }
+
+        if (action.brushType === "neon") {
+          return (
+            <Group key={`path-${index}`}>
+              <Path
+                path={action.path!}
+                color={action.color}
+                style="stroke"
+                strokeWidth={strokeWidth}
+                strokeCap="round"
+                strokeJoin="round"
+                opacity={1}
+              >
+                <BlurMask blur={12} style="outer" />
+              </Path>
+            </Group>
+          );
+        }
+
+        // Glitter effect with sparkle particles
+        if (action.brushType === "glitter") {
+          const particles = generateGlitterParticles(
+            action.path!,
+            action.color,
+            0.12,
+          );
+          return (
+            <Group key={`path-${index}`}>
+              {/* Base stroke with transparency */}
+              <Path
+                path={action.path!}
+                color={action.color}
+                style="stroke"
+                strokeWidth={strokeWidth}
+                strokeCap="round"
+                strokeJoin="round"
+                opacity={0.6}
+              />
+              {/* Sparkle particles */}
+              {particles.map((particle, pIndex) => {
+                const sparklePath = createSparklePath(
+                  particle.x,
+                  particle.y,
+                  particle.size,
+                  particle.rotation,
+                );
+                return (
+                  <Path
+                    key={`sparkle-${index}-${pIndex}`}
+                    path={sparklePath}
+                    color={particle.color}
+                    style="fill"
+                    opacity={particle.opacity}
+                  />
+                );
+              })}
+            </Group>
+          );
+        }
+
+        return (
+          <Path
+            key={`path-${index}`}
+            path={action.path!}
+            color={action.color}
+            style="stroke"
+            strokeWidth={strokeWidth}
+            strokeCap="round"
+            strokeJoin="round"
+            opacity={alpha}
+          />
+        );
+      });
+  }, [visibleActions, brushSize]);
+
   if (!svgDimensions) {
-    // render a loading state or nothing until SVG dimensions are available
     return null;
   }
 
   return (
-    <View
-      style={tw.style(`bg-white rounded-lg`, {
-        height: canvasSizeWithPadding,
-        width: canvasSizeWithPadding,
-        ...perfect.boxShadow,
-        ...style,
-      })}
-      {...panResponder.panHandlers}
-    >
-      {svg ? (
-        <Canvas
-          ref={canvasRef}
-          style={tw.style({
-            height: canvasSizeWithPadding,
-            width: canvasSizeWithPadding,
-          })}
+    <View className="relative">
+      <GestureDetector gesture={composedGesture}>
+        <Animated.View
+          className="bg-white rounded-lg overflow-hidden"
+          style={[
+            {
+              height: canvasSize,
+              width: canvasSize,
+              ...perfect.boxShadow,
+              ...style,
+            },
+            animatedStyle,
+          ]}
         >
-          {/* render SVG once to be below the colored paths */}
-          <Group transform={transform}>
-            <ImageSVG
-              x={0}
-              y={0}
-              width={canvasSize}
-              height={canvasSize}
-              svg={svg}
-            />
-            {paths.map((drawingPath, index) => (
-              <Path
-                key={index}
-                path={drawingPath.path}
-                color={drawingPath.color}
-                style="stroke"
-                strokeWidth={5}
-                strokeCap="round"
-                strokeJoin="round"
-              />
-            ))}
-            {currentPath ? (
-              <Path
-                path={currentPath}
-                color={selectedColor}
-                style="stroke"
-                strokeWidth={5}
-                strokeCap="round"
-                strokeJoin="round"
-              />
-            ) : null}
-          </Group>
-          {/* render SVG again to be on top of the colored paths */}
-          <Group transform={transform}>
-            <ImageSVG
-              x={0}
-              y={0}
-              width={canvasSize}
-              height={canvasSize}
-              svg={svg}
-            />
-          </Group>
-        </Canvas>
-      ) : null}
+          {svg ? (
+            <Canvas
+              ref={canvasRef}
+              style={{
+                height: canvasSize,
+                width: canvasSize,
+              }}
+            >
+              {/* SVG base layer (below drawings) */}
+              <Group transform={transform}>
+                <ImageSVG
+                  x={0}
+                  y={0}
+                  width={canvasSize}
+                  height={canvasSize}
+                  svg={svg}
+                />
+                {/* Rendered paths */}
+                {renderPaths}
+                {/* Rendered stickers */}
+                {renderStickers}
+                {/* Current drawing path */}
+                {currentPath && brushType === "glow" ? (
+                  <Group>
+                    <Path
+                      path={currentPath}
+                      color={selectedColor}
+                      style="stroke"
+                      strokeWidth={brushSize * getBrushMultiplier(brushType)}
+                      strokeCap="round"
+                      strokeJoin="round"
+                      opacity={0.7}
+                    >
+                      <BlurMask blur={8} style="normal" />
+                    </Path>
+                  </Group>
+                ) : currentPath && brushType === "neon" ? (
+                  <Group>
+                    <Path
+                      path={currentPath}
+                      color={selectedColor}
+                      style="stroke"
+                      strokeWidth={brushSize * getBrushMultiplier(brushType)}
+                      strokeCap="round"
+                      strokeJoin="round"
+                      opacity={1}
+                    >
+                      <BlurMask blur={12} style="outer" />
+                    </Path>
+                  </Group>
+                ) : currentPath ? (
+                  <Path
+                    path={currentPath}
+                    color={
+                      brushType === "rainbow"
+                        ? getRainbowColor(rainbowHue)
+                        : selectedColor
+                    }
+                    style="stroke"
+                    strokeWidth={brushSize * getBrushMultiplier(brushType)}
+                    strokeCap="round"
+                    strokeJoin="round"
+                    opacity={
+                      brushType === "crayon"
+                        ? 0.85
+                        : brushType === "marker"
+                          ? 0.75
+                          : 1
+                    }
+                  />
+                ) : null}
+              </Group>
+              {/* SVG outline layer (on top) */}
+              <Group transform={transform}>
+                <ImageSVG
+                  x={0}
+                  y={0}
+                  width={canvasSize}
+                  height={canvasSize}
+                  svg={svg}
+                />
+              </Group>
+            </Canvas>
+          ) : null}
+        </Animated.View>
+      </GestureDetector>
+
+      {/* Magic Color Hint popup */}
+      <MagicColorHint
+        colorCell={magicHintCell}
+        position={magicHintPosition}
+        onDismiss={handleDismissMagicHint}
+        onUseColor={handleUseMagicColor}
+      />
     </View>
   );
 };

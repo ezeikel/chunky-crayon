@@ -1,13 +1,16 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ColoringContextProvider } from "./contexts/coloring";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ColoProvider } from "@/contexts";
 
 export const queryClient = new QueryClient();
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ColoringContextProvider>{children}</ColoringContextProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <ColoProvider>{children}</ColoProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 };
 

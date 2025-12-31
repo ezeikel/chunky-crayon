@@ -6,19 +6,19 @@
   "build": {
     "base": {
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "m-medium",
+        "image": "macos-sequoia-15.5-xcode-26.0"
+      },
+      "android": {
+        "image": "latest"
       }
     },
     "development": {
       "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
-      "android": {
-        "image": "latest"
-      },
       "ios": {
-        "simulator": true,
-        "image": "latest"
+        "simulator": true
       },
       "env": {
         "EXPO_PUBLIC_ENVIRONMENT": "development"

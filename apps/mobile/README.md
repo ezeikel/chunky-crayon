@@ -1,60 +1,113 @@
-# Welcome to your Expo app 👋
+# Chunky Crayon Mobile App
 
-This is an [Expo](https://expo.dev) project created with
-[`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+React Native mobile app for Chunky Crayon - a kids coloring app (ages 3-8).
 
-## Get started
+## Tech Stack
 
-1. Install dependencies
+- **Expo SDK 54** with Expo Router
+- **React Native Skia** for canvas drawing
+- **React Native Gesture Handler** for touch interactions
+- **React Native Reanimated** for animations
+- **Zustand** for state management
+- **TanStack Query** for data fetching
+- **AsyncStorage** for local persistence
 
-   ```bash
-   npm install
-   ```
+## Development Progress
 
-2. Start the app
+### Phase 0: Foundation (Completed)
 
-   ```bash
-    npx expo start
-   ```
+- [x] Expo SDK 54 upgrade
+- [x] Native dependencies installation
+- [x] FlashList 2.0 migration
 
-In the output, you'll find options to open the app in a
+### Phase 1: Core Coloring Experience (Completed)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app
-  development with Expo
+- [x] **Zustand Canvas Store** (`stores/canvasStore.ts`)
+  - Tool selection (brush, fill)
+  - Color management
+  - Brush type selection (crayon, marker, pencil)
+  - Undo/redo history stack
+  - Zoom/pan state
 
-You can start developing by editing the files inside the **app** directory. This
-project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- [x] **Fill Tool** (`utils/floodFill.ts`)
+  - Scanline flood fill algorithm
+  - Color tolerance for smooth fills
+  - Boundary detection for line art
 
-## Get a fresh project
+- [x] **Brush Textures** (`utils/brushShaders.ts`)
+  - Crayon: Semi-transparent (0.85 alpha), slightly thicker
+  - Marker: Bold strokes with transparency (0.75 alpha)
+  - Pencil: Thin, precise lines
 
-When you're ready, run:
+- [x] **Zoom/Pan Gestures** (`components/ImageCanvas/ImageCanvas.tsx`)
+  - Pinch to zoom (0.5x - 4x)
+  - Pan to move canvas
+  - Double-tap to reset view
+  - Smooth spring animations
+
+- [x] **Auto-save** (`utils/canvasPersistence.ts`)
+  - Debounced save (2 seconds after last change)
+  - Persists drawing actions to AsyncStorage
+  - Restores state on return to image
+
+- [x] **Canvas Toolbar** (`components/CanvasToolbar/CanvasToolbar.tsx`)
+  - Draw/Fill tool selection
+  - Brush type picker (when brush selected)
+  - Undo/redo buttons with disabled states
+
+- [x] **Color Palette** (`constants/Colors.ts`)
+  - 21 kid-friendly colors
+  - Includes skin tones for inclusive coloring
+  - Horizontal scrollable palette
+
+### Phase 2: Enhanced Features (Planned)
+
+- [ ] Magic Brush / Auto-Color using colorMapJson
+- [ ] Sticker placement
+- [ ] Background music/ambient sounds
+- [ ] Share completed artwork
+
+### Phase 3: Gamification (Planned)
+
+- [ ] Colo mascot integration
+- [ ] Achievement system
+- [ ] Progress tracking
+
+## Getting Started
 
 ```bash
-npm run reset-project
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm start
+
+# Run on iOS simulator
+pnpm ios
+
+# Run on Android emulator
+pnpm android
 ```
 
-This command will move the starter code to the **app-example** directory and
-create a blank **app** directory where you can start developing.
+## Project Structure
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following
-resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into
-  advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a
-  step-by-step tutorial where you'll create a project that runs on Android, iOS,
-  and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform
-  and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask
-  questions.
+```
+apps/mobile/
+├── app/                    # Expo Router pages
+│   ├── coloring-image/     # Coloring page routes
+│   └── ...
+├── components/
+│   ├── ImageCanvas/        # Main canvas component
+│   ├── CanvasToolbar/      # Tool selection UI
+│   ├── ColorPalette/       # Color picker
+│   └── ...
+├── stores/
+│   └── canvasStore.ts      # Zustand state management
+├── utils/
+│   ├── floodFill.ts        # Fill algorithm
+│   ├── brushShaders.ts     # Brush effects
+│   └── canvasPersistence.ts # Save/load
+├── constants/
+│   └── Colors.ts           # Color palettes
+└── hooks/                  # Custom hooks
+```

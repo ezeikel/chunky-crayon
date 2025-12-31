@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
   useSharedValue,
@@ -7,16 +7,17 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import tw from "twrnc";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faSpinnerThird } from "@fortawesome/pro-regular-svg-icons";
+import { COLORS } from "@/lib/design";
 
 type SpinnerProps = {
-  style?: Record<string, unknown>;
+  style?: ViewStyle;
   size?: number;
+  color?: string;
 };
 
-const Spinner = ({ style, size }: SpinnerProps) => {
+const Spinner = ({ style, size, color }: SpinnerProps) => {
   const rotation = useSharedValue(0);
 
   useEffect(() => {
@@ -37,14 +38,13 @@ const Spinner = ({ style, size }: SpinnerProps) => {
   });
 
   return (
-    <View style={tw`justify-center items-center`}>
+    <View className="justify-center items-center">
       <Animated.View style={animatedStyle}>
         <FontAwesomeIcon
           icon={faSpinnerThird}
-          style={tw.style(`text-[#FF8A65]`, {
-            ...style,
-          })}
+          style={style}
           size={size || 48}
+          color={color || COLORS.primaryLight}
         />
       </Animated.View>
     </View>
