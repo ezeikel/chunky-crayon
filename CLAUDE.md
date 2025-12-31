@@ -42,3 +42,43 @@ Use semantic commit style (`type(scope): message`). Keep messages as one-liners,
 - Magic Brush/Auto-Color: Uses pre-computed `colorMapJson` for instant color mapping (no AI call at runtime)
 - Ambient Sound: Generated via ElevenLabs, stored in `ambientSoundUrl` field
 - Colo mascot: Evolving character that grows with user's coloring activity
+
+## Mobile App Development
+
+**Key constraints:**
+
+- No Firebase Analytics or tracking SDKs (causes Kids Category rejection)
+- Parental gates required for IAP, external links, permissions
+- Local-first data storage (no PII collection)
+- React version must match across monorepo (use root `resolutions`)
+- Target: iPad-first, ages 3-8, COPPA/GDPR-K compliant
+
+For detailed plans, see `apps/web/docs/MOBILE_APP_PLAN.md` (only read when needed).
+
+### Running the Mobile App
+
+From `apps/mobile`:
+
+**iOS:**
+
+```bash
+pnpm prebuild:ios  # Only when native dependencies change (non-JS packages installed)
+pnpm ios           # Build and run on iOS simulator
+```
+
+**Android:**
+
+```bash
+pnpm prebuild:android  # Only when native dependencies change
+pnpm android           # Build and run on Android emulator
+```
+
+**Development server only:**
+
+```bash
+pnpm start         # Start Metro bundler
+pnpm dev:ios       # Start with iOS simulator
+pnpm dev:android   # Start with Android emulator
+```
+
+Note: Prebuild regenerates native `ios/` and `android/` folders. Only run when adding native dependencies.

@@ -53,3 +53,4 @@ android/build/
 android/app/build/
 android/.gradle/
 packages/db/src/generated/
+.playwright-mcp/
