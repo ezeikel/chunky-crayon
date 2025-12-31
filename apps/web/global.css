@@ -1,118 +1,290 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* =============================================================================
-   WARM CANVAS DESIGN SYSTEM
-   A warm, harmonious palette using analogous colors (coral → peach → yellow)
-   All colors sit next to each other on the color wheel for natural harmony
-   ============================================================================= */
+@theme {
+  /* Fonts */
+  --font-heading: var(--font-tondo), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-body: var(--font-rooney-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-tondo: var(--font-tondo), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-rooney-sans: var(--font-rooney-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
+  /* Crayon Colors */
+  --color-crayon-orange: hsl(var(--crayon-orange));
+  --color-crayon-orange-light: hsl(var(--crayon-orange-light));
+  --color-crayon-orange-dark: hsl(var(--crayon-orange-dark));
+  --color-crayon-teal: hsl(var(--crayon-teal));
+  --color-crayon-teal-light: hsl(var(--crayon-teal-light));
+  --color-crayon-teal-dark: hsl(var(--crayon-teal-dark));
+  --color-crayon-pink: hsl(var(--crayon-pink));
+  --color-crayon-pink-light: hsl(var(--crayon-pink-light));
+  --color-crayon-pink-dark: hsl(var(--crayon-pink-dark));
+  --color-crayon-yellow: hsl(var(--crayon-yellow));
+  --color-crayon-yellow-light: hsl(var(--crayon-yellow-light));
+  --color-crayon-yellow-dark: hsl(var(--crayon-yellow-dark));
+  --color-crayon-green: hsl(var(--crayon-green));
+  --color-crayon-green-light: hsl(var(--crayon-green-light));
+  --color-crayon-green-dark: hsl(var(--crayon-green-dark));
+  --color-crayon-purple: hsl(var(--crayon-purple));
+  --color-crayon-purple-light: hsl(var(--crayon-purple-light));
+  --color-crayon-purple-dark: hsl(var(--crayon-purple-dark));
+  --color-crayon-sky: hsl(var(--crayon-sky));
+  --color-crayon-sky-light: hsl(var(--crayon-sky-light));
+  --color-crayon-sky-dark: hsl(var(--crayon-sky-dark));
+
+  /* Social */
+  --color-social-facebook: hsl(var(--social-facebook));
+  --color-social-facebook-dark: hsl(var(--social-facebook-dark));
+
+  /* Text Colors */
+  --color-text-primary: hsl(var(--text-primary));
+  --color-text-secondary: hsl(var(--text-secondary));
+  --color-text-muted: hsl(var(--text-muted));
+  --color-text-inverted: hsl(var(--text-inverted));
+
+  /* Background Colors */
+  --color-bg-cream: hsl(var(--bg-cream));
+  --color-bg-cream-dark: hsl(var(--bg-cream-dark));
+  --color-bg-lavender: hsl(var(--bg-lavender));
+  --color-bg-white: hsl(var(--bg-white));
+  --color-paper-sky: hsl(var(--paper-sky));
+  --color-paper-cream: hsl(var(--paper-cream));
+  --color-paper-cream-dark: hsl(var(--paper-cream-dark));
+
+  /* Border Colors */
+  --color-border-light: hsl(var(--border-light));
+  --color-border-medium: hsl(var(--border-medium));
+
+  /* Semantic Tokens (shadcn/ui) */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-orange: hsl(var(--crayon-orange));
+
+  /* Border Radius */
+  --radius-sm: 0.75rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+
+  /* Spacing */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+
+  /* Shadows */
+  --shadow-perfect: 0 24px 24px -12px rgba(14, 63, 126, 0.04), 0 12px 12px -6px rgba(14, 63, 126, 0.04), 0 6px 6px -3px rgba(42, 51, 70, 0.04), 0 3px 3px -1.5px rgba(42, 51, 70, 0.04), 0 1px 1px -0.5px rgba(42, 51, 70, 0.04), 0 4px 4px 1px rgba(14, 63, 126, 0.04);
+  --shadow-crayon: 0 4px 6px -1px hsl(12 75% 58% / 0.1), 0 2px 4px -2px hsl(12 75% 58% / 0.1);
+  --shadow-crayon-lg: 0 10px 15px -3px hsl(12 75% 58% / 0.1), 0 4px 6px -4px hsl(12 75% 58% / 0.1);
+  --shadow-crayon-xl: 0 20px 25px -5px hsl(12 75% 58% / 0.1), 0 8px 10px -6px hsl(12 75% 58% / 0.1);
+  --shadow-inner-glow: inset 0 2px 4px 0 hsl(12 75% 58% / 0.06);
+  --shadow-card: 0 4px 6px -1px hsl(12 75% 58% / 0.08), 0 2px 4px -2px hsl(12 75% 58% / 0.06), 0 0 0 1px hsl(35 30% 90%);
+  --shadow-card-hover: 0 10px 15px -3px hsl(12 75% 58% / 0.12), 0 4px 6px -4px hsl(12 75% 58% / 0.08), 0 0 0 1px hsl(35 30% 90%);
+  --shadow-btn-primary: 0 4px 14px 0 hsl(12 75% 58% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.2);
+  --shadow-btn-primary-hover: 0 6px 20px 0 hsl(12 75% 58% / 0.5), inset 0 1px 0 hsl(0 0% 100% / 0.25);
+  --shadow-btn-secondary: 0 4px 14px 0 hsl(25 80% 72% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.2);
+  --shadow-btn-secondary-hover: 0 6px 20px 0 hsl(25 80% 72% / 0.5), inset 0 1px 0 hsl(0 0% 100% / 0.25);
+
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-bounce-in: bounce-in 0.5s ease-out;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-slide-up-full: slide-up-full 0.3s ease-out;
+  --animate-slide-down: slide-down 0.4s ease-out;
+  --animate-slide-in-right: slide-in-right 0.3s ease-out;
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-shake: shake 0.5s ease-in-out;
+  --animate-sound-wave: sound-wave 0.6s ease-in-out infinite;
+  --animate-bounce-subtle: bounce-subtle 0.3s ease-out;
+  --animate-squish: squish 0.3s ease-out;
+  --animate-happy-jump: happy-jump 0.6s ease-out;
+  --animate-reaction-float: reaction-float 0.8s ease-out forwards;
+  --animate-spin-slow: spin-slow 4s linear infinite;
+
+  /* Background Gradients */
+  --background-image-paper-gradient: linear-gradient(135deg, hsl(var(--bg-cream)) 0%, hsl(var(--bg-cream-dark)) 100%);
+  --background-image-paper-lavender: linear-gradient(135deg, hsl(var(--bg-lavender)) 0%, hsl(270 60% 95%) 100%);
+  --background-image-btn-orange: linear-gradient(135deg, hsl(var(--crayon-orange)) 0%, hsl(var(--crayon-orange-dark)) 100%);
+  --background-image-btn-teal: linear-gradient(135deg, hsl(var(--crayon-teal)) 0%, hsl(var(--crayon-teal-dark)) 100%);
+  --background-image-btn-pink: linear-gradient(135deg, hsl(var(--crayon-pink)) 0%, hsl(var(--crayon-pink-dark)) 100%);
+  --background-image-text-rainbow: linear-gradient(90deg, hsl(var(--crayon-orange)) 0%, hsl(var(--crayon-pink)) 33%, hsl(var(--crayon-purple)) 66%, hsl(var(--crayon-teal)) 100%);
+}
+
+/* Keyframes */
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+  75% { transform: rotate(-3deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes bounce-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(12 75% 58% / 0.4); }
+  50% { box-shadow: 0 0 20px 10px hsl(12 75% 58% / 0); }
+}
+
+@keyframes slide-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up-full {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes sound-wave {
+  0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+  60% { transform: translateY(-2px); }
+}
+
+@keyframes squish {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.9) rotate(-2deg); }
+}
+
+@keyframes happy-jump {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-12px) rotate(-5deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-8px) rotate(5deg); }
+}
+
+@keyframes reaction-float {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* CSS Variables */
 @layer base {
   :root {
-    /* =========================================================================
-       WARM ANALOGOUS PALETTE
-       Coral, peach, yellow, cream - all warm tones that work together
-       ========================================================================= */
-
-    /* Primary - Coral: Warm, friendly, inviting */
     --crayon-orange: 12 75% 58%;
     --crayon-orange-light: 12 80% 75%;
     --crayon-orange-dark: 12 70% 48%;
-
-    /* Secondary - Peach: Soft, approachable, gentle */
     --crayon-teal: 25 80% 72%;
     --crayon-teal-light: 25 85% 85%;
     --crayon-teal-dark: 25 75% 58%;
-
-    /* Accent - Blush Pink: Warm pink (not magenta), playful */
     --crayon-pink: 355 65% 72%;
     --crayon-pink-light: 355 70% 86%;
     --crayon-pink-dark: 355 60% 58%;
-
-    /* Highlight - Sunshine Yellow: Cheerful, bright, happy */
     --crayon-yellow: 42 95% 62%;
     --crayon-yellow-light: 42 100% 80%;
     --crayon-yellow-dark: 42 90% 48%;
-
-    /* Success - Sage Green: Warm-toned green, natural */
     --crayon-green: 85 35% 52%;
     --crayon-green-light: 85 40% 72%;
     --crayon-green-dark: 85 35% 40%;
-
-    /* Purple - Dusty Rose: Warm purple/mauve for variety */
     --crayon-purple: 340 30% 65%;
     --crayon-purple-light: 340 35% 80%;
     --crayon-purple-dark: 340 30% 50%;
-
-    /* Warm Tan - For subtle accents */
     --crayon-sky: 30 50% 85%;
     --crayon-sky-light: 30 55% 92%;
     --crayon-sky-dark: 30 45% 75%;
-
-    /* Social Media Blue - Exception for Facebook brand color */
     --social-facebook: 214 89% 52%;
     --social-facebook-dark: 214 89% 42%;
-
-    /* =========================================================================
-       NEUTRAL PALETTE
-       Warm cream and brown tones - no blue/cool undertones
-       ========================================================================= */
-
-    /* Text Colors - Warm charcoal with brown undertones */
     --text-primary: 20 20% 22%;
     --text-secondary: 20 12% 40%;
     --text-muted: 25 10% 55%;
     --text-inverted: 0 0% 100%;
-
-    /* Background Colors - Warm cream tones */
     --bg-cream: 38 55% 97%;
     --bg-cream-dark: 35 40% 93%;
     --bg-lavender: 30 45% 96%;
     --bg-white: 40 30% 99%;
-
-    /* Paper texture backgrounds */
     --paper-sky: 35 45% 94%;
     --paper-cream: 40 50% 96%;
-
-    /* Border Colors - Warm tones */
+    --paper-cream-dark: 35 40% 93%;
     --border-light: 35 30% 90%;
     --border-medium: 30 25% 82%;
-
-    /* =========================================================================
-       SHADCN/UI SEMANTIC TOKENS
-       Mapped to our Crayon palette
-       ========================================================================= */
-
-    --background: var(--bg-cream);
-    --foreground: var(--text-primary);
-
-    --card: var(--bg-white);
-    --card-foreground: var(--text-primary);
-
-    --popover: var(--bg-white);
-    --popover-foreground: var(--text-primary);
-
-    --primary: var(--crayon-orange);
+    --background: 38 55% 97%;
+    --foreground: 20 20% 22%;
+    --card: 40 30% 99%;
+    --card-foreground: 20 20% 22%;
+    --popover: 40 30% 99%;
+    --popover-foreground: 20 20% 22%;
+    --primary: 12 75% 58%;
     --primary-foreground: 0 0% 100%;
-
-    --secondary: var(--crayon-teal);
+    --secondary: 25 80% 72%;
     --secondary-foreground: 0 0% 100%;
-
-    --muted: var(--bg-cream-dark);
-    --muted-foreground: var(--text-muted);
-
-    --accent: var(--crayon-orange-light);
-    --accent-foreground: var(--text-primary);
-
+    --muted: 35 40% 93%;
+    --muted-foreground: 25 10% 55%;
+    --accent: 12 80% 75%;
+    --accent-foreground: 20 20% 22%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-
-    --border: var(--border-light);
-    --input: var(--border-medium);
-    --ring: var(--crayon-orange);
-
-    /* Increased radius for more playful, rounded feel */
+    --border: 35 30% 90%;
+    --input: 30 25% 82%;
+    --ring: 12 75% 58%;
     --radius: 1rem;
     --radius-sm: 0.75rem;
     --radius-lg: 1.5rem;
@@ -120,106 +292,66 @@
     --radius-full: 9999px;
   }
 
-  /* Dark mode - subtle adjustments for evening coloring sessions */
   .dark {
     --background: 240 10% 10%;
     --foreground: 0 0% 95%;
-
     --card: 240 10% 14%;
     --card-foreground: 0 0% 95%;
-
     --popover: 240 10% 14%;
     --popover-foreground: 0 0% 95%;
-
-    --primary: var(--crayon-orange);
+    --primary: 12 75% 58%;
     --primary-foreground: 0 0% 100%;
-
-    --secondary: var(--crayon-teal);
+    --secondary: 25 80% 72%;
     --secondary-foreground: 0 0% 100%;
-
     --muted: 240 10% 20%;
     --muted-foreground: 0 0% 65%;
-
     --accent: 240 10% 20%;
     --accent-foreground: 0 0% 95%;
-
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
-
     --border: 240 10% 20%;
     --input: 240 10% 25%;
-    --ring: var(--crayon-orange);
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+    --ring: 12 75% 58%;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Improve focus states for accessibility */
   :focus-visible {
-    @apply outline-none ring-2 ring-offset-2;
-    --tw-ring-color: hsl(var(--crayon-orange));
-    --tw-ring-offset-color: hsl(var(--background));
+    outline: none;
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) hsl(var(--background));
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) hsl(var(--crayon-orange));
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
   }
 
-  /* Smooth scrolling for the whole page */
   html {
     scroll-behavior: smooth;
   }
 
-  /* Selection color matching brand */
   ::selection {
     background-color: hsl(var(--crayon-orange-light));
     color: hsl(var(--text-primary));
   }
 }
 
-/* =============================================================================
-   CUSTOM UTILITY CLASSES
-   ============================================================================= */
-
 @layer utilities {
-  /* Colorful tinted shadows for playful depth */
-  .shadow-crayon {
-    box-shadow:
-      0 4px 6px -1px hsl(var(--crayon-orange) / 0.1),
-      0 2px 4px -2px hsl(var(--crayon-orange) / 0.1);
-  }
-
-  .shadow-crayon-lg {
-    box-shadow:
-      0 10px 15px -3px hsl(var(--crayon-orange) / 0.1),
-      0 4px 6px -4px hsl(var(--crayon-orange) / 0.1);
-  }
-
-  .shadow-crayon-xl {
-    box-shadow:
-      0 20px 25px -5px hsl(var(--crayon-orange) / 0.1),
-      0 8px 10px -6px hsl(var(--crayon-orange) / 0.1);
-  }
-
-  /* Teal shadow variant */
   .shadow-teal {
     box-shadow:
       0 4px 6px -1px hsl(var(--crayon-teal) / 0.15),
       0 2px 4px -2px hsl(var(--crayon-teal) / 0.1);
   }
 
-  /* Pink shadow variant */
   .shadow-pink {
     box-shadow:
       0 4px 6px -1px hsl(var(--crayon-pink) / 0.15),
       0 2px 4px -2px hsl(var(--crayon-pink) / 0.1);
   }
 
-  /* Paper texture gradient backgrounds */
   .bg-paper {
     background: linear-gradient(
       135deg,
@@ -236,9 +368,10 @@
     );
   }
 
-  /* Gradient text for headings */
   .text-gradient-orange {
-    @apply bg-clip-text text-transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
     background-image: linear-gradient(
       135deg,
       hsl(var(--crayon-orange)) 0%,
@@ -247,7 +380,9 @@
   }
 
   .text-gradient-rainbow {
-    @apply bg-clip-text text-transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
     background-image: linear-gradient(
       90deg,
       hsl(var(--crayon-orange)) 0%,
@@ -257,83 +392,22 @@
     );
   }
 
-  /* Bouncy hover effect for interactive elements */
   .hover-bounce {
-    @apply transition-transform duration-200 ease-out;
+    transition: transform 0.2s ease-out;
   }
   .hover-bounce:hover {
-    @apply scale-105;
-  }
-  .hover-bounce:active {
-    @apply scale-95;
-  }
-
-  /* Wiggle animation for fun interactions */
-  .animate-wiggle {
-    animation: wiggle 0.5s ease-in-out;
-  }
-
-  /* Float animation for decorative elements */
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  /* Pulse glow for CTAs */
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-}
-
-/* =============================================================================
-   KEYFRAME ANIMATIONS
-   ============================================================================= */
-
-@keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-5deg); }
-  50% { transform: rotate(5deg); }
-  75% { transform: rotate(-3deg); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 hsl(var(--crayon-orange) / 0.4);
-  }
-  50% {
-    box-shadow: 0 0 20px 10px hsl(var(--crayon-orange) / 0);
-  }
-}
-
-@keyframes bounce-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-  50% {
     transform: scale(1.05);
   }
-  70% {
-    transform: scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
+  .hover-bounce:active {
+    transform: scale(0.95);
   }
 }
 
-/* =============================================================================
-   COMPONENT STYLES
-   ============================================================================= */
-
 @layer components {
-  /* Card styles with playful shadows */
   .card-crayon {
-    @apply bg-white rounded-2xl p-6;
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
     box-shadow:
       0 4px 6px -1px hsl(var(--crayon-orange) / 0.08),
       0 2px 4px -2px hsl(var(--crayon-orange) / 0.06),
@@ -347,12 +421,18 @@
       0 0 0 1px hsl(var(--border-medium));
   }
 
-  /* Button with crayon styling */
   .btn-crayon {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3;
-    @apply font-tondo font-bold text-lg text-white;
-    @apply rounded-xl transition-all duration-200;
-    @apply hover:scale-105 active:scale-95;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: white;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+    font-family: var(--font-tondo), ui-sans-serif, system-ui, sans-serif;
     background: linear-gradient(
       135deg,
       hsl(var(--crayon-orange)) 0%,
@@ -364,19 +444,37 @@
   }
 
   .btn-crayon:hover {
+    transform: scale(1.05);
     box-shadow:
       0 6px 20px 0 hsl(var(--crayon-orange) / 0.5),
       inset 0 1px 0 hsl(0 0% 100% / 0.25);
   }
 
-  .btn-crayon:disabled {
-    @apply opacity-50 cursor-not-allowed;
-    @apply hover:scale-100;
+  .btn-crayon:active {
+    transform: scale(0.95);
   }
 
-  /* Secondary button variant */
+  .btn-crayon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-crayon:disabled:hover {
+    transform: scale(1);
+  }
+
   .btn-crayon-secondary {
-    @apply btn-crayon;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: white;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+    font-family: var(--font-tondo), ui-sans-serif, system-ui, sans-serif;
     background: linear-gradient(
       135deg,
       hsl(var(--crayon-teal)) 0%,
@@ -388,52 +486,76 @@
   }
 
   .btn-crayon-secondary:hover {
+    transform: scale(1.05);
     box-shadow:
       0 6px 20px 0 hsl(var(--crayon-teal) / 0.5),
       inset 0 1px 0 hsl(0 0% 100% / 0.25);
   }
 
-  /* Outline button variant */
+  .btn-crayon-secondary:active {
+    transform: scale(0.95);
+  }
+
   .btn-crayon-outline {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3;
-    @apply font-tondo font-bold text-lg;
-    @apply rounded-xl transition-all duration-200;
-    @apply hover:scale-105 active:scale-95;
-    @apply bg-white border-2;
-    border-color: hsl(var(--crayon-orange));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+    background-color: white;
+    border: 2px solid hsl(var(--crayon-orange));
     color: hsl(var(--crayon-orange));
+    font-family: var(--font-tondo), ui-sans-serif, system-ui, sans-serif;
   }
 
   .btn-crayon-outline:hover {
-    background: hsl(var(--crayon-orange-light) / 0.1);
+    transform: scale(1.05);
+    background-color: hsl(var(--crayon-orange-light) / 0.1);
   }
 
-  /* Speech bubble for voice/image results */
+  .btn-crayon-outline:active {
+    transform: scale(0.95);
+  }
+
   .speech-bubble {
-    @apply relative bg-white rounded-2xl p-5;
+    position: relative;
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1.25rem;
     border: 2px solid hsl(var(--crayon-teal));
     box-shadow: 0 4px 12px hsl(var(--crayon-teal) / 0.15);
   }
 
   .speech-bubble::after {
     content: '';
-    @apply absolute -bottom-3 left-1/2 -translate-x-1/2;
-    @apply w-5 h-5 bg-white;
+    position: absolute;
+    bottom: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: white;
     border-right: 2px solid hsl(var(--crayon-teal));
     border-bottom: 2px solid hsl(var(--crayon-teal));
-    transform: translateX(-50%) rotate(45deg);
   }
 
-  /* Input fields with playful styling */
   .input-crayon {
-    @apply w-full px-4 py-3 text-lg rounded-xl;
-    @apply bg-white border-2 transition-all duration-200;
-    @apply font-tondo;
-    border-color: hsl(var(--border-medium));
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1.125rem;
+    border-radius: 0.75rem;
+    background-color: white;
+    border: 2px solid hsl(var(--border-medium));
+    transition: all 0.2s;
+    font-family: var(--font-tondo), ui-sans-serif, system-ui, sans-serif;
   }
 
   .input-crayon:focus {
-    @apply outline-none;
+    outline: none;
     border-color: hsl(var(--crayon-orange));
     box-shadow: 0 0 0 3px hsl(var(--crayon-orange) / 0.1);
   }
@@ -442,54 +564,59 @@
     color: hsl(var(--text-muted));
   }
 
-  /* Textarea variant */
   .textarea-crayon {
-    @apply input-crayon resize-none;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1.125rem;
+    border-radius: 0.75rem;
+    resize: none;
+    background-color: white;
+    border: 2px solid hsl(var(--border-medium));
+    transition: all 0.2s;
     min-height: 120px;
+    font-family: var(--font-tondo), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .textarea-crayon:focus {
+    outline: none;
+    border-color: hsl(var(--crayon-orange));
+    box-shadow: 0 0 0 3px hsl(var(--crayon-orange) / 0.1);
+  }
+
+  .textarea-crayon::placeholder {
+    color: hsl(var(--text-muted));
   }
 }
 
-/* =============================================================================
-   FONTAWESOME DUOTONE ICON STYLING
-   ============================================================================= */
-
-/* Default duotone colors - orange primary, teal secondary */
+/* FontAwesome Duotone */
 .fa-duotone {
   --fa-primary-color: hsl(var(--crayon-orange));
   --fa-secondary-color: hsl(var(--crayon-teal));
   --fa-secondary-opacity: 0.8;
 }
 
-/* Teal variant */
 .fa-duotone.icon-teal {
   --fa-primary-color: hsl(var(--crayon-teal));
   --fa-secondary-color: hsl(var(--crayon-orange));
 }
 
-/* Pink variant */
 .fa-duotone.icon-pink {
   --fa-primary-color: hsl(var(--crayon-pink));
   --fa-secondary-color: hsl(var(--crayon-purple));
 }
 
-/* Success variant */
 .fa-duotone.icon-success {
   --fa-primary-color: hsl(var(--crayon-green));
   --fa-secondary-color: hsl(var(--crayon-teal));
 }
 
-/* Muted/disabled variant */
 .fa-duotone.icon-muted {
   --fa-primary-color: hsl(var(--text-muted));
   --fa-secondary-color: hsl(var(--text-muted));
   --fa-secondary-opacity: 0.5;
 }
 
-/* =============================================================================
-   SONNER TOAST OVERRIDES
-   Outside @layer for higher specificity
-   ============================================================================= */
-
+/* Sonner Toast */
 [data-sonner-toast] [data-description] {
   color: hsl(var(--text-secondary)) !important;
 }

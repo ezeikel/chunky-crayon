@@ -147,6 +147,7 @@ export { analyzeImageForAnalytics } from './analytics';
 // Re-export image provider abstraction
 export {
   generateColoringPageImage,
+  generateColoringPageFromPhoto,
   getCurrentProviderConfig,
   getAvailableProviders,
 } from './image-providers';

@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { ColoringImage } from '@chunky-crayon/db/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPrint } from '@fortawesome/pro-solid-svg-icons';
+import { faImage } from '@fortawesome/pro-solid-svg-icons';
 import { pdf } from '@react-pdf/renderer';
 import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/ColoringPageDocument';
 import cn from '@/utils/cn';
@@ -135,7 +135,7 @@ const DownloadPDFButtonContent = ({
         type="button"
       >
         <FontAwesomeIcon
-          icon={faPrint}
+          icon={faImage}
           className="text-xl md:text-2xl animate-pulse"
         />
         <span className="hidden md:inline">{t('loading')}</span>
@@ -154,7 +154,7 @@ const DownloadPDFButtonContent = ({
         disabled
         type="button"
       >
-        <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
+        <FontAwesomeIcon icon={faImage} className="text-xl md:text-2xl" />
         <span className="hidden md:inline">{t('error')}</span>
       </button>
     );
@@ -168,7 +168,7 @@ const DownloadPDFButtonContent = ({
         type="button"
       >
         <FontAwesomeIcon
-          icon={faPrint}
+          icon={faImage}
           className="text-xl md:text-2xl animate-pulse"
         />
         <span className="hidden md:inline">{t('creating')}</span>
@@ -187,7 +187,7 @@ const DownloadPDFButtonContent = ({
         disabled
         type="button"
       >
-        <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
+        <FontAwesomeIcon icon={faImage} className="text-xl md:text-2xl" />
         <span className="hidden md:inline">{t('error')}</span>
       </button>
     );
@@ -199,7 +199,7 @@ const DownloadPDFButtonContent = ({
       onClick={handlePrint}
       className={cn(buttonClassName, className)}
     >
-      <FontAwesomeIcon icon={faPrint} className="text-xl md:text-2xl" />
+      <FontAwesomeIcon icon={faImage} className="text-xl md:text-2xl" />
       <span className="hidden md:inline">{t('idle')}</span>
     </button>
   );

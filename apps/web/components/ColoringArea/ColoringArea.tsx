@@ -14,7 +14,7 @@ import ImageCanvas, {
   ImageCanvasHandle,
 } from '@/components/ImageCanvas/ImageCanvas';
 import ColoringToolbar from '@/components/ColoringToolbar/ColoringToolbar';
-import MobileColoringToolbar from '@/components/MobileColoringToolbar/MobileColoringToolbar';
+import MobileColoringDrawer from '@/components/MobileColoringDrawer/MobileColoringDrawer';
 import StickerSelector from '@/components/StickerSelector';
 import ProgressIndicator from '@/components/ProgressIndicator';
 import MuteToggle from '@/components/MuteToggle';
@@ -467,8 +467,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           )}
         </div>
 
-        {/* Fixed bottom toolbar for mobile */}
-        <MobileColoringToolbar
+        {/* Fixed bottom drawer for mobile - Vaul-based draggable bottom sheet */}
+        <MobileColoringDrawer
           className="md:hidden"
           onUndo={handleUndo}
           onRedo={handleRedo}

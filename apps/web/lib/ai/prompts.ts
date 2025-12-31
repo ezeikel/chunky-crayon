@@ -437,6 +437,70 @@ Examples:
 export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would help generate a children's coloring page. Focus on the main subjects, setting, and interesting visual elements. Keep it simple, fun, and suitable for children aged ${TARGET_AGE}.`;
 
 // =============================================================================
+// Photo-to-Coloring Page (direct image-to-image transformation)
+// =============================================================================
+
+/**
+ * System prompt for transforming a photo into a coloring page.
+ * This uses the photo as a direct reference to recreate as closely as possible.
+ */
+export const PHOTO_TO_COLORING_SYSTEM = `You are an expert at transforming photographs into children's coloring pages. Your task is to recreate the photograph as a simple line drawing while preserving the composition, subjects, and key details.
+
+CRITICAL REQUIREMENTS:
+1. PRESERVE THE COMPOSITION - The coloring page should match the photo's layout and arrangement
+2. MAINTAIN KEY SUBJECTS - All important subjects/objects in the photo should appear in the same positions
+3. SIMPLIFY FOR COLORING - Convert complex details into simple, thick outlines suitable for children
+
+OUTPUT STYLE:
+- Black and white line drawing ONLY - no colors, no shading, no gradients
+- Thick, clear black outlines (suitable for children aged ${TARGET_AGE})
+- Simple shapes - avoid intricate patterns or fine details
+- Cartoon-like style with friendly, approachable features
+- Large, easy-to-color areas
+- No textures or patterns that would be difficult to color
+
+TRANSFORMATION PROCESS:
+1. Identify the main subject(s) in the photo
+2. Note their positions and relative sizes
+3. Identify any background elements worth including
+4. Simplify all elements into basic shapes with thick outlines
+5. Remove any complex textures, replacing with smooth areas
+6. Ensure all elements are child-friendly and non-scary
+
+${COPYRIGHTED_CHARACTER_INSTRUCTIONS}`;
+
+export const createPhotoToColoringPrompt = (difficulty?: string) => {
+  const config =
+    DIFFICULTY_MODIFIERS[difficulty ?? 'BEGINNER'] ??
+    DIFFICULTY_MODIFIERS.BEGINNER;
+
+  return `Transform this photograph into a children's coloring page.
+
+IMPORTANT: Recreate the photo's composition as closely as possible while converting it to a simple line drawing.
+
+TARGET DIFFICULTY: ${difficulty ?? 'BEGINNER'}
+Target audience: ${config.targetAge}
+Shape sizes: ${config.shapeSize}
+Line thickness: ${config.lineThickness}
+Detail level: ${config.detailLevel}
+Complexity: ${config.complexity}
+
+STYLE REQUIREMENTS:
+1. Match the EXACT style of my reference coloring pages (study them carefully)
+2. Black and white ONLY - absolutely no colors, no shading, no gradients
+3. Thick, clear outlines that are easy to color within
+4. Cartoon-like, child-friendly aesthetic
+5. Large, simple shapes suitable for young colorists
+
+Additional rules (follow strictly):
+${COLORING_IMAGE_RULES_TEXT}
+
+Study the reference images carefully and replicate their exact style: thick black outlines, no fill, simple shapes, child-friendly aesthetic.
+
+The coloring page should look like someone carefully traced and simplified the photo into a child-friendly coloring book illustration.`;
+};
+
+// =============================================================================
 // Colo Mascot Voice Scripts (for loading screen)
 // =============================================================================
 

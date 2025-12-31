@@ -7,6 +7,8 @@ import {
   createDifficultyAwarePrompt,
   REFERENCE_IMAGES,
   DIFFICULTY_MODIFIERS,
+  PHOTO_TO_COLORING_SYSTEM,
+  createPhotoToColoringPrompt,
 } from './prompts';
 import { openai } from '@ai-sdk/openai';
 
@@ -300,4 +302,118 @@ export function getCurrentProviderConfig(): ProviderConfig {
  */
 export function getAvailableProviders(): ProviderConfig[] {
   return Object.values(PROVIDERS);
+}
+
+/**
+ * Generate a coloring page directly from a user's photo.
+ *
+ * This uses Gemini's multimodal capabilities to:
+ * 1. Analyze the user's photo
+ * 2. Recreate it as a coloring page that closely matches the composition
+ * 3. Apply the same style as our reference coloring pages
+ *
+ * @param photoBase64 - The user's photo as a base64 string
+ * @param difficulty - Optional difficulty level for age-appropriate generation
+ * @returns The generated coloring page image and metadata
+ */
+export async function generateColoringPageFromPhoto(
+  photoBase64: string,
+  difficulty?: Difficulty,
+): Promise<GenerationResult> {
+  // eslint-disable-next-line no-console
+  console.log(
+    `[PhotoToColoring] Generating coloring page from photo${difficulty ? ` with difficulty: ${difficulty}` : ''}`,
+  );
+
+  const startTime = Date.now();
+
+  // Build message content with:
+  // 1. The user's photo as the primary reference
+  // 2. Our style reference images
+  // 3. The transformation prompt
+  const messageContent: Array<
+    | { type: 'text'; text: string }
+    | { type: 'image'; image: URL }
+    | { type: 'image'; image: string }
+  > = [
+    // System context and prompt
+    { type: 'text', text: PHOTO_TO_COLORING_SYSTEM },
+    // User's photo (as base64)
+    {
+      type: 'image',
+      image: photoBase64.startsWith('data:')
+        ? photoBase64
+        : `data:image/jpeg;base64,${photoBase64}`,
+    },
+    // Transformation instructions
+    { type: 'text', text: createPhotoToColoringPrompt(difficulty) },
+    // Style reference images
+    {
+      type: 'text',
+      text: 'Here are examples of the coloring page style to match:',
+    },
+    ...REFERENCE_IMAGES.map((url) => ({
+      type: 'image' as const,
+      image: new URL(url),
+    })),
+  ];
+
+  try {
+    const result = await generateText({
+      model: models.geminiImage,
+      messages: [
+        {
+          role: 'user',
+          content: messageContent,
+        },
+      ],
+      providerOptions: {
+        google: {
+          responseModalities: ['TEXT', 'IMAGE'],
+        },
+      },
+    });
+
+    const generationTimeMs = Date.now() - startTime;
+
+    // Extract the generated image from the response
+    const generatedImage = result.files?.find((file) =>
+      file.mediaType?.startsWith('image/'),
+    );
+
+    if (!generatedImage?.base64) {
+      throw new Error(
+        'Gemini did not return an image for photo transformation',
+      );
+    }
+
+    const imageBuffer = Buffer.from(generatedImage.base64, 'base64');
+
+    // Save to blob storage
+    const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
+    const { url } = await put(tempFileName, imageBuffer, { access: 'public' });
+
+    // eslint-disable-next-line no-console
+    console.log(`[PhotoToColoring] Generated in ${generationTimeMs}ms`);
+
+    return {
+      url,
+      tempFileName,
+      generationTimeMs,
+      provider: 'google',
+      model: MODEL_IDS.GEMINI_3_PRO_IMAGE,
+      imageBuffer,
+    };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      '[PhotoToColoring] Failed:',
+      error instanceof Error ? error.message : error,
+    );
+
+    // Re-throw with context
+    throw new Error(
+      `Photo-to-coloring generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+  }
 }

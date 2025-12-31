@@ -207,6 +207,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           tondo.variable,
           rooneySans.variable,
         )}
+        data-vaul-drawer-wrapper=""
       >
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>

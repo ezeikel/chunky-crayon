@@ -219,7 +219,7 @@ const CreateColoringPageForm = ({
     return (
       <div
         className={cn(
-          'flex flex-col gap-y-5 p-6 md:p-8 bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark relative overflow-hidden',
+          'flex flex-col gap-y-5 p-6 md:p-8 bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark relative overflow-clip',
           isLarge ? 'max-w-2xl' : 'max-w-lg',
         )}
       >
@@ -277,7 +277,7 @@ const CreateColoringPageForm = ({
 
   // Legacy single-mode behavior (text only)
   return (
-    <div className="max-w-lg flex flex-col gap-y-5 p-6 md:p-8 bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark relative overflow-hidden">
+    <div className="max-w-lg flex flex-col gap-y-5 p-6 md:p-8 bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark relative overflow-clip">
       {/* Decorative corner accent */}
       <div className="absolute -top-12 -right-12 w-24 h-24 bg-crayon-orange-light/20 rounded-full blur-2xl" />
       <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-crayon-teal-light/20 rounded-full blur-2xl" />

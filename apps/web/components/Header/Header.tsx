@@ -30,6 +30,7 @@ import HeaderStickerIndicator from './HeaderStickerIndicator';
 import HeaderChallengeIndicator from './HeaderChallengeIndicator';
 import HeaderColoIndicator from './HeaderColoIndicator';
 import MobileMenu from './MobileMenu';
+import ScrollHeader from './ScrollHeader';
 import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
 
 export type Visibility = 'always' | 'authenticated' | 'unauthenticated';
@@ -60,7 +61,9 @@ const handleSignOut = async () => {
 
 // Simplified nav items - text only for navigation
 // Note: Credits are now shown in the Combined Profile Pill (HeaderDropdown)
-const getNavItems = (t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>): NavItem[] => [
+const getNavItems = (
+  t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>,
+): NavItem[] => [
   {
     label: t('home'),
     href: '/',
@@ -101,7 +104,7 @@ const getNavItems = (t: Awaited<ReturnType<typeof getTranslations<'navigation'>>
 const getMobileItems = (
   user: Partial<User> | null,
   t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>,
-  tCommon: Awaited<ReturnType<typeof getTranslations<'common'>>>
+  tCommon: Awaited<ReturnType<typeof getTranslations<'common'>>>,
 ): MobileNavItem[] => {
   const items: MobileNavItem[] = [];
   if (user) {
@@ -136,7 +139,9 @@ const getMobileItems = (
       href: '/account/challenges',
     });
     items.push({
-      label: tCommon('creditsWithCount', { count: formatNumber(user.credits || 0) }),
+      label: tCommon('creditsWithCount', {
+        count: formatNumber(user.credits || 0),
+      }),
       iconName: faCoins,
       liClass: 'bg-crayon-yellow-light/30 rounded-full',
     });
@@ -320,7 +325,7 @@ const Header = async () => {
   };
 
   return (
-    <header className="flex items-center justify-between px-4 md:px-6 py-3 sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-card border-b border-paper-cream-dark">
+    <ScrollHeader>
       <Link
         href="/"
         className="group flex items-center hover:scale-105 active:scale-95 transition-transform duration-200"
@@ -330,7 +335,7 @@ const Header = async () => {
         </h1>
       </Link>
       {renderItems()}
-    </header>
+    </ScrollHeader>
   );
 };
 

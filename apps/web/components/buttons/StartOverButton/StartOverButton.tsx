@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRotateLeft } from '@fortawesome/pro-solid-svg-icons';
+import { faBroomWide } from '@fortawesome/pro-solid-svg-icons';
 import cn from '@/utils/cn';
 
 type StartOverButtonProps = {
@@ -50,7 +50,7 @@ const StartOverButton = ({
           onClick={handleClick}
           className="flex items-center justify-center gap-x-2 text-white font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-crayon-pink hover:bg-crayon-pink-dark active:scale-95 transition-all duration-150"
         >
-          <FontAwesomeIcon icon={faArrowRotateLeft} className="text-base" />
+          <FontAwesomeIcon icon={faBroomWide} className="text-base" />
           <span>{t('confirm')}</span>
         </button>
         <button
@@ -75,10 +75,7 @@ const StartOverButton = ({
         className,
       )}
     >
-      <FontAwesomeIcon
-        icon={faArrowRotateLeft}
-        className="text-xl md:text-2xl"
-      />
+      <FontAwesomeIcon icon={faBroomWide} className="text-xl md:text-2xl" />
       <span className="hidden md:inline">{t('idle')}</span>
     </button>
   );

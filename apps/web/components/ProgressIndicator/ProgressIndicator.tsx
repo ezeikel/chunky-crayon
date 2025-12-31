@@ -103,74 +103,84 @@ const ProgressIndicator = ({
   }, [updateProgress]);
 
   return (
-    <div className={cn('flex items-center gap-3 w-full', className)}>
-      {/* Progress bar - flexible width */}
-      <div className="relative flex-1 min-w-0">
-        <div className="h-3 bg-paper-cream-dark rounded-full overflow-hidden border border-paper-cream-dark/50 shadow-inner">
-          <motion.div
-            className="h-full rounded-full"
-            style={{
-              background: `linear-gradient(90deg,
-                hsl(var(--crayon-orange)) 0%,
-                hsl(var(--crayon-yellow)) 50%,
-                hsl(var(--crayon-green)) 100%
-              )`,
-            }}
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-          />
-        </div>
-
-        {/* Star icons for milestones */}
-        <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-1 pointer-events-none">
-          {MILESTONE_PERCENTS.map((percent) => (
-            <motion.div
-              key={percent}
-              className={cn(
-                'w-2.5 h-2.5 flex items-center justify-center',
-                progress >= percent
-                  ? 'text-crayon-yellow'
-                  : 'text-paper-cream-dark/60',
-              )}
-              animate={
-                progress >= percent
-                  ? { scale: [1, 1.3, 1], rotate: [0, 15, -15, 0] }
-                  : {}
-              }
-              transition={{ duration: 0.3 }}
-            >
-              <FontAwesomeIcon
-                icon={faStar}
-                className="text-[10px] drop-shadow-sm"
-              />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Milestone celebration popup */}
-        <AnimatePresence>
-          {showMilestone && lastMilestone && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.9 }}
-              className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-crayon-yellow rounded-full shadow-lg z-10"
-            >
-              <span className="font-tondo font-bold text-sm text-text-primary whitespace-nowrap">
-                {t(`milestones.${lastMilestone}`)}
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Progress text - compact */}
-      <div className="flex items-center gap-1.5 shrink-0">
-        <span className="font-tondo font-bold text-base text-text-primary">
+    <div className={cn('flex items-center gap-3', className)}>
+      {/* Mobile: Just percentage in a pill */}
+      <div className="flex md:hidden items-center justify-center h-10 px-4 bg-white/95 rounded-full shadow-md">
+        <span className="font-tondo font-bold text-base text-crayon-orange">
           {progress}%
         </span>
-        <span className="text-xs text-text-secondary">{t('colored')}</span>
+      </div>
+
+      {/* Desktop: Full progress bar with milestones */}
+      <div className="hidden md:flex items-center gap-3 w-full">
+        {/* Progress bar - flexible width */}
+        <div className="relative flex-1 min-w-0">
+          <div className="h-3 bg-paper-cream-dark rounded-full overflow-hidden border border-paper-cream-dark/50 shadow-inner">
+            <motion.div
+              className="h-full rounded-full"
+              style={{
+                background: `linear-gradient(90deg,
+                  hsl(var(--crayon-orange)) 0%,
+                  hsl(var(--crayon-yellow)) 50%,
+                  hsl(var(--crayon-green)) 100%
+                )`,
+              }}
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            />
+          </div>
+
+          {/* Star icons for milestones */}
+          <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-1 pointer-events-none">
+            {MILESTONE_PERCENTS.map((percent) => (
+              <motion.div
+                key={percent}
+                className={cn(
+                  'w-2.5 h-2.5 flex items-center justify-center',
+                  progress >= percent
+                    ? 'text-crayon-yellow'
+                    : 'text-paper-cream-dark/60',
+                )}
+                animate={
+                  progress >= percent
+                    ? { scale: [1, 1.3, 1], rotate: [0, 15, -15, 0] }
+                    : {}
+                }
+                transition={{ duration: 0.3 }}
+              >
+                <FontAwesomeIcon
+                  icon={faStar}
+                  className="text-[10px] drop-shadow-sm"
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Milestone celebration popup */}
+          <AnimatePresence>
+            {showMilestone && lastMilestone && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-crayon-yellow rounded-full shadow-lg z-10"
+              >
+                <span className="font-tondo font-bold text-sm text-text-primary whitespace-nowrap">
+                  {t(`milestones.${lastMilestone}`)}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Progress text - compact */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="font-tondo font-bold text-base text-text-primary">
+            {progress}%
+          </span>
+          <span className="text-xs text-text-secondary">{t('colored')}</span>
+        </div>
       </div>
     </div>
   );
