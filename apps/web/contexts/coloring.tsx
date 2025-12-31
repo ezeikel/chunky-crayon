@@ -158,38 +158,43 @@ export const ColoringContextProvider = ({
   const [undoStack, setUndoStack] = useState<CanvasAction[]>([]);
   const [redoStack, setRedoStack] = useState<CanvasAction[]>([]);
 
-  // Audio state - initialize from localStorage
-  const [isMuted, setIsMuted] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('chunky-crayon-muted') === 'true';
-    }
-    return false;
-  });
-  const [isSfxMuted, setIsSfxMuted] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('chunky-crayon-sfx-muted') === 'true';
-    }
-    return false;
-  });
-  const [isAmbientMuted, setIsAmbientMuted] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('chunky-crayon-ambient-muted') === 'true';
-    }
-    return false;
-  });
+  // Audio state - initialize with defaults, hydrate from localStorage after mount
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSfxMuted, setIsSfxMuted] = useState(false);
+  const [isAmbientMuted, setIsAmbientMuted] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Persist audio settings to localStorage
+  // Hydrate audio settings from localStorage after mount (avoids SSR mismatch)
   useEffect(() => {
-    localStorage.setItem('chunky-crayon-muted', String(isMuted));
-  }, [isMuted]);
+    setIsMuted(localStorage.getItem('chunky-crayon-muted') === 'true');
+    setIsSfxMuted(localStorage.getItem('chunky-crayon-sfx-muted') === 'true');
+    setIsAmbientMuted(
+      localStorage.getItem('chunky-crayon-ambient-muted') === 'true',
+    );
+    setIsHydrated(true);
+  }, []);
+
+  // Persist audio settings to localStorage (only after hydration)
+  useEffect(() => {
+    if (isHydrated) {
+      localStorage.setItem('chunky-crayon-muted', String(isMuted));
+    }
+  }, [isMuted, isHydrated]);
 
   useEffect(() => {
-    localStorage.setItem('chunky-crayon-sfx-muted', String(isSfxMuted));
-  }, [isSfxMuted]);
+    if (isHydrated) {
+      localStorage.setItem('chunky-crayon-sfx-muted', String(isSfxMuted));
+    }
+  }, [isSfxMuted, isHydrated]);
 
   useEffect(() => {
-    localStorage.setItem('chunky-crayon-ambient-muted', String(isAmbientMuted));
-  }, [isAmbientMuted]);
+    if (isHydrated) {
+      localStorage.setItem(
+        'chunky-crayon-ambient-muted',
+        String(isAmbientMuted),
+      );
+    }
+  }, [isAmbientMuted, isHydrated]);
 
   // Progress state
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
