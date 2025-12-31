@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getActiveProfile, setActiveProfile } from '@/app/actions/profiles';
+import { db } from '@chunky-crayon/db';
+import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,28 +16,64 @@ export async function OPTIONS() {
  * GET /api/mobile/profiles/active
  * Returns the currently active profile
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const profile = await getActiveProfile();
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
 
-    if (!profile) {
+    if (!userId) {
       return NextResponse.json(
         { activeProfile: null },
-        { status: 200, headers: corsHeaders },
+        { headers: corsHeaders },
       );
     }
+
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        activeProfileId: true,
+        profiles: {
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            name: true,
+            avatarId: true,
+            ageGroup: true,
+            difficulty: true,
+            isDefault: true,
+            createdAt: true,
+            _count: {
+              select: {
+                savedArtworks: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user || user.profiles.length === 0) {
+      return NextResponse.json(
+        { activeProfile: null },
+        { headers: corsHeaders },
+      );
+    }
+
+    const activeProfile =
+      user.profiles.find((p) => p.id === user.activeProfileId) ||
+      user.profiles.find((p) => p.isDefault) ||
+      user.profiles[0];
 
     return NextResponse.json(
       {
         activeProfile: {
-          id: profile.id,
-          name: profile.name,
-          avatarId: profile.avatarId,
-          ageGroup: profile.ageGroup,
-          difficulty: profile.difficulty,
-          isDefault: profile.isDefault,
-          artworkCount: profile._count.coloringImages,
-          createdAt: profile.createdAt,
+          id: activeProfile.id,
+          name: activeProfile.name,
+          avatarId: activeProfile.avatarId,
+          ageGroup: activeProfile.ageGroup,
+          difficulty: activeProfile.difficulty,
+          isDefault: activeProfile.isDefault,
+          artworkCount: activeProfile._count.savedArtworks,
+          createdAt: activeProfile.createdAt,
         },
       },
       { headers: corsHeaders },
@@ -56,6 +93,15 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401, headers: corsHeaders },
+      );
+    }
+
     const body = await request.json();
     const { profileId } = body;
 
@@ -66,24 +112,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await setActiveProfile(profileId);
+    // Verify the profile belongs to this user
+    const profile = await db.profile.findFirst({
+      where: {
+        id: profileId,
+        userId,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
-    if ('error' in result) {
+    if (!profile) {
       return NextResponse.json(
-        { error: result.error },
-        { status: 400, headers: corsHeaders },
+        { error: 'Profile not found' },
+        { status: 404, headers: corsHeaders },
       );
     }
+
+    // Update user's active profile
+    await db.user.update({
+      where: { id: userId },
+      data: { activeProfileId: profileId },
+    });
 
     return NextResponse.json(
       {
         success: true,
-        activeProfile: result.profile
-          ? {
-              id: result.profile.id,
-              name: result.profile.name,
-            }
-          : null,
+        activeProfile: {
+          id: profile.id,
+          name: profile.name,
+        },
       },
       { headers: corsHeaders },
     );

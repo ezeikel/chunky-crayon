@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  getProfiles,
-  createProfile,
-  type CreateProfileInput,
-} from '@/app/actions/profiles';
-import { AgeGroup, Difficulty } from '@chunky-crayon/db';
+import { db } from '@chunky-crayon/db';
+import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,16 +16,35 @@ export async function OPTIONS() {
  * GET /api/mobile/profiles
  * Returns all profiles for the current user
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const profiles = await getProfiles();
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
 
-    if (!profiles) {
+    if (!userId) {
       return NextResponse.json(
-        { error: 'Not authenticated', profiles: [] },
-        { status: 200, headers: corsHeaders },
+        { profiles: [] },
+        { headers: corsHeaders },
       );
     }
+
+    const profiles = await db.profile.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        avatarId: true,
+        ageGroup: true,
+        difficulty: true,
+        isDefault: true,
+        createdAt: true,
+        _count: {
+          select: {
+            savedArtworks: true,
+          },
+        },
+      },
+    });
 
     return NextResponse.json(
       {
@@ -40,7 +55,7 @@ export async function GET() {
           ageGroup: profile.ageGroup,
           difficulty: profile.difficulty,
           isDefault: profile.isDefault,
-          artworkCount: profile._count.coloringImages,
+          artworkCount: profile._count.savedArtworks,
           createdAt: profile.createdAt,
         })),
       },
@@ -61,6 +76,15 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401, headers: corsHeaders },
+      );
+    }
+
     const body = await request.json();
     const { name, avatarId, ageGroup, difficulty } = body;
 
@@ -71,34 +95,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const input: CreateProfileInput = {
-      name: name.trim(),
-      avatarId,
-      ageGroup: ageGroup as AgeGroup | undefined,
-      difficulty: difficulty as Difficulty | undefined,
-    };
+    // Check profile limit (max 5 profiles per user)
+    const existingCount = await db.profile.count({
+      where: { userId },
+    });
 
-    const result = await createProfile(input);
-
-    if ('error' in result) {
+    if (existingCount >= 5) {
       return NextResponse.json(
-        { error: result.error },
+        { error: 'Maximum of 5 profiles allowed' },
         { status: 400, headers: corsHeaders },
       );
     }
+
+    const profile = await db.profile.create({
+      data: {
+        userId,
+        name: name.trim(),
+        avatarId: avatarId || 'default',
+        ageGroup: ageGroup || 'CHILD',
+        difficulty: difficulty || 'BEGINNER',
+        isDefault: existingCount === 0,
+      },
+      select: {
+        id: true,
+        name: true,
+        avatarId: true,
+        ageGroup: true,
+        difficulty: true,
+        isDefault: true,
+        createdAt: true,
+        _count: {
+          select: {
+            savedArtworks: true,
+          },
+        },
+      },
+    });
 
     return NextResponse.json(
       {
         success: true,
         profile: {
-          id: result.profile.id,
-          name: result.profile.name,
-          avatarId: result.profile.avatarId,
-          ageGroup: result.profile.ageGroup,
-          difficulty: result.profile.difficulty,
-          isDefault: result.profile.isDefault,
-          artworkCount: result.profile._count.coloringImages,
-          createdAt: result.profile.createdAt,
+          id: profile.id,
+          name: profile.name,
+          avatarId: profile.avatarId,
+          ageGroup: profile.ageGroup,
+          difficulty: profile.difficulty,
+          isDefault: profile.isDefault,
+          artworkCount: profile._count.savedArtworks,
+          createdAt: profile.createdAt,
         },
       },
       { status: 201, headers: corsHeaders },

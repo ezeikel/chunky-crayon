@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  getUserSavedArtwork,
-  saveArtworkToGallery,
-} from '@/app/actions/saved-artwork';
+import { put } from '@vercel/blob';
+import { db } from '@chunky-crayon/db';
+import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
+import { checkAndAwardStickers } from '@/lib/stickers/service';
+import { checkEvolution } from '@/lib/colo/service';
+import type { ColoStage, EvolutionResult } from '@/lib/colo/types';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,12 +19,105 @@ export async function OPTIONS() {
 }
 
 /**
+ * Check for Colo evolution and update profile if needed
+ */
+async function checkAndUpdateColoEvolution(
+  profileId: string,
+): Promise<EvolutionResult | null> {
+  const profile = await db.profile.findUnique({
+    where: { id: profileId },
+    select: {
+      id: true,
+      coloStage: true,
+      coloAccessories: true,
+      _count: {
+        select: {
+          savedArtworks: true,
+        },
+      },
+    },
+  });
+
+  if (!profile) {
+    return null;
+  }
+
+  // Check for evolution
+  const evolutionResult = checkEvolution(
+    profile.coloStage as ColoStage,
+    profile.coloAccessories,
+    profile._count.savedArtworks,
+  );
+
+  // If evolved or unlocked new accessories, update the profile
+  if (evolutionResult.evolved || evolutionResult.newAccessories.length > 0) {
+    await db.profile.update({
+      where: { id: profile.id },
+      data: {
+        coloStage: evolutionResult.newStage,
+        coloAccessories: [
+          ...profile.coloAccessories,
+          ...evolutionResult.newAccessories,
+        ],
+      },
+    });
+  }
+
+  return evolutionResult;
+}
+
+/**
  * GET /api/mobile/saved-artworks
  * Returns all saved artworks for the current user/profile
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const artworks = await getUserSavedArtwork();
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
+
+    if (!userId) {
+      return NextResponse.json(
+        { artworks: [] },
+        { headers: corsHeaders },
+      );
+    }
+
+    // Get user's active profile
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        activeProfileId: true,
+        profiles: {
+          orderBy: { createdAt: 'asc' },
+          select: { id: true, isDefault: true },
+        },
+      },
+    });
+
+    const activeProfileId =
+      user?.activeProfileId ||
+      user?.profiles.find((p) => p.isDefault)?.id ||
+      user?.profiles[0]?.id;
+
+    // Filter by active profile if exists
+    const where = activeProfileId
+      ? { userId, profileId: activeProfileId }
+      : { userId };
+
+    const artworks = await db.savedArtwork.findMany({
+      where,
+      include: {
+        coloringImage: {
+          select: {
+            id: true,
+            title: true,
+            svgUrl: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
     return NextResponse.json(
       {
@@ -58,6 +153,15 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401, headers: corsHeaders },
+      );
+    }
+
     const body = await request.json();
     const { coloringImageId, imageDataUrl, title } = body;
 
@@ -75,22 +179,86 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await saveArtworkToGallery(coloringImageId, imageDataUrl, title);
+    // Get user's active profile
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        activeProfileId: true,
+        profiles: {
+          orderBy: { createdAt: 'asc' },
+          select: { id: true, isDefault: true },
+        },
+      },
+    });
 
-    if (!result.success) {
+    const activeProfileId =
+      user?.activeProfileId ||
+      user?.profiles.find((p) => p.isDefault)?.id ||
+      user?.profiles[0]?.id;
+
+    // Verify the coloring image exists
+    const coloringImage = await db.coloringImage.findUnique({
+      where: { id: coloringImageId },
+    });
+
+    if (!coloringImage) {
       return NextResponse.json(
-        { error: result.error },
-        { status: 400, headers: corsHeaders },
+        { error: 'Coloring image not found' },
+        { status: 404, headers: corsHeaders },
       );
     }
+
+    // Convert data URL to buffer
+    const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
+    const imageBuffer = Buffer.from(base64Data, 'base64');
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const fileName = `uploads/saved-artwork/${userId}/${coloringImageId}/${timestamp}.png`;
+
+    // Upload to Vercel Blob
+    const { url: imageUrl } = await put(fileName, imageBuffer, {
+      access: 'public',
+      contentType: 'image/png',
+    });
+
+    // Create the saved artwork record
+    const savedArtwork = await db.savedArtwork.create({
+      data: {
+        userId,
+        profileId: activeProfileId,
+        coloringImageId,
+        title: title || coloringImage.title,
+        imageUrl,
+      },
+    });
+
+    // Check for sticker unlocks after saving artwork
+    const { newStickers } = await checkAndAwardStickers(userId, activeProfileId);
+
+    // Check for Colo evolution after saving artwork
+    const evolutionResult = activeProfileId
+      ? await checkAndUpdateColoEvolution(activeProfileId)
+      : null;
 
     return NextResponse.json(
       {
         success: true,
-        artworkId: result.artworkId,
-        imageUrl: result.imageUrl,
-        newStickers: result.newStickers,
-        evolutionResult: result.evolutionResult,
+        artworkId: savedArtwork.id,
+        imageUrl,
+        newStickers: newStickers.map((s) => ({
+          id: s.id,
+          name: s.name,
+          imageUrl: s.imageUrl,
+        })),
+        evolutionResult: evolutionResult
+          ? {
+              evolved: evolutionResult.evolved,
+              previousStage: evolutionResult.previousStage,
+              newStage: evolutionResult.newStage,
+              newAccessories: evolutionResult.newAccessories,
+            }
+          : null,
       },
       { status: 201, headers: corsHeaders },
     );

@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id                  String    @id @default(cuid())
-  email               String    @unique
+  email               String?   @unique // Optional for anonymous mobile users
   name                String?
   emailVerified       DateTime?
   image               String?
@@ -29,6 +29,8 @@ model User {
   // Auth.js relations
   accounts           Account[]
   sessions           Session[]
+  // Mobile device sessions
+  mobileDeviceSessions MobileDeviceSession[]
 
   @@map("users")
 }
@@ -125,6 +127,19 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// Mobile device session - links device IDs to users for app authentication
+model MobileDeviceSession {
+  id        String   @id @default(cuid())
+  deviceId  String   @unique // Unique device identifier from mobile app
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastSeenAt DateTime @default(now()) // Last time device made an API call
+
+  @@map("mobile_device_sessions")
 }
 
 // Track processed Stripe webhook events for idempotency

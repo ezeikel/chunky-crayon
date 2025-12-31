@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserId } from '@/app/actions/user';
+import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
 import {
   getUserStickers,
   getStickerStats,
@@ -21,9 +21,9 @@ export async function OPTIONS() {
  * GET /api/mobile/stickers
  * Returns all stickers with unlock status for the current user
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const userId = await getUserId();
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
 
     if (!userId) {
       // Return catalog with all stickers locked for unauthenticated users
@@ -103,7 +103,7 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const userId = await getUserId();
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
 
     if (!userId) {
       return NextResponse.json(

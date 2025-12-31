@@ -1,7 +1,12 @@
-import axios from "axios";
-
+import axios, { AxiosInstance } from "axios";
 import { Platform } from "react-native";
 import type { AgeGroup, Difficulty } from "./types";
+import {
+  getAuthHeader,
+  getDeviceId,
+  setSessionToken,
+  getSessionToken,
+} from "./lib/auth";
 
 // allow an override just for Android if set in EAS
 const apiUrlFromEnv =
@@ -10,30 +15,192 @@ const apiUrlFromEnv =
       process.env.EXPO_PUBLIC_API_URL)
     : process.env.EXPO_PUBLIC_API_URL;
 
+// Create axios instance with auth interceptors
+const api: AxiosInstance = axios.create({
+  baseURL: apiUrlFromEnv,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Track if we're currently registering to prevent duplicate registrations
+let isRegistering = false;
+let registrationPromise: Promise<void> | null = null;
+
+/**
+ * Ensure the device is registered before making API calls
+ * Called automatically by the request interceptor
+ */
+async function ensureRegistered(): Promise<void> {
+  // If already have a token, we're good
+  const token = await getSessionToken();
+  if (token) {
+    return;
+  }
+
+  // If already registering, wait for that to complete
+  if (isRegistering && registrationPromise) {
+    await registrationPromise;
+    return;
+  }
+
+  // Start registration
+  isRegistering = true;
+  registrationPromise = (async () => {
+    try {
+      const deviceId = await getDeviceId();
+      const response = await axios.post(`${apiUrlFromEnv}/mobile/auth/register`, {
+        deviceId,
+      });
+
+      if (response.data.token) {
+        await setSessionToken(response.data.token);
+      }
+    } catch (error) {
+      console.error("Failed to register device:", error);
+      // Don't throw - allow the request to proceed without auth
+    } finally {
+      isRegistering = false;
+      registrationPromise = null;
+    }
+  })();
+
+  await registrationPromise;
+}
+
+// Add auth header to all requests
+api.interceptors.request.use(
+  async (config) => {
+    // Skip auth for registration endpoint
+    if (config.url?.includes("/auth/register")) {
+      return config;
+    }
+
+    // Ensure device is registered
+    await ensureRegistered();
+
+    // Add auth header
+    const authHeader = await getAuthHeader();
+    config.headers = config.headers || {};
+    config.headers.Authorization = authHeader.Authorization;
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+// ============================================================================
+// Auth
+// ============================================================================
+
+export type RegisterResponse = {
+  token: string;
+  userId: string;
+  profileId: string;
+  isNew: boolean;
+};
+
+/**
+ * Register the device with the server
+ * Usually called automatically, but can be called manually if needed
+ */
+export const registerDevice = async (): Promise<RegisterResponse> => {
+  const deviceId = await getDeviceId();
+  const response = await axios.post(`${apiUrlFromEnv}/mobile/auth/register`, {
+    deviceId,
+  });
+
+  if (response.data.token) {
+    await setSessionToken(response.data.token);
+  }
+
+  return response.data;
+};
+
+export type AuthMeResponse = {
+  authenticated: boolean;
+  deviceId: string | null;
+  userId: string | null;
+  isLinked: boolean;
+  user: {
+    id: string;
+    email: string | null;
+    name: string | null;
+    image: string | null;
+    credits: number;
+  } | null;
+  activeProfile: {
+    id: string;
+    name: string;
+    avatarId: string;
+    ageGroup: AgeGroup;
+    difficulty: Difficulty;
+    isDefault: boolean;
+    coloStage: number;
+  } | null;
+  profiles: Array<{
+    id: string;
+    name: string;
+    avatarId: string;
+    ageGroup: AgeGroup;
+    difficulty: Difficulty;
+    isDefault: boolean;
+    coloStage: number;
+  }>;
+  error?: string;
+};
+
+/**
+ * Get current authentication status
+ */
+export const getAuthMe = async (): Promise<AuthMeResponse> => {
+  const response = await api.get("/mobile/auth/me");
+  return response.data;
+};
+
+export type LinkAccountResponse = {
+  token: string;
+  userId: string;
+  profileId: string;
+  linked: boolean;
+  error?: string;
+};
+
+/**
+ * Link device to an authenticated user (after OAuth)
+ */
+export const linkAccount = async (
+  userId?: string,
+  email?: string,
+): Promise<LinkAccountResponse> => {
+  const response = await api.post("/mobile/auth/link", { userId, email });
+
+  if (response.data.token) {
+    await setSessionToken(response.data.token);
+  }
+
+  return response.data;
+};
+
 // ============================================================================
 // Coloring Images
 // ============================================================================
 
 export const getColoringImages = async (cursor?: string) => {
   const params = cursor ? { cursor } : {};
-  const response = await axios.get(`${apiUrlFromEnv}/coloring-images`, {
-    params,
-  });
+  const response = await api.get("/coloring-images", { params });
   return response.data;
 };
 
 export const getColoringImage = async (id: string) => {
-  const response = await axios.get(`${apiUrlFromEnv}/coloring-images/${id}`);
+  const response = await api.get(`/coloring-images/${id}`);
   return response.data;
 };
 
 export const createColoringImage = async (description: string) => {
-  const response = await axios.post(
-    `${apiUrlFromEnv}/coloring-images`,
-    { description },
-    { headers: { "Content-Type": "application/json" } },
-  );
-
+  const response = await api.post("/coloring-images", { description });
   return response.data;
 };
 
@@ -41,12 +208,7 @@ export const describeSketch = async (
   base64Image: string,
 ): Promise<string | null> => {
   try {
-    const response = await axios.post(
-      `${apiUrlFromEnv}/describe-sketch`,
-      { image: base64Image },
-      { headers: { "Content-Type": "application/json" } },
-    );
-
+    const response = await api.post("/describe-sketch", { image: base64Image });
     return response.data.description || null;
   } catch (error) {
     console.error("Failed to describe sketch:", error);
@@ -59,12 +221,7 @@ export const describeSketch = async (
  * Uses AI to transform the photo into a coloring page that closely matches the original.
  */
 export const generateFromPhoto = async (base64Image: string) => {
-  const response = await axios.post(
-    `${apiUrlFromEnv}/photo-to-coloring`,
-    { image: base64Image },
-    { headers: { "Content-Type": "application/json" } },
-  );
-
+  const response = await api.post("/photo-to-coloring", { image: base64Image });
   return response.data;
 };
 
@@ -103,7 +260,7 @@ export type UserResponse = {
 };
 
 export const getCurrentUser = async (): Promise<UserResponse> => {
-  const response = await axios.get(`${apiUrlFromEnv}/mobile/user`);
+  const response = await api.get("/mobile/user");
   return response.data;
 };
 
@@ -128,7 +285,7 @@ export type ProfilesResponse = {
 };
 
 export const getProfiles = async (): Promise<ProfilesResponse> => {
-  const response = await axios.get(`${apiUrlFromEnv}/mobile/profiles`);
+  const response = await api.get("/mobile/profiles");
   return response.data;
 };
 
@@ -142,9 +299,7 @@ export type CreateProfileInput = {
 export const createProfile = async (
   input: CreateProfileInput,
 ): Promise<{ success: boolean; profile?: Profile; error?: string }> => {
-  const response = await axios.post(`${apiUrlFromEnv}/mobile/profiles`, input, {
-    headers: { "Content-Type": "application/json" },
-  });
+  const response = await api.post("/mobile/profiles", input);
   return response.data;
 };
 
@@ -154,18 +309,14 @@ export type ActiveProfileResponse = {
 };
 
 export const getActiveProfile = async (): Promise<ActiveProfileResponse> => {
-  const response = await axios.get(`${apiUrlFromEnv}/mobile/profiles/active`);
+  const response = await api.get("/mobile/profiles/active");
   return response.data;
 };
 
 export const setActiveProfile = async (
   profileId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const response = await axios.post(
-    `${apiUrlFromEnv}/mobile/profiles/active`,
-    { profileId },
-    { headers: { "Content-Type": "application/json" } },
-  );
+  const response = await api.post("/mobile/profiles/active", { profileId });
   return response.data;
 };
 
@@ -192,7 +343,7 @@ export type SavedArtworksResponse = {
 };
 
 export const getSavedArtworks = async (): Promise<SavedArtworksResponse> => {
-  const response = await axios.get(`${apiUrlFromEnv}/mobile/saved-artworks`);
+  const response = await api.get("/mobile/saved-artworks");
   return response.data;
 };
 
@@ -223,11 +374,7 @@ export type SaveArtworkResponse = {
 export const saveArtwork = async (
   input: SaveArtworkInput,
 ): Promise<SaveArtworkResponse> => {
-  const response = await axios.post(
-    `${apiUrlFromEnv}/mobile/saved-artworks`,
-    input,
-    { headers: { "Content-Type": "application/json" } },
-  );
+  const response = await api.post("/mobile/saved-artworks", input);
   return response.data;
 };
 
@@ -250,7 +397,7 @@ export type ColoStateResponse = {
 };
 
 export const getColoState = async (): Promise<ColoStateResponse> => {
-  const response = await axios.get(`${apiUrlFromEnv}/mobile/colo`);
+  const response = await api.get("/mobile/colo");
   return response.data;
 };
 
@@ -268,11 +415,7 @@ export type CheckColoEvolutionResponse = {
 export const checkColoEvolution = async (
   profileId?: string,
 ): Promise<CheckColoEvolutionResponse> => {
-  const response = await axios.post(
-    `${apiUrlFromEnv}/mobile/colo`,
-    { profileId },
-    { headers: { "Content-Type": "application/json" } },
-  );
+  const response = await api.post("/mobile/colo", { profileId });
   return response.data;
 };
 
@@ -302,17 +445,13 @@ export type StickersResponse = {
 };
 
 export const getStickers = async (): Promise<StickersResponse> => {
-  const response = await axios.get(`${apiUrlFromEnv}/mobile/stickers`);
+  const response = await api.get("/mobile/stickers");
   return response.data;
 };
 
 export const markStickersAsViewed = async (
   stickerIds: string[],
 ): Promise<{ success: boolean; error?: string }> => {
-  const response = await axios.post(
-    `${apiUrlFromEnv}/mobile/stickers`,
-    { stickerIds },
-    { headers: { "Content-Type": "application/json" } },
-  );
+  const response = await api.post("/mobile/stickers", { stickerIds });
   return response.data;
 };

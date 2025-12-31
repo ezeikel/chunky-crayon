@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/app/actions/user';
-import { getActiveProfile } from '@/app/actions/profiles';
+import { db } from '@chunky-crayon/db';
+import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
 import { getStickerStats } from '@/lib/stickers/service';
 
 const corsHeaders = {
@@ -19,22 +19,87 @@ export async function OPTIONS() {
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
+    const { userId } = await getMobileAuthFromHeaders(request.headers);
 
-    if (!user) {
+    if (!userId) {
       return NextResponse.json(
-        { error: 'Not authenticated', user: null },
-        { status: 200, headers: corsHeaders },
+        {
+          user: null,
+          activeProfile: null,
+          stickerStats: {
+            totalUnlocked: 0,
+            totalPossible: 0,
+            newCount: 0,
+          },
+        },
+        { headers: corsHeaders },
       );
     }
 
-    const activeProfile = await getActiveProfile();
-    const stickerStats = await getStickerStats(user.id);
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        credits: true,
+        activeProfileId: true,
+        subscriptions: {
+          where: {
+            OR: [{ status: 'ACTIVE' }, { status: 'TRIALING' }],
+          },
+          select: {
+            planName: true,
+            billingPeriod: true,
+            status: true,
+            currentPeriodEnd: true,
+          },
+          take: 1,
+        },
+        profiles: {
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            name: true,
+            avatarId: true,
+            ageGroup: true,
+            difficulty: true,
+            isDefault: true,
+            _count: {
+              select: {
+                savedArtworks: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-    // Get active subscription
-    const activeSubscription = user.subscriptions.find(
-      (sub) => sub.status === 'active' || sub.status === 'trialing',
-    );
+    if (!user) {
+      return NextResponse.json(
+        {
+          user: null,
+          activeProfile: null,
+          stickerStats: {
+            totalUnlocked: 0,
+            totalPossible: 0,
+            newCount: 0,
+          },
+        },
+        { headers: corsHeaders },
+      );
+    }
+
+    // Determine active profile
+    const activeProfile =
+      user.profiles.find((p) => p.id === user.activeProfileId) ||
+      user.profiles.find((p) => p.isDefault) ||
+      user.profiles[0];
+
+    const stickerStats = await getStickerStats(userId);
+
+    const activeSubscription = user.subscriptions[0];
 
     return NextResponse.json(
       {
@@ -60,7 +125,7 @@ export async function GET(request: NextRequest) {
               avatarId: activeProfile.avatarId,
               ageGroup: activeProfile.ageGroup,
               difficulty: activeProfile.difficulty,
-              artworkCount: activeProfile._count.coloringImages,
+              artworkCount: activeProfile._count.savedArtworks,
             }
           : null,
         stickerStats: {
