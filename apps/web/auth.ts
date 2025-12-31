@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import type { NextAuthConfig, Profile } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import AppleProvider from 'next-auth/providers/apple';
+import FacebookProvider from 'next-auth/providers/facebook';
 import Resend from 'next-auth/providers/resend';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { db } from '@chunky-crayon/db';
@@ -31,6 +32,11 @@ const config = {
       clientSecret: process.env.AUTH_APPLE_SECRET as string,
       allowDangerousEmailAccountLinking: true,
     }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_APP_ID as string,
+      clientSecret: process.env.FACEBOOK_APP_SECRET as string,
+      allowDangerousEmailAccountLinking: true,
+    }),
     Resend({
       apiKey: process.env.RESEND_API_KEY,
       from: 'no-reply@chunkycrayon.com',
@@ -44,7 +50,11 @@ const config = {
         return true;
       }
 
-      if (account?.provider === 'google' || account?.provider === 'apple') {
+      if (
+        account?.provider === 'google' ||
+        account?.provider === 'apple' ||
+        account?.provider === 'facebook'
+      ) {
         const appleProfile = profile as AppleProfile;
         const existingUser = profile?.email
           ? await db.user.findUnique({ where: { email: profile.email } })
@@ -56,7 +66,7 @@ const config = {
 
         let name;
 
-        if (account?.provider === 'google') {
+        if (account?.provider === 'google' || account?.provider === 'facebook') {
           name = profile?.name;
         } else if (account?.provider === 'apple' && appleProfile?.user) {
           // Apple only returns the user object this first time the user authorises the app - subsequent authorisations don't return the user object https://stackoverflow.com/questions/63500926/apple-sign-in-authorize-method-returns-name-only-first-time
