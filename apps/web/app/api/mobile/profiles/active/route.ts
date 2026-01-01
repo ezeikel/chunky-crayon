@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@chunky-crayon/db';
 import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
+import {
+  getActiveProfileForUser,
+  setActiveProfileForUser,
+} from '@/lib/profiles/service';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +17,7 @@ export async function OPTIONS() {
 
 /**
  * GET /api/mobile/profiles/active
- * Returns the currently active profile
+ * Returns the currently active profile - wraps getActiveProfileForUser service
  */
 export async function GET(request: NextRequest) {
   try {
@@ -27,41 +30,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const user = await db.user.findUnique({
-      where: { id: userId },
-      select: {
-        activeProfileId: true,
-        profiles: {
-          orderBy: { createdAt: 'asc' },
-          select: {
-            id: true,
-            name: true,
-            avatarId: true,
-            ageGroup: true,
-            difficulty: true,
-            isDefault: true,
-            createdAt: true,
-            _count: {
-              select: {
-                savedArtworks: true,
-              },
-            },
-          },
-        },
-      },
-    });
+    const activeProfile = await getActiveProfileForUser(userId);
 
-    if (!user || user.profiles.length === 0) {
+    if (!activeProfile) {
       return NextResponse.json(
         { activeProfile: null },
         { headers: corsHeaders },
       );
     }
-
-    const activeProfile =
-      user.profiles.find((p) => p.id === user.activeProfileId) ||
-      user.profiles.find((p) => p.isDefault) ||
-      user.profiles[0];
 
     return NextResponse.json(
       {
@@ -89,7 +65,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/mobile/profiles/active
- * Set the active profile
+ * Set the active profile - wraps setActiveProfileForUser service
  */
 export async function POST(request: NextRequest) {
   try {
@@ -112,37 +88,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the profile belongs to this user
-    const profile = await db.profile.findFirst({
-      where: {
-        id: profileId,
-        userId,
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-    });
+    const result = await setActiveProfileForUser(profileId, userId);
 
-    if (!profile) {
+    if ('error' in result) {
       return NextResponse.json(
-        { error: 'Profile not found' },
+        { error: result.error },
         { status: 404, headers: corsHeaders },
       );
     }
-
-    // Update user's active profile
-    await db.user.update({
-      where: { id: userId },
-      data: { activeProfileId: profileId },
-    });
 
     return NextResponse.json(
       {
         success: true,
         activeProfile: {
-          id: profile.id,
-          name: profile.name,
+          id: result.profile.id,
+          name: result.profile.name,
+          avatarId: result.profile.avatarId,
+          ageGroup: result.profile.ageGroup,
+          difficulty: result.profile.difficulty,
+          isDefault: result.profile.isDefault,
+          artworkCount: result.profile._count.savedArtworks,
+          createdAt: result.profile.createdAt,
         },
       },
       { headers: corsHeaders },

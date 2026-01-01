@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@chunky-crayon/db';
 import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
+import {
+  updateProfileForUser,
+  deleteProfileForUser,
+} from '@/lib/profiles/service';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +17,7 @@ export async function OPTIONS() {
 
 /**
  * PUT /api/mobile/profiles/[id]
- * Update a profile
+ * Update a profile - wraps updateProfileForUser service
  */
 export async function PUT(
   request: NextRequest,
@@ -31,66 +34,35 @@ export async function PUT(
       );
     }
 
-    // Verify the profile belongs to the user
-    const existingProfile = await db.profile.findFirst({
-      where: { id, userId },
-    });
-
-    if (!existingProfile) {
-      return NextResponse.json(
-        { error: 'Profile not found' },
-        { status: 404, headers: corsHeaders },
-      );
-    }
-
     const body = await request.json();
     const { name, avatarId, ageGroup, difficulty } = body;
 
-    const updateData: Record<string, unknown> = {};
-    if (name && typeof name === 'string') {
-      updateData.name = name.trim();
-    }
-    if (avatarId) {
-      updateData.avatarId = avatarId;
-    }
-    if (ageGroup) {
-      updateData.ageGroup = ageGroup;
-    }
-    if (difficulty) {
-      updateData.difficulty = difficulty;
-    }
-
-    const profile = await db.profile.update({
-      where: { id },
-      data: updateData,
-      select: {
-        id: true,
-        name: true,
-        avatarId: true,
-        ageGroup: true,
-        difficulty: true,
-        isDefault: true,
-        createdAt: true,
-        _count: {
-          select: {
-            savedArtworks: true,
-          },
-        },
-      },
+    const result = await updateProfileForUser(id, userId, {
+      name,
+      avatarId,
+      ageGroup,
+      difficulty,
     });
+
+    if ('error' in result) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: 400, headers: corsHeaders },
+      );
+    }
 
     return NextResponse.json(
       {
         success: true,
         profile: {
-          id: profile.id,
-          name: profile.name,
-          avatarId: profile.avatarId,
-          ageGroup: profile.ageGroup,
-          difficulty: profile.difficulty,
-          isDefault: profile.isDefault,
-          artworkCount: profile._count.savedArtworks,
-          createdAt: profile.createdAt,
+          id: result.profile.id,
+          name: result.profile.name,
+          avatarId: result.profile.avatarId,
+          ageGroup: result.profile.ageGroup,
+          difficulty: result.profile.difficulty,
+          isDefault: result.profile.isDefault,
+          artworkCount: result.profile._count.savedArtworks,
+          createdAt: result.profile.createdAt,
         },
       },
       { headers: corsHeaders },
@@ -106,7 +78,7 @@ export async function PUT(
 
 /**
  * DELETE /api/mobile/profiles/[id]
- * Delete a profile
+ * Delete a profile - wraps deleteProfileForUser service
  */
 export async function DELETE(
   request: NextRequest,
@@ -123,45 +95,14 @@ export async function DELETE(
       );
     }
 
-    // Verify the profile belongs to the user
-    const existingProfile = await db.profile.findFirst({
-      where: { id, userId },
-    });
+    const result = await deleteProfileForUser(id, userId);
 
-    if (!existingProfile) {
+    if ('error' in result) {
       return NextResponse.json(
-        { error: 'Profile not found' },
-        { status: 404, headers: corsHeaders },
+        { error: result.error },
+        { status: 400, headers: corsHeaders },
       );
     }
-
-    // Check if it's the default profile
-    if (existingProfile.isDefault) {
-      // Count other profiles
-      const otherProfiles = await db.profile.findMany({
-        where: { userId, id: { not: id } },
-        orderBy: { createdAt: 'asc' },
-        take: 1,
-      });
-
-      if (otherProfiles.length === 0) {
-        return NextResponse.json(
-          { error: 'Cannot delete the only profile' },
-          { status: 400, headers: corsHeaders },
-        );
-      }
-
-      // Make another profile the default before deleting
-      await db.profile.update({
-        where: { id: otherProfiles[0].id },
-        data: { isDefault: true },
-      });
-    }
-
-    // Delete the profile (this will cascade delete saved artworks due to schema)
-    await db.profile.delete({
-      where: { id },
-    });
 
     return NextResponse.json(
       { success: true },

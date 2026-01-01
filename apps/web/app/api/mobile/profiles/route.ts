@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@chunky-crayon/db';
 import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
+import {
+  getProfilesForUser,
+  createProfileForUser,
+} from '@/lib/profiles/service';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +17,7 @@ export async function OPTIONS() {
 
 /**
  * GET /api/mobile/profiles
- * Returns all profiles for the current user
+ * Returns all profiles for the current user - wraps getProfilesForUser service
  */
 export async function GET(request: NextRequest) {
   try {
@@ -27,24 +30,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const profiles = await db.profile.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'asc' },
-      select: {
-        id: true,
-        name: true,
-        avatarId: true,
-        ageGroup: true,
-        difficulty: true,
-        isDefault: true,
-        createdAt: true,
-        _count: {
-          select: {
-            savedArtworks: true,
-          },
-        },
-      },
-    });
+    const profiles = await getProfilesForUser(userId);
 
     return NextResponse.json(
       {
@@ -72,7 +58,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/mobile/profiles
- * Create a new profile
+ * Create a new profile - wraps createProfileForUser service
  */
 export async function POST(request: NextRequest) {
   try {
@@ -95,55 +81,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check profile limit (max 5 profiles per user)
-    const existingCount = await db.profile.count({
-      where: { userId },
+    const result = await createProfileForUser(userId, {
+      name: name.trim(),
+      avatarId,
+      ageGroup,
+      difficulty,
     });
 
-    if (existingCount >= 5) {
+    if ('error' in result) {
       return NextResponse.json(
-        { error: 'Maximum of 5 profiles allowed' },
+        { error: result.error },
         { status: 400, headers: corsHeaders },
       );
     }
-
-    const profile = await db.profile.create({
-      data: {
-        userId,
-        name: name.trim(),
-        avatarId: avatarId || 'default',
-        ageGroup: ageGroup || 'CHILD',
-        difficulty: difficulty || 'BEGINNER',
-        isDefault: existingCount === 0,
-      },
-      select: {
-        id: true,
-        name: true,
-        avatarId: true,
-        ageGroup: true,
-        difficulty: true,
-        isDefault: true,
-        createdAt: true,
-        _count: {
-          select: {
-            savedArtworks: true,
-          },
-        },
-      },
-    });
 
     return NextResponse.json(
       {
         success: true,
         profile: {
-          id: profile.id,
-          name: profile.name,
-          avatarId: profile.avatarId,
-          ageGroup: profile.ageGroup,
-          difficulty: profile.difficulty,
-          isDefault: profile.isDefault,
-          artworkCount: profile._count.savedArtworks,
-          createdAt: profile.createdAt,
+          id: result.profile.id,
+          name: result.profile.name,
+          avatarId: result.profile.avatarId,
+          ageGroup: result.profile.ageGroup,
+          difficulty: result.profile.difficulty,
+          isDefault: result.profile.isDefault,
+          artworkCount: result.profile._count.savedArtworks,
+          createdAt: result.profile.createdAt,
         },
       },
       { status: 201, headers: corsHeaders },
