@@ -18,16 +18,18 @@ Full Axios-based API client with:
 - **Auth interceptor** that injects Bearer tokens on all requests
 - **Secure token storage** via `expo-secure-store`
 
-#### Endpoints Implemented
+#### API Client Methods (`apps/mobile/api.ts`)
 
-| Category       | Endpoints                                                                    |
-| -------------- | ---------------------------------------------------------------------------- |
-| Auth           | `register`, `google`, `apple`, `facebook`, `magic-link`, `magic-link/verify` |
-| Profiles       | `list`, `create`, `update`, `delete`, `setActive`                            |
-| Saved Artworks | `list`, `get`, `save`, `delete`                                              |
-| Colo Evolution | `get`, `evolve`, `unlockAccessory`                                           |
-| Stickers       | `list`, `unlock`, `markSeen`                                                 |
-| Challenges     | `getActive`, `getProgress`, `updateProgress`, `claimReward`                  |
+| Category       | Methods                                                                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth           | `registerDevice`, `getAuthMe`, `linkAccount`, `signInWithGoogle`, `signInWithApple`, `signInWithFacebook`, `sendMagicLink`, `verifyMagicLink` |
+| User           | `getCurrentUser`                                                                                                                              |
+| Profiles       | `getProfiles`, `createProfile`, `getActiveProfile`, `setActiveProfile`, `updateProfile`, `deleteProfile`                                      |
+| Feed           | `getFeed`                                                                                                                                     |
+| Saved Artworks | `getSavedArtworks`, `saveArtwork`                                                                                                             |
+| Colo Evolution | `getColoState`, `checkColoEvolution`                                                                                                          |
+| Stickers       | `getStickers`, `markStickersAsViewed`                                                                                                         |
+| Challenges     | `getChallenges`, `claimChallengeReward`                                                                                                       |
 
 ### 2. Authentication System
 
@@ -39,11 +41,11 @@ Full Axios-based API client with:
 
 #### OAuth Integration
 
-| Provider | Backend  | Mobile SDK       | Status      |
-| -------- | -------- | ---------------- | ----------- |
-| Google   | ✅ Ready | ✅ Installed     | **Working** |
-| Apple    | ✅ Ready | ✅ Installed     | **Working** |
-| Facebook | ✅ Ready | ❌ Not installed | **Pending** |
+| Provider | Backend  | Mobile SDK   | Status      |
+| -------- | -------- | ------------ | ----------- |
+| Google   | ✅ Ready | ✅ Installed | **Working** |
+| Apple    | ✅ Ready | ✅ Installed | **Working** |
+| Facebook | ✅ Ready | ✅ Installed | **Working** |
 
 #### Magic Link (Passwordless)
 
@@ -104,17 +106,26 @@ model MobileDeviceSession {
 
 ### 5. Web API Endpoints
 
-| Endpoint                             | Method       | Description                |
-| ------------------------------------ | ------------ | -------------------------- |
-| `/api/mobile/auth/register`          | POST         | Register device, get token |
-| `/api/mobile/auth/google`            | POST         | Exchange Google token      |
-| `/api/mobile/auth/apple`             | POST         | Exchange Apple token       |
-| `/api/mobile/auth/facebook`          | POST         | Exchange Facebook token    |
-| `/api/mobile/auth/magic-link`        | POST         | Send magic link email      |
-| `/api/mobile/auth/magic-link/verify` | POST         | Verify magic link token    |
-| `/api/mobile/profiles`               | GET/POST     | List/create profiles       |
-| `/api/mobile/profiles/[id]`          | PATCH/DELETE | Update/delete profile      |
-| `/api/mobile/profiles/[id]/activate` | POST         | Set active profile         |
+| Endpoint                             | Method       | Description                  |
+| ------------------------------------ | ------------ | ---------------------------- |
+| `/api/mobile/auth/register`          | POST         | Register device, get token   |
+| `/api/mobile/auth/google`            | POST         | Exchange Google token        |
+| `/api/mobile/auth/apple`             | POST         | Exchange Apple token         |
+| `/api/mobile/auth/facebook`          | POST         | Exchange Facebook token      |
+| `/api/mobile/auth/magic-link`        | POST         | Send magic link email        |
+| `/api/mobile/auth/magic-link/verify` | POST         | Verify magic link token      |
+| `/api/mobile/auth/me`                | GET          | Get current auth status      |
+| `/api/mobile/auth/link`              | POST         | Link OAuth to device         |
+| `/api/mobile/profiles`               | GET/POST     | List/create profiles         |
+| `/api/mobile/profiles/[id]`          | PATCH/DELETE | Update/delete profile        |
+| `/api/mobile/profiles/active`        | GET/POST     | Get/set active profile       |
+| `/api/mobile/user`                   | GET/PATCH    | Get/update user info         |
+| `/api/mobile/feed`                   | GET          | Get curated home feed        |
+| `/api/mobile/saved-artworks`         | GET/POST     | List/save artworks           |
+| `/api/mobile/colo`                   | GET/PATCH    | Get/evolve Colo              |
+| `/api/mobile/stickers`               | GET/POST     | List/unlock stickers         |
+| `/api/mobile/challenges`             | GET/POST     | List challenges/update prog. |
+| `/api/mobile/challenges/claim`       | POST         | Claim challenge reward       |
 
 ---
 
@@ -168,9 +179,9 @@ Daily notifications tied to curated content:
 - "New weekly collection: Space Adventures"
 - "Challenge reminder: 2 more animals to complete!"
 
-### API Endpoint Changes Needed
+### Feed API Endpoint ✅
 
-New endpoint: `GET /api/mobile/feed`
+Implemented: `GET /api/mobile/feed`
 
 ```typescript
 // Returns curated content for home feed
@@ -185,126 +196,63 @@ New endpoint: `GET /api/mobile/feed`
 
 ---
 
+## Recently Completed ✅
+
+### Middleware → Proxy Consolidation
+
+Next.js 16 renamed `middleware.ts` to `proxy.ts`. The mobile JWT authentication logic has been consolidated into `proxy.ts`:
+
+- Mobile API auth with JWT verification via `jose`
+- Header injection (`x-user-id`, `x-profile-id`, `x-device-id`)
+- Skip auth for token-creating endpoints (register, OAuth)
+- Unified with i18n and PostHog ingest routing
+
+### Facebook SDK Integration
+
+Facebook OAuth is fully integrated:
+
+- SDK installed: `react-native-fbsdk-next`
+- `AuthContext.tsx` updated with `LoginManager` and `AccessToken` usage
+- Backend endpoint ready at `/api/mobile/auth/facebook`
+
+### Periodic Token Validity Checks
+
+Added 10-minute background check in `AuthContext.tsx` to detect expired tokens and trigger sign-out.
+
+### Facebook SDK Configuration
+
+Full Facebook SDK integration in `apps/mobile/app.config.ts`:
+
+- Plugin configured with `appID`, `displayName`, `clientToken`, and `scheme`
+- iOS URL scheme added for deep linking (`fb${FACEBOOK_APP_ID}`)
+- `AuthContext.tsx` updated with `LoginManager` and `AccessToken` from `react-native-fbsdk-next`
+
+### Google Token Verification
+
+Backend verifies Google ID tokens using `google-auth-library` in `/api/mobile/auth/google`:
+
+```typescript
+import { OAuth2Client } from "google-auth-library";
+
+const ticket = await googleClient.verifyIdToken({
+  idToken,
+  audience: [GOOGLE_CLIENT_ID, GOOGLE_WEB_CLIENT_ID, GOOGLE_IOS_CLIENT_ID],
+});
+```
+
+---
+
 ## Remaining Work ⚠️
 
-### 1. Install Facebook SDK (High Priority)
+### 1. Pending Service Initialization
 
-The Facebook OAuth backend is ready but the mobile SDK is not installed.
+These improvements are blocked until their respective services are set up:
 
-**Current behavior** (`apps/mobile/contexts/AuthContext.tsx`):
+#### Auth Event Analytics (Pending: PostHog installation)
 
-```typescript
-Alert.alert(
-  "Coming Soon",
-  "Facebook sign-in will be available in a future update.",
-);
-```
+Track auth events for monitoring and debugging. Requires PostHog SDK to be installed on mobile first.
 
-**To complete:**
-
-```bash
-cd apps/mobile
-pnpm add react-native-fbsdk-next
-pnpm prebuild:ios
-pnpm prebuild:android
-```
-
-Then update `AuthContext.tsx` to use the actual SDK:
-
-```typescript
-import { LoginManager, AccessToken } from "react-native-fbsdk-next";
-
-const signInWithFacebookHandler = async () => {
-  const result = await LoginManager.logInWithPermissions([
-    "public_profile",
-    "email",
-  ]);
-  if (result.isCancelled) return null;
-
-  const data = await AccessToken.getCurrentAccessToken();
-  const response = await api.auth.facebook(data.accessToken);
-  // ... handle response
-};
-```
-
-### 2. Fix Enum Mismatch (Bug)
-
-In `apps/web/lib/mobile-auth.ts:97-98`, profile creation uses incorrect string values:
-
-**Current (broken):**
-
-```typescript
-ageGroup: "5_7",
-difficulty: "easy",
-```
-
-**Should be:**
-
-```typescript
-ageGroup: AgeGroup.CHILD,
-difficulty: Difficulty.BEGINNER,
-```
-
-### 3. Improvements from parking-ticket-pal (Recommended)
-
-The parking-ticket-pal project has a mature auth implementation with patterns we should adopt:
-
-#### Facebook SDK Configuration
-
-Update `apps/mobile/app.config.ts` to include proper Facebook SDK config:
-
-```typescript
-[
-  "react-native-fbsdk-next",
-  {
-    appID: `${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID}`,
-    displayName: "Chunky Crayon",
-    clientToken: `${process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN}`,
-    scheme: "chunkycrayon",
-  }
-],
-```
-
-Also add URL scheme configuration for iOS deep linking:
-
-```typescript
-ios: {
-  infoPlist: {
-    CFBundleURLTypes: [
-      {
-        CFBundleURLSchemes: [`fb${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID}`],
-      },
-    ],
-  },
-},
-```
-
-#### Periodic Token Validity Checks
-
-Add a background check every 10 minutes to detect expired tokens:
-
-```typescript
-useEffect(() => {
-  const interval = setInterval(
-    async () => {
-      const token = await getToken();
-      if (token) {
-        const isValid = await api.auth.validateToken();
-        if (!isValid) {
-          await signOut();
-        }
-      }
-    },
-    10 * 60 * 1000,
-  ); // 10 minutes
-
-  return () => clearInterval(interval);
-}, []);
-```
-
-#### Auth Event Analytics
-
-Track auth events for monitoring and debugging:
+Events to track:
 
 - `auth_sign_in_started` - When user initiates sign-in
 - `auth_sign_in_success` - When sign-in completes
@@ -312,48 +260,20 @@ Track auth events for monitoring and debugging:
 - `auth_sign_out` - When user signs out
 - `auth_merge_complete` - When anonymous account merges
 
-#### Proper Sign-Out Cleanup
+#### Sign-Out Cleanup Extensions (Pending: RevenueCat initialization)
 
-Ensure sign-out cleans up all services:
+Currently sign-out cleans up:
 
-```typescript
-const signOut = async () => {
-  // Clear stored tokens
-  await SecureStore.deleteItemAsync("auth_token");
+- ✅ Stored auth tokens via `expo-secure-store`
+- ✅ Google sign-in state via `GoogleSignin.signOut()`
+- ✅ Local auth state reset
 
-  // Sign out from OAuth providers if needed
-  await GoogleSignIn.signOutAsync();
+When services are initialized, add:
 
-  // Reset analytics identity
-  posthog.reset();
+- ⏳ `posthog.reset()` - Reset analytics identity (when PostHog installed)
+- ⏳ `Purchases.logOut()` - Clear RevenueCat user (when RevenueCat initialized)
 
-  // Clear RevenueCat user
-  await Purchases.logOut();
-
-  // Reset auth state
-  setUser(null);
-};
-```
-
-#### Google Token Verification
-
-Backend should verify Google tokens using `google-auth-library`:
-
-```typescript
-import { OAuth2Client } from "google-auth-library";
-
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-async function verifyGoogleToken(idToken: string) {
-  const ticket = await client.verifyIdToken({
-    idToken,
-    audience: process.env.GOOGLE_CLIENT_ID,
-  });
-  return ticket.getPayload();
-}
-```
-
-### 4. Future Enhancements
+### 2. Future Enhancements
 
 - [ ] Add biometric authentication option
 - [ ] Implement push notification token registration

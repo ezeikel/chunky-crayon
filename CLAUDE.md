@@ -82,3 +82,7 @@ pnpm dev:android   # Start with Android emulator
 ```
 
 Note: Prebuild regenerates native `ios/` and `android/` folders. Only run when adding native dependencies.
+
+## GitHub CLI
+
+Use `gh` CLI when referencing GitHub repos that I own or public repos (e.g., `gh repo view`, `gh issue list`, `gh pr list`).
