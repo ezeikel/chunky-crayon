@@ -21,6 +21,11 @@ const config = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours
   },
+  pages: {
+    signIn: '/signin',
+    verifyRequest: '/verify-request',
+    error: '/auth-error',
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
