@@ -4,9 +4,12 @@ import {
   createProfile,
   getActiveProfile,
   setActiveProfile,
+  updateProfile,
+  deleteProfile,
   type ProfilesResponse,
   type ActiveProfileResponse,
   type CreateProfileInput,
+  type UpdateProfileInput,
 } from "@/api";
 
 /**
@@ -51,6 +54,41 @@ export const useSetActiveProfile = () => {
   return useMutation({
     mutationFn: (profileId: string) => setActiveProfile(profileId),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["savedArtworks"] });
+      queryClient.invalidateQueries({ queryKey: ["coloState"] });
+    },
+  });
+};
+
+/**
+ * Hook to update a profile
+ */
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ profileId, input }: { profileId: string; input: UpdateProfileInput }) =>
+      updateProfile(profileId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+};
+
+/**
+ * Hook to delete a profile
+ */
+export const useDeleteProfile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (profileId: string) => deleteProfile(profileId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
       queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
       queryClient.invalidateQueries({ queryKey: ["user"] });
       queryClient.invalidateQueries({ queryKey: ["savedArtworks"] });

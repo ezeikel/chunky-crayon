@@ -407,6 +407,28 @@ export const setActiveProfile = async (
   return response.data;
 };
 
+export type UpdateProfileInput = {
+  name?: string;
+  avatarId?: string;
+  ageGroup?: AgeGroup;
+  difficulty?: Difficulty;
+};
+
+export const updateProfile = async (
+  profileId: string,
+  input: UpdateProfileInput,
+): Promise<{ success: boolean; profile?: Profile; error?: string }> => {
+  const response = await api.put(`/mobile/profiles/${profileId}`, input);
+  return response.data;
+};
+
+export const deleteProfile = async (
+  profileId: string,
+): Promise<{ success: boolean; error?: string }> => {
+  const response = await api.delete(`/mobile/profiles/${profileId}`);
+  return response.data;
+};
+
 // ============================================================================
 // Saved Artworks
 // ============================================================================

@@ -41,6 +41,7 @@ import Constants from "expo-constants";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import AppHeader from "@/components/AppHeader";
 import ParentalGate from "@/components/ParentalGate";
+import ProfileSwitcher from "@/components/ProfileSwitcher";
 import useHeaderData from "@/hooks/useHeaderData";
 import { useAuth } from "@/contexts";
 
@@ -153,10 +154,11 @@ const SettingsScreen = () => {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [signInLoading, setSignInLoading] = useState(false);
 
+  // Profile switcher state
+  const [profileSwitcherOpen, setProfileSwitcherOpen] = useState(false);
+
   const handleManageProfiles = () => {
-    Alert.alert("Profiles", "Profile management screen coming soon!", [
-      { text: "OK" },
-    ]);
+    setProfileSwitcherOpen(true);
   };
 
   const handleSubscription = () => {
@@ -637,6 +639,12 @@ const SettingsScreen = () => {
           )}
         </View>
       </Modal>
+
+      {/* Profile Switcher Bottom Sheet */}
+      <ProfileSwitcher
+        isOpen={profileSwitcherOpen}
+        onClose={() => setProfileSwitcherOpen(false)}
+      />
     </View>
   );
 };
