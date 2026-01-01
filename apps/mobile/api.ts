@@ -185,6 +185,93 @@ export const linkAccount = async (
 };
 
 // ============================================================================
+// OAuth Sign-In
+// ============================================================================
+
+export type OAuthSignInResponse = {
+  token: string;
+  userId: string;
+  profileId: string;
+  isNewUser: boolean;
+  wasMerged: boolean;
+  error?: string;
+};
+
+/**
+ * Sign in with Google ID token
+ */
+export const signInWithGoogle = async (
+  idToken: string,
+): Promise<OAuthSignInResponse> => {
+  const response = await api.post("/mobile/auth/google", { idToken });
+
+  if (response.data.token) {
+    await setSessionToken(response.data.token);
+  }
+
+  return response.data;
+};
+
+/**
+ * Sign in with Apple identity token
+ */
+export const signInWithApple = async (
+  identityToken: string,
+  fullName?: { givenName?: string; familyName?: string },
+): Promise<OAuthSignInResponse> => {
+  const response = await api.post("/mobile/auth/apple", {
+    identityToken,
+    fullName,
+  });
+
+  if (response.data.token) {
+    await setSessionToken(response.data.token);
+  }
+
+  return response.data;
+};
+
+/**
+ * Sign in with Facebook access token
+ */
+export const signInWithFacebook = async (
+  accessToken: string,
+): Promise<OAuthSignInResponse> => {
+  const response = await api.post("/mobile/auth/facebook", { accessToken });
+
+  if (response.data.token) {
+    await setSessionToken(response.data.token);
+  }
+
+  return response.data;
+};
+
+/**
+ * Request a magic link email
+ */
+export const sendMagicLink = async (
+  email: string,
+): Promise<{ success: boolean; message?: string; error?: string }> => {
+  const response = await api.post("/mobile/auth/magic-link", { email });
+  return response.data;
+};
+
+/**
+ * Verify magic link token (called from deep link handler)
+ */
+export const verifyMagicLink = async (
+  token: string,
+): Promise<OAuthSignInResponse> => {
+  const response = await api.post("/mobile/auth/magic-link/verify", { token });
+
+  if (response.data.token) {
+    await setSessionToken(response.data.token);
+  }
+
+  return response.data;
+};
+
+// ============================================================================
 // Coloring Images
 // ============================================================================
 

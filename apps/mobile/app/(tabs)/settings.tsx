@@ -9,6 +9,9 @@ import {
   Platform,
   Alert,
   Switch,
+  TextInput,
+  ActivityIndicator,
+  Modal,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -25,12 +28,21 @@ import {
   faShieldCheck,
   faFileLines,
   faLock,
+  faRightFromBracket,
+  faLink,
+  faCheck,
 } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faGoogle,
+  faApple,
+  faFacebook,
+} from "@fortawesome/free-brands-svg-icons";
 import Constants from "expo-constants";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import AppHeader from "@/components/AppHeader";
 import ParentalGate from "@/components/ParentalGate";
 import useHeaderData from "@/hooks/useHeaderData";
+import { useAuth } from "@/contexts";
 
 type SettingsItemProps = {
   icon: IconDefinition;
@@ -115,6 +127,17 @@ const SettingsToggle = ({
 const SettingsScreen = () => {
   const appVersion = Constants.expoConfig?.version || "1.0.0";
   const headerData = useHeaderData();
+  const {
+    isLoading: authLoading,
+    isAuthenticated,
+    isLinked,
+    user,
+    signInWithGoogleHandler,
+    signInWithAppleHandler,
+    signInWithFacebookHandler,
+    sendMagicLinkHandler,
+    signOut,
+  } = useAuth();
 
   // Audio preference states
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
@@ -123,6 +146,12 @@ const SettingsScreen = () => {
   // Parental gate state - entire screen is gated
   const [isParentVerified, setIsParentVerified] = useState(false);
   const [parentalGateVisible, setParentalGateVisible] = useState(true);
+
+  // Sign-in modal state
+  const [signInModalVisible, setSignInModalVisible] = useState(false);
+  const [magicLinkEmail, setMagicLinkEmail] = useState("");
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [signInLoading, setSignInLoading] = useState(false);
 
   const handleManageProfiles = () => {
     Alert.alert("Profiles", "Profile management screen coming soon!", [
@@ -174,6 +203,111 @@ const SettingsScreen = () => {
 
   const handleRetryVerification = () => {
     setParentalGateVisible(true);
+  };
+
+  const handleSignIn = () => {
+    setSignInModalVisible(true);
+    setMagicLinkSent(false);
+    setMagicLinkEmail("");
+  };
+
+  const handleSignOut = async () => {
+    Alert.alert(
+      "Sign Out",
+      "Are you sure you want to sign out? Your artwork will remain on this device.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: async () => {
+            await signOut();
+            Alert.alert("Signed Out", "You have been signed out successfully.");
+          },
+        },
+      ],
+    );
+  };
+
+  const handleGoogleSignIn = async () => {
+    setSignInLoading(true);
+    try {
+      const result = await signInWithGoogleHandler();
+      if (result) {
+        setSignInModalVisible(false);
+        Alert.alert(
+          "Success",
+          result.wasMerged
+            ? "Your account has been linked and artwork synced!"
+            : "You are now signed in!",
+        );
+      }
+    } catch {
+      Alert.alert("Error", "Failed to sign in with Google. Please try again.");
+    } finally {
+      setSignInLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setSignInLoading(true);
+    try {
+      const result = await signInWithAppleHandler();
+      if (result) {
+        setSignInModalVisible(false);
+        Alert.alert(
+          "Success",
+          result.wasMerged
+            ? "Your account has been linked and artwork synced!"
+            : "You are now signed in!",
+        );
+      }
+    } catch {
+      Alert.alert("Error", "Failed to sign in with Apple. Please try again.");
+    } finally {
+      setSignInLoading(false);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    setSignInLoading(true);
+    try {
+      const result = await signInWithFacebookHandler();
+      if (result) {
+        setSignInModalVisible(false);
+        Alert.alert(
+          "Success",
+          result.wasMerged
+            ? "Your account has been linked and artwork synced!"
+            : "You are now signed in!",
+        );
+      }
+    } catch {
+      Alert.alert("Error", "Failed to sign in with Facebook. Please try again.");
+    } finally {
+      setSignInLoading(false);
+    }
+  };
+
+  const handleSendMagicLink = async () => {
+    if (!magicLinkEmail || !magicLinkEmail.includes("@")) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return;
+    }
+
+    setSignInLoading(true);
+    try {
+      const success = await sendMagicLinkHandler(magicLinkEmail);
+      if (success) {
+        setMagicLinkSent(true);
+      } else {
+        Alert.alert("Error", "Failed to send magic link. Please try again.");
+      }
+    } catch {
+      Alert.alert("Error", "Failed to send magic link. Please try again.");
+    } finally {
+      setSignInLoading(false);
+    }
   };
 
   // Show locked state if parent hasn't verified
@@ -230,6 +364,41 @@ const SettingsScreen = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account</Text>
             <View style={styles.sectionContent}>
+              {isLinked ? (
+                <>
+                  <View style={styles.settingsItem}>
+                    <View
+                      style={[
+                        styles.iconContainer,
+                        { backgroundColor: "rgba(34, 197, 94, 0.2)" },
+                      ]}
+                    >
+                      <FontAwesomeIcon icon={faCheck} size={18} color="#22C55E" />
+                    </View>
+                    <View style={styles.itemContent}>
+                      <Text style={styles.itemTitle}>Signed In</Text>
+                      <Text style={styles.itemSubtitle}>
+                        {user?.email || "Syncing across devices"}
+                      </Text>
+                    </View>
+                  </View>
+                  <SettingsItem
+                    icon={faRightFromBracket}
+                    iconColor="#EF4444"
+                    title="Sign Out"
+                    subtitle="Your artwork stays on this device"
+                    onPress={handleSignOut}
+                  />
+                </>
+              ) : (
+                <SettingsItem
+                  icon={faLink}
+                  iconColor="#8B5CF6"
+                  title="Sign In"
+                  subtitle="Sync artwork across devices"
+                  onPress={handleSignIn}
+                />
+              )}
               <SettingsItem
                 icon={faUsers}
                 iconColor="#E46444"
@@ -340,6 +509,134 @@ const SettingsScreen = () => {
         onClose={handleParentalGateClose}
         onSuccess={handleParentalGateSuccess}
       />
+
+      {/* Sign In Modal */}
+      <Modal
+        visible={signInModalVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setSignInModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Sign In</Text>
+            <Pressable
+              style={styles.modalCloseButton}
+              onPress={() => setSignInModalVisible(false)}
+            >
+              <Text style={styles.modalCloseText}>Cancel</Text>
+            </Pressable>
+          </View>
+
+          {magicLinkSent ? (
+            <View style={styles.magicLinkSentContainer}>
+              <View style={styles.magicLinkSentIcon}>
+                <FontAwesomeIcon icon={faEnvelope} size={48} color="#E46444" />
+              </View>
+              <Text style={styles.magicLinkSentTitle}>Check Your Email!</Text>
+              <Text style={styles.magicLinkSentText}>
+                We sent a sign-in link to {magicLinkEmail}
+              </Text>
+              <Text style={styles.magicLinkSentSubtext}>
+                Click the link in the email to sign in. The link expires in 15
+                minutes.
+              </Text>
+              <Pressable
+                style={styles.magicLinkRetryButton}
+                onPress={() => setMagicLinkSent(false)}
+              >
+                <Text style={styles.magicLinkRetryText}>Use Different Email</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <ScrollView style={styles.modalContent}>
+              <Text style={styles.modalSubtitle}>
+                Sign in to sync your artwork across devices and access your
+                account on the web.
+              </Text>
+
+              {/* Social Sign In Buttons */}
+              <View style={styles.socialButtonsContainer}>
+                {Platform.OS === "ios" && (
+                  <Pressable
+                    style={[styles.socialButton, styles.appleButton]}
+                    onPress={handleAppleSignIn}
+                    disabled={signInLoading}
+                  >
+                    <FontAwesomeIcon icon={faApple} size={20} color="#FFFFFF" />
+                    <Text style={[styles.socialButtonText, { color: "#FFFFFF" }]}>
+                      Continue with Apple
+                    </Text>
+                  </Pressable>
+                )}
+
+                <Pressable
+                  style={[styles.socialButton, styles.googleButton]}
+                  onPress={handleGoogleSignIn}
+                  disabled={signInLoading}
+                >
+                  <FontAwesomeIcon icon={faGoogle} size={20} color="#EA4335" />
+                  <Text style={styles.socialButtonText}>Continue with Google</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.socialButton, styles.facebookButton]}
+                  onPress={handleFacebookSignIn}
+                  disabled={signInLoading}
+                >
+                  <FontAwesomeIcon icon={faFacebook} size={20} color="#1877F2" />
+                  <Text style={styles.socialButtonText}>
+                    Continue with Facebook
+                  </Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.dividerContainer}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              {/* Magic Link */}
+              <View style={styles.magicLinkContainer}>
+                <Text style={styles.magicLinkLabel}>Sign in with email</Text>
+                <TextInput
+                  style={styles.magicLinkInput}
+                  placeholder="Enter your email"
+                  placeholderTextColor="#9CA3AF"
+                  value={magicLinkEmail}
+                  onChangeText={setMagicLinkEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  editable={!signInLoading}
+                />
+                <Pressable
+                  style={[
+                    styles.magicLinkButton,
+                    signInLoading && styles.magicLinkButtonDisabled,
+                  ]}
+                  onPress={handleSendMagicLink}
+                  disabled={signInLoading}
+                >
+                  {signInLoading ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.magicLinkButtonText}>
+                      Send Magic Link
+                    </Text>
+                  )}
+                </Pressable>
+              </View>
+
+              <Text style={styles.privacyNote}>
+                By signing in, you agree to our Terms of Service and Privacy
+                Policy.
+              </Text>
+            </ScrollView>
+          )}
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -468,6 +765,179 @@ const styles = StyleSheet.create({
     fontFamily: "TondoTrial-Bold",
     fontSize: 16,
     color: "#FFFFFF",
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#FDFAF5",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  modalTitle: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 20,
+    color: "#374151",
+  },
+  modalCloseButton: {
+    padding: 8,
+  },
+  modalCloseText: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 16,
+    color: "#E46444",
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
+  modalSubtitle: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 15,
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  socialButtonsContainer: {
+    gap: 12,
+  },
+  socialButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    gap: 12,
+  },
+  appleButton: {
+    backgroundColor: "#000000",
+  },
+  googleButton: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  facebookButton: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  socialButtonText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 16,
+    color: "#374151",
+  },
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E5E7EB",
+  },
+  dividerText: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 14,
+    color: "#9CA3AF",
+    marginHorizontal: 16,
+  },
+  magicLinkContainer: {
+    gap: 12,
+  },
+  magicLinkLabel: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 14,
+    color: "#374151",
+  },
+  magicLinkInput: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 16,
+    color: "#374151",
+  },
+  magicLinkButton: {
+    backgroundColor: "#E46444",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  magicLinkButtonDisabled: {
+    opacity: 0.6,
+  },
+  magicLinkButtonText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 16,
+    color: "#FFFFFF",
+  },
+  privacyNote: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 12,
+    color: "#9CA3AF",
+    textAlign: "center",
+    marginTop: 24,
+    lineHeight: 18,
+  },
+  magicLinkSentContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 32,
+  },
+  magicLinkSentIcon: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: "rgba(228, 100, 68, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 24,
+  },
+  magicLinkSentTitle: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 24,
+    color: "#374151",
+    marginBottom: 12,
+  },
+  magicLinkSentText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 16,
+    color: "#374151",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  magicLinkSentSubtext: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 14,
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 32,
+  },
+  magicLinkRetryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  magicLinkRetryText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 14,
+    color: "#E46444",
   },
 });
 
