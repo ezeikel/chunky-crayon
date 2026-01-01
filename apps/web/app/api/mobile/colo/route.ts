@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@chunky-crayon/db';
-import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
-import { getColoState, checkEvolution } from '@/lib/colo/service';
-import type { ColoStage } from '@/lib/colo/types';
+import {
+  getMobileColoStateAction,
+  checkMobileColoEvolutionAction,
+} from '@/app/actions/colo';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,70 +17,14 @@ export async function OPTIONS() {
 /**
  * GET /api/mobile/colo
  * Returns the current Colo state for the active profile
+ *
+ * Auth: Handled by middleware (sets x-user-id header from JWT)
+ * Uses unified auth via getUserId() in server action
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { userId } = await getMobileAuthFromHeaders(request.headers);
-
-    if (!userId) {
-      return NextResponse.json(
-        { coloState: null },
-        { headers: corsHeaders },
-      );
-    }
-
-    // Get user's active profile with Colo data
-    const user = await db.user.findUnique({
-      where: { id: userId },
-      select: {
-        activeProfileId: true,
-        profiles: {
-          orderBy: { createdAt: 'asc' },
-          select: {
-            id: true,
-            isDefault: true,
-            coloStage: true,
-            coloAccessories: true,
-            _count: {
-              select: {
-                savedArtworks: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!user || user.profiles.length === 0) {
-      return NextResponse.json(
-        { coloState: null },
-        { headers: corsHeaders },
-      );
-    }
-
-    const activeProfile =
-      user.profiles.find((p) => p.id === user.activeProfileId) ||
-      user.profiles.find((p) => p.isDefault) ||
-      user.profiles[0];
-
-    const coloState = getColoState(
-      activeProfile.coloStage as ColoStage,
-      activeProfile.coloAccessories,
-      activeProfile._count.savedArtworks,
-    );
-
-    return NextResponse.json(
-      {
-        coloState: {
-          stage: coloState.stage,
-          stageName: coloState.stageName,
-          imagePath: coloState.imagePath,
-          accessories: coloState.accessories,
-          progressToNext: coloState.progressToNext,
-        },
-      },
-      { headers: corsHeaders },
-    );
+    const data = await getMobileColoStateAction();
+    return NextResponse.json(data, { headers: corsHeaders });
   } catch (error) {
     console.error('Error fetching Colo state:', error);
     return NextResponse.json(
@@ -93,117 +37,17 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/mobile/colo
  * Check for Colo evolution (called after saving artwork)
+ *
+ * Auth: Handled by middleware (sets x-user-id header from JWT)
+ * Uses unified auth via getUserId() in server action
  */
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await getMobileAuthFromHeaders(request.headers);
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401, headers: corsHeaders },
-      );
-    }
-
     const body = await request.json();
-    const { profileId: requestedProfileId } = body;
+    const { profileId } = body;
 
-    // Get user's active profile or use the requested one
-    const user = await db.user.findUnique({
-      where: { id: userId },
-      select: {
-        activeProfileId: true,
-        profiles: {
-          orderBy: { createdAt: 'asc' },
-          select: { id: true, isDefault: true },
-        },
-      },
-    });
-
-    const profileId =
-      requestedProfileId ||
-      user?.activeProfileId ||
-      user?.profiles.find((p) => p.isDefault)?.id ||
-      user?.profiles[0]?.id;
-
-    if (!profileId) {
-      return NextResponse.json(
-        { coloState: null, evolutionResult: null },
-        { headers: corsHeaders },
-      );
-    }
-
-    // Verify profile belongs to user
-    const profile = await db.profile.findFirst({
-      where: {
-        id: profileId,
-        userId,
-      },
-      select: {
-        id: true,
-        coloStage: true,
-        coloAccessories: true,
-        _count: {
-          select: {
-            savedArtworks: true,
-          },
-        },
-      },
-    });
-
-    if (!profile) {
-      return NextResponse.json(
-        { coloState: null, evolutionResult: null },
-        { headers: corsHeaders },
-      );
-    }
-
-    // Check for evolution
-    const evolutionResult = checkEvolution(
-      profile.coloStage as ColoStage,
-      profile.coloAccessories,
-      profile._count.savedArtworks,
-    );
-
-    // If evolved or unlocked new accessories, update the profile
-    if (evolutionResult.evolved || evolutionResult.newAccessories.length > 0) {
-      await db.profile.update({
-        where: { id: profile.id },
-        data: {
-          coloStage: evolutionResult.newStage,
-          coloAccessories: [
-            ...profile.coloAccessories,
-            ...evolutionResult.newAccessories,
-          ],
-        },
-      });
-    }
-
-    // Get updated Colo state
-    const coloState = getColoState(
-      evolutionResult.newStage as ColoStage,
-      [...profile.coloAccessories, ...evolutionResult.newAccessories],
-      profile._count.savedArtworks,
-    );
-
-    return NextResponse.json(
-      {
-        coloState: {
-          stage: coloState.stage,
-          stageName: coloState.stageName,
-          imagePath: coloState.imagePath,
-          accessories: coloState.accessories,
-          progressToNext: coloState.progressToNext,
-        },
-        evolutionResult: {
-          evolved: evolutionResult.evolved,
-          previousStage: evolutionResult.previousStage,
-          newStage: evolutionResult.newStage,
-          newAccessories: evolutionResult.newAccessories,
-        },
-      },
-      { headers: corsHeaders },
-    );
+    const data = await checkMobileColoEvolutionAction(profileId);
+    return NextResponse.json(data, { headers: corsHeaders });
   } catch (error) {
     console.error('Error checking Colo evolution:', error);
     return NextResponse.json(

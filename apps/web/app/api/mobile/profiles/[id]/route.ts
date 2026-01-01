@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
-import {
-  updateProfileForUser,
-  deleteProfileForUser,
-} from '@/lib/profiles/service';
+import { updateProfile, deleteProfile } from '@/app/actions/profiles';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,7 +13,10 @@ export async function OPTIONS() {
 
 /**
  * PUT /api/mobile/profiles/[id]
- * Update a profile - wraps updateProfileForUser service
+ * Update a profile
+ *
+ * Auth: Handled by middleware (sets x-user-id header from JWT)
+ * Uses unified auth via getUserId() in server action
  */
 export async function PUT(
   request: NextRequest,
@@ -25,19 +24,10 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const { userId } = await getMobileAuthFromHeaders(request.headers);
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401, headers: corsHeaders },
-      );
-    }
-
     const body = await request.json();
     const { name, avatarId, ageGroup, difficulty } = body;
 
-    const result = await updateProfileForUser(id, userId, {
+    const result = await updateProfile(id, {
       name,
       avatarId,
       ageGroup,
@@ -45,9 +35,10 @@ export async function PUT(
     });
 
     if ('error' in result) {
+      const status = result.error.includes('logged in') ? 401 : 400;
       return NextResponse.json(
         { error: result.error },
-        { status: 400, headers: corsHeaders },
+        { status, headers: corsHeaders },
       );
     }
 
@@ -78,36 +69,29 @@ export async function PUT(
 
 /**
  * DELETE /api/mobile/profiles/[id]
- * Delete a profile - wraps deleteProfileForUser service
+ * Delete a profile
+ *
+ * Auth: Handled by middleware (sets x-user-id header from JWT)
+ * Uses unified auth via getUserId() in server action
  */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
-    const { userId } = await getMobileAuthFromHeaders(request.headers);
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401, headers: corsHeaders },
-      );
-    }
-
-    const result = await deleteProfileForUser(id, userId);
+    const result = await deleteProfile(id);
 
     if ('error' in result) {
+      const status = result.error.includes('logged in') ? 401 : 400;
       return NextResponse.json(
         { error: result.error },
-        { status: 400, headers: corsHeaders },
+        { status, headers: corsHeaders },
       );
     }
 
-    return NextResponse.json(
-      { success: true },
-      { headers: corsHeaders },
-    );
+    return NextResponse.json({ success: true }, { headers: corsHeaders });
   } catch (error) {
     console.error('Error deleting profile:', error);
     return NextResponse.json(

@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
-import {
-  getActiveProfileForUser,
-  setActiveProfileForUser,
-} from '@/lib/profiles/service';
+import { getActiveProfile, setActiveProfile } from '@/app/actions/profiles';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,20 +13,14 @@ export async function OPTIONS() {
 
 /**
  * GET /api/mobile/profiles/active
- * Returns the currently active profile - wraps getActiveProfileForUser service
+ * Returns the currently active profile
+ *
+ * Auth: Handled by middleware (sets x-user-id header from JWT)
+ * Uses unified auth via getUserId() in server action
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { userId } = await getMobileAuthFromHeaders(request.headers);
-
-    if (!userId) {
-      return NextResponse.json(
-        { activeProfile: null },
-        { headers: corsHeaders },
-      );
-    }
-
-    const activeProfile = await getActiveProfileForUser(userId);
+    const activeProfile = await getActiveProfile();
 
     if (!activeProfile) {
       return NextResponse.json(
@@ -65,19 +55,13 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/mobile/profiles/active
- * Set the active profile - wraps setActiveProfileForUser service
+ * Set the active profile
+ *
+ * Auth: Handled by middleware (sets x-user-id header from JWT)
+ * Uses unified auth via getUserId() in server action
  */
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await getMobileAuthFromHeaders(request.headers);
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401, headers: corsHeaders },
-      );
-    }
-
     const body = await request.json();
     const { profileId } = body;
 
@@ -88,12 +72,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await setActiveProfileForUser(profileId, userId);
+    const result = await setActiveProfile(profileId);
 
     if ('error' in result) {
+      const status = result.error.includes('logged in') ? 401 : 404;
       return NextResponse.json(
         { error: result.error },
-        { status: 404, headers: corsHeaders },
+        { status, headers: corsHeaders },
       );
     }
 

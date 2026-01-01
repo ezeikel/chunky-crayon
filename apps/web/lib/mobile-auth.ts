@@ -1,18 +1,20 @@
-import { SignJWT, jwtVerify } from "jose";
-import { db } from "@chunky-crayon/db";
+import { SignJWT, jwtVerify } from 'jose';
+import { db, AgeGroup, Difficulty } from '@chunky-crayon/db';
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.MOBILE_AUTH_SECRET || process.env.NEXT_AUTH_SECRET || "dev-secret-change-me"
+  process.env.MOBILE_AUTH_SECRET ||
+    process.env.NEXT_AUTH_SECRET ||
+    'dev-secret-change-me',
 );
 
 // Token expiration: 1 year for device tokens (they're device-bound anyway)
-const TOKEN_EXPIRATION = "365d";
+const TOKEN_EXPIRATION = '365d';
 
 export type MobileTokenPayload = {
   deviceId: string;
-  userId?: string;       // Set when linked to an OAuth account
-  profileId?: string;    // Current active profile
-  type: "device" | "user";
+  userId?: string; // Set when linked to an OAuth account
+  profileId?: string; // Current active profile
+  type: 'device' | 'user';
 };
 
 /**
@@ -21,15 +23,15 @@ export type MobileTokenPayload = {
 export async function createDeviceToken(
   deviceId: string,
   userId?: string,
-  profileId?: string
+  profileId?: string,
 ): Promise<string> {
   const token = await new SignJWT({
     deviceId,
     userId,
     profileId,
-    type: userId ? "user" : "device",
+    type: userId ? 'user' : 'device',
   } as MobileTokenPayload)
-    .setProtectedHeader({ alg: "HS256" })
+    .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(TOKEN_EXPIRATION)
     .sign(JWT_SECRET);
@@ -41,13 +43,13 @@ export async function createDeviceToken(
  * Verify and decode a mobile token
  */
 export async function verifyMobileToken(
-  token: string
+  token: string,
 ): Promise<MobileTokenPayload | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return payload as unknown as MobileTokenPayload;
   } catch (error) {
-    console.error("Failed to verify mobile token:", error);
+    console.error('Failed to verify mobile token:', error);
     return null;
   }
 }
@@ -68,7 +70,7 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<{
       user: {
         include: {
           profiles: {
-            orderBy: { createdAt: "asc" },
+            orderBy: { createdAt: 'asc' },
             take: 1,
           },
         },
@@ -80,7 +82,7 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<{
     const profile = existingSession.user.profiles[0];
     return {
       userId: existingSession.userId,
-      profileId: profile?.id || "",
+      profileId: profile?.id || '',
       isNew: false,
     };
   }
@@ -89,13 +91,13 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<{
   const user = await db.user.create({
     data: {
       // Anonymous user - no email
-      name: "Mobile User",
+      name: 'Mobile User',
       profiles: {
         create: {
-          name: "Artist",
-          avatarId: "default",
-          ageGroup: "5_7",
-          difficulty: "easy",
+          name: 'Artist',
+          avatarId: 'default',
+          ageGroup: AgeGroup.CHILD,
+          difficulty: Difficulty.BEGINNER,
           isDefault: true,
         },
       },
@@ -115,7 +117,7 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<{
 
   return {
     userId: user.id,
-    profileId: user.profiles[0]?.id || "",
+    profileId: user.profiles[0]?.id || '',
     isNew: true,
   };
 }
@@ -223,7 +225,7 @@ export async function handleMobileOAuthSignIn(
       user: {
         include: {
           profiles: {
-            orderBy: { createdAt: "asc" },
+            orderBy: { createdAt: 'asc' },
           },
         },
       },
@@ -235,7 +237,7 @@ export async function handleMobileOAuthSignIn(
     where: { email },
     include: {
       profiles: {
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: 'asc' },
       },
     },
   });
@@ -250,7 +252,7 @@ export async function handleMobileOAuthSignIn(
     if (existingUserWithEmail) {
       // User already exists - link device to them
       finalUserId = existingUserWithEmail.id;
-      finalProfileId = existingUserWithEmail.profiles[0]?.id || "";
+      finalProfileId = existingUserWithEmail.profiles[0]?.id || '';
 
       await db.mobileDeviceSession.create({
         data: { deviceId, userId: finalUserId },
@@ -260,13 +262,13 @@ export async function handleMobileOAuthSignIn(
       const newUser = await db.user.create({
         data: {
           email,
-          name: name || email.split("@")[0],
+          name: name || email.split('@')[0],
           profiles: {
             create: {
-              name: "Artist",
-              avatarId: "default",
-              ageGroup: "CHILD",
-              difficulty: "BEGINNER",
+              name: 'Artist',
+              avatarId: 'default',
+              ageGroup: AgeGroup.CHILD,
+              difficulty: Difficulty.BEGINNER,
               isDefault: true,
             },
           },
@@ -275,7 +277,7 @@ export async function handleMobileOAuthSignIn(
       });
 
       finalUserId = newUser.id;
-      finalProfileId = newUser.profiles[0]?.id || "";
+      finalProfileId = newUser.profiles[0]?.id || '';
       isNewUser = true;
 
       await db.mobileDeviceSession.create({
@@ -292,10 +294,13 @@ export async function handleMobileOAuthSignIn(
       if (existingUserWithEmail.id === currentUser.id) {
         // Same user - nothing to do
         finalUserId = currentUser.id;
-        finalProfileId = currentUser.profiles[0]?.id || "";
+        finalProfileId = currentUser.profiles[0]?.id || '';
       } else if (isAnonymous) {
         // Anonymous user signing in - merge into existing
-        await mergeAnonymousUserIntoTarget(currentUser.id, existingUserWithEmail.id);
+        await mergeAnonymousUserIntoTarget(
+          currentUser.id,
+          existingUserWithEmail.id,
+        );
         wasMerged = true;
 
         // Update device session
@@ -305,7 +310,7 @@ export async function handleMobileOAuthSignIn(
         });
 
         finalUserId = existingUserWithEmail.id;
-        finalProfileId = existingUserWithEmail.profiles[0]?.id || "";
+        finalProfileId = existingUserWithEmail.profiles[0]?.id || '';
       } else {
         // Different authenticated user - switch device to new user
         await db.mobileDeviceSession.update({
@@ -314,7 +319,7 @@ export async function handleMobileOAuthSignIn(
         });
 
         finalUserId = existingUserWithEmail.id;
-        finalProfileId = existingUserWithEmail.profiles[0]?.id || "";
+        finalProfileId = existingUserWithEmail.profiles[0]?.id || '';
       }
     } else {
       // Email doesn't exist - update current user with email
@@ -324,24 +329,24 @@ export async function handleMobileOAuthSignIn(
           where: { id: currentUser.id },
           data: {
             email,
-            name: name || currentUser.name || email.split("@")[0],
+            name: name || currentUser.name || email.split('@')[0],
           },
         });
 
         finalUserId = currentUser.id;
-        finalProfileId = currentUser.profiles[0]?.id || "";
+        finalProfileId = currentUser.profiles[0]?.id || '';
       } else {
         // User already has a different email - create new user
         const newUser = await db.user.create({
           data: {
             email,
-            name: name || email.split("@")[0],
+            name: name || email.split('@')[0],
             profiles: {
               create: {
-                name: "Artist",
-                avatarId: "default",
-                ageGroup: "CHILD",
-                difficulty: "BEGINNER",
+                name: 'Artist',
+                avatarId: 'default',
+                ageGroup: AgeGroup.CHILD,
+                difficulty: Difficulty.BEGINNER,
                 isDefault: true,
               },
             },
@@ -355,7 +360,7 @@ export async function handleMobileOAuthSignIn(
         });
 
         finalUserId = newUser.id;
-        finalProfileId = newUser.profiles[0]?.id || "";
+        finalProfileId = newUser.profiles[0]?.id || '';
         isNewUser = true;
       }
     }
@@ -379,7 +384,7 @@ export async function handleMobileOAuthSignIn(
  */
 export async function linkDeviceToUser(
   deviceId: string,
-  userId: string
+  userId: string,
 ): Promise<void> {
   // Get existing device session
   const existingSession = await db.mobileDeviceSession.findUnique({
@@ -413,7 +418,9 @@ export async function linkDeviceToUser(
 /**
  * Get the user ID for a device (if registered)
  */
-export async function getDeviceUserId(deviceId: string): Promise<string | null> {
+export async function getDeviceUserId(
+  deviceId: string,
+): Promise<string | null> {
   const session = await db.mobileDeviceSession.findUnique({
     where: { deviceId },
     select: { userId: true },
@@ -426,21 +433,19 @@ export async function getDeviceUserId(deviceId: string): Promise<string | null> 
  * Extract auth info from request headers
  * Supports both Bearer (JWT) and Device (deviceId) auth
  */
-export async function getMobileAuthFromHeaders(
-  headers: Headers
-): Promise<{
+export async function getMobileAuthFromHeaders(headers: Headers): Promise<{
   userId: string | null;
   deviceId: string | null;
   profileId: string | null;
 }> {
-  const authHeader = headers.get("authorization");
+  const authHeader = headers.get('authorization');
 
   if (!authHeader) {
     return { userId: null, deviceId: null, profileId: null };
   }
 
   // Handle Bearer token (JWT)
-  if (authHeader.startsWith("Bearer ")) {
+  if (authHeader.startsWith('Bearer ')) {
     const token = authHeader.slice(7);
     const payload = await verifyMobileToken(token);
 
@@ -454,7 +459,7 @@ export async function getMobileAuthFromHeaders(
   }
 
   // Handle Device ID (anonymous auth)
-  if (authHeader.startsWith("Device ")) {
+  if (authHeader.startsWith('Device ')) {
     const deviceId = authHeader.slice(7);
     const userId = await getDeviceUserId(deviceId);
 

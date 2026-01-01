@@ -561,6 +561,9 @@ export const ACTIONS = {
   GET_CHALLENGE_HISTORY: 'get challenge history',
   UPDATE_CHALLENGE_PROGRESS: 'update challenge progress',
   CLAIM_CHALLENGE_REWARD: 'claim challenge reward',
+  // Saved artwork actions
+  SAVE_ARTWORK: 'save artwork',
+  GET_SAVED_ARTWORKS: 'get saved artworks',
 };
 
 export type PlanInterval = 'monthly' | 'annual';

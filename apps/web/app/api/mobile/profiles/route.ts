@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
-import {
-  getProfilesForUser,
-  createProfileForUser,
-} from '@/lib/profiles/service';
+import { getProfiles, createProfile } from '@/app/actions/profiles';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,20 +13,18 @@ export async function OPTIONS() {
 
 /**
  * GET /api/mobile/profiles
- * Returns all profiles for the current user - wraps getProfilesForUser service
+ * Returns all profiles for the current user
+ *
+ * Auth: Handled by middleware (sets x-user-id header from JWT)
+ * Uses unified auth via getUserId() in server action
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { userId } = await getMobileAuthFromHeaders(request.headers);
+    const profiles = await getProfiles();
 
-    if (!userId) {
-      return NextResponse.json(
-        { profiles: [] },
-        { headers: corsHeaders },
-      );
+    if (!profiles) {
+      return NextResponse.json({ profiles: [] }, { headers: corsHeaders });
     }
-
-    const profiles = await getProfilesForUser(userId);
 
     return NextResponse.json(
       {
@@ -58,19 +52,13 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/mobile/profiles
- * Create a new profile - wraps createProfileForUser service
+ * Create a new profile
+ *
+ * Auth: Handled by middleware (sets x-user-id header from JWT)
+ * Uses unified auth via getUserId() in server action
  */
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await getMobileAuthFromHeaders(request.headers);
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401, headers: corsHeaders },
-      );
-    }
-
     const body = await request.json();
     const { name, avatarId, ageGroup, difficulty } = body;
 
@@ -81,7 +69,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await createProfileForUser(userId, {
+    const result = await createProfile({
       name: name.trim(),
       avatarId,
       ageGroup,
@@ -89,9 +77,10 @@ export async function POST(request: NextRequest) {
     });
 
     if ('error' in result) {
+      const status = result.error.includes('logged in') ? 401 : 400;
       return NextResponse.json(
         { error: result.error },
-        { status: 400, headers: corsHeaders },
+        { status, headers: corsHeaders },
       );
     }
 
