@@ -20,6 +20,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.chewybytes.chunkycrayon",
+    infoPlist: {
+      CFBundleURLTypes: [
+        {
+          CFBundleURLSchemes: [`fb${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID}`],
+        },
+      ],
+    },
   },
   android: {
     adaptiveIcon: {
@@ -41,6 +48,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-audio",
     "expo-apple-authentication",
     "@react-native-google-signin/google-signin",
+    [
+      "react-native-fbsdk-next",
+      {
+        appID: `${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID}`,
+        displayName: "Chunky Crayon",
+        clientToken: `${process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN}`,
+        scheme: "chunkycrayon",
+      },
+    ],
     [
       "expo-image-picker",
       {

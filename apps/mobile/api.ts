@@ -49,9 +49,12 @@ async function ensureRegistered(): Promise<void> {
   registrationPromise = (async () => {
     try {
       const deviceId = await getDeviceId();
-      const response = await axios.post(`${apiUrlFromEnv}/mobile/auth/register`, {
-        deviceId,
-      });
+      const response = await axios.post(
+        `${apiUrlFromEnv}/mobile/auth/register`,
+        {
+          deviceId,
+        },
+      );
 
       if (response.data.token) {
         await setSessionToken(response.data.token);
@@ -627,5 +630,51 @@ export const claimChallengeReward = async (
   const response = await api.post("/mobile/challenges/claim", {
     weeklyChallengeId,
   });
+  return response.data;
+};
+
+// ============================================================================
+// Feed
+// ============================================================================
+
+export type FeedColoringImage = {
+  id: string;
+  title: string;
+  description: string;
+  alt: string;
+  url: string | null;
+  svgUrl: string | null;
+  tags: string[];
+  difficulty: string | null;
+  createdAt: string;
+};
+
+export type FeedSavedArtwork = {
+  id: string;
+  title: string | null;
+  imageUrl: string;
+  thumbnailUrl: string | null;
+  createdAt: string;
+  coloringImage: {
+    id: string;
+    title: string;
+  };
+};
+
+export type FeedResponse = {
+  todaysPick: FeedColoringImage | null;
+  activeChallenge: ChallengeWithProgress | null;
+  recentArt: FeedSavedArtwork[];
+  weeklyCollection: FeedColoringImage[];
+  monthlyFeatured: FeedColoringImage[];
+  error?: string;
+};
+
+/**
+ * Get the curated home feed for the mobile app
+ * Includes today's pick, active challenge, recent art, and curated collections
+ */
+export const getFeed = async (): Promise<FeedResponse> => {
+  const response = await api.get("/mobile/feed");
   return response.data;
 };

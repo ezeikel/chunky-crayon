@@ -1,7 +1,14 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import { Alert } from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
+import { LoginManager, AccessToken } from "react-native-fbsdk-next";
 import {
   signInWithGoogle,
   signInWithApple,
@@ -12,7 +19,10 @@ import {
   type OAuthSignInResponse,
   type AuthMeResponse,
 } from "@/api";
-import { logout as clearAuthTokens, isAuthenticated as checkIsAuthenticated } from "@/lib/auth";
+import {
+  logout as clearAuthTokens,
+  isAuthenticated as checkIsAuthenticated,
+} from "@/lib/auth";
 
 // Configure Google Sign-In
 GoogleSignin.configure({
@@ -29,7 +39,9 @@ type AuthContextType = {
   signInWithAppleHandler: () => Promise<OAuthSignInResponse | null>;
   signInWithFacebookHandler: () => Promise<OAuthSignInResponse | null>;
   sendMagicLinkHandler: (email: string) => Promise<boolean>;
-  handleMagicLinkCallback: (token: string) => Promise<OAuthSignInResponse | null>;
+  handleMagicLinkCallback: (
+    token: string,
+  ) => Promise<OAuthSignInResponse | null>;
   signOut: () => Promise<void>;
   refreshAuth: () => Promise<void>;
 };
@@ -90,151 +102,181 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [refreshAuth]);
 
   // Google Sign-In
-  const signInWithGoogleHandler = useCallback(async (): Promise<OAuthSignInResponse | null> => {
-    try {
-      setIsLoading(true);
+  const signInWithGoogleHandler =
+    useCallback(async (): Promise<OAuthSignInResponse | null> => {
+      try {
+        setIsLoading(true);
 
-      // Check if Google Play Services are available
-      await GoogleSignin.hasPlayServices();
+        // Check if Google Play Services are available
+        await GoogleSignin.hasPlayServices();
 
-      // Sign in with Google
-      const userInfo = await GoogleSignin.signIn();
-      const idToken = userInfo.data?.idToken;
+        // Sign in with Google
+        const userInfo = await GoogleSignin.signIn();
+        const idToken = userInfo.data?.idToken;
 
-      if (!idToken) {
-        throw new Error("No ID token returned from Google");
+        if (!idToken) {
+          throw new Error("No ID token returned from Google");
+        }
+
+        // Send to our server
+        const response = await signInWithGoogle(idToken);
+
+        // Update local state
+        await refreshAuth();
+
+        return response;
+      } catch (error: unknown) {
+        console.error("Google sign-in error:", error);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to sign in with Google";
+        Alert.alert("Sign In Failed", message);
+        return null;
+      } finally {
+        setIsLoading(false);
       }
-
-      // Send to our server
-      const response = await signInWithGoogle(idToken);
-
-      // Update local state
-      await refreshAuth();
-
-      return response;
-    } catch (error: unknown) {
-      console.error("Google sign-in error:", error);
-      const message = error instanceof Error ? error.message : "Failed to sign in with Google";
-      Alert.alert("Sign In Failed", message);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [refreshAuth]);
+    }, [refreshAuth]);
 
   // Apple Sign-In
-  const signInWithAppleHandler = useCallback(async (): Promise<OAuthSignInResponse | null> => {
-    try {
-      setIsLoading(true);
+  const signInWithAppleHandler =
+    useCallback(async (): Promise<OAuthSignInResponse | null> => {
+      try {
+        setIsLoading(true);
 
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-        ],
-      });
+        const credential = await AppleAuthentication.signInAsync({
+          requestedScopes: [
+            AppleAuthentication.AppleAuthenticationScope.EMAIL,
+            AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          ],
+        });
 
-      if (!credential.identityToken) {
-        throw new Error("No identity token returned from Apple");
-      }
+        if (!credential.identityToken) {
+          throw new Error("No identity token returned from Apple");
+        }
 
-      // Send to our server
-      const response = await signInWithApple(credential.identityToken, {
-        givenName: credential.fullName?.givenName ?? undefined,
-        familyName: credential.fullName?.familyName ?? undefined,
-      });
+        // Send to our server
+        const response = await signInWithApple(credential.identityToken, {
+          givenName: credential.fullName?.givenName ?? undefined,
+          familyName: credential.fullName?.familyName ?? undefined,
+        });
 
-      // Update local state
-      await refreshAuth();
+        // Update local state
+        await refreshAuth();
 
-      return response;
-    } catch (error: unknown) {
-      // Don't show error if user cancelled
-      if (error instanceof Error && error.message.includes("cancelled")) {
+        return response;
+      } catch (error: unknown) {
+        // Don't show error if user cancelled
+        if (error instanceof Error && error.message.includes("cancelled")) {
+          return null;
+        }
+
+        console.error("Apple sign-in error:", error);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to sign in with Apple";
+        Alert.alert("Sign In Failed", message);
         return null;
+      } finally {
+        setIsLoading(false);
       }
+    }, [refreshAuth]);
 
-      console.error("Apple sign-in error:", error);
-      const message = error instanceof Error ? error.message : "Failed to sign in with Apple";
-      Alert.alert("Sign In Failed", message);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [refreshAuth]);
+  // Facebook Sign-In
+  const signInWithFacebookHandler =
+    useCallback(async (): Promise<OAuthSignInResponse | null> => {
+      try {
+        setIsLoading(true);
 
-  // Facebook Sign-In (requires react-native-fbsdk-next to be installed)
-  const signInWithFacebookHandler = useCallback(async (): Promise<OAuthSignInResponse | null> => {
-    try {
-      setIsLoading(true);
+        // Request permissions from Facebook
+        const result = await LoginManager.logInWithPermissions([
+          "public_profile",
+          "email",
+        ]);
 
-      // Note: This requires react-native-fbsdk-next to be installed
-      // For now, show a message that it's not yet available
-      Alert.alert(
-        "Coming Soon",
-        "Facebook sign-in will be available in a future update.",
-      );
-      return null;
+        if (result.isCancelled) {
+          return null;
+        }
 
-      // When Facebook SDK is installed, uncomment this:
-      // const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
-      // if (result.isCancelled) return null;
-      // const data = await AccessToken.getCurrentAccessToken();
-      // if (!data?.accessToken) throw new Error('No access token');
-      // const response = await signInWithFacebook(data.accessToken);
-      // await refreshAuth();
-      // return response;
-    } catch (error: unknown) {
-      console.error("Facebook sign-in error:", error);
-      const message = error instanceof Error ? error.message : "Failed to sign in with Facebook";
-      Alert.alert("Sign In Failed", message);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [refreshAuth]);
+        // Get the access token
+        const data = await AccessToken.getCurrentAccessToken();
+
+        if (!data?.accessToken) {
+          throw new Error("No access token returned from Facebook");
+        }
+
+        // Send to our server
+        const response = await signInWithFacebook(data.accessToken);
+
+        // Update local state
+        await refreshAuth();
+
+        return response;
+      } catch (error: unknown) {
+        console.error("Facebook sign-in error:", error);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to sign in with Facebook";
+        Alert.alert("Sign In Failed", message);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    }, [refreshAuth]);
 
   // Send Magic Link
-  const sendMagicLinkHandler = useCallback(async (email: string): Promise<boolean> => {
-    try {
-      setIsLoading(true);
-      const response = await sendMagicLink(email);
+  const sendMagicLinkHandler = useCallback(
+    async (email: string): Promise<boolean> => {
+      try {
+        setIsLoading(true);
+        const response = await sendMagicLink(email);
 
-      if (response.success) {
-        Alert.alert(
-          "Check Your Email",
-          "We sent a sign-in link to your email. Tap it to sign in!",
-        );
-        return true;
+        if (response.success) {
+          Alert.alert(
+            "Check Your Email",
+            "We sent a sign-in link to your email. Tap it to sign in!",
+          );
+          return true;
+        }
+
+        Alert.alert("Error", response.error || "Failed to send magic link");
+        return false;
+      } catch (error: unknown) {
+        console.error("Magic link error:", error);
+        const message =
+          error instanceof Error ? error.message : "Failed to send magic link";
+        Alert.alert("Error", message);
+        return false;
+      } finally {
+        setIsLoading(false);
       }
-
-      Alert.alert("Error", response.error || "Failed to send magic link");
-      return false;
-    } catch (error: unknown) {
-      console.error("Magic link error:", error);
-      const message = error instanceof Error ? error.message : "Failed to send magic link";
-      Alert.alert("Error", message);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Handle Magic Link Callback (from deep link)
-  const handleMagicLinkCallback = useCallback(async (token: string): Promise<OAuthSignInResponse | null> => {
-    try {
-      setIsLoading(true);
-      const response = await verifyMagicLink(token);
-      await refreshAuth();
-      return response;
-    } catch (error: unknown) {
-      console.error("Magic link verification error:", error);
-      Alert.alert("Sign In Failed", "The magic link is invalid or expired. Please try again.");
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [refreshAuth]);
+  const handleMagicLinkCallback = useCallback(
+    async (token: string): Promise<OAuthSignInResponse | null> => {
+      try {
+        setIsLoading(true);
+        const response = await verifyMagicLink(token);
+        await refreshAuth();
+        return response;
+      } catch (error: unknown) {
+        console.error("Magic link verification error:", error);
+        Alert.alert(
+          "Sign In Failed",
+          "The magic link is invalid or expired. Please try again.",
+        );
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [refreshAuth],
+  );
 
   // Sign Out
   const signOut = useCallback(async () => {
@@ -261,6 +303,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsLoading(false);
     }
   }, []);
+
+  // Periodic token validity check (every 10 minutes)
+  React.useEffect(() => {
+    const checkTokenValidity = async () => {
+      const hasToken = await checkIsAuthenticated();
+      if (!hasToken) return;
+
+      try {
+        // Attempt to fetch auth state - will fail if token is invalid
+        await getAuthMe();
+      } catch (error) {
+        console.log("Token validation failed, signing out");
+        await signOut();
+      }
+    };
+
+    const interval = setInterval(checkTokenValidity, 10 * 60 * 1000); // 10 minutes
+
+    return () => clearInterval(interval);
+  }, [signOut]);
 
   const value: AuthContextType = {
     isLoading,

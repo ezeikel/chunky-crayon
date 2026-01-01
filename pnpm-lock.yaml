@@ -149,6 +149,9 @@ importers:
       expo-router:
         specifier: ~6.0.21
         version: 6.0.21(4c0ddc259c8b0e1e20e89faf99b6a59c)
+      expo-secure-store:
+        specifier: ~15.0.4
+        version: 15.0.8(expo@54.0.30)
       expo-sharing:
         specifier: ~14.0.8
         version: 14.0.8(expo@54.0.30)
@@ -188,6 +191,9 @@ importers:
       react-native-css:
         specifier: ^3.0.1
         version: 3.0.1(@expo/metro-config@54.0.12(bufferutil@4.0.9)(expo@54.0.30))(lightningcss@1.30.2)(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0)
+      react-native-fbsdk-next:
+        specifier: ^13.4.1
+        version: 13.4.1(expo@54.0.30)(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))
       react-native-gesture-handler:
         specifier: ~2.28.0
         version: 2.28.0(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0)
@@ -245,10 +251,10 @@ importers:
         version: 10.0.0(eslint-plugin-import-x@4.16.1(@typescript-eslint/utils@8.49.0(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint@8.57.1))(eslint@8.57.1)(typescript@5.9.3)
       jest:
         specifier: ^29.7.0
-        version: 29.7.0(@types/node@22.18.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@22.18.1)(typescript@5.8.3))
+        version: 29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
       jest-expo:
         specifier: ~54.0.16
-        version: 54.0.16(@babel/core@7.28.3)(bufferutil@4.0.9)(expo@54.0.30)(jest@29.7.0)(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0)
+        version: 54.0.16(@babel/core@7.28.3)(bufferutil@4.0.9)(expo@54.0.30)(jest@29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3)))(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0)
       postcss:
         specifier: ^8
         version: 8.5.6
@@ -405,6 +411,12 @@ importers:
       framer-motion:
         specifier: ^12.23.26
         version: 12.23.26(@emotion/is-prop-valid@1.2.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      google-auth-library:
+        specifier: ^9.15.1
+        version: 9.15.1
+      jose:
+        specifier: ^6.0.11
+        version: 6.1.0
       lucide-react:
         specifier: ^0.509.0
         version: 0.509.0(react@19.1.0)
@@ -8487,6 +8499,11 @@ packages:
       react-server-dom-webpack:
         optional: true
 
+  expo-secure-store@15.0.8:
+    resolution: {integrity: sha512-lHnzvRajBu4u+P99+0GEMijQMFCOYpWRO4dWsXSuMt77+THPIGjzNvVKrGSl6mMrLsfVaKL8BpwYZLGlgA+zAw==}
+    peerDependencies:
+      expo: '*'
+
   expo-server@1.0.5:
     resolution: {integrity: sha512-IGR++flYH70rhLyeXF0Phle56/k4cee87WeQ4mamS+MkVAVP+dDlOHf2nN06Z9Y2KhU0Gp1k+y61KkghF7HdhA==}
     engines: {node: '>=20.16.0'}
@@ -8816,9 +8833,17 @@ packages:
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
 
+  gaxios@6.7.1:
+    resolution: {integrity: sha512-LDODD4TMYx7XXdpwxAVRAIAuB0bzv0s+ywFonY46k126qzQHT9ygyoa9tncmOiQmmDrik65UYsEkv3lbfqQ3yQ==}
+    engines: {node: '>=14'}
+
   gaxios@7.1.3:
     resolution: {integrity: sha512-YGGyuEdVIjqxkxVH1pUTMY/XtmmsApXrCVv5EU25iX6inEPbV+VakJfLealkBtJN69AQmh1eGOdCl9Sm1UP6XQ==}
     engines: {node: '>=18'}
+
+  gcp-metadata@6.1.1:
+    resolution: {integrity: sha512-a4tiq7E0/5fTjxPAaH4jpjkSv/uCaU2p5KC6HVGrvl0cDjA8iBZv4vv1gyzlmK0ZUKqwpOyQMKzZQe3lTit77A==}
+    engines: {node: '>=14'}
 
   gcp-metadata@8.1.2:
     resolution: {integrity: sha512-zV/5HKTfCeKWnxG0Dmrw51hEWFGfcF2xiXqcA3+J90WDuP0SvoiSO5ORvcBsifmx/FoIjgQN3oNOGaQ5PhLFkg==}
@@ -8972,6 +8997,14 @@ packages:
     resolution: {integrity: sha512-7ABviyMOlX5hIVD60YOfHw4/CxOfBhyduaYB+wbFWCWoni4N7SLcV46hrVRktuBbZjFC9ONyqamZITN7q3n32w==}
     engines: {node: '>=18'}
 
+  google-auth-library@9.15.1:
+    resolution: {integrity: sha512-Jb6Z0+nvECVz+2lzSMt9u98UsoakXxA2HGHMCxh+so3n90XgYWkq5dur19JAJV7ONiJY22yBTyJB1TSkvPq9Ng==}
+    engines: {node: '>=14'}
+
+  google-logging-utils@0.0.2:
+    resolution: {integrity: sha512-NEgUnEcBiP5HrPzufUkBzJOD/Sxsco3rLNo1F1TNf7ieU8ryUzBhqba8r756CjLX7rn3fHl6iLEwPYuqpoKgQQ==}
+    engines: {node: '>=14'}
+
   google-logging-utils@1.1.3:
     resolution: {integrity: sha512-eAmLkjDjAFCVXg7A1unxHsLf961m6y17QFqXqAXGj/gVkKFrEICfStRfwUlGNfeCEjNRa32JEWOUTlYXPyyKvA==}
     engines: {node: '>=14'}
@@ -9003,6 +9036,10 @@ packages:
   groq@5.1.0:
     resolution: {integrity: sha512-ayFz6MxyEPBi16z0jrM/gUSUAXaTqiwEMRCGpkUSAdrcfVVR4GcfD8+kSe36zZvXEC9h3xvPDtIopF/T/5AhTA==}
     engines: {node: '>=20.19 <22 || >=22.12'}
+
+  gtoken@7.1.0:
+    resolution: {integrity: sha512-pCcEwRi+TKpMlxAQObHDQ56KawURgyAf6jtIY046fJ5tIv3zDe/LEIubckAO8fj6JnAxLdmWkUfNyulQ2iKdEw==}
+    engines: {node: '>=14.0.0'}
 
   gtoken@8.0.0:
     resolution: {integrity: sha512-+CqsMbHPiSTdtSO14O51eMNlrp9N79gmeqmXeouJOhfucAedHw9noVe/n5uJk3tbKE6a+6ZCQg3RPhVhHByAIw==}
@@ -11459,6 +11496,16 @@ packages:
       lightningcss: 1.30.1
       react: 19.1.0
       react-native: '>=0.81'
+
+  react-native-fbsdk-next@13.4.1:
+    resolution: {integrity: sha512-Cto+oF0FJyvxKDjKyLKI5DgnLCeeRlXvVQb8qw0XesT1Xune1ijDWAnvt9fy6wXJ4G7K510xKkcSUsbK/KyPhg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      expo: '>=47.0.0'
+      react-native: '>=0.63.3'
+    peerDependenciesMeta:
+      expo:
+        optional: true
 
   react-native-gesture-handler@2.28.0:
     resolution: {integrity: sha512-0msfJ1vRxXKVgTgvL+1ZOoYw3/0z1R+Ked0+udoJhyplC2jbVKIJ8Z1bzWdpQRCV3QcQ87Op0zJVE5DhKK2A0A==}
@@ -16926,6 +16973,41 @@ snapshots:
       - supports-color
       - ts-node
 
+  '@jest/core@29.7.0(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))':
+    dependencies:
+      '@jest/console': 29.7.0
+      '@jest/reporters': 29.7.0
+      '@jest/test-result': 29.7.0
+      '@jest/transform': 29.7.0
+      '@jest/types': 29.6.3
+      '@types/node': 24.3.1
+      ansi-escapes: 4.3.2
+      chalk: 4.1.2
+      ci-info: 3.9.0
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-changed-files: 29.7.0
+      jest-config: 29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
+      jest-haste-map: 29.7.0
+      jest-message-util: 29.7.0
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-resolve-dependencies: 29.7.0
+      jest-runner: 29.7.0
+      jest-runtime: 29.7.0
+      jest-snapshot: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      jest-watcher: 29.7.0
+      micromatch: 4.0.8
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-ansi: 6.0.1
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
   '@jest/create-cache-key-function@29.7.0':
     dependencies:
       '@jest/types': 29.6.3
@@ -17268,14 +17350,14 @@ snapshots:
 
   '@juggle/resize-observer@3.4.0': {}
 
-  '@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))':
+  '@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.21
-      langsmith: 0.4.0(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))
+      langsmith: 0.4.0(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76))
       mustache: 4.2.0
       p-queue: 6.6.2
       uuid: 10.0.0
@@ -17286,26 +17368,26 @@ snapshots:
       - '@opentelemetry/sdk-trace-base'
       - openai
 
-  '@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))':
+  '@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))':
     dependencies:
-      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))
+      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76))
       uuid: 10.0.0
 
-  '@langchain/langgraph-sdk@1.3.1(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@langchain/langgraph-sdk@1.3.1(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       p-queue: 6.6.2
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))
+      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76))
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  '@langchain/langgraph@1.0.7(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod@3.25.76)':
+  '@langchain/langgraph@1.0.7(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod@3.25.76)':
     dependencies:
-      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))
-      '@langchain/langgraph-checkpoint': 1.0.0(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))
-      '@langchain/langgraph-sdk': 1.3.1(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76))
+      '@langchain/langgraph-checkpoint': 1.0.0(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))
+      '@langchain/langgraph-sdk': 1.3.1(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       uuid: 10.0.0
       zod: 3.25.76
     transitivePeerDependencies:
@@ -17961,9 +18043,9 @@ snapshots:
     dependencies:
       '@anthropic-ai/sdk': 0.71.2(zod@4.2.1)
       '@google/genai': 1.34.0(bufferutil@4.0.9)
-      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))
-      langchain: 1.2.2(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      openai: 6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)
+      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76))
+      langchain: 1.2.2(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      openai: 6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)
       posthog-node: 5.17.4
       uuid: 11.1.0
       zod: 4.2.1
@@ -22414,6 +22496,21 @@ snapshots:
       - supports-color
       - ts-node
 
+  create-jest@29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3)):
+    dependencies:
+      '@jest/types': 29.6.3
+      chalk: 4.1.2
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      jest-config: 29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
+      jest-util: 29.7.0
+      prompts: 2.4.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
   create-require@1.1.1: {}
 
   crelt@1.0.6: {}
@@ -23024,7 +23121,7 @@ snapshots:
       eslint: 9.34.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import-x@4.16.1(@typescript-eslint/utils@8.49.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.34.0(jiti@2.6.1)))(eslint-plugin-import@2.32.0)(eslint@9.34.0(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.42.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.34.0(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.42.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.34.0(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.34.0(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.34.0(jiti@2.6.1))
       eslint-plugin-react-hooks: 7.0.1(eslint@9.34.0(jiti@2.6.1))
@@ -23088,7 +23185,7 @@ snapshots:
       tinyglobby: 0.2.15
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.42.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.34.0(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.42.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.34.0(jiti@2.6.1))
       eslint-plugin-import-x: 4.16.1(@typescript-eslint/utils@8.49.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.34.0(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
@@ -23104,7 +23201,7 @@ snapshots:
       tinyglobby: 0.2.14
       unrs-resolver: 1.11.1
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.42.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.34.0(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.42.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.34.0(jiti@2.6.1))
       eslint-plugin-import-x: 4.16.1(@typescript-eslint/utils@8.49.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.34.0(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
@@ -23177,7 +23274,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.42.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.34.0(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.42.0(eslint@9.34.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@4.4.4)(eslint@9.34.0(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -23757,6 +23854,10 @@ snapshots:
       - '@types/react-dom'
       - supports-color
 
+  expo-secure-store@15.0.8(expo@54.0.30):
+    dependencies:
+      expo: 54.0.30(@babel/core@7.28.3)(@expo/metro-runtime@6.1.2)(bufferutil@4.0.9)(expo-router@6.0.21)(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0)
+
   expo-server@1.0.5: {}
 
   expo-sharing@14.0.8(expo@54.0.30):
@@ -24119,6 +24220,17 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
+  gaxios@6.7.1:
+    dependencies:
+      extend: 3.0.2
+      https-proxy-agent: 7.0.6
+      is-stream: 2.0.1
+      node-fetch: 2.7.0
+      uuid: 9.0.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
   gaxios@7.1.3:
     dependencies:
       extend: 3.0.2
@@ -24126,6 +24238,15 @@ snapshots:
       node-fetch: 3.3.2
       rimraf: 5.0.10
     transitivePeerDependencies:
+      - supports-color
+
+  gcp-metadata@6.1.1:
+    dependencies:
+      gaxios: 6.7.1
+      google-logging-utils: 0.0.2
+      json-bigint: 1.0.0
+    transitivePeerDependencies:
+      - encoding
       - supports-color
 
   gcp-metadata@8.1.2:
@@ -24326,6 +24447,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  google-auth-library@9.15.1:
+    dependencies:
+      base64-js: 1.5.1
+      ecdsa-sig-formatter: 1.0.11
+      gaxios: 6.7.1
+      gcp-metadata: 6.1.1
+      gtoken: 7.1.0
+      jws: 4.0.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  google-logging-utils@0.0.2: {}
+
   google-logging-utils@1.1.3: {}
 
   gopd@1.2.0: {}
@@ -24347,6 +24482,14 @@ snapshots:
   groq@3.88.1-typegen-experimental.0: {}
 
   groq@5.1.0: {}
+
+  gtoken@7.1.0:
+    dependencies:
+      gaxios: 6.7.1
+      jws: 4.0.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
 
   gtoken@8.0.0:
     dependencies:
@@ -24972,6 +25115,25 @@ snapshots:
       - supports-color
       - ts-node
 
+  jest-cli@29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3)):
+    dependencies:
+      '@jest/core': 29.7.0(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
+      '@jest/test-result': 29.7.0
+      '@jest/types': 29.6.3
+      chalk: 4.1.2
+      create-jest: 29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
+      exit: 0.1.2
+      import-local: 3.2.0
+      jest-config: 29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
   jest-config@29.7.0(@types/node@22.18.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@22.18.1)(typescript@5.8.3)):
     dependencies:
       '@babel/core': 7.28.3
@@ -25034,6 +25196,37 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
+  jest-config@29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3)):
+    dependencies:
+      '@babel/core': 7.28.3
+      '@jest/test-sequencer': 29.7.0
+      '@jest/types': 29.6.3
+      babel-jest: 29.7.0(@babel/core@7.28.3)
+      chalk: 4.1.2
+      ci-info: 3.9.0
+      deepmerge: 4.3.1
+      glob: 7.2.3
+      graceful-fs: 4.2.11
+      jest-circus: 29.7.0
+      jest-environment-node: 29.7.0
+      jest-get-type: 29.6.3
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-runner: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      micromatch: 4.0.8
+      parse-json: 5.2.0
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-json-comments: 3.1.1
+    optionalDependencies:
+      '@types/node': 24.3.1
+      ts-node: 10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+
   jest-diff@29.7.0:
     dependencies:
       chalk: 4.1.2
@@ -25077,7 +25270,7 @@ snapshots:
       jest-mock: 29.7.0
       jest-util: 29.7.0
 
-  jest-expo@54.0.16(@babel/core@7.28.3)(bufferutil@4.0.9)(expo@54.0.30)(jest@29.7.0)(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0):
+  jest-expo@54.0.16(@babel/core@7.28.3)(bufferutil@4.0.9)(expo@54.0.30)(jest@29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3)))(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0):
     dependencies:
       '@expo/config': 12.0.13
       '@expo/json-file': 10.0.8
@@ -25088,7 +25281,7 @@ snapshots:
       jest-environment-jsdom: 29.7.0(bufferutil@4.0.9)
       jest-snapshot: 29.7.0
       jest-watch-select-projects: 2.0.0
-      jest-watch-typeahead: 2.2.1(jest@29.7.0)
+      jest-watch-typeahead: 2.2.1(jest@29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3)))
       json5: 2.2.3
       lodash: 4.17.21
       react-native: 0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0)
@@ -25279,11 +25472,11 @@ snapshots:
       chalk: 3.0.0
       prompts: 2.4.2
 
-  jest-watch-typeahead@2.2.1(jest@29.7.0):
+  jest-watch-typeahead@2.2.1(jest@29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))):
     dependencies:
       ansi-escapes: 6.2.1
       chalk: 4.1.2
-      jest: 29.7.0(@types/node@22.18.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@22.18.1)(typescript@5.8.3))
+      jest: 29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
       jest-regex-util: 29.6.3
       jest-watcher: 29.7.0
       slash: 5.1.0
@@ -25331,6 +25524,18 @@ snapshots:
       '@jest/types': 29.6.3
       import-local: 3.2.0
       jest-cli: 29.7.0(@types/node@22.18.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@22.18.1)(typescript@5.8.3))
+    transitivePeerDependencies:
+      - '@types/node'
+      - babel-plugin-macros
+      - supports-color
+      - ts-node
+
+  jest@29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3)):
+    dependencies:
+      '@jest/core': 29.7.0(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
+      '@jest/types': 29.6.3
+      import-local: 3.2.0
+      jest-cli: 29.7.0(@types/node@24.3.1)(ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3))
     transitivePeerDependencies:
       - '@types/node'
       - babel-plugin-macros
@@ -25536,12 +25741,12 @@ snapshots:
 
   lan-network@0.1.7: {}
 
-  langchain@1.2.2(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  langchain@1.2.2(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))
-      '@langchain/langgraph': 1.0.7(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod@3.25.76)
-      '@langchain/langgraph-checkpoint': 1.0.0(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)))
-      langsmith: 0.4.0(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1))
+      '@langchain/core': 1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76))
+      '@langchain/langgraph': 1.0.7(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod@3.25.76)
+      '@langchain/langgraph-checkpoint': 1.0.0(@langchain/core@1.1.7(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)))
+      langsmith: 0.4.0(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76))
       uuid: 10.0.0
       zod: 3.25.76
     transitivePeerDependencies:
@@ -25553,7 +25758,7 @@ snapshots:
       - react-dom
       - zod-to-json-schema
 
-  langsmith@0.4.0(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)):
+  langsmith@0.4.0(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)):
     dependencies:
       '@types/uuid': 10.0.0
       chalk: 4.1.2
@@ -25564,7 +25769,7 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/sdk-trace-base': 1.30.1(@opentelemetry/api@1.9.0)
-      openai: 6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)
+      openai: 6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1)
 
   language-subtag-registry@0.3.23: {}
 
@@ -26506,10 +26711,10 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76):
+  openai@6.15.0(ws@8.18.3(bufferutil@4.0.9))(zod@4.2.1):
     optionalDependencies:
       ws: 8.18.3(bufferutil@4.0.9)
-      zod: 3.25.76
+      zod: 4.2.1
 
   optionator@0.9.4:
     dependencies:
@@ -27159,6 +27364,12 @@ snapshots:
       react-native: 0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0)
     transitivePeerDependencies:
       - supports-color
+
+  react-native-fbsdk-next@13.4.1(expo@54.0.30)(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0)):
+    dependencies:
+      react-native: 0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0)
+    optionalDependencies:
+      expo: 54.0.30(@babel/core@7.28.3)(@expo/metro-runtime@6.1.2)(bufferutil@4.0.9)(expo-router@6.0.21)(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0)
 
   react-native-gesture-handler@2.28.0(react-native@0.81.5(@babel/core@7.28.3)(@types/react@19.1.12)(bufferutil@4.0.9)(react@19.1.0))(react@19.1.0):
     dependencies:
@@ -28698,6 +28909,27 @@ snapshots:
       yn: 3.1.1
     optionalDependencies:
       '@swc/core': 1.15.7(@swc/helpers@0.5.17)
+
+  ts-node@10.9.2(@swc/core@1.15.7(@swc/helpers@0.5.17))(@types/node@24.3.1)(typescript@5.9.3):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.11
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 24.3.1
+      acorn: 8.15.0
+      acorn-walk: 8.3.4
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.9.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+    optionalDependencies:
+      '@swc/core': 1.15.7(@swc/helpers@0.5.17)
+    optional: true
 
   tsc-files@1.1.4(typescript@5.8.3):
     dependencies:
