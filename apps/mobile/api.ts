@@ -564,3 +564,68 @@ export const markStickersAsViewed = async (
   const response = await api.post("/mobile/stickers", { stickerIds });
   return response.data;
 };
+
+// ============================================================================
+// Challenges
+// ============================================================================
+
+export type ChallengeType = "THEME" | "VARIETY" | "EXPLORATION" | "SEASONAL";
+export type ChallengeRewardType = "sticker" | "accessory";
+
+export type ChallengeDefinition = {
+  id: string;
+  title: string;
+  description: string;
+  type: ChallengeType;
+  requirement: number;
+  category?: string;
+  tags?: string[];
+  rewardType: ChallengeRewardType;
+  rewardId: string;
+  icon: string;
+  backgroundColor: string;
+  accentColor: string;
+};
+
+export type ChallengeWithProgress = {
+  challenge: ChallengeDefinition;
+  weeklyChallengeId: string;
+  progress: number;
+  isCompleted: boolean;
+  completedAt: string | null;
+  percentComplete: number;
+  daysRemaining: number;
+  isActive: boolean;
+  startDate: string;
+  endDate: string;
+  rewardClaimed: boolean;
+};
+
+export type ChallengesResponse = {
+  currentChallenge: ChallengeWithProgress | null;
+  history: ChallengeWithProgress[];
+  error?: string;
+};
+
+export const getChallenges = async (): Promise<ChallengesResponse> => {
+  const response = await api.get("/mobile/challenges");
+  return response.data;
+};
+
+export type ClaimChallengeRewardResponse = {
+  success: boolean;
+  reward?: {
+    type: ChallengeRewardType;
+    id: string;
+  };
+  error?: string;
+};
+
+export const claimChallengeReward = async (
+  weeklyChallengeId: string,
+): Promise<ClaimChallengeRewardResponse> => {
+  const response = await api.post("/mobile/challenges/claim", {
+    weeklyChallengeId,
+  });
+  return response.data;
+};
