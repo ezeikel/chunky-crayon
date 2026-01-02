@@ -140,6 +140,20 @@ export const saveCanvasState = async (
   imageId: string,
   actions: DrawingAction[],
 ): Promise<boolean> => {
+  console.log(
+    `[CANVAS_PERSIST] SAVE START - Image: ${imageId}, Actions: ${actions.length}`,
+  );
+
+  // Log action types
+  const actionTypes = actions.reduce(
+    (acc, action) => {
+      acc[action.type] = (acc[action.type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+  console.log(`[CANVAS_PERSIST] Action breakdown:`, actionTypes);
+
   try {
     const key = `${STORAGE_PREFIX}${imageId}`;
     const data: SavedCanvasData = {
@@ -149,14 +163,18 @@ export const saveCanvasState = async (
       version: CURRENT_VERSION,
     };
 
+    console.log(`[CANVAS_PERSIST] Saving to AsyncStorage with key: ${key}`);
     await AsyncStorage.setItem(key, JSON.stringify(data));
+    console.log(
+      `[CANVAS_PERSIST] SAVE SUCCESS - Saved ${data.actions.length} serialized actions`,
+    );
 
     // Update metadata
     await updateMetadata(imageId);
 
     return true;
   } catch (error) {
-    console.error("Failed to save canvas state:", error);
+    console.error(`[CANVAS_PERSIST] SAVE FAILED - Error:`, error);
     return false;
   }
 };
@@ -167,22 +185,51 @@ export const saveCanvasState = async (
 export const loadCanvasState = async (
   imageId: string,
 ): Promise<DrawingAction[] | null> => {
+  console.log(`[CANVAS_PERSIST] LOAD START - Image: ${imageId}`);
+
   try {
     const key = `${STORAGE_PREFIX}${imageId}`;
+    console.log(`[CANVAS_PERSIST] Loading from AsyncStorage with key: ${key}`);
     const stored = await AsyncStorage.getItem(key);
 
-    if (!stored) return null;
+    if (!stored) {
+      console.log(
+        `[CANVAS_PERSIST] LOAD RESULT - No saved data found for image ${imageId}`,
+      );
+      return null;
+    }
 
     const data: SavedCanvasData = JSON.parse(stored);
+    console.log(
+      `[CANVAS_PERSIST] Found saved data - Actions: ${data.actions.length}, Saved at: ${new Date(data.savedAt).toISOString()}`,
+    );
 
     // Handle version migrations if needed
     if (data.version !== CURRENT_VERSION) {
+      console.log(
+        `[CANVAS_PERSIST] Version mismatch - stored: ${data.version}, current: ${CURRENT_VERSION}`,
+      );
       // Future: handle migrations here
     }
 
-    return deserializeActions(data.actions);
+    const actions = deserializeActions(data.actions);
+    console.log(
+      `[CANVAS_PERSIST] LOAD SUCCESS - Deserialized ${actions.length} actions`,
+    );
+
+    // Log action types
+    const actionTypes = actions.reduce(
+      (acc, action) => {
+        acc[action.type] = (acc[action.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+    console.log(`[CANVAS_PERSIST] Loaded action breakdown:`, actionTypes);
+
+    return actions;
   } catch (error) {
-    console.error("Failed to load canvas state:", error);
+    console.error(`[CANVAS_PERSIST] LOAD FAILED - Error:`, error);
     return null;
   }
 };
@@ -304,4 +351,69 @@ export const clearAllCanvasData = async (): Promise<boolean> => {
     console.error("Failed to clear all canvas data:", error);
     return false;
   }
+};
+
+/**
+ * Debug utility to inspect all saved canvas data
+ */
+export const debugCanvasStorage = async (): Promise<void> => {
+  console.log(`[CANVAS_DEBUG] ===== STORAGE INSPECTION START =====`);
+
+  try {
+    // Get all keys
+    const allKeys = await AsyncStorage.getAllKeys();
+    const canvasKeys = allKeys.filter((key) => key.startsWith(STORAGE_PREFIX));
+
+    console.log(`[CANVAS_DEBUG] Total canvas keys found: ${canvasKeys.length}`);
+
+    // Get metadata
+    const metadata = await getMetadata();
+    if (metadata) {
+      console.log(
+        `[CANVAS_DEBUG] Metadata - Saved canvases: ${metadata.savedCanvases.length}`,
+      );
+      metadata.savedCanvases.forEach((canvas, idx) => {
+        console.log(
+          `[CANVAS_DEBUG]   ${idx + 1}. Image: ${canvas.imageId}, Saved: ${new Date(canvas.savedAt).toISOString()}`,
+        );
+      });
+    } else {
+      console.log(`[CANVAS_DEBUG] No metadata found`);
+    }
+
+    // Inspect each canvas
+    for (const key of canvasKeys) {
+      if (key === METADATA_KEY) continue;
+
+      const stored = await AsyncStorage.getItem(key);
+      if (stored) {
+        try {
+          const data = JSON.parse(stored) as SavedCanvasData;
+          const imageId = key.replace(STORAGE_PREFIX, "");
+          console.log(`[CANVAS_DEBUG] Canvas ${imageId}:`);
+          console.log(`[CANVAS_DEBUG]   - Actions: ${data.actions.length}`);
+          console.log(
+            `[CANVAS_DEBUG]   - Saved at: ${new Date(data.savedAt).toISOString()}`,
+          );
+          console.log(`[CANVAS_DEBUG]   - Size: ${stored.length} bytes`);
+
+          // Count action types
+          const actionTypes = data.actions.reduce(
+            (acc, action) => {
+              acc[action.type] = (acc[action.type] || 0) + 1;
+              return acc;
+            },
+            {} as Record<string, number>,
+          );
+          console.log(`[CANVAS_DEBUG]   - Action types:`, actionTypes);
+        } catch (e) {
+          console.log(`[CANVAS_DEBUG] Failed to parse data for key ${key}:`, e);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`[CANVAS_DEBUG] Error inspecting storage:`, error);
+  }
+
+  console.log(`[CANVAS_DEBUG] ===== STORAGE INSPECTION END =====`);
 };

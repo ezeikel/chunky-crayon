@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Text, View, ScrollView, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -13,8 +13,8 @@ import MuteToggle from "@/components/MuteToggle/MuteToggle";
 import ProgressIndicator from "@/components/ProgressIndicator/ProgressIndicator";
 import useColoringImage from "@/hooks/api/useColoringImage";
 import Loading from "@/components/Loading/Loading";
-import { useCanvasStore } from "@/stores/canvasStore";
 import { tapLight } from "@/utils/haptics";
+import { debugCanvasStorage } from "@/utils/canvasPersistence";
 
 const ColoringImage = () => {
   const { id } = useLocalSearchParams();
@@ -22,8 +22,13 @@ const ColoringImage = () => {
   const { data, isLoading } = useColoringImage(id as string);
   const [scroll, setScroll] = useState(true);
   const [showActionModal, setShowActionModal] = useState(false);
-  const { reset } = useCanvasStore();
   const insets = useSafeAreaInsets();
+
+  // Debug storage on mount
+  useEffect(() => {
+    console.log(`[COLORING_PAGE] Mounted for image ID: ${id}`);
+    debugCanvasStorage();
+  }, [id]);
 
   const handleBack = () => {
     router.back();
@@ -33,11 +38,6 @@ const ColoringImage = () => {
     tapLight();
     setShowActionModal(true);
   }, []);
-
-  // Reset canvas state when entering a new coloring image
-  useEffect(() => {
-    reset();
-  }, [id, reset]);
 
   if (isLoading) {
     return <Loading />;

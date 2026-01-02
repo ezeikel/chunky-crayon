@@ -280,16 +280,30 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
 
     // History actions
     addAction: (action) => {
-      const { history, historyIndex } = get();
+      console.log(
+        `[CANVAS_STORE] ADD_ACTION - Type: ${action.type}, Color: ${action.color}`,
+      );
+
+      const { history, historyIndex, imageId } = get();
+      console.log(
+        `[CANVAS_STORE] ADD_ACTION - Current history: ${history.length} items, Index: ${historyIndex}, Image: ${imageId}`,
+      );
+
       // Remove any redo history when new action is added
       const newHistory = history.slice(0, historyIndex + 1);
       newHistory.push(action);
 
       // Trim history if too long
       if (newHistory.length > MAX_HISTORY) {
+        console.log(
+          `[CANVAS_STORE] ADD_ACTION - Trimming history (exceeded ${MAX_HISTORY} items)`,
+        );
         newHistory.shift();
       }
 
+      console.log(
+        `[CANVAS_STORE] ADD_ACTION - New history: ${newHistory.length} items`,
+      );
       set({
         history: newHistory,
         historyIndex: newHistory.length - 1,
@@ -328,11 +342,25 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     resetTransform: () => set({ scale: 1, translateX: 0, translateY: 0 }),
 
     // Canvas state actions
-    setImageId: (id) => set({ imageId: id }),
+    setImageId: (id) => {
+      console.log(
+        `[CANVAS_STORE] SET_IMAGE_ID - New ID: ${id}, Previous: ${get().imageId}`,
+      );
+      set({ imageId: id });
+    },
 
-    setDirty: (dirty) => set({ isDirty: dirty }),
+    setDirty: (dirty) => {
+      console.log(`[CANVAS_STORE] SET_DIRTY - ${dirty}`);
+      set({ isDirty: dirty });
+    },
 
-    reset: () => set({ ...initialState, captureCanvas: get().captureCanvas }),
+    reset: () => {
+      const currentState = get();
+      console.log(
+        `[CANVAS_STORE] RESET - Clearing state for image: ${currentState.imageId}, History: ${currentState.history.length} items`,
+      );
+      set({ ...initialState, captureCanvas: currentState.captureCanvas });
+    },
 
     // Audio actions
     setMuted: (muted) => set({ isMuted: muted }),

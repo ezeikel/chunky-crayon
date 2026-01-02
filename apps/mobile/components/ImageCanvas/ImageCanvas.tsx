@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { View, useWindowDimensions, StyleSheet } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   Canvas,
   ImageSVG,
@@ -95,6 +96,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     scale,
     translateX,
     translateY,
+    imageId,
     addAction,
     setColor,
     setTool,
@@ -104,6 +106,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     setDirty,
     advanceRainbowHue,
     setCaptureCanvas,
+    reset,
   } = useCanvasStore();
 
   // Gesture shared values
@@ -116,6 +119,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
 
   // Auto-save timer
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Track which image ID we've initialized for (prevents re-init and detects changes)
+  const initializedForImageIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (svg) {
@@ -140,27 +146,137 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     };
   }, [setCaptureCanvas]);
 
-  // Initialize canvas with saved state
+  // Initialize canvas with saved state when image changes
+  // This handles both first mount AND navigation between different images
   useEffect(() => {
+    const currentImageId = coloringImage.id;
+    const previousImageId = imageId; // Get the previous image ID from store
+
+    console.log(
+      `[CANVAS_INIT] useEffect triggered - Current: ${currentImageId}, Previous: ${previousImageId}, Initialized for: ${initializedForImageIdRef.current}`,
+    );
+
+    // Skip if we've already initialized for this exact image
+    if (initializedForImageIdRef.current === currentImageId) {
+      console.log(
+        `[CANVAS_INIT] Already initialized for image ${currentImageId}, skipping`,
+      );
+      return;
+    }
+
+    // Track if this effect is still valid (not cancelled by navigation)
+    let isCancelled = false;
+
     const initializeCanvas = async () => {
-      if (!coloringImage.id || isInitialized) return;
+      console.log(
+        `[CANVAS_INIT] Starting initialization for image: ${currentImageId}`,
+      );
+      setIsInitialized(false);
 
-      setImageId(coloringImage.id);
+      // Only reset if we're switching to a different image
+      // If it's the same image (e.g., navigating from feed to detail), preserve state
+      const isNewImage = previousImageId !== currentImageId;
+      console.log(
+        `[CANVAS_INIT] Is new image: ${isNewImage} (prev: ${previousImageId}, curr: ${currentImageId})`,
+      );
 
-      // Load saved state
-      const savedActions = await loadCanvasState(coloringImage.id);
-      if (savedActions && savedActions.length > 0) {
-        // Restore saved actions to the store
-        savedActions.forEach((action) => {
-          addAction(action);
-        });
+      if (isNewImage) {
+        console.log(`[CANVAS_INIT] Loading saved state BEFORE reset...`);
+        // Load saved state BEFORE resetting to check if we have data
+        const savedActions = await loadCanvasState(currentImageId);
+        console.log(
+          `[CANVAS_INIT] Loaded ${savedActions?.length || 0} saved actions`,
+        );
+
+        // Check if we've navigated away before the load completed
+        if (isCancelled) {
+          console.log(
+            `[CANVAS_INIT] Effect cancelled, aborting initialization`,
+          );
+          return;
+        }
+
+        // Now reset the store to clear previous image's state
+        console.log(
+          `[CANVAS_INIT] Resetting store and setting imageId to ${currentImageId}`,
+        );
+        reset();
+        setImageId(currentImageId);
+
+        // Restore saved actions if they exist
+        if (savedActions && savedActions.length > 0) {
+          console.log(
+            `[CANVAS_INIT] Restoring ${savedActions.length} actions to store...`,
+          );
+          savedActions.forEach((action, idx) => {
+            console.log(
+              `[CANVAS_INIT] Adding action ${idx + 1}/${savedActions.length}, type: ${action.type}`,
+            );
+            addAction(action);
+          });
+          console.log(`[CANVAS_INIT] All actions restored`);
+        } else {
+          console.log(`[CANVAS_INIT] No saved actions to restore`);
+        }
+      } else {
+        // Same image - just update the ID without resetting
+        console.log(`[CANVAS_INIT] Same image, updating ID without reset`);
+        setImageId(currentImageId);
       }
 
+      // Mark as initialized for this specific image
+      console.log(
+        `[CANVAS_INIT] Marking as initialized for image ${currentImageId}`,
+      );
+      initializedForImageIdRef.current = currentImageId;
       setIsInitialized(true);
+      console.log(`[CANVAS_INIT] Initialization complete`);
     };
 
     initializeCanvas();
-  }, [coloringImage.id, isInitialized, setImageId, addAction]);
+
+    // Cleanup function to cancel stale loads
+    return () => {
+      console.log(
+        `[CANVAS_INIT] Cleanup - cancelling effect for image ${currentImageId}`,
+      );
+      isCancelled = true;
+    };
+  }, [coloringImage.id, reset, setImageId, addAction, imageId]);
+
+  // Save immediately when screen loses focus (user navigates away)
+  useFocusEffect(
+    useCallback(() => {
+      console.log(`[CANVAS_FOCUS] Screen focused - Image: ${coloringImage.id}`);
+
+      // Return cleanup function that runs when screen loses focus
+      return () => {
+        console.log(
+          `[CANVAS_FOCUS] Screen losing focus - Image: ${coloringImage.id}`,
+        );
+
+        // Clear any pending auto-save timer
+        if (autoSaveTimerRef.current) {
+          clearTimeout(autoSaveTimerRef.current);
+          console.log(`[CANVAS_FOCUS] Cleared pending auto-save timer`);
+        }
+
+        // Immediately save current state if there are any actions
+        const actionsToSave = history.slice(0, historyIndex + 1);
+        console.log(
+          `[CANVAS_FOCUS] Actions to save: ${actionsToSave.length}, isInitialized: ${isInitialized}`,
+        );
+
+        if (actionsToSave.length > 0 && isInitialized) {
+          console.log(`[CANVAS_FOCUS] Saving state on focus loss...`);
+          saveCanvasState(coloringImage.id, actionsToSave);
+          setDirty(false);
+        } else {
+          console.log(`[CANVAS_FOCUS] No actions to save or not initialized`);
+        }
+      };
+    }, [history, historyIndex, coloringImage.id, isInitialized, setDirty]),
+  );
 
   // Auto-save effect
   useEffect(() => {
@@ -177,7 +293,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         saveCanvasState(coloringImage.id, actionsToSave);
         setDirty(false);
       }
-    }, 2000); // Save 2 seconds after last change
+    }, 1000); // Save 1 second after last change (matching web)
 
     return () => {
       if (autoSaveTimerRef.current) {
