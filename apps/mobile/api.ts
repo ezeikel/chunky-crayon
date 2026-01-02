@@ -665,8 +665,8 @@ export type FeedResponse = {
   todaysPick: FeedColoringImage | null;
   activeChallenge: ChallengeWithProgress | null;
   recentArt: FeedSavedArtwork[];
-  weeklyCollection: FeedColoringImage[];
-  monthlyFeatured: FeedColoringImage[];
+  myCreations: FeedColoringImage[];
+  moreToColor: FeedColoringImage[];
   error?: string;
 };
 

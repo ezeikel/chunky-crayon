@@ -16,13 +16,18 @@ import {
   faStar,
   faPalette,
   faCalendarWeek,
-  faCalendarAlt,
+  faTrophy,
+  faWandMagicSparkles,
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { useFeed } from "@/hooks/api";
 import Loading from "@/components/Loading/Loading";
 import { perfect } from "@/styles";
-import type { FeedColoringImage, FeedSavedArtwork } from "@/api";
+import type {
+  FeedColoringImage,
+  FeedSavedArtwork,
+  ChallengeWithProgress,
+} from "@/api";
 
 const COLORS = {
   textMuted: "#8B7E78",
@@ -216,6 +221,50 @@ const RecentArtSection = ({
   );
 };
 
+// Challenge progress section
+const ChallengeSection = ({
+  challenge,
+}: {
+  challenge: ChallengeWithProgress;
+}) => {
+  const router = useRouter();
+
+  return (
+    <Pressable
+      style={styles.section}
+      onPress={() => router.push("/challenges")}
+    >
+      <SectionHeader title="Challenge" icon={faTrophy} />
+      <View style={styles.challengeCard}>
+        <View style={styles.challengeContent}>
+          <Text style={styles.challengeIcon}>{challenge.challenge.icon}</Text>
+          <View style={styles.challengeInfo}>
+            <Text style={styles.challengeTitle} numberOfLines={1}>
+              {challenge.challenge.title}
+            </Text>
+            <Text style={styles.challengeProgress}>
+              {challenge.progress} / {challenge.challenge.requirement}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.progressBarContainer}>
+          <View
+            style={[
+              styles.progressBarFill,
+              { width: `${Math.min(challenge.percentComplete, 100)}%` },
+            ]}
+          />
+        </View>
+        {challenge.isCompleted && !challenge.rewardClaimed && (
+          <View style={styles.claimBadge}>
+            <Text style={styles.claimBadgeText}>Claim!</Text>
+          </View>
+        )}
+      </View>
+    </Pressable>
+  );
+};
+
 const Feed = () => {
   const [screenWidth] = useState(Dimensions.get("window").width);
   const cardSize = getCardSize(screenWidth);
@@ -239,14 +288,16 @@ const Feed = () => {
     );
   }
 
-  const { todaysPick, recentArt, weeklyCollection, monthlyFeatured } = data;
+  const { todaysPick, activeChallenge, recentArt, myCreations, moreToColor } =
+    data;
 
   // Check if we have any content to show
   const hasContent =
     todaysPick ||
+    activeChallenge ||
     recentArt.length > 0 ||
-    weeklyCollection.length > 0 ||
-    monthlyFeatured.length > 0;
+    myCreations.length > 0 ||
+    moreToColor.length > 0;
 
   if (!hasContent) {
     return (
@@ -260,32 +311,35 @@ const Feed = () => {
 
   return (
     <View style={styles.container}>
-      {/* Today's Pick as horizontal section */}
+      {/* Today's Pick */}
       {todaysPick && (
         <HorizontalSection
-          title="Today's Pick"
+          title="Today"
           icon={faStar}
           items={[todaysPick]}
           cardSize={cardSize}
         />
       )}
 
-      {/* Recent Art (User's saved artworks) */}
+      {/* Active Challenge */}
+      {activeChallenge && <ChallengeSection challenge={activeChallenge} />}
+
+      {/* User's saved artworks */}
       <RecentArtSection artworks={recentArt} cardSize={cardSize} />
 
-      {/* Weekly Collection */}
+      {/* User's generated coloring pages */}
       <HorizontalSection
-        title="This Week"
-        icon={faCalendarWeek}
-        items={weeklyCollection}
+        title="My Creations"
+        icon={faWandMagicSparkles}
+        items={myCreations}
         cardSize={cardSize}
       />
 
-      {/* Monthly Featured */}
+      {/* More to Color - Past daily images */}
       <HorizontalSection
-        title="Featured"
-        icon={faCalendarAlt}
-        items={monthlyFeatured}
+        title="More to Color"
+        icon={faCalendarWeek}
+        items={moreToColor}
         cardSize={cardSize}
       />
     </View>
@@ -368,6 +422,61 @@ const styles = StyleSheet.create({
     fontFamily: "TondoTrial-Regular",
     color: COLORS.textMuted,
     textAlign: "center",
+  },
+  challengeCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: outerPadding,
+    ...perfect.boxShadow,
+  },
+  challengeContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 12,
+  },
+  challengeIcon: {
+    fontSize: 32,
+  },
+  challengeInfo: {
+    flex: 1,
+  },
+  challengeTitle: {
+    fontSize: 16,
+    fontFamily: "TondoTrial-Bold",
+    color: COLORS.textPrimary,
+    marginBottom: 2,
+  },
+  challengeProgress: {
+    fontSize: 14,
+    fontFamily: "TondoTrial-Regular",
+    color: COLORS.textMuted,
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: "#E5E7EB",
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  progressBarFill: {
+    height: "100%",
+    backgroundColor: COLORS.crayonOrange,
+    borderRadius: 4,
+  },
+  claimBadge: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    backgroundColor: COLORS.crayonOrange,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  claimBadgeText: {
+    fontSize: 12,
+    fontFamily: "TondoTrial-Bold",
+    color: COLORS.white,
   },
 });
 

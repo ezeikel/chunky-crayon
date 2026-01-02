@@ -147,27 +147,27 @@ For child safety (ages 3-8, COPPA/GDPR-K compliance), the mobile app will **not*
 
 ### Home Feed Architecture ("For You" Tab)
 
-The home screen presents a curated, safe experience:
+The home screen presents a curated, safe experience with kid-friendly headers (target audience: ages 3-8).
+
+**Note**: We only generate DAILY images (not WEEKLY or MONTHLY), so the feed is simplified to 4 sections:
 
 ```
 ┌─────────────────────────────────┐
-│  Today's Pick                   │  ← DAILY image with notification tie-in
-│  "The Unicorn Knight"           │
+│  ⭐ Today                       │  ← Today's DAILY image
 │  [Large preview with CTA]       │
 └─────────────────────────────────┘
 ┌─────────────────────────────────┐
-│  Active Challenge               │  ← From WeeklyChallenge table
+│  🏆 Challenge                   │  ← From WeeklyChallenge table
 │  "Color 5 animals this week!"   │
 │  Progress: ███░░ 3/5            │
 └─────────────────────────────────┘
 ┌─────────────────────────────────┐
-│  Recent Art                     │  ← User's own SavedArtwork
+│  🎨 Your Art                    │  ← User's own SavedArtwork
 │  [Horizontal scroll of thumbs]  │
 └─────────────────────────────────┘
 ┌─────────────────────────────────┐
-│  Weekly Collection              │  ← WEEKLY themed images
-│  "Space Adventures"             │
-│  [Grid of 4-6 images]           │
+│  📅 More to Color               │  ← Past DAILY images to explore
+│  [Horizontal scroll]            │
 └─────────────────────────────────┘
 ```
 
@@ -186,11 +186,11 @@ Implemented: `GET /api/mobile/feed`
 ```typescript
 // Returns curated content for home feed
 {
-  todaysPick: ColoringImage | null,      // DAILY for today
+  todaysPick: ColoringImage | null,      // Today's DAILY image
   activeChallenge: WeeklyChallenge | null,
-  recentArt: SavedArtwork[],             // User's own (limit 10)
-  weeklyCollection: ColoringImage[],     // WEEKLY images
-  monthlyFeatured: ColoringImage[],      // MONTHLY images
+  recentArt: SavedArtwork[],             // User's own colored art (limit 10)
+  myCreations: ColoringImage[],          // User's generated line art (limit 10)
+  moreToColor: ColoringImage[],          // Past DAILY images (limit 20)
 }
 ```
 

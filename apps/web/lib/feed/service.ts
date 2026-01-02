@@ -36,8 +36,8 @@ export type MobileFeedResponse = {
       })
     | null;
   recentArt: FeedSavedArtwork[];
-  weeklyCollection: FeedColoringImage[];
-  monthlyFeatured: FeedColoringImage[];
+  myCreations: FeedColoringImage[];
+  moreToColor: FeedColoringImage[];
 };
 
 /**
@@ -163,13 +163,19 @@ export async function getRecentArt(
 }
 
 /**
- * Get weekly collection images
+ * Get user's own generated coloring pages (their creations)
+ * These are coloring page line art the user created via text prompt or photo-to-coloring
+ * Distinct from SavedArtwork which are colored versions
  */
-export async function getWeeklyCollection(
+export async function getUserCreations(
+  userId: string,
   limit: number = 10,
 ): Promise<FeedColoringImage[]> {
   const images = await db.coloringImage.findMany({
-    where: { generationType: GenerationType.WEEKLY },
+    where: {
+      userId,
+      generationType: GenerationType.USER,
+    },
     orderBy: { createdAt: 'desc' },
     take: limit,
     select: {
@@ -189,13 +195,19 @@ export async function getWeeklyCollection(
 }
 
 /**
- * Get monthly featured images
+ * Get past daily images (excluding today's pick)
+ * Shows all daily images for users to explore
  */
-export async function getMonthlyFeatured(
-  limit: number = 6,
+export async function getPastDailyImages(
+  limit: number = 20,
 ): Promise<FeedColoringImage[]> {
+  const todayStart = getTodayStart();
+
   const images = await db.coloringImage.findMany({
-    where: { generationType: GenerationType.MONTHLY },
+    where: {
+      generationType: GenerationType.DAILY,
+      createdAt: { lt: todayStart },
+    },
     orderBy: { createdAt: 'desc' },
     take: limit,
     select: {
@@ -217,25 +229,27 @@ export async function getMonthlyFeatured(
 /**
  * Get the complete mobile home feed
  * Returns curated content for the "For You" tab
+ *
+ * Sections:
+ * 1. Today - Today's daily pick
+ * 2. Challenge - Weekly challenge progress
+ * 3. Your Art - User's saved artworks (colored versions)
+ * 4. My Creations - User's own generated coloring pages (line art)
+ * 5. More to Color - Past daily images to explore
  */
 export async function getMobileFeed(
   userId: string | null,
   profileId: string | null,
 ): Promise<MobileFeedResponse> {
   // Run all queries in parallel for performance
-  const [
-    todaysPick,
-    recentArt,
-    weeklyCollection,
-    monthlyFeatured,
-    activeChallenge,
-  ] = await Promise.all([
-    getTodaysPick(),
-    userId ? getRecentArt(userId, 10) : Promise.resolve([]),
-    getWeeklyCollection(10),
-    getMonthlyFeatured(6),
-    profileId ? getCurrentChallenge(profileId) : Promise.resolve(null),
-  ]);
+  const [todaysPick, recentArt, myCreations, moreToColor, activeChallenge] =
+    await Promise.all([
+      getTodaysPick(),
+      userId ? getRecentArt(userId, 10) : Promise.resolve([]),
+      userId ? getUserCreations(userId, 10) : Promise.resolve([]),
+      getPastDailyImages(20),
+      profileId ? getCurrentChallenge(profileId) : Promise.resolve(null),
+    ]);
 
   // Serialize challenge dates for JSON response
   const serializedChallenge = activeChallenge
@@ -251,7 +265,7 @@ export async function getMobileFeed(
     todaysPick,
     activeChallenge: serializedChallenge,
     recentArt,
-    weeklyCollection,
-    monthlyFeatured,
+    myCreations,
+    moreToColor,
   };
 }
