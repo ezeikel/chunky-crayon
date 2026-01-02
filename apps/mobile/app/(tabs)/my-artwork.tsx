@@ -30,9 +30,8 @@ const MyArtworkScreen = () => {
 
   const artworks = data?.artworks ?? [];
 
-  const handleArtworkPress = (artworkId: string) => {
-    // Could navigate to a detail view or open in full screen
-    console.log("Pressed artwork:", artworkId);
+  const handleArtworkPress = (coloringImageId: string) => {
+    router.push(`/coloring-image/${coloringImageId}`);
   };
 
   const renderEmptyState = () => (
@@ -76,7 +75,7 @@ const MyArtworkScreen = () => {
               styles.artworkCard,
               pressed && styles.artworkCardPressed,
             ]}
-            onPress={() => handleArtworkPress(artwork.id)}
+            onPress={() => handleArtworkPress(artwork.coloringImageId)}
           >
             <Image
               source={{ uri: artwork.imageUrl }}
