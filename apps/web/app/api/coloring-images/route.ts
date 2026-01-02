@@ -1,8 +1,18 @@
 import { db } from '@chunky-crayon/db';
 import { createColoringImage } from '@/app/actions/coloring-image';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const maxDuration = 150;
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
 
 const IMAGES_PER_PAGE = 12;
 
@@ -50,12 +60,7 @@ export const GET = async (request: NextRequest) => {
   const cursor = searchParams.get('cursor') || undefined;
 
   return Response.json(await getColoringImagesForApi(cursor), {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Content-Type': 'application/json',
-    },
+    headers: corsHeaders,
   });
 };
 
@@ -67,13 +72,6 @@ export const POST = async (request: Request) => {
 
   return Response.json(
     { coloringImage: await createColoringImage(formData) },
-    {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Content-Type': 'application/json',
-      },
-    },
+    { headers: corsHeaders },
   );
 };

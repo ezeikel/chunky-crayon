@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OAuth2Client } from 'google-auth-library';
-import { getMobileAuthFromHeaders, handleMobileOAuthSignIn } from '@/lib/mobile-auth';
+import {
+  getMobileAuthFromHeaders,
+  handleMobileOAuthSignIn,
+} from '@/lib/mobile-auth';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,18 +36,22 @@ export async function POST(request: NextRequest) {
 
     if (!deviceId) {
       return NextResponse.json(
-        { error: 'Device not registered. Call /api/mobile/auth/register first.' },
+        {
+          error: 'Device not registered. Call /api/mobile/auth/register first.',
+        },
         { status: 401, headers: corsHeaders },
       );
     }
 
     // Verify the Google ID token
+    // Include all Google client IDs that may sign users in
     const ticket = await googleClient.verifyIdToken({
       idToken,
       audience: [
         process.env.GOOGLE_CLIENT_ID as string,
         process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID as string,
         process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID as string,
+        process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID as string,
       ].filter(Boolean),
     });
 

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProfiles, createProfile } from '@/app/actions/profiles';
+import { headers } from 'next/headers';
+import {
+  getProfilesForUser,
+  createProfileForUser,
+} from '@/lib/profiles/service';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,11 +20,20 @@ export async function OPTIONS() {
  * Returns all profiles for the current user
  *
  * Auth: Handled by middleware (sets x-user-id header from JWT)
- * Uses unified auth via getUserId() in server action
  */
 export async function GET() {
   try {
-    const profiles = await getProfiles();
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401, headers: corsHeaders },
+      );
+    }
+
+    const profiles = await getProfilesForUser(userId);
 
     if (!profiles) {
       return NextResponse.json({ profiles: [] }, { headers: corsHeaders });
@@ -55,10 +68,19 @@ export async function GET() {
  * Create a new profile
  *
  * Auth: Handled by middleware (sets x-user-id header from JWT)
- * Uses unified auth via getUserId() in server action
  */
 export async function POST(request: NextRequest) {
   try {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401, headers: corsHeaders },
+      );
+    }
+
     const body = await request.json();
     const { name, avatarId, ageGroup, difficulty } = body;
 
@@ -69,7 +91,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await createProfile({
+    const result = await createProfileForUser(userId, {
       name: name.trim(),
       avatarId,
       ageGroup,
@@ -77,10 +99,9 @@ export async function POST(request: NextRequest) {
     });
 
     if ('error' in result) {
-      const status = result.error.includes('logged in') ? 401 : 400;
       return NextResponse.json(
         { error: result.error },
-        { status, headers: corsHeaders },
+        { status: 400, headers: corsHeaders },
       );
     }
 

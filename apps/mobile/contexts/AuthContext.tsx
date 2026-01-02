@@ -3,9 +3,11 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useEffect,
   ReactNode,
 } from "react";
 import { Alert } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
@@ -23,12 +25,6 @@ import {
   logout as clearAuthTokens,
   isAuthenticated as checkIsAuthenticated,
 } from "@/lib/auth";
-
-// Configure Google Sign-In
-GoogleSignin.configure({
-  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-});
 
 type AuthContextType = {
   isLoading: boolean;
@@ -67,10 +63,19 @@ type AuthProviderProps = {
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLinked, setIsLinked] = useState(false);
   const [user, setUser] = useState<AuthMeResponse["user"]>(null);
+
+  // Configure Google Sign-In
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    });
+  }, []);
 
   // Refresh auth state from server
   const refreshAuth = useCallback(async () => {
@@ -121,8 +126,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Send to our server
         const response = await signInWithGoogle(idToken);
 
-        // Update local state
+        // After successful OAuth, the user is authenticated and linked (has email)
+        // Update state directly to avoid race conditions with refreshAuth
+        setIsAuthenticated(true);
+        setIsLinked(true);
+
+        // Also refresh to get full user data (but state is already correct)
         await refreshAuth();
+
+        // Invalidate profile queries so ProfileSwitcher loads fresh data
+        queryClient.invalidateQueries({ queryKey: ["profiles"] });
+        queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
 
         return response;
       } catch (error: unknown) {
@@ -161,8 +175,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           familyName: credential.fullName?.familyName ?? undefined,
         });
 
-        // Update local state
+        // After successful OAuth, the user is authenticated and linked (has email)
+        // Update state directly to avoid race conditions with refreshAuth
+        setIsAuthenticated(true);
+        setIsLinked(true);
+
+        // Also refresh to get full user data (but state is already correct)
         await refreshAuth();
+
+        // Invalidate profile queries so ProfileSwitcher loads fresh data
+        queryClient.invalidateQueries({ queryKey: ["profiles"] });
+        queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
 
         return response;
       } catch (error: unknown) {
@@ -209,8 +232,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Send to our server
         const response = await signInWithFacebook(data.accessToken);
 
-        // Update local state
+        // After successful OAuth, the user is authenticated and linked (has email)
+        // Update state directly to avoid race conditions with refreshAuth
+        setIsAuthenticated(true);
+        setIsLinked(true);
+
+        // Also refresh to get full user data (but state is already correct)
         await refreshAuth();
+
+        // Invalidate profile queries so ProfileSwitcher loads fresh data
+        queryClient.invalidateQueries({ queryKey: ["profiles"] });
+        queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
 
         return response;
       } catch (error: unknown) {
@@ -262,7 +294,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         setIsLoading(true);
         const response = await verifyMagicLink(token);
+
+        // After successful magic link verification, user is authenticated and linked
+        // Update state directly to avoid race conditions with refreshAuth
+        setIsAuthenticated(true);
+        setIsLinked(true);
+
+        // Also refresh to get full user data (but state is already correct)
         await refreshAuth();
+
+        // Invalidate profile queries so ProfileSwitcher loads fresh data
+        queryClient.invalidateQueries({ queryKey: ["profiles"] });
+        queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
+
         return response;
       } catch (error: unknown) {
         console.error("Magic link verification error:", error);

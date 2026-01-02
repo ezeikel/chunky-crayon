@@ -3,7 +3,7 @@
 import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
 import ProfileIndicator from '@/components/ProfileIndicator/ProfileIndicator';
 import ProfileUI from '@/components/ProfileUI/ProfileUI';
-import type { ProfileWithStats } from '@/app/actions/profiles';
+import type { ProfileWithStats } from '@/lib/profiles/service';
 
 type HeaderProfileIndicatorProps = {
   profiles: ProfileWithStats[];

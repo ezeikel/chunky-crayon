@@ -14,10 +14,11 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import ColoringImages from "@/components/ColoringImages/ColoringImages";
+import Feed from "@/components/Feed/Feed";
 import CreateColoringImageForm from "@/components/forms/CreateColoringImageForm/CreateColoringImageForm";
 import ColoAvatar from "@/components/ColoAvatar";
 import AppHeader from "@/components/AppHeader";
+import ProfileSwitcher from "@/components/ProfileSwitcher";
 import { useColoContext } from "@/contexts";
 import useHeaderData from "@/hooks/useHeaderData";
 
@@ -25,6 +26,7 @@ const padding = 20;
 
 const HomeScreen = () => {
   const [screenWidth] = useState(Dimensions.get("window").width);
+  const [isProfileSwitcherOpen, setIsProfileSwitcherOpen] = useState(false);
   const { coloState, isLoading: coloLoading } = useColoContext();
   const headerData = useHeaderData();
 
@@ -52,6 +54,7 @@ const HomeScreen = () => {
           stickerCount={headerData.stickerCount}
           profileName={headerData.profileName}
           coloStage={headerData.coloStage}
+          onProfilePress={() => setIsProfileSwitcherOpen(true)}
         />
         <ScrollView
           style={{ flex: 1 }}
@@ -162,10 +165,15 @@ const HomeScreen = () => {
           </View>
 
           <View style={{ marginTop: 16 }}>
-            <ColoringImages />
+            <Feed />
           </View>
         </ScrollView>
       </LinearGradient>
+
+      <ProfileSwitcher
+        isOpen={isProfileSwitcherOpen}
+        onClose={() => setIsProfileSwitcherOpen(false)}
+      />
     </View>
   );
 };

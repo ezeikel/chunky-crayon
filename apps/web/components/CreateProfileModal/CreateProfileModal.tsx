@@ -101,7 +101,7 @@ const CreateProfileModal = ({
         ageGroup,
       });
 
-      if (result.error) {
+      if ('error' in result) {
         setError(result.error);
         return;
       }

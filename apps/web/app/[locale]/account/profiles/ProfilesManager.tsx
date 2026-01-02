@@ -18,11 +18,8 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import {
-  setActiveProfile,
-  deleteProfile,
-  type ProfileWithStats,
-} from '@/app/actions/profiles';
+import { setActiveProfile, deleteProfile } from '@/app/actions/profiles';
+import type { ProfileWithStats } from '@/lib/profiles/service';
 
 const MAX_PROFILES = 10;
 
@@ -46,7 +43,7 @@ const ProfilesManager = ({ profiles, activeProfile }: ProfilesManagerProps) => {
 
     startTransition(async () => {
       const result = await setActiveProfile(profileId);
-      if (result.error) {
+      if ('error' in result) {
         toast.error(result.error);
       } else {
         toast.success(t('form.profileSwitched'));
@@ -60,7 +57,7 @@ const ProfilesManager = ({ profiles, activeProfile }: ProfilesManagerProps) => {
 
     startTransition(async () => {
       const result = await deleteProfile(profileToDelete.id);
-      if (result.error) {
+      if ('error' in result) {
         toast.error(result.error);
       } else {
         toast.success(t('delete.deleted', { name: profileToDelete.name }));
@@ -137,7 +134,9 @@ const ProfilesManager = ({ profiles, activeProfile }: ProfilesManagerProps) => {
 
               {/* Stats badge */}
               <div className="absolute bottom-16 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                {t('manager.colorings', { count: profile._count.coloringImages })}
+                {t('manager.colorings', {
+                  count: profile._count.coloringImages,
+                })}
               </div>
             </div>
           ))}
@@ -167,9 +166,7 @@ const ProfilesManager = ({ profiles, activeProfile }: ProfilesManagerProps) => {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-crayon-orange mt-1">•</span>
-              <span>
-                {t('manager.maxProfiles', { max: MAX_PROFILES })}
-              </span>
+              <span>{t('manager.maxProfiles', { max: MAX_PROFILES })}</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-crayon-orange mt-1">•</span>
@@ -180,7 +177,10 @@ const ProfilesManager = ({ profiles, activeProfile }: ProfilesManagerProps) => {
 
         {/* Profile limit info */}
         <p className="text-center text-sm text-muted-foreground">
-          {t('manager.profilesUsed', { count: profiles.length, max: MAX_PROFILES })}
+          {t('manager.profilesUsed', {
+            count: profiles.length,
+            max: MAX_PROFILES,
+          })}
         </p>
       </div>
 
@@ -213,15 +213,15 @@ const ProfilesManager = ({ profiles, activeProfile }: ProfilesManagerProps) => {
                           {profileToDelete.name}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {t('delete.coloringPages', { count: profileToDelete._count.coloringImages })}
+                          {t('delete.coloringPages', {
+                            count: profileToDelete._count.coloringImages,
+                          })}
                         </p>
                       </div>
                     </>
                   )}
                 </div>
-                <p>
-                  {t('delete.confirmText')}
-                </p>
+                <p>{t('delete.confirmText')}</p>
               </div>
             </DialogDescription>
           </DialogHeader>

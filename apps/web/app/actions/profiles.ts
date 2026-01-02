@@ -18,8 +18,8 @@ import {
   type UpdateProfileInput,
 } from '@/lib/profiles/service';
 
-// Re-export types from service
-export type { ProfileWithStats, CreateProfileInput, UpdateProfileInput };
+// NOTE: Types are NOT re-exported from server action files due to bundling issues.
+// Import types directly from '@/lib/profiles/service' instead.
 
 // Get all profiles for the current user
 export const getProfiles = async (): Promise<ProfileWithStats[] | null> => {

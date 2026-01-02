@@ -8,7 +8,7 @@ import {
   useMemo,
   type ReactNode,
 } from 'react';
-import type { ProfileWithStats } from '@/app/actions/profiles';
+import type { ProfileWithStats } from '@/lib/profiles/service';
 
 type ProfileContextValue = {
   profiles: ProfileWithStats[];

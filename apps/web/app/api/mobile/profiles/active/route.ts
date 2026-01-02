@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getActiveProfile, setActiveProfile } from '@/app/actions/profiles';
+import { headers } from 'next/headers';
+import {
+  getActiveProfileForUser,
+  setActiveProfileForUser,
+} from '@/lib/profiles/service';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,11 +20,20 @@ export async function OPTIONS() {
  * Returns the currently active profile
  *
  * Auth: Handled by middleware (sets x-user-id header from JWT)
- * Uses unified auth via getUserId() in server action
  */
 export async function GET() {
   try {
-    const activeProfile = await getActiveProfile();
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401, headers: corsHeaders },
+      );
+    }
+
+    const activeProfile = await getActiveProfileForUser(userId);
 
     if (!activeProfile) {
       return NextResponse.json(
@@ -58,10 +71,19 @@ export async function GET() {
  * Set the active profile
  *
  * Auth: Handled by middleware (sets x-user-id header from JWT)
- * Uses unified auth via getUserId() in server action
  */
 export async function POST(request: NextRequest) {
   try {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401, headers: corsHeaders },
+      );
+    }
+
     const body = await request.json();
     const { profileId } = body;
 
@@ -72,10 +94,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await setActiveProfile(profileId);
+    const result = await setActiveProfileForUser(profileId, userId);
 
     if ('error' in result) {
-      const status = result.error.includes('logged in') ? 401 : 404;
+      const status = result.error.includes('not found') ? 404 : 400;
       return NextResponse.json(
         { error: result.error },
         { status, headers: corsHeaders },
