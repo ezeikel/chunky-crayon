@@ -36,7 +36,11 @@ import { ColoringImage, Dimension, GridColorCell, GridColorMap } from "@/types";
 import { useCanvasStore, DrawingAction } from "@/stores/canvasStore";
 import { createSimplePaint, getBrushMultiplier } from "@/utils/brushShaders";
 import { getRainbowColor } from "@/utils/colorUtils";
-import { saveCanvasState, loadCanvasState } from "@/utils/canvasPersistence";
+import {
+  saveCanvasState,
+  loadCanvasState,
+  debugCanvasStorage,
+} from "@/utils/canvasPersistence";
 import {
   generateGlitterParticles,
   createSparklePath,
@@ -63,7 +67,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
 
   const [svgDimensions, setSvgDimensions] = useState<Dimension | null>(null);
   const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const isInitializedRef = useRef(false);
 
   // Magic color hint state
   const [magicHintCell, setMagicHintCell] = useState<GridColorCell | null>(
@@ -171,7 +175,10 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
       console.log(
         `[CANVAS_INIT] Starting initialization for image: ${currentImageId}`,
       );
-      setIsInitialized(false);
+      isInitializedRef.current = false;
+
+      // Debug storage to see what's actually saved
+      await debugCanvasStorage();
 
       // Only reset if we're switching to a different image
       // If it's the same image (e.g., navigating from feed to detail), preserve state
@@ -229,7 +236,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         `[CANVAS_INIT] Marking as initialized for image ${currentImageId}`,
       );
       initializedForImageIdRef.current = currentImageId;
-      setIsInitialized(true);
+      isInitializedRef.current = true;
       console.log(`[CANVAS_INIT] Initialization complete`);
     };
 
@@ -261,26 +268,42 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
           console.log(`[CANVAS_FOCUS] Cleared pending auto-save timer`);
         }
 
-        // Immediately save current state if there are any actions
-        const actionsToSave = history.slice(0, historyIndex + 1);
+        // Get the latest state from the store directly
+        const currentState = useCanvasStore.getState();
+        const actionsToSave = currentState.history.slice(
+          0,
+          currentState.historyIndex + 1,
+        );
         console.log(
-          `[CANVAS_FOCUS] Actions to save: ${actionsToSave.length}, isInitialized: ${isInitialized}`,
+          `[CANVAS_FOCUS] Actions to save: ${actionsToSave.length}, isInitialized: ${isInitializedRef.current}`,
+        );
+        console.log(
+          `[CANVAS_FOCUS] History length: ${currentState.history.length}, historyIndex: ${currentState.historyIndex}`,
         );
 
-        if (actionsToSave.length > 0 && isInitialized) {
+        if (actionsToSave.length > 0 && isInitializedRef.current) {
           console.log(`[CANVAS_FOCUS] Saving state on focus loss...`);
-          saveCanvasState(coloringImage.id, actionsToSave);
-          setDirty(false);
+          // Make save async and await it to see if it completes
+          saveCanvasState(coloringImage.id, actionsToSave)
+            .then((success) => {
+              console.log(
+                `[CANVAS_FOCUS] Save completed with result: ${success}`,
+              );
+            })
+            .catch((error) => {
+              console.error(`[CANVAS_FOCUS] Save failed with error:`, error);
+            });
+          currentState.setDirty(false);
         } else {
           console.log(`[CANVAS_FOCUS] No actions to save or not initialized`);
         }
       };
-    }, [history, historyIndex, coloringImage.id, isInitialized, setDirty]),
+    }, [coloringImage.id]),
   );
 
   // Auto-save effect
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitializedRef.current) return;
 
     // Debounce auto-save
     if (autoSaveTimerRef.current) {
@@ -288,10 +311,22 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     }
 
     autoSaveTimerRef.current = setTimeout(() => {
-      const actionsToSave = history.slice(0, historyIndex + 1);
+      // Get the latest state from the store directly
+      const currentState = useCanvasStore.getState();
+      const actionsToSave = currentState.history.slice(
+        0,
+        currentState.historyIndex + 1,
+      );
       if (actionsToSave.length > 0) {
-        saveCanvasState(coloringImage.id, actionsToSave);
-        setDirty(false);
+        console.log(`[AUTO_SAVE] Saving ${actionsToSave.length} actions...`);
+        saveCanvasState(coloringImage.id, actionsToSave)
+          .then((success) => {
+            console.log(`[AUTO_SAVE] Save completed with result: ${success}`);
+          })
+          .catch((error) => {
+            console.error(`[AUTO_SAVE] Save failed with error:`, error);
+          });
+        currentState.setDirty(false);
       }
     }, 1000); // Save 1 second after last change (matching web)
 
@@ -300,7 +335,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [history, historyIndex, coloringImage.id, isInitialized, setDirty]);
+  }, [history, historyIndex, coloringImage.id, setDirty]);
 
   // Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
   const canvasSize = screenWidth - 32 - 24;

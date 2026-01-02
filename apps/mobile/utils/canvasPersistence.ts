@@ -144,6 +144,17 @@ export const saveCanvasState = async (
     `[CANVAS_PERSIST] SAVE START - Image: ${imageId}, Actions: ${actions.length}`,
   );
 
+  // Validate inputs
+  if (!imageId) {
+    console.error(`[CANVAS_PERSIST] SAVE FAILED - Invalid imageId: ${imageId}`);
+    return false;
+  }
+
+  if (!actions || actions.length === 0) {
+    console.warn(`[CANVAS_PERSIST] SAVE SKIPPED - No actions to save`);
+    return false;
+  }
+
   // Log action types
   const actionTypes = actions.reduce(
     (acc, action) => {
@@ -163,18 +174,39 @@ export const saveCanvasState = async (
       version: CURRENT_VERSION,
     };
 
-    console.log(`[CANVAS_PERSIST] Saving to AsyncStorage with key: ${key}`);
-    await AsyncStorage.setItem(key, JSON.stringify(data));
     console.log(
-      `[CANVAS_PERSIST] SAVE SUCCESS - Saved ${data.actions.length} serialized actions`,
+      `[CANVAS_PERSIST] Serialized data size: ${JSON.stringify(data).length} bytes`,
+    );
+    console.log(`[CANVAS_PERSIST] Saving to AsyncStorage with key: ${key}`);
+
+    // Try to save to AsyncStorage
+    await AsyncStorage.setItem(key, JSON.stringify(data));
+
+    // Verify the save worked by reading it back
+    const verification = await AsyncStorage.getItem(key);
+    if (!verification) {
+      throw new Error("Save verification failed - data not found after save");
+    }
+
+    console.log(
+      `[CANVAS_PERSIST] SAVE SUCCESS - Saved ${data.actions.length} serialized actions, verified size: ${verification.length} bytes`,
     );
 
     // Update metadata
     await updateMetadata(imageId);
 
+    // Run debug check to confirm data is persisted
+    console.log(`[CANVAS_PERSIST] Running post-save verification...`);
+    const allKeys = await AsyncStorage.getAllKeys();
+    const canvasKeys = allKeys.filter((k) => k.startsWith(STORAGE_PREFIX));
+    console.log(
+      `[CANVAS_PERSIST] Post-save canvas keys found: ${canvasKeys.length}`,
+    );
+
     return true;
   } catch (error) {
     console.error(`[CANVAS_PERSIST] SAVE FAILED - Error:`, error);
+    console.error(`[CANVAS_PERSIST] Error stack:`, (error as Error)?.stack);
     return false;
   }
 };

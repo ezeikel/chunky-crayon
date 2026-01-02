@@ -303,10 +303,9 @@ export async function handleMobileOAuthSignIn(
         );
         wasMerged = true;
 
-        // Update device session
-        await db.mobileDeviceSession.update({
-          where: { deviceId },
-          data: { userId: existingUserWithEmail.id },
+        // Recreate device session (merge deletes the old one)
+        await db.mobileDeviceSession.create({
+          data: { deviceId, userId: existingUserWithEmail.id },
         });
 
         finalUserId = existingUserWithEmail.id;
