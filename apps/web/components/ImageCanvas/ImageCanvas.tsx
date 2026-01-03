@@ -600,9 +600,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         let scaleX = 1;
         let scaleY = 1;
 
-        // Check for per-action source dimensions first
-        const actionSourceWidth = action.sourceWidth;
-        const actionSourceHeight = action.sourceHeight;
+        // Check for per-action source dimensions first (not all action types have these)
+        const actionSourceWidth =
+          'sourceWidth' in action ? action.sourceWidth : undefined;
+        const actionSourceHeight =
+          'sourceHeight' in action ? action.sourceHeight : undefined;
 
         // Use action-level dimensions if available, otherwise fall back to progress-level
         const effectiveSourceWidth = actionSourceWidth || sourceWidth;
