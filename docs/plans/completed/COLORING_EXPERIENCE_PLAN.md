@@ -96,8 +96,8 @@ scroll, making coloring impossible.
 
 ```javascript
 // Secondary defense - JavaScript event prevention
-canvas.addEventListener('touchstart', handler, { passive: false });
-canvas.addEventListener('touchmove', handler, { passive: false });
+canvas.addEventListener("touchstart", handler, { passive: false });
+canvas.addEventListener("touchmove", handler, { passive: false });
 
 function handler(e) {
   e.preventDefault();
@@ -197,7 +197,7 @@ abandonment.
 
 ```typescript
 interface CanvasAction {
-  type: 'stroke' | 'fill' | 'clear';
+  type: "stroke" | "fill" | "clear";
   imageData: ImageData; // Canvas state before action
   timestamp: number;
 }
@@ -224,7 +224,7 @@ useEffect(() => {
   if (!canvas) return;
 
   // CSS approach
-  canvas.style.touchAction = 'none';
+  canvas.style.touchAction = "none";
 
   // JavaScript fallback for Safari
   const preventScroll = (e: TouchEvent) => {
@@ -233,10 +233,10 @@ useEffect(() => {
     }
   };
 
-  document.addEventListener('touchmove', preventScroll, { passive: false });
+  document.addEventListener("touchmove", preventScroll, { passive: false });
 
   return () => {
-    document.removeEventListener('touchmove', preventScroll);
+    document.removeEventListener("touchmove", preventScroll);
   };
 }, []);
 ```
@@ -250,41 +250,41 @@ colors
 const CHUNKY_PALETTE = {
   // Primary (8) - Large buttons
   primary: [
-    { name: 'Cherry Red', hex: '#E53935' },
-    { name: 'Sunset Orange', hex: '#FB8C00' },
-    { name: 'Sunshine Yellow', hex: '#FDD835' },
-    { name: 'Grass Green', hex: '#43A047' },
-    { name: 'Sky Blue', hex: '#1E88E5' },
-    { name: 'Grape Purple', hex: '#8E24AA' },
-    { name: 'Bubblegum Pink', hex: '#EC407A' },
-    { name: 'Chocolate Brown', hex: '#6D4C41' },
+    { name: "Cherry Red", hex: "#E53935" },
+    { name: "Sunset Orange", hex: "#FB8C00" },
+    { name: "Sunshine Yellow", hex: "#FDD835" },
+    { name: "Grass Green", hex: "#43A047" },
+    { name: "Sky Blue", hex: "#1E88E5" },
+    { name: "Grape Purple", hex: "#8E24AA" },
+    { name: "Bubblegum Pink", hex: "#EC407A" },
+    { name: "Chocolate Brown", hex: "#6D4C41" },
   ],
   // Secondary (8) - Medium buttons
   secondary: [
-    { name: 'Coral', hex: '#FF7043' },
-    { name: 'Mint', hex: '#26A69A' },
-    { name: 'Lavender', hex: '#AB47BC' },
-    { name: 'Peach', hex: '#FFAB91' },
-    { name: 'Navy', hex: '#3949AB' },
-    { name: 'Forest', hex: '#2E7D32' },
-    { name: 'Gold', hex: '#FFD54F' },
-    { name: 'Rose', hex: '#F48FB1' },
+    { name: "Coral", hex: "#FF7043" },
+    { name: "Mint", hex: "#26A69A" },
+    { name: "Lavender", hex: "#AB47BC" },
+    { name: "Peach", hex: "#FFAB91" },
+    { name: "Navy", hex: "#3949AB" },
+    { name: "Forest", hex: "#2E7D32" },
+    { name: "Gold", hex: "#FFD54F" },
+    { name: "Rose", hex: "#F48FB1" },
   ],
   // Essentials (4) - Always visible
   essentials: [
-    { name: 'Black', hex: '#212121' },
-    { name: 'White', hex: '#FFFFFF' },
-    { name: 'Gray', hex: '#9E9E9E' },
-    { name: 'Skin Tone', hex: '#FFCC80' },
+    { name: "Black", hex: "#212121" },
+    { name: "White", hex: "#FFFFFF" },
+    { name: "Gray", hex: "#9E9E9E" },
+    { name: "Skin Tone", hex: "#FFCC80" },
   ],
   // Additional skin tones (accessible via long-press on Skin Tone)
   skinTones: [
-    { name: 'Light', hex: '#FFE0B2' },
-    { name: 'Medium Light', hex: '#FFCC80' },
-    { name: 'Medium', hex: '#DEB887' },
-    { name: 'Medium Dark', hex: '#A0522D' },
-    { name: 'Dark', hex: '#8B4513' },
-    { name: 'Deep', hex: '#5D4037' },
+    { name: "Light", hex: "#FFE0B2" },
+    { name: "Medium Light", hex: "#FFCC80" },
+    { name: "Medium", hex: "#DEB887" },
+    { name: "Medium Dark", hex: "#A0522D" },
+    { name: "Dark", hex: "#8B4513" },
+    { name: "Deep", hex: "#5D4037" },
   ],
 };
 ```
@@ -297,9 +297,9 @@ Three sizes optimized for children's motor skills:
 
 ```typescript
 const BRUSH_SIZES = {
-  small: { radius: 4, name: 'Fine', icon: '•' },
-  medium: { radius: 12, name: 'Regular', icon: '●' },
-  large: { radius: 24, name: 'Chunky', icon: '⬤' },
+  small: { radius: 4, name: "Fine", icon: "•" },
+  medium: { radius: 12, name: "Regular", icon: "●" },
+  large: { radius: 24, name: "Chunky", icon: "⬤" },
 };
 ```
 
@@ -327,7 +327,7 @@ Start simple, expand later:
 ```typescript
 // Eraser uses same drawing logic but with white/transparent color
 // AND compositing mode for true transparency
-ctx.globalCompositeOperation = 'destination-out';
+ctx.globalCompositeOperation = "destination-out";
 ```
 
 ### Phase 3: Audio & Delight (Week 3-4)
@@ -402,7 +402,7 @@ class SoundManager {
 
 ```typescript
 // Use Vibration API for tactile feedback
-function hapticFeedback(type: 'light' | 'medium' | 'heavy') {
+function hapticFeedback(type: "light" | "medium" | "heavy") {
   if (!navigator.vibrate) return;
 
   const patterns = {
@@ -518,9 +518,9 @@ components/
 interface ColoringState {
   // Tool state
   selectedColor: string;
-  brushSize: 'small' | 'medium' | 'large';
-  brushType: 'crayon' | 'marker' | 'eraser';
-  activeTool: 'brush' | 'fill';
+  brushSize: "small" | "medium" | "large";
+  brushType: "crayon" | "marker" | "eraser";
+  activeTool: "brush" | "fill";
 
   // History
   canUndo: boolean;
@@ -536,9 +536,9 @@ interface ColoringState {
 
 interface ColoringActions {
   setColor: (color: string) => void;
-  setBrushSize: (size: 'small' | 'medium' | 'large') => void;
-  setBrushType: (type: 'crayon' | 'marker' | 'eraser') => void;
-  setActiveTool: (tool: 'brush' | 'fill') => void;
+  setBrushSize: (size: "small" | "medium" | "large") => void;
+  setBrushType: (type: "crayon" | "marker" | "eraser") => void;
+  setActiveTool: (tool: "brush" | "fill") => void;
   undo: () => void;
   redo: () => void;
   save: () => Promise<void>;

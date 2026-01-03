@@ -248,9 +248,9 @@ Next.js 16 cache components require locale-aware caching:
 const nextConfig = {
   cacheLife: {
     // Existing profiles remain, cache is per-locale automatically
-    'blog-list': { stale: 3600, revalidate: 86400, expire: 2592000 },
-    'blog-post': { stale: 86400, revalidate: 604800, expire: 7776000 },
-    'gallery-category': { stale: 21600, revalidate: 86400, expire: 2592000 },
+    "blog-list": { stale: 3600, revalidate: 86400, expire: 2592000 },
+    "blog-post": { stale: 86400, revalidate: 604800, expire: 7776000 },
+    "gallery-category": { stale: 21600, revalidate: 86400, expire: 2592000 },
     // ... etc
   },
   cacheComponents: true,
@@ -264,7 +264,7 @@ separate cache entries per locale. No additional configuration needed.
 
 ```typescript
 // app/[locale]/gallery/[category]/page.tsx
-import { routing } from '@/i18n/routing';
+import { routing } from "@/i18n/routing";
 
 export async function generateStaticParams() {
   const categories = await getCategories();
@@ -581,12 +581,12 @@ Each page generates unique metadata per locale including:
 
 ```typescript
 // Track language preferences
-posthog.capture('language_changed', {
+posthog.capture("language_changed", {
   from_locale: previousLocale,
   to_locale: newLocale,
 });
 
-posthog.capture('page_view', {
+posthog.capture("page_view", {
   locale: currentLocale,
   // ... other properties
 });
@@ -867,11 +867,11 @@ pnpm build --filter=@chunky-crayon/translations
 ```yaml
 on:
   schedule:
-    - cron: '0 9 * * 1' # Weekly on Monday
+    - cron: "0 9 * * 1" # Weekly on Monday
   workflow_dispatch: # Manual trigger with optional locale filter
     inputs:
       locale:
-        description: 'Specific locale to review (leave empty for all)'
+        description: "Specific locale to review (leave empty for all)"
 ```
 
 **PR Format:**
@@ -935,15 +935,15 @@ In Next.js 16, `middleware.ts` has been renamed to `proxy.ts`. Key differences:
 
 ```typescript
 // proxy.ts (Next.js 16+)
-import createProxy from 'next-intl/proxy'; // Note: next-intl may need updates
-import { routing } from './i18n/routing';
+import createProxy from "next-intl/proxy"; // Note: next-intl may need updates
+import { routing } from "./i18n/routing";
 
 export function proxy(request: NextRequest) {
   // Locale detection and routing logic
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };
 ```
 

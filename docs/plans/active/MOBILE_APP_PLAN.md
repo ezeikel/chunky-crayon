@@ -324,7 +324,7 @@ enum CreditTransactionType {
 // lib/subscription.ts
 
 export function hasActiveSubscription(user: UserWithSubscription): boolean {
-  return user.subscription?.status === 'ACTIVE';
+  return user.subscription?.status === "ACTIVE";
 }
 
 export function getSubscriptionTier(
@@ -335,11 +335,11 @@ export function getSubscriptionTier(
 }
 
 export function isStripeSubscription(user: UserWithSubscription): boolean {
-  return user.subscription?.source === 'STRIPE';
+  return user.subscription?.source === "STRIPE";
 }
 
 export function isRevenueCatSubscription(user: UserWithSubscription): boolean {
-  return user.subscription?.source === 'REVENUECAT';
+  return user.subscription?.source === "REVENUECAT";
 }
 
 // Prevent duplicate subscriptions from different sources
@@ -373,17 +373,17 @@ export function getMonthlyCredits(tier: SubscriptionTier): number {
 **RevenueCat Webhook** (`/api/webhooks/revenuecat/route.ts`):
 
 ```typescript
-import { headers } from 'next/headers';
-import { revalidatePath } from 'next/cache';
-import crypto from 'crypto';
+import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
+import crypto from "crypto";
 
 // HMAC SHA256 verification
 function verifyWebhookSignature(body: string, signature: string): boolean {
   const secret = process.env.REVENUECAT_WEBHOOK_SECRET!;
   const expectedSignature = crypto
-    .createHmac('sha256', secret)
+    .createHmac("sha256", secret)
     .update(body)
-    .digest('hex');
+    .digest("hex");
   return crypto.timingSafeEqual(
     Buffer.from(signature),
     Buffer.from(expectedSignature),
@@ -393,10 +393,10 @@ function verifyWebhookSignature(body: string, signature: string): boolean {
 export async function POST(request: Request) {
   const body = await request.text();
   const headersList = await headers();
-  const signature = headersList.get('x-revenuecat-signature');
+  const signature = headersList.get("x-revenuecat-signature");
 
   if (!signature || !verifyWebhookSignature(body, signature)) {
-    return Response.json({ error: 'Invalid signature' }, { status: 401 });
+    return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
   const event = JSON.parse(body);
@@ -409,42 +409,42 @@ export async function POST(request: Request) {
   });
 
   if (!user) {
-    console.error('User not found for RevenueCat ID:', app_user_id);
+    console.error("User not found for RevenueCat ID:", app_user_id);
     return Response.json({ received: true });
   }
 
   const tier = getTierFromProductId(product_id); // splash_monthly_v1 → SPLASH
 
   switch (type) {
-    case 'INITIAL_PURCHASE':
-    case 'RENEWAL':
+    case "INITIAL_PURCHASE":
+    case "RENEWAL":
       await prisma.subscription.upsert({
         where: { userId: user.id },
         create: {
           userId: user.id,
           revenueCatSubscriptionId: original_transaction_id,
           tier,
-          source: 'REVENUECAT',
-          status: 'ACTIVE',
+          source: "REVENUECAT",
+          status: "ACTIVE",
         },
         update: {
           tier,
-          status: 'ACTIVE',
+          status: "ACTIVE",
         },
       });
       // Refill credits on renewal
       await refillCredits(user.id, tier);
       break;
 
-    case 'CANCELLATION':
-    case 'EXPIRATION':
+    case "CANCELLATION":
+    case "EXPIRATION":
       await prisma.subscription.update({
         where: { userId: user.id },
-        data: { status: type === 'CANCELLATION' ? 'CANCELLED' : 'EXPIRED' },
+        data: { status: type === "CANCELLATION" ? "CANCELLED" : "EXPIRED" },
       });
       break;
 
-    case 'PRODUCT_CHANGE':
+    case "PRODUCT_CHANGE":
       // Upgrade/downgrade
       await prisma.subscription.update({
         where: { userId: user.id },
@@ -452,30 +452,30 @@ export async function POST(request: Request) {
       });
       break;
 
-    case 'NON_RENEWING_PURCHASE':
+    case "NON_RENEWING_PURCHASE":
       // Credit pack purchase
       const credits = getCreditsFromProductId(product_id); // credits_500_v1 → 500
-      await addCredits(user.id, credits, 'PACK_PURCHASE');
+      await addCredits(user.id, credits, "PACK_PURCHASE");
       break;
   }
 
-  revalidatePath('/dashboard');
-  revalidatePath('/color');
+  revalidatePath("/dashboard");
+  revalidatePath("/color");
 
   return Response.json({ received: true });
 }
 
 function getTierFromProductId(productId: string): SubscriptionTier {
-  if (productId.startsWith('splash_')) return 'SPLASH';
-  if (productId.startsWith('rainbow_')) return 'RAINBOW';
-  if (productId.startsWith('sparkle_')) return 'SPARKLE';
+  if (productId.startsWith("splash_")) return "SPLASH";
+  if (productId.startsWith("rainbow_")) return "RAINBOW";
+  if (productId.startsWith("sparkle_")) return "SPARKLE";
   throw new Error(`Unknown product: ${productId}`);
 }
 
 function getCreditsFromProductId(productId: string): number {
-  if (productId.includes('credits_100')) return 100;
-  if (productId.includes('credits_500')) return 500;
-  if (productId.includes('credits_1000')) return 1000;
+  if (productId.includes("credits_100")) return 100;
+  if (productId.includes("credits_500")) return 500;
+  if (productId.includes("credits_1000")) return 1000;
   throw new Error(`Unknown credit pack: ${productId}`);
 }
 ```
@@ -488,8 +488,8 @@ import Purchases, {
   CustomerInfo,
   PurchasesOfferings,
   PurchasesPackage,
-} from 'react-native-purchases';
-import { Platform } from 'react-native';
+} from "react-native-purchases";
+import { Platform } from "react-native";
 
 class PurchaseService {
   private static instance: PurchaseService;
@@ -506,7 +506,7 @@ class PurchaseService {
     if (this.initialized) return;
 
     const apiKey =
-      Platform.OS === 'ios'
+      Platform.OS === "ios"
         ? process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY!
         : process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY!;
 
@@ -1381,22 +1381,22 @@ iPad should mirror this:
 
 ```typescript
 // hooks/useDeviceLayout.ts
-import { useWindowDimensions, Platform } from 'react-native';
+import { useWindowDimensions, Platform } from "react-native";
 
-export type LayoutMode = 'phone' | 'tablet-portrait' | 'tablet-landscape';
+export type LayoutMode = "phone" | "tablet-portrait" | "tablet-landscape";
 
 export const useDeviceLayout = () => {
   const { width, height } = useWindowDimensions();
   const isTablet =
     Platform.isPad ||
-    (Platform.OS === 'android' && Math.min(width, height) >= 600);
+    (Platform.OS === "android" && Math.min(width, height) >= 600);
   const isLandscape = width > height;
 
   const layoutMode: LayoutMode = !isTablet
-    ? 'phone'
+    ? "phone"
     : isLandscape
-      ? 'tablet-landscape'
-      : 'tablet-portrait';
+      ? "tablet-landscape"
+      : "tablet-portrait";
 
   // Panel widths matching web
   const sidebarWidth = width >= 1400 ? 220 : width >= 1200 ? 200 : 180;
@@ -1410,8 +1410,8 @@ export const useDeviceLayout = () => {
     isLandscape,
     sidebarWidth,
     canvasMaxWidth,
-    showSidePanels: layoutMode === 'tablet-landscape',
-    showBottomToolbar: layoutMode !== 'tablet-landscape',
+    showSidePanels: layoutMode === "tablet-landscape",
+    showBottomToolbar: layoutMode !== "tablet-landscape",
     dimensions: { width, height },
   };
 };
@@ -1519,14 +1519,14 @@ Many kids/parents use iPads with keyboard cases. Support standard shortcuts:
 
 ```typescript
 // hooks/useKeyboardShortcuts.ts
-import { useEffect } from 'react';
-import { Platform, Keyboard } from 'react-native';
+import { useEffect } from "react";
+import { Platform, Keyboard } from "react-native";
 
 export const useKeyboardShortcuts = (handlers: ShortcutHandlers) => {
   useEffect(() => {
-    if (Platform.OS !== 'ios') return;
+    if (Platform.OS !== "ios") return;
 
-    const subscription = Keyboard.addListener('keyboardDidShow', () => {
+    const subscription = Keyboard.addListener("keyboardDidShow", () => {
       // Register shortcuts via UIKeyCommand (native module needed)
     });
 
@@ -1559,16 +1559,16 @@ const useAdaptiveLayout = () => {
 
   // Split View detection: iPad full width is ~1024-1366px
   // If significantly narrower, we're in split view
-  const screenWidth = Dimensions.get('screen').width;
+  const screenWidth = Dimensions.get("screen").width;
   const isSplitView = width < screenWidth * 0.9;
 
   // Force phone layout in narrow split views
   const effectiveLayout =
     width < 500
-      ? 'phone' // Slide Over or 33% split
+      ? "phone" // Slide Over or 33% split
       : width < 700
-        ? 'tablet-portrait' // 50% split
-        : 'tablet-landscape'; // Full or 66%+ split
+        ? "tablet-portrait" // 50% split
+        : "tablet-landscape"; // Full or 66%+ split
 
   return { effectiveLayout, isSplitView };
 };
@@ -1817,15 +1817,15 @@ during beta/launch.
 
 ```typescript
 // lib/posthog.ts
-import PostHog from 'posthog-react-native';
+import PostHog from "posthog-react-native";
 
 export const initPostHog = async () => {
   await PostHog.initAsync(process.env.EXPO_PUBLIC_POSTHOG_KEY!, {
-    host: 'https://eu.i.posthog.com', // EU for GDPR
+    host: "https://eu.i.posthog.com", // EU for GDPR
 
     // COPPA compliance settings
     defaultOptIn: false, // Opt-out by default
-    persistence: 'memory', // No persistent storage
+    persistence: "memory", // No persistent storage
     sendFeatureFlagEvent: false, // Reduce data collection
 
     // Capture settings
@@ -1835,7 +1835,7 @@ export const initPostHog = async () => {
     // Disable PII collection
     autocapture: {
       captureTextContent: false, // Don't capture text (kid names)
-      propsToCapture: ['testID'], // Only capture test IDs
+      propsToCapture: ["testID"], // Only capture test IDs
     },
   });
 };
@@ -1851,9 +1851,9 @@ Mirror these web events for mobile analytics parity:
 **Generation Events:**
 
 ```typescript
-posthog.capture('generation_started', { method: 'text' | 'voice' | 'image' });
-posthog.capture('generation_completed', { imageId, duration_ms });
-posthog.capture('generation_failed', { error_type });
+posthog.capture("generation_started", { method: "text" | "voice" | "image" });
+posthog.capture("generation_completed", { imageId, duration_ms });
+posthog.capture("generation_failed", { error_type });
 ```
 
 **Coloring Events:**
@@ -1870,18 +1870,18 @@ posthog.capture('artwork_shared', { method: 'save' | 'print' | 'share' });
 **Retention Events:**
 
 ```typescript
-posthog.capture('sticker_unlocked', { stickerId });
-posthog.capture('colo_evolved', { stage: 1 - 6 });
-posthog.capture('challenge_completed', { challengeId });
-posthog.capture('streak_continued', { days });
+posthog.capture("sticker_unlocked", { stickerId });
+posthog.capture("colo_evolved", { stage: 1 - 6 });
+posthog.capture("challenge_completed", { challengeId });
+posthog.capture("streak_continued", { days });
 ```
 
 **Subscription Events:**
 
 ```typescript
-posthog.capture('paywall_viewed', { trigger });
-posthog.capture('subscription_started', { plan, source: 'mobile' });
-posthog.capture('subscription_cancelled', { reason });
+posthog.capture("paywall_viewed", { trigger });
+posthog.capture("subscription_started", { plan, source: "mobile" });
+posthog.capture("subscription_cancelled", { reason });
 ```
 
 #### Dashboard Sync
@@ -3275,10 +3275,10 @@ packages/
 
 ```typescript
 // Web (apps/web)
-import toolSelect from '@chunky-crayon/assets/sounds/tool-select.mp3';
+import toolSelect from "@chunky-crayon/assets/sounds/tool-select.mp3";
 
 // Mobile (apps/mobile) - requires metro.config.js update
-import toolSelect from '@chunky-crayon/assets/sounds/tool-select.mp3';
+import toolSelect from "@chunky-crayon/assets/sounds/tool-select.mp3";
 ```
 
 **Benefits:**
@@ -3356,7 +3356,7 @@ Create/source these animation files (`packages/assets/animations/`):
 Define in `utils/haptics.ts`:
 
 ```typescript
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 
 export const haptics = {
   // Light feedback
@@ -3401,18 +3401,18 @@ export const haptics = {
 // NOTE: expo-audio replaces deprecated expo-av in SDK 54
 // New hook-based API using useAudioPlayer
 
-import { useAudioPlayer, AudioSource } from 'expo-audio';
+import { useAudioPlayer, AudioSource } from "expo-audio";
 
 // Define sound sources
 const soundSources: Record<string, AudioSource> = {
-  toolSelect: require('../assets/sounds/tool-select.mp3'),
-  colorPick: require('../assets/sounds/color-pick.mp3'),
-  fillPour: require('../assets/sounds/fill-pour.mp3'),
-  stampPlace: require('../assets/sounds/stamp-place.mp3'),
-  stickerUnlock: require('../assets/sounds/sticker-unlock.mp3'),
-  buttonPress: require('../assets/sounds/button-press.mp3'),
-  undo: require('../assets/sounds/undo.mp3'),
-  redo: require('../assets/sounds/redo.mp3'),
+  toolSelect: require("../assets/sounds/tool-select.mp3"),
+  colorPick: require("../assets/sounds/color-pick.mp3"),
+  fillPour: require("../assets/sounds/fill-pour.mp3"),
+  stampPlace: require("../assets/sounds/stamp-place.mp3"),
+  stickerUnlock: require("../assets/sounds/sticker-unlock.mp3"),
+  buttonPress: require("../assets/sounds/button-press.mp3"),
+  undo: require("../assets/sounds/undo.mp3"),
+  redo: require("../assets/sounds/redo.mp3"),
 };
 
 // Hook-based approach (recommended for SDK 54)
@@ -3432,7 +3432,7 @@ export function useSoundEffect(soundName: keyof typeof soundSources) {
 // <Pressable onPress={() => { playToolSelect(); selectTool('crayon'); }}>
 
 // For non-hook contexts, use Audio.Sound directly:
-import { Audio } from 'expo-audio';
+import { Audio } from "expo-audio";
 
 class AudioManager {
   private sounds: Map<string, Audio.Sound> = new Map();
@@ -3562,52 +3562,52 @@ The web uses CSS HSL variables. For React Native, convert to hex or RGB values.
 // apps/mobile/lib/colors.ts
 export const COLORS = {
   // Primary
-  crayonOrange: '#E8734A',
-  crayonOrangeLight: '#F4A588',
-  crayonOrangeDark: '#C45A34',
+  crayonOrange: "#E8734A",
+  crayonOrangeLight: "#F4A588",
+  crayonOrangeDark: "#C45A34",
 
   // Secondary (Peach)
-  crayonTeal: '#F0B88A',
-  crayonTealLight: '#F9D9C0',
-  crayonTealDark: '#D99A5C',
+  crayonTeal: "#F0B88A",
+  crayonTealLight: "#F9D9C0",
+  crayonTealDark: "#D99A5C",
 
   // Accent (Blush Pink)
-  crayonPink: '#E89DA1',
-  crayonPinkLight: '#F5CED0',
-  crayonPinkDark: '#C96A70',
+  crayonPink: "#E89DA1",
+  crayonPinkLight: "#F5CED0",
+  crayonPinkDark: "#C96A70",
 
   // Highlight (Sunshine Yellow)
-  crayonYellow: '#F5C842',
-  crayonYellowLight: '#FFE599',
-  crayonYellowDark: '#D4A122',
+  crayonYellow: "#F5C842",
+  crayonYellowLight: "#FFE599",
+  crayonYellowDark: "#D4A122",
 
   // Success (Sage Green)
-  crayonGreen: '#8AAE5C',
-  crayonGreenLight: '#B5D08C',
-  crayonGreenDark: '#6B8B47',
+  crayonGreen: "#8AAE5C",
+  crayonGreenLight: "#B5D08C",
+  crayonGreenDark: "#6B8B47",
 
   // Creative (Dusty Rose)
-  crayonPurple: '#C499A9',
-  crayonPurpleLight: '#DCC5CE',
-  crayonPurpleDark: '#A77389',
+  crayonPurple: "#C499A9",
+  crayonPurpleLight: "#DCC5CE",
+  crayonPurpleDark: "#A77389",
 
   // Text
-  textPrimary: '#433631',
-  textSecondary: '#6E635B',
-  textMuted: '#938B84',
-  textInverted: '#FFFFFF',
+  textPrimary: "#433631",
+  textSecondary: "#6E635B",
+  textMuted: "#938B84",
+  textInverted: "#FFFFFF",
 
   // Backgrounds
-  background: '#FCF9F5',
-  backgroundDark: '#F3EDE6',
-  backgroundCard: '#FEFDFB',
+  background: "#FCF9F5",
+  backgroundDark: "#F3EDE6",
+  backgroundCard: "#FEFDFB",
 
   // Borders
-  borderLight: '#E8E2DA',
-  borderMedium: '#D6CEC3',
+  borderLight: "#E8E2DA",
+  borderMedium: "#D6CEC3",
 
   // Semantic
-  destructive: '#E53935',
+  destructive: "#E53935",
 } as const;
 ```
 
@@ -3698,13 +3698,13 @@ Web uses `box-shadow`, React Native uses `shadowColor`, `shadowOffset`,
 #### Shadow Presets
 
 ```typescript
-import { Platform, ViewStyle } from 'react-native';
+import { Platform, ViewStyle } from "react-native";
 
 export const SHADOWS = {
   // Light shadow for cards
   card: Platform.select<ViewStyle>({
     ios: {
-      shadowColor: '#E8734A', // crayon orange tint
+      shadowColor: "#E8734A", // crayon orange tint
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.08,
       shadowRadius: 6,
@@ -3717,7 +3717,7 @@ export const SHADOWS = {
   // Medium shadow for elevated elements
   cardHover: Platform.select<ViewStyle>({
     ios: {
-      shadowColor: '#E8734A',
+      shadowColor: "#E8734A",
       shadowOffset: { width: 0, height: 10 },
       shadowOpacity: 0.12,
       shadowRadius: 15,
@@ -3730,7 +3730,7 @@ export const SHADOWS = {
   // Button shadow (primary CTA)
   buttonPrimary: Platform.select<ViewStyle>({
     ios: {
-      shadowColor: '#E8734A',
+      shadowColor: "#E8734A",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.4,
       shadowRadius: 14,
@@ -3743,7 +3743,7 @@ export const SHADOWS = {
   // Subtle inner glow for inputs
   inputFocus: Platform.select<ViewStyle>({
     ios: {
-      shadowColor: '#E8734A',
+      shadowColor: "#E8734A",
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 0.1,
       shadowRadius: 3,
@@ -3840,7 +3840,7 @@ scale.value = withSequence(
 ```tsx
 <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
   <LinearGradient
-    colors={['#E8734A', '#C45A34']}
+    colors={["#E8734A", "#C45A34"]}
     style={[styles.button, SHADOWS.buttonPrimary]}
   >
     <Animated.View style={[animatedStyle]}>
@@ -3868,11 +3868,11 @@ scale.value = withSequence(
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FEFDFB',
+    backgroundColor: "#FEFDFB",
     borderRadius: 32,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#E8E2DA',
+    borderColor: "#E8E2DA",
   },
 });
 ```
@@ -3897,16 +3897,16 @@ const styles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: '#D6CEC3',
+    borderColor: "#D6CEC3",
     borderRadius: 24,
     padding: 16,
-    fontFamily: 'TondoTrial-Regular',
+    fontFamily: "TondoTrial-Regular",
     fontSize: 16,
   },
   inputFocused: {
-    borderColor: '#E8734A',
+    borderColor: "#E8734A",
     ...SHADOWS.inputFocus,
   },
 });

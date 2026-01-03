@@ -140,51 +140,51 @@ export const aiRegionAssignmentSchemaV2 = z.object({
         .number()
         .min(1)
         .max(5)
-        .describe('Starting row (1=top, 5=bottom)'),
-      rowEnd: z.number().min(1).max(5).describe('Ending row'),
+        .describe("Starting row (1=top, 5=bottom)"),
+      rowEnd: z.number().min(1).max(5).describe("Ending row"),
       colStart: z
         .number()
         .min(1)
         .max(5)
-        .describe('Starting column (1=left, 5=right)'),
-      colEnd: z.number().min(1).max(5).describe('Ending column'),
+        .describe("Starting column (1=left, 5=right)"),
+      colEnd: z.number().min(1).max(5).describe("Ending column"),
     })
-    .describe('Grid position using 5x5 grid'),
+    .describe("Grid position using 5x5 grid"),
 
   // Semantic hierarchy
   hierarchy: z
-    .enum(['main-subject', 'background', 'detail'])
-    .describe('Role in the image composition'),
+    .enum(["main-subject", "background", "detail"])
+    .describe("Role in the image composition"),
 
   // Size estimate (kept for backwards compatibility)
-  relativeSize: z.enum(['small', 'medium', 'large']),
+  relativeSize: z.enum(["small", "medium", "large"]),
 
   // Adjacency information for contrast checking
   adjacentTo: z
     .array(z.string())
-    .describe('Descriptions of neighboring regions'),
+    .describe("Descriptions of neighboring regions"),
 
   // Color assignment
-  suggestedColor: z.string().describe('Hex color from the palette'),
-  colorName: z.string().describe('Name of the color'),
-  reasoning: z.string().describe('Brief kid-friendly reason (5-7 words)'),
+  suggestedColor: z.string().describe("Hex color from the palette"),
+  colorName: z.string().describe("Name of the color"),
+  reasoning: z.string().describe("Brief kid-friendly reason (5-7 words)"),
 
   // Confidence score
   confidence: z
     .number()
     .min(0)
     .max(1)
-    .describe('How confident the model is in this assignment'),
+    .describe("How confident the model is in this assignment"),
 });
 
 export const coloringImageAnalysisSchemaV2 = z.object({
   // Scene understanding
   sceneDescription: z
     .string()
-    .describe('Brief description of the overall scene'),
+    .describe("Brief description of the overall scene"),
 
   // Main subject identification
-  mainSubject: z.string().describe('What is the primary focus of this image'),
+  mainSubject: z.string().describe("What is the primary focus of this image"),
 
   // All regions with enhanced data
   regions: z.array(aiRegionAssignmentSchemaV2),
@@ -193,7 +193,7 @@ export const coloringImageAnalysisSchemaV2 = z.object({
   harmonyNotes: z
     .string()
     .optional()
-    .describe('Notes about the overall color scheme'),
+    .describe("Notes about the overall color scheme"),
 });
 ```
 

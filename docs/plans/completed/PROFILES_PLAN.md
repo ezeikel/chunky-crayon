@@ -104,7 +104,7 @@ model ColoringImage {
 
 ```typescript
 // actions/profiles.ts
-'use server';
+"use server";
 
 export async function createProfile(data: CreateProfileInput);
 export async function updateProfile(id: string, data: UpdateProfileInput);
@@ -148,17 +148,17 @@ Full-screen takeover (Netflix-style) shown when:
 ```typescript
 // lib/avatars.ts
 export const AVATARS = [
-  { id: 'crayon-red', name: 'Red Crayon', color: '#FF6B6B' },
-  { id: 'crayon-orange', name: 'Orange Crayon', color: '#FF9F43' },
-  { id: 'crayon-yellow', name: 'Yellow Crayon', color: '#FECA57' },
-  { id: 'crayon-green', name: 'Green Crayon', color: '#1DD1A1' },
-  { id: 'crayon-blue', name: 'Blue Crayon', color: '#54A0FF' },
-  { id: 'crayon-purple', name: 'Purple Crayon', color: '#A29BFE' },
-  { id: 'crayon-pink', name: 'Pink Crayon', color: '#FF85A2' },
-  { id: 'crayon-brown', name: 'Brown Crayon', color: '#C8A879' },
+  { id: "crayon-red", name: "Red Crayon", color: "#FF6B6B" },
+  { id: "crayon-orange", name: "Orange Crayon", color: "#FF9F43" },
+  { id: "crayon-yellow", name: "Yellow Crayon", color: "#FECA57" },
+  { id: "crayon-green", name: "Green Crayon", color: "#1DD1A1" },
+  { id: "crayon-blue", name: "Blue Crayon", color: "#54A0FF" },
+  { id: "crayon-purple", name: "Purple Crayon", color: "#A29BFE" },
+  { id: "crayon-pink", name: "Pink Crayon", color: "#FF85A2" },
+  { id: "crayon-brown", name: "Brown Crayon", color: "#C8A879" },
   // Placeholder slots for custom avatars
-  { id: 'avatar-01', name: 'Character 1', placeholder: true },
-  { id: 'avatar-02', name: 'Character 2', placeholder: true },
+  { id: "avatar-01", name: "Character 1", placeholder: true },
+  { id: "avatar-02", name: "Character 2", placeholder: true },
   // ... up to 10+ custom avatars
 ] as const;
 ```
@@ -167,7 +167,7 @@ export const AVATARS = [
 
 ```tsx
 // components/ProfileAvatar/ProfileAvatar.tsx
-const ProfileAvatar = ({ avatarId, size = 'md' }: Props) => {
+const ProfileAvatar = ({ avatarId, size = "md" }: Props) => {
   const avatar = AVATARS.find((a) => a.id === avatarId);
 
   if (avatar?.placeholder) {
@@ -266,69 +266,69 @@ Keep the current prompt style/format but adjust complexity parameters:
 
 export const DIFFICULTY_MODIFIERS: Record<Difficulty, DifficultyConfig> = {
   BEGINNER: {
-    targetAge: '2-8 years old',
-    shapeSize: 'extra large, simple',
-    lineThickness: 'very thick (4-5px equivalent)',
-    detailLevel: 'minimal - only essential features',
-    background: 'simple or none',
-    complexity: 'very low - big areas easy for small hands to color',
+    targetAge: "2-8 years old",
+    shapeSize: "extra large, simple",
+    lineThickness: "very thick (4-5px equivalent)",
+    detailLevel: "minimal - only essential features",
+    background: "simple or none",
+    complexity: "very low - big areas easy for small hands to color",
     additionalRules: [
-      'All shapes should be large enough for toddler crayons',
-      'No small details or fine lines anywhere',
-      'Maximum of 5-7 distinct colorable areas',
-      'Characters should be cute and non-threatening',
+      "All shapes should be large enough for toddler crayons",
+      "No small details or fine lines anywhere",
+      "Maximum of 5-7 distinct colorable areas",
+      "Characters should be cute and non-threatening",
     ],
   },
   INTERMEDIATE: {
-    targetAge: '9-12 years old',
-    shapeSize: 'medium to large',
-    lineThickness: 'thick (3-4px equivalent)',
-    detailLevel: 'moderate - include interesting features',
-    background: 'simple scene elements allowed',
-    complexity: 'medium - more areas to color, some smaller sections',
+    targetAge: "9-12 years old",
+    shapeSize: "medium to large",
+    lineThickness: "thick (3-4px equivalent)",
+    detailLevel: "moderate - include interesting features",
+    background: "simple scene elements allowed",
+    complexity: "medium - more areas to color, some smaller sections",
     additionalRules: [
-      'Can include more character details (clothing patterns, accessories)',
-      'Background can have 2-3 simple elements',
-      'Around 10-15 distinct colorable areas',
-      'Can include more dynamic poses',
+      "Can include more character details (clothing patterns, accessories)",
+      "Background can have 2-3 simple elements",
+      "Around 10-15 distinct colorable areas",
+      "Can include more dynamic poses",
     ],
   },
   ADVANCED: {
-    targetAge: '13-17 years old',
-    shapeSize: 'varied sizes',
-    lineThickness: 'medium (2-3px equivalent)',
-    detailLevel: 'detailed - include textures and patterns',
-    background: 'full scene with multiple elements',
-    complexity: 'higher - many areas, varied sizes',
+    targetAge: "13-17 years old",
+    shapeSize: "varied sizes",
+    lineThickness: "medium (2-3px equivalent)",
+    detailLevel: "detailed - include textures and patterns",
+    background: "full scene with multiple elements",
+    complexity: "higher - many areas, varied sizes",
     additionalRules: [
-      'Can include pattern details in clothing, objects',
-      'Hair and fur can have more texture lines',
-      'Background can be a full scene',
-      '20-30 distinct colorable areas',
-      'Can include more sophisticated poses and expressions',
+      "Can include pattern details in clothing, objects",
+      "Hair and fur can have more texture lines",
+      "Background can be a full scene",
+      "20-30 distinct colorable areas",
+      "Can include more sophisticated poses and expressions",
     ],
   },
   EXPERT: {
-    targetAge: '18+ years old',
-    shapeSize: 'all sizes including fine details',
-    lineThickness: 'varied (1-3px equivalent)',
-    detailLevel: 'intricate - rich in detail and patterns',
-    background: 'complex, detailed scenes',
-    complexity: 'high - intricate areas suitable for adult colorists',
+    targetAge: "18+ years old",
+    shapeSize: "all sizes including fine details",
+    lineThickness: "varied (1-3px equivalent)",
+    detailLevel: "intricate - rich in detail and patterns",
+    background: "complex, detailed scenes",
+    complexity: "high - intricate areas suitable for adult colorists",
     additionalRules: [
-      'Mandala-style patterns welcome',
-      'Intricate details encouraged',
-      'Complex backgrounds with many elements',
-      '40+ distinct colorable areas',
-      'Can include zentangle-style patterns',
-      'Fine details and small sections allowed',
+      "Mandala-style patterns welcome",
+      "Intricate details encouraged",
+      "Complex backgrounds with many elements",
+      "40+ distinct colorable areas",
+      "Can include zentangle-style patterns",
+      "Fine details and small sections allowed",
     ],
   },
 };
 
 export const createDifficultyAwarePrompt = (
   description: string,
-  difficulty: Difficulty = 'BEGINNER',
+  difficulty: Difficulty = "BEGINNER",
 ) => {
   const config = DIFFICULTY_MODIFIERS[difficulty];
 
@@ -344,7 +344,7 @@ Complexity requirements for this difficulty:
 - Background: ${config.background}
 - Overall complexity: ${config.complexity}
 
-${config.additionalRules.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
+${config.additionalRules.map((rule, i) => `${i + 1}. ${rule}`).join("\n")}
 
 ${COLORING_IMAGE_DETAILED_SUFFIX}`;
 };
@@ -363,7 +363,7 @@ export async function generateColoringImage(
     ? await getProfile(profileId)
     : await getActiveProfile();
 
-  const difficulty = profile?.difficulty ?? 'BEGINNER';
+  const difficulty = profile?.difficulty ?? "BEGINNER";
 
   // Generate with difficulty-aware prompt
   const prompt = createDifficultyAwarePrompt(description, difficulty);
@@ -641,7 +641,7 @@ Store active profile ID in:
 ```typescript
 // middleware.ts
 export function middleware(request: NextRequest) {
-  const activeProfileId = request.cookies.get('activeProfileId');
+  const activeProfileId = request.cookies.get("activeProfileId");
   // Make available to server components
 }
 ```

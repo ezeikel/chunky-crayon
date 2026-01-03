@@ -497,7 +497,7 @@ interface BaseEventProperties {
   utm_campaign?: string;
 
   // Device
-  device: 'mobile' | 'tablet' | 'desktop';
+  device: "mobile" | "tablet" | "desktop";
   browser?: string;
 
   // Page context

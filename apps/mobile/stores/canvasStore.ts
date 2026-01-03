@@ -137,6 +137,10 @@ export type DrawingAction = {
   stickerSize?: number;
   // For magic auto-fill actions (stores all fills applied)
   magicFills?: Array<{ x: number; y: number; color: string }>;
+  // Cross-platform source dimensions - each action stores where it was recorded
+  // so actions from web (CSS pixels ~880) and mobile (SVG viewBox ~1024) can coexist
+  sourceWidth?: number;
+  sourceHeight?: number;
 };
 
 // Capture function type for getting canvas image data

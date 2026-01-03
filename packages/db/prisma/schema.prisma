@@ -20,15 +20,16 @@ model User {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  subscriptions      Subscription[]
-  creditTransactions CreditTransaction[]
-  coloringImages     ColoringImage[]
-  savedArtworks      SavedArtwork[] // User's saved colored artwork
-  profiles           Profile[] // Multi-profile support for families
-  userStickers       UserSticker[] // Collected stickers
+  subscriptions        Subscription[]
+  creditTransactions   CreditTransaction[]
+  coloringImages       ColoringImage[]
+  savedArtworks        SavedArtwork[] // User's saved colored artwork
+  profiles             Profile[] // Multi-profile support for families
+  userStickers         UserSticker[] // Collected stickers
+  canvasProgress       CanvasProgress[] // Canvas progress for cross-platform sync
   // Auth.js relations
-  accounts           Account[]
-  sessions           Session[]
+  accounts             Account[]
+  sessions             Session[]
   // Mobile device sessions
   mobileDeviceSessions MobileDeviceSession[]
 
@@ -86,7 +87,31 @@ model ColoringImage {
   colorMapJson        String?   @db.Text // JSON with 5x5 grid color assignments
   colorMapGeneratedAt DateTime? // When the color map was generated
 
+  // Canvas progress for cross-platform sync
+  canvasProgress CanvasProgress[]
+
   @@map("coloring_images")
+}
+
+// Canvas progress model for cross-platform synchronization
+model CanvasProgress {
+  id              String   @id @default(cuid())
+  userId          String
+  coloringImageId String
+  actions         Json // Serialized drawing actions
+  canvasWidth     Int? // Canvas width for aspect ratio (optional for backward compatibility)
+  canvasHeight    Int? // Canvas height for aspect ratio (optional for backward compatibility)
+  version         Int      @default(1) // For conflict resolution
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coloringImage ColoringImage @relation(fields: [coloringImageId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, coloringImageId])
+  @@index([userId])
+  @@index([coloringImageId])
+  @@map("canvas_progress")
 }
 
 // Auth.js models
@@ -131,12 +156,12 @@ model VerificationToken {
 
 // Mobile device session - links device IDs to users for app authentication
 model MobileDeviceSession {
-  id        String   @id @default(cuid())
-  deviceId  String   @unique // Unique device identifier from mobile app
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  deviceId   String   @unique // Unique device identifier from mobile app
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   lastSeenAt DateTime @default(now()) // Last time device made an API call
 
   @@map("mobile_device_sessions")

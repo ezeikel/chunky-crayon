@@ -20,8 +20,6 @@ import {
   SkPath,
   Skia,
   Path,
-  Image as SkiaImage,
-  useImage,
   BlurMask,
   Text as SkiaText,
 } from "@shopify/react-native-skia";
@@ -64,6 +62,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
   const canvasRef = useCanvasRef();
   const { width: screenWidth } = useWindowDimensions();
   const svg = useSVG(coloringImage.svgUrl);
+
+  // Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
+  const canvasSize = screenWidth - 32 - 24;
 
   const [svgDimensions, setSvgDimensions] = useState<Dimension | null>(null);
   const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
@@ -190,10 +191,117 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
       if (isNewImage) {
         console.log(`[CANVAS_INIT] Loading saved state BEFORE reset...`);
         // Load saved state BEFORE resetting to check if we have data
-        const savedActions = await loadCanvasState(currentImageId);
+        const savedData = await loadCanvasState(currentImageId);
+        let savedActions = savedData?.actions || [];
+        // Progress-level dimensions (fallback for actions without per-action dimensions)
+        const progressSourceWidth = savedData?.sourceCanvasWidth;
+        const progressSourceHeight = savedData?.sourceCanvasHeight;
+
         console.log(
-          `[CANVAS_INIT] Loaded ${savedActions?.length || 0} saved actions`,
+          `[CANVAS_INIT] Loaded ${savedActions.length} saved actions, progress-level dimensions: ${progressSourceWidth}x${progressSourceHeight}, svgDimensions: ${svgDimensions?.width}x${svgDimensions?.height}`,
         );
+
+        // Scale each action based on its OWN source dimensions (per-action scaling)
+        // This handles mixed actions from different platforms correctly:
+        // - Mobile actions have sourceWidth: 1024 (SVG viewBox) → no scaling needed
+        // - Web actions have sourceWidth: 880 (CSS pixels) → scale to SVG coords
+        if (savedActions.length > 0) {
+          // Target is SVG dimensions (what mobile uses for coordinate space)
+          // Fall back to 1024 if SVG not loaded yet (common SVG size)
+          const targetWidth = svgDimensions?.width || 1024;
+          const targetHeight = svgDimensions?.height || 1024;
+
+          savedActions = savedActions.map((action) => {
+            // Use per-action source dimensions if available, fall back to progress-level
+            const actionSourceWidth =
+              action.sourceWidth || progressSourceWidth || targetWidth;
+            const actionSourceHeight =
+              action.sourceHeight || progressSourceHeight || targetHeight;
+
+            const scaleX = targetWidth / actionSourceWidth;
+            const scaleY = targetHeight / actionSourceHeight;
+
+            // Only scale if there's a meaningful difference (action came from different coordinate space)
+            const needsScaling =
+              Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01;
+
+            if (!needsScaling) {
+              return action;
+            }
+
+            console.log(
+              `[CANVAS_INIT] Scaling action (${action.type}) from ${actionSourceWidth}x${actionSourceHeight} to ${targetWidth}x${targetHeight} (scale: ${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`,
+            );
+
+            if (action.type === "stroke" && action.path) {
+              // Transform the path using Skia's matrix transformation
+              const scaledPath = action.path.copy();
+              scaledPath.transform(Skia.Matrix().scale(scaleX, scaleY));
+              return {
+                ...action,
+                path: scaledPath,
+                // Also scale stroke width proportionally
+                strokeWidth: action.strokeWidth
+                  ? action.strokeWidth * Math.min(scaleX, scaleY)
+                  : action.strokeWidth,
+                // Update source dimensions to target - coordinates are now in mobile space
+                // This prevents double-scaling on next load
+                sourceWidth: targetWidth,
+                sourceHeight: targetHeight,
+              };
+            } else if (action.type === "fill") {
+              // Scale fill coordinates
+              return {
+                ...action,
+                fillX:
+                  action.fillX !== undefined
+                    ? action.fillX * scaleX
+                    : undefined,
+                fillY:
+                  action.fillY !== undefined
+                    ? action.fillY * scaleY
+                    : undefined,
+                sourceWidth: targetWidth,
+                sourceHeight: targetHeight,
+              };
+            } else if (action.type === "sticker") {
+              // Scale sticker position and size
+              return {
+                ...action,
+                stickerX:
+                  action.stickerX !== undefined
+                    ? action.stickerX * scaleX
+                    : undefined,
+                stickerY:
+                  action.stickerY !== undefined
+                    ? action.stickerY * scaleY
+                    : undefined,
+                stickerSize: action.stickerSize
+                  ? action.stickerSize * Math.min(scaleX, scaleY)
+                  : action.stickerSize,
+                sourceWidth: targetWidth,
+                sourceHeight: targetHeight,
+              };
+            } else if (action.type === "magic-fill" && action.magicFills) {
+              // Scale magic-fill coordinates
+              return {
+                ...action,
+                magicFills: action.magicFills.map((fill) => ({
+                  ...fill,
+                  x: fill.x * scaleX,
+                  y: fill.y * scaleY,
+                })),
+                sourceWidth: targetWidth,
+                sourceHeight: targetHeight,
+              };
+            }
+            return action;
+          });
+
+          console.log(
+            `[CANVAS_INIT] Processed ${savedActions.length} actions with per-action scaling`,
+          );
+        }
 
         // Check if we've navigated away before the load completed
         if (isCancelled) {
@@ -211,7 +319,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         setImageId(currentImageId);
 
         // Restore saved actions if they exist
-        if (savedActions && savedActions.length > 0) {
+        if (savedActions.length > 0) {
           console.log(
             `[CANVAS_INIT] Restoring ${savedActions.length} actions to store...`,
           );
@@ -283,8 +391,19 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
 
         if (actionsToSave.length > 0 && isInitializedRef.current) {
           console.log(`[CANVAS_FOCUS] Saving state on focus loss...`);
-          // Make save async and await it to see if it completes
-          saveCanvasState(coloringImage.id, actionsToSave)
+          // Pass SVG dimensions (coordinate space) for cross-platform sync
+          // Mobile strokes are in SVG viewBox space, not CSS layout space
+          const saveWidth = svgDimensions?.width || 1024;
+          const saveHeight = svgDimensions?.height || 1024;
+          console.log(
+            `[CANVAS_FOCUS] Saving with SVG dimensions: ${saveWidth}x${saveHeight}`,
+          );
+          saveCanvasState(
+            coloringImage.id,
+            actionsToSave,
+            saveWidth,
+            saveHeight,
+          )
             .then((success) => {
               console.log(
                 `[CANVAS_FOCUS] Save completed with result: ${success}`,
@@ -318,8 +437,14 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         currentState.historyIndex + 1,
       );
       if (actionsToSave.length > 0) {
-        console.log(`[AUTO_SAVE] Saving ${actionsToSave.length} actions...`);
-        saveCanvasState(coloringImage.id, actionsToSave)
+        // Pass SVG dimensions (coordinate space) for cross-platform sync
+        // Mobile strokes are in SVG viewBox space (typically 1024x1024), not CSS layout space
+        const saveWidth = svgDimensions?.width || 1024;
+        const saveHeight = svgDimensions?.height || 1024;
+        console.log(
+          `[AUTO_SAVE] Saving ${actionsToSave.length} actions with SVG dimensions: ${saveWidth}x${saveHeight}`,
+        );
+        saveCanvasState(coloringImage.id, actionsToSave, saveWidth, saveHeight)
           .then((success) => {
             console.log(`[AUTO_SAVE] Save completed with result: ${success}`);
           })
@@ -336,9 +461,6 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
       }
     };
   }, [history, historyIndex, coloringImage.id, setDirty]);
-
-  // Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
-  const canvasSize = screenWidth - 32 - 24;
 
   const src = svgDimensions
     ? rect(0, 0, svgDimensions.width, svgDimensions.height)
@@ -415,6 +537,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         brushType,
         strokeWidth,
         startHue: brushType === "rainbow" ? rainbowHue : undefined,
+        // Store source dimensions for cross-platform sync
+        sourceWidth: svgDimensions?.width,
+        sourceHeight: svgDimensions?.height,
       };
       addAction(action);
       setCurrentPath(null);
@@ -434,6 +559,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     addAction,
     setScroll,
     advanceRainbowHue,
+    svgDimensions,
   ]);
 
   // Handle fill tool tap
@@ -455,6 +581,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         fillY: coords.y,
         fillType: fillType,
         patternType: fillType === "pattern" ? selectedPattern : undefined,
+        // Store source dimensions for cross-platform sync
+        sourceWidth: svgDimensions?.width,
+        sourceHeight: svgDimensions?.height,
       };
       addAction(action);
     },
@@ -465,6 +594,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
       selectedPattern,
       touchToSvgCoords,
       addAction,
+      svgDimensions,
     ],
   );
 
@@ -487,6 +617,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         stickerX: coords.x,
         stickerY: coords.y,
         stickerSize: stickerSize,
+        // Store source dimensions for cross-platform sync
+        sourceWidth: svgDimensions?.width,
+        sourceHeight: svgDimensions?.height,
       };
       addAction(action);
     },
@@ -497,6 +630,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
       stickerSize,
       touchToSvgCoords,
       addAction,
+      svgDimensions,
     ],
   );
 
@@ -558,6 +692,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
           type: "magic-fill",
           color: colorMap.gridColors[0]?.suggestedColor || "#FFFFFF",
           magicFills: fills,
+          // Store source dimensions for cross-platform sync
+          sourceWidth: svgDimensions?.width,
+          sourceHeight: svgDimensions?.height,
         };
         addAction(action);
       }

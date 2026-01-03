@@ -103,7 +103,7 @@ export const getUserId = async (action?: string) => {
 
   // Fall back to mobile JWT (set by middleware)
   const headersList = await headers();
-  const mobileUserId = headersList.get('x-user-id');
+  const mobileUserId = headersList.get("x-user-id");
   if (mobileUserId) return mobileUserId;
 
   // Not authenticated
@@ -118,12 +118,12 @@ Middleware decrypts mobile JWT and sets headers:
 
 ```typescript
 // In middleware.ts
-if (pathname.startsWith('/api/mobile')) {
-  const token = req.headers.get('authorization')?.split(' ')[1];
+if (pathname.startsWith("/api/mobile")) {
+  const token = req.headers.get("authorization")?.split(" ")[1];
   if (token) {
     const payload = await decryptMobileToken(token);
-    reqHeaders.set('x-user-id', payload.userId);
-    reqHeaders.set('x-profile-id', payload.profileId);
+    reqHeaders.set("x-user-id", payload.userId);
+    reqHeaders.set("x-profile-id", payload.profileId);
   }
 }
 ```
@@ -260,10 +260,10 @@ export async function GET(request: NextRequest) {
 
 ```typescript
 // app/actions/feed.ts
-'use server';
+"use server";
 
-import { getUserId, getProfileId } from '@/utils/user';
-import { getMobileFeed } from '@/lib/feed/service';
+import { getUserId, getProfileId } from "@/utils/user";
+import { getMobileFeed } from "@/lib/feed/service";
 
 export async function getMobileFeedAction() {
   const userId = await getUserId();
@@ -275,7 +275,7 @@ export async function getMobileFeedAction() {
 
 ```typescript
 // app/api/mobile/feed/route.ts
-import { getMobileFeedAction } from '@/app/actions/feed';
+import { getMobileFeedAction } from "@/app/actions/feed";
 
 const corsHeaders = {
   /* ... */
@@ -286,9 +286,9 @@ export async function GET() {
     const feed = await getMobileFeedAction();
     return NextResponse.json(feed, { headers: corsHeaders });
   } catch (error) {
-    console.error('Error fetching mobile feed:', error);
+    console.error("Error fetching mobile feed:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch feed' },
+      { error: "Failed to fetch feed" },
       { status: 500, headers: corsHeaders },
     );
   }
@@ -361,7 +361,7 @@ export const getUserId = async (action?: string) => {
   const headersList = await headers();
 
   // Check BOTH sources
-  const userId = session?.user.id || headersList.get('x-user-id');
+  const userId = session?.user.id || headersList.get("x-user-id");
 
   if (!userId) {
     console.error(`You need to be logged in to ${action}.`);
@@ -373,14 +373,14 @@ export const getUserId = async (action?: string) => {
 
 ```typescript
 // parking-ticket-pal/apps/web/middleware.ts
-if (pathname.startsWith('/api')) {
+if (pathname.startsWith("/api")) {
   if (session) return NextResponse.next();
 
-  const token = req.headers.get('authorization')?.split(' ')[1];
+  const token = req.headers.get("authorization")?.split(" ")[1];
   if (token) {
     const payload = await decrypt(token);
-    reqHeaders.set('x-user-id', payload.id);
-    reqHeaders.set('x-user-email', payload.email);
+    reqHeaders.set("x-user-id", payload.id);
+    reqHeaders.set("x-user-email", payload.email);
   }
 }
 ```

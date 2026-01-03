@@ -290,15 +290,15 @@ Add "What's Included" section above plan cards:
 <FadeIn direction="up" delay={0.1}>
   <section className="mb-12 text-center">
     <h2 className="font-tondo text-2xl font-bold mb-6">
-      {t('included.title')}
+      {t("included.title")}
     </h2>
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-      <IncludedFeature icon={Sparkles} text={t('included.aiCreation')} />
-      <IncludedFeature icon={Palette} text={t('included.colorOnline')} />
-      <IncludedFeature icon={Bookmark} text={t('included.saveFavorites')} />
-      <IncludedFeature icon={Share2} text={t('included.shareCreations')} />
-      <IncludedFeature icon={Star} text={t('included.collectStickers')} />
-      <IncludedFeature icon={Smartphone} text={t('included.mobileApps')} />
+      <IncludedFeature icon={Sparkles} text={t("included.aiCreation")} />
+      <IncludedFeature icon={Palette} text={t("included.colorOnline")} />
+      <IncludedFeature icon={Bookmark} text={t("included.saveFavorites")} />
+      <IncludedFeature icon={Share2} text={t("included.shareCreations")} />
+      <IncludedFeature icon={Star} text={t("included.collectStickers")} />
+      <IncludedFeature icon={Smartphone} text={t("included.mobileApps")} />
     </div>
   </section>
 </FadeIn>;

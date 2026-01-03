@@ -33,9 +33,9 @@ ColoringArea/
 ```typescript
 {
   selectedColor: string; // Hex color
-  brushSize: 'small' | 'medium' | 'large';
-  brushType: 'crayon' | 'marker' | 'eraser';
-  activeTool: 'brush' | 'fill';
+  brushSize: "small" | "medium" | "large";
+  brushType: "crayon" | "marker" | "eraser";
+  activeTool: "brush" | "fill";
   // + undo/redo history, muted, unsavedChanges
 }
 ```
@@ -138,12 +138,12 @@ const createPattern = (
   pattern: FillPattern,
   color: string,
 ): CanvasPattern | string => {
-  if (pattern === 'solid') return color;
+  if (pattern === "solid") return color;
 
-  const patternCanvas = document.createElement('canvas');
-  const patternCtx = patternCanvas.getContext('2d');
+  const patternCanvas = document.createElement("canvas");
+  const patternCtx = patternCanvas.getContext("2d");
   // Draw pattern tile...
-  return ctx.createPattern(patternCanvas, 'repeat');
+  return ctx.createPattern(patternCanvas, "repeat");
 };
 ```
 
@@ -185,7 +185,7 @@ delight.
 **New tool type:**
 
 ```typescript
-type ColoringTool = 'brush' | 'fill' | 'sticker';
+type ColoringTool = "brush" | "fill" | "sticker";
 ```
 
 **Sticker state:**
@@ -266,13 +266,13 @@ pens.
 
 ```typescript
 type BrushType =
-  | 'crayon'
-  | 'marker'
-  | 'eraser'
-  | 'glitter'
-  | 'rainbow'
-  | 'glow'
-  | 'neon';
+  | "crayon"
+  | "marker"
+  | "eraser"
+  | "glitter"
+  | "rainbow"
+  | "glow"
+  | "neon";
 ```
 
 **Glitter brush:**

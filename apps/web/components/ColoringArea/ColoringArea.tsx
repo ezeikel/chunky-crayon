@@ -69,6 +69,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       activeTool,
       setActiveTool,
       setBrushType,
+      drawingActions,
+      clearDrawingActions,
+      addDrawingAction,
+      setDrawingActions,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -253,6 +257,9 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       clearHistory();
       redoStatesRef.current.clear();
 
+      // Clear serializable drawing actions
+      clearDrawingActions();
+
       // Reset magic color map (so it re-generates if magic tool is active)
       resetMagicColorMap();
 
@@ -268,6 +275,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     }, [
       coloringImage.id,
       clearHistory,
+      clearDrawingActions,
       resetMagicColorMap,
       setActiveTool,
       setBrushType,
@@ -311,7 +319,11 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       saveTimerRef.current = setTimeout(() => {
         const canvas = canvasRef.current?.getCanvas();
         if (canvas) {
-          saveColoringProgress(coloringImage.id as string, canvas);
+          saveColoringProgress(
+            coloringImage.id as string,
+            canvas,
+            drawingActions,
+          );
           setHasUnsavedChanges(false);
         }
       }, 1000);
@@ -321,20 +333,83 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           clearTimeout(saveTimerRef.current);
         }
       };
-    }, [hasUnsavedChanges, coloringImage.id, setHasUnsavedChanges]);
+    }, [
+      hasUnsavedChanges,
+      coloringImage.id,
+      setHasUnsavedChanges,
+      drawingActions,
+    ]);
 
     // Handle canvas ready - restore any saved progress
     const handleCanvasReady = useCallback(async () => {
+      console.log(
+        `[ColoringArea] handleCanvasReady called, coloringImage.id=${coloringImage.id}, canvasRef.current=${!!canvasRef.current}`,
+      );
       canvasReadyRef.current = true;
 
-      if (!coloringImage.id) return;
-
-      // Try to load saved progress
-      const savedImage = await loadColoringProgress(coloringImage.id);
-      if (savedImage && canvasRef.current) {
-        canvasRef.current.restoreFromImage(savedImage);
+      if (!coloringImage.id) {
+        console.log(`[ColoringArea] Skipping load - no coloringImage.id`);
+        return;
       }
-    }, [coloringImage.id]);
+
+      // Try to load saved progress (actions + optional local snapshot)
+      const savedProgress = await loadColoringProgress(coloringImage.id);
+      console.log(
+        `[ColoringArea] loadColoringProgress returned:`,
+        savedProgress
+          ? {
+              hasImage: !!savedProgress.image,
+              actionsCount: savedProgress.actions?.length || 0,
+              version: savedProgress.version,
+              source: savedProgress.source,
+              dimensions: `${savedProgress.sourceWidth}x${savedProgress.sourceHeight}`,
+            }
+          : 'null',
+      );
+
+      if (savedProgress && canvasRef.current) {
+        // Restore visual state from local snapshot if available (quick restore)
+        if (savedProgress.image) {
+          canvasRef.current.restoreFromImage(savedProgress.image);
+          console.log(`[ColoringArea] Restored canvas from local snapshot`);
+        } else if (savedProgress.actions.length > 0) {
+          // Server data only (no local snapshot) - replay actions to restore canvas
+          console.log(
+            `[ColoringArea] Replaying ${savedProgress.actions.length} actions from server (source dimensions: ${savedProgress.sourceWidth}x${savedProgress.sourceHeight})`,
+          );
+          let replayedCount = 0;
+          for (const action of savedProgress.actions) {
+            const success = canvasRef.current.replayAction(
+              action,
+              savedProgress.sourceWidth,
+              savedProgress.sourceHeight,
+            );
+            if (success) replayedCount++;
+          }
+          console.log(
+            `[ColoringArea] Successfully replayed ${replayedCount}/${savedProgress.actions.length} actions`,
+          );
+
+          // Force canvas repaint after bulk replay to flush GPU cache
+          // This fixes display issues where canvas content doesn't appear until devtools toggle
+          if (replayedCount > 0) {
+            requestAnimationFrame(() => {
+              canvasRef.current?.forceRepaint();
+            });
+          }
+        }
+
+        // Restore drawing actions to context for future saves
+        // Use setDrawingActions directly to avoid triggering hasUnsavedChanges
+        // (addDrawingAction sets hasUnsavedChanges(true) which would trigger auto-save)
+        if (savedProgress.actions.length > 0) {
+          setDrawingActions(savedProgress.actions);
+          console.log(
+            `[ColoringArea] Restored ${savedProgress.actions.length} drawing actions to context`,
+          );
+        }
+      }
+    }, [coloringImage.id, setDrawingActions]);
 
     // Handle region revealed by magic brush
     const handleRegionRevealed = useCallback(

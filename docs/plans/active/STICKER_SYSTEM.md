@@ -226,24 +226,24 @@ Tags from ColoringImage are mapped to sticker categories:
 
 ```typescript
 const categoryMappings = {
-  animals: ['animal', 'animals', 'pet', 'cat', 'dog', 'bird', 'fish'],
+  animals: ["animal", "animals", "pet", "cat", "dog", "bird", "fish"],
   fantasy: [
-    'fantasy',
-    'magic',
-    'unicorn',
-    'dragon',
-    'fairy',
-    'wizard',
-    'castle',
+    "fantasy",
+    "magic",
+    "unicorn",
+    "dragon",
+    "fairy",
+    "wizard",
+    "castle",
   ],
-  space: ['space', 'astronaut', 'rocket', 'planet', 'star', 'moon', 'alien'],
-  nature: ['nature', 'flower', 'tree', 'forest', 'garden', 'plant'],
-  vehicles: ['vehicle', 'car', 'truck', 'train', 'plane', 'boat'],
-  dinosaurs: ['dinosaur', 'dino', 'prehistoric', 't-rex', 'jurassic'],
-  ocean: ['ocean', 'sea', 'underwater', 'beach', 'whale', 'dolphin', 'shark'],
-  food: ['food', 'fruit', 'vegetable', 'cake', 'dessert', 'cooking'],
-  sports: ['sport', 'soccer', 'football', 'basketball', 'baseball', 'tennis'],
-  holidays: ['holiday', 'christmas', 'halloween', 'easter', 'birthday'],
+  space: ["space", "astronaut", "rocket", "planet", "star", "moon", "alien"],
+  nature: ["nature", "flower", "tree", "forest", "garden", "plant"],
+  vehicles: ["vehicle", "car", "truck", "train", "plane", "boat"],
+  dinosaurs: ["dinosaur", "dino", "prehistoric", "t-rex", "jurassic"],
+  ocean: ["ocean", "sea", "underwater", "beach", "whale", "dolphin", "shark"],
+  food: ["food", "fruit", "vegetable", "cake", "dessert", "cooking"],
+  sports: ["sport", "soccer", "football", "basketball", "baseball", "tennis"],
+  holidays: ["holiday", "christmas", "halloween", "easter", "birthday"],
 };
 ```
 
