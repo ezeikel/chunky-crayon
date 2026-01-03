@@ -485,7 +485,11 @@ export const POST = async (req: Request) => {
         include: { user: true },
       });
 
-      if (subscription && subscription.user.stripeCustomerId) {
+      if (
+        subscription &&
+        subscription.user.stripeCustomerId &&
+        subscription.user.email
+      ) {
         console.error(
           `Payment failed for user ${subscription.user.email} (subscription ${subscriptionId}). ` +
             `Attempt ${invoiceData.attempt_count}. Invoice: ${invoiceData.id}`,
