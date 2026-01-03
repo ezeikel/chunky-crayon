@@ -150,16 +150,14 @@ DOTENV_CONFIG_PATH=apps/web/.env.local \
   pnpm tsx -r dotenv/config apps/web/scripts/migrate-blob-urls-to-r2.ts
 ```
 
-### 5. Cleanup (Optional)
+## R2 Durability & Backups
 
-After confirming R2 works correctly:
+R2 provides **11 9s durability** (99.999999999%) - same as AWS S3. Data loss is extremely rare.
 
-1. Remove `@vercel/blob` from `package.json`
-2. Archive or delete legacy utilities:
-   - `utils/backupVercelBlobsToR2.ts`
-   - `utils/syncBlobStorage.ts`
-   - `utils/syncBlobStorageReverse.ts`
-   - `app/api/utils/blob/backup/route.ts`
+No automatic backups are configured. Options if needed:
+- Replicate to a second R2 bucket
+- Backup to another provider (S3, Backblaze B2)
+- Most applications trust R2's built-in durability
 
 ## Rollback Plan
 
