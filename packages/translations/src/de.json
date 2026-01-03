@@ -1147,7 +1147,30 @@
     "chooseMethod": "Wähle deine Lieblings-Anmeldemethode",
     "orContinueWith": "Oder weiter mit",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "Wenn du weitermachst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu."
+    "termsAgreement": "Wenn du weitermachst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
+    "verifyRequest": {
+      "title": "Schau in deine E-Mails!",
+      "description": "Wir haben dir einen magischen Link zum Anmelden geschickt. Klicke auf den Link in deiner E-Mail, um weiterzumachen.",
+      "checkSpam": "Nicht zu sehen? Schau in deinen Spam-Ordner.",
+      "linkExpiry": "Der Link läuft in 24 Stunden ab.",
+      "tryDifferentEmail": "Andere E-Mail verwenden"
+    },
+    "error": {
+      "title": "Etwas ist schiefgelaufen",
+      "tryAgain": "Bitte versuche die Anmeldung erneut. Wenn das Problem bleibt, kontaktiere den Support.",
+      "backToSignIn": "Zurück zur Anmeldung",
+      "goHome": "Zur Startseite"
+    },
+    "errors": {
+      "configuration": "Es gibt ein Problem mit der Server-Konfiguration. Bitte versuche es später noch einmal.",
+      "accessDenied": "Zugriff verweigert. Du hast keine Berechtigung, dich anzumelden.",
+      "verification": "Der Anmeldelink ist abgelaufen oder wurde schon benutzt. Bitte fordere einen neuen an.",
+      "oauth": "Es gab ein Problem beim Anmelden mit deinem Konto. Bitte versuche es noch einmal.",
+      "email": "Beim Senden der Anmelde-E-Mail ist etwas schiefgelaufen. Bitte versuche es noch einmal.",
+      "credentials": "Ungültige Zugangsdaten. Bitte prüfe deine E-Mail und versuche es erneut.",
+      "sessionRequired": "Bitte melde dich an, um diese Seite zu öffnen.",
+      "default": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es noch einmal."
+    }
   },
   "errors": {
     "generic": "Oh nein! Da ist etwas schiefgelaufen. Bitte versuch’s nochmal.",

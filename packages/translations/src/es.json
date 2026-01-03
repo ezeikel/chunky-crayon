@@ -1147,7 +1147,30 @@
     "chooseMethod": "Elige tu forma favorita de iniciar sesión",
     "orContinueWith": "O continúa con",
     "emailPlaceholder": "nombre@ejemplo.com",
-    "termsAgreement": "Al continuar, aceptas nuestros Términos del servicio y Política de privacidad."
+    "termsAgreement": "Al continuar, aceptas nuestros Términos del servicio y Política de privacidad.",
+    "verifyRequest": {
+      "title": "¡Revisa tu correo!",
+      "description": "Te enviamos un enlace mágico para iniciar sesión. Toca el enlace de tu correo para continuar.",
+      "checkSpam": "¿No lo ves? Revisa la carpeta de spam.",
+      "linkExpiry": "El enlace caduca en 24 horas.",
+      "tryDifferentEmail": "Usar otro correo"
+    },
+    "error": {
+      "title": "Algo salió mal",
+      "tryAgain": "Vuelve a intentar iniciar sesión. Si el problema continúa, contacta con soporte.",
+      "backToSignIn": "Volver a iniciar sesión",
+      "goHome": "Ir a inicio"
+    },
+    "errors": {
+      "configuration": "Hay un problema con la configuración del servidor. Inténtalo más tarde.",
+      "accessDenied": "Acceso denegado. No tienes permiso para iniciar sesión.",
+      "verification": "El enlace para iniciar sesión caducó o ya se usó. Pide uno nuevo.",
+      "oauth": "Hubo un problema al iniciar sesión con tu cuenta. Inténtalo de nuevo.",
+      "email": "Hubo un problema al enviar el correo de inicio de sesión. Inténtalo de nuevo.",
+      "credentials": "Credenciales no válidas. Revisa tu correo e inténtalo de nuevo.",
+      "sessionRequired": "Inicia sesión para entrar a esta página.",
+      "default": "Ocurrió un error inesperado. Inténtalo de nuevo."
+    }
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",

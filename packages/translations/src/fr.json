@@ -1147,7 +1147,30 @@
     "chooseMethod": "Choisis ta méthode de connexion préférée",
     "orContinueWith": "Ou continuer avec",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "En continuant, tu acceptes nos Conditions d’utilisation et notre Politique de confidentialité."
+    "termsAgreement": "En continuant, tu acceptes nos Conditions d’utilisation et notre Politique de confidentialité.",
+    "verifyRequest": {
+      "title": "Vérifiez votre e-mail !",
+      "description": "On vous a envoyé un lien magique pour vous connecter. Cliquez sur le lien dans votre e-mail pour continuer.",
+      "checkSpam": "Vous ne le voyez pas ? Regardez dans vos spams.",
+      "linkExpiry": "Le lien expire dans 24 heures.",
+      "tryDifferentEmail": "Utiliser un autre e-mail"
+    },
+    "error": {
+      "title": "Oups, un souci",
+      "tryAgain": "Essayez de vous reconnecter. Si le problème continue, contactez l’assistance.",
+      "backToSignIn": "Retour à la connexion",
+      "goHome": "Aller à l’accueil"
+    },
+    "errors": {
+      "configuration": "Il y a un problème de configuration du serveur. Réessayez plus tard.",
+      "accessDenied": "Accès refusé. Vous n’avez pas la permission de vous connecter.",
+      "verification": "Le lien de connexion a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
+      "oauth": "Un problème est survenu lors de la connexion avec votre compte. Réessayez.",
+      "email": "Un problème est survenu lors de l’envoi de l’e-mail de connexion. Réessayez.",
+      "credentials": "Identifiants invalides. Vérifiez votre e-mail et réessayez.",
+      "sessionRequired": "Connectez-vous pour accéder à cette page.",
+      "default": "Une erreur inattendue est survenue. Réessayez."
+    }
   },
   "errors": {
     "generic": "Oups, quelque chose s’est mal passé. Réessaie.",
