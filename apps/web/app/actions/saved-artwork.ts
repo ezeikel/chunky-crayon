@@ -3,11 +3,11 @@
 import { put } from '@vercel/blob';
 import { revalidatePath } from 'next/cache';
 import { db } from '@chunky-crayon/db';
-import { auth } from '@/auth';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { checkAndAwardStickers } from '@/lib/stickers/service';
 import { checkAndUpdateColoEvolution } from '@/app/actions/colo';
+import { ACTIONS } from '@/constants';
 import type { Sticker } from '@/lib/stickers/types';
 import type { EvolutionResult } from '@/lib/colo';
 
@@ -33,15 +33,10 @@ export async function saveArtworkToGallery(
   title?: string,
 ): Promise<SaveArtworkResult> {
   try {
-    // Verify user is authenticated
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { success: false, error: 'You must be signed in to save artwork' };
-    }
-
-    const userId = await getUserId();
+    // Verify user is authenticated (works for both web session and mobile JWT)
+    const userId = await getUserId(ACTIONS.SAVE_ARTWORK);
     if (!userId) {
-      return { success: false, error: 'User not found' };
+      return { success: false, error: 'You must be signed in to save artwork' };
     }
 
     // Get active profile if any
@@ -178,4 +173,204 @@ export async function deleteSavedArtwork(
     console.error('Error deleting artwork:', error);
     return { success: false, error: 'Failed to delete artwork' };
   }
+}
+
+/**
+ * Mobile API response types for saved artworks
+ */
+export type MobileSavedArtwork = {
+  id: string;
+  title: string;
+  imageUrl: string;
+  coloringImageId: string | null;
+  coloringImage: {
+    id: string;
+    title: string;
+    svgUrl: string | null;
+  } | null;
+  createdAt: string;
+};
+
+export type MobileSavedArtworksResponse = {
+  artworks: MobileSavedArtwork[];
+};
+
+export type MobileSaveArtworkResponse =
+  | {
+      success: true;
+      artworkId: string;
+      imageUrl: string;
+      newStickers: { id: string; name: string; imageUrl: string }[];
+      evolutionResult: {
+        evolved: boolean;
+        previousStage: number;
+        newStage: number;
+        newAccessories: string[];
+      } | null;
+    }
+  | { success: false; error: string };
+
+/**
+ * Get all saved artwork for mobile API
+ * Returns formatted response for mobile consumption
+ */
+export async function getMobileSavedArtworksAction(): Promise<MobileSavedArtworksResponse> {
+  const userId = await getUserId(ACTIONS.GET_SAVED_ARTWORKS);
+
+  if (!userId) {
+    return { artworks: [] };
+  }
+
+  // Get user's active profile
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      activeProfileId: true,
+      profiles: {
+        orderBy: { createdAt: 'asc' },
+        select: { id: true, isDefault: true },
+      },
+    },
+  });
+
+  const activeProfileId =
+    user?.activeProfileId ||
+    user?.profiles.find((p) => p.isDefault)?.id ||
+    user?.profiles[0]?.id;
+
+  // Filter by active profile if exists
+  const where = activeProfileId
+    ? { userId, profileId: activeProfileId }
+    : { userId };
+
+  const artworks = await db.savedArtwork.findMany({
+    where,
+    include: {
+      coloringImage: {
+        select: {
+          id: true,
+          title: true,
+          svgUrl: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return {
+    artworks: artworks.map((artwork) => ({
+      id: artwork.id,
+      title: artwork.title || 'Untitled',
+      imageUrl: artwork.imageUrl,
+      coloringImageId: artwork.coloringImageId,
+      coloringImage: artwork.coloringImage
+        ? {
+            id: artwork.coloringImage.id,
+            title: artwork.coloringImage.title,
+            svgUrl: artwork.coloringImage.svgUrl,
+          }
+        : null,
+      createdAt: artwork.createdAt.toISOString(),
+    })),
+  };
+}
+
+/**
+ * Save artwork for mobile API
+ * Returns formatted response for mobile consumption
+ */
+export async function saveMobileArtworkAction(
+  coloringImageId: string,
+  imageDataUrl: string,
+  title?: string,
+): Promise<MobileSaveArtworkResponse> {
+  const userId = await getUserId(ACTIONS.SAVE_ARTWORK);
+
+  if (!userId) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  // Get user's active profile
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      activeProfileId: true,
+      profiles: {
+        orderBy: { createdAt: 'asc' },
+        select: { id: true, isDefault: true },
+      },
+    },
+  });
+
+  const activeProfileId =
+    user?.activeProfileId ||
+    user?.profiles.find((p) => p.isDefault)?.id ||
+    user?.profiles[0]?.id;
+
+  // Verify the coloring image exists
+  const coloringImage = await db.coloringImage.findUnique({
+    where: { id: coloringImageId },
+  });
+
+  if (!coloringImage) {
+    return { success: false, error: 'Coloring image not found' };
+  }
+
+  // Convert data URL to buffer
+  const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
+  const imageBuffer = Buffer.from(base64Data, 'base64');
+
+  // Generate unique filename
+  const timestamp = Date.now();
+  const fileName = `uploads/saved-artwork/${userId}/${coloringImageId}/${timestamp}.png`;
+
+  // Upload to Vercel Blob
+  const { url: imageUrl } = await put(fileName, imageBuffer, {
+    access: 'public',
+    contentType: 'image/png',
+  });
+
+  // Create the saved artwork record
+  const savedArtwork = await db.savedArtwork.create({
+    data: {
+      userId,
+      profileId: activeProfileId,
+      coloringImageId,
+      title: title || coloringImage.title,
+      imageUrl,
+    },
+  });
+
+  // Check for sticker unlocks after saving artwork
+  const { newStickers } = await checkAndAwardStickers(userId, activeProfileId);
+
+  // Check for Colo evolution after saving artwork
+  const evolutionResult = activeProfileId
+    ? await checkAndUpdateColoEvolution(activeProfileId)
+    : null;
+
+  // Revalidate paths
+  revalidatePath('/gallery');
+  revalidatePath('/my-artwork');
+
+  return {
+    success: true,
+    artworkId: savedArtwork.id,
+    imageUrl,
+    newStickers: newStickers.map((s) => ({
+      id: s.id,
+      name: s.name,
+      imageUrl: s.imageUrl,
+    })),
+    evolutionResult: evolutionResult
+      ? {
+          evolved: evolutionResult.evolved,
+          previousStage: evolutionResult.previousStage,
+          newStage: evolutionResult.newStage,
+          newAccessories: evolutionResult.newAccessories,
+        }
+      : null,
+  };
 }

@@ -17,6 +17,7 @@ import type {
   FillPattern,
   Sticker,
 } from '@/constants';
+import type { SerializableCanvasAction } from '@/types/canvasActions';
 
 // Zoom/Pan constants
 const MIN_ZOOM = 1;
@@ -64,7 +65,7 @@ type ColoringContextArgs = {
   minZoom: number;
   maxZoom: number;
 
-  // History state
+  // History state (for undo/redo - uses ImageData)
   canUndo: boolean;
   canRedo: boolean;
   undoStack: CanvasAction[];
@@ -73,6 +74,12 @@ type ColoringContextArgs = {
   undo: () => CanvasAction | null;
   redo: () => CanvasAction | null;
   clearHistory: () => void;
+
+  // Serializable actions (for server sync - uses stroke paths)
+  drawingActions: SerializableCanvasAction[];
+  addDrawingAction: (action: SerializableCanvasAction) => void;
+  clearDrawingActions: () => void;
+  setDrawingActions: Dispatch<SetStateAction<SerializableCanvasAction[]>>;
 
   // Audio state
   isMuted: boolean;
@@ -121,6 +128,10 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   undo: () => null,
   redo: () => null,
   clearHistory: () => {},
+  drawingActions: [],
+  addDrawingAction: () => {},
+  clearDrawingActions: () => {},
+  setDrawingActions: () => {},
   isMuted: false,
   setIsMuted: () => {},
   isSfxMuted: false,
@@ -157,6 +168,11 @@ export const ColoringContextProvider = ({
   // History state for undo/redo
   const [undoStack, setUndoStack] = useState<CanvasAction[]>([]);
   const [redoStack, setRedoStack] = useState<CanvasAction[]>([]);
+
+  // Serializable drawing actions for server sync
+  const [drawingActions, setDrawingActions] = useState<
+    SerializableCanvasAction[]
+  >([]);
 
   // Audio state - initialize with defaults, hydrate from localStorage after mount
   const [isMuted, setIsMuted] = useState(false);
@@ -243,6 +259,16 @@ export const ColoringContextProvider = ({
     setRedoStack([]);
   }, []);
 
+  // Serializable drawing action functions (for server sync)
+  const addDrawingAction = useCallback((action: SerializableCanvasAction) => {
+    setDrawingActions((prev) => [...prev, action]);
+    setHasUnsavedChanges(true);
+  }, []);
+
+  const clearDrawingActions = useCallback(() => {
+    setDrawingActions([]);
+  }, []);
+
   // Zoom/Pan functions
   const setZoom = useCallback((newZoom: number) => {
     // Clamp zoom between min and max
@@ -288,6 +314,10 @@ export const ColoringContextProvider = ({
       undo,
       redo,
       clearHistory,
+      drawingActions,
+      addDrawingAction,
+      clearDrawingActions,
+      setDrawingActions,
       isMuted,
       setIsMuted,
       isSfxMuted,
@@ -317,6 +347,9 @@ export const ColoringContextProvider = ({
       undo,
       redo,
       clearHistory,
+      drawingActions,
+      addDrawingAction,
+      clearDrawingActions,
       isMuted,
       isSfxMuted,
       isAmbientMuted,

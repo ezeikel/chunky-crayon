@@ -20,6 +20,10 @@ import { drawTexturedStroke } from '@/utils/brushTextures';
 import { createFillPattern } from '@/utils/fillPatterns';
 import { createIconCursor } from '@/utils/iconCursor';
 import {
+  pointsToSvgPath,
+  type SerializableCanvasAction,
+} from '@/types/canvasActions';
+import {
   faPencil,
   faPaintbrush,
   faEraser,
@@ -61,6 +65,74 @@ const CURSOR_SIZES: Record<string, number> = {
   large: 36,
 };
 
+/**
+ * Parse SVG path string to array of points.
+ * Handles M (moveTo) and L (lineTo) commands from our path format.
+ * Supports both space-separated (web format: "M 100 200") and
+ * comma-separated (Skia format: "M100,200") coordinates.
+ */
+function parseSvgPath(pathString: string): { x: number; y: number }[] {
+  const points: { x: number; y: number }[] = [];
+
+  if (!pathString) {
+    console.warn('[parseSvgPath] Empty or null path string');
+    return points;
+  }
+
+  console.log(
+    `[parseSvgPath] Input path (${pathString.length} chars): "${pathString.substring(0, 150)}${pathString.length > 150 ? '...' : ''}"`,
+  );
+
+  // Match M/L commands followed by coordinates
+  // Handles both formats:
+  // - Web format: "M 100.00 200.00 L 150.00 250.00" (space-separated)
+  // - Skia format: "M100,200L150,250" or "M100,200 L150,250" (comma-separated)
+  // - Skia with spaces: "M878.98267 256.49323L871.09052 261.42581" (space between coords)
+  // The key change: [\s,]+ matches either spaces or commas between x and y
+  const regex = /([ML])\s*([\d.-]+)[\s,]+([\d.-]+)/gi;
+  let match: RegExpExecArray | null;
+  let matchCount = 0;
+
+  while ((match = regex.exec(pathString)) !== null) {
+    matchCount++;
+    const cmd = match[1];
+    const x = parseFloat(match[2]);
+    const y = parseFloat(match[3]);
+
+    if (matchCount <= 3) {
+      console.log(
+        `[parseSvgPath] Match ${matchCount}: cmd=${cmd}, x=${x}, y=${y}, raw="${match[0]}"`,
+      );
+    }
+
+    if (!isNaN(x) && !isNaN(y)) {
+      points.push({ x, y });
+    } else {
+      console.warn(
+        `[parseSvgPath] Invalid coords at match ${matchCount}: x=${match[2]}, y=${match[3]}`,
+      );
+    }
+  }
+
+  console.log(
+    `[parseSvgPath] Result: ${points.length} points from ${matchCount} regex matches`,
+  );
+
+  if (points.length === 0 && pathString.length > 0) {
+    // Debug: show what characters are in the path
+    const charCodes = pathString
+      .substring(0, 50)
+      .split('')
+      .map((c) => `${c}(${c.charCodeAt(0)})`)
+      .join(' ');
+    console.warn(
+      `[parseSvgPath] No points parsed! First 50 char codes: ${charCodes}`,
+    );
+  }
+
+  return points;
+}
+
 type ImageCanvasProps = {
   coloringImage: Partial<ColoringImage>;
   className?: string;
@@ -97,6 +169,18 @@ export type ImageCanvasHandle = {
     color: string,
     isCanvasPixels?: boolean,
   ) => boolean;
+  /** Replay a saved action (stroke, fill, sticker) on the canvas
+   * @param action - The action to replay
+   * @param sourceWidth - Optional source canvas width for coordinate scaling
+   * @param sourceHeight - Optional source canvas height for coordinate scaling
+   */
+  replayAction: (
+    action: SerializableCanvasAction,
+    sourceWidth?: number,
+    sourceHeight?: number,
+  ) => boolean;
+  /** Force canvas repaint by reading/writing a pixel to flush GPU cache */
+  forceRepaint: () => void;
 };
 
 const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
@@ -127,6 +211,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       selectedPattern,
       selectedSticker,
       pushToHistory,
+      addDrawingAction,
       zoom,
       panOffset,
       setZoom,
@@ -144,6 +229,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     const [isDrawing, setIsDrawing] = useState<boolean>(false);
     const [svgImage, setSvgImage] = useState<HTMLImageElement | null>(null);
     const [dpr, setDpr] = useState<number>(1);
+    // Ref for synchronous access to DPR (React state updates are async)
+    // This solves the stale closure issue when replayAction is called from onCanvasReady
+    const dprRef = useRef<number>(1);
 
     // Store the last position for smooth drawing
     const lastPosRef = useRef<{ x: number; y: number } | null>(null);
@@ -158,6 +246,14 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     // Pan tool state
     const isPanningRef = useRef(false);
     const lastPanPosRef = useRef<{ x: number; y: number } | null>(null);
+
+    // Track current stroke points for serializable actions
+    const currentStrokeRef = useRef<{
+      points: { x: number; y: number }[];
+      color: string;
+      brushType: typeof brushType;
+      strokeWidth: number;
+    } | null>(null);
 
     // Brush sound debounce - stop sound after no movement for 150ms
     const brushSoundTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -446,6 +542,243 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       [dpr],
     );
 
+    /**
+     * Force canvas repaint by reading and writing a pixel.
+     * This forces GPU→CPU→GPU sync, ensuring browser flushes canvas to screen.
+     * Needed after bulk action replays due to GPU compositor caching in CSS-transformed containers.
+     */
+    const forceRepaint = useCallback(() => {
+      const canvas = drawingCanvasRef.current;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Read and write a single pixel to force GPU sync
+      const imageData = ctx.getImageData(0, 0, 1, 1);
+      ctx.putImageData(imageData, 0, 0);
+
+      console.log('[ImageCanvas] forceRepaint - flushed canvas to screen');
+    }, []);
+
+    /**
+     * Replay a saved action (stroke, fill, sticker) on the canvas.
+     * Used for restoring progress from server-synced actions.
+     * @param action - The action to replay
+     * @param sourceWidth - Original canvas width (for coordinate scaling from mobile)
+     * @param sourceHeight - Original canvas height (for coordinate scaling from mobile)
+     */
+    const replayAction = useCallback(
+      (
+        action: SerializableCanvasAction,
+        sourceWidth?: number,
+        sourceHeight?: number,
+      ): boolean => {
+        const drawingCanvas = drawingCanvasRef.current;
+        const drawingCtx = drawingCanvas?.getContext('2d');
+
+        if (!drawingCanvas || !drawingCtx) {
+          console.warn('[ImageCanvas] Cannot replay action - canvas not ready');
+          return false;
+        }
+
+        // Get current canvas CSS dimensions (coordinate space, before DPR scaling)
+        // Use dprRef.current for synchronous access (dpr state may be stale in closures)
+        const currentDpr = dprRef.current;
+        console.log(
+          `[ImageCanvas] replayAction using DPR=${currentDpr} (ref), state dpr=${dpr}`,
+        );
+        const currentWidth =
+          drawingCanvas.clientWidth || drawingCanvas.width / currentDpr;
+        const currentHeight =
+          drawingCanvas.clientHeight || drawingCanvas.height / currentDpr;
+
+        // Calculate scale factors based on source dimensions
+        // PRIORITY: Use per-action dimensions first (from action itself), fall back to progress-level dimensions
+        // This handles mixed actions from different platforms correctly - each action scales based on
+        // where it was originally recorded (web CSS pixels vs mobile SVG viewBox)
+        let scaleX = 1;
+        let scaleY = 1;
+
+        // Check for per-action source dimensions first (not all action types have these)
+        const actionSourceWidth =
+          'sourceWidth' in action ? action.sourceWidth : undefined;
+        const actionSourceHeight =
+          'sourceHeight' in action ? action.sourceHeight : undefined;
+
+        // Use action-level dimensions if available, otherwise fall back to progress-level
+        const effectiveSourceWidth = actionSourceWidth || sourceWidth;
+        const effectiveSourceHeight = actionSourceHeight || sourceHeight;
+
+        if (effectiveSourceWidth && effectiveSourceHeight) {
+          scaleX = currentWidth / effectiveSourceWidth;
+          scaleY = currentHeight / effectiveSourceHeight;
+        }
+
+        console.log(
+          `[ImageCanvas] Coordinate scaling: action-level=${actionSourceWidth || 'none'}x${actionSourceHeight || 'none'}, progress-level=${sourceWidth || 'none'}x${sourceHeight || 'none'}, effective=${effectiveSourceWidth || 'unknown'}x${effectiveSourceHeight || 'unknown'} -> current=${currentWidth}x${currentHeight}, scale=${scaleX.toFixed(3)}x${scaleY.toFixed(3)}`,
+        );
+
+        console.log(`[ImageCanvas] Replaying action: ${action.type}`);
+
+        switch (action.type) {
+          case 'stroke': {
+            // Parse path from SVG string or use points array
+            const points = action.pathSvg
+              ? parseSvgPath(action.pathSvg)
+              : action.path;
+
+            if (!points || points.length < 2) {
+              console.warn(
+                `[ImageCanvas] Stroke has insufficient points (${points?.length || 0}). pathSvg: ${action.pathSvg?.substring(0, 50) || 'none'}`,
+              );
+              return false;
+            }
+
+            // Log first few points for debugging cross-platform sync
+            if (points.length > 0) {
+              const firstPoints = points
+                .slice(0, 3)
+                .map((p) => `(${p.x.toFixed(1)},${p.y.toFixed(1)})`)
+                .join(' ');
+              console.log(
+                `[ImageCanvas] Stroke: ${points.length} points, first: ${firstPoints}, color: ${action.color}`,
+              );
+            }
+
+            // Sanity check: skip corrupted data with extreme coordinates
+            const maxCoord = Math.max(
+              ...points.map((p) => Math.max(Math.abs(p.x), Math.abs(p.y))),
+            );
+            if (maxCoord > 10000) {
+              console.warn(
+                `[ImageCanvas] Skipping corrupted stroke with extreme coordinates (max: ${maxCoord})`,
+              );
+              return false;
+            }
+
+            // Get brush radius from strokeWidth, scaled if needed
+            const radius =
+              ((action.strokeWidth || 10) * Math.max(scaleX, scaleY)) / 2;
+
+            // Draw each segment of the stroke
+            for (let i = 1; i < points.length; i++) {
+              const lastPoint = points[i - 1];
+              const point = points[i];
+
+              // Scale coordinates from source to current canvas
+              // NOTE: Do NOT multiply by DPR here - the context is already scaled via ctx.scale(dpr, dpr)
+              const scaledX = point.x * scaleX;
+              const scaledY = point.y * scaleY;
+              const scaledLastX = lastPoint.x * scaleX;
+              const scaledLastY = lastPoint.y * scaleY;
+
+              // Draw on visible canvas
+              drawTexturedStroke({
+                ctx: drawingCtx,
+                x: scaledX,
+                y: scaledY,
+                lastX: scaledLastX,
+                lastY: scaledLastY,
+                color: action.color || '#000000',
+                radius: radius * currentDpr,
+                brushType: action.brushType || 'marker',
+              });
+
+              // Update offscreen canvas
+              if (offScreenCanvasRef.current) {
+                const offScreenCtx =
+                  offScreenCanvasRef.current.getContext('2d');
+                if (offScreenCtx) {
+                  drawTexturedStroke({
+                    ctx: offScreenCtx,
+                    x: scaledX,
+                    y: scaledY,
+                    lastX: scaledLastX,
+                    lastY: scaledLastY,
+                    color: action.color || '#000000',
+                    radius: radius * currentDpr,
+                    brushType: action.brushType || 'marker',
+                  });
+                }
+              }
+            }
+            return true;
+          }
+
+          case 'fill': {
+            // Scale fill coordinates from source to current canvas
+            const scaledX = action.x * scaleX;
+            const scaledY = action.y * scaleY;
+
+            // Sanity check for extreme coordinates
+            if (Math.abs(scaledX) > 10000 || Math.abs(scaledY) > 10000) {
+              console.warn(
+                `[ImageCanvas] Skipping corrupted fill at (${scaledX}, ${scaledY})`,
+              );
+              return false;
+            }
+
+            // Use fillRegionAtPoint which handles DPR scaling
+            return fillRegionAtPoint(scaledX, scaledY, action.color, false);
+          }
+
+          case 'sticker': {
+            // Scale sticker coordinates and size from source to current canvas
+            const scaledX = action.x * scaleX * currentDpr;
+            const scaledY = action.y * scaleY * currentDpr;
+            const scaledSize =
+              (action.size || 48) * Math.max(scaleX, scaleY) * currentDpr;
+
+            // Sanity check for extreme coordinates
+            if (
+              Math.abs(scaledX) > 10000 * currentDpr ||
+              Math.abs(scaledY) > 10000 * currentDpr
+            ) {
+              console.warn(
+                `[ImageCanvas] Skipping corrupted sticker at (${scaledX}, ${scaledY})`,
+              );
+              return false;
+            }
+
+            drawingCtx.save();
+            drawingCtx.font = `${scaledSize}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+            drawingCtx.textAlign = 'center';
+            drawingCtx.textBaseline = 'middle';
+            drawingCtx.fillText(action.sticker, scaledX, scaledY);
+            drawingCtx.restore();
+
+            // Update offscreen canvas
+            if (offScreenCanvasRef.current) {
+              const offScreenCtx = offScreenCanvasRef.current.getContext('2d');
+              if (offScreenCtx) {
+                offScreenCtx.save();
+                offScreenCtx.font = `${scaledSize}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+                offScreenCtx.textAlign = 'center';
+                offScreenCtx.textBaseline = 'middle';
+                offScreenCtx.fillText(action.sticker, scaledX, scaledY);
+                offScreenCtx.restore();
+              }
+            }
+            return true;
+          }
+
+          case 'clear': {
+            // Clear the canvas
+            clearCanvas();
+            return true;
+          }
+
+          default:
+            console.warn(
+              `[ImageCanvas] Unknown action type: ${(action as SerializableCanvasAction).type}`,
+            );
+            return false;
+        }
+      },
+      [fillRegionAtPoint, clearCanvas],
+    );
+
     // Expose methods to parent via ref
     useImperativeHandle(
       ref,
@@ -458,6 +791,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         getCompositeCanvas,
         getBoundaryCanvas,
         fillRegionAtPoint,
+        replayAction,
+        forceRepaint,
       }),
       [
         restoreCanvasState,
@@ -468,6 +803,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         getCompositeCanvas,
         getBoundaryCanvas,
         fillRegionAtPoint,
+        replayAction,
+        forceRepaint,
       ],
     );
 
@@ -523,6 +860,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               setRatio(imgRatio);
 
               const devicePixelRatio = window.devicePixelRatio || 1;
+              dprRef.current = devicePixelRatio; // Update ref synchronously for replayAction
               setDpr(devicePixelRatio);
 
               drawingCanvas.width = newWidth * devicePixelRatio;
@@ -576,6 +914,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           const newHeight = newWidth / ratio;
 
           const devicePixelRatio = window.devicePixelRatio || 1;
+          dprRef.current = devicePixelRatio; // Update ref synchronously
           setDpr(devicePixelRatio);
 
           // Capture existing drawing BEFORE resizing canvases
@@ -760,6 +1099,28 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       [zoom, panOffset],
     );
 
+    // Normalize stroke points for cross-platform sync
+    // Reverses zoom transformation so coordinates are in CSS canvas space (0 to containerWidth/Height)
+    // The actual dimensions are sent alongside, so receiving platform can scale appropriately
+    const normalizePointsForSync = useCallback(
+      (points: { x: number; y: number }[]): { x: number; y: number }[] => {
+        const container = containerRef.current;
+        if (!container || zoom === 1) return points;
+
+        const centerX = container.clientWidth / 2;
+        const centerY = container.clientHeight / 2;
+
+        // Reverse the screenToCanvas transformation:
+        // Original: x = (relX - centerX - panOffset.x) / zoom + centerX
+        // To normalize: normalizedX = (x - centerX) * zoom + centerX
+        return points.map((point) => ({
+          x: (point.x - centerX) * zoom + centerX,
+          y: (point.y - centerY) * zoom + centerY,
+        }));
+      },
+      [zoom],
+    );
+
     // Get distance between two touch points
     const getTouchDistance = (touches: React.TouchList) => {
       if (touches.length < 2) return 0;
@@ -849,6 +1210,13 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
             lastPosRef.current = { x, y };
             return;
           }
+        }
+
+        // Track stroke points for serializable actions
+        if (currentStrokeRef.current) {
+          currentStrokeRef.current.points.push({ x, y });
+          // Update color in case it changed (e.g., for magic reveal)
+          currentStrokeRef.current.color = strokeColor;
         }
 
         // Draw textured stroke on visible canvas
@@ -1065,6 +1433,22 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           });
         }
 
+        // Add fill action for server sync (normalize coordinates for cross-platform sync)
+        const normalizedFillPoint = normalizePointsForSync([canvasCoords])[0];
+        // Include source dimensions for cross-platform scaling
+        const container = containerRef.current;
+        addDrawingAction({
+          type: 'fill',
+          x: normalizedFillPoint.x,
+          y: normalizedFillPoint.y,
+          color: selectedColor,
+          fillType: selectedPattern === 'solid' ? 'solid' : 'pattern',
+          patternType: selectedPattern,
+          timestamp: Date.now(),
+          sourceWidth: container?.clientWidth,
+          sourceHeight: container?.clientHeight,
+        });
+
         // Play fill sound
         playSound('fill');
 
@@ -1134,6 +1518,21 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         });
       }
 
+      // Add sticker action for server sync (normalize coordinates for cross-platform sync)
+      const normalizedStickerPoint = normalizePointsForSync([{ x, y }])[0];
+      // Include source dimensions for cross-platform scaling
+      const stickerContainer = containerRef.current;
+      addDrawingAction({
+        type: 'sticker',
+        sticker: selectedSticker.emoji,
+        x: normalizedStickerPoint.x,
+        y: normalizedStickerPoint.y,
+        size: stickerSize,
+        timestamp: Date.now(),
+        sourceWidth: stickerContainer?.clientWidth,
+        sourceHeight: stickerContainer?.clientHeight,
+      });
+
       // Play pop sound for sticker placement
       playSound('pop');
 
@@ -1185,6 +1584,13 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
             timestamp: Date.now(),
           });
         }
+        // Initialize stroke tracking for magic-reveal
+        currentStrokeRef.current = {
+          points: [],
+          color: selectedColor, // Will be overridden per-point for magic reveal
+          brushType: 'marker', // Magic reveal uses marker
+          strokeWidth: getRadius() * 2,
+        };
         setIsDrawing(true);
         lastPosRef.current = null;
         colorAtPosition(event.clientX, event.clientY);
@@ -1201,6 +1607,14 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           timestamp: Date.now(),
         });
       }
+
+      // Initialize stroke tracking for serializable actions
+      currentStrokeRef.current = {
+        points: [],
+        color: selectedColor,
+        brushType: brushType,
+        strokeWidth: getRadius() * 2, // Diameter
+      };
 
       setIsDrawing(true);
       lastPosRef.current = null;
@@ -1232,6 +1646,30 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       if (!isDrawing) return;
       setIsDrawing(false);
       lastPosRef.current = null;
+
+      // Finalize stroke and add to serializable actions
+      if (
+        currentStrokeRef.current &&
+        currentStrokeRef.current.points.length > 0
+      ) {
+        const stroke = currentStrokeRef.current;
+        // Normalize points to CSS canvas space for cross-platform sync
+        const normalizedPoints = normalizePointsForSync(stroke.points);
+        // Include source dimensions for cross-platform scaling
+        const strokeContainer = containerRef.current;
+        addDrawingAction({
+          type: 'stroke',
+          path: normalizedPoints,
+          pathSvg: pointsToSvgPath(normalizedPoints),
+          color: stroke.color,
+          brushType: stroke.brushType,
+          strokeWidth: stroke.strokeWidth,
+          timestamp: Date.now(),
+          sourceWidth: strokeContainer?.clientWidth,
+          sourceHeight: strokeContainer?.clientHeight,
+        });
+        currentStrokeRef.current = null;
+      }
 
       trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
         coloringImageId: coloringImage.id,
@@ -1334,6 +1772,13 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               timestamp: Date.now(),
             });
           }
+          // Initialize stroke tracking for magic-reveal
+          currentStrokeRef.current = {
+            points: [],
+            color: selectedColor, // Will be overridden per-point for magic reveal
+            brushType: 'marker', // Magic reveal uses marker
+            strokeWidth: getRadius() * 2,
+          };
           setIsDrawing(true);
           lastPosRef.current = null;
           colorAtPosition(touch.clientX, touch.clientY);
@@ -1350,6 +1795,14 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
             timestamp: Date.now(),
           });
         }
+
+        // Initialize stroke tracking for serializable actions
+        currentStrokeRef.current = {
+          points: [],
+          color: selectedColor,
+          brushType: brushType,
+          strokeWidth: getRadius() * 2, // Diameter
+        };
 
         setIsDrawing(true);
         lastPosRef.current = null;
@@ -1469,6 +1922,30 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       setIsDrawing(false);
       lastPosRef.current = null;
 
+      // Finalize stroke and add to serializable actions
+      if (
+        currentStrokeRef.current &&
+        currentStrokeRef.current.points.length > 0
+      ) {
+        const stroke = currentStrokeRef.current;
+        // Normalize points to CSS canvas space for cross-platform sync
+        const normalizedPoints = normalizePointsForSync(stroke.points);
+        // Include source dimensions for cross-platform scaling
+        const touchContainer = containerRef.current;
+        addDrawingAction({
+          type: 'stroke',
+          path: normalizedPoints,
+          pathSvg: pointsToSvgPath(normalizedPoints),
+          color: stroke.color,
+          brushType: stroke.brushType,
+          strokeWidth: stroke.strokeWidth,
+          timestamp: Date.now(),
+          sourceWidth: touchContainer?.clientWidth,
+          sourceHeight: touchContainer?.clientHeight,
+        });
+        currentStrokeRef.current = null;
+      }
+
       trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
         coloringImageId: coloringImage.id,
         color: selectedColor,
@@ -1492,6 +1969,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
             transition: isPinchingRef.current
               ? 'none'
               : 'transform 0.1s ease-out',
+            // Hint to browser not to aggressively cache canvas content
+            // Helps ensure canvas repaints after bulk action replays
+            willChange: 'contents',
           }}
         >
           <canvas

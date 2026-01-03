@@ -13,4 +13,8 @@ export type {
   ColoringImage as DbColoringImageType,
   Account as DbAccountType,
   Session as DbSessionType,
+  CanvasProgress as DbCanvasProgressType,
 } from "./generated/prisma/client";
+
+// Re-export canvas types for cross-platform sync
+export * from "./canvas-types";

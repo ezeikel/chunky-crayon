@@ -6,7 +6,7 @@ import cn from '@/lib/utils';
 import ProfileCard from '@/components/ProfileCard/ProfileCard';
 import AddProfileCard from '@/components/AddProfileCard/AddProfileCard';
 import { setActiveProfile } from '@/app/actions/profiles';
-import type { ProfileWithStats } from '@/app/actions/profiles';
+import type { ProfileWithStats } from '@/lib/profiles/service';
 
 const MAX_PROFILES = 10;
 
@@ -39,7 +39,7 @@ const ProfileSwitcher = ({
       startTransition(async () => {
         const result = await setActiveProfile(profileId);
 
-        if (result.success) {
+        if ('success' in result) {
           router.refresh();
           onClose?.();
         }

@@ -10,11 +10,8 @@ import { Button } from '@/components/ui/button';
 import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
 import DifficultySlider from '@/components/DifficultySlider/DifficultySlider';
 import { getSelectableAvatars } from '@/lib/avatars';
-import {
-  updateProfile,
-  deleteProfile,
-  type ProfileWithStats,
-} from '@/app/actions/profiles';
+import { updateProfile, deleteProfile } from '@/app/actions/profiles';
+import type { ProfileWithStats } from '@/lib/profiles/service';
 import {
   Dialog,
   DialogContent,
@@ -131,7 +128,7 @@ const ProfileEditForm = ({ profile, canDelete }: ProfileEditFormProps) => {
         difficulty,
       });
 
-      if (result.error) {
+      if ('error' in result) {
         setError(result.error);
         toast.error(result.error);
         return;
@@ -146,7 +143,7 @@ const ProfileEditForm = ({ profile, canDelete }: ProfileEditFormProps) => {
     startTransition(async () => {
       const result = await deleteProfile(profile.id);
 
-      if (result.error) {
+      if ('error' in result) {
         toast.error(result.error);
         setShowDeleteDialog(false);
         return;
@@ -169,7 +166,10 @@ const ProfileEditForm = ({ profile, canDelete }: ProfileEditFormProps) => {
               {name || t('form.unnamed')}
             </h2>
             <p className="text-sm text-muted-foreground">
-              {t(AGE_GROUP_OPTIONS.find((o) => o.value === ageGroup)?.descriptionKey || 'ageGroups.toddlerDescription')}
+              {t(
+                AGE_GROUP_OPTIONS.find((o) => o.value === ageGroup)
+                  ?.descriptionKey || 'ageGroups.toddlerDescription',
+              )}
             </p>
           </div>
         </div>
@@ -237,7 +237,10 @@ const ProfileEditForm = ({ profile, canDelete }: ProfileEditFormProps) => {
             ))}
           </div>
           <p className="mt-2 text-xs text-gray-500 text-center">
-            {t(AGE_GROUP_OPTIONS.find((o) => o.value === ageGroup)?.descriptionKey || 'ageGroups.toddlerDescription')}
+            {t(
+              AGE_GROUP_OPTIONS.find((o) => o.value === ageGroup)
+                ?.descriptionKey || 'ageGroups.toddlerDescription',
+            )}
           </p>
         </div>
 
@@ -379,13 +382,13 @@ const ProfileEditForm = ({ profile, canDelete }: ProfileEditFormProps) => {
                   <div>
                     <p className="font-tondo font-bold">{profile.name}</p>
                     <p className="text-sm text-gray-500">
-                      {t('delete.coloringPages', { count: profile._count.coloringImages })}
+                      {t('delete.coloringPages', {
+                        count: profile._count.coloringImages,
+                      })}
                     </p>
                   </div>
                 </div>
-                <p>
-                  {t('delete.confirmText')}
-                </p>
+                <p>{t('delete.confirmText')}</p>
               </div>
             </DialogDescription>
           </DialogHeader>

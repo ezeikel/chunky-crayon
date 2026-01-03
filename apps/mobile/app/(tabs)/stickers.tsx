@@ -1,15 +1,18 @@
+import { useMemo } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Pressable,
-  Image,
+  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar, faLock, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import AppHeader from "@/components/AppHeader";
+import useHeaderData from "@/hooks/useHeaderData";
+import { useStickers, useMarkStickersAsViewed } from "@/hooks/api";
 
 type StickerCategory = {
   id: string;
@@ -20,9 +23,10 @@ type StickerCategory = {
 type Sticker = {
   id: string;
   name: string;
-  emoji: string;
+  imageUrl: string;
   isUnlocked: boolean;
   isNew?: boolean;
+  category: string;
 };
 
 type StickerItemProps = {
@@ -30,90 +34,104 @@ type StickerItemProps = {
   onPress: () => void;
 };
 
-const StickerItem = ({ sticker, onPress }: StickerItemProps) => (
-  <Pressable
-    style={({ pressed }) => [
-      styles.stickerItem,
-      !sticker.isUnlocked && styles.stickerItemLocked,
-      pressed && styles.stickerItemPressed,
-    ]}
-    onPress={onPress}
-    disabled={!sticker.isUnlocked}
-  >
-    <View style={styles.stickerEmoji}>
-      <Text style={styles.stickerEmojiText}>{sticker.emoji}</Text>
-      {!sticker.isUnlocked && (
-        <View style={styles.lockOverlay}>
-          <FontAwesomeIcon icon={faLock} size={16} color="#9CA3AF" />
+// Map sticker IDs to emojis for display (until we have real sticker images)
+const STICKER_EMOJIS: Record<string, string> = {
+  "first-steps": "🎨",
+  "getting-started": "✨",
+  "high-five": "🖐️",
+  "perfect-ten": "🏆",
+  "super-artist": "🦸",
+  "master-creator": "👑",
+  "century-club": "💯",
+  "animal-friend": "🐱",
+  "fantasy-dreamer": "🧙",
+  "space-explorer": "🚀",
+  "nature-lover": "🌸",
+  "vehicle-driver": "🚗",
+  "dino-hunter": "🦖",
+  "ocean-diver": "🐠",
+  "food-lover": "🍕",
+  "sports-star": "⚽",
+  "holiday-spirit": "🎉",
+  "animal-master": "🦁",
+  "fantasy-master": "🔮",
+  "space-master": "🌟",
+  "category-explorer": "🗺️",
+  "world-traveler": "🌍",
+};
+
+const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
+  const emoji = STICKER_EMOJIS[sticker.id] || "⭐";
+
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.stickerItem,
+        !sticker.isUnlocked && styles.stickerItemLocked,
+        pressed && styles.stickerItemPressed,
+      ]}
+      onPress={onPress}
+      disabled={!sticker.isUnlocked}
+    >
+      <View style={styles.stickerEmoji}>
+        <Text style={styles.stickerEmojiText}>{emoji}</Text>
+        {!sticker.isUnlocked && (
+          <View style={styles.lockOverlay}>
+            <FontAwesomeIcon icon={faLock} size={16} color="#9CA3AF" />
+          </View>
+        )}
+      </View>
+      {sticker.isNew && sticker.isUnlocked && (
+        <View style={styles.newBadge}>
+          <Text style={styles.newBadgeText}>NEW</Text>
         </View>
       )}
-    </View>
-    {sticker.isNew && sticker.isUnlocked && (
-      <View style={styles.newBadge}>
-        <Text style={styles.newBadgeText}>NEW</Text>
-      </View>
-    )}
-  </Pressable>
-);
+    </Pressable>
+  );
+};
 
 const StickersScreen = () => {
-  // Placeholder sticker data - will be replaced with real data from backend
-  const stickerCategories: StickerCategory[] = [
-    {
-      id: "animals",
-      name: "Animals",
-      stickers: [
-        { id: "1", name: "Cat", emoji: "🐱", isUnlocked: true },
-        { id: "2", name: "Dog", emoji: "🐶", isUnlocked: true },
-        { id: "3", name: "Bunny", emoji: "🐰", isUnlocked: true, isNew: true },
-        { id: "4", name: "Bear", emoji: "🐻", isUnlocked: true },
-        { id: "5", name: "Fox", emoji: "🦊", isUnlocked: false },
-        { id: "6", name: "Owl", emoji: "🦉", isUnlocked: false },
-      ],
-    },
-    {
-      id: "nature",
-      name: "Nature",
-      stickers: [
-        { id: "7", name: "Sun", emoji: "☀️", isUnlocked: true },
-        {
-          id: "8",
-          name: "Rainbow",
-          emoji: "🌈",
-          isUnlocked: true,
-          isNew: true,
-        },
-        { id: "9", name: "Flower", emoji: "🌸", isUnlocked: true },
-        { id: "10", name: "Tree", emoji: "🌳", isUnlocked: false },
-        { id: "11", name: "Star", emoji: "⭐", isUnlocked: false },
-        { id: "12", name: "Moon", emoji: "🌙", isUnlocked: false },
-      ],
-    },
-    {
-      id: "food",
-      name: "Food",
-      stickers: [
-        { id: "13", name: "Cookie", emoji: "🍪", isUnlocked: true },
-        { id: "14", name: "Cake", emoji: "🎂", isUnlocked: true },
-        { id: "15", name: "Ice Cream", emoji: "🍦", isUnlocked: false },
-        { id: "16", name: "Pizza", emoji: "🍕", isUnlocked: false },
-        { id: "17", name: "Apple", emoji: "🍎", isUnlocked: false },
-        { id: "18", name: "Candy", emoji: "🍬", isUnlocked: false },
-      ],
-    },
-  ];
+  const headerData = useHeaderData();
+  const { data, isLoading } = useStickers();
+  const markAsViewed = useMarkStickersAsViewed();
 
-  const totalStickers = stickerCategories.reduce(
-    (acc, cat) => acc + cat.stickers.length,
-    0,
-  );
-  const unlockedStickers = stickerCategories.reduce(
-    (acc, cat) => acc + cat.stickers.filter((s) => s.isUnlocked).length,
-    0,
-  );
+  // Group stickers by category
+  const stickerCategories = useMemo(() => {
+    if (!data?.stickers) return [];
+
+    const categoryMap = new Map<string, Sticker[]>();
+
+    data.stickers.forEach((sticker) => {
+      const category = sticker.category || "other";
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, []);
+      }
+      categoryMap.get(category)!.push({
+        id: sticker.id,
+        name: sticker.name,
+        imageUrl: sticker.imageUrl,
+        isUnlocked: sticker.isUnlocked,
+        isNew: sticker.isNew,
+        category: sticker.category,
+      });
+    });
+
+    // Convert to array and capitalize category names
+    return Array.from(categoryMap.entries()).map(([id, stickers]) => ({
+      id,
+      name: id.charAt(0).toUpperCase() + id.slice(1),
+      stickers,
+    }));
+  }, [data?.stickers]);
+
+  const totalStickers = data?.stats.totalPossible ?? 0;
+  const unlockedStickers = data?.stats.totalUnlocked ?? 0;
 
   const handleStickerPress = (sticker: Sticker) => {
-    // Will navigate to sticker detail or show sticker preview
+    // Mark as viewed if it's new
+    if (sticker.isNew) {
+      markAsViewed.mutate([sticker.id]);
+    }
     console.log("Sticker pressed:", sticker.name);
   };
 
@@ -121,11 +139,11 @@ const StickersScreen = () => {
     <View style={styles.container}>
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={styles.gradient}>
         <AppHeader
-          credits={50}
-          challengeProgress={40}
-          stickerCount={unlockedStickers}
-          profileName="Artist"
-          coloStage={1}
+          credits={headerData.credits}
+          challengeProgress={headerData.challengeProgress}
+          stickerCount={headerData.stickerCount}
+          profileName={headerData.profileName}
+          coloStage={headerData.coloStage}
         />
         <ScrollView
           style={styles.scrollView}
@@ -143,29 +161,38 @@ const StickersScreen = () => {
             </View>
           </View>
 
-          {/* Sticker Categories */}
-          {stickerCategories.map((category) => (
-            <View key={category.id} style={styles.categorySection}>
-              <Text style={styles.categoryTitle}>{category.name}</Text>
-              <View style={styles.stickersGrid}>
-                {category.stickers.map((sticker) => (
-                  <StickerItem
-                    key={sticker.id}
-                    sticker={sticker}
-                    onPress={() => handleStickerPress(sticker)}
-                  />
-                ))}
-              </View>
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#E46444" />
+              <Text style={styles.loadingText}>Loading stickers...</Text>
             </View>
-          ))}
+          ) : (
+            <>
+              {/* Sticker Categories */}
+              {stickerCategories.map((category) => (
+                <View key={category.id} style={styles.categorySection}>
+                  <Text style={styles.categoryTitle}>{category.name}</Text>
+                  <View style={styles.stickersGrid}>
+                    {category.stickers.map((sticker) => (
+                      <StickerItem
+                        key={sticker.id}
+                        sticker={sticker}
+                        onPress={() => handleStickerPress(sticker)}
+                      />
+                    ))}
+                  </View>
+                </View>
+              ))}
 
-          {/* Unlock Hint */}
-          <View style={styles.hintContainer}>
-            <FontAwesomeIcon icon={faCheck} size={14} color="#10B981" />
-            <Text style={styles.hintText}>
-              Complete challenges to unlock more stickers!
-            </Text>
-          </View>
+              {/* Unlock Hint */}
+              <View style={styles.hintContainer}>
+                <FontAwesomeIcon icon={faCheck} size={14} color="#10B981" />
+                <Text style={styles.hintText}>
+                  Complete challenges to unlock more stickers!
+                </Text>
+              </View>
+            </>
+          )}
         </ScrollView>
       </LinearGradient>
     </View>
@@ -185,6 +212,18 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 100,
     paddingTop: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 100,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 16,
+    color: "#6B7280",
   },
   header: {
     paddingHorizontal: 16,

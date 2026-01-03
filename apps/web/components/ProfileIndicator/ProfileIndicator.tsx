@@ -14,7 +14,7 @@ import { ParentalGateLink } from '@/components/ParentalGate';
 import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
 import cn from '@/lib/utils';
 import { setActiveProfile } from '@/app/actions/profiles';
-import type { ProfileWithStats } from '@/app/actions/profiles';
+import type { ProfileWithStats } from '@/lib/profiles/service';
 
 type ProfileIndicatorProps = {
   profiles: ProfileWithStats[];

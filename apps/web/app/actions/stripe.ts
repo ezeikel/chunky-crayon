@@ -98,7 +98,7 @@ export const createCheckoutSession = async (
     sessionOptions.customer = user.stripeCustomerId ?? undefined;
     sessionOptions.customer_email = existingSubscription
       ? undefined
-      : user.email;
+      : (user.email ?? undefined);
   }
   // Guest checkout flow: no client_reference_id or customer set
   // For subscriptions, Stripe automatically creates a customer and collects email

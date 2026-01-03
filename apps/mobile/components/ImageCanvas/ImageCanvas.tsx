@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { View, useWindowDimensions, StyleSheet } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   Canvas,
   ImageSVG,
@@ -19,8 +20,6 @@ import {
   SkPath,
   Skia,
   Path,
-  Image as SkiaImage,
-  useImage,
   BlurMask,
   Text as SkiaText,
 } from "@shopify/react-native-skia";
@@ -35,7 +34,11 @@ import { ColoringImage, Dimension, GridColorCell, GridColorMap } from "@/types";
 import { useCanvasStore, DrawingAction } from "@/stores/canvasStore";
 import { createSimplePaint, getBrushMultiplier } from "@/utils/brushShaders";
 import { getRainbowColor } from "@/utils/colorUtils";
-import { saveCanvasState, loadCanvasState } from "@/utils/canvasPersistence";
+import {
+  saveCanvasState,
+  loadCanvasState,
+  debugCanvasStorage,
+} from "@/utils/canvasPersistence";
 import {
   generateGlitterParticles,
   createSparklePath,
@@ -60,9 +63,12 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
   const { width: screenWidth } = useWindowDimensions();
   const svg = useSVG(coloringImage.svgUrl);
 
+  // Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
+  const canvasSize = screenWidth - 32 - 24;
+
   const [svgDimensions, setSvgDimensions] = useState<Dimension | null>(null);
   const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const isInitializedRef = useRef(false);
 
   // Magic color hint state
   const [magicHintCell, setMagicHintCell] = useState<GridColorCell | null>(
@@ -95,6 +101,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     scale,
     translateX,
     translateY,
+    imageId,
     addAction,
     setColor,
     setTool,
@@ -104,6 +111,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     setDirty,
     advanceRainbowHue,
     setCaptureCanvas,
+    reset,
   } = useCanvasStore();
 
   // Gesture shared values
@@ -116,6 +124,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
 
   // Auto-save timer
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Track which image ID we've initialized for (prevents re-init and detects changes)
+  const initializedForImageIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (svg) {
@@ -140,31 +151,278 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     };
   }, [setCaptureCanvas]);
 
-  // Initialize canvas with saved state
+  // Initialize canvas with saved state when image changes
+  // This handles both first mount AND navigation between different images
   useEffect(() => {
+    const currentImageId = coloringImage.id;
+    const previousImageId = imageId; // Get the previous image ID from store
+
+    console.log(
+      `[CANVAS_INIT] useEffect triggered - Current: ${currentImageId}, Previous: ${previousImageId}, Initialized for: ${initializedForImageIdRef.current}`,
+    );
+
+    // Skip if we've already initialized for this exact image
+    if (initializedForImageIdRef.current === currentImageId) {
+      console.log(
+        `[CANVAS_INIT] Already initialized for image ${currentImageId}, skipping`,
+      );
+      return;
+    }
+
+    // Track if this effect is still valid (not cancelled by navigation)
+    let isCancelled = false;
+
     const initializeCanvas = async () => {
-      if (!coloringImage.id || isInitialized) return;
+      console.log(
+        `[CANVAS_INIT] Starting initialization for image: ${currentImageId}`,
+      );
+      isInitializedRef.current = false;
 
-      setImageId(coloringImage.id);
+      // Debug storage to see what's actually saved
+      await debugCanvasStorage();
 
-      // Load saved state
-      const savedActions = await loadCanvasState(coloringImage.id);
-      if (savedActions && savedActions.length > 0) {
-        // Restore saved actions to the store
-        savedActions.forEach((action) => {
-          addAction(action);
-        });
+      // Only reset if we're switching to a different image
+      // If it's the same image (e.g., navigating from feed to detail), preserve state
+      const isNewImage = previousImageId !== currentImageId;
+      console.log(
+        `[CANVAS_INIT] Is new image: ${isNewImage} (prev: ${previousImageId}, curr: ${currentImageId})`,
+      );
+
+      if (isNewImage) {
+        console.log(`[CANVAS_INIT] Loading saved state BEFORE reset...`);
+        // Load saved state BEFORE resetting to check if we have data
+        const savedData = await loadCanvasState(currentImageId);
+        let savedActions = savedData?.actions || [];
+        // Progress-level dimensions (fallback for actions without per-action dimensions)
+        const progressSourceWidth = savedData?.sourceCanvasWidth;
+        const progressSourceHeight = savedData?.sourceCanvasHeight;
+
+        console.log(
+          `[CANVAS_INIT] Loaded ${savedActions.length} saved actions, progress-level dimensions: ${progressSourceWidth}x${progressSourceHeight}, svgDimensions: ${svgDimensions?.width}x${svgDimensions?.height}`,
+        );
+
+        // Scale each action based on its OWN source dimensions (per-action scaling)
+        // This handles mixed actions from different platforms correctly:
+        // - Mobile actions have sourceWidth: 1024 (SVG viewBox) → no scaling needed
+        // - Web actions have sourceWidth: 880 (CSS pixels) → scale to SVG coords
+        if (savedActions.length > 0) {
+          // Target is SVG dimensions (what mobile uses for coordinate space)
+          // Fall back to 1024 if SVG not loaded yet (common SVG size)
+          const targetWidth = svgDimensions?.width || 1024;
+          const targetHeight = svgDimensions?.height || 1024;
+
+          savedActions = savedActions.map((action) => {
+            // Use per-action source dimensions if available, fall back to progress-level
+            const actionSourceWidth =
+              action.sourceWidth || progressSourceWidth || targetWidth;
+            const actionSourceHeight =
+              action.sourceHeight || progressSourceHeight || targetHeight;
+
+            const scaleX = targetWidth / actionSourceWidth;
+            const scaleY = targetHeight / actionSourceHeight;
+
+            // Only scale if there's a meaningful difference (action came from different coordinate space)
+            const needsScaling =
+              Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01;
+
+            if (!needsScaling) {
+              return action;
+            }
+
+            console.log(
+              `[CANVAS_INIT] Scaling action (${action.type}) from ${actionSourceWidth}x${actionSourceHeight} to ${targetWidth}x${targetHeight} (scale: ${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`,
+            );
+
+            if (action.type === "stroke" && action.path) {
+              // Transform the path using Skia's matrix transformation
+              const scaledPath = action.path.copy();
+              scaledPath.transform(Skia.Matrix().scale(scaleX, scaleY));
+              return {
+                ...action,
+                path: scaledPath,
+                // Also scale stroke width proportionally
+                strokeWidth: action.strokeWidth
+                  ? action.strokeWidth * Math.min(scaleX, scaleY)
+                  : action.strokeWidth,
+                // Update source dimensions to target - coordinates are now in mobile space
+                // This prevents double-scaling on next load
+                sourceWidth: targetWidth,
+                sourceHeight: targetHeight,
+              };
+            } else if (action.type === "fill") {
+              // Scale fill coordinates
+              return {
+                ...action,
+                fillX:
+                  action.fillX !== undefined
+                    ? action.fillX * scaleX
+                    : undefined,
+                fillY:
+                  action.fillY !== undefined
+                    ? action.fillY * scaleY
+                    : undefined,
+                sourceWidth: targetWidth,
+                sourceHeight: targetHeight,
+              };
+            } else if (action.type === "sticker") {
+              // Scale sticker position and size
+              return {
+                ...action,
+                stickerX:
+                  action.stickerX !== undefined
+                    ? action.stickerX * scaleX
+                    : undefined,
+                stickerY:
+                  action.stickerY !== undefined
+                    ? action.stickerY * scaleY
+                    : undefined,
+                stickerSize: action.stickerSize
+                  ? action.stickerSize * Math.min(scaleX, scaleY)
+                  : action.stickerSize,
+                sourceWidth: targetWidth,
+                sourceHeight: targetHeight,
+              };
+            } else if (action.type === "magic-fill" && action.magicFills) {
+              // Scale magic-fill coordinates
+              return {
+                ...action,
+                magicFills: action.magicFills.map((fill) => ({
+                  ...fill,
+                  x: fill.x * scaleX,
+                  y: fill.y * scaleY,
+                })),
+                sourceWidth: targetWidth,
+                sourceHeight: targetHeight,
+              };
+            }
+            return action;
+          });
+
+          console.log(
+            `[CANVAS_INIT] Processed ${savedActions.length} actions with per-action scaling`,
+          );
+        }
+
+        // Check if we've navigated away before the load completed
+        if (isCancelled) {
+          console.log(
+            `[CANVAS_INIT] Effect cancelled, aborting initialization`,
+          );
+          return;
+        }
+
+        // Now reset the store to clear previous image's state
+        console.log(
+          `[CANVAS_INIT] Resetting store and setting imageId to ${currentImageId}`,
+        );
+        reset();
+        setImageId(currentImageId);
+
+        // Restore saved actions if they exist
+        if (savedActions.length > 0) {
+          console.log(
+            `[CANVAS_INIT] Restoring ${savedActions.length} actions to store...`,
+          );
+          savedActions.forEach((action, idx) => {
+            console.log(
+              `[CANVAS_INIT] Adding action ${idx + 1}/${savedActions.length}, type: ${action.type}`,
+            );
+            addAction(action);
+          });
+          console.log(`[CANVAS_INIT] All actions restored`);
+        } else {
+          console.log(`[CANVAS_INIT] No saved actions to restore`);
+        }
+      } else {
+        // Same image - just update the ID without resetting
+        console.log(`[CANVAS_INIT] Same image, updating ID without reset`);
+        setImageId(currentImageId);
       }
 
-      setIsInitialized(true);
+      // Mark as initialized for this specific image
+      console.log(
+        `[CANVAS_INIT] Marking as initialized for image ${currentImageId}`,
+      );
+      initializedForImageIdRef.current = currentImageId;
+      isInitializedRef.current = true;
+      console.log(`[CANVAS_INIT] Initialization complete`);
     };
 
     initializeCanvas();
-  }, [coloringImage.id, isInitialized, setImageId, addAction]);
+
+    // Cleanup function to cancel stale loads
+    return () => {
+      console.log(
+        `[CANVAS_INIT] Cleanup - cancelling effect for image ${currentImageId}`,
+      );
+      isCancelled = true;
+    };
+  }, [coloringImage.id, reset, setImageId, addAction, imageId]);
+
+  // Save immediately when screen loses focus (user navigates away)
+  useFocusEffect(
+    useCallback(() => {
+      console.log(`[CANVAS_FOCUS] Screen focused - Image: ${coloringImage.id}`);
+
+      // Return cleanup function that runs when screen loses focus
+      return () => {
+        console.log(
+          `[CANVAS_FOCUS] Screen losing focus - Image: ${coloringImage.id}`,
+        );
+
+        // Clear any pending auto-save timer
+        if (autoSaveTimerRef.current) {
+          clearTimeout(autoSaveTimerRef.current);
+          console.log(`[CANVAS_FOCUS] Cleared pending auto-save timer`);
+        }
+
+        // Get the latest state from the store directly
+        const currentState = useCanvasStore.getState();
+        const actionsToSave = currentState.history.slice(
+          0,
+          currentState.historyIndex + 1,
+        );
+        console.log(
+          `[CANVAS_FOCUS] Actions to save: ${actionsToSave.length}, isInitialized: ${isInitializedRef.current}`,
+        );
+        console.log(
+          `[CANVAS_FOCUS] History length: ${currentState.history.length}, historyIndex: ${currentState.historyIndex}`,
+        );
+
+        if (actionsToSave.length > 0 && isInitializedRef.current) {
+          console.log(`[CANVAS_FOCUS] Saving state on focus loss...`);
+          // Pass SVG dimensions (coordinate space) for cross-platform sync
+          // Mobile strokes are in SVG viewBox space, not CSS layout space
+          const saveWidth = svgDimensions?.width || 1024;
+          const saveHeight = svgDimensions?.height || 1024;
+          console.log(
+            `[CANVAS_FOCUS] Saving with SVG dimensions: ${saveWidth}x${saveHeight}`,
+          );
+          saveCanvasState(
+            coloringImage.id,
+            actionsToSave,
+            saveWidth,
+            saveHeight,
+          )
+            .then((success) => {
+              console.log(
+                `[CANVAS_FOCUS] Save completed with result: ${success}`,
+              );
+            })
+            .catch((error) => {
+              console.error(`[CANVAS_FOCUS] Save failed with error:`, error);
+            });
+          currentState.setDirty(false);
+        } else {
+          console.log(`[CANVAS_FOCUS] No actions to save or not initialized`);
+        }
+      };
+    }, [coloringImage.id]),
+  );
 
   // Auto-save effect
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitializedRef.current) return;
 
     // Debounce auto-save
     if (autoSaveTimerRef.current) {
@@ -172,22 +430,37 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     }
 
     autoSaveTimerRef.current = setTimeout(() => {
-      const actionsToSave = history.slice(0, historyIndex + 1);
+      // Get the latest state from the store directly
+      const currentState = useCanvasStore.getState();
+      const actionsToSave = currentState.history.slice(
+        0,
+        currentState.historyIndex + 1,
+      );
       if (actionsToSave.length > 0) {
-        saveCanvasState(coloringImage.id, actionsToSave);
-        setDirty(false);
+        // Pass SVG dimensions (coordinate space) for cross-platform sync
+        // Mobile strokes are in SVG viewBox space (typically 1024x1024), not CSS layout space
+        const saveWidth = svgDimensions?.width || 1024;
+        const saveHeight = svgDimensions?.height || 1024;
+        console.log(
+          `[AUTO_SAVE] Saving ${actionsToSave.length} actions with SVG dimensions: ${saveWidth}x${saveHeight}`,
+        );
+        saveCanvasState(coloringImage.id, actionsToSave, saveWidth, saveHeight)
+          .then((success) => {
+            console.log(`[AUTO_SAVE] Save completed with result: ${success}`);
+          })
+          .catch((error) => {
+            console.error(`[AUTO_SAVE] Save failed with error:`, error);
+          });
+        currentState.setDirty(false);
       }
-    }, 2000); // Save 2 seconds after last change
+    }, 1000); // Save 1 second after last change (matching web)
 
     return () => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [history, historyIndex, coloringImage.id, isInitialized, setDirty]);
-
-  // Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
-  const canvasSize = screenWidth - 32 - 24;
+  }, [history, historyIndex, coloringImage.id, setDirty]);
 
   const src = svgDimensions
     ? rect(0, 0, svgDimensions.width, svgDimensions.height)
@@ -264,6 +537,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         brushType,
         strokeWidth,
         startHue: brushType === "rainbow" ? rainbowHue : undefined,
+        // Store source dimensions for cross-platform sync
+        sourceWidth: svgDimensions?.width,
+        sourceHeight: svgDimensions?.height,
       };
       addAction(action);
       setCurrentPath(null);
@@ -283,6 +559,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
     addAction,
     setScroll,
     advanceRainbowHue,
+    svgDimensions,
   ]);
 
   // Handle fill tool tap
@@ -304,6 +581,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         fillY: coords.y,
         fillType: fillType,
         patternType: fillType === "pattern" ? selectedPattern : undefined,
+        // Store source dimensions for cross-platform sync
+        sourceWidth: svgDimensions?.width,
+        sourceHeight: svgDimensions?.height,
       };
       addAction(action);
     },
@@ -314,6 +594,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
       selectedPattern,
       touchToSvgCoords,
       addAction,
+      svgDimensions,
     ],
   );
 
@@ -336,6 +617,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         stickerX: coords.x,
         stickerY: coords.y,
         stickerSize: stickerSize,
+        // Store source dimensions for cross-platform sync
+        sourceWidth: svgDimensions?.width,
+        sourceHeight: svgDimensions?.height,
       };
       addAction(action);
     },
@@ -346,6 +630,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
       stickerSize,
       touchToSvgCoords,
       addAction,
+      svgDimensions,
     ],
   );
 
@@ -407,6 +692,9 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
           type: "magic-fill",
           color: colorMap.gridColors[0]?.suggestedColor || "#FFFFFF",
           magicFills: fills,
+          // Store source dimensions for cross-platform sync
+          sourceWidth: svgDimensions?.width,
+          sourceHeight: svgDimensions?.height,
         };
         addAction(action);
       }

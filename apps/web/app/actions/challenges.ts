@@ -161,6 +161,86 @@ export const claimMyChallengeReward = async (
 };
 
 /**
+ * Mobile API response type for challenges
+ */
+type SerializedChallenge = Omit<
+  ChallengeWithProgress,
+  'startDate' | 'endDate' | 'completedAt'
+> & {
+  startDate: string;
+  endDate: string;
+  completedAt: string | null;
+};
+
+export type MobileChallengesResponse = {
+  currentChallenge: SerializedChallenge | null;
+  history: SerializedChallenge[];
+};
+
+/**
+ * Helper to serialize challenge dates for JSON response
+ */
+const serializeChallenge = (
+  challenge: ChallengeWithProgress | null,
+): SerializedChallenge | null => {
+  if (!challenge) return null;
+  return {
+    ...challenge,
+    startDate: challenge.startDate.toISOString(),
+    endDate: challenge.endDate.toISOString(),
+    completedAt: challenge.completedAt?.toISOString() || null,
+  };
+};
+
+/**
+ * Get challenges data for mobile API
+ * Returns current challenge and history in a single call with serialized dates
+ */
+export const getMobileChallengesAction =
+  async (): Promise<MobileChallengesResponse> => {
+    const userId = await getUserId(ACTIONS.GET_CURRENT_CHALLENGE);
+
+    const emptyResponse: MobileChallengesResponse = {
+      currentChallenge: null,
+      history: [],
+    };
+
+    if (!userId) {
+      return emptyResponse;
+    }
+
+    // Get the active profile
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { activeProfileId: true },
+    });
+
+    if (!user?.activeProfileId) {
+      return emptyResponse;
+    }
+
+    const profileId = user.activeProfileId;
+
+    // Get current challenge and history in parallel
+    const [currentChallenge, history] = await Promise.all([
+      getCurrentChallenge(profileId),
+      getChallengeHistory(profileId, 5),
+    ]);
+
+    // Filter out current challenge from history if it exists
+    const filteredHistory = history.filter(
+      (h) => h.weeklyChallengeId !== currentChallenge?.weeklyChallengeId,
+    );
+
+    return {
+      currentChallenge: serializeChallenge(currentChallenge),
+      history: filteredHistory.map(
+        (h) => serializeChallenge(h) as SerializedChallenge,
+      ),
+    };
+  };
+
+/**
  * Update challenge progress when artwork is saved
  * This is called internally when saving artwork
  *

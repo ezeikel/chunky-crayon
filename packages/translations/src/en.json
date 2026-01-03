@@ -1150,7 +1150,30 @@
     "chooseMethod": "Choose your preferred sign in method",
     "orContinueWith": "Or continue with",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy."
+    "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy.",
+    "verifyRequest": {
+      "title": "Check Your Email!",
+      "description": "We sent you a magic link to sign in. Click the link in your email to continue.",
+      "checkSpam": "Don't see it? Check your spam folder.",
+      "linkExpiry": "The link expires in 24 hours.",
+      "tryDifferentEmail": "Use a different email"
+    },
+    "error": {
+      "title": "Something Went Wrong",
+      "tryAgain": "Please try signing in again. If the problem persists, contact support.",
+      "backToSignIn": "Back to Sign In",
+      "goHome": "Go to Homepage"
+    },
+    "errors": {
+      "configuration": "There's a problem with the server configuration. Please try again later.",
+      "accessDenied": "Access denied. You don't have permission to sign in.",
+      "verification": "The sign-in link has expired or has already been used. Please request a new one.",
+      "oauth": "There was a problem signing in with your account. Please try again.",
+      "email": "There was a problem sending the sign-in email. Please try again.",
+      "credentials": "Invalid credentials. Please check your email and try again.",
+      "sessionRequired": "Please sign in to access this page.",
+      "default": "An unexpected error occurred. Please try again."
+    }
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

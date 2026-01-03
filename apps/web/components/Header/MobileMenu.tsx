@@ -12,10 +12,8 @@ import cn from '@/lib/utils';
 import { ParentalGateLink } from '@/components/ParentalGate';
 import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
 import MobileLanguageSelector from '@/components/LanguageSwitcher/MobileLanguageSelector';
-import {
-  setActiveProfile,
-  type ProfileWithStats,
-} from '@/app/actions/profiles';
+import { setActiveProfile } from '@/app/actions/profiles';
+import type { ProfileWithStats } from '@/lib/profiles/service';
 import type { MobileNavItem } from './Header';
 
 type MobileMenuProps = {
