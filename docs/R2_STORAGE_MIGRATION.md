@@ -57,20 +57,16 @@ const fileExists = await exists('uploads/image.webp');
 
 ## Environment Variables
 
-Required variables in `.env.local`:
+Most R2 variables are already configured (used by backup utility). Only one new variable needed:
 
 ```bash
-# R2 API endpoint (from Cloudflare dashboard)
+# Already configured (existing)
 R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
-
-# R2 API credentials (create in Cloudflare dashboard → R2 → Manage R2 API Tokens)
 R2_ACCESS_KEY_ID=your-access-key-id
 R2_SECRET_ACCESS_KEY=your-secret-access-key
-
-# Bucket name
 R2_BUCKET=chunky-crayon
 
-# Public URL for the bucket (custom domain or R2.dev URL)
+# NEW - Public URL for the bucket (custom domain or R2.dev URL)
 R2_PUBLIC_URL=https://assets.chunkycrayon.com
 ```
 
