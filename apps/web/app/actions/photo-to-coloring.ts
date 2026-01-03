@@ -1,6 +1,6 @@
 'use server';
 
-import { put, del } from '@vercel/blob';
+import { put, del } from '@/lib/storage';
 import QRCode from 'qrcode';
 import sharp from 'sharp';
 import {

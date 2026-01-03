@@ -1,6 +1,6 @@
 'use server';
 
-import { put } from '@vercel/blob';
+import { put } from '@/lib/storage';
 import {
   generateText,
   getTracedModels,

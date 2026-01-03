@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob';
+import { put } from '@/lib/storage';
 import { generateImage, generateText } from 'ai';
 import { models, MODEL_IDS } from './models';
 import {

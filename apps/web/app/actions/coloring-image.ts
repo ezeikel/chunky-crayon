@@ -1,6 +1,6 @@
 'use server';
 
-import { put, del } from '@vercel/blob';
+import { put, del } from '@/lib/storage';
 import { revalidatePath, revalidateTag, cacheLife, cacheTag } from 'next/cache';
 import { after } from 'next/server';
 import QRCode from 'qrcode';

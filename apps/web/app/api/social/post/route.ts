@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
 import sharp from 'sharp';
-import { put, del } from '@vercel/blob';
+import { put, del } from '@/lib/storage';
 import { db } from '@chunky-crayon/db';
 import {
   generateInstagramCaption,
