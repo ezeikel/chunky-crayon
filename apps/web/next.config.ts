@@ -67,6 +67,17 @@ const nextConfig: NextConfig = {
         hostname: 'cdn.sanity.io',
         pathname: '**',
       },
+      // Cloudflare R2 storage
+      {
+        protocol: 'https',
+        hostname: 'assets.chunkycrayon.com',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.r2.dev',
+        pathname: '**',
+      },
     ],
   },
   serverExternalPackages: ['@react-pdf/renderer', 'playwright'],
