@@ -6,12 +6,12 @@ This document describes the migration from Vercel Blob Storage to Cloudflare R2 
 
 ## Why R2?
 
-| Metric | Vercel Blob | Cloudflare R2 | Savings |
-|--------|-------------|---------------|---------|
-| Storage | $0.23/GB/mo | $0.015/GB/mo | **~15x cheaper** |
-| Egress | $0.15/GB | **Free** | **100%** |
-| Class A ops | Included | $4.50/million | Minimal |
-| Class B ops | Included | $0.36/million | Minimal |
+| Metric      | Vercel Blob | Cloudflare R2 | Savings          |
+| ----------- | ----------- | ------------- | ---------------- |
+| Storage     | $0.23/GB/mo | $0.015/GB/mo  | **~15x cheaper** |
+| Egress      | $0.15/GB    | **Free**      | **100%**         |
+| Class A ops | Included    | $4.50/million | Minimal          |
+| Class B ops | Included    | $0.36/million | Minimal          |
 
 At scale, R2 significantly reduces costs, especially with free egress for image-heavy applications.
 
@@ -32,27 +32,27 @@ lib/storage/
 The R2 module provides a drop-in replacement for `@vercel/blob`:
 
 ```typescript
-import { put, del, list, exists } from '@/lib/storage';
+import { put, del, list, exists } from "@/lib/storage";
 
 // Upload a file
-const { url, pathname } = await put('uploads/image.webp', buffer, {
-  access: 'public',
-  contentType: 'image/webp',
+const { url, pathname } = await put("uploads/image.webp", buffer, {
+  access: "public",
+  contentType: "image/webp",
 });
 
 // Delete a file
-await del('uploads/image.webp');
+await del("uploads/image.webp");
 // or
-await del('https://r2.example.com/uploads/image.webp');
+await del("https://r2.example.com/uploads/image.webp");
 
 // List files
 const { blobs, hasMore, cursor } = await list({
-  prefix: 'uploads/',
+  prefix: "uploads/",
   limit: 100,
 });
 
 // Check if file exists
-const fileExists = await exists('uploads/image.webp');
+const fileExists = await exists("uploads/image.webp");
 ```
 
 ## Environment Variables
@@ -72,18 +72,19 @@ R2_PUBLIC_URL=https://assets.chunkycrayon.com
 
 ## Files Using Storage
 
-| File | Operations | Purpose |
-|------|------------|---------|
-| `app/actions/coloring-image.ts` | put, del | Coloring images (webp, svg, qr) |
-| `app/actions/photo-to-coloring.ts` | put, del | Photo-to-coloring generation |
-| `app/actions/ambient-sound.ts` | put | Ambient audio files |
-| `app/actions/saved-artwork.ts` | put | User saved artwork |
-| `app/actions/share-artwork.ts` | put | Shared artwork for social |
-| `app/actions/loading-audio.ts` | put | Colo voice audio |
-| `lib/ai/image-providers.ts` | put | Temp AI-generated images |
-| `utils/traceImage.ts` | put | SVG retracing |
-| `app/api/social/post/route.ts` | put, del | Social media temp images |
-| `scripts/generate-ambient-sounds.ts` | put | Batch ambient sound generation |
+| File                                 | Operations | Purpose                            |
+| ------------------------------------ | ---------- | ---------------------------------- |
+| `app/actions/coloring-image.ts`      | put, del   | Coloring images (webp, svg, qr)    |
+| `app/actions/photo-to-coloring.ts`   | put, del   | Photo-to-coloring generation       |
+| `app/actions/ambient-sound.ts`       | put        | Ambient audio files                |
+| `app/actions/saved-artwork.ts`       | put        | User saved artwork                 |
+| `app/actions/share-artwork.ts`       | put        | Shared artwork for social          |
+| `app/actions/loading-audio.ts`       | put        | Colo voice audio                   |
+| `lib/ai/image-providers.ts`          | put        | Temp AI-generated images           |
+| `utils/traceImage.ts`                | put        | SVG retracing                      |
+| `app/api/social/post/route.ts`       | put, del   | Social media temp images           |
+| `app/api/canvas/progress/route.ts`   | put, del   | Canvas progress preview thumbnails |
+| `scripts/generate-ambient-sounds.ts` | put        | Batch ambient sound generation     |
 
 ## Storage Path Structure
 
@@ -94,6 +95,8 @@ uploads/
 │   ├── image.svg        # SVG trace for coloring
 │   ├── qr-code.svg      # QR code for PDF
 │   └── ambient.mp3      # Background soundscape
+├── canvas-previews/{userId}/{coloringImageId}/
+│   └── {timestamp}.webp # User's coloring progress preview thumbnail
 ├── saved-artwork/{userId}/{coloringImageId}/
 │   └── {timestamp}.png  # User's colored artwork
 └── shared-artwork/
@@ -136,6 +139,8 @@ pnpm tsx apps/web/utils/backupVercelBlobsToR2.ts
 
 The code changes in this PR update all storage imports to use R2.
 
+**Post-merge note:** After merging with `main`, update `app/api/canvas/progress/route.ts` to import from `@/lib/storage` instead of `@vercel/blob`. This file handles canvas progress preview uploads and was added after this branch was created.
+
 ### 4. Update Database URLs
 
 After deploying, run the migration script to update stored URLs:
@@ -155,6 +160,7 @@ DOTENV_CONFIG_PATH=apps/web/.env.local \
 R2 provides **11 9s durability** (99.999999999%) - same as AWS S3. Data loss is extremely rare.
 
 No automatic backups are configured. Options if needed:
+
 - Replicate to a second R2 bucket
 - Backup to another provider (S3, Backblaze B2)
 - Most applications trust R2's built-in durability
@@ -175,5 +181,8 @@ If issues arise:
 - [ ] Share artwork to social media
 - [ ] Photo-to-coloring generation
 - [ ] Loading audio plays during generation
+- [ ] Canvas progress preview saves on web (auto-save after coloring)
+- [ ] Canvas progress preview saves on mobile (auto-save after coloring)
+- [ ] Preview thumbnails display in gallery/feed
 - [ ] Verify all URLs resolve correctly
 - [ ] Run migration script on development database
