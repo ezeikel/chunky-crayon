@@ -112,36 +112,41 @@ temp/
 
 ## Migration Steps
 
-### 1. Set Up R2 Bucket
+### 1. Set Up R2 Buckets
 
-1. Go to Cloudflare Dashboard → R2
-2. Create a bucket (e.g., `chunky-crayon`)
-3. Enable public access or set up a custom domain
-4. Create an API token with read/write permissions
+Create two buckets in Cloudflare Dashboard → R2:
 
-### 2. Sync Existing Blobs
+| Bucket               | Purpose             | Public Access                            |
+| -------------------- | ------------------- | ---------------------------------------- |
+| `chunky-crayon-prod` | Production          | Custom domain: `assets.chunkycrayon.com` |
+| `chunky-crayon-dev`  | Preview/Development | R2.dev URL enabled                       |
 
-Use the existing backup utility to sync all Vercel blobs to R2:
+### 2. Configure Vercel Environment Variables
+
+| Env Var         | Production                        | Preview/Development      |
+| --------------- | --------------------------------- | ------------------------ |
+| `R2_BUCKET`     | `chunky-crayon-prod`              | `chunky-crayon-dev`      |
+| `R2_PUBLIC_URL` | `https://assets.chunkycrayon.com` | `https://pub-xxx.r2.dev` |
+
+Other R2 vars (`R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`) are account-level and shared.
+
+### 3. Sync Existing Blobs
+
+Run the sync scripts to copy Vercel Blob data to R2:
 
 ```bash
-# Set environment variables
-export PROD_BLOB_TOKEN=your-vercel-blob-token
-export R2_ENDPOINT=https://xxx.r2.cloudflarestorage.com
-export R2_BUCKET=chunky-crayon
-export R2_ACCESS_KEY_ID=xxx
-export R2_SECRET_ACCESS_KEY=xxx
+# Sync production
+./apps/web/scripts/sync-prod-to-r2.sh
 
-# Run backup
-pnpm tsx apps/web/utils/backupVercelBlobsToR2.ts
+# Sync development
+./apps/web/scripts/sync-dev-to-r2.sh
 ```
 
-### 3. Deploy Code Changes
+### 4. Deploy Code Changes
 
 The code changes in this PR update all storage imports to use R2.
 
-**Post-merge note:** After merging with `main`, update `app/api/canvas/progress/route.ts` to import from `@/lib/storage` instead of `@vercel/blob`. This file handles canvas progress preview uploads and was added after this branch was created.
-
-### 4. Update Database URLs
+### 5. Update Database URLs
 
 After deploying, run the migration script to update stored URLs:
 
@@ -155,15 +160,27 @@ DOTENV_CONFIG_PATH=apps/web/.env.local \
   pnpm tsx -r dotenv/config apps/web/scripts/migrate-blob-urls-to-r2.ts
 ```
 
+### 6. Cleanup
+
+After migration is verified working:
+
+```bash
+# Delete one-time migration files
+rm apps/web/utils/backupVercelBlobsToR2.ts
+rm apps/web/scripts/sync-prod-to-r2.sh
+rm apps/web/scripts/sync-dev-to-r2.sh
+```
+
+Optionally:
+
+- Delete or keep `chunky-crayon-backup-prod` R2 bucket (historical archive)
+- Remove Vercel Blob stores once confident in R2
+
 ## R2 Durability & Backups
 
 R2 provides **11 9s durability** (99.999999999%) - same as AWS S3. Data loss is extremely rare.
 
-No automatic backups are configured. Options if needed:
-
-- Replicate to a second R2 bucket
-- Backup to another provider (S3, Backblaze B2)
-- Most applications trust R2's built-in durability
+**No backup job needed.** The old Vercel Blob → R2 backup job can be discontinued. Most applications trust R2's built-in durability without additional backups.
 
 ## Rollback Plan
 
