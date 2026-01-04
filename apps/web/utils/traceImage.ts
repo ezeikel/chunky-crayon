@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob';
+import { put } from '@/lib/storage';
 import { chromium } from 'playwright';
 import sharp from 'sharp';
 import potrace from 'oslllo-potrace';

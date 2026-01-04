@@ -14,7 +14,7 @@
 // DOTENV_CONFIG_PATH=apps/web/.env.local pnpm tsx -r dotenv/config apps/web/scripts/generate-ambient-sounds.ts [limit]
 
 import { db } from '@chunky-crayon/db';
-import { put } from '@vercel/blob';
+import { put } from '../lib/storage';
 import { generateAmbientSound } from '../lib/elevenlabs';
 import { createAmbientPrompt } from '../lib/audio/prompts';
 

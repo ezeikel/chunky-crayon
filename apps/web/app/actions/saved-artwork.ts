@@ -1,6 +1,6 @@
 'use server';
 
-import { put } from '@vercel/blob';
+import { put } from '@/lib/storage';
 import { revalidatePath } from 'next/cache';
 import { db } from '@chunky-crayon/db';
 import { getUserId } from '@/app/actions/user';

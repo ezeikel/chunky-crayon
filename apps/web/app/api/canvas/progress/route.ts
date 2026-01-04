@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { put, del } from '@vercel/blob';
+import { put, del } from '@/lib/storage';
 import { auth } from '@/auth';
 import { db } from '@chunky-crayon/db';
 import { verifyMobileToken } from '@/lib/mobile-auth';

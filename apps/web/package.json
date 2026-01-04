@@ -59,7 +59,6 @@
     "@types/ws": "^8.18.1",
     "@upstash/redis": "^1.35.8",
     "@vercel/analytics": "^1.2.2",
-    "@vercel/blob": "^1.0.1",
     "@vercel/postgres": "^0.10.0",
     "@vercel/toolbar": "^0.1.36",
     "ai": "^6.0.3",
