@@ -214,7 +214,7 @@ Style: whimsical, playful, soothing like a kids' app or cartoon.`;
 ```typescript
 "use server";
 
-import { put } from "@vercel/blob";
+import { put } from "@/lib/storage";
 import { db } from "@chunky-crayon/db";
 import { generateBackgroundMusic } from "@/lib/elevenlabs";
 
