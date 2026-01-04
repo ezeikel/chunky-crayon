@@ -55,6 +55,7 @@ export interface SaveCanvasProgressRequest {
   version: number;
   canvasWidth?: number; // Canvas width for aspect ratio scaling
   canvasHeight?: number; // Canvas height for aspect ratio scaling
+  previewDataUrl?: string; // Base64 data URL of canvas preview thumbnail
 }
 
 export interface GetCanvasProgressResponse {
@@ -63,6 +64,7 @@ export interface GetCanvasProgressResponse {
   lastUpdated: string;
   canvasWidth?: number; // Canvas width for aspect ratio scaling
   canvasHeight?: number; // Canvas height for aspect ratio scaling
+  previewUrl?: string; // URL to progress preview thumbnail
 }
 
 // Sync status for UI

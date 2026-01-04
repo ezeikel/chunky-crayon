@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { put, del } from '@vercel/blob';
 import { auth } from '@/auth';
 import { db } from '@chunky-crayon/db';
 import { verifyMobileToken } from '@/lib/mobile-auth';
@@ -7,6 +8,72 @@ import type {
   SaveCanvasProgressRequest,
   GetCanvasProgressResponse,
 } from '@chunky-crayon/db';
+
+// Preview update throttle: 5 seconds minimum between updates
+// Short enough to feel responsive, long enough to prevent rapid uploads
+const PREVIEW_UPDATE_THROTTLE_MS = 5 * 1000;
+
+/**
+ * Upload preview image to blob storage
+ * Returns the blob URL or null if upload fails
+ */
+async function uploadPreviewImage(
+  userId: string,
+  coloringImageId: string,
+  previewDataUrl: string,
+): Promise<string | null> {
+  try {
+    // Extract base64 data from data URL
+    const base64Match = previewDataUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!base64Match) {
+      console.error('[Canvas API] Invalid preview data URL format');
+      return null;
+    }
+
+    const [, format, base64Data] = base64Match;
+    const imageBuffer = Buffer.from(base64Data, 'base64');
+
+    // Validate size (max 300KB for 1024×1024 thumbnails)
+    if (imageBuffer.length > 300 * 1024) {
+      console.warn('[Canvas API] Preview too large:', imageBuffer.length);
+      // Still upload but log warning - client should optimize
+    }
+
+    const timestamp = Date.now();
+    const fileName = `uploads/canvas-previews/${userId}/${coloringImageId}/${timestamp}.${format === 'webp' ? 'webp' : 'png'}`;
+
+    const { url } = await put(fileName, imageBuffer, {
+      access: 'public',
+      contentType: format === 'webp' ? 'image/webp' : 'image/png',
+    });
+
+    return url;
+  } catch (error) {
+    console.error('[Canvas API] Error uploading preview:', error);
+    return null;
+  }
+}
+
+/**
+ * Delete old preview image from blob storage
+ */
+async function deletePreviewImage(previewUrl: string): Promise<void> {
+  try {
+    await del(previewUrl);
+  } catch (error) {
+    // Log but don't fail - old blobs can be cleaned up later
+    console.warn('[Canvas API] Error deleting old preview:', error);
+  }
+}
+
+/**
+ * Check if preview should be updated based on throttle
+ */
+function shouldUpdatePreview(lastUpdatedAt: Date | null): boolean {
+  if (!lastUpdatedAt) return true;
+  const elapsed = Date.now() - lastUpdatedAt.getTime();
+  return elapsed >= PREVIEW_UPDATE_THROTTLE_MS;
+}
 
 /**
  * Get the authenticated user ID from either:
@@ -61,8 +128,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body: SaveCanvasProgressRequest = await request.json();
-    const { coloringImageId, actions, version, canvasWidth, canvasHeight } =
-      body;
+    const {
+      coloringImageId,
+      actions,
+      version,
+      canvasWidth,
+      canvasHeight,
+      previewDataUrl,
+    } = body;
     console.log(
       '[Canvas API] POST - coloringImageId:',
       coloringImageId,
@@ -74,6 +147,8 @@ export async function POST(request: NextRequest) {
       canvasWidth,
       'x',
       canvasHeight,
+      'hasPreview:',
+      !!previewDataUrl,
     );
 
     if (!coloringImageId || !actions || version === undefined) {
@@ -120,6 +195,25 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Handle preview upload with throttling
+      let newPreviewUrl: string | null = null;
+      const shouldUploadPreview =
+        previewDataUrl &&
+        shouldUpdatePreview(existingProgress.previewUpdatedAt);
+
+      if (shouldUploadPreview) {
+        newPreviewUrl = await uploadPreviewImage(
+          userId,
+          coloringImageId,
+          previewDataUrl,
+        );
+
+        // Delete old preview if new one was uploaded successfully
+        if (newPreviewUrl && existingProgress.previewUrl) {
+          await deletePreviewImage(existingProgress.previewUrl);
+        }
+      }
+
       // Update existing progress
       const updated = await db.canvasProgress.update({
         where: {
@@ -134,6 +228,11 @@ export async function POST(request: NextRequest) {
           // Only update dimensions if provided (to preserve existing values)
           ...(canvasWidth && { canvasWidth }),
           ...(canvasHeight && { canvasHeight }),
+          // Only update preview if new one was uploaded
+          ...(newPreviewUrl && {
+            previewUrl: newPreviewUrl,
+            previewUpdatedAt: new Date(),
+          }),
         },
       });
 
@@ -141,8 +240,19 @@ export async function POST(request: NextRequest) {
         success: true,
         version: updated.version,
         lastUpdated: updated.updatedAt.toISOString(),
+        previewUrl: updated.previewUrl,
       });
     } else {
+      // Upload preview for new progress if provided
+      let previewUrl: string | null = null;
+      if (previewDataUrl) {
+        previewUrl = await uploadPreviewImage(
+          userId,
+          coloringImageId,
+          previewDataUrl,
+        );
+      }
+
       // Create new progress
       const created = await db.canvasProgress.create({
         data: {
@@ -152,6 +262,8 @@ export async function POST(request: NextRequest) {
           version: 1,
           canvasWidth: canvasWidth || null,
           canvasHeight: canvasHeight || null,
+          previewUrl,
+          previewUpdatedAt: previewUrl ? new Date() : null,
         },
       });
 
@@ -159,6 +271,7 @@ export async function POST(request: NextRequest) {
         success: true,
         version: created.version,
         lastUpdated: created.createdAt.toISOString(),
+        previewUrl: created.previewUrl,
       });
     }
   } catch (error) {
@@ -210,6 +323,7 @@ export async function GET(request: NextRequest) {
       lastUpdated: progress.updatedAt.toISOString(),
       ...(progress.canvasWidth && { canvasWidth: progress.canvasWidth }),
       ...(progress.canvasHeight && { canvasHeight: progress.canvasHeight }),
+      ...(progress.previewUrl && { previewUrl: progress.previewUrl }),
     };
 
     return NextResponse.json(response);
@@ -240,6 +354,23 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // First fetch the progress to get the previewUrl for cleanup
+    const progress = await db.canvasProgress.findUnique({
+      where: {
+        userId_coloringImageId: {
+          userId,
+          coloringImageId: imageId,
+        },
+      },
+      select: { previewUrl: true },
+    });
+
+    // Delete the preview blob if it exists
+    if (progress?.previewUrl) {
+      await deletePreviewImage(progress.previewUrl);
+    }
+
+    // Delete the database record
     await db.canvasProgress.delete({
       where: {
         userId_coloringImageId: {

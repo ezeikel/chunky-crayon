@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SkPath, Skia } from "@shopify/react-native-skia";
 import { Platform } from "react-native";
 import { getAuthHeader } from "@/lib/auth";
+import { queryClient } from "@/providers";
 import type {
   DrawingAction,
   BrushType,
@@ -109,6 +110,7 @@ const convertToApiAction = (
  * @param version - The current version for conflict detection
  * @param canvasWidth - Canvas width for aspect ratio scaling
  * @param canvasHeight - Canvas height for aspect ratio scaling
+ * @param previewDataUrl - Optional base64 data URL of preview thumbnail
  */
 export const syncCanvasToServer = async (
   imageId: string,
@@ -116,6 +118,7 @@ export const syncCanvasToServer = async (
   version: number = 0,
   canvasWidth?: number,
   canvasHeight?: number,
+  previewDataUrl?: string,
 ): Promise<{ success: boolean; version?: number; error?: string }> => {
   console.log(
     `[CANVAS_SYNC] Syncing to server - Image: ${imageId}, Actions: ${actions.length}, Dimensions: ${canvasWidth}x${canvasHeight}`,
@@ -128,6 +131,9 @@ export const syncCanvasToServer = async (
     console.log(`[CANVAS_SYNC] API URL: ${apiUrl}/canvas/progress`);
     console.log(
       `[CANVAS_SYNC] Auth header present: ${!!authHeader.Authorization}`,
+    );
+    console.log(
+      `[CANVAS_SYNC] Has preview: ${!!previewDataUrl}, preview size: ${previewDataUrl?.length || 0} chars`,
     );
 
     // Convert to API format (stroke actions only)
@@ -147,6 +153,7 @@ export const syncCanvasToServer = async (
         version,
         canvasWidth,
         canvasHeight,
+        previewDataUrl,
       }),
     });
 
@@ -160,10 +167,16 @@ export const syncCanvasToServer = async (
       } catch {
         errorData = { raw: errorText };
       }
-      console.error(`[CANVAS_SYNC] Server error:`, errorData);
       console.error(
-        `[CANVAS_SYNC] Server error details:`,
-        errorData.details || "No details",
+        `[CANVAS_SYNC] Server error (${response.status}):`,
+        errorData,
+      );
+      console.error(
+        `[CANVAS_SYNC] Error message:`,
+        errorData.error ||
+          errorData.details ||
+          errorData.raw ||
+          "No error message",
       );
 
       // Handle version conflict - retry with the correct version
@@ -189,13 +202,14 @@ export const syncCanvasToServer = async (
           console.error(`[CANVAS_SYNC] Failed to update local version:`, e);
         }
 
-        // Retry the sync with the correct version (pass through dimensions)
+        // Retry the sync with the correct version (pass through dimensions and preview)
         return syncCanvasToServer(
           imageId,
           actions,
           errorData.currentVersion,
           canvasWidth,
           canvasHeight,
+          previewDataUrl,
         );
       }
 
@@ -215,6 +229,9 @@ export const syncCanvasToServer = async (
 
     // Clear pending sync marker
     await clearPendingSync(imageId);
+
+    // Invalidate feed query so previews refresh when user navigates back
+    queryClient.invalidateQueries({ queryKey: ["feed"] });
 
     return { success: true, version: data.version };
   } catch (error) {
@@ -499,12 +516,14 @@ const deserializeActions = (
  * @param actions - The drawing actions to save
  * @param canvasWidth - Canvas width for cross-platform aspect ratio scaling
  * @param canvasHeight - Canvas height for cross-platform aspect ratio scaling
+ * @param previewDataUrl - Optional base64 data URL of preview thumbnail
  */
 export const saveCanvasState = async (
   imageId: string,
   actions: DrawingAction[],
   canvasWidth?: number,
   canvasHeight?: number,
+  previewDataUrl?: string,
 ): Promise<boolean> => {
   console.log(
     `[CANVAS_PERSIST] SAVE START - Image: ${imageId}, Actions: ${actions.length}, Dimensions: ${canvasWidth}x${canvasHeight}`,
@@ -594,6 +613,7 @@ export const saveCanvasState = async (
       data.version,
       canvasWidth,
       canvasHeight,
+      previewDataUrl,
     )
       .then(async (result) => {
         if (result.success && result.version !== undefined) {

@@ -17,6 +17,7 @@ import { TRACKING_EVENTS } from '@/constants';
 import { trackLead } from '@/utils/pixels';
 import useUser from '@/hooks/useUser';
 import useRecentCreations from '@/hooks/useRecentCreations';
+import { signalGalleryRefresh } from '@/utils/galleryRefresh';
 import { ColoLoading, type AudioState } from '@/components/Loading/ColoLoading';
 import UserInputV2 from './UserInputV2';
 import {
@@ -166,6 +167,9 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           contentName: desc || 'Coloring Page',
           contentCategory: 'coloring_page_creation',
         });
+
+        // Signal galleries to refresh when user navigates back
+        signalGalleryRefresh('image-created');
 
         // Reset audio state before navigation
         setAudioUrl(null);
@@ -351,6 +355,9 @@ const CreateColoringPageForm = ({
             contentName: rawFormData.description || 'Coloring Page',
             contentCategory: 'coloring_page_creation',
           });
+
+          // Signal galleries to refresh when user navigates back
+          signalGalleryRefresh('image-created');
 
           if (coloringImage.id) {
             router.push(`/coloring-image/${coloringImage.id}`);

@@ -1,7 +1,7 @@
 'use server';
 
 import { put, del } from '@vercel/blob';
-import { revalidatePath, updateTag, cacheLife, cacheTag } from 'next/cache';
+import { revalidatePath, revalidateTag, cacheLife, cacheTag } from 'next/cache';
 import { after } from 'next/server';
 import QRCode from 'qrcode';
 import sharp from 'sharp';
@@ -397,11 +397,11 @@ export const createColoringImage = async (
       ]);
 
       // Invalidate cache so new data (color map, ambient sound) is available
-      updateTag(`coloring-image-${result.id}`);
+      revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
     });
 
     // Invalidate gallery cache so new image appears immediately
-    updateTag('all-coloring-images');
+    revalidateTag('all-coloring-images', { expire: 0 });
     revalidatePath('/');
     return result;
   }
@@ -469,11 +469,11 @@ export const createColoringImage = async (
     ]);
 
     // Invalidate cache so new data (color map, ambient sound) is available
-    updateTag(`coloring-image-${result.id}`);
+    revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
   });
 
   // Invalidate gallery cache so new image appears immediately
-  updateTag('all-coloring-images');
+  revalidateTag('all-coloring-images', { expire: 0 });
   revalidatePath('/');
   return result;
 };

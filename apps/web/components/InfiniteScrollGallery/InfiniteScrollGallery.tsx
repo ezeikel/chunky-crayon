@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPalette } from '@fortawesome/pro-duotone-svg-icons';
 import { loadMoreImages } from '@/app/actions/load-more-images';
 import {
   loadGalleryImages,
@@ -11,6 +14,8 @@ import {
 } from '@/app/actions/load-gallery-images';
 import type { GalleryImage } from '@/app/data/coloring-image';
 import ColoringImageSkeleton from '@/components/ColoringImage/ColoringImageSkeleton';
+import { useProgressPreviews } from '@/hooks/useProgressPreviews';
+import { shouldRefresh, clearRefreshSignal } from '@/utils/galleryRefresh';
 import cn from '@/utils/cn';
 
 type InfiniteScrollGalleryProps = {
@@ -36,13 +41,29 @@ const InfiniteScrollGallery = ({
   difficultySlug,
 }: InfiniteScrollGalleryProps) => {
   const t = useTranslations('gallery.infiniteScroll');
+  const router = useRouter();
   const [images, setImages] = useState<GalleryImage[]>(initialImages);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Track when component mounted to detect stale data
+  const mountedAtRef = useRef(Date.now());
+
   // Ref for the sentinel element that triggers loading
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Check if we need to refresh after navigation (e.g., after creating an image)
+  useEffect(() => {
+    if (shouldRefresh(mountedAtRef.current)) {
+      clearRefreshSignal();
+      router.refresh();
+    }
+  }, [router]);
+
+  // Fetch progress previews for displayed images
+  const imageIds = useMemo(() => images.map((img) => img.id), [images]);
+  const { getPreview } = useProgressPreviews(imageIds);
 
   // Load more images when the sentinel comes into view
   const loadMore = useCallback(async () => {
@@ -112,30 +133,45 @@ const InfiniteScrollGallery = ({
     <>
       {/* Image grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {images.map((image) => (
-          <Link
-            href={`/coloring-image/${image.id}`}
-            key={image.id}
-            className="block"
-          >
-            <div
-              className={cn(
-                'relative w-full overflow-hidden rounded-lg shadow-lg bg-white',
-                'transition-transform duration-200 hover:scale-[1.02]',
-              )}
+        {images.map((image) => {
+          // Use progress preview if available, otherwise fall back to SVG
+          const previewUrl = getPreview(image.id);
+          const imageSrc = previewUrl || (image.svgUrl as string);
+
+          return (
+            <Link
+              href={`/coloring-image/${image.id}`}
+              key={image.id}
+              className="block"
             >
-              <Image
-                src={image.svgUrl as string}
-                alt={image.description || image.title || 'Coloring page'}
-                width={1024}
-                height={1024}
-                quality={100}
-                className="w-full h-auto"
-                style={{ objectFit: 'cover' }}
-              />
-            </div>
-          </Link>
-        ))}
+              <div
+                className={cn(
+                  'relative w-full overflow-hidden rounded-lg shadow-lg bg-white',
+                  'transition-transform duration-200 hover:scale-[1.02]',
+                )}
+              >
+                <Image
+                  src={imageSrc}
+                  alt={image.description || image.title || 'Coloring page'}
+                  width={1024}
+                  height={1024}
+                  quality={100}
+                  className="w-full h-auto"
+                  style={{ objectFit: 'cover' }}
+                />
+                {/* Show palette indicator when there's progress (kid-friendly, no text) */}
+                {previewUrl && (
+                  <div className="absolute bottom-2 right-2 size-8 bg-crayon-orange rounded-full shadow-lg flex items-center justify-center">
+                    <FontAwesomeIcon
+                      icon={faPalette}
+                      className="text-sm text-white"
+                    />
+                  </div>
+                )}
+              </div>
+            </Link>
+          );
+        })}
 
         {/* Show skeleton loaders while loading more */}
         {isLoading &&

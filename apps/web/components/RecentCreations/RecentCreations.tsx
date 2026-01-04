@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -10,9 +10,11 @@ import {
   faArrowRight,
   faSparkles,
   faHeart,
+  faPalette,
 } from '@fortawesome/pro-duotone-svg-icons';
 import useRecentCreations from '@/hooks/useRecentCreations';
 import { fetchRecentCreationImages } from '@/app/actions/recent-creations';
+import { useProgressPreviews } from '@/hooks/useProgressPreviews';
 import type { GalleryImage } from '@/app/data/coloring-image';
 import cn from '@/utils/cn';
 
@@ -25,6 +27,10 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
   const { recentIds, isLoaded, hasCreations } = useRecentCreations();
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
+
+  // Fetch progress previews for displayed images
+  const imageIds = useMemo(() => images.map((img) => img.id), [images]);
+  const { getPreview } = useProgressPreviews(imageIds);
 
   // Fetch image data when we have IDs
   useEffect(() => {
@@ -91,29 +97,46 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
           </div>
         ) : images.length > 0 ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {images.map((image) => (
-              <Link
-                key={image.id}
-                href={`/coloring-image/${image.id}`}
-                className="relative aspect-square rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 group border-2 border-transparent hover:border-crayon-teal/30"
-              >
-                {image.svgUrl ? (
-                  <Image
-                    src={image.svgUrl}
-                    alt={image.title || t('imageAlt')}
-                    fill
-                    className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-paper-cream">
-                    <FontAwesomeIcon
-                      icon={faSparkles}
-                      className="text-2xl text-crayon-teal/50"
-                    />
-                  </div>
-                )}
-              </Link>
-            ))}
+            {images.map((image) => {
+              // Use progress preview if available, otherwise fall back to SVG
+              const previewUrl = getPreview(image.id);
+              const imageSrc = previewUrl || image.svgUrl;
+
+              return (
+                <Link
+                  key={image.id}
+                  href={`/coloring-image/${image.id}`}
+                  className="relative aspect-square rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300 group border-2 border-transparent hover:border-crayon-teal/30"
+                >
+                  {imageSrc ? (
+                    <>
+                      <Image
+                        src={imageSrc}
+                        alt={image.title || t('imageAlt')}
+                        fill
+                        className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {/* Show palette indicator when there's progress (kid-friendly, no text) */}
+                      {previewUrl && (
+                        <div className="absolute bottom-1 right-1 size-6 bg-crayon-orange rounded-full shadow-md flex items-center justify-center">
+                          <FontAwesomeIcon
+                            icon={faPalette}
+                            className="text-xs text-white"
+                          />
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-paper-cream">
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        className="text-2xl text-crayon-teal/50"
+                      />
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         ) : null}
 

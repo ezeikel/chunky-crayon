@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -11,6 +10,7 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import { getTodaysDailyImage, getFeaturedImages } from '@/app/data/gallery';
 import { GALLERY_CATEGORIES } from '@/constants';
+import GalleryImageWithPreview from '@/components/GalleryImageWithPreview/GalleryImageWithPreview';
 import DailyImageHeading from './DailyImageHeading';
 import AnimatedGalleryHeader from './AnimatedGalleryHeader';
 import AnimatedGalleryGrid, {
@@ -53,11 +53,13 @@ const DailyImagePreview = async () => {
           href={`/coloring-image/${dailyImage.id}`}
           className="relative w-32 h-32 rounded-xl overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow group flex-shrink-0"
         >
-          <Image
-            src={dailyImage.svgUrl}
+          <GalleryImageWithPreview
+            imageId={dailyImage.id}
+            defaultSrc={dailyImage.svgUrl}
             alt={dailyImage.title || t('dailyColoringPageAlt')}
             fill
-            className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+            className="p-2 group-hover:scale-105 transition-transform duration-300"
+            badgePosition="top-right"
           />
         </Link>
         <div className="flex-1 min-w-0">
@@ -118,11 +120,13 @@ const CommunityPreview = async () => {
             href={`/coloring-image/${image.id}`}
             className="relative aspect-square rounded-lg overflow-hidden bg-white border border-paper-cream-dark hover:border-crayon-purple/50 transition-colors group"
           >
-            <Image
-              src={image.svgUrl as string}
+            <GalleryImageWithPreview
+              imageId={image.id}
+              defaultSrc={image.svgUrl as string}
               alt={image.title || t('coloringPageAlt')}
               fill
-              className="object-contain p-1 group-hover:scale-105 transition-transform duration-300"
+              className="p-1 group-hover:scale-105 transition-transform duration-300"
+              showBadge={false}
             />
           </Link>
         ))}

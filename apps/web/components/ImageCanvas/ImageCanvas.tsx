@@ -181,6 +181,10 @@ export type ImageCanvasHandle = {
   ) => boolean;
   /** Force canvas repaint by reading/writing a pixel to flush GPU cache */
   forceRepaint: () => void;
+  /** Generate a 256×256 preview thumbnail for progress display
+   * @returns WebP data URL of the thumbnail or null if canvas not available
+   */
+  generatePreviewThumbnail: () => string | null;
 };
 
 const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
@@ -465,6 +469,56 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
       return compositeCanvas;
     }, []);
+
+    // Generate a preview thumbnail for progress display
+    // Used when saving canvas progress to show visual previews in the feed
+    const generatePreviewThumbnail = useCallback((): string | null => {
+      const compositeCanvas = getCompositeCanvas();
+      if (!compositeCanvas) return null;
+
+      // Use 1024×1024 for crisp display on retina screens
+      const thumbCanvas = document.createElement('canvas');
+      const thumbSize = 1024;
+      thumbCanvas.width = thumbSize;
+      thumbCanvas.height = thumbSize;
+      const thumbCtx = thumbCanvas.getContext('2d');
+      if (!thumbCtx) return null;
+
+      // Enable high-quality image smoothing
+      thumbCtx.imageSmoothingEnabled = true;
+      thumbCtx.imageSmoothingQuality = 'high';
+
+      // Fill with white background
+      thumbCtx.fillStyle = '#FFFFFF';
+      thumbCtx.fillRect(0, 0, thumbSize, thumbSize);
+
+      // Calculate scaling to fit within thumbnail while maintaining aspect ratio
+      const sourceWidth = compositeCanvas.width;
+      const sourceHeight = compositeCanvas.height;
+      const scale = Math.min(thumbSize / sourceWidth, thumbSize / sourceHeight);
+      const scaledWidth = sourceWidth * scale;
+      const scaledHeight = sourceHeight * scale;
+
+      // Center the image in the thumbnail
+      const offsetX = (thumbSize - scaledWidth) / 2;
+      const offsetY = (thumbSize - scaledHeight) / 2;
+
+      // Draw the composite canvas scaled to thumbnail size
+      thumbCtx.drawImage(
+        compositeCanvas,
+        0,
+        0,
+        sourceWidth,
+        sourceHeight,
+        offsetX,
+        offsetY,
+        scaledWidth,
+        scaledHeight,
+      );
+
+      // Return as WebP data URL with 92% quality
+      return thumbCanvas.toDataURL('image/webp', 0.92);
+    }, [getCompositeCanvas]);
 
     // Fill a specific region at given coordinates with a color (for auto-color)
     const fillRegionAtPoint = useCallback(
@@ -793,6 +847,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         fillRegionAtPoint,
         replayAction,
         forceRepaint,
+        generatePreviewThumbnail,
       }),
       [
         restoreCanvasState,
@@ -805,6 +860,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         fillRegionAtPoint,
         replayAction,
         forceRepaint,
+        generatePreviewThumbnail,
       ],
     );
 

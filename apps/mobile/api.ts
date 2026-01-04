@@ -647,6 +647,8 @@ export type FeedColoringImage = {
   tags: string[];
   difficulty: string | null;
   createdAt: string;
+  /** User's progress preview URL if they have in-progress work */
+  previewUrl?: string | null;
 };
 
 export type FeedSavedArtwork = {
@@ -661,9 +663,22 @@ export type FeedSavedArtwork = {
   };
 };
 
+export type FeedInProgressItem = {
+  id: string;
+  coloringImageId: string;
+  coloringImage: {
+    id: string;
+    title: string;
+    svgUrl: string | null;
+  };
+  previewUrl: string | null;
+  updatedAt: string;
+};
+
 export type FeedResponse = {
   todaysPick: FeedColoringImage | null;
   activeChallenge: ChallengeWithProgress | null;
+  inProgressWork: FeedInProgressItem[];
   recentArt: FeedSavedArtwork[];
   myCreations: FeedColoringImage[];
   moreToColor: FeedColoringImage[];

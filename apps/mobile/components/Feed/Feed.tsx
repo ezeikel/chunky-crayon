@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faStar,
   faPalette,
+  faPaintBrush,
   faCalendarWeek,
   faTrophy,
   faWandMagicSparkles,
@@ -26,6 +27,7 @@ import { perfect } from "@/styles";
 import type {
   FeedColoringImage,
   FeedSavedArtwork,
+  FeedInProgressItem,
   ChallengeWithProgress,
 } from "@/api";
 
@@ -46,7 +48,7 @@ const getCardSize = (screenWidth: number) => {
   return (screenWidth - outerPadding * 2 - gridGap) / 2.3;
 };
 
-// Memoized coloring image card
+// Memoized coloring image card - shows preview if user has progress
 const ColoringCard = memo(
   ({
     item,
@@ -62,7 +64,15 @@ const ColoringCard = memo(
       onPress={onPress}
     >
       <View style={styles.cardInner}>
-        {item.svgUrl ? (
+        {item.previewUrl ? (
+          // Show user's progress preview if available
+          <Image
+            source={{ uri: item.previewUrl }}
+            style={styles.artworkImage}
+            resizeMode="cover"
+          />
+        ) : item.svgUrl ? (
+          // Fall back to SVG outline
           <SvgUri
             width="100%"
             height="100%"
@@ -71,6 +81,12 @@ const ColoringCard = memo(
           />
         ) : (
           <Text style={styles.placeholderText}>🎨</Text>
+        )}
+        {/* Show indicator when there's progress */}
+        {item.previewUrl && (
+          <View style={styles.progressIndicator}>
+            <FontAwesomeIcon icon={faPalette} size={12} color={COLORS.white} />
+          </View>
         )}
       </View>
     </Pressable>
@@ -110,6 +126,49 @@ const ArtworkCard = memo(
 );
 
 ArtworkCard.displayName = "ArtworkCard";
+
+// Memoized in-progress card (shows preview or falls back to SVG)
+const InProgressCard = memo(
+  ({
+    item,
+    size,
+    onPress,
+  }: {
+    item: FeedInProgressItem;
+    size: number;
+    onPress: () => void;
+  }) => (
+    <Pressable
+      style={[styles.card, { width: size, height: size }]}
+      onPress={onPress}
+    >
+      <View style={styles.cardInner}>
+        {item.previewUrl ? (
+          <Image
+            source={{ uri: item.previewUrl }}
+            style={styles.artworkImage}
+            resizeMode="cover"
+          />
+        ) : item.coloringImage.svgUrl ? (
+          <SvgUri
+            width="100%"
+            height="100%"
+            uri={item.coloringImage.svgUrl}
+            viewBox="0 0 1024 1024"
+          />
+        ) : (
+          <Text style={styles.placeholderText}>🎨</Text>
+        )}
+        {/* Palette overlay to indicate resumable coloring */}
+        <View style={styles.progressOverlay}>
+          <FontAwesomeIcon icon={faPalette} size={12} color={COLORS.white} />
+        </View>
+      </View>
+    </Pressable>
+  ),
+);
+
+InProgressCard.displayName = "InProgressCard";
 
 // Section header component
 const SectionHeader = ({
@@ -163,6 +222,50 @@ const HorizontalSection = ({
   return (
     <View style={styles.section}>
       <SectionHeader title={title} icon={icon} />
+      <View style={{ height: cardSize, width: "100%" }}>
+        <FlatList
+          data={items}
+          renderItem={renderItem}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.horizontalList}
+          keyExtractor={(item) => item.id}
+        />
+      </View>
+    </View>
+  );
+};
+
+// In-progress coloring section (Continue Coloring)
+const InProgressSection = ({
+  items,
+  cardSize,
+}: {
+  items: FeedInProgressItem[];
+  cardSize: number;
+}) => {
+  const router = useRouter();
+
+  const renderItem: ListRenderItem<FeedInProgressItem> = useCallback(
+    ({ item }) => (
+      <View style={{ marginRight: gridGap }}>
+        <InProgressCard
+          item={item}
+          size={cardSize}
+          onPress={() =>
+            router.push(`/coloring-image/${item.coloringImage.id}`)
+          }
+        />
+      </View>
+    ),
+    [cardSize, router],
+  );
+
+  if (items.length === 0) return null;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader title="Continue Coloring" icon={faPaintBrush} />
       <View style={{ height: cardSize, width: "100%" }}>
         <FlatList
           data={items}
@@ -288,13 +391,20 @@ const Feed = () => {
     );
   }
 
-  const { todaysPick, activeChallenge, recentArt, myCreations, moreToColor } =
-    data;
+  const {
+    todaysPick,
+    activeChallenge,
+    inProgressWork,
+    recentArt,
+    myCreations,
+    moreToColor,
+  } = data;
 
   // Check if we have any content to show
   const hasContent =
     todaysPick ||
     activeChallenge ||
+    inProgressWork.length > 0 ||
     recentArt.length > 0 ||
     myCreations.length > 0 ||
     moreToColor.length > 0;
@@ -324,12 +434,15 @@ const Feed = () => {
       {/* Active Challenge */}
       {activeChallenge && <ChallengeSection challenge={activeChallenge} />}
 
+      {/* Continue Coloring - In-progress work */}
+      <InProgressSection items={inProgressWork} cardSize={cardSize} />
+
       {/* User's saved artworks */}
       <RecentArtSection artworks={recentArt} cardSize={cardSize} />
 
       {/* User's generated coloring pages */}
       <HorizontalSection
-        title="My Creations"
+        title="Your Creations"
         icon={faWandMagicSparkles}
         items={myCreations}
         cardSize={cardSize}
@@ -477,6 +590,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "TondoTrial-Bold",
     color: COLORS.white,
+  },
+  progressIndicator: {
+    position: "absolute",
+    bottom: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#E46444", // crayon-orange
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  progressOverlay: {
+    position: "absolute",
+    bottom: 8,
+    right: 8,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#E46444", // crayon-orange
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
 });
 

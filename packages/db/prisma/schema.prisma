@@ -95,15 +95,17 @@ model ColoringImage {
 
 // Canvas progress model for cross-platform synchronization
 model CanvasProgress {
-  id              String   @id @default(cuid())
-  userId          String
-  coloringImageId String
-  actions         Json // Serialized drawing actions
-  canvasWidth     Int? // Canvas width for aspect ratio (optional for backward compatibility)
-  canvasHeight    Int? // Canvas height for aspect ratio (optional for backward compatibility)
-  version         Int      @default(1) // For conflict resolution
-  updatedAt       DateTime @updatedAt
-  createdAt       DateTime @default(now())
+  id               String    @id @default(cuid())
+  userId           String
+  coloringImageId  String
+  actions          Json // Serialized drawing actions
+  canvasWidth      Int? // Canvas width for aspect ratio (optional for backward compatibility)
+  canvasHeight     Int? // Canvas height for aspect ratio (optional for backward compatibility)
+  previewUrl       String? // URL to progress thumbnail for feed display
+  previewUpdatedAt DateTime? // Track when preview was last updated (throttle updates)
+  version          Int       @default(1) // For conflict resolution
+  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime  @default(now())
 
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   coloringImage ColoringImage @relation(fields: [coloringImageId], references: [id], onDelete: Cascade)

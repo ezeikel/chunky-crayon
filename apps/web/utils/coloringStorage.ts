@@ -6,6 +6,7 @@
 
 import type { SerializableCanvasAction } from '@/types/canvasActions';
 import { serializableToApiAction } from '@/types/canvasActions';
+import { invalidatePreviewCache } from '@/hooks/useProgressPreviews';
 
 const STORAGE_KEY_PREFIX = 'coloring-progress-';
 const SYNC_PENDING_PREFIX = 'coloring-sync-pending-';
@@ -34,7 +35,8 @@ const syncToServer = async (
   version: number = 0,
   canvasWidth?: number,
   canvasHeight?: number,
-): Promise<{ success: boolean; version?: number }> => {
+  previewDataUrl?: string,
+): Promise<{ success: boolean; version?: number; previewUrl?: string }> => {
   try {
     console.log(
       `[CANVAS_SYNC_WEB] Syncing to server - Image: ${coloringImageId}, Actions: ${actions.length}, Version: ${version}, Dimensions: ${canvasWidth}x${canvasHeight}`,
@@ -56,6 +58,7 @@ const syncToServer = async (
         version,
         canvasWidth,
         canvasHeight,
+        previewDataUrl,
       }),
     });
 
@@ -88,13 +91,14 @@ const syncToServer = async (
           console.error(`[CANVAS_SYNC_WEB] Failed to update local version:`, e);
         }
 
-        // Retry with the correct version (pass through dimensions)
+        // Retry with the correct version (pass through dimensions and preview)
         return syncToServer(
           coloringImageId,
           actions,
           errorData.currentVersion,
           canvasWidth,
           canvasHeight,
+          previewDataUrl,
         );
       }
 
@@ -111,7 +115,11 @@ const syncToServer = async (
     // Clear pending sync marker
     clearPendingSync(coloringImageId);
 
-    return { success: true, version: data.version };
+    return {
+      success: true,
+      version: data.version,
+      previewUrl: data.previewUrl,
+    };
   } catch (error) {
     console.error('[CANVAS_SYNC_WEB] Network error:', error);
     markPendingSync(coloringImageId);
@@ -149,11 +157,13 @@ const clearPendingSync = (coloringImageId: string): void => {
  * @param coloringImageId - The ID of the coloring image
  * @param canvas - The HTML canvas element to capture as snapshot
  * @param drawingActions - The serializable drawing actions to sync (strokes, fills, etc.)
+ * @param previewDataUrl - Optional base64 data URL of preview thumbnail for server storage
  */
 export const saveColoringProgress = (
   coloringImageId: string,
   canvas: HTMLCanvasElement,
   drawingActions: SerializableCanvasAction[] = [],
+  previewDataUrl?: string,
 ): boolean => {
   try {
     const imageDataUrl = canvas.toDataURL('image/png');
@@ -199,6 +209,7 @@ export const saveColoringProgress = (
       data.version,
       canvasWidth,
       canvasHeight,
+      previewDataUrl,
     )
       .then((result) => {
         if (result.success && result.version !== undefined) {
@@ -211,6 +222,9 @@ export const saveColoringProgress = (
           console.log(
             `[CANVAS_SYNC_WEB] Updated local version to: ${result.version}`,
           );
+
+          // Invalidate preview cache so feed/gallery shows fresh preview
+          invalidatePreviewCache(coloringImageId);
         }
       })
       .catch((err) => {

@@ -22,6 +22,8 @@ import {
   Path,
   BlurMask,
   Text as SkiaText,
+  Fill,
+  ImageFormat,
 } from "@shopify/react-native-skia";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -398,11 +400,34 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
           console.log(
             `[CANVAS_FOCUS] Saving with SVG dimensions: ${saveWidth}x${saveHeight}`,
           );
+
+          // Generate preview thumbnail for server storage
+          // Note: Canvas may be unmounted during cleanup, so wrap in try-catch
+          // Use JPEG with 80% quality for smaller file size (PNG is too large)
+          let previewDataUrl: string | undefined;
+          try {
+            if (canvasRef.current) {
+              const image = canvasRef.current.makeImageSnapshot();
+              if (image) {
+                const base64 = image.encodeToBase64(ImageFormat.JPEG, 80);
+                previewDataUrl = `data:image/jpeg;base64,${base64}`;
+                console.log(
+                  `[CANVAS_FOCUS] Generated preview, size: ${previewDataUrl.length} chars`,
+                );
+              }
+            }
+          } catch (e) {
+            console.log(
+              `[CANVAS_FOCUS] Could not capture preview (canvas likely unmounted)`,
+            );
+          }
+
           saveCanvasState(
             coloringImage.id,
             actionsToSave,
             saveWidth,
             saveHeight,
+            previewDataUrl,
           )
             .then((success) => {
               console.log(
@@ -417,7 +442,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
           console.log(`[CANVAS_FOCUS] No actions to save or not initialized`);
         }
       };
-    }, [coloringImage.id]),
+    }, [coloringImage.id, svgDimensions]),
   );
 
   // Auto-save effect
@@ -444,7 +469,34 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         console.log(
           `[AUTO_SAVE] Saving ${actionsToSave.length} actions with SVG dimensions: ${saveWidth}x${saveHeight}`,
         );
-        saveCanvasState(coloringImage.id, actionsToSave, saveWidth, saveHeight)
+
+        // Generate preview thumbnail for server storage
+        // Use JPEG with 80% quality for smaller file size (PNG is too large)
+        let previewDataUrl: string | undefined;
+        try {
+          if (canvasRef.current) {
+            const image = canvasRef.current.makeImageSnapshot();
+            if (image) {
+              const base64 = image.encodeToBase64(ImageFormat.JPEG, 80);
+              previewDataUrl = `data:image/jpeg;base64,${base64}`;
+              console.log(
+                `[AUTO_SAVE] Generated preview, size: ${previewDataUrl.length} chars`,
+              );
+            }
+          }
+        } catch (e) {
+          console.log(
+            `[AUTO_SAVE] Could not capture preview (canvas not ready)`,
+          );
+        }
+
+        saveCanvasState(
+          coloringImage.id,
+          actionsToSave,
+          saveWidth,
+          saveHeight,
+          previewDataUrl,
+        )
           .then((success) => {
             console.log(`[AUTO_SAVE] Save completed with result: ${success}`);
           })
@@ -460,7 +512,7 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [history, historyIndex, coloringImage.id, setDirty]);
+  }, [history, historyIndex, coloringImage.id, setDirty, svgDimensions]);
 
   const src = svgDimensions
     ? rect(0, 0, svgDimensions.width, svgDimensions.height)
@@ -976,6 +1028,8 @@ const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
                 width: canvasSize,
               }}
             >
+              {/* White background for snapshot capture (JPEG doesn't support transparency) */}
+              <Fill color="white" />
               {/* SVG base layer (below drawings) */}
               <Group transform={transform}>
                 <ImageSVG

@@ -319,10 +319,14 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       saveTimerRef.current = setTimeout(() => {
         const canvas = canvasRef.current?.getCanvas();
         if (canvas) {
+          // Generate preview thumbnail for server storage
+          const previewDataUrl =
+            canvasRef.current?.generatePreviewThumbnail() ?? undefined;
           saveColoringProgress(
             coloringImage.id as string,
             canvas,
             drawingActions,
+            previewDataUrl,
           );
           setHasUnsavedChanges(false);
         }
