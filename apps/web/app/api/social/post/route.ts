@@ -499,9 +499,14 @@ const handleRequest = async (request: Request) => {
         let instagramMediaId: string;
 
         if (coloringImage.animationUrl) {
-          console.log('[Instagram] Creating carousel with video + image...');
+          console.log('[Instagram] Creating carousel with image + video...');
 
-          // Create video container (animation first)
+          // Create image container (static image first for conversion)
+          const imageContainerId =
+            await createInstagramImageContainerForCarousel(instagramImageUrl);
+          console.log('[Instagram] Image container created:', imageContainerId);
+
+          // Create video container (animation second for engagement)
           const videoContainerId = await createInstagramVideoContainer(
             coloringImage.animationUrl,
           );
@@ -510,14 +515,9 @@ const handleRequest = async (request: Request) => {
           // Wait for video to process
           await waitForMediaReady(videoContainerId);
 
-          // Create image container
-          const imageContainerId =
-            await createInstagramImageContainerForCarousel(instagramImageUrl);
-          console.log('[Instagram] Image container created:', imageContainerId);
-
-          // Create carousel container with both items
+          // Create carousel container with both items (image first, video second)
           const carouselId = await createInstagramCarouselContainer(
-            [videoContainerId, imageContainerId],
+            [imageContainerId, videoContainerId],
             instagramCaption,
           );
           console.log('[Instagram] Carousel container created:', carouselId);

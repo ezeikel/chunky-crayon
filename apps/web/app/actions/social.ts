@@ -14,15 +14,15 @@ import { ColoringImage } from '@chunky-crayon/db';
 
 /**
  * Instagram carousel-specific system prompt addition.
- * Encourages viewers to swipe to see the printable coloring page.
+ * Static image first (conversion), video second (engagement).
  */
 const INSTAGRAM_CAROUSEL_ADDENDUM = `
 
-IMPORTANT - This is a CAROUSEL post with video first, image second:
-- The first slide is an animated video that brings the coloring page to life
-- The second slide is the actual printable coloring page
-- You MUST include a call-to-action to swipe/scroll to see the colorable version
-- Use phrases like "Swipe to see the colorable version", "Scroll for the printable page", or "Watch it come alive, then swipe to color it yourself"
+IMPORTANT - This is a CAROUSEL post with static image first, animated video second:
+- The first slide shows the printable coloring page (what they can download)
+- The second slide is the magical animated version that brings it to life
+- You MUST include a call-to-action to swipe to see the animation
+- Use phrases like "Swipe to watch it come alive!", "Scroll to see the magic!", or "This coloring page comes to LIFE - swipe to see!"
 - Make it engaging and encourage them to visit the link in bio to download`;
 
 /**
