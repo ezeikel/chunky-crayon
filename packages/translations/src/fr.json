@@ -342,7 +342,7 @@
     "seo": {
       "aboutTitle": "À propos de nos coloriages gratuits",
       "aboutParagraph1": "Bienvenue dans la galerie de coloriages gratuits de Chunky Crayon ! Nous proposons une collection grandissante de coloriages à imprimer, parfaite pour les enfants comme pour les adultes. Nos outils propulsés par l’IA aident à créer des coloriages uniques et amusants, dans plein de catégories.",
-      "aboutParagraph2": "Chaque jour, nous ajoutons un nouveau coloriage du jour que vous pouvez colorier en ligne avec nos outils numériques, ou télécharger et imprimer pour colorier comme à l’ancienne. Les membres de notre communauté partagent aussi leurs idées créatives, pour encore plus de variété.",
+      "aboutParagraph2": "Chaque jour, nous ajoutons un nouveau coloriage du jour que vous pouvez colorier en ligne avec nos outils numériques, ou télécharger et imprimer pour colorier de façon traditionnelle. Les membres de notre communauté partagent aussi leurs idées créatives, pour encore plus de variété.",
       "aboutParagraph3": "Parcourez par catégorie pour trouver exactement ce que vous cherchez : animaux trop mignons, créatures fantastiques comme les dragons et les licornes, ou thèmes de fêtes et de saisons. Chaque page est dessinée avec des contours nets, parfaits pour colorier."
     },
     "jumpToNav": {
@@ -373,7 +373,7 @@
       "createAPage": "Créer une page",
       "freeColoringPages": "Coloriages {category} gratuits",
       "lookingFor": "Vous cherchez le coloriage {category} parfait ? Vous êtes au bon endroit ! Notre collection propose plein de dessins {category}, parfaits pour les enfants comme pour les adultes.",
-      "eachPageDescription": "Chaque coloriage peut être colorié en ligne avec nos outils numériques, ou téléchargé et imprimé pour colorier avec des crayons, des crayons de couleur ou des feutres. Nos dessins générés par IA ont des contours propres et des détails amusants, pour un coloriage relaxant et joyeux.",
+      "eachPageDescription": "Chaque coloriage peut être colorié en ligne avec nos outils numériques, ou téléchargé et imprimé pour colorier avec des crayons, des crayons de couleur ou des feutres. Nos dessins générés par IA ont des contours propres et des détails captivants, pour un coloriage relaxant et joyeux.",
       "popularThemes": "Thèmes {category} populaires",
       "includesPopular": "Notre catégorie {category} inclut des recherches populaires comme :"
     },
@@ -456,7 +456,7 @@
         "why3Description": "Faites une pause et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop bébé » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d’anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
-        "seoParagraph2": "Ici, pas des coloriages pour petits. Nos dessins pour ados ont des détails minutieux, des compositions dynamiques et des thèmes qui parlent aux ados. Parfait pour s’exprimer, décompresser pendant les révisions, ou juste se poser.",
+        "seoParagraph2": "Ce ne sont pas des coloriages pour petits ! Nos dessins pour ados ont des détails minutieux, des compositions dynamiques et des thèmes qui parlent aux ados. Parfait pour s'exprimer, décompresser pendant les révisions, ou juste se poser.",
         "seoParagraph3": "Créez vos propres coloriages personnalisés en décrivant exactement ce que vous voulez. Un dragon qui se bat contre un robot dans l’espace ? Un portrait style anime ? Un mandala détaillé avec vos symboles préférés ? Décrivez-le, et notre IA lui donne vie !",
         "popularTitle": "Thèmes ado populaires",
         "popularDescription": "Nos catégories les plus populaires chez les ados : coloriages anime et manga, créatures fantastiques, scènes d’action de super-héros, art inspiré des jeux vidéo, designs espace et sci-fi, et pages de motifs très détaillés. Chaque catégorie propose des dessins captivants."
@@ -475,8 +475,8 @@
         "why3Description": "Exprimez-vous avec vos choix de couleurs et créez de jolies œuvres.",
         "seoTitle": "Coloriages gratuits pour adultes",
         "seoParagraph1": "Le coloriage pour adultes est devenu une activité bien-être très appréciée, et ce n’est pas un hasard. Des études montrent qu’il peut réduire l’anxiété, améliorer la concentration et offrir une pause apaisante loin des écrans. Notre collection propose de magnifiques dessins détaillés, parfaits pour les grands.",
-        "seoParagraph2": "Des mandalas minutieux pour la pleine conscience aux scènes de nature paisibles et aux motifs élégants, chaque page est conçue pour offrir des heures de créativité relaxante. Imprimez sur un papier de qualité et utilisez vos outils préférés : crayons de couleur, feutres ou stylos gel, tout fonctionne à merveille.",
-        "seoParagraph3": "Envie d’un coloriage unique ? Créez vos pages personnalisées ! Décrivez votre scène détente idéale : un jardin zen, un motif Art nouveau, ou une illustration botanique détaillée… et notre IA donne vie à votre idée.",
+        "seoParagraph2": "Des mandalas détaillés pour la pleine conscience aux scènes de nature paisibles et aux motifs élégants, chaque page est conçue pour offrir des heures de créativité relaxante. Imprimez sur un papier de qualité et utilisez vos outils préférés : crayons de couleur, feutres ou stylos gel, tout fonctionne à merveille.",
+        "seoParagraph3": "Envie de quelque chose d'unique ? Créez vos pages personnalisées ! Décrivez votre scène détente idéale : un jardin zen, un motif Art nouveau, ou une illustration botanique détaillée… et notre IA donne vie à votre idée.",
         "popularTitle": "Thèmes populaires de coloriage pour adultes",
         "popularDescription": "Découvrez nos catégories adultes les plus populaires : mandalas pour méditer, motifs nature et botaniques détaillés, motifs géométriques, styles Art déco et Art nouveau, pages inspirées du zentangle, et paysages apaisants. Chacune est une invitation à la détente."
       }
