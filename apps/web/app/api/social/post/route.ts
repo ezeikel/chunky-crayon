@@ -9,7 +9,7 @@ import {
   generatePinterestCaption,
 } from '@/app/actions/social';
 
-export const maxDuration = 150;
+export const maxDuration = 180; // Increased for carousel creation
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -95,6 +95,134 @@ const createInstagramMediaContainer = async (
   return data.id;
 };
 
+/**
+ * Create an Instagram video media container for carousel items.
+ * Videos in carousels don't have captions - caption goes on the carousel container.
+ */
+const createInstagramVideoContainer = async (videoUrl: string) => {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        media_type: 'VIDEO',
+        video_url: videoUrl,
+        is_carousel_item: true,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+
+  const data = await response.json();
+  if (!data.id) {
+    console.error('Instagram video container error:', data);
+    throw new Error(
+      `failed to create Instagram video container: ${JSON.stringify(data)}`,
+    );
+  }
+  return data.id;
+};
+
+/**
+ * Create an Instagram image media container for carousel items.
+ * Images in carousels don't have captions - caption goes on the carousel container.
+ */
+const createInstagramImageContainerForCarousel = async (imageUrl: string) => {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image_url: imageUrl,
+        is_carousel_item: true,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+
+  const data = await response.json();
+  if (!data.id) {
+    console.error('Instagram image container error:', data);
+    throw new Error(
+      `failed to create Instagram image container: ${JSON.stringify(data)}`,
+    );
+  }
+  return data.id;
+};
+
+/**
+ * Create an Instagram carousel container with multiple media items.
+ * The carousel can contain videos and images.
+ */
+const createInstagramCarouselContainer = async (
+  childrenIds: string[],
+  caption: string,
+) => {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        media_type: 'CAROUSEL',
+        children: childrenIds.join(','),
+        caption,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+
+  const data = await response.json();
+  if (!data.id) {
+    console.error('Instagram carousel container error:', data);
+    throw new Error(
+      `failed to create Instagram carousel container: ${JSON.stringify(data)}`,
+    );
+  }
+  return data.id;
+};
+
+/**
+ * Wait for a media container to be ready for publishing.
+ * Videos take time to process on Instagram's servers.
+ */
+const waitForMediaReady = async (
+  containerId: string,
+  maxAttempts = 30,
+  intervalMs = 5000,
+): Promise<void> => {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const response = await fetch(
+      `https://graph.facebook.com/v22.0/${containerId}?fields=status_code,status&access_token=${process.env.FACEBOOK_ACCESS_TOKEN}`,
+    );
+    const data = await response.json();
+
+    console.log(
+      `[Instagram] Media ${containerId} status: ${data.status_code || data.status}`,
+    );
+
+    if (data.status_code === 'FINISHED' || data.status === 'FINISHED') {
+      return;
+    }
+
+    if (data.status_code === 'ERROR' || data.status === 'ERROR') {
+      throw new Error(`Media processing failed: ${JSON.stringify(data)}`);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error('Media processing timed out');
+};
+
 const publishInstagramMedia = async (creationId: string) => {
   const response = await fetch(
     `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media_publish`,
@@ -137,6 +265,39 @@ const postToFacebookPage = async (imageUrl: string, message: string) => {
   if (!data.id) {
     console.error('Facebook API response:', data);
     throw new Error(`Failed to post to Facebook: ${JSON.stringify(data)}`);
+  }
+  return data.id;
+};
+
+/**
+ * Post a video to Facebook page.
+ * Uses the video upload API for direct URL posting.
+ */
+const postVideoToFacebookPage = async (
+  videoUrl: string,
+  description: string,
+  title: string,
+) => {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/videos`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        file_url: videoUrl,
+        description,
+        title,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+
+  const data = await response.json();
+  if (!data.id) {
+    console.error('Facebook video API response:', data);
+    throw new Error(`Failed to post video to Facebook: ${JSON.stringify(data)}`);
   }
   return data.id;
 };
@@ -283,19 +444,55 @@ const handleRequest = async (request: Request) => {
         );
         tempFiles.push(instagramImageUrl.split('/').pop() || '');
 
-        // generate Instagram caption
-        const instagramCaption = await generateInstagramCaption(coloringImage);
+        // generate Instagram caption (with carousel CTA if animation exists)
+        const instagramCaption = await generateInstagramCaption(
+          coloringImage,
+          !!coloringImage.animationUrl, // Pass flag for carousel-specific caption
+        );
 
         if (!instagramCaption) {
           throw new Error('failed to generate Instagram caption');
         }
 
-        // create media container and publish
-        const creationId = await createInstagramMediaContainer(
-          instagramImageUrl,
-          instagramCaption,
-        );
-        const instagramMediaId = await publishInstagramMedia(creationId);
+        let instagramMediaId: string;
+
+        // If we have an animation, create a carousel (video first, then image)
+        if (coloringImage.animationUrl) {
+          console.log('[Instagram] Creating carousel with video + image...');
+
+          // Create video container (animation first)
+          const videoContainerId = await createInstagramVideoContainer(
+            coloringImage.animationUrl,
+          );
+          console.log('[Instagram] Video container created:', videoContainerId);
+
+          // Wait for video to process
+          await waitForMediaReady(videoContainerId);
+
+          // Create image container
+          const imageContainerId =
+            await createInstagramImageContainerForCarousel(instagramImageUrl);
+          console.log('[Instagram] Image container created:', imageContainerId);
+
+          // Create carousel container with both items
+          const carouselId = await createInstagramCarouselContainer(
+            [videoContainerId, imageContainerId],
+            instagramCaption,
+          );
+          console.log('[Instagram] Carousel container created:', carouselId);
+
+          // Publish carousel
+          instagramMediaId = await publishInstagramMedia(carouselId);
+          console.log('[Instagram] Carousel published:', instagramMediaId);
+        } else {
+          // Fallback to single image post
+          console.log('[Instagram] No animation, posting single image...');
+          const creationId = await createInstagramMediaContainer(
+            instagramImageUrl,
+            instagramCaption,
+          );
+          instagramMediaId = await publishInstagramMedia(creationId);
+        }
 
         results.instagram = instagramMediaId;
         console.log('Successfully posted to Instagram:', instagramMediaId);
@@ -323,18 +520,34 @@ const handleRequest = async (request: Request) => {
         );
         tempFiles.push(facebookImageUrl.split('/').pop() || '');
 
-        // generate Facebook caption
-        const facebookCaption = await generateFacebookCaption(coloringImage);
+        // generate Facebook caption (with carousel CTA if animation exists)
+        const facebookCaption = await generateFacebookCaption(
+          coloringImage,
+          !!coloringImage.animationUrl, // Pass flag for video-specific caption
+        );
 
         if (!facebookCaption) {
           throw new Error('failed to generate Facebook caption');
         }
 
-        // post to Facebook page
-        const facebookPostId = await postToFacebookPage(
-          facebookImageUrl,
-          facebookCaption,
-        );
+        let facebookPostId: string;
+
+        // If we have an animation, post as video instead of image
+        if (coloringImage.animationUrl) {
+          console.log('[Facebook] Posting video...');
+          facebookPostId = await postVideoToFacebookPage(
+            coloringImage.animationUrl,
+            facebookCaption,
+            coloringImage.title ?? 'Coloring Page',
+          );
+        } else {
+          // Fallback to image post
+          console.log('[Facebook] Posting image...');
+          facebookPostId = await postToFacebookPage(
+            facebookImageUrl,
+            facebookCaption,
+          );
+        }
 
         results.facebook = facebookPostId;
         console.log('Successfully posted to Facebook:', facebookPostId);

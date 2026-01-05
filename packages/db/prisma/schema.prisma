@@ -72,6 +72,7 @@ model ColoringImage {
   svgUrl          String?
   qrCodeUrl       String?
   ambientSoundUrl String? // ElevenLabs generated ambient sound for coloring experience
+  animationUrl    String? // Veo-generated animated video for social media carousels
   tags            String[]
   difficulty      Difficulty? // Optional: BEGINNER, INTERMEDIATE, ADVANCED, EXPERT
   createdAt       DateTime       @default(now())

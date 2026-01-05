@@ -843,3 +843,74 @@ Start with a brief scene description, then list all grid cells with their colors
 
 Create a beautiful, cohesive color scheme for the whole image!`;
 };
+
+// =============================================================================
+// Social Media Animation (Veo 3 image-to-video for carousels)
+// =============================================================================
+
+/**
+ * System prompt for generating animation prompts for Veo 3.
+ * Used to create engaging image-to-video animations for social media.
+ */
+export const ANIMATION_PROMPT_SYSTEM = `You are an expert at creating prompts for Veo 3 image-to-video AI. Your task is to generate animation prompts that bring children's coloring pages to life in an engaging, magical way.
+
+GOAL: Create 5-second animations that stop the scroll on Instagram/Facebook and make people want to swipe to see more.
+
+ANIMATION STYLE GUIDELINES:
+- Subtle, magical movements (not jarring or fast)
+- Gentle "breathing" motion where elements softly pulse or float
+- Parallax depth effects (foreground moves differently than background)
+- Sparkles, shimmers, or gentle particle effects
+- Soft camera movements (slow push-in or gentle drift)
+- Child-friendly and enchanting feel
+
+EFFECTIVE ANIMATION ELEMENTS:
+- Floating elements (clouds, bubbles, sparkles)
+- Gentle swaying (trees, flowers, hair/mane)
+- Soft breathing/pulsing (characters, objects)
+- Twinkling stars or shimmer effects
+- Subtle wind effects on fabric/leaves
+- Magical dust or particle trails
+
+DO NOT include:
+- Fast or sudden movements
+- Scary or intense animations
+- Complex realistic physics
+- Character walking or running
+- Dramatic camera movements
+
+OUTPUT FORMAT:
+Write a single, detailed Veo 3 prompt using this structure:
+[Camera movement] + [Main subject animation] + [Secondary element animations] + [Ambient effects] + [Style/mood]`;
+
+/**
+ * Generate an animation prompt for Veo 3 based on coloring page metadata.
+ * The prompt should create engaging, child-friendly animations for social media.
+ */
+export const createAnimationPromptPrompt = (
+  title: string,
+  description: string,
+  tags: string[],
+) => `Create a Veo 3 image-to-video prompt for this coloring page:
+
+Title: ${title}
+Description: ${description}
+Tags: ${tags.join(', ')}
+
+Generate a single animation prompt (2-4 sentences) that will:
+1. Bring the coloring page to life with subtle, magical motion
+2. Stop the scroll on social media
+3. Feel enchanting and child-friendly
+4. Use the 5-part structure: [Camera] + [Main animation] + [Secondary elements] + [Ambient effects] + [Style]
+
+Example outputs:
+- "Slow dolly-in on a magical unicorn. The unicorn's mane flows gently as if caught in a soft breeze, sparkles drift lazily through the scene. Soft pastel particle effects float upward. Dreamy, enchanting children's book illustration style."
+- "Gentle push-in on a friendly dinosaur in a prehistoric garden. The dinosaur's head turns slightly as butterflies flutter around. Ferns sway softly, dust motes catch the light. Warm, inviting cartoon style with magical atmosphere."
+
+Output ONLY the animation prompt, nothing else.`;
+
+/**
+ * Default animation prompt for when AI generation fails or isn't needed.
+ * Works well for most coloring page subjects.
+ */
+export const DEFAULT_ANIMATION_PROMPT = `Gentle camera push-in on this illustration. Elements softly breathe and pulse with a magical glow, sparkles drift lazily through the scene. Subtle parallax creates depth as foreground elements float slightly. Warm, enchanting children's book style with dreamy, inviting atmosphere.`;
