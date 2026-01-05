@@ -26,6 +26,21 @@ IMPORTANT - This is a CAROUSEL post with static image first, animated video seco
 - Make it engaging and encourage them to visit the link in bio to download`;
 
 /**
+ * Instagram carousel with colored example (3 slides).
+ * Static → Colored example → Animation
+ */
+const INSTAGRAM_CAROUSEL_WITH_COLORED_ADDENDUM = `
+
+IMPORTANT - This is a 3-SLIDE CAROUSEL:
+- Slide 1: The printable coloring page (black & white)
+- Slide 2: A colored-in example showing what it could look like
+- Slide 3: The magical animated version that brings it to life
+- You MUST include a call-to-action to swipe through all slides
+- Use phrases like "Swipe to see it colored AND animated!", "From blank → colored → alive!", or "Watch the transformation - keep swiping!"
+- Highlight the journey: download it, color it like our example, then watch it come alive
+- Make it engaging and encourage them to visit the link in bio to download`;
+
+/**
  * Instagram Reel-specific system prompt addition.
  * Cross-promotes the carousel post for downloads.
  */
@@ -61,7 +76,11 @@ IMPORTANT - This is the PRINTABLE IMAGE post (we also posted a video):
 - Encourage them to download from chunkycrayon.com
 - Keep it warm and inviting for families`;
 
-export type InstagramPostType = 'image' | 'carousel' | 'reel';
+export type InstagramPostType =
+  | 'image'
+  | 'carousel'
+  | 'carousel_with_colored'
+  | 'reel';
 
 export const generateInstagramCaption = async (
   coloringImage: ColoringImage,
@@ -71,6 +90,8 @@ export const generateInstagramCaption = async (
 
   if (postType === 'carousel') {
     systemPrompt += INSTAGRAM_CAROUSEL_ADDENDUM;
+  } else if (postType === 'carousel_with_colored') {
+    systemPrompt += INSTAGRAM_CAROUSEL_WITH_COLORED_ADDENDUM;
   } else if (postType === 'reel') {
     systemPrompt += INSTAGRAM_REEL_ADDENDUM;
   }

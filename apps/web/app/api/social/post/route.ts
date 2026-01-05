@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
 import sharp from 'sharp';
-import { put, del } from '@/lib/storage';
+import { put, del, exists } from '@/lib/storage';
 import { db } from '@chunky-crayon/db';
 import {
   generateInstagramCaption,
@@ -12,6 +12,40 @@ import {
 } from '@/app/actions/social';
 
 export const maxDuration = 180; // Increased for carousel creation
+
+/**
+ * Folder convention for colored example images.
+ * You can manually upload colored versions to this folder in R2.
+ * Supported formats: .png, .jpg, .jpeg
+ *
+ * Example: colored-examples/clx123abc.png
+ */
+const COLORED_EXAMPLES_FOLDER = 'colored-examples';
+
+/**
+ * Check if a colored example exists for the given coloring image.
+ * Returns the public URL if found, null otherwise.
+ */
+const getColoredExampleUrl = async (
+  coloringImageId: string,
+): Promise<string | null> => {
+  const publicUrl = process.env.R2_PUBLIC_URL?.replace(/\/$/, '');
+  if (!publicUrl) return null;
+
+  // Check for different image formats
+  const formats = ['png', 'jpg', 'jpeg'];
+
+  for (const format of formats) {
+    const pathname = `${COLORED_EXAMPLES_FOLDER}/${coloringImageId}.${format}`;
+    const found = await exists(pathname);
+    if (found) {
+      console.log(`[Social] Found colored example: ${pathname}`);
+      return `${publicUrl}/${pathname}`;
+    }
+  }
+
+  return null;
+};
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -484,29 +518,50 @@ const handleRequest = async (request: Request) => {
 
       // Post 1: Carousel (if we have animation) or single image
       try {
-        const postType: InstagramPostType = coloringImage.animationUrl
-          ? 'carousel'
-          : 'image';
-        const instagramCaption = await generateInstagramCaption(
-          coloringImage,
-          postType,
-        );
-
-        if (!instagramCaption) {
-          throw new Error('failed to generate Instagram caption');
-        }
-
         let instagramMediaId: string;
 
         if (coloringImage.animationUrl) {
-          console.log('[Instagram] Creating carousel with image + video...');
+          console.log('[Instagram] Creating carousel...');
 
-          // Create image container (static image first for conversion)
+          // Check for optional colored example (manually uploaded)
+          const coloredExampleUrl = await getColoredExampleUrl(coloringImage.id);
+          const hasColoredExample = !!coloredExampleUrl;
+
+          // Generate caption with correct post type based on slides
+          const carouselPostType: InstagramPostType = hasColoredExample
+            ? 'carousel_with_colored'
+            : 'carousel';
+          const instagramCaption = await generateInstagramCaption(
+            coloringImage,
+            carouselPostType,
+          );
+
+          if (!instagramCaption) {
+            throw new Error('failed to generate Instagram caption');
+          }
+
+          // Build carousel slides array
+          const carouselChildren: string[] = [];
+
+          // Slide 1: Static coloring page (always first)
           const imageContainerId =
             await createInstagramImageContainerForCarousel(instagramImageUrl);
           console.log('[Instagram] Image container created:', imageContainerId);
+          carouselChildren.push(imageContainerId);
 
-          // Create video container (animation second for engagement)
+          // Slide 2 (optional): Colored example if available
+          if (coloredExampleUrl) {
+            console.log('[Instagram] Adding colored example slide...');
+            const coloredContainerId =
+              await createInstagramImageContainerForCarousel(coloredExampleUrl);
+            console.log(
+              '[Instagram] Colored example container created:',
+              coloredContainerId,
+            );
+            carouselChildren.push(coloredContainerId);
+          }
+
+          // Slide 3 (or 2): Animated video
           const videoContainerId = await createInstagramVideoContainer(
             coloringImage.animationUrl,
           );
@@ -514,10 +569,15 @@ const handleRequest = async (request: Request) => {
 
           // Wait for video to process
           await waitForMediaReady(videoContainerId);
+          carouselChildren.push(videoContainerId);
 
-          // Create carousel container with both items (image first, video second)
+          console.log(
+            `[Instagram] Creating ${carouselChildren.length}-slide carousel...`,
+          );
+
+          // Create carousel container with all slides
           const carouselId = await createInstagramCarouselContainer(
-            [imageContainerId, videoContainerId],
+            carouselChildren,
             instagramCaption,
           );
           console.log('[Instagram] Carousel container created:', carouselId);
@@ -526,8 +586,18 @@ const handleRequest = async (request: Request) => {
           instagramMediaId = await publishInstagramMedia(carouselId);
           console.log('[Instagram] Carousel published:', instagramMediaId);
         } else {
-          // Single image post
+          // Single image post (no animation)
           console.log('[Instagram] No animation, posting single image...');
+
+          const instagramCaption = await generateInstagramCaption(
+            coloringImage,
+            'image',
+          );
+
+          if (!instagramCaption) {
+            throw new Error('failed to generate Instagram caption');
+          }
+
           const creationId = await createInstagramMediaContainer(
             instagramImageUrl,
             instagramCaption,
