@@ -27,18 +27,18 @@ IMPORTANT - This is a CAROUSEL post with static image first, animated video seco
 
 /**
  * Instagram carousel with colored example (3 slides).
- * Static → Colored example → Animation
+ * Static → Animation → Colored example (finale)
  */
 const INSTAGRAM_CAROUSEL_WITH_COLORED_ADDENDUM = `
 
 IMPORTANT - This is a 3-SLIDE CAROUSEL:
-- Slide 1: The printable coloring page (black & white)
-- Slide 2: A colored-in example showing what it could look like
-- Slide 3: The magical animated version that brings it to life
+- Slide 1: The printable coloring page (black & white) - what they download
+- Slide 2: The magical animated version that brings it to life
+- Slide 3: A beautifully colored-in example showing what THEY could create!
 - You MUST include a call-to-action to swipe through all slides
-- Use phrases like "Swipe to see it colored AND animated!", "From blank → colored → alive!", or "Watch the transformation - keep swiping!"
-- Highlight the journey: download it, color it like our example, then watch it come alive
-- Make it engaging and encourage them to visit the link in bio to download`;
+- Use phrases like "Swipe to see the magic, then see what you could create!", "Keep swiping for the full journey!", or "B&W → Animated → Your masterpiece awaits!"
+- End with encouragement: the colored example shows what's possible when THEY color it
+- Make it engaging and encourage them to visit the link in bio to download and create their own`;
 
 /**
  * Instagram Reel-specific system prompt addition.

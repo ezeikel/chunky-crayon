@@ -543,25 +543,13 @@ const handleRequest = async (request: Request) => {
           // Build carousel slides array
           const carouselChildren: string[] = [];
 
-          // Slide 1: Static coloring page (always first)
+          // Slide 1: Static B&W coloring page (what they download)
           const imageContainerId =
             await createInstagramImageContainerForCarousel(instagramImageUrl);
           console.log('[Instagram] Image container created:', imageContainerId);
           carouselChildren.push(imageContainerId);
 
-          // Slide 2 (optional): Colored example if available
-          if (coloredExampleUrl) {
-            console.log('[Instagram] Adding colored example slide...');
-            const coloredContainerId =
-              await createInstagramImageContainerForCarousel(coloredExampleUrl);
-            console.log(
-              '[Instagram] Colored example container created:',
-              coloredContainerId,
-            );
-            carouselChildren.push(coloredContainerId);
-          }
-
-          // Slide 3 (or 2): Animated video
+          // Slide 2: Animated video (the magic)
           const videoContainerId = await createInstagramVideoContainer(
             coloringImage.animationUrl,
           );
@@ -570,6 +558,18 @@ const handleRequest = async (request: Request) => {
           // Wait for video to process
           await waitForMediaReady(videoContainerId);
           carouselChildren.push(videoContainerId);
+
+          // Slide 3 (optional): Colored example as finale (what it could look like)
+          if (coloredExampleUrl) {
+            console.log('[Instagram] Adding colored example as final slide...');
+            const coloredContainerId =
+              await createInstagramImageContainerForCarousel(coloredExampleUrl);
+            console.log(
+              '[Instagram] Colored example container created:',
+              coloredContainerId,
+            );
+            carouselChildren.push(coloredContainerId);
+          }
 
           console.log(
             `[Instagram] Creating ${carouselChildren.length}-slide carousel...`,
