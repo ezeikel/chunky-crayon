@@ -176,10 +176,25 @@ async function pollForVideoCompletion(
         throw new Error(`Video generation failed: ${operation.error.message}`);
       }
 
-      // Extract video from response
-      const video = operation.response?.generatedVideos?.[0]?.video;
+      // Log response structure for debugging
+      // eslint-disable-next-line no-console
+      console.log(
+        '[VideoGeneration] Operation response:',
+        JSON.stringify(operation, null, 2),
+      );
+
+      // Extract video from response - try multiple possible paths
+      const video =
+        operation.response?.generatedVideos?.[0]?.video ||
+        operation.response?.videos?.[0]?.video ||
+        operation.response?.video ||
+        operation.result?.generatedVideos?.[0]?.video ||
+        operation.result?.videos?.[0]?.video;
+
       if (!video) {
-        throw new Error('No video in completed operation response');
+        throw new Error(
+          `No video in completed operation response. Keys: ${Object.keys(operation.response || operation).join(', ')}`,
+        );
       }
 
       return { videoBytes: video };
