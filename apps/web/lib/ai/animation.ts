@@ -1,9 +1,9 @@
 import { generateText } from 'ai';
-import { models } from './models';
-import {
-  ANIMATION_PROMPT_SYSTEM,
-  DEFAULT_ANIMATION_PROMPT,
-} from './prompts';
+import { google } from '@ai-sdk/google';
+import { ANIMATION_PROMPT_SYSTEM, DEFAULT_ANIMATION_PROMPT } from './prompts';
+
+// Direct model for animation - avoids posthog/anthropic dependency issues in CI
+const animationModel = google('gemini-2.0-flash');
 
 /**
  * Generate an expert-level Veo 3 animation prompt by analyzing the actual image.
@@ -33,7 +33,7 @@ export const generateAnimationPromptFromImage = async (
 ): Promise<string> => {
   try {
     const { text } = await generateText({
-      model: models.textFast, // Fast model is sufficient for prompt generation
+      model: animationModel, // Fast model for prompt generation
       system: ANIMATION_PROMPT_SYSTEM,
       messages: [
         {
