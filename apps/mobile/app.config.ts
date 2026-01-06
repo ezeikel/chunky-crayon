@@ -24,6 +24,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       supportsTablet: true,
       bundleIdentifier: "com.chewybytes.chunkycrayon.app",
       infoPlist: {
+        ITSAppUsesNonExemptEncryption: false,
         CFBundleURLTypes: [
           {
             CFBundleURLSchemes: [
