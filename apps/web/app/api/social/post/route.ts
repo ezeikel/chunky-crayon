@@ -24,14 +24,13 @@ export const maxDuration = 180; // Increased for carousel creation
 
 /**
  * Check if the configured user has a saved artwork for this coloring image.
- * If found, processes it to 1080x1080 for Instagram and returns a temp URL.
+ * Saved artwork is already stored at 1080x1080 (Instagram-ready).
  *
  * This allows automatic inclusion of colored examples without manual upload.
  * Configure via COLORED_EXAMPLE_USER_EMAIL and COLORED_EXAMPLE_PROFILE_NAME.
  */
 const getColoredExampleUrl = async (
   coloringImageId: string,
-  tempFiles: string[],
 ): Promise<string | null> => {
   const userEmail = process.env.COLORED_EXAMPLE_USER_EMAIL;
   const profileName = process.env.COLORED_EXAMPLE_PROFILE_NAME;
@@ -83,30 +82,9 @@ const getColoredExampleUrl = async (
       `[Social] Found saved artwork from ${profileName}: ${savedArtwork.imageUrl}`,
     );
 
-    // Fetch and process to 1080x1080 for Instagram quality
-    console.log('[Social] Processing colored example to 1080x1080...');
-    const imageResponse = await fetch(savedArtwork.imageUrl);
-    const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-
-    // Resize to 1080x1080 square (Instagram standard)
-    const processedBuffer = await sharp(imageBuffer)
-      .resize(1080, 1080, {
-        fit: 'contain',
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
-      })
-      .png({ quality: 95 })
-      .toBuffer();
-
-    // Upload to temp storage
-    const tempFileName = `temp/social/colored-example/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
-    const { url } = await put(tempFileName, processedBuffer, {
-      access: 'public',
-    });
-
-    tempFiles.push(tempFileName);
-    console.log(`[Social] Colored example processed and uploaded: ${url}`);
-
-    return url;
+    // Saved artwork is already stored at 1080x1080 (Instagram-ready)
+    // No need to fetch/resize/re-upload - use directly
+    return savedArtwork.imageUrl;
   } catch (error) {
     console.error('[Social] Error processing colored example:', error);
     return null;
@@ -592,7 +570,6 @@ const handleRequest = async (request: Request) => {
           // Check for optional colored example from configured user's saved artwork
           const coloredExampleUrl = await getColoredExampleUrl(
             coloringImage.id,
-            tempFiles,
           );
           const hasColoredExample = !!coloredExampleUrl;
 

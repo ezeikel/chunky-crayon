@@ -8,8 +8,14 @@ import { getActiveProfile } from '@/app/actions/profiles';
 import { checkAndAwardStickers } from '@/lib/stickers/service';
 import { checkAndUpdateColoEvolution } from '@/app/actions/colo';
 import { ACTIONS } from '@/constants';
+import sharp from 'sharp';
 import type { Sticker } from '@/lib/stickers/types';
 import type { EvolutionResult } from '@/lib/colo';
+
+/**
+ * Standard size for saved artwork (Instagram-ready)
+ */
+const SAVED_ARTWORK_SIZE = 1080;
 
 type SaveArtworkResult =
   | {
@@ -53,13 +59,23 @@ export async function saveArtworkToGallery(
 
     // Convert data URL to buffer
     const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
-    const imageBuffer = Buffer.from(base64Data, 'base64');
+    const rawBuffer = Buffer.from(base64Data, 'base64');
+
+    // Process image to Instagram-ready size (1080x1080)
+    // Using 'cover' fit to fill the square, centered
+    const imageBuffer = await sharp(rawBuffer)
+      .resize(SAVED_ARTWORK_SIZE, SAVED_ARTWORK_SIZE, {
+        fit: 'contain',
+        background: { r: 255, g: 255, b: 255, alpha: 1 },
+      })
+      .png()
+      .toBuffer();
 
     // Generate unique filename
     const timestamp = Date.now();
     const fileName = `uploads/saved-artwork/${userId}/${coloringImageId}/${timestamp}.png`;
 
-    // Upload to Vercel Blob
+    // Upload to R2 storage
     const { url: imageUrl } = await put(fileName, imageBuffer, {
       access: 'public',
       contentType: 'image/png',
@@ -320,13 +336,23 @@ export async function saveMobileArtworkAction(
 
   // Convert data URL to buffer
   const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
-  const imageBuffer = Buffer.from(base64Data, 'base64');
+  const rawBuffer = Buffer.from(base64Data, 'base64');
+
+  // Process image to Instagram-ready size (1080x1080)
+  // Using 'contain' fit to preserve aspect ratio with white background
+  const imageBuffer = await sharp(rawBuffer)
+    .resize(SAVED_ARTWORK_SIZE, SAVED_ARTWORK_SIZE, {
+      fit: 'contain',
+      background: { r: 255, g: 255, b: 255, alpha: 1 },
+    })
+    .png()
+    .toBuffer();
 
   // Generate unique filename
   const timestamp = Date.now();
   const fileName = `uploads/saved-artwork/${userId}/${coloringImageId}/${timestamp}.png`;
 
-  // Upload to Vercel Blob
+  // Upload to R2 storage
   const { url: imageUrl } = await put(fileName, imageBuffer, {
     access: 'public',
     contentType: 'image/png',
