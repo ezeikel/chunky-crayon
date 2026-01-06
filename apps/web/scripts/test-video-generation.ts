@@ -207,7 +207,7 @@ async function main() {
             },
           ],
           parameters: {
-            aspectRatio: '16:9',
+            aspectRatio: '9:16',
             durationSeconds: 6,
           },
         }),

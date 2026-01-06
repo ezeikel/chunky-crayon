@@ -21,7 +21,7 @@ const VEO_MODEL = 'veo-3.1-generate-preview';
 // Note: Veo only allows durationSeconds of 4, 6, or 8
 const VIDEO_CONFIG = {
   durationSeconds: 6, // 6 seconds for social media (Veo only allows 4, 6, or 8)
-  aspectRatio: '16:9', // Standard video ratio (1:1 not supported by Veo)
+  aspectRatio: '9:16', // Vertical video for Reels/Stories (1:1 not supported by Veo)
 } as const;
 
 /**
