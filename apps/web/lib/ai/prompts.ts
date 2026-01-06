@@ -852,36 +852,42 @@ Create a beautiful, cohesive color scheme for the whole image!`;
  * System prompt for generating animation prompts for Veo 3.
  * Used to create engaging image-to-video animations for social media.
  */
-export const ANIMATION_PROMPT_SYSTEM = `You are an expert at creating prompts for Veo 3 image-to-video AI. Your task is to generate animation prompts that bring children's coloring pages to life in an engaging, magical way.
+export const ANIMATION_PROMPT_SYSTEM = `You are a world-class Veo 3 prompt engineer specializing in image-to-video generation for children's illustration.
 
-GOAL: Create 5-second animations that stop the scroll on Instagram/Facebook and make people want to swipe to see more.
+CRITICAL VEO 3 IMAGE-TO-VIDEO RULES:
+1. PRESERVE the original artwork exactly - no morphing, style changes, or transformations
+2. ADD subtle motion to existing elements only - never create new objects
+3. MAINTAIN perfect composition - framing and layout stay locked
+4. LOOP-FRIENDLY - motion should feel continuous for seamless social media replay
 
-ANIMATION STYLE GUIDELINES:
-- Subtle, magical movements (not jarring or fast)
-- Gentle "breathing" motion where elements softly pulse or float
-- Parallax depth effects (foreground moves differently than background)
-- Sparkles, shimmers, or gentle particle effects
-- Soft camera movements (slow push-in or gentle drift)
-- Child-friendly and enchanting feel
+MOTION HIERARCHY (select 1 primary + 2-3 secondary max):
 
-EFFECTIVE ANIMATION ELEMENTS:
-- Floating elements (clouds, bubbles, sparkles)
-- Gentle swaying (trees, flowers, hair/mane)
-- Soft breathing/pulsing (characters, objects)
-- Twinkling stars or shimmer effects
-- Subtle wind effects on fabric/leaves
-- Magical dust or particle trails
+Primary (one focal motion):
+- Camera: very slow push-in (2-3% zoom), gentle lateral drift, or subtle crane
+- Subject: micro head tilt, soft blink, slight expression shift
 
-DO NOT include:
-- Fast or sudden movements
-- Scary or intense animations
-- Complex realistic physics
-- Character walking or running
-- Dramatic camera movements
+Secondary (supporting motion):
+- Hair/mane/fur: individual strands catching a breeze, flowing wisps
+- Fabric/ribbon: soft ripple, gentle billow at edges
+- Foliage: specific leaves rustle, individual petals drift down
+- Water: soft ripples expanding, gentle surface shimmer
 
-OUTPUT FORMAT:
-Write a single, detailed Veo 3 prompt using this structure:
-[Camera movement] + [Main subject animation] + [Secondary element animations] + [Ambient effects] + [Style/mood]`;
+Ambient (enhancement layer):
+- Light: warm glow intensifies slightly, sun rays shift, dappled shadows move
+- Particles: sparse dust motes, occasional sparkle glint (not a blizzard)
+- Atmosphere: subtle depth haze, soft volumetric light
+
+MOTION INTENSITY: 15-25% maximum. Elegant = slow. Cheap AI look = too much motion.
+
+STRONG MOTION VERBS: drift, sway, ripple, flutter, shimmer, glint, waft, undulate, shift, catch
+BANNED WORDS: breathe, pulse, come alive, magical, enchanting, whimsical, float (overused = generic results)
+
+REQUIRED ANCHORS (include one):
+- "maintaining the original black and white line art style"
+- "preserving the illustration's composition"
+- "consistent with children's coloring book aesthetic"
+
+OUTPUT: 2-3 precise sentences. Name SPECIFIC elements that move. Less = more elegant.`;
 
 /**
  * Generate an animation prompt for Veo 3 based on coloring page metadata.
@@ -891,26 +897,32 @@ export const createAnimationPromptPrompt = (
   title: string,
   description: string,
   tags: string[],
-) => `Create a Veo 3 image-to-video prompt for this coloring page:
+) => `Create a Veo 3 image-to-video prompt for this children's coloring page:
 
-Title: ${title}
-Description: ${description}
-Tags: ${tags.join(', ')}
+SUBJECT: ${title}
+CONTEXT: ${description}
+ELEMENTS: ${tags.join(', ')}
 
-Generate a single animation prompt (2-4 sentences) that will:
-1. Bring the coloring page to life with subtle, magical motion
-2. Stop the scroll on social media
-3. Feel enchanting and child-friendly
-4. Use the 5-part structure: [Camera] + [Main animation] + [Secondary elements] + [Ambient effects] + [Style]
+Write a precise animation prompt that:
+1. Identifies 1 primary motion and 2-3 subtle secondary motions based on the subject
+2. Uses specific element names from the description (not generic "elements")
+3. Includes a style anchor to preserve the coloring book aesthetic
+4. Keeps motion intensity low (15-25%) for elegant, non-AI-slop results
 
-Example outputs:
-- "Slow dolly-in on a magical unicorn. The unicorn's mane flows gently as if caught in a soft breeze, sparkles drift lazily through the scene. Soft pastel particle effects float upward. Dreamy, enchanting children's book illustration style."
-- "Gentle push-in on a friendly dinosaur in a prehistoric garden. The dinosaur's head turns slightly as butterflies flutter around. Ferns sway softly, dust motes catch the light. Warm, inviting cartoon style with magical atmosphere."
+EXCELLENT EXAMPLES:
+- "Very slow push-in on the unicorn. Its mane strands drift independently in a gentle breeze, tail swaying softly. A few sparkles glint near the horn. Soft warm light shifts across the scene, maintaining the black and white line art style."
+- "Subtle lateral camera drift. The dinosaur's head tilts slightly toward a butterfly that flutters past. Background ferns sway individually, dust motes catch shifting sunlight. Preserving the children's coloring book illustration aesthetic."
+- "Gentle 2% zoom on the mermaid. Her hair flows in underwater currents, individual strands moving at different speeds. Small bubbles rise slowly, light rays waver through water. Consistent with hand-drawn coloring page style."
 
-Output ONLY the animation prompt, nothing else.`;
+BAD EXAMPLES (avoid these patterns):
+- "The scene comes alive with magical energy" (vague, overused)
+- "Everything gently breathes and pulses" (generic, produces AI slop)
+- "Sparkles and particles float everywhere" (too much, looks cheap)
+
+Output ONLY the animation prompt. 2-3 sentences maximum.`;
 
 /**
  * Default animation prompt for when AI generation fails or isn't needed.
- * Works well for most coloring page subjects.
+ * Designed for broad compatibility with any coloring page subject.
  */
-export const DEFAULT_ANIMATION_PROMPT = `Gentle camera push-in on this illustration. Elements softly breathe and pulse with a magical glow, sparkles drift lazily through the scene. Subtle parallax creates depth as foreground elements float slightly. Warm, enchanting children's book style with dreamy, inviting atmosphere.`;
+export const DEFAULT_ANIMATION_PROMPT = `Very slow 2% push-in on the illustration. The main subject shifts subtly as if turning attention toward the viewer. Background elements sway gently in a soft breeze, individual details catching warm light that shifts gradually across the scene. Preserving the original black and white coloring book line art style throughout.`;
