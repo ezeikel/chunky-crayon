@@ -122,7 +122,8 @@ async function main() {
   console.log(`   Image source: ${imageSource}`);
   console.log(`   Prompt source: ${promptSource}`);
   if (specificId) console.log(`   Specific ID: ${specificId}`);
-  if (customPrompt) console.log(`   Custom prompt: ${customPrompt.slice(0, 50)}...`);
+  if (customPrompt)
+    console.log(`   Custom prompt: ${customPrompt.slice(0, 50)}...`);
 
   // Create output directory
   const outputDir = path.join(process.cwd(), 'test-output');
@@ -155,7 +156,9 @@ async function main() {
         customPrompt,
       );
 
-    console.log(`\n✅ Animation prompt (${promptUsed}):\n"${animationPrompt}"\n`);
+    console.log(
+      `\n✅ Animation prompt (${promptUsed}):\n"${animationPrompt}"\n`,
+    );
 
     // Save image info and prompt to file
     fs.writeFileSync(
@@ -173,26 +176,63 @@ async function main() {
     );
 
     // Step 3: Generate video using Veo 3
-    console.log('🎥 Generating video with Veo 3 (this may take a few minutes)...');
+    // Note: We use the internal helper functions directly to avoid R2 upload
+    // (R2 secrets aren't configured in CI - we just save locally for artifact upload)
+    console.log(
+      '🎥 Generating video with Veo 3 (this may take a few minutes)...',
+    );
     const startTime = Date.now();
 
-    const { generateAnimationFromImage } = await import(
-      '../lib/ai/video-providers'
+    const { fetchImageAsBase64, pollForVideoCompletion, downloadVideoFromUri } =
+      await import('../lib/ai/video-providers');
+
+    // Prepare the Veo API request
+    const VEO_MODEL = 'veo-3.1-generate-preview';
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${VEO_MODEL}:predictLongRunning`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': process.env.GOOGLE_GENERATIVE_AI_API_KEY || '',
+        },
+        body: JSON.stringify({
+          instances: [
+            {
+              prompt: animationPrompt,
+              image: {
+                bytesBase64Encoded: await fetchImageAsBase64(coloringImage.url),
+                mimeType: 'image/webp',
+              },
+            },
+          ],
+          parameters: {
+            aspectRatio: '16:9',
+            durationSeconds: 6,
+          },
+        }),
+      },
     );
-    const result = await generateAnimationFromImage(
-      coloringImage.url,
-      animationPrompt,
-    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Veo API error: ${response.status} - ${errorText}`);
+    }
+
+    const result = await response.json();
+    if (!result.name) {
+      throw new Error('Veo API did not return an operation name');
+    }
+
+    // Poll for completion and download the video
+    const { videoUri } = await pollForVideoCompletion(result.name);
+    const videoBuffer = await downloadVideoFromUri(videoUri);
 
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+    const durationSeconds = 6;
     console.log(`\n✅ Video generated in ${duration}s`);
-    console.log(`   Duration: ${result.durationSeconds}s`);
-    console.log(`   URL: ${result.url}`);
-
-    // Step 4: Download video and save locally
-    console.log('\n💾 Downloading video...');
-    const videoResponse = await fetch(result.url);
-    const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+    console.log(`   Duration: ${durationSeconds}s`);
+    console.log(`   Video URI: ${videoUri}`);
 
     const videoPath = path.join(outputDir, 'animation.mp4');
     fs.writeFileSync(videoPath, videoBuffer);
@@ -201,6 +241,7 @@ async function main() {
     console.log(`   Size: ${(videoBuffer.length / 1024 / 1024).toFixed(2)} MB`);
 
     // Save metadata
+    const generationTimeMs = Date.now() - startTime;
     const metadata = {
       coloringImageId: coloringImage.id,
       coloringImageTitle: coloringImage.title,
@@ -208,9 +249,9 @@ async function main() {
       imageUrl: coloringImage.url,
       promptSource: promptUsed,
       animationPrompt,
-      generatedVideoUrl: result.url,
-      durationSeconds: result.durationSeconds,
-      generationTimeMs: result.generationTimeMs,
+      generatedVideoUri: videoUri,
+      durationSeconds,
+      generationTimeMs,
       fileSizeBytes: videoBuffer.length,
       timestamp: new Date().toISOString(),
     };

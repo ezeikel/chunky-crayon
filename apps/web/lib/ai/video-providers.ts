@@ -26,8 +26,9 @@ const VIDEO_CONFIG = {
 
 /**
  * Fetch an image and convert to base64
+ * @internal Exported for testing purposes
  */
-async function fetchImageAsBase64(imageUrl: string): Promise<string> {
+export async function fetchImageAsBase64(imageUrl: string): Promise<string> {
   const response = await fetch(imageUrl);
   if (!response.ok) {
     throw new Error(`Failed to fetch image: ${response.status}`);
@@ -132,8 +133,9 @@ export async function generateAnimationFromImage(
 /**
  * Poll for video generation completion (Veo operations are async)
  * Returns a URL to download the video from
+ * @internal Exported for testing purposes
  */
-async function pollForVideoCompletion(
+export async function pollForVideoCompletion(
   operationName: string,
   maxAttempts = 60, // 5 minutes max with 5s intervals
   intervalMs = 5000,
@@ -197,8 +199,9 @@ async function pollForVideoCompletion(
 
 /**
  * Download video from Veo's file URI
+ * @internal Exported for testing purposes
  */
-async function downloadVideoFromUri(videoUri: string): Promise<Buffer> {
+export async function downloadVideoFromUri(videoUri: string): Promise<Buffer> {
   // eslint-disable-next-line no-console
   console.log('[VideoGeneration] Downloading video from URI...');
 
