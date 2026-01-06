@@ -20,7 +20,7 @@ const VEO_MODEL = 'veo-3.1-generate-preview';
 // Video generation config
 const VIDEO_CONFIG = {
   durationSeconds: 5, // 5 seconds is ideal for social media
-  aspectRatio: '1:1', // Square for Instagram/Facebook
+  aspectRatio: '16:9', // Standard video ratio (1:1 not supported by Veo)
 } as const;
 
 /**
