@@ -1,5 +1,4 @@
 import { put } from '@/lib/storage';
-import { google } from '@ai-sdk/google';
 
 /**
  * Video Generation Provider using Google Veo 3
@@ -25,6 +24,18 @@ const VIDEO_CONFIG = {
 } as const;
 
 /**
+ * Fetch an image and convert to base64
+ */
+async function fetchImageAsBase64(imageUrl: string): Promise<string> {
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch image: ${response.status}`);
+  }
+  const buffer = await response.arrayBuffer();
+  return Buffer.from(buffer).toString('base64');
+}
+
+/**
  * Generate an animated video from a coloring page image using Veo 3.
  *
  * @param imageUrl - URL of the source image (PNG/JPEG)
@@ -43,14 +54,10 @@ export async function generateAnimationFromImage(
   console.log('[VideoGeneration] Prompt:', animationPrompt);
 
   try {
-    // Use the Google AI SDK to call Veo 3 for image-to-video generation
-    // Veo 3 supports image-to-video via the generateVideo API
-    const model = google(VEO_MODEL);
-
-    // For Veo 3, we need to use a specific API call pattern
-    // The @ai-sdk/google package supports video generation through the underlying API
+    // For Veo 3, we need to use the predictLongRunning endpoint
+    // See: https://ai.google.dev/gemini-api/docs/video
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/veo-3.0-generate-preview:generateVideo',
+      `https://generativelanguage.googleapis.com/v1beta/models/${VEO_MODEL}:predictLongRunning`,
       {
         method: 'POST',
         headers: {
@@ -62,7 +69,8 @@ export async function generateAnimationFromImage(
             {
               prompt: animationPrompt,
               image: {
-                imageUri: imageUrl,
+                bytesBase64Encoded: await fetchImageAsBase64(imageUrl),
+                mimeType: 'image/webp',
               },
             },
           ],
@@ -70,7 +78,6 @@ export async function generateAnimationFromImage(
             aspectRatio: VIDEO_CONFIG.aspectRatio,
             durationSeconds: VIDEO_CONFIG.durationSeconds,
             personGeneration: 'dont_allow', // Safe for kids content
-            safetyFilterLevel: 'block_some',
           },
         }),
       },
@@ -92,7 +99,9 @@ export async function generateAnimationFromImage(
       // Save video to storage
       const videoBuffer = Buffer.from(videoData.videoBytes, 'base64');
       const tempFileName = `coloring-images/animations/${Date.now()}-${Math.random().toString(36).substring(2)}.mp4`;
-      const { url } = await put(tempFileName, videoBuffer, { access: 'public' });
+      const { url } = await put(tempFileName, videoBuffer, {
+        access: 'public',
+      });
 
       // eslint-disable-next-line no-console
       console.log(
@@ -112,7 +121,9 @@ export async function generateAnimationFromImage(
       const generationTimeMs = Date.now() - startTime;
       const videoBuffer = Buffer.from(result.predictions[0].video, 'base64');
       const tempFileName = `coloring-images/animations/${Date.now()}-${Math.random().toString(36).substring(2)}.mp4`;
-      const { url } = await put(tempFileName, videoBuffer, { access: 'public' });
+      const { url } = await put(tempFileName, videoBuffer, {
+        access: 'public',
+      });
 
       return {
         url,
