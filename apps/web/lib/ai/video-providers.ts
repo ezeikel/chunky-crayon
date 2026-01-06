@@ -93,11 +93,13 @@ export async function generateAnimationFromImage(
     // Check if we got an operation (async) or direct result
     if (result.name) {
       // Async operation - need to poll for completion
-      const videoData = await pollForVideoCompletion(result.name);
+      const { videoUri } = await pollForVideoCompletion(result.name);
+
+      // Download the video from Veo's file URI
+      const videoBuffer = await downloadVideoFromUri(videoUri);
       const generationTimeMs = Date.now() - startTime;
 
       // Save video to storage
-      const videoBuffer = Buffer.from(videoData.videoBytes, 'base64');
       const tempFileName = `coloring-images/animations/${Date.now()}-${Math.random().toString(36).substring(2)}.mp4`;
       const { url } = await put(tempFileName, videoBuffer, {
         access: 'public',
@@ -116,24 +118,7 @@ export async function generateAnimationFromImage(
       };
     }
 
-    // Direct result (less common)
-    if (result.predictions?.[0]?.video) {
-      const generationTimeMs = Date.now() - startTime;
-      const videoBuffer = Buffer.from(result.predictions[0].video, 'base64');
-      const tempFileName = `coloring-images/animations/${Date.now()}-${Math.random().toString(36).substring(2)}.mp4`;
-      const { url } = await put(tempFileName, videoBuffer, {
-        access: 'public',
-      });
-
-      return {
-        url,
-        tempFileName,
-        generationTimeMs,
-        durationSeconds: VIDEO_CONFIG.durationSeconds,
-      };
-    }
-
-    throw new Error('Unexpected Veo API response format');
+    throw new Error('Unexpected Veo API response format - no operation name');
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(
@@ -146,12 +131,13 @@ export async function generateAnimationFromImage(
 
 /**
  * Poll for video generation completion (Veo operations are async)
+ * Returns a URL to download the video from
  */
 async function pollForVideoCompletion(
   operationName: string,
   maxAttempts = 60, // 5 minutes max with 5s intervals
   intervalMs = 5000,
-): Promise<{ videoBytes: string }> {
+): Promise<{ videoUri: string }> {
   // eslint-disable-next-line no-console
   console.log(`[VideoGeneration] Polling operation: ${operationName}`);
 
@@ -176,28 +162,27 @@ async function pollForVideoCompletion(
         throw new Error(`Video generation failed: ${operation.error.message}`);
       }
 
-      // Log response structure for debugging
-      // eslint-disable-next-line no-console
-      console.log(
-        '[VideoGeneration] Operation response:',
-        JSON.stringify(operation, null, 2),
-      );
+      // Veo returns a URI to download the video from
+      // Path: response.generateVideoResponse.generatedSamples[0].video.uri
+      const videoUri =
+        operation.response?.generateVideoResponse?.generatedSamples?.[0]?.video
+          ?.uri;
 
-      // Extract video from response - try multiple possible paths
-      const video =
-        operation.response?.generatedVideos?.[0]?.video ||
-        operation.response?.videos?.[0]?.video ||
-        operation.response?.video ||
-        operation.result?.generatedVideos?.[0]?.video ||
-        operation.result?.videos?.[0]?.video;
-
-      if (!video) {
+      if (!videoUri) {
+        // Log for debugging if path not found
+        // eslint-disable-next-line no-console
+        console.log(
+          '[VideoGeneration] Operation response:',
+          JSON.stringify(operation, null, 2),
+        );
         throw new Error(
-          `No video in completed operation response. Keys: ${Object.keys(operation.response || operation).join(', ')}`,
+          `No video URI in completed operation response. Keys: ${Object.keys(operation.response || operation).join(', ')}`,
         );
       }
 
-      return { videoBytes: video };
+      // eslint-disable-next-line no-console
+      console.log(`[VideoGeneration] Got video URI: ${videoUri}`);
+      return { videoUri };
     }
 
     // eslint-disable-next-line no-console
@@ -208,6 +193,31 @@ async function pollForVideoCompletion(
   }
 
   throw new Error('Video generation timed out');
+}
+
+/**
+ * Download video from Veo's file URI
+ */
+async function downloadVideoFromUri(videoUri: string): Promise<Buffer> {
+  // eslint-disable-next-line no-console
+  console.log('[VideoGeneration] Downloading video from URI...');
+
+  const response = await fetch(videoUri, {
+    headers: {
+      'x-goog-api-key': process.env.GOOGLE_GENERATIVE_AI_API_KEY || '',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to download video: ${response.status}`);
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  // eslint-disable-next-line no-console
+  console.log(
+    `[VideoGeneration] Downloaded video: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`,
+  );
+  return buffer;
 }
 
 /**
