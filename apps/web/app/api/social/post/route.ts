@@ -24,13 +24,14 @@ export const maxDuration = 180; // Increased for carousel creation
 
 /**
  * Check if the configured user has a saved artwork for this coloring image.
- * Returns the imageUrl if found, null otherwise.
+ * If found, processes it to 1080x1080 for Instagram and returns a temp URL.
  *
  * This allows automatic inclusion of colored examples without manual upload.
  * Configure via COLORED_EXAMPLE_USER_EMAIL and COLORED_EXAMPLE_PROFILE_NAME.
  */
 const getColoredExampleUrl = async (
   coloringImageId: string,
+  tempFiles: string[],
 ): Promise<string | null> => {
   const userEmail = process.env.COLORED_EXAMPLE_USER_EMAIL;
   const profileName = process.env.COLORED_EXAMPLE_PROFILE_NAME;
@@ -71,19 +72,43 @@ const getColoredExampleUrl = async (
       orderBy: { createdAt: 'desc' }, // Get most recent if multiple
     });
 
-    if (savedArtwork?.imageUrl) {
+    if (!savedArtwork?.imageUrl) {
       console.log(
-        `[Social] Found saved artwork from ${profileName}: ${savedArtwork.imageUrl}`,
+        `[Social] No saved artwork found for image ${coloringImageId} by ${profileName}`,
       );
-      return savedArtwork.imageUrl;
+      return null;
     }
 
     console.log(
-      `[Social] No saved artwork found for image ${coloringImageId} by ${profileName}`,
+      `[Social] Found saved artwork from ${profileName}: ${savedArtwork.imageUrl}`,
     );
-    return null;
+
+    // Fetch and process to 1080x1080 for Instagram quality
+    console.log('[Social] Processing colored example to 1080x1080...');
+    const imageResponse = await fetch(savedArtwork.imageUrl);
+    const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+
+    // Resize to 1080x1080 square (Instagram standard)
+    const processedBuffer = await sharp(imageBuffer)
+      .resize(1080, 1080, {
+        fit: 'contain',
+        background: { r: 255, g: 255, b: 255, alpha: 1 },
+      })
+      .png({ quality: 95 })
+      .toBuffer();
+
+    // Upload to temp storage
+    const tempFileName = `temp/social/colored-example/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
+    const { url } = await put(tempFileName, processedBuffer, {
+      access: 'public',
+    });
+
+    tempFiles.push(tempFileName);
+    console.log(`[Social] Colored example processed and uploaded: ${url}`);
+
+    return url;
   } catch (error) {
-    console.error('[Social] Error checking for saved artwork:', error);
+    console.error('[Social] Error processing colored example:', error);
     return null;
   }
 };
@@ -564,8 +589,11 @@ const handleRequest = async (request: Request) => {
         if (coloringImage.animationUrl) {
           console.log('[Instagram] Creating carousel...');
 
-          // Check for optional colored example (manually uploaded)
-          const coloredExampleUrl = await getColoredExampleUrl(coloringImage.id);
+          // Check for optional colored example from configured user's saved artwork
+          const coloredExampleUrl = await getColoredExampleUrl(
+            coloringImage.id,
+            tempFiles,
+          );
           const hasColoredExample = !!coloredExampleUrl;
 
           // Generate caption with correct post type based on slides
