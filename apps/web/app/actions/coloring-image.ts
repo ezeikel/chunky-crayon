@@ -225,6 +225,7 @@ const generateColoringImageWithMetadata = async (
       description: imageMetadata.description,
       alt: imageMetadata.alt,
       tags: imageMetadata.tags,
+      animationPrompt: imageMetadata.animationPrompt, // Pre-generated for Veo 3
       generationType: generationType || GenerationType.USER,
       userId,
       profileId: activeProfile?.id,

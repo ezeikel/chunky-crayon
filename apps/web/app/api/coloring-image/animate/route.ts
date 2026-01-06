@@ -175,13 +175,20 @@ const handleRequest = async (request: NextRequest) => {
     console.log('[Animate] Converting SVG to PNG...');
     const pngUrl = await convertSvgToPng(coloringImage.svgUrl);
 
-    // Step 2: Generate a custom animation prompt based on image metadata
-    console.log('[Animate] Generating animation prompt...');
-    const animationPrompt = await generateAnimationPrompt(
-      coloringImage.title,
-      coloringImage.description,
-      coloringImage.tags,
-    );
+    // Step 2: Use stored animation prompt (generated at image creation from visual analysis)
+    // Fall back to dynamic generation only for older images without stored prompts
+    let animationPrompt: string;
+    if (coloringImage.animationPrompt) {
+      console.log('[Animate] Using stored animation prompt (image-specific)');
+      animationPrompt = coloringImage.animationPrompt;
+    } else {
+      console.log('[Animate] No stored prompt, generating from metadata (fallback)...');
+      animationPrompt = await generateAnimationPrompt(
+        coloringImage.title,
+        coloringImage.description,
+        coloringImage.tags,
+      );
+    }
     console.log('[Animate] Animation prompt:', animationPrompt);
 
     // Step 3: Generate video using Veo 3
