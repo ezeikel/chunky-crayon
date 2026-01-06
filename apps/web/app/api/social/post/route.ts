@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
 import sharp from 'sharp';
-import { put, del, exists } from '@/lib/storage';
+import { put, del } from '@/lib/storage';
 import { db } from '@chunky-crayon/db';
 import {
   generateInstagramCaption,
@@ -14,37 +14,78 @@ import {
 export const maxDuration = 180; // Increased for carousel creation
 
 /**
- * Folder convention for colored example images.
- * You can manually upload colored versions to this folder in R2.
- * Supported formats: .png, .jpg, .jpeg
+ * Environment variables for colored example auto-pull:
+ * - COLORED_EXAMPLE_USER_EMAIL: Email of user whose saved artwork to use
+ * - COLORED_EXAMPLE_PROFILE_NAME: Profile name to check for saved artwork
  *
- * Example: colored-examples/clx123abc.png
+ * If configured, the social post will automatically include their saved
+ * artwork as the colored example in the carousel (3rd slide).
  */
-const COLORED_EXAMPLES_FOLDER = 'colored-examples';
 
 /**
- * Check if a colored example exists for the given coloring image.
- * Returns the public URL if found, null otherwise.
+ * Check if the configured user has a saved artwork for this coloring image.
+ * Returns the imageUrl if found, null otherwise.
+ *
+ * This allows automatic inclusion of colored examples without manual upload.
+ * Configure via COLORED_EXAMPLE_USER_EMAIL and COLORED_EXAMPLE_PROFILE_NAME.
  */
 const getColoredExampleUrl = async (
   coloringImageId: string,
 ): Promise<string | null> => {
-  const publicUrl = process.env.R2_PUBLIC_URL?.replace(/\/$/, '');
-  if (!publicUrl) return null;
+  const userEmail = process.env.COLORED_EXAMPLE_USER_EMAIL;
+  const profileName = process.env.COLORED_EXAMPLE_PROFILE_NAME;
 
-  // Check for different image formats
-  const formats = ['png', 'jpg', 'jpeg'];
-
-  for (const format of formats) {
-    const pathname = `${COLORED_EXAMPLES_FOLDER}/${coloringImageId}.${format}`;
-    const found = await exists(pathname);
-    if (found) {
-      console.log(`[Social] Found colored example: ${pathname}`);
-      return `${publicUrl}/${pathname}`;
-    }
+  if (!userEmail || !profileName) {
+    console.log('[Social] Colored example env vars not configured, skipping');
+    return null;
   }
 
-  return null;
+  try {
+    // Find the user and profile
+    const user = await db.user.findUnique({
+      where: { email: userEmail },
+      include: {
+        profiles: {
+          where: { name: profileName },
+        },
+      },
+    });
+
+    if (!user) {
+      console.log(`[Social] User ${userEmail} not found`);
+      return null;
+    }
+
+    const profile = user.profiles[0];
+    if (!profile) {
+      console.log(`[Social] Profile ${profileName} not found for ${userEmail}`);
+      return null;
+    }
+
+    // Check for saved artwork for this coloring image
+    const savedArtwork = await db.savedArtwork.findFirst({
+      where: {
+        coloringImageId,
+        profileId: profile.id,
+      },
+      orderBy: { createdAt: 'desc' }, // Get most recent if multiple
+    });
+
+    if (savedArtwork?.imageUrl) {
+      console.log(
+        `[Social] Found saved artwork from ${profileName}: ${savedArtwork.imageUrl}`,
+      );
+      return savedArtwork.imageUrl;
+    }
+
+    console.log(
+      `[Social] No saved artwork found for image ${coloringImageId} by ${profileName}`,
+    );
+    return null;
+  } catch (error) {
+    console.error('[Social] Error checking for saved artwork:', error);
+    return null;
+  }
 };
 
 const corsHeaders = {
