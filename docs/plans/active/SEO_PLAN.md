@@ -631,6 +631,38 @@ Based on competitor analysis and search volume research:
 
 ---
 
+## SEO Tools
+
+### Currently Using
+
+| Tool                      | Purpose                             | Status             |
+| ------------------------- | ----------------------------------- | ------------------ |
+| **Google Search Console** | Rankings, clicks, indexing, sitemap | ✅ Set up Jan 2026 |
+| **PostHog**               | Product analytics, user behavior    | ✅ Already in use  |
+
+### Recommended to Add (Free)
+
+| Tool                     | Purpose                                             | Effort   |
+| ------------------------ | --------------------------------------------------- | -------- |
+| **Bing Webmaster Tools** | Free backlink data (worth $99/mo elsewhere)         | 5 mins   |
+| **PageSpeed Insights**   | Core Web Vitals - run manually at pagespeed.web.dev | No setup |
+
+### Not Needed Yet (Paid)
+
+| Tool               | Cost       | When to Consider                                               |
+| ------------------ | ---------- | -------------------------------------------------------------- |
+| **Ahrefs/Semrush** | $99-199/mo | When you have 10k+ monthly visits and need competitor analysis |
+| **Outrank.so**     | Varies     | When producing blog content at scale                           |
+
+### Notes
+
+- **PostHog vs Google Analytics:** PostHog handles product analytics well. GA's main
+  SEO advantage is direct Search Console integration for keyword-to-conversion tracking.
+  Not essential - can add later if needed.
+- **Bing Webmaster:** Submit same sitemap.xml - Bing also powers DuckDuckGo and Yahoo.
+
+---
+
 ### Overall Progress: 9/10 phases complete (90%)
 
 ---
