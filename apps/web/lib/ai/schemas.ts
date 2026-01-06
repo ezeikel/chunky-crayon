@@ -20,11 +20,6 @@ export const imageMetadataSchema = z.object({
   tags: z
     .array(z.string())
     .describe('Relevant tags/keywords for categorization'),
-  animationPrompt: z
-    .string()
-    .describe(
-      'Veo 3 animation prompt: 2-3 sentences describing specific motion for the visual elements in this image. Reference actual elements visible (mane, tail, flowers, etc). Include style anchor.',
-    ),
 });
 
 export type ImageMetadata = z.infer<typeof imageMetadataSchema>;

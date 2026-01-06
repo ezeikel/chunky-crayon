@@ -265,36 +265,11 @@ export const createImageMetadataSystemPrompt = (
 
 IMPORTANT LANGUAGE REQUIREMENT:
 - The "title" field MUST be in ${targetLanguage} (${nativeName}) - use natural, child-friendly expressions
-- The "description", "alt", "tags", and "animationPrompt" fields MUST remain in English
+- The "description", "alt", and "tags" fields MUST remain in English for consistency and filtering
 - Only translate the title, nothing else`
       : '';
 
-  return `You are an assistant that generates metadata for children's coloring page images. Generate:
-- title: SEO-friendly title, suitable for ages 3-8
-- description: Brief description for SEO
-- alt: Accessible alt text
-- tags: Relevant keywords for categorization
-- animationPrompt: A Veo 3 image-to-video prompt (see rules below)
-
-ANIMATION PROMPT RULES (critical for quality):
-1. Reference SPECIFIC visual elements you see (e.g., "the unicorn's flowing mane", "the butterfly's wings", "background flowers")
-2. Pick 1 primary motion + 2-3 subtle secondary motions based on what's actually in the image
-3. Keep motion intensity LOW (15-25%) - elegant and slow, not busy
-4. Include a style anchor: "maintaining the black and white line art style" or similar
-5. 2-3 sentences maximum
-
-MOTION IDEAS BY ELEMENT TYPE:
-- Hair/mane/fur: individual strands drift in breeze, flowing wisps
-- Wings: gentle flutter, slight lift and settle
-- Fabric/ribbon: soft ripple at edges, gentle billow
-- Foliage/flowers: leaves rustle, petals drift slowly
-- Water: soft ripples, surface shimmer
-- Camera: very slow 2-3% push-in or subtle lateral drift
-
-BANNED WORDS (produce generic AI slop): breathe, pulse, come alive, magical, enchanting, whimsical
-
-EXAMPLE animationPrompt for a unicorn image:
-"Very slow push-in on the unicorn. Its mane strands drift independently in a gentle breeze, tail swaying softly. Background flowers sway slightly, a few sparkles glint near the horn. Maintaining the black and white coloring book line art style."${languageInstruction}`;
+  return `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.${languageInstruction}`;
 };
 
 /** Default English system prompt for backwards compatibility */

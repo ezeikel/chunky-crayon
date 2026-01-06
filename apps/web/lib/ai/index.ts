@@ -148,6 +148,9 @@ export type {
 // Re-export analytics functions
 export { analyzeImageForAnalytics } from './analytics';
 
+// Re-export animation prompt generation (for after() hooks)
+export { generateAnimationPromptFromImage } from './animation';
+
 // Re-export image provider abstraction
 export {
   generateColoringPageImage,
