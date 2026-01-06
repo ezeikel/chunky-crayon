@@ -78,7 +78,6 @@ export async function generateAnimationFromImage(
           parameters: {
             aspectRatio: VIDEO_CONFIG.aspectRatio,
             durationSeconds: VIDEO_CONFIG.durationSeconds,
-            personGeneration: 'dont_allow', // Safe for kids content
           },
         }),
       },
