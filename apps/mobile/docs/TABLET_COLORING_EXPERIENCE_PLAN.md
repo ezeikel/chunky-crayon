@@ -1347,24 +1347,23 @@ Sentry.startSpan(
 | **Brush Types** | ✅ 7 types | ✅ 6 types | ✅ 7 types + textures |
 | **AI Features** | ✅ Magic Color | ⚠️ Basic auto-fill | ✅ Magic Color (pre-computed) |
 | **Content** | ✅ 100+ pages | ✅ 2,000+ pages | ✅ 100+ (growing) |
-| **Price** | ✅ Free (no paywall) | ❌ $5.99/mo or $45/yr | ✅ Free |
 | **Ad-Free** | ✅ Yes | ✅ Yes | ✅ Yes |
 | **Offline Mode** | ✅ Yes | ❌ Requires internet | ✅ Yes |
 
 **Our Advantages Post-Implementation**:
-1. **Free** - Disney has aggressive paywall
-2. **Better tablet UX** - Landscape mode, side toolbar
-3. **Symmetry drawing** - Disney doesn't have this
-4. **Layers** - Disney doesn't have this
-5. **Texture brushes** - More realistic than Disney
-6. **Offline-first** - Works without internet
+1. **Better tablet UX** - Landscape mode, side toolbar, Apple Pencil optimization
+2. **Symmetry drawing** - Disney doesn't have this
+3. **Layers** - Disney doesn't have this
+4. **Texture brushes** - More realistic than Disney
+5. **Offline-first** - Works without internet
+6. **Advanced tools** - More features for young artists
 
 **Disney's Remaining Advantages**:
 1. **Brand** - Disney characters (licensed)
 2. **Content** - 2,000+ pages vs our 100+
 3. **AR** - Mature 3D playsets (we'll catch up)
 
-**Strategy**: Position as "The artist's coloring app for kids" - more advanced tools, better performance, free forever.
+**Strategy**: Position as "The artist's coloring app for kids" - more advanced tools, better performance, superior tablet experience.
 
 ---
 
