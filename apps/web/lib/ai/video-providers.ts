@@ -14,8 +14,8 @@ export type VideoGenerationResult = {
   durationSeconds: number;
 };
 
-// Veo 3 model ID
-const VEO_MODEL = 'veo-3.0-generate-preview';
+// Veo 3.1 model ID (supports image-to-video via Gemini API)
+const VEO_MODEL = 'veo-3.1-generate-preview';
 
 // Video generation config
 const VIDEO_CONFIG = {
