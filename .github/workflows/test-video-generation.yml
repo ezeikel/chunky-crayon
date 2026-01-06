@@ -1,0 +1,94 @@
+name: Test Video Generation
+
+on:
+  # Manual trigger only - Veo 3 API costs money
+  workflow_dispatch:
+    inputs:
+      image_source:
+        description: 'Which image to animate'
+        required: true
+        type: choice
+        default: 'latest_daily'
+        options:
+          - latest_daily
+          - latest_any
+          - specific_id
+      coloring_image_id:
+        description: 'Coloring image ID (only used if image_source is "specific_id")'
+        required: false
+        type: string
+      prompt_source:
+        description: 'Animation prompt source'
+        required: true
+        type: choice
+        default: 'stored_or_generate'
+        options:
+          - stored_or_generate
+          - generate_new
+          - custom
+      custom_prompt:
+        description: 'Custom animation prompt (only used if prompt_source is "custom")'
+        required: false
+        type: string
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test-video-generation:
+    runs-on: ubuntu-latest
+    name: Generate Test Animation
+    timeout-minutes: 10 # Veo 3 can take a few minutes
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        working-directory: ./packages/db
+        run: pnpm prisma generate
+
+      - name: Run video generation test
+        env:
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TEST_IMAGE_SOURCE: ${{ inputs.image_source }}
+          TEST_COLORING_IMAGE_ID: ${{ inputs.coloring_image_id }}
+          TEST_PROMPT_SOURCE: ${{ inputs.prompt_source }}
+          TEST_CUSTOM_PROMPT: ${{ inputs.custom_prompt }}
+        working-directory: ./apps/web
+        run: npx tsx scripts/test-video-generation.ts
+
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-animation-${{ github.run_id }}
+          path: apps/web/test-output/
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Summary
+        run: |
+          echo "## Video Generation Test Complete 🎬" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download the video artifact from the Actions tab to review the generated animation." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Inputs" >> $GITHUB_STEP_SUMMARY
+          echo "- Image source: ${{ inputs.image_source }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Coloring image ID: ${{ inputs.coloring_image_id || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Prompt source: ${{ inputs.prompt_source }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Custom prompt: ${{ inputs.custom_prompt || 'N/A' }}" >> $GITHUB_STEP_SUMMARY

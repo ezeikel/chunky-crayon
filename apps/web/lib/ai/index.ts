@@ -97,6 +97,10 @@ export {
   // Pre-computed grid color map prompts (for instant Magic Fill)
   GRID_COLOR_MAP_SYSTEM,
   createGridColorMapPrompt,
+  // Animation prompts (for Veo 3 video generation)
+  ANIMATION_PROMPT_SYSTEM,
+  createAnimationPromptPrompt,
+  DEFAULT_ANIMATION_PROMPT,
 } from './prompts';
 export type { MagicColorMode } from './prompts';
 
@@ -144,6 +148,9 @@ export type {
 // Re-export analytics functions
 export { analyzeImageForAnalytics } from './analytics';
 
+// Re-export animation prompt generation (for after() hooks)
+export { generateAnimationPromptFromImage } from './animation';
+
 // Re-export image provider abstraction
 export {
   generateColoringPageImage,
@@ -156,3 +163,10 @@ export type {
   GenerationResult,
   ProviderConfig,
 } from './image-providers';
+
+// Re-export video provider abstraction (Veo 3)
+export {
+  generateAnimationFromImage,
+  isVideoGenerationAvailable,
+} from './video-providers';
+export type { VideoGenerationResult } from './video-providers';

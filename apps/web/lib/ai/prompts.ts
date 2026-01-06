@@ -843,3 +843,86 @@ Start with a brief scene description, then list all grid cells with their colors
 
 Create a beautiful, cohesive color scheme for the whole image!`;
 };
+
+// =============================================================================
+// Social Media Animation (Veo 3 image-to-video for carousels)
+// =============================================================================
+
+/**
+ * System prompt for generating animation prompts for Veo 3.
+ * Used to create engaging image-to-video animations for social media.
+ */
+export const ANIMATION_PROMPT_SYSTEM = `You are a world-class Veo 3 prompt engineer specializing in image-to-video generation for children's illustration.
+
+CRITICAL VEO 3 IMAGE-TO-VIDEO RULES:
+1. PRESERVE the original artwork exactly - no morphing, style changes, or transformations
+2. ADD subtle motion to existing elements only - never create new objects
+3. MAINTAIN perfect composition - framing and layout stay locked
+4. LOOP-FRIENDLY - motion should feel continuous for seamless social media replay
+
+MOTION HIERARCHY (select 1 primary + 2-3 secondary max):
+
+Primary (one focal motion):
+- Camera: very slow push-in (2-3% zoom), gentle lateral drift, or subtle crane
+- Subject: micro head tilt, soft blink, slight expression shift
+
+Secondary (supporting motion):
+- Hair/mane/fur: individual strands catching a breeze, flowing wisps
+- Fabric/ribbon: soft ripple, gentle billow at edges
+- Foliage: specific leaves rustle, individual petals drift down
+- Water: soft ripples expanding, gentle surface shimmer
+
+Ambient (enhancement layer):
+- Light: warm glow intensifies slightly, sun rays shift, dappled shadows move
+- Particles: sparse dust motes, occasional sparkle glint (not a blizzard)
+- Atmosphere: subtle depth haze, soft volumetric light
+
+MOTION INTENSITY: 15-25% maximum. Elegant = slow. Cheap AI look = too much motion.
+
+STRONG MOTION VERBS: drift, sway, ripple, flutter, shimmer, glint, waft, undulate, shift, catch
+BANNED WORDS: breathe, pulse, come alive, magical, enchanting, whimsical, float (overused = generic results)
+
+REQUIRED ANCHORS (include one):
+- "maintaining the original black and white line art style"
+- "preserving the illustration's composition"
+- "consistent with children's coloring book aesthetic"
+
+OUTPUT: 2-3 precise sentences. Name SPECIFIC elements that move. Less = more elegant.`;
+
+/**
+ * Generate an animation prompt for Veo 3 based on coloring page metadata.
+ * The prompt should create engaging, child-friendly animations for social media.
+ */
+export const createAnimationPromptPrompt = (
+  title: string,
+  description: string,
+  tags: string[],
+) => `Create a Veo 3 image-to-video prompt for this children's coloring page:
+
+SUBJECT: ${title}
+CONTEXT: ${description}
+ELEMENTS: ${tags.join(', ')}
+
+Write a precise animation prompt that:
+1. Identifies 1 primary motion and 2-3 subtle secondary motions based on the subject
+2. Uses specific element names from the description (not generic "elements")
+3. Includes a style anchor to preserve the coloring book aesthetic
+4. Keeps motion intensity low (15-25%) for elegant, non-AI-slop results
+
+EXCELLENT EXAMPLES:
+- "Very slow push-in on the unicorn. Its mane strands drift independently in a gentle breeze, tail swaying softly. A few sparkles glint near the horn. Soft warm light shifts across the scene, maintaining the black and white line art style."
+- "Subtle lateral camera drift. The dinosaur's head tilts slightly toward a butterfly that flutters past. Background ferns sway individually, dust motes catch shifting sunlight. Preserving the children's coloring book illustration aesthetic."
+- "Gentle 2% zoom on the mermaid. Her hair flows in underwater currents, individual strands moving at different speeds. Small bubbles rise slowly, light rays waver through water. Consistent with hand-drawn coloring page style."
+
+BAD EXAMPLES (avoid these patterns):
+- "The scene comes alive with magical energy" (vague, overused)
+- "Everything gently breathes and pulses" (generic, produces AI slop)
+- "Sparkles and particles float everywhere" (too much, looks cheap)
+
+Output ONLY the animation prompt. 2-3 sentences maximum.`;
+
+/**
+ * Default animation prompt for when AI generation fails or isn't needed.
+ * Designed for broad compatibility with any coloring page subject.
+ */
+export const DEFAULT_ANIMATION_PROMPT = `Very slow 2% push-in on the illustration. The main subject shifts subtly as if turning attention toward the viewer. Background elements sway gently in a soft breeze, individual details catching warm light that shifts gradually across the scene. Preserving the original black and white coloring book line art style throughout.`;

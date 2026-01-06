@@ -14,6 +14,7 @@ import {
   IMAGE_METADATA_PROMPT,
   imageMetadataSchema,
   analyzeImageForAnalytics,
+  generateAnimationPromptFromImage,
   generateColoringPageImage,
   getCurrentProviderConfig,
 } from '@/lib/ai';
@@ -219,6 +220,7 @@ const generateColoringImageWithMetadata = async (
 
   // Step 4: Create DB record (needs metadata)
   // Uses activeProfile fetched at start of function
+  // Note: animationPrompt is generated in after() hook with image visibility
   const coloringImage = await db.coloringImage.create({
     data: {
       title: imageMetadata.title,
@@ -394,6 +396,26 @@ export const createColoringImage = async (
             );
           }
         })(),
+
+        // Generate animation prompt using expert system + image visibility
+        // This is used by Veo 3 to create engaging social media animations
+        (async () => {
+          try {
+            const animationPrompt = await generateAnimationPromptFromImage(
+              result.url!,
+            );
+            await db.coloringImage.update({
+              where: { id: result.id },
+              data: { animationPrompt },
+            });
+            console.log(`[Pipeline] Animation prompt generated for ${result.id}`);
+          } catch (error) {
+            console.error(
+              `[Pipeline] Failed to generate animation prompt:`,
+              error,
+            );
+          }
+        })(),
       ]);
 
       // Invalidate cache so new data (color map, ambient sound) is available
@@ -463,6 +485,26 @@ export const createColoringImage = async (
         } else {
           console.error(
             `[Pipeline] Failed to generate ambient sound: ${soundResult.error}`,
+          );
+        }
+      })(),
+
+      // Generate animation prompt using expert system + image visibility
+      // This is used by Veo 3 to create engaging social media animations
+      (async () => {
+        try {
+          const animationPrompt = await generateAnimationPromptFromImage(
+            result.url!,
+          );
+          await db.coloringImage.update({
+            where: { id: result.id },
+            data: { animationPrompt },
+          });
+          console.log(`[Pipeline] Animation prompt generated for ${result.id}`);
+        } catch (error) {
+          console.error(
+            `[Pipeline] Failed to generate animation prompt:`,
+            error,
           );
         }
       })(),
