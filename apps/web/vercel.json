@@ -25,10 +25,6 @@
       "schedule": "0 15 * * 0,6"
     },
     {
-      "path": "/api/utils/blob/backup",
-      "schedule": "0 9 * * *"
-    },
-    {
       "path": "/api/admin/tokens",
       "schedule": "0 8 * * 1"
     },
