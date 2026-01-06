@@ -18,9 +18,9 @@ export type VideoGenerationResult = {
 const VEO_MODEL = 'veo-3.1-generate-preview';
 
 // Video generation config
-// Note: Veo only supports durationSeconds as string "4", "6", or "8"
+// Note: Veo only allows durationSeconds of 4, 6, or 8
 const VIDEO_CONFIG = {
-  durationSeconds: '6', // 6 seconds for social media (Veo only allows 4, 6, or 8)
+  durationSeconds: 6, // 6 seconds for social media (Veo only allows 4, 6, or 8)
   aspectRatio: '16:9', // Standard video ratio (1:1 not supported by Veo)
 } as const;
 
@@ -113,7 +113,7 @@ export async function generateAnimationFromImage(
         url,
         tempFileName,
         generationTimeMs,
-        durationSeconds: parseInt(VIDEO_CONFIG.durationSeconds, 10),
+        durationSeconds: VIDEO_CONFIG.durationSeconds,
       };
     }
 
@@ -130,7 +130,7 @@ export async function generateAnimationFromImage(
         url,
         tempFileName,
         generationTimeMs,
-        durationSeconds: parseInt(VIDEO_CONFIG.durationSeconds, 10),
+        durationSeconds: VIDEO_CONFIG.durationSeconds,
       };
     }
 
