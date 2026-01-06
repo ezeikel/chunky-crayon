@@ -4,12 +4,30 @@ on:
   # Manual trigger only - Veo 3 API costs money
   workflow_dispatch:
     inputs:
-      image_url:
-        description: 'URL of coloring page image to animate (leave empty for default test image)'
+      image_source:
+        description: 'Which image to animate'
+        required: true
+        type: choice
+        default: 'latest_daily'
+        options:
+          - latest_daily
+          - latest_any
+          - specific_id
+      coloring_image_id:
+        description: 'Coloring image ID (only used if image_source is "specific_id")'
         required: false
         type: string
+      prompt_source:
+        description: 'Animation prompt source'
+        required: true
+        type: choice
+        default: 'stored_or_generate'
+        options:
+          - stored_or_generate
+          - generate_new
+          - custom
       custom_prompt:
-        description: 'Custom animation prompt (leave empty to auto-generate)'
+        description: 'Custom animation prompt (only used if prompt_source is "custom")'
         required: false
         type: string
 
@@ -47,7 +65,10 @@ jobs:
       - name: Run video generation test
         env:
           GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
-          TEST_IMAGE_URL: ${{ inputs.image_url }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TEST_IMAGE_SOURCE: ${{ inputs.image_source }}
+          TEST_COLORING_IMAGE_ID: ${{ inputs.coloring_image_id }}
+          TEST_PROMPT_SOURCE: ${{ inputs.prompt_source }}
           TEST_CUSTOM_PROMPT: ${{ inputs.custom_prompt }}
         working-directory: ./apps/web
         run: npx tsx scripts/test-video-generation.ts
@@ -67,5 +88,7 @@ jobs:
           echo "Download the video artifact from the Actions tab to review the generated animation." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Inputs" >> $GITHUB_STEP_SUMMARY
-          echo "- Image URL: ${{ inputs.image_url || 'Default test image' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Custom prompt: ${{ inputs.custom_prompt || 'Auto-generated' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Image source: ${{ inputs.image_source }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Coloring image ID: ${{ inputs.coloring_image_id || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Prompt source: ${{ inputs.prompt_source }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Custom prompt: ${{ inputs.custom_prompt || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
