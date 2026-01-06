@@ -58,9 +58,10 @@ jobs:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: pnpm install --frozen-lockfile
 
-      - name: Generate Prisma client
-        working-directory: ./packages/db
-        run: pnpm prisma generate
+      - name: Generate Prisma client and build db
+        run: |
+          pnpm --filter @chunky-crayon/db exec prisma generate
+          pnpm --filter @chunky-crayon/db build
 
       - name: Run video generation test
         env:
