@@ -1,9 +1,9 @@
 # Chunky Crayon SEO Plan
 
-## Competitor Analysis: ColorBliss.com
+## Competitor Analysis: ColorBliss.com & Disney Coloring World
 
 This document outlines SEO improvements for Chunky Crayon based on analysis of
-our main competitor, ColorBliss.com.
+our main competitors: ColorBliss.art (web) and Disney Coloring World (app space).
 
 ---
 
@@ -453,4 +453,186 @@ Based on ColorBliss blog analysis:
 
 ---
 
-_Last Updated: December 25, 2024_
+## January 2026 SEO Audit
+
+### Critical Issues Discovered & Fixed
+
+During a comprehensive SEO audit on January 6, 2026, several critical issues
+were discovered and fixed:
+
+#### 1. robots.txt Was Missing (FIXED)
+
+Despite being marked as "implemented" above, the robots.txt file was actually
+returning 404. This has now been fixed.
+
+**File created:** `apps/web/app/robots.ts`
+
+**Features:**
+
+- Allows all pages except private routes (/api, /account, /auth, etc.)
+- Blocks AI scrapers (GPTBot, ChatGPT-User, CCBot, anthropic-ai)
+- References sitemap.xml location
+- Sets canonical host
+
+#### 2. sitemap.xml Was Missing (FIXED)
+
+The XML sitemap was also returning 404. This has now been fixed with a dynamic
+sitemap.
+
+**File created:** `apps/web/app/sitemap.ts`
+
+**Features:**
+
+- Includes all static pages with proper priorities
+- Includes all gallery categories
+- Includes age-based pages (for-kids, for-teens, etc.)
+- Includes difficulty pages
+- Dynamically fetches all public coloring images
+- Dynamically fetches all published blog posts
+- Proper hreflang alternates for all 6 locales
+- Change frequency and priority signals
+
+#### 3. Canonical URL Bug (FIXED)
+
+Category pages were setting canonical URL to homepage instead of their own URL.
+
+**Files fixed:**
+
+- `apps/web/app/[locale]/gallery/[category]/page.tsx`
+- `apps/web/app/[locale]/gallery/difficulty/[difficulty]/page.tsx`
+- `apps/web/app/[locale]/gallery/for-kids/page.tsx`
+- `apps/web/app/[locale]/gallery/for-toddlers/page.tsx`
+- `apps/web/app/[locale]/gallery/for-teens/page.tsx`
+- `apps/web/app/[locale]/gallery/for-adults/page.tsx`
+
+All pages now include proper `alternates.canonical` and `alternates.languages`
+in their metadata.
+
+#### 4. Coloring Page Metadata Disabled
+
+Individual coloring pages (`/coloring-image/[id]`) have `generateMetadata`
+commented out due to a Sentry/Turbopack bug. This means the most important
+pages for SEO are using generic homepage metadata.
+
+**Status:** Waiting for upstream fix
+**Tracking:** https://github.com/getsentry/sentry-javascript/issues/18392
+
+---
+
+## Competitive Advantages vs. ColorBliss
+
+Chunky Crayon has several unique advantages over ColorBliss that should be
+emphasized in SEO strategy:
+
+| Feature             | ColorBliss | Chunky Crayon    | SEO Opportunity          |
+| ------------------- | ---------- | ---------------- | ------------------------ |
+| **In-app coloring** | ❌         | ✅               | "color online" keywords  |
+| **Save progress**   | ❌         | ✅               | "save coloring progress" |
+| **Mobile apps**     | ❌         | ✅ (iOS/Android) | App store keywords       |
+| **Kids profiles**   | ❌         | ✅               | "kids coloring profiles" |
+| **AI generation**   | ✅         | ✅               | Parity                   |
+| **Print support**   | ✅         | ✅               | Parity                   |
+
+### Key Differentiator Keywords to Target
+
+Based on these advantages, target these keywords that ColorBliss cannot compete
+on:
+
+1. "color online for kids" / "online coloring app"
+2. "coloring app with save progress"
+3. "kids coloring app with profiles"
+4. "interactive coloring pages"
+5. "digital coloring for kids"
+
+---
+
+## Disney Coloring World Analysis (App Competitor)
+
+Disney Coloring World is the primary competitor in the app space:
+
+- **Platform:** App-only (iOS/Android), Apple Arcade
+- **Content:** 2,000+ pages with licensed Disney/Pixar/Marvel characters
+- **Features:** 3D playsets, character dress-up, stickers
+- **Certification:** COPPA Safe Harbor certified
+- **Awards:** Kidscreen 2025 nominee, Apple Editor's Choice 2022
+
+### Differentiation Strategy
+
+Disney owns licensed characters. Chunky Crayon's advantage is:
+
+1. **AI-generated custom content** - Create any character, not limited to Disney
+2. **Educational angle** - Worksheets and learning content
+3. **Web + app** - Accessible without app download
+4. **Family creation** - Parents and kids create together
+
+---
+
+## High-Value Keywords to Target
+
+Based on competitor analysis and search volume research:
+
+### Tier 1: High Volume (10,000+ monthly searches)
+
+- "free printable coloring pages"
+- "coloring pages for kids"
+- "animal coloring pages" (6,000+ searches)
+- "easy coloring pages"
+
+### Tier 2: Underserved Niches
+
+- **Animal sub-niches:** pugs, cats, whales (6,000+ monthly, less competition)
+- "toddler coloring pages"
+- "simple coloring pages"
+
+### Tier 3: AI Differentiator Keywords
+
+- "AI coloring page generator"
+- "custom coloring pages"
+- "personalized coloring pages"
+- "create your own coloring page"
+
+### Tier 4: In-App Coloring (Unique to Us)
+
+- "color online free"
+- "online coloring for kids"
+- "interactive coloring pages"
+- "digital coloring book"
+
+---
+
+## Next Actions
+
+### Immediate (P0)
+
+1. ✅ **DONE:** Create robots.txt
+2. ✅ **DONE:** Create dynamic sitemap.xml
+3. ✅ **DONE:** Fix canonical URL bugs
+4. ⏳ **WAITING:** Re-enable coloring page metadata (blocked by Sentry bug)
+
+### Short-term (P1)
+
+1. Create dedicated landing page for "color online" feature
+2. Emphasize in-app coloring in homepage copy
+3. Add "Try it online" CTAs to coloring pages
+4. Submit sitemap to Google Search Console
+
+### Medium-term (P2)
+
+1. Create blog content targeting "AI coloring pages" keywords
+2. Build landing pages for high-volume animal niches (cats, whales, pugs)
+3. Develop educational content section
+4. Implement Core Web Vitals optimizations
+
+### Long-term (P3)
+
+1. Consider URL structure change from /gallery to /coloring-pages
+2. Build backlink strategy targeting parenting/education sites
+3. Pinterest SEO optimization (critical for visual content)
+
+---
+
+### Overall Progress: 9/10 phases complete (90%)
+
+---
+
+_Last Updated: January 6, 2026_

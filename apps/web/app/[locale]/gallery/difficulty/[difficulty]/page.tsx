@@ -26,6 +26,7 @@ import { Difficulty } from '@chunky-crayon/db';
 import cn from '@/lib/utils';
 
 type PageParams = {
+  locale: string;
   difficulty: string;
 };
 
@@ -73,7 +74,7 @@ export async function generateMetadata({
 }: {
   params: Promise<PageParams>;
 }): Promise<Metadata> {
-  const { difficulty: difficultySlug } = await params;
+  const { locale, difficulty: difficultySlug } = await params;
   const difficulty = getDifficultyFromSlug(difficultySlug);
 
   if (!difficulty) {
@@ -87,6 +88,9 @@ export async function generateMetadata({
 
   const title = `${label} Coloring Pages - Free Printable Pages | Chunky Crayon`;
   const metaDescription = `Free ${label.toLowerCase()} coloring pages. ${description} Print or color online!`;
+
+  const baseUrl = 'https://chunkycrayon.com';
+  const pagePath = `/gallery/difficulty/${difficultySlug}`;
 
   return {
     title,
@@ -103,6 +107,19 @@ export async function generateMetadata({
       title: `${label} Coloring Pages - Chunky Crayon`,
       description: metaDescription,
       type: 'website',
+      url: `${baseUrl}/${locale}${pagePath}`,
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}${pagePath}`,
+      languages: {
+        en: `${baseUrl}/en${pagePath}`,
+        ja: `${baseUrl}/ja${pagePath}`,
+        ko: `${baseUrl}/ko${pagePath}`,
+        de: `${baseUrl}/de${pagePath}`,
+        fr: `${baseUrl}/fr${pagePath}`,
+        es: `${baseUrl}/es${pagePath}`,
+        'x-default': `${baseUrl}/en${pagePath}`,
+      },
     },
   };
 }

@@ -14,26 +14,49 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { getFeaturedImages, getCategoryCounts } from '@/app/data/gallery';
 
-export const metadata: Metadata = {
-  title: 'Coloring Pages for Teens - Cool Detailed Designs | Chunky Crayon',
-  description:
-    'Cool coloring pages for teenagers. Detailed designs featuring anime, gaming, fantasy, and more. Free printable pages for teens who love to create!',
-  keywords: [
-    'coloring pages for teens',
-    'teenage coloring pages',
-    'cool coloring pages',
-    'anime coloring pages',
-    'gaming coloring pages',
-    'detailed coloring pages',
-    'coloring pages for teenagers',
-  ],
-  openGraph: {
-    title: 'Coloring Pages for Teens - Chunky Crayon',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = 'https://chunkycrayon.com';
+  const pagePath = '/gallery/for-teens';
+
+  return {
+    title: 'Coloring Pages for Teens - Cool Detailed Designs | Chunky Crayon',
     description:
-      'Cool coloring pages for teenagers. Anime, gaming, fantasy, and more!',
-    type: 'website',
-  },
-};
+      'Cool coloring pages for teenagers. Detailed designs featuring anime, gaming, fantasy, and more. Free printable pages for teens who love to create!',
+    keywords: [
+      'coloring pages for teens',
+      'teenage coloring pages',
+      'cool coloring pages',
+      'anime coloring pages',
+      'gaming coloring pages',
+      'detailed coloring pages',
+      'coloring pages for teenagers',
+    ],
+    openGraph: {
+      title: 'Coloring Pages for Teens - Chunky Crayon',
+      description:
+        'Cool coloring pages for teenagers. Anime, gaming, fantasy, and more!',
+      type: 'website',
+      url: `${baseUrl}/${locale}${pagePath}`,
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}${pagePath}`,
+      languages: {
+        en: `${baseUrl}/en${pagePath}`,
+        ja: `${baseUrl}/ja${pagePath}`,
+        ko: `${baseUrl}/ko${pagePath}`,
+        de: `${baseUrl}/de${pagePath}`,
+        fr: `${baseUrl}/fr${pagePath}`,
+        es: `${baseUrl}/es${pagePath}`,
+        'x-default': `${baseUrl}/en${pagePath}`,
+      },
+    },
+  };
+}
 
 // Categories most suitable for teens (ages 13-17)
 const TEEN_CATEGORIES = [

@@ -14,26 +14,49 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { getFeaturedImages, getCategoryCounts } from '@/app/data/gallery';
 
-export const metadata: Metadata = {
-  title: 'Coloring Pages for Toddlers - Simple Easy Pages | Chunky Crayon',
-  description:
-    'Simple coloring pages perfect for toddlers ages 2-4. Large shapes, bold lines, and easy-to-color designs. Free printable pages for little ones!',
-  keywords: [
-    'coloring pages for toddlers',
-    'toddler coloring pages',
-    'easy coloring pages',
-    'simple coloring pages',
-    'coloring pages for 2 year olds',
-    'coloring pages for 3 year olds',
-    'preschool coloring pages',
-  ],
-  openGraph: {
-    title: 'Coloring Pages for Toddlers - Chunky Crayon',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = 'https://chunkycrayon.com';
+  const pagePath = '/gallery/for-toddlers';
+
+  return {
+    title: 'Coloring Pages for Toddlers - Simple Easy Pages | Chunky Crayon',
     description:
-      'Simple coloring pages perfect for toddlers ages 2-4. Large shapes and bold lines!',
-    type: 'website',
-  },
-};
+      'Simple coloring pages perfect for toddlers ages 2-4. Large shapes, bold lines, and easy-to-color designs. Free printable pages for little ones!',
+    keywords: [
+      'coloring pages for toddlers',
+      'toddler coloring pages',
+      'easy coloring pages',
+      'simple coloring pages',
+      'coloring pages for 2 year olds',
+      'coloring pages for 3 year olds',
+      'preschool coloring pages',
+    ],
+    openGraph: {
+      title: 'Coloring Pages for Toddlers - Chunky Crayon',
+      description:
+        'Simple coloring pages perfect for toddlers ages 2-4. Large shapes and bold lines!',
+      type: 'website',
+      url: `${baseUrl}/${locale}${pagePath}`,
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}${pagePath}`,
+      languages: {
+        en: `${baseUrl}/en${pagePath}`,
+        ja: `${baseUrl}/ja${pagePath}`,
+        ko: `${baseUrl}/ko${pagePath}`,
+        de: `${baseUrl}/de${pagePath}`,
+        fr: `${baseUrl}/fr${pagePath}`,
+        es: `${baseUrl}/es${pagePath}`,
+        'x-default': `${baseUrl}/en${pagePath}`,
+      },
+    },
+  };
+}
 
 // Categories most suitable for toddlers (ages 2-4) - simple, recognizable shapes
 const TODDLER_CATEGORIES = ['animals', 'food', 'vehicles', 'nature'];

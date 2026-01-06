@@ -14,27 +14,50 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { getFeaturedImages, getCategoryCounts } from '@/app/data/gallery';
 
-export const metadata: Metadata = {
-  title:
-    'Coloring Pages for Adults - Relaxing Detailed Designs | Chunky Crayon',
-  description:
-    'Beautiful coloring pages for adults. Intricate mandalas, nature scenes, and relaxing patterns. Free printable pages for stress relief and mindfulness.',
-  keywords: [
-    'coloring pages for adults',
-    'adult coloring pages',
-    'mandala coloring pages',
-    'stress relief coloring',
-    'mindfulness coloring',
-    'intricate coloring pages',
-    'relaxing coloring pages',
-  ],
-  openGraph: {
-    title: 'Coloring Pages for Adults - Chunky Crayon',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = 'https://chunkycrayon.com';
+  const pagePath = '/gallery/for-adults';
+
+  return {
+    title:
+      'Coloring Pages for Adults - Relaxing Detailed Designs | Chunky Crayon',
     description:
-      'Beautiful coloring pages for adults. Mandalas, nature, and relaxing patterns!',
-    type: 'website',
-  },
-};
+      'Beautiful coloring pages for adults. Intricate mandalas, nature scenes, and relaxing patterns. Free printable pages for stress relief and mindfulness.',
+    keywords: [
+      'coloring pages for adults',
+      'adult coloring pages',
+      'mandala coloring pages',
+      'stress relief coloring',
+      'mindfulness coloring',
+      'intricate coloring pages',
+      'relaxing coloring pages',
+    ],
+    openGraph: {
+      title: 'Coloring Pages for Adults - Chunky Crayon',
+      description:
+        'Beautiful coloring pages for adults. Mandalas, nature, and relaxing patterns!',
+      type: 'website',
+      url: `${baseUrl}/${locale}${pagePath}`,
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}${pagePath}`,
+      languages: {
+        en: `${baseUrl}/en${pagePath}`,
+        ja: `${baseUrl}/ja${pagePath}`,
+        ko: `${baseUrl}/ko${pagePath}`,
+        de: `${baseUrl}/de${pagePath}`,
+        fr: `${baseUrl}/fr${pagePath}`,
+        es: `${baseUrl}/es${pagePath}`,
+        'x-default': `${baseUrl}/en${pagePath}`,
+      },
+    },
+  };
+}
 
 // Categories most suitable for adults
 const ADULT_CATEGORIES = [

@@ -37,7 +37,7 @@ export async function generateMetadata({
 }: {
   params: Promise<PageParams>;
 }): Promise<Metadata> {
-  const { category: categorySlug } = await params;
+  const { locale, category: categorySlug } = await params;
   const category = getCategoryBySlug(categorySlug);
 
   if (!category) {
@@ -53,6 +53,9 @@ export async function generateMetadata({
   const title = `${countText}${category.name} Coloring Pages - Free Printable Pages | Chunky Crayon`;
   const description = `Free ${category.name.toLowerCase()} coloring pages for kids and adults. ${category.description} Print or color online!`;
 
+  const baseUrl = 'https://chunkycrayon.com';
+  const pagePath = `/gallery/${categorySlug}`;
+
   return {
     title,
     description,
@@ -61,6 +64,19 @@ export async function generateMetadata({
       title: `${countText}${category.name} Coloring Pages - Chunky Crayon`,
       description,
       type: 'website',
+      url: `${baseUrl}/${locale}${pagePath}`,
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}${pagePath}`,
+      languages: {
+        en: `${baseUrl}/en${pagePath}`,
+        ja: `${baseUrl}/ja${pagePath}`,
+        ko: `${baseUrl}/ko${pagePath}`,
+        de: `${baseUrl}/de${pagePath}`,
+        fr: `${baseUrl}/fr${pagePath}`,
+        es: `${baseUrl}/es${pagePath}`,
+        'x-default': `${baseUrl}/en${pagePath}`,
+      },
     },
   };
 }
@@ -246,7 +262,11 @@ const CategoryGalleryContent = async ({
       </section>
 
       {/* Related Categories */}
-      <RelatedCategories currentSlug={categorySlug} t={t} categoryT={categoryT} />
+      <RelatedCategories
+        currentSlug={categorySlug}
+        t={t}
+        categoryT={categoryT}
+      />
 
       {/* Gallery */}
       <section id="gallery" className="scroll-mt-24">
@@ -262,10 +282,14 @@ const CategoryGalleryContent = async ({
           <div className="text-center py-16">
             <div className="text-6xl mb-4">{category.emoji}</div>
             <h2 className="font-tondo font-semibold text-xl text-text-primary mb-2">
-              {t('noPagesYet', { category: categoryT(category.id).toLowerCase() })}
+              {t('noPagesYet', {
+                category: categoryT(category.id).toLowerCase(),
+              })}
             </h2>
             <p className="text-text-secondary mb-6">
-              {t('beTheFirst', { category: categoryT(category.id).toLowerCase() })}
+              {t('beTheFirst', {
+                category: categoryT(category.id).toLowerCase(),
+              })}
             </p>
             <Link
               href="/"
@@ -287,7 +311,9 @@ const CategoryGalleryContent = async ({
         </h2>
         <div className="space-y-4 text-text-secondary leading-relaxed max-w-4xl">
           <p>
-            {t('lookingFor', { category: categoryT(category.id).toLowerCase() })}
+            {t('lookingFor', {
+              category: categoryT(category.id).toLowerCase(),
+            })}
           </p>
           <p>{t('eachPageDescription')}</p>
         </div>
@@ -295,7 +321,9 @@ const CategoryGalleryContent = async ({
           {t('popularThemes', { category: categoryT(category.id) })}
         </h3>
         <p className="text-text-secondary leading-relaxed max-w-4xl">
-          {t('includesPopular', { category: categoryT(category.id).toLowerCase() })}{' '}
+          {t('includesPopular', {
+            category: categoryT(category.id).toLowerCase(),
+          })}{' '}
           {category.keywords.slice(0, 5).map((keyword, i) => (
             <span key={keyword}>
               {keyword}

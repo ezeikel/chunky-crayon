@@ -14,25 +14,48 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { getFeaturedImages, getCategoryCounts } from '@/app/data/gallery';
 
-export const metadata: Metadata = {
-  title: 'Coloring Pages for Kids - Free Printable Pages | Chunky Crayon',
-  description:
-    'Free coloring pages perfect for kids ages 4-12. Animals, dinosaurs, superheroes, unicorns, and more! Easy to color online or print at home.',
-  keywords: [
-    'coloring pages for kids',
-    'kids coloring pages',
-    'children coloring pages',
-    'free coloring pages for children',
-    'printable coloring pages kids',
-    'easy coloring pages',
-  ],
-  openGraph: {
-    title: 'Coloring Pages for Kids - Chunky Crayon',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = 'https://chunkycrayon.com';
+  const pagePath = '/gallery/for-kids';
+
+  return {
+    title: 'Coloring Pages for Kids - Free Printable Pages | Chunky Crayon',
     description:
-      'Free coloring pages perfect for kids ages 4-12. Animals, dinosaurs, superheroes, and more!',
-    type: 'website',
-  },
-};
+      'Free coloring pages perfect for kids ages 4-12. Animals, dinosaurs, superheroes, unicorns, and more! Easy to color online or print at home.',
+    keywords: [
+      'coloring pages for kids',
+      'kids coloring pages',
+      'children coloring pages',
+      'free coloring pages for children',
+      'printable coloring pages kids',
+      'easy coloring pages',
+    ],
+    openGraph: {
+      title: 'Coloring Pages for Kids - Chunky Crayon',
+      description:
+        'Free coloring pages perfect for kids ages 4-12. Animals, dinosaurs, superheroes, and more!',
+      type: 'website',
+      url: `${baseUrl}/${locale}${pagePath}`,
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}${pagePath}`,
+      languages: {
+        en: `${baseUrl}/en${pagePath}`,
+        ja: `${baseUrl}/ja${pagePath}`,
+        ko: `${baseUrl}/ko${pagePath}`,
+        de: `${baseUrl}/de${pagePath}`,
+        fr: `${baseUrl}/fr${pagePath}`,
+        es: `${baseUrl}/es${pagePath}`,
+        'x-default': `${baseUrl}/en${pagePath}`,
+      },
+    },
+  };
+}
 
 // Categories most suitable for kids (ages 4-12)
 const KIDS_CATEGORIES = [
