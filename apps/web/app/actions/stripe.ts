@@ -236,6 +236,14 @@ export const changeSubscription = async ({
     return null;
   }
 
+  // Only Stripe subscriptions can be changed via this action
+  if (!subscription.stripeSubscriptionId) {
+    console.error(
+      'Cannot change plan: subscription is not a Stripe subscription.',
+    );
+    return null;
+  }
+
   try {
     const stripeSubscription = await stripe.subscriptions.retrieve(
       subscription.stripeSubscriptionId,
