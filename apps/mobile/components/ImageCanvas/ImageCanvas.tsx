@@ -69,6 +69,7 @@ import {
   notifySuccess,
   brushHaptics,
 } from "@/utils/haptics";
+import { applySymmetryToPath } from "@/utils/symmetryUtils";
 
 import type { LayoutMode } from "@/utils/deviceUtils";
 
@@ -154,6 +155,7 @@ const ImageCanvas = ({
     advanceRainbowHue,
     setCaptureCanvas,
     reset,
+    symmetryMode,
   } = useCanvasStore();
 
   // Sync haptics enabled state with mute setting
@@ -643,7 +645,7 @@ const ImageCanvas = ({
     // Stop continuous haptic feedback
     brushHaptics.stop();
 
-    if (currentPath) {
+    if (currentPath && svgDimensions) {
       // Use rainbow color if rainbow brush is selected
       const strokeColor =
         brushType === "rainbow" ? getRainbowColor(rainbowHue) : selectedColor;
@@ -668,21 +670,35 @@ const ImageCanvas = ({
         averagePressure,
       );
 
-      const action: DrawingAction = {
-        type: "stroke",
-        path: currentPath,
-        color: strokeColor,
-        brushType,
-        strokeWidth,
-        startHue: brushType === "rainbow" ? rainbowHue : undefined,
-        // Store source dimensions for cross-platform sync
-        sourceWidth: svgDimensions?.width,
-        sourceHeight: svgDimensions?.height,
-        // Apple Pencil pressure sensitivity data
-        pressurePoints,
-        isStylus,
-      };
-      addAction(action);
+      // Apply symmetry transforms to create mirrored copies
+      const centerX = svgDimensions.width / 2;
+      const centerY = svgDimensions.height / 2;
+      const symmetryPaths = applySymmetryToPath(
+        currentPath,
+        symmetryMode,
+        centerX,
+        centerY,
+      );
+
+      // Add an action for each symmetry copy (including original)
+      symmetryPaths.forEach((path) => {
+        const action: DrawingAction = {
+          type: "stroke",
+          path,
+          color: strokeColor,
+          brushType,
+          strokeWidth,
+          startHue: brushType === "rainbow" ? rainbowHue : undefined,
+          // Store source dimensions for cross-platform sync
+          sourceWidth: svgDimensions.width,
+          sourceHeight: svgDimensions.height,
+          // Apple Pencil pressure sensitivity data
+          pressurePoints,
+          isStylus,
+        };
+        addAction(action);
+      });
+
       setCurrentPath(null);
 
       // Reset pressure tracking
@@ -705,6 +721,7 @@ const ImageCanvas = ({
     setScroll,
     advanceRainbowHue,
     svgDimensions,
+    symmetryMode,
   ]);
 
   // Handle fill tool tap

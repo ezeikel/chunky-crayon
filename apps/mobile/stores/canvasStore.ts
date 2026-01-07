@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { SkPath } from "@shopify/react-native-skia";
+import type { SymmetryMode } from "@/utils/symmetryUtils";
+import { getNextSymmetryMode } from "@/utils/symmetryUtils";
 
 export type Tool = "brush" | "fill" | "eraser" | "sticker" | "magic" | "pan";
 export type BrushType =
@@ -192,6 +194,9 @@ export type CanvasState = {
   // Progress tracking (0-100)
   progress: number;
 
+  // Symmetry drawing mode
+  symmetryMode: SymmetryMode;
+
   // Canvas capture function (set by ImageCanvas)
   captureCanvas: CanvasCaptureFunction | null;
 };
@@ -235,6 +240,10 @@ type CanvasActions = {
   // Progress actions
   setProgress: (progress: number) => void;
 
+  // Symmetry actions
+  setSymmetryMode: (mode: SymmetryMode) => void;
+  cycleSymmetryMode: () => void;
+
   // Canvas capture
   setCaptureCanvas: (fn: CanvasCaptureFunction | null) => void;
 };
@@ -263,6 +272,7 @@ const initialState: CanvasState = {
   isDirty: false,
   isMuted: false,
   progress: 0,
+  symmetryMode: "none",
   captureCanvas: null,
 };
 
@@ -378,6 +388,13 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     // Progress actions
     setProgress: (progress) =>
       set({ progress: Math.max(0, Math.min(100, progress)) }),
+
+    // Symmetry actions
+    setSymmetryMode: (mode) => set({ symmetryMode: mode }),
+    cycleSymmetryMode: () =>
+      set((state) => ({
+        symmetryMode: getNextSymmetryMode(state.symmetryMode),
+      })),
 
     // Canvas capture
     setCaptureCanvas: (fn) => set({ captureCanvas: fn }),
