@@ -15,7 +15,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     slug: "chunky-crayon",
     owner: "chewybytes",
     version: pkg.version,
-    orientation: "portrait",
+    orientation: "default",
     icon: "./assets/images/icon.png",
     scheme: "chunkycrayon",
     userInterfaceStyle: "automatic",
