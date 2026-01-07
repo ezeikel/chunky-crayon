@@ -63,7 +63,12 @@ import {
 } from "@/utils/pressureUtils";
 import MagicColorHint from "@/components/MagicColorHint";
 import { perfect } from "@/styles";
-import { tapHeavy, tapMedium, notifySuccess } from "@/utils/haptics";
+import {
+  tapHeavy,
+  tapMedium,
+  notifySuccess,
+  brushHaptics,
+} from "@/utils/haptics";
 
 import type { LayoutMode } from "@/utils/deviceUtils";
 
@@ -136,6 +141,7 @@ const ImageCanvas = ({
     translateX,
     translateY,
     imageId,
+    isMuted,
     addAction,
     undo,
     redo,
@@ -149,6 +155,11 @@ const ImageCanvas = ({
     setCaptureCanvas,
     reset,
   } = useCanvasStore();
+
+  // Sync haptics enabled state with mute setting
+  useEffect(() => {
+    brushHaptics.setEnabled(!isMuted);
+  }, [isMuted]);
 
   // Gesture shared values
   const gestureScale = useSharedValue(1);
@@ -594,6 +605,9 @@ const ImageCanvas = ({
       pressurePointsRef.current = [];
       isStylusRef.current = isApplePencil(pointerType);
 
+      // Start continuous haptic feedback for this brush type
+      brushHaptics.start(brushType);
+
       // Get smoothed pressure for first point
       const pressure = getPressureFromEvent({ force, pointerType });
       const smoothedPressure = pressureSmootherRef.current.add(pressure);
@@ -604,7 +618,7 @@ const ImageCanvas = ({
       setCurrentPath(newPath);
       setScroll(false);
     },
-    [selectedTool, touchToSvgCoords, setScroll],
+    [selectedTool, touchToSvgCoords, setScroll, brushType],
   );
 
   const handleDrawingMove = useCallback(
@@ -626,6 +640,9 @@ const ImageCanvas = ({
   );
 
   const handleDrawingEnd = useCallback(() => {
+    // Stop continuous haptic feedback
+    brushHaptics.stop();
+
     if (currentPath) {
       // Use rainbow color if rainbow brush is selected
       const strokeColor =
