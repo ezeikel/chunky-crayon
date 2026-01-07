@@ -25,7 +25,11 @@ import {
   Fill,
   ImageFormat,
 } from "@shopify/react-native-skia";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import {
+  Gesture,
+  GestureDetector,
+  PointerType,
+} from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -50,6 +54,13 @@ import {
   getSuggestedColor,
   isValidColorMap,
 } from "@/utils/magicColorUtils";
+import {
+  PressureSmoother,
+  getPressureFromEvent,
+  getPressureAdjustedWidth,
+  isApplePencil,
+  DEFAULT_PRESSURE,
+} from "@/utils/pressureUtils";
 import MagicColorHint from "@/components/MagicColorHint";
 import { perfect } from "@/styles";
 import { tapHeavy, tapMedium, notifySuccess } from "@/utils/haptics";
@@ -87,6 +98,11 @@ const ImageCanvas = ({
   const [svgDimensions, setSvgDimensions] = useState<Dimension | null>(null);
   const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
   const isInitializedRef = useRef(false);
+
+  // Apple Pencil pressure tracking
+  const pressurePointsRef = useRef<number[]>([]);
+  const isStylusRef = useRef(false);
+  const pressureSmootherRef = useRef(new PressureSmoother(3));
 
   // Magic color hint state
   const [magicHintCell, setMagicHintCell] = useState<GridColorCell | null>(
@@ -565,11 +581,21 @@ const ImageCanvas = ({
 
   // Handle drawing stroke
   const handleDrawingStart = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number, force?: number, pointerType?: PointerType) => {
       if (selectedTool !== "brush") return;
 
       const coords = touchToSvgCoords(x, y);
       if (!coords) return;
+
+      // Initialize pressure tracking for this stroke
+      pressureSmootherRef.current.reset();
+      pressurePointsRef.current = [];
+      isStylusRef.current = isApplePencil(pointerType);
+
+      // Get smoothed pressure for first point
+      const pressure = getPressureFromEvent({ force, pointerType });
+      const smoothedPressure = pressureSmootherRef.current.add(pressure);
+      pressurePointsRef.current.push(smoothedPressure);
 
       const newPath = Skia.Path.Make();
       newPath.moveTo(coords.x, coords.y);
@@ -580,11 +606,16 @@ const ImageCanvas = ({
   );
 
   const handleDrawingMove = useCallback(
-    (x: number, y: number) => {
+    (x: number, y: number, force?: number, pointerType?: PointerType) => {
       if (selectedTool !== "brush" || !currentPath) return;
 
       const coords = touchToSvgCoords(x, y);
       if (!coords) return;
+
+      // Capture pressure for this point
+      const pressure = getPressureFromEvent({ force, pointerType });
+      const smoothedPressure = pressureSmootherRef.current.add(pressure);
+      pressurePointsRef.current.push(smoothedPressure);
 
       currentPath.lineTo(coords.x, coords.y);
       setCurrentPath(currentPath.copy());
@@ -594,10 +625,30 @@ const ImageCanvas = ({
 
   const handleDrawingEnd = useCallback(() => {
     if (currentPath) {
-      const strokeWidth = brushSize * getBrushMultiplier(brushType);
       // Use rainbow color if rainbow brush is selected
       const strokeColor =
         brushType === "rainbow" ? getRainbowColor(rainbowHue) : selectedColor;
+
+      // Capture pressure data from this stroke
+      const pressurePoints =
+        pressurePointsRef.current.length > 0
+          ? [...pressurePointsRef.current]
+          : undefined;
+      const isStylus = isStylusRef.current;
+
+      // Calculate pressure-adjusted stroke width
+      // For stylus input, use average pressure; for finger, use default pressure
+      let averagePressure = DEFAULT_PRESSURE;
+      if (pressurePoints && pressurePoints.length > 0) {
+        averagePressure =
+          pressurePoints.reduce((a, b) => a + b, 0) / pressurePoints.length;
+      }
+      const strokeWidth = getPressureAdjustedWidth(
+        brushSize,
+        brushType,
+        averagePressure,
+      );
+
       const action: DrawingAction = {
         type: "stroke",
         path: currentPath,
@@ -608,9 +659,16 @@ const ImageCanvas = ({
         // Store source dimensions for cross-platform sync
         sourceWidth: svgDimensions?.width,
         sourceHeight: svgDimensions?.height,
+        // Apple Pencil pressure sensitivity data
+        pressurePoints,
+        isStylus,
       };
       addAction(action);
       setCurrentPath(null);
+
+      // Reset pressure tracking
+      pressurePointsRef.current = [];
+      isStylusRef.current = false;
 
       // Advance rainbow hue for next stroke
       if (brushType === "rainbow") {
@@ -793,15 +851,29 @@ const ImageCanvas = ({
   );
 
   // Pan gesture for drawing or panning
+  // Note: event.force and event.pointerType provide Apple Pencil pressure data
   const panGesture = Gesture.Pan()
     .onStart((event) => {
       if (selectedTool === "brush") {
-        runOnJS(handleDrawingStart)(event.x, event.y);
+        // Pass force (pressure) and pointerType for Apple Pencil detection
+        // force is available on iOS for stylus input
+        runOnJS(handleDrawingStart)(
+          event.x,
+          event.y,
+          (event as unknown as { force?: number }).force,
+          event.pointerType,
+        );
       }
     })
     .onUpdate((event) => {
       if (selectedTool === "brush") {
-        runOnJS(handleDrawingMove)(event.x, event.y);
+        // Pass force (pressure) and pointerType for Apple Pencil detection
+        runOnJS(handleDrawingMove)(
+          event.x,
+          event.y,
+          (event as unknown as { force?: number }).force,
+          event.pointerType,
+        );
       } else {
         // Pan mode
         gestureTranslateX.value = savedTranslateX.value + event.translationX;
@@ -879,6 +951,17 @@ const ImageCanvas = ({
   const visibleActions = useMemo(() => {
     return history.slice(0, historyIndex + 1);
   }, [history, historyIndex]);
+
+  // Calculate current stroke width with pressure (for live preview while drawing)
+  // This recalculates when currentPath changes (which happens on each move)
+  const currentStrokeWidth = useMemo(() => {
+    const points = pressurePointsRef.current;
+    let avgPressure = DEFAULT_PRESSURE;
+    if (points.length > 0) {
+      avgPressure = points.reduce((a, b) => a + b, 0) / points.length;
+    }
+    return getPressureAdjustedWidth(brushSize, brushType, avgPressure);
+  }, [currentPath, brushSize, brushType]); // currentPath triggers recalculation
 
   // Render stickers
   const renderStickers = useMemo(() => {
@@ -1059,14 +1142,14 @@ const ImageCanvas = ({
                 {renderPaths}
                 {/* Rendered stickers */}
                 {renderStickers}
-                {/* Current drawing path */}
+                {/* Current drawing path (with pressure-adjusted stroke width) */}
                 {currentPath && brushType === "glow" ? (
                   <Group>
                     <Path
                       path={currentPath}
                       color={selectedColor}
                       style="stroke"
-                      strokeWidth={brushSize * getBrushMultiplier(brushType)}
+                      strokeWidth={currentStrokeWidth}
                       strokeCap="round"
                       strokeJoin="round"
                       opacity={0.7}
@@ -1080,7 +1163,7 @@ const ImageCanvas = ({
                       path={currentPath}
                       color={selectedColor}
                       style="stroke"
-                      strokeWidth={brushSize * getBrushMultiplier(brushType)}
+                      strokeWidth={currentStrokeWidth}
                       strokeCap="round"
                       strokeJoin="round"
                       opacity={1}
@@ -1097,7 +1180,7 @@ const ImageCanvas = ({
                         : selectedColor
                     }
                     style="stroke"
-                    strokeWidth={brushSize * getBrushMultiplier(brushType)}
+                    strokeWidth={currentStrokeWidth}
                     strokeCap="round"
                     strokeJoin="round"
                     opacity={

@@ -141,6 +141,11 @@ export type DrawingAction = {
   // so actions from web (CSS pixels ~880) and mobile (SVG viewBox ~1024) can coexist
   sourceWidth?: number;
   sourceHeight?: number;
+  // Apple Pencil pressure sensitivity data
+  // Array of pressure values (0-1) corresponding to path points
+  pressurePoints?: number[];
+  // Whether this stroke was made with a stylus (Apple Pencil)
+  isStylus?: boolean;
 };
 
 // Capture function type for getting canvas image data
