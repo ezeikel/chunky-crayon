@@ -1,47 +1,105 @@
-import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { Tabs } from "expo-router";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faHouseChimney,
+  faHeart,
+  faTrophy,
+  faNoteSticky,
+  faGear,
+} from "@fortawesome/pro-solid-svg-icons";
+import {
+  faHouseChimney as faHouseChimneyLight,
+  faHeart as faHeartLight,
+  faTrophy as faTrophyLight,
+  faNoteSticky as faNoteStickyLight,
+  faGear as faGearLight,
+} from "@fortawesome/pro-light-svg-icons";
 
 export default function TabLayout() {
   return (
-    <NativeTabs
-      iconColor={{
-        default: "#9CA3AF",
-        selected: "#E46444",
-      }}
-      labelStyle={{
-        default: { color: "#9CA3AF", fontFamily: "TondoTrial-Regular" },
-        selected: { color: "#E46444", fontFamily: "TondoTrial-Bold" },
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#E46444",
+        tabBarInactiveTintColor: "#9CA3AF",
+        tabBarLabelStyle: {
+          fontFamily: "TondoTrial-Regular",
+          fontSize: 11,
+        },
+        tabBarStyle: {
+          backgroundColor: "#FFFFFF",
+          borderTopColor: "#E5E7EB",
+          paddingTop: 8,
+          paddingBottom: 8,
+          height: 80,
+        },
       }}
     >
-      <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Icon
-          sf={{ default: "house", selected: "house.fill" }}
-        />
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="my-artwork">
-        <NativeTabs.Trigger.Icon
-          sf={{ default: "heart", selected: "heart.fill" }}
-        />
-        <NativeTabs.Trigger.Label>My Art</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="challenges">
-        <NativeTabs.Trigger.Icon
-          sf={{ default: "trophy", selected: "trophy.fill" }}
-        />
-        <NativeTabs.Trigger.Label>Challenges</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="stickers">
-        <NativeTabs.Trigger.Icon
-          sf={{ default: "note", selected: "note.text" }}
-        />
-        <NativeTabs.Trigger.Label>Stickers</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="settings">
-        <NativeTabs.Trigger.Icon
-          sf={{ default: "gearshape", selected: "gearshape.fill" }}
-        />
-        <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
-      </NativeTabs.Trigger>
-    </NativeTabs>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ focused, color }) => (
+            <FontAwesomeIcon
+              icon={focused ? faHouseChimney : faHouseChimneyLight}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="my-artwork"
+        options={{
+          title: "My Art",
+          tabBarIcon: ({ focused, color }) => (
+            <FontAwesomeIcon
+              icon={focused ? faHeart : faHeartLight}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="challenges"
+        options={{
+          title: "Challenges",
+          tabBarIcon: ({ focused, color }) => (
+            <FontAwesomeIcon
+              icon={focused ? faTrophy : faTrophyLight}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="stickers"
+        options={{
+          title: "Stickers",
+          tabBarIcon: ({ focused, color }) => (
+            <FontAwesomeIcon
+              icon={focused ? faNoteSticky : faNoteStickyLight}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ focused, color }) => (
+            <FontAwesomeIcon
+              icon={focused ? faGear : faGearLight}
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }
