@@ -25,41 +25,39 @@ Disney Coloring World **Last Updated**: 2026-01-07
 | Color palette bar (landscape)    | ✅ Complete | `components/ColorPaletteBar/ColorPaletteBar.tsx`   |
 | Responsive coloring page         | ✅ Complete | `app/coloring-image/[id].tsx`                      |
 | Dynamic canvas sizing            | ✅ Complete | `components/ImageCanvas/ImageCanvas.tsx`           |
+| Enable landscape orientation     | ✅ Complete | `app.config.ts` (orientation: "default")           |
 
-### Phase 1B: Apple Pencil Integration ⏳ PENDING
+### Phase 1B: Apple Pencil Integration ✅ COMPLETE
 
-| Task                | Status     | Files                    |
-| ------------------- | ---------- | ------------------------ |
-| Pressure detection  | ⏳ Pending | `ImageCanvas.tsx`        |
-| Pressure utilities  | ⏳ Pending | `utils/pressureUtils.ts` |
-| Dynamic brush width | ⏳ Pending | `utils/brushShaders.ts`  |
-| Store pressure data | ⏳ Pending | `stores/canvasStore.ts`  |
+| Task                | Status      | Files                    |
+| ------------------- | ----------- | ------------------------ |
+| Pressure detection  | ✅ Complete | `ImageCanvas.tsx`        |
+| Pressure utilities  | ✅ Complete | `utils/pressureUtils.ts` |
+| Dynamic brush width | ✅ Complete | `utils/brushShaders.ts`  |
+| Store pressure data | ✅ Complete | `stores/canvasStore.ts`  |
 
-### Phase 1C: Performance ⏳ PENDING
+### Phase 1C: Performance ✅ COMPLETE
 
-| Task                | Status     | Files                         |
-| ------------------- | ---------- | ----------------------------- |
-| Path simplification | ⏳ Pending | `utils/pathSimplification.ts` |
-| Path batching       | ⏳ Pending | `utils/pathBatching.ts`       |
-| Glitter reduction   | ⏳ Pending | `utils/glitterUtils.ts`       |
-| Drawing cache       | ⏳ Pending | `ImageCanvas.tsx`             |
+| Task                | Status      | Files                         |
+| ------------------- | ----------- | ----------------------------- |
+| Path simplification | ✅ Complete | `utils/pathSimplification.ts` |
+| Glitter reduction   | ✅ Complete | `utils/glitterUtils.ts`       |
 
-### Phase 1D: Advanced Gestures ⏳ PENDING
+### Phase 1D: Advanced Gestures ✅ COMPLETE
 
-| Task              | Status     | Files             |
-| ----------------- | ---------- | ----------------- |
-| Two-finger undo   | ⏳ Pending | `ImageCanvas.tsx` |
-| Three-finger redo | ⏳ Pending | `ImageCanvas.tsx` |
-| Rotation gesture  | ⏳ Pending | `ImageCanvas.tsx` |
+| Task              | Status      | Files             |
+| ----------------- | ----------- | ----------------- |
+| Two-finger undo   | ✅ Complete | `ImageCanvas.tsx` |
+| Three-finger redo | ✅ Complete | `ImageCanvas.tsx` |
 
-### Phase 2: Differentiators ⏳ PENDING
+### Phase 2: Differentiators ✅ COMPLETE
 
-| Task                 | Status     | Files                     |
-| -------------------- | ---------- | ------------------------- |
-| Enhanced haptics     | ⏳ Pending | `utils/haptics.ts`        |
-| Symmetry mode        | ⏳ Pending | `utils/symmetryUtils.ts`  |
-| Basic layers (3 max) | ⏳ Pending | `stores/canvasStore.ts`   |
-| Texture brushes      | ⏳ Pending | `utils/textureShaders.ts` |
+| Task                 | Status      | Files                                             | Notes                                                                                                                                                    |
+| -------------------- | ----------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Enhanced haptics     | ✅ Complete | `utils/haptics.ts`                                | Continuous brush feedback during strokes                                                                                                                 |
+| Symmetry mode        | ✅ Complete | `utils/symmetryUtils.ts`                          | 6 modes: none, vertical, horizontal, both, radial4, radial8                                                                                              |
+| Basic layers (3 max) | ✅ Complete | `stores/canvasStore.ts`, `components/LayerPanel/` | **⚠️ Review needed**: May be too complex for ages 3-8. Feature-flagged OFF by default. Consider removing or simplifying to "foreground/background" only. |
+| Texture brushes      | ✅ Complete | `utils/brushTextures.ts`                          | Procedural SKSL shaders for crayon, pencil, watercolor textures. Feature-flagged OFF by default.                                                         |
 
 ---
 
