@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { View, useWindowDimensions, StyleSheet } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router";
 import {
   Canvas,
   ImageSVG,
