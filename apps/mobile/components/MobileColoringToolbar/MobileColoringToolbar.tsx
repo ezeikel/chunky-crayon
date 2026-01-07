@@ -40,6 +40,7 @@ import {
 import { PALETTE_COLORS } from "@/constants/Colors";
 import { PATTERN_INFO } from "@/utils/patternUtils";
 import BrushSizeSelector from "@/components/BrushSizeSelector/BrushSizeSelector";
+import LayerPanel from "@/components/LayerPanel";
 import {
   tapLight,
   tapMedium,
@@ -464,6 +465,11 @@ const MobileColoringToolbar = () => {
               small
             />
           </View>
+        </View>
+
+        {/* Layers */}
+        <View style={styles.section}>
+          <LayerPanel />
         </View>
       </BottomSheetScrollView>
     </BottomSheet>

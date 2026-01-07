@@ -37,7 +37,11 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { ColoringImage, Dimension, GridColorCell, GridColorMap } from "@/types";
-import { useCanvasStore, DrawingAction } from "@/stores/canvasStore";
+import {
+  useCanvasStore,
+  DrawingAction,
+  getVisibleActions,
+} from "@/stores/canvasStore";
 import { createSimplePaint, getBrushMultiplier } from "@/utils/brushShaders";
 import { getRainbowColor } from "@/utils/colorUtils";
 import {
@@ -156,6 +160,7 @@ const ImageCanvas = ({
     setCaptureCanvas,
     reset,
     symmetryMode,
+    layers,
   } = useCanvasStore();
 
   // Sync haptics enabled state with mute setting
@@ -1010,10 +1015,10 @@ const ImageCanvas = ({
     ],
   }));
 
-  // Get visible actions based on history index (for undo/redo)
+  // Get visible actions based on history index (for undo/redo) and layer visibility
   const visibleActions = useMemo(() => {
-    return history.slice(0, historyIndex + 1);
-  }, [history, historyIndex]);
+    return getVisibleActions(history, historyIndex, layers);
+  }, [history, historyIndex, layers]);
 
   // Calculate current stroke width with pressure (for live preview while drawing)
   // This recalculates when currentPath changes (which happens on each move)
