@@ -14,6 +14,25 @@ import {
 export const maxDuration = 180; // Increased for carousel creation
 
 /**
+ * Fetch with configurable timeout to prevent connection hanging.
+ * Default timeout is 30 seconds, which is more generous than Node's default 10s.
+ */
+const fetchWithTimeout = async (
+  url: string,
+  options: RequestInit = {},
+  timeoutMs = 30000,
+): Promise<Response> => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
+/**
  * Environment variables for colored example auto-pull:
  * - COLORED_EXAMPLE_USER_EMAIL: Email of user whose saved artwork to use
  * - COLORED_EXAMPLE_PROFILE_NAME: Profile name to check for saved artwork
@@ -280,8 +299,10 @@ const waitForMediaReady = async (
   intervalMs = 5000,
 ): Promise<void> => {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `https://graph.facebook.com/v22.0/${containerId}?fields=status_code,status&access_token=${process.env.FACEBOOK_ACCESS_TOKEN}`,
+      {},
+      30000, // 30 second timeout for status checks
     );
     const data = await response.json();
 
@@ -339,7 +360,7 @@ const createInstagramReelContainer = async (
 };
 
 const publishInstagramMedia = async (creationId: string) => {
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media_publish`,
     {
       method: 'POST',
@@ -351,11 +372,17 @@ const publishInstagramMedia = async (creationId: string) => {
         access_token: process.env.FACEBOOK_ACCESS_TOKEN,
       }),
     },
+    30000, // 30 second timeout for publish
   );
 
   const data = await response.json();
+
+  // Log the full response for debugging
+  console.log('[Instagram] Publish response:', JSON.stringify(data));
+
   if (!data.id) {
-    throw new Error('failed to publish Instagram media');
+    console.error('[Instagram] Publish error - full response:', data);
+    throw new Error(`failed to publish Instagram media: ${JSON.stringify(data)}`);
   }
   return data.id;
 };
@@ -627,6 +654,9 @@ const handleRequest = async (request: Request) => {
             instagramCaption,
           );
           console.log('[Instagram] Carousel container created:', carouselId);
+
+          // Wait for carousel to be ready (Instagram needs time to stitch media)
+          await waitForMediaReady(carouselId, 10, 2000);
 
           // Publish carousel
           instagramMediaId = await publishInstagramMedia(carouselId);
