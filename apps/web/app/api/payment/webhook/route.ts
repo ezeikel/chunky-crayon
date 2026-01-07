@@ -179,10 +179,13 @@ export const POST = async (req: Request) => {
         db.subscription.create({
           data: {
             userId: user.id,
-            stripeSubscriptionId: subscription.id,
+            platform: 'STRIPE',
+            externalId: subscription.id,
+            stripeSubscriptionId: subscription.id, // Keep for backwards compatibility
             planName,
             billingPeriod,
             status: mapStripeStatusToSubscriptionStatus(subscription.status),
+            currentPeriodStart: new Date(firstItem.current_period_start * 1000),
             currentPeriodEnd,
           },
         }),

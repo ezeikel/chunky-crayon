@@ -533,6 +533,7 @@ export const ACTIONS = {
   MAGIC_COLOR: 'magic color',
   CREATE_CHECKOUT_SESSION: 'create a checkout session',
   GET_CURRENT_USER: 'get the current user',
+  GET_ENTITLEMENTS: 'get entitlements',
   GET_USER_CREDITS: 'get the user credits',
   GET_USER_SUBSCRIPTIONS: 'get the user subscriptions',
   GET_USER_SUBSCRIPTION: 'get the user subscription',
@@ -878,7 +879,8 @@ export const TRACKING_EVENTS = {
   SUBSCRIPTION_PORTAL_OPENED: 'subscription_portal_opened', // Stripe portal
 
   // ===== CREDITS =====
-  CREDITS_PURCHASED: 'credits_purchased', // Credit pack bought
+  CREDITS_PURCHASED: 'credits_purchased', // Credit pack bought (Stripe/web)
+  CREDIT_PACK_PURCHASED: 'credit_pack_purchased', // Credit pack bought (RevenueCat/mobile)
   CREDITS_USED: 'credits_used', // Credit consumed
   CREDITS_LOW: 'credits_low', // Credits running low (trigger)
 

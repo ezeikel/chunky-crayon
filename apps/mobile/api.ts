@@ -693,3 +693,53 @@ export const getFeed = async (): Promise<FeedResponse> => {
   const response = await api.get("/mobile/feed");
   return response.data;
 };
+
+// ============================================================================
+// Entitlements / Subscriptions
+// ============================================================================
+
+export type PlanName = "SPLASH" | "RAINBOW" | "SPARKLE" | "FREE";
+export type SubscriptionStatus =
+  | "TRIALING"
+  | "ACTIVE"
+  | "PAST_DUE"
+  | "CANCELLED"
+  | "EXPIRED"
+  | "PAUSED"
+  | "NONE";
+export type SubscriptionPlatform = "STRIPE" | "REVENUECAT" | null;
+
+export type PlanFeatures = {
+  canGenerate: boolean;
+  canDownload: boolean;
+  canUseVoice: boolean;
+  canUseCamera: boolean;
+  maxProfiles: number;
+  hasMagicBrush: boolean;
+  hasAmbientSound: boolean;
+  hasPrioritySupport: boolean;
+  hasCommercialUse: boolean;
+};
+
+export type EntitlementsResponse = {
+  hasAccess: boolean;
+  plan: PlanName;
+  status: SubscriptionStatus;
+  platform: SubscriptionPlatform;
+  expiresAt: string | null;
+  isTrialing: boolean;
+  isCancelled: boolean;
+  credits: number;
+  creditsPerMonth: number;
+  features: PlanFeatures;
+  error?: string;
+};
+
+/**
+ * Get user's current subscription entitlements
+ * Works with both web and mobile auth
+ */
+export const getEntitlements = async (): Promise<EntitlementsResponse> => {
+  const response = await api.get("/entitlements");
+  return response.data;
+};

@@ -27,6 +27,7 @@ export const getUserId = async (action?: string) => {
   // These actions can return null without logging an error (guest-friendly)
   if (
     action === ACTIONS.GET_CURRENT_USER ||
+    action === ACTIONS.GET_ENTITLEMENTS ||
     action === ACTIONS.GET_ALL_COLORING_IMAGES ||
     action === ACTIONS.CREATE_CHECKOUT_SESSION ||
     action === ACTIONS.GET_ACTIVE_PROFILE

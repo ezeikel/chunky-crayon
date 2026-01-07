@@ -269,6 +269,11 @@ export type EventProperties = {
     creditAmount: number;
     value: number;
   };
+  [TRACKING_EVENTS.CREDIT_PACK_PURCHASED]: {
+    creditAmount: number;
+    productId: string;
+    platform: 'revenuecat' | 'stripe';
+  };
   [TRACKING_EVENTS.CREDITS_USED]: {
     creditAmount: number;
     action: 'creation' | 'other';

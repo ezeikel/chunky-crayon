@@ -14,6 +14,7 @@ model User {
   emailVerified       DateTime?
   image               String?
   stripeCustomerId    String? // set after Stripe customer creation
+  revenuecatUserId    String?   @unique // RevenueCat app_user_id (same as our userId)
   credits             Int       @default(15) // initial credits for new users
   showCommunityImages Boolean   @default(false) // parental control for community gallery
   activeProfileId     String? // Currently selected profile
@@ -37,18 +38,70 @@ model User {
 }
 
 model Subscription {
-  id                   String             @id @default(cuid())
-  userId               String
-  user                 User               @relation(fields: [userId], references: [id])
-  stripeSubscriptionId String             @unique
-  planName             PlanName
-  billingPeriod        BillingPeriod
-  status               SubscriptionStatus
-  currentPeriodEnd     DateTime
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // Platform identification
+  platform   SubscriptionPlatform @default(STRIPE)
+  externalId String               @unique // Stripe subscription ID or RevenueCat transaction ID
+
+  // Legacy field - keep for backwards compatibility during migration
+  stripeSubscriptionId String? @unique
+
+  // Subscription state
+  planName      PlanName
+  billingPeriod BillingPeriod
+  status        SubscriptionStatus
+
+  // Timing
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime
+  trialStart         DateTime?
+  trialEnd           DateTime?
+  cancelledAt        DateTime?
+
+  // Grace period handling
+  gracePeriodEnd DateTime?
+
+  // Platform-specific metadata
+  storeProductId String? // e.g., "splash_sub_monthly_v1" for RevenueCat
+  metadata       Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Audit log
+  events SubscriptionEvent[]
+
+  @@index([userId])
+  @@index([platform, externalId])
   @@map("subscriptions")
+}
+
+// Audit log for subscription changes (helps debug cross-platform issues)
+model SubscriptionEvent {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  eventType       SubscriptionEventType
+  platform        SubscriptionPlatform
+  externalEventId String?               @unique // Stripe event ID or RevenueCat event ID
+
+  previousStatus SubscriptionStatus?
+  newStatus      SubscriptionStatus?
+  previousPlan   PlanName?
+  newPlan        PlanName?
+
+  creditsAdded Int   @default(0)
+  rawPayload   Json? // Store original webhook payload for debugging
+
+  processedAt DateTime @default(now())
+
+  @@index([subscriptionId])
+  @@index([externalEventId])
+  @@map("subscription_events")
 }
 
 model CreditTransaction {
@@ -171,7 +224,17 @@ model MobileDeviceSession {
   @@map("mobile_device_sessions")
 }
 
-// Track processed Stripe webhook events for idempotency
+// Track processed webhook events for idempotency (both Stripe and RevenueCat)
+model WebhookEvent {
+  id          String               @id // Stripe event ID or RevenueCat event ID
+  platform    SubscriptionPlatform
+  eventType   String // Event type (e.g., "invoice.payment_succeeded" or "INITIAL_PURCHASE")
+  processedAt DateTime             @default(now())
+
+  @@map("webhook_events")
+}
+
+// Legacy table - kept for backwards compatibility, will be deprecated
 model StripeWebhookEvent {
   id          String   @id // Use Stripe event ID directly
   type        String // Event type (e.g., "invoice.payment_succeeded")
@@ -332,12 +395,15 @@ enum PlanName {
 }
 
 enum SubscriptionStatus {
-  ACTIVE
-  CANCELLED
+  TRIALING // User is in trial period
+  ACTIVE // Subscription is active and paid
+  PAST_DUE // Payment failed, in grace period
+  CANCELLED // User cancelled, but still has access until period end
+  EXPIRED // Subscription ended, no access
+  PAUSED // Subscription paused (Play Store feature)
+  // Legacy statuses kept for backwards compatibility
   INCOMPLETE
-  PAST_DUE
   UNPAID
-  TRIALING
 }
 
 enum CreditTransactionType {
@@ -351,4 +417,30 @@ enum CreditTransactionType {
 enum BillingPeriod {
   MONTHLY
   ANNUAL
+}
+
+// Platform where the subscription was purchased
+enum SubscriptionPlatform {
+  STRIPE // Web subscriptions
+  REVENUECAT // Mobile subscriptions (App Store / Play Store via RevenueCat)
+}
+
+// Event types for subscription audit log
+enum SubscriptionEventType {
+  TRIAL_STARTED
+  SUBSCRIPTION_STARTED
+  RENEWAL_SUCCESS
+  RENEWAL_FAILED
+  PLAN_UPGRADED
+  PLAN_DOWNGRADED
+  CANCELLATION_SCHEDULED // User requested cancellation, still active until period end
+  CANCELLED // Subscription actually cancelled/ended
+  REACTIVATED // User resubscribed after cancellation
+  BILLING_ISSUE_DETECTED // Payment failed
+  BILLING_ISSUE_RESOLVED // Payment recovered
+  GRACE_PERIOD_STARTED
+  GRACE_PERIOD_EXPIRED
+  REFUNDED
+  TRANSFERRED // RevenueCat: subscription transferred to another user
+  EXPIRED
 }

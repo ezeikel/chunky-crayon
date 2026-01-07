@@ -45,18 +45,39 @@ const COLORS = {
 // Types
 // =============================================================================
 
+const CREDITS_PER_GENERATION = 5;
+
 type VoiceInputPanelProps = {
   onSubmit: () => void;
   isSubmitting: boolean;
+  credits: number;
+  onShowPaywall: () => void;
 };
 
 // =============================================================================
 // Component
 // =============================================================================
 
-const VoiceInputPanel = ({ onSubmit, isSubmitting }: VoiceInputPanelProps) => {
+const VoiceInputPanel = ({
+  onSubmit,
+  isSubmitting,
+  credits,
+  onShowPaywall,
+}: VoiceInputPanelProps) => {
   const { description, setDescription, setIsProcessing, setError } =
     useInputMode();
+
+  // Check if user has enough credits to generate
+  const hasEnoughCredits = credits >= CREDITS_PER_GENERATION;
+
+  // Wrap onSubmit with credit check
+  const handleSubmit = useCallback(() => {
+    if (!hasEnoughCredits) {
+      onShowPaywall();
+      return;
+    }
+    onSubmit();
+  }, [hasEnoughCredits, onShowPaywall, onSubmit]);
   const [isListening, setIsListening] = useState(false);
   const [partialResult, setPartialResult] = useState("");
 
@@ -247,7 +268,7 @@ const VoiceInputPanel = ({ onSubmit, isSubmitting }: VoiceInputPanelProps) => {
             styles.submitButton,
             isSubmitting && styles.submitButtonDisabled,
           ]}
-          onPress={onSubmit}
+          onPress={handleSubmit}
           disabled={isSubmitting}
           activeOpacity={0.8}
         >

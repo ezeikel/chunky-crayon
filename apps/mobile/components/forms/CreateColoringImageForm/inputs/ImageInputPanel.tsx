@@ -40,18 +40,27 @@ type ColoringImage = {
   title: string;
 };
 
+const CREDITS_PER_GENERATION = 5;
+
 type ImageInputPanelProps = {
   onColoringImageCreated: (coloringImage: ColoringImage) => void;
   isSubmitting: boolean;
+  credits: number;
+  onShowPaywall: () => void;
 };
 
 const ImageInputPanel = ({
   onColoringImageCreated,
   isSubmitting,
+  credits,
+  onShowPaywall,
 }: ImageInputPanelProps) => {
   const { setIsProcessing, setError, isProcessing } = useInputMode();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
+
+  // Check if user has enough credits to generate
+  const hasEnoughCredits = credits >= CREDITS_PER_GENERATION;
 
   const takePhoto = useCallback(async () => {
     try {
@@ -119,6 +128,12 @@ const ImageInputPanel = ({
   const processImage = useCallback(async () => {
     if (!base64Image) return;
 
+    // Check credits before processing
+    if (!hasEnoughCredits) {
+      onShowPaywall();
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const { generateFromPhoto } = await import("@/api");
@@ -149,7 +164,14 @@ const ImageInputPanel = ({
     } finally {
       setIsProcessing(false);
     }
-  }, [base64Image, onColoringImageCreated, setIsProcessing, setError]);
+  }, [
+    base64Image,
+    onColoringImageCreated,
+    setIsProcessing,
+    setError,
+    hasEnoughCredits,
+    onShowPaywall,
+  ]);
 
   const clearImage = useCallback(() => {
     setSelectedImage(null);
