@@ -137,6 +137,8 @@ const ImageCanvas = ({
     translateY,
     imageId,
     addAction,
+    undo,
+    redo,
     setColor,
     setTool,
     setScale,
@@ -932,9 +934,36 @@ const ImageCanvas = ({
       runOnJS(setTranslate)(0, 0);
     });
 
+  // Two-finger tap for Undo (advanced gesture)
+  // Note: minPointers ensures at least 2 fingers; gesture priority handles the rest
+  const twoFingerUndoGesture = Gesture.Tap()
+    .minPointers(2)
+    .onEnd((_event, success) => {
+      if (success) {
+        runOnJS(tapMedium)();
+        runOnJS(undo)();
+      }
+    });
+
+  // Three-finger tap for Redo (advanced gesture)
+  const threeFingerRedoGesture = Gesture.Tap()
+    .minPointers(3)
+    .onEnd((_event, success) => {
+      if (success) {
+        runOnJS(tapMedium)();
+        runOnJS(redo)();
+      }
+    });
+
   // Combine gestures
+  // Priority order: three-finger redo > two-finger undo > double-tap > single-tap
   const composedGesture = Gesture.Simultaneous(
-    Gesture.Race(doubleTapGesture, tapGesture),
+    Gesture.Exclusive(
+      threeFingerRedoGesture,
+      twoFingerUndoGesture,
+      doubleTapGesture,
+      tapGesture,
+    ),
     Gesture.Simultaneous(panGesture, pinchGesture),
   );
 
