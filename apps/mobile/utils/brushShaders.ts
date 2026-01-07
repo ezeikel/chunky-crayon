@@ -7,6 +7,17 @@ import {
   BlurStyle,
 } from "@shopify/react-native-skia";
 import type { BrushType } from "@/stores/canvasStore";
+import { BRUSH_TEXTURE_CONFIG, applyTextureToStroke } from "./brushTextures";
+
+/**
+ * Options for brush paint creation
+ */
+type BrushPaintOptions = {
+  /** Enable texture effects for applicable brushes */
+  useTextures?: boolean;
+  /** Seed for texture variation (random variation per stroke) */
+  textureSeed?: number;
+};
 
 /**
  * Creates a paint object configured for the specified brush type
@@ -15,7 +26,10 @@ export const createBrushPaint = (
   color: string,
   brushType: BrushType,
   strokeWidth: number,
+  options: BrushPaintOptions = {},
 ): SkPaint => {
+  const { useTextures = false, textureSeed = 0 } = options;
+
   const paint = Skia.Paint();
   paint.setColor(Skia.Color(color));
   paint.setStyle(1); // Stroke
@@ -24,24 +38,48 @@ export const createBrushPaint = (
   paint.setStrokeJoin(StrokeJoin.Round);
   paint.setAntiAlias(true);
 
+  let styledPaint: SkPaint;
+
   switch (brushType) {
     case "crayon":
-      return applyCrayonEffect(paint, strokeWidth);
+      styledPaint = applyCrayonEffect(paint, strokeWidth);
+      break;
     case "marker":
-      return applyMarkerEffect(paint);
+      styledPaint = applyMarkerEffect(paint);
+      break;
     case "pencil":
-      return applyPencilEffect(paint, strokeWidth);
+      styledPaint = applyPencilEffect(paint, strokeWidth);
+      break;
     case "rainbow":
-      return applyRainbowEffect(paint, strokeWidth);
+      styledPaint = applyRainbowEffect(paint, strokeWidth);
+      break;
     case "glow":
-      return applyGlowEffect(paint, strokeWidth);
+      styledPaint = applyGlowEffect(paint, strokeWidth);
+      break;
     case "neon":
-      return applyNeonEffect(paint, strokeWidth);
+      styledPaint = applyNeonEffect(paint, strokeWidth);
+      break;
     case "glitter":
-      return applyGlitterEffect(paint, strokeWidth);
+      styledPaint = applyGlitterEffect(paint, strokeWidth);
+      break;
     default:
-      return paint;
+      styledPaint = paint;
   }
+
+  // Apply texture if enabled and brush supports it
+  if (useTextures) {
+    const textureConfig = BRUSH_TEXTURE_CONFIG[brushType];
+    if (textureConfig?.texture) {
+      applyTextureToStroke(
+        styledPaint,
+        textureConfig.texture,
+        color,
+        textureSeed,
+      );
+    }
+  }
+
+  return styledPaint;
 };
 
 /**

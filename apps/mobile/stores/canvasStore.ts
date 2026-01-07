@@ -150,6 +150,8 @@ export type DrawingAction = {
   isStylus?: boolean;
   // Layer this action belongs to (for layer visibility filtering)
   layerId?: string;
+  // Texture seed for deterministic texture rendering
+  textureSeed?: number;
 };
 
 /**

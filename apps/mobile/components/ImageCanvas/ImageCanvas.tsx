@@ -42,7 +42,18 @@ import {
   DrawingAction,
   getVisibleActions,
 } from "@/stores/canvasStore";
-import { createSimplePaint, getBrushMultiplier } from "@/utils/brushShaders";
+import {
+  createBrushPaint,
+  createSimplePaint,
+  getBrushMultiplier,
+} from "@/utils/brushShaders";
+import {
+  BRUSH_TEXTURE_CONFIG,
+  createCrayonTextureShader,
+  createPaperGrainShader,
+  createWatercolorTextureShader,
+} from "@/utils/brushTextures";
+import { useFeatureStore } from "@/stores/featureStore";
 import { getRainbowColor } from "@/utils/colorUtils";
 import {
   saveCanvasState,
@@ -162,6 +173,9 @@ const ImageCanvas = ({
     symmetryMode,
     layers,
   } = useCanvasStore();
+
+  // Feature flags
+  const { texturedBrushes } = useFeatureStore();
 
   // Sync haptics enabled state with mute setting
   useEffect(() => {
@@ -686,6 +700,9 @@ const ImageCanvas = ({
       );
 
       // Add an action for each symmetry copy (including original)
+      // Generate a unique texture seed for this stroke
+      const textureSeed = Math.random() * 1000;
+
       symmetryPaths.forEach((path) => {
         const action: DrawingAction = {
           type: "stroke",
@@ -700,6 +717,8 @@ const ImageCanvas = ({
           // Apple Pencil pressure sensitivity data
           pressurePoints,
           isStylus,
+          // Texture seed for deterministic texture rendering
+          textureSeed,
         };
         addAction(action);
       });
@@ -1075,6 +1094,62 @@ const ImageCanvas = ({
           alpha = 0.7;
         }
 
+        // Textured crayon rendering (when texture feature is enabled)
+        if (
+          texturedBrushes &&
+          action.brushType === "crayon" &&
+          BRUSH_TEXTURE_CONFIG.crayon?.texture
+        ) {
+          const paint = createBrushPaint(
+            action.color,
+            action.brushType,
+            strokeWidth,
+            {
+              useTextures: true,
+              textureSeed: action.textureSeed ?? 0,
+            },
+          );
+
+          return (
+            <Path
+              key={`path-${index}`}
+              path={action.path!}
+              paint={paint}
+              style="stroke"
+              strokeCap="round"
+              strokeJoin="round"
+            />
+          );
+        }
+
+        // Textured pencil rendering (when texture feature is enabled)
+        if (
+          texturedBrushes &&
+          action.brushType === "pencil" &&
+          BRUSH_TEXTURE_CONFIG.pencil?.texture
+        ) {
+          const paint = createBrushPaint(
+            action.color,
+            action.brushType,
+            strokeWidth,
+            {
+              useTextures: true,
+              textureSeed: action.textureSeed ?? 0,
+            },
+          );
+
+          return (
+            <Path
+              key={`path-${index}`}
+              path={action.path!}
+              paint={paint}
+              style="stroke"
+              strokeCap="round"
+              strokeJoin="round"
+            />
+          );
+        }
+
         // Glow and neon effects need blur
         if (action.brushType === "glow") {
           return (
@@ -1166,7 +1241,7 @@ const ImageCanvas = ({
           />
         );
       });
-  }, [visibleActions, brushSize]);
+  }, [visibleActions, brushSize, texturedBrushes]);
 
   if (!svgDimensions) {
     return null;
