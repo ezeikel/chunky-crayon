@@ -15,13 +15,19 @@ export type GlitterParticle = {
 };
 
 /**
+ * Maximum number of particles per stroke for performance
+ * Keeps rendering smooth even on older devices
+ */
+const MAX_PARTICLES = 30;
+
+/**
  * Generates glitter particles along a path
  * Uses path length sampling with randomization
  */
 export const generateGlitterParticles = (
   path: SkPath,
   baseColor: string,
-  density: number = 0.15, // Particles per unit length
+  density: number = 0.08, // Particles per unit length (reduced for performance)
 ): GlitterParticle[] => {
   const particles: GlitterParticle[] = [];
 
@@ -33,8 +39,11 @@ export const generateGlitterParticles = (
       Math.abs(bounds.height) +
       Math.sqrt(bounds.width * bounds.width + bounds.height * bounds.height);
 
-    // Calculate number of particles based on density
-    const numParticles = Math.max(5, Math.floor(estimatedLength * density));
+    // Calculate number of particles based on density, with min/max limits
+    const numParticles = Math.min(
+      MAX_PARTICLES,
+      Math.max(5, Math.floor(estimatedLength * density)),
+    );
 
     // Sample points along the path
     const pathMeasure = Skia.ContourMeasureIter(path, false, 1);
