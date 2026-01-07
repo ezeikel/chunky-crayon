@@ -54,19 +54,35 @@ import MagicColorHint from "@/components/MagicColorHint";
 import { perfect } from "@/styles";
 import { tapHeavy, tapMedium, notifySuccess } from "@/utils/haptics";
 
+import type { LayoutMode } from "@/utils/deviceUtils";
+
 type ImageCanvasProps = {
   coloringImage: ColoringImage;
   setScroll: Dispatch<SetStateAction<boolean>>;
   style?: Record<string, unknown>;
+  /** Available canvas area dimensions from responsive layout */
+  canvasArea?: { width: number; height: number };
+  /** Current layout mode for responsive sizing */
+  layoutMode?: LayoutMode;
 };
 
-const ImageCanvas = ({ coloringImage, setScroll, style }: ImageCanvasProps) => {
+const ImageCanvas = ({
+  coloringImage,
+  setScroll,
+  style,
+  canvasArea,
+  layoutMode,
+}: ImageCanvasProps) => {
   const canvasRef = useCanvasRef();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const svg = useSVG(coloringImage.svgUrl);
 
-  // Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
-  const canvasSize = screenWidth - 32 - 24;
+  // Calculate canvas size based on available area or fallback to legacy calculation
+  // Legacy: Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
+  const legacyCanvasSize = screenWidth - 32 - 24;
+  const canvasSize = canvasArea
+    ? Math.min(canvasArea.width, canvasArea.height)
+    : legacyCanvasSize;
 
   const [svgDimensions, setSvgDimensions] = useState<Dimension | null>(null);
   const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
