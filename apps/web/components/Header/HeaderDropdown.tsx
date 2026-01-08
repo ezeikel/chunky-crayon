@@ -184,20 +184,18 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
           // Sign out action
           if (item.isSignOut) {
             return (
-              <DropdownMenuItem key={item.labelKey} asChild>
-                <form action={signOutAction} className="w-full">
-                  <button
-                    type="submit"
-                    className="w-full text-left flex items-center gap-3"
-                  >
-                    <FontAwesomeIcon
-                      icon={item.icon!}
-                      className="text-lg"
-                      style={iconStyle}
-                    />
-                    {label}
-                  </button>
-                </form>
+              <DropdownMenuItem
+                key={item.labelKey}
+                onClick={async () => {
+                  await signOutAction();
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={item.icon!}
+                  className="text-lg"
+                  style={iconStyle}
+                />
+                {label}
               </DropdownMenuItem>
             );
           }
