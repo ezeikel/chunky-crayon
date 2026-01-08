@@ -21,6 +21,31 @@ This project uses Neon PostgreSQL with branch-based development:
 - `coloring_images` - Main coloring page content (uses snake_case)
 - `users`, `profiles`, `saved_artworks`, etc.
 
+### Migrations
+
+**CRITICAL: Never use `prisma db push`** - it causes schema drift between the database and migration history.
+
+#### Workflow
+
+1. **Make schema changes** in `packages/db/prisma/schema.prisma`
+2. **Create migration locally**: `cd packages/db && pnpm db:migrate`
+3. **Build the db package**: `pnpm build` (compiles TypeScript after Prisma generates client)
+4. **Commit & push** migration files to `main` branch
+5. **Auto-deploy**: GitHub Action runs `prisma migrate deploy` on production
+
+#### Commands (run from `packages/db`)
+
+| Command            | Purpose                   | When to Use                     |
+| ------------------ | ------------------------- | ------------------------------- |
+| `pnpm db:migrate`  | Create + apply migration  | After schema changes            |
+| `pnpm build`       | Compile TypeScript        | After db:migrate or db:generate |
+| `pnpm db:deploy`   | Apply existing migrations | CI/CD only                      |
+| `pnpm db:generate` | Regenerate Prisma client  | After pulling changes           |
+| `pnpm db:push`     | ⛔ **NEVER USE**          | Causes drift                    |
+| `pnpm db:studio`   | Database GUI              | Debugging                       |
+
+**Important**: Always run `pnpm build` after `db:migrate` or `db:generate` to compile the updated Prisma client.
+
 ## Project Structure
 
 - **Monorepo** using Turborepo + pnpm workspaces
