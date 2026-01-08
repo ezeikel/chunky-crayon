@@ -21,7 +21,6 @@ import {
   faTableCellsLarge,
   faBorderAll,
   faGripVertical,
-  faWandSparkles,
   faEraser,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -32,15 +31,9 @@ import {
   PatternType,
   MagicMode,
 } from "@/stores/canvasStore";
-import type { SymmetryMode } from "@/utils/symmetryUtils";
-import {
-  SYMMETRY_MODE_LABELS,
-  SYMMETRY_MODE_ICONS,
-} from "@/utils/symmetryUtils";
 import { PALETTE_COLORS } from "@/constants/Colors";
 import { PATTERN_INFO } from "@/utils/patternUtils";
 import BrushSizeSelector from "@/components/BrushSizeSelector/BrushSizeSelector";
-import LayerPanel from "@/components/LayerPanel";
 import {
   tapLight,
   tapMedium,
@@ -230,8 +223,6 @@ const MobileColoringToolbar = () => {
     redo,
     canUndo,
     canRedo,
-    symmetryMode,
-    cycleSymmetryMode,
   } = useCanvasStore();
 
   const handleToolSelect = (config: ToolConfig) => {
@@ -349,35 +340,6 @@ const MobileColoringToolbar = () => {
           </View>
         )}
 
-        {/* Symmetry Mode (when brush tool is selected) */}
-        {selectedTool === "brush" && (
-          <View style={styles.section}>
-            <SectionTitle title="Symmetry" />
-            <Pressable
-              onPress={() => {
-                tapLight();
-                cycleSymmetryMode();
-              }}
-              style={[
-                styles.symmetryButton,
-                symmetryMode !== "none" && styles.symmetryButtonActive,
-              ]}
-            >
-              <Text style={styles.symmetryIcon}>
-                {SYMMETRY_MODE_ICONS[symmetryMode]}
-              </Text>
-              <Text
-                style={[
-                  styles.symmetryLabel,
-                  symmetryMode !== "none" && styles.symmetryLabelActive,
-                ]}
-              >
-                {SYMMETRY_MODE_LABELS[symmetryMode]}
-              </Text>
-            </Pressable>
-          </View>
-        )}
-
         {/* Fill Types (when fill tool is selected) */}
         {selectedTool === "fill" && (
           <>
@@ -465,11 +427,6 @@ const MobileColoringToolbar = () => {
               small
             />
           </View>
-        </View>
-
-        {/* Layers */}
-        <View style={styles.section}>
-          <LayerPanel />
         </View>
       </BottomSheetScrollView>
     </BottomSheet>
@@ -580,30 +537,6 @@ const styles = StyleSheet.create({
   undoRedoRow: {
     flexDirection: "row",
     gap: 12,
-  },
-  symmetryButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: "#F3F4F6",
-    alignSelf: "flex-start",
-  },
-  symmetryButtonActive: {
-    backgroundColor: "#E46444",
-  },
-  symmetryIcon: {
-    fontSize: 18,
-  },
-  symmetryLabel: {
-    fontSize: 14,
-    fontFamily: "RooneySans-Bold",
-    color: "#4B5563",
-  },
-  symmetryLabelActive: {
-    color: "#FFFFFF",
   },
 });
 

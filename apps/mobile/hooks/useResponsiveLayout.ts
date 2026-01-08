@@ -12,8 +12,7 @@ import {
   getHeaderHeight,
   getSideToolbarWidth,
   getAvailableCanvasArea,
-  TOOLBAR,
-  CANVAS,
+  getLandscapeSidebarWidths,
 } from "../constants/Sizes";
 import { useFeatureStore } from "../stores/featureStore";
 
@@ -43,6 +42,13 @@ export type ResponsiveLayout = {
     width: number;
     height: number;
   };
+
+  // Three-panel landscape layout widths
+  landscapeLayout: {
+    leftSidebarWidth: number;
+    rightSidebarWidth: number;
+    canvasSize: number;
+  } | null;
 
   // Feature flags
   responsiveLayoutEnabled: boolean;
@@ -109,6 +115,25 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
     ],
   );
 
+  // Three-panel landscape layout dimensions
+  // Uses dynamic sidebar widths based on remaining space after canvas
+  const landscapeLayout = useMemo(() => {
+    if (!useSideToolbar) return null;
+
+    const { leftWidth, rightWidth, canvasSize } = getLandscapeSidebarWidths(
+      deviceInfo.screenWidth,
+      deviceInfo.screenHeight,
+      0, // leftInset - will be handled by component using safe area
+      0, // rightInset - will be handled by component using safe area
+    );
+
+    return {
+      leftSidebarWidth: leftWidth,
+      rightSidebarWidth: rightWidth,
+      canvasSize,
+    };
+  }, [deviceInfo.screenWidth, deviceInfo.screenHeight, useSideToolbar]);
+
   return {
     deviceInfo,
     layoutMode: effectiveLayoutMode,
@@ -122,6 +147,7 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
     sideToolbarWidth,
     touchTargetSize,
     canvasArea,
+    landscapeLayout,
 
     responsiveLayoutEnabled,
 

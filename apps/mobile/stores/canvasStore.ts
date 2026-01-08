@@ -1,7 +1,5 @@
 import { create } from "zustand";
 import { SkPath } from "@shopify/react-native-skia";
-import type { SymmetryMode } from "@/utils/symmetryUtils";
-import { getNextSymmetryMode } from "@/utils/symmetryUtils";
 
 export type Tool = "brush" | "fill" | "eraser" | "sticker" | "magic" | "pan";
 export type BrushType =
@@ -148,77 +146,18 @@ export type DrawingAction = {
   pressurePoints?: number[];
   // Whether this stroke was made with a stylus (Apple Pencil)
   isStylus?: boolean;
-  // Layer this action belongs to (for layer visibility filtering)
-  layerId?: string;
   // Texture seed for deterministic texture rendering
   textureSeed?: number;
 };
 
 /**
- * Layer type for organizing drawing actions into separate layers.
- * Kids can use layers to separate foreground/background elements.
- */
-export type Layer = {
-  /** Unique identifier for the layer */
-  id: string;
-  /** Display name (e.g., "Layer 1", "Background") */
-  name: string;
-  /** Whether the layer is visible */
-  visible: boolean;
-  /** Drawing actions in this layer */
-  actions: DrawingAction[];
-  /** History index for undo/redo within this layer */
-  historyIndex: number;
-};
-
-/** Maximum number of layers allowed (keep it simple for kids) */
-export const MAX_LAYERS = 3;
-
-/** Layer colors for visual distinction in UI */
-export const LAYER_COLORS = ["#E46444", "#4CAF50", "#2196F3"] as const;
-
-/** Generate unique layer ID */
-const generateLayerId = () =>
-  `layer-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-
-/** Default layer ID (used for initial state) */
-const DEFAULT_LAYER_ID = "default-layer";
-
-/** Create the initial default layer */
-const createInitialLayer = (): Layer => ({
-  id: DEFAULT_LAYER_ID,
-  name: "Layer 1",
-  visible: true,
-  actions: [],
-  historyIndex: -1,
-});
-
-/** Create a new layer with given index */
-const createNewLayer = (index: number): Layer => ({
-  id: generateLayerId(),
-  name: `Layer ${index}`,
-  visible: true,
-  actions: [],
-  historyIndex: -1,
-});
-
-/**
- * Helper function to get visible actions filtered by layer visibility.
- * Actions without a layerId are shown on all layers (backward compatibility).
+ * Helper function to get visible actions from history.
  */
 export const getVisibleActions = (
   history: DrawingAction[],
   historyIndex: number,
-  layers: Layer[],
 ): DrawingAction[] => {
-  const visibleLayerIds = new Set(
-    layers.filter((l) => l.visible).map((l) => l.id),
-  );
-  const visibleHistory = history.slice(0, historyIndex + 1);
-
-  return visibleHistory.filter(
-    (action) => !action.layerId || visibleLayerIds.has(action.layerId),
-  );
+  return history.slice(0, historyIndex + 1);
 };
 
 // Capture function type for getting canvas image data
@@ -246,13 +185,9 @@ export type CanvasState = {
   // Rainbow brush hue tracking (0-360)
   rainbowHue: number;
 
-  // Drawing history for undo/redo (legacy flat structure for backward compatibility)
+  // Drawing history for undo/redo
   history: DrawingAction[];
   historyIndex: number;
-
-  // Layers system
-  layers: Layer[];
-  activeLayerId: string;
 
   // Zoom/Pan state
   scale: number;
@@ -268,9 +203,6 @@ export type CanvasState = {
 
   // Progress tracking (0-100)
   progress: number;
-
-  // Symmetry drawing mode
-  symmetryMode: SymmetryMode;
 
   // Canvas capture function (set by ImageCanvas)
   captureCanvas: CanvasCaptureFunction | null;
@@ -315,18 +247,6 @@ type CanvasActions = {
   // Progress actions
   setProgress: (progress: number) => void;
 
-  // Symmetry actions
-  setSymmetryMode: (mode: SymmetryMode) => void;
-  cycleSymmetryMode: () => void;
-
-  // Layer actions
-  addLayer: () => void;
-  removeLayer: (layerId: string) => void;
-  setActiveLayer: (layerId: string) => void;
-  toggleLayerVisibility: (layerId: string) => void;
-  reorderLayers: (fromIndex: number, toIndex: number) => void;
-  renameLayer: (layerId: string, name: string) => void;
-
   // Canvas capture
   setCaptureCanvas: (fn: CanvasCaptureFunction | null) => void;
 };
@@ -347,9 +267,6 @@ const initialState: CanvasState = {
   history: [],
   historyIndex: -1,
 
-  layers: [createInitialLayer()],
-  activeLayerId: DEFAULT_LAYER_ID,
-
   scale: 1,
   translateX: 0,
   translateY: 0,
@@ -358,7 +275,6 @@ const initialState: CanvasState = {
   isDirty: false,
   isMuted: false,
   progress: 0,
-  symmetryMode: "none",
   captureCanvas: null,
 };
 
@@ -385,16 +301,10 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
 
     // History actions
     addAction: (action) => {
-      const { history, historyIndex, imageId, activeLayerId } = get();
-
-      // Tag action with current active layer
-      const actionWithLayer = {
-        ...action,
-        layerId: action.layerId || activeLayerId,
-      };
+      const { history, historyIndex, imageId } = get();
 
       console.log(
-        `[CANVAS_STORE] ADD_ACTION - Type: ${action.type}, Color: ${action.color}, Layer: ${actionWithLayer.layerId}`,
+        `[CANVAS_STORE] ADD_ACTION - Type: ${action.type}, Color: ${action.color}`,
       );
       console.log(
         `[CANVAS_STORE] ADD_ACTION - Current history: ${history.length} items, Index: ${historyIndex}, Image: ${imageId}`,
@@ -402,7 +312,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
 
       // Remove any redo history when new action is added
       const newHistory = history.slice(0, historyIndex + 1);
-      newHistory.push(actionWithLayer);
+      newHistory.push(action);
 
       // Trim history if too long
       if (newHistory.length > MAX_HISTORY) {
@@ -470,12 +380,10 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
       console.log(
         `[CANVAS_STORE] RESET - Clearing state for image: ${currentState.imageId}, History: ${currentState.history.length} items`,
       );
-      // Reset to initial state but preserve capture function and create fresh default layer
+      // Reset to initial state but preserve capture function
       set({
         ...initialState,
         captureCanvas: currentState.captureCanvas,
-        layers: [createInitialLayer()],
-        activeLayerId: DEFAULT_LAYER_ID,
       });
     },
 
@@ -486,107 +394,6 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     // Progress actions
     setProgress: (progress) =>
       set({ progress: Math.max(0, Math.min(100, progress)) }),
-
-    // Symmetry actions
-    setSymmetryMode: (mode) => set({ symmetryMode: mode }),
-    cycleSymmetryMode: () =>
-      set((state) => ({
-        symmetryMode: getNextSymmetryMode(state.symmetryMode),
-      })),
-
-    // Layer actions
-    addLayer: () => {
-      const { layers } = get();
-      if (layers.length >= MAX_LAYERS) {
-        console.log(
-          `[CANVAS_STORE] ADD_LAYER - Max layers (${MAX_LAYERS}) reached`,
-        );
-        return;
-      }
-      const newLayer = createNewLayer(layers.length + 1);
-      console.log(
-        `[CANVAS_STORE] ADD_LAYER - Creating ${newLayer.name} (${newLayer.id})`,
-      );
-      set({
-        layers: [...layers, newLayer],
-        activeLayerId: newLayer.id,
-        isDirty: true,
-      });
-    },
-
-    removeLayer: (layerId) => {
-      const { layers, activeLayerId } = get();
-      if (layers.length <= 1) {
-        console.log(`[CANVAS_STORE] REMOVE_LAYER - Cannot remove last layer`);
-        return;
-      }
-      const newLayers = layers.filter((l) => l.id !== layerId);
-      const newActiveId =
-        activeLayerId === layerId
-          ? newLayers[newLayers.length - 1].id
-          : activeLayerId;
-      console.log(
-        `[CANVAS_STORE] REMOVE_LAYER - Removed ${layerId}, active is now ${newActiveId}`,
-      );
-      set({
-        layers: newLayers,
-        activeLayerId: newActiveId,
-        isDirty: true,
-      });
-    },
-
-    setActiveLayer: (layerId) => {
-      const { layers } = get();
-      const layer = layers.find((l) => l.id === layerId);
-      if (layer) {
-        console.log(
-          `[CANVAS_STORE] SET_ACTIVE_LAYER - ${layer.name} (${layerId})`,
-        );
-        set({ activeLayerId: layerId });
-      }
-    },
-
-    toggleLayerVisibility: (layerId) => {
-      const { layers } = get();
-      const newLayers = layers.map((layer) =>
-        layer.id === layerId ? { ...layer, visible: !layer.visible } : layer,
-      );
-      const layer = newLayers.find((l) => l.id === layerId);
-      console.log(
-        `[CANVAS_STORE] TOGGLE_VISIBILITY - ${layer?.name} is now ${layer?.visible ? "visible" : "hidden"}`,
-      );
-      set({ layers: newLayers, isDirty: true });
-    },
-
-    reorderLayers: (fromIndex, toIndex) => {
-      const { layers } = get();
-      if (
-        fromIndex < 0 ||
-        fromIndex >= layers.length ||
-        toIndex < 0 ||
-        toIndex >= layers.length
-      ) {
-        return;
-      }
-      const newLayers = [...layers];
-      const [movedLayer] = newLayers.splice(fromIndex, 1);
-      newLayers.splice(toIndex, 0, movedLayer);
-      console.log(
-        `[CANVAS_STORE] REORDER_LAYERS - Moved from ${fromIndex} to ${toIndex}`,
-      );
-      set({ layers: newLayers, isDirty: true });
-    },
-
-    renameLayer: (layerId, name) => {
-      const { layers } = get();
-      const newLayers = layers.map((layer) =>
-        layer.id === layerId ? { ...layer, name } : layer,
-      );
-      console.log(
-        `[CANVAS_STORE] RENAME_LAYER - ${layerId} renamed to "${name}"`,
-      );
-      set({ layers: newLayers, isDirty: true });
-    },
 
     // Canvas capture
     setCaptureCanvas: (fn) => set({ captureCanvas: fn }),

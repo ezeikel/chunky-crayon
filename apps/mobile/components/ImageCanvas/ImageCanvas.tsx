@@ -76,6 +76,11 @@ import {
   isApplePencil,
   DEFAULT_PRESSURE,
 } from "@/utils/pressureUtils";
+import {
+  simplifyPath,
+  shouldSimplify,
+  DEFAULT_SIMPLIFICATION_TOLERANCE,
+} from "@/utils/pathSimplification";
 import MagicColorHint from "@/components/MagicColorHint";
 import { perfect } from "@/styles";
 import {
@@ -84,9 +89,9 @@ import {
   notifySuccess,
   brushHaptics,
 } from "@/utils/haptics";
-import { applySymmetryToPath } from "@/utils/symmetryUtils";
 
 import type { LayoutMode } from "@/utils/deviceUtils";
+import { getOptimalCanvasDimensions } from "@/hooks/useResponsiveLayout";
 
 type ImageCanvasProps = {
   coloringImage: ColoringImage;
@@ -109,14 +114,28 @@ const ImageCanvas = ({
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const svg = useSVG(coloringImage.svgUrl);
 
-  // Calculate canvas size based on available area or fallback to legacy calculation
+  // Calculate canvas dimensions based on available area or fallback to legacy calculation
   // Legacy: Account for horizontal padding (16px each side from scrollContent + 12px each side from canvasCard)
   const legacyCanvasSize = screenWidth - 32 - 24;
-  const canvasSize = canvasArea
-    ? Math.min(canvasArea.width, canvasArea.height)
-    : legacyCanvasSize;
 
   const [svgDimensions, setSvgDimensions] = useState<Dimension | null>(null);
+
+  // Calculate optimal canvas dimensions respecting SVG aspect ratio
+  const { canvasWidth, canvasHeight } = useMemo(() => {
+    if (canvasArea && svgDimensions) {
+      // Use optimal dimensions that respect SVG aspect ratio
+      const optimal = getOptimalCanvasDimensions(
+        svgDimensions.width,
+        svgDimensions.height,
+        canvasArea.width,
+        canvasArea.height,
+      );
+      return { canvasWidth: optimal.width, canvasHeight: optimal.height };
+    }
+    // Fallback to legacy square canvas
+    return { canvasWidth: legacyCanvasSize, canvasHeight: legacyCanvasSize };
+  }, [canvasArea, svgDimensions, legacyCanvasSize]);
+
   const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
   const isInitializedRef = useRef(false);
 
@@ -170,12 +189,10 @@ const ImageCanvas = ({
     advanceRainbowHue,
     setCaptureCanvas,
     reset,
-    symmetryMode,
-    layers,
   } = useCanvasStore();
 
   // Feature flags
-  const { texturedBrushes } = useFeatureStore();
+  const { texturedBrushes, pathSimplification } = useFeatureStore();
 
   // Sync haptics enabled state with mute setting
   useEffect(() => {
@@ -583,7 +600,7 @@ const ImageCanvas = ({
   const src = svgDimensions
     ? rect(0, 0, svgDimensions.width, svgDimensions.height)
     : rect(0, 0, 1024, 1024);
-  const dst = rect(0, 0, canvasSize, canvasSize);
+  const dst = rect(0, 0, canvasWidth, canvasHeight);
 
   const transform = useMemo(() => fitbox("contain", src, dst), [src, dst]);
 
@@ -592,14 +609,14 @@ const ImageCanvas = ({
     (touchX: number, touchY: number): { x: number; y: number } | null => {
       if (!svgDimensions) return null;
 
-      const scaleX = canvasSize / svgDimensions.width;
-      const scaleY = canvasSize / svgDimensions.height;
+      const scaleX = canvasWidth / svgDimensions.width;
+      const scaleY = canvasHeight / svgDimensions.height;
       const svgScale = Math.min(scaleX, scaleY);
 
       const scaledWidth = svgDimensions.width * svgScale;
       const scaledHeight = svgDimensions.height * svgScale;
-      const offsetX = (canvasSize - scaledWidth) / 2;
-      const offsetY = (canvasSize - scaledHeight) / 2;
+      const offsetX = (canvasWidth - scaledWidth) / 2;
+      const offsetY = (canvasHeight - scaledHeight) / 2;
 
       // Account for zoom/pan
       const adjustedX = (touchX - translateX) / scale;
@@ -610,7 +627,7 @@ const ImageCanvas = ({
 
       return { x: svgX, y: svgY };
     },
-    [svgDimensions, canvasSize, scale, translateX, translateY],
+    [svgDimensions, canvasWidth, canvasHeight, scale, translateX, translateY],
   );
 
   // Handle drawing stroke
@@ -689,39 +706,32 @@ const ImageCanvas = ({
         averagePressure,
       );
 
-      // Apply symmetry transforms to create mirrored copies
-      const centerX = svgDimensions.width / 2;
-      const centerY = svgDimensions.height / 2;
-      const symmetryPaths = applySymmetryToPath(
-        currentPath,
-        symmetryMode,
-        centerX,
-        centerY,
-      );
-
-      // Add an action for each symmetry copy (including original)
       // Generate a unique texture seed for this stroke
       const textureSeed = Math.random() * 1000;
 
-      symmetryPaths.forEach((path) => {
-        const action: DrawingAction = {
-          type: "stroke",
-          path,
-          color: strokeColor,
-          brushType,
-          strokeWidth,
-          startHue: brushType === "rainbow" ? rainbowHue : undefined,
-          // Store source dimensions for cross-platform sync
-          sourceWidth: svgDimensions.width,
-          sourceHeight: svgDimensions.height,
-          // Apple Pencil pressure sensitivity data
-          pressurePoints,
-          isStylus,
-          // Texture seed for deterministic texture rendering
-          textureSeed,
-        };
-        addAction(action);
-      });
+      // Apply path simplification if enabled (reduces points by 70-90% without visible quality loss)
+      const finalPath =
+        pathSimplification && shouldSimplify(currentPath)
+          ? simplifyPath(currentPath, DEFAULT_SIMPLIFICATION_TOLERANCE)
+          : currentPath;
+
+      const action: DrawingAction = {
+        type: "stroke",
+        path: finalPath,
+        color: strokeColor,
+        brushType,
+        strokeWidth,
+        startHue: brushType === "rainbow" ? rainbowHue : undefined,
+        // Store source dimensions for cross-platform sync
+        sourceWidth: svgDimensions.width,
+        sourceHeight: svgDimensions.height,
+        // Apple Pencil pressure sensitivity data
+        pressurePoints,
+        isStylus,
+        // Texture seed for deterministic texture rendering
+        textureSeed,
+      };
+      addAction(action);
 
       setCurrentPath(null);
 
@@ -745,7 +755,7 @@ const ImageCanvas = ({
     setScroll,
     advanceRainbowHue,
     svgDimensions,
-    symmetryMode,
+    pathSimplification,
   ]);
 
   // Handle fill tool tap
@@ -1034,10 +1044,10 @@ const ImageCanvas = ({
     ],
   }));
 
-  // Get visible actions based on history index (for undo/redo) and layer visibility
+  // Get visible actions based on history index (for undo/redo)
   const visibleActions = useMemo(() => {
-    return getVisibleActions(history, historyIndex, layers);
-  }, [history, historyIndex, layers]);
+    return getVisibleActions(history, historyIndex);
+  }, [history, historyIndex]);
 
   // Calculate current stroke width with pressure (for live preview while drawing)
   // This recalculates when currentPath changes (which happens on each move)
@@ -1254,8 +1264,8 @@ const ImageCanvas = ({
           className="bg-white rounded-lg overflow-hidden"
           style={[
             {
-              height: canvasSize,
-              width: canvasSize,
+              height: canvasHeight,
+              width: canvasWidth,
               ...perfect.boxShadow,
               ...style,
             },
@@ -1266,8 +1276,8 @@ const ImageCanvas = ({
             <Canvas
               ref={canvasRef}
               style={{
-                height: canvasSize,
-                width: canvasSize,
+                height: canvasHeight,
+                width: canvasWidth,
               }}
             >
               {/* White background for snapshot capture (JPEG doesn't support transparency) */}
@@ -1277,8 +1287,8 @@ const ImageCanvas = ({
                 <ImageSVG
                   x={0}
                   y={0}
-                  width={canvasSize}
-                  height={canvasSize}
+                  width={canvasWidth}
+                  height={canvasHeight}
                   svg={svg}
                 />
                 {/* Rendered paths */}
@@ -1341,8 +1351,8 @@ const ImageCanvas = ({
                 <ImageSVG
                   x={0}
                   y={0}
-                  width={canvasSize}
-                  height={canvasSize}
+                  width={canvasWidth}
+                  height={canvasHeight}
                   svg={svg}
                 />
               </Group>

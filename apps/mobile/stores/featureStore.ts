@@ -5,7 +5,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 /**
  * Feature flags for gradual rollout of tablet experience features.
  * All Phase 1 features default to ON after testing.
- * Phase 2 features default to OFF until stable.
  */
 
 export type FeatureState = {
@@ -18,16 +17,8 @@ export type FeatureState = {
   advancedGestures: boolean;
   /** Enable Douglas-Peucker path simplification */
   pathSimplification: boolean;
-
-  // Phase 2 features - Default OFF
-  /** Enable symmetry drawing mode */
-  symmetryMode: boolean;
-  /** Enable layers system (max 3 layers) */
-  layers: boolean;
   /** Enable texture-based brushes */
   texturedBrushes: boolean;
-  /** Enable two-finger rotation */
-  rotation: boolean;
 
   // User preferences
   /** Enable haptic feedback */
@@ -42,17 +33,12 @@ type FeatureActions = {
   setPressureSensitivity: (enabled: boolean) => void;
   setAdvancedGestures: (enabled: boolean) => void;
   setPathSimplification: (enabled: boolean) => void;
-  setSymmetryMode: (enabled: boolean) => void;
-  setLayers: (enabled: boolean) => void;
   setTexturedBrushes: (enabled: boolean) => void;
-  setRotation: (enabled: boolean) => void;
   setHapticsEnabled: (enabled: boolean) => void;
   setSideToolbarExpanded: (expanded: boolean) => void;
   toggleSideToolbar: () => void;
 
   // Bulk operations
-  enableAllPhase1: () => void;
-  enableAllPhase2: () => void;
   resetToDefaults: () => void;
 };
 
@@ -62,12 +48,7 @@ const initialState: FeatureState = {
   pressureSensitivity: true,
   advancedGestures: true,
   pathSimplification: true,
-
-  // Phase 2 - OFF by default
-  symmetryMode: false,
-  layers: false,
-  texturedBrushes: false,
-  rotation: false,
+  texturedBrushes: false, // OFF until tested
 
   // User preferences
   hapticsEnabled: true,
@@ -85,10 +66,7 @@ export const useFeatureStore = create<FeatureState & FeatureActions>()(
         set({ pressureSensitivity: enabled }),
       setAdvancedGestures: (enabled) => set({ advancedGestures: enabled }),
       setPathSimplification: (enabled) => set({ pathSimplification: enabled }),
-      setSymmetryMode: (enabled) => set({ symmetryMode: enabled }),
-      setLayers: (enabled) => set({ layers: enabled }),
       setTexturedBrushes: (enabled) => set({ texturedBrushes: enabled }),
-      setRotation: (enabled) => set({ rotation: enabled }),
       setHapticsEnabled: (enabled) => set({ hapticsEnabled: enabled }),
       setSideToolbarExpanded: (expanded) =>
         set({ sideToolbarExpanded: expanded }),
@@ -96,20 +74,6 @@ export const useFeatureStore = create<FeatureState & FeatureActions>()(
         set((state) => ({ sideToolbarExpanded: !state.sideToolbarExpanded })),
 
       // Bulk operations
-      enableAllPhase1: () =>
-        set({
-          responsiveLayout: true,
-          pressureSensitivity: true,
-          advancedGestures: true,
-          pathSimplification: true,
-        }),
-      enableAllPhase2: () =>
-        set({
-          symmetryMode: true,
-          layers: true,
-          texturedBrushes: true,
-          rotation: true,
-        }),
       resetToDefaults: () => set(initialState),
     }),
     {

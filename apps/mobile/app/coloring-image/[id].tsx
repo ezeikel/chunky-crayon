@@ -7,18 +7,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChevronLeft, faStar } from "@fortawesome/pro-solid-svg-icons";
 import ImageCanvas from "@/components/ImageCanvas/ImageCanvas";
 import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColoringToolbar";
-import SideToolbar from "@/components/MobileColoringToolbar/SideToolbar";
+import ColorPaletteSidebar from "@/components/ColorPaletteSidebar/ColorPaletteSidebar";
+import ToolsSidebar from "@/components/ToolsSidebar/ToolsSidebar";
 import ActionModal from "@/components/ActionModal/ActionModal";
 import ZoomControls from "@/components/ZoomControls/ZoomControls";
 import MuteToggle from "@/components/MuteToggle/MuteToggle";
 import ProgressIndicator from "@/components/ProgressIndicator/ProgressIndicator";
-import ColorPaletteBar from "@/components/ColorPaletteBar/ColorPaletteBar";
 import useColoringImage from "@/hooks/api/useColoringImage";
 import Loading from "@/components/Loading/Loading";
 import { tapLight } from "@/utils/haptics";
 import { debugCanvasStorage } from "@/utils/canvasPersistence";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
-import { HEADER } from "@/constants/Sizes";
+import { useCanvasStore } from "@/stores/canvasStore";
 
 const ColoringImage = () => {
   const { id } = useLocalSearchParams();
@@ -33,12 +33,24 @@ const ColoringImage = () => {
     layoutMode,
     useSideToolbar,
     useCompactHeader,
-    toolbarCollapsible,
-    sideToolbarExpanded,
-    headerHeight,
-    touchTargetSize,
     canvasArea,
+    landscapeLayout,
   } = useResponsiveLayout();
+
+  // Get zoom state and actions from canvas store
+  const { scale, setScale, resetTransform } = useCanvasStore();
+
+  const handleZoomIn = useCallback(() => {
+    setScale(scale * 1.2);
+  }, [scale, setScale]);
+
+  const handleZoomOut = useCallback(() => {
+    setScale(scale / 1.2);
+  }, [scale, setScale]);
+
+  const handleResetZoom = useCallback(() => {
+    resetTransform();
+  }, [resetTransform]);
 
   // Debug storage on mount
   useEffect(() => {
@@ -84,7 +96,11 @@ const ColoringImage = () => {
           style={[
             styles.header,
             useCompactHeader && styles.headerCompact,
-            { paddingTop: insets.top + (useCompactHeader ? 4 : 8) },
+            {
+              paddingTop: insets.top + (useCompactHeader ? 4 : 8),
+              paddingLeft: insets.left + 8,
+              paddingRight: insets.right + 8,
+            },
           ]}
         >
           {/* Back button */}
@@ -112,13 +128,17 @@ const ColoringImage = () => {
             </View>
           )}
 
-          {/* Canvas Controls - In header for landscape, separate row for portrait */}
+          {/* Spacer for landscape - controls go in middle, done button at end */}
           {isLandscapeLayout && (
-            <View style={styles.headerControls}>
-              <ProgressIndicator />
-              <MuteToggle />
-              <ZoomControls />
-            </View>
+            <>
+              <View style={{ flex: 1 }} />
+              {/* Controls in header for landscape */}
+              <View style={styles.landscapeHeaderControls}>
+                <ProgressIndicator />
+                <MuteToggle />
+              </View>
+              <View style={{ flex: 1 }} />
+            </>
           )}
 
           {/* Done button */}
@@ -150,27 +170,15 @@ const ColoringImage = () => {
 
         {/* Main Content Area */}
         <View style={styles.mainContent}>
-          {/* Side Toolbar for landscape modes */}
-          {useSideToolbar && (
-            <SideToolbar
-              collapsible={toolbarCollapsible}
-              buttonSize={touchTargetSize.medium}
-            />
-          )}
+          {/* Three-panel landscape layout: Colors | Canvas | Tools */}
+          {isLandscapeLayout && landscapeLayout ? (
+            <>
+              {/* Left Sidebar - Color Palette */}
+              <ColorPaletteSidebar width={landscapeLayout.leftSidebarWidth} />
 
-          {/* Canvas Area */}
-          <View style={styles.canvasWrapper}>
-            <ScrollView
-              style={styles.scrollView}
-              contentContainerStyle={[
-                styles.scrollContent,
-                isLandscapeLayout && styles.scrollContentLandscape,
-              ]}
-              scrollEnabled={scroll}
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.canvasContainer}>
-                <View style={styles.canvasCard}>
+              {/* Center - Canvas */}
+              <View style={styles.canvasCenter}>
+                <View style={styles.canvasCardLandscape}>
                   <ImageCanvas
                     coloringImage={coloringImage}
                     setScroll={setScroll}
@@ -179,11 +187,38 @@ const ColoringImage = () => {
                   />
                 </View>
               </View>
-            </ScrollView>
 
-            {/* Color Palette Bar for landscape modes */}
-            {isLandscapeLayout && <ColorPaletteBar />}
-          </View>
+              {/* Right Sidebar - Tools */}
+              <ToolsSidebar
+                width={landscapeLayout.rightSidebarWidth}
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onResetZoom={handleResetZoom}
+                zoom={scale}
+              />
+            </>
+          ) : (
+            /* Portrait layout - Canvas with bottom toolbar */
+            <View style={styles.canvasWrapper}>
+              <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                scrollEnabled={scroll}
+                showsVerticalScrollIndicator={false}
+              >
+                <View style={styles.canvasContainer}>
+                  <View style={styles.canvasCard}>
+                    <ImageCanvas
+                      coloringImage={coloringImage}
+                      setScroll={setScroll}
+                      canvasArea={canvasArea}
+                      layoutMode={layoutMode}
+                    />
+                  </View>
+                </View>
+              </ScrollView>
+            </View>
+          )}
         </View>
 
         {/* Action Modal */}
@@ -207,7 +242,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
     paddingBottom: 12,
     flexDirection: "row",
     alignItems: "flex-start",
@@ -263,6 +297,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
+  landscapeHeaderControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
   mainContent: {
     flex: 1,
     flexDirection: "row",
@@ -279,15 +318,34 @@ const styles = StyleSheet.create({
     paddingBottom: 180,
   },
   scrollContentLandscape: {
-    paddingBottom: 16,
-    paddingHorizontal: 12,
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 8,
   },
   canvasContainer: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
   },
   canvasCard: {
     width: "100%",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: 20,
+    padding: 12,
+    shadowColor: "#E46444",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  canvasCenter: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  canvasCardLandscape: {
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderRadius: 20,
     padding: 12,

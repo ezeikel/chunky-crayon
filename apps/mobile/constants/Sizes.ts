@@ -38,13 +38,66 @@ export const TOOLBAR = {
   bottomCollapsed: 140,
   /** Bottom toolbar expanded height (phone portrait) */
   bottomExpanded: 380,
-  /** Side toolbar width (tablet landscape) */
+  /** Side toolbar width (tablet landscape) - used as minimum */
   sideWidth: 120,
   /** Side toolbar collapsed width (phone landscape) */
   sideCollapsed: 64,
   /** Color palette bar height */
   paletteHeight: 80,
+  /** Minimum sidebar width (phone landscape) */
+  minSidebarWidth: 80,
+  /** Maximum sidebar width (tablet landscape) */
+  maxSidebarWidth: 200,
 } as const;
+
+/**
+ * Calculate dynamic sidebar widths for landscape three-panel layout.
+ * Canvas is always square, sidebars split remaining horizontal space equally.
+ *
+ * Layout: [Left Sidebar] [Canvas] [Right Sidebar]
+ */
+export const getLandscapeSidebarWidths = (
+  screenWidth: number,
+  screenHeight: number,
+  leftInset: number = 0,
+  rightInset: number = 0,
+): { leftWidth: number; rightWidth: number; canvasSize: number } => {
+  // Canvas is square, sized to fit available height (minus header and bottom padding)
+  const headerHeight = HEADER.compact;
+  const bottomPadding = 16; // Minimal bottom margin
+  const topPadding = 8;
+  const canvasVerticalPadding = 16; // Padding around canvas card
+
+  const availableHeight =
+    screenHeight -
+    headerHeight -
+    bottomPadding -
+    topPadding -
+    canvasVerticalPadding * 2;
+  const canvasSize = Math.floor(availableHeight);
+
+  // Remaining horizontal space split between sidebars
+  const horizontalPadding = 8; // Small padding between canvas and sidebars
+  const remainingWidth = screenWidth - canvasSize - horizontalPadding * 2;
+
+  // Each sidebar gets half, accounting for safe area insets
+  const leftWidth = Math.max(
+    TOOLBAR.minSidebarWidth,
+    Math.min(
+      TOOLBAR.maxSidebarWidth,
+      Math.floor(remainingWidth / 2) + leftInset,
+    ),
+  );
+  const rightWidth = Math.max(
+    TOOLBAR.minSidebarWidth,
+    Math.min(
+      TOOLBAR.maxSidebarWidth,
+      Math.floor(remainingWidth / 2) + rightInset,
+    ),
+  );
+
+  return { leftWidth, rightWidth, canvasSize };
+};
 
 // Canvas padding and margins
 export const CANVAS = {

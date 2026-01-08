@@ -1,12 +1,5 @@
-import { useCallback, useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Animated,
-} from "react-native";
+import { useCallback } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -32,10 +25,6 @@ import {
   BrushType,
   MagicMode,
 } from "@/stores/canvasStore";
-import {
-  SYMMETRY_MODE_ICONS,
-  SYMMETRY_MODE_LABELS,
-} from "@/utils/symmetryUtils";
 import { useFeatureStore } from "@/stores/featureStore";
 import { tapLight, tapMedium, notifyWarning } from "@/utils/haptics";
 import { TOOLBAR } from "@/constants/Sizes";
@@ -141,8 +130,6 @@ const SideToolbar = ({
     redo,
     canUndo,
     canRedo,
-    symmetryMode,
-    cycleSymmetryMode,
   } = useCanvasStore();
 
   const handleToolSelect = useCallback(
@@ -241,39 +228,6 @@ const SideToolbar = ({
           </Pressable>
         ))}
       </ScrollView>
-
-      {/* Symmetry toggle (when brush tool is selected) */}
-      {selectedTool === "brush" && (
-        <Pressable
-          onPress={() => {
-            tapLight();
-            cycleSymmetryMode();
-          }}
-          style={[
-            styles.symmetryButton,
-            {
-              width: isExpanded ? buttonSize : buttonSize - 8,
-              minHeight: isExpanded ? buttonSize : buttonSize - 8,
-            },
-            symmetryMode !== "none" && styles.symmetryButtonActive,
-          ]}
-        >
-          <Text style={styles.symmetryIcon}>
-            {SYMMETRY_MODE_ICONS[symmetryMode]}
-          </Text>
-          {isExpanded && (
-            <Text
-              style={[
-                styles.symmetryLabel,
-                symmetryMode !== "none" && styles.symmetryLabelActive,
-              ]}
-              numberOfLines={1}
-            >
-              {SYMMETRY_MODE_LABELS[symmetryMode]}
-            </Text>
-          )}
-        </Pressable>
-      )}
 
       {/* Undo/Redo at bottom */}
       <View style={styles.historySection}>
@@ -394,31 +348,6 @@ const styles = StyleSheet.create({
   },
   historyButtonDisabled: {
     opacity: 0.5,
-  },
-  symmetryButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 12,
-    backgroundColor: "#F3F4F6",
-    gap: 2,
-    marginTop: 8,
-    paddingVertical: 4,
-  },
-  symmetryButtonActive: {
-    backgroundColor: "#E46444",
-  },
-  symmetryIcon: {
-    fontSize: 16,
-  },
-  symmetryLabel: {
-    fontSize: 8,
-    fontFamily: "RooneySans-Regular",
-    color: "#4B5563",
-    textAlign: "center",
-  },
-  symmetryLabelActive: {
-    color: "#FFFFFF",
-    fontWeight: "bold",
   },
 });
 

@@ -159,7 +159,25 @@ const uploadToTempStorage = async (
     // save the image to blob storage temporarily
     const { url } = await put(tempFileName, imageBuffer, {
       access: 'public',
+      contentType: 'image/jpeg',
     });
+
+    console.log(
+      `[${platform}] Uploaded temp image: ${url} (${imageBuffer.length} bytes)`,
+    );
+
+    // Verify the upload is accessible before returning
+    try {
+      const verifyResponse = await fetch(url, { method: 'HEAD' });
+      console.log(
+        `[${platform}] Verify upload - Status: ${verifyResponse.status}, Content-Type: ${verifyResponse.headers.get('content-type')}`,
+      );
+    } catch (verifyError) {
+      console.error(
+        `[${platform}] Warning: Could not verify upload:`,
+        verifyError,
+      );
+    }
 
     return url;
   } catch (error) {
@@ -188,8 +206,15 @@ const createInstagramMediaContainer = async (
   );
 
   const data = await response.json();
+
+  // Log the full response for debugging
+  console.log('[Instagram] Media container response:', JSON.stringify(data));
+
   if (!data.id) {
-    throw new Error('failed to create Instagram media container');
+    console.error('[Instagram] Media container error - full response:', data);
+    throw new Error(
+      `failed to create Instagram media container: ${JSON.stringify(data)}`,
+    );
   }
   return data.id;
 };
@@ -382,7 +407,9 @@ const publishInstagramMedia = async (creationId: string) => {
 
   if (!data.id) {
     console.error('[Instagram] Publish error - full response:', data);
-    throw new Error(`failed to publish Instagram media: ${JSON.stringify(data)}`);
+    throw new Error(
+      `failed to publish Instagram media: ${JSON.stringify(data)}`,
+    );
   }
   return data.id;
 };
@@ -439,7 +466,9 @@ const postVideoToFacebookPage = async (
   const data = await response.json();
   if (!data.id) {
     console.error('Facebook video API response:', data);
-    throw new Error(`Failed to post video to Facebook: ${JSON.stringify(data)}`);
+    throw new Error(
+      `Failed to post video to Facebook: ${JSON.stringify(data)}`,
+    );
   }
   return data.id;
 };
@@ -656,7 +685,8 @@ const handleRequest = async (request: Request) => {
           console.log('[Instagram] Carousel container created:', carouselId);
 
           // Wait for carousel to be ready (Instagram needs time to stitch media)
-          await waitForMediaReady(carouselId, 10, 2000);
+          // Use longer timeout since carousel contains video that may still be processing
+          await waitForMediaReady(carouselId, 20, 3000);
 
           // Publish carousel
           instagramMediaId = await publishInstagramMedia(carouselId);
@@ -764,7 +794,10 @@ const handleRequest = async (request: Request) => {
           );
 
           results.facebook = facebookVideoId;
-          console.log('Successfully posted video to Facebook:', facebookVideoId);
+          console.log(
+            'Successfully posted video to Facebook:',
+            facebookVideoId,
+          );
         } catch (error) {
           console.error('Error posting video to Facebook:', error);
           results.errors.push(
