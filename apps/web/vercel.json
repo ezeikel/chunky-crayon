@@ -21,12 +21,36 @@
       "schedule": "10 8 * * *"
     },
     {
-      "path": "/api/social/post",
+      "path": "/api/social/post?platform=instagram&type=carousel",
       "schedule": "0 16 * * 1-5"
     },
     {
-      "path": "/api/social/post",
+      "path": "/api/social/post?platform=instagram&type=reel",
+      "schedule": "5 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?platform=facebook",
+      "schedule": "10 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?platform=pinterest",
+      "schedule": "12 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?platform=instagram&type=carousel",
       "schedule": "0 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?platform=instagram&type=reel",
+      "schedule": "5 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?platform=facebook",
+      "schedule": "10 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?platform=pinterest",
+      "schedule": "12 15 * * 0,6"
     },
     {
       "path": "/api/admin/tokens",

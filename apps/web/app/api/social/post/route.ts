@@ -549,6 +549,7 @@ const handleRequest = async (request: Request) => {
     const url = new URL(request.url);
     let coloringImageId = url.searchParams.get('coloring_image_id');
     const platformFilter = url.searchParams.get('platform'); // optional: 'instagram', 'facebook', 'pinterest'
+    const typeFilter = url.searchParams.get('type'); // optional: 'carousel', 'reel' (Instagram only)
 
     // if POST request, also check request body
     if (!coloringImageId && request.method === 'POST') {
@@ -562,6 +563,11 @@ const handleRequest = async (request: Request) => {
 
     const shouldPost = (platform: string) =>
       !platformFilter || platformFilter === platform;
+
+    // For Instagram, allow filtering by post type (carousel vs reel)
+    // This enables splitting into separate cron jobs to avoid timeout
+    const shouldPostInstagramType = (type: 'carousel' | 'reel') =>
+      !typeFilter || typeFilter === type;
 
     let coloringImage;
 
@@ -603,125 +609,146 @@ const handleRequest = async (request: Request) => {
 
     // post to Instagram
     if (shouldPost('instagram')) {
-      // convert svg to jpeg for Instagram
-      const instagramBuffer = await convertSvgToJpeg(
-        coloringImage.svgUrl,
-        'instagram',
-      );
+      // Only prepare image assets if we're posting carousel (or no type filter)
+      const needsImageAsset = shouldPostInstagramType('carousel');
 
-      // upload to temporary storage
-      const instagramImageUrl = await uploadToTempStorage(
-        instagramBuffer,
-        'instagram',
-      );
-      tempFiles.push(instagramImageUrl.split('/').pop() || '');
+      let instagramImageUrl: string | null = null;
+
+      if (needsImageAsset) {
+        // convert svg to jpeg for Instagram
+        const instagramBuffer = await convertSvgToJpeg(
+          coloringImage.svgUrl,
+          'instagram',
+        );
+
+        // upload to temporary storage
+        instagramImageUrl = await uploadToTempStorage(
+          instagramBuffer,
+          'instagram',
+        );
+        tempFiles.push(instagramImageUrl.split('/').pop() || '');
+      }
 
       // Post 1: Carousel (if we have animation) or single image
-      try {
-        let instagramMediaId: string;
+      if (shouldPostInstagramType('carousel')) {
+        try {
+          let instagramMediaId: string;
 
-        if (coloringImage.animationUrl) {
-          console.log('[Instagram] Creating carousel...');
+          if (coloringImage.animationUrl) {
+            console.log('[Instagram] Creating carousel...');
 
-          // Check for optional colored example from configured user's saved artwork
-          const coloredExampleUrl = await getColoredExampleUrl(
-            coloringImage.id,
-          );
-          const hasColoredExample = !!coloredExampleUrl;
-
-          // Generate caption with correct post type based on slides
-          const carouselPostType: InstagramPostType = hasColoredExample
-            ? 'carousel_with_colored'
-            : 'carousel';
-          const instagramCaption = await generateInstagramCaption(
-            coloringImage,
-            carouselPostType,
-          );
-
-          if (!instagramCaption) {
-            throw new Error('failed to generate Instagram caption');
-          }
-
-          // Build carousel slides array
-          const carouselChildren: string[] = [];
-
-          // Slide 1: Static B&W coloring page (what they download)
-          const imageContainerId =
-            await createInstagramImageContainerForCarousel(instagramImageUrl);
-          console.log('[Instagram] Image container created:', imageContainerId);
-          carouselChildren.push(imageContainerId);
-
-          // Slide 2: Animated video (the magic)
-          const videoContainerId = await createInstagramVideoContainer(
-            coloringImage.animationUrl,
-          );
-          console.log('[Instagram] Video container created:', videoContainerId);
-
-          // Wait for video to process
-          await waitForMediaReady(videoContainerId);
-          carouselChildren.push(videoContainerId);
-
-          // Slide 3 (optional): Colored example as finale (what it could look like)
-          if (coloredExampleUrl) {
-            console.log('[Instagram] Adding colored example as final slide...');
-            const coloredContainerId =
-              await createInstagramImageContainerForCarousel(coloredExampleUrl);
-            console.log(
-              '[Instagram] Colored example container created:',
-              coloredContainerId,
+            // Check for optional colored example from configured user's saved artwork
+            const coloredExampleUrl = await getColoredExampleUrl(
+              coloringImage.id,
             );
-            carouselChildren.push(coloredContainerId);
+            const hasColoredExample = !!coloredExampleUrl;
+
+            // Generate caption with correct post type based on slides
+            const carouselPostType: InstagramPostType = hasColoredExample
+              ? 'carousel_with_colored'
+              : 'carousel';
+            const instagramCaption = await generateInstagramCaption(
+              coloringImage,
+              carouselPostType,
+            );
+
+            if (!instagramCaption) {
+              throw new Error('failed to generate Instagram caption');
+            }
+
+            // Build carousel slides array
+            const carouselChildren: string[] = [];
+
+            // Slide 1: Static B&W coloring page (what they download)
+            const imageContainerId =
+              await createInstagramImageContainerForCarousel(
+                instagramImageUrl!,
+              );
+            console.log(
+              '[Instagram] Image container created:',
+              imageContainerId,
+            );
+            carouselChildren.push(imageContainerId);
+
+            // Slide 2: Animated video (the magic)
+            const videoContainerId = await createInstagramVideoContainer(
+              coloringImage.animationUrl,
+            );
+            console.log(
+              '[Instagram] Video container created:',
+              videoContainerId,
+            );
+
+            // Wait for video to process
+            await waitForMediaReady(videoContainerId);
+            carouselChildren.push(videoContainerId);
+
+            // Slide 3 (optional): Colored example as finale (what it could look like)
+            if (coloredExampleUrl) {
+              console.log(
+                '[Instagram] Adding colored example as final slide...',
+              );
+              const coloredContainerId =
+                await createInstagramImageContainerForCarousel(
+                  coloredExampleUrl,
+                );
+              console.log(
+                '[Instagram] Colored example container created:',
+                coloredContainerId,
+              );
+              carouselChildren.push(coloredContainerId);
+            }
+
+            console.log(
+              `[Instagram] Creating ${carouselChildren.length}-slide carousel...`,
+            );
+
+            // Create carousel container with all slides
+            const carouselId = await createInstagramCarouselContainer(
+              carouselChildren,
+              instagramCaption,
+            );
+            console.log('[Instagram] Carousel container created:', carouselId);
+
+            // Wait for carousel to be ready (Instagram needs time to stitch media)
+            // Use longer timeout since carousel contains video that may still be processing
+            await waitForMediaReady(carouselId, 20, 3000);
+
+            // Publish carousel
+            instagramMediaId = await publishInstagramMedia(carouselId);
+            console.log('[Instagram] Carousel published:', instagramMediaId);
+          } else {
+            // Single image post (no animation)
+            console.log('[Instagram] No animation, posting single image...');
+
+            const instagramCaption = await generateInstagramCaption(
+              coloringImage,
+              'image',
+            );
+
+            if (!instagramCaption) {
+              throw new Error('failed to generate Instagram caption');
+            }
+
+            const creationId = await createInstagramMediaContainer(
+              instagramImageUrl!,
+              instagramCaption,
+            );
+            instagramMediaId = await publishInstagramMedia(creationId);
           }
 
-          console.log(
-            `[Instagram] Creating ${carouselChildren.length}-slide carousel...`,
+          results.instagram = instagramMediaId;
+          console.log('Successfully posted to Instagram:', instagramMediaId);
+        } catch (error) {
+          console.error('Error posting to Instagram:', error);
+          results.errors.push(
+            `Instagram: ${error instanceof Error ? error.message : 'Unknown error'}`,
           );
-
-          // Create carousel container with all slides
-          const carouselId = await createInstagramCarouselContainer(
-            carouselChildren,
-            instagramCaption,
-          );
-          console.log('[Instagram] Carousel container created:', carouselId);
-
-          // Wait for carousel to be ready (Instagram needs time to stitch media)
-          // Use longer timeout since carousel contains video that may still be processing
-          await waitForMediaReady(carouselId, 20, 3000);
-
-          // Publish carousel
-          instagramMediaId = await publishInstagramMedia(carouselId);
-          console.log('[Instagram] Carousel published:', instagramMediaId);
-        } else {
-          // Single image post (no animation)
-          console.log('[Instagram] No animation, posting single image...');
-
-          const instagramCaption = await generateInstagramCaption(
-            coloringImage,
-            'image',
-          );
-
-          if (!instagramCaption) {
-            throw new Error('failed to generate Instagram caption');
-          }
-
-          const creationId = await createInstagramMediaContainer(
-            instagramImageUrl,
-            instagramCaption,
-          );
-          instagramMediaId = await publishInstagramMedia(creationId);
         }
-
-        results.instagram = instagramMediaId;
-        console.log('Successfully posted to Instagram:', instagramMediaId);
-      } catch (error) {
-        console.error('Error posting to Instagram:', error);
-        results.errors.push(
-          `Instagram: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
       }
 
       // Post 2: Reel (if we have animation) - for algorithm reach/discovery
-      if (coloringImage.animationUrl) {
+      if (shouldPostInstagramType('reel') && coloringImage.animationUrl) {
         try {
           console.log('[Instagram] Creating Reel for discovery...');
 
