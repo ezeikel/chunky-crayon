@@ -28,12 +28,12 @@ async function convertSvgToPng(svgUrl: string): Promise<string> {
   const svgResponse = await fetch(svgUrl);
   const svgBuffer = Buffer.from(await svgResponse.arrayBuffer());
 
-  // Convert to PNG at 1080x1080 (square for social media)
+  // Convert to PNG at 1080x1920 (9:16 vertical for Instagram Reels)
   const pngBuffer = await sharp(svgBuffer)
     .flatten({ background: '#ffffff' })
-    .resize(1080, 1080, {
-      fit: 'contain',
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
+    .resize(1080, 1920, {
+      fit: 'cover',
+      position: 'center',
     })
     .png({ quality: 95 })
     .toBuffer();
@@ -62,7 +62,10 @@ async function generateAnimationPrompt(
 
     return text.trim() || DEFAULT_ANIMATION_PROMPT;
   } catch (error) {
-    console.error('[Animate] Failed to generate custom prompt, using default:', error);
+    console.error(
+      '[Animate] Failed to generate custom prompt, using default:',
+      error,
+    );
     return DEFAULT_ANIMATION_PROMPT;
   }
 }
@@ -182,7 +185,9 @@ const handleRequest = async (request: NextRequest) => {
       console.log('[Animate] Using stored animation prompt (image-specific)');
       animationPrompt = coloringImage.animationPrompt;
     } else {
-      console.log('[Animate] No stored prompt, generating from metadata (fallback)...');
+      console.log(
+        '[Animate] No stored prompt, generating from metadata (fallback)...',
+      );
       animationPrompt = await generateAnimationPrompt(
         coloringImage.title,
         coloringImage.description,
@@ -193,7 +198,10 @@ const handleRequest = async (request: NextRequest) => {
 
     // Step 3: Generate video using Veo 3
     console.log('[Animate] Generating video with Veo 3...');
-    const videoResult = await generateAnimationFromImage(pngUrl, animationPrompt);
+    const videoResult = await generateAnimationFromImage(
+      pngUrl,
+      animationPrompt,
+    );
 
     // Step 4: Update the coloring image with the animation URL
     const updatedImage = await db.coloringImage.update({

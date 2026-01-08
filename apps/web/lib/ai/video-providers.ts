@@ -72,7 +72,7 @@ export async function generateAnimationFromImage(
               prompt: animationPrompt,
               image: {
                 bytesBase64Encoded: await fetchImageAsBase64(imageUrl),
-                mimeType: 'image/webp',
+                mimeType: 'image/png',
               },
             },
           ],
