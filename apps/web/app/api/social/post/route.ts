@@ -629,27 +629,27 @@ const handleRequest = async (request: Request) => {
         tempFiles.push(instagramImageUrl.split('/').pop() || '');
       }
 
-      // Post 1: Carousel (if we have animation) or single image
+      // Post 1: Image post (single image or carousel with colored example)
+      // Video is handled separately as a Reel for proper 9:16 display
       if (shouldPostInstagramType('carousel')) {
         try {
           let instagramMediaId: string;
 
-          if (coloringImage.animationUrl) {
-            console.log('[Instagram] Creating carousel...');
+          // Check for optional colored example from configured user's saved artwork
+          const coloredExampleUrl = await getColoredExampleUrl(
+            coloringImage.id,
+          );
+          const hasColoredExample = !!coloredExampleUrl;
 
-            // Check for optional colored example from configured user's saved artwork
-            const coloredExampleUrl = await getColoredExampleUrl(
-              coloringImage.id,
+          if (hasColoredExample) {
+            // Carousel: B&W image + colored example (2 slides)
+            console.log(
+              '[Instagram] Creating carousel with colored example...',
             );
-            const hasColoredExample = !!coloredExampleUrl;
 
-            // Generate caption with correct post type based on slides
-            const carouselPostType: InstagramPostType = hasColoredExample
-              ? 'carousel_with_colored'
-              : 'carousel';
             const instagramCaption = await generateInstagramCaption(
               coloringImage,
-              carouselPostType,
+              'carousel_with_colored',
             );
 
             if (!instagramCaption) {
@@ -659,7 +659,7 @@ const handleRequest = async (request: Request) => {
             // Build carousel slides array
             const carouselChildren: string[] = [];
 
-            // Slide 1: Static B&W coloring page (what they download)
+            // Slide 1: Static B&W coloring page
             const imageContainerId =
               await createInstagramImageContainerForCarousel(
                 instagramImageUrl!,
@@ -670,56 +670,34 @@ const handleRequest = async (request: Request) => {
             );
             carouselChildren.push(imageContainerId);
 
-            // Slide 2: Animated video (the magic)
-            const videoContainerId = await createInstagramVideoContainer(
-              coloringImage.animationUrl,
-            );
+            // Slide 2: Colored example
+            console.log('[Instagram] Adding colored example...');
+            const coloredContainerId =
+              await createInstagramImageContainerForCarousel(coloredExampleUrl);
             console.log(
-              '[Instagram] Video container created:',
-              videoContainerId,
+              '[Instagram] Colored example container created:',
+              coloredContainerId,
             );
+            carouselChildren.push(coloredContainerId);
 
-            // Wait for video to process
-            await waitForMediaReady(videoContainerId);
-            carouselChildren.push(videoContainerId);
+            console.log('[Instagram] Creating 2-slide carousel...');
 
-            // Slide 3 (optional): Colored example as finale (what it could look like)
-            if (coloredExampleUrl) {
-              console.log(
-                '[Instagram] Adding colored example as final slide...',
-              );
-              const coloredContainerId =
-                await createInstagramImageContainerForCarousel(
-                  coloredExampleUrl,
-                );
-              console.log(
-                '[Instagram] Colored example container created:',
-                coloredContainerId,
-              );
-              carouselChildren.push(coloredContainerId);
-            }
-
-            console.log(
-              `[Instagram] Creating ${carouselChildren.length}-slide carousel...`,
-            );
-
-            // Create carousel container with all slides
+            // Create carousel container
             const carouselId = await createInstagramCarouselContainer(
               carouselChildren,
               instagramCaption,
             );
             console.log('[Instagram] Carousel container created:', carouselId);
 
-            // Wait for carousel to be ready (Instagram needs time to stitch media)
-            // Use longer timeout since carousel contains video that may still be processing
+            // Wait for carousel to be ready
             await waitForMediaReady(carouselId, 20, 3000);
 
             // Publish carousel
             instagramMediaId = await publishInstagramMedia(carouselId);
             console.log('[Instagram] Carousel published:', instagramMediaId);
           } else {
-            // Single image post (no animation)
-            console.log('[Instagram] No animation, posting single image...');
+            // Single image post (no colored example)
+            console.log('[Instagram] Posting single image...');
 
             const instagramCaption = await generateInstagramCaption(
               coloringImage,
