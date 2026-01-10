@@ -14,6 +14,17 @@ import {
 export const maxDuration = 180; // Increased for carousel creation
 
 /**
+ * Get Pinterest API base URL.
+ * Uses sandbox for Trial access apps, production for Standard access.
+ */
+const getPinterestApiUrl = () => {
+  const useSandbox = process.env.PINTEREST_USE_SANDBOX === 'true';
+  return useSandbox
+    ? 'https://api-sandbox.pinterest.com'
+    : 'https://api.pinterest.com';
+};
+
+/**
  * Fetch with configurable timeout to prevent connection hanging.
  * Default timeout is 30 seconds, which is more generous than Node's default 10s.
  */
@@ -492,6 +503,205 @@ const getPinterestAccessToken = async (): Promise<string> => {
   throw new Error('Pinterest access token not configured');
 };
 
+/**
+ * Create a 9:16 cover image from the SVG for Pinterest video pins.
+ * Pinterest requires a cover image for video pins.
+ */
+const createPinterestVideoCoverImage = async (
+  svgUrl: string,
+): Promise<string> => {
+  console.log('[Pinterest Video] Creating cover image from SVG...');
+
+  const svgResponse = await fetch(svgUrl);
+  const svgBuffer = Buffer.from(await svgResponse.arrayBuffer());
+
+  // Convert to 9:16 vertical (same as video)
+  const coverBuffer = await sharp(svgBuffer)
+    .flatten({ background: '#ffffff' })
+    .resize(1080, 1920, {
+      fit: 'cover',
+      position: 'center',
+    })
+    .jpeg({ quality: 90 })
+    .toBuffer();
+
+  const tempFileName = `temp/social/pinterest/${Date.now()}-cover.jpg`;
+  const { url } = await put(tempFileName, coverBuffer, {
+    access: 'public',
+    contentType: 'image/jpeg',
+  });
+
+  console.log('[Pinterest Video] Cover image created:', url);
+  return url;
+};
+
+/**
+ * Poll for Pinterest video media upload status.
+ * Pinterest processes videos asynchronously.
+ */
+const pollPinterestMediaStatus = async (
+  accessToken: string,
+  mediaId: string,
+  maxAttempts = 60,
+  intervalMs = 5000,
+): Promise<void> => {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const response = await fetch(
+      `${getPinterestApiUrl()}/v5/media/${mediaId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    const data = await response.json();
+    console.log(
+      `[Pinterest Video] Media status (attempt ${attempt + 1}):`,
+      data.status,
+    );
+
+    if (data.status === 'succeeded') {
+      return;
+    }
+
+    if (data.status === 'failed') {
+      throw new Error(
+        `Pinterest media processing failed: ${data.failure_code || 'Unknown error'}`,
+      );
+    }
+
+    // Wait before next poll
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error('Pinterest media processing timed out');
+};
+
+/**
+ * Post a video pin to Pinterest.
+ *
+ * Pinterest Video Pin Creation Flow:
+ * 1. Register media upload (declare intent to upload video)
+ * 2. Upload video file to the provided upload URL
+ * 3. Wait for media processing to complete
+ * 4. Create pin with the processed video
+ */
+const postVideoToPinterest = async (
+  videoUrl: string,
+  coverImageUrl: string,
+  title: string,
+  description: string,
+  coloringImageId: string,
+  boardId: string,
+): Promise<string> => {
+  const accessToken = await getPinterestAccessToken();
+
+  console.log('[Pinterest Video] Starting video pin creation...');
+
+  // Step 1: Register media upload
+  console.log('[Pinterest Video] Step 1: Registering media upload...');
+  const registerResponse = await fetch(`${getPinterestApiUrl()}/v5/media`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      media_type: 'video',
+    }),
+  });
+
+  const registerData = await registerResponse.json();
+
+  if (!registerResponse.ok) {
+    console.error('[Pinterest Video] Media register failed:', registerData);
+    throw new Error(
+      `Pinterest media registration failed: ${JSON.stringify(registerData)}`,
+    );
+  }
+
+  const { media_id, upload_url, upload_parameters } = registerData;
+  console.log('[Pinterest Video] Media ID:', media_id);
+
+  // Step 2: Upload video file
+  console.log('[Pinterest Video] Step 2: Fetching video from R2...');
+  const videoResponse = await fetch(videoUrl);
+  if (!videoResponse.ok) {
+    throw new Error(`Failed to fetch video: ${videoResponse.status}`);
+  }
+  const videoBuffer = await videoResponse.arrayBuffer();
+  console.log('[Pinterest Video] Video size:', videoBuffer.byteLength, 'bytes');
+
+  console.log('[Pinterest Video] Step 2: Uploading video to Pinterest...');
+
+  // Pinterest uses multipart form upload
+  const formData = new FormData();
+
+  // Add upload parameters if provided
+  if (upload_parameters) {
+    for (const [key, value] of Object.entries(upload_parameters)) {
+      formData.append(key, value as string);
+    }
+  }
+
+  // Add the video file
+  formData.append('file', new Blob([videoBuffer], { type: 'video/mp4' }));
+
+  const uploadResponse = await fetch(upload_url, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!uploadResponse.ok) {
+    const uploadError = await uploadResponse.text();
+    console.error('[Pinterest Video] Upload failed:', uploadError);
+    throw new Error(`Pinterest video upload failed: ${uploadError}`);
+  }
+
+  console.log('[Pinterest Video] Video uploaded successfully');
+
+  // Step 3: Wait for media processing
+  console.log('[Pinterest Video] Step 3: Waiting for media processing...');
+  await pollPinterestMediaStatus(accessToken, media_id);
+  console.log('[Pinterest Video] Media processing complete');
+
+  // Step 4: Create pin with video
+  console.log('[Pinterest Video] Step 4: Creating pin...');
+
+  const pinResponse = await fetch(`${getPinterestApiUrl()}/v5/pins`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      board_id: boardId,
+      media_source: {
+        source_type: 'video_id',
+        cover_image_url: coverImageUrl,
+        media_id: media_id,
+      },
+      title: title.slice(0, 100), // Pinterest title limit
+      description: description.slice(0, 500), // Pinterest description limit
+      link: `https://chunkycrayon.com/coloring/${coloringImageId}`,
+      alt_text: `${title} - Animated coloring page from Chunky Crayon`,
+    }),
+  });
+
+  const pinData = await pinResponse.json();
+
+  if (!pinResponse.ok) {
+    console.error('[Pinterest Video] Pin creation failed:', pinData);
+    throw new Error(
+      `Pinterest pin creation failed: ${JSON.stringify(pinData)}`,
+    );
+  }
+
+  console.log('[Pinterest Video] Pin created successfully:', pinData.id);
+  return pinData.id;
+};
+
 const postToPinterest = async (
   imageUrl: string,
   title: string,
@@ -505,7 +715,7 @@ const postToPinterest = async (
   const accessToken = await getPinterestAccessToken();
 
   // Pinterest API v5 - Create a pin
-  const response = await fetch('https://api.pinterest.com/v5/pins', {
+  const response = await fetch(`${getPinterestApiUrl()}/v5/pins`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -604,6 +814,7 @@ const handleRequest = async (request: Request) => {
       facebook: null as string | null,
       facebookImage: null as string | null, // Image post when video is also posted
       pinterest: null as string | null,
+      pinterestVideo: null as string | null, // Video pin for engagement
       errors: [] as string[],
     };
 
@@ -850,6 +1061,7 @@ const handleRequest = async (request: Request) => {
 
     // post to Pinterest
     if (shouldPost('pinterest')) {
+      // Post 1: Image pin (static coloring page for search traffic)
       try {
         // convert svg to jpeg for Pinterest (reuse instagram dimensions - square works well)
         const pinterestBuffer = await convertSvgToJpeg(
@@ -880,12 +1092,53 @@ const handleRequest = async (request: Request) => {
         );
 
         results.pinterest = pinterestPinId;
-        console.log('Successfully posted to Pinterest:', pinterestPinId);
+        console.log('Successfully posted image to Pinterest:', pinterestPinId);
       } catch (error) {
-        console.error('Error posting to Pinterest:', error);
+        console.error('Error posting image to Pinterest:', error);
         results.errors.push(
-          `Pinterest: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Pinterest Image: ${error instanceof Error ? error.message : 'Unknown error'}`,
         );
+      }
+
+      // Post 2: Video pin (animated coloring page for engagement)
+      if (coloringImage.animationUrl && process.env.PINTEREST_BOARD_ID_VIDEOS) {
+        try {
+          console.log('[Pinterest] Posting video pin...');
+
+          // Create cover image from SVG (9:16 aspect ratio)
+          const coverImageUrl = await createPinterestVideoCoverImage(
+            coloringImage.svgUrl,
+          );
+          tempFiles.push(coverImageUrl.split('/').pop() || '');
+
+          // Generate Pinterest caption (can reuse or generate new)
+          const videoCaption = await generatePinterestCaption(coloringImage);
+
+          if (!videoCaption) {
+            throw new Error('failed to generate Pinterest video caption');
+          }
+
+          // Post video pin to separate board
+          const pinterestVideoId = await postVideoToPinterest(
+            coloringImage.animationUrl,
+            coverImageUrl,
+            coloringImage.title ?? 'Free Coloring Page',
+            videoCaption,
+            coloringImage.id,
+            process.env.PINTEREST_BOARD_ID_VIDEOS,
+          );
+
+          results.pinterestVideo = pinterestVideoId;
+          console.log(
+            'Successfully posted video to Pinterest:',
+            pinterestVideoId,
+          );
+        } catch (error) {
+          console.error('Error posting video to Pinterest:', error);
+          results.errors.push(
+            `Pinterest Video: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          );
+        }
       }
     }
 
@@ -895,7 +1148,8 @@ const handleRequest = async (request: Request) => {
       results.instagramReel ||
       results.facebook ||
       results.facebookImage ||
-      results.pinterest;
+      results.pinterest ||
+      results.pinterestVideo;
 
     return NextResponse.json(
       {

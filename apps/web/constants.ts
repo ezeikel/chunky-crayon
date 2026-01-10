@@ -10,6 +10,9 @@ import {
 
 export const MAX_IMAGE_GENERATION_ATTEMPTS = 3;
 
+// Admin emails for social media posting and admin features
+export const ADMIN_EMAILS = ['ezeikelpemberton@gmail.com'];
+
 // Legacy colors - kept for backwards compatibility
 export const COLORS = [
   '#FF0000',
