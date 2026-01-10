@@ -140,7 +140,10 @@ const pollPublishStatus = async (
       return { status: 'PUBLISH_COMPLETE', publishId };
     }
 
-    if (data.data?.status === 'FAILED' || data.error?.code) {
+    if (
+      data.data?.status === 'FAILED' ||
+      (data.error?.code && data.error.code !== 'ok')
+    ) {
       throw new Error(
         `TikTok publish failed: ${data.data?.fail_reason || data.error?.message || 'Unknown error'}`,
       );
@@ -195,7 +198,11 @@ const postVideoToTikTok = async (
 
   const initData = await initResponse.json();
 
-  if (!initResponse.ok || initData.error?.code) {
+  // TikTok returns error.code: "ok" for successful responses
+  if (
+    !initResponse.ok ||
+    (initData.error?.code && initData.error.code !== 'ok')
+  ) {
     console.error('[TikTok] Init failed:', initData);
     throw new Error(
       `TikTok video init failed: ${initData.error?.message || JSON.stringify(initData)}`,
