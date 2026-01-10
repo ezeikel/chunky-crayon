@@ -31,6 +31,13 @@ const getSocialTokenStatus = async () => {
 };
 
 const AdminSocialContent = async () => {
+  const session = await auth();
+
+  // Check if user is authenticated and is an admin
+  if (!session?.user?.email || !ADMIN_EMAILS.includes(session.user.email)) {
+    redirect('/');
+  }
+
   const tokenStatus = await getSocialTokenStatus();
 
   return (
@@ -48,14 +55,7 @@ const AdminSocialContent = async () => {
   );
 };
 
-const AdminSocialPage = async () => {
-  const session = await auth();
-
-  // Check if user is authenticated and is an admin
-  if (!session?.user?.email || !ADMIN_EMAILS.includes(session.user.email)) {
-    redirect('/');
-  }
-
+const AdminSocialPage = () => {
   return (
     <div className="container mx-auto p-8 max-w-3xl">
       <Suspense fallback={<Loading size="lg" />}>
