@@ -379,27 +379,6 @@ const SocialConnections = ({ initialStatus }: SocialConnectionsProps) => {
           )}
         </CardContent>
       </Card>
-
-      {/* Info Card */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="pt-6">
-          <h3 className="font-semibold text-blue-900 mb-2">
-            Demo Video Recording Tips
-          </h3>
-          <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-            <li>Start screen recording before clicking &quot;Connect&quot;</li>
-            <li>
-              Show the full OAuth flow (login, permissions, redirect back)
-            </li>
-            <li>
-              After connecting, click &quot;Post Video Now&quot; to demonstrate
-              posting
-            </li>
-            <li>Open the platform app/website to show the post appeared</li>
-            <li>Keep recording until you verify the post is visible</li>
-          </ul>
-        </CardContent>
-      </Card>
     </div>
   );
 };
