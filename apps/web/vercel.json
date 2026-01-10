@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "app/api/social/pinterest/video/route.ts": {
+      "maxDuration": 300
+    }
+  },
   "crons": [
     {
       "path": "/api/tokens/refresh",
