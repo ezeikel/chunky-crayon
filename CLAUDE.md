@@ -54,6 +54,10 @@ This project uses Neon PostgreSQL with branch-based development:
 - `packages/db` - Prisma database client
 - `packages/translations` - i18n translations (next-intl)
 
+### Monorepo Constraints
+
+**React version must stay in sync** across all apps and packages. pnpm's strict dependency isolation means version mismatches cause multiple React instances, leading to "Invalid hook call" errors. When upgrading React, update all workspaces together.
+
 ## Next.js 16 Specifics
 
 ### Middleware → Proxy
@@ -81,7 +85,6 @@ Use semantic commit style (`type(scope): message`). Keep messages as one-liners,
 - No Firebase Analytics or tracking SDKs (causes Kids Category rejection)
 - Parental gates required for IAP, external links, permissions
 - Local-first data storage (no PII collection)
-- React version must match across monorepo (use root `resolutions`)
 - Target: iPad-first, ages 3-8, COPPA/GDPR-K compliant
 
 For detailed plans, see `apps/web/docs/MOBILE_APP_PLAN.md` (only read when needed).
