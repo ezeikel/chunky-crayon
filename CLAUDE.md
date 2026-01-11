@@ -54,6 +54,12 @@ This project uses Neon PostgreSQL with branch-based development:
 - `packages/db` - Prisma database client
 - `packages/translations` - i18n translations (next-intl)
 
+## Next.js 16 Specifics
+
+### Middleware → Proxy
+
+In Next.js 16, `middleware.ts` was renamed to `proxy.ts`. The middleware file is located at `apps/web/proxy.ts`.
+
 ## Translations
 
 Only edit `packages/translations/src/en.json`. A GitHub Action automatically populates all other languages in CI.
