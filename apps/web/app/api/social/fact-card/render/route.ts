@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ImageResponse } from 'next/og';
+import satori from 'satori';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+import sharp from 'sharp';
 import { FactCard } from '@/components/social/FactCard';
 
 // Cache fonts at module level for performance
@@ -67,8 +68,8 @@ export async function GET(request: NextRequest) {
     const width = format === 'vertical' ? 1000 : 1080;
     const height = format === 'vertical' ? 1500 : 1080;
 
-    // Generate image using @vercel/og ImageResponse
-    return new ImageResponse(
+    // Generate SVG using satori
+    const svg = await satori(
       FactCard({
         fact: decodeURIComponent(fact),
         category: decodeURIComponent(category),
@@ -99,11 +100,18 @@ export async function GET(request: NextRequest) {
             style: 'normal',
           },
         ],
-        headers: {
-          'Cache-Control': 'public, max-age=31536000, immutable',
-        },
       },
     );
+
+    // Convert SVG to PNG using sharp
+    const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
+
+    return new NextResponse(pngBuffer, {
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    });
   } catch (error) {
     console.error('Error rendering fact card:', error);
     return NextResponse.json(
@@ -141,8 +149,8 @@ export async function POST(request: NextRequest) {
     const width = format === 'vertical' ? 1000 : 1080;
     const height = format === 'vertical' ? 1500 : 1080;
 
-    // Generate image using @vercel/og ImageResponse
-    return new ImageResponse(
+    // Generate SVG using satori
+    const svg = await satori(
       FactCard({
         fact,
         category,
@@ -173,11 +181,18 @@ export async function POST(request: NextRequest) {
             style: 'normal',
           },
         ],
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
       },
     );
+
+    // Convert SVG to PNG using sharp
+    const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
+
+    return new NextResponse(pngBuffer, {
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'no-cache',
+      },
+    });
   } catch (error) {
     console.error('Error rendering fact card:', error);
     return NextResponse.json(

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ImageResponse } from 'next/og';
+import satori from 'satori';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import sharp from 'sharp';
@@ -59,7 +59,7 @@ function getColorIndexFromFact(fact: string): number {
 }
 
 /**
- * Render a fact card to PNG buffer using @vercel/og ImageResponse.
+ * Render a fact card to PNG buffer using satori + sharp.
  */
 async function renderFactCard(
   fact: GeneratedFact,
@@ -71,8 +71,8 @@ async function renderFactCard(
   const width = format === 'vertical' ? 1000 : 1080;
   const height = format === 'vertical' ? 1500 : 1080;
 
-  // Generate image using ImageResponse
-  const imageResponse = new ImageResponse(
+  // Generate SVG using satori
+  const svg = await satori(
     FactCard({
       fact: fact.fact,
       category: fact.category,
@@ -106,9 +106,10 @@ async function renderFactCard(
     },
   );
 
-  // Convert response to buffer
-  const arrayBuffer = await imageResponse.arrayBuffer();
-  return Buffer.from(arrayBuffer);
+  // Convert SVG to PNG using sharp
+  const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
+
+  return pngBuffer;
 }
 
 /**
