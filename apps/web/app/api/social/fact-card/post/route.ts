@@ -134,7 +134,8 @@ async function renderFactCard(
             console.warn(`[Fact Card] Failed to load emoji: ${segment}`, e);
           }
         }
-        return undefined;
+        // Return empty string for non-emoji or failed fetches
+        return '';
       },
     },
   );

@@ -131,7 +131,8 @@ export async function GET(request: NextRequest) {
               console.warn(`[Fact Card] Failed to load emoji: ${segment}`, e);
             }
           }
-          return undefined;
+          // Return empty string for non-emoji or failed fetches
+          return '';
         },
       },
     );
@@ -228,7 +229,8 @@ export async function POST(request: NextRequest) {
               console.warn(`[Fact Card] Failed to load emoji: ${segment}`, e);
             }
           }
-          return undefined;
+          // Return empty string for non-emoji or failed fetches
+          return '';
         },
       },
     );
