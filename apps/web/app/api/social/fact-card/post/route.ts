@@ -16,7 +16,6 @@ export const maxDuration = 120;
 let rooneySansRegular: ArrayBuffer | null = null;
 let rooneySansMedium: ArrayBuffer | null = null;
 let tondoBold: ArrayBuffer | null = null;
-let notoEmoji: ArrayBuffer | null = null;
 
 async function loadFonts() {
   if (!rooneySansRegular || !rooneySansMedium || !tondoBold) {
@@ -42,22 +41,24 @@ async function loadFonts() {
     ) as ArrayBuffer;
   }
 
-  // Load emoji font from CDN (cached separately)
-  if (!notoEmoji) {
-    // Using a stable Noto Emoji font URL
-    const emojiResponse = await fetch(
-      'https://cdn.jsdelivr.net/npm/@fontsource/noto-color-emoji@5.0.0/files/noto-color-emoji-emoji-400-normal.woff',
-    );
-    if (!emojiResponse.ok) {
-      console.warn(
-        '[Fact Card] Failed to load emoji font, emojis may not render',
-      );
-    } else {
-      notoEmoji = await emojiResponse.arrayBuffer();
+  return { rooneySansRegular, rooneySansMedium, tondoBold };
+}
+
+/**
+ * Convert emoji to Twemoji CDN URL.
+ * Handles multi-codepoint emojis (skin tones, flags, ZWJ sequences).
+ */
+function emojiToTwemojiUrl(emoji: string): string {
+  const codePoints: string[] = [];
+  for (const char of emoji) {
+    const codePoint = char.codePointAt(0);
+    if (codePoint) {
+      codePoints.push(codePoint.toString(16));
     }
   }
-
-  return { rooneySansRegular, rooneySansMedium, tondoBold, notoEmoji };
+  // Filter out fe0f (variation selector-16) for cleaner URLs
+  const filtered = codePoints.filter((cp) => cp !== 'fe0f');
+  return `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${filtered.join('-')}.svg`;
 }
 
 /**
@@ -118,13 +119,23 @@ async function renderFactCard(
           weight: 700,
           style: 'normal',
         },
-        {
-          name: 'Noto Color Emoji',
-          data: fonts.notoEmoji!,
-          weight: 400,
-          style: 'normal',
-        },
       ],
+      // Load emoji SVGs from Twemoji CDN
+      loadAdditionalAsset: async (code, segment) => {
+        if (code === 'emoji') {
+          const url = emojiToTwemojiUrl(segment);
+          try {
+            const response = await fetch(url);
+            if (response.ok) {
+              const svgText = await response.text();
+              return `data:image/svg+xml,${encodeURIComponent(svgText)}`;
+            }
+          } catch (e) {
+            console.warn(`[Fact Card] Failed to load emoji: ${segment}`, e);
+          }
+        }
+        return undefined;
+      },
     },
   );
 

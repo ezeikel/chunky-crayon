@@ -89,9 +89,7 @@ export function FactCard({
           marginBottom: isVertical ? 80 : 60,
         }}
       >
-        <span style={{ fontSize: 28, fontFamily: 'Noto Color Emoji' }}>
-          {emoji}
-        </span>
+        <span style={{ fontSize: 28 }}>{emoji}</span>
         <span
           style={{
             color: 'white',
