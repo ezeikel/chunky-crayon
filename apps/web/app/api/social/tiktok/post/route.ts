@@ -183,7 +183,7 @@ const postVideoToTikTok = async (
       body: JSON.stringify({
         post_info: {
           title: caption.slice(0, 150), // TikTok title limit
-          privacy_level: 'PUBLIC_TO_EVERYONE',
+          privacy_level: 'SELF_ONLY', // TODO: Change to PUBLIC_TO_EVERYONE after TikTok audit approval
           disable_duet: false,
           disable_comment: false,
           disable_stitch: false,
