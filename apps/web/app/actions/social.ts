@@ -151,3 +151,82 @@ export const generatePinterestCaption = async (
 
   return text;
 };
+
+// =============================================================================
+// Fact Card Caption Generation
+// =============================================================================
+
+import type { GeneratedFact } from '@/lib/social/facts';
+
+/**
+ * System prompt for fact card captions.
+ * These are different from coloring page captions - they focus on the fact itself.
+ */
+const FACT_CARD_CAPTION_SYSTEM = `You are a social media expert for Chunky Crayon, a children's coloring app. Your task is to write an engaging caption for a fact card post.
+
+The post features a beautiful graphic with a short fact about coloring, creativity, or child development.
+
+Your caption should:
+1. Expand on the fact with a brief, conversational comment (1-2 sentences)
+2. Use 1-2 relevant emojis naturally
+3. Include a soft call-to-action to visit chunkycrayon.com for free coloring pages
+4. Use a warm, friendly tone that resonates with parents
+5. Include 3-5 relevant hashtags at the end
+
+Keep it concise - the graphic already contains the main message. Your caption should complement it, not repeat it.`;
+
+const FACT_CARD_INSTAGRAM_ADDENDUM = `
+Format for Instagram:
+- Keep caption under 150 characters before hashtags
+- Use 4-5 popular hashtags (#coloring #kidsactivities #parentingtips #creativity #learningthroughplay)
+- End with "Link in bio!" or similar CTA`;
+
+const FACT_CARD_FACEBOOK_ADDENDUM = `
+Format for Facebook:
+- Conversational, community-building tone
+- Use 2-3 hashtags maximum
+- Encourage comments: "Did you know this?" or "Tag a parent who'd love this!"
+- Include full website link: chunkycrayon.com`;
+
+const FACT_CARD_PINTEREST_ADDENDUM = `
+Format for Pinterest:
+- Front-load keywords for search (coloring tips, kids activities, parenting)
+- Be descriptive and searchable
+- Include 3-4 relevant keywords naturally
+- Link goes to chunkycrayon.com`;
+
+export type FactCardPlatform = 'instagram' | 'facebook' | 'pinterest';
+
+/**
+ * Generate a caption for a fact card post.
+ */
+export const generateFactCardCaption = async (
+  fact: GeneratedFact,
+  platform: FactCardPlatform,
+): Promise<string> => {
+  let systemPrompt = FACT_CARD_CAPTION_SYSTEM;
+
+  if (platform === 'instagram') {
+    systemPrompt += FACT_CARD_INSTAGRAM_ADDENDUM;
+  } else if (platform === 'facebook') {
+    systemPrompt += FACT_CARD_FACEBOOK_ADDENDUM;
+  } else if (platform === 'pinterest') {
+    systemPrompt += FACT_CARD_PINTEREST_ADDENDUM;
+  }
+
+  const prompt = `Write a caption for this fact card:
+
+Fact: "${fact.fact}"
+Category: ${fact.category}
+Emoji used on card: ${fact.emoji}
+
+Remember: The fact is already displayed on the graphic. Your caption should complement it with a brief comment and CTA.`;
+
+  const { text } = await generateText({
+    model: models.text,
+    system: systemPrompt,
+    prompt,
+  });
+
+  return text;
+};

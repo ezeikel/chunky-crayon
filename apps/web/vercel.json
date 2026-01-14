@@ -5,6 +5,9 @@
     },
     "app/api/social/tiktok/post/route.ts": {
       "maxDuration": 300
+    },
+    "app/api/social/fact-card/post/route.ts": {
+      "maxDuration": 120
     }
   },
   "crons": [
@@ -79,6 +82,30 @@
     {
       "path": "/api/blog/generate",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/social/fact-card/post?platform=instagram",
+      "schedule": "0 14 * * 1-5"
+    },
+    {
+      "path": "/api/social/fact-card/post?platform=facebook",
+      "schedule": "5 14 * * 1-5"
+    },
+    {
+      "path": "/api/social/fact-card/post?platform=pinterest",
+      "schedule": "10 14 * * 1-5"
+    },
+    {
+      "path": "/api/social/fact-card/post?platform=instagram",
+      "schedule": "0 13 * * 0,6"
+    },
+    {
+      "path": "/api/social/fact-card/post?platform=facebook",
+      "schedule": "5 13 * * 0,6"
+    },
+    {
+      "path": "/api/social/fact-card/post?platform=pinterest",
+      "schedule": "10 13 * * 0,6"
     }
   ]
 }
