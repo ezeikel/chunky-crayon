@@ -157,10 +157,10 @@ export function FactCard({
             fontSize: 32,
             fontWeight: 700,
             fontFamily: 'Tondo',
-            letterSpacing: 2,
+            letterSpacing: -0.5,
           }}
         >
-          CHUNKY CRAYON
+          Chunky Crayon
         </span>
         {/* Website */}
         <span
