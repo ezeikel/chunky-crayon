@@ -225,9 +225,58 @@ async function createInstagramMediaContainer(
 }
 
 /**
+ * Check Instagram media container status.
+ */
+async function checkInstagramContainerStatus(
+  containerId: string,
+): Promise<{ status: string; error?: string }> {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${containerId}?fields=status_code,status&access_token=${process.env.FACEBOOK_ACCESS_TOKEN}`,
+  );
+  const data = await response.json();
+  return {
+    status: data.status_code || 'UNKNOWN',
+    error: data.status,
+  };
+}
+
+/**
+ * Wait for Instagram container to be ready.
+ */
+async function waitForInstagramContainer(
+  containerId: string,
+  maxAttempts = 10,
+  delayMs = 2000,
+): Promise<void> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const { status, error } = await checkInstagramContainerStatus(containerId);
+    console.log(
+      `[Fact Card Instagram] Container status check ${attempt}/${maxAttempts}: ${status}`,
+    );
+
+    if (status === 'FINISHED') {
+      return;
+    }
+
+    if (status === 'ERROR') {
+      throw new Error(`Instagram container failed: ${error}`);
+    }
+
+    if (attempt < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+
+  throw new Error('Instagram container not ready after maximum attempts');
+}
+
+/**
  * Publish Instagram media.
  */
 async function publishInstagramMedia(creationId: string): Promise<string> {
+  // Wait for container to be ready before publishing
+  await waitForInstagramContainer(creationId);
+
   const response = await fetch(
     `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media_publish`,
     {
