@@ -9,6 +9,7 @@ import { FactCard } from '@/components/social/FactCard';
 let rooneySansRegular: ArrayBuffer | null = null;
 let rooneySansMedium: ArrayBuffer | null = null;
 let tondoBold: ArrayBuffer | null = null;
+let notoEmoji: ArrayBuffer | null = null;
 
 async function loadFonts() {
   if (!rooneySansRegular || !rooneySansMedium || !tondoBold) {
@@ -34,10 +35,19 @@ async function loadFonts() {
     ) as ArrayBuffer;
   }
 
+  // Load emoji font from Google Fonts CDN (cached separately)
+  if (!notoEmoji) {
+    const emojiResponse = await fetch(
+      'https://fonts.gstatic.com/s/notocoloremoji/v30/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.ttf',
+    );
+    notoEmoji = await emojiResponse.arrayBuffer();
+  }
+
   return {
     rooneySansRegular,
     rooneySansMedium,
     tondoBold,
+    notoEmoji,
   };
 }
 
@@ -97,6 +107,12 @@ export async function GET(request: NextRequest) {
             name: 'Tondo',
             data: fonts.tondoBold!,
             weight: 700,
+            style: 'normal',
+          },
+          {
+            name: 'Noto Color Emoji',
+            data: fonts.notoEmoji!,
+            weight: 400,
             style: 'normal',
           },
         ],
@@ -178,6 +194,12 @@ export async function POST(request: NextRequest) {
             name: 'Tondo',
             data: fonts.tondoBold!,
             weight: 700,
+            style: 'normal',
+          },
+          {
+            name: 'Noto Color Emoji',
+            data: fonts.notoEmoji!,
+            weight: 400,
             style: 'normal',
           },
         ],
