@@ -35,12 +35,19 @@ async function loadFonts() {
     ) as ArrayBuffer;
   }
 
-  // Load emoji font from Google Fonts CDN (cached separately)
+  // Load emoji font from CDN (cached separately)
   if (!notoEmoji) {
+    // Using a stable Noto Emoji font URL
     const emojiResponse = await fetch(
-      'https://fonts.gstatic.com/s/notocoloremoji/v30/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabsE4tq3luCC7p-aXxcn.ttf',
+      'https://cdn.jsdelivr.net/npm/@fontsource/noto-color-emoji@5.0.0/files/noto-color-emoji-emoji-400-normal.woff',
     );
-    notoEmoji = await emojiResponse.arrayBuffer();
+    if (!emojiResponse.ok) {
+      console.warn(
+        '[Fact Card] Failed to load emoji font, emojis may not render',
+      );
+    } else {
+      notoEmoji = await emojiResponse.arrayBuffer();
+    }
   }
 
   return {
