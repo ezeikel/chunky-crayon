@@ -923,6 +923,10 @@ const handleRequest = async (request: Request) => {
               instagramImageUrl!,
               instagramCaption,
             );
+
+            // Wait for media to be ready before publishing
+            await waitForMediaReady(creationId, 20, 3000);
+
             instagramMediaId = await publishInstagramMedia(creationId);
           }
 
