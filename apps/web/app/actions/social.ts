@@ -31,20 +31,20 @@ REQUIREMENTS:
 Remember: Output ONLY the final caption text without any labels or section markers.`;
 
 /**
- * Instagram carousel with colored example (3 slides).
- * Static → Animation → Colored example (finale)
+ * Instagram carousel with colored example (2 slides).
+ * Colored example first (scroll-stopper) → B&W printable second
  */
 const INSTAGRAM_CAROUSEL_WITH_COLORED_ADDENDUM = `
 
-3-SLIDE CAROUSEL - Build excitement through ALL slides:
+2-SLIDE CAROUSEL - Color first to stop the scroll:
 
-Slides: 1) Printable B&W 2) Animated magic 3) Colored example (inspiration)
+Slides: 1) Colored example (eye-catching) 2) Printable B&W version
 
 REQUIREMENTS:
-1. Journey hook: "From blank page → animated magic → your kid's masterpiece (keep swiping!)"
-2. Slide 3 payoff: "The last slide shows what YOUR kid could create"
-3. SAVE TRIGGER: "Save this for weekend crafts"
-4. CTA: "Ready to create your own? Free download - link in bio!"
+1. Color hook: "Look at this adorable [subject]!" / "This is what YOUR kid could create"
+2. Swipe CTA: "Swipe for the free printable version!"
+3. SAVE TRIGGER: "Save this for your next coloring session"
+4. CTA: "Free download - link in bio!"
 
 Remember: Output ONLY the final caption text without any labels or section markers.`;
 

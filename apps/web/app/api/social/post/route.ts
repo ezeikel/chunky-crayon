@@ -853,7 +853,8 @@ const handleRequest = async (request: Request) => {
           const hasColoredExample = !!coloredExampleUrl;
 
           if (hasColoredExample) {
-            // Carousel: B&W image + colored example (2 slides)
+            // Carousel: Colored example + B&W image (2 slides)
+            // Colored first for scroll-stopping color in feed, B&W second as the printable
             console.log(
               '[Instagram] Creating carousel with colored example...',
             );
@@ -870,19 +871,8 @@ const handleRequest = async (request: Request) => {
             // Build carousel slides array
             const carouselChildren: string[] = [];
 
-            // Slide 1: Static B&W coloring page
-            const imageContainerId =
-              await createInstagramImageContainerForCarousel(
-                instagramImageUrl!,
-              );
-            console.log(
-              '[Instagram] Image container created:',
-              imageContainerId,
-            );
-            carouselChildren.push(imageContainerId);
-
-            // Slide 2: Colored example
-            console.log('[Instagram] Adding colored example...');
+            // Slide 1: Colored example (eye-catching, stops the scroll)
+            console.log('[Instagram] Adding colored example as first slide...');
             const coloredContainerId =
               await createInstagramImageContainerForCarousel(coloredExampleUrl);
             console.log(
@@ -890,6 +880,17 @@ const handleRequest = async (request: Request) => {
               coloredContainerId,
             );
             carouselChildren.push(coloredContainerId);
+
+            // Slide 2: Static B&W coloring page (the printable)
+            const imageContainerId =
+              await createInstagramImageContainerForCarousel(
+                instagramImageUrl!,
+              );
+            console.log(
+              '[Instagram] B&W image container created:',
+              imageContainerId,
+            );
+            carouselChildren.push(imageContainerId);
 
             console.log('[Instagram] Creating 2-slide carousel...');
 
