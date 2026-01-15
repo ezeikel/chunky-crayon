@@ -19,6 +19,7 @@ import {
 import { FREE_CREDITS, PLAN_ROLLOVER_CAPS, TRACKING_EVENTS } from '@/constants';
 import { sendPaymentFailedEmail } from '@/app/actions/email';
 import { trackWithUser } from '@/utils/analytics-server';
+import { sendPurchaseConversionEvents } from '@/lib/conversion-api';
 
 // Check if webhook event has already been processed (idempotency)
 const isEventProcessed = async (eventId: string): Promise<boolean> => {
@@ -210,6 +211,18 @@ export const POST = async (req: Request) => {
         planInterval: billingPeriod,
         value: priceAmount,
       });
+
+      // Send to Conversion APIs (Facebook + Pinterest)
+      if (user.email) {
+        await sendPurchaseConversionEvents({
+          email: user.email,
+          userId: user.id,
+          value: priceAmount,
+          currency: 'GBP',
+          eventId: `stripe_${stripeEvent.id}`,
+          contentName: `${planName} Subscription`,
+        });
+      }
     } else {
       // handle one-time credit purchase
       // verify user has an active subscription
@@ -285,6 +298,18 @@ export const POST = async (req: Request) => {
               creditAmount,
               value: priceAmount,
             });
+
+            // Send to Conversion APIs (Facebook + Pinterest)
+            if (user.email) {
+              await sendPurchaseConversionEvents({
+                email: user.email,
+                userId: user.id,
+                value: priceAmount,
+                currency: 'GBP',
+                eventId: `stripe_${stripeEvent.id}_${item.price?.id}`,
+                contentName: `${creditAmount} Credits Pack`,
+              });
+            }
           }
         }),
       );
