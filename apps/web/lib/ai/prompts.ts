@@ -322,7 +322,10 @@ CRITICAL STRUCTURE (follow exactly):
    - Always include: #chunkycrayon #freeprintable
 
 TONE: Warm, playful, parent-to-parent. 2-3 emojis naturally placed.
-AVOID: Dashes (—), starting with title, "check out", corporate language.`;
+AVOID: Dashes (—), starting with title, "check out", corporate language.
+
+OUTPUT FORMAT:
+Return ONLY the final caption text ready to copy-paste to Instagram. Do NOT include labels like "HOOK:", "STORY:", "BODY:", "ENGAGEMENT TRIGGER:", "CTA:", "HASHTAGS:", etc. Write the caption as one flowing piece of text with natural line breaks, ending with hashtags. No section markers or formatting - just the caption itself.`;
 
 export const FACEBOOK_CAPTION_SYSTEM = `You are a community-focused Facebook strategist for Chunky Crayon. Facebook is a SHARING platform - write captions parents want to share to their timeline or mommy groups.
 
@@ -351,7 +354,10 @@ CRITICAL STRUCTURE:
 
 6. HASHTAGS: 2-3 max (#coloringpage #kidsactivities)
 
-TONE: Conversational, parent-to-parent, community member. 1-2 emojis max.`;
+TONE: Conversational, parent-to-parent, community member. 1-2 emojis max.
+
+OUTPUT FORMAT:
+Return ONLY the final post text ready to copy-paste to Facebook. Do NOT include labels like "HOOK:", "STORY:", "CTA:", "Caption:", "Call to Action:", etc. Write it as one natural flowing post. No section markers or formatting - just the post itself.`;
 
 export const PINTEREST_CAPTION_SYSTEM = `You are a Pinterest SEO specialist. Pinterest is a SEARCH ENGINE, not a social platform - write descriptions that RANK IN SEARCH and drive CLICKS.
 
@@ -381,7 +387,10 @@ STRUCTURE (400-500 characters):
 
 POWER WORDS TO INCLUDE: FREE, Printable, Download, Instant, Easy, Simple, Quick, Fun, Educational
 
-DO NOT INCLUDE: Hashtags, emojis, "Click now!" spam`;
+DO NOT INCLUDE: Hashtags, emojis, "Click now!" spam
+
+OUTPUT FORMAT:
+Return ONLY the pin description text. No labels, no section markers, no formatting like "OPENER:", "BENEFITS:", etc. Just the description itself.`;
 
 export const createInstagramCaptionPrompt = (
   title: string,
@@ -390,7 +399,9 @@ export const createInstagramCaptionPrompt = (
 ) => `Generate an Instagram caption for this coloring page:
 Title: ${title}
 Description: ${description}
-Tags: ${tags.join(', ')}`;
+Tags: ${tags.join(', ')}
+
+Return ONLY the final caption - no labels, no section headers, no "HOOK:", "BODY:", "CTA:" markers. Just the ready-to-post text with hashtags at the end.`;
 
 export const createFacebookCaptionPrompt = (
   title: string,
@@ -401,7 +412,9 @@ Title: ${title}
 Description: ${description}
 Tags: ${tags.join(', ')}
 
-Website: https://chunkycrayon.com`;
+Website: https://chunkycrayon.com
+
+Return ONLY the final post - no labels, no section headers, no "HOOK:", "STORY:", "CTA:", "Caption:" markers. Just the ready-to-post text.`;
 
 export const createPinterestCaptionPrompt = (
   title: string,
@@ -414,7 +427,7 @@ Tags: ${tags.join(', ')}
 
 Website: https://chunkycrayon.com
 
-Remember: 400-500 characters, SEO-optimized, no hashtags, no emojis.`;
+Remember: 400-500 characters, SEO-optimized, no hashtags, no emojis. Return ONLY the description text - no labels or section markers.`;
 
 // =============================================================================
 // Image Analytics (for PostHog tracking)

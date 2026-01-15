@@ -26,7 +26,9 @@ REQUIREMENTS:
 1. Hook MUST create swipe urge: "Watch what happens when this [subject] comes to life... (slide 2 is everything)"
 2. Natural swipe CTAs: "Swipe to watch the magic unfold" / "Slide 2 is *chef's kiss*"
 3. SAVE TRIGGER (essential): "Save this for your next coloring adventure"
-4. Final CTA: "Love it? Grab this page free - link in bio!"`;
+4. Final CTA: "Love it? Grab this page free - link in bio!"
+
+Remember: Output ONLY the final caption text without any labels or section markers.`;
 
 /**
  * Instagram carousel with colored example (3 slides).
@@ -42,7 +44,9 @@ REQUIREMENTS:
 1. Journey hook: "From blank page → animated magic → your kid's masterpiece (keep swiping!)"
 2. Slide 3 payoff: "The last slide shows what YOUR kid could create"
 3. SAVE TRIGGER: "Save this for weekend crafts"
-4. CTA: "Ready to create your own? Free download - link in bio!"`;
+4. CTA: "Ready to create your own? Free download - link in bio!"
+
+Remember: Output ONLY the final caption text without any labels or section markers.`;
 
 /**
  * Instagram Reel-specific system prompt addition.
@@ -64,7 +68,9 @@ REQUIREMENTS:
 
 4. ENGAGEMENT: "Double tap if your kid would love this" / "Comment what we should make next!"
 
-5. DISCOVERY HASHTAGS (8-12): Mix #reels #explorepage with niche tags like #kidsactivities #coloringpage`;
+5. DISCOVERY HASHTAGS (8-12): Mix #reels #explorepage with niche tags like #kidsactivities #coloringpage
+
+Remember: Output ONLY the final caption text without any labels or section markers like "REEL:", "VIRAL HOOK:", etc.`;
 
 /**
  * Facebook video-specific system prompt addition.
@@ -77,7 +83,9 @@ REQUIREMENTS:
 1. WATCH-TIME hook: "Watch until the end - the animation is SO satisfying"
 2. SHARE TRIGGER: "Share this with a parent who needs a screen-free activity idea"
 3. COMMENT DRIVER: "What animal should we animate next? Drop your vote!"
-4. CTA: "Download the printable version at chunkycrayon.com"`;
+4. CTA: "Download the printable version at chunkycrayon.com"
+
+Remember: Output ONLY the final post text without any labels or section markers like "POST CAPTION:", "VIDEO:", etc.`;
 
 /**
  * Facebook image post when video is also posted.
@@ -91,7 +99,9 @@ REQUIREMENTS:
 1. Reference the video: "Saw our animated video? Here's the printable so your kid can color it themselves!"
 2. OR lead with printable: "The printable version of today's animated coloring page"
 3. Download CTA: "Free download at chunkycrayon.com"
-4. Keep warm and family-focused`;
+4. Keep warm and family-focused
+
+Remember: Output ONLY the final post text without any labels or section markers like "Caption:", "Call to Action:", etc.`;
 
 export type InstagramPostType =
   | 'image'
@@ -190,7 +200,10 @@ STRUCTURE:
 4. SOFT CTA: "More coloring fun at chunkycrayon.com"
 
 Keep SHORT - the graphic has the main message. Caption supports, doesn't repeat.
-Use 1-2 emojis naturally.`;
+Use 1-2 emojis naturally.
+
+OUTPUT FORMAT:
+Return ONLY the final caption text. Do NOT include labels like "REACTION:", "SHAREABILITY:", "ENGAGEMENT:", etc. Just the caption itself.`;
 
 const FACT_CARD_INSTAGRAM_ADDENDUM = `
 
@@ -198,7 +211,9 @@ Instagram format:
 - Hook + reaction (under 100 chars before hashtags)
 - SAVE TRIGGER: "Save this for inspiration"
 - 5-6 hashtags: #parentingtips #kidsactivities #coloring #creativity #learningthroughplay #chunkycrayon
-- End: "Link in bio for free coloring pages!"`;
+- End: "Link in bio for free coloring pages!"
+
+Remember: Output ONLY the final caption text without any labels or section markers.`;
 
 const FACT_CARD_FACEBOOK_ADDENDUM = `
 
@@ -206,7 +221,9 @@ Facebook format:
 - Conversational, shareable tone
 - SHARE TRIGGER: "Tag a parent who'd love this!" / "Share to your mommy group"
 - 2-3 hashtags max
-- Full link: chunkycrayon.com`;
+- Full link: chunkycrayon.com
+
+Remember: Output ONLY the final post text without any labels or section markers.`;
 
 const FACT_CARD_PINTEREST_ADDENDUM = `
 
@@ -214,7 +231,9 @@ Pinterest format:
 - SEO-first: Front-load "coloring tips" "kids activities" "parenting" keywords
 - 300-400 characters, descriptive and searchable
 - NO hashtags, NO emojis
-- End with: chunkycrayon.com`;
+- End with: chunkycrayon.com
+
+Remember: Output ONLY the pin description text without any labels or section markers.`;
 
 export type FactCardPlatform = 'instagram' | 'facebook' | 'pinterest';
 
