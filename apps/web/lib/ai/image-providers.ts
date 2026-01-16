@@ -200,6 +200,18 @@ function shouldFallback(error: unknown): boolean {
   )
     return true;
 
+  // Content policy / bad request errors (400) - the other provider might accept the prompt
+  // This happens when OpenAI's content filter is more strict than Gemini's
+  if (message.includes('400') || message.includes('bad request')) return true;
+
+  // Content policy violations (OpenAI specific)
+  if (
+    message.includes('content_policy') ||
+    message.includes('safety') ||
+    message.includes('moderation')
+  )
+    return true;
+
   return false;
 }
 

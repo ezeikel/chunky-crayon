@@ -34,6 +34,11 @@ const handleRequest = async (request: Request) => {
       );
     }
 
+    // TODO: Consider skipping the email if today's image generation failed and
+    // we'd be re-sending yesterday's image. For now with low user count this is
+    // acceptable, but may want to check if coloringImage.createdAt is from today
+    // before sending. Options: skip email entirely, or send with "missed yesterday" note.
+
     // parse custom emails if provided
     const customEmails = emails
       ? emails.split(',').map((email) => email.trim())
