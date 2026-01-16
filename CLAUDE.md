@@ -54,6 +54,14 @@ This project uses Neon PostgreSQL with branch-based development:
 - `packages/db` - Prisma database client
 - `packages/translations` - i18n translations (next-intl)
 
+## Vercel Deployment
+
+The web app is deployed via Vercel. **Important**: The Vercel project is linked in `apps/web`, not the repo root.
+
+- **Project**: `chunky-crayon-web` (in Chewy Bytes team)
+- **Vercel CLI**: Always run from `apps/web` directory when managing env vars or deployments
+- **Env vars**: Use `cd apps/web && vercel env ls` to list/manage environment variables
+
 ### Monorepo Constraints
 
 **React version must stay in sync** across all apps and packages. pnpm's strict dependency isolation means version mismatches cause multiple React instances, leading to "Invalid hook call" errors. When upgrading React, update all workspaces together.
