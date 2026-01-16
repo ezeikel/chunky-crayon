@@ -240,12 +240,27 @@ const postVideoToTikTok = async (
 /**
  * POST /api/social/tiktok/post
  * Posts the most recent daily coloring page animation to TikTok.
+ * Accepts either CRON_SECRET (for cron jobs) or admin session (for manual triggers).
  */
-export const POST = async () => {
+export const POST = async (request: Request) => {
   try {
-    // Check if user is admin
-    const session = await auth();
-    if (!session?.user?.email || !ADMIN_EMAILS.includes(session.user.email)) {
+    // Check for cron secret OR admin session
+    const authHeader = request.headers.get('authorization');
+    const cronSecret = process.env.CRON_SECRET;
+
+    // Allow if valid cron secret provided
+    const hasCronAuth = cronSecret && authHeader === `Bearer ${cronSecret}`;
+
+    // Or allow if admin session (for manual triggers from dashboard)
+    let hasSessionAuth = false;
+    if (!hasCronAuth) {
+      const session = await auth();
+      hasSessionAuth = !!(
+        session?.user?.email && ADMIN_EMAILS.includes(session.user.email)
+      );
+    }
+
+    if (!hasCronAuth && !hasSessionAuth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

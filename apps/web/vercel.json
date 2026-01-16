@@ -13,7 +13,7 @@
   "crons": [
     {
       "path": "/api/tokens/refresh",
-      "schedule": "0 7 * * 1"
+      "schedule": "0 7 * * *"
     },
     {
       "path": "/api/subscription/credit-drip",
