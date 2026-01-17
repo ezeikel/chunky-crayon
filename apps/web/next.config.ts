@@ -100,12 +100,13 @@ const sentryOptions = {
 // Create the next-intl plugin (points to i18n/request.ts)
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
-const configWithIntl = withNextIntl(nextConfig);
+// Apply Plausible proxy FIRST (before intl) so rewrites aren't affected by locale routing
+const configWithPlausible = withPlausibleProxy()(nextConfig);
+
+const configWithIntl = withNextIntl(configWithPlausible);
 
 const configWithSentry = withSentryConfig(configWithIntl, sentryOptions);
 
-const configWithPlausible = withPlausibleProxy()(configWithSentry);
-
-const configWithVercelToolbar = withVercelToolbar()(configWithPlausible);
+const configWithVercelToolbar = withVercelToolbar()(configWithSentry);
 
 export default configWithVercelToolbar;

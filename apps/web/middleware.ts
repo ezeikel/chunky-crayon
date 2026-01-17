@@ -23,7 +23,7 @@ type MobileTokenPayload = {
 
 /**
  * Verify and decode a mobile JWT token
- * Edge-compatible version for proxy
+ * Edge-compatible version for middleware
  */
 async function verifyMobileToken(
   token: string,
@@ -99,13 +99,18 @@ async function handleMobileApiAuth(
   });
 }
 
-export async function proxy(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
   // Handle mobile API routes - verify JWT and inject user info
   if (pathname.startsWith('/api/mobile')) {
     return handleMobileApiAuth(request);
+  }
+
+  // Skip i18n for Plausible analytics proxy routes
+  if (pathname.startsWith('/js/') || pathname.startsWith('/proxy/')) {
+    return NextResponse.next();
   }
 
   // Skip i18n for OG image routes - they should be served directly
