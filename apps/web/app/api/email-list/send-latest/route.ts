@@ -18,10 +18,15 @@ const handleRequest = async (request: Request) => {
       (url.searchParams.get('type') as GenerationType) || GenerationType.DAILY;
     const emails = url.searchParams.get('emails');
 
-    // get the most recent coloring image of the specified type
+    // Get start of today in UTC to only send emails for fresh images
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+
+    // get the most recent coloring image of the specified type created today
     const coloringImage = await db.coloringImage.findFirst({
       where: {
         generationType,
+        createdAt: { gte: todayStart },
       },
       orderBy: {
         createdAt: 'desc',
@@ -29,15 +34,18 @@ const handleRequest = async (request: Request) => {
     });
 
     if (!coloringImage) {
-      throw new Error(
-        `No ${generationType.toLowerCase()} coloring image found to send`,
+      console.warn(
+        `[send-latest] No ${generationType} image generated today - skipping email`,
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          message: `No ${generationType.toLowerCase()} image generated today - email skipped`,
+          skipped: true,
+        },
+        { headers: corsHeaders },
       );
     }
-
-    // TODO: Consider skipping the email if today's image generation failed and
-    // we'd be re-sending yesterday's image. For now with low user count this is
-    // acceptable, but may want to check if coloringImage.createdAt is from today
-    // before sending. Options: skip email entirely, or send with "missed yesterday" note.
 
     // parse custom emails if provided
     const customEmails = emails

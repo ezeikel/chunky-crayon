@@ -175,36 +175,24 @@ const PRIMARY_PROVIDER: ImageProvider =
 const FALLBACK_PROVIDER: ImageProvider =
   PRIMARY_PROVIDER === 'openai' ? 'google' : 'openai';
 
+// Retry configuration - OpenAI gives most consistent images, so retry before fallback
+const MAX_RETRIES = 3; // Total attempts on primary provider before fallback
+const RETRY_DELAY_MS = 1000; // Wait 1 second between retries
+
 /**
- * Check if an error should trigger fallback to another provider
+ * Check if an error is retryable on the same provider
+ * These are typically transient errors that may succeed on retry
  */
-function shouldFallback(error: unknown): boolean {
-  if (!(error instanceof Error)) return true;
+function isRetryableError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
 
   const message = error.message.toLowerCase();
 
-  // Rate limiting or quota errors
-  if (message.includes('rate limit') || message.includes('quota')) return true;
-
-  // Service unavailable
-  if (message.includes('503') || message.includes('unavailable')) return true;
-
-  // Timeout
-  if (message.includes('timeout')) return true;
-
-  // Server errors
-  if (
-    message.includes('500') ||
-    message.includes('502') ||
-    message.includes('504')
-  )
-    return true;
-
-  // Content policy / bad request errors (400) - the other provider might accept the prompt
-  // This happens when OpenAI's content filter is more strict than Gemini's
+  // Content policy / 400 errors - OpenAI may accept on retry with same prompt
+  // (content moderation can be non-deterministic)
   if (message.includes('400') || message.includes('bad request')) return true;
 
-  // Content policy violations (OpenAI specific)
+  // Content policy violations (OpenAI specific) - worth retrying
   if (
     message.includes('content_policy') ||
     message.includes('safety') ||
@@ -212,11 +200,55 @@ function shouldFallback(error: unknown): boolean {
   )
     return true;
 
+  // Transient server errors
+  if (
+    message.includes('500') ||
+    message.includes('502') ||
+    message.includes('504')
+  )
+    return true;
+
+  // Timeout - may succeed on retry
+  if (message.includes('timeout')) return true;
+
   return false;
 }
 
 /**
- * Generate a coloring page image with automatic fallback
+ * Check if an error should trigger immediate fallback to another provider
+ * (skip retries on primary provider)
+ */
+function shouldImmediateFallback(error: unknown): boolean {
+  if (!(error instanceof Error)) return true;
+
+  const message = error.message.toLowerCase();
+
+  // Rate limiting or quota errors - no point retrying, switch provider
+  if (message.includes('rate limit') || message.includes('quota')) return true;
+
+  // Service unavailable - provider is down
+  if (message.includes('503') || message.includes('unavailable')) return true;
+
+  // Authentication errors - won't be fixed by retry
+  if (message.includes('401') || message.includes('403')) return true;
+
+  return false;
+}
+
+/**
+ * Sleep for a given number of milliseconds
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Generate a coloring page image with retry logic and automatic fallback
+ *
+ * Strategy:
+ * 1. Try primary provider (OpenAI) up to MAX_RETRIES times
+ * 2. If all retries fail, fallback to secondary provider (Gemini)
+ * 3. Some errors (rate limits, auth) trigger immediate fallback without retries
  *
  * @param description - The user's description of what to generate
  * @param difficulty - Optional difficulty level for age-appropriate generation
@@ -234,41 +266,12 @@ export async function generateColoringPageImage(
     `[ImageGeneration] Using ${primaryConfig.name} (primary)${difficulty ? ` with difficulty: ${difficulty}` : ''}`,
   );
 
-  try {
-    const { imageBuffer, generationTimeMs } = await primaryConfig.generate(
-      description,
-      difficulty,
-    );
+  let lastPrimaryError: Error | null = null;
 
-    // Save to blob storage
-    const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
-    const { url } = await put(tempFileName, imageBuffer, { access: 'public' });
-
-    return {
-      url,
-      tempFileName,
-      generationTimeMs,
-      provider: primaryConfig.provider,
-      model: primaryConfig.id,
-      imageBuffer,
-    };
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `[ImageGeneration] ${primaryConfig.name} failed:`,
-      error instanceof Error ? error.message : error,
-    );
-
-    if (!shouldFallback(error)) {
-      throw error;
-    }
-
-    // Try fallback provider
-    // eslint-disable-next-line no-console
-    console.log(`[ImageGeneration] Falling back to ${fallbackConfig.name}`);
-
+  // Try primary provider with retries
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const { imageBuffer, generationTimeMs } = await fallbackConfig.generate(
+      const { imageBuffer, generationTimeMs } = await primaryConfig.generate(
         description,
         difficulty,
       );
@@ -279,26 +282,97 @@ export async function generateColoringPageImage(
         access: 'public',
       });
 
+      if (attempt > 1) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[ImageGeneration] ${primaryConfig.name} succeeded on attempt ${attempt}`,
+        );
+      }
+
       return {
         url,
         tempFileName,
         generationTimeMs,
-        provider: fallbackConfig.provider,
-        model: fallbackConfig.id,
+        provider: primaryConfig.provider,
+        model: primaryConfig.id,
         imageBuffer,
       };
-    } catch (fallbackError) {
+    } catch (error) {
+      lastPrimaryError =
+        error instanceof Error ? error : new Error(String(error));
+
       // eslint-disable-next-line no-console
       console.error(
-        `[ImageGeneration] Fallback ${fallbackConfig.name} also failed:`,
-        fallbackError instanceof Error ? fallbackError.message : fallbackError,
+        `[ImageGeneration] ${primaryConfig.name} attempt ${attempt}/${MAX_RETRIES} failed:`,
+        lastPrimaryError.message,
       );
 
-      // Re-throw the original error with context
-      throw new Error(
-        `Image generation failed with both providers. Primary (${primaryConfig.name}): ${error instanceof Error ? error.message : 'Unknown error'}. Fallback (${fallbackConfig.name}): ${fallbackError instanceof Error ? fallbackError.message : 'Unknown error'}`,
-      );
+      // Check if we should skip retries and immediately fallback
+      if (shouldImmediateFallback(error)) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[ImageGeneration] Error requires immediate fallback, skipping remaining retries`,
+        );
+        break;
+      }
+
+      // Check if the error is retryable
+      if (!isRetryableError(error)) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[ImageGeneration] Error is not retryable, moving to fallback`,
+        );
+        break;
+      }
+
+      // If we have more retries, wait before the next attempt
+      if (attempt < MAX_RETRIES) {
+        // eslint-disable-next-line no-console
+        console.log(
+          `[ImageGeneration] Retrying ${primaryConfig.name} in ${RETRY_DELAY_MS}ms...`,
+        );
+        await sleep(RETRY_DELAY_MS);
+      }
     }
+  }
+
+  // All retries exhausted or non-retryable error, try fallback provider
+  // eslint-disable-next-line no-console
+  console.log(
+    `[ImageGeneration] ${primaryConfig.name} failed after ${MAX_RETRIES} attempts, falling back to ${fallbackConfig.name}`,
+  );
+
+  try {
+    const { imageBuffer, generationTimeMs } = await fallbackConfig.generate(
+      description,
+      difficulty,
+    );
+
+    // Save to blob storage
+    const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
+    const { url } = await put(tempFileName, imageBuffer, {
+      access: 'public',
+    });
+
+    return {
+      url,
+      tempFileName,
+      generationTimeMs,
+      provider: fallbackConfig.provider,
+      model: fallbackConfig.id,
+      imageBuffer,
+    };
+  } catch (fallbackError) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `[ImageGeneration] Fallback ${fallbackConfig.name} also failed:`,
+      fallbackError instanceof Error ? fallbackError.message : fallbackError,
+    );
+
+    // Re-throw with context about both failures
+    throw new Error(
+      `Image generation failed with both providers. Primary (${primaryConfig.name}): ${lastPrimaryError?.message || 'Unknown error'}. Fallback (${fallbackConfig.name}): ${fallbackError instanceof Error ? fallbackError.message : 'Unknown error'}`,
+    );
   }
 }
 
