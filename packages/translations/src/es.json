@@ -284,7 +284,7 @@
     },
     "ageGroups": {
       "toddlers": {
-        "title": "Para peques",
+        "title": "Para pequeños",
         "ages": "De 2 a 4 años",
         "description": "Formas simples, líneas gruesas"
       },
@@ -405,10 +405,10 @@
         "createYourDesign": "Crea tu diseño"
       },
       "toddlers": {
-        "pageTitle": "Dibujos para colorear para peques",
-        "featuredSection": "Dibujos sencillos para peques",
-        "categoriesSection": "Categorías para peques",
-        "heroDescription": "¡Páginas simples y fáciles de colorear para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos: perfectas para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
+        "pageTitle": "Dibujos para colorear para pequeños",
+        "featuredSection": "Dibujos sencillos para pequeños",
+        "categoriesSection": "Categorías para pequeños",
+        "heroDescription": "¡Páginas simples y fáciles de colorear para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos las hacen perfectas para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
         "whyTitle": "Perfecto para pequeños artistas",
         "why1Title": "Líneas grandes y marcadas",
         "why1Description": "¡Los contornos gruesos ayudan a las manitas pequeñas a no salirse de las líneas!",
@@ -416,11 +416,11 @@
         "why2Description": "Formas básicas y objetos conocidos que a los peques les encantan.",
         "why3Title": "Aprende los colores",
         "why3Description": "¡Genial para aprender colores y desarrollar la creatividad!",
-        "seoTitle": "Dibujos para colorear gratis para peques",
+        "seoTitle": "Dibujos para colorear gratis para pequeños",
         "seoParagraph1": "¿Vas a iniciar a tu peque en el coloreado? Nuestra colección de dibujos sencillos es perfecta para niños de 2 a 4 años. Cada diseño tiene zonas grandes y fáciles de colorear, con contornos marcados que ayudan a desarrollar la motricidad fina.",
         "seoParagraph2": "Nuestros dibujos para peques se centran en objetos familiares que les encantan: animalitos adorables, comida rica, vehículos coloridos y bonitas escenas de naturaleza. Los diseños simples reducen la frustración y animan a crear.",
-        "seoParagraph3": "Todas las páginas se pueden imprimir en papel A4 o colorear online con nuestras herramientas digitales, súper fáciles de usar. Perfectas para ratitos tranquilos, días de lluvia o actividades en casa o en infantil.",
-        "benefitsTitle": "Beneficios de colorear para los peques",
+        "seoParagraph3": "Todas las páginas se pueden imprimir en papel A4 o colorear online con nuestras herramientas digitales, súper fáciles de usar. Perfectas para ratitos tranquilos, días de lluvia o actividades en casa o en preescolar.",
+        "benefitsTitle": "Beneficios de colorear para pequeños",
         "benefitsDescription": "Colorear ayuda a desarrollar habilidades importantes como: coordinación mano-ojo, reconocimiento de colores, fuerza de agarre, atención y concentración, y expresión creativa. ¡Empieza con los diseños más sencillos y mira cómo crece tu peque!"
       },
       "kids": {
@@ -436,7 +436,7 @@
         "why3Title": "Colorea online",
         "why3Description": "¡Usa nuestras herramientas para colorear en el navegador!",
         "seoTitle": "Dibujos para colorear gratis para niños",
-        "seoParagraph1": "¿Buscas los dibujos perfectos para tus hijos? Chunky Crayon ofrece una enorme colección de dibujos para colorear gratis e imprimibles, pensados especialmente para niños de 4 a 12 años. De animales adorables a superhéroes llenos de acción: hay algo para cada pequeño artista.",
+        "seoParagraph1": "¿Buscas los dibujos perfectos para tus hijos? Chunky Crayon ofrece una enorme colección de dibujos para colorear gratis e imprimibles, pensados especialmente para niños de 4 a 12 años. Desde animales adorables hasta superhéroes llenos de acción, hay algo para cada pequeño artista.",
         "seoParagraph2": "Nuestros dibujos tienen líneas limpias y marcadas, fáciles de colorear para manitas pequeñas. Ya sea con ceras, lápices de colores o rotuladores, están diseñados para que el resultado quede genial. También puedes usar nuestras herramientas online para crear en pantalla.",
         "seoParagraph3": "Y lo mejor: los niños pueden crear sus propios dibujos únicos describiendo lo que quieren colorear. ¿Un dragón jugando al fútbol? ¿Un unicornio en el espacio? ¡Lo que imaginen puede hacerse realidad en segundos!",
         "popularTitle": "Categorías populares para niños",
@@ -455,7 +455,7 @@
         "why3Title": "Alivio del estrés",
         "why3Description": "Tómate un respiro de las pantallas y relájate coloreando.",
         "seoTitle": "Dibujos para colorear gratis para adolescentes",
-        "seoParagraph1": "¿Buscas dibujos para colorear que no sean \"demasiado infantiles\"? Nuestra colección para adolescentes tiene diseños geniales y detallados, perfectos para edades de 13 a 17 años. De personajes de anime y escenas gaming a mundos de fantasía y patrones abstractos: hay un estilo para cada uno.",
+        "seoParagraph1": "¿Buscas dibujos para colorear que no sean \"demasiado infantiles\"? Nuestra colección para adolescentes tiene diseños geniales y detallados, perfectos para edades de 13 a 17 años. Desde personajes de anime y escenas gaming hasta mundos de fantasía y patrones abstractos, hay algo para cada estilo.",
         "seoParagraph2": "Estos no son los dibujos de tu hermanito. Nuestros diseños para adolescentes tienen detalles elaborados, composiciones dinámicas y temas que conectan con sus intereses. Ideales para expresarte, relajarte en descansos de estudio o simplemente desconectar.",
         "seoParagraph3": "Crea tus propios dibujos personalizados describiendo exactamente lo que quieres. ¿Un dragón luchando contra un robot en el espacio? ¿Un retrato estilo anime? ¿Un mandala detallado con tus símbolos favoritos? ¡Descríbelo y nuestra IA lo hace realidad!",
         "popularTitle": "Temas populares para adolescentes",
