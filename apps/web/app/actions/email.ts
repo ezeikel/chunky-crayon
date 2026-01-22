@@ -13,6 +13,7 @@ import DailyColoringEmail from '@/emails/DailyColoringEmail';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
 import { stripe } from '@/lib/stripe';
+import { getResendFromAddress } from '@/lib/email-config';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
@@ -87,7 +88,7 @@ export const joinColoringPageEmailList = async (
     const welcomeEmailHtml = await render(WelcomeEmail({ unsubscribeUrl }));
 
     await resend.emails.send({
-      from: 'Chunky Crayon <no-reply@notifications.chunkycrayon.com>',
+      from: getResendFromAddress('no-reply', 'Chunky Crayon'),
       to: email,
       subject: 'Welcome to Chunky Crayon! 🎨',
       html: welcomeEmailHtml,
@@ -163,7 +164,7 @@ const sendSingleColoringEmail = async (
   const emailHtml = await render(DailyColoringEmail({ unsubscribeUrl }));
 
   return resend.emails.send({
-    from: 'Chunky Crayon <no-reply@notifications.chunkycrayon.com>',
+    from: getResendFromAddress('no-reply', 'Chunky Crayon'),
     to,
     subject,
     html: emailHtml,
@@ -252,7 +253,7 @@ export const sendPaymentFailedEmail = async ({
     );
 
     await resend.emails.send({
-      from: 'Chunky Crayon <billing@notifications.chunkycrayon.com>',
+      from: getResendFromAddress('billing', 'Chunky Crayon'),
       to: email,
       subject: `Action needed: Your payment couldn't be processed`,
       html: emailHtml,

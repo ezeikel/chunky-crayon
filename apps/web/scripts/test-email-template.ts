@@ -13,6 +13,7 @@ import { render } from '@react-email/components';
 import * as dotenv from 'dotenv';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import DailyColoringEmail from '@/emails/DailyColoringEmail';
+import { getResendFromAddress } from '@/lib/email-config';
 
 dotenv.config({ path: '.env.local' });
 
@@ -49,7 +50,7 @@ async function main() {
 
   try {
     const result = await resend.emails.send({
-      from: 'Chunky Crayon <no-reply@chunkycrayon.com>',
+      from: getResendFromAddress('no-reply', 'Chunky Crayon'),
       to: email,
       subject,
       html,

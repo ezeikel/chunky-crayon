@@ -6,6 +6,7 @@ import FacebookProvider from 'next-auth/providers/facebook';
 import Resend from 'next-auth/providers/resend';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { db } from '@chunky-crayon/db';
+import { getResendFromAddress } from '@/lib/email-config';
 
 type AppleProfile = Profile & {
   user?: {
@@ -44,7 +45,7 @@ const config = {
     }),
     Resend({
       apiKey: process.env.RESEND_API_KEY,
-      from: 'no-reply@chunkycrayon.com',
+      from: getResendFromAddress('no-reply'),
     }),
   ],
   callbacks: {
@@ -71,7 +72,10 @@ const config = {
 
         let name;
 
-        if (account?.provider === 'google' || account?.provider === 'facebook') {
+        if (
+          account?.provider === 'google' ||
+          account?.provider === 'facebook'
+        ) {
           name = profile?.name;
         } else if (account?.provider === 'apple' && appleProfile?.user) {
           // Apple only returns the user object this first time the user authorises the app - subsequent authorisations don't return the user object https://stackoverflow.com/questions/63500926/apple-sign-in-authorize-method-returns-name-only-first-time

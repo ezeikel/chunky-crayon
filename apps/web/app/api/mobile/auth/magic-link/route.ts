@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { SignJWT, jwtVerify } from 'jose';
 import { Resend } from 'resend';
 import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
+import { getResendFromAddress } from '@/lib/email-config';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +13,9 @@ const corsHeaders = {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const MAGIC_LINK_SECRET = new TextEncoder().encode(
-  process.env.MAGIC_LINK_SECRET || process.env.NEXT_AUTH_SECRET || 'magic-link-secret',
+  process.env.MAGIC_LINK_SECRET ||
+    process.env.NEXT_AUTH_SECRET ||
+    'magic-link-secret',
 );
 
 // Magic link expires in 15 minutes
@@ -25,7 +28,10 @@ export async function OPTIONS() {
 /**
  * Create an encrypted magic link token
  */
-async function createMagicLinkToken(email: string, deviceId: string): Promise<string> {
+async function createMagicLinkToken(
+  email: string,
+  deviceId: string,
+): Promise<string> {
   return new SignJWT({ email, deviceId })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -78,7 +84,9 @@ export async function POST(request: NextRequest) {
 
     if (!deviceId) {
       return NextResponse.json(
-        { error: 'Device not registered. Call /api/mobile/auth/register first.' },
+        {
+          error: 'Device not registered. Call /api/mobile/auth/register first.',
+        },
         { status: 401, headers: corsHeaders },
       );
     }
@@ -88,12 +96,13 @@ export async function POST(request: NextRequest) {
 
     // Build the magic link URL
     // This redirects to a page that handles the mobile app deep link
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chunkycrayon.com';
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL || 'https://chunkycrayon.com';
     const magicLinkUrl = `${baseUrl}/auth/mobile/magic-link-redirect?token=${encodeURIComponent(token)}`;
 
     // Send the email
     await resend.emails.send({
-      from: 'Chunky Crayon <no-reply@chunkycrayon.com>',
+      from: getResendFromAddress('no-reply', 'Chunky Crayon'),
       to: email,
       subject: 'Sign in to Chunky Crayon',
       html: `
