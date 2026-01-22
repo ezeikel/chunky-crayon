@@ -87,7 +87,7 @@ export const joinColoringPageEmailList = async (
     const welcomeEmailHtml = await render(WelcomeEmail({ unsubscribeUrl }));
 
     await resend.emails.send({
-      from: 'Chunky Crayon <no-reply@chunkycrayon.com>',
+      from: 'Chunky Crayon <no-reply@notifications.chunkycrayon.com>',
       to: email,
       subject: 'Welcome to Chunky Crayon! 🎨',
       html: welcomeEmailHtml,
@@ -163,7 +163,7 @@ const sendSingleColoringEmail = async (
   const emailHtml = await render(DailyColoringEmail({ unsubscribeUrl }));
 
   return resend.emails.send({
-    from: 'Chunky Crayon <no-reply@chunkycrayon.com>',
+    from: 'Chunky Crayon <no-reply@notifications.chunkycrayon.com>',
     to,
     subject,
     html: emailHtml,
@@ -252,7 +252,7 @@ export const sendPaymentFailedEmail = async ({
     );
 
     await resend.emails.send({
-      from: 'Chunky Crayon <billing@chunkycrayon.com>',
+      from: 'Chunky Crayon <billing@notifications.chunkycrayon.com>',
       to: email,
       subject: `Action needed: Your payment couldn't be processed`,
       html: emailHtml,
