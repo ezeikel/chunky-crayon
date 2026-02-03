@@ -14,6 +14,7 @@ import {
   createBlogImagePromptPrompt,
   generateColoringPageImage,
 } from '@/lib/ai';
+import { del } from '@/lib/storage';
 import { writeClient, client, coveredTopicsQuery } from '@/lib/sanity';
 import { BLOG_TOPICS, BLOG_AUTHORS, type BlogTopic } from '@/constants';
 
@@ -536,6 +537,13 @@ export async function generateBlogPostForTopic(
       // Upload to Sanity (GenerationResult always has url on success, throws on failure)
       const filename = `${meta.slug}-featured.webp`;
       imageAssetRef = await uploadImageToSanity(imageResult.url, filename);
+
+      // Clean up temp file from R2 after uploading to Sanity
+      try {
+        await del(imageResult.tempFileName);
+      } catch (cleanupError) {
+        console.error('Failed to clean up temp image:', cleanupError);
+      }
     } catch (imageError) {
       console.error(
         'Failed to generate image, continuing without:',
