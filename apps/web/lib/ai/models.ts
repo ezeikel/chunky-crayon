@@ -1,3 +1,4 @@
+import { anthropic } from '@ai-sdk/anthropic';
 import { openai } from '@ai-sdk/openai';
 import { google } from '@ai-sdk/google';
 import { createReplicate } from '@ai-sdk/replicate';
@@ -14,7 +15,10 @@ import { getPostHogClient } from '@/lib/posthog-server';
 
 // Model identifiers
 export const MODEL_IDS = {
-  // OpenAI Text models
+  // Anthropic Text models
+  CLAUDE_SONNET_4_5: 'claude-sonnet-4-5-20250929',
+
+  // OpenAI Text models (kept for image generation pipelines)
   GPT_4O: 'gpt-4o',
   GPT_4O_MINI: 'gpt-4o-mini',
 
@@ -77,10 +81,10 @@ export function getImageQualityModel(): ImageModel {
 // Pre-configured model instances (text models are safe to initialize eagerly)
 export const models = {
   // Primary text model for complex tasks (vision, structured output, reasoning)
-  text: openai(MODEL_IDS.GPT_4O),
+  text: anthropic(MODEL_IDS.CLAUDE_SONNET_4_5),
 
-  // Faster/cheaper text model for simpler tasks
-  textFast: openai(MODEL_IDS.GPT_4O_MINI),
+  // Faster/cheaper text model for simpler tasks (same model, single tier for now)
+  textFast: anthropic(MODEL_IDS.CLAUDE_SONNET_4_5),
 
   // Image generation model - use getter function for lazy initialization
   // ~1.3s generation time, $0.003/image (vs DALL-E 3's 15-45s, $0.04-0.08)
