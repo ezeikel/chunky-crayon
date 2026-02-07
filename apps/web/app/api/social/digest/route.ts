@@ -7,7 +7,7 @@ import {
   generateTikTokCaption,
 } from '@/app/actions/social';
 import { sendSocialDigest } from '@/app/actions/email';
-import type { SocialDigestEntry } from '@/emails/SocialDigestEmail';
+import type { SocialDigestEntry } from '@/app/actions/email';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 

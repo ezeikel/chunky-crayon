@@ -13,11 +13,16 @@ import DailyColoringEmail from '@/emails/DailyColoringEmail';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
 import SocialDigestEmail from '@/emails/SocialDigestEmail';
-import type { SocialDigestEntry } from '@/emails/SocialDigestEmail';
 import { stripe } from '@/lib/stripe';
 import { getResendFromAddress } from '@/lib/email-config';
 
-export type { SocialDigestEntry };
+export type SocialDigestEntry = {
+  platform: string;
+  caption: string;
+  autoPosted: boolean;
+  assetType: 'image' | 'video';
+  assetUrl?: string;
+};
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';

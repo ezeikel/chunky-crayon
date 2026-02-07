@@ -11,7 +11,7 @@ import {
   Text,
 } from '@react-email/components';
 
-export type SocialDigestEntry = {
+type SocialDigestEntry = {
   platform: string;
   caption: string;
   autoPosted: boolean;
