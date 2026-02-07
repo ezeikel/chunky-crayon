@@ -1,58 +1,8 @@
 import { NextResponse } from 'next/server';
 import { db, GenerationType } from '@chunky-crayon/db';
 import { auth } from '@/auth';
-import { generateText, models } from '@/lib/ai';
 import { ADMIN_EMAILS } from '@/constants';
-
-const TIKTOK_CAPTION_SYSTEM = `You are a TikTok content strategist. TikTok is about AUTHENTICITY and ENTERTAINMENT. Your audience is young parents (25-40) discovering parenting hacks on their FYP.
-
-STRUCTURE (300-500 chars including hashtags):
-
-1. HOOK FORMAT (choose ONE that fits):
-   - "POV: Your kid gets the exact coloring page they described"
-   - "Wait for it..."
-   - "Things that make parenting easier:"
-   - "Why didn't this exist when I was a kid?"
-
-2. ONE-LINER PUNCH: "The future of coloring pages is HERE" / "Screen-free wins"
-
-3. COMMENT BAIT (essential): "What should we make next? Comment!" / "Drop a 🎨 if your kid would love this"
-
-4. CTA: "Link in bio!"
-
-5. HASHTAGS (5-7 total):
-   - Niche: #coloringpage #kidsactivities #screenfreeplay #parentinghack
-   - Broad: #fyp #momtok #parentsoftiktok
-
-TONE: Casual, authentic. Cool parent sharing a discovery, not a brand.`;
-
-/**
- * Generate a TikTok-optimized caption using AI.
- */
-const generateTikTokCaption = async (
-  title: string,
-  description: string,
-  tags: string[],
-): Promise<string> => {
-  try {
-    const { text } = await generateText({
-      model: models.textFast,
-      system: TIKTOK_CAPTION_SYSTEM,
-      prompt: `Create a TikTok caption for this coloring page:
-Title: ${title}
-Description: ${description}
-Tags: ${tags.join(', ')}
-
-Return ONLY the caption with hashtags, nothing else.`,
-    });
-
-    return text.trim();
-  } catch (error) {
-    console.error('[TikTok] Caption generation failed:', error);
-    // Fallback caption
-    return `${title} 🎨 Free coloring page! #coloringpage #kidscrafts #artforkids #freecoloringpage`;
-  }
-};
+import { generateTikTokCaption } from '@/app/actions/social';
 
 /**
  * Get TikTok access token from database.
@@ -283,11 +233,7 @@ export const POST = async (request: Request) => {
     console.log('[TikTok] Posting animation for:', coloringImage.title);
 
     // Generate TikTok-optimized caption
-    const caption = await generateTikTokCaption(
-      coloringImage.title,
-      coloringImage.description,
-      coloringImage.tags,
-    );
+    const caption = await generateTikTokCaption(coloringImage);
 
     // Post to TikTok
     const result = await postVideoToTikTok(coloringImage.animationUrl, caption);

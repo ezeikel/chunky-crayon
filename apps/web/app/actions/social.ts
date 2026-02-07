@@ -6,9 +6,11 @@ import {
   INSTAGRAM_CAPTION_SYSTEM,
   FACEBOOK_CAPTION_SYSTEM,
   PINTEREST_CAPTION_SYSTEM,
+  TIKTOK_CAPTION_SYSTEM,
   createInstagramCaptionPrompt,
   createFacebookCaptionPrompt,
   createPinterestCaptionPrompt,
+  createTikTokCaptionPrompt,
 } from '@/lib/ai';
 import { ColoringImage } from '@chunky-crayon/db';
 
@@ -23,12 +25,12 @@ CAROUSEL POST - Create ANTICIPATION for swiping:
 Slides: 1) Printable coloring page 2) Animated version coming to life
 
 REQUIREMENTS:
-1. Hook MUST create swipe urge: "Watch what happens when this [subject] comes to life... (slide 2 is everything)"
-2. Natural swipe CTAs: "Swipe to watch the magic unfold" / "Slide 2 is *chef's kiss*"
-3. SAVE TRIGGER (essential): "Save this for your next coloring adventure"
+1. Hook MUST create swipe urge: "Swipe to see this [subject] come to life" / "Slide 2 is *chef's kiss*"
+2. Natural swipe CTAs: "Swipe to watch the animation" / "Wait till you see slide 2"
+3. SAVE TRIGGER (essential): "Save this for your next coloring session"
 4. Final CTA: "Love it? Grab this page free - link in bio!"
 
-Remember: Output ONLY the final caption text without any labels or section markers.`;
+Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text without any labels or section markers.`;
 
 /**
  * Instagram carousel with colored example (2 slides).
@@ -41,12 +43,12 @@ const INSTAGRAM_CAROUSEL_WITH_COLORED_ADDENDUM = `
 Slides: 1) Colored example (eye-catching) 2) Printable B&W version
 
 REQUIREMENTS:
-1. Color hook: "Look at this adorable [subject]!" / "This is what YOUR kid could create"
+1. Color hook: "Look how this one turned out!" / "We love how this [subject] came together"
 2. Swipe CTA: "Swipe for the free printable version!"
 3. SAVE TRIGGER: "Save this for your next coloring session"
 4. CTA: "Free download - link in bio!"
 
-Remember: Output ONLY the final caption text without any labels or section markers.`;
+Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text without any labels or section markers.`;
 
 /**
  * Instagram Reel-specific system prompt addition.
@@ -58,9 +60,9 @@ REEL - Optimized for DISCOVERY and REACH:
 
 REQUIREMENTS:
 1. VIRAL HOOK (choose one that fits):
-   - "Parents, you're welcome."
-   - "POV: Your kid gets exactly the coloring page they asked for"
-   - "This is why I love screen-free activities"
+   - "You're welcome."
+   - "POV: You find the perfect coloring page"
+   - "This is why we love making coloring pages"
 
 2. SHORT caption (under 150 chars before hashtags) - Reel captions get clipped
 
@@ -70,7 +72,7 @@ REQUIREMENTS:
 
 5. DISCOVERY HASHTAGS (8-12): Mix #reels #explorepage with niche tags like #kidsactivities #coloringpage
 
-Remember: Output ONLY the final caption text without any labels or section markers like "REEL:", "VIRAL HOOK:", etc.`;
+Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text without any labels or section markers like "REEL:", "VIRAL HOOK:", etc.`;
 
 /**
  * Facebook video-specific system prompt addition.
@@ -81,11 +83,11 @@ VIDEO POST - Optimize for watch time and shares:
 
 REQUIREMENTS:
 1. WATCH-TIME hook: "Watch until the end - the animation is SO satisfying"
-2. SHARE TRIGGER: "Share this with a parent who needs a screen-free activity idea"
-3. COMMENT DRIVER: "What animal should we animate next? Drop your vote!"
+2. SHARE TRIGGER: "Share this with someone who loves creative activities!"
+3. COMMENT DRIVER: "What should we animate next? Drop your vote!"
 4. CTA: "Download the printable version at chunkycrayon.com"
 
-Remember: Output ONLY the final post text without any labels or section markers like "POST CAPTION:", "VIDEO:", etc.`;
+Remember: Write as Chunky Crayon the brand. Output ONLY the final post text without any labels or section markers like "POST CAPTION:", "VIDEO:", etc.`;
 
 /**
  * Facebook image post when video is also posted.
@@ -96,12 +98,12 @@ const FACEBOOK_IMAGE_WITH_VIDEO_ADDENDUM = `
 IMAGE POST (video also posted) - Cross-reference naturally:
 
 REQUIREMENTS:
-1. Reference the video: "Saw our animated video? Here's the printable so your kid can color it themselves!"
+1. Reference the video: "Saw our animated video? Here's the printable version!"
 2. OR lead with printable: "The printable version of today's animated coloring page"
 3. Download CTA: "Free download at chunkycrayon.com"
 4. Keep warm and family-focused
 
-Remember: Output ONLY the final post text without any labels or section markers like "Caption:", "Call to Action:", etc.`;
+Remember: Write as Chunky Crayon the brand. Output ONLY the final post text without any labels or section markers like "Caption:", "Call to Action:", etc.`;
 
 export type InstagramPostType =
   | 'image'
@@ -179,6 +181,27 @@ export const generatePinterestCaption = async (
   return text;
 };
 
+export const generateTikTokCaption = async (
+  coloringImage: ColoringImage,
+): Promise<string> => {
+  try {
+    const { text } = await generateText({
+      model: models.textFast,
+      system: TIKTOK_CAPTION_SYSTEM,
+      prompt: createTikTokCaptionPrompt(
+        coloringImage.title ?? '',
+        coloringImage.description ?? '',
+        coloringImage.tags ?? [],
+      ),
+    });
+
+    return text.trim();
+  } catch (error) {
+    console.error('[TikTok] Caption generation failed:', error);
+    return `${coloringImage.title ?? 'New coloring page'} 🎨 Free coloring page! #coloringpage #kidscrafts #artforkids #freecoloringpage`;
+  }
+};
+
 // =============================================================================
 // Fact Card Caption Generation
 // =============================================================================
@@ -191,11 +214,13 @@ import type { GeneratedFact } from '@/lib/social/facts';
  */
 const FACT_CARD_CAPTION_SYSTEM = `You are writing captions for Chunky Crayon's fact card posts - beautiful graphics with facts about coloring, creativity, or child development.
 
-FACT CARD TRUTH: These are SHARE-BAIT. Parents love sharing "did you know" content to look like informed parents.
+VOICE: You ARE Chunky Crayon the brand. Use "we" not "I". Never pretend to be a parent.
+
+FACT CARD TRUTH: These are SHARE-BAIT. People love sharing "did you know" content.
 
 STRUCTURE:
-1. REACTION (1 sentence): "I had to share this!" / "This is why we're passionate about coloring"
-2. SHAREABILITY: "Tag a parent who needs to see this!" / "Share with your parenting group"
+1. REACTION (1 sentence): "We had to share this!" / "This is why we're passionate about coloring"
+2. SHAREABILITY: "Tag someone who'd love this!" / "Share this with your friends"
 3. ENGAGEMENT: "Did you know this? Yes or No!" / "Does this resonate?"
 4. SOFT CTA: "More coloring fun at chunkycrayon.com"
 
@@ -219,11 +244,11 @@ const FACT_CARD_FACEBOOK_ADDENDUM = `
 
 Facebook format:
 - Conversational, shareable tone
-- SHARE TRIGGER: "Tag a parent who'd love this!" / "Share to your mommy group"
+- SHARE TRIGGER: "Tag someone who'd love this!" / "Share this with your friends"
 - 2-3 hashtags max
 - Full link: chunkycrayon.com
 
-Remember: Output ONLY the final post text without any labels or section markers.`;
+Remember: Write as Chunky Crayon the brand. Output ONLY the final post text without any labels or section markers.`;
 
 const FACT_CARD_PINTEREST_ADDENDUM = `
 

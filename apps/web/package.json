@@ -23,6 +23,7 @@
     "test:social": "tsx scripts/test-social-posting.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.38",
     "@ai-sdk/google": "^3.0.1",
     "@ai-sdk/openai": "^3.0.1",
     "@ai-sdk/provider": "^3.0.0",

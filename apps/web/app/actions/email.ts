@@ -12,8 +12,17 @@ import redis, { REDIS_KEYS } from '@/lib/redis';
 import DailyColoringEmail from '@/emails/DailyColoringEmail';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
+import SocialDigestEmail from '@/emails/SocialDigestEmail';
 import { stripe } from '@/lib/stripe';
 import { getResendFromAddress } from '@/lib/email-config';
+
+export type SocialDigestEntry = {
+  platform: string;
+  caption: string;
+  autoPosted: boolean;
+  assetType: 'image' | 'video';
+  assetUrl?: string;
+};
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
@@ -263,6 +272,68 @@ export const sendPaymentFailedEmail = async ({
     return { success: true };
   } catch (error) {
     console.error(`Failed to send payment failed email to ${email}:`, error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+};
+
+// Send social media digest email
+export const sendSocialDigest = async ({
+  coloringImageTitle,
+  coloringImageUrl,
+  svgUrl,
+  animationUrl,
+  entries,
+}: {
+  coloringImageTitle: string;
+  coloringImageUrl: string;
+  svgUrl?: string;
+  animationUrl?: string;
+  entries: SocialDigestEntry[];
+}): Promise<{ success: boolean; error?: string }> => {
+  const digestEmail = process.env.SOCIAL_DIGEST_EMAIL;
+
+  if (!digestEmail) {
+    return { success: false, error: 'SOCIAL_DIGEST_EMAIL not configured' };
+  }
+
+  try {
+    const timestamp = new Date().toLocaleDateString('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+
+    const emailHtml = await render(
+      SocialDigestEmail({
+        coloringImageTitle,
+        coloringImageUrl,
+        svgUrl,
+        animationUrl,
+        entries,
+        timestamp,
+      }),
+    );
+
+    const date = new Date();
+    const dayName = date.toLocaleDateString('en-GB', { weekday: 'short' });
+    const day = date.getDate();
+    const month = date.toLocaleDateString('en-GB', { month: 'short' });
+
+    await resend.emails.send({
+      from: getResendFromAddress('no-reply', 'Chunky Crayon'),
+      to: digestEmail,
+      subject: `Social Digest - ${dayName} ${day} ${month}`,
+      html: emailHtml,
+    });
+
+    console.log(`📧 Sent social digest email to: ${digestEmail}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to send social digest email:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

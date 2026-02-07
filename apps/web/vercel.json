@@ -72,6 +72,14 @@
       "schedule": "20 15 * * 0,6"
     },
     {
+      "path": "/api/social/digest",
+      "schedule": "25 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/digest",
+      "schedule": "25 15 * * 0,6"
+    },
+    {
       "path": "/api/admin/tokens",
       "schedule": "0 8 * * 1"
     },
