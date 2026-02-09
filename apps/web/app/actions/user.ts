@@ -29,8 +29,10 @@ export const getUserId = async (action?: string) => {
     action === ACTIONS.GET_CURRENT_USER ||
     action === ACTIONS.GET_ENTITLEMENTS ||
     action === ACTIONS.GET_ALL_COLORING_IMAGES ||
+    action === ACTIONS.CREATE_COLORING_IMAGE ||
     action === ACTIONS.CREATE_CHECKOUT_SESSION ||
-    action === ACTIONS.GET_ACTIVE_PROFILE
+    action === ACTIONS.GET_ACTIVE_PROFILE ||
+    action === 'track analytics event'
   ) {
     return userId;
   }
