@@ -53,7 +53,7 @@ export async function generateFact(): Promise<GeneratedFact> {
   const category = selectRandomCategory();
 
   const { text } = await generateText({
-    model: models.text,
+    model: models.creative,
     system: FACT_GENERATION_SYSTEM,
     prompt: createFactGenerationPrompt(category),
   });
@@ -85,7 +85,7 @@ export async function generateFactForCategory(
     FACT_CATEGORIES.find((c) => c.name === categoryName) || FACT_CATEGORIES[0];
 
   const { text } = await generateText({
-    model: models.text,
+    model: models.creative,
     system: FACT_GENERATION_SYSTEM,
     prompt: createFactGenerationPrompt(category),
   });

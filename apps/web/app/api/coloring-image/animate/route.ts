@@ -55,7 +55,7 @@ async function generateAnimationPrompt(
 ): Promise<string> {
   try {
     const { text } = await generateText({
-      model: models.textFast,
+      model: models.creative,
       system: ANIMATION_PROMPT_SYSTEM,
       prompt: createAnimationPromptPrompt(title, description, tags),
     });

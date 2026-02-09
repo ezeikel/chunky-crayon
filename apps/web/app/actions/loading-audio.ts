@@ -68,7 +68,7 @@ export async function generateLoadingAudio(
 
   // Step 1: Generate Colo's script using fast model (with language support)
   const { text: script } = await generateText({
-    model: tracedModels.textFast,
+    model: tracedModels.creative,
     system: createColoVoiceScriptSystemPrompt(
       languageInfo.name,
       languageInfo.nativeName,

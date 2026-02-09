@@ -156,7 +156,7 @@ const generateColoringImageWithMetadata = async (
 
   // Step 1: Clean up the user's description
   const { text: cleanedUpUserDescription } = await generateText({
-    model: tracedModels.text,
+    model: tracedModels.creative,
     system: CLEAN_UP_DESCRIPTION_SYSTEM,
     prompt: description,
   });
@@ -185,7 +185,7 @@ const generateColoringImageWithMetadata = async (
   const [metadataResult, svg, webpBuffer] = await Promise.all([
     // A) Generate metadata using faster model (GPT-4o-mini), with language support
     generateObject({
-      model: tracedModels.textFast,
+      model: tracedModels.vision,
       schema: imageMetadataSchema,
       system: createImageMetadataSystemPrompt(
         languageInfo.name,
@@ -408,7 +408,9 @@ export const createColoringImage = async (
               where: { id: result.id },
               data: { animationPrompt },
             });
-            console.log(`[Pipeline] Animation prompt generated for ${result.id}`);
+            console.log(
+              `[Pipeline] Animation prompt generated for ${result.id}`,
+            );
           } catch (error) {
             console.error(
               `[Pipeline] Failed to generate animation prompt:`,

@@ -126,7 +126,7 @@ export const generateInstagramCaption = async (
   }
 
   const { text } = await generateText({
-    model: models.text,
+    model: models.creative,
     system: systemPrompt,
     prompt: createInstagramCaptionPrompt(
       coloringImage.title ?? '',
@@ -153,7 +153,7 @@ export const generateFacebookCaption = async (
   }
 
   const { text } = await generateText({
-    model: models.text,
+    model: models.creative,
     system: systemPrompt,
     prompt: createFacebookCaptionPrompt(
       coloringImage.title ?? '',
@@ -169,7 +169,7 @@ export const generatePinterestCaption = async (
   coloringImage: ColoringImage,
 ) => {
   const { text } = await generateText({
-    model: models.text,
+    model: models.creative,
     system: PINTEREST_CAPTION_SYSTEM,
     prompt: createPinterestCaptionPrompt(
       coloringImage.title ?? '',
@@ -186,7 +186,7 @@ export const generateTikTokCaption = async (
 ): Promise<string> => {
   try {
     const { text } = await generateText({
-      model: models.textFast,
+      model: models.creative,
       system: TIKTOK_CAPTION_SYSTEM,
       prompt: createTikTokCaptionPrompt(
         coloringImage.title ?? '',
@@ -288,7 +288,7 @@ Emoji used on card: ${fact.emoji}
 Remember: The fact is already displayed on the graphic. Your caption should complement it with a brief comment and CTA.`;
 
   const { text } = await generateText({
-    model: models.text,
+    model: models.creative,
     system: systemPrompt,
     prompt,
   });

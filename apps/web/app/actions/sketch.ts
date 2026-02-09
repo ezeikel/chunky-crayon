@@ -26,7 +26,7 @@ const DESCRIBE_SKETCH_PROMPT = `Please describe this child's sketch for generati
 
 export async function describeSketch(base64Image: string): Promise<string> {
   const { text } = await generateText({
-    model: models.text,
+    model: models.vision,
     system: DESCRIBE_SKETCH_SYSTEM,
     messages: [
       {

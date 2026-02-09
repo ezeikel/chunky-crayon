@@ -18,9 +18,8 @@ export const MODEL_IDS = {
   // Anthropic Text models
   CLAUDE_SONNET_4_5: 'claude-sonnet-4-5-20250929',
 
-  // OpenAI Text models (kept for image generation pipelines)
-  GPT_4O: 'gpt-4o',
-  GPT_4O_MINI: 'gpt-4o-mini',
+  // OpenAI multimodal models (vision + text)
+  GPT_5_2: 'gpt-5.2',
 
   // OpenAI Image models (legacy - slower, more expensive)
   GPT_IMAGE: 'gpt-image-1',
@@ -80,11 +79,11 @@ export function getImageQualityModel(): ImageModel {
 
 // Pre-configured model instances (text models are safe to initialize eagerly)
 export const models = {
-  // Primary text model for complex tasks (vision, structured output, reasoning)
-  text: anthropic(MODEL_IDS.CLAUDE_SONNET_4_5),
+  // Creative writing: captions, blogs, facts, descriptions (text-only tasks)
+  creative: anthropic(MODEL_IDS.CLAUDE_SONNET_4_5),
 
-  // Faster/cheaper text model for simpler tasks (same model, single tier for now)
-  textFast: anthropic(MODEL_IDS.CLAUDE_SONNET_4_5),
+  // Vision/multimodal: tasks requiring image input (metadata extraction, sketch analysis, SVG validation)
+  vision: openai(MODEL_IDS.GPT_5_2),
 
   // Image generation model - use getter function for lazy initialization
   // ~1.3s generation time, $0.003/image (vs DALL-E 3's 15-45s, $0.04-0.08)
@@ -142,7 +141,7 @@ export type TracingOptions = {
  * See: https://github.com/PostHog/posthog-js/issues/2522
  *
  * @example
- * const tracedModel = withAITracing(models.text, { userId: 'user_123' });
+ * const tracedModel = withAITracing(models.creative, { userId: 'user_123' });
  * const { text } = await generateText({ model: tracedModel, prompt: '...' });
  */
 export function withAITracing(
@@ -160,11 +159,26 @@ export function withAITracing(
   // AI SDK 6 provides LanguageModelV3. Runtime API is compatible.
   // Note: posthogProperties must be an object, not undefined (library calls Object.entries on it)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return withTracing(model as any, posthog, {
+  const traced = withTracing(model as any, posthog, {
     posthogDistinctId: options.userId || 'anonymous',
     posthogTraceId: options.traceId,
     posthogProperties: options.properties ?? {},
   }) as unknown as LanguageModelV3;
+
+  // Fix: withTracing uses object spread which loses prototype properties (e.g.
+  // Anthropic's `supportedUrls`). Wrap in a Proxy that falls through to the
+  // original model for any property missing on the traced copy.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return new Proxy(traced as any, {
+    get(target, prop, receiver) {
+      if (prop in target) {
+        return Reflect.get(target, prop, receiver);
+      }
+      // Fall through to the original model for prototype properties
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (model as any)[prop];
+    },
+  }) as LanguageModelV3;
 }
 
 /**
@@ -172,12 +186,12 @@ export function withAITracing(
  *
  * @example
  * const traced = getTracedModels({ userId: 'user_123', traceId: 'req_abc' });
- * const { text } = await generateText({ model: traced.text, prompt: '...' });
+ * const { text } = await generateText({ model: traced.creative, prompt: '...' });
  */
 export function getTracedModels(options: TracingOptions = {}) {
   return {
-    text: withAITracing(models.text, options),
-    textFast: withAITracing(models.textFast, options),
+    creative: withAITracing(models.creative, options),
+    vision: withAITracing(models.vision, options),
     analytics: withAITracing(models.analytics, options),
     analyticsQuality: withAITracing(models.analyticsQuality, options),
     // Note: Image models use a different API and don't support withTracing

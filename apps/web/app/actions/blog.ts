@@ -73,7 +73,7 @@ async function generateBlogMeta(topic: string, keywords: string[]) {
   });
 
   const { object } = await generateObject({
-    model: models.text,
+    model: models.creative,
     system: BLOG_META_SYSTEM,
     prompt: createBlogMetaPrompt(topic, keywords),
     schema: blogMetaSchema,
@@ -95,7 +95,7 @@ async function generateBlogContent(
   });
 
   const { object } = await generateObject({
-    model: models.text,
+    model: models.creative,
     system: BLOG_POST_SYSTEM,
     prompt: createBlogPostPrompt(topic, keywords, coveredTopics),
     schema: blogPostSchema,
@@ -113,7 +113,7 @@ async function generateImagePrompt(topic: string, postTitle: string) {
   });
 
   const { object } = await generateObject({
-    model: models.textFast,
+    model: models.creative,
     system: BLOG_IMAGE_PROMPT_SYSTEM,
     prompt: createBlogImagePromptPrompt(topic, postTitle),
     schema: blogImagePromptSchema,

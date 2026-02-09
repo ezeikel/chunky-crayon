@@ -87,7 +87,7 @@ export const checkSvgImage = async (
 
   // check if traced image is blank
   const { object } = await generateObject({
-    model: models.text,
+    model: models.vision,
     schema: svgValidationSchema,
     system: CHECK_SVG_IMAGE_SYSTEM,
     messages: [

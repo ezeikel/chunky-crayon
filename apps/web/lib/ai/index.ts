@@ -8,7 +8,7 @@
  * import { models, prompts, schemas, generateColoringImage } from '@/lib/ai';
  *
  * // Use pre-configured models
- * const { text } = await generateText({ model: models.text, ... });
+ * const { text } = await generateText({ model: models.creative, ... });
  *
  * // Use centralized prompts
  * const prompt = prompts.createColoringImagePrompt(description);

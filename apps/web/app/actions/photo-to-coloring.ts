@@ -102,7 +102,7 @@ export async function createColoringImageFromPhoto(
     const [metadataResult, svg, webpBuffer] = await Promise.all([
       // Generate metadata
       generateObject({
-        model: tracedModels.textFast,
+        model: tracedModels.vision,
         schema: imageMetadataSchema,
         system: createImageMetadataSystemPrompt(
           languageInfo.name,
