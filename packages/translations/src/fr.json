@@ -286,7 +286,7 @@
       "toddlers": {
         "title": "Pour les tout-petits",
         "ages": "2-4 ans",
-        "description": "Formes simples, gros traits"
+        "description": "Formes simples, gros contours"
       },
       "kids": {
         "title": "Pour les enfants",
@@ -366,12 +366,12 @@
       "filterByDifficulty": "Filtrer par niveau"
     },
     "categoryPage": {
-      "coloringPages": "Coloriages {category}",
+      "coloringPages": "Coloriages de {category}",
       "relatedCategories": "Catégories associées",
       "noPagesYet": "Pas encore de pages {category}",
       "beTheFirst": "Soyez le premier à créer un coloriage {category} !",
       "createAPage": "Créer une page",
-      "freeColoringPages": "Coloriages {category} gratuits",
+      "freeColoringPages": "Coloriages de {category} gratuits",
       "lookingFor": "Vous cherchez le coloriage {category} parfait ? Vous êtes au bon endroit ! Notre collection propose plein de dessins {category}, parfaits pour les enfants comme pour les adultes.",
       "eachPageDescription": "Chaque coloriage peut être colorié en ligne avec nos outils numériques ou téléchargé et imprimé pour un coloriage traditionnel avec des crayons, crayons de couleur ou feutres. Nos dessins générés par IA ont des contours propres et des détails captivants, pour un coloriage relaxant et amusant.",
       "popularThemes": "Thèmes {category} populaires",
@@ -410,7 +410,7 @@
         "categoriesSection": "Catégories adaptées aux tout-petits",
         "heroDescription": "Des pages simples et faciles à colorier, pensées pour les petites mains ! Grandes formes, contours épais et objets familiers : parfait pour les enfants de 2 à 4 ans. Idéal pour développer la motricité fine.",
         "whyTitle": "Parfait pour les petits artistes",
-        "why1Title": "Gros contours",
+        "why1Title": "Gros contours épais",
         "why1Description": "Des contours épais pour aider les petites mains à rester dans les lignes !",
         "why2Title": "Formes simples",
         "why2Description": "Des formes de base et des objets familiers que les tout-petits reconnaissent et adorent.",
@@ -452,7 +452,7 @@
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins faits pour vos passions !",
         "why2Title": "Art détaillé",
         "why2Description": "Des dessins minutieux qui mettent au défi vos talents et sont magnifiques une fois finis.",
-        "why3Title": "Détente",
+        "why3Title": "Anti-stress",
         "why3Description": "Faites une pause loin des écrans et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop enfantins » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d'anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
@@ -467,7 +467,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits thérapeutiques du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Détente",
+        "why1Title": "Anti-stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
@@ -476,7 +476,7 @@
         "seoTitle": "Coloriages gratuits pour adultes",
         "seoParagraph1": "Le coloriage pour adultes est devenu une activité bien-être très appréciée, et ce n’est pas un hasard. Des études montrent qu’il peut réduire l’anxiété, améliorer la concentration et offrir une pause apaisante loin des écrans. Notre collection propose de magnifiques dessins détaillés, parfaits pour les grands.",
         "seoParagraph2": "Des mandalas détaillés pour la pleine conscience aux scènes de nature paisibles et aux motifs élégants, chaque page est conçue pour offrir des heures de créativité relaxante. Imprimez sur un papier de qualité et utilisez vos outils préférés : crayons de couleur, feutres ou stylos gel, tout fonctionne à merveille.",
-        "seoParagraph3": "Envie de quelque chose d'unique ? Créez vos pages personnalisées ! Décrivez votre scène détente idéale : un jardin zen, un motif Art nouveau, ou une illustration botanique détaillée… et notre IA donne vie à votre idée.",
+        "seoParagraph3": "Envie de quelque chose d'unique ? Créez vos pages personnalisées ! Décrivez votre scène détente idéale : un jardin zen, un motif Art nouveau, ou une illustration botanique détaillée... et notre IA donne vie à votre idée.",
         "popularTitle": "Thèmes populaires de coloriage pour adultes",
         "popularDescription": "Découvrez nos catégories adultes les plus populaires : mandalas pour méditer, motifs nature et botaniques détaillés, motifs géométriques, styles Art déco et Art nouveau, pages inspirées du zentangle, et paysages apaisants. Chacune offre un chemin unique vers la détente."
       }
