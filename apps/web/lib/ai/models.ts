@@ -21,10 +21,8 @@ export const MODEL_IDS = {
   // OpenAI multimodal models (vision + text)
   GPT_5_2: 'gpt-5.2',
 
-  // OpenAI Image models (legacy - slower, more expensive)
-  GPT_IMAGE: 'gpt-image-1',
+  // OpenAI Image models
   GPT_IMAGE_1_5: 'gpt-image-1.5',
-  DALL_E_3: 'dall-e-3',
 
   // FLUX Image models via Replicate (faster, cheaper)
   // Schnell: ~1.3s, $0.003/image - best for speed
@@ -90,9 +88,6 @@ export const models = {
   get image() {
     return getImageModel();
   },
-
-  // Legacy image model (DALL-E 3) - kept for fallback/comparison
-  imageLegacy: openai.image(MODEL_IDS.GPT_IMAGE_1_5),
 
   // Higher quality FLUX model for when quality matters more than speed
   get imageQuality() {
