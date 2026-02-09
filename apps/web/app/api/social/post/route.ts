@@ -10,6 +10,7 @@ import {
   type InstagramPostType,
   type FacebookPostType,
 } from '@/app/actions/social';
+import { sendAdminAlert } from '@/app/actions/email';
 
 export const maxDuration = 180; // Increased for carousel creation
 
@@ -793,10 +794,14 @@ const handleRequest = async (request: Request) => {
         throw new Error(`Coloring image with ID ${coloringImageId} not found`);
       }
     } else {
-      // get the most recent daily coloring image (default behavior)
+      // Only post today's image — prevents re-posting stale content when generation fails
+      const todayStart = new Date();
+      todayStart.setUTCHours(0, 0, 0, 0);
+
       coloringImage = await db.coloringImage.findFirst({
         where: {
           generationType: GenerationType.DAILY,
+          createdAt: { gte: todayStart },
         },
         orderBy: {
           createdAt: 'desc',
@@ -805,7 +810,17 @@ const handleRequest = async (request: Request) => {
     }
 
     if (!coloringImage?.svgUrl) {
-      throw new Error('no recent coloring image found');
+      const message =
+        'No daily coloring image generated today - skipping social posts';
+      console.warn(`[Social] ${message}`);
+      await sendAdminAlert({
+        subject: 'Social posts skipped - no daily image',
+        body: `The social media posting cron was skipped because no DAILY coloring image was generated today.\n\nThis likely means the image generation cron at 08:00 UTC failed. Check the Vercel function logs for /api/coloring-image/generate.`,
+      });
+      return NextResponse.json(
+        { success: false, message, skipped: true },
+        { headers: corsHeaders },
+      );
     }
 
     const results = {

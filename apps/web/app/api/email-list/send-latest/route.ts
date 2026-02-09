@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
-import { sendColoringImageEmail } from '@/app/actions/email';
+import { sendColoringImageEmail, sendAdminAlert } from '@/app/actions/email';
 import { db } from '@chunky-crayon/db';
 
 export const maxDuration = 150;
@@ -34,9 +34,12 @@ const handleRequest = async (request: Request) => {
     });
 
     if (!coloringImage) {
-      console.warn(
-        `[send-latest] No ${generationType} image generated today - skipping email`,
-      );
+      const message = `No ${generationType} image generated today - skipping email`;
+      console.warn(`[send-latest] ${message}`);
+      await sendAdminAlert({
+        subject: 'Daily email skipped - no daily image',
+        body: `The daily coloring image email was skipped because no ${generationType} image was generated today.\n\nThis likely means the image generation cron at 08:00 UTC failed. Check the Vercel function logs for /api/coloring-image/generate.`,
+      });
       return NextResponse.json(
         {
           success: false,

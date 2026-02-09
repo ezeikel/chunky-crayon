@@ -340,3 +340,38 @@ export const sendSocialDigest = async ({
     };
   }
 };
+
+/**
+ * Send an admin alert email when a cron job fails or skips.
+ * Uses SOCIAL_DIGEST_EMAIL as the recipient.
+ */
+export const sendAdminAlert = async ({
+  subject,
+  body,
+}: {
+  subject: string;
+  body: string;
+}): Promise<void> => {
+  const adminEmail = process.env.SOCIAL_DIGEST_EMAIL;
+
+  if (!adminEmail) {
+    console.warn(
+      '[Admin Alert] SOCIAL_DIGEST_EMAIL not configured, skipping alert',
+    );
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: getResendFromAddress('alerts', 'Chunky Crayon Alerts'),
+      to: adminEmail,
+      subject,
+      text: body,
+    });
+
+    console.log(`[Admin Alert] Sent: ${subject}`);
+  } catch (error) {
+    // Don't throw — alert failure shouldn't break the calling cron
+    console.error('[Admin Alert] Failed to send:', error);
+  }
+};

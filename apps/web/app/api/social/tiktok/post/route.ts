@@ -3,6 +3,7 @@ import { db, GenerationType } from '@chunky-crayon/db';
 import { auth } from '@/auth';
 import { ADMIN_EMAILS } from '@/constants';
 import { generateTikTokCaption } from '@/app/actions/social';
+import { sendAdminAlert } from '@/app/actions/email';
 
 /**
  * Get TikTok access token from database.
@@ -214,19 +215,30 @@ export const POST = async (request: Request) => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get the most recent daily coloring image with animation
+    // Only post today's image — prevents re-posting stale content
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+
     const coloringImage = await db.coloringImage.findFirst({
       where: {
         generationType: GenerationType.DAILY,
         animationUrl: { not: null },
+        createdAt: { gte: todayStart },
       },
       orderBy: { createdAt: 'desc' },
     });
 
     if (!coloringImage?.animationUrl) {
+      const message =
+        'No daily coloring image with animation generated today - skipping TikTok';
+      console.warn(`[TikTok] ${message}`);
+      await sendAdminAlert({
+        subject: 'TikTok post skipped - no daily image',
+        body: `The TikTok posting cron was skipped because no DAILY coloring image with animation was generated today.\n\nCheck the Vercel function logs for /api/coloring-image/generate and /api/coloring-image/animate.`,
+      });
       return NextResponse.json(
-        { error: 'No coloring image with animation found' },
-        { status: 404 },
+        { success: false, message, skipped: true },
+        { status: 200 },
       );
     }
 

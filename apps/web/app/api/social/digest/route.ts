@@ -6,7 +6,7 @@ import {
   generatePinterestCaption,
   generateTikTokCaption,
 } from '@/app/actions/social';
-import { sendSocialDigest } from '@/app/actions/email';
+import { sendSocialDigest, sendAdminAlert } from '@/app/actions/email';
 import type { SocialDigestEntry } from '@/app/actions/email';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
@@ -26,10 +26,14 @@ export const GET = async (request: Request) => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch the most recent daily coloring image
+    // Only digest today's image — prevents sending stale content
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+
     const coloringImage = await db.coloringImage.findFirst({
       where: {
         generationType: GenerationType.DAILY,
+        createdAt: { gte: todayStart },
       },
       orderBy: {
         createdAt: 'desc',
@@ -37,9 +41,16 @@ export const GET = async (request: Request) => {
     });
 
     if (!coloringImage) {
+      const message =
+        'No daily coloring image generated today - skipping digest';
+      console.warn(`[Digest] ${message}`);
+      await sendAdminAlert({
+        subject: 'Social digest skipped - no daily image',
+        body: `The social digest cron was skipped because no DAILY coloring image was generated today.\n\nCheck the Vercel function logs for /api/coloring-image/generate.`,
+      });
       return NextResponse.json(
-        { error: 'No daily coloring image found' },
-        { status: 404 },
+        { success: false, message, skipped: true },
+        { status: 200 },
       );
     }
 
