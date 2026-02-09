@@ -419,7 +419,7 @@
         "seoTitle": "Dibujos para colorear gratis para pequeños",
         "seoParagraph1": "¿Vas a iniciar a tu peque en el coloreado? Nuestra colección de dibujos sencillos es perfecta para niños de 2 a 4 años. Cada diseño tiene zonas grandes y fáciles de colorear, con contornos marcados que ayudan a desarrollar la motricidad fina.",
         "seoParagraph2": "Nuestros dibujos para peques se centran en objetos familiares que les encantan: animalitos adorables, comida rica, vehículos coloridos y bonitas escenas de naturaleza. Los diseños simples reducen la frustración y animan a crear.",
-        "seoParagraph3": "Todas las páginas se pueden imprimir en papel A4 o colorear online con nuestras herramientas digitales, súper fáciles de usar. Perfectas para ratitos tranquilos, días de lluvia o actividades en casa o en preescolar.",
+        "seoParagraph3": "Todas las páginas se pueden imprimir en papel A4 o colorear online con nuestras herramientas digitales, súper fáciles de usar. Perfectas para ratitos tranquilos, días de lluvia o actividades de aprendizaje en casa o en preescolar.",
         "benefitsTitle": "Beneficios de colorear para los más pequeños",
         "benefitsDescription": "Colorear ayuda a desarrollar habilidades importantes como: coordinación mano-ojo, reconocimiento de colores, fuerza de agarre, atención y concentración, y expresión creativa. ¡Empieza con los diseños más sencillos y mira cómo crece tu peque!"
       },
@@ -437,7 +437,7 @@
         "why3Description": "¡Usa nuestras herramientas para colorear en el navegador!",
         "seoTitle": "Dibujos para colorear gratis para niños",
         "seoParagraph1": "¿Buscas los dibujos perfectos para tus hijos? Chunky Crayon ofrece una enorme colección de dibujos para colorear gratis e imprimibles, pensados especialmente para niños de 4 a 12 años. Desde animales adorables hasta superhéroes llenos de acción, hay algo para cada pequeño artista.",
-        "seoParagraph2": "Nuestros dibujos tienen líneas limpias y marcadas, fáciles de colorear para manitas pequeñas. Ya sea con ceras, lápices de colores o rotuladores, están diseñados para que el resultado quede genial. También puedes usar nuestras herramientas online para crear en pantalla.",
+        "seoParagraph2": "Nuestros dibujos tienen líneas limpias y marcadas, fáciles de colorear para manitas pequeñas. Ya sea con ceras, lápices de colores o rotuladores, están diseñados para que el resultado quede genial. También puedes usar nuestras herramientas online para colorear digitalmente.",
         "seoParagraph3": "Y lo mejor: los niños pueden crear sus propios dibujos únicos describiendo lo que quieren colorear. ¿Un dragón jugando al fútbol? ¿Un unicornio en el espacio? ¡Lo que imaginen puede hacerse realidad en segundos!",
         "popularTitle": "Categorías populares para niños",
         "popularDescription": "Nuestras categorías infantiles más populares incluyen: dinosaurios, unicornios, superhéroes, animales, espacio y cohetes, y vehículos. Cada categoría está llena de diseños adecuados para su edad."
@@ -456,7 +456,7 @@
         "why3Description": "Tómate un respiro de las pantallas y relájate coloreando.",
         "seoTitle": "Dibujos para colorear gratis para adolescentes",
         "seoParagraph1": "¿Buscas dibujos para colorear que no sean \"demasiado infantiles\"? Nuestra colección para adolescentes tiene diseños geniales y detallados, perfectos para edades de 13 a 17 años. Desde personajes de anime y escenas gaming hasta mundos de fantasía y patrones abstractos, hay algo para cada estilo.",
-        "seoParagraph2": "Estos no son los dibujos de tu hermanito. Nuestros diseños para adolescentes tienen detalles elaborados, composiciones dinámicas y temas que conectan con sus intereses. Ideales para expresarte, relajarte en descansos de estudio o simplemente desconectar.",
+        "seoParagraph2": "Estos no son los dibujos de tu hermanito. Nuestros diseños para adolescentes tienen detalles elaborados, composiciones dinámicas y temas que conectan con sus intereses. Ideales para expresarte, relajarte en descansos de estudio o simplemente relajarte.",
         "seoParagraph3": "Crea tus propios dibujos personalizados describiendo exactamente lo que quieres. ¿Un dragón luchando contra un robot en el espacio? ¿Un retrato estilo anime? ¿Un mandala detallado con tus símbolos favoritos? ¡Descríbelo y nuestra IA lo hace realidad!",
         "popularTitle": "Temas populares para adolescentes",
         "popularDescription": "Nuestras categorías más populares para adolescentes incluyen: anime y manga, criaturas de fantasía, escenas de acción de superhéroes, arte inspirado en videojuegos, diseños espaciales y sci-fi, y páginas de patrones muy detallados. Cada categoría ofrece diseños entretenidos y con mucho detalle."
@@ -474,7 +474,7 @@
         "why3Title": "Creatividad",
         "why3Description": "Exprésate con tus colores y crea obras preciosas.",
         "seoTitle": "Dibujos para colorear gratis para adultos",
-        "seoParagraph1": "Colorear para adultos se ha convertido en una actividad de bienestar muy popular, y con razón. Los estudios muestran que colorear puede reducir la ansiedad, mejorar la concentración y dar un descanso relajante de nuestras vidas llenas de pantallas. Nuestra colección ofrece diseños bonitos y elaborados, perfectos para personas mayores.",
+        "seoParagraph1": "Colorear para adultos se ha convertido en una actividad de bienestar muy popular, y con razón. Los estudios muestran que colorear puede reducir la ansiedad, mejorar la concentración y dar un descanso relajante de nuestras vidas llenas de pantallas. Nuestra colección ofrece diseños bonitos y elaborados, perfectos para adultos.",
         "seoParagraph2": "Desde mandalas detallados que invitan a la meditación hasta escenas tranquilas de naturaleza y patrones elegantes, cada página está pensada para darte horas de creatividad relajante. Imprime en papel de buena calidad y usa tus herramientas favoritas: lápices de colores, rotuladores o bolígrafos de gel funcionan perfectamente.",
         "seoParagraph3": "¿Quieres algo único? ¡Crea tus propios dibujos personalizados! Describe tu escena ideal para relajarte: un jardín zen, un patrón Art Nouveau o una ilustración botánica detallada, y nuestra IA dará vida a tu idea.",
         "popularTitle": "Temas populares de coloreado para adultos",
@@ -665,7 +665,7 @@
     },
     "colorPalette": {
       "selectColor": "Seleccionar color {color}",
-      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas Mágicas"
+      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas mágicas"
     },
     "patternSelector": {
       "label": "Patrón:"
