@@ -120,12 +120,15 @@ ${config.additionalRules.map((rule, i) => `${i + 1}. ${rule}`).join('\n')}
       prompt = `${difficultyContext}\n\n${prompt}`;
     }
 
-    // Build message content with reference images as actual inputs
+    // Build message content with reference images adjacent to the style instruction.
+    // Gemini works better when instruction text is right before the images it references.
+    // Limit to 4 reference images — too many can dilute style matching.
+    const selectedRefs = REFERENCE_IMAGES.slice(0, 4);
     const messageContent: Array<
       { type: 'text'; text: string } | { type: 'image'; image: URL }
     > = [
       { type: 'text', text: prompt },
-      ...REFERENCE_IMAGES.map((url) => ({
+      ...selectedRefs.map((url) => ({
         type: 'image' as const,
         image: new URL(url),
       })),
@@ -417,13 +420,20 @@ export async function generateColoringPageFromPhoto(
   // 1. The user's photo as the primary reference
   // 2. Our style reference images
   // 3. The transformation prompt
+  // Limit to 4 reference images — too many can dilute style matching.
+  const selectedRefs = REFERENCE_IMAGES.slice(0, 4);
   const messageContent: Array<
     | { type: 'text'; text: string }
     | { type: 'image'; image: URL }
     | { type: 'image'; image: string }
   > = [
-    // System context and prompt
+    // System context
     { type: 'text', text: PHOTO_TO_COLORING_SYSTEM },
+    // Style reference images (adjacent to the style instruction in system prompt)
+    ...selectedRefs.map((url) => ({
+      type: 'image' as const,
+      image: new URL(url),
+    })),
     // User's photo (as base64)
     {
       type: 'image',
@@ -433,15 +443,6 @@ export async function generateColoringPageFromPhoto(
     },
     // Transformation instructions
     { type: 'text', text: createPhotoToColoringPrompt(difficulty) },
-    // Style reference images
-    {
-      type: 'text',
-      text: 'Here are examples of the coloring page style to match:',
-    },
-    ...REFERENCE_IMAGES.map((url) => ({
-      type: 'image' as const,
-      image: new URL(url),
-    })),
   ];
 
   try {

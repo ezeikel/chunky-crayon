@@ -78,7 +78,7 @@ Only edit `packages/translations/src/en.json`. A GitHub Action automatically pop
 
 ## Commits
 
-Use semantic commit style (`type(scope): message`). Keep messages as one-liners, succinct but covering work done. Do not attribute Claude in commit messages.
+Use semantic commit style (`type(scope): message`). Keep messages as one-liners, succinct but covering work done. Do not attribute Claude in commit messages. Never include Co-Authored-By lines.
 
 ## Key Features
 

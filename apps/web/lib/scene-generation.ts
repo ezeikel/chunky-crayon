@@ -268,7 +268,8 @@ function isTooSimilar(
 
 /**
  * Fetch recent DAILY image sourcePrompt values for deduplication.
- * Returns up to 30 most recent prompts from the last 30 days.
+ * Returns up to 15 most recent prompts from the last 30 days.
+ * (Trimmed from 30 to save context window in the AI prompt.)
  */
 async function getRecentPrompts(): Promise<string[]> {
   try {
@@ -283,7 +284,7 @@ async function getRecentPrompts(): Promise<string[]> {
       },
       select: { sourcePrompt: true },
       orderBy: { createdAt: 'desc' },
-      take: 30,
+      take: 15,
     });
 
     return recentImages
@@ -315,6 +316,12 @@ async function attemptGeneration(prompt: string): Promise<string | null> {
       schema: sceneDescriptionSchema,
       system: SCENE_DESCRIPTION_SYSTEM,
       prompt,
+      temperature: 0.7,
+      providerOptions: {
+        perplexity: {
+          search_recency_filter: 'week',
+        },
+      },
     });
 
     console.log('[SceneGen] generateObject succeeded:', {
@@ -338,6 +345,12 @@ async function attemptGeneration(prompt: string): Promise<string | null> {
       model: models.search,
       system: `${SCENE_DESCRIPTION_SYSTEM}\n\nIMPORTANT: Respond with valid JSON matching this schema: { character: string, activity: string, setting: string, seasonalContext: string | null, fullDescription: string }`,
       prompt,
+      temperature: 0.7,
+      providerOptions: {
+        perplexity: {
+          search_recency_filter: 'week',
+        },
+      },
     });
 
     const parsed = sceneDescriptionSchema.parse(JSON.parse(text));

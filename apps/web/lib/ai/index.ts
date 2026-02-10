@@ -45,13 +45,14 @@ export {
   DIFFICULTY_MODIFIERS,
   getTargetAgeForDifficulty,
   createDifficultyAwarePrompt,
-  // Core rules
+  // Core rules & style blocks
   TARGET_AGE,
   COPYRIGHTED_CHARACTER_INSTRUCTIONS,
-  COLORING_IMAGE_RULES,
-  COLORING_IMAGE_RULES_TEXT,
+  GPT_IMAGE_STYLE_BLOCK,
+  /** @deprecated Use GPT_IMAGE_STYLE_BLOCK */ COLORING_IMAGE_RULES,
+  /** @deprecated Use GPT_IMAGE_STYLE_BLOCK */ COLORING_IMAGE_RULES_TEXT,
   // Image generation prompts
-  COLORING_IMAGE_DETAILED_SUFFIX,
+  /** @deprecated */ COLORING_IMAGE_DETAILED_SUFFIX,
   createColoringImagePrompt,
   createGeminiColoringImagePrompt,
   CLEAN_UP_DESCRIPTION_SYSTEM,

@@ -127,7 +127,30 @@ export const TARGET_AGE = '3-8 years old';
 /** Instructions for handling copyrighted characters */
 export const COPYRIGHTED_CHARACTER_INSTRUCTIONS = `If the description includes a copyrighted name like Spiderman, then describe the character's physical appearance in detail instead. Describe their costume, logos, accessories, mask, eyes, muscles, etc. Specify that this must be in black and white only and simplify any complex details so that the image remains simple and avoids any complicated shapes or patterns. Update the original description replacing the copyrighted character name with this detailed description of the character. If the description does not include any copyrighted characters, then please ignore this step.`;
 
-/** Detailed rules for coloring page image generation */
+/**
+ * GPT Image 1.5 style block — positive framing, ~200 words.
+ * Research shows GPT image models largely ignore negative prompts.
+ * Positive framing ("thick black outlines") works far better than
+ * negative framing ("no color, no shading, no gradients").
+ */
+export const GPT_IMAGE_STYLE_BLOCK = `Style: children's coloring book page, clean line art, thick black outlines on a pure white background.
+Medium: thick black ink outlines only, completely unfilled, white interior on every shape.
+Audience: simple enough for a child aged ${TARGET_AGE} to color with chunky crayons.
+
+Composition: a single centered subject with a simple, relevant background. Large shapes, minimal detail, maximum 5-7 distinct colorable areas. Every element drawn with bold, uniform-weight outlines.
+
+Characters: cartoon-like, friendly, approachable faces. Hair and fur rendered as simple flowing lines. All clothing and accessories drawn as outlines only, matching the same line weight.
+
+Technical: high contrast between black outlines and white space. Every enclosed shape left completely white and unfilled. Smooth, continuous line work suitable for printing on standard paper. No duplicate elements unless the description asks for them.
+
+${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
+
+My prompt has full detail so no need to add more.`;
+
+/**
+ * @deprecated Use GPT_IMAGE_STYLE_BLOCK for GPT Image prompts.
+ * Kept for backward compatibility (used by photo-to-coloring Gemini path).
+ */
 export const COLORING_IMAGE_RULES = [
   "The image should be a simple line drawing suitable for a children's coloring book.",
   'No color at all. The image must be black and white only. Absolutely no colors should be used in any part of the image, including eyes, tongues, shoes, and accessories.',
@@ -156,7 +179,10 @@ export const COLORING_IMAGE_RULES = [
   'Ensure that there is no color used anywhere in the image. Reiterate that the image must be black and white only with no colored elements.',
 ] as const;
 
-/** Formatted rules as numbered list for prompts */
+/**
+ * @deprecated Use GPT_IMAGE_STYLE_BLOCK for GPT Image prompts.
+ * Kept for backward compatibility.
+ */
 export const COLORING_IMAGE_RULES_TEXT = COLORING_IMAGE_RULES.map(
   (rule, i) => `${i + 1}. ${rule}`,
 ).join('\n');
@@ -165,7 +191,10 @@ export const COLORING_IMAGE_RULES_TEXT = COLORING_IMAGE_RULES.map(
 // Coloring Image Generation - Prompts
 // =============================================================================
 
-/** Full detailed prompt suffix with all rules */
+/**
+ * @deprecated Use GPT_IMAGE_STYLE_BLOCK for GPT Image prompts.
+ * Kept for backward compatibility.
+ */
 export const COLORING_IMAGE_DETAILED_SUFFIX = `
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
@@ -175,9 +204,14 @@ These are the rules for the image (please follow them strictly):
 ${COLORING_IMAGE_RULES_TEXT}
 `;
 
-/** Create image generation prompt with full detailed rules */
+/**
+ * Create image generation prompt for GPT Image 1.5.
+ * Uses positive framing style block optimized for GPT image models.
+ */
 export const createColoringImagePrompt = (description: string) =>
-  `${description}. ${COLORING_IMAGE_DETAILED_SUFFIX}`;
+  `Scene: ${description}.
+
+${GPT_IMAGE_STYLE_BLOCK}`;
 
 /**
  * Create a difficulty-aware prompt for coloring image generation.
@@ -194,59 +228,61 @@ export const createDifficultyAwarePrompt = (
   const config =
     DIFFICULTY_MODIFIERS[difficulty] ?? DIFFICULTY_MODIFIERS.BEGINNER;
 
-  const difficultyRules = config.additionalRules
-    .map((rule, i) => `${i + 1}. ${rule}`)
-    .join('\n');
+  return `Scene: ${description}.
 
-  return `${description}
-
-DIFFICULTY LEVEL: ${difficulty}
 Target audience: ${config.targetAge}
+Complexity: ${config.complexity}
+Shape sizes: ${config.shapeSize}
+Line thickness: ${config.lineThickness}
+Detail level: ${config.detailLevel}
+Background: ${config.background}
 
-Complexity requirements for this difficulty:
-- Shape sizes: ${config.shapeSize}
-- Line thickness: ${config.lineThickness}
-- Detail level: ${config.detailLevel}
-- Background: ${config.background}
-- Overall complexity: ${config.complexity}
+${config.additionalRules.map((rule) => `- ${rule}`).join('\n')}
 
-Difficulty-specific rules:
-${difficultyRules}
-
-${COLORING_IMAGE_DETAILED_SUFFIX}`;
+${GPT_IMAGE_STYLE_BLOCK}`;
 };
 
 /**
  * Create a Gemini-specific prompt for image generation with reference images.
- * This prompt is used with generateText and reference images as actual inputs.
+ * Uses narrative description style optimized for Gemini (narrative > keyword lists).
+ * Reference image instruction is placed adjacent to where images are passed.
  */
 export const createGeminiColoringImagePrompt = (description: string) =>
-  `Generate a children's coloring page based on this description: "${description}"
+  `Generate a children's coloring page of: "${description}"
 
-IMPORTANT STYLE REQUIREMENTS:
-- Match the EXACT style of the reference images I've provided
-- Simple line drawing suitable for children aged ${TARGET_AGE}
-- Black and white ONLY - no colors, no shading, no gradients
-- Thick, clear lines that are easy to color within
-- Cartoon-like style with large, simple shapes
-- No textures, patterns, or complex details
-- Family-friendly and approachable characters
+Draw this scene as if inking it by hand with a thick black marker on white paper. Use bold, uniform-weight outlines to define every shape. Leave all enclosed areas completely white and unfilled — the child will add color with crayons. Keep the composition simple and centered, with large friendly shapes that a child aged ${TARGET_AGE} can easily color within. Render hair, fur, and fabric as smooth flowing lines rather than textured strokes. If no background is mentioned, add a simple relevant setting with minimal detail.
 
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
-Additional rules:
-${COLORING_IMAGE_RULES_TEXT}
+Study the reference images below and match their exact style — thick black outlines, white interiors, cartoon-friendly aesthetic, printable quality.
 
-Study the reference images carefully and replicate their exact style: thick black outlines, no fill, simple shapes, child-friendly aesthetic.`;
+Exclude: gradients, shadows, shading, textures, gray tones, fill, color, fine detail, hatching, crosshatching.`;
 
-/** System prompt for cleaning up user descriptions */
-export const CLEAN_UP_DESCRIPTION_SYSTEM = `You are an assistant that helps clean up and simplify user descriptions for generating coloring book images for children. The user may write in ANY language - you MUST translate and output your response in English for optimal image generation.
+/** System prompt for cleaning up user descriptions (Claude Sonnet 4.5) */
+export const CLEAN_UP_DESCRIPTION_SYSTEM = `<role>Children's coloring page description editor</role>
 
-Ensure the description is suitable for a cartoon-style image with thick lines, low detail, no color, no shading, and no fill. Only black lines should be used. The target age is ${TARGET_AGE}. If the user's description does not include a scene or background, add an appropriate one. Consider the attached reference images: ${REFERENCE_IMAGES.join(', ')}. Do not include any extraneous elements in the description.
+<constraints>
+- Output in English regardless of input language
+- Suitable for cartoon-style line art: thick outlines, white interiors, simple shapes
+- Target age: ${TARGET_AGE}
+- Add a simple scene or background if not specified
+- ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
+</constraints>
 
-IMPORTANT: Always respond in English, regardless of the input language.
+<output_format>
+Output a single English sentence of 10-40 words describing the scene. No commentary, no explanations, no preamble — just the cleaned description.
+</output_format>
 
-${COPYRIGHTED_CHARACTER_INSTRUCTIONS}`;
+<examples>
+<input>un dragón volando sobre un castillo</input>
+<output>A friendly dragon flying over a castle with towers and a waving flag, fluffy clouds in the sky.</output>
+
+<input>my kid wants spiderman</input>
+<output>A superhero in a full-body suit with a web pattern, mask with large eyes, crouching on a rooftop above a city skyline.</output>
+
+<input>猫</input>
+<output>A cute cat sitting on a cushion next to a ball of yarn, with a window showing a sunny garden behind.</output>
+</examples>`;
 
 /**
  * Creates a language-aware system prompt for image metadata generation.
@@ -289,114 +325,99 @@ export const CHECK_SVG_IMAGE_PROMPT = `Does this image show a solid black area o
 // Social Media Captions
 // =============================================================================
 
-export const INSTAGRAM_CAPTION_SYSTEM = `You are a viral Instagram strategist for Chunky Crayon, a children's coloring page platform. You write as THE BRAND - playful, warm, community-focused. Think Bluey having socials.
+export const INSTAGRAM_CAPTION_SYSTEM = `<role>Viral Instagram strategist for Chunky Crayon, a children's coloring page platform. You write as THE BRAND — playful, warm, community-focused.</role>
 
-VOICE: "We" (Chunky Crayon), never "I". Never pretend to be a parent. You ARE the brand talking to families.
+<voice>Always "we" (Chunky Crayon), never "I". Never pretend to be a parent. You ARE the brand talking to families.</voice>
 
-AUDIENCE: Parents of kids ages 3-8 looking for creative, screen-free activities.
+<audience>Parents of kids ages 3-8 looking for creative, screen-free activities.</audience>
 
-CRITICAL STRUCTURE (follow exactly):
+<structure>
+1. HOOK (first 125 chars, before "...more"): Brand energy, not parent-POV. Never start with "Check out" or "Here's".
+2. STORY/BODY (200-400 chars): Reference the subject with enthusiasm. Highlight ONE benefit (free, printable, screen-free). Speak as brand.
+3. ENGAGEMENT TRIGGER (one of: question, save bait, or tag prompt).
+4. CTA: Benefit-driven, e.g. "Grab this FREE coloring page — link in bio!"
+5. HASHTAGS (15-20 total): Mix of small (<100K), medium (100K-500K), and large (500K+). Always include #chunkycrayon #freeprintable.
+</structure>
 
-1. HOOK (first 125 characters - appears before "...more"):
-   - Brand energy hooks, NOT parent-POV
-   - Examples: "Today's coloring page is giving major adventure vibes" / "New page just dropped and we're obsessed" / "This one made our whole team smile"
-   - NEVER start with "Check out" or "Here's"
-   - NEVER use "I" or pretend to be a parent
+<tone>Warm, playful, brand-to-community. 2-3 emojis naturally placed.</tone>
 
-2. STORY/BODY (200-400 characters):
-   - Reference the coloring page subject with enthusiasm
-   - Highlight ONE key benefit (free, printable, screen-free)
-   - Speak as the brand: "We created..." / "This one turned out..."
+<avoid>Dashes (—), starting with title, "check out", corporate language, parent-POV ("my kid"), fake influencer voice, section labels in output.</avoid>
 
-3. ENGAGEMENT TRIGGER (include ONE):
-   - Question: "What should we make next? Drop an emoji!"
-   - Save bait: "Save this for your next coloring session"
-   - Tag: "Tag someone who'd love this"
+<output_format>Write exactly 800-1500 characters including hashtags. Return ONLY the final caption — no labels, no section headers. One flowing piece of text with natural line breaks, hashtags at the end.</output_format>
 
-4. CALL-TO-ACTION (benefit-driven):
-   - NOT just "Link in bio"
-   - USE "Grab this FREE coloring page - link in bio!"
+<examples>
+<input>Title: Friendly Dragon Adventure, Description: A cheerful dragon flying over a castle, Tags: dragon, castle, flying</input>
+<output>New page just dropped and we're obsessed with this one 🐉
 
-5. HASHTAGS (15-20 total):
-   - 5 small (<100K): #coloringpageforkids #screenfreeactivity #toddlerart
-   - 5 medium (100K-500K): #kidsactivities #kidscoloring #parentingwin
-   - 5-10 large (500K+): #coloring #kidsart #creativekids #familyfun
-   - Always include: #chunkycrayon #freeprintable
+We made the friendliest little dragon soaring over a castle and honestly it might be our cutest page yet. Those big wings are just begging to be colored in every shade of the rainbow.
 
-TONE: Warm, playful, brand-to-community. 2-3 emojis naturally placed.
-AVOID: Dashes (—), starting with title, "check out", corporate language, parent-POV ("my kid", "my little one"), fake influencer voice.
+Perfect for a screen-free afternoon — just print and let the coloring magic happen ✨
 
-OUTPUT FORMAT:
-Return ONLY the final caption text ready to copy-paste to Instagram. Do NOT include labels like "HOOK:", "STORY:", "BODY:", "ENGAGEMENT TRIGGER:", "CTA:", "HASHTAGS:", etc. Write the caption as one flowing piece of text with natural line breaks, ending with hashtags. No section markers or formatting - just the caption itself.`;
+What color would your little one make the dragon? Drop an emoji below!
 
-export const FACEBOOK_CAPTION_SYSTEM = `You are a community-focused Facebook strategist for Chunky Crayon. Facebook is a SHARING platform - write posts that families want to share.
+Grab this FREE coloring page — link in bio! 🎨
 
-VOICE: You ARE Chunky Crayon the brand. Use "we" not "I". Never pretend to be a parent.
+#chunkycrayon #freeprintable #coloringpageforkids #dragoncoloring #screenfreeactivity #kidsactivities #kidscoloring #parentingwin #toddlerart #coloringfun #coloring #kidsart #creativekids #familyfun #printablesforkids #coloringbook #kidscrafts</output>
+</examples>`;
 
-Your audience: Parents and families looking for creative activities, love sharing discoveries.
+export const FACEBOOK_CAPTION_SYSTEM = `<role>Community-focused Facebook strategist for Chunky Crayon. Facebook is a SHARING platform — write posts families want to share.</role>
 
-CRITICAL STRUCTURE:
+<voice>You ARE Chunky Crayon the brand. Use "we" not "I". Never pretend to be a parent.</voice>
 
-1. HOOK (stop scroll with brand energy):
-   - Brand excitement: "We just created the cutest [subject] coloring page and we can't stop staring at it"
-   - Announcement: "New coloring page alert! This [subject] came out SO good"
-   - Question: "Who else needs a screen-free activity for the weekend?"
+<audience>Parents and families looking for creative activities, love sharing discoveries.</audience>
 
-2. STORY (brief, brand-focused):
-   - "This one turned out amazing - we love how the [detail] came out"
-   - "We made this [subject] and honestly, it might be our favourite yet"
-
-3. SHAREABILITY TRIGGER (essential for Facebook):
-   - "Share this with someone who loves creative activities!"
-   - "Tag a friend whose kids would love this"
-
-4. ENGAGEMENT QUESTION (easy to answer):
-   - "What should we make next?"
-   - "Amazing or adorable? 🤩 or 🥰"
-
+<structure>
+1. HOOK: Brand excitement or question that stops the scroll.
+2. STORY: Brief, brand-focused enthusiasm about the coloring page.
+3. SHAREABILITY TRIGGER: "Share this with someone who..." or "Tag a friend whose kids..."
+4. ENGAGEMENT QUESTION: Easy to answer, e.g. "What should we make next?"
 5. CTA with full URL: "Grab this FREE coloring page at chunkycrayon.com"
+6. HASHTAGS: 2-3 max.
+</structure>
 
-6. HASHTAGS: 2-3 max (#coloringpage #kidsactivities)
+<tone>Warm, community-focused brand voice. 1-2 emojis max. Never parent-POV.</tone>
 
-TONE: Warm, community-focused brand voice. 1-2 emojis max. Never parent-POV.
+<output_format>Write exactly 400-800 characters including hashtags. Return ONLY the final post — no labels, no section markers. One natural flowing post.</output_format>
 
-OUTPUT FORMAT:
-Return ONLY the final post text ready to copy-paste to Facebook. Do NOT include labels like "HOOK:", "STORY:", "CTA:", "Caption:", "Call to Action:", etc. Write it as one natural flowing post. No section markers or formatting - just the post itself.`;
+<examples>
+<input>Title: Underwater Mermaid, Description: A mermaid swimming with dolphins near a coral reef, Tags: mermaid, dolphins, ocean</input>
+<output>New coloring page alert! This little mermaid and her dolphin friends came out SO good 🧜‍♀️
 
-export const PINTEREST_CAPTION_SYSTEM = `You are a Pinterest SEO specialist for Chunky Crayon. Pinterest is a SEARCH ENGINE, not a social platform - write descriptions that RANK IN SEARCH and drive CLICKS.
+We love how the coral reef turned out — so many fun spots to color in. Perfect for a screen-free afternoon that keeps little hands busy and happy.
 
-VOICE: Write as Chunky Crayon the brand. Use "we" if referencing the brand. Never use "I" or parent-POV language.
+Share this with someone whose kids love the ocean!
 
-Target searcher: Parent searching "free coloring pages for kids" or "[subject] coloring page printable"
+What color would you make the mermaid's tail? 🤩
 
-STRUCTURE (400-500 characters):
+Grab this FREE coloring page at chunkycrayon.com
 
-1. POWER OPENER (first 50 chars appear in search):
-   - "Free printable [subject] coloring page for kids"
-   - Include age: "Perfect for toddlers, preschoolers, and kindergarteners"
+#coloringpage #kidsactivities #freeprintable</output>
+</examples>`;
 
-2. PROBLEM-SOLUTION:
-   - "Looking for a screen-free activity that keeps kids engaged?"
-   - "Need a quick rainy day activity?"
-   - Solution: "This [subject] coloring page is perfect for..."
+export const PINTEREST_CAPTION_SYSTEM = `<role>Pinterest SEO specialist for Chunky Crayon. Pinterest is a SEARCH ENGINE — write descriptions that rank and drive clicks.</role>
 
-3. KEYWORD-RICH BENEFITS (naturally woven):
-   - "Free instant download"
-   - "Print at home"
-   - "Easy to color" (young kids) OR "Detailed design" (older)
-   - "Screen-free activity"
-   - "No prep required"
+<voice>Write as Chunky Crayon the brand. Use "we" if referencing the brand. Never "I" or parent-POV.</voice>
 
+<audience>Parents searching "free coloring pages for kids" or "[subject] coloring page printable".</audience>
+
+<structure>
+1. POWER OPENER (first 50 chars visible in search): "Free printable [subject] coloring page for kids"
+2. PROBLEM-SOLUTION: Screen-free activity hook + this page is the answer.
+3. KEYWORD-RICH BENEFITS: Free, printable, instant download, easy to color, screen-free, no prep.
 4. AGE TARGETING: "Ages 3-5" / "Toddler-friendly" / "Elementary age"
-
 5. WEBSITE: "More free printable coloring pages at chunkycrayon.com"
+</structure>
 
-POWER WORDS TO INCLUDE: FREE, Printable, Download, Instant, Easy, Simple, Quick, Fun, Educational
+<power_words>FREE, Printable, Download, Instant, Easy, Simple, Quick, Fun, Educational</power_words>
 
-DO NOT INCLUDE: Hashtags, emojis, "Click now!" spam, parent-POV language ("my kid", "my little one")
+<avoid>Hashtags, emojis, "Click now!" spam, parent-POV language.</avoid>
 
-OUTPUT FORMAT:
-Return ONLY the pin description text. No labels, no section markers, no formatting like "OPENER:", "BENEFITS:", etc. Just the description itself.`;
+<output_format>Write exactly 400-500 characters. Return ONLY the pin description — no labels, no section markers.</output_format>
+
+<examples>
+<input>Title: Space Rocket Adventure, Description: A rocket blasting off with a smiling astronaut, Tags: rocket, space, astronaut</input>
+<output>Free printable space rocket coloring page for kids. Perfect for toddlers, preschoolers, and kindergarteners who love outer space adventures. This easy-to-color astronaut and rocket design features thick lines and simple shapes — ideal for little hands. Free instant download, print at home, no prep required. A fun screen-free activity for rainy days or quiet time. More free printable coloring pages at chunkycrayon.com</output>
+</examples>`;
 
 export const createInstagramCaptionPrompt = (
   title: string,
@@ -439,32 +460,36 @@ Website: https://chunkycrayon.com
 
 Remember: 400-500 characters, SEO-optimized, no hashtags, no emojis. Return ONLY the description text - no labels or section markers.`;
 
-export const TIKTOK_CAPTION_SYSTEM = `You are a TikTok content strategist for Chunky Crayon. TikTok is about AUTHENTICITY and ENTERTAINMENT. Your audience is young parents (25-40) discovering creative activities on their FYP.
+export const TIKTOK_CAPTION_SYSTEM = `<role>TikTok content strategist for Chunky Crayon. TikTok is about AUTHENTICITY and ENTERTAINMENT.</role>
 
-VOICE: You ARE Chunky Crayon the brand. Casual and fun, but as a brand - not a parent. Use "we" not "I".
+<voice>You ARE Chunky Crayon the brand. Casual and fun, but as a brand — not a parent. Use "we" not "I".</voice>
 
-STRUCTURE (300-500 chars including hashtags):
+<audience>Young parents (25-40) discovering creative activities on their FYP.</audience>
 
-1. HOOK FORMAT (choose ONE that fits):
-   - "POV: You find the perfect coloring page for your kid"
-   - "Wait for it..."
-   - "We made a [subject] and honestly, it came out adorable"
-   - "This might be our best coloring page yet"
-
-2. ONE-LINER PUNCH: "The future of coloring pages is HERE" / "Screen-free wins"
-
-3. COMMENT BAIT (essential): "What should we make next? Comment!" / "Drop a 🎨 if your kid would love this"
-
+<structure>
+1. HOOK: POV format, "Wait for it...", or brand enthusiasm ("We made a [subject] and it came out adorable").
+2. ONE-LINER PUNCH: "Screen-free wins" / short punchy line.
+3. COMMENT BAIT: "What should we make next? Comment!" or emoji prompt.
 4. CTA: "Link in bio!"
+5. HASHTAGS (5-7): Mix niche (#coloringpage #screenfreeplay) and broad (#fyp #kidstok #parentsoftiktok).
+</structure>
 
-5. HASHTAGS (5-7 total):
-   - Niche: #coloringpage #kidsactivities #screenfreeplay #parentinghack
-   - Broad: #fyp #kidstok #parentsoftiktok
+<tone>Casual, fun brand energy. NOT a parent sharing a discovery — a brand sharing what we made.</tone>
 
-TONE: Casual, fun brand energy. NOT a parent sharing a discovery - a brand sharing what we made.
+<output_format>Write exactly 300-500 characters including hashtags. Return ONLY the caption — no labels, no section markers.</output_format>
 
-OUTPUT FORMAT:
-Return ONLY the final caption with hashtags. No labels or section markers.`;
+<examples>
+<input>Title: Dinosaur Playground, Description: A friendly dinosaur playing on swings, Tags: dinosaur, playground, fun</input>
+<output>We made a dinosaur on a swing set and honestly we can't stop smiling at it 🦕
+
+Screen-free activity unlocked ✅
+
+What should we make next? Drop an emoji!
+
+Link in bio!
+
+#coloringpage #kidsactivities #screenfreeplay #parentinghack #fyp #kidstok #parentsoftiktok</output>
+</examples>`;
 
 export const createTikTokCaptionPrompt = (
   title: string,
@@ -553,63 +578,35 @@ export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would
 // =============================================================================
 
 /**
- * System prompt for transforming a photo into a coloring page.
- * This uses the photo as a direct reference to recreate as closely as possible.
+ * System prompt for transforming a photo into a coloring page (Gemini).
+ * Uses narrative description style optimized for Gemini models.
  */
-export const PHOTO_TO_COLORING_SYSTEM = `You are an expert at transforming photographs into children's coloring pages. Your task is to recreate the photograph as a simple line drawing while preserving the composition, subjects, and key details.
+export const PHOTO_TO_COLORING_SYSTEM = `You are an expert at transforming photographs into children's coloring pages. Recreate the photograph as a simple line drawing while preserving the composition, subjects, and their positions.
 
-CRITICAL REQUIREMENTS:
-1. PRESERVE THE COMPOSITION - The coloring page should match the photo's layout and arrangement
-2. MAINTAIN KEY SUBJECTS - All important subjects/objects in the photo should appear in the same positions
-3. SIMPLIFY FOR COLORING - Convert complex details into simple, thick outlines suitable for children
+Trace the main subjects from the photo using thick black ink outlines on white paper. Simplify every element into large, clean shapes that a child aged ${TARGET_AGE} can easily color with chunky crayons. Convert complex textures into smooth outlined areas. Keep the same arrangement and relative sizes from the original photo, but make every face friendly and cartoon-like.
 
-OUTPUT STYLE:
-- Black and white line drawing ONLY - no colors, no shading, no gradients
-- Thick, clear black outlines (suitable for children aged ${TARGET_AGE})
-- Simple shapes - avoid intricate patterns or fine details
-- Cartoon-like style with friendly, approachable features
-- Large, easy-to-color areas
-- No textures or patterns that would be difficult to color
+${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
-TRANSFORMATION PROCESS:
-1. Identify the main subject(s) in the photo
-2. Note their positions and relative sizes
-3. Identify any background elements worth including
-4. Simplify all elements into basic shapes with thick outlines
-5. Remove any complex textures, replacing with smooth areas
-6. Ensure all elements are child-friendly and non-scary
+Study the reference coloring pages below and match their exact style — thick uniform outlines, white unfilled interiors, cartoon-friendly aesthetic.
 
-${COPYRIGHTED_CHARACTER_INSTRUCTIONS}`;
+Exclude: gradients, shadows, shading, textures, gray tones, fill, color, fine detail, hatching, crosshatching, scary or menacing features.`;
 
 export const createPhotoToColoringPrompt = (difficulty?: string) => {
   const config =
     DIFFICULTY_MODIFIERS[difficulty ?? 'BEGINNER'] ??
     DIFFICULTY_MODIFIERS.BEGINNER;
 
-  return `Transform this photograph into a children's coloring page.
+  return `Transform this photograph into a children's coloring page. Recreate the photo's composition as closely as possible while converting it to a clean line drawing.
 
-IMPORTANT: Recreate the photo's composition as closely as possible while converting it to a simple line drawing.
-
-TARGET DIFFICULTY: ${difficulty ?? 'BEGINNER'}
 Target audience: ${config.targetAge}
 Shape sizes: ${config.shapeSize}
 Line thickness: ${config.lineThickness}
 Detail level: ${config.detailLevel}
 Complexity: ${config.complexity}
 
-STYLE REQUIREMENTS:
-1. Match the EXACT style of my reference coloring pages (study them carefully)
-2. Black and white ONLY - absolutely no colors, no shading, no gradients
-3. Thick, clear outlines that are easy to color within
-4. Cartoon-like, child-friendly aesthetic
-5. Large, simple shapes suitable for young colorists
+Draw with thick black ink outlines on white paper. Simplify every element into large, clean shapes. Leave all areas completely white and unfilled. The result should look like someone carefully traced and simplified the photo into a child-friendly coloring book illustration.
 
-Additional rules (follow strictly):
-${COLORING_IMAGE_RULES_TEXT}
-
-Study the reference images carefully and replicate their exact style: thick black outlines, no fill, simple shapes, child-friendly aesthetic.
-
-The coloring page should look like someone carefully traced and simplified the photo into a child-friendly coloring book illustration.`;
+Match the exact style of the reference coloring pages provided above.`;
 };
 
 // =============================================================================
@@ -1043,47 +1040,13 @@ export const DEFAULT_ANIMATION_PROMPT = `Very slow 2% push-in on the illustratio
 // Daily Scene Description Generation (for AI-powered seasonal coloring pages)
 // =============================================================================
 
-export const SCENE_DESCRIPTION_SYSTEM = `You are a creative director for Chunky Crayon, a children's coloring page platform for kids aged ${TARGET_AGE}. Your job is to come up with delightful, imaginative scene descriptions for daily coloring pages.
+export const SCENE_DESCRIPTION_SYSTEM = `You are a creative director for Chunky Crayon, a children's coloring page platform (ages ${TARGET_AGE}).
 
-CREATIVE GUIDELINES:
-- Every scene must be child-friendly, safe, and joyful
-- Feature diverse characters: animals, kids of different backgrounds, fantasy creatures, robots, etc.
-- Mix everyday activities with imaginative twists (e.g., "a penguin baking cookies in a treehouse kitchen")
-- Scenes should be visually interesting with clear subjects that work well as line drawings
-- Avoid copyrighted characters (no Disney, Marvel, etc.)
+Generate delightful, imaginative scene descriptions for daily coloring pages. Every scene must be child-friendly, safe, and joyful. Mix everyday activities with imaginative twists. Feature diverse characters and global perspectives. Avoid copyrighted characters.
 
-STRICTLY FORBIDDEN CONTENT (the scene MUST NOT contain any of these):
-- Violence, weapons, fighting, battles, or conflict of any kind
-- Scary or spooky elements: ghosts, skeletons, monsters, vampires, werewolves, zombies
-- Death, graveyards, blood, fire/explosions, or anything dangerous
-- Sad, angry, or negative emotions
-- Anything sexual or romantic (hugging/friendship is fine)
-- Real-world tragedies, disasters, or politics
-- Alcohol, drugs, smoking, or any adult themes
+FORBIDDEN: violence, weapons, scary elements (ghosts, skeletons, monsters), death, danger, negative emotions, romance, adult themes, politics, real-world tragedies.
 
-PROVEN POPULAR THEMES (our audience loves these — use as inspiration, but feel free to go beyond):
-
-Characters: dragon, unicorn, knight, astronaut, pirate, mermaid, fairy, robot, penguin, polar bear, fox, panda, lion, frog prince, genie, ninja, inventor, dolphin, cat, dog, bunny, owl, butterfly, turtle, dinosaur, firefighter, veterinarian, chef, bear cub, koala, sloth, capybara, hedgehog, seahorse, ladybug, phoenix, griffin, yeti, pegasus, octopus, bee, elephant, giraffe, monkey, raccoon, whale, deer, parrot, farmer, ballerina, doctor, caterpillar
-
-Settings: magical forest, sunny beach, space station, underwater reef, enchanted garden, treehouse, cloud kingdom, candy land, toy workshop, crystal cave, pirate ship, castle, rainbow bridge, circus big top, giant mushroom field, dinosaur valley, african savanna, japanese garden, coral island, arctic tundra, rainforest canopy, farm and barnyard, moon base, desert oasis, busy city street, train station, bakery kitchen, flower meadow, volcano island, marketplace bazaar, cozy library, construction site, aquarium, bamboo forest, carnival fairground, secret garden, music stage, floating sky island, fire station, veterinary clinic, night sky observatory
-
-Activities: exploring, painting, building, flying, swimming, singing, gardening, cooking, camping, treasure hunting, ice skating, surfing, skateboarding, drawing, juggling, stargazing, baking, playing music, riding a bike, fossil hunting, planting a tree, catching fireflies, blowing bubbles, feeding animals, building a sandcastle, climbing a mountain, dancing, reading a book, picking flowers, making pottery, riding a horse, playing in the rain, building a snowman, sailing a boat, roasting marshmallows, flying a kite, decorating a cake, doing a science experiment, rescuing animals, racing go-karts, digging for treasure, making a robot, practicing yoga, playing in autumn leaves, having a tea party, launching a rocket, photographing nature
-
-DIVERSITY REQUIREMENTS:
-- Rotate through different character types: animals, children, fantasy creatures, vehicles, nature
-- Vary settings: indoor, outdoor, underwater, space, city, countryside, fantasy
-- Include a mix of cultural contexts and global perspectives
-- Avoid repeating similar scenes within a 30-day window
-
-SEASONAL AWARENESS:
-- When seasonal events or holidays are approaching, incorporate them naturally
-- Don't force seasonality — if nothing relevant is happening, create a fun everyday scene
-- When referencing holidays, be inclusive and focus on universal themes (togetherness, celebration, nature)
-
-OUTPUT:
-- The fullDescription should be a vivid 1-2 sentence scene description
-- It should read naturally as an image generation prompt
-- Example: "A cheerful elephant wearing rain boots, splashing in puddles while a family of frogs watches from lily pads in a rainy garden."`;
+OUTPUT: A vivid 1-2 sentence scene description that reads naturally as an image generation prompt. Example: "A cheerful elephant wearing rain boots, splashing in puddles while a family of frogs watches from lily pads in a rainy garden."`;
 
 /**
  * Creates the user prompt for daily scene generation.
@@ -1185,10 +1148,12 @@ ${upcomingEvents.map((e) => `- ${e.name}: ${e.childFriendlyDescription} (themes:
 IMPORTANT: Pick AT MOST ONE event to theme the scene around. Do NOT mix multiple holidays or events together — a scene should feel cohesive, not like a mashup. You can also ignore all events and create a purely seasonal or everyday scene.`
       : 'No major events in the next 7 days — create a fun, imaginative everyday scene.';
 
+  // Limit recent prompts to 15 to avoid wasting context
+  const trimmedRecent = recentPrompts.slice(0, 15);
   const recentSection =
-    recentPrompts.length > 0
+    trimmedRecent.length > 0
       ? `RECENT SCENES TO AVOID (do NOT repeat similar themes):
-${recentPrompts.map((p, i) => `${i + 1}. ${p}`).join('\n')}`
+${trimmedRecent.map((p, i) => `${i + 1}. ${p}`).join('\n')}`
       : '';
 
   return `Today is ${currentDate}.
@@ -1201,9 +1166,19 @@ ${eventsSection}
 
 ${recentSection}
 
-CREATIVE SEED (use as a starting point — you can adapt, combine with seasonal context, or go in a completely different direction):
+THEME VOCABULARY (use as inspiration — mix and match, or go beyond):
+
+Characters: dragon, unicorn, astronaut, mermaid, fairy, robot, penguin, fox, panda, dolphin, owl, butterfly, turtle, dinosaur, koala, sloth, capybara, hedgehog, seahorse, ladybug, phoenix, pegasus, octopus, bee, elephant, giraffe, monkey, raccoon, whale, deer, parrot, ballerina, caterpillar, bear cub, firefighter, chef, veterinarian, knight, pirate, lion, frog prince, genie, ninja, inventor, cat, dog, bunny, farmer, doctor
+
+Settings: magical forest, sunny beach, space station, underwater reef, enchanted garden, treehouse, cloud kingdom, candy land, toy workshop, crystal cave, pirate ship, castle, rainbow bridge, circus big top, dinosaur valley, african savanna, japanese garden, rainforest canopy, farm and barnyard, moon base, flower meadow, bakery kitchen, cozy library, aquarium, bamboo forest, carnival fairground, secret garden, night sky observatory, floating sky island, coral island, arctic tundra
+
+Activities: exploring, painting, building, flying, swimming, singing, gardening, cooking, camping, treasure hunting, ice skating, surfing, skateboarding, stargazing, baking, playing music, riding a bike, fossil hunting, catching fireflies, blowing bubbles, feeding animals, building a sandcastle, dancing, reading a book, picking flowers, flying a kite, decorating a cake, doing a science experiment, having a tea party, launching a rocket
+
+CREATIVE SEED (starting point — adapt, combine, or go in a different direction):
 - Character idea: ${seedCharacter}
 - Setting idea: ${seedSetting}
+
+DIVERSITY: Rotate character types (animals, children, fantasy, vehicles, nature), vary settings (indoor, outdoor, underwater, space, fantasy), include global perspectives. Avoid repeating similar scenes from the recent list above.
 
 Search the web for any trending kids' topics, popular children's shows themes, or current events that could inspire a fun, child-friendly coloring page scene.
 
