@@ -7,6 +7,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark, faCoins, faStar } from "@fortawesome/pro-solid-svg-icons";
 import { PurchasesPackage } from "react-native-purchases";
@@ -19,6 +20,8 @@ type CreditPackModalProps = {
   visible: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  /** Skip parental gate (e.g. when already behind a gated screen like Settings) */
+  skipParentalGate?: boolean;
 };
 
 // Credit amounts per product
@@ -73,7 +76,9 @@ const CreditPackModal = ({
   visible,
   onClose,
   onSuccess,
+  skipParentalGate = false,
 }: CreditPackModalProps) => {
+  const insets = useSafeAreaInsets();
   const { data: offering, isLoading } = useCreditPacksOffering();
   const purchaseMutation = usePurchaseCreditPack();
 
@@ -81,29 +86,43 @@ const CreditPackModal = ({
     useState<PurchasesPackage | null>(null);
   const [showParentalGate, setShowParentalGate] = useState(false);
 
-  // Handle purchase initiation (requires parental gate)
-  const handlePurchasePress = useCallback((pkg: PurchasesPackage) => {
-    setSelectedPackage(pkg);
-    setShowParentalGate(true);
-  }, []);
+  // Execute a purchase directly (no gate)
+  const executePurchase = useCallback(
+    async (pkg: PurchasesPackage) => {
+      try {
+        await purchaseMutation.mutateAsync(pkg);
+        onSuccess?.();
+        onClose();
+      } catch (error) {
+        console.error("Credit pack purchase failed:", error);
+      }
+    },
+    [purchaseMutation, onSuccess, onClose],
+  );
+
+  // Handle purchase initiation
+  const handlePurchasePress = useCallback(
+    (pkg: PurchasesPackage) => {
+      if (skipParentalGate) {
+        executePurchase(pkg);
+        return;
+      }
+      setSelectedPackage(pkg);
+      setShowParentalGate(true);
+    },
+    [skipParentalGate, executePurchase],
+  );
 
   // Execute purchase after parental gate success
   const handleParentalGateSuccess = useCallback(async () => {
     setShowParentalGate(false);
 
     if (selectedPackage) {
-      try {
-        await purchaseMutation.mutateAsync(selectedPackage);
-        onSuccess?.();
-        onClose();
-      } catch (error) {
-        // Error handled in mutation
-        console.error("Credit pack purchase failed:", error);
-      }
+      await executePurchase(selectedPackage);
     }
 
     setSelectedPackage(null);
-  }, [selectedPackage, purchaseMutation, onSuccess, onClose]);
+  }, [selectedPackage, executePurchase]);
 
   const handleParentalGateClose = useCallback(() => {
     setShowParentalGate(false);
@@ -118,10 +137,10 @@ const CreditPackModal = ({
       <Modal
         visible={visible}
         animationType="slide"
-        presentationStyle="pageSheet"
+        presentationStyle="overFullScreen"
         onRequestClose={onClose}
       >
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
           {/* Header */}
           <View style={styles.header}>
             <Pressable onPress={onClose} style={styles.closeButton}>
@@ -216,16 +235,16 @@ const CreditPackModal = ({
             </View>
           )}
         </View>
-      </Modal>
 
-      {/* Parental Gate */}
-      <ParentalGate
-        visible={showParentalGate}
-        onClose={handleParentalGateClose}
-        onSuccess={handleParentalGateSuccess}
-        title="Parent Verification"
-        subtitle="Please verify you are a parent to make this purchase"
-      />
+        {/* Parental Gate rendered inside Modal so it layers correctly on iOS */}
+        <ParentalGate
+          visible={showParentalGate}
+          onClose={handleParentalGateClose}
+          onSuccess={handleParentalGateSuccess}
+          title="Parent Verification"
+          subtitle="Please verify you are a parent to make this purchase"
+        />
+      </Modal>
     </>
   );
 };
@@ -236,14 +255,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#FDFAF5",
   },
   header: {
-    paddingTop: 60,
+    paddingTop: 48,
     paddingHorizontal: 24,
     paddingBottom: 24,
     alignItems: "center",
   },
   closeButton: {
     position: "absolute",
-    top: 16,
+    top: 12,
     right: 16,
     padding: 8,
     zIndex: 10,

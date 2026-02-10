@@ -7,7 +7,10 @@ import {
   Pressable,
   ScrollView,
   ActivityIndicator,
+  Platform,
+  Linking,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faXmark,
@@ -35,30 +38,35 @@ type PaywallProps = {
   visible: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  /** Skip parental gate (e.g. when already behind a gated screen like Settings) */
+  skipParentalGate?: boolean;
 };
 
-// Plan features for display
+// Plan taglines matching web pricing page
+const PLAN_TAGLINES = {
+  SPLASH: "Great for occasional creators",
+  RAINBOW: "Perfect for creative families",
+  SPARKLE: "For serious creators",
+};
+
+// Plan features aligned with web pricing page
 const PLAN_FEATURES: Record<"SPLASH" | "RAINBOW" | "SPARKLE", string[]> = {
   SPLASH: [
-    "250 credits/month",
-    "3 profiles",
-    "Magic Brush",
-    "Voice input",
-    "Camera input",
+    "250 credits/month (~50 pages)",
+    "All platform features",
+    "Credits reset monthly",
   ],
   RAINBOW: [
-    "500 credits/month",
-    "5 profiles",
-    "Everything in Splash",
+    "500 credits/month (~100 pages)",
+    "All platform features",
+    "Unused credits roll over (1 month)",
     "Priority support",
-    "Credit rollover",
   ],
   SPARKLE: [
-    "1,000 credits/month",
-    "10 profiles",
-    "Everything in Rainbow",
-    "Commercial use",
-    "2x credit rollover",
+    "1,000 credits/month (~200 pages)",
+    "All platform features",
+    "Extended rollover (2 months)",
+    "Commercial use license",
   ],
 };
 
@@ -74,7 +82,19 @@ const PLAN_COLORS = {
   SPARKLE: "#FCD34D", // amber-300
 };
 
-const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
+const PLAN_DISPLAY_NAMES = {
+  SPLASH: "Splash",
+  RAINBOW: "Rainbow",
+  SPARKLE: "Sparkle",
+};
+
+const Paywall = ({
+  visible,
+  onClose,
+  onSuccess,
+  skipParentalGate = false,
+}: PaywallProps) => {
+  const insets = useSafeAreaInsets();
   const { data: offering, isLoading: isLoadingOfferings } = useOfferings();
   const purchaseMutation = usePurchase();
   const restoreMutation = useRestorePurchases();
@@ -103,53 +123,70 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
     return grouped;
   }, [offering]);
 
-  // Handle purchase initiation (requires parental gate)
-  const handlePurchasePress = useCallback((pkg: PurchasesPackage) => {
-    setSelectedPackage(pkg);
-    setPendingAction("purchase");
-    setShowParentalGate(true);
-  }, []);
-
-  // Handle restore press (requires parental gate)
-  const handleRestorePress = useCallback(() => {
-    setPendingAction("restore");
-    setShowParentalGate(true);
-  }, []);
-
-  // Execute purchase after parental gate success
-  const handleParentalGateSuccess = useCallback(async () => {
-    setShowParentalGate(false);
-
-    if (pendingAction === "purchase" && selectedPackage) {
+  // Execute a purchase directly (no gate)
+  const executePurchase = useCallback(
+    async (pkg: PurchasesPackage) => {
       try {
-        await purchaseMutation.mutateAsync(selectedPackage);
+        await purchaseMutation.mutateAsync(pkg);
         onSuccess?.();
         onClose();
       } catch (error) {
         // Error handled in mutation
       }
-    } else if (pendingAction === "restore") {
-      try {
-        const customerInfo = await restoreMutation.mutateAsync();
-        if (customerInfo.entitlements.active["premium"]) {
-          onSuccess?.();
-          onClose();
-        }
-      } catch (error) {
-        // Error handled in mutation
+    },
+    [purchaseMutation, onSuccess, onClose],
+  );
+
+  // Execute a restore directly (no gate)
+  const executeRestore = useCallback(async () => {
+    try {
+      const customerInfo = await restoreMutation.mutateAsync();
+      if (customerInfo.entitlements.active["premium"]) {
+        onSuccess?.();
+        onClose();
       }
+    } catch (error) {
+      // Error handled in mutation
+    }
+  }, [restoreMutation, onSuccess, onClose]);
+
+  // Handle purchase initiation
+  const handlePurchasePress = useCallback(
+    (pkg: PurchasesPackage) => {
+      if (skipParentalGate) {
+        executePurchase(pkg);
+        return;
+      }
+      setSelectedPackage(pkg);
+      setPendingAction("purchase");
+      setShowParentalGate(true);
+    },
+    [skipParentalGate, executePurchase],
+  );
+
+  // Handle restore press
+  const handleRestorePress = useCallback(() => {
+    if (skipParentalGate) {
+      executeRestore();
+      return;
+    }
+    setPendingAction("restore");
+    setShowParentalGate(true);
+  }, [skipParentalGate, executeRestore]);
+
+  // Execute action after parental gate success
+  const handleParentalGateSuccess = useCallback(async () => {
+    setShowParentalGate(false);
+
+    if (pendingAction === "purchase" && selectedPackage) {
+      await executePurchase(selectedPackage);
+    } else if (pendingAction === "restore") {
+      await executeRestore();
     }
 
     setPendingAction(null);
     setSelectedPackage(null);
-  }, [
-    pendingAction,
-    selectedPackage,
-    purchaseMutation,
-    restoreMutation,
-    onSuccess,
-    onClose,
-  ]);
+  }, [pendingAction, selectedPackage, executePurchase, executeRestore]);
 
   const handleParentalGateClose = useCallback(() => {
     setShowParentalGate(false);
@@ -165,10 +202,10 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
       <Modal
         visible={visible}
         animationType="slide"
-        presentationStyle="pageSheet"
+        presentationStyle="overFullScreen"
         onRequestClose={onClose}
       >
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
           {/* Header */}
           <View style={styles.header}>
             <Pressable onPress={onClose} style={styles.closeButton}>
@@ -182,6 +219,11 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
               Create unlimited coloring pages with Magic Brush, voice input, and
               more!
             </Text>
+            <View style={styles.trialBanner}>
+              <Text style={styles.trialBannerText}>
+                7-day free trial on all plans — cancel anytime
+              </Text>
+            </View>
           </View>
 
           {/* Content */}
@@ -197,7 +239,7 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
             ) : (
               <>
                 {/* Plan cards */}
-                {(["RAINBOW", "SPLASH", "SPARKLE"] as const).map((planName) => {
+                {(["SPLASH", "RAINBOW", "SPARKLE"] as const).map((planName) => {
                   const packages = grouped[planName];
                   if (!packages?.length) return null;
 
@@ -237,7 +279,14 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
                             color="#FFFFFF"
                           />
                         </View>
-                        <Text style={styles.planName}>{planName}</Text>
+                        <View>
+                          <Text style={styles.planName}>
+                            {PLAN_DISPLAY_NAMES[planName]}
+                          </Text>
+                          <Text style={styles.planTagline}>
+                            {PLAN_TAGLINES[planName]}
+                          </Text>
+                        </View>
                       </View>
 
                       <View style={styles.features}>
@@ -262,11 +311,28 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
                             disabled={isLoading}
                           >
                             <View style={styles.priceButtonContent}>
-                              <Text style={styles.priceLabel}>Annual</Text>
-                              <Text style={styles.priceAmount}>
+                              <Text
+                                style={[
+                                  styles.priceLabel,
+                                  { color: "rgba(255,255,255,0.8)" },
+                                ]}
+                              >
+                                Annual
+                              </Text>
+                              <Text
+                                style={[
+                                  styles.priceAmount,
+                                  { color: "#FFFFFF" },
+                                ]}
+                              >
                                 {formatPackagePrice(annualPkg)}
                               </Text>
-                              <Text style={styles.priceSubtext}>
+                              <Text
+                                style={[
+                                  styles.priceSubtext,
+                                  { color: "rgba(255,255,255,0.7)" },
+                                ]}
+                              >
                                 {formatAnnualMonthlyPrice(annualPkg)}
                               </Text>
                             </View>
@@ -296,12 +362,8 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
                   );
                 })}
 
-                {/* Trial info */}
-                <View style={styles.trialInfo}>
-                  <Text style={styles.trialText}>
-                    Start with a 7-day free trial. Cancel anytime.
-                  </Text>
-                </View>
+                {/* Spacer for bottom scroll padding */}
+                <View style={{ height: 8 }} />
               </>
             )}
           </ScrollView>
@@ -317,10 +379,29 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
               <Text style={styles.restoreText}>Restore Purchases</Text>
             </Pressable>
 
+            <View style={styles.legalLinks}>
+              <Pressable
+                onPress={() =>
+                  Linking.openURL("https://chunkycrayon.com/terms")
+                }
+              >
+                <Text style={styles.legalLink}>Terms of Service</Text>
+              </Pressable>
+              <Text style={styles.legalDot}>&middot;</Text>
+              <Pressable
+                onPress={() =>
+                  Linking.openURL("https://chunkycrayon.com/privacy")
+                }
+              >
+                <Text style={styles.legalLink}>Privacy Policy</Text>
+              </Pressable>
+            </View>
+
             <Text style={styles.legalText}>
-              Payment will be charged to your Apple ID account. Subscription
-              automatically renews unless cancelled at least 24 hours before the
-              end of the current period.
+              Payment will be charged to your{" "}
+              {Platform.OS === "ios" ? "Apple ID" : "Google Play"} account.
+              Subscription automatically renews unless cancelled at least 24
+              hours before the end of the current period.
             </Text>
           </View>
 
@@ -332,16 +413,16 @@ const Paywall = ({ visible, onClose, onSuccess }: PaywallProps) => {
             </View>
           )}
         </View>
-      </Modal>
 
-      {/* Parental Gate */}
-      <ParentalGate
-        visible={showParentalGate}
-        onClose={handleParentalGateClose}
-        onSuccess={handleParentalGateSuccess}
-        title="Parent Verification"
-        subtitle="Please verify you are a parent to make this purchase"
-      />
+        {/* Parental Gate rendered inside Modal so it layers correctly on iOS */}
+        <ParentalGate
+          visible={showParentalGate}
+          onClose={handleParentalGateClose}
+          onSuccess={handleParentalGateSuccess}
+          title="Parent Verification"
+          subtitle="Please verify you are a parent to make this purchase"
+        />
+      </Modal>
     </>
   );
 };
@@ -352,14 +433,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#FDFAF5",
   },
   header: {
-    paddingTop: 60,
+    paddingTop: 48,
     paddingHorizontal: 24,
     paddingBottom: 24,
     alignItems: "center",
   },
   closeButton: {
     position: "absolute",
-    top: 16,
+    top: 12,
     right: 16,
     padding: 8,
     zIndex: 10,
@@ -406,10 +487,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
+    overflow: "visible",
   },
   recommendedCard: {
     borderWidth: 2,
     borderColor: "#7C3AED",
+    marginTop: 12,
   },
   recommendedBadge: {
     position: "absolute",
@@ -443,7 +526,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     color: "#1E293B",
-    textTransform: "capitalize",
+  },
+  planTagline: {
+    fontSize: 13,
+    color: "#64748B",
+    marginTop: 2,
   },
   features: {
     marginBottom: 16,
@@ -502,14 +589,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
-  trialInfo: {
-    alignItems: "center",
-    paddingVertical: 16,
+  trialBanner: {
+    backgroundColor: "#F0EBFF",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 16,
   },
-  trialText: {
-    fontSize: 14,
+  trialBannerText: {
+    fontSize: 15,
+    fontWeight: "700",
     color: "#7C3AED",
-    fontWeight: "500",
+    textAlign: "center",
   },
   footer: {
     paddingHorizontal: 24,
@@ -530,6 +621,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#64748B",
     fontWeight: "500",
+  },
+  legalLinks: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 12,
+  },
+  legalLink: {
+    fontSize: 13,
+    color: "#7C3AED",
+    fontWeight: "500",
+  },
+  legalDot: {
+    fontSize: 13,
+    color: "#94A3B8",
   },
   legalText: {
     fontSize: 11,

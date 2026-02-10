@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faSpinnerThird } from "@fortawesome/pro-regular-svg-icons";
+import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
 import { COLORS } from "@/lib/design";
 
 type SpinnerProps = {

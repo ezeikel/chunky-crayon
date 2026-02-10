@@ -42,7 +42,9 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import AppHeader from "@/components/AppHeader";
 import ParentalGate from "@/components/ParentalGate";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
+import SubscriptionManager from "@/components/SubscriptionManager";
 import useHeaderData from "@/hooks/useHeaderData";
+import { usePlanName } from "@/hooks/useEntitlements";
 import { useAuth } from "@/contexts";
 
 type SettingsItemProps = {
@@ -125,9 +127,17 @@ const SettingsToggle = ({
   </View>
 );
 
+const PLAN_DISPLAY_NAMES: Record<string, string> = {
+  FREE: "Free",
+  SPLASH: "Splash Plan",
+  RAINBOW: "Rainbow Plan",
+  SPARKLE: "Sparkle Plan",
+};
+
 const SettingsScreen = () => {
   const appVersion = Constants.expoConfig?.version || "1.0.0";
   const headerData = useHeaderData();
+  const planName = usePlanName();
   const {
     isLoading: authLoading,
     isAuthenticated,
@@ -157,14 +167,16 @@ const SettingsScreen = () => {
   // Profile switcher state
   const [profileSwitcherOpen, setProfileSwitcherOpen] = useState(false);
 
+  // Subscription modal state
+  const [subscriptionModalVisible, setSubscriptionModalVisible] =
+    useState(false);
+
   const handleManageProfiles = () => {
     setProfileSwitcherOpen(true);
   };
 
   const handleSubscription = () => {
-    Alert.alert("Subscription", "Subscription management screen coming soon!", [
-      { text: "OK" },
-    ]);
+    setSubscriptionModalVisible(true);
   };
 
   const handleParentalGateSuccess = useCallback(() => {
@@ -285,7 +297,10 @@ const SettingsScreen = () => {
         );
       }
     } catch {
-      Alert.alert("Error", "Failed to sign in with Facebook. Please try again.");
+      Alert.alert(
+        "Error",
+        "Failed to sign in with Facebook. Please try again.",
+      );
     } finally {
       setSignInLoading(false);
     }
@@ -375,7 +390,11 @@ const SettingsScreen = () => {
                         { backgroundColor: "rgba(34, 197, 94, 0.2)" },
                       ]}
                     >
-                      <FontAwesomeIcon icon={faCheck} size={18} color="#22C55E" />
+                      <FontAwesomeIcon
+                        icon={faCheck}
+                        size={18}
+                        color="#22C55E"
+                      />
                     </View>
                     <View style={styles.itemContent}>
                       <Text style={styles.itemTitle}>Signed In</Text>
@@ -412,7 +431,7 @@ const SettingsScreen = () => {
                 icon={faCreditCard}
                 iconColor="#F1AE7E"
                 title="Subscription & Credits"
-                subtitle="Manage your plan"
+                subtitle={PLAN_DISPLAY_NAMES[planName] || "Manage your plan"}
                 onPress={handleSubscription}
               />
             </View>
@@ -547,7 +566,9 @@ const SettingsScreen = () => {
                 style={styles.magicLinkRetryButton}
                 onPress={() => setMagicLinkSent(false)}
               >
-                <Text style={styles.magicLinkRetryText}>Use Different Email</Text>
+                <Text style={styles.magicLinkRetryText}>
+                  Use Different Email
+                </Text>
               </Pressable>
             </View>
           ) : (
@@ -566,7 +587,9 @@ const SettingsScreen = () => {
                     disabled={signInLoading}
                   >
                     <FontAwesomeIcon icon={faApple} size={20} color="#FFFFFF" />
-                    <Text style={[styles.socialButtonText, { color: "#FFFFFF" }]}>
+                    <Text
+                      style={[styles.socialButtonText, { color: "#FFFFFF" }]}
+                    >
                       Continue with Apple
                     </Text>
                   </Pressable>
@@ -578,7 +601,9 @@ const SettingsScreen = () => {
                   disabled={signInLoading}
                 >
                   <FontAwesomeIcon icon={faGoogle} size={20} color="#EA4335" />
-                  <Text style={styles.socialButtonText}>Continue with Google</Text>
+                  <Text style={styles.socialButtonText}>
+                    Continue with Google
+                  </Text>
                 </Pressable>
 
                 <Pressable
@@ -586,7 +611,11 @@ const SettingsScreen = () => {
                   onPress={handleFacebookSignIn}
                   disabled={signInLoading}
                 >
-                  <FontAwesomeIcon icon={faFacebook} size={20} color="#1877F2" />
+                  <FontAwesomeIcon
+                    icon={faFacebook}
+                    size={20}
+                    color="#1877F2"
+                  />
                   <Text style={styles.socialButtonText}>
                     Continue with Facebook
                   </Text>
@@ -644,6 +673,12 @@ const SettingsScreen = () => {
       <ProfileSwitcher
         isOpen={profileSwitcherOpen}
         onClose={() => setProfileSwitcherOpen(false)}
+      />
+
+      {/* Subscription Manager Modal */}
+      <SubscriptionManager
+        visible={subscriptionModalVisible}
+        onClose={() => setSubscriptionModalVisible(false)}
       />
     </View>
   );
