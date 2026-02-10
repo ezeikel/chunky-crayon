@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,15 @@ import {
   ActivityIndicator,
   useWindowDimensions,
 } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  useSharedValue,
+  useAnimatedStyle,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCrown, faCheck, faRainbow } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -23,6 +31,7 @@ import Paywall from "../Paywall";
 
 type OnboardingPaywallSlideProps = {
   onComplete: () => void;
+  isActive?: boolean;
 };
 
 const FEATURES = [
@@ -33,6 +42,7 @@ const FEATURES = [
 
 const OnboardingPaywallSlide = ({
   onComplete,
+  isActive = true,
 }: OnboardingPaywallSlideProps) => {
   const { width } = useWindowDimensions();
   const { data: offering, isPending: isLoadingOfferings } = useOfferings();
@@ -40,6 +50,13 @@ const OnboardingPaywallSlide = ({
 
   const [showParentalGate, setShowParentalGate] = useState(false);
   const [showFullPaywall, setShowFullPaywall] = useState(false);
+  const [hasBeenActive, setHasBeenActive] = useState(isActive);
+
+  useEffect(() => {
+    if (isActive && !hasBeenActive) {
+      setHasBeenActive(true);
+    }
+  }, [isActive, hasBeenActive]);
 
   // Find the Rainbow monthly package (primary CTA focus)
   const rainbowPackage = offering?.availablePackages?.find((pkg) => {
@@ -101,6 +118,30 @@ const OnboardingPaywallSlide = ({
 
   const isLoading = purchaseMutation.isPending;
 
+  // CTA pulse animation — 3 subtle pulses after 800ms delay
+  const ctaScale = useSharedValue(1);
+
+  useEffect(() => {
+    ctaScale.value = withDelay(
+      800,
+      withRepeat(
+        withSequence(
+          withTiming(1.03, { duration: 600 }),
+          withTiming(1.0, { duration: 600 }),
+        ),
+        3,
+      ),
+    );
+  }, [ctaScale]);
+
+  const ctaPulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: ctaScale.value }],
+  }));
+
+  if (!hasBeenActive) {
+    return <View style={[styles.container, { width }]} />;
+  }
+
   return (
     <View style={[styles.container, { width }]}>
       <Animated.View entering={FadeIn.duration(600)} style={styles.content}>
@@ -145,22 +186,24 @@ const OnboardingPaywallSlide = ({
             </View>
           ) : (
             <>
-              {/* Start Free Trial */}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.trialButton,
-                  pressed && styles.trialButtonPressed,
-                  isLoading && styles.trialButtonDisabled,
-                ]}
-                onPress={handleStartTrial}
-                disabled={isLoading || !targetPackage}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.trialButtonText}>Start Free Trial</Text>
-                )}
-              </Pressable>
+              {/* Start Free Trial — with pulse animation */}
+              <Animated.View style={ctaPulseStyle}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.trialButton,
+                    pressed && styles.trialButtonPressed,
+                    isLoading && styles.trialButtonDisabled,
+                  ]}
+                  onPress={handleStartTrial}
+                  disabled={isLoading || !targetPackage}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.trialButtonText}>Start Free Trial</Text>
+                  )}
+                </Pressable>
+              </Animated.View>
 
               {/* See All Plans */}
               <Pressable

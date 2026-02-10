@@ -18,7 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     orientation: "default",
     icon: "./assets/images/icon.png",
     scheme: "chunkycrayon",
-    userInterfaceStyle: "automatic",
+    userInterfaceStyle: "light",
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
@@ -38,7 +38,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/images/adaptive-icon.png",
-        backgroundColor: "#FFD6A5",
+        backgroundColor: "#FF9F6E",
       },
       package: "com.chewybytes.chunkycrayon.app",
     },
@@ -55,7 +55,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           image: "./assets/images/splash-icon.png",
           imageWidth: 200,
           resizeMode: "contain",
-          backgroundColor: "#FDFAF5",
+          backgroundColor: "#FF9F6E",
         },
       ],
       "expo-dev-client",

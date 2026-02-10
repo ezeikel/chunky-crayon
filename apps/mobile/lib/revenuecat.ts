@@ -6,13 +6,13 @@ import Purchases, {
 } from "react-native-purchases";
 import { Platform } from "react-native";
 
-// RevenueCat API keys - Test Store for now, will add iOS/Android when apps are created
+// RevenueCat API keys
 const REVENUECAT_API_KEYS = {
   ios:
-    process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY ||
+    process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ||
     "test_kzLtZBdhgwAtzUNMzuNsPmyNeKB",
   android:
-    process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY ||
+    process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY ||
     "test_kzLtZBdhgwAtzUNMzuNsPmyNeKB",
 };
 
