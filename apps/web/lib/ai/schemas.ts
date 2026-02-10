@@ -8,6 +8,41 @@ import { z } from 'zod';
  */
 
 // =============================================================================
+// Scene Description (for AI-powered daily scene generation)
+// =============================================================================
+
+export const sceneDescriptionSchema = z.object({
+  character: z
+    .string()
+    .describe(
+      'The main character or creature in the scene (e.g., "a friendly dinosaur", "a brave astronaut cat")',
+    ),
+  activity: z
+    .string()
+    .describe(
+      'What the character is doing (e.g., "building a sandcastle", "exploring a magical forest")',
+    ),
+  setting: z
+    .string()
+    .describe(
+      'The environment or location (e.g., "a sunny beach", "a cozy treehouse")',
+    ),
+  seasonalContext: z
+    .string()
+    .nullable()
+    .describe(
+      'Optional seasonal or event tie-in (e.g., "celebrating Diwali", "enjoying a snowy winter day"). Null if not seasonal.',
+    ),
+  fullDescription: z
+    .string()
+    .describe(
+      'A complete, vivid 1-2 sentence description combining all elements into a child-friendly coloring page scene. This is the final prompt used for image generation.',
+    ),
+});
+
+export type SceneDescription = z.infer<typeof sceneDescriptionSchema>;
+
+// =============================================================================
 // Image Metadata
 // =============================================================================
 

@@ -103,6 +103,9 @@ export {
   ANIMATION_PROMPT_SYSTEM,
   createAnimationPromptPrompt,
   DEFAULT_ANIMATION_PROMPT,
+  // Scene description prompts (for AI-powered daily generation)
+  SCENE_DESCRIPTION_SYSTEM,
+  createDailyScenePrompt,
 } from './prompts';
 export type { MagicColorMode } from './prompts';
 
@@ -123,6 +126,8 @@ export {
   detectedRegionInputSchema,
   regionColorAssignmentSchema,
   regionFirstColorResponseSchema,
+  // Scene description schema (for AI-powered daily generation)
+  sceneDescriptionSchema,
   // Pre-computed grid color map schemas (for instant Magic Fill)
   gridCellColorSchema,
   gridColorMapSchema,
@@ -142,6 +147,8 @@ export type {
   DetectedRegionInput,
   RegionColorAssignment,
   RegionFirstColorResponse,
+  // Scene description type
+  SceneDescription,
   // Pre-computed grid color map types
   GridCellColor,
   GridColorMap,

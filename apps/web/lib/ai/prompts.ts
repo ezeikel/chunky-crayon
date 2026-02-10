@@ -1038,3 +1038,174 @@ Output ONLY the animation prompt. 2-3 sentences maximum.`;
  * Designed for broad compatibility with any coloring page subject.
  */
 export const DEFAULT_ANIMATION_PROMPT = `Very slow 2% push-in on the illustration. The main subject shifts subtly as if turning attention toward the viewer. Background elements sway gently in a soft breeze, individual details catching warm light that shifts gradually across the scene. Preserving the original black and white coloring book line art style throughout.`;
+
+// =============================================================================
+// Daily Scene Description Generation (for AI-powered seasonal coloring pages)
+// =============================================================================
+
+export const SCENE_DESCRIPTION_SYSTEM = `You are a creative director for Chunky Crayon, a children's coloring page platform for kids aged ${TARGET_AGE}. Your job is to come up with delightful, imaginative scene descriptions for daily coloring pages.
+
+CREATIVE GUIDELINES:
+- Every scene must be child-friendly, safe, and joyful
+- Feature diverse characters: animals, kids of different backgrounds, fantasy creatures, robots, etc.
+- Mix everyday activities with imaginative twists (e.g., "a penguin baking cookies in a treehouse kitchen")
+- Scenes should be visually interesting with clear subjects that work well as line drawings
+- Avoid copyrighted characters (no Disney, Marvel, etc.)
+
+STRICTLY FORBIDDEN CONTENT (the scene MUST NOT contain any of these):
+- Violence, weapons, fighting, battles, or conflict of any kind
+- Scary or spooky elements: ghosts, skeletons, monsters, vampires, werewolves, zombies
+- Death, graveyards, blood, fire/explosions, or anything dangerous
+- Sad, angry, or negative emotions
+- Anything sexual or romantic (hugging/friendship is fine)
+- Real-world tragedies, disasters, or politics
+- Alcohol, drugs, smoking, or any adult themes
+
+PROVEN POPULAR THEMES (our audience loves these — use as inspiration, but feel free to go beyond):
+
+Characters: dragon, unicorn, knight, astronaut, pirate, mermaid, fairy, robot, penguin, polar bear, fox, panda, lion, frog prince, genie, ninja, inventor, dolphin, cat, dog, bunny, owl, butterfly, turtle, dinosaur, firefighter, veterinarian, chef, bear cub, koala, sloth, capybara, hedgehog, seahorse, ladybug, phoenix, griffin, yeti, pegasus, octopus, bee, elephant, giraffe, monkey, raccoon, whale, deer, parrot, farmer, ballerina, doctor, caterpillar
+
+Settings: magical forest, sunny beach, space station, underwater reef, enchanted garden, treehouse, cloud kingdom, candy land, toy workshop, crystal cave, pirate ship, castle, rainbow bridge, circus big top, giant mushroom field, dinosaur valley, african savanna, japanese garden, coral island, arctic tundra, rainforest canopy, farm and barnyard, moon base, desert oasis, busy city street, train station, bakery kitchen, flower meadow, volcano island, marketplace bazaar, cozy library, construction site, aquarium, bamboo forest, carnival fairground, secret garden, music stage, floating sky island, fire station, veterinary clinic, night sky observatory
+
+Activities: exploring, painting, building, flying, swimming, singing, gardening, cooking, camping, treasure hunting, ice skating, surfing, skateboarding, drawing, juggling, stargazing, baking, playing music, riding a bike, fossil hunting, planting a tree, catching fireflies, blowing bubbles, feeding animals, building a sandcastle, climbing a mountain, dancing, reading a book, picking flowers, making pottery, riding a horse, playing in the rain, building a snowman, sailing a boat, roasting marshmallows, flying a kite, decorating a cake, doing a science experiment, rescuing animals, racing go-karts, digging for treasure, making a robot, practicing yoga, playing in autumn leaves, having a tea party, launching a rocket, photographing nature
+
+DIVERSITY REQUIREMENTS:
+- Rotate through different character types: animals, children, fantasy creatures, vehicles, nature
+- Vary settings: indoor, outdoor, underwater, space, city, countryside, fantasy
+- Include a mix of cultural contexts and global perspectives
+- Avoid repeating similar scenes within a 30-day window
+
+SEASONAL AWARENESS:
+- When seasonal events or holidays are approaching, incorporate them naturally
+- Don't force seasonality — if nothing relevant is happening, create a fun everyday scene
+- When referencing holidays, be inclusive and focus on universal themes (togetherness, celebration, nature)
+
+OUTPUT:
+- The fullDescription should be a vivid 1-2 sentence scene description
+- It should read naturally as an image generation prompt
+- Example: "A cheerful elephant wearing rain boots, splashing in puddles while a family of frogs watches from lily pads in a rainy garden."`;
+
+/**
+ * Creates the user prompt for daily scene generation.
+ * Provides seasonal context, recent descriptions to avoid, and real-time awareness instructions.
+ */
+// Random seed pools for creative nudges — prevents AI from always picking the most obvious theme
+const SEED_CHARACTERS = [
+  'dragon',
+  'unicorn',
+  'astronaut',
+  'mermaid',
+  'fairy',
+  'robot',
+  'penguin',
+  'fox',
+  'panda',
+  'dolphin',
+  'owl',
+  'butterfly',
+  'turtle',
+  'dinosaur',
+  'koala',
+  'sloth',
+  'capybara',
+  'hedgehog',
+  'seahorse',
+  'ladybug',
+  'phoenix',
+  'pegasus',
+  'octopus',
+  'bee',
+  'elephant',
+  'giraffe',
+  'monkey',
+  'raccoon',
+  'whale',
+  'deer',
+  'parrot',
+  'ballerina',
+  'caterpillar',
+  'bear cub',
+  'firefighter',
+  'chef',
+  'veterinarian',
+];
+
+const SEED_SETTINGS = [
+  'magical forest',
+  'sunny beach',
+  'space station',
+  'underwater reef',
+  'enchanted garden',
+  'treehouse',
+  'cloud kingdom',
+  'candy land',
+  'toy workshop',
+  'crystal cave',
+  'dinosaur valley',
+  'african savanna',
+  'japanese garden',
+  'rainforest canopy',
+  'farm and barnyard',
+  'moon base',
+  'flower meadow',
+  'bakery kitchen',
+  'cozy library',
+  'aquarium',
+  'bamboo forest',
+  'carnival fairground',
+  'secret garden',
+  'night sky observatory',
+  'floating sky island',
+  'coral island',
+  'arctic tundra',
+];
+
+function randomFrom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+export const createDailyScenePrompt = (
+  currentDate: string,
+  upcomingEvents: Array<{
+    name: string;
+    themes: string[];
+    childFriendlyDescription: string;
+  }>,
+  currentSeason: { northern: string; southern: string },
+  recentPrompts: string[],
+): string => {
+  // Random creative seed to encourage variety
+  const seedCharacter = randomFrom(SEED_CHARACTERS);
+  const seedSetting = randomFrom(SEED_SETTINGS);
+  const eventsSection =
+    upcomingEvents.length > 0
+      ? `UPCOMING EVENTS (within the next 7 days):
+${upcomingEvents.map((e) => `- ${e.name}: ${e.childFriendlyDescription} (themes: ${e.themes.join(', ')})`).join('\n')}
+
+IMPORTANT: Pick AT MOST ONE event to theme the scene around. Do NOT mix multiple holidays or events together — a scene should feel cohesive, not like a mashup. You can also ignore all events and create a purely seasonal or everyday scene.`
+      : 'No major events in the next 7 days — create a fun, imaginative everyday scene.';
+
+  const recentSection =
+    recentPrompts.length > 0
+      ? `RECENT SCENES TO AVOID (do NOT repeat similar themes):
+${recentPrompts.map((p, i) => `${i + 1}. ${p}`).join('\n')}`
+      : '';
+
+  return `Today is ${currentDate}.
+
+CURRENT SEASON:
+- Northern Hemisphere: ${currentSeason.northern}
+- Southern Hemisphere: ${currentSeason.southern}
+
+${eventsSection}
+
+${recentSection}
+
+CREATIVE SEED (use as a starting point — you can adapt, combine with seasonal context, or go in a completely different direction):
+- Character idea: ${seedCharacter}
+- Setting idea: ${seedSetting}
+
+Search the web for any trending kids' topics, popular children's shows themes, or current events that could inspire a fun, child-friendly coloring page scene.
+
+Generate a single, unique, delightful scene description for today's daily coloring page. Make it specific, visual, and perfect for a children's coloring book.`;
+};

@@ -27,6 +27,7 @@ import {
   CreditTransactionType,
 } from '@chunky-crayon/db';
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
+import { getAIDescription } from '@/lib/scene-generation';
 import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
@@ -140,6 +141,7 @@ const generateColoringImageWithMetadata = async (
   userId?: string,
   generationType?: GenerationType,
   locale: string = 'en',
+  sourcePrompt?: string,
 ) => {
   // Get language info for the locale (default to English if unknown)
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
@@ -230,6 +232,7 @@ const generateColoringImageWithMetadata = async (
       generationType: generationType || GenerationType.USER,
       userId,
       profileId: activeProfile?.id,
+      sourcePrompt: sourcePrompt || undefined,
     },
   });
 
@@ -337,6 +340,7 @@ export const createColoringImage = async (
           userId,
           rawFormData.generationType,
           rawFormData.locale,
+          rawFormData.description,
         );
       },
       {
@@ -436,6 +440,7 @@ export const createColoringImage = async (
     undefined,
     rawFormData.generationType,
     rawFormData.locale,
+    rawFormData.description,
   );
 
   after(async () => {
@@ -639,7 +644,15 @@ export const getAllColoringImagesStatic = async () => {
 export const generateColoringImageOnly = async (
   generationType: GenerationType,
 ): Promise<Partial<ColoringImage>> => {
-  const description = getRandomDescription();
+  let description: string;
+
+  if (generationType === GenerationType.DAILY) {
+    // For daily images: use Perplexity Sonar for seasonal/trending scene,
+    // with fallback to static random on any failure
+    description = await getAIDescription();
+  } else {
+    description = getRandomDescription();
+  }
 
   const formData = new FormData();
 

@@ -1,6 +1,7 @@
 import { anthropic } from '@ai-sdk/anthropic';
 import { openai } from '@ai-sdk/openai';
 import { google } from '@ai-sdk/google';
+import { perplexity } from '@ai-sdk/perplexity';
 import { createReplicate } from '@ai-sdk/replicate';
 import { withTracing } from '@posthog/ai';
 import type { LanguageModel as LanguageModelV3, ImageModel } from 'ai';
@@ -31,6 +32,9 @@ export const MODEL_IDS = {
   FLUX_SCHNELL: 'black-forest-labs/flux-schnell',
   FLUX_DEV: 'black-forest-labs/flux-dev',
   FLUX_PRO: 'black-forest-labs/flux-1.1-pro',
+
+  // Perplexity search models (has built-in web search)
+  PERPLEXITY_SONAR: 'sonar',
 
   // Google Gemini models
   GEMINI_3_FLASH: 'gemini-3-flash-preview',
@@ -93,6 +97,11 @@ export const models = {
   get imageQuality() {
     return getImageQualityModel();
   },
+
+  // Search-augmented model for web-aware generation (Perplexity Sonar)
+  // Best for: seasonal/trending content, real-time context, creative writing with web search
+  // Pricing: $1/M input + $1/M output tokens (includes web search)
+  search: perplexity(MODEL_IDS.PERPLEXITY_SONAR),
 
   // Ultra-fast vision model for analytics (Gemini 3 Flash)
   // Best for: image analysis, categorization, structured extraction
@@ -187,6 +196,7 @@ export function getTracedModels(options: TracingOptions = {}) {
   return {
     creative: withAITracing(models.creative, options),
     vision: withAITracing(models.vision, options),
+    search: withAITracing(models.search, options),
     analytics: withAITracing(models.analytics, options),
     analyticsQuality: withAITracing(models.analyticsQuality, options),
     // Note: Image models use a different API and don't support withTracing
