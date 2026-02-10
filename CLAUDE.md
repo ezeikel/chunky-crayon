@@ -85,6 +85,11 @@ Use semantic commit style (`type(scope): message`). Keep messages as one-liners,
 - Magic Brush/Auto-Color: Uses pre-computed `colorMapJson` for instant color mapping (no AI call at runtime)
 - Ambient Sound: Generated via ElevenLabs, stored in `ambientSoundUrl` field
 - Colo mascot: Evolving character that grows with user's coloring activity
+- Daily Scene Generation: Perplexity Sonar generates seasonal/trending scene descriptions for daily coloring images, with content safety blocklist and dedup
+
+## AI Prompt Optimization
+
+Model-specific prompt engineering research is documented in `apps/web/lib/ai/PROMPT_OPTIMIZATION.md`. Read this before modifying any AI prompts — each model (GPT Image 1.5, Perplexity Sonar, Claude Sonnet 4.5, Gemini) has different optimal patterns.
 
 ## Mobile App Development
 
