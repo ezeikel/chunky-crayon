@@ -1,5 +1,5 @@
 import { put } from '@/lib/storage';
-import { generateImage, generateText } from 'ai';
+import { generateText } from 'ai';
 import { models, MODEL_IDS } from './models';
 import {
   createColoringImagePrompt,
@@ -12,7 +12,6 @@ import {
   IMAGE_TO_COLORING_SYSTEM,
   createImageToColoringPrompt,
 } from './prompts';
-import { openai } from '@ai-sdk/openai';
 import OpenAI from 'openai';
 
 /**
@@ -50,13 +49,51 @@ export type ProviderConfig = {
   }>;
 };
 
-// OpenAI configuration - uses generateImage API
+// =============================================================================
+// Style Reference Image Helpers
+// =============================================================================
+
+/**
+ * Cache for fetched style reference images.
+ * Avoids re-fetching on every generation call — these images never change.
+ */
+let cachedStyleReferenceFiles: File[] | null = null;
+
+/**
+ * Fetch REFERENCE_IMAGES URLs and convert to File objects for OpenAI images.edit.
+ * Results are cached in memory for the lifetime of the process.
+ *
+ * @param maxImages - Maximum number of reference images to fetch (default 4)
+ * @returns Array of File objects ready for the images.edit endpoint
+ */
+async function getStyleReferenceFiles(maxImages = 4): Promise<File[]> {
+  if (cachedStyleReferenceFiles) {
+    return cachedStyleReferenceFiles.slice(0, maxImages);
+  }
+
+  const urls = REFERENCE_IMAGES.slice(0, maxImages);
+  const files = await Promise.all(
+    urls.map(async (url, i) => {
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      const ext = url.endsWith('.webp') ? 'webp' : 'png';
+      return new File([arrayBuffer], `style-ref-${i}.${ext}`, {
+        type: `image/${ext}`,
+      });
+    }),
+  );
+
+  cachedStyleReferenceFiles = files;
+  return files;
+}
+
+// OpenAI configuration - uses images.edit API with style reference images
 const openaiProvider: ProviderConfig = {
   id: MODEL_IDS.GPT_IMAGE_1_5,
   name: 'OpenAI GPT Image 1.5',
   provider: 'openai',
   costPerImage: 0.08, // ~$0.04-0.17, using middle estimate
-  supportsReferenceImages: false,
+  supportsReferenceImages: true,
   generate: async (description: string, difficulty?: Difficulty) => {
     const startTime = Date.now();
 
@@ -66,26 +103,29 @@ const openaiProvider: ProviderConfig = {
         ? createDifficultyAwarePrompt(description, difficulty)
         : createColoringImagePrompt(description);
 
-    const result = await generateImage({
-      model: openai.image(MODEL_IDS.GPT_IMAGE_1_5),
-      prompt,
+    // Prepend style context referencing the images by position
+    const styledPrompt = `The provided images show the target coloring book style. Match their line weight, simplicity, and outline-only aesthetic.\n\n${prompt}`;
+
+    // Fetch style reference images for the edit endpoint
+    const styleFiles = await getStyleReferenceFiles(4);
+
+    const client = new OpenAI();
+    const result = await client.images.edit({
+      model: MODEL_IDS.GPT_IMAGE_1_5,
+      image: styleFiles,
+      prompt: styledPrompt,
       size: '1024x1024',
-      providerOptions: {
-        openai: {
-          quality: 'high',
-        },
-      },
+      quality: 'high',
     });
 
     const generationTimeMs = Date.now() - startTime;
 
-    // Get the first image
-    const imageData = result.images[0];
-    if (!imageData?.base64) {
+    const b64 = result.data?.[0]?.b64_json;
+    if (!b64) {
       throw new Error('OpenAI did not return an image');
     }
 
-    const imageBuffer = Buffer.from(imageData.base64, 'base64');
+    const imageBuffer = Buffer.from(b64, 'base64');
 
     return { imageBuffer, generationTimeMs };
   },
@@ -532,8 +572,10 @@ export async function generateColoringPageFromImage(
 
   const startTime = Date.now();
 
-  // Build the prompt combining system instructions + user prompt
-  const prompt = `${IMAGE_TO_COLORING_SYSTEM}\n\n${createImageToColoringPrompt(description, difficulty)}`;
+  // Build the prompt combining system instructions + user prompt.
+  // Reference images by position: image 1 = character, images 2+ = style examples.
+  const userPrompt = createImageToColoringPrompt(description, difficulty);
+  const prompt = `Image 1 is the character to transform. Images 2-5 show the target coloring book style — match their line weight, simplicity, and outline-only aesthetic.\n\n${IMAGE_TO_COLORING_SYSTEM}\n\n${userPrompt}`;
 
   // Strip data URL prefix if present — OpenAI edit endpoint needs raw base64
   const rawBase64 = imageBase64.startsWith('data:')
@@ -546,12 +588,17 @@ export async function generateColoringPageFromImage(
     type: 'image/png',
   });
 
+  // Fetch style reference images and combine with character ref.
+  // Character first (highest fidelity on gpt-image-1.5), then style refs.
+  const styleFiles = await getStyleReferenceFiles(4);
+  const allImages = [imageFile, ...styleFiles];
+
   const client = new OpenAI();
 
   try {
     const result = await client.images.edit({
       model: MODEL_IDS.GPT_IMAGE_1_5,
-      image: imageFile,
+      image: allImages,
       prompt,
       size: '1024x1024',
       n: 1,
