@@ -1,8 +1,10 @@
 import "../global.css";
-import { Stack } from "expo-router";
+import { useState, useEffect } from "react";
+import { Redirect, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import * as Sentry from "@sentry/react-native";
 import Providers from "@/providers";
+import { useOnboardingStore } from "@/stores/onboardingStore";
 
 Sentry.init({
   dsn: "https://3ced8899cf0a5a8dd3b15c539379d654:590a9050ad3be778d873c840cb48012c@o358156.ingest.us.sentry.io/4507397854330880",
@@ -29,13 +31,36 @@ const RootLayout = () => {
     "TondoTrial-Regular": require("../assets/fonts/TondoTrial-Regular.ttf"),
   });
 
-  if (!loaded) {
+  const hasCompleted = useOnboardingStore((s) => s.hasCompleted);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    // Wait for Zustand persist to rehydrate from AsyncStorage
+    const unsub = useOnboardingStore.persist.onFinishHydration(() => {
+      setHydrated(true);
+    });
+    // If already hydrated (e.g. sync storage), set immediately
+    if (useOnboardingStore.persist.hasHydrated()) {
+      setHydrated(true);
+    }
+    return unsub;
+  }, []);
+
+  if (!loaded || !hydrated) {
     return null;
   }
 
   return (
     <Providers>
       <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="onboarding"
+          options={{
+            headerShown: false,
+            gestureEnabled: false,
+            animation: "fade",
+          }}
+        />
         <Stack.Screen
           name="(tabs)"
           options={{
@@ -58,6 +83,7 @@ const RootLayout = () => {
           }}
         />
       </Stack>
+      {!hasCompleted && <Redirect href="/onboarding" />}
     </Providers>
   );
 };

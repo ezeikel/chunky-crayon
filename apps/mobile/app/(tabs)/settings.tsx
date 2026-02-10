@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { router } from "expo-router";
 import {
   View,
   Text,
@@ -32,6 +33,7 @@ import {
   faLink,
   faCheck,
   faInfoCircle,
+  faBookOpen,
 } from "@fortawesome/pro-solid-svg-icons";
 import { faHeart } from "@fortawesome/pro-regular-svg-icons";
 import {
@@ -49,6 +51,7 @@ import SubscriptionManager from "@/components/SubscriptionManager";
 import useHeaderData from "@/hooks/useHeaderData";
 import { usePlanName } from "@/hooks/useEntitlements";
 import { useAuth } from "@/contexts";
+import { useOnboardingStore } from "@/stores/onboardingStore";
 
 type SettingsItemProps = {
   icon: IconDefinition;
@@ -521,6 +524,16 @@ const SettingsScreen = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>App Information</Text>
             <View style={styles.sectionContent}>
+              <SettingsItem
+                icon={faBookOpen}
+                iconColor="#F1AE7E"
+                title="View Onboarding"
+                subtitle="Replay the welcome tour"
+                onPress={() => {
+                  useOnboardingStore.getState().reset();
+                  router.replace("/onboarding");
+                }}
+              />
               <View style={styles.settingsItem}>
                 <View
                   style={[
