@@ -315,6 +315,21 @@ export const generateFromPhoto = async (base64Image: string) => {
   return response.data;
 };
 
+/**
+ * Generate a coloring page from a reference image while preserving character likeness.
+ * Optionally places the character in a described scene.
+ */
+export const generateFromImage = async (
+  base64Image: string,
+  description?: string,
+) => {
+  const response = await api.post("/image-to-coloring", {
+    image: base64Image,
+    ...(description ? { description } : {}),
+  });
+  return response.data;
+};
+
 // ============================================================================
 // User & Authentication
 // ============================================================================

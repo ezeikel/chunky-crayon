@@ -9,8 +9,11 @@ import {
   DIFFICULTY_MODIFIERS,
   PHOTO_TO_COLORING_SYSTEM,
   createPhotoToColoringPrompt,
+  IMAGE_TO_COLORING_SYSTEM,
+  createImageToColoringPrompt,
 } from './prompts';
 import { openai } from '@ai-sdk/openai';
+import OpenAI from 'openai';
 
 /**
  * Image Generation Provider Abstraction
@@ -501,6 +504,95 @@ export async function generateColoringPageFromPhoto(
     // Re-throw with context
     throw new Error(
       `Photo-to-coloring generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+  }
+}
+
+/**
+ * Generate a coloring page from a reference image while preserving character likeness.
+ *
+ * Uses GPT Image 1.5's edit endpoint (images.edit) to pass the reference image
+ * directly. GPT Image excels at positive-framing style instructions and
+ * consistently produces clean coloring book output with proper outlines.
+ *
+ * @param imageBase64 - The reference image as a base64 string
+ * @param description - Optional scene description to place the character in
+ * @param difficulty - Optional difficulty level for age-appropriate generation
+ * @returns The generated coloring page image and metadata
+ */
+export async function generateColoringPageFromImage(
+  imageBase64: string,
+  description?: string,
+  difficulty?: Difficulty,
+): Promise<GenerationResult> {
+  // eslint-disable-next-line no-console
+  console.log(
+    `[ImageToColoring] Generating coloring page from reference image${description ? ` with scene: "${description}"` : ''}${difficulty ? ` difficulty: ${difficulty}` : ''}`,
+  );
+
+  const startTime = Date.now();
+
+  // Build the prompt combining system instructions + user prompt
+  const prompt = `${IMAGE_TO_COLORING_SYSTEM}\n\n${createImageToColoringPrompt(description, difficulty)}`;
+
+  // Strip data URL prefix if present — OpenAI edit endpoint needs raw base64
+  const rawBase64 = imageBase64.startsWith('data:')
+    ? imageBase64.replace(/^data:image\/\w+;base64,/, '')
+    : imageBase64;
+
+  // Convert base64 to a File object for the edit endpoint
+  const imageBuffer = Buffer.from(rawBase64, 'base64');
+  const imageFile = new File([imageBuffer], 'reference.png', {
+    type: 'image/png',
+  });
+
+  const client = new OpenAI();
+
+  try {
+    const result = await client.images.edit({
+      model: MODEL_IDS.GPT_IMAGE_1_5,
+      image: imageFile,
+      prompt,
+      size: '1024x1024',
+      n: 1,
+    });
+
+    const generationTimeMs = Date.now() - startTime;
+
+    const b64 = result.data?.[0]?.b64_json;
+    if (!b64) {
+      throw new Error(
+        'GPT Image did not return an image for character-to-coloring transformation',
+      );
+    }
+
+    const outputBuffer = Buffer.from(b64, 'base64');
+
+    // Save to blob storage
+    const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
+    const { url } = await put(tempFileName, outputBuffer, { access: 'public' });
+
+    // eslint-disable-next-line no-console
+    console.log(`[ImageToColoring] Generated in ${generationTimeMs}ms`);
+
+    return {
+      url,
+      tempFileName,
+      generationTimeMs,
+      provider: 'openai',
+      model: MODEL_IDS.GPT_IMAGE_1_5,
+      imageBuffer: outputBuffer,
+    };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      '[ImageToColoring] Failed:',
+      error instanceof Error ? error.message : error,
+    );
+
+    // Re-throw with context
+    throw new Error(
+      `Image-to-coloring generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );
   }
 }

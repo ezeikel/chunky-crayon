@@ -107,6 +107,9 @@ export {
   // Scene description prompts (for AI-powered daily generation)
   SCENE_DESCRIPTION_SYSTEM,
   createDailyScenePrompt,
+  // Image-to-coloring prompts (character likeness preservation)
+  IMAGE_TO_COLORING_SYSTEM,
+  createImageToColoringPrompt,
 } from './prompts';
 export type { MagicColorMode } from './prompts';
 
@@ -165,6 +168,7 @@ export { generateAnimationPromptFromImage } from './animation';
 export {
   generateColoringPageImage,
   generateColoringPageFromPhoto,
+  generateColoringPageFromImage,
   getCurrentProviderConfig,
   getAvailableProviders,
 } from './image-providers';

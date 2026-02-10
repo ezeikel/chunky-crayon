@@ -85,6 +85,7 @@
     "next-themes": "^0.4.6",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.5",
+    "openai": "^6.21.0",
     "oslllo-potrace": "^4.0.0",
     "p-limit": "^6.2.0",
     "playwright": "^1.52.0",

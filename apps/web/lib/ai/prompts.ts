@@ -610,6 +610,69 @@ Match the exact style of the reference coloring pages provided above.`;
 };
 
 // =============================================================================
+// Image-to-Coloring Page (character likeness preservation)
+// =============================================================================
+
+/**
+ * System prompt for transforming a reference image into a coloring page
+ * while preserving character likeness. Optimized for GPT Image 1.5:
+ * - Positive framing (GPT Image ignores negative instructions)
+ * - Layered: identity > style > constraints
+ * - ~200 words for optimal adherence
+ */
+export const IMAGE_TO_COLORING_SYSTEM = `Study the reference image and preserve the character's exact visual identity: the overall body shape and silhouette, head proportions, facial features (eye shape, spacing, mouth), every costume detail (stripes, bands, wavy lines, patterns), accessories, and limb style.
+
+The character's body shape IS the character — a crayon must stay a crayon, a robot must stay a robot. You may adjust the pose (arm and leg positions) to fit a scene, but the core silhouette, costume, and face must be identical to the reference.
+
+Convert the reference into a children's coloring book page. Style: clean line art, thick black outlines on a pure white background. Medium: thick black ink outlines only, completely unfilled, white interior on every shape. Every element — eyes, mouth, hands, feet, body, accessories — is drawn as an outline with a white empty interior. The reference image has color fills; convert each colored area into just its boundary outline with white inside.
+
+Audience: simple enough for a child aged ${TARGET_AGE} to color with chunky crayons.
+
+${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
+
+My prompt has full detail so no need to add more.`;
+
+/**
+ * Create a prompt for generating a coloring page from a reference image.
+ * Optimized for GPT Image 1.5: positive framing, concise, layered.
+ * Two modes:
+ * - No description: converts the character as-is with a simple background
+ * - With description: places the character in the described scene
+ */
+export const createImageToColoringPrompt = (
+  description?: string,
+  difficulty?: string,
+) => {
+  const config =
+    DIFFICULTY_MODIFIERS[difficulty ?? 'BEGINNER'] ??
+    DIFFICULTY_MODIFIERS.BEGINNER;
+
+  if (description) {
+    return `Scene: The character from the reference image in this setting: ${description}.
+
+The character occupies roughly one third of the image height, with the scene environment filling the rest. The character's pose fits the scene naturally — interacting with objects, gesturing, participating. Scene elements appear around, behind, and in front of the character for depth.
+
+Character identity: preserve the exact body shape, silhouette, head proportions, facial features, costume details (stripes, bands, patterns), and limb style from the reference. Only the pose changes.
+
+Style: children's coloring book page, clean line art, thick black outlines on a pure white background. Every shape — eyes, mouth, hands, body, accessories — is an outlined shape with a completely white, unfilled interior.
+
+Target audience: ${config.targetAge}. Complexity: ${config.complexity}. Line thickness: ${config.lineThickness}.
+
+My prompt has full detail so no need to add more.`;
+  }
+
+  return `Convert the character from the reference image into a children's coloring book page with a simple, relevant background.
+
+Character identity: preserve the exact body shape, silhouette, head proportions, facial features, costume details (stripes, bands, patterns), and limb style from the reference.
+
+Style: children's coloring book page, clean line art, thick black outlines on a pure white background. Every shape — eyes, mouth, hands, body, accessories — is an outlined shape with a completely white, unfilled interior.
+
+Target audience: ${config.targetAge}. Complexity: ${config.complexity}. Line thickness: ${config.lineThickness}.
+
+My prompt has full detail so no need to add more.`;
+};
+
+// =============================================================================
 // Colo Mascot Voice Scripts (for loading screen)
 // =============================================================================
 
