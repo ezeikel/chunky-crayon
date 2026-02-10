@@ -31,12 +31,15 @@ import {
   faRightFromBracket,
   faLink,
   faCheck,
+  faInfoCircle,
 } from "@fortawesome/pro-solid-svg-icons";
+import { faHeart } from "@fortawesome/pro-regular-svg-icons";
 import {
   faGoogle,
   faApple,
   faFacebook,
 } from "@fortawesome/free-brands-svg-icons";
+import * as Application from "expo-application";
 import Constants from "expo-constants";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import AppHeader from "@/components/AppHeader";
@@ -514,12 +517,44 @@ const SettingsScreen = () => {
             </View>
           </View>
 
-          {/* Version Info */}
-          <View style={styles.versionContainer}>
-            <Text style={styles.versionText}>Chunky Crayon v{appVersion}</Text>
-            <Text style={styles.copyrightText}>
-              Made with 🖍️ for creative kids
-            </Text>
+          {/* App Information Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>App Information</Text>
+            <View style={styles.sectionContent}>
+              <View style={styles.settingsItem}>
+                <View
+                  style={[
+                    styles.iconContainer,
+                    { backgroundColor: "rgba(156, 163, 175, 0.2)" },
+                  ]}
+                >
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    size={18}
+                    color="#9CA3AF"
+                  />
+                </View>
+                <View style={styles.itemContent}>
+                  <Text style={styles.itemTitle}>Version</Text>
+                  <Text style={styles.itemSubtitle}>
+                    {Application.nativeApplicationVersion || appVersion}
+                    {Application.nativeBuildVersion
+                      ? ` (${Application.nativeBuildVersion})`
+                      : ""}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Made with love footer */}
+          <View style={styles.footerContainer}>
+            <View style={styles.madeWithRow}>
+              <Text style={styles.madeWithText}>Made with </Text>
+              <FontAwesomeIcon icon={faHeart} size={12} color="#EF4444" />
+              <Text style={styles.madeWithText}> in </Text>
+              <Text style={styles.madeWithLocation}>South London</Text>
+            </View>
           </View>
         </ScrollView>
       </LinearGradient>
@@ -744,20 +779,23 @@ const styles = StyleSheet.create({
     color: "#9CA3AF",
     marginTop: 2,
   },
-  versionContainer: {
+  footerContainer: {
     alignItems: "center",
-    paddingVertical: 24,
+    paddingBottom: 8,
   },
-  versionText: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 14,
-    color: "#9CA3AF",
+  madeWithRow: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  copyrightText: {
+  madeWithText: {
     fontFamily: "TondoTrial-Regular",
     fontSize: 12,
-    color: "#D1D5DB",
-    marginTop: 4,
+    color: "#9CA3AF",
+  },
+  madeWithLocation: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 12,
+    color: "#6B7280",
   },
   lockedContainer: {
     flex: 1,
