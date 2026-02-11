@@ -143,6 +143,10 @@ model ColoringImage {
   colorMapJson        String?   @db.Text // JSON with 5x5 grid color assignments
   colorMapGeneratedAt DateTime? // When the color map was generated
 
+  // Region-aware fill points for Magic Fill (replaces grid approach for new images)
+  fillPointsJson        String?   @db.Text // JSON with region centroids + AI-assigned colors
+  fillPointsGeneratedAt DateTime? // When the fill points were generated
+
   // Canvas progress for cross-platform sync
   canvasProgress CanvasProgress[]
 

@@ -313,6 +313,43 @@ export type RegionFirstColorResponse = z.infer<
 >;
 
 // =============================================================================
+// Region-First Fill Points (stored in ColoringImage.fillPointsJson)
+// Server generates at image creation time, client uses for instant auto-fill
+// =============================================================================
+
+/**
+ * Schema for a single fill point (region centroid + assigned color)
+ */
+export const fillPointSchema = z.object({
+  x: z.number().describe('X coordinate of the region centroid'),
+  y: z.number().describe('Y coordinate of the region centroid'),
+  color: z.string().describe('Hex color assigned to this region'),
+  label: z
+    .string()
+    .describe('What this region represents (e.g., "sky", "flower petal")'),
+});
+
+export type FillPoint = z.infer<typeof fillPointSchema>;
+
+/**
+ * Full fill points data — stored as JSON string in ColoringImage.fillPointsJson
+ */
+export const fillPointsDataSchema = z.object({
+  sourceWidth: z
+    .number()
+    .describe('Width at which regions were detected (for coordinate scaling)'),
+  sourceHeight: z
+    .number()
+    .describe('Height at which regions were detected (for coordinate scaling)'),
+  sceneDescription: z
+    .string()
+    .describe('Brief description of the overall scene'),
+  points: z.array(fillPointSchema).describe('Fill points for each region'),
+});
+
+export type FillPointsData = z.infer<typeof fillPointsDataSchema>;
+
+// =============================================================================
 // Pre-computed Grid Color Map (for instant Magic Fill without AI call)
 // Server generates this at image creation time, client uses for instant lookup
 // =============================================================================

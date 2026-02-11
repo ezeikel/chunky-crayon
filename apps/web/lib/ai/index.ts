@@ -97,6 +97,9 @@ export {
   // Region-first prompts (1:1 mapping guaranteed)
   REGION_FIRST_COLOR_SYSTEM,
   createRegionFirstColorPrompt,
+  // Region-first fill points prompts (artist-quality, replaces grid for new images)
+  REGION_FILL_POINTS_SYSTEM,
+  createRegionFillPointsPrompt,
   // Pre-computed grid color map prompts (for instant Magic Fill)
   GRID_COLOR_MAP_SYSTEM,
   createGridColorMapPrompt,
@@ -132,6 +135,9 @@ export {
   regionFirstColorResponseSchema,
   // Scene description schema (for AI-powered daily generation)
   sceneDescriptionSchema,
+  // Region-first fill points schemas (artist-quality, replaces grid for new images)
+  fillPointSchema,
+  fillPointsDataSchema,
   // Pre-computed grid color map schemas (for instant Magic Fill)
   gridCellColorSchema,
   gridColorMapSchema,
@@ -151,6 +157,9 @@ export type {
   DetectedRegionInput,
   RegionColorAssignment,
   RegionFirstColorResponse,
+  // Region-first fill points types
+  FillPoint,
+  FillPointsData,
   // Scene description type
   SceneDescription,
   // Pre-computed grid color map types

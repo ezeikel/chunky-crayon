@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import type { GridColorMap } from '@/lib/ai';
+import type { GridColorMap, FillPointsData } from '@/lib/ai';
 import {
   detectAllRegions,
   getRegionAtPoint,
@@ -55,6 +55,11 @@ export type UseMagicColorMapReturn = {
     color: string;
     centroid: { x: number; y: number };
   }>;
+  /** Get fill points scaled to canvas dimensions (bypasses region detection) */
+  getDirectFillPoints: (
+    canvasWidth: number,
+    canvasHeight: number,
+  ) => Array<{ x: number; y: number; color: string }> | null;
   /** Reset the color map */
   reset: () => void;
 };
@@ -226,6 +231,8 @@ function createPreColoredCanvas(
 export type UseMagicColorMapOptions = {
   /** Pre-computed grid color map from server (for instant color assignment) */
   preComputedColorMap?: GridColorMap | null;
+  /** Region-aware fill points from server (preferred over grid when available) */
+  fillPointsData?: FillPointsData | null;
 };
 
 /**
@@ -239,7 +246,7 @@ export type UseMagicColorMapOptions = {
 export function useMagicColorMap(
   options: UseMagicColorMapOptions = {},
 ): UseMagicColorMapReturn {
-  const { preComputedColorMap } = options;
+  const { preComputedColorMap, fillPointsData } = options;
   const [state, setState] = useState<MagicColorMapState>(initialState);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -280,9 +287,9 @@ export function useMagicColorMap(
         }
 
         // Step 2: Get color assignments from pre-computed data
-        // No fallback to AI - if no pre-computed data, buttons should stay disabled
-        if (!preComputedColorMap) {
-          console.log('[MagicColorMap] No pre-computed color map available');
+        // Prefer fill points (region-aware) over grid (5x5 approximation)
+        if (!fillPointsData && !preComputedColorMap) {
+          console.log('[MagicColorMap] No pre-computed color data available');
           setState((s) => ({
             ...s,
             isLoading: false,
@@ -292,31 +299,82 @@ export function useMagicColorMap(
           return false;
         }
 
-        // Use pre-computed grid color map (instant)
-        console.log(
-          '\n========== MAGIC FILL: USING PRE-COMPUTED COLORS ==========',
-        );
-        console.log('Scene:', preComputedColorMap.sceneDescription);
-        console.log(
-          `Grid cells available: ${preComputedColorMap.gridColors.length}`,
-        );
-        console.log(
-          '============================================================\n',
-        );
-
         setState((s) => ({
           ...s,
           loadingMessage: `Found ${regionMap.regions.length} areas. Applying colors...`,
         }));
 
-        // Build color maps from pre-computed grid data (instant lookup)
-        const { colorMap, colorNameMap, reasoningMap } =
-          buildColorMapsFromPreComputed(
-            preComputedColorMap,
-            regionMap.regions,
-            regionMap.width,
-            regionMap.height,
+        let colorMap: Map<number, string>;
+        let colorNameMap: Map<number, string>;
+        let reasoningMap: Map<number, string>;
+
+        if (fillPointsData) {
+          // Use region-aware fill points (preferred path)
+          console.log(
+            '\n========== MAGIC FILL: USING REGION FILL POINTS ==========',
           );
+          console.log('Scene:', fillPointsData.sceneDescription);
+          console.log(`Fill points: ${fillPointsData.points.length}`);
+          console.log(
+            '============================================================\n',
+          );
+
+          // Scale fill points to canvas dimensions and match to detected regions
+          const scaleX = regionMap.width / fillPointsData.sourceWidth;
+          const scaleY = regionMap.height / fillPointsData.sourceHeight;
+
+          colorMap = new Map();
+          colorNameMap = new Map();
+          reasoningMap = new Map();
+
+          // For each fill point, find the region it falls into and assign its color
+          for (const point of fillPointsData.points) {
+            const scaledX = Math.round(point.x * scaleX);
+            const scaledY = Math.round(point.y * scaleY);
+            const regionId = getRegionAtPoint(regionMap, scaledX, scaledY);
+
+            if (regionId !== 0 && !colorMap.has(regionId)) {
+              colorMap.set(regionId, point.color);
+              colorNameMap.set(regionId, point.label);
+              reasoningMap.set(regionId, `${point.label} colored beautifully!`);
+            }
+          }
+
+          // Fill any unmatched regions with default colors
+          for (const region of regionMap.regions) {
+            if (!colorMap.has(region.id)) {
+              const grid = getGridPosition(
+                region.centroid,
+                regionMap.width,
+                regionMap.height,
+              );
+              const fallback = getDefaultColorForGrid(grid);
+              colorMap.set(region.id, fallback.hex);
+              colorNameMap.set(region.id, fallback.name);
+              reasoningMap.set(region.id, 'A nice color for this spot!');
+            }
+          }
+        } else {
+          // Fall back to grid-based color map (legacy path)
+          console.log(
+            '\n========== MAGIC FILL: USING PRE-COMPUTED GRID ==========',
+          );
+          console.log('Scene:', preComputedColorMap!.sceneDescription);
+          console.log(
+            `Grid cells available: ${preComputedColorMap!.gridColors.length}`,
+          );
+          console.log(
+            '============================================================\n',
+          );
+
+          ({ colorMap, colorNameMap, reasoningMap } =
+            buildColorMapsFromPreComputed(
+              preComputedColorMap!,
+              regionMap.regions,
+              regionMap.width,
+              regionMap.height,
+            ));
+        }
 
         setState((s) => ({
           ...s,
@@ -356,7 +414,7 @@ export function useMagicColorMap(
         return false;
       }
     },
-    [preComputedColorMap],
+    [preComputedColorMap, fillPointsData],
   );
 
   /**
@@ -439,6 +497,29 @@ export function useMagicColorMap(
   }, [state.regionMap, state.colorMap, state.coloredRegions]);
 
   /**
+   * Get fill points scaled to canvas dimensions, bypassing region detection.
+   * Returns null if fillPointsData is not available.
+   */
+  const getDirectFillPoints = useCallback(
+    (
+      canvasWidth: number,
+      canvasHeight: number,
+    ): Array<{ x: number; y: number; color: string }> | null => {
+      if (!fillPointsData) return null;
+
+      const scaleX = canvasWidth / fillPointsData.sourceWidth;
+      const scaleY = canvasHeight / fillPointsData.sourceHeight;
+
+      return fillPointsData.points.map((point) => ({
+        x: Math.round(point.x * scaleX),
+        y: Math.round(point.y * scaleY),
+        color: point.color,
+      }));
+    },
+    [fillPointsData],
+  );
+
+  /**
    * Reset the color map.
    */
   const reset = useCallback(() => {
@@ -456,6 +537,7 @@ export function useMagicColorMap(
     markRegionColored,
     getRemainingRegionCount,
     getAllColorsForAutoFill,
+    getDirectFillPoints,
     reset,
   };
 }

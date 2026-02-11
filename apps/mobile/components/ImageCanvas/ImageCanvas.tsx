@@ -37,7 +37,13 @@ import Animated, {
   withSpring,
   runOnJS,
 } from "react-native-reanimated";
-import { ColoringImage, Dimension, GridColorCell, GridColorMap } from "@/types";
+import {
+  ColoringImage,
+  Dimension,
+  GridColorCell,
+  GridColorMap,
+  FillPointsData,
+} from "@/types";
 import {
   useCanvasStore,
   DrawingAction,
@@ -67,6 +73,7 @@ import {
 } from "@/utils/glitterUtils";
 import {
   parseColorMap,
+  parseFillPoints,
   getSuggestedColor,
   isValidColorMap,
 } from "@/utils/magicColorUtils";
@@ -155,7 +162,11 @@ const ImageCanvas = ({
     y: number;
   } | null>(null);
 
-  // Parse colorMapJson once
+  // Parse fillPointsJson (preferred) and colorMapJson (fallback) once
+  const fillPoints = useMemo(() => {
+    return parseFillPoints(coloringImage.fillPointsJson);
+  }, [coloringImage.fillPointsJson]);
+
   const colorMap = useMemo(() => {
     return parseColorMap(coloringImage.colorMapJson);
   }, [coloringImage.colorMapJson]);
@@ -837,10 +848,12 @@ const ImageCanvas = ({
     (x: number, y: number) => {
       if (selectedTool !== "magic") return;
 
-      // Check if color map is available
-      if (!colorMap || !isValidColorMap(colorMap)) {
-        // No color map available - show message or fallback
-        console.warn("No color map available for magic tool");
+      // Check if any color data is available (prefer fill points over grid)
+      const hasFillPoints = fillPoints && fillPoints.points.length > 0;
+      const hasColorMap = colorMap && isValidColorMap(colorMap);
+
+      if (!hasFillPoints && !hasColorMap) {
+        console.warn("No color data available for magic tool");
         return;
       }
 
@@ -850,47 +863,58 @@ const ImageCanvas = ({
       tapMedium();
 
       if (magicMode === "suggest") {
-        // Show color suggestion for the tapped area
-        const suggestedCell = getSuggestedColor(
-          coords.x,
-          coords.y,
-          svgDimensions,
-          colorMap,
-        );
+        // Show color suggestion for the tapped area (grid-based only for now)
+        if (hasColorMap) {
+          const suggestedCell = getSuggestedColor(
+            coords.x,
+            coords.y,
+            svgDimensions,
+            colorMap,
+          );
 
-        if (suggestedCell) {
-          setMagicHintCell(suggestedCell);
-          setMagicHintPosition({ x, y });
+          if (suggestedCell) {
+            setMagicHintCell(suggestedCell);
+            setMagicHintPosition({ x, y });
+          }
         }
       } else if (magicMode === "auto") {
-        // Auto-fill: Apply all colors from the grid
-        // This is a simplified version - just sets the first/dominant color for now
-        // Full implementation would detect regions and fill them
         notifySuccess();
 
-        // For now, we'll fill regions based on the grid cells
-        // This creates fill actions for representative points in each grid cell
         const fills: Array<{ x: number; y: number; color: string }> = [];
-        const cellWidth = svgDimensions.width / 5;
-        const cellHeight = svgDimensions.height / 5;
 
-        colorMap.gridColors.forEach((cell) => {
-          // Calculate center point of each grid cell
-          const centerX = (cell.col - 0.5) * cellWidth;
-          const centerY = (cell.row - 0.5) * cellHeight;
-          fills.push({
-            x: centerX,
-            y: centerY,
-            color: cell.suggestedColor,
+        if (hasFillPoints) {
+          // Use region-aware fill points with coordinate scaling
+          const scaleX = svgDimensions.width / fillPoints.sourceWidth;
+          const scaleY = svgDimensions.height / fillPoints.sourceHeight;
+
+          for (const point of fillPoints.points) {
+            fills.push({
+              x: point.x * scaleX,
+              y: point.y * scaleY,
+              color: point.color,
+            });
+          }
+        } else if (hasColorMap) {
+          // Fall back to grid-based cell center approach
+          const cellWidth = svgDimensions.width / 5;
+          const cellHeight = svgDimensions.height / 5;
+
+          colorMap.gridColors.forEach((cell) => {
+            const centerX = (cell.col - 0.5) * cellWidth;
+            const centerY = (cell.row - 0.5) * cellHeight;
+            fills.push({
+              x: centerX,
+              y: centerY,
+              color: cell.suggestedColor,
+            });
           });
-        });
+        }
 
         // Add a single magic-fill action that contains all fills
         const action: DrawingAction = {
           type: "magic-fill",
-          color: colorMap.gridColors[0]?.suggestedColor || "#FFFFFF",
+          color: fills[0]?.color || "#FFFFFF",
           magicFills: fills,
-          // Store source dimensions for cross-platform sync
           sourceWidth: svgDimensions?.width,
           sourceHeight: svgDimensions?.height,
         };
@@ -900,6 +924,7 @@ const ImageCanvas = ({
     [
       selectedTool,
       magicMode,
+      fillPoints,
       colorMap,
       svgDimensions,
       touchToSvgCoords,

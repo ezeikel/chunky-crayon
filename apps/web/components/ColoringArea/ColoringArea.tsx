@@ -26,12 +26,13 @@ import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton';
 import { CanvasAction, useColoringContext } from '@/contexts/coloring';
 import { useSound } from '@/hooks/useSound';
 import { useMagicColorMap } from '@/hooks/useMagicColorMap';
-import type { GridColorMap } from '@/lib/ai';
+import type { GridColorMap, FillPointsData } from '@/lib/ai';
 import {
   saveColoringProgress,
   loadColoringProgress,
   clearColoringProgress,
 } from '@/utils/coloringStorage';
+import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
 
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
@@ -76,7 +77,24 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
-    // Parse pre-computed color map from static page data (generated at image creation time)
+    // Parse region-aware fill points (preferred) and grid color map (fallback)
+    const parsedFillPoints = useMemo<FillPointsData | null>(() => {
+      if (!coloringImage.fillPointsJson) return null;
+      try {
+        return JSON.parse(coloringImage.fillPointsJson) as FillPointsData;
+      } catch {
+        console.error('[ColoringArea] Failed to parse fillPointsJson');
+        return null;
+      }
+    }, [coloringImage.fillPointsJson]);
+
+    // On-demand fill points (generated when auto-color is clicked and none exist)
+    const [onDemandFillPoints, setOnDemandFillPoints] =
+      useState<FillPointsData | null>(null);
+    const [isGeneratingFillPoints, setIsGeneratingFillPoints] = useState(false);
+
+    const fillPointsData = parsedFillPoints ?? onDemandFillPoints;
+
     const preComputedColorMap = useMemo<GridColorMap | null>(() => {
       if (!coloringImage.colorMapJson) return null;
       try {
@@ -88,7 +106,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     }, [coloringImage.colorMapJson]);
 
     // Magic Color Map for reveal mode and auto-color
-    // Uses pre-computed data for instant color assignment (no AI call needed)
+    // Prefers fill points (region-aware) over grid (5x5 approximation)
     const {
       state: magicColorMapState,
       generateColorMap,
@@ -96,8 +114,9 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       getRegionIdAtPoint,
       markRegionColored,
       getAllColorsForAutoFill,
+      getDirectFillPoints,
       reset: resetMagicColorMap,
-    } = useMagicColorMap({ preComputedColorMap });
+    } = useMagicColorMap({ preComputedColorMap, fillPointsData });
 
     // Handle first canvas interaction - load and play ambient sound
     // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
@@ -127,12 +146,63 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       };
     }, [stopAmbient]);
 
+    // Generate fill points on-demand for images that don't have them
+    const generateFillPointsOnDemand = useCallback(async () => {
+      if (!coloringImage.id || !coloringImage.url || isGeneratingFillPoints)
+        return;
+
+      setIsGeneratingFillPoints(true);
+      try {
+        const result = await generateRegionFillPoints(
+          coloringImage.id,
+          coloringImage.url,
+          {
+            title: coloringImage.title ?? '',
+            description: coloringImage.description ?? '',
+            tags: (coloringImage.tags as string[]) ?? [],
+          },
+        );
+
+        if (result.success) {
+          setOnDemandFillPoints(result.fillPoints);
+        } else {
+          console.error(
+            '[ColoringArea] On-demand fill points failed:',
+            result.error,
+          );
+        }
+      } catch (error) {
+        console.error('[ColoringArea] On-demand fill points error:', error);
+      } finally {
+        setIsGeneratingFillPoints(false);
+      }
+    }, [
+      coloringImage.id,
+      coloringImage.url,
+      coloringImage.title,
+      coloringImage.description,
+      coloringImage.tags,
+      isGeneratingFillPoints,
+    ]);
+
     // Generate color map when any magic tool is selected
     const isMagicToolActive =
       activeTool === 'magic-reveal' || activeTool === 'magic-auto';
 
     useEffect(() => {
       if (!isMagicToolActive || !canvasReadyRef.current) return;
+
+      // For magic-auto with fill points, skip region detection entirely
+      // (handled by the auto-fill effect below)
+      if (activeTool === 'magic-auto' && fillPointsData) return;
+
+      // No color data at all — trigger on-demand generation
+      if (!fillPointsData && !preComputedColorMap) {
+        if (!isGeneratingFillPoints) {
+          generateFillPointsOnDemand();
+        }
+        return;
+      }
 
       // Skip if already ready or loading
       if (magicColorMapState.isReady || magicColorMapState.isLoading) return;
@@ -145,6 +215,11 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       generateColorMap(drawingCanvas, boundaryCanvas);
     }, [
       isMagicToolActive,
+      activeTool,
+      fillPointsData,
+      preComputedColorMap,
+      isGeneratingFillPoints,
+      generateFillPointsOnDemand,
       magicColorMapState.isReady,
       magicColorMapState.isLoading,
       generateColorMap,
@@ -181,12 +256,46 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setHasUnsavedChanges,
     ]);
 
-    // Trigger auto-fill when magic-auto tool is selected and color map is ready
-    useEffect(() => {
-      if (activeTool === 'magic-auto' && magicColorMapState.isReady) {
-        handleAutoColor();
+    // Handle direct auto-color using fill points (bypasses region detection)
+    const handleDirectAutoColor = useCallback(() => {
+      const drawingCanvas = canvasRef.current?.getCanvas();
+      if (!drawingCanvas) return;
+
+      const points = getDirectFillPoints(
+        drawingCanvas.width,
+        drawingCanvas.height,
+      );
+      if (!points || points.length === 0) return;
+
+      for (const { x, y, color } of points) {
+        canvasRef.current?.fillRegionAtPoint(x, y, color, true);
       }
-    }, [activeTool, magicColorMapState.isReady, handleAutoColor]);
+
+      playSound('sparkle');
+      setHasUnsavedChanges(true);
+    }, [getDirectFillPoints, playSound, setHasUnsavedChanges]);
+
+    // Trigger auto-fill when magic-auto tool is selected
+    useEffect(() => {
+      if (activeTool !== 'magic-auto' || !canvasReadyRef.current) return;
+
+      // Prefer direct fill points (no region detection needed)
+      if (fillPointsData) {
+        handleDirectAutoColor();
+        return;
+      }
+
+      // No fill points — generate on-demand
+      if (!isGeneratingFillPoints) {
+        generateFillPointsOnDemand();
+      }
+    }, [
+      activeTool,
+      fillPointsData,
+      isGeneratingFillPoints,
+      handleDirectAutoColor,
+      generateFillPointsOnDemand,
+    ]);
 
     // Get canvas data URL for saving to gallery
     // Uses composite canvas that merges user's colors with line art
@@ -465,22 +574,25 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           />
 
           {/* Magic Loading Overlay - Shows when magic tools are analyzing the image */}
-          {isMagicToolActive && magicColorMapState.isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-              <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 border-2 border-crayon-purple/20 shadow-lg">
-                <div className="relative">
-                  <div className="size-12 border-4 border-crayon-purple/30 border-t-crayon-purple rounded-full animate-spin" />
-                  <span className="absolute inset-0 flex items-center justify-center text-2xl">
-                    ✨
-                  </span>
+          {isMagicToolActive &&
+            (magicColorMapState.isLoading || isGeneratingFillPoints) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
+                <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 border-2 border-crayon-purple/20 shadow-lg">
+                  <div className="relative">
+                    <div className="size-12 border-4 border-crayon-purple/30 border-t-crayon-purple rounded-full animate-spin" />
+                    <span className="absolute inset-0 flex items-center justify-center text-2xl">
+                      ✨
+                    </span>
+                  </div>
+                  <p className="text-sm font-bold text-crayon-purple text-center max-w-[200px]">
+                    {isGeneratingFillPoints
+                      ? 'Preparing magic colors for the first time...'
+                      : magicColorMapState.loadingMessage ||
+                        'Preparing magic colors...'}
+                  </p>
                 </div>
-                <p className="text-sm font-bold text-crayon-purple text-center max-w-[200px]">
-                  {magicColorMapState.loadingMessage ||
-                    'Preparing magic colors...'}
-                </p>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Magic Error Overlay - Shows if magic analysis fails */}
           {isMagicToolActive && magicColorMapState.error && (

@@ -37,6 +37,7 @@ export const getColoringImageBase = async (
       qrCodeUrl: true,
       ambientSoundUrl: true,
       colorMapJson: true,
+      fillPointsJson: true,
     },
   });
 };

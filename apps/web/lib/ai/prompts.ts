@@ -962,6 +962,90 @@ Create a beautiful, harmonious coloring scheme!`;
 };
 
 // =============================================================================
+// Region-First Fill Points (artist-quality, replaces grid approach for new images)
+// =============================================================================
+
+/**
+ * System prompt for region-first artist-quality color assignment.
+ * Used by generateRegionFillPoints() at image creation time.
+ * Scene-agnostic version of the onboarding script's prompt.
+ */
+export const REGION_FILL_POINTS_SYSTEM = `You are a professional children's book illustrator coloring a line-art page. You think in terms of OBJECTS first, then assign colors to individual regions.
+
+WORKFLOW (follow this order):
+1. IDENTIFY OBJECTS — Look at the image and group nearby regions into logical objects (e.g., "the main character", "the background sky", "a tree", "flowers"). Many small regions belong to the SAME object.
+2. DECIDE OBJECT PALETTE — For each object, pick a base color and optional accent. All regions belonging to one object should share a cohesive look:
+   - Character body parts → same base color
+   - Hands/feet → can be a lighter or complementary shade but still harmonious
+   - Stripes/bands on a character → use 1-2 contrasting accent colors consistently
+   - Background (sky, ground) → one color each
+   - Foliage (bushes, trees) → one green consistently
+   - Decorative elements (balloons, flags, flowers) → each a DIFFERENT bright color for variety
+   - Small details (confetti, sparkles) → distribute rainbow colors evenly
+3. ASSIGN REGIONS — For each region, pick the color that matches its object.
+
+ARTIST PRINCIPLES:
+- CONSISTENCY: Regions belonging to the same object get the same (or very similar) color. A character's left arm and right arm should match.
+- DIFFERENTIATION: Different objects should contrast. The main subject should pop against the background.
+- HARMONY: The overall palette should feel warm and inviting, like a finished coloring book page a child would be proud of.
+- NATURALISM: Use colors that make visual sense — sky is blue, grass is green, skin is warm.
+- VARIETY FOR DECORATIONS: Decorative elements should each be a different bright color — cycle through the full palette for visual richness.
+
+CONSTRAINTS:
+- You MUST assign a color to EVERY region — no skipping
+- You MUST use ONLY colors from the provided palette
+- Use region IDs exactly as given`;
+
+/**
+ * Create a user prompt for region-first fill point generation.
+ * Takes scene context (title, description, tags) to guide color choices.
+ */
+export const createRegionFillPointsPrompt = (
+  palette: Array<{ hex: string; name: string }>,
+  regions: Array<{
+    id: number;
+    gridRow: number;
+    gridCol: number;
+    size: 'small' | 'medium' | 'large';
+    pixelPercentage: number;
+  }>,
+  sceneContext?: { title: string; description: string; tags: string[] },
+) => {
+  const regionsList = regions
+    .map(
+      (r) =>
+        `  - Region #${r.id}: Grid position (row ${r.gridRow}, col ${r.gridCol}), Size: ${r.size} (${r.pixelPercentage.toFixed(1)}% of image)`,
+    )
+    .join('\n');
+
+  const sceneSection = sceneContext
+    ? `SCENE CONTEXT (use this to guide your color choices):
+Title: ${sceneContext.title}
+Description: ${sceneContext.description}
+Tags: ${sceneContext.tags.join(', ')}
+
+`
+    : '';
+
+  return `Color this children's coloring page.
+
+${sceneSection}AVAILABLE PALETTE (you MUST only use these):
+${palette.map((c) => `- ${c.name}: ${c.hex}`).join('\n')}
+
+DETECTED REGIONS (${regions.length} total):
+${regionsList}
+
+For EACH region, provide:
+- regionId: exact region ID
+- element: what it is (e.g., "sky", "character body", "flower petal")
+- suggestedColor: hex from palette
+- colorName: palette color name
+- reasoning: brief reason (5-7 words)
+
+Return ALL ${regions.length} assignments. Think like an artist — consistency within objects, variety between objects.`;
+};
+
+// =============================================================================
 // Pre-computed Grid Color Map (for instant Magic Fill)
 // =============================================================================
 // This prompt is used at image generation time to pre-compute colors for a 5x5 grid.

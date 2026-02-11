@@ -19,6 +19,21 @@ export type GridColorMap = {
   gridColors: GridColorCell[];
 };
 
+// Region-aware fill points (replaces grid approach for new images)
+export type FillPoint = {
+  x: number;
+  y: number;
+  color: string;
+  label: string;
+};
+
+export type FillPointsData = {
+  sourceWidth: number;
+  sourceHeight: number;
+  sceneDescription: string;
+  points: FillPoint[];
+};
+
 export type ColoringImage = {
   id: string;
   title: string;
@@ -28,7 +43,8 @@ export type ColoringImage = {
   svgUrl?: string;
   qrCodeUrl?: string;
   ambientSoundUrl?: string;
-  colorMapJson?: string; // Pre-computed color map JSON
+  colorMapJson?: string; // Pre-computed grid color map JSON (legacy)
+  fillPointsJson?: string; // Region-aware fill points JSON (preferred)
   tags: string[];
   createdAt: string;
   updatedAt: string;

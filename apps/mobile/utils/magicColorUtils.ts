@@ -3,7 +3,37 @@
  * Uses pre-computed 5x5 grid color map from colorMapJson
  */
 
-import type { GridColorMap, GridColorCell, Dimension } from "@/types";
+import type {
+  GridColorMap,
+  GridColorCell,
+  Dimension,
+  FillPointsData,
+} from "@/types";
+
+/**
+ * Parse the fillPointsJson string from API response.
+ * Returns null if missing or invalid.
+ */
+export const parseFillPoints = (
+  fillPointsJson: string | undefined | null,
+): FillPointsData | null => {
+  if (!fillPointsJson) return null;
+
+  try {
+    const parsed = JSON.parse(fillPointsJson);
+    if (
+      typeof parsed.sourceWidth === "number" &&
+      typeof parsed.sourceHeight === "number" &&
+      Array.isArray(parsed.points)
+    ) {
+      return parsed as FillPointsData;
+    }
+    return null;
+  } catch (error) {
+    console.warn("Failed to parse fillPointsJson:", error);
+    return null;
+  }
+};
 
 /**
  * Parse the colorMapJson string from API response

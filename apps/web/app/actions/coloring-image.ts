@@ -33,7 +33,7 @@ import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 import { generateAmbientSoundForImage } from '@/app/actions/ambient-sound';
-import { generateGridColorMap } from '@/app/actions/generate-color-map';
+import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
 
 /**
  * Locale to language mapping for image metadata generation.
@@ -374,17 +374,22 @@ export const createColoringImage = async (
           }
         })(),
 
-        // Generate pre-computed grid color map for instant Magic Fill
+        // Generate region-aware fill points for instant Magic Fill
         (async () => {
-          const colorMapResult = await generateGridColorMap(
+          const fillPointsResult = await generateRegionFillPoints(
             result.id,
             result.url!,
+            {
+              title: result.title ?? '',
+              description: result.description ?? '',
+              tags: (result.tags as string[]) ?? [],
+            },
           );
-          if (colorMapResult.success) {
-            console.log(`[Pipeline] Color map generated for ${result.id}`);
+          if (fillPointsResult.success) {
+            console.log(`[Pipeline] Fill points generated for ${result.id}`);
           } else {
             console.error(
-              `[Pipeline] Failed to generate color map: ${colorMapResult.error}`,
+              `[Pipeline] Failed to generate fill points: ${fillPointsResult.error}`,
             );
           }
         })(),
@@ -424,7 +429,7 @@ export const createColoringImage = async (
         })(),
       ]);
 
-      // Invalidate cache so new data (color map, ambient sound) is available
+      // Invalidate cache so new data (fill points, ambient sound) is available
       revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
     });
 
@@ -469,17 +474,22 @@ export const createColoringImage = async (
         }
       })(),
 
-      // Generate pre-computed grid color map for instant Magic Fill
+      // Generate region-aware fill points for instant Magic Fill
       (async () => {
-        const colorMapResult = await generateGridColorMap(
+        const fillPointsResult = await generateRegionFillPoints(
           result.id,
           result.url!,
+          {
+            title: result.title ?? '',
+            description: result.description ?? '',
+            tags: (result.tags as string[]) ?? [],
+          },
         );
-        if (colorMapResult.success) {
-          console.log(`[Pipeline] Color map generated for ${result.id}`);
+        if (fillPointsResult.success) {
+          console.log(`[Pipeline] Fill points generated for ${result.id}`);
         } else {
           console.error(
-            `[Pipeline] Failed to generate color map: ${colorMapResult.error}`,
+            `[Pipeline] Failed to generate fill points: ${fillPointsResult.error}`,
           );
         }
       })(),
