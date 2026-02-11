@@ -12,6 +12,7 @@ import { useFocusEffect } from "expo-router";
 import {
   Canvas,
   ImageSVG,
+  Image as SkiaImage,
   useCanvasRef,
   useSVG,
   fitbox,
@@ -92,6 +93,7 @@ import {
 
 import type { LayoutMode } from "@/utils/deviceUtils";
 import { getOptimalCanvasDimensions } from "@/hooks/useResponsiveLayout";
+import { useFillLayer } from "@/hooks/useFillLayer";
 
 type ImageCanvasProps = {
   coloringImage: ColoringImage;
@@ -1049,6 +1051,9 @@ const ImageCanvas = ({
     return getVisibleActions(history, historyIndex);
   }, [history, historyIndex]);
 
+  // Compute fill layer image (SVG + all fill/magic-fill actions baked in)
+  const { fillLayerImage } = useFillLayer(svg, svgDimensions, visibleActions);
+
   // Calculate current stroke width with pressure (for live preview while drawing)
   // This recalculates when currentPath changes (which happens on each move)
   const currentStrokeWidth = useMemo(() => {
@@ -1282,15 +1287,28 @@ const ImageCanvas = ({
             >
               {/* White background for snapshot capture (JPEG doesn't support transparency) */}
               <Fill color="white" />
-              {/* SVG base layer (below drawings) */}
-              <Group transform={transform}>
-                <ImageSVG
+              {/* Fill layer image — rendered outside fitbox at canvas dimensions */}
+              {fillLayerImage && (
+                <SkiaImage
+                  image={fillLayerImage}
                   x={0}
                   y={0}
                   width={canvasWidth}
                   height={canvasHeight}
-                  svg={svg}
+                  fit="contain"
                 />
+              )}
+              {/* SVG base layer (below drawings) — hidden when fill layer is active */}
+              <Group transform={transform}>
+                {!fillLayerImage && (
+                  <ImageSVG
+                    x={0}
+                    y={0}
+                    width={canvasWidth}
+                    height={canvasHeight}
+                    svg={svg}
+                  />
+                )}
                 {/* Rendered paths */}
                 {renderPaths}
                 {/* Rendered stickers */}
