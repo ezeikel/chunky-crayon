@@ -1,6 +1,5 @@
 'use server';
 
-import crypto from 'node:crypto';
 import { Readable } from 'stream';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
@@ -8,7 +7,7 @@ import { GenerationType, ColoringImage } from '@chunky-crayon/db';
 import generatePDFNode from '@/utils/generatePDFNode';
 import streamToBuffer from '@/utils/streamToBuffer';
 import fetchSvg from '@/utils/fetchSvg';
-import redis, { REDIS_KEYS } from '@/lib/redis';
+import { getUnsubscribeUrl } from '@/lib/unsubscribe';
 import DailyColoringEmail from '@/emails/DailyColoringEmail';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
@@ -26,23 +25,10 @@ export type SocialDigestEntry = {
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
+const audienceId = process.env.RESEND_DAILY_EMAIL_SEGMENT_ID!;
 
 function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
-}
-
-async function generateUnsubscribeToken(email: string): Promise<string> {
-  const token = crypto.randomBytes(24).toString('base64url');
-  // Token expires in 1 year
-  await redis.set(REDIS_KEYS.UNSUB_TOKEN(token), email, {
-    ex: 60 * 60 * 24 * 365,
-  });
-  return token;
-}
-
-async function getUnsubscribeUrl(email: string): Promise<string> {
-  const token = await generateUnsubscribeToken(email);
-  return `${baseUrl}/unsubscribe?token=${token}`;
 }
 
 type JoinColoringPageEmailListState = {
@@ -62,38 +48,36 @@ export const joinColoringPageEmailList = async (
   const email = normalizeEmail(rawFormData.email);
 
   try {
-    // Check if email has unsubscribed
-    const isUnsubscribed = await redis.get<boolean>(
-      REDIS_KEYS.UNSUB_FLAG(email),
-    );
-    if (isUnsubscribed) {
-      return {
-        error: 'This email has previously unsubscribed.',
-        success: false,
-      };
-    }
-
-    // Check if already subscribed
-    const isSubscribed = await redis.sismember(REDIS_KEYS.EMAILS_SET, email);
-    if (isSubscribed) {
-      return {
-        success: true,
-        email,
-      };
-    }
-
-    // Add to email set
-    await redis.sadd(REDIS_KEYS.EMAILS_SET, email);
-
-    // Store metadata
-    const now = Date.now();
-    await redis.hset(REDIS_KEYS.EMAIL_META(email), {
-      tsJoined: now,
-      source: 'coloring_page_footer',
+    // Check if contact already exists in the audience
+    const { data: existing } = await resend.contacts.get({
+      audienceId,
+      email,
     });
 
+    if (existing) {
+      if (existing.unsubscribed) {
+        return {
+          error: 'This email has previously unsubscribed.',
+          success: false,
+        };
+      }
+      // Already subscribed
+      return { success: true, email };
+    }
+
+    // Create new contact
+    const { error: createError } = await resend.contacts.create({
+      audienceId,
+      email,
+    });
+
+    if (createError) {
+      console.error({ contactCreateError: createError });
+      return { error: 'Failed to join the email list', success: false };
+    }
+
     // Send welcome email
-    const unsubscribeUrl = await getUnsubscribeUrl(email);
+    const unsubscribeUrl = getUnsubscribeUrl(email);
     const welcomeEmailHtml = await render(WelcomeEmail({ unsubscribeUrl }));
 
     await resend.emails.send({
@@ -103,10 +87,7 @@ export const joinColoringPageEmailList = async (
       html: welcomeEmailHtml,
     });
 
-    return {
-      success: true,
-      email,
-    };
+    return { success: true, email };
   } catch (error) {
     console.error({ emailListError: error });
 
@@ -118,8 +99,13 @@ export const joinColoringPageEmailList = async (
 };
 
 export const getEmailListMembers = async (): Promise<string[]> => {
-  const emails = await redis.smembers(REDIS_KEYS.EMAILS_SET);
-  return emails;
+  const { data } = await resend.contacts.list({ audienceId });
+
+  if (!data?.data) return [];
+
+  return data.data
+    .filter((contact) => !contact.unsubscribed)
+    .map((contact) => contact.email);
 };
 
 // Resend's default rate limit is 2 requests per second
@@ -169,7 +155,7 @@ const sendSingleColoringEmail = async (
   filename: string,
   coloringImagePdf: Buffer,
 ) => {
-  const unsubscribeUrl = await getUnsubscribeUrl(to);
+  const unsubscribeUrl = getUnsubscribeUrl(to);
   const emailHtml = await render(DailyColoringEmail({ unsubscribeUrl }));
 
   return resend.emails.send({
@@ -204,7 +190,7 @@ export const sendColoringImageEmail = async (
   // convert PDF stream to buffer
   const pdfBuffer = await streamToBuffer(pdfStream as Readable);
 
-  // use custom emails if provided, otherwise get from Redis
+  // use custom emails if provided, otherwise get from Resend Contacts
   let emails: string[];
 
   if (customEmails) {

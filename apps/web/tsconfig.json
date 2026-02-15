@@ -35,5 +35,10 @@
     "app/.well-known/vercel/flags/route.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "e2e", "playwright.config.ts"]
+  "exclude": [
+    "node_modules",
+    "e2e",
+    "playwright.config.ts",
+    "scripts/migrate-redis-to-resend.ts"
+  ]
 }

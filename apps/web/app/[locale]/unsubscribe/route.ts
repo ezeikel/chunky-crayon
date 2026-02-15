@@ -1,31 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
-import redis, { REDIS_KEYS } from '@/lib/redis';
+import { Resend } from 'resend';
+import { verifyEmailSignature } from '@/lib/unsubscribe';
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+const audienceId = process.env.RESEND_DAILY_EMAIL_SEGMENT_ID!;
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 
 export async function GET(req: NextRequest) {
-  const token = new URL(req.url).searchParams.get('token');
+  const url = new URL(req.url);
+  const encodedEmail = url.searchParams.get('email');
+  const sig = url.searchParams.get('sig');
 
-  if (!token) {
+  if (!encodedEmail || !sig) {
     return NextResponse.redirect(`${baseUrl}/?unsub=invalid`, 302);
   }
 
-  const email = await redis.get<string>(REDIS_KEYS.UNSUB_TOKEN(token));
-
-  if (!email) {
+  let email: string;
+  try {
+    email = Buffer.from(encodedEmail, 'base64url').toString();
+  } catch {
     return NextResponse.redirect(`${baseUrl}/?unsub=invalid`, 302);
   }
 
-  // Mark email as unsubscribed
-  await redis.set(REDIS_KEYS.UNSUB_FLAG(email), true);
+  if (!verifyEmailSignature(email, sig)) {
+    return NextResponse.redirect(`${baseUrl}/?unsub=invalid`, 302);
+  }
 
-  // Remove from email list
-  await redis.srem(REDIS_KEYS.EMAILS_SET, email);
-
-  // Update metadata
-  await redis.hset(REDIS_KEYS.EMAIL_META(email), {
-    tsUnsubscribed: Date.now(),
+  // Mark contact as unsubscribed in Resend
+  const { error } = await resend.contacts.update({
+    audienceId,
+    email,
+    unsubscribed: true,
   });
+
+  if (error) {
+    console.error('Failed to unsubscribe contact:', error);
+    return NextResponse.redirect(`${baseUrl}/?unsub=invalid`, 302);
+  }
 
   return NextResponse.redirect(`${baseUrl}/?unsub=success`, 302);
 }
