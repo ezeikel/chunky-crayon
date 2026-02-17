@@ -337,7 +337,7 @@
       "nature": "Nature et fleurs",
       "holidays": "Fêtes et saisons",
       "robots": "Robots et technologie",
-      "food": "Nourriture et gourmandises"
+      "food": "Cuisine et friandises"
     },
     "seo": {
       "aboutTitle": "À propos de nos coloriages gratuits",
@@ -363,7 +363,7 @@
       "easy": "Facile",
       "medium": "Moyen",
       "hard": "Difficile",
-      "filterByDifficulty": "Filtrer par niveau"
+      "filterByDifficulty": "Filtrer par difficulté"
     },
     "categoryPage": {
       "coloringPages": "Coloriages {category}",
@@ -410,7 +410,7 @@
         "categoriesSection": "Catégories adaptées aux tout-petits",
         "heroDescription": "Des pages simples et faciles à colorier, pensées pour les petites mains ! Grandes formes, contours épais et objets familiers : parfait pour les enfants de 2 à 4 ans. Idéal pour développer la motricité fine.",
         "whyTitle": "Parfait pour les petits artistes",
-        "why1Title": "Gros contours",
+        "why1Title": "Gros traits bien nets",
         "why1Description": "Des contours épais pour aider les petites mains à rester dans les lignes !",
         "why2Title": "Formes simples",
         "why2Description": "Des formes de base et des objets familiers que les tout-petits reconnaissent et adorent.",
@@ -438,7 +438,7 @@
         "seoTitle": "Coloriages gratuits pour enfants",
         "seoParagraph1": "Vous cherchez les coloriages parfaits pour vos enfants ? Chunky Crayon propose une immense collection de coloriages gratuits à imprimer, conçus spécialement pour les 4 à 12 ans. Des animaux adorables aux super-héros pleins d'action, il y en a pour tous les petits artistes.",
         "seoParagraph2": "Nos coloriages ont des contours nets et bien marqués, faciles à colorier pour les petites mains. Que votre enfant préfère les crayons, les crayons de couleur ou les feutres, ces pages sont faites pour de super résultats. Vous pouvez aussi utiliser nos outils de coloriage en ligne pour créer sur écran.",
-        "seoParagraph3": "Et le plus magique : les enfants peuvent créer leurs propres coloriages en décrivant ce qu’ils veulent colorier. Un dragon qui joue au foot ? Une licorne dans l’espace ? Tout ce qu’ils imaginent peut devenir un vrai coloriage en quelques secondes !",
+        "seoParagraph3": "Et le mieux dans tout ça : les enfants peuvent créer leurs propres coloriages en décrivant ce qu'ils veulent colorier. Un dragon qui joue au foot ? Une licorne dans l'espace ? Tout ce qu'ils imaginent peut devenir un vrai coloriage en quelques secondes !",
         "popularTitle": "Catégories populaires pour enfants",
         "popularDescription": "Nos catégories enfants les plus populaires : coloriages de dinosaures, de licornes, de super-héros, d’animaux, d’espace et de fusées, et de véhicules. Chaque catégorie est remplie de dessins adaptés à leur âge."
       },
@@ -456,7 +456,7 @@
         "why3Description": "Faites une pause loin des écrans et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop enfantins » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d'anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
-        "seoParagraph2": "Ce ne sont pas les coloriages de votre petit frère ou petite sœur. Nos dessins pour ados ont des détails complexes, des compositions dynamiques, et des thèmes qui parlent aux ados. Parfait pour s'exprimer, décompresser pendant les pauses révisions, ou juste se détendre.",
+        "seoParagraph2": "Ce ne sont pas les coloriages de votre petit frère ou petite sœur. Nos dessins pour ados ont des détails complexes, des compositions dynamiques, et des thèmes qui parlent aux ados. Parfait pour s'exprimer, décompresser pendant les pauses révisions, ou juste chiller.",
         "seoParagraph3": "Créez vos propres coloriages personnalisés en décrivant exactement ce que vous voulez. Un dragon qui se bat contre un robot dans l’espace ? Un portrait style anime ? Un mandala détaillé avec vos symboles préférés ? Décrivez-le, et notre IA lui donne vie !",
         "popularTitle": "Thèmes ado populaires",
         "popularDescription": "Nos catégories les plus populaires chez les ados : coloriages anime et manga, créatures fantastiques, scènes d’action de super-héros, art inspiré des jeux vidéo, designs espace et sci-fi, et pages de motifs très détaillés. Chaque catégorie propose des dessins captivants."
@@ -467,7 +467,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits thérapeutiques du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Détente",
+        "why1Title": "Anti-stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
@@ -665,7 +665,7 @@
     },
     "colorPalette": {
       "selectColor": "Choisir la couleur {color}",
-      "magicToolsMessage": "Les couleurs sont choisies automatiquement avec les outils magiques"
+      "magicToolsMessage": "Couleurs automatiques avec les outils magiques"
     },
     "patternSelector": {
       "label": "Motif :"
