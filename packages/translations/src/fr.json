@@ -437,7 +437,7 @@
         "why3Description": "Utilisez nos outils de coloriage directement dans le navigateur !",
         "seoTitle": "Coloriages gratuits pour enfants",
         "seoParagraph1": "Vous cherchez les coloriages parfaits pour vos enfants ? Chunky Crayon propose une immense collection de coloriages gratuits à imprimer, conçus spécialement pour les 4 à 12 ans. Des animaux adorables aux super-héros pleins d'action, il y en a pour tous les petits artistes.",
-        "seoParagraph2": "Nos coloriages ont des contours nets et bien marqués, faciles à colorier pour les petites mains. Que votre enfant préfère les crayons, les crayons de couleur ou les feutres, ces pages sont faites pour de super résultats. Vous pouvez aussi utiliser nos outils de coloriage en ligne pour créer sur écran.",
+        "seoParagraph2": "Nos coloriages ont des contours nets et bien marqués, faciles à colorier pour les petites mains. Que votre enfant préfère les crayons, les crayons de couleur ou les feutres, ces pages sont faites pour des résultats excellents. Vous pouvez aussi utiliser nos outils de coloriage en ligne pour créer sur écran.",
         "seoParagraph3": "Et le mieux dans tout ça : les enfants peuvent créer leurs propres coloriages en décrivant ce qu'ils veulent colorier. Un dragon qui joue au foot ? Une licorne dans l'espace ? Tout ce qu'ils imaginent peut devenir un vrai coloriage en quelques secondes !",
         "popularTitle": "Catégories populaires pour enfants",
         "popularDescription": "Nos catégories enfants les plus populaires : coloriages de dinosaures, de licornes, de super-héros, d’animaux, d’espace et de fusées, et de véhicules. Chaque catégorie est remplie de dessins adaptés à leur âge."
@@ -452,11 +452,11 @@
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins faits pour vos passions !",
         "why2Title": "Art détaillé",
         "why2Description": "Des dessins minutieux qui mettent au défi vos talents et sont magnifiques une fois finis.",
-        "why3Title": "Détente",
+        "why3Title": "Soulagement du stress",
         "why3Description": "Faites une pause loin des écrans et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop enfantins » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d'anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
-        "seoParagraph2": "Ce ne sont pas les coloriages de votre petit frère ou petite sœur. Nos dessins pour ados ont des détails complexes, des compositions dynamiques, et des thèmes qui parlent aux ados. Parfait pour s'exprimer, décompresser pendant les pauses révisions, ou juste chiller.",
+        "seoParagraph2": "Ce ne sont pas les coloriages de votre petit frère ou petite sœur. Nos dessins pour ados ont des détails complexes, des compositions dynamiques, et des thèmes qui parlent aux ados. Parfait pour s'exprimer, décompresser pendant les pauses révisions, ou juste se détendre.",
         "seoParagraph3": "Créez vos propres coloriages personnalisés en décrivant exactement ce que vous voulez. Un dragon qui se bat contre un robot dans l’espace ? Un portrait style anime ? Un mandala détaillé avec vos symboles préférés ? Décrivez-le, et notre IA lui donne vie !",
         "popularTitle": "Thèmes ado populaires",
         "popularDescription": "Nos catégories les plus populaires chez les ados : coloriages anime et manga, créatures fantastiques, scènes d’action de super-héros, art inspiré des jeux vidéo, designs espace et sci-fi, et pages de motifs très détaillés. Chaque catégorie propose des dessins captivants."
@@ -467,7 +467,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits thérapeutiques du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Anti-stress",
+        "why1Title": "Soulagement du stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
@@ -629,11 +629,11 @@
     "brushSizes": {
       "small": "Fin",
       "medium": "Normal",
-      "large": "Épais"
+      "large": "Gros"
     },
     "fillPatterns": {
       "solid": "Uni",
-      "dots": "Pois",
+      "dots": "À pois",
       "stripes": "Rayures",
       "diagonal": "Diagonal",
       "checkerboard": "Damier",
