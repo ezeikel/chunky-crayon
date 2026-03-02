@@ -3,7 +3,11 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "build:web": "turbo run build --filter=@chunky-crayon/web",
+    "build:mobile": "turbo run build --filter=@chunky-crayon/mobile",
     "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@chunky-crayon/web",
+    "dev:mobile": "turbo run dev --filter=@chunky-crayon/mobile",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",

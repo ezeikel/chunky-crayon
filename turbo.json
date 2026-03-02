@@ -2,6 +2,9 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
     "build": {
       "dependsOn": ["^build", "db:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
@@ -12,21 +15,91 @@
         "android/app/build/**",
         "ios/build/**"
       ],
-      "env": ["**"]
+      "env": [
+        "ANTHROPIC_API_KEY",
+        "AUTH_APPLE_ID",
+        "AUTH_APPLE_SECRET",
+        "COLORED_EXAMPLE_PROFILE_NAME",
+        "COLORED_EXAMPLE_USER_EMAIL",
+        "CRON_SECRET",
+        "DATABASE_URL",
+        "DATABASE_URL_UNPOOLED",
+        "ELEVENLABS_API_KEY",
+        "ELEVENLABS_COLO_VOICE_ID",
+        "FACEBOOK_ACCESS_TOKEN",
+        "FACEBOOK_CAPI_ACCESS_TOKEN",
+        "FACEBOOK_CAPI_TEST_CODE",
+        "FACEBOOK_PAGE_ID",
+        "FACEBOOK_PIXEL_ID",
+        "FLAGS_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "GOOGLE_GENERATIVE_AI_API_KEY",
+        "IMAGE_PROVIDER",
+        "INSTAGRAM_ACCOUNT_ID",
+        "MAILCHIMP_API_KEY",
+        "MAILCHIMP_API_SERVER",
+        "MAILCHIMP_AUDIENCE_ID",
+        "MAILTRAP_PASS",
+        "MAILTRAP_USER",
+        "META_APP_ID",
+        "META_APP_SECRET",
+        "MOBILE_AUTH_SECRET",
+        "NEXT_AUTH_SECRET",
+        "NEXTAUTH_URL",
+        "OPENAI_API_KEY",
+        "PERPLEXITY_API_KEY",
+        "PINTEREST_ACCESS_TOKEN",
+        "PINTEREST_AD_ACCOUNT_ID",
+        "PINTEREST_APP_ID",
+        "PINTEREST_APP_SECRET",
+        "PINTEREST_BOARD_ID",
+        "PINTEREST_BOARD_ID_VIDEOS",
+        "PINTEREST_CAPI_ACCESS_TOKEN",
+        "PINTEREST_REFRESH_TOKEN",
+        "PINTEREST_SANDBOX_TOKEN",
+        "PINTEREST_USE_SANDBOX",
+        "R2_ACCESS_KEY_ID",
+        "R2_BUCKET",
+        "R2_ENDPOINT",
+        "R2_EU_ENDPOINT",
+        "R2_PUBLIC_URL",
+        "R2_SECRET_ACCESS_KEY",
+        "R2_TOKEN",
+        "REPLICATE_API_TOKEN",
+        "RESEND_API_KEY",
+        "RESEND_DAILY_EMAIL_SEGMENT_ID",
+        "RESEND_EMAIL_DOMAIN",
+        "REVENUECAT_WEBHOOK_AUTH_KEY",
+        "SANITY_API_TOKEN",
+        "SANITY_REVALIDATE_SECRET",
+        "SENTRY_AUTH_TOKEN",
+        "SENTRY_DSN",
+        "SOCIAL_DIGEST_EMAIL",
+        "STRIPE_SECRET",
+        "STRIPE_WEBHOOK_SECRET",
+        "TEMP_USER_TOKEN",
+        "TIKTOK_CLIENT_KEY",
+        "TIKTOK_CLIENT_SECRET",
+        "UNSUBSCRIBE_SECRET",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "UPSTASH_REDIS_REST_URL"
+      ]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["transit"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["transit"]
     },
     "dev": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "db:generate"],
       "cache": false,
       "persistent": true
     },
     "db:generate": {
-      "cache": false
+      "inputs": ["packages/db/prisma/schema.prisma"],
+      "outputs": ["node_modules/.prisma/client/**"]
     },
     "db:migrate": {
       "cache": false,
