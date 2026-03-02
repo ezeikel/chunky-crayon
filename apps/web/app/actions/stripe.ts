@@ -13,6 +13,8 @@ import {
   calculateDaysRemaining,
   calculateProratedCredits,
   getDaysInPeriod,
+  getCreditAmountFromPriceId,
+  mapStripePriceToPlanName,
   mapStripeStatusToSubscriptionStatus,
 } from '@/utils/stripe';
 import { PLAN_CREDITS, ACTIONS } from '@/constants';
@@ -26,10 +28,33 @@ export const getStripeSession = async (sessionId: string) => {
 
   if (!sessionId) return null;
   try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items.data.price'],
+    });
+
+    // Derive productType and planName from the session
+    const productType: 'subscription' | 'credits' =
+      session.mode === 'subscription' ? 'subscription' : 'credits';
+
+    let planName: PlanName | undefined;
+    let creditAmount: number | undefined;
+    const priceId = session.line_items?.data[0]?.price?.id;
+
+    if (priceId) {
+      if (productType === 'subscription') {
+        const mapping = mapStripePriceToPlanName(priceId);
+        planName = mapping.planName;
+      } else {
+        creditAmount = getCreditAmountFromPriceId(priceId) ?? undefined;
+      }
+    }
+
     return {
       amount_total: session.amount_total,
       currency: session.currency,
+      productType,
+      planName,
+      creditAmount,
     };
   } catch (error) {
     console.error('Error fetching Stripe session:', error);

@@ -19,6 +19,9 @@ const BillingSuccessWrapper = async ({
       amount={sessionData?.amount_total ? sessionData.amount_total / 100 : null}
       currency={sessionData?.currency?.toUpperCase() || 'GBP'}
       sessionId={sessionId}
+      productType={sessionData?.productType}
+      planName={sessionData?.planName}
+      creditAmount={sessionData?.creditAmount}
     />
   );
 };

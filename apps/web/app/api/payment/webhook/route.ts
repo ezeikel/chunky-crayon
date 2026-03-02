@@ -219,7 +219,7 @@ export const POST = async (req: Request) => {
           userId: user.id,
           value: priceAmount,
           currency: 'GBP',
-          eventId: `stripe_${stripeEvent.id}`,
+          eventId: session.id,
           contentName: `${planName} Subscription`,
         });
       }
@@ -306,7 +306,10 @@ export const POST = async (req: Request) => {
                 userId: user.id,
                 value: priceAmount,
                 currency: 'GBP',
-                eventId: `stripe_${stripeEvent.id}_${item.price?.id}`,
+                eventId:
+                  lineItems.data.length === 1
+                    ? session.id
+                    : `${session.id}_${item.price?.id}`,
                 contentName: `${creditAmount} Credits Pack`,
               });
             }

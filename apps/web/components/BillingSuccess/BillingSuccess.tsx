@@ -26,8 +26,7 @@ const BillingSuccess = ({
       <PurchaseTracking
         value={amount}
         currency={currency}
-        transactionId={sessionId}
-        quantity={1}
+        eventId={sessionId}
         productType={productType}
         planName={planName}
         creditAmount={creditAmount}

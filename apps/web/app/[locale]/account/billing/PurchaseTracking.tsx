@@ -1,26 +1,51 @@
 'use client';
 
 import { useEffect } from 'react';
-import { trackPurchase, PurchaseTrackingProps } from '@/utils/trackPurchase';
+import { trackPurchase, trackSubscribe } from '@/utils/pixels';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
+
+type PurchaseTrackingProps = {
+  value: number;
+  currency: string;
+  eventId: string;
+  productType: 'subscription' | 'credits';
+  planName?: string;
+  creditAmount?: number;
+};
 
 const PurchaseTracking = ({
   value,
   currency,
-  transactionId,
-  quantity,
+  eventId,
   productType,
   planName,
   creditAmount,
 }: PurchaseTrackingProps) => {
   useEffect(() => {
+    // Facebook + Pinterest pixels with event ID for dedup
     trackPurchase({
       value,
       currency,
-      transactionId,
-      quantity,
+      eventId,
       productType,
       planName,
       creditAmount,
+    });
+
+    // Fire Subscribe event for subscription purchases
+    if (productType === 'subscription' && planName) {
+      trackSubscribe({ planName, value, currency });
+    }
+
+    // PostHog + Vercel analytics
+    trackEvent(TRACKING_EVENTS.CHECKOUT_COMPLETED, {
+      productType,
+      planName: planName as any,
+      creditAmount,
+      value,
+      currency,
+      transactionId: eventId,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

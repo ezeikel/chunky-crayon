@@ -171,6 +171,8 @@ export const trackViewContent = (params: {
           },
         ]
       : undefined,
+    value: params.value,
+    currency: params.currency,
   });
 };
 
@@ -196,33 +198,47 @@ export const trackLead = (params: {
 };
 
 /**
- * Track when a user adds an item to cart (pre-checkout interest)
+ * Track a completed purchase with event ID for dedup between client-side
+ * pixels and server-side Conversion APIs.
  */
-export const trackAddToCart = (params: {
+export const trackPurchase = (params: {
+  value: number;
+  currency: string;
+  eventId: string;
   productType: 'subscription' | 'credits';
   planName?: string;
   creditAmount?: number;
-  value: number;
-  currency: string;
 }) => {
+  const w = window as WindowWithPixels;
   const contentName =
     params.productType === 'subscription'
       ? `${params.planName} Subscription`
       : `${params.creditAmount} Credits`;
 
-  trackFacebookEvent('AddToCart', {
-    content_type: 'product',
-    content_name: contentName,
-    value: params.value / 100,
-    currency: params.currency,
-  });
+  // Facebook: 4th argument is the options object with eventID for dedup
+  if (w.fbq) {
+    w.fbq(
+      'track',
+      'Purchase',
+      {
+        value: params.value / 100,
+        currency: params.currency,
+        content_type: 'product',
+        content_name: contentName,
+      },
+      { eventID: params.eventId },
+    );
+  }
 
-  trackPinterestEvent('addtocart', {
-    value: params.value / 100,
-    currency: params.currency,
-    order_quantity: 1,
-    product_name: contentName,
-  });
+  // Pinterest: event_id inside the params object for dedup
+  if (w.pintrk) {
+    w.pintrk('track', 'checkout', {
+      value: params.value / 100,
+      currency: params.currency,
+      order_quantity: 1,
+      event_id: params.eventId,
+    });
+  }
 };
 
 /**

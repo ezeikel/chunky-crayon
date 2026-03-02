@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { ColoringImage } from '@chunky-crayon/db/types';
 import ColoringArea, {
   ColoringAreaHandle,
@@ -9,6 +9,7 @@ import ProgressIndicator from '@/components/ProgressIndicator';
 import MuteToggle from '@/components/MuteToggle';
 import DesktopColorPalette from '@/components/DesktopColorPalette';
 import DesktopToolsSidebar from '@/components/DesktopToolsSidebar';
+import { trackViewContent } from '@/utils/pixels';
 
 type ColoringPageContentProps = {
   coloringImage: Partial<ColoringImage>;
@@ -27,6 +28,15 @@ const ColoringPageContent = ({
     ambientSoundUrl: coloringImage?.ambientSoundUrl,
     hasAmbientSoundUrl: !!coloringImage?.ambientSoundUrl,
   });
+
+  useEffect(() => {
+    trackViewContent({
+      contentType: 'coloring_page',
+      contentId: coloringImage.id,
+      contentName: coloringImage.title || undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const coloringAreaRef = useRef<ColoringAreaHandle>(null);
 
