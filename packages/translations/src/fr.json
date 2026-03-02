@@ -267,7 +267,7 @@
     "pageTitle": "Galerie de coloriages gratuits - Chunky Crayon",
     "pageDescription": "Parcourez notre collection gratuite de coloriages à imprimer. Animaux, dragons, licornes, princesses et plus encore. De nouvelles pages chaque jour !",
     "heroTitle": "Coloriages gratuits",
-    "heroSubtitle": "Découvrez des milliers de coloriages gratuits à imprimer. Des animaux trop mignons aux dragons magiques, trouvez la page parfaite à colorier en ligne ou à imprimer à la maison.",
+    "heroSubtitle": "Découvrez des milliers de coloriages gratuits à imprimer. Des animaux adorables aux dragons magiques, trouvez la page parfaite à colorier en ligne ou à imprimer à la maison.",
     "browseByCategory": "Parcourir par catégorie",
     "browseByDifficulty": "Parcourir par niveau",
     "browseByAge": "Parcourir par âge",
@@ -341,7 +341,7 @@
     },
     "seo": {
       "aboutTitle": "À propos de nos coloriages gratuits",
-      "aboutParagraph1": "Bienvenue dans la galerie de coloriages gratuits de Chunky Crayon ! Nous proposons une collection grandissante de coloriages à imprimer, parfaite pour les enfants comme pour les adultes. Nos outils propulsés par l’IA aident à créer des coloriages uniques et amusants, dans plein de catégories.",
+      "aboutParagraph1": "Bienvenue dans la galerie de coloriages gratuits de Chunky Crayon ! Nous proposons une collection grandissante de coloriages à imprimer, parfaite pour les enfants comme pour les adultes. Nos outils basés sur l'IA aident à créer des coloriages uniques et amusants, dans plein de catégories.",
       "aboutParagraph2": "Chaque jour, nous ajoutons un nouveau coloriage du jour que vous pouvez colorier en ligne avec nos outils numériques, ou télécharger et imprimer pour colorier de façon traditionnelle. Les membres de notre communauté partagent aussi leurs idées créatives, pour encore plus de variété.",
       "aboutParagraph3": "Parcourez par catégorie pour trouver exactement ce que vous cherchez : animaux trop mignons, créatures fantastiques comme les dragons et les licornes, ou thèmes de fêtes et de saisons. Chaque page est dessinée avec des contours nets, parfaits pour colorier."
     },
@@ -369,7 +369,7 @@
       "coloringPages": "Coloriages {category}",
       "relatedCategories": "Catégories associées",
       "noPagesYet": "Pas encore de pages {category}",
-      "beTheFirst": "Soyez le premier à créer un coloriage {category} !",
+      "beTheFirst": "Soyez la première personne à créer un coloriage {category} !",
       "createAPage": "Créer une page",
       "freeColoringPages": "Coloriages {category} gratuits",
       "lookingFor": "Vous cherchez le coloriage {category} parfait ? Vous êtes au bon endroit ! Notre collection propose plein de dessins {category}, parfaits pour les enfants comme pour les adultes.",
@@ -378,7 +378,7 @@
       "includesPopular": "Notre catégorie {category} inclut des recherches populaires comme :"
     },
     "categoryDescriptions": {
-      "animals": "Coloriages d’animaux mignons et sauvages, pour petits et grands",
+      "animals": "Coloriages d'animaux adorables et sauvages, pour petits et grands",
       "fantasy": "Créatures magiques et mondes enchantés à colorier",
       "dragons": "Coloriages de dragons épiques aux détails flamboyants",
       "unicorns": "Coloriages de licornes magiques avec arcs-en-ciel et paillettes",
@@ -399,7 +399,7 @@
     },
     "ageGroupPages": {
       "common": {
-        "moreAgeGroups": "Plus d’âges",
+        "moreAgeGroups": "Autres groupes d'âge",
         "createSimplePages": "Créer des pages simples",
         "createYourOwn": "Créez le vôtre",
         "createYourDesign": "Créer votre dessin"
@@ -452,7 +452,7 @@
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins faits pour vos passions !",
         "why2Title": "Art détaillé",
         "why2Description": "Des dessins minutieux qui mettent au défi vos talents et sont magnifiques une fois finis.",
-        "why3Title": "Détente",
+        "why3Title": "Gestion du stress",
         "why3Description": "Faites une pause loin des écrans et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop enfantins » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d'anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
@@ -467,7 +467,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits thérapeutiques du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Anti-stress",
+        "why1Title": "Gestion du stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
@@ -476,7 +476,7 @@
         "seoTitle": "Coloriages gratuits pour adultes",
         "seoParagraph1": "Le coloriage pour adultes est devenu une activité bien-être très appréciée, et ce n’est pas un hasard. Des études montrent qu’il peut réduire l’anxiété, améliorer la concentration et offrir une pause apaisante loin des écrans. Notre collection propose de magnifiques dessins détaillés, parfaits pour les grands.",
         "seoParagraph2": "Des mandalas détaillés pour la pleine conscience aux scènes de nature paisibles et aux motifs élégants, chaque page est conçue pour offrir des heures de créativité relaxante. Imprimez sur un papier de qualité et utilisez vos outils préférés : crayons de couleur, feutres ou stylos gel, tout fonctionne à merveille.",
-        "seoParagraph3": "Envie de quelque chose d'unique ? Créez vos pages personnalisées ! Décrivez votre scène détente idéale : un jardin zen, un motif Art nouveau, ou une illustration botanique détaillée… et notre IA donne vie à votre idée.",
+        "seoParagraph3": "Envie de quelque chose d'unique ? Créez vos pages personnalisées ! Décrivez votre scène détente idéale : un jardin zen, un motif Art nouveau, ou une illustration botanique détaillée… et notre IA donne vie à votre idée !",
         "popularTitle": "Thèmes populaires de coloriage pour adultes",
         "popularDescription": "Découvrez nos catégories adultes les plus populaires : mandalas pour méditer, motifs nature et botaniques détaillés, motifs géométriques, styles Art déco et Art nouveau, pages inspirées du zentangle, et paysages apaisants. Chacune offre un chemin unique vers la détente."
       }
