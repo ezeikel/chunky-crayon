@@ -1,10 +1,8 @@
 'use server';
 
+import { generateText, Output } from 'ai';
 import {
-  generateObject,
-  generateText,
   getTracedModels,
-  models,
   AUDIO_TRANSCRIPTION_SYSTEM,
   AUDIO_TRANSCRIPTION_PROMPT,
   IMAGE_DESCRIPTION_SYSTEM,
@@ -185,9 +183,9 @@ export async function describeImage(
     // Convert File to ArrayBuffer for Gemini
     const imageBuffer = await imageFile.arrayBuffer();
 
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: tracedModels.analytics, // Gemini 3 Flash
-      schema: imageDescriptionSchema,
+      output: Output.object({ schema: imageDescriptionSchema }),
       system: IMAGE_DESCRIPTION_SYSTEM,
       messages: [
         {
@@ -206,7 +204,7 @@ export async function describeImage(
       ],
     });
 
-    if (!object.description || object.description.trim().length === 0) {
+    if (!output?.description || output.description.trim().length === 0) {
       return {
         success: false,
         error: "Couldn't understand the image. Please try another one!",
@@ -215,9 +213,9 @@ export async function describeImage(
 
     return {
       success: true,
-      description: object.description.trim(),
-      subjects: object.subjects || [],
-      isChildDrawing: object.isChildDrawing || false,
+      description: output.description.trim(),
+      subjects: output.subjects || [],
+      isChildDrawing: output.isChildDrawing || false,
     };
   } catch (error) {
     console.error('Error describing image:', error);

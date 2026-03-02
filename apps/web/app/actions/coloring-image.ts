@@ -5,9 +5,8 @@ import { revalidatePath, revalidateTag, cacheLife, cacheTag } from 'next/cache';
 import { after } from 'next/server';
 import QRCode from 'qrcode';
 import sharp from 'sharp';
+import { generateText, Output } from 'ai';
 import {
-  generateText,
-  generateObject,
   getTracedModels,
   CLEAN_UP_DESCRIPTION_SYSTEM,
   createImageMetadataSystemPrompt,
@@ -186,9 +185,9 @@ const generateColoringImageWithMetadata = async (
   // This saves ~2-3 seconds compared to sequential execution
   const [metadataResult, svg, webpBuffer] = await Promise.all([
     // A) Generate metadata using faster model (GPT-4o-mini), with language support
-    generateObject({
+    generateText({
       model: tracedModels.vision,
-      schema: imageMetadataSchema,
+      output: Output.object({ schema: imageMetadataSchema }),
       system: createImageMetadataSystemPrompt(
         languageInfo.name,
         languageInfo.nativeName,
@@ -211,7 +210,7 @@ const generateColoringImageWithMetadata = async (
     sharp(imageBuffer).webp().toBuffer(),
   ]);
 
-  const imageMetadata = metadataResult.object;
+  const imageMetadata = metadataResult.output!;
 
   // eslint-disable-next-line no-console
   console.log('[Pipeline] Parallel processing complete:', {

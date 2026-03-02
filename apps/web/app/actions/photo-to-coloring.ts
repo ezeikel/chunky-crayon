@@ -3,8 +3,8 @@
 import { put, del } from '@/lib/storage';
 import QRCode from 'qrcode';
 import sharp from 'sharp';
+import { generateText, Output } from 'ai';
 import {
-  generateObject,
   getTracedModels,
   createImageMetadataSystemPrompt,
   IMAGE_METADATA_PROMPT,
@@ -101,9 +101,9 @@ export async function createColoringImageFromPhoto(
     // Step 2: Run metadata, SVG trace, and WebP conversion in parallel
     const [metadataResult, svg, webpBuffer] = await Promise.all([
       // Generate metadata
-      generateObject({
+      generateText({
         model: tracedModels.vision,
-        schema: imageMetadataSchema,
+        output: Output.object({ schema: imageMetadataSchema }),
         system: createImageMetadataSystemPrompt(
           languageInfo.name,
           languageInfo.nativeName,
@@ -126,7 +126,7 @@ export async function createColoringImageFromPhoto(
       sharp(imageBuffer).webp().toBuffer(),
     ]);
 
-    const imageMetadata = metadataResult.object;
+    const imageMetadata = metadataResult.output!;
 
     // eslint-disable-next-line no-console
     console.log('[PhotoToColoring] Parallel processing complete:', {

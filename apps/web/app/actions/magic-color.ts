@@ -1,7 +1,7 @@
 'use server';
 
+import { generateText, Output } from 'ai';
 import {
-  generateObject,
   getTracedModels,
   MAGIC_COLOR_SYSTEM,
   createMagicColorPrompt,
@@ -98,9 +98,9 @@ export async function getMagicColorSuggestions(
       imageSize: imageBuffer.length,
     });
 
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: tracedModels.analytics, // Gemini 3 Flash - fast vision model
-      schema: magicColorResponseSchema,
+      output: Output.object({ schema: magicColorResponseSchema }),
       system: MAGIC_COLOR_SYSTEM,
       messages: [
         {
@@ -125,11 +125,11 @@ export async function getMagicColorSuggestions(
     });
 
     console.log('[MagicColor] Result:', {
-      region: object.regionDescription,
-      suggestionsCount: object.suggestions.length,
+      region: output!.regionDescription,
+      suggestionsCount: output!.suggestions.length,
     });
 
-    return { success: true, data: object };
+    return { success: true, data: output! };
   } catch (error) {
     console.error('Error getting magic color suggestions:', error);
     return {

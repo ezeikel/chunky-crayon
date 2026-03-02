@@ -3,8 +3,8 @@ import { chromium } from 'playwright';
 import sharp from 'sharp';
 import potrace from 'oslllo-potrace';
 import * as Sentry from '@sentry/nextjs';
+import { generateText, Output } from 'ai';
 import {
-  generateObject,
   models,
   svgValidationSchema,
   CHECK_SVG_IMAGE_SYSTEM,
@@ -86,9 +86,9 @@ export const checkSvgImage = async (
   const dataUrl = `data:image/png;base64,${base64Screenshot}`;
 
   // check if traced image is blank
-  const { object } = await generateObject({
+  const { output } = await generateText({
     model: models.vision,
-    schema: svgValidationSchema,
+    output: Output.object({ schema: svgValidationSchema }),
     system: CHECK_SVG_IMAGE_SYSTEM,
     messages: [
       {
@@ -107,7 +107,7 @@ export const checkSvgImage = async (
     ],
   });
 
-  const { hasBlackLeftWhiteRight } = object;
+  const { hasBlackLeftWhiteRight } = output!;
 
   const isValid = !hasBlackLeftWhiteRight;
 

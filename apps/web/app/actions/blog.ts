@@ -1,6 +1,6 @@
 'use server';
 
-import { generateObject, generateText } from 'ai';
+import { generateText, Output } from 'ai';
 import {
   getTracedModels,
   blogMetaSchema,
@@ -72,14 +72,14 @@ async function generateBlogMeta(topic: string, keywords: string[]) {
     properties: { feature: 'blog_generation' },
   });
 
-  const { object } = await generateObject({
+  const { output } = await generateText({
     model: models.creative,
     system: BLOG_META_SYSTEM,
     prompt: createBlogMetaPrompt(topic, keywords),
-    schema: blogMetaSchema,
+    output: Output.object({ schema: blogMetaSchema }),
   });
 
-  return object;
+  return output!;
 }
 
 /**
@@ -94,14 +94,14 @@ async function generateBlogContent(
     properties: { feature: 'blog_generation' },
   });
 
-  const { object } = await generateObject({
+  const { output } = await generateText({
     model: models.creative,
     system: BLOG_POST_SYSTEM,
     prompt: createBlogPostPrompt(topic, keywords, coveredTopics),
-    schema: blogPostSchema,
+    output: Output.object({ schema: blogPostSchema }),
   });
 
-  return object;
+  return output!;
 }
 
 /**
@@ -112,14 +112,14 @@ async function generateImagePrompt(topic: string, postTitle: string) {
     properties: { feature: 'blog_generation' },
   });
 
-  const { object } = await generateObject({
+  const { output } = await generateText({
     model: models.creative,
     system: BLOG_IMAGE_PROMPT_SYSTEM,
     prompt: createBlogImagePromptPrompt(topic, postTitle),
-    schema: blogImagePromptSchema,
+    output: Output.object({ schema: blogImagePromptSchema }),
   });
 
-  return object;
+  return output!;
 }
 
 /**

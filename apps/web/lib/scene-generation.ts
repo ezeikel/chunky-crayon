@@ -1,4 +1,4 @@
-import { generateObject, generateText } from 'ai';
+import { generateText, Output } from 'ai';
 import { models } from '@/lib/ai/models';
 import { sceneDescriptionSchema } from '@/lib/ai/schemas';
 import {
@@ -309,11 +309,11 @@ const MAX_ATTEMPTS = 3;
  * Returns the fullDescription string or null on failure.
  */
 async function attemptGeneration(prompt: string): Promise<string | null> {
-  // Attempt 1: generateObject with structured output
+  // Attempt 1: generateText with structured output
   try {
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: models.search,
-      schema: sceneDescriptionSchema,
+      output: Output.object({ schema: sceneDescriptionSchema }),
       system: SCENE_DESCRIPTION_SYSTEM,
       prompt,
       temperature: 0.7,
@@ -324,17 +324,17 @@ async function attemptGeneration(prompt: string): Promise<string | null> {
       },
     });
 
-    console.log('[SceneGen] generateObject succeeded:', {
-      character: object.character,
-      activity: object.activity,
-      setting: object.setting,
-      seasonalContext: object.seasonalContext,
+    console.log('[SceneGen] structured output succeeded:', {
+      character: output!.character,
+      activity: output!.activity,
+      setting: output!.setting,
+      seasonalContext: output!.seasonalContext,
     });
 
-    return object.fullDescription;
+    return output!.fullDescription;
   } catch (error) {
     console.warn(
-      '[SceneGen] generateObject failed, trying generateText:',
+      '[SceneGen] structured output failed, trying generateText:',
       error,
     );
   }
@@ -375,7 +375,7 @@ async function attemptGeneration(prompt: string): Promise<string | null> {
  * - Content safety blocklist validation
  * - Keyword similarity deduplication against last 30 days
  * - Up to 3 generation attempts before falling back to static
- * - Triple fallback per attempt: generateObject → generateText → retry/static
+ * - Triple fallback per attempt: structured output → plain generateText → retry/static
  *
  * @returns The scene description string for image generation
  */

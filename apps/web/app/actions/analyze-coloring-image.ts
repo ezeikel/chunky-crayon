@@ -1,8 +1,8 @@
 'use server';
 
 import { auth } from '@/auth';
+import { generateText, Output } from 'ai';
 import {
-  generateObject,
   models,
   regionFirstColorResponseSchema,
   REGION_FIRST_COLOR_SYSTEM,
@@ -64,9 +64,9 @@ export async function assignColorsToRegions(
     );
 
     const startTime = Date.now();
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: models.analyticsQuality, // Gemini 3 Pro for vision analysis
-      schema: regionFirstColorResponseSchema,
+      output: Output.object({ schema: regionFirstColorResponseSchema }),
       system: REGION_FIRST_COLOR_SYSTEM,
       messages: [
         {
@@ -84,6 +84,7 @@ export async function assignColorsToRegions(
         },
       ],
     });
+    const object = output!;
     const duration = Date.now() - startTime;
 
     console.log(`Duration: ${duration}ms`);

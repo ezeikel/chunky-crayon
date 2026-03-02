@@ -15,7 +15,7 @@
  * Output: apps/mobile/constants/onboardingFillPoints.ts
  */
 import { google } from '@ai-sdk/google';
-import { generateObject } from 'ai';
+import { generateText, Output } from 'ai';
 import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -223,9 +223,9 @@ Return ALL ${detectedRegions.length} assignments. Think like an artist — consi
   const imageBase64 = `data:image/png;base64,${pngBuffer.toString('base64')}`;
 
   const startTime = Date.now();
-  const { object } = await generateObject({
+  const { output } = await generateText({
     model: google('gemini-3-pro-image-preview'),
-    schema: regionFirstColorResponseSchema,
+    output: Output.object({ schema: regionFirstColorResponseSchema }),
     system: REGION_FIRST_COLOR_SYSTEM,
     messages: [
       {
@@ -237,6 +237,7 @@ Return ALL ${detectedRegions.length} assignments. Think like an artist — consi
       },
     ],
   });
+  const object = output!;
   const elapsed = Date.now() - startTime;
   console.log(`  AI response in ${elapsed}ms`);
   console.log(`  Scene: ${object.sceneDescription}`);

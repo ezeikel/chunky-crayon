@@ -5,7 +5,7 @@
  * Import from '@/lib/ai' for all AI-related functionality.
  *
  * @example
- * import { models, prompts, schemas, generateColoringImage } from '@/lib/ai';
+ * import { models, prompts, schemas, generateText, Output } from '@/lib/ai';
  *
  * // Use pre-configured models
  * const { text } = await generateText({ model: models.creative, ... });
@@ -13,18 +13,16 @@
  * // Use centralized prompts
  * const prompt = prompts.createColoringImagePrompt(description);
  *
- * // Use typed schemas
- * const { object } = await generateObject({ schema: schemas.imageMetadataSchema, ... });
+ * // Use structured output
+ * const { output } = await generateText({
+ *   model: models.creative,
+ *   output: Output.object({ schema: schemas.imageMetadataSchema }),
+ *   ...
+ * });
  */
 
 // Re-export Vercel AI SDK functions for convenience
-export {
-  generateText,
-  generateObject,
-  generateImage,
-  streamText,
-  streamObject,
-} from 'ai';
+export { generateText, generateImage, streamText, Output } from 'ai';
 
 // Re-export models
 export {

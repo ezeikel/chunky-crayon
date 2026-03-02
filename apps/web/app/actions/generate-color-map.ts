@@ -1,8 +1,8 @@
 'use server';
 
 import sharp from 'sharp';
+import { generateText, Output } from 'ai';
 import {
-  generateObject,
   models,
   gridColorMapSchema,
   GRID_COLOR_MAP_SYSTEM,
@@ -62,9 +62,9 @@ export async function generateGridColorMap(
     );
     const startTime = Date.now();
 
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: models.analyticsQuality, // Gemini Pro for high-accuracy vision analysis (runs in after() so latency not an issue)
-      schema: gridColorMapSchema,
+      output: Output.object({ schema: gridColorMapSchema }),
       system: GRID_COLOR_MAP_SYSTEM,
       messages: [
         {
@@ -83,17 +83,18 @@ export async function generateGridColorMap(
       ],
     });
 
+    const colorMap = output!;
     const elapsedMs = Date.now() - startTime;
     console.log(`[ColorMap] Generated in ${elapsedMs}ms:`, {
-      sceneDescription: object.sceneDescription,
-      gridCellCount: object.gridColors.length,
+      sceneDescription: colorMap.sceneDescription,
+      gridCellCount: colorMap.gridColors.length,
     });
 
     // Save to database
     await db.coloringImage.update({
       where: { id: coloringImageId },
       data: {
-        colorMapJson: JSON.stringify(object),
+        colorMapJson: JSON.stringify(colorMap),
         colorMapGeneratedAt: new Date(),
       },
     });
@@ -102,7 +103,7 @@ export async function generateGridColorMap(
 
     return {
       success: true,
-      colorMap: object,
+      colorMap,
     };
   } catch (error) {
     console.error('[ColorMap] Error generating color map:', error);
@@ -241,9 +242,9 @@ export async function generateRegionFillPoints(
     const imageBase64 = `data:image/png;base64,${pngBuffer.toString('base64')}`;
 
     // Step 5: Call Gemini Pro for color assignment
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: models.analyticsQuality,
-      schema: regionFirstColorResponseSchema,
+      output: Output.object({ schema: regionFirstColorResponseSchema }),
       system: REGION_FILL_POINTS_SYSTEM,
       messages: [
         {
@@ -263,6 +264,7 @@ export async function generateRegionFillPoints(
       ],
     });
 
+    const object = output!;
     const elapsedMs = Date.now() - startTime;
     console.log(`[FillPoints] AI response in ${elapsedMs}ms:`, {
       sceneDescription: object.sceneDescription,

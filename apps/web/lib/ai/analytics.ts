@@ -1,4 +1,4 @@
-import { generateObject } from 'ai';
+import { generateText, Output } from 'ai';
 import { models } from './models';
 import { imageAnalyticsSchema, type ImageAnalytics } from './schemas';
 import { IMAGE_ANALYTICS_SYSTEM, IMAGE_ANALYTICS_PROMPT } from './prompts';
@@ -25,9 +25,9 @@ export const analyzeImageForAnalytics = async (
   imageUrl: string,
 ): Promise<ImageAnalytics | null> => {
   try {
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model: models.analytics,
-      schema: imageAnalyticsSchema,
+      output: Output.object({ schema: imageAnalyticsSchema }),
       system: IMAGE_ANALYTICS_SYSTEM,
       messages: [
         {
@@ -46,7 +46,7 @@ export const analyzeImageForAnalytics = async (
       ],
     });
 
-    return object;
+    return output ?? null;
   } catch (error) {
     // Log error but don't throw - analytics should never break the main flow
     // eslint-disable-next-line no-console
