@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { db } from '@chunky-crayon/db';
 
 /**
@@ -6,6 +6,8 @@ import { db } from '@chunky-crayon/db';
  * Exchanges authorization code for access token and stores it.
  */
 export const GET = async (request: NextRequest) => {
+  await connection();
+
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
   const state = searchParams.get('state');

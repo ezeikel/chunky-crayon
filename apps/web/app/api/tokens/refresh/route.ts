@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, connection } from 'next/server';
 import { db } from '@chunky-crayon/db';
 
 export const maxDuration = 30;
@@ -71,6 +71,8 @@ const refreshTikTokToken = async (refreshToken: string) => {
 };
 
 const handleRequest = async () => {
+  await connection();
+
   try {
     const results = {
       pinterest: null as string | null,

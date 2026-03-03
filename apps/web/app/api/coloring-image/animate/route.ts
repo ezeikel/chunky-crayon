@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { GenerationType, db } from '@chunky-crayon/db';
 import sharp from 'sharp';
 import { put } from '@/lib/storage';
@@ -71,6 +71,8 @@ async function generateAnimationPrompt(
 }
 
 const handleRequest = async (request: NextRequest) => {
+  await connection();
+
   try {
     // Check if video generation is available
     if (!isVideoGenerationAvailable()) {

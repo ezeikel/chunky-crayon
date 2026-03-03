@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { db } from '@chunky-crayon/db';
 import { getMobileAuthFromHeaders } from '@/lib/mobile-auth';
 
@@ -17,6 +17,8 @@ export async function OPTIONS() {
  * Get current authentication status
  */
 export async function GET(request: NextRequest) {
+  await connection();
+
   try {
     const { userId, deviceId, profileId } = await getMobileAuthFromHeaders(
       request.headers,

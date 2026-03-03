@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, connection } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
 import sharp from 'sharp';
 import { put, del } from '@/lib/storage';
@@ -746,6 +746,8 @@ const postToPinterest = async (
 };
 
 const handleRequest = async (request: Request) => {
+  await connection();
+
   const tempFiles: string[] = [];
 
   try {

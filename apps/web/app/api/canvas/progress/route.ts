@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { put, del } from '@/lib/storage';
 import { auth } from '@/auth';
 import { db } from '@chunky-crayon/db';
@@ -288,6 +288,8 @@ export async function POST(request: NextRequest) {
 
 // GET /api/canvas/progress?imageId=xxx - Get canvas progress
 export async function GET(request: NextRequest) {
+  await connection();
+
   try {
     const userId = await getAuthenticatedUserId(request);
     if (!userId) {

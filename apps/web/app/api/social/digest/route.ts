@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, connection } from 'next/server';
 import { db, GenerationType } from '@chunky-crayon/db';
 import {
   generateInstagramCaption,
@@ -17,6 +17,8 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
  * Runs at :25 after all platform crons finish.
  */
 export const GET = async (request: Request) => {
+  await connection();
+
   try {
     // Auth: CRON_SECRET bearer token
     const authHeader = request.headers.get('authorization');

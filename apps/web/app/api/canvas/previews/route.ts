@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { auth } from '@/auth';
 import { db } from '@chunky-crayon/db';
 import { verifyMobileToken } from '@/lib/mobile-auth';
@@ -22,6 +22,8 @@ export type GetProgressPreviewsResponse = {
  * Returns previewUrl for each image the user has progress on
  */
 export async function GET(request: NextRequest) {
+  await connection();
+
   // Get user from session or mobile token
   let userId: string | undefined;
 

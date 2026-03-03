@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, connection } from 'next/server';
 import { generateFact } from '@/app/actions/generate-fact';
 
 /**
@@ -8,6 +8,8 @@ import { generateFact } from '@/app/actions/generate-fact';
  * Used by the preview page for testing.
  */
 export async function GET() {
+  await connection();
+
   try {
     const fact = await generateFact();
     return NextResponse.json({ fact });

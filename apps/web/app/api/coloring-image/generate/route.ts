@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { GenerationType } from '@chunky-crayon/db';
 import { generateColoringImageOnly } from '@/app/actions/coloring-image';
 
@@ -14,6 +14,8 @@ const isValidGenerationType = (type: string): type is GenerationType =>
   Object.values(GenerationType).includes(type as any);
 
 const handleRequest = async (request: NextRequest) => {
+  await connection();
+
   try {
     let generationType: GenerationType = GenerationType.DAILY; // Default
 

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { headers } from 'next/headers';
 import {
   getActiveProfileForUser,
@@ -22,6 +22,8 @@ export async function OPTIONS() {
  * Auth: Handled by middleware (sets x-user-id header from JWT)
  */
 export async function GET() {
+  await connection();
+
   try {
     const headersList = await headers();
     const userId = headersList.get('x-user-id');

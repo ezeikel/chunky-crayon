@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { auth } from '@/auth';
 import { cookies } from 'next/headers';
 import { ADMIN_EMAILS } from '@/constants';
@@ -15,6 +15,8 @@ import { ADMIN_EMAILS } from '@/constants';
  * 5. Callback exchanges code for access token
  */
 export const GET = async (request: NextRequest) => {
+  await connection();
+
   // Access cookies first to enable crypto.randomUUID() in Next.js 16
   await cookies();
 

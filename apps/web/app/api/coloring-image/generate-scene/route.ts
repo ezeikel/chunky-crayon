@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { generateDailyScene } from '@/lib/scene-generation';
 
 export const maxDuration = 60;
@@ -11,6 +11,8 @@ export const maxDuration = 60;
  * triggering image generation.
  */
 export async function GET(request: NextRequest) {
+  await connection();
+
   // Verify cron secret (reuse same auth pattern)
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

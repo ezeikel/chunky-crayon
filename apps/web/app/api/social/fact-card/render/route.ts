@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import satori from 'satori';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -59,6 +59,8 @@ function emojiToTwemojiUrl(emoji: string): string {
 }
 
 export async function GET(request: NextRequest) {
+  await connection();
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const fact = searchParams.get('fact');

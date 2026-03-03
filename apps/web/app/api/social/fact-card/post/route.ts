@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, connection } from 'next/server';
 import satori from 'satori';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
@@ -570,5 +570,6 @@ export async function POST(request: Request) {
 
 // Also support GET for cron jobs
 export async function GET(request: Request) {
+  await connection();
   return POST(request);
 }
