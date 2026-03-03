@@ -686,7 +686,8 @@
       "unmute": "Töne an",
       "turnOn": "Töne einschalten",
       "turnOff": "Töne ausschalten"
-    }
+    },
+    "relatedPages": "Mehr Ausmalbilder"
   },
   "shareModal": {
     "title": "Kunstwerk teilen",
@@ -1193,7 +1194,10 @@
     "forKids": "Für Kinder",
     "forTeens": "Für Teenager",
     "forAdults": "Für Erwachsene",
-    "ariaLabel": "Brotkrümelnavigation"
+    "ariaLabel": "Brotkrümelnavigation",
+    "daily": "Tägliche Ausmalbilder",
+    "community": "Community-Ausmalbilder",
+    "holidays": "Feiertage & Jahreszeiten"
   },
   "jumpToNav": {
     "jumpToSection": "Zum Abschnitt springen",
@@ -1264,7 +1268,11 @@
     "mascot": "Colo, das freundliche Buntstift-Maskottchen",
     "dailyPage": "Tägliche Ausmalseite",
     "coloringPage": "Ausmalseite",
-    "ogImage": "Chunky Crayon KI-generierte Malbuchseiten"
+    "ogImage": "Chunky Crayon KI-generierte Malbuchseiten",
+    "toddlerPage": "Malvorlage für Kleinkinder",
+    "kidsPage": "Malvorlage für Kinder",
+    "teenPage": "Malvorlage für Teens",
+    "adultPage": "Malvorlage für Erwachsene"
   },
   "metadata": {
     "keywords": "Ausmalbilder, kreative App für Kinder, personalisierte Ausmalbilder, Lernarbeitsblätter, lustige Lernaktivitäten, Kreativ-App für Kinder, interaktive Mal-App, digitales Ausmalen, druckbare Ausmalbilder"

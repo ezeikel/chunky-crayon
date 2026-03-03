@@ -686,7 +686,8 @@
       "unmute": "Activar sonidos",
       "turnOn": "Activar sonidos",
       "turnOff": "Desactivar sonidos"
-    }
+    },
+    "relatedPages": "Más páginas para colorear"
   },
   "shareModal": {
     "title": "Compartir dibujo",
@@ -1193,7 +1194,10 @@
     "forKids": "Para niños",
     "forTeens": "Para adolescentes",
     "forAdults": "Para adultos",
-    "ariaLabel": "Ruta de navegación"
+    "ariaLabel": "Ruta de navegación",
+    "daily": "Páginas para colorear diarias",
+    "community": "Páginas para colorear de la comunidad",
+    "holidays": "Fiestas y estaciones"
   },
   "jumpToNav": {
     "jumpToSection": "Ir a la sección",
@@ -1264,7 +1268,11 @@
     "mascot": "Colo, la simpática mascota crayón",
     "dailyPage": "Página para colorear del día",
     "coloringPage": "Página para colorear",
-    "ogImage": "Páginas para colorear con IA de Chunky Crayon"
+    "ogImage": "Páginas para colorear con IA de Chunky Crayon",
+    "toddlerPage": "Página para colorear para peques",
+    "kidsPage": "Página para colorear para niños",
+    "teenPage": "Página para colorear para adolescentes",
+    "adultPage": "Página para colorear para adultos"
   },
   "metadata": {
     "keywords": "páginas para colorear, app creativa para niños, páginas para colorear personalizadas, fichas educativas, actividades divertidas de aprendizaje, app de creatividad infantil, app interactiva para colorear, colorear digital, páginas para colorear imprimibles"

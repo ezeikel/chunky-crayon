@@ -686,7 +686,8 @@
       "unmute": "おとを出す",
       "turnOn": "おとをオン",
       "turnOff": "おとをオフ"
-    }
+    },
+    "relatedPages": "もっとぬりえ"
   },
   "shareModal": {
     "title": "作品をシェア",
@@ -1193,7 +1194,10 @@
     "forKids": "子ども向け",
     "forTeens": "ティーン向け",
     "forAdults": "大人向け",
-    "ariaLabel": "パンくずリスト"
+    "ariaLabel": "パンくずリスト",
+    "daily": "きょうのぬりえ",
+    "community": "みんなのぬりえ",
+    "holidays": "イベント・きせつ"
   },
   "jumpToNav": {
     "jumpToSection": "セクションへジャンプ",
@@ -1264,7 +1268,11 @@
     "mascot": "やさしいクレヨンのマスコット、コロ",
     "dailyPage": "今日のぬりえ",
     "coloringPage": "ぬりえ",
-    "ogImage": "Chunky Crayon AIで作ったぬりえページ"
+    "ogImage": "Chunky Crayon AIで作ったぬりえページ",
+    "toddlerPage": "幼児向けぬりえページ",
+    "kidsPage": "子ども向けぬりえページ",
+    "teenPage": "ティーン向けぬりえページ",
+    "adultPage": "大人向けぬりえページ"
   },
   "metadata": {
     "keywords": "ぬりえ, 子ども向けクリエイティブアプリ, オリジナルぬりえ, 学習プリント, 楽しい学びあそび, 子どもの創造力アプリ, インタラクティブぬりえアプリ, デジタルぬりえ, 印刷できるぬりえ"

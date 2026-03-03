@@ -686,7 +686,8 @@
       "unmute": "소리 켜기",
       "turnOn": "소리 켜기",
       "turnOff": "소리 끄기"
-    }
+    },
+    "relatedPages": "색칠공부 더 보기"
   },
   "shareModal": {
     "title": "작품 공유하기",
@@ -1193,7 +1194,10 @@
     "forKids": "어린이용",
     "forTeens": "청소년용",
     "forAdults": "어른용",
-    "ariaLabel": "경로"
+    "ariaLabel": "경로",
+    "daily": "매일 색칠놀이",
+    "community": "커뮤니티 색칠놀이",
+    "holidays": "명절 & 계절"
   },
   "jumpToNav": {
     "jumpToSection": "섹션으로 이동",
@@ -1264,7 +1268,11 @@
     "mascot": "친구 같은 크레용 마스코트 콜로",
     "dailyPage": "오늘의 색칠 페이지",
     "coloringPage": "색칠 페이지",
-    "ogImage": "Chunky Crayon AI가 만든 색칠책 페이지"
+    "ogImage": "Chunky Crayon AI가 만든 색칠책 페이지",
+    "toddlerPage": "유아용 색칠 페이지",
+    "kidsPage": "어린이용 색칠 페이지",
+    "teenPage": "청소년용 색칠 페이지",
+    "adultPage": "성인용 색칠 페이지"
   },
   "metadata": {
     "keywords": "색칠공부 도안, 아이들을 위한 창의력 앱, 맞춤형 색칠공부 도안, 교육 워크시트, 재미있는 학습 활동, 어린이 창의력 앱, 인터랙티브 색칠 앱, 디지털 색칠, 출력용 색칠공부 도안"

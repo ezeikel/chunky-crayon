@@ -686,7 +686,8 @@
       "unmute": "Remettre les sons",
       "turnOn": "Activer les sons",
       "turnOff": "Désactiver les sons"
-    }
+    },
+    "relatedPages": "Plus de pages à colorier"
   },
   "shareModal": {
     "title": "Partager l’œuvre",
@@ -1193,7 +1194,10 @@
     "forKids": "Pour les enfants",
     "forTeens": "Pour les ados",
     "forAdults": "Pour les adultes",
-    "ariaLabel": "Fil d’Ariane"
+    "ariaLabel": "Fil d’Ariane",
+    "daily": "Coloriages du jour",
+    "community": "Coloriages de la communauté",
+    "holidays": "Fêtes & saisons"
   },
   "jumpToNav": {
     "jumpToSection": "Aller à la section",
@@ -1264,7 +1268,11 @@
     "mascot": "Colo, la mascotte crayon super sympa",
     "dailyPage": "Page de coloriage du jour",
     "coloringPage": "Page de coloriage",
-    "ogImage": "Pages de coloriage IA de Chunky Crayon"
+    "ogImage": "Pages de coloriage IA de Chunky Crayon",
+    "toddlerPage": "Page de coloriage pour tout-petits",
+    "kidsPage": "Page de coloriage pour enfants",
+    "teenPage": "Page de coloriage pour ados",
+    "adultPage": "Page de coloriage pour adultes"
   },
   "metadata": {
     "keywords": "pages de coloriage, appli créative pour enfants, pages de coloriage personnalisées, fiches éducatives, activités d’apprentissage ludiques, appli de créativité pour enfants, appli de coloriage interactive, coloriage numérique, pages de coloriage à imprimer"
