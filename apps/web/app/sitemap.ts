@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { db } from '@chunky-crayon/db';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { routing } from '@/i18n/routing';
+import { getAllTags, ALL_DIFFICULTIES } from '@/app/data/gallery';
 
 const baseUrl = 'https://chunkycrayon.com';
 
@@ -115,6 +116,55 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
+  // Add category + difficulty combo pages for each locale
+  for (const category of GALLERY_CATEGORIES) {
+    for (const diff of ALL_DIFFICULTIES) {
+      const path = `/gallery/${category.slug}/${diff.toLowerCase()}`;
+      for (const locale of locales) {
+        urls.push({
+          url: `${baseUrl}/${locale}${path}`,
+          lastModified: new Date(),
+          changeFrequency: 'weekly',
+          priority: 0.6,
+          alternates: {
+            languages: Object.fromEntries(
+              locales.map((l) => [l, `${baseUrl}/${l}${path}`]),
+            ),
+          },
+        });
+      }
+    }
+  }
+
+  // Add holiday/seasonal event pages for each locale
+  const holidayEvents = [
+    'christmas',
+    'halloween',
+    'easter',
+    'thanksgiving',
+    'valentines-day',
+    'winter',
+    'spring',
+    'summer',
+    'autumn',
+  ];
+  for (const event of holidayEvents) {
+    const path = `/gallery/holidays/${event}`;
+    for (const locale of locales) {
+      urls.push({
+        url: `${baseUrl}/${locale}${path}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${baseUrl}/${l}${path}`]),
+          ),
+        },
+      });
+    }
+  }
+
   // Add age group pages for each locale
   for (const page of ageGroupPages) {
     for (const locale of locales) {
@@ -150,10 +200,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Fetch dynamic content
-  const [images, blogPosts] = await Promise.all([
+  const [images, blogPosts, tags] = await Promise.all([
     getAllPublicImages(),
     getAllBlogPosts(),
+    getAllTags(),
   ]);
+
+  // Add tag pages for each locale
+  for (const tag of tags) {
+    for (const locale of locales) {
+      urls.push({
+        url: `${baseUrl}/${locale}/gallery/tag/${encodeURIComponent(tag)}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.6,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [
+              l,
+              `${baseUrl}/${l}/gallery/tag/${encodeURIComponent(tag)}`,
+            ]),
+          ),
+        },
+      });
+    }
+  }
 
   // Add coloring image pages for each locale
   // These are the most important pages for SEO - individual coloring pages

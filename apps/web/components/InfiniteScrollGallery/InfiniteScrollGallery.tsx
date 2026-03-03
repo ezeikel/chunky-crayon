@@ -25,6 +25,7 @@ type InfiniteScrollGalleryProps = {
   galleryType?: GalleryType;
   categorySlug?: string;
   difficultySlug?: string;
+  tagSlug?: string;
 };
 
 // TODO: Add emoji tag filtering in the future
@@ -39,6 +40,7 @@ const InfiniteScrollGallery = ({
   galleryType,
   categorySlug,
   difficultySlug,
+  tagSlug,
 }: InfiniteScrollGalleryProps) => {
   const t = useTranslations('gallery.infiniteScroll');
   const router = useRouter();
@@ -79,6 +81,7 @@ const InfiniteScrollGallery = ({
             cursor,
             categorySlug,
             difficultySlug,
+            tagSlug,
           )
         : await loadMoreImages(cursor);
       setImages((prev) => [...prev, ...result.images]);
@@ -89,7 +92,15 @@ const InfiniteScrollGallery = ({
     } finally {
       setIsLoading(false);
     }
-  }, [cursor, hasMore, isLoading, galleryType, categorySlug, difficultySlug]);
+  }, [
+    cursor,
+    hasMore,
+    isLoading,
+    galleryType,
+    categorySlug,
+    difficultySlug,
+    tagSlug,
+  ]);
 
   // Set up Intersection Observer
   useEffect(() => {

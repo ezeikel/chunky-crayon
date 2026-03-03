@@ -12,6 +12,7 @@ import {
 } from '@/lib/sanity';
 
 type PageParams = {
+  locale: string;
   slug: string;
 };
 
@@ -28,7 +29,7 @@ export async function generateMetadata({
 }: {
   params: Promise<PageParams>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const category = await getCategory(slug);
 
   if (!category) {
@@ -36,6 +37,8 @@ export async function generateMetadata({
       title: 'Category Not Found - Chunky Crayon',
     };
   }
+
+  const { generateAlternates } = await import('@/lib/seo');
 
   return {
     title: `${category.title} - Chunky Crayon Blog`,
@@ -48,7 +51,9 @@ export async function generateMetadata({
         category.description ||
         `Browse all ${category.title} articles on the Chunky Crayon blog.`,
       type: 'website',
+      url: `https://chunkycrayon.com/${locale}/blog/category/${slug}`,
     },
+    alternates: generateAlternates(locale, `/blog/category/${slug}`),
   };
 }
 

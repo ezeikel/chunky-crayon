@@ -5,7 +5,12 @@ import type { PaginatedImagesResponse } from '@/app/data/coloring-image';
 import { GALLERY_PAGE_SIZE, getDifficultyFromSlug } from '@/app/data/gallery';
 import { getCategoryBySlug } from '@/constants';
 
-export type GalleryType = 'community' | 'daily' | 'category' | 'difficulty';
+export type GalleryType =
+  | 'community'
+  | 'daily'
+  | 'category'
+  | 'difficulty'
+  | 'tag';
 
 /**
  * Server action to load more gallery images for infinite scroll.
@@ -16,6 +21,7 @@ export async function loadGalleryImages(
   cursor: string,
   categorySlug?: string,
   difficultySlug?: string,
+  tagSlug?: string,
 ): Promise<PaginatedImagesResponse> {
   const limit = GALLERY_PAGE_SIZE;
 
@@ -62,6 +68,16 @@ export async function loadGalleryImages(
       }
       whereClause = {
         difficulty,
+        userId: null,
+      };
+      break;
+
+    case 'tag':
+      if (!tagSlug) {
+        return { images: [], nextCursor: null, hasMore: false };
+      }
+      whereClause = {
+        tags: { has: tagSlug },
         userId: null,
       };
       break;

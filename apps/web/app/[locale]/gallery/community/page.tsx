@@ -7,23 +7,34 @@ import PageWrap from '@/components/PageWrap/PageWrap';
 import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
 import { getCommunityImages } from '@/app/data/gallery';
 
-export const metadata: Metadata = {
-  title: 'Community Coloring Pages - Free Printable Pages | Chunky Crayon',
-  description:
-    'Browse free coloring pages created by our community. Unique designs from creative minds around the world. Color online or print for free!',
-  keywords: [
-    'community coloring pages',
-    'free coloring pages',
-    'user created coloring pages',
-    'printable coloring pages',
-  ],
-  openGraph: {
-    title: 'Community Coloring Pages - Chunky Crayon',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const { generateAlternates } = await import('@/lib/seo');
+
+  return {
+    title: 'Community Coloring Pages - Free Printable Pages | Chunky Crayon',
     description:
-      'Browse free coloring pages created by our community. Unique designs from creative minds around the world.',
-    type: 'website',
-  },
-};
+      'Browse free coloring pages created by our community. Unique designs from creative minds around the world. Color online or print for free!',
+    keywords: [
+      'community coloring pages',
+      'free coloring pages',
+      'user created coloring pages',
+      'printable coloring pages',
+    ],
+    openGraph: {
+      title: 'Community Coloring Pages - Chunky Crayon',
+      description:
+        'Browse free coloring pages created by our community. Unique designs from creative minds around the world.',
+      type: 'website',
+      url: `https://chunkycrayon.com/${locale}/gallery/community`,
+    },
+    alternates: generateAlternates(locale, '/gallery/community'),
+  };
+}
 
 const CommunityGalleryContent = async () => {
   const { images, nextCursor, hasMore } = await getCommunityImages();

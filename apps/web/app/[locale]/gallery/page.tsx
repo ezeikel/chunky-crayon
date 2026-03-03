@@ -30,25 +30,36 @@ import { GALLERY_CATEGORIES } from '@/constants';
 import { Difficulty } from '@chunky-crayon/db';
 import cn from '@/lib/utils';
 
-export const metadata: Metadata = {
-  title: 'Free Coloring Pages Gallery - Chunky Crayon',
-  description:
-    'Browse our free collection of printable coloring pages. Find animals, dragons, unicorns, princesses, and more. New pages added daily!',
-  keywords: [
-    'free coloring pages',
-    'printable coloring pages',
-    'coloring pages for kids',
-    'coloring pages for adults',
-    'animal coloring pages',
-    'dragon coloring pages',
-  ],
-  openGraph: {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const { generateAlternates } = await import('@/lib/seo');
+
+  return {
     title: 'Free Coloring Pages Gallery - Chunky Crayon',
     description:
-      'Browse our free collection of printable coloring pages. Find animals, dragons, unicorns, princesses, and more.',
-    type: 'website',
-  },
-};
+      'Browse our free collection of printable coloring pages. Find animals, dragons, unicorns, princesses, and more. New pages added daily!',
+    keywords: [
+      'free coloring pages',
+      'printable coloring pages',
+      'coloring pages for kids',
+      'coloring pages for adults',
+      'animal coloring pages',
+      'dragon coloring pages',
+    ],
+    openGraph: {
+      title: 'Free Coloring Pages Gallery - Chunky Crayon',
+      description:
+        'Browse our free collection of printable coloring pages. Find animals, dragons, unicorns, princesses, and more.',
+      type: 'website',
+      url: `https://chunkycrayon.com/${locale}/gallery`,
+    },
+    alternates: generateAlternates(locale, '/gallery'),
+  };
+}
 
 const DailyImageSection = async ({ locale }: { locale: string }) => {
   const t = await getTranslations({ locale, namespace: 'gallery' });
@@ -381,19 +392,25 @@ const GalleryStats = async ({ locale }: { locale: string }) => {
         <div className="font-tondo font-bold text-3xl text-crayon-orange">
           {stats.totalImages.toLocaleString()}
         </div>
-        <div className="text-sm text-text-secondary">{t('stats.totalPages')}</div>
+        <div className="text-sm text-text-secondary">
+          {t('stats.totalPages')}
+        </div>
       </div>
       <div>
         <div className="font-tondo font-bold text-3xl text-crayon-purple">
           {stats.communityImages.toLocaleString()}
         </div>
-        <div className="text-sm text-text-secondary">{t('stats.communityPages')}</div>
+        <div className="text-sm text-text-secondary">
+          {t('stats.communityPages')}
+        </div>
       </div>
       <div>
         <div className="font-tondo font-bold text-3xl text-crayon-blue">
           {stats.dailyImages.toLocaleString()}
         </div>
-        <div className="text-sm text-text-secondary">{t('stats.dailyPages')}</div>
+        <div className="text-sm text-text-secondary">
+          {t('stats.dailyPages')}
+        </div>
       </div>
     </div>
   );

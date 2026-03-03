@@ -99,8 +99,9 @@ const AgeGroupSchema = () => {
 };
 
 const FeaturedImages = async ({ locale }: { locale: string }) => {
-  const [t, images] = await Promise.all([
+  const [t, tAlt, images] = await Promise.all([
     getTranslations({ locale, namespace: 'gallery.ageGroupPages.kids' }),
+    getTranslations({ locale, namespace: 'altText' }),
     getFeaturedImages(8),
   ]);
   const validImages = images.filter((img) => img.svgUrl);
@@ -121,7 +122,7 @@ const FeaturedImages = async ({ locale }: { locale: string }) => {
           >
             <Image
               src={image.svgUrl as string}
-              alt={image.title || 'Kids coloring page'}
+              alt={image.title || tAlt('kidsPage')}
               fill
               className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
             />

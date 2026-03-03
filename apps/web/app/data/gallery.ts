@@ -598,3 +598,127 @@ export const getDifficultyFromSlug = (slug: string): Difficulty | null => {
   }
   return null;
 };
+
+// ===== TAG-BASED IMAGES =====
+// Images filtered by a specific tag for programmatic SEO pages
+
+const getTagImagesBase = async (
+  tag: string,
+  cursor?: string,
+  limit: number = GALLERY_PAGE_SIZE,
+): Promise<PaginatedImagesResponse> => {
+  'use cache';
+  cacheLife('gallery-category');
+  cacheTag('gallery-tag', `gallery-tag-${tag}`);
+
+  const images = await db.coloringImage.findMany({
+    where: {
+      tags: { has: tag },
+      userId: null,
+    },
+    select: {
+      id: true,
+      svgUrl: true,
+      title: true,
+      description: true,
+      userId: true,
+      tags: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: limit + 1,
+    ...(cursor
+      ? {
+          cursor: { id: cursor },
+          skip: 1,
+        }
+      : {}),
+  });
+
+  const hasMore = images.length > limit;
+  const resultImages = hasMore ? images.slice(0, limit) : images;
+  const nextCursor = hasMore ? resultImages[resultImages.length - 1]?.id : null;
+
+  return {
+    images: resultImages,
+    nextCursor,
+    hasMore,
+  };
+};
+
+export const getTagImages = async (
+  tag: string,
+  cursor?: string,
+  limit?: number,
+): Promise<PaginatedImagesResponse> => {
+  return getTagImagesBase(tag, cursor, limit);
+};
+
+export const getTagCount = async (tag: string): Promise<number> => {
+  'use cache';
+  cacheLife('gallery-category');
+  cacheTag('gallery-tag', `gallery-tag-count-${tag}`);
+
+  return db.coloringImage.count({
+    where: {
+      tags: { has: tag },
+      userId: null,
+    },
+  });
+};
+
+// Get all distinct tags used across public images
+export const getAllTags = async (): Promise<string[]> => {
+  'use cache';
+  cacheLife('gallery-category');
+  cacheTag('gallery-tags-all');
+
+  const images = await db.coloringImage.findMany({
+    where: { userId: null },
+    select: { tags: true },
+  });
+
+  const tagSet = new Set<string>();
+  for (const image of images) {
+    for (const tag of image.tags) {
+      tagSet.add(tag);
+    }
+  }
+
+  return Array.from(tagSet).sort();
+};
+
+// ===== RELATED IMAGES =====
+// For showing related images on individual coloring image pages
+
+export const getRelatedImages = async (
+  imageId: string,
+  tags: string[],
+  limit: number = 6,
+): Promise<GalleryImage[]> => {
+  'use cache';
+  cacheLife('gallery-category');
+  cacheTag('gallery-related', `gallery-related-${imageId}`);
+
+  if (tags.length === 0) return [];
+
+  return db.coloringImage.findMany({
+    where: {
+      id: { not: imageId },
+      tags: { hasSome: tags },
+      userId: null,
+    },
+    select: {
+      id: true,
+      svgUrl: true,
+      title: true,
+      description: true,
+      userId: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: limit,
+  });
+};

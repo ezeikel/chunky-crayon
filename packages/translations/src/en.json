@@ -576,6 +576,7 @@
   },
   "coloringPage": {
     "title": "Coloring Page",
+    "relatedPages": "More Coloring Pages",
     "defaultDescription": "Free printable coloring page from Chunky Crayon",
     "progress": {
       "colored": "colored",
@@ -1192,10 +1193,13 @@
   "breadcrumbs": {
     "home": "Home",
     "gallery": "Gallery",
+    "daily": "Daily Coloring Pages",
+    "community": "Community Coloring Pages",
     "forToddlers": "For Toddlers",
     "forKids": "For Kids",
     "forTeens": "For Teens",
     "forAdults": "For Adults",
+    "holidays": "Holidays & Seasons",
     "ariaLabel": "Breadcrumb"
   },
   "jumpToNav": {
@@ -1276,6 +1280,10 @@
     "mascot": "Colo the friendly crayon mascot",
     "dailyPage": "Daily coloring page",
     "coloringPage": "Coloring page",
+    "toddlerPage": "Toddler coloring page",
+    "kidsPage": "Kids coloring page",
+    "teenPage": "Teen coloring page",
+    "adultPage": "Adult coloring page",
     "ogImage": "Chunky Crayon AI-Generated Coloring Book Pages"
   },
   "metadata": {

@@ -4,30 +4,42 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarStar, faSparkles } from '@fortawesome/pro-duotone-svg-icons';
+import { getTranslations } from 'next-intl/server';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
 import TodaysDate from '@/components/TodaysDate';
 import { getDailyImages, getTodaysDailyImage } from '@/app/data/gallery';
 
-export const metadata: Metadata = {
-  title: 'Daily Coloring Pages - New Free Page Every Day | Chunky Crayon',
-  description:
-    'Get a free new coloring page every day! Browse our archive of daily coloring pages. Color online or print for free. Never run out of pages to color!',
-  keywords: [
-    'daily coloring pages',
-    'free coloring pages',
-    'new coloring pages',
-    'coloring page of the day',
-    'printable coloring pages',
-  ],
-  openGraph: {
-    title: 'Daily Coloring Pages - Chunky Crayon',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const { generateAlternates } = await import('@/lib/seo');
+
+  return {
+    title: 'Daily Coloring Pages - New Free Page Every Day | Chunky Crayon',
     description:
-      'Get a free new coloring page every day! Browse our archive of daily coloring pages.',
-    type: 'website',
-  },
-};
+      'Get a free new coloring page every day! Browse our archive of daily coloring pages. Color online or print for free. Never run out of pages to color!',
+    keywords: [
+      'daily coloring pages',
+      'free coloring pages',
+      'new coloring pages',
+      'coloring page of the day',
+      'printable coloring pages',
+    ],
+    openGraph: {
+      title: 'Daily Coloring Pages - Chunky Crayon',
+      description:
+        'Get a free new coloring page every day! Browse our archive of daily coloring pages.',
+      type: 'website',
+      url: `https://chunkycrayon.com/${locale}/gallery/daily`,
+    },
+    alternates: generateAlternates(locale, '/gallery/daily'),
+  };
+}
 
 const TodaysFeatured = async () => {
   const todaysImage = await getTodaysDailyImage();
@@ -87,8 +99,11 @@ const TodaysFeatured = async () => {
   );
 };
 
-const DailyGalleryContent = async () => {
-  const { images, nextCursor, hasMore } = await getDailyImages();
+const DailyGalleryContent = async ({ locale }: { locale: string }) => {
+  const [{ images, nextCursor, hasMore }, breadcrumbsT] = await Promise.all([
+    getDailyImages(),
+    getTranslations({ locale, namespace: 'breadcrumbs' }),
+  ]);
 
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
@@ -101,9 +116,9 @@ const DailyGalleryContent = async () => {
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Home', href: '/' },
-          { label: 'Gallery', href: '/gallery' },
-          { label: 'Daily Coloring Pages' },
+          { label: breadcrumbsT('home'), href: '/' },
+          { label: breadcrumbsT('gallery'), href: '/gallery' },
+          { label: breadcrumbsT('daily') },
         ]}
         className="mb-6"
       />
@@ -199,11 +214,17 @@ const LoadingSkeleton = () => (
   </div>
 );
 
-const DailyGalleryPage = () => {
+const DailyGalleryPage = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) => {
+  const { locale } = await params;
+
   return (
     <PageWrap>
       <Suspense fallback={<LoadingSkeleton />}>
-        <DailyGalleryContent />
+        <DailyGalleryContent locale={locale} />
       </Suspense>
     </PageWrap>
   );

@@ -24,6 +24,7 @@ import {
 import cn from '@/utils/cn';
 
 type PageParams = {
+  locale: string;
   slug: string;
 };
 
@@ -86,7 +87,7 @@ export async function generateMetadata({
 }: {
   params: Promise<PageParams>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const post = await getPost(slug);
 
   if (!post) {
@@ -101,6 +102,8 @@ export async function generateMetadata({
     ? urlFor(post.featuredImage).width(1200).height(630).url()
     : undefined;
 
+  const { generateAlternates } = await import('@/lib/seo');
+
   return {
     title,
     description,
@@ -111,6 +114,7 @@ export async function generateMetadata({
       type: 'article',
       publishedTime: post.publishedAt,
       authors: post.author?.name ? [post.author.name] : undefined,
+      url: `https://chunkycrayon.com/${locale}/blog/${slug}`,
       images: imageUrl
         ? [
             {
@@ -128,6 +132,7 @@ export async function generateMetadata({
       description,
       images: imageUrl ? [imageUrl] : undefined,
     },
+    alternates: generateAlternates(locale, `/blog/${slug}`),
   };
 }
 

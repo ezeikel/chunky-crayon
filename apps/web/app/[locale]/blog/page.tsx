@@ -9,17 +9,28 @@ import {
   categoriesQuery,
 } from '@/lib/sanity';
 
-export const metadata: Metadata = {
-  title: 'Blog - Chunky Crayon',
-  description:
-    'Tips, ideas, and inspiration for creative coloring activities. Discover coloring tips for kids, adults, and families.',
-  openGraph: {
-    title: 'The Chunky Crayon Blog',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const { generateAlternates } = await import('@/lib/seo');
+
+  return {
+    title: 'Blog - Chunky Crayon',
     description:
       'Tips, ideas, and inspiration for creative coloring activities. Discover coloring tips for kids, adults, and families.',
-    type: 'website',
-  },
-};
+    openGraph: {
+      title: 'The Chunky Crayon Blog',
+      description:
+        'Tips, ideas, and inspiration for creative coloring activities. Discover coloring tips for kids, adults, and families.',
+      type: 'website',
+      url: `https://chunkycrayon.com/${locale}/blog`,
+    },
+    alternates: generateAlternates(locale, '/blog'),
+  };
+}
 
 async function getPosts() {
   'use cache';

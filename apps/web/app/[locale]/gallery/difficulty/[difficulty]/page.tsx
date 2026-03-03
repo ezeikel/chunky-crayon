@@ -10,6 +10,7 @@ import {
   faMedal,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { getTranslations } from 'next-intl/server';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
@@ -170,16 +171,17 @@ const DifficultyGalleryContent = async ({
 }: {
   paramsPromise: Promise<PageParams>;
 }) => {
-  const { difficulty: difficultySlug } = await paramsPromise;
+  const { locale, difficulty: difficultySlug } = await paramsPromise;
   const difficulty = getDifficultyFromSlug(difficultySlug);
 
   if (!difficulty) {
     notFound();
   }
 
-  const [galleryData, counts] = await Promise.all([
+  const [galleryData, counts, breadcrumbsT] = await Promise.all([
     getDifficultyImages(difficulty),
     getDifficultyCounts(),
+    getTranslations({ locale, namespace: 'breadcrumbs' }),
   ]);
 
   const { images, nextCursor, hasMore } = galleryData;
@@ -234,8 +236,8 @@ const DifficultyGalleryContent = async ({
       {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
-          { label: 'Home', href: '/' },
-          { label: 'Gallery', href: '/gallery' },
+          { label: breadcrumbsT('home'), href: '/' },
+          { label: breadcrumbsT('gallery'), href: '/gallery' },
           { label: `${label} Coloring Pages` },
         ]}
         className="mb-6"
