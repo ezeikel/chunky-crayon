@@ -12,6 +12,7 @@ import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import fetchSvg from '@/utils/fetchSvg';
+import { proxyR2Url } from '@/utils/proxyR2Url';
 
 const formatTitleForFileName = (title: string | undefined): string => {
   if (!title) {
@@ -58,8 +59,8 @@ const DownloadPDFButtonContent = ({
     const loadSvgs = async () => {
       try {
         const [imageSvgData, qrCodeSvgData] = await Promise.all([
-          fetchSvg(coloringImage.svgUrl as string),
-          fetchSvg(coloringImage.qrCodeUrl as string),
+          fetchSvg(proxyR2Url(coloringImage.svgUrl as string)),
+          fetchSvg(proxyR2Url(coloringImage.qrCodeUrl as string)),
         ]);
         setImageSvg(imageSvgData);
         setQrCodeSvg(qrCodeSvgData);

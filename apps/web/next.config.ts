@@ -5,6 +5,14 @@ import withVercelToolbar from '@vercel/toolbar/plugins/next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/_r2/:path*',
+        destination: 'https://assets.chunkycrayon.com/:path*',
+      },
+    ];
+  },
   cacheComponents: true,
   cacheLife: {
     // Blog list - updates daily via cron, but use webhook for immediate invalidation

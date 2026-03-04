@@ -19,6 +19,7 @@ import { scanlineFill, hexToRGBA } from '@/utils/floodFill';
 import { drawTexturedStroke } from '@/utils/brushTextures';
 import { createFillPattern } from '@/utils/fillPatterns';
 import { createIconCursor } from '@/utils/iconCursor';
+import { proxyR2Url } from '@/utils/proxyR2Url';
 import {
   pointsToSvgPath,
   type SerializableCanvasAction,
@@ -900,7 +901,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       if (drawingCanvas && imageCanvas && drawingCtx && imageCtx && container) {
         const img = new Image();
 
-        fetch(coloringImage.svgUrl as string)
+        fetch(proxyR2Url(coloringImage.svgUrl as string))
           .then((response) => response.text())
           .then((svgText) => {
             const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
