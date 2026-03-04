@@ -90,11 +90,10 @@ const sentryOptions = {
   project: 'chunky-crayon-web',
   authToken: process.env.SENTRY_AUTH_TOKEN,
   widenClientFileUpload: true,
-  transpileClientSDK: true,
   tunnelRoute: '/monitoring',
-  hideSourceMaps: true,
-  disableLogger: true,
-  automaticVercelMonitors: true,
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+  },
 };
 
 // Create the next-intl plugin (points to i18n/request.ts)
