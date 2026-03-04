@@ -8,7 +8,7 @@ import { faTag } from '@fortawesome/pro-duotone-svg-icons';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
-import { getTagImages, getTagCount, getAllTags } from '@/app/data/gallery';
+import { getTagImages, getTagCount } from '@/app/data/gallery';
 import { generateAlternates } from '@/lib/seo';
 import { GALLERY_CATEGORIES } from '@/constants';
 
@@ -16,11 +16,6 @@ type PageParams = {
   locale: string;
   tag: string;
 };
-
-export async function generateStaticParams() {
-  const tags = await getAllTags();
-  return tags.map((tag) => ({ tag }));
-}
 
 export async function generateMetadata({
   params,

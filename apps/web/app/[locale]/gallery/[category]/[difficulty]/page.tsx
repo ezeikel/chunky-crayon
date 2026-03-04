@@ -13,28 +13,14 @@ import {
   DIFFICULTY_DESCRIPTIONS,
   ALL_DIFFICULTIES,
 } from '@/app/data/gallery';
-import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
+import { getCategoryBySlug } from '@/constants';
 import { generateAlternates } from '@/lib/seo';
-import { Difficulty } from '@chunky-crayon/db';
 
 type PageParams = {
   locale: string;
   category: string;
   difficulty: string;
 };
-
-export async function generateStaticParams() {
-  const params: Array<{ category: string; difficulty: string }> = [];
-  for (const cat of GALLERY_CATEGORIES) {
-    for (const diff of ALL_DIFFICULTIES) {
-      params.push({
-        category: cat.slug,
-        difficulty: diff.toLowerCase(),
-      });
-    }
-  }
-  return params;
-}
 
 export async function generateMetadata({
   params,
