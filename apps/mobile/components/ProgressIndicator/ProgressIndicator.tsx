@@ -10,7 +10,7 @@ type ProgressIndicatorProps = {
  * Shows just the percentage to save space on mobile.
  */
 const ProgressIndicator = ({ style }: ProgressIndicatorProps) => {
-  const { progress } = useCanvasStore();
+  const progress = useCanvasStore((s) => s.progress);
 
   return (
     <View style={[styles.container, style]}>

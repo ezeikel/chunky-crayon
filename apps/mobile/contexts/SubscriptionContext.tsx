@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  useMemo,
   ReactNode,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -131,15 +132,26 @@ export const SubscriptionProvider = ({
   const planName = customerInfo ? getActivePlanName(customerInfo) : null;
   const isTrialing = customerInfo ? isInTrialPeriod(customerInfo) : false;
 
-  const value: SubscriptionContextType = {
-    isInitialized,
-    isLoading,
-    customerInfo,
-    hasSubscription,
-    planName,
-    isTrialing,
-    refreshSubscription,
-  };
+  const value = useMemo<SubscriptionContextType>(
+    () => ({
+      isInitialized,
+      isLoading,
+      customerInfo,
+      hasSubscription,
+      planName,
+      isTrialing,
+      refreshSubscription,
+    }),
+    [
+      isInitialized,
+      isLoading,
+      customerInfo,
+      hasSubscription,
+      planName,
+      isTrialing,
+      refreshSubscription,
+    ],
+  );
 
   return (
     <SubscriptionContext.Provider value={value}>

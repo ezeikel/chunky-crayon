@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useInputMode } from "./InputModeContext";
 import Spinner from "@/components/Spinner/Spinner";
 
@@ -54,20 +48,19 @@ const TextInputPanel = ({ onSubmit, isSubmitting }: TextInputPanelProps) => {
         editable={!isSubmitting}
       />
 
-      <TouchableOpacity
+      <Pressable
         style={[
           styles.submitButton,
           isSubmitting && styles.submitButtonDisabled,
         ]}
         onPress={onSubmit}
         disabled={isSubmitting || !description.trim()}
-        activeOpacity={0.8}
       >
         <Text style={styles.buttonText}>
           {isSubmitting ? "Creating..." : "Create coloring page"}
         </Text>
         {isSubmitting && <Spinner color={COLORS.white} size={18} />}
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };

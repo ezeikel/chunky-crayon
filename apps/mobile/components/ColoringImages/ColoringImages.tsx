@@ -13,14 +13,9 @@ import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import useColoringImages from "@/hooks/api/useColoringImages";
 import Loading from "@/components/Loading/Loading";
+import { COLORS } from "@/lib/design";
 import { perfect } from "@/styles";
 import Spinner from "../Spinner/Spinner";
-
-const COLORS = {
-  textMuted: "#8B7E78",
-  white: "#FFFFFF",
-  crayonOrange: "#E46444",
-};
 
 // Memoized Square component to prevent unnecessary re-renders
 const Square = memo(
@@ -241,7 +236,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   endMessage: {
-    color: COLORS.textMuted,
+    color: COLORS.textWarmMuted,
     fontSize: 14,
     fontFamily: "TondoTrial-Regular",
     textAlign: "center",

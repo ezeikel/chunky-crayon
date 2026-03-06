@@ -11,7 +11,8 @@ import { selectionChanged } from "@/utils/haptics";
  */
 const ColorPaletteBar = () => {
   const insets = useSafeAreaInsets();
-  const { selectedColor, setColor } = useCanvasStore();
+  const selectedColor = useCanvasStore((s) => s.selectedColor);
+  const setColor = useCanvasStore((s) => s.setColor);
 
   const handleColorSelect = (color: string) => {
     selectionChanged();

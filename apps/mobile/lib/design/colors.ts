@@ -21,12 +21,16 @@ export const COLORS = {
   textPrimary: "#3D2C1E",
   textSecondary: "#6B5344",
   textMuted: "#A89080",
+  textGray: "#374151",
+  textWarmMuted: "#8B7E78",
 
   // UI colors
   white: "#FFFFFF",
   black: "#000000",
 
   // Accent colors
+  crayonOrange: "#E46444",
+  secondaryOrange: "#F1AE7E",
   coral: "#FF6B6B",
   peach: "#FFAB91",
   yellow: "#FFD93D",

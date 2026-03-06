@@ -320,16 +320,24 @@ const StageDot = ({ index }: { index: number }) => {
   return <Animated.View style={[styles.stageCircle, animatedStyle]} />;
 };
 
+const DOT_INACTIVE_WIDTH = 8;
+const DOT_ACTIVE_WIDTH = 24;
+
 const PaginationDot = ({ active }: { active: boolean }) => {
-  const animatedWidth = useSharedValue(active ? 24 : 8);
+  const animatedScale = useSharedValue(
+    active ? DOT_ACTIVE_WIDTH / DOT_INACTIVE_WIDTH : 1,
+  );
   const animatedOpacity = useSharedValue(active ? 1 : 0.3);
 
   // Update animation values when active state changes
-  animatedWidth.value = withTiming(active ? 24 : 8, { duration: 200 });
+  animatedScale.value = withTiming(
+    active ? DOT_ACTIVE_WIDTH / DOT_INACTIVE_WIDTH : 1,
+    { duration: 200 },
+  );
   animatedOpacity.value = withTiming(active ? 1 : 0.3, { duration: 200 });
 
   const animatedStyle = useAnimatedStyle(() => ({
-    width: animatedWidth.value,
+    transform: [{ scaleX: animatedScale.value }],
     opacity: animatedOpacity.value,
   }));
 

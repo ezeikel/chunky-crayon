@@ -9,7 +9,8 @@ type ColorPaletteProps = {
 };
 
 const ColorPalette = ({ style }: ColorPaletteProps) => {
-  const { selectedColor, setColor } = useCanvasStore();
+  const selectedColor = useCanvasStore((s) => s.selectedColor);
+  const setColor = useCanvasStore((s) => s.setColor);
 
   return (
     <View className="rounded-lg bg-white" style={[style, perfect.boxShadow]}>

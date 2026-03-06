@@ -4,6 +4,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useMemo,
   ReactNode,
 } from "react";
 import { Alert } from "react-native";
@@ -368,19 +369,34 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => clearInterval(interval);
   }, [signOut]);
 
-  const value: AuthContextType = {
-    isLoading,
-    isAuthenticated,
-    isLinked,
-    user,
-    signInWithGoogleHandler,
-    signInWithAppleHandler,
-    signInWithFacebookHandler,
-    sendMagicLinkHandler,
-    handleMagicLinkCallback,
-    signOut,
-    refreshAuth,
-  };
+  const value = useMemo<AuthContextType>(
+    () => ({
+      isLoading,
+      isAuthenticated,
+      isLinked,
+      user,
+      signInWithGoogleHandler,
+      signInWithAppleHandler,
+      signInWithFacebookHandler,
+      sendMagicLinkHandler,
+      handleMagicLinkCallback,
+      signOut,
+      refreshAuth,
+    }),
+    [
+      isLoading,
+      isAuthenticated,
+      isLinked,
+      user,
+      signInWithGoogleHandler,
+      signInWithAppleHandler,
+      signInWithFacebookHandler,
+      sendMagicLinkHandler,
+      handleMagicLinkCallback,
+      signOut,
+      refreshAuth,
+    ],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

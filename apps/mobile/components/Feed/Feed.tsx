@@ -23,6 +23,7 @@ import {
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { useFeed } from "@/hooks/api";
 import Loading from "@/components/Loading/Loading";
+import { COLORS } from "@/lib/design";
 import { perfect } from "@/styles";
 import type {
   FeedColoringImage,
@@ -30,14 +31,6 @@ import type {
   FeedInProgressItem,
   ChallengeWithProgress,
 } from "@/api";
-
-const COLORS = {
-  textMuted: "#8B7E78",
-  textPrimary: "#374151",
-  white: "#FFFFFF",
-  crayonOrange: "#E46444",
-  secondaryOrange: "#F1AE7E",
-};
 
 const outerPadding = 20;
 const gridGap = 12;
@@ -474,7 +467,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: "TondoTrial-Bold",
-    color: COLORS.textPrimary,
+    color: COLORS.textGray,
   },
   horizontalList: {
     paddingHorizontal: outerPadding,
@@ -509,7 +502,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 16,
     fontFamily: "TondoTrial-Regular",
-    color: COLORS.textMuted,
+    color: COLORS.textWarmMuted,
     textAlign: "center",
     marginBottom: 16,
   },
@@ -533,7 +526,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontFamily: "TondoTrial-Regular",
-    color: COLORS.textMuted,
+    color: COLORS.textWarmMuted,
     textAlign: "center",
   },
   challengeCard: {
@@ -558,13 +551,13 @@ const styles = StyleSheet.create({
   challengeTitle: {
     fontSize: 16,
     fontFamily: "TondoTrial-Bold",
-    color: COLORS.textPrimary,
+    color: COLORS.textGray,
     marginBottom: 2,
   },
   challengeProgress: {
     fontSize: 14,
     fontFamily: "TondoTrial-Regular",
-    color: COLORS.textMuted,
+    color: COLORS.textWarmMuted,
   },
   progressBarContainer: {
     height: 8,

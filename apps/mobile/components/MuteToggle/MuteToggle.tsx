@@ -19,7 +19,8 @@ type MuteToggleProps = {
  * - Coral color scheme (#E46444)
  */
 const MuteToggle = ({ style }: MuteToggleProps) => {
-  const { isMuted, toggleMuted } = useCanvasStore();
+  const isMuted = useCanvasStore((s) => s.isMuted);
+  const toggleMuted = useCanvasStore((s) => s.toggleMuted);
 
   const handleToggle = () => {
     tapLight();

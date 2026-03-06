@@ -1,4 +1,10 @@
-import { createContext, useContext, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useCallback,
+  useMemo,
+  ReactNode,
+} from "react";
 import { useUser } from "@/hooks/api";
 import type { UserResponse } from "@/api";
 
@@ -38,14 +44,25 @@ type UserProviderProps = {
 export const UserProvider = ({ children }: UserProviderProps) => {
   const { data, isLoading, refetch } = useUser();
 
-  const value: UserContextType = {
-    isLoading,
-    isAuthenticated: !!data?.user,
-    user: data?.user ?? null,
-    activeProfile: data?.activeProfile ?? null,
-    stickerStats: data?.stickerStats ?? defaultStickerStats,
-    refetch: () => refetch(),
-  };
+  const stableRefetch = useCallback(() => refetch(), [refetch]);
+
+  const value = useMemo<UserContextType>(
+    () => ({
+      isLoading,
+      isAuthenticated: !!data?.user,
+      user: data?.user ?? null,
+      activeProfile: data?.activeProfile ?? null,
+      stickerStats: data?.stickerStats ?? defaultStickerStats,
+      refetch: stableRefetch,
+    }),
+    [
+      isLoading,
+      data?.user,
+      data?.activeProfile,
+      data?.stickerStats,
+      stableRefetch,
+    ],
+  );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

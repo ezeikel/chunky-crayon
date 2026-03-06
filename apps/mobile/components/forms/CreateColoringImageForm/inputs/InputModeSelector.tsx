@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faPencil,
@@ -83,11 +83,10 @@ const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
         const isDisabled = disabled || isProcessing;
 
         return (
-          <TouchableOpacity
+          <Pressable
             key={option.mode}
             onPress={() => handleModeChange(option.mode)}
             disabled={isDisabled}
-            activeOpacity={0.8}
             style={[
               styles.button,
               isActive && styles.buttonActive,
@@ -109,7 +108,7 @@ const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
             <Text style={[styles.label, isActive && styles.labelActive]}>
               {option.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>

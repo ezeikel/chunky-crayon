@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faMicrophoneLines, faStop } from "@fortawesome/pro-duotone-svg-icons";
 import Animated, {
@@ -213,7 +213,7 @@ const VoiceInputPanel = ({
 
       {/* Microphone button */}
       <View style={styles.micContainer}>
-        <TouchableOpacity
+        <Pressable
           onPress={handleMicPress}
           disabled={isSubmitting}
           accessibilityLabel={
@@ -242,7 +242,7 @@ const VoiceInputPanel = ({
               secondaryOpacity={1}
             />
           </View>
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Status text */}
         <Text style={styles.statusText}>
@@ -263,20 +263,19 @@ const VoiceInputPanel = ({
 
       {/* Submit button - only show when we have text */}
       {description.trim() && !isListening && (
-        <TouchableOpacity
+        <Pressable
           style={[
             styles.submitButton,
             isSubmitting && styles.submitButtonDisabled,
           ]}
           onPress={handleSubmit}
           disabled={isSubmitting}
-          activeOpacity={0.8}
         >
           <Text style={styles.buttonText}>
             {isSubmitting ? "Creating..." : "Create coloring page"}
           </Text>
           {isSubmitting && <Spinner color={COLORS.white} size={18} />}
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );

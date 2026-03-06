@@ -15,7 +15,8 @@ const SIZES = Object.entries(BRUSH_SIZES) as [
 ][];
 
 const BrushSizeSelector = ({ style }: BrushSizeSelectorProps) => {
-  const { brushSize, setBrushSize } = useCanvasStore();
+  const brushSize = useCanvasStore((s) => s.brushSize);
+  const setBrushSize = useCanvasStore((s) => s.setBrushSize);
 
   return (
     <View style={[styles.container, style]}>

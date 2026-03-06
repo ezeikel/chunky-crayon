@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -230,9 +230,8 @@ const ColoAvatar = ({
       ))}
 
       {/* Main avatar container */}
-      <TouchableOpacity
+      <Pressable
         onPress={handlePress}
-        activeOpacity={0.9}
         accessibilityLabel={`${stageInfo.name} - ${stageInfo.description}`}
         accessibilityRole="button"
         style={styles.touchable}
@@ -276,7 +275,7 @@ const ColoAvatar = ({
           {/* Shine effect overlay */}
           <View style={styles.shineOverlay} />
         </Animated.View>
-      </TouchableOpacity>
+      </Pressable>
 
       {/* Progress ring (optional) */}
       {hasProgress && (
