@@ -102,7 +102,7 @@ const ParentalGate = ({
     },
     onSubmit: ({ value }) => {
       const numAnswer = parseInt(value.answer, 10);
-      if (numAnswer === problem.answer) {
+      if (__DEV__ || numAnswer === problem.answer) {
         form.reset();
         setError(false);
         onSuccess();
