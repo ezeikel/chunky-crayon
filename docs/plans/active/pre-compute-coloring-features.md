@@ -91,7 +91,7 @@ type GridColorMap = {
 "use server";
 
 import { generateObject, models, getTracedModels } from "@/lib/ai";
-import { db } from "@chunky-crayon/db";
+import { db } from "@one-colored-pixel/db";
 import {
   gridColorMapSchema,
   GRID_COLOR_MAP_SYSTEM,
@@ -215,7 +215,7 @@ Style: whimsical, playful, soothing like a kids' app or cartoon.`;
 "use server";
 
 import { put } from "@/lib/storage";
-import { db } from "@chunky-crayon/db";
+import { db } from "@one-colored-pixel/db";
 import { generateBackgroundMusic } from "@/lib/elevenlabs";
 
 export async function generateBackgroundMusicForImage(

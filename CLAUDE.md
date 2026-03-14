@@ -48,19 +48,20 @@ This project uses Neon PostgreSQL with branch-based development:
 
 ## Project Structure
 
-- **Monorepo** using Turborepo + pnpm workspaces
-- `apps/web` - Next.js 16 web application
-- `apps/mobile` - React Native mobile app
-- `packages/db` - Prisma database client
-- `packages/translations` - i18n translations (next-intl)
+- **Monorepo** using Turborepo + pnpm workspaces (parent brand: One Colored Pixel)
+- `apps/chunky-crayon-web` - Next.js 16 web application (Chunky Crayon - kids coloring)
+- `apps/chunky-crayon-mobile` - React Native mobile app (Chunky Crayon)
+- `apps/coloring-habitat-web` - Next.js 16 web application (Coloring Habitat - adult coloring)
+- `packages/db` - Prisma database client (`@one-colored-pixel/db`)
+- `packages/chunky-crayon-translations` - i18n translations for Chunky Crayon (`@one-colored-pixel/chunky-crayon-translations`)
 
 ## Vercel Deployment
 
-The web app is deployed via Vercel. **Important**: The Vercel project is linked in `apps/web`, not the repo root.
+The web app is deployed via Vercel. **Important**: The Vercel project is linked in `apps/chunky-crayon-web`, not the repo root.
 
 - **Project**: `chunky-crayon-web` (in Chewy Bytes team)
-- **Vercel CLI**: Always run from `apps/web` directory when managing env vars or deployments
-- **Env vars**: Use `cd apps/web && vercel env ls` to list/manage environment variables
+- **Vercel CLI**: Always run from `apps/chunky-crayon-web` directory when managing env vars or deployments
+- **Env vars**: Use `cd apps/chunky-crayon-web && vercel env ls` to list/manage environment variables
 
 ### Monorepo Constraints
 
@@ -70,11 +71,11 @@ The web app is deployed via Vercel. **Important**: The Vercel project is linked 
 
 ### Middleware → Proxy
 
-In Next.js 16, `middleware.ts` was renamed to `proxy.ts`. The middleware file is located at `apps/web/proxy.ts`.
+In Next.js 16, `middleware.ts` was renamed to `proxy.ts`. The middleware file is located at `apps/chunky-crayon-web/proxy.ts`.
 
 ## Translations
 
-Only edit `packages/translations/src/en.json`. A GitHub Action automatically populates all other languages in CI.
+Only edit `packages/chunky-crayon-translations/src/en.json`. A GitHub Action automatically populates all other languages in CI.
 
 ## Commits
 
@@ -89,7 +90,7 @@ Use semantic commit style (`type(scope): message`). Keep messages as one-liners,
 
 ## AI Prompt Optimization
 
-Model-specific prompt engineering research is documented in `apps/web/lib/ai/PROMPT_OPTIMIZATION.md`. Read this before modifying any AI prompts — each model (GPT Image 1.5, Perplexity Sonar, Claude Sonnet 4.5, Gemini) has different optimal patterns.
+Model-specific prompt engineering research is documented in `apps/chunky-crayon-web/lib/ai/PROMPT_OPTIMIZATION.md`. Read this before modifying any AI prompts — each model (GPT Image 1.5, Perplexity Sonar, Claude Sonnet 4.5, Gemini) has different optimal patterns.
 
 ## Mobile App Development
 
@@ -100,11 +101,11 @@ Model-specific prompt engineering research is documented in `apps/web/lib/ai/PRO
 - Local-first data storage (no PII collection)
 - Target: iPad-first, ages 3-8, COPPA/GDPR-K compliant
 
-For detailed plans, see `apps/web/docs/MOBILE_APP_PLAN.md` (only read when needed).
+For detailed plans, see `docs/plans/active/MOBILE_APP_PLAN.md` (only read when needed).
 
 ### Running the Mobile App
 
-From `apps/mobile`:
+From `apps/chunky-crayon-mobile`:
 
 **iOS:**
 

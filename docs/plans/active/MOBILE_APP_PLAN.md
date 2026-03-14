@@ -3261,7 +3261,7 @@ packages/
 ```json
 // packages/assets/package.json
 {
-  "name": "@chunky-crayon/assets",
+  "name": "@one-colored-pixel/assets",
   "version": "0.1.0",
   "main": "index.ts",
   "exports": {
@@ -3275,10 +3275,10 @@ packages/
 
 ```typescript
 // Web (apps/web)
-import toolSelect from "@chunky-crayon/assets/sounds/tool-select.mp3";
+import toolSelect from "@one-colored-pixel/assets/sounds/tool-select.mp3";
 
 // Mobile (apps/mobile) - requires metro.config.js update
-import toolSelect from "@chunky-crayon/assets/sounds/tool-select.mp3";
+import toolSelect from "@one-colored-pixel/assets/sounds/tool-select.mp3";
 ```
 
 **Benefits:**
