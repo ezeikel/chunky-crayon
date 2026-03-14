@@ -8,6 +8,8 @@
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=@one-colored-pixel/chunky-crayon-web",
     "dev:mobile": "turbo run dev --filter=@one-colored-pixel/chunky-crayon-mobile",
+    "dev:habitat": "turbo run dev --filter=@one-colored-pixel/coloring-habitat-web",
+    "build:habitat": "turbo run build --filter=@one-colored-pixel/coloring-habitat-web",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
