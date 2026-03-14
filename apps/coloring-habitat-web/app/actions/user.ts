@@ -1,4 +1,3 @@
-// @ts-nocheck — TODO: adapt for Habitat auth & db
 "use server";
 
 import { headers } from "next/headers";

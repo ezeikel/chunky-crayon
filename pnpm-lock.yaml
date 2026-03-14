@@ -665,6 +665,9 @@ importers:
       '@ai-sdk/replicate':
         specifier: ^2.0.21
         version: 2.0.21(zod@3.25.76)
+      '@auth/prisma-adapter':
+        specifier: ^2.9.1
+        version: 2.10.0(@prisma/client@7.0.1(prisma@7.2.0(@types/react@19.1.12)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.9.3))(typescript@5.9.3))(nodemailer@7.0.6)
       '@aws-sdk/client-s3':
         specifier: ^3.825.0
         version: 3.882.0
@@ -716,6 +719,9 @@ importers:
       next:
         specifier: 16.1.0
         version: 16.1.0(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next-auth:
+        specifier: 5.0.0-beta.28
+        version: 5.0.0-beta.28(next@16.1.0(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(nodemailer@7.0.6)(react@19.1.0)
       openai:
         specifier: ^6.21.0
         version: 6.21.0(ws@8.18.3(bufferutil@4.0.9))(zod@3.25.76)
@@ -734,6 +740,9 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      resend:
+        specifier: ^4.5.1
+        version: 4.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       sharp:
         specifier: ^0.34.1
         version: 0.34.5
