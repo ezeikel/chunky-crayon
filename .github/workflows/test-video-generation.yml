@@ -60,8 +60,8 @@ jobs:
 
       - name: Generate Prisma client and build db
         run: |
-          pnpm --filter @chunky-crayon/db exec prisma generate
-          pnpm --filter @chunky-crayon/db build
+          pnpm --filter @one-colored-pixel/db exec prisma generate
+          pnpm --filter @one-colored-pixel/db build
 
       - name: Run video generation test
         env:
@@ -71,14 +71,14 @@ jobs:
           TEST_COLORING_IMAGE_ID: ${{ inputs.coloring_image_id }}
           TEST_PROMPT_SOURCE: ${{ inputs.prompt_source }}
           TEST_CUSTOM_PROMPT: ${{ inputs.custom_prompt }}
-        working-directory: ./apps/web
+        working-directory: ./apps/chunky-crayon-web
         run: npx tsx scripts/test-video-generation.ts
 
       - name: Upload video artifact
         uses: actions/upload-artifact@v4
         with:
           name: test-animation-${{ github.run_id }}
-          path: apps/web/test-output/
+          path: apps/chunky-crayon-web/test-output/
           retention-days: 7
           if-no-files-found: error
 

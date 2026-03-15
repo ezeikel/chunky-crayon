@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'packages/translations/src/en.json'
+      - 'packages/chunky-crayon-translations/src/en.json'
   # Allow manual trigger for testing
   workflow_dispatch:
 
@@ -40,7 +40,7 @@ jobs:
 
       - name: Run audit to check for missing translations
         id: audit
-        working-directory: packages/translations
+        working-directory: packages/chunky-crayon-translations
         run: |
           if pnpm run audit 2>&1 | grep -qi "MISSING KEYS"; then
             echo "needs_translation=true" >> $GITHUB_OUTPUT
@@ -51,7 +51,7 @@ jobs:
 
       - name: Translate missing keys
         if: steps.audit.outputs.needs_translation == 'true'
-        working-directory: packages/translations
+        working-directory: packages/chunky-crayon-translations
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: pnpm translate:diff
@@ -60,5 +60,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(i18n): auto-translate missing keys [skip ci]"
-          file_pattern: "packages/translations/src/*.json"
+          file_pattern: "packages/chunky-crayon-translations/src/*.json"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"

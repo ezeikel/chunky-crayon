@@ -830,7 +830,7 @@ pnpm tsx packages/translations/scripts/translate.ts
 pnpm tsx packages/translations/scripts/audit-translations.ts
 
 # 4. Build translations package
-pnpm build --filter=@chunky-crayon/translations
+pnpm build --filter=@one-colored-pixel/chunky-crayon-translations
 
 # 5. Test in browser
 ```

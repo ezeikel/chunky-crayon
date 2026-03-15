@@ -60,7 +60,7 @@ jobs:
 
       - name: Run translation review for ${{ matrix.locale }}
         if: steps.check-locale.outputs.skip != 'true'
-        working-directory: packages/translations
+        working-directory: packages/chunky-crayon-translations
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: pnpm review --locale=${{ matrix.locale }}
@@ -69,7 +69,7 @@ jobs:
         if: steps.check-locale.outputs.skip != 'true'
         id: check-changes
         run: |
-          if git diff --quiet packages/translations/src/${{ matrix.locale }}.json; then
+          if git diff --quiet packages/chunky-crayon-translations/src/${{ matrix.locale }}.json; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
@@ -101,7 +101,7 @@ jobs:
             const branchName = `i18n/review-${locale}-${date}`;
 
             // Find the latest report
-            const reportsDir = 'packages/translations/reports';
+            const reportsDir = 'packages/chunky-crayon-translations/reports';
             const files = fs.readdirSync(reportsDir)
               .filter(f => f.endsWith('.md'))
               .sort()
@@ -132,7 +132,7 @@ jobs:
 
             // Create branch and commit
             await exec.exec('git', ['checkout', '-b', branchName]);
-            await exec.exec('git', ['add', `packages/translations/src/${locale}.json`]);
+            await exec.exec('git', ['add', `packages/chunky-crayon-translations/src/${locale}.json`]);
             await exec.exec('git', ['commit', '-m', `chore(i18n): auto-fix ${localeName} translation issues`]);
             await exec.exec('git', ['push', 'origin', branchName]);
 
@@ -178,13 +178,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: translation-review-${{ matrix.locale }}
-          path: packages/translations/reports/*.md
+          path: packages/chunky-crayon-translations/reports/*.md
           retention-days: 90
 
       - name: Check for critical issues
         if: steps.check-locale.outputs.skip != 'true'
         id: check-issues
-        working-directory: packages/translations
+        working-directory: packages/chunky-crayon-translations
         run: |
           REPORT=$(ls -t reports/*.md 2>/dev/null | head -1)
           if [ -z "$REPORT" ]; then
@@ -209,7 +209,7 @@ jobs:
             const locale = '${{ matrix.locale }}';
             const localeName = '${{ steps.locale-name.outputs.name }}';
 
-            const reportsDir = 'packages/translations/reports';
+            const reportsDir = 'packages/chunky-crayon-translations/reports';
             const files = fs.readdirSync(reportsDir)
               .filter(f => f.endsWith('.md'))
               .sort()

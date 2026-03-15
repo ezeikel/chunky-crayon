@@ -1,0 +1,43 @@
+'use client';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenNib } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
+import cn from '@/utils/cn';
+
+type BlogHeaderProps = {
+  title?: string;
+  description?: string;
+  className?: string;
+};
+
+const BlogHeader = ({ title, description, className }: BlogHeaderProps) => {
+  const t = useTranslations('blog');
+  const displayTitle = title || t('title');
+  const displayDescription = description || t('subtitle');
+  const iconStyle = {
+    '--fa-primary-color': 'hsl(var(--crayon-orange))',
+    '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+    '--fa-secondary-opacity': '1',
+  } as React.CSSProperties;
+
+  return (
+    <header className={cn('text-center mb-10 md:mb-12', className)}>
+      <div className="inline-flex items-center gap-3 mb-4">
+        <FontAwesomeIcon
+          icon={faPenNib}
+          className="text-3xl md:text-4xl"
+          style={iconStyle}
+        />
+        <h1 className="font-tondo font-bold text-2xl md:text-3xl lg:text-4xl text-text-primary">
+          {displayTitle}
+        </h1>
+      </div>
+      <p className="text-text-secondary max-w-2xl mx-auto">
+        {displayDescription}
+      </p>
+    </header>
+  );
+};
+
+export default BlogHeader;
