@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
     // Convert SVG to PNG using sharp
     const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
 
-    return new NextResponse(pngBuffer, {
+    return new NextResponse(new Uint8Array(pngBuffer), {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=31536000, immutable',
@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
     // Convert SVG to PNG using sharp
     const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
 
-    return new NextResponse(pngBuffer, {
+    return new NextResponse(new Uint8Array(pngBuffer), {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'no-cache',
