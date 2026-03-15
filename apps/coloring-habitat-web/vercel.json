@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "app/api/coloring-image/generate/route.ts": {
+      "maxDuration": 120
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/coloring-image/generate",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/email-list/send-latest",
+      "schedule": "10 7 * * *"
+    }
+  ]
+}
