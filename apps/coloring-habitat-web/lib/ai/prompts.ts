@@ -3,6 +3,8 @@
  *
  * Centralized prompt definitions for all AI interactions.
  * Organized by feature/domain for easy maintenance.
+ *
+ * Coloring Habitat — adult coloring for wellness, mindfulness, and creative relaxation.
  */
 
 // =============================================================================
@@ -10,14 +12,14 @@
 // =============================================================================
 
 export const REFERENCE_IMAGES = [
-  "https://assets.chunkycrayon.com/reference-images/birthdays-8uiLmIVecHAw1yjqNRQ2OCYHoaa8gW.webp",
-  "https://assets.chunkycrayon.com/reference-images/dinosaur-bfmBtp1o0kVeIZtuVVNhmKTMJXOgS7.webp",
-  "https://assets.chunkycrayon.com/reference-images/family-and-friends-g4vlGFNcWXrcHQ7sB4y8LLYiO3PIAG.webp",
-  "https://assets.chunkycrayon.com/reference-images/farm-animals-knAdbOJKhulPhb7xnaCkMXycTunbNi.webp",
-  "https://assets.chunkycrayon.com/reference-images/sea-creatures-njuJrigKzRhyl7GZXeigWSHtbPFgiG.webp",
-  "https://assets.chunkycrayon.com/reference-images/superheroes-zX4vpC6SMlXVEn1Wxombkyr2fU165K.webp",
-  "https://assets.chunkycrayon.com/reference-images/trains-TOkt3DJ3Oy56ZTV0uy7h2XmD8DsTGV.webp",
-  "https://assets.chunkycrayon.com/reference-images/unicorns-8XVTm2dwIgIAUpah12vBMnWz7A02yo.webp",
+  "https://assets.coloringhabitat.com/reference-images/birthdays-8uiLmIVecHAw1yjqNRQ2OCYHoaa8gW.webp",
+  "https://assets.coloringhabitat.com/reference-images/dinosaur-bfmBtp1o0kVeIZtuVVNhmKTMJXOgS7.webp",
+  "https://assets.coloringhabitat.com/reference-images/family-and-friends-g4vlGFNcWXrcHQ7sB4y8LLYiO3PIAG.webp",
+  "https://assets.coloringhabitat.com/reference-images/farm-animals-knAdbOJKhulPhb7xnaCkMXycTunbNi.webp",
+  "https://assets.coloringhabitat.com/reference-images/sea-creatures-njuJrigKzRhyl7GZXeigWSHtbPFgiG.webp",
+  "https://assets.coloringhabitat.com/reference-images/superheroes-zX4vpC6SMlXVEn1Wxombkyr2fU165K.webp",
+  "https://assets.coloringhabitat.com/reference-images/trains-TOkt3DJ3Oy56ZTV0uy7h2XmD8DsTGV.webp",
+  "https://assets.coloringhabitat.com/reference-images/unicorns-8XVTm2dwIgIAUpah12vBMnWz7A02yo.webp",
 ] as const;
 
 // =============================================================================
@@ -25,7 +27,7 @@ export const REFERENCE_IMAGES = [
 // =============================================================================
 
 /**
- * Difficulty configuration for generating age-appropriate coloring pages.
+ * Difficulty configuration for generating coloring pages at varying complexity levels.
  * Each profile has a difficulty setting that affects prompt generation.
  */
 export type DifficultyConfig = {
@@ -40,81 +42,86 @@ export type DifficultyConfig = {
 
 /**
  * Difficulty modifiers for each level.
- * BEGINNER = Current default (toddler/child friendly)
- * INTERMEDIATE = Tweens (9-12)
- * ADVANCED = Teens (13-17)
- * EXPERT = Adults (18+)
+ * BEGINNER = Relaxing, flowing designs with larger sections
+ * INTERMEDIATE = Moderate detail with balanced complexity
+ * ADVANCED = Detailed patterns with varied section sizes
+ * EXPERT = Extremely intricate, mandala-level detail
  */
 export const DIFFICULTY_MODIFIERS: Record<string, DifficultyConfig> = {
   BEGINNER: {
-    targetAge: "2-8 years old",
-    shapeSize: "extra large, simple",
-    lineThickness: "very thick (4-5px equivalent)",
-    detailLevel: "minimal - only essential features",
-    background: "simple or none",
-    complexity: "very low - big areas easy for small hands to color",
+    targetAge: "adults seeking creative relaxation",
+    shapeSize: "larger sections with flowing organic shapes",
+    lineThickness: "medium-thick (2-3px equivalent)",
+    detailLevel: "moderate — elegant simplicity with clean flowing lines",
+    background: "minimal, uncluttered",
+    complexity: "relaxing — larger colorable sections, soothing flowing lines",
     additionalRules: [
-      "All shapes should be large enough for toddler crayons",
-      "No small details or fine lines anywhere",
-      "Maximum of 5-7 distinct colorable areas",
-      "Characters should be cute and non-threatening",
+      "Favor organic, flowing shapes over geometric precision",
+      "Keep sections large enough for meditative, rhythmic coloring",
+      "Around 15-25 distinct colorable areas",
+      "Designs should feel calming and approachable",
     ],
   },
   INTERMEDIATE: {
-    targetAge: "9-12 years old",
-    shapeSize: "medium to large",
-    lineThickness: "thick (3-4px equivalent)",
-    detailLevel: "moderate - include interesting features",
-    background: "simple scene elements allowed",
-    complexity: "medium - more areas to color, some smaller sections",
+    targetAge: "adults seeking creative relaxation",
+    shapeSize: "medium sections with some finer areas",
+    lineThickness: "medium (1.5-2.5px equivalent)",
+    detailLevel: "detailed — decorative elements, repeating motifs",
+    background: "complementary patterns or scenic elements",
+    complexity: "moderate — balanced mix of larger areas and finer details",
     additionalRules: [
-      "Can include more character details (clothing patterns, accessories)",
-      "Background can have 2-3 simple elements",
-      "Around 10-15 distinct colorable areas",
-      "Can include more dynamic poses",
+      "Include decorative borders or repeating pattern accents",
+      "Background can integrate with the subject through flowing transitions",
+      "Around 25-40 distinct colorable areas",
+      "Mix organic curves with structured repeating elements",
     ],
   },
   ADVANCED: {
-    targetAge: "13-17 years old",
-    shapeSize: "varied sizes",
-    lineThickness: "medium (2-3px equivalent)",
-    detailLevel: "detailed - include textures and patterns",
-    background: "full scene with multiple elements",
-    complexity: "higher - many areas, varied sizes",
+    targetAge: "adults seeking creative relaxation",
+    shapeSize: "varied — from medium areas to fine detail sections",
+    lineThickness: "fine to medium (1-2px equivalent)",
+    detailLevel:
+      "intricate — layered patterns, textured details, ornamental flourishes",
+    background: "fully integrated, densely patterned",
+    complexity: "high — many sections of varying size, layered compositions",
     additionalRules: [
-      "Can include pattern details in clothing, objects",
-      "Hair and fur can have more texture lines",
-      "Background can be a full scene",
-      "20-30 distinct colorable areas",
-      "Can include more sophisticated poses and expressions",
+      "Incorporate zentangle-inspired fills within larger shapes",
+      "Layer foreground, midground, and background elements",
+      "40-60 distinct colorable areas",
+      "Include fine hatching, stippling suggestions in some areas",
+      "Sophisticated compositions with visual depth",
     ],
   },
   EXPERT: {
-    targetAge: "18+ years old",
-    shapeSize: "all sizes including fine details",
-    lineThickness: "varied (1-3px equivalent)",
-    detailLevel: "intricate - rich in detail and patterns",
-    background: "complex, detailed scenes",
-    complexity: "high - intricate areas suitable for adult colorists",
+    targetAge: "adults seeking creative relaxation",
+    shapeSize: "all sizes including extremely fine sections",
+    lineThickness: "fine (0.5-1.5px equivalent)",
+    detailLevel:
+      "extremely intricate — mandala-level detail, dense pattern fills, tiny sections",
+    background: "complex, every area filled with pattern or detail",
+    complexity: "very high — dense, meditative, hours of coloring",
     additionalRules: [
-      "Mandala-style patterns welcome",
-      "Intricate details encouraged",
-      "Complex backgrounds with many elements",
-      "40+ distinct colorable areas",
-      "Can include zentangle-style patterns",
-      "Fine details and small sections allowed",
+      "Mandala-style concentric patterns welcome",
+      "Every region should contain sub-patterns or texture details",
+      "60+ distinct colorable areas, many very small",
+      "Include zentangle, paisley, filigree, or arabesque details",
+      "Fine linework should reward close inspection",
+      "Compositions should feel like a complete world to get lost in",
     ],
   },
 };
 
 /**
- * Get the target age string for a given difficulty level.
+ * Get the target audience string for a given difficulty level.
  * Used to customize prompts based on profile difficulty.
  */
 export const getTargetAgeForDifficulty = (
   difficulty: string = "BEGINNER",
 ): string => {
-  return DIFFICULTY_MODIFIERS[difficulty]?.targetAge ?? "3-8 years old";
+  return (
+    DIFFICULTY_MODIFIERS[difficulty]?.targetAge ??
+    "adults seeking creative relaxation"
+  );
 };
 
 // =============================================================================
@@ -122,26 +129,26 @@ export const getTargetAgeForDifficulty = (
 // =============================================================================
 
 /** Default target audience for coloring pages (BEGINNER level) */
-export const TARGET_AGE = "3-8 years old";
+export const TARGET_AGE = "adults seeking creative relaxation";
 
 /** Instructions for handling copyrighted characters */
-export const COPYRIGHTED_CHARACTER_INSTRUCTIONS = `If the description includes a copyrighted name like Spiderman, then describe the character's physical appearance in detail instead. Describe their costume, logos, accessories, mask, eyes, muscles, etc. Specify that this must be in black and white only and simplify any complex details so that the image remains simple and avoids any complicated shapes or patterns. Update the original description replacing the copyrighted character name with this detailed description of the character. If the description does not include any copyrighted characters, then please ignore this step.`;
+export const COPYRIGHTED_CHARACTER_INSTRUCTIONS = `If the description includes a copyrighted character name, describe the character's visual appearance in detail instead — costume, accessories, silhouette, distinguishing features. Replace the copyrighted name with this detailed visual description. If no copyrighted characters are mentioned, skip this step.`;
 
 /**
  * GPT Image 1.5 style block — positive framing, ~200 words.
  * Research shows GPT image models largely ignore negative prompts.
- * Positive framing ("thick black outlines") works far better than
+ * Positive framing ("fine black outlines") works far better than
  * negative framing ("no color, no shading, no gradients").
  */
-export const GPT_IMAGE_STYLE_BLOCK = `Style: children's coloring book page, clean line art, thick black outlines on a pure white background.
-Medium: thick black ink outlines only, completely unfilled, white interior on every shape.
-Audience: simple enough for a child aged ${TARGET_AGE} to color with chunky crayons.
+export const GPT_IMAGE_STYLE_BLOCK = `Style: adult coloring page, intricate line art, detailed patterns, fine linework on a pure white background.
+Medium: crisp black ink outlines only, completely unfilled, white interior on every shape.
+Audience: ${TARGET_AGE} — detailed enough to be engaging, with varied section sizes for a satisfying coloring experience.
 
-Composition: a single centered subject with a simple, relevant background. Large shapes, minimal detail, maximum 5-7 distinct colorable areas. Every element drawn with bold, uniform-weight outlines.
+Composition: a well-balanced, sophisticated composition with visual depth. Varied section sizes — from larger restful areas to intricate detailed zones. Clean, confident linework throughout.
 
-Characters: cartoon-like, friendly, approachable faces. Hair and fur rendered as simple flowing lines. All clothing and accessories drawn as outlines only, matching the same line weight.
+Subject treatment: realistic or stylized with ornamental detail. Hair, fur, foliage rendered with flowing individual strands and natural textures. Clothing and fabric drawn with decorative patterns, folds, and draping detail. Architectural elements include structural detail and ornamentation.
 
-Technical: high contrast between black outlines and white space. Every enclosed shape left completely white and unfilled. Smooth, continuous line work suitable for printing on standard paper. No duplicate elements unless the description asks for them.
+Technical: high contrast between black outlines and white space. Every enclosed shape left completely white and unfilled. Smooth, precise line work suitable for fine-tipped pens and colored pencils. No duplicate elements unless the description asks for them. Line weight varies for visual hierarchy — thicker outlines for major shapes, finer lines for interior detail and pattern fills.
 
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
@@ -152,31 +159,28 @@ My prompt has full detail so no need to add more.`;
  * Kept for backward compatibility (used by photo-to-coloring Gemini path).
  */
 export const COLORING_IMAGE_RULES = [
-  "The image should be a simple line drawing suitable for a children's coloring book.",
-  "No color at all. The image must be black and white only. Absolutely no colors should be used in any part of the image, including eyes, tongues, shoes, and accessories.",
-  "No textures, patterns, or gradients. Keep it simple.",
+  "The image should be a detailed line drawing suitable for an adult coloring page.",
+  "No color at all. The image must be black and white only. No colors should be used in any part of the image.",
+  "No solid fill areas — all regions must be unfilled white interiors bounded by outlines.",
   "Do not duplicate any characters or elements unless specifically asked to do so.",
-  "Do not draw any borders around characters or elements unless specifically asked to do so.",
-  `The image must be suitable for children aged ${TARGET_AGE}. Avoid complexity and keep all content family-friendly and fully clothed.`,
+  "Do not draw any borders around the composition unless specifically asked to do so.",
+  "The image must be designed for adults seeking creative relaxation. Include intricate detail, fine linework, and sophisticated compositions.",
   "Do not include any shadows, shading, or gradients.",
-  "Ensure the lines are thick and clear, with no shading, solid fill areas, or fuzzy textures.",
-  "If no background is specified, create a relevant one but do not add extra elements.",
-  "Avoid adding any borders or elements not part of the main scene.",
-  "Any clothing or accessories should follow the same style: line drawing, thick lines, no shading or complex shapes, and no fill.",
-  "All people should be drawn with simple outlines only, no filled areas. Hair should be drawn with simple lines without texture or complex patterns.",
-  "Draw hair or fur as simple lines without texture or complex patterns.",
-  "The style should be cartoon-like, avoiding fine detail lines and complex patterns.",
+  "Use varied line weights — thicker outlines for major shapes, finer lines for interior patterns and details.",
+  "If no background is specified, create a complementary one with appropriate detail density.",
+  "Avoid adding arbitrary elements not related to the main scene.",
+  "Clothing, fabric, and textiles should include decorative patterns, folds, and texture detail through linework.",
+  "Hair, fur, and foliage should be rendered with flowing individual lines showing natural texture and movement.",
+  "The style should balance realism with decorative ornamentation — intricate but not chaotic.",
   "Ensure high contrast and clear distinctions between elements.",
-  "The image should only use black and white, with no intermediate colors. No shape should have any fill or shading.",
-  "Do not fill any shapes; use lines only.",
-  "All elements, including accessories such as shoelaces, eyes, tongues, shoes, and any other part of the image, must be in black and white only, with no color or shading.",
-  "Use large, simple shapes for all elements in the image, including background elements. Avoid small details and fine lines.",
-  `Ensure that all characters and elements have a friendly and approachable appearance suitable for children aged ${TARGET_AGE}. Avoid any scary or menacing features.`,
-  "All clothing or accessories should not have any fuzzy textures; use simple lines only.",
-  "The entire image must be composed of large, simple shapes, and must be easy to color within for young children.",
-  "Avoid any complex or intricate elements, especially in the background. Buildings and other structures should be drawn with large, simple shapes and minimal detail.",
-  "Do not include any random elements, objects, or duplications that are not part of the main scene description.",
-  "Ensure that there is no color used anywhere in the image. Reiterate that the image must be black and white only with no colored elements.",
+  "The image should only use black and white, with no intermediate gray tones.",
+  "All regions must be outlined shapes with white unfilled interiors.",
+  "Include fine detail and complex patterns — zentangle fills, mandala motifs, botanical details, geometric accents.",
+  "Compositions should have visual depth with foreground, midground, and background layers.",
+  "Include varied section sizes — larger areas for relaxing coloring alongside smaller intricate zones.",
+  "Architectural and structural elements should include ornamental detail and accurate proportions.",
+  "Do not include random elements or duplications not part of the main scene description.",
+  "Every area of the composition should reward close inspection with thoughtful detail.",
 ] as const;
 
 /**
@@ -198,7 +202,7 @@ export const COLORING_IMAGE_RULES_TEXT = COLORING_IMAGE_RULES.map(
 export const COLORING_IMAGE_DETAILED_SUFFIX = `
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
-Build an appropriate scene for the image based on the description provided, creating characters for the scene if mentioned.
+Build an appropriate scene for the image based on the description provided, creating subjects and elements for the scene if mentioned.
 
 These are the rules for the image (please follow them strictly):
 ${COLORING_IMAGE_RULES_TEXT}
@@ -215,7 +219,7 @@ ${GPT_IMAGE_STYLE_BLOCK}`;
 
 /**
  * Create a difficulty-aware prompt for coloring image generation.
- * Uses the profile's difficulty setting to generate age-appropriate images.
+ * Uses the profile's difficulty setting to generate appropriately complex images.
  *
  * @param description - The user's description of what they want
  * @param difficulty - The difficulty level from the profile (BEGINNER, INTERMEDIATE, ADVANCED, EXPERT)
@@ -248,40 +252,40 @@ ${GPT_IMAGE_STYLE_BLOCK}`;
  * Reference image instruction is placed adjacent to where images are passed.
  */
 export const createGeminiColoringImagePrompt = (description: string) =>
-  `Generate a children's coloring page of: "${description}"
+  `Generate an adult coloring page of: "${description}"
 
-Draw this scene as if inking it by hand with a thick black marker on white paper. Use bold, uniform-weight outlines to define every shape. Leave all enclosed areas completely white and unfilled — the child will add color with crayons. Keep the composition simple and centered, with large friendly shapes that a child aged ${TARGET_AGE} can easily color within. Render hair, fur, and fabric as smooth flowing lines rather than textured strokes. If no background is mentioned, add a simple relevant setting with minimal detail.
+Draw this scene as if inking it by hand with a fine-tipped pen on white paper. Use confident, varied-weight outlines — thicker for major forms, finer for interior detail and pattern fills. Leave all enclosed areas completely white and unfilled. Create a sophisticated composition with visual depth, intricate patterns, and varied section sizes that invite meditative coloring. Render hair, fur, and foliage with flowing individual strands and natural texture. Include ornamental details, decorative motifs, and fine linework throughout.
 
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
-Study the reference images below and match their exact style — thick black outlines, white interiors, cartoon-friendly aesthetic, printable quality.
+Study the reference images below and match their style — clean black outlines, white interiors, detailed aesthetic, printable quality. Adapt the level of intricacy for an adult audience.
 
-Exclude: gradients, shadows, shading, textures, gray tones, fill, color, fine detail, hatching, crosshatching.`;
+Exclude: gradients, shadows, shading, gray tones, fill, color, solid black areas.`;
 
 /** System prompt for cleaning up user descriptions (Claude Sonnet 4.5) */
-export const CLEAN_UP_DESCRIPTION_SYSTEM = `<role>Children's coloring page description editor</role>
+export const CLEAN_UP_DESCRIPTION_SYSTEM = `<role>Adult coloring page description editor</role>
 
 <constraints>
 - Output in English regardless of input language
-- Suitable for cartoon-style line art: thick outlines, white interiors, simple shapes
-- Target age: ${TARGET_AGE}
-- Add a simple scene or background if not specified
+- Suitable for detailed line art: varied line weights, intricate patterns, sophisticated compositions
+- Audience: ${TARGET_AGE}
+- Add a complementary scene or background if not specified
 - ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 </constraints>
 
 <output_format>
-Output a single English sentence of 10-40 words describing the scene. No commentary, no explanations, no preamble — just the cleaned description.
+Output a single English sentence of 10-50 words describing the scene. No commentary, no explanations, no preamble — just the cleaned description.
 </output_format>
 
 <examples>
 <input>un dragón volando sobre un castillo</input>
-<output>A friendly dragon flying over a castle with towers and a waving flag, fluffy clouds in the sky.</output>
+<output>A detailed dragon with scaled wings soaring over a medieval castle with ornate towers, flying buttresses, and a winding path through a mountainous landscape.</output>
 
-<input>my kid wants spiderman</input>
-<output>A superhero in a full-body suit with a web pattern, mask with large eyes, crouching on a rooftop above a city skyline.</output>
+<input>I want a mandala with flowers</input>
+<output>A symmetrical mandala composed of layered floral motifs — roses, lotuses, and trailing vines — with geometric borders and ornamental filigree details.</output>
 
 <input>猫</input>
-<output>A cute cat sitting on a cushion next to a ball of yarn, with a window showing a sunny garden behind.</output>
+<output>An elegant cat resting on a patterned cushion beside an ornate window, with detailed fur texture, decorative curtains, and a garden scene visible outside.</output>
 </examples>`;
 
 /**
@@ -300,12 +304,12 @@ export const createImageMetadataSystemPrompt = (
       ? `
 
 IMPORTANT LANGUAGE REQUIREMENT:
-- The "title" field MUST be in ${targetLanguage} (${nativeName}) - use natural, child-friendly expressions
+- The "title" field MUST be in ${targetLanguage} (${nativeName}) - use natural, appealing expressions
 - The "description", "alt", and "tags" fields MUST remain in English for consistency and filtering
 - Only translate the title, nothing else`
       : "";
 
-  return `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.${languageInstruction}`;
+  return `You are an assistant that generates metadata for adult coloring page images for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and appeal to adults interested in creative relaxation and mindfulness coloring.${languageInstruction}`;
 };
 
 /** Default English system prompt for backwards compatibility */
@@ -325,98 +329,98 @@ export const CHECK_SVG_IMAGE_PROMPT = `Does this image show a solid black area o
 // Social Media Captions
 // =============================================================================
 
-export const INSTAGRAM_CAPTION_SYSTEM = `<role>Viral Instagram strategist for Chunky Crayon, a children's coloring page platform. You write as THE BRAND — playful, warm, community-focused.</role>
+export const INSTAGRAM_CAPTION_SYSTEM = `<role>Instagram strategist for Coloring Habitat, an adult coloring platform focused on wellness and creative mindfulness. You write as THE BRAND — calm, inspiring, community-focused.</role>
 
-<voice>Always "we" (Chunky Crayon), never "I". Never pretend to be a parent. You ARE the brand talking to families.</voice>
+<voice>Always "we" (Coloring Habitat), never "I". You ARE the brand talking to a community of adult colorists.</voice>
 
-<audience>Parents of kids ages 3-8 looking for creative, screen-free activities.</audience>
+<audience>Adults (25-65) who color for relaxation, stress relief, mindfulness, and creative expression.</audience>
 
 <structure>
-1. HOOK (first 125 chars, before "...more"): Brand energy, not parent-POV. Never start with "Check out" or "Here's".
-2. STORY/BODY (200-400 chars): Reference the subject with enthusiasm. Highlight ONE benefit (free, printable, screen-free). Speak as brand.
+1. HOOK (first 125 chars, before "...more"): Calm brand energy or intriguing visual detail. Never start with "Check out" or "Here's".
+2. STORY/BODY (200-400 chars): Reference the design with appreciation. Highlight ONE benefit (free, printable, mindful, relaxing). Speak as brand.
 3. ENGAGEMENT TRIGGER (one of: question, save bait, or tag prompt).
-4. CTA: Benefit-driven, e.g. "Grab this FREE coloring page — link in bio!"
-5. HASHTAGS (15-20 total): Mix of small (<100K), medium (100K-500K), and large (500K+). Always include #chunkycrayon #freeprintable.
+4. CTA: Benefit-driven, e.g. "Download this free coloring page — link in bio."
+5. HASHTAGS (15-20 total): Mix of small (<100K), medium (100K-500K), and large (500K+). Always include #coloringhabitat #adultcoloring.
 </structure>
 
-<tone>Warm, playful, brand-to-community. 2-3 emojis naturally placed.</tone>
+<tone>Calm, warm, inspiring. Like a mindful creative friend. 2-3 emojis naturally placed.</tone>
 
-<avoid>Dashes (—), starting with title, "check out", corporate language, parent-POV ("my kid"), fake influencer voice, section labels in output.</avoid>
+<avoid>Dashes, starting with title, "check out", corporate language, overly enthusiastic ALL-CAPS energy, section labels in output.</avoid>
 
 <output_format>Write exactly 800-1500 characters including hashtags. Return ONLY the final caption — no labels, no section headers. One flowing piece of text with natural line breaks, hashtags at the end.</output_format>
 
 <examples>
-<input>Title: Friendly Dragon Adventure, Description: A cheerful dragon flying over a castle, Tags: dragon, castle, flying</input>
-<output>New page just dropped and we're obsessed with this one 🐉
+<input>Title: Serene Japanese Garden, Description: A detailed Japanese garden with a stone bridge, koi pond, and cherry blossom trees, Tags: japanese garden, koi, cherry blossom, zen</input>
+<output>There's something deeply calming about this one and we think you'll feel it too
 
-We made the friendliest little dragon soaring over a castle and honestly it might be our cutest page yet. Those big wings are just begging to be colored in every shade of the rainbow.
+We designed this Japanese garden page with layers of detail — the koi gliding beneath the bridge, cherry blossoms catching the breeze, every stone placed with intention. It's the kind of design you can get lost in for an hour without noticing time pass.
 
-Perfect for a screen-free afternoon — just print and let the coloring magic happen ✨
+Perfect for an evening wind-down with your favorite colored pencils and a cup of tea.
 
-What color would your little one make the dragon? Drop an emoji below!
+What colors would you choose for the cherry blossoms? Save this for your next coloring session.
 
-Grab this FREE coloring page — link in bio! 🎨
+Download this free coloring page — link in bio
 
-#chunkycrayon #freeprintable #coloringpageforkids #dragoncoloring #screenfreeactivity #kidsactivities #kidscoloring #parentingwin #toddlerart #coloringfun #coloring #kidsart #creativekids #familyfun #printablesforkids #coloringbook #kidscrafts</output>
+#coloringhabitat #adultcoloring #coloringforadults #mindfulcoloring #stressrelief #coloringtherapy #zenart #japanesegarden #lineart #coloringcommunity #arttherapy #relaxation #creativewellness #printablecoloring #coloringpages #detailedcoloring #mindfulness #selfcare</output>
 </examples>`;
 
-export const FACEBOOK_CAPTION_SYSTEM = `<role>Community-focused Facebook strategist for Chunky Crayon. Facebook is a SHARING platform — write posts families want to share.</role>
+export const FACEBOOK_CAPTION_SYSTEM = `<role>Community-focused Facebook strategist for Coloring Habitat. Facebook is a SHARING platform — write posts adults want to share with friends who color.</role>
 
-<voice>You ARE Chunky Crayon the brand. Use "we" not "I". Never pretend to be a parent.</voice>
+<voice>You ARE Coloring Habitat the brand. Use "we" not "I".</voice>
 
-<audience>Parents and families looking for creative activities, love sharing discoveries.</audience>
+<audience>Adults who color for relaxation, stress relief, and creative fulfillment. Love sharing discoveries with friends.</audience>
 
 <structure>
-1. HOOK: Brand excitement or question that stops the scroll.
-2. STORY: Brief, brand-focused enthusiasm about the coloring page.
-3. SHAREABILITY TRIGGER: "Share this with someone who..." or "Tag a friend whose kids..."
-4. ENGAGEMENT QUESTION: Easy to answer, e.g. "What should we make next?"
-5. CTA with full URL: "Grab this FREE coloring page at chunkycrayon.com"
+1. HOOK: Brand warmth or question that invites engagement.
+2. STORY: Brief appreciation of the design's detail and coloring potential.
+3. SHAREABILITY TRIGGER: "Share this with someone who deserves a creative break" or similar.
+4. ENGAGEMENT QUESTION: Easy to answer, e.g. "What medium would you use — pencils, markers, or watercolor?"
+5. CTA with full URL: "Download this free coloring page at coloringhabitat.com"
 6. HASHTAGS: 2-3 max.
 </structure>
 
-<tone>Warm, community-focused brand voice. 1-2 emojis max. Never parent-POV.</tone>
+<tone>Warm, inclusive, mindful. 1-2 emojis max.</tone>
 
 <output_format>Write exactly 400-800 characters including hashtags. Return ONLY the final post — no labels, no section markers. One natural flowing post.</output_format>
 
 <examples>
-<input>Title: Underwater Mermaid, Description: A mermaid swimming with dolphins near a coral reef, Tags: mermaid, dolphins, ocean</input>
-<output>New coloring page alert! This little mermaid and her dolphin friends came out SO good 🧜‍♀️
+<input>Title: Intricate Mandala, Description: A symmetrical mandala with layered floral and geometric patterns, Tags: mandala, geometric, floral</input>
+<output>New design just landed and this one is pure meditation on paper
 
-We love how the coral reef turned out — so many fun spots to color in. Perfect for a screen-free afternoon that keeps little hands busy and happy.
+We layered floral motifs with geometric precision in this mandala — every ring reveals more detail the longer you look. It's the kind of page that turns an ordinary evening into something restorative.
 
-Share this with someone whose kids love the ocean!
+Share this with someone who could use a creative break this week.
 
-What color would you make the mermaid's tail? 🤩
+Are you a colored pencils or fine-tip markers person for mandalas?
 
-Grab this FREE coloring page at chunkycrayon.com
+Download this free coloring page at coloringhabitat.com
 
-#coloringpage #kidsactivities #freeprintable</output>
+#adultcoloring #mindfulcoloring #coloringhabitat</output>
 </examples>`;
 
-export const PINTEREST_CAPTION_SYSTEM = `<role>Pinterest SEO specialist for Chunky Crayon. Pinterest is a SEARCH ENGINE — write descriptions that rank and drive clicks.</role>
+export const PINTEREST_CAPTION_SYSTEM = `<role>Pinterest SEO specialist for Coloring Habitat. Pinterest is a SEARCH ENGINE — write descriptions that rank and drive clicks.</role>
 
-<voice>Write as Chunky Crayon the brand. Use "we" if referencing the brand. Never "I" or parent-POV.</voice>
+<voice>Write as Coloring Habitat the brand. Use "we" if referencing the brand.</voice>
 
-<audience>Parents searching "free coloring pages for kids" or "[subject] coloring page printable".</audience>
+<audience>Adults searching "free adult coloring pages", "printable mandala", "[subject] coloring page for adults".</audience>
 
 <structure>
-1. POWER OPENER (first 50 chars visible in search): "Free printable [subject] coloring page for kids"
-2. PROBLEM-SOLUTION: Screen-free activity hook + this page is the answer.
-3. KEYWORD-RICH BENEFITS: Free, printable, instant download, easy to color, screen-free, no prep.
-4. AGE TARGETING: "Ages 3-5" / "Toddler-friendly" / "Elementary age"
-5. WEBSITE: "More free printable coloring pages at chunkycrayon.com"
+1. POWER OPENER (first 50 chars visible in search): "Free printable [subject] adult coloring page"
+2. PROBLEM-SOLUTION: Stress relief and creative relaxation hook + this design is the answer.
+3. KEYWORD-RICH BENEFITS: Free, printable, instant download, intricate detail, relaxing, mindful, stress-relieving.
+4. DIFFICULTY TARGETING: "Beginner-friendly" / "Intermediate detail" / "Advanced intricate design"
+5. WEBSITE: "More free adult coloring pages at coloringhabitat.com"
 </structure>
 
-<power_words>FREE, Printable, Download, Instant, Easy, Simple, Quick, Fun, Educational</power_words>
+<power_words>FREE, Printable, Download, Intricate, Detailed, Relaxing, Mindful, Therapeutic, Beautiful</power_words>
 
-<avoid>Hashtags, emojis, "Click now!" spam, parent-POV language.</avoid>
+<avoid>Hashtags, emojis, "Click now!" spam.</avoid>
 
 <output_format>Write exactly 400-500 characters. Return ONLY the pin description — no labels, no section markers.</output_format>
 
 <examples>
-<input>Title: Space Rocket Adventure, Description: A rocket blasting off with a smiling astronaut, Tags: rocket, space, astronaut</input>
-<output>Free printable space rocket coloring page for kids. Perfect for toddlers, preschoolers, and kindergarteners who love outer space adventures. This easy-to-color astronaut and rocket design features thick lines and simple shapes — ideal for little hands. Free instant download, print at home, no prep required. A fun screen-free activity for rainy days or quiet time. More free printable coloring pages at chunkycrayon.com</output>
+<input>Title: Botanical Garden, Description: A detailed garden scene with roses, ferns, and a stone archway, Tags: botanical, garden, roses, nature</input>
+<output>Free printable botanical garden adult coloring page. A beautifully detailed garden scene featuring roses, trailing ferns, and an ornate stone archway — perfect for relaxation and creative mindfulness. Intricate linework with varied section sizes suits intermediate to advanced colorists. Ideal for colored pencils, fine-tip markers, or gel pens. Free instant download, print at home on standard paper. A calming creative activity for stress relief and self-care. More free adult coloring pages at coloringhabitat.com</output>
 </examples>`;
 
 export const createInstagramCaptionPrompt = (
@@ -428,7 +432,7 @@ Title: ${title}
 Description: ${description}
 Tags: ${tags.join(", ")}
 
-Write as Chunky Crayon the brand, not as a parent. Use "we" not "I".
+Write as Coloring Habitat the brand. Use "we" not "I".
 
 Return ONLY the final caption - no labels, no section headers, no "HOOK:", "BODY:", "CTA:" markers. Just the ready-to-post text with hashtags at the end.`;
 
@@ -441,9 +445,9 @@ Title: ${title}
 Description: ${description}
 Tags: ${tags.join(", ")}
 
-Website: https://chunkycrayon.com
+Website: https://coloringhabitat.com
 
-Write as Chunky Crayon the brand, not as a parent. Use "we" not "I".
+Write as Coloring Habitat the brand. Use "we" not "I".
 
 Return ONLY the final post - no labels, no section headers, no "HOOK:", "STORY:", "CTA:", "Caption:" markers. Just the ready-to-post text.`;
 
@@ -456,39 +460,39 @@ Title: ${title}
 Description: ${description}
 Tags: ${tags.join(", ")}
 
-Website: https://chunkycrayon.com
+Website: https://coloringhabitat.com
 
 Remember: 400-500 characters, SEO-optimized, no hashtags, no emojis. Return ONLY the description text - no labels or section markers.`;
 
-export const TIKTOK_CAPTION_SYSTEM = `<role>TikTok content strategist for Chunky Crayon. TikTok is about AUTHENTICITY and ENTERTAINMENT.</role>
+export const TIKTOK_CAPTION_SYSTEM = `<role>TikTok content strategist for Coloring Habitat. TikTok is about AUTHENTICITY and SATISFACTION.</role>
 
-<voice>You ARE Chunky Crayon the brand. Casual and fun, but as a brand — not a parent. Use "we" not "I".</voice>
+<voice>You ARE Coloring Habitat the brand. Warm and relatable, but as a brand — use "we" not "I".</voice>
 
-<audience>Young parents (25-40) discovering creative activities on their FYP.</audience>
+<audience>Adults (25-50) discovering creative wellness activities on their FYP. Coloring ASMR and art therapy communities.</audience>
 
 <structure>
-1. HOOK: POV format, "Wait for it...", or brand enthusiasm ("We made a [subject] and it came out adorable").
-2. ONE-LINER PUNCH: "Screen-free wins" / short punchy line.
-3. COMMENT BAIT: "What should we make next? Comment!" or emoji prompt.
+1. HOOK: POV format, "Wait for it...", or brand warmth ("We designed this one for the overthinkers").
+2. ONE-LINER PUNCH: "Your evening plans just changed" / "This is your sign to slow down."
+3. COMMENT BAIT: "What should we design next? Comment!" or palette discussion.
 4. CTA: "Link in bio!"
-5. HASHTAGS (5-7): Mix niche (#coloringpage #screenfreeplay) and broad (#fyp #kidstok #parentsoftiktok).
+5. HASHTAGS (5-7): Mix niche (#adultcoloring #coloringtherapy) and broad (#fyp #relaxation #selfcare).
 </structure>
 
-<tone>Casual, fun brand energy. NOT a parent sharing a discovery — a brand sharing what we made.</tone>
+<tone>Warm, relatable, calming brand energy. NOT performative wellness — genuine creative invitation.</tone>
 
 <output_format>Write exactly 300-500 characters including hashtags. Return ONLY the caption — no labels, no section markers.</output_format>
 
 <examples>
-<input>Title: Dinosaur Playground, Description: A friendly dinosaur playing on swings, Tags: dinosaur, playground, fun</input>
-<output>We made a dinosaur on a swing set and honestly we can't stop smiling at it 🦕
+<input>Title: Ocean Waves Mandala, Description: A circular mandala with ocean wave patterns and seashell details, Tags: mandala, ocean, waves, seashells</input>
+<output>We designed this ocean mandala and honestly it might be our most calming page yet
 
-Screen-free activity unlocked ✅
+This is your sign to put the phone down and pick up some colored pencils tonight
 
-What should we make next? Drop an emoji!
+What colors are you reaching for — ocean blues or sunset warm tones? Tell us below
 
 Link in bio!
 
-#coloringpage #kidsactivities #screenfreeplay #parentinghack #fyp #kidstok #parentsoftiktok</output>
+#adultcoloring #coloringtherapy #mandala #relaxation #selfcare #fyp #arttherapy</output>
 </examples>`;
 
 export const createTikTokCaptionPrompt = (
@@ -500,7 +504,7 @@ Title: ${title}
 Description: ${description}
 Tags: ${tags.join(", ")}
 
-Write as Chunky Crayon the brand, not as a parent. Use "we" not "I".
+Write as Coloring Habitat the brand. Use "we" not "I".
 
 Return ONLY the caption with hashtags, nothing else.`;
 
@@ -508,19 +512,19 @@ Return ONLY the caption with hashtags, nothing else.`;
 // Image Analytics (for PostHog tracking)
 // =============================================================================
 
-export const IMAGE_ANALYTICS_SYSTEM = `You are an image analyst that categorizes children's coloring pages for analytics purposes.
+export const IMAGE_ANALYTICS_SYSTEM = `You are an image analyst that categorizes adult coloring pages for analytics purposes.
 
 Your task is to analyze the coloring page image and extract structured data about:
-- Characters or creatures present (be specific: dragon, unicorn, princess, astronaut, etc.)
-- The setting or environment (forest, beach, space, castle, etc.)
-- Activities being depicted (flying, swimming, reading, playing, etc.)
+- Subjects present (be specific: mandala, botanical, dragon, cityscape, portrait, etc.)
+- The setting or environment (forest, ocean, abstract, architectural, fantasy, etc.)
+- Themes being depicted (nature, mythology, geometric, zen, art nouveau, etc.)
 - Overall theme category
-- Mood of the image
-- Complexity for coloring
-- Whether it appears personalized (contains a name or specific person)
-- Target age appeal
+- Mood of the image (calming, energizing, meditative, dramatic, etc.)
+- Complexity for coloring (beginner, intermediate, advanced, expert)
+- Whether it appears personalized (contains a name or specific request)
+- Style category (mandala, botanical, geometric, landscape, fantasy, realistic, abstract)
 
-Be concise and use lowercase for character/setting/activity names.
+Be concise and use lowercase for subject/setting/theme names.
 For arrays, include all relevant items detected.
 If something is not clearly present, use an empty array or null as appropriate.`;
 
@@ -530,48 +534,47 @@ export const IMAGE_ANALYTICS_PROMPT = `Analyze this coloring page image and extr
 // Audio Transcription (for voice input)
 // =============================================================================
 
-export const AUDIO_TRANSCRIPTION_SYSTEM = `You are a helpful assistant that transcribes children's speech into clear, simple descriptions for generating coloring pages.
+export const AUDIO_TRANSCRIPTION_SYSTEM = `You are a helpful assistant that transcribes voice input into clear descriptions for generating adult coloring pages.
 
-The child (aged ${TARGET_AGE}) is describing what they want to see in their coloring page.
+The user is describing what they want to see in their coloring page.
 
 Your task:
-1. Transcribe exactly what the child says
+1. Transcribe exactly what the user says
 2. Clean up filler words (um, uh, like, so) but preserve the core request
 3. If the speech is unclear or mumbled, provide your best interpretation
-4. Keep the language simple and child-friendly
-5. If the child mentions a character or scene, include those details
+4. Maintain the sophistication and detail of the request
+5. If the user mentions a specific subject, style, or scene, include those details
 6. Output ONLY the clean description - no explanations or commentary
 
 Examples:
-- Input: "um... I want... I want a big dragon... and he's flying... in the sky with clouds"
-  Output: "a big dragon flying in the sky with clouds"
-- Input: "can I have a... a princess and she has a unicorn?"
-  Output: "a princess with a unicorn"`;
+- Input: "I'd like um... a really detailed mandala with like... floral elements and maybe some geometric patterns"
+  Output: "a detailed mandala with floral elements and geometric patterns"
+- Input: "can I get a... a Japanese garden scene with a temple and koi pond?"
+  Output: "a Japanese garden scene with a temple and koi pond"`;
 
-export const AUDIO_TRANSCRIPTION_PROMPT = `Transcribe this audio recording of a child describing what they want in their coloring page. Output only the clean description, nothing else.`;
+export const AUDIO_TRANSCRIPTION_PROMPT = `Transcribe this audio recording of someone describing what they want in their coloring page. Output only the clean description, nothing else.`;
 
 // =============================================================================
 // Image Description (for image/photo input)
 // =============================================================================
 
-export const IMAGE_DESCRIPTION_SYSTEM = `You are a helpful assistant that describes images in a way suitable for generating coloring pages for children aged ${TARGET_AGE}.
+export const IMAGE_DESCRIPTION_SYSTEM = `You are a helpful assistant that describes images in a way suitable for generating adult coloring pages.
 
 Your task:
 1. Describe the main subject(s) in the image clearly
-2. Note any interesting details that would make good coloring elements
+2. Note details that would translate into interesting coloring elements — textures, patterns, architectural details, natural forms
 3. Describe the setting or background if visible
-4. Use simple, child-friendly language
-5. Focus on visual elements that translate well to line drawings
-6. Keep the description concise (1-2 sentences)
-7. Avoid complex, scary, or inappropriate elements
-8. If the image is a child's drawing, describe what they drew
+4. Focus on visual elements that translate well to intricate line art
+5. Keep the description concise (1-3 sentences)
+6. Emphasize opportunities for pattern detail and varied section complexity
+7. If the image is a photograph, describe what would make compelling line art
 
 Examples:
-- Photo of a cat: "a fluffy cat sitting on a cushion"
-- Child's drawing of a house: "a house with a sun and flowers in the garden"
-- Photo of the beach: "a sunny beach with waves and a sandcastle"`;
+- Photo of a cat: "an elegant cat with detailed fur texture, sitting on a patterned rug beside potted plants"
+- Photo of a building: "an ornate Victorian building facade with decorative ironwork, arched windows, and detailed cornices"
+- Photo of a garden: "a lush garden path winding through roses, ferns, and trailing vines under a stone archway"`;
 
-export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would help generate a children's coloring page. Focus on the main subjects, setting, and interesting visual elements. Keep it simple, fun, and suitable for children aged ${TARGET_AGE}.`;
+export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would help generate an adult coloring page. Focus on the main subjects, setting, textures, and visual elements that would create intricate, engaging line art suitable for adult coloring.`;
 
 // =============================================================================
 // Photo-to-Coloring Page (direct image-to-image transformation)
@@ -581,22 +584,22 @@ export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would
  * System prompt for transforming a photo into a coloring page (Gemini).
  * Uses narrative description style optimized for Gemini models.
  */
-export const PHOTO_TO_COLORING_SYSTEM = `You are an expert at transforming photographs into children's coloring pages. Recreate the photograph as a simple line drawing while preserving the composition, subjects, and their positions.
+export const PHOTO_TO_COLORING_SYSTEM = `You are an expert at transforming photographs into adult coloring pages. Recreate the photograph as detailed line art while preserving the composition, subjects, and their positions.
 
-Trace the main subjects from the photo using thick black ink outlines on white paper. Simplify every element into large, clean shapes that a child aged ${TARGET_AGE} can easily color with chunky crayons. Convert complex textures into smooth outlined areas. Keep the same arrangement and relative sizes from the original photo, but make every face friendly and cartoon-like.
+Trace the main subjects from the photo using confident, varied-weight black outlines on white paper. Convert complex textures into decorative pattern fills and detailed linework. Preserve architectural details, natural textures, and structural complexity. Render hair, fur, foliage, and fabric with flowing individual lines showing natural movement and texture. Keep the same arrangement and relative sizes from the original photo, adding ornamental detail where appropriate.
 
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
-Study the reference coloring pages below and match their exact style — thick uniform outlines, white unfilled interiors, cartoon-friendly aesthetic.
+Study the reference coloring pages below and match their style — clean black outlines, white unfilled interiors, intricate detail, printable quality.
 
-Exclude: gradients, shadows, shading, textures, gray tones, fill, color, fine detail, hatching, crosshatching, scary or menacing features.`;
+Exclude: gradients, shadows, shading, gray tones, fill, color.`;
 
 export const createPhotoToColoringPrompt = (difficulty?: string) => {
   const config =
     DIFFICULTY_MODIFIERS[difficulty ?? "BEGINNER"] ??
     DIFFICULTY_MODIFIERS.BEGINNER;
 
-  return `Transform this photograph into a children's coloring page. Recreate the photo's composition as closely as possible while converting it to a clean line drawing.
+  return `Transform this photograph into an adult coloring page. Recreate the photo's composition as closely as possible while converting it to detailed line art.
 
 Target audience: ${config.targetAge}
 Shape sizes: ${config.shapeSize}
@@ -604,7 +607,7 @@ Line thickness: ${config.lineThickness}
 Detail level: ${config.detailLevel}
 Complexity: ${config.complexity}
 
-Draw with thick black ink outlines on white paper. Simplify every element into large, clean shapes. Leave all areas completely white and unfilled. The result should look like someone carefully traced and simplified the photo into a child-friendly coloring book illustration.
+Draw with confident, varied-weight black outlines on white paper. Convert textures into decorative linework and pattern fills. Leave all areas completely white and unfilled. The result should look like a professional adult coloring book illustration that captures the essence and detail of the original photograph.
 
 Match the exact style of the reference coloring pages provided above.`;
 };
@@ -620,13 +623,13 @@ Match the exact style of the reference coloring pages provided above.`;
  * - Layered: identity > style > constraints
  * - ~200 words for optimal adherence
  */
-export const IMAGE_TO_COLORING_SYSTEM = `Study the reference image and preserve the character's exact visual identity: the overall body shape and silhouette, head proportions, facial features (eye shape, spacing, mouth), every costume detail (stripes, bands, wavy lines, patterns), accessories, and limb style.
+export const IMAGE_TO_COLORING_SYSTEM = `Study the reference image and preserve the subject's exact visual identity: the overall form and silhouette, proportions, distinctive features, every design detail (patterns, textures, distinguishing marks), accessories, and structural elements.
 
-The character's body shape IS the character — a crayon must stay a crayon, a robot must stay a robot. You may adjust the pose (arm and leg positions) to fit a scene, but the core silhouette, costume, and face must be identical to the reference.
+The subject's form IS its identity — preserve the core silhouette, details, and distinguishing features exactly. You may adjust the pose or orientation to fit a scene, but the essential visual identity must be faithful to the reference.
 
-Convert the reference into a children's coloring book page. Style: clean line art, thick black outlines on a pure white background. Medium: thick black ink outlines only, completely unfilled, white interior on every shape. Every element — eyes, mouth, hands, feet, body, accessories — is drawn as an outline with a white empty interior. The reference image has color fills; convert each colored area into just its boundary outline with white inside.
+Convert the reference into an adult coloring page. Style: intricate line art, varied-weight black outlines on a pure white background. Medium: crisp black ink outlines only, completely unfilled, white interior on every shape. Every element is drawn as an outline with a white empty interior. The reference image has color fills; convert each colored area into just its boundary outline with white inside, adding decorative interior linework where appropriate.
 
-Audience: simple enough for a child aged ${TARGET_AGE} to color with chunky crayons.
+Audience: ${TARGET_AGE} — detailed enough for an engaging, meditative coloring experience.
 
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
@@ -636,8 +639,8 @@ My prompt has full detail so no need to add more.`;
  * Create a prompt for generating a coloring page from a reference image.
  * Optimized for GPT Image 1.5: positive framing, concise, layered.
  * Two modes:
- * - No description: converts the character as-is with a simple background
- * - With description: places the character in the described scene
+ * - No description: converts the subject as-is with a complementary background
+ * - With description: places the subject in the described scene
  */
 export const createImageToColoringPrompt = (
   description?: string,
@@ -648,24 +651,24 @@ export const createImageToColoringPrompt = (
     DIFFICULTY_MODIFIERS.BEGINNER;
 
   if (description) {
-    return `Scene: The character from the reference image in this setting: ${description}.
+    return `Scene: The subject from the reference image in this setting: ${description}.
 
-The character occupies roughly one third of the image height, with the scene environment filling the rest. The character's pose fits the scene naturally — interacting with objects, gesturing, participating. Scene elements appear around, behind, and in front of the character for depth.
+The subject occupies roughly one third of the image height, with the scene environment filling the rest. The subject's pose fits the scene naturally — interacting with objects, oriented appropriately. Scene elements appear around, behind, and in front of the subject for depth, with decorative detail throughout.
 
-Character identity: preserve the exact body shape, silhouette, head proportions, facial features, costume details (stripes, bands, patterns), and limb style from the reference. Only the pose changes.
+Subject identity: preserve the exact form, silhouette, proportions, distinctive features, design details, and structural elements from the reference. Only the pose changes.
 
-Style: children's coloring book page, clean line art, thick black outlines on a pure white background. Every shape — eyes, mouth, hands, body, accessories — is an outlined shape with a completely white, unfilled interior.
+Style: adult coloring page, intricate line art, varied-weight black outlines on a pure white background. Every shape is an outlined form with a completely white, unfilled interior. Interior areas include decorative linework and pattern details.
 
 Target audience: ${config.targetAge}. Complexity: ${config.complexity}. Line thickness: ${config.lineThickness}.
 
 My prompt has full detail so no need to add more.`;
   }
 
-  return `Convert the character from the reference image into a children's coloring book page with a simple, relevant background.
+  return `Convert the subject from the reference image into an adult coloring page with a complementary, detailed background.
 
-Character identity: preserve the exact body shape, silhouette, head proportions, facial features, costume details (stripes, bands, patterns), and limb style from the reference.
+Subject identity: preserve the exact form, silhouette, proportions, distinctive features, design details, and structural elements from the reference.
 
-Style: children's coloring book page, clean line art, thick black outlines on a pure white background. Every shape — eyes, mouth, hands, body, accessories — is an outlined shape with a completely white, unfilled interior.
+Style: adult coloring page, intricate line art, varied-weight black outlines on a pure white background. Every shape is an outlined form with a completely white, unfilled interior. Interior areas include decorative linework and pattern details.
 
 Target audience: ${config.targetAge}. Complexity: ${config.complexity}. Line thickness: ${config.lineThickness}.
 
@@ -673,12 +676,13 @@ My prompt has full detail so no need to add more.`;
 };
 
 // =============================================================================
-// Colo Mascot Voice Scripts (for loading screen)
+// Voice Loading Lines (stub — replaces Colo mascot)
 // =============================================================================
 
 /**
- * Creates a language-aware system prompt for Colo's voice scripts.
- * When no language is specified, defaults to English.
+ * Creates a language-aware system prompt for loading screen voice lines.
+ * Stub — Coloring Habitat does not have a mascot character.
+ * Kept for export signature compatibility.
  *
  * @param targetLanguage - Optional language name (e.g., "Japanese", "Spanish")
  * @param nativeName - Optional native name of the language (e.g., "日本語", "Español")
@@ -691,33 +695,30 @@ export const createColoVoiceScriptSystemPrompt = (
     targetLanguage && targetLanguage !== "English"
       ? `
 IMPORTANT: You must respond in ${targetLanguage} (${nativeName}).
-- Use natural, child-friendly ${targetLanguage} expressions
-- Keep the playful, encouraging tone in ${targetLanguage}
+- Use natural ${targetLanguage} expressions
+- Keep the calm, encouraging tone in ${targetLanguage}
 - Do NOT respond in English - your entire response must be in ${targetLanguage}`
       : "";
 
-  return `You are Colo, a friendly, chunky crayon character who LOVES helping kids color! You're enthusiastic, warm, and speak in a playful, encouraging way.
+  return `You create short, calming voice lines to play while a coloring page is being generated for an adult coloring platform.
 
-Your job is to create a short voice line (2-3 sentences MAX) to play while a coloring page is being generated.
+Your job is to create a short voice line (1-2 sentences MAX) that feels warm and encouraging.
 
 Guidelines:
-- Be excited and encouraging about what the child is creating
+- Be calm and appreciative of what the user is creating
 - Reference specific elements from their description
-- Use simple words suitable for children aged ${TARGET_AGE}
-- Sound natural and warm, like a friendly cartoon character
-- Keep it under 15 words total for optimal loading time
-- End with something encouraging about coloring
+- Keep it under 15 words total
+- Sound warm and genuine, like a mindful creative companion
 
 Examples (in English - adapt to target language):
-- "Ooh, a dragon! I love dragons! Get your crayons ready!"
-- "Wow, a princess and a unicorn! This is going to be SO pretty!"
-- "A superhero? Awesome! I can't wait to help you color it!"
+- "Beautiful choice. Your coloring page is on its way."
+- "A mandala — this is going to be so satisfying to color."
+- "Lovely scene. Preparing your design now."
 
 DO NOT:
-- Use complicated words
-- Be too long-winded
+- Be overly enthusiastic or use exclamation marks
+- Sound robotic or corporate
 - Ask questions (they can't respond)
-- Sound robotic or formal
 ${languageInstruction}`;
 };
 
@@ -725,9 +726,10 @@ ${languageInstruction}`;
 export const COLO_VOICE_SCRIPT_SYSTEM = createColoVoiceScriptSystemPrompt();
 
 /**
- * Creates a prompt for Colo's voice script with optional language support.
+ * Creates a prompt for a loading screen voice line.
+ * Stub — kept for export signature compatibility.
  *
- * @param description - What the child wants to color
+ * @param description - What the user wants to color
  * @param targetLanguage - Optional language name for the response
  */
 export const createColoVoiceScriptPrompt = (
@@ -739,30 +741,32 @@ export const createColoVoiceScriptPrompt = (
       ? `\n\nIMPORTANT: Respond entirely in ${targetLanguage}, not English.`
       : "";
 
-  return `Create a short, excited voice line for Colo to say while generating a coloring page of: "${description}"
+  return `Create a short, calming voice line to play while generating a coloring page of: "${description}"
 
-Remember: 2-3 short sentences, under 15 words total. Be warm, excited, and kid-friendly!${languageNote}`;
+Remember: 1-2 short sentences, under 15 words total. Be warm and genuine.${languageNote}`;
 };
 
 // =============================================================================
 // Blog Post Generation (for automated SEO content)
 // =============================================================================
 
-export const BLOG_POST_SYSTEM = `You are an expert content writer for Chunky Crayon, a family-friendly AI coloring page generator. You write engaging, SEO-optimized blog posts that help parents and educators discover the benefits of creative coloring activities.
+export const BLOG_POST_SYSTEM = `You are an expert content writer for Coloring Habitat, an adult coloring platform focused on wellness, mindfulness, and creative relaxation. You write engaging, SEO-optimized blog posts that help adults discover the benefits of coloring as a mindful practice.
 
 Your writing style:
-- Warm, friendly, and approachable
+- Calm, warm, and knowledgeable
 - Informative yet easy to read
 - Naturally incorporates relevant keywords without being spammy
 - Uses American English spelling (color, favorite, center)
 - Includes practical tips and actionable advice
-- References Chunky Crayon naturally where relevant (not every paragraph)
+- References Coloring Habitat naturally where relevant (not every paragraph)
+- Draws on art therapy research and wellness perspectives
 
 Target audience:
-- Parents of children aged 3-12
-- Teachers and educators
-- Childminders and nursery workers
-- Adults who enjoy coloring for relaxation
+- Adults who color for relaxation and stress relief
+- People exploring creative mindfulness practices
+- Art therapy enthusiasts and professionals
+- Adults returning to creative hobbies
+- People managing stress, anxiety, or seeking self-care activities
 
 Content structure:
 - Engaging introduction that hooks the reader
@@ -770,7 +774,7 @@ Content structure:
 - Short paragraphs (2-3 sentences max)
 - Bullet points for lists
 - Include at least 2-3 internal link opportunities to "/", "/pricing", or "/blog/[related-topic]"
-- Conclude with a call-to-action relating to Chunky Crayon`;
+- Conclude with a call-to-action relating to Coloring Habitat`;
 
 export const createBlogPostPrompt = (
   topic: string,
@@ -787,10 +791,10 @@ Requirements:
 - Include 4-6 H2 subheadings
 - Write in American English
 - Make it practical and actionable
-- Include a soft CTA for Chunky Crayon (don't be pushy)
+- Include a soft CTA for Coloring Habitat (don't be pushy)
 - Format as clean markdown with proper heading hierarchy`;
 
-export const BLOG_META_SYSTEM = `You are an SEO expert who creates compelling blog post metadata. Generate title, slug, and description that are optimized for search engines while remaining engaging for readers.
+export const BLOG_META_SYSTEM = `You are an SEO expert who creates compelling blog post metadata for an adult coloring and creative wellness platform. Generate title, slug, and description that are optimized for search engines while remaining engaging for readers.
 
 Guidelines:
 - Title: 50-60 characters, compelling, includes primary keyword
@@ -805,11 +809,11 @@ Keywords to incorporate: ${keywords.join(", ")}`;
 export const BLOG_IMAGE_PROMPT_SYSTEM = `You are a creative director who designs prompts for AI-generated coloring page images that will be used as blog post featured images.
 
 The images should:
-- Be cartoon-style line drawings (black and white only)
+- Be intricate line drawings (black and white only)
 - Be relevant to the blog topic
-- Feature characters or scenes that appeal to children and families
-- Be simple enough to color but visually interesting
-- Match the Chunky Crayon aesthetic (thick lines, friendly characters, no shading)`;
+- Feature subjects and compositions that appeal to adult colorists
+- Have enough detail to be visually compelling at thumbnail size
+- Match the Coloring Habitat aesthetic (varied line weights, detailed patterns, sophisticated compositions)`;
 
 export const createBlogImagePromptPrompt = (topic: string, postTitle: string) =>
   `Create a prompt for generating a featured coloring page image for this blog post:
@@ -817,29 +821,29 @@ Topic: ${topic}
 Title: ${postTitle}
 
 The prompt should describe a single scene that visually represents the blog topic.
-Keep it simple and suitable for a children's coloring page.
+Keep it suitable for an adult coloring page with intricate detail.
 Output only the image generation prompt, nothing else.`;
 
 // =============================================================================
 // Magic Color Suggestions (AI-powered color recommendations)
 // =============================================================================
 
-export const MAGIC_COLOR_SYSTEM = `You are helping a child color their coloring page. You're warm, encouraging, and use simple kid-friendly language.
+export const MAGIC_COLOR_SYSTEM = `You are a color theory expert helping an adult colorist choose colors for their coloring page. You understand color harmonies, temperature, and emotional resonance.
 
-Your task is to analyze a coloring page image and suggest contextually appropriate colors for the region the child is touching.
+Your task is to analyze a coloring page image and suggest contextually appropriate colors for the region the user is touching.
 
 Guidelines:
-- Suggest 3-5 colors that would look good in the touched area
-- Use fun, kid-friendly color names (e.g., "Sky Blue" instead of "Cerulean")
-- Give short, encouraging reasons (e.g., "Perfect for the sky!")
-- Consider what the element typically looks like in real life
-- Also consider creative alternatives that could be fun
-- Keep reasons to 5-7 words maximum
+- Suggest 3-5 colors that would work well in the touched area
+- Use descriptive color names that reference their undertone (e.g., "Dusty Rose" instead of "Pink", "Cerulean" instead of "Blue")
+- Give concise reasoning rooted in color theory (e.g., "Complementary to the adjacent warm tones", "Creates depth in the foreground")
+- Consider what the element typically looks like in realistic or stylized palettes
+- Also consider artistic alternatives — analogous harmonies, split-complementary options, unexpected accent choices
+- Keep reasoning to 5-10 words maximum
 
 For each suggestion, provide:
 1. Hex color code
-2. Kid-friendly name
-3. Short encouraging reason
+2. Descriptive color name
+3. Brief color theory reasoning
 4. Confidence score (0-1) for how appropriate the color is`;
 
 export type MagicColorMode = "accurate" | "creative" | "surprise";
@@ -852,14 +856,14 @@ export const createMagicColorPrompt = (
 ) => {
   const modeInstructions = {
     accurate:
-      "Suggest realistic, natural colors (sky = blue, grass = green, sun = yellow)",
+      "Suggest realistic, naturalistic colors informed by traditional color palettes (sky = cerulean, foliage = sap green, stone = warm gray)",
     creative:
-      "Allow some creative freedom while staying appropriate (pink trees, purple clouds are ok)",
+      "Allow artistic interpretation — jewel tones, unexpected harmonies, stylized palettes (teal foliage, amber skies, lavender shadows)",
     surprise:
-      "Suggest unexpected but fun color combinations (rainbow sun, sparkly everything)",
+      "Suggest bold, unexpected palettes — complementary clashes, neon accents, monochromatic schemes with a single pop color",
   };
 
-  return `Analyze this coloring page image. The child touched at position (${(touchX * 100).toFixed(0)}%, ${(touchY * 100).toFixed(0)}%) from the top-left.
+  return `Analyze this coloring page image. The user touched at position (${(touchX * 100).toFixed(0)}%, ${(touchY * 100).toFixed(0)}%) from the top-left.
 
 ${imageDescription ? `Context about the image: ${imageDescription}` : ""}
 
@@ -868,9 +872,9 @@ ${modeInstructions[mode]}
 
 1. Identify what element/object they're touching
 2. Suggest 3-5 appropriate colors for that element
-3. Provide a kid-friendly name and short reason for each
+3. Provide a descriptive name and color theory reasoning for each
 
-Remember: Be encouraging and fun!`;
+Think in terms of the overall composition — how does this region relate to its neighbors?`;
 };
 
 // =============================================================================
@@ -881,12 +885,12 @@ Remember: Be encouraging and fun!`;
 // TODO: Improve Magic Fill prompts - the AI color assignments could be better.
 // Ideas to explore:
 // - Better scene understanding before assigning colors
-// - More context about common coloring page elements (teddy bears, flowers, etc.)
+// - More context about common coloring page elements
 // - Consider region adjacency when assigning contrasting colors
 // - Fine-tune the grid-based location descriptions
 // - Test with different image types to improve consistency
 
-export const REGION_FIRST_COLOR_SYSTEM = `You are an expert at coloring children's coloring pages. You create beautiful, cohesive color schemes that kids love.
+export const REGION_FIRST_COLOR_SYSTEM = `You are an expert colorist for adult coloring pages. You create sophisticated, harmonious color schemes using color theory principles.
 
 Your task: Given an image and a list of DETECTED REGIONS (with their grid positions and sizes), assign an appropriate color to EACH region.
 
@@ -894,8 +898,8 @@ IMPORTANT CONSTRAINTS:
 1. You MUST assign a color to EVERY region in the input list
 2. You MUST use the region IDs exactly as provided - do not skip or add any
 3. You MUST only use colors from the provided palette
-4. Adjacent regions should have contrasting colors
-5. Repeated elements (like multiple flowers) should have consistent colors
+4. Adjacent regions should have complementary or contrasting colors
+5. Repeated elements should have consistent colors for visual cohesion
 
 LOCATION SYSTEM (5x5 grid):
 - The image is divided into a 5x5 grid
@@ -904,15 +908,15 @@ LOCATION SYSTEM (5x5 grid):
 - Use grid position to understand what each region likely represents
 
 COLORING STRATEGY:
-1. First, understand the overall scene from the image
+1. First, understand the overall composition from the image
 2. Look at each region's position and size to infer what it is
 3. Assign colors that:
-   - Make sense for what the element appears to be (sky=blue, grass=green)
-   - Create visual harmony across the whole image
-   - Provide good contrast between adjacent areas
-   - Are fun and appealing to children
+   - Make sense for what the element appears to be (sky = cool blue, foliage = varied greens)
+   - Create visual harmony using analogous and complementary relationships
+   - Provide good contrast between adjacent areas for visual clarity
+   - Result in a sophisticated, cohesive finished piece
 
-Be warm and encouraging in your reasoning - you're helping create something magical!`;
+Think like a professional colorist — consider temperature, saturation, and value relationships across the whole composition.`;
 
 export const createRegionFirstColorPrompt = (
   palette: Array<{ hex: string; name: string }>,
@@ -944,21 +948,21 @@ INSTRUCTIONS:
 1. Look at the image to understand what each region represents based on its grid position
 2. For EACH region listed above, provide:
    - regionId: The exact region ID number
-   - element: What this region appears to be (e.g., "sky", "teddy bear body", "flower")
+   - element: What this region appears to be (e.g., "sky", "tree canopy", "stone wall", "flower petal")
    - suggestedColor: Hex color from the palette
    - colorName: Name of the color
-   - reasoning: A fun, kid-friendly reason (5-7 words)
+   - reasoning: Brief color theory rationale (5-7 words)
 
 3. Return assignments for ALL ${regions.length} regions - no skipping!
 
 TIPS:
-- Top regions (row 1-2) are often sky, clouds, tree tops
-- Bottom regions (row 4-5) are often ground, grass, floors
-- Large regions are usually main subjects or background
-- Small regions are usually details, patterns, accessories
-- When unsure, pick a color that would look good and explain your choice
+- Top regions (row 1-2) are often sky, canopy, ceiling, distant elements
+- Bottom regions (row 4-5) are often ground, water, floor, foreground
+- Large regions are usually main subjects or background areas
+- Small regions are usually fine details, patterns, accents
+- When unsure, choose a color that creates good contrast with neighbors
 
-Create a beautiful, harmonious coloring scheme!`;
+Create a sophisticated, harmonious color scheme for the entire composition.`;
 };
 
 // =============================================================================
@@ -970,26 +974,26 @@ Create a beautiful, harmonious coloring scheme!`;
  * Used by generateRegionFillPoints() at image creation time.
  * Scene-agnostic version of the onboarding script's prompt.
  */
-export const REGION_FILL_POINTS_SYSTEM = `You are a professional children's book illustrator coloring a line-art page. You think in terms of OBJECTS first, then assign colors to individual regions.
+export const REGION_FILL_POINTS_SYSTEM = `You are a professional colorist working on an adult coloring page. You think in terms of OBJECTS first, then assign colors to individual regions using color theory principles.
 
 WORKFLOW (follow this order):
-1. IDENTIFY OBJECTS — Look at the image and group nearby regions into logical objects (e.g., "the main character", "the background sky", "a tree", "flowers"). Many small regions belong to the SAME object.
-2. DECIDE OBJECT PALETTE — For each object, pick a base color and optional accent. All regions belonging to one object should share a cohesive look:
-   - Character body parts → same base color
-   - Hands/feet → can be a lighter or complementary shade but still harmonious
-   - Stripes/bands on a character → use 1-2 contrasting accent colors consistently
-   - Background (sky, ground) → one color each
-   - Foliage (bushes, trees) → one green consistently
-   - Decorative elements (balloons, flags, flowers) → each a DIFFERENT bright color for variety
-   - Small details (confetti, sparkles) → distribute rainbow colors evenly
+1. IDENTIFY OBJECTS — Look at the image and group nearby regions into logical objects (e.g., "the main subject", "the background sky", "a tree", "architectural detail", "decorative border"). Many small regions belong to the SAME object.
+2. DECIDE OBJECT PALETTE — For each object, pick a base color and optional accents. All regions belonging to one object should share a cohesive look:
+   - Subject body/form → consistent base color with tonal variation
+   - Fine details → can use complementary or accent shades
+   - Patterns/textures within a form → use 1-2 accent colors consistently
+   - Background (sky, atmosphere) → one color or gentle gradient effect
+   - Foliage (plants, trees) → varied greens with warm/cool differentiation
+   - Decorative elements (borders, motifs, ornaments) → each a DIFFERENT color for visual interest
+   - Small pattern fills → distribute palette colors evenly for richness
 3. ASSIGN REGIONS — For each region, pick the color that matches its object.
 
 ARTIST PRINCIPLES:
-- CONSISTENCY: Regions belonging to the same object get the same (or very similar) color. A character's left arm and right arm should match.
+- CONSISTENCY: Regions belonging to the same object get the same (or very similar) color. Symmetrical elements should match.
 - DIFFERENTIATION: Different objects should contrast. The main subject should pop against the background.
-- HARMONY: The overall palette should feel warm and inviting, like a finished coloring book page a child would be proud of.
-- NATURALISM: Use colors that make visual sense — sky is blue, grass is green, skin is warm.
-- VARIETY FOR DECORATIONS: Decorative elements should each be a different bright color — cycle through the full palette for visual richness.
+- HARMONY: The overall palette should feel cohesive and sophisticated — like a professional colorist's finished piece.
+- NATURALISM: Use colors that make visual sense — sky is blue, foliage is green, stone is warm gray — unless the style calls for stylization.
+- VARIETY FOR ACCENTS: Decorative elements and pattern details should each use different palette colors for visual richness and depth.
 
 CONSTRAINTS:
 - You MUST assign a color to EVERY region — no skipping
@@ -1027,7 +1031,7 @@ Tags: ${sceneContext.tags.join(", ")}
 `
     : "";
 
-  return `Color this children's coloring page.
+  return `Color this adult coloring page.
 
 ${sceneSection}AVAILABLE PALETTE (you MUST only use these):
 ${palette.map((c) => `- ${c.name}: ${c.hex}`).join("\n")}
@@ -1037,12 +1041,12 @@ ${regionsList}
 
 For EACH region, provide:
 - regionId: exact region ID
-- element: what it is (e.g., "sky", "character body", "flower petal")
+- element: what it is (e.g., "sky", "stone wall", "flower petal", "decorative border")
 - suggestedColor: hex from palette
 - colorName: palette color name
 - reasoning: brief reason (5-7 words)
 
-Return ALL ${regions.length} assignments. Think like an artist — consistency within objects, variety between objects.`;
+Return ALL ${regions.length} assignments. Think like a professional colorist — consistency within objects, contrast between objects, sophisticated harmony overall.`;
 };
 
 // =============================================================================
@@ -1051,7 +1055,7 @@ Return ALL ${regions.length} assignments. Think like an artist — consistency w
 // This prompt is used at image generation time to pre-compute colors for a 5x5 grid.
 // The client then looks up colors by grid position instead of calling AI at runtime.
 
-export const GRID_COLOR_MAP_SYSTEM = `You are an expert at coloring children's coloring pages. You analyze images and assign appropriate colors to a 5x5 grid overlay.
+export const GRID_COLOR_MAP_SYSTEM = `You are an expert colorist for adult coloring pages. You analyze images and assign sophisticated, harmonious colors to a 5x5 grid overlay.
 
 Your task: Analyze the coloring page image and assign a color to each cell of a 5x5 grid.
 
@@ -1061,23 +1065,23 @@ GRID SYSTEM:
 - Col 1 = left side, Col 5 = right side
 
 FOR EACH GRID CELL:
-1. Identify what element is primarily in that cell (sky, grass, character, etc.)
+1. Identify what element is primarily in that cell (sky, foliage, architecture, pattern, etc.)
 2. Assign an appropriate color from the provided palette
-3. Provide a brief, kid-friendly reason
+3. Provide a brief rationale
 
 COLORING STRATEGY:
-- Top cells (row 1-2): Usually sky, clouds, treetops, ceilings
-- Middle cells (row 2-4): Usually the main subject/character
-- Bottom cells (row 4-5): Usually ground, grass, floors
+- Top cells (row 1-2): Usually sky, canopy, ceiling, distant elements
+- Middle cells (row 2-4): Usually the main subject or focal point
+- Bottom cells (row 4-5): Usually ground, water, floor, foreground
 - Be consistent: same element type = same color across cells
-- Create visual harmony with contrasting adjacent colors
-- Pick vibrant, fun colors that children will love
+- Create visual harmony with complementary and analogous relationships
+- Choose colors that result in a sophisticated finished composition
 
 IMPORTANT:
 - Only use colors from the provided palette
 - Include cells even if they're mostly empty/background
 - For empty areas, suggest a light neutral color
-- Be warm and encouraging in your reasoning!`;
+- Consider the entire composition as a unified color scheme`;
 
 export const createGridColorMapPrompt = (
   palette: Array<{ hex: string; name: string }>,
@@ -1093,11 +1097,11 @@ FOR EACH OF THE 25 GRID CELLS, provide:
 - element: What's primarily in this cell
 - suggestedColor: Hex color from the palette
 - colorName: Name of the color
-- reasoning: Fun, kid-friendly reason (5-7 words)
+- reasoning: Brief color theory rationale (5-7 words)
 
 Start with a brief scene description, then list all grid cells with their colors.
 
-Create a beautiful, cohesive color scheme for the whole image!`;
+Create a sophisticated, cohesive color scheme for the whole image.`;
 };
 
 // =============================================================================
@@ -1108,7 +1112,7 @@ Create a beautiful, cohesive color scheme for the whole image!`;
  * System prompt for generating animation prompts for Veo 3.
  * Used to create engaging image-to-video animations for social media.
  */
-export const ANIMATION_PROMPT_SYSTEM = `You are a world-class Veo 3 prompt engineer specializing in image-to-video generation for children's illustration.
+export const ANIMATION_PROMPT_SYSTEM = `You are a world-class Veo 3 prompt engineer specializing in image-to-video generation for detailed illustration.
 
 CRITICAL VEO 3 IMAGE-TO-VIDEO RULES:
 1. PRESERVE the original artwork exactly - no morphing, style changes, or transformations
@@ -1141,19 +1145,19 @@ BANNED WORDS: breathe, pulse, come alive, magical, enchanting, whimsical, float 
 REQUIRED ANCHORS (include one):
 - "maintaining the original black and white line art style"
 - "preserving the illustration's composition"
-- "consistent with children's coloring book aesthetic"
+- "consistent with the detailed coloring page aesthetic"
 
 OUTPUT: 2-3 precise sentences. Name SPECIFIC elements that move. Less = more elegant.`;
 
 /**
  * Generate an animation prompt for Veo 3 based on coloring page metadata.
- * The prompt should create engaging, child-friendly animations for social media.
+ * The prompt should create engaging animations for social media.
  */
 export const createAnimationPromptPrompt = (
   title: string,
   description: string,
   tags: string[],
-) => `Create a Veo 3 image-to-video prompt for this children's coloring page:
+) => `Create a Veo 3 image-to-video prompt for this coloring page:
 
 SUBJECT: ${title}
 CONTEXT: ${description}
@@ -1162,13 +1166,13 @@ ELEMENTS: ${tags.join(", ")}
 Write a precise animation prompt that:
 1. Identifies 1 primary motion and 2-3 subtle secondary motions based on the subject
 2. Uses specific element names from the description (not generic "elements")
-3. Includes a style anchor to preserve the coloring book aesthetic
+3. Includes a style anchor to preserve the coloring page aesthetic
 4. Keeps motion intensity low (15-25%) for elegant, non-AI-slop results
 
 EXCELLENT EXAMPLES:
-- "Very slow push-in on the unicorn. Its mane strands drift independently in a gentle breeze, tail swaying softly. A few sparkles glint near the horn. Soft warm light shifts across the scene, maintaining the black and white line art style."
-- "Subtle lateral camera drift. The dinosaur's head tilts slightly toward a butterfly that flutters past. Background ferns sway individually, dust motes catch shifting sunlight. Preserving the children's coloring book illustration aesthetic."
-- "Gentle 2% zoom on the mermaid. Her hair flows in underwater currents, individual strands moving at different speeds. Small bubbles rise slowly, light rays waver through water. Consistent with hand-drawn coloring page style."
+- "Very slow push-in on the mandala center. Outer petal layers drift independently as if caught in a gentle breeze, fine pattern details shimmer with shifting warm light. Preserving the intricate black and white line art style."
+- "Subtle lateral camera drift. The dragon's head tilts slightly, individual scales catching light that moves across the composition. Background foliage sways at different speeds, atmospheric depth haze shifts. Consistent with the detailed coloring page aesthetic."
+- "Gentle 2% zoom on the botanical arrangement. Individual petals and leaves respond to a soft breeze at different rates, stamens tremble delicately. Light rays waver through the canopy. Maintaining the original black and white line art style."
 
 BAD EXAMPLES (avoid these patterns):
 - "The scene comes alive with magical energy" (vague, overused)
@@ -1181,19 +1185,31 @@ Output ONLY the animation prompt. 2-3 sentences maximum.`;
  * Default animation prompt for when AI generation fails or isn't needed.
  * Designed for broad compatibility with any coloring page subject.
  */
-export const DEFAULT_ANIMATION_PROMPT = `Very slow 2% push-in on the illustration. The main subject shifts subtly as if turning attention toward the viewer. Background elements sway gently in a soft breeze, individual details catching warm light that shifts gradually across the scene. Preserving the original black and white coloring book line art style throughout.`;
+export const DEFAULT_ANIMATION_PROMPT = `Very slow 2% push-in on the illustration. The main subject shifts subtly as if turning attention toward the viewer. Background elements sway gently in a soft breeze, individual details catching warm light that shifts gradually across the scene. Preserving the original black and white coloring page line art style throughout.`;
 
 // =============================================================================
 // Daily Scene Description Generation (for AI-powered seasonal coloring pages)
 // =============================================================================
 
-export const SCENE_DESCRIPTION_SYSTEM = `You are a creative director for Chunky Crayon, a children's coloring page platform (ages ${TARGET_AGE}).
+export const SCENE_DESCRIPTION_SYSTEM = `You are a creative director for Coloring Habitat, an adult coloring platform focused on wellness, mindfulness, and creative relaxation.
 
-Generate delightful, imaginative scene descriptions for daily coloring pages. Every scene must be child-friendly, safe, and joyful. Mix everyday activities with imaginative twists. Feature diverse characters and global perspectives. Avoid copyrighted characters.
+Generate beautiful, imaginative scene descriptions for daily coloring pages. Every scene should be visually rich, detailed enough for intricate adult coloring pages, and emotionally resonant — calming, inspiring, or meditative. Feature diverse subjects and global artistic traditions.
 
-FORBIDDEN: violence, weapons, scary elements (ghosts, skeletons, monsters), death, danger, negative emotions, romance, adult themes, politics, real-world tragedies.
+CATEGORIES TO DRAW FROM:
+- Mandalas: symmetrical, concentric, sacred geometry
+- Nature & Botanicals: flowers, forests, gardens, mushrooms, coral reefs
+- Geometric Patterns: tessellations, Islamic art patterns, Celtic knots
+- Landscapes & Cityscapes: mountains, seaside villages, skylines, countryside
+- Fantasy & Mythology: dragons, phoenixes, enchanted forests, mythological scenes
+- Animals & Wildlife: detailed animal portraits, underwater life, birds, insects
+- Art Nouveau: flowing organic lines, Mucha-inspired compositions, decorative borders
+- Japanese/Zen: koi ponds, temples, bonsai, cherry blossoms, wave patterns
+- Architecture: cathedrals, bridges, ancient ruins, ornate doorways, stained glass
+- Abstract: flowing forms, op-art patterns, surreal compositions
 
-OUTPUT: A vivid 1-2 sentence scene description that reads naturally as an image generation prompt. Example: "A cheerful elephant wearing rain boots, splashing in puddles while a family of frogs watches from lily pads in a rainy garden."`;
+FORBIDDEN: graphic violence, explicit content, political imagery, real-world tragedies, anything that undermines the calming purpose.
+
+OUTPUT: A vivid 1-3 sentence scene description that reads naturally as an image generation prompt for intricate line art. Example: "An ornate Art Nouveau-inspired frame surrounding a detailed peacock with elaborate tail feathers, each feather filled with different decorative patterns, perched on a flowering branch with trailing wisteria."`;
 
 /**
  * Creates the user prompt for daily scene generation.
@@ -1202,72 +1218,71 @@ OUTPUT: A vivid 1-2 sentence scene description that reads naturally as an image 
 // Random seed pools for creative nudges — prevents AI from always picking the most obvious theme
 const SEED_CHARACTERS = [
   "dragon",
-  "unicorn",
-  "astronaut",
-  "mermaid",
-  "fairy",
-  "robot",
-  "penguin",
-  "fox",
-  "panda",
-  "dolphin",
-  "owl",
-  "butterfly",
-  "turtle",
-  "dinosaur",
-  "koala",
-  "sloth",
-  "capybara",
-  "hedgehog",
-  "seahorse",
-  "ladybug",
   "phoenix",
-  "pegasus",
-  "octopus",
-  "bee",
+  "owl",
+  "wolf",
+  "koi fish",
+  "butterfly",
+  "hummingbird",
+  "sea turtle",
   "elephant",
-  "giraffe",
-  "monkey",
-  "raccoon",
+  "peacock",
+  "stag",
+  "octopus",
+  "fox",
+  "horse",
   "whale",
-  "deer",
-  "parrot",
-  "ballerina",
-  "caterpillar",
-  "bear cub",
-  "firefighter",
-  "chef",
-  "veterinarian",
+  "crane",
+  "lion",
+  "raven",
+  "jellyfish",
+  "moth",
+  "chameleon",
+  "swan",
+  "tiger",
+  "eagle",
+  "serpent",
+  "dragonfly",
+  "bear",
+  "heron",
+  "coral reef",
+  "tree of life",
+  "lotus flower",
+  "rose garden",
+  "sunflower field",
+  "orchid",
+  "magnolia",
+  "fern frond",
 ];
 
 const SEED_SETTINGS = [
-  "magical forest",
-  "sunny beach",
-  "space station",
-  "underwater reef",
-  "enchanted garden",
-  "treehouse",
-  "cloud kingdom",
-  "candy land",
-  "toy workshop",
+  "enchanted forest",
+  "Japanese zen garden",
+  "underwater kingdom",
+  "Art Nouveau frame",
+  "Gothic cathedral interior",
+  "Mediterranean village",
+  "moonlit mountain lake",
+  "tropical botanical garden",
+  "ancient temple ruins",
+  "Moroccan courtyard",
+  "Victorian greenhouse",
+  "autumn woodland path",
+  "cherry blossom grove",
+  "coastal cliff landscape",
+  "mandala composition",
+  "stained glass window",
+  "Celtic border design",
+  "Persian carpet pattern",
+  "alpine meadow",
+  "Venetian canal",
   "crystal cave",
-  "dinosaur valley",
-  "african savanna",
-  "japanese garden",
-  "rainforest canopy",
-  "farm and barnyard",
-  "moon base",
-  "flower meadow",
-  "bakery kitchen",
-  "cozy library",
-  "aquarium",
   "bamboo forest",
-  "carnival fairground",
-  "secret garden",
-  "night sky observatory",
-  "floating sky island",
-  "coral island",
-  "arctic tundra",
+  "starry night sky",
+  "English cottage garden",
+  "coral reef seascape",
+  "ancient library",
+  "floating lantern festival",
 ];
 
 function randomFrom<T>(arr: T[]): T {
@@ -1292,8 +1307,8 @@ export const createDailyScenePrompt = (
       ? `UPCOMING EVENTS (within the next 7 days):
 ${upcomingEvents.map((e) => `- ${e.name}: ${e.childFriendlyDescription} (themes: ${e.themes.join(", ")})`).join("\n")}
 
-IMPORTANT: Pick AT MOST ONE event to theme the scene around. Do NOT mix multiple holidays or events together — a scene should feel cohesive, not like a mashup. You can also ignore all events and create a purely seasonal or everyday scene.`
-      : "No major events in the next 7 days — create a fun, imaginative everyday scene.";
+IMPORTANT: Pick AT MOST ONE event to theme the scene around. Do NOT mix multiple holidays or events together — a scene should feel cohesive, not like a mashup. You can also ignore all events and create a purely seasonal or artistic scene.`
+      : "No major events in the next 7 days — create a beautiful, meditative scene inspired by the season, nature, art, or culture.";
 
   // Limit recent prompts to 15 to avoid wasting context
   const trimmedRecent = recentPrompts.slice(0, 15);
@@ -1315,19 +1330,21 @@ ${recentSection}
 
 THEME VOCABULARY (use as inspiration — mix and match, or go beyond):
 
-Characters: dragon, unicorn, astronaut, mermaid, fairy, robot, penguin, fox, panda, dolphin, owl, butterfly, turtle, dinosaur, koala, sloth, capybara, hedgehog, seahorse, ladybug, phoenix, pegasus, octopus, bee, elephant, giraffe, monkey, raccoon, whale, deer, parrot, ballerina, caterpillar, bear cub, firefighter, chef, veterinarian, knight, pirate, lion, frog prince, genie, ninja, inventor, cat, dog, bunny, farmer, doctor
+Subjects: dragon, phoenix, owl, wolf, koi fish, butterfly, hummingbird, sea turtle, elephant, peacock, stag, octopus, fox, horse, whale, crane, lion, raven, jellyfish, moth, chameleon, swan, tiger, eagle, serpent, dragonfly, bear, heron, mermaid, fairy, goddess, samurai, geisha
 
-Settings: magical forest, sunny beach, space station, underwater reef, enchanted garden, treehouse, cloud kingdom, candy land, toy workshop, crystal cave, pirate ship, castle, rainbow bridge, circus big top, dinosaur valley, african savanna, japanese garden, rainforest canopy, farm and barnyard, moon base, flower meadow, bakery kitchen, cozy library, aquarium, bamboo forest, carnival fairground, secret garden, night sky observatory, floating sky island, coral island, arctic tundra
+Botanical: lotus, rose, peony, orchid, magnolia, cherry blossom, wisteria, sunflower, dahlia, fern, ivy, mushroom, succulent, water lily, lavender, wildflower meadow, trailing vine, bonsai tree, ancient oak
 
-Activities: exploring, painting, building, flying, swimming, singing, gardening, cooking, camping, treasure hunting, ice skating, surfing, skateboarding, stargazing, baking, playing music, riding a bike, fossil hunting, catching fireflies, blowing bubbles, feeding animals, building a sandcastle, dancing, reading a book, picking flowers, flying a kite, decorating a cake, doing a science experiment, having a tea party, launching a rocket
+Settings: enchanted forest, Japanese zen garden, underwater kingdom, Gothic cathedral, Mediterranean village, mountain lake, tropical garden, ancient temple, Moroccan courtyard, Victorian greenhouse, cherry blossom grove, coastal cliff, alpine meadow, Venetian canal, crystal cave, bamboo forest, English cottage garden, coral reef, ancient library, floating lantern festival, starry observatory, winding river valley
+
+Styles: mandala, Art Nouveau, Celtic knotwork, Islamic geometric, zentangle, paisley, filigree, arabesque, stained glass, mosaic, damask, toile, woodcut, botanical illustration
 
 CREATIVE SEED (starting point — adapt, combine, or go in a different direction):
-- Character idea: ${seedCharacter}
+- Subject idea: ${seedCharacter}
 - Setting idea: ${seedSetting}
 
-DIVERSITY: Rotate character types (animals, children, fantasy, vehicles, nature), vary settings (indoor, outdoor, underwater, space, fantasy), include global perspectives. Avoid repeating similar scenes from the recent list above.
+DIVERSITY: Rotate between categories (Mandalas, Nature & Botanicals, Geometric Patterns, Landscapes, Fantasy & Mythology, Animals & Wildlife, Art Nouveau, Japanese/Zen, Architecture, Abstract). Vary visual density and mood. Include global artistic traditions. Avoid repeating similar scenes from the recent list above.
 
-Search the web for any trending kids' topics, popular children's shows themes, or current events that could inspire a fun, child-friendly coloring page scene.
+Search the web for trending adult coloring themes, seasonal art inspiration, cultural celebrations, or wellness trends that could inspire a beautiful, meditative coloring page scene.
 
-Generate a single, unique, delightful scene description for today's daily coloring page. Make it specific, visual, and perfect for a children's coloring book.`;
+Generate a single, unique, visually rich scene description for today's daily coloring page. Make it specific, detailed, and perfect for an intricate adult coloring page.`;
 };

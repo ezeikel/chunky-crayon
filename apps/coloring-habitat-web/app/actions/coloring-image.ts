@@ -1,8 +1,7 @@
-// @ts-nocheck — TODO: adapt for Habitat auth & db
 "use server";
 
 import { put, del } from "@/lib/storage";
-import { revalidatePath, revalidateTag, cacheLife, cacheTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { after } from "next/server";
 import QRCode from "qrcode";
 import sharp from "sharp";
@@ -25,12 +24,12 @@ import {
   ColoringImage,
   GenerationType,
   CreditTransactionType,
+  Brand,
 } from "@one-colored-pixel/db";
 import { getRandomDescriptionSmart as getRandomDescription } from "@/utils/random";
 import { getAIDescription } from "@/lib/scene-generation";
 import type { ColoringImageSearchParams } from "@/types";
 import { getUserId } from "@/app/actions/user";
-import { getActiveProfile } from "@/app/actions/profiles";
 import { checkSvgImage, retraceImage, traceImage } from "@/utils/traceImage";
 import { generateAmbientSoundForImage } from "@/app/actions/ambient-sound";
 import { generateRegionFillPoints } from "@/app/actions/generate-color-map";
@@ -58,17 +57,12 @@ const LOCALE_LANGUAGE_MAP: Record<
  * - Defaults to OpenAI (cheaper) with Gemini fallback
  * - Can be switched via IMAGE_PROVIDER env var
  * - Automatically falls back on provider failures
- * - Uses difficulty level from profile for age-appropriate generation
  */
-const generateColoringImage = async (
-  description: string,
-  userId?: string,
-  difficulty?: "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "EXPERT",
-) => {
+const generateColoringImage = async (description: string, userId?: string) => {
   const providerConfig = getCurrentProviderConfig();
 
   try {
-    const result = await generateColoringPageImage(description, difficulty);
+    const result = await generateColoringPageImage(description);
 
     // Track successful generation with timing
     const trackingData = {
@@ -146,14 +140,10 @@ const generateColoringImageWithMetadata = async (
   // Get language info for the locale (default to English if unknown)
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
 
-  // Get active profile early to use its difficulty setting for generation
-  const activeProfile = await getActiveProfile();
-  const difficulty = activeProfile?.difficulty;
-
   // Get traced models for observability (latency, tokens, costs)
   const tracedModels = getTracedModels({
     userId,
-    properties: { action: "coloring-image-generation", difficulty },
+    properties: { action: "coloring-image-generation" },
   });
 
   // Step 1: Clean up the user's description
@@ -167,16 +157,11 @@ const generateColoringImageWithMetadata = async (
   console.log("[Pipeline] Description cleaned:", cleanedUpUserDescription);
 
   // Step 2: Generate the coloring image (returns buffer to avoid re-fetching)
-  // Uses difficulty from active profile for age-appropriate generation
   const {
     url: imageUrl,
     tempFileName,
     imageBuffer,
-  } = await generateColoringImage(
-    cleanedUpUserDescription as string,
-    userId,
-    difficulty,
-  );
+  } = await generateColoringImage(cleanedUpUserDescription as string, userId);
 
   if (!imageUrl || !imageBuffer) {
     throw new Error("Failed to generate an acceptable image");
@@ -221,7 +206,6 @@ const generateColoringImageWithMetadata = async (
   });
 
   // Step 4: Create DB record (needs metadata)
-  // Uses activeProfile fetched at start of function
   // Note: animationPrompt is generated in after() hook with image visibility
   const coloringImage = await db.coloringImage.create({
     data: {
@@ -231,14 +215,14 @@ const generateColoringImageWithMetadata = async (
       tags: imageMetadata.tags,
       generationType: generationType || GenerationType.USER,
       userId,
-      profileId: activeProfile?.id,
       sourcePrompt: sourcePrompt || undefined,
+      brand: Brand.COLORING_HABITAT,
     },
   });
 
   // Step 5: Generate QR code (needs coloringImage.id, but very fast ~50ms)
   const qrCodeSvg = await QRCode.toString(
-    `https://chunkycrayon.com?utm_source=${coloringImage.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
+    `https://coloringhabitat.com?utm_source=${coloringImage.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
     { type: "svg" },
   );
 
@@ -537,19 +521,16 @@ export const createColoringImage = async (
   return result;
 };
 
-// Base cached function for fetching a coloring image by ID
+// Base function for fetching a coloring image by ID
 export async function getColoringImageBase(
   id: string,
 ): Promise<Partial<ColoringImage> | null> {
   // 'use cache'; // TODO: enable caching
 
-  // The id parameter is serializable and becomes part of the cache key
-  cacheLife("max");
-  cacheTag("coloring-image", `coloring-image-${id}`);
-
   return db.coloringImage.findUnique({
     where: {
       id,
+      brand: Brand.COLORING_HABITAT,
     },
     select: {
       id: true,
@@ -580,35 +561,33 @@ export const getColoringImageById = async (
   return getColoringImageBase(id);
 };
 
-async function getAllColoringImagesBase(
-  show = "all",
-  userId?: string,
-  profileId?: string,
-) {
+async function getAllColoringImagesBase(show = "all", userId?: string) {
   // 'use cache'; // TODO: enable caching
-  cacheLife("max");
-  cacheTag("all-coloring-images");
 
-  // Build where clause based on show mode and profile
+  // Build where clause based on show mode (no profile filtering in Habitat)
   let whereClause;
 
   if (show === "all") {
     if (userId) {
-      // Show user's images (filtered by profile if available) + community images
+      // Show user's images + community images, brand-filtered
       whereClause = {
-        OR: [{ userId, ...(profileId ? { profileId } : {}) }, { userId: null }],
+        OR: [{ userId }, { userId: null }],
+        brand: Brand.COLORING_HABITAT,
       };
     } else {
       // Logged out - show community images only
-      whereClause = { userId: null };
+      whereClause = { userId: null, brand: Brand.COLORING_HABITAT };
     }
   } else {
     // show === 'user' - only user's images
     if (userId) {
-      whereClause = { userId, ...(profileId ? { profileId } : {}) };
+      whereClause = { userId, brand: Brand.COLORING_HABITAT };
     } else {
       // No userId but trying to show user's images - return empty
-      whereClause = { id: { in: [] } };
+      whereClause = {
+        id: { in: [] as string[] },
+        brand: Brand.COLORING_HABITAT,
+      };
     }
   }
 
@@ -634,14 +613,7 @@ export const getAllColoringImages = async (
 
   const userId = await getUserId(ACTIONS.GET_ALL_COLORING_IMAGES);
 
-  // Get active profile for filtering
-  let profileId: string | undefined;
-  if (userId) {
-    const activeProfile = await getActiveProfile();
-    profileId = activeProfile?.id;
-  }
-
-  return getAllColoringImagesBase(show, userId || undefined, profileId);
+  return getAllColoringImagesBase(show, userId || undefined);
 };
 
 // Static version for generateStaticParams - no user context needed

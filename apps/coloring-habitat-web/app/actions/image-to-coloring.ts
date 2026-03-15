@@ -1,4 +1,3 @@
-// @ts-nocheck — TODO: adapt for Habitat auth & db
 "use server";
 
 import { put, del } from "@/lib/storage";
@@ -14,9 +13,13 @@ import {
 } from "@/lib/ai";
 import { ACTIONS, TRACKING_EVENTS } from "@/constants";
 import { trackWithUser } from "@/utils/analytics-server";
-import { db, ColoringImage, GenerationType } from "@one-colored-pixel/db";
+import {
+  db,
+  ColoringImage,
+  GenerationType,
+  Brand,
+} from "@one-colored-pixel/db";
 import { getUserId } from "@/app/actions/user";
-import { getActiveProfile } from "@/app/actions/profiles";
 import { traceImage } from "@/utils/traceImage";
 
 /**
@@ -72,11 +75,8 @@ export async function createColoringImageFromReference(
       // eslint-disable-next-line no-console
       console.log("[ImageToColoring] Dev mode — generating image only...");
 
-      const {
-        url: imageUrl,
-        imageBuffer,
-        generationTimeMs,
-      } = await generateColoringPageFromImage(imageBase64, description);
+      const { url: imageUrl, generationTimeMs } =
+        await generateColoringPageFromImage(imageBase64, description);
 
       // eslint-disable-next-line no-console
       console.log(
@@ -96,16 +96,11 @@ export async function createColoringImageFromReference(
   // Get language info for the locale
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
 
-  // Get active profile for difficulty setting
-  const activeProfile = await getActiveProfile();
-  const difficulty = activeProfile?.difficulty;
-
   // Get traced models for observability
   const tracedModels = getTracedModels({
     userId,
     properties: {
       action: "image-to-coloring-generation",
-      difficulty,
       hasSceneDescription: !!description,
     },
   });
@@ -122,11 +117,7 @@ export async function createColoringImageFromReference(
       tempFileName,
       imageBuffer,
       generationTimeMs,
-    } = await generateColoringPageFromImage(
-      imageBase64,
-      description,
-      difficulty,
-    );
+    } = await generateColoringPageFromImage(imageBase64, description);
 
     if (!imageUrl || !imageBuffer) {
       throw new Error("Failed to generate coloring image from reference");
@@ -188,13 +179,13 @@ export async function createColoringImageFromReference(
         tags: imageMetadata.tags,
         generationType: GenerationType.USER,
         userId,
-        profileId: activeProfile?.id,
+        brand: Brand.COLORING_HABITAT,
       },
     });
 
     // Step 4: Generate QR code
     const qrCodeSvg = await QRCode.toString(
-      `https://chunkycrayon.com?utm_source=${coloringImage.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
+      `https://coloringhabitat.com?utm_source=${coloringImage.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
       { type: "svg" },
     );
 

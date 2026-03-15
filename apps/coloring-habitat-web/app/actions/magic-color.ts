@@ -1,4 +1,3 @@
-// @ts-nocheck — TODO: adapt for Habitat auth & db
 "use server";
 
 import { generateText, Output } from "ai";
@@ -39,7 +38,7 @@ export type MagicColorInput = {
  * Uses Gemini Flash for fast vision analysis.
  *
  * @param input - Image data and touch coordinates
- * @returns Color suggestions with kid-friendly names and reasons
+ * @returns Color suggestions with names and reasons
  */
 export async function getMagicColorSuggestions(
   input: MagicColorInput,

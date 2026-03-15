@@ -1,4 +1,3 @@
-// @ts-nocheck — TODO: adapt for Habitat auth & db
 "use server";
 
 import { put, del } from "@/lib/storage";
@@ -13,10 +12,14 @@ import {
   generateColoringPageFromPhoto,
 } from "@/lib/ai";
 import { ACTIONS, TRACKING_EVENTS } from "@/constants";
-import { trackWithUser, track } from "@/utils/analytics-server";
-import { db, ColoringImage, GenerationType } from "@one-colored-pixel/db";
+import { trackWithUser } from "@/utils/analytics-server";
+import {
+  db,
+  ColoringImage,
+  GenerationType,
+  Brand,
+} from "@one-colored-pixel/db";
 import { getUserId } from "@/app/actions/user";
-import { getActiveProfile } from "@/app/actions/profiles";
 import { traceImage } from "@/utils/traceImage";
 
 /**
@@ -35,10 +38,6 @@ const LOCALE_LANGUAGE_MAP: Record<
 };
 
 type CreateFromPhotoResult = Partial<ColoringImage> | { error: string };
-
-const isErrorResult = (
-  result: CreateFromPhotoResult,
-): result is { error: string } => "error" in result;
 
 /**
  * Generate a coloring image directly from a user's photo.
@@ -63,14 +62,10 @@ export async function createColoringImageFromPhoto(
   // Get language info for the locale
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
 
-  // Get active profile for difficulty setting
-  const activeProfile = await getActiveProfile();
-  const difficulty = activeProfile?.difficulty;
-
   // Get traced models for observability
   const tracedModels = getTracedModels({
     userId,
-    properties: { action: "photo-to-coloring-generation", difficulty },
+    properties: { action: "photo-to-coloring-generation" },
   });
 
   try {
@@ -83,7 +78,7 @@ export async function createColoringImageFromPhoto(
       tempFileName,
       imageBuffer,
       generationTimeMs,
-    } = await generateColoringPageFromPhoto(photoBase64, difficulty);
+    } = await generateColoringPageFromPhoto(photoBase64);
 
     if (!imageUrl || !imageBuffer) {
       throw new Error("Failed to generate coloring image from photo");
@@ -145,13 +140,13 @@ export async function createColoringImageFromPhoto(
         tags: imageMetadata.tags,
         generationType: GenerationType.USER,
         userId,
-        profileId: activeProfile?.id,
+        brand: Brand.COLORING_HABITAT,
       },
     });
 
     // Step 4: Generate QR code
     const qrCodeSvg = await QRCode.toString(
-      `https://chunkycrayon.com?utm_source=${coloringImage.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
+      `https://coloringhabitat.com?utm_source=${coloringImage.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
       { type: "svg" },
     );
 
