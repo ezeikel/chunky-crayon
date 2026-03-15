@@ -698,6 +698,9 @@ importers:
       '@sentry/nextjs':
         specifier: ^10.42.0
         version: 10.42.0(@opentelemetry/context-async-hooks@2.5.1(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.5.1(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.5.1(@opentelemetry/api@1.9.0))(next@16.1.0(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.101.3)
+      '@stripe/stripe-js':
+        specifier: ^7.3.0
+        version: 7.9.0
       '@vercel/analytics':
         specifier: ^1.2.2
         version: 1.5.0(next@16.1.0(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
@@ -731,6 +734,12 @@ importers:
       playwright:
         specifier: ^1.52.0
         version: 1.55.0
+      posthog-js:
+        specifier: ^1.309.1
+        version: 1.309.1
+      posthog-node:
+        specifier: ^5.17.4
+        version: 5.17.4
       qrcode:
         specifier: ^1.5.3
         version: 1.5.4
@@ -746,6 +755,12 @@ importers:
       sharp:
         specifier: ^0.34.1
         version: 0.34.5
+      sonner:
+        specifier: ^2.0.3
+        version: 2.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      stripe:
+        specifier: ^18.1.0
+        version: 18.5.0(@types/node@22.19.13)
       tailwind-merge:
         specifier: ^3.2.0
         version: 3.3.1

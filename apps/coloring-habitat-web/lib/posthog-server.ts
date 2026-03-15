@@ -1,5 +1,25 @@
-// Stub — PostHog not yet configured for Habitat
-export function captureServerEvent(..._args: unknown[]) {}
-export function getPostHogClient() {
-  return null;
+import { PostHog } from "posthog-node";
+
+let posthogClient: PostHog | null = null;
+
+export const getPostHogClient = (): PostHog | null => {
+  if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return null;
+
+  if (!posthogClient) {
+    posthogClient = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+      host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      flushAt: 1,
+      flushInterval: 0,
+    });
+  }
+  return posthogClient;
+};
+
+export function captureServerEvent(
+  distinctId: string,
+  event: string,
+  properties?: Record<string, unknown>,
+) {
+  const client = getPostHogClient();
+  client?.capture({ distinctId, event, properties });
 }
