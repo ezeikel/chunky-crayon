@@ -70,7 +70,7 @@ const Header = () => {
             <FontAwesomeIcon icon={faGlobe} size="sm" />
           </button>
           <Link
-            href="/login"
+            href="/signin"
             className="rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground transition-shadow hover:shadow-md"
           >
             Sign in
@@ -109,7 +109,7 @@ const Header = () => {
             ))}
             <li className="mt-4 border-t border-border pt-4">
               <Link
-                href="/login"
+                href="/signin"
                 className="block rounded-lg bg-primary px-4 py-3 text-center text-base font-bold text-primary-foreground"
                 onClick={() => setMobileOpen(false)}
               >
