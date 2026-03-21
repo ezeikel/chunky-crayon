@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import Providers from "@/components/Providers";
 import "./globals.css";
 
 config.autoAddCss = false;
@@ -47,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={jakarta.variable}>
       <body className="font-sans antialiased">
-        {children}
+        <Providers>{children}</Providers>
         <Analytics />
       </body>
     </html>
