@@ -8,27 +8,27 @@ Goal: Bring Coloring Habitat to full feature parity with Chunky Crayon (minus ki
 
 Without this, monetization is broken — Stripe webhook is a stub.
 
-- [ ] 1.1 Port Stripe webhook handler (CC's 559-line implementation → Habitat plan names GROVE/SANCTUARY)
-- [ ] 1.2 Add `formatNumber.ts` and `formatPenniesToPounds.ts` utils
-- [ ] 1.3 Enhance `utils/stripe.ts` with credit calculations, proration logic
-- [ ] 1.4 Add `/api/subscription/credit-drip` route for monthly subscriber credit drip
-- [ ] 1.5 Create Billing page (`/account/billing/page.tsx`) with Billing component
-- [ ] 1.6 Create billing success page (`/account/billing/success/page.tsx`)
-- [ ] 1.7 Add `PaymentFailedEmail.tsx` email template
-- [ ] 1.8 Add `email.ts` server action for sending emails via Resend
+- [x] 1.1 Port Stripe webhook handler (CC's 559-line implementation → Habitat plan names GROVE/SANCTUARY)
+- [x] 1.2 Add `formatNumber.ts` and `formatPenniesToPounds.ts` utils
+- [x] 1.3 Enhance `utils/stripe.ts` with credit calculations, proration logic
+- [x] 1.4 Add `/api/subscription/credit-drip` route for monthly subscriber credit drip
+- [x] 1.5 Create Billing page (`/account/billing/page.tsx`) with Billing component
+- [x] 1.6 Create billing success page (`/account/billing/success/page.tsx`)
+- [x] 1.7 Add `PaymentFailedEmail.tsx` email template
+- [x] 1.8 Add `email.ts` server action for sending emails via Resend
 
 ## Phase 2: Core UI Components & Header
 
 Enables all subsequent pages — header dropdown, shadcn primitives, layout components.
 
-- [ ] 2.1 Copy shadcn UI primitives from CC: button, card, dialog, dropdown-menu, sonner/toast, input, textarea, select, switch, badge, avatar
-- [ ] 2.2 Create Loading component
+- [x] 2.1 Copy shadcn UI primitives from CC: button, card, dialog, dropdown-menu, sonner/toast, input, textarea, select, switch, badge, avatar
+- [x] 2.2 Create Loading component
 - [ ] 2.3 Create PageWrap component
 - [ ] 2.4 Create Breadcrumbs component
-- [ ] 2.5 Create HeaderDropdown with account menu (billing, settings, sign out) + credits display
-- [ ] 2.6 Upgrade Header to show authenticated nav (My Artwork link), credits pill, dropdown
-- [ ] 2.7 Improve mobile menu with full nav items and auth state
-- [ ] 2.8 Add sonner Toaster to root layout for toast notifications
+- [x] 2.5 Create HeaderDropdown with account menu (billing, settings, sign out) + credits display
+- [x] 2.6 Upgrade Header to show authenticated nav (My Artwork link), credits pill, dropdown
+- [x] 2.7 Improve mobile menu with full nav items and auth state
+- [x] 2.8 Add sonner Toaster to root layout for toast notifications
 
 ## Phase 3: Account Pages
 
