@@ -1,28 +1,42 @@
+import { Suspense } from "react";
 import { connection } from "next/server";
-import { db } from "@one-colored-pixel/db";
-import Image from "next/image";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { BRAND } from "@/lib/db";
+import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
+import DifficultyFilter from "@/components/DifficultyFilter/DifficultyFilter";
+import { GALLERY_CATEGORIES } from "@/constants";
+import {
+  getGalleryImages,
+  getDifficultyImages,
+  getDifficultyCounts,
+  getDifficultyFromSlug,
+} from "@/app/data/gallery";
+import cn from "@/utils/cn";
 
-const GalleryPage = async () => {
+export const metadata: Metadata = {
+  title: "Gallery",
+  description:
+    "Browse our collection of intricate coloring pages for adults. Filter by category or difficulty.",
+};
+
+type GalleryPageProps = {
+  searchParams: Promise<{ difficulty?: string; category?: string }>;
+};
+
+const GalleryPage = async ({ searchParams }: GalleryPageProps) => {
   await connection();
 
-  const images = await db.coloringImage.findMany({
-    where: { brand: BRAND },
-    orderBy: { createdAt: "desc" },
-    take: 24,
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      url: true,
-      svgUrl: true,
-      difficulty: true,
-      tags: true,
-    },
-  });
+  const { difficulty: difficultySlug } = await searchParams;
+  const difficulty = difficultySlug
+    ? getDifficultyFromSlug(difficultySlug)
+    : null;
+
+  const [data, difficultyCounts] = await Promise.all([
+    difficulty ? getDifficultyImages(difficulty) : getGalleryImages(),
+    getDifficultyCounts(),
+  ]);
 
   return (
     <>
@@ -33,49 +47,53 @@ const GalleryPage = async () => {
             Gallery
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Browse our collection of intricate coloring pages
+            Browse our collection of intricate coloring pages for relaxation and
+            mindfulness
           </p>
 
-          {images.length === 0 ? (
-            <div className="mt-16 text-center">
-              <p className="text-lg text-muted-foreground">
-                No coloring pages yet. Check back soon!
-              </p>
-            </div>
-          ) : (
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {images.map((image) => (
-                <Link
-                  key={image.id}
-                  href={`/coloring-image/${image.id}`}
-                  className="group"
-                >
-                  <div className="relative aspect-square overflow-hidden rounded-2xl bg-secondary">
-                    {image.url && (
-                      <Image
-                        src={image.url}
-                        alt={image.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    )}
-                    {image.difficulty && (
-                      <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-foreground backdrop-blur-sm">
-                        {image.difficulty}
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-3">
-                    <h3 className="font-bold text-foreground">{image.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-1">
-                      {image.description}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          {/* Category filter pills */}
+          <div className="mt-8 flex flex-wrap gap-2">
+            <Link
+              href="/gallery"
+              className={cn(
+                "inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium transition-all",
+                !difficultySlug
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border bg-background text-muted-foreground hover:bg-secondary hover:text-foreground",
+              )}
+            >
+              All
+            </Link>
+            {GALLERY_CATEGORIES.map((cat) => (
+              <Link
+                key={cat.slug}
+                href={`/gallery/${cat.slug}`}
+                className="inline-flex items-center rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+              >
+                {cat.name}
+              </Link>
+            ))}
+          </div>
+
+          {/* Difficulty filter */}
+          <Suspense fallback={null}>
+            <DifficultyFilter
+              currentDifficulty={difficulty}
+              counts={difficultyCounts}
+              className="mt-4"
+            />
+          </Suspense>
+
+          {/* Gallery grid */}
+          <div className="mt-8">
+            <GalleryGrid
+              initialImages={data.images}
+              initialCursor={data.nextCursor}
+              initialHasMore={data.hasMore}
+              galleryType={difficulty ? "difficulty" : "all"}
+              difficultySlug={difficultySlug}
+            />
+          </div>
         </div>
       </main>
       <Footer />

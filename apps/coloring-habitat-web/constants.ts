@@ -240,6 +240,214 @@ export const TRACKING_EVENTS = {
   LANGUAGE_CHANGED: "language_changed",
 } as const;
 
+// ===== GALLERY CATEGORIES (for SEO landing pages) =====
+
+export type GalleryCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  keywords: string[];
+  tags: string[];
+};
+
+export const GALLERY_CATEGORIES: GalleryCategory[] = [
+  {
+    id: "mandalas",
+    name: "Mandalas",
+    slug: "mandalas",
+    description:
+      "Intricate mandala coloring pages for meditation and relaxation",
+    keywords: [
+      "mandala coloring pages",
+      "mandala art",
+      "meditation coloring",
+      "zentangle",
+    ],
+    tags: [
+      "mandala",
+      "mandalas",
+      "zentangle",
+      "meditation",
+      "circular",
+      "symmetry",
+      "symmetrical",
+    ],
+  },
+  {
+    id: "nature",
+    name: "Nature",
+    slug: "nature",
+    description:
+      "Beautiful nature scenes and botanical coloring pages for adults",
+    keywords: [
+      "nature coloring pages",
+      "botanical coloring",
+      "floral coloring",
+      "garden coloring",
+    ],
+    tags: [
+      "nature",
+      "botanical",
+      "floral",
+      "flower",
+      "flowers",
+      "garden",
+      "plant",
+      "plants",
+      "tree",
+      "trees",
+      "leaves",
+      "forest",
+    ],
+  },
+  {
+    id: "geometric",
+    name: "Geometric",
+    slug: "geometric",
+    description: "Complex geometric patterns and tessellations to color",
+    keywords: [
+      "geometric coloring pages",
+      "pattern coloring",
+      "tessellation coloring",
+    ],
+    tags: [
+      "geometric",
+      "geometry",
+      "pattern",
+      "patterns",
+      "tessellation",
+      "abstract pattern",
+      "mosaic",
+    ],
+  },
+  {
+    id: "landscapes",
+    name: "Landscapes",
+    slug: "landscapes",
+    description:
+      "Scenic landscape coloring pages featuring mountains, oceans, and cityscapes",
+    keywords: [
+      "landscape coloring pages",
+      "scenery coloring",
+      "mountain coloring",
+    ],
+    tags: [
+      "landscape",
+      "landscapes",
+      "scenery",
+      "mountain",
+      "mountains",
+      "ocean",
+      "sea",
+      "city",
+      "cityscape",
+      "skyline",
+      "sunset",
+    ],
+  },
+  {
+    id: "fantasy",
+    name: "Fantasy",
+    slug: "fantasy",
+    description:
+      "Magical and fantastical coloring pages with mythical creatures and enchanted worlds",
+    keywords: [
+      "fantasy coloring pages",
+      "mythical creatures coloring",
+      "magical coloring",
+    ],
+    tags: [
+      "fantasy",
+      "magic",
+      "magical",
+      "mythical",
+      "fairy",
+      "dragon",
+      "unicorn",
+      "enchanted",
+      "wizard",
+      "castle",
+    ],
+  },
+  {
+    id: "animals",
+    name: "Animals",
+    slug: "animals",
+    description:
+      "Detailed animal coloring pages from realistic wildlife to decorative designs",
+    keywords: [
+      "animal coloring pages",
+      "wildlife coloring",
+      "detailed animal art",
+    ],
+    tags: [
+      "animal",
+      "animals",
+      "wildlife",
+      "bird",
+      "birds",
+      "fish",
+      "butterfly",
+      "horse",
+      "cat",
+      "dog",
+      "owl",
+      "wolf",
+      "deer",
+    ],
+  },
+  {
+    id: "architecture",
+    name: "Architecture",
+    slug: "architecture",
+    description:
+      "Architectural coloring pages featuring buildings, cathedrals, and interiors",
+    keywords: [
+      "architecture coloring pages",
+      "building coloring",
+      "cathedral coloring",
+    ],
+    tags: [
+      "architecture",
+      "building",
+      "buildings",
+      "cathedral",
+      "church",
+      "temple",
+      "house",
+      "interior",
+      "facade",
+      "bridge",
+    ],
+  },
+  {
+    id: "abstract",
+    name: "Abstract",
+    slug: "abstract",
+    description: "Free-form abstract coloring pages for creative expression",
+    keywords: [
+      "abstract coloring pages",
+      "creative coloring",
+      "artistic coloring",
+    ],
+    tags: [
+      "abstract",
+      "artistic",
+      "creative",
+      "freeform",
+      "contemporary",
+      "modern art",
+      "expressive",
+      "swirl",
+      "swirls",
+    ],
+  },
+];
+
+export const getCategoryBySlug = (slug: string): GalleryCategory | undefined =>
+  GALLERY_CATEGORIES.find((cat) => cat.slug === slug);
+
 // Scene generation seed data
 export const SETTINGS = [
   "forest",

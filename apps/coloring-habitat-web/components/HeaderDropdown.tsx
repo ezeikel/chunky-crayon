@@ -65,7 +65,7 @@ const HeaderDropdown = ({ user }: HeaderDropdownProps) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem asChild>
-          <Link href="/my-artwork" className="cursor-pointer">
+          <Link href="/account/my-artwork" className="cursor-pointer">
             <FontAwesomeIcon
               icon={faPalette}
               className="text-muted-foreground"

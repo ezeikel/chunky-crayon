@@ -7,11 +7,29 @@ const nextConfig: NextConfig = {
       revalidate: 60 * 60 * 24 * 7,
       expire: 60 * 60 * 24 * 30,
     },
+    gallery: {
+      stale: 60 * 5,
+      revalidate: 60 * 60,
+      expire: 60 * 60 * 24,
+    },
+    hours: {
+      stale: 60,
+      revalidate: 60 * 60,
+      expire: 60 * 60 * 24,
+    },
   },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "assets.coloringhabitat.com" },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/_r2/:path*",
+        destination: "https://assets.coloringhabitat.com/:path*",
+      },
+    ];
   },
 };
 

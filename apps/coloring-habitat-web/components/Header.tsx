@@ -15,7 +15,7 @@ import HeaderDropdown from "@/components/HeaderDropdown";
 const authenticatedLinks = [
   { label: "Home", href: "/" },
   { label: "Gallery", href: "/gallery" },
-  { label: "My Artwork", href: "/my-artwork" },
+  { label: "My Artwork", href: "/account/my-artwork" },
   { label: "Pricing", href: "/pricing" },
 ];
 
