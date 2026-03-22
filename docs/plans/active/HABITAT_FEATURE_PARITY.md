@@ -58,7 +58,7 @@ Goal: Bring Coloring Habitat to full feature parity with Chunky Crayon (minus ki
 - [x] 6.1 Add `/api/canvas/progress` route for cross-session persistence
 - [x] 6.2 Add `/api/coloring-image/generate-scene` with Perplexity Sonar + dedup
 - [x] 6.3 Add `/gallery/daily` page
-- [ ] 6.4 Connect Blog to Sanity CMS (pending Sanity MCP auth)
+- [x] 6.4 Connect Blog to Sanity CMS (project 1od8pera, event-driven auto-generation)
 - [x] 6.5 Add RecentCreations component + hook
 - [ ] 6.6 Add Plausible analytics proxy
 - [ ] 6.7 Add `/admin/social` page
