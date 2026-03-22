@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "assets.coloringhabitat.com" },
+      { protocol: "https", hostname: "cdn.sanity.io" },
     ],
   },
   async rewrites() {
