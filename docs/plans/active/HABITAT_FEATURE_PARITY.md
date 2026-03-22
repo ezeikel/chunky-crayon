@@ -4,7 +4,7 @@ Goal: Bring Coloring Habitat to full feature parity with Chunky Crayon (minus ki
 
 ---
 
-## Phase 1: Payment Infrastructure (CRITICAL)
+## Phase 1: Payment Infrastructure (CRITICAL) ✅
 
 Without this, monetization is broken — Stripe webhook is a stub.
 
@@ -17,7 +17,7 @@ Without this, monetization is broken — Stripe webhook is a stub.
 - [x] 1.7 Add `PaymentFailedEmail.tsx` email template
 - [x] 1.8 Add `email.ts` server action for sending emails via Resend
 
-## Phase 2: Core UI Components & Header
+## Phase 2: Core UI Components & Header ✅
 
 Enables all subsequent pages — header dropdown, shadcn primitives, layout components.
 
@@ -30,31 +30,31 @@ Enables all subsequent pages — header dropdown, shadcn primitives, layout comp
 - [x] 2.7 Improve mobile menu with full nav items and auth state
 - [x] 2.8 Add sonner Toaster to root layout for toast notifications
 
-## Phase 3: Account Pages
+## Phase 3: Account Pages ✅
 
 User retention — artwork management, settings, sharing.
 
-- [ ] 3.1 Create My Artwork page (`/account/my-artwork/page.tsx`)
-- [ ] 3.2 Create Settings page (`/account/settings/page.tsx`) with `settings.ts` server action
-- [ ] 3.3 Port `share-artwork.ts` and `share.ts` server actions
-- [ ] 3.4 Create ShareArtworkModal and SocialShare components
-- [ ] 3.5 Create shared artwork page (`/shared/[code]/page.tsx`)
-- [ ] 3.6 Add `proxy.ts` for auth protection on `/account/*` routes
-- [ ] 3.7 Port `entitlements.ts` server action for feature gating
+- [x] 3.1 Create My Artwork page (`/account/my-artwork/page.tsx`)
+- [x] 3.2 Create Settings page (`/account/settings/page.tsx`) with `settings.ts` server action
+- [x] 3.3 Port `share-artwork.ts` and `share.ts` server actions
+- [x] 3.4 Create ShareArtworkModal and SocialShare components
+- [x] 3.5 Create shared artwork page (`/shared/[code]/page.tsx`)
+- [x] 3.6 Add middleware for auth protection on `/account/*` routes
+- [x] 3.7 Port `entitlements.ts` server action for feature gating
 
-## Phase 4: Gallery Enhancements
+## Phase 4: Gallery Enhancements ✅
 
 SEO, discoverability, user engagement.
 
-- [ ] 4.1 Create gallery data layer (`/app/data/gallery.ts`) with categories, difficulties, pagination, caching
-- [ ] 4.2 Port `load-gallery-images.ts` and `load-more-images.ts` server actions
-- [ ] 4.3 Create InfiniteScrollGallery component
-- [ ] 4.4 Create DifficultyFilter component (adapted for Habitat theming)
-- [ ] 4.5 Add gallery sub-routes: `/gallery/[category]`, `/gallery/difficulty/[difficulty]`, `/gallery/tag/[tag]`
-- [ ] 4.6 Add `next.config.ts` cacheLife profiles for gallery pages
-- [ ] 4.7 Add R2 rewrite in `next.config.ts` for CORS-free asset serving
-- [ ] 4.8 Add `galleryRefresh.ts` util for cache invalidation
-- [ ] 4.9 Port PDF generation (`generatePDF.tsx` + `generatePDFNode.tsx`)
+- [x] 4.1 Create gallery data layer (`/app/data/gallery.ts`) with categories, difficulties, pagination, caching
+- [x] 4.2 Port `load-gallery-images.ts` and `load-more-images.ts` server actions
+- [x] 4.3 Create GalleryGrid component with load-more
+- [x] 4.4 Create DifficultyFilter component (adapted for Habitat theming)
+- [x] 4.5 Add gallery sub-routes: `/gallery/[category]`, `/gallery/difficulty/[difficulty]`
+- [x] 4.6 Add `next.config.ts` cacheLife profiles for gallery pages
+- [x] 4.7 Add R2 rewrite in `next.config.ts` for CORS-free asset serving
+- [x] 4.8 Add `galleryRefresh.ts` util for cache invalidation
+- [x] 4.9 Port PDF generation (`generatePDF.tsx` + `generatePDFNode.tsx`)
 
 ## Phase 5: Guest Mode & Conversion
 
