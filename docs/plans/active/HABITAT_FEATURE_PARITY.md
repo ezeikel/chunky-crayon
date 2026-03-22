@@ -60,7 +60,7 @@ Goal: Bring Coloring Habitat to full feature parity with Chunky Crayon (minus ki
 - [x] 6.3 Add `/gallery/daily` page
 - [x] 6.4 Connect Blog to Sanity CMS (project 1od8pera, event-driven auto-generation)
 - [x] 6.5 Add RecentCreations component + hook
-- [ ] 6.6 Add Plausible analytics proxy
+- [x] ~~6.6 Add Plausible analytics proxy~~ (removed — using PostHog only)
 - [ ] 6.7 Add `/admin/social` page
 - [x] 6.8 Clean up orphaned kid-specific stubs (deleted 8 files)
 
