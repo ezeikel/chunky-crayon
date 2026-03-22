@@ -1,5 +1,7 @@
 // Canvas-related constants for Coloring Habitat (adult coloring)
 
+export const FREE_CREDITS = 10;
+
 export const MAX_IMAGE_GENERATION_ATTEMPTS = 3;
 
 // Admin emails

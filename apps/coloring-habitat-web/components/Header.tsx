@@ -2,17 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
   faXmark,
-  faGlobe,
-  faUser,
   faArrowRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
+import { signOut } from "next-auth/react";
+import HeaderDropdown from "@/components/HeaderDropdown";
 
-const navLinks = [
+const authenticatedLinks = [
+  { label: "Home", href: "/" },
+  { label: "Gallery", href: "/gallery" },
+  { label: "My Artwork", href: "/my-artwork" },
+  { label: "Pricing", href: "/pricing" },
+];
+
+const unauthenticatedLinks = [
   { label: "Home", href: "/" },
   { label: "Gallery", href: "/gallery" },
   { label: "Pricing", href: "/pricing" },
@@ -23,6 +30,8 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session, status } = useSession();
   const isAuthenticated = status === "authenticated";
+
+  const navLinks = isAuthenticated ? authenticatedLinks : unauthenticatedLinks;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
@@ -71,34 +80,13 @@ const Header = () => {
         {/* Desktop actions */}
         <div className="hidden items-center gap-2 lg:flex">
           {isAuthenticated ? (
-            <>
-              <div className="flex items-center gap-3">
-                {session?.user?.image ? (
-                  <img
-                    src={session.user.image}
-                    alt={session.user.name || ""}
-                    className="h-8 w-8 rounded-full"
-                  />
-                ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                    {session?.user?.name?.[0] ||
-                      session?.user?.email?.[0] ||
-                      "?"}
-                  </div>
-                )}
-                <span className="text-sm font-semibold text-foreground">
-                  {session?.user?.name || session?.user?.email?.split("@")[0]}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => signOut()}
-                className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                aria-label="Sign out"
-              >
-                <FontAwesomeIcon icon={faArrowRightFromBracket} size="sm" />
-              </button>
-            </>
+            <HeaderDropdown
+              user={{
+                name: session?.user?.name,
+                email: session?.user?.email,
+                image: session?.user?.image,
+              }}
+            />
           ) : (
             <Link
               href="/signin"

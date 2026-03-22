@@ -4,12 +4,20 @@ import {
   SubscriptionStatus,
 } from "@one-colored-pixel/db";
 
+type PriceMapping = {
+  planName: string;
+  billingPeriod: BillingPeriod;
+};
+
 // Habitat plan names — wellness/mindfulness themed
 export const HABITAT_PLANS = {
   BLOOM: "BLOOM", // Free tier
   GROVE: "GROVE", // Mid tier
   SANCTUARY: "SANCTUARY", // Premium tier
 } as const;
+
+export type HabitatPlanName =
+  (typeof HABITAT_PLANS)[keyof typeof HABITAT_PLANS];
 
 export const PLAN_PRICE_MAP: Record<
   string,
@@ -44,4 +52,88 @@ export const mapStripeStatus = (status: string): SubscriptionStatus => {
     paused: "PAUSED",
   };
   return map[status] || "EXPIRED";
+};
+
+export const mapStripePriceToPlanName = (priceId: string): PriceMapping => {
+  const mapping = PLAN_PRICE_MAP[priceId];
+  if (mapping) {
+    return { planName: mapping.plan, billingPeriod: mapping.period };
+  }
+
+  // Fallback: check env vars directly
+  switch (priceId) {
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_GROVE_MONTHLY:
+      return { planName: "GROVE", billingPeriod: BillingPeriod.MONTHLY };
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_GROVE_ANNUAL:
+      return { planName: "GROVE", billingPeriod: BillingPeriod.ANNUAL };
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_SANCTUARY_MONTHLY:
+      return { planName: "SANCTUARY", billingPeriod: BillingPeriod.MONTHLY };
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_SANCTUARY_ANNUAL:
+      return { planName: "SANCTUARY", billingPeriod: BillingPeriod.ANNUAL };
+    default:
+      throw new Error(`Unknown price ID: ${priceId}`);
+  }
+};
+
+// Monthly credit allotment per Habitat plan
+export const PLAN_CREDITS_MONTHLY: Record<string, number> = {
+  GROVE: 300,
+  SANCTUARY: 800,
+};
+
+// Rollover caps: max credits that can carry over to next month
+// Grove: 1 month rollover (300 max carryover)
+// Sanctuary: 2 months rollover (1600 max carryover)
+export const PLAN_ROLLOVER_CAPS: Record<string, number> = {
+  GROVE: 300,
+  SANCTUARY: 1600,
+};
+
+export const getCreditAmountFromPlanName = (planName: string): number => {
+  const credits = PLAN_CREDITS_MONTHLY[planName];
+  if (credits === undefined) {
+    throw new Error(`Unknown plan name: ${planName}`);
+  }
+  return credits;
+};
+
+export const getCreditAmountFromPriceId = (priceId?: string): number | null => {
+  if (!priceId) return null;
+
+  switch (priceId) {
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000:
+      return 1000;
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_CREDITS_500:
+      return 500;
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100:
+      return 100;
+    default:
+      return null;
+  }
+};
+
+export const calculateProratedCredits = (
+  currentPlanCredits: number,
+  newPlanCredits: number,
+  daysRemainingInPeriod: number,
+  totalDaysInPeriod: number,
+  isUpgrade: boolean,
+): number => {
+  if (!isUpgrade) {
+    return 0;
+  }
+
+  const creditDifference = newPlanCredits - currentPlanCredits;
+  return Math.floor(
+    (creditDifference * daysRemainingInPeriod) / totalDaysInPeriod,
+  );
+};
+
+export const getDaysInPeriod = (billingPeriod: "monthly" | "annual"): number =>
+  billingPeriod === "monthly" ? 30 : 365;
+
+export const calculateDaysRemaining = (currentPeriodEnd: Date): number => {
+  const now = new Date();
+  const diffTime = currentPeriodEnd.getTime() - now.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
