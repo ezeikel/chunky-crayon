@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { getCurrentUser } from "@/app/actions/user";
 import { useRouter } from "next/navigation";
+import { useGuestMode } from "@/hooks/useGuestMode";
 
 type User = {
   id: string;
@@ -16,12 +17,21 @@ type User = {
   }[];
 };
 
+type BlockedReason =
+  | "not_signed_in"
+  | "no_credits"
+  | "guest_limit_reached"
+  | null;
+
 const useUser = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   const isSignedIn = !!user;
+  const isGuest = !isSignedIn;
+
+  const guestMode = useGuestMode();
 
   const fetchUser = useCallback(async () => {
     try {
@@ -57,13 +67,19 @@ const useUser = () => {
 
   const hasEnoughCredits = user?.credits ? user.credits >= 5 : false;
 
-  const canGenerate = isSignedIn ? hasEnoughCredits : false;
+  // Signed-in users: check credits. Guests: check daily free limit.
+  const canGenerate = isSignedIn ? hasEnoughCredits : guestMode.canGenerate;
 
-  const getBlockedReason = (): "not_signed_in" | "no_credits" | null => {
+  const remainingGenerations = isSignedIn
+    ? (user?.credits ?? 0)
+    : guestMode.remainingGenerations;
+
+  const getBlockedReason = (): BlockedReason => {
     if (canGenerate) return null;
 
     if (!isSignedIn) {
-      return "not_signed_in";
+      // Guest who has exhausted daily free generations
+      return guestMode.canGenerate ? "not_signed_in" : "guest_limit_reached";
     }
 
     return "no_credits";
@@ -73,11 +89,16 @@ const useUser = () => {
     user,
     isLoading,
     isSignedIn,
+    isGuest,
     hasEnoughCredits,
     hasActiveSubscription,
     handleAuthAction,
     canGenerate,
     blockedReason: getBlockedReason(),
+    remainingGenerations,
+    // Expose guest mode helpers for callers that need them
+    recordGuestGeneration: guestMode.recordGeneration,
+    hasUsedFreeGeneration: guestMode.hasUsedFreeGeneration,
   };
 };
 
