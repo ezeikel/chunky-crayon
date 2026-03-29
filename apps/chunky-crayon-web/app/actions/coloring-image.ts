@@ -352,6 +352,14 @@ export const createColoringImage = async (
         return;
       }
 
+      // Track creation completed
+      await trackWithUser(userId, TRACKING_EVENTS.CREATION_COMPLETED, {
+        coloringImageId: result.id,
+        description: rawFormData.description,
+        durationMs: 0, // TODO: capture end-to-end timing
+        creditsUsed: 5,
+      });
+
       // Run all post-processing tasks in parallel, independently
       await Promise.allSettled([
         // Check SVG validity and retrace if needed
@@ -451,6 +459,14 @@ export const createColoringImage = async (
     if (!result.url || !result.svgUrl) {
       return;
     }
+
+    // Track creation completed (guest)
+    await track(TRACKING_EVENTS.CREATION_COMPLETED, {
+      coloringImageId: result.id,
+      description: rawFormData.description,
+      durationMs: 0, // TODO: capture end-to-end timing
+      creditsUsed: 0,
+    });
 
     // Run all post-processing tasks in parallel, independently
     await Promise.allSettled([

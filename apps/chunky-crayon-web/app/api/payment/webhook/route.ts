@@ -212,6 +212,15 @@ export const POST = async (req: Request) => {
         value: priceAmount,
       });
 
+      // Track checkout completed
+      await trackWithUser(user.id, TRACKING_EVENTS.CHECKOUT_COMPLETED, {
+        productType: 'subscription',
+        planName,
+        value: priceAmount,
+        currency: 'gbp',
+        transactionId: session.id,
+      });
+
       // Send to Conversion APIs (Facebook + Pinterest)
       if (user.email) {
         await sendPurchaseConversionEvents({
@@ -297,6 +306,15 @@ export const POST = async (req: Request) => {
             await trackWithUser(user.id, TRACKING_EVENTS.CREDITS_PURCHASED, {
               creditAmount,
               value: priceAmount,
+            });
+
+            // Track checkout completed for credits
+            await trackWithUser(user.id, TRACKING_EVENTS.CHECKOUT_COMPLETED, {
+              productType: 'credits',
+              creditAmount,
+              value: priceAmount,
+              currency: 'gbp',
+              transactionId: session.id,
             });
 
             // Send to Conversion APIs (Facebook + Pinterest)

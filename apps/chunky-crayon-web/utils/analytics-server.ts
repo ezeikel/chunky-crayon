@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { track as vercelTrackServer } from '@vercel/analytics/server';
-import { getPostHogClient, shutdownPostHog } from '@/lib/posthog-server';
+import { createPostHogClient } from '@/lib/posthog-server';
 import { getUserId, getCurrentUser } from '@/app/actions/user';
 import type { EventProperties, TrackingEvent } from '@/types/analytics';
 
@@ -30,8 +30,8 @@ const cleanVercelProperties = (
 /**
  * Server-side analytics tracking for server actions and API routes.
  *
- * Automatically enriches events with user information from the session.
- * Sends events to both PostHog and Vercel Analytics.
+ * Creates a per-request PostHog client and shuts it down after capture
+ * to ensure events flush reliably in serverless environments.
  *
  * @example
  * ```ts
@@ -68,8 +68,8 @@ export const track = async <
       environment: 'server',
     };
 
-    // PostHog tracking
-    const posthog = getPostHogClient();
+    // PostHog tracking — per-request client for reliable serverless flushing
+    const posthog = createPostHogClient();
     if (posthog) {
       // Identify user if we have their info
       if (userProperties && userId) {
@@ -85,8 +85,7 @@ export const track = async <
         properties: enrichedProperties,
       });
 
-      // Flush immediately for serverless
-      await shutdownPostHog();
+      await posthog.shutdown();
     }
 
     // Vercel Analytics
@@ -131,14 +130,15 @@ export const trackWithUser = async <
       environment: 'server',
     };
 
-    const posthog = getPostHogClient();
+    // Per-request client for reliable serverless flushing
+    const posthog = createPostHogClient();
     if (posthog) {
       posthog.capture({
         distinctId: userId,
         event,
         properties: enrichedProperties,
       });
-      await shutdownPostHog();
+      await posthog.shutdown();
     }
 
     await vercelTrackServer(event, cleanVercelProperties(enrichedProperties));

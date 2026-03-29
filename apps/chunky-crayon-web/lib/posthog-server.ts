@@ -1,16 +1,15 @@
 import { PostHog } from 'posthog-node';
 
-let posthogClient: PostHog | null = null;
-
 /**
- * Get or create a PostHog client for server-side tracking.
- * Configured for serverless with immediate flushing.
+ * Create a PostHog Node SDK client configured for server-side use.
+ *
+ * PostHog recommends creating a client per request in serverless environments
+ * and calling `shutdown()` when done so events flush before the function freezes.
  */
-export function getPostHogClient(): PostHog | null {
+export function createPostHogClient(): PostHog | null {
   const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-  const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST;
 
-  if (!posthogKey || !posthogHost) {
+  if (!posthogKey) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
       console.warn('PostHog server-side tracking disabled: missing env vars');
@@ -18,16 +17,28 @@ export function getPostHogClient(): PostHog | null {
     return null;
   }
 
-  if (!posthogClient) {
-    posthogClient = new PostHog(posthogKey, {
-      host: posthogHost,
-      // For serverless functions, flush immediately
-      flushAt: 1,
-      flushInterval: 0,
-    });
-  }
+  // Server-side: send directly to PostHog EU, not through the reverse proxy.
+  // The proxy (/ingest) is for client-side ad-blocker avoidance and doesn't
+  // work server-side (deployment URLs have Vercel Authentication).
+  return new PostHog(posthogKey, {
+    host: 'https://eu.i.posthog.com',
+    flushAt: 1,
+    flushInterval: 0,
+  });
+}
 
-  return posthogClient;
+// Lazy singleton — created on first access so the env var is available at runtime
+let posthogServerInstance: PostHog | null | undefined;
+
+/**
+ * Get a shared PostHog server client (lazy singleton).
+ * Prefer `createPostHogClient()` + `shutdown()` in route handlers for reliable flushing.
+ */
+export function getPostHogClient(): PostHog | null {
+  if (posthogServerInstance === undefined) {
+    posthogServerInstance = createPostHogClient();
+  }
+  return posthogServerInstance;
 }
 
 /**
@@ -35,8 +46,8 @@ export function getPostHogClient(): PostHog | null {
  * Call this at the end of server actions/API routes.
  */
 export async function shutdownPostHog() {
-  if (posthogClient) {
-    await posthogClient.shutdown();
-    posthogClient = null; // Reset for next request in serverless
+  if (posthogServerInstance) {
+    await posthogServerInstance.shutdown();
+    posthogServerInstance = null;
   }
 }
