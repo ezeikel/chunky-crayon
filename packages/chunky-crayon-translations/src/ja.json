@@ -363,13 +363,13 @@
       "easy": "かんたん",
       "medium": "ふつう",
       "hard": "むずかしい",
-      "filterByDifficulty": "むずかしさで絞り込み"
+      "filterByDifficulty": "むずかしさで絞る"
     },
     "categoryPage": {
       "coloringPages": "{category}のぬりえ",
       "relatedCategories": "関連カテゴリ",
       "noPagesYet": "{category}のページはまだありません",
-      "beTheFirst": "初めての{category}ぬりえを作ってみませんか？",
+      "beTheFirst": "初めての{category}ぬりえを作ってみよう！",
       "createAPage": "ページを作る",
       "freeColoringPages": "無料{category}ぬりえ",
       "lookingFor": "ぴったりの{category}ぬりえをお探しですか？ここなら必ず見つかります！子どもから大人まで、みんなが楽しめる{category}デザインをたくさんご用意しています。",
@@ -395,7 +395,7 @@
       "food": "おいしそうなたべもの＆あまいスイーツぬりえ"
     },
     "infiniteScroll": {
-      "allPagesViewed": "ぜんぶのぬりえを見たよ！"
+      "allPagesViewed": "全部のぬりえを見たね！すごいよ！"
     },
     "ageGroupPages": {
       "common": {
@@ -411,7 +411,7 @@
         "heroDescription": "小さな手でもぬりやすい、かんたんページ！大きな形、くっきり太い線、よく知っているものがいっぱい。2〜4歳にぴったりで、手先の練習にも◎",
         "whyTitle": "ちいさなアーティストにぴったり",
         "why1Title": "太くてくっきり",
-        "why1Description": "線が太いので、小さな手でもはみ出しにくく安心です！",
+        "why1Description": "ふとい線だから、ちいさな手でもはみ出しにくくて安心だよ！",
         "why2Title": "かんたんな形",
         "why2Description": "幼児が知っていて大好きなものを集めました。",
         "why3Title": "色を覚える",
@@ -430,7 +430,7 @@
         "heroDescription": "4〜12歳にぴったりの、たのしく夢中になれるぬりえ！きょうりゅう、ユニコーン、スーパーヒーローなどいろいろ。オンラインでも、おうち印刷でもずっと楽しめるよ。",
         "whyTitle": "子どもがChunky Crayonを好きな理由",
         "why1Title": "なんでも作れる",
-        "why1Description": "どんなワクワクするアイデアでも、言葉で伝えると魔法みたいにぬりえができちゃう！",
+        "why1Description": "どんなワクワクするアイデアでも、言葉で伝えるとまほうみたいにぬりえができちゃう！",
         "why2Title": "印刷してぬる",
         "why2Description": "A4で印刷できる高画質PDFをダウンロード。",
         "why3Title": "オンラインでぬる",
@@ -446,7 +446,7 @@
         "pageTitle": "ティーン向けぬりえ",
         "featuredSection": "人気のティーンぬりえ",
         "categoriesSection": "ティーンカテゴリ",
-        "heroDescription": "ティーン向けの、かっこよくて細かいぬりえ！アニメ、ゲーム、ファンタジー、SFまで、自分らしいスタイルで表現してみよう。ストレス解消や創作活動にもぴったり。",
+        "heroDescription": "ティーン向けの、かっこよくて細かいぬりえ！アニメ、ゲーム、ファンタジー、SFまで、自分らしいスタイルで表現してみよう。ストレス解消やクリエイティブな活動にもぴったり。",
         "whyTitle": "創作好きティーンのために",
         "why1Title": "かっこいいテーマ",
         "why1Description": "アニメ、ゲーム、ファンタジー、SFなど、好きが見つかる！",
@@ -465,7 +465,7 @@
         "pageTitle": "大人向けぬりえ",
         "featuredSection": "人気の大人ぬりえ",
         "categoriesSection": "大人向けカテゴリ",
-        "heroDescription": "大人のぬりえで心の癒しを体験してみませんか？美しいマンダラや自然の風景、繊細な模様で、リラックスとマインドフルネスのひとときを。忙しい一日の疲れも、きっとすっきりしますよ。",
+        "heroDescription": "大人のぬりえで心の癒しを体験しよう！美しいマンダラや自然の風景、繊細な模様で、リラックスとマインドフルネスのひとときを。忙しい一日の疲れもきっとすっきり。",
         "whyTitle": "大人のぬりえの効果",
         "why1Title": "ストレス軽減",
         "why1Description": "ぬりえで心がリラックス。不安もやわらいで、おだやかな気持ちに。",
@@ -665,7 +665,7 @@
     },
     "colorPalette": {
       "selectColor": "{color}を選ぶ",
-      "magicToolsMessage": "マジックツールで色が自動選択されます"
+      "magicToolsMessage": "マジックツールで色が自動で選ばれるよ"
     },
     "patternSelector": {
       "label": "もよう:"
