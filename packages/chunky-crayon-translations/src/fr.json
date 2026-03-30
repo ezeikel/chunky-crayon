@@ -337,7 +337,7 @@
       "nature": "Nature et fleurs",
       "holidays": "Fêtes et saisons",
       "robots": "Robots et technologie",
-      "food": "Cuisine et friandises"
+      "food": "Nourriture et friandises"
     },
     "seo": {
       "aboutTitle": "À propos de nos coloriages gratuits",
@@ -369,7 +369,7 @@
       "coloringPages": "Coloriages {category}",
       "relatedCategories": "Catégories associées",
       "noPagesYet": "Pas encore de pages {category}",
-      "beTheFirst": "Soyez la première personne à créer un coloriage {category} !",
+      "beTheFirst": "Sois le premier à créer un coloriage {category} !",
       "createAPage": "Créer une page",
       "freeColoringPages": "Coloriages {category} gratuits",
       "lookingFor": "Vous cherchez le coloriage {category} parfait ? Vous êtes au bon endroit ! Notre collection propose plein de dessins {category}, parfaits pour les enfants comme pour les adultes.",
@@ -392,7 +392,7 @@
       "nature": "Beaux coloriages de nature et de fleurs",
       "holidays": "Coloriages festifs de fêtes et de saisons",
       "robots": "Coloriages futuristes de robots et de technologie",
-      "food": "Coloriages gourmands de nourriture et de gourmandises"
+      "food": "Délicieux coloriages de nourriture et de friandises"
     },
     "infiniteScroll": {
       "allPagesViewed": "Vous avez vu tous les coloriages !"
@@ -452,7 +452,7 @@
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins faits pour vos passions !",
         "why2Title": "Art détaillé",
         "why2Description": "Des dessins minutieux qui mettent au défi vos talents et sont magnifiques une fois finis.",
-        "why3Title": "Gestion du stress",
+        "why3Title": "Anti-stress",
         "why3Description": "Faites une pause loin des écrans et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop enfantins » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d'anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
@@ -467,7 +467,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits thérapeutiques du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Gestion du stress",
+        "why1Title": "Anti-stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
@@ -629,11 +629,11 @@
     "brushSizes": {
       "small": "Fin",
       "medium": "Normal",
-      "large": "Épais"
+      "large": "Gros"
     },
     "fillPatterns": {
       "solid": "Uni",
-      "dots": "Pois",
+      "dots": "À pois",
       "stripes": "Rayures",
       "diagonal": "Diagonal",
       "checkerboard": "Damier",
