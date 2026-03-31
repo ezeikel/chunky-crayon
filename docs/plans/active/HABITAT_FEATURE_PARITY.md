@@ -6,14 +6,17 @@ Goal: Bring Coloring Habitat to full feature parity with Chunky Crayon (minus ki
 
 ## Phase 1: Payment Infrastructure ✅
 
-- [x] 1.1 Port Stripe webhook handler (GROVE/SANCTUARY plans)
+- [x] 1.1 Port Stripe webhook handler (GROVE/SANCTUARY/OASIS plans)
 - [x] 1.2 Add `formatNumber.ts` and `formatPenniesToPounds.ts` utils
 - [x] 1.3 Enhance `utils/stripe.ts` with credit calculations, proration logic
 - [x] 1.4 Add `/api/subscription/credit-drip` route
-- [x] 1.5 Create Billing page
+- [x] 1.5 Create Billing page (3-tier: Grove/Sanctuary/Oasis)
 - [x] 1.6 Create billing success page
 - [x] 1.7 Add `PaymentFailedEmail.tsx` email template
 - [x] 1.8 Add `email.ts` server action
+- [x] 1.9 Separate Stripe account for Coloring Habitat (acct_1TGNOxPVKi0lifb0)
+- [x] 1.10 Create Stripe products, prices, and webhook endpoint
+- [x] 1.11 3-tier pricing: Grove £9.99/mo, Sanctuary £17.99/mo, Oasis £29.99/mo
 
 ## Phase 2: Core UI Components & Header ✅
 
@@ -52,6 +55,8 @@ Goal: Bring Coloring Habitat to full feature parity with Chunky Crayon (minus ki
 - [x] 5.2 Update `useUser` with guest mode integration (canGenerate/blockedReason)
 - [x] 5.3 Add PostHog UserIdentify component
 - [x] 5.4 Add proper analytics-client with posthog.capture
+- [x] 5.5 Separate PostHog project for Coloring Habitat (phc_QGU3Tyq9FKxBZUsltXExZPmyhZjv3YACxOrB1E7fQnC)
+- [x] 5.6 Fix server-side PostHog tracking (per-request client, direct EU endpoint)
 
 ## Phase 6: Content, SEO & Polish ✅
 
