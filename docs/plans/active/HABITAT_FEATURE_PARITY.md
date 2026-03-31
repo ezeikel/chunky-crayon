@@ -73,9 +73,9 @@ Goal: Bring Coloring Habitat to full feature parity with Chunky Crayon (minus ki
 
 Reduce duplication between Chunky Crayon and Coloring Habitat.
 
-- [ ] 7.1 `packages/canvas` — floodFill, brushTextures, fillPatterns, pixels, regionDetection
-- [ ] 7.2 `packages/ui` — shadcn components (button, card, dialog, dropdown, etc.)
-- [ ] 7.3 `packages/storage` — R2 client
+- [x] 7.1 `packages/storage` — R2 client (`@one-colored-pixel/storage`)
+- [ ] 7.2 `packages/canvas` — floodFill, brushTextures, fillPatterns, pixels, regionDetection
+- [ ] 7.3 `packages/ui` — shadcn components (button, card, dialog, dropdown, etc.)
 - [ ] 7.4 `packages/coloring-core` — AI schemas, image providers with `BrandConfig` pattern
 - [ ] 7.5 `packages/auth-core` — getUserId, session helpers
 - [ ] 7.6 `packages/stripe-shared` — webhook patterns, credit calculations with plan config

@@ -1,6 +1,6 @@
 'use server';
 
-import { put } from '@/lib/storage';
+import { put } from '@one-colored-pixel/storage';
 import { revalidatePath } from 'next/cache';
 import { db } from '@one-colored-pixel/db';
 import { generateAmbientSound } from '@/lib/elevenlabs';

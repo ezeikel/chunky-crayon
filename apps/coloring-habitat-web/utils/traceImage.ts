@@ -1,4 +1,4 @@
-import { put } from "@/lib/storage";
+import { put } from "@one-colored-pixel/storage";
 import { chromium } from "playwright";
 import sharp from "sharp";
 import potrace from "oslllo-potrace";

@@ -1,4 +1,4 @@
-import { put } from "@/lib/storage";
+import { put } from "@one-colored-pixel/storage";
 
 /**
  * Video Generation Provider using Google Veo 3

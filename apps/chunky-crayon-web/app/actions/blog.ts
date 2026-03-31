@@ -14,7 +14,7 @@ import {
   createBlogImagePromptPrompt,
   generateColoringPageImage,
 } from '@/lib/ai';
-import { del } from '@/lib/storage';
+import { del } from '@one-colored-pixel/storage';
 import { writeClient, client, coveredTopicsQuery } from '@/lib/sanity';
 import { BLOG_TOPICS, BLOG_AUTHORS, type BlogTopic } from '@/constants';
 

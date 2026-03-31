@@ -1,6 +1,6 @@
 'use server';
 
-import { put, del } from '@/lib/storage';
+import { put, del } from '@one-colored-pixel/storage';
 import QRCode from 'qrcode';
 import sharp from 'sharp';
 import { generateText, Output } from 'ai';

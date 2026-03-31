@@ -1,4 +1,4 @@
-import { put } from '@/lib/storage';
+import { put } from '@one-colored-pixel/storage';
 import { generateText } from 'ai';
 import { models, MODEL_IDS } from './models';
 import {

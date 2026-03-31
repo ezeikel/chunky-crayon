@@ -1,6 +1,6 @@
 'use server';
 
-import { put, del } from '@/lib/storage';
+import { put, del } from '@one-colored-pixel/storage';
 import { revalidatePath, revalidateTag, cacheLife, cacheTag } from 'next/cache';
 import { after } from 'next/server';
 import QRCode from 'qrcode';

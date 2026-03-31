@@ -1,7 +1,7 @@
 import { NextResponse, connection } from 'next/server';
 import { GenerationType } from '@one-colored-pixel/db';
 import sharp from 'sharp';
-import { put, del } from '@/lib/storage';
+import { put, del } from '@one-colored-pixel/storage';
 import { db } from '@one-colored-pixel/db';
 import {
   generateInstagramCaption,

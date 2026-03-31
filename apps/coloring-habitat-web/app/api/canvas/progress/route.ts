@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse, connection } from "next/server";
-import { put, del } from "@/lib/storage";
+import { put, del } from "@one-colored-pixel/storage";
 import { auth } from "@/auth";
 import { db } from "@one-colored-pixel/db";
 import { BRAND } from "@/lib/db";

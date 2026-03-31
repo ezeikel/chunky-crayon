@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, connection } from 'next/server';
 import { GenerationType, db } from '@one-colored-pixel/db';
 import sharp from 'sharp';
-import { put } from '@/lib/storage';
+import { put } from '@one-colored-pixel/storage';
 import {
   generateText,
   models,

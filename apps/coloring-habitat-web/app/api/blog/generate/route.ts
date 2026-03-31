@@ -3,7 +3,7 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { models } from "@/lib/ai/models";
 import { generateColoringPageImage } from "@/lib/ai/image-providers";
-import { del } from "@/lib/storage";
+import { del } from "@one-colored-pixel/storage";
 import {
   client,
   writeClient,

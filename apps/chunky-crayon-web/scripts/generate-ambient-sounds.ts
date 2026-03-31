@@ -14,7 +14,7 @@
 // DOTENV_CONFIG_PATH=apps/chunky-crayon-web/.env.local pnpm tsx -r dotenv/config apps/chunky-crayon-web/scripts/generate-ambient-sounds.ts [limit]
 
 import { db } from '@one-colored-pixel/db';
-import { put } from '../lib/storage';
+import { put } from '@one-colored-pixel/storage';
 import { generateAmbientSound } from '../lib/elevenlabs';
 import { createAmbientPrompt } from '../lib/audio/prompts';
 

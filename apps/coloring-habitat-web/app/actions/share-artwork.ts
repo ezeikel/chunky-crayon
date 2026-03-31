@@ -1,6 +1,6 @@
 "use server";
 
-import { put } from "@/lib/storage";
+import { put } from "@one-colored-pixel/storage";
 import { randomUUID } from "crypto";
 
 type ShareArtworkResult =

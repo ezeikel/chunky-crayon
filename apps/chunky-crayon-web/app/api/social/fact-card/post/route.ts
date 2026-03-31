@@ -3,7 +3,7 @@ import satori from 'satori';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import sharp from 'sharp';
-import { put, del } from '@/lib/storage';
+import { put, del } from '@one-colored-pixel/storage';
 import { generateFact } from '@/app/actions/generate-fact';
 import { generateFactCardCaption } from '@/app/actions/social';
 import { FactCard } from '@/components/social/FactCard';

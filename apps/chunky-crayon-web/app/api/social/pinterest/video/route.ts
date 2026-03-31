@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { db, GenerationType } from '@one-colored-pixel/db';
 import { auth } from '@/auth';
 import sharp from 'sharp';
-import { put } from '@/lib/storage';
+import { put } from '@one-colored-pixel/storage';
 import { generatePinterestCaption } from '@/app/actions/social';
 import { ADMIN_EMAILS } from '@/constants';
 
