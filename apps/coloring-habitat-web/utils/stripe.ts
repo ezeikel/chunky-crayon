@@ -12,8 +12,9 @@ type PriceMapping = {
 // Habitat plan names — wellness/mindfulness themed
 export const HABITAT_PLANS = {
   BLOOM: "BLOOM", // Free tier
-  GROVE: "GROVE", // Mid tier
-  SANCTUARY: "SANCTUARY", // Premium tier
+  GROVE: "GROVE", // Entry tier
+  SANCTUARY: "SANCTUARY", // Mid tier (most popular)
+  OASIS: "OASIS", // Premium tier
 } as const;
 
 export type HabitatPlanName =
@@ -37,6 +38,14 @@ export const PLAN_PRICE_MAP: Record<
   },
   [process.env.NEXT_PUBLIC_STRIPE_PRICE_SANCTUARY_ANNUAL || ""]: {
     plan: "SANCTUARY",
+    period: "ANNUAL",
+  },
+  [process.env.NEXT_PUBLIC_STRIPE_PRICE_OASIS_MONTHLY || ""]: {
+    plan: "OASIS",
+    period: "MONTHLY",
+  },
+  [process.env.NEXT_PUBLIC_STRIPE_PRICE_OASIS_ANNUAL || ""]: {
+    plan: "OASIS",
     period: "ANNUAL",
   },
 };
@@ -70,6 +79,10 @@ export const mapStripePriceToPlanName = (priceId: string): PriceMapping => {
       return { planName: "SANCTUARY", billingPeriod: BillingPeriod.MONTHLY };
     case process.env.NEXT_PUBLIC_STRIPE_PRICE_SANCTUARY_ANNUAL:
       return { planName: "SANCTUARY", billingPeriod: BillingPeriod.ANNUAL };
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_OASIS_MONTHLY:
+      return { planName: "OASIS", billingPeriod: BillingPeriod.MONTHLY };
+    case process.env.NEXT_PUBLIC_STRIPE_PRICE_OASIS_ANNUAL:
+      return { planName: "OASIS", billingPeriod: BillingPeriod.ANNUAL };
     default:
       throw new Error(`Unknown price ID: ${priceId}`);
   }
@@ -79,14 +92,17 @@ export const mapStripePriceToPlanName = (priceId: string): PriceMapping => {
 export const PLAN_CREDITS_MONTHLY: Record<string, number> = {
   GROVE: 300,
   SANCTUARY: 800,
+  OASIS: 2000,
 };
 
 // Rollover caps: max credits that can carry over to next month
-// Grove: 1 month rollover (300 max carryover)
-// Sanctuary: 2 months rollover (1600 max carryover)
+// Grove: no rollover
+// Sanctuary: 1 month rollover (800 max carryover)
+// Oasis: 2 months rollover (4000 max carryover)
 export const PLAN_ROLLOVER_CAPS: Record<string, number> = {
-  GROVE: 300,
-  SANCTUARY: 1600,
+  GROVE: 0,
+  SANCTUARY: 800,
+  OASIS: 4000,
 };
 
 export const getCreditAmountFromPlanName = (planName: string): number => {

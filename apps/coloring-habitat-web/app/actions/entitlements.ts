@@ -51,6 +51,15 @@ const PLAN_FEATURES: Record<
     canUseCamera: true,
     hasMagicBrush: true,
     hasPrioritySupport: true,
+    hasCommercialUse: false,
+    maxSavedArtworks: 500,
+  },
+  OASIS: {
+    canGenerate: true,
+    canDownload: true,
+    canUseCamera: true,
+    hasMagicBrush: true,
+    hasPrioritySupport: true,
     hasCommercialUse: true,
     maxSavedArtworks: -1, // unlimited
   },

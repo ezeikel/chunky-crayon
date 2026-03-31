@@ -9,6 +9,7 @@ import {
   faSeedling,
   faLeaf,
   faSpa,
+  faWater,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -35,42 +36,61 @@ const plans = [
   {
     name: "Grove",
     icon: faLeaf,
-    description: "For regular colorists",
-    monthlyPrice: 7.99,
-    annualPrice: 59.99,
+    description: "For casual colorists",
+    monthlyPrice: 9.99,
+    annualPrice: 99.99,
     priceId: {
       monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_GROVE_MONTHLY,
       annual: process.env.NEXT_PUBLIC_STRIPE_PRICE_GROVE_ANNUAL,
     },
     features: [
-      "Unlimited creations",
-      "Full library access",
-      "Priority generation",
+      "300 credits/month",
+      "All coloring features",
       "HD PDF downloads",
       "Save to gallery",
-      "Daily email page",
     ],
     cta: "Start free trial",
-    highlighted: true,
+    highlighted: false,
   },
   {
     name: "Sanctuary",
     icon: faSpa,
-    description: "The complete wellness experience",
-    monthlyPrice: 14.99,
-    annualPrice: 99.99,
+    description: "For regular colorists",
+    monthlyPrice: 17.99,
+    annualPrice: 179.99,
     priceId: {
       monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_SANCTUARY_MONTHLY,
       annual: process.env.NEXT_PUBLIC_STRIPE_PRICE_SANCTUARY_ANNUAL,
     },
     features: [
+      "800 credits/month",
       "Everything in Grove",
+      "1 month credit rollover",
+      "Priority generation",
+      "Daily email page",
+      "Priority support",
+    ],
+    cta: "Start free trial",
+    highlighted: true,
+  },
+  {
+    name: "Oasis",
+    icon: faWater,
+    description: "The complete wellness experience",
+    monthlyPrice: 29.99,
+    annualPrice: 299.99,
+    priceId: {
+      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_OASIS_MONTHLY,
+      annual: process.env.NEXT_PUBLIC_STRIPE_PRICE_OASIS_ANNUAL,
+    },
+    features: [
+      "2,000 credits/month",
+      "Everything in Sanctuary",
+      "2 month credit rollover",
+      "Commercial use license",
       "Exclusive collections",
-      "Early access to new features",
-      "Community gallery sharing",
       "Custom color palettes",
       "Ambient soundscapes",
-      "Priority support",
     ],
     cta: "Start free trial",
     highlighted: false,
@@ -90,7 +110,7 @@ const PricingPage = () => {
     <>
       <Header />
       <main className="bg-background py-16">
-        <div className="mx-auto max-w-6xl px-6">
+        <div className="mx-auto max-w-7xl px-6">
           <div className="text-center">
             <h1 className="text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
               Simple, honest pricing
@@ -124,14 +144,14 @@ const PricingPage = () => {
               >
                 Annual
                 <span className="ml-1.5 text-xs font-bold text-accent">
-                  Save 35%
+                  Save 17%
                 </span>
               </button>
             </div>
           </div>
 
           {/* Plan cards */}
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-4">
             {plans.map((plan) => {
               const price =
                 interval === "monthly" ? plan.monthlyPrice : plan.annualPrice;

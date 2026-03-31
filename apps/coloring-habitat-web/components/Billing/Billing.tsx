@@ -39,33 +39,51 @@ const HABITAT_SUBSCRIPTION_PLANS: HabitatPlan[] = [
   {
     key: "GROVE",
     name: "Grove",
-    tagline: "For regular colorists who want more",
+    tagline: "For casual colorists",
     price: "\u00a39.99",
     credits: 300,
     features: [
       "300 credits/month",
       "All coloring features",
-      "1 month credit rollover",
-      "Priority support",
+      "HD PDF downloads",
+      "Save to gallery",
     ],
     stripePriceEnv: process.env
       .NEXT_PUBLIC_STRIPE_PRICE_GROVE_MONTHLY as string,
-    mostPopular: true,
   },
   {
     key: "SANCTUARY",
     name: "Sanctuary",
-    tagline: "For dedicated artists who want it all",
-    price: "\u00a319.99",
+    tagline: "For regular colorists",
+    price: "\u00a317.99",
     credits: 800,
     features: [
       "800 credits/month",
       "All coloring features",
-      "2 months credit rollover",
-      "Commercial use license",
+      "1 month credit rollover",
+      "Priority generation",
+      "Priority support",
     ],
     stripePriceEnv: process.env
       .NEXT_PUBLIC_STRIPE_PRICE_SANCTUARY_MONTHLY as string,
+    mostPopular: true,
+  },
+  {
+    key: "OASIS",
+    name: "Oasis",
+    tagline: "The complete wellness experience",
+    price: "\u00a329.99",
+    credits: 2000,
+    features: [
+      "2,000 credits/month",
+      "All coloring features",
+      "2 month credit rollover",
+      "Commercial use license",
+      "Custom color palettes",
+      "Ambient soundscapes",
+    ],
+    stripePriceEnv: process.env
+      .NEXT_PUBLIC_STRIPE_PRICE_OASIS_MONTHLY as string,
   },
 ];
 
@@ -242,7 +260,7 @@ const Billing = ({ user }: BillingProps) => {
       {/* Available Plans */}
       <section>
         <h2 className="text-2xl font-bold mb-6">Available Plans</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {HABITAT_SUBSCRIPTION_PLANS.map((plan) => (
             <Card
               key={plan.key}
