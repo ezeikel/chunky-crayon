@@ -326,6 +326,9 @@ importers:
       '@fortawesome/react-fontawesome':
         specifier: ^0.2.0
         version: 0.2.6(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.1.0)
+      '@one-colored-pixel/canvas':
+        specifier: workspace:^
+        version: link:../../packages/canvas
       '@one-colored-pixel/chunky-crayon-translations':
         specifier: workspace:*
         version: link:../../packages/chunky-crayon-translations
@@ -690,6 +693,9 @@ importers:
       '@fortawesome/react-fontawesome':
         specifier: ^0.2.0
         version: 0.2.6(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.1.0)
+      '@one-colored-pixel/canvas':
+        specifier: workspace:^
+        version: link:../../packages/canvas
       '@one-colored-pixel/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -841,6 +847,22 @@ importers:
       postcss:
         specifier: ^8
         version: 8.5.6
+      typescript:
+        specifier: ^5.4.5
+        version: 5.9.3
+
+  packages/canvas:
+    dependencies:
+      xmldom:
+        specifier: ^0.6.0
+        version: 0.6.0
+    devDependencies:
+      '@fortawesome/fontawesome-svg-core':
+        specifier: ^6.7.2
+        version: 6.7.2
+      '@types/node':
+        specifier: ^24.3.0
+        version: 24.3.1
       typescript:
         specifier: ^5.4.5
         version: 5.9.3

@@ -7,7 +7,7 @@
  * Sparkle: Star-shaped sparkles that appear randomly along the stroke
  */
 
-import type { BrushType } from "@/constants";
+import type { BrushType } from "./types";
 
 type DrawStrokeParams = {
   ctx: CanvasRenderingContext2D;

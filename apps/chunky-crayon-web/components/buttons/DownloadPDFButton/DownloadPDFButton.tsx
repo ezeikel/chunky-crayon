@@ -11,7 +11,7 @@ import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/Colorin
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
-import fetchSvg from '@/utils/fetchSvg';
+import { fetchSvg } from '@one-colored-pixel/canvas';
 import { proxyR2Url } from '@/utils/proxyR2Url';
 
 const formatTitleForFileName = (title: string | undefined): string => {

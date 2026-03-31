@@ -3,7 +3,7 @@
  * Creates repeatable canvas patterns for various fill effects
  */
 
-import type { FillPattern } from '@/constants';
+import type { FillPattern } from "./types";
 
 type PatternConfig = {
   tileSize: number;
@@ -43,10 +43,10 @@ function createDotsPattern(
   config: PatternConfig,
 ): CanvasPattern | null {
   const { tileSize, color, backgroundColor } = config;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = tileSize;
   canvas.height = tileSize;
-  const patternCtx = canvas.getContext('2d');
+  const patternCtx = canvas.getContext("2d");
   if (!patternCtx) return null;
 
   // Background
@@ -76,7 +76,7 @@ function createDotsPattern(
   patternCtx.arc(tileSize, tileSize, dotRadius, 0, Math.PI * 2);
   patternCtx.fill();
 
-  return ctx.createPattern(canvas, 'repeat');
+  return ctx.createPattern(canvas, "repeat");
 }
 
 /**
@@ -87,10 +87,10 @@ function createStripesPattern(
   config: PatternConfig,
 ): CanvasPattern | null {
   const { tileSize, color, backgroundColor } = config;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = tileSize;
   canvas.height = tileSize;
-  const patternCtx = canvas.getContext('2d');
+  const patternCtx = canvas.getContext("2d");
   if (!patternCtx) return null;
 
   const stripeHeight = tileSize / 2;
@@ -102,7 +102,7 @@ function createStripesPattern(
   patternCtx.fillStyle = backgroundColor || lightenColor(color);
   patternCtx.fillRect(0, stripeHeight, tileSize, stripeHeight);
 
-  return ctx.createPattern(canvas, 'repeat');
+  return ctx.createPattern(canvas, "repeat");
 }
 
 /**
@@ -113,12 +113,12 @@ function createDiagonalStripesPattern(
   config: PatternConfig,
 ): CanvasPattern | null {
   const { tileSize, color, backgroundColor } = config;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   // Larger tile for diagonal pattern
   const diagSize = tileSize * 2;
   canvas.width = diagSize;
   canvas.height = diagSize;
-  const patternCtx = canvas.getContext('2d');
+  const patternCtx = canvas.getContext("2d");
   if (!patternCtx) return null;
 
   // Background
@@ -129,7 +129,7 @@ function createDiagonalStripesPattern(
   patternCtx.fillStyle = color;
   patternCtx.lineWidth = tileSize * 0.4;
   patternCtx.strokeStyle = color;
-  patternCtx.lineCap = 'square';
+  patternCtx.lineCap = "square";
 
   // Draw diagonal lines
   for (let i = -diagSize; i < diagSize * 2; i += tileSize) {
@@ -139,7 +139,7 @@ function createDiagonalStripesPattern(
     patternCtx.stroke();
   }
 
-  return ctx.createPattern(canvas, 'repeat');
+  return ctx.createPattern(canvas, "repeat");
 }
 
 /**
@@ -150,10 +150,10 @@ function createCheckerboardPattern(
   config: PatternConfig,
 ): CanvasPattern | null {
   const { tileSize, color, backgroundColor } = config;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = tileSize * 2;
   canvas.height = tileSize * 2;
-  const patternCtx = canvas.getContext('2d');
+  const patternCtx = canvas.getContext("2d");
   if (!patternCtx) return null;
 
   const bg = backgroundColor || lightenColor(color);
@@ -168,7 +168,7 @@ function createCheckerboardPattern(
   patternCtx.fillRect(tileSize, 0, tileSize, tileSize);
   patternCtx.fillRect(0, tileSize, tileSize, tileSize);
 
-  return ctx.createPattern(canvas, 'repeat');
+  return ctx.createPattern(canvas, "repeat");
 }
 
 /**
@@ -179,10 +179,10 @@ function createHeartsPattern(
   config: PatternConfig,
 ): CanvasPattern | null {
   const { tileSize, color, backgroundColor } = config;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = tileSize;
   canvas.height = tileSize;
-  const patternCtx = canvas.getContext('2d');
+  const patternCtx = canvas.getContext("2d");
   if (!patternCtx) return null;
 
   // Background
@@ -222,7 +222,7 @@ function createHeartsPattern(
   );
   patternCtx.fill();
 
-  return ctx.createPattern(canvas, 'repeat');
+  return ctx.createPattern(canvas, "repeat");
 }
 
 /**
@@ -233,10 +233,10 @@ function createStarsPattern(
   config: PatternConfig,
 ): CanvasPattern | null {
   const { tileSize, color, backgroundColor } = config;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = tileSize;
   canvas.height = tileSize;
-  const patternCtx = canvas.getContext('2d');
+  const patternCtx = canvas.getContext("2d");
   if (!patternCtx) return null;
 
   // Background
@@ -271,7 +271,7 @@ function createStarsPattern(
   patternCtx.closePath();
   patternCtx.fill();
 
-  return ctx.createPattern(canvas, 'repeat');
+  return ctx.createPattern(canvas, "repeat");
 }
 
 /**
@@ -282,10 +282,10 @@ function createZigzagPattern(
   config: PatternConfig,
 ): CanvasPattern | null {
   const { tileSize, color, backgroundColor } = config;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = tileSize;
   canvas.height = tileSize;
-  const patternCtx = canvas.getContext('2d');
+  const patternCtx = canvas.getContext("2d");
   if (!patternCtx) return null;
 
   // Background
@@ -295,8 +295,8 @@ function createZigzagPattern(
   // Draw zigzag
   patternCtx.strokeStyle = color;
   patternCtx.lineWidth = tileSize * 0.15;
-  patternCtx.lineCap = 'round';
-  patternCtx.lineJoin = 'round';
+  patternCtx.lineCap = "round";
+  patternCtx.lineJoin = "round";
 
   const zigHeight = tileSize / 3;
   const zigWidth = tileSize / 2;
@@ -313,7 +313,7 @@ function createZigzagPattern(
     patternCtx.stroke();
   }
 
-  return ctx.createPattern(canvas, 'repeat');
+  return ctx.createPattern(canvas, "repeat");
 }
 
 /**
@@ -327,7 +327,7 @@ export function createFillPattern(
   tileSize: number = 24,
 ): CanvasPattern | string {
   // Solid fill just returns the color
-  if (pattern === 'solid') {
+  if (pattern === "solid") {
     return color;
   }
 
@@ -339,25 +339,25 @@ export function createFillPattern(
   let canvasPattern: CanvasPattern | null = null;
 
   switch (pattern) {
-    case 'dots':
+    case "dots":
       canvasPattern = createDotsPattern(ctx, config);
       break;
-    case 'stripes':
+    case "stripes":
       canvasPattern = createStripesPattern(ctx, config);
       break;
-    case 'stripes-diagonal':
+    case "stripes-diagonal":
       canvasPattern = createDiagonalStripesPattern(ctx, config);
       break;
-    case 'checkerboard':
+    case "checkerboard":
       canvasPattern = createCheckerboardPattern(ctx, config);
       break;
-    case 'hearts':
+    case "hearts":
       canvasPattern = createHeartsPattern(ctx, config);
       break;
-    case 'stars':
+    case "stars":
       canvasPattern = createStarsPattern(ctx, config);
       break;
-    case 'zigzag':
+    case "zigzag":
       canvasPattern = createZigzagPattern(ctx, config);
       break;
     default:

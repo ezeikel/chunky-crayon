@@ -15,10 +15,13 @@ import { useSound } from '@/hooks/useSound';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS, BRUSH_SIZES, BrushType } from '@/constants';
-import { scanlineFill, hexToRGBA } from '@/utils/floodFill';
-import { drawTexturedStroke } from '@/utils/brushTextures';
-import { createFillPattern } from '@/utils/fillPatterns';
-import { createIconCursor } from '@/utils/iconCursor';
+import {
+  scanlineFill,
+  hexToRGBA,
+  drawTexturedStroke,
+  createFillPattern,
+  createIconCursor,
+} from '@one-colored-pixel/canvas';
 import { proxyR2Url } from '@/utils/proxyR2Url';
 import {
   pointsToSvgPath,

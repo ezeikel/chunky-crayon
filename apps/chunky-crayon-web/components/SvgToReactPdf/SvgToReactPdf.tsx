@@ -1,5 +1,5 @@
 import { Svg, Path } from '@react-pdf/renderer';
-import parseSvg from '@/utils/parseSvg';
+import { parseSvg } from '@one-colored-pixel/canvas';
 
 type SvgToReactPdfProps = {
   svgString: string;

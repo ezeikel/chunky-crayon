@@ -7,7 +7,7 @@ import {
   getRegionAtPoint,
   type Region,
   type RegionMap,
-} from "@/utils/regionDetection";
+} from "@one-colored-pixel/canvas";
 
 export type MagicColorMapState = {
   /** Whether the color map is currently being generated */

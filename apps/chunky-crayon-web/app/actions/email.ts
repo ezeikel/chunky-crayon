@@ -6,7 +6,7 @@ import { render } from '@react-email/components';
 import { GenerationType, ColoringImage } from '@one-colored-pixel/db';
 import generatePDFNode from '@/utils/generatePDFNode';
 import streamToBuffer from '@/utils/streamToBuffer';
-import fetchSvg from '@/utils/fetchSvg';
+import { fetchSvg } from '@one-colored-pixel/canvas';
 import { getUnsubscribeUrl } from '@/lib/unsubscribe';
 import DailyColoringEmail from '@/emails/DailyColoringEmail';
 import WelcomeEmail from '@/emails/WelcomeEmail';

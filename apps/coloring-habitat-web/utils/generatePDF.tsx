@@ -1,7 +1,7 @@
 import ReactPDF from "@react-pdf/renderer";
 import { ColoringImage } from "@one-colored-pixel/db/types";
 import ColoringPageDocument from "@/components/pdfs/ColoringPageDocument/ColoringPageDocument";
-import fetchSvg from "@/utils/fetchSvg";
+import { fetchSvg } from "@one-colored-pixel/canvas";
 
 const generatePDF = async (coloringImage: ColoringImage) => {
   if (!coloringImage.svgUrl || !coloringImage.qrCodeUrl) {

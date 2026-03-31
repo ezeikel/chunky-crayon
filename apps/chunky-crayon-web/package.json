@@ -39,6 +39,7 @@
     "@fortawesome/pro-regular-svg-icons": "^6.5.2",
     "@fortawesome/pro-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@one-colored-pixel/canvas": "workspace:^",
     "@one-colored-pixel/chunky-crayon-translations": "workspace:*",
     "@one-colored-pixel/db": "workspace:*",
     "@one-colored-pixel/storage": "workspace:^",

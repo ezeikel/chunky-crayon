@@ -21,7 +21,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Resvg } from '@resvg/resvg-js';
 import sharp from 'sharp';
-import { detectAllRegionsFromPixels } from '../utils/regionDetectionNode';
+import { detectAllRegionsFromPixels } from '@one-colored-pixel/canvas';
 
 // ---------------------------------------------------------------------------
 // Schema (inlined to avoid Next.js import issues)

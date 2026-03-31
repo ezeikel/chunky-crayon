@@ -14,7 +14,7 @@ import {
 import type { GridColorMap, FillPointsData } from "@/lib/ai";
 import { ALL_COLORING_COLORS } from "@/constants";
 import { db } from "@one-colored-pixel/db";
-import { detectAllRegionsFromPixels } from "@/utils/regionDetectionNode";
+import { detectAllRegionsFromPixels } from "@one-colored-pixel/canvas";
 
 export type GenerateColorMapResult =
   | {

@@ -1,0 +1,27 @@
+{
+  "name": "@one-colored-pixel/canvas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf .turbo node_modules dist",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "xmldom": "^0.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "typescript": "^5.4.5"
+  }
+}
