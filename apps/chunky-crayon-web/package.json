@@ -43,6 +43,7 @@
     "@one-colored-pixel/chunky-crayon-translations": "workspace:*",
     "@one-colored-pixel/db": "workspace:*",
     "@one-colored-pixel/storage": "workspace:^",
+    "@one-colored-pixel/stripe-shared": "workspace:^",
     "@portabletext/react": "^6.0.0",
     "@posthog/ai": "^7.3.0",
     "@radix-ui/react-avatar": "^1.1.9",

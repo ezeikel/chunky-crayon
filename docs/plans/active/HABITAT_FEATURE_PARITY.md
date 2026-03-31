@@ -78,7 +78,7 @@ Reduce duplication between Chunky Crayon and Coloring Habitat.
 - [ ] 7.3 `packages/ui` — shadcn components (button, card, dialog, dropdown, etc.)
 - [ ] 7.4 `packages/coloring-core` — AI schemas, image providers with `BrandConfig` pattern
 - [ ] 7.5 `packages/auth-core` — getUserId, session helpers
-- [ ] 7.6 `packages/stripe-shared` — webhook patterns, credit calculations with plan config
+- [x] 7.6 `packages/stripe-shared` — credit calculations, status mapping, configurable plan helpers (`@one-colored-pixel/stripe-shared`)
 
 ---
 

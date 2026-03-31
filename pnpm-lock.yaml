@@ -338,6 +338,9 @@ importers:
       '@one-colored-pixel/storage':
         specifier: workspace:^
         version: link:../../packages/storage
+      '@one-colored-pixel/stripe-shared':
+        specifier: workspace:^
+        version: link:../../packages/stripe-shared
       '@portabletext/react':
         specifier: ^6.0.0
         version: 6.0.0(react@19.1.0)
@@ -702,6 +705,9 @@ importers:
       '@one-colored-pixel/storage':
         specifier: workspace:^
         version: link:../../packages/storage
+      '@one-colored-pixel/stripe-shared':
+        specifier: workspace:^
+        version: link:../../packages/stripe-shared
       '@portabletext/react':
         specifier: ^6.0.0
         version: 6.0.0(react@19.1.0)
@@ -919,6 +925,19 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.817.0
         version: 3.882.0
+    devDependencies:
+      '@types/node':
+        specifier: ^24.3.0
+        version: 24.3.1
+      typescript:
+        specifier: ^5.4.5
+        version: 5.9.3
+
+  packages/stripe-shared:
+    dependencies:
+      '@one-colored-pixel/db':
+        specifier: workspace:*
+        version: link:../db
     devDependencies:
       '@types/node':
         specifier: ^24.3.0
