@@ -23,6 +23,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@one-colored-pixel/canvas": "workspace:^",
+    "@one-colored-pixel/coloring-core": "workspace:*",
     "@one-colored-pixel/db": "workspace:*",
     "@one-colored-pixel/storage": "workspace:^",
     "@one-colored-pixel/stripe-shared": "workspace:^",

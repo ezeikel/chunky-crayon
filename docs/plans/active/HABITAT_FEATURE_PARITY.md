@@ -76,7 +76,7 @@ Reduce duplication between Chunky Crayon and Coloring Habitat.
 - [x] 7.1 `packages/storage` — R2 client (`@one-colored-pixel/storage`)
 - [x] 7.2 `packages/canvas` — floodFill, brushTextures, fillPatterns, regionDetection, parseSvg, fetchSvg, iconCursor (`@one-colored-pixel/canvas`)
 - [ ] 7.3 `packages/ui` — shadcn components (button, card, dialog, dropdown, etc.)
-- [ ] 7.4 `packages/coloring-core` — AI schemas, image providers with `BrandConfig` pattern
+- [x] 7.4 `packages/coloring-core` — AI models, tracing with injectable PostHog client (`@one-colored-pixel/coloring-core`). Schemas stay in apps (Zod type inference issue). Prompts/image-providers stay in apps (brand-specific).
 - [ ] 7.5 `packages/auth-core` — getUserId, session helpers
 - [x] 7.6 `packages/stripe-shared` — credit calculations, status mapping, configurable plan helpers (`@one-colored-pixel/stripe-shared`)
 

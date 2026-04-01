@@ -1,0 +1,35 @@
+{
+  "name": "@one-colored-pixel/coloring-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf .turbo node_modules dist",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.51",
+    "@ai-sdk/google": "^3.0.35",
+    "@ai-sdk/openai": "^3.0.38",
+    "@ai-sdk/perplexity": "^3.0.20",
+    "@ai-sdk/replicate": "^2.0.21",
+    "@one-colored-pixel/storage": "workspace:*",
+    "@posthog/ai": "^1.2.0",
+    "ai": "^6.0.106",
+    "openai": "^6.21.0",
+    "zod": "^3.25.42"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.4.5"
+  }
+}
