@@ -75,9 +75,9 @@ Reduce duplication between Chunky Crayon and Coloring Habitat.
 
 - [x] 7.1 `packages/storage` — R2 client (`@one-colored-pixel/storage`)
 - [x] 7.2 `packages/canvas` — floodFill, brushTextures, fillPatterns, regionDetection, parseSvg, fetchSvg, iconCursor (`@one-colored-pixel/canvas`)
-- [ ] 7.3 `packages/ui` — shadcn components (button, card, dialog, dropdown, etc.)
+- [ ] 7.3 `packages/ui` — DEFERRED. Only 12 small shadcn files, designed for copy-paste. Shared Tailwind config is the real challenge. Cost exceeds value.
 - [x] 7.4 `packages/coloring-core` — AI models, tracing with injectable PostHog client (`@one-colored-pixel/coloring-core`). Schemas stay in apps (Zod type inference issue). Prompts/image-providers stay in apps (brand-specific).
-- [ ] 7.5 `packages/auth-core` — getUserId, session helpers
+- [ ] 7.5 `packages/auth-core` — DEFERRED. Only 125 lines in CH, coupled to `"use server"` + `@/auth` + `@/constants`. Factory pattern overhead exceeds duplication cost.
 - [x] 7.6 `packages/stripe-shared` — credit calculations, status mapping, configurable plan helpers (`@one-colored-pixel/stripe-shared`)
 
 ---
