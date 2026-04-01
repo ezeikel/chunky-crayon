@@ -50,7 +50,7 @@ export { getSoundManager } from "./audio";
 export type { SoundType, BrushSoundType } from "./audio";
 
 // Components
-export { default as ImageCanvas } from "./ImageCanvas";
+export { default as ImageCanvas, type ImageCanvasHandle } from "./ImageCanvas";
 export { default as ColorPalette } from "./ColorPalette";
 export { default as DesktopColorPalette } from "./DesktopColorPalette";
 export { default as MobileColoringToolbar } from "./MobileColoringToolbar";

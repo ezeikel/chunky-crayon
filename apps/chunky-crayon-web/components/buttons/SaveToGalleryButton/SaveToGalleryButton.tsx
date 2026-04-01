@@ -8,7 +8,7 @@ import { saveArtworkToGallery } from '@/app/actions/saved-artwork';
 import Confetti from '@/components/Confetti';
 import { StickerReward } from '@/components/StickerReward';
 import { ColoEvolutionCelebration } from '@/components/ColoEvolutionCelebration';
-import { useSound } from '@/hooks/useSound';
+import { useSound } from '@one-colored-pixel/coloring-ui';
 import cn from '@/utils/cn';
 import type { Sticker } from '@/lib/stickers';
 import type { EvolutionResult } from '@/lib/colo';

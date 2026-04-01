@@ -14,7 +14,7 @@ import {
   CardContent,
 } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { useColoringContext } from '@/contexts/coloring';
+import { useColoringContext } from '@one-colored-pixel/coloring-ui';
 
 const AudioSettings = () => {
   const t = useTranslations('settings');

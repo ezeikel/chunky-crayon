@@ -2,7 +2,7 @@
 
 import { SessionProvider } from 'next-auth/react';
 import PlausibleProvider from 'next-plausible';
-import { ColoringContextProvider } from '@/contexts/coloring';
+import { ColoringContextProvider } from '@one-colored-pixel/coloring-ui';
 import { ParentalGateProvider } from '@/components/ParentalGate';
 import UserIdentify from '@/components/UserIdentify/UserIdentify';
 import PixelTracker from '@/components/PixelTracker/PixelTracker';

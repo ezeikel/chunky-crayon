@@ -10,28 +10,29 @@ import {
   useImperativeHandle,
 } from 'react';
 import { ColoringImage } from '@one-colored-pixel/db/types';
-import ImageCanvas, {
-  ImageCanvasHandle,
-} from '@/components/ImageCanvas/ImageCanvas';
-import ColoringToolbar from '@/components/ColoringToolbar/ColoringToolbar';
-import MobileColoringDrawer from '@/components/MobileColoringDrawer/MobileColoringDrawer';
+import { ImageCanvas, ImageCanvasHandle } from '@one-colored-pixel/coloring-ui';
+import { ColoringToolbar } from '@one-colored-pixel/coloring-ui';
+import { MobileColoringDrawer } from '@one-colored-pixel/coloring-ui';
 import StickerSelector from '@/components/StickerSelector';
 import ProgressIndicator from '@/components/ProgressIndicator';
-import MuteToggle from '@/components/MuteToggle';
-import ZoomControls from '@/components/ZoomControls/ZoomControls';
+import { MuteToggle } from '@one-colored-pixel/coloring-ui';
+import { ZoomControls } from '@one-colored-pixel/coloring-ui';
 import DownloadPDFButton from '@/components/buttons/DownloadPDFButton/DownloadPDFButton';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
 import ShareButton from '@/components/buttons/ShareButton';
 import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton';
-import { CanvasAction, useColoringContext } from '@/contexts/coloring';
-import { useSound } from '@/hooks/useSound';
+import {
+  CanvasAction,
+  useColoringContext,
+} from '@one-colored-pixel/coloring-ui';
+import { useSound } from '@one-colored-pixel/coloring-ui';
 import { useMagicColorMap } from '@/hooks/useMagicColorMap';
 import type { GridColorMap, FillPointsData } from '@/lib/ai';
 import {
   saveColoringProgress,
   loadColoringProgress,
   clearColoringProgress,
-} from '@/utils/coloringStorage';
+} from '@one-colored-pixel/coloring-ui';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
 
 type ColoringAreaProps = {

@@ -9,8 +9,8 @@ import {
   Sticker,
   StickerCategory,
 } from '@/constants';
-import { useColoringContext } from '@/contexts/coloring';
-import { useSound } from '@/hooks/useSound';
+import { useColoringContext } from '@one-colored-pixel/coloring-ui';
+import { useSound } from '@one-colored-pixel/coloring-ui';
 import cn from '@/utils/cn';
 
 type StickerSelectorProps = {

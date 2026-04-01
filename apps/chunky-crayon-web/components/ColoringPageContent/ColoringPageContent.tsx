@@ -6,8 +6,8 @@ import ColoringArea, {
   ColoringAreaHandle,
 } from '@/components/ColoringArea/ColoringArea';
 import ProgressIndicator from '@/components/ProgressIndicator';
-import MuteToggle from '@/components/MuteToggle';
-import DesktopColorPalette from '@/components/DesktopColorPalette';
+import { MuteToggle } from '@one-colored-pixel/coloring-ui';
+import { DesktopColorPalette } from '@one-colored-pixel/coloring-ui';
 import DesktopToolsSidebar from '@/components/DesktopToolsSidebar';
 import { trackViewContent } from '@/utils/pixels';
 

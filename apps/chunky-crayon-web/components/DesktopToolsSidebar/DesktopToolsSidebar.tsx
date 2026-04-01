@@ -1,8 +1,11 @@
 'use client';
 
 import { ColoringImage } from '@one-colored-pixel/db/types';
-import { useColoringContext, CanvasAction } from '@/contexts/coloring';
-import { useSound } from '@/hooks/useSound';
+import {
+  useColoringContext,
+  CanvasAction,
+} from '@one-colored-pixel/coloring-ui';
+import { useSound } from '@one-colored-pixel/coloring-ui';
 import cn from '@/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useTranslations } from 'next-intl';

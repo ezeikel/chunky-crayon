@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ColoringPageContent from "@/components/ColoringPageContent/ColoringPageContent";
-import { ColoringContextProvider } from "@/contexts/coloring";
+import { ColoringContextProvider } from "@one-colored-pixel/coloring-ui";
 import { BRAND } from "@/lib/db";
 
 type Props = {
