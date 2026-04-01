@@ -1,0 +1,38 @@
+{
+  "name": "@one-colored-pixel/coloring-ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/pro-duotone-svg-icons": "^6.7.2",
+    "@fortawesome/pro-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.6",
+    "@one-colored-pixel/canvas": "workspace:*",
+    "@one-colored-pixel/db": "workspace:*",
+    "clsx": "^2.1.1",
+    "posthog-js": "^1.238.0",
+    "tailwind-merge": "^3.3.0"
+  },
+  "peerDependencies": {
+    "next": "*",
+    "react": "*",
+    "react-dom": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.4.5"
+  }
+}

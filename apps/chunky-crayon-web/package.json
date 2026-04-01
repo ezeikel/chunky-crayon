@@ -41,6 +41,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@one-colored-pixel/canvas": "workspace:^",
     "@one-colored-pixel/chunky-crayon-translations": "workspace:*",
+    "@one-colored-pixel/coloring-ui": "workspace:^",
     "@one-colored-pixel/db": "workspace:*",
     "@one-colored-pixel/storage": "workspace:^",
     "@one-colored-pixel/stripe-shared": "workspace:^",

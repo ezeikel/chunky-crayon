@@ -332,6 +332,9 @@ importers:
       '@one-colored-pixel/chunky-crayon-translations':
         specifier: workspace:*
         version: link:../../packages/chunky-crayon-translations
+      '@one-colored-pixel/coloring-ui':
+        specifier: workspace:^
+        version: link:../../packages/coloring-ui
       '@one-colored-pixel/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -702,6 +705,9 @@ importers:
       '@one-colored-pixel/coloring-core':
         specifier: workspace:*
         version: link:../../packages/coloring-core
+      '@one-colored-pixel/coloring-ui':
+        specifier: workspace:^
+        version: link:../../packages/coloring-ui
       '@one-colored-pixel/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -925,6 +931,61 @@ importers:
       '@types/node':
         specifier: ^24.3.0
         version: 24.3.1
+      typescript:
+        specifier: ^5.4.5
+        version: 5.9.3
+
+  packages/coloring-ui:
+    dependencies:
+      '@fortawesome/fontawesome-svg-core':
+        specifier: ^6.7.2
+        version: 6.7.2
+      '@fortawesome/free-brands-svg-icons':
+        specifier: ^6.7.2
+        version: 6.7.2
+      '@fortawesome/free-solid-svg-icons':
+        specifier: ^6.7.2
+        version: 6.7.2
+      '@fortawesome/pro-duotone-svg-icons':
+        specifier: ^6.7.2
+        version: 6.7.2
+      '@fortawesome/pro-solid-svg-icons':
+        specifier: ^6.7.2
+        version: 6.7.2
+      '@fortawesome/react-fontawesome':
+        specifier: ^0.2.6
+        version: 0.2.6(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.1.0)
+      '@one-colored-pixel/canvas':
+        specifier: workspace:*
+        version: link:../canvas
+      '@one-colored-pixel/db':
+        specifier: workspace:*
+        version: link:../db
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      next:
+        specifier: '*'
+        version: 16.1.0(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      posthog-js:
+        specifier: ^1.238.0
+        version: 1.309.1
+      react:
+        specifier: 19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: 19.1.0
+        version: 19.1.0(react@19.1.0)
+      tailwind-merge:
+        specifier: ^3.3.0
+        version: 3.3.1
+    devDependencies:
+      '@types/node':
+        specifier: ^24.3.0
+        version: 24.3.1
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
       typescript:
         specifier: ^5.4.5
         version: 5.9.3
