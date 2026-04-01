@@ -8,11 +8,13 @@ import ShareArtworkModal from '@/components/ShareArtworkModal/ShareArtworkModal'
 type ShareArtworkButtonProps = {
   artworkId: string;
   artworkTitle: string;
+  artworkImageUrl?: string;
 };
 
 const ShareArtworkButton = ({
   artworkId,
   artworkTitle,
+  artworkImageUrl,
 }: ShareArtworkButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,6 +33,7 @@ const ShareArtworkButton = ({
       <ShareArtworkModal
         artworkId={artworkId}
         artworkTitle={artworkTitle}
+        artworkImageUrl={artworkImageUrl}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />

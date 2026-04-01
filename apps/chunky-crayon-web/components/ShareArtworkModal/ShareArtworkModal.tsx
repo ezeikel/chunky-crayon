@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -12,7 +12,9 @@ import {
   faInfinity,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faLockOpen, faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
+import { faTiktok } from '@fortawesome/free-brands-svg-icons';
 import AdultGate from '@/components/AdultGate';
+import TikTokPostComposer from '@/components/TikTokPostComposer';
 import { createShare } from '@/app/actions/share';
 import type { ShareExpiration } from '@/lib/share';
 import cn from '@/utils/cn';
@@ -20,11 +22,12 @@ import cn from '@/utils/cn';
 type ShareArtworkModalProps = {
   artworkId: string;
   artworkTitle: string;
+  artworkImageUrl?: string;
   isOpen: boolean;
   onClose: () => void;
 };
 
-type ModalState = 'gate' | 'options' | 'generating' | 'success';
+type ModalState = 'gate' | 'options' | 'generating' | 'success' | 'tiktok';
 
 type ExpirationOption = {
   value: ShareExpiration;
@@ -41,6 +44,7 @@ const EXPIRATION_OPTIONS: ExpirationOption[] = [
 const ShareArtworkModal = ({
   artworkId,
   artworkTitle,
+  artworkImageUrl,
   isOpen,
   onClose,
 }: ShareArtworkModalProps) => {
@@ -52,6 +56,40 @@ const ShareArtworkModal = ({
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasTikTok, setHasTikTok] = useState<boolean | null>(null);
+
+  // Check if user has TikTok connected
+  useEffect(() => {
+    if (!isOpen) return;
+    const checkTikTok = async () => {
+      try {
+        const { getUserTikTokAccount } = await import(
+          '@/app/actions/user-social'
+        );
+        const account = await getUserTikTokAccount();
+        setHasTikTok(!!account);
+      } catch {
+        setHasTikTok(false);
+      }
+    };
+    checkTikTok();
+  }, [isOpen]);
+
+  const handleTikTokClick = () => {
+    if (hasTikTok) {
+      setState('tiktok');
+    } else {
+      const returnUrl = encodeURIComponent(window.location.pathname);
+      window.location.href = `/api/auth/tiktok/user?return_url=${returnUrl}`;
+    }
+  };
+
+  const handleTikTokDisconnect = async () => {
+    const { disconnectUserTikTok } = await import('@/app/actions/user-social');
+    await disconnectUserTikTok();
+    setHasTikTok(false);
+    setState('success');
+  };
 
   const handleGateSuccess = useCallback(() => {
     setState('options');
@@ -285,6 +323,21 @@ const ShareArtworkModal = ({
               </button>
             </div>
 
+            {/* Share to TikTok */}
+            <div className="mb-4">
+              <p className="text-sm font-medium text-text-primary mb-2">
+                Share on social media
+              </p>
+              <button
+                type="button"
+                onClick={handleTikTokClick}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                <FontAwesomeIcon icon={faTiktok} />
+                {hasTikTok ? 'Share to TikTok' : 'Connect TikTok'}
+              </button>
+            </div>
+
             {/* Done button */}
             <button
               type="button"
@@ -293,6 +346,32 @@ const ShareArtworkModal = ({
             >
               {t('done')}
             </button>
+          </div>
+        )}
+
+        {state === 'tiktok' && artworkImageUrl && (
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-text-primary">
+                Share to TikTok
+              </h3>
+              <button
+                type="button"
+                onClick={() => setState('success')}
+                className="p-2 text-text-secondary hover:text-text-primary transition-colors"
+                aria-label={tCommon('close')}
+              >
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+            <TikTokPostComposer
+              artworkId={artworkId}
+              artworkTitle={artworkTitle}
+              artworkImageUrl={artworkImageUrl}
+              hasVideo={false}
+              onClose={handleDone}
+              onDisconnect={handleTikTokDisconnect}
+            />
           </div>
         )}
       </div>

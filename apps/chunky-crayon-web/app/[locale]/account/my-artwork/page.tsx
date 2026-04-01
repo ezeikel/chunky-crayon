@@ -215,6 +215,7 @@ const ArtworkGrid = async () => {
               <ShareArtworkButton
                 artworkId={artwork.id}
                 artworkTitle={artwork.title || 'My Artwork'}
+                artworkImageUrl={artwork.imageUrl}
               />
               {/* Delete Button - big circular */}
               <DeleteArtworkButton artworkId={artwork.id} />

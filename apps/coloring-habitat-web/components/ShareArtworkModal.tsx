@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLink,
@@ -12,6 +12,7 @@ import {
   faXTwitter,
   faFacebookF,
   faPinterest,
+  faTiktok,
 } from "@fortawesome/free-brands-svg-icons";
 import {
   Dialog,
@@ -23,15 +24,17 @@ import {
 import { createShare } from "@/app/actions/share";
 import type { ShareExpiration } from "@/lib/share";
 import { cn } from "@/lib/utils";
+import TikTokPostComposer from "@/components/TikTokPostComposer";
 
 type ShareArtworkModalProps = {
   artworkId: string;
   artworkTitle: string;
+  artworkImageUrl: string;
   isOpen: boolean;
   onClose: () => void;
 };
 
-type ModalState = "options" | "generating" | "success";
+type ModalState = "options" | "generating" | "success" | "tiktok";
 
 const EXPIRATION_OPTIONS: { value: ShareExpiration; label: string }[] = [
   { value: "7days", label: "7 days" },
@@ -42,6 +45,7 @@ const EXPIRATION_OPTIONS: { value: ShareExpiration; label: string }[] = [
 const ShareArtworkModal = ({
   artworkId,
   artworkTitle,
+  artworkImageUrl,
   isOpen,
   onClose,
 }: ShareArtworkModalProps) => {
@@ -51,6 +55,24 @@ const ShareArtworkModal = ({
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasTikTok, setHasTikTok] = useState<boolean | null>(null);
+
+  // Check if user has TikTok connected
+  useEffect(() => {
+    if (!isOpen) return;
+    const checkTikTok = async () => {
+      try {
+        const { getUserTikTokAccount } = await import(
+          "@/app/actions/user-social"
+        );
+        const account = await getUserTikTokAccount();
+        setHasTikTok(!!account);
+      } catch {
+        setHasTikTok(false);
+      }
+    };
+    checkTikTok();
+  }, [isOpen]);
 
   const handleClose = useCallback(() => {
     setState("options");
@@ -93,6 +115,23 @@ const ShareArtworkModal = ({
       setTimeout(() => setCopied(false), 2000);
     }
   }, [shareUrl]);
+
+  const handleTikTokClick = () => {
+    if (hasTikTok) {
+      setState("tiktok");
+    } else {
+      // Start OAuth — redirect to TikTok connect
+      const returnUrl = encodeURIComponent(window.location.pathname);
+      window.location.href = `/api/auth/tiktok?return_url=${returnUrl}`;
+    }
+  };
+
+  const handleTikTokDisconnect = async () => {
+    const { disconnectUserTikTok } = await import("@/app/actions/user-social");
+    await disconnectUserTikTok();
+    setHasTikTok(false);
+    setState("success");
+  };
 
   const getSocialShareUrl = (
     platform: "twitter" | "facebook" | "pinterest",
@@ -224,6 +263,17 @@ const ShareArtworkModal = ({
                 Share on social media
               </p>
               <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleTikTokClick}
+                  className="flex items-center justify-center size-10 rounded-full bg-black text-white hover:opacity-90 transition-opacity"
+                  aria-label="Share to TikTok"
+                  title={
+                    hasTikTok ? "Share to TikTok" : "Connect TikTok to share"
+                  }
+                >
+                  <FontAwesomeIcon icon={faTiktok} />
+                </button>
                 <a
                   href={getSocialShareUrl("twitter")}
                   target="_blank"
@@ -253,6 +303,25 @@ const ShareArtworkModal = ({
                 </a>
               </div>
             </div>
+          </>
+        )}
+
+        {state === "tiktok" && (
+          <>
+            <DialogHeader>
+              <DialogTitle>Share to TikTok</DialogTitle>
+              <DialogDescription>
+                Post your artwork to your TikTok account
+              </DialogDescription>
+            </DialogHeader>
+            <TikTokPostComposer
+              artworkId={artworkId}
+              artworkTitle={artworkTitle}
+              artworkImageUrl={artworkImageUrl}
+              hasVideo={false}
+              onClose={handleClose}
+              onDisconnect={handleTikTokDisconnect}
+            />
           </>
         )}
       </DialogContent>
