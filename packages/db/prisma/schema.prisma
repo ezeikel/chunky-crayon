@@ -33,6 +33,8 @@ model User {
   sessions             Session[]
   // Mobile device sessions
   mobileDeviceSessions MobileDeviceSession[]
+  // User-linked social accounts (for sharing artwork to TikTok, Pinterest, etc.)
+  socialAccounts       UserSocialAccount[]
 
   // Multi-brand support
   brand Brand @default(CHUNKY_CRAYON)
@@ -378,6 +380,28 @@ model ApiToken {
   updatedAt    DateTime @updatedAt
 
   @@map("api_tokens")
+}
+
+// Per-user social account connections (for user-facing sharing to TikTok, Pinterest, etc.)
+model UserSocialAccount {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider          String // "tiktok", "pinterest"
+  providerAccountId String // TikTok open_id, Pinterest user ID
+  accessToken       String   @db.Text
+  refreshToken      String   @db.Text
+  expiresAt         DateTime
+  scopes            String[]
+  displayName       String? // TikTok nickname (shown before posting, required by TikTok review)
+  avatarUrl         String?
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("user_social_accounts")
 }
 
 enum Brand {

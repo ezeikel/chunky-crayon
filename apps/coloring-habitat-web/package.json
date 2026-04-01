@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "check-types": "tsc"
+    "check-types": "tsc",
+    "stripe:listen": "stripe listen --forward-to localhost:3001/api/payment/webhook"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.51",
