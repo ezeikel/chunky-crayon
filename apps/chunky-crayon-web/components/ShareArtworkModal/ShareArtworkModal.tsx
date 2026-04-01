@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import posthog from 'posthog-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTimes,
@@ -57,10 +58,11 @@ const ShareArtworkModal = ({
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasTikTok, setHasTikTok] = useState<boolean | null>(null);
+  const tiktokEnabled = posthog.isFeatureEnabled('tiktok-sharing');
 
-  // Check if user has TikTok connected
+  // Check if user has TikTok connected (only if feature flag is on)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !tiktokEnabled) return;
     const checkTikTok = async () => {
       try {
         const { getUserTikTokAccount } = await import(
@@ -73,7 +75,7 @@ const ShareArtworkModal = ({
       }
     };
     checkTikTok();
-  }, [isOpen]);
+  }, [isOpen, tiktokEnabled]);
 
   const handleTikTokClick = () => {
     if (hasTikTok) {
@@ -323,20 +325,22 @@ const ShareArtworkModal = ({
               </button>
             </div>
 
-            {/* Share to TikTok */}
-            <div className="mb-4">
-              <p className="text-sm font-medium text-text-primary mb-2">
-                Share on social media
-              </p>
-              <button
-                type="button"
-                onClick={handleTikTokClick}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity"
-              >
-                <FontAwesomeIcon icon={faTiktok} />
-                {hasTikTok ? 'Share to TikTok' : 'Connect TikTok'}
-              </button>
-            </div>
+            {/* Share to TikTok (feature flagged for TikTok API review) */}
+            {tiktokEnabled && (
+              <div className="mb-4">
+                <p className="text-sm font-medium text-text-primary mb-2">
+                  Share on social media
+                </p>
+                <button
+                  type="button"
+                  onClick={handleTikTokClick}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                >
+                  <FontAwesomeIcon icon={faTiktok} />
+                  {hasTikTok ? 'Share to TikTok' : 'Connect TikTok'}
+                </button>
+              </div>
+            )}
 
             {/* Done button */}
             <button
@@ -349,7 +353,7 @@ const ShareArtworkModal = ({
           </div>
         )}
 
-        {state === 'tiktok' && artworkImageUrl && (
+        {state === 'tiktok' && tiktokEnabled && artworkImageUrl && (
           <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-text-primary">
