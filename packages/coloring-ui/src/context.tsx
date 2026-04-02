@@ -96,6 +96,8 @@ type ColoringContextArgs = {
 
 type ColoringContextProviderProps = {
   children: React.ReactNode;
+  /** localStorage key prefix for persisting audio settings (e.g. "chunky-crayon" or "coloring-habitat") */
+  storagePrefix?: string;
 };
 
 const MAX_HISTORY_SIZE = 20;
@@ -144,6 +146,7 @@ export const ColoringContext = createContext<ColoringContextArgs>({
 
 export const ColoringContextProvider = ({
   children,
+  storagePrefix = "coloring",
 }: ColoringContextProviderProps) => {
   // Color state
   const [selectedColor, setSelectedColor] = useState("#212121"); // Default to black
@@ -182,10 +185,12 @@ export const ColoringContextProvider = ({
 
   // Hydrate audio settings from localStorage after mount (avoids SSR mismatch)
   useEffect(() => {
-    setIsMuted(localStorage.getItem("chunky-crayon-muted") === "true");
-    setIsSfxMuted(localStorage.getItem("chunky-crayon-sfx-muted") === "true");
+    setIsMuted(localStorage.getItem(`${storagePrefix}-muted`) === "true");
+    setIsSfxMuted(
+      localStorage.getItem(`${storagePrefix}-sfx-muted`) === "true",
+    );
     setIsAmbientMuted(
-      localStorage.getItem("chunky-crayon-ambient-muted") === "true",
+      localStorage.getItem(`${storagePrefix}-ambient-muted`) === "true",
     );
     setIsHydrated(true);
   }, []);
@@ -193,20 +198,20 @@ export const ColoringContextProvider = ({
   // Persist audio settings to localStorage (only after hydration)
   useEffect(() => {
     if (isHydrated) {
-      localStorage.setItem("chunky-crayon-muted", String(isMuted));
+      localStorage.setItem(`${storagePrefix}-muted`, String(isMuted));
     }
   }, [isMuted, isHydrated]);
 
   useEffect(() => {
     if (isHydrated) {
-      localStorage.setItem("chunky-crayon-sfx-muted", String(isSfxMuted));
+      localStorage.setItem(`${storagePrefix}-sfx-muted`, String(isSfxMuted));
     }
   }, [isSfxMuted, isHydrated]);
 
   useEffect(() => {
     if (isHydrated) {
       localStorage.setItem(
-        "chunky-crayon-ambient-muted",
+        `${storagePrefix}-ambient-muted`,
         String(isAmbientMuted),
       );
     }

@@ -188,9 +188,9 @@ const PatternSelector = ({ className }: PatternSelectorProps) => {
               onClick={() => handlePatternSelect(pattern)}
               className={cn(
                 "flex items-center justify-center size-10 sm:size-11 rounded-lg transition-all duration-150",
-                "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+                "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
                 {
-                  "bg-crayon-orange/20 ring-2 ring-crayon-orange": isActive,
+                  "bg-coloring-accent/20 ring-2 ring-coloring-accent": isActive,
                 },
               )}
               aria-label={config.name}

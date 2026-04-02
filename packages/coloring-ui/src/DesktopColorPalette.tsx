@@ -29,7 +29,7 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 p-4 bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-paper-cream-dark shadow-lg",
+        "flex flex-col gap-3 p-4 bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-coloring-surface-dark shadow-lg",
         className,
       )}
     >
@@ -37,7 +37,7 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
       <div className="flex items-center gap-2">
         <FontAwesomeIcon
           icon={faPalette}
-          className="size-5 text-crayon-orange"
+          className="size-5 text-coloring-accent"
         />
         <h3 className="font-tondo font-bold text-sm text-text-primary">
           {t("sidebar.colors")}
@@ -66,7 +66,7 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
               type="button"
               className={cn(
                 "size-8 rounded-full shadow-md transition-all duration-150 ease-out",
-                "hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-crayon-orange",
+                "hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coloring-accent",
                 {
                   "ring-2 ring-offset-2 ring-gray-800 scale-110":
                     isSelected && !isMagicToolActive,

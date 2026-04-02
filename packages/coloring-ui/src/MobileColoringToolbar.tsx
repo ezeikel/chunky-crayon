@@ -389,7 +389,7 @@ const MobileColoringToolbar = ({
                     // Default state
                     "bg-gray-100",
                     // Active state
-                    isToolActive(tool.id) && "bg-crayon-orange text-white",
+                    isToolActive(tool.id) && "bg-coloring-accent text-white",
                     // Magic tools slightly wider
                     tool.isMagic && "w-14",
                   )}
@@ -473,7 +473,7 @@ const MobileColoringToolbar = ({
                       // Default state
                       "bg-gray-100",
                       // Active state
-                      brushSize === key && "bg-crayon-orange",
+                      brushSize === key && "bg-coloring-accent",
                     )}
                     aria-label={size.name}
                     aria-pressed={brushSize === key}
@@ -526,7 +526,7 @@ const MobileColoringToolbar = ({
                       // Default state
                       "bg-gray-100",
                       // Active state
-                      selectedPattern === pattern.type && "bg-crayon-orange",
+                      selectedPattern === pattern.type && "bg-coloring-accent",
                     )}
                     aria-label={pattern.label}
                     aria-pressed={selectedPattern === pattern.type}

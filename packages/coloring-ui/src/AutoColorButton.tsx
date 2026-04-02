@@ -25,7 +25,7 @@ type AutoColorButtonProps = {
 
 // Kid-friendly button: magical purple theme for AI features
 const buttonClassName =
-  "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-crayon-purple hover:bg-crayon-purple-dark active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100";
+  "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-coloring-accent hover:bg-coloring-accent-dark active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100";
 
 const AutoColorButton = ({
   onAutoColor,
@@ -42,7 +42,7 @@ const AutoColorButton = ({
     return (
       <div
         className={cn(
-          "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg px-4 md:px-8 py-2 md:py-4 rounded-full shadow-lg bg-crayon-purple/70 cursor-wait",
+          "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg px-4 md:px-8 py-2 md:py-4 rounded-full shadow-lg bg-coloring-accent/70 cursor-wait",
           className,
         )}
       >
@@ -59,7 +59,7 @@ const AutoColorButton = ({
     return (
       <div
         className={cn(
-          "flex items-center justify-center gap-x-2 text-crayon-pink font-bold text-sm md:text-base px-4 md:px-6 py-2 md:py-3 rounded-full shadow-lg bg-white border-2 border-crayon-pink",
+          "flex items-center justify-center gap-x-2 text-coloring-highlight font-bold text-sm md:text-base px-4 md:px-6 py-2 md:py-3 rounded-full shadow-lg bg-white border-2 border-coloring-highlight",
           className,
         )}
       >
@@ -92,7 +92,7 @@ const AutoColorButton = ({
     return (
       <div
         className={cn(
-          "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg px-4 md:px-8 py-2 md:py-4 rounded-full shadow-lg bg-crayon-green",
+          "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg px-4 md:px-8 py-2 md:py-4 rounded-full shadow-lg bg-coloring-success",
           className,
         )}
       >

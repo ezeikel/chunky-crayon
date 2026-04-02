@@ -74,7 +74,7 @@ const UndoRedoButtons = ({
         disabled={!canUndo}
         className={cn(
           "flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150",
-          "focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+          "focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           {
             "hover:bg-gray-100 active:scale-95 text-gray-700": canUndo,
             "text-gray-300 cursor-not-allowed": !canUndo,
@@ -92,7 +92,7 @@ const UndoRedoButtons = ({
         disabled={!canRedo}
         className={cn(
           "flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150",
-          "focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+          "focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           {
             "hover:bg-gray-100 active:scale-95 text-gray-700": canRedo,
             "text-gray-300 cursor-not-allowed": !canRedo,

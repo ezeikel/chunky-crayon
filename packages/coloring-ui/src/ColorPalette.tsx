@@ -42,7 +42,7 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
             type="button"
             className={cn(
               "size-8 sm:size-10 rounded-full shadow-md transition-all duration-150 ease-out",
-              "hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-crayon-orange",
+              "hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coloring-accent",
               {
                 "ring-2 ring-offset-2 ring-gray-800 scale-110":
                   isSelected && !isMagicToolActive,

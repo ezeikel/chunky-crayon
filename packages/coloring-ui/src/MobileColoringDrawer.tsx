@@ -410,7 +410,7 @@ const MobileColoringDrawer = ({
                             // Default state - bg-gray-100 matching mobile
                             "bg-gray-100",
                             // Active state - crayon orange
-                            isActive && "bg-crayon-orange",
+                            isActive && "bg-coloring-accent",
                             // Magic tools slightly wider
                             tool.isMagic && "w-14 gap-0.5",
                           )}
@@ -514,7 +514,7 @@ const MobileColoringDrawer = ({
                             // Default state
                             "bg-gray-100",
                             // Active state
-                            isSelected && "bg-crayon-orange",
+                            isSelected && "bg-coloring-accent",
                           )}
                           aria-label={`${config.name} brush size`}
                           aria-pressed={isSelected}
@@ -566,7 +566,7 @@ const MobileColoringDrawer = ({
                             // Default state
                             "bg-gray-100",
                             // Active state
-                            isActive && "bg-crayon-orange",
+                            isActive && "bg-coloring-accent",
                           )}
                           aria-label={fill.label}
                           aria-pressed={isActive}
@@ -620,7 +620,7 @@ const MobileColoringDrawer = ({
                               // Default state
                               "bg-gray-100",
                               // Active state
-                              isActive && "bg-crayon-orange",
+                              isActive && "bg-coloring-accent",
                             )}
                             aria-label={pattern.label}
                             aria-pressed={isActive}

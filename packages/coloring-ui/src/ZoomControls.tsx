@@ -98,7 +98,7 @@ const ZoomIndicator = ({
           key={i}
           className={cn(
             "size-3 rounded-full transition-all duration-200",
-            i < filledDots ? "bg-crayon-orange scale-125" : "bg-gray-300",
+            i < filledDots ? "bg-coloring-accent scale-125" : "bg-gray-300",
             // Extra pop for the most recently filled dot
             isAnimating && i === filledDots - 1 && "scale-150",
           )}
@@ -159,7 +159,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
     <div
       className={cn(
         "flex items-center gap-1 p-2 rounded-lg bg-white/90 backdrop-blur-sm transition-colors duration-200",
-        isZoomed && "ring-2 ring-crayon-orange/30",
+        isZoomed && "ring-2 ring-coloring-accent/30",
         className,
       )}
     >
@@ -170,7 +170,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         disabled={isAtMinZoom}
         className={cn(
           "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
-          "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+          "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           {
             "opacity-50 cursor-not-allowed hover:bg-transparent": isAtMinZoom,
           },
@@ -191,7 +191,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         disabled={isAtMaxZoom}
         className={cn(
           "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
-          "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+          "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           {
             "opacity-50 cursor-not-allowed hover:bg-transparent": isAtMaxZoom,
           },
@@ -209,9 +209,9 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
           onClick={handlePanToggle}
           className={cn(
             "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
-            "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+            "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
             isPanActive &&
-              "bg-crayon-orange text-white hover:bg-crayon-orange/90",
+              "bg-coloring-accent text-white hover:bg-coloring-accent/90",
           )}
           aria-label="Move around the picture"
           title="Move"
@@ -232,12 +232,12 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
           disabled={isAtDefaultView}
           className={cn(
             "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
-            "bg-crayon-orange/10 hover:bg-crayon-orange/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+            "bg-coloring-accent/10 hover:bg-coloring-accent/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           )}
           aria-label="Go back to full picture"
           title="See whole picture"
         >
-          <HomeIcon className="size-4 sm:size-5 md:size-6 text-crayon-orange" />
+          <HomeIcon className="size-4 sm:size-5 md:size-6 text-coloring-accent" />
         </button>
       )}
     </div>

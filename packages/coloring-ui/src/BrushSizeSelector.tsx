@@ -40,7 +40,7 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
             }}
             className={cn(
               "flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150",
-              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
               {
                 "bg-gray-200 ring-2 ring-gray-400": isSelected,
               },

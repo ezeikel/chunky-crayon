@@ -213,12 +213,12 @@ const ToolSelector = ({
             onClick={() => handleToolSelect(id)}
             className={cn(
               "flex items-center justify-center rounded-lg transition-all duration-150",
-              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
               isMagic
                 ? "flex-col gap-0.5 px-2 py-1 sm:px-3 sm:py-1.5 min-w-[3rem] sm:min-w-[3.5rem]"
                 : "size-10 sm:size-12",
               {
-                "bg-crayon-orange text-white hover:bg-crayon-orange/90":
+                "bg-coloring-accent text-white hover:bg-coloring-accent/90":
                   isActive,
               },
             )}

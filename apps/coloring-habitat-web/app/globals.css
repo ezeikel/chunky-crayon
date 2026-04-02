@@ -66,6 +66,15 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  /* Shared Coloring UI theme (maps to Habitat brand colors) */
+  --color-coloring-accent: var(--primary);
+  --color-coloring-accent-dark: color-mix(in oklch, var(--primary) 85%, black);
+  --color-coloring-highlight: var(--accent);
+  --color-coloring-success: oklch(0.55 0.15 145);
+  --color-coloring-surface: var(--secondary);
+  --color-coloring-surface-dark: var(--muted);
+  --color-coloring-muted: var(--muted-foreground);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

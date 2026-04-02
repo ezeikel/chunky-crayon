@@ -45,8 +45,8 @@ const MuteToggle = ({ className }: MuteToggleProps) => {
       onClick={handleToggle}
       className={cn(
         "flex items-center justify-center w-12 h-12 rounded-full",
-        "bg-paper-cream border-2 border-paper-cream-dark",
-        "hover:bg-paper-cream-dark active:scale-95",
+        "bg-coloring-surface border-2 border-coloring-surface-dark",
+        "hover:bg-coloring-surface-dark active:scale-95",
         "transition-all duration-150",
         "shadow-sm hover:shadow-md",
         className,
@@ -59,7 +59,7 @@ const MuteToggle = ({ className }: MuteToggleProps) => {
         icon={isMuted ? faVolumeXmark : faVolumeHigh}
         className={cn(
           "text-xl transition-colors",
-          isMuted ? "text-text-muted" : "text-crayon-orange",
+          isMuted ? "text-coloring-muted" : "text-coloring-accent",
         )}
       />
     </motion.button>

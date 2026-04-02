@@ -118,7 +118,10 @@ class SoundManager {
   private static readonly BRUSH_FADE_IN = 0.08; // 80ms fade in
   private static readonly BRUSH_FADE_OUT = 0.12; // 120ms fade out
 
-  constructor() {
+  private storagePrefix: string = "coloring";
+
+  constructor(storagePrefix: string = "coloring") {
+    this.storagePrefix = storagePrefix;
     console.log("[SoundManager] Constructor called");
     // Initialize on first user interaction
     if (typeof window !== "undefined") {
@@ -646,18 +649,20 @@ class SoundManager {
    */
   private loadMutePreference(): void {
     try {
-      const savedMuted = localStorage.getItem("chunky-crayon-muted");
+      const savedMuted = localStorage.getItem(`${this.storagePrefix}-muted`);
       if (savedMuted !== null) {
         this.isMuted = savedMuted === "true";
       }
 
-      const savedSfxMuted = localStorage.getItem("chunky-crayon-sfx-muted");
+      const savedSfxMuted = localStorage.getItem(
+        `${this.storagePrefix}-sfx-muted`,
+      );
       if (savedSfxMuted !== null) {
         this.isSfxMuted = savedSfxMuted === "true";
       }
 
       const savedAmbientMuted = localStorage.getItem(
-        "chunky-crayon-ambient-muted",
+        `${this.storagePrefix}-ambient-muted`,
       );
       if (savedAmbientMuted !== null) {
         this.isAmbientMuted = savedAmbientMuted === "true";
@@ -672,10 +677,13 @@ class SoundManager {
    */
   private saveMutePreference(): void {
     try {
-      localStorage.setItem("chunky-crayon-muted", String(this.isMuted));
-      localStorage.setItem("chunky-crayon-sfx-muted", String(this.isSfxMuted));
+      localStorage.setItem(`${this.storagePrefix}-muted`, String(this.isMuted));
       localStorage.setItem(
-        "chunky-crayon-ambient-muted",
+        `${this.storagePrefix}-sfx-muted`,
+        String(this.isSfxMuted),
+      );
+      localStorage.setItem(
+        `${this.storagePrefix}-ambient-muted`,
         String(this.isAmbientMuted),
       );
     } catch {
@@ -874,9 +882,11 @@ let soundManagerInstance: SoundManager | null = null;
 /**
  * Get the singleton SoundManager instance
  */
-export const getSoundManager = (): SoundManager => {
+export const getSoundManager = (
+  storagePrefix: string = "coloring",
+): SoundManager => {
   if (!soundManagerInstance) {
-    soundManagerInstance = new SoundManager();
+    soundManagerInstance = new SoundManager(storagePrefix);
   }
   return soundManagerInstance;
 };

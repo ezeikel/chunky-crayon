@@ -30,6 +30,15 @@
   --color-crayon-sky-light: hsl(var(--crayon-sky-light));
   --color-crayon-sky-dark: hsl(var(--crayon-sky-dark));
 
+  /* Shared Coloring UI theme (maps to brand-specific colors) */
+  --color-coloring-accent: hsl(var(--crayon-orange));
+  --color-coloring-accent-dark: hsl(var(--crayon-orange-dark));
+  --color-coloring-highlight: hsl(var(--crayon-pink));
+  --color-coloring-success: hsl(var(--crayon-green));
+  --color-coloring-surface: hsl(var(--paper-cream));
+  --color-coloring-surface-dark: hsl(var(--paper-cream-dark));
+  --color-coloring-muted: hsl(var(--text-muted));
+
   /* Social */
   --color-social-facebook: hsl(var(--social-facebook));
   --color-social-facebook-dark: hsl(var(--social-facebook-dark));
