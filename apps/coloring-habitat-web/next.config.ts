@@ -71,14 +71,17 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "assets.coloringhabitat.com" },
+      { protocol: "https", hostname: "*.r2.dev" },
       { protocol: "https", hostname: "cdn.sanity.io" },
     ],
   },
   async rewrites() {
+    const r2PublicUrl =
+      process.env.R2_PUBLIC_URL || "https://assets.coloringhabitat.com";
     return [
       {
         source: "/_r2/:path*",
-        destination: "https://assets.coloringhabitat.com/:path*",
+        destination: `${r2PublicUrl}/:path*`,
       },
     ];
   },

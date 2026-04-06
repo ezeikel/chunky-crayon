@@ -2,11 +2,17 @@
 // Needed because canvas pixel operations (getImageData, toDataURL) require
 // same-origin images. R2 doesn't serve CORS headers, so fetch() from the
 // browser would fail. The /_r2/* rewrite in next.config.ts proxies to R2.
-const R2_HOST = "https://assets.chunkycrayon.com";
+// Match both prod custom domain and dev public URL
+const R2_HOSTS = [
+  "https://assets.coloringhabitat.com",
+  "https://pub-6786013d1ffa411aa84ff29f787d7387.r2.dev",
+];
 
 export function proxyR2Url(url: string): string {
-  if (url.startsWith(R2_HOST)) {
-    return url.replace(R2_HOST, "/_r2");
+  for (const host of R2_HOSTS) {
+    if (url.startsWith(host)) {
+      return url.replace(host, "/_r2");
+    }
   }
   return url;
 }
