@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
@@ -83,4 +84,20 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+// Sentry configuration options
+const sentryOptions = {
+  silent: true,
+  org: "chewybytes",
+  project: "coloring-habitat-web",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+  },
+};
+
+const configWithIntl = withNextIntl(nextConfig);
+const configWithSentry = withSentryConfig(configWithIntl, sentryOptions);
+
+export default configWithSentry;
