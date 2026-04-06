@@ -1,4 +1,15 @@
 {
+  "startOverButton": {
+    "idle": "Start Over",
+    "confirm": "Yes, Start Over",
+    "cancel": "Keep Coloring"
+  },
+  "downloadPDFButton": {
+    "idle": "Print",
+    "loading": "Loading...",
+    "creating": "Creating...",
+    "error": "Oops!"
+  },
   "coloringPage": {
     "title": "Coloring Page",
     "relatedPages": "More Coloring Pages",
