@@ -1,0 +1,108 @@
+{
+  "coloringPage": {
+    "title": "Coloring Page",
+    "relatedPages": "More Coloring Pages",
+    "defaultDescription": "Free adult coloring page from Coloring Habitat",
+    "progress": {
+      "colored": "colored",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "Great start!",
+        "50": "Halfway there!",
+        "75": "Almost done!",
+        "100": "Amazing!"
+      }
+    },
+    "sidebar": {
+      "colors": "Colors",
+      "tools": "Tools",
+      "size": "Size",
+      "history": "History",
+      "zoom": "Zoom",
+      "actions": "Actions"
+    },
+    "tools": {
+      "pan": "Pan",
+      "fill": "Fill",
+      "brush": "Brush",
+      "sticker": "Sticker",
+      "magicReveal": "Magic Reveal",
+      "magicAuto": "Magic Auto",
+      "magicBrush": "Magic Brush",
+      "magicFill": "Magic Fill",
+      "autoColor": "Auto Color",
+      "magic": "Magic"
+    },
+    "brushTypes": {
+      "crayon": "Crayon",
+      "marker": "Marker",
+      "eraser": "Eraser",
+      "glitter": "Glitter",
+      "sparkle": "Sparkle",
+      "rainbow": "Rainbow",
+      "glow": "Glow",
+      "neon": "Neon"
+    },
+    "brushSizes": {
+      "small": "Fine",
+      "medium": "Regular",
+      "large": "Chunky"
+    },
+    "fillPatterns": {
+      "solid": "Solid",
+      "dots": "Polka Dots",
+      "stripes": "Stripes",
+      "diagonal": "Diagonal",
+      "checkerboard": "Checkers",
+      "hearts": "Hearts",
+      "stars": "Stars",
+      "zigzag": "Zigzag"
+    },
+    "actions": {
+      "save": "Save",
+      "download": "Download",
+      "share": "Share",
+      "print": "Print",
+      "preparing": "Preparing...",
+      "doneSharing": "Done sharing",
+      "colorAgain": "Color again",
+      "startOver": "Start Over"
+    },
+    "toolbar": {
+      "expand": "Expand toolbar",
+      "collapse": "Collapse toolbar",
+      "moreTools": "More tools",
+      "less": "Less"
+    },
+    "undoRedo": {
+      "undo": "Undo",
+      "undoShortcut": "Undo (Ctrl+Z)",
+      "redo": "Redo",
+      "redoShortcut": "Redo (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "Select {color} color",
+      "magicToolsMessage": "Colors are chosen automatically with Magic tools"
+    },
+    "patternSelector": {
+      "label": "Pattern:"
+    },
+    "zoomControls": {
+      "zoomLevel": "Zoom level: {level}%",
+      "zoomOut": "Zoom out",
+      "zoomOutAria": "Zoom out (see more)",
+      "zoomIn": "Zoom in",
+      "zoomInAria": "Zoom in (see closer)",
+      "pan": "Move",
+      "panAria": "Move around the picture",
+      "reset": "See whole picture",
+      "resetAria": "Go back to full picture"
+    },
+    "muteToggle": {
+      "mute": "Mute sounds",
+      "unmute": "Unmute sounds",
+      "turnOn": "Turn sounds on",
+      "turnOff": "Turn sounds off"
+    }
+  }
+}

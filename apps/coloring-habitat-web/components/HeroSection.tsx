@@ -1,36 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faStar,
-  faKeyboard,
-  faMicrophone,
-  faCamera,
-  faArrowRight,
-  faCircleCheck,
-} from "@fortawesome/free-solid-svg-icons";
-
-type InputMode = "type" | "talk" | "photo";
-
-const modes: { id: InputMode; label: string; icon: typeof faKeyboard }[] = [
-  { id: "type", label: "Type", icon: faKeyboard },
-  { id: "talk", label: "Talk", icon: faMicrophone },
-  { id: "photo", label: "Photo", icon: faCamera },
-];
-
-const SUGGESTIONS = [
-  "Zen garden at sunset",
-  "Art Nouveau florals",
-  "Coral reef",
-  "Cozy forest cabin",
-];
+import { faStar, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import CreateColoringPageForm from "@/components/forms/CreateColoringPageForm/CreateColoringPageForm";
 
 const HeroSection = () => {
-  const [activeMode, setActiveMode] = useState<InputMode>("type");
-  const [prompt, setPrompt] = useState("");
-
   return (
     <section className="bg-background pb-16 pt-10 md:pb-24 md:pt-16">
       <div className="mx-auto max-w-7xl px-6">
@@ -75,100 +50,11 @@ const HeroSection = () => {
 
         {/* Create form card - centered below headline */}
         <div className="mx-auto mt-10 max-w-xl">
-          <div className="rounded-2xl border border-border bg-background shadow-lg">
-            {/* Mode tabs */}
-            <div className="flex border-b border-border">
-              {modes.map((mode) => (
-                <button
-                  key={mode.id}
-                  type="button"
-                  onClick={() => setActiveMode(mode.id)}
-                  className={`flex flex-1 items-center justify-center gap-2 py-4 text-sm font-semibold transition-colors ${
-                    activeMode === mode.id
-                      ? "border-b-2 border-foreground text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  aria-pressed={activeMode === mode.id}
-                >
-                  <FontAwesomeIcon icon={mode.icon} size="sm" />
-                  {mode.label}
-                </button>
-              ))}
-            </div>
+          <CreateColoringPageForm />
 
-            {/* Input area */}
-            <div className="p-5">
-              {activeMode === "type" && (
-                <>
-                  <textarea
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="e.g. a serene Japanese garden with koi and cherry blossoms..."
-                    className="min-h-24 w-full resize-none rounded-xl border border-border bg-secondary p-4 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
-                    aria-label="Describe your coloring page"
-                  />
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {SUGGESTIONS.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setPrompt(s)}
-                        className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {activeMode === "talk" && (
-                <div className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-border bg-secondary p-6">
-                  <button
-                    type="button"
-                    className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white transition-transform hover:scale-105"
-                    aria-label="Start recording"
-                  >
-                    <FontAwesomeIcon icon={faMicrophone} size="lg" />
-                  </button>
-                  <span className="text-sm text-muted-foreground">
-                    Tap to describe your page
-                  </span>
-                </div>
-              )}
-
-              {activeMode === "photo" && (
-                <label className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border bg-secondary p-6 transition-colors hover:border-foreground/30">
-                  <FontAwesomeIcon
-                    icon={faCamera}
-                    size="lg"
-                    className="text-muted-foreground"
-                  />
-                  <span className="text-sm text-muted-foreground">
-                    Upload a photo to transform
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="sr-only"
-                    aria-label="Upload a photo"
-                  />
-                </label>
-              )}
-
-              <button
-                type="button"
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-base font-bold text-primary-foreground transition-shadow hover:shadow-md"
-              >
-                Create my page
-                <FontAwesomeIcon icon={faArrowRight} size="sm" />
-              </button>
-
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                2 free creations daily &middot; No account needed
-              </p>
-            </div>
-          </div>
+          <p className="mt-3 text-center text-xs text-muted-foreground">
+            2 free creations daily &middot; No account needed
+          </p>
         </div>
 
         {/* Social proof bar */}

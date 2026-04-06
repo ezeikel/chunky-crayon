@@ -2,11 +2,13 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { NextIntlClientProvider } from "next-intl";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import Providers from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import messages from "@/messages/en.json";
 import "./globals.css";
 
 config.autoAddCss = false;
@@ -51,15 +53,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={jakarta.variable}>
       <body className="font-sans antialiased">
-        <Providers>
-          <Suspense>
-            <Header />
-          </Suspense>
-          <main className="flex min-h-[calc(100vh-72px)] flex-col [&>div]:flex-1">
-            <Suspense>{children}</Suspense>
-          </main>
-          <Footer />
-        </Providers>
+        <NextIntlClientProvider messages={messages} locale="en">
+          <Providers>
+            <Suspense>
+              <Header />
+            </Suspense>
+            <main className="flex min-h-[calc(100vh-72px)] flex-col [&>div]:flex-1">
+              <Suspense>{children}</Suspense>
+            </main>
+            <Footer />
+          </Providers>
+        </NextIntlClientProvider>
         <Analytics />
       </body>
     </html>
