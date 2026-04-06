@@ -53,15 +53,52 @@ This project uses Neon PostgreSQL with branch-based development:
 - `apps/chunky-crayon-mobile` - React Native mobile app (Chunky Crayon)
 - `apps/coloring-habitat-web` - Next.js 16 web application (Coloring Habitat - adult coloring)
 - `packages/db` - Prisma database client (`@one-colored-pixel/db`)
+- `packages/storage` - R2 storage client (`@one-colored-pixel/storage`)
+- `packages/canvas` - Canvas algorithms: floodFill, brushTextures, fillPatterns, regionDetection (`@one-colored-pixel/canvas`)
+- `packages/stripe-shared` - Configurable Stripe utilities (`@one-colored-pixel/stripe-shared`)
+- `packages/coloring-core` - AI models and tracing (`@one-colored-pixel/coloring-core`)
+- `packages/coloring-ui` - Full coloring experience: ImageCanvas, palettes, toolbars, sound, context (`@one-colored-pixel/coloring-ui`) — has Storybook
 - `packages/chunky-crayon-translations` - i18n translations for Chunky Crayon (`@one-colored-pixel/chunky-crayon-translations`)
+
+## Keeping CC and CH in Sync
+
+**CRITICAL**: Chunky Crayon (CC) and Coloring Habitat (CH) are the same app for different audiences (kids vs adults). They share 7 packages and must use identical patterns.
+
+### Rules
+
+1. **CC is the reference**. If CH has a bug, check how CC handles the same thing first. CC has solved every problem CH encounters.
+2. **Shared packages first**. When adding/modifying coloring experience code (canvas, palette, toolbar, sound), change the shared package — never add code to only one app.
+3. **Same Next.js patterns**. Both apps must use:
+   - `cacheComponents: true` in next.config
+   - `'use cache'` with `cacheLife` for data functions
+   - Suspense boundaries around dynamic content (static shell pattern)
+   - Header/Footer in the layout, not in individual pages
+   - Granular `cacheLife` profiles per content type
+4. **No `connection()` for DB reads**. Prisma/Neon WebSocket works with prerender. Only use `connection()` when explicitly opting into dynamic rendering.
+5. **Run local build before pushing**. Run `pnpm build` in the app directory to catch Cache Components / prerender errors before Vercel.
+6. **Feature changes go to both apps** unless they're brand-specific (e.g. Colo mascot = CC only, wellness theming = CH only).
+
+### What differs between apps (by design)
+
+| Aspect         | CC (kids)                            | CH (adults)                          |
+| -------------- | ------------------------------------ | ------------------------------------ |
+| Prompts        | `lib/ai/prompts.ts` — child-friendly | `lib/ai/prompts.ts` — adult/wellness |
+| Pricing        | Splash/Rainbow/Sparkle               | Grove/Sanctuary/Oasis                |
+| Theme          | crayon-orange, crayon-purple         | green primary, nature tones          |
+| Routing        | `[locale]/...` (i18n)                | `/...` (no i18n)                     |
+| Stickers       | Yes (kid-focused)                    | No                                   |
+| Colo mascot    | Yes                                  | No                                   |
+| TikTok sharing | Feature-flagged (admin only)         | Always on                            |
+| PostHog        | Project 110135                       | Project 149826                       |
+| Stripe         | Existing account                     | acct_1TGNOxPVKi0lifb0                |
 
 ## Vercel Deployment
 
-The web app is deployed via Vercel. **Important**: The Vercel project is linked in `apps/chunky-crayon-web`, not the repo root.
+Each app has its own Vercel project. **Important**: Run Vercel CLI from the app directory, not the repo root.
 
-- **Project**: `chunky-crayon-web` (in Chewy Bytes team)
-- **Vercel CLI**: Always run from `apps/chunky-crayon-web` directory when managing env vars or deployments
-- **Env vars**: Use `cd apps/chunky-crayon-web && vercel env ls` to list/manage environment variables
+- **Chunky Crayon**: `chunky-crayon-web` — linked in `apps/chunky-crayon-web`
+- **Coloring Habitat**: `coloring-habitat-web` — linked in `apps/coloring-habitat-web` (also linked at repo root)
+- **Env vars**: `cd apps/<app-name> && vercel env ls`
 
 ### Monorepo Constraints
 
