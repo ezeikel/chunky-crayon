@@ -93,7 +93,7 @@ const getDailyImagesBase = async (
   limit: number = GALLERY_PAGE_SIZE,
 ): Promise<PaginatedImagesResponse> => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-daily");
   cacheTag("gallery", "gallery-daily");
 
   const images = await db.coloringImage.findMany({
@@ -146,7 +146,7 @@ export const getDailyImages = async (
 // Get the most recent daily image
 export const getLatestDailyImage = async () => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-daily");
   cacheTag("gallery", "gallery-daily-latest");
 
   return db.coloringImage.findFirst({
@@ -184,7 +184,7 @@ const getCategoryImagesBase = async (
   }
 > => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-daily");
   cacheTag("gallery-category", `gallery-category-${categorySlug}`);
 
   const category = getCategoryBySlug(categorySlug);
@@ -258,7 +258,7 @@ export const getCategoryImages = async (
 
 export const getFeaturedImages = async (limit: number = 6) => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-category");
   cacheTag("gallery", "gallery-featured");
 
   return db.coloringImage.findMany({
@@ -282,7 +282,7 @@ export const getFeaturedImages = async (limit: number = 6) => {
 
 export const getCategoryCounts = async () => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-category");
   cacheTag("gallery-category", "gallery-category-counts");
 
   const counts: Record<string, number> = {};
@@ -316,7 +316,7 @@ export const getCategoryCount = async (
   categorySlug: string,
 ): Promise<number> => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-category");
   cacheTag("gallery-category", `gallery-category-count-${categorySlug}`);
 
   const category = getCategoryBySlug(categorySlug);
@@ -347,7 +347,7 @@ export const getCategoryCount = async (
 
 export const getGalleryStats = async () => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-stats");
   cacheTag("gallery-stats");
 
   const [totalImages, dailyImages] = await Promise.all([
@@ -377,7 +377,7 @@ const getDifficultyImagesBase = async (
   limit: number = GALLERY_PAGE_SIZE,
 ): Promise<PaginatedImagesResponse> => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-difficulty");
   cacheTag(
     "gallery-difficulty",
     `gallery-difficulty-${difficulty.toLowerCase()}`,
@@ -434,7 +434,7 @@ export const getDifficultyImages = async (
 
 export const getDifficultyCounts = async () => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-difficulty");
   cacheTag("gallery-difficulty", "gallery-difficulty-counts");
 
   const counts: Record<Difficulty, number> = {
@@ -476,7 +476,7 @@ const getCategoryImagesWithDifficultyBase = async (
   }
 > => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-category");
   cacheTag(
     "gallery-category",
     `gallery-category-${categorySlug}`,
@@ -586,7 +586,7 @@ const getTagImagesBase = async (
   limit: number = GALLERY_PAGE_SIZE,
 ): Promise<PaginatedImagesResponse> => {
   "use cache";
-  cacheLife("gallery");
+  cacheLife("gallery-category");
   cacheTag("gallery-tag", `gallery-tag-${tag}`);
 
   const images = await db.coloringImage.findMany({

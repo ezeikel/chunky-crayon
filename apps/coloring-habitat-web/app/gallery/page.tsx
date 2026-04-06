@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { connection } from "next/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
@@ -24,8 +23,6 @@ type GalleryPageProps = {
 };
 
 const GalleryPage = async ({ searchParams }: GalleryPageProps) => {
-  await connection();
-
   const { difficulty: difficultySlug } = await searchParams;
   const difficulty = difficultySlug
     ? getDifficultyFromSlug(difficultySlug)

@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { connection } from "next/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
@@ -18,8 +17,6 @@ export const metadata: Metadata = {
 };
 
 const DailyGalleryPage = async () => {
-  await connection();
-
   const [data, latestDaily] = await Promise.all([
     getDailyImages(),
     getLatestDailyImage(),

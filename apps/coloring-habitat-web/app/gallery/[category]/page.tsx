@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -42,8 +41,6 @@ export async function generateMetadata({
 }
 
 const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
-  await connection();
-
   const { category: categorySlug } = await params;
   const { difficulty: difficultySlug } = await searchParams;
 

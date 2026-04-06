@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -41,8 +40,6 @@ export async function generateMetadata({
 }
 
 const DifficultyPage = async ({ params }: DifficultyPageProps) => {
-  await connection();
-
   const { difficulty: difficultySlug } = await params;
   const difficulty = getDifficultyFromSlug(difficultySlug);
 

@@ -75,7 +75,7 @@ type RelatedPost = {
 
 async function getPost(slug: string) {
   "use cache";
-  cacheLife("hours");
+  cacheLife("blog-post");
   cacheTag("blog-posts", `blog-post-${slug}`);
   if (!isSanityConfigured) return null;
   return client.fetch<Post>(postBySlugQuery, { slug });
@@ -83,7 +83,7 @@ async function getPost(slug: string) {
 
 async function getRecentPosts(currentSlug: string) {
   "use cache";
-  cacheLife("hours");
+  cacheLife("blog-list");
   cacheTag("blog-posts");
   if (!isSanityConfigured) return [];
   return client.fetch<RelatedPost[]>(recentPostsQuery, { currentSlug });

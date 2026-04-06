@@ -9,14 +9,14 @@ import { urlFor } from "@/lib/sanity";
 
 async function getCachedPosts() {
   "use cache";
-  cacheLife("hours");
+  cacheLife("blog-list");
   cacheTag("blog-list", "blog-posts");
   return getAllPosts();
 }
 
 async function getCachedCategories() {
   "use cache";
-  cacheLife("hours");
+  cacheLife("blog-list");
   cacheTag("blog-list", "blog-categories");
   return getCategories();
 }

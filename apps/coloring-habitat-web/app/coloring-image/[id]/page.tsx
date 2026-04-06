@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { db } from "@one-colored-pixel/db";
 import { auth } from "@/auth";
 import ColoringPageContent from "@/components/ColoringPageContent/ColoringPageContent";
@@ -13,7 +12,6 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await connection();
   const { id } = await params;
 
   const image = await db.coloringImage.findUnique({
@@ -44,7 +42,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const ColoringImagePage = async ({ params }: Props) => {
-  await connection();
   const { id } = await params;
 
   const [image, session] = await Promise.all([
