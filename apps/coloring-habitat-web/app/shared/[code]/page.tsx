@@ -8,8 +8,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { format } from "date-fns";
 import { getSharedArtworkByCode } from "@/app/actions/share";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 type SharedArtworkPageProps = {
   params: Promise<{ code: string }>;
@@ -142,13 +140,11 @@ const SharedArtworkPage = async ({ params }: SharedArtworkPageProps) => {
 
   return (
     <>
-      <Header />
       <main className="min-h-screen">
         <Suspense fallback={<SharedArtworkLoading />}>
           <SharedArtworkContent code={code} />
         </Suspense>
       </main>
-      <Footer />
     </>
   );
 };

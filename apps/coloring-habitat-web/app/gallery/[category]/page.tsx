@@ -3,8 +3,6 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
 import DifficultyFilter from "@/components/DifficultyFilter/DifficultyFilter";
 import { GALLERY_CATEGORIES, getCategoryBySlug } from "@/constants";
@@ -67,7 +65,6 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
 
   return (
     <>
-      <Header />
       <main className="bg-background py-12">
         <div className="mx-auto max-w-7xl px-6">
           {/* Breadcrumbs */}
@@ -130,7 +127,6 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 };

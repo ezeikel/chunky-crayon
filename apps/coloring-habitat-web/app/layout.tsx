@@ -5,6 +5,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import Providers from "@/components/Providers";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 config.autoAddCss = false;
@@ -50,7 +52,13 @@ export default function RootLayout({
     <html lang="en" className={jakarta.variable}>
       <body className="font-sans antialiased">
         <Providers>
-          <Suspense>{children}</Suspense>
+          <Suspense>
+            <Header />
+          </Suspense>
+          <main className="flex min-h-[calc(100vh-72px)] flex-col [&>div]:flex-1">
+            <Suspense>{children}</Suspense>
+          </main>
+          <Footer />
         </Providers>
         <Analytics />
       </body>

@@ -11,8 +11,6 @@ import {
   faSpa,
   faWater,
 } from "@fortawesome/free-solid-svg-icons";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 type BillingInterval = "monthly" | "annual";
 
@@ -108,7 +106,6 @@ const PricingPage = () => {
 
   return (
     <>
-      <Header />
       <main className="bg-background py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center">
@@ -251,7 +248,6 @@ const PricingPage = () => {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 };

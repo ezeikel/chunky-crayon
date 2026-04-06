@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Terms of Service | Coloring Habitat",
@@ -9,7 +7,6 @@ export const metadata: Metadata = {
 const TermsPage = () => {
   return (
     <>
-      <Header />
       <main className="bg-background py-16">
         <div className="prose prose-neutral mx-auto max-w-3xl px-6">
           <h1>Terms of Service</h1>
@@ -65,7 +62,6 @@ const TermsPage = () => {
           </p>
         </div>
       </main>
-      <Footer />
     </>
   );
 };

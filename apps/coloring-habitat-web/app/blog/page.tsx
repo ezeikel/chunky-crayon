@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { getAllPosts, getCategories } from "@/app/actions/blog";
 import type { BlogPost, BlogCategory } from "@/app/actions/blog";
 import { urlFor } from "@/lib/sanity";
@@ -113,7 +111,6 @@ const BlogPage = async () => {
 
   return (
     <>
-      <Header />
       <main className="bg-background py-16">
         <div className="mx-auto max-w-6xl px-6">
           {/* Header */}
@@ -150,7 +147,6 @@ const BlogPage = async () => {
           )}
         </div>
       </main>
-      <Footer />
     </>
   );
 };

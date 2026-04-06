@@ -2,8 +2,6 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
 import DifficultyFilter from "@/components/DifficultyFilter/DifficultyFilter";
 import { GALLERY_CATEGORIES } from "@/constants";
@@ -40,7 +38,6 @@ const GalleryPage = async ({ searchParams }: GalleryPageProps) => {
 
   return (
     <>
-      <Header />
       <main className="bg-background py-12">
         <div className="mx-auto max-w-7xl px-6">
           <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
@@ -96,7 +93,6 @@ const GalleryPage = async ({ searchParams }: GalleryPageProps) => {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 };

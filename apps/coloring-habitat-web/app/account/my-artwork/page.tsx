@@ -11,8 +11,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { differenceInDays, isToday, isYesterday, format } from "date-fns";
 import { auth } from "@/auth";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { getUserSavedArtwork } from "@/app/actions/saved-artwork";
 import DeleteArtworkButton from "./DeleteArtworkButton";
 import ShareArtworkButton from "./ShareArtworkButton";
@@ -127,7 +125,6 @@ const ArtworkGrid = async () => {
 const MyArtworkPage = () => {
   return (
     <>
-      <Header />
       <main className="min-h-screen">
         <div className="mx-auto max-w-7xl px-6 py-12">
           {/* Header */}
@@ -158,7 +155,6 @@ const MyArtworkPage = () => {
           </Suspense>
         </div>
       </main>
-      <Footer />
     </>
   );
 };

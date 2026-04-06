@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 
 export default function SharedArtworkNotFound() {
   return (
     <>
-      <Header />
       <main className="min-h-screen flex items-center justify-center">
         <div className="text-center px-6 py-20">
           <h1 className="text-3xl font-bold text-foreground mb-3">
@@ -26,7 +23,6 @@ export default function SharedArtworkNotFound() {
           </Link>
         </div>
       </main>
-      <Footer />
     </>
   );
 }

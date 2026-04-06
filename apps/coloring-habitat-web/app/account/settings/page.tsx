@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import SettingsForm from "./SettingsForm";
 import { getUserSettings } from "@/app/actions/settings";
 
@@ -39,7 +37,6 @@ const SettingsContent = async () => {
 const SettingsPage = () => {
   return (
     <>
-      <Header />
       <main className="min-h-screen">
         <div className="mx-auto max-w-2xl px-6 py-12">
           <Suspense
@@ -56,7 +53,6 @@ const SettingsPage = () => {
           </Suspense>
         </div>
       </main>
-      <Footer />
     </>
   );
 };

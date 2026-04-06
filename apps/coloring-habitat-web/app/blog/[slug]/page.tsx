@@ -11,8 +11,6 @@ import {
   faClock,
   faCalendar,
 } from "@fortawesome/free-solid-svg-icons";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { portableTextComponents } from "@/components/blog/PortableTextComponents";
 import {
   client,
@@ -335,7 +333,6 @@ const BlogPostContent = async ({
 const BlogPostPage = async ({ params }: { params: Promise<PageParams> }) => {
   return (
     <>
-      <Header />
       <main className="bg-background py-16">
         <div className="mx-auto max-w-4xl px-6">
           <Suspense
@@ -357,7 +354,6 @@ const BlogPostPage = async ({ params }: { params: Promise<PageParams> }) => {
           </Suspense>
         </div>
       </main>
-      <Footer />
     </>
   );
 };

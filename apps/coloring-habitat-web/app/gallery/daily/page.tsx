@@ -2,8 +2,6 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
 import { getDailyImages, getLatestDailyImage } from "@/app/data/gallery";
 
@@ -29,7 +27,6 @@ const DailyGalleryPage = async () => {
 
   return (
     <>
-      <Header />
       <main className="bg-background py-12">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center gap-4">
@@ -96,7 +93,6 @@ const DailyGalleryPage = async () => {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 };

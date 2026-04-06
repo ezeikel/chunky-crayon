@@ -4,8 +4,6 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { db } from "@one-colored-pixel/db";
 import { auth } from "@/auth";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import ColoringPageContent from "@/components/ColoringPageContent/ColoringPageContent";
 import { ColoringContextProvider } from "@one-colored-pixel/coloring-ui";
 import { BRAND } from "@/lib/db";
@@ -76,7 +74,6 @@ const ColoringImagePage = async ({ params }: Props) => {
 
   return (
     <>
-      <Header />
       <main className="bg-background py-8">
         <div className="mx-auto max-w-7xl px-6">
           {/* Back to gallery link */}
@@ -118,7 +115,6 @@ const ColoringImagePage = async ({ params }: Props) => {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   );
 };
