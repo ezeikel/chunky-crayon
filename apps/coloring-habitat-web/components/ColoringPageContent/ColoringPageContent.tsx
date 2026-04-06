@@ -77,7 +77,7 @@ const ColoringPageContent = ({
     <div className="flex flex-col gap-y-4 @container">
       {/* Title with progress/mute underneath on desktop */}
       <div className="flex flex-col items-center gap-2 max-w-3xl xl:max-w-none w-full mx-auto xl:px-4">
-        <h1 className="font-tondo font-bold text-2xl md:text-3xl text-text-primary text-center">
+        <h1 className="font-sans font-bold text-2xl md:text-3xl text-foreground text-center">
           {title}
         </h1>
         {/* Desktop only: Progress bar stretches, mute on right */}
@@ -108,7 +108,7 @@ const ColoringPageContent = ({
           </div>
 
           {/* Coloring Area - clean white card matching gallery aesthetic */}
-          <div className="bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 @[1600px]:p-8 shadow-sm">
+          <div className="bg-white rounded-2xl border-2 border-border p-4 md:p-6 @[1600px]:p-8 shadow-sm">
             <ColoringArea
               ref={coloringAreaRef}
               coloringImage={coloringImage}

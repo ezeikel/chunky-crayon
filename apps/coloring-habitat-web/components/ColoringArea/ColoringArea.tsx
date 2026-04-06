@@ -578,14 +578,14 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           {isMagicToolActive &&
             (magicColorMapState.isLoading || isGeneratingFillPoints) && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-                <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 border-2 border-crayon-purple/20 shadow-lg">
+                <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-violet-600/10 to-rose-500/10 border-2 border-violet-600/20 shadow-lg">
                   <div className="relative">
-                    <div className="size-12 border-4 border-crayon-purple/30 border-t-crayon-purple rounded-full animate-spin" />
+                    <div className="size-12 border-4 border-violet-600/30 border-t-violet-600 rounded-full animate-spin" />
                     <span className="absolute inset-0 flex items-center justify-center text-2xl">
                       ✨
                     </span>
                   </div>
-                  <p className="text-sm font-bold text-crayon-purple text-center max-w-[200px]">
+                  <p className="text-sm font-bold text-violet-600 text-center max-w-[200px]">
                     {isGeneratingFillPoints
                       ? "Preparing magic colors for the first time..."
                       : magicColorMapState.loadingMessage ||
@@ -598,15 +598,15 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           {/* Magic Error Overlay - Shows if magic analysis fails */}
           {isMagicToolActive && magicColorMapState.error && (
             <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-              <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-crayon-pink/10 border-2 border-crayon-pink/30 shadow-lg">
+              <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-destructive/10 border-2 border-destructive/30 shadow-lg">
                 <span className="text-3xl">😕</span>
-                <p className="text-sm font-bold text-crayon-pink text-center max-w-[200px]">
+                <p className="text-sm font-bold text-destructive text-center max-w-[200px]">
                   {magicColorMapState.error}
                 </p>
                 <button
                   type="button"
                   onClick={() => resetMagicColorMap()}
-                  className="px-4 py-2 text-sm font-bold text-white bg-crayon-purple rounded-full hover:bg-crayon-purple/90 active:scale-95 transition-all"
+                  className="px-4 py-2 text-sm font-bold text-white bg-violet-600 rounded-full hover:bg-violet-600/90 active:scale-95 transition-all"
                 >
                   Try Again
                 </button>
@@ -625,7 +625,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           <ShareButton
             url={typeof window !== "undefined" ? window.location.href : ""}
             title={coloringImage.title || "Coloring Page"}
-            description={`Color this ${coloringImage.title || "fun coloring page"} on Chunky Crayon!`}
+            description={`Color this ${coloringImage.title || "fun coloring page"} on Coloring Habitat!`}
             imageUrl={coloringImage.url || undefined}
             getCanvasDataUrl={getCanvasDataUrl}
           />
@@ -647,7 +647,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           <ShareButton
             url={typeof window !== "undefined" ? window.location.href : ""}
             title={coloringImage.title || "Coloring Page"}
-            description={`Color this ${coloringImage.title || "fun coloring page"} on Chunky Crayon!`}
+            description={`Color this ${coloringImage.title || "fun coloring page"} on Coloring Habitat!`}
             imageUrl={coloringImage.url || undefined}
             getCanvasDataUrl={getCanvasDataUrl}
           />

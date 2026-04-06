@@ -12,10 +12,10 @@ type StartOverButtonProps = {
   disabled?: boolean;
 };
 
-// Kid-friendly button: matches Print button style but secondary color (teal)
+// Button: matches Print button style but secondary color (accent)
 // Responsive: icon-only on mobile (44px touch target), icon+text on desktop
 const buttonClassName =
-  "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-crayon-teal hover:bg-crayon-teal-dark active:scale-95 transition-all duration-150";
+  "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-accent hover:bg-accent/90 active:scale-95 transition-all duration-150";
 
 const StartOverButton = ({
   onStartOver,
@@ -48,7 +48,7 @@ const StartOverButton = ({
         <button
           type="button"
           onClick={handleClick}
-          className="flex items-center justify-center gap-x-2 text-white font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-crayon-pink hover:bg-crayon-pink-dark active:scale-95 transition-all duration-150"
+          className="flex items-center justify-center gap-x-2 text-white font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-destructive hover:bg-destructive/90 active:scale-95 transition-all duration-150"
         >
           <FontAwesomeIcon icon={faBroomWide} className="text-base" />
           <span>{t("confirm")}</span>
@@ -56,7 +56,7 @@ const StartOverButton = ({
         <button
           type="button"
           onClick={handleCancel}
-          className="flex items-center justify-center text-text-secondary font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-white hover:bg-paper-cream active:scale-95 transition-all duration-150 border-2 border-paper-cream-dark"
+          className="flex items-center justify-center text-muted-foreground font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-white hover:bg-secondary active:scale-95 transition-all duration-150 border-2 border-border"
         >
           {t("cancel")}
         </button>

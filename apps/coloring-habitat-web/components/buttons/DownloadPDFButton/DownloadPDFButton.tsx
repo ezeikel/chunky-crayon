@@ -16,7 +16,7 @@ import { proxyR2Url } from "@/utils/proxyR2Url";
 
 const formatTitleForFileName = (title: string | undefined): string => {
   if (!title) {
-    return "chunky-crayon";
+    return "coloring-habitat";
   }
 
   return `${title.toLowerCase().replace(/\s+/g, "-")}-coloring-page.pdf`;
@@ -28,10 +28,10 @@ type SaveButtonProps = {
   className?: string;
 };
 
-// Kid-friendly button: big, colorful, clear language
+// Button: big, colorful, clear language
 // Responsive: icon-only on mobile (44px touch target), icon+text on desktop
 const buttonClassName =
-  "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-crayon-orange hover:bg-crayon-orange-dark active:scale-95 transition-all duration-150";
+  "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-primary hover:bg-primary/90 active:scale-95 transition-all duration-150";
 
 type GeneratingState = "idle" | "generating" | "error";
 

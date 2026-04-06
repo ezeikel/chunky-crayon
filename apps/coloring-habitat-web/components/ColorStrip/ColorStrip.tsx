@@ -54,7 +54,7 @@ const ColorStrip = ({ className }: ColorStripProps) => {
               className={cn(
                 // Large touch targets for young children - minimum 44px
                 "size-11 min-w-11 rounded-full shadow-md transition-all duration-150 ease-out flex-shrink-0",
-                "active:scale-90 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-crayon-orange",
+                "active:scale-90 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary",
                 {
                   "ring-2 ring-offset-1 ring-gray-800 scale-105":
                     isSelected && !isMagicToolActive,

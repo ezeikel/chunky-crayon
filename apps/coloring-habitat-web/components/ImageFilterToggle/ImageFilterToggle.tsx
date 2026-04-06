@@ -38,12 +38,12 @@ const ImageFilterToggle = ({
         type="button"
         onClick={() => handleSelect("all")}
         className={cn(
-          "flex items-center gap-2 px-4 py-2.5 rounded-full font-tondo font-bold text-base",
+          "flex items-center gap-2 px-4 py-2.5 rounded-full font-sans font-bold text-base",
           "transition-all duration-200 hover:scale-105 active:scale-95",
           "border-2",
           show === "all"
-            ? "bg-crayon-teal text-white border-crayon-teal shadow-btn-primary"
-            : "bg-white text-text-secondary border-paper-cream-dark hover:border-crayon-teal hover:text-crayon-teal",
+            ? "bg-accent text-white border-accent shadow-lg"
+            : "bg-white text-muted-foreground border-border hover:border-accent hover:text-accent",
         )}
       >
         <FontAwesomeIcon
@@ -57,8 +57,8 @@ const ImageFilterToggle = ({
                   "--fa-secondary-opacity": "0.7",
                 } as React.CSSProperties)
               : ({
-                  "--fa-primary-color": "hsl(var(--crayon-teal))",
-                  "--fa-secondary-color": "hsl(var(--crayon-orange))",
+                  "--fa-primary-color": "hsl(var(--accent))",
+                  "--fa-secondary-color": "hsl(var(--primary))",
                   "--fa-secondary-opacity": "0.8",
                 } as React.CSSProperties)
           }
@@ -71,12 +71,12 @@ const ImageFilterToggle = ({
         type="button"
         onClick={() => handleSelect("user")}
         className={cn(
-          "flex items-center gap-2 px-4 py-2.5 rounded-full font-tondo font-bold text-base",
+          "flex items-center gap-2 px-4 py-2.5 rounded-full font-sans font-bold text-base",
           "transition-all duration-200 hover:scale-105 active:scale-95",
           "border-2",
           show === "user"
-            ? "bg-crayon-orange text-white border-crayon-orange shadow-btn-primary"
-            : "bg-white text-text-secondary border-paper-cream-dark hover:border-crayon-orange hover:text-crayon-orange",
+            ? "bg-primary text-white border-primary shadow-lg"
+            : "bg-white text-muted-foreground border-border hover:border-primary hover:text-primary",
         )}
       >
         <FontAwesomeIcon
@@ -90,8 +90,8 @@ const ImageFilterToggle = ({
                   "--fa-secondary-opacity": "0.7",
                 } as React.CSSProperties)
               : ({
-                  "--fa-primary-color": "hsl(var(--crayon-orange))",
-                  "--fa-secondary-color": "hsl(var(--crayon-teal))",
+                  "--fa-primary-color": "hsl(var(--primary))",
+                  "--fa-secondary-color": "hsl(var(--accent))",
                   "--fa-secondary-opacity": "0.8",
                 } as React.CSSProperties)
           }

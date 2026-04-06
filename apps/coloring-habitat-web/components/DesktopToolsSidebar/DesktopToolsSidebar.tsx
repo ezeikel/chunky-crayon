@@ -308,18 +308,15 @@ const DesktopToolsSidebar = ({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 p-4 bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-paper-cream-dark shadow-lg",
+        "flex flex-col gap-4 p-4 bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-border shadow-lg",
         className,
       )}
     >
       {/* Tools Section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faToolbox}
-            className="size-5 text-crayon-orange"
-          />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
+          <FontAwesomeIcon icon={faToolbox} className="size-5 text-primary" />
+          <h3 className="font-sans font-bold text-sm text-foreground">
             {t("sidebar.tools")}
           </h3>
         </div>
@@ -342,10 +339,9 @@ const DesktopToolsSidebar = ({
                 onClick={() => handleToolSelect(id)}
                 className={cn(
                   "flex items-center justify-center p-3 rounded-lg transition-all duration-150",
-                  "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+                  "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary",
                   {
-                    "bg-crayon-orange text-white hover:bg-crayon-orange/90":
-                      isActive,
+                    "bg-primary text-white hover:bg-primary/90": isActive,
                   },
                 )}
                 aria-label={label}
@@ -374,10 +370,10 @@ const DesktopToolsSidebar = ({
                 onClick={() => handleToolSelect(id)}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all duration-150",
-                  "hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-purple",
+                  "hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-violet-600",
                   isActive
-                    ? "bg-gradient-to-r from-crayon-purple to-crayon-pink text-white shadow-md"
-                    : "bg-gradient-to-r from-crayon-purple/10 to-crayon-pink/10 text-crayon-purple hover:from-crayon-purple/20 hover:to-crayon-pink/20",
+                    ? "bg-gradient-to-r from-violet-600 to-rose-500 text-white shadow-md"
+                    : "bg-gradient-to-r from-violet-600/10 to-rose-500/10 text-violet-600 hover:from-violet-600/20 hover:to-rose-500/20",
                 )}
                 aria-label={label}
                 aria-pressed={isActive}
@@ -392,16 +388,13 @@ const DesktopToolsSidebar = ({
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-paper-cream-dark" />
+      <div className="h-px bg-muted" />
 
       {/* Brush Size Section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faRuler}
-            className="size-4 text-crayon-orange"
-          />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
+          <FontAwesomeIcon icon={faRuler} className="size-4 text-primary" />
+          <h3 className="font-sans font-bold text-sm text-foreground">
             {t("sidebar.size")}
           </h3>
         </div>
@@ -423,7 +416,7 @@ const DesktopToolsSidebar = ({
                 }}
                 className={cn(
                   "flex items-center justify-center size-10 rounded-lg transition-all duration-150",
-                  "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+                  "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary",
                   {
                     "bg-gray-200 ring-2 ring-gray-400": isSelected,
                   },
@@ -446,16 +439,16 @@ const DesktopToolsSidebar = ({
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-paper-cream-dark" />
+      <div className="h-px bg-muted" />
 
       {/* Undo/Redo Section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon
             icon={faClockRotateLeft}
-            className="size-4 text-crayon-orange"
+            className="size-4 text-primary"
           />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
+          <h3 className="font-sans font-bold text-sm text-foreground">
             {t("sidebar.history")}
           </h3>
         </div>
@@ -467,7 +460,7 @@ const DesktopToolsSidebar = ({
             disabled={!canUndo}
             className={cn(
               "flex items-center justify-center size-10 rounded-lg transition-all duration-150",
-              "focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+              "focus:outline-none focus:ring-2 focus:ring-primary",
               {
                 "hover:bg-gray-100 active:scale-95 text-gray-700": canUndo,
                 "text-gray-300 cursor-not-allowed": !canUndo,
@@ -485,7 +478,7 @@ const DesktopToolsSidebar = ({
             disabled={!canRedo}
             className={cn(
               "flex items-center justify-center size-10 rounded-lg transition-all duration-150",
-              "focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+              "focus:outline-none focus:ring-2 focus:ring-primary",
               {
                 "hover:bg-gray-100 active:scale-95 text-gray-700": canRedo,
                 "text-gray-300 cursor-not-allowed": !canRedo,
@@ -500,16 +493,16 @@ const DesktopToolsSidebar = ({
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-paper-cream-dark" />
+      <div className="h-px bg-muted" />
 
       {/* Zoom Section */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon
             icon={faMagnifyingGlass}
-            className="size-4 text-crayon-orange"
+            className="size-4 text-primary"
           />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
+          <h3 className="font-sans font-bold text-sm text-foreground">
             {t("sidebar.zoom")}
           </h3>
         </div>
@@ -521,7 +514,7 @@ const DesktopToolsSidebar = ({
             disabled={zoom <= minZoom}
             className={cn(
               "flex items-center justify-center size-9 rounded-lg transition-all duration-150",
-              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary",
               {
                 "opacity-50 cursor-not-allowed hover:bg-transparent":
                   zoom <= minZoom,
@@ -539,7 +532,7 @@ const DesktopToolsSidebar = ({
             disabled={zoom >= maxZoom}
             className={cn(
               "flex items-center justify-center size-9 rounded-lg transition-all duration-150",
-              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary",
               {
                 "opacity-50 cursor-not-allowed hover:bg-transparent":
                   zoom >= maxZoom,
@@ -558,9 +551,8 @@ const DesktopToolsSidebar = ({
                 onClick={handlePanToggle}
                 className={cn(
                   "flex items-center justify-center size-9 rounded-lg transition-all duration-150",
-                  "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
-                  isPanActive &&
-                    "bg-crayon-orange text-white hover:bg-crayon-orange/90",
+                  "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary",
+                  isPanActive && "bg-primary text-white hover:bg-primary/90",
                 )}
                 aria-label={t("zoomControls.pan")}
                 title={t("zoomControls.pan")}
@@ -574,34 +566,34 @@ const DesktopToolsSidebar = ({
                 onClick={handleResetView}
                 className={cn(
                   "flex items-center justify-center size-9 rounded-lg transition-all duration-150",
-                  "bg-crayon-orange/10 hover:bg-crayon-orange/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange",
+                  "bg-primary/10 hover:bg-primary/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary",
                 )}
                 aria-label={t("zoomControls.reset")}
                 title={t("zoomControls.reset")}
               >
-                <HomeIcon className="size-4 text-crayon-orange" />
+                <HomeIcon className="size-4 text-primary" />
               </button>
             </>
           )}
         </div>
 
         {/* Zoom level indicator */}
-        <div className="text-center text-xs text-text-secondary">
+        <div className="text-center text-xs text-muted-foreground">
           {Math.round(zoom * 100)}%
         </div>
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-paper-cream-dark" />
+      <div className="h-px bg-muted" />
 
       {/* Actions Section */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon
             icon={faRocketLaunch}
-            className="size-4 text-crayon-orange"
+            className="size-4 text-primary"
           />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
+          <h3 className="font-sans font-bold text-sm text-foreground">
             {t("sidebar.actions")}
           </h3>
         </div>
@@ -623,7 +615,7 @@ const DesktopToolsSidebar = ({
           <ShareButton
             url={typeof window !== "undefined" ? window.location.href : ""}
             title={coloringImage?.title || "Coloring Page"}
-            description={`Color this ${coloringImage?.title || "fun coloring page"} on Chunky Crayon!`}
+            description={`Color this ${coloringImage?.title || "fun coloring page"} on Coloring Habitat!`}
             imageUrl={coloringImage?.url || undefined}
             getCanvasDataUrl={getCanvasDataUrl}
             className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
