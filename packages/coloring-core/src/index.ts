@@ -19,3 +19,13 @@ export {
   getTracedModels,
 } from "./models";
 export type { ModelId, TracingOptions } from "./models";
+
+export { createImageGenerationPipeline } from "./image-providers";
+export type {
+  ImageProvider,
+  GenerationResult,
+  Difficulty,
+  DifficultyConfig,
+  ProviderConfig,
+  ImageGenerationConfig,
+} from "./image-providers";
