@@ -363,14 +363,14 @@
       "easy": "Fácil",
       "medium": "Medio",
       "hard": "Difícil",
-      "filterByDifficulty": "Filtrar por dificultad"
+      "filterByDifficulty": "Por dificultad"
     },
     "categoryPage": {
       "coloringPages": "Dibujos para colorear de {category}",
       "relatedCategories": "Categorías relacionadas",
-      "noPagesYet": "Aún no hay páginas de {category}",
-      "beTheFirst": "¡Sé quien primero cree una página para colorear de {category}!",
-      "createAPage": "Crear una página",
+      "noPagesYet": "Aún no hay dibujos de {category}",
+      "beTheFirst": "¡Sé el primero en crear un dibujo para colorear de {category}!",
+      "createAPage": "Crear dibujo",
       "freeColoringPages": "Dibujos para colorear gratis de {category}",
       "lookingFor": "¿Buscas el dibujo perfecto de {category} para colorear? ¡Has llegado al lugar ideal! Nuestra colección tiene una gran variedad de diseños de {category} perfectos para niños y adultos.",
       "eachPageDescription": "Cada dibujo se puede colorear online con nuestras herramientas digitales o descargar e imprimir para usar con ceras, lápices de colores o rotuladores. Nuestros diseños creados con IA tienen líneas limpias y detalles divertidos para que colorear sea entretenido y relajante.",
@@ -408,7 +408,7 @@
         "pageTitle": "Dibujos para colorear para pequeños",
         "featuredSection": "Dibujos sencillos para pequeños",
         "categoriesSection": "Categorías para pequeños",
-        "heroDescription": "¡Páginas simples y fáciles de colorear para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos las hacen perfectas para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
+        "heroDescription": "¡Dibujos simples y fáciles de colorear para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos los hacen perfectos para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
         "whyTitle": "Perfecto para pequeños artistas",
         "why1Title": "Líneas grandes y marcadas",
         "why1Description": "¡Los contornos gruesos ayudan a las manitas pequeñas a no salirse de las líneas!",
@@ -463,8 +463,8 @@
       },
       "adults": {
         "pageTitle": "Dibujos para colorear para adultos",
-        "featuredSection": "Dibujos populares para adultos",
-        "categoriesSection": "Categorías para adultos",
+        "featuredSection": "Dibujos para colorear populares para adultos",
+        "categoriesSection": "Categorías de adultos",
         "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas elaborados, preciosas escenas de naturaleza y patrones detallados pensados para la relajación y la atención plena. Perfecto para aliviar el estrés tras un día largo.",
         "whyTitle": "Beneficios de colorear para adultos",
         "why1Title": "Alivio del estrés",
@@ -647,7 +647,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Compartido",
+      "doneSharing": "Listo",
       "colorAgain": "Colorear otra vez",
       "startOver": "Empezar de nuevo"
     },
@@ -664,7 +664,7 @@
       "redoShortcut": "Rehacer (Ctrl+Y)"
     },
     "colorPalette": {
-      "selectColor": "Seleccionar color {color}",
+      "selectColor": "Seleccionar {color}",
       "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas Mágicas"
     },
     "patternSelector": {
