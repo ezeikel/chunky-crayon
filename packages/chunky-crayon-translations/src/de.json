@@ -286,7 +286,7 @@
       "toddlers": {
         "title": "Für Kleinkinder",
         "ages": "2–4 Jahre",
-        "description": "Einfache Formen, große Linien"
+        "description": "Einfache Formen, dicke Linien"
       },
       "kids": {
         "title": "Für Kinder",
@@ -370,7 +370,7 @@
       "relatedCategories": "Ähnliche Kategorien",
       "noPagesYet": "Noch keine {category}-Seiten",
       "beTheFirst": "Sei die/der Erste und erstelle ein {category}-Ausmalbild!",
-      "createAPage": "Seite erstellen",
+      "createAPage": "Seite machen",
       "freeColoringPages": "Kostenlose {category} Ausmalbilder",
       "lookingFor": "Du suchst das perfekte {category}-Ausmalbild? Dann bist du hier genau richtig! Unsere Sammlung bietet viele {category}-Motive – für Groß und Klein.",
       "eachPageDescription": "Jedes Ausmalbild kannst du online mit unseren digitalen Tools ausmalen oder herunterladen und ausdrucken – ganz klassisch mit Wachsmalern, Buntstiften oder Filzstiften. Unsere KI-Designs haben klare Linien und liebevolle Details – so macht Ausmalen Spaß und entspannt.",
@@ -400,9 +400,9 @@
     "ageGroupPages": {
       "common": {
         "moreAgeGroups": "Mehr Altersgruppen",
-        "createSimplePages": "Einfache Seiten erstellen",
-        "createYourOwn": "Eigene erstellen",
-        "createYourDesign": "Dein Motiv erstellen"
+        "createSimplePages": "Einfache Motive machen",
+        "createYourOwn": "Eigene machen",
+        "createYourDesign": "Dein Motiv gestalten"
       },
       "toddlers": {
         "pageTitle": "Ausmalbilder für Kleinkinder",
@@ -411,7 +411,7 @@
         "heroDescription": "Einfache Seiten für kleine Hände! Große Formen, kräftige Umrisse und bekannte Motive – perfekt für Kinder von 2–4 Jahren. Ideal zum Üben der Feinmotorik.",
         "whyTitle": "Perfekt für kleine Künstler",
         "why1Title": "Dicke, klare Linien",
-        "why1Description": "Dicke Linien machen es winzigen Händchen super leicht, innerhalb der Linien zu bleiben!",
+        "why1Description": "Dicke Linien machen es winzigen Händchen ganz leicht, innerhalb der Linien zu bleiben!",
         "why2Title": "Einfache Formen",
         "why2Description": "Grundformen und bekannte Dinge, die Kleinkinder erkennen und lieben.",
         "why3Title": "Farben lernen",
@@ -682,7 +682,7 @@
       "resetAria": "Zurück zur Gesamtansicht"
     },
     "muteToggle": {
-      "mute": "Töne stumm",
+      "mute": "Töne stumm schalten",
       "unmute": "Töne an",
       "turnOn": "Töne einschalten",
       "turnOff": "Töne ausschalten"
