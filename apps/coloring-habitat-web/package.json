@@ -54,7 +54,7 @@
     "next": "16.1.0",
     "next-auth": "5.0.0-beta.28",
     "next-intl": "^4.6.1",
-    "openai": "^6.21.0",
+    "openai": "^6.33.0",
     "oslllo-potrace": "^4.0.0",
     "playwright": "^1.52.0",
     "posthog-js": "^1.309.1",

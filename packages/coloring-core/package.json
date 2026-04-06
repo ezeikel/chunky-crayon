@@ -25,7 +25,7 @@
     "@one-colored-pixel/storage": "workspace:*",
     "@posthog/ai": "^1.2.0",
     "ai": "^6.0.106",
-    "openai": "^6.21.0",
+    "openai": "^6.33.0",
     "zod": "^3.25.42"
   },
   "devDependencies": {

@@ -109,21 +109,6 @@ const openaiProvider: ProviderConfig = {
     // Fetch style reference images for the edit endpoint
     const styleFiles = await getStyleReferenceFiles(4);
 
-    // Debug: test raw fetch to OpenAI to isolate header issue
-    const rawKey = process.env.OPENAI_API_KEY?.trim();
-    console.log("[DEBUG] Testing raw fetch to OpenAI API...");
-    try {
-      const testResp = await fetch("https://api.openai.com/v1/models", {
-        headers: { Authorization: `Bearer ${rawKey}` },
-      });
-      console.log("[DEBUG] Raw fetch succeeded:", testResp.status);
-    } catch (fetchErr) {
-      console.error(
-        "[DEBUG] Raw fetch failed:",
-        fetchErr instanceof Error ? fetchErr.message : fetchErr,
-      );
-    }
-
     const client = new OpenAI();
     const result = await client.images.edit({
       model: MODEL_IDS.GPT_IMAGE_1_5,
