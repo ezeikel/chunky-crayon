@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -6,6 +7,12 @@ import {
   faTiktok,
   faPinterest,
 } from "@fortawesome/free-brands-svg-icons";
+
+const getCachedYear = async () => {
+  "use cache";
+  cacheLife("days");
+  return new Date().getFullYear();
+};
 
 const footerLinks = {
   Explore: [
@@ -37,7 +44,8 @@ const socialLinks = [
   { label: "Pinterest", icon: faPinterest, href: "#" },
 ];
 
-const Footer = () => {
+const Footer = async () => {
+  const year = await getCachedYear();
   return (
     <footer className="border-t border-border bg-card">
       <div className="mx-auto max-w-7xl px-6 py-16">
@@ -108,8 +116,7 @@ const Footer = () => {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Coloring Habitat. All rights
-            reserved.
+            &copy; {year} Coloring Habitat. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link href="/privacy" className="hover:text-foreground">
