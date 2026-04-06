@@ -1,3 +1,5 @@
+export const maxDuration = 150;
+
 import HeroSection from "@/components/HeroSection";
 import ShowcaseSection from "@/components/ShowcaseSection";
 import StatsSection from "@/components/StatsSection";
