@@ -8,13 +8,18 @@ const nextConfig: NextConfig = {
       revalidate: 60 * 60 * 24 * 7,
       expire: 60 * 60 * 24 * 30,
     },
-    gallery: {
-      stale: 60 * 5,
-      revalidate: 60 * 60,
-      expire: 60 * 60 * 24,
+    days: {
+      stale: 60 * 60 * 24,
+      revalidate: 60 * 60 * 24,
+      expire: 60 * 60 * 24 * 30,
     },
     hours: {
       stale: 60,
+      revalidate: 60 * 60,
+      expire: 60 * 60 * 24,
+    },
+    gallery: {
+      stale: 60 * 5,
       revalidate: 60 * 60,
       expire: 60 * 60 * 24,
     },
