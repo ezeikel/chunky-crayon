@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cacheLife, cacheTag } from "next/cache";
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -73,11 +74,17 @@ type RelatedPost = {
 };
 
 async function getPost(slug: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("blog-posts", `blog-post-${slug}`);
   if (!isSanityConfigured) return null;
   return client.fetch<Post>(postBySlugQuery, { slug });
 }
 
 async function getRecentPosts(currentSlug: string) {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("blog-posts");
   if (!isSanityConfigured) return [];
   return client.fetch<RelatedPost[]>(recentPostsQuery, { currentSlug });
 }

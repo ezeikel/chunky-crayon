@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { db } from "@one-colored-pixel/db";
@@ -8,7 +9,7 @@ export const metadata = {
   description: "Manage your Coloring Habitat subscription and credits",
 };
 
-export default async function BillingPage() {
+const BillingContent = async () => {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -39,4 +40,18 @@ export default async function BillingPage() {
   }
 
   return <Billing user={user} />;
+};
+
+export default function BillingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto p-8 min-h-[600px] flex items-center justify-center">
+          <div className="animate-pulse text-muted-foreground">Loading...</div>
+        </div>
+      }
+    >
+      <BillingContent />
+    </Suspense>
+  );
 }

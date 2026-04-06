@@ -1,10 +1,25 @@
 import type { Metadata } from "next";
+import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
 import { getAllPosts, getCategories } from "@/app/actions/blog";
 import type { BlogPost, BlogCategory } from "@/app/actions/blog";
 import { urlFor } from "@/lib/sanity";
+
+async function getCachedPosts() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("blog-list", "blog-posts");
+  return getAllPosts();
+}
+
+async function getCachedCategories() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("blog-list", "blog-categories");
+  return getCategories();
+}
 
 export const metadata: Metadata = {
   title: "Blog | Coloring Habitat",
@@ -105,8 +120,8 @@ function PostCard({ post }: { post: BlogPost }) {
 
 const BlogPage = async () => {
   const [posts, categories] = await Promise.all([
-    getAllPosts(),
-    getCategories(),
+    getCachedPosts(),
+    getCachedCategories(),
   ]);
 
   return (

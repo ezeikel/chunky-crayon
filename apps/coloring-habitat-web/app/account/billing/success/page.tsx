@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getStripe } from "@/lib/stripe";
 import BillingSuccess from "@/components/BillingSuccess/BillingSuccess";
 
@@ -9,11 +10,11 @@ type SearchParams = Promise<{
   session_id?: string;
 }>;
 
-export default async function BillingSuccessPage({
+const BillingSuccessContent = async ({
   searchParams,
 }: {
   searchParams: SearchParams;
-}) {
+}) => {
   const { session_id: sessionId } = await searchParams;
 
   let amount: number | null = null;
@@ -32,5 +33,23 @@ export default async function BillingSuccessPage({
 
   return (
     <BillingSuccess amount={amount} currency={currency} sessionId={sessionId} />
+  );
+};
+
+export default function BillingSuccessPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto p-8 min-h-[400px] flex items-center justify-center">
+          <div className="animate-pulse text-muted-foreground">Loading...</div>
+        </div>
+      }
+    >
+      <BillingSuccessContent searchParams={searchParams} />
+    </Suspense>
   );
 }
