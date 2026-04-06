@@ -39,7 +39,7 @@ const getGalleryImagesBase = async (
   cursor?: string,
   limit: number = GALLERY_PAGE_SIZE,
 ): Promise<PaginatedImagesResponse> => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery", "gallery-all");
 
@@ -92,7 +92,7 @@ const getDailyImagesBase = async (
   cursor?: string,
   limit: number = GALLERY_PAGE_SIZE,
 ): Promise<PaginatedImagesResponse> => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery", "gallery-daily");
 
@@ -145,7 +145,7 @@ export const getDailyImages = async (
 
 // Get the most recent daily image
 export const getLatestDailyImage = async () => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery", "gallery-daily-latest");
 
@@ -183,7 +183,7 @@ const getCategoryImagesBase = async (
     category: (typeof GALLERY_CATEGORIES)[0] | null;
   }
 > => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery-category", `gallery-category-${categorySlug}`);
 
@@ -257,7 +257,7 @@ export const getCategoryImages = async (
 // ===== FEATURED IMAGES =====
 
 export const getFeaturedImages = async (limit: number = 6) => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery", "gallery-featured");
 
@@ -281,7 +281,7 @@ export const getFeaturedImages = async (limit: number = 6) => {
 // ===== CATEGORY COUNTS =====
 
 export const getCategoryCounts = async () => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery-category", "gallery-category-counts");
 
@@ -315,7 +315,7 @@ export const getCategoryCounts = async () => {
 export const getCategoryCount = async (
   categorySlug: string,
 ): Promise<number> => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery-category", `gallery-category-count-${categorySlug}`);
 
@@ -346,7 +346,7 @@ export const getCategoryCount = async (
 // ===== GALLERY STATS =====
 
 export const getGalleryStats = async () => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery-stats");
 
@@ -376,7 +376,7 @@ const getDifficultyImagesBase = async (
   cursor?: string,
   limit: number = GALLERY_PAGE_SIZE,
 ): Promise<PaginatedImagesResponse> => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag(
     "gallery-difficulty",
@@ -433,7 +433,7 @@ export const getDifficultyImages = async (
 // ===== DIFFICULTY COUNTS =====
 
 export const getDifficultyCounts = async () => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery-difficulty", "gallery-difficulty-counts");
 
@@ -475,7 +475,7 @@ const getCategoryImagesWithDifficultyBase = async (
     category: (typeof GALLERY_CATEGORIES)[0] | null;
   }
 > => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag(
     "gallery-category",
@@ -585,7 +585,7 @@ const getTagImagesBase = async (
   cursor?: string,
   limit: number = GALLERY_PAGE_SIZE,
 ): Promise<PaginatedImagesResponse> => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery-tag", `gallery-tag-${tag}`);
 
@@ -637,7 +637,7 @@ export const getTagImages = async (
 };
 
 export const getTagCount = async (tag: string): Promise<number> => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery-tag", `gallery-tag-count-${tag}`);
 
@@ -656,7 +656,7 @@ export const getRelatedImages = async (
   tags: string[],
   limit: number = 6,
 ): Promise<GalleryImage[]> => {
-  // "use cache"; // TODO: enable when using function declarations
+  "use cache";
   cacheLife("gallery");
   cacheTag("gallery-related", `gallery-related-${imageId}`);
 
