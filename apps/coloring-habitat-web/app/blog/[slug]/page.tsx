@@ -85,10 +85,12 @@ async function getRecentPosts(currentSlug: string) {
 }
 
 export async function generateStaticParams() {
-  if (!isSanityConfigured) return [];
+  if (!isSanityConfigured) return [{ slug: "placeholder" }];
   const posts = await client.fetch<Array<{ slug: { current: string } }>>(
     `*[_type == "post" && status == "published"]{ slug }`,
   );
+  // Cache Components requires at least one result from generateStaticParams
+  if (posts.length === 0) return [{ slug: "placeholder" }];
   return posts.map((post) => ({ slug: post.slug.current }));
 }
 
