@@ -69,6 +69,7 @@ export { default as ToolSelector } from "./ToolSelector";
 export { default as PatternSelector } from "./PatternSelector";
 export { default as UndoRedoButtons } from "./UndoRedoButtons";
 export { default as ProgressIndicator } from "./ProgressIndicator";
+export { default as AutoColorPreview } from "./AutoColorPreview";
 export { default as CompletionCelebration } from "./CompletionCelebration";
 
 // Async fill (Web Worker)

@@ -33,7 +33,9 @@ import {
   loadColoringProgress,
   clearColoringProgress,
 } from "@one-colored-pixel/coloring-ui";
+import { AutoColorPreview } from "@one-colored-pixel/coloring-ui";
 import { generateRegionFillPoints } from "@/app/actions/generate-color-map";
+import { generateColoredReference } from "@/app/actions/generate-colored-reference";
 
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
