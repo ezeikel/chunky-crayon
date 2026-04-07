@@ -26,6 +26,7 @@ export {
   getRegionById,
   getPositionDescriptor,
   getSizeDescriptor,
+  calculateColoringProgress,
   type Region,
   type RegionMap,
 } from "./regionDetection";

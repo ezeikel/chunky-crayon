@@ -65,6 +65,8 @@ export { default as BrushSizeSelector } from "./BrushSizeSelector";
 export { default as ToolSelector } from "./ToolSelector";
 export { default as PatternSelector } from "./PatternSelector";
 export { default as UndoRedoButtons } from "./UndoRedoButtons";
+export { default as ProgressIndicator } from "./ProgressIndicator";
+export { default as CompletionCelebration } from "./CompletionCelebration";
 
 // Storage utilities
 export {

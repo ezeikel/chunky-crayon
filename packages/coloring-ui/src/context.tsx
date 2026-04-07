@@ -99,6 +99,12 @@ type ColoringContextArgs = {
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: Dispatch<SetStateAction<boolean>>;
 
+  // Coloring progress (0-100%)
+  coloringProgress: number;
+  setColoringProgress: Dispatch<SetStateAction<number>>;
+  isColoringComplete: boolean;
+  setIsColoringComplete: Dispatch<SetStateAction<boolean>>;
+
   // Variant — controls which feature set is exposed
   variant: ColoringVariant;
 };
@@ -155,6 +161,10 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setIsAmbientMuted: () => {},
   hasUnsavedChanges: false,
   setHasUnsavedChanges: () => {},
+  coloringProgress: 0,
+  setColoringProgress: () => {},
+  isColoringComplete: false,
+  setIsColoringComplete: () => {},
   variant: "adult",
 });
 
@@ -237,6 +247,8 @@ export const ColoringContextProvider = ({
 
   // Progress state
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [coloringProgress, setColoringProgress] = useState(0);
+  const [isColoringComplete, setIsColoringComplete] = useState(false);
 
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
@@ -351,6 +363,10 @@ export const ColoringContextProvider = ({
       setIsAmbientMuted,
       hasUnsavedChanges,
       setHasUnsavedChanges,
+      coloringProgress,
+      setColoringProgress,
+      isColoringComplete,
+      setIsColoringComplete,
       variant,
     }),
     [
@@ -381,6 +397,8 @@ export const ColoringContextProvider = ({
       isSfxMuted,
       isAmbientMuted,
       hasUnsavedChanges,
+      coloringProgress,
+      isColoringComplete,
       variant,
     ],
   );

@@ -466,3 +466,60 @@ export function getSizeDescriptor(
     return "small";
   }
 }
+
+/**
+ * Calculate coloring progress by checking how many detected regions
+ * have been colored on the drawing canvas.
+ *
+ * A region is considered "colored" if >30% of its sampled pixels
+ * are non-transparent on the drawing canvas.
+ *
+ * @returns Object with coloredCount, totalCount, and percentage (0-100)
+ */
+export function calculateColoringProgress(
+  regionMap: RegionMap,
+  drawingCanvas: HTMLCanvasElement,
+): { coloredCount: number; totalCount: number; percentage: number } {
+  const totalCount = regionMap.regions.length;
+  if (totalCount === 0)
+    return { coloredCount: 0, totalCount: 0, percentage: 0 };
+
+  const ctx = drawingCanvas.getContext("2d");
+  if (!ctx) return { coloredCount: 0, totalCount, percentage: 0 };
+
+  const imageData = ctx.getImageData(
+    0,
+    0,
+    drawingCanvas.width,
+    drawingCanvas.height,
+  );
+  const data = imageData.data;
+
+  let coloredCount = 0;
+
+  for (const region of regionMap.regions) {
+    // Sample pixels from this region to check if colored
+    // Use the stored sample pixels for efficiency
+    const samples = region.samplePixels;
+    if (samples.length === 0) continue;
+
+    let coloredSamples = 0;
+    for (const { x, y } of samples) {
+      if (x < 0 || x >= imageData.width || y < 0 || y >= imageData.height)
+        continue;
+      const idx = (y * imageData.width + x) * 4;
+      // Check if pixel has been colored (non-transparent)
+      if (data[idx + 3] > 30) {
+        coloredSamples++;
+      }
+    }
+
+    // Region is "colored" if >30% of samples have paint
+    if (coloredSamples / samples.length > 0.3) {
+      coloredCount++;
+    }
+  }
+
+  const percentage = Math.round((coloredCount / totalCount) * 100);
+  return { coloredCount, totalCount, percentage };
+}
