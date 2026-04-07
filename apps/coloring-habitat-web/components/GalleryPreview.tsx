@@ -58,12 +58,12 @@ const GalleryPreview = async () => {
               href={`/coloring-image/${image.id}`}
               className="group block overflow-hidden rounded-2xl border border-border bg-background transition-shadow hover:shadow-lg"
             >
-              <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
+              <div className="relative aspect-[4/5] overflow-hidden">
                 <Image
                   src={image.svgUrl!}
                   alt={image.title || "Coloring page"}
                   fill
-                  className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </div>
@@ -100,7 +100,7 @@ const GalleryPreview = async () => {
                   src={dailyImage.svgUrl}
                   alt={dailyImage.title || "Today's coloring page"}
                   fill
-                  className="object-contain p-2"
+                  className="object-cover"
                 />
               </Link>
               <div className="flex-1">

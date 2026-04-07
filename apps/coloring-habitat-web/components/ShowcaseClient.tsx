@@ -74,12 +74,12 @@ const ShowcaseClient = ({ images, categories }: ShowcaseClientProps) => {
               href={`/coloring-image/${item.id}`}
               className="group"
             >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-secondary">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
                 <Image
                   src={item.svgUrl}
                   alt={item.title || "Coloring page"}
                   fill
-                  className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </div>
