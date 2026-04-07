@@ -5,6 +5,7 @@ import Link from "next/link";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
 import DifficultyFilter from "@/components/DifficultyFilter/DifficultyFilter";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import CategoryFaq from "@/components/CategoryFaq";
 import { GALLERY_CATEGORIES, getCategoryBySlug } from "@/constants";
 import {
   getCategoryImages,
@@ -63,6 +64,34 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
     getDifficultyCounts(),
   ]);
 
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: `How to use ${category.name} coloring pages`,
+    step: [
+      {
+        "@type": "HowToStep",
+        name: "Browse",
+        text: `Browse our collection of ${category.name.toLowerCase()} coloring pages and find a design you like`,
+      },
+      {
+        "@type": "HowToStep",
+        name: "Open",
+        text: "Click on any coloring page to open it in our online coloring tool",
+      },
+      {
+        "@type": "HowToStep",
+        name: "Color online",
+        text: "Use our brushes, fill tools, and color palettes to color the page digitally",
+      },
+      {
+        "@type": "HowToStep",
+        name: "Download & print",
+        text: "Download the finished page as a PDF to print and color at home",
+      },
+    ],
+  };
+
   const collectionSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -102,6 +131,10 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
       />
       <main className="bg-background py-12">
         <div className="mx-auto max-w-7xl px-6">
@@ -163,6 +196,8 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
               difficultySlug={difficultySlug}
             />
           </div>
+
+          <CategoryFaq categoryName={category.name} />
         </div>
       </main>
     </>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import CategoryFaq from "@/components/CategoryFaq";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
 import DifficultyFilter from "@/components/DifficultyFilter/DifficultyFilter";
 import {
@@ -60,6 +61,34 @@ const DifficultyPage = async ({ params }: DifficultyPageProps) => {
     getDifficultyCounts(),
   ]);
 
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: `How to use ${label.toLowerCase()} coloring pages`,
+    step: [
+      {
+        "@type": "HowToStep",
+        name: "Browse",
+        text: `Browse our collection of ${label.toLowerCase()} difficulty coloring pages`,
+      },
+      {
+        "@type": "HowToStep",
+        name: "Open",
+        text: "Click on any coloring page to open it in our online coloring tool",
+      },
+      {
+        "@type": "HowToStep",
+        name: "Color online",
+        text: "Use our brushes, fill tools, and color palettes to color the page digitally",
+      },
+      {
+        "@type": "HowToStep",
+        name: "Download & print",
+        text: "Download the finished page as a PDF to print and color at home",
+      },
+    ],
+  };
+
   const collectionSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -100,6 +129,10 @@ const DifficultyPage = async ({ params }: DifficultyPageProps) => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
+      />
       <main className="bg-background py-12">
         <div className="mx-auto max-w-7xl px-6">
           <Breadcrumbs
@@ -137,6 +170,8 @@ const DifficultyPage = async ({ params }: DifficultyPageProps) => {
               difficultySlug={difficultySlug}
             />
           </div>
+
+          <CategoryFaq categoryName={label} />
         </div>
       </main>
     </>

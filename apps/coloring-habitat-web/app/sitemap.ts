@@ -124,6 +124,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
+  // Add holiday/seasonal pages for each locale
+  const holidayEvents = [
+    "christmas",
+    "halloween",
+    "easter",
+    "thanksgiving",
+    "valentines-day",
+    "winter",
+    "spring",
+    "summer",
+    "autumn",
+  ];
+  for (const event of holidayEvents) {
+    const path = `/gallery/holidays/${event}`;
+    for (const locale of locales) {
+      urls.push({
+        url: `${BASE_URL}/${locale}${path}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.7,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${BASE_URL}/${l}${path}`]),
+          ),
+        },
+      });
+    }
+  }
+
   // Fetch dynamic content
   const [images, blogPosts, blogCategories] = await Promise.all([
     getAllPublicImages(),

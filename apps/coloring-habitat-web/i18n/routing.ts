@@ -12,6 +12,7 @@ export const routing = defineRouting({
     "/gallery/difficulty/[difficulty]": "/gallery/difficulty/[difficulty]",
     "/coloring-image/[id]": "/coloring-image/[id]",
     "/blog": "/blog",
+    "/gallery/holidays/[event]": "/gallery/holidays/[event]",
     "/blog/[slug]": "/blog/[slug]",
     "/pricing": "/pricing",
     "/account/settings": "/account/settings",
