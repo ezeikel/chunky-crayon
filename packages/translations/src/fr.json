@@ -404,5 +404,10 @@
     "loading": "Chargement...",
     "creating": "Création...",
     "error": "Oups !"
+  },
+  "difficulty": {
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile"
   }
 }

@@ -404,5 +404,10 @@
     "loading": "Cargando...",
     "creating": "Creando...",
     "error": "¡Ups!"
+  },
+  "difficulty": {
+    "easy": "Fácil",
+    "medium": "Medio",
+    "hard": "Difícil"
   }
 }

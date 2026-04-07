@@ -404,5 +404,10 @@
     "loading": "Lädt...",
     "creating": "Wird erstellt...",
     "error": "Ups!"
+  },
+  "difficulty": {
+    "easy": "Einfach",
+    "medium": "Mittel",
+    "hard": "Schwer"
   }
 }

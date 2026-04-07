@@ -404,5 +404,10 @@
     "loading": "불러오는 중...",
     "creating": "만드는 중...",
     "error": "어머!"
+  },
+  "difficulty": {
+    "easy": "쉬움",
+    "medium": "보통",
+    "hard": "어려움"
   }
 }
