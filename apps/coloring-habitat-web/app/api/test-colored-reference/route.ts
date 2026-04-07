@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     `[TestColoredRef] Generating colored reference for: ${image.title}`,
   );
 
-  const result = await generateColoredReference(image.url, {
+  const result = await generateColoredReference(id, image.url, {
     title: image.title ?? undefined,
     description: image.description ?? undefined,
   });
@@ -62,10 +62,10 @@ export async function GET(request: NextRequest) {
     </div>
     <div class="panel">
       <h2>AI-Colored Reference</h2>
-      <img src="${result.imageBase64}" alt="AI Colored" />
+      <img src="${result.url}" alt="AI Colored" />
     </div>
   </div>
-  <div class="meta">Image ID: ${id}</div>
+  <div class="meta">Image ID: ${id} — Reference saved to DB and R2 ✅</div>
 </body>
 </html>`;
 
