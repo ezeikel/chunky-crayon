@@ -406,8 +406,8 @@
     "error": "あれっ！"
   },
   "difficulty": {
-    "easy": "かんたん",
-    "medium": "ふつう",
-    "hard": "むずかしい"
+    "easy": "簡単",
+    "medium": "普通",
+    "hard": "難しい"
   }
 }
