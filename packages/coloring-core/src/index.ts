@@ -87,6 +87,23 @@ export type {
   BlogImagePrompt,
 } from "./schemas";
 
+// Shared action logic
+export {
+  transcribeAudioLogic,
+  describeImageLogic,
+  type TranscribeAudioResult,
+  type DescribeImageResult,
+  type InputProcessingConfig,
+} from "./actions/input-processing";
+
+export {
+  getMagicColorSuggestionsLogic,
+  type MagicColorMode,
+  type MagicColorResult,
+  type MagicColorInput,
+  type MagicColorConfig,
+} from "./actions/magic-color";
+
 // Utilities
 export { default as formatNumber } from "./utils/formatNumber";
 export { default as streamToBuffer } from "./utils/streamToBuffer";
