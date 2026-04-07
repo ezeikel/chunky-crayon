@@ -8,6 +8,7 @@ import {
 } from "./types";
 import { useColoringContext } from "./context";
 import { useSound } from "./useSound";
+import { haptics } from "./haptics";
 import cn from "./cn";
 import { trackEvent } from "./analytics-client";
 
@@ -75,6 +76,7 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
     setSelectedColor(hex);
     addRecentColor(hex);
     playSound("tap");
+    haptics.tap(variant);
   };
 
   const renderColorButton = (

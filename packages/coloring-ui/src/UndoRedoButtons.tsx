@@ -1,6 +1,7 @@
 "use client";
 
 import { CanvasAction, useColoringContext } from "./context";
+import { haptics } from "./haptics";
 import cn from "./cn";
 
 type UndoRedoButtonsProps = {
@@ -51,6 +52,7 @@ const UndoRedoButtons = ({
     const action = undo();
     if (action && onUndo) {
       onUndo(action);
+      haptics.undoRedo();
     }
   };
 
@@ -58,6 +60,7 @@ const UndoRedoButtons = ({
     const action = redo();
     if (action && onRedo) {
       onRedo(action);
+      haptics.undoRedo();
     }
   };
 

@@ -23,6 +23,7 @@ import {
   createIconCursor,
   StrokeBuffer,
 } from "@one-colored-pixel/canvas";
+import { haptics } from "./haptics";
 import { proxyR2Url } from "./proxyR2Url";
 import {
   pointsToSvgPath,
@@ -230,6 +231,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       setZoom,
       setPanOffset,
       customBrushRadius,
+      variant,
     } = useColoringContext();
     const {
       playSound,
@@ -1542,8 +1544,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           sourceHeight: container?.clientHeight,
         });
 
-        // Play fill sound
+        // Play fill sound + haptic
         playSound("fill");
+        haptics.fill(variant);
 
         trackEvent(TRACKING_EVENTS.PAGE_COLOR_SELECTED, {
           coloringImageId: coloringImage.id,
@@ -1626,8 +1629,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         sourceHeight: stickerContainer?.clientHeight,
       });
 
-      // Play pop sound for sticker placement
+      // Play pop sound + haptic for sticker placement
       playSound("pop");
+      haptics.fill(variant);
 
       trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
         coloringImageId: coloringImage.id,
@@ -1721,6 +1725,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               // Switch back to brush after picking
               setActiveTool("brush");
               playSound("pop");
+              haptics.tap(variant);
             }
           }
           return;

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useColoringContext } from "./context";
 import { useSound } from "./useSound";
+import { haptics } from "./haptics";
 import cn from "./cn";
 
 type CompletionCelebrationProps = {
@@ -36,6 +37,7 @@ const CompletionCelebration = ({
       setIsVisible(true);
       setHasShown(true);
       playSound("sparkle");
+      haptics.celebration(variant);
 
       // Auto-dismiss after 5 seconds (kids) or 4 seconds (adults)
       const timer = setTimeout(
