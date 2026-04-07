@@ -26,6 +26,7 @@ import {
   useColoringContext,
 } from '@one-colored-pixel/coloring-ui';
 import { useSound } from '@one-colored-pixel/coloring-ui';
+import { useReferenceColor } from '@one-colored-pixel/coloring-ui';
 import { useMagicColorMap } from '@/hooks/useMagicColorMap';
 import type { GridColorMap, FillPointsData } from '@/lib/ai';
 import {
@@ -34,6 +35,8 @@ import {
   clearColoringProgress,
 } from '@one-colored-pixel/coloring-ui';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
+import { generateColoredReference } from '@/app/actions/generate-colored-reference';
+import { detectAllRegions } from '@one-colored-pixel/canvas';
 
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
@@ -107,8 +110,18 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }
     }, [coloringImage.colorMapJson]);
 
-    // Magic Color Map for reveal mode and auto-color
-    // Prefers fill points (region-aware) over grid (5x5 approximation)
+    // Reference color — AI-colored reference image for Auto Color + Magic Brush
+    const referenceColor = useReferenceColor();
+    const hasColoredReference = !!coloringImage.coloredReferenceUrl;
+
+    // Load colored reference on mount if available
+    useEffect(() => {
+      if (coloringImage.coloredReferenceUrl && !referenceColor.state.isReady) {
+        referenceColor.loadReference(coloringImage.coloredReferenceUrl);
+      }
+    }, [coloringImage.coloredReferenceUrl]);
+
+    // Magic Color Map (legacy fallback when no colored reference)
     const {
       state: magicColorMapState,
       generateColorMap,
@@ -321,11 +334,70 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setIsAutoColoring,
     ]);
 
+    // Handle reference-based auto-color: detect regions, sample colors from reference
+    const handleReferenceAutoColor = useCallback(() => {
+      const drawingCanvas = canvasRef.current?.getCanvas();
+      const boundaryCanvas = canvasRef.current?.getBoundaryCanvas();
+      if (!drawingCanvas || !boundaryCanvas || !referenceColor.state.isReady)
+        return;
+
+      setIsAutoColoring(true);
+
+      const regionMap = detectAllRegions(drawingCanvas, boundaryCanvas);
+
+      if (regionMap.regions.length === 0) {
+        setIsAutoColoring(false);
+        return;
+      }
+
+      const boundary = canvasRef.current?.getDilatedBoundary();
+      const regions = regionMap.regions;
+      let index = 0;
+      const batchSize = 3;
+
+      const fillBatch = () => {
+        const end = Math.min(index + batchSize, regions.length);
+        for (let i = index; i < end; i++) {
+          const region = regions[i];
+          const normX = region.centroid.x / regionMap.width;
+          const normY = region.centroid.y / regionMap.height;
+          const color = referenceColor.getColorAtNormalized(normX, normY);
+
+          if (color) {
+            canvasRef.current?.fillRegionAtPoint(
+              Math.round(region.centroid.x),
+              Math.round(region.centroid.y),
+              color,
+              true,
+              boundary ?? undefined,
+            );
+          }
+        }
+        index = end;
+
+        if (index < regions.length) {
+          requestAnimationFrame(fillBatch);
+        } else {
+          setIsAutoColoring(false);
+          playSound('sparkle');
+          setHasUnsavedChanges(true);
+        }
+      };
+
+      requestAnimationFrame(fillBatch);
+    }, [referenceColor, playSound, setHasUnsavedChanges, setIsAutoColoring]);
+
     // Trigger auto-fill when magic-auto tool is selected
     useEffect(() => {
       if (activeTool !== 'magic-auto' || !canvasReadyRef.current) return;
 
-      // Prefer direct fill points (no region detection needed)
+      // Prefer reference image (holistic AI coloring)
+      if (hasColoredReference && referenceColor.state.isReady) {
+        handleReferenceAutoColor();
+        return;
+      }
+
+      // Fallback: direct fill points (no region detection needed)
       if (fillPointsData) {
         handleDirectAutoColor();
         return;
@@ -337,6 +409,9 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }
     }, [
       activeTool,
+      hasColoredReference,
+      referenceColor.state.isReady,
+      handleReferenceAutoColor,
       fillPointsData,
       isGeneratingFillPoints,
       handleDirectAutoColor,
@@ -579,6 +654,27 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       [markRegionColored, setHasUnsavedChanges],
     );
 
+    // Reference-based color lookup for Magic Brush (CSS coords → reference sampling)
+    const getRevealColorFromCSS = useCallback(
+      (
+        cssX: number,
+        cssY: number,
+        cssWidth: number,
+        cssHeight: number,
+      ): string | null => {
+        if (!referenceColor.state.isReady) return null;
+        const normX = cssX / cssWidth;
+        const normY = cssY / cssHeight;
+        return referenceColor.getColorAtNormalized(normX, normY);
+      },
+      [referenceColor.state.isReady, referenceColor.getColorAtNormalized],
+    );
+
+    // Determine which color source to use for magic tools
+    const useReferenceForMagic =
+      hasColoredReference && referenceColor.state.isReady;
+    const isMagicReady = useReferenceForMagic || magicColorMapState.isReady;
+
     return (
       <div className="flex flex-col gap-y-2 md:gap-y-3">
         {/* Desktop Toolbar (md-lg only) - Traditional top toolbar */}
@@ -613,10 +709,17 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             className="rounded-lg shadow-lg bg-white overflow-hidden"
             onCanvasReady={handleCanvasReady}
             onFirstInteraction={handleFirstInteraction}
-            getRevealColor={getColorAtPoint}
-            getRevealRegionId={getRegionIdAtPoint}
-            onRegionRevealed={handleRegionRevealed}
-            isMagicRevealReady={magicColorMapState.isReady}
+            getRevealColor={useReferenceForMagic ? undefined : getColorAtPoint}
+            getRevealColorFromCSS={
+              useReferenceForMagic ? getRevealColorFromCSS : undefined
+            }
+            getRevealRegionId={
+              useReferenceForMagic ? undefined : getRegionIdAtPoint
+            }
+            onRegionRevealed={
+              useReferenceForMagic ? undefined : handleRegionRevealed
+            }
+            isMagicRevealReady={isMagicReady}
           />
 
           {/* Magic Loading Overlay - Shows when magic tools are analyzing the image */}

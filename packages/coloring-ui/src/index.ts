@@ -49,6 +49,9 @@ export { proxyR2Url, setR2Host } from "./proxyR2Url";
 // Haptics
 export { haptics } from "./haptics";
 
+// Reference color (for Auto Color + Magic Brush)
+export { useReferenceColor } from "./useReferenceColor";
+
 // Sound
 export { useSound } from "./useSound";
 export { getSoundManager } from "./audio";

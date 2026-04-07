@@ -38,6 +38,7 @@ export const getColoringImageBase = async (
       ambientSoundUrl: true,
       colorMapJson: true,
       fillPointsJson: true,
+      coloredReferenceUrl: true,
     },
   });
 };

@@ -33,6 +33,7 @@ import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 import { generateAmbientSoundForImage } from '@/app/actions/ambient-sound';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
+import { generateColoredReference } from '@/app/actions/generate-colored-reference';
 
 /**
  * Locale to language mapping for image metadata generation.
@@ -401,6 +402,27 @@ export const createColoringImage = async (
           }
         })(),
 
+        // Generate AI-colored reference for Auto Color + Magic Brush
+        (async () => {
+          const refResult = await generateColoredReference(
+            result.id,
+            result.url!,
+            {
+              title: result.title ?? undefined,
+              description: result.description ?? undefined,
+            },
+          );
+          if (refResult.success) {
+            console.log(
+              `[Pipeline] Colored reference generated for ${result.id}`,
+            );
+          } else {
+            console.error(
+              `[Pipeline] Failed to generate colored reference: ${refResult.error}`,
+            );
+          }
+        })(),
+
         // Generate ambient sound for the coloring experience
         (async () => {
           const soundResult = await generateAmbientSoundForImage(result.id);
@@ -505,6 +527,27 @@ export const createColoringImage = async (
         } else {
           console.error(
             `[Pipeline] Failed to generate fill points: ${fillPointsResult.error}`,
+          );
+        }
+      })(),
+
+      // Generate AI-colored reference for Auto Color + Magic Brush
+      (async () => {
+        const refResult = await generateColoredReference(
+          result.id,
+          result.url!,
+          {
+            title: result.title ?? undefined,
+            description: result.description ?? undefined,
+          },
+        );
+        if (refResult.success) {
+          console.log(
+            `[Pipeline] Colored reference generated for ${result.id}`,
+          );
+        } else {
+          console.error(
+            `[Pipeline] Failed to generate colored reference: ${refResult.error}`,
           );
         }
       })(),

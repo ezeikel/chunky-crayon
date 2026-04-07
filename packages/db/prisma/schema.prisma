@@ -152,6 +152,9 @@ model ColoringImage {
   fillPointsJson        String?   @db.Text // JSON with region centroids + AI-assigned colors
   fillPointsGeneratedAt DateTime? // When the fill points were generated
 
+  // AI-colored reference image for Auto Color + Magic Brush (holistic coloring)
+  coloredReferenceUrl String? // R2 URL of AI-colored version of the line art
+
   // Canvas progress for cross-platform sync
   canvasProgress CanvasProgress[]
 

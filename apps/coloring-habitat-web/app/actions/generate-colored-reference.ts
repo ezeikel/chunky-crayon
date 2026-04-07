@@ -2,20 +2,21 @@
 
 import { generateText } from "ai";
 import { models } from "@one-colored-pixel/coloring-core";
+import { put } from "@one-colored-pixel/storage";
+import { db } from "@one-colored-pixel/db";
 
 export type GenerateColoredReferenceResult =
-  | { success: true; imageBase64: string }
+  | { success: true; url: string }
   | { success: false; error: string };
 
 /**
- * Generate a colored version of a line art coloring page using AI.
- * The AI colors the image holistically, producing a coherent reference
- * that can be used to sample colors for auto-fill.
+ * Generate a colored version of a line art coloring page using AI,
+ * upload to R2, and save the URL to the database.
  *
- * Uses Gemini Pro Image which can take an image input and generate
- * a modified version with colors applied.
+ * Used as the primary color source for Auto Color + Magic Brush.
  */
 export async function generateColoredReference(
+  coloringImageId: string,
   imageUrl: string,
   sceneContext?: { title?: string; description?: string },
 ): Promise<GenerateColoredReferenceResult> {
@@ -60,23 +61,32 @@ RULES:
     });
 
     const elapsedMs = Date.now() - startTime;
-    console.log(`[ColoredReference] Generated in ${elapsedMs}ms`);
 
-    // Extract the generated image (Gemini returns files with mediaType + base64)
+    // Extract the generated image
     const generatedImage = files?.find((file) =>
       file.mediaType?.startsWith("image/"),
     );
 
-    if (generatedImage?.base64) {
-      const mimeType = generatedImage.mediaType || "image/png";
-      const imageBase64 = `data:${mimeType};base64,${generatedImage.base64}`;
-      return { success: true, imageBase64 };
+    if (!generatedImage?.base64) {
+      return { success: false, error: "No image was generated" };
     }
 
-    return {
-      success: false,
-      error: "No image was generated. Please try again.",
-    };
+    // Upload to R2
+    const imageBuffer = Buffer.from(generatedImage.base64, "base64");
+    const fileName = `colored-references/${coloringImageId}-${Date.now()}.png`;
+    const { url } = await put(fileName, imageBuffer, { access: "public" });
+
+    // Save URL to database
+    await db.coloringImage.update({
+      where: { id: coloringImageId },
+      data: { coloredReferenceUrl: url },
+    });
+
+    console.log(
+      `[ColoredReference] Generated + stored in ${elapsedMs}ms for ${coloringImageId}: ${url}`,
+    );
+
+    return { success: true, url };
   } catch (error) {
     console.error("[ColoredReference] Error:", error);
     return {

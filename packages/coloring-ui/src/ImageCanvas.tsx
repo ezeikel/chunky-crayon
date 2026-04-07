@@ -147,8 +147,15 @@ type ImageCanvasProps = {
   className?: string;
   onCanvasReady?: () => void;
   onFirstInteraction?: () => void;
-  /** Magic brush reveal mode: get color at canvas coordinates */
+  /** Magic brush reveal mode: get color at DPR-scaled canvas coordinates (legacy region-based) */
   getRevealColor?: (x: number, y: number) => string | null;
+  /** Magic brush reveal mode: get color at CSS coordinates from reference image */
+  getRevealColorFromCSS?: (
+    cssX: number,
+    cssY: number,
+    cssWidth: number,
+    cssHeight: number,
+  ) => string | null;
   /** Magic brush reveal mode: get region ID at canvas coordinates */
   getRevealRegionId?: (x: number, y: number) => number;
   /** Magic brush reveal mode: callback when a region is revealed/colored */
@@ -207,6 +214,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       onCanvasReady,
       onFirstInteraction,
       getRevealColor,
+      getRevealColorFromCSS,
       getRevealRegionId,
       onRegionRevealed,
       isMagicRevealReady,
@@ -1310,31 +1318,34 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         let strokeColor = selectedColor;
         let strokeBrushType = brushType;
 
-        if (
-          activeTool === "magic-reveal" &&
-          getRevealColor &&
-          getRevealRegionId
-        ) {
-          // Scale coordinates to match regionMap dimensions (which use DPR-scaled pixels)
-          // The regionMap was created with canvas.width/height which are DPR-scaled
-          // But x,y from screenToCanvas are CSS coordinates (not DPR-scaled)
-          const scaledX = Math.floor(x * dpr);
-          const scaledY = Math.floor(y * dpr);
+        if (activeTool === "magic-reveal") {
+          let revealColor: string | null = null;
 
-          const regionId = getRevealRegionId(scaledX, scaledY);
-          const revealColor = getRevealColor(scaledX, scaledY);
+          if (getRevealColorFromCSS) {
+            // Reference image path — sample from AI-colored reference using CSS coords
+            const cssWidth =
+              parseFloat(drawingCanvas.style.width) ||
+              drawingCanvas.clientWidth;
+            const cssHeight =
+              parseFloat(drawingCanvas.style.height) ||
+              drawingCanvas.clientHeight;
+            revealColor = getRevealColorFromCSS(x, y, cssWidth, cssHeight);
+          } else if (getRevealColor && getRevealRegionId) {
+            // Legacy region-based path — DPR-scaled coordinates
+            const scaledX = Math.floor(x * dpr);
+            const scaledY = Math.floor(y * dpr);
+            const regionId = getRevealRegionId(scaledX, scaledY);
+            revealColor = getRevealColor(scaledX, scaledY);
+            if (revealColor && regionId > 0 && onRegionRevealed) {
+              onRegionRevealed(regionId);
+            }
+          }
 
           if (revealColor) {
             strokeColor = revealColor;
-            // Use marker brush for magic reveal (clean, visible strokes)
             strokeBrushType = "marker";
-            // Track which region is being colored
-            if (regionId > 0 && onRegionRevealed) {
-              onRegionRevealed(regionId);
-            }
           } else {
-            // No color available (boundary or already colored area) - don't draw
-            // This prevents the palette color from leaking into magic brush strokes
+            // No color available — don't draw
             lastPosRef.current = { x, y };
             return;
           }
