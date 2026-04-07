@@ -115,9 +115,19 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     const referenceColor = useReferenceColor();
     const hasColoredReference = !!coloringImage.coloredReferenceUrl;
 
+    console.log("[ColoringArea] Reference color state:", {
+      hasColoredReference,
+      coloredReferenceUrl: coloringImage.coloredReferenceUrl,
+      isReady: referenceColor.state.isReady,
+    });
+
     // Load colored reference on mount if available
     useEffect(() => {
       if (coloringImage.coloredReferenceUrl && !referenceColor.state.isReady) {
+        console.log(
+          "[ColoringArea] Loading colored reference:",
+          coloringImage.coloredReferenceUrl,
+        );
         referenceColor.loadReference(coloringImage.coloredReferenceUrl);
       }
     }, [coloringImage.coloredReferenceUrl]);

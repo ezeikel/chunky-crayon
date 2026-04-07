@@ -64,6 +64,7 @@ const ColoringImagePage = async ({ params }: Props) => {
         fillPointsJson: true,
         colorMapJson: true,
         ambientSoundUrl: true,
+        coloredReferenceUrl: true,
       },
     }),
     auth(),
