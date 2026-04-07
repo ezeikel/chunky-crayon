@@ -1,34 +1,18 @@
 import { ImageResponse } from "next/og";
 import { loadOGFonts, OG_FONT_CONFIG } from "@/lib/og/fonts";
 import { colors, OG_WIDTH, OG_HEIGHT, accentColors } from "@/lib/og/constants";
-import { getColoringImageForOG } from "@/lib/og/data";
 
 export const runtime = "nodejs";
 
-export const alt = "Coloring page on Coloring Habitat";
+export const alt = "Coloring Habitat - Mindful Coloring for Adults";
 export const size = {
   width: OG_WIDTH,
   height: OG_HEIGHT,
 };
 export const contentType = "image/png";
 
-export default async function Image({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-
-  const [fonts, image] = await Promise.all([
-    loadOGFonts(),
-    getColoringImageForOG(id),
-  ]);
-
-  const [jakartaRegular, jakartaBold, jakartaExtraBold] = fonts;
-
-  const title = image?.title || "Coloring Page";
-  const difficulty = image?.difficulty || "";
-  const tags = image?.tags?.slice(0, 3) || [];
+export default async function Image() {
+  const [jakartaRegular, jakartaBold, jakartaExtraBold] = await loadOGFonts();
 
   return new ImageResponse(
     (
@@ -59,7 +43,13 @@ export default async function Image({
           }}
         >
           {accentColors.map((color, i) => (
-            <div key={i} style={{ flex: 1, backgroundColor: color }} />
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                backgroundColor: color,
+              }}
+            />
           ))}
         </div>
 
@@ -67,124 +57,101 @@ export default async function Image({
         <div
           style={{
             position: "absolute",
-            top: "-60px",
-            right: "-60px",
-            width: "200px",
-            height: "200px",
+            top: "-80px",
+            right: "-80px",
+            width: "280px",
+            height: "280px",
             borderRadius: "50%",
             backgroundColor: colors.sageLight,
-            opacity: 0.5,
+            opacity: 0.6,
           }}
         />
         <div
           style={{
             position: "absolute",
-            bottom: "-80px",
-            left: "-80px",
-            width: "240px",
-            height: "240px",
+            bottom: "-100px",
+            left: "-100px",
+            width: "320px",
+            height: "320px",
             borderRadius: "50%",
             backgroundColor: colors.lavenderLight,
             opacity: 0.4,
           }}
         />
 
-        {/* Brand */}
+        {/* Main content */}
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            gap: "12px",
-            marginBottom: "40px",
+            gap: "24px",
             zIndex: 1,
           }}
         >
+          {/* Brand name */}
           <span
             style={{
-              fontSize: "28px",
+              fontSize: "72px",
               fontWeight: 800,
               color: colors.primary,
+              letterSpacing: "-2px",
             }}
           >
             Coloring Habitat
           </span>
-        </div>
 
-        {/* Title */}
-        <h1
-          style={{
-            fontSize: "56px",
-            fontWeight: 800,
-            color: colors.textPrimary,
-            textAlign: "center",
-            maxWidth: "900px",
-            lineHeight: 1.1,
-            letterSpacing: "-1px",
-            margin: 0,
-            zIndex: 1,
-          }}
-        >
-          {title}
-        </h1>
-
-        {/* Difficulty badge */}
-        {difficulty && (
-          <span
+          {/* Tagline */}
+          <p
             style={{
-              marginTop: "24px",
-              fontSize: "18px",
-              fontWeight: 600,
-              color: colors.primary,
-              background: `${colors.primaryLight}30`,
-              padding: "8px 20px",
-              borderRadius: "100px",
-              zIndex: 1,
+              fontSize: "30px",
+              fontWeight: 400,
+              color: colors.textSecondary,
+              marginTop: "-8px",
             }}
           >
-            {difficulty}
-          </span>
-        )}
+            Mindful coloring for relaxation and creativity
+          </p>
 
-        {/* Tags */}
-        {tags.length > 0 && (
+          {/* Feature badges */}
           <div
             style={{
               display: "flex",
-              gap: "10px",
-              marginTop: "16px",
-              zIndex: 1,
+              gap: "20px",
+              marginTop: "32px",
             }}
           >
-            {tags.map((tag, i) => (
-              <span
+            {[
+              { emoji: "🎨", text: "Intricate Designs" },
+              { emoji: "✨", text: "AI Generated" },
+              { emoji: "🧘", text: "Mindful Relaxation" },
+            ].map((badge, i) => (
+              <div
                 key={i}
                 style={{
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  color: colors.textSecondary,
-                  background: colors.bgWhite,
-                  padding: "6px 16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  backgroundColor: colors.bgWhite,
+                  padding: "14px 28px",
                   borderRadius: "100px",
+                  boxShadow: "0 4px 16px rgba(45, 106, 79, 0.12)",
                 }}
               >
-                {tag}
-              </span>
+                <span style={{ fontSize: "24px" }}>{badge.emoji}</span>
+                <span
+                  style={{
+                    fontSize: "20px",
+                    fontWeight: 700,
+                    color: colors.textPrimary,
+                  }}
+                >
+                  {badge.text}
+                </span>
+              </div>
             ))}
           </div>
-        )}
-
-        {/* URL */}
-        <p
-          style={{
-            fontSize: "18px",
-            color: colors.primary,
-            marginTop: "32px",
-            fontWeight: 600,
-            zIndex: 1,
-          }}
-        >
-          coloringhabitat.com
-        </p>
+        </div>
 
         {/* Bottom accent bar */}
         <div
@@ -198,7 +165,13 @@ export default async function Image({
           }}
         >
           {[...accentColors].reverse().map((color, i) => (
-            <div key={i} style={{ flex: 1, backgroundColor: color }} />
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                backgroundColor: color,
+              }}
+            />
           ))}
         </div>
       </div>
