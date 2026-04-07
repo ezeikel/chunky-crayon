@@ -79,6 +79,29 @@ const GalleryPage = async ({ searchParams }: GalleryPageProps) => {
             ))}
           </div>
 
+          {/* Holidays & Seasons */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {[
+              { slug: "christmas", name: "Christmas", emoji: "🎄" },
+              { slug: "halloween", name: "Halloween", emoji: "🎃" },
+              { slug: "easter", name: "Easter", emoji: "🐰" },
+              { slug: "valentines-day", name: "Valentine's", emoji: "💝" },
+              { slug: "winter", name: "Winter", emoji: "❄️" },
+              { slug: "spring", name: "Spring", emoji: "🌸" },
+              { slug: "summer", name: "Summer", emoji: "☀️" },
+              { slug: "autumn", name: "Autumn", emoji: "🍂" },
+            ].map((event) => (
+              <Link
+                key={event.slug}
+                href={`/gallery/holidays/${event.slug}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+              >
+                <span>{event.emoji}</span>
+                <span>{event.name}</span>
+              </Link>
+            ))}
+          </div>
+
           {/* Difficulty filter */}
           <Suspense fallback={null}>
             <DifficultyFilter
