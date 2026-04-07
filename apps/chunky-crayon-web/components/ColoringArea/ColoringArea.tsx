@@ -75,6 +75,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       clearDrawingActions,
       addDrawingAction,
       setDrawingActions,
+      setIsAutoColoring,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -226,39 +227,50 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       generateColorMap,
     ]);
 
-    // Handle auto-color - fill all remaining regions at once
+    // Handle auto-color - fill regions progressively for visual feedback
     const handleAutoColor = useCallback(() => {
       const regionsToFill = getAllColorsForAutoFill();
-
       if (regionsToFill.length === 0) return;
 
-      // Pre-compute dilated boundary ONCE for all fills (avoids N dilation passes)
+      setIsAutoColoring(true);
       const boundary = canvasRef.current?.getDilatedBoundary();
 
-      // Fill each region with its assigned color
-      // Note: centroids are in canvas pixel coordinates (DPR-scaled), so we pass isCanvasPixels=true
-      for (const { regionId, color, centroid } of regionsToFill) {
-        const success = canvasRef.current?.fillRegionAtPoint(
-          Math.round(centroid.x),
-          Math.round(centroid.y),
-          color,
-          true, // isCanvasPixels - centroids from region detection are in canvas pixels
-          boundary ?? undefined,
-        );
+      let index = 0;
+      const batchSize = 3;
 
-        if (success) {
-          markRegionColored(regionId);
+      const fillBatch = () => {
+        const end = Math.min(index + batchSize, regionsToFill.length);
+        for (let i = index; i < end; i++) {
+          const { regionId, color, centroid } = regionsToFill[i];
+          const success = canvasRef.current?.fillRegionAtPoint(
+            Math.round(centroid.x),
+            Math.round(centroid.y),
+            color,
+            true,
+            boundary ?? undefined,
+          );
+          if (success) {
+            markRegionColored(regionId);
+          }
         }
-      }
+        index = end;
 
-      // Play celebration sound
-      playSound('sparkle');
-      setHasUnsavedChanges(true);
+        if (index < regionsToFill.length) {
+          requestAnimationFrame(fillBatch);
+        } else {
+          setIsAutoColoring(false);
+          playSound('sparkle');
+          setHasUnsavedChanges(true);
+        }
+      };
+
+      requestAnimationFrame(fillBatch);
     }, [
       getAllColorsForAutoFill,
       markRegionColored,
       playSound,
       setHasUnsavedChanges,
+      setIsAutoColoring,
     ]);
 
     // Handle direct auto-color using fill points (bypasses region detection)
@@ -272,22 +284,42 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       );
       if (!points || points.length === 0) return;
 
-      // Pre-compute dilated boundary ONCE for all fills
+      setIsAutoColoring(true);
       const boundary = canvasRef.current?.getDilatedBoundary();
 
-      for (const { x, y, color } of points) {
-        canvasRef.current?.fillRegionAtPoint(
-          x,
-          y,
-          color,
-          true,
-          boundary ?? undefined,
-        );
-      }
+      let index = 0;
+      const batchSize = 3;
 
-      playSound('sparkle');
-      setHasUnsavedChanges(true);
-    }, [getDirectFillPoints, playSound, setHasUnsavedChanges]);
+      const fillBatch = () => {
+        const end = Math.min(index + batchSize, points.length);
+        for (let i = index; i < end; i++) {
+          const { x, y, color } = points[i];
+          canvasRef.current?.fillRegionAtPoint(
+            x,
+            y,
+            color,
+            true,
+            boundary ?? undefined,
+          );
+        }
+        index = end;
+
+        if (index < points.length) {
+          requestAnimationFrame(fillBatch);
+        } else {
+          setIsAutoColoring(false);
+          playSound('sparkle');
+          setHasUnsavedChanges(true);
+        }
+      };
+
+      requestAnimationFrame(fillBatch);
+    }, [
+      getDirectFillPoints,
+      playSound,
+      setHasUnsavedChanges,
+      setIsAutoColoring,
+    ]);
 
     // Trigger auto-fill when magic-auto tool is selected
     useEffect(() => {

@@ -196,6 +196,7 @@ const DesktopToolsSidebar = ({
     resetView,
     minZoom,
     maxZoom,
+    isAutoColoring,
   } = useColoringContext();
   const { playSound } = useSound();
 
@@ -358,6 +359,8 @@ const DesktopToolsSidebar = ({
         <div className="flex flex-col gap-1.5 mt-1">
           {magicTools.map(({ id, icon }) => {
             const isActive = isToolActive(id);
+            const isAutoColorBtn = id === "magic-auto";
+            const showSpinner = isAutoColorBtn && isAutoColoring;
             // Get translation key based on tool ID
             const translationKey =
               id === "magic-reveal" ? "tools.magicBrush" : "tools.autoColor";
@@ -368,19 +371,29 @@ const DesktopToolsSidebar = ({
                 type="button"
                 key={id}
                 onClick={() => handleToolSelect(id)}
+                disabled={showSpinner}
                 className={cn(
                   "flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all duration-150",
                   "hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-violet-600",
-                  isActive
+                  "disabled:cursor-wait disabled:opacity-80",
+                  isActive || showSpinner
                     ? "bg-gradient-to-r from-violet-600 to-rose-500 text-white shadow-md"
                     : "bg-gradient-to-r from-violet-600/10 to-rose-500/10 text-violet-600 hover:from-violet-600/20 hover:to-rose-500/20",
                 )}
                 aria-label={label}
                 aria-pressed={isActive}
               >
-                <FontAwesomeIcon icon={icon} className="size-5" />
-                <span className="font-bold text-sm">{label}</span>
-                <span className="ml-auto text-xs opacity-70">✨</span>
+                {showSpinner ? (
+                  <div className="size-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <FontAwesomeIcon icon={icon} className="size-5" />
+                )}
+                <span className="font-bold text-sm">
+                  {showSpinner ? "Coloring..." : label}
+                </span>
+                {!showSpinner && (
+                  <span className="ml-auto text-xs opacity-70">✨</span>
+                )}
               </button>
             );
           })}
