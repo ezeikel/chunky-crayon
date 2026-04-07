@@ -180,7 +180,9 @@
       "viewAll": "전체 보기",
       "viewAllPages": "모든 페이지 보기",
       "addToFavourites": "즐겨찾기에 추가",
-      "removeFromFavourites": "즐겨찾기에서 제거"
+      "removeFromFavourites": "즐겨찾기에서 제거",
+      "dailyPage": "오늘의 컬러링 페이지",
+      "colorNow": "지금 색칠하기"
     },
     "testimonials": {
       "fromReviews": "{count}개의 리뷰 기반",

@@ -180,7 +180,9 @@
       "viewAll": "Alle anzeigen",
       "viewAllPages": "Alle Seiten anzeigen",
       "addToFavourites": "Zu Favoriten hinzufügen",
-      "removeFromFavourites": "Aus Favoriten entfernen"
+      "removeFromFavourites": "Aus Favoriten entfernen",
+      "dailyPage": "Heutige Ausmalseite",
+      "colorNow": "Jetzt ausmalen"
     },
     "testimonials": {
       "fromReviews": "aus {count} Bewertungen",

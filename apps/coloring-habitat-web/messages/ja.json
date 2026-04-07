@@ -180,7 +180,9 @@
       "viewAll": "すべて見る",
       "viewAllPages": "すべてのページを見る",
       "addToFavourites": "お気に入りに追加",
-      "removeFromFavourites": "お気に入りから削除"
+      "removeFromFavourites": "お気に入りから削除",
+      "dailyPage": "今日の塗り絵",
+      "colorNow": "今すぐ塗る"
     },
     "testimonials": {
       "fromReviews": "{count}件のレビューより",

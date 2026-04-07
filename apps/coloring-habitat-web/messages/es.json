@@ -180,7 +180,9 @@
       "viewAll": "Ver todo",
       "viewAllPages": "Ver todas las páginas",
       "addToFavourites": "Agregar a favoritos",
-      "removeFromFavourites": "Quitar de favoritos"
+      "removeFromFavourites": "Quitar de favoritos",
+      "dailyPage": "La lámina de hoy",
+      "colorNow": "Colorear ahora"
     },
     "testimonials": {
       "fromReviews": "de {count} reseñas",

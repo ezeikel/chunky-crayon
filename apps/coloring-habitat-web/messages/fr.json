@@ -180,7 +180,9 @@
       "viewAll": "Tout voir",
       "viewAllPages": "Voir toutes les pages",
       "addToFavourites": "Ajouter aux favoris",
-      "removeFromFavourites": "Retirer des favoris"
+      "removeFromFavourites": "Retirer des favoris",
+      "dailyPage": "Coloriage du jour",
+      "colorNow": "Colorier maintenant"
     },
     "testimonials": {
       "fromReviews": "sur {count} avis",
