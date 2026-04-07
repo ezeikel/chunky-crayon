@@ -336,5 +336,80 @@
         "cameraFailed": "La cámara falló. Intenta subir una foto en su lugar."
       }
     }
+  },
+  "pricing": {
+    "title": "Precios simples y honestos",
+    "subtitle": "Comienza gratis y mejora cuando estés listo. Sin costos ocultos, cancela en cualquier momento.",
+    "monthly": "Mensual",
+    "annual": "Anual",
+    "savePercent": "Ahorra 17%",
+    "free": "Gratis",
+    "perMonth": "/mes",
+    "perYear": "/año",
+    "mostPopular": "Más popular",
+    "plans": {
+      "bloom": {
+        "name": "Bloom",
+        "description": "Comienza tu viaje de colorear",
+        "cta": "Comenzar gratis",
+        "features": [
+          "2 creaciones gratuitas diarias",
+          "Acceso a la biblioteca gratuita",
+          "Lienzo de colorear en línea",
+          "Descargas en PDF"
+        ]
+      },
+      "grove": {
+        "name": "Grove",
+        "description": "Para coloristas ocasionales",
+        "cta": "Prueba gratuita",
+        "features": [
+          "300 créditos/mes",
+          "Todas las funciones de colorear",
+          "Descargas PDF en HD",
+          "Guardar en galería"
+        ]
+      },
+      "sanctuary": {
+        "name": "Sanctuary",
+        "description": "Para coloristas regulares",
+        "cta": "Prueba gratuita",
+        "features": [
+          "800 créditos/mes",
+          "Todo en Grove",
+          "1 mes de créditos acumulables",
+          "Generación prioritaria",
+          "Página diaria por email",
+          "Soporte prioritario"
+        ]
+      },
+      "oasis": {
+        "name": "Oasis",
+        "description": "La experiencia completa de bienestar",
+        "cta": "Prueba gratuita",
+        "features": [
+          "2.000 créditos/mes",
+          "Todo en Sanctuary",
+          "2 meses de créditos acumulables",
+          "Licencia de uso comercial",
+          "Colecciones exclusivas",
+          "Paletas de colores personalizadas",
+          "Paisajes sonoros ambientales"
+        ]
+      }
+    }
+  },
+  "accountSettings": {
+    "account": "Cuenta",
+    "accountDetails": "Detalles de tu cuenta",
+    "email": "Email",
+    "name": "Nombre",
+    "noEmail": "No hay email configurado",
+    "galleryPreferences": "Preferencias de galería",
+    "galleryControl": "Controla tu experiencia de galería",
+    "showCommunityArtwork": "Mostrar obras de la comunidad",
+    "showCommunityDescription": "Mostrar obras compartidas por otros miembros en la galería",
+    "communityEnabled": "Imágenes de galería comunitaria habilitadas",
+    "communityDisabled": "Imágenes de galería comunitaria deshabilitadas"
   }
 }

@@ -263,7 +263,10 @@
         "label": "BGM",
         "description": "ぬりえ中のリラックスした音楽"
       }
-    }
+    },
+    "communityGalleryEnabled": "コミュニティギャラリー画像を有効化",
+    "communityGalleryDisabled": "コミュニティギャラリー画像を無効化",
+    "noEmail": "メールが設定されていません"
   },
   "email": {
     "signup": {
@@ -410,5 +413,9 @@
     "easy": "簡単",
     "medium": "普通",
     "hard": "難しい"
+  },
+  "gallery": {
+    "categoryNotFound": "カテゴリーが見つかりません",
+    "difficultyNotFound": "難易度が見つかりません"
   }
 }

@@ -336,5 +336,80 @@
         "cameraFailed": "카메라가 실패했습니다. 사진을 업로드해 보세요."
       }
     }
+  },
+  "pricing": {
+    "title": "간단하고 솔직한 요금제",
+    "subtitle": "무료로 시작하고 준비가 되면 업그레이드하세요. 숨겨진 비용 없이, 언제든 취소 가능.",
+    "monthly": "월간",
+    "annual": "연간",
+    "savePercent": "17% 할인",
+    "free": "무료",
+    "perMonth": "/월",
+    "perYear": "/년",
+    "mostPopular": "가장 인기",
+    "plans": {
+      "bloom": {
+        "name": "Bloom",
+        "description": "컬러링 여정을 시작하세요",
+        "cta": "무료로 시작",
+        "features": [
+          "매일 2회 무료 생성",
+          "무료 라이브러리 접근",
+          "온라인 컬러링 캔버스",
+          "PDF 다운로드"
+        ]
+      },
+      "grove": {
+        "name": "Grove",
+        "description": "가벼운 컬러링 애호가를 위해",
+        "cta": "무료 체험 시작",
+        "features": [
+          "월 300 크레딧",
+          "모든 컬러링 기능",
+          "HD PDF 다운로드",
+          "갤러리에 저장"
+        ]
+      },
+      "sanctuary": {
+        "name": "Sanctuary",
+        "description": "정기적인 컬러링 애호가를 위해",
+        "cta": "무료 체험 시작",
+        "features": [
+          "월 800 크레딧",
+          "Grove의 모든 기능",
+          "1개월 크레딧 이월",
+          "우선 생성",
+          "매일 이메일 페이지",
+          "우선 지원"
+        ]
+      },
+      "oasis": {
+        "name": "Oasis",
+        "description": "완전한 웰니스 경험",
+        "cta": "무료 체험 시작",
+        "features": [
+          "월 2,000 크레딧",
+          "Sanctuary의 모든 기능",
+          "2개월 크레딧 이월",
+          "상업적 사용 라이선스",
+          "독점 컬렉션",
+          "맞춤 색상 팔레트",
+          "앰비언트 사운드스케이프"
+        ]
+      }
+    }
+  },
+  "accountSettings": {
+    "account": "계정",
+    "accountDetails": "계정 세부 정보",
+    "email": "이메일",
+    "name": "이름",
+    "noEmail": "이메일이 설정되지 않았습니다",
+    "galleryPreferences": "갤러리 환경설정",
+    "galleryControl": "갤러리 경험을 관리하세요",
+    "showCommunityArtwork": "커뮤니티 작품 표시",
+    "showCommunityDescription": "갤러리에서 다른 회원이 공유한 작품을 표시",
+    "communityEnabled": "커뮤니티 갤러리 이미지 활성화됨",
+    "communityDisabled": "커뮤니티 갤러리 이미지 비활성화됨"
   }
 }

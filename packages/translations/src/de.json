@@ -263,7 +263,10 @@
         "label": "Hintergrundmusik",
         "description": "Entspannende Klänge beim Malen"
       }
-    }
+    },
+    "communityGalleryEnabled": "Community-Galeriebilder aktiviert",
+    "communityGalleryDisabled": "Community-Galeriebilder deaktiviert",
+    "noEmail": "Keine E-Mail festgelegt"
   },
   "email": {
     "signup": {
@@ -410,5 +413,9 @@
     "easy": "Einfach",
     "medium": "Mittel",
     "hard": "Schwer"
+  },
+  "gallery": {
+    "categoryNotFound": "Kategorie nicht gefunden",
+    "difficultyNotFound": "Schwierigkeit nicht gefunden"
   }
 }

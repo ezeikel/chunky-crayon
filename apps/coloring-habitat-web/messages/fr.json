@@ -336,5 +336,80 @@
         "cameraFailed": "L'appareil photo a échoué. Veuillez essayer d'importer une photo."
       }
     }
+  },
+  "pricing": {
+    "title": "Des tarifs simples et honnêtes",
+    "subtitle": "Commencez gratuitement et passez à la version supérieure quand vous êtes prêt. Pas de frais cachés, annulation à tout moment.",
+    "monthly": "Mensuel",
+    "annual": "Annuel",
+    "savePercent": "Économisez 17%",
+    "free": "Gratuit",
+    "perMonth": "/mois",
+    "perYear": "/an",
+    "mostPopular": "Le plus populaire",
+    "plans": {
+      "bloom": {
+        "name": "Bloom",
+        "description": "Commencez votre aventure coloriage",
+        "cta": "Commencer gratuitement",
+        "features": [
+          "2 créations gratuites par jour",
+          "Accès à la bibliothèque gratuite",
+          "Toile de coloriage en ligne",
+          "Téléchargements PDF"
+        ]
+      },
+      "grove": {
+        "name": "Grove",
+        "description": "Pour les coloristes occasionnels",
+        "cta": "Essai gratuit",
+        "features": [
+          "300 crédits/mois",
+          "Toutes les fonctionnalités",
+          "Téléchargements PDF HD",
+          "Enregistrer dans la galerie"
+        ]
+      },
+      "sanctuary": {
+        "name": "Sanctuary",
+        "description": "Pour les coloristes réguliers",
+        "cta": "Essai gratuit",
+        "features": [
+          "800 crédits/mois",
+          "Tout dans Grove",
+          "Report de crédits 1 mois",
+          "Génération prioritaire",
+          "Page quotidienne par email",
+          "Support prioritaire"
+        ]
+      },
+      "oasis": {
+        "name": "Oasis",
+        "description": "L'expérience bien-être complète",
+        "cta": "Essai gratuit",
+        "features": [
+          "2 000 crédits/mois",
+          "Tout dans Sanctuary",
+          "Report de crédits 2 mois",
+          "Licence d'utilisation commerciale",
+          "Collections exclusives",
+          "Palettes de couleurs personnalisées",
+          "Ambiances sonores"
+        ]
+      }
+    }
+  },
+  "accountSettings": {
+    "account": "Compte",
+    "accountDetails": "Vos détails de compte",
+    "email": "Email",
+    "name": "Nom",
+    "noEmail": "Aucun email défini",
+    "galleryPreferences": "Préférences de galerie",
+    "galleryControl": "Contrôlez votre expérience galerie",
+    "showCommunityArtwork": "Afficher les œuvres communautaires",
+    "showCommunityDescription": "Afficher les œuvres partagées par les autres membres dans la galerie",
+    "communityEnabled": "Images de la galerie communautaire activées",
+    "communityDisabled": "Images de la galerie communautaire désactivées"
   }
 }

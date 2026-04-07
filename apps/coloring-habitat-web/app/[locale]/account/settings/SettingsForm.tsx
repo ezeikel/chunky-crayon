@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   Card,
@@ -25,6 +26,7 @@ const SettingsForm = ({ initialSettings }: SettingsFormProps) => {
     initialSettings?.showCommunityImages ?? false,
   );
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("accountSettings");
 
   const handleCommunityToggle = (checked: boolean) => {
     setShowCommunityImages(checked);
@@ -36,37 +38,32 @@ const SettingsForm = ({ initialSettings }: SettingsFormProps) => {
         toast.error(result.error);
         setShowCommunityImages(!checked);
       } else {
-        toast.success(
-          checked
-            ? "Community gallery images enabled"
-            : "Community gallery images disabled",
-        );
+        toast.success(checked ? t("communityEnabled") : t("communityDisabled"));
       }
     });
   };
 
   return (
     <div className="space-y-6">
-      {/* Account Info */}
       <Card>
         <CardHeader>
-          <CardTitle>Account</CardTitle>
-          <CardDescription>Your account details</CardDescription>
+          <CardTitle>{t("account")}</CardTitle>
+          <CardDescription>{t("accountDetails")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-foreground">
-                Email
+                {t("email")}
               </label>
               <p className="text-sm text-muted-foreground mt-1">
-                {initialSettings?.email || "No email set"}
+                {initialSettings?.email || t("noEmail")}
               </p>
             </div>
             {initialSettings?.name && (
               <div>
                 <label className="text-sm font-medium text-foreground">
-                  Name
+                  {t("name")}
                 </label>
                 <p className="text-sm text-muted-foreground mt-1">
                   {initialSettings.name}
@@ -77,11 +74,10 @@ const SettingsForm = ({ initialSettings }: SettingsFormProps) => {
         </CardContent>
       </Card>
 
-      {/* Community Gallery */}
       <Card>
         <CardHeader>
-          <CardTitle>Gallery Preferences</CardTitle>
-          <CardDescription>Control your gallery experience</CardDescription>
+          <CardTitle>{t("galleryPreferences")}</CardTitle>
+          <CardDescription>{t("galleryControl")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -90,10 +86,10 @@ const SettingsForm = ({ initialSettings }: SettingsFormProps) => {
                 htmlFor="show-community"
                 className="text-sm font-medium leading-none"
               >
-                Show community artwork
+                {t("showCommunityArtwork")}
               </label>
               <p className="text-sm text-muted-foreground">
-                Display artwork shared by other members in the gallery
+                {t("showCommunityDescription")}
               </p>
             </div>
             <Switch

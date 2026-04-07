@@ -336,5 +336,80 @@
         "cameraFailed": "カメラが失敗しました。写真をアップロードしてみてください。"
       }
     }
+  },
+  "pricing": {
+    "title": "シンプルで正直な料金",
+    "subtitle": "無料で始めて、準備ができたらアップグレード。隠れた料金なし、いつでもキャンセル可能。",
+    "monthly": "月額",
+    "annual": "年額",
+    "savePercent": "17%お得",
+    "free": "無料",
+    "perMonth": "/月",
+    "perYear": "/年",
+    "mostPopular": "一番人気",
+    "plans": {
+      "bloom": {
+        "name": "Bloom",
+        "description": "ぬりえの旅を始めましょう",
+        "cta": "無料で始める",
+        "features": [
+          "毎日2回無料作成",
+          "無料ライブラリへのアクセス",
+          "オンラインぬりえキャンバス",
+          "PDFダウンロード"
+        ]
+      },
+      "grove": {
+        "name": "Grove",
+        "description": "カジュアルなぬりえ愛好者向け",
+        "cta": "無料トライアル開始",
+        "features": [
+          "月300クレジット",
+          "すべてのぬりえ機能",
+          "HD PDFダウンロード",
+          "ギャラリーに保存"
+        ]
+      },
+      "sanctuary": {
+        "name": "Sanctuary",
+        "description": "定期的なぬりえ愛好者向け",
+        "cta": "無料トライアル開始",
+        "features": [
+          "月800クレジット",
+          "Groveのすべて",
+          "1ヶ月クレジット繰り越し",
+          "優先生成",
+          "毎日のメールページ",
+          "優先サポート"
+        ]
+      },
+      "oasis": {
+        "name": "Oasis",
+        "description": "完全なウェルネス体験",
+        "cta": "無料トライアル開始",
+        "features": [
+          "月2,000クレジット",
+          "Sanctuaryのすべて",
+          "2ヶ月クレジット繰り越し",
+          "商用利用ライセンス",
+          "限定コレクション",
+          "カスタムカラーパレット",
+          "アンビエントサウンド"
+        ]
+      }
+    }
+  },
+  "accountSettings": {
+    "account": "アカウント",
+    "accountDetails": "アカウントの詳細",
+    "email": "メール",
+    "name": "名前",
+    "noEmail": "メールが設定されていません",
+    "galleryPreferences": "ギャラリー設定",
+    "galleryControl": "ギャラリー体験を管理",
+    "showCommunityArtwork": "コミュニティ作品を表示",
+    "showCommunityDescription": "ギャラリーで他のメンバーが共有した作品を表示",
+    "communityEnabled": "コミュニティギャラリー画像を有効化",
+    "communityDisabled": "コミュニティギャラリー画像を無効化"
   }
 }

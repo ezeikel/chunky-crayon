@@ -336,5 +336,80 @@
         "cameraFailed": "Kamera fehlgeschlagen. Bitte versuche stattdessen ein Foto hochzuladen."
       }
     }
+  },
+  "pricing": {
+    "title": "Einfache, ehrliche Preise",
+    "subtitle": "Starte kostenlos und upgrade, wenn du bereit bist. Keine versteckten Gebühren, jederzeit kündbar.",
+    "monthly": "Monatlich",
+    "annual": "Jährlich",
+    "savePercent": "17% sparen",
+    "free": "Kostenlos",
+    "perMonth": "/Monat",
+    "perYear": "/Jahr",
+    "mostPopular": "Am beliebtesten",
+    "plans": {
+      "bloom": {
+        "name": "Bloom",
+        "description": "Starte deine Ausmal-Reise",
+        "cta": "Kostenlos starten",
+        "features": [
+          "2 kostenlose Kreationen täglich",
+          "Zugang zur kostenlosen Bibliothek",
+          "Online-Ausmalleinwand",
+          "PDF-Downloads"
+        ]
+      },
+      "grove": {
+        "name": "Grove",
+        "description": "Für Gelegenheitsausmaler",
+        "cta": "Kostenlos testen",
+        "features": [
+          "300 Credits/Monat",
+          "Alle Ausmal-Funktionen",
+          "HD-PDF-Downloads",
+          "In Galerie speichern"
+        ]
+      },
+      "sanctuary": {
+        "name": "Sanctuary",
+        "description": "Für regelmäßige Ausmaler",
+        "cta": "Kostenlos testen",
+        "features": [
+          "800 Credits/Monat",
+          "Alles aus Grove",
+          "1 Monat Credit-Übertrag",
+          "Prioritäts-Generierung",
+          "Tägliche E-Mail-Seite",
+          "Prioritäts-Support"
+        ]
+      },
+      "oasis": {
+        "name": "Oasis",
+        "description": "Das komplette Wellness-Erlebnis",
+        "cta": "Kostenlos testen",
+        "features": [
+          "2.000 Credits/Monat",
+          "Alles aus Sanctuary",
+          "2 Monate Credit-Übertrag",
+          "Kommerzielle Nutzungslizenz",
+          "Exklusive Sammlungen",
+          "Individuelle Farbpaletten",
+          "Ambient-Klangwelten"
+        ]
+      }
+    }
+  },
+  "accountSettings": {
+    "account": "Konto",
+    "accountDetails": "Deine Kontodetails",
+    "email": "E-Mail",
+    "name": "Name",
+    "noEmail": "Keine E-Mail festgelegt",
+    "galleryPreferences": "Galerie-Einstellungen",
+    "galleryControl": "Dein Galerie-Erlebnis steuern",
+    "showCommunityArtwork": "Community-Kunstwerke anzeigen",
+    "showCommunityDescription": "Kunstwerke anderer Mitglieder in der Galerie anzeigen",
+    "communityEnabled": "Community-Galeriebilder aktiviert",
+    "communityDisabled": "Community-Galeriebilder deaktiviert"
   }
 }

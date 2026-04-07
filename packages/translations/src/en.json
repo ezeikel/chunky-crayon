@@ -274,7 +274,10 @@
         "label": "Background Music",
         "description": "Relaxing ambient sounds while coloring"
       }
-    }
+    },
+    "communityGalleryEnabled": "Community gallery images enabled",
+    "communityGalleryDisabled": "Community gallery images disabled",
+    "noEmail": "No email set"
   },
   "email": {
     "signup": {
@@ -410,5 +413,9 @@
     "easy": "Easy",
     "medium": "Medium",
     "hard": "Hard"
+  },
+  "gallery": {
+    "categoryNotFound": "Category not found",
+    "difficultyNotFound": "Difficulty not found"
   }
 }

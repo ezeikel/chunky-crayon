@@ -263,7 +263,10 @@
         "label": "배경음악",
         "description": "색칠하는 동안 편안한 음악"
       }
-    }
+    },
+    "communityGalleryEnabled": "커뮤니티 갤러리 이미지 활성화됨",
+    "communityGalleryDisabled": "커뮤니티 갤러리 이미지 비활성화됨",
+    "noEmail": "이메일이 설정되지 않았습니다"
   },
   "email": {
     "signup": {
@@ -410,5 +413,9 @@
     "easy": "쉬움",
     "medium": "보통",
     "hard": "어려움"
+  },
+  "gallery": {
+    "categoryNotFound": "카테고리를 찾을 수 없습니다",
+    "difficultyNotFound": "난이도를 찾을 수 없습니다"
   }
 }

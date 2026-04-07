@@ -263,7 +263,10 @@
         "label": "Musique de Fond",
         "description": "Sons d'ambiance relaxants pendant le coloriage"
       }
-    }
+    },
+    "communityGalleryEnabled": "Images de la galerie communautaire activées",
+    "communityGalleryDisabled": "Images de la galerie communautaire désactivées",
+    "noEmail": "Aucun email défini"
   },
   "email": {
     "signup": {
@@ -410,5 +413,9 @@
     "easy": "Facile",
     "medium": "Moyen",
     "hard": "Difficile"
+  },
+  "gallery": {
+    "categoryNotFound": "Catégorie introuvable",
+    "difficultyNotFound": "Difficulté introuvable"
   }
 }

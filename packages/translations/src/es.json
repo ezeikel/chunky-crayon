@@ -263,7 +263,10 @@
         "label": "Música de Fondo",
         "description": "Sonidos ambientales relajantes mientras coloreas"
       }
-    }
+    },
+    "communityGalleryEnabled": "Imágenes de galería comunitaria habilitadas",
+    "communityGalleryDisabled": "Imágenes de galería comunitaria deshabilitadas",
+    "noEmail": "No hay email configurado"
   },
   "email": {
     "signup": {
@@ -410,5 +413,9 @@
     "easy": "Fácil",
     "medium": "Medio",
     "hard": "Difícil"
+  },
+  "gallery": {
+    "categoryNotFound": "Categoría no encontrada",
+    "difficultyNotFound": "Dificultad no encontrada"
   }
 }

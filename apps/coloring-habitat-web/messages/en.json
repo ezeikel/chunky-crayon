@@ -336,5 +336,80 @@
         "cameraFailed": "Camera failed. Please try uploading a photo instead."
       }
     }
+  },
+  "pricing": {
+    "title": "Simple, honest pricing",
+    "subtitle": "Start free and upgrade when you're ready. No hidden fees, cancel anytime.",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "savePercent": "Save 17%",
+    "free": "Free",
+    "perMonth": "/mo",
+    "perYear": "/yr",
+    "mostPopular": "Most popular",
+    "plans": {
+      "bloom": {
+        "name": "Bloom",
+        "description": "Start your coloring journey",
+        "cta": "Get started free",
+        "features": [
+          "2 free creations daily",
+          "Access to free library",
+          "Online coloring canvas",
+          "PDF downloads"
+        ]
+      },
+      "grove": {
+        "name": "Grove",
+        "description": "For casual colorists",
+        "cta": "Start free trial",
+        "features": [
+          "300 credits/month",
+          "All coloring features",
+          "HD PDF downloads",
+          "Save to gallery"
+        ]
+      },
+      "sanctuary": {
+        "name": "Sanctuary",
+        "description": "For regular colorists",
+        "cta": "Start free trial",
+        "features": [
+          "800 credits/month",
+          "Everything in Grove",
+          "1 month credit rollover",
+          "Priority generation",
+          "Daily email page",
+          "Priority support"
+        ]
+      },
+      "oasis": {
+        "name": "Oasis",
+        "description": "The complete wellness experience",
+        "cta": "Start free trial",
+        "features": [
+          "2,000 credits/month",
+          "Everything in Sanctuary",
+          "2 month credit rollover",
+          "Commercial use license",
+          "Exclusive collections",
+          "Custom color palettes",
+          "Ambient soundscapes"
+        ]
+      }
+    }
+  },
+  "accountSettings": {
+    "account": "Account",
+    "accountDetails": "Your account details",
+    "email": "Email",
+    "name": "Name",
+    "noEmail": "No email set",
+    "galleryPreferences": "Gallery Preferences",
+    "galleryControl": "Control your gallery experience",
+    "showCommunityArtwork": "Show community artwork",
+    "showCommunityDescription": "Display artwork shared by other members in the gallery",
+    "communityEnabled": "Community gallery images enabled",
+    "communityDisabled": "Community gallery images disabled"
   }
 }
