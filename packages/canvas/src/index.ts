@@ -7,7 +7,7 @@
  */
 
 // Types
-export type { BrushType, FillPattern } from "./types";
+export type { BrushType, FillPattern, PointerInputType } from "./types";
 
 // Canvas algorithms
 export { hexToRGBA, floodFill, scanlineFill } from "./floodFill";
@@ -35,6 +35,9 @@ export {
   type SvgElementProps,
 } from "./parseSvg";
 export { default as fetchSvg } from "./fetchSvg";
+
+// Stroke smoothing
+export { smoothStroke, StrokeBuffer } from "./strokeSmoothing";
 
 // Cursor generation
 export { createIconCursor, createIconCursorWithRing } from "./iconCursor";

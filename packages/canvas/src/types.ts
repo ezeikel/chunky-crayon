@@ -17,3 +17,5 @@ export type FillPattern =
   | "hearts"
   | "stars"
   | "zigzag";
+
+export type PointerInputType = "mouse" | "touch" | "pen";

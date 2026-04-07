@@ -21,6 +21,7 @@ import {
   drawTexturedStroke,
   createFillPattern,
   createIconCursor,
+  StrokeBuffer,
 } from "@one-colored-pixel/canvas";
 import { proxyR2Url } from "./proxyR2Url";
 import {
@@ -243,6 +244,14 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
     // Store the last position for smooth drawing
     const lastPosRef = useRef<{ x: number; y: number } | null>(null);
+
+    // Stroke smoothing buffer (Catmull-Rom interpolation)
+    const strokeBufferRef = useRef<StrokeBuffer>(new StrokeBuffer(0.5, 4));
+
+    // Active pointer tracking for multi-touch gestures
+    const activePointersRef = useRef<Map<number, { x: number; y: number }>>(
+      new Map(),
+    );
 
     // Gesture handling refs
     const isPinchingRef = useRef(false);
@@ -1089,6 +1098,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     }, [ratio, svgImage]);
 
     // Prevent scroll on touch for mobile
+    // With touch-action: none on the canvas, most browsers handle this,
+    // but we keep a document-level handler as a safety net for edge cases
     useEffect(() => {
       const canvas = drawingCanvasRef.current;
       if (!canvas) return;
@@ -1181,22 +1192,24 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       [zoom],
     );
 
-    // Get distance between two touch points
-    const getTouchDistance = (touches: React.TouchList) => {
-      if (touches.length < 2) return 0;
-      const dx = touches[0].clientX - touches[1].clientX;
-      const dy = touches[0].clientY - touches[1].clientY;
+    // Get distance between two active pointers
+    const getPointerDistance = useCallback(() => {
+      const pointers = Array.from(activePointersRef.current.values());
+      if (pointers.length < 2) return 0;
+      const dx = pointers[0].x - pointers[1].x;
+      const dy = pointers[0].y - pointers[1].y;
       return Math.sqrt(dx * dx + dy * dy);
-    };
+    }, []);
 
-    // Get center point between two touch points
-    const getTouchCenter = (touches: React.TouchList) => {
-      if (touches.length < 2) return { x: 0, y: 0 };
+    // Get center point between two active pointers
+    const getPointerCenter = useCallback(() => {
+      const pointers = Array.from(activePointersRef.current.values());
+      if (pointers.length < 2) return { x: 0, y: 0 };
       return {
-        x: (touches[0].clientX + touches[1].clientX) / 2,
-        y: (touches[0].clientY + touches[1].clientY) / 2,
+        x: (pointers[0].x + pointers[1].x) / 2,
+        y: (pointers[0].y + pointers[1].y) / 2,
       };
-    };
+    }, []);
 
     // Clamp pan offset to keep at least 25% of the image visible
     const clampPanOffset = useCallback(
@@ -1227,7 +1240,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       [],
     );
 
-    const colorAtPosition = (clientX: number, clientY: number) => {
+    const colorAtPosition = (
+      clientX: number,
+      clientY: number,
+      pressure: number = 0.5,
+    ) => {
       const drawingCanvas = drawingCanvasRef.current;
       const drawingCtx = drawingCanvas?.getContext("2d");
 
@@ -1289,6 +1306,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           color: strokeColor,
           radius,
           brushType: strokeBrushType,
+          pressure,
         });
 
         // Update offscreen canvas with same stroke
@@ -1304,6 +1322,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               color: strokeColor,
               radius,
               brushType: strokeBrushType,
+              pressure,
             });
           }
         }
@@ -1605,225 +1624,71 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       });
     };
 
-    const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
-      // Initialize sounds on first interaction (required for Web Audio API)
-      handleFirstInteraction();
+    // =========================================================================
+    // Unified Pointer Event Handlers
+    // Replaces separate mouse/touch handlers with Pointer Events API.
+    // Provides: unified input handling, pressure sensitivity, pen detection.
+    // Multi-touch gestures (pinch-zoom) tracked via activePointersRef map.
+    // =========================================================================
 
-      // Pan tool - single click to start panning
-      if (activeTool === "pan") {
-        isPanningRef.current = true;
-        lastPanPosRef.current = { x: event.clientX, y: event.clientY };
-        return;
-      }
+    const handlePointerDown = (
+      event: React.PointerEvent<HTMLCanvasElement>,
+    ) => {
+      // Capture this pointer so we get move/up events even outside canvas
+      (event.target as HTMLElement).setPointerCapture(event.pointerId);
 
-      if (activeTool === "fill") {
-        handleFill(event.clientX, event.clientY);
-        return;
-      }
-
-      // Sticker tool - place sticker on click
-      if (activeTool === "sticker") {
-        handleStickerPlace(event.clientX, event.clientY);
-        return;
-      }
-
-      // Magic brush tool - stroke-based reveal with AI colors
-      // Unlike other tools, magic-reveal uses the same drawing flow as brush
-      // but dynamically looks up the color for each point from the color map
-      if (activeTool === "magic-reveal") {
-        if (!isMagicRevealReady) {
-          // Color map not ready yet - don't start drawing
-          return;
-        }
-        // Start drawing session (same as regular brush)
-        const beforeState = captureCanvasState();
-        if (beforeState) {
-          pushToHistory({
-            type: "stroke",
-            imageData: beforeState,
-            timestamp: Date.now(),
-          });
-        }
-        // Initialize stroke tracking for magic-reveal
-        currentStrokeRef.current = {
-          points: [],
-          color: selectedColor, // Will be overridden per-point for magic reveal
-          brushType: "marker", // Magic reveal uses marker
-          strokeWidth: getRadius() * 2,
-        };
-        setIsDrawing(true);
-        lastPosRef.current = null;
-        colorAtPosition(event.clientX, event.clientY);
-        // Sound will start on first move
-        return;
-      }
-
-      // Capture state before drawing for undo
-      const beforeState = captureCanvasState();
-      if (beforeState) {
-        pushToHistory({
-          type: "stroke",
-          imageData: beforeState,
-          timestamp: Date.now(),
-        });
-      }
-
-      // Initialize stroke tracking for serializable actions
-      currentStrokeRef.current = {
-        points: [],
-        color: selectedColor,
-        brushType: brushType,
-        strokeWidth: getRadius() * 2, // Diameter
-      };
-
-      setIsDrawing(true);
-      lastPosRef.current = null;
-      colorAtPosition(event.clientX, event.clientY);
-      // Sound will start on first move
-    };
-
-    const handleMouseUp = () => {
-      console.log("[ImageCanvas] handleMouseUp", {
-        isDrawing,
-        isPanning: isPanningRef.current,
+      // Track active pointers for multi-touch gestures
+      activePointersRef.current.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
       });
-
-      // Reset pan state
-      if (isPanningRef.current) {
-        isPanningRef.current = false;
-        lastPanPosRef.current = null;
-        return;
-      }
-
-      // Always try to stop brush sound on mouse up, even if not drawing
-      // This handles edge cases where isDrawing state might be stale
-      if (brushSoundTimeoutRef.current) {
-        clearTimeout(brushSoundTimeoutRef.current);
-        brushSoundTimeoutRef.current = null;
-      }
-      stopBrushLoop();
-
-      if (!isDrawing) return;
-      setIsDrawing(false);
-      lastPosRef.current = null;
-
-      // Finalize stroke and add to serializable actions
-      if (
-        currentStrokeRef.current &&
-        currentStrokeRef.current.points.length > 0
-      ) {
-        const stroke = currentStrokeRef.current;
-        // Normalize points to CSS canvas space for cross-platform sync
-        const normalizedPoints = normalizePointsForSync(stroke.points);
-        // Include source dimensions for cross-platform scaling
-        const strokeContainer = containerRef.current;
-        addDrawingAction({
-          type: "stroke",
-          path: normalizedPoints,
-          pathSvg: pointsToSvgPath(normalizedPoints),
-          color: stroke.color,
-          brushType: stroke.brushType,
-          strokeWidth: stroke.strokeWidth,
-          timestamp: Date.now(),
-          sourceWidth: strokeContainer?.clientWidth,
-          sourceHeight: strokeContainer?.clientHeight,
-        });
-        currentStrokeRef.current = null;
-      }
-
-      trackEvent(TRACKING_EVENTS.PAGE_STROKE_MADE, {
-        coloringImageId: coloringImage.id,
-        color: selectedColor,
-        brushSize,
-        brushType,
-      });
-    };
-
-    const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-      // Handle pan tool dragging
-      if (isPanningRef.current && lastPanPosRef.current) {
-        const deltaX = event.clientX - lastPanPosRef.current.x;
-        const deltaY = event.clientY - lastPanPosRef.current.y;
-        const newOffset = {
-          x: panOffset.x + deltaX,
-          y: panOffset.y + deltaY,
-        };
-        setPanOffset(clampPanOffset(newOffset, zoom));
-        lastPanPosRef.current = { x: event.clientX, y: event.clientY };
-        return;
-      }
-
-      // Allow drawing for brush tools and magic-reveal (stroke-based reveal)
-      if (
-        !isDrawing ||
-        (activeTool !== "brush" && activeTool !== "magic-reveal")
-      ) {
-        return;
-      }
-
-      // Start brush sound on move (not on mousedown)
-      const soundType =
-        activeTool === "magic-reveal" ? "magic-reveal" : brushType;
-      if (!isBrushLoopActive()) {
-        startBrushLoop(soundType);
-      }
-
-      // Reset debounce timer - stop sound after 150ms of no movement
-      if (brushSoundTimeoutRef.current) {
-        clearTimeout(brushSoundTimeoutRef.current);
-      }
-      brushSoundTimeoutRef.current = setTimeout(() => {
-        stopBrushLoop();
-      }, 150);
-
-      colorAtPosition(event.clientX, event.clientY);
-    };
-
-    const handleTouchStart = (event: React.TouchEvent<HTMLCanvasElement>) => {
-      event.preventDefault(); // Prevent scroll
 
       // Initialize sounds on first interaction (required for Web Audio API)
       handleFirstInteraction();
 
-      // Two-finger gesture (pinch/pan)
-      if (event.touches.length === 2) {
+      // Two-pointer gesture (pinch/pan) — enter pinch mode
+      if (activePointersRef.current.size === 2) {
+        // If we were drawing with first finger, cancel that stroke
+        if (isDrawing) {
+          setIsDrawing(false);
+          lastPosRef.current = null;
+          currentStrokeRef.current = null;
+          strokeBufferRef.current.reset();
+        }
         isPinchingRef.current = true;
-        lastPinchDistanceRef.current = getTouchDistance(event.touches);
-        lastTouchCenterRef.current = getTouchCenter(event.touches);
+        lastPinchDistanceRef.current = getPointerDistance();
+        lastTouchCenterRef.current = getPointerCenter();
         gestureStartZoomRef.current = zoom;
         gestureStartPanRef.current = { ...panOffset };
         return;
       }
 
-      // Single touch - pan tool, sticker, drawing, or fill
-      if (event.touches.length === 1) {
-        const touch = event.touches[0];
+      // Single pointer actions (only if not in pinch mode)
+      if (activePointersRef.current.size === 1 && !isPinchingRef.current) {
+        const pressure = event.pressure || 0.5;
 
-        // Pan tool - single finger panning
+        // Pan tool
         if (activeTool === "pan") {
           isPanningRef.current = true;
-          lastPanPosRef.current = { x: touch.clientX, y: touch.clientY };
+          lastPanPosRef.current = { x: event.clientX, y: event.clientY };
           return;
         }
 
+        // Fill tool
         if (activeTool === "fill") {
-          handleFill(touch.clientX, touch.clientY);
+          handleFill(event.clientX, event.clientY);
           return;
         }
 
-        // Sticker tool - place sticker on tap
+        // Sticker tool
         if (activeTool === "sticker") {
-          handleStickerPlace(touch.clientX, touch.clientY);
+          handleStickerPlace(event.clientX, event.clientY);
           return;
         }
 
-        // Magic brush tool - stroke-based reveal with AI colors
+        // Magic brush tool — stroke-based reveal with AI colors
         if (activeTool === "magic-reveal") {
-          if (!isMagicRevealReady) {
-            // Color map not ready yet - don't start drawing
-            return;
-          }
-          // Start drawing session (same as regular brush)
+          if (!isMagicRevealReady) return;
           const beforeState = captureCanvasState();
           if (beforeState) {
             pushToHistory({
@@ -1832,21 +1697,20 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               timestamp: Date.now(),
             });
           }
-          // Initialize stroke tracking for magic-reveal
           currentStrokeRef.current = {
             points: [],
-            color: selectedColor, // Will be overridden per-point for magic reveal
-            brushType: "marker", // Magic reveal uses marker
+            color: selectedColor,
+            brushType: "marker",
             strokeWidth: getRadius() * 2,
           };
+          strokeBufferRef.current.reset();
           setIsDrawing(true);
           lastPosRef.current = null;
-          colorAtPosition(touch.clientX, touch.clientY);
-          // Sound will start on first move
+          colorAtPosition(event.clientX, event.clientY, pressure);
           return;
         }
 
-        // Capture state before drawing for undo
+        // Regular brush drawing
         const beforeState = captureCanvasState();
         if (beforeState) {
           pushToHistory({
@@ -1856,30 +1720,36 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           });
         }
 
-        // Initialize stroke tracking for serializable actions
         currentStrokeRef.current = {
           points: [],
           color: selectedColor,
           brushType: brushType,
-          strokeWidth: getRadius() * 2, // Diameter
+          strokeWidth: getRadius() * 2,
         };
 
+        strokeBufferRef.current.reset();
         setIsDrawing(true);
         lastPosRef.current = null;
-        colorAtPosition(touch.clientX, touch.clientY);
-        // Sound will start on first move
+        colorAtPosition(event.clientX, event.clientY, pressure);
       }
     };
 
-    const handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
-      event.preventDefault(); // Prevent scroll
+    const handlePointerMove = (
+      event: React.PointerEvent<HTMLCanvasElement>,
+    ) => {
+      // Update pointer position in tracking map
+      if (activePointersRef.current.has(event.pointerId)) {
+        activePointersRef.current.set(event.pointerId, {
+          x: event.clientX,
+          y: event.clientY,
+        });
+      }
 
-      // Handle pinch-to-zoom and two-finger pan
-      if (event.touches.length === 2 && isPinchingRef.current) {
-        const currentDistance = getTouchDistance(event.touches);
-        const currentCenter = getTouchCenter(event.touches);
+      // Handle pinch-to-zoom and two-pointer pan
+      if (activePointersRef.current.size === 2 && isPinchingRef.current) {
+        const currentDistance = getPointerDistance();
+        const currentCenter = getPointerCenter();
 
-        // Calculate zoom change
         let currentZoom = zoom;
         if (lastPinchDistanceRef.current !== null) {
           const scale = currentDistance / lastPinchDistanceRef.current;
@@ -1890,7 +1760,6 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           setZoom(currentZoom);
         }
 
-        // Calculate pan change
         if (lastTouchCenterRef.current !== null) {
           const deltaX = currentCenter.x - lastTouchCenterRef.current.x;
           const deltaY = currentCenter.y - lastTouchCenterRef.current.y;
@@ -1904,25 +1773,20 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         return;
       }
 
-      // Handle pan tool single-finger panning
-      if (
-        isPanningRef.current &&
-        lastPanPosRef.current &&
-        event.touches.length === 1
-      ) {
-        const touch = event.touches[0];
-        const deltaX = touch.clientX - lastPanPosRef.current.x;
-        const deltaY = touch.clientY - lastPanPosRef.current.y;
+      // Handle pan tool dragging
+      if (isPanningRef.current && lastPanPosRef.current) {
+        const deltaX = event.clientX - lastPanPosRef.current.x;
+        const deltaY = event.clientY - lastPanPosRef.current.y;
         const newOffset = {
           x: panOffset.x + deltaX,
           y: panOffset.y + deltaY,
         };
         setPanOffset(clampPanOffset(newOffset, zoom));
-        lastPanPosRef.current = { x: touch.clientX, y: touch.clientY };
+        lastPanPosRef.current = { x: event.clientX, y: event.clientY };
         return;
       }
 
-      // Single-finger drawing (brush or magic-reveal)
+      // Drawing (brush or magic-reveal)
       if (
         !isDrawing ||
         (activeTool !== "brush" && activeTool !== "magic-reveal") ||
@@ -1931,14 +1795,14 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         return;
       }
 
-      // Start brush sound on move (not on touchstart)
+      // Start brush sound on move (not on pointerdown)
       const soundType =
         activeTool === "magic-reveal" ? "magic-reveal" : brushType;
       if (!isBrushLoopActive()) {
         startBrushLoop(soundType);
       }
 
-      // Reset debounce timer - stop sound after 150ms of no movement
+      // Reset debounce timer — stop sound after 150ms of no movement
       if (brushSoundTimeoutRef.current) {
         clearTimeout(brushSoundTimeoutRef.current);
       }
@@ -1946,32 +1810,38 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         stopBrushLoop();
       }, 150);
 
-      const touch = event.touches[0];
-      colorAtPosition(touch.clientX, touch.clientY);
+      const pressure = event.pressure || 0.5;
+      colorAtPosition(event.clientX, event.clientY, pressure);
     };
 
-    const handleTouchEnd = (event: React.TouchEvent<HTMLCanvasElement>) => {
-      event.preventDefault();
-      console.log("[ImageCanvas] handleTouchEnd", {
-        isDrawing,
-        touchCount: event.touches.length,
-      });
+    const handlePointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => {
+      // Release pointer capture
+      try {
+        (event.target as HTMLElement).releasePointerCapture(event.pointerId);
+      } catch {
+        // Ignore if pointer capture was already released
+      }
 
-      // Reset pinch state when all fingers are lifted or down to one finger
-      if (event.touches.length < 2) {
+      // Remove from active pointers
+      activePointersRef.current.delete(event.pointerId);
+
+      // Reset pinch state when below 2 pointers
+      if (activePointersRef.current.size < 2) {
         isPinchingRef.current = false;
         lastPinchDistanceRef.current = null;
         lastTouchCenterRef.current = null;
       }
 
-      // Reset pan state when all fingers are lifted
-      if (event.touches.length === 0) {
-        isPanningRef.current = false;
-        lastPanPosRef.current = null;
+      // Reset pan state when all pointers are lifted
+      if (activePointersRef.current.size === 0) {
+        if (isPanningRef.current) {
+          isPanningRef.current = false;
+          lastPanPosRef.current = null;
+          return;
+        }
       }
 
-      // Always try to stop brush sound on touch end, even if not drawing
-      // This handles edge cases where isDrawing state might be stale
+      // Always try to stop brush sound
       if (brushSoundTimeoutRef.current) {
         clearTimeout(brushSoundTimeoutRef.current);
         brushSoundTimeoutRef.current = null;
@@ -1981,6 +1851,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       if (!isDrawing) return;
       setIsDrawing(false);
       lastPosRef.current = null;
+      strokeBufferRef.current.reset();
 
       // Finalize stroke and add to serializable actions
       if (
@@ -1988,10 +1859,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         currentStrokeRef.current.points.length > 0
       ) {
         const stroke = currentStrokeRef.current;
-        // Normalize points to CSS canvas space for cross-platform sync
         const normalizedPoints = normalizePointsForSync(stroke.points);
-        // Include source dimensions for cross-platform scaling
-        const touchContainer = containerRef.current;
+        const pointerContainer = containerRef.current;
         addDrawingAction({
           type: "stroke",
           path: normalizedPoints,
@@ -2000,8 +1869,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           brushType: stroke.brushType,
           strokeWidth: stroke.strokeWidth,
           timestamp: Date.now(),
-          sourceWidth: touchContainer?.clientWidth,
-          sourceHeight: touchContainer?.clientHeight,
+          sourceWidth: pointerContainer?.clientWidth,
+          sourceHeight: pointerContainer?.clientHeight,
         });
         currentStrokeRef.current = null;
       }
@@ -2042,13 +1911,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               userSelect: "none",
               cursor: activeTool === "pan" ? "grab" : toolCursor || "default",
             }}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseUp}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onPointerLeave={handlePointerUp}
             ref={drawingCanvasRef}
           />
           <canvas

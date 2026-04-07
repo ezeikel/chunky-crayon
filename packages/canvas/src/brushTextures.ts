@@ -18,6 +18,8 @@ type DrawStrokeParams = {
   color: string;
   radius: number;
   brushType: BrushType;
+  /** Pointer pressure from 0.0 to 1.0. Default 0.5 (mouse). Pen/stylus provides real values. */
+  pressure?: number;
 };
 
 /**
@@ -32,23 +34,60 @@ export const drawTexturedStroke = ({
   color,
   radius,
   brushType,
+  pressure = 0.5,
 }: DrawStrokeParams): void => {
+  // Apply pressure scaling: radius scales from 30% to 100% based on pressure
+  // Mouse events default to 0.5 pressure → 65% radius (close to original feel)
+  const effectiveRadius = radius * (0.3 + pressure * 0.7);
+
   if (brushType === "eraser") {
-    drawEraserStroke({ ctx, x, y, lastX, lastY, radius });
+    drawEraserStroke({ ctx, x, y, lastX, lastY, radius: effectiveRadius });
   } else if (brushType === "crayon") {
-    drawCrayonStroke({ ctx, x, y, lastX, lastY, color, radius });
+    drawCrayonStroke({
+      ctx,
+      x,
+      y,
+      lastX,
+      lastY,
+      color,
+      radius: effectiveRadius,
+    });
   } else if (brushType === "glitter") {
-    drawGlitterStroke({ ctx, x, y, lastX, lastY, color, radius });
+    drawGlitterStroke({
+      ctx,
+      x,
+      y,
+      lastX,
+      lastY,
+      color,
+      radius: effectiveRadius,
+    });
   } else if (brushType === "sparkle") {
-    drawSparkleStroke({ ctx, x, y, lastX, lastY, color, radius });
+    drawSparkleStroke({
+      ctx,
+      x,
+      y,
+      lastX,
+      lastY,
+      color,
+      radius: effectiveRadius,
+    });
   } else if (brushType === "rainbow") {
-    drawRainbowStroke({ ctx, x, y, lastX, lastY, radius });
+    drawRainbowStroke({ ctx, x, y, lastX, lastY, radius: effectiveRadius });
   } else if (brushType === "glow") {
-    drawGlowStroke({ ctx, x, y, lastX, lastY, color, radius });
+    drawGlowStroke({ ctx, x, y, lastX, lastY, color, radius: effectiveRadius });
   } else if (brushType === "neon") {
-    drawNeonStroke({ ctx, x, y, lastX, lastY, color, radius });
+    drawNeonStroke({ ctx, x, y, lastX, lastY, color, radius: effectiveRadius });
   } else {
-    drawMarkerStroke({ ctx, x, y, lastX, lastY, color, radius });
+    drawMarkerStroke({
+      ctx,
+      x,
+      y,
+      lastX,
+      lastY,
+      color,
+      radius: effectiveRadius,
+    });
   }
 };
 
