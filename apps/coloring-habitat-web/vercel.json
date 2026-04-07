@@ -8,6 +8,9 @@
     },
     "app/api/blog/generate/route.ts": {
       "maxDuration": 300
+    },
+    "app/api/seed/gallery/route.ts": {
+      "maxDuration": 300
     }
   },
   "crons": [
