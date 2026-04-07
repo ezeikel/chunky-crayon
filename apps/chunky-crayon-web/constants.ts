@@ -65,13 +65,36 @@ export const COLORING_PALETTE = {
     { name: 'Dark', hex: '#8B4513' },
     { name: 'Deep', hex: '#5D4037' },
   ],
+  // Extended colors — available to AI auto-color and power users.
+  // More natural tones and vivid options for realistic scene coloring.
+  extended: [
+    { name: 'Turquoise', hex: '#00ACC1' },
+    { name: 'Teal', hex: '#00897B' },
+    { name: 'Indigo', hex: '#283593' },
+    { name: 'Magenta', hex: '#C2185B' },
+    { name: 'Lime', hex: '#7CB342' },
+    { name: 'Amber', hex: '#FFB300' },
+    { name: 'Crimson', hex: '#B71C1C' },
+    { name: 'Olive', hex: '#827717' },
+    { name: 'Tan', hex: '#D2B48C' },
+    { name: 'Salmon', hex: '#FF8A65' },
+    { name: 'Slate', hex: '#546E7A' },
+    { name: 'Cream', hex: '#FFF8E1' },
+  ],
 } as const;
 
-// Flat array of all coloring palette colors for easy iteration
+// Flat array of all coloring palette colors for easy iteration (UI palette)
 export const ALL_COLORING_COLORS = [
   ...COLORING_PALETTE.primary,
   ...COLORING_PALETTE.secondary,
   ...COLORING_PALETTE.essentials,
+];
+
+// Extended palette including all colors — used by AI auto-color for richer results
+export const ALL_COLORING_COLORS_EXTENDED = [
+  ...ALL_COLORING_COLORS,
+  ...COLORING_PALETTE.extended,
+  ...COLORING_PALETTE.skinTones,
 ];
 
 // Brush size configuration optimized for children's motor skills

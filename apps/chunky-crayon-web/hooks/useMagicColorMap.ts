@@ -293,7 +293,8 @@ export function useMagicColorMap(
           setState((s) => ({
             ...s,
             isLoading: false,
-            error: null,
+            error:
+              'Color data is being generated. Please try again in a moment!',
             loadingMessage: null,
           }));
           return false;

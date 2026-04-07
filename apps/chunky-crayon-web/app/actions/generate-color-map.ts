@@ -13,7 +13,7 @@ import {
   REGION_FILL_POINTS_SYSTEM,
   createRegionFillPointsPrompt,
 } from '@/lib/ai';
-import { ALL_COLORING_COLORS } from '@/constants';
+import { ALL_COLORING_COLORS_EXTENDED } from '@/constants';
 import { db } from '@one-colored-pixel/db';
 
 const colorMapConfig = {
@@ -21,7 +21,10 @@ const colorMapConfig = {
   createGridColorMapPrompt,
   regionFillPointsSystem: REGION_FILL_POINTS_SYSTEM,
   createRegionFillPointsPrompt,
-  allColors: ALL_COLORING_COLORS.map((c) => ({ hex: c.hex, name: c.name })),
+  allColors: ALL_COLORING_COLORS_EXTENDED.map((c) => ({
+    hex: c.hex,
+    name: c.name,
+  })),
 };
 
 /**

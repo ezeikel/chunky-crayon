@@ -6,6 +6,8 @@
  * bounded by dark lines.
  */
 
+import { dilateBoundaries } from "./floodFill";
+
 export type Region = {
   id: number;
   bounds: { x: number; y: number; width: number; height: number };
@@ -313,6 +315,11 @@ export function detectAllRegions(
 
   const imageData = drawingCtx.getImageData(0, 0, width, height);
   const boundaryData = boundaryCtx.getImageData(0, 0, width, height);
+
+  // Apply gap-closing dilation to boundary data to prevent region merging
+  // through small gaps in SVG line art (same technique as fill bleeding fix)
+  dilateBoundaries(boundaryData, 2, BOUNDARY_LUMINANCE_THRESHOLD);
+
   const pixelToRegion = new Uint16Array(width * height);
 
   const regions: Region[] = [];

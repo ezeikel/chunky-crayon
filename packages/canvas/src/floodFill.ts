@@ -30,6 +30,13 @@ type FloodFillOptions = {
    * Default: 200 (treats dark lines as boundaries)
    */
   boundaryThreshold?: number;
+  /**
+   * Number of pixels to dilate boundary lines before filling.
+   * Closes small gaps in SVG line art that cause fill bleeding.
+   * 0 = no dilation (default for backwards compatibility).
+   * 1-2 = recommended for most coloring pages.
+   */
+  gapClosingRadius?: number;
 };
 
 /**
@@ -116,6 +123,69 @@ function isBoundaryPixel(
 
   // Pixel is a boundary if it's dark enough (below threshold)
   return luminance < threshold;
+}
+
+/**
+ * Dilate boundary pixels to close small gaps in line art.
+ * Uses morphological dilation: for each boundary pixel, mark its neighbors
+ * within the given radius as boundaries too. This bridges small gaps where
+ * SVG lines don't quite meet, preventing fill bleeding.
+ *
+ * Mutates the provided ImageData in place.
+ */
+export function dilateBoundaries(
+  imageData: ImageData,
+  radius: number,
+  threshold: number,
+): void {
+  const { width, height, data } = imageData;
+
+  // First pass: identify all boundary pixels
+  const isBoundary = new Uint8Array(width * height);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      const a = data[idx + 3];
+      if (a < 128) continue;
+      const luminance =
+        0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+      if (luminance < threshold) {
+        isBoundary[y * width + x] = 1;
+      }
+    }
+  }
+
+  // Second pass: for each non-boundary pixel, check if any boundary pixel
+  // is within `radius` — if so, mark it as a boundary (darken it)
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (isBoundary[y * width + x]) continue; // Already a boundary
+
+      let foundNearby = false;
+      for (let dy = -radius; dy <= radius && !foundNearby; dy++) {
+        for (let dx = -radius; dx <= radius && !foundNearby; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          // Use diamond/Manhattan distance for faster check
+          if (Math.abs(dx) + Math.abs(dy) > radius) continue;
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+          if (isBoundary[ny * width + nx]) {
+            foundNearby = true;
+          }
+        }
+      }
+
+      if (foundNearby) {
+        // Darken this pixel to make it a boundary
+        const idx = (y * width + x) * 4;
+        data[idx] = 0; // R
+        data[idx + 1] = 0; // G
+        data[idx + 2] = 0; // B
+        data[idx + 3] = 255; // A
+      }
+    }
+  }
 }
 
 /**
@@ -216,6 +286,7 @@ export function scanlineFill(
     tolerance = 32,
     boundaryImageData,
     boundaryThreshold = 200,
+    gapClosingRadius = 0,
   } = options;
   const canvas = ctx.canvas;
   const width = canvas.width;
@@ -230,11 +301,20 @@ export function scanlineFill(
     fillColor,
     tolerance,
     boundaryThreshold,
+    gapClosingRadius,
   });
 
   if (pixelX < 0 || pixelX >= width || pixelY < 0 || pixelY >= height) {
     console.log("[FloodFill] Out of bounds");
     return false;
+  }
+
+  // Apply gap-closing dilation to boundary data if requested
+  if (boundaryImageData && gapClosingRadius > 0) {
+    dilateBoundaries(boundaryImageData, gapClosingRadius, boundaryThreshold);
+    console.log(
+      `[FloodFill] Applied gap-closing dilation with radius ${gapClosingRadius}`,
+    );
   }
 
   // If we have boundary data, check if we clicked on a boundary line

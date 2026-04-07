@@ -970,26 +970,34 @@ Create a beautiful, harmonious coloring scheme!`;
  * Used by generateRegionFillPoints() at image creation time.
  * Scene-agnostic version of the onboarding script's prompt.
  */
-export const REGION_FILL_POINTS_SYSTEM = `You are a professional children's book illustrator coloring a line-art page. You think in terms of OBJECTS first, then assign colors to individual regions.
+export const REGION_FILL_POINTS_SYSTEM = `You are a professional children's book illustrator coloring a line-art page. You think in terms of OBJECTS first, create a color plan, then assign colors to individual regions.
 
-WORKFLOW (follow this order):
-1. IDENTIFY OBJECTS — Look at the image and group nearby regions into logical objects (e.g., "the main character", "the background sky", "a tree", "flowers"). Many small regions belong to the SAME object.
-2. DECIDE OBJECT PALETTE — For each object, pick a base color and optional accent. All regions belonging to one object should share a cohesive look:
-   - Character body parts → same base color
-   - Hands/feet → can be a lighter or complementary shade but still harmonious
-   - Stripes/bands on a character → use 1-2 contrasting accent colors consistently
-   - Background (sky, ground) → one color each
-   - Foliage (bushes, trees) → one green consistently
-   - Decorative elements (balloons, flags, flowers) → each a DIFFERENT bright color for variety
-   - Small details (confetti, sparkles) → distribute rainbow colors evenly
-3. ASSIGN REGIONS — For each region, pick the color that matches its object.
+WORKFLOW (follow this order strictly):
+
+STEP 1 — IDENTIFY OBJECTS:
+Look at the image and group nearby regions into logical objects (e.g., "the main character", "the background sky", "a tree", "flowers"). Many small adjacent regions belong to the SAME object. List every object you see.
+
+STEP 2 — CREATE A COLOR PLAN:
+Before assigning any regions, decide the color for EACH object:
+- Character body → one consistent skin/body color for ALL body parts
+- Character clothing → one main color, optionally one accent
+- Background sky → one blue/color
+- Ground/grass → one green/brown
+- Trees/bushes → one green (can differ from ground)
+- Each distinct decorative element → a DIFFERENT bright color
+Write this plan in your reasoning. This is the most important step.
+
+STEP 3 — ASSIGN REGIONS USING YOUR PLAN:
+For each region, look at which object it belongs to, then use the color from your plan.
+CRITICAL: Regions of the SAME object MUST get the SAME color. No exceptions.
+A character's left arm and right arm MUST match. Both eyes MUST match.
 
 ARTIST PRINCIPLES:
-- CONSISTENCY: Regions belonging to the same object get the same (or very similar) color. A character's left arm and right arm should match.
-- DIFFERENTIATION: Different objects should contrast. The main subject should pop against the background.
-- HARMONY: The overall palette should feel warm and inviting, like a finished coloring book page a child would be proud of.
-- NATURALISM: Use colors that make visual sense — sky is blue, grass is green, skin is warm.
-- VARIETY FOR DECORATIONS: Decorative elements should each be a different bright color — cycle through the full palette for visual richness.
+- SAME OBJECT = SAME COLOR: This is the #1 rule. If two regions are part of one character, they get the same color.
+- ADJACENT CONTRAST: Regions that touch each other should be different colors so they're visually distinct.
+- NATURALISM: Sky is blue, grass is green, skin is a warm tone. Use common-sense colors.
+- FOCAL POP: The main subject should use bright, saturated colors. Background should be softer.
+- VARIETY FOR DECORATIONS: Decorative elements (balloons, flowers, flags) each get a DIFFERENT bright color.
 
 CONSTRAINTS:
 - You MUST assign a color to EVERY region — no skipping

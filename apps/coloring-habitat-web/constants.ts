@@ -59,13 +59,36 @@ export const COLORING_PALETTE = {
     { name: "Dark", hex: "#8B4513" },
     { name: "Deep", hex: "#5D4037" },
   ],
+  // Extended colors — available to AI auto-color and power users.
+  // More natural tones and vivid options for realistic scene coloring.
+  extended: [
+    { name: "Turquoise", hex: "#00ACC1" },
+    { name: "Teal", hex: "#00897B" },
+    { name: "Indigo", hex: "#283593" },
+    { name: "Magenta", hex: "#C2185B" },
+    { name: "Lime", hex: "#7CB342" },
+    { name: "Amber", hex: "#FFB300" },
+    { name: "Crimson", hex: "#B71C1C" },
+    { name: "Olive", hex: "#827717" },
+    { name: "Tan", hex: "#D2B48C" },
+    { name: "Salmon", hex: "#FF8A65" },
+    { name: "Slate", hex: "#546E7A" },
+    { name: "Cream", hex: "#FFF8E1" },
+  ],
 } as const;
 
-// Flat array of all coloring palette colors for easy iteration
+// Flat array of all coloring palette colors for easy iteration (UI palette)
 export const ALL_COLORING_COLORS = [
   ...COLORING_PALETTE.primary,
   ...COLORING_PALETTE.secondary,
   ...COLORING_PALETTE.essentials,
+];
+
+// Extended palette including all colors — used by AI auto-color for richer results
+export const ALL_COLORING_COLORS_EXTENDED = [
+  ...ALL_COLORING_COLORS,
+  ...COLORING_PALETTE.extended,
+  ...COLORING_PALETTE.skinTones,
 ];
 
 // Brush size configuration
@@ -441,6 +464,180 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       "expressive",
       "swirl",
       "swirls",
+    ],
+  },
+  {
+    id: "flowers",
+    name: "Flowers",
+    slug: "flowers",
+    description:
+      "Detailed floral bouquets, botanical illustrations, and garden designs to color",
+    keywords: [
+      "flower coloring pages",
+      "botanical coloring",
+      "floral coloring pages",
+      "garden coloring",
+    ],
+    tags: [
+      "flower",
+      "flowers",
+      "floral",
+      "bouquet",
+      "botanical",
+      "rose",
+      "tulip",
+      "lily",
+      "daisy",
+      "sunflower",
+    ],
+  },
+  {
+    id: "ocean",
+    name: "Ocean & Marine",
+    slug: "ocean",
+    description:
+      "Underwater scenes, coral reefs, sea creatures, and coastal views to color",
+    keywords: [
+      "ocean coloring pages",
+      "underwater coloring",
+      "marine life coloring",
+      "sea creature coloring",
+    ],
+    tags: [
+      "ocean",
+      "sea",
+      "underwater",
+      "marine",
+      "coral",
+      "reef",
+      "fish",
+      "whale",
+      "dolphin",
+      "seahorse",
+      "jellyfish",
+    ],
+  },
+  {
+    id: "patterns",
+    name: "Patterns & Tiles",
+    slug: "patterns",
+    description:
+      "Repeating patterns, Islamic geometry, tile designs, and textile motifs to color",
+    keywords: [
+      "pattern coloring pages",
+      "tile coloring pages",
+      "decorative pattern coloring",
+      "textile coloring",
+    ],
+    tags: [
+      "pattern",
+      "patterns",
+      "tile",
+      "tiles",
+      "textile",
+      "repeating",
+      "ornamental",
+      "decorative",
+      "motif",
+    ],
+  },
+  {
+    id: "wildlife",
+    name: "Wildlife",
+    slug: "wildlife",
+    description:
+      "Detailed wildlife portraits and safari scenes featuring majestic animals",
+    keywords: [
+      "wildlife coloring pages",
+      "safari coloring",
+      "wild animal coloring",
+      "nature wildlife coloring",
+    ],
+    tags: [
+      "wildlife",
+      "safari",
+      "wolf",
+      "bear",
+      "eagle",
+      "lion",
+      "tiger",
+      "elephant",
+      "fox",
+      "deer",
+      "hawk",
+    ],
+  },
+  {
+    id: "mythology",
+    name: "Mythology",
+    slug: "mythology",
+    description:
+      "Gods, goddesses, myths, and legendary creatures from world cultures",
+    keywords: [
+      "mythology coloring pages",
+      "mythical coloring",
+      "greek mythology coloring",
+      "legendary creatures coloring",
+    ],
+    tags: [
+      "mythology",
+      "mythical",
+      "greek",
+      "norse",
+      "legend",
+      "god",
+      "goddess",
+      "celtic",
+      "dragon",
+      "phoenix",
+    ],
+  },
+  {
+    id: "steampunk",
+    name: "Steampunk",
+    slug: "steampunk",
+    description:
+      "Victorian-era mechanical designs, gears, and retrofuturistic scenes to color",
+    keywords: [
+      "steampunk coloring pages",
+      "mechanical coloring",
+      "clockwork coloring pages",
+      "victorian coloring",
+    ],
+    tags: [
+      "steampunk",
+      "mechanical",
+      "gears",
+      "clockwork",
+      "victorian",
+      "industrial",
+      "retro",
+      "cog",
+    ],
+  },
+  {
+    id: "food",
+    name: "Food & Drink",
+    slug: "food",
+    description:
+      "Detailed food illustrations, kitchen scenes, and culinary art to color",
+    keywords: [
+      "food coloring pages",
+      "kitchen coloring",
+      "culinary coloring pages",
+      "dessert coloring",
+    ],
+    tags: [
+      "food",
+      "drink",
+      "kitchen",
+      "cooking",
+      "cake",
+      "coffee",
+      "fruit",
+      "dessert",
+      "baking",
+      "tea",
     ],
   },
 ];

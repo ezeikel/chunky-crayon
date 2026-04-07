@@ -10,7 +10,12 @@
 export type { BrushType, FillPattern, PointerInputType } from "./types";
 
 // Canvas algorithms
-export { hexToRGBA, floodFill, scanlineFill } from "./floodFill";
+export {
+  hexToRGBA,
+  floodFill,
+  scanlineFill,
+  dilateBoundaries,
+} from "./floodFill";
 export { drawTexturedStroke } from "./brushTextures";
 export { createFillPattern, getPatternFillColor } from "./fillPatterns";
 

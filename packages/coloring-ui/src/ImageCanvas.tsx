@@ -577,7 +577,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           boundaryCanvas.height,
         );
 
-        // Perform the fill
+        // Perform the fill (gap closing bridges small breaks in SVG line art)
         const fillColor = hexToRGBA(color);
         const filled = scanlineFill(drawingCtx, {
           x: scaledX,
@@ -586,6 +586,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           tolerance: 48,
           boundaryImageData,
           boundaryThreshold: 180,
+          gapClosingRadius: 2,
         });
 
         if (filled) {
@@ -1384,6 +1385,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           tolerance: 48,
           boundaryImageData,
           boundaryThreshold: 180,
+          gapClosingRadius: 2,
         });
       } else {
         // Pattern fill - use a two-step process:
@@ -1410,6 +1412,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           tolerance: 48,
           boundaryImageData,
           boundaryThreshold: 180,
+          gapClosingRadius: 2,
         });
 
         if (filled) {
