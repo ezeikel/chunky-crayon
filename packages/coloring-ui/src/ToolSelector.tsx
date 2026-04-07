@@ -119,13 +119,30 @@ const baseTools: ToolConfig[] = [
   },
 ];
 
+// Kids variant: simplified tool set
+const KIDS_TOOL_IDS = new Set([
+  "fill",
+  "crayon",
+  "marker",
+  "rainbow",
+  "eraser",
+  "sticker",
+  "magic-auto",
+]);
+
 const ToolSelector = ({
   className,
   onStickerToolSelect,
 }: ToolSelectorProps) => {
-  const { activeTool, setActiveTool, brushType, setBrushType } =
+  const { activeTool, setActiveTool, brushType, setBrushType, variant } =
     useColoringContext();
   const { playSound } = useSound();
+
+  // Filter tools based on variant
+  const tools =
+    variant === "kids"
+      ? baseTools.filter((t) => KIDS_TOOL_IDS.has(t.id))
+      : baseTools;
 
   const handleToolSelect = (toolId: ToolConfig["id"]) => {
     switch (toolId) {
@@ -203,7 +220,7 @@ const ToolSelector = ({
         className,
       )}
     >
-      {baseTools.map(({ id, label, shortLabel, icon: Icon, isMagic }) => {
+      {tools.map(({ id, label, shortLabel, icon: Icon, isMagic }) => {
         const isActive = isToolActive(id);
 
         return (

@@ -10,9 +10,10 @@ type BrushSizeSelectorProps = {
 };
 
 const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
-  const { brushSize, setBrushSize, selectedColor, brushType } =
+  const { brushSize, setBrushSize, selectedColor, brushType, variant } =
     useColoringContext();
   const { playSound } = useSound();
+  const isKids = variant === "kids";
 
   const sizes = Object.entries(BRUSH_SIZES) as [
     BrushSize,
@@ -23,6 +24,8 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
     <div
       className={cn(
         "flex items-center gap-2 p-2 rounded-lg bg-white/90 backdrop-blur-sm",
+        // Kids: bigger gap between buttons for easier tapping
+        { "gap-3": isKids },
         className,
       )}
     >
@@ -39,8 +42,10 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
               playSound("tap");
             }}
             className={cn(
-              "flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150",
+              "flex items-center justify-center rounded-lg transition-all duration-150",
               "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
+              // Kids: larger touch targets (48px min per NN/g research)
+              isKids ? "size-12 sm:size-14" : "size-10 sm:size-12",
               {
                 "bg-gray-200 ring-2 ring-gray-400": isSelected,
               },

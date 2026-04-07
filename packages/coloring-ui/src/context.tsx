@@ -19,6 +19,9 @@ import type {
 } from "./types";
 import type { SerializableCanvasAction } from "./canvasActions";
 
+/** Controls which feature set is exposed in the UI */
+export type ColoringVariant = "kids" | "adult";
+
 // Zoom/Pan constants
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;
@@ -92,12 +95,17 @@ type ColoringContextArgs = {
   // Progress state
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: Dispatch<SetStateAction<boolean>>;
+
+  // Variant — controls which feature set is exposed
+  variant: ColoringVariant;
 };
 
 type ColoringContextProviderProps = {
   children: React.ReactNode;
   /** localStorage key prefix for persisting audio settings (e.g. "chunky-crayon" or "coloring-habitat") */
   storagePrefix?: string;
+  /** Controls which feature set is exposed: 'kids' (simplified) or 'adult' (full power) */
+  variant?: ColoringVariant;
 };
 
 const MAX_HISTORY_SIZE = 20;
@@ -142,11 +150,13 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setIsAmbientMuted: () => {},
   hasUnsavedChanges: false,
   setHasUnsavedChanges: () => {},
+  variant: "adult",
 });
 
 export const ColoringContextProvider = ({
   children,
   storagePrefix = "coloring",
+  variant = "adult",
 }: ColoringContextProviderProps) => {
   // Color state
   const [selectedColor, setSelectedColor] = useState("#212121"); // Default to black
@@ -331,6 +341,7 @@ export const ColoringContextProvider = ({
       setIsAmbientMuted,
       hasUnsavedChanges,
       setHasUnsavedChanges,
+      variant,
     }),
     [
       selectedColor,
@@ -359,6 +370,7 @@ export const ColoringContextProvider = ({
       isSfxMuted,
       isAmbientMuted,
       hasUnsavedChanges,
+      variant,
     ],
   );
 

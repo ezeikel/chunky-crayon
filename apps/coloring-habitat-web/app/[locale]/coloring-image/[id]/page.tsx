@@ -119,7 +119,10 @@ const ColoringImagePage = async ({ params }: Props) => {
           />
 
           {/* Coloring canvas with toolbar and sidebars */}
-          <ColoringContextProvider>
+          <ColoringContextProvider
+            variant="adult"
+            storagePrefix="coloring-habitat"
+          >
             <ColoringPageContent
               coloringImage={image}
               isAuthenticated={isAuthenticated}

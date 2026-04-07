@@ -65,7 +65,7 @@ const COLLAPSED_HEIGHT = 180; // Enough for handle + tools + colors
 const EXPANDED_HEIGHT = 420; // Full height with all sections
 
 // All tools in a single scrollable row (matching mobile pattern)
-const tools: ToolConfig[] = [
+const allTools: ToolConfig[] = [
   { id: "crayon", label: "Crayon", icon: faPencil },
   { id: "marker", label: "Marker", icon: faPaintbrush },
   { id: "pencil", label: "Pencil", icon: faPencil },
@@ -78,6 +78,17 @@ const tools: ToolConfig[] = [
   { id: "sticker", label: "Sticker", icon: faStar },
   { id: "magic-reveal", label: "Magic", icon: faBrush, isMagic: true },
   { id: "magic-auto", label: "Auto", icon: faFillDrip, isMagic: true },
+];
+
+// Kids variant: simplified tool set — big, easy to understand
+const KIDS_TOOL_IDS: Tool[] = [
+  "fill",
+  "crayon",
+  "marker",
+  "rainbow",
+  "eraser",
+  "sticker",
+  "magic-auto",
 ];
 
 // Pattern options for fill tool
@@ -179,10 +190,17 @@ const MobileColoringToolbar = ({
     redoStack,
     undo: contextUndo,
     redo: contextRedo,
+    variant,
   } = useColoringContext();
 
-  // Show pattern selector only when fill tool is active
-  const showPatternSelector = activeTool === "fill";
+  // Filter tools based on variant
+  const tools =
+    variant === "kids"
+      ? allTools.filter((t) => KIDS_TOOL_IDS.includes(t.id))
+      : allTools;
+
+  // Show pattern selector only when fill tool is active (adults only)
+  const showPatternSelector = activeTool === "fill" && variant === "adult";
 
   // Calculate current height based on expanded state
   const sheetHeight = isExpanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT;

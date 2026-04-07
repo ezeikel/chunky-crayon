@@ -9,7 +9,7 @@ import PixelTracker from '@/components/PixelTracker/PixelTracker';
 
 const Providers = ({ children }: { children: React.ReactNode }) => (
   <PlausibleProvider domain="chunkycrayon.com" trackOutboundLinks>
-    <ColoringContextProvider>
+    <ColoringContextProvider variant="kids" storagePrefix="chunky-crayon">
       <SessionProvider>
         <ParentalGateProvider>
           <UserIdentify />

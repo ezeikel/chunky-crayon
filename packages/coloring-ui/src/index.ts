@@ -30,6 +30,7 @@ export {
   ColoringContextProvider,
   useColoringContext,
   type CanvasAction,
+  type ColoringVariant,
 } from "./context";
 
 // Canvas action types
