@@ -158,7 +158,9 @@
       "title": "Link erstellt!",
       "subtitle": "Teile diesen Link mit Familie und Freunden"
     },
-    "done": "Fertig"
+    "done": "Fertig",
+    "error": "Freigabelink konnte nicht erstellt werden",
+    "socialShare": "In sozialen Medien teilen"
   },
   "saveToGallery": {
     "idle": "In Galerie speichern",

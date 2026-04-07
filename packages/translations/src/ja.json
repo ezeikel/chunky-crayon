@@ -158,7 +158,9 @@
       "title": "リンクができたよ！",
       "subtitle": "家族やお友だちにこのリンクを送ってね"
     },
-    "done": "完了"
+    "done": "完了",
+    "error": "共有リンクの作成に失敗しました",
+    "socialShare": "SNSで共有"
   },
   "saveToGallery": {
     "idle": "ギャラリーに保存",

@@ -158,7 +158,9 @@
       "title": "¡Enlace creado!",
       "subtitle": "Comparte este enlace con familia y amigos"
     },
-    "done": "Listo"
+    "done": "Listo",
+    "error": "No se pudo crear el enlace para compartir",
+    "socialShare": "Compartir en redes sociales"
   },
   "saveToGallery": {
     "idle": "Guardar en la galería",

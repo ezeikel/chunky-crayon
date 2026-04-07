@@ -158,7 +158,9 @@
       "title": "링크가 만들어졌어요!",
       "subtitle": "가족과 친구에게 이 링크를 공유해요"
     },
-    "done": "완료"
+    "done": "완료",
+    "error": "공유 링크 생성 실패",
+    "socialShare": "소셜 미디어에 공유"
   },
   "saveToGallery": {
     "idle": "갤러리에 저장",

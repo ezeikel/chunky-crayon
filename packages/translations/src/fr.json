@@ -158,7 +158,9 @@
       "title": "Lien créé !",
       "subtitle": "Partagez ce lien avec votre famille et vos amis"
     },
-    "done": "Terminé"
+    "done": "Terminé",
+    "error": "Échec de la création du lien de partage",
+    "socialShare": "Partager sur les réseaux sociaux"
   },
   "saveToGallery": {
     "idle": "Enregistrer dans la galerie",
