@@ -11,6 +11,7 @@ import {
   faCheck,
   faCloudArrowUp,
 } from "@fortawesome/free-solid-svg-icons";
+import { useTranslations } from "next-intl";
 import useUser from "@/hooks/useUser";
 import { trackEvent } from "@/utils/analytics-client";
 import { TRACKING_EVENTS } from "@/constants";
@@ -25,6 +26,9 @@ type ImageInputProps = {
 };
 
 const ImageInput = ({ className }: ImageInputProps) => {
+  const t = useTranslations("createForm.imageInput");
+  const tf = useTranslations("createForm.textInput");
+
   const {
     canGenerate,
     blockedReason,
@@ -131,42 +135,42 @@ const ImageInput = ({ className }: ImageInputProps) => {
     if (canGenerate) {
       if (isGuest) {
         return {
-          text: `Create my page (${remainingGenerations} free left)`,
+          text: tf("createPageFree", { count: remainingGenerations }),
           isSubmit: true,
         };
       }
-      return { text: "Create my page", isSubmit: true };
+      return { text: tf("createPage"), isSubmit: true };
     }
 
     if (blockedReason === "guest_limit_reached") {
       return {
-        text: "Sign up for free",
+        text: tf("signUpFree"),
         action: () => {
           trackEvent(TRACKING_EVENTS.GUEST_SIGNUP_CLICKED, {
             location: "image_input",
           });
           handleAuthAction("signin");
         },
-        subtext: "Create an account to unlock more creations",
+        subtext: tf("signUpSubtext"),
         isSubmit: false,
       };
     }
 
     if (blockedReason === "no_credits") {
       return {
-        text: hasActiveSubscription ? "Buy credits" : "View plans",
+        text: hasActiveSubscription ? tf("buyCredits") : tf("viewPlans"),
         action: () => handleAuthAction("billing"),
         subtext: hasActiveSubscription
-          ? "Get more credits to keep creating"
-          : "Subscribe for unlimited creativity",
+          ? tf("buyCreditsSubtext")
+          : tf("subscribeSubtext"),
         isSubmit: false,
       };
     }
 
     return {
-      text: "Get started",
+      text: tf("getStarted"),
       action: () => handleAuthAction("signin"),
-      subtext: "Sign in to start creating",
+      subtext: tf("signInSubtext"),
       isSubmit: false,
     };
   };
@@ -176,11 +180,10 @@ const ImageInput = ({ className }: ImageInputProps) => {
   // Error state
   if (state === "error") {
     const errorMessages: Record<string, string> = {
-      file_too_large: "Image is too large. Please use an image under 10MB.",
-      invalid_type:
-        "Invalid image format. Please use JPEG, PNG, WebP, or HEIC.",
-      processing_failed: "Couldn't process the image. Please try again.",
-      camera_failed: "Camera failed. Please try uploading a photo instead.",
+      file_too_large: t("errors.fileTooLarge"),
+      invalid_type: t("errors.invalidType"),
+      processing_failed: t("errors.processingFailed"),
+      camera_failed: t("errors.cameraFailed"),
     };
 
     return (
@@ -195,7 +198,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
         </p>
         <Button onClick={handleRetry} variant="outline">
           <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
-          Try again
+          {t("tryAgain")}
         </Button>
       </div>
     );
@@ -215,9 +218,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           className="text-5xl animate-spin text-primary"
         />
         <p className="text-center text-foreground font-semibold">
-          {state === "capturing"
-            ? "Processing your photo..."
-            : "Analyzing the image..."}
+          {state === "capturing" ? t("processingPhoto") : t("analyzingImage")}
         </p>
       </div>
     );
@@ -233,7 +234,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
         aria-labelledby="image-mode-tab"
       >
         <p className="text-center text-foreground font-semibold">
-          Great picture!
+          {t("greatPicture")}
         </p>
 
         <div className="relative w-48 h-48 rounded-2xl overflow-hidden shadow-lg border-2 border-primary">
@@ -248,11 +249,11 @@ const ImageInput = ({ className }: ImageInputProps) => {
         <div className="flex gap-3">
           <Button onClick={clearImage} variant="outline">
             <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
-            Pick another
+            {t("pickAnother")}
           </Button>
           <Button onClick={processImage}>
             <FontAwesomeIcon icon={faCheck} className="mr-2" />
-            Use this
+            {t("useThis")}
           </Button>
         </div>
       </div>
@@ -284,7 +285,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
             )}
             <p className="text-center text-foreground text-base leading-relaxed">
               {isChildDrawing ? "✏️ " : "📸 "}
-              <span className="font-bold">I see:</span> {aiDescription}
+              <span className="font-bold">{t("iSee")}</span> {aiDescription}
             </p>
           </div>
         </div>
@@ -293,7 +294,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           {buttonConfig.isSubmit ? (
             <SubmitButton
               ref={submitButtonRef}
-              text="Create my coloring page"
+              text={t("createColoringPage")}
               className="text-lg px-8 py-6 rounded-lg"
               disabled={!isDescriptionReady}
             />
@@ -318,7 +319,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
             onClick={handleRetry}
             className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
           >
-            Not quite right? Try again
+            {t("notQuiteRight")}
           </button>
         </div>
       </div>
@@ -335,12 +336,12 @@ const ImageInput = ({ className }: ImageInputProps) => {
     >
       <p className="text-center text-foreground font-semibold text-lg">
         {canInteract
-          ? "Take a photo or upload an image"
+          ? t("takeOrUpload")
           : blockedReason === "guest_limit_reached"
-            ? "You've used your free creations. Sign up to continue!"
+            ? t("guestLimitReached")
             : blockedReason === "no_credits"
-              ? "You've run out of credits."
-              : "Sign in to upload"}
+              ? t("noCredits")
+              : t("signInToUpload")}
       </p>
 
       {/* Hidden file inputs */}
@@ -380,7 +381,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           aria-label="Take a photo"
         >
           <FontAwesomeIcon icon={faCamera} className="text-3xl" />
-          <span className="text-sm font-bold">Camera</span>
+          <span className="text-sm font-bold">{t("camera")}</span>
         </button>
 
         <button
@@ -399,7 +400,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           aria-label="Upload an image"
         >
           <FontAwesomeIcon icon={faImages} className="text-3xl" />
-          <span className="text-sm font-bold">Upload</span>
+          <span className="text-sm font-bold">{t("upload")}</span>
         </button>
       </div>
 
@@ -426,13 +427,13 @@ const ImageInput = ({ className }: ImageInputProps) => {
             )}
           />
           <p className="text-sm text-muted-foreground text-center">
-            {isDragging ? "Drop it here!" : "or drag and drop an image"}
+            {isDragging ? t("dropHere") : t("dragAndDrop")}
           </p>
         </div>
       )}
 
       <p className="text-sm text-muted-foreground text-center">
-        Share a drawing, photo, or any image to transform
+        {t("shareImage")}
       </p>
 
       {!canInteract && (

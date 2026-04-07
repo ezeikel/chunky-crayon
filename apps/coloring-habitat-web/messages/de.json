@@ -283,6 +283,58 @@
       "subscribeSubtext": "Abonniere für unbegrenzte Kreativität",
       "getStarted": "Loslegen",
       "signInSubtext": "Melde dich an, um zu starten"
+    },
+    "voiceInput": {
+      "tapToDescribe": "Tippe, um deine Seite zu beschreiben",
+      "maxSeconds": "Max. {seconds} Sekunden",
+      "guestLimitReached": "Du hast deine kostenlosen Kreationen verbraucht. Registriere dich, um weiterzumachen!",
+      "noCredits": "Deine Credits sind aufgebraucht.",
+      "signInToRecord": "Melde dich an, um aufzunehmen",
+      "listening": "Hört zu...",
+      "allDone": "Fertig? Stoppt in {seconds}s...",
+      "cancel": "Abbrechen",
+      "imDone": "Fertig",
+      "doneTalking": "Fertig gesprochen",
+      "notSupported": "Sprachaufnahme wird in diesem Browser nicht unterstützt.",
+      "trySafari": "Probiere Chrome oder Safari für das beste Erlebnis.",
+      "tryAgain": "Nochmal versuchen",
+      "gettingMicReady": "Mikrofon wird vorbereitet...",
+      "understanding": "Verstehe, was du gesagt hast...",
+      "createColoringPage": "Meine Ausmalseite erstellen",
+      "notQuiteRight": "Nicht ganz richtig? Nochmal versuchen",
+      "errors": {
+        "permissionDenied": "Mikrofonzugriff wurde verweigert. Bitte erlaube den Zugriff in deinen Browsereinstellungen.",
+        "notSupported": "Sprachaufnahme wird in diesem Browser nicht unterstützt.",
+        "transcriptionFailed": "Die Aufnahme konnte nicht verstanden werden. Bitte versuche es erneut.",
+        "recordingFailed": "Aufnahme fehlgeschlagen. Bitte versuche es erneut.",
+        "timeout": "Aufnahme hat das Zeitlimit überschritten. Bitte versuche es erneut."
+      }
+    },
+    "imageInput": {
+      "takeOrUpload": "Foto aufnehmen oder Bild hochladen",
+      "guestLimitReached": "Du hast deine kostenlosen Kreationen verbraucht. Registriere dich!",
+      "noCredits": "Deine Credits sind aufgebraucht.",
+      "signInToUpload": "Melde dich an zum Hochladen",
+      "camera": "Kamera",
+      "upload": "Hochladen",
+      "dragAndDrop": "oder Bild hierher ziehen",
+      "dropHere": "Hier ablegen!",
+      "shareImage": "Teile eine Zeichnung, ein Foto oder ein beliebiges Bild",
+      "greatPicture": "Tolles Bild!",
+      "pickAnother": "Anderes wählen",
+      "useThis": "Dieses verwenden",
+      "processingPhoto": "Dein Foto wird verarbeitet...",
+      "analyzingImage": "Bild wird analysiert...",
+      "iSee": "Ich sehe:",
+      "createColoringPage": "Meine Ausmalseite erstellen",
+      "notQuiteRight": "Nicht ganz richtig? Nochmal versuchen",
+      "tryAgain": "Nochmal versuchen",
+      "errors": {
+        "fileTooLarge": "Bild ist zu groß. Bitte verwende ein Bild unter 10 MB.",
+        "invalidType": "Ungültiges Bildformat. Bitte verwende JPEG, PNG, WebP oder HEIC.",
+        "processingFailed": "Das Bild konnte nicht verarbeitet werden. Bitte versuche es erneut.",
+        "cameraFailed": "Kamera fehlgeschlagen. Bitte versuche stattdessen ein Foto hochzuladen."
+      }
     }
   }
 }

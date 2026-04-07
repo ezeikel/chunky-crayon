@@ -283,6 +283,58 @@
       "subscribeSubtext": "Suscríbete para creatividad ilimitada",
       "getStarted": "Comenzar",
       "signInSubtext": "Inicia sesión para comenzar"
+    },
+    "voiceInput": {
+      "tapToDescribe": "Toca para describir tu página",
+      "maxSeconds": "Máx. {seconds} segundos",
+      "guestLimitReached": "Has usado tus creaciones gratuitas. ¡Regístrate para continuar!",
+      "noCredits": "Te has quedado sin créditos.",
+      "signInToRecord": "Inicia sesión para grabar",
+      "listening": "Escuchando...",
+      "allDone": "¿Terminaste? Deteniendo en {seconds}s...",
+      "cancel": "Cancelar",
+      "imDone": "Listo",
+      "doneTalking": "Terminé de hablar",
+      "notSupported": "La grabación de voz no es compatible con este navegador.",
+      "trySafari": "Prueba Chrome o Safari para la mejor experiencia.",
+      "tryAgain": "Intentar de nuevo",
+      "gettingMicReady": "Preparando el micrófono...",
+      "understanding": "Entendiendo lo que dijiste...",
+      "createColoringPage": "Crear mi página para colorear",
+      "notQuiteRight": "¿No es correcto? Intentar de nuevo",
+      "errors": {
+        "permissionDenied": "Se denegó el acceso al micrófono. Por favor, permite el acceso en la configuración de tu navegador.",
+        "notSupported": "La grabación de voz no es compatible con este navegador.",
+        "transcriptionFailed": "No se pudo entender la grabación. Por favor, inténtalo de nuevo.",
+        "recordingFailed": "La grabación falló. Por favor, inténtalo de nuevo.",
+        "timeout": "La grabación expiró. Por favor, inténtalo de nuevo."
+      }
+    },
+    "imageInput": {
+      "takeOrUpload": "Toma una foto o sube una imagen",
+      "guestLimitReached": "Has usado tus creaciones gratuitas. ¡Regístrate para continuar!",
+      "noCredits": "Te has quedado sin créditos.",
+      "signInToUpload": "Inicia sesión para subir",
+      "camera": "Cámara",
+      "upload": "Subir",
+      "dragAndDrop": "o arrastra y suelta una imagen",
+      "dropHere": "¡Suéltala aquí!",
+      "shareImage": "Comparte un dibujo, foto o cualquier imagen para transformar",
+      "greatPicture": "¡Buena imagen!",
+      "pickAnother": "Elegir otra",
+      "useThis": "Usar esta",
+      "processingPhoto": "Procesando tu foto...",
+      "analyzingImage": "Analizando la imagen...",
+      "iSee": "Veo:",
+      "createColoringPage": "Crear mi página para colorear",
+      "notQuiteRight": "¿No es correcto? Intentar de nuevo",
+      "tryAgain": "Intentar de nuevo",
+      "errors": {
+        "fileTooLarge": "La imagen es demasiado grande. Usa una imagen de menos de 10 MB.",
+        "invalidType": "Formato de imagen no válido. Usa JPEG, PNG, WebP o HEIC.",
+        "processingFailed": "No se pudo procesar la imagen. Por favor, inténtalo de nuevo.",
+        "cameraFailed": "La cámara falló. Intenta subir una foto en su lugar."
+      }
     }
   }
 }

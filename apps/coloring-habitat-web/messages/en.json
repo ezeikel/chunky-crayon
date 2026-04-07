@@ -283,6 +283,58 @@
       "subscribeSubtext": "Subscribe for unlimited creativity",
       "getStarted": "Get started",
       "signInSubtext": "Sign in to start creating"
+    },
+    "voiceInput": {
+      "tapToDescribe": "Tap to describe your page",
+      "maxSeconds": "Max {seconds} seconds",
+      "guestLimitReached": "You've used your free creations. Sign up to continue!",
+      "noCredits": "You've run out of credits.",
+      "signInToRecord": "Sign in to record",
+      "listening": "Listening...",
+      "allDone": "All done? Stopping in {seconds}s...",
+      "cancel": "Cancel",
+      "imDone": "I'm done",
+      "doneTalking": "Done talking",
+      "notSupported": "Voice recording is not supported in this browser.",
+      "trySafari": "Try Chrome or Safari for the best experience.",
+      "tryAgain": "Try again",
+      "gettingMicReady": "Getting microphone ready...",
+      "understanding": "Understanding what you said...",
+      "createColoringPage": "Create my coloring page",
+      "notQuiteRight": "Not quite right? Try again",
+      "errors": {
+        "permissionDenied": "Microphone access was denied. Please allow access in your browser settings.",
+        "notSupported": "Voice recording is not supported in this browser.",
+        "transcriptionFailed": "Couldn't understand the recording. Please try again.",
+        "recordingFailed": "Recording failed. Please try again.",
+        "timeout": "Recording timed out. Please try again."
+      }
+    },
+    "imageInput": {
+      "takeOrUpload": "Take a photo or upload an image",
+      "guestLimitReached": "You've used your free creations. Sign up to continue!",
+      "noCredits": "You've run out of credits.",
+      "signInToUpload": "Sign in to upload",
+      "camera": "Camera",
+      "upload": "Upload",
+      "dragAndDrop": "or drag and drop an image",
+      "dropHere": "Drop it here!",
+      "shareImage": "Share a drawing, photo, or any image to transform",
+      "greatPicture": "Great picture!",
+      "pickAnother": "Pick another",
+      "useThis": "Use this",
+      "processingPhoto": "Processing your photo...",
+      "analyzingImage": "Analyzing the image...",
+      "iSee": "I see:",
+      "createColoringPage": "Create my coloring page",
+      "notQuiteRight": "Not quite right? Try again",
+      "tryAgain": "Try again",
+      "errors": {
+        "fileTooLarge": "Image is too large. Please use an image under 10MB.",
+        "invalidType": "Invalid image format. Please use JPEG, PNG, WebP, or HEIC.",
+        "processingFailed": "Couldn't process the image. Please try again.",
+        "cameraFailed": "Camera failed. Please try uploading a photo instead."
+      }
     }
   }
 }

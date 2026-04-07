@@ -283,6 +283,58 @@
       "subscribeSubtext": "無制限のクリエイティビティのために登録",
       "getStarted": "始める",
       "signInSubtext": "ログインして始める"
+    },
+    "voiceInput": {
+      "tapToDescribe": "タップしてページを説明してください",
+      "maxSeconds": "最大{seconds}秒",
+      "guestLimitReached": "無料作成分を使い切りました。登録して続けましょう！",
+      "noCredits": "クレジットが不足しています。",
+      "signInToRecord": "ログインして録音する",
+      "listening": "聞いています...",
+      "allDone": "完了ですか？{seconds}秒後に停止します...",
+      "cancel": "キャンセル",
+      "imDone": "完了",
+      "doneTalking": "話し終わりました",
+      "notSupported": "このブラウザでは音声録音がサポートされていません。",
+      "trySafari": "ChromeまたはSafariをお試しください。",
+      "tryAgain": "もう一度試す",
+      "gettingMicReady": "マイクを準備中...",
+      "understanding": "おっしゃったことを理解中...",
+      "createColoringPage": "ぬりえページを作成",
+      "notQuiteRight": "違いましたか？もう一度試す",
+      "errors": {
+        "permissionDenied": "マイクへのアクセスが拒否されました。ブラウザの設定でアクセスを許可してください。",
+        "notSupported": "このブラウザでは音声録音がサポートされていません。",
+        "transcriptionFailed": "録音を理解できませんでした。もう一度お試しください。",
+        "recordingFailed": "録音に失敗しました。もう一度お試しください。",
+        "timeout": "録音がタイムアウトしました。もう一度お試しください。"
+      }
+    },
+    "imageInput": {
+      "takeOrUpload": "写真を撮るか画像をアップロード",
+      "guestLimitReached": "無料作成分を使い切りました。登録して続けましょう！",
+      "noCredits": "クレジットが不足しています。",
+      "signInToUpload": "ログインしてアップロード",
+      "camera": "カメラ",
+      "upload": "アップロード",
+      "dragAndDrop": "または画像をドラッグ＆ドロップ",
+      "dropHere": "ここにドロップ！",
+      "shareImage": "絵、写真、または任意の画像を共有して変換",
+      "greatPicture": "素敵な写真です！",
+      "pickAnother": "別の画像を選ぶ",
+      "useThis": "これを使う",
+      "processingPhoto": "写真を処理中...",
+      "analyzingImage": "画像を分析中...",
+      "iSee": "見えるもの：",
+      "createColoringPage": "ぬりえページを作成",
+      "notQuiteRight": "違いましたか？もう一度試す",
+      "tryAgain": "もう一度試す",
+      "errors": {
+        "fileTooLarge": "画像が大きすぎます。10MB以下の画像を使用してください。",
+        "invalidType": "無効な画像形式です。JPEG、PNG、WebP、またはHEICを使用してください。",
+        "processingFailed": "画像を処理できませんでした。もう一度お試しください。",
+        "cameraFailed": "カメラが失敗しました。写真をアップロードしてみてください。"
+      }
     }
   }
 }

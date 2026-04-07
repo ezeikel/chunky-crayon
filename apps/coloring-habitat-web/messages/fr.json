@@ -283,6 +283,58 @@
       "subscribeSubtext": "Abonnez-vous pour une créativité illimitée",
       "getStarted": "Commencer",
       "signInSubtext": "Connectez-vous pour commencer"
+    },
+    "voiceInput": {
+      "tapToDescribe": "Appuyez pour décrire votre page",
+      "maxSeconds": "Max {seconds} secondes",
+      "guestLimitReached": "Vous avez utilisé vos créations gratuites. Inscrivez-vous pour continuer !",
+      "noCredits": "Vous n'avez plus de crédits.",
+      "signInToRecord": "Connectez-vous pour enregistrer",
+      "listening": "Écoute en cours...",
+      "allDone": "Terminé ? Arrêt dans {seconds}s...",
+      "cancel": "Annuler",
+      "imDone": "Terminé",
+      "doneTalking": "J'ai fini de parler",
+      "notSupported": "L'enregistrement vocal n'est pas pris en charge dans ce navigateur.",
+      "trySafari": "Essayez Chrome ou Safari pour une meilleure expérience.",
+      "tryAgain": "Réessayer",
+      "gettingMicReady": "Préparation du microphone...",
+      "understanding": "Compréhension de ce que vous avez dit...",
+      "createColoringPage": "Créer ma page de coloriage",
+      "notQuiteRight": "Pas tout à fait correct ? Réessayer",
+      "errors": {
+        "permissionDenied": "L'accès au microphone a été refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.",
+        "notSupported": "L'enregistrement vocal n'est pas pris en charge dans ce navigateur.",
+        "transcriptionFailed": "Impossible de comprendre l'enregistrement. Veuillez réessayer.",
+        "recordingFailed": "L'enregistrement a échoué. Veuillez réessayer.",
+        "timeout": "L'enregistrement a expiré. Veuillez réessayer."
+      }
+    },
+    "imageInput": {
+      "takeOrUpload": "Prenez une photo ou importez une image",
+      "guestLimitReached": "Vous avez utilisé vos créations gratuites. Inscrivez-vous !",
+      "noCredits": "Vous n'avez plus de crédits.",
+      "signInToUpload": "Connectez-vous pour importer",
+      "camera": "Appareil photo",
+      "upload": "Importer",
+      "dragAndDrop": "ou glissez-déposez une image",
+      "dropHere": "Déposez ici !",
+      "shareImage": "Partagez un dessin, une photo ou toute image à transformer",
+      "greatPicture": "Belle image !",
+      "pickAnother": "En choisir une autre",
+      "useThis": "Utiliser celle-ci",
+      "processingPhoto": "Traitement de votre photo...",
+      "analyzingImage": "Analyse de l'image...",
+      "iSee": "Je vois :",
+      "createColoringPage": "Créer ma page de coloriage",
+      "notQuiteRight": "Pas tout à fait correct ? Réessayer",
+      "tryAgain": "Réessayer",
+      "errors": {
+        "fileTooLarge": "Image trop volumineuse. Veuillez utiliser une image de moins de 10 Mo.",
+        "invalidType": "Format d'image invalide. Veuillez utiliser JPEG, PNG, WebP ou HEIC.",
+        "processingFailed": "Impossible de traiter l'image. Veuillez réessayer.",
+        "cameraFailed": "L'appareil photo a échoué. Veuillez essayer d'importer une photo."
+      }
     }
   }
 }

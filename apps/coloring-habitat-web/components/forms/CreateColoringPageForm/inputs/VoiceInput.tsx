@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMicrophone,
@@ -78,6 +79,9 @@ const CountdownTimer = ({
 };
 
 const VoiceInput = ({ className }: VoiceInputProps) => {
+  const t = useTranslations("createForm.voiceInput");
+  const tf = useTranslations("createForm.textInput");
+
   const {
     canGenerate,
     blockedReason,
@@ -164,42 +168,42 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     if (canGenerate) {
       if (isGuest) {
         return {
-          text: `Create my page (${remainingGenerations} free left)`,
+          text: tf("createPageFree", { count: remainingGenerations }),
           isSubmit: true,
         };
       }
-      return { text: "Create my page", isSubmit: true };
+      return { text: tf("createPage"), isSubmit: true };
     }
 
     if (blockedReason === "guest_limit_reached") {
       return {
-        text: "Sign up for free",
+        text: tf("signUpFree"),
         action: () => {
           trackEvent(TRACKING_EVENTS.GUEST_SIGNUP_CLICKED, {
             location: "voice_input",
           });
           handleAuthAction("signin");
         },
-        subtext: "Create an account to unlock more creations",
+        subtext: tf("signUpSubtext"),
         isSubmit: false,
       };
     }
 
     if (blockedReason === "no_credits") {
       return {
-        text: hasActiveSubscription ? "Buy credits" : "View plans",
+        text: hasActiveSubscription ? tf("buyCredits") : tf("viewPlans"),
         action: () => handleAuthAction("billing"),
         subtext: hasActiveSubscription
-          ? "Get more credits to keep creating"
-          : "Subscribe for unlimited creativity",
+          ? tf("buyCreditsSubtext")
+          : tf("subscribeSubtext"),
         isSubmit: false,
       };
     }
 
     return {
-      text: "Get started",
+      text: tf("getStarted"),
       action: () => handleAuthAction("signin"),
-      subtext: "Sign in to start creating",
+      subtext: tf("signInSubtext"),
       isSubmit: false,
     };
   };
@@ -215,10 +219,10 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
         aria-labelledby="voice-mode-tab"
       >
         <p className="text-center text-muted-foreground font-semibold">
-          Voice recording is not supported in this browser.
+          {t("notSupported")}
         </p>
         <p className="text-center text-sm text-muted-foreground">
-          Try Chrome or Safari for the best experience.
+          {t("trySafari")}
         </p>
       </div>
     );
@@ -226,13 +230,11 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
 
   if (state === "error") {
     const errorMessages: Record<string, string> = {
-      permission_denied:
-        "Microphone access was denied. Please allow access in your browser settings.",
-      not_supported: "Voice recording is not supported in this browser.",
-      transcription_failed:
-        "Couldn't understand the recording. Please try again.",
-      recording_failed: "Recording failed. Please try again.",
-      timeout: "Recording timed out. Please try again.",
+      permission_denied: t("errors.permissionDenied"),
+      not_supported: t("errors.notSupported"),
+      transcription_failed: t("errors.transcriptionFailed"),
+      recording_failed: t("errors.recordingFailed"),
+      timeout: t("errors.timeout"),
     };
 
     return (
@@ -247,7 +249,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
         </p>
         <Button onClick={handleRetry} variant="outline">
           <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
-          Try again
+          {t("tryAgain")}
         </Button>
       </div>
     );
@@ -272,8 +274,8 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
           )}
         >
           {isSilenceDetected
-            ? `All done? Stopping in ${autoStopCountdown}s...`
-            : "Listening..."}
+            ? t("allDone", { seconds: autoStopCountdown })
+            : t("listening")}
         </p>
 
         <AudioLevelIndicator level={audioLevel} />
@@ -281,7 +283,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
 
         <div className="flex gap-3">
           <Button onClick={handleCancel} variant="outline">
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleStopRecording}
@@ -291,7 +293,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
             )}
           >
             <FontAwesomeIcon icon={faStop} className="mr-2" />
-            {isSilenceDetected ? "I'm done" : "Done talking"}
+            {isSilenceDetected ? t("imDone") : t("doneTalking")}
           </Button>
         </div>
       </div>
@@ -312,8 +314,8 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
         />
         <p className="text-center text-foreground font-semibold">
           {state === "requesting_permission"
-            ? "Getting microphone ready..."
-            : "Understanding what you said..."}
+            ? t("gettingMicReady")
+            : t("understanding")}
         </p>
       </div>
     );
@@ -342,7 +344,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
           {buttonConfig.isSubmit ? (
             <SubmitButton
               ref={submitButtonRef}
-              text="Create my coloring page"
+              text={t("createColoringPage")}
               className="text-lg px-8 py-6 rounded-lg"
               disabled={!isDescriptionReady}
             />
@@ -367,7 +369,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
             onClick={handleRetry}
             className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
           >
-            Not quite right? Try again
+            {t("notQuiteRight")}
           </button>
         </div>
       </div>
@@ -384,12 +386,12 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     >
       <p className="text-center text-foreground font-semibold text-lg">
         {canRecord
-          ? "Tap to describe your page"
+          ? t("tapToDescribe")
           : blockedReason === "guest_limit_reached"
-            ? "You've used your free creations. Sign up to continue!"
+            ? t("guestLimitReached")
             : blockedReason === "no_credits"
-              ? "You've run out of credits."
-              : "Sign in to record"}
+              ? t("noCredits")
+              : t("signInToRecord")}
       </p>
 
       <button
@@ -413,7 +415,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
       </button>
 
       <p className="text-sm text-muted-foreground text-center">
-        Max {maxDuration} seconds
+        {t("maxSeconds", { seconds: maxDuration })}
       </p>
 
       {!canRecord && (
