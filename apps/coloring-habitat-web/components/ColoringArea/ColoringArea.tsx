@@ -360,23 +360,62 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       let index = 0;
       const batchSize = 3;
 
+      // Nudge offsets to try when centroid lands on a boundary line
+      const nudgeOffsets = [
+        [0, 0],
+        [3, 0],
+        [-3, 0],
+        [0, 3],
+        [0, -3],
+        [3, 3],
+        [-3, -3],
+        [3, -3],
+        [-3, 3],
+        [6, 0],
+        [-6, 0],
+        [0, 6],
+        [0, -6],
+      ];
+
       const fillBatch = () => {
         const end = Math.min(index + batchSize, regions.length);
         for (let i = index; i < end; i++) {
           const region = regions[i];
-          // Map centroid from canvas pixel space to reference image space
           const normX = region.centroid.x / regionMap.width;
           const normY = region.centroid.y / regionMap.height;
           const color = referenceColor.getColorAtNormalized(normX, normY);
 
           if (color) {
-            canvasRef.current?.fillRegionAtPoint(
-              Math.round(region.centroid.x),
-              Math.round(region.centroid.y),
-              color,
-              true,
-              boundary ?? undefined,
-            );
+            // Try centroid first, then nudged positions, then sample pixels
+            let filled = false;
+
+            for (const [dx, dy] of nudgeOffsets) {
+              const success = canvasRef.current?.fillRegionAtPoint(
+                Math.round(region.centroid.x + dx),
+                Math.round(region.centroid.y + dy),
+                color,
+                true,
+                boundary ?? undefined,
+              );
+              if (success) {
+                filled = true;
+                break;
+              }
+            }
+
+            // If all nudges failed, try the stored sample pixels
+            if (!filled && region.samplePixels) {
+              for (const sample of region.samplePixels) {
+                const success = canvasRef.current?.fillRegionAtPoint(
+                  Math.round(sample.x),
+                  Math.round(sample.y),
+                  color,
+                  true,
+                  boundary ?? undefined,
+                );
+                if (success) break;
+              }
+            }
           }
         }
         index = end;
