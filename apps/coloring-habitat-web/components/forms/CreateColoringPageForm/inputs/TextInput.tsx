@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import useUser from "@/hooks/useUser";
 import { trackEvent } from "@/utils/analytics-client";
 import { TRACKING_EVENTS } from "@/constants";
@@ -25,6 +26,7 @@ const TextInput = ({ className }: TextInputProps) => {
   } = useUser();
 
   const { description, setDescription } = useInputMode();
+  const t = useTranslations("createForm.textInput");
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDescription(e.target.value);
@@ -34,16 +36,14 @@ const TextInput = ({ className }: TextInputProps) => {
     if (canGenerate) {
       return {
         disabled: false,
-        placeholder:
-          "e.g. a serene Japanese garden with koi and cherry blossoms...",
+        placeholder: t("placeholder"),
       };
     }
 
     if (blockedReason === "guest_limit_reached") {
       return {
         disabled: true,
-        placeholder:
-          "You've used your 2 free creations today. Sign up to keep creating!",
+        placeholder: t("guestLimitPlaceholder"),
       };
     }
 
@@ -51,19 +51,18 @@ const TextInput = ({ className }: TextInputProps) => {
       if (hasActiveSubscription) {
         return {
           disabled: true,
-          placeholder:
-            "You've run out of credits. Buy more to continue creating!",
+          placeholder: t("noCreditsSubscribed"),
         };
       }
       return {
         disabled: true,
-        placeholder: "You've run out of credits. Subscribe for more creations!",
+        placeholder: t("noCreditsUnsubscribed"),
       };
     }
 
     return {
       disabled: true,
-      placeholder: "Sign in to start creating coloring pages",
+      placeholder: t("signInPlaceholder"),
     };
   };
 
@@ -71,45 +70,45 @@ const TextInput = ({ className }: TextInputProps) => {
     if (canGenerate) {
       if (isGuest) {
         return {
-          text: `Create my page (${remainingGenerations} free left)`,
+          text: t("createPageFree", { count: remainingGenerations }),
           isSubmit: true,
         };
       }
       return {
-        text: "Create my page",
+        text: t("createPage"),
         isSubmit: true,
       };
     }
 
     if (blockedReason === "guest_limit_reached") {
       return {
-        text: "Sign up for free",
+        text: t("signUpFree"),
         action: () => {
           trackEvent(TRACKING_EVENTS.GUEST_SIGNUP_CLICKED, {
             location: "text_input",
           });
           handleAuthAction("signin");
         },
-        subtext: "Create an account to unlock more creations",
+        subtext: t("signUpSubtext"),
         isSubmit: false,
       };
     }
 
     if (blockedReason === "no_credits") {
       return {
-        text: hasActiveSubscription ? "Buy credits" : "View plans",
+        text: hasActiveSubscription ? t("buyCredits") : t("viewPlans"),
         action: () => handleAuthAction("billing"),
         subtext: hasActiveSubscription
-          ? "Get more credits to keep creating"
-          : "Subscribe for unlimited creativity",
+          ? t("buyCreditsSubtext")
+          : t("subscribeSubtext"),
         isSubmit: false,
       };
     }
 
     return {
-      text: "Get started",
+      text: t("getStarted"),
       action: () => handleAuthAction("signin"),
-      subtext: "Sign in to start creating",
+      subtext: t("signInSubtext"),
       isSubmit: false,
     };
   };

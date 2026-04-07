@@ -256,5 +256,33 @@
       "terms": "Terms",
       "cookies": "Cookies"
     }
+  },
+  "createForm": {
+    "inputModes": {
+      "type": "Type",
+      "talk": "Talk",
+      "photo": "Photo"
+    },
+    "loading": {
+      "creating": "Creating your coloring page...",
+      "readyIn": "Ready in about 30 seconds"
+    },
+    "textInput": {
+      "placeholder": "e.g. a serene Japanese garden with koi and cherry blossoms...",
+      "guestLimitPlaceholder": "You've used your 2 free creations today. Sign up to keep creating!",
+      "noCreditsSubscribed": "You've run out of credits. Buy more to continue creating!",
+      "noCreditsUnsubscribed": "You've run out of credits. Subscribe for more creations!",
+      "signInPlaceholder": "Sign in to start creating coloring pages",
+      "createPage": "Create my page",
+      "createPageFree": "Create my page ({count} free left)",
+      "signUpFree": "Sign up for free",
+      "signUpSubtext": "Create an account to unlock more creations",
+      "buyCredits": "Buy credits",
+      "viewPlans": "View plans",
+      "buyCreditsSubtext": "Get more credits to keep creating",
+      "subscribeSubtext": "Subscribe for unlimited creativity",
+      "getStarted": "Get started",
+      "signInSubtext": "Sign in to start creating"
+    }
   }
 }

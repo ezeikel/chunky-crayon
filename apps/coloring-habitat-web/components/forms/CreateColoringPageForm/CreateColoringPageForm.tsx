@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 import { createColoringImage } from "@/app/actions/coloring-image";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/utils/analytics-client";
@@ -25,23 +26,22 @@ type CreateColoringPageFormProps = {
   className?: string;
 };
 
-// Loading overlay that uses form status
 const FormLoadingOverlay = () => {
   const { pending } = useFormStatus();
+  const t = useTranslations("createForm.loading");
 
   if (!pending) return null;
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 rounded-2xl bg-background/90 backdrop-blur-sm">
-      <Loading size="lg" text="Creating your coloring page..." />
+      <Loading size="lg" text={t("creating")} />
       <p className="text-sm text-muted-foreground animate-pulse">
-        Ready in about 30 seconds
+        {t("readyIn")}
       </p>
     </div>
   );
 };
 
-// Inner form component that uses the input mode context
 const MultiModeForm = ({ className }: { className?: string }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
@@ -67,7 +67,6 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           return;
         }
 
-        // Track and record guest generation
         if (isGuest) {
           trackEvent(TRACKING_EVENTS.GUEST_GENERATION_USED, {
             generationsRemaining: remainingGenerations - 1,
@@ -83,13 +82,11 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           recordGuestGeneration();
         }
 
-        // Track Lead event for Facebook/Pinterest pixels
         trackLead({
           contentName: desc || "Coloring Page",
           contentCategory: "coloring_page_creation",
         });
 
-        // Signal galleries to refresh
         signalGalleryRefresh("image-created");
 
         if (coloringImage.id) {
@@ -99,17 +96,13 @@ const MultiModeForm = ({ className }: { className?: string }) => {
       ref={formRef}
       className={cn("flex flex-col gap-y-4", className)}
     >
-      {/* Loading overlay */}
       <FormLoadingOverlay />
 
-      {/* Hidden inputs for form submission */}
       <input type="hidden" name="inputType" value={mode} />
       <input type="hidden" name="description" value={description} />
 
-      {/* Input mode selector */}
       <InputModeSelector />
 
-      {/* Input area */}
       <div className="p-5">
         {mode === "text" && <TextInput />}
         {mode === "voice" && <VoiceInput />}

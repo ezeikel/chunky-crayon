@@ -256,5 +256,33 @@
       "terms": "AGB",
       "cookies": "Cookies"
     }
+  },
+  "createForm": {
+    "inputModes": {
+      "type": "Eingeben",
+      "talk": "Sprechen",
+      "photo": "Foto"
+    },
+    "loading": {
+      "creating": "Deine Ausmalseite wird erstellt...",
+      "readyIn": "In etwa 30 Sekunden fertig"
+    },
+    "textInput": {
+      "placeholder": "z.B. ein ruhiger japanischer Garten mit Koi und Kirschblüten...",
+      "guestLimitPlaceholder": "Du hast deine 2 kostenlosen Kreationen heute verbraucht. Registriere dich, um weiterzumachen!",
+      "noCreditsSubscribed": "Deine Credits sind aufgebraucht. Kaufe mehr, um weiterzumachen!",
+      "noCreditsUnsubscribed": "Deine Credits sind aufgebraucht. Abonniere für mehr Kreationen!",
+      "signInPlaceholder": "Melde dich an, um Ausmalseiten zu erstellen",
+      "createPage": "Meine Seite erstellen",
+      "createPageFree": "Meine Seite erstellen ({count} kostenlos übrig)",
+      "signUpFree": "Kostenlos registrieren",
+      "signUpSubtext": "Erstelle ein Konto für mehr Kreationen",
+      "buyCredits": "Credits kaufen",
+      "viewPlans": "Pakete ansehen",
+      "buyCreditsSubtext": "Hol dir mehr Credits zum Weitermachen",
+      "subscribeSubtext": "Abonniere für unbegrenzte Kreativität",
+      "getStarted": "Loslegen",
+      "signInSubtext": "Melde dich an, um zu starten"
+    }
   }
 }

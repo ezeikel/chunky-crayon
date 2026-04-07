@@ -256,5 +256,33 @@
       "terms": "利用規約",
       "cookies": "Cookie"
     }
+  },
+  "createForm": {
+    "inputModes": {
+      "type": "入力",
+      "talk": "音声",
+      "photo": "写真"
+    },
+    "loading": {
+      "creating": "ぬりえページを作成中...",
+      "readyIn": "約30秒で完成します"
+    },
+    "textInput": {
+      "placeholder": "例：鯉と桜のある静かな日本庭園...",
+      "guestLimitPlaceholder": "本日の無料作成2回分を使い切りました。登録してさらに作成しましょう！",
+      "noCreditsSubscribed": "クレジットが不足しています。追加購入して作成を続けましょう！",
+      "noCreditsUnsubscribed": "クレジットが不足しています。プランに登録してさらに作成しましょう！",
+      "signInPlaceholder": "ログインしてぬりえページを作成しましょう",
+      "createPage": "ページを作成",
+      "createPageFree": "ページを作成（残り{count}回無料）",
+      "signUpFree": "無料で登録",
+      "signUpSubtext": "アカウントを作成してさらに作成を解放",
+      "buyCredits": "クレジットを購入",
+      "viewPlans": "プランを見る",
+      "buyCreditsSubtext": "クレジットを追加して作成を続ける",
+      "subscribeSubtext": "無制限のクリエイティビティのために登録",
+      "getStarted": "始める",
+      "signInSubtext": "ログインして始める"
+    }
   }
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faKeyboard,
@@ -12,14 +13,14 @@ import { cn } from "@/lib/utils";
 
 type InputOption = {
   mode: InputMode;
-  label: string;
+  labelKey: string;
   icon: IconDefinition;
 };
 
 const INPUT_OPTIONS: InputOption[] = [
-  { mode: "text", label: "Type", icon: faKeyboard },
-  { mode: "voice", label: "Talk", icon: faMicrophone },
-  { mode: "image", label: "Photo", icon: faCamera },
+  { mode: "text", labelKey: "type", icon: faKeyboard },
+  { mode: "voice", labelKey: "talk", icon: faMicrophone },
+  { mode: "image", labelKey: "photo", icon: faCamera },
 ];
 
 type InputModeSelectorProps = {
@@ -29,6 +30,7 @@ type InputModeSelectorProps = {
 
 const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
   const { mode: currentMode, setMode, isProcessing } = useInputMode();
+  const t = useTranslations("createForm.inputModes");
 
   const handleModeChange = (mode: InputMode) => {
     if (disabled || isProcessing) return;
@@ -64,7 +66,7 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
             )}
           >
             <FontAwesomeIcon icon={option.icon} size="sm" />
-            {option.label}
+            {t(option.labelKey)}
           </button>
         );
       })}

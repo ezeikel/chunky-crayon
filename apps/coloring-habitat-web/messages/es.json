@@ -256,5 +256,33 @@
       "terms": "Términos",
       "cookies": "Cookies"
     }
+  },
+  "createForm": {
+    "inputModes": {
+      "type": "Escribir",
+      "talk": "Hablar",
+      "photo": "Foto"
+    },
+    "loading": {
+      "creating": "Creando tu página para colorear...",
+      "readyIn": "Lista en unos 30 segundos"
+    },
+    "textInput": {
+      "placeholder": "ej. un sereno jardín japonés con carpas koi y cerezos en flor...",
+      "guestLimitPlaceholder": "Has usado tus 2 creaciones gratuitas de hoy. ¡Regístrate para seguir creando!",
+      "noCreditsSubscribed": "Te has quedado sin créditos. ¡Compra más para seguir creando!",
+      "noCreditsUnsubscribed": "Te has quedado sin créditos. ¡Suscríbete para más creaciones!",
+      "signInPlaceholder": "Inicia sesión para crear páginas para colorear",
+      "createPage": "Crear mi página",
+      "createPageFree": "Crear mi página ({count} gratis restantes)",
+      "signUpFree": "Registrarse gratis",
+      "signUpSubtext": "Crea una cuenta para desbloquear más creaciones",
+      "buyCredits": "Comprar créditos",
+      "viewPlans": "Ver planes",
+      "buyCreditsSubtext": "Obtén más créditos para seguir creando",
+      "subscribeSubtext": "Suscríbete para creatividad ilimitada",
+      "getStarted": "Comenzar",
+      "signInSubtext": "Inicia sesión para comenzar"
+    }
   }
 }
