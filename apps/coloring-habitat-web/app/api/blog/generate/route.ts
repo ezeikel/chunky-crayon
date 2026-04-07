@@ -170,7 +170,7 @@ function pickContentTypeAndTopic(
       return {
         contentType: "event",
         topic: event.name,
-        context: `Upcoming event: ${event.name}. ${event.description || event.childFriendlyDescription}. Themes: ${event.themes.join(", ")}. Write about celebrating this through coloring and creative expression.`,
+        context: `Upcoming event: ${event.name}. ${event.childFriendlyDescription}. Themes: ${event.themes.join(", ")}. Write about celebrating this through coloring and creative expression.`,
       };
     }
 
