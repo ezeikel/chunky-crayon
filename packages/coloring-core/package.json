@@ -22,10 +22,12 @@
     "@ai-sdk/openai": "^3.0.38",
     "@ai-sdk/perplexity": "^3.0.20",
     "@ai-sdk/replicate": "^2.0.21",
+    "@one-colored-pixel/canvas": "workspace:^",
     "@one-colored-pixel/storage": "workspace:*",
     "@posthog/ai": "^1.2.0",
     "ai": "^6.0.106",
     "openai": "^6.33.0",
+    "sharp": "^0.34.1",
     "zod": "^3.25.42"
   },
   "devDependencies": {

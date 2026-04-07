@@ -104,6 +104,15 @@ export {
   type MagicColorConfig,
 } from "./actions/magic-color";
 
+export {
+  generateGridColorMapLogic,
+  generateRegionFillPointsLogic,
+  type GenerateColorMapResult,
+  type GenerateFillPointsResult,
+  type ColorPaletteEntry,
+  type ColorMapConfig,
+} from "./actions/generate-color-map";
+
 // Utilities
 export { default as formatNumber } from "./utils/formatNumber";
 export { default as streamToBuffer } from "./utils/streamToBuffer";
