@@ -48,12 +48,34 @@ export const COLORING_PALETTE = {
     { name: "Dark", hex: "#8B4513" },
     { name: "Deep", hex: "#5D4037" },
   ],
+  extended: [
+    { name: "Turquoise", hex: "#00ACC1" },
+    { name: "Teal", hex: "#00897B" },
+    { name: "Indigo", hex: "#283593" },
+    { name: "Magenta", hex: "#C2185B" },
+    { name: "Lime", hex: "#7CB342" },
+    { name: "Amber", hex: "#FFB300" },
+    { name: "Crimson", hex: "#B71C1C" },
+    { name: "Olive", hex: "#827717" },
+    { name: "Tan", hex: "#D2B48C" },
+    { name: "Salmon", hex: "#FF8A65" },
+    { name: "Slate", hex: "#546E7A" },
+    { name: "Cream", hex: "#FFF8E1" },
+  ],
 } as const;
 
+/** Basic palette (primary + secondary + essentials) — used by kids variant */
 export const ALL_COLORING_COLORS = [
   ...COLORING_PALETTE.primary,
   ...COLORING_PALETTE.secondary,
   ...COLORING_PALETTE.essentials,
+];
+
+/** Full palette including extended + skin tones — used by adult variant */
+export const ALL_COLORING_COLORS_EXTENDED = [
+  ...ALL_COLORING_COLORS,
+  ...COLORING_PALETTE.extended,
+  ...COLORING_PALETTE.skinTones,
 ];
 
 export const BRUSH_SIZES = {
@@ -70,7 +92,8 @@ export type ColoringTool =
   | "pan"
   | "sticker"
   | "magic-reveal"
-  | "magic-auto";
+  | "magic-auto"
+  | "eyedropper";
 
 export type StickerCategory =
   | "shapes"

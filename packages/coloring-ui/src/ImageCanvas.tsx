@@ -40,6 +40,7 @@ import {
   faFillDrip,
   faBrush,
   faStar,
+  faEyeDropper,
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
@@ -61,6 +62,7 @@ const TOOL_ICONS: Record<string, IconDefinition> = {
   sticker: faStar,
   "magic-reveal": faBrush,
   "magic-auto": faFillDrip,
+  eyedropper: faEyeDropper,
 };
 
 // Cursor sizes based on brush size
@@ -214,9 +216,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
     const {
       selectedColor,
+      setSelectedColor,
       brushSize,
       brushType,
       activeTool,
+      setActiveTool,
       selectedPattern,
       selectedSticker,
       pushToHistory,
@@ -225,6 +229,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       panOffset,
       setZoom,
       setPanOffset,
+      customBrushRadius,
     } = useColoringContext();
     const {
       playSound,
@@ -355,6 +360,10 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           cursorSize,
           selectedColor,
         );
+      }
+
+      if (activeTool === "eyedropper") {
+        return createIconCursor(TOOL_ICONS.eyedropper, cursorSize, "#333333");
       }
 
       // Pan tool uses grab cursor (handled separately)
@@ -1140,6 +1149,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     }, [initSounds, onFirstInteraction]);
 
     const getRadius = () => {
+      // Custom radius from slider overrides preset sizes
+      if (customBrushRadius !== null) return customBrushRadius;
       return BRUSH_SIZES[brushSize].radius;
     };
 
@@ -1674,6 +1685,44 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         if (activeTool === "pan") {
           isPanningRef.current = true;
           lastPanPosRef.current = { x: event.clientX, y: event.clientY };
+          return;
+        }
+
+        // Eyedropper tool — sample color from canvas
+        if (activeTool === "eyedropper") {
+          const drawingCanvas = drawingCanvasRef.current;
+          const imageCanvas = imageCanvasRef.current;
+          if (drawingCanvas && imageCanvas) {
+            const { x, y } = screenToCanvas(event.clientX, event.clientY);
+            // Sample from the composite (drawing + line art) for accurate color
+            const compositeCanvas = document.createElement("canvas");
+            compositeCanvas.width = drawingCanvas.width;
+            compositeCanvas.height = drawingCanvas.height;
+            const compositeCtx = compositeCanvas.getContext("2d");
+            if (compositeCtx) {
+              compositeCtx.fillStyle = "#FFFFFF";
+              compositeCtx.fillRect(
+                0,
+                0,
+                compositeCanvas.width,
+                compositeCanvas.height,
+              );
+              compositeCtx.drawImage(drawingCanvas, 0, 0);
+              compositeCtx.globalCompositeOperation = "multiply";
+              compositeCtx.drawImage(imageCanvas, 0, 0);
+              compositeCtx.globalCompositeOperation = "source-over";
+
+              const px = Math.floor(x * dpr);
+              const py = Math.floor(y * dpr);
+              const pixel = compositeCtx.getImageData(px, py, 1, 1).data;
+              const hex =
+                `#${pixel[0].toString(16).padStart(2, "0")}${pixel[1].toString(16).padStart(2, "0")}${pixel[2].toString(16).padStart(2, "0")}`.toUpperCase();
+              setSelectedColor(hex);
+              // Switch back to brush after picking
+              setActiveTool("brush");
+              playSound("pop");
+            }
+          }
           return;
         }
 

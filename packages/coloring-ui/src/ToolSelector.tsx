@@ -16,6 +16,7 @@ import {
   faSun,
   faBoltLightning,
   faStar,
+  faEyeDropper,
 } from "@fortawesome/pro-duotone-svg-icons";
 
 type ToolSelectorProps = {
@@ -72,6 +73,10 @@ const MagicAutoIcon = ({ className }: { className?: string }) => (
   <FontAwesomeIcon icon={faFillDrip} className={className} />
 );
 
+const EyedropperIcon = ({ className }: { className?: string }) => (
+  <FontAwesomeIcon icon={faEyeDropper} className={className} />
+);
+
 type ToolConfig = {
   id:
     | "crayon"
@@ -85,7 +90,8 @@ type ToolConfig = {
     | "eraser"
     | "sticker"
     | "magic-reveal"
-    | "magic-auto";
+    | "magic-auto"
+    | "eyedropper";
   label: string;
   shortLabel?: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -103,6 +109,12 @@ const baseTools: ToolConfig[] = [
   { id: "fill", label: "Fill", icon: FillIcon },
   { id: "eraser", label: "Eraser", icon: EraserIcon },
   { id: "sticker", label: "Sticker", icon: StickerIcon },
+  {
+    id: "eyedropper",
+    label: "Eyedropper",
+    shortLabel: "Pick",
+    icon: EyedropperIcon,
+  },
   {
     id: "magic-reveal",
     label: "Magic Brush",
@@ -186,6 +198,9 @@ const ToolSelector = ({
         setActiveTool("sticker");
         onStickerToolSelect?.();
         break;
+      case "eyedropper":
+        setActiveTool("eyedropper");
+        break;
       case "magic-reveal":
         setActiveTool("magic-reveal");
         break;
@@ -208,6 +223,9 @@ const ToolSelector = ({
     }
     if (toolId === "magic-auto") {
       return activeTool === "magic-auto";
+    }
+    if (toolId === "eyedropper") {
+      return activeTool === "eyedropper";
     }
     // For brush-based tools, check both activeTool and brushType
     return activeTool === "brush" && brushType === toolId;

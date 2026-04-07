@@ -46,6 +46,9 @@ type ColoringContextArgs = {
   setBrushSize: Dispatch<SetStateAction<BrushSize>>;
   brushType: BrushType;
   setBrushType: Dispatch<SetStateAction<BrushType>>;
+  /** Custom brush radius (1-40). When set, overrides the preset brushSize radius. */
+  customBrushRadius: number | null;
+  setCustomBrushRadius: Dispatch<SetStateAction<number | null>>;
 
   // Tool state
   activeTool: ColoringTool;
@@ -117,6 +120,8 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setBrushSize: () => {},
   brushType: "crayon",
   setBrushType: () => {},
+  customBrushRadius: null,
+  setCustomBrushRadius: () => {},
   activeTool: "brush",
   setActiveTool: () => {},
   selectedPattern: "solid",
@@ -164,6 +169,9 @@ export const ColoringContextProvider = ({
   // Brush state
   const [brushSize, setBrushSize] = useState<BrushSize>("medium");
   const [brushType, setBrushType] = useState<BrushType>("crayon");
+  const [customBrushRadius, setCustomBrushRadius] = useState<number | null>(
+    null,
+  );
 
   // Tool state
   const [activeTool, setActiveTool] = useState<ColoringTool>("brush");
@@ -308,6 +316,8 @@ export const ColoringContextProvider = ({
       setBrushSize,
       brushType,
       setBrushType,
+      customBrushRadius,
+      setCustomBrushRadius,
       activeTool,
       setActiveTool,
       selectedPattern,
@@ -347,6 +357,7 @@ export const ColoringContextProvider = ({
       selectedColor,
       brushSize,
       brushType,
+      customBrushRadius,
       activeTool,
       selectedPattern,
       selectedSticker,
