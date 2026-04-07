@@ -232,6 +232,9 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
       if (regionsToFill.length === 0) return;
 
+      // Pre-compute dilated boundary ONCE for all fills (avoids N dilation passes)
+      const boundary = canvasRef.current?.getDilatedBoundary();
+
       // Fill each region with its assigned color
       // Note: centroids are in canvas pixel coordinates (DPR-scaled), so we pass isCanvasPixels=true
       for (const { regionId, color, centroid } of regionsToFill) {
@@ -240,6 +243,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           Math.round(centroid.y),
           color,
           true, // isCanvasPixels - centroids from region detection are in canvas pixels
+          boundary ?? undefined,
         );
 
         if (success) {
@@ -268,8 +272,17 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       );
       if (!points || points.length === 0) return;
 
+      // Pre-compute dilated boundary ONCE for all fills
+      const boundary = canvasRef.current?.getDilatedBoundary();
+
       for (const { x, y, color } of points) {
-        canvasRef.current?.fillRegionAtPoint(x, y, color, true);
+        canvasRef.current?.fillRegionAtPoint(
+          x,
+          y,
+          color,
+          true,
+          boundary ?? undefined,
+        );
       }
 
       playSound('sparkle');

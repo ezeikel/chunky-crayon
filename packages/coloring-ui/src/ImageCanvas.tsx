@@ -21,6 +21,7 @@ import {
   drawTexturedStroke,
   createFillPattern,
   createIconCursor,
+  dilateBoundaries,
   StrokeBuffer,
 } from "@one-colored-pixel/canvas";
 import { haptics } from "./haptics";
@@ -176,7 +177,10 @@ export type ImageCanvasHandle = {
     y: number,
     color: string,
     isCanvasPixels?: boolean,
+    precomputedBoundary?: ImageData,
   ) => boolean;
+  /** Get pre-computed dilated boundary for batch fill operations (auto-color) */
+  getDilatedBoundary: () => ImageData | null;
   /** Replay a saved action (stroke, fill, sticker) on the canvas
    * @param action - The action to replay
    * @param sourceWidth - Optional source canvas width for coordinate scaling
@@ -544,6 +548,32 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       return thumbCanvas.toDataURL("image/webp", 0.92);
     }, [getCompositeCanvas]);
 
+    // Get pre-computed dilated boundary ImageData for batch fills.
+    // Avoids recomputing dilation for every fill in auto-color.
+    const getDilatedBoundary = useCallback((): ImageData | null => {
+      const drawingCanvas = drawingCanvasRef.current;
+      const imageCanvas = imageCanvasRef.current;
+      if (!drawingCanvas || !imageCanvas) return null;
+
+      const boundaryCanvas = document.createElement("canvas");
+      boundaryCanvas.width = drawingCanvas.width;
+      boundaryCanvas.height = drawingCanvas.height;
+      const boundaryCtx = boundaryCanvas.getContext("2d");
+      if (!boundaryCtx) return null;
+
+      boundaryCtx.drawImage(imageCanvas, 0, 0);
+      const boundaryImageData = boundaryCtx.getImageData(
+        0,
+        0,
+        boundaryCanvas.width,
+        boundaryCanvas.height,
+      );
+
+      // Pre-apply gap-closing dilation once
+      dilateBoundaries(boundaryImageData, 2, 180);
+      return boundaryImageData;
+    }, []);
+
     // Fill a specific region at given coordinates with a color (for auto-color)
     const fillRegionAtPoint = useCallback(
       (
@@ -551,6 +581,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         y: number,
         color: string,
         isCanvasPixels: boolean = false,
+        /** Pre-computed dilated boundary — pass to avoid recomputing per fill in batch operations */
+        precomputedBoundary?: ImageData,
       ): boolean => {
         const drawingCanvas = drawingCanvasRef.current;
         const imageCanvas = imageCanvasRef.current;
@@ -565,30 +597,33 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         const scaledX = isCanvasPixels ? x : x * dpr;
         const scaledY = isCanvasPixels ? y : y * dpr;
 
-        // Create a boundary canvas from SVG outlines ONLY
-        // We don't include existing coloring because:
-        // 1. Many colors (red, blue, green) have low luminance and would be detected as boundaries
-        // 2. This would prevent re-filling already colored regions
-        // The targetColor matching already handles not filling over different colors
-        const boundaryCanvas = document.createElement("canvas");
-        boundaryCanvas.width = drawingCanvas.width;
-        boundaryCanvas.height = drawingCanvas.height;
-        const boundaryCtx = boundaryCanvas.getContext("2d");
+        let boundaryImageData: ImageData;
 
-        if (!boundaryCtx) return false;
+        if (precomputedBoundary) {
+          // Use pre-computed boundary (batch auto-color path — much faster)
+          boundaryImageData = precomputedBoundary;
+        } else {
+          // Single fill: compute boundary on the fly
+          const boundaryCanvas = document.createElement("canvas");
+          boundaryCanvas.width = drawingCanvas.width;
+          boundaryCanvas.height = drawingCanvas.height;
+          const boundaryCtx = boundaryCanvas.getContext("2d");
 
-        // Only use SVG outline layer for boundary detection (black lines)
-        boundaryCtx.drawImage(imageCanvas, 0, 0);
+          if (!boundaryCtx) return false;
 
-        // Get the boundary image data
-        const boundaryImageData = boundaryCtx.getImageData(
-          0,
-          0,
-          boundaryCanvas.width,
-          boundaryCanvas.height,
-        );
+          boundaryCtx.drawImage(imageCanvas, 0, 0);
 
-        // Perform the fill (gap closing bridges small breaks in SVG line art)
+          boundaryImageData = boundaryCtx.getImageData(
+            0,
+            0,
+            boundaryCanvas.width,
+            boundaryCanvas.height,
+          );
+        }
+
+        // Perform the fill
+        // gapClosingRadius is 0 when using precomputed boundary (already dilated),
+        // or 2 for single fills (dilation applied inside scanlineFill)
         const fillColor = hexToRGBA(color);
         const filled = scanlineFill(drawingCtx, {
           x: scaledX,
@@ -597,7 +632,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           tolerance: 48,
           boundaryImageData,
           boundaryThreshold: 180,
-          gapClosingRadius: 2,
+          gapClosingRadius: precomputedBoundary ? 0 : 2,
         });
 
         if (filled) {
@@ -870,6 +905,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         getCompositeCanvas,
         getBoundaryCanvas,
         fillRegionAtPoint,
+        getDilatedBoundary,
         replayAction,
         forceRepaint,
         generatePreviewThumbnail,
@@ -883,6 +919,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         getCompositeCanvas,
         getBoundaryCanvas,
         fillRegionAtPoint,
+        getDilatedBoundary,
         replayAction,
         forceRepaint,
         generatePreviewThumbnail,
