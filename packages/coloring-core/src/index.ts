@@ -1,14 +1,11 @@
 /**
  * @one-colored-pixel/coloring-core
  *
- * Shared AI model configuration for all coloring apps.
- * Models, tracing, and image generation defaults are identical across apps.
- *
- * Note: Schemas (Zod) stay in each app due to TypeScript inference issues
- * with re-exported Zod types across package boundaries. Prompts stay in
- * each app because they contain brand-specific content.
+ * Shared AI configuration, schemas, and generation pipelines for all coloring apps.
+ * Brand-specific prompts stay in each app; everything else is shared here.
  */
 
+// Models & tracing
 export {
   models,
   MODEL_IDS,
@@ -20,6 +17,7 @@ export {
 } from "./models";
 export type { ModelId, TracingOptions } from "./models";
 
+// Image generation pipeline
 export { createImageGenerationPipeline } from "./image-providers";
 export type {
   ImageProvider,
@@ -29,3 +27,66 @@ export type {
   ProviderConfig,
   ImageGenerationConfig,
 } from "./image-providers";
+
+// Video generation
+export {
+  generateAnimationFromImage,
+  pollForVideoCompletion,
+  downloadVideoFromUri,
+  fetchImageAsBase64,
+  isVideoGenerationAvailable,
+} from "./video-providers";
+export type { VideoGenerationResult } from "./video-providers";
+
+// Analytics
+export { analyzeImageForAnalytics } from "./analytics";
+
+// Animation prompt generation
+export { generateAnimationPromptFromImage } from "./animation";
+export type { AnimationConfig } from "./animation";
+
+// Schemas (Zod)
+export {
+  sceneDescriptionSchema,
+  imageMetadataSchema,
+  svgValidationSchema,
+  imageAnalyticsSchema,
+  audioTranscriptionSchema,
+  imageDescriptionSchema,
+  magicColorSuggestionSchema,
+  magicColorResponseSchema,
+  detectedRegionInputSchema,
+  regionColorAssignmentSchema,
+  regionFirstColorResponseSchema,
+  fillPointSchema,
+  fillPointsDataSchema,
+  gridCellColorSchema,
+  gridColorMapSchema,
+  blogMetaSchema,
+  blogPostSchema,
+  blogImagePromptSchema,
+} from "./schemas";
+export type {
+  SceneDescription,
+  ImageMetadata,
+  SvgValidation,
+  ImageAnalytics,
+  AudioTranscription,
+  ImageDescription,
+  MagicColorSuggestion,
+  MagicColorResponse,
+  DetectedRegionInput,
+  RegionColorAssignment,
+  RegionFirstColorResponse,
+  FillPoint,
+  FillPointsData,
+  GridCellColor,
+  GridColorMap,
+  BlogMeta,
+  BlogPost,
+  BlogImagePrompt,
+} from "./schemas";
+
+// Utilities
+export { default as formatNumber } from "./utils/formatNumber";
+export { default as streamToBuffer } from "./utils/streamToBuffer";
