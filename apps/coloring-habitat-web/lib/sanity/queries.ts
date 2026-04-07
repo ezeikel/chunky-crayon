@@ -120,6 +120,17 @@ export const postSlugsQuery = `
   *[_type == "post" && status == "published"].slug.current
 `;
 
+// Get a category by slug
+export const categoryBySlugQuery = `
+  *[_type == "category" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    description,
+    color
+  }
+`;
+
 // Get all covered topics (for blog generation dedup)
 export const coveredTopicsQuery = `
   *[_type == "post" && defined(generationMeta.topic)].generationMeta.topic

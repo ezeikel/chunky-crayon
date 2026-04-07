@@ -170,7 +170,7 @@ function pickContentTypeAndTopic(
       return {
         contentType: "event",
         topic: event.name,
-        context: `Upcoming event: ${event.name}. ${event.childFriendlyDescription}. Themes: ${event.themes.join(", ")}. Write an adult-focused article about celebrating this through coloring and creative expression.`,
+        context: `Upcoming event: ${event.name}. ${event.description || event.childFriendlyDescription}. Themes: ${event.themes.join(", ")}. Write about celebrating this through coloring and creative expression.`,
       };
     }
 
@@ -464,15 +464,16 @@ async function uploadImageToSanity(
 // Blog post system prompt
 // --------------------------------------------------------------------------
 
-const BLOG_SYSTEM_PROMPT = `You are a writer for Coloring Habitat, an adult coloring platform focused on wellness, mindfulness, and creative relaxation.
+const BLOG_SYSTEM_PROMPT = `You are a writer for Coloring Habitat, a coloring platform focused on wellness, mindfulness, and creative relaxation.
 
 Brand voice:
 - Warm, knowledgeable, and encouraging
 - Science-informed but accessible — not academic
 - We speak as "we" (Coloring Habitat), never "I"
-- Our audience is adults (25-55) who color for relaxation, stress relief, and creative expression
-- We celebrate coloring as a legitimate wellness practice, not a childish hobby
+- Our audience colors for relaxation, stress relief, and creative expression
+- We celebrate coloring as a legitimate wellness practice
 - Tone is calm and grounding, like a trusted friend who happens to know a lot about art therapy
+- Never use the word "adult" in titles or to describe coloring — it's just coloring
 
 Content guidelines:
 - Use h2 (##) for main sections and h3 (###) for subsections
@@ -521,13 +522,13 @@ export async function GET(request: Request) {
         const { text: research } = await generateText({
           model: models.search,
           prompt:
-            "What are the current trending topics in adult coloring books, art therapy, creative wellness, and mindful art in 2026? List the top 5 trending topics with a brief description of why each is trending.",
+            "What are the current trending topics in coloring books, art therapy, creative wellness, and mindful art in 2026? List the top 5 trending topics with a brief description of why each is trending.",
         });
-        researchContext = `Based on current trends research:\n${research}\n\nPick the most interesting trending topic and write about it in the context of adult coloring.`;
+        researchContext = `Based on current trends research:\n${research}\n\nPick the most interesting trending topic and write about it in the context of coloring for wellness.`;
       } catch (error) {
         console.error("Perplexity research failed, falling back:", error);
         researchContext =
-          "Write about a creative wellness topic that connects mindfulness with adult coloring.";
+          "Write about a creative wellness topic that connects mindfulness with coloring.";
       }
     }
 
@@ -629,7 +630,7 @@ export async function GET(request: Request) {
       categories: [],
       contentType,
       publishedAt: new Date().toISOString(),
-      status: "draft",
+      status: "published",
       seo: {
         metaTitle: postData.title,
         metaDescription: postData.excerpt,
@@ -645,7 +646,7 @@ export async function GET(request: Request) {
       },
     });
 
-    console.log(`Blog post created as draft: ${post._id}`);
+    console.log(`Blog post published: ${post._id}`);
 
     return NextResponse.json({
       success: true,
@@ -653,7 +654,7 @@ export async function GET(request: Request) {
       slug: postData.slug,
       contentType,
       topic,
-      message: "Blog post created as draft in Sanity",
+      message: "Blog post published to Sanity",
     });
   } catch (error) {
     console.error("Error generating blog post:", error);

@@ -257,6 +257,12 @@
       "cookies": "Cookies"
     }
   },
+  "blog": {
+    "title": "The Coloring Habitat Blog",
+    "subtitle": "Wellness, techniques, and inspiration for mindful coloring",
+    "allPosts": "All Posts",
+    "byAuthor": "By {author}"
+  },
   "createForm": {
     "inputModes": {
       "type": "Type",
