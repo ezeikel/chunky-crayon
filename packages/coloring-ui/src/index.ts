@@ -71,6 +71,9 @@ export { default as UndoRedoButtons } from "./UndoRedoButtons";
 export { default as ProgressIndicator } from "./ProgressIndicator";
 export { default as CompletionCelebration } from "./CompletionCelebration";
 
+// Async fill (Web Worker)
+export { asyncFloodFill, terminateFillWorker } from "./asyncFill";
+
 // Storage utilities
 export {
   saveColoringProgress,

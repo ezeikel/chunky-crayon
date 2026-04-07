@@ -6,6 +6,7 @@
 
 import type { SerializableCanvasAction } from "./canvasActions";
 import { serializableToApiAction } from "./canvasActions";
+import { idbSet, idbGet, idbDelete } from "./idbStorage";
 // Preview cache invalidation — apps can provide their own implementation
 let _invalidatePreviewCache: ((id: string) => void) | null = null;
 
@@ -178,8 +179,6 @@ export const saveColoringProgress = (
     const imageDataUrl = canvas.toDataURL("image/png");
 
     // Send actual CSS dimensions for cross-platform coordinate scaling
-    // Actions are normalized to 0-1 range in normalizePointsForSync
-    // These dimensions tell the receiving platform what aspect ratio to use
     const canvasWidth = canvas.clientWidth || canvas.width;
     const canvasHeight = canvas.clientHeight || canvas.height;
 
@@ -199,13 +198,33 @@ export const saveColoringProgress = (
     }
 
     const data: SavedColoringData = {
-      imageDataUrl,
+      imageDataUrl: "", // Snapshot stored in IndexedDB, not localStorage
       savedAt: Date.now(),
       coloringImageId,
       version: currentVersion,
       actions: drawingActions,
     };
+
+    // Store lightweight metadata in localStorage (no base64 snapshot)
     localStorage.setItem(getStorageKey(coloringImageId), JSON.stringify(data));
+
+    // Store the snapshot in IndexedDB (avoids localStorage 5MB limit)
+    idbSet(`snapshot-${coloringImageId}`, imageDataUrl).catch((err) => {
+      console.warn(
+        "[CANVAS_SYNC_WEB] IDB snapshot save failed, using localStorage fallback:",
+        err,
+      );
+      // Fallback: store in localStorage if IDB fails
+      data.imageDataUrl = imageDataUrl;
+      try {
+        localStorage.setItem(
+          getStorageKey(coloringImageId),
+          JSON.stringify(data),
+        );
+      } catch {
+        // localStorage also full — snapshot will be lost but actions are synced to server
+      }
+    });
 
     console.log(
       `[CANVAS_SYNC_WEB] Saving progress - Actions: ${drawingActions.length}, Version: ${currentVersion}, Canvas: ${canvasWidth}x${canvasHeight}`,
@@ -496,7 +515,7 @@ export const loadColoringProgress = async (
     // Fall through to local storage
   }
 
-  // Fall back to local storage
+  // Fall back to local storage + IndexedDB
   try {
     const stored = localStorage.getItem(getStorageKey(coloringImageId));
     if (!stored) {
@@ -504,6 +523,20 @@ export const loadColoringProgress = async (
     }
 
     const data: SavedColoringData = JSON.parse(stored);
+
+    // Try to load snapshot from IndexedDB first (new path), then localStorage (legacy)
+    let snapshotUrl = data.imageDataUrl || null;
+    if (!snapshotUrl) {
+      try {
+        const idbSnapshot = await idbGet<string>(`snapshot-${coloringImageId}`);
+        if (idbSnapshot) {
+          snapshotUrl = idbSnapshot;
+          console.log(`[CANVAS_SYNC_WEB] Loaded snapshot from IndexedDB`);
+        }
+      } catch {
+        // IDB unavailable, continue without snapshot
+      }
+    }
 
     // If we have local actions, use those
     if (data.actions && data.actions.length > 0) {
@@ -513,7 +546,7 @@ export const loadColoringProgress = async (
 
       // Also try to load the snapshot image for quick restore
       return new Promise((resolve) => {
-        if (data.imageDataUrl) {
+        if (snapshotUrl) {
           const img = new Image();
           img.onload = () =>
             resolve({
@@ -528,7 +561,7 @@ export const loadColoringProgress = async (
               version: data.version || 0,
               source: "local",
             });
-          img.src = data.imageDataUrl;
+          img.src = snapshotUrl;
         } else {
           resolve({
             actions: data.actions || [],
@@ -540,8 +573,8 @@ export const loadColoringProgress = async (
     }
 
     // Legacy: only snapshot, no actions - load image
-    if (data.imageDataUrl) {
-      console.log(`[CANVAS_SYNC_WEB] Using legacy local snapshot (no actions)`);
+    if (snapshotUrl) {
+      console.log(`[CANVAS_SYNC_WEB] Using local/IDB snapshot (no actions)`);
       return new Promise((resolve) => {
         const img = new Image();
         img.onload = () =>
@@ -552,7 +585,7 @@ export const loadColoringProgress = async (
             source: "local",
           });
         img.onerror = () => resolve(null);
-        img.src = data.imageDataUrl;
+        img.src = snapshotUrl;
       });
     }
 
@@ -580,6 +613,8 @@ export const hasSavedProgress = (coloringImageId: string): boolean => {
 export const clearColoringProgress = (coloringImageId: string): boolean => {
   try {
     localStorage.removeItem(getStorageKey(coloringImageId));
+    // Also clean up IndexedDB snapshot
+    idbDelete(`snapshot-${coloringImageId}`).catch(() => {});
     return true;
   } catch (error) {
     console.error("Failed to clear coloring progress:", error);
