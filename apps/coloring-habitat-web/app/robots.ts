@@ -6,7 +6,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/signin", "/verify-request", "/auth-error"],
+        disallow: [
+          "/api/",
+          "/admin/",
+          "/account/",
+          "/signin",
+          "/verify-request",
+          "/auth-error",
+        ],
       },
     ],
     sitemap: "https://coloringhabitat.com/sitemap.xml",

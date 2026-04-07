@@ -11,12 +11,22 @@ import {
   getDifficultyFromSlug,
 } from "@/app/data/gallery";
 import cn from "@/utils/cn";
+import { generateAlternates } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Gallery",
-  description:
-    "Browse our collection of intricate coloring pages for adults. Filter by category or difficulty.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  return {
+    title: "Gallery",
+    description:
+      "Browse our collection of intricate coloring pages for adults. Filter by category or difficulty.",
+    alternates: generateAlternates(locale, "/gallery"),
+  };
+}
 
 type GalleryPageProps = {
   searchParams: Promise<{ difficulty?: string; category?: string }>;

@@ -7,12 +7,9 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { PortableText, type PortableTextBlock } from "@portabletext/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faClock,
-  faCalendar,
-} from "@fortawesome/free-solid-svg-icons";
+import { faClock, faCalendar } from "@fortawesome/free-solid-svg-icons";
 import { portableTextComponents } from "@/components/blog/PortableTextComponents";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import {
   client,
   isSanityConfigured,
@@ -20,8 +17,10 @@ import {
   recentPostsQuery,
   urlFor,
 } from "@/lib/sanity";
+import { generateAlternates } from "@/lib/seo";
 
 type PageParams = {
+  locale: string;
   slug: string;
 };
 
@@ -104,7 +103,7 @@ export async function generateMetadata({
 }: {
   params: Promise<PageParams>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const post = await getPost(slug);
 
   if (!post) {
@@ -129,7 +128,7 @@ export async function generateMetadata({
       type: "article",
       publishedTime: post.publishedAt,
       authors: post.author?.name ? [post.author.name] : undefined,
-      url: `https://coloringhabitat.com/blog/${slug}`,
+      url: `https://coloringhabitat.com/${locale}/blog/${slug}`,
       images: imageUrl
         ? [
             {
@@ -147,6 +146,7 @@ export async function generateMetadata({
       description,
       images: imageUrl ? [imageUrl] : undefined,
     },
+    alternates: generateAlternates(locale, `/blog/${slug}`),
   };
 }
 
@@ -173,16 +173,39 @@ const BlogPostContent = async ({
     ? urlFor(post.author.image).width(80).height(80).url()
     : null;
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt || "",
+    ...(imageUrl && { image: imageUrl }),
+    datePublished: post.publishedAt,
+    ...(post.author && {
+      author: {
+        "@type": "Person",
+        name: post.author.name,
+      },
+    }),
+    publisher: {
+      "@id": "https://coloringhabitat.com/#organization",
+    },
+    mainEntityOfPage: `https://coloringhabitat.com/blog/${slug}`,
+  };
+
   return (
     <>
-      {/* Back Link */}
-      <Link
-        href="/blog"
-        className="mb-8 inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary"
-      >
-        <FontAwesomeIcon icon={faArrowLeft} className="text-sm" />
-        <span>Back to Blog</span>
-      </Link>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Blog", href: "/blog" },
+          { label: post.title },
+        ]}
+        className="mb-8"
+      />
 
       <article>
         {/* Header */}

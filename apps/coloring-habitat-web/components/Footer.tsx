@@ -16,10 +16,26 @@ const getCachedYear = async () => {
 };
 
 const socialLinks = [
-  { label: "Instagram", icon: faInstagram, href: "#" },
-  { label: "Facebook", icon: faFacebookF, href: "#" },
-  { label: "TikTok", icon: faTiktok, href: "#" },
-  { label: "Pinterest", icon: faPinterest, href: "#" },
+  {
+    label: "Instagram",
+    icon: faInstagram,
+    href: "https://www.instagram.com/coloringhabitat",
+  },
+  {
+    label: "Facebook",
+    icon: faFacebookF,
+    href: "https://www.facebook.com/coloringhabitat",
+  },
+  {
+    label: "TikTok",
+    icon: faTiktok,
+    href: "https://www.tiktok.com/@coloringhabitat",
+  },
+  {
+    label: "Pinterest",
+    icon: faPinterest,
+    href: "https://www.pinterest.com/coloringhabitat",
+  },
 ];
 
 const Footer = async () => {

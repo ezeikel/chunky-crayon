@@ -3,18 +3,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
 import { getDailyImages, getLatestDailyImage } from "@/app/data/gallery";
+import { generateAlternates } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Daily Coloring Pages",
-  description:
-    "Discover a new intricate coloring page every day. Our AI-generated daily designs feature seasonal themes, cultural celebrations, and artistic styles perfect for mindful relaxation.",
-  openGraph: {
-    title: "Daily Coloring Pages | Coloring Habitat",
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  return {
+    title: "Daily Coloring Pages",
     description:
-      "A fresh, beautifully designed coloring page every day. Seasonal themes, global art traditions, and intricate patterns for adult coloring enthusiasts.",
-    type: "website",
-  },
-};
+      "Discover a new intricate coloring page every day. Our AI-generated daily designs feature seasonal themes, cultural celebrations, and artistic styles perfect for mindful relaxation.",
+    openGraph: {
+      title: "Daily Coloring Pages | Coloring Habitat",
+      description:
+        "A fresh, beautifully designed coloring page every day. Seasonal themes, global art traditions, and intricate patterns for adult coloring enthusiasts.",
+      type: "website",
+    },
+    alternates: generateAlternates(locale, "/gallery/daily"),
+  };
+}
 
 const DailyGalleryPage = async () => {
   const [data, latestDaily] = await Promise.all([

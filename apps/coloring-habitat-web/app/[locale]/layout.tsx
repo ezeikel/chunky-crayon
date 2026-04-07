@@ -36,6 +36,55 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} className={jakarta.variable}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": "https://coloringhabitat.com/#website",
+                  url: "https://coloringhabitat.com",
+                  name: "Coloring Habitat",
+                  description:
+                    "Create beautiful coloring pages for relaxation and mindfulness. Type, talk, or snap a photo to generate intricate designs.",
+                  publisher: {
+                    "@id": "https://coloringhabitat.com/#organization",
+                  },
+                  potentialAction: {
+                    "@type": "SearchAction",
+                    target: {
+                      "@type": "EntryPoint",
+                      urlTemplate:
+                        "https://coloringhabitat.com/gallery?search={search_term_string}",
+                    },
+                    "query-input": "required name=search_term_string",
+                  },
+                },
+                {
+                  "@type": "Organization",
+                  "@id": "https://coloringhabitat.com/#organization",
+                  name: "Coloring Habitat",
+                  url: "https://coloringhabitat.com",
+                  sameAs: [
+                    "https://www.instagram.com/coloringhabitat",
+                    "https://www.facebook.com/coloringhabitat",
+                    "https://www.tiktok.com/@coloringhabitat",
+                    "https://www.pinterest.com/coloringhabitat",
+                  ],
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    contactType: "customer service",
+                    email: "hello@coloringhabitat.com",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+      </head>
       <body className="font-sans antialiased">
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import GalleryGrid from "@/components/GalleryGrid/GalleryGrid";
 import DifficultyFilter from "@/components/DifficultyFilter/DifficultyFilter";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { GALLERY_CATEGORIES, getCategoryBySlug } from "@/constants";
 import {
   getCategoryImages,
@@ -13,9 +14,10 @@ import {
   getAllCategorySlugs,
 } from "@/app/data/gallery";
 import cn from "@/utils/cn";
+import { generateAlternates } from "@/lib/seo";
 
 type CategoryPageProps = {
-  params: Promise<{ category: string }>;
+  params: Promise<{ locale: string; category: string }>;
   searchParams: Promise<{ difficulty?: string }>;
 };
 
@@ -26,7 +28,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
-  const { category: categorySlug } = await params;
+  const { locale, category: categorySlug } = await params;
   const category = getCategoryBySlug(categorySlug);
 
   if (!category) {
@@ -37,6 +39,7 @@ export async function generateMetadata({
     title: `${category.name} Coloring Pages`,
     description: category.description,
     keywords: category.keywords,
+    alternates: generateAlternates(locale, `/gallery/${categorySlug}`),
   };
 }
 
@@ -60,18 +63,56 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
     getDifficultyCounts(),
   ]);
 
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `https://coloringhabitat.com/gallery/${categorySlug}`,
+    name: `${category.name} Coloring Pages`,
+    description: category.description,
+    url: `https://coloringhabitat.com/gallery/${categorySlug}`,
+    isPartOf: {
+      "@id": "https://coloringhabitat.com/#website",
+    },
+    about: {
+      "@type": "Thing",
+      name: category.name,
+    },
+    numberOfItems: data.images.length,
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: data.images.length,
+      itemListElement: data.images.slice(0, 10).map((image, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "ImageObject",
+          "@id": `https://coloringhabitat.com/coloring-image/${image.id}`,
+          name: image.title || `${category.name} Coloring Page`,
+          contentUrl: image.svgUrl,
+          thumbnailUrl: image.svgUrl,
+          description:
+            image.description || `Free ${category.name} coloring page`,
+        },
+      })),
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
       <main className="bg-background py-12">
         <div className="mx-auto max-w-7xl px-6">
-          {/* Breadcrumbs */}
-          <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-            <Link href="/gallery" className="hover:text-foreground">
-              Gallery
-            </Link>
-            <span>/</span>
-            <span className="text-foreground">{category.name}</span>
-          </nav>
+          <Breadcrumbs
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Gallery", href: "/gallery" },
+              { label: category.name },
+            ]}
+            className="mb-6"
+          />
 
           <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
             {category.name} Coloring Pages

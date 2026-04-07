@@ -7,13 +7,15 @@ import { auth } from "@/auth";
 import ColoringPageContent from "@/components/ColoringPageContent/ColoringPageContent";
 import { ColoringContextProvider } from "@one-colored-pixel/coloring-ui";
 import { BRAND } from "@/lib/db";
+import { generateAlternates } from "@/lib/seo";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { locale, id } = await params;
 
   const image = await db.coloringImage.findUnique({
     where: { id, brand: BRAND },
@@ -38,7 +40,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: "website",
+      url: `https://coloringhabitat.com/${locale}/coloring-image/${id}`,
     },
+    alternates: generateAlternates(locale, `/coloring-image/${id}`),
   };
 }
 
@@ -71,18 +75,48 @@ const ColoringImagePage = async ({ params }: Props) => {
 
   const isAuthenticated = !!session?.user?.id;
 
+  const imageSchema = {
+    "@context": "https://schema.org",
+    "@type": "ImageObject",
+    "@id": `https://coloringhabitat.com/coloring-image/${id}`,
+    name: image.title || "Coloring Page",
+    description:
+      image.description ||
+      "Free adult coloring page from Coloring Habitat for relaxation and mindfulness",
+    contentUrl: image.svgUrl || image.url,
+    thumbnailUrl: image.svgUrl || image.url,
+    url: `https://coloringhabitat.com/coloring-image/${id}`,
+    isPartOf: {
+      "@id": "https://coloringhabitat.com/#website",
+    },
+    creator: {
+      "@id": "https://coloringhabitat.com/#organization",
+    },
+    copyrightHolder: {
+      "@id": "https://coloringhabitat.com/#organization",
+    },
+    license: "https://coloringhabitat.com/terms",
+    acquireLicensePage: "https://coloringhabitat.com/pricing",
+    keywords:
+      image.tags?.join(", ") || "coloring page, adult coloring, mindfulness",
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(imageSchema) }}
+      />
       <main className="bg-background py-8">
         <div className="mx-auto max-w-7xl px-6">
-          {/* Back to gallery link */}
-          <Link
-            href="/gallery"
-            className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <span aria-hidden="true">&larr;</span>
-            {t("backToGallery")}
-          </Link>
+          <Breadcrumbs
+            items={[
+              { label: t("home"), href: "/" },
+              { label: t("gallery"), href: "/gallery" },
+              { label: image.title || "Coloring Page" },
+            ]}
+            className="mb-6"
+          />
 
           {/* Coloring canvas with toolbar and sidebars */}
           <ColoringContextProvider>

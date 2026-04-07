@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { getAllPosts, getCategories } from "@/app/actions/blog";
 import type { BlogPost, BlogCategory } from "@/app/actions/blog";
 import { urlFor } from "@/lib/sanity";
+import { generateAlternates } from "@/lib/seo";
 
 async function getCachedPosts() {
   "use cache";
@@ -21,18 +22,27 @@ async function getCachedCategories() {
   return getCategories();
 }
 
-export const metadata: Metadata = {
-  title: "Blog | Coloring Habitat",
-  description:
-    "Wellness tips, coloring techniques, and creative inspiration for mindful coloring. Discover the science behind coloring for stress relief.",
-  openGraph: {
-    title: "The Coloring Habitat Blog",
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  return {
+    title: "Blog | Coloring Habitat",
     description:
-      "Wellness tips, coloring techniques, and creative inspiration for mindful coloring.",
-    type: "website",
-    url: "https://coloringhabitat.com/blog",
-  },
-};
+      "Wellness tips, coloring techniques, and creative inspiration for mindful coloring. Discover the science behind coloring for stress relief.",
+    openGraph: {
+      title: "The Coloring Habitat Blog",
+      description:
+        "Wellness tips, coloring techniques, and creative inspiration for mindful coloring.",
+      type: "website",
+      url: `https://coloringhabitat.com/${locale}/blog`,
+    },
+    alternates: generateAlternates(locale, "/blog"),
+  };
+}
 
 function CategoryPills({ categories }: { categories: BlogCategory[] }) {
   const filtered = categories.filter((c) => c.postCount > 0);
