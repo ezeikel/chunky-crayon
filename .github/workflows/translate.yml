@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'packages/translations/src/en.json'
+      - 'apps/chunky-crayon-web/messages/en.json'
+      - 'apps/coloring-habitat-web/messages/en.json'
   # Allow manual trigger for testing
   workflow_dispatch:
 
@@ -38,8 +40,9 @@ jobs:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Run audit to check for missing translations
-        id: audit
+      # 1. Shared translations (neutral tone)
+      - name: Check shared translations
+        id: audit-shared
         working-directory: packages/translations
         run: |
           if pnpm run audit 2>&1 | grep -qi "MISSING KEYS"; then
@@ -49,16 +52,30 @@ jobs:
           fi
         continue-on-error: true
 
-      - name: Translate missing keys
-        if: steps.audit.outputs.needs_translation == 'true'
+      - name: Translate shared missing keys
+        if: steps.audit-shared.outputs.needs_translation == 'true'
         working-directory: packages/translations
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: pnpm translate:diff
 
+      # 2. CC overrides (kids tone)
+      - name: Translate CC overrides
+        working-directory: packages/translations
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: pnpm tsx scripts/translate-app-overrides.ts --app=chunky-crayon-web --tone=kids
+
+      # 3. CH overrides (adults tone)
+      - name: Translate CH overrides
+        working-directory: packages/translations
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: pnpm tsx scripts/translate-app-overrides.ts --app=coloring-habitat-web --tone=adults
+
       - name: Commit translations
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(i18n): auto-translate missing keys [skip ci]"
-          file_pattern: "packages/translations/src/*.json"
+          file_pattern: "packages/translations/src/*.json apps/chunky-crayon-web/messages/*.json apps/coloring-habitat-web/messages/*.json"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"

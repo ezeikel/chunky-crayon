@@ -112,7 +112,15 @@ In Next.js 16, `middleware.ts` was renamed to `proxy.ts`. The middleware file is
 
 ## Translations
 
-Edit `packages/translations/src/en.json` for shared/universal strings. Edit `apps/{app}/messages/en.json` for brand-specific overrides. A GitHub Action automatically translates to all other languages in CI.
+Three translation sources, each with a different tone for AI translation:
+
+| Source                                       | Tone             | What goes here                                      |
+| -------------------------------------------- | ---------------- | --------------------------------------------------- |
+| `packages/translations/src/en.json`          | Neutral          | Shared UI: nav, tools, colors, common               |
+| `apps/chunky-crayon-web/messages/en.json`    | Kids (playful)   | CC brand: homepage, footer, pricing, Colo, stickers |
+| `apps/coloring-habitat-web/messages/en.json` | Adults (mindful) | CH brand: homepage, footer, pricing, create form    |
+
+A GitHub Action auto-translates all three when any `en.json` changes on main. The script `packages/translations/scripts/translate-app-overrides.ts` handles per-app translations with tone-specific prompts.
 
 ## Commits
 
