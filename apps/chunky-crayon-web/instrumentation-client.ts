@@ -1,8 +1,22 @@
-import * as Sentry from '@sentry/nextjs';
 import posthog from 'posthog-js';
+import * as Sentry from '@sentry/nextjs';
 
-// Required for Sentry to instrument client-side navigations
-export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  sendDefaultPii: false,
+  integrations: [
+    Sentry.replayIntegration({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+  ],
+  tracesSampleRate: process.env.NODE_ENV === 'development' ? 1.0 : 0.2,
+  environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 
 posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
   // Use local proxy to avoid ad blockers (falls back to direct in dev)
@@ -16,3 +30,6 @@ posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
   // Turn on debug in development mode
   debug: process.env.NODE_ENV === 'development',
 });
+
+// eslint-disable-next-line import-x/prefer-default-export
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

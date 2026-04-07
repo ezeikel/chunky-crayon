@@ -1,4 +1,22 @@
 import posthog from "posthog-js";
+import * as Sentry from "@sentry/nextjs";
+
+const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  sendDefaultPii: false,
+  integrations: [
+    Sentry.replayIntegration({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+  ],
+  tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.2,
+  environment: process.env.VERCEL_ENV || process.env.NODE_ENV || "development",
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 
 if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
@@ -11,3 +29,6 @@ if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
     capture_pageleave: true,
   });
 }
+
+// eslint-disable-next-line import-x/prefer-default-export
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

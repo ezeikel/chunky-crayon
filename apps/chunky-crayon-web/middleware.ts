@@ -108,6 +108,11 @@ export default async function middleware(request: NextRequest) {
     return handleMobileApiAuth(request);
   }
 
+  // Skip i18n for Sentry tunnel route
+  if (pathname.startsWith('/monitoring')) {
+    return NextResponse.next();
+  }
+
   // Skip i18n for R2 asset proxy routes
   if (pathname.startsWith('/_r2/')) {
     return NextResponse.next();

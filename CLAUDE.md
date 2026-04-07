@@ -85,7 +85,7 @@ This project uses Neon PostgreSQL with branch-based development:
 | Prompts        | `lib/ai/prompts.ts` — child-friendly | `lib/ai/prompts.ts` — adult/wellness |
 | Pricing        | Splash/Rainbow/Sparkle               | Grove/Sanctuary/Oasis                |
 | Theme          | crayon-orange, crayon-purple         | green primary, nature tones          |
-| Routing        | `[locale]/...` (i18n)                | `/...` (no i18n)                     |
+| Routing        | `[locale]/...` (i18n)                | `[locale]/...` (i18n)                |
 | Stickers       | Yes (kid-focused)                    | No                                   |
 | Colo mascot    | Yes                                  | No                                   |
 | TikTok sharing | Feature-flagged (admin only)         | Always on                            |
