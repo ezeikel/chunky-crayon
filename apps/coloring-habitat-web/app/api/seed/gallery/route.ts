@@ -11,9 +11,7 @@ export const maxDuration = 300;
  * Protected by CRON_SECRET. Each prompt targets a specific category.
  *
  * Body: { batchIndex?: number }
- * - batchIndex 0 (default): first ~17 prompts
- * - batchIndex 1: next ~17 prompts
- * - batchIndex 2: remaining prompts
+ * Batches of 5 prompts each (0-8). Each image takes ~30-60s.
  *
  * Generates sequentially to avoid overwhelming the image API.
  */
@@ -112,8 +110,8 @@ export async function POST(request: NextRequest) {
     // use default
   }
 
-  // Split into batches of ~17 to stay within timeout
-  const batchSize = 17;
+  // Batches of 5 — each image takes ~30-60s, so 5 images ≈ 3-5 minutes
+  const batchSize = 5;
   const start = batchIndex * batchSize;
   const batch = SEED_PROMPTS.slice(start, start + batchSize);
 
