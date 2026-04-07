@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as faStarSolid } from "@fortawesome/free-solid-svg-icons";
 import { faApple, faGooglePlay } from "@fortawesome/free-brands-svg-icons";
@@ -12,7 +13,7 @@ const reviews = [
     quote:
       "Coloring Habitat has become my evening ritual. The designs are beautifully intricate and the online canvas is incredibly soothing.",
     rating: 5,
-    stat: "35 pages colored",
+    pagesColored: 35,
     timeAgo: "2 weeks ago",
   },
   {
@@ -21,7 +22,7 @@ const reviews = [
     quote:
       "I was skeptical about coloring as a hobby, but this genuinely helps me decompress after long work days. The designs are stunning.",
     rating: 5,
-    stat: "52 pages colored",
+    pagesColored: 52,
     timeAgo: "1 week ago",
   },
   {
@@ -30,7 +31,7 @@ const reviews = [
     quote:
       "The daily free page is such a lovely touch. I actually look forward to my morning inbox now. Perfect for mindfulness.",
     rating: 5,
-    stat: "28 pages colored",
+    pagesColored: 28,
     timeAgo: "3 weeks ago",
   },
   {
@@ -39,7 +40,7 @@ const reviews = [
     quote:
       "Printed a whole stack for a rainy Sunday. The detail level is remarkable and the print quality is perfect every time.",
     rating: 5,
-    stat: "64 pages colored",
+    pagesColored: 64,
     timeAgo: "1 month ago",
   },
   {
@@ -48,7 +49,7 @@ const reviews = [
     quote:
       "Better than any coloring book I have bought. Endless variety and I can create exactly what I am in the mood for.",
     rating: 5,
-    stat: "41 pages colored",
+    pagesColored: 41,
     timeAgo: "2 weeks ago",
   },
   {
@@ -57,18 +58,18 @@ const reviews = [
     quote:
       "My therapist recommended coloring for anxiety. This app makes it so easy to get started. Genuinely calming.",
     rating: 5,
-    stat: "73 pages colored",
+    pagesColored: 73,
     timeAgo: "3 weeks ago",
   },
 ];
 
 const TestimonialsSection = () => {
+  const t = useTranslations("homepage.testimonials");
+
   return (
     <section className="bg-background py-24">
       <div className="mx-auto max-w-7xl px-6">
-        {/* Header row */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          {/* Rating summary */}
           <div className="flex items-center gap-5">
             <span className="text-6xl font-extrabold tracking-tight text-foreground">
               4.9
@@ -85,12 +86,11 @@ const TestimonialsSection = () => {
                 ))}
               </div>
               <p className="mt-0.5 text-sm text-muted-foreground">
-                from 2,847 reviews
+                {t("fromReviews", { count: "2,847" })}
               </p>
             </div>
           </div>
 
-          {/* Platform badges */}
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
               <svg
@@ -127,14 +127,12 @@ const TestimonialsSection = () => {
           </div>
         </div>
 
-        {/* Review cards grid */}
         <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {reviews.map((review) => (
             <div
               key={review.name}
               className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm"
             >
-              {/* Stars */}
               <div className="flex gap-0.5">
                 {Array.from({ length: review.rating }).map((_, i) => (
                   <FontAwesomeIcon
@@ -146,12 +144,10 @@ const TestimonialsSection = () => {
                 ))}
               </div>
 
-              {/* Quote */}
               <blockquote className="mt-4 flex-1 text-sm italic leading-relaxed text-foreground/80">
                 &ldquo;{review.quote}&rdquo;
               </blockquote>
 
-              {/* Footer */}
               <div className="mt-5 flex items-end justify-between">
                 <div>
                   <p className="text-sm font-bold text-foreground">
@@ -164,7 +160,7 @@ const TestimonialsSection = () => {
                 <div className="text-right">
                   <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
                     <FontAwesomeIcon icon={faCircleCheck} size="xs" />
-                    {review.stat}
+                    {t("pagesColored", { count: review.pagesColored })}
                   </span>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {review.timeAgo}

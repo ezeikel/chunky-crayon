@@ -1,4 +1,5 @@
 import { cacheLife } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,29 +15,6 @@ const getCachedYear = async () => {
   return new Date().getFullYear();
 };
 
-const footerLinks = {
-  Explore: [
-    { label: "Gallery", href: "/gallery" },
-    { label: "Create", href: "/create" },
-    { label: "Categories", href: "/gallery" },
-    { label: "Daily page", href: "/daily" },
-  ],
-  Company: [
-    { label: "About", href: "/about" },
-    { label: "Pricing", href: "/pricing" },
-    { label: "Blog", href: "/blog" },
-  ],
-  Support: [
-    { label: "Contact us", href: "/contact" },
-    { label: "FAQ", href: "/#faq" },
-  ],
-  Legal: [
-    { label: "Privacy", href: "/privacy" },
-    { label: "Terms", href: "/terms" },
-    { label: "Cookies", href: "/cookies" },
-  ],
-};
-
 const socialLinks = [
   { label: "Instagram", icon: faInstagram, href: "#" },
   { label: "Facebook", icon: faFacebookF, href: "#" },
@@ -46,11 +24,35 @@ const socialLinks = [
 
 const Footer = async () => {
   const year = await getCachedYear();
+  const t = await getTranslations("footer");
+
+  const footerLinks = {
+    [t("sections.explore")]: [
+      { label: t("links.gallery"), href: "/gallery" },
+      { label: t("links.create"), href: "/create" },
+      { label: t("links.categories"), href: "/gallery" },
+      { label: t("links.dailyPage"), href: "/daily" },
+    ],
+    [t("sections.company")]: [
+      { label: t("links.about"), href: "/about" },
+      { label: t("links.pricing"), href: "/pricing" },
+      { label: t("links.blog"), href: "/blog" },
+    ],
+    [t("sections.support")]: [
+      { label: t("links.contactUs"), href: "/contact" },
+      { label: t("links.faq"), href: "/#faq" },
+    ],
+    [t("sections.legal")]: [
+      { label: t("links.privacy"), href: "/privacy" },
+      { label: t("links.terms"), href: "/terms" },
+      { label: t("links.cookies"), href: "/cookies" },
+    ],
+  };
+
   return (
     <footer className="border-t border-border bg-card">
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
-          {/* Brand */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2">
               <svg
@@ -72,11 +74,11 @@ const Footer = async () => {
                 />
               </svg>
               <span className="text-base font-bold tracking-tight text-foreground">
-                Coloring Habitat
+                {t("brand")}
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              Mindful coloring for everyone. Create, color, and find your calm.
+              {t("tagline")}
             </p>
             <div className="mt-6 flex items-center gap-3">
               {socialLinks.map((social) => (
@@ -92,7 +94,6 @@ const Footer = async () => {
             </div>
           </div>
 
-          {/* Link columns */}
           {Object.entries(footerLinks).map(([heading, links]) => (
             <div key={heading}>
               <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
@@ -116,19 +117,19 @@ const Footer = async () => {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {year} Coloring Habitat. All rights reserved.
+            {t("copyright", { year })}
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link href="/privacy" className="hover:text-foreground">
-              Privacy
+              {t("links.privacy")}
             </Link>
             <span aria-hidden="true">&middot;</span>
             <Link href="/terms" className="hover:text-foreground">
-              Terms
+              {t("links.terms")}
             </Link>
             <span aria-hidden="true">&middot;</span>
             <Link href="/cookies" className="hover:text-foreground">
-              Cookies
+              {t("links.cookies")}
             </Link>
           </div>
         </div>

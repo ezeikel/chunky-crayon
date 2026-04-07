@@ -404,5 +404,10 @@
     "selectLanguage": "Select language",
     "language": "Language",
     "switchTo": "Switch to"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
   }
 }

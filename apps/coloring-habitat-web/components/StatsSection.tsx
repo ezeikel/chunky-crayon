@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPalette,
@@ -12,7 +13,7 @@ import {
 type Stat = {
   value: number;
   suffix: string;
-  label: string;
+  labelKey: string;
   icon: typeof faPalette;
   color: string;
 };
@@ -21,28 +22,28 @@ const stats: Stat[] = [
   {
     value: 2.4,
     suffix: "M+",
-    label: "Coloring pages created",
+    labelKey: "pagesCreated",
     icon: faPalette,
     color: "text-primary",
   },
   {
     value: 50,
     suffix: "K+",
-    label: "Happy colorists",
+    labelKey: "happyColorists",
     icon: faUsers,
     color: "text-accent",
   },
   {
     value: 89,
     suffix: "%",
-    label: "Report feeling calmer",
+    labelKey: "feelingCalmer",
     icon: faSpa,
     color: "text-primary",
   },
   {
     value: 12,
     suffix: "min",
-    label: "Average session length",
+    labelKey: "sessionLength",
     icon: faClock,
     color: "text-accent",
   },
@@ -79,7 +80,15 @@ const useCountUp = (target: number, duration: number, shouldStart: boolean) => {
   return count;
 };
 
-const StatCard = ({ stat, inView }: { stat: Stat; inView: boolean }) => {
+const StatCard = ({
+  stat,
+  inView,
+  label,
+}: {
+  stat: Stat;
+  inView: boolean;
+  label: string;
+}) => {
   const count = useCountUp(stat.value, 1800, inView);
 
   return (
@@ -93,7 +102,7 @@ const StatCard = ({ stat, inView }: { stat: Stat; inView: boolean }) => {
         {stat.value % 1 !== 0 ? count.toFixed(1) : count}
         <span className="text-muted-foreground">{stat.suffix}</span>
       </p>
-      <p className="mt-2 text-sm text-muted-foreground">{stat.label}</p>
+      <p className="mt-2 text-sm text-muted-foreground">{label}</p>
     </div>
   );
 };
@@ -101,6 +110,7 @@ const StatCard = ({ stat, inView }: { stat: Stat; inView: boolean }) => {
 const StatsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [inView, setInView] = useState(false);
+  const t = useTranslations("homepage.stats");
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -128,7 +138,12 @@ const StatsSection = () => {
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
           {stats.map((stat) => (
-            <StatCard key={stat.label} stat={stat} inView={inView} />
+            <StatCard
+              key={stat.labelKey}
+              stat={stat}
+              inView={inView}
+              label={t(stat.labelKey)}
+            />
           ))}
         </div>
       </div>

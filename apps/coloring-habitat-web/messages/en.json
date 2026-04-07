@@ -115,5 +115,146 @@
       "turnOn": "Turn sounds on",
       "turnOff": "Turn sounds off"
     }
+  },
+  "homepage": {
+    "hero": {
+      "title": "Color your way to calm",
+      "subtitle": "Create intricate coloring pages in seconds. Color online or print at home. Your daily dose of creative mindfulness.",
+      "trustBadge1": "1,000+ free pages",
+      "trustBadge2": "No account needed",
+      "trustBadge3": "Trusted by 50k+ people",
+      "freeCreations": "2 free creations daily · No account needed",
+      "users": "50k+ users"
+    },
+    "showcase": {
+      "title": "Popular coloring pages",
+      "showAll": "Show all pages",
+      "free": "Free",
+      "printReady": "Print-ready PDF",
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites",
+      "filters": {
+        "all": "All",
+        "mandalas": "Mandalas",
+        "nature": "Nature",
+        "geometric": "Geometric",
+        "landscapes": "Landscapes",
+        "fantasy": "Fantasy",
+        "animals": "Animals"
+      }
+    },
+    "stats": {
+      "pagesCreated": "Coloring pages created",
+      "happyColorists": "Happy colorists",
+      "feelingCalmer": "Report feeling calmer",
+      "sessionLength": "Average session length"
+    },
+    "features": {
+      "badge": "How it works",
+      "title": "Your creative wellness toolkit",
+      "subtitle": "Research shows coloring activates the same calming neural pathways as meditation. We make it effortless to build a daily creative practice.",
+      "stressReduction": "stress reduction reported",
+      "step": "Step {number}",
+      "steps": {
+        "1": {
+          "title": "Describe your vision",
+          "description": "Type a prompt, speak aloud, or upload a photo. We turn your imagination into a unique, intricate design."
+        },
+        "2": {
+          "title": "Color digitally or print",
+          "description": "Use our calming online canvas, or download high-res PDFs for your favorite real pencils."
+        },
+        "3": {
+          "title": "Save and share",
+          "description": "Keep a personal gallery of your finished work, or share your creations with the community."
+        },
+        "4": {
+          "title": "Build a daily habit",
+          "description": "A free coloring page every morning. Five minutes of calm to start your day right."
+        }
+      }
+    },
+    "galleryPreview": {
+      "title": "Popular this week",
+      "subtitle": "Free pages from our growing library, loved by the community.",
+      "viewAll": "View all",
+      "viewAllPages": "View all pages",
+      "addToFavourites": "Add to favourites",
+      "removeFromFavourites": "Remove from favourites"
+    },
+    "testimonials": {
+      "fromReviews": "from {count} reviews",
+      "pagesColored": "{count} pages colored"
+    },
+    "newsletter": {
+      "badge": "Free daily coloring",
+      "title": "A free page, every morning",
+      "subtitle": "Join 12,000+ people who start their day with a moment of creative calm. Delivered straight to your inbox.",
+      "emailPlaceholder": "your@email.com",
+      "subscribe": "Subscribe",
+      "subscribed": "Subscribed",
+      "noSpam": "No spam, ever. Unsubscribe anytime."
+    },
+    "faq": {
+      "title": "Questions & answers",
+      "items": {
+        "1": {
+          "question": "How does Coloring Habitat work?",
+          "answer": "Describe what you want to color using text, voice, or a photo. We generate a detailed, intricate coloring page in about 30 seconds. Color it online with our digital tools or download a high-res PDF to print at home."
+        },
+        "2": {
+          "question": "Is it really free?",
+          "answer": "You get 2 free page creations every day, no account needed. Sign up (also free) to unlock our full library of 1,000+ pages and a daily coloring page delivered to your inbox each morning."
+        },
+        "3": {
+          "question": "What makes this different from other coloring apps?",
+          "answer": "Coloring Habitat is designed for people seeking mindful relaxation. Every design is sophisticated and intricate, and the experience is completely ad-free and calming."
+        },
+        "4": {
+          "question": "Can I print the coloring pages?",
+          "answer": "Every page can be downloaded as a high-resolution PDF, perfectly sized for A4 or US Letter paper. Many users love the tactile experience of coloring with real pencils, pens, and markers."
+        },
+        "5": {
+          "question": "Is there a mobile app?",
+          "answer": "Native iOS and Android apps are coming soon. Our web app is fully responsive and works beautifully on phones and tablets in the meantime."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to find your calm?",
+      "subtitle": "Join thousands who have made coloring part of their daily wellness routine.",
+      "startColoring": "Start coloring free",
+      "viewPlans": "View plans",
+      "getTheApp": "Get the App",
+      "downloadOnAppStore": "Download on the",
+      "appStore": "App Store",
+      "getItOn": "Get it on",
+      "googlePlay": "Google Play"
+    }
+  },
+  "footer": {
+    "brand": "Coloring Habitat",
+    "tagline": "Mindful coloring for everyone. Create, color, and find your calm.",
+    "copyright": "© {year} Coloring Habitat. All rights reserved.",
+    "sections": {
+      "explore": "Explore",
+      "company": "Company",
+      "support": "Support",
+      "legal": "Legal"
+    },
+    "links": {
+      "gallery": "Gallery",
+      "create": "Create",
+      "categories": "Categories",
+      "dailyPage": "Daily page",
+      "about": "About",
+      "pricing": "Pricing",
+      "blog": "Blog",
+      "contactUs": "Contact us",
+      "faq": "FAQ",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies"
+    }
   }
 }

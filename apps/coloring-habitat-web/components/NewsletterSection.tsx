@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 const NewsletterSection = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const t = useTranslations("homepage.newsletter");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,18 +22,14 @@ const NewsletterSection = () => {
     <section className="bg-accent py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          {/* Left: copy + form */}
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-white/70">
-              Free daily coloring
+              {t("badge")}
             </span>
             <h2 className="mt-4 text-4xl font-extrabold tracking-tight leading-tight text-white md:text-5xl">
-              A free page, every morning
+              {t("title")}
             </h2>
-            <p className="mt-5 max-w-md text-white/70">
-              Join 12,000+ people who start their day with a moment of creative
-              calm. Delivered straight to your inbox.
-            </p>
+            <p className="mt-5 max-w-md text-white/70">{t("subtitle")}</p>
 
             <form
               onSubmit={handleSubmit}
@@ -41,7 +39,7 @@ const NewsletterSection = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder={t("emailPlaceholder")}
                 required
                 className="flex-1 rounded-full border border-white/20 bg-white/10 py-3.5 pl-5 pr-4 text-sm text-white placeholder:text-white/50 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 aria-label="Email address"
@@ -54,22 +52,19 @@ const NewsletterSection = () => {
                 {submitted ? (
                   <>
                     <FontAwesomeIcon icon={faCheck} size="sm" />
-                    Subscribed
+                    {t("subscribed")}
                   </>
                 ) : (
                   <>
-                    Subscribe
+                    {t("subscribe")}
                     <FontAwesomeIcon icon={faArrowRight} size="sm" />
                   </>
                 )}
               </button>
             </form>
-            <p className="mt-3 text-xs text-white/50">
-              No spam, ever. Unsubscribe anytime.
-            </p>
+            <p className="mt-3 text-xs text-white/50">{t("noSpam")}</p>
           </div>
 
-          {/* Right: preview images */}
           <div className="relative mx-auto hidden h-72 w-72 lg:block">
             <div className="absolute left-0 top-4 w-36 -rotate-6 overflow-hidden rounded-2xl shadow-2xl transition-transform hover:rotate-0">
               <Image
