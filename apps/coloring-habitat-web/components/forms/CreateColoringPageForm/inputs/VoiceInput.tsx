@@ -274,7 +274,7 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
           )}
         >
           {isSilenceDetected
-            ? t("allDone", { seconds: autoStopCountdown })
+            ? t("allDone", { seconds: autoStopCountdown ?? 0 })
             : t("listening")}
         </p>
 

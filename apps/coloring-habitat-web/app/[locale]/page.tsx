@@ -1,5 +1,6 @@
 export const maxDuration = 150;
 
+import { Suspense } from "react";
 import HeroSection from "@/components/HeroSection";
 import ShowcaseSection from "@/components/ShowcaseSection";
 import StatsSection from "@/components/StatsSection";
@@ -10,21 +11,29 @@ import NewsletterSection from "@/components/NewsletterSection";
 import FaqSection from "@/components/FaqSection";
 import CtaSection from "@/components/CtaSection";
 
-const HomePage = () => {
+const HomePageContent = async () => {
   return (
     <>
-      <main>
-        <HeroSection />
-        <ShowcaseSection />
-        <StatsSection />
-        <FeaturesSection />
-        <GalleryPreview />
-        <TestimonialsSection />
-        <NewsletterSection />
-        <FaqSection />
-        <CtaSection />
-      </main>
+      <HeroSection />
+      <ShowcaseSection />
+      <StatsSection />
+      <FeaturesSection />
+      <GalleryPreview />
+      <TestimonialsSection />
+      <NewsletterSection />
+      <FaqSection />
+      <CtaSection />
     </>
+  );
+};
+
+const HomePage = () => {
+  return (
+    <main>
+      <Suspense>
+        <HomePageContent />
+      </Suspense>
+    </main>
   );
 };
 

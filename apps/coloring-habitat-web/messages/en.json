@@ -399,10 +399,6 @@
       }
     }
   },
-  "common": {
-    "loading": "Loading...",
-    "loadMore": "Load more"
-  },
   "billing": {
     "pageTitle": "Billing",
     "pageSubtitle": "Manage your subscription and credits",

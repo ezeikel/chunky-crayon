@@ -16,8 +16,6 @@ import {
 import { ALL_COLORING_COLORS } from '@/constants';
 import { db } from '@one-colored-pixel/db';
 
-export type { GenerateColorMapResult, GenerateFillPointsResult };
-
 const colorMapConfig = {
   gridColorMapSystem: GRID_COLOR_MAP_SYSTEM,
   createGridColorMapPrompt,
