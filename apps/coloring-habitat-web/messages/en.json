@@ -179,8 +179,8 @@
       "subtitle": "Free pages from our growing library, loved by the community.",
       "viewAll": "View all",
       "viewAllPages": "View all pages",
-      "addToFavourites": "Add to favourites",
-      "removeFromFavourites": "Remove from favourites"
+      "dailyPage": "Today's coloring page",
+      "colorNow": "Color now"
     },
     "testimonials": {
       "fromReviews": "from {count} reviews",
