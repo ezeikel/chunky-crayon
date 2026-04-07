@@ -1,0 +1,408 @@
+{
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "もう一度",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "done": "完了",
+    "copy": "コピー",
+    "copied": "コピーしたよ！",
+    "credits": "クレジット",
+    "creditsWithCount": "{count} クレジット"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "gallery": "ギャラリー",
+    "myArtwork": "わたしの作品",
+    "challenges": "チャレンジ",
+    "blog": "ブログ",
+    "pricing": "料金",
+    "support": "サポート",
+    "signIn": "ログイン",
+    "signOut": "ログアウト",
+    "billing": "お支払い",
+    "settings": "設定",
+    "stickerBook": "ステッカーブック",
+    "account": "アカウント",
+    "menu": "メニュー",
+    "currentlyActive": "いま使っているプロフィール",
+    "switchTo": "切り替え",
+    "selectProfile": "プロフィールを選ぶ",
+    "manageProfiles": "プロフィール管理",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる",
+    "navigationMenu": "ナビゲーションメニュー"
+  },
+  "coloringPage": {
+    "title": "ぬりえ",
+    "defaultDescription": "Chunky Crayonの無料で印刷できるぬりえ",
+    "progress": {
+      "colored": "ぬれたよ",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "いいスタート！",
+        "50": "半分できた！",
+        "75": "もうすぐ完成！",
+        "100": "すごい！"
+      }
+    },
+    "sidebar": {
+      "colors": "いろ",
+      "tools": "どうぐ",
+      "size": "太さ",
+      "history": "りれき",
+      "zoom": "ズーム",
+      "actions": "メニュー"
+    },
+    "tools": {
+      "pan": "うごかす",
+      "fill": "ぬりつぶし",
+      "brush": "ブラシ",
+      "sticker": "シール",
+      "magicReveal": "まほうでひらく",
+      "magicAuto": "まほうおまかせ",
+      "magicBrush": "まほうブラシ",
+      "magicFill": "まほうぬりつぶし",
+      "autoColor": "おまかせぬり",
+      "magic": "まほう"
+    },
+    "brushTypes": {
+      "crayon": "クレヨン",
+      "marker": "マーカー",
+      "eraser": "けしゴム",
+      "glitter": "ラメ",
+      "sparkle": "キラキラ",
+      "rainbow": "にじいろ",
+      "glow": "ひかる",
+      "neon": "ネオン"
+    },
+    "brushSizes": {
+      "small": "細い",
+      "medium": "ふつう",
+      "large": "ぶっとい"
+    },
+    "fillPatterns": {
+      "solid": "ベタ",
+      "dots": "みずたま",
+      "stripes": "しましま",
+      "diagonal": "ななめ",
+      "checkerboard": "チェック",
+      "hearts": "ハート",
+      "stars": "ほし",
+      "zigzag": "ジグザグ"
+    },
+    "actions": {
+      "save": "ほぞん",
+      "download": "ダウンロード",
+      "share": "シェア",
+      "print": "印刷",
+      "preparing": "準備中...",
+      "doneSharing": "シェアしたよ",
+      "colorAgain": "もう一回ぬる",
+      "startOver": "はじめから"
+    },
+    "toolbar": {
+      "expand": "ツールバーをひらく",
+      "collapse": "ツールバーをたたむ",
+      "moreTools": "もっとどうぐ",
+      "less": "少なく"
+    },
+    "undoRedo": {
+      "undo": "もどす",
+      "undoShortcut": "もどす (Ctrl+Z)",
+      "redo": "やりなおす",
+      "redoShortcut": "やりなおす (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "{color}を選ぶ",
+      "magicToolsMessage": "マジックツールで色が自動選択されます"
+    },
+    "patternSelector": {
+      "label": "もよう:"
+    },
+    "zoomControls": {
+      "zoomLevel": "ズーム: {level}%",
+      "zoomOut": "ちいさく",
+      "zoomOutAria": "ちいさくする（もっと見る）",
+      "zoomIn": "おおきく",
+      "zoomInAria": "おおきくする（もっと近く）",
+      "pan": "うごかす",
+      "panAria": "えのまわりをうごかす",
+      "reset": "ぜんたいを見る",
+      "resetAria": "ぜんたいにもどす"
+    },
+    "muteToggle": {
+      "mute": "おとを消す",
+      "unmute": "おとを出す",
+      "turnOn": "おとをオン",
+      "turnOff": "おとをオフ"
+    },
+    "relatedPages": "もっとぬりえ"
+  },
+  "shareModal": {
+    "title": "作品をシェア",
+    "privacyNote": "このリンクを知っている人なら誰でも見られます。個人情報は共有されません。",
+    "expiresIn": "リンクの有効期限：",
+    "expiration": {
+      "7days": "7日",
+      "30days": "30日",
+      "never": "期限なし"
+    },
+    "createLink": "シェアリンクを作る",
+    "creating": "シェアリンクを作成中...",
+    "success": {
+      "title": "リンクができたよ！",
+      "subtitle": "家族やお友だちにこのリンクを送ってね"
+    },
+    "done": "完了"
+  },
+  "saveToGallery": {
+    "idle": "ギャラリーに保存",
+    "saving": "保存中...",
+    "saved": "保存したよ！",
+    "tryAgain": "もう一度",
+    "errors": {
+      "captureArtwork": "作品を保存できなかったよ",
+      "generic": "うまくいかなかったよ。もう一度ためしてね。"
+    }
+  },
+  "shareButton": {
+    "idle": "シェア",
+    "preparing": "準備中…",
+    "doneSharing": "シェア完了"
+  },
+  "colors": {
+    "primary": {
+      "cherryRed": "さくらんぼレッド",
+      "sunsetOrange": "ゆうやけオレンジ",
+      "sunshineYellow": "おひさまイエロー",
+      "grassGreen": "くさむらグリーン",
+      "skyBlue": "そらいろブルー",
+      "grapePurple": "ぶどうパープル",
+      "bubblegumPink": "バブルガムピンク",
+      "chocolateBrown": "チョコレートブラウン"
+    },
+    "secondary": {
+      "coral": "コーラル",
+      "mint": "ミント",
+      "lavender": "ラベンダー",
+      "peach": "ピーチ",
+      "navy": "ネイビー",
+      "forest": "フォレストグリーン",
+      "gold": "ゴールド",
+      "rose": "ローズ"
+    },
+    "essentials": {
+      "black": "くろ",
+      "white": "しろ",
+      "gray": "はいいろ",
+      "skinTone": "はだいろ"
+    },
+    "skinTones": {
+      "light": "あかるめ",
+      "mediumLight": "ややあかるめ",
+      "medium": "ふつう",
+      "mediumDark": "ややこいめ",
+      "dark": "こいめ",
+      "deep": "とてもこいめ"
+    }
+  },
+  "shareArtwork": {
+    "title": "作品をシェア",
+    "linkCreated": "リンクを作ったよ！",
+    "sharePrompt": "このリンクを家族やお友だちに送ってね",
+    "privacyNotice": "このリンクを持っている人はだれでも作品を見られます。個人情報は共有されません。",
+    "expiresIn": "リンクの有効期限：",
+    "expiration": {
+      "7days": "7日",
+      "30days": "30日",
+      "never": "期限なし"
+    },
+    "createLink": "シェアリンクを作る",
+    "creating": "シェアリンクを作成中…",
+    "close": "閉じる",
+    "copy": "コピー",
+    "copied": "コピーしたよ！",
+    "done": "完了",
+    "error": "シェアリンクを作れませんでした"
+  },
+  "account": {
+    "profiles": "プロフィール",
+    "billing": "お支払い",
+    "settings": "設定",
+    "myArtwork": "わたしの作品"
+  },
+  "settings": {
+    "pageTitle": "設定",
+    "pageSubtitle": "アカウントの設定を管理します",
+    "parentalControls": {
+      "title": "ペアレンタルコントロール",
+      "description": "アプリで表示される内容をコントロールします"
+    },
+    "communityImages": {
+      "label": "みんなの作品を表示",
+      "description": "オンにすると、ギャラリーでほかのユーザーが作ったぬりえが見られます。オフにすると、自分の作品だけが表示されます。",
+      "enabled": "みんなの作品：オン",
+      "disabled": "みんなの作品：オフ"
+    },
+    "languagePreference": {
+      "title": "言語",
+      "description": "アプリで使う言語を選びます"
+    },
+    "audio": {
+      "title": "オーディオ",
+      "description": "効果音とBGMを設定します",
+      "sfx": {
+        "label": "効果音",
+        "description": "筆やタップなど、ぬりえの音"
+      },
+      "ambient": {
+        "label": "BGM",
+        "description": "ぬりえ中のリラックスした音楽"
+      }
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "毎日無料ぬりえ！",
+      "subtitle": "毎日、受信箱に<free>無料</free>ぬりえをお届けします。",
+      "placeholder": "parent@example.com",
+      "join": "登録",
+      "success": "完了！",
+      "successDescription": "メール配信に登録できました！",
+      "error": "エラーが発生しました",
+      "errorDescription": "メール配信に登録できませんでした。もう一度お試しください。"
+    },
+    "unsubscribe": {
+      "success": "配信停止しました",
+      "successDescription": "メーリングリストから削除しました。さみしいけれど、またね！",
+      "invalid": "無効なリンク",
+      "invalidDescription": "この配信停止リンクは無効か、期限切れです。"
+    }
+  },
+  "billing": {
+    "pageTitle": "お支払い・サブスク",
+    "pageSubtitle": "サブスクの管理や、追加クレジットの購入で、すてきなぬりえをどんどん作ろう！",
+    "currentPlan": "現在のプラン",
+    "currentCredits": "現在のクレジット: {count}",
+    "renewsOn": "サブスク更新日: {date}",
+    "manageSubscription": "サブスクを管理",
+    "noActiveSubscription": "有効なサブスクがありません",
+    "noSubscriptionDescription": "プランを選んで、すてきなぬりえ作りを始めよう！",
+    "viewPlans": "プランを見る",
+    "buyMoreCredits": "クレジットを追加",
+    "credits": "{count} クレジット",
+    "buyNow": "今すぐ買う",
+    "loading": "読み込み中...",
+    "availablePlans": "利用できるプラン",
+    "changePlan": "プラン変更",
+    "currentPlanBadge": "現在のプラン",
+    "manageInPortal": "お客様ポータルでサブスクを管理",
+    "noCommitment": "縛りなし。いつでも解約OK。",
+    "perMonth": "/月",
+    "noSubscriptionForCredits": "クレジット購入には有効なサブスクが必要です",
+    "noSubscriptionFound": "有効なサブスクが見つかりません",
+    "failedToChangeSubscription": "サブスクの変更に失敗しました",
+    "failedToCheckout": "チェックアウトに移動できませんでした",
+    "failedToPurchaseCredits": "クレジットの購入に失敗しました",
+    "failedToOpenPortal": "お客様ポータルを開けませんでした",
+    "subscribe": "サブスク登録"
+  },
+  "auth": {
+    "signIn": "ログイン",
+    "signUp": "新規登録",
+    "signOut": "ログアウト",
+    "continueWithGoogle": "Googleで続ける",
+    "continueWithApple": "Appleで続ける",
+    "signInWithEmail": "メールでログイン",
+    "sendingLink": "リンクを送信中…",
+    "chooseMethod": "ログイン方法をえらんでね",
+    "orContinueWith": "または",
+    "emailPlaceholder": "name@example.com",
+    "termsAgreement": "続けると、利用規約とプライバシーポリシーに同意したことになります。",
+    "verifyRequest": {
+      "title": "メールをチェック！",
+      "description": "サインイン用の魔法のリンクを送りました。メールのリンクをタップして続けてね。",
+      "checkSpam": "見当たらない？迷惑メールも見てみてね。",
+      "linkExpiry": "リンクは24時間で期限切れです。",
+      "tryDifferentEmail": "別のメールを使う"
+    },
+    "error": {
+      "title": "うまくいきませんでした",
+      "tryAgain": "もう一度サインインしてみてください。直らない場合はサポートに連絡してください。",
+      "backToSignIn": "サインインに戻る",
+      "goHome": "ホームへ"
+    },
+    "errors": {
+      "configuration": "サーバー設定に問題があります。しばらくしてからお試しください。",
+      "accessDenied": "アクセスできません。サインインの権限がありません。",
+      "verification": "サインイン用リンクの期限切れ、または使用済みです。新しいリンクをリクエストしてください。",
+      "oauth": "アカウントでのサインインに問題がありました。もう一度お試しください。",
+      "email": "サインインメールの送信に失敗しました。もう一度お試しください。",
+      "credentials": "入力内容が正しくありません。メールアドレスを確認して、もう一度お試しください。",
+      "sessionRequired": "このページを見るにはサインインしてください。",
+      "default": "予期しないエラーが発生しました。もう一度お試しください。"
+    }
+  },
+  "errors": {
+    "generic": "うまくいきませんでした。もう一度ためしてね。",
+    "notFound": "ページが見つかりません",
+    "sharedArtworkNotFound": {
+      "title": "作品が見つかりません",
+      "description": "この共有リンクは期限切れか、削除されたみたい。作った人に新しいリンクを聞いてね！",
+      "cta": "ぬりえをさがす"
+    },
+    "unauthorized": "続けるにはサインインしてね",
+    "stripeLoadFailed": "Stripeの読み込みに失敗しました",
+    "checkoutFailed": "お支払いの準備に失敗しました",
+    "unexpectedError": "予期しないエラーが発生しました。もう一度ためしてね。",
+    "redirectFailed": "お支払い画面へ移動できませんでした"
+  },
+  "breadcrumbs": {
+    "home": "ホーム",
+    "gallery": "ギャラリー",
+    "forToddlers": "幼児向け",
+    "forKids": "子ども向け",
+    "forTeens": "ティーン向け",
+    "forAdults": "大人向け",
+    "ariaLabel": "パンくずリスト",
+    "daily": "きょうのぬりえ",
+    "community": "みんなのぬりえ",
+    "holidays": "イベント・きせつ"
+  },
+  "jumpToNav": {
+    "jumpToSection": "セクションへジャンプ",
+    "backToTop": "トップへ戻る"
+  },
+  "time": {
+    "today": "今日",
+    "yesterday": "昨日",
+    "daysAgo": "{count}日前",
+    "lastWeek": "先週",
+    "weeksAgo": "{count}週間前",
+    "monthsAgo": "{count}か月前",
+    "justNow": "たった今",
+    "minutesAgo": "{count}分前",
+    "hoursAgo": "{count}時間前"
+  },
+  "language": {
+    "switchLanguage": "言語を切り替える",
+    "currentLanguage": "現在の言語",
+    "selectLanguage": "言語をえらぶ",
+    "language": "言語",
+    "switchTo": "切り替える"
+  },
+  "startOverButton": {
+    "idle": "はじめから",
+    "confirm": "うん、はじめから",
+    "cancel": "つづけてぬる"
+  },
+  "downloadPDFButton": {
+    "idle": "印刷",
+    "loading": "読み込み中…",
+    "creating": "作成中…",
+    "error": "あれっ！"
+  }
+}

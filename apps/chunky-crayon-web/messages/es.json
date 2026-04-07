@@ -1,17 +1,4 @@
 {
-  "common": {
-    "loading": "Cargando...",
-    "error": "Algo salió mal",
-    "retry": "Inténtalo de nuevo",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "close": "Cerrar",
-    "done": "Listo",
-    "copy": "Copiar",
-    "copied": "¡Copiado!",
-    "credits": "créditos",
-    "creditsWithCount": "{count} créditos"
-  },
   "coloLoading": {
     "title": "¡Creando tu página!",
     "titleSpeaking": "¡Qué emoción!",
@@ -75,29 +62,6 @@
         "description": "¡El gran maestro del color!"
       }
     }
-  },
-  "navigation": {
-    "home": "Inicio",
-    "gallery": "Galería",
-    "myArtwork": "Mis dibujos",
-    "challenges": "Retos",
-    "blog": "Blog",
-    "pricing": "Precios",
-    "support": "Ayuda",
-    "signIn": "Iniciar sesión",
-    "signOut": "Cerrar sesión",
-    "billing": "Facturación",
-    "settings": "Ajustes",
-    "stickerBook": "Álbum de pegatinas",
-    "account": "Cuenta",
-    "menu": "Menú",
-    "currentlyActive": "Activo ahora",
-    "switchTo": "Cambiar a",
-    "selectProfile": "Elegir perfil",
-    "manageProfiles": "Gestionar perfiles",
-    "openMenu": "Abrir menú",
-    "closeMenu": "Cerrar menú",
-    "navigationMenu": "Menú de navegación"
   },
   "footer": {
     "brand": "Chunky Crayon",
@@ -583,129 +547,6 @@
       "seasonalHolidays": "Temporadas y festivos"
     }
   },
-  "coloringPage": {
-    "title": "Página para colorear",
-    "defaultDescription": "Página para colorear imprimible gratis de Chunky Crayon",
-    "progress": {
-      "colored": "coloreado",
-      "percentage": "{percent}%",
-      "milestones": {
-        "25": "¡Buen comienzo!",
-        "50": "¡Ya vas por la mitad!",
-        "75": "¡Casi listo!",
-        "100": "¡Increíble!"
-      }
-    },
-    "sidebar": {
-      "colors": "Colores",
-      "tools": "Herramientas",
-      "size": "Tamaño",
-      "history": "Historial",
-      "zoom": "Zoom",
-      "actions": "Acciones"
-    },
-    "tools": {
-      "pan": "Mover",
-      "fill": "Rellenar",
-      "brush": "Pincel",
-      "sticker": "Pegatina",
-      "magicReveal": "Revelado mágico",
-      "magicAuto": "Auto mágico",
-      "magicBrush": "Pincel mágico",
-      "magicFill": "Relleno mágico",
-      "autoColor": "Color automático",
-      "magic": "Magia"
-    },
-    "brushTypes": {
-      "crayon": "Cera",
-      "marker": "Rotulador",
-      "eraser": "Borrador",
-      "glitter": "Purpurina",
-      "sparkle": "Brillitos",
-      "rainbow": "Arcoíris",
-      "glow": "Resplandor",
-      "neon": "Neón"
-    },
-    "brushSizes": {
-      "small": "Fino",
-      "medium": "Normal",
-      "large": "Grueso"
-    },
-    "fillPatterns": {
-      "solid": "Liso",
-      "dots": "Lunares",
-      "stripes": "Rayas",
-      "diagonal": "Diagonal",
-      "checkerboard": "A cuadros",
-      "hearts": "Corazones",
-      "stars": "Estrellas",
-      "zigzag": "Zigzag"
-    },
-    "actions": {
-      "save": "Guardar",
-      "download": "Descargar",
-      "share": "Compartir",
-      "print": "Imprimir",
-      "preparing": "Preparando...",
-      "doneSharing": "Compartido",
-      "colorAgain": "Colorear otra vez",
-      "startOver": "Empezar de nuevo"
-    },
-    "toolbar": {
-      "expand": "Expandir barra",
-      "collapse": "Contraer barra",
-      "moreTools": "Más herramientas",
-      "less": "Menos"
-    },
-    "undoRedo": {
-      "undo": "Deshacer",
-      "undoShortcut": "Deshacer (Ctrl+Z)",
-      "redo": "Rehacer",
-      "redoShortcut": "Rehacer (Ctrl+Y)"
-    },
-    "colorPalette": {
-      "selectColor": "Seleccionar color {color}",
-      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas Mágicas"
-    },
-    "patternSelector": {
-      "label": "Patrón:"
-    },
-    "zoomControls": {
-      "zoomLevel": "Nivel de zoom: {level}%",
-      "zoomOut": "Alejar",
-      "zoomOutAria": "Alejar (ver más)",
-      "zoomIn": "Acercar",
-      "zoomInAria": "Acercar (ver más cerca)",
-      "pan": "Mover",
-      "panAria": "Moverse por el dibujo",
-      "reset": "Ver el dibujo completo",
-      "resetAria": "Volver al dibujo completo"
-    },
-    "muteToggle": {
-      "mute": "Silenciar sonidos",
-      "unmute": "Activar sonidos",
-      "turnOn": "Activar sonidos",
-      "turnOff": "Desactivar sonidos"
-    },
-    "relatedPages": "Más páginas para colorear"
-  },
-  "shareModal": {
-    "title": "Compartir dibujo",
-    "privacyNote": "Cualquiera con este enlace puede ver este dibujo. No se comparte información personal.",
-    "expiresIn": "El enlace vence en:",
-    "expiration": {
-      "7days": "7 días",
-      "30days": "30 días",
-      "never": "Nunca vence"
-    },
-    "createLink": "Crear enlace para compartir",
-    "creating": "Creando enlace para compartir...",
-    "success": {
-      "title": "¡Enlace creado!",
-      "subtitle": "Comparte este enlace con familia y amigos"
-    },
-    "done": "Listo"
-  },
   "adultGate": {
     "title": "¿Eres un adulto?",
     "subtitle": "Esta sección es para padres y tutores",
@@ -714,57 +555,6 @@
     "submit": "Continuar",
     "error": "Casi, pero no. ¡Inténtalo de nuevo!",
     "cancel": "Volver"
-  },
-  "saveToGallery": {
-    "idle": "Guardar en la galería",
-    "saving": "Guardando...",
-    "saved": "¡Guardado!",
-    "tryAgain": "Intentar de nuevo",
-    "errors": {
-      "captureArtwork": "No pudimos guardar tu dibujo",
-      "generic": "Algo salió mal. Inténtalo de nuevo."
-    }
-  },
-  "shareButton": {
-    "idle": "Compartir",
-    "preparing": "Preparando...",
-    "doneSharing": "¡Listo!"
-  },
-  "colors": {
-    "primary": {
-      "cherryRed": "Rojo cereza",
-      "sunsetOrange": "Naranja atardecer",
-      "sunshineYellow": "Amarillo sol",
-      "grassGreen": "Verde césped",
-      "skyBlue": "Azul cielo",
-      "grapePurple": "Morado uva",
-      "bubblegumPink": "Rosa chicle",
-      "chocolateBrown": "Marrón chocolate"
-    },
-    "secondary": {
-      "coral": "Coral",
-      "mint": "Menta",
-      "lavender": "Lavanda",
-      "peach": "Melocotón",
-      "navy": "Azul marino",
-      "forest": "Verde bosque",
-      "gold": "Dorado",
-      "rose": "Rosa"
-    },
-    "essentials": {
-      "black": "Negro",
-      "white": "Blanco",
-      "gray": "Gris",
-      "skinTone": "Tono de piel"
-    },
-    "skinTones": {
-      "light": "Claro",
-      "mediumLight": "Claro medio",
-      "medium": "Medio",
-      "mediumDark": "Medio oscuro",
-      "dark": "Oscuro",
-      "deep": "Muy oscuro"
-    }
   },
   "stickers": {
     "categories": {
@@ -966,31 +756,6 @@
     "selected": "Elegida:",
     "helpText": "Toca el dibujo para poner tu pegatina"
   },
-  "shareArtwork": {
-    "title": "Compartir dibujo",
-    "linkCreated": "¡Enlace creado!",
-    "sharePrompt": "Comparte este enlace con familia y amigos",
-    "privacyNotice": "Cualquiera con este enlace puede ver este dibujo. No se comparte información personal.",
-    "expiresIn": "El enlace caduca en:",
-    "expiration": {
-      "7days": "7 días",
-      "30days": "30 días",
-      "never": "No caduca"
-    },
-    "createLink": "Crear enlace para compartir",
-    "creating": "Creando enlace...",
-    "close": "Cerrar",
-    "copy": "Copiar",
-    "copied": "¡Copiado!",
-    "done": "Listo",
-    "error": "No se pudo crear el enlace"
-  },
-  "account": {
-    "profiles": "Perfiles",
-    "billing": "Pagos",
-    "settings": "Ajustes",
-    "myArtwork": "Mis dibujos"
-  },
   "profiles": {
     "pageTitle": "Gestionar perfiles",
     "pageSubtitle": "Crea y gestiona perfiles para tu familia",
@@ -1060,148 +825,6 @@
       "ageGroupLabel": "Grupo de edad",
       "avatarLabel": "Avatar"
     }
-  },
-  "settings": {
-    "pageTitle": "Ajustes",
-    "pageSubtitle": "Administra las preferencias de tu cuenta",
-    "parentalControls": {
-      "title": "Controles parentales",
-      "description": "Controla qué contenido se ve al usar la app"
-    },
-    "communityImages": {
-      "label": "Mostrar imágenes de la comunidad",
-      "description": "Si está activado, verás en la galería páginas para colorear creadas por otros usuarios. Si está desactivado, solo se mostrarán tus propias creaciones.",
-      "enabled": "Imágenes de la comunidad activadas",
-      "disabled": "Imágenes de la comunidad desactivadas"
-    },
-    "languagePreference": {
-      "title": "Idioma",
-      "description": "Elige el idioma que prefieras para la app"
-    },
-    "audio": {
-      "title": "Audio",
-      "description": "Controla los efectos de sonido y la música de fondo",
-      "sfx": {
-        "label": "Efectos de Sonido",
-        "description": "Sonidos de pinceladas, toques y otros efectos al colorear"
-      },
-      "ambient": {
-        "label": "Música de Fondo",
-        "description": "Sonidos ambientales relajantes mientras coloreas"
-      }
-    }
-  },
-  "email": {
-    "signup": {
-      "title": "¡Colorea gratis cada día!",
-      "subtitle": "Recibe una página para colorear <free>gratis</free> en tu correo cada día.",
-      "placeholder": "parent@example.com",
-      "join": "Unirme",
-      "success": "¡Listo!",
-      "successDescription": "¡Te has unido a la lista de correo!",
-      "error": "Algo salió mal",
-      "errorDescription": "No se pudo unir a la lista de correo. Inténtalo de nuevo."
-    },
-    "unsubscribe": {
-      "success": "Suscripción cancelada",
-      "successDescription": "Te hemos quitado de nuestra lista de correo. ¡Nos da pena verte partir!",
-      "invalid": "Enlace no válido",
-      "invalidDescription": "Este enlace para cancelar la suscripción no es válido o ha caducado."
-    }
-  },
-  "billing": {
-    "pageTitle": "Tu facturación y suscripción",
-    "pageSubtitle": "Gestiona tu suscripción y compra más créditos para seguir creando increíbles páginas para colorear.",
-    "currentPlan": "Plan actual",
-    "currentCredits": "Créditos actuales: {count}",
-    "renewsOn": "Tu suscripción se renueva el {date}",
-    "manageSubscription": "Gestionar suscripción",
-    "noActiveSubscription": "Sin suscripción activa",
-    "noSubscriptionDescription": "Elige un plan para empezar a crear increíbles páginas para colorear.",
-    "viewPlans": "Ver planes",
-    "buyMoreCredits": "Comprar más créditos",
-    "credits": "{count} créditos",
-    "buyNow": "Comprar ahora",
-    "loading": "Cargando...",
-    "availablePlans": "Planes disponibles",
-    "changePlan": "Cambiar plan",
-    "currentPlanBadge": "Plan actual",
-    "manageInPortal": "Gestiona tu suscripción en el portal del cliente",
-    "noCommitment": "Sin compromiso. Cancela cuando quieras.",
-    "perMonth": "/mes",
-    "noSubscriptionForCredits": "Necesitas una suscripción activa para comprar créditos",
-    "noSubscriptionFound": "No se encontró una suscripción activa",
-    "failedToChangeSubscription": "No se pudo cambiar la suscripción",
-    "failedToCheckout": "No se pudo ir al pago",
-    "failedToPurchaseCredits": "No se pudieron comprar los créditos",
-    "failedToOpenPortal": "No se pudo abrir el portal del cliente",
-    "subscribe": "Suscribirse"
-  },
-  "auth": {
-    "signIn": "Iniciar sesión",
-    "signUp": "Crear cuenta",
-    "signOut": "Cerrar sesión",
-    "continueWithGoogle": "Continuar con Google",
-    "continueWithApple": "Continuar con Apple",
-    "signInWithEmail": "Iniciar sesión con email",
-    "sendingLink": "Enviando enlace...",
-    "chooseMethod": "Elige tu forma favorita de iniciar sesión",
-    "orContinueWith": "O continúa con",
-    "emailPlaceholder": "nombre@ejemplo.com",
-    "termsAgreement": "Al continuar, aceptas nuestros Términos del servicio y Política de privacidad.",
-    "verifyRequest": {
-      "title": "¡Revisa tu correo!",
-      "description": "Te enviamos un enlace mágico para iniciar sesión. Toca el enlace de tu correo para continuar.",
-      "checkSpam": "¿No lo ves? Revisa la carpeta de spam.",
-      "linkExpiry": "El enlace caduca en 24 horas.",
-      "tryDifferentEmail": "Usar otro correo"
-    },
-    "error": {
-      "title": "Algo salió mal",
-      "tryAgain": "Vuelve a intentar iniciar sesión. Si el problema continúa, contacta con soporte.",
-      "backToSignIn": "Volver a iniciar sesión",
-      "goHome": "Ir a inicio"
-    },
-    "errors": {
-      "configuration": "Hay un problema con la configuración del servidor. Inténtalo más tarde.",
-      "accessDenied": "Acceso denegado. No tienes permiso para iniciar sesión.",
-      "verification": "El enlace para iniciar sesión caducó o ya se usó. Pide uno nuevo.",
-      "oauth": "Hubo un problema al iniciar sesión con tu cuenta. Inténtalo de nuevo.",
-      "email": "Hubo un problema al enviar el correo de inicio de sesión. Inténtalo de nuevo.",
-      "credentials": "Credenciales no válidas. Revisa tu correo e inténtalo de nuevo.",
-      "sessionRequired": "Inicia sesión para entrar a esta página.",
-      "default": "Ocurrió un error inesperado. Inténtalo de nuevo."
-    }
-  },
-  "errors": {
-    "generic": "Algo salió mal. Inténtalo de nuevo.",
-    "notFound": "Página no encontrada",
-    "sharedArtworkNotFound": {
-      "title": "Dibujo no encontrado",
-      "description": "Este enlace de dibujo compartido puede haber caducado o haberse eliminado. ¡Pídele al artista un enlace nuevo!",
-      "cta": "Explorar páginas para colorear"
-    },
-    "unauthorized": "Inicia sesión para continuar",
-    "stripeLoadFailed": "No se pudo cargar Stripe",
-    "checkoutFailed": "No se pudo crear la sesión de pago",
-    "unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo.",
-    "redirectFailed": "No se pudo ir al pago"
-  },
-  "breadcrumbs": {
-    "home": "Inicio",
-    "gallery": "Galería",
-    "forToddlers": "Para peques",
-    "forKids": "Para niños",
-    "forTeens": "Para adolescentes",
-    "forAdults": "Para adultos",
-    "ariaLabel": "Ruta de navegación",
-    "daily": "Páginas para colorear diarias",
-    "community": "Páginas para colorear de la comunidad",
-    "holidays": "Fiestas y estaciones"
-  },
-  "jumpToNav": {
-    "jumpToSection": "Ir a la sección",
-    "backToTop": "Volver arriba"
   },
   "social": {
     "instagram": "Instagram",
@@ -1314,17 +937,6 @@
       "confirm": "Sí, borrar",
       "cancel": "No, conservar"
     }
-  },
-  "time": {
-    "today": "Hoy",
-    "yesterday": "Ayer",
-    "daysAgo": "Hace {count} días",
-    "lastWeek": "La semana pasada",
-    "weeksAgo": "Hace {count} semanas",
-    "monthsAgo": "Hace {count} meses",
-    "justNow": "Ahora mismo",
-    "minutesAgo": "Hace {count} minutos",
-    "hoursAgo": "Hace {count} horas"
   },
   "challenges": {
     "pageTitle": "Desafíos semanales",
@@ -1440,24 +1052,6 @@
     "subtextNoCreditsSubscribed": "¿Necesitas más magia? ¡Recarga o mejora tu plan para que la creatividad siga!",
     "subtextNoCreditsNoSubscription": "Elige una suscripción para desbloquear más creaciones",
     "subtextFallback": "Tendrás 15 créditos gratis — ¡suficientes para crear 3 páginas!"
-  },
-  "language": {
-    "switchLanguage": "Cambiar idioma",
-    "currentLanguage": "Idioma actual",
-    "selectLanguage": "Elegir idioma",
-    "language": "Idioma",
-    "switchTo": "Cambiar a"
-  },
-  "startOverButton": {
-    "idle": "Empezar de nuevo",
-    "confirm": "Sí, empezar de nuevo",
-    "cancel": "Seguir coloreando"
-  },
-  "downloadPDFButton": {
-    "idle": "Imprimir",
-    "loading": "Cargando...",
-    "creating": "Creando...",
-    "error": "¡Ups!"
   },
   "og": {
     "homepage": {

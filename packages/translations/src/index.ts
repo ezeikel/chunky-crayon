@@ -40,5 +40,31 @@ export type NestedKeyOf<ObjectType extends object> = {
 
 export type TranslationKey = NestedKeyOf<typeof enTranslations>;
 
+/**
+ * Deep merge shared translations with app-specific overrides.
+ * Override values win when both exist for the same key.
+ */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function mergeMessages(
+  shared: Record<string, unknown>,
+  overrides: Record<string, unknown>,
+): Record<string, unknown> {
+  const result = { ...shared };
+  for (const key of Object.keys(overrides)) {
+    if (isPlainObject(result[key]) && isPlainObject(overrides[key])) {
+      result[key] = mergeMessages(
+        result[key] as Record<string, unknown>,
+        overrides[key] as Record<string, unknown>,
+      );
+    } else {
+      result[key] = overrides[key];
+    }
+  }
+  return result;
+}
+
 // Default export for convenience
 export default translations;

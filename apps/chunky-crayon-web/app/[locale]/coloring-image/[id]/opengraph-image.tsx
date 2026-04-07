@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { translations } from '@one-colored-pixel/chunky-crayon-translations';
+import { getTranslationsForLocale } from '@/i18n/messages';
 import { loadOGFonts, OG_FONT_CONFIG } from '@/lib/og/fonts';
 import { colors, OG_WIDTH, OG_HEIGHT, crayonColors } from '@/lib/og/constants';
 import { getColoringImageForOG } from '@/lib/og/data';
@@ -27,9 +27,7 @@ type Props = {
 
 export default async function Image({ params }: Props) {
   const { id, locale } = await params;
-  const t = (
-    translations[locale as keyof typeof translations] as typeof translations.en
-  ).og;
+  const t = (getTranslationsForLocale(locale) as any).og;
 
   const [fonts, coloringImage] = await Promise.all([
     loadOGFonts(),

@@ -58,7 +58,7 @@ This project uses Neon PostgreSQL with branch-based development:
 - `packages/stripe-shared` - Configurable Stripe utilities (`@one-colored-pixel/stripe-shared`)
 - `packages/coloring-core` - AI models and tracing (`@one-colored-pixel/coloring-core`)
 - `packages/coloring-ui` - Full coloring experience: ImageCanvas, palettes, toolbars, sound, context (`@one-colored-pixel/coloring-ui`) — has Storybook
-- `packages/chunky-crayon-translations` - i18n translations for Chunky Crayon (`@one-colored-pixel/chunky-crayon-translations`)
+- `packages/translations` - Shared i18n translations (`@one-colored-pixel/translations`)
 
 ## Keeping CC and CH in Sync
 
@@ -112,7 +112,7 @@ In Next.js 16, `middleware.ts` was renamed to `proxy.ts`. The middleware file is
 
 ## Translations
 
-Only edit `packages/chunky-crayon-translations/src/en.json`. A GitHub Action automatically populates all other languages in CI.
+Edit `packages/translations/src/en.json` for shared/universal strings. Edit `apps/{app}/messages/en.json` for brand-specific overrides. A GitHub Action automatically translates to all other languages in CI.
 
 ## Commits
 

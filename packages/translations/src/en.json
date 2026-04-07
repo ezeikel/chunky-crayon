@@ -1,0 +1,408 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "done": "Done",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "credits": "credits",
+    "creditsWithCount": "{count} credits"
+  },
+  "navigation": {
+    "home": "Home",
+    "gallery": "Gallery",
+    "myArtwork": "My Artwork",
+    "challenges": "Challenges",
+    "blog": "Blog",
+    "pricing": "Pricing",
+    "support": "Support",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "billing": "Billing",
+    "settings": "Settings",
+    "stickerBook": "Sticker Book",
+    "account": "Account",
+    "menu": "Menu",
+    "currentlyActive": "Currently active",
+    "switchTo": "Switch to",
+    "selectProfile": "Select Profile",
+    "manageProfiles": "Manage Profiles",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "navigationMenu": "Navigation menu"
+  },
+  "coloringPage": {
+    "title": "Coloring Page",
+    "relatedPages": "More Coloring Pages",
+    "defaultDescription": "Free printable coloring page from Chunky Crayon",
+    "progress": {
+      "colored": "colored",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "Great start!",
+        "50": "Halfway there!",
+        "75": "Almost done!",
+        "100": "Amazing!"
+      }
+    },
+    "sidebar": {
+      "colors": "Colors",
+      "tools": "Tools",
+      "size": "Size",
+      "history": "History",
+      "zoom": "Zoom",
+      "actions": "Actions"
+    },
+    "tools": {
+      "pan": "Pan",
+      "fill": "Fill",
+      "brush": "Brush",
+      "sticker": "Sticker",
+      "magicReveal": "Magic Reveal",
+      "magicAuto": "Magic Auto",
+      "magicBrush": "Magic Brush",
+      "magicFill": "Magic Fill",
+      "autoColor": "Auto Color",
+      "magic": "Magic"
+    },
+    "brushTypes": {
+      "crayon": "Crayon",
+      "marker": "Marker",
+      "eraser": "Eraser",
+      "glitter": "Glitter",
+      "sparkle": "Sparkle",
+      "rainbow": "Rainbow",
+      "glow": "Glow",
+      "neon": "Neon"
+    },
+    "brushSizes": {
+      "small": "Fine",
+      "medium": "Regular",
+      "large": "Chunky"
+    },
+    "fillPatterns": {
+      "solid": "Solid",
+      "dots": "Polka Dots",
+      "stripes": "Stripes",
+      "diagonal": "Diagonal",
+      "checkerboard": "Checkers",
+      "hearts": "Hearts",
+      "stars": "Stars",
+      "zigzag": "Zigzag"
+    },
+    "actions": {
+      "save": "Save",
+      "download": "Download",
+      "share": "Share",
+      "print": "Print",
+      "preparing": "Preparing...",
+      "doneSharing": "Done sharing",
+      "colorAgain": "Color again",
+      "startOver": "Start Over"
+    },
+    "toolbar": {
+      "expand": "Expand toolbar",
+      "collapse": "Collapse toolbar",
+      "moreTools": "More tools",
+      "less": "Less"
+    },
+    "undoRedo": {
+      "undo": "Undo",
+      "undoShortcut": "Undo (Ctrl+Z)",
+      "redo": "Redo",
+      "redoShortcut": "Redo (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "Select {color} color",
+      "magicToolsMessage": "Colors are chosen automatically with Magic tools"
+    },
+    "patternSelector": {
+      "label": "Pattern:"
+    },
+    "zoomControls": {
+      "zoomLevel": "Zoom level: {level}%",
+      "zoomOut": "Zoom out",
+      "zoomOutAria": "Zoom out (see more)",
+      "zoomIn": "Zoom in",
+      "zoomInAria": "Zoom in (see closer)",
+      "pan": "Move",
+      "panAria": "Move around the picture",
+      "reset": "See whole picture",
+      "resetAria": "Go back to full picture"
+    },
+    "muteToggle": {
+      "mute": "Mute sounds",
+      "unmute": "Unmute sounds",
+      "turnOn": "Turn sounds on",
+      "turnOff": "Turn sounds off"
+    }
+  },
+  "shareModal": {
+    "title": "Share Artwork",
+    "privacyNote": "Anyone with this link can view this artwork. No personal information is shared.",
+    "expiresIn": "Link expires in:",
+    "expiration": {
+      "7days": "7 days",
+      "30days": "30 days",
+      "never": "Never expires"
+    },
+    "createLink": "Create Share Link",
+    "creating": "Creating share link...",
+    "success": {
+      "title": "Link Created!",
+      "subtitle": "Share this link with family and friends"
+    },
+    "done": "Done"
+  },
+  "saveToGallery": {
+    "idle": "Save to Gallery",
+    "saving": "Saving...",
+    "saved": "Saved!",
+    "tryAgain": "Try Again",
+    "errors": {
+      "captureArtwork": "Could not capture your artwork",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "shareButton": {
+    "idle": "Share",
+    "preparing": "Preparing...",
+    "doneSharing": "Done sharing"
+  },
+  "startOverButton": {
+    "idle": "Start Over",
+    "confirm": "Yes, Start Over",
+    "cancel": "Keep Coloring"
+  },
+  "downloadPDFButton": {
+    "idle": "Print",
+    "loading": "Loading...",
+    "creating": "Creating...",
+    "error": "Oops!"
+  },
+  "colors": {
+    "primary": {
+      "cherryRed": "Cherry Red",
+      "sunsetOrange": "Sunset Orange",
+      "sunshineYellow": "Sunshine Yellow",
+      "grassGreen": "Grass Green",
+      "skyBlue": "Sky Blue",
+      "grapePurple": "Grape Purple",
+      "bubblegumPink": "Bubblegum Pink",
+      "chocolateBrown": "Chocolate Brown"
+    },
+    "secondary": {
+      "coral": "Coral",
+      "mint": "Mint",
+      "lavender": "Lavender",
+      "peach": "Peach",
+      "navy": "Navy",
+      "forest": "Forest",
+      "gold": "Gold",
+      "rose": "Rose"
+    },
+    "essentials": {
+      "black": "Black",
+      "white": "White",
+      "gray": "Gray",
+      "skinTone": "Skin Tone"
+    },
+    "skinTones": {
+      "light": "Light",
+      "mediumLight": "Medium Light",
+      "medium": "Medium",
+      "mediumDark": "Medium Dark",
+      "dark": "Dark",
+      "deep": "Deep"
+    }
+  },
+  "shareArtwork": {
+    "title": "Share Artwork",
+    "linkCreated": "Link Created!",
+    "sharePrompt": "Share this link with family and friends",
+    "privacyNotice": "Anyone with this link can view this artwork. No personal information is shared.",
+    "expiresIn": "Link expires in:",
+    "expiration": {
+      "7days": "7 days",
+      "30days": "30 days",
+      "never": "Never expires"
+    },
+    "createLink": "Create Share Link",
+    "creating": "Creating share link...",
+    "close": "Close",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "done": "Done",
+    "error": "Failed to create share link"
+  },
+  "account": {
+    "profiles": "Profiles",
+    "billing": "Billing",
+    "settings": "Settings",
+    "myArtwork": "My Artwork"
+  },
+  "settings": {
+    "pageTitle": "Settings",
+    "pageSubtitle": "Manage your account preferences",
+    "parentalControls": {
+      "title": "Parental Controls",
+      "description": "Control what content is visible when using the app"
+    },
+    "communityImages": {
+      "label": "Show community images",
+      "description": "When enabled, you'll see coloring pages created by other users in the gallery. When disabled, only your own creations are shown.",
+      "enabled": "Community images enabled",
+      "disabled": "Community images disabled"
+    },
+    "languagePreference": {
+      "title": "Language",
+      "description": "Choose your preferred language for the app"
+    },
+    "audio": {
+      "title": "Audio",
+      "description": "Control sound effects and background music",
+      "sfx": {
+        "label": "Sound Effects",
+        "description": "Brush strokes, taps, and other coloring sounds"
+      },
+      "ambient": {
+        "label": "Background Music",
+        "description": "Relaxing ambient sounds while coloring"
+      }
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "Free Daily Coloring!",
+      "subtitle": "Get a <free>free</free> coloring page in your inbox every day.",
+      "placeholder": "parent@example.com",
+      "join": "Join",
+      "success": "Success!",
+      "successDescription": "You have successfully joined the email list!",
+      "error": "Something went wrong",
+      "errorDescription": "Failed to join the email list. Please try again."
+    },
+    "unsubscribe": {
+      "success": "Unsubscribed",
+      "successDescription": "You've been removed from our mailing list. We're sad to see you go!",
+      "invalid": "Invalid link",
+      "invalidDescription": "This unsubscribe link is invalid or has expired."
+    }
+  },
+  "billing": {
+    "pageTitle": "Your Billing & Subscription",
+    "pageSubtitle": "Manage your subscription and purchase additional credits to keep creating amazing coloring pages.",
+    "currentPlan": "Current Plan",
+    "currentCredits": "Current credits: {count}",
+    "renewsOn": "Your subscription renews on {date}",
+    "manageSubscription": "Manage Subscription",
+    "noActiveSubscription": "No Active Subscription",
+    "noSubscriptionDescription": "Choose a plan to start creating amazing coloring pages.",
+    "viewPlans": "View Plans",
+    "buyMoreCredits": "Buy More Credits",
+    "credits": "{count} credits",
+    "buyNow": "Buy Now",
+    "loading": "Loading...",
+    "availablePlans": "Available Plans",
+    "changePlan": "Change Plan",
+    "subscribe": "Subscribe",
+    "currentPlanBadge": "Current Plan",
+    "manageInPortal": "Manage your subscription in the customer portal",
+    "noCommitment": "No commitment. Cancel anytime.",
+    "perMonth": "/mo",
+    "noSubscriptionForCredits": "Active subscription required to purchase credits",
+    "noSubscriptionFound": "No active subscription found",
+    "failedToChangeSubscription": "Failed to change subscription",
+    "failedToCheckout": "Failed to redirect to checkout",
+    "failedToPurchaseCredits": "Failed to purchase credits",
+    "failedToOpenPortal": "Failed to open customer portal"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "signInWithEmail": "Sign in with Email",
+    "sendingLink": "Sending link...",
+    "chooseMethod": "Choose your preferred sign in method",
+    "orContinueWith": "Or continue with",
+    "emailPlaceholder": "name@example.com",
+    "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy.",
+    "verifyRequest": {
+      "title": "Check Your Email!",
+      "description": "We sent you a magic link to sign in. Click the link in your email to continue.",
+      "checkSpam": "Don't see it? Check your spam folder.",
+      "linkExpiry": "The link expires in 24 hours.",
+      "tryDifferentEmail": "Use a different email"
+    },
+    "error": {
+      "title": "Something Went Wrong",
+      "tryAgain": "Please try signing in again. If the problem persists, contact support.",
+      "backToSignIn": "Back to Sign In",
+      "goHome": "Go to Homepage"
+    },
+    "errors": {
+      "configuration": "There's a problem with the server configuration. Please try again later.",
+      "accessDenied": "Access denied. You don't have permission to sign in.",
+      "verification": "The sign-in link has expired or has already been used. Please request a new one.",
+      "oauth": "There was a problem signing in with your account. Please try again.",
+      "email": "There was a problem sending the sign-in email. Please try again.",
+      "credentials": "Invalid credentials. Please check your email and try again.",
+      "sessionRequired": "Please sign in to access this page.",
+      "default": "An unexpected error occurred. Please try again."
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "notFound": "Page not found",
+    "sharedArtworkNotFound": {
+      "title": "Artwork Not Found",
+      "description": "This shared artwork link may have expired or been removed. Ask the artist for a new link!",
+      "cta": "Explore Coloring Pages"
+    },
+    "unauthorized": "Please sign in to continue",
+    "stripeLoadFailed": "Stripe failed to load",
+    "checkoutFailed": "Failed to create checkout session",
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "redirectFailed": "Failed to redirect to checkout"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "gallery": "Gallery",
+    "daily": "Daily Coloring Pages",
+    "community": "Community Coloring Pages",
+    "forToddlers": "For Toddlers",
+    "forKids": "For Kids",
+    "forTeens": "For Teens",
+    "forAdults": "For Adults",
+    "holidays": "Holidays & Seasons",
+    "ariaLabel": "Breadcrumb"
+  },
+  "jumpToNav": {
+    "jumpToSection": "Jump to section",
+    "backToTop": "Back to top"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{count} days ago",
+    "lastWeek": "Last week",
+    "weeksAgo": "{count} weeks ago",
+    "monthsAgo": "{count} months ago",
+    "justNow": "Just now",
+    "minutesAgo": "{count} minutes ago",
+    "hoursAgo": "{count} hours ago"
+  },
+  "language": {
+    "switchLanguage": "Switch language",
+    "currentLanguage": "Current language",
+    "selectLanguage": "Select language",
+    "language": "Language",
+    "switchTo": "Switch to"
+  }
+}

@@ -28,6 +28,7 @@
     "@fortawesome/pro-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@one-colored-pixel/canvas": "workspace:^",
+    "@one-colored-pixel/translations": "workspace:*",
     "@one-colored-pixel/coloring-core": "workspace:*",
     "@one-colored-pixel/coloring-ui": "workspace:^",
     "@one-colored-pixel/db": "workspace:*",

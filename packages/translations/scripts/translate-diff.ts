@@ -35,13 +35,12 @@ import { LOCALES } from "../src/locales.js";
 // Path to translation files
 const SRC_DIR = path.join(__dirname, "..", "src");
 
-const TRANSLATION_PROMPT = `You are a professional translator for a children's coloring app called "Chunky Crayon".
+const TRANSLATION_PROMPT = `You are a professional translator for a digital coloring application.
 
 Context:
-- Target audience: Parents of children aged 3-8
-- Tone: Friendly, playful, encouraging, magical
-- Brand voice: Creative, fun, child-safe
-- App features: AI-generated coloring pages, digital coloring tools, sticker collection
+- These are shared UI strings used across multiple coloring apps
+- Tone: Clear, neutral, professional
+- Content includes: navigation labels, tool names, color names, common UI elements
 
 You are translating specific keys that are missing from the {{TARGET_LANGUAGE}} translation.
 Each key is provided with its namespace context to help you understand where it's used.
@@ -52,10 +51,9 @@ Rules:
 3. Use culturally appropriate language for {{TARGET_LANGUAGE}} speakers
 4. Keep translations concise (UI space is limited)
 5. Preserve any {placeholders} and {count, plural, ...} ICU syntax EXACTLY as-is
-6. For children's app context, use warm and encouraging language
-7. Maintain brand name "Chunky Crayon" without translation
-8. For color names, use common {{TARGET_LANGUAGE}} equivalents that children would understand
-9. Return ONLY valid JSON, no markdown code blocks or explanations
+6. Use clear, universally understood language suitable for all ages
+7. For color names, use common {{TARGET_LANGUAGE}} equivalents
+8. Return ONLY valid JSON, no markdown code blocks or explanations
 
 Target Language: {{TARGET_LANGUAGE}} ({{NATIVE_NAME}})
 

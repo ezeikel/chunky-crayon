@@ -1,14 +1,8 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { NextIntlClientProvider } from "next-intl";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import Providers from "@/components/Providers";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import messages from "@/messages/en.json";
 import "./globals.css";
 
 config.autoAddCss = false;
@@ -28,7 +22,6 @@ export const metadata: Metadata = {
     "Create beautiful coloring pages for relaxation and mindfulness. Type, talk, or snap a photo to generate intricate designs.",
   openGraph: {
     type: "website",
-    locale: "en_GB",
     siteName: "Coloring Habitat",
     title: "Coloring Habitat | Mindful Coloring for Adults",
     description:
@@ -51,19 +44,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={jakarta.variable}>
+    <html className={jakarta.variable}>
       <body className="font-sans antialiased">
-        <NextIntlClientProvider messages={messages} locale="en">
-          <Providers>
-            <Suspense>
-              <Header />
-            </Suspense>
-            <main className="flex min-h-[calc(100vh-72px)] flex-col [&>div]:flex-1">
-              <Suspense>{children}</Suspense>
-            </main>
-            <Footer />
-          </Providers>
-        </NextIntlClientProvider>
+        {children}
         <Analytics />
       </body>
     </html>
