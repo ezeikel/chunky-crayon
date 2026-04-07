@@ -411,5 +411,39 @@
     "showCommunityDescription": "Kunstwerke anderer Mitglieder in der Galerie anzeigen",
     "communityEnabled": "Community-Galeriebilder aktiviert",
     "communityDisabled": "Community-Galeriebilder deaktiviert"
+  },
+  "blog": {
+    "title": "Der Coloring Habitat Blog",
+    "subtitle": "Wohlbefinden, Techniken und Inspiration fürs achtsame Ausmalen",
+    "allPosts": "Alle Beiträge",
+    "byAuthor": "Von {author}"
+  },
+  "billing": {
+    "pageTitle": "Abrechnung",
+    "pageSubtitle": "Verwalte dein Abo und deine Credits",
+    "currentPlan": "Aktueller Plan",
+    "currentCredits": "Du hast noch <strong>{credits} Credits</strong>.",
+    "renewsOn": "Verlängert sich am {date}",
+    "manageSubscription": "Abo verwalten",
+    "noActiveSubscription": "Kein aktives Abo",
+    "noActiveSubscriptionDescription": "Wähle unten einen Plan, um mit Coloring Habitat zu starten.",
+    "availablePlans": "Verfügbare Pläne",
+    "mostPopular": "Am beliebtesten",
+    "perMonth": "/Monat",
+    "creditsPerMonth": "{credits} Credits/Monat",
+    "cancelAnytime": "Jederzeit kündbar, keine Bindung",
+    "manageInPortal": "Im Abrechnungsportal verwalten",
+    "loading": "Wird geladen...",
+    "changePlan": "Plan wechseln",
+    "subscribe": "Abonnieren",
+    "viewPlans": "Pläne ansehen",
+    "errors": {
+      "noActiveSubscription": "Kein aktives Abo gefunden.",
+      "changeSubscriptionFailed": "Abo konnte nicht geändert werden. Bitte versuche es erneut.",
+      "checkoutFailed": "Checkout konnte nicht gestartet werden. Bitte versuche es erneut.",
+      "portalFailed": "Abo-Verwaltung konnte nicht geöffnet werden.",
+      "checkoutSessionFailed": "Checkout-Sitzung konnte nicht erstellt werden",
+      "redirectFailed": "Weiterleitung zum Checkout fehlgeschlagen"
+    }
   }
 }

@@ -411,5 +411,39 @@
     "showCommunityDescription": "Afficher les œuvres partagées par les autres membres dans la galerie",
     "communityEnabled": "Images de la galerie communautaire activées",
     "communityDisabled": "Images de la galerie communautaire désactivées"
+  },
+  "blog": {
+    "title": "Le blog Coloring Habitat",
+    "subtitle": "Bien-être, techniques et inspiration pour une coloration en pleine conscience",
+    "allPosts": "Tous les articles",
+    "byAuthor": "Par {author}"
+  },
+  "billing": {
+    "pageTitle": "Facturation",
+    "pageSubtitle": "Gérez votre abonnement et vos crédits",
+    "currentPlan": "Forfait actuel",
+    "currentCredits": "Il vous reste <strong>{credits} crédits</strong>.",
+    "renewsOn": "Renouvellement le {date}",
+    "manageSubscription": "Gérer l’abonnement",
+    "noActiveSubscription": "Aucun abonnement actif",
+    "noActiveSubscriptionDescription": "Choisissez un forfait ci-dessous pour commencer avec Coloring Habitat.",
+    "availablePlans": "Forfaits disponibles",
+    "mostPopular": "Le plus populaire",
+    "perMonth": "/mois",
+    "creditsPerMonth": "{credits} crédits/mois",
+    "cancelAnytime": "Annulez à tout moment, sans engagement",
+    "manageInPortal": "Gérer dans le portail de facturation",
+    "loading": "Chargement…",
+    "changePlan": "Changer de forfait",
+    "subscribe": "S’abonner",
+    "viewPlans": "Voir les forfaits",
+    "errors": {
+      "noActiveSubscription": "Aucun abonnement actif trouvé.",
+      "changeSubscriptionFailed": "Impossible de changer d’abonnement. Veuillez réessayer.",
+      "checkoutFailed": "Impossible de lancer le paiement. Veuillez réessayer.",
+      "portalFailed": "Impossible d’ouvrir la gestion de l’abonnement.",
+      "checkoutSessionFailed": "Impossible de créer la session de paiement",
+      "redirectFailed": "Impossible de rediriger vers le paiement"
+    }
   }
 }

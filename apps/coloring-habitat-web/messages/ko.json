@@ -411,5 +411,39 @@
     "showCommunityDescription": "갤러리에서 다른 회원이 공유한 작품을 표시",
     "communityEnabled": "커뮤니티 갤러리 이미지 활성화됨",
     "communityDisabled": "커뮤니티 갤러리 이미지 비활성화됨"
+  },
+  "blog": {
+    "title": "Coloring Habitat 블로그",
+    "subtitle": "마음챙김 컬러링을 위한 웰니스, 기법, 영감",
+    "allPosts": "전체 글",
+    "byAuthor": "{author} 작성"
+  },
+  "billing": {
+    "pageTitle": "결제",
+    "pageSubtitle": "구독과 크레딧을 관리하세요",
+    "currentPlan": "현재 플랜",
+    "currentCredits": "<strong>{credits} 크레딧</strong>이 남아 있습니다.",
+    "renewsOn": "{date}에 갱신",
+    "manageSubscription": "구독 관리",
+    "noActiveSubscription": "활성 구독 없음",
+    "noActiveSubscriptionDescription": "아래에서 플랜을 선택해 Coloring Habitat를 시작하세요.",
+    "availablePlans": "이용 가능한 플랜",
+    "mostPopular": "가장 인기",
+    "perMonth": "/월",
+    "creditsPerMonth": "{credits} 크레딧/월",
+    "cancelAnytime": "언제든 취소 가능, 약정 없음",
+    "manageInPortal": "결제 포털에서 관리",
+    "loading": "로딩 중...",
+    "changePlan": "플랜 변경",
+    "subscribe": "구독하기",
+    "viewPlans": "플랜 보기",
+    "errors": {
+      "noActiveSubscription": "활성 구독을 찾을 수 없습니다.",
+      "changeSubscriptionFailed": "구독 변경에 실패했습니다. 다시 시도해 주세요.",
+      "checkoutFailed": "결제를 시작하지 못했습니다. 다시 시도해 주세요.",
+      "portalFailed": "구독 관리 페이지를 열지 못했습니다.",
+      "checkoutSessionFailed": "결제 세션 생성에 실패했습니다",
+      "redirectFailed": "결제 페이지로 이동하지 못했습니다"
+    }
   }
 }

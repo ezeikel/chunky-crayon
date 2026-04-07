@@ -411,5 +411,39 @@
     "showCommunityDescription": "Mostrar obras compartidas por otros miembros en la galería",
     "communityEnabled": "Imágenes de galería comunitaria habilitadas",
     "communityDisabled": "Imágenes de galería comunitaria deshabilitadas"
+  },
+  "blog": {
+    "title": "El blog de Coloring Habitat",
+    "subtitle": "Bienestar, técnicas e inspiración para colorear con atención plena",
+    "allPosts": "Todas las entradas",
+    "byAuthor": "Por {author}"
+  },
+  "billing": {
+    "pageTitle": "Facturación",
+    "pageSubtitle": "Gestiona tu suscripción y créditos",
+    "currentPlan": "Plan actual",
+    "currentCredits": "Te quedan <strong>{credits} créditos</strong>.",
+    "renewsOn": "Se renueva el {date}",
+    "manageSubscription": "Gestionar suscripción",
+    "noActiveSubscription": "Sin suscripción activa",
+    "noActiveSubscriptionDescription": "Elige un plan abajo para empezar con Coloring Habitat.",
+    "availablePlans": "Planes disponibles",
+    "mostPopular": "Más popular",
+    "perMonth": "/mes",
+    "creditsPerMonth": "{credits} créditos/mes",
+    "cancelAnytime": "Cancela cuando quieras, sin compromiso",
+    "manageInPortal": "Gestionar en el portal de facturación",
+    "loading": "Cargando...",
+    "changePlan": "Cambiar plan",
+    "subscribe": "Suscribirse",
+    "viewPlans": "Ver planes",
+    "errors": {
+      "noActiveSubscription": "No se encontró ninguna suscripción activa.",
+      "changeSubscriptionFailed": "No se pudo cambiar la suscripción. Inténtalo de nuevo.",
+      "checkoutFailed": "No se pudo iniciar el pago. Inténtalo de nuevo.",
+      "portalFailed": "No se pudo abrir la gestión de la suscripción.",
+      "checkoutSessionFailed": "No se pudo crear la sesión de pago",
+      "redirectFailed": "No se pudo redirigir al pago"
+    }
   }
 }

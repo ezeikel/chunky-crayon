@@ -411,5 +411,39 @@
     "showCommunityDescription": "ギャラリーで他のメンバーが共有した作品を表示",
     "communityEnabled": "コミュニティギャラリー画像を有効化",
     "communityDisabled": "コミュニティギャラリー画像を無効化"
+  },
+  "blog": {
+    "title": "Coloring Habitat ブログ",
+    "subtitle": "マインドフルな塗り絵のウェルネス、テクニック、インスピレーション",
+    "allPosts": "すべての記事",
+    "byAuthor": "著者：{author}"
+  },
+  "billing": {
+    "pageTitle": "請求",
+    "pageSubtitle": "サブスクリプションとクレジットを管理",
+    "currentPlan": "現在のプラン",
+    "currentCredits": "<strong>{credits} クレジット</strong>残っています。",
+    "renewsOn": "{date}に更新",
+    "manageSubscription": "サブスクリプション管理",
+    "noActiveSubscription": "有効なサブスクリプションはありません",
+    "noActiveSubscriptionDescription": "下のプランから選んでColoring Habitatを始めましょう。",
+    "availablePlans": "利用可能なプラン",
+    "mostPopular": "人気No.1",
+    "perMonth": "/月",
+    "creditsPerMonth": "{credits} クレジット/月",
+    "cancelAnytime": "いつでも解約可能（契約縛りなし）",
+    "manageInPortal": "請求ポータルで管理",
+    "loading": "読み込み中...",
+    "changePlan": "プラン変更",
+    "subscribe": "申し込む",
+    "viewPlans": "プランを見る",
+    "errors": {
+      "noActiveSubscription": "有効なサブスクリプションが見つかりません。",
+      "changeSubscriptionFailed": "サブスクリプションの変更に失敗しました。もう一度お試しください。",
+      "checkoutFailed": "決済の開始に失敗しました。もう一度お試しください。",
+      "portalFailed": "サブスクリプション管理を開けませんでした。",
+      "checkoutSessionFailed": "決済セッションの作成に失敗しました",
+      "redirectFailed": "決済画面への遷移に失敗しました"
+    }
   }
 }
