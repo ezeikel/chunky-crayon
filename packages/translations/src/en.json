@@ -33,7 +33,8 @@
     "manageProfiles": "Manage Profiles",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "navigationMenu": "Navigation menu"
+    "navigationMenu": "Navigation menu",
+    "backToGallery": "Back to Gallery"
   },
   "coloringPage": {
     "title": "Coloring Page",

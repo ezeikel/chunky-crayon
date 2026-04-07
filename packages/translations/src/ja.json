@@ -33,7 +33,8 @@
     "manageProfiles": "プロフィール管理",
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
-    "navigationMenu": "ナビゲーションメニュー"
+    "navigationMenu": "ナビゲーションメニュー",
+    "backToGallery": "ギャラリーに戻る"
   },
   "coloringPage": {
     "title": "ぬりえ",

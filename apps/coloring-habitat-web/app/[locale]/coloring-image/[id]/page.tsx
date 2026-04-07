@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { db } from "@one-colored-pixel/db";
 import { auth } from "@/auth";
@@ -43,6 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const ColoringImagePage = async ({ params }: Props) => {
   const { id } = await params;
+  const t = await getTranslations("navigation");
 
   const [image, session] = await Promise.all([
     db.coloringImage.findUnique({
@@ -79,7 +81,7 @@ const ColoringImagePage = async ({ params }: Props) => {
             className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <span aria-hidden="true">&larr;</span>
-            Back to Gallery
+            {t("backToGallery")}
           </Link>
 
           {/* Coloring canvas with toolbar and sidebars */}

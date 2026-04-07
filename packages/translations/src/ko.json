@@ -33,7 +33,8 @@
     "manageProfiles": "프로필 관리",
     "openMenu": "메뉴 열기",
     "closeMenu": "메뉴 닫기",
-    "navigationMenu": "내비게이션 메뉴"
+    "navigationMenu": "내비게이션 메뉴",
+    "backToGallery": "갤러리로 돌아가기"
   },
   "coloringPage": {
     "title": "색칠하기",
