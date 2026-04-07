@@ -1,0 +1,260 @@
+{
+  "startOverButton": {
+    "idle": "Neu beginnen",
+    "confirm": "Ja, neu beginnen",
+    "cancel": "Weiter ausmalen"
+  },
+  "downloadPDFButton": {
+    "idle": "Drucken",
+    "loading": "Laden...",
+    "creating": "Erstellen...",
+    "error": "Hoppla!"
+  },
+  "coloringPage": {
+    "title": "Ausmalseite",
+    "relatedPages": "Weitere Ausmalseiten",
+    "defaultDescription": "Kostenlose Ausmalseite für Erwachsene von Coloring Habitat",
+    "progress": {
+      "colored": "ausgemalt",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "Guter Anfang!",
+        "50": "Schon halb fertig!",
+        "75": "Fast geschafft!",
+        "100": "Wunderbar!"
+      }
+    },
+    "sidebar": {
+      "colors": "Farben",
+      "tools": "Werkzeuge",
+      "size": "Größe",
+      "history": "Verlauf",
+      "zoom": "Zoom",
+      "actions": "Aktionen"
+    },
+    "tools": {
+      "pan": "Verschieben",
+      "fill": "Füllen",
+      "brush": "Pinsel",
+      "sticker": "Sticker",
+      "magicReveal": "Magisches Enthüllen",
+      "magicAuto": "Magisch Auto",
+      "magicBrush": "Magischer Pinsel",
+      "magicFill": "Magisches Füllen",
+      "autoColor": "Auto-Farbe",
+      "magic": "Magie"
+    },
+    "brushTypes": {
+      "crayon": "Wachsmalstift",
+      "marker": "Filzstift",
+      "eraser": "Radierer",
+      "glitter": "Glitzer",
+      "sparkle": "Funkeln",
+      "rainbow": "Regenbogen",
+      "glow": "Leuchten",
+      "neon": "Neon"
+    },
+    "brushSizes": {
+      "small": "Fein",
+      "medium": "Normal",
+      "large": "Breit"
+    },
+    "fillPatterns": {
+      "solid": "Einfarbig",
+      "dots": "Punkte",
+      "stripes": "Streifen",
+      "diagonal": "Diagonal",
+      "checkerboard": "Schachbrett",
+      "hearts": "Herzen",
+      "stars": "Sterne",
+      "zigzag": "Zickzack"
+    },
+    "actions": {
+      "save": "Speichern",
+      "download": "Herunterladen",
+      "share": "Teilen",
+      "print": "Drucken",
+      "preparing": "Vorbereiten...",
+      "doneSharing": "Geteilt",
+      "colorAgain": "Nochmal ausmalen",
+      "startOver": "Neu beginnen"
+    },
+    "toolbar": {
+      "expand": "Werkzeugleiste erweitern",
+      "collapse": "Werkzeugleiste einklappen",
+      "moreTools": "Mehr Werkzeuge",
+      "less": "Weniger"
+    },
+    "undoRedo": {
+      "undo": "Rückgängig",
+      "undoShortcut": "Rückgängig (Strg+Z)",
+      "redo": "Wiederherstellen",
+      "redoShortcut": "Wiederherstellen (Strg+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "Farbe {color} auswählen",
+      "magicToolsMessage": "Farben werden automatisch mit Magie-Werkzeugen gewählt"
+    },
+    "patternSelector": {
+      "label": "Muster:"
+    },
+    "zoomControls": {
+      "zoomLevel": "Zoomstufe: {level}%",
+      "zoomOut": "Verkleinern",
+      "zoomOutAria": "Verkleinern (mehr sehen)",
+      "zoomIn": "Vergrößern",
+      "zoomInAria": "Vergrößern (näher sehen)",
+      "pan": "Bewegen",
+      "panAria": "Im Bild bewegen",
+      "reset": "Ganzes Bild sehen",
+      "resetAria": "Zurück zum ganzen Bild"
+    },
+    "muteToggle": {
+      "mute": "Ton ausschalten",
+      "unmute": "Ton einschalten",
+      "turnOn": "Ton einschalten",
+      "turnOff": "Ton ausschalten"
+    }
+  },
+  "homepage": {
+    "hero": {
+      "title": "Male dich zur Ruhe",
+      "subtitle": "Erstelle detaillierte Ausmalseiten in Sekunden. Online ausmalen oder zu Hause ausdrucken. Deine tägliche Dosis kreative Achtsamkeit.",
+      "trustBadge1": "1.000+ kostenlose Seiten",
+      "trustBadge2": "Kein Konto nötig",
+      "trustBadge3": "Über 50.000 zufriedene Nutzer",
+      "freeCreations": "2 kostenlose Kreationen täglich · Kein Konto nötig",
+      "users": "50.000+ Nutzer"
+    },
+    "showcase": {
+      "title": "Beliebte Ausmalseiten",
+      "showAll": "Alle Seiten anzeigen",
+      "free": "Kostenlos",
+      "printReady": "Druckfertiges PDF",
+      "addToFavorites": "Zu Favoriten hinzufügen",
+      "removeFromFavorites": "Aus Favoriten entfernen",
+      "filters": {
+        "all": "Alle",
+        "mandalas": "Mandalas",
+        "nature": "Natur",
+        "geometric": "Geometrisch",
+        "landscapes": "Landschaften",
+        "fantasy": "Fantasy",
+        "animals": "Tiere"
+      }
+    },
+    "stats": {
+      "pagesCreated": "Ausmalseiten erstellt",
+      "happyColorists": "Zufriedene Ausmaler",
+      "feelingCalmer": "Fühlen sich ruhiger",
+      "sessionLength": "Durchschnittliche Sitzungsdauer"
+    },
+    "features": {
+      "badge": "So funktioniert's",
+      "title": "Dein kreatives Wellness-Toolkit",
+      "subtitle": "Forschung zeigt, dass Ausmalen die gleichen beruhigenden Nervenbahnen aktiviert wie Meditation. Wir machen es mühelos, eine tägliche kreative Praxis aufzubauen.",
+      "stressReduction": "Stressreduktion berichtet",
+      "step": "Schritt {number}",
+      "steps": {
+        "1": {
+          "title": "Beschreibe deine Vision",
+          "description": "Tippe eine Beschreibung, sprich laut oder lade ein Foto hoch. Wir verwandeln deine Vorstellung in ein einzigartiges, detailliertes Design."
+        },
+        "2": {
+          "title": "Digital ausmalen oder drucken",
+          "description": "Nutze unsere beruhigende Online-Leinwand oder lade hochauflösende PDFs für deine Lieblingsbuntstifte herunter."
+        },
+        "3": {
+          "title": "Speichern und teilen",
+          "description": "Bewahre eine persönliche Galerie deiner fertigen Werke auf oder teile deine Kreationen mit der Community."
+        },
+        "4": {
+          "title": "Baue eine tägliche Gewohnheit auf",
+          "description": "Jeden Morgen eine kostenlose Ausmalseite. Fünf Minuten Ruhe für einen guten Start in den Tag."
+        }
+      }
+    },
+    "galleryPreview": {
+      "title": "Beliebt diese Woche",
+      "subtitle": "Kostenlose Seiten aus unserer wachsenden Bibliothek, beliebt in der Community.",
+      "viewAll": "Alle anzeigen",
+      "viewAllPages": "Alle Seiten anzeigen",
+      "addToFavourites": "Zu Favoriten hinzufügen",
+      "removeFromFavourites": "Aus Favoriten entfernen"
+    },
+    "testimonials": {
+      "fromReviews": "aus {count} Bewertungen",
+      "pagesColored": "{count} Seiten ausgemalt"
+    },
+    "newsletter": {
+      "badge": "Tägliches kostenloses Ausmalen",
+      "title": "Jeden Morgen eine kostenlose Seite",
+      "subtitle": "Schließe dich 12.000+ Menschen an, die ihren Tag mit einem Moment kreativer Ruhe beginnen. Direkt in dein Postfach.",
+      "emailPlaceholder": "deine@email.de",
+      "subscribe": "Abonnieren",
+      "subscribed": "Abonniert",
+      "noSpam": "Kein Spam, nie. Jederzeit abbestellbar."
+    },
+    "faq": {
+      "title": "Fragen & Antworten",
+      "items": {
+        "1": {
+          "question": "Wie funktioniert Coloring Habitat?",
+          "answer": "Beschreibe, was du ausmalen möchtest – per Text, Sprache oder Foto. Wir erstellen eine detaillierte Ausmalseite in etwa 30 Sekunden. Male sie online mit unseren digitalen Werkzeugen aus oder lade ein hochauflösendes PDF zum Ausdrucken herunter."
+        },
+        "2": {
+          "question": "Ist es wirklich kostenlos?",
+          "answer": "Du erhältst täglich 2 kostenlose Seitenerstellungen, kein Konto nötig. Registriere dich (ebenfalls kostenlos), um unsere gesamte Bibliothek mit über 1.000 Seiten und eine tägliche Ausmalseite per E-Mail freizuschalten."
+        },
+        "3": {
+          "question": "Was unterscheidet dies von anderen Ausmal-Apps?",
+          "answer": "Coloring Habitat ist für Menschen konzipiert, die achtsame Entspannung suchen. Jedes Design ist anspruchsvoll und detailliert, und das Erlebnis ist komplett werbefrei und beruhigend."
+        },
+        "4": {
+          "question": "Kann ich die Ausmalseiten drucken?",
+          "answer": "Jede Seite kann als hochauflösendes PDF heruntergeladen werden, perfekt für A4-Papier. Viele Nutzer lieben das haptische Erlebnis des Ausmalens mit echten Buntstiften und Filzstiften."
+        },
+        "5": {
+          "question": "Gibt es eine mobile App?",
+          "answer": "Native iOS- und Android-Apps kommen bald. Unsere Web-App ist vollständig responsiv und funktioniert wunderbar auf Handys und Tablets."
+        }
+      }
+    },
+    "cta": {
+      "title": "Bereit, deine Ruhe zu finden?",
+      "subtitle": "Schließe dich Tausenden an, die Ausmalen zu einem Teil ihrer täglichen Wellness-Routine gemacht haben.",
+      "startColoring": "Jetzt kostenlos ausmalen",
+      "viewPlans": "Pakete ansehen",
+      "getTheApp": "Hol dir die App",
+      "downloadOnAppStore": "Laden im",
+      "appStore": "App Store",
+      "getItOn": "Jetzt bei",
+      "googlePlay": "Google Play"
+    }
+  },
+  "footer": {
+    "brand": "Coloring Habitat",
+    "tagline": "Achtsames Ausmalen für alle. Erstellen, ausmalen und Ruhe finden.",
+    "copyright": "© {year} Coloring Habitat. Alle Rechte vorbehalten.",
+    "sections": {
+      "explore": "Entdecken",
+      "company": "Unternehmen",
+      "support": "Hilfe",
+      "legal": "Rechtliches"
+    },
+    "links": {
+      "gallery": "Galerie",
+      "create": "Erstellen",
+      "categories": "Kategorien",
+      "dailyPage": "Tägliche Seite",
+      "about": "Über uns",
+      "pricing": "Preise",
+      "blog": "Blog",
+      "contactUs": "Kontakt",
+      "faq": "FAQ",
+      "privacy": "Datenschutz",
+      "terms": "AGB",
+      "cookies": "Cookies"
+    }
+  }
+}

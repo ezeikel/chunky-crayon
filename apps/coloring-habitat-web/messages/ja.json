@@ -1,0 +1,260 @@
+{
+  "startOverButton": {
+    "idle": "最初からやり直す",
+    "confirm": "はい、やり直します",
+    "cancel": "続けて塗る"
+  },
+  "downloadPDFButton": {
+    "idle": "印刷",
+    "loading": "読み込み中...",
+    "creating": "作成中...",
+    "error": "エラーが発生しました"
+  },
+  "coloringPage": {
+    "title": "ぬりえページ",
+    "relatedPages": "その他のぬりえページ",
+    "defaultDescription": "Coloring Habitatの無料大人向けぬりえページ",
+    "progress": {
+      "colored": "着色済み",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "いい調子です！",
+        "50": "半分まで来ました！",
+        "75": "もうすぐ完成です！",
+        "100": "素晴らしい！"
+      }
+    },
+    "sidebar": {
+      "colors": "カラー",
+      "tools": "ツール",
+      "size": "サイズ",
+      "history": "履歴",
+      "zoom": "ズーム",
+      "actions": "アクション"
+    },
+    "tools": {
+      "pan": "移動",
+      "fill": "塗りつぶし",
+      "brush": "ブラシ",
+      "sticker": "ステッカー",
+      "magicReveal": "マジックリビール",
+      "magicAuto": "マジックオート",
+      "magicBrush": "マジックブラシ",
+      "magicFill": "マジック塗りつぶし",
+      "autoColor": "自動着色",
+      "magic": "マジック"
+    },
+    "brushTypes": {
+      "crayon": "クレヨン",
+      "marker": "マーカー",
+      "eraser": "消しゴム",
+      "glitter": "グリッター",
+      "sparkle": "スパークル",
+      "rainbow": "レインボー",
+      "glow": "グロー",
+      "neon": "ネオン"
+    },
+    "brushSizes": {
+      "small": "細い",
+      "medium": "標準",
+      "large": "太い"
+    },
+    "fillPatterns": {
+      "solid": "べた塗り",
+      "dots": "ドット",
+      "stripes": "ストライプ",
+      "diagonal": "斜線",
+      "checkerboard": "チェック",
+      "hearts": "ハート",
+      "stars": "スター",
+      "zigzag": "ジグザグ"
+    },
+    "actions": {
+      "save": "保存",
+      "download": "ダウンロード",
+      "share": "共有",
+      "print": "印刷",
+      "preparing": "準備中...",
+      "doneSharing": "共有完了",
+      "colorAgain": "もう一度塗る",
+      "startOver": "最初からやり直す"
+    },
+    "toolbar": {
+      "expand": "ツールバーを展開",
+      "collapse": "ツールバーを折りたたむ",
+      "moreTools": "その他のツール",
+      "less": "閉じる"
+    },
+    "undoRedo": {
+      "undo": "元に戻す",
+      "undoShortcut": "元に戻す（Ctrl+Z）",
+      "redo": "やり直す",
+      "redoShortcut": "やり直す（Ctrl+Y）"
+    },
+    "colorPalette": {
+      "selectColor": "{color}色を選択",
+      "magicToolsMessage": "マジックツール使用時は色が自動で選ばれます"
+    },
+    "patternSelector": {
+      "label": "パターン："
+    },
+    "zoomControls": {
+      "zoomLevel": "ズームレベル：{level}%",
+      "zoomOut": "縮小",
+      "zoomOutAria": "縮小（全体を見る）",
+      "zoomIn": "拡大",
+      "zoomInAria": "拡大（近づいて見る）",
+      "pan": "移動",
+      "panAria": "画像内を移動する",
+      "reset": "全体を表示",
+      "resetAria": "全体表示に戻る"
+    },
+    "muteToggle": {
+      "mute": "消音にする",
+      "unmute": "音声をオンにする",
+      "turnOn": "音声をオンにする",
+      "turnOff": "音声をオフにする"
+    }
+  },
+  "homepage": {
+    "hero": {
+      "title": "色を塗って、心を整える",
+      "subtitle": "精密なぬりえページを数秒で作成。オンラインで塗るも、印刷して楽しむも自由自在。毎日のクリエイティブなマインドフルネスをお届けします。",
+      "trustBadge1": "1,000以上の無料ページ",
+      "trustBadge2": "アカウント不要",
+      "trustBadge3": "50,000人以上が利用中",
+      "freeCreations": "毎日2作品まで無料 · アカウント不要",
+      "users": "50,000人以上のユーザー"
+    },
+    "showcase": {
+      "title": "人気のぬりえページ",
+      "showAll": "すべてのページを見る",
+      "free": "無料",
+      "printReady": "印刷用PDF対応",
+      "addToFavorites": "お気に入りに追加",
+      "removeFromFavorites": "お気に入りから削除",
+      "filters": {
+        "all": "すべて",
+        "mandalas": "曼荼羅",
+        "nature": "自然",
+        "geometric": "幾何学",
+        "landscapes": "風景",
+        "fantasy": "ファンタジー",
+        "animals": "動物"
+      }
+    },
+    "stats": {
+      "pagesCreated": "作成されたぬりえページ",
+      "happyColorists": "満足いただいているユーザー",
+      "feelingCalmer": "リラックス効果を実感",
+      "sessionLength": "平均セッション時間"
+    },
+    "features": {
+      "badge": "ご利用方法",
+      "title": "あなたのクリエイティブ・ウェルネスツールキット",
+      "subtitle": "研究によると、ぬりえは瞑想と同じリラクゼーション効果をもたらす神経経路を活性化します。私たちは、毎日のクリエイティブな習慣づくりを簡単にします。",
+      "stressReduction": "ストレス軽減を報告",
+      "step": "ステップ {number}",
+      "steps": {
+        "1": {
+          "title": "イメージを伝える",
+          "description": "テキストで入力、音声で話す、または写真をアップロード。あなたの想像を繊細でユニークなデザインに仕上げます。"
+        },
+        "2": {
+          "title": "デジタルで塗る、または印刷する",
+          "description": "心安らぐオンラインキャンバスで塗るか、高解像度PDFをダウンロードしてお好みの色鉛筆でお楽しみください。"
+        },
+        "3": {
+          "title": "保存して共有する",
+          "description": "完成した作品をギャラリーに保存したり、コミュニティと共有したりできます。"
+        },
+        "4": {
+          "title": "毎日の習慣にする",
+          "description": "毎朝、無料のぬりえページをお届けします。一日の始まりに5分間の穏やかな時間を。"
+        }
+      }
+    },
+    "galleryPreview": {
+      "title": "今週の人気ページ",
+      "subtitle": "コミュニティで人気の、充実し続けるライブラリの無料ページです。",
+      "viewAll": "すべて見る",
+      "viewAllPages": "すべてのページを見る",
+      "addToFavourites": "お気に入りに追加",
+      "removeFromFavourites": "お気に入りから削除"
+    },
+    "testimonials": {
+      "fromReviews": "{count}件のレビューより",
+      "pagesColored": "{count}ページ着色済み"
+    },
+    "newsletter": {
+      "badge": "毎日の無料ぬりえ",
+      "title": "毎朝、無料ページをお届け",
+      "subtitle": "12,000人以上の方が、クリエイティブで穏やかなひとときで一日をスタートしています。メールで直接お届けします。",
+      "emailPlaceholder": "your@email.com",
+      "subscribe": "登録する",
+      "subscribed": "登録済み",
+      "noSpam": "スパムは一切ありません。いつでも配信停止できます。"
+    },
+    "faq": {
+      "title": "よくあるご質問",
+      "items": {
+        "1": {
+          "question": "Coloring Habitatはどのように使いますか？",
+          "answer": "テキスト、音声、または写真で塗りたいものを伝えてください。約30秒で繊細で精密なぬりえページを生成します。オンラインのデジタルツールで塗るか、高解像度PDFをダウンロードして印刷してお楽しみください。"
+        },
+        "2": {
+          "question": "本当に無料ですか？",
+          "answer": "毎日2ページまで無料で作成でき、アカウントも不要です。無料登録していただくと、1,000以上のページが揃ったライブラリへのフルアクセスと、毎朝届くぬりえページをご利用いただけます。"
+        },
+        "3": {
+          "question": "他のぬりえアプリとの違いは何ですか？",
+          "answer": "Coloring Habitatは、マインドフルなリラクゼーションを求める方のために設計されています。すべてのデザインは洗練された繊細な仕上がりで、完全に広告のない心地よい体験をお届けします。"
+        },
+        "4": {
+          "question": "ぬりえページを印刷できますか？",
+          "answer": "すべてのページを高解像度PDFとしてダウンロードでき、A4用紙に最適なサイズです。色鉛筆やペン、マーカーで実際に塗る触覚的な体験を楽しまれる方も多くいらっしゃいます。"
+        },
+        "5": {
+          "question": "モバイルアプリはありますか？",
+          "answer": "iOS・Android向けのネイティブアプリは近日公開予定です。現在、Webアプリはスマートフォンやタブレットでも快適にご利用いただけるレスポンシブ対応となっております。"
+        }
+      }
+    },
+    "cta": {
+      "title": "心の安らぎを見つけませんか？",
+      "subtitle": "ぬりえを毎日のウェルネス習慣に取り入れている多くの方々に加わりましょう。",
+      "startColoring": "無料で始める",
+      "viewPlans": "プランを見る",
+      "getTheApp": "アプリを入手",
+      "downloadOnAppStore": "からダウンロード",
+      "appStore": "App Store",
+      "getItOn": "で入手",
+      "googlePlay": "Google Play"
+    }
+  },
+  "footer": {
+    "brand": "Coloring Habitat",
+    "tagline": "すべての人にマインドフルなぬりえを。作って、塗って、心の安らぎを見つけましょう。",
+    "copyright": "© {year} Coloring Habitat. All rights reserved.",
+    "sections": {
+      "explore": "探す",
+      "company": "会社情報",
+      "support": "サポート",
+      "legal": "法的情報"
+    },
+    "links": {
+      "gallery": "ギャラリー",
+      "create": "作成する",
+      "categories": "カテゴリー",
+      "dailyPage": "今日のページ",
+      "about": "について",
+      "pricing": "料金プラン",
+      "blog": "ブログ",
+      "contactUs": "お問い合わせ",
+      "faq": "よくあるご質問",
+      "privacy": "プライバシーポリシー",
+      "terms": "利用規約",
+      "cookies": "Cookie"
+    }
+  }
+}

@@ -1,0 +1,260 @@
+{
+  "startOverButton": {
+    "idle": "Empezar de nuevo",
+    "confirm": "Sí, empezar de nuevo",
+    "cancel": "Seguir coloreando"
+  },
+  "downloadPDFButton": {
+    "idle": "Imprimir",
+    "loading": "Cargando...",
+    "creating": "Creando...",
+    "error": "Error"
+  },
+  "coloringPage": {
+    "title": "Página para colorear",
+    "relatedPages": "Más páginas para colorear",
+    "defaultDescription": "Página para colorear gratuita para adultos de Coloring Habitat",
+    "progress": {
+      "colored": "coloreado",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "Buen comienzo",
+        "50": "A mitad de camino",
+        "75": "Casi terminado",
+        "100": "Increíble"
+      }
+    },
+    "sidebar": {
+      "colors": "Colores",
+      "tools": "Herramientas",
+      "size": "Tamaño",
+      "history": "Historial",
+      "zoom": "Zoom",
+      "actions": "Acciones"
+    },
+    "tools": {
+      "pan": "Mover",
+      "fill": "Rellenar",
+      "brush": "Pincel",
+      "sticker": "Adhesivo",
+      "magicReveal": "Revelado mágico",
+      "magicAuto": "Auto mágico",
+      "magicBrush": "Pincel mágico",
+      "magicFill": "Relleno mágico",
+      "autoColor": "Color automático",
+      "magic": "Magia"
+    },
+    "brushTypes": {
+      "crayon": "Crayón",
+      "marker": "Marcador",
+      "eraser": "Borrador",
+      "glitter": "Purpurina",
+      "sparkle": "Destello",
+      "rainbow": "Arcoíris",
+      "glow": "Resplandor",
+      "neon": "Neón"
+    },
+    "brushSizes": {
+      "small": "Fino",
+      "medium": "Regular",
+      "large": "Grueso"
+    },
+    "fillPatterns": {
+      "solid": "Sólido",
+      "dots": "Lunares",
+      "stripes": "Rayas",
+      "diagonal": "Diagonal",
+      "checkerboard": "Cuadros",
+      "hearts": "Corazones",
+      "stars": "Estrellas",
+      "zigzag": "Zigzag"
+    },
+    "actions": {
+      "save": "Guardar",
+      "download": "Descargar",
+      "share": "Compartir",
+      "print": "Imprimir",
+      "preparing": "Preparando...",
+      "doneSharing": "Compartido",
+      "colorAgain": "Colorear de nuevo",
+      "startOver": "Empezar de nuevo"
+    },
+    "toolbar": {
+      "expand": "Expandir barra de herramientas",
+      "collapse": "Contraer barra de herramientas",
+      "moreTools": "Más herramientas",
+      "less": "Menos"
+    },
+    "undoRedo": {
+      "undo": "Deshacer",
+      "undoShortcut": "Deshacer (Ctrl+Z)",
+      "redo": "Rehacer",
+      "redoShortcut": "Rehacer (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "Seleccionar color {color}",
+      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas mágicas"
+    },
+    "patternSelector": {
+      "label": "Patrón:"
+    },
+    "zoomControls": {
+      "zoomLevel": "Nivel de zoom: {level}%",
+      "zoomOut": "Alejar",
+      "zoomOutAria": "Alejar (ver más)",
+      "zoomIn": "Acercar",
+      "zoomInAria": "Acercar (ver de cerca)",
+      "pan": "Mover",
+      "panAria": "Mover por la imagen",
+      "reset": "Ver imagen completa",
+      "resetAria": "Volver a la imagen completa"
+    },
+    "muteToggle": {
+      "mute": "Silenciar sonidos",
+      "unmute": "Activar sonidos",
+      "turnOn": "Activar sonidos",
+      "turnOff": "Desactivar sonidos"
+    }
+  },
+  "homepage": {
+    "hero": {
+      "title": "Colorea su camino hacia la calma",
+      "subtitle": "Cree páginas para colorear detalladas en segundos. Coloree en línea o imprima en casa. Su dosis diaria de creatividad consciente.",
+      "trustBadge1": "Más de 1.000 páginas gratuitas",
+      "trustBadge2": "Sin necesidad de cuenta",
+      "trustBadge3": "Más de 50.000 personas confían en nosotros",
+      "freeCreations": "2 creaciones gratuitas diarias · Sin necesidad de cuenta",
+      "users": "Más de 50.000 usuarios"
+    },
+    "showcase": {
+      "title": "Páginas para colorear populares",
+      "showAll": "Ver todas las páginas",
+      "free": "Gratis",
+      "printReady": "PDF listo para imprimir",
+      "addToFavorites": "Agregar a favoritos",
+      "removeFromFavorites": "Quitar de favoritos",
+      "filters": {
+        "all": "Todas",
+        "mandalas": "Mandalas",
+        "nature": "Naturaleza",
+        "geometric": "Geométrico",
+        "landscapes": "Paisajes",
+        "fantasy": "Fantasía",
+        "animals": "Animales"
+      }
+    },
+    "stats": {
+      "pagesCreated": "Páginas para colorear creadas",
+      "happyColorists": "Coloristas satisfechos",
+      "feelingCalmer": "Reportan sentirse más tranquilos",
+      "sessionLength": "Duración promedio de sesión"
+    },
+    "features": {
+      "badge": "Cómo funciona",
+      "title": "Su kit de bienestar creativo",
+      "subtitle": "Las investigaciones demuestran que colorear activa las mismas vías neuronales calmantes que la meditación. Le facilitamos desarrollar una práctica creativa diaria.",
+      "stressReduction": "reducción del estrés reportada",
+      "step": "Paso {number}",
+      "steps": {
+        "1": {
+          "title": "Describa su visión",
+          "description": "Escriba una indicación, hable en voz alta o suba una foto. Convertimos su imaginación en un diseño único y detallado."
+        },
+        "2": {
+          "title": "Coloree digitalmente o imprima",
+          "description": "Use nuestro lienzo digital relajante, o descargue PDF en alta resolución para sus lápices favoritos."
+        },
+        "3": {
+          "title": "Guarde y comparta",
+          "description": "Mantenga una galería personal de sus obras terminadas, o comparta sus creaciones con la comunidad."
+        },
+        "4": {
+          "title": "Cree un hábito diario",
+          "description": "Una página para colorear gratuita cada mañana. Cinco minutos de calma para comenzar bien el día."
+        }
+      }
+    },
+    "galleryPreview": {
+      "title": "Populares esta semana",
+      "subtitle": "Páginas gratuitas de nuestra creciente biblioteca, apreciadas por la comunidad.",
+      "viewAll": "Ver todo",
+      "viewAllPages": "Ver todas las páginas",
+      "addToFavourites": "Agregar a favoritos",
+      "removeFromFavourites": "Quitar de favoritos"
+    },
+    "testimonials": {
+      "fromReviews": "de {count} reseñas",
+      "pagesColored": "{count} páginas coloreadas"
+    },
+    "newsletter": {
+      "badge": "Colorear diario gratuito",
+      "title": "Una página gratuita, cada mañana",
+      "subtitle": "Únase a más de 12.000 personas que comienzan su día con un momento de calma creativa. Entregado directamente en su bandeja de entrada.",
+      "emailPlaceholder": "su@correo.com",
+      "subscribe": "Suscribirse",
+      "subscribed": "Suscrito",
+      "noSpam": "Sin spam, nunca. Cancele su suscripción en cualquier momento."
+    },
+    "faq": {
+      "title": "Preguntas y respuestas",
+      "items": {
+        "1": {
+          "question": "¿Cómo funciona Coloring Habitat?",
+          "answer": "Describa lo que desea colorear usando texto, voz o una foto. Generamos una página para colorear detallada e intrincada en aproximadamente 30 segundos. Coloree en línea con nuestras herramientas digitales o descargue un PDF en alta resolución para imprimir en casa."
+        },
+        "2": {
+          "question": "¿Es realmente gratuito?",
+          "answer": "Obtiene 2 creaciones de páginas gratuitas cada día, sin necesidad de cuenta. Regístrese (también gratis) para desbloquear nuestra biblioteca completa de más de 1.000 páginas y una página para colorear diaria entregada en su bandeja de entrada cada mañana."
+        },
+        "3": {
+          "question": "¿Qué hace diferente a esta aplicación de otras aplicaciones para colorear?",
+          "answer": "Coloring Habitat está diseñado para personas que buscan relajación consciente. Cada diseño es sofisticado e intrincado, y la experiencia es completamente libre de anuncios y relajante."
+        },
+        "4": {
+          "question": "¿Puedo imprimir las páginas para colorear?",
+          "answer": "Cada página se puede descargar como un PDF de alta resolución, perfectamente dimensionado para papel A4 o carta. Muchos usuarios disfrutan la experiencia táctil de colorear con lápices, bolígrafos y marcadores reales."
+        },
+        "5": {
+          "question": "¿Hay una aplicación móvil?",
+          "answer": "Las aplicaciones nativas para iOS y Android estarán disponibles pronto. Nuestra aplicación web es totalmente responsiva y funciona perfectamente en teléfonos y tabletas mientras tanto."
+        }
+      }
+    },
+    "cta": {
+      "title": "¿Listo para encontrar su calma?",
+      "subtitle": "Únase a miles de personas que han hecho del colorear parte de su rutina diaria de bienestar.",
+      "startColoring": "Comience a colorear gratis",
+      "viewPlans": "Ver planes",
+      "getTheApp": "Obtenga la aplicación",
+      "downloadOnAppStore": "Descargar en la",
+      "appStore": "App Store",
+      "getItOn": "Disponible en",
+      "googlePlay": "Google Play"
+    }
+  },
+  "footer": {
+    "brand": "Coloring Habitat",
+    "tagline": "Colorear consciente para todos. Cree, coloree y encuentre su calma.",
+    "copyright": "© {year} Coloring Habitat. Todos los derechos reservados.",
+    "sections": {
+      "explore": "Explorar",
+      "company": "Empresa",
+      "support": "Soporte",
+      "legal": "Legal"
+    },
+    "links": {
+      "gallery": "Galería",
+      "create": "Crear",
+      "categories": "Categorías",
+      "dailyPage": "Página diaria",
+      "about": "Acerca de",
+      "pricing": "Precios",
+      "blog": "Blog",
+      "contactUs": "Contáctenos",
+      "faq": "Preguntas frecuentes",
+      "privacy": "Privacidad",
+      "terms": "Términos",
+      "cookies": "Cookies"
+    }
+  }
+}

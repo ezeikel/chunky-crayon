@@ -1,0 +1,260 @@
+{
+  "startOverButton": {
+    "idle": "Recommencer",
+    "confirm": "Oui, recommencer",
+    "cancel": "Continuer le coloriage"
+  },
+  "downloadPDFButton": {
+    "idle": "Imprimer",
+    "loading": "Chargement...",
+    "creating": "Création...",
+    "error": "Erreur !"
+  },
+  "coloringPage": {
+    "title": "Page de coloriage",
+    "relatedPages": "Plus de pages de coloriage",
+    "defaultDescription": "Page de coloriage gratuite pour adultes de Coloring Habitat",
+    "progress": {
+      "colored": "colorié",
+      "percentage": "{percent} %",
+      "milestones": {
+        "25": "Bon début !",
+        "50": "À mi-chemin !",
+        "75": "Presque terminé !",
+        "100": "Magnifique !"
+      }
+    },
+    "sidebar": {
+      "colors": "Couleurs",
+      "tools": "Outils",
+      "size": "Taille",
+      "history": "Historique",
+      "zoom": "Zoom",
+      "actions": "Actions"
+    },
+    "tools": {
+      "pan": "Déplacer",
+      "fill": "Remplissage",
+      "brush": "Pinceau",
+      "sticker": "Autocollant",
+      "magicReveal": "Révélation magique",
+      "magicAuto": "Auto magique",
+      "magicBrush": "Pinceau magique",
+      "magicFill": "Remplissage magique",
+      "autoColor": "Coloriage auto",
+      "magic": "Magique"
+    },
+    "brushTypes": {
+      "crayon": "Crayon de cire",
+      "marker": "Feutre",
+      "eraser": "Gomme",
+      "glitter": "Paillettes",
+      "sparkle": "Étincelle",
+      "rainbow": "Arc-en-ciel",
+      "glow": "Lueur",
+      "neon": "Néon"
+    },
+    "brushSizes": {
+      "small": "Fin",
+      "medium": "Normal",
+      "large": "Épais"
+    },
+    "fillPatterns": {
+      "solid": "Uni",
+      "dots": "Pois",
+      "stripes": "Rayures",
+      "diagonal": "Diagonales",
+      "checkerboard": "Damier",
+      "hearts": "Cœurs",
+      "stars": "Étoiles",
+      "zigzag": "Zigzag"
+    },
+    "actions": {
+      "save": "Enregistrer",
+      "download": "Télécharger",
+      "share": "Partager",
+      "print": "Imprimer",
+      "preparing": "Préparation...",
+      "doneSharing": "Partage terminé",
+      "colorAgain": "Colorier à nouveau",
+      "startOver": "Recommencer"
+    },
+    "toolbar": {
+      "expand": "Développer la barre d'outils",
+      "collapse": "Réduire la barre d'outils",
+      "moreTools": "Plus d'outils",
+      "less": "Moins"
+    },
+    "undoRedo": {
+      "undo": "Annuler",
+      "undoShortcut": "Annuler (Ctrl+Z)",
+      "redo": "Rétablir",
+      "redoShortcut": "Rétablir (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "Sélectionner la couleur {color}",
+      "magicToolsMessage": "Les couleurs sont choisies automatiquement avec les outils magiques"
+    },
+    "patternSelector": {
+      "label": "Motif :"
+    },
+    "zoomControls": {
+      "zoomLevel": "Niveau de zoom : {level} %",
+      "zoomOut": "Dézoomer",
+      "zoomOutAria": "Dézoomer (voir plus large)",
+      "zoomIn": "Zoomer",
+      "zoomInAria": "Zoomer (voir de plus près)",
+      "pan": "Déplacer",
+      "panAria": "Se déplacer dans l'image",
+      "reset": "Voir l'image entière",
+      "resetAria": "Revenir à l'image complète"
+    },
+    "muteToggle": {
+      "mute": "Couper les sons",
+      "unmute": "Activer les sons",
+      "turnOn": "Activer les sons",
+      "turnOff": "Couper les sons"
+    }
+  },
+  "homepage": {
+    "hero": {
+      "title": "Coloriez votre chemin vers la sérénité",
+      "subtitle": "Créez des pages de coloriage détaillées en quelques secondes. Coloriez en ligne ou imprimez chez vous. Votre dose quotidienne de pleine conscience créative.",
+      "trustBadge1": "Plus de 1 000 pages gratuites",
+      "trustBadge2": "Aucun compte requis",
+      "trustBadge3": "Adopté par plus de 50 000 personnes",
+      "freeCreations": "2 créations gratuites par jour · Aucun compte requis",
+      "users": "Plus de 50 000 utilisateurs"
+    },
+    "showcase": {
+      "title": "Pages de coloriage populaires",
+      "showAll": "Voir toutes les pages",
+      "free": "Gratuit",
+      "printReady": "PDF prêt à imprimer",
+      "addToFavorites": "Ajouter aux favoris",
+      "removeFromFavorites": "Retirer des favoris",
+      "filters": {
+        "all": "Tout",
+        "mandalas": "Mandalas",
+        "nature": "Nature",
+        "geometric": "Géométrique",
+        "landscapes": "Paysages",
+        "fantasy": "Fantaisie",
+        "animals": "Animaux"
+      }
+    },
+    "stats": {
+      "pagesCreated": "Pages de coloriage créées",
+      "happyColorists": "Coloristes satisfaits",
+      "feelingCalmer": "Se sentent plus apaisés",
+      "sessionLength": "Durée moyenne d'une session"
+    },
+    "features": {
+      "badge": "Comment ça fonctionne",
+      "title": "Votre boîte à outils de bien-être créatif",
+      "subtitle": "La recherche montre que le coloriage active les mêmes voies neuronales apaisantes que la méditation. Nous rendons la pratique créative quotidienne accessible et naturelle.",
+      "stressReduction": "de réduction du stress constatée",
+      "step": "Étape {number}",
+      "steps": {
+        "1": {
+          "title": "Décrivez votre vision",
+          "description": "Saisissez un texte, dictez à voix haute ou téléversez une photo. Nous transformons votre imagination en un motif unique et détaillé."
+        },
+        "2": {
+          "title": "Coloriez en ligne ou imprimez",
+          "description": "Utilisez notre toile numérique apaisante, ou téléchargez des PDF haute résolution pour vos crayons et feutres préférés."
+        },
+        "3": {
+          "title": "Enregistrez et partagez",
+          "description": "Conservez une galerie personnelle de vos œuvres terminées, ou partagez vos créations avec la communauté."
+        },
+        "4": {
+          "title": "Créez une habitude quotidienne",
+          "description": "Une page de coloriage gratuite chaque matin. Cinq minutes de calme pour bien commencer votre journée."
+        }
+      }
+    },
+    "galleryPreview": {
+      "title": "Populaires cette semaine",
+      "subtitle": "Des pages gratuites issues de notre bibliothèque grandissante, appréciées par la communauté.",
+      "viewAll": "Tout voir",
+      "viewAllPages": "Voir toutes les pages",
+      "addToFavourites": "Ajouter aux favoris",
+      "removeFromFavourites": "Retirer des favoris"
+    },
+    "testimonials": {
+      "fromReviews": "sur {count} avis",
+      "pagesColored": "{count} pages coloriées"
+    },
+    "newsletter": {
+      "badge": "Coloriage quotidien gratuit",
+      "title": "Une page gratuite, chaque matin",
+      "subtitle": "Rejoignez plus de 12 000 personnes qui commencent leur journée par un moment de calme créatif. Directement dans votre boîte de réception.",
+      "emailPlaceholder": "votre@email.com",
+      "subscribe": "S'abonner",
+      "subscribed": "Abonné",
+      "noSpam": "Aucun spam, jamais. Désabonnement possible à tout moment."
+    },
+    "faq": {
+      "title": "Questions et réponses",
+      "items": {
+        "1": {
+          "question": "Comment fonctionne Coloring Habitat ?",
+          "answer": "Décrivez ce que vous souhaitez colorier à l'aide d'un texte, de la voix ou d'une photo. Nous générons une page de coloriage détaillée et élaborée en environ 30 secondes. Coloriez-la en ligne avec nos outils numériques ou téléchargez un PDF haute résolution pour l'imprimer chez vous."
+        },
+        "2": {
+          "question": "Est-ce vraiment gratuit ?",
+          "answer": "Vous bénéficiez de 2 créations de pages gratuites chaque jour, sans avoir besoin de compte. Inscrivez-vous (également gratuitement) pour accéder à notre bibliothèque complète de plus de 1 000 pages et recevoir une page de coloriage quotidienne dans votre boîte de réception chaque matin."
+        },
+        "3": {
+          "question": "Qu'est-ce qui différencie cette application des autres applications de coloriage ?",
+          "answer": "Coloring Habitat est conçu pour les personnes en quête de détente en pleine conscience. Chaque motif est raffiné et élaboré, et l'expérience est entièrement sans publicité et apaisante."
+        },
+        "4": {
+          "question": "Puis-je imprimer les pages de coloriage ?",
+          "answer": "Chaque page peut être téléchargée en PDF haute résolution, parfaitement dimensionnée pour le format A4 ou Lettre US. De nombreux utilisateurs apprécient l'expérience tactile du coloriage avec de vrais crayons, stylos et feutres."
+        },
+        "5": {
+          "question": "Existe-t-il une application mobile ?",
+          "answer": "Les applications natives iOS et Android arrivent bientôt. Notre application web est entièrement responsive et fonctionne parfaitement sur les téléphones et tablettes en attendant."
+        }
+      }
+    },
+    "cta": {
+      "title": "Prêt à trouver votre sérénité ?",
+      "subtitle": "Rejoignez des milliers de personnes qui ont intégré le coloriage dans leur routine de bien-être quotidienne.",
+      "startColoring": "Commencer à colorier gratuitement",
+      "viewPlans": "Voir les offres",
+      "getTheApp": "Obtenir l'application",
+      "downloadOnAppStore": "Télécharger sur l'",
+      "appStore": "App Store",
+      "getItOn": "Disponible sur",
+      "googlePlay": "Google Play"
+    }
+  },
+  "footer": {
+    "brand": "Coloring Habitat",
+    "tagline": "Coloriage en pleine conscience pour tous. Créez, coloriez et trouvez votre sérénité.",
+    "copyright": "© {year} Coloring Habitat. Tous droits réservés.",
+    "sections": {
+      "explore": "Explorer",
+      "company": "Entreprise",
+      "support": "Assistance",
+      "legal": "Mentions légales"
+    },
+    "links": {
+      "gallery": "Galerie",
+      "create": "Créer",
+      "categories": "Catégories",
+      "dailyPage": "Page du jour",
+      "about": "À propos",
+      "pricing": "Tarifs",
+      "blog": "Blog",
+      "contactUs": "Nous contacter",
+      "faq": "FAQ",
+      "privacy": "Confidentialité",
+      "terms": "Conditions",
+      "cookies": "Cookies"
+    }
+  }
+}

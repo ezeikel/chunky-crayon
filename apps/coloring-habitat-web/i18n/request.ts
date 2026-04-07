@@ -3,11 +3,19 @@ import { hasLocale } from "next-intl";
 import { routing } from "./routing";
 import { translations, mergeMessages } from "@one-colored-pixel/translations";
 import enOverrides from "@/messages/en.json";
+import deOverrides from "@/messages/de.json";
+import jaOverrides from "@/messages/ja.json";
+import koOverrides from "@/messages/ko.json";
+import frOverrides from "@/messages/fr.json";
+import esOverrides from "@/messages/es.json";
 
-// For now, only English overrides exist. Other locales will use shared translations
-// with English overrides as fallback until CH override translations are generated.
 const overridesByLocale: Record<string, Record<string, unknown>> = {
   en: enOverrides,
+  de: deOverrides,
+  ja: jaOverrides,
+  ko: koOverrides,
+  fr: frOverrides,
+  es: esOverrides,
 };
 
 export default getRequestConfig(async ({ requestLocale }) => {
@@ -18,14 +26,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
     : routing.defaultLocale;
 
   const shared = translations[locale as keyof typeof translations];
-
-  // Always start with English overrides as fallback, then layer locale-specific on top
-  const localeOverrides = overridesByLocale[locale] || {};
-  const fallbackOverrides = enOverrides as Record<string, unknown>;
   const overrides =
-    locale === "en"
-      ? fallbackOverrides
-      : mergeMessages(fallbackOverrides, localeOverrides);
+    overridesByLocale[locale] || (enOverrides as Record<string, unknown>);
 
   return {
     locale,
