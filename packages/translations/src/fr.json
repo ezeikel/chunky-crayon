@@ -10,7 +10,8 @@
     "copy": "Copier",
     "copied": "Copié !",
     "credits": "crédits",
-    "creditsWithCount": "{count} crédits"
+    "creditsWithCount": "{count} crédits",
+    "loadMore": "Charger plus"
   },
   "navigation": {
     "home": "Accueil",

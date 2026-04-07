@@ -10,7 +10,8 @@
     "copy": "Copy",
     "copied": "Copied!",
     "credits": "credits",
-    "creditsWithCount": "{count} credits"
+    "creditsWithCount": "{count} credits",
+    "loadMore": "Load more"
   },
   "navigation": {
     "home": "Home",
@@ -157,7 +158,9 @@
       "title": "Link Created!",
       "subtitle": "Share this link with family and friends"
     },
-    "done": "Done"
+    "done": "Done",
+    "error": "Failed to create share link",
+    "socialShare": "Share on social media"
   },
   "saveToGallery": {
     "idle": "Save to Gallery",

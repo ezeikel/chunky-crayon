@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faSpinner, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { saveArtworkToGallery } from "@/app/actions/saved-artwork";
@@ -22,6 +23,7 @@ const SaveToGalleryButton = ({
   getCanvasDataUrl,
   className,
 }: SaveToGalleryButtonProps) => {
+  const t = useTranslations("saveToGallery");
   const [state, setState] = useState<SaveState>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -33,7 +35,7 @@ const SaveToGalleryButton = ({
       const dataUrl = getCanvasDataUrl();
       if (!dataUrl) {
         setState("error");
-        setErrorMessage("Could not capture artwork");
+        setErrorMessage(t("errors.captureArtwork"));
         return;
       }
 
@@ -48,7 +50,7 @@ const SaveToGalleryButton = ({
       }
     } catch {
       setState("error");
-      setErrorMessage("Something went wrong. Please try again.");
+      setErrorMessage(t("errors.generic"));
     }
   }, [coloringImageId, getCanvasDataUrl]);
 
@@ -63,7 +65,7 @@ const SaveToGalleryButton = ({
           icon={faSpinner}
           className="text-xl md:text-2xl animate-spin"
         />
-        <span className="hidden md:inline">Saving...</span>
+        <span className="hidden md:inline">{t("saving")}</span>
       </button>
     );
   }
@@ -76,7 +78,7 @@ const SaveToGalleryButton = ({
         className={cn(buttonClassName, "bg-accent cursor-default", className)}
       >
         <FontAwesomeIcon icon={faCheck} className="text-xl md:text-2xl" />
-        <span className="hidden md:inline">Saved</span>
+        <span className="hidden md:inline">{t("saved")}</span>
       </button>
     );
   }
@@ -93,7 +95,7 @@ const SaveToGalleryButton = ({
           )}
         >
           <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
-          <span className="hidden md:inline">Try again</span>
+          <span className="hidden md:inline">{t("tryAgain")}</span>
         </button>
         {errorMessage && (
           <p className="text-sm text-destructive">{errorMessage}</p>
@@ -113,7 +115,7 @@ const SaveToGalleryButton = ({
       )}
     >
       <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
-      <span className="hidden md:inline">Save to gallery</span>
+      <span className="hidden md:inline">{t("idle")}</span>
     </button>
   );
 };

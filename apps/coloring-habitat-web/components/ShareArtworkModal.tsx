@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLink,
@@ -36,10 +37,13 @@ type ShareArtworkModalProps = {
 
 type ModalState = "options" | "generating" | "success" | "tiktok";
 
-const EXPIRATION_OPTIONS: { value: ShareExpiration; label: string }[] = [
-  { value: "7days", label: "7 days" },
-  { value: "30days", label: "30 days" },
-  { value: "never", label: "Never" },
+const EXPIRATION_OPTIONS: {
+  value: ShareExpiration;
+  labelKey: "7days" | "30days" | "never";
+}[] = [
+  { value: "7days", labelKey: "7days" },
+  { value: "30days", labelKey: "30days" },
+  { value: "never", labelKey: "never" },
 ];
 
 const ShareArtworkModal = ({
@@ -56,6 +60,8 @@ const ShareArtworkModal = ({
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasTikTok, setHasTikTok] = useState<boolean | null>(null);
+  const t = useTranslations("shareModal");
+  const tCommon = useTranslations("common");
 
   // Check if user has TikTok connected
   useEffect(() => {
@@ -92,7 +98,7 @@ const ShareArtworkModal = ({
       setShareUrl(result.shareUrl);
       setState("success");
     } else {
-      setError(result.error || "Failed to create share link");
+      setError(result.error || t("error"));
       setState("options");
     }
   }, [artworkId, selectedExpiration]);
@@ -158,7 +164,7 @@ const ShareArtworkModal = ({
         {state === "options" && (
           <>
             <DialogHeader>
-              <DialogTitle>Share Artwork</DialogTitle>
+              <DialogTitle>{t("title")}</DialogTitle>
               <DialogDescription className="truncate">
                 {artworkTitle}
               </DialogDescription>
@@ -166,14 +172,13 @@ const ShareArtworkModal = ({
 
             {/* Privacy note */}
             <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
-              Anyone with the link will be able to view this artwork. You can
-              revoke access at any time.
+              {t("privacyNote")}
             </p>
 
             {/* Expiration options */}
             <div>
               <p className="text-sm font-medium text-foreground mb-2">
-                Link expires in
+                {t("expiresIn")}
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {EXPIRATION_OPTIONS.map((option) => (
@@ -188,7 +193,7 @@ const ShareArtworkModal = ({
                         : "border-border text-muted-foreground hover:border-primary/50",
                     )}
                   >
-                    {option.label}
+                    {t(`expiration.${option.labelKey}`)}
                   </button>
                 ))}
               </div>
@@ -206,7 +211,7 @@ const ShareArtworkModal = ({
               className="w-full flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
             >
               <FontAwesomeIcon icon={faLink} className="text-sm" />
-              Create Share Link
+              {t("createLink")}
             </button>
           </>
         )}
@@ -214,7 +219,7 @@ const ShareArtworkModal = ({
         {state === "generating" && (
           <>
             <DialogHeader>
-              <DialogTitle>Creating Link...</DialogTitle>
+              <DialogTitle>{t("creating")}</DialogTitle>
             </DialogHeader>
             <div className="flex items-center justify-center py-8">
               <FontAwesomeIcon
@@ -228,10 +233,8 @@ const ShareArtworkModal = ({
         {state === "success" && shareUrl && (
           <>
             <DialogHeader>
-              <DialogTitle>Link Created</DialogTitle>
-              <DialogDescription>
-                Share this link with anyone to let them see your artwork.
-              </DialogDescription>
+              <DialogTitle>{t("success.title")}</DialogTitle>
+              <DialogDescription>{t("success.subtitle")}</DialogDescription>
             </DialogHeader>
 
             {/* Link display */}
@@ -253,14 +256,14 @@ const ShareArtworkModal = ({
                 )}
               >
                 <FontAwesomeIcon icon={copied ? faCheck : faCopy} />
-                {copied ? "Copied" : "Copy"}
+                {copied ? tCommon("copied") : tCommon("copy")}
               </button>
             </div>
 
             {/* Social share buttons */}
             <div>
               <p className="text-sm font-medium text-foreground mb-3">
-                Share on social media
+                {t("socialShare")}
               </p>
               <div className="flex items-center gap-3">
                 <button

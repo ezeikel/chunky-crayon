@@ -10,7 +10,8 @@
     "copy": "コピー",
     "copied": "コピーしたよ！",
     "credits": "クレジット",
-    "creditsWithCount": "{count} クレジット"
+    "creditsWithCount": "{count} クレジット",
+    "loadMore": "もっと見る"
   },
   "navigation": {
     "home": "ホーム",

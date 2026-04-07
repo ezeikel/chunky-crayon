@@ -399,6 +399,38 @@
       }
     }
   },
+  "common": {
+    "loading": "Loading...",
+    "loadMore": "Load more"
+  },
+  "billing": {
+    "pageTitle": "Billing",
+    "pageSubtitle": "Manage your subscription and credits",
+    "currentPlan": "Current Plan",
+    "currentCredits": "You have <strong>{credits} credits</strong> remaining.",
+    "renewsOn": "Renews on {date}",
+    "manageSubscription": "Manage Subscription",
+    "noActiveSubscription": "No Active Subscription",
+    "noActiveSubscriptionDescription": "Choose a plan below to get started with Coloring Habitat.",
+    "availablePlans": "Available Plans",
+    "mostPopular": "Most Popular",
+    "perMonth": "/month",
+    "creditsPerMonth": "{credits} credits/month",
+    "cancelAnytime": "Cancel anytime, no commitment",
+    "manageInPortal": "Manage in billing portal",
+    "loading": "Loading...",
+    "changePlan": "Change Plan",
+    "subscribe": "Subscribe",
+    "viewPlans": "View Plans",
+    "errors": {
+      "noActiveSubscription": "No active subscription found.",
+      "changeSubscriptionFailed": "Failed to change subscription. Please try again.",
+      "checkoutFailed": "Failed to start checkout. Please try again.",
+      "portalFailed": "Failed to open subscription management.",
+      "checkoutSessionFailed": "Failed to create checkout session",
+      "redirectFailed": "Failed to redirect to checkout"
+    }
+  },
   "accountSettings": {
     "account": "Account",
     "accountDetails": "Your account details",

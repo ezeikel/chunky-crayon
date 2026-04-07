@@ -10,7 +10,8 @@
     "copy": "복사",
     "copied": "복사했어요!",
     "credits": "크레딧",
-    "creditsWithCount": "{count} 크레딧"
+    "creditsWithCount": "{count} 크레딧",
+    "loadMore": "더 보기"
   },
   "navigation": {
     "home": "홈",

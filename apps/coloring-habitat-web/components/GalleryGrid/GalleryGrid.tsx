@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { GalleryImage } from "@/app/data/coloring-image";
 import {
   loadGalleryImages,
@@ -36,6 +37,7 @@ const GalleryGrid = ({
   difficultySlug,
   tagSlug,
 }: GalleryGridProps) => {
+  const t = useTranslations("common");
   const [images, setImages] = useState(initialImages);
   const [cursor, setCursor] = useState(initialCursor);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -148,7 +150,7 @@ const GalleryGrid = ({
               isPending && "cursor-wait opacity-60",
             )}
           >
-            {isPending ? "Loading..." : "Load more"}
+            {isPending ? t("loading") : t("loadMore")}
           </button>
         </div>
       )}

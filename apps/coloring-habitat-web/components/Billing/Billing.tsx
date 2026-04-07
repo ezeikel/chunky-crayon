@@ -20,17 +20,16 @@ import {
 } from "@/app/actions/stripe";
 import { format } from "date-fns";
 import { Prisma } from "@one-colored-pixel/db";
+import { useTranslations } from "next-intl";
 import formatNumber from "@/utils/formatNumber";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
 
 type HabitatPlan = {
   key: string;
-  name: string;
-  tagline: string;
+  translationKey: string;
   price: string;
   credits: number;
-  features: string[];
   stripePriceEnv: string;
   mostPopular?: boolean;
 };
@@ -38,50 +37,26 @@ type HabitatPlan = {
 const HABITAT_SUBSCRIPTION_PLANS: HabitatPlan[] = [
   {
     key: "GROVE",
-    name: "Grove",
-    tagline: "For casual colorists",
+    translationKey: "grove",
     price: "\u00a39.99",
     credits: 300,
-    features: [
-      "300 credits/month",
-      "All coloring features",
-      "HD PDF downloads",
-      "Save to gallery",
-    ],
     stripePriceEnv: process.env
       .NEXT_PUBLIC_STRIPE_PRICE_GROVE_MONTHLY as string,
   },
   {
     key: "SANCTUARY",
-    name: "Sanctuary",
-    tagline: "For regular colorists",
+    translationKey: "sanctuary",
     price: "\u00a317.99",
     credits: 800,
-    features: [
-      "800 credits/month",
-      "All coloring features",
-      "1 month credit rollover",
-      "Priority generation",
-      "Priority support",
-    ],
     stripePriceEnv: process.env
       .NEXT_PUBLIC_STRIPE_PRICE_SANCTUARY_MONTHLY as string,
     mostPopular: true,
   },
   {
     key: "OASIS",
-    name: "Oasis",
-    tagline: "The complete wellness experience",
+    translationKey: "oasis",
     price: "\u00a329.99",
     credits: 2000,
-    features: [
-      "2,000 credits/month",
-      "All coloring features",
-      "2 month credit rollover",
-      "Commercial use license",
-      "Custom color palettes",
-      "Ambient soundscapes",
-    ],
     stripePriceEnv: process.env
       .NEXT_PUBLIC_STRIPE_PRICE_OASIS_MONTHLY as string,
   },
@@ -107,6 +82,8 @@ type BillingProps = {
 };
 
 const Billing = ({ user }: BillingProps) => {
+  const t = useTranslations("billing");
+  const tPricing = useTranslations("pricing");
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const currentSubscription = user.subscriptions?.find(
@@ -117,7 +94,7 @@ const Billing = ({ user }: BillingProps) => {
 
   const handlePlanChange = async (plan: HabitatPlan) => {
     if (!currentSubscription) {
-      toast.error("No active subscription found.");
+      toast.error(t("errors.noActiveSubscription"));
       return;
     }
 
@@ -137,7 +114,7 @@ const Billing = ({ user }: BillingProps) => {
       }
     } catch (error) {
       console.error("Error changing subscription:", error);
-      toast.error("Failed to change subscription. Please try again.");
+      toast.error(t("errors.changeSubscriptionFailed"));
     } finally {
       setLoadingPlan(null);
     }
@@ -161,7 +138,7 @@ const Billing = ({ user }: BillingProps) => {
 
       if (!session || "error" in session) {
         const errorMessage =
-          session?.error || "Failed to create checkout session";
+          session?.error || t("errors.checkoutSessionFailed");
         console.error("Checkout session error:", errorMessage);
         toast.error(errorMessage);
         return;
@@ -174,12 +151,12 @@ const Billing = ({ user }: BillingProps) => {
 
         if (error) {
           console.error("Stripe redirect error:", error);
-          toast.error(error.message || "Failed to redirect to checkout");
+          toast.error(error.message || t("errors.redirectFailed"));
         }
       }
     } catch (error) {
       console.error("Error purchasing plan:", error);
-      toast.error("Failed to start checkout. Please try again.");
+      toast.error(t("errors.checkoutFailed"));
     } finally {
       setLoadingPlan(null);
     }
@@ -196,44 +173,49 @@ const Billing = ({ user }: BillingProps) => {
       }
     } catch (error) {
       console.error("Error opening customer portal:", error);
-      toast.error("Failed to open subscription management.");
+      toast.error(t("errors.portalFailed"));
     }
   };
 
   const getPlanButtonText = (planKey: string) => {
-    if (loadingPlan === planKey) return "Loading...";
-    if (currentSubscription?.planName === planKey) return "Current Plan";
-    return hasActiveSubscription ? "Change Plan" : "Subscribe";
+    if (loadingPlan === planKey) return t("loading");
+    if (currentSubscription?.planName === planKey) return t("currentPlan");
+    return hasActiveSubscription ? t("changePlan") : t("subscribe");
   };
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
       <header className="text-center mb-16">
-        <h1 className="text-4xl font-extrabold mb-2 text-green-800">Billing</h1>
+        <h1 className="text-4xl font-extrabold mb-2 text-green-800">
+          {t("pageTitle")}
+        </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Manage your subscription and credits
+          {t("pageSubtitle")}
         </p>
       </header>
 
       {/* Current Subscription */}
       <section className="mb-16">
-        <h2 className="text-2xl font-bold mb-6">Current Plan</h2>
+        <h2 className="text-2xl font-bold mb-6">{t("currentPlan")}</h2>
         {currentSubscription ? (
           <Card>
             <CardHeader>
               <CardTitle>{currentSubscription.planName}</CardTitle>
               <CardDescription>
-                Renews on{" "}
-                {format(
-                  new Date(currentSubscription.currentPeriodEnd),
-                  "MMMM d, yyyy",
-                )}
+                {t("renewsOn", {
+                  date: format(
+                    new Date(currentSubscription.currentPeriodEnd),
+                    "MMMM d, yyyy",
+                  ),
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                You have <strong>{formatNumber(user.credits)} credits</strong>{" "}
-                remaining.
+                {t.rich("currentCredits", {
+                  credits: formatNumber(user.credits),
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
             </CardContent>
             <CardFooter>
@@ -241,16 +223,16 @@ const Billing = ({ user }: BillingProps) => {
                 onClick={handleManageSubscription}
                 className="bg-green-700 hover:bg-green-800 text-white"
               >
-                Manage Subscription
+                {t("manageSubscription")}
               </Button>
             </CardFooter>
           </Card>
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>No Active Subscription</CardTitle>
+              <CardTitle>{t("noActiveSubscription")}</CardTitle>
               <CardDescription>
-                Choose a plan below to get started with Coloring Habitat.
+                {t("noActiveSubscriptionDescription")}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -259,7 +241,7 @@ const Billing = ({ user }: BillingProps) => {
 
       {/* Available Plans */}
       <section>
-        <h2 className="text-2xl font-bold mb-6">Available Plans</h2>
+        <h2 className="text-2xl font-bold mb-6">{t("availablePlans")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {HABITAT_SUBSCRIPTION_PLANS.map((plan) => (
             <Card
@@ -275,35 +257,43 @@ const Billing = ({ user }: BillingProps) => {
             >
               {currentSubscription?.planName === plan.key && (
                 <span className="absolute -top-4 right-1/2 translate-x-1/2 bg-green-700 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                  Current Plan
+                  {t("currentPlan")}
                 </span>
               )}
               {plan.mostPopular &&
                 currentSubscription?.planName !== plan.key && (
                   <span className="absolute -top-4 right-1/2 translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                    Most Popular
+                    {t("mostPopular")}
                   </span>
                 )}
               <CardHeader>
                 <CardTitle className="flex flex-col gap-1">
-                  <span className="text-center mb-2">{plan.name}</span>
+                  <span className="text-center mb-2">
+                    {tPricing(`plans.${plan.translationKey}.name`)}
+                  </span>
                   <span className="text-base font-normal text-muted-foreground">
-                    {plan.tagline}
+                    {tPricing(`plans.${plan.translationKey}.description`)}
                   </span>
                 </CardTitle>
                 <CardDescription className="mt-2 text-lg font-bold text-green-800">
                   {plan.price}{" "}
                   <span className="text-sm font-normal text-muted-foreground">
-                    /month
+                    {t("perMonth")}
                   </span>
                 </CardDescription>
                 <div className="text-sm text-muted-foreground mt-1">
-                  {formatNumber(plan.credits)} credits/month
+                  {t("creditsPerMonth", {
+                    credits: formatNumber(plan.credits),
+                  })}
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col gap-2">
                 <ul className="mb-2 space-y-1">
-                  {plan.features.map((feature) => (
+                  {(
+                    tPricing.raw(
+                      `plans.${plan.translationKey}.features`,
+                    ) as string[]
+                  ).map((feature) => (
                     <li key={feature} className="flex items-center gap-2">
                       <span className="text-green-600">&#10003;</span>
                       <span>{feature}</span>
@@ -328,8 +318,8 @@ const Billing = ({ user }: BillingProps) => {
                 </Button>
                 <span className="text-xs text-muted-foreground">
                   {currentSubscription?.planName === plan.key
-                    ? "Manage in billing portal"
-                    : "Cancel anytime, no commitment"}
+                    ? t("manageInPortal")
+                    : t("cancelAnytime")}
                 </span>
               </CardFooter>
             </Card>
