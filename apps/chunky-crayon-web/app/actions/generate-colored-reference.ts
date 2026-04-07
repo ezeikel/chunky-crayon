@@ -59,12 +59,14 @@ RULES:
     const elapsedMs = Date.now() - startTime;
     console.log(`[ColoredReference] Generated in ${elapsedMs}ms`);
 
-    if (files && files.length > 0) {
-      const imageFile = files[0];
-      const base64 = Buffer.from(imageFile.data).toString('base64');
-      const mimeType = imageFile.mimeType || 'image/png';
-      const imageBase64 = `data:${mimeType};base64,${base64}`;
+    // Extract the generated image (Gemini returns files with mediaType + base64)
+    const generatedImage = files?.find((file) =>
+      file.mediaType?.startsWith('image/'),
+    );
 
+    if (generatedImage?.base64) {
+      const mimeType = generatedImage.mediaType || 'image/png';
+      const imageBase64 = `data:${mimeType};base64,${generatedImage.base64}`;
       return { success: true, imageBase64 };
     }
 
