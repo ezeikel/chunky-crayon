@@ -34,7 +34,10 @@ import {
   loadColoringProgress,
   clearColoringProgress,
 } from "@one-colored-pixel/coloring-ui";
-import { AutoColorPreview } from "@one-colored-pixel/coloring-ui";
+import {
+  AutoColorPreview,
+  AutoColorModal,
+} from "@one-colored-pixel/coloring-ui";
 import { generateRegionFillPoints } from "@/app/actions/generate-color-map";
 import { generateColoredReference } from "@/app/actions/generate-colored-reference";
 import { detectAllRegions } from "@one-colored-pixel/canvas";
@@ -332,7 +335,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     }, [getDirectFillPoints, playSound, setHasUnsavedChanges]);
 
     // Handle reference-based auto-color: region fill with nudging + pixel
-    // gap-fill pass for ~100% coverage while keeping flat coloring look
+    // gap-fill pass for ~100% coverage while keeping flat coloring look.
+    // Deferred via setTimeout so the modal loader renders before heavy work.
     const handleReferenceAutoColor = useCallback(() => {
       const drawingCanvas = canvasRef.current?.getCanvas();
       const boundaryCanvas = canvasRef.current?.getBoundaryCanvas();
@@ -342,117 +346,109 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       const refDims = referenceColor.getDimensions();
       if (!refDims) return;
 
+      // Set loading state — modal renders on next React tick
       setIsAutoColoring(true);
 
-      // Phase 1: Region-based fill (flat colors, respects boundaries)
-      const regionMap = detectAllRegions(drawingCanvas, boundaryCanvas);
-      const boundary = canvasRef.current?.getDilatedBoundary();
+      // Defer heavy work so the loading modal has time to render
+      setTimeout(() => {
+        // Phase 1: Region-based fill (flat colors, respects boundaries)
+        const regionMap = detectAllRegions(drawingCanvas, boundaryCanvas);
+        const boundary = canvasRef.current?.getDilatedBoundary();
 
-      const nudgeOffsets = [
-        [0, 0],
-        [3, 0],
-        [-3, 0],
-        [0, 3],
-        [0, -3],
-        [3, 3],
-        [-3, -3],
-        [3, -3],
-        [-3, 3],
-        [6, 0],
-        [-6, 0],
-        [0, 6],
-        [0, -6],
-      ];
+        const nudgeOffsets = [
+          [0, 0],
+          [3, 0],
+          [-3, 0],
+          [0, 3],
+          [0, -3],
+          [3, 3],
+          [-3, -3],
+          [3, -3],
+          [-3, 3],
+          [6, 0],
+          [-6, 0],
+          [0, 6],
+          [0, -6],
+        ];
 
-      // Fill all detected regions with reference colors
-      for (const region of regionMap.regions) {
-        const normX = region.centroid.x / regionMap.width;
-        const normY = region.centroid.y / regionMap.height;
-        const color = referenceColor.getColorAtNormalized(normX, normY);
+        for (const region of regionMap.regions) {
+          const normX = region.centroid.x / regionMap.width;
+          const normY = region.centroid.y / regionMap.height;
+          const color = referenceColor.getColorAtNormalized(normX, normY);
 
-        if (color) {
-          let filled = false;
-          for (const [dx, dy] of nudgeOffsets) {
-            const success = canvasRef.current?.fillRegionAtPoint(
-              Math.round(region.centroid.x + dx),
-              Math.round(region.centroid.y + dy),
-              color,
-              true,
-              boundary ?? undefined,
-            );
-            if (success) {
-              filled = true;
-              break;
-            }
-          }
-          if (!filled && region.samplePixels) {
-            for (const sample of region.samplePixels) {
+          if (color) {
+            let filled = false;
+            for (const [dx, dy] of nudgeOffsets) {
               const success = canvasRef.current?.fillRegionAtPoint(
-                Math.round(sample.x),
-                Math.round(sample.y),
+                Math.round(region.centroid.x + dx),
+                Math.round(region.centroid.y + dy),
                 color,
                 true,
                 boundary ?? undefined,
               );
-              if (success) break;
+              if (success) {
+                filled = true;
+                break;
+              }
             }
-          }
-        }
-      }
-
-      // Phase 2: Gap fill — paint remaining transparent non-boundary pixels
-      // using reference colors (catches tiny regions missed by flood fill)
-      const drawingCtx = drawingCanvas.getContext("2d");
-      const boundaryCtx = boundaryCanvas.getContext("2d");
-      if (drawingCtx && boundaryCtx) {
-        const width = drawingCanvas.width;
-        const height = drawingCanvas.height;
-        const drawingData = drawingCtx.getImageData(0, 0, width, height);
-        const boundaryData = boundaryCtx.getImageData(0, 0, width, height);
-        const scaleX = refDims.width / width;
-        const scaleY = refDims.height / height;
-
-        let gapsFilled = 0;
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) {
-            const idx = (y * width + x) * 4;
-
-            // Skip if already colored (alpha > 0 means flood fill painted it)
-            if (drawingData.data[idx + 3] > 0) continue;
-
-            // Skip boundary pixels
-            const bA = boundaryData.data[idx + 3];
-            if (bA >= 128) {
-              const lum =
-                0.299 * boundaryData.data[idx] +
-                0.587 * boundaryData.data[idx + 1] +
-                0.114 * boundaryData.data[idx + 2];
-              if (lum < 200) continue;
-            }
-
-            // Paint this gap pixel with reference color
-            const refX = Math.floor(x * scaleX);
-            const refY = Math.floor(y * scaleY);
-            const color = referenceColor.getColorAt(refX, refY);
-            if (color) {
-              drawingData.data[idx] = parseInt(color.slice(1, 3), 16);
-              drawingData.data[idx + 1] = parseInt(color.slice(3, 5), 16);
-              drawingData.data[idx + 2] = parseInt(color.slice(5, 7), 16);
-              drawingData.data[idx + 3] = 255;
-              gapsFilled++;
+            if (!filled && region.samplePixels) {
+              for (const sample of region.samplePixels) {
+                const success = canvasRef.current?.fillRegionAtPoint(
+                  Math.round(sample.x),
+                  Math.round(sample.y),
+                  color,
+                  true,
+                  boundary ?? undefined,
+                );
+                if (success) break;
+              }
             }
           }
         }
 
-        if (gapsFilled > 0) {
+        // Phase 2: Gap fill — paint remaining transparent non-boundary pixels
+        const drawingCtx = drawingCanvas.getContext("2d");
+        const boundaryCtx = boundaryCanvas.getContext("2d");
+        if (drawingCtx && boundaryCtx) {
+          const width = drawingCanvas.width;
+          const height = drawingCanvas.height;
+          const drawingData = drawingCtx.getImageData(0, 0, width, height);
+          const boundaryData = boundaryCtx.getImageData(0, 0, width, height);
+          const scaleX = refDims.width / width;
+          const scaleY = refDims.height / height;
+
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              const idx = (y * width + x) * 4;
+              if (drawingData.data[idx + 3] > 0) continue;
+
+              const bA = boundaryData.data[idx + 3];
+              if (bA >= 128) {
+                const lum =
+                  0.299 * boundaryData.data[idx] +
+                  0.587 * boundaryData.data[idx + 1] +
+                  0.114 * boundaryData.data[idx + 2];
+                if (lum < 200) continue;
+              }
+
+              const refX = Math.floor(x * scaleX);
+              const refY = Math.floor(y * scaleY);
+              const color = referenceColor.getColorAt(refX, refY);
+              if (color) {
+                drawingData.data[idx] = parseInt(color.slice(1, 3), 16);
+                drawingData.data[idx + 1] = parseInt(color.slice(3, 5), 16);
+                drawingData.data[idx + 2] = parseInt(color.slice(5, 7), 16);
+                drawingData.data[idx + 3] = 255;
+              }
+            }
+          }
           drawingCtx.putImageData(drawingData, 0, 0);
-          console.log(`[AutoColor] Gap-filled ${gapsFilled} pixels`);
         }
-      }
 
-      setIsAutoColoring(false);
-      playSound("sparkle");
-      setHasUnsavedChanges(true);
+        setIsAutoColoring(false);
+        playSound("sparkle");
+        setHasUnsavedChanges(true);
+      }, 50); // 50ms delay gives React time to render the modal
     }, [referenceColor, playSound, setHasUnsavedChanges, setIsAutoColoring]);
 
     // Trigger auto-fill when magic-auto tool is selected
@@ -745,6 +741,9 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
     return (
       <div className="flex flex-col gap-y-2 md:gap-y-3">
+        {/* Auto Color loading modal */}
+        <AutoColorModal />
+
         {/* Desktop Toolbar (md-lg only) - Traditional top toolbar */}
         {/* Hidden on xl+ where sidebar controls are used instead */}
         {/* Note: Progress/Mute moved to page header on desktop for cleaner canvas area */}
