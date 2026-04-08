@@ -148,6 +148,68 @@ export function useReferenceColor(): UseReferenceColorReturn {
     return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`.toUpperCase();
   }, []);
 
+  /**
+   * Sample a small area around a point and return the most common color.
+   * Skips very dark pixels (boundary lines) and very light pixels (white areas).
+   * This is more robust than single-pixel sampling when the reference
+   * isn't perfectly pixel-aligned with the original line art.
+   */
+  const getDominantColorAt = useCallback(
+    (x: number, y: number, radius: number = 4): string | null => {
+      const data = imageDataRef.current;
+      if (!data) return null;
+
+      const cx = Math.floor(x);
+      const cy = Math.floor(y);
+      const colorCounts = new Map<string, number>();
+
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          const px = cx + dx;
+          const py = cy + dy;
+          if (px < 0 || px >= data.width || py < 0 || py >= data.height)
+            continue;
+
+          const idx = (py * data.width + px) * 4;
+          const r = data.data[idx];
+          const g = data.data[idx + 1];
+          const b = data.data[idx + 2];
+
+          // Skip very dark pixels (likely boundary lines in reference)
+          const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+          if (luminance < 40) continue;
+
+          // Skip near-white pixels (likely uncolored background)
+          if (r > 245 && g > 245 && b > 245) continue;
+
+          // Quantize to reduce noise (group similar colors)
+          const qr = Math.round(r / 8) * 8;
+          const qg = Math.round(g / 8) * 8;
+          const qb = Math.round(b / 8) * 8;
+          const key = `${qr},${qg},${qb}`;
+
+          colorCounts.set(key, (colorCounts.get(key) || 0) + 1);
+        }
+      }
+
+      if (colorCounts.size === 0) return getColorAt(cx, cy);
+
+      // Find most common color
+      let maxCount = 0;
+      let dominantKey = "";
+      for (const [key, count] of colorCounts) {
+        if (count > maxCount) {
+          maxCount = count;
+          dominantKey = key;
+        }
+      }
+
+      const [r, g, b] = dominantKey.split(",").map(Number);
+      return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`.toUpperCase();
+    },
+    [getColorAt],
+  );
+
   const getColorAtNormalized = useCallback(
     (normX: number, normY: number): string | null => {
       const data = imageDataRef.current;
@@ -155,9 +217,10 @@ export function useReferenceColor(): UseReferenceColorReturn {
 
       const x = normX * data.width;
       const y = normY * data.height;
-      return getColorAt(x, y);
+      // Use dominant color sampling for robustness against misalignment
+      return getDominantColorAt(x, y);
     },
-    [getColorAt],
+    [getDominantColorAt],
   );
 
   const getColorsAtPoints = useCallback(
