@@ -450,9 +450,17 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           setHasUnsavedChanges(true);
         } finally {
           setIsAutoColoring(false);
+          // Reset tool to brush so the magic-auto useEffect doesn't re-trigger
+          setActiveTool("brush");
         }
       }, 50); // 50ms delay gives React time to render the modal
-    }, [referenceColor, playSound, setHasUnsavedChanges, setIsAutoColoring]);
+    }, [
+      referenceColor,
+      playSound,
+      setHasUnsavedChanges,
+      setIsAutoColoring,
+      setActiveTool,
+    ]);
 
     // Trigger auto-fill when magic-auto tool is selected
     useEffect(() => {
