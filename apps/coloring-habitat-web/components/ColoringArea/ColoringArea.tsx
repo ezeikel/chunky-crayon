@@ -331,36 +331,23 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       requestAnimationFrame(fillBatch);
     }, [getDirectFillPoints, playSound, setHasUnsavedChanges]);
 
-    // Handle reference-based auto-color: detect regions, sample colors from reference
+    // Handle reference-based auto-color: region fill with nudging + pixel
+    // gap-fill pass for ~100% coverage while keeping flat coloring look
     const handleReferenceAutoColor = useCallback(() => {
       const drawingCanvas = canvasRef.current?.getCanvas();
       const boundaryCanvas = canvasRef.current?.getBoundaryCanvas();
       if (!drawingCanvas || !boundaryCanvas || !referenceColor.state.isReady)
         return;
 
+      const refDims = referenceColor.getDimensions();
+      if (!refDims) return;
+
       setIsAutoColoring(true);
 
-      // Detect regions client-side
+      // Phase 1: Region-based fill (flat colors, respects boundaries)
       const regionMap = detectAllRegions(drawingCanvas, boundaryCanvas);
-
-      if (regionMap.regions.length === 0) {
-        setIsAutoColoring(false);
-        return;
-      }
-
-      // Sample color from reference at each region centroid
-      const refDims = referenceColor.getDimensions();
-      if (!refDims) {
-        setIsAutoColoring(false);
-        return;
-      }
-
       const boundary = canvasRef.current?.getDilatedBoundary();
-      const regions = regionMap.regions;
-      let index = 0;
-      const batchSize = 3;
 
-      // Nudge offsets to try when centroid lands on a boundary line
       const nudgeOffsets = [
         [0, 0],
         [3, 0],
@@ -377,59 +364,95 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         [0, -6],
       ];
 
-      const fillBatch = () => {
-        const end = Math.min(index + batchSize, regions.length);
-        for (let i = index; i < end; i++) {
-          const region = regions[i];
-          const normX = region.centroid.x / regionMap.width;
-          const normY = region.centroid.y / regionMap.height;
-          const color = referenceColor.getColorAtNormalized(normX, normY);
+      // Fill all detected regions with reference colors
+      for (const region of regionMap.regions) {
+        const normX = region.centroid.x / regionMap.width;
+        const normY = region.centroid.y / regionMap.height;
+        const color = referenceColor.getColorAtNormalized(normX, normY);
 
-          if (color) {
-            // Try centroid first, then nudged positions, then sample pixels
-            let filled = false;
-
-            for (const [dx, dy] of nudgeOffsets) {
+        if (color) {
+          let filled = false;
+          for (const [dx, dy] of nudgeOffsets) {
+            const success = canvasRef.current?.fillRegionAtPoint(
+              Math.round(region.centroid.x + dx),
+              Math.round(region.centroid.y + dy),
+              color,
+              true,
+              boundary ?? undefined,
+            );
+            if (success) {
+              filled = true;
+              break;
+            }
+          }
+          if (!filled && region.samplePixels) {
+            for (const sample of region.samplePixels) {
               const success = canvasRef.current?.fillRegionAtPoint(
-                Math.round(region.centroid.x + dx),
-                Math.round(region.centroid.y + dy),
+                Math.round(sample.x),
+                Math.round(sample.y),
                 color,
                 true,
                 boundary ?? undefined,
               );
-              if (success) {
-                filled = true;
-                break;
-              }
-            }
-
-            // If all nudges failed, try the stored sample pixels
-            if (!filled && region.samplePixels) {
-              for (const sample of region.samplePixels) {
-                const success = canvasRef.current?.fillRegionAtPoint(
-                  Math.round(sample.x),
-                  Math.round(sample.y),
-                  color,
-                  true,
-                  boundary ?? undefined,
-                );
-                if (success) break;
-              }
+              if (success) break;
             }
           }
         }
-        index = end;
+      }
 
-        if (index < regions.length) {
-          requestAnimationFrame(fillBatch);
-        } else {
-          setIsAutoColoring(false);
-          playSound("sparkle");
-          setHasUnsavedChanges(true);
+      // Phase 2: Gap fill — paint remaining transparent non-boundary pixels
+      // using reference colors (catches tiny regions missed by flood fill)
+      const drawingCtx = drawingCanvas.getContext("2d");
+      const boundaryCtx = boundaryCanvas.getContext("2d");
+      if (drawingCtx && boundaryCtx) {
+        const width = drawingCanvas.width;
+        const height = drawingCanvas.height;
+        const drawingData = drawingCtx.getImageData(0, 0, width, height);
+        const boundaryData = boundaryCtx.getImageData(0, 0, width, height);
+        const scaleX = refDims.width / width;
+        const scaleY = refDims.height / height;
+
+        let gapsFilled = 0;
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+
+            // Skip if already colored (alpha > 0 means flood fill painted it)
+            if (drawingData.data[idx + 3] > 0) continue;
+
+            // Skip boundary pixels
+            const bA = boundaryData.data[idx + 3];
+            if (bA >= 128) {
+              const lum =
+                0.299 * boundaryData.data[idx] +
+                0.587 * boundaryData.data[idx + 1] +
+                0.114 * boundaryData.data[idx + 2];
+              if (lum < 200) continue;
+            }
+
+            // Paint this gap pixel with reference color
+            const refX = Math.floor(x * scaleX);
+            const refY = Math.floor(y * scaleY);
+            const color = referenceColor.getColorAt(refX, refY);
+            if (color) {
+              drawingData.data[idx] = parseInt(color.slice(1, 3), 16);
+              drawingData.data[idx + 1] = parseInt(color.slice(3, 5), 16);
+              drawingData.data[idx + 2] = parseInt(color.slice(5, 7), 16);
+              drawingData.data[idx + 3] = 255;
+              gapsFilled++;
+            }
+          }
         }
-      };
 
-      requestAnimationFrame(fillBatch);
+        if (gapsFilled > 0) {
+          drawingCtx.putImageData(drawingData, 0, 0);
+          console.log(`[AutoColor] Gap-filled ${gapsFilled} pixels`);
+        }
+      }
+
+      setIsAutoColoring(false);
+      playSound("sparkle");
+      setHasUnsavedChanges(true);
     }, [referenceColor, playSound, setHasUnsavedChanges, setIsAutoColoring]);
 
     // Trigger auto-fill when magic-auto tool is selected
