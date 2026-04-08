@@ -43,14 +43,14 @@ export async function generateColoredReference(
               text: `Color this line art coloring page with beautiful, coherent colors. ${sceneHint}
 
 CRITICAL RULES:
-- Use FLAT, SOLID colors only — no gradients, no shading, no textures, no patterns
-- Each enclosed region should be filled with ONE single uniform color
-- Keep ALL black outlines/lines EXACTLY as they are — do not alter any lines
-- Do NOT add any new elements, details, textures, or patterns that are not in the original line art
-- Do NOT add backgrounds, wallpapers, or decorations — if an area is blank/white in the original, fill it with a single solid color
-- The result must be IDENTICAL to the original line art but with flat color fills — like a coloring book page colored with markers
-- Use realistic, natural color choices (blue sky, green grass, natural skin tones)
-- Ensure adjacent regions have contrasting colors so each shape is visually distinct`,
+- Keep ALL black outlines/lines EXACTLY as they are — do not remove, lighten, or alter any lines
+- Color ONLY within the existing line art — do NOT invent new details, textures, or patterns that aren't drawn in the original
+- Do NOT add backgrounds, wallpapers, or decorations to empty/white areas — fill large blank areas with a single simple color
+- The LINE ART itself must remain unchanged — same shapes, same lines, same composition
+- Within each drawn region, you may use natural color variation and shading to bring the subject to life
+- Use realistic, natural color choices (natural skin/fur tones, fabric colors, etc.)
+- Ensure adjacent regions have contrasting colors so each shape is visually distinct
+- The result should look like the same coloring page, expertly colored with colored pencils`,
             },
             {
               type: "image",
