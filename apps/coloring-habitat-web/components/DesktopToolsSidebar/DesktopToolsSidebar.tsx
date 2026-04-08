@@ -396,7 +396,7 @@ const DesktopToolsSidebar = ({
                   {showSpinner
                     ? "Coloring..."
                     : isAutoColorDone
-                      ? "Colored"
+                      ? "Auto Colored"
                       : label}
                 </span>
                 {!showSpinner && (
