@@ -42,14 +42,15 @@ export async function generateColoredReference(
               type: 'text',
               text: `Color this children's coloring page with bright, cheerful, kid-friendly colors. ${sceneHint}
 
-RULES:
-- Keep ALL the black outlines/lines exactly as they are — do NOT remove, lighten, or alter any lines
-- Fill EVERY white region with an appropriate color
+CRITICAL RULES:
+- Use FLAT, SOLID colors only — no gradients, no shading, no textures, no patterns
+- Each enclosed region should be filled with ONE single uniform color
+- Keep ALL black outlines/lines EXACTLY as they are — do not alter any lines
+- Do NOT add any new elements, details, textures, or patterns that are not in the original line art
+- Do NOT add backgrounds, wallpapers, or decorations — if an area is blank/white in the original, fill it with a single solid color
+- The result must be IDENTICAL to the original line art but with flat color fills — like a coloring book page colored with markers
 - Use bright, saturated, cheerful colors that kids would love
-- Ensure adjacent regions have contrasting colors so each shape is visually distinct
-- The result should look like a beautifully colored children's illustration
-- Maintain the exact same composition and line work — only add color to the white areas
-- Do NOT add any new elements, text, or modify the drawing in any way`,
+- Ensure adjacent regions have contrasting colors so each shape is visually distinct`,
             },
             {
               type: 'image',
