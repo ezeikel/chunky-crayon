@@ -83,6 +83,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       addDrawingAction,
       setDrawingActions,
       setIsAutoColoring,
+      setHasAutoColored,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -448,9 +449,9 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
           playSound("sparkle");
           setHasUnsavedChanges(true);
+          setHasAutoColored(true);
         } finally {
           setIsAutoColoring(false);
-          // Reset tool to brush so the magic-auto useEffect doesn't re-trigger
           setActiveTool("brush");
         }
       }, 50); // 50ms delay gives React time to render the modal
@@ -459,6 +460,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       playSound,
       setHasUnsavedChanges,
       setIsAutoColoring,
+      setHasAutoColored,
       setActiveTool,
     ]);
 
@@ -574,6 +576,9 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
       // Reset unsaved changes flag
       setHasUnsavedChanges(false);
+
+      // Reset auto-color state so button is re-enabled
+      setHasAutoColored(false);
 
       // Play sparkle sound for fresh start
       playSound("sparkle");

@@ -105,9 +105,11 @@ type ColoringContextArgs = {
   isColoringComplete: boolean;
   setIsColoringComplete: Dispatch<SetStateAction<boolean>>;
 
-  // Auto-color state (true while batch fill is in progress)
+  // Auto-color state
   isAutoColoring: boolean;
   setIsAutoColoring: Dispatch<SetStateAction<boolean>>;
+  hasAutoColored: boolean;
+  setHasAutoColored: Dispatch<SetStateAction<boolean>>;
 
   // Variant — controls which feature set is exposed
   variant: ColoringVariant;
@@ -171,6 +173,8 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setIsColoringComplete: () => {},
   isAutoColoring: false,
   setIsAutoColoring: () => {},
+  hasAutoColored: false,
+  setHasAutoColored: () => {},
   variant: "adult",
 });
 
@@ -256,6 +260,7 @@ export const ColoringContextProvider = ({
   const [coloringProgress, setColoringProgress] = useState(0);
   const [isColoringComplete, setIsColoringComplete] = useState(false);
   const [isAutoColoring, setIsAutoColoring] = useState(false);
+  const [hasAutoColored, setHasAutoColored] = useState(false);
 
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
@@ -376,6 +381,8 @@ export const ColoringContextProvider = ({
       setIsColoringComplete,
       isAutoColoring,
       setIsAutoColoring,
+      hasAutoColored,
+      setHasAutoColored,
       variant,
     }),
     [
@@ -409,6 +416,7 @@ export const ColoringContextProvider = ({
       coloringProgress,
       isColoringComplete,
       isAutoColoring,
+      hasAutoColored,
       variant,
     ],
   );

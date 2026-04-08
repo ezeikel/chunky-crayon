@@ -80,6 +80,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       addDrawingAction,
       setDrawingActions,
       setIsAutoColoring,
+      setHasAutoColored,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -446,6 +447,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
           playSound('sparkle');
           setHasUnsavedChanges(true);
+          setHasAutoColored(true);
         } finally {
           setIsAutoColoring(false);
           setActiveTool('brush');
@@ -456,6 +458,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       playSound,
       setHasUnsavedChanges,
       setIsAutoColoring,
+      setHasAutoColored,
       setActiveTool,
     ]);
 
