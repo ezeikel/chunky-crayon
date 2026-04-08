@@ -351,103 +351,106 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
       // Defer heavy work so the loading modal has time to render
       setTimeout(() => {
-        // Phase 1: Region-based fill (flat colors, respects boundaries)
-        const regionMap = detectAllRegions(drawingCanvas, boundaryCanvas);
-        const boundary = canvasRef.current?.getDilatedBoundary();
+        try {
+          // Phase 1: Region-based fill (flat colors, respects boundaries)
+          const regionMap = detectAllRegions(drawingCanvas, boundaryCanvas);
+          const boundary = canvasRef.current?.getDilatedBoundary();
 
-        const nudgeOffsets = [
-          [0, 0],
-          [3, 0],
-          [-3, 0],
-          [0, 3],
-          [0, -3],
-          [3, 3],
-          [-3, -3],
-          [3, -3],
-          [-3, 3],
-          [6, 0],
-          [-6, 0],
-          [0, 6],
-          [0, -6],
-        ];
+          const nudgeOffsets = [
+            [0, 0],
+            [3, 0],
+            [-3, 0],
+            [0, 3],
+            [0, -3],
+            [3, 3],
+            [-3, -3],
+            [3, -3],
+            [-3, 3],
+            [6, 0],
+            [-6, 0],
+            [0, 6],
+            [0, -6],
+          ];
 
-        for (const region of regionMap.regions) {
-          const normX = region.centroid.x / regionMap.width;
-          const normY = region.centroid.y / regionMap.height;
-          const color = referenceColor.getColorAtNormalized(normX, normY);
+          for (const region of regionMap.regions) {
+            const normX = region.centroid.x / regionMap.width;
+            const normY = region.centroid.y / regionMap.height;
+            const color = referenceColor.getColorAtNormalized(normX, normY);
 
-          if (color) {
-            let filled = false;
-            for (const [dx, dy] of nudgeOffsets) {
-              const success = canvasRef.current?.fillRegionAtPoint(
-                Math.round(region.centroid.x + dx),
-                Math.round(region.centroid.y + dy),
-                color,
-                true,
-                boundary ?? undefined,
-              );
-              if (success) {
-                filled = true;
-                break;
-              }
-            }
-            if (!filled && region.samplePixels) {
-              for (const sample of region.samplePixels) {
+            if (color) {
+              let filled = false;
+              for (const [dx, dy] of nudgeOffsets) {
                 const success = canvasRef.current?.fillRegionAtPoint(
-                  Math.round(sample.x),
-                  Math.round(sample.y),
+                  Math.round(region.centroid.x + dx),
+                  Math.round(region.centroid.y + dy),
                   color,
                   true,
                   boundary ?? undefined,
                 );
-                if (success) break;
+                if (success) {
+                  filled = true;
+                  break;
+                }
+              }
+              if (!filled && region.samplePixels) {
+                for (const sample of region.samplePixels) {
+                  const success = canvasRef.current?.fillRegionAtPoint(
+                    Math.round(sample.x),
+                    Math.round(sample.y),
+                    color,
+                    true,
+                    boundary ?? undefined,
+                  );
+                  if (success) break;
+                }
               }
             }
           }
-        }
 
-        // Phase 2: Gap fill — paint remaining transparent non-boundary pixels
-        const drawingCtx = drawingCanvas.getContext("2d");
-        const boundaryCtx = boundaryCanvas.getContext("2d");
-        if (drawingCtx && boundaryCtx) {
-          const width = drawingCanvas.width;
-          const height = drawingCanvas.height;
-          const drawingData = drawingCtx.getImageData(0, 0, width, height);
-          const boundaryData = boundaryCtx.getImageData(0, 0, width, height);
-          const scaleX = refDims.width / width;
-          const scaleY = refDims.height / height;
+          // Phase 2: Gap fill — paint remaining transparent non-boundary pixels
+          const drawingCtx = drawingCanvas.getContext("2d");
+          const boundaryCtx = boundaryCanvas.getContext("2d");
+          if (drawingCtx && boundaryCtx) {
+            const width = drawingCanvas.width;
+            const height = drawingCanvas.height;
+            const drawingData = drawingCtx.getImageData(0, 0, width, height);
+            const boundaryData = boundaryCtx.getImageData(0, 0, width, height);
+            const scaleX = refDims.width / width;
+            const scaleY = refDims.height / height;
 
-          for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-              const idx = (y * width + x) * 4;
-              if (drawingData.data[idx + 3] > 0) continue;
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const idx = (y * width + x) * 4;
+                if (drawingData.data[idx + 3] > 0) continue;
 
-              const bA = boundaryData.data[idx + 3];
-              if (bA >= 128) {
-                const lum =
-                  0.299 * boundaryData.data[idx] +
-                  0.587 * boundaryData.data[idx + 1] +
-                  0.114 * boundaryData.data[idx + 2];
-                if (lum < 200) continue;
-              }
+                const bA = boundaryData.data[idx + 3];
+                if (bA >= 128) {
+                  const lum =
+                    0.299 * boundaryData.data[idx] +
+                    0.587 * boundaryData.data[idx + 1] +
+                    0.114 * boundaryData.data[idx + 2];
+                  if (lum < 200) continue;
+                }
 
-              const refX = Math.floor(x * scaleX);
-              const refY = Math.floor(y * scaleY);
-              const color = referenceColor.getColorAt(refX, refY);
-              if (color) {
-                drawingData.data[idx] = parseInt(color.slice(1, 3), 16);
-                drawingData.data[idx + 1] = parseInt(color.slice(3, 5), 16);
-                drawingData.data[idx + 2] = parseInt(color.slice(5, 7), 16);
-                drawingData.data[idx + 3] = 255;
+                const refX = Math.floor(x * scaleX);
+                const refY = Math.floor(y * scaleY);
+                const color = referenceColor.getColorAt(refX, refY);
+                if (color) {
+                  drawingData.data[idx] = parseInt(color.slice(1, 3), 16);
+                  drawingData.data[idx + 1] = parseInt(color.slice(3, 5), 16);
+                  drawingData.data[idx + 2] = parseInt(color.slice(5, 7), 16);
+                  drawingData.data[idx + 3] = 255;
+                }
               }
             }
+            drawingCtx.putImageData(drawingData, 0, 0);
           }
-          drawingCtx.putImageData(drawingData, 0, 0);
-        }
 
-        setIsAutoColoring(false);
-        playSound("sparkle");
-        setHasUnsavedChanges(true);
+          playSound("sparkle");
+          setHasUnsavedChanges(true);
+        } finally {
+          setIsAutoColoring(false);
+        }
       }, 50); // 50ms delay gives React time to render the modal
     }, [referenceColor, playSound, setHasUnsavedChanges, setIsAutoColoring]);
 

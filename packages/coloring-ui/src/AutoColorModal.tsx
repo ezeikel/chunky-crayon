@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useColoringContext } from "./context";
 import cn from "./cn";
 
@@ -9,58 +10,68 @@ type AutoColorModalProps = {
 
 /**
  * Full-page modal overlay shown during auto-color.
- * Blocks all interaction while the canvas is being painted.
+ * Blocks all interaction and scroll while the canvas is being painted.
  */
 const AutoColorModal = ({ className }: AutoColorModalProps) => {
   const { isAutoColoring, variant } = useColoringContext();
   const isKids = variant === "kids";
+
+  // Disable body scroll while modal is visible
+  useEffect(() => {
+    if (isAutoColoring) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [isAutoColoring]);
 
   if (!isAutoColoring) return null;
 
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-[2px]",
+        "fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm",
         className,
       )}
     >
       <div
         className={cn(
-          "flex flex-col items-center gap-4 p-8 rounded-2xl shadow-2xl",
+          "flex flex-col items-center gap-5 px-10 py-8 rounded-2xl shadow-xl max-w-sm mx-4",
           isKids
-            ? "bg-orange-50 border-2 border-orange-200"
-            : "bg-white border border-gray-200",
+            ? "bg-white border-2 border-crayon-purple/20"
+            : "bg-white border border-gray-100",
         )}
       >
         {/* Spinner */}
-        <div className="relative">
-          <div
-            className={cn(
-              "size-16 border-4 rounded-full animate-spin",
-              isKids
-                ? "border-orange-200 border-t-orange-500"
-                : "border-gray-200 border-t-violet-600",
-            )}
-          />
-          <span className="absolute inset-0 flex items-center justify-center text-2xl">
-            {isKids ? "🎨" : "✨"}
-          </span>
-        </div>
+        <div
+          className={cn(
+            "size-12 border-[3px] rounded-full animate-spin",
+            isKids
+              ? "border-crayon-purple/20 border-t-crayon-purple"
+              : "border-gray-200 border-t-gray-800",
+          )}
+        />
 
         {/* Text */}
         <div className="text-center">
           <h3
             className={cn(
-              "font-bold text-lg",
-              isKids ? "text-orange-600" : "text-gray-800",
+              "font-semibold text-base",
+              isKids ? "text-crayon-purple" : "text-gray-900",
             )}
           >
-            {isKids ? "Coloring your picture!" : "Auto-coloring..."}
+            {isKids ? "Coloring your picture!" : "Adding color to your page"}
           </h3>
-          <p className="text-sm text-gray-500 mt-1">
+          <p
+            className={cn(
+              "text-sm mt-1.5",
+              isKids ? "text-crayon-purple/60" : "text-gray-500",
+            )}
+          >
             {isKids
-              ? "Watch the magic happen! ✨"
-              : "Painting colors from AI reference"}
+              ? "Hang tight, the magic is happening"
+              : "This may take a few seconds"}
           </p>
         </div>
       </div>
