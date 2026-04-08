@@ -274,6 +274,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           requestAnimationFrame(fillBatch);
         } else {
           setIsAutoColoring(false);
+          setActiveTool('brush');
           playSound('sparkle');
           setHasUnsavedChanges(true);
         }
@@ -323,6 +324,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           requestAnimationFrame(fillBatch);
         } else {
           setIsAutoColoring(false);
+          setActiveTool('brush');
           playSound('sparkle');
           setHasUnsavedChanges(true);
         }
