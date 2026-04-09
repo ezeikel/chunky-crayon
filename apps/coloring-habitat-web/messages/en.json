@@ -261,7 +261,22 @@
     "title": "The Coloring Habitat Blog",
     "subtitle": "Wellness, techniques, and inspiration for mindful coloring",
     "allPosts": "All Posts",
-    "byAuthor": "By {author}"
+    "all": "All",
+    "byAuthor": "By {author}",
+    "comingSoon": "Coming soon",
+    "comingSoonDescription": "We're working on articles about the science of coloring for wellness, technique guides, and creative inspiration.",
+    "metaTitle": "Blog | Coloring Habitat",
+    "metaDescription": "Wellness tips, coloring techniques, and creative inspiration for mindful coloring. Discover the science behind coloring for stress relief.",
+    "home": "Home",
+    "blog": "Blog",
+    "postNotFound": "Post Not Found | Coloring Habitat",
+    "minRead": "{count} min read",
+    "moreFromBlog": "More from the Blog",
+    "categoryNotFound": "Category Not Found | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Coloring Habitat Blog",
+    "categoryDescription": "Browse all {category} articles on the Coloring Habitat blog.",
+    "noCategoryPosts": "No posts in this category yet",
+    "checkBackSoon": "Check back soon for new articles!"
   },
   "email": {
     "signup": {
@@ -371,7 +386,7 @@
         "description": "Start your coloring journey",
         "cta": "Get started free",
         "features": [
-          "2 free creations daily",
+          "2 free creations to start",
           "Access to free library",
           "Online coloring canvas",
           "PDF downloads"
@@ -415,6 +430,31 @@
           "Ambient soundscapes"
         ]
       }
+    },
+    "faq": {
+      "title": "Questions about plans",
+      "items": {
+        "cancelAnytime": {
+          "question": "Can I cancel anytime?",
+          "answer": "Yes. Cancel your subscription anytime from your account settings. No questions, no guilt."
+        },
+        "rollover": {
+          "question": "Do credits roll over?",
+          "answer": "Grove credits reset each month. Sanctuary rolls over up to 1 month. Oasis gives you 2 months of rollover — so you're never rushed to use them."
+        },
+        "creditsPerPage": {
+          "question": "How many pages can I make?",
+          "answer": "Each page costs about 5 credits. That's around 60 pages a month on Grove, 160 on Sanctuary, and 400 on Oasis."
+        },
+        "audience": {
+          "question": "Is Coloring Habitat for me?",
+          "answer": "We designed Coloring Habitat for anyone who wants to slow down, find calm, and enjoy creative relaxation. If coloring sounds restorative, you're in the right place."
+        },
+        "gettingStarted": {
+          "question": "How do I get started?",
+          "answer": "Pick a plan and start creating. Bloom is free — no account needed to try it out."
+        }
+      }
     }
   },
   "billing": {
@@ -443,6 +483,134 @@
       "portalFailed": "Failed to open subscription management.",
       "checkoutSessionFailed": "Failed to create checkout session",
       "redirectFailed": "Failed to redirect to checkout"
+    }
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "gallery": "Gallery"
+  },
+  "gallery": {
+    "pageTitle": "Coloring Gallery | Coloring Habitat",
+    "pageDescription": "Browse our growing collection of intricate coloring pages for relaxation and mindfulness. Filter by category, difficulty, or season.",
+    "heroTitle": "Coloring gallery",
+    "heroSubtitle": "Browse intricate coloring pages for relaxation and mindfulness. Every design is made to help you slow down and find a quieter moment.",
+    "browseByCategory": "Browse by category",
+    "browseByDifficulty": "Browse by difficulty",
+    "browseByHolidays": "Seasons & holidays",
+    "dailyPage": "Today's coloring page",
+    "viewAllDaily": "View all daily pages",
+    "communityCreations": "Featured pages",
+    "viewAllCommunity": "View all featured",
+    "startColoring": "Color this page",
+    "stats": {
+      "totalPages": "Pages in the library",
+      "communityPages": "Free library pages",
+      "dailyPages": "Daily pages generated",
+      "pagesSuffix": "pages"
+    },
+    "filters": {
+      "all": "All"
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "Beginner",
+        "shortLabel": "Easy",
+        "description": "Gentle patterns, perfect for a quick moment of calm"
+      },
+      "intermediate": {
+        "title": "Intermediate",
+        "shortLabel": "Medium",
+        "description": "Moderate detail for a longer, grounding session"
+      },
+      "advanced": {
+        "title": "Advanced",
+        "shortLabel": "Hard",
+        "description": "Detailed designs that reward unhurried focus"
+      },
+      "expert": {
+        "title": "Expert",
+        "shortLabel": "Expert",
+        "description": "Intricate pieces for deep, meditative flow"
+      }
+    },
+    "categories": {
+      "mandalas": {
+        "name": "Mandalas",
+        "description": "Symmetrical patterns for quiet focus"
+      },
+      "nature": {
+        "name": "Nature",
+        "description": "Botanical scenes and natural beauty"
+      },
+      "geometric": {
+        "name": "Geometric",
+        "description": "Precise patterns and tessellations"
+      },
+      "landscapes": {
+        "name": "Landscapes",
+        "description": "Mountains, oceans, and distant horizons"
+      },
+      "fantasy": {
+        "name": "Fantasy",
+        "description": "Mythical creatures and enchanted worlds"
+      },
+      "animals": {
+        "name": "Animals",
+        "description": "Wildlife in intricate detail"
+      },
+      "architecture": {
+        "name": "Architecture",
+        "description": "Buildings, cathedrals, and historic spaces"
+      },
+      "abstract": {
+        "name": "Abstract",
+        "description": "Free-form designs for creative expression"
+      },
+      "flowers": {
+        "name": "Flowers",
+        "description": "Delicate florals for gentle focus"
+      },
+      "ocean": {
+        "name": "Ocean",
+        "description": "Underwater scenes and marine life"
+      },
+      "patterns": {
+        "name": "Patterns",
+        "description": "Repeating motifs for meditative coloring"
+      },
+      "wildlife": {
+        "name": "Wildlife",
+        "description": "Animals in their natural habitats"
+      },
+      "mythology": {
+        "name": "Mythology",
+        "description": "Ancient myths and legendary figures"
+      },
+      "steampunk": {
+        "name": "Steampunk",
+        "description": "Victorian machinery and curious contraptions"
+      },
+      "food": {
+        "name": "Food",
+        "description": "Feasts and culinary scenes"
+      }
+    },
+    "holidays": {
+      "title": "Seasons & holidays",
+      "christmas": "Christmas",
+      "halloween": "Halloween",
+      "easter": "Easter",
+      "valentines": "Valentine's",
+      "winter": "Winter",
+      "spring": "Spring",
+      "summer": "Summer",
+      "autumn": "Autumn"
+    },
+    "seo": {
+      "aboutTitle": "A quiet place to color",
+      "aboutParagraph1": "Coloring Habitat is a growing library of intricate coloring pages designed for adults who want to slow down, find calm, and reconnect with a creative practice. Every page is crafted to invite focus — whether you have five minutes or a quiet afternoon.",
+      "aboutParagraph2": "A brand-new coloring page is generated every day. Subscribe to the daily email to get a fresh design in your inbox each morning, or browse the full library anytime. Color online using our digital canvas, or download a high-resolution PDF to print and color by hand.",
+      "aboutParagraph3": "Research in art therapy suggests that even short coloring sessions can lower cortisol levels, quiet racing thoughts, and activate the same regions of the brain as meditation. Coloring Habitat is built to make that practice easy to return to — a small, daily ritual for a calmer mind."
     }
   },
   "accountSettings": {

@@ -12,10 +12,19 @@ import {
   faWater,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "@/i18n/routing";
+import FaqSection from "@/components/FaqSection";
 
 type BillingInterval = "monthly" | "annual";
 
 const planKeys = ["bloom", "grove", "sanctuary", "oasis"] as const;
+
+const PRICING_FAQ_IDS = [
+  "cancelAnytime",
+  "rollover",
+  "creditsPerPage",
+  "audience",
+  "gettingStarted",
+] as const;
 
 const planConfig = {
   bloom: {
@@ -216,6 +225,8 @@ const PricingPage = () => {
           </div>
         </div>
       </main>
+
+      <FaqSection namespace="pricing.faq" itemIds={PRICING_FAQ_IDS} />
     </>
   );
 };

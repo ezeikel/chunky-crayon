@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
+import { getTranslations } from "next-intl/server";
 import {
   client,
   isSanityConfigured,
@@ -34,24 +35,28 @@ export async function generateMetadata({
   params: Promise<PageParams>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const category = await getCategory(slug);
+  const [t, category] = await Promise.all([
+    getTranslations({ locale, namespace: "blog" }),
+    getCategory(slug),
+  ]);
 
   if (!category) {
     return {
-      title: "Category Not Found | Coloring Habitat",
+      title: t("categoryNotFound"),
     };
   }
 
+  const title = t("categoryMetaTitle", { category: category.title });
+  const description =
+    category.description ||
+    t("categoryDescription", { category: category.title });
+
   return {
-    title: `${category.title} | Coloring Habitat Blog`,
-    description:
-      category.description ||
-      `Browse all ${category.title} articles on the Coloring Habitat blog.`,
+    title,
+    description,
     openGraph: {
-      title: `${category.title} - Coloring Habitat Blog`,
-      description:
-        category.description ||
-        `Browse all ${category.title} articles on the Coloring Habitat blog.`,
+      title,
+      description,
       type: "website",
     },
     alternates: generateAlternates(locale, `/blog/category/${slug}`),
@@ -76,13 +81,14 @@ async function getCategory(slug: string) {
   return client.fetch<Category>(categoryBySlugQuery, { slug });
 }
 
-function CategoryPills({
+async function CategoryPills({
   categories,
   activeSlug,
 }: {
   categories: BlogCategory[];
   activeSlug: string;
 }) {
+  const t = await getTranslations("blog");
   const filtered = categories.filter((c) => c.postCount > 0);
   if (filtered.length === 0) return null;
 
@@ -92,7 +98,7 @@ function CategoryPills({
         href="/blog"
         className="rounded-full border border-border bg-card px-4 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-secondary"
       >
-        All
+        {t("all")}
       </Link>
       {filtered.map((category) => (
         <Link
@@ -114,7 +120,8 @@ function CategoryPills({
   );
 }
 
-function PostCard({ post }: { post: BlogPost }) {
+async function PostCard({ post }: { post: BlogPost }) {
+  const t = await getTranslations("blog");
   const imageUrl = post.featuredImage?.asset
     ? urlFor(post.featuredImage).width(600).height(400).url()
     : null;
@@ -159,7 +166,9 @@ function PostCard({ post }: { post: BlogPost }) {
         )}
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          {post.author && <span>By {post.author.name}</span>}
+          {post.author && (
+            <span>{t("byAuthor", { author: post.author.name })}</span>
+          )}
           <time dateTime={post.publishedAt}>
             {format(new Date(post.publishedAt), "MMM d, yyyy")}
           </time>
@@ -175,7 +184,8 @@ const CategoryContent = async ({
   paramsPromise: Promise<PageParams>;
 }) => {
   const { slug } = await paramsPromise;
-  const [posts, categories, category] = await Promise.all([
+  const [t, posts, categories, category] = await Promise.all([
+    getTranslations("blog"),
     getPosts(slug),
     getCategories(),
     getCategory(slug),
@@ -194,7 +204,7 @@ const CategoryContent = async ({
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
           {category.description ||
-            `Browse all ${category.title} articles on the Coloring Habitat blog.`}
+            t("categoryDescription", { category: category.title })}
         </p>
       </div>
 
@@ -211,10 +221,10 @@ const CategoryContent = async ({
       ) : (
         <div className="mt-16 rounded-2xl border border-border bg-card p-12 text-center">
           <p className="text-lg font-semibold text-foreground">
-            No posts in this category yet
+            {t("noCategoryPosts")}
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Check back soon for new articles!
+            {t("checkBackSoon")}
           </p>
         </div>
       )}

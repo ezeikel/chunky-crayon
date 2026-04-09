@@ -145,11 +145,8 @@
     },
     "stats": {
       "pagesCreated": "Ausmalseiten erstellt",
-      "happyColorists": "Zufriedene Ausmaler",
-      "feelingCalmer": "Fühlen sich ruhiger",
-      "sessionLength": "Durchschnittliche Sitzungsdauer",
-      "dailyPages": "Tägliche Seiten",
-      "freeLibraryPages": "Kostenlose Bibliotheksseiten",
+      "dailyPages": "Seiten pro Tag",
+      "freeLibraryPages": "Kostenlose Seiten in der Bibliothek",
       "categories": "Kategorien"
     },
     "features": {
@@ -402,6 +399,159 @@
           "Ambient-Klangwelten"
         ]
       }
+    },
+    "faq": {
+      "title": "Fragen zu den Plänen",
+      "items": {
+        "cancelAnytime": {
+          "question": "Kann ich jederzeit kündigen?",
+          "answer": "Ja. Kündige dein Abo jederzeit über deine Kontoeinstellungen. Keine Fragen, kein schlechtes Gewissen."
+        },
+        "rollover": {
+          "question": "Werden Credits übertragen?",
+          "answer": "Grove-Credits werden jeden Monat zurückgesetzt. Sanctuary überträgt bis zu 1 Monat. Oasis gibt dir 2 Monate Übertrag — so bist du nie unter Zeitdruck."
+        },
+        "creditsPerPage": {
+          "question": "Wie viele Seiten kann ich erstellen?",
+          "answer": "Jede Seite kostet etwa 5 Credits. Das sind rund 60 Seiten pro Monat bei Grove, 160 bei Sanctuary und 400 bei Oasis."
+        },
+        "audience": {
+          "question": "Ist Coloring Habitat das Richtige für mich?",
+          "answer": "Wir haben Coloring Habitat für alle gestaltet, die langsamer machen, Ruhe finden und kreative Entspannung genießen möchten. Wenn Ausmalen für dich wohltuend klingt, bist du hier richtig."
+        },
+        "gettingStarted": {
+          "question": "Wie fange ich an?",
+          "answer": "Wähle einen Plan und leg los. Bloom ist kostenlos — du brauchst nicht mal ein Konto, um es auszuprobieren."
+        }
+      }
+    }
+  },
+  "breadcrumbs": {
+    "home": "Startseite",
+    "gallery": "Galerie"
+  },
+  "gallery": {
+    "pageTitle": "Ausmal-Galerie | Coloring Habitat",
+    "pageDescription": "Stöbere in unserer wachsenden Sammlung filigraner Ausmalseiten für Entspannung und Achtsamkeit. Filtere nach Kategorie, Schwierigkeit oder Saison.",
+    "heroTitle": "Ausmal-Galerie",
+    "heroSubtitle": "Stöbere in filigranen Ausmalseiten für Entspannung und Achtsamkeit. Jedes Design lädt dich ein, zur Ruhe zu kommen und einen stillen Moment zu finden.",
+    "browseByCategory": "Nach Kategorie entdecken",
+    "browseByDifficulty": "Nach Schwierigkeit entdecken",
+    "browseByHolidays": "Jahreszeiten & Feiertage",
+    "dailyPage": "Seite des Tages",
+    "viewAllDaily": "Alle Tagesseiten ansehen",
+    "communityCreations": "Empfohlene Seiten",
+    "viewAllCommunity": "Alle empfohlenen ansehen",
+    "startColoring": "Diese Seite ausmalen",
+    "stats": {
+      "totalPages": "Seiten in der Bibliothek",
+      "communityPages": "Kostenlose Seiten",
+      "dailyPages": "Täglich generierte Seiten",
+      "pagesSuffix": "Seiten"
+    },
+    "filters": {
+      "all": "Alle"
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "Anfänger",
+        "shortLabel": "Leicht",
+        "description": "Sanfte Muster, perfekt für einen kurzen Moment der Ruhe"
+      },
+      "intermediate": {
+        "title": "Mittel",
+        "shortLabel": "Mittel",
+        "description": "Moderate Details für eine längere, erdende Sitzung"
+      },
+      "advanced": {
+        "title": "Fortgeschritten",
+        "shortLabel": "Schwer",
+        "description": "Detailreiche Designs, die konzentriertes Arbeiten belohnen"
+      },
+      "expert": {
+        "title": "Experte",
+        "shortLabel": "Experte",
+        "description": "Filigrane Werke für tiefe, meditative Flow-Zustände"
+      }
+    },
+    "categories": {
+      "mandalas": {
+        "name": "Mandalas",
+        "description": "Symmetrische Muster für stille Konzentration"
+      },
+      "nature": {
+        "name": "Natur",
+        "description": "Botanische Szenen und natürliche Schönheit"
+      },
+      "geometric": {
+        "name": "Geometrisch",
+        "description": "Präzise Muster und Parkettierungen"
+      },
+      "landscapes": {
+        "name": "Landschaften",
+        "description": "Berge, Meere und ferne Horizonte"
+      },
+      "fantasy": {
+        "name": "Fantasy",
+        "description": "Mythische Kreaturen und verzauberte Welten"
+      },
+      "animals": {
+        "name": "Tiere",
+        "description": "Tierwelt in filigranen Details"
+      },
+      "architecture": {
+        "name": "Architektur",
+        "description": "Gebäude, Kathedralen und historische Orte"
+      },
+      "abstract": {
+        "name": "Abstrakt",
+        "description": "Freie Designs für kreativen Ausdruck"
+      },
+      "flowers": {
+        "name": "Blumen",
+        "description": "Zarte Blüten für sanfte Konzentration"
+      },
+      "ocean": {
+        "name": "Ozean",
+        "description": "Unterwasserszenen und Meeresbewohner"
+      },
+      "patterns": {
+        "name": "Muster",
+        "description": "Wiederkehrende Motive für meditatives Ausmalen"
+      },
+      "wildlife": {
+        "name": "Wildtiere",
+        "description": "Tiere in ihren natürlichen Lebensräumen"
+      },
+      "mythology": {
+        "name": "Mythologie",
+        "description": "Alte Mythen und legendäre Gestalten"
+      },
+      "steampunk": {
+        "name": "Steampunk",
+        "description": "Viktorianische Maschinen und kuriose Apparaturen"
+      },
+      "food": {
+        "name": "Essen",
+        "description": "Festmahle und kulinarische Szenen"
+      }
+    },
+    "holidays": {
+      "title": "Jahreszeiten & Feiertage",
+      "christmas": "Weihnachten",
+      "halloween": "Halloween",
+      "easter": "Ostern",
+      "valentines": "Valentinstag",
+      "winter": "Winter",
+      "spring": "Frühling",
+      "summer": "Sommer",
+      "autumn": "Herbst"
+    },
+    "seo": {
+      "aboutTitle": "Ein ruhiger Ort zum Ausmalen",
+      "aboutParagraph1": "Coloring Habitat ist eine wachsende Bibliothek filigraner Ausmalseiten, gestaltet für Erwachsene, die zur Ruhe kommen, Gelassenheit finden und sich mit einer kreativen Praxis verbinden möchten. Jede Seite lädt zur Konzentration ein — ob du nun fünf Minuten oder einen ruhigen Nachmittag Zeit hast.",
+      "aboutParagraph2": "Jeden Tag wird eine brandneue Ausmalseite erstellt. Abonniere die tägliche E-Mail, um jeden Morgen ein neues Design im Posteingang zu erhalten, oder stöbere jederzeit in der gesamten Bibliothek. Male online auf unserer digitalen Leinwand oder lade ein hochauflösendes PDF herunter, um es auszudrucken und von Hand auszumalen.",
+      "aboutParagraph3": "Forschung in der Kunsttherapie legt nahe, dass schon kurze Ausmal-Sitzungen den Cortisolspiegel senken, rasende Gedanken beruhigen und dieselben Gehirnregionen aktivieren können wie Meditation. Coloring Habitat macht es einfach, zu dieser Praxis zurückzukehren — ein kleines, tägliches Ritual für einen ruhigeren Geist."
     }
   },
   "accountSettings": {
@@ -421,7 +571,22 @@
     "title": "Der Coloring Habitat Blog",
     "subtitle": "Wohlbefinden, Techniken und Inspiration fürs achtsame Ausmalen",
     "allPosts": "Alle Beiträge",
-    "byAuthor": "Von {author}"
+    "all": "Alle",
+    "byAuthor": "Von {author}",
+    "comingSoon": "Demnächst",
+    "comingSoonDescription": "Wir arbeiten an Artikeln über die Wissenschaft des Ausmalens für das Wohlbefinden, Techniktipps und kreative Inspiration.",
+    "metaTitle": "Blog | Coloring Habitat",
+    "metaDescription": "Tipps für Wohlbefinden, Ausmal-Techniken und kreative Inspiration für achtsames Ausmalen. Entdecke die Wissenschaft hinter dem Ausmalen zur Stressbewältigung.",
+    "home": "Startseite",
+    "blog": "Blog",
+    "postNotFound": "Beitrag nicht gefunden | Coloring Habitat",
+    "minRead": "{count} Min. Lesezeit",
+    "moreFromBlog": "Mehr aus dem Blog",
+    "categoryNotFound": "Kategorie nicht gefunden | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Coloring Habitat Blog",
+    "categoryDescription": "Entdecke alle Artikel zu {category} im Coloring Habitat Blog.",
+    "noCategoryPosts": "Noch keine Beiträge in dieser Kategorie",
+    "checkBackSoon": "Schau bald wieder für neue Artikel vorbei!"
   },
   "billing": {
     "pageTitle": "Abrechnung",

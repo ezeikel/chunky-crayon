@@ -7,15 +7,33 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import cn from "@/utils/cn";
 
-const FAQ_COUNT = 5;
+type FaqSectionProps = {
+  /** Translation namespace for the FAQ content */
+  namespace?: "homepage.faq" | "pricing.faq";
+  /** Named item keys (e.g. ["cancelAnytime", "rollover"]) — use for pricing */
+  itemIds?: readonly string[];
+  /** Number of numbered items (e.g. 5 → fetches items.1 through items.5) — use for homepage */
+  itemCount?: number;
+  className?: string;
+};
 
-const FaqSection = () => {
-  const t = useTranslations("homepage.faq");
+const FaqSection = ({
+  namespace = "homepage.faq",
+  itemIds,
+  itemCount = 5,
+  className,
+}: FaqSectionProps) => {
+  const t = useTranslations(namespace);
 
-  const faqItems = Array.from({ length: FAQ_COUNT }).map((_, index) => ({
-    question: t(`items.${index + 1}.question`),
-    answer: t(`items.${index + 1}.answer`),
+  const keys =
+    itemIds ?? Array.from({ length: itemCount }, (_, i) => `${i + 1}`);
+
+  const faqItems = keys.map((key) => ({
+    id: key,
+    question: t(`items.${key}.question`),
+    answer: t(`items.${key}.answer`),
   }));
 
   const faqSchema = {
@@ -32,7 +50,7 @@ const FaqSection = () => {
   };
 
   return (
-    <section className="bg-card py-24" id="faq">
+    <section className={cn("bg-card py-24", className)} id="faq">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -43,10 +61,10 @@ const FaqSection = () => {
         </h2>
 
         <Accordion type="single" collapsible className="mt-12">
-          {faqItems.map((item, index) => (
+          {faqItems.map((item) => (
             <AccordionItem
-              key={index}
-              value={`item-${index}`}
+              key={item.id}
+              value={item.id}
               className="border-b-border/60"
             >
               <AccordionTrigger className="py-5 text-left text-base font-semibold text-foreground hover:no-underline [&[data-state=open]]:text-primary">

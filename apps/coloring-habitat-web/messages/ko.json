@@ -145,10 +145,7 @@
     },
     "stats": {
       "pagesCreated": "생성된 컬러링 페이지",
-      "happyColorists": "만족한 이용자",
-      "feelingCalmer": "마음이 편안해졌다고 응답",
-      "sessionLength": "평균 이용 시간",
-      "dailyPages": "일일 페이지",
+      "dailyPages": "데일리 페이지",
       "freeLibraryPages": "무료 라이브러리 페이지",
       "categories": "카테고리"
     },
@@ -402,6 +399,159 @@
           "앰비언트 사운드스케이프"
         ]
       }
+    },
+    "faq": {
+      "title": "요금제 관련 질문",
+      "items": {
+        "cancelAnytime": {
+          "question": "언제든지 해지할 수 있나요?",
+          "answer": "네. 계정 설정에서 언제든지 구독을 해지할 수 있습니다. 이유를 묻지 않고, 미안해할 필요도 없습니다."
+        },
+        "rollover": {
+          "question": "크레딧이 이월되나요?",
+          "answer": "Grove 크레딧은 매달 초기화됩니다. Sanctuary는 최대 1개월 이월되고, Oasis는 2개월까지 이월되니 서둘러 사용하실 필요가 없습니다."
+        },
+        "creditsPerPage": {
+          "question": "몇 페이지나 만들 수 있나요?",
+          "answer": "페이지 하나당 약 5크레딧입니다. Grove는 월 약 60페이지, Sanctuary는 160페이지, Oasis는 400페이지 정도 만들 수 있습니다."
+        },
+        "audience": {
+          "question": "Coloring Habitat이 저에게 맞을까요?",
+          "answer": "Coloring Habitat은 천천히 숨을 고르고 마음의 여유를 찾으며 창의적인 휴식을 즐기고 싶은 모든 분을 위해 만들어졌습니다. 색칠하기가 마음을 편안하게 해준다면, 잘 오신 겁니다."
+        },
+        "gettingStarted": {
+          "question": "어떻게 시작하나요?",
+          "answer": "요금제를 선택하고 바로 시작하세요. Bloom은 무료이며 계정을 만들지 않아도 체험해 볼 수 있습니다."
+        }
+      }
+    }
+  },
+  "breadcrumbs": {
+    "home": "홈",
+    "gallery": "갤러리"
+  },
+  "gallery": {
+    "pageTitle": "컬러링 갤러리 | Coloring Habitat",
+    "pageDescription": "휴식과 마음챙김을 위한 정교한 컬러링 페이지 컬렉션을 둘러보세요. 카테고리, 난이도, 계절별로 필터링할 수 있어요.",
+    "heroTitle": "컬러링 갤러리",
+    "heroSubtitle": "휴식과 마음챙김을 위해 정성껏 만든 컬러링 페이지를 둘러보세요. 모든 디자인은 천천히 숨을 고르며 조용한 순간을 찾도록 도와드려요.",
+    "browseByCategory": "카테고리로 둘러보기",
+    "browseByDifficulty": "난이도로 둘러보기",
+    "browseByHolidays": "계절과 기념일",
+    "dailyPage": "오늘의 컬러링 페이지",
+    "viewAllDaily": "모든 데일리 페이지 보기",
+    "communityCreations": "추천 페이지",
+    "viewAllCommunity": "모든 추천 보기",
+    "startColoring": "이 페이지 칠하기",
+    "stats": {
+      "totalPages": "라이브러리의 페이지",
+      "communityPages": "무료 라이브러리 페이지",
+      "dailyPages": "생성된 데일리 페이지",
+      "pagesSuffix": "페이지"
+    },
+    "filters": {
+      "all": "전체"
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "초급",
+        "shortLabel": "쉬움",
+        "description": "부드러운 패턴으로, 짧은 휴식 시간에 딱 좋아요"
+      },
+      "intermediate": {
+        "title": "중급",
+        "shortLabel": "보통",
+        "description": "적당한 디테일로 차분하게 몰입할 수 있어요"
+      },
+      "advanced": {
+        "title": "고급",
+        "shortLabel": "어려움",
+        "description": "섬세한 디자인으로, 천천히 집중하는 시간이 필요해요"
+      },
+      "expert": {
+        "title": "전문가",
+        "shortLabel": "전문가",
+        "description": "명상처럼 깊이 몰입할 수 있는 정교한 작품"
+      }
+    },
+    "categories": {
+      "mandalas": {
+        "name": "만다라",
+        "description": "고요한 집중을 위한 대칭 패턴"
+      },
+      "nature": {
+        "name": "자연",
+        "description": "식물과 자연의 아름다움"
+      },
+      "geometric": {
+        "name": "기하학",
+        "description": "정교한 패턴과 테셀레이션"
+      },
+      "landscapes": {
+        "name": "풍경",
+        "description": "산, 바다, 그리고 먼 지평선"
+      },
+      "fantasy": {
+        "name": "판타지",
+        "description": "신화 속 생물과 마법의 세계"
+      },
+      "animals": {
+        "name": "동물",
+        "description": "정교하게 그려진 동물들"
+      },
+      "architecture": {
+        "name": "건축",
+        "description": "건물, 대성당, 그리고 역사적인 공간"
+      },
+      "abstract": {
+        "name": "추상",
+        "description": "자유롭게 표현할 수 있는 디자인"
+      },
+      "flowers": {
+        "name": "꽃",
+        "description": "부드러운 집중을 위한 섬세한 꽃들"
+      },
+      "ocean": {
+        "name": "바다",
+        "description": "바닷속 풍경과 해양 생물"
+      },
+      "patterns": {
+        "name": "패턴",
+        "description": "명상처럼 칠할 수 있는 반복 모티프"
+      },
+      "wildlife": {
+        "name": "야생 동물",
+        "description": "자연 속 동물들의 모습"
+      },
+      "mythology": {
+        "name": "신화",
+        "description": "고대 신화와 전설 속 인물들"
+      },
+      "steampunk": {
+        "name": "스팀펑크",
+        "description": "빅토리아 시대의 기계와 신기한 장치들"
+      },
+      "food": {
+        "name": "음식",
+        "description": "풍성한 요리와 식탁 풍경"
+      }
+    },
+    "holidays": {
+      "title": "계절과 기념일",
+      "christmas": "크리스마스",
+      "halloween": "할로윈",
+      "easter": "부활절",
+      "valentines": "밸런타인데이",
+      "winter": "겨울",
+      "spring": "봄",
+      "summer": "여름",
+      "autumn": "가을"
+    },
+    "seo": {
+      "aboutTitle": "조용히 컬러링을 즐기는 공간",
+      "aboutParagraph1": "Coloring Habitat은 천천히 숨을 고르고, 평온을 찾고, 창의적인 시간을 되찾고 싶은 분들을 위해 만든 정교한 컬러링 페이지 라이브러리예요. 모든 페이지는 5분이든 조용한 오후든, 편안하게 집중할 수 있도록 디자인되었어요.",
+      "aboutParagraph2": "매일 새로운 컬러링 페이지가 추가됩니다. 데일리 이메일을 구독하면 매일 아침 받은편지함으로 새 디자인이 도착해요. 언제든 전체 라이브러리를 둘러볼 수 있고, 디지털 캔버스로 온라인에서 칠하거나, 고해상도 PDF로 다운로드해 손으로 칠할 수도 있어요.",
+      "aboutParagraph3": "미술 치료 연구에 따르면 짧은 컬러링 시간만으로도 코르티솔 수치가 낮아지고, 산만한 생각이 가라앉으며, 명상할 때와 같은 뇌 영역이 활성화된다고 해요. Coloring Habitat은 그런 연습으로 쉽게 돌아올 수 있도록 만들어졌어요 — 더 편안한 마음을 위한 작고 따뜻한 하루의 습관입니다."
     }
   },
   "accountSettings": {
@@ -421,7 +571,22 @@
     "title": "Coloring Habitat 블로그",
     "subtitle": "마음챙김 컬러링을 위한 웰니스, 기법, 영감",
     "allPosts": "전체 글",
-    "byAuthor": "{author} 작성"
+    "all": "전체",
+    "byAuthor": "{author} 작성",
+    "comingSoon": "곧 만나요",
+    "comingSoonDescription": "컬러링이 주는 웰니스 효과, 기법 가이드, 창의적 영감에 관한 글을 준비하고 있어요.",
+    "metaTitle": "블로그 | Coloring Habitat",
+    "metaDescription": "마음챙김 컬러링을 위한 웰니스 팁, 컬러링 기법, 창의적 영감. 스트레스 해소에 도움이 되는 컬러링의 과학을 알아보세요.",
+    "home": "홈",
+    "blog": "블로그",
+    "postNotFound": "글을 찾을 수 없어요 | Coloring Habitat",
+    "minRead": "{count}분 분량",
+    "moreFromBlog": "블로그의 다른 글",
+    "categoryNotFound": "카테고리를 찾을 수 없어요 | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Coloring Habitat 블로그",
+    "categoryDescription": "Coloring Habitat 블로그의 {category} 관련 글을 모두 살펴보세요.",
+    "noCategoryPosts": "아직 이 카테고리에 글이 없어요",
+    "checkBackSoon": "곧 새로운 글로 찾아올게요!"
   },
   "billing": {
     "pageTitle": "결제",

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
+import { getTranslations } from "next-intl/server";
 import { PortableText, type PortableTextBlock } from "@portabletext/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faCalendar } from "@fortawesome/free-solid-svg-icons";
@@ -102,11 +103,14 @@ export async function generateMetadata({
   params: Promise<PageParams>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const post = await getPost(slug);
+  const [t, post] = await Promise.all([
+    getTranslations({ locale, namespace: "blog" }),
+    getPost(slug),
+  ]);
 
   if (!post) {
     return {
-      title: "Post Not Found | Coloring Habitat",
+      title: t("postNotFound"),
     };
   }
 
@@ -154,7 +158,8 @@ const BlogPostContent = async ({
   paramsPromise: Promise<PageParams>;
 }) => {
   const { slug } = await paramsPromise;
-  const [post, recentPosts] = await Promise.all([
+  const [t, post, recentPosts] = await Promise.all([
+    getTranslations("blog"),
     getPost(slug),
     getRecentPosts(slug),
   ]);
@@ -198,8 +203,8 @@ const BlogPostContent = async ({
       />
       <Breadcrumbs
         items={[
-          { label: "Home", href: "/" },
-          { label: "Blog", href: "/blog" },
+          { label: t("home"), href: "/" },
+          { label: t("blog"), href: "/blog" },
           { label: post.title },
         ]}
         className="mb-8"
@@ -240,7 +245,7 @@ const BlogPostContent = async ({
                     className="rounded-full"
                   />
                 )}
-                <span>By {post.author.name}</span>
+                <span>{t("byAuthor", { author: post.author.name })}</span>
               </div>
             )}
             <div className="flex items-center gap-1.5">
@@ -252,7 +257,11 @@ const BlogPostContent = async ({
             {post.generationMeta?.estimatedReadTime && (
               <div className="flex items-center gap-1.5">
                 <FontAwesomeIcon icon={faClock} className="text-xs" />
-                <span>{post.generationMeta.estimatedReadTime} min read</span>
+                <span>
+                  {t("minRead", {
+                    count: post.generationMeta.estimatedReadTime,
+                  })}
+                </span>
               </div>
             )}
           </div>
@@ -311,7 +320,7 @@ const BlogPostContent = async ({
       {recentPosts.length > 0 && (
         <section className="mt-16">
           <h2 className="mb-6 text-2xl font-bold text-foreground">
-            More from the Blog
+            {t("moreFromBlog")}
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {recentPosts.map((relatedPost) => {

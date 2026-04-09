@@ -145,11 +145,8 @@
     },
     "stats": {
       "pagesCreated": "Pages de coloriage créées",
-      "happyColorists": "Coloristes satisfaits",
-      "feelingCalmer": "Se sentent plus apaisés",
-      "sessionLength": "Durée moyenne d'une session",
       "dailyPages": "Pages quotidiennes",
-      "freeLibraryPages": "Pages de la bibliothèque gratuite",
+      "freeLibraryPages": "Pages gratuites de la bibliothèque",
       "categories": "Catégories"
     },
     "features": {
@@ -402,6 +399,159 @@
           "Ambiances sonores"
         ]
       }
+    },
+    "faq": {
+      "title": "Questions sur les formules",
+      "items": {
+        "cancelAnytime": {
+          "question": "Puis-je annuler à tout moment ?",
+          "answer": "Oui. Annulez votre abonnement quand vous voulez depuis les paramètres de votre compte. Sans questions, sans culpabilité."
+        },
+        "rollover": {
+          "question": "Les crédits se reportent-ils ?",
+          "answer": "Les crédits Grove se réinitialisent chaque mois. Sanctuary reporte jusqu'à 1 mois. Oasis vous donne 2 mois de report — vous n'êtes jamais pressé de les utiliser."
+        },
+        "creditsPerPage": {
+          "question": "Combien de pages puis-je créer ?",
+          "answer": "Chaque page coûte environ 5 crédits. Cela représente environ 60 pages par mois avec Grove, 160 avec Sanctuary et 400 avec Oasis."
+        },
+        "audience": {
+          "question": "Coloring Habitat est-il fait pour moi ?",
+          "answer": "Nous avons conçu Coloring Habitat pour toute personne souhaitant ralentir, trouver le calme et profiter de la détente créative. Si le coloriage vous semble ressourçant, vous êtes au bon endroit."
+        },
+        "gettingStarted": {
+          "question": "Comment commencer ?",
+          "answer": "Choisissez une formule et commencez à créer. Bloom est gratuit — pas besoin de compte pour l'essayer."
+        }
+      }
+    }
+  },
+  "breadcrumbs": {
+    "home": "Accueil",
+    "gallery": "Galerie"
+  },
+  "gallery": {
+    "pageTitle": "Galerie de coloriages | Coloring Habitat",
+    "pageDescription": "Parcourez notre collection croissante de pages de coloriage complexes pour la détente et la pleine conscience. Filtrez par catégorie, difficulté ou saison.",
+    "heroTitle": "Galerie de coloriages",
+    "heroSubtitle": "Parcourez des pages de coloriage complexes pour la détente et la pleine conscience. Chaque design vous invite à ralentir et à trouver un moment de calme.",
+    "browseByCategory": "Explorer par catégorie",
+    "browseByDifficulty": "Explorer par difficulté",
+    "browseByHolidays": "Saisons et fêtes",
+    "dailyPage": "Page du jour",
+    "viewAllDaily": "Voir toutes les pages quotidiennes",
+    "communityCreations": "Pages à la une",
+    "viewAllCommunity": "Voir toutes les pages à la une",
+    "startColoring": "Colorier cette page",
+    "stats": {
+      "totalPages": "Pages dans la bibliothèque",
+      "communityPages": "Pages gratuites",
+      "dailyPages": "Pages quotidiennes générées",
+      "pagesSuffix": "pages"
+    },
+    "filters": {
+      "all": "Toutes"
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "Débutant",
+        "shortLabel": "Facile",
+        "description": "Motifs doux, parfaits pour un moment rapide de calme"
+      },
+      "intermediate": {
+        "title": "Intermédiaire",
+        "shortLabel": "Moyen",
+        "description": "Détail modéré pour une séance apaisante plus longue"
+      },
+      "advanced": {
+        "title": "Avancé",
+        "shortLabel": "Difficile",
+        "description": "Designs détaillés qui récompensent une concentration sans hâte"
+      },
+      "expert": {
+        "title": "Expert",
+        "shortLabel": "Expert",
+        "description": "Œuvres complexes pour un état de flux méditatif"
+      }
+    },
+    "categories": {
+      "mandalas": {
+        "name": "Mandalas",
+        "description": "Motifs symétriques pour une concentration apaisée"
+      },
+      "nature": {
+        "name": "Nature",
+        "description": "Scènes botaniques et beauté naturelle"
+      },
+      "geometric": {
+        "name": "Géométrique",
+        "description": "Motifs précis et pavages"
+      },
+      "landscapes": {
+        "name": "Paysages",
+        "description": "Montagnes, océans et horizons lointains"
+      },
+      "fantasy": {
+        "name": "Fantastique",
+        "description": "Créatures mythiques et mondes enchantés"
+      },
+      "animals": {
+        "name": "Animaux",
+        "description": "Faune aux détails raffinés"
+      },
+      "architecture": {
+        "name": "Architecture",
+        "description": "Bâtiments, cathédrales et lieux historiques"
+      },
+      "abstract": {
+        "name": "Abstrait",
+        "description": "Designs libres pour l'expression créative"
+      },
+      "flowers": {
+        "name": "Fleurs",
+        "description": "Fleurs délicates pour une concentration douce"
+      },
+      "ocean": {
+        "name": "Océan",
+        "description": "Scènes sous-marines et vie marine"
+      },
+      "patterns": {
+        "name": "Motifs",
+        "description": "Motifs répétés pour un coloriage méditatif"
+      },
+      "wildlife": {
+        "name": "Faune sauvage",
+        "description": "Animaux dans leurs habitats naturels"
+      },
+      "mythology": {
+        "name": "Mythologie",
+        "description": "Mythes anciens et figures légendaires"
+      },
+      "steampunk": {
+        "name": "Steampunk",
+        "description": "Machineries victoriennes et curieux engins"
+      },
+      "food": {
+        "name": "Cuisine",
+        "description": "Festins et scènes culinaires"
+      }
+    },
+    "holidays": {
+      "title": "Saisons et fêtes",
+      "christmas": "Noël",
+      "halloween": "Halloween",
+      "easter": "Pâques",
+      "valentines": "Saint-Valentin",
+      "winter": "Hiver",
+      "spring": "Printemps",
+      "summer": "Été",
+      "autumn": "Automne"
+    },
+    "seo": {
+      "aboutTitle": "Un lieu tranquille pour colorier",
+      "aboutParagraph1": "Coloring Habitat est une bibliothèque grandissante de pages de coloriage complexes, pensée pour les adultes qui souhaitent ralentir, trouver le calme et renouer avec une pratique créative. Chaque page invite à la concentration — que vous ayez cinq minutes ou un après-midi tranquille.",
+      "aboutParagraph2": "Une toute nouvelle page de coloriage est générée chaque jour. Abonnez-vous à l'e-mail quotidien pour recevoir un nouveau design dans votre boîte mail chaque matin, ou parcourez la bibliothèque complète à tout moment. Coloriez en ligne sur notre toile numérique, ou téléchargez un PDF haute résolution pour imprimer et colorier à la main.",
+      "aboutParagraph3": "La recherche en art-thérapie suggère que même de courtes séances de coloriage peuvent réduire le cortisol, apaiser les pensées agitées et activer les mêmes régions du cerveau que la méditation. Coloring Habitat est conçu pour rendre cette pratique facile à retrouver — un petit rituel quotidien pour un esprit plus serein."
     }
   },
   "accountSettings": {
@@ -421,7 +571,22 @@
     "title": "Le blog Coloring Habitat",
     "subtitle": "Bien-être, techniques et inspiration pour une coloration en pleine conscience",
     "allPosts": "Tous les articles",
-    "byAuthor": "Par {author}"
+    "all": "Tous",
+    "byAuthor": "Par {author}",
+    "comingSoon": "Bientôt",
+    "comingSoonDescription": "Nous préparons des articles sur la science du coloriage pour le bien-être, des guides techniques et de l'inspiration créative.",
+    "metaTitle": "Blog | Coloring Habitat",
+    "metaDescription": "Conseils bien-être, techniques de coloriage et inspiration créative pour un coloriage en pleine conscience. Découvrez la science du coloriage pour soulager le stress.",
+    "home": "Accueil",
+    "blog": "Blog",
+    "postNotFound": "Article introuvable | Coloring Habitat",
+    "minRead": "{count} min de lecture",
+    "moreFromBlog": "Plus d'articles",
+    "categoryNotFound": "Catégorie introuvable | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Blog Coloring Habitat",
+    "categoryDescription": "Parcourez tous les articles de {category} sur le blog Coloring Habitat.",
+    "noCategoryPosts": "Pas encore d'articles dans cette catégorie",
+    "checkBackSoon": "Revenez bientôt pour de nouveaux articles !"
   },
   "billing": {
     "pageTitle": "Facturation",

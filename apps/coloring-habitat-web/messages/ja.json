@@ -145,12 +145,9 @@
     },
     "stats": {
       "pagesCreated": "作成されたぬりえページ",
-      "happyColorists": "満足いただいているユーザー",
-      "feelingCalmer": "リラックス効果を実感",
-      "sessionLength": "平均セッション時間",
-      "dailyPages": "毎日のページ数",
-      "freeLibraryPages": "無料ライブラリのページ数",
-      "categories": "カテゴリ数"
+      "dailyPages": "デイリーページ",
+      "freeLibraryPages": "無料ライブラリのページ",
+      "categories": "カテゴリー"
     },
     "features": {
       "badge": "ご利用方法",
@@ -240,7 +237,7 @@
   "footer": {
     "brand": "Coloring Habitat",
     "tagline": "すべての人にマインドフルなぬりえを。作って、塗って、心の安らぎを見つけましょう。",
-    "copyright": "© {year} Coloring Habitat. All rights reserved.",
+    "copyright": "© {year} Coloring Habitat. 無断転載禁止。",
     "sections": {
       "explore": "探す",
       "company": "会社情報",
@@ -402,6 +399,159 @@
           "アンビエントサウンド"
         ]
       }
+    },
+    "faq": {
+      "title": "プランについてのご質問",
+      "items": {
+        "cancelAnytime": {
+          "question": "いつでも解約できますか？",
+          "answer": "はい。アカウント設定からいつでも解約できます。理由を聞かれることもなく、気まずさもありません。"
+        },
+        "rollover": {
+          "question": "クレジットは繰り越せますか？",
+          "answer": "Groveのクレジットは毎月リセットされます。Sanctuaryは1か月まで繰り越し可能、Oasisは2か月分の繰り越しができるので、急いで使う必要はありません。"
+        },
+        "creditsPerPage": {
+          "question": "何ページ作れますか？",
+          "answer": "1ページあたり約5クレジットです。Groveなら月に約60ページ、Sanctuaryで160ページ、Oasisで400ページ作れます。"
+        },
+        "audience": {
+          "question": "Coloring Habitatは自分に合っていますか？",
+          "answer": "Coloring Habitatは、少しペースを落として穏やかな時間を過ごし、創造的なリラックスを楽しみたい方のためにデザインされています。塗り絵に癒やしを感じる方なら、きっとぴったりです。"
+        },
+        "gettingStarted": {
+          "question": "どうやって始めればいいですか？",
+          "answer": "プランを選んで作成を始めましょう。Bloomは無料で、アカウントを作らなくても試せます。"
+        }
+      }
+    }
+  },
+  "breadcrumbs": {
+    "home": "ホーム",
+    "gallery": "ギャラリー"
+  },
+  "gallery": {
+    "pageTitle": "塗り絵ギャラリー | Coloring Habitat",
+    "pageDescription": "リラックスとマインドフルネスのための、細かくデザインされた塗り絵ページを集めたコレクションをご覧ください。カテゴリー、難易度、季節で絞り込めます。",
+    "heroTitle": "塗り絵ギャラリー",
+    "heroSubtitle": "リラックスとマインドフルネスのために丁寧にデザインされた塗り絵ページをご覧ください。ひと息つき、静かな時間を見つけるためのデザインです。",
+    "browseByCategory": "カテゴリーで探す",
+    "browseByDifficulty": "難易度で探す",
+    "browseByHolidays": "季節と行事",
+    "dailyPage": "今日の塗り絵",
+    "viewAllDaily": "デイリーページをすべて見る",
+    "communityCreations": "おすすめのページ",
+    "viewAllCommunity": "おすすめをすべて見る",
+    "startColoring": "このページを塗る",
+    "stats": {
+      "totalPages": "ライブラリのページ数",
+      "communityPages": "無料ライブラリのページ",
+      "dailyPages": "生成されたデイリーページ",
+      "pagesSuffix": "ページ"
+    },
+    "filters": {
+      "all": "すべて"
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "初級",
+        "shortLabel": "やさしい",
+        "description": "やさしいパターンで、短いリラックスタイムにぴったり"
+      },
+      "intermediate": {
+        "title": "中級",
+        "shortLabel": "ふつう",
+        "description": "少し細かい部分もあり、じっくり落ち着きたいときに"
+      },
+      "advanced": {
+        "title": "上級",
+        "shortLabel": "むずかしい",
+        "description": "細部まで描き込まれた、集中して向き合いたいデザイン"
+      },
+      "expert": {
+        "title": "エキスパート",
+        "shortLabel": "エキスパート",
+        "description": "瞑想のように深く没入できる、とても緻密な作品"
+      }
+    },
+    "categories": {
+      "mandalas": {
+        "name": "マンダラ",
+        "description": "静かに集中できる対称的なパターン"
+      },
+      "nature": {
+        "name": "自然",
+        "description": "植物や自然の美しい風景"
+      },
+      "geometric": {
+        "name": "幾何学",
+        "description": "緻密なパターンとテッセレーション"
+      },
+      "landscapes": {
+        "name": "風景",
+        "description": "山、海、遠い地平線"
+      },
+      "fantasy": {
+        "name": "ファンタジー",
+        "description": "神話の生き物と魔法の世界"
+      },
+      "animals": {
+        "name": "動物",
+        "description": "緻密に描かれた動物たち"
+      },
+      "architecture": {
+        "name": "建築",
+        "description": "建物、大聖堂、歴史的な場所"
+      },
+      "abstract": {
+        "name": "抽象",
+        "description": "自由な発想で表現を楽しめるデザイン"
+      },
+      "flowers": {
+        "name": "花",
+        "description": "やさしく集中できる繊細な花々"
+      },
+      "ocean": {
+        "name": "海",
+        "description": "海中の風景と海の生き物"
+      },
+      "patterns": {
+        "name": "パターン",
+        "description": "瞑想のように塗れる繰り返しのモチーフ"
+      },
+      "wildlife": {
+        "name": "野生動物",
+        "description": "自然の中で暮らす動物たち"
+      },
+      "mythology": {
+        "name": "神話",
+        "description": "古代の神話と伝説の人物"
+      },
+      "steampunk": {
+        "name": "スチームパンク",
+        "description": "ヴィクトリア朝の機械と不思議な装置"
+      },
+      "food": {
+        "name": "食べもの",
+        "description": "豪華な料理や食卓の風景"
+      }
+    },
+    "holidays": {
+      "title": "季節と行事",
+      "christmas": "クリスマス",
+      "halloween": "ハロウィン",
+      "easter": "イースター",
+      "valentines": "バレンタイン",
+      "winter": "冬",
+      "spring": "春",
+      "summer": "夏",
+      "autumn": "秋"
+    },
+    "seo": {
+      "aboutTitle": "静かに塗り絵を楽しむ場所",
+      "aboutParagraph1": "Coloring Habitatは、少し立ち止まり、心を落ち着け、創作の時間を取り戻したい大人のために作られた、緻密な塗り絵ページのライブラリです。ひとつひとつのページは、5分でも、静かな午後の時間でも、集中して楽しんでいただけるように作られています。",
+      "aboutParagraph2": "毎日、新しい塗り絵ページを作成しています。デイリーメールを購読すれば、毎朝新しいデザインが受信箱に届きます。いつでもライブラリ全体をご覧いただけます。デジタルキャンバスでオンラインで塗ることも、高解像度PDFをダウンロードして印刷し、手で塗ることもできます。",
+      "aboutParagraph3": "アートセラピーの研究では、短時間の塗り絵でもコルチゾール値を下げ、忙しい思考を静め、瞑想と同じ脳の領域を活性化できることが示されています。Coloring Habitatは、そうした実践に気軽に戻って来られるように作られています — 穏やかな心のための、ちいさな日々の習慣です。"
     }
   },
   "accountSettings": {
@@ -421,7 +571,22 @@
     "title": "Coloring Habitat ブログ",
     "subtitle": "マインドフルな塗り絵のウェルネス、テクニック、インスピレーション",
     "allPosts": "すべての記事",
-    "byAuthor": "著者：{author}"
+    "all": "すべて",
+    "byAuthor": "著者：{author}",
+    "comingSoon": "近日公開",
+    "comingSoonDescription": "塗り絵がもたらすウェルネス効果、テクニックガイド、クリエイティブなインスピレーションに関する記事を準備中です。",
+    "metaTitle": "ブログ | Coloring Habitat",
+    "metaDescription": "マインドフルな塗り絵のためのウェルネスのヒント、塗り絵のテクニック、クリエイティブなインスピレーション。塗り絵がストレス解消に役立つ科学的根拠をご紹介。",
+    "home": "ホーム",
+    "blog": "ブログ",
+    "postNotFound": "記事が見つかりません | Coloring Habitat",
+    "minRead": "約{count}分で読めます",
+    "moreFromBlog": "ブログの他の記事",
+    "categoryNotFound": "カテゴリーが見つかりません | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Coloring Habitat ブログ",
+    "categoryDescription": "Coloring Habitat ブログの {category} 関連記事をすべてご覧ください。",
+    "noCategoryPosts": "このカテゴリーにはまだ記事がありません",
+    "checkBackSoon": "新しい記事をお楽しみに！"
   },
   "billing": {
     "pageTitle": "請求",
