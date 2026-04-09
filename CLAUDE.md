@@ -67,16 +67,17 @@ This project uses Neon PostgreSQL with branch-based development:
 ### Rules
 
 1. **CC is the reference**. If CH has a bug, check how CC handles the same thing first. CC has solved every problem CH encounters.
-2. **Shared packages first**. When adding/modifying coloring experience code (canvas, palette, toolbar, sound), change the shared package — never add code to only one app.
-3. **Same Next.js patterns**. Both apps must use:
+2. **Parity is bidirectional**. Any feature, fix, or UI state added to one app must immediately be added to the other. Don't wait to be asked — if you add a disabled button state to CH, add it to CC in the same change.
+3. **Shared packages first**. When adding/modifying coloring experience code (canvas, palette, toolbar, sound), change the shared package — never add code to only one app.
+4. **Same Next.js patterns**. Both apps must use:
    - `cacheComponents: true` in next.config
    - `'use cache'` with `cacheLife` for data functions
    - Suspense boundaries around dynamic content (static shell pattern)
    - Header/Footer in the layout, not in individual pages
    - Granular `cacheLife` profiles per content type
-4. **No `connection()` for DB reads**. Prisma/Neon WebSocket works with prerender. Only use `connection()` when explicitly opting into dynamic rendering.
-5. **Run local build before pushing**. Run `pnpm build` in the app directory to catch Cache Components / prerender errors before Vercel.
-6. **Feature changes go to both apps** unless they're brand-specific (e.g. Colo mascot = CC only, wellness theming = CH only).
+5. **No `connection()` for DB reads**. Prisma/Neon WebSocket works with prerender. Only use `connection()` when explicitly opting into dynamic rendering.
+6. **Run local build before pushing**. Run `pnpm build` in the app directory to catch Cache Components / prerender errors before Vercel.
+7. **Feature changes go to both apps** unless they're brand-specific (e.g. Colo mascot = CC only, wellness theming = CH only).
 
 ### What differs between apps (by design)
 

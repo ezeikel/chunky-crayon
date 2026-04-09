@@ -37,19 +37,19 @@ const AutoColorModal = ({ className }: AutoColorModalProps) => {
     >
       <div
         className={cn(
-          "flex flex-col items-center gap-5 px-10 py-8 rounded-2xl shadow-xl max-w-sm mx-4",
+          "flex flex-col items-center gap-5 p-8 rounded-2xl shadow-xl max-w-sm mx-4",
           isKids
-            ? "bg-white border-2 border-crayon-purple/20"
+            ? "bg-white border-2 border-crayon-orange/20"
             : "bg-white border border-gray-100",
         )}
       >
         {/* Spinner */}
         <div
           className={cn(
-            "size-12 border-[3px] rounded-full animate-spin",
+            "w-12 h-12 rounded-full animate-spin",
             isKids
-              ? "border-crayon-purple/20 border-t-crayon-purple"
-              : "border-gray-200 border-t-gray-800",
+              ? "border-4 border-crayon-orange/30 border-t-crayon-orange"
+              : "border-4 border-gray-200 border-t-gray-800",
           )}
         />
 
@@ -58,7 +58,7 @@ const AutoColorModal = ({ className }: AutoColorModalProps) => {
           <h3
             className={cn(
               "font-semibold text-base",
-              isKids ? "text-crayon-purple" : "text-gray-900",
+              isKids ? "text-crayon-orange-dark" : "text-gray-900",
             )}
           >
             {isKids ? "Coloring your picture!" : "Adding color to your page"}
@@ -66,7 +66,7 @@ const AutoColorModal = ({ className }: AutoColorModalProps) => {
           <p
             className={cn(
               "text-sm mt-1.5",
-              isKids ? "text-crayon-purple/60" : "text-gray-500",
+              isKids ? "text-crayon-orange-dark/60" : "text-gray-500",
             )}
           >
             {isKids
