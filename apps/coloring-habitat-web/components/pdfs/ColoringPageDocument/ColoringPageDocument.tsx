@@ -14,15 +14,15 @@ Font.register({
   family: "Plus Jakarta Sans",
   fonts: [
     {
-      src: "/fonts/plus-jakarta-sans-regular.ttf",
+      src: "https://coloringhabitat.com/fonts/plus-jakarta-sans-regular.ttf",
       fontWeight: 400,
     },
     {
-      src: "/fonts/plus-jakarta-sans-semibold.ttf",
+      src: "https://coloringhabitat.com/fonts/plus-jakarta-sans-semibold.ttf",
       fontWeight: 600,
     },
     {
-      src: "/fonts/plus-jakarta-sans-bold.ttf",
+      src: "https://coloringhabitat.com/fonts/plus-jakarta-sans-bold.ttf",
       fontWeight: 700,
     },
   ],
