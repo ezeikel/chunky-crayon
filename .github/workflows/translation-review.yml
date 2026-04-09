@@ -11,6 +11,16 @@ on:
         description: 'Specific locale to review (leave empty for all)'
         required: false
         type: string
+      source:
+        description: 'Specific source to review (leave empty for all)'
+        required: false
+        type: choice
+        default: ''
+        options:
+          - ''
+          - shared
+          - cc
+          - ch
 
 jobs:
   review:
@@ -22,54 +32,78 @@ jobs:
     strategy:
       matrix:
         locale: [ja, ko, de, fr, es]
+        source: [shared, cc, ch]
       fail-fast: false
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check if specific locale requested
-        id: check-locale
+      - name: Check if specific locale/source requested
+        id: check-filter
         run: |
-          if [ -n "${{ github.event.inputs.locale }}" ]; then
-            if [ "${{ github.event.inputs.locale }}" != "${{ matrix.locale }}" ]; then
-              echo "skip=true" >> $GITHUB_OUTPUT
-            else
-              echo "skip=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
+          SKIP=false
+          if [ -n "${{ github.event.inputs.locale }}" ] && [ "${{ github.event.inputs.locale }}" != "${{ matrix.locale }}" ]; then
+            SKIP=true
           fi
+          if [ -n "${{ github.event.inputs.source }}" ] && [ "${{ github.event.inputs.source }}" != "${{ matrix.source }}" ]; then
+            SKIP=true
+          fi
+          echo "skip=$SKIP" >> $GITHUB_OUTPUT
+
+      - name: Resolve file path for source
+        id: paths
+        if: steps.check-filter.outputs.skip != 'true'
+        run: |
+          case "${{ matrix.source }}" in
+            shared)
+              echo "file=packages/translations/src/${{ matrix.locale }}.json" >> $GITHUB_OUTPUT
+              echo "source_name=Shared" >> $GITHUB_OUTPUT
+              ;;
+            cc)
+              echo "file=apps/chunky-crayon-web/messages/${{ matrix.locale }}.json" >> $GITHUB_OUTPUT
+              echo "source_name=Chunky Crayon" >> $GITHUB_OUTPUT
+              ;;
+            ch)
+              echo "file=apps/coloring-habitat-web/messages/${{ matrix.locale }}.json" >> $GITHUB_OUTPUT
+              echo "source_name=Coloring Habitat" >> $GITHUB_OUTPUT
+              ;;
+          esac
 
       - name: Setup pnpm
-        if: steps.check-locale.outputs.skip != 'true'
+        if: steps.check-filter.outputs.skip != 'true'
         uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        if: steps.check-locale.outputs.skip != 'true'
+        if: steps.check-filter.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
 
       - name: Install dependencies
-        if: steps.check-locale.outputs.skip != 'true'
+        if: steps.check-filter.outputs.skip != 'true'
         env:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Run translation review for ${{ matrix.locale }}
-        if: steps.check-locale.outputs.skip != 'true'
+      - name: Run translation review for ${{ matrix.source }} / ${{ matrix.locale }}
+        if: steps.check-filter.outputs.skip != 'true'
         working-directory: packages/translations
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: pnpm review --locale=${{ matrix.locale }}
+        run: pnpm review --locale=${{ matrix.locale }} --source=${{ matrix.source }}
 
       - name: Check for changes
-        if: steps.check-locale.outputs.skip != 'true'
+        if: steps.check-filter.outputs.skip != 'true'
         id: check-changes
         run: |
-          if git diff --quiet packages/translations/src/${{ matrix.locale }}.json; then
+          if [ ! -f "${{ steps.paths.outputs.file }}" ]; then
+            echo "File does not exist — nothing to review"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          if git diff --quiet "${{ steps.paths.outputs.file }}"; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
@@ -87,9 +121,13 @@ jobs:
             es) echo "name=Spanish" >> $GITHUB_OUTPUT ;;
           esac
 
-      - name: Create Pull Request for ${{ matrix.locale }}
+      - name: Create Pull Request for ${{ matrix.source }} / ${{ matrix.locale }}
         if: steps.check-changes.outputs.has_changes == 'true'
         uses: actions/github-script@v7
+        env:
+          SOURCE_ID: ${{ matrix.source }}
+          SOURCE_NAME: ${{ steps.paths.outputs.source_name }}
+          FILE_PATH: ${{ steps.paths.outputs.file }}
         with:
           script: |
             const fs = require('fs');
@@ -97,8 +135,11 @@ jobs:
 
             const locale = '${{ matrix.locale }}';
             const localeName = '${{ steps.locale-name.outputs.name }}';
+            const sourceId = process.env.SOURCE_ID;
+            const sourceName = process.env.SOURCE_NAME;
+            const filePath = process.env.FILE_PATH;
             const date = new Date().toISOString().split('T')[0];
-            const branchName = `i18n/review-${locale}-${date}`;
+            const branchName = `i18n/review-${locale}-${sourceId}-${date}`;
 
             // Find the latest report
             const reportsDir = 'packages/translations/reports';
@@ -112,9 +153,12 @@ jobs:
               const reportPath = path.join(reportsDir, files[0]);
               const fullReport = fs.readFileSync(reportPath, 'utf8');
 
-              // Extract just this locale's section from the report
+              // Extract this (source, locale) section. Heading format:
+              // `## {sourceName} — {localeName} ({locale})`
+              // The em-dash is literal in the report generator.
+              const escapedSource = sourceName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
               const localeSection = fullReport.match(
-                new RegExp(`## ${localeName} \\(${locale}\\)[\\s\\S]*?(?=\\n---\\n|$)`)
+                new RegExp(`## ${escapedSource} — ${localeName} \\(${locale}\\)[\\s\\S]*?(?=\\n---\\n|$)`)
               );
               reportContent = localeSection ? localeSection[0] : fullReport;
             }
@@ -132,15 +176,17 @@ jobs:
 
             // Create branch and commit
             await exec.exec('git', ['checkout', '-b', branchName]);
-            await exec.exec('git', ['add', `packages/translations/src/${locale}.json`]);
-            await exec.exec('git', ['commit', '-m', `chore(i18n): auto-fix ${localeName} translation issues`]);
+            await exec.exec('git', ['add', filePath]);
+            await exec.exec('git', ['commit', '-m', `chore(i18n): auto-fix ${sourceName} ${localeName} translation issues`]);
             await exec.exec('git', ['push', 'origin', branchName]);
 
-            // Create PR with locale-specific report
+            // Create PR with source + locale specific report
             const prBody = [
-              `# ${localeName} Translation Review`,
+              `# ${sourceName} · ${localeName} Translation Review`,
               '',
-              `This PR contains auto-fixes for ${localeName} translation quality issues.`,
+              `This PR contains auto-fixes for **${sourceName}** ${localeName} translation quality issues.`,
+              '',
+              `File: \`${filePath}\``,
               '',
               'Each fix includes:',
               '- **Key**: The translation key that was fixed',
@@ -157,7 +203,7 @@ jobs:
             const pr = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🌍 ${localeName} Translation Fixes - ${date}`,
+              title: `🌍 ${sourceName} · ${localeName} Translation Fixes - ${date}`,
               head: branchName,
               base: 'main',
               body: prBody
@@ -168,21 +214,21 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.data.number,
-              labels: ['i18n', 'quality', 'automated', `lang:${locale}`]
+              labels: ['i18n', 'quality', 'automated', `lang:${locale}`, `source:${sourceId}`]
             });
 
             console.log(`Created PR #${pr.data.number}: ${pr.data.html_url}`);
 
       - name: Upload review report
-        if: steps.check-locale.outputs.skip != 'true'
+        if: steps.check-filter.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: translation-review-${{ matrix.locale }}
+          name: translation-review-${{ matrix.source }}-${{ matrix.locale }}
           path: packages/translations/reports/*.md
           retention-days: 90
 
       - name: Check for critical issues
-        if: steps.check-locale.outputs.skip != 'true'
+        if: steps.check-filter.outputs.skip != 'true'
         id: check-issues
         working-directory: packages/translations
         run: |
@@ -193,7 +239,7 @@ jobs:
             exit 0
           fi
 
-          if grep -q "🔴 Critical" "$REPORT" && grep -q "${{ matrix.locale }}" "$REPORT"; then
+          if grep -q "🔴 Needs Human Review" "$REPORT" && grep -q "${{ matrix.locale }}" "$REPORT"; then
             echo "has_critical=true" >> $GITHUB_OUTPUT
           else
             echo "has_critical=false" >> $GITHUB_OUTPUT
@@ -202,12 +248,17 @@ jobs:
       - name: Create issue for critical problems
         if: steps.check-issues.outputs.has_critical == 'true'
         uses: actions/github-script@v7
+        env:
+          SOURCE_ID: ${{ matrix.source }}
+          SOURCE_NAME: ${{ steps.paths.outputs.source_name }}
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
             const locale = '${{ matrix.locale }}';
             const localeName = '${{ steps.locale-name.outputs.name }}';
+            const sourceId = process.env.SOURCE_ID;
+            const sourceName = process.env.SOURCE_NAME;
 
             const reportsDir = 'packages/translations/reports';
             const files = fs.readdirSync(reportsDir)
@@ -220,16 +271,17 @@ jobs:
             const reportPath = path.join(reportsDir, files[0]);
             const report = fs.readFileSync(reportPath, 'utf8');
 
-            // Extract critical issues for this locale
+            // Extract critical issues for this (source, locale)
+            const escapedSource = sourceName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const criticalMatch = report.match(
-              new RegExp(`## ${localeName}[\\s\\S]*?### 🔴 Needs Human Review[\\s\\S]*?(?=\\n---\\n|\\n## |$)`)
+              new RegExp(`## ${escapedSource} — ${localeName}[\\s\\S]*?### 🔴 Needs Human Review[\\s\\S]*?(?=\\n---\\n|\\n## |$)`)
             );
             const criticalSection = criticalMatch ? criticalMatch[0] : 'See full report.';
 
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🔴 ${localeName} Translation Issues Need Review - ${new Date().toISOString().split('T')[0]}`,
-              body: `# Critical ${localeName} Translation Issues\n\nThe following issues require human review and cannot be auto-fixed:\n\n${criticalSection}\n\n## Action Required\n\nPlease review and manually fix these translations.\n\n---\n*This issue was automatically created by the translation review workflow.*`,
-              labels: ['i18n', 'quality', 'needs-review', 'critical', `lang:${locale}`]
+              title: `🔴 ${sourceName} · ${localeName} Translation Issues Need Review - ${new Date().toISOString().split('T')[0]}`,
+              body: `# Critical ${sourceName} ${localeName} Translation Issues\n\nThe following issues require human review and cannot be auto-fixed:\n\n${criticalSection}\n\n## Action Required\n\nPlease review and manually fix these translations.\n\n---\n*This issue was automatically created by the translation review workflow.*`,
+              labels: ['i18n', 'quality', 'needs-review', 'critical', `lang:${locale}`, `source:${sourceId}`]
             });
