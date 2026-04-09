@@ -8,7 +8,7 @@
     "idle": "Print",
     "loading": "Loading...",
     "creating": "Creating...",
-    "error": "Oops!"
+    "error": "Unavailable"
   },
   "coloringPage": {
     "title": "Coloring Page",

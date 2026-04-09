@@ -59,6 +59,7 @@ const ColoringImagePage = async ({ params }: Props) => {
         description: true,
         url: true,
         svgUrl: true,
+        qrCodeUrl: true,
         difficulty: true,
         tags: true,
         fillPointsJson: true,
