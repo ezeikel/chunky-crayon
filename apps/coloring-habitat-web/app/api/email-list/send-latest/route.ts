@@ -1,46 +1,87 @@
-import { NextResponse, connection } from "next/server";
-import { db } from "@one-colored-pixel/db";
+import { NextResponse } from "next/server";
+import { db, GenerationType } from "@one-colored-pixel/db";
+import { sendColoringImageEmail, sendAdminAlert } from "@/app/actions/email";
 import { BRAND } from "@/lib/db";
 
-export const maxDuration = 60;
+export const maxDuration = 150;
 
-export async function GET() {
-  await connection();
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
-  // TODO: Wire up Resend broadcast to Habitat audience
-  // For now, just find the latest image and return it
-
+const handleRequest = async (request: Request) => {
   try {
-    const latestImage = await db.coloringImage.findFirst({
-      where: { brand: BRAND },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        url: true,
-        difficulty: true,
+    const url = new URL(request.url);
+    const generationType =
+      (url.searchParams.get("type") as GenerationType) || GenerationType.DAILY;
+    const emails = url.searchParams.get("emails");
+
+    // Get start of today in UTC to only send emails for fresh images
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+
+    // get the most recent coloring image of the specified type created today
+    const coloringImage = await db.coloringImage.findFirst({
+      where: {
+        brand: BRAND,
+        generationType,
+        createdAt: { gte: todayStart },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
-    if (!latestImage) {
-      return NextResponse.json({ message: "No images to send" });
+    if (!coloringImage) {
+      const message = `No ${generationType} image generated today - skipping email`;
+      console.warn(`[send-latest] ${message}`);
+      await sendAdminAlert({
+        subject: "Daily email skipped - no daily image",
+        body: `The daily coloring image email was skipped because no ${generationType} image was generated today.\n\nThis likely means the image generation cron at 07:00 UTC failed. Check the Vercel function logs for /api/coloring-image/generate.`,
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: `No ${generationType.toLowerCase()} image generated today - email skipped`,
+          skipped: true,
+        },
+        { headers: corsHeaders },
+      );
     }
 
-    // TODO: Send email via Resend using DailyColoringEmail template
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    // await resend.emails.send({ ... });
+    // parse custom emails if provided
+    const customEmails = emails
+      ? emails.split(",").map((email) => email.trim())
+      : undefined;
 
-    return NextResponse.json({
-      success: true,
-      message: `Would send daily email for: ${latestImage.title}`,
-      imageId: latestImage.id,
-    });
-  } catch (error) {
-    console.error("[Habitat] Error sending daily email:", error);
+    await sendColoringImageEmail(coloringImage, generationType, customEmails);
+
     return NextResponse.json(
-      { error: "Failed to send daily email" },
-      { status: 500 },
+      {
+        success: true,
+        message: customEmails
+          ? `Email sent to ${customEmails.length} specific recipients for ${generationType.toLowerCase()} coloring image`
+          : `Email sent for ${generationType.toLowerCase()} coloring image`,
+        ...(customEmails && { emailsSent: customEmails }),
+      },
+      {
+        headers: corsHeaders,
+      },
+    );
+  } catch (error) {
+    console.error("Error sending coloring image email:", error);
+    return NextResponse.json(
+      { error: "Failed to send coloring image email" },
+      {
+        status: 500,
+        headers: corsHeaders,
+      },
     );
   }
-}
+};
+
+// vercel Cron Jobs only work with GET requests
+export const GET = handleRequest;
+export const POST = handleRequest;

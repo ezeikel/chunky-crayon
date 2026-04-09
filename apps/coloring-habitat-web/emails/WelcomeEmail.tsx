@@ -62,12 +62,12 @@ export const WelcomeEmail = ({ name }: WelcomeEmailProps) => {
           </Section>
 
           <Text style={paragraph}>
-            You get 2 free creations every day. If you&apos;d like unlimited
-            access, check out our{" "}
+            You get 2 free creations to start. When you&apos;re ready for more,
+            our{" "}
             <Link href="https://coloringhabitat.com/pricing" style={link}>
               plans
-            </Link>
-            .
+            </Link>{" "}
+            unlock unlimited coloring.
           </Text>
 
           <Hr style={hr} />

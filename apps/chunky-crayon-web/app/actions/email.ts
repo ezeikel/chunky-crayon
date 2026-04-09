@@ -23,6 +23,9 @@ export type SocialDigestEntry = {
   assetUrl?: string;
 };
 
+// TODO: Route through Mailtrap on localhost (NODE_ENV === 'development')
+// instead of real Resend to avoid spamming inboxes during dev. Apply same
+// pattern to CH.
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 const audienceId = process.env.RESEND_DAILY_EMAIL_SEGMENT_ID!;

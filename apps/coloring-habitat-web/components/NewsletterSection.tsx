@@ -9,13 +9,40 @@ import { faArrowRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 const NewsletterSection = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const t = useTranslations("homepage.newsletter");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setEmail("");
-    setTimeout(() => setSubmitted(false), 3000);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/email-list/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(
+          typeof data.error === "string"
+            ? data.error
+            : "Something went wrong. Please try again.",
+        );
+        return;
+      }
+
+      setSubmitted(true);
+      setEmail("");
+      setTimeout(() => setSubmitted(false), 3000);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,7 +73,7 @@ const NewsletterSection = () => {
               />
               <button
                 type="submit"
-                disabled={submitted}
+                disabled={submitted || loading}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-accent transition-all hover:bg-white/90 hover:shadow-lg disabled:opacity-70"
               >
                 {submitted ? (
@@ -56,12 +83,15 @@ const NewsletterSection = () => {
                   </>
                 ) : (
                   <>
-                    {t("subscribe")}
-                    <FontAwesomeIcon icon={faArrowRight} size="sm" />
+                    {loading ? "..." : t("subscribe")}
+                    {!loading && (
+                      <FontAwesomeIcon icon={faArrowRight} size="sm" />
+                    )}
                   </>
                 )}
               </button>
             </form>
+            {error && <p className="mt-3 text-xs text-white">{error}</p>}
             <p className="mt-3 text-xs text-white/50">{t("noSpam")}</p>
           </div>
 

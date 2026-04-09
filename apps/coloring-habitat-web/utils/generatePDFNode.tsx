@@ -9,7 +9,7 @@ const generatePDFNode = async (
 ) => {
   const doc = (
     <ColoringPageDocument
-      coloringImage={coloringImage}
+      coloringImageId={coloringImage.id ?? ""}
       imageSvg={imageSvg}
       qrCodeSvg={qrCodeSvg}
     />
