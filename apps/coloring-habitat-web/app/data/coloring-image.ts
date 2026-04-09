@@ -29,6 +29,7 @@ export const getColoringImageBase = async (
       title: true,
       description: true,
       alt: true,
+      difficulty: true,
       tags: true,
       url: true,
       svgUrl: true,

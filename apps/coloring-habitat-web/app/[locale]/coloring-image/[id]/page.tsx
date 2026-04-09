@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { db } from "@one-colored-pixel/db";
 import { auth } from "@/auth";
 import ColoringPageContent from "@/components/ColoringPageContent/ColoringPageContent";
 import { ColoringContextProvider } from "@one-colored-pixel/coloring-ui";
-import { BRAND } from "@/lib/db";
 import { generateAlternates } from "@/lib/seo";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { getAllColoringImagesStatic } from "@/app/data/coloring-image";
+import {
+  getAllColoringImagesStatic,
+  getColoringImageById,
+} from "@/app/data/coloring-image";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -28,11 +29,7 @@ export const generateStaticParams = async () => {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, id } = await params;
-
-  const image = await db.coloringImage.findUnique({
-    where: { id, brand: BRAND },
-    select: { title: true, description: true, tags: true },
-  });
+  const image = await getColoringImageById(id);
 
   if (!image) {
     return { title: "Coloring Page Not Found" };
@@ -62,24 +59,11 @@ const ColoringImagePage = async ({ params }: Props) => {
   const { id } = await params;
   const t = await getTranslations("navigation");
 
+  // Uses cached getColoringImageById ('use cache' directive) so the page
+  // can be prerendered under cacheComponents without hitting Next.js 16's
+  // uncached-access rule. auth() is dynamic and Suspends during prerender.
   const [image, session] = await Promise.all([
-    db.coloringImage.findFirst({
-      where: { id, brand: BRAND },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        url: true,
-        svgUrl: true,
-        qrCodeUrl: true,
-        difficulty: true,
-        tags: true,
-        fillPointsJson: true,
-        colorMapJson: true,
-        ambientSoundUrl: true,
-        coloredReferenceUrl: true,
-      },
-    }),
+    getColoringImageById(id),
     auth(),
   ]);
 
@@ -150,7 +134,7 @@ const ColoringImagePage = async ({ params }: Props) => {
               <p className="text-muted-foreground">{image.description}</p>
             )}
 
-            {image.tags.length > 0 && (
+            {image.tags && image.tags.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {image.tags.map((tag) => (
                   <span
