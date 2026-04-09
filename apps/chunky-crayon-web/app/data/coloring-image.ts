@@ -184,6 +184,14 @@ export const getAllColoringImages = async (
 
 // Static version for generateStaticParams - no caching, direct DB query
 // This runs at build time and should NOT use 'use cache'
+//
+// Capped at 400 newest images to stay under Vercel's 80MB deploy output limit.
+// Each path contributes ~19KB × 6 locales to the upload body, so ~400 images
+// uses ~45MB of the 80MB budget, leaving headroom for blog + gallery + other
+// routes. Older images still work — they render on-demand via ISR and are
+// cached forever after first request (see cacheComponents in next.config).
+const STATIC_PARAMS_LIMIT = 400;
+
 export const getAllColoringImagesStatic = async () => {
   return db.coloringImage.findMany({
     where: {
@@ -196,6 +204,7 @@ export const getAllColoringImagesStatic = async () => {
     orderBy: {
       createdAt: 'desc',
     },
+    take: STATIC_PARAMS_LIMIT,
   });
 };
 

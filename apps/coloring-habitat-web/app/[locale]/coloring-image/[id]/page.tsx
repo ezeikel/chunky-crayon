@@ -9,9 +9,21 @@ import { ColoringContextProvider } from "@one-colored-pixel/coloring-ui";
 import { BRAND } from "@/lib/db";
 import { generateAlternates } from "@/lib/seo";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { getAllColoringImagesStatic } from "@/app/data/coloring-image";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
+};
+
+// Static generation for the newest 400 coloring images (see
+// getAllColoringImagesStatic for the rationale on the 400 cap).
+// Older images render on-demand via ISR and are cached forever after
+// first request thanks to cacheComponents in next.config.
+export const generateStaticParams = async () => {
+  const images = await getAllColoringImagesStatic();
+  return images.map((image) => ({
+    id: image.id,
+  }));
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
