@@ -3,6 +3,10 @@ import { db, ColoringImage } from "@one-colored-pixel/db";
 import { ACTIONS } from "@/constants";
 import type { ColoringImageSearchParams } from "@/types";
 import { getUserId } from "@/app/actions/user";
+import { BRAND } from "@/lib/db";
+
+// Brand-scoped base where clause for all coloringImage queries
+const brandWhere = { brand: BRAND };
 
 // Cached data fetching for coloring images using Next.js 16 Cache Components
 
@@ -14,8 +18,10 @@ export const getColoringImageBase = async (
   cacheLife("max");
   cacheTag("coloring-image", `coloring-image-${id}`);
 
-  return db.coloringImage.findUnique({
+  // findUnique doesn't support compound filters so use findFirst to enforce brand
+  return db.coloringImage.findFirst({
     where: {
+      ...brandWhere,
       id,
     },
     select: {
@@ -62,6 +68,7 @@ export const getColoringImagesByIds = async (
 
   const images = await db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       id: { in: ids },
     },
     select: {
@@ -98,15 +105,16 @@ const getAllColoringImagesBase = async (
 
   if (!userId) {
     // Logged out: show all community images (userId: null)
-    whereClause = { userId: null };
+    whereClause = { ...brandWhere, userId: null };
   } else if (showCommunityImages) {
     // Logged in + community enabled: show user's images + community images
     whereClause = {
+      ...brandWhere,
       OR: [{ userId }, { userId: null }],
     };
   } else {
     // Logged in + community disabled (default): show only user's images
-    whereClause = { userId };
+    whereClause = { ...brandWhere, userId };
   }
 
   return db.coloringImage.findMany({
@@ -152,6 +160,7 @@ export const getAllColoringImages = async (
 export const getAllColoringImagesStatic = async () => {
   return db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       userId: null, // Only public images for static generation
     },
     select: {
@@ -196,13 +205,14 @@ const getColoringImagesPaginatedBase = async (
   let whereClause;
 
   if (!userId) {
-    whereClause = { userId: null };
+    whereClause = { ...brandWhere, userId: null };
   } else if (showCommunityImages) {
     whereClause = {
+      ...brandWhere,
       OR: [{ userId }, { userId: null }],
     };
   } else {
-    whereClause = { userId };
+    whereClause = { ...brandWhere, userId };
   }
 
   // Fetch one extra to determine if there are more pages

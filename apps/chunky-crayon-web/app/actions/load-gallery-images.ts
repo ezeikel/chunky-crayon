@@ -1,6 +1,7 @@
 'use server';
 
 import { db, GenerationType, Prisma, Difficulty } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import type { PaginatedImagesResponse } from '@/app/data/coloring-image';
 import { GALLERY_PAGE_SIZE, getDifficultyFromSlug } from '@/app/data/gallery';
 import { getCategoryBySlug } from '@/constants';
@@ -25,15 +26,15 @@ export async function loadGalleryImages(
 ): Promise<PaginatedImagesResponse> {
   const limit = GALLERY_PAGE_SIZE;
 
-  let whereClause: Prisma.ColoringImageWhereInput = {};
+  let whereClause: Prisma.ColoringImageWhereInput = { brand: BRAND };
 
   switch (galleryType) {
     case 'community':
-      whereClause = { userId: null };
+      whereClause = { brand: BRAND, userId: null };
       break;
 
     case 'daily':
-      whereClause = { generationType: GenerationType.DAILY };
+      whereClause = { brand: BRAND, generationType: GenerationType.DAILY };
       break;
 
     case 'category':
@@ -45,6 +46,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
+        brand: BRAND,
         OR: [
           { tags: { hasSome: category.tags } },
           ...category.tags.map((tag) => ({
@@ -67,6 +69,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
+        brand: BRAND,
         difficulty,
         userId: null,
       };
@@ -77,6 +80,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
+        brand: BRAND,
         tags: { has: tagSlug },
         userId: null,
       };

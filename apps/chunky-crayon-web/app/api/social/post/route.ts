@@ -3,6 +3,7 @@ import { GenerationType } from '@one-colored-pixel/db';
 import sharp from 'sharp';
 import { put, del } from '@one-colored-pixel/storage';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import {
   generateInstagramCaption,
   generateFacebookCaption,
@@ -786,9 +787,10 @@ const handleRequest = async (request: Request) => {
 
     if (coloringImageId) {
       // get specific coloring image by ID
-      coloringImage = await db.coloringImage.findUnique({
+      coloringImage = await db.coloringImage.findFirst({
         where: {
           id: coloringImageId,
+          brand: BRAND,
         },
       });
 
@@ -802,6 +804,7 @@ const handleRequest = async (request: Request) => {
 
       coloringImage = await db.coloringImage.findFirst({
         where: {
+          brand: BRAND,
           generationType: GenerationType.DAILY,
           createdAt: { gte: todayStart },
         },

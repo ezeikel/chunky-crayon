@@ -6,10 +6,12 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
   async rewrites() {
+    const r2PublicUrl =
+      process.env.R2_PUBLIC_URL || 'https://assets.chunkycrayon.com';
     return [
       {
         source: '/_r2/:path*',
-        destination: 'https://assets.chunkycrayon.com/:path*',
+        destination: `${r2PublicUrl}/:path*`,
       },
     ];
   },

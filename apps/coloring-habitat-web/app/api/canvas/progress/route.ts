@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the coloringImage exists and belongs to this brand
-    const coloringImage = await db.coloringImage.findUnique({
+    const coloringImage = await db.coloringImage.findFirst({
       where: { id: coloringImageId, brand: BRAND },
       select: { id: true },
     });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse, connection } from 'next/server';
 import { GenerationType, db } from '@one-colored-pixel/db';
 import sharp from 'sharp';
 import { put } from '@one-colored-pixel/storage';
+import { BRAND } from '@/lib/db';
 import {
   generateText,
   models,
@@ -105,8 +106,8 @@ const handleRequest = async (request: NextRequest) => {
 
     if (coloringImageId) {
       // Get specific coloring image by ID
-      coloringImage = await db.coloringImage.findUnique({
-        where: { id: coloringImageId },
+      coloringImage = await db.coloringImage.findFirst({
+        where: { id: coloringImageId, brand: BRAND },
       });
 
       if (!coloringImage) {
@@ -119,6 +120,7 @@ const handleRequest = async (request: NextRequest) => {
       // Get the most recent DAILY coloring image without animation
       coloringImage = await db.coloringImage.findFirst({
         where: {
+          brand: BRAND,
           generationType: GenerationType.DAILY,
           animationUrl: null, // Only ones without animation
         },
@@ -129,6 +131,7 @@ const handleRequest = async (request: NextRequest) => {
         // Check if we have a recent one that already has animation
         const recentWithAnimation = await db.coloringImage.findFirst({
           where: {
+            brand: BRAND,
             generationType: GenerationType.DAILY,
             animationUrl: { not: null },
           },

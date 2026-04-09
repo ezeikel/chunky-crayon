@@ -44,7 +44,7 @@ export {
 export { default as cn } from "./cn";
 export { trackEvent } from "./analytics-client";
 export { setPreviewCacheInvalidator } from "./coloringStorage";
-export { proxyR2Url, setR2Host } from "./proxyR2Url";
+export { proxyR2Url, setR2Host, setR2Hosts } from "./proxyR2Url";
 
 // Haptics
 export { haptics } from "./haptics";

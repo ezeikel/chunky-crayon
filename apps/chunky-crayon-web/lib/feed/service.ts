@@ -1,4 +1,5 @@
 import { db, GenerationType } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { getCurrentChallenge } from '../challenges/service';
 import type { ChallengeWithProgress } from '../challenges/types';
 
@@ -102,6 +103,7 @@ export async function getTodaysPick(): Promise<FeedColoringImage | null> {
   // First, try to find a DAILY image created today
   let dailyImage = await db.coloringImage.findFirst({
     where: {
+      brand: BRAND,
       generationType: GenerationType.DAILY,
       createdAt: { gte: todayStart },
     },
@@ -122,7 +124,7 @@ export async function getTodaysPick(): Promise<FeedColoringImage | null> {
   // If no image today, get the most recent DAILY image
   if (!dailyImage) {
     dailyImage = await db.coloringImage.findFirst({
-      where: { generationType: GenerationType.DAILY },
+      where: { brand: BRAND, generationType: GenerationType.DAILY },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -188,6 +190,7 @@ export async function getUserCreations(
 ): Promise<FeedColoringImage[]> {
   const images = await db.coloringImage.findMany({
     where: {
+      brand: BRAND,
       userId,
       generationType: GenerationType.USER,
     },
@@ -220,6 +223,7 @@ export async function getPastDailyImages(
 
   const images = await db.coloringImage.findMany({
     where: {
+      brand: BRAND,
       generationType: GenerationType.DAILY,
       createdAt: { lt: todayStart },
     },

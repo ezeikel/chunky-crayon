@@ -1,4 +1,5 @@
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { createColoringImage } from '@/app/actions/coloring-image';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -24,6 +25,7 @@ const getColoringImagesForApi = async (
   // Fetch one extra to determine if there are more pages
   const images = await db.coloringImage.findMany({
     where: {
+      brand: BRAND,
       userId: null, // Only public/community images
     },
     select: {

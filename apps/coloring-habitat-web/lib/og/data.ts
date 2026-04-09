@@ -22,7 +22,7 @@ export type ColoringImageOGData = {
 export async function getColoringImageForOG(
   id: string,
 ): Promise<ColoringImageOGData | null> {
-  const image = await db.coloringImage.findUnique({
+  const image = await db.coloringImage.findFirst({
     where: { id, brand: BRAND },
     select: {
       id: true,

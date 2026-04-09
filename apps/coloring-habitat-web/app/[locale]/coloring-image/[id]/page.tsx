@@ -51,7 +51,7 @@ const ColoringImagePage = async ({ params }: Props) => {
   const t = await getTranslations("navigation");
 
   const [image, session] = await Promise.all([
-    db.coloringImage.findUnique({
+    db.coloringImage.findFirst({
       where: { id, brand: BRAND },
       select: {
         id: true,

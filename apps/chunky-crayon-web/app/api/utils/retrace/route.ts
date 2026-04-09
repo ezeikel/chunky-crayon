@@ -1,11 +1,12 @@
 import { checkSvgImage, retraceImage } from '@/utils/traceImage';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 
 export const POST = async (req: Request) => {
   const { id } = await req.json();
 
-  const coloringImage = await db.coloringImage.findUnique({
-    where: { id },
+  const coloringImage = await db.coloringImage.findFirst({
+    where: { id, brand: BRAND },
     select: { svgUrl: true, url: true },
   });
 

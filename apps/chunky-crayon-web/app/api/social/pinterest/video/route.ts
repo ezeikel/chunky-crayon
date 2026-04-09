@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db, GenerationType } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { auth } from '@/auth';
 import sharp from 'sharp';
 import { put } from '@one-colored-pixel/storage';
@@ -314,6 +315,7 @@ export const POST = async () => {
     // Get the most recent daily coloring image with animation
     const coloringImage = await db.coloringImage.findFirst({
       where: {
+        brand: BRAND,
         generationType: GenerationType.DAILY,
         animationUrl: { not: null },
         svgUrl: { not: null },

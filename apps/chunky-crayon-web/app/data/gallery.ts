@@ -1,7 +1,11 @@
 import { cacheLife, cacheTag } from 'next/cache';
 import { db, GenerationType, Difficulty } from '@one-colored-pixel/db';
 import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
+import { BRAND } from '@/lib/db';
 import type { GalleryImage, PaginatedImagesResponse } from './coloring-image';
+
+// Brand-scoped base where clause for all gallery queries
+const brandWhere = { brand: BRAND };
 
 // Re-export Difficulty enum for use in components
 export { Difficulty } from '@one-colored-pixel/db';
@@ -48,6 +52,7 @@ const getCommunityImagesBase = async (
 
   const images = await db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       userId: null, // Community images have no userId
     },
     select: {
@@ -101,6 +106,7 @@ const getDailyImagesBase = async (
 
   const images = await db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       generationType: GenerationType.DAILY,
     },
     select: {
@@ -151,6 +157,7 @@ export const getLatestDailyImage = async () => {
 
   return db.coloringImage.findFirst({
     where: {
+      ...brandWhere,
       generationType: GenerationType.DAILY,
     },
     select: {
@@ -202,6 +209,7 @@ const getCategoryImagesBase = async (
   // Using hasSome to match any tag in the array
   const images = await db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       OR: [
         // Match images with tags that contain any of the category tags
         {
@@ -270,6 +278,7 @@ export const getFeaturedImages = async (limit: number = 6) => {
 
   return db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       userId: null, // Only community images
     },
     select: {
@@ -300,6 +309,7 @@ export const getCategoryCounts = async () => {
   for (const category of GALLERY_CATEGORIES) {
     const count = await db.coloringImage.count({
       where: {
+        ...brandWhere,
         OR: [
           {
             tags: {
@@ -340,6 +350,7 @@ export const getCategoryCount = async (
 
   return db.coloringImage.count({
     where: {
+      ...brandWhere,
       OR: [
         {
           tags: {
@@ -367,9 +378,11 @@ export const getGalleryStats = async () => {
   cacheTag('gallery-stats');
 
   const [totalImages, communityImages, dailyImages] = await Promise.all([
-    db.coloringImage.count(),
-    db.coloringImage.count({ where: { userId: null } }),
-    db.coloringImage.count({ where: { generationType: GenerationType.DAILY } }),
+    db.coloringImage.count({ where: brandWhere }),
+    db.coloringImage.count({ where: { ...brandWhere, userId: null } }),
+    db.coloringImage.count({
+      where: { ...brandWhere, generationType: GenerationType.DAILY },
+    }),
   ]);
 
   return {
@@ -403,6 +416,7 @@ const getDifficultyImagesBase = async (
 
   const images = await db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       difficulty,
       userId: null, // Only community images
     },
@@ -467,6 +481,7 @@ export const getDifficultyCounts = async () => {
       difficulty,
       count: await db.coloringImage.count({
         where: {
+          ...brandWhere,
           difficulty,
           userId: null,
         },
@@ -515,6 +530,7 @@ const getCategoryImagesWithDifficultyBase = async (
 
   // Build base where clause for category
   const categoryWhere = {
+    ...brandWhere,
     OR: [
       {
         tags: {
@@ -613,6 +629,7 @@ const getTagImagesBase = async (
 
   const images = await db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       tags: { has: tag },
       userId: null,
     },
@@ -662,6 +679,7 @@ export const getTagCount = async (tag: string): Promise<number> => {
 
   return db.coloringImage.count({
     where: {
+      ...brandWhere,
       tags: { has: tag },
       userId: null,
     },
@@ -675,7 +693,7 @@ export const getAllTags = async (): Promise<string[]> => {
   cacheTag('gallery-tags-all');
 
   const images = await db.coloringImage.findMany({
-    where: { userId: null },
+    where: { ...brandWhere, userId: null },
     select: { tags: true },
   });
 
@@ -705,6 +723,7 @@ export const getRelatedImages = async (
 
   return db.coloringImage.findMany({
     where: {
+      ...brandWhere,
       id: { not: imageId },
       tags: { hasSome: tags },
       userId: null,

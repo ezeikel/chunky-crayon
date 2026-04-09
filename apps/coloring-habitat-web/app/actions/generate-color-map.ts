@@ -15,6 +15,7 @@ import {
 } from "@/lib/ai";
 import { ALL_COLORING_COLORS_EXTENDED } from "@/constants";
 import { db } from "@one-colored-pixel/db";
+import { BRAND } from "@/lib/db";
 
 const colorMapConfig = {
   gridColorMapSystem: GRID_COLOR_MAP_SYSTEM,
@@ -56,8 +57,8 @@ export async function generateGridColorMap(
 export async function getColorMapForImage(
   coloringImageId: string,
 ): Promise<GridColorMap | null> {
-  const image = await db.coloringImage.findUnique({
-    where: { id: coloringImageId },
+  const image = await db.coloringImage.findFirst({
+    where: { id: coloringImageId, brand: BRAND },
     select: { colorMapJson: true },
   });
 

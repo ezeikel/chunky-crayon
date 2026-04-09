@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db, GenerationType } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { auth } from '@/auth';
 import { ADMIN_EMAILS } from '@/constants';
 import { generateTikTokCaption } from '@/app/actions/social';
@@ -221,6 +222,7 @@ export const POST = async (request: Request) => {
 
     const coloringImage = await db.coloringImage.findFirst({
       where: {
+        brand: BRAND,
         generationType: GenerationType.DAILY,
         animationUrl: { not: null },
         createdAt: { gte: todayStart },

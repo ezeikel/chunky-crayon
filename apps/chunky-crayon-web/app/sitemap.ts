@@ -3,6 +3,7 @@ import { db } from '@one-colored-pixel/db';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { routing } from '@/i18n/routing';
 import { getAllTags, ALL_DIFFICULTIES } from '@/app/data/gallery';
+import { BRAND } from '@/lib/db';
 
 const baseUrl = 'https://chunkycrayon.com';
 
@@ -10,6 +11,7 @@ const baseUrl = 'https://chunkycrayon.com';
 async function getAllPublicImages() {
   return db.coloringImage.findMany({
     where: {
+      brand: BRAND,
       userId: null, // Only public images
     },
     select: {

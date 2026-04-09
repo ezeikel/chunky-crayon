@@ -3,6 +3,7 @@
 import { put } from '@one-colored-pixel/storage';
 import { revalidatePath } from 'next/cache';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { checkAndAwardStickers } from '@/lib/stickers/service';
@@ -48,9 +49,9 @@ export async function saveArtworkToGallery(
     // Get active profile if any
     const activeProfile = await getActiveProfile();
 
-    // Verify the coloring image exists
-    const coloringImage = await db.coloringImage.findUnique({
-      where: { id: coloringImageId },
+    // Verify the coloring image exists and belongs to this brand
+    const coloringImage = await db.coloringImage.findFirst({
+      where: { id: coloringImageId, brand: BRAND },
     });
 
     if (!coloringImage) {
@@ -325,9 +326,9 @@ export async function saveMobileArtworkAction(
     user?.profiles.find((p) => p.isDefault)?.id ||
     user?.profiles[0]?.id;
 
-  // Verify the coloring image exists
-  const coloringImage = await db.coloringImage.findUnique({
-    where: { id: coloringImageId },
+  // Verify the coloring image exists and belongs to this brand
+  const coloringImage = await db.coloringImage.findFirst({
+    where: { id: coloringImageId, brand: BRAND },
   });
 
   if (!coloringImage) {

@@ -570,7 +570,7 @@ export async function getColoringImageBase(
 ): Promise<Partial<ColoringImage> | null> {
   // 'use cache'; // TODO: enable caching
 
-  return db.coloringImage.findUnique({
+  return db.coloringImage.findFirst({
     where: {
       id,
       brand: Brand.COLORING_HABITAT,

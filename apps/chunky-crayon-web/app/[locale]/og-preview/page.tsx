@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { connection } from 'next/server';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { client, isSanityConfigured } from '@/lib/sanity';
 import ManualTestingSection from './ManualTestingSection';
 
@@ -19,6 +20,7 @@ async function getSampleData() {
 
   // Get a sample coloring image
   const coloringImage = await db.coloringImage.findFirst({
+    where: { brand: BRAND },
     select: { id: true, title: true },
     orderBy: { createdAt: 'desc' },
   });

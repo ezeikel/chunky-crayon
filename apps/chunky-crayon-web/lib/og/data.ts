@@ -1,6 +1,7 @@
 import { db } from '@one-colored-pixel/db';
 import { client, isSanityConfigured, postBySlugQuery } from '@/lib/sanity';
 import type { PortableTextBlock } from '@portabletext/react';
+import { BRAND } from '@/lib/db';
 
 /**
  * Data fetching utilities for OG image generation.
@@ -26,8 +27,8 @@ export type ColoringImageOGData = {
 export async function getColoringImageForOG(
   id: string,
 ): Promise<ColoringImageOGData | null> {
-  const image = await db.coloringImage.findUnique({
-    where: { id },
+  const image = await db.coloringImage.findFirst({
+    where: { id, brand: BRAND },
     select: {
       id: true,
       title: true,

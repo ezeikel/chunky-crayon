@@ -3,6 +3,7 @@
 import { put } from '@one-colored-pixel/storage';
 import { revalidatePath } from 'next/cache';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { generateAmbientSound } from '@/lib/elevenlabs';
 import { createAmbientPrompt } from '@/lib/audio/prompts';
 
@@ -30,8 +31,8 @@ export async function generateAmbientSoundForImage(
 ): Promise<GenerateAmbientSoundResult> {
   try {
     // Fetch the coloring image
-    const coloringImage = await db.coloringImage.findUnique({
-      where: { id: coloringImageId },
+    const coloringImage = await db.coloringImage.findFirst({
+      where: { id: coloringImageId, brand: BRAND },
       select: {
         id: true,
         title: true,
@@ -106,7 +107,7 @@ export async function generateAmbientSoundsForExistingImages(
 ): Promise<{ processed: number; failed: number }> {
   // Find images without ambient sounds
   const images = await db.coloringImage.findMany({
-    where: { ambientSoundUrl: null },
+    where: { brand: BRAND, ambientSoundUrl: null },
     select: { id: true, title: true },
     take: limit,
     orderBy: { createdAt: 'desc' },

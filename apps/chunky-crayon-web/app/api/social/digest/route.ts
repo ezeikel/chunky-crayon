@@ -1,5 +1,6 @@
 import { NextResponse, connection } from 'next/server';
 import { db, GenerationType } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import {
   generateInstagramCaption,
   generateFacebookCaption,
@@ -34,6 +35,7 @@ export const GET = async (request: Request) => {
 
     const coloringImage = await db.coloringImage.findFirst({
       where: {
+        brand: BRAND,
         generationType: GenerationType.DAILY,
         createdAt: { gte: todayStart },
       },

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { auth } from '@/auth';
 import { postVideoForUser, postPhotoForUser } from '@/lib/tiktok';
 
@@ -35,8 +36,8 @@ export const POST = async (request: Request) => {
     }
 
     // Look up the coloring image
-    const coloringImage = await db.coloringImage.findUnique({
-      where: { id: artworkId },
+    const coloringImage = await db.coloringImage.findFirst({
+      where: { id: artworkId, brand: BRAND },
     });
 
     if (!coloringImage) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateColoredReference } from "@/app/actions/generate-colored-reference";
 import { db } from "@one-colored-pixel/db";
+import { BRAND } from "@/lib/db";
 
 /**
  * TEST ONLY: Generate a colored reference image for a coloring page.
@@ -15,8 +16,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing id param" }, { status: 400 });
   }
 
-  const image = await db.coloringImage.findUnique({
-    where: { id },
+  const image = await db.coloringImage.findFirst({
+    where: { id, brand: BRAND },
     select: { id: true, title: true, description: true, url: true },
   });
 

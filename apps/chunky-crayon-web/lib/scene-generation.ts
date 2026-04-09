@@ -8,6 +8,7 @@ import {
 import { getUpcomingEvents, getCurrentSeason } from '@/lib/seasonal-calendar';
 import { getRandomDescriptionSmart } from '@/utils/random';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 
 // =============================================================================
 // Content Safety — blocklist validation
@@ -278,6 +279,7 @@ async function getRecentPrompts(): Promise<string[]> {
 
     const recentImages = await db.coloringImage.findMany({
       where: {
+        brand: BRAND,
         generationType: 'DAILY',
         sourcePrompt: { not: null },
         createdAt: { gte: thirtyDaysAgo },

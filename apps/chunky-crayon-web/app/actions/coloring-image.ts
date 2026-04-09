@@ -25,6 +25,7 @@ import {
   GenerationType,
   CreditTransactionType,
 } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
 import { getAIDescription } from '@/lib/scene-generation';
 import type { ColoringImageSearchParams } from '@/types';
@@ -605,9 +606,10 @@ export const getColoringImageBase = async (
   cacheLife('max');
   cacheTag('coloring-image', `coloring-image-${id}`);
 
-  return db.coloringImage.findUnique({
+  return db.coloringImage.findFirst({
     where: {
       id,
+      brand: BRAND,
     },
     select: {
       id: true,
@@ -654,19 +656,24 @@ const getAllColoringImagesBase = async (
     if (userId) {
       // Show user's images (filtered by profile if available) + community images
       whereClause = {
+        brand: BRAND,
         OR: [{ userId, ...(profileId ? { profileId } : {}) }, { userId: null }],
       };
     } else {
       // Logged out - show community images only
-      whereClause = { userId: null };
+      whereClause = { brand: BRAND, userId: null };
     }
   } else {
     // show === 'user' - only user's images
     if (userId) {
-      whereClause = { userId, ...(profileId ? { profileId } : {}) };
+      whereClause = {
+        brand: BRAND,
+        userId,
+        ...(profileId ? { profileId } : {}),
+      };
     } else {
       // No userId but trying to show user's images - return empty
-      whereClause = { id: { in: [] } };
+      whereClause = { brand: BRAND, id: { in: [] } };
     }
   }
 

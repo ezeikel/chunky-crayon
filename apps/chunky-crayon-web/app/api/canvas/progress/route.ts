@@ -2,6 +2,7 @@ import { NextRequest, NextResponse, connection } from 'next/server';
 import { put, del } from '@one-colored-pixel/storage';
 import { auth } from '@/auth';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { verifyMobileToken } from '@/lib/mobile-auth';
 import type {
   CanvasAction,
@@ -159,8 +160,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the coloringImage exists
-    const coloringImage = await db.coloringImage.findUnique({
-      where: { id: coloringImageId },
+    const coloringImage = await db.coloringImage.findFirst({
+      where: { id: coloringImageId, brand: BRAND },
       select: { id: true },
     });
 

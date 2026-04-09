@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { GenerationType } from '@one-colored-pixel/db';
 import { sendColoringImageEmail, sendAdminAlert } from '@/app/actions/email';
 import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 
 export const maxDuration = 150;
 
@@ -25,6 +26,7 @@ const handleRequest = async (request: Request) => {
     // get the most recent coloring image of the specified type created today
     const coloringImage = await db.coloringImage.findFirst({
       where: {
+        brand: BRAND,
         generationType,
         createdAt: { gte: todayStart },
       },
