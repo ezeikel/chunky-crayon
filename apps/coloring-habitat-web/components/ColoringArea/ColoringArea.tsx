@@ -375,10 +375,90 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             [0, -6],
           ];
 
+          // Helper: pick the most common color from multiple sample points.
+          // Clusters similar colors (within distance 60) so slight shading
+          // differences don't split votes. Returns the dominant cluster's color.
+          const pickDominantColor = (colors: string[]): string | null => {
+            if (colors.length === 0) return null;
+            if (colors.length === 1) return colors[0];
+
+            // Parse hex to RGB, filter out near-white/very light colors
+            // that are likely background or boundary artifacts
+            const allRgbs = colors.map((c) => ({
+              hex: c,
+              r: parseInt(c.slice(1, 3), 16),
+              g: parseInt(c.slice(3, 5), 16),
+              b: parseInt(c.slice(5, 7), 16),
+            }));
+            // Filter out near-white (background) and near-black (boundary)
+            const rgbs = allRgbs.filter((c) => {
+              const avg = (c.r + c.g + c.b) / 3;
+              const maxC = Math.max(c.r, c.g, c.b);
+              const minC = Math.min(c.r, c.g, c.b);
+              // Remove near-black (boundary artifacts)
+              if (avg < 30) return false;
+              // Remove near-white unless it has some saturation
+              if (avg > 220 && maxC - minC <= 30) return false;
+              return true;
+            });
+            // If all colors were filtered out, fall back to originals
+            if (rgbs.length === 0) return allRgbs[0]?.hex ?? null;
+
+            // Simple clustering: group colors within distance threshold
+            const clusters: { colors: typeof rgbs; count: number }[] = [];
+            const threshold = 60;
+            for (const rgb of rgbs) {
+              let found = false;
+              for (const cluster of clusters) {
+                const rep = cluster.colors[0];
+                const dist = Math.sqrt(
+                  (rgb.r - rep.r) ** 2 +
+                    (rgb.g - rep.g) ** 2 +
+                    (rgb.b - rep.b) ** 2,
+                );
+                if (dist < threshold) {
+                  cluster.colors.push(rgb);
+                  cluster.count++;
+                  found = true;
+                  break;
+                }
+              }
+              if (!found) {
+                clusters.push({ colors: [rgb], count: 1 });
+              }
+            }
+
+            // Return the average color from the largest cluster
+            clusters.sort((a, b) => b.count - a.count);
+            const best = clusters[0].colors;
+            const avgR = Math.round(
+              best.reduce((s, c) => s + c.r, 0) / best.length,
+            );
+            const avgG = Math.round(
+              best.reduce((s, c) => s + c.g, 0) / best.length,
+            );
+            const avgB = Math.round(
+              best.reduce((s, c) => s + c.b, 0) / best.length,
+            );
+            return `#${avgR.toString(16).padStart(2, "0")}${avgG.toString(16).padStart(2, "0")}${avgB.toString(16).padStart(2, "0")}`.toUpperCase();
+          };
+
           for (const region of regionMap.regions) {
-            const normX = region.centroid.x / regionMap.width;
-            const normY = region.centroid.y / regionMap.height;
-            const color = referenceColor.getColorAtNormalized(normX, normY);
+            // Sample centroid + all samplePixels from the reference,
+            // then pick the dominant color via clustering. This handles
+            // slight misalignment between reference and original line art.
+            const samplePoints = [
+              region.centroid,
+              ...(region.samplePixels || []),
+            ];
+            const sampledColors: string[] = [];
+            for (const pt of samplePoints) {
+              const normX = pt.x / regionMap.width;
+              const normY = pt.y / regionMap.height;
+              const c = referenceColor.getColorAtNormalized(normX, normY);
+              if (c) sampledColors.push(c);
+            }
+            const color = pickDominantColor(sampledColors);
 
             if (color) {
               let filled = false;
