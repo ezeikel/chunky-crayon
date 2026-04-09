@@ -147,7 +147,10 @@
       "pagesCreated": "Páginas para colorear creadas",
       "happyColorists": "Coloristas satisfechos",
       "feelingCalmer": "Reportan sentirse más tranquilos",
-      "sessionLength": "Duración promedio de sesión"
+      "sessionLength": "Duración promedio de sesión",
+      "dailyPages": "Páginas diarias",
+      "freeLibraryPages": "Páginas gratis en la biblioteca",
+      "categories": "Categorías"
     },
     "features": {
       "badge": "Cómo funciona",
@@ -446,6 +449,18 @@
       "portalFailed": "No se pudo abrir la gestión de la suscripción.",
       "checkoutSessionFailed": "No se pudo crear la sesión de pago",
       "redirectFailed": "No se pudo redirigir al pago"
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "Una página gratis, cada mañana",
+      "subtitle": "Recibe una página para colorear <free>gratis</free> en tu correo cada día.",
+      "placeholder": "tu@correo.com",
+      "join": "Suscribirme",
+      "success": "Listo",
+      "successDescription": "Tu primera página para colorear llegará mañana por la mañana.",
+      "error": "Algo salió mal",
+      "errorDescription": "No pudimos añadirte a la lista. Inténtalo de nuevo."
     }
   }
 }

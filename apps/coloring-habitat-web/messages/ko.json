@@ -147,7 +147,10 @@
       "pagesCreated": "생성된 컬러링 페이지",
       "happyColorists": "만족한 이용자",
       "feelingCalmer": "마음이 편안해졌다고 응답",
-      "sessionLength": "평균 이용 시간"
+      "sessionLength": "평균 이용 시간",
+      "dailyPages": "일일 페이지",
+      "freeLibraryPages": "무료 라이브러리 페이지",
+      "categories": "카테고리"
     },
     "features": {
       "badge": "이용 방법",
@@ -446,6 +449,18 @@
       "portalFailed": "구독 관리 페이지를 열지 못했습니다.",
       "checkoutSessionFailed": "결제 세션 생성에 실패했습니다",
       "redirectFailed": "결제 페이지로 이동하지 못했습니다"
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "매일 아침, 무료 페이지",
+      "subtitle": "매일 받은편지함에서 <free>무료</free> 컬러링 페이지를 받아보세요.",
+      "placeholder": "your@email.com",
+      "join": "구독하기",
+      "success": "등록 완료",
+      "successDescription": "첫 컬러링 페이지는 내일 아침 도착합니다.",
+      "error": "문제가 발생했어요",
+      "errorDescription": "목록에 추가하지 못했어요. 다시 시도해 주세요."
     }
   }
 }

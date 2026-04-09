@@ -147,7 +147,10 @@
       "pagesCreated": "Ausmalseiten erstellt",
       "happyColorists": "Zufriedene Ausmaler",
       "feelingCalmer": "Fühlen sich ruhiger",
-      "sessionLength": "Durchschnittliche Sitzungsdauer"
+      "sessionLength": "Durchschnittliche Sitzungsdauer",
+      "dailyPages": "Tägliche Seiten",
+      "freeLibraryPages": "Kostenlose Bibliotheksseiten",
+      "categories": "Kategorien"
     },
     "features": {
       "badge": "So funktioniert's",
@@ -446,6 +449,18 @@
       "portalFailed": "Abo-Verwaltung konnte nicht geöffnet werden.",
       "checkoutSessionFailed": "Checkout-Sitzung konnte nicht erstellt werden",
       "redirectFailed": "Weiterleitung zum Checkout fehlgeschlagen"
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "Eine kostenlose Seite, jeden Morgen",
+      "subtitle": "Jeden Tag eine <free>kostenlose</free> Malvorlage per E-Mail erhalten.",
+      "placeholder": "deine@email.com",
+      "join": "Abonnieren",
+      "success": "Du bist dabei",
+      "successDescription": "Deine erste Malvorlage kommt morgen früh.",
+      "error": "Etwas ist schiefgelaufen",
+      "errorDescription": "Wir konnten dich nicht zur Liste hinzufügen. Bitte versuche es erneut."
     }
   }
 }

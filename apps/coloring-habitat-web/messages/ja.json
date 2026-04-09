@@ -147,7 +147,10 @@
       "pagesCreated": "作成されたぬりえページ",
       "happyColorists": "満足いただいているユーザー",
       "feelingCalmer": "リラックス効果を実感",
-      "sessionLength": "平均セッション時間"
+      "sessionLength": "平均セッション時間",
+      "dailyPages": "毎日のページ数",
+      "freeLibraryPages": "無料ライブラリのページ数",
+      "categories": "カテゴリ数"
     },
     "features": {
       "badge": "ご利用方法",
@@ -446,6 +449,18 @@
       "portalFailed": "サブスクリプション管理を開けませんでした。",
       "checkoutSessionFailed": "決済セッションの作成に失敗しました",
       "redirectFailed": "決済画面への遷移に失敗しました"
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "毎朝、無料の1枚を",
+      "subtitle": "毎日、受信箱に<free>無料</free>の塗り絵をお届けします。",
+      "placeholder": "your@email.com",
+      "join": "登録する",
+      "success": "登録完了",
+      "successDescription": "最初の塗り絵は明日の朝に届きます。",
+      "error": "問題が発生しました",
+      "errorDescription": "リストに追加できませんでした。もう一度お試しください。"
     }
   }
 }

@@ -147,7 +147,10 @@
       "pagesCreated": "Pages de coloriage créées",
       "happyColorists": "Coloristes satisfaits",
       "feelingCalmer": "Se sentent plus apaisés",
-      "sessionLength": "Durée moyenne d'une session"
+      "sessionLength": "Durée moyenne d'une session",
+      "dailyPages": "Pages quotidiennes",
+      "freeLibraryPages": "Pages de la bibliothèque gratuite",
+      "categories": "Catégories"
     },
     "features": {
       "badge": "Comment ça fonctionne",
@@ -446,6 +449,18 @@
       "portalFailed": "Impossible d’ouvrir la gestion de l’abonnement.",
       "checkoutSessionFailed": "Impossible de créer la session de paiement",
       "redirectFailed": "Impossible de rediriger vers le paiement"
+    }
+  },
+  "email": {
+    "signup": {
+      "title": "Une page gratuite, chaque matin",
+      "subtitle": "Recevez une page de coloriage <free>gratuite</free> chaque jour dans votre boîte mail.",
+      "placeholder": "votre@email.com",
+      "join": "S’abonner",
+      "success": "C’est bon",
+      "successDescription": "Votre première page de coloriage arrivera demain matin.",
+      "error": "Une erreur est survenue",
+      "errorDescription": "Impossible de vous ajouter à la liste. Veuillez réessayer."
     }
   }
 }
