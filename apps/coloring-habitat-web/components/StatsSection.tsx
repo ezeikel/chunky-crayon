@@ -1,148 +1,60 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getTranslations } from "next-intl/server";
 import {
   faPalette,
-  faSpa,
-  faUsers,
-  faClock,
+  faCalendarDays,
+  faImages,
+  faShapes,
 } from "@fortawesome/free-solid-svg-icons";
+import { getGalleryStats } from "@/app/data/gallery";
+import AnimatedStatCard from "@/components/AnimatedStatCard";
 
-type Stat = {
-  value: number;
-  suffix: string;
-  labelKey: string;
-  icon: typeof faPalette;
-  color: string;
-};
+const StatsSection = async () => {
+  const t = await getTranslations("homepage.stats");
+  const stats = await getGalleryStats();
 
-const stats: Stat[] = [
-  {
-    value: 2.4,
-    suffix: "M+",
-    labelKey: "pagesCreated",
-    icon: faPalette,
-    color: "text-primary",
-  },
-  {
-    value: 50,
-    suffix: "K+",
-    labelKey: "happyColorists",
-    icon: faUsers,
-    color: "text-accent",
-  },
-  {
-    value: 89,
-    suffix: "%",
-    labelKey: "feelingCalmer",
-    icon: faSpa,
-    color: "text-primary",
-  },
-  {
-    value: 12,
-    suffix: "min",
-    labelKey: "sessionLength",
-    icon: faClock,
-    color: "text-accent",
-  },
-];
-
-const useCountUp = (target: number, duration: number, shouldStart: boolean) => {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!shouldStart) return;
-
-    const isDecimal = target % 1 !== 0;
-    const steps = 60;
-    const increment = target / steps;
-    let current = 0;
-    let step = 0;
-
-    const timer = setInterval(() => {
-      step += 1;
-      current += increment;
-      if (step >= steps) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(
-          isDecimal ? parseFloat(current.toFixed(1)) : Math.floor(current),
-        );
-      }
-    }, duration / steps);
-
-    return () => clearInterval(timer);
-  }, [target, duration, shouldStart]);
-
-  return count;
-};
-
-const StatCard = ({
-  stat,
-  inView,
-  label,
-}: {
-  stat: Stat;
-  inView: boolean;
-  label: string;
-}) => {
-  const count = useCountUp(stat.value, 1800, inView);
+  const statItems = [
+    {
+      icon: faPalette,
+      value: stats.totalImages,
+      label: t("pagesCreated"),
+      color: "text-primary",
+      suffix: "+",
+    },
+    {
+      icon: faCalendarDays,
+      value: stats.dailyImages,
+      label: t("dailyPages"),
+      color: "text-accent",
+      suffix: "+",
+    },
+    {
+      icon: faImages,
+      value: stats.communityImages,
+      label: t("freeLibraryPages"),
+      color: "text-primary",
+      suffix: "+",
+    },
+    {
+      icon: faShapes,
+      value: stats.categoryCount,
+      label: t("categories"),
+      color: "text-accent",
+      suffix: "",
+    },
+  ];
 
   return (
-    <div className="flex flex-col items-center text-center">
-      <div
-        className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary ${stat.color}`}
-      >
-        <FontAwesomeIcon icon={stat.icon} size="lg" />
-      </div>
-      <p className="text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
-        {stat.value % 1 !== 0 ? count.toFixed(1) : count}
-        <span className="text-muted-foreground">{stat.suffix}</span>
-      </p>
-      <p className="mt-2 text-sm text-muted-foreground">{label}</p>
-    </div>
-  );
-};
-
-const StatsSection = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [inView, setInView] = useState(false);
-  const t = useTranslations("homepage.stats");
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section
-      ref={sectionRef}
-      className="border-y border-border bg-secondary py-20"
-    >
+    <section className="border-y border-border bg-secondary py-20">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
-          {stats.map((stat) => (
-            <StatCard
-              key={stat.labelKey}
-              stat={stat}
-              inView={inView}
-              label={t(stat.labelKey)}
+          {statItems.map((stat) => (
+            <AnimatedStatCard
+              key={stat.label}
+              icon={stat.icon}
+              value={stat.value}
+              label={stat.label}
+              color={stat.color}
+              suffix={stat.suffix}
             />
           ))}
         </div>

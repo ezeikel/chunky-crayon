@@ -69,6 +69,10 @@
     "aboutText": "Wo Fantasie lebendig wird! Mach aus deinen verrücktesten Ideen zauberhafte Malvorlagen.",
     "madeBy": "Mit <heart>♡</heart> gemacht in <location>South London</location>",
     "copyright": "© {year} Chunky Crayon. Alle Rechte vorbehalten.",
+    "newsletter": {
+      "title": "Kostenlose Malvorlage, jeden Tag",
+      "subtitle": "Schließe dich Familien an, die jeden Morgen eine brandneue Malvorlage in ihrem Posteingang erhalten."
+    },
     "sections": {
       "about": "Über uns",
       "connect": "Kontakt",

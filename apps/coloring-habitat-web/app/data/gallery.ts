@@ -350,16 +350,21 @@ export const getGalleryStats = async () => {
   cacheLife("gallery-stats");
   cacheTag("gallery-stats");
 
-  const [totalImages, dailyImages] = await Promise.all([
+  const [totalImages, dailyImages, communityImages] = await Promise.all([
     db.coloringImage.count({ where: brandWhere }),
     db.coloringImage.count({
       where: { ...brandWhere, generationType: GenerationType.DAILY },
+    }),
+    db.coloringImage.count({
+      where: { ...brandWhere, userId: null },
     }),
   ]);
 
   return {
     totalImages,
     dailyImages,
+    communityImages,
+    categoryCount: GALLERY_CATEGORIES.length,
   };
 };
 

@@ -120,11 +120,11 @@
     "hero": {
       "title": "Color your way to calm",
       "subtitle": "Create intricate coloring pages in seconds. Color online or print at home. Your daily dose of creative mindfulness.",
-      "trustBadge1": "1,000+ free pages",
+      "trustBadge1": "Free to start",
       "trustBadge2": "No account needed",
-      "trustBadge3": "Trusted by 50k+ people",
-      "freeCreations": "2 free creations daily · No account needed",
-      "users": "50k+ users"
+      "trustBadge3": "Print or color online",
+      "freeCreations": "2 free creations to start · No account needed",
+      "users": "Browse the gallery"
     },
     "showcase": {
       "title": "Popular coloring pages",
@@ -145,9 +145,9 @@
     },
     "stats": {
       "pagesCreated": "Coloring pages created",
-      "happyColorists": "Happy colorists",
-      "feelingCalmer": "Report feeling calmer",
-      "sessionLength": "Average session length"
+      "dailyPages": "Daily pages",
+      "freeLibraryPages": "Free library pages",
+      "categories": "Categories"
     },
     "features": {
       "badge": "How it works",
@@ -189,7 +189,7 @@
     "newsletter": {
       "badge": "Free daily coloring",
       "title": "A free page, every morning",
-      "subtitle": "Join 12,000+ people who start their day with a moment of creative calm. Delivered straight to your inbox.",
+      "subtitle": "Start your day with a moment of creative calm. A new coloring page in your inbox every morning.",
       "emailPlaceholder": "your@email.com",
       "subscribe": "Subscribe",
       "subscribed": "Subscribed",
@@ -204,7 +204,7 @@
         },
         "2": {
           "question": "Is it really free?",
-          "answer": "You get 2 free page creations every day, no account needed. Sign up (also free) to unlock our full library of 1,000+ pages and a daily coloring page delivered to your inbox each morning."
+          "answer": "You get 2 free page creations to start, no account needed. Sign up (also free) to browse our growing library and get a fresh coloring page delivered to your inbox each morning."
         },
         "3": {
           "question": "What makes this different from other coloring apps?",
@@ -212,7 +212,7 @@
         },
         "4": {
           "question": "Can I print the coloring pages?",
-          "answer": "Every page can be downloaded as a high-resolution PDF, perfectly sized for A4 or US Letter paper. Many users love the tactile experience of coloring with real pencils, pens, and markers."
+          "answer": "Every page can be downloaded as a high-resolution PDF, perfectly sized for A4 or US Letter paper. Print yours and color with real pencils, pens, and markers — or color online and skip the printer."
         },
         "5": {
           "question": "Is there a mobile app?",
@@ -222,7 +222,7 @@
     },
     "cta": {
       "title": "Ready to find your calm?",
-      "subtitle": "Join thousands who have made coloring part of their daily wellness routine.",
+      "subtitle": "Make coloring part of your daily wellness routine. Five minutes a day is all it takes.",
       "startColoring": "Start coloring free",
       "viewPlans": "View plans",
       "getTheApp": "Get the App",
@@ -262,6 +262,18 @@
     "subtitle": "Wellness, techniques, and inspiration for mindful coloring",
     "allPosts": "All Posts",
     "byAuthor": "By {author}"
+  },
+  "email": {
+    "signup": {
+      "title": "A free page, every morning",
+      "subtitle": "Get a <free>free</free> coloring page in your inbox every day.",
+      "placeholder": "your@email.com",
+      "join": "Subscribe",
+      "success": "You're in",
+      "successDescription": "Your first coloring page will arrive tomorrow morning.",
+      "error": "Something went wrong",
+      "errorDescription": "We couldn't add you to the list. Please try again."
+    }
   },
   "createForm": {
     "inputModes": {

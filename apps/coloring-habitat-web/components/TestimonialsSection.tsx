@@ -86,7 +86,7 @@ const TestimonialsSection = () => {
                 ))}
               </div>
               <p className="mt-0.5 text-sm text-muted-foreground">
-                {t("fromReviews", { count: "2,847" })}
+                {t("fromReviews", { count: "42" })}
               </p>
             </div>
           </div>

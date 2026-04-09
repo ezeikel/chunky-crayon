@@ -25,6 +25,8 @@ type HomePageContentProps = {
   recentCreations?: React.ReactNode;
   /** Intro section for logged-out users - server component passed as prop */
   intro?: React.ReactNode;
+  /** Daily email signup form for logged-out users - client component passed as prop */
+  emailSignup?: React.ReactNode;
 };
 
 const HomePageContent = ({
@@ -36,6 +38,7 @@ const HomePageContent = ({
   socialProofStats,
   recentCreations,
   intro,
+  emailSignup,
 }: HomePageContentProps) => {
   const { status } = useSession();
   const isLoggedIn = status === 'authenticated';
@@ -87,12 +90,18 @@ const HomePageContent = ({
         <div className="absolute bottom-[5%] right-[15%] w-28 h-28 md:w-40 md:h-40 bg-crayon-purple-light/15 rounded-full blur-3xl" />
       </div>
 
-      {/* Hero section */}
-      <div className="flex flex-col lg:flex-row gap-10 md:gap-12 lg:gap-16 w-full items-center lg:items-start lg:justify-between relative z-10">
-        <div className="flex-1 max-w-xl lg:max-w-none lg:flex-shrink">
-          {intro}
+      {/* Hero section - desktop: copy+email left, form right; mobile: copy, form, email */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-12 lg:gap-16 w-full items-center lg:items-start relative z-10">
+        {/* Intro copy: 1st on mobile, top-left on desktop */}
+        <div className="order-1 max-w-xl lg:max-w-none">{intro}</div>
+
+        {/* Create form: 2nd on mobile (primary action), right column spanning both rows on desktop */}
+        <div className="order-2 w-full max-w-lg mx-auto lg:max-w-none lg:row-span-2 lg:mx-0">
+          {form}
         </div>
-        <div className="flex-shrink-0 w-full max-w-lg">{form}</div>
+
+        {/* Email signup: 3rd on mobile, bottom-left on desktop */}
+        {emailSignup && <div className="order-3">{emailSignup}</div>}
       </div>
 
       {/* Recent creations - shows images guests have created */}

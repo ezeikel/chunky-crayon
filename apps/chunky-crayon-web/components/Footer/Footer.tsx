@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,6 +7,7 @@ import { cacheLife } from 'next/cache';
 import cn from '@/utils/cn';
 import { SOCIAL_LINKS } from '@/constants';
 import AppStoreButtons from '@/components/AppStoreButtons';
+import JoinColoringPageEmailListForm from '@/components/forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 
 // Cache the year calculation separately from translations
 const getCachedYear = async () => {
@@ -32,7 +34,7 @@ const Footer = async ({ className }: FooterProps) => {
         className,
       )}
     >
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-0">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-16">
         <div className="flex-1 min-w-[220px] flex flex-col gap-8">
           <div className="mb-4">
             <Link
@@ -79,7 +81,19 @@ const Footer = async ({ className }: FooterProps) => {
             <AppStoreButtons location="footer" />
           </div>
         </div>
-        <div className="flex-1 min-w-[220px] flex flex-col gap-8 justify-center md:items-end">
+        <div className="flex-1 min-w-[220px] flex flex-col gap-8">
+          <div>
+            <h3 className="font-tondo font-bold text-lg mb-2">
+              {t('newsletter.title')}
+            </h3>
+            <p className="text-sm text-gray-300 mb-4 max-w-sm">
+              {t('newsletter.subtitle')}
+            </p>
+            <Suspense fallback={null}>
+              <JoinColoringPageEmailListForm location="footer" />
+            </Suspense>
+          </div>
+
           <div>
             <h3 className="font-bold text-lg mb-2">{t('sections.support')}</h3>
             <a

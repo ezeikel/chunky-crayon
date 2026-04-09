@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Balancer from 'react-wrap-balancer';
 import { getTranslations } from 'next-intl/server';
 import cn from '@/utils/cn';
-import JoinColoringPageEmailListForm from '../forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 import TypedText from '../TypedText/TypedText';
 import AppStoreButtons from '@/components/AppStoreButtons';
 
@@ -104,11 +103,6 @@ const Intro = async ({ className }: IntroProps) => {
       </div>
 
       <AppStoreButtons location="hero" className="mb-6 md:mb-8" />
-
-      <JoinColoringPageEmailListForm
-        className="max-w-[429px]"
-        location="hero"
-      />
     </div>
   );
 };

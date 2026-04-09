@@ -69,6 +69,10 @@
     "aboutText": "Là où l’imagination prend vie ! Transforme tes idées les plus folles en pages de coloriage magiques.",
     "madeBy": "Fait avec <heart>♡</heart> à <location>South London</location>",
     "copyright": "© {year} Chunky Crayon. Tous droits réservés.",
+    "newsletter": {
+      "title": "Une page de coloriage gratuite, chaque jour",
+      "subtitle": "Rejoins les familles qui reçoivent une toute nouvelle page de coloriage dans leur boîte mail chaque matin."
+    },
     "sections": {
       "about": "À propos",
       "connect": "Nous contacter",

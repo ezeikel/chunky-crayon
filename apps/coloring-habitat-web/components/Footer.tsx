@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { cacheLife } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -8,6 +9,7 @@ import {
   faTiktok,
   faPinterest,
 } from "@fortawesome/free-brands-svg-icons";
+import JoinDailyEmailForm from "@/components/forms/JoinDailyEmailForm/JoinDailyEmailForm";
 
 const getCachedYear = async () => {
   "use cache";
@@ -41,6 +43,7 @@ const socialLinks = [
 const Footer = async () => {
   const year = await getCachedYear();
   const t = await getTranslations("footer");
+  const tNewsletter = await getTranslations("homepage.newsletter");
 
   const footerLinks = {
     [t("sections.explore")]: [
@@ -66,8 +69,23 @@ const Footer = async () => {
   };
 
   return (
-    <footer className="border-t border-border bg-card">
-      <div className="mx-auto max-w-7xl px-6 py-16">
+    <footer className="border-t border-border bg-secondary">
+      <div className="mx-auto max-w-7xl px-6 pb-12 pt-12">
+        {/* Newsletter signup */}
+        <div className="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+          <div className="max-w-md">
+            <h3 className="text-2xl font-extrabold tracking-tight text-foreground">
+              {tNewsletter("title")}
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {tNewsletter("subtitle")}
+            </p>
+          </div>
+          <Suspense fallback={null}>
+            <JoinDailyEmailForm variant="inline" location="footer" />
+          </Suspense>
+        </div>
+
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2">

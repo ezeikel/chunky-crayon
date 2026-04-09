@@ -9,6 +9,7 @@ import Loading from '@/components/Loading/Loading';
 import UnsubscribeToast from '@/components/UnsubscribeToast/UnsubscribeToast';
 import HomePageContent from '@/components/HomePageContent';
 import Intro from '@/components/Intro/Intro';
+import JoinColoringPageEmailListForm from '@/components/forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 import { getMyColoState } from '@/app/actions/colo';
 import { getActiveProfile } from '@/app/actions/profiles';
 import type { ColoringImageSearchParams } from '@/types';
@@ -45,6 +46,7 @@ const HomePageWithColoState = async ({
   socialProofStats,
   recentCreations,
   intro,
+  emailSignup,
 }: {
   searchParams: Promise<ColoringImageSearchParams>;
   form: React.ReactNode;
@@ -54,6 +56,7 @@ const HomePageWithColoState = async ({
   socialProofStats: React.ReactNode;
   recentCreations: React.ReactNode;
   intro: React.ReactNode;
+  emailSignup: React.ReactNode;
 }) => {
   const coloState = await ColoStateLoader();
 
@@ -67,6 +70,7 @@ const HomePageWithColoState = async ({
       socialProofStats={socialProofStats}
       recentCreations={recentCreations}
       intro={intro}
+      emailSignup={emailSignup}
     />
   );
 };
@@ -160,6 +164,12 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
           }
           recentCreations={<RecentCreations />}
           intro={<Intro />}
+          emailSignup={
+            <JoinColoringPageEmailListForm
+              className="max-w-[429px]"
+              location="hero"
+            />
+          }
         />
       </Suspense>
     </>
