@@ -34,6 +34,7 @@ import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 import { generateAmbientSoundForImage } from '@/app/actions/ambient-sound';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
+import { generateRegionStore } from '@/app/actions/generate-regions';
 import { generateColoredReference } from '@/app/actions/generate-colored-reference';
 
 /**
@@ -403,6 +404,28 @@ export const createColoringImage = async (
           }
         })(),
 
+        // Generate the region store (gzipped pixel map + 4 palette variants)
+        // for the reveal-mask Magic Brush. Runs against the traced SVG, not
+        // the raster PNG, so regions match what the client renders.
+        (async () => {
+          const regionStoreResult = await generateRegionStore(
+            result.id,
+            result.svgUrl!,
+            {
+              title: result.title ?? '',
+              description: result.description ?? '',
+              tags: (result.tags as string[]) ?? [],
+            },
+          );
+          if (regionStoreResult.success) {
+            console.log(`[Pipeline] Region store generated for ${result.id}`);
+          } else {
+            console.error(
+              `[Pipeline] Failed to generate region store: ${regionStoreResult.error}`,
+            );
+          }
+        })(),
+
         // Generate AI-colored reference for Auto Color + Magic Brush
         (async () => {
           const refResult = await generateColoredReference(
@@ -528,6 +551,28 @@ export const createColoringImage = async (
         } else {
           console.error(
             `[Pipeline] Failed to generate fill points: ${fillPointsResult.error}`,
+          );
+        }
+      })(),
+
+      // Generate the region store (gzipped pixel map + 4 palette variants)
+      // for the reveal-mask Magic Brush. Runs against the traced SVG, not
+      // the raster PNG, so regions match what the client renders.
+      (async () => {
+        const regionStoreResult = await generateRegionStore(
+          result.id,
+          result.svgUrl!,
+          {
+            title: result.title ?? '',
+            description: result.description ?? '',
+            tags: (result.tags as string[]) ?? [],
+          },
+        );
+        if (regionStoreResult.success) {
+          console.log(`[Pipeline] Region store generated for ${result.id}`);
+        } else {
+          console.error(
+            `[Pipeline] Failed to generate region store: ${regionStoreResult.error}`,
           );
         }
       })(),

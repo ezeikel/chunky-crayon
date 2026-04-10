@@ -90,7 +90,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['@react-pdf/renderer', 'playwright'],
+  serverExternalPackages: [
+    '@react-pdf/renderer',
+    '@resvg/resvg-js',
+    'playwright',
+  ],
 };
 
 // sentry configuration options

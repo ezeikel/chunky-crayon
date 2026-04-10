@@ -85,6 +85,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  serverExternalPackages: ["@resvg/resvg-js"],
 };
 
 // Sentry configuration options
