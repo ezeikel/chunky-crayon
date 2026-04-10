@@ -28,7 +28,7 @@ async function generateAmbientSoundsForImages() {
   // Find images without ambient sounds
   const images = await db.coloringImage.findMany({
     where: { ambientSoundUrl: null },
-    select: { id: true, title: true, tags: true },
+    select: { id: true, title: true, description: true, tags: true },
     take: limit,
     orderBy: { createdAt: 'desc' },
   });
@@ -48,8 +48,12 @@ async function generateAmbientSoundsForImages() {
     console.log(`[${index}/${images.length}] Processing: "${image.title}"`);
 
     try {
-      // Generate the ambient sound prompt
-      const prompt = createAmbientPrompt(image.title, image.tags);
+      // Generate the ambient sound prompt (async — calls Claude)
+      const prompt = await createAmbientPrompt(
+        image.title,
+        image.description,
+        image.tags,
+      );
       console.log(`  Prompt: ${prompt.slice(0, 80)}...`);
 
       // Generate the ambient sound using ElevenLabs

@@ -111,6 +111,9 @@ export {
   // Image-to-coloring prompts (character likeness preservation)
   IMAGE_TO_COLORING_SYSTEM,
   createImageToColoringPrompt,
+  // Ambient music prompt generation (for ElevenLabs Music API)
+  MUSIC_PROMPT_SYSTEM,
+  createMusicPromptUserPrompt,
 } from "./prompts";
 export type { MagicColorMode } from "./prompts";
 

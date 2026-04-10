@@ -36,6 +36,7 @@ export async function generateAmbientSoundForImage(
       select: {
         id: true,
         title: true,
+        description: true,
         tags: true,
         ambientSoundUrl: true,
       },
@@ -50,8 +51,12 @@ export async function generateAmbientSoundForImage(
       return { success: true, ambientSoundUrl: coloringImage.ambientSoundUrl };
     }
 
-    // Generate the ambient sound prompt
-    const prompt = createAmbientPrompt(coloringImage.title, coloringImage.tags);
+    // Generate the ambient sound prompt (async — calls Claude)
+    const prompt = await createAmbientPrompt(
+      coloringImage.title,
+      coloringImage.description,
+      coloringImage.tags,
+    );
 
     // eslint-disable-next-line no-console
     console.log(

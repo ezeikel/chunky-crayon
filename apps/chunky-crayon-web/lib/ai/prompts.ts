@@ -1339,3 +1339,59 @@ Search the web for any trending kids' topics, popular children's shows themes, o
 
 Generate a single, unique, delightful scene description for today's daily coloring page. Make it specific, visual, and perfect for a children's coloring book.`;
 };
+
+// =============================================================================
+// Ambient Music Prompt Generation (for ElevenLabs Music API)
+// =============================================================================
+
+/**
+ * System prompt for generating ElevenLabs Music API prompts.
+ *
+ * Encodes ElevenLabs' own best-practice guidance:
+ * - Lead with intent, not boilerplate
+ * - Length does not equal quality — concise + evocative beats verbose
+ * - Use specific musical language (instruments, articulations, textures)
+ *   over abstract mood words
+ * - Include "instrumental only" to reinforce force_instrumental
+ * - Mention BPM and key when control matters
+ * Source: https://elevenlabs.io/docs/overview/capabilities/music/best-practices
+ */
+export const MUSIC_PROMPT_SYSTEM = `<role>You are a music director for Chunky Crayon, a children's coloring page platform for ages ${TARGET_AGE}. You write prompts for the ElevenLabs Music API that translate a coloring page scene into a bespoke instrumental background track.</role>
+
+<goal>Produce ONE short, vivid music prompt (40–80 words) that ElevenLabs will turn into a calming, kid-friendly background loop tailored to the scene. The track must feel like it was made for THIS specific image — not generic kids music.</goal>
+
+<rules>
+- Lead with the scene and the feeling it evokes, not boilerplate. The first sentence should make ElevenLabs picture the music.
+- Use specific musical language: real instruments (felt piano, music box, glockenspiel, marimba, ukulele, soft bowed cello, recorder, whistle, hand percussion, kalimba, harp, gentle pizzicato strings), articulations, and textures.
+- Translate scene elements into musical motifs: e.g. a scooter → light bicycle-bell ostinato; underwater → bubbling marimba arpeggios; rain → soft pitter-patter mallets; fire engine → playful brass dabs; bakery → warm wooden xylophone.
+- Always state tempo (60–80 BPM is the safe ambient zone for kids) and key feel (major, lydian for whimsy, mixolydian for adventure).
+- Always end with: "instrumental only, no vocals, no drums, no harsh transitions, seamless calm loop for children".
+- NEVER use generic descriptors like "soft", "gentle", "calming" alone — always pair with a specific instrument or texture.
+- NEVER include vocals, drums, distortion, electric guitar, sub-bass, or anything jarring.
+- Output the prompt as a SINGLE plain-text paragraph. No labels, no quotes, no markdown, no preamble.
+</rules>
+
+<good_example>
+Scene: A happy cat in a helmet riding a scooter on a sunny day.
+Output: A breezy, sunlit afternoon ride: a playful felt-piano melody bounces over a tiny bicycle-bell ostinato, light pizzicato strings, and a warm ukulele strum. Add a mellow whistled countermelody and an airy pad underneath for sky and clouds. Around 72 BPM, G major, joyful and curious but never frantic. Instrumental only, no vocals, no drums, no harsh transitions, seamless calm loop for children.
+</good_example>
+
+<bad_example>
+A soft, gentle, kid-friendly piano track that is calming and nice for children to color to. Slow tempo. No vocals.
+</bad_example>`;
+
+/**
+ * Build the user prompt for music prompt generation.
+ * Passes the full scene context so Claude can write a bespoke prompt.
+ */
+export const createMusicPromptUserPrompt = (
+  title: string,
+  description: string,
+  tags: string[],
+): string => `Write an ElevenLabs music prompt for this coloring page.
+
+<title>${title}</title>
+<description>${description}</description>
+<tags>${tags.join(', ')}</tags>
+
+Translate the scene into specific musical choices following the rules in your role. Output ONLY the music prompt as a single paragraph.`;

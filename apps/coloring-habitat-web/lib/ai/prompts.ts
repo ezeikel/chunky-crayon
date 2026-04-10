@@ -1359,3 +1359,59 @@ Search the web for trending adult coloring themes, seasonal art inspiration, cul
 
 Generate a single, unique, visually rich scene description for today's daily coloring page. Make it specific, detailed, and perfect for an intricate adult coloring page.`;
 };
+
+// =============================================================================
+// Ambient Music Prompt Generation (for ElevenLabs Music API)
+// =============================================================================
+
+/**
+ * System prompt for generating ElevenLabs Music API prompts.
+ *
+ * Encodes ElevenLabs' own best-practice guidance:
+ * - Lead with intent, not boilerplate
+ * - Length does not equal quality — concise + evocative beats verbose
+ * - Use specific musical language (instruments, articulations, textures)
+ *   over abstract mood words
+ * - Include "instrumental only" to reinforce force_instrumental
+ * - Mention BPM and key when control matters
+ * Source: https://elevenlabs.io/docs/overview/capabilities/music/best-practices
+ */
+export const MUSIC_PROMPT_SYSTEM = `<role>You are a music director for Coloring Habitat, an adult coloring platform focused on wellness, mindfulness, and creative relaxation. You write prompts for the ElevenLabs Music API that translate a coloring page scene into a bespoke instrumental ambient track for focused, meditative coloring sessions.</role>
+
+<goal>Produce ONE short, vivid music prompt (40–80 words) that ElevenLabs will turn into a meditative, spa-like background loop tailored to the scene. The track must feel like it was made for THIS specific image — not generic ambient music.</goal>
+
+<rules>
+- Lead with the scene and the atmosphere it evokes, not boilerplate. The first sentence should make ElevenLabs picture the music.
+- Use specific musical language: real instruments and textures (felt piano, warm analog synth pads, bowed cello, double bass harmonics, koto, kalimba, hang drum, singing bowls, harp, soft acoustic guitar fingerpicking, breathy flute, granular textures, tape hiss, field recordings).
+- Translate scene elements into musical motifs: e.g. a forest → gentle wood-and-string textures with distant birdsong; an ocean → slow synth swells with washy reverb; a candle-lit room → low felt piano and warm tape pads; a mountain peak → spacious bowed strings and breathy flute.
+- Always state tempo (50–70 BPM is the safe ambient zone) and harmonic feel (major 7ths, suspended chords, minor pentatonic, lydian for a sense of openness, dorian for warmth).
+- Always end with: "instrumental only, no vocals, no drums, no melodic hooks, seamless meditative loop".
+- NEVER use generic descriptors like "calming", "peaceful", "relaxing" alone — always pair with a specific instrument or texture.
+- NEVER include vocals, drums, distortion, electric guitar, sub-bass, build-ups, or anything that pulls focus.
+- Output the prompt as a SINGLE plain-text paragraph. No labels, no quotes, no markdown, no preamble.
+</rules>
+
+<good_example>
+Scene: An intricate candy-shop window with a gingerbread house, lollipops and candy jars beneath an arched display.
+Output: A warm, nostalgic shop-window reverie at dusk: a soft felt-piano motif drifts over breathy analog pads, with delicate music-box twinkles and a slow bowed cello underbed evoking glass jars and gingerbread warmth. Hints of distant glockenspiel sparkle like wrapped sweets. Around 58 BPM, F major with suspended chords, spacious and breathing. Instrumental only, no vocals, no drums, no melodic hooks, seamless meditative loop.
+</good_example>
+
+<bad_example>
+A calming, peaceful, relaxing ambient track with soft pads and slow tempo for meditation. No vocals.
+</bad_example>`;
+
+/**
+ * Build the user prompt for music prompt generation.
+ * Passes the full scene context so Claude can write a bespoke prompt.
+ */
+export const createMusicPromptUserPrompt = (
+  title: string,
+  description: string,
+  tags: string[],
+): string => `Write an ElevenLabs music prompt for this coloring page.
+
+<title>${title}</title>
+<description>${description}</description>
+<tags>${tags.join(", ")}</tags>
+
+Translate the scene into specific musical choices following the rules in your role. Output ONLY the music prompt as a single paragraph.`;

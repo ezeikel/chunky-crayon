@@ -78,30 +78,42 @@ export async function generateColoVoice(
 }
 
 /**
- * Generate ambient sound effect
+ * Generate ambient background music for a coloring scene.
  *
- * @param description - Description of the sound effect to generate
- * @returns Audio buffer
+ * Uses the ElevenLabs Music API (`/v1/music`) with `force_instrumental: true`
+ * to produce a looping 90s track. Called via raw fetch because the music
+ * endpoint is not yet exposed by the installed `elevenlabs` SDK (v1.59).
+ *
+ * @param prompt - Scene-aware music description (see createAmbientPrompt)
+ * @returns MP3 audio buffer (90 seconds, designed to loop seamlessly)
  */
-export async function generateAmbientSound(
-  description: string,
-): Promise<Buffer> {
-  const elevenlabs = getClient();
-
-  // Use ElevenLabs sound effects API
-  const audioStream = await elevenlabs.textToSoundEffects.convert({
-    text: description,
-    duration_seconds: 10, // Ambient loop length
-    prompt_influence: 0.3, // Let it be creative
-  });
-
-  // Collect stream chunks into buffer
-  const chunks: Uint8Array[] = [];
-  for await (const chunk of audioStream) {
-    chunks.push(chunk);
+export async function generateAmbientSound(prompt: string): Promise<Buffer> {
+  const apiKey = process.env.ELEVENLABS_API_KEY;
+  if (!apiKey) {
+    throw new Error('ELEVENLABS_API_KEY is not configured');
   }
 
-  return Buffer.concat(chunks);
+  const res = await fetch('https://api.elevenlabs.io/v1/music', {
+    method: 'POST',
+    headers: {
+      'xi-api-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      prompt,
+      music_length_ms: 90_000,
+      force_instrumental: true,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(
+      `ElevenLabs music generation failed (${res.status}): ${err}`,
+    );
+  }
+
+  return Buffer.from(await res.arrayBuffer());
 }
 
 export { COLO_VOICE_ID };
