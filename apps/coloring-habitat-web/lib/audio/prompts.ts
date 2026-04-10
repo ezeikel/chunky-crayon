@@ -1,15 +1,24 @@
 /**
- * Prompt templates for audio generation (Coloring Habitat)
+ * Prompt templates for audio generation (Coloring Habitat — SERVER-ONLY)
  *
  * `createAmbientPrompt` asks Claude to write a scene-tailored ElevenLabs
  * Music API prompt for the coloring page. If Claude fails, falls back to a
  * simple scene-led template so generation never crashes.
  *
- * NOTE: Imports the Anthropic provider directly rather than going through
- * `@/lib/ai/models`, because the PostHog tracing wrapper in models.ts tries
- * to subclass `Anthropic.Messages` at module-load time, which breaks in
- * non-Next.js contexts (e.g. tsx scripts). The system + user prompt strings
- * still live in `@/lib/ai/prompts` so prompt content has one source of truth.
+ * NOTES:
+ * - This file is server-only (it calls Claude via the Anthropic provider).
+ *   Never import it from client components. It can't be marked with
+ *   `import 'server-only'` because the backfill scripts need to import it
+ *   via tsx, which doesn't honor the Next.js `server-only` replacement.
+ * - Imports the Anthropic provider directly rather than going through
+ *   `@/lib/ai/models`, because the PostHog tracing wrapper in models.ts
+ *   tries to subclass `Anthropic.Messages` at module-load time, which breaks
+ *   in non-Next.js contexts (e.g. tsx scripts).
+ * - The Claude model ID is hardcoded (not imported from `coloring-core`)
+ *   because `coloring-core`'s barrel transitively pulls `sharp` and
+ *   `detect-libc` — Node-only modules that blow up Turbopack client builds.
+ *   Keep this string in sync with `MODEL_IDS.CLAUDE_SONNET_4_5` in
+ *   `packages/coloring-core/src/models.ts`.
  */
 
 import { generateText } from "ai";
@@ -18,7 +27,8 @@ import {
   MUSIC_PROMPT_SYSTEM,
   createMusicPromptUserPrompt,
 } from "@/lib/ai/prompts";
-import { MODEL_IDS } from "@one-colored-pixel/coloring-core";
+
+const CLAUDE_SONNET_4_5 = "claude-sonnet-4-5-20250929";
 
 /**
  * Generate a bespoke ElevenLabs music prompt for a coloring page scene.
@@ -34,7 +44,7 @@ export async function createAmbientPrompt(
 ): Promise<string> {
   try {
     const { text } = await generateText({
-      model: anthropic(MODEL_IDS.CLAUDE_SONNET_4_5),
+      model: anthropic(CLAUDE_SONNET_4_5),
       system: MUSIC_PROMPT_SYSTEM,
       prompt: createMusicPromptUserPrompt(title, description, tags),
     });
