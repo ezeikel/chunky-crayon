@@ -152,6 +152,15 @@ model ColoringImage {
   fillPointsJson        String?   @db.Text // JSON with region centroids + AI-assigned colors
   fillPointsGeneratedAt DateTime? // When the fill points were generated
 
+  // Pre-computed region store for reveal-mask Magic Brush & palette variants.
+  // regionMapUrl points to a gzipped Uint16Array pixel→regionId lookup in R2;
+  // regionsJson holds per-region metadata { id, bounds, centroid, pixelCount, label, palettes }.
+  regionMapUrl       String? // R2 URL of gzipped Uint16Array (regionMapWidth*regionMapHeight*2 bytes)
+  regionMapWidth     Int? // Resolution the region map was computed at
+  regionMapHeight    Int?
+  regionsJson        String?   @db.Text // JSON array of region metadata + palette variants
+  regionsGeneratedAt DateTime? // When the region store was generated
+
   // AI-colored reference image for Auto Color + Magic Brush (holistic coloring)
   coloredReferenceUrl String? // R2 URL of AI-colored version of the line art
 
