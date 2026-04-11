@@ -9,7 +9,10 @@ import {
   type RegionFirstColorResponse,
   type RegionLabellingResponse,
 } from "../schemas";
-import { detectAllRegionsFromPixels } from "@one-colored-pixel/canvas";
+import {
+  detectAllRegionsFromPixels,
+  dilateBoundariesPixels,
+} from "@one-colored-pixel/canvas";
 import type { ColorMapConfig, ColorPaletteEntry } from "./generate-color-map";
 
 // =============================================================================
@@ -103,25 +106,27 @@ export const DEFAULT_PALETTE_VARIANT_MODIFIERS: Record<PaletteVariant, string> =
  */
 const REGION_LABELLING_SYSTEM = `You are a coloring-book scene analyst. You will be shown TWO images of the same coloring page:
 
-1. The original black-and-white line art.
-2. The same line art with numeric region IDs overlaid at each fillable region's centroid, in white text with a black outline.
+1. The ORIGINAL black-and-white line art. Use this to identify what each object in the scene IS (a pirate ship, a moon, a star, a planet).
+2. A COLOUR-CODED REGION MAP of the same scene. Every fillable region is filled with its own distinct colour. A numeric region ID is stamped on top of each region in white text with a black outline.
 
-Your job is to read each number in the overlay image, identify what that region represents in the scene, and assign it a precise semantic label plus an object group.
+CRITICAL: In the colour-coded map, every pixel that shares the same colour belongs to the SAME region. When you see a number N on a coloured area, that entire coloured area is region N — not just the point where the number is drawn. Use the full coloured area to understand which pixels belong to which region.
+
+Your job is to read each number in the colour-coded map, look at the corresponding area in the original line art, identify what that region represents in the scene, and assign it a precise semantic label plus an object group.
 
 RULES:
 - You MUST return exactly one entry per region ID shown in the overlay. Do not skip any. Do not invent IDs that aren't present.
-- The label describes what the region IS in the scene (e.g. "sky", "mast", "left sail stripe", "wave", "pirate flag skull", "moon face", "star").
+- To identify a region: first find its number in the colour-coded map. Note the full extent of the colour area surrounding that number. Then look at the SAME area in the original line art to see what object is drawn there. That's the region's identity.
+- The label describes what the region IS in the scene (e.g. "sky", "mast", "sail stripe", "wave", "pirate flag skull", "moon face", "star", "planet ring").
 - The objectGroup groups regions that belong to the same logical object. For example:
   - If a crow's nest is made of three separate regions (cup, base, strut), all three get objectGroup "crow's nest".
-  - If a face has eyes and a mouth as separate regions, all get objectGroup "moon face".
-  - If sails have multiple stripes, each stripe shares objectGroup "main sail" but can keep its own label like "left sail stripe".
+  - If a face has eyes and a mouth as separate regions, all get objectGroup "moon".
+  - If sails have multiple stripes, each stripe shares objectGroup "main sail" but keeps its own label like "sail stripe".
   - Single-region objects like "sky" or "sea" just repeat their label as the group.
-- Use VISUAL CONTEXT to disambiguate. Two small round regions may look similar in isolation — but one is a star in the sky and the other is a porthole on a ship. Use neighbourhood cues.
+- Use VISUAL CONTEXT to disambiguate. Two small round regions may look similar in isolation — but one is a star in the sky and the other is a porthole on a ship. Use neighbourhood cues from the original line art.
+- IMPORTANT: The LARGEST region by coloured area is almost always the BACKGROUND (sky, sea, space, etc.). If one region clearly dominates the image — spanning the whole background with a single colour in the map — label it as the background it represents ("sky", "space", "sea", "grass field") regardless of what foreground objects are nearby.
 - Prefer specific over generic: "pirate flag skull" beats "skull" beats "decoration".
-- If you genuinely cannot tell what a region is, use label "unknown" and objectGroup "unknown". Do NOT guess wildly. "unknown" is better than a wrong confident label — we can flag it for review later.
-- Return labels in kebab-free plain English, singular unless it obviously denotes a group.
-
-Read the numbers CAREFULLY. Each region ID only appears once in the overlay. The numbers are drawn at each region's centroid. If a region is very small, its number may be tiny — look closely.`;
+- If you genuinely cannot tell what a region is, use label "unknown" and objectGroup "unknown". Do NOT guess wildly. "unknown" is better than a wrong confident label.
+- Return labels in plain English, singular unless it obviously denotes a group.`;
 
 // =============================================================================
 // Helpers
@@ -170,43 +175,79 @@ async function rasterizeSvgToPixels(
 }
 
 /**
- * Build an SVG that stamps each region's numeric ID at its centroid, with
- * white fill and a black stroke so it's readable on any background.
+ * Assign a distinct, visually-contrasting HSL colour to each region.
  *
- * Font size scales with sqrt(pixelCount) so large regions get bigger numbers
- * and small regions still have legible numbers without occluding everything.
- * Very tiny regions (< 60 px at 1024×1024) are skipped because their number
- * would occlude the whole region — we'll still have a label gap but that's
- * preferable to an illegible overlay.
+ * Uses a golden-ratio hue rotation so adjacent region IDs get maximally
+ * different hues. Saturation and lightness are varied across a small set of
+ * bands so even regions that collide on hue still look different.
+ *
+ * Returns a map from regionId → `rgb(r, g, b)` CSS string.
  */
-function buildNumberedOverlaySvg(
-  regions: Array<{
-    id: number;
-    centroid: { x: number; y: number };
-    pixelCount: number;
-  }>,
-  width: number,
-  height: number,
-): string {
-  const textElements = regions
-    .filter((r) => r.pixelCount >= 60)
-    .map((r) => {
-      // sqrt-based sizing keeps small regions from getting absurdly tiny text.
-      // Clamp to a sensible range for readability.
-      const raw = Math.sqrt(r.pixelCount) / 2.5;
-      const fontSize = Math.max(14, Math.min(56, Math.round(raw)));
-      const strokeWidth = Math.max(2, fontSize / 8);
-      return `<text x="${r.centroid.x}" y="${r.centroid.y}" font-family="Arial, sans-serif" font-size="${fontSize}" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="white" stroke="black" stroke-width="${strokeWidth}" paint-order="stroke fill">${r.id}</text>`;
-    })
-    .join("");
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${textElements}</svg>`;
+function assignRegionColours(regionIds: number[]): Map<number, string> {
+  const colours = new Map<number, string>();
+  const goldenRatio = 0.61803398875;
+  let hue = 0;
+  // Cycle through a small set of saturation/lightness bands so overflow
+  // regions with repeating hues still look distinguishable.
+  const bands: Array<[number, number]> = [
+    [85, 55],
+    [70, 45],
+    [90, 65],
+    [75, 35],
+  ];
+
+  regionIds.forEach((id, i) => {
+    hue = (hue + goldenRatio) % 1;
+    const [s, l] = bands[i % bands.length];
+    const { r, g, b } = hslToRgb(hue * 360, s, l);
+    colours.set(id, `rgb(${r}, ${g}, ${b})`);
+  });
+
+  return colours;
+}
+
+function hslToRgb(
+  h: number,
+  s: number,
+  l: number,
+): { r: number; g: number; b: number } {
+  const S = s / 100;
+  const L = l / 100;
+  const C = (1 - Math.abs(2 * L - 1)) * S;
+  const hp = h / 60;
+  const X = C * (1 - Math.abs((hp % 2) - 1));
+  let r1 = 0,
+    g1 = 0,
+    b1 = 0;
+  if (hp >= 0 && hp < 1) [r1, g1, b1] = [C, X, 0];
+  else if (hp < 2) [r1, g1, b1] = [X, C, 0];
+  else if (hp < 3) [r1, g1, b1] = [0, C, X];
+  else if (hp < 4) [r1, g1, b1] = [0, X, C];
+  else if (hp < 5) [r1, g1, b1] = [X, 0, C];
+  else if (hp < 6) [r1, g1, b1] = [C, 0, X];
+  const m = L - C / 2;
+  return {
+    r: Math.round((r1 + m) * 255),
+    g: Math.round((g1 + m) * 255),
+    b: Math.round((b1 + m) * 255),
+  };
 }
 
 /**
- * Composite a numbered overlay SVG on top of the line-art PNG.
+ * Build a PNG where each pixel is coloured according to its region's
+ * assigned hue, plus a numeric label stamped at every region's centroid.
+ *
+ * This is MUCH more reliable than numbered points on the line art because
+ * Gemini can see the full extent of each region as a coloured area, not
+ * just a floating number. When asked "which region is labelled #1?",
+ * Gemini can look at the entire area filled with region #1's colour,
+ * not guess based on what's visually near a tiny number.
+ *
+ * The numeric labels are still drawn on top so Gemini can tie colours
+ * back to IDs.
  */
-async function renderNumberedOverlayPng(
-  linePngBuffer: Buffer,
+function renderColouredRegionOverlayPng(
+  pixelToRegion: Uint16Array,
   regions: Array<{
     id: number;
     centroid: { x: number; y: number };
@@ -215,15 +256,50 @@ async function renderNumberedOverlayPng(
   width: number,
   height: number,
 ): Promise<Buffer> {
-  const overlaySvg = buildNumberedOverlaySvg(regions, width, height);
-  return sharp(linePngBuffer)
-    .composite([
-      {
-        input: Buffer.from(overlaySvg),
-        top: 0,
-        left: 0,
-      },
-    ])
+  // Step 1: build raw RGB buffer by looking up each pixel's region colour.
+  const regionIds = regions.map((r) => r.id);
+  const colours = assignRegionColours(regionIds);
+
+  // Pre-parse colours into RGB triples for the inner loop
+  const rgbByRegion = new Map<number, [number, number, number]>();
+  for (const [id, rgb] of colours.entries()) {
+    const m = /^rgb\((\d+), (\d+), (\d+)\)$/.exec(rgb);
+    if (m) {
+      rgbByRegion.set(id, [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])]);
+    }
+  }
+
+  const raw = Buffer.alloc(width * height * 3);
+  for (let i = 0; i < pixelToRegion.length; i++) {
+    const regionId = pixelToRegion[i];
+    const rgb = rgbByRegion.get(regionId);
+    const p = i * 3;
+    if (rgb) {
+      raw[p] = rgb[0];
+      raw[p + 1] = rgb[1];
+      raw[p + 2] = rgb[2];
+    } else {
+      // Boundary or unassigned — black
+      raw[p] = 0;
+      raw[p + 1] = 0;
+      raw[p + 2] = 0;
+    }
+  }
+
+  // Step 2: build an SVG overlay with numeric labels stamped at centroids.
+  // Skip very small regions where a number would overwrite the entire region.
+  const labelSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">${regions
+    .filter((r) => r.pixelCount >= 60)
+    .map((r) => {
+      const raw = Math.sqrt(r.pixelCount) / 2.5;
+      const fontSize = Math.max(14, Math.min(56, Math.round(raw)));
+      const strokeWidth = Math.max(2, fontSize / 8);
+      return `<text x="${r.centroid.x}" y="${r.centroid.y}" font-family="Arial, sans-serif" font-size="${fontSize}" font-weight="900" text-anchor="middle" dominant-baseline="middle" fill="white" stroke="black" stroke-width="${strokeWidth}" paint-order="stroke fill">${r.id}</text>`;
+    })
+    .join("")}</svg>`;
+
+  return sharp(raw, { raw: { width, height, channels: 3 } })
+    .composite([{ input: Buffer.from(labelSvg), top: 0, left: 0 }])
     .png()
     .toBuffer();
 }
@@ -247,11 +323,19 @@ async function generateRegionLabels(
   const startTime = Date.now();
 
   try {
-    const userPrompt = `The first image is the line art. The second image is the same line art with region IDs overlaid at each region's centroid.
+    const userPrompt = `The first image is the original black-and-white line art. Use it to identify what each object in the scene is.
 
-There are ${regionIds.length} regions in the overlay. Their IDs are: ${regionIds.join(", ")}.
+The second image is a COLOUR-CODED REGION MAP. Each of the ${regionIds.length} regions is filled with a distinct colour, with its numeric ID stamped on top in white text. Every pixel that shares a colour belongs to the same region.
 
-Return exactly one entry per region ID — no skips, no duplicates, no invented IDs. Use the overlay to read each number, then look at the line art to identify what that region is.`;
+Region IDs present: ${regionIds.join(", ")}.
+
+For each region ID:
+  1. Locate it in the colour-coded map by finding its number.
+  2. Note the full coloured area around the number — that's the region's footprint.
+  3. Look at the SAME footprint in the original line art to see what that region represents.
+  4. Return a label and objectGroup.
+
+Return exactly one entry per region ID — no skips, no duplicates, no invented IDs. Pay special attention to the largest coloured area — that is almost certainly the background (sky, space, sea, etc.).`;
 
     const { output } = await generateText({
       model: models.analyticsQuality,
@@ -409,6 +493,16 @@ export async function generateRegionStoreLogic(
     );
     console.log(`[RegionStore] Rasterised SVG to ${width}×${height}`);
 
+    // --- Step 1b: close micro-gaps in the line art --------------------------
+    // Potrace-traced SVGs often have 1-2 pixel gaps where curves meet at
+    // intersections. Without dilation, flood fill bleeds across those gaps
+    // and merges distinct regions into mega-regions (e.g. sky leaks into a
+    // star silhouette, or into the moon, producing a ~650k-pixel region that
+    // visually looks like sky but actually overlaps with other objects).
+    // Dilate boundaries by 2 pixels to close typical gaps.
+    dilateBoundariesPixels(pixels, width, height, 2);
+    console.log(`[RegionStore] Closed boundary gaps (radius 2)`);
+
     // --- Step 2: detect regions on the line-art raster ----------------------
     const regionMap = detectAllRegionsFromPixels(pixels, width, height, 100);
     console.log(`[RegionStore] Detected ${regionMap.regions.length} regions`);
@@ -420,15 +514,20 @@ export async function generateRegionStoreLogic(
       };
     }
 
-    // --- Step 3: render the numbered-overlay PNG ----------------------------
-    const overlayPngBuffer = await renderNumberedOverlayPng(
-      pngBuffer,
+    // --- Step 3: render the coloured region overlay PNG --------------------
+    // Each region gets its own distinct HSL colour, with a numeric label
+    // stamped on top at the centroid. This is MUCH more reliable than
+    // numbered points on the original line art — Gemini can see the full
+    // extent of each region as a coloured area instead of guessing from
+    // spatial context around a tiny number.
+    const overlayPngBuffer = await renderColouredRegionOverlayPng(
+      regionMap.pixelToRegion,
       regionMap.regions,
       width,
       height,
     );
     console.log(
-      `[RegionStore] Rendered numbered overlay (${overlayPngBuffer.byteLength} bytes)`,
+      `[RegionStore] Rendered coloured region overlay (${overlayPngBuffer.byteLength} bytes)`,
     );
 
     const linePngBase64 = `data:image/png;base64,${pngBuffer.toString("base64")}`;

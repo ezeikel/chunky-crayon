@@ -29,6 +29,75 @@ const DEFAULT_MIN_REGION_SIZE = 100;
 const BOUNDARY_LUMINANCE_THRESHOLD = 200;
 
 /**
+ * Dilate boundary pixels in a raw RGBA pixel buffer to close small gaps in
+ * line art. Mutates the buffer in place: pixels within `radius` of any
+ * boundary pixel are blackened so the subsequent flood fill treats them as
+ * boundaries too.
+ *
+ * This is a direct port of dilateBoundaries() from floodFill.ts for use
+ * in the Node-side preprocessing pipeline (where we can't import
+ * canvas-dependent ImageData).
+ *
+ * Use before detectAllRegionsFromPixels to stop flood fill from bleeding
+ * across micro-gaps in potrace-traced SVGs — e.g. where sky leaks into a
+ * star silhouette through a 1-pixel crack.
+ */
+export function dilateBoundariesPixels(
+  pixels: Uint8Array,
+  width: number,
+  height: number,
+  radius: number,
+  threshold: number = BOUNDARY_LUMINANCE_THRESHOLD,
+): void {
+  if (radius <= 0) return;
+
+  // First pass: identify all boundary pixels
+  const isBoundary = new Uint8Array(width * height);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      const a = pixels[idx + 3];
+      if (a < 128) continue;
+      const luminance =
+        0.299 * pixels[idx] + 0.587 * pixels[idx + 1] + 0.114 * pixels[idx + 2];
+      if (luminance < threshold) {
+        isBoundary[y * width + x] = 1;
+      }
+    }
+  }
+
+  // Second pass: for each non-boundary pixel, if any boundary pixel is
+  // within Manhattan distance `radius`, darken it so flood fill will skip it.
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (isBoundary[y * width + x]) continue;
+
+      let foundNearby = false;
+      for (let dy = -radius; dy <= radius && !foundNearby; dy++) {
+        for (let dx = -radius; dx <= radius && !foundNearby; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          if (Math.abs(dx) + Math.abs(dy) > radius) continue;
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+          if (isBoundary[ny * width + nx]) {
+            foundNearby = true;
+          }
+        }
+      }
+
+      if (foundNearby) {
+        const idx = (y * width + x) * 4;
+        pixels[idx] = 0;
+        pixels[idx + 1] = 0;
+        pixels[idx + 2] = 0;
+        pixels[idx + 3] = 255;
+      }
+    }
+  }
+}
+
+/**
  * Check if a pixel is a dark boundary line.
  */
 function isBoundaryPixel(

@@ -32,7 +32,10 @@ export {
 } from "./regionDetection";
 
 // Region detection (Node.js / server-side)
-export { detectAllRegionsFromPixels } from "./regionDetectionNode";
+export {
+  detectAllRegionsFromPixels,
+  dilateBoundariesPixels,
+} from "./regionDetectionNode";
 
 // SVG utilities
 export {
