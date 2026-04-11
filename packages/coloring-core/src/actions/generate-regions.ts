@@ -9,10 +9,7 @@ import {
   type RegionFirstColorResponse,
   type RegionLabellingResponse,
 } from "../schemas";
-import {
-  detectAllRegionsFromPixels,
-  dilateBoundariesPixels,
-} from "@one-colored-pixel/canvas";
+import { detectAllRegionsFromPixels } from "@one-colored-pixel/canvas";
 import type { ColorMapConfig, ColorPaletteEntry } from "./generate-color-map";
 
 // =============================================================================
@@ -145,7 +142,16 @@ function getSizeDescriptor(
 /**
  * Rasterise an SVG buffer to an RGBA pixel buffer at a target width
  * (preserving aspect ratio). Uses Resvg for reliable SVG rendering, then
- * sharp to extract raw pixels.
+ * sharp to apply morphological closing + extract raw pixels.
+ *
+ * Morphological closing (dilate → erode) is applied to close 1-2 pixel gaps
+ * at potrace curve intersections without eroding small feature interiors.
+ * Sharp's dilate/erode operate on the LUMINANCE of the pixels — dilation
+ * expands dark pixels (line art), erosion shrinks them. Applied in sequence,
+ * this closes any dark-pixel gap smaller than ~2× the operation width.
+ *
+ * Returns both the original PNG (for display / AI vision) and the
+ * closed-boundary pixels (for region detection).
  */
 async function rasterizeSvgToPixels(
   svgBuffer: Buffer,
@@ -165,9 +171,18 @@ async function rasterizeSvgToPixels(
   const width = rendered.width;
   const height = rendered.height;
 
+  // Apply morphological closing to the rasterised line art. Sharp's
+  // dilate/erode use greyscale morphology — dilate grows dark regions,
+  // erode shrinks them. Sequenced as dilate(N) → erode(N), any dark-pixel
+  // gap smaller than ~2N pixels gets filled in, while feature interiors
+  // (which were never dark) are preserved. Width 2 gives us gap closing
+  // up to ~4 pixels, which handles potrace micro-gaps reliably.
   const { data } = await sharp(pngBuffer)
-    .raw()
+    .flatten({ background: "white" })
+    .dilate(2)
+    .erode(2)
     .ensureAlpha()
+    .raw()
     .toBuffer({ resolveWithObject: true });
   const pixels = new Uint8Array(data);
 
@@ -486,22 +501,18 @@ export async function generateRegionStoreLogic(
   try {
     const overallStart = Date.now();
 
-    // --- Step 1: rasterise the SVG ------------------------------------------
+    // --- Step 1: rasterise the SVG with morphological gap-closing ----------
+    // rasterizeSvgToPixels runs sharp dilate(2)→erode(2) on the line art
+    // before extracting pixels, which closes potrace micro-gaps up to ~4
+    // pixels wide while preserving small feature interiors (stars, planet
+    // edges, decorations). No separate dilation step needed downstream.
     const { pngBuffer, pixels, width, height } = await rasterizeSvgToPixels(
       svgBuffer,
       1024,
     );
-    console.log(`[RegionStore] Rasterised SVG to ${width}×${height}`);
-
-    // --- Step 1b: close micro-gaps in the line art --------------------------
-    // Potrace-traced SVGs often have 1-2 pixel gaps where curves meet at
-    // intersections. Without dilation, flood fill bleeds across those gaps
-    // and merges distinct regions into mega-regions (e.g. sky leaks into a
-    // star silhouette, or into the moon, producing a ~650k-pixel region that
-    // visually looks like sky but actually overlaps with other objects).
-    // Dilate boundaries by 2 pixels to close typical gaps.
-    dilateBoundariesPixels(pixels, width, height, 2);
-    console.log(`[RegionStore] Closed boundary gaps (radius 2)`);
+    console.log(
+      `[RegionStore] Rasterised SVG to ${width}×${height} with morphological gap-closing`,
+    );
 
     // --- Step 2: detect regions on the line-art raster ----------------------
     const regionMap = detectAllRegionsFromPixels(pixels, width, height, 100);
