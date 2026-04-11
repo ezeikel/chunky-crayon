@@ -152,6 +152,12 @@ model ColoringImage {
   fillPointsJson        String?   @db.Text // JSON with region centroids + AI-assigned colors
   fillPointsGeneratedAt DateTime? // When the fill points were generated
 
+  // Topology SVG — internal watertight version of the line art, traced from
+  // the raster with aggressive settings to close all gaps. Used ONLY by
+  // region detection + reveal-mask pipeline. Users never see this; the
+  // display SVG at svgUrl stays stylistically correct.
+  svgTopologyUrl String? // R2 URL of the topology SVG (gap-free version)
+
   // Pre-computed region store for reveal-mask Magic Brush & palette variants.
   // regionMapUrl points to a gzipped Uint16Array pixel→regionId lookup in R2;
   // regionsJson holds per-region metadata { id, bounds, centroid, pixelCount, label, palettes }.
