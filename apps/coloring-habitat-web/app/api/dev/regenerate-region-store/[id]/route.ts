@@ -3,7 +3,7 @@ import { db } from "@one-colored-pixel/db";
 import { BRAND } from "@/lib/db";
 import { generateRegionStore } from "@/app/actions/generate-regions";
 
-export const maxDuration = 300; // 5 minutes — labelling + 4 colour calls
+export const maxDuration = 900; // 15 minutes — CH images can have 500+ regions, labelling pass alone takes 2-3 minutes per image at scale
 
 /**
  * Dev-only: regenerate the region store for a single coloring image.

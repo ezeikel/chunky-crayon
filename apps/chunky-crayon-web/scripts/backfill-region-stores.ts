@@ -46,7 +46,10 @@ function parseArgs(argv: string[]): Args {
   const args: Args = {
     dryRun: false,
     limit: Infinity,
-    concurrency: 3,
+    // Gemini rate-limit contention makes concurrency > 1 slower than sequential
+    // for images with hundreds of regions — each parallel call stretches to 3×
+    // baseline latency. Keep sequential by default.
+    concurrency: 1,
     force: false,
     id: null,
     baseUrl: 'http://localhost:3000',
@@ -87,14 +90,16 @@ type RegenerateResponse = {
 async function regenerateOne(
   id: string,
   baseUrl: string,
-  timeoutMs = 360_000,
 ): Promise<RegenerateResponse> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  // No AbortController: the dev server will finish whenever it finishes, and
+  // aborting the client-side fetch doesn't stop the server-side work — it
+  // just causes us to miss the response and mis-report a success as a
+  // failure. Running locally, there's no reason to enforce a client-side
+  // timeout; if the script hangs we'll Ctrl-C it manually.
   try {
     const resp = await fetch(
       `${baseUrl}/api/dev/regenerate-region-store/${id}`,
-      { method: 'POST', signal: controller.signal },
+      { method: 'POST' },
     );
     const body = (await resp.json()) as RegenerateResponse;
     if (!resp.ok && body.success !== false) {
@@ -106,8 +111,6 @@ async function regenerateOne(
       success: false,
       error: err instanceof Error ? err.message : String(err),
     };
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
