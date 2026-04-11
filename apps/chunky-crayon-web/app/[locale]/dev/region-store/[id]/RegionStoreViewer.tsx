@@ -116,7 +116,14 @@ const RegionStoreViewer = ({
           status: 'loading',
           message: 'Fetching regionMapUrl...',
         });
-        const response = await fetch(regionMapUrl);
+        // Cache-bust with the regionsGeneratedAt-equivalent via a timestamp,
+        // plus explicit no-store to dodge Chrome's aggressive R2 blob cache.
+        // Without this, regenerating the region store shows stale pixel data
+        // even though regionsJson is fresh, and you waste time thinking the
+        // pipeline is broken when it's just a cache hit.
+        const response = await fetch(`${regionMapUrl}?t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         if (!response.ok) {
           throw new Error(`Fetch failed: ${response.status}`);
         }
