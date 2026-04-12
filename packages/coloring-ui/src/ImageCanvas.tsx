@@ -224,6 +224,8 @@ export type ImageCanvasHandle = {
    * @returns WebP data URL of the thumbnail or null if canvas not available
    */
   generatePreviewThumbnail: () => string | null;
+  /** Get the pre-coloured canvas (for Auto Color to draw in one shot) */
+  getPreColoredCanvas: () => HTMLCanvasElement | null;
 };
 
 const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
@@ -947,6 +949,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         replayAction,
         forceRepaint,
         generatePreviewThumbnail,
+        getPreColoredCanvas: () => preColoredCanvasRef.current,
       }),
       [
         restoreCanvasState,

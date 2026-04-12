@@ -86,6 +86,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setIsAutoColoring,
       setHasAutoColored,
       paletteVariant,
+      pushToHistory,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -315,68 +316,47 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setIsAutoColoring,
     ]);
 
-    // Handle auto-color using the pre-computed region store. Each region's
-    // centroid is mapped from region-map coordinates to canvas pixel
-    // coordinates, then filled with the active palette variant's colour.
-    // No runtime region detection, no AI calls — all data is pre-computed.
+    // Handle auto-color using the pre-computed region store. Draws the
+    // pre-coloured canvas (built by ImageCanvas from the region store +
+    // active palette variant) directly onto the drawing canvas in one shot.
+    // Same data source as Magic Brush — pixel-perfect, no flood fill,
+    // no centroids, no missed regions.
     const handleRegionStoreAutoColor = useCallback(() => {
       const drawingCanvas = canvasRef.current?.getCanvas();
-      if (!drawingCanvas || !regionStore.state.isReady) return;
+      const preColoredCanvas = canvasRef.current?.getPreColoredCanvas();
+      if (!drawingCanvas || !preColoredCanvas) return;
 
-      const points = regionStore.getAllColorsForAutoFill(paletteVariant);
-      if (points.length === 0) return;
+      const drawingCtx = drawingCanvas.getContext('2d');
+      if (!drawingCtx) return;
 
       setIsAutoColoring(true);
-      const boundary = canvasRef.current?.getDilatedBoundary();
 
-      // Map centroids from region-map coords to canvas pixel coords
-      const canvasW = drawingCanvas.width;
-      const canvasH = drawingCanvas.height;
-      const regionW = regionStore.state.width;
-      const regionH = regionStore.state.height;
+      // Capture state for undo
+      const beforeState = canvasRef.current?.captureCanvasState();
+      if (beforeState) {
+        pushToHistory({
+          type: 'fill',
+          imageData: beforeState,
+          timestamp: Date.now(),
+        });
+      }
 
-      const scaledPoints = points.map((pt) => ({
-        x: Math.round((pt.centroid.x / regionW) * canvasW),
-        y: Math.round((pt.centroid.y / regionH) * canvasH),
-        color: pt.color,
-      }));
+      // Draw the entire pre-coloured canvas onto the drawing canvas.
+      // Reset transform so drawImage operates in raw pixel space (the
+      // drawing context has DPR scaling applied).
+      drawingCtx.save();
+      drawingCtx.setTransform(1, 0, 0, 1, 0, 0);
+      drawingCtx.drawImage(preColoredCanvas, 0, 0);
+      drawingCtx.restore();
 
-      let index = 0;
-      const batchSize = 3;
-
-      const fillBatch = () => {
-        const end = Math.min(index + batchSize, scaledPoints.length);
-        for (let i = index; i < end; i++) {
-          const { x, y, color } = scaledPoints[i];
-          canvasRef.current?.fillRegionAtPoint(
-            x,
-            y,
-            color,
-            true,
-            boundary ?? undefined,
-          );
-        }
-        index = end;
-
-        if (index < scaledPoints.length) {
-          requestAnimationFrame(fillBatch);
-        } else {
-          setIsAutoColoring(false);
-          setHasAutoColored(true);
-          setActiveTool('brush');
-          playSound('sparkle');
-          setHasUnsavedChanges(true);
-        }
-      };
-
-      requestAnimationFrame(fillBatch);
+      setIsAutoColoring(false);
+      setHasAutoColored(true);
+      setActiveTool('brush');
+      playSound('sparkle');
+      setHasUnsavedChanges(true);
     }, [
-      regionStore.state.isReady,
-      regionStore.state.width,
-      regionStore.state.height,
-      regionStore.getAllColorsForAutoFill,
-      paletteVariant,
       playSound,
+      pushToHistory,
       setHasUnsavedChanges,
       setIsAutoColoring,
       setHasAutoColored,
