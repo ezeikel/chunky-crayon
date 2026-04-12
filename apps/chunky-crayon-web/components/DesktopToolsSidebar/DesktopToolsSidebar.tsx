@@ -14,6 +14,8 @@ import { useTranslations } from 'next-intl';
 import {
   faPencil,
   faPaintbrush,
+  faPenNib,
+  faPaintRoller,
   faFillDrip,
   faEraser,
   faSparkles,
@@ -51,6 +53,8 @@ type ToolConfig = {
   id:
     | 'crayon'
     | 'marker'
+    | 'pencil'
+    | 'paintbrush'
     | 'glitter'
     | 'sparkle'
     | 'rainbow'
@@ -74,6 +78,8 @@ type ToolConfig = {
 const regularTools: ToolConfig[] = [
   { id: 'crayon', label: 'Crayon', icon: faPencil },
   { id: 'marker', label: 'Marker', icon: faPaintbrush },
+  { id: 'pencil', label: 'Pencil', icon: faPenNib },
+  { id: 'paintbrush', label: 'Paint', icon: faPaintRoller },
   { id: 'glitter', label: 'Glitter', icon: faSparkles },
   { id: 'fill', label: 'Fill', icon: faFillDrip },
   { id: 'eraser', label: 'Eraser', icon: faEraser },
@@ -215,6 +221,14 @@ const DesktopToolsSidebar = ({
       case 'marker':
         setActiveTool('brush');
         setBrushType('marker');
+        break;
+      case 'pencil':
+        setActiveTool('brush');
+        setBrushType('pencil');
+        break;
+      case 'paintbrush':
+        setActiveTool('brush');
+        setBrushType('paintbrush');
         break;
       case 'glitter':
         setActiveTool('brush');

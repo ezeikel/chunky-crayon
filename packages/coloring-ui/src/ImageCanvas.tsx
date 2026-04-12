@@ -33,6 +33,8 @@ import {
 import {
   faPencil,
   faPaintbrush,
+  faPenNib,
+  faPaintRoller,
   faEraser,
   faSparkles,
   faWandSparkles,
@@ -50,6 +52,8 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 const BRUSH_ICONS: Record<BrushType, IconDefinition> = {
   crayon: faPencil,
   marker: faPaintbrush,
+  pencil: faPenNib,
+  paintbrush: faPaintRoller,
   eraser: faEraser,
   glitter: faSparkles,
   sparkle: faWandSparkles,

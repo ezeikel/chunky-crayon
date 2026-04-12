@@ -42,6 +42,26 @@ export const drawTexturedStroke = ({
 
   if (brushType === "eraser") {
     drawEraserStroke({ ctx, x, y, lastX, lastY, radius: effectiveRadius });
+  } else if (brushType === "pencil") {
+    drawPencilStroke({
+      ctx,
+      x,
+      y,
+      lastX,
+      lastY,
+      color,
+      radius: effectiveRadius * 0.5, // pencil is finer than crayon
+    });
+  } else if (brushType === "paintbrush") {
+    drawPaintbrushStroke({
+      ctx,
+      x,
+      y,
+      lastX,
+      lastY,
+      color,
+      radius: effectiveRadius * 1.3, // paintbrush is broader
+    });
   } else if (brushType === "crayon") {
     drawCrayonStroke({
       ctx,
@@ -206,6 +226,118 @@ const drawMarkerStroke = ({
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fillStyle = markerColor;
+  ctx.fill();
+};
+
+/**
+ * Pencil texture: Fine, precise strokes with light grain
+ * - Thinner than crayon, more controlled
+ * - Subtle grain texture (like colored pencil on paper)
+ * - Pressure-sensitive opacity (lighter strokes for shading)
+ * - Good for detail work and outlines
+ */
+const drawPencilStroke = ({
+  ctx,
+  x,
+  y,
+  lastX,
+  lastY,
+  color,
+  radius,
+}: Omit<DrawStrokeParams, "brushType">): void => {
+  ctx.globalCompositeOperation = "source-over";
+
+  const rgb = hexToRgb(color);
+  if (!rgb) return;
+
+  if (lastX !== null && lastY !== null) {
+    const distance = Math.sqrt((x - lastX) ** 2 + (y - lastY) ** 2);
+    const steps = Math.max(1, Math.floor(distance / 1.5));
+
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const px = lastX + (x - lastX) * t;
+      const py = lastY + (y - lastY) * t;
+
+      // Pencil grain: fewer, tighter particles than crayon
+      const grainCount = Math.floor(radius * 3);
+      for (let j = 0; j < grainCount; j++) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * radius * 0.7;
+        const gx = px + Math.cos(angle) * dist;
+        const gy = py + Math.sin(angle) * dist;
+
+        // Tight opacity range — pencil is more consistent than crayon
+        const opacity = 0.4 + Math.random() * 0.4;
+        const dotRadius = Math.random() * 1.2 + 0.3;
+
+        ctx.beginPath();
+        ctx.arc(gx, gy, dotRadius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+        ctx.fill();
+      }
+    }
+  }
+
+  // Current position
+  const grainCount = Math.floor(radius * 3);
+  for (let j = 0; j < grainCount; j++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * radius * 0.7;
+    const gx = x + Math.cos(angle) * dist;
+    const gy = y + Math.sin(angle) * dist;
+    const opacity = 0.4 + Math.random() * 0.4;
+    const dotRadius = Math.random() * 1.2 + 0.3;
+
+    ctx.beginPath();
+    ctx.arc(gx, gy, dotRadius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+    ctx.fill();
+  }
+};
+
+/**
+ * Paintbrush texture: Smooth, slightly transparent, broader strokes
+ * - Wider than marker, softer edges
+ * - Semi-transparent for natural layering and blending
+ * - Smooth gradient falloff at edges (not hard-edged like marker)
+ * - Good for filling large areas with a natural, hand-painted feel
+ */
+const drawPaintbrushStroke = ({
+  ctx,
+  x,
+  y,
+  lastX,
+  lastY,
+  color,
+  radius,
+}: Omit<DrawStrokeParams, "brushType">): void => {
+  ctx.globalCompositeOperation = "source-over";
+
+  const rgb = hexToRgb(color);
+  if (!rgb) return;
+
+  // Draw smooth connecting line with soft edges
+  if (lastX !== null && lastY !== null) {
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`;
+    ctx.lineWidth = radius * 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }
+
+  // Soft radial gradient dab for natural brush feel
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+  gradient.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.55)`);
+  gradient.addColorStop(0.6, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)`);
+  gradient.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
+
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = gradient;
   ctx.fill();
 };
 

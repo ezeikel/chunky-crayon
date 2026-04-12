@@ -24,6 +24,8 @@ export type SoundType =
 export type BrushSoundType =
   | "crayon" // Waxy, textured scratching sound
   | "marker" // Smooth, squeaky felt-tip sound
+  | "pencil" // Fine, light scratching sound (falls back to crayon)
+  | "paintbrush" // Smooth, swishing brush sound (falls back to marker)
   | "eraser" // Soft rubbery erasing sound
   | "glitter" // Sparkly, shimmery tinkling sound
   | "sparkle" // Magical twinkling sound
@@ -71,6 +73,8 @@ const BRUSH_SOUND_CONFIG: Record<BrushSoundType, BrushSoundConfig> = {
   // Traditional drawing tools
   crayon: { src: "/audio/brush/crayon.mp3", volume: 0.25 },
   marker: { src: "/audio/brush/marker.mp3", volume: 0.25 },
+  pencil: { src: "/audio/brush/crayon.mp3", volume: 0.2 }, // falls back to crayon sound
+  paintbrush: { src: "/audio/brush/marker.mp3", volume: 0.2 }, // falls back to marker sound
   eraser: { src: "/audio/brush/eraser.mp3", volume: 0.2 },
 
   // Special effect brushes
