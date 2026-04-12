@@ -24,7 +24,11 @@ export type {
   StickerCategory,
   Sticker,
   ColorDefinition,
+  PaletteVariant,
+  RegionStoreJson,
+  RegionStoreRegion,
 } from "./types";
+export { PALETTE_VARIANTS } from "./types";
 
 // Context
 export {
@@ -51,6 +55,14 @@ export { haptics } from "./haptics";
 
 // Reference color (for Auto Color + Magic Brush)
 export { useReferenceColor } from "./useReferenceColor";
+
+// Region store (pre-computed region map for reveal-mask Magic Brush)
+export {
+  useRegionStore,
+  type UseRegionStoreReturn,
+  type UseRegionStoreOptions,
+  type RegionStoreState,
+} from "./useRegionStore";
 
 // Sound
 export { useSound } from "./useSound";

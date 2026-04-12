@@ -184,6 +184,37 @@ export const FILL_PATTERNS = {
   zigzag: { name: "Zigzag", icon: "⚡", description: "Zigzag waves" },
 } as const;
 
+// Palette variants — must match the server-side PaletteVariant in coloring-core.
+// Defined here to avoid a cross-package dependency from this client-side package
+// to the server-side coloring-core package.
+export const PALETTE_VARIANTS = [
+  "realistic",
+  "pastel",
+  "cute",
+  "surprise",
+] as const;
+export type PaletteVariant = (typeof PALETTE_VARIANTS)[number];
+
+// Region store types — mirrors the server-side types from coloring-core.
+// Defined locally for the same reason as PaletteVariant above.
+export type RegionStoreRegion = {
+  id: number;
+  bounds: { x: number; y: number; width: number; height: number };
+  centroid: { x: number; y: number };
+  pixelCount: number;
+  label: string;
+  objectGroup: string;
+  palettes: Record<PaletteVariant, { hex: string; colorName: string }>;
+};
+
+export type RegionStoreJson = {
+  sceneDescription: string;
+  sourceWidth: number;
+  sourceHeight: number;
+  regionPixelCount: number;
+  regions: RegionStoreRegion[];
+};
+
 // Tracking events used by coloring UI components
 export const TRACKING_EVENTS = {
   PAGE_COLOR_SELECTED: "page_color_selected",
