@@ -98,14 +98,13 @@ type ToolConfig = {
   isMagic?: boolean;
 };
 
+// Core tools only — sparkle, rainbow, glow, neon removed (confusing UX,
+// implementations don't match user expectations). The rendering code stays
+// in brushTextures.ts in case we want to bring them back later.
 const baseTools: ToolConfig[] = [
   { id: "crayon", label: "Crayon", icon: CrayonIcon },
   { id: "marker", label: "Marker", icon: MarkerIcon },
   { id: "glitter", label: "Glitter", icon: GlitterIcon },
-  { id: "sparkle", label: "Sparkle", icon: SparkleIcon },
-  { id: "rainbow", label: "Rainbow", icon: RainbowIcon },
-  { id: "glow", label: "Glow", icon: GlowIcon },
-  { id: "neon", label: "Neon", icon: NeonIcon },
   { id: "fill", label: "Fill", icon: FillIcon },
   { id: "eraser", label: "Eraser", icon: EraserIcon },
   { id: "sticker", label: "Sticker", icon: StickerIcon },

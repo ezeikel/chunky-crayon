@@ -63,14 +63,11 @@ type ToolConfig = {
 // ============================================================================
 
 // All tools in a single scrollable row (matching mobile pattern)
+// Core tools — sparkle, rainbow, glow, neon removed (confusing UX)
 const tools: ToolConfig[] = [
   { id: "crayon", label: "Crayon", icon: faPencil },
   { id: "marker", label: "Marker", icon: faPaintbrush },
   { id: "glitter", label: "Glitter", icon: faSparkles },
-  { id: "sparkle", label: "Sparkle", icon: faWandSparkles },
-  { id: "rainbow", label: "Rainbow", icon: faRainbow },
-  { id: "glow", label: "Glow", icon: faSun },
-  { id: "neon", label: "Neon", icon: faBoltLightning },
   { id: "fill", label: "Fill", icon: faFillDrip },
   { id: "eraser", label: "Eraser", icon: faEraser },
   { id: "sticker", label: "Sticker", icon: faStar },

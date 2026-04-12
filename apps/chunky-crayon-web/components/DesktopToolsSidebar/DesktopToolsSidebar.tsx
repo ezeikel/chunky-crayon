@@ -67,14 +67,14 @@ type ToolConfig = {
 };
 
 // Regular tools shown as icon-only grid
+// Core tools only — sparkle, rainbow, glow, neon removed because they
+// don't map to real-world tools kids understand and the implementations
+// are confusing (garish rainbow, particle effects, unclear glow/neon).
+// Glitter kept but needs a fix to use selected colour not random rainbow.
 const regularTools: ToolConfig[] = [
   { id: 'crayon', label: 'Crayon', icon: faPencil },
   { id: 'marker', label: 'Marker', icon: faPaintbrush },
   { id: 'glitter', label: 'Glitter', icon: faSparkles },
-  { id: 'sparkle', label: 'Sparkle', icon: faWandSparkles },
-  { id: 'rainbow', label: 'Rainbow', icon: faRainbow },
-  { id: 'glow', label: 'Glow', icon: faSun },
-  { id: 'neon', label: 'Neon', icon: faBoltLightning },
   { id: 'fill', label: 'Fill', icon: faFillDrip },
   { id: 'eraser', label: 'Eraser', icon: faEraser },
   { id: 'sticker', label: 'Sticker', icon: faStar },

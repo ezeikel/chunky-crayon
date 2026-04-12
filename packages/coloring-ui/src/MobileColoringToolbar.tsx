@@ -65,14 +65,11 @@ const COLLAPSED_HEIGHT = 180; // Enough for handle + tools + colors
 const EXPANDED_HEIGHT = 420; // Full height with all sections
 
 // All tools in a single scrollable row (matching mobile pattern)
+// Core tools — sparkle, rainbow, glow, neon removed (confusing UX)
 const allTools: ToolConfig[] = [
   { id: "crayon", label: "Crayon", icon: faPencil },
   { id: "marker", label: "Marker", icon: faPaintbrush },
-  { id: "pencil", label: "Pencil", icon: faPencil },
   { id: "glitter", label: "Glitter", icon: faSparkles },
-  { id: "rainbow", label: "Rainbow", icon: faRainbow },
-  { id: "glow", label: "Glow", icon: faSun },
-  { id: "neon", label: "Neon", icon: faBoltLightning },
   { id: "fill", label: "Fill", icon: faFillDrip },
   { id: "eraser", label: "Eraser", icon: faEraser },
   { id: "sticker", label: "Sticker", icon: faStar },
@@ -85,7 +82,7 @@ const KIDS_TOOL_IDS: Tool[] = [
   "fill",
   "crayon",
   "marker",
-  "rainbow",
+  "glitter",
   "eraser",
   "sticker",
   "magic-auto",
