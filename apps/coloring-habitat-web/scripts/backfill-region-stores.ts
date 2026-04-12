@@ -1,57 +1,77 @@
 /**
- * Backfill region stores for every ColoringImage that doesn't have one yet.
+ * Backfill region stores for every CH ColoringImage that doesn't have one.
  *
- * Mirror of apps/chunky-crayon-web/scripts/backfill-region-stores.ts, but
- * scoped to COLORING_HABITAT brand and targeting the CH dev server (default
- * port 3001). See the CC version for full documentation.
+ * Runs the region store pipeline IN-PROCESS from tsx — no dev server, no
+ * HTTP layer, no timeouts. This is possible because coloring-core's
+ * models.ts now lazy-imports @posthog/ai only when withAITracing is called
+ * with a real posthog client, so standalone scripts can load the module.
  *
  * Usage (from the CH app dir):
  *
  *   pnpm tsx scripts/backfill-region-stores.ts --dry-run
  *   pnpm tsx scripts/backfill-region-stores.ts --limit=5
- *   pnpm tsx scripts/backfill-region-stores.ts --concurrency=3
  *   pnpm tsx scripts/backfill-region-stores.ts --id=<specific-id> --force
- *   pnpm tsx scripts/backfill-region-stores.ts --base-url=http://localhost:3001
+ *
+ * Requires DATABASE_URL in the shell env (source .env.local first).
  */
 
+import { put } from "@one-colored-pixel/storage";
+import {
+  generateRegionStoreLogic,
+  DEFAULT_PALETTE_VARIANT_MODIFIERS,
+} from "@one-colored-pixel/coloring-core";
 import { db } from "@one-colored-pixel/db";
+// Deep-import prompts directly to avoid the @/lib/ai barrel, which pulls in
+// models.ts and would trigger the @posthog/ai load. Prompts are plain
+// constants with no side effects.
+import {
+  REGION_FILL_POINTS_SYSTEM,
+  createRegionFillPointsPrompt,
+  GRID_COLOR_MAP_SYSTEM,
+  createGridColorMapPrompt,
+} from "../lib/ai/prompts";
+import { ALL_COLORING_COLORS_EXTENDED } from "../constants";
 import { BRAND } from "../lib/db";
 
 // ---------------------------------------------------------------------------
-// Arg parsing (lightweight, zero deps)
+// Config
+// ---------------------------------------------------------------------------
+const regionStoreConfig = {
+  gridColorMapSystem: GRID_COLOR_MAP_SYSTEM,
+  createGridColorMapPrompt,
+  regionFillPointsSystem: REGION_FILL_POINTS_SYSTEM,
+  createRegionFillPointsPrompt,
+  allColors: ALL_COLORING_COLORS_EXTENDED.map((c) => ({
+    hex: c.hex,
+    name: c.name,
+  })),
+  paletteVariantModifiers: DEFAULT_PALETTE_VARIANT_MODIFIERS,
+};
+
+// ---------------------------------------------------------------------------
+// Arg parsing
 // ---------------------------------------------------------------------------
 type Args = {
   dryRun: boolean;
   limit: number;
-  concurrency: number;
   force: boolean;
   id: string | null;
-  baseUrl: string;
 };
 
 function parseArgs(argv: string[]): Args {
   const args: Args = {
     dryRun: false,
     limit: Infinity,
-    // CH images have 400-700 regions each, so each Gemini call is heavy and
-    // parallel requests just queue against rate limits. Concurrency 1 finishes
-    // faster than concurrency 3 because it avoids stretching every call.
-    concurrency: 1,
     force: false,
     id: null,
-    baseUrl: "http://localhost:3001",
   };
   for (const arg of argv.slice(2)) {
     if (arg === "--dry-run") args.dryRun = true;
     else if (arg === "--force") args.force = true;
     else if (arg.startsWith("--limit=")) {
       args.limit = parseInt(arg.slice("--limit=".length), 10);
-    } else if (arg.startsWith("--concurrency=")) {
-      args.concurrency = parseInt(arg.slice("--concurrency=".length), 10);
     } else if (arg.startsWith("--id=")) {
       args.id = arg.slice("--id=".length);
-    } else if (arg.startsWith("--base-url=")) {
-      args.baseUrl = arg.slice("--base-url=".length);
     } else {
       console.error(`Unknown argument: ${arg}`);
       process.exit(1);
@@ -61,174 +81,158 @@ function parseArgs(argv: string[]): Args {
 }
 
 // ---------------------------------------------------------------------------
-// HTTP call + DB poll for the dev regenerate endpoint
+// Per-image pipeline — mirrors apps/coloring-habitat-web/app/actions/generate-regions.ts
 // ---------------------------------------------------------------------------
-type RegenerateResponse = {
+type ProcessResult = {
   success: boolean;
   error?: string;
-  source?: "http" | "db-poll"; // which signal we used to declare done
-  elapsedMs?: number;
   regionCount?: number;
   gzippedBytes?: number;
-  sceneDescription?: string;
-  width?: number;
-  height?: number;
+  elapsedMs: number;
 };
 
-/**
- * Poll the DB for this image until its regionsGeneratedAt is newer than the
- * recorded startedAt (meaning a completed save happened after we fired the
- * POST), or the hard timeout is hit.
- *
- * Returns success:true with basic metadata as soon as the row updates.
- * Returns success:false on timeout.
- */
-async function waitForRegionStoreSave(
-  id: string,
-  startedAt: Date,
-  timeoutMs: number,
-  pollIntervalMs = 15_000,
-): Promise<RegenerateResponse> {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    await new Promise((r) => setTimeout(r, pollIntervalMs));
-    const row = await db.coloringImage.findUnique({
-      where: { id },
-      select: {
-        regionMapUrl: true,
-        regionMapWidth: true,
-        regionMapHeight: true,
-        regionsGeneratedAt: true,
-        regionsJson: true,
-      },
-    });
-    if (
-      row?.regionMapUrl &&
-      row.regionsGeneratedAt &&
-      row.regionsGeneratedAt.getTime() > startedAt.getTime()
-    ) {
-      // Parse regionsJson loosely to extract region count for logging
-      let regionCount: number | undefined;
-      try {
-        const parsed = JSON.parse(row.regionsJson ?? "{}");
-        regionCount = Array.isArray(parsed?.regions)
-          ? parsed.regions.length
-          : undefined;
-      } catch {
-        /* ignore */
-      }
-      return {
-        success: true,
-        source: "db-poll",
-        width: row.regionMapWidth ?? undefined,
-        height: row.regionMapHeight ?? undefined,
-        regionCount,
-      };
-    }
-  }
-  return {
-    success: false,
-    source: "db-poll",
-    error: `DB save did not land within ${Math.round(timeoutMs / 60000)} min`,
-  };
+// Unbuffered stderr logger with millisecond-precise timestamps.
+// stderr is synchronous when attached to a file, avoiding the stdout
+// buffering gotchas that have bitten us previously.
+const startedOverallAt = Date.now();
+function log(msg: string) {
+  const s = ((Date.now() - startedOverallAt) / 1000).toFixed(1).padStart(6);
+  process.stderr.write(`[${s}s] ${msg}\n`);
 }
 
-/**
- * Regenerate one image by POSTing the dev route, then race the HTTP response
- * against a DB poll. Whichever wins first determines success.
- *
- * - Happy path (image < ~4 min): HTTP response arrives with full metadata.
- * - Slow path (image > 5 min, Next's dev response cap kicks in): HTTP throws
- *   or closes, DB poll sees the save land and returns success.
- * - Failure path: both paths fail — HTTP errors AND DB poll times out.
- *
- * The dev route handler runs to completion in-process even if Next closes
- * the HTTP response, so the DB save happens regardless of client-side
- * aborts.
- */
-async function regenerateOne(
-  id: string,
-  baseUrl: string,
-  perImageTimeoutMs = 20 * 60 * 1000,
-): Promise<RegenerateResponse> {
-  const startedAt = new Date();
-
-  // HTTP leg — fire the POST, handle success/failure normally
-  const httpLeg = (async (): Promise<RegenerateResponse> => {
-    try {
-      const resp = await fetch(
-        `${baseUrl}/api/dev/regenerate-region-store/${id}`,
-        { method: "POST" },
-      );
-      const body = (await resp.json()) as RegenerateResponse;
-      if (!resp.ok && body.success !== false) {
-        return { success: false, source: "http", error: `HTTP ${resp.status}` };
-      }
-      return { ...body, source: "http" };
-    } catch (err) {
-      return {
-        success: false,
-        source: "http",
-        error: err instanceof Error ? err.message : String(err),
-      };
-    }
-  })();
-
-  // DB poll leg — waits for regionsGeneratedAt to update
-  const dbLeg = waitForRegionStoreSave(id, startedAt, perImageTimeoutMs);
-
-  // Race the two. The DB poll only returns success if the save lands; it
-  // returns failure only after the full timeout. So if HTTP succeeds fast,
-  // it wins. If HTTP fails (server closed response), DB poll wins once the
-  // save happens. If both fail, HTTP fails fast and DB times out later.
-  const raced = await Promise.race([
-    httpLeg.then((r) => ({ result: r, done: r.success })),
-    dbLeg.then((r) => ({ result: r, done: r.success })),
+const withTimeout = <T>(p: Promise<T>, ms: number, label: string) =>
+  Promise.race<T>([
+    p,
+    new Promise<T>((_, reject) =>
+      setTimeout(
+        () => reject(new Error(`${label} timed out after ${ms}ms`)),
+        ms,
+      ),
+    ),
   ]);
 
-  if (raced.done) {
-    return raced.result;
+async function processOne(image: {
+  id: string;
+  title: string;
+  description: string | null;
+  tags: string[];
+  svgUrl: string;
+}): Promise<ProcessResult> {
+  const start = Date.now();
+  const tag = `[${image.id}]`;
+
+  // --- SVG fetch -----------------------------------------------------------
+  log(`${tag} STEP 1/5: fetch SVG from ${image.svgUrl}`);
+  let svgBuffer: Buffer;
+  try {
+    const svgStart = Date.now();
+    const resp = await withTimeout(fetch(image.svgUrl), 30_000, "SVG fetch");
+    if (!resp.ok) {
+      return {
+        success: false,
+        elapsedMs: Date.now() - start,
+        error: `Failed to fetch SVG: ${resp.status} ${resp.statusText}`,
+      };
+    }
+    svgBuffer = Buffer.from(await resp.arrayBuffer());
+    log(
+      `${tag} STEP 1/5: SVG fetched (${svgBuffer.byteLength}B, ${Date.now() - svgStart}ms)`,
+    );
+  } catch (err) {
+    return {
+      success: false,
+      elapsedMs: Date.now() - start,
+      error:
+        err instanceof Error ? `SVG fetch threw: ${err.message}` : String(err),
+    };
   }
 
-  // HTTP failed (or returned !success) before DB poll fired. Wait for the
-  // DB poll to finish — it might still land the save.
-  const dbResult = await dbLeg;
-  if (dbResult.success) {
-    return dbResult;
-  }
-
-  // Both paths failed — return whichever has a more useful error
-  const httpResult = await httpLeg;
-  return {
-    success: false,
-    source: "db-poll",
-    error: `http: ${httpResult.error ?? "unknown"} | db: ${dbResult.error ?? "unknown"}`,
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Worker pool — process candidates with bounded concurrency
-// ---------------------------------------------------------------------------
-async function processWithPool<T, R>(
-  items: T[],
-  concurrency: number,
-  worker: (item: T, index: number) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = new Array(items.length);
-  let nextIndex = 0;
-
-  const runNext = async (): Promise<void> => {
-    const i = nextIndex++;
-    if (i >= items.length) return;
-    results[i] = await worker(items[i], i);
-    await runNext();
-  };
-
-  const pool = Array.from({ length: Math.min(concurrency, items.length) }, () =>
-    runNext(),
+  // --- Region store pipeline (labelling + 4 colour passes) -----------------
+  log(`${tag} STEP 2/5: generateRegionStoreLogic start`);
+  const genStart = Date.now();
+  const result = await generateRegionStoreLogic(svgBuffer, regionStoreConfig, {
+    title: image.title ?? "",
+    description: image.description ?? "",
+    tags: image.tags ?? [],
+  });
+  log(
+    `${tag} STEP 2/5: generateRegionStoreLogic done (success=${result.success}, ${Date.now() - genStart}ms)`,
   );
-  await Promise.all(pool);
-  return results;
+
+  if (!result.success) {
+    return {
+      success: false,
+      elapsedMs: Date.now() - start,
+      error: result.error,
+    };
+  }
+
+  // --- R2 upload -----------------------------------------------------------
+  log(`${tag} STEP 3/5: R2 put (${result.regionMapGzipped.byteLength}B) start`);
+  let regionMapUrl: string;
+  try {
+    const r2Start = Date.now();
+    const fileName = `uploads/coloring-images/${image.id}/regions.bin.gz`;
+    const putResult = await withTimeout(
+      put(fileName, result.regionMapGzipped, {
+        access: "public",
+        contentType: "application/gzip",
+        allowOverwrite: true,
+      }),
+      60_000,
+      "R2 put",
+    );
+    regionMapUrl = putResult.url;
+    log(`${tag} STEP 3/5: R2 put done (${Date.now() - r2Start}ms)`);
+  } catch (err) {
+    return {
+      success: false,
+      elapsedMs: Date.now() - start,
+      error:
+        err instanceof Error ? `R2 put failed: ${err.message}` : String(err),
+    };
+  }
+
+  // --- DB update -----------------------------------------------------------
+  // Wake up the Neon connection. After 3+ minutes of Gemini calls, the
+  // pooled WebSocket to Neon may have gone stale (Neon suspends idle
+  // computes after 5 min). A trivial query forces reconnection before
+  // the real update, preventing a silent hang.
+  log(`${tag} STEP 4/5: DB warmup + update start`);
+  try {
+    await withTimeout(db.$executeRaw`SELECT 1`, 15_000, "DB warmup");
+    const dbStart = Date.now();
+    await withTimeout(
+      db.coloringImage.update({
+        where: { id: image.id, brand: BRAND },
+        data: {
+          regionMapUrl,
+          regionMapWidth: result.width,
+          regionMapHeight: result.height,
+          regionsJson: JSON.stringify(result.regionsJson),
+          regionsGeneratedAt: new Date(),
+        },
+      }),
+      30_000,
+      "DB update",
+    );
+    log(`${tag} STEP 4/5: DB update done (${Date.now() - dbStart}ms)`);
+  } catch (err) {
+    return {
+      success: false,
+      elapsedMs: Date.now() - start,
+      error:
+        err instanceof Error ? `DB update failed: ${err.message}` : String(err),
+    };
+  }
+
+  log(`${tag} STEP 5/5: all done, returning success`);
+  return {
+    success: true,
+    elapsedMs: Date.now() - start,
+    regionCount: result.regionsJson.regions.length,
+    gzippedBytes: result.regionMapGzipped.byteLength,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -239,12 +243,9 @@ async function main() {
 
   console.log(`[Backfill] Brand: ${BRAND}`);
   console.log(`[Backfill] Dry run: ${args.dryRun}`);
-  console.log(`[Backfill] Concurrency: ${args.concurrency}`);
-  console.log(`[Backfill] Base URL: ${args.baseUrl}`);
   if (args.id) console.log(`[Backfill] Targeted ID: ${args.id}`);
   if (args.force) console.log(`[Backfill] Force: re-process existing stores`);
 
-  // Load candidates from the DB
   const candidates = await db.coloringImage.findMany({
     where: {
       brand: BRAND,
@@ -254,7 +255,13 @@ async function main() {
     },
     orderBy: { createdAt: "desc" },
     take: isFinite(args.limit) ? args.limit : undefined,
-    select: { id: true, title: true },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      tags: true,
+      svgUrl: true,
+    },
   });
 
   console.log(`\n[Backfill] Found ${candidates.length} candidate(s)\n`);
@@ -296,30 +303,33 @@ async function main() {
   let failCount = 0;
   const failures: Array<{ id: string; error: string }> = [];
 
-  await processWithPool(candidates, args.concurrency, async (image, i) => {
+  for (let i = 0; i < candidates.length; i++) {
+    const image = candidates[i];
     const label = `[${i + 1}/${candidates.length}] ${image.id}`;
-    const itemStart = Date.now();
-    const result = await regenerateOne(image.id, args.baseUrl);
-    const itemMs = Date.now() - itemStart;
+    const result = await processOne({
+      id: image.id,
+      title: image.title,
+      description: image.description,
+      tags: image.tags as string[],
+      svgUrl: image.svgUrl!,
+    });
 
     if (result.success) {
       okCount++;
-      const gz = result.gzippedBytes ? `${result.gzippedBytes}B gz` : "";
-      const via = result.source === "db-poll" ? " [via db-poll]" : "";
       console.log(
-        `${label} ✅ ${result.regionCount ?? "?"} regions${gz ? ", " + gz : ""}, ${(itemMs / 1000).toFixed(1)}s${via}`,
+        `${label} ✅ ${result.regionCount ?? "?"} regions, ${result.gzippedBytes ?? "?"}B gz, ${(result.elapsedMs / 1000).toFixed(1)}s`,
       );
     } else {
       failCount++;
       failures.push({ id: image.id, error: result.error ?? "unknown" });
       console.log(
-        `${label} ❌ ${result.error ?? "unknown error"} (${(itemMs / 1000).toFixed(1)}s)`,
+        `${label} ❌ ${result.error ?? "unknown error"} (${(result.elapsedMs / 1000).toFixed(1)}s)`,
       );
     }
 
     // Progress snapshot every 10 items
     const done = okCount + failCount;
-    if (done % 10 === 0 && done > 0) {
+    if (done % 10 === 0 && done > 0 && done < candidates.length) {
       const elapsedMin = (Date.now() - startedAt) / 60000;
       const rate = done / elapsedMin;
       const remaining = candidates.length - done;
@@ -328,7 +338,7 @@ async function main() {
         `  — progress ${done}/${candidates.length} (${okCount} ok, ${failCount} fail), ${rate.toFixed(1)}/min, ETA ${etaMin.toFixed(1)} min`,
       );
     }
-  });
+  }
 
   const totalMin = ((Date.now() - startedAt) / 60000).toFixed(1);
   console.log(`\n[Backfill] Done in ${totalMin} min`);
