@@ -891,7 +891,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // Determine which color source to use for magic tools
     const useReferenceForMagic =
       hasColoredReference && referenceColor.state.isReady;
-    const isMagicReady = useReferenceForMagic || magicColorMapState.isReady;
+    const isMagicReady =
+      regionStore.state.isReady ||
+      useReferenceForMagic ||
+      magicColorMapState.isReady;
 
     return (
       <div className="flex flex-col gap-y-2 md:gap-y-3">
