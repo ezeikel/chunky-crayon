@@ -4,6 +4,7 @@ import { ColoringImage } from "@one-colored-pixel/db/types";
 import {
   useColoringContext,
   CanvasAction,
+  PALETTE_VARIANTS,
 } from "@one-colored-pixel/coloring-ui";
 import { useSound } from "@one-colored-pixel/coloring-ui";
 import cn from "@/utils/cn";
@@ -198,6 +199,8 @@ const DesktopToolsSidebar = ({
     maxZoom,
     isAutoColoring,
     hasAutoColored,
+    paletteVariant,
+    setPaletteVariant,
   } = useColoringContext();
   const { playSound } = useSound();
 
@@ -405,6 +408,27 @@ const DesktopToolsSidebar = ({
               </button>
             );
           })}
+
+          {/* Palette Variant Switcher */}
+          {(activeTool === "magic-reveal" || activeTool === "magic-auto") && (
+            <div className="flex gap-1 mt-1">
+              {PALETTE_VARIANTS.map((v) => (
+                <button
+                  type="button"
+                  key={v}
+                  onClick={() => setPaletteVariant(v)}
+                  className={cn(
+                    "flex-1 px-1 py-1 text-[10px] rounded transition-all capitalize",
+                    paletteVariant === v
+                      ? "bg-primary text-primary-foreground font-bold"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80",
+                  )}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
