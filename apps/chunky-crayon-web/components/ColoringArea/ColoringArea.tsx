@@ -85,6 +85,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setDrawingActions,
       setIsAutoColoring,
       setHasAutoColored,
+      paletteVariant,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -312,6 +313,73 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       playSound,
       setHasUnsavedChanges,
       setIsAutoColoring,
+    ]);
+
+    // Handle auto-color using the pre-computed region store. Each region's
+    // centroid is mapped from region-map coordinates to canvas pixel
+    // coordinates, then filled with the active palette variant's colour.
+    // No runtime region detection, no AI calls — all data is pre-computed.
+    const handleRegionStoreAutoColor = useCallback(() => {
+      const drawingCanvas = canvasRef.current?.getCanvas();
+      if (!drawingCanvas || !regionStore.state.isReady) return;
+
+      const points = regionStore.getAllColorsForAutoFill(paletteVariant);
+      if (points.length === 0) return;
+
+      setIsAutoColoring(true);
+      const boundary = canvasRef.current?.getDilatedBoundary();
+
+      // Map centroids from region-map coords to canvas pixel coords
+      const canvasW = drawingCanvas.width;
+      const canvasH = drawingCanvas.height;
+      const regionW = regionStore.state.width;
+      const regionH = regionStore.state.height;
+
+      const scaledPoints = points.map((pt) => ({
+        x: Math.round((pt.centroid.x / regionW) * canvasW),
+        y: Math.round((pt.centroid.y / regionH) * canvasH),
+        color: pt.color,
+      }));
+
+      let index = 0;
+      const batchSize = 3;
+
+      const fillBatch = () => {
+        const end = Math.min(index + batchSize, scaledPoints.length);
+        for (let i = index; i < end; i++) {
+          const { x, y, color } = scaledPoints[i];
+          canvasRef.current?.fillRegionAtPoint(
+            x,
+            y,
+            color,
+            true,
+            boundary ?? undefined,
+          );
+        }
+        index = end;
+
+        if (index < scaledPoints.length) {
+          requestAnimationFrame(fillBatch);
+        } else {
+          setIsAutoColoring(false);
+          setHasAutoColored(true);
+          setActiveTool('brush');
+          playSound('sparkle');
+          setHasUnsavedChanges(true);
+        }
+      };
+
+      requestAnimationFrame(fillBatch);
+    }, [
+      regionStore.state.isReady,
+      regionStore.state.width,
+      regionStore.state.height,
+      regionStore.getAllColorsForAutoFill,
+      paletteVariant,
+      playSound,
+      setHasUnsavedChanges,
+      setIsAutoColoring,
+      setHasAutoColored,
     ]);
 
     // Handle direct auto-color using fill points (bypasses region detection)
@@ -609,7 +677,13 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     useEffect(() => {
       if (activeTool !== 'magic-auto' || !canvasReadyRef.current) return;
 
-      // Prefer reference image (holistic AI coloring)
+      // Prefer region store (pre-computed, palette-aware, most accurate)
+      if (regionStore.state.isReady) {
+        handleRegionStoreAutoColor();
+        return;
+      }
+
+      // Fallback: reference image (holistic AI coloring)
       if (hasColoredReference && referenceColor.state.isReady) {
         handleReferenceAutoColor();
         return;
@@ -627,6 +701,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }
     }, [
       activeTool,
+      regionStore.state.isReady,
+      handleRegionStoreAutoColor,
       hasColoredReference,
       referenceColor.state.isReady,
       handleReferenceAutoColor,
