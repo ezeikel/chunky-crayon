@@ -27,6 +27,10 @@ import {
 } from "@one-colored-pixel/coloring-ui";
 import { useSound } from "@one-colored-pixel/coloring-ui";
 import { useReferenceColor } from "@one-colored-pixel/coloring-ui";
+import {
+  useRegionStore,
+  type RegionStoreJson,
+} from "@one-colored-pixel/coloring-ui";
 import { useMagicColorMap } from "@/hooks/useMagicColorMap";
 import type { GridColorMap, FillPointsData } from "@/lib/ai";
 import {
@@ -137,6 +141,25 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       getDirectFillPoints,
       reset: resetMagicColorMap,
     } = useMagicColorMap({ preComputedColorMap, fillPointsData });
+
+    // Region store — pre-computed region map for reveal-mask magic brush
+    const parsedRegionsJson = useMemo<RegionStoreJson | null>(() => {
+      if (!coloringImage.regionsJson) return null;
+      try {
+        return JSON.parse(
+          coloringImage.regionsJson as string,
+        ) as RegionStoreJson;
+      } catch {
+        return null;
+      }
+    }, [coloringImage.regionsJson]);
+
+    const regionStore = useRegionStore({
+      regionMapUrl: coloringImage.regionMapUrl as string | undefined,
+      regionMapWidth: coloringImage.regionMapWidth as number | undefined,
+      regionMapHeight: coloringImage.regionMapHeight as number | undefined,
+      regionsJson: parsedRegionsJson,
+    });
 
     // Handle first canvas interaction - load and play ambient sound
     // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
@@ -835,7 +858,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // Determine which color source to use for magic tools
     const useReferenceForMagic =
       hasColoredReference && referenceColor.state.isReady;
-    const isMagicReady = useReferenceForMagic || magicColorMapState.isReady;
+    const isMagicReady =
+      regionStore.state.isReady ||
+      useReferenceForMagic ||
+      magicColorMapState.isReady;
 
     return (
       <div className="flex flex-col gap-y-2 md:gap-y-3">
@@ -885,6 +911,17 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
               useReferenceForMagic ? undefined : handleRegionRevealed
             }
             isMagicRevealReady={isMagicReady}
+            regionStore={
+              regionStore.state.isReady
+                ? {
+                    getRegionIdAt: regionStore.getRegionIdAt,
+                    getColorForRegion: regionStore.getColorForRegion,
+                    isReady: regionStore.state.isReady,
+                    width: regionStore.state.width,
+                    height: regionStore.state.height,
+                  }
+                : undefined
+            }
           />
 
           {/* Magic Loading Overlay - Shows when magic tools are analyzing the image */}
