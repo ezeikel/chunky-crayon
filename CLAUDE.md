@@ -129,10 +129,17 @@ Use semantic commit style (`type(scope): message`). Keep messages as one-liners,
 
 ## Key Features
 
-- Magic Brush/Auto-Color: Uses pre-computed `colorMapJson` for instant color mapping (no AI call at runtime)
+- Magic Brush/Auto-Color: Uses pre-computed region store (`regionMapUrl` + `regionsJson`) with 4 palette variants (realistic/pastel/cute/surprise). Source-in compositing for per-pixel region-accurate brush reveal. Falls back to legacy `colorMapJson`/`fillPointsJson` for unbackfilled images.
 - Ambient Sound: Generated via ElevenLabs, stored in `ambientSoundUrl` field
 - Colo mascot: Evolving character that grows with user's coloring activity
 - Daily Scene Generation: Perplexity Sonar generates seasonal/trending scene descriptions for daily coloring images, with content safety blocklist and dedup
+
+## Dev-Only Debug Tools
+
+**Do NOT delete these pages** — they are permanent dev tools for debugging and improving the coloring experience:
+
+- **Region Store Debug Viewer**: `/en/dev/region-store/[id]` on both CC (port 3000) and CH (port 3001). Shows region fills, palette variants, hover labels, stats, and has a "Regenerate" button. Gated by `NODE_ENV=development`.
+- **Region Store Regenerate API**: `POST /api/dev/regenerate-region-store/[id]` on both apps. Callable via curl for scripted regeneration.
 
 ## AI Prompt Optimization
 
