@@ -38,6 +38,10 @@ export const getColoringImageBase = async (
       colorMapJson: true,
       fillPointsJson: true,
       coloredReferenceUrl: true,
+      regionMapUrl: true,
+      regionMapWidth: true,
+      regionMapHeight: true,
+      regionsJson: true,
     },
   });
 };

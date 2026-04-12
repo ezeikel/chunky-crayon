@@ -162,6 +162,26 @@ type ImageCanvasProps = {
   onRegionRevealed?: (regionId: number) => void;
   /** Whether magic brush reveal mode is ready */
   isMagicRevealReady?: boolean;
+  /**
+   * Pre-computed region store for reveal-mask magic brush (new path).
+   * When provided, the magic-reveal tool uses this instead of the legacy
+   * getRevealColor/getRevealColorFromCSS callbacks. Provides O(1) region
+   * lookup and per-region palette colours with region-boundary clipping.
+   */
+  regionStore?: {
+    /** O(1) pixel→regionId lookup at region-map coordinates */
+    getRegionIdAt: (x: number, y: number) => number;
+    /** Get hex colour for a region in the active palette variant */
+    getColorForRegion: (
+      regionId: number,
+      variant: import("./types").PaletteVariant,
+    ) => string | null;
+    /** Whether the region store data is loaded and ready */
+    isReady: boolean;
+    /** Region map dimensions (typically 1024×1024) */
+    width: number;
+    height: number;
+  };
 };
 
 export type ImageCanvasHandle = {
@@ -218,6 +238,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       getRevealRegionId,
       onRegionRevealed,
       isMagicRevealReady,
+      regionStore,
     },
     ref,
   ) => {
@@ -243,6 +264,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       setZoom,
       setPanOffset,
       customBrushRadius,
+      paletteVariant,
       variant,
     } = useColoringContext();
     const {
@@ -1317,12 +1339,39 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         // For magic-reveal, dynamically look up the color at this position
         let strokeColor = selectedColor;
         let strokeBrushType = brushType;
+        // Hoisted so it's accessible in the post-dab region clipping block
+        let revealRegionId: number | undefined;
 
         if (activeTool === "magic-reveal") {
           let revealColor: string | null = null;
 
-          if (getRevealColorFromCSS) {
-            // Reference image path — sample from AI-colored reference using CSS coords
+          if (regionStore?.isReady) {
+            // ── New path: pre-computed region store ──
+            // Convert CSS canvas coordinates to region-map coordinates.
+            // The region map is at a fixed resolution (typically 1024×1024)
+            // while the drawing canvas is at CSS width × DPR. We need to
+            // map from CSS coords → region-map coords.
+            const cssWidth =
+              parseFloat(drawingCanvas.style.width) ||
+              drawingCanvas.clientWidth;
+            const cssHeight =
+              parseFloat(drawingCanvas.style.height) ||
+              drawingCanvas.clientHeight;
+            const regionX = Math.floor((x / cssWidth) * regionStore.width);
+            const regionY = Math.floor((y / cssHeight) * regionStore.height);
+
+            revealRegionId = regionStore.getRegionIdAt(regionX, regionY);
+            if (revealRegionId > 0) {
+              revealColor = regionStore.getColorForRegion(
+                revealRegionId,
+                paletteVariant,
+              );
+              if (revealColor && onRegionRevealed) {
+                onRegionRevealed(revealRegionId);
+              }
+            }
+          } else if (getRevealColorFromCSS) {
+            // ── Legacy path: reference image ──
             const cssWidth =
               parseFloat(drawingCanvas.style.width) ||
               drawingCanvas.clientWidth;
@@ -1331,7 +1380,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               drawingCanvas.clientHeight;
             revealColor = getRevealColorFromCSS(x, y, cssWidth, cssHeight);
           } else if (getRevealColor && getRevealRegionId) {
-            // Legacy region-based path — DPR-scaled coordinates
+            // ── Legacy path: region-based ──
             const scaledX = Math.floor(x * dpr);
             const scaledY = Math.floor(y * dpr);
             const regionId = getRevealRegionId(scaledX, scaledY);
@@ -1386,6 +1435,90 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               brushType: strokeBrushType,
               pressure,
             });
+          }
+        }
+
+        // ── Region-boundary clipping for magic-reveal with region store ──
+        // After the dab is drawn, erase any pixels that fall outside the
+        // target region. This clips the brush stroke to the region boundary
+        // so it never bleeds across lines into adjacent regions.
+        if (
+          activeTool === "magic-reveal" &&
+          regionStore?.isReady &&
+          revealRegionId !== undefined &&
+          revealRegionId > 0
+        ) {
+          const canvasW = drawingCanvas.width;
+          const canvasH = drawingCanvas.height;
+          const regionW = regionStore.width;
+          const regionH = regionStore.height;
+
+          // Bounding box of the dab in CSS coords, then scale to canvas pixels
+          const dabR = radius * 1.2; // slight margin for textured brush scatter
+          const x0 = Math.max(0, Math.floor((x - dabR) * dpr));
+          const y0 = Math.max(0, Math.floor((y - dabR) * dpr));
+          const x1 = Math.min(canvasW, Math.ceil((x + dabR) * dpr));
+          const y1 = Math.min(canvasH, Math.ceil((y + dabR) * dpr));
+          const bw = x1 - x0;
+          const bh = y1 - y0;
+
+          if (bw > 0 && bh > 0) {
+            // Read the dab area from the drawing canvas
+            const dabData = drawingCtx.getImageData(x0, y0, bw, bh);
+            const { data } = dabData;
+            let modified = false;
+
+            for (let py = 0; py < bh; py++) {
+              for (let px = 0; px < bw; px++) {
+                // Map canvas pixel → region map pixel
+                const canvasPx = x0 + px;
+                const canvasPy = y0 + py;
+                const regionPx = Math.floor((canvasPx / canvasW) * regionW);
+                const regionPy = Math.floor((canvasPy / canvasH) * regionH);
+                const rid = regionStore.getRegionIdAt(regionPx, regionPy);
+
+                // If this pixel belongs to a different region (or is a
+                // boundary), erase it by setting alpha to 0
+                if (rid !== revealRegionId) {
+                  const i = (py * bw + px) * 4;
+                  if (data[i + 3] > 0) {
+                    data[i + 3] = 0;
+                    modified = true;
+                  }
+                }
+              }
+            }
+
+            if (modified) {
+              drawingCtx.putImageData(dabData, x0, y0);
+
+              // Also clip the offscreen canvas
+              if (offScreenCanvasRef.current) {
+                const offCtx = offScreenCanvasRef.current.getContext("2d");
+                if (offCtx) {
+                  const offDab = offCtx.getImageData(x0, y0, bw, bh);
+                  const offData = offDab.data;
+                  for (let py = 0; py < bh; py++) {
+                    for (let px = 0; px < bw; px++) {
+                      const canvasPx = x0 + px;
+                      const canvasPy = y0 + py;
+                      const regionPx = Math.floor(
+                        (canvasPx / canvasW) * regionW,
+                      );
+                      const regionPy = Math.floor(
+                        (canvasPy / canvasH) * regionH,
+                      );
+                      const rid = regionStore.getRegionIdAt(regionPx, regionPy);
+                      if (rid !== revealRegionId) {
+                        const i = (py * bw + px) * 4;
+                        offData[i + 3] = 0;
+                      }
+                    }
+                  }
+                  offCtx.putImageData(offDab, x0, y0);
+                }
+              }
+            }
           }
         }
 
