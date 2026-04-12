@@ -61,11 +61,12 @@ function parseArgs(argv: string[]): Args {
 }
 
 // ---------------------------------------------------------------------------
-// HTTP call to the dev regenerate endpoint
+// HTTP call + DB poll for the dev regenerate endpoint
 // ---------------------------------------------------------------------------
 type RegenerateResponse = {
   success: boolean;
   error?: string;
+  source?: "http" | "db-poll"; // which signal we used to declare done
   elapsedMs?: number;
   regionCount?: number;
   gzippedBytes?: number;
@@ -74,31 +75,135 @@ type RegenerateResponse = {
   height?: number;
 };
 
+/**
+ * Poll the DB for this image until its regionsGeneratedAt is newer than the
+ * recorded startedAt (meaning a completed save happened after we fired the
+ * POST), or the hard timeout is hit.
+ *
+ * Returns success:true with basic metadata as soon as the row updates.
+ * Returns success:false on timeout.
+ */
+async function waitForRegionStoreSave(
+  id: string,
+  startedAt: Date,
+  timeoutMs: number,
+  pollIntervalMs = 15_000,
+): Promise<RegenerateResponse> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, pollIntervalMs));
+    const row = await db.coloringImage.findUnique({
+      where: { id },
+      select: {
+        regionMapUrl: true,
+        regionMapWidth: true,
+        regionMapHeight: true,
+        regionsGeneratedAt: true,
+        regionsJson: true,
+      },
+    });
+    if (
+      row?.regionMapUrl &&
+      row.regionsGeneratedAt &&
+      row.regionsGeneratedAt.getTime() > startedAt.getTime()
+    ) {
+      // Parse regionsJson loosely to extract region count for logging
+      let regionCount: number | undefined;
+      try {
+        const parsed = JSON.parse(row.regionsJson ?? "{}");
+        regionCount = Array.isArray(parsed?.regions)
+          ? parsed.regions.length
+          : undefined;
+      } catch {
+        /* ignore */
+      }
+      return {
+        success: true,
+        source: "db-poll",
+        width: row.regionMapWidth ?? undefined,
+        height: row.regionMapHeight ?? undefined,
+        regionCount,
+      };
+    }
+  }
+  return {
+    success: false,
+    source: "db-poll",
+    error: `DB save did not land within ${Math.round(timeoutMs / 60000)} min`,
+  };
+}
+
+/**
+ * Regenerate one image by POSTing the dev route, then race the HTTP response
+ * against a DB poll. Whichever wins first determines success.
+ *
+ * - Happy path (image < ~4 min): HTTP response arrives with full metadata.
+ * - Slow path (image > 5 min, Next's dev response cap kicks in): HTTP throws
+ *   or closes, DB poll sees the save land and returns success.
+ * - Failure path: both paths fail — HTTP errors AND DB poll times out.
+ *
+ * The dev route handler runs to completion in-process even if Next closes
+ * the HTTP response, so the DB save happens regardless of client-side
+ * aborts.
+ */
 async function regenerateOne(
   id: string,
   baseUrl: string,
+  perImageTimeoutMs = 20 * 60 * 1000,
 ): Promise<RegenerateResponse> {
-  // No AbortController: the dev server will finish whenever it finishes, and
-  // aborting the client-side fetch doesn't stop the server-side work — it
-  // just causes us to miss the response and mis-report a success as a
-  // failure. Running locally, there's no reason to enforce a client-side
-  // timeout; if the script hangs we'll Ctrl-C it manually.
-  try {
-    const resp = await fetch(
-      `${baseUrl}/api/dev/regenerate-region-store/${id}`,
-      { method: "POST" },
-    );
-    const body = (await resp.json()) as RegenerateResponse;
-    if (!resp.ok && body.success !== false) {
-      return { success: false, error: `HTTP ${resp.status}` };
+  const startedAt = new Date();
+
+  // HTTP leg — fire the POST, handle success/failure normally
+  const httpLeg = (async (): Promise<RegenerateResponse> => {
+    try {
+      const resp = await fetch(
+        `${baseUrl}/api/dev/regenerate-region-store/${id}`,
+        { method: "POST" },
+      );
+      const body = (await resp.json()) as RegenerateResponse;
+      if (!resp.ok && body.success !== false) {
+        return { success: false, source: "http", error: `HTTP ${resp.status}` };
+      }
+      return { ...body, source: "http" };
+    } catch (err) {
+      return {
+        success: false,
+        source: "http",
+        error: err instanceof Error ? err.message : String(err),
+      };
     }
-    return body;
-  } catch (err) {
-    return {
-      success: false,
-      error: err instanceof Error ? err.message : String(err),
-    };
+  })();
+
+  // DB poll leg — waits for regionsGeneratedAt to update
+  const dbLeg = waitForRegionStoreSave(id, startedAt, perImageTimeoutMs);
+
+  // Race the two. The DB poll only returns success if the save lands; it
+  // returns failure only after the full timeout. So if HTTP succeeds fast,
+  // it wins. If HTTP fails (server closed response), DB poll wins once the
+  // save happens. If both fail, HTTP fails fast and DB times out later.
+  const raced = await Promise.race([
+    httpLeg.then((r) => ({ result: r, done: r.success })),
+    dbLeg.then((r) => ({ result: r, done: r.success })),
+  ]);
+
+  if (raced.done) {
+    return raced.result;
   }
+
+  // HTTP failed (or returned !success) before DB poll fired. Wait for the
+  // DB poll to finish — it might still land the save.
+  const dbResult = await dbLeg;
+  if (dbResult.success) {
+    return dbResult;
+  }
+
+  // Both paths failed — return whichever has a more useful error
+  const httpResult = await httpLeg;
+  return {
+    success: false,
+    source: "db-poll",
+    error: `http: ${httpResult.error ?? "unknown"} | db: ${dbResult.error ?? "unknown"}`,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -199,8 +304,10 @@ async function main() {
 
     if (result.success) {
       okCount++;
+      const gz = result.gzippedBytes ? `${result.gzippedBytes}B gz` : "";
+      const via = result.source === "db-poll" ? " [via db-poll]" : "";
       console.log(
-        `${label} ✅ ${result.regionCount ?? "?"} regions, ${result.gzippedBytes ?? "?"}B gz, ${(itemMs / 1000).toFixed(1)}s`,
+        `${label} ✅ ${result.regionCount ?? "?"} regions${gz ? ", " + gz : ""}, ${(itemMs / 1000).toFixed(1)}s${via}`,
       );
     } else {
       failCount++;
