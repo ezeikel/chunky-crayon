@@ -36,7 +36,7 @@
       "pan": "Mover",
       "fill": "Rellenar",
       "brush": "Pincel",
-      "sticker": "Adhesivo",
+      "sticker": "Sticker",
       "magicReveal": "Revelado mágico",
       "magicAuto": "Auto mágico",
       "magicBrush": "Pincel mágico",
@@ -75,7 +75,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Compartido",
+      "doneSharing": "Listo",
       "colorAgain": "Colorear de nuevo",
       "startOver": "Empezar de nuevo"
     },
@@ -355,7 +355,7 @@
         "description": "Comienza tu viaje de colorear",
         "cta": "Comenzar gratis",
         "features": [
-          "2 creaciones gratuitas diarias",
+          "2 creaciones gratuitas para empezar",
           "Acceso a la biblioteca gratuita",
           "Lienzo de colorear en línea",
           "Descargas en PDF"
@@ -461,7 +461,7 @@
       "intermediate": {
         "title": "Intermedio",
         "shortLabel": "Medio",
-        "description": "Detalle moderado para una sesión tranquila y reconfortante"
+        "description": "Detalle moderado para una sesión más larga y tranquilizadora"
       },
       "advanced": {
         "title": "Avanzado",
@@ -471,7 +471,7 @@
       "expert": {
         "title": "Experto",
         "shortLabel": "Experto",
-        "description": "Piezas intrincadas para un estado de flujo meditativo"
+        "description": "Piezas intrincadas para un flujo meditativo profundo"
       }
     },
     "categories": {
