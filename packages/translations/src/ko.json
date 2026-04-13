@@ -1,14 +1,14 @@
 {
   "common": {
     "loading": "불러오는 중...",
-    "error": "문제가 생겼어요",
+    "error": "문제가 발생했습니다",
     "retry": "다시 해보기",
     "save": "저장",
     "cancel": "취소",
     "close": "닫기",
     "done": "완료",
     "copy": "복사",
-    "copied": "복사했어요!",
+    "copied": "복사됨",
     "credits": "크레딧",
     "creditsWithCount": "{count} 크레딧",
     "loadMore": "더 보기"
@@ -39,15 +39,15 @@
   },
   "coloringPage": {
     "title": "색칠하기",
-    "defaultDescription": "Chunky Crayon의 무료 프린트 색칠공부",
+    "defaultDescription": "무료 인쇄용 색칠하기 페이지",
     "progress": {
       "colored": "색칠됨",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "좋은 시작!",
-        "50": "반이나 왔어요!",
-        "75": "거의 다 됐어요!",
-        "100": "최고예요!"
+        "25": "잘 시작했어요!",
+        "50": "절반 완성했어요!",
+        "75": "거의 완성했어요!",
+        "100": "완성했어요!"
       }
     },
     "sidebar": {
@@ -119,7 +119,7 @@
     },
     "colorPalette": {
       "selectColor": "{color} 색 선택",
-      "magicToolsMessage": "마법 도구는 색을 자동으로 골라요"
+      "magicToolsMessage": "마법 도구는 색을 자동으로 선택합니다"
     },
     "patternSelector": {
       "label": "무늬:"
@@ -354,8 +354,8 @@
     }
   },
   "errors": {
-    "generic": "문제가 생겼어요. 다시 시도해 주세요.",
-    "notFound": "페이지를 찾을 수 없어요",
+    "generic": "문제가 발생했습니다. 다시 시도해 주세요.",
+    "notFound": "페이지를 찾을 수 없습니다",
     "sharedArtworkNotFound": {
       "title": "그림을 찾을 수 없어요",
       "description": "공유된 그림 링크가 만료되었거나 삭제되었을 수 있어요. 그림 만든 사람에게 새 링크를 부탁해 보세요!",
@@ -363,7 +363,7 @@
     },
     "unauthorized": "계속하려면 로그인해 주세요",
     "stripeLoadFailed": "Stripe를 불러오지 못했어요",
-    "checkoutFailed": "결제 세션을 만들지 못했어요",
+    "checkoutFailed": "결제 세션을 생성하지 못했습니다",
     "unexpectedError": "예기치 못한 오류가 발생했어요. 다시 시도해 주세요.",
     "redirectFailed": "결제 페이지로 이동하지 못했어요"
   },
