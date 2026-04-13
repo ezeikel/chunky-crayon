@@ -1,63 +1,90 @@
 "use client";
 
-import { ALL_COLORING_COLORS, TRACKING_EVENTS } from "./types";
+import {
+  COLORING_PALETTE_VARIANTS,
+  PALETTE_VARIANTS,
+  TRACKING_EVENTS,
+  type PaletteVariant,
+} from "./types";
 import { useColoringContext } from "./context";
 import { useSound } from "./useSound";
 import cn from "./cn";
 import { trackEvent } from "./analytics-client";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPalette } from "@fortawesome/pro-duotone-svg-icons";
 import { useTranslations } from "next-intl";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPalette,
+  faIceCream,
+  faHeart,
+  faDice,
+} from "@fortawesome/pro-duotone-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 type DesktopColorPaletteProps = {
   className?: string;
 };
 
+const variantIcons: Record<PaletteVariant, IconDefinition> = {
+  realistic: faPalette,
+  pastel: faIceCream,
+  cute: faHeart,
+  surprise: faDice,
+};
+
 /**
- * Desktop-only vertical color palette for sidebar layout
- * Displays colors in a 4-column grid optimized for sidebar width
+ * Desktop-only vertical color palette for sidebar layout.
+ *
+ * Top of the panel: 4 mood tabs (realistic/pastel/cute/surprise). Tapping a
+ * mood swaps the swatch grid AND drives the same paletteVariant the magic
+ * tools use — one knob, two effects.
  */
 const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
   const t = useTranslations("coloringPage");
-  const { selectedColor, setSelectedColor, activeTool } = useColoringContext();
+  const { selectedColor, setSelectedColor, paletteVariant, setPaletteVariant } =
+    useColoringContext();
   const { playSound } = useSound();
 
-  // Disable palette when magic tools are active (they use AI-assigned colors)
-  const isMagicToolActive =
-    activeTool === "magic-reveal" || activeTool === "magic-auto";
+  const colors = COLORING_PALETTE_VARIANTS[paletteVariant];
 
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 p-4 bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-coloring-surface-dark shadow-lg",
+        "@container flex flex-col gap-3 p-4 bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-coloring-surface-dark shadow-lg",
         className,
       )}
     >
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <FontAwesomeIcon
-          icon={faPalette}
-          className="size-5 text-coloring-accent"
-        />
-        <h3 className="font-tondo font-bold text-sm text-text-primary">
-          {t("sidebar.colors")}
-        </h3>
+      {/* Mood tabs — 2×2 tiles aligned to match the colour grid below. */}
+      <div className="grid grid-cols-2 gap-2">
+        {PALETTE_VARIANTS.map((variant) => {
+          const isActive = paletteVariant === variant;
+          return (
+            <button
+              key={variant}
+              type="button"
+              onClick={() => {
+                setPaletteVariant(variant);
+                playSound("tap");
+              }}
+              aria-label={variant}
+              aria-pressed={isActive}
+              title={variant}
+              className={cn(
+                "flex items-center justify-center h-12 @[200px]:h-14 w-full rounded-coloring-card transition-all duration-coloring-base ease-coloring",
+                "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
+                isActive
+                  ? "bg-coloring-accent text-white"
+                  : "bg-white border border-paper-cream-dark text-text-primary hover:bg-paper-cream",
+              )}
+            >
+              <FontAwesomeIcon icon={variantIcons[variant]} size="xl" />
+            </button>
+          );
+        })}
       </div>
 
-      {/* Color Grid - 4 columns for sidebar width */}
-      {/* Math: 4×32px buttons + 3×6px gaps = 146px, fits in 180px - 32px padding = 148px */}
-      <div
-        className={cn(
-          "grid grid-cols-4 gap-1.5",
-          "transition-opacity duration-200",
-          isMagicToolActive && "opacity-40 pointer-events-none",
-        )}
-        aria-disabled={isMagicToolActive}
-        title={
-          isMagicToolActive ? t("colorPalette.magicToolsMessage") : undefined
-        }
-      >
-        {ALL_COLORING_COLORS.map((color, index) => {
+      {/* Color grid — 3 columns. Swatches shrink at narrow container widths. */}
+      <div className="grid grid-cols-3 gap-2">
+        {colors.map((color, index) => {
           const isSelected = selectedColor === color.hex;
           const isWhite = color.hex === "#FFFFFF";
 
@@ -65,19 +92,14 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
             <button
               type="button"
               className={cn(
-                "size-8 rounded-full shadow-md transition-all duration-150 ease-out",
+                // Swatches shrink at narrow container widths so the row stays balanced.
+                "size-10 @[200px]:size-12 rounded-full shadow-md transition-all duration-coloring-base ease-coloring",
                 "hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coloring-accent",
-                {
-                  "ring-2 ring-offset-2 ring-gray-800 scale-110":
-                    isSelected && !isMagicToolActive,
-                  "border border-gray-300": isWhite,
-                },
+                isSelected && "ring-2 ring-offset-2 ring-gray-800 scale-110",
+                isWhite && "border border-gray-300",
               )}
-              style={{
-                backgroundColor: color.hex,
-              }}
+              style={{ backgroundColor: color.hex }}
               onClick={() => {
-                if (isMagicToolActive) return;
                 trackEvent(TRACKING_EVENTS.PAGE_COLOR_SELECTED, {
                   color: color.hex,
                   colorName: color.name,
@@ -86,13 +108,8 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
                 setSelectedColor(color.hex);
                 playSound("tap");
               }}
-              disabled={isMagicToolActive}
               aria-label={t("colorPalette.selectColor", { color: color.name })}
-              title={
-                isMagicToolActive
-                  ? t("colorPalette.magicToolsMessage")
-                  : color.name
-              }
+              title={color.name}
               key={color.hex}
             />
           );

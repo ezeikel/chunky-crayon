@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroomWide } from "@fortawesome/pro-solid-svg-icons";
+import { ActionButton } from "@one-colored-pixel/coloring-ui";
 import cn from "@/utils/cn";
 
 type StartOverButtonProps = {
@@ -11,11 +11,6 @@ type StartOverButtonProps = {
   className?: string;
   disabled?: boolean;
 };
-
-// Button: matches Print button style but secondary color (accent)
-// Responsive: icon-only on mobile (44px touch target), icon+text on desktop
-const buttonClassName =
-  "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-accent hover:bg-accent/90 active:scale-95 transition-all duration-150";
 
 const StartOverButton = ({
   onStartOver,
@@ -27,57 +22,45 @@ const StartOverButton = ({
 
   const handleClick = () => {
     if (showConfirm) {
-      // User confirmed, execute start over
       onStartOver();
       setShowConfirm(false);
     } else {
-      // Show confirmation
       setShowConfirm(true);
-      // Auto-hide confirmation after 3 seconds
       setTimeout(() => setShowConfirm(false), 3000);
     }
-  };
-
-  const handleCancel = () => {
-    setShowConfirm(false);
   };
 
   if (showConfirm) {
     return (
       <div className={cn("flex flex-col gap-2", className)}>
-        <button
-          type="button"
+        <ActionButton
+          size="compact"
+          tone="destructive"
+          icon={faBroomWide}
+          label={t("confirm")}
           onClick={handleClick}
-          className="flex items-center justify-center gap-x-2 text-white font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-destructive hover:bg-destructive/90 active:scale-95 transition-all duration-150"
-        >
-          <FontAwesomeIcon icon={faBroomWide} className="text-base" />
-          <span>{t("confirm")}</span>
-        </button>
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="flex items-center justify-center text-muted-foreground font-bold text-sm px-4 py-2.5 rounded-full shadow-lg bg-white hover:bg-secondary active:scale-95 transition-all duration-150 border-2 border-border"
-        >
-          {t("cancel")}
-        </button>
+        />
+        <ActionButton
+          size="compact"
+          tone="outline"
+          icon={faBroomWide}
+          label={t("cancel")}
+          onClick={() => setShowConfirm(false)}
+        />
       </div>
     );
   }
 
   return (
-    <button
-      type="button"
+    <ActionButton
+      size="compact"
+      tone="secondary"
+      icon={faBroomWide}
+      label={t("idle")}
       onClick={handleClick}
       disabled={disabled}
-      className={cn(
-        buttonClassName,
-        disabled && "opacity-50 cursor-not-allowed",
-        className,
-      )}
-    >
-      <FontAwesomeIcon icon={faBroomWide} className="text-xl md:text-2xl" />
-      <span className="hidden md:inline">{t("idle")}</span>
-    </button>
+      className={className}
+    />
   );
 };
 

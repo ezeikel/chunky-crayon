@@ -28,31 +28,24 @@ const ColoringToolbar = ({
   return (
     <div className={cn("flex flex-col gap-3 w-full", className)}>
       {/* Color Palette - Full width */}
-      <ColorPalette className="shadow-lg" />
+      <ColorPalette />
 
       {/* Tools Row - Responsive layout */}
       <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
         {/* Tool Selector (Brush/Fill/Eraser/Sticker) */}
-        <ToolSelector
-          className="shadow-lg"
-          onStickerToolSelect={onStickerToolSelect}
-        />
+        <ToolSelector onStickerToolSelect={onStickerToolSelect} />
 
         {/* Pattern Selector - adults only, shows when fill tool is active */}
-        {!isKids && <PatternSelector className="shadow-lg" />}
+        {!isKids && <PatternSelector />}
 
         {/* Brush Size Selector */}
-        <BrushSizeSelector className="shadow-lg" />
+        <BrushSizeSelector />
 
         {/* Undo/Redo */}
-        <UndoRedoButtons
-          className="shadow-lg"
-          onUndo={onUndo}
-          onRedo={onRedo}
-        />
+        <UndoRedoButtons onUndo={onUndo} onRedo={onRedo} />
 
         {/* Zoom Controls - adults only (kids use pinch-to-zoom) */}
-        {!isKids && <ZoomControls className="shadow-lg" />}
+        {!isKids && <ZoomControls />}
       </div>
     </div>
   );

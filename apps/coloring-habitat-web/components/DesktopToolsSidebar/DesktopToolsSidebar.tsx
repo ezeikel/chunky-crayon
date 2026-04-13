@@ -654,17 +654,11 @@ const DesktopToolsSidebar = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          {onStartOver && (
-            <StartOverButton
-              onStartOver={onStartOver}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
-            />
-          )}
+          {onStartOver && <StartOverButton onStartOver={onStartOver} />}
           {coloringImage && (
             <DownloadPDFButton
               coloringImage={coloringImage}
               getCanvasDataUrl={getCanvasDataUrl}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
             />
           )}
           <ShareButton
@@ -673,13 +667,11 @@ const DesktopToolsSidebar = ({
             description={`Color this ${coloringImage?.title || "fun coloring page"} on Coloring Habitat!`}
             imageUrl={coloringImage?.url || undefined}
             getCanvasDataUrl={getCanvasDataUrl}
-            className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
           />
           {isAuthenticated && coloringImage?.id && (
             <SaveToGalleryButton
               coloringImageId={coloringImage.id}
               getCanvasDataUrl={getCanvasDataUrl!}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
             />
           )}
         </div>

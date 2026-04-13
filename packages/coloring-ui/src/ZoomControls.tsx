@@ -158,7 +158,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-1 p-2 rounded-lg bg-white/90 backdrop-blur-sm transition-colors duration-200",
+        "flex items-center gap-1 p-2 rounded-coloring-card bg-white/90 backdrop-blur-sm transition-colors duration-200",
         isZoomed && "ring-2 ring-coloring-accent/30",
         className,
       )}
@@ -169,7 +169,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         onClick={handleZoomOut}
         disabled={isAtMinZoom}
         className={cn(
-          "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
+          "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-coloring-card transition-all duration-coloring-base ease-coloring",
           "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           {
             "opacity-50 cursor-not-allowed hover:bg-transparent": isAtMinZoom,
@@ -190,7 +190,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         onClick={handleZoomIn}
         disabled={isAtMaxZoom}
         className={cn(
-          "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
+          "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-coloring-card transition-all duration-coloring-base ease-coloring",
           "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           {
             "opacity-50 cursor-not-allowed hover:bg-transparent": isAtMaxZoom,
@@ -208,7 +208,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
           type="button"
           onClick={handlePanToggle}
           className={cn(
-            "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
+            "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-coloring-card transition-all duration-coloring-base ease-coloring",
             "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
             isPanActive &&
               "bg-coloring-accent text-white hover:bg-coloring-accent/90",
@@ -231,7 +231,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
           onClick={handleResetView}
           disabled={isAtDefaultView}
           className={cn(
-            "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
+            "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-coloring-card transition-all duration-coloring-base ease-coloring",
             "bg-coloring-accent/10 hover:bg-coloring-accent/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           )}
           aria-label="Go back to full picture"

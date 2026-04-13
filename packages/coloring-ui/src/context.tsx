@@ -168,7 +168,7 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setIsMuted: () => {},
   isSfxMuted: false,
   setIsSfxMuted: () => {},
-  isAmbientMuted: false,
+  isAmbientMuted: true,
   setIsAmbientMuted: () => {},
   hasUnsavedChanges: false,
   setHasUnsavedChanges: () => {},
@@ -225,7 +225,9 @@ export const ColoringContextProvider = ({
   // Audio state - initialize with defaults, hydrate from localStorage after mount
   const [isMuted, setIsMuted] = useState(false);
   const [isSfxMuted, setIsSfxMuted] = useState(false);
-  const [isAmbientMuted, setIsAmbientMuted] = useState(false);
+  // Music defaults to OFF — kids find ambient music intrusive in coloring
+  // sessions; SFX (taps, completion) stays on.
+  const [isAmbientMuted, setIsAmbientMuted] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Hydrate audio settings from localStorage after mount (avoids SSR mismatch)

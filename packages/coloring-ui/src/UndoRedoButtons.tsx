@@ -67,7 +67,7 @@ const UndoRedoButtons = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-1 p-2 rounded-lg bg-white/90 backdrop-blur-sm",
+        "flex items-center gap-1 p-2 rounded-coloring-card bg-white/90 backdrop-blur-sm",
         className,
       )}
     >
@@ -76,7 +76,7 @@ const UndoRedoButtons = ({
         onClick={handleUndo}
         disabled={!canUndo}
         className={cn(
-          "flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150",
+          "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card transition-all duration-coloring-base ease-coloring",
           "focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           {
             "hover:bg-gray-100 active:scale-95 text-gray-700": canUndo,
@@ -94,7 +94,7 @@ const UndoRedoButtons = ({
         onClick={handleRedo}
         disabled={!canRedo}
         className={cn(
-          "flex items-center justify-center size-10 sm:size-12 rounded-lg transition-all duration-150",
+          "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card transition-all duration-coloring-base ease-coloring",
           "focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           {
             "hover:bg-gray-100 active:scale-95 text-gray-700": canRedo,

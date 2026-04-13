@@ -47,7 +47,7 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-2 p-2 rounded-lg bg-white/90 backdrop-blur-sm",
+        "flex items-center gap-2 p-2 rounded-coloring-card bg-white/90 backdrop-blur-sm",
         { "gap-3": isKids },
         className,
       )}
@@ -63,7 +63,7 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
             key={size}
             onClick={() => handlePresetClick(size)}
             className={cn(
-              "flex items-center justify-center rounded-lg transition-all duration-150",
+              "flex items-center justify-center rounded-coloring-card transition-all duration-coloring-base ease-coloring",
               "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
               isKids ? "size-12 sm:size-14" : "size-10 sm:size-12",
               {
@@ -94,11 +94,11 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
             max={MAX_RADIUS}
             value={effectiveRadius}
             onChange={(e) => handleSliderChange(Number(e.target.value))}
-            className="w-20 sm:w-28 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-600"
+            className="w-20 sm:w-28 h-2 bg-gray-200 rounded-coloring-card appearance-none cursor-pointer accent-gray-600"
             aria-label="Brush size"
             title={`Size: ${effectiveRadius}px`}
           />
-          <span className="text-xs text-gray-500 tabular-nums w-6 text-right">
+          <span className="text-xs text-coloring-muted tabular-nums w-6 text-right">
             {effectiveRadius}
           </span>
         </div>

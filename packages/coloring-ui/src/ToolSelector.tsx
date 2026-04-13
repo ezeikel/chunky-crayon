@@ -233,7 +233,7 @@ const ToolSelector = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-1 p-2 rounded-lg bg-white/90 backdrop-blur-sm",
+        "flex items-center gap-1 p-2 rounded-coloring-card bg-white/90 backdrop-blur-sm shadow-coloring-surface",
         className,
       )}
     >
@@ -246,7 +246,7 @@ const ToolSelector = ({
             key={id}
             onClick={() => handleToolSelect(id)}
             className={cn(
-              "flex items-center justify-center rounded-lg transition-all duration-150",
+              "flex items-center justify-center rounded-coloring-card transition-all duration-coloring-base ease-coloring",
               "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
               isMagic
                 ? "flex-col gap-0.5 px-2 py-1 sm:px-3 sm:py-1.5 min-w-[3rem] sm:min-w-[3.5rem]"

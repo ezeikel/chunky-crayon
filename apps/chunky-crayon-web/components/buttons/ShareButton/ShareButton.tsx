@@ -2,12 +2,11 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShare, faSpinner } from '@fortawesome/pro-solid-svg-icons';
+import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import AdultGate from '@/components/AdultGate';
 import SocialShare from '@/components/SocialShare/SocialShare';
 import { uploadArtworkForSharing } from '@/app/actions/share-artwork';
-import cn from '@/utils/cn';
 
 type ShareButtonProps = {
   url: string;
@@ -19,11 +18,6 @@ type ShareButtonProps = {
 };
 
 type ShareState = 'idle' | 'gate' | 'uploading' | 'sharing';
-
-// Kid-friendly button style (matches Start Over button)
-// Responsive: icon-only on mobile (44px touch target), icon+text on desktop
-const buttonClassName =
-  'flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-crayon-purple hover:bg-crayon-purple-dark active:scale-95 transition-all duration-150';
 
 const ShareButton = ({
   url,
@@ -94,17 +88,14 @@ const ShareButton = ({
   // Show uploading state
   if (state === 'uploading') {
     return (
-      <button
-        type="button"
+      <ActionButton
+        size="tile"
+        tone="accent"
+        icon={faSpinner}
+        label={t('preparing')}
         disabled
-        className={cn(buttonClassName, 'cursor-wait opacity-80', className)}
-      >
-        <FontAwesomeIcon
-          icon={faSpinner}
-          className="text-xl md:text-2xl animate-spin"
-        />
-        <span className="hidden md:inline">{t('preparing')}</span>
-      </button>
+        className={className}
+      />
     );
   }
 
@@ -140,14 +131,14 @@ const ShareButton = ({
 
   // Default: show share button
   return (
-    <button
-      type="button"
+    <ActionButton
+      size="tile"
+      tone="accent"
+      icon={faShare}
+      label={t('idle')}
       onClick={handleShareClick}
-      className={cn(buttonClassName, className)}
-    >
-      <FontAwesomeIcon icon={faShare} className="text-xl md:text-2xl" />
-      <span className="hidden md:inline">{t('idle')}</span>
-    </button>
+      className={className}
+    />
   );
 };
 

@@ -66,7 +66,7 @@ const AutoColorModal = ({ className }: AutoColorModalProps) => {
           <p
             className={cn(
               "text-sm mt-1.5",
-              isKids ? "text-crayon-orange-dark/60" : "text-gray-500",
+              isKids ? "text-crayon-orange-dark/60" : "text-coloring-muted",
             )}
           >
             {isKids

@@ -8,6 +8,7 @@
 // Types and constants
 export {
   COLORING_PALETTE,
+  COLORING_PALETTE_VARIANTS,
   ALL_COLORING_COLORS,
   ALL_COLORING_COLORS_EXTENDED,
   BRUSH_SIZES,
@@ -78,7 +79,7 @@ export { default as MobileColoringDrawer } from "./MobileColoringDrawer";
 export { default as ColoringToolbar } from "./ColoringToolbar";
 export { default as ZoomControls } from "./ZoomControls";
 export { default as MuteToggle } from "./MuteToggle";
-export { default as AutoColorButton } from "./AutoColorButton";
+export { default as ActionButton, type ActionButtonTone } from "./ActionButton";
 export { default as BrushSizeSelector } from "./BrushSizeSelector";
 export { default as ToolSelector } from "./ToolSelector";
 export { default as PatternSelector } from "./PatternSelector";

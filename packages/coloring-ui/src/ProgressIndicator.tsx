@@ -75,7 +75,7 @@ const ProgressIndicator = ({ className }: ProgressIndicatorProps) => {
           style={{ width: `${coloringProgress}%` }}
         />
       </div>
-      <span className="text-xs text-gray-500 tabular-nums">
+      <span className="text-xs text-coloring-muted tabular-nums">
         {coloringProgress}%
       </span>
     </div>

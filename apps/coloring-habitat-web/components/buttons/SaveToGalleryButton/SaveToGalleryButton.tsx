@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faSpinner, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { ActionButton } from "@one-colored-pixel/coloring-ui";
 import { saveArtworkToGallery } from "@/app/actions/saved-artwork";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +14,6 @@ type SaveToGalleryButtonProps = {
 };
 
 type SaveState = "idle" | "saving" | "success" | "error";
-
-const buttonClassName =
-  "flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200";
 
 const SaveToGalleryButton = ({
   coloringImageId,
@@ -56,47 +53,40 @@ const SaveToGalleryButton = ({
 
   if (state === "saving") {
     return (
-      <button
-        type="button"
+      <ActionButton
+        size="compact"
+        tone="accent"
+        icon={faSpinner}
+        label={t("saving")}
         disabled
-        className={cn(buttonClassName, "bg-primary cursor-wait", className)}
-      >
-        <FontAwesomeIcon
-          icon={faSpinner}
-          className="text-xl md:text-2xl animate-spin"
-        />
-        <span className="hidden md:inline">{t("saving")}</span>
-      </button>
+        className={className}
+      />
     );
   }
 
   if (state === "success") {
     return (
-      <button
-        type="button"
+      <ActionButton
+        size="compact"
+        tone="success"
+        icon={faCheck}
+        label={t("saved")}
         disabled
-        className={cn(buttonClassName, "bg-accent cursor-default", className)}
-      >
-        <FontAwesomeIcon icon={faCheck} className="text-xl md:text-2xl" />
-        <span className="hidden md:inline">{t("saved")}</span>
-      </button>
+        className={className}
+      />
     );
   }
 
   if (state === "error") {
     return (
       <div className={cn("flex flex-col items-center gap-2", className)}>
-        <button
-          type="button"
+        <ActionButton
+          size="compact"
+          tone="accent"
+          icon={faHeart}
+          label={t("tryAgain")}
           onClick={handleSave}
-          className={cn(
-            buttonClassName,
-            "bg-primary hover:bg-primary/90 active:scale-95",
-          )}
-        >
-          <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
-          <span className="hidden md:inline">{t("tryAgain")}</span>
-        </button>
+        />
         {errorMessage && (
           <p className="text-sm text-destructive">{errorMessage}</p>
         )}
@@ -105,18 +95,14 @@ const SaveToGalleryButton = ({
   }
 
   return (
-    <button
-      type="button"
+    <ActionButton
+      size="compact"
+      tone="accent"
+      icon={faHeart}
+      label={t("idle")}
       onClick={handleSave}
-      className={cn(
-        buttonClassName,
-        "bg-primary hover:bg-primary/90 active:scale-95",
-        className,
-      )}
-    >
-      <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
-      <span className="hidden md:inline">{t("idle")}</span>
-    </button>
+      className={className}
+    />
   );
 };
 

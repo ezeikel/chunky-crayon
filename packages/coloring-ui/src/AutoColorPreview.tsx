@@ -60,14 +60,14 @@ const AutoColorPreview = ({
           {isKids ? "Look at these colors! 🎨" : "Preview Auto-Color"}
         </h3>
 
-        <p className="text-sm text-gray-500 text-center">
+        <p className="text-sm text-coloring-muted text-center">
           {isKids
             ? "Do you like how this looks?"
             : "Review the AI-suggested coloring before applying it to your canvas."}
         </p>
 
         {/* Reference image preview */}
-        <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+        <div className="relative w-full aspect-square rounded-coloring-card overflow-hidden border border-gray-200 bg-gray-50">
           {!imageLoaded && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="size-8 border-3 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
@@ -91,8 +91,8 @@ const AutoColorPreview = ({
             onClick={onCancel}
             disabled={isRetrying}
             className={cn(
-              "flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors",
-              "border border-gray-300 text-gray-600 hover:bg-gray-50",
+              "flex-1 py-2.5 px-4 rounded-coloring-card text-sm font-medium transition-colors",
+              "border border-gray-300 text-coloring-muted hover:bg-gray-50",
               "disabled:opacity-50 disabled:cursor-not-allowed",
             )}
           >
@@ -104,7 +104,7 @@ const AutoColorPreview = ({
             onClick={onRetry}
             disabled={isRetrying}
             className={cn(
-              "flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors",
+              "flex-1 py-2.5 px-4 rounded-coloring-card text-sm font-medium transition-colors",
               isKids
                 ? "bg-orange-100 text-orange-600 hover:bg-orange-200"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200",
@@ -126,7 +126,7 @@ const AutoColorPreview = ({
             onClick={onApply}
             disabled={isRetrying}
             className={cn(
-              "flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-colors text-white",
+              "flex-1 py-2.5 px-4 rounded-coloring-card text-sm font-bold transition-colors text-white",
               isKids
                 ? "bg-orange-500 hover:bg-orange-600"
                 : "bg-green-600 hover:bg-green-700",

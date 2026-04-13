@@ -117,12 +117,12 @@ const CompletionCelebration = ({
         <h2 className="text-xl font-semibold text-gray-800">
           Beautifully done
         </h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-coloring-muted">
           Your coloring is complete. Take a moment to admire your work.
         </p>
         <button
           type="button"
-          className="mt-2 px-4 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+          className="mt-2 px-4 py-1.5 text-sm font-medium text-coloring-muted bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
           onClick={handleDismiss}
         >
           Continue

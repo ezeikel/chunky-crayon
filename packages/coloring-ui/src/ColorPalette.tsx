@@ -123,8 +123,8 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 p-3 sm:p-4 rounded-lg bg-white/90 backdrop-blur-sm",
-        "transition-opacity duration-200",
+        "flex flex-col gap-2 p-3 sm:p-4 rounded-coloring-card bg-white/90 backdrop-blur-sm shadow-coloring-surface",
+        "transition-opacity duration-coloring-base ease-coloring",
         isMagicToolActive && "opacity-40 pointer-events-none",
         className,
       )}
@@ -138,7 +138,7 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
       {/* Recent colors row (adults only) */}
       {!isKids && recentColors.length > 0 && (
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider shrink-0">
+          <span className="text-[10px] font-medium text-coloring-muted uppercase tracking-wider shrink-0">
             Recent
           </span>
           <div className="flex gap-1.5 overflow-x-auto">
@@ -192,7 +192,7 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
         <button
           type="button"
           onClick={() => setShowSkinTones((prev) => !prev)}
-          className="text-xs text-gray-500 hover:text-gray-700 transition-colors self-start"
+          className="text-xs text-coloring-muted hover:opacity-80 transition-colors self-start"
           disabled={isMagicToolActive}
         >
           {showSkinTones ? "Hide" : "Show"} skin tones

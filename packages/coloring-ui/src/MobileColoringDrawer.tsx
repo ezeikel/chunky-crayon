@@ -113,7 +113,7 @@ const patternTypes: {
 
 // Section header component matching mobile app style
 const SectionTitle = ({ title }: { title: string }) => (
-  <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2 font-body">
+  <h3 className="text-xs font-semibold uppercase tracking-wide text-coloring-muted mb-2 font-body">
     {title}
   </h3>
 );
@@ -159,7 +159,7 @@ const RedoIcon = ({ className }: { className?: string }) => (
  * Matches the iOS/Android-style bottom sheet from the mobile app.
  *
  * Design specs (matching mobile native):
- * - Tool buttons: 48x48px, 8px gap, rounded-xl, bg-gray-100
+ * - Tool buttons: 48x48px, 8px gap, rounded-coloring-card, bg-gray-100
  * - Color swatches: 40x40px, 8px gap, rounded-full, 2px border
  * - Section rows: Direct flex with gap, no container wrappers
  * - Large touch targets for young children (ages 3-8)
@@ -401,9 +401,9 @@ const MobileColoringDrawer = ({
                           onClick={() => handleToolSelect(tool.id)}
                           className={cn(
                             // Base: 48x48px touch target matching mobile native
-                            "shrink-0 size-12 rounded-xl",
+                            "shrink-0 size-12 rounded-coloring-card",
                             "flex flex-col items-center justify-center",
-                            "transition-all duration-150 active:scale-95",
+                            "transition-all duration-coloring-base ease-coloring active:scale-95",
                             // Default state - bg-gray-100 matching mobile
                             "bg-gray-100",
                             // Active state - crayon orange
@@ -418,14 +418,14 @@ const MobileColoringDrawer = ({
                             icon={tool.icon}
                             className={cn(
                               tool.isMagic ? "text-base" : "text-xl",
-                              isActive ? "text-white" : "text-gray-600",
+                              isActive ? "text-white" : "text-coloring-muted",
                             )}
                           />
                           {tool.isMagic && tool.shortLabel && (
                             <span
                               className={cn(
                                 "text-[8px] font-bold uppercase leading-none",
-                                isActive ? "text-white" : "text-gray-600",
+                                isActive ? "text-white" : "text-coloring-muted",
                               )}
                             >
                               {tool.shortLabel}
@@ -460,7 +460,7 @@ const MobileColoringDrawer = ({
                             // Base: 40x40px color swatch matching mobile native
                             "shrink-0 size-10 rounded-full",
                             "border-2 border-gray-200",
-                            "transition-all duration-150 active:scale-95",
+                            "transition-all duration-coloring-base ease-coloring active:scale-95",
                             // Active: thicker border matching mobile
                             isSelected &&
                               "border-[3px] border-gray-700 scale-105",
@@ -505,9 +505,9 @@ const MobileColoringDrawer = ({
                           }}
                           className={cn(
                             // Base: 48x48px button matching mobile native
-                            "shrink-0 size-12 rounded-xl",
+                            "shrink-0 size-12 rounded-coloring-card",
                             "flex items-center justify-center",
-                            "transition-all duration-150 active:scale-95",
+                            "transition-all duration-coloring-base ease-coloring active:scale-95",
                             // Default state
                             "bg-gray-100",
                             // Active state
@@ -557,9 +557,9 @@ const MobileColoringDrawer = ({
                           }}
                           className={cn(
                             // Base: pill-shaped button with label matching mobile
-                            "shrink-0 h-12 px-4 rounded-xl",
+                            "shrink-0 h-12 px-4 rounded-coloring-card",
                             "flex items-center justify-center gap-2",
-                            "transition-all duration-150 active:scale-95",
+                            "transition-all duration-coloring-base ease-coloring active:scale-95",
                             // Default state
                             "bg-gray-100",
                             // Active state
@@ -572,13 +572,13 @@ const MobileColoringDrawer = ({
                             icon={fill.icon}
                             className={cn(
                               "text-base",
-                              isActive ? "text-white" : "text-gray-600",
+                              isActive ? "text-white" : "text-coloring-muted",
                             )}
                           />
                           <span
                             className={cn(
                               "text-sm font-medium",
-                              isActive ? "text-white" : "text-gray-600",
+                              isActive ? "text-white" : "text-coloring-muted",
                             )}
                           >
                             {fill.label}
@@ -611,9 +611,9 @@ const MobileColoringDrawer = ({
                             }}
                             className={cn(
                               // Base: pill-shaped button with label matching mobile
-                              "shrink-0 h-12 px-4 rounded-xl",
+                              "shrink-0 h-12 px-4 rounded-coloring-card",
                               "flex items-center justify-center gap-2",
-                              "transition-all duration-150 active:scale-95",
+                              "transition-all duration-coloring-base ease-coloring active:scale-95",
                               // Default state
                               "bg-gray-100",
                               // Active state
@@ -626,13 +626,13 @@ const MobileColoringDrawer = ({
                               icon={pattern.icon}
                               className={cn(
                                 "text-base",
-                                isActive ? "text-white" : "text-gray-600",
+                                isActive ? "text-white" : "text-coloring-muted",
                               )}
                             />
                             <span
                               className={cn(
                                 "text-sm font-medium",
-                                isActive ? "text-white" : "text-gray-600",
+                                isActive ? "text-white" : "text-coloring-muted",
                               )}
                             >
                               {pattern.label}
@@ -656,9 +656,9 @@ const MobileColoringDrawer = ({
                       disabled={!canUndo}
                       className={cn(
                         // Base: pill button with icon and label
-                        "h-12 px-4 rounded-xl",
+                        "h-12 px-4 rounded-coloring-card",
                         "flex items-center justify-center gap-2",
-                        "transition-all duration-150 active:scale-95",
+                        "transition-all duration-coloring-base ease-coloring active:scale-95",
                         // Default state
                         "bg-gray-100",
                         // Disabled state
@@ -666,8 +666,8 @@ const MobileColoringDrawer = ({
                       )}
                       aria-label="Undo"
                     >
-                      <UndoIcon className="size-5 text-gray-600" />
-                      <span className="text-sm font-medium text-gray-600">
+                      <UndoIcon className="size-5 text-coloring-muted" />
+                      <span className="text-sm font-medium text-coloring-muted">
                         Undo
                       </span>
                     </button>
@@ -678,9 +678,9 @@ const MobileColoringDrawer = ({
                       disabled={!canRedo}
                       className={cn(
                         // Base: pill button with icon and label
-                        "h-12 px-4 rounded-xl",
+                        "h-12 px-4 rounded-coloring-card",
                         "flex items-center justify-center gap-2",
-                        "transition-all duration-150 active:scale-95",
+                        "transition-all duration-coloring-base ease-coloring active:scale-95",
                         // Default state
                         "bg-gray-100",
                         // Disabled state
@@ -688,8 +688,8 @@ const MobileColoringDrawer = ({
                       )}
                       aria-label="Redo"
                     >
-                      <RedoIcon className="size-5 text-gray-600" />
-                      <span className="text-sm font-medium text-gray-600">
+                      <RedoIcon className="size-5 text-coloring-muted" />
+                      <span className="text-sm font-medium text-coloring-muted">
                         Redo
                       </span>
                     </button>
