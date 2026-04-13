@@ -8,7 +8,7 @@
     "close": "閉じる",
     "done": "完了",
     "copy": "コピー",
-    "copied": "コピーしたよ！",
+    "copied": "コピーしました！",
     "credits": "クレジット",
     "creditsWithCount": "{count} クレジット",
     "loadMore": "もっと見る"
@@ -39,9 +39,9 @@
   },
   "coloringPage": {
     "title": "ぬりえ",
-    "defaultDescription": "Chunky Crayonの無料で印刷できるぬりえ",
+    "defaultDescription": "無料で印刷できるぬりえ",
     "progress": {
-      "colored": "ぬれたよ",
+      "colored": "完了",
       "percentage": "{percent}%",
       "milestones": {
         "25": "いいスタート！",
@@ -63,7 +63,7 @@
       "fill": "ぬりつぶし",
       "brush": "ブラシ",
       "sticker": "シール",
-      "magicReveal": "まほうでひらく",
+      "magicReveal": "まほう表示",
       "magicAuto": "まほうおまかせ",
       "magicBrush": "まほうブラシ",
       "magicFill": "まほうぬりつぶし",
@@ -83,10 +83,10 @@
     "brushSizes": {
       "small": "細い",
       "medium": "ふつう",
-      "large": "ぶっとい"
+      "large": "太い"
     },
     "fillPatterns": {
-      "solid": "ベタ",
+      "solid": "単色",
       "dots": "みずたま",
       "stripes": "しましま",
       "diagonal": "ななめ",
@@ -96,7 +96,7 @@
       "zigzag": "ジグザグ"
     },
     "actions": {
-      "save": "ほぞん",
+      "save": "保存",
       "download": "ダウンロード",
       "share": "シェア",
       "print": "印刷",
@@ -131,9 +131,9 @@
       "zoomIn": "おおきく",
       "zoomInAria": "おおきくする（もっと近く）",
       "pan": "うごかす",
-      "panAria": "えのまわりをうごかす",
+      "panAria": "絵の周りを動かす",
       "reset": "ぜんたいを見る",
-      "resetAria": "ぜんたいにもどす"
+      "resetAria": "全体に戻す"
     },
     "muteToggle": {
       "mute": "おとを消す",
@@ -291,13 +291,13 @@
   },
   "billing": {
     "pageTitle": "お支払い・サブスク",
-    "pageSubtitle": "サブスクの管理や、追加クレジットの購入で、すてきなぬりえをどんどん作ろう！",
+    "pageSubtitle": "サブスクの管理や、追加クレジットの購入で、素敵なぬりえをどんどん作れます。",
     "currentPlan": "現在のプラン",
     "currentCredits": "現在のクレジット: {count}",
     "renewsOn": "サブスク更新日: {date}",
     "manageSubscription": "サブスクを管理",
     "noActiveSubscription": "有効なサブスクがありません",
-    "noSubscriptionDescription": "プランを選んで、すてきなぬりえ作りを始めよう！",
+    "noSubscriptionDescription": "プランを選んで、素敵なぬりえ作りを始めましょう。",
     "viewPlans": "プランを見る",
     "buyMoreCredits": "クレジットを追加",
     "credits": "{count} クレジット",
@@ -325,14 +325,14 @@
     "continueWithApple": "Appleで続ける",
     "signInWithEmail": "メールでログイン",
     "sendingLink": "リンクを送信中…",
-    "chooseMethod": "ログイン方法をえらんでね",
+    "chooseMethod": "ログイン方法を選択してください",
     "orContinueWith": "または",
     "emailPlaceholder": "name@example.com",
     "termsAgreement": "続けると、利用規約とプライバシーポリシーに同意したことになります。",
     "verifyRequest": {
       "title": "メールをチェック！",
-      "description": "サインイン用の魔法のリンクを送りました。メールのリンクをタップして続けてね。",
-      "checkSpam": "見当たらない？迷惑メールも見てみてね。",
+      "description": "サインイン用のリンクを送信しました。メールのリンクをタップして続けてください。",
+      "checkSpam": "見当たりませんか？迷惑メールフォルダもご確認ください。",
       "linkExpiry": "リンクは24時間で期限切れです。",
       "tryDifferentEmail": "別のメールを使う"
     },
@@ -358,10 +358,10 @@
     "notFound": "ページが見つかりません",
     "sharedArtworkNotFound": {
       "title": "作品が見つかりません",
-      "description": "この共有リンクは期限切れか、削除されたみたい。作った人に新しいリンクを聞いてね！",
+      "description": "この共有リンクは期限切れか、削除された可能性があります。作成者に新しいリンクをお聞きください。",
       "cta": "ぬりえをさがす"
     },
-    "unauthorized": "続けるにはサインインしてね",
+    "unauthorized": "続けるにはサインインしてください",
     "stripeLoadFailed": "Stripeの読み込みに失敗しました",
     "checkoutFailed": "お支払いの準備に失敗しました",
     "unexpectedError": "予期しないエラーが発生しました。もう一度ためしてね。",
