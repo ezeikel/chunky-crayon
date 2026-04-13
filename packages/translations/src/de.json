@@ -101,7 +101,7 @@
       "share": "Teilen",
       "print": "Drucken",
       "preparing": "Wird vorbereitet...",
-      "doneSharing": "Fertig geteilt",
+      "doneSharing": "Teilen abgeschlossen",
       "colorAgain": "Nochmal ausmalen",
       "startOver": "Neu starten"
     },
@@ -136,8 +136,8 @@
       "resetAria": "Zurück zur Gesamtansicht"
     },
     "muteToggle": {
-      "mute": "Töne stumm",
-      "unmute": "Töne an",
+      "mute": "Töne stummschalten",
+      "unmute": "Ton einschalten",
       "turnOn": "Töne einschalten",
       "turnOff": "Töne ausschalten"
     },
@@ -325,13 +325,13 @@
     "continueWithApple": "Weiter mit Apple",
     "signInWithEmail": "Mit E-Mail anmelden",
     "sendingLink": "Link wird gesendet...",
-    "chooseMethod": "Wähle deine Lieblings-Anmeldemethode",
+    "chooseMethod": "Wähle deine bevorzugte Anmeldemethode",
     "orContinueWith": "Oder weiter mit",
     "emailPlaceholder": "name@example.com",
     "termsAgreement": "Wenn du weitermachst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
     "verifyRequest": {
       "title": "Schau in deine E-Mails!",
-      "description": "Wir haben dir einen magischen Link zum Anmelden geschickt. Klicke auf den Link in deiner E-Mail, um weiterzumachen.",
+      "description": "Wir haben dir einen magischen Link zum Anmelden geschickt. Klicke auf den Link in deiner E-Mail, um fortzufahren.",
       "checkSpam": "Nicht zu sehen? Schau in deinen Spam-Ordner.",
       "linkExpiry": "Der Link läuft in 24 Stunden ab.",
       "tryDifferentEmail": "Andere E-Mail verwenden"
@@ -354,7 +354,7 @@
     }
   },
   "errors": {
-    "generic": "Oh nein! Da ist etwas schiefgelaufen. Bitte versuch’s nochmal.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "notFound": "Seite nicht gefunden",
     "sharedArtworkNotFound": {
       "title": "Kunstwerk nicht gefunden",
