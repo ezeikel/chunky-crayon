@@ -1,4 +1,6 @@
 import type { Preview } from "@storybook/react-vite";
+import React from "react";
+import { ColoringContextProvider } from "../src/context";
 import "./themes.css";
 
 const preview: Preview = {
@@ -22,8 +24,15 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const theme = context.globals.theme || "chunky-crayon";
-      document.documentElement.setAttribute("data-theme", theme);
-      return Story();
+      const variant = theme === "chunky-crayon" ? "kids" : "adult";
+      if (typeof document !== "undefined") {
+        document.documentElement.setAttribute("data-theme", theme);
+      }
+      return (
+        <ColoringContextProvider variant={variant} storagePrefix="storybook">
+          <Story />
+        </ColoringContextProvider>
+      );
     },
   ],
   parameters: {

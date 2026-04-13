@@ -4,6 +4,8 @@ import { dirname } from "path";
 
 import { fileURLToPath } from "url";
 
+import tailwindcss from "@tailwindcss/vite";
+
 /**
  * This function is used to resolve the absolute path of a package.
  * It is needed in projects that use Yarn PnP or are set up within a monorepo.
@@ -21,5 +23,10 @@ const config: StorybookConfig = {
     getAbsolutePath("@storybook/addon-onboarding"),
   ],
   framework: getAbsolutePath("@storybook/react-vite"),
+  staticDirs: ["./public"],
+  viteFinal: async (viteConfig) => {
+    viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()];
+    return viteConfig;
+  },
 };
 export default config;
