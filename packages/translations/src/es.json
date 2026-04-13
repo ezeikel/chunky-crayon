@@ -39,7 +39,7 @@
   },
   "coloringPage": {
     "title": "Página para colorear",
-    "defaultDescription": "Página para colorear imprimible gratis de Chunky Crayon",
+    "defaultDescription": "Página para colorear imprimible gratis",
     "progress": {
       "colored": "coloreado",
       "percentage": "{percent}%",
@@ -59,7 +59,7 @@
       "actions": "Acciones"
     },
     "tools": {
-      "pan": "Mover",
+      "pan": "Desplazar",
       "fill": "Rellenar",
       "brush": "Pincel",
       "sticker": "Pegatina",
@@ -71,11 +71,11 @@
       "magic": "Magia"
     },
     "brushTypes": {
-      "crayon": "Cera",
+      "crayon": "Crayón",
       "marker": "Rotulador",
       "eraser": "Borrador",
       "glitter": "Purpurina",
-      "sparkle": "Brillitos",
+      "sparkle": "Brillos",
       "rainbow": "Arcoíris",
       "glow": "Resplandor",
       "neon": "Neón"
@@ -101,7 +101,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Compartido",
+      "doneSharing": "Listo",
       "colorAgain": "Colorear otra vez",
       "startOver": "Empezar de nuevo"
     },
@@ -119,7 +119,7 @@
     },
     "colorPalette": {
       "selectColor": "Seleccionar color {color}",
-      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas Mágicas"
+      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas mágicas"
     },
     "patternSelector": {
       "label": "Patrón:"
@@ -328,7 +328,7 @@
     "chooseMethod": "Elige tu forma favorita de iniciar sesión",
     "orContinueWith": "O continúa con",
     "emailPlaceholder": "nombre@ejemplo.com",
-    "termsAgreement": "Al continuar, aceptas nuestros Términos del servicio y Política de privacidad.",
+    "termsAgreement": "Al continuar, aceptas nuestros Términos de Servicio y Política de Privacidad.",
     "verifyRequest": {
       "title": "¡Revisa tu correo!",
       "description": "Te enviamos un enlace mágico para iniciar sesión. Toca el enlace de tu correo para continuar.",
@@ -365,7 +365,7 @@
     "stripeLoadFailed": "No se pudo cargar Stripe",
     "checkoutFailed": "No se pudo crear la sesión de pago",
     "unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo.",
-    "redirectFailed": "No se pudo ir al pago"
+    "redirectFailed": "No se pudo redirigir al pago"
   },
   "breadcrumbs": {
     "home": "Inicio",
