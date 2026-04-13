@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@source "../../../packages/coloring-ui/src";
+@source "../../packages/coloring-ui";
+@source "../../../packages/coloring-ui";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -77,6 +78,32 @@
   --color-coloring-surface-dark: var(--muted);
   --color-coloring-muted: var(--muted-foreground);
 
+  /* Coloring UI brand tokens — Coloring Habitat (adult: clean, airy) */
+  --radius-coloring-button: 0.5rem;
+  --radius-coloring-card: 0.75rem;
+  --radius-coloring-pill: 9999px;
+  --radius-coloring-surface: 1rem;
+  --font-coloring-heading: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-coloring-body: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --coloring-weight-heading: 600;
+  --coloring-weight-body: 400;
+  --coloring-weight-emphasis: 500;
+  --shadow-coloring-button: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+  --shadow-coloring-button-hover: inset 0 0 0 1px rgb(0 0 0 / 0.16);
+  --shadow-coloring-surface: 0 1px 2px rgb(0 0 0 / 0.04);
+  --ease-coloring: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-coloring-fast: 180ms;
+  --duration-coloring-base: 260ms;
+  --coloring-touch-target: 44px;
+  --coloring-border-width: 1px;
+
+  /* Button sizing — Airbnb: 48px tall, tight padding */
+  --spacing-coloring-button-px: 1.5rem;
+  --spacing-coloring-button-py: 0.75rem;
+  --spacing-coloring-button-gap: 0.5rem;
+  --spacing-coloring-icon: 1rem;
+  --text-coloring-button: 0.9375rem;
+  --tracking-coloring-button: 0;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
