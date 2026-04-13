@@ -269,7 +269,7 @@
       "adults": {
         "title": "Für Erwachsene",
         "ages": "18+",
-        "description": "Entspannend & filigran"
+        "description": "Entspannend & detailreich"
       }
     },
     "difficulty": {
@@ -452,10 +452,10 @@
   },
   "pricing": {
     "pageTitle": "Preise – Chunky Crayon",
-    "heroTitle": "Pläne für jedes Malabenteuer!",
-    "heroSubtitle": "Egal ob du Elternteil, kleiner Künstler oder erwachsen und malbegeistert bist – es gibt einen Chunky Crayon Plan für dich. Kein Konto nötig, um loszulegen!",
+    "heroTitle": "Mehr als nur Ausmalbilder",
+    "heroSubtitle": "Erstellen, online ausmalen, Sticker sammeln und mit Freunden teilen. Wähle den Plan, der zu deiner Familie passt.",
     "monthly": "Monatlich",
-    "annual": "Jährlich (15% sparen)",
+    "annual": "Jährlich (17% sparen)",
     "mostPopular": "Am beliebtesten",
     "buyNow": "Jetzt kaufen",
     "noCommitment": "Keine Bindung. Jederzeit kündbar.",
@@ -512,7 +512,7 @@
       },
       "rollover": {
         "question": "Werden Credits übernommen?",
-        "answer": "Bei manchen Plänen werden ungenutzte Credits übernommen. Details findest du im Plan."
+        "answer": "Splash-Credits werden monatlich zurückgesetzt. Rainbow-Credits werden bis zu 1 Monat übernommen. Sparkle bietet 2 Monate Credit-Übernahme."
       },
       "audience": {
         "question": "Ist das für Kinder oder Erwachsene?",
