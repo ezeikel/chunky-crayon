@@ -57,11 +57,11 @@
     "brushSizes": {
       "small": "가늘게",
       "medium": "보통",
-      "large": "굵게"
+      "large": "두꺼운"
     },
     "fillPatterns": {
       "solid": "단색",
-      "dots": "물방울",
+      "dots": "도트",
       "stripes": "줄무늬",
       "diagonal": "대각선",
       "checkerboard": "체크",
@@ -355,7 +355,7 @@
         "description": "컬러링 여정을 시작하세요",
         "cta": "무료로 시작",
         "features": [
-          "매일 2회 무료 생성",
+          "시작할 때 2회 무료 생성",
           "무료 라이브러리 접근",
           "온라인 컬러링 캔버스",
           "PDF 다운로드"
@@ -456,17 +456,17 @@
       "beginner": {
         "title": "초급",
         "shortLabel": "쉬움",
-        "description": "부드러운 패턴으로, 짧은 휴식 시간에 딱 좋아요"
+        "description": "부드러운 패턴으로 짧은 순간의 평온에 완벽해요"
       },
       "intermediate": {
         "title": "중급",
         "shortLabel": "보통",
-        "description": "적당한 디테일로 차분하게 몰입할 수 있어요"
+        "description": "적당한 디테일로 더 긴 시간 차분히 몰입할 수 있어요"
       },
       "advanced": {
         "title": "고급",
         "shortLabel": "어려움",
-        "description": "섬세한 디자인으로, 천천히 집중하는 시간이 필요해요"
+        "description": "서두르지 않는 집중을 보상하는 세밀한 디자인"
       },
       "expert": {
         "title": "전문가",
@@ -497,7 +497,7 @@
       },
       "animals": {
         "name": "동물",
-        "description": "정교하게 그려진 동물들"
+        "description": "정교한 디테일의 동물들"
       },
       "architecture": {
         "name": "건축",
@@ -505,7 +505,7 @@
       },
       "abstract": {
         "name": "추상",
-        "description": "자유롭게 표현할 수 있는 디자인"
+        "description": "창의적 표현을 위한 자유로운 형태의 디자인"
       },
       "flowers": {
         "name": "꽃",
@@ -533,7 +533,7 @@
       },
       "food": {
         "name": "음식",
-        "description": "풍성한 요리와 식탁 풍경"
+        "description": "풍성한 만찬과 요리 장면"
       }
     },
     "holidays": {
