@@ -50,6 +50,7 @@ type ColoringAreaProps = {
 
 export type ColoringAreaHandle = {
   getCanvas: () => HTMLCanvasElement | null;
+  getBoundaryCanvas: () => HTMLCanvasElement | null;
   getCanvasDataUrl: () => string | null;
   handleUndo: (action: CanvasAction) => void;
   handleRedo: (action: CanvasAction) => void;
@@ -705,6 +706,12 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       return canvasRef.current?.getCanvas() || null;
     }, []);
 
+    // Get boundary (line-art) canvas — used by ProgressIndicator to compute
+    // the colourable area excluding line pixels.
+    const getBoundaryCanvas = useCallback(() => {
+      return canvasRef.current?.getBoundaryCanvas() || null;
+    }, []);
+
     // Handle undo by restoring the canvas to the state before the action
     const handleUndo = useCallback(
       (action: CanvasAction) => {
@@ -792,6 +799,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       ref,
       () => ({
         getCanvas,
+        getBoundaryCanvas,
         getCanvasDataUrl,
         handleUndo,
         handleRedo,
@@ -800,6 +808,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }),
       [
         getCanvas,
+        getBoundaryCanvas,
         getCanvasDataUrl,
         handleUndo,
         handleRedo,
@@ -974,6 +983,14 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <ProgressIndicator
               getCanvas={getCanvas}
+              regions={parsedRegionsJson?.regions}
+              totalRegionPixels={parsedRegionsJson?.regionPixelCount}
+              regionMapWidth={
+                coloringImage.regionMapWidth as number | undefined
+              }
+              regionMapHeight={
+                coloringImage.regionMapHeight as number | undefined
+              }
               className="flex-1 min-w-0"
             />
             <MuteToggle />

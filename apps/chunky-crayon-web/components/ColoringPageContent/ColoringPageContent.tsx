@@ -1,12 +1,15 @@
 'use client';
 
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { ColoringImage } from '@one-colored-pixel/db/types';
 import ColoringArea, {
   ColoringAreaHandle,
 } from '@/components/ColoringArea/ColoringArea';
 import ProgressIndicator from '@/components/ProgressIndicator';
-import { MuteToggle } from '@one-colored-pixel/coloring-ui';
+import {
+  MuteToggle,
+  type RegionStoreJson,
+} from '@one-colored-pixel/coloring-ui';
 import { DesktopColorPalette } from '@one-colored-pixel/coloring-ui';
 import DesktopToolsSidebar from '@/components/DesktopToolsSidebar';
 import { trackViewContent } from '@/utils/pixels';
@@ -40,9 +43,25 @@ const ColoringPageContent = ({
 
   const coloringAreaRef = useRef<ColoringAreaHandle>(null);
 
-  const getCanvas = () => {
+  // Parse regionsJson once for the progress indicator's accurate path.
+  const parsedRegionsJson = useMemo(() => {
+    try {
+      const raw = coloringImage.regionsJson;
+      if (!raw) return null;
+      if (typeof raw === 'string') return JSON.parse(raw) as RegionStoreJson;
+      return raw as unknown as RegionStoreJson;
+    } catch {
+      return null;
+    }
+  }, [coloringImage.regionsJson]);
+
+  const getCanvas = useCallback(() => {
     return coloringAreaRef.current?.getCanvas() || null;
-  };
+  }, []);
+
+  const getBoundaryCanvas = useCallback(() => {
+    return coloringAreaRef.current?.getBoundaryCanvas() || null;
+  }, []);
 
   const getCanvasDataUrl = useCallback(() => {
     return coloringAreaRef.current?.getCanvasDataUrl() || null;
@@ -83,14 +102,23 @@ const ColoringPageContent = ({
         {/* Desktop only: Progress bar stretches, mute on right */}
         {/* Hidden on xl+ where sidebars are visible */}
         <div className="hidden md:flex xl:hidden items-center gap-4 w-full">
-          <ProgressIndicator getCanvas={getCanvas} className="flex-1" />
+          <ProgressIndicator
+            getCanvas={getCanvas}
+            regions={parsedRegionsJson?.regions}
+            totalRegionPixels={parsedRegionsJson?.regionPixelCount}
+            regionMapWidth={coloringImage.regionMapWidth as number | undefined}
+            regionMapHeight={
+              coloringImage.regionMapHeight as number | undefined
+            }
+            className="flex-1"
+          />
           <MuteToggle />
         </div>
       </div>
 
       {/* Three-panel layout for xl+, single column for smaller screens */}
       {/* Uses container queries to scale with available space */}
-      <div className="flex justify-center gap-4 xl:gap-6 @[1400px]:gap-8 xl:px-4">
+      <div className="flex justify-center xl:justify-between items-start gap-4 xl:gap-6 @[1400px]:gap-8">
         {/* Left Sidebar - Color Palette (xl+ only) */}
         {/* Scales wider on larger containers */}
         {/* top-24 (96px) accounts for header height + padding */}
@@ -100,10 +128,21 @@ const ColoringPageContent = ({
 
         {/* Center - Canvas Area */}
         {/* Grows to fill available space with max-width cap */}
-        <div className="max-w-3xl w-full flex-1 xl:max-w-none xl:w-[800px] @[1400px]:w-[900px] @[1600px]:w-[1000px] @[1800px]:w-[1100px]">
+        <div className="max-w-3xl w-full flex-1 xl:max-w-none xl:min-w-[600px]">
           {/* Progress bar for xl+ - above canvas */}
           <div className="hidden xl:flex items-center gap-4 mb-3">
-            <ProgressIndicator getCanvas={getCanvas} className="flex-1" />
+            <ProgressIndicator
+              getCanvas={getCanvas}
+              regions={parsedRegionsJson?.regions}
+              totalRegionPixels={parsedRegionsJson?.regionPixelCount}
+              regionMapWidth={
+                coloringImage.regionMapWidth as number | undefined
+              }
+              regionMapHeight={
+                coloringImage.regionMapHeight as number | undefined
+              }
+              className="flex-1"
+            />
             <MuteToggle />
           </div>
 
@@ -122,7 +161,6 @@ const ColoringPageContent = ({
         {/* top-24 (96px) accounts for header height + padding */}
         <div className="hidden xl:block shrink-0 sticky top-24 self-start">
           <DesktopToolsSidebar
-            className="w-[200px] @[1400px]:w-[220px] @[1600px]:w-[240px]"
             onUndo={handleUndo}
             onRedo={handleRedo}
             onStickerToolSelect={handleStickerToolSelect}
