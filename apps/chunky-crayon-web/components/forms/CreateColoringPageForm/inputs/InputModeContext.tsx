@@ -25,6 +25,12 @@ export type InputModeState = {
   error: string | null;
   /** Whether the input is ready for form submission */
   isReady: boolean;
+  /**
+   * True while the input is in a transient inner state that owns the UX
+   * (recording, capturing, previewing, error). The shared FormCTA hides
+   * while busy so the input's own in-flow controls take over.
+   */
+  isBusy: boolean;
 };
 
 export type InputModeActions = {
@@ -36,6 +42,8 @@ export type InputModeActions = {
   setIsProcessing: (isProcessing: boolean) => void;
   /** Set error message */
   setError: (error: string | null) => void;
+  /** Set busy state — hides the shared FormCTA */
+  setIsBusy: (isBusy: boolean) => void;
   /** Reset the input state */
   reset: () => void;
 };
@@ -58,6 +66,7 @@ const initialState: InputModeState = {
   isProcessing: false,
   error: null,
   isReady: false,
+  isBusy: false,
 };
 
 type InputModeProviderProps = {
@@ -81,6 +90,7 @@ export function InputModeProvider({
       mode,
       // Reset processing state when switching modes
       isProcessing: false,
+      isBusy: false,
       error: null,
       // Clear description when switching to non-text modes
       // Keep it if switching back to text
@@ -116,6 +126,10 @@ export function InputModeProvider({
     }));
   }, []);
 
+  const setIsBusy = useCallback((isBusy: boolean) => {
+    setState((prev) => ({ ...prev, isBusy }));
+  }, []);
+
   const reset = useCallback(() => {
     setState((prev) => ({
       ...initialState,
@@ -130,9 +144,18 @@ export function InputModeProvider({
       setDescription,
       setIsProcessing,
       setError,
+      setIsBusy,
       reset,
     }),
-    [state, setMode, setDescription, setIsProcessing, setError, reset],
+    [
+      state,
+      setMode,
+      setDescription,
+      setIsProcessing,
+      setError,
+      setIsBusy,
+      reset,
+    ],
   );
 
   return (
