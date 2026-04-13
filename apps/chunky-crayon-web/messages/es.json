@@ -378,7 +378,7 @@
         "categoriesSection": "Categorías para pequeños",
         "heroDescription": "¡Páginas simples y fáciles de colorear para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos las hacen perfectas para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
         "whyTitle": "Perfecto para pequeños artistas",
-        "why1Title": "Líneas grandes y marcadas",
+        "why1Title": "Líneas gruesas",
         "why1Description": "¡Los contornos gruesos ayudan a las manitas pequeñas a no salirse de las líneas!",
         "why2Title": "Formas simples",
         "why2Description": "Formas básicas y objetos conocidos que a los peques les encantan.",
@@ -414,7 +414,7 @@
         "pageTitle": "Dibujos para colorear para adolescentes",
         "featuredSection": "Dibujos populares para adolescentes",
         "categoriesSection": "Categorías para adolescentes",
-        "heroDescription": "¡Dibujos geniales y detallados para adolescentes! De anime y videojuegos a fantasía y ciencia ficción, expresa tu creatividad con diseños a tu estilo. Perfectos para relajarte y expresarte creativamente.",
+        "heroDescription": "¡Dibujos geniales y detallados diseñados para adolescentes! Desde anime y videojuegos hasta fantasía y ciencia ficción, expresa tu creatividad con diseños que van con tu estilo. Perfectos para relajarte y expresarte creativamente.",
         "whyTitle": "Hecho para adolescentes creativos",
         "why1Title": "Temas geniales",
         "why1Description": "¡Diseños de anime, videojuegos, fantasía y sci-fi que se adaptan a tus gustos!",
@@ -433,7 +433,7 @@
         "pageTitle": "Dibujos para colorear para adultos",
         "featuredSection": "Dibujos populares para adultos",
         "categoriesSection": "Categorías para adultos",
-        "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas elaborados, preciosas escenas de naturaleza y patrones detallados pensados para la relajación y la atención plena. Perfecto para aliviar el estrés tras un día largo.",
+        "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas elaborados, hermosas escenas naturales y patrones detallados diseñados para la relajación y la atención plena. Perfecto para aliviar el estrés después de un día intenso.",
         "whyTitle": "Beneficios de colorear para adultos",
         "why1Title": "Alivio del estrés",
         "why1Description": "Colorear activa la respuesta de relajación, reduce la ansiedad y aporta calma.",
@@ -455,7 +455,7 @@
     "heroTitle": "¡Planes para cada aventura de colorear!",
     "heroSubtitle": "Ya seas mamá o papá, un pequeño artista o un adulto que ama colorear, hay un plan de Chunky Crayon para ti. ¡No necesitas cuenta para empezar!",
     "monthly": "Mensual",
-    "annual": "Anual (ahorra 15%)",
+    "annual": "Anual (ahorra 17%)",
     "mostPopular": "Más popular",
     "buyNow": "Comprar ahora",
     "noCommitment": "Sin compromiso. Cancela cuando quieras.",
@@ -512,7 +512,7 @@
       },
       "rollover": {
         "question": "¿Los créditos se acumulan?",
-        "answer": "Algunos planes permiten acumular créditos sin usar. Mira los detalles del plan para más info."
+        "answer": "Los créditos de Splash se reinician cada mes. Rainbow permite acumular hasta 1 mes. Sparkle te da 2 meses de acumulación."
       },
       "audience": {
         "question": "¿Es para niños o para adultos?",
