@@ -19,7 +19,6 @@ import useUser from '@/hooks/useUser';
 import useRecentCreations from '@/hooks/useRecentCreations';
 import { signalGalleryRefresh } from '@/utils/galleryRefresh';
 import { ColoLoading, type AudioState } from '@/components/Loading/ColoLoading';
-import UserInputV2 from './UserInputV2';
 import {
   InputModeProvider,
   InputModeSelector,
@@ -32,8 +31,6 @@ import {
 
 type CreateColoringPageFormProps = {
   className?: string;
-  /** Enable new multi-mode input (text/voice/image) */
-  enableMultiMode?: boolean;
   /** Size variant - 'large' for logged-in dashboard */
   size?: 'default' | 'large';
 };
@@ -206,86 +203,23 @@ const MultiModeForm = ({ className }: { className?: string }) => {
 
 const CreateColoringPageForm = ({
   className,
-  enableMultiMode = true,
   size = 'default',
 }: CreateColoringPageFormProps) => {
-  const formRef = useRef<HTMLFormElement>(null);
-  const router = useRouter();
-  const locale = useLocale();
-  const { isGuest } = useUser();
-  const { addCreation } = useRecentCreations();
   const t = useTranslations('createForm');
-
   const isLarge = size === 'large';
 
-  // Use new multi-mode input system (default)
-  if (enableMultiMode) {
-    return (
-      <div
-        className={cn(
-          'flex flex-col gap-y-5 p-6 md:p-8 bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark relative overflow-clip',
-          isLarge ? 'max-w-2xl' : 'max-w-lg',
-        )}
-      >
-        {/* Decorative corner accent */}
-        <div className="absolute -top-12 -right-12 w-24 h-24 bg-crayon-orange-light/20 rounded-full blur-2xl" />
-        <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-crayon-teal-light/20 rounded-full blur-2xl" />
-
-        {/* Header */}
-        <div className="text-center relative z-10">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <FontAwesomeIcon
-              icon={faWandMagicSparkles}
-              className="text-2xl"
-              style={
-                {
-                  '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                  '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                  '--fa-secondary-opacity': '1',
-                } as React.CSSProperties
-              }
-            />
-            <h3 className="font-tondo font-bold text-xl md:text-2xl text-gradient-orange">
-              {t('title')}
-            </h3>
-          </div>
-          <p className="font-tondo font-medium text-base md:text-lg text-text-primary">
-            {t('tagline')}
-          </p>
-        </div>
-
-        {/* Time notice */}
-        <div className="flex items-center justify-center gap-2 px-4 py-2 bg-crayon-yellow-light/30 rounded-xl text-center">
-          <FontAwesomeIcon
-            icon={faClock}
-            className="text-sm"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                '--fa-secondary-opacity': '0.8',
-              } as React.CSSProperties
-            }
-          />
-          <p className="font-tondo text-sm text-text-secondary">
-            {t('generatingMessage')}
-          </p>
-        </div>
-
-        <InputModeProvider>
-          <MultiModeForm className={className} />
-        </InputModeProvider>
-      </div>
-    );
-  }
-
-  // Legacy single-mode behavior (text only)
   return (
-    <div className="max-w-lg flex flex-col gap-y-5 p-6 md:p-8 bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark relative overflow-clip">
+    <div
+      className={cn(
+        'flex flex-col gap-y-5 p-6 md:p-8 bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark relative overflow-clip',
+        isLarge ? 'max-w-2xl' : 'max-w-lg',
+      )}
+    >
       {/* Decorative corner accent */}
       <div className="absolute -top-12 -right-12 w-24 h-24 bg-crayon-orange-light/20 rounded-full blur-2xl" />
       <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-crayon-teal-light/20 rounded-full blur-2xl" />
 
+      {/* Header */}
       <div className="text-center relative z-10">
         <div className="inline-flex items-center gap-2 mb-3">
           <FontAwesomeIcon
@@ -303,7 +237,7 @@ const CreateColoringPageForm = ({
             {t('title')}
           </h3>
         </div>
-        <p className="font-tondo font-medium text-base text-text-primary">
+        <p className="font-tondo font-medium text-base md:text-lg text-text-primary">
           {t('tagline')}
         </p>
       </div>
@@ -326,49 +260,9 @@ const CreateColoringPageForm = ({
         </p>
       </div>
 
-      <form
-        action={async (formData) => {
-          const rawFormData = {
-            description: (formData.get('description') as string) || '',
-          };
-
-          trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
-            description: rawFormData.description,
-            inputType: 'text',
-            characterCount: rawFormData.description.length,
-          });
-
-          const coloringImage = await createColoringImage(formData);
-
-          if ('error' in coloringImage) {
-            console.error(coloringImage.error);
-            return;
-          }
-
-          // Store in recent creations for guests to find later
-          if (isGuest && coloringImage.id) {
-            addCreation(coloringImage.id);
-          }
-
-          // Track Lead event for Facebook/Pinterest pixels (successful content creation)
-          trackLead({
-            contentName: rawFormData.description || 'Coloring Page',
-            contentCategory: 'coloring_page_creation',
-          });
-
-          // Signal galleries to refresh when user navigates back
-          signalGalleryRefresh('image-created');
-
-          if (coloringImage.id) {
-            router.push(`/coloring-image/${coloringImage.id}`);
-          }
-        }}
-        ref={formRef}
-        className={cn('flex flex-col gap-y-4 relative z-10', className)}
-      >
-        <input type="hidden" name="locale" value={locale} />
-        <UserInputV2 />
-      </form>
+      <InputModeProvider>
+        <MultiModeForm className={className} />
+      </InputModeProvider>
     </div>
   );
 };
