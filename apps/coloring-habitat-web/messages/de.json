@@ -38,7 +38,7 @@
       "brush": "Pinsel",
       "sticker": "Sticker",
       "magicReveal": "Magisches Enthüllen",
-      "magicAuto": "Magisch Auto",
+      "magicAuto": "Magic Auto",
       "magicBrush": "Magischer Pinsel",
       "magicFill": "Magisches Füllen",
       "autoColor": "Auto-Farbe",
@@ -61,7 +61,7 @@
     },
     "fillPatterns": {
       "solid": "Einfarbig",
-      "dots": "Punkte",
+      "dots": "Tupfen",
       "stripes": "Streifen",
       "diagonal": "Diagonal",
       "checkerboard": "Schachbrett",
@@ -355,7 +355,7 @@
         "description": "Starte deine Ausmal-Reise",
         "cta": "Kostenlos starten",
         "features": [
-          "2 kostenlose Kreationen täglich",
+          "2 kostenlose Kreationen zum Start",
           "Zugang zur kostenlosen Bibliothek",
           "Online-Ausmalleinwand",
           "PDF-Downloads"
@@ -461,7 +461,7 @@
       "intermediate": {
         "title": "Mittel",
         "shortLabel": "Mittel",
-        "description": "Moderate Details für eine längere, erdende Sitzung"
+        "description": "Moderate Details für eine längere, beruhigende Sitzung"
       },
       "advanced": {
         "title": "Fortgeschritten",
@@ -471,7 +471,7 @@
       "expert": {
         "title": "Experte",
         "shortLabel": "Experte",
-        "description": "Filigrane Werke für tiefe, meditative Flow-Zustände"
+        "description": "Filigrane Werke für tiefe, meditative Versenkung"
       }
     },
     "categories": {
@@ -485,7 +485,7 @@
       },
       "geometric": {
         "name": "Geometrisch",
-        "description": "Präzise Muster und Parkettierungen"
+        "description": "Präzise Muster und Kachelmuster"
       },
       "landscapes": {
         "name": "Landschaften",
@@ -497,7 +497,7 @@
       },
       "animals": {
         "name": "Tiere",
-        "description": "Tierwelt in filigranen Details"
+        "description": "Tierwelt in feinen Details"
       },
       "architecture": {
         "name": "Architektur",
