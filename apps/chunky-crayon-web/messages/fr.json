@@ -337,7 +337,7 @@
       "coloringPages": "Coloriages {category}",
       "relatedCategories": "Catégories associées",
       "noPagesYet": "Pas encore de pages {category}",
-      "beTheFirst": "Soyez la première personne à créer un coloriage {category} !",
+      "beTheFirst": "Soyez le premier ou la première à créer un coloriage {category} !",
       "createAPage": "Créer une page",
       "freeColoringPages": "Coloriages {category} gratuits",
       "lookingFor": "Vous cherchez le coloriage {category} parfait ? Vous êtes au bon endroit ! Notre collection propose plein de dessins {category}, parfaits pour les enfants comme pour les adultes.",
@@ -420,7 +420,7 @@
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins faits pour vos passions !",
         "why2Title": "Art détaillé",
         "why2Description": "Des dessins minutieux qui mettent au défi vos talents et sont magnifiques une fois finis.",
-        "why3Title": "Gestion du stress",
+        "why3Title": "Anti-stress",
         "why3Description": "Faites une pause loin des écrans et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop enfantins » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d'anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
@@ -435,7 +435,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits thérapeutiques du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Gestion du stress",
+        "why1Title": "Anti-stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
@@ -453,9 +453,9 @@
   "pricing": {
     "pageTitle": "Tarifs - Chunky Crayon",
     "heroTitle": "Des formules pour chaque aventure coloriage !",
-    "heroSubtitle": "Que vous soyez parent, jeune artiste ou adulte qui adore colorier, il y a une formule Chunky Crayon pour vous. Pas besoin de compte pour commencer !",
+    "heroSubtitle": "Créez, coloriez en ligne, collectionnez des autocollants et partagez avec vos amis. Choisissez la formule qui convient à votre famille.",
     "monthly": "Mensuel",
-    "annual": "Annuel (économisez 15 %)",
+    "annual": "Annuel (économisez 17 %)",
     "mostPopular": "La plus populaire",
     "buyNow": "Acheter",
     "noCommitment": "Sans engagement. Annulez à tout moment.",
@@ -512,7 +512,7 @@
       },
       "rollover": {
         "question": "Les crédits sont-ils reportés ?",
-        "answer": "Certaines formules permettent de reporter les crédits inutilisés. Consultez les détails de la formule pour en savoir plus."
+        "answer": "Les crédits Splash se remettent à zéro chaque mois. Rainbow permet un report jusqu'à 1 mois. Sparkle vous donne 2 mois de report."
       },
       "audience": {
         "question": "C’est pour les enfants ou les adultes ?",
