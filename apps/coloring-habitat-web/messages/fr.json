@@ -16,7 +16,7 @@
     "defaultDescription": "Page de coloriage gratuite pour adultes de Coloring Habitat",
     "progress": {
       "colored": "colorié",
-      "percentage": "{percent} %",
+      "percentage": "{percent}%",
       "milestones": {
         "25": "Bon début !",
         "50": "À mi-chemin !",
@@ -45,7 +45,7 @@
       "magic": "Magique"
     },
     "brushTypes": {
-      "crayon": "Crayon de cire",
+      "crayon": "Crayon",
       "marker": "Feutre",
       "eraser": "Gomme",
       "glitter": "Paillettes",
@@ -99,7 +99,7 @@
       "label": "Motif :"
     },
     "zoomControls": {
-      "zoomLevel": "Niveau de zoom : {level} %",
+      "zoomLevel": "Niveau de zoom : {level}%",
       "zoomOut": "Dézoomer",
       "zoomOutAria": "Dézoomer (voir plus large)",
       "zoomIn": "Zoomer",
@@ -344,7 +344,7 @@
     "subtitle": "Commencez gratuitement et passez à la version supérieure quand vous êtes prêt. Pas de frais cachés, annulation à tout moment.",
     "monthly": "Mensuel",
     "annual": "Annuel",
-    "savePercent": "Économisez 17%",
+    "savePercent": "-17%",
     "free": "Gratuit",
     "perMonth": "/mois",
     "perYear": "/an",
@@ -355,7 +355,7 @@
         "description": "Commencez votre aventure coloriage",
         "cta": "Commencer gratuitement",
         "features": [
-          "2 créations gratuites par jour",
+          "2 créations gratuites pour commencer",
           "Accès à la bibliothèque gratuite",
           "Toile de coloriage en ligne",
           "Téléchargements PDF"
@@ -532,7 +532,7 @@
         "description": "Machineries victoriennes et curieux engins"
       },
       "food": {
-        "name": "Cuisine",
+        "name": "Nourriture",
         "description": "Festins et scènes culinaires"
       }
     },
