@@ -92,6 +92,9 @@ export { default as CompletionCelebration } from "./CompletionCelebration";
 // Async fill (Web Worker)
 export { asyncFloodFill, terminateFillWorker } from "./asyncFill";
 
+// Async progress measurement (Web Worker)
+export { measureProgress, terminateProgressWorker } from "./asyncProgress";
+
 // Storage utilities
 export {
   saveColoringProgress,

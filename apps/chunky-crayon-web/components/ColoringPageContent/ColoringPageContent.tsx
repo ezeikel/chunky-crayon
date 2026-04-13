@@ -1,15 +1,12 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { ColoringImage } from '@one-colored-pixel/db/types';
 import ColoringArea, {
   ColoringAreaHandle,
 } from '@/components/ColoringArea/ColoringArea';
 import ProgressIndicator from '@/components/ProgressIndicator';
-import {
-  MuteToggle,
-  type RegionStoreJson,
-} from '@one-colored-pixel/coloring-ui';
+import { MuteToggle } from '@one-colored-pixel/coloring-ui';
 import { DesktopColorPalette } from '@one-colored-pixel/coloring-ui';
 import DesktopToolsSidebar from '@/components/DesktopToolsSidebar';
 import { trackViewContent } from '@/utils/pixels';
@@ -42,18 +39,6 @@ const ColoringPageContent = ({
   }, []);
 
   const coloringAreaRef = useRef<ColoringAreaHandle>(null);
-
-  // Parse regionsJson once for the progress indicator's accurate path.
-  const parsedRegionsJson = useMemo(() => {
-    try {
-      const raw = coloringImage.regionsJson;
-      if (!raw) return null;
-      if (typeof raw === 'string') return JSON.parse(raw) as RegionStoreJson;
-      return raw as unknown as RegionStoreJson;
-    } catch {
-      return null;
-    }
-  }, [coloringImage.regionsJson]);
 
   const getCanvas = useCallback(() => {
     return coloringAreaRef.current?.getCanvas() || null;
@@ -104,12 +89,7 @@ const ColoringPageContent = ({
         <div className="hidden md:flex xl:hidden items-center gap-4 w-full">
           <ProgressIndicator
             getCanvas={getCanvas}
-            regions={parsedRegionsJson?.regions}
-            totalRegionPixels={parsedRegionsJson?.regionPixelCount}
-            regionMapWidth={coloringImage.regionMapWidth as number | undefined}
-            regionMapHeight={
-              coloringImage.regionMapHeight as number | undefined
-            }
+            getBoundaryCanvas={getBoundaryCanvas}
             className="flex-1"
           />
           <MuteToggle />
@@ -133,14 +113,7 @@ const ColoringPageContent = ({
           <div className="hidden xl:flex items-center gap-4 mb-3">
             <ProgressIndicator
               getCanvas={getCanvas}
-              regions={parsedRegionsJson?.regions}
-              totalRegionPixels={parsedRegionsJson?.regionPixelCount}
-              regionMapWidth={
-                coloringImage.regionMapWidth as number | undefined
-              }
-              regionMapHeight={
-                coloringImage.regionMapHeight as number | undefined
-              }
+              getBoundaryCanvas={getBoundaryCanvas}
               className="flex-1"
             />
             <MuteToggle />

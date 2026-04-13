@@ -983,14 +983,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <ProgressIndicator
               getCanvas={getCanvas}
-              regions={parsedRegionsJson?.regions}
-              totalRegionPixels={parsedRegionsJson?.regionPixelCount}
-              regionMapWidth={
-                coloringImage.regionMapWidth as number | undefined
-              }
-              regionMapHeight={
-                coloringImage.regionMapHeight as number | undefined
-              }
+              getBoundaryCanvas={getBoundaryCanvas}
               className="flex-1 min-w-0"
             />
             <MuteToggle />
