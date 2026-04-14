@@ -10,6 +10,31 @@ import { renderDemoReel } from "./video/render.js";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
+/**
+ * Compute final output length in frames, mirroring DemoReel's section math.
+ * Keep in sync with GENERATION_SPEED in DemoReel.tsx.
+ */
+const GENERATION_SPEED = 8;
+const TAIL_HOLD_MS = 1500;
+
+function computeOutputFrames(
+  fps: number,
+  markers: {
+    typeStartMs: number;
+    submitMs: number;
+    redirectMs: number;
+    sweepDoneMs: number;
+  },
+): number {
+  const msToFrames = (ms: number) => Math.round((ms / 1000) * fps);
+  const typing = msToFrames(markers.submitMs - markers.typeStartMs);
+  const waitingSource = msToFrames(markers.redirectMs - markers.submitMs);
+  const waiting = Math.max(1, Math.round(waitingSource / GENERATION_SPEED));
+  const reveal = msToFrames(markers.sweepDoneMs - markers.redirectMs);
+  const tail = msToFrames(TAIL_HOLD_MS);
+  return typing + waiting + reveal + tail;
+}
+
 const app = new Hono();
 app.use("*", logger());
 
@@ -32,28 +57,43 @@ app.get("/health", (c) =>
  * iterate on the Remotion composition without burning a 2.5min generation.
  *
  * POST /publish/render-only
- * Body: { webm_filename: string, prompt?: string, duration_ms?: number }
+ * Body: {
+ *   webm_filename: string;
+ *   prompt: string;
+ *   recording_duration_ms: number;
+ *   flow_markers: FlowMarkers;
+ * }
+ *
+ * All fields required — copy them straight from a previous /publish/next
+ * response. Without the markers we can't do fast-forward.
  */
 app.post("/publish/render-only", async (c) => {
   const body = await c.req.json<{
     webm_filename: string;
-    prompt?: string;
-    duration_ms?: number;
+    prompt: string;
+    recording_duration_ms: number;
+    flow_markers: {
+      typeStartMs: number;
+      submitMs: number;
+      redirectMs: number;
+      brushReadyMs: number;
+      sweepDoneMs: number;
+    };
   }>();
-  if (!body.webm_filename)
-    return c.json({ error: "webm_filename required" }, 400);
+  if (!body.webm_filename || !body.flow_markers)
+    return c.json({ error: "webm_filename and flow_markers required" }, 400);
 
   const port = parseInt(process.env.PORT ?? "3030", 10);
   const recordedVideoUrl = `http://localhost:${port}/tmp/${body.webm_filename}`;
   const fps = 30;
-  const durationInFrames = Math.ceil(
-    (((body.duration_ms ?? 30_000) + 1500) / 1000) * fps,
-  );
+  const durationInFrames = computeOutputFrames(fps, body.flow_markers);
 
   const outputPath = resolve(WORKER_OUT_DIR, `${Date.now()}-render-only.mp4`);
   await renderDemoReel({
     recordedVideoUrl,
-    prompt: body.prompt ?? "A cute panda with a flower crown",
+    prompt: body.prompt,
+    recordingDurationMs: body.recording_duration_ms,
+    flowMarkers: body.flow_markers,
     durationInFrames,
     outputPath,
   });
@@ -112,65 +152,53 @@ app.get("/tmp/:filename", async (c) => {
 });
 
 /**
- * End-to-end record → render → post flow. Skeleton only — at this stage it
- * just runs the Playwright recording and returns the webm path. Remotion
- * composition, voiceover, and social posting get layered on in follow-ups.
+ * End-to-end record → render → post flow.
  *
  * POST /publish/next
- * Body: { image_id: string, dry_run?: boolean, sweep?: 'diagonal' | 'horizontal' }
+ * Body: { prompt: string, dry_run?: boolean, sweep?: 'diagonal' | 'horizontal' }
+ *
+ * Every run drives the full homepage → create → reveal flow. Costs one
+ * image generation (~5p) per call. For iterating on Remotion without
+ * re-recording, use POST /publish/render-only against an existing webm.
  */
 app.post("/publish/next", async (c) => {
   const body = await c.req.json<{
-    image_id?: string;
-    prompt?: string;
-    use_create_flow?: boolean;
+    prompt: string;
     dry_run?: boolean;
     sweep?: "diagonal" | "horizontal";
   }>();
 
-  if (!body.use_create_flow && !body.image_id) {
-    return c.json(
-      { error: "image_id is required (or pass use_create_flow + prompt)" },
-      400,
-    );
-  }
-  if (body.use_create_flow && !body.prompt) {
-    return c.json(
-      { error: "prompt is required when use_create_flow is true" },
-      400,
-    );
+  if (!body.prompt) {
+    return c.json({ error: "prompt is required" }, 400);
   }
 
   await mkdir(WORKER_OUT_DIR, { recursive: true });
 
-  // 1. Playwright — drive /create flow (or skip to coloring page) and record.
+  // 1. Playwright — drive the homepage create flow and record the reveal.
   const origin = process.env.CC_ORIGIN ?? "http://localhost:3000";
   const recording = await recordColoringSession({
-    imageId: body.image_id,
+    prompt: body.prompt,
     origin,
     sweep: body.sweep ?? "diagonal",
     outDir: WORKER_OUT_DIR,
-    createFlow: body.use_create_flow ? { prompt: body.prompt! } : undefined,
   });
 
-  // 2. Remotion — composite the raw webm with a caption overlay.
-  //    Serve the webm to the headless Chromium via the /tmp file server below.
+  // 2. Remotion — composite the raw webm into a time-remapped reel.
+  //    Sections: typing (1×) + waiting (8× ff) + reveal (1×) + tail hold.
+  //    Serve the webm to the headless Chromium via the /tmp file server.
   const port = parseInt(process.env.PORT ?? "3030", 10);
   const webmName = recording.webmPath.split("/").pop();
   const recordedVideoUrl = `http://localhost:${port}/tmp/${webmName}`;
 
-  // Use the actual recording length + a small tail-hold so the final colored
-  // image stays on screen for ~1.5s before the video ends.
   const fps = 30;
-  const tailHoldMs = 1500;
-  const durationInFrames = Math.ceil(
-    ((recording.durationMs + tailHoldMs) / 1000) * fps,
-  );
+  const durationInFrames = computeOutputFrames(fps, recording.flowMarkers);
 
   const outputPath = resolve(WORKER_OUT_DIR, `${Date.now()}-reel.mp4`);
   await renderDemoReel({
     recordedVideoUrl,
-    prompt: body.prompt ?? "A cute panda with a flower crown",
+    prompt: body.prompt,
+    recordingDurationMs: recording.durationMs,
+    flowMarkers: recording.flowMarkers,
     durationInFrames,
     outputPath,
   });

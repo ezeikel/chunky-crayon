@@ -8,12 +8,8 @@ import { mkdir, rename } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
 export type RecordSessionOptions = {
-  /**
-   * Coloring image id to navigate to (must be backfilled with region store).
-   * In createFlow mode this is ignored — we use whatever id comes back from
-   * the actual generation.
-   */
-  imageId?: string;
+  /** The prompt to type into the create form. Every run drives the full flow. */
+  prompt: string;
   /** Origin of the CC web app, e.g. "https://chunkycrayon.com" or "http://localhost:3000". */
   origin: string;
   /** Directory where the final webm should land (created if needed). */
@@ -30,27 +26,22 @@ export type RecordSessionOptions = {
    */
   sweepYieldMs?: number;
   /**
-   * If set, drive the full /create flow: type the prompt, submit, wait for
-   * redirect, then do the reveal. Otherwise navigate directly to imageId.
-   */
-  createFlow?: { prompt: string };
-  /**
    * Per-character delay when typing the prompt (ms). Slower = more natural.
    */
   typingDelayMs?: number;
 };
 
+/**
+ * Timestamps (ms from recording start) marking each phase of the flow.
+ * These drive Remotion's per-section playback rate so we can fast-forward
+ * the boring generation wait while keeping typing + reveal at 1×.
+ */
 export type FlowMarkers = {
-  /** ms from recording start when prompt typing began. */
-  typeStartMs?: number;
-  /** ms when "Create" was clicked. */
-  submitMs?: number;
-  /** ms when redirect to /coloring-image landed. */
-  redirectMs?: number;
-  /** ms when line art finished painting and brush activated. */
-  brushReadyMs?: number;
-  /** ms when the sweep finished. */
-  sweepDoneMs?: number;
+  typeStartMs: number;
+  submitMs: number;
+  redirectMs: number;
+  brushReadyMs: number;
+  sweepDoneMs: number;
 };
 
 export type RecordSessionResult = {
@@ -102,8 +93,9 @@ export async function recordColoringSession(
   const page: Page = await context.newPage();
   await page.setViewportSize({ width: VIDEO_WIDTH, height: VIDEO_HEIGHT });
   // Long-running flows (image gen, magic-colors prep) exceed the 30s Playwright
-  // default. Raise the floor for every call that doesn't pass its own timeout.
-  page.setDefaultTimeout(120_000);
+  // default. Raise the floor generously — our slowest stage (magic colors prep
+  // on a fresh image) can take 3–4 min on a cold worker.
+  page.setDefaultTimeout(5 * 60_000);
 
   // Mirror browser console to the worker log so we can see what the reveal
   // worker is doing mid-sweep — errors, warnings, or abrupt silence all tell us
@@ -120,63 +112,74 @@ export async function recordColoringSession(
   page.on("crash", () => console.log("[browser:crash] page crashed"));
   page.on("close", () => console.log("[browser:close] page closed"));
 
-  const flowMarkers: FlowMarkers = {};
-  let imageId = opts.imageId ?? "";
+  let imageId = "";
   let recordingError: unknown;
+  const flowMarkers: Partial<FlowMarkers> = {};
+
+  const log = (msg: string) => console.log(`[record] ${msg}`);
+  const phaseStart = Date.now();
+  const elapsed = () => ((Date.now() - phaseStart) / 1000).toFixed(1);
 
   try {
-    if (opts.createFlow) {
-      // Full flow: homepage → type prompt → submit → wait for redirect.
-      // The create form lives on the locale homepage, not at /create.
-      await page.goto(`${opts.origin}/en`, {
-        waitUntil: "domcontentloaded",
-        timeout: 60_000,
-      });
+    // ── 1. Homepage → create form ────────────────────────────────────────
+    log(`navigating to ${opts.origin}/en`);
+    await page.goto(`${opts.origin}/en`, {
+      waitUntil: "domcontentloaded",
+      timeout: 60_000,
+    });
+    log(`homepage loaded (${elapsed()}s)`);
 
-      const promptInput = page.getByTestId("create-prompt").first();
-      await promptInput.waitFor({ state: "visible", timeout: 15_000 });
-      await promptInput.click();
+    log(
+      "waiting for create-prompt textarea (60s — dev first-compile can be slow)",
+    );
+    const promptInput = page.getByTestId("create-prompt").first();
+    await promptInput.waitFor({ state: "visible", timeout: 60_000 });
+    await promptInput.click();
+    log("create-prompt focused");
 
-      flowMarkers.typeStartMs = Date.now() - start;
-      await promptInput.type(opts.createFlow.prompt, {
-        delay: opts.typingDelayMs ?? 80,
-      });
+    flowMarkers.typeStartMs = Date.now() - start;
+    log(
+      `typing prompt (${opts.prompt.length} chars @ ${opts.typingDelayMs ?? 80}ms/char)`,
+    );
+    await promptInput.type(opts.prompt, {
+      delay: opts.typingDelayMs ?? 80,
+    });
+    log(`typing done (${elapsed()}s)`);
 
-      // Tiny pause so the viewer reads the typed text before we hit submit.
-      await page.waitForTimeout(800);
+    // Tiny pause so the viewer reads the typed text before we hit submit.
+    await page.waitForTimeout(800);
 
-      flowMarkers.submitMs = Date.now() - start;
-      const submitBtn = page.getByTestId("create-submit").first();
-      await submitBtn.click();
+    // ── 2. Submit → wait for redirect to coloring page ───────────────────
+    flowMarkers.submitMs = Date.now() - start;
+    log("clicking submit button");
+    const submitBtn = page.getByTestId("create-submit").first();
+    await submitBtn.click();
+    log("submit clicked — waiting for redirect to /coloring-image/*");
 
-      // Wait for the server action to redirect us to the coloring page.
-      // Generation can take 30–90s, so be generous.
-      await page.waitForURL(/\/coloring-image\/[a-z0-9]+/, {
-        timeout: 180_000,
-      });
-      flowMarkers.redirectMs = Date.now() - start;
-      const url = page.url();
-      const match = url.match(/\/coloring-image\/([a-z0-9]+)/);
-      if (!match)
-        throw new Error(`Could not extract image id from URL: ${url}`);
-      imageId = match[1];
-    } else {
-      if (!opts.imageId)
-        throw new Error("imageId is required when createFlow is not set");
-      await page.goto(`${opts.origin}/en/coloring-image/${opts.imageId}`, {
-        waitUntil: "domcontentloaded",
-        timeout: 60_000,
-      });
-    }
+    await page.waitForURL(/\/coloring-image\/[a-z0-9]+/, {
+      timeout: 180_000,
+    });
+    flowMarkers.redirectMs = Date.now() - start;
+    const url = page.url();
+    const match = url.match(/\/coloring-image\/([a-z0-9]+)/);
+    if (!match) throw new Error(`Could not extract image id from URL: ${url}`);
+    imageId = match[1];
+    log(`redirected to image ${imageId} (${elapsed()}s since submit)`);
 
+    // ── 3. Wait for line art to paint ────────────────────────────────────
+    log("waiting for line art canvas to paint");
     await waitForLineArt(page);
-    // Critical: wait for the drawing canvas to be sized (it starts at the HTML
-    // default 300×150 until the image loads). The region-store pre-coloured
-    // canvas effect reads drawingCanvas.width/height at mount time — if we
-    // activate magic-brush before the canvas has been resized, the effect
-    // builds a tiny 300×150 mask and every subsequent stroke falls through
-    // to the legacy black-crayon fallback path. Manual users don't hit this
-    // because they take a couple seconds to click before stroking.
+    log(`line art painted (${elapsed()}s)`);
+
+    // ── 4. Wait for drawing canvas to be sized ───────────────────────────
+    // Critical: canvas starts at 300×150 (HTML default) until the image loads.
+    // The region-store pre-coloured canvas effect reads drawingCanvas.width/
+    // height at mount time — if we activate magic-brush before the canvas has
+    // been resized, the effect builds a tiny 300×150 mask and every subsequent
+    // stroke falls through to the legacy black-crayon fallback path. Manual
+    // users don't hit this because they take a couple seconds to click before
+    // stroking.
+    log("waiting for drawing canvas to be sized (>400×400)");
     await page.waitForFunction(
       () => {
         const canvases = document.querySelectorAll("canvas");
@@ -186,41 +189,95 @@ export async function recordColoringSession(
       },
       { timeout: 30_000, polling: 500 },
     );
-    console.log("[record] drawing canvas sized correctly");
+    const canvasDims = await page.evaluate(() => {
+      const d = document.querySelectorAll("canvas")[0] as HTMLCanvasElement;
+      return { w: d.width, h: d.height };
+    });
+    log(`drawing canvas sized: ${canvasDims.w}×${canvasDims.h}`);
+
+    // ── 4b. Wait for region store to land ────────────────────────────────
+    // ColoringArea polls the DB after mount and calls router.refresh() when
+    // the post-create pipeline has finished backfilling regionMapUrl. After
+    // refresh the ImageCanvas effect rebuilds the pre-coloured canvas at
+    // full size, which logs "[ImageCanvas] Pre-coloured canvas built".
+    // Wait for THAT specific log with a reasonable dimension so we know the
+    // magic-brush reveal path will use region-store (not the legacy colour
+    // map fallback). Times out after 3 min — by then the image either has
+    // regions or we give up and accept the legacy reveal.
+    log("waiting for region store to hydrate (preColoured canvas >= 400px)");
+    const regionReady = await waitForRegionStoreReady(page, 180_000);
+    if (regionReady) {
+      log(`region store ready — preColoured canvas built at ${regionReady}`);
+    } else {
+      log("region store wait timed out — proceeding with legacy reveal path");
+    }
+
+    // ── 5. Activate Magic Brush + pick size ──────────────────────────────
+    log("selecting Magic Brush (first time)");
     await selectMagicBrush(page);
+    log("selecting large brush size");
     await selectLargeBrush(page);
     await page.waitForTimeout(400);
 
+    // ── 6. Wait for magic-colors prep to finish ──────────────────────────
     // First time on a fresh image, the magic-colors palette has to be prepared
     // server-side. The page shows a "Mixing the magic colors!" overlay
     // (testid="magic-colors-loading"). Wait for it to disappear before sweeping.
-    // Generation can take several minutes, so be generous.
+    log("waiting for magic-colors modal to detach (server-side prep)");
     await waitForMagicColorsReady(page);
+    log(`magic-colors ready (${elapsed()}s since line art)`);
 
     // Re-select the brush: the modal-driven state transition can leave
     // activeTool in a stale state. Also give the client region store a beat
     // to hydrate after the modal detaches — otherwise the first strokes fire
     // before region queries work and the reveal falls back to the legacy
     // colour-map path. 2s is enough in practice; cheap insurance.
+    log("re-selecting Magic Brush (after modal close)");
     await selectMagicBrush(page);
     await page.waitForTimeout(2000);
+    // Final sanity check: aria-pressed on magic-reveal must be true right
+    // before the sweep. If it's not, the whole sweep will draw black crayon.
+    const preSweepState = await page.evaluate(() => {
+      const btns = Array.from(
+        document.querySelectorAll<HTMLButtonElement>(
+          '[data-testid="tool-magic-reveal"]',
+        ),
+      );
+      return btns.map((b) => ({
+        ariaPressed: b.getAttribute("aria-pressed"),
+        disabled: b.disabled,
+      }));
+    });
+    log(`pre-sweep magic-reveal state: ${JSON.stringify(preSweepState)}`);
+    const anyPressed = preSweepState.some((b) => b.ariaPressed === "true");
+    if (!anyPressed) {
+      throw new Error(
+        `Magic Brush is NOT aria-pressed right before sweep — would produce black strokes. State: ${JSON.stringify(preSweepState)}`,
+      );
+    }
     flowMarkers.brushReadyMs = Date.now() - start;
 
+    // ── 7. Sweep ─────────────────────────────────────────────────────────
     const canvas = page.locator("canvas").first();
     const box = await canvas.boundingBox();
     if (!box) throw new Error("Canvas has no bounding box");
+    log(
+      `canvas bounding box: x=${Math.round(box.x)} y=${Math.round(box.y)} ${Math.round(box.width)}×${Math.round(box.height)}`,
+    );
 
-    console.log(`[record] starting ${sweep} sweep (yield=${sweepYieldMs}ms)`);
+    log(`starting ${sweep} sweep (yield=${sweepYieldMs}ms between strokes)`);
     if (sweep === "horizontal") {
       await sweepHorizontal(page, box, sweepYieldMs);
     } else {
       await sweepDiagonal(page, box, sweepYieldMs);
     }
-    console.log("[record] sweep finished");
+    log(`sweep finished (${elapsed()}s)`);
     flowMarkers.sweepDoneMs = Date.now() - start;
 
     // Let the reveal worker drain any in-flight mask updates before we close.
+    log("draining reveal worker (1.5s tail)");
     await page.waitForTimeout(1500);
+    log("recording phase complete, closing browser");
   } catch (err) {
     recordingError = err;
     console.error("[record] error during session:", err);
@@ -245,7 +302,7 @@ export async function recordColoringSession(
         webmPath: finalPath,
         durationMs: Date.now() - start,
         imageId,
-        flowMarkers,
+        flowMarkers: flowMarkers as FlowMarkers,
       };
     }
   }
@@ -254,29 +311,120 @@ export async function recordColoringSession(
 }
 
 async function waitForLineArt(page: Page): Promise<void> {
-  console.log("[record] waitForLineArt: waiting for canvas to be visible");
+  console.log(
+    "[record] waitForLineArt: waiting for first canvas to be visible",
+  );
   await page
     .locator("canvas")
     .first()
     .waitFor({ state: "visible", timeout: 15_000 });
   console.log(
-    "[record] waitForLineArt: canvas visible, polling for paint (90s budget)",
+    "[record] waitForLineArt: canvas visible, polling image-canvas center pixel for alpha > 0 (180s budget)",
   );
   await page.waitForTimeout(2000);
-  await page.waitForFunction(
-    () => {
-      const canvases = document.querySelectorAll("canvas");
-      if (canvases.length < 2) return false;
-      const img = canvases[1] as HTMLCanvasElement;
-      const ctx = img.getContext("2d");
-      if (!ctx || img.width === 0) return false;
-      const data = ctx.getImageData(img.width / 2, img.height / 2, 1, 1).data;
-      return data[3] > 0;
-    },
-    { timeout: 180_000, polling: 500 },
-  );
+
+  // Poll for paint. Sample a 3×3 grid (not just center) because line art is
+  // often sparse — a single bounding-box-center sample can be on blank paper
+  // even when most of the image has been drawn. If ANY grid point has paint,
+  // we consider the canvas ready.
+  try {
+    await page.waitForFunction(
+      () => {
+        const canvases = document.querySelectorAll("canvas");
+        if (canvases.length < 2) return false;
+        const img = canvases[1] as HTMLCanvasElement;
+        const ctx = img.getContext("2d");
+        if (!ctx || img.width === 0) return false;
+        for (let dy = 0; dy < 3; dy++) {
+          for (let dx = 0; dx < 3; dx++) {
+            const px = Math.floor((img.width * (dx + 1)) / 4);
+            const py = Math.floor((img.height * (dy + 1)) / 4);
+            if (ctx.getImageData(px, py, 1, 1).data[3] > 0) return true;
+          }
+        }
+        return false;
+      },
+      { timeout: 180_000, polling: 500 },
+    );
+  } catch (err) {
+    const diag = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll("canvas")).map((c, i) => {
+        const r = c.getBoundingClientRect();
+        const ctx = c.getContext("2d");
+        let centerAlpha: number | null = null;
+        let anyPainted = false;
+        try {
+          if (ctx && c.width > 0 && c.height > 0) {
+            const cx = Math.floor(c.width / 2);
+            const cy = Math.floor(c.height / 2);
+            centerAlpha = ctx.getImageData(cx, cy, 1, 1).data[3];
+            // Sample a 3×3 grid to see if ANY point has paint.
+            for (let dy = 0; dy < 3 && !anyPainted; dy++) {
+              for (let dx = 0; dx < 3 && !anyPainted; dx++) {
+                const px = Math.floor((c.width * (dx + 1)) / 4);
+                const py = Math.floor((c.height * (dy + 1)) / 4);
+                if (ctx.getImageData(px, py, 1, 1).data[3] > 0) {
+                  anyPainted = true;
+                }
+              }
+            }
+          }
+        } catch {
+          centerAlpha = -1;
+        }
+        return {
+          index: i,
+          intrinsic: { w: c.width, h: c.height },
+          cssRect: { w: Math.round(r.width), h: Math.round(r.height) },
+          centerAlpha,
+          anyPaintedIn3x3Grid: anyPainted,
+        };
+      });
+    });
+    console.error(
+      `[record] waitForLineArt TIMEOUT — canvas diag:\n${JSON.stringify(diag, null, 2)}`,
+    );
+    throw err;
+  }
+
   console.log("[record] waitForLineArt: line art painted");
   await page.waitForTimeout(600);
+}
+
+/**
+ * Wait for the ImageCanvas pre-coloured canvas to be built at full size.
+ * That log fires inside the ImageCanvas effect at line ~1144 of
+ * packages/coloring-ui/src/ImageCanvas.tsx when regionStore.isReady becomes
+ * true. If dimensions are < 400, it's the stale 300×150 default and doesn't
+ * count. Returns the "{w}×{h}" string on success, or null on timeout.
+ */
+async function waitForRegionStoreReady(
+  page: Page,
+  timeoutMs: number,
+): Promise<string | null> {
+  return new Promise((resolvePromise) => {
+    const rx = /\[ImageCanvas\] Pre-coloured canvas built:\s*(\d+)×(\d+)/;
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      page.off("console", onConsole);
+      resolvePromise(null);
+    }, timeoutMs);
+    const onConsole = (msg: import("playwright").ConsoleMessage) => {
+      const m = msg.text().match(rx);
+      if (!m) return;
+      const w = parseInt(m[1], 10);
+      const h = parseInt(m[2], 10);
+      if (w < 400 || h < 400) return; // stale default, keep waiting
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      page.off("console", onConsole);
+      resolvePromise(`${w}×${h}`);
+    };
+    page.on("console", onConsole);
+  });
 }
 
 async function selectMagicBrush(page: Page): Promise<void> {
@@ -284,35 +432,71 @@ async function selectMagicBrush(page: Page): Promise<void> {
     () => !!document.querySelector('[data-testid="tool-magic-reveal"]'),
     { timeout: 15_000, polling: 250 },
   );
+  const buttonCount = await page.evaluate(
+    () => document.querySelectorAll('[data-testid="tool-magic-reveal"]').length,
+  );
+  console.log(
+    `[record] selectMagicBrush: found ${buttonCount} tool-magic-reveal button(s)`,
+  );
 
   for (let attempt = 0; attempt < 20; attempt++) {
-    const pressed = await page.evaluate(() => {
+    const state = await page.evaluate(() => {
       const buttons = Array.from(
         document.querySelectorAll<HTMLButtonElement>(
           '[data-testid="tool-magic-reveal"]',
         ),
       );
       buttons.forEach((b) => b.click());
-      return buttons.some((b) => b.getAttribute("aria-pressed") === "true");
+      return {
+        pressed: buttons.some((b) => b.getAttribute("aria-pressed") === "true"),
+        details: buttons.map((b) => ({
+          ariaPressed: b.getAttribute("aria-pressed"),
+          disabled: b.disabled,
+        })),
+      };
     });
-    if (pressed) return;
+    if (state.pressed) {
+      if (attempt > 0) {
+        console.log(
+          `[record] selectMagicBrush: activated on attempt ${attempt + 1}`,
+        );
+      } else {
+        console.log("[record] selectMagicBrush: activated");
+      }
+      return;
+    }
+    console.log(
+      `[record] selectMagicBrush attempt ${attempt + 1}/20 not pressed yet: ${JSON.stringify(state.details)}`,
+    );
     await page.waitForTimeout(300);
   }
-  throw new Error("Magic Brush failed to activate");
+  throw new Error("Magic Brush failed to activate after 20 attempts");
 }
 
 async function waitForMagicColorsReady(page: Page): Promise<void> {
   // The overlay only mounts AFTER the magic tool is active. Give the page a
   // moment for it to appear if it's going to, then poll until it's gone.
   await page.waitForTimeout(800);
+  const modalPresent = await page.evaluate(
+    () => !!document.querySelector('[data-testid="magic-colors-loading"]'),
+  );
+  console.log(
+    `[record] magic-colors modal ${modalPresent ? "detected — waiting for it to detach" : "not present (already prepared?)"}`,
+  );
+  const start = Date.now();
   await page
     .locator('[data-testid="magic-colors-loading"]')
     .waitFor({ state: "detached", timeout: 5 * 60_000 })
-    .catch(() => {
-      // If the overlay never appeared (image already had a region store
-      // cached) the locator is already detached and waitFor resolves
-      // immediately. Anything else is a real timeout — let the caller know.
+    .catch((err) => {
+      console.log(
+        `[record] magic-colors waitFor detached ended: ${err?.message ?? "already detached"}`,
+      );
     });
+  if (modalPresent) {
+    console.log(
+      `[record] magic-colors modal detached after ${((Date.now() - start) / 1000).toFixed(1)}s`,
+    );
+  }
 }
 
 async function selectLargeBrush(page: Page): Promise<void> {
@@ -335,6 +519,9 @@ async function sweepHorizontal(
   const y1 = box.y + box.height - padding;
   const rows = 32;
   const rowHeight = (y1 - y0) / (rows - 1);
+  console.log(
+    `[record] horizontal sweep: ${rows} rows, ${Math.round(rowHeight)}px apart`,
+  );
 
   for (let r = 0; r < rows; r++) {
     const y = y0 + r * rowHeight;
@@ -342,6 +529,11 @@ async function sweepHorizontal(
     await page.mouse.down();
     await page.mouse.move(x1, y, { steps: 50 });
     await page.mouse.up();
+    if ((r + 1) % 5 === 0 || r === rows - 1) {
+      console.log(
+        `[record]   horizontal row ${r + 1}/${rows}  y=${Math.round(y)}`,
+      );
+    }
     if (yieldMs > 0) await page.waitForTimeout(yieldMs);
   }
 }
@@ -361,6 +553,9 @@ async function sweepDiagonal(
 
   const strokeStep = 32;
   const totalStrokes = Math.ceil((W + H) / strokeStep);
+  console.log(
+    `[record] diagonal sweep: ~${totalStrokes} strokes, step=${strokeStep}px across ${W}×${H} canvas`,
+  );
 
   for (let i = 0; i < totalStrokes; i++) {
     const d = i * strokeStep;
