@@ -351,6 +351,7 @@ const DesktopToolsSidebar = ({
                 aria-label={label}
                 title={label}
                 aria-pressed={isActive}
+                data-testid={`tool-${id}`}
               >
                 <FontAwesomeIcon icon={icon} size="xl" />
               </button>
@@ -400,6 +401,7 @@ const DesktopToolsSidebar = ({
                       : label
                 }
                 aria-pressed={isActive}
+                data-testid={`tool-${id}`}
               >
                 {showSpinner ? (
                   <div className="size-10 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -455,6 +457,7 @@ const DesktopToolsSidebar = ({
                 )}
                 aria-label={sizeLabel}
                 title={sizeLabel}
+                data-testid={`brush-size-${size}`}
               >
                 <span
                   className="rounded-full transition-colors"

@@ -259,6 +259,7 @@ const ToolSelector = ({
             aria-label={label}
             title={label}
             aria-pressed={isActive}
+            data-testid={`tool-${id}`}
           >
             <Icon
               className={isMagic ? "size-4 sm:size-5" : "size-5 sm:size-6"}

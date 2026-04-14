@@ -39,6 +39,7 @@ const StartOverButton = ({
           icon={faBroomWide}
           label={t('confirm')}
           onClick={handleClick}
+          data-testid="start-over-confirm"
         />
         <ActionButton
           size="tile"
@@ -60,6 +61,7 @@ const StartOverButton = ({
       onClick={handleClick}
       disabled={disabled}
       className={className}
+      data-testid="start-over"
     />
   );
 };
