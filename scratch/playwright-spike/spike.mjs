@@ -29,10 +29,9 @@ if (!['fill', 'brush'].includes(mode)) {
   process.exit(1);
 }
 
-// Sweep pattern for brush mode. 'horizontal' is the default — proven reliable.
-// 'diagonal' looks more organic but can stall the offscreen-canvas reveal worker
-// on slower machines due to more/longer strokes in the dense middle band.
-const sweep = process.env.SWEEP || 'horizontal';
+// Sweep pattern for brush mode. Diagonal looks more organic and covers cleanly
+// at strokeStep=32. Horizontal is the fallback if the reveal worker stalls.
+const sweep = process.env.SWEEP || 'diagonal';
 if (!['horizontal', 'diagonal'].includes(sweep)) {
   console.error('SWEEP must be "horizontal" or "diagonal"');
   process.exit(1);
@@ -70,11 +69,16 @@ const context = await browser.newContext({
 const page = await context.newPage();
 await page.setViewportSize({ width: VIDEO_WIDTH, height: VIDEO_HEIGHT });
 
-// Clear storage so previous runs' coloring state doesn't linger and disable the button.
+// Clear storage so previous runs' coloring state doesn't linger and disable the button,
+// and pre-mute audio so the recording has no SFX/music.
 await page.addInitScript(() => {
   try {
     localStorage.clear();
     sessionStorage.clear();
+    // ColoringContextProvider reads these on mount (see context.tsx hydration).
+    localStorage.setItem('chunky-crayon-muted', 'true');
+    localStorage.setItem('chunky-crayon-sfx-muted', 'true');
+    localStorage.setItem('chunky-crayon-ambient-muted', 'true');
   } catch {}
 });
 
@@ -275,15 +279,10 @@ if (mode === 'fill') {
     //   t = +H  → stroke clings to the bottom-left corner (short)
     // Sweeping t from -W → +H walks the reveal from TR down to BL, but we want
     // TL → BR, so we iterate t from +H → -W and the cursor fills in from TL outward.
-    // TL→BR diagonal sweep. Each stroke is a short 45° segment; d grows from 0 so
-    // the reveal propagates out of the TL corner.
-    //
-    // TODO: coverage gaps remain between strokes (parallel short segments don't
-    // tile perfectly at step=48 with a large brush). Attempts to close them by
-    // tightening strokeStep or switching to parallel-line math made the offscreen
-    // reveal worker stall on slower machines. Revisit once running on Hetzner
-    // under xvfb (no HMR noise) — should have more CPU headroom there.
-    const strokeStep = 48;
+    // TL→BR diagonal sweep. Each stroke is a short 45° segment; d grows from 0
+    // so the reveal propagates out of the TL corner. Step 32 closes gaps
+    // between strokes without overwhelming the reveal worker.
+    const strokeStep = 32;
     const totalStrokes = Math.ceil((W + H) / strokeStep);
 
     for (let i = 0; i < totalStrokes; i++) {
