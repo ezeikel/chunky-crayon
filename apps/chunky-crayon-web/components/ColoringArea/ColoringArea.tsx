@@ -42,6 +42,12 @@ import {
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
 import { generateColoredReference } from '@/app/actions/generate-colored-reference';
 import { detectAllRegions } from '@one-colored-pixel/canvas';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faSpinnerThird,
+  faWandMagicSparkles,
+  faFaceFrownOpen,
+} from '@fortawesome/pro-duotone-svg-icons';
 
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
@@ -1026,36 +1032,57 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           {/* Magic Loading Overlay - Shows when magic tools are analyzing the image */}
           {isMagicToolActive &&
             (magicColorMapState.isLoading || isGeneratingFillPoints) && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-                <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 border-2 border-crayon-purple/20 shadow-lg">
-                  <div className="relative">
-                    <div className="size-12 border-4 border-crayon-purple/30 border-t-crayon-purple rounded-full animate-spin" />
-                    <span className="absolute inset-0 flex items-center justify-center text-2xl">
-                      ✨
-                    </span>
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6"
+                data-testid="magic-colors-loading"
+              >
+                <div className="flex flex-col items-center gap-5 p-8 sm:p-10 rounded-3xl bg-white border-4 border-crayon-purple/30 shadow-xl max-w-md w-full">
+                  <div className="relative size-20">
+                    <FontAwesomeIcon
+                      icon={faSpinnerThird}
+                      className="size-20 text-crayon-purple animate-spin"
+                    />
+                    <FontAwesomeIcon
+                      icon={faWandMagicSparkles}
+                      className="absolute inset-0 m-auto size-9 text-crayon-purple"
+                    />
                   </div>
-                  <p className="text-sm font-bold text-crayon-purple text-center max-w-[200px]">
+                  <p className="text-2xl sm:text-3xl font-extrabold text-crayon-purple text-center leading-tight">
                     {isGeneratingFillPoints
-                      ? 'Preparing magic colors for the first time...'
-                      : magicColorMapState.loadingMessage ||
-                        'Preparing magic colors...'}
+                      ? 'Mixing the magic colors!'
+                      : 'Getting the colors ready!'}
                   </p>
+                  <p className="text-base sm:text-lg font-medium text-text-muted text-center max-w-xs">
+                    {isGeneratingFillPoints
+                      ? 'This only happens once — hang tight, the rainbow is on its way.'
+                      : magicColorMapState.loadingMessage ||
+                        'Almost there — getting your palette ready.'}
+                  </p>
+                  <div className="w-full h-3 rounded-full bg-crayon-purple/15 overflow-hidden">
+                    <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-crayon-purple via-crayon-pink to-crayon-orange animate-magic-progress" />
+                  </div>
                 </div>
               </div>
             )}
 
           {/* Magic Error Overlay - Shows if magic analysis fails */}
           {isMagicToolActive && magicColorMapState.error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-              <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-crayon-pink/10 border-2 border-crayon-pink/30 shadow-lg">
-                <span className="text-3xl">😕</span>
-                <p className="text-sm font-bold text-crayon-pink text-center max-w-[200px]">
+            <div className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6">
+              <div className="flex flex-col items-center gap-5 p-8 sm:p-10 rounded-3xl bg-white border-4 border-crayon-pink/40 shadow-xl max-w-md w-full">
+                <FontAwesomeIcon
+                  icon={faFaceFrownOpen}
+                  className="size-16 text-crayon-pink"
+                />
+                <p className="text-2xl sm:text-3xl font-extrabold text-crayon-pink text-center leading-tight">
+                  Oops, the magic got tangled!
+                </p>
+                <p className="text-base sm:text-lg font-medium text-text-muted text-center max-w-xs">
                   {magicColorMapState.error}
                 </p>
                 <button
                   type="button"
                   onClick={() => resetMagicColorMap()}
-                  className="px-4 py-2 text-sm font-bold text-white bg-crayon-purple rounded-full hover:bg-crayon-purple/90 active:scale-95 transition-all"
+                  className="px-6 py-3 text-base font-bold text-white bg-crayon-purple rounded-full hover:bg-crayon-purple/90 active:scale-95 transition-all"
                 >
                   Try Again
                 </button>

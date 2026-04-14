@@ -13,10 +13,11 @@ type SubmitButtonProps = {
   disabled?: boolean;
   /** Optional leading icon shown before the label (hidden while pending). */
   icon?: IconDefinition;
+  'data-testid'?: string;
 };
 
 const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
-  ({ text, className, disabled, icon }, ref) => {
+  ({ text, className, disabled, icon, 'data-testid': dataTestId }, ref) => {
     const { pending } = useFormStatus();
 
     return (
@@ -24,6 +25,7 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
         ref={ref}
         type="submit"
         disabled={pending || disabled}
+        data-testid={dataTestId}
         className={cn('flex gap-x-2', {
           [className as string]: !!className,
         })}

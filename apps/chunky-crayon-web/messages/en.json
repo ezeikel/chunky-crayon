@@ -967,6 +967,17 @@
     "ctaMessage": "to keep your creations forever and unlock more!",
     "ctaButton": "Start Free"
   },
+  "coloringPage": {
+    "progress": {
+      "allDone": "All done!",
+      "milestones": {
+        "25": "Great start!",
+        "50": "Halfway there!",
+        "75": "Nearly there!",
+        "100": "All done!"
+      }
+    }
+  },
   "createForm": {
     "title": "Create Magic!",
     "tagline": "Type, talk, or snap a photo!",
@@ -1038,7 +1049,7 @@
     "placeholderSignIn": "Sign in to start creating magical coloring pages!",
     "buttonCreate": "Create",
     "buttonCreateGuest": "Create",
-    "freeTriesChip": "{remaining} free {remaining, plural, =1 {try} other {tries}} left",
+    "freeTriesChip": "{remaining, plural, =1 {# free try left} other {# free tries left}}",
     "buttonSignUp": "Sign up for 15 free credits",
     "buttonBuyCredits": "Buy more credits",
     "buttonViewPlans": "View plans",

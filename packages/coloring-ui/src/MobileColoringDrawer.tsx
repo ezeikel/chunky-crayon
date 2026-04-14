@@ -499,7 +499,7 @@ const MobileColoringDrawer = ({
 
               {/* Colors — grid driven by the current palette variant */}
               <div className="mb-4">
-                <div className="grid grid-cols-7 gap-2 py-1">
+                <div className="grid grid-cols-8 gap-1.5 py-1">
                   {colors.map((color) => {
                     const isSelected = selectedColor === color.hex;
                     return (

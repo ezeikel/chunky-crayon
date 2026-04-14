@@ -49,6 +49,7 @@ const TextInput = ({ className }: TextInputProps) => {
         value={description}
         onChange={handleChange}
         placeholder={getPlaceholder()}
+        data-testid="create-prompt"
         className={cn(
           'font-tondo text-base md:text-lg border-2 h-36 md:h-40 rounded-coloring-card resize-none p-4 md:p-5',
           'placeholder:text-text-muted placeholder:text-base md:placeholder:text-lg',

@@ -664,3 +664,14 @@
 [data-sonner-toast] [data-description] {
   color: hsl(var(--text-secondary)) !important;
 }
+
+/* Magic colors loading bar — sweeps a coloured fill back and forth across
+   the track. Used in ColoringArea's "Mixing the magic colors" overlay. */
+@keyframes magic-progress {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(220%); }
+}
+
+.animate-magic-progress {
+  animation: magic-progress 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
