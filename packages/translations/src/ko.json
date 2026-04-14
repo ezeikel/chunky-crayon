@@ -404,7 +404,9 @@
   "startOverButton": {
     "idle": "처음부터",
     "confirm": "네, 처음부터 할래요",
-    "cancel": "계속 색칠하기"
+    "cancel": "계속 색칠하기",
+    "modalTitle": "처음부터 할까요?",
+    "modalBody": "색칠한 게 전부 지워져요. 괜찮아요?"
   },
   "downloadPDFButton": {
     "idle": "인쇄",

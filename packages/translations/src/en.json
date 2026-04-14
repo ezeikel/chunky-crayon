@@ -183,7 +183,9 @@
   "startOverButton": {
     "idle": "Start Over",
     "confirm": "Yes, Start Over",
-    "cancel": "Keep Coloring"
+    "cancel": "Keep Coloring",
+    "modalTitle": "Start over?",
+    "modalBody": "This will wipe all your colouring. Are you sure?"
   },
   "downloadPDFButton": {
     "idle": "Print",

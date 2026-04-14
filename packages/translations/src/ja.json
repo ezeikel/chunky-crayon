@@ -404,7 +404,9 @@
   "startOverButton": {
     "idle": "はじめから",
     "confirm": "うん、はじめから",
-    "cancel": "つづけてぬる"
+    "cancel": "つづけてぬる",
+    "modalTitle": "はじめからにする？",
+    "modalBody": "いまぬったのが ぜんぶ きえるよ。いい？"
   },
   "downloadPDFButton": {
     "idle": "印刷",

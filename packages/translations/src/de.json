@@ -404,7 +404,9 @@
   "startOverButton": {
     "idle": "Neu anfangen",
     "confirm": "Ja, neu anfangen",
-    "cancel": "Weiter ausmalen"
+    "cancel": "Weiter ausmalen",
+    "modalTitle": "Neu anfangen?",
+    "modalBody": "Dein ganzes Bild wird gelöscht. Bist du sicher?"
   },
   "downloadPDFButton": {
     "idle": "Drucken",

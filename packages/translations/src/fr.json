@@ -404,7 +404,9 @@
   "startOverButton": {
     "idle": "Recommencer",
     "confirm": "Oui, recommencer",
-    "cancel": "Continuer à colorier"
+    "cancel": "Continuer à colorier",
+    "modalTitle": "Recommencer ?",
+    "modalBody": "Cela effacera tout ton coloriage. Tu es sûr ?"
   },
   "downloadPDFButton": {
     "idle": "Imprimer",
