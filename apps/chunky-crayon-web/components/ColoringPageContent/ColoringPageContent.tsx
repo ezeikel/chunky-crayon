@@ -81,7 +81,9 @@ const ColoringPageContent = ({
     <div className="flex flex-col gap-y-4 @container">
       {/* Title with progress/mute underneath on desktop */}
       <div className="flex flex-col items-center gap-2 max-w-3xl xl:max-w-none w-full mx-auto xl:px-4">
-        <h1 className="font-tondo font-bold text-2xl md:text-3xl text-text-primary text-center">
+        {/* Hidden on mobile to maximise canvas real estate — the title is
+         * already present via the breadcrumb and browser tab. */}
+        <h1 className="hidden md:block font-tondo font-bold text-2xl md:text-3xl text-text-primary text-center">
           {title}
         </h1>
         {/* Desktop only: Progress bar stretches, mute on right */}

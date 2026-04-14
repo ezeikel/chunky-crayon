@@ -97,14 +97,13 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
       <button
         type="button"
         className={cn(
-          "rounded-full shadow-md transition-all duration-150 ease-out",
-          "hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coloring-accent",
+          "rounded-full border-2 transition-all duration-150 ease-out",
+          "active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coloring-accent",
           sizeClasses[size],
-          {
-            "ring-2 ring-offset-2 ring-gray-800 scale-110":
-              isSelected && !isMagicToolActive,
-            "border border-gray-300": isWhite,
-          },
+          isSelected && !isMagicToolActive
+            ? "ring-2 ring-offset-1 ring-coloring-accent border-white"
+            : "border-paper-cream-dark",
+          isWhite && !isSelected && "border-paper-cream-dark",
         )}
         style={{ backgroundColor: color.hex }}
         onClick={() => handleColorSelect(color.hex, color.name, index)}
@@ -123,7 +122,7 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 p-3 sm:p-4 rounded-coloring-card bg-white/90 backdrop-blur-sm shadow-coloring-surface",
+        "flex flex-col gap-2 p-3 sm:p-4 rounded-coloring-card bg-white border-2 border-paper-cream-dark shadow-coloring-surface",
         "transition-opacity duration-coloring-base ease-coloring",
         isMagicToolActive && "opacity-40 pointer-events-none",
         className,
@@ -147,11 +146,10 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
                 type="button"
                 key={`recent-${hex}`}
                 className={cn(
-                  "size-6 sm:size-7 rounded-full shadow-sm transition-all duration-150",
-                  "hover:scale-110 active:scale-95 focus:outline-none",
+                  "size-6 sm:size-7 rounded-full border-2 border-paper-cream-dark transition-all duration-150",
+                  "active:scale-95 focus:outline-none",
                   selectedColor === hex &&
-                    "ring-2 ring-offset-1 ring-gray-800 scale-110",
-                  hex === "#FFFFFF" && "border border-gray-300",
+                    "ring-2 ring-offset-1 ring-coloring-accent border-white",
                 )}
                 style={{ backgroundColor: hex }}
                 onClick={() => handleColorSelect(hex, "Recent", i)}

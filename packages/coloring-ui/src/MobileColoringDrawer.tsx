@@ -13,28 +13,31 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPencil,
   faPaintbrush,
+  faPenNib,
+  faPaintRoller,
   faFillDrip,
   faSparkles,
-  faRainbow,
-  faSun,
-  faBoltLightning,
   faEraser,
   faStar,
   faBrush,
-  faWandSparkles,
   faCircle,
   faGripVertical,
   faHeart,
   faBorderAll,
   faTableCellsLarge,
-} from "@fortawesome/pro-solid-svg-icons";
+  faPalette,
+  faIceCream,
+  faDice,
+} from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CanvasAction, useColoringContext } from "./context";
 import {
-  ALL_COLORING_COLORS,
   BRUSH_SIZES,
+  COLORING_PALETTE_VARIANTS,
+  PALETTE_VARIANTS,
   type FillPattern,
   type BrushSize,
+  type PaletteVariant,
 } from "./types";
 import { useSound } from "./useSound";
 import cn from "./cn";
@@ -62,11 +65,21 @@ type ToolConfig = {
 // Constants - Matching mobile native app
 // ============================================================================
 
-// All tools in a single scrollable row (matching mobile pattern)
-// Core tools — sparkle, rainbow, glow, neon removed (confusing UX)
+// Palette mood icons — same mapping desktop uses so both surfaces feel unified.
+const variantIcons: Record<PaletteVariant, IconDefinition> = {
+  realistic: faPalette,
+  pastel: faIceCream,
+  cute: faHeart,
+  surprise: faDice,
+};
+
+// Tools — match desktop sidebar's list and order exactly so the two surfaces
+// stay feature-coherent.
 const tools: ToolConfig[] = [
   { id: "crayon", label: "Crayon", icon: faPencil },
   { id: "marker", label: "Marker", icon: faPaintbrush },
+  { id: "pencil", label: "Pencil", icon: faPenNib },
+  { id: "paintbrush", label: "Paint", icon: faPaintRoller },
   { id: "glitter", label: "Glitter", icon: faSparkles },
   { id: "fill", label: "Fill", icon: faFillDrip },
   { id: "eraser", label: "Eraser", icon: faEraser },
@@ -110,13 +123,6 @@ const patternTypes: {
 // ============================================================================
 // Subcomponents
 // ============================================================================
-
-// Section header component matching mobile app style
-const SectionTitle = ({ title }: { title: string }) => (
-  <h3 className="text-xs font-semibold uppercase tracking-wide text-coloring-muted mb-2 font-body">
-    {title}
-  </h3>
-);
 
 // Undo icon
 const UndoIcon = ({ className }: { className?: string }) => (
@@ -176,16 +182,19 @@ const MobileColoringDrawer = ({
     selectedColor,
     brushSize,
     selectedPattern,
+    paletteVariant,
     setActiveTool,
     setBrushType,
     setSelectedColor,
     setBrushSize,
     setSelectedPattern,
+    setPaletteVariant,
     canUndo,
     canRedo,
     undo,
     redo,
   } = useColoringContext();
+  const colors = COLORING_PALETTE_VARIANTS[paletteVariant];
   const { playSound } = useSound();
 
   // Heights matching mobile app
@@ -273,6 +282,14 @@ const MobileColoringDrawer = ({
         setActiveTool("brush");
         setBrushType("marker");
         break;
+      case "pencil":
+        setActiveTool("brush");
+        setBrushType("pencil");
+        break;
+      case "paintbrush":
+        setActiveTool("brush");
+        setBrushType("paintbrush");
+        break;
       case "glitter":
         setActiveTool("brush");
         setBrushType("glitter");
@@ -354,6 +371,7 @@ const MobileColoringDrawer = ({
               "fixed bottom-0 left-0 right-0 z-50 mx-2",
               "flex flex-col overflow-hidden",
               "bg-white rounded-t-3xl",
+              "border-2 border-b-0 border-paper-cream-dark",
               "shadow-[0_-4px_16px_rgba(0,0,0,0.15)]",
               // Safe area padding for notched devices
               "pb-safe",
@@ -379,106 +397,138 @@ const MobileColoringDrawer = ({
               }}
               aria-label={isExpanded ? "Collapse toolbar" : "Expand toolbar"}
             >
-              <div className="w-10 h-1 rounded-full bg-gray-300" />
+              <div className="w-12 h-1.5 rounded-full bg-paper-cream-dark" />
             </motion.div>
 
             {/* Scrollable content area */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pb-4">
-              {/* Tools Section */}
+              {/* Tools — icon-only chunky-card grid, matching desktop sidebar */}
               <div className="mb-4">
-                <SectionTitle title="Tools" />
-                <div
-                  className="overflow-x-auto -mx-4 px-4 scrollbar-hide"
-                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                >
-                  <div className="flex gap-2">
-                    {tools.map((tool) => {
-                      const isActive = isToolActive(tool.id);
+                <div className="grid grid-cols-5 gap-2">
+                  {tools.map((tool) => {
+                    const isActive = isToolActive(tool.id);
+                    if (tool.isMagic) {
+                      // Magic tools — purple→pink gradient background + sparkle
+                      // decoration, mirroring desktop.
                       return (
                         <button
                           key={tool.id}
                           type="button"
                           onClick={() => handleToolSelect(tool.id)}
                           className={cn(
-                            // Base: 48x48px touch target matching mobile native
-                            "shrink-0 size-12 rounded-coloring-card",
-                            "flex flex-col items-center justify-center",
+                            "relative aspect-square w-full rounded-coloring-card",
+                            "flex items-center justify-center",
                             "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            // Default state - bg-gray-100 matching mobile
-                            "bg-gray-100",
-                            // Active state - crayon orange
-                            isActive && "bg-coloring-accent",
-                            // Magic tools slightly wider
-                            tool.isMagic && "w-14 gap-0.5",
+                            isActive
+                              ? "bg-gradient-to-br from-crayon-purple to-crayon-pink text-white"
+                              : "bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 text-crayon-purple",
                           )}
                           aria-label={tool.label}
                           aria-pressed={isActive}
                         >
+                          <FontAwesomeIcon icon={tool.icon} size="xl" />
                           <FontAwesomeIcon
-                            icon={tool.icon}
+                            icon={faSparkles}
+                            size="lg"
+                            aria-hidden
                             className={cn(
-                              tool.isMagic ? "text-base" : "text-xl",
-                              isActive ? "text-white" : "text-coloring-muted",
+                              "absolute -top-2 -right-2 drop-shadow-sm",
+                              isActive ? "text-white" : "text-crayon-purple",
                             )}
                           />
-                          {tool.isMagic && tool.shortLabel && (
-                            <span
-                              className={cn(
-                                "text-[8px] font-bold uppercase leading-none",
-                                isActive ? "text-white" : "text-coloring-muted",
-                              )}
-                            >
-                              {tool.shortLabel}
-                            </span>
-                          )}
                         </button>
                       );
-                    })}
-                  </div>
+                    }
+                    return (
+                      <button
+                        key={tool.id}
+                        type="button"
+                        onClick={() => handleToolSelect(tool.id)}
+                        className={cn(
+                          "aspect-square w-full rounded-coloring-card border-2",
+                          "flex items-center justify-center",
+                          "transition-all duration-coloring-base ease-coloring active:scale-95",
+                          isActive
+                            ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
+                            : "bg-white border-paper-cream-dark text-text-primary",
+                        )}
+                        aria-label={tool.label}
+                        aria-pressed={isActive}
+                      >
+                        <FontAwesomeIcon icon={tool.icon} size="xl" />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Colors Section */}
-              <div className="mb-4">
-                <SectionTitle title="Colors" />
-                <div
-                  className="overflow-x-auto -mx-4 px-4 scrollbar-hide"
-                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                >
-                  <div className="flex gap-2">
-                    {ALL_COLORING_COLORS.map((color) => {
-                      const isSelected = selectedColor === color.hex;
-                      return (
-                        <button
-                          key={color.hex}
-                          type="button"
-                          onClick={() => {
-                            setSelectedColor(color.hex);
-                            playSound("tap");
-                          }}
-                          className={cn(
-                            // Base: 40x40px color swatch matching mobile native
-                            "shrink-0 size-10 rounded-full",
-                            "border-2 border-gray-200",
-                            "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            // Active: thicker border matching mobile
-                            isSelected &&
-                              "border-[3px] border-gray-700 scale-105",
-                          )}
-                          style={{ backgroundColor: color.hex }}
-                          aria-label={`Select ${color.name} color`}
-                          aria-pressed={isSelected}
+              {/* Palette variant switcher — swaps the swatch grid and drives
+               * the magic-tool palette too, matching desktop's single-knob UX. */}
+              <div className="mb-3">
+                <div className="grid grid-cols-4 gap-2">
+                  {PALETTE_VARIANTS.map((variant) => {
+                    const isActive = paletteVariant === variant;
+                    return (
+                      <button
+                        key={variant}
+                        type="button"
+                        onClick={() => {
+                          setPaletteVariant(variant);
+                          playSound("tap");
+                        }}
+                        aria-label={variant}
+                        title={variant}
+                        aria-pressed={isActive}
+                        className={cn(
+                          "flex items-center justify-center h-12 rounded-coloring-card border-2",
+                          "transition-all duration-coloring-base ease-coloring active:scale-95",
+                          isActive
+                            ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
+                            : "bg-white border-paper-cream-dark text-text-primary",
+                        )}
+                      >
+                        <FontAwesomeIcon
+                          icon={variantIcons[variant]}
+                          size="lg"
                         />
-                      );
-                    })}
-                  </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Colors — grid driven by the current palette variant */}
+              <div className="mb-4">
+                <div className="grid grid-cols-7 gap-2 py-1">
+                  {colors.map((color) => {
+                    const isSelected = selectedColor === color.hex;
+                    return (
+                      <button
+                        key={color.hex}
+                        type="button"
+                        onClick={() => {
+                          setSelectedColor(color.hex);
+                          playSound("tap");
+                        }}
+                        className={cn(
+                          "aspect-square w-full rounded-full border-2",
+                          "transition-all duration-coloring-base ease-coloring active:scale-95",
+                          isSelected
+                            ? "ring-2 ring-coloring-accent ring-offset-1 border-white"
+                            : "border-paper-cream-dark",
+                        )}
+                        style={{ backgroundColor: color.hex }}
+                        aria-label={`Select ${color.name} color`}
+                        aria-pressed={isSelected}
+                      />
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Brush Size Section - only when expanded and brush tool active */}
               {isExpanded && showBrushSizeSelector && (
                 <div className="mb-4">
-                  <SectionTitle title="Brush Size" />
                   <div className="flex gap-2">
                     {(
                       Object.entries(BRUSH_SIZES) as [
@@ -504,14 +554,12 @@ const MobileColoringDrawer = ({
                             playSound("tap");
                           }}
                           className={cn(
-                            // Base: 48x48px button matching mobile native
-                            "shrink-0 size-12 rounded-coloring-card",
+                            "shrink-0 size-14 rounded-coloring-card border-2",
                             "flex items-center justify-center",
                             "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            // Default state
-                            "bg-gray-100",
-                            // Active state
-                            isSelected && "bg-coloring-accent",
+                            isSelected
+                              ? "bg-coloring-accent border-transparent shadow-btn-primary"
+                              : "bg-white border-paper-cream-dark",
                           )}
                           aria-label={`${config.name} brush size`}
                           aria-pressed={isSelected}
@@ -533,10 +581,9 @@ const MobileColoringDrawer = ({
                 </div>
               )}
 
-              {/* Fill Type Section - only when expanded and fill tool active (matching mobile) */}
+              {/* Fill Type — icon-only tiles matching tools */}
               {isExpanded && showFillTypeSelector && (
                 <div className="mb-4">
-                  <SectionTitle title="Fill Type" />
                   <div className="flex gap-2">
                     {fillTypes.map((fill) => {
                       const isActive = fillType === fill.type;
@@ -545,44 +592,31 @@ const MobileColoringDrawer = ({
                           key={fill.type}
                           type="button"
                           onClick={() => {
-                            // When selecting solid, set pattern to solid
-                            // When selecting pattern, set to first pattern type (dots)
                             if (fill.type === "solid") {
                               setSelectedPattern("solid");
                             } else if (selectedPattern === "solid") {
-                              // Switching from solid to pattern, default to dots
                               setSelectedPattern("dots");
                             }
                             playSound("tap");
                           }}
                           className={cn(
-                            // Base: pill-shaped button with label matching mobile
-                            "shrink-0 h-12 px-4 rounded-coloring-card",
-                            "flex items-center justify-center gap-2",
+                            "size-14 rounded-coloring-card border-2",
+                            "flex items-center justify-center",
                             "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            // Default state
-                            "bg-gray-100",
-                            // Active state
-                            isActive && "bg-coloring-accent",
+                            isActive
+                              ? "bg-coloring-accent border-transparent shadow-btn-primary"
+                              : "bg-white border-paper-cream-dark",
                           )}
                           aria-label={fill.label}
                           aria-pressed={isActive}
                         >
                           <FontAwesomeIcon
                             icon={fill.icon}
+                            size="xl"
                             className={cn(
-                              "text-base",
-                              isActive ? "text-white" : "text-coloring-muted",
+                              isActive ? "text-white" : "text-text-primary",
                             )}
                           />
-                          <span
-                            className={cn(
-                              "text-sm font-medium",
-                              isActive ? "text-white" : "text-coloring-muted",
-                            )}
-                          >
-                            {fill.label}
-                          </span>
                         </button>
                       );
                     })}
@@ -590,57 +624,41 @@ const MobileColoringDrawer = ({
                 </div>
               )}
 
-              {/* Pattern Section - only when expanded, fill tool active AND fillType is 'pattern' (matching mobile) */}
+              {/* Pattern — icon-only tile grid */}
               {isExpanded && showPatternSelector && (
                 <div className="mb-4">
-                  <SectionTitle title="Pattern" />
-                  <div
-                    className="overflow-x-auto -mx-4 px-4 scrollbar-hide"
-                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                  >
-                    <div className="flex gap-2">
-                      {patternTypes.map((pattern) => {
-                        const isActive = selectedPattern === pattern.type;
-                        return (
-                          <button
-                            key={pattern.type}
-                            type="button"
-                            onClick={() => {
-                              setSelectedPattern(pattern.type);
-                              playSound("tap");
-                            }}
+                  <div className="grid grid-cols-5 gap-2">
+                    {patternTypes.map((pattern) => {
+                      const isActive = selectedPattern === pattern.type;
+                      return (
+                        <button
+                          key={pattern.type}
+                          type="button"
+                          onClick={() => {
+                            setSelectedPattern(pattern.type);
+                            playSound("tap");
+                          }}
+                          className={cn(
+                            "aspect-square w-full rounded-coloring-card border-2",
+                            "flex items-center justify-center",
+                            "transition-all duration-coloring-base ease-coloring active:scale-95",
+                            isActive
+                              ? "bg-coloring-accent border-transparent shadow-btn-primary"
+                              : "bg-white border-paper-cream-dark",
+                          )}
+                          aria-label={pattern.label}
+                          aria-pressed={isActive}
+                        >
+                          <FontAwesomeIcon
+                            icon={pattern.icon}
+                            size="xl"
                             className={cn(
-                              // Base: pill-shaped button with label matching mobile
-                              "shrink-0 h-12 px-4 rounded-coloring-card",
-                              "flex items-center justify-center gap-2",
-                              "transition-all duration-coloring-base ease-coloring active:scale-95",
-                              // Default state
-                              "bg-gray-100",
-                              // Active state
-                              isActive && "bg-coloring-accent",
+                              isActive ? "text-white" : "text-text-primary",
                             )}
-                            aria-label={pattern.label}
-                            aria-pressed={isActive}
-                          >
-                            <FontAwesomeIcon
-                              icon={pattern.icon}
-                              className={cn(
-                                "text-base",
-                                isActive ? "text-white" : "text-coloring-muted",
-                              )}
-                            />
-                            <span
-                              className={cn(
-                                "text-sm font-medium",
-                                isActive ? "text-white" : "text-coloring-muted",
-                              )}
-                            >
-                              {pattern.label}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -648,28 +666,20 @@ const MobileColoringDrawer = ({
               {/* History Section - Undo/Redo - only when expanded */}
               {isExpanded && (
                 <div className="mb-4">
-                  <SectionTitle title="History" />
                   <div className="flex gap-3">
                     <button
                       type="button"
                       onClick={handleUndo}
                       disabled={!canUndo}
                       className={cn(
-                        // Base: pill button with icon and label
-                        "h-12 px-4 rounded-coloring-card",
-                        "flex items-center justify-center gap-2",
+                        "size-14 rounded-coloring-card border-2 border-paper-cream-dark bg-white",
+                        "flex items-center justify-center",
                         "transition-all duration-coloring-base ease-coloring active:scale-95",
-                        // Default state
-                        "bg-gray-100",
-                        // Disabled state
                         !canUndo && "opacity-50 cursor-not-allowed",
                       )}
                       aria-label="Undo"
                     >
-                      <UndoIcon className="size-5 text-coloring-muted" />
-                      <span className="text-sm font-medium text-coloring-muted">
-                        Undo
-                      </span>
+                      <UndoIcon className="size-6 text-text-primary" />
                     </button>
 
                     <button
@@ -677,21 +687,14 @@ const MobileColoringDrawer = ({
                       onClick={handleRedo}
                       disabled={!canRedo}
                       className={cn(
-                        // Base: pill button with icon and label
-                        "h-12 px-4 rounded-coloring-card",
-                        "flex items-center justify-center gap-2",
+                        "size-14 rounded-coloring-card border-2 border-paper-cream-dark bg-white",
+                        "flex items-center justify-center",
                         "transition-all duration-coloring-base ease-coloring active:scale-95",
-                        // Default state
-                        "bg-gray-100",
-                        // Disabled state
                         !canRedo && "opacity-50 cursor-not-allowed",
                       )}
                       aria-label="Redo"
                     >
-                      <RedoIcon className="size-5 text-coloring-muted" />
-                      <span className="text-sm font-medium text-coloring-muted">
-                        Redo
-                      </span>
+                      <RedoIcon className="size-6 text-text-primary" />
                     </button>
                   </div>
                 </div>

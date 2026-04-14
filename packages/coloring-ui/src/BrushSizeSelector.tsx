@@ -47,7 +47,7 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-2 p-2 rounded-coloring-card bg-white/90 backdrop-blur-sm",
+        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-paper-cream-dark",
         { "gap-3": isKids },
         className,
       )}
@@ -63,12 +63,12 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
             key={size}
             onClick={() => handlePresetClick(size)}
             className={cn(
-              "flex items-center justify-center rounded-coloring-card transition-all duration-coloring-base ease-coloring",
-              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
+              "flex items-center justify-center rounded-coloring-card border-2 transition-all duration-coloring-base ease-coloring",
+              "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
               isKids ? "size-12 sm:size-14" : "size-10 sm:size-12",
-              {
-                "bg-gray-200 ring-2 ring-gray-400": isSelected,
-              },
+              isSelected
+                ? "bg-coloring-accent border-transparent shadow-btn-primary"
+                : "bg-white border-paper-cream-dark",
             )}
             aria-label={`${config.name} brush size`}
             title={config.name}
