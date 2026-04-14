@@ -1,0 +1,16 @@
+[Unit]
+Description=Chunky Crayon Social Demo Worker
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/chunky-crayon/apps/chunky-crayon-worker
+EnvironmentFile=/opt/chunky-crayon/apps/chunky-crayon-worker/.env
+ExecStart=/usr/bin/xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" /root/.bun/bin/bun run src/index.ts
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
