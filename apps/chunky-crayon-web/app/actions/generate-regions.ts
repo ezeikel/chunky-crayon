@@ -98,3 +98,21 @@ export async function generateRegionStore(
 
   return result;
 }
+
+/**
+ * Lightweight server action: has this coloring image had its region store
+ * populated yet? Used by ColoringArea to poll after initial page load when
+ * the user lands on a freshly-created image (the post-create pipeline runs
+ * region-store generation in parallel with the redirect).
+ *
+ * Deliberately skips 'use cache' so the client always sees fresh DB state.
+ */
+export async function checkRegionStoreReady(
+  coloringImageId: string,
+): Promise<{ ready: boolean }> {
+  const row = await db.coloringImage.findFirst({
+    where: { id: coloringImageId, brand: BRAND },
+    select: { regionMapUrl: true },
+  });
+  return { ready: !!row?.regionMapUrl };
+}

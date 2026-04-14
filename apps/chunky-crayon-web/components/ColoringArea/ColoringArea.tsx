@@ -41,6 +41,8 @@ import {
 } from '@one-colored-pixel/coloring-ui';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
 import { generateColoredReference } from '@/app/actions/generate-colored-reference';
+import { checkRegionStoreReady } from '@/app/actions/generate-regions';
+import { useRouter } from 'next/navigation';
 import { detectAllRegions } from '@one-colored-pixel/canvas';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -168,6 +170,72 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       regionMapHeight: coloringImage.regionMapHeight as number | undefined,
       regionsJson: parsedRegionsJson,
     });
+
+    useEffect(() => {
+      console.log('[ColoringArea] regionStore state changed', {
+        isReady: regionStore.state.isReady,
+        width: regionStore.state.width,
+        height: regionStore.state.height,
+        coloringImageRegionMapUrl: !!coloringImage.regionMapUrl,
+      });
+    }, [
+      regionStore.state.isReady,
+      regionStore.state.width,
+      regionStore.state.height,
+      coloringImage.regionMapUrl,
+    ]);
+
+    // If we landed on a freshly-generated image before the post-create
+    // pipeline finished building the region store, poll until it's ready
+    // then router.refresh() to pull the new coloringImage prop (with
+    // regionMapUrl/regionsJson populated) — no visual reload. Enables
+    // proper per-region Magic Brush reveal on freshly-created images.
+    const router = useRouter();
+    useEffect(() => {
+      console.log('[ColoringArea] region-store poll effect mounted', {
+        id: coloringImage.id,
+        hasRegionMapUrl: !!coloringImage.regionMapUrl,
+        willPoll: !coloringImage.regionMapUrl && !!coloringImage.id,
+      });
+      if (coloringImage.regionMapUrl) return; // already have it
+      if (!coloringImage.id) return;
+      let stopped = false;
+      const POLL_MS = 3000;
+      const MAX_ATTEMPTS = 100; // ~5 minutes total
+      let attempts = 0;
+      const tick = async () => {
+        if (stopped) return;
+        attempts += 1;
+        try {
+          const { ready } = await checkRegionStoreReady(coloringImage.id!);
+          console.log(
+            `[ColoringArea] region-store poll ${attempts}: ready=${ready}`,
+          );
+          if (stopped) return;
+          if (ready) {
+            console.log('[ColoringArea] region store ready — refreshing RSC');
+            router.refresh();
+            return; // stop polling
+          }
+        } catch (err) {
+          console.warn('[ColoringArea] region-store poll failed:', err);
+        }
+        if (attempts >= MAX_ATTEMPTS) {
+          console.warn(
+            '[ColoringArea] gave up waiting for region store after',
+            attempts,
+            'attempts',
+          );
+          return;
+        }
+        setTimeout(tick, POLL_MS);
+      };
+      const t = setTimeout(tick, POLL_MS);
+      return () => {
+        stopped = true;
+        clearTimeout(t);
+      };
+    }, [coloringImage.id, coloringImage.regionMapUrl, router]);
 
     // Handle first canvas interaction - load and play ambient sound
     // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
