@@ -44,6 +44,7 @@
     "progress": {
       "colored": "colored",
       "percentage": "{percent}%",
+      "allDone": "All done!",
       "milestones": {
         "25": "Great start!",
         "50": "Halfway there!",
@@ -74,6 +75,8 @@
     "brushTypes": {
       "crayon": "Crayon",
       "marker": "Marker",
+      "pencil": "Pencil",
+      "paintbrush": "Paintbrush",
       "eraser": "Eraser",
       "glitter": "Glitter",
       "sparkle": "Sparkle",
@@ -180,7 +183,9 @@
   "startOverButton": {
     "idle": "Start Over",
     "confirm": "Yes, Start Over",
-    "cancel": "Keep Coloring"
+    "cancel": "Keep Coloring",
+    "modalTitle": "Start over?",
+    "modalBody": "This will wipe all your colouring. Are you sure?"
   },
   "downloadPDFButton": {
     "idle": "Print",

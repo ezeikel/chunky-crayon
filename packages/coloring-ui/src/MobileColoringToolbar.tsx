@@ -65,14 +65,11 @@ const COLLAPSED_HEIGHT = 180; // Enough for handle + tools + colors
 const EXPANDED_HEIGHT = 420; // Full height with all sections
 
 // All tools in a single scrollable row (matching mobile pattern)
+// Core tools — sparkle, rainbow, glow, neon removed (confusing UX)
 const allTools: ToolConfig[] = [
   { id: "crayon", label: "Crayon", icon: faPencil },
   { id: "marker", label: "Marker", icon: faPaintbrush },
-  { id: "pencil", label: "Pencil", icon: faPencil },
   { id: "glitter", label: "Glitter", icon: faSparkles },
-  { id: "rainbow", label: "Rainbow", icon: faRainbow },
-  { id: "glow", label: "Glow", icon: faSun },
-  { id: "neon", label: "Neon", icon: faBoltLightning },
   { id: "fill", label: "Fill", icon: faFillDrip },
   { id: "eraser", label: "Eraser", icon: faEraser },
   { id: "sticker", label: "Sticker", icon: faStar },
@@ -85,7 +82,7 @@ const KIDS_TOOL_IDS: Tool[] = [
   "fill",
   "crayon",
   "marker",
-  "rainbow",
+  "glitter",
   "eraser",
   "sticker",
   "magic-auto",
@@ -112,7 +109,7 @@ const patternOptions: {
 
 /** Section header matching mobile's uppercase gray styling */
 const SectionHeader = ({ title }: { title: string }) => (
-  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 px-1">
+  <h3 className="text-xs font-semibold uppercase tracking-wider text-coloring-muted mb-2 px-1">
     {title}
   </h3>
 );
@@ -401,7 +398,7 @@ const MobileColoringToolbar = ({
                   onClick={() => handleToolSelect(tool.id)}
                   className={cn(
                     // Base: 48x48px touch target
-                    "flex-shrink-0 size-12 rounded-xl",
+                    "flex-shrink-0 size-12 rounded-coloring-card",
                     "flex flex-col items-center justify-center",
                     "transition-all duration-150 active:scale-95",
                     // Default state
@@ -418,14 +415,18 @@ const MobileColoringToolbar = ({
                     icon={tool.icon}
                     className={cn(
                       "text-xl",
-                      isToolActive(tool.id) ? "text-white" : "text-gray-600",
+                      isToolActive(tool.id)
+                        ? "text-white"
+                        : "text-coloring-muted",
                     )}
                   />
                   {tool.isMagic && (
                     <span
                       className={cn(
                         "text-[8px] font-bold uppercase leading-none mt-0.5",
-                        isToolActive(tool.id) ? "text-white" : "text-gray-600",
+                        isToolActive(tool.id)
+                          ? "text-white"
+                          : "text-coloring-muted",
                       )}
                     >
                       {tool.label}
@@ -485,7 +486,7 @@ const MobileColoringToolbar = ({
                     }
                     className={cn(
                       // Base: 48px tall, variable width
-                      "flex-shrink-0 h-12 px-4 rounded-xl",
+                      "flex-shrink-0 h-12 px-4 rounded-coloring-card",
                       "flex items-center justify-center gap-2",
                       "transition-all duration-150 active:scale-95",
                       // Default state
@@ -510,7 +511,9 @@ const MobileColoringToolbar = ({
                     <span
                       className={cn(
                         "text-sm font-medium",
-                        brushSize === key ? "text-white" : "text-gray-600",
+                        brushSize === key
+                          ? "text-white"
+                          : "text-coloring-muted",
                       )}
                     >
                       {size.name}
@@ -538,7 +541,7 @@ const MobileColoringToolbar = ({
                     onClick={() => setSelectedPattern(pattern.type)}
                     className={cn(
                       // Base: 48px button
-                      "flex-shrink-0 h-12 px-4 rounded-xl",
+                      "flex-shrink-0 h-12 px-4 rounded-coloring-card",
                       "flex items-center justify-center gap-2",
                       "transition-all duration-150 active:scale-95",
                       // Default state
@@ -555,7 +558,7 @@ const MobileColoringToolbar = ({
                         "text-base",
                         selectedPattern === pattern.type
                           ? "text-white"
-                          : "text-gray-600",
+                          : "text-coloring-muted",
                       )}
                     />
                     <span
@@ -563,7 +566,7 @@ const MobileColoringToolbar = ({
                         "text-sm font-medium",
                         selectedPattern === pattern.type
                           ? "text-white"
-                          : "text-gray-600",
+                          : "text-coloring-muted",
                       )}
                     >
                       {pattern.label}
@@ -586,7 +589,7 @@ const MobileColoringToolbar = ({
                 disabled={!canUndo}
                 className={cn(
                   // Base: 48px button
-                  "h-12 px-5 rounded-xl",
+                  "h-12 px-5 rounded-coloring-card",
                   "flex items-center justify-center gap-2",
                   "transition-all duration-150 active:scale-95",
                   // Default state
@@ -596,8 +599,10 @@ const MobileColoringToolbar = ({
                 )}
                 aria-label="Undo"
               >
-                <UndoIcon className="size-5 text-gray-600" />
-                <span className="text-sm font-medium text-gray-600">Undo</span>
+                <UndoIcon className="size-5 text-coloring-muted" />
+                <span className="text-sm font-medium text-coloring-muted">
+                  Undo
+                </span>
               </button>
 
               <button
@@ -606,7 +611,7 @@ const MobileColoringToolbar = ({
                 disabled={!canRedo}
                 className={cn(
                   // Base: 48px button
-                  "h-12 px-5 rounded-xl",
+                  "h-12 px-5 rounded-coloring-card",
                   "flex items-center justify-center gap-2",
                   "transition-all duration-150 active:scale-95",
                   // Default state
@@ -616,8 +621,10 @@ const MobileColoringToolbar = ({
                 )}
                 aria-label="Redo"
               >
-                <RedoIcon className="size-5 text-gray-600" />
-                <span className="text-sm font-medium text-gray-600">Redo</span>
+                <RedoIcon className="size-5 text-coloring-muted" />
+                <span className="text-sm font-medium text-coloring-muted">
+                  Redo
+                </span>
               </button>
             </div>
           </div>

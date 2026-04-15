@@ -28,6 +28,10 @@ import {
 } from '@one-colored-pixel/coloring-ui';
 import { useSound } from '@one-colored-pixel/coloring-ui';
 import { useReferenceColor } from '@one-colored-pixel/coloring-ui';
+import {
+  useRegionStore,
+  type RegionStoreJson,
+} from '@one-colored-pixel/coloring-ui';
 import { useMagicColorMap } from '@/hooks/useMagicColorMap';
 import type { GridColorMap, FillPointsData } from '@/lib/ai';
 import {
@@ -37,7 +41,14 @@ import {
 } from '@one-colored-pixel/coloring-ui';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
 import { generateColoredReference } from '@/app/actions/generate-colored-reference';
+import { checkRegionStoreReady } from '@/app/actions/generate-regions';
+import { useRouter } from 'next/navigation';
 import { detectAllRegions } from '@one-colored-pixel/canvas';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faWandMagicSparkles,
+  faFaceFrownOpen,
+} from '@fortawesome/pro-duotone-svg-icons';
 
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
@@ -46,6 +57,7 @@ type ColoringAreaProps = {
 
 export type ColoringAreaHandle = {
   getCanvas: () => HTMLCanvasElement | null;
+  getBoundaryCanvas: () => HTMLCanvasElement | null;
   getCanvasDataUrl: () => string | null;
   handleUndo: (action: CanvasAction) => void;
   handleRedo: (action: CanvasAction) => void;
@@ -81,6 +93,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setDrawingActions,
       setIsAutoColoring,
       setHasAutoColored,
+      paletteVariant,
+      pushToHistory,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -134,6 +148,93 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       getDirectFillPoints,
       reset: resetMagicColorMap,
     } = useMagicColorMap({ preComputedColorMap, fillPointsData });
+
+    // Region store — new pre-computed region map for reveal-mask magic brush.
+    // When available (image has been backfilled), this takes priority over the
+    // legacy useMagicColorMap path. Falls back gracefully when no data exists.
+    const parsedRegionsJson = useMemo<RegionStoreJson | null>(() => {
+      if (!coloringImage.regionsJson) return null;
+      try {
+        return JSON.parse(
+          coloringImage.regionsJson as string,
+        ) as RegionStoreJson;
+      } catch {
+        return null;
+      }
+    }, [coloringImage.regionsJson]);
+
+    const regionStore = useRegionStore({
+      regionMapUrl: coloringImage.regionMapUrl as string | undefined,
+      regionMapWidth: coloringImage.regionMapWidth as number | undefined,
+      regionMapHeight: coloringImage.regionMapHeight as number | undefined,
+      regionsJson: parsedRegionsJson,
+    });
+
+    useEffect(() => {
+      console.log('[ColoringArea] regionStore state changed', {
+        isReady: regionStore.state.isReady,
+        width: regionStore.state.width,
+        height: regionStore.state.height,
+        coloringImageRegionMapUrl: !!coloringImage.regionMapUrl,
+      });
+    }, [
+      regionStore.state.isReady,
+      regionStore.state.width,
+      regionStore.state.height,
+      coloringImage.regionMapUrl,
+    ]);
+
+    // If we landed on a freshly-generated image before the post-create
+    // pipeline finished building the region store, poll until it's ready
+    // then router.refresh() to pull the new coloringImage prop (with
+    // regionMapUrl/regionsJson populated) — no visual reload. Enables
+    // proper per-region Magic Brush reveal on freshly-created images.
+    const router = useRouter();
+    useEffect(() => {
+      console.log('[ColoringArea] region-store poll effect mounted', {
+        id: coloringImage.id,
+        hasRegionMapUrl: !!coloringImage.regionMapUrl,
+        willPoll: !coloringImage.regionMapUrl && !!coloringImage.id,
+      });
+      if (coloringImage.regionMapUrl) return; // already have it
+      if (!coloringImage.id) return;
+      let stopped = false;
+      const POLL_MS = 3000;
+      const MAX_ATTEMPTS = 200; // ~10 minutes total — complex images take longer
+      let attempts = 0;
+      const tick = async () => {
+        if (stopped) return;
+        attempts += 1;
+        try {
+          const { ready } = await checkRegionStoreReady(coloringImage.id!);
+          console.log(
+            `[ColoringArea] region-store poll ${attempts}: ready=${ready}`,
+          );
+          if (stopped) return;
+          if (ready) {
+            console.log('[ColoringArea] region store ready — refreshing RSC');
+            router.refresh();
+            return; // stop polling
+          }
+        } catch (err) {
+          console.warn('[ColoringArea] region-store poll failed:', err);
+        }
+        if (attempts >= MAX_ATTEMPTS) {
+          console.warn(
+            '[ColoringArea] gave up waiting for region store after',
+            attempts,
+            'attempts',
+          );
+          return;
+        }
+        setTimeout(tick, POLL_MS);
+      };
+      const t = setTimeout(tick, POLL_MS);
+      return () => {
+        stopped = true;
+        clearTimeout(t);
+      };
+    }, [coloringImage.id, coloringImage.regionMapUrl, router]);
 
     // Handle first canvas interaction - load and play ambient sound
     // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
@@ -287,6 +388,52 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       playSound,
       setHasUnsavedChanges,
       setIsAutoColoring,
+    ]);
+
+    // Handle auto-color using the pre-computed region store. Draws the
+    // pre-coloured canvas (built by ImageCanvas from the region store +
+    // active palette variant) directly onto the drawing canvas in one shot.
+    // Same data source as Magic Brush — pixel-perfect, no flood fill,
+    // no centroids, no missed regions.
+    const handleRegionStoreAutoColor = useCallback(() => {
+      const drawingCanvas = canvasRef.current?.getCanvas();
+      const preColoredCanvas = canvasRef.current?.getPreColoredCanvas();
+      if (!drawingCanvas || !preColoredCanvas) return;
+
+      const drawingCtx = drawingCanvas.getContext('2d');
+      if (!drawingCtx) return;
+
+      setIsAutoColoring(true);
+
+      // Capture state for undo
+      const beforeState = canvasRef.current?.captureCanvasState();
+      if (beforeState) {
+        pushToHistory({
+          type: 'fill',
+          imageData: beforeState,
+          timestamp: Date.now(),
+        });
+      }
+
+      // Draw the entire pre-coloured canvas onto the drawing canvas.
+      // Reset transform so drawImage operates in raw pixel space (the
+      // drawing context has DPR scaling applied).
+      drawingCtx.save();
+      drawingCtx.setTransform(1, 0, 0, 1, 0, 0);
+      drawingCtx.drawImage(preColoredCanvas, 0, 0);
+      drawingCtx.restore();
+
+      setIsAutoColoring(false);
+      setHasAutoColored(true);
+      setActiveTool('brush');
+      playSound('sparkle');
+      setHasUnsavedChanges(true);
+    }, [
+      playSound,
+      pushToHistory,
+      setHasUnsavedChanges,
+      setIsAutoColoring,
+      setHasAutoColored,
     ]);
 
     // Handle direct auto-color using fill points (bypasses region detection)
@@ -584,7 +731,13 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     useEffect(() => {
       if (activeTool !== 'magic-auto' || !canvasReadyRef.current) return;
 
-      // Prefer reference image (holistic AI coloring)
+      // Prefer region store (pre-computed, palette-aware, most accurate)
+      if (regionStore.state.isReady) {
+        handleRegionStoreAutoColor();
+        return;
+      }
+
+      // Fallback: reference image (holistic AI coloring)
       if (hasColoredReference && referenceColor.state.isReady) {
         handleReferenceAutoColor();
         return;
@@ -602,6 +755,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }
     }, [
       activeTool,
+      regionStore.state.isReady,
+      handleRegionStoreAutoColor,
       hasColoredReference,
       referenceColor.state.isReady,
       handleReferenceAutoColor,
@@ -622,6 +777,12 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // Get canvas element for progress indicator
     const getCanvas = useCallback(() => {
       return canvasRef.current?.getCanvas() || null;
+    }, []);
+
+    // Get boundary (line-art) canvas — used by ProgressIndicator to compute
+    // the colourable area excluding line pixels.
+    const getBoundaryCanvas = useCallback(() => {
+      return canvasRef.current?.getBoundaryCanvas() || null;
     }, []);
 
     // Handle undo by restoring the canvas to the state before the action
@@ -711,6 +872,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       ref,
       () => ({
         getCanvas,
+        getBoundaryCanvas,
         getCanvasDataUrl,
         handleUndo,
         handleRedo,
@@ -719,6 +881,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }),
       [
         getCanvas,
+        getBoundaryCanvas,
         getCanvasDataUrl,
         handleUndo,
         handleRedo,
@@ -866,7 +1029,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // Determine which color source to use for magic tools
     const useReferenceForMagic =
       hasColoredReference && referenceColor.state.isReady;
-    const isMagicReady = useReferenceForMagic || magicColorMapState.isReady;
+    const isMagicReady =
+      regionStore.state.isReady ||
+      useReferenceForMagic ||
+      magicColorMapState.isReady;
 
     return (
       <div className="flex flex-col gap-y-2 md:gap-y-3">
@@ -890,6 +1056,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <ProgressIndicator
               getCanvas={getCanvas}
+              getBoundaryCanvas={getBoundaryCanvas}
               className="flex-1 min-w-0"
             />
             <MuteToggle />
@@ -916,41 +1083,76 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
               useReferenceForMagic ? undefined : handleRegionRevealed
             }
             isMagicRevealReady={isMagicReady}
+            regionStore={
+              regionStore.state.isReady
+                ? {
+                    getRegionIdAt: regionStore.getRegionIdAt,
+                    getColorForRegion: regionStore.getColorForRegion,
+                    isReady: regionStore.state.isReady,
+                    width: regionStore.state.width,
+                    height: regionStore.state.height,
+                  }
+                : undefined
+            }
           />
 
-          {/* Magic Loading Overlay - Shows when magic tools are analyzing the image */}
+          {/* Magic Loading Overlay — analysing image / generating fill points.
+           * Styled to match the Start Over modal language: chunky card with
+           * a coloured icon badge, bold title, body copy, then a single
+           * sweeping progress bar (no separate spinner). */}
           {isMagicToolActive &&
             (magicColorMapState.isLoading || isGeneratingFillPoints) && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-                <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 border-2 border-crayon-purple/20 shadow-lg">
-                  <div className="relative">
-                    <div className="size-12 border-4 border-crayon-purple/30 border-t-crayon-purple rounded-full animate-spin" />
-                    <span className="absolute inset-0 flex items-center justify-center text-2xl">
-                      ✨
-                    </span>
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6"
+                data-testid="magic-colors-loading"
+              >
+                <div className="flex flex-col items-center gap-4 p-6 md:p-8 rounded-coloring-card bg-white border-2 border-paper-cream-dark shadow-card max-w-sm w-full">
+                  {/* Purple→pink gradient badge to match magic-tool identity */}
+                  <div className="flex items-center justify-center size-16 rounded-full bg-gradient-to-br from-crayon-purple to-crayon-pink">
+                    <FontAwesomeIcon
+                      icon={faWandMagicSparkles}
+                      className="text-white text-2xl"
+                    />
                   </div>
-                  <p className="text-sm font-bold text-crayon-purple text-center max-w-[200px]">
+                  <h2 className="font-tondo font-bold text-2xl text-text-primary text-center">
                     {isGeneratingFillPoints
-                      ? 'Preparing magic colors for the first time...'
+                      ? 'Mixing the magic colours!'
+                      : 'Getting the colours ready!'}
+                  </h2>
+                  <p className="font-tondo text-base text-text-secondary text-center">
+                    {isGeneratingFillPoints
+                      ? 'This only happens once — hang tight, the rainbow is on its way.'
                       : magicColorMapState.loadingMessage ||
-                        'Preparing magic colors...'}
+                        'Almost there — getting your palette ready.'}
                   </p>
+                  {/* Sweeping gradient bar — the single loading indicator. */}
+                  <div className="w-full h-3 rounded-full bg-paper-cream overflow-hidden">
+                    <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-crayon-purple via-crayon-pink to-crayon-orange animate-magic-progress" />
+                  </div>
                 </div>
               </div>
             )}
 
-          {/* Magic Error Overlay - Shows if magic analysis fails */}
+          {/* Magic Error Overlay — same chunky-card language as the loader. */}
           {isMagicToolActive && magicColorMapState.error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-              <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-crayon-pink/10 border-2 border-crayon-pink/30 shadow-lg">
-                <span className="text-3xl">😕</span>
-                <p className="text-sm font-bold text-crayon-pink text-center max-w-[200px]">
+            <div className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6">
+              <div className="flex flex-col items-center gap-4 p-6 md:p-8 rounded-coloring-card bg-white border-2 border-paper-cream-dark shadow-card max-w-sm w-full">
+                <div className="flex items-center justify-center size-16 rounded-full bg-crayon-pink/15">
+                  <FontAwesomeIcon
+                    icon={faFaceFrownOpen}
+                    className="text-crayon-pink text-2xl"
+                  />
+                </div>
+                <h2 className="font-tondo font-bold text-2xl text-text-primary text-center">
+                  Oops, the magic got tangled!
+                </h2>
+                <p className="font-tondo text-base text-text-secondary text-center">
                   {magicColorMapState.error}
                 </p>
                 <button
                   type="button"
                   onClick={() => resetMagicColorMap()}
-                  className="px-4 py-2 text-sm font-bold text-white bg-crayon-purple rounded-full hover:bg-crayon-purple/90 active:scale-95 transition-all"
+                  className="font-tondo font-bold text-white bg-gradient-to-br from-crayon-purple to-crayon-pink rounded-full px-8 py-3 text-lg shadow-btn-primary hover:scale-105 active:scale-95 transition-all"
                 >
                   Try Again
                 </button>

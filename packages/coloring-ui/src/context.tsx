@@ -18,6 +18,7 @@ import type {
   Sticker,
 } from "./types";
 import type { SerializableCanvasAction } from "./canvasActions";
+import type { PaletteVariant } from "./types";
 
 /** Controls which feature set is exposed in the UI */
 export type ColoringVariant = "kids" | "adult";
@@ -111,6 +112,10 @@ type ColoringContextArgs = {
   hasAutoColored: boolean;
   setHasAutoColored: Dispatch<SetStateAction<boolean>>;
 
+  // Palette variant — which pre-computed colour set to use for magic brush/auto-color
+  paletteVariant: PaletteVariant;
+  setPaletteVariant: Dispatch<SetStateAction<PaletteVariant>>;
+
   // Variant — controls which feature set is exposed
   variant: ColoringVariant;
 };
@@ -163,7 +168,7 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setIsMuted: () => {},
   isSfxMuted: false,
   setIsSfxMuted: () => {},
-  isAmbientMuted: false,
+  isAmbientMuted: true,
   setIsAmbientMuted: () => {},
   hasUnsavedChanges: false,
   setHasUnsavedChanges: () => {},
@@ -175,6 +180,8 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setIsAutoColoring: () => {},
   hasAutoColored: false,
   setHasAutoColored: () => {},
+  paletteVariant: "realistic",
+  setPaletteVariant: () => {},
   variant: "adult",
 });
 
@@ -218,7 +225,9 @@ export const ColoringContextProvider = ({
   // Audio state - initialize with defaults, hydrate from localStorage after mount
   const [isMuted, setIsMuted] = useState(false);
   const [isSfxMuted, setIsSfxMuted] = useState(false);
-  const [isAmbientMuted, setIsAmbientMuted] = useState(false);
+  // Music defaults to OFF — kids find ambient music intrusive in coloring
+  // sessions; SFX (taps, completion) stays on.
+  const [isAmbientMuted, setIsAmbientMuted] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Hydrate audio settings from localStorage after mount (avoids SSR mismatch)
@@ -261,6 +270,8 @@ export const ColoringContextProvider = ({
   const [isColoringComplete, setIsColoringComplete] = useState(false);
   const [isAutoColoring, setIsAutoColoring] = useState(false);
   const [hasAutoColored, setHasAutoColored] = useState(false);
+  const [paletteVariant, setPaletteVariant] =
+    useState<PaletteVariant>("realistic");
 
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
@@ -383,6 +394,8 @@ export const ColoringContextProvider = ({
       setIsAutoColoring,
       hasAutoColored,
       setHasAutoColored,
+      paletteVariant,
+      setPaletteVariant,
       variant,
     }),
     [
@@ -417,6 +430,7 @@ export const ColoringContextProvider = ({
       isColoringComplete,
       isAutoColoring,
       hasAutoColored,
+      paletteVariant,
       variant,
     ],
   );

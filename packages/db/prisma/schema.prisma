@@ -130,7 +130,8 @@ model ColoringImage {
   svgUrl          String?
   qrCodeUrl       String?
   ambientSoundUrl String? // ElevenLabs generated ambient sound for coloring experience
-  animationUrl    String? // Veo-generated animated video for social media carousels
+  animationUrl    String? // Veo-generated animated video for social media carousels (dormant — kept for future models)
+  demoReelUrl     String? // Playwright-recorded product-demo reel (prompt → AI draws → Magic Brush) rendered on the Hetzner worker
   animationPrompt String? // Pre-generated Veo 3 prompt based on actual image content
   sourcePrompt    String? // Original input description for deduplication across daily generations
   tags            String[]
@@ -151,6 +152,21 @@ model ColoringImage {
   // Region-aware fill points for Magic Fill (replaces grid approach for new images)
   fillPointsJson        String?   @db.Text // JSON with region centroids + AI-assigned colors
   fillPointsGeneratedAt DateTime? // When the fill points were generated
+
+  // Topology SVG — internal watertight version of the line art, traced from
+  // the raster with aggressive settings to close all gaps. Used ONLY by
+  // region detection + reveal-mask pipeline. Users never see this; the
+  // display SVG at svgUrl stays stylistically correct.
+  svgTopologyUrl String? // R2 URL of the topology SVG (gap-free version)
+
+  // Pre-computed region store for reveal-mask Magic Brush & palette variants.
+  // regionMapUrl points to a gzipped Uint16Array pixel→regionId lookup in R2;
+  // regionsJson holds per-region metadata { id, bounds, centroid, pixelCount, label, palettes }.
+  regionMapUrl       String? // R2 URL of gzipped Uint16Array (regionMapWidth*regionMapHeight*2 bytes)
+  regionMapWidth     Int? // Resolution the region map was computed at
+  regionMapHeight    Int?
+  regionsJson        String?   @db.Text // JSON array of region metadata + palette variants
+  regionsGeneratedAt DateTime? // When the region store was generated
 
   // AI-colored reference image for Auto Color + Magic Brush (holistic coloring)
   coloredReferenceUrl String? // R2 URL of AI-colored version of the line art

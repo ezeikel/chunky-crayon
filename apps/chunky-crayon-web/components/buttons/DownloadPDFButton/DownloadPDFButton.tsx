@@ -4,11 +4,10 @@ import { useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { ColoringImage } from '@one-colored-pixel/db/types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faImage } from '@fortawesome/pro-solid-svg-icons';
+import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import { pdf } from '@react-pdf/renderer';
 import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/ColoringPageDocument';
-import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { fetchSvg } from '@one-colored-pixel/canvas';
@@ -27,11 +26,6 @@ type SaveButtonProps = {
   getCanvasDataUrl?: () => string | null;
   className?: string;
 };
-
-// Kid-friendly button: big, colorful, clear language
-// Responsive: icon-only on mobile (44px touch target), icon+text on desktop
-const buttonClassName =
-  'flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg bg-crayon-orange hover:bg-crayon-orange-dark active:scale-95 transition-all duration-150';
 
 type GeneratingState = 'idle' | 'generating' | 'error';
 
@@ -130,79 +124,65 @@ const DownloadPDFButtonContent = ({
 
   if (isLoading) {
     return (
-      <button
-        className={cn(buttonClassName, 'opacity-60 cursor-wait', className)}
+      <ActionButton
+        size="tile"
+        tone="accent"
+        icon={faImage}
+        label={t('loading')}
         disabled
-        type="button"
-      >
-        <FontAwesomeIcon
-          icon={faImage}
-          className="text-xl md:text-2xl animate-pulse"
-        />
-        <span className="hidden md:inline">{t('loading')}</span>
-      </button>
+        className={className}
+      />
     );
   }
 
   if (error || !imageSvg || !qrCodeSvg) {
     return (
-      <button
-        className={cn(
-          buttonClassName,
-          'opacity-60 cursor-not-allowed',
-          className,
-        )}
+      <ActionButton
+        size="tile"
+        tone="accent"
+        icon={faImage}
+        label={t('error')}
         disabled
-        type="button"
-      >
-        <FontAwesomeIcon icon={faImage} className="text-xl md:text-2xl" />
-        <span className="hidden md:inline">{t('error')}</span>
-      </button>
+        className={className}
+      />
     );
   }
 
   if (generatingState === 'generating') {
     return (
-      <button
-        className={cn(buttonClassName, 'opacity-60 cursor-wait', className)}
+      <ActionButton
+        size="tile"
+        tone="accent"
+        icon={faImage}
+        label={t('creating')}
         disabled
-        type="button"
-      >
-        <FontAwesomeIcon
-          icon={faImage}
-          className="text-xl md:text-2xl animate-pulse"
-        />
-        <span className="hidden md:inline">{t('creating')}</span>
-      </button>
+        className={className}
+      />
     );
   }
 
   if (generatingState === 'error') {
     return (
-      <button
-        className={cn(
-          buttonClassName,
-          'opacity-60 cursor-not-allowed',
-          className,
-        )}
+      <ActionButton
+        size="tile"
+        tone="accent"
+        icon={faImage}
+        label={t('error')}
         disabled
-        type="button"
-      >
-        <FontAwesomeIcon icon={faImage} className="text-xl md:text-2xl" />
-        <span className="hidden md:inline">{t('error')}</span>
-      </button>
+        className={className}
+      />
     );
   }
 
   return (
-    <button
-      type="button"
+    <ActionButton
+      size="tile"
+      tone="accent"
+      icon={faImage}
+      label={t('idle')}
       onClick={handlePrint}
-      className={cn(buttonClassName, className)}
-    >
-      <FontAwesomeIcon icon={faImage} className="text-xl md:text-2xl" />
-      <span className="hidden md:inline">{t('idle')}</span>
-    </button>
+      className={className}
+    />
   );
 };
 

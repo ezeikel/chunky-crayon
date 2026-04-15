@@ -169,11 +169,11 @@ const PatternSelector = ({ className }: PatternSelectorProps) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-1 p-2 rounded-lg bg-white/90 backdrop-blur-sm",
+        "flex items-center gap-1 p-2 rounded-coloring-card bg-white/90 backdrop-blur-sm",
         className,
       )}
     >
-      <span className="text-xs font-medium text-gray-500 px-1 hidden sm:block">
+      <span className="text-xs font-medium text-coloring-muted px-1 hidden sm:block">
         Pattern:
       </span>
       <div className="flex items-center gap-1">
@@ -187,7 +187,7 @@ const PatternSelector = ({ className }: PatternSelectorProps) => {
               key={pattern}
               onClick={() => handlePatternSelect(pattern)}
               className={cn(
-                "flex items-center justify-center size-10 sm:size-11 rounded-lg transition-all duration-150",
+                "flex items-center justify-center size-10 sm:size-11 rounded-coloring-card transition-all duration-coloring-base ease-coloring",
                 "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
                 {
                   "bg-coloring-accent/20 ring-2 ring-coloring-accent": isActive,

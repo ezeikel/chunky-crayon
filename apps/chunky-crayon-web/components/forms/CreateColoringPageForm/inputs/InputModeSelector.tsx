@@ -64,7 +64,7 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
 
   return (
     <div
-      className={cn('flex gap-3 justify-center items-center', className)}
+      className={cn('flex gap-2 md:gap-3 justify-center', className)}
       role="tablist"
       aria-label={t('ariaLabel')}
     >
@@ -82,32 +82,28 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
             tabIndex={isActive ? 0 : -1}
             disabled={isDisabled}
             onClick={() => handleModeChange(option.mode)}
+            aria-label={t(option.labelKey)}
+            title={t(option.labelKey)}
             className={cn(
-              // Base styles
-              'flex flex-col items-center justify-center gap-1.5',
-              'min-w-[80px] md:min-w-[90px] p-3 md:p-4 rounded-2xl',
-              'transition-all duration-200 ease-out',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-              // Active state
+              // Base — compact tile matching DesktopToolsSidebar tool buttons
+              'flex items-center justify-center size-14 md:size-16 rounded-coloring-card',
+              'border-2 transition-all duration-200 ease-out',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-crayon-orange',
               isActive
-                ? 'bg-btn-orange text-white shadow-btn-primary scale-105 focus-visible:ring-crayon-orange'
-                : 'bg-white text-text-primary border-2 border-paper-cream-dark hover:border-crayon-orange hover:bg-crayon-orange-light/10 focus-visible:ring-crayon-orange',
-              // Disabled state
+                ? 'bg-btn-orange border-transparent text-white shadow-btn-primary'
+                : 'bg-white border-paper-cream-dark text-text-primary hover:border-crayon-orange hover:bg-crayon-orange-light/10',
               isDisabled &&
                 'opacity-50 cursor-not-allowed hover:border-paper-cream-dark hover:bg-white',
-              // Animation on hover
               !isDisabled && !isActive && 'hover:scale-105 active:scale-95',
             )}
             style={
               isActive
                 ? ({
-                    // Duotone icon colors for active state
                     '--fa-primary-color': 'white',
-                    '--fa-secondary-color': 'rgba(255, 255, 255, 0.8)',
+                    '--fa-secondary-color': 'rgba(255, 255, 255, 0.85)',
                     '--fa-secondary-opacity': '1',
                   } as React.CSSProperties)
                 : ({
-                    // Duotone icon colors for inactive state
                     '--fa-primary-color': 'hsl(var(--crayon-orange))',
                     '--fa-secondary-color': 'hsl(var(--crayon-teal))',
                     '--fa-secondary-opacity': '1',
@@ -116,14 +112,12 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
           >
             <FontAwesomeIcon
               icon={option.icon}
+              size="2x"
               className={cn(
-                'text-2xl md:text-3xl transition-transform duration-200',
+                'transition-transform duration-200',
                 isActive && 'animate-bounce-in',
               )}
             />
-            <span className="text-xs md:text-sm font-tondo font-bold">
-              {t(option.labelKey)}
-            </span>
           </button>
         );
       })}

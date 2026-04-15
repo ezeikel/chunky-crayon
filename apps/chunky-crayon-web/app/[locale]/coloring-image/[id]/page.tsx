@@ -126,7 +126,7 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
   };
 
   return (
-    <PageWrap className="flex flex-col gap-y-6">
+    <PageWrap className="flex flex-col gap-y-6 lg:px-6">
       {/* ImageObject Schema */}
       <script
         type="application/ld+json"

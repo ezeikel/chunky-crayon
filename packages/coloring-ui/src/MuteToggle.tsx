@@ -2,8 +2,13 @@
 
 import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faVolumeHigh, faVolumeXmark } from "@fortawesome/pro-solid-svg-icons";
-import { motion } from "framer-motion";
+import {
+  faVolumeHigh,
+  faVolumeXmark,
+  faMusic,
+  faMusicSlash,
+} from "@fortawesome/pro-solid-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { useSound } from "./useSound";
 import cn from "./cn";
 
@@ -11,8 +16,54 @@ type MuteToggleProps = {
   className?: string;
 };
 
+type AudioTileProps = {
+  isOn: boolean;
+  onToggle: () => void;
+  iconOn: IconDefinition;
+  iconOff: IconDefinition;
+  ariaOn: string;
+  ariaOff: string;
+};
+
+const AudioTile = ({
+  isOn,
+  onToggle,
+  iconOn,
+  iconOff,
+  ariaOn,
+  ariaOff,
+}: AudioTileProps) => (
+  <button
+    type="button"
+    onClick={onToggle}
+    aria-label={isOn ? ariaOn : ariaOff}
+    aria-pressed={isOn}
+    title={isOn ? ariaOn : ariaOff}
+    className={cn(
+      "flex items-center justify-center size-12 rounded-coloring-card transition-all duration-coloring-base ease-coloring",
+      "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
+      isOn
+        ? "bg-coloring-accent text-white"
+        : "bg-white border border-paper-cream-dark text-coloring-muted hover:bg-paper-cream",
+    )}
+  >
+    <FontAwesomeIcon icon={isOn ? iconOn : iconOff} size="lg" />
+  </button>
+);
+
+/**
+ * Two side-by-side icon tiles for SFX and ambient music.
+ * SFX is on by default; music is off by default. Each toggles independently.
+ */
 const MuteToggle = ({ className }: MuteToggleProps) => {
-  const { isMuted, toggleMute, initSounds, playSound } = useSound();
+  const {
+    isSfxMuted,
+    toggleSfxMute,
+    isAmbientMuted,
+    toggleAmbientMute,
+    initSounds,
+    playSound,
+  } = useSound();
 
   // Initialize sounds on first interaction
   useEffect(() => {
@@ -31,38 +82,35 @@ const MuteToggle = ({ className }: MuteToggleProps) => {
     };
   }, [initSounds]);
 
-  const handleToggle = () => {
-    toggleMute();
-    if (isMuted) {
-      // Will be unmuted, so play a sound
-      playSound("pop");
-    }
+  const handleSfxToggle = () => {
+    const wasOff = isSfxMuted;
+    toggleSfxMute();
+    if (wasOff) playSound("pop");
+  };
+
+  const handleMusicToggle = () => {
+    toggleAmbientMute();
   };
 
   return (
-    <motion.button
-      type="button"
-      onClick={handleToggle}
-      className={cn(
-        "flex items-center justify-center w-12 h-12 rounded-full",
-        "bg-coloring-surface border-2 border-coloring-surface-dark",
-        "hover:bg-coloring-surface-dark active:scale-95",
-        "transition-all duration-150",
-        "shadow-sm hover:shadow-md",
-        className,
-      )}
-      whileTap={{ scale: 0.9 }}
-      aria-label={isMuted ? "Unmute sounds" : "Mute sounds"}
-      title={isMuted ? "Turn sounds on" : "Turn sounds off"}
-    >
-      <FontAwesomeIcon
-        icon={isMuted ? faVolumeXmark : faVolumeHigh}
-        className={cn(
-          "text-xl transition-colors",
-          isMuted ? "text-coloring-muted" : "text-coloring-accent",
-        )}
+    <div className={cn("flex items-center gap-2", className)}>
+      <AudioTile
+        isOn={!isSfxMuted}
+        onToggle={handleSfxToggle}
+        iconOn={faVolumeHigh}
+        iconOff={faVolumeXmark}
+        ariaOn="Sound effects on"
+        ariaOff="Sound effects off"
       />
-    </motion.button>
+      <AudioTile
+        isOn={!isAmbientMuted}
+        onToggle={handleMusicToggle}
+        iconOn={faMusic}
+        iconOff={faMusicSlash}
+        ariaOn="Music on"
+        ariaOff="Music off"
+      />
+    </div>
   );
 };
 

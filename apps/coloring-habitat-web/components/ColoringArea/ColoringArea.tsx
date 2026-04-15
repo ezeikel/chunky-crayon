@@ -27,6 +27,10 @@ import {
 } from "@one-colored-pixel/coloring-ui";
 import { useSound } from "@one-colored-pixel/coloring-ui";
 import { useReferenceColor } from "@one-colored-pixel/coloring-ui";
+import {
+  useRegionStore,
+  type RegionStoreJson,
+} from "@one-colored-pixel/coloring-ui";
 import { useMagicColorMap } from "@/hooks/useMagicColorMap";
 import type { GridColorMap, FillPointsData } from "@/lib/ai";
 import {
@@ -40,6 +44,8 @@ import {
 } from "@one-colored-pixel/coloring-ui";
 import { generateRegionFillPoints } from "@/app/actions/generate-color-map";
 import { generateColoredReference } from "@/app/actions/generate-colored-reference";
+import { checkRegionStoreReady } from "@/app/actions/generate-regions";
+import { useRouter } from "next/navigation";
 import { detectAllRegions } from "@one-colored-pixel/canvas";
 
 type ColoringAreaProps = {
@@ -84,6 +90,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setDrawingActions,
       setIsAutoColoring,
       setHasAutoColored,
+      paletteVariant,
+      pushToHistory,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -137,6 +145,69 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       getDirectFillPoints,
       reset: resetMagicColorMap,
     } = useMagicColorMap({ preComputedColorMap, fillPointsData });
+
+    // Region store — pre-computed region map for reveal-mask magic brush
+    const parsedRegionsJson = useMemo<RegionStoreJson | null>(() => {
+      if (!coloringImage.regionsJson) return null;
+      try {
+        return JSON.parse(
+          coloringImage.regionsJson as string,
+        ) as RegionStoreJson;
+      } catch {
+        return null;
+      }
+    }, [coloringImage.regionsJson]);
+
+    const regionStore = useRegionStore({
+      regionMapUrl: coloringImage.regionMapUrl as string | undefined,
+      regionMapWidth: coloringImage.regionMapWidth as number | undefined,
+      regionMapHeight: coloringImage.regionMapHeight as number | undefined,
+      regionsJson: parsedRegionsJson,
+    });
+
+    // If we landed on a freshly-generated image before the post-create
+    // pipeline finished building the region store, poll until it's ready
+    // then router.refresh() to pull the new coloringImage prop (with
+    // regionMapUrl/regionsJson populated) — no visual reload. Enables
+    // proper per-region Magic Brush reveal on freshly-created images.
+    const router = useRouter();
+    useEffect(() => {
+      if (coloringImage.regionMapUrl) return; // already have it
+      if (!coloringImage.id) return;
+      let stopped = false;
+      const POLL_MS = 3000;
+      const MAX_ATTEMPTS = 200; // ~10 minutes total — complex images take longer
+      let attempts = 0;
+      const tick = async () => {
+        if (stopped) return;
+        attempts += 1;
+        try {
+          const { ready } = await checkRegionStoreReady(coloringImage.id!);
+          if (stopped) return;
+          if (ready) {
+            console.log("[ColoringArea] region store ready — refreshing RSC");
+            router.refresh();
+            return; // stop polling
+          }
+        } catch (err) {
+          console.warn("[ColoringArea] region-store poll failed:", err);
+        }
+        if (attempts >= MAX_ATTEMPTS) {
+          console.warn(
+            "[ColoringArea] gave up waiting for region store after",
+            attempts,
+            "attempts",
+          );
+          return;
+        }
+        setTimeout(tick, POLL_MS);
+      };
+      const t = setTimeout(tick, POLL_MS);
+      return () => {
+        stopped = true;
+        clearTimeout(t);
+      };
+    }, [coloringImage.id, coloringImage.regionMapUrl, router]);
 
     // Handle first canvas interaction - load and play ambient sound
     // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
@@ -290,6 +361,46 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       markRegionColored,
       playSound,
       setHasUnsavedChanges,
+    ]);
+
+    // Handle auto-color using the pre-computed region store. Draws the
+    // pre-coloured canvas directly onto the drawing canvas in one shot.
+    // Same data source as Magic Brush — pixel-perfect, no flood fill.
+    const handleRegionStoreAutoColor = useCallback(() => {
+      const drawingCanvas = canvasRef.current?.getCanvas();
+      const preColoredCanvas = canvasRef.current?.getPreColoredCanvas();
+      if (!drawingCanvas || !preColoredCanvas) return;
+
+      const drawingCtx = drawingCanvas.getContext("2d");
+      if (!drawingCtx) return;
+
+      setIsAutoColoring(true);
+
+      const beforeState = canvasRef.current?.captureCanvasState();
+      if (beforeState) {
+        pushToHistory({
+          type: "fill",
+          imageData: beforeState,
+          timestamp: Date.now(),
+        });
+      }
+
+      drawingCtx.save();
+      drawingCtx.setTransform(1, 0, 0, 1, 0, 0);
+      drawingCtx.drawImage(preColoredCanvas, 0, 0);
+      drawingCtx.restore();
+
+      setIsAutoColoring(false);
+      setHasAutoColored(true);
+      setActiveTool("brush");
+      playSound("sparkle");
+      setHasUnsavedChanges(true);
+    }, [
+      playSound,
+      pushToHistory,
+      setHasUnsavedChanges,
+      setIsAutoColoring,
+      setHasAutoColored,
     ]);
 
     // Handle direct auto-color using fill points (bypasses region detection)
@@ -550,7 +661,13 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     useEffect(() => {
       if (activeTool !== "magic-auto" || !canvasReadyRef.current) return;
 
-      // Prefer reference image (holistic AI coloring)
+      // Prefer region store (pre-computed, palette-aware, most accurate)
+      if (regionStore.state.isReady) {
+        handleRegionStoreAutoColor();
+        return;
+      }
+
+      // Fallback: reference image (holistic AI coloring)
       if (hasColoredReference && referenceColor.state.isReady) {
         handleReferenceAutoColor();
         return;
@@ -568,6 +685,8 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }
     }, [
       activeTool,
+      regionStore.state.isReady,
+      handleRegionStoreAutoColor,
       hasColoredReference,
       referenceColor.state.isReady,
       handleReferenceAutoColor,
@@ -835,7 +954,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // Determine which color source to use for magic tools
     const useReferenceForMagic =
       hasColoredReference && referenceColor.state.isReady;
-    const isMagicReady = useReferenceForMagic || magicColorMapState.isReady;
+    const isMagicReady =
+      regionStore.state.isReady ||
+      useReferenceForMagic ||
+      magicColorMapState.isReady;
 
     return (
       <div className="flex flex-col gap-y-2 md:gap-y-3">
@@ -885,6 +1007,17 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
               useReferenceForMagic ? undefined : handleRegionRevealed
             }
             isMagicRevealReady={isMagicReady}
+            regionStore={
+              regionStore.state.isReady
+                ? {
+                    getRegionIdAt: regionStore.getRegionIdAt,
+                    getColorForRegion: regionStore.getColorForRegion,
+                    isReady: regionStore.state.isReady,
+                    width: regionStore.state.width,
+                    height: regionStore.state.height,
+                  }
+                : undefined
+            }
           />
 
           {/* Magic Loading Overlay - Shows when magic tools are analyzing the image */}

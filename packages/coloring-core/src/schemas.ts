@@ -308,6 +308,51 @@ export const regionFirstColorResponseSchema = z.object({
     .describe("Color assignment for each input region"),
 });
 
+// =============================================================================
+// Region Labelling (Strategy C: separate labelling pass before colouring)
+// =============================================================================
+
+/**
+ * Output schema for a single region label assignment.
+ *
+ * Used by the labelling pass in generateRegionStoreLogic, which sends a
+ * numbered-overlay image to the AI so it can read region IDs off the image
+ * and assign accurate semantic labels. Colouring is handled separately.
+ */
+export const regionLabelAssignmentSchema = z.object({
+  regionId: z
+    .number()
+    .describe("Numeric region ID read from the numbered overlay image"),
+  label: z
+    .string()
+    .describe(
+      'Semantic label for this region (e.g. "sky", "mast", "left sail stripe", "star")',
+    ),
+  objectGroup: z
+    .string()
+    .describe(
+      'Logical object this region belongs to. Multiple regions can share a group (e.g. three mast regions → "main mast"). Single-region objects repeat their label.',
+    ),
+});
+
+export type RegionLabelAssignment = z.infer<typeof regionLabelAssignmentSchema>;
+
+/**
+ * Full response schema for the labelling pass.
+ */
+export const regionLabellingResponseSchema = z.object({
+  sceneDescription: z
+    .string()
+    .describe("Brief description of the overall scene"),
+  regions: z
+    .array(regionLabelAssignmentSchema)
+    .describe("Label assignment for every input region"),
+});
+
+export type RegionLabellingResponse = z.infer<
+  typeof regionLabellingResponseSchema
+>;
+
 export type RegionFirstColorResponse = z.infer<
   typeof regionFirstColorResponseSchema
 >;

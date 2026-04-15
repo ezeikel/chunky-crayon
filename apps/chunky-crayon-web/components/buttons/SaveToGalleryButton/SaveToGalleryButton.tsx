@@ -2,13 +2,12 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faSpinner, faCheck } from '@fortawesome/pro-solid-svg-icons';
 import { saveArtworkToGallery } from '@/app/actions/saved-artwork';
 import Confetti from '@/components/Confetti';
 import { StickerReward } from '@/components/StickerReward';
 import { ColoEvolutionCelebration } from '@/components/ColoEvolutionCelebration';
-import { useSound } from '@one-colored-pixel/coloring-ui';
+import { ActionButton, useSound } from '@one-colored-pixel/coloring-ui';
 import cn from '@/utils/cn';
 import type { Sticker } from '@/lib/stickers';
 import type { EvolutionResult } from '@/lib/colo';
@@ -20,11 +19,6 @@ type SaveToGalleryButtonProps = {
 };
 
 type SaveState = 'idle' | 'saving' | 'success' | 'error';
-
-// Kid-friendly button style
-// Responsive: icon-only on mobile (44px touch target), icon+text on desktop
-const buttonClassName =
-  'flex items-center justify-center gap-x-2 md:gap-x-3 text-white font-tondo font-bold text-base md:text-lg size-11 md:size-auto md:px-8 md:py-4 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200';
 
 const SaveToGalleryButton = ({
   coloringImageId,
@@ -123,60 +117,42 @@ const SaveToGalleryButton = ({
   }, []);
 
   const renderButton = () => {
-    // Saving state
     if (state === 'saving') {
       return (
-        <button
-          type="button"
+        <ActionButton
+          size="tile"
+          tone="secondary"
+          icon={faSpinner}
+          label={t('saving')}
           disabled
-          className={cn(
-            buttonClassName,
-            'bg-crayon-pink cursor-wait',
-            className,
-          )}
-        >
-          <FontAwesomeIcon
-            icon={faSpinner}
-            className="text-xl md:text-2xl animate-spin"
-          />
-          <span className="hidden md:inline">{t('saving')}</span>
-        </button>
+          className={className}
+        />
       );
     }
 
-    // Success state
     if (state === 'success') {
       return (
-        <button
-          type="button"
+        <ActionButton
+          size="tile"
+          tone="success"
+          icon={faCheck}
+          label={t('saved')}
           disabled
-          className={cn(
-            buttonClassName,
-            'bg-crayon-green cursor-default animate-bounce-in',
-            className,
-          )}
-        >
-          <FontAwesomeIcon icon={faCheck} className="text-xl md:text-2xl" />
-          <span className="hidden md:inline">{t('saved')}</span>
-        </button>
+          className={cn('animate-bounce-in', className)}
+        />
       );
     }
 
-    // Error state
     if (state === 'error') {
       return (
         <div className={cn('flex flex-col items-center gap-2', className)}>
-          <button
-            type="button"
+          <ActionButton
+            size="tile"
+            tone="secondary"
+            icon={faHeart}
+            label={t('tryAgain')}
             onClick={handleSave}
-            className={cn(
-              buttonClassName,
-              'bg-crayon-pink hover:bg-crayon-pink-dark active:scale-95',
-            )}
-          >
-            <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
-            <span className="hidden md:inline">{t('tryAgain')}</span>
-          </button>
+          />
           {errorMessage && (
             <p className="text-sm text-crayon-pink">{errorMessage}</p>
           )}
@@ -184,20 +160,15 @@ const SaveToGalleryButton = ({
       );
     }
 
-    // Default idle state
     return (
-      <button
-        type="button"
+      <ActionButton
+        size="tile"
+        tone="secondary"
+        icon={faHeart}
+        label={t('idle')}
         onClick={handleSave}
-        className={cn(
-          buttonClassName,
-          'bg-crayon-pink hover:bg-crayon-pink-dark active:scale-95',
-          className,
-        )}
-      >
-        <FontAwesomeIcon icon={faHeart} className="text-xl md:text-2xl" />
-        <span className="hidden md:inline">{t('idle')}</span>
-      </button>
+        className={className}
+      />
     );
   };
 

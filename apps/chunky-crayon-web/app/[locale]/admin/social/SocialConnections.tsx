@@ -10,13 +10,30 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  CheckCircle,
-  ExternalLink,
-  Loader2,
-  XCircle,
-  Unplug,
-} from 'lucide-react';
+  faCircleCheck,
+  faCircleXmark,
+  faSpinner,
+  faPlugCircleXmark,
+  faArrowUpRightFromSquare,
+} from '@fortawesome/pro-solid-svg-icons';
+
+const CheckCircle = ({ className }: { className?: string }) => (
+  <FontAwesomeIcon icon={faCircleCheck} className={className} />
+);
+const XCircle = ({ className }: { className?: string }) => (
+  <FontAwesomeIcon icon={faCircleXmark} className={className} />
+);
+const Loader2 = ({ className }: { className?: string }) => (
+  <FontAwesomeIcon icon={faSpinner} className={className} />
+);
+const Unplug = ({ className }: { className?: string }) => (
+  <FontAwesomeIcon icon={faPlugCircleXmark} className={className} />
+);
+const ExternalLink = ({ className }: { className?: string }) => (
+  <FontAwesomeIcon icon={faArrowUpRightFromSquare} className={className} />
+);
 
 type TokenStatus = {
   connected: boolean;

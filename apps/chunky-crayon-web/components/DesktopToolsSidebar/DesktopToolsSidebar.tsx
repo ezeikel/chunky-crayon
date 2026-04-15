@@ -4,6 +4,7 @@ import { ColoringImage } from '@one-colored-pixel/db/types';
 import {
   useColoringContext,
   CanvasAction,
+  type PaletteVariant,
 } from '@one-colored-pixel/coloring-ui';
 import { useSound } from '@one-colored-pixel/coloring-ui';
 import cn from '@/utils/cn';
@@ -12,6 +13,8 @@ import { useTranslations } from 'next-intl';
 import {
   faPencil,
   faPaintbrush,
+  faPenNib,
+  faPaintRoller,
   faFillDrip,
   faEraser,
   faSparkles,
@@ -22,11 +25,6 @@ import {
   faStar,
   faBrush,
   faHand,
-  faToolbox,
-  faRuler,
-  faClockRotateLeft,
-  faMagnifyingGlass,
-  faRocketLaunch,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { BRUSH_SIZES, BrushSize } from '@/constants';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
@@ -49,6 +47,8 @@ type ToolConfig = {
   id:
     | 'crayon'
     | 'marker'
+    | 'pencil'
+    | 'paintbrush'
     | 'glitter'
     | 'sparkle'
     | 'rainbow'
@@ -65,14 +65,16 @@ type ToolConfig = {
 };
 
 // Regular tools shown as icon-only grid
+// Core tools only — sparkle, rainbow, glow, neon removed because they
+// don't map to real-world tools kids understand and the implementations
+// are confusing (garish rainbow, particle effects, unclear glow/neon).
+// Glitter kept but needs a fix to use selected colour not random rainbow.
 const regularTools: ToolConfig[] = [
   { id: 'crayon', label: 'Crayon', icon: faPencil },
   { id: 'marker', label: 'Marker', icon: faPaintbrush },
+  { id: 'pencil', label: 'Pencil', icon: faPenNib },
+  { id: 'paintbrush', label: 'Paint', icon: faPaintRoller },
   { id: 'glitter', label: 'Glitter', icon: faSparkles },
-  { id: 'sparkle', label: 'Sparkle', icon: faWandSparkles },
-  { id: 'rainbow', label: 'Rainbow', icon: faRainbow },
-  { id: 'glow', label: 'Glow', icon: faSun },
-  { id: 'neon', label: 'Neon', icon: faBoltLightning },
   { id: 'fill', label: 'Fill', icon: faFillDrip },
   { id: 'eraser', label: 'Eraser', icon: faEraser },
   { id: 'sticker', label: 'Sticker', icon: faStar },
@@ -212,6 +214,14 @@ const DesktopToolsSidebar = ({
         setActiveTool('brush');
         setBrushType('marker');
         break;
+      case 'pencil':
+        setActiveTool('brush');
+        setBrushType('pencil');
+        break;
+      case 'paintbrush':
+        setActiveTool('brush');
+        setBrushType('paintbrush');
+        break;
       case 'glitter':
         setActiveTool('brush');
         setBrushType('glitter');
@@ -310,27 +320,16 @@ const DesktopToolsSidebar = ({
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 p-4 bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-paper-cream-dark shadow-lg',
+        'w-fit flex flex-col gap-4 p-4 bg-white/95 backdrop-blur-sm rounded-2xl border-2 border-paper-cream-dark shadow-lg',
         className,
       )}
     >
-      {/* Tools Section */}
+      {/* Tools Section — header omitted; brush/fill/eraser icons speak for themselves. */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faToolbox}
-            className="size-5 text-crayon-orange"
-          />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
-            {t('sidebar.tools')}
-          </h3>
-        </div>
-
-        {/* Regular Tool Grid - 4 columns, icons only with tooltips */}
-        <div className="grid grid-cols-4 gap-1.5">
+        {/* Regular Tool Grid - 3 columns, 64px each */}
+        <div className="grid grid-cols-3 gap-3 w-fit">
           {regularTools.map(({ id, icon }) => {
             const isActive = isToolActive(id);
-            // Get translation key based on tool ID
             const translationKey =
               id === 'fill' || id === 'sticker'
                 ? `tools.${id}`
@@ -343,31 +342,30 @@ const DesktopToolsSidebar = ({
                 key={id}
                 onClick={() => handleToolSelect(id)}
                 className={cn(
-                  'flex items-center justify-center p-3 rounded-lg transition-all duration-150',
-                  'hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
-                  {
-                    'bg-crayon-orange text-white hover:bg-crayon-orange/90':
-                      isActive,
-                  },
+                  'flex items-center justify-center size-16 rounded-coloring-card transition-all duration-coloring-base ease-coloring',
+                  'active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
+                  isActive
+                    ? 'bg-crayon-orange text-white hover:bg-crayon-orange/90 shadow-sm'
+                    : 'bg-white border border-paper-cream-dark text-text-primary hover:bg-paper-cream',
                 )}
                 aria-label={label}
                 title={label}
                 aria-pressed={isActive}
+                data-testid={`tool-${id}`}
               >
-                <FontAwesomeIcon icon={icon} className="size-6" />
+                <FontAwesomeIcon icon={icon} size="xl" />
               </button>
             );
           })}
         </div>
 
-        {/* Magic Tools - Featured with labels and gradient background */}
-        <div className="flex flex-col gap-1.5 mt-1">
+        {/* Magic Tools - 2-up icon-only tiles with sparkle marker */}
+        <div className="grid grid-cols-2 gap-3 w-fit mt-1">
           {magicTools.map(({ id, icon }) => {
             const isActive = isToolActive(id);
             const isAutoColorBtn = id === 'magic-auto';
             const showSpinner = isAutoColorBtn && isAutoColoring;
             const isAutoColorDone = isAutoColorBtn && hasAutoColored;
-            // Get translation key based on tool ID
             const translationKey =
               id === 'magic-reveal' ? 'tools.magicBrush' : 'tools.autoColor';
             const label = t(translationKey);
@@ -379,54 +377,62 @@ const DesktopToolsSidebar = ({
                 onClick={() => handleToolSelect(id)}
                 disabled={showSpinner || isAutoColorDone}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all duration-150',
-                  'hover:scale-[1.02] active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-purple',
-                  'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100',
+                  'relative flex items-center justify-center size-16 rounded-coloring-card transition-all duration-coloring-base ease-coloring',
+                  'active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-purple',
+                  'disabled:cursor-not-allowed disabled:opacity-50',
                   isActive || showSpinner
-                    ? 'bg-gradient-to-r from-crayon-purple to-crayon-pink text-white shadow-md'
+                    ? 'bg-gradient-to-br from-crayon-purple to-crayon-pink text-white'
                     : isAutoColorDone
                       ? 'bg-gray-100 text-gray-400'
-                      : 'bg-gradient-to-r from-crayon-purple/10 to-crayon-pink/10 text-crayon-purple hover:from-crayon-purple/20 hover:to-crayon-pink/20',
+                      : 'bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 text-crayon-purple hover:from-crayon-purple/20 hover:to-crayon-pink/20',
                 )}
-                aria-label={label}
+                aria-label={
+                  showSpinner
+                    ? 'Coloring…'
+                    : isAutoColorDone
+                      ? 'Auto colored'
+                      : label
+                }
+                title={
+                  showSpinner
+                    ? 'Coloring…'
+                    : isAutoColorDone
+                      ? 'Auto colored'
+                      : label
+                }
                 aria-pressed={isActive}
+                data-testid={`tool-${id}`}
               >
                 {showSpinner ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="size-10 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <FontAwesomeIcon icon={icon} className="size-5" />
+                  <FontAwesomeIcon icon={icon} size="xl" />
                 )}
-                <span className="font-bold text-sm">
-                  {showSpinner
-                    ? 'Coloring...'
-                    : isAutoColorDone
-                      ? 'Auto Colored'
-                      : label}
-                </span>
-                {!showSpinner && (
-                  <span className="ml-auto text-xs opacity-70">✨</span>
+                {!showSpinner && !isAutoColorDone && (
+                  <FontAwesomeIcon
+                    icon={faSparkles}
+                    size="lg"
+                    aria-hidden
+                    className={cn(
+                      'absolute -top-2 -right-2 drop-shadow-sm',
+                      isActive ? 'text-white' : 'text-crayon-purple',
+                    )}
+                  />
                 )}
               </button>
             );
           })}
+
+          {/* Palette variant switcher moved to the colours panel — it now
+           * controls both the manual swatches and the magic-tool palette. */}
         </div>
       </div>
 
       {/* Divider */}
       <div className="h-px bg-paper-cream-dark" />
 
-      {/* Brush Size Section */}
+      {/* Brush Size Section — header omitted; the row of size dots reads as size on its own. */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faRuler}
-            className="size-4 text-crayon-orange"
-          />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
-            {t('sidebar.size')}
-          </h3>
-        </div>
-
         <div className="flex items-center justify-between gap-1">
           {sizes.map(([size, config]) => {
             const isSelected = brushSize === size;
@@ -443,7 +449,7 @@ const DesktopToolsSidebar = ({
                   playSound('tap');
                 }}
                 className={cn(
-                  'flex items-center justify-center size-10 rounded-lg transition-all duration-150',
+                  'flex items-center justify-center size-12 rounded-coloring-card transition-all duration-150',
                   'hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
                   {
                     'bg-gray-200 ring-2 ring-gray-400': isSelected,
@@ -451,12 +457,13 @@ const DesktopToolsSidebar = ({
                 )}
                 aria-label={sizeLabel}
                 title={sizeLabel}
+                data-testid={`brush-size-${size}`}
               >
                 <span
                   className="rounded-full transition-colors"
                   style={{
-                    width: `${Math.min(config.radius * 1.5, 24)}px`,
-                    height: `${Math.min(config.radius * 1.5, 24)}px`,
+                    width: `${Math.min(config.radius * 2, 32)}px`,
+                    height: `${Math.min(config.radius * 2, 32)}px`,
                     backgroundColor: displayColor,
                   }}
                 />
@@ -469,25 +476,15 @@ const DesktopToolsSidebar = ({
       {/* Divider */}
       <div className="h-px bg-paper-cream-dark" />
 
-      {/* Undo/Redo Section */}
+      {/* Undo/Redo Section — header omitted; the ↶ ↷ icons are universal. */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faClockRotateLeft}
-            className="size-4 text-crayon-orange"
-          />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
-            {t('sidebar.history')}
-          </h3>
-        </div>
-
         <div className="flex items-center justify-center gap-2">
           <button
             type="button"
             onClick={handleUndo}
             disabled={!canUndo}
             className={cn(
-              'flex items-center justify-center size-10 rounded-lg transition-all duration-150',
+              'flex items-center justify-center size-12 rounded-coloring-card transition-all duration-150',
               'focus:outline-none focus:ring-2 focus:ring-crayon-orange',
               {
                 'hover:bg-gray-100 active:scale-95 text-gray-700': canUndo,
@@ -497,7 +494,7 @@ const DesktopToolsSidebar = ({
             aria-label={t('undoRedo.undo')}
             title={t('undoRedo.undo')}
           >
-            <UndoIcon className="size-5" />
+            <UndoIcon className="size-8" />
           </button>
 
           <button
@@ -505,7 +502,7 @@ const DesktopToolsSidebar = ({
             onClick={handleRedo}
             disabled={!canRedo}
             className={cn(
-              'flex items-center justify-center size-10 rounded-lg transition-all duration-150',
+              'flex items-center justify-center size-12 rounded-coloring-card transition-all duration-150',
               'focus:outline-none focus:ring-2 focus:ring-crayon-orange',
               {
                 'hover:bg-gray-100 active:scale-95 text-gray-700': canRedo,
@@ -515,7 +512,7 @@ const DesktopToolsSidebar = ({
             aria-label={t('undoRedo.redo')}
             title={t('undoRedo.redo')}
           >
-            <RedoIcon className="size-5" />
+            <RedoIcon className="size-8" />
           </button>
         </div>
       </div>
@@ -523,25 +520,15 @@ const DesktopToolsSidebar = ({
       {/* Divider */}
       <div className="h-px bg-paper-cream-dark" />
 
-      {/* Zoom Section */}
+      {/* Zoom Section — header omitted; +/- magnifier icons are universal. */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faMagnifyingGlass}
-            className="size-4 text-crayon-orange"
-          />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
-            {t('sidebar.zoom')}
-          </h3>
-        </div>
-
         <div className="flex flex-wrap items-center justify-center gap-1">
           <button
             type="button"
             onClick={handleZoomOut}
             disabled={zoom <= minZoom}
             className={cn(
-              'flex items-center justify-center size-9 rounded-lg transition-all duration-150',
+              'flex items-center justify-center size-12 rounded-coloring-card transition-all duration-150',
               'hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
               {
                 'opacity-50 cursor-not-allowed hover:bg-transparent':
@@ -551,7 +538,7 @@ const DesktopToolsSidebar = ({
             aria-label={t('zoomControls.zoomOut')}
             title={t('zoomControls.zoomOut')}
           >
-            <ZoomOutIcon className="size-4" />
+            <ZoomOutIcon className="size-7" />
           </button>
 
           <button
@@ -559,7 +546,7 @@ const DesktopToolsSidebar = ({
             onClick={handleZoomIn}
             disabled={zoom >= maxZoom}
             className={cn(
-              'flex items-center justify-center size-9 rounded-lg transition-all duration-150',
+              'flex items-center justify-center size-12 rounded-coloring-card transition-all duration-150',
               'hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
               {
                 'opacity-50 cursor-not-allowed hover:bg-transparent':
@@ -569,7 +556,7 @@ const DesktopToolsSidebar = ({
             aria-label={t('zoomControls.zoomIn')}
             title={t('zoomControls.zoomIn')}
           >
-            <ZoomInIcon className="size-4" />
+            <ZoomInIcon className="size-7" />
           </button>
 
           {isZoomed && (
@@ -578,7 +565,7 @@ const DesktopToolsSidebar = ({
                 type="button"
                 onClick={handlePanToggle}
                 className={cn(
-                  'flex items-center justify-center size-9 rounded-lg transition-all duration-150',
+                  'flex items-center justify-center size-12 rounded-coloring-card transition-all duration-150',
                   'hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
                   isPanActive &&
                     'bg-crayon-orange text-white hover:bg-crayon-orange/90',
@@ -587,27 +574,27 @@ const DesktopToolsSidebar = ({
                 title={t('zoomControls.pan')}
                 aria-pressed={isPanActive}
               >
-                <FontAwesomeIcon icon={faHand} className="size-4" />
+                <FontAwesomeIcon icon={faHand} size="lg" />
               </button>
 
               <button
                 type="button"
                 onClick={handleResetView}
                 className={cn(
-                  'flex items-center justify-center size-9 rounded-lg transition-all duration-150',
+                  'flex items-center justify-center size-12 rounded-coloring-card transition-all duration-150',
                   'bg-crayon-orange/10 hover:bg-crayon-orange/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-orange',
                 )}
                 aria-label={t('zoomControls.reset')}
                 title={t('zoomControls.reset')}
               >
-                <HomeIcon className="size-4 text-crayon-orange" />
+                <HomeIcon className="size-7 text-crayon-orange" />
               </button>
             </>
           )}
         </div>
 
         {/* Zoom level indicator */}
-        <div className="text-center text-xs text-text-secondary">
+        <div className="text-center font-tondo font-bold text-xl text-text-primary tabular-nums">
           {Math.round(zoom * 100)}%
         </div>
       </div>
@@ -617,28 +604,13 @@ const DesktopToolsSidebar = ({
 
       {/* Actions Section */}
       <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <FontAwesomeIcon
-            icon={faRocketLaunch}
-            className="size-4 text-crayon-orange"
-          />
-          <h3 className="font-tondo font-bold text-sm text-text-primary">
-            {t('sidebar.actions')}
-          </h3>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          {onStartOver && (
-            <StartOverButton
-              onStartOver={onStartOver}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
-            />
-          )}
+        {/* Icon-only tile row — distribute across the same width as the 4-tool grid above. */}
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          {onStartOver && <StartOverButton onStartOver={onStartOver} />}
           {coloringImage && (
             <DownloadPDFButton
               coloringImage={coloringImage}
               getCanvasDataUrl={getCanvasDataUrl}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
             />
           )}
           <ShareButton
@@ -647,13 +619,11 @@ const DesktopToolsSidebar = ({
             description={`Color this ${coloringImage?.title || 'fun coloring page'} on Chunky Crayon!`}
             imageUrl={coloringImage?.url || undefined}
             getCanvasDataUrl={getCanvasDataUrl}
-            className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
           />
           {isAuthenticated && coloringImage?.id && (
             <SaveToGalleryButton
               coloringImageId={coloringImage.id}
               getCanvasDataUrl={getCanvasDataUrl!}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
             />
           )}
         </div>

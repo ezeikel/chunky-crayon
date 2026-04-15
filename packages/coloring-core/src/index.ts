@@ -58,6 +58,8 @@ export {
   detectedRegionInputSchema,
   regionColorAssignmentSchema,
   regionFirstColorResponseSchema,
+  regionLabelAssignmentSchema,
+  regionLabellingResponseSchema,
   fillPointSchema,
   fillPointsDataSchema,
   gridCellColorSchema,
@@ -78,6 +80,8 @@ export type {
   DetectedRegionInput,
   RegionColorAssignment,
   RegionFirstColorResponse,
+  RegionLabelAssignment,
+  RegionLabellingResponse,
   FillPoint,
   FillPointsData,
   GridCellColor,
@@ -112,6 +116,17 @@ export {
   type ColorPaletteEntry,
   type ColorMapConfig,
 } from "./actions/generate-color-map";
+
+export {
+  generateRegionStoreLogic,
+  PALETTE_VARIANTS,
+  DEFAULT_PALETTE_VARIANT_MODIFIERS,
+  type PaletteVariant,
+  type RegionStoreRegion,
+  type RegionStoreJson,
+  type GenerateRegionStoreConfig,
+  type GenerateRegionStoreResult,
+} from "./actions/generate-regions";
 
 // Utilities
 export { default as formatNumber } from "./utils/formatNumber";

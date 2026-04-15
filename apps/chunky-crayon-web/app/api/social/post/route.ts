@@ -8,6 +8,8 @@ import {
   generateInstagramCaption,
   generateFacebookCaption,
   generatePinterestCaption,
+  generateLinkedInCaption,
+  generateTikTokCaption,
   type InstagramPostType,
   type FacebookPostType,
 } from '@/app/actions/social';
@@ -746,6 +748,112 @@ const postToPinterest = async (
   return data.id;
 };
 
+/**
+ * Post a single image + text to Chunky Crayon's LinkedIn company page.
+ *
+ * Uses the v2 /assets/registerUpload → upload → /ugcPosts flow, authored
+ * as the organisation (not a personal profile).
+ *
+ * Env required:
+ *   LINKEDIN_ACCESS_TOKEN     — page/org-scoped OAuth token (needs
+ *                                w_organization_social scope)
+ *   LINKEDIN_ORGANIZATION_ID  — numeric org ID (e.g. 12345678)
+ */
+const postToLinkedInPage = async (imageUrl: string, message: string) => {
+  if (
+    !process.env.LINKEDIN_ACCESS_TOKEN ||
+    !process.env.LINKEDIN_ORGANIZATION_ID
+  ) {
+    throw new Error('LinkedIn credentials not configured');
+  }
+
+  const owner = `urn:li:organization:${process.env.LINKEDIN_ORGANIZATION_ID}`;
+
+  // 1. Register an upload slot for the image.
+  const registerRes = await fetch(
+    'https://api.linkedin.com/v2/assets?action=registerUpload',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        registerUploadRequest: {
+          recipes: ['urn:li:digitalmediaRecipe:feedshare-image'],
+          owner,
+          serviceRelationships: [
+            {
+              relationshipType: 'OWNER',
+              identifier: 'urn:li:userGeneratedContent',
+            },
+          ],
+        },
+      }),
+    },
+  );
+
+  const registerData = await registerRes.json();
+  const uploadMech =
+    registerData?.value?.uploadMechanism?.[
+      'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'
+    ];
+  if (!uploadMech || !registerData.value?.asset) {
+    throw new Error(
+      `Failed to register LinkedIn image upload: ${JSON.stringify(registerData)}`,
+    );
+  }
+
+  // 2. Upload the image bytes to the signed URL LinkedIn gave us.
+  const imageBuffer = await fetch(imageUrl).then((r) => r.arrayBuffer());
+  const uploadRes = await fetch(uploadMech.uploadUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
+    },
+    body: imageBuffer,
+  });
+  if (!uploadRes.ok) {
+    throw new Error(
+      `LinkedIn image upload failed: ${uploadRes.status} ${await uploadRes.text().catch(() => '')}`,
+    );
+  }
+
+  // 3. Publish the UGC post referencing the uploaded asset.
+  const postRes = await fetch('https://api.linkedin.com/v2/ugcPosts', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+      'X-Restli-Protocol-Version': '2.0.0',
+    },
+    body: JSON.stringify({
+      author: owner,
+      lifecycleState: 'PUBLISHED',
+      specificContent: {
+        'com.linkedin.ugc.ShareContent': {
+          shareCommentary: { text: message },
+          shareMediaCategory: 'IMAGE',
+          media: [
+            {
+              status: 'READY',
+              media: registerData.value.asset,
+            },
+          ],
+        },
+      },
+      visibility: {
+        'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC',
+      },
+    }),
+  });
+  const postData = await postRes.json();
+  if (!postData.id) {
+    throw new Error(`Failed to post to LinkedIn: ${JSON.stringify(postData)}`);
+  }
+  return postData.id as string;
+};
+
 const handleRequest = async (request: Request) => {
   await connection();
 
@@ -762,8 +870,8 @@ const handleRequest = async (request: Request) => {
 
     const url = new URL(request.url);
     let coloringImageId = url.searchParams.get('coloring_image_id');
-    const platformFilter = url.searchParams.get('platform'); // optional: 'instagram', 'facebook', 'pinterest'
-    const typeFilter = url.searchParams.get('type'); // optional: 'carousel', 'reel' (Instagram only)
+    const platformFilter = url.searchParams.get('platform'); // optional: 'instagram', 'facebook', 'pinterest', 'linkedin', 'tiktok'
+    const typeFilter = url.searchParams.get('type'); // optional: 'carousel', 'reel', 'demo-reel'
 
     // if POST request, also check request body
     if (!coloringImageId && request.method === 'POST') {
@@ -828,6 +936,257 @@ const handleRequest = async (request: Request) => {
       );
     }
 
+    // ---------------------------------------------------------------------
+    // DEMO-REEL MODE — product-demo video (prompt → AI draws → Magic Brush).
+    //
+    // Triggered separately from the static image posts so it can:
+    //   1. Kick the Hetzner worker to produce the mp4 if we don't have one
+    //      on the row already (coloringImage.demoReelUrl).
+    //   2. Post as video across IG Reel, FB Reel, TikTok, LinkedIn,
+    //      Pinterest video pin — all using the `demo_reel` caption variant
+    //      so copy reflects the workflow, not the artwork.
+    //
+    // Runs as its own cron slot (type=demo-reel). Short-circuits the rest
+    // of the handler so we don't double-post or fight with the static flow.
+    // ---------------------------------------------------------------------
+    if (typeFilter === 'demo-reel') {
+      const demoResults = {
+        instagramReel: null as string | null,
+        facebook: null as string | null,
+        tiktok: null as string | null,
+        linkedin: null as string | null,
+        pinterestVideo: null as string | null,
+        errors: [] as string[],
+      };
+
+      // Ensure we have a rendered mp4. Trigger the worker if missing.
+      if (!coloringImage.demoReelUrl) {
+        const workerUrl = process.env.CHUNKY_CRAYON_WORKER_URL;
+        const workerSecret = process.env.WORKER_SECRET;
+        if (!workerUrl) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'CHUNKY_CRAYON_WORKER_URL not configured',
+            },
+            { status: 500, headers: corsHeaders },
+          );
+        }
+        try {
+          console.log(
+            `[DemoReel] No demoReelUrl on image ${coloringImage.id} — triggering worker ${workerUrl}/publish/reel`,
+          );
+          // Worker does scene fetch + recording + render + R2 upload + DB
+          // write. Can take 5-7 minutes end to end.
+          const res = await fetch(`${workerUrl}/publish/reel`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(workerSecret
+                ? { Authorization: `Bearer ${workerSecret}` }
+                : {}),
+            },
+            body: JSON.stringify({}), // worker fetches its own scene
+            signal: AbortSignal.timeout(10 * 60 * 1000),
+          });
+          if (!res.ok) {
+            const txt = await res.text().catch(() => '');
+            throw new Error(`worker ${res.status}: ${txt.slice(0, 200)}`);
+          }
+          // Worker wrote demoReelUrl to a (potentially different) image row —
+          // the one it generated. Re-fetch today's image to pick it up.
+          const refreshed = await db.coloringImage.findFirst({
+            where: { id: coloringImage.id },
+          });
+          if (refreshed) coloringImage = refreshed;
+          if (!coloringImage.demoReelUrl) {
+            // Worker generated a brand-new image row — switch to it.
+            const todayStart = new Date();
+            todayStart.setUTCHours(0, 0, 0, 0);
+            const freshest = await db.coloringImage.findFirst({
+              where: {
+                brand: BRAND,
+                demoReelUrl: { not: null },
+                createdAt: { gte: todayStart },
+              },
+              orderBy: { createdAt: 'desc' },
+            });
+            if (freshest) coloringImage = freshest;
+          }
+        } catch (err) {
+          console.error('[DemoReel] Worker trigger failed:', err);
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'worker_failed',
+              details: err instanceof Error ? err.message : String(err),
+            },
+            { status: 502, headers: corsHeaders },
+          );
+        }
+      }
+
+      if (!coloringImage.demoReelUrl) {
+        return NextResponse.json(
+          { success: false, error: 'demoReelUrl still missing after worker' },
+          { status: 500, headers: corsHeaders },
+        );
+      }
+
+      const reelUrl = coloringImage.demoReelUrl;
+
+      // IG Reel
+      if (shouldPost('instagram')) {
+        try {
+          const caption = await generateInstagramCaption(
+            coloringImage,
+            'demo_reel',
+          );
+          const containerId = await createInstagramReelContainer(
+            reelUrl,
+            caption,
+          );
+          await waitForMediaReady(containerId);
+          demoResults.instagramReel = await publishInstagramMedia(containerId);
+        } catch (err) {
+          console.error('[DemoReel] IG Reel failed:', err);
+          demoResults.errors.push(
+            `Instagram Reel: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          );
+        }
+      }
+
+      // FB Reel (posted via the same video endpoint)
+      if (shouldPost('facebook')) {
+        try {
+          const caption = await generateFacebookCaption(
+            coloringImage,
+            'demo_reel',
+          );
+          demoResults.facebook = await postVideoToFacebookPage(
+            reelUrl,
+            caption,
+            coloringImage.title ?? 'Chunky Crayon demo',
+          );
+        } catch (err) {
+          console.error('[DemoReel] FB video failed:', err);
+          demoResults.errors.push(
+            `Facebook: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          );
+        }
+      }
+
+      // TikTok
+      if (shouldPost('tiktok')) {
+        try {
+          const caption = await generateTikTokCaption(
+            coloringImage,
+            'demo_reel',
+          );
+          // Hand off to the tiktok/post route via an internal call so we
+          // reuse the upload + inbox-publish flow (TikTok sandbox).
+          const tiktokRes = await fetch(
+            new URL('/api/social/tiktok/post', request.url).toString(),
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                authorization: request.headers.get('authorization') ?? '',
+              },
+              body: JSON.stringify({
+                videoUrl: reelUrl,
+                caption,
+                coloringImageId: coloringImage.id,
+              }),
+            },
+          );
+          const tiktokJson = (await tiktokRes.json().catch(() => ({}))) as {
+            publishId?: string;
+            id?: string;
+          };
+          demoResults.tiktok =
+            tiktokJson.publishId ?? tiktokJson.id ?? 'posted';
+        } catch (err) {
+          console.error('[DemoReel] TikTok failed:', err);
+          demoResults.errors.push(
+            `TikTok: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          );
+        }
+      }
+
+      // LinkedIn — reuses the same page helper; pass the mp4 URL directly.
+      // NOTE: postToLinkedInPage currently uploads as IMAGE. True LinkedIn
+      // video posts need a different registerUpload recipe
+      // (urn:li:digitalmediaRecipe:feedshare-video). TODO before first
+      // production run.
+      if (
+        shouldPost('linkedin') &&
+        process.env.LINKEDIN_ACCESS_TOKEN &&
+        process.env.LINKEDIN_ORGANIZATION_ID
+      ) {
+        try {
+          const caption = await generateLinkedInCaption(
+            coloringImage,
+            'demo_reel',
+          );
+          demoResults.linkedin = await postToLinkedInPage(reelUrl, caption);
+        } catch (err) {
+          console.error('[DemoReel] LinkedIn failed:', err);
+          demoResults.errors.push(
+            `LinkedIn: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          );
+        }
+      }
+
+      // Pinterest video pin — reuse existing video-pin helper.
+      if (
+        shouldPost('pinterest') &&
+        process.env.PINTEREST_BOARD_ID_VIDEOS &&
+        coloringImage.svgUrl
+      ) {
+        try {
+          const coverUrl = await createPinterestVideoCoverImage(
+            coloringImage.svgUrl,
+          );
+          tempFiles.push(coverUrl.split('/').pop() || '');
+          const caption = await generatePinterestCaption(coloringImage);
+          demoResults.pinterestVideo = await postVideoToPinterest(
+            reelUrl,
+            coverUrl,
+            coloringImage.title ?? 'Free Coloring Page',
+            caption,
+            coloringImage.id,
+            process.env.PINTEREST_BOARD_ID_VIDEOS,
+          );
+        } catch (err) {
+          console.error('[DemoReel] Pinterest video failed:', err);
+          demoResults.errors.push(
+            `Pinterest: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          );
+        }
+      }
+
+      const hasSuccess =
+        demoResults.instagramReel ||
+        demoResults.facebook ||
+        demoResults.tiktok ||
+        demoResults.linkedin ||
+        demoResults.pinterestVideo;
+
+      return NextResponse.json(
+        {
+          success: hasSuccess,
+          type: 'demo-reel',
+          demoReelUrl: reelUrl,
+          results: demoResults,
+        },
+        {
+          status: hasSuccess ? 200 : 500,
+          headers: corsHeaders,
+        },
+      );
+    }
+
     const results = {
       instagram: null as string | null,
       instagramReel: null as string | null, // Separate Reel for discovery
@@ -835,6 +1194,7 @@ const handleRequest = async (request: Request) => {
       facebookImage: null as string | null, // Image post when video is also posted
       pinterest: null as string | null,
       pinterestVideo: null as string | null, // Video pin for engagement
+      linkedin: null as string | null,
       errors: [] as string[],
     };
 
@@ -1167,6 +1527,44 @@ const handleRequest = async (request: Request) => {
       }
     }
 
+    // post to LinkedIn (company page, single image + professional caption)
+    if (
+      shouldPost('linkedin') &&
+      process.env.LINKEDIN_ACCESS_TOKEN &&
+      process.env.LINKEDIN_ORGANIZATION_ID
+    ) {
+      try {
+        console.log('[LinkedIn] Posting image...');
+
+        const linkedInBuffer = await convertSvgToJpeg(
+          coloringImage.svgUrl,
+          'instagram', // 1080x1080 square is a good fit for LinkedIn feed
+        );
+        const linkedInImageUrl = await uploadToTempStorage(
+          linkedInBuffer,
+          'linkedin',
+        );
+        tempFiles.push(linkedInImageUrl.split('/').pop() || '');
+
+        const linkedInCaption = await generateLinkedInCaption(coloringImage);
+        if (!linkedInCaption) {
+          throw new Error('failed to generate LinkedIn caption');
+        }
+
+        const linkedInPostId = await postToLinkedInPage(
+          linkedInImageUrl,
+          linkedInCaption,
+        );
+        results.linkedin = linkedInPostId;
+        console.log('Successfully posted image to LinkedIn:', linkedInPostId);
+      } catch (error) {
+        console.error('Error posting image to LinkedIn:', error);
+        results.errors.push(
+          `LinkedIn: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
+    }
+
     // return results
     const hasSuccess =
       results.instagram ||
@@ -1174,7 +1572,8 @@ const handleRequest = async (request: Request) => {
       results.facebook ||
       results.facebookImage ||
       results.pinterest ||
-      results.pinterestVideo;
+      results.pinterestVideo ||
+      results.linkedin;
 
     return NextResponse.json(
       {

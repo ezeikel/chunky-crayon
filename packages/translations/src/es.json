@@ -404,7 +404,9 @@
   "startOverButton": {
     "idle": "Empezar de nuevo",
     "confirm": "Sí, empezar de nuevo",
-    "cancel": "Seguir coloreando"
+    "cancel": "Seguir coloreando",
+    "modalTitle": "¿Empezar de nuevo?",
+    "modalBody": "Esto borrará todo tu dibujo. ¿Seguro?"
   },
   "downloadPDFButton": {
     "idle": "Imprimir",

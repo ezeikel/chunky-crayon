@@ -33,6 +33,8 @@ import {
 import {
   faPencil,
   faPaintbrush,
+  faPenNib,
+  faPaintRoller,
   faEraser,
   faSparkles,
   faWandSparkles,
@@ -50,6 +52,8 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 const BRUSH_ICONS: Record<BrushType, IconDefinition> = {
   crayon: faPencil,
   marker: faPaintbrush,
+  pencil: faPenNib,
+  paintbrush: faPaintRoller,
   eraser: faEraser,
   glitter: faSparkles,
   sparkle: faWandSparkles,
@@ -162,6 +166,26 @@ type ImageCanvasProps = {
   onRegionRevealed?: (regionId: number) => void;
   /** Whether magic brush reveal mode is ready */
   isMagicRevealReady?: boolean;
+  /**
+   * Pre-computed region store for reveal-mask magic brush (new path).
+   * When provided, the magic-reveal tool uses this instead of the legacy
+   * getRevealColor/getRevealColorFromCSS callbacks. Provides O(1) region
+   * lookup and per-region palette colours with region-boundary clipping.
+   */
+  regionStore?: {
+    /** O(1) pixel→regionId lookup at region-map coordinates */
+    getRegionIdAt: (x: number, y: number) => number;
+    /** Get hex colour for a region in the active palette variant */
+    getColorForRegion: (
+      regionId: number,
+      variant: import("./types").PaletteVariant,
+    ) => string | null;
+    /** Whether the region store data is loaded and ready */
+    isReady: boolean;
+    /** Region map dimensions (typically 1024×1024) */
+    width: number;
+    height: number;
+  };
 };
 
 export type ImageCanvasHandle = {
@@ -204,6 +228,8 @@ export type ImageCanvasHandle = {
    * @returns WebP data URL of the thumbnail or null if canvas not available
    */
   generatePreviewThumbnail: () => string | null;
+  /** Get the pre-coloured canvas (for Auto Color to draw in one shot) */
+  getPreColoredCanvas: () => HTMLCanvasElement | null;
 };
 
 const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
@@ -218,6 +244,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       getRevealRegionId,
       onRegionRevealed,
       isMagicRevealReady,
+      regionStore,
     },
     ref,
   ) => {
@@ -226,6 +253,14 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const offScreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const hasInteractedRef = useRef(false);
+
+    // ── Pre-coloured canvas for magic-reveal brush ──
+    // Holds the region-coloured image at the drawing canvas's DPR-scaled
+    // resolution. Used as a source for 'source-in' compositing during
+    // magic-reveal brush strokes.
+    const preColoredCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    // Temp canvas for per-dab compositing scratch space
+    const tempDabCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const {
       selectedColor,
@@ -243,6 +278,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       setZoom,
       setPanOffset,
       customBrushRadius,
+      paletteVariant,
       variant,
     } = useColoringContext();
     const {
@@ -917,6 +953,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         replayAction,
         forceRepaint,
         generatePreviewThumbnail,
+        getPreColoredCanvas: () => preColoredCanvasRef.current,
       }),
       [
         restoreCanvasState,
@@ -1023,6 +1060,97 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
       return undefined;
     }, [coloringImage.svgUrl]);
+
+    // Build the pre-coloured canvas when the region store is ready or the
+    // palette variant changes. The pre-coloured canvas is at the drawing
+    // canvas's DPR-scaled resolution (not the region map's 1024×1024) so
+    // that 'source-in' compositing during brush dabs works without scaling.
+    useEffect(() => {
+      if (!regionStore?.isReady) return;
+      const drawingCanvas = drawingCanvasRef.current;
+      if (!drawingCanvas) return;
+
+      const canvasW = drawingCanvas.width;
+      const canvasH = drawingCanvas.height;
+      const regionW = regionStore.width;
+      const regionH = regionStore.height;
+
+      // Create or reuse the pre-coloured canvas
+      if (!preColoredCanvasRef.current) {
+        preColoredCanvasRef.current = document.createElement("canvas");
+      }
+      const pcCanvas = preColoredCanvasRef.current;
+      pcCanvas.width = canvasW;
+      pcCanvas.height = canvasH;
+      const pcCtx = pcCanvas.getContext("2d");
+      if (!pcCtx) return;
+
+      // Build a colour lookup for the active palette variant
+      const colorCache = new Map<
+        number,
+        { r: number; g: number; b: number } | null
+      >();
+      const getRgb = (rid: number) => {
+        if (colorCache.has(rid)) return colorCache.get(rid)!;
+        const hex = regionStore.getColorForRegion(rid, paletteVariant);
+        if (!hex) {
+          colorCache.set(rid, null);
+          return null;
+        }
+        const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        const rgb = m
+          ? {
+              r: parseInt(m[1], 16),
+              g: parseInt(m[2], 16),
+              b: parseInt(m[3], 16),
+            }
+          : null;
+        colorCache.set(rid, rgb);
+        return rgb;
+      };
+
+      // Paint every pixel with its region's colour. This runs on the main
+      // thread for now (~50-100ms for a 1024×1024 canvas at DPR 2 = 2048×2048).
+      // Can be moved to the BUILD_PRECOLORED worker for zero-jank if needed.
+      const imageData = pcCtx.createImageData(canvasW, canvasH);
+      const data = imageData.data;
+
+      for (let cy = 0; cy < canvasH; cy++) {
+        // Map canvas Y → region map Y
+        const ry = Math.floor((cy / canvasH) * regionH);
+        for (let cx = 0; cx < canvasW; cx++) {
+          const rx = Math.floor((cx / canvasW) * regionW);
+          const rid = regionStore.getRegionIdAt(rx, ry);
+          if (rid === 0) continue; // boundary — leave transparent
+          const rgb = getRgb(rid);
+          if (!rgb) continue;
+          const i = (cy * canvasW + cx) * 4;
+          data[i] = rgb.r;
+          data[i + 1] = rgb.g;
+          data[i + 2] = rgb.b;
+          data[i + 3] = 255;
+        }
+      }
+
+      pcCtx.putImageData(imageData, 0, 0);
+
+      // Also create the temp dab canvas at the same size
+      if (!tempDabCanvasRef.current) {
+        tempDabCanvasRef.current = document.createElement("canvas");
+      }
+      tempDabCanvasRef.current.width = canvasW;
+      tempDabCanvasRef.current.height = canvasH;
+
+      console.log(
+        `[ImageCanvas] Pre-coloured canvas built: ${canvasW}×${canvasH} for palette "${paletteVariant}"`,
+      );
+    }, [
+      regionStore?.isReady,
+      regionStore?.width,
+      regionStore?.height,
+      paletteVariant,
+      dpr,
+    ]);
 
     // Handle resize
     useEffect(() => {
@@ -1317,12 +1445,98 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         // For magic-reveal, dynamically look up the color at this position
         let strokeColor = selectedColor;
         let strokeBrushType = brushType;
+        // Hoisted so it's accessible in the post-dab region clipping block
+        let revealRegionId: number | undefined;
 
         if (activeTool === "magic-reveal") {
           let revealColor: string | null = null;
 
+          if (
+            regionStore?.isReady &&
+            preColoredCanvasRef.current &&
+            tempDabCanvasRef.current
+          ) {
+            // ── New path: source-in compositing with pre-coloured canvas ──
+            // The brush stamps onto a temp canvas, then 'source-in'
+            // composites with the pre-coloured canvas (which has every
+            // pixel set to its region's palette colour). This replaces
+            // the dab's colour with the correct per-pixel region colour
+            // while keeping the dab's alpha/texture shape. Finally the
+            // recoloured dab is composited onto the main drawing canvas.
+            //
+            // No putImageData, no getImageData, no pixel loops — just
+            // GPU-accelerated canvas compositing. Each dab independently
+            // gets the right colour at every pixel.
+            const tempCanvas = tempDabCanvasRef.current;
+            const tempCtx = tempCanvas.getContext("2d");
+            if (tempCtx) {
+              // 1. Clear temp canvas
+              tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+              // 2. Draw the textured brush dab onto temp canvas
+              // Save/restore the context transform to match the drawing canvas
+              tempCtx.save();
+              tempCtx.scale(dpr, dpr);
+              drawTexturedStroke({
+                ctx: tempCtx,
+                x,
+                y,
+                lastX,
+                lastY,
+                color: "#FFFFFF", // colour doesn't matter — source-in replaces it
+                radius,
+                brushType: "marker",
+                pressure,
+              });
+              tempCtx.restore();
+
+              // 3. source-in: keep temp's alpha, take preColoredCanvas's colour
+              tempCtx.globalCompositeOperation = "source-in";
+              tempCtx.drawImage(preColoredCanvasRef.current, 0, 0);
+              tempCtx.globalCompositeOperation = "source-over";
+
+              // 4. Composite the recoloured dab onto the main drawing canvas
+              drawingCtx.save();
+              drawingCtx.setTransform(1, 0, 0, 1, 0, 0); // reset DPR scale for drawImage
+              drawingCtx.drawImage(tempCanvas, 0, 0);
+              drawingCtx.restore();
+
+              // 5. Same for offscreen canvas
+              if (offScreenCanvasRef.current) {
+                const offCtx = offScreenCanvasRef.current.getContext("2d");
+                if (offCtx) {
+                  offCtx.drawImage(tempCanvas, 0, 0);
+                }
+              }
+
+              // Track region for callback
+              const cssWidth =
+                parseFloat(drawingCanvas.style.width) ||
+                drawingCanvas.clientWidth;
+              const cssHeight =
+                parseFloat(drawingCanvas.style.height) ||
+                drawingCanvas.clientHeight;
+              const regionX = Math.floor((x / cssWidth) * regionStore.width);
+              const regionY = Math.floor((y / cssHeight) * regionStore.height);
+              revealRegionId = regionStore.getRegionIdAt(regionX, regionY);
+              if (revealRegionId > 0 && onRegionRevealed) {
+                onRegionRevealed(revealRegionId);
+              }
+
+              // Track stroke point + update lastPos, then return early —
+              // the dab is fully handled, skip the normal drawTexturedStroke below
+              if (currentStrokeRef.current) {
+                currentStrokeRef.current.points.push({ x, y });
+                currentStrokeRef.current.color = "#REGION_STORE";
+              }
+              lastPosRef.current = { x, y };
+              return; // ← skip normal stroke + clipping below
+            }
+          }
+
+          // ── Fallback: legacy paths when region store isn't available ──
           if (getRevealColorFromCSS) {
-            // Reference image path — sample from AI-colored reference using CSS coords
+            // ── Legacy path: reference image ──
             const cssWidth =
               parseFloat(drawingCanvas.style.width) ||
               drawingCanvas.clientWidth;
@@ -1331,7 +1545,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               drawingCanvas.clientHeight;
             revealColor = getRevealColorFromCSS(x, y, cssWidth, cssHeight);
           } else if (getRevealColor && getRevealRegionId) {
-            // Legacy region-based path — DPR-scaled coordinates
+            // ── Legacy path: region-based ──
             const scaledX = Math.floor(x * dpr);
             const scaledY = Math.floor(y * dpr);
             const regionId = getRevealRegionId(scaledX, scaledY);

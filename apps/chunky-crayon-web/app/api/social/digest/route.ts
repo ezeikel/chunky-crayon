@@ -6,6 +6,7 @@ import {
   generateFacebookCaption,
   generatePinterestCaption,
   generateTikTokCaption,
+  generateLinkedInCaption,
 } from '@/app/actions/social';
 import { sendSocialDigest, sendAdminAlert } from '@/app/actions/email';
 import type { SocialDigestEntry } from '@/app/actions/email';
@@ -64,18 +65,33 @@ export const GET = async (request: Request) => {
     const [
       instagramCarouselCaption,
       instagramReelCaption,
+      instagramDemoReelCaption,
       facebookVideoCaption,
       facebookImageCaption,
+      facebookDemoReelCaption,
       pinterestCaption,
       tiktokCaption,
+      tiktokDemoReelCaption,
+      linkedinCaption,
+      linkedinDemoReelCaption,
     ] = await Promise.all([
       generateInstagramCaption(coloringImage, 'carousel'),
       generateInstagramCaption(coloringImage, 'reel'),
+      generateInstagramCaption(coloringImage, 'demo_reel'),
       generateFacebookCaption(coloringImage, 'video'),
       generateFacebookCaption(coloringImage, 'image_with_video'),
+      generateFacebookCaption(coloringImage, 'demo_reel'),
       generatePinterestCaption(coloringImage),
       generateTikTokCaption(coloringImage),
+      generateTikTokCaption(coloringImage, 'demo_reel'),
+      generateLinkedInCaption(coloringImage),
+      generateLinkedInCaption(coloringImage, 'demo_reel'),
     ]);
+
+    // Prefer the product-demo reel as the video asset — the Veo animation
+    // cron is dormant, so animationUrl will usually be null for new images.
+    const videoAssetUrl =
+      coloringImage.demoReelUrl ?? coloringImage.animationUrl ?? undefined;
 
     // Assemble digest entries
     const entries: SocialDigestEntry[] = [
@@ -90,20 +106,34 @@ export const GET = async (request: Request) => {
         caption: instagramReelCaption,
         autoPosted: true,
         assetType: 'video',
-        assetUrl: coloringImage.animationUrl ?? undefined,
+        assetUrl: videoAssetUrl,
+      },
+      {
+        platform: 'Instagram Demo Reel',
+        caption: instagramDemoReelCaption,
+        autoPosted: !!coloringImage.demoReelUrl,
+        assetType: 'video',
+        assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
       {
         platform: 'Facebook Video',
         caption: facebookVideoCaption,
         autoPosted: true,
         assetType: 'video',
-        assetUrl: coloringImage.animationUrl ?? undefined,
+        assetUrl: videoAssetUrl,
       },
       {
         platform: 'Facebook Image',
         caption: facebookImageCaption,
         autoPosted: true,
         assetType: 'image',
+      },
+      {
+        platform: 'Facebook Demo Reel',
+        caption: facebookDemoReelCaption,
+        autoPosted: !!coloringImage.demoReelUrl,
+        assetType: 'video',
+        assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
       {
         platform: 'Pinterest Image',
@@ -116,14 +146,37 @@ export const GET = async (request: Request) => {
         caption: pinterestCaption,
         autoPosted: true,
         assetType: 'video',
-        assetUrl: coloringImage.animationUrl ?? undefined,
+        assetUrl: videoAssetUrl,
       },
       {
         platform: 'TikTok',
         caption: tiktokCaption,
         autoPosted: false,
         assetType: 'video',
-        assetUrl: coloringImage.animationUrl ?? undefined,
+        assetUrl: videoAssetUrl,
+      },
+      {
+        platform: 'TikTok Demo Reel',
+        caption: tiktokDemoReelCaption,
+        autoPosted: !!coloringImage.demoReelUrl,
+        assetType: 'video',
+        assetUrl: coloringImage.demoReelUrl ?? undefined,
+      },
+      {
+        platform: 'LinkedIn',
+        caption: linkedinCaption,
+        autoPosted: !!(
+          process.env.LINKEDIN_ACCESS_TOKEN &&
+          process.env.LINKEDIN_ORGANIZATION_ID
+        ),
+        assetType: 'image',
+      },
+      {
+        platform: 'LinkedIn Demo Reel',
+        caption: linkedinDemoReelCaption,
+        autoPosted: !!coloringImage.demoReelUrl,
+        assetType: 'video',
+        assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
     ];
 
@@ -132,7 +185,7 @@ export const GET = async (request: Request) => {
       coloringImageTitle: coloringImage.title ?? 'Untitled',
       coloringImageUrl: `${baseUrl}/coloring/${coloringImage.id}`,
       svgUrl: coloringImage.svgUrl ?? undefined,
-      animationUrl: coloringImage.animationUrl ?? undefined,
+      animationUrl: videoAssetUrl,
       entries,
     });
 

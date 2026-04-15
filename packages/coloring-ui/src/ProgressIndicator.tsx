@@ -25,7 +25,11 @@ const ProgressIndicator = ({ className }: ProgressIndicatorProps) => {
     const offset = circumference - (coloringProgress / 100) * circumference;
 
     return (
-      <div className={cn("flex items-center gap-2", className)}>
+      <div
+        className={cn("flex items-center gap-2", className)}
+        data-testid="coloring-progress"
+        data-progress={coloringProgress}
+      >
         <div className="relative size-10">
           <svg className="size-10 -rotate-90" viewBox="0 0 40 40">
             {/* Background ring */}
@@ -65,7 +69,11 @@ const ProgressIndicator = ({ className }: ProgressIndicatorProps) => {
 
   // Adults: minimal progress line
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div
+      className={cn("flex items-center gap-2", className)}
+      data-testid="coloring-progress"
+      data-progress={coloringProgress}
+    >
       <div className="w-20 sm:w-28 h-1.5 bg-gray-200 rounded-full overflow-hidden">
         <div
           className={cn(
@@ -75,7 +83,7 @@ const ProgressIndicator = ({ className }: ProgressIndicatorProps) => {
           style={{ width: `${coloringProgress}%` }}
         />
       </div>
-      <span className="text-xs text-gray-500 tabular-nums">
+      <span className="text-xs text-coloring-muted tabular-nums">
         {coloringProgress}%
       </span>
     </div>

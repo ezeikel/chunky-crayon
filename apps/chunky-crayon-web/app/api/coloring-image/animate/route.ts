@@ -1,3 +1,26 @@
+/**
+ * ⚠️ DORMANT (April 2026) — Gemini Veo line-art → animated reel.
+ *
+ * This route uses Google Veo to animate a static coloring page into a
+ * ~5s video that previously ran as an Instagram/Facebook reel. In
+ * practice the model struggles with black-on-white line art: results
+ * are often uncanny (melting strokes, drifting eyes, warped faces)
+ * and engagement has been weak.
+ *
+ * The route is intentionally NOT referenced in vercel.json crons any
+ * more — the daily reel slot is now filled by the demo-reel pipeline
+ * (Playwright recording of the actual coloring product, rendered via
+ * Remotion on the Hetzner worker).
+ *
+ * Kept in the codebase so we can flip it back on if a future Veo /
+ * other video model gets good enough to produce watchable results
+ * from line art. To re-enable:
+ *   1. Restore the cron in vercel.json (was "schedule": "15 8 * * *")
+ *   2. Decide whether it should coexist with the demo-reel or replace
+ *      it — they'd currently both populate coloringImage fields
+ *      (animationUrl here vs mp4 URL on the worker) and the social
+ *      post logic would need a source-of-truth for which to publish.
+ */
 import { NextRequest, NextResponse, connection } from 'next/server';
 import { GenerationType, db } from '@one-colored-pixel/db';
 import sharp from 'sharp';

@@ -158,7 +158,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-1 p-2 rounded-lg bg-white/90 backdrop-blur-sm transition-colors duration-200",
+        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-paper-cream-dark transition-colors duration-200",
         isZoomed && "ring-2 ring-coloring-accent/30",
         className,
       )}
@@ -169,16 +169,15 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         onClick={handleZoomOut}
         disabled={isAtMinZoom}
         className={cn(
-          "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
-          "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
-          {
-            "opacity-50 cursor-not-allowed hover:bg-transparent": isAtMinZoom,
-          },
+          "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card border-2 border-paper-cream-dark bg-white text-coloring-muted transition-all duration-coloring-base ease-coloring",
+          "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent hover:border-coloring-accent",
+          isAtMinZoom &&
+            "opacity-50 cursor-not-allowed hover:border-paper-cream-dark",
         )}
         aria-label="Zoom out (see more)"
         title="Zoom out"
       >
-        <ZoomOutIcon className="size-4 sm:size-5 md:size-6" />
+        <ZoomOutIcon className="size-5 sm:size-6" />
       </button>
 
       {/* Visual Zoom Level Indicator */}
@@ -190,16 +189,15 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         onClick={handleZoomIn}
         disabled={isAtMaxZoom}
         className={cn(
-          "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
-          "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
-          {
-            "opacity-50 cursor-not-allowed hover:bg-transparent": isAtMaxZoom,
-          },
+          "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card border-2 border-paper-cream-dark bg-white text-coloring-muted transition-all duration-coloring-base ease-coloring",
+          "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent hover:border-coloring-accent",
+          isAtMaxZoom &&
+            "opacity-50 cursor-not-allowed hover:border-paper-cream-dark",
         )}
         aria-label="Zoom in (see closer)"
         title="Zoom in"
       >
-        <ZoomInIcon className="size-4 sm:size-5 md:size-6" />
+        <ZoomInIcon className="size-5 sm:size-6" />
       </button>
 
       {/* Pan/Move Tool - only show when zoomed */}
@@ -208,19 +206,17 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
           type="button"
           onClick={handlePanToggle}
           className={cn(
-            "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
-            "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
-            isPanActive &&
-              "bg-coloring-accent text-white hover:bg-coloring-accent/90",
+            "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card border-2 transition-all duration-coloring-base ease-coloring",
+            "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
+            isPanActive
+              ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
+              : "bg-white border-paper-cream-dark text-coloring-muted hover:border-coloring-accent",
           )}
           aria-label="Move around the picture"
           title="Move"
           aria-pressed={isPanActive}
         >
-          <FontAwesomeIcon
-            icon={faHand}
-            className="size-4 sm:size-5 md:size-6"
-          />
+          <FontAwesomeIcon icon={faHand} className="size-5 sm:size-6" />
         </button>
       )}
 
@@ -231,13 +227,13 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
           onClick={handleResetView}
           disabled={isAtDefaultView}
           className={cn(
-            "flex items-center justify-center size-8 sm:size-10 md:size-12 rounded-lg transition-all duration-150",
-            "bg-coloring-accent/10 hover:bg-coloring-accent/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
+            "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card border-2 border-coloring-accent/40 bg-coloring-accent/10 text-coloring-accent transition-all duration-coloring-base ease-coloring",
+            "hover:bg-coloring-accent/20 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
           )}
           aria-label="Go back to full picture"
           title="See whole picture"
         >
-          <HomeIcon className="size-4 sm:size-5 md:size-6 text-coloring-accent" />
+          <HomeIcon className="size-5 sm:size-6" />
         </button>
       )}
     </div>

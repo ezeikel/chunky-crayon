@@ -218,9 +218,64 @@ function scanlineFillWorker(
   return { filled: pixelsFilled > 0, pixelsFilled };
 }
 
+// =============================================================================
+// BUILD_PRECOLORED — build a pre-coloured ImageData from the region map
+// =============================================================================
+
+type BuildPrecoloredMessage = {
+  type: "build-precolored";
+  /** Raw Uint16Array bytes (pixel→regionId, little-endian) */
+  pixelToRegionBuffer: ArrayBuffer;
+  /** JSON-encoded Map entries: [[regionId, {r,g,b}], ...] */
+  regionColorsJson: string;
+  width: number;
+  height: number;
+};
+
+type BuildPrecoloredResult = {
+  type: "build-precolored-result";
+  imageData: ImageData;
+};
+
+function buildPrecoloredCanvas(
+  msg: BuildPrecoloredMessage,
+): BuildPrecoloredResult {
+  const { pixelToRegionBuffer, regionColorsJson, width, height } = msg;
+  const pixelToRegion = new Uint16Array(pixelToRegionBuffer);
+  const regionColors: Array<[number, { r: number; g: number; b: number }]> =
+    JSON.parse(regionColorsJson);
+  const colorLookup = new Map(regionColors);
+
+  const imageData = new ImageData(width, height);
+  const data = imageData.data;
+
+  for (let i = 0; i < pixelToRegion.length; i++) {
+    const regionId = pixelToRegion[i];
+    const rgb = colorLookup.get(regionId);
+    const p = i * 4;
+    if (rgb) {
+      data[p] = rgb.r;
+      data[p + 1] = rgb.g;
+      data[p + 2] = rgb.b;
+      data[p + 3] = 255;
+    }
+    // regionId 0 (boundary) or unassigned → stays transparent (0,0,0,0)
+  }
+
+  return { type: "build-precolored-result", imageData };
+}
+
 // Worker message handler
-self.onmessage = (e: MessageEvent<FillMessage>) => {
+self.onmessage = (e: MessageEvent<FillMessage | BuildPrecoloredMessage>) => {
   const msg = e.data;
+
+  if (msg.type === "build-precolored") {
+    const result = buildPrecoloredCanvas(msg);
+    (self as unknown as Worker).postMessage(result, [
+      result.imageData.data.buffer,
+    ]);
+    return;
+  }
 
   if (msg.type === "fill") {
     const {

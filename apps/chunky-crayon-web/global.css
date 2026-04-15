@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-@source "../../../packages/coloring-ui/src";
+@source "../../packages/coloring-ui";
+@source "../../../packages/coloring-ui";
 
 @theme {
   /* Fonts */
@@ -40,6 +41,33 @@
   --color-coloring-surface: hsl(var(--paper-cream));
   --color-coloring-surface-dark: hsl(var(--paper-cream-dark));
   --color-coloring-muted: hsl(var(--text-muted));
+
+  /* Coloring UI brand tokens — Chunky Crayon (kids: chunky, bouncy) */
+  --radius-coloring-button: 1.5rem;
+  --radius-coloring-card: 1.5rem;
+  --radius-coloring-pill: 9999px;
+  --radius-coloring-surface: 2rem;
+  --font-coloring-heading: var(--font-tondo), ui-rounded, system-ui, sans-serif;
+  --font-coloring-body: var(--font-rooney-sans), ui-rounded, system-ui, sans-serif;
+  --coloring-weight-heading: 800;
+  --coloring-weight-body: 500;
+  --coloring-weight-emphasis: 700;
+  --shadow-coloring-button: 0 6px 0 0 hsl(var(--crayon-orange-dark));
+  --shadow-coloring-button-hover: 0 4px 0 0 hsl(var(--crayon-orange-dark));
+  --shadow-coloring-surface: 0 4px 20px rgb(0 0 0 / 0.08);
+  --ease-coloring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-coloring-fast: 120ms;
+  --duration-coloring-base: 200ms;
+  --coloring-touch-target: 56px;
+  --coloring-border-width: 0px;
+
+  /* Button sizing — Duolingo chunky, ~72px tall */
+  --spacing-coloring-button-px: 2rem;
+  --spacing-coloring-button-py: 1.5rem;
+  --spacing-coloring-button-gap: 0.75rem;
+  --spacing-coloring-icon: 2rem;
+  --text-coloring-button: 1.125rem;
+  --tracking-coloring-button: 0.02em;
 
   /* Social */
   --color-social-facebook: hsl(var(--social-facebook));
@@ -342,6 +370,11 @@
 
   html {
     scroll-behavior: smooth;
+    /* Reserve scrollbar gutter on the right (LTR inline-end) so the layout
+     * width stays the same whether the page is scrolling or not. Prevents
+     * jank when navigating between pages with/without overflow.
+     */
+    scrollbar-gutter: stable;
   }
 
   ::selection {
@@ -630,4 +663,15 @@
 /* Sonner Toast */
 [data-sonner-toast] [data-description] {
   color: hsl(var(--text-secondary)) !important;
+}
+
+/* Magic colors loading bar — sweeps a coloured fill back and forth across
+   the track. Used in ColoringArea's "Mixing the magic colors" overlay. */
+@keyframes magic-progress {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(220%); }
+}
+
+.animate-magic-progress {
+  animation: magic-progress 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }

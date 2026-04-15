@@ -174,7 +174,7 @@ const MobileMenu = ({
   };
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         onClick={() => setIsOpen(true)}

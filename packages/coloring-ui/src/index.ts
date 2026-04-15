@@ -8,6 +8,7 @@
 // Types and constants
 export {
   COLORING_PALETTE,
+  COLORING_PALETTE_VARIANTS,
   ALL_COLORING_COLORS,
   ALL_COLORING_COLORS_EXTENDED,
   BRUSH_SIZES,
@@ -24,7 +25,11 @@ export type {
   StickerCategory,
   Sticker,
   ColorDefinition,
+  PaletteVariant,
+  RegionStoreJson,
+  RegionStoreRegion,
 } from "./types";
+export { PALETTE_VARIANTS } from "./types";
 
 // Context
 export {
@@ -52,6 +57,14 @@ export { haptics } from "./haptics";
 // Reference color (for Auto Color + Magic Brush)
 export { useReferenceColor } from "./useReferenceColor";
 
+// Region store (pre-computed region map for reveal-mask Magic Brush)
+export {
+  useRegionStore,
+  type UseRegionStoreReturn,
+  type UseRegionStoreOptions,
+  type RegionStoreState,
+} from "./useRegionStore";
+
 // Sound
 export { useSound } from "./useSound";
 export { getSoundManager } from "./audio";
@@ -66,7 +79,7 @@ export { default as MobileColoringDrawer } from "./MobileColoringDrawer";
 export { default as ColoringToolbar } from "./ColoringToolbar";
 export { default as ZoomControls } from "./ZoomControls";
 export { default as MuteToggle } from "./MuteToggle";
-export { default as AutoColorButton } from "./AutoColorButton";
+export { default as ActionButton, type ActionButtonTone } from "./ActionButton";
 export { default as BrushSizeSelector } from "./BrushSizeSelector";
 export { default as ToolSelector } from "./ToolSelector";
 export { default as PatternSelector } from "./PatternSelector";
@@ -78,6 +91,9 @@ export { default as CompletionCelebration } from "./CompletionCelebration";
 
 // Async fill (Web Worker)
 export { asyncFloodFill, terminateFillWorker } from "./asyncFill";
+
+// Async progress measurement (Web Worker)
+export { measureProgress, terminateProgressWorker } from "./asyncProgress";
 
 // Storage utilities
 export {

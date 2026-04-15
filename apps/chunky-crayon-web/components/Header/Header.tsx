@@ -265,7 +265,7 @@ const Header = async () => {
       return (
         <div className="flex items-center gap-3 md:gap-6">
           {/* Desktop nav - text links and profile/dropdown */}
-          <nav className="hidden md:flex gap-6 items-center">
+          <nav className="hidden lg:flex gap-6 items-center">
             {visibleItems.map((item) => (
               <div key={item.href || item.label} className={item.liClass}>
                 {renderNavLink(item, user)}
@@ -305,7 +305,7 @@ const Header = async () => {
 
     return (
       <div className="flex items-center gap-6">
-        <nav className="hidden md:flex gap-8 items-center">
+        <nav className="hidden lg:flex gap-8 items-center">
           {visibleItems.map((item) => (
             <div key={item.href || item.label} className={item.liClass}>
               {renderNavLink(item, null)}
@@ -315,7 +315,7 @@ const Header = async () => {
         </nav>
         <Link
           href="/signin"
-          className="hidden md:flex items-center font-tondo font-bold text-white px-6 py-2.5 rounded-full bg-crayon-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200"
+          className="hidden lg:flex items-center font-tondo font-bold text-white px-6 py-2.5 rounded-full bg-crayon-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200"
         >
           {t('signIn')}
         </Link>

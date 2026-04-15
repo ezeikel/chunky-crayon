@@ -3,7 +3,11 @@ import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
 import { perplexity } from "@ai-sdk/perplexity";
 import { createReplicate } from "@ai-sdk/replicate";
-import { withTracing } from "@posthog/ai";
+// NOTE: @posthog/ai is lazy-imported inside withAITracing because its
+// top-level `class WrappedMessages extends AnthropicOriginal.Messages`
+// crashes under plain tsx due to ESM/CJS interop with the Anthropic SDK.
+// Next.js bundles handle the interop correctly, but standalone Node scripts
+// (like our backfill) need to load this module without triggering posthog.
 import type { LanguageModel as LanguageModelV3, ImageModel } from "ai";
 
 /**
@@ -107,6 +111,13 @@ export function withAITracing(
   if (!posthogClient) {
     return model;
   }
+
+  // Lazy-load @posthog/ai so this file can be imported under plain tsx
+  // without crashing at module load time. Only callers that actually pass
+  // a posthogClient pay the import cost (and trigger the Anthropic SDK
+  // interop code that tsx can't handle — Next.js bundles are fine).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { withTracing } = require("@posthog/ai");
 
   const tracingOptions: Record<string, unknown> = {
     posthogDistinctId: options.userId || "anonymous",

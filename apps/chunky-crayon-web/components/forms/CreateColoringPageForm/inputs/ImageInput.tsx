@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,36 +16,18 @@ import useUser from '@/hooks/useUser';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
-import SubmitButton from '@/components/buttons/SubmitButton/SubmitButton';
 import cn from '@/utils/cn';
 import { useInputMode } from './InputModeContext';
 import { useImageInput } from '../hooks/useImageInput';
-
-// =============================================================================
-// Types
-// =============================================================================
 
 type ImageInputProps = {
   className?: string;
 };
 
-// =============================================================================
-// Main Component
-// =============================================================================
-
 const ImageInput = ({ className }: ImageInputProps) => {
   const t = useTranslations('createForm');
-  const {
-    canGenerate,
-    blockedReason,
-    hasActiveSubscription,
-    handleAuthAction,
-    isGuest,
-    guestGenerationsRemaining,
-    maxGuestGenerations,
-  } = useUser();
-
-  const { description, setDescription, setIsProcessing } = useInputMode();
+  const { canGenerate } = useUser();
+  const { setDescription, setIsProcessing, setIsBusy } = useInputMode();
 
   const {
     state,
@@ -66,31 +48,32 @@ const ImageInput = ({ className }: ImageInputProps) => {
     handleFileChange,
   } = useImageInput();
 
-  // Drag and drop state
   const [isDragging, setIsDragging] = useState(false);
 
-  // Ref for auto-focusing submit button when processing completes
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Sync AI description to form description
   useEffect(() => {
-    if (aiDescription) {
-      setDescription(aiDescription);
-    }
+    if (aiDescription) setDescription(aiDescription);
   }, [aiDescription, setDescription]);
 
-  // Sync processing state
   useEffect(() => {
     setIsProcessing(state === 'processing');
   }, [state, setIsProcessing]);
 
-  // Track image input events
+  // Hide the global FormCTA while the image UX owns the flow (capturing,
+  // processing, confirming preview, or showing an error).
+  useEffect(() => {
+    const busy =
+      state === 'capturing' ||
+      state === 'processing' ||
+      state === 'preview' ||
+      state === 'error';
+    setIsBusy(busy);
+    return () => setIsBusy(false);
+  }, [state, setIsBusy]);
+
   useEffect(() => {
     if (state === 'preview' && source) {
       if (source === 'camera') {
-        trackEvent(TRACKING_EVENTS.IMAGE_INPUT_CAPTURED, {
-          source: 'camera',
-        });
+        trackEvent(TRACKING_EVENTS.IMAGE_INPUT_CAPTURED, { source: 'camera' });
       } else {
         trackEvent(TRACKING_EVENTS.IMAGE_INPUT_UPLOADED, {
           fileType: 'image',
@@ -110,23 +93,9 @@ const ImageInput = ({ className }: ImageInputProps) => {
     }
   }, [state, aiDescription, subjects, isChildDrawing, source]);
 
-  // Auto-focus submit button when processing completes
-  useEffect(() => {
-    if (state === 'complete' && aiDescription && submitButtonRef.current) {
-      // Small delay to ensure the button is rendered and description is synced
-      const timer = setTimeout(() => {
-        submitButtonRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [state, aiDescription]);
-
-  // Handle drag and drop
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    if (canInteract) {
-      setIsDragging(true);
-    }
+    if (canGenerate) setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
@@ -137,12 +106,9 @@ const ImageInput = ({ className }: ImageInputProps) => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-
-    if (!canInteract) return;
-
+    if (!canGenerate) return;
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-      // Create a synthetic event for the handler
       const syntheticEvent = {
         target: { files: [file], value: '' },
       } as unknown as React.ChangeEvent<HTMLInputElement>;
@@ -154,70 +120,6 @@ const ImageInput = ({ className }: ImageInputProps) => {
     reset();
   };
 
-  // Auth/credit checks - use canGenerate which handles both signed-in and guest users
-  const canInteract = canGenerate;
-
-  const getButtonConfig = () => {
-    // Can generate - show submit button
-    if (canGenerate) {
-      // Show remaining generations for guests
-      if (isGuest) {
-        return {
-          text: t('buttonCreateGuest', {
-            remaining: guestGenerationsRemaining,
-          }),
-          isSubmit: true,
-        };
-      }
-      return {
-        text: t('buttonCreate'),
-        isSubmit: true,
-      };
-    }
-
-    // Blocked - show appropriate CTA
-    if (blockedReason === 'guest_limit_reached') {
-      return {
-        text: t('buttonSignUp'),
-        action: () => {
-          trackEvent(TRACKING_EVENTS.GUEST_SIGNUP_CLICKED, {
-            location: 'image_input',
-            generationsUsed: maxGuestGenerations - guestGenerationsRemaining,
-          });
-          handleAuthAction('signin');
-        },
-        subtext: t('subtextGuestLimit'),
-        isSubmit: false,
-      };
-    }
-
-    if (blockedReason === 'no_credits') {
-      // Both cases go to billing - with or without subscription
-      // "View Plans" and "Buy Credits" both route to /account/billing
-      return {
-        text: hasActiveSubscription
-          ? t('buttonBuyCredits')
-          : t('buttonViewPlans'),
-        action: () => handleAuthAction('billing'),
-        subtext: hasActiveSubscription
-          ? t('subtextNoCreditsSubscribed')
-          : t('subtextNoCreditsNoSubscription'),
-        isSubmit: false,
-      };
-    }
-
-    // Fallback
-    return {
-      text: t('buttonGetStarted'),
-      action: () => handleAuthAction('signin'),
-      subtext: t('subtextFallback'),
-      isSubmit: false,
-    };
-  };
-
-  const buttonConfig = getButtonConfig();
-
-  // Error state
   if (state === 'error') {
     const errorMessageKeys: Record<string, string> = {
       file_too_large: 'imageInput.errors.fileTooLarge',
@@ -225,23 +127,22 @@ const ImageInput = ({ className }: ImageInputProps) => {
       processing_failed: 'imageInput.errors.processingFailed',
       camera_failed: 'imageInput.errors.cameraFailed',
     };
-
     const errorKey = errorMessageKeys[error || 'processing_failed'];
 
     return (
       <div
-        className={cn('flex flex-col items-center gap-4 py-8', className)}
+        className={cn('flex flex-col items-center gap-4 py-6', className)}
         role="tabpanel"
         id="image-input-panel"
         aria-labelledby="image-mode-tab"
       >
-        <div className="text-6xl mb-2">😅</div>
+        <div className="text-5xl">😅</div>
         <p className="text-center text-text-primary font-tondo font-bold">
           {t(errorKey)}
         </p>
         <Button
           onClick={handleRetry}
-          className="font-tondo font-bold text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-xl"
+          className="font-tondo font-bold text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-coloring-card"
         >
           <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
           {t('imageInput.tryAgain')}
@@ -250,11 +151,10 @@ const ImageInput = ({ className }: ImageInputProps) => {
     );
   }
 
-  // Processing state
   if (state === 'processing' || state === 'capturing') {
     return (
       <div
-        className={cn('flex flex-col items-center gap-4 py-8', className)}
+        className={cn('flex flex-col items-center gap-4 py-6', className)}
         role="tabpanel"
         id="image-input-panel"
         aria-labelledby="image-mode-tab"
@@ -279,20 +179,19 @@ const ImageInput = ({ className }: ImageInputProps) => {
     );
   }
 
-  // Preview state - show image and confirm button
   if (state === 'preview' && previewUrl) {
     return (
       <div
-        className={cn('flex flex-col items-center gap-4', className)}
+        className={cn('flex flex-col items-center gap-4 py-2', className)}
         role="tabpanel"
         id="image-input-panel"
         aria-labelledby="image-mode-tab"
       >
-        <p className="text-center text-text-primary font-tondo font-bold">
+        <p className="text-center text-text-primary font-tondo font-bold text-lg">
           {t('imageInput.greatPicture')}
         </p>
 
-        <div className="relative w-48 h-48 rounded-2xl overflow-hidden shadow-lg border-4 border-crayon-orange">
+        <div className="relative w-48 h-48 rounded-coloring-card overflow-hidden shadow-lg border-4 border-crayon-orange">
           <Image
             src={previewUrl}
             alt={t('imageInput.altImagePreview')}
@@ -305,14 +204,14 @@ const ImageInput = ({ className }: ImageInputProps) => {
           <Button
             onClick={clearImage}
             variant="outline"
-            className="font-tondo font-bold border-2 border-paper-cream-dark text-text-primary hover:bg-paper-cream rounded-xl"
+            className="font-tondo font-bold border-2 border-paper-cream-dark text-text-primary hover:bg-paper-cream rounded-coloring-card"
           >
             <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
             {t('imageInput.pickAnother')}
           </Button>
           <Button
             onClick={processImage}
-            className="font-tondo font-bold text-white bg-btn-teal shadow-btn-secondary hover:shadow-btn-secondary-hover hover:scale-105 active:scale-95 transition-all duration-200 px-8 rounded-xl"
+            className="font-tondo font-bold text-white bg-btn-teal shadow-btn-secondary hover:shadow-btn-secondary-hover hover:scale-105 active:scale-95 transition-all duration-200 px-8 rounded-coloring-card"
           >
             <FontAwesomeIcon icon={faCheck} className="mr-2" />
             {t('imageInput.useThis')}
@@ -322,24 +221,18 @@ const ImageInput = ({ className }: ImageInputProps) => {
     );
   }
 
-  // Complete state - show polaroid-style image with caption and exciting CTA
   if (state === 'complete' && aiDescription) {
-    // Check if description is ready (synced from aiDescription via useEffect)
-    const isDescriptionReady = description.trim().length > 0;
-
     return (
       <div
-        className={cn('flex flex-col items-center gap-5 py-4', className)}
+        className={cn('flex flex-col items-center gap-4 py-2', className)}
         role="tabpanel"
         id="image-input-panel"
         aria-labelledby="image-mode-tab"
       >
-        {/* Polaroid-style frame with image and caption */}
         <div className="relative w-full max-w-xs">
-          <div className="bg-white border-2 border-crayon-teal rounded-2xl p-3 pb-4 shadow-lg">
-            {/* Image container */}
+          <div className="bg-white border-2 border-crayon-teal rounded-coloring-card p-3 pb-4 shadow-lg">
             {previewUrl && (
-              <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
+              <div className="relative w-full aspect-square rounded-coloring-card overflow-hidden mb-3">
                 <Image
                   src={previewUrl}
                   alt={t('imageInput.altUploadedImage')}
@@ -348,7 +241,6 @@ const ImageInput = ({ className }: ImageInputProps) => {
                 />
               </div>
             )}
-            {/* Caption showing AI description */}
             <p className="text-center text-text-primary font-tondo text-base leading-relaxed">
               {isChildDrawing ? '✏️ ' : '📸 '}
               <span className="font-bold">{t('imageInput.iSee')}</span>{' '}
@@ -356,61 +248,27 @@ const ImageInput = ({ className }: ImageInputProps) => {
             </p>
           </div>
         </div>
-
-        {/* Exciting CTA */}
-        <div className="flex flex-col items-center gap-3 mt-2">
-          {buttonConfig.isSubmit ? (
-            <SubmitButton
-              ref={submitButtonRef}
-              text={t('imageInput.makeMyColoringPage')}
-              className="font-tondo font-bold text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover px-8 py-6 rounded-xl hover:scale-105 active:scale-95 transition-all duration-200"
-              disabled={!isDescriptionReady}
-            />
-          ) : (
-            <Button
-              onClick={buttonConfig.action}
-              className="font-tondo font-bold text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover px-8 py-6 rounded-xl hover:scale-105 active:scale-95 transition-all duration-200 h-auto"
-              type="button"
-            >
-              {buttonConfig.text}
-            </Button>
-          )}
-
-          {buttonConfig.subtext && (
-            <p className="font-tondo text-sm text-center text-text-muted">
-              {buttonConfig.subtext}
-            </p>
-          )}
-
-          {/* Subtle retry option */}
-          <button
-            type="button"
-            onClick={handleRetry}
-            className="font-tondo text-sm text-text-muted hover:text-text-primary underline underline-offset-2 transition-colors"
-          >
-            {t('imageInput.notQuiteRight')}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleRetry}
+          className="font-tondo text-sm text-text-muted hover:text-text-primary underline underline-offset-2 transition-colors"
+        >
+          {t('imageInput.notQuiteRight')}
+        </button>
       </div>
     );
   }
 
-  // Idle state - show camera and upload options
+  // Idle
   return (
     <div
-      className={cn('flex flex-col items-center gap-6 py-4', className)}
+      className={cn('flex flex-col items-center gap-5 py-2', className)}
       role="tabpanel"
       id="image-input-panel"
       aria-labelledby="image-mode-tab"
     >
-      <p className="text-center text-text-primary font-tondo font-bold text-lg">
-        {canInteract
-          ? t('imageInput.takePhotoOrUpload')
-          : blockedReason === 'guest_limit_reached'
-            ? t('subtextGuestLimit')
-            : blockedReason === 'no_credits'
-              ? t('subtextNoCredits')
-              : t('imageInput.signInToUpload')}
+      <p className="text-center text-text-primary font-tondo font-bold text-xl md:text-2xl">
+        {t('imageInput.takePhotoOrUpload')}
       </p>
 
       {/* Hidden file inputs */}
@@ -421,7 +279,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
         capture="environment"
         className="hidden"
         onChange={(e) => handleFileChange(e, 'camera')}
-        disabled={!canInteract}
+        disabled={!canGenerate}
       />
       <input
         ref={fileInputRef}
@@ -429,30 +287,28 @@ const ImageInput = ({ className }: ImageInputProps) => {
         accept="image/*"
         className="hidden"
         onChange={(e) => handleFileChange(e, 'file_picker')}
-        disabled={!canInteract}
+        disabled={!canGenerate}
       />
 
-      {/* Action buttons */}
       <div className="flex gap-4">
         <button
           type="button"
           onClick={openCamera}
-          disabled={!canInteract}
+          disabled={!canGenerate}
           className={cn(
-            'flex flex-col items-center justify-center gap-2',
-            'w-28 h-28 rounded-2xl',
+            'flex flex-col items-center justify-center gap-2 w-28 h-28 rounded-coloring-card',
             'transition-all duration-200 ease-out',
             'focus:outline-none focus-visible:ring-4 focus-visible:ring-crayon-orange focus-visible:ring-offset-2',
-            canInteract
+            canGenerate
               ? 'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 cursor-pointer text-white'
               : 'bg-paper-cream-dark cursor-not-allowed text-text-muted',
           )}
           style={
             {
-              '--fa-primary-color': canInteract
+              '--fa-primary-color': canGenerate
                 ? 'white'
                 : 'hsl(var(--text-muted))',
-              '--fa-secondary-color': canInteract
+              '--fa-secondary-color': canGenerate
                 ? 'rgba(255, 255, 255, 0.8)'
                 : 'hsl(var(--text-muted))',
               '--fa-secondary-opacity': '1',
@@ -460,7 +316,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           }
           aria-label={t('imageInput.takePhoto')}
         >
-          <FontAwesomeIcon icon={faCameraRetro} className="text-3xl" />
+          <FontAwesomeIcon icon={faCameraRetro} size="2x" />
           <span className="text-sm font-tondo font-bold">
             {t('imageInput.camera')}
           </span>
@@ -469,22 +325,21 @@ const ImageInput = ({ className }: ImageInputProps) => {
         <button
           type="button"
           onClick={openFilePicker}
-          disabled={!canInteract}
+          disabled={!canGenerate}
           className={cn(
-            'flex flex-col items-center justify-center gap-2',
-            'w-28 h-28 rounded-2xl',
+            'flex flex-col items-center justify-center gap-2 w-28 h-28 rounded-coloring-card',
             'transition-all duration-200 ease-out',
             'focus:outline-none focus-visible:ring-4 focus-visible:ring-crayon-teal focus-visible:ring-offset-2',
-            canInteract
+            canGenerate
               ? 'bg-btn-teal shadow-btn-secondary hover:shadow-btn-secondary-hover hover:scale-105 active:scale-95 cursor-pointer text-white'
               : 'bg-paper-cream-dark cursor-not-allowed text-text-muted',
           )}
           style={
             {
-              '--fa-primary-color': canInteract
+              '--fa-primary-color': canGenerate
                 ? 'white'
                 : 'hsl(var(--text-muted))',
-              '--fa-secondary-color': canInteract
+              '--fa-secondary-color': canGenerate
                 ? 'rgba(255, 255, 255, 0.8)'
                 : 'hsl(var(--text-muted))',
               '--fa-secondary-opacity': '1',
@@ -492,7 +347,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           }
           aria-label={t('imageInput.uploadImage')}
         >
-          <FontAwesomeIcon icon={faImages} className="text-3xl" />
+          <FontAwesomeIcon icon={faImages} size="2x" />
           <span className="text-sm font-tondo font-bold">
             {t('imageInput.upload')}
           </span>
@@ -500,23 +355,22 @@ const ImageInput = ({ className }: ImageInputProps) => {
       </div>
 
       {/* Drop zone for desktop */}
-      {canInteract && (
+      {canGenerate && (
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={cn(
-            'w-full py-6 px-4 border-2 border-dashed rounded-xl',
-            'transition-all duration-200',
-            'flex flex-col items-center gap-2',
+            'w-full py-4 px-4 border-2 border-dashed rounded-coloring-card',
+            'transition-all duration-200 flex flex-col items-center gap-2',
             isDragging
-              ? 'border-crayon-orange bg-crayon-orange-light/20 scale-102'
+              ? 'border-crayon-orange bg-crayon-orange-light/20 scale-[1.02]'
               : 'border-paper-cream-dark hover:border-crayon-teal',
           )}
         >
           <FontAwesomeIcon
             icon={faCloudArrowUp}
-            className="text-2xl transition-colors"
+            className="text-2xl"
             style={
               {
                 '--fa-primary-color': isDragging
@@ -535,29 +389,6 @@ const ImageInput = ({ className }: ImageInputProps) => {
               : t('imageInput.dragAndDrop')}
           </p>
         </div>
-      )}
-
-      <p className="font-tondo text-sm text-text-muted text-center">
-        {t('imageInput.shareDrawing')}
-      </p>
-
-      {!canInteract && (
-        <>
-          {buttonConfig.isSubmit ? null : (
-            <Button
-              onClick={buttonConfig.action}
-              className="font-tondo font-bold text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-xl"
-              type="button"
-            >
-              {buttonConfig.text}
-            </Button>
-          )}
-          {buttonConfig.subtext && (
-            <p className="font-tondo text-sm text-center text-text-muted">
-              {buttonConfig.subtext}
-            </p>
-          )}
-        </>
       )}
     </div>
   );

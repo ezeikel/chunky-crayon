@@ -4,6 +4,7 @@ import { ColoringImage } from "@one-colored-pixel/db/types";
 import {
   useColoringContext,
   CanvasAction,
+  PALETTE_VARIANTS,
 } from "@one-colored-pixel/coloring-ui";
 import { useSound } from "@one-colored-pixel/coloring-ui";
 import cn from "@/utils/cn";
@@ -12,6 +13,8 @@ import { useTranslations } from "next-intl";
 import {
   faPencil,
   faPaintbrush,
+  faPenNib,
+  faPaintRoller,
   faFillDrip,
   faEraser,
   faSparkles,
@@ -49,6 +52,8 @@ type ToolConfig = {
   id:
     | "crayon"
     | "marker"
+    | "pencil"
+    | "paintbrush"
     | "glitter"
     | "sparkle"
     | "rainbow"
@@ -64,15 +69,13 @@ type ToolConfig = {
   isMagic?: boolean;
 };
 
-// Regular tools shown as icon-only grid
+// Core tools + pencil and paintbrush
 const regularTools: ToolConfig[] = [
   { id: "crayon", label: "Crayon", icon: faPencil },
   { id: "marker", label: "Marker", icon: faPaintbrush },
+  { id: "pencil", label: "Pencil", icon: faPenNib },
+  { id: "paintbrush", label: "Paint", icon: faPaintRoller },
   { id: "glitter", label: "Glitter", icon: faSparkles },
-  { id: "sparkle", label: "Sparkle", icon: faWandSparkles },
-  { id: "rainbow", label: "Rainbow", icon: faRainbow },
-  { id: "glow", label: "Glow", icon: faSun },
-  { id: "neon", label: "Neon", icon: faBoltLightning },
   { id: "fill", label: "Fill", icon: faFillDrip },
   { id: "eraser", label: "Eraser", icon: faEraser },
   { id: "sticker", label: "Sticker", icon: faStar },
@@ -198,6 +201,8 @@ const DesktopToolsSidebar = ({
     maxZoom,
     isAutoColoring,
     hasAutoColored,
+    paletteVariant,
+    setPaletteVariant,
   } = useColoringContext();
   const { playSound } = useSound();
 
@@ -211,6 +216,14 @@ const DesktopToolsSidebar = ({
       case "marker":
         setActiveTool("brush");
         setBrushType("marker");
+        break;
+      case "pencil":
+        setActiveTool("brush");
+        setBrushType("pencil");
+        break;
+      case "paintbrush":
+        setActiveTool("brush");
+        setBrushType("paintbrush");
         break;
       case "glitter":
         setActiveTool("brush");
@@ -405,6 +418,27 @@ const DesktopToolsSidebar = ({
               </button>
             );
           })}
+
+          {/* Palette Variant Switcher */}
+          {(activeTool === "magic-reveal" || activeTool === "magic-auto") && (
+            <div className="flex gap-1 mt-1">
+              {PALETTE_VARIANTS.map((v) => (
+                <button
+                  type="button"
+                  key={v}
+                  onClick={() => setPaletteVariant(v)}
+                  className={cn(
+                    "flex-1 px-1 py-1 text-[10px] rounded transition-all capitalize",
+                    paletteVariant === v
+                      ? "bg-primary text-primary-foreground font-bold"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80",
+                  )}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -620,17 +654,11 @@ const DesktopToolsSidebar = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          {onStartOver && (
-            <StartOverButton
-              onStartOver={onStartOver}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
-            />
-          )}
+          {onStartOver && <StartOverButton onStartOver={onStartOver} />}
           {coloringImage && (
             <DownloadPDFButton
               coloringImage={coloringImage}
               getCanvasDataUrl={getCanvasDataUrl}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
             />
           )}
           <ShareButton
@@ -639,13 +667,11 @@ const DesktopToolsSidebar = ({
             description={`Color this ${coloringImage?.title || "fun coloring page"} on Coloring Habitat!`}
             imageUrl={coloringImage?.url || undefined}
             getCanvasDataUrl={getCanvasDataUrl}
-            className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
           />
           {isAuthenticated && coloringImage?.id && (
             <SaveToGalleryButton
               coloringImageId={coloringImage.id}
               getCanvasDataUrl={getCanvasDataUrl!}
-              className="!size-auto !w-full !px-4 !py-3 !text-sm !gap-2"
             />
           )}
         </div>

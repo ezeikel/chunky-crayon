@@ -98,14 +98,13 @@ type ToolConfig = {
   isMagic?: boolean;
 };
 
+// Core tools only — sparkle, rainbow, glow, neon removed (confusing UX,
+// implementations don't match user expectations). The rendering code stays
+// in brushTextures.ts in case we want to bring them back later.
 const baseTools: ToolConfig[] = [
   { id: "crayon", label: "Crayon", icon: CrayonIcon },
   { id: "marker", label: "Marker", icon: MarkerIcon },
   { id: "glitter", label: "Glitter", icon: GlitterIcon },
-  { id: "sparkle", label: "Sparkle", icon: SparkleIcon },
-  { id: "rainbow", label: "Rainbow", icon: RainbowIcon },
-  { id: "glow", label: "Glow", icon: GlowIcon },
-  { id: "neon", label: "Neon", icon: NeonIcon },
   { id: "fill", label: "Fill", icon: FillIcon },
   { id: "eraser", label: "Eraser", icon: EraserIcon },
   { id: "sticker", label: "Sticker", icon: StickerIcon },
@@ -234,12 +233,43 @@ const ToolSelector = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-1 p-2 rounded-lg bg-white/90 backdrop-blur-sm",
+        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-paper-cream-dark shadow-coloring-surface",
         className,
       )}
     >
-      {tools.map(({ id, label, shortLabel, icon: Icon, isMagic }) => {
+      {tools.map(({ id, label, icon: Icon, isMagic }) => {
         const isActive = isToolActive(id);
+
+        if (isMagic) {
+          return (
+            <button
+              type="button"
+              key={id}
+              onClick={() => handleToolSelect(id)}
+              className={cn(
+                "relative flex items-center justify-center rounded-coloring-card size-10 sm:size-12 transition-all duration-coloring-base ease-coloring",
+                "active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-purple",
+                isActive
+                  ? "bg-gradient-to-br from-crayon-purple to-crayon-pink text-white"
+                  : "bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 text-crayon-purple",
+              )}
+              aria-label={label}
+              title={label}
+              aria-pressed={isActive}
+              data-testid={`tool-${id}`}
+            >
+              <Icon className="size-5 sm:size-6" />
+              <FontAwesomeIcon
+                icon={faSparkles}
+                className={cn(
+                  "absolute -top-2 -right-2 size-4 drop-shadow-sm",
+                  isActive ? "text-white" : "text-crayon-purple",
+                )}
+                aria-hidden
+              />
+            </button>
+          );
+        }
 
         return (
           <button
@@ -247,28 +277,18 @@ const ToolSelector = ({
             key={id}
             onClick={() => handleToolSelect(id)}
             className={cn(
-              "flex items-center justify-center rounded-lg transition-all duration-150",
-              "hover:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
-              isMagic
-                ? "flex-col gap-0.5 px-2 py-1 sm:px-3 sm:py-1.5 min-w-[3rem] sm:min-w-[3.5rem]"
-                : "size-10 sm:size-12",
-              {
-                "bg-coloring-accent text-white hover:bg-coloring-accent/90":
-                  isActive,
-              },
+              "flex items-center justify-center rounded-coloring-card border-2 size-10 sm:size-12 transition-all duration-coloring-base ease-coloring",
+              "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
+              isActive
+                ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
+                : "bg-white border-paper-cream-dark text-text-primary hover:border-coloring-accent",
             )}
             aria-label={label}
             title={label}
             aria-pressed={isActive}
+            data-testid={`tool-${id}`}
           >
-            <Icon
-              className={isMagic ? "size-4 sm:size-5" : "size-5 sm:size-6"}
-            />
-            {isMagic && shortLabel && (
-              <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wide">
-                {shortLabel}
-              </span>
-            )}
+            <Icon className="size-5 sm:size-6" />
           </button>
         );
       })}
