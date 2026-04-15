@@ -9,6 +9,7 @@ import { recordColoringSession } from "./record/session.js";
 import { renderDemoReel } from "./video/render.js";
 import { trimWebmToMp4 } from "./record/trim.js";
 import { db } from "@one-colored-pixel/db";
+import { put } from "@one-colored-pixel/storage";
 import { generateReelScript } from "./script/generate.js";
 import { generateVoiceClip } from "./voice/elevenlabs.js";
 
@@ -91,17 +92,24 @@ app.get("/tmp/:filename", async (c) => {
 });
 
 /**
- * End-to-end record → render flow. Costs ~1 image gen + voiceover + music
- * credits per call.
+ * End-to-end record → render → upload flow. Costs ~1 image gen + voiceover
+ * + music credits per call, plus a Remotion render.
  *
- * POST /publish/next
- * Body: { prompt?: string, dry_run?: boolean, sweep?: 'diagonal' | 'horizontal' }
+ * POST /publish/reel
+ * Body: {
+ *   prompt?: string,          // short, on-camera prompt. Falls back to CC daily-scene if omitted.
+ *   dry_run?: boolean,        // skip R2 upload + DB write; return local tmp URL only.
+ *   sweep?: 'diagonal' | 'horizontal',
+ * }
  *
  * If `prompt` is omitted we ask CC for a fresh scene description via
  * /api/dev/next-scene-prompt (same pipeline that powers the daily homepage
  * image — Perplexity Sonar + Claude cleanup + content safety + dedup).
+ *
+ * On success (non-dry-run) the final mp4 is uploaded to R2 and written back
+ * to coloringImage.demoReelUrl for the social post handler to pick up.
  */
-app.post("/publish/next", async (c) => {
+app.post("/publish/reel", async (c) => {
   const body = await c.req
     .json<{
       prompt?: string;
@@ -121,7 +129,7 @@ app.post("/publish/next", async (c) => {
   let prompt = body.prompt;
   if (!prompt) {
     console.log(
-      `[/publish/next] no prompt supplied — fetching scene from ${ccOrigin}/api/dev/next-scene-prompt`,
+      `[/publish/reel] no prompt supplied — fetching scene from ${ccOrigin}/api/dev/next-scene-prompt`,
     );
     // Perplexity + Claude cleanup + dedup can take 30–90s. Default undici
     // timeout would kill this; give it a generous 3min budget.
@@ -141,7 +149,7 @@ app.post("/publish/next", async (c) => {
       short: string;
     };
     prompt = short;
-    console.log(`[/publish/next] got scene:`);
+    console.log(`[/publish/reel] got scene:`);
     console.log(`  full:  ${full}`);
     console.log(`  short: ${short} ← typed on camera`);
   }
@@ -165,7 +173,7 @@ app.post("/publish/next", async (c) => {
     select: { ambientSoundUrl: true, title: true },
   });
   console.log(
-    `[/publish/next] ambientSoundUrl(raw): ${imageRow?.ambientSoundUrl ?? "(none)"}  title: ${imageRow?.title ?? "(none)"}`,
+    `[/publish/reel] ambientSoundUrl(raw): ${imageRow?.ambientSoundUrl ?? "(none)"}  title: ${imageRow?.title ?? "(none)"}`,
   );
 
   const port = parseInt(process.env.PORT ?? "3030", 10);
@@ -184,11 +192,11 @@ app.post("/publish/next", async (c) => {
       await writeFile(ambientPath, buf);
       ambientSoundUrl = `http://localhost:${port}/tmp/${ambientPath.split("/").pop()}`;
       console.log(
-        `[/publish/next] ambient proxied: ${ambientSoundUrl} (${buf.length} bytes)`,
+        `[/publish/reel] ambient proxied: ${ambientSoundUrl} (${buf.length} bytes)`,
       );
     } catch (err) {
       console.warn(
-        "[/publish/next] ambient download failed (continuing without music):",
+        "[/publish/reel] ambient download failed (continuing without music):",
         err,
       );
     }
@@ -199,12 +207,12 @@ app.post("/publish/next", async (c) => {
   let kidVoiceUrl: string | undefined;
   let adultVoiceUrl: string | undefined;
   try {
-    console.log("[/publish/next] generating reel script via Claude");
+    console.log("[/publish/reel] generating reel script via Claude");
     const script = await generateReelScript({
       prompt: prompt as string,
       imageTitle: imageRow?.title,
     });
-    console.log("[/publish/next] script:", script);
+    console.log("[/publish/reel] script:", script);
 
     const kidPath = resolve(WORKER_OUT_DIR, `${Date.now()}-kid.mp3`);
     const adultPath = resolve(WORKER_OUT_DIR, `${Date.now() + 1}-adult.mp3`);
@@ -227,16 +235,16 @@ app.post("/publish/next", async (c) => {
       kidVoiceUrl = `http://localhost:${port}/tmp/${kidPath.split("/").pop()}`;
       adultVoiceUrl = `http://localhost:${port}/tmp/${adultPath.split("/").pop()}`;
       console.log(
-        `[/publish/next] voice clips ready: kid=${kidVoiceUrl} adult=${adultVoiceUrl}`,
+        `[/publish/reel] voice clips ready: kid=${kidVoiceUrl} adult=${adultVoiceUrl}`,
       );
     } else {
       console.log(
-        "[/publish/next] skipping voiceover — ELEVENLABS_*_VOICE_ID not set",
+        "[/publish/reel] skipping voiceover — ELEVENLABS_*_VOICE_ID not set",
       );
     }
   } catch (err) {
     console.error(
-      "[/publish/next] voiceover generation failed (continuing):",
+      "[/publish/reel] voiceover generation failed (continuing):",
       err,
     );
   }
@@ -259,10 +267,10 @@ app.post("/publish/next", async (c) => {
   const revealDurationSec = revealEndSec - revealStartSec;
 
   console.log(
-    `[/publish/next] trimming typing clip [${typingStartSec.toFixed(1)}s → ${typingEndSec.toFixed(1)}s] (${typingDurationSec.toFixed(1)}s)`,
+    `[/publish/reel] trimming typing clip [${typingStartSec.toFixed(1)}s → ${typingEndSec.toFixed(1)}s] (${typingDurationSec.toFixed(1)}s)`,
   );
   console.log(
-    `[/publish/next] trimming reveal clip [${revealStartSec.toFixed(1)}s → ${revealEndSec.toFixed(1)}s] (${revealDurationSec.toFixed(1)}s)`,
+    `[/publish/reel] trimming reveal clip [${revealStartSec.toFixed(1)}s → ${revealEndSec.toFixed(1)}s] (${revealDurationSec.toFixed(1)}s)`,
   );
   void redirectMs; // intentionally unused — we keep the marker for future cuts
 
@@ -309,16 +317,47 @@ app.post("/publish/next", async (c) => {
     adultVoiceUrl,
   });
 
+  // 6. Upload to R2 and persist on the coloringImage row so the CC social
+  //    post handler can read it. Skipped on dry-run.
+  const localUrl = `http://localhost:${port}/tmp/${outputPath.split("/").pop()}`;
+  let publishedUrl: string | undefined;
+  if (!body.dry_run) {
+    try {
+      const mp4Buffer = await readFile(outputPath);
+      const r2Key = `reels/demo/${recording.imageId}-${Date.now()}.mp4`;
+      const { url } = await put(r2Key, mp4Buffer, {
+        contentType: "video/mp4",
+        access: "public",
+      });
+      publishedUrl = url;
+      await db.coloringImage.update({
+        where: { id: recording.imageId },
+        data: { demoReelUrl: url },
+      });
+      console.log(`[/publish/reel] uploaded to R2: ${url}`);
+    } catch (err) {
+      console.error("[/publish/reel] R2 upload / DB write failed:", err);
+      return c.json(
+        {
+          error: "upload_failed",
+          details: err instanceof Error ? err.message : String(err),
+          localUrl,
+        },
+        500,
+      );
+    }
+  }
+
   return c.json({
     ok: true,
     dry_run: !!body.dry_run,
     recording,
     output: {
       mp4Path: outputPath,
-      url: `http://localhost:${port}/tmp/${outputPath.split("/").pop()}`,
+      localUrl,
+      publishedUrl,
       durationSecs: durationInFrames / fps,
     },
-    note: "record + render — voiceover/music working. Social posting still to land.",
   });
 });
 
