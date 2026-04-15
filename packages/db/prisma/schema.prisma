@@ -130,7 +130,8 @@ model ColoringImage {
   svgUrl          String?
   qrCodeUrl       String?
   ambientSoundUrl String? // ElevenLabs generated ambient sound for coloring experience
-  animationUrl    String? // Veo-generated animated video for social media carousels
+  animationUrl    String? // Veo-generated animated video for social media carousels (dormant — kept for future models)
+  demoReelUrl     String? // Playwright-recorded product-demo reel (prompt → AI draws → Magic Brush) rendered on the Hetzner worker
   animationPrompt String? // Pre-generated Veo 3 prompt based on actual image content
   sourcePrompt    String? // Original input description for deduplication across daily generations
   tags            String[]
