@@ -54,3 +54,4 @@ android/app/build/
 android/.gradle/
 packages/db/src/generated/
 .playwright-mcp/
+apps/chunky-crayon-web/.env.local.bak-*

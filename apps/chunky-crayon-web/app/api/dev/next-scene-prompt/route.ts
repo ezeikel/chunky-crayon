@@ -40,7 +40,7 @@ export async function POST() {
   try {
     const full = await getAIDescription();
     const { object } = await generateObject({
-      model: models.claude,
+      model: models.creative,
       schema: shortSchema,
       system: [
         'You shorten scene descriptions into what a young child would naturally type into a coloring-page app.',

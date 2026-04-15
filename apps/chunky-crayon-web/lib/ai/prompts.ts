@@ -504,6 +504,54 @@ Write as Chunky Crayon the brand, not as a parent. Use "we" not "I".
 
 Return ONLY the caption with hashtags, nothing else.`;
 
+export const LINKEDIN_CAPTION_SYSTEM = `<role>LinkedIn content strategist for Chunky Crayon, a kids' AI coloring-book platform. LinkedIn is a PROFESSIONAL network — write posts that resonate with parents, educators, and childcare professionals.</role>
+
+<voice>Write as Chunky Crayon the brand. Warm-professional, not stiff-corporate. Use "we" if referencing the brand. Never "I" or parent-POV.</voice>
+
+<audience>Working parents, teachers, early-years educators, paediatric professionals, and entrepreneurs in the EdTech / family space.</audience>
+
+<structure>
+1. PROFESSIONAL HOOK (first line): A reflective statement or gentle stat — e.g. "Screen-time limits are the modern parenting tightrope." Avoid click-bait.
+2. SHORT STORY / INSIGHT (2–3 sentences): Connect the coloring page to a wider theme — creativity, screen-free play, fine motor skills, family rituals, early literacy, or how AI can support (not replace) traditional activities.
+3. CONCRETE VALUE: One clear thing this page / activity offers. "A printable page the whole family can do together, no tablet required."
+4. SOFT CTA: "Free to download at chunkycrayon.com" or "Print one for your classroom — share what your kids make."
+5. 3–5 PROFESSIONAL HASHTAGS: mix of #EarlyYears #Parenting #Education #ScreenFreeActivities #FamilyTime #EdTech. No #FYP-style tags.
+</structure>
+
+<tone>Thoughtful, warm, grounded. Longer than Instagram (150–220 words). Avoid jargon and marketing clichés ("unlock creativity," "game-changing"). Avoid emojis beyond one or two if the moment calls for it.</tone>
+
+<avoid>Parent-POV ("As a mum of three..."), corporate filler ("In today's fast-paced world..."), excessive hashtags, Markdown formatting.</avoid>
+
+<output_format>Write 150–220 words. Return ONLY the post — no labels, no section markers.</output_format>
+
+<examples>
+<input>Title: Space Rocket Adventure, Description: A rocket blasting off with a smiling astronaut, Tags: rocket, space, astronaut</input>
+<output>There's something quietly powerful about watching a child focus on colouring between lines. It's creativity, yes — but it's also patience, motor control, and a rare moment of stillness in a world full of scrolling.
+
+Today's page is a space rocket with a beaming astronaut, generated for us by AI and ready to print at home. It's the kind of thing that might hold a 4-year-old's attention for twenty minutes on a rainy Sunday. No screens, no login, no ads — just paper and crayons.
+
+We think tools like ours are at their best when they make traditional play easier to access, not when they try to replace it. A free printable that gets a kid off a device is a small win. We're here for that.
+
+Free to download at chunkycrayon.com — share what your little ones make.
+
+#EarlyYears #ScreenFreePlay #ChildDevelopment #EdTech #Parenting</output>
+</examples>`;
+
+export const createLinkedInCaptionPrompt = (
+  title: string,
+  description: string,
+  tags: string[],
+) => `Generate a LinkedIn post for this coloring page:
+Title: ${title}
+Description: ${description}
+Tags: ${tags.join(', ')}
+
+Website: https://chunkycrayon.com
+
+Write as Chunky Crayon the brand. Warm-professional tone. Use "we" not "I".
+
+Return ONLY the final post — no labels or section markers. End with 3–5 relevant professional hashtags.`;
+
 // =============================================================================
 // Image Analytics (for PostHog tracking)
 // =============================================================================

@@ -7,10 +7,12 @@ import {
   FACEBOOK_CAPTION_SYSTEM,
   PINTEREST_CAPTION_SYSTEM,
   TIKTOK_CAPTION_SYSTEM,
+  LINKEDIN_CAPTION_SYSTEM,
   createInstagramCaptionPrompt,
   createFacebookCaptionPrompt,
   createPinterestCaptionPrompt,
   createTikTokCaptionPrompt,
+  createLinkedInCaptionPrompt,
 } from '@/lib/ai';
 import { ColoringImage } from '@one-colored-pixel/db';
 
@@ -105,11 +107,94 @@ REQUIREMENTS:
 
 Remember: Write as Chunky Crayon the brand. Output ONLY the final post text without any labels or section markers like "Caption:", "Call to Action:", etc.`;
 
+/**
+ * Shared demo-reel framing. The reel is a product demo (not an animated
+ * line-art reel): a kid types/speaks a prompt, AI draws the coloring page,
+ * Magic Brush reveals the colors. Captions should sell the *product*, not
+ * the artwork — that's what the static image posts are for.
+ */
+const DEMO_REEL_FRAMING = `
+This video is a real product demo recorded from chunkycrayon.com:
+1. A kid types a short prompt
+2. Our AI draws a printable coloring page in seconds
+3. Magic Brush sweeps across and colors it in automatically
+
+The caption must frame this as "watch our AI turn an idea into a coloring
+page" — NOT as "animated line-art" or "a video of a coloring page". The
+hero is the workflow, not the drawing.`;
+
+const INSTAGRAM_DEMO_REEL_ADDENDUM = `
+${DEMO_REEL_FRAMING}
+
+REEL — product-demo hook, optimized for saves + shares:
+
+REQUIREMENTS:
+1. HOOK (first line, <60 chars): something that teases the transformation.
+   Good: "Kid types 3 words → coloring page appears." /
+         "Watch AI turn 'space dinosaur' into a coloring page."
+   Avoid: "So satisfying", "ASMR", "animation" framing.
+2. BENEFIT (1 line): why a parent cares — free, instant, any idea their kid has.
+3. SAVE TRIGGER: "Save this for the next 'I'm bored' moment".
+4. CTA: "Try it free at chunkycrayon.com".
+5. 8-12 discovery hashtags mixing #reels with niche parent tags
+   (#kidsactivities #aiforkids #coloringpage #screenfreeplay).
+6. Short — under 220 chars before hashtags. Reel captions get clipped.
+
+Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text without any labels or section markers.`;
+
+const FACEBOOK_DEMO_REEL_ADDENDUM = `
+${DEMO_REEL_FRAMING}
+
+FACEBOOK VIDEO — product demo framed for parents/grandparents:
+
+REQUIREMENTS:
+1. Warm opener acknowledging the workflow: "We had to show you this —
+   your kid types an idea, and our AI draws a free coloring page for them."
+2. SHARE TRIGGER: "Tag a parent who'd love this" / "Share with the grandparents".
+3. CTA: "Free at chunkycrayon.com — no signup needed to try it".
+4. 2-3 hashtags max, family-friendly (#Parenting #KidsActivities).
+
+Remember: Write as Chunky Crayon the brand. Output ONLY the final post text without any labels or section markers.`;
+
+const TIKTOK_DEMO_REEL_ADDENDUM = `
+${DEMO_REEL_FRAMING}
+
+TIKTOK — authentic product-demo energy:
+
+REQUIREMENTS:
+1. Lead with the transformation in present tense: "kid types a prompt
+   → ai draws the coloring page → watch it color itself".
+2. Keep it short, lowercase, conversational — no corporate voice.
+3. One cheeky aside is fine ("this is unfair to crayons").
+4. 5-8 hashtags: #fyp #parentsoftiktok #kidsactivities #aiforkids #coloringpage.
+5. End with "free at chunkycrayon.com".
+
+Remember: Output ONLY the final caption text without any labels.`;
+
+const LINKEDIN_DEMO_REEL_ADDENDUM = `
+${DEMO_REEL_FRAMING}
+
+LINKEDIN — professional framing for educators, early-years pros, working parents:
+
+REQUIREMENTS:
+1. Open with the observation, not the pitch: "We've been watching how
+   kids interact with generative AI, and this is what convinced us we
+   were onto something."
+2. Explain the workflow in one sentence (prompt → AI → Magic Brush).
+3. Tie it to a professional theme — screen-free follow-through, agency,
+   creativity, reducing prep time for educators.
+4. CTA: "Free to try at chunkycrayon.com — we'd love your feedback".
+5. 3-5 professional hashtags (#EarlyYears #EdTech #ScreenFreePlay #Parenting).
+6. 150-220 words.
+
+Remember: Output ONLY the final post text without any labels.`;
+
 export type InstagramPostType =
   | 'image'
   | 'carousel'
   | 'carousel_with_colored'
-  | 'reel';
+  | 'reel'
+  | 'demo_reel';
 
 export const generateInstagramCaption = async (
   coloringImage: ColoringImage,
@@ -123,6 +208,8 @@ export const generateInstagramCaption = async (
     systemPrompt += INSTAGRAM_CAROUSEL_WITH_COLORED_ADDENDUM;
   } else if (postType === 'reel') {
     systemPrompt += INSTAGRAM_REEL_ADDENDUM;
+  } else if (postType === 'demo_reel') {
+    systemPrompt += INSTAGRAM_DEMO_REEL_ADDENDUM;
   }
 
   const { text } = await generateText({
@@ -138,7 +225,11 @@ export const generateInstagramCaption = async (
   return text;
 };
 
-export type FacebookPostType = 'image' | 'video' | 'image_with_video';
+export type FacebookPostType =
+  | 'image'
+  | 'video'
+  | 'image_with_video'
+  | 'demo_reel';
 
 export const generateFacebookCaption = async (
   coloringImage: ColoringImage,
@@ -150,6 +241,8 @@ export const generateFacebookCaption = async (
     systemPrompt += FACEBOOK_VIDEO_ADDENDUM;
   } else if (postType === 'image_with_video') {
     systemPrompt += FACEBOOK_IMAGE_WITH_VIDEO_ADDENDUM;
+  } else if (postType === 'demo_reel') {
+    systemPrompt += FACEBOOK_DEMO_REEL_ADDENDUM;
   }
 
   const { text } = await generateText({
@@ -181,13 +274,21 @@ export const generatePinterestCaption = async (
   return text;
 };
 
+export type TikTokPostType = 'image' | 'demo_reel';
+
 export const generateTikTokCaption = async (
   coloringImage: ColoringImage,
+  postType: TikTokPostType = 'image',
 ): Promise<string> => {
+  let systemPrompt = TIKTOK_CAPTION_SYSTEM;
+  if (postType === 'demo_reel') {
+    systemPrompt += TIKTOK_DEMO_REEL_ADDENDUM;
+  }
+
   try {
     const { text } = await generateText({
       model: models.creative,
-      system: TIKTOK_CAPTION_SYSTEM,
+      system: systemPrompt,
       prompt: createTikTokCaptionPrompt(
         coloringImage.title ?? '',
         coloringImage.description ?? '',
@@ -199,6 +300,35 @@ export const generateTikTokCaption = async (
   } catch (error) {
     console.error('[TikTok] Caption generation failed:', error);
     return `${coloringImage.title ?? 'New coloring page'} 🎨 Free coloring page! #coloringpage #kidscrafts #artforkids #freecoloringpage`;
+  }
+};
+
+export type LinkedInPostType = 'image' | 'demo_reel';
+
+export const generateLinkedInCaption = async (
+  coloringImage: ColoringImage,
+  postType: LinkedInPostType = 'image',
+): Promise<string> => {
+  let systemPrompt = LINKEDIN_CAPTION_SYSTEM;
+  if (postType === 'demo_reel') {
+    systemPrompt += LINKEDIN_DEMO_REEL_ADDENDUM;
+  }
+
+  try {
+    const { text } = await generateText({
+      model: models.creative,
+      system: systemPrompt,
+      prompt: createLinkedInCaptionPrompt(
+        coloringImage.title ?? '',
+        coloringImage.description ?? '',
+        coloringImage.tags ?? [],
+      ),
+    });
+
+    return text.trim();
+  } catch (error) {
+    console.error('[LinkedIn] Caption generation failed:', error);
+    throw error;
   }
 };
 

@@ -8,6 +8,12 @@
     },
     "app/api/social/fact-card/post/route.ts": {
       "maxDuration": 120
+    },
+    "app/api/social/post/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/social/demo-reel/produce/route.ts": {
+      "maxDuration": 60
     }
   },
   "crons": [
@@ -22,10 +28,6 @@
     {
       "path": "/api/coloring-image/generate",
       "schedule": "0 8 * * *"
-    },
-    {
-      "path": "/api/coloring-image/animate",
-      "schedule": "15 8 * * *"
     },
     {
       "path": "/api/email-list/send-latest",
@@ -48,6 +50,34 @@
       "schedule": "12 16 * * 1-5"
     },
     {
+      "path": "/api/social/post?platform=linkedin",
+      "schedule": "15 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/demo-reel/produce",
+      "schedule": "30 15 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=instagram",
+      "schedule": "30 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=facebook",
+      "schedule": "35 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=tiktok",
+      "schedule": "40 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=linkedin",
+      "schedule": "45 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=pinterest",
+      "schedule": "50 16 * * 1-5"
+    },
+    {
       "path": "/api/social/post?platform=instagram&type=carousel",
       "schedule": "0 15 * * 0,6"
     },
@@ -62,6 +92,34 @@
     {
       "path": "/api/social/post?platform=pinterest",
       "schedule": "12 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?platform=linkedin",
+      "schedule": "15 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/demo-reel/produce",
+      "schedule": "30 14 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=instagram",
+      "schedule": "30 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=facebook",
+      "schedule": "35 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=tiktok",
+      "schedule": "40 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=linkedin",
+      "schedule": "45 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=pinterest",
+      "schedule": "50 15 * * 0,6"
     },
     {
       "path": "/api/social/tiktok/post",
