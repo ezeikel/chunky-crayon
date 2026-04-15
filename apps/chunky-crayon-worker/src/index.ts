@@ -91,24 +91,59 @@ app.get("/tmp/:filename", async (c) => {
 });
 
 /**
- * End-to-end record → render → post flow.
+ * End-to-end record → render flow. Costs ~1 image gen + voiceover + music
+ * credits per call.
  *
  * POST /publish/next
- * Body: { prompt: string, dry_run?: boolean, sweep?: 'diagonal' | 'horizontal' }
+ * Body: { prompt?: string, dry_run?: boolean, sweep?: 'diagonal' | 'horizontal' }
  *
- * Every run drives the full homepage → create → reveal flow. Costs one
- * image generation (~5p) per call. For iterating on Remotion without
- * re-recording, use POST /publish/render-only against an existing webm.
+ * If `prompt` is omitted we ask CC for a fresh scene description via
+ * /api/dev/next-scene-prompt (same pipeline that powers the daily homepage
+ * image — Perplexity Sonar + Claude cleanup + content safety + dedup).
  */
 app.post("/publish/next", async (c) => {
-  const body = await c.req.json<{
-    prompt: string;
-    dry_run?: boolean;
-    sweep?: "diagonal" | "horizontal";
-  }>();
+  const body = await c.req
+    .json<{
+      prompt?: string;
+      dry_run?: boolean;
+      sweep?: "diagonal" | "horizontal";
+    }>()
+    .catch(
+      () =>
+        ({}) as {
+          prompt?: string;
+          dry_run?: boolean;
+          sweep?: "diagonal" | "horizontal";
+        },
+    );
 
-  if (!body.prompt) {
-    return c.json({ error: "prompt is required" }, 400);
+  const ccOrigin = process.env.CC_ORIGIN ?? "http://localhost:3000";
+  let prompt = body.prompt;
+  if (!prompt) {
+    console.log(
+      `[/publish/next] no prompt supplied — fetching scene from ${ccOrigin}/api/dev/next-scene-prompt`,
+    );
+    // Perplexity + Claude cleanup + dedup can take 30–90s. Default undici
+    // timeout would kill this; give it a generous 3min budget.
+    const r = await fetch(`${ccOrigin}/api/dev/next-scene-prompt`, {
+      method: "POST",
+      signal: AbortSignal.timeout(180_000),
+    });
+    if (!r.ok) {
+      const txt = await r.text().catch(() => "");
+      return c.json(
+        { error: `scene fetch failed (${r.status}): ${txt.slice(0, 200)}` },
+        502,
+      );
+    }
+    const { full, short } = (await r.json()) as {
+      full: string;
+      short: string;
+    };
+    prompt = short;
+    console.log(`[/publish/next] got scene:`);
+    console.log(`  full:  ${full}`);
+    console.log(`  short: ${short} ← typed on camera`);
   }
 
   await mkdir(WORKER_OUT_DIR, { recursive: true });
@@ -116,7 +151,7 @@ app.post("/publish/next", async (c) => {
   // 1. Playwright — drive the homepage create flow and record the reveal.
   const origin = process.env.CC_ORIGIN ?? "http://localhost:3000";
   const recording = await recordColoringSession({
-    prompt: body.prompt,
+    prompt: prompt as string,
     origin,
     sweep: body.sweep ?? "diagonal",
     outDir: WORKER_OUT_DIR,
@@ -166,7 +201,7 @@ app.post("/publish/next", async (c) => {
   try {
     console.log("[/publish/next] generating reel script via Claude");
     const script = await generateReelScript({
-      prompt: body.prompt,
+      prompt: prompt as string,
       imageTitle: imageRow?.title,
     });
     console.log("[/publish/next] script:", script);
@@ -264,7 +299,7 @@ app.post("/publish/next", async (c) => {
   await renderDemoReel({
     typingVideoUrl,
     revealVideoUrl,
-    prompt: body.prompt,
+    prompt: prompt as string,
     typingDurationFrames,
     revealDurationFrames,
     durationInFrames,

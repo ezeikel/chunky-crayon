@@ -205,7 +205,10 @@ export async function recordColoringSession(
     // map fallback). Times out after 3 min — by then the image either has
     // regions or we give up and accept the legacy reveal.
     log("waiting for region store to hydrate (preColoured canvas >= 400px)");
-    const regionReady = await waitForRegionStoreReady(page, 180_000);
+    // Complex images (lots of regions) can take 5+ min to backfill. Give it
+    // a generous budget — we'd rather wait than fall back to the legacy
+    // colour-map path which produces blobby / wrong-colour reveals.
+    const regionReady = await waitForRegionStoreReady(page, 10 * 60_000);
     if (regionReady) {
       log(`region store ready — preColoured canvas built at ${regionReady}`);
     } else {
