@@ -1055,7 +1055,8 @@
     "subtextNoCredits": "Te quedaste sin créditos — ¡recarga o mejora tu plan!",
     "subtextNoCreditsSubscribed": "¿Necesitas más magia? ¡Recarga o mejora tu plan para que la creatividad siga!",
     "subtextNoCreditsNoSubscription": "Elige una suscripción para desbloquear más creaciones",
-    "subtextFallback": "Tendrás 15 créditos gratis — ¡suficientes para crear 3 páginas!"
+    "subtextFallback": "Tendrás 15 créditos gratis — ¡suficientes para crear 3 páginas!",
+    "freeTriesChip": "{remaining, plural, =1 {Queda # intento gratis} other {Quedan # intentos gratis}}"
   },
   "og": {
     "homepage": {
@@ -1083,6 +1084,17 @@
       "intermediate": "Intermedio",
       "advanced": "Avanzado",
       "expert": "Experto"
+    }
+  },
+  "coloringPage": {
+    "progress": {
+      "allDone": "¡Listo!",
+      "milestones": {
+        "25": "¡Gran comienzo!",
+        "50": "¡A mitad de camino!",
+        "75": "¡Casi listo!",
+        "100": "¡Listo!"
+      }
     }
   }
 }

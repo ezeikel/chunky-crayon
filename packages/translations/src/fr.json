@@ -48,7 +48,8 @@
         "50": "À mi-chemin !",
         "75": "Presque fini !",
         "100": "Incroyable !"
-      }
+      },
+      "allDone": "Terminé !"
     },
     "sidebar": {
       "colors": "Couleurs",
@@ -78,7 +79,9 @@
       "sparkle": "Scintillant",
       "rainbow": "Arc-en-ciel",
       "glow": "Lueur",
-      "neon": "Néon"
+      "neon": "Néon",
+      "pencil": "Crayon",
+      "paintbrush": "Pinceau"
     },
     "brushSizes": {
       "small": "Fin",

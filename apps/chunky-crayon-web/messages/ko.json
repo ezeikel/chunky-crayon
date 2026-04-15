@@ -1055,7 +1055,8 @@
     "subtextNoCredits": "크레딧이 없어요 — 충전하거나 업그레이드해요!",
     "subtextNoCreditsSubscribed": "마법이 더 필요하신가요? 충전하거나 업그레이드해서 창작을 이어가요!",
     "subtextNoCreditsNoSubscription": "구독을 선택하고 더 많이 만들어요",
-    "subtextFallback": "무료 크레딧 15개를 드려요 — 색칠공부 3장을 만들 수 있어요!"
+    "subtextFallback": "무료 크레딧 15개를 드려요 — 색칠공부 3장을 만들 수 있어요!",
+    "freeTriesChip": "{remaining, plural, =1 {무료 체험 #회 남음} other {무료 체험 #회 남음}}"
   },
   "og": {
     "homepage": {
@@ -1083,6 +1084,17 @@
       "intermediate": "중급",
       "advanced": "고급",
       "expert": "전문가"
+    }
+  },
+  "coloringPage": {
+    "progress": {
+      "allDone": "완성!",
+      "milestones": {
+        "25": "좋은 시작!",
+        "50": "반이나 했어요!",
+        "75": "거의 다 됐어요!",
+        "100": "완성!"
+      }
     }
   }
 }

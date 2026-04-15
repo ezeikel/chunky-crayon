@@ -1055,7 +1055,8 @@
     "subtextNoCredits": "Tu n’as plus de crédits — recharge ou améliore !",
     "subtextNoCreditsSubscribed": "Besoin de plus de magie ? Recharge ou améliore pour garder la créativité en route !",
     "subtextNoCreditsNoSubscription": "Choisis un abonnement pour débloquer plus de créations",
-    "subtextFallback": "Tu auras 15 crédits gratuits — de quoi créer 3 pages !"
+    "subtextFallback": "Tu auras 15 crédits gratuits — de quoi créer 3 pages !",
+    "freeTriesChip": "{remaining, plural, =1 {# essai gratuit restant} other {# essais gratuits restants}}"
   },
   "og": {
     "homepage": {
@@ -1083,6 +1084,17 @@
       "intermediate": "Intermédiaire",
       "advanced": "Avancé",
       "expert": "Expert"
+    }
+  },
+  "coloringPage": {
+    "progress": {
+      "allDone": "Terminé !",
+      "milestones": {
+        "25": "Super départ !",
+        "50": "À mi-chemin !",
+        "75": "Presque fini !",
+        "100": "Terminé !"
+      }
     }
   }
 }

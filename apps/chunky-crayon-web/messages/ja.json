@@ -1055,7 +1055,8 @@
     "subtextNoCredits": "クレジットがないよ — 追加するかアップグレードしてね！",
     "subtextNoCreditsSubscribed": "もっとまほうがほしい？追加またはアップグレードで、創作をつづけよう！",
     "subtextNoCreditsNoSubscription": "サブスクを選んで、もっと作れるようにしよう",
-    "subtextFallback": "無料で15クレジットもらえるよ — ぬりえ3枚分！"
+    "subtextFallback": "無料で15クレジットもらえるよ — ぬりえ3枚分！",
+    "freeTriesChip": "{remaining, plural, =1 {無料おためし 残り#回} other {無料おためし 残り#回}}"
   },
   "og": {
     "homepage": {
@@ -1083,6 +1084,17 @@
       "intermediate": "ふつう",
       "advanced": "むずかしい",
       "expert": "とてもむずかしい"
+    }
+  },
+  "coloringPage": {
+    "progress": {
+      "allDone": "できた！",
+      "milestones": {
+        "25": "いいスタート！",
+        "50": "はんぶんできた！",
+        "75": "もうすぐ！",
+        "100": "できた！"
+      }
     }
   }
 }

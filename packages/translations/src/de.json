@@ -48,7 +48,8 @@
         "50": "Halb geschafft!",
         "75": "Fast fertig!",
         "100": "Wahnsinn!"
-      }
+      },
+      "allDone": "Alles fertig!"
     },
     "sidebar": {
       "colors": "Farben",
@@ -78,7 +79,9 @@
       "sparkle": "Funkeln",
       "rainbow": "Regenbogen",
       "glow": "Leuchten",
-      "neon": "Neon"
+      "neon": "Neon",
+      "pencil": "Bleistift",
+      "paintbrush": "Pinsel"
     },
     "brushSizes": {
       "small": "Fein",

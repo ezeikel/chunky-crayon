@@ -1055,7 +1055,8 @@
     "subtextNoCredits": "Keine Credits mehr — lade auf oder upgrade!",
     "subtextNoCreditsSubscribed": "Mehr Zauber gefällig? Lade auf oder upgrade, damit die Kreativität weitergeht!",
     "subtextNoCreditsNoSubscription": "Wähle ein Abo, um mehr Kreationen freizuschalten",
-    "subtextFallback": "Du bekommst 15 Gratis-Credits — genug für 3 Seiten!"
+    "subtextFallback": "Du bekommst 15 Gratis-Credits — genug für 3 Seiten!",
+    "freeTriesChip": "{remaining, plural, =1 {# gratis Versuch übrig} other {# gratis Versuche übrig}}"
   },
   "og": {
     "homepage": {
@@ -1083,6 +1084,17 @@
       "intermediate": "Fortgeschritten",
       "advanced": "Profi",
       "expert": "Meister"
+    }
+  },
+  "coloringPage": {
+    "progress": {
+      "allDone": "Fertig!",
+      "milestones": {
+        "25": "Toller Start!",
+        "50": "Halb geschafft!",
+        "75": "Fast geschafft!",
+        "100": "Fertig!"
+      }
     }
   }
 }

@@ -48,7 +48,8 @@
         "50": "절반 완성했어요!",
         "75": "거의 완성했어요!",
         "100": "완성했어요!"
-      }
+      },
+      "allDone": "완료!"
     },
     "sidebar": {
       "colors": "색",
@@ -78,7 +79,9 @@
       "sparkle": "반짝이",
       "rainbow": "무지개",
       "glow": "빛나는",
-      "neon": "네온"
+      "neon": "네온",
+      "pencil": "연필",
+      "paintbrush": "붓"
     },
     "brushSizes": {
       "small": "얇게",

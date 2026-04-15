@@ -48,7 +48,8 @@
         "50": "半分できた！",
         "75": "もうすぐ完成！",
         "100": "すごい！"
-      }
+      },
+      "allDone": "完了！"
     },
     "sidebar": {
       "colors": "いろ",
@@ -78,7 +79,9 @@
       "sparkle": "キラキラ",
       "rainbow": "にじいろ",
       "glow": "ひかる",
-      "neon": "ネオン"
+      "neon": "ネオン",
+      "pencil": "鉛筆",
+      "paintbrush": "絵筆"
     },
     "brushSizes": {
       "small": "細い",

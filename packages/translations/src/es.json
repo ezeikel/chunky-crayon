@@ -48,7 +48,8 @@
         "50": "¡Ya vas por la mitad!",
         "75": "¡Casi listo!",
         "100": "¡Increíble!"
-      }
+      },
+      "allDone": "¡Todo listo!"
     },
     "sidebar": {
       "colors": "Colores",
@@ -78,7 +79,9 @@
       "sparkle": "Brillitos",
       "rainbow": "Arcoíris",
       "glow": "Resplandor",
-      "neon": "Neón"
+      "neon": "Neón",
+      "pencil": "Lápiz",
+      "paintbrush": "Pincel"
     },
     "brushSizes": {
       "small": "Fino",
