@@ -323,10 +323,10 @@ async function waitForLineArt(page: Page): Promise<void> {
   );
   await page.waitForTimeout(2000);
 
-  // Poll for paint. Sample a 3×3 grid (not just center) because line art is
-  // often sparse — a single bounding-box-center sample can be on blank paper
-  // even when most of the image has been drawn. If ANY grid point has paint,
-  // we consider the canvas ready.
+  // Poll for paint. Sample the canvas densely — a full row and column strip
+  // at the image's center. Single-point and even 3×3 grid can all fall on
+  // blank paper for sparse line art. If ANY of the sampled pixels along
+  // those two crosshair strips has non-zero alpha, we're satisfied.
   try {
     await page.waitForFunction(
       () => {
@@ -335,12 +335,20 @@ async function waitForLineArt(page: Page): Promise<void> {
         const img = canvases[1] as HTMLCanvasElement;
         const ctx = img.getContext("2d");
         if (!ctx || img.width === 0) return false;
-        for (let dy = 0; dy < 3; dy++) {
-          for (let dx = 0; dx < 3; dx++) {
-            const px = Math.floor((img.width * (dx + 1)) / 4);
-            const py = Math.floor((img.height * (dy + 1)) / 4);
-            if (ctx.getImageData(px, py, 1, 1).data[3] > 0) return true;
+        const w = img.width;
+        const h = img.height;
+        try {
+          // Middle row + middle column strips.
+          const rowData = ctx.getImageData(0, Math.floor(h / 2), w, 1).data;
+          for (let i = 3; i < rowData.length; i += 4) {
+            if (rowData[i] > 0) return true;
           }
+          const colData = ctx.getImageData(Math.floor(w / 2), 0, 1, h).data;
+          for (let i = 3; i < colData.length; i += 4) {
+            if (colData[i] > 0) return true;
+          }
+        } catch {
+          return false;
         }
         return false;
       },

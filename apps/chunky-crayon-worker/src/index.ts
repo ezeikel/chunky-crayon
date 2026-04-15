@@ -7,33 +7,21 @@ import { resolve } from "node:path";
 
 import { recordColoringSession } from "./record/session.js";
 import { renderDemoReel } from "./video/render.js";
+import { trimWebmToMp4 } from "./record/trim.js";
+import { db } from "@one-colored-pixel/db";
+import { generateReelScript } from "./script/generate.js";
+import { generateVoiceClip } from "./voice/elevenlabs.js";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
-/**
- * Compute final output length in frames, mirroring DemoReel's section math.
- * Keep in sync with GENERATION_SPEED in DemoReel.tsx.
- */
-const GENERATION_SPEED = 8;
-const TAIL_HOLD_MS = 1500;
-
-function computeOutputFrames(
-  fps: number,
-  markers: {
-    typeStartMs: number;
-    submitMs: number;
-    redirectMs: number;
-    sweepDoneMs: number;
-  },
-): number {
-  const msToFrames = (ms: number) => Math.round((ms / 1000) * fps);
-  const typing = msToFrames(markers.submitMs - markers.typeStartMs);
-  const waitingSource = msToFrames(markers.redirectMs - markers.submitMs);
-  const waiting = Math.max(1, Math.round(waitingSource / GENERATION_SPEED));
-  const reveal = msToFrames(markers.sweepDoneMs - markers.redirectMs);
-  const tail = msToFrames(TAIL_HOLD_MS);
-  return typing + waiting + reveal + tail;
-}
+// Section pacing — keep in sync with DemoReel.tsx.
+const INTRO_SECS = 2.0;
+const OUTRO_SECS = 2.0;
+// Post-submit padding — a short tail on the typing clip so the viewer sees
+// the submit click register before we cut to the reveal.
+const POST_SUBMIT_PAD_SECS = 0.4;
+// Post-sweep padding — brief hold on the finished coloured image.
+const POST_SWEEP_PAD_SECS = 1.5;
 
 const app = new Hono();
 app.use("*", logger());
@@ -51,55 +39,6 @@ app.use("/publish/*", async (c, next) => {
 app.get("/health", (c) =>
   c.json({ status: "ok", service: "chunky-crayon-worker" }),
 );
-
-/**
- * Dev-only: re-render an existing recording without re-recording. Lets us
- * iterate on the Remotion composition without burning a 2.5min generation.
- *
- * POST /publish/render-only
- * Body: {
- *   webm_filename: string;
- *   prompt: string;
- *   recording_duration_ms: number;
- *   flow_markers: FlowMarkers;
- * }
- *
- * All fields required — copy them straight from a previous /publish/next
- * response. Without the markers we can't do fast-forward.
- */
-app.post("/publish/render-only", async (c) => {
-  const body = await c.req.json<{
-    webm_filename: string;
-    prompt: string;
-    recording_duration_ms: number;
-    flow_markers: {
-      typeStartMs: number;
-      submitMs: number;
-      redirectMs: number;
-      brushReadyMs: number;
-      sweepDoneMs: number;
-    };
-  }>();
-  if (!body.webm_filename || !body.flow_markers)
-    return c.json({ error: "webm_filename and flow_markers required" }, 400);
-
-  const port = parseInt(process.env.PORT ?? "3030", 10);
-  const recordedVideoUrl = `http://localhost:${port}/tmp/${body.webm_filename}`;
-  const fps = 30;
-  const durationInFrames = computeOutputFrames(fps, body.flow_markers);
-
-  const outputPath = resolve(WORKER_OUT_DIR, `${Date.now()}-render-only.mp4`);
-  await renderDemoReel({
-    recordedVideoUrl,
-    prompt: body.prompt,
-    recordingDurationMs: body.recording_duration_ms,
-    flowMarkers: body.flow_markers,
-    durationInFrames,
-    outputPath,
-  });
-
-  return c.json({ ok: true, outputPath });
-});
 
 // Serve files from the worker output dir with Range support — Remotion's
 // headless Chromium needs this to load locally-generated webm/mp3 during
@@ -183,24 +122,156 @@ app.post("/publish/next", async (c) => {
     outDir: WORKER_OUT_DIR,
   });
 
-  // 2. Remotion — composite the raw webm into a time-remapped reel.
-  //    Sections: typing (1×) + waiting (8× ff) + reveal (1×) + tail hold.
-  //    Serve the webm to the headless Chromium via the /tmp file server.
-  const port = parseInt(process.env.PORT ?? "3030", 10);
-  const webmName = recording.webmPath.split("/").pop();
-  const recordedVideoUrl = `http://localhost:${port}/tmp/${webmName}`;
+  // 2. Fetch the image's ambient sound URL from the DB, and use its title
+  //    to prompt a better voiceover script. Every backfilled image has an
+  //    ambient track; we layer it as ducked music in Remotion.
+  const imageRow = await db.coloringImage.findUnique({
+    where: { id: recording.imageId },
+    select: { ambientSoundUrl: true, title: true },
+  });
+  console.log(
+    `[/publish/next] ambientSoundUrl(raw): ${imageRow?.ambientSoundUrl ?? "(none)"}  title: ${imageRow?.title ?? "(none)"}`,
+  );
 
+  const port = parseInt(process.env.PORT ?? "3030", 10);
+
+  // Download the ambient mp3 locally so Remotion's headless Chromium loads it
+  // via our /tmp server (avoids CORS/cross-origin hangs + timeouts that crash
+  // the compositor).
+  let ambientSoundUrl: string | undefined;
+  if (imageRow?.ambientSoundUrl) {
+    try {
+      const res = await fetch(imageRow.ambientSoundUrl);
+      if (!res.ok) throw new Error(`ambient fetch ${res.status}`);
+      const buf = Buffer.from(await res.arrayBuffer());
+      const ambientPath = resolve(WORKER_OUT_DIR, `${Date.now()}-ambient.mp3`);
+      const { writeFile } = await import("node:fs/promises");
+      await writeFile(ambientPath, buf);
+      ambientSoundUrl = `http://localhost:${port}/tmp/${ambientPath.split("/").pop()}`;
+      console.log(
+        `[/publish/next] ambient proxied: ${ambientSoundUrl} (${buf.length} bytes)`,
+      );
+    } catch (err) {
+      console.warn(
+        "[/publish/next] ambient download failed (continuing without music):",
+        err,
+      );
+    }
+  }
+
+  // 3. Generate voiceover: script via Claude, TTS via ElevenLabs.
+  //    Non-fatal if it fails — reel still renders, just silent voice layer.
+  let kidVoiceUrl: string | undefined;
+  let adultVoiceUrl: string | undefined;
+  try {
+    console.log("[/publish/next] generating reel script via Claude");
+    const script = await generateReelScript({
+      prompt: body.prompt,
+      imageTitle: imageRow?.title,
+    });
+    console.log("[/publish/next] script:", script);
+
+    const kidPath = resolve(WORKER_OUT_DIR, `${Date.now()}-kid.mp3`);
+    const adultPath = resolve(WORKER_OUT_DIR, `${Date.now() + 1}-adult.mp3`);
+    const kidVoiceId = process.env.ELEVENLABS_KID_VOICE_ID;
+    const adultVoiceId = process.env.ELEVENLABS_ADULT_VOICE_ID;
+
+    if (kidVoiceId && adultVoiceId) {
+      await Promise.all([
+        generateVoiceClip({
+          text: script.kidLine,
+          voiceId: kidVoiceId,
+          outputPath: kidPath,
+        }),
+        generateVoiceClip({
+          text: script.adultLine,
+          voiceId: adultVoiceId,
+          outputPath: adultPath,
+        }),
+      ]);
+      kidVoiceUrl = `http://localhost:${port}/tmp/${kidPath.split("/").pop()}`;
+      adultVoiceUrl = `http://localhost:${port}/tmp/${adultPath.split("/").pop()}`;
+      console.log(
+        `[/publish/next] voice clips ready: kid=${kidVoiceUrl} adult=${adultVoiceUrl}`,
+      );
+    } else {
+      console.log(
+        "[/publish/next] skipping voiceover — ELEVENLABS_*_VOICE_ID not set",
+      );
+    }
+  } catch (err) {
+    console.error(
+      "[/publish/next] voiceover generation failed (continuing):",
+      err,
+    );
+  }
+
+  // 4. Trim the raw webm to just the two segments we want in the reel.
+  //    Everything else (post-submit loading, region-store polling) gets cut
+  //    entirely — keeps Remotion's frame cache tiny and render fast.
   const fps = 30;
-  const durationInFrames = computeOutputFrames(fps, recording.flowMarkers);
+  const { typeStartMs, submitMs, brushReadyMs, sweepDoneMs, redirectMs } =
+    recording.flowMarkers;
+
+  // Typing clip: from typing start through just past submit click.
+  const typingStartSec = typeStartMs / 1000;
+  const typingEndSec = submitMs / 1000 + POST_SUBMIT_PAD_SECS;
+  const typingDurationSec = typingEndSec - typingStartSec;
+
+  // Reveal clip: from brush-ready (=sweep start) through sweep done + hold.
+  const revealStartSec = brushReadyMs / 1000;
+  const revealEndSec = sweepDoneMs / 1000 + POST_SWEEP_PAD_SECS;
+  const revealDurationSec = revealEndSec - revealStartSec;
+
+  console.log(
+    `[/publish/next] trimming typing clip [${typingStartSec.toFixed(1)}s → ${typingEndSec.toFixed(1)}s] (${typingDurationSec.toFixed(1)}s)`,
+  );
+  console.log(
+    `[/publish/next] trimming reveal clip [${revealStartSec.toFixed(1)}s → ${revealEndSec.toFixed(1)}s] (${revealDurationSec.toFixed(1)}s)`,
+  );
+  void redirectMs; // intentionally unused — we keep the marker for future cuts
+
+  const typingPath = resolve(WORKER_OUT_DIR, `${Date.now()}-typing.mp4`);
+  const revealPath = resolve(WORKER_OUT_DIR, `${Date.now() + 1}-reveal.mp4`);
+  await Promise.all([
+    trimWebmToMp4({
+      sourcePath: recording.webmPath,
+      outputPath: typingPath,
+      startSec: typingStartSec,
+      durationSec: typingDurationSec,
+    }),
+    trimWebmToMp4({
+      sourcePath: recording.webmPath,
+      outputPath: revealPath,
+      startSec: revealStartSec,
+      durationSec: revealDurationSec,
+    }),
+  ]);
+
+  const typingVideoUrl = `http://localhost:${port}/tmp/${typingPath.split("/").pop()}`;
+  const revealVideoUrl = `http://localhost:${port}/tmp/${revealPath.split("/").pop()}`;
+  const typingDurationFrames = Math.round(typingDurationSec * fps);
+  const revealDurationFrames = Math.round(revealDurationSec * fps);
+
+  // 5. Remotion — composite trimmed clips with intro/outro cards, ambient
+  //    music, and two-voice narration.
+  const introFrames = Math.round(INTRO_SECS * fps);
+  const outroFrames = Math.round(OUTRO_SECS * fps);
+  const durationInFrames =
+    introFrames + typingDurationFrames + revealDurationFrames + outroFrames;
 
   const outputPath = resolve(WORKER_OUT_DIR, `${Date.now()}-reel.mp4`);
   await renderDemoReel({
-    recordedVideoUrl,
+    typingVideoUrl,
+    revealVideoUrl,
     prompt: body.prompt,
-    recordingDurationMs: recording.durationMs,
-    flowMarkers: recording.flowMarkers,
+    typingDurationFrames,
+    revealDurationFrames,
     durationInFrames,
     outputPath,
+    ambientSoundUrl,
+    kidVoiceUrl,
+    adultVoiceUrl,
   });
 
   return c.json({
@@ -210,8 +281,9 @@ app.post("/publish/next", async (c) => {
     output: {
       mp4Path: outputPath,
       url: `http://localhost:${port}/tmp/${outputPath.split("/").pop()}`,
+      durationSecs: durationInFrames / fps,
     },
-    note: "record + render only — voiceover/music/social posting still to land",
+    note: "record + render — voiceover/music working. Social posting still to land.",
   });
 });
 
