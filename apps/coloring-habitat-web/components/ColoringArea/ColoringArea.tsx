@@ -176,7 +176,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       if (!coloringImage.id) return;
       let stopped = false;
       const POLL_MS = 3000;
-      const MAX_ATTEMPTS = 100; // ~5 minutes total
+      const MAX_ATTEMPTS = 200; // ~10 minutes total — complex images take longer
       let attempts = 0;
       const tick = async () => {
         if (stopped) return;
