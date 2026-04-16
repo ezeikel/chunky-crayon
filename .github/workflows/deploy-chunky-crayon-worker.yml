@@ -43,11 +43,22 @@ jobs:
               echo "Code pulled"
 
               echo "Installing chunky-crayon-worker dependencies..."
-              cd apps/chunky-crayon-worker
-              rm -rf node_modules
-              ~/.bun/bin/bun install
-              echo "Dependencies installed"
-              cd /opt/chunky-crayon
+              # Monorepo uses pnpm workspace:* refs for @one-colored-pixel/db
+              # and @one-colored-pixel/storage — must install from repo root so
+              # pnpm can resolve workspace deps. Filter to only the worker's
+              # dep graph to avoid pulling in the full web + mobile trees.
+              # FONTAWESOME_NPM_AUTH_TOKEN lives at /root/.npmrc-fontawesome so
+              # pnpm can substitute ${FONTAWESOME_NPM_AUTH_TOKEN} in the repo's
+              # .npmrc (web/mobile apps need Pro icons).
+              set -a; source /root/.npmrc-fontawesome; set +a
+              yes | /root/.local/share/pnpm/pnpm install \
+                --filter "@one-colored-pixel/chunky-crayon-worker..."
+              echo "Worker deps installed"
+
+              echo "Building shared packages..."
+              /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/db build
+              /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/storage build
+              echo "Shared packages built"
             fi
 
             if [[ "$ACTION" != deploy-only ]]; then
