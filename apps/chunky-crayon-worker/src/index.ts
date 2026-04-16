@@ -126,6 +126,7 @@ app.post("/publish/reel", async (c) => {
     );
 
   const ccOrigin = process.env.CC_ORIGIN ?? "http://localhost:3000";
+  const workerSecret = process.env.WORKER_SECRET;
   let prompt = body.prompt;
   if (!prompt) {
     console.log(
@@ -133,7 +134,6 @@ app.post("/publish/reel", async (c) => {
     );
     // Perplexity + Claude cleanup + dedup can take 30–90s. Default undici
     // timeout would kill this; give it a generous 3min budget.
-    const workerSecret = process.env.WORKER_SECRET;
     const r = await fetch(`${ccOrigin}/api/dev/next-scene-prompt`, {
       method: "POST",
       headers: workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {},
@@ -159,11 +159,9 @@ app.post("/publish/reel", async (c) => {
   await mkdir(WORKER_OUT_DIR, { recursive: true });
 
   // 1. Playwright — drive the homepage create flow and record the reveal.
-  const origin = process.env.CC_ORIGIN ?? "http://localhost:3000";
-  const workerSecret = process.env.WORKER_SECRET;
   const recording = await recordColoringSession({
     prompt: prompt as string,
-    origin,
+    origin: ccOrigin,
     sweep: body.sweep ?? "diagonal",
     outDir: WORKER_OUT_DIR,
     onImageCreated: (id) => {
@@ -172,7 +170,7 @@ app.post("/publish/reel", async (c) => {
       // we explicitly trigger it here. The Playwright session's
       // region-store poll will pick it up once CC finishes.
       console.log(`[/publish/reel] triggering region-store regen for ${id}`);
-      fetch(`${origin}/api/dev/regenerate-region-store/${id}`, {
+      fetch(`${ccOrigin}/api/dev/regenerate-region-store/${id}`, {
         method: "POST",
         headers: workerSecret
           ? { Authorization: `Bearer ${workerSecret}` }
