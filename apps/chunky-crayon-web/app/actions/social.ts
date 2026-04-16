@@ -189,12 +189,67 @@ REQUIREMENTS:
 
 Remember: Output ONLY the final post text without any labels.`;
 
+/**
+ * Shared "colored static after the demo reel" framing. We post this AFTER
+ * the demo reel so people who saw the colored result think "I want to make
+ * my own", click through, and get the printable line art.
+ */
+const COLORED_STATIC_FRAMING = `
+This is a finished colored coloring page (a single still image showing
+how the page looked after our Magic Brush colored it). It's posted RIGHT
+AFTER our product-demo reel so the audience just saw it being colored.
+The image they're seeing is the "after" state — the *blank* version is
+free to print + color from chunkycrayon.com.
+
+The caption must:
+- Acknowledge the demo reel they just watched ("you just saw it come
+  to life") OR stand alone if they missed it ("here's how today's
+  coloring page came out — yours can look totally different")
+- Drive the click: the static image is the *finished* artwork, the
+  *blank* version they can print + color is at chunkycrayon.com — free,
+  no signup needed to try.
+- Make it about the kid trying it, not us showing off.`;
+
+const INSTAGRAM_COLORED_STATIC_ADDENDUM = `
+${COLORED_STATIC_FRAMING}
+
+INSTAGRAM SINGLE IMAGE — drive a click to chunkycrayon.com:
+
+REQUIREMENTS:
+1. HOOK (first line): something that ties to the demo reel they just
+   saw OR teases the printable. Avoid "ASMR", "satisfying" framing.
+   Good: "Saw the AI color this one earlier? Now it's your kid's turn."
+         "We made this in seconds. Your kid can too — link in bio."
+2. SAVE TRIGGER: "Save this idea for your next bored-rainy-day moment".
+3. CTA: "Try it free at chunkycrayon.com — link in bio".
+4. 6-10 hashtags mixing #kidsactivities #coloringpage #freeprintable
+   #aiforkids #screenfreeplay.
+
+Remember: Output ONLY the caption text without labels.`;
+
+const FACEBOOK_COLORED_STATIC_ADDENDUM = `
+${COLORED_STATIC_FRAMING}
+
+FACEBOOK SINGLE IMAGE — warm, parent/grandparent voice:
+
+REQUIREMENTS:
+1. Open warmly: "Saw our short video earlier? This is how today's
+   coloring page came out — and the blank version is free at
+   chunkycrayon.com so your kid can have a go."
+2. SHARE TRIGGER: "Tag a parent or grandparent who'd love this for
+   the next car ride / rainy day".
+3. CTA: "Free at chunkycrayon.com — no signup needed to try".
+4. 2-3 family-friendly hashtags (#KidsActivities #FreePrintable).
+
+Remember: Output ONLY the post text without labels.`;
+
 export type InstagramPostType =
   | 'image'
   | 'carousel'
   | 'carousel_with_colored'
   | 'reel'
-  | 'demo_reel';
+  | 'demo_reel'
+  | 'colored_static';
 
 export const generateInstagramCaption = async (
   coloringImage: ColoringImage,
@@ -210,6 +265,8 @@ export const generateInstagramCaption = async (
     systemPrompt += INSTAGRAM_REEL_ADDENDUM;
   } else if (postType === 'demo_reel') {
     systemPrompt += INSTAGRAM_DEMO_REEL_ADDENDUM;
+  } else if (postType === 'colored_static') {
+    systemPrompt += INSTAGRAM_COLORED_STATIC_ADDENDUM;
   }
 
   const { text } = await generateText({
@@ -229,7 +286,8 @@ export type FacebookPostType =
   | 'image'
   | 'video'
   | 'image_with_video'
-  | 'demo_reel';
+  | 'demo_reel'
+  | 'colored_static';
 
 export const generateFacebookCaption = async (
   coloringImage: ColoringImage,
@@ -243,6 +301,8 @@ export const generateFacebookCaption = async (
     systemPrompt += FACEBOOK_IMAGE_WITH_VIDEO_ADDENDUM;
   } else if (postType === 'demo_reel') {
     systemPrompt += FACEBOOK_DEMO_REEL_ADDENDUM;
+  } else if (postType === 'colored_static') {
+    systemPrompt += FACEBOOK_COLORED_STATIC_ADDENDUM;
   }
 
   const { text } = await generateText({

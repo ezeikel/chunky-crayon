@@ -5,8 +5,8 @@ import {
   generateInstagramCaption,
   generateFacebookCaption,
   generatePinterestCaption,
-  generateTikTokCaption,
   generateLinkedInCaption,
+  generateTikTokCaption,
 } from '@/app/actions/social';
 import { sendSocialDigest, sendAdminAlert } from '@/app/actions/email';
 import type { SocialDigestEntry } from '@/app/actions/email';
@@ -64,25 +64,23 @@ export const GET = async (request: Request) => {
     // Generate all captions in parallel
     const [
       instagramCarouselCaption,
-      instagramReelCaption,
       instagramDemoReelCaption,
-      facebookVideoCaption,
+      instagramColoredStaticCaption,
       facebookImageCaption,
       facebookDemoReelCaption,
+      facebookColoredStaticCaption,
       pinterestCaption,
-      tiktokCaption,
       tiktokDemoReelCaption,
       linkedinCaption,
       linkedinDemoReelCaption,
     ] = await Promise.all([
       generateInstagramCaption(coloringImage, 'carousel'),
-      generateInstagramCaption(coloringImage, 'reel'),
       generateInstagramCaption(coloringImage, 'demo_reel'),
-      generateFacebookCaption(coloringImage, 'video'),
-      generateFacebookCaption(coloringImage, 'image_with_video'),
+      generateInstagramCaption(coloringImage, 'colored_static'),
+      generateFacebookCaption(coloringImage, 'image'),
       generateFacebookCaption(coloringImage, 'demo_reel'),
+      generateFacebookCaption(coloringImage, 'colored_static'),
       generatePinterestCaption(coloringImage),
-      generateTikTokCaption(coloringImage),
       generateTikTokCaption(coloringImage, 'demo_reel'),
       generateLinkedInCaption(coloringImage),
       generateLinkedInCaption(coloringImage, 'demo_reel'),
@@ -103,8 +101,13 @@ export const GET = async (request: Request) => {
     >;
     const wasAutoPosted = (key: string): boolean => !!results[key]?.success;
 
-    // Assemble digest entries
+    // Assemble digest entries — flow ordered like the cron slots:
+    //   1. Static carousel (line art for printing)
+    //   2. Static FB / Pinterest / LinkedIn (line art)
+    //   3. Demo reel (worker product video) across IG/FB/TikTok/LinkedIn/Pinterest
+    //   4. Colored-static (finished artwork CTA) on IG + FB
     const entries: SocialDigestEntry[] = [
+      // 1. Static carousel — line art printable
       {
         platform: 'Instagram Carousel',
         caption: instagramCarouselCaption,
@@ -112,31 +115,30 @@ export const GET = async (request: Request) => {
         assetType: 'image',
       },
       {
-        platform: 'Instagram Reel',
-        caption: instagramReelCaption,
-        autoPosted: wasAutoPosted('instagramReel'),
-        assetType: 'video',
-        assetUrl: videoAssetUrl,
+        platform: 'Facebook Image',
+        caption: facebookImageCaption,
+        autoPosted: wasAutoPosted('facebookImage'),
+        assetType: 'image',
       },
+      {
+        platform: 'Pinterest Image',
+        caption: pinterestCaption,
+        autoPosted: wasAutoPosted('pinterest'),
+        assetType: 'image',
+      },
+      {
+        platform: 'LinkedIn',
+        caption: linkedinCaption,
+        autoPosted: wasAutoPosted('linkedin'),
+        assetType: 'image',
+      },
+      // 2. Demo reel — product-demo video
       {
         platform: 'Instagram Demo Reel',
         caption: instagramDemoReelCaption,
         autoPosted: wasAutoPosted('instagramDemoReel'),
         assetType: 'video',
         assetUrl: coloringImage.demoReelUrl ?? undefined,
-      },
-      {
-        platform: 'Facebook Video',
-        caption: facebookVideoCaption,
-        autoPosted: wasAutoPosted('facebookVideo'),
-        assetType: 'video',
-        assetUrl: videoAssetUrl,
-      },
-      {
-        platform: 'Facebook Image',
-        caption: facebookImageCaption,
-        autoPosted: wasAutoPosted('facebookImage'),
-        assetType: 'image',
       },
       {
         platform: 'Facebook Demo Reel',
@@ -146,38 +148,12 @@ export const GET = async (request: Request) => {
         assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
       {
-        platform: 'Pinterest Image',
-        caption: pinterestCaption,
-        autoPosted: wasAutoPosted('pinterest'),
-        assetType: 'image',
-      },
-      {
-        platform: 'Pinterest Video',
-        caption: pinterestCaption,
-        autoPosted: wasAutoPosted('pinterestVideo'),
-        assetType: 'video',
-        assetUrl: videoAssetUrl,
-      },
-      {
-        platform: 'TikTok',
-        caption: tiktokCaption,
-        // TikTok always goes to drafts — never truly auto-published.
-        autoPosted: false,
-        assetType: 'video',
-        assetUrl: videoAssetUrl,
-      },
-      {
         platform: 'TikTok Demo Reel',
         caption: tiktokDemoReelCaption,
+        // TikTok always goes to drafts — never auto-published.
         autoPosted: false,
         assetType: 'video',
         assetUrl: coloringImage.demoReelUrl ?? undefined,
-      },
-      {
-        platform: 'LinkedIn',
-        caption: linkedinCaption,
-        autoPosted: wasAutoPosted('linkedin'),
-        assetType: 'image',
       },
       {
         platform: 'LinkedIn Demo Reel',
@@ -185,6 +161,28 @@ export const GET = async (request: Request) => {
         autoPosted: wasAutoPosted('linkedinDemoReel'),
         assetType: 'video',
         assetUrl: coloringImage.demoReelUrl ?? undefined,
+      },
+      {
+        platform: 'Pinterest Demo Reel',
+        caption: pinterestCaption,
+        autoPosted: wasAutoPosted('pinterestDemoReel'),
+        assetType: 'video',
+        assetUrl: coloringImage.demoReelUrl ?? undefined,
+      },
+      // 3. Colored static — finished artwork CTA
+      {
+        platform: 'Instagram Colored Static',
+        caption: instagramColoredStaticCaption,
+        autoPosted: wasAutoPosted('instagramColoredStatic'),
+        assetType: 'image',
+        assetUrl: coloringImage.demoReelCoverUrl ?? undefined,
+      },
+      {
+        platform: 'Facebook Colored Static',
+        caption: facebookColoredStaticCaption,
+        autoPosted: wasAutoPosted('facebookColoredStatic'),
+        assetType: 'image',
+        assetUrl: coloringImage.demoReelCoverUrl ?? undefined,
       },
     ];
 

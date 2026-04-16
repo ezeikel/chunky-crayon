@@ -34,29 +34,27 @@
       "schedule": "10 8 * * *"
     },
     {
+      "path": "/api/social/demo-reel/produce",
+      "schedule": "30 15 * * 1-5"
+    },
+
+    {
       "path": "/api/social/post?platform=instagram&type=carousel",
       "schedule": "0 16 * * 1-5"
     },
     {
-      "path": "/api/social/post?platform=instagram&type=reel",
+      "path": "/api/social/post?platform=facebook",
       "schedule": "5 16 * * 1-5"
     },
     {
-      "path": "/api/social/post?platform=facebook",
-      "schedule": "10 16 * * 1-5"
-    },
-    {
       "path": "/api/social/post?platform=pinterest",
-      "schedule": "12 16 * * 1-5"
+      "schedule": "10 16 * * 1-5"
     },
     {
       "path": "/api/social/post?platform=linkedin",
       "schedule": "15 16 * * 1-5"
     },
-    {
-      "path": "/api/social/demo-reel/produce",
-      "schedule": "30 15 * * 1-5"
-    },
+
     {
       "path": "/api/social/post?type=demo-reel&platform=instagram",
       "schedule": "30 16 * * 1-5"
@@ -77,30 +75,38 @@
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
       "schedule": "50 16 * * 1-5"
     },
+
+    {
+      "path": "/api/social/post?type=colored-static&platform=instagram",
+      "schedule": "55 16 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?type=colored-static&platform=facebook",
+      "schedule": "0 17 * * 1-5"
+    },
+
+    {
+      "path": "/api/social/demo-reel/produce",
+      "schedule": "30 14 * * 0,6"
+    },
+
     {
       "path": "/api/social/post?platform=instagram&type=carousel",
       "schedule": "0 15 * * 0,6"
     },
     {
-      "path": "/api/social/post?platform=instagram&type=reel",
+      "path": "/api/social/post?platform=facebook",
       "schedule": "5 15 * * 0,6"
     },
     {
-      "path": "/api/social/post?platform=facebook",
-      "schedule": "10 15 * * 0,6"
-    },
-    {
       "path": "/api/social/post?platform=pinterest",
-      "schedule": "12 15 * * 0,6"
+      "schedule": "10 15 * * 0,6"
     },
     {
       "path": "/api/social/post?platform=linkedin",
       "schedule": "15 15 * * 0,6"
     },
-    {
-      "path": "/api/social/demo-reel/produce",
-      "schedule": "30 14 * * 0,6"
-    },
+
     {
       "path": "/api/social/post?type=demo-reel&platform=instagram",
       "schedule": "30 15 * * 0,6"
@@ -121,6 +127,16 @@
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
       "schedule": "50 15 * * 0,6"
     },
+
+    {
+      "path": "/api/social/post?type=colored-static&platform=instagram",
+      "schedule": "55 15 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=colored-static&platform=facebook",
+      "schedule": "0 16 * * 0,6"
+    },
+
     {
       "path": "/api/social/tiktok/post",
       "schedule": "20 16 * * 1-5"

@@ -149,9 +149,11 @@ type SocialPostResults = {
   instagramCarousel?: PlatformResult;
   instagramReel?: PlatformResult;
   instagramDemoReel?: PlatformResult;
+  instagramColoredStatic?: PlatformResult;
   facebookImage?: PlatformResult;
   facebookVideo?: PlatformResult;
   facebookDemoReel?: PlatformResult;
+  facebookColoredStatic?: PlatformResult;
   pinterest?: PlatformResult;
   pinterestVideo?: PlatformResult;
   pinterestDemoReel?: PlatformResult;
@@ -1277,6 +1279,142 @@ const handleRequest = async (request: Request) => {
       );
     }
 
+    // ---------------------------------------------------------------------
+    // COLORED-STATIC MODE — single image of the FINISHED colored artwork.
+    //
+    // Posts AFTER the demo reel so audience that just watched the AI
+    // colour it is now nudged to print/colour the *blank* version
+    // themselves at chunkycrayon.com. CTA-driven, not entertainment.
+    //
+    // Uses coloringImage.demoReelCoverUrl (the worker-captured composite
+    // of line art + Magic Brush colours). Posts to IG + FB only — TikTok
+    // doesn't take stills, LinkedIn already has a static post elsewhere,
+    // Pinterest's image pin is a different audience play (line art).
+    // ---------------------------------------------------------------------
+    if (typeFilter === 'colored-static') {
+      // Same fallback rule as demo-reel: prefer today's image, otherwise
+      // pick the most recent one that has both demoReelCoverUrl set.
+      if (!coloringImage.demoReelCoverUrl) {
+        const todayStart = new Date();
+        todayStart.setUTCHours(0, 0, 0, 0);
+        const withCover = await db.coloringImage.findFirst({
+          where: {
+            brand: BRAND,
+            demoReelCoverUrl: { not: null },
+            createdAt: { gte: todayStart },
+          },
+          orderBy: { createdAt: 'desc' },
+        });
+        if (withCover) {
+          console.log(
+            `[ColoredStatic] Today's image ${coloringImage.id} has no cover yet — using ${withCover.id}`,
+          );
+          coloringImage = withCover;
+        } else {
+          const message = `No demoReelCoverUrl on today's image yet — produce cron may still be running. Skipping ${platformFilter ?? 'all'}.`;
+          console.warn(`[ColoredStatic] ${message}`);
+          return NextResponse.json(
+            { success: false, message, skipped: true },
+            { status: 200, headers: corsHeaders },
+          );
+        }
+      }
+
+      const coverUrl = coloringImage.demoReelCoverUrl;
+      if (!coverUrl) {
+        return NextResponse.json(
+          { success: false, error: 'demoReelCoverUrl unexpectedly null' },
+          { status: 500, headers: corsHeaders },
+        );
+      }
+
+      const coloredResults = {
+        instagram: null as string | null,
+        facebook: null as string | null,
+        errors: [] as string[],
+      };
+      const platformResults: SocialPostResults = {};
+
+      // Instagram single-image post
+      if (shouldPost('instagram')) {
+        const caption = await generateInstagramCaption(
+          coloringImage,
+          'colored_static',
+        );
+        try {
+          const containerId = await createInstagramMediaContainer(
+            coverUrl,
+            caption,
+          );
+          await waitForMediaReady(containerId, 20, 3000);
+          const mediaId = await publishInstagramMedia(containerId);
+          coloredResults.instagram = mediaId;
+          platformResults.instagramColoredStatic = {
+            success: true,
+            mediaId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
+        } catch (err) {
+          console.error('[ColoredStatic] IG failed:', err);
+          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+          coloredResults.errors.push(`Instagram: ${errorMsg}`);
+          platformResults.instagramColoredStatic = {
+            success: false,
+            caption,
+            error: errorMsg,
+          };
+        }
+      }
+
+      // Facebook single-image post
+      if (shouldPost('facebook')) {
+        const caption = await generateFacebookCaption(
+          coloringImage,
+          'colored_static',
+        );
+        try {
+          const postId = await postToFacebookPage(coverUrl, caption);
+          coloredResults.facebook = postId;
+          platformResults.facebookColoredStatic = {
+            success: true,
+            mediaId: postId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
+        } catch (err) {
+          console.error('[ColoredStatic] FB failed:', err);
+          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+          coloredResults.errors.push(`Facebook: ${errorMsg}`);
+          platformResults.facebookColoredStatic = {
+            success: false,
+            caption,
+            error: errorMsg,
+          };
+        }
+      }
+
+      try {
+        await mergeSocialPostResults(coloringImage.id, platformResults);
+      } catch (err) {
+        console.error('[ColoredStatic] persist results failed:', err);
+      }
+
+      const hasSuccess = coloredResults.instagram || coloredResults.facebook;
+      return NextResponse.json(
+        {
+          success: hasSuccess,
+          type: 'colored-static',
+          coverUrl,
+          results: coloredResults,
+        },
+        {
+          status: hasSuccess ? 200 : 500,
+          headers: corsHeaders,
+        },
+      );
+    }
+
     const results = {
       instagram: null as string | null,
       instagramReel: null as string | null, // Separate Reel for discovery
@@ -1287,6 +1425,10 @@ const handleRequest = async (request: Request) => {
       linkedin: null as string | null,
       errors: [] as string[],
     };
+
+    // Per-platform results merged into coloringImage.socialPostResults at
+    // the end so /api/social/digest reflects what actually posted.
+    const staticPlatformResults: SocialPostResults = {};
 
     // post to Instagram
     if (shouldPost('instagram')) {
@@ -1313,6 +1455,7 @@ const handleRequest = async (request: Request) => {
       // Post 1: Image post (single image or carousel with colored example)
       // Video is handled separately as a Reel for proper 9:16 display
       if (shouldPostInstagramType('carousel')) {
+        let instagramCaptionForResults = '';
         try {
           let instagramMediaId: string;
 
@@ -1324,7 +1467,6 @@ const handleRequest = async (request: Request) => {
 
           if (hasColoredExample) {
             // Carousel: Colored example + B&W image (2 slides)
-            // Colored first for scroll-stopping color in feed, B&W second as the printable
             console.log(
               '[Instagram] Creating carousel with colored example...',
             );
@@ -1333,58 +1475,38 @@ const handleRequest = async (request: Request) => {
               coloringImage,
               'carousel_with_colored',
             );
+            instagramCaptionForResults = instagramCaption ?? '';
 
             if (!instagramCaption) {
               throw new Error('failed to generate Instagram caption');
             }
 
-            // Build carousel slides array
             const carouselChildren: string[] = [];
-
-            // Slide 1: Colored example (eye-catching, stops the scroll)
             console.log('[Instagram] Adding colored example as first slide...');
             const coloredContainerId =
               await createInstagramImageContainerForCarousel(coloredExampleUrl);
-            console.log(
-              '[Instagram] Colored example container created:',
-              coloredContainerId,
-            );
             carouselChildren.push(coloredContainerId);
 
-            // Slide 2: Static B&W coloring page (the printable)
             const imageContainerId =
               await createInstagramImageContainerForCarousel(
                 instagramImageUrl!,
               );
-            console.log(
-              '[Instagram] B&W image container created:',
-              imageContainerId,
-            );
             carouselChildren.push(imageContainerId);
 
-            console.log('[Instagram] Creating 2-slide carousel...');
-
-            // Create carousel container
             const carouselId = await createInstagramCarouselContainer(
               carouselChildren,
               instagramCaption,
             );
-            console.log('[Instagram] Carousel container created:', carouselId);
-
-            // Wait for carousel to be ready
             await waitForMediaReady(carouselId, 20, 3000);
-
-            // Publish carousel
             instagramMediaId = await publishInstagramMedia(carouselId);
             console.log('[Instagram] Carousel published:', instagramMediaId);
           } else {
-            // Single image post (no colored example)
             console.log('[Instagram] Posting single image...');
-
             const instagramCaption = await generateInstagramCaption(
               coloringImage,
               'image',
             );
+            instagramCaptionForResults = instagramCaption ?? '';
 
             if (!instagramCaption) {
               throw new Error('failed to generate Instagram caption');
@@ -1394,20 +1516,28 @@ const handleRequest = async (request: Request) => {
               instagramImageUrl!,
               instagramCaption,
             );
-
-            // Wait for media to be ready before publishing
             await waitForMediaReady(creationId, 20, 3000);
-
             instagramMediaId = await publishInstagramMedia(creationId);
           }
 
           results.instagram = instagramMediaId;
+          staticPlatformResults.instagramCarousel = {
+            success: true,
+            mediaId: instagramMediaId,
+            caption: instagramCaptionForResults,
+            postedAt: new Date().toISOString(),
+          };
           console.log('Successfully posted to Instagram:', instagramMediaId);
         } catch (error) {
           console.error('Error posting to Instagram:', error);
-          results.errors.push(
-            `Instagram: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          );
+          const errorMsg =
+            error instanceof Error ? error.message : 'Unknown error';
+          results.errors.push(`Instagram: ${errorMsg}`);
+          staticPlatformResults.instagramCarousel = {
+            success: false,
+            caption: instagramCaptionForResults,
+            error: errorMsg,
+          };
         }
       }
 
@@ -1498,6 +1628,7 @@ const handleRequest = async (request: Request) => {
       }
 
       // Post 2: Image (always post - either standalone or as companion to video)
+      let imageCaptionForResults = '';
       try {
         console.log('[Facebook] Posting image...');
 
@@ -1508,6 +1639,7 @@ const handleRequest = async (request: Request) => {
           coloringImage,
           postType,
         );
+        imageCaptionForResults = imageCaption ?? '';
 
         if (!imageCaption) {
           throw new Error('failed to generate Facebook image caption');
@@ -1525,40 +1657,48 @@ const handleRequest = async (request: Request) => {
           results.facebook = facebookImageId;
         }
 
+        staticPlatformResults.facebookImage = {
+          success: true,
+          mediaId: facebookImageId,
+          caption: imageCaptionForResults,
+          postedAt: new Date().toISOString(),
+        };
         console.log('Successfully posted image to Facebook:', facebookImageId);
       } catch (error) {
         console.error('Error posting image to Facebook:', error);
-        results.errors.push(
-          `Facebook Image: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
+        const errorMsg =
+          error instanceof Error ? error.message : 'Unknown error';
+        results.errors.push(`Facebook Image: ${errorMsg}`);
+        staticPlatformResults.facebookImage = {
+          success: false,
+          caption: imageCaptionForResults,
+          error: errorMsg,
+        };
       }
     }
 
     // post to Pinterest
     if (shouldPost('pinterest')) {
       // Post 1: Image pin (static coloring page for search traffic)
+      let pinterestImageCaptionForResults = '';
       try {
-        // convert svg to jpeg for Pinterest (reuse instagram dimensions - square works well)
         const pinterestBuffer = await convertSvgToJpeg(
           coloringImage.svgUrl,
-          'instagram', // reuse instagram dimensions for Pinterest (1080x1080 square)
+          'instagram', // reuse 1080x1080 square
         );
-
-        // upload to temporary storage
         const pinterestImageUrl = await uploadToTempStorage(
           pinterestBuffer,
           'pinterest',
         );
         tempFiles.push(pinterestImageUrl.split('/').pop() || '');
 
-        // generate Pinterest caption (description)
         const pinterestCaption = await generatePinterestCaption(coloringImage);
+        pinterestImageCaptionForResults = pinterestCaption ?? '';
 
         if (!pinterestCaption) {
           throw new Error('failed to generate Pinterest caption');
         }
 
-        // post to Pinterest
         const pinterestPinId = await postToPinterest(
           pinterestImageUrl,
           coloringImage.title ?? 'Free Coloring Page',
@@ -1567,12 +1707,23 @@ const handleRequest = async (request: Request) => {
         );
 
         results.pinterest = pinterestPinId;
+        staticPlatformResults.pinterest = {
+          success: true,
+          mediaId: pinterestPinId,
+          caption: pinterestImageCaptionForResults,
+          postedAt: new Date().toISOString(),
+        };
         console.log('Successfully posted image to Pinterest:', pinterestPinId);
       } catch (error) {
         console.error('Error posting image to Pinterest:', error);
-        results.errors.push(
-          `Pinterest Image: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
+        const errorMsg =
+          error instanceof Error ? error.message : 'Unknown error';
+        results.errors.push(`Pinterest Image: ${errorMsg}`);
+        staticPlatformResults.pinterest = {
+          success: false,
+          caption: pinterestImageCaptionForResults,
+          error: errorMsg,
+        };
       }
 
       // Post 2: Video pin (animated coloring page for engagement)
@@ -1623,12 +1774,13 @@ const handleRequest = async (request: Request) => {
       process.env.LINKEDIN_ACCESS_TOKEN &&
       process.env.LINKEDIN_ORGANIZATION_ID
     ) {
+      let linkedInCaptionForResults = '';
       try {
         console.log('[LinkedIn] Posting image...');
 
         const linkedInBuffer = await convertSvgToJpeg(
           coloringImage.svgUrl,
-          'instagram', // 1080x1080 square is a good fit for LinkedIn feed
+          'instagram',
         );
         const linkedInImageUrl = await uploadToTempStorage(
           linkedInBuffer,
@@ -1637,6 +1789,7 @@ const handleRequest = async (request: Request) => {
         tempFiles.push(linkedInImageUrl.split('/').pop() || '');
 
         const linkedInCaption = await generateLinkedInCaption(coloringImage);
+        linkedInCaptionForResults = linkedInCaption ?? '';
         if (!linkedInCaption) {
           throw new Error('failed to generate LinkedIn caption');
         }
@@ -1646,15 +1799,34 @@ const handleRequest = async (request: Request) => {
           linkedInCaption,
         );
         results.linkedin = linkedInPostId;
+        staticPlatformResults.linkedin = {
+          success: true,
+          mediaId: linkedInPostId,
+          caption: linkedInCaptionForResults,
+          postedAt: new Date().toISOString(),
+        };
         console.log('Successfully posted image to LinkedIn:', linkedInPostId);
       } catch (error) {
         console.error('Error posting image to LinkedIn:', error);
-        results.errors.push(
-          `LinkedIn: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
+        const errorMsg =
+          error instanceof Error ? error.message : 'Unknown error';
+        results.errors.push(`LinkedIn: ${errorMsg}`);
+        staticPlatformResults.linkedin = {
+          success: false,
+          caption: linkedInCaptionForResults,
+          error: errorMsg,
+        };
       }
     }
 
+    // Persist per-platform outcomes for the digest cron.
+    if (Object.keys(staticPlatformResults).length > 0) {
+      try {
+        await mergeSocialPostResults(coloringImage.id, staticPlatformResults);
+      } catch (err) {
+        console.error('[Social] Failed to persist socialPostResults:', err);
+      }
+    }
     // return results
     const hasSuccess =
       results.instagram ||
