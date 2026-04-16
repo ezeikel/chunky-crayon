@@ -3,7 +3,10 @@ import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
 import { generateRegionStore } from '@/app/actions/generate-regions';
 
-export const maxDuration = 900; // 15 minutes — some images have 500+ regions and the labelling pass alone takes 2-3 minutes at that scale
+// Pro-plan cap is 300s. Images with 500+ regions may partially fail
+// here — run the regeneration from CLI against a longer-running worker
+// if this becomes a recurring bottleneck.
+export const maxDuration = 300;
 
 /**
  * Dev-only: regenerate the region store for a single coloring image.
