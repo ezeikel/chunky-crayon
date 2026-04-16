@@ -18,11 +18,14 @@ export const maxDuration = 300;
  *   curl -X POST http://localhost:3000/api/dev/regenerate-region-store/<id>
  */
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ error: 'Not available' }, { status: 404 });
+    const auth = request.headers.get('authorization');
+    if (!auth || auth !== `Bearer ${process.env.WORKER_SECRET}`) {
+      return NextResponse.json({ error: 'Not available' }, { status: 404 });
+    }
   }
 
   await connection();

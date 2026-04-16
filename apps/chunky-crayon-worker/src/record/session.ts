@@ -29,6 +29,13 @@ export type RecordSessionOptions = {
    * Per-character delay when typing the prompt (ms). Slower = more natural.
    */
   typingDelayMs?: number;
+  /**
+   * Called once the image has been created and we have its ID (right after
+   * redirect to /coloring-image/:id). Fire-and-forget — the recording
+   * continues independently. Use this to trigger region-store generation
+   * on CC so it runs in parallel with the line-art / canvas-sizing waits.
+   */
+  onImageCreated?: (imageId: string) => void;
 };
 
 /**
@@ -165,6 +172,10 @@ export async function recordColoringSession(
     if (!match) throw new Error(`Could not extract image id from URL: ${url}`);
     imageId = match[1];
     log(`redirected to image ${imageId} (${elapsed()}s since submit)`);
+
+    if (opts.onImageCreated) {
+      opts.onImageCreated(imageId);
+    }
 
     // ── 3. Wait for line art to paint ────────────────────────────────────
     log("waiting for line art canvas to paint");

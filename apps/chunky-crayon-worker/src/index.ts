@@ -160,11 +160,37 @@ app.post("/publish/reel", async (c) => {
 
   // 1. Playwright — drive the homepage create flow and record the reveal.
   const origin = process.env.CC_ORIGIN ?? "http://localhost:3000";
+  const workerSecret = process.env.WORKER_SECRET;
   const recording = await recordColoringSession({
     prompt: prompt as string,
     origin,
     sweep: body.sweep ?? "diagonal",
     outDir: WORKER_OUT_DIR,
+    onImageCreated: (id) => {
+      // Fire region-store generation on CC in the background. The
+      // after() hook on Vercel often times out for this heavy task, so
+      // we explicitly trigger it here. The Playwright session's
+      // region-store poll will pick it up once CC finishes.
+      console.log(`[/publish/reel] triggering region-store regen for ${id}`);
+      fetch(`${origin}/api/dev/regenerate-region-store/${id}`, {
+        method: "POST",
+        headers: workerSecret
+          ? { Authorization: `Bearer ${workerSecret}` }
+          : {},
+        signal: AbortSignal.timeout(5 * 60_000),
+      })
+        .then((r) =>
+          console.log(
+            `[/publish/reel] region-store regen response: ${r.status}`,
+          ),
+        )
+        .catch((err) =>
+          console.warn(
+            `[/publish/reel] region-store regen failed (after() may still succeed):`,
+            err instanceof Error ? err.message : err,
+          ),
+        );
+    },
   });
 
   // 2. Fetch the image's ambient sound URL from the DB, and use its title
