@@ -310,6 +310,21 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     useEffect(() => {
       if (!isMagicToolActive || !canvasReadyRef.current) return;
 
+      // Region store (pre-computed server-side) is the preferred source
+      // for BOTH magic-reveal and magic-auto. When it's ready, nothing
+      // below is needed — magic-reveal reads from preColoredCanvasRef
+      // directly in ImageCanvas, magic-auto uses handleRegionStoreAutoColor
+      // in the effect at line 737. The legacy useMagicColorMap warm-up +
+      // on-demand fill-points generation below is only relevant for old
+      // images without regionMapUrl.
+      //
+      // Without this short-circuit the modal-gating state
+      // (isGeneratingFillPoints) gets flipped to true for images that
+      // happen to lack fillPointsJson — which puts the magic-colors
+      // overlay on screen and, if the on-demand server action 504s,
+      // keeps it there forever.
+      if (regionStore.state.isReady) return;
+
       // For magic-auto with fill points, skip region detection entirely
       // (handled by the auto-fill effect below)
       if (activeTool === 'magic-auto' && fillPointsData) return;
@@ -341,6 +356,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       magicColorMapState.isReady,
       magicColorMapState.isLoading,
       generateColorMap,
+      regionStore.state.isReady,
     ]);
 
     // Handle auto-color - fill regions progressively for visual feedback
@@ -1096,11 +1112,13 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             }
           />
 
-          {/* Magic Loading Overlay — analysing image / generating fill points.
-           * Styled to match the Start Over modal language: chunky card with
-           * a coloured icon badge, bold title, body copy, then a single
-           * sweeping progress bar (no separate spinner). */}
+          {/* Magic Loading Overlay — only relevant on the LEGACY path
+           * (on-demand fill-points gen / 5×5 colour-map generation for
+           * old images that don't have a region store yet). When the
+           * region store is ready, both magic tools draw from it
+           * directly so no prep work / modal is needed. */}
           {isMagicToolActive &&
+            !regionStore.state.isReady &&
             (magicColorMapState.isLoading || isGeneratingFillPoints) && (
               <div
                 className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6"
