@@ -177,10 +177,11 @@ app.post("/publish/reel", async (c) => {
         `[/publish/reel] starting in-process region-store gen for ${id}`,
       );
       (async () => {
-        // svgUrl lands a few seconds after the redirect (CC traces the
-        // raster to SVG + uploads to R2 inside the create flow). Poll
-        // up to 90s for it to appear before bailing.
-        const pollUntil = Date.now() + 90_000;
+        // svgUrl lands after the redirect (CC traces the raster to SVG +
+        // uploads to R2 inside the create flow, then runs image-metadata
+        // generation). In practice this takes 90-180s on prod. Poll up
+        // to 4 min before giving up.
+        const pollUntil = Date.now() + 4 * 60_000;
         let row: {
           svgUrl: string | null;
           title: string | null;
