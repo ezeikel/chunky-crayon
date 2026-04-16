@@ -211,24 +211,29 @@ export async function recordColoringSession(
     log(`drawing canvas sized: ${canvasDims.w}×${canvasDims.h}`);
 
     // ── 4b. Wait for region store to land ────────────────────────────────
-    // ColoringArea polls the DB after mount and calls router.refresh() when
-    // the post-create pipeline has finished backfilling regionMapUrl. After
-    // refresh the ImageCanvas effect rebuilds the pre-coloured canvas at
-    // full size, which logs "[ImageCanvas] Pre-coloured canvas built".
-    // Wait for THAT specific log with a reasonable dimension so we know the
-    // magic-brush reveal path will use region-store (not the legacy colour
-    // map fallback). Times out after 3 min — by then the image either has
-    // regions or we give up and accept the legacy reveal.
+    // ColoringArea polls the DB after mount and calls router.refresh()
+    // when the post-create pipeline has finished backfilling regionMapUrl.
+    // After refresh the ImageCanvas effect rebuilds the pre-coloured
+    // canvas at full size. We MUST wait for that — falling through to
+    // the legacy reveal path triggers CC's "Mixing the magic colours!"
+    // modal which (a) can hang for minutes while server-side fill-points
+    // gen fails, (b) sits over the canvas so the sweep paints nothing,
+    // (c) is visible in the final reel to viewers. None of that is
+    // acceptable.
+    //
+    // Fail HARD if region store never arrives. The worker runs its own
+    // in-process gen (typically ~90-180s, up to 4min on complex images)
+    // so a 15-min wait is plenty of slack. If we still don't see it,
+    // something is genuinely broken upstream and we should surface the
+    // error, not ship a bad reel.
     log("waiting for region store to hydrate (preColoured canvas >= 400px)");
-    // Complex images (lots of regions) can take 5+ min to backfill. Give it
-    // a generous budget — we'd rather wait than fall back to the legacy
-    // colour-map path which produces blobby / wrong-colour reveals.
-    const regionReady = await waitForRegionStoreReady(page, 10 * 60_000);
-    if (regionReady) {
-      log(`region store ready — preColoured canvas built at ${regionReady}`);
-    } else {
-      log("region store wait timed out — proceeding with legacy reveal path");
+    const regionReady = await waitForRegionStoreReady(page, 15 * 60_000);
+    if (!regionReady) {
+      throw new Error(
+        "Region store never landed after 15min wait — refusing to fall through to legacy reveal path (it shows the 'Mixing the magic colours' modal in the final reel). Check worker logs for [region-store] saved/failed, and CC prod for checkRegionStoreReady results.",
+      );
     }
+    log(`region store ready — preColoured canvas built at ${regionReady}`);
 
     // ── 5. Activate Magic Brush + pick size ──────────────────────────────
     log("selecting Magic Brush (first time)");
@@ -303,38 +308,50 @@ export async function recordColoringSession(
     // will see at the very end of the reel.
     try {
       log("capturing finished cover frame from canvases");
-      const dataUrl = await page.evaluate(() => {
-        const canvases = Array.from(
-          document.querySelectorAll<HTMLCanvasElement>("canvas"),
+      const result = await page.evaluate(() => {
+        const drawingCanvas = document.querySelector<HTMLCanvasElement>(
+          'canvas[data-testid="drawing-canvas"]',
         );
-        // ImageCanvas mounts two canvases: drawing (user colours) + image
-        // (line art). They sit at the same dimensions, stacked. We can't
-        // distinguish them via a stable testid, but the larger one is the
-        // image canvas and they share dimensions when sized — use both.
-        const sized = canvases.filter((c) => c.width > 100 && c.height > 100);
-        if (sized.length < 2) return null;
-        const [drawingCanvas, imageCanvas] = sized;
+        const imageCanvas = document.querySelector<HTMLCanvasElement>(
+          'canvas[data-testid="image-canvas"]',
+        );
+        if (!drawingCanvas || !imageCanvas) {
+          return {
+            ok: false as const,
+            reason: `missing canvas — drawing:${!!drawingCanvas} image:${!!imageCanvas}`,
+          };
+        }
+        // Same recipe as ImageCanvas.getCompositeCanvas: white base,
+        // drawing canvas (user colours) first, then line art on top
+        // with multiply blend.
         const composite = document.createElement("canvas");
         composite.width = drawingCanvas.width;
         composite.height = drawingCanvas.height;
         const ctx = composite.getContext("2d");
-        if (!ctx) return null;
+        if (!ctx) return { ok: false as const, reason: "no 2d context" };
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, composite.width, composite.height);
         ctx.drawImage(drawingCanvas, 0, 0);
         ctx.globalCompositeOperation = "multiply";
         ctx.drawImage(imageCanvas, 0, 0);
         ctx.globalCompositeOperation = "source-over";
-        return composite.toDataURL("image/jpeg", 0.92);
+        return {
+          ok: true as const,
+          dataUrl: composite.toDataURL("image/jpeg", 0.92),
+          drawingSize: `${drawingCanvas.width}×${drawingCanvas.height}`,
+          imageSize: `${imageCanvas.width}×${imageCanvas.height}`,
+        };
       });
-      if (dataUrl?.startsWith("data:image/jpeg;base64,")) {
+      if (result.ok && result.dataUrl.startsWith("data:image/jpeg;base64,")) {
         coverJpeg = Buffer.from(
-          dataUrl.slice("data:image/jpeg;base64,".length),
+          result.dataUrl.slice("data:image/jpeg;base64,".length),
           "base64",
         );
-        log(`cover frame captured (${coverJpeg.byteLength} bytes)`);
-      } else {
-        log("cover frame capture returned no dataUrl — skipping");
+        log(
+          `cover frame captured (${coverJpeg.byteLength} bytes, drawing=${result.drawingSize} image=${result.imageSize})`,
+        );
+      } else if (!result.ok) {
+        log(`cover frame capture skipped: ${result.reason}`);
       }
     } catch (err) {
       console.warn(
@@ -558,20 +575,29 @@ async function waitForMagicColorsReady(page: Page): Promise<void> {
   console.log(
     `[record] magic-colors modal ${modalPresent ? "detected — waiting for it to detach" : "not present (already prepared?)"}`,
   );
+  if (!modalPresent) return;
+
   const start = Date.now();
-  await page
-    .locator('[data-testid="magic-colors-loading"]')
-    .waitFor({ state: "detached", timeout: 5 * 60_000 })
-    .catch((err) => {
-      console.log(
-        `[record] magic-colors waitFor detached ended: ${err?.message ?? "already detached"}`,
-      );
-    });
-  if (modalPresent) {
-    console.log(
-      `[record] magic-colors modal detached after ${((Date.now() - start) / 1000).toFixed(1)}s`,
+  try {
+    await page
+      .locator('[data-testid="magic-colors-loading"]')
+      .waitFor({ state: "detached", timeout: 5 * 60_000 });
+  } catch (err) {
+    // Fail HARD if the modal never detaches — it means server-side prep
+    // (fill points, color map etc.) failed/timed out on CC. Continuing
+    // and sweeping anyway produces a blank reel: the modal covers the
+    // canvas so the sweep never hits it and nothing paints. Better to
+    // fail the whole run so the caller can retry.
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+    throw new Error(
+      `magic-colors modal never detached after ${elapsed}s — server-side prep stuck. Root cause likely upstream (region-store gen or fill-points endpoint). Original: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
     );
   }
+  console.log(
+    `[record] magic-colors modal detached after ${((Date.now() - start) / 1000).toFixed(1)}s`,
+  );
 }
 
 async function selectLargeBrush(page: Page): Promise<void> {

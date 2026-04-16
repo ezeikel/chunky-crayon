@@ -2224,6 +2224,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         >
           <canvas
             className="w-full h-auto touch-none select-none"
+            data-testid="drawing-canvas"
             style={{
               touchAction: "none",
               WebkitUserSelect: "none",
@@ -2239,6 +2240,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           />
           <canvas
             className="absolute top-0 left-0 w-full h-auto pointer-events-none mix-blend-multiply"
+            data-testid="image-canvas"
             ref={imageCanvasRef}
           />
         </div>

@@ -251,27 +251,51 @@ export async function generateRegionStoreLocal(
     return result;
   }
 
+  // R2 and Prisma have historically hung silently on the Hetzner worker
+  // when CPU+network is saturated (browser + Remotion + 4 parallel AI
+  // calls all running concurrently). Wrap each with an explicit timeout
+  // + log so we fail loudly instead of dying quietly.
+  const withTimeout = <T>(p: Promise<T>, ms: number, label: string) =>
+    Promise.race<T>([
+      p,
+      new Promise<T>((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`${label} timed out after ${ms}ms`)),
+          ms,
+        ),
+      ),
+    ]);
+
   const regionMapFileName = `uploads/coloring-images/${coloringImageId}/regions.bin.gz`;
-  const { url: regionMapUrl } = await put(
-    regionMapFileName,
-    result.regionMapGzipped,
-    {
+  console.log(
+    `[region-store] uploading region map to R2 for ${coloringImageId} (${result.regionMapGzipped.byteLength} bytes)`,
+  );
+  const { url: regionMapUrl } = await withTimeout(
+    put(regionMapFileName, result.regionMapGzipped, {
       access: "public",
       contentType: "application/gzip",
       allowOverwrite: true,
-    },
+    }),
+    60_000,
+    "R2 put regions.bin.gz",
   );
+  console.log(`[region-store] R2 upload done: ${regionMapUrl}`);
 
-  await db.coloringImage.update({
-    where: { id: coloringImageId, brand: Brand.CHUNKY_CRAYON },
-    data: {
-      regionMapUrl,
-      regionMapWidth: result.width,
-      regionMapHeight: result.height,
-      regionsJson: JSON.stringify(result.regionsJson),
-      regionsGeneratedAt: new Date(),
-    },
-  });
+  console.log(`[region-store] writing DB row for ${coloringImageId}`);
+  await withTimeout(
+    db.coloringImage.update({
+      where: { id: coloringImageId, brand: Brand.CHUNKY_CRAYON },
+      data: {
+        regionMapUrl,
+        regionMapWidth: result.width,
+        regionMapHeight: result.height,
+        regionsJson: JSON.stringify(result.regionsJson),
+        regionsGeneratedAt: new Date(),
+      },
+    }),
+    30_000,
+    "db.coloringImage.update region fields",
+  );
 
   console.log(
     `[region-store] saved for ${coloringImageId}: ${result.regionsJson.regions.length} regions, ${result.regionMapGzipped.byteLength} gz bytes`,
