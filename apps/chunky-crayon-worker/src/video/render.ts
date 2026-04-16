@@ -36,6 +36,7 @@ export async function renderDemoReel(
     serveUrl: bundleLocation,
     id: "DemoReel",
     inputProps: opts,
+    timeoutInMilliseconds: 120_000,
   });
 
   await renderMedia({
@@ -44,7 +45,7 @@ export async function renderDemoReel(
     codec: "h264",
     outputLocation: opts.outputPath,
     inputProps: opts,
-    timeoutInMilliseconds: 60_000,
+    timeoutInMilliseconds: 120_000,
     onBrowserLog: ({ type, text }) => {
       if (type === "error" || type === "warning") {
         console.log(`[remotion-browser:${type}] ${text}`);
