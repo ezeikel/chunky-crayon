@@ -110,9 +110,15 @@ export async function generateRegionStore(
 export async function checkRegionStoreReady(
   coloringImageId: string,
 ): Promise<{ ready: boolean }> {
+  const t0 = Date.now();
   const row = await db.coloringImage.findFirst({
     where: { id: coloringImageId, brand: BRAND },
-    select: { regionMapUrl: true },
+    select: { regionMapUrl: true, regionsGeneratedAt: true },
   });
-  return { ready: !!row?.regionMapUrl };
+  const elapsed = Date.now() - t0;
+  const ready = !!row?.regionMapUrl;
+  console.log(
+    `[checkRegionStoreReady] id=${coloringImageId} ready=${ready} regionMapUrl=${row?.regionMapUrl ?? 'null'} regionsGeneratedAt=${row?.regionsGeneratedAt?.toISOString() ?? 'null'} queryMs=${elapsed}`,
+  );
+  return { ready };
 }
