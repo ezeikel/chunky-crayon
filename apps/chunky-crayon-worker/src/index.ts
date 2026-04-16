@@ -177,18 +177,32 @@ app.post("/publish/reel", async (c) => {
         `[/publish/reel] starting in-process region-store gen for ${id}`,
       );
       (async () => {
-        const row = await db.coloringImage.findUnique({
-          where: { id },
-          select: {
-            svgUrl: true,
-            title: true,
-            description: true,
-            tags: true,
-          },
-        });
+        // svgUrl lands a few seconds after the redirect (CC traces the
+        // raster to SVG + uploads to R2 inside the create flow). Poll
+        // up to 90s for it to appear before bailing.
+        const pollUntil = Date.now() + 90_000;
+        let row: {
+          svgUrl: string | null;
+          title: string | null;
+          description: string | null;
+          tags: string[];
+        } | null = null;
+        while (Date.now() < pollUntil) {
+          row = await db.coloringImage.findUnique({
+            where: { id },
+            select: {
+              svgUrl: true,
+              title: true,
+              description: true,
+              tags: true,
+            },
+          });
+          if (row?.svgUrl) break;
+          await new Promise((r) => setTimeout(r, 2000));
+        }
         if (!row?.svgUrl) {
           console.warn(
-            `[/publish/reel] can't gen region store — no svgUrl yet for ${id}`,
+            `[/publish/reel] svgUrl never appeared for ${id} — skipping region gen`,
           );
           return;
         }
