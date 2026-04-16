@@ -959,81 +959,45 @@ const handleRequest = async (request: Request) => {
         errors: [] as string[],
       };
 
-      // Ensure we have a rendered mp4. Trigger the worker if missing.
+      // If today's image doesn't have a rendered reel yet, pick the most
+      // recent image that does. The separate /api/social/demo-reel/produce
+      // cron is responsible for triggering the Hetzner worker; this post
+      // route never waits on rendering (that'd blow past Vercel's 300s cap).
       if (!coloringImage.demoReelUrl) {
-        const workerUrl = process.env.CHUNKY_CRAYON_WORKER_URL;
-        const workerSecret = process.env.WORKER_SECRET;
-        if (!workerUrl) {
-          return NextResponse.json(
-            {
-              success: false,
-              error: 'CHUNKY_CRAYON_WORKER_URL not configured',
-            },
-            { status: 500, headers: corsHeaders },
-          );
-        }
-        try {
+        const todayStart = new Date();
+        todayStart.setUTCHours(0, 0, 0, 0);
+        const withReel = await db.coloringImage.findFirst({
+          where: {
+            brand: BRAND,
+            demoReelUrl: { not: null },
+            createdAt: { gte: todayStart },
+          },
+          orderBy: { createdAt: 'desc' },
+        });
+        if (withReel) {
           console.log(
-            `[DemoReel] No demoReelUrl on image ${coloringImage.id} — triggering worker ${workerUrl}/publish/reel`,
+            `[DemoReel] Today's image ${coloringImage.id} has no reel yet — using ${withReel.id} which does`,
           );
-          // Worker does scene fetch + recording + render + R2 upload + DB
-          // write. Can take 5-7 minutes end to end.
-          const res = await fetch(`${workerUrl}/publish/reel`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(workerSecret
-                ? { Authorization: `Bearer ${workerSecret}` }
-                : {}),
-            },
-            body: JSON.stringify({}), // worker fetches its own scene
-            signal: AbortSignal.timeout(10 * 60 * 1000),
-          });
-          if (!res.ok) {
-            const txt = await res.text().catch(() => '');
-            throw new Error(`worker ${res.status}: ${txt.slice(0, 200)}`);
-          }
-          // Worker wrote demoReelUrl to a (potentially different) image row —
-          // the one it generated. Re-fetch today's image to pick it up.
-          const refreshed = await db.coloringImage.findFirst({
-            where: { id: coloringImage.id },
-          });
-          if (refreshed) coloringImage = refreshed;
-          if (!coloringImage.demoReelUrl) {
-            // Worker generated a brand-new image row — switch to it.
-            const todayStart = new Date();
-            todayStart.setUTCHours(0, 0, 0, 0);
-            const freshest = await db.coloringImage.findFirst({
-              where: {
-                brand: BRAND,
-                demoReelUrl: { not: null },
-                createdAt: { gte: todayStart },
-              },
-              orderBy: { createdAt: 'desc' },
-            });
-            if (freshest) coloringImage = freshest;
-          }
-        } catch (err) {
-          console.error('[DemoReel] Worker trigger failed:', err);
+          coloringImage = withReel;
+        } else {
+          const message = `No demoReelUrl on today's image yet — the produce cron may still be running. Skipping ${platformFilter ?? 'all'}.`;
+          console.warn(`[DemoReel] ${message}`);
           return NextResponse.json(
-            {
-              success: false,
-              error: 'worker_failed',
-              details: err instanceof Error ? err.message : String(err),
-            },
-            { status: 502, headers: corsHeaders },
+            { success: false, message, skipped: true },
+            { status: 200, headers: corsHeaders },
           );
         }
-      }
-
-      if (!coloringImage.demoReelUrl) {
-        return NextResponse.json(
-          { success: false, error: 'demoReelUrl still missing after worker' },
-          { status: 500, headers: corsHeaders },
-        );
       }
 
       const reelUrl = coloringImage.demoReelUrl;
+      if (!reelUrl) {
+        // unreachable — we either swapped in a row with demoReelUrl or
+        // returned `skipped` above. Narrow for TypeScript.
+        return NextResponse.json(
+          { success: false, error: 'demoReelUrl unexpectedly null' },
+          { status: 500, headers: corsHeaders },
+        );
+      }
 
       // IG Reel
       if (shouldPost('instagram')) {
