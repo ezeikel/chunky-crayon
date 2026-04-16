@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
 import { readFile, stat, mkdir } from "node:fs/promises";
@@ -111,6 +111,36 @@ app.get("/tmp/:filename", async (c) => {
  * to coloringImage.demoReelUrl for the social post handler to pick up.
  */
 app.post("/publish/reel", async (c) => {
+  // Neon WebSocket keepalive — scoped to this handler only.
+  //
+  // The PrismaNeon adapter maintains a single WebSocket to Neon. Between
+  // Playwright phases the worker sits idle for 3-4 min (e.g. between the
+  // region-store upload and Playwright finishing the sweep). If the
+  // socket goes idle for too long Neon drops it, and the next DB call
+  // hangs on a half-open connection — we saw this as a silent 30s
+  // timeout on db.coloringImage.update right after R2 upload.
+  //
+  // A 60s SELECT 1 keeps the socket warm. We only run it during a reel
+  // job — starting on handler entry, clearing in the finally — so it
+  // doesn't prevent Neon's compute from auto-suspending between jobs
+  // (which would rack up compute-hours charges).
+  const keepaliveTimer = setInterval(() => {
+    db.$queryRaw`SELECT 1`.catch((err) => {
+      console.warn(
+        "[keepalive] Neon ping failed:",
+        err instanceof Error ? err.message : err,
+      );
+    });
+  }, 60_000);
+
+  try {
+    return await runPublishReel(c);
+  } finally {
+    clearInterval(keepaliveTimer);
+  }
+});
+
+async function runPublishReel(c: Context) {
   const body = await c.req
     .json<{
       prompt?: string;
@@ -445,7 +475,7 @@ app.post("/publish/reel", async (c) => {
       durationSecs: durationInFrames / fps,
     },
   });
-});
+}
 
 const port = parseInt(process.env.PORT ?? "3030", 10);
 serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {
