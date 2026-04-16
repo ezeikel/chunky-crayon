@@ -8,6 +8,7 @@ import { resolve } from "node:path";
 import { recordColoringSession } from "./record/session.js";
 import { renderDemoReel } from "./video/render.js";
 import { trimWebmToMp4 } from "./record/trim.js";
+import { generateRegionStoreLocal } from "./record/region-store.js";
 import { db } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
 import { generateReelScript } from "./script/generate.js";
@@ -165,29 +166,46 @@ app.post("/publish/reel", async (c) => {
     sweep: body.sweep ?? "diagonal",
     outDir: WORKER_OUT_DIR,
     onImageCreated: (id) => {
-      // Fire region-store generation on CC in the background. The
-      // after() hook on Vercel often times out for this heavy task, so
-      // we explicitly trigger it here. The Playwright session's
-      // region-store poll will pick it up once CC finishes.
-      console.log(`[/publish/reel] triggering region-store regen for ${id}`);
-      fetch(`${ccOrigin}/api/dev/regenerate-region-store/${id}`, {
-        method: "POST",
-        headers: workerSecret
-          ? { Authorization: `Bearer ${workerSecret}` }
-          : {},
-        signal: AbortSignal.timeout(5 * 60_000),
-      })
-        .then((r) =>
-          console.log(
-            `[/publish/reel] region-store regen response: ${r.status}`,
-          ),
-        )
-        .catch((err) =>
+      // Generate the region store in-process on the box. Vercel's after()
+      // hook times out on complex images (300s Pro cap) — running here
+      // has no timeout and plenty of CPU/RAM. The Playwright session's
+      // region-store poll will pick up the DB write once this finishes.
+      //
+      // Fire-and-forget: we don't await here so the recording can
+      // continue to the line-art / canvas-sizing waits in parallel.
+      console.log(
+        `[/publish/reel] starting in-process region-store gen for ${id}`,
+      );
+      (async () => {
+        const row = await db.coloringImage.findUnique({
+          where: { id },
+          select: {
+            svgUrl: true,
+            title: true,
+            description: true,
+            tags: true,
+          },
+        });
+        if (!row?.svgUrl) {
           console.warn(
-            `[/publish/reel] region-store regen failed (after() may still succeed):`,
+            `[/publish/reel] can't gen region store — no svgUrl yet for ${id}`,
+          );
+          return;
+        }
+        try {
+          await generateRegionStoreLocal(id, row.svgUrl, {
+            title: row.title ?? "",
+            description: row.description ?? "",
+            tags: (row.tags as string[]) ?? [],
+          });
+          console.log(`[/publish/reel] region-store gen done for ${id}`);
+        } catch (err) {
+          console.error(
+            `[/publish/reel] region-store gen failed for ${id}:`,
             err instanceof Error ? err.message : err,
-          ),
-        );
+          );
+        }
+      })();
     },
   });
 

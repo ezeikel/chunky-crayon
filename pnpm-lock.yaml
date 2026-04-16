@@ -672,6 +672,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.19.11
         version: 1.19.14(hono@4.11.9)
+      '@one-colored-pixel/coloring-core':
+        specifier: workspace:*
+        version: link:../../packages/coloring-core
       '@one-colored-pixel/db':
         specifier: workspace:*
         version: link:../../packages/db
