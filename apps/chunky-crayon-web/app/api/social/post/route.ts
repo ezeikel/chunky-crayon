@@ -131,6 +131,58 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
+/**
+ * Per-platform post outcome stored in coloringImage.socialPostResults.
+ * Each platform gets its own key — autoPosted in the digest reflects
+ * `success`, not a hardcoded assumption.
+ */
+type PlatformResult = {
+  success: boolean;
+  /** IG/FB media ID, LinkedIn URN, etc. */
+  mediaId?: string;
+  caption?: string;
+  postedAt?: string; // ISO
+  error?: string;
+};
+
+type SocialPostResults = {
+  instagramCarousel?: PlatformResult;
+  instagramReel?: PlatformResult;
+  instagramDemoReel?: PlatformResult;
+  facebookImage?: PlatformResult;
+  facebookVideo?: PlatformResult;
+  facebookDemoReel?: PlatformResult;
+  pinterest?: PlatformResult;
+  pinterestVideo?: PlatformResult;
+  pinterestDemoReel?: PlatformResult;
+  linkedin?: PlatformResult;
+  linkedinDemoReel?: PlatformResult;
+  tiktok?: PlatformResult;
+  tiktokDemoReel?: PlatformResult;
+};
+
+/**
+ * Merge new platform results into the row's existing `socialPostResults`
+ * JSON. We do a shallow merge keyed by platform so multiple cron runs
+ * (carousel at 16:00, reel at 16:05, demo-reel at 16:30 etc.) accumulate
+ * outcomes on the same row without overwriting each other.
+ */
+const mergeSocialPostResults = async (
+  coloringImageId: string,
+  partial: SocialPostResults,
+): Promise<void> => {
+  const row = await db.coloringImage.findUnique({
+    where: { id: coloringImageId },
+    select: { socialPostResults: true },
+  });
+  const existing = (row?.socialPostResults as SocialPostResults | null) ?? {};
+  const merged: SocialPostResults = { ...existing, ...partial };
+  await db.coloringImage.update({
+    where: { id: coloringImageId },
+    data: { socialPostResults: merged },
+  });
+};
+
 const convertSvgToJpeg = async (
   svgUrl: string,
   platform: 'instagram' | 'facebook',
@@ -371,7 +423,17 @@ const waitForMediaReady = async (
 const createInstagramReelContainer = async (
   videoUrl: string,
   caption: string,
+  coverUrl?: string,
 ) => {
+  const payload: Record<string, unknown> = {
+    media_type: 'REELS',
+    video_url: videoUrl,
+    caption,
+    share_to_feed: true, // Also share to main feed
+    access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+  };
+  if (coverUrl) payload.cover_url = coverUrl;
+
   const response = await fetch(
     `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media`,
     {
@@ -379,13 +441,7 @@ const createInstagramReelContainer = async (
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        media_type: 'REELS',
-        video_url: videoUrl,
-        caption,
-        share_to_feed: true, // Also share to main feed
-        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
-      }),
+      body: JSON.stringify(payload),
     },
   );
 
@@ -999,56 +1055,83 @@ const handleRequest = async (request: Request) => {
         );
       }
 
-      // IG Reel
+      // Per-platform results we'll merge into coloringImage.socialPostResults
+      // at the end so the digest cron can read accurate auto-posted flags.
+      const platformResults: SocialPostResults = {};
+
+      // IG Reel — pass the worker-captured colored cover so the reel
+      // thumbnail in feed/explore shows the finished artwork instead
+      // of a random video frame (often the dark Colo intro card).
       if (shouldPost('instagram')) {
+        const caption = await generateInstagramCaption(
+          coloringImage,
+          'demo_reel',
+        );
         try {
-          const caption = await generateInstagramCaption(
-            coloringImage,
-            'demo_reel',
-          );
           const containerId = await createInstagramReelContainer(
             reelUrl,
             caption,
+            coloringImage.demoReelCoverUrl ?? undefined,
           );
           await waitForMediaReady(containerId);
-          demoResults.instagramReel = await publishInstagramMedia(containerId);
+          const mediaId = await publishInstagramMedia(containerId);
+          demoResults.instagramReel = mediaId;
+          platformResults.instagramDemoReel = {
+            success: true,
+            mediaId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
         } catch (err) {
           console.error('[DemoReel] IG Reel failed:', err);
-          demoResults.errors.push(
-            `Instagram Reel: ${err instanceof Error ? err.message : 'Unknown error'}`,
-          );
+          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+          demoResults.errors.push(`Instagram Reel: ${errorMsg}`);
+          platformResults.instagramDemoReel = {
+            success: false,
+            caption,
+            error: errorMsg,
+          };
         }
       }
 
       // FB Reel (posted via the same video endpoint)
       if (shouldPost('facebook')) {
+        const caption = await generateFacebookCaption(
+          coloringImage,
+          'demo_reel',
+        );
         try {
-          const caption = await generateFacebookCaption(
-            coloringImage,
-            'demo_reel',
-          );
-          demoResults.facebook = await postVideoToFacebookPage(
+          const postId = await postVideoToFacebookPage(
             reelUrl,
             caption,
             coloringImage.title ?? 'Chunky Crayon demo',
           );
+          demoResults.facebook = postId;
+          platformResults.facebookDemoReel = {
+            success: true,
+            mediaId: postId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
         } catch (err) {
           console.error('[DemoReel] FB video failed:', err);
-          demoResults.errors.push(
-            `Facebook: ${err instanceof Error ? err.message : 'Unknown error'}`,
-          );
+          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+          demoResults.errors.push(`Facebook: ${errorMsg}`);
+          platformResults.facebookDemoReel = {
+            success: false,
+            caption,
+            error: errorMsg,
+          };
         }
       }
 
-      // TikTok
+      // TikTok — note that the underlying tiktok/post handler uploads to
+      // the user's TikTok Inbox/Drafts (sandbox API). It's a successful
+      // upload but NOT a published post — the user has to hit publish in
+      // the TikTok app. Reflect that in autoPosted=false on the digest.
       if (shouldPost('tiktok')) {
+        const caption = await generateTikTokCaption(coloringImage, 'demo_reel');
         try {
-          const caption = await generateTikTokCaption(
-            coloringImage,
-            'demo_reel',
-          );
-          // Hand off to the tiktok/post route via an internal call so we
-          // reuse the upload + inbox-publish flow (TikTok sandbox).
           const tiktokRes = await fetch(
             new URL('/api/social/tiktok/post', request.url).toString(),
             {
@@ -1068,13 +1151,23 @@ const handleRequest = async (request: Request) => {
             publishId?: string;
             id?: string;
           };
-          demoResults.tiktok =
-            tiktokJson.publishId ?? tiktokJson.id ?? 'posted';
+          const draftId = tiktokJson.publishId ?? tiktokJson.id ?? 'queued';
+          demoResults.tiktok = draftId;
+          platformResults.tiktokDemoReel = {
+            success: false, // sandbox API → drafts only, not auto-published
+            mediaId: draftId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
         } catch (err) {
           console.error('[DemoReel] TikTok failed:', err);
-          demoResults.errors.push(
-            `TikTok: ${err instanceof Error ? err.message : 'Unknown error'}`,
-          );
+          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+          demoResults.errors.push(`TikTok: ${errorMsg}`);
+          platformResults.tiktokDemoReel = {
+            success: false,
+            caption,
+            error: errorMsg,
+          };
         }
       }
 
@@ -1088,33 +1181,48 @@ const handleRequest = async (request: Request) => {
         process.env.LINKEDIN_ACCESS_TOKEN &&
         process.env.LINKEDIN_ORGANIZATION_ID
       ) {
+        const caption = await generateLinkedInCaption(
+          coloringImage,
+          'demo_reel',
+        );
         try {
-          const caption = await generateLinkedInCaption(
-            coloringImage,
-            'demo_reel',
-          );
-          demoResults.linkedin = await postToLinkedInPage(reelUrl, caption);
+          const postId = await postToLinkedInPage(reelUrl, caption);
+          demoResults.linkedin = postId;
+          platformResults.linkedinDemoReel = {
+            success: true,
+            mediaId: postId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
         } catch (err) {
           console.error('[DemoReel] LinkedIn failed:', err);
-          demoResults.errors.push(
-            `LinkedIn: ${err instanceof Error ? err.message : 'Unknown error'}`,
-          );
+          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+          demoResults.errors.push(`LinkedIn: ${errorMsg}`);
+          platformResults.linkedinDemoReel = {
+            success: false,
+            caption,
+            error: errorMsg,
+          };
         }
       }
 
-      // Pinterest video pin — reuse existing video-pin helper.
+      // Pinterest video pin — prefer the worker-captured colored cover
+      // (finished artwork). Fall back to a square line-art render if
+      // that's missing (e.g. older images without demoReelCoverUrl).
       if (
         shouldPost('pinterest') &&
         process.env.PINTEREST_BOARD_ID_VIDEOS &&
         coloringImage.svgUrl
       ) {
+        const caption = await generatePinterestCaption(coloringImage);
         try {
-          const coverUrl = await createPinterestVideoCoverImage(
-            coloringImage.svgUrl,
-          );
-          tempFiles.push(coverUrl.split('/').pop() || '');
-          const caption = await generatePinterestCaption(coloringImage);
-          demoResults.pinterestVideo = await postVideoToPinterest(
+          const coverUrl =
+            coloringImage.demoReelCoverUrl ??
+            (await createPinterestVideoCoverImage(coloringImage.svgUrl));
+          if (!coloringImage.demoReelCoverUrl) {
+            tempFiles.push(coverUrl.split('/').pop() || '');
+          }
+          const pinId = await postVideoToPinterest(
             reelUrl,
             coverUrl,
             coloringImage.title ?? 'Free Coloring Page',
@@ -1122,12 +1230,30 @@ const handleRequest = async (request: Request) => {
             coloringImage.id,
             process.env.PINTEREST_BOARD_ID_VIDEOS,
           );
+          demoResults.pinterestVideo = pinId;
+          platformResults.pinterestDemoReel = {
+            success: true,
+            mediaId: pinId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
         } catch (err) {
           console.error('[DemoReel] Pinterest video failed:', err);
-          demoResults.errors.push(
-            `Pinterest: ${err instanceof Error ? err.message : 'Unknown error'}`,
-          );
+          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+          demoResults.errors.push(`Pinterest: ${errorMsg}`);
+          platformResults.pinterestDemoReel = {
+            success: false,
+            caption,
+            error: errorMsg,
+          };
         }
+      }
+
+      // Persist per-platform outcomes for the digest cron.
+      try {
+        await mergeSocialPostResults(coloringImage.id, platformResults);
+      } catch (err) {
+        console.error('[DemoReel] Failed to persist socialPostResults:', err);
       }
 
       const hasSuccess =

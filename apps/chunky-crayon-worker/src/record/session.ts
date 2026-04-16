@@ -56,6 +56,9 @@ export type RecordSessionResult = {
   durationMs: number;
   imageId: string;
   flowMarkers: FlowMarkers;
+  /** JPEG bytes of the finished canvas (line art + Magic Brush colours
+   *  composited as the user sees them). Used as the social-reel cover. */
+  coverJpeg?: Buffer;
 };
 
 const VIDEO_WIDTH = 1080;
@@ -120,6 +123,7 @@ export async function recordColoringSession(
   page.on("close", () => console.log("[browser:close] page closed"));
 
   let imageId = "";
+  let coverJpeg: Buffer | undefined;
   let recordingError: unknown;
   const flowMarkers: Partial<FlowMarkers> = {};
 
@@ -291,6 +295,54 @@ export async function recordColoringSession(
     // Let the reveal worker drain any in-flight mask updates before we close.
     log("draining reveal worker (1.5s tail)");
     await page.waitForTimeout(1500);
+
+    // ── 8. Capture the finished frame as the reel cover ──────────────────
+    // Composite the drawing canvas (Magic Brush colours) under the image
+    // canvas (line art) with multiply blend — same merge ImageCanvas
+    // uses for save-to-gallery. Result is the exact picture the viewer
+    // will see at the very end of the reel.
+    try {
+      log("capturing finished cover frame from canvases");
+      const dataUrl = await page.evaluate(() => {
+        const canvases = Array.from(
+          document.querySelectorAll<HTMLCanvasElement>("canvas"),
+        );
+        // ImageCanvas mounts two canvases: drawing (user colours) + image
+        // (line art). They sit at the same dimensions, stacked. We can't
+        // distinguish them via a stable testid, but the larger one is the
+        // image canvas and they share dimensions when sized — use both.
+        const sized = canvases.filter((c) => c.width > 100 && c.height > 100);
+        if (sized.length < 2) return null;
+        const [drawingCanvas, imageCanvas] = sized;
+        const composite = document.createElement("canvas");
+        composite.width = drawingCanvas.width;
+        composite.height = drawingCanvas.height;
+        const ctx = composite.getContext("2d");
+        if (!ctx) return null;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, composite.width, composite.height);
+        ctx.drawImage(drawingCanvas, 0, 0);
+        ctx.globalCompositeOperation = "multiply";
+        ctx.drawImage(imageCanvas, 0, 0);
+        ctx.globalCompositeOperation = "source-over";
+        return composite.toDataURL("image/jpeg", 0.92);
+      });
+      if (dataUrl?.startsWith("data:image/jpeg;base64,")) {
+        coverJpeg = Buffer.from(
+          dataUrl.slice("data:image/jpeg;base64,".length),
+          "base64",
+        );
+        log(`cover frame captured (${coverJpeg.byteLength} bytes)`);
+      } else {
+        log("cover frame capture returned no dataUrl — skipping");
+      }
+    } catch (err) {
+      console.warn(
+        "[record] cover frame capture failed (non-fatal):",
+        err instanceof Error ? err.message : err,
+      );
+    }
+
     log("recording phase complete, closing browser");
   } catch (err) {
     recordingError = err;
@@ -317,6 +369,7 @@ export async function recordColoringSession(
         durationMs: Date.now() - start,
         imageId,
         flowMarkers: flowMarkers as FlowMarkers,
+        coverJpeg,
       };
     }
   }

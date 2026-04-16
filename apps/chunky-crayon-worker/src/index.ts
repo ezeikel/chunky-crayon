@@ -376,24 +376,44 @@ app.post("/publish/reel", async (c) => {
     adultVoiceUrl,
   });
 
-  // 6. Upload to R2 and persist on the coloringImage row so the CC social
-  //    post handler can read it. Skipped on dry-run.
+  // 6. Upload mp4 + cover to R2, persist URLs on the coloringImage row so
+  //    the CC social post handler can read both. Skipped on dry-run.
   const localUrl = `http://localhost:${port}/tmp/${outputPath.split("/").pop()}`;
   let publishedUrl: string | undefined;
+  let publishedCoverUrl: string | undefined;
   if (!body.dry_run) {
     try {
       const mp4Buffer = await readFile(outputPath);
-      const r2Key = `reels/demo/${recording.imageId}-${Date.now()}.mp4`;
+      const stamp = Date.now();
+      const r2Key = `reels/demo/${recording.imageId}-${stamp}.mp4`;
       const { url } = await put(r2Key, mp4Buffer, {
         contentType: "video/mp4",
         access: "public",
       });
       publishedUrl = url;
+
+      if (recording.coverJpeg) {
+        const coverKey = `reels/demo/${recording.imageId}-${stamp}-cover.jpg`;
+        const { url: coverUrl } = await put(coverKey, recording.coverJpeg, {
+          contentType: "image/jpeg",
+          access: "public",
+        });
+        publishedCoverUrl = coverUrl;
+        console.log(
+          `[/publish/reel] cover uploaded to R2: ${coverUrl} (${recording.coverJpeg.byteLength} bytes)`,
+        );
+      } else {
+        console.warn("[/publish/reel] no cover JPEG to upload");
+      }
+
       await db.coloringImage.update({
         where: { id: recording.imageId },
-        data: { demoReelUrl: url },
+        data: {
+          demoReelUrl: url,
+          ...(publishedCoverUrl ? { demoReelCoverUrl: publishedCoverUrl } : {}),
+        },
       });
-      console.log(`[/publish/reel] uploaded to R2: ${url}`);
+      console.log(`[/publish/reel] uploaded mp4 to R2: ${url}`);
     } catch (err) {
       console.error("[/publish/reel] R2 upload / DB write failed:", err);
       return c.json(
@@ -407,14 +427,21 @@ app.post("/publish/reel", async (c) => {
     }
   }
 
+  // Strip the JPEG buffer from `recording` before serialising — it's
+  // multi-MB binary that bloats the JSON response and isn't useful to
+  // the caller (it's already uploaded to R2).
+  const { coverJpeg: _coverJpeg, ...recordingPublic } = recording;
+  void _coverJpeg;
+
   return c.json({
     ok: true,
     dry_run: !!body.dry_run,
-    recording,
+    recording: recordingPublic,
     output: {
       mp4Path: outputPath,
       localUrl,
       publishedUrl,
+      publishedCoverUrl,
       durationSecs: durationInFrames / fps,
     },
   });
