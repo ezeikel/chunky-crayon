@@ -58,6 +58,8 @@ jobs:
               echo "Building shared packages..."
               /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/db build
               /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/storage build
+              /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/canvas build
+              /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/coloring-core build
               echo "Shared packages built"
             fi
 
