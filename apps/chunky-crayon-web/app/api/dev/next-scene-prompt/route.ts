@@ -25,14 +25,21 @@ const shortSchema = z.object({
  *   - short: a 5–10 word version that gets typed on-camera in the reel
  *     so the typing phase feels like something a child actually said.
  *
- * Hard-gated to NODE_ENV != production because it spends real AI credits.
+ * In production, access is gated by WORKER_SECRET — only the Hetzner
+ * worker (which holds the same secret) can call this. In dev, the bearer
+ * is optional to keep local iteration painless.
  *
  * Usage:
  *   curl -X POST http://localhost:3000/api/dev/next-scene-prompt
+ *   curl -X POST -H "Authorization: Bearer $WORKER_SECRET" \
+ *     https://chunkycrayon.com/api/dev/next-scene-prompt
  */
-export async function POST() {
+export async function POST(request: Request) {
   if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ error: 'Not available' }, { status: 404 });
+    const auth = request.headers.get('authorization');
+    if (!auth || auth !== `Bearer ${process.env.WORKER_SECRET}`) {
+      return NextResponse.json({ error: 'Not available' }, { status: 404 });
+    }
   }
 
   await connection();

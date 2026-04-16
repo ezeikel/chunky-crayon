@@ -133,8 +133,10 @@ app.post("/publish/reel", async (c) => {
     );
     // Perplexity + Claude cleanup + dedup can take 30–90s. Default undici
     // timeout would kill this; give it a generous 3min budget.
+    const workerSecret = process.env.WORKER_SECRET;
     const r = await fetch(`${ccOrigin}/api/dev/next-scene-prompt`, {
       method: "POST",
+      headers: workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {},
       signal: AbortSignal.timeout(180_000),
     });
     if (!r.ok) {
