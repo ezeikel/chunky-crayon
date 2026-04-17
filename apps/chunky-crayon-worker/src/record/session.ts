@@ -239,44 +239,10 @@ export async function recordColoringSession(
     }
     log(`region store ready — preColoured canvas built at ${regionReady}`);
 
-    // ── 5. Capture blank PDF (before sweep — canvas is still empty) ──────
-    // Click the Print/Download button while the canvas has no colours. The
-    // PDF shows the blank line art + QR code + footer — exactly what a
-    // parent would print out for their kid. This happens in the "dead time"
-    // between region-store-ready and brush selection, which gets trimmed
-    // out of the final video, so viewers never see the click.
-    try {
-      log("clicking Print button to capture blank PDF");
-      const printBtn = page.locator('button[aria-label="Print"]').first();
-      const btnVisible = await printBtn.isVisible().catch(() => false);
-      if (btnVisible) {
-        const [download] = await Promise.all([
-          page.waitForEvent("download", { timeout: 30_000 }),
-          printBtn.click(),
-        ]);
-        const pdfPath = resolve(opts.outDir, `${Date.now()}-print.pdf`);
-        await download.saveAs(pdfPath);
-        log(`blank PDF intercepted: ${pdfPath}`);
-
-        // Convert page 1 to PNG using pdf-to-img (Mozilla PDF.js)
-        const { pdf: pdfToImg } = await import("pdf-to-img");
-        const doc = await pdfToImg(pdfPath, { scale: 2 });
-        const firstPage = await doc.getPage(1);
-        if (firstPage) {
-          pdfPreviewPng = Buffer.from(firstPage);
-          log(`blank PDF converted to PNG (${pdfPreviewPng.byteLength} bytes)`);
-        } else {
-          log("PDF conversion returned no pages");
-        }
-      } else {
-        log("Print button not visible — skipping PDF capture");
-      }
-    } catch (err) {
-      console.warn(
-        "[record] PDF capture failed (non-fatal):",
-        err instanceof Error ? err.message : err,
-      );
-    }
+    // ── 5. PDF capture disabled — pdf-to-img's pdfjs-dist dependency
+    // breaks Remotion's renderer on the Hetzner box (RangeError in
+    // Array allocation). Will re-enable with a different PDF-to-PNG
+    // approach that doesn't pollute the hoisted node_modules.
 
     // ── 6. Activate Magic Brush + pick size ──────────────────────────────
     log("selecting Magic Brush (first time)");

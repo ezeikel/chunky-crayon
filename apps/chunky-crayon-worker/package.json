@@ -23,7 +23,6 @@
     "dotenv": "^17.2.2",
     "elevenlabs": "^1.59.0",
     "hono": "^4.0.0",
-    "pdf-to-img": "^6.0.0",
     "playwright": "^1.59.0",
     "remotion": "^4.0.0",
     "zod": "^3.25.0"
