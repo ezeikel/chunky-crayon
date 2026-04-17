@@ -239,10 +239,68 @@ export async function recordColoringSession(
     }
     log(`region store ready — preColoured canvas built at ${regionReady}`);
 
-    // ── 5. PDF capture disabled — pdf-to-img's pdfjs-dist dependency
-    // breaks Remotion's renderer on the Hetzner box (RangeError in
-    // Array allocation). Will re-enable with a different PDF-to-PNG
-    // approach that doesn't pollute the hoisted node_modules.
+    // ── 5. Capture blank PDF (before sweep — canvas is still empty) ──────
+    // Click the Print/Download button while the canvas has no colours. The
+    // PDF shows the blank line art + QR code + footer — exactly what a
+    // parent would print out for their kid. This happens in the "dead time"
+    // between region-store-ready and brush selection, which gets trimmed
+    // out of the final video, so viewers never see the click.
+    //
+    // NOTE: pdf-to-img uses pdfjs-dist which MUST NOT be hoisted into
+    // the root node_modules — it conflicts with Remotion's webpack
+    // bundler (RangeError in Array allocation). pdf-to-img is installed
+    // in an isolated dir (/opt/pdf-tools/) on the box, and we run the
+    // conversion via a subprocess so its deps don't touch the monorepo.
+    //
+    // Box setup (one-time):
+    //   mkdir -p /opt/pdf-tools && cd /opt/pdf-tools && npm init -y && npm i pdf-to-img
+    try {
+      log("clicking Print button to capture blank PDF");
+      const printBtn = page.locator('button[aria-label="Print"]').first();
+      const btnVisible = await printBtn.isVisible().catch(() => false);
+      if (btnVisible) {
+        const [download] = await Promise.all([
+          page.waitForEvent("download", { timeout: 30_000 }),
+          printBtn.click(),
+        ]);
+        const pdfPath = resolve(opts.outDir, `${Date.now()}-print.pdf`);
+        await download.saveAs(pdfPath);
+        log(`blank PDF intercepted: ${pdfPath}`);
+
+        const pngPath = pdfPath.replace(".pdf", ".png");
+        const scriptDir = resolve(
+          new URL(".", import.meta.url).pathname,
+          "..",
+          "scripts",
+        );
+        const { execFileSync } = await import("node:child_process");
+        const output = execFileSync(
+          "node",
+          [resolve(scriptDir, "pdf-to-png.mjs"), pdfPath, pngPath],
+          {
+            timeout: 30_000,
+            encoding: "utf-8",
+            // Use the isolated pdf-tools dir for module resolution
+            env: {
+              ...process.env,
+              NODE_PATH: "/opt/pdf-tools/node_modules",
+            },
+          },
+        );
+        log(`PDF→PNG: ${output.trim()}`);
+
+        const { readFile: readFileAsync } = await import("node:fs/promises");
+        pdfPreviewPng = await readFileAsync(pngPath);
+        log(`blank PDF converted to PNG (${pdfPreviewPng.byteLength} bytes)`);
+      } else {
+        log("Print button not visible — skipping PDF capture");
+      }
+    } catch (err) {
+      console.warn(
+        "[record] PDF capture failed (non-fatal):",
+        err instanceof Error ? err.message : err,
+      );
+    }
 
     // ── 6. Activate Magic Brush + pick size ──────────────────────────────
     log("selecting Magic Brush (first time)");
