@@ -1061,10 +1061,18 @@ const handleRequest = async (request: Request) => {
       // at the end so the digest cron can read accurate auto-posted flags.
       const platformResults: SocialPostResults = {};
 
+      // Guard: check if this platform already posted successfully for
+      // this image. Prevents duplicate posts when the cron or manual
+      // trigger fires twice for the same image.
+      const existingResults =
+        (coloringImage.socialPostResults as SocialPostResults | null) ?? {};
+      const alreadyPosted = (key: keyof SocialPostResults) =>
+        !!existingResults[key]?.success;
+
       // IG Reel — pass the worker-captured colored cover so the reel
       // thumbnail in feed/explore shows the finished artwork instead
       // of a random video frame (often the dark Colo intro card).
-      if (shouldPost('instagram')) {
+      if (shouldPost('instagram') && !alreadyPosted('instagramDemoReel')) {
         const caption = await generateInstagramCaption(
           coloringImage,
           'demo_reel',
@@ -1097,7 +1105,7 @@ const handleRequest = async (request: Request) => {
       }
 
       // FB Reel (posted via the same video endpoint)
-      if (shouldPost('facebook')) {
+      if (shouldPost('facebook') && !alreadyPosted('facebookDemoReel')) {
         const caption = await generateFacebookCaption(
           coloringImage,
           'demo_reel',
@@ -1131,7 +1139,7 @@ const handleRequest = async (request: Request) => {
       // the user's TikTok Inbox/Drafts (sandbox API). It's a successful
       // upload but NOT a published post — the user has to hit publish in
       // the TikTok app. Reflect that in autoPosted=false on the digest.
-      if (shouldPost('tiktok')) {
+      if (shouldPost('tiktok') && !alreadyPosted('tiktokDemoReel')) {
         const caption = await generateTikTokCaption(coloringImage, 'demo_reel');
         try {
           const tiktokRes = await fetch(
@@ -1180,6 +1188,7 @@ const handleRequest = async (request: Request) => {
       // production run.
       if (
         shouldPost('linkedin') &&
+        !alreadyPosted('linkedinDemoReel') &&
         process.env.LINKEDIN_ACCESS_TOKEN &&
         process.env.LINKEDIN_ORGANIZATION_ID
       ) {
@@ -1213,6 +1222,7 @@ const handleRequest = async (request: Request) => {
       // that's missing (e.g. older images without demoReelCoverUrl).
       if (
         shouldPost('pinterest') &&
+        !alreadyPosted('pinterestDemoReel') &&
         process.env.PINTEREST_BOARD_ID_VIDEOS &&
         coloringImage.svgUrl
       ) {
@@ -1343,8 +1353,17 @@ const handleRequest = async (request: Request) => {
       };
       const platformResults: SocialPostResults = {};
 
+      // Guard against duplicate posts
+      const csExisting =
+        (coloringImage.socialPostResults as SocialPostResults | null) ?? {};
+      const csAlreadyPosted = (key: keyof SocialPostResults) =>
+        !!csExisting[key]?.success;
+
       // Instagram single-image post
-      if (shouldPost('instagram')) {
+      if (
+        shouldPost('instagram') &&
+        !csAlreadyPosted('instagramColoredStatic')
+      ) {
         const caption = await generateInstagramCaption(
           coloringImage,
           'colored_static',
@@ -1376,7 +1395,7 @@ const handleRequest = async (request: Request) => {
       }
 
       // Facebook single-image post
-      if (shouldPost('facebook')) {
+      if (shouldPost('facebook') && !csAlreadyPosted('facebookColoredStatic')) {
         const caption = await generateFacebookCaption(
           coloringImage,
           'colored_static',
