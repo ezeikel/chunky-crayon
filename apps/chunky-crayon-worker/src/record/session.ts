@@ -252,8 +252,17 @@ export async function recordColoringSession(
     // in an isolated dir (/opt/pdf-tools/) on the box, and we run the
     // conversion via a subprocess so its deps don't touch the monorepo.
     //
-    // Box setup (one-time):
+    // LOCAL DEV: /opt/pdf-tools/ doesn't exist on your laptop. The
+    // subprocess will fail with ENOENT but it's inside a try/catch
+    // marked (non-fatal) so the reel still renders — just without the
+    // PDF preview frame. To enable locally:
+    //   mkdir -p /opt/pdf-tools && cd /opt/pdf-tools
+    //   npm init -y && npm i pdf-to-img
+    //   cp <repo>/apps/chunky-crayon-worker/src/scripts/pdf-to-png.mjs .
+    //
+    // HETZNER BOX SETUP (one-time, already done):
     //   mkdir -p /opt/pdf-tools && cd /opt/pdf-tools && npm init -y && npm i pdf-to-img
+    //   The deploy workflow copies pdf-to-png.mjs there on each deploy.
     try {
       log("clicking Print button to capture blank PDF");
       const printBtn = page.locator('button[aria-label="Print"]').first();
