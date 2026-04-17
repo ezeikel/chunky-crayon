@@ -57,7 +57,7 @@ export const RemotionRoot: React.FC = () => {
           ambientSoundUrl: undefined,
           kidVoiceUrl: undefined,
           adultVoiceUrl: undefined,
-          pdfPreviewUrl: staticFile("/preview/pdf-placeholder.png"),
+          pdfPreviewUrl: undefined,
           prompt: "",
         } satisfies DemoReelProps
       }
