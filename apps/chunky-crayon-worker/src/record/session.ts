@@ -268,21 +268,16 @@ export async function recordColoringSession(
         log(`blank PDF intercepted: ${pdfPath}`);
 
         const pngPath = pdfPath.replace(".pdf", ".png");
-        const scriptDir = resolve(
-          new URL(".", import.meta.url).pathname,
-          "..",
-          "scripts",
-        );
         const { execFileSync } = await import("node:child_process");
+        // The script lives IN /opt/pdf-tools/ (alongside its own
+        // node_modules) so ESM resolves pdf-to-img from there, not
+        // from the monorepo's hoisted tree.
         const output = execFileSync(
           "node",
-          [resolve(scriptDir, "pdf-to-png.mjs"), pdfPath, pngPath],
+          ["/opt/pdf-tools/pdf-to-png.mjs", pdfPath, pngPath],
           {
             timeout: 30_000,
             encoding: "utf-8",
-            // Run from /opt/pdf-tools so ESM resolves pdf-to-img from
-            // its local node_modules, not the monorepo's hoisted tree.
-            cwd: "/opt/pdf-tools",
           },
         );
         log(`PDF→PNG: ${output.trim()}`);
