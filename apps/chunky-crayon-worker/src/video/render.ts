@@ -32,11 +32,25 @@ export async function renderDemoReel(
     publicDir: PUBLIC_DIR,
   });
 
+  console.log("[render] inputProps:", {
+    durationInFrames: opts.durationInFrames,
+    typingDurationFrames: opts.typingDurationFrames,
+    revealDurationFrames: opts.revealDurationFrames,
+    hasPdfPreview: !!opts.pdfPreviewUrl,
+  });
+
   const composition = await selectComposition({
     serveUrl: bundleLocation,
     id: "DemoReel",
     inputProps: opts,
     timeoutInMilliseconds: 120_000,
+  });
+
+  console.log("[render] composition resolved:", {
+    durationInFrames: composition.durationInFrames,
+    fps: composition.fps,
+    width: composition.width,
+    height: composition.height,
   });
 
   await renderMedia({
