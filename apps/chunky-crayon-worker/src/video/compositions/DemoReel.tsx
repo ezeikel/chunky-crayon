@@ -35,10 +35,13 @@ export type DemoReelProps = {
   kidVoiceUrl?: string;
   /** Optional adult narrator — plays over the reveal section. */
   adultVoiceUrl?: string;
+  /** Optional PDF preview PNG URL — shown as a "free printable" frame. */
+  pdfPreviewUrl?: string;
 };
 
 // ─── Section pacing (keep computeOutputFrames in worker/index.ts in sync) ───
 export const INTRO_SECS = 2.0;
+export const PDF_PREVIEW_SECS = 2.5;
 export const OUTRO_SECS = 2.0;
 
 // Brand palette (mirrors CC globals.css).
@@ -67,13 +70,18 @@ export const DemoReel: React.FC<DemoReelProps> = ({
   ambientSoundUrl,
   kidVoiceUrl,
   adultVoiceUrl,
+  pdfPreviewUrl,
 }) => {
   const { fps } = useVideoConfig();
   const introFrames = Math.round(INTRO_SECS * fps);
+  const pdfPreviewFrames = pdfPreviewUrl
+    ? Math.round(PDF_PREVIEW_SECS * fps)
+    : 0;
   const outroFrames = Math.round(OUTRO_SECS * fps);
   const typingStart = introFrames;
   const revealStart = typingStart + typingDurationFrames;
-  const outroStart = revealStart + revealDurationFrames;
+  const pdfStart = revealStart + revealDurationFrames;
+  const outroStart = pdfStart + pdfPreviewFrames;
 
   return (
     <AbsoluteFill style={{ background: PAPER_CREAM }}>
@@ -88,19 +96,55 @@ export const DemoReel: React.FC<DemoReelProps> = ({
 
       {/* 1 — Typing clip (kid voice overlay) */}
       <Sequence from={typingStart} durationInFrames={typingDurationFrames}>
-        <OffthreadVideo src={typingVideoUrl} style={fillStyle} />
-        <BottomCallout text="Type anything" />
+        {typingVideoUrl ? (
+          <OffthreadVideo src={typingVideoUrl} style={fillStyle} />
+        ) : (
+          <AbsoluteFill
+            style={{
+              background: "#e0e0e0",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ fontFamily: FONT, fontSize: 40, color: CHARCOAL }}>
+              Typing clip placeholder
+            </div>
+          </AbsoluteFill>
+        )}
+        <BottomCallout text="Any idea" />
         {kidVoiceUrl ? <Audio src={kidVoiceUrl} volume={1} /> : null}
       </Sequence>
 
       {/* 2 — Reveal clip (adult narrator overlay) */}
       <Sequence from={revealStart} durationInFrames={revealDurationFrames}>
-        <OffthreadVideo src={revealVideoUrl} style={fillStyle} />
-        <BottomCallout text="Now color it in" />
+        {revealVideoUrl ? (
+          <OffthreadVideo src={revealVideoUrl} style={fillStyle} />
+        ) : (
+          <AbsoluteFill
+            style={{
+              background: "#d0d0d0",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ fontFamily: FONT, fontSize: 40, color: CHARCOAL }}>
+              Reveal clip placeholder
+            </div>
+          </AbsoluteFill>
+        )}
+        <BottomCallout text="Watch it come to life" />
         {adultVoiceUrl ? <Audio src={adultVoiceUrl} volume={1} /> : null}
       </Sequence>
 
-      {/* 3 — Outro card */}
+      {/* 3 — PDF preview (free printable) */}
+      {pdfPreviewUrl && pdfPreviewFrames > 0 && (
+        <Sequence from={pdfStart} durationInFrames={pdfPreviewFrames}>
+          <PdfPreviewCard imageUrl={pdfPreviewUrl} />
+          <BottomCallout text="Print it. Color it for real." />
+        </Sequence>
+      )}
+
+      {/* 4 — Outro card */}
       <Sequence from={outroStart} durationInFrames={outroFrames}>
         <OutroCard />
       </Sequence>
@@ -321,6 +365,69 @@ const OutroCard: React.FC = () => {
         }}
       >
         chunkycrayon.com
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+const PdfPreviewCard: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
+  const frame = useCurrentFrame();
+  const { fps, durationInFrames } = useVideoConfig();
+
+  // Fade in/out
+  const fade = Math.round(fps * 0.3);
+  const opacity = interpolate(
+    frame,
+    [0, fade, durationInFrames - fade, durationInFrames],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+
+  // Spring scale-up: the PDF "page" springs in from slightly small.
+  const scale = spring({
+    frame,
+    fps,
+    config: { damping: 14, stiffness: 160, mass: 0.7 },
+    from: 0.82,
+    to: 1,
+  });
+
+  return (
+    <AbsoluteFill
+      style={{
+        background: PAPER_CREAM,
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: FONT,
+        opacity,
+      }}
+    >
+      {/* "Paper" frame with shadow — looks like a printed page */}
+      <div
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: "center center",
+          background: "#FFFFFF",
+          borderRadius: 16,
+          boxShadow:
+            "0 20px 60px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)",
+          padding: 24,
+          maxWidth: 700,
+          maxHeight: 1200,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Img
+          src={imageUrl}
+          style={{
+            width: "100%",
+            height: "auto",
+            borderRadius: 8,
+            objectFit: "contain",
+          }}
+        />
       </div>
     </AbsoluteFill>
   );

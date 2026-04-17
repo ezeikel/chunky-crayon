@@ -385,12 +385,30 @@ async function runPublishReel(c: Context) {
   const typingDurationFrames = Math.round(typingDurationSec * fps);
   const revealDurationFrames = Math.round(revealDurationSec * fps);
 
-  // 5. Remotion — composite trimmed clips with intro/outro cards, ambient
-  //    music, and two-voice narration.
+  // 5. Serve PDF preview PNG via the /tmp static server (if captured).
+  let pdfPreviewUrl: string | undefined;
+  if (recording.pdfPreviewPng) {
+    const pdfPngPath = resolve(WORKER_OUT_DIR, `${Date.now()}-pdf-preview.png`);
+    const { writeFile } = await import("node:fs/promises");
+    await writeFile(pdfPngPath, recording.pdfPreviewPng);
+    pdfPreviewUrl = `http://localhost:${port}/tmp/${pdfPngPath.split("/").pop()}`;
+    console.log(
+      `[/publish/reel] PDF preview proxied: ${pdfPreviewUrl} (${recording.pdfPreviewPng.byteLength} bytes)`,
+    );
+  }
+
+  // 6. Remotion — composite trimmed clips with intro/outro cards, ambient
+  //    music, two-voice narration, and optional PDF preview.
+  const PDF_PREVIEW_SECS = pdfPreviewUrl ? 2.5 : 0;
   const introFrames = Math.round(INTRO_SECS * fps);
+  const pdfPreviewFrames = Math.round(PDF_PREVIEW_SECS * fps);
   const outroFrames = Math.round(OUTRO_SECS * fps);
   const durationInFrames =
-    introFrames + typingDurationFrames + revealDurationFrames + outroFrames;
+    introFrames +
+    typingDurationFrames +
+    revealDurationFrames +
+    pdfPreviewFrames +
+    outroFrames;
 
   const outputPath = resolve(WORKER_OUT_DIR, `${Date.now()}-reel.mp4`);
   await renderDemoReel({
@@ -404,6 +422,7 @@ async function runPublishReel(c: Context) {
     ambientSoundUrl,
     kidVoiceUrl,
     adultVoiceUrl,
+    pdfPreviewUrl,
   });
 
   // 6. Upload mp4 + cover to R2, persist URLs on the coloringImage row so

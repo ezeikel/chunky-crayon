@@ -1,5 +1,10 @@
 import { Composition } from "remotion";
-import { DemoReel, type DemoReelProps } from "./compositions/DemoReel";
+import { staticFile } from "remotion";
+import {
+  DemoReel,
+  type DemoReelProps,
+  PDF_PREVIEW_SECS,
+} from "./compositions/DemoReel";
 
 const FPS = 30;
 
@@ -30,7 +35,9 @@ export const RemotionRoot: React.FC = () => {
   // Arbitrary default lengths — real render overrides via inputProps.
   const typingFrames = Math.round(4 * FPS);
   const revealFrames = Math.round(25 * FPS);
-  const totalFrames = introFrames + typingFrames + revealFrames + outroFrames;
+  const pdfPreviewFrames = Math.round(PDF_PREVIEW_SECS * FPS);
+  const totalFrames =
+    introFrames + typingFrames + revealFrames + pdfPreviewFrames + outroFrames;
 
   return (
     <Composition
@@ -50,6 +57,7 @@ export const RemotionRoot: React.FC = () => {
           ambientSoundUrl: undefined,
           kidVoiceUrl: undefined,
           adultVoiceUrl: undefined,
+          pdfPreviewUrl: staticFile("/preview/pdf-placeholder.png"),
           prompt: "",
         } satisfies DemoReelProps
       }
