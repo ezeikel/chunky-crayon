@@ -1282,36 +1282,34 @@ const handleRequest = async (request: Request) => {
     // ---------------------------------------------------------------------
     // COLORED-STATIC MODE — single image of the FINISHED colored artwork.
     //
-    // Posts AFTER the demo reel so audience that just watched the AI
-    // colour it is now nudged to print/colour the *blank* version
-    // themselves at chunkycrayon.com. CTA-driven, not entertainment.
+    // Posts the BLANK line art of the demo-reel image so the audience
+    // that just watched the coloured reveal can print + colour it
+    // themselves. CTA: "your kid can color this — free at chunkycrayon.com"
     //
-    // Uses coloringImage.demoReelCoverUrl (the worker-captured composite
-    // of line art + Magic Brush colours). Posts to IG + FB only — TikTok
-    // doesn't take stills, LinkedIn already has a static post elsewhere,
-    // Pinterest's image pin is a different audience play (line art).
+    // Uses the image's svgUrl (converted to JPEG). The coloured cover is
+    // already visible as the reel's thumbnail — this post is the blank
+    // canvas counterpart. IG + FB only.
     // ---------------------------------------------------------------------
     if (typeFilter === 'colored-static') {
-      // Same fallback rule as demo-reel: prefer today's image, otherwise
-      // pick the most recent one that has both demoReelCoverUrl set.
-      if (!coloringImage.demoReelCoverUrl) {
+      // Find the image that was used for the demo reel.
+      if (!coloringImage.demoReelUrl) {
         const todayStart = new Date();
         todayStart.setUTCHours(0, 0, 0, 0);
-        const withCover = await db.coloringImage.findFirst({
+        const withReel = await db.coloringImage.findFirst({
           where: {
             brand: BRAND,
-            demoReelCoverUrl: { not: null },
+            demoReelUrl: { not: null },
             createdAt: { gte: todayStart },
           },
           orderBy: { createdAt: 'desc' },
         });
-        if (withCover) {
+        if (withReel) {
           console.log(
-            `[ColoredStatic] Today's image ${coloringImage.id} has no cover yet — using ${withCover.id}`,
+            `[ColoredStatic] Today's image ${coloringImage.id} has no reel — using ${withReel.id}`,
           );
-          coloringImage = withCover;
+          coloringImage = withReel;
         } else {
-          const message = `No demoReelCoverUrl on today's image yet — produce cron may still be running. Skipping ${platformFilter ?? 'all'}.`;
+          const message = `No demoReelUrl on today's images — produce cron may not have run. Skipping ${platformFilter ?? 'all'}.`;
           console.warn(`[ColoredStatic] ${message}`);
           return NextResponse.json(
             { success: false, message, skipped: true },
@@ -1320,13 +1318,23 @@ const handleRequest = async (request: Request) => {
         }
       }
 
-      const coverUrl = coloringImage.demoReelCoverUrl;
-      if (!coverUrl) {
+      if (!coloringImage.svgUrl) {
         return NextResponse.json(
-          { success: false, error: 'demoReelCoverUrl unexpectedly null' },
+          { success: false, error: 'svgUrl missing on demo-reel image' },
           { status: 500, headers: corsHeaders },
         );
       }
+
+      // Convert SVG line art to JPEG for posting
+      const blankBuffer = await convertSvgToJpeg(
+        coloringImage.svgUrl,
+        'instagram',
+      );
+      const blankImageUrl = await uploadToTempStorage(
+        blankBuffer,
+        'colored-static',
+      );
+      tempFiles.push(blankImageUrl.split('/').pop() || '');
 
       const coloredResults = {
         instagram: null as string | null,
@@ -1343,7 +1351,7 @@ const handleRequest = async (request: Request) => {
         );
         try {
           const containerId = await createInstagramMediaContainer(
-            coverUrl,
+            blankImageUrl,
             caption,
           );
           await waitForMediaReady(containerId, 20, 3000);
@@ -1374,7 +1382,7 @@ const handleRequest = async (request: Request) => {
           'colored_static',
         );
         try {
-          const postId = await postToFacebookPage(coverUrl, caption);
+          const postId = await postToFacebookPage(blankImageUrl, caption);
           coloredResults.facebook = postId;
           platformResults.facebookColoredStatic = {
             success: true,
@@ -1405,7 +1413,7 @@ const handleRequest = async (request: Request) => {
         {
           success: hasSuccess,
           type: 'colored-static',
-          coverUrl,
+          blankImageUrl,
           results: coloredResults,
         },
         {

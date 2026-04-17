@@ -33,125 +33,126 @@
       "path": "/api/email-list/send-latest",
       "schedule": "10 8 * * *"
     },
+
     {
       "path": "/api/social/demo-reel/produce",
-      "schedule": "30 15 * * 1-5"
+      "schedule": "30 14 * * 1-5"
     },
 
     {
       "path": "/api/social/post?platform=instagram&type=carousel",
-      "schedule": "0 16 * * 1-5"
+      "schedule": "0 15 * * 1-5"
     },
     {
       "path": "/api/social/post?platform=facebook",
-      "schedule": "5 16 * * 1-5"
+      "schedule": "5 15 * * 1-5"
     },
     {
       "path": "/api/social/post?platform=pinterest",
-      "schedule": "10 16 * * 1-5"
+      "schedule": "10 15 * * 1-5"
     },
     {
       "path": "/api/social/post?platform=linkedin",
-      "schedule": "15 16 * * 1-5"
+      "schedule": "15 15 * * 1-5"
     },
 
     {
       "path": "/api/social/post?type=demo-reel&platform=instagram",
-      "schedule": "30 16 * * 1-5"
+      "schedule": "0 18 * * 1-5"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=facebook",
-      "schedule": "35 16 * * 1-5"
+      "schedule": "5 18 * * 1-5"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=tiktok",
-      "schedule": "40 16 * * 1-5"
+      "schedule": "10 18 * * 1-5"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=linkedin",
-      "schedule": "45 16 * * 1-5"
+      "schedule": "15 18 * * 1-5"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
-      "schedule": "50 16 * * 1-5"
+      "schedule": "20 18 * * 1-5"
     },
 
     {
       "path": "/api/social/post?type=colored-static&platform=instagram",
-      "schedule": "55 16 * * 1-5"
+      "schedule": "30 18 * * 1-5"
     },
     {
       "path": "/api/social/post?type=colored-static&platform=facebook",
-      "schedule": "0 17 * * 1-5"
+      "schedule": "35 18 * * 1-5"
     },
 
     {
       "path": "/api/social/demo-reel/produce",
-      "schedule": "30 14 * * 0,6"
+      "schedule": "30 13 * * 0,6"
     },
 
     {
       "path": "/api/social/post?platform=instagram&type=carousel",
-      "schedule": "0 15 * * 0,6"
+      "schedule": "0 14 * * 0,6"
     },
     {
       "path": "/api/social/post?platform=facebook",
-      "schedule": "5 15 * * 0,6"
+      "schedule": "5 14 * * 0,6"
     },
     {
       "path": "/api/social/post?platform=pinterest",
-      "schedule": "10 15 * * 0,6"
+      "schedule": "10 14 * * 0,6"
     },
     {
       "path": "/api/social/post?platform=linkedin",
-      "schedule": "15 15 * * 0,6"
+      "schedule": "15 14 * * 0,6"
     },
 
     {
       "path": "/api/social/post?type=demo-reel&platform=instagram",
-      "schedule": "30 15 * * 0,6"
+      "schedule": "0 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=facebook",
-      "schedule": "35 15 * * 0,6"
+      "schedule": "5 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=tiktok",
-      "schedule": "40 15 * * 0,6"
+      "schedule": "10 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=linkedin",
-      "schedule": "45 15 * * 0,6"
+      "schedule": "15 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
-      "schedule": "50 15 * * 0,6"
+      "schedule": "20 17 * * 0,6"
     },
 
     {
       "path": "/api/social/post?type=colored-static&platform=instagram",
-      "schedule": "55 15 * * 0,6"
+      "schedule": "30 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=colored-static&platform=facebook",
-      "schedule": "0 16 * * 0,6"
+      "schedule": "35 17 * * 0,6"
     },
 
     {
       "path": "/api/social/tiktok/post",
-      "schedule": "20 16 * * 1-5"
+      "schedule": "20 15 * * 1-5"
     },
     {
       "path": "/api/social/tiktok/post",
-      "schedule": "20 15 * * 0,6"
+      "schedule": "20 14 * * 0,6"
     },
     {
       "path": "/api/social/digest",
-      "schedule": "25 16 * * 1-5"
+      "schedule": "45 18 * * 1-5"
     },
     {
       "path": "/api/social/digest",
-      "schedule": "25 15 * * 0,6"
+      "schedule": "45 17 * * 0,6"
     },
     {
       "path": "/api/admin/tokens",

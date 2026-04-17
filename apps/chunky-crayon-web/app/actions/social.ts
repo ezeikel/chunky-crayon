@@ -195,20 +195,19 @@ Remember: Output ONLY the final post text without any labels.`;
  * my own", click through, and get the printable line art.
  */
 const COLORED_STATIC_FRAMING = `
-This is a finished colored coloring page (a single still image showing
-how the page looked after our Magic Brush colored it). It's posted RIGHT
-AFTER our product-demo reel so the audience just saw it being colored.
-The image they're seeing is the "after" state — the *blank* version is
-free to print + color from chunkycrayon.com.
+This is the BLANK line-art coloring page — the one viewers just saw
+being colored in our demo reel. It's posted immediately after the reel
+so people who watched it think "I want my kid to try that". The image
+they're seeing is the blank canvas, ready to print and color.
 
 The caption must:
-- Acknowledge the demo reel they just watched ("you just saw it come
-  to life") OR stand alone if they missed it ("here's how today's
-  coloring page came out — yours can look totally different")
-- Drive the click: the static image is the *finished* artwork, the
-  *blank* version they can print + color is at chunkycrayon.com — free,
-  no signup needed to try.
-- Make it about the kid trying it, not us showing off.`;
+- Tie back to the reel they just watched ("saw the AI color this one?
+  here's the blank version for your kid")
+- Drive the click: this page is free to print + color at
+  chunkycrayon.com — no signup needed.
+- Make it about the kid's creativity, not the AI.
+- Emphasize that THEIR version will look completely different — every
+  kid colors it their own way.`;
 
 const INSTAGRAM_COLORED_STATIC_ADDENDUM = `
 ${COLORED_STATIC_FRAMING}
