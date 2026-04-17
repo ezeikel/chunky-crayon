@@ -11,10 +11,10 @@ import {
   useVideoConfig,
 } from "remotion";
 
-// Tondo weights are inlined as an @font-face CSS rule rendered into the
-// composition's <style> tag below. Avoids @remotion/fonts' per-tab
-// delayRender hang on the Hetzner render workers.
-import { TONDO_FONT_FACE_CSS } from "../fonts";
+// Tondo weights are embedded as base64 data URIs in a static CSS file.
+// Loading via <link> avoids all HTTP font fetches during render — no
+// delayRender race across Remotion's parallel tabs.
+import { TONDO_FONT_CSS_URL } from "../fonts";
 
 export type DemoReelProps = {
   /** Short mp4 of the typing phase (trimmed from the raw webm). */
@@ -77,9 +77,9 @@ export const DemoReel: React.FC<DemoReelProps> = ({
 
   return (
     <AbsoluteFill style={{ background: PAPER_CREAM }}>
-      {/* Inlined Tondo weights — loaded via @font-face so Remotion's
-          parallel render tabs don't fight over delayRender() promises. */}
-      <style dangerouslySetInnerHTML={{ __html: TONDO_FONT_FACE_CSS }} />
+      {/* Tondo fonts embedded as base64 in a static CSS file — no HTTP
+          font fetches, no delayRender race across render tabs. */}
+      <link rel="stylesheet" href={TONDO_FONT_CSS_URL} />
 
       {/* 0 — Intro card */}
       <Sequence from={0} durationInFrames={introFrames}>
