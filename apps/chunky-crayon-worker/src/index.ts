@@ -403,11 +403,14 @@ async function runPublishReel(c: Context) {
   const introFrames = Math.round(INTRO_SECS * fps);
   const pdfPreviewFrames = Math.round(PDF_PREVIEW_SECS * fps);
   const outroFrames = Math.round(OUTRO_SECS * fps);
+  // TODO: re-enable pdfPreviewFrames once the Remotion RangeError on
+  // Hetzner is resolved. For now, skip the PDF section in the render but
+  // still capture the PDF preview PNG for future use.
   const durationInFrames =
     introFrames +
     typingDurationFrames +
     revealDurationFrames +
-    pdfPreviewFrames +
+    // pdfPreviewFrames + // disabled — causes RangeError on Hetzner
     outroFrames;
 
   const outputPath = resolve(WORKER_OUT_DIR, `${Date.now()}-reel.mp4`);
@@ -422,7 +425,7 @@ async function runPublishReel(c: Context) {
     ambientSoundUrl,
     kidVoiceUrl,
     adultVoiceUrl,
-    pdfPreviewUrl,
+    // pdfPreviewUrl, // disabled — causes RangeError on Hetzner
   });
 
   // 6. Upload mp4 + cover to R2, persist URLs on the coloringImage row so
