@@ -280,11 +280,9 @@ export async function recordColoringSession(
           {
             timeout: 30_000,
             encoding: "utf-8",
-            // Use the isolated pdf-tools dir for module resolution
-            env: {
-              ...process.env,
-              NODE_PATH: "/opt/pdf-tools/node_modules",
-            },
+            // Run from /opt/pdf-tools so ESM resolves pdf-to-img from
+            // its local node_modules, not the monorepo's hoisted tree.
+            cwd: "/opt/pdf-tools",
           },
         );
         log(`PDF→PNG: ${output.trim()}`);
