@@ -27,10 +27,12 @@ export type RenderDemoReelOptions = DemoReelProps & {
 export async function renderDemoReel(
   opts: RenderDemoReelOptions,
 ): Promise<string> {
+  console.log("[render] bundling...");
   const bundleLocation = await bundle({
     entryPoint: ENTRY_POINT,
     publicDir: PUBLIC_DIR,
   });
+  console.log(`[render] bundled: ${bundleLocation}`);
 
   console.log("[render] inputProps:", {
     durationInFrames: opts.durationInFrames,
