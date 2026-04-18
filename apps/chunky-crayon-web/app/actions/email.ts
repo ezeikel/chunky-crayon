@@ -274,12 +274,16 @@ export const sendSocialDigest = async ({
   coloringImageUrl,
   svgUrl,
   animationUrl,
+  demoReelUrl,
+  demoReelCoverUrl,
   entries,
 }: {
   coloringImageTitle: string;
   coloringImageUrl: string;
   svgUrl?: string;
   animationUrl?: string;
+  demoReelUrl?: string;
+  demoReelCoverUrl?: string;
   entries: SocialDigestEntry[];
 }): Promise<{ success: boolean; error?: string }> => {
   const digestEmail = process.env.SOCIAL_DIGEST_EMAIL;
@@ -302,6 +306,8 @@ export const sendSocialDigest = async ({
         coloringImageUrl,
         svgUrl,
         animationUrl,
+        demoReelUrl,
+        demoReelCoverUrl,
         entries,
         timestamp,
       }),

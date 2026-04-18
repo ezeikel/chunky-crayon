@@ -192,6 +192,8 @@ export const GET = async (request: Request) => {
       coloringImageUrl: `${baseUrl}/coloring/${coloringImage.id}`,
       svgUrl: coloringImage.svgUrl ?? undefined,
       animationUrl: videoAssetUrl,
+      demoReelUrl: coloringImage.demoReelUrl ?? undefined,
+      demoReelCoverUrl: coloringImage.demoReelCoverUrl ?? undefined,
       entries,
     });
 

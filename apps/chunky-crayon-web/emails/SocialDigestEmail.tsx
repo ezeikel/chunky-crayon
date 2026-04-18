@@ -24,6 +24,8 @@ type SocialDigestEmailProps = {
   coloringImageUrl: string;
   svgUrl?: string;
   animationUrl?: string;
+  demoReelUrl?: string;
+  demoReelCoverUrl?: string;
   entries: SocialDigestEntry[];
   timestamp: string;
 };
@@ -35,6 +37,8 @@ const SocialDigestEmail = ({
   coloringImageUrl = 'https://chunkycrayon.com',
   svgUrl,
   animationUrl,
+  demoReelUrl,
+  demoReelCoverUrl,
   entries = [],
   timestamp = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
@@ -76,30 +80,44 @@ const SocialDigestEmail = ({
           </Text>
         </Section>
 
-        {/* Asset Downloads */}
-        {(svgUrl || animationUrl) && (
-          <Section style={infoSection}>
-            <Heading as="h2" style={sectionTitle}>
-              Assets
-            </Heading>
-            {svgUrl && (
-              <Text style={paragraph}>
-                SVG:{' '}
-                <Link href={svgUrl} style={inlineLink}>
-                  Download
-                </Link>
-              </Text>
-            )}
-            {animationUrl && (
-              <Text style={paragraph}>
-                Animation:{' '}
-                <Link href={animationUrl} style={inlineLink}>
-                  Download
-                </Link>
-              </Text>
-            )}
-          </Section>
-        )}
+        {/* Asset Downloads — clickable R2 links for manual posting */}
+        <Section style={assetSection}>
+          <Heading as="h2" style={assetTitle}>
+            📦 Download Assets
+          </Heading>
+          {demoReelUrl && (
+            <Text style={paragraph}>
+              🎬 Demo Reel (mp4):{' '}
+              <Link href={demoReelUrl} style={inlineLink}>
+                Download Video (1080×1920)
+              </Link>
+            </Text>
+          )}
+          {demoReelCoverUrl && (
+            <Text style={paragraph}>
+              📸 Reel Cover (jpg):{' '}
+              <Link href={demoReelCoverUrl} style={inlineLink}>
+                Download Cover Image
+              </Link>
+            </Text>
+          )}
+          {animationUrl && animationUrl !== demoReelUrl && (
+            <Text style={paragraph}>
+              🎞️ Animation:{' '}
+              <Link href={animationUrl} style={inlineLink}>
+                Download Animation
+              </Link>
+            </Text>
+          )}
+          {svgUrl && (
+            <Text style={paragraph}>
+              ✏️ Line Art (svg):{' '}
+              <Link href={svgUrl} style={inlineLink}>
+                Download SVG
+              </Link>
+            </Text>
+          )}
+        </Section>
 
         {/* Platform Entries */}
         {entries.map((entry, index) => (
@@ -215,6 +233,21 @@ const paragraph = {
 const inlineLink = {
   color: '#DA7353',
   textDecoration: 'underline',
+};
+
+const assetSection = {
+  backgroundColor: '#FFF5EE',
+  border: '2px solid #EDAF8B',
+  borderRadius: '16px',
+  padding: '24px',
+  margin: '0 0 16px',
+};
+
+const assetTitle = {
+  fontSize: '16px',
+  fontWeight: '700',
+  color: '#DA7353',
+  margin: '0 0 12px',
 };
 
 const platformCard = {
