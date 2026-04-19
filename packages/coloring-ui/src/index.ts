@@ -78,7 +78,18 @@ export { default as MobileColoringDrawer } from "./MobileColoringDrawer";
 export { default as ColoringToolbar } from "./ColoringToolbar";
 export { default as ZoomControls } from "./ZoomControls";
 export { default as MuteToggle } from "./MuteToggle";
-export { default as ActionButton, type ActionButtonTone } from "./ActionButton";
+export {
+  default as ActionButton,
+  ActionButtonSizeProvider,
+  type ActionButtonTone,
+  type ActionButtonSize,
+} from "./ActionButton";
+export {
+  default as DesktopToolsSidebar,
+  type DesktopToolsSidebarLabels,
+  type DesktopToolsSidebarSize,
+} from "./DesktopToolsSidebar";
+export { default as ColorStrip } from "./ColorStrip";
 export { default as BrushSizeSelector } from "./BrushSizeSelector";
 export { default as ToolSelector } from "./ToolSelector";
 export { default as PatternSelector } from "./PatternSelector";
