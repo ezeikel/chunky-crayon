@@ -77,6 +77,10 @@
   --color-coloring-surface: var(--secondary);
   --color-coloring-surface-dark: var(--muted);
   --color-coloring-muted: var(--muted-foreground);
+  --color-coloring-text-primary: var(--foreground);
+  --color-coloring-text-secondary: var(--muted-foreground);
+  --color-coloring-magic-from: var(--accent);
+  --color-coloring-magic-to: var(--primary);
 
   /* Coloring UI brand tokens — Coloring Habitat (adult: clean, airy) */
   --radius-coloring-button: 0.5rem;

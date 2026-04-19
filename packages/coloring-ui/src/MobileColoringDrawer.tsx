@@ -371,7 +371,7 @@ const MobileColoringDrawer = ({
               "fixed bottom-0 left-0 right-0 z-50 mx-2",
               "flex flex-col overflow-hidden",
               "bg-white rounded-t-3xl",
-              "border-2 border-b-0 border-paper-cream-dark",
+              "border-2 border-b-0 border-coloring-surface-dark",
               "shadow-[0_-4px_16px_rgba(0,0,0,0.15)]",
               // Safe area padding for notched devices
               "pb-safe",
@@ -397,7 +397,7 @@ const MobileColoringDrawer = ({
               }}
               aria-label={isExpanded ? "Collapse toolbar" : "Expand toolbar"}
             >
-              <div className="w-12 h-1.5 rounded-full bg-paper-cream-dark" />
+              <div className="w-12 h-1.5 rounded-full bg-coloring-surface-dark" />
             </motion.div>
 
             {/* Scrollable content area */}
@@ -420,8 +420,8 @@ const MobileColoringDrawer = ({
                             "flex items-center justify-center",
                             "transition-all duration-coloring-base ease-coloring active:scale-95",
                             isActive
-                              ? "bg-gradient-to-br from-crayon-purple to-crayon-pink text-white"
-                              : "bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 text-crayon-purple",
+                              ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
+                              : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
                           )}
                           aria-label={tool.label}
                           aria-pressed={isActive}
@@ -433,7 +433,9 @@ const MobileColoringDrawer = ({
                             aria-hidden
                             className={cn(
                               "absolute -top-2 -right-2 drop-shadow-sm",
-                              isActive ? "text-white" : "text-crayon-purple",
+                              isActive
+                                ? "text-white"
+                                : "text-coloring-magic-from",
                             )}
                           />
                         </button>
@@ -450,7 +452,7 @@ const MobileColoringDrawer = ({
                           "transition-all duration-coloring-base ease-coloring active:scale-95",
                           isActive
                             ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-                            : "bg-white border-paper-cream-dark text-text-primary",
+                            : "bg-white border-coloring-surface-dark text-coloring-text-primary",
                         )}
                         aria-label={tool.label}
                         aria-pressed={isActive}
@@ -484,7 +486,7 @@ const MobileColoringDrawer = ({
                           "transition-all duration-coloring-base ease-coloring active:scale-95",
                           isActive
                             ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-                            : "bg-white border-paper-cream-dark text-text-primary",
+                            : "bg-white border-coloring-surface-dark text-coloring-text-primary",
                         )}
                       >
                         <FontAwesomeIcon
@@ -515,7 +517,7 @@ const MobileColoringDrawer = ({
                           "transition-all duration-coloring-base ease-coloring active:scale-95",
                           isSelected
                             ? "ring-2 ring-coloring-accent ring-offset-1 border-white"
-                            : "border-paper-cream-dark",
+                            : "border-coloring-surface-dark",
                         )}
                         style={{ backgroundColor: color.hex }}
                         aria-label={`Select ${color.name} color`}
@@ -559,7 +561,7 @@ const MobileColoringDrawer = ({
                             "transition-all duration-coloring-base ease-coloring active:scale-95",
                             isSelected
                               ? "bg-coloring-accent border-transparent shadow-btn-primary"
-                              : "bg-white border-paper-cream-dark",
+                              : "bg-white border-coloring-surface-dark",
                           )}
                           aria-label={`${config.name} brush size`}
                           aria-pressed={isSelected}
@@ -605,7 +607,7 @@ const MobileColoringDrawer = ({
                             "transition-all duration-coloring-base ease-coloring active:scale-95",
                             isActive
                               ? "bg-coloring-accent border-transparent shadow-btn-primary"
-                              : "bg-white border-paper-cream-dark",
+                              : "bg-white border-coloring-surface-dark",
                           )}
                           aria-label={fill.label}
                           aria-pressed={isActive}
@@ -614,7 +616,9 @@ const MobileColoringDrawer = ({
                             icon={fill.icon}
                             size="xl"
                             className={cn(
-                              isActive ? "text-white" : "text-text-primary",
+                              isActive
+                                ? "text-white"
+                                : "text-coloring-text-primary",
                             )}
                           />
                         </button>
@@ -644,7 +648,7 @@ const MobileColoringDrawer = ({
                             "transition-all duration-coloring-base ease-coloring active:scale-95",
                             isActive
                               ? "bg-coloring-accent border-transparent shadow-btn-primary"
-                              : "bg-white border-paper-cream-dark",
+                              : "bg-white border-coloring-surface-dark",
                           )}
                           aria-label={pattern.label}
                           aria-pressed={isActive}
@@ -653,7 +657,9 @@ const MobileColoringDrawer = ({
                             icon={pattern.icon}
                             size="xl"
                             className={cn(
-                              isActive ? "text-white" : "text-text-primary",
+                              isActive
+                                ? "text-white"
+                                : "text-coloring-text-primary",
                             )}
                           />
                         </button>
@@ -672,14 +678,14 @@ const MobileColoringDrawer = ({
                       onClick={handleUndo}
                       disabled={!canUndo}
                       className={cn(
-                        "size-14 rounded-coloring-card border-2 border-paper-cream-dark bg-white",
+                        "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
                         "flex items-center justify-center",
                         "transition-all duration-coloring-base ease-coloring active:scale-95",
                         !canUndo && "opacity-50 cursor-not-allowed",
                       )}
                       aria-label="Undo"
                     >
-                      <UndoIcon className="size-6 text-text-primary" />
+                      <UndoIcon className="size-6 text-coloring-text-primary" />
                     </button>
 
                     <button
@@ -687,14 +693,14 @@ const MobileColoringDrawer = ({
                       onClick={handleRedo}
                       disabled={!canRedo}
                       className={cn(
-                        "size-14 rounded-coloring-card border-2 border-paper-cream-dark bg-white",
+                        "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
                         "flex items-center justify-center",
                         "transition-all duration-coloring-base ease-coloring active:scale-95",
                         !canRedo && "opacity-50 cursor-not-allowed",
                       )}
                       aria-label="Redo"
                     >
-                      <RedoIcon className="size-6 text-text-primary" />
+                      <RedoIcon className="size-6 text-coloring-text-primary" />
                     </button>
                   </div>
                 </div>

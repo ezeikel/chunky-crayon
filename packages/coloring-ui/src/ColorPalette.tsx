@@ -102,8 +102,8 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
           sizeClasses[size],
           isSelected && !isMagicToolActive
             ? "ring-2 ring-offset-1 ring-coloring-accent border-white"
-            : "border-paper-cream-dark",
-          isWhite && !isSelected && "border-paper-cream-dark",
+            : "border-coloring-surface-dark",
+          isWhite && !isSelected && "border-coloring-surface-dark",
         )}
         style={{ backgroundColor: color.hex }}
         onClick={() => handleColorSelect(color.hex, color.name, index)}
@@ -122,7 +122,7 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 p-3 sm:p-4 rounded-coloring-card bg-white border-2 border-paper-cream-dark shadow-coloring-surface",
+        "flex flex-col gap-2 p-3 sm:p-4 rounded-coloring-card bg-white border-2 border-coloring-surface-dark shadow-coloring-surface",
         "transition-opacity duration-coloring-base ease-coloring",
         isMagicToolActive && "opacity-40 pointer-events-none",
         className,
@@ -146,7 +146,7 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
                 type="button"
                 key={`recent-${hex}`}
                 className={cn(
-                  "size-6 sm:size-7 rounded-full border-2 border-paper-cream-dark transition-all duration-150",
+                  "size-6 sm:size-7 rounded-full border-2 border-coloring-surface-dark transition-all duration-150",
                   "active:scale-95 focus:outline-none",
                   selectedColor === hex &&
                     "ring-2 ring-offset-1 ring-coloring-accent border-white",

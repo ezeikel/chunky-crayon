@@ -233,7 +233,7 @@ const ToolSelector = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-paper-cream-dark shadow-coloring-surface",
+        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-coloring-surface-dark shadow-coloring-surface",
         className,
       )}
     >
@@ -248,10 +248,10 @@ const ToolSelector = ({
               onClick={() => handleToolSelect(id)}
               className={cn(
                 "relative flex items-center justify-center rounded-coloring-card size-10 sm:size-12 transition-all duration-coloring-base ease-coloring",
-                "active:scale-95 focus:outline-none focus:ring-2 focus:ring-crayon-purple",
+                "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-magic-from",
                 isActive
-                  ? "bg-gradient-to-br from-crayon-purple to-crayon-pink text-white"
-                  : "bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 text-crayon-purple",
+                  ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
+                  : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
               )}
               aria-label={label}
               title={label}
@@ -263,7 +263,7 @@ const ToolSelector = ({
                 icon={faSparkles}
                 className={cn(
                   "absolute -top-2 -right-2 size-4 drop-shadow-sm",
-                  isActive ? "text-white" : "text-crayon-purple",
+                  isActive ? "text-white" : "text-coloring-magic-from",
                 )}
                 aria-hidden
               />
@@ -281,7 +281,7 @@ const ToolSelector = ({
               "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
               isActive
                 ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-                : "bg-white border-paper-cream-dark text-text-primary hover:border-coloring-accent",
+                : "bg-white border-coloring-surface-dark text-coloring-text-primary hover:border-coloring-accent",
             )}
             aria-label={label}
             title={label}

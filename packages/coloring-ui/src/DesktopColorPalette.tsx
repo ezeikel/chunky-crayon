@@ -73,7 +73,7 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
                 "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
                 isActive
                   ? "bg-coloring-accent text-white"
-                  : "bg-white border border-paper-cream-dark text-text-primary hover:bg-paper-cream",
+                  : "bg-white border border-coloring-surface-dark text-coloring-text-primary hover:bg-coloring-surface",
               )}
             >
               <FontAwesomeIcon icon={variantIcons[variant]} size="xl" />

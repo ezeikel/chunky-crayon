@@ -44,7 +44,7 @@ const AudioTile = ({
       "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
       isOn
         ? "bg-coloring-accent text-white"
-        : "bg-white border border-paper-cream-dark text-coloring-muted hover:bg-paper-cream",
+        : "bg-white border border-coloring-surface-dark text-coloring-muted hover:bg-coloring-surface",
     )}
   >
     <FontAwesomeIcon icon={isOn ? iconOn : iconOff} size="lg" />
@@ -93,7 +93,7 @@ const MuteToggle = ({ className }: MuteToggleProps) => {
   };
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-3", className)}>
       <AudioTile
         isOn={!isSfxMuted}
         onToggle={handleSfxToggle}

@@ -158,7 +158,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-paper-cream-dark transition-colors duration-200",
+        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-coloring-surface-dark transition-colors duration-200",
         isZoomed && "ring-2 ring-coloring-accent/30",
         className,
       )}
@@ -169,10 +169,10 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         onClick={handleZoomOut}
         disabled={isAtMinZoom}
         className={cn(
-          "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card border-2 border-paper-cream-dark bg-white text-coloring-muted transition-all duration-coloring-base ease-coloring",
+          "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card border-2 border-coloring-surface-dark bg-white text-coloring-muted transition-all duration-coloring-base ease-coloring",
           "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent hover:border-coloring-accent",
           isAtMinZoom &&
-            "opacity-50 cursor-not-allowed hover:border-paper-cream-dark",
+            "opacity-50 cursor-not-allowed hover:border-coloring-surface-dark",
         )}
         aria-label="Zoom out (see more)"
         title="Zoom out"
@@ -189,10 +189,10 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
         onClick={handleZoomIn}
         disabled={isAtMaxZoom}
         className={cn(
-          "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card border-2 border-paper-cream-dark bg-white text-coloring-muted transition-all duration-coloring-base ease-coloring",
+          "flex items-center justify-center size-10 sm:size-12 rounded-coloring-card border-2 border-coloring-surface-dark bg-white text-coloring-muted transition-all duration-coloring-base ease-coloring",
           "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent hover:border-coloring-accent",
           isAtMaxZoom &&
-            "opacity-50 cursor-not-allowed hover:border-paper-cream-dark",
+            "opacity-50 cursor-not-allowed hover:border-coloring-surface-dark",
         )}
         aria-label="Zoom in (see closer)"
         title="Zoom in"
@@ -210,7 +210,7 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
             "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-accent",
             isPanActive
               ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-              : "bg-white border-paper-cream-dark text-coloring-muted hover:border-coloring-accent",
+              : "bg-white border-coloring-surface-dark text-coloring-muted hover:border-coloring-accent",
           )}
           aria-label="Move around the picture"
           title="Move"

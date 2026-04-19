@@ -37,19 +37,17 @@ const AutoColorModal = ({ className }: AutoColorModalProps) => {
     >
       <div
         className={cn(
-          "flex flex-col items-center gap-5 p-8 rounded-2xl shadow-xl max-w-sm mx-4",
+          "flex flex-col items-center gap-5 p-8 rounded-coloring-card shadow-xl max-w-sm mx-4",
           isKids
-            ? "bg-white border-2 border-crayon-orange/20"
-            : "bg-white border border-gray-100",
+            ? "bg-white border-2 border-coloring-accent/20"
+            : "bg-white border border-coloring-surface-dark",
         )}
       >
         {/* Spinner */}
         <div
           className={cn(
             "w-12 h-12 rounded-full animate-spin",
-            isKids
-              ? "border-4 border-crayon-orange/30 border-t-crayon-orange"
-              : "border-4 border-gray-200 border-t-gray-800",
+            "border-4 border-coloring-accent/30 border-t-coloring-accent",
           )}
         />
 
@@ -57,18 +55,13 @@ const AutoColorModal = ({ className }: AutoColorModalProps) => {
         <div className="text-center">
           <h3
             className={cn(
-              "font-semibold text-base",
-              isKids ? "text-crayon-orange-dark" : "text-gray-900",
+              "font-coloring-heading font-semibold text-base",
+              "text-coloring-text-primary",
             )}
           >
             {isKids ? "Coloring your picture!" : "Adding color to your page"}
           </h3>
-          <p
-            className={cn(
-              "text-sm mt-1.5",
-              isKids ? "text-crayon-orange-dark/60" : "text-coloring-muted",
-            )}
-          >
+          <p className={cn("text-sm mt-1.5", "text-coloring-muted")}>
             {isKids
               ? "Hang tight, the magic is happening"
               : "This may take a few seconds"}

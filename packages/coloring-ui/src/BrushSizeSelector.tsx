@@ -47,7 +47,7 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
   return (
     <div
       className={cn(
-        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-paper-cream-dark",
+        "flex items-center gap-2 p-2 rounded-coloring-card bg-white border-2 border-coloring-surface-dark",
         { "gap-3": isKids },
         className,
       )}
@@ -68,7 +68,7 @@ const BrushSizeSelector = ({ className }: BrushSizeSelectorProps) => {
               isKids ? "size-12 sm:size-14" : "size-10 sm:size-12",
               isSelected
                 ? "bg-coloring-accent border-transparent shadow-btn-primary"
-                : "bg-white border-paper-cream-dark",
+                : "bg-white border-coloring-surface-dark",
             )}
             aria-label={`${config.name} brush size`}
             title={config.name}

@@ -161,7 +161,7 @@ const ColoringToolbar = ({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 p-4 bg-white border-2 border-paper-cream-dark rounded-coloring-card shadow-coloring-surface",
+        "flex flex-col gap-4 p-4 bg-white border-2 border-coloring-surface-dark rounded-coloring-card shadow-coloring-surface",
         className,
       )}
     >
@@ -186,7 +186,7 @@ const ColoringToolbar = ({
                 "transition-all duration-coloring-base ease-coloring active:scale-95",
                 isActive
                   ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-                  : "bg-white border-paper-cream-dark text-text-primary",
+                  : "bg-white border-coloring-surface-dark text-coloring-text-primary",
               )}
             >
               <FontAwesomeIcon icon={variantIcons[variant]} size="lg" />
@@ -212,7 +212,7 @@ const ColoringToolbar = ({
                 "transition-all duration-coloring-base ease-coloring active:scale-95",
                 isSelected
                   ? "ring-2 ring-coloring-accent ring-offset-1 border-white"
-                  : "border-paper-cream-dark",
+                  : "border-coloring-surface-dark",
               )}
               style={{ backgroundColor: color.hex }}
               aria-label={`Select ${color.name} color`}
@@ -237,8 +237,8 @@ const ColoringToolbar = ({
                   "flex items-center justify-center",
                   "transition-all duration-coloring-base ease-coloring active:scale-95",
                   isActive
-                    ? "bg-gradient-to-br from-crayon-purple to-crayon-pink text-white"
-                    : "bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 text-crayon-purple",
+                    ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
+                    : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
                 )}
                 aria-label={tool.label}
                 title={tool.label}
@@ -251,7 +251,7 @@ const ColoringToolbar = ({
                   aria-hidden
                   className={cn(
                     "absolute -top-2 -right-2 drop-shadow-sm",
-                    isActive ? "text-white" : "text-crayon-purple",
+                    isActive ? "text-white" : "text-coloring-magic-from",
                   )}
                 />
               </button>
@@ -268,7 +268,7 @@ const ColoringToolbar = ({
                 "transition-all duration-coloring-base ease-coloring active:scale-95",
                 isActive
                   ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-                  : "bg-white border-paper-cream-dark text-text-primary",
+                  : "bg-white border-coloring-surface-dark text-coloring-text-primary",
               )}
               aria-label={tool.label}
               title={tool.label}
@@ -307,7 +307,7 @@ const ColoringToolbar = ({
                   "transition-all duration-coloring-base ease-coloring active:scale-95",
                   isSelected
                     ? "bg-coloring-accent border-transparent shadow-btn-primary"
-                    : "bg-white border-paper-cream-dark",
+                    : "bg-white border-coloring-surface-dark",
                 )}
                 aria-label={`${config.name} brush size`}
                 aria-pressed={isSelected}

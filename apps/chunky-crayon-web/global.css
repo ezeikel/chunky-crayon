@@ -41,6 +41,10 @@
   --color-coloring-surface: hsl(var(--paper-cream));
   --color-coloring-surface-dark: hsl(var(--paper-cream-dark));
   --color-coloring-muted: hsl(var(--text-muted));
+  --color-coloring-text-primary: hsl(var(--text-primary));
+  --color-coloring-text-secondary: hsl(var(--text-secondary));
+  --color-coloring-magic-from: hsl(var(--crayon-purple));
+  --color-coloring-magic-to: hsl(var(--crayon-pink));
 
   /* Coloring UI brand tokens — Chunky Crayon (kids: chunky, bouncy) */
   --radius-coloring-button: 1.5rem;
