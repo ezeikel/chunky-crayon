@@ -39,7 +39,7 @@ import {
   clearColoringProgress,
 } from "@one-colored-pixel/coloring-ui";
 import {
-  AutoColorPreview,
+  ActionButtonSizeProvider,
   AutoColorModal,
 } from "@one-colored-pixel/coloring-ui";
 import { generateRegionFillPoints } from "@/app/actions/generate-color-map";
@@ -47,6 +47,11 @@ import { generateColoredReference } from "@/app/actions/generate-colored-referen
 import { checkRegionStoreReady } from "@/app/actions/generate-regions";
 import { useRouter } from "next/navigation";
 import { detectAllRegions } from "@one-colored-pixel/canvas";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faWandMagicSparkles,
+  faFaceFrownOpen,
+} from "@fortawesome/pro-duotone-svg-icons";
 
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
@@ -55,6 +60,7 @@ type ColoringAreaProps = {
 
 export type ColoringAreaHandle = {
   getCanvas: () => HTMLCanvasElement | null;
+  getBoundaryCanvas: () => HTMLCanvasElement | null;
   getCanvasDataUrl: () => string | null;
   handleUndo: (action: CanvasAction) => void;
   handleRedo: (action: CanvasAction) => void;
@@ -283,6 +289,11 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     useEffect(() => {
       if (!isMagicToolActive || !canvasReadyRef.current) return;
 
+      // Region store (pre-computed server-side) is the preferred source for
+      // BOTH magic-reveal and magic-auto. When ready, the legacy warm-up +
+      // on-demand fill-points path below is not needed.
+      if (regionStore.state.isReady) return;
+
       // For magic-auto with fill points, skip region detection entirely
       // (handled by the auto-fill effect below)
       if (activeTool === "magic-auto" && fillPointsData) return;
@@ -314,6 +325,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       magicColorMapState.isReady,
       magicColorMapState.isLoading,
       generateColorMap,
+      regionStore.state.isReady,
     ]);
 
     // Handle auto-color - fill regions progressively for visual feedback
@@ -709,6 +721,12 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       return canvasRef.current?.getCanvas() || null;
     }, []);
 
+    // Get boundary (line-art) canvas — used by ProgressIndicator to compute
+    // the colourable area excluding line pixels.
+    const getBoundaryCanvas = useCallback(() => {
+      return canvasRef.current?.getBoundaryCanvas() || null;
+    }, []);
+
     // Handle undo by restoring the canvas to the state before the action
     const handleUndo = useCallback(
       (action: CanvasAction) => {
@@ -799,6 +817,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       ref,
       () => ({
         getCanvas,
+        getBoundaryCanvas,
         getCanvasDataUrl,
         handleUndo,
         handleRedo,
@@ -807,6 +826,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       }),
       [
         getCanvas,
+        getBoundaryCanvas,
         getCanvasDataUrl,
         handleUndo,
         handleRedo,
@@ -960,165 +980,194 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       magicColorMapState.isReady;
 
     return (
-      <div className="flex flex-col gap-y-2 md:gap-y-3">
-        {/* Auto Color loading modal */}
-        <AutoColorModal />
+      <ActionButtonSizeProvider value="compact">
+        <div className="flex flex-col gap-y-2 md:gap-y-3">
+          {/* Auto Color loading modal */}
+          <AutoColorModal />
 
-        {/* Desktop Toolbar (md-lg only) - Traditional top toolbar */}
-        {/* Hidden on xl+ where sidebar controls are used instead */}
-        {/* Note: Progress/Mute moved to page header on desktop for cleaner canvas area */}
-        <div className="hidden md:block xl:hidden">
-          <ColoringToolbar
+          {/* Desktop Toolbar (md-lg only) - Traditional top toolbar */}
+          {/* Hidden on xl+ where sidebar controls are used instead */}
+          {/* Note: Progress/Mute moved to page header on desktop for cleaner canvas area */}
+          <div className="hidden md:block xl:hidden">
+            <ColoringToolbar
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              onStickerToolSelect={openStickerSelector}
+            />
+          </div>
+
+          {/* Mobile Top Bar - Minimal with progress, mute, and zoom */}
+          <div className="md:hidden flex items-center justify-between gap-3 px-1">
+            {/* Left side: Progress bar needs flex-1 to expand and give ProgressIndicator width */}
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <ProgressIndicator
+                getCanvas={getCanvas}
+                getBoundaryCanvas={getBoundaryCanvas}
+                className="flex-1 min-w-0"
+              />
+              <MuteToggle />
+            </div>
+            <ZoomControls className="shadow-sm shrink-0" />
+          </div>
+
+          {/* Canvas - Shared between mobile and desktop */}
+          <div className="relative flex-1 flex items-center justify-center md:block">
+            <ImageCanvas
+              ref={canvasRef}
+              coloringImage={coloringImage}
+              className="rounded-lg shadow-lg bg-white overflow-hidden"
+              onCanvasReady={handleCanvasReady}
+              onFirstInteraction={handleFirstInteraction}
+              getRevealColor={
+                useReferenceForMagic ? undefined : getColorAtPoint
+              }
+              getRevealColorFromCSS={
+                useReferenceForMagic ? getRevealColorFromCSS : undefined
+              }
+              getRevealRegionId={
+                useReferenceForMagic ? undefined : getRegionIdAtPoint
+              }
+              onRegionRevealed={
+                useReferenceForMagic ? undefined : handleRegionRevealed
+              }
+              isMagicRevealReady={isMagicReady}
+              regionStore={
+                regionStore.state.isReady
+                  ? {
+                      getRegionIdAt: regionStore.getRegionIdAt,
+                      getColorForRegion: regionStore.getColorForRegion,
+                      isReady: regionStore.state.isReady,
+                      width: regionStore.state.width,
+                      height: regionStore.state.height,
+                    }
+                  : undefined
+              }
+            />
+
+            {/* Magic Loading Overlay — only relevant on the LEGACY path
+             * (on-demand fill-points gen / 5×5 colour-map generation for
+             * old images that don't have a region store yet). When the
+             * region store is ready, both magic tools draw from it
+             * directly so no prep work / modal is needed. */}
+            {isMagicToolActive &&
+              !regionStore.state.isReady &&
+              (magicColorMapState.isLoading || isGeneratingFillPoints) && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6"
+                  data-testid="magic-colors-loading"
+                >
+                  <div className="flex flex-col items-center gap-4 p-6 md:p-8 rounded-coloring-card bg-white border-2 border-coloring-surface-dark shadow-lg max-w-sm w-full">
+                    <div className="flex items-center justify-center size-16 rounded-full bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to">
+                      <FontAwesomeIcon
+                        icon={faWandMagicSparkles}
+                        className="text-white text-2xl"
+                      />
+                    </div>
+                    <h2 className="font-coloring-heading font-bold text-2xl text-coloring-text-primary text-center">
+                      {isGeneratingFillPoints
+                        ? "Mixing the colours"
+                        : "Getting the colours ready"}
+                    </h2>
+                    <p className="font-coloring-body text-base text-coloring-text-secondary text-center">
+                      {isGeneratingFillPoints
+                        ? "This only happens once — hang tight, your palette is on its way."
+                        : magicColorMapState.loadingMessage ||
+                          "Almost there — getting your palette ready."}
+                    </p>
+                    <div className="w-full h-3 rounded-full bg-coloring-surface overflow-hidden">
+                      <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-coloring-magic-from to-coloring-magic-to animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            {/* Magic Error Overlay — matches loader styling */}
+            {isMagicToolActive && magicColorMapState.error && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6">
+                <div className="flex flex-col items-center gap-4 p-6 md:p-8 rounded-coloring-card bg-white border-2 border-coloring-surface-dark shadow-lg max-w-sm w-full">
+                  <div className="flex items-center justify-center size-16 rounded-full bg-coloring-magic-to/15">
+                    <FontAwesomeIcon
+                      icon={faFaceFrownOpen}
+                      className="text-coloring-magic-to text-2xl"
+                    />
+                  </div>
+                  <h2 className="font-coloring-heading font-bold text-2xl text-coloring-text-primary text-center">
+                    Something went wrong
+                  </h2>
+                  <p className="font-coloring-body text-base text-coloring-text-secondary text-center">
+                    {magicColorMapState.error}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => resetMagicColorMap()}
+                    className="font-coloring-heading font-bold text-white bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to rounded-full px-8 py-3 text-lg shadow-lg hover:scale-105 active:scale-95 transition-all"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Action buttons - Desktop style (md-lg only, hidden on xl+ where sidebar has them) */}
+          <div className="hidden md:flex xl:hidden flex-wrap items-center justify-center gap-3">
+            <StartOverButton onStartOver={handleStartOver} />
+            <DownloadPDFButton
+              coloringImage={coloringImage}
+              getCanvasDataUrl={getCanvasDataUrl}
+            />
+            <ShareButton
+              url={typeof window !== "undefined" ? window.location.href : ""}
+              title={coloringImage.title || "Coloring Page"}
+              description={`Color this ${coloringImage.title || "fun coloring page"} on Coloring Habitat!`}
+              imageUrl={coloringImage.url || undefined}
+              getCanvasDataUrl={getCanvasDataUrl}
+            />
+            {isAuthenticated && coloringImage.id && (
+              <SaveToGalleryButton
+                coloringImageId={coloringImage.id}
+                getCanvasDataUrl={getCanvasDataUrl}
+              />
+            )}
+          </div>
+
+          {/* Mobile Action buttons - Compact row with icon-only buttons */}
+          <div className="md:hidden flex items-center justify-center gap-3 py-2 px-2">
+            <StartOverButton onStartOver={handleStartOver} />
+            <DownloadPDFButton
+              coloringImage={coloringImage}
+              getCanvasDataUrl={getCanvasDataUrl}
+            />
+            <ShareButton
+              url={typeof window !== "undefined" ? window.location.href : ""}
+              title={coloringImage.title || "Coloring Page"}
+              description={`Color this ${coloringImage.title || "fun coloring page"} on Coloring Habitat!`}
+              imageUrl={coloringImage.url || undefined}
+              getCanvasDataUrl={getCanvasDataUrl}
+            />
+            {isAuthenticated && coloringImage.id && (
+              <SaveToGalleryButton
+                coloringImageId={coloringImage.id}
+                getCanvasDataUrl={getCanvasDataUrl}
+              />
+            )}
+          </div>
+
+          {/* Fixed bottom drawer for mobile - Vaul-based draggable bottom sheet */}
+          <MobileColoringDrawer
+            className="md:hidden"
             onUndo={handleUndo}
             onRedo={handleRedo}
             onStickerToolSelect={openStickerSelector}
           />
-        </div>
 
-        {/* Mobile Top Bar - Minimal with progress, mute, and zoom */}
-        <div className="md:hidden flex items-center justify-between gap-3 px-1">
-          {/* Left side: Progress bar needs flex-1 to expand and give ProgressIndicator width */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <ProgressIndicator
-              getCanvas={getCanvas}
-              className="flex-1 min-w-0"
-            />
-            <MuteToggle />
-          </div>
-          <ZoomControls className="shadow-sm shrink-0" />
-        </div>
-
-        {/* Canvas - Shared between mobile and desktop */}
-        <div className="relative flex-1 flex items-center justify-center md:block">
-          <ImageCanvas
-            ref={canvasRef}
-            coloringImage={coloringImage}
-            className="rounded-lg shadow-lg bg-white overflow-hidden"
-            onCanvasReady={handleCanvasReady}
-            onFirstInteraction={handleFirstInteraction}
-            getRevealColor={useReferenceForMagic ? undefined : getColorAtPoint}
-            getRevealColorFromCSS={
-              useReferenceForMagic ? getRevealColorFromCSS : undefined
-            }
-            getRevealRegionId={
-              useReferenceForMagic ? undefined : getRegionIdAtPoint
-            }
-            onRegionRevealed={
-              useReferenceForMagic ? undefined : handleRegionRevealed
-            }
-            isMagicRevealReady={isMagicReady}
-            regionStore={
-              regionStore.state.isReady
-                ? {
-                    getRegionIdAt: regionStore.getRegionIdAt,
-                    getColorForRegion: regionStore.getColorForRegion,
-                    isReady: regionStore.state.isReady,
-                    width: regionStore.state.width,
-                    height: regionStore.state.height,
-                  }
-                : undefined
-            }
+          {/* Sticker selector modal */}
+          <StickerSelector
+            isOpen={isStickerSelectorOpen}
+            onClose={() => setIsStickerSelectorOpen(false)}
           />
-
-          {/* Magic Loading Overlay - Shows when magic tools are analyzing the image */}
-          {isMagicToolActive &&
-            (magicColorMapState.isLoading || isGeneratingFillPoints) && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-                <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gradient-to-br from-violet-600/10 to-rose-500/10 border-2 border-violet-600/20 shadow-lg">
-                  <div className="relative">
-                    <div className="size-12 border-4 border-violet-600/30 border-t-violet-600 rounded-full animate-spin" />
-                    <span className="absolute inset-0 flex items-center justify-center text-2xl">
-                      ✨
-                    </span>
-                  </div>
-                  <p className="text-sm font-bold text-violet-600 text-center max-w-[200px]">
-                    {isGeneratingFillPoints
-                      ? "Preparing magic colors for the first time..."
-                      : magicColorMapState.loadingMessage ||
-                        "Preparing magic colors..."}
-                  </p>
-                </div>
-              </div>
-            )}
-
-          {/* Magic Error Overlay - Shows if magic analysis fails */}
-          {isMagicToolActive && magicColorMapState.error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg z-10">
-              <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-destructive/10 border-2 border-destructive/30 shadow-lg">
-                <span className="text-3xl">😕</span>
-                <p className="text-sm font-bold text-destructive text-center max-w-[200px]">
-                  {magicColorMapState.error}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => resetMagicColorMap()}
-                  className="px-4 py-2 text-sm font-bold text-white bg-violet-600 rounded-full hover:bg-violet-600/90 active:scale-95 transition-all"
-                >
-                  Try Again
-                </button>
-              </div>
-            </div>
-          )}
         </div>
-
-        {/* Action buttons - Desktop style (md-lg only, hidden on xl+ where sidebar has them) */}
-        <div className="hidden md:flex xl:hidden flex-wrap items-center justify-center gap-3">
-          <StartOverButton onStartOver={handleStartOver} />
-          <DownloadPDFButton
-            coloringImage={coloringImage}
-            getCanvasDataUrl={getCanvasDataUrl}
-          />
-          <ShareButton
-            url={typeof window !== "undefined" ? window.location.href : ""}
-            title={coloringImage.title || "Coloring Page"}
-            description={`Color this ${coloringImage.title || "fun coloring page"} on Coloring Habitat!`}
-            imageUrl={coloringImage.url || undefined}
-            getCanvasDataUrl={getCanvasDataUrl}
-          />
-          {isAuthenticated && coloringImage.id && (
-            <SaveToGalleryButton
-              coloringImageId={coloringImage.id}
-              getCanvasDataUrl={getCanvasDataUrl}
-            />
-          )}
-        </div>
-
-        {/* Mobile Action buttons - Compact row with icon-only buttons */}
-        <div className="md:hidden flex items-center justify-center gap-3 py-2 px-2">
-          <StartOverButton onStartOver={handleStartOver} />
-          <DownloadPDFButton
-            coloringImage={coloringImage}
-            getCanvasDataUrl={getCanvasDataUrl}
-          />
-          <ShareButton
-            url={typeof window !== "undefined" ? window.location.href : ""}
-            title={coloringImage.title || "Coloring Page"}
-            description={`Color this ${coloringImage.title || "fun coloring page"} on Coloring Habitat!`}
-            imageUrl={coloringImage.url || undefined}
-            getCanvasDataUrl={getCanvasDataUrl}
-          />
-          {isAuthenticated && coloringImage.id && (
-            <SaveToGalleryButton
-              coloringImageId={coloringImage.id}
-              getCanvasDataUrl={getCanvasDataUrl}
-            />
-          )}
-        </div>
-
-        {/* Fixed bottom drawer for mobile - Vaul-based draggable bottom sheet */}
-        <MobileColoringDrawer
-          className="md:hidden"
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onStickerToolSelect={openStickerSelector}
-        />
-
-        {/* Sticker selector modal */}
-        <StickerSelector
-          isOpen={isStickerSelectorOpen}
-          onClose={() => setIsStickerSelectorOpen(false)}
-        />
-      </div>
+      </ActionButtonSizeProvider>
     );
   },
 );

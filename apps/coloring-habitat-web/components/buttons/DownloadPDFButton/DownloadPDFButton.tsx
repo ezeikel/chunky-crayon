@@ -125,7 +125,6 @@ const DownloadPDFButtonContent = ({
   if (isLoading) {
     return (
       <ActionButton
-        size="compact"
         tone="accent"
         icon={faImage}
         label={t("loading")}
@@ -138,7 +137,6 @@ const DownloadPDFButtonContent = ({
   if (error || !imageSvg || !qrCodeSvg) {
     return (
       <ActionButton
-        size="compact"
         tone="accent"
         icon={faImage}
         label={t("error")}
@@ -151,7 +149,6 @@ const DownloadPDFButtonContent = ({
   if (generatingState === "generating") {
     return (
       <ActionButton
-        size="compact"
         tone="accent"
         icon={faImage}
         label={t("creating")}
@@ -164,7 +161,6 @@ const DownloadPDFButtonContent = ({
   if (generatingState === "error") {
     return (
       <ActionButton
-        size="compact"
         tone="accent"
         icon={faImage}
         label={t("error")}
@@ -176,7 +172,6 @@ const DownloadPDFButtonContent = ({
 
   return (
     <ActionButton
-      size="compact"
       tone="accent"
       icon={faImage}
       label={t("idle")}

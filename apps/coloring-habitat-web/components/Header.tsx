@@ -55,7 +55,7 @@ const Header = () => {
         isScrolled && "shadow-sm border-b border-border",
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-6 py-3">
+      <div className="flex items-center justify-between px-4 md:px-6 py-3">
         {/* Logo */}
         <Link
           href="/"

@@ -61,7 +61,6 @@ const ShareButton = ({
   if (state === "uploading") {
     return (
       <ActionButton
-        size="compact"
         tone="accent"
         icon={faSpinner}
         label="Preparing..."
@@ -74,7 +73,6 @@ const ShareButton = ({
   if (state === "done") {
     return (
       <ActionButton
-        size="compact"
         tone="success"
         icon={faCheck}
         label="Link Copied"
@@ -86,7 +84,6 @@ const ShareButton = ({
 
   return (
     <ActionButton
-      size="compact"
       tone="accent"
       icon={faShare}
       label="Share"

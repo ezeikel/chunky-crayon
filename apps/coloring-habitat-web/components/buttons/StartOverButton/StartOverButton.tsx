@@ -34,14 +34,12 @@ const StartOverButton = ({
     return (
       <div className={cn("flex flex-col gap-2", className)}>
         <ActionButton
-          size="compact"
           tone="destructive"
           icon={faBroomWide}
           label={t("confirm")}
           onClick={handleClick}
         />
         <ActionButton
-          size="compact"
           tone="outline"
           icon={faBroomWide}
           label={t("cancel")}
@@ -53,7 +51,6 @@ const StartOverButton = ({
 
   return (
     <ActionButton
-      size="compact"
       tone="secondary"
       icon={faBroomWide}
       label={t("idle")}

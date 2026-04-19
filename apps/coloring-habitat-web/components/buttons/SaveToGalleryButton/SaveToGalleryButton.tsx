@@ -54,7 +54,6 @@ const SaveToGalleryButton = ({
   if (state === "saving") {
     return (
       <ActionButton
-        size="compact"
         tone="accent"
         icon={faSpinner}
         label={t("saving")}
@@ -67,7 +66,6 @@ const SaveToGalleryButton = ({
   if (state === "success") {
     return (
       <ActionButton
-        size="compact"
         tone="success"
         icon={faCheck}
         label={t("saved")}
@@ -81,7 +79,6 @@ const SaveToGalleryButton = ({
     return (
       <div className={cn("flex flex-col items-center gap-2", className)}>
         <ActionButton
-          size="compact"
           tone="accent"
           icon={faHeart}
           label={t("tryAgain")}
@@ -96,7 +93,6 @@ const SaveToGalleryButton = ({
 
   return (
     <ActionButton
-      size="compact"
       tone="accent"
       icon={faHeart}
       label={t("idle")}

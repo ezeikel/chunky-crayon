@@ -106,7 +106,7 @@ const ColoringImagePage = async ({ params }: Props) => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(imageSchema) }}
       />
       <main className="bg-background py-8">
-        <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-[100vw] px-6">
           <Breadcrumbs
             items={[
               { label: t("home"), href: "/" },
