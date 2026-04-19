@@ -74,7 +74,6 @@ export type { SoundType, BrushSoundType } from "./audio";
 export { default as ImageCanvas, type ImageCanvasHandle } from "./ImageCanvas";
 export { default as ColorPalette } from "./ColorPalette";
 export { default as DesktopColorPalette } from "./DesktopColorPalette";
-export { default as MobileColoringToolbar } from "./MobileColoringToolbar";
 export { default as MobileColoringDrawer } from "./MobileColoringDrawer";
 export { default as ColoringToolbar } from "./ColoringToolbar";
 export { default as ZoomControls } from "./ZoomControls";
