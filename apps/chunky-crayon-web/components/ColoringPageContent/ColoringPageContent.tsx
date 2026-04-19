@@ -2,13 +2,21 @@
 
 import { useRef, useCallback, useEffect } from 'react';
 import { ColoringImage } from '@one-colored-pixel/db/types';
+import { useTranslations } from 'next-intl';
 import ColoringArea, {
   ColoringAreaHandle,
 } from '@/components/ColoringArea/ColoringArea';
 import ProgressIndicator from '@/components/ProgressIndicator';
 import { MuteToggle } from '@one-colored-pixel/coloring-ui';
 import { DesktopColorPalette } from '@one-colored-pixel/coloring-ui';
-import DesktopToolsSidebar from '@/components/DesktopToolsSidebar';
+import {
+  DesktopToolsSidebar,
+  type DesktopToolsSidebarLabels,
+} from '@one-colored-pixel/coloring-ui';
+import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
+import DownloadPDFButton from '@/components/buttons/DownloadPDFButton/DownloadPDFButton';
+import ShareButton from '@/components/buttons/ShareButton/ShareButton';
+import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton/SaveToGalleryButton';
 import { trackViewContent } from '@/utils/pixels';
 
 type ColoringPageContentProps = {
@@ -22,6 +30,23 @@ const ColoringPageContent = ({
   isAuthenticated,
   title,
 }: ColoringPageContentProps) => {
+  const t = useTranslations('coloringPage');
+  const sidebarLabels: DesktopToolsSidebarLabels = {
+    crayon: t('brushTypes.crayon'),
+    marker: t('brushTypes.marker'),
+    glitter: t('brushTypes.glitter'),
+    eraser: t('brushTypes.eraser'),
+    fill: t('tools.fill'),
+    sticker: t('tools.sticker'),
+    'magic-reveal': t('tools.magicBrush'),
+    'magic-auto': t('tools.autoColor'),
+    undo: t('undoRedo.undo'),
+    redo: t('undoRedo.redo'),
+    zoomIn: t('zoomControls.zoomIn'),
+    zoomOut: t('zoomControls.zoomOut'),
+    pan: t('zoomControls.pan'),
+    resetView: t('zoomControls.reset'),
+  };
   console.log('[ColoringPageContent] Received coloringImage:', {
     id: coloringImage?.id,
     title: coloringImage?.title,
@@ -139,10 +164,31 @@ const ColoringPageContent = ({
             onUndo={handleUndo}
             onRedo={handleRedo}
             onStickerToolSelect={handleStickerToolSelect}
-            onStartOver={handleStartOver}
-            coloringImage={coloringImage}
-            getCanvasDataUrl={getCanvasDataUrl}
-            isAuthenticated={isAuthenticated}
+            labels={sidebarLabels}
+            actions={
+              <>
+                <StartOverButton onStartOver={handleStartOver} />
+                <DownloadPDFButton
+                  coloringImage={coloringImage}
+                  getCanvasDataUrl={getCanvasDataUrl}
+                />
+                <ShareButton
+                  url={
+                    typeof window !== 'undefined' ? window.location.href : ''
+                  }
+                  title={coloringImage?.title || 'Coloring Page'}
+                  description={`Color this ${coloringImage?.title || 'fun coloring page'} on Chunky Crayon!`}
+                  imageUrl={coloringImage?.url || undefined}
+                  getCanvasDataUrl={getCanvasDataUrl}
+                />
+                {isAuthenticated && coloringImage?.id && (
+                  <SaveToGalleryButton
+                    coloringImageId={coloringImage.id}
+                    getCanvasDataUrl={getCanvasDataUrl}
+                  />
+                )}
+              </>
+            }
           />
         </div>
       </div>

@@ -1,6 +1,12 @@
 "use client";
 
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
+import {
+  createContext,
+  forwardRef,
+  useContext,
+  type ButtonHTMLAttributes,
+  type ReactNode,
+} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import cn from "./cn";
@@ -38,7 +44,19 @@ export type ActionButtonTone =
  *   for sidebar action rows where icons read better than text for young
  *   users.
  */
-export type ActionButtonSize = "hero" | "compact" | "tile";
+export type ActionButtonSize = "hero" | "compact" | "tile" | "tile-compact";
+
+/**
+ * Context allowing a parent container (e.g. `DesktopToolsSidebar`) to
+ * dictate the default size of any `ActionButton`s rendered inside it.
+ * Lets app-level button wrappers stay size-agnostic — the surrounding
+ * sidebar decides how dense the action row should be.
+ *
+ * Explicit `size` prop on an `ActionButton` always wins over context.
+ */
+const ActionButtonSizeContext = createContext<ActionButtonSize | null>(null);
+
+export const ActionButtonSizeProvider = ActionButtonSizeContext.Provider;
 
 type ActionButtonProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
@@ -94,12 +112,17 @@ const sizeClasses: Record<ActionButtonSize, string> = {
     // Kid-first icon-only square. 64px hits Sesame Workshop's 60-75px target
     // for ages 3-6. Label hidden visually; surfaced via aria-label + tooltip.
     "size-16",
+  "tile-compact":
+    // Adult / dense sidebars. Matches compact tool-grid tile size (48px)
+    // so action row aligns column-for-column with the tool grid above.
+    "size-12",
 };
 
 const heroIconClass =
   "[width:var(--spacing-coloring-icon)] [height:var(--spacing-coloring-icon)]";
 const compactIconClass = "size-4";
 const tileIconClass = "size-12";
+const tileCompactIconClass = "size-8";
 
 const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
   (
@@ -108,7 +131,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
       label,
       ariaLabel,
       tone = "accent",
-      size = "hero",
+      size,
       className,
       trailing,
       type = "button",
@@ -116,28 +139,43 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     },
     ref,
   ) => {
+    const contextSize = useContext(ActionButtonSizeContext);
+    const resolvedSize: ActionButtonSize = size ?? contextSize ?? "hero";
+    const isTileLike =
+      resolvedSize === "tile" || resolvedSize === "tile-compact";
     const iconClass =
-      size === "tile"
+      resolvedSize === "tile"
         ? tileIconClass
-        : size === "compact"
-          ? compactIconClass
-          : heroIconClass;
+        : resolvedSize === "tile-compact"
+          ? tileCompactIconClass
+          : resolvedSize === "compact"
+            ? compactIconClass
+            : heroIconClass;
     return (
       <button
         ref={ref}
         type={type}
         aria-label={ariaLabel ?? label}
-        title={size === "tile" ? (ariaLabel ?? label) : undefined}
-        className={cn(base, sizeClasses[size], toneClasses[tone], className)}
+        title={isTileLike ? (ariaLabel ?? label) : undefined}
+        className={cn(
+          base,
+          sizeClasses[resolvedSize],
+          toneClasses[tone],
+          className,
+        )}
         {...rest}
       >
         <FontAwesomeIcon
           icon={icon}
-          size={size === "tile" ? "xl" : undefined}
-          className={size === "tile" ? undefined : iconClass}
+          size={resolvedSize === "tile" ? "xl" : undefined}
+          className={resolvedSize === "tile" ? undefined : iconClass}
         />
-        {size !== "tile" && (
-          <span className={size === "compact" ? undefined : "hidden md:inline"}>
+        {!isTileLike && (
+          <span
+            className={
+              resolvedSize === "compact" ? undefined : "hidden md:inline"
+            }
+          >
             {label}
           </span>
         )}
