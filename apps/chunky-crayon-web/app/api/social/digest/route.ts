@@ -59,7 +59,26 @@ export const GET = async (request: Request) => {
       );
     }
 
+    // The demo reel is produced by the worker on a SEPARATE image (not the
+    // daily one). Find the most recent image with demoReelUrl from today
+    // so we can include its R2 asset links in the digest.
+    const demoReelImage = await db.coloringImage.findFirst({
+      where: {
+        brand: BRAND,
+        demoReelUrl: { not: null },
+        createdAt: { gte: todayStart },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
     console.log('[Digest] Generating captions for:', coloringImage.title);
+    if (demoReelImage) {
+      console.log(
+        '[Digest] Demo reel image:',
+        demoReelImage.title,
+        demoReelImage.id,
+      );
+    }
 
     // Generate all captions in parallel
     const [
@@ -91,15 +110,20 @@ export const GET = async (request: Request) => {
     const videoAssetUrl =
       coloringImage.demoReelUrl ?? coloringImage.animationUrl ?? undefined;
 
-    // PTP-style: read per-platform success from the row's
-    // socialPostResults JSON, populated by /api/social/post during the
-    // platform crons. Falls back to false if the platform never ran.
+    // PTP-style: read per-platform success from socialPostResults JSON.
+    // Static posts store results on the DAILY image; demo-reel posts store
+    // results on the WORKER-CREATED image. Merge both for accurate badges.
     type PostResult = { success?: boolean } | undefined;
-    const results = (coloringImage.socialPostResults ?? {}) as Record<
+    const dailyResults = (coloringImage.socialPostResults ?? {}) as Record<
       string,
       PostResult
     >;
-    const wasAutoPosted = (key: string): boolean => !!results[key]?.success;
+    const reelResults = (demoReelImage?.socialPostResults ?? {}) as Record<
+      string,
+      PostResult
+    >;
+    const wasAutoPosted = (key: string): boolean =>
+      !!dailyResults[key]?.success || !!reelResults[key]?.success;
 
     // Assemble digest entries — flow ordered like the cron slots:
     //   1. Static carousel (line art for printing)
@@ -192,8 +216,12 @@ export const GET = async (request: Request) => {
       coloringImageUrl: `${baseUrl}/coloring/${coloringImage.id}`,
       svgUrl: coloringImage.svgUrl ?? undefined,
       animationUrl: videoAssetUrl,
-      demoReelUrl: coloringImage.demoReelUrl ?? undefined,
-      demoReelCoverUrl: coloringImage.demoReelCoverUrl ?? undefined,
+      demoReelUrl:
+        demoReelImage?.demoReelUrl ?? coloringImage.demoReelUrl ?? undefined,
+      demoReelCoverUrl:
+        demoReelImage?.demoReelCoverUrl ??
+        coloringImage.demoReelCoverUrl ??
+        undefined,
       entries,
     });
 
