@@ -125,13 +125,9 @@ export const GET = async (request: Request) => {
     const wasAutoPosted = (key: string): boolean =>
       !!dailyResults[key]?.success || !!reelResults[key]?.success;
 
-    // Assemble digest entries — flow ordered like the cron slots:
-    //   1. Static carousel (line art for printing)
-    //   2. Static FB / Pinterest / LinkedIn (line art)
-    //   3. Demo reel (worker product video) across IG/FB/TikTok/LinkedIn/Pinterest
-    //   4. Colored-static (finished artwork CTA) on IG + FB
-    const entries: SocialDigestEntry[] = [
-      // 1. Static carousel — line art printable
+    // Split entries into two groups: daily image (static posts) and
+    // demo reel (worker-produced video + colored-static CTA).
+    const dailyEntries: SocialDigestEntry[] = [
       {
         platform: 'Instagram Carousel',
         caption: instagramCarouselCaption,
@@ -156,57 +152,50 @@ export const GET = async (request: Request) => {
         autoPosted: wasAutoPosted('linkedin'),
         assetType: 'image',
       },
-      // 2. Demo reel — product-demo video
+    ];
+
+    const demoReelEntries: SocialDigestEntry[] = [
       {
-        platform: 'Instagram Demo Reel',
+        platform: 'Instagram Reel',
         caption: instagramDemoReelCaption,
         autoPosted: wasAutoPosted('instagramDemoReel'),
         assetType: 'video',
-        assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
       {
-        platform: 'Facebook Demo Reel',
+        platform: 'Facebook Reel',
         caption: facebookDemoReelCaption,
         autoPosted: wasAutoPosted('facebookDemoReel'),
         assetType: 'video',
-        assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
       {
-        platform: 'TikTok Demo Reel',
+        platform: 'TikTok',
         caption: tiktokDemoReelCaption,
-        // TikTok always goes to drafts — never auto-published.
         autoPosted: false,
         assetType: 'video',
-        assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
       {
-        platform: 'LinkedIn Demo Reel',
+        platform: 'LinkedIn Reel',
         caption: linkedinDemoReelCaption,
         autoPosted: wasAutoPosted('linkedinDemoReel'),
         assetType: 'video',
-        assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
       {
-        platform: 'Pinterest Demo Reel',
+        platform: 'Pinterest Video',
         caption: pinterestCaption,
         autoPosted: wasAutoPosted('pinterestDemoReel'),
         assetType: 'video',
-        assetUrl: coloringImage.demoReelUrl ?? undefined,
       },
-      // 3. Colored static — finished artwork CTA
       {
-        platform: 'Instagram Colored Static',
+        platform: 'Instagram Static (blank)',
         caption: instagramColoredStaticCaption,
         autoPosted: wasAutoPosted('instagramColoredStatic'),
         assetType: 'image',
-        assetUrl: coloringImage.demoReelCoverUrl ?? undefined,
       },
       {
-        platform: 'Facebook Colored Static',
+        platform: 'Facebook Static (blank)',
         caption: facebookColoredStaticCaption,
         autoPosted: wasAutoPosted('facebookColoredStatic'),
         assetType: 'image',
-        assetUrl: coloringImage.demoReelCoverUrl ?? undefined,
       },
     ];
 
@@ -215,14 +204,15 @@ export const GET = async (request: Request) => {
       coloringImageTitle: coloringImage.title ?? 'Untitled',
       coloringImageUrl: `${baseUrl}/coloring/${coloringImage.id}`,
       svgUrl: coloringImage.svgUrl ?? undefined,
-      animationUrl: videoAssetUrl,
+      dailyEntries,
+      demoReelTitle: demoReelImage?.title ?? undefined,
       demoReelUrl:
         demoReelImage?.demoReelUrl ?? coloringImage.demoReelUrl ?? undefined,
       demoReelCoverUrl:
         demoReelImage?.demoReelCoverUrl ??
         coloringImage.demoReelCoverUrl ??
         undefined,
-      entries,
+      demoReelEntries,
     });
 
     if (!result.success) {
@@ -236,7 +226,7 @@ export const GET = async (request: Request) => {
       success: true,
       message: 'Social digest email sent',
       coloringImageId: coloringImage.id,
-      platformCount: entries.length,
+      platformCount: dailyEntries.length + demoReelEntries.length,
     });
   } catch (error) {
     console.error('[Digest] Error:', error);

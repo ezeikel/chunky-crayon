@@ -273,18 +273,20 @@ export const sendSocialDigest = async ({
   coloringImageTitle,
   coloringImageUrl,
   svgUrl,
-  animationUrl,
+  dailyEntries,
+  demoReelTitle,
   demoReelUrl,
   demoReelCoverUrl,
-  entries,
+  demoReelEntries,
 }: {
   coloringImageTitle: string;
   coloringImageUrl: string;
   svgUrl?: string;
-  animationUrl?: string;
+  dailyEntries: SocialDigestEntry[];
+  demoReelTitle?: string;
   demoReelUrl?: string;
   demoReelCoverUrl?: string;
-  entries: SocialDigestEntry[];
+  demoReelEntries: SocialDigestEntry[];
 }): Promise<{ success: boolean; error?: string }> => {
   const digestEmail = process.env.SOCIAL_DIGEST_EMAIL;
 
@@ -305,10 +307,11 @@ export const sendSocialDigest = async ({
         coloringImageTitle,
         coloringImageUrl,
         svgUrl,
-        animationUrl,
+        dailyEntries,
+        demoReelTitle,
         demoReelUrl,
         demoReelCoverUrl,
-        entries,
+        demoReelEntries,
         timestamp,
       }),
     );

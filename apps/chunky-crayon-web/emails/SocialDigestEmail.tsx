@@ -20,13 +20,16 @@ type SocialDigestEntry = {
 };
 
 type SocialDigestEmailProps = {
+  // Daily image (static posts)
   coloringImageTitle: string;
   coloringImageUrl: string;
   svgUrl?: string;
-  animationUrl?: string;
+  dailyEntries: SocialDigestEntry[];
+  // Demo reel (worker-produced)
+  demoReelTitle?: string;
   demoReelUrl?: string;
   demoReelCoverUrl?: string;
-  entries: SocialDigestEntry[];
+  demoReelEntries: SocialDigestEntry[];
   timestamp: string;
 };
 
@@ -36,10 +39,11 @@ const SocialDigestEmail = ({
   coloringImageTitle = "Today's Coloring Page",
   coloringImageUrl = 'https://chunkycrayon.com',
   svgUrl,
-  animationUrl,
+  dailyEntries = [],
+  demoReelTitle,
   demoReelUrl,
   demoReelCoverUrl,
-  entries = [],
+  demoReelEntries = [],
   timestamp = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -65,10 +69,10 @@ const SocialDigestEmail = ({
           <Text style={heroSubtitle}>{timestamp}</Text>
         </Section>
 
-        {/* Coloring Page Info */}
+        {/* ── Section 1: Daily Image (static posts) ── */}
         <Section style={infoSection}>
           <Heading as="h2" style={sectionTitle}>
-            Coloring Page
+            📌 Daily Image
           </Heading>
           <Text style={paragraph}>
             <strong>{coloringImageTitle}</strong>
@@ -78,70 +82,79 @@ const SocialDigestEmail = ({
               View on site
             </Link>
           </Text>
-        </Section>
-
-        {/* Asset Downloads — clickable R2 links for manual posting */}
-        <Section style={assetSection}>
-          <Heading as="h2" style={assetTitle}>
-            📦 Download Assets
-          </Heading>
-          {demoReelUrl && (
-            <Text style={paragraph}>
-              🎬 Demo Reel (mp4):{' '}
-              <Link href={demoReelUrl} style={inlineLink}>
-                Download Video (1080×1920)
-              </Link>
-            </Text>
-          )}
-          {demoReelCoverUrl && (
-            <Text style={paragraph}>
-              📸 Reel Cover (jpg):{' '}
-              <Link href={demoReelCoverUrl} style={inlineLink}>
-                Download Cover Image
-              </Link>
-            </Text>
-          )}
-          {animationUrl && animationUrl !== demoReelUrl && (
-            <Text style={paragraph}>
-              🎞️ Animation:{' '}
-              <Link href={animationUrl} style={inlineLink}>
-                Download Animation
-              </Link>
-            </Text>
-          )}
           {svgUrl && (
-            <Text style={paragraph}>
-              ✏️ Line Art (svg):{' '}
-              <Link href={svgUrl} style={inlineLink}>
-                Download SVG
-              </Link>
-            </Text>
+            <Section style={assetSection}>
+              <Text style={paragraph}>
+                ✏️ Line Art (svg):{' '}
+                <Link href={svgUrl} style={inlineLink}>
+                  Download SVG
+                </Link>
+              </Text>
+            </Section>
           )}
         </Section>
 
-        {/* Platform Entries */}
-        {entries.map((entry, index) => (
-          <Section key={index} style={platformCard}>
+        {dailyEntries.map((entry, index) => (
+          <Section key={`daily-${index}`} style={platformCard}>
             <Text style={platformHeader}>
               <span style={platformName}>{entry.platform}</span>
               <span style={entry.autoPosted ? badgeAuto : badgeManual}>
                 {entry.autoPosted ? 'auto-posted' : 'manual'}
               </span>
             </Text>
-            <Text style={assetTypeText}>
-              Asset: {entry.assetType}
-              {entry.assetUrl && (
-                <>
-                  {' '}
-                  <Link href={entry.assetUrl} style={inlineLink}>
-                    (view)
-                  </Link>
-                </>
-              )}
-            </Text>
+            <Text style={assetTypeText}>Asset: {entry.assetType}</Text>
             <Text style={captionBlock}>{entry.caption}</Text>
           </Section>
         ))}
+
+        <Hr style={hr} />
+
+        {/* ── Section 2: Demo Reel (worker-produced) ── */}
+        {(demoReelUrl || demoReelEntries.length > 0) && (
+          <>
+            <Section style={infoSection}>
+              <Heading as="h2" style={sectionTitle}>
+                🎬 Demo Reel
+              </Heading>
+              {demoReelTitle && (
+                <Text style={paragraph}>
+                  <strong>{demoReelTitle}</strong>
+                </Text>
+              )}
+              <Section style={assetSection}>
+                {demoReelUrl && (
+                  <Text style={paragraph}>
+                    🎬 Video (mp4):{' '}
+                    <Link href={demoReelUrl} style={inlineLink}>
+                      Download Video (1080×1920)
+                    </Link>
+                  </Text>
+                )}
+                {demoReelCoverUrl && (
+                  <Text style={paragraph}>
+                    📸 Cover (jpg):{' '}
+                    <Link href={demoReelCoverUrl} style={inlineLink}>
+                      Download Cover Image
+                    </Link>
+                  </Text>
+                )}
+              </Section>
+            </Section>
+
+            {demoReelEntries.map((entry, index) => (
+              <Section key={`reel-${index}`} style={platformCard}>
+                <Text style={platformHeader}>
+                  <span style={platformName}>{entry.platform}</span>
+                  <span style={entry.autoPosted ? badgeAuto : badgeManual}>
+                    {entry.autoPosted ? 'auto-posted' : 'manual'}
+                  </span>
+                </Text>
+                <Text style={assetTypeText}>Asset: {entry.assetType}</Text>
+                <Text style={captionBlock}>{entry.caption}</Text>
+              </Section>
+            ))}
+          </>
+        )}
 
         <Hr style={hr} />
 
