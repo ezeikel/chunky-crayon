@@ -36,7 +36,7 @@
 
     {
       "path": "/api/social/demo-reel/produce",
-      "schedule": "30 14 * * 1-5"
+      "schedule": "0 6 * * 1-5"
     },
 
     {
@@ -88,7 +88,7 @@
 
     {
       "path": "/api/social/demo-reel/produce",
-      "schedule": "30 13 * * 0,6"
+      "schedule": "0 6 * * 0,6"
     },
 
     {
