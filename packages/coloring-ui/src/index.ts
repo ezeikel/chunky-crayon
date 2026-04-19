@@ -103,6 +103,18 @@ export {
   type MagicColorOverlayMessages,
 } from "./MagicColorOverlay";
 export { default as CompletionCelebration } from "./CompletionCelebration";
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogTrigger,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "./Dialog";
 
 // Async fill (Web Worker)
 export { asyncFloodFill, terminateFillWorker } from "./asyncFill";
