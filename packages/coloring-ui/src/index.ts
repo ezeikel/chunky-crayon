@@ -97,6 +97,11 @@ export { default as UndoRedoButtons } from "./UndoRedoButtons";
 export { default as ProgressIndicator } from "./ProgressIndicator";
 export { default as AutoColorPreview } from "./AutoColorPreview";
 export { default as AutoColorModal } from "./AutoColorModal";
+export {
+  default as MagicColorOverlay,
+  type MagicColorOverlayPhase,
+  type MagicColorOverlayMessages,
+} from "./MagicColorOverlay";
 export { default as CompletionCelebration } from "./CompletionCelebration";
 
 // Async fill (Web Worker)

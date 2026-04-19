@@ -17,7 +17,10 @@ import StickerSelector from '@/components/StickerSelector';
 import ProgressIndicator from '@/components/ProgressIndicator';
 import { MuteToggle } from '@one-colored-pixel/coloring-ui';
 import { ZoomControls } from '@one-colored-pixel/coloring-ui';
-import { AutoColorModal } from '@one-colored-pixel/coloring-ui';
+import {
+  AutoColorModal,
+  MagicColorOverlay,
+} from '@one-colored-pixel/coloring-ui';
 import DownloadPDFButton from '@/components/buttons/DownloadPDFButton/DownloadPDFButton';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
 import ShareButton from '@/components/buttons/ShareButton';
@@ -44,11 +47,6 @@ import { generateColoredReference } from '@/app/actions/generate-colored-referen
 import { checkRegionStoreReady } from '@/app/actions/generate-regions';
 import { useRouter } from 'next/navigation';
 import { detectAllRegions } from '@one-colored-pixel/canvas';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faWandMagicSparkles,
-  faFaceFrownOpen,
-} from '@fortawesome/pro-duotone-svg-icons';
 
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
@@ -1112,71 +1110,32 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             }
           />
 
-          {/* Magic Loading Overlay — only relevant on the LEGACY path
+          {/* Magic overlay — only shown on the LEGACY warm-up path
            * (on-demand fill-points gen / 5×5 colour-map generation for
-           * old images that don't have a region store yet). When the
-           * region store is ready, both magic tools draw from it
-           * directly so no prep work / modal is needed. */}
-          {isMagicToolActive &&
-            !regionStore.state.isReady &&
-            (magicColorMapState.isLoading || isGeneratingFillPoints) && (
-              <div
-                className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6"
-                data-testid="magic-colors-loading"
-              >
-                <div className="flex flex-col items-center gap-4 p-6 md:p-8 rounded-coloring-card bg-white border-2 border-paper-cream-dark shadow-card max-w-sm w-full">
-                  {/* Purple→pink gradient badge to match magic-tool identity */}
-                  <div className="flex items-center justify-center size-16 rounded-full bg-gradient-to-br from-crayon-purple to-crayon-pink">
-                    <FontAwesomeIcon
-                      icon={faWandMagicSparkles}
-                      className="text-white text-2xl"
-                    />
-                  </div>
-                  <h2 className="font-tondo font-bold text-2xl text-text-primary text-center">
-                    {isGeneratingFillPoints
-                      ? 'Mixing the magic colours!'
-                      : 'Getting the colours ready!'}
-                  </h2>
-                  <p className="font-tondo text-base text-text-secondary text-center">
-                    {isGeneratingFillPoints
-                      ? 'This only happens once — hang tight, the rainbow is on its way.'
-                      : magicColorMapState.loadingMessage ||
-                        'Almost there — getting your palette ready.'}
-                  </p>
-                  {/* Sweeping gradient bar — the single loading indicator. */}
-                  <div className="w-full h-3 rounded-full bg-paper-cream overflow-hidden">
-                    <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-crayon-purple via-crayon-pink to-crayon-orange animate-magic-progress" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-          {/* Magic Error Overlay — same chunky-card language as the loader. */}
-          {isMagicToolActive && magicColorMapState.error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6">
-              <div className="flex flex-col items-center gap-4 p-6 md:p-8 rounded-coloring-card bg-white border-2 border-paper-cream-dark shadow-card max-w-sm w-full">
-                <div className="flex items-center justify-center size-16 rounded-full bg-crayon-pink/15">
-                  <FontAwesomeIcon
-                    icon={faFaceFrownOpen}
-                    className="text-crayon-pink text-2xl"
-                  />
-                </div>
-                <h2 className="font-tondo font-bold text-2xl text-text-primary text-center">
-                  Oops, the magic got tangled!
-                </h2>
-                <p className="font-tondo text-base text-text-secondary text-center">
-                  {magicColorMapState.error}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => resetMagicColorMap()}
-                  className="font-tondo font-bold text-white bg-gradient-to-br from-crayon-purple to-crayon-pink rounded-full px-8 py-3 text-lg shadow-btn-primary hover:scale-105 active:scale-95 transition-all"
-                >
-                  Try Again
-                </button>
-              </div>
-            </div>
-          )}
+           * images without a region store). Gated by parent; component
+           * itself just handles presentation. */}
+          <MagicColorOverlay
+            state={
+              isMagicToolActive && magicColorMapState.error
+                ? 'error'
+                : isMagicToolActive &&
+                    !regionStore.state.isReady &&
+                    (magicColorMapState.isLoading || isGeneratingFillPoints)
+                  ? 'loading'
+                  : null
+            }
+            phase={isGeneratingFillPoints ? 'fillPoints' : 'colorMap'}
+            loadingMessage={magicColorMapState.loadingMessage ?? undefined}
+            errorMessage={magicColorMapState.error ?? undefined}
+            onRetry={() => resetMagicColorMap()}
+            messages={{
+              loadingTitleFillPoints: 'Mixing the magic colours!',
+              loadingTitleColorMap: 'Getting the colours ready!',
+              loadingBodyFillPoints:
+                'This only happens once — hang tight, the rainbow is on its way.',
+              errorTitle: 'Oops, the magic got tangled!',
+            }}
+          />
         </div>
 
         {/* Action buttons - Desktop style (md-lg only, hidden on xl+ where sidebar has them) */}

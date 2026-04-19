@@ -41,17 +41,13 @@ import {
 import {
   ActionButtonSizeProvider,
   AutoColorModal,
+  MagicColorOverlay,
 } from "@one-colored-pixel/coloring-ui";
 import { generateRegionFillPoints } from "@/app/actions/generate-color-map";
 import { generateColoredReference } from "@/app/actions/generate-colored-reference";
 import { checkRegionStoreReady } from "@/app/actions/generate-regions";
 import { useRouter } from "next/navigation";
 import { detectAllRegions } from "@one-colored-pixel/canvas";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faWandMagicSparkles,
-  faFaceFrownOpen,
-} from "@fortawesome/pro-duotone-svg-icons";
 
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
@@ -1044,69 +1040,21 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
               }
             />
 
-            {/* Magic Loading Overlay — only relevant on the LEGACY path
-             * (on-demand fill-points gen / 5×5 colour-map generation for
-             * old images that don't have a region store yet). When the
-             * region store is ready, both magic tools draw from it
-             * directly so no prep work / modal is needed. */}
-            {isMagicToolActive &&
-              !regionStore.state.isReady &&
-              (magicColorMapState.isLoading || isGeneratingFillPoints) && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6"
-                  data-testid="magic-colors-loading"
-                >
-                  <div className="flex flex-col items-center gap-4 p-6 md:p-8 rounded-coloring-card bg-white border-2 border-coloring-surface-dark shadow-lg max-w-sm w-full">
-                    <div className="flex items-center justify-center size-16 rounded-full bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to">
-                      <FontAwesomeIcon
-                        icon={faWandMagicSparkles}
-                        className="text-white text-2xl"
-                      />
-                    </div>
-                    <h2 className="font-coloring-heading font-bold text-2xl text-coloring-text-primary text-center">
-                      {isGeneratingFillPoints
-                        ? "Mixing the colours"
-                        : "Getting the colours ready"}
-                    </h2>
-                    <p className="font-coloring-body text-base text-coloring-text-secondary text-center">
-                      {isGeneratingFillPoints
-                        ? "This only happens once — hang tight, your palette is on its way."
-                        : magicColorMapState.loadingMessage ||
-                          "Almost there — getting your palette ready."}
-                    </p>
-                    <div className="w-full h-3 rounded-full bg-coloring-surface overflow-hidden">
-                      <div className="h-full w-1/2 rounded-full bg-gradient-to-r from-coloring-magic-from to-coloring-magic-to animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            {/* Magic Error Overlay — matches loader styling */}
-            {isMagicToolActive && magicColorMapState.error && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/85 backdrop-blur-sm rounded-lg z-10 px-6">
-                <div className="flex flex-col items-center gap-4 p-6 md:p-8 rounded-coloring-card bg-white border-2 border-coloring-surface-dark shadow-lg max-w-sm w-full">
-                  <div className="flex items-center justify-center size-16 rounded-full bg-coloring-magic-to/15">
-                    <FontAwesomeIcon
-                      icon={faFaceFrownOpen}
-                      className="text-coloring-magic-to text-2xl"
-                    />
-                  </div>
-                  <h2 className="font-coloring-heading font-bold text-2xl text-coloring-text-primary text-center">
-                    Something went wrong
-                  </h2>
-                  <p className="font-coloring-body text-base text-coloring-text-secondary text-center">
-                    {magicColorMapState.error}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => resetMagicColorMap()}
-                    className="font-coloring-heading font-bold text-white bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to rounded-full px-8 py-3 text-lg shadow-lg hover:scale-105 active:scale-95 transition-all"
-                  >
-                    Try Again
-                  </button>
-                </div>
-              </div>
-            )}
+            <MagicColorOverlay
+              state={
+                isMagicToolActive && magicColorMapState.error
+                  ? "error"
+                  : isMagicToolActive &&
+                      !regionStore.state.isReady &&
+                      (magicColorMapState.isLoading || isGeneratingFillPoints)
+                    ? "loading"
+                    : null
+              }
+              phase={isGeneratingFillPoints ? "fillPoints" : "colorMap"}
+              loadingMessage={magicColorMapState.loadingMessage ?? undefined}
+              errorMessage={magicColorMapState.error ?? undefined}
+              onRetry={() => resetMagicColorMap()}
+            />
           </div>
 
           {/* Action buttons - Desktop style (md-lg only, hidden on xl+ where sidebar has them) */}
