@@ -364,9 +364,10 @@
       "tryAgain": "Try again",
       "errors": {
         "fileTooLarge": "Image is too large. Please use an image under 10MB.",
-        "invalidType": "Invalid image format. Please use JPEG, PNG, WebP, or HEIC.",
+        "invalidType": "Invalid image format. Please use JPEG, PNG, or WebP.",
         "processingFailed": "Couldn't process the image. Please try again.",
-        "cameraFailed": "Camera failed. Please try uploading a photo instead."
+        "cameraFailed": "Camera failed. Please try uploading a photo instead.",
+        "heicUnsupported": "HEIC images aren't supported. Save as JPG or PNG first."
       }
     }
   },

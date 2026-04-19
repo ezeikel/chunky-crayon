@@ -21,6 +21,11 @@ export type InputModeState = {
   mode: InputMode;
   /** The processed text from voice/image (or the direct text input) */
   description: string;
+  /**
+   * Base64 data URL of the user's photo when in image mode. Drives the
+   * photo-to-coloring pipeline at submit time.
+   */
+  imageBase64: string | null;
   /** Whether voice/image is currently being processed */
   isProcessing: boolean;
   /** Error message from processing */
@@ -38,6 +43,8 @@ export type InputModeState = {
 export type InputModeActions = {
   setMode: (mode: InputMode) => void;
   setDescription: (description: string) => void;
+  /** Set the base64 photo payload (image mode only) */
+  setImageBase64: (imageBase64: string | null) => void;
   setIsProcessing: (isProcessing: boolean) => void;
   setError: (error: string | null) => void;
   setIsBusy: (isBusy: boolean) => void;
@@ -51,6 +58,7 @@ const InputModeContext = createContext<InputModeContextValue | null>(null);
 const initialState: InputModeState = {
   mode: "text",
   description: "",
+  imageBase64: null,
   isProcessing: false,
   error: null,
   isReady: false,
@@ -79,6 +87,8 @@ export function InputModeProvider({
       isBusy: false,
       error: null,
       description: mode === "text" ? prev.description : "",
+      // Image payload only belongs to image mode
+      imageBase64: mode === "image" ? prev.imageBase64 : null,
       isReady: mode === "text" ? prev.description.trim().length > 0 : false,
     }));
   }, []);
@@ -87,8 +97,19 @@ export function InputModeProvider({
     setState((prev) => ({
       ...prev,
       description,
-      isReady: description.trim().length > 0,
+      isReady:
+        prev.mode === "image"
+          ? prev.imageBase64 !== null
+          : description.trim().length > 0,
       error: null,
+    }));
+  }, []);
+
+  const setImageBase64 = useCallback((imageBase64: string | null) => {
+    setState((prev) => ({
+      ...prev,
+      imageBase64,
+      isReady: prev.mode === "image" ? imageBase64 !== null : prev.isReady,
     }));
   }, []);
 
@@ -125,6 +146,7 @@ export function InputModeProvider({
       ...state,
       setMode,
       setDescription,
+      setImageBase64,
       setIsProcessing,
       setError,
       setIsBusy,
@@ -134,6 +156,7 @@ export function InputModeProvider({
       state,
       setMode,
       setDescription,
+      setImageBase64,
       setIsProcessing,
       setError,
       setIsBusy,

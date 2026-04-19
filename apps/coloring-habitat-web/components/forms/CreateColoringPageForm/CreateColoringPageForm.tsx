@@ -3,9 +3,10 @@
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import posthog from "posthog-js";
 import { createColoringImage } from "@/app/actions/coloring-image";
+import { createColoringImageFromPhoto } from "@/app/actions/photo-to-coloring";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/utils/analytics-client";
 import { TRACKING_EVENTS } from "@/constants";
@@ -46,7 +47,8 @@ const FormLoadingOverlay = () => {
 const MultiModeForm = ({ className }: { className?: string }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
-  const { mode, description } = useInputMode();
+  const locale = useLocale();
+  const { mode, description, imageBase64 } = useInputMode();
   const { isGuest, remainingGenerations, recordGuestGeneration } = useUser();
 
   return (
@@ -72,7 +74,10 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           characterCount: desc?.length || 0,
         });
 
-        const coloringImage = await createColoringImage(formData);
+        const coloringImage =
+          inputType === "image" && imageBase64
+            ? await createColoringImageFromPhoto(imageBase64, locale)
+            : await createColoringImage(formData);
 
         if ("error" in coloringImage) {
           console.error(coloringImage.error);

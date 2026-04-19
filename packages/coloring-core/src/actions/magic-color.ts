@@ -1,5 +1,4 @@
-import { generateText, Output } from "ai";
-import { getTracedModels } from "../models";
+import { generateText, Output, type LanguageModel } from "ai";
 import { magicColorResponseSchema, type MagicColorResponse } from "../schemas";
 
 // =============================================================================
@@ -43,7 +42,7 @@ export type MagicColorConfig = {
 export async function getMagicColorSuggestionsLogic(
   input: MagicColorInput,
   config: MagicColorConfig,
-  userId?: string | null,
+  model: LanguageModel,
 ): Promise<MagicColorResult> {
   try {
     const {
@@ -74,16 +73,6 @@ export async function getMagicColorSuggestionsLogic(
       return { success: false, error: "Unsupported image format" };
     }
 
-    const tracedModels = getTracedModels({
-      userId: userId || undefined,
-      properties: {
-        action: "magic-color",
-        mode,
-        touchX: touchX.toFixed(2),
-        touchY: touchY.toFixed(2),
-      },
-    });
-
     const imageBuffer = Buffer.from(base64Data, "base64");
 
     console.log("[MagicColor] Processing request:", {
@@ -94,7 +83,7 @@ export async function getMagicColorSuggestionsLogic(
     });
 
     const { output } = await generateText({
-      model: tracedModels.analytics,
+      model,
       output: Output.object({ schema: magicColorResponseSchema }),
       system: config.system,
       messages: [

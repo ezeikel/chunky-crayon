@@ -408,56 +408,45 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
     difficulty?: Difficulty,
   ): Promise<GenerationResult> {
     console.log(
-      `[PhotoToColoring] Generating coloring page from photo${difficulty ? ` with difficulty: ${difficulty}` : ""}`,
+      `[PhotoToColoring] Converting via GPT Image 1.5 images.edit${difficulty ? ` (difficulty: ${difficulty})` : ""}`,
     );
 
     const startTime = Date.now();
 
-    const selectedRefs = config.referenceImages.slice(0, 4);
-    const messageContent: Array<
-      | { type: "text"; text: string }
-      | { type: "image"; image: URL }
-      | { type: "image"; image: string }
-    > = [
-      { type: "text", text: config.photoToColoringSystem },
-      ...selectedRefs.map((url) => ({
-        type: "image" as const,
-        image: new URL(url),
-      })),
-      {
-        type: "image",
-        image: photoBase64.startsWith("data:")
-          ? photoBase64
-          : `data:image/jpeg;base64,${photoBase64}`,
-      },
-      { type: "text", text: config.createPhotoToColoringPrompt(difficulty) },
-    ];
+    const rawBase64 = photoBase64.startsWith("data:")
+      ? photoBase64.replace(/^data:image\/\w+;base64,/, "")
+      : photoBase64;
+    const imageBuffer = Buffer.from(rawBase64, "base64");
+    const imageFile = new File([imageBuffer], "photo.png", {
+      type: "image/png",
+    });
+
+    // Prompt: structural first (system), specific second (user). NO style
+    // reference images — they pull GPT Image toward cartoon drift on photos.
+    const prompt = `${config.photoToColoringSystem}\n\n${config.createPhotoToColoringPrompt(difficulty)}`;
+
+    const client = new OpenAI();
 
     try {
-      const result = await generateText({
-        model: models.geminiImage,
-        messages: [{ role: "user", content: messageContent }],
-        providerOptions: {
-          google: { responseModalities: ["TEXT", "IMAGE"] },
-        },
+      const result = await client.images.edit({
+        model: MODEL_IDS.GPT_IMAGE_1_5,
+        image: [imageFile],
+        prompt,
+        size: "1024x1024",
+        n: 1,
       });
 
       const generationTimeMs = Date.now() - startTime;
 
-      const generatedImage = result.files?.find((file) =>
-        file.mediaType?.startsWith("image/"),
-      );
-
-      if (!generatedImage?.base64) {
-        throw new Error(
-          "Gemini did not return an image for photo transformation",
-        );
+      const b64 = result.data?.[0]?.b64_json;
+      if (!b64) {
+        throw new Error("GPT Image did not return an image for photo trace");
       }
 
-      const imageBuffer = Buffer.from(generatedImage.base64, "base64");
+      const outputBuffer = Buffer.from(b64, "base64");
 
       const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
-      const { url } = await put(tempFileName, imageBuffer, {
+      const { url } = await put(tempFileName, outputBuffer, {
         access: "public",
       });
 
@@ -467,9 +456,9 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
         url,
         tempFileName,
         generationTimeMs,
-        provider: "google",
-        model: MODEL_IDS.GEMINI_3_PRO_IMAGE,
-        imageBuffer,
+        provider: "openai",
+        model: MODEL_IDS.GPT_IMAGE_1_5,
+        imageBuffer: outputBuffer,
       };
     } catch (error) {
       console.error(

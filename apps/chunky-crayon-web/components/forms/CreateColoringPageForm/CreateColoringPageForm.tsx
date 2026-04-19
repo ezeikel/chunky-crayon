@@ -6,6 +6,7 @@ import { useFormStatus } from 'react-dom';
 import { useLocale } from 'next-intl';
 import posthog from 'posthog-js';
 import { createColoringImage } from '@/app/actions/coloring-image';
+import { createColoringImageFromPhoto } from '@/app/actions/photo-to-coloring';
 import { generateLoadingAudio } from '@/app/actions/loading-audio';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
@@ -66,7 +67,7 @@ const MultiModeForm = ({ className }: { className?: string }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const locale = useLocale();
-  const { mode, description } = useInputMode();
+  const { mode, description, imageBase64 } = useInputMode();
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioState, setAudioState] = useState<AudioState>('idle');
   const {
@@ -130,7 +131,10 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           characterCount: desc?.length || 0,
         });
 
-        const coloringImage = await createColoringImage(formData);
+        const coloringImage =
+          inputType === 'image' && imageBase64
+            ? await createColoringImageFromPhoto(imageBase64, locale)
+            : await createColoringImage(formData);
 
         if ('error' in coloringImage) {
           console.error(coloringImage.error);

@@ -19,13 +19,15 @@ export type ImageInputError =
   | "file_too_large"
   | "invalid_type"
   | "processing_failed"
-  | "camera_failed";
+  | "camera_failed"
+  | "heic_unsupported";
 
 export type ImageInputSource = "camera" | "file_picker";
 
 export type ImageInputResult = {
   state: ImageInputState;
   previewUrl: string | null;
+  imageBase64: string | null;
   description: string | null;
   subjects: string[];
   isChildDrawing: boolean;
@@ -50,84 +52,97 @@ export type ImageInputResult = {
 // =============================================================================
 
 const MAX_FILE_SIZE_MB = 10;
-const MAX_IMAGE_DIMENSION = 1024;
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic"];
+const MAX_IMAGE_DIMENSION = 1536;
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const HEIC_TYPES = ["image/heic", "image/heif"];
 
 // =============================================================================
 // Helper Functions
 // =============================================================================
 
-async function resizeImage(file: File): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const img = new window.Image();
-    const url = URL.createObjectURL(file);
-
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-
-      let { width, height } = img;
-
-      if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
-        if (width > height) {
-          height = Math.round((height * MAX_IMAGE_DIMENSION) / width);
-          width = MAX_IMAGE_DIMENSION;
-        } else {
-          width = Math.round((width * MAX_IMAGE_DIMENSION) / height);
-          height = MAX_IMAGE_DIMENSION;
+const canvasToBlobWithFallback = (canvas: HTMLCanvasElement): Promise<Blob> =>
+  new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+          return;
         }
-      }
-
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        reject(new Error("Could not get canvas context"));
-        return;
-      }
-
-      ctx.drawImage(img, 0, 0, width, height);
-
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
-            canvas.toBlob(
-              (jpegBlob) => {
-                if (jpegBlob) {
-                  resolve(jpegBlob);
-                } else {
-                  reject(new Error("Could not create image blob"));
-                }
-              },
-              "image/jpeg",
-              0.85,
-            );
-          }
-        },
-        "image/webp",
-        0.85,
-      );
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Could not load image"));
-    };
-
-    img.src = url;
+        canvas.toBlob(
+          (jpegBlob) => {
+            if (jpegBlob) {
+              resolve(jpegBlob);
+            } else {
+              reject(new Error("Could not create image blob"));
+            }
+          },
+          "image/jpeg",
+          0.85,
+        );
+      },
+      "image/webp",
+      0.85,
+    );
   });
+
+/**
+ * Resize image to max dimensions while respecting EXIF orientation,
+ * and convert to WebP for smaller file size. Uses createImageBitmap with
+ * imageOrientation: 'from-image' so iPhone photos uploaded in Chrome/Firefox
+ * aren't sideways or upside-down.
+ */
+async function resizeImage(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file, {
+    imageOrientation: "from-image",
+    premultiplyAlpha: "default",
+  });
+
+  try {
+    let { width, height } = bitmap;
+
+    if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
+      if (width > height) {
+        height = Math.round((height * MAX_IMAGE_DIMENSION) / width);
+        width = MAX_IMAGE_DIMENSION;
+      } else {
+        width = Math.round((width * MAX_IMAGE_DIMENSION) / height);
+        height = MAX_IMAGE_DIMENSION;
+      }
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("Could not get canvas context");
+    }
+
+    ctx.drawImage(bitmap, 0, 0, width, height);
+
+    return await canvasToBlobWithFallback(canvas);
+  } finally {
+    bitmap.close();
+  }
 }
 
 // =============================================================================
 // Hook
 // =============================================================================
 
+const blobToBase64 = (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error ?? new Error("Read failed"));
+    reader.readAsDataURL(blob);
+  });
+
 export function useImageInput(): ImageInputResult {
   const [state, setState] = useState<ImageInputState>("idle");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [isChildDrawing, setIsChildDrawing] = useState(false);
@@ -149,6 +164,7 @@ export function useImageInput(): ImageInputResult {
     cleanupPreview();
     setState("idle");
     setPreviewUrl(null);
+    setImageBase64(null);
     setDescription(null);
     setSubjects([]);
     setIsChildDrawing(false);
@@ -162,6 +178,7 @@ export function useImageInput(): ImageInputResult {
     cleanupPreview();
     setState("idle");
     setPreviewUrl(null);
+    setImageBase64(null);
     setDescription(null);
     setSubjects([]);
     setIsChildDrawing(false);
@@ -189,6 +206,19 @@ export function useImageInput(): ImageInputResult {
 
       event.target.value = "";
 
+      // HEIC/HEIF can't be decoded by <canvas> on Chrome/Firefox/most mobile
+      // webviews. Call it out explicitly instead of failing inside resize().
+      const lowered = file.name.toLowerCase();
+      if (
+        HEIC_TYPES.includes(file.type) ||
+        lowered.endsWith(".heic") ||
+        lowered.endsWith(".heif")
+      ) {
+        setError("heic_unsupported");
+        setState("error");
+        return;
+      }
+
       if (
         !ALLOWED_TYPES.includes(file.type) &&
         !file.type.startsWith("image/")
@@ -215,6 +245,10 @@ export function useImageInput(): ImageInputResult {
         cleanupPreview();
         const url = URL.createObjectURL(resizedBlob);
         setPreviewUrl(url);
+
+        const base64 = await blobToBase64(resizedBlob);
+        setImageBase64(base64);
+
         setState("preview");
       } catch {
         setError("camera_failed");
@@ -257,6 +291,7 @@ export function useImageInput(): ImageInputResult {
   return {
     state,
     previewUrl,
+    imageBase64,
     description,
     subjects,
     isChildDrawing,

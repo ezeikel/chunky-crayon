@@ -24,7 +24,7 @@
     "@ai-sdk/replicate": "^2.0.21",
     "@one-colored-pixel/canvas": "workspace:^",
     "@one-colored-pixel/storage": "workspace:*",
-    "@posthog/ai": "^1.2.0",
+    "@posthog/ai": "^7.16.0",
     "@resvg/resvg-js": "^2.6.2",
     "ai": "^6.0.106",
     "openai": "^6.33.0",

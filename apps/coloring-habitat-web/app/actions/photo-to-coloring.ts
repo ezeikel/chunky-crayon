@@ -1,6 +1,8 @@
 "use server";
 
 import { put, del } from "@one-colored-pixel/storage";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { after } from "next/server";
 import QRCode from "qrcode";
 import sharp from "sharp";
 import { generateText, Output } from "ai";
@@ -9,22 +11,25 @@ import {
   createImageMetadataSystemPrompt,
   IMAGE_METADATA_PROMPT,
   imageMetadataSchema,
+  analyzeImageForAnalytics,
   generateColoringPageFromPhoto,
 } from "@/lib/ai";
 import { ACTIONS, TRACKING_EVENTS } from "@/constants";
-import { trackWithUser } from "@/utils/analytics-server";
+import { trackWithUser, track } from "@/utils/analytics-server";
 import {
   db,
   ColoringImage,
   GenerationType,
+  CreditTransactionType,
   Brand,
 } from "@one-colored-pixel/db";
 import { getUserId } from "@/app/actions/user";
-import { traceImage } from "@/utils/traceImage";
+import { checkSvgImage, retraceImage, traceImage } from "@/utils/traceImage";
+import { generateAmbientSoundForImage } from "@/app/actions/ambient-sound";
+import { generateRegionFillPoints } from "@/app/actions/generate-color-map";
+import { generateRegionStore } from "@/app/actions/generate-regions";
+import { generateColoredReference } from "@/app/actions/generate-colored-reference";
 
-/**
- * Locale to language mapping for image metadata generation.
- */
 const LOCALE_LANGUAGE_MAP: Record<
   string,
   { name: string; nativeName: string }
@@ -37,66 +42,55 @@ const LOCALE_LANGUAGE_MAP: Record<
   es: { name: "Spanish", nativeName: "Español" },
 };
 
-type CreateFromPhotoResult = Partial<ColoringImage> | { error: string };
+type CreateFromPhotoResult =
+  | Partial<ColoringImage>
+  | { error: string; credits?: number };
 
-/**
- * Generate a coloring image directly from a user's photo.
- *
- * This bypasses the description step and uses the photo as a reference
- * to create a coloring page that closely matches the original.
- *
- * @param photoBase64 - The photo as a base64 string
- * @param locale - Optional locale for metadata generation
- * @returns The created coloring image or an error
- */
-export async function createColoringImageFromPhoto(
+const generatePhotoColoringImageWithMetadata = async (
   photoBase64: string,
+  userId?: string,
   locale: string = "en",
-): Promise<CreateFromPhotoResult> {
-  const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
-
-  if (!userId) {
-    return { error: "User not authenticated" };
-  }
-
-  // Get language info for the locale
+) => {
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
 
-  // Get traced models for observability
   const tracedModels = getTracedModels({
     userId,
     properties: { action: "photo-to-coloring-generation" },
   });
 
   try {
-    // eslint-disable-next-line no-console
-    console.log("[PhotoToColoring] Starting generation from photo...");
-
-    // Step 1: Generate coloring image directly from photo
     const {
       url: imageUrl,
       tempFileName,
       imageBuffer,
       generationTimeMs,
+      provider: generationProvider,
+      model: generationModel,
     } = await generateColoringPageFromPhoto(photoBase64);
 
     if (!imageUrl || !imageBuffer) {
       throw new Error("Failed to generate coloring image from photo");
     }
 
-    // Track successful generation
-    await trackWithUser(userId, TRACKING_EVENTS.IMAGE_GENERATION_COMPLETED, {
-      model: "gemini-3-pro-image",
-      provider: "google",
+    const trackingData = {
+      model: generationModel,
+      provider: generationProvider,
       generationTimeMs,
-      promptLength: 0, // Photo-based, no text prompt
-      referenceImageCount: 1, // The user's photo
-      success: true,
-    });
+      promptLength: 0,
+      referenceImageCount: 1,
+      success: true as const,
+    };
+    if (userId) {
+      await trackWithUser(
+        userId,
+        TRACKING_EVENTS.IMAGE_GENERATION_COMPLETED,
+        trackingData,
+      );
+    } else {
+      await track(TRACKING_EVENTS.IMAGE_GENERATION_COMPLETED, trackingData);
+    }
 
-    // Step 2: Run metadata, SVG trace, and WebP conversion in parallel
     const [metadataResult, svg, webpBuffer] = await Promise.all([
-      // Generate metadata
       generateText({
         model: tracedModels.vision,
         output: Output.object({ schema: imageMetadataSchema }),
@@ -114,11 +108,7 @@ export async function createColoringImageFromPhoto(
           },
         ],
       }),
-
-      // Trace image to SVG
       traceImage(imageBuffer),
-
-      // Convert to WebP
       sharp(imageBuffer).webp().toBuffer(),
     ]);
 
@@ -131,7 +121,6 @@ export async function createColoringImageFromPhoto(
       webpSize: webpBuffer.length,
     });
 
-    // Step 3: Create DB record
     const coloringImage = await db.coloringImage.create({
       data: {
         title: imageMetadata.title,
@@ -144,7 +133,6 @@ export async function createColoringImageFromPhoto(
       },
     });
 
-    // Step 4: Generate QR code
     const qrCodeSvg = await QRCode.toString(
       `https://coloringhabitat.com?utm_source=${coloringImage.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
       { type: "svg" },
@@ -153,7 +141,6 @@ export async function createColoringImageFromPhoto(
     const qrCodeSvgBuffer = Buffer.from(qrCodeSvg);
     const imageSvgBuffer = Buffer.from(svg);
 
-    // Step 5: Upload all files in parallel
     const imageFileName = `uploads/coloring-images/${coloringImage.id}/image.webp`;
     const svgFileName = `uploads/coloring-images/${coloringImage.id}/image.svg`;
     const qrCodeFileName = `uploads/coloring-images/${coloringImage.id}/qr-code.svg`;
@@ -168,7 +155,6 @@ export async function createColoringImageFromPhoto(
       put(qrCodeFileName, qrCodeSvgBuffer, { access: "public" }),
     ]);
 
-    // Step 6: Update DB record with URLs
     const updatedColoringImage = await db.coloringImage.update({
       where: { id: coloringImage.id },
       data: {
@@ -178,7 +164,6 @@ export async function createColoringImageFromPhoto(
       },
     });
 
-    // Clean up temporary file
     try {
       if (tempFileName) {
         await del(tempFileName);
@@ -187,32 +172,208 @@ export async function createColoringImageFromPhoto(
       console.error("Error cleaning up temporary file:", error);
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
-      "[PhotoToColoring] Complete! Created:",
-      updatedColoringImage.id,
-    );
-
     return updatedColoringImage;
   } catch (error) {
-    // Track failed generation
-    await trackWithUser(userId, TRACKING_EVENTS.IMAGE_GENERATION_FAILED, {
-      model: "gemini-3-pro-image",
-      provider: "google",
+    const trackingData = {
+      model: "gpt-image-1.5",
+      provider: "openai" as const,
       generationTimeMs: 0,
-      promptLength: 0, // Photo-based, no text prompt
-      referenceImageCount: 1, // The user's photo
-      success: false,
+      promptLength: 0,
+      referenceImageCount: 1,
+      success: false as const,
       error: error instanceof Error ? error.message : "Unknown error",
-    });
+    };
+    if (userId) {
+      await trackWithUser(
+        userId,
+        TRACKING_EVENTS.IMAGE_GENERATION_FAILED,
+        trackingData,
+      );
+    } else {
+      await track(TRACKING_EVENTS.IMAGE_GENERATION_FAILED, trackingData);
+    }
 
     console.error("[PhotoToColoring] Failed:", error);
-
-    return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to generate coloring image from photo",
-    };
+    throw error;
   }
+};
+
+const runPhotoPostProcessing = async (
+  result: Partial<ColoringImage> & { id: string },
+  userId: string | undefined,
+) => {
+  if (!result.url || !result.svgUrl) {
+    return;
+  }
+
+  await Promise.allSettled([
+    (async () => {
+      const { isValid } = await checkSvgImage(result.svgUrl!);
+      if (!isValid) {
+        await retraceImage(result.id, result.url!);
+      }
+    })(),
+
+    (async () => {
+      const imageAnalytics = await analyzeImageForAnalytics(result.url!);
+      if (imageAnalytics) {
+        const analyzedData = {
+          coloringImageId: result.id,
+          ...imageAnalytics,
+        };
+        if (userId) {
+          await trackWithUser(
+            userId,
+            TRACKING_EVENTS.CREATION_ANALYZED,
+            analyzedData,
+          );
+        } else {
+          await track(TRACKING_EVENTS.CREATION_ANALYZED, analyzedData);
+        }
+      }
+    })(),
+
+    (async () => {
+      const fillPointsResult = await generateRegionFillPoints(
+        result.id,
+        result.url!,
+        {
+          title: result.title ?? "",
+          description: result.description ?? "",
+          tags: (result.tags as string[]) ?? [],
+        },
+      );
+      if (fillPointsResult.success) {
+        // eslint-disable-next-line no-console
+        console.log(`[Pipeline] Fill points generated for ${result.id}`);
+      } else {
+        console.error(
+          `[Pipeline] Failed to generate fill points: ${fillPointsResult.error}`,
+        );
+      }
+    })(),
+
+    (async () => {
+      const regionStoreResult = await generateRegionStore(
+        result.id,
+        result.svgUrl!,
+        {
+          title: result.title ?? "",
+          description: result.description ?? "",
+          tags: (result.tags as string[]) ?? [],
+        },
+      );
+      if (regionStoreResult.success) {
+        // eslint-disable-next-line no-console
+        console.log(`[Pipeline] Region store generated for ${result.id}`);
+      } else {
+        console.error(
+          `[Pipeline] Failed to generate region store: ${regionStoreResult.error}`,
+        );
+      }
+    })(),
+
+    (async () => {
+      const refResult = await generateColoredReference(result.id, result.url!, {
+        title: result.title ?? undefined,
+        description: result.description ?? undefined,
+      });
+      if (refResult.success) {
+        // eslint-disable-next-line no-console
+        console.log(`[Pipeline] Colored reference generated for ${result.id}`);
+      } else {
+        console.error(
+          `[Pipeline] Failed to generate colored reference: ${refResult.error}`,
+        );
+      }
+    })(),
+
+    (async () => {
+      const soundResult = await generateAmbientSoundForImage(result.id);
+      if (soundResult.success) {
+        // eslint-disable-next-line no-console
+        console.log(`[Pipeline] Ambient sound generated for ${result.id}`);
+      } else {
+        console.error(
+          `[Pipeline] Failed to generate ambient sound: ${soundResult.error}`,
+        );
+      }
+    })(),
+  ]);
+
+  revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
+};
+
+/**
+ * Generate a coloring image directly from a user's photo.
+ *
+ * Uses Gemini 3 Pro Image to trace the photo into line art, preserving
+ * composition and subject placement. Full post-processing pipeline
+ * (fill points, region store, colored reference, ambient sound) runs
+ * in an after() hook so Magic Fill / Magic Brush / Auto Color / ambient
+ * sound all work on the resulting page, matching the text-generated path.
+ */
+export async function createColoringImageFromPhoto(
+  photoBase64: string,
+  locale: string = "en",
+): Promise<CreateFromPhotoResult> {
+  const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
+
+  if (userId) {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { credits: true },
+    });
+
+    if (!user || user.credits < 5) {
+      return {
+        error: "Insufficient credits",
+        credits: user?.credits || 0,
+      };
+    }
+
+    const result = await db.$transaction(
+      async (tx) => {
+        await tx.user.update({
+          where: { id: userId },
+          data: { credits: { decrement: 5 } },
+        });
+
+        await tx.creditTransaction.create({
+          data: {
+            userId,
+            amount: -5,
+            type: CreditTransactionType.GENERATION,
+          },
+        });
+
+        return generatePhotoColoringImageWithMetadata(
+          photoBase64,
+          userId,
+          locale,
+        );
+      },
+      {
+        timeout: 180000,
+      },
+    );
+
+    after(() => runPhotoPostProcessing(result, userId));
+
+    revalidateTag("all-coloring-images", { expire: 0 });
+    revalidatePath("/");
+    return result;
+  }
+
+  const result = await generatePhotoColoringImageWithMetadata(
+    photoBase64,
+    undefined,
+    locale,
+  );
+
+  after(() => runPhotoPostProcessing(result, undefined));
+
+  revalidateTag("all-coloring-images", { expire: 0 });
+  revalidatePath("/");
+  return result;
 }

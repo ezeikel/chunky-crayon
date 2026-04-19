@@ -38,11 +38,13 @@ const ImageInput = ({ className }: ImageInputProps) => {
     remainingGenerations,
   } = useUser();
 
-  const { description, setDescription, setIsProcessing } = useInputMode();
+  const { description, setDescription, setImageBase64, setIsProcessing } =
+    useInputMode();
 
   const {
     state,
     previewUrl,
+    imageBase64,
     description: aiDescription,
     subjects,
     isChildDrawing,
@@ -67,6 +69,10 @@ const ImageInput = ({ className }: ImageInputProps) => {
       setDescription(aiDescription);
     }
   }, [aiDescription, setDescription]);
+
+  useEffect(() => {
+    setImageBase64(imageBase64);
+  }, [imageBase64, setImageBase64]);
 
   useEffect(() => {
     setIsProcessing(state === "processing");
@@ -184,6 +190,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
       invalid_type: t("errors.invalidType"),
       processing_failed: t("errors.processingFailed"),
       camera_failed: t("errors.cameraFailed"),
+      heic_unsupported: t("errors.heicUnsupported"),
     };
 
     return (

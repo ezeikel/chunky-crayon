@@ -27,11 +27,13 @@ type ImageInputProps = {
 const ImageInput = ({ className }: ImageInputProps) => {
   const t = useTranslations('createForm');
   const { canGenerate } = useUser();
-  const { setDescription, setIsProcessing, setIsBusy } = useInputMode();
+  const { setDescription, setImageBase64, setIsProcessing, setIsBusy } =
+    useInputMode();
 
   const {
     state,
     previewUrl,
+    imageBase64,
     description: aiDescription,
     subjects,
     isChildDrawing,
@@ -53,6 +55,10 @@ const ImageInput = ({ className }: ImageInputProps) => {
   useEffect(() => {
     if (aiDescription) setDescription(aiDescription);
   }, [aiDescription, setDescription]);
+
+  useEffect(() => {
+    setImageBase64(imageBase64);
+  }, [imageBase64, setImageBase64]);
 
   useEffect(() => {
     setIsProcessing(state === 'processing');
@@ -126,6 +132,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
       invalid_type: 'imageInput.errors.invalidType',
       processing_failed: 'imageInput.errors.processingFailed',
       camera_failed: 'imageInput.errors.cameraFailed',
+      heic_unsupported: 'imageInput.errors.heicUnsupported',
     };
     const errorKey = errorMessageKeys[error || 'processing_failed'];
 

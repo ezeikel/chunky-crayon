@@ -1039,7 +1039,8 @@
         "fileTooLarge": "Too big! Try a smaller one.",
         "invalidType": "Try a different picture!",
         "processingFailed": "Didn't work! Try another!",
-        "cameraFailed": "Camera's stuck! Try again!"
+        "cameraFailed": "Camera's stuck! Try again!",
+        "heicUnsupported": "HEIC photos aren't supported yet. Save as JPG or PNG first!"
       }
     },
     "placeholder": "What do you want to color?",

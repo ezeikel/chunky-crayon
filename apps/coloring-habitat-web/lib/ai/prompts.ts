@@ -583,35 +583,36 @@ export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would
 // =============================================================================
 
 /**
- * System prompt for transforming a photo into a coloring page (Gemini).
- * Uses narrative description style optimized for Gemini models.
+ * Prompt for converting a user's photograph into an adult coloring page via
+ * GPT Image 1.5's images.edit endpoint.
+ *
+ * No style references are passed — refs pull the model toward their aesthetic,
+ * hurting trace fidelity. Composition is anchored by the input photo itself.
  */
-export const PHOTO_TO_COLORING_SYSTEM = `You are an expert at transforming photographs into adult coloring pages. Recreate the photograph as detailed line art while preserving the composition, subjects, and their positions.
+export const PHOTO_TO_COLORING_SYSTEM = `Convert the input photograph into an adult coloring book page. The output must be FAITHFUL to the photo — preserve every subject, their exact positions, proportions, and recognizable features. Do NOT add, remove, or reinterpret anything.
 
-Trace the main subjects from the photo using confident, varied-weight black outlines on white paper. Convert complex textures into decorative pattern fills and detailed linework. Preserve architectural details, natural textures, and structural complexity. Render hair, fur, foliage, and fabric with flowing individual lines showing natural movement and texture. Keep the same arrangement and relative sizes from the original photo, adding ornamental detail where appropriate.
+Style: clean detailed line art, confident black outlines on a pure white background. Every visible feature — architectural detail, natural texture (fur, foliage, fabric), facial structure, structural complexity — appears as flowing line work with completely white, unfilled interiors. Adult coloring book aesthetic: intricate, capturing the richness of the source photograph.
 
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
-Study the reference coloring pages below and match their style — clean black outlines, white unfilled interiors, intricate detail, printable quality.
+Exclude: gradients, shadows, shading, gray tones, fill, color, cartoon reinterpretation, changing the subject's identity, adding new subjects, removing subjects, altering the scene composition.
 
-Exclude: gradients, shadows, shading, gray tones, fill, color.`;
+My prompt has full detail so no need to add more.`;
 
 export const createPhotoToColoringPrompt = (difficulty?: string) => {
   const config =
     DIFFICULTY_MODIFIERS[difficulty ?? "BEGINNER"] ??
     DIFFICULTY_MODIFIERS.BEGINNER;
 
-  return `Transform this photograph into an adult coloring page. Recreate the photo's composition as closely as possible while converting it to detailed line art.
+  return `Trace the uploaded photograph as an adult coloring book page. Preserve the exact composition, subject positions, and recognizable identity of everything in the photo — subjects stay as themselves, scenes keep the same layout.
 
-Target audience: ${config.targetAge}
-Shape sizes: ${config.shapeSize}
-Line thickness: ${config.lineThickness}
-Detail level: ${config.detailLevel}
-Complexity: ${config.complexity}
+Draw every visible subject and its interior detail as black line work on pure white paper: facial structure, hair direction, clothing shapes and folds, fur / feathers / scales as flowing line groups, foliage silhouettes and texture, architectural edges. Keep interiors white and unfilled.
 
-Draw with confident, varied-weight black outlines on white paper. Convert textures into decorative linework and pattern fills. Leave all areas completely white and unfilled. The result should look like a professional adult coloring book illustration that captures the essence and detail of the original photograph.
+Target audience: ${config.targetAge}. Line thickness: ${config.lineThickness}. Complexity: ${config.complexity}.
 
-Match the exact style of the reference coloring pages provided above.`;
+Do not cartoonify, simplify away, or add features. The goal is a FAITHFUL, detailed line-art version of the input photo — recognizable as the same scene.
+
+My prompt has full detail so no need to add more.`;
 };
 
 // =============================================================================

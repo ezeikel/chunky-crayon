@@ -1,5 +1,4 @@
-import { generateText, Output } from "ai";
-import { getTracedModels } from "../models";
+import { generateText, Output, type LanguageModel } from "ai";
 import { imageDescriptionSchema } from "../schemas";
 
 // =============================================================================
@@ -41,7 +40,7 @@ export type InputProcessingConfig = {
 export async function transcribeAudioLogic(
   formData: FormData,
   config: InputProcessingConfig,
-  userId?: string | null,
+  model: LanguageModel,
 ): Promise<TranscribeAudioResult> {
   try {
     const audioFile = formData.get("audio") as File | null;
@@ -68,11 +67,6 @@ export async function transcribeAudioLogic(
       return { success: false, error: "Audio file too large (max 10MB)" };
     }
 
-    const tracedModels = getTracedModels({
-      userId: userId || undefined,
-      properties: { action: "audio-transcription", inputType: "voice" },
-    });
-
     const audioBuffer = await audioFile.arrayBuffer();
 
     const minAudioSize = 1000;
@@ -95,7 +89,7 @@ export async function transcribeAudioLogic(
     });
 
     const { text } = await generateText({
-      model: tracedModels.analytics,
+      model,
       system: config.audioTranscriptionSystem,
       messages: [
         {
@@ -142,7 +136,7 @@ export async function transcribeAudioLogic(
 export async function describeImageLogic(
   formData: FormData,
   config: InputProcessingConfig,
-  userId?: string | null,
+  model: LanguageModel,
 ): Promise<DescribeImageResult> {
   try {
     const imageFile = formData.get("image") as File | null;
@@ -161,15 +155,10 @@ export async function describeImageLogic(
       return { success: false, error: "Image too large (max 10MB)" };
     }
 
-    const tracedModels = getTracedModels({
-      userId: userId || undefined,
-      properties: { action: "image-description", inputType: "image" },
-    });
-
     const imageBuffer = await imageFile.arrayBuffer();
 
     const { output } = await generateText({
-      model: tracedModels.analytics,
+      model,
       output: Output.object({ schema: imageDescriptionSchema }),
       system: config.imageDescriptionSystem,
       messages: [

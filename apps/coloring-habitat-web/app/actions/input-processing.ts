@@ -9,6 +9,7 @@ import {
   AUDIO_TRANSCRIPTION_PROMPT,
   IMAGE_DESCRIPTION_SYSTEM,
   IMAGE_DESCRIPTION_PROMPT,
+  getTracedModels,
 } from "@/lib/ai";
 import { ACTIONS } from "@/constants";
 import { getUserId } from "@/app/actions/user";
@@ -27,10 +28,18 @@ const config = {
 
 export async function transcribeAudio(formData: FormData) {
   const userId = await getUserId(ACTIONS.TRANSCRIBE_AUDIO);
-  return transcribeAudioLogic(formData, config, userId);
+  const { analytics } = getTracedModels({
+    userId: userId ?? undefined,
+    properties: { action: "audio-transcription", inputType: "voice" },
+  });
+  return transcribeAudioLogic(formData, config, analytics);
 }
 
 export async function describeImage(formData: FormData) {
   const userId = await getUserId(ACTIONS.DESCRIBE_IMAGE);
-  return describeImageLogic(formData, config, userId);
+  const { analytics } = getTracedModels({
+    userId: userId ?? undefined,
+    properties: { action: "image-description", inputType: "image" },
+  });
+  return describeImageLogic(formData, config, analytics);
 }

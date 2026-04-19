@@ -626,35 +626,44 @@ export const IMAGE_DESCRIPTION_PROMPT = `Describe this image in a way that would
 // =============================================================================
 
 /**
- * System prompt for transforming a photo into a coloring page (Gemini).
- * Uses narrative description style optimized for Gemini models.
+ * Prompt for converting a user's photograph into a coloring book page via
+ * GPT Image 1.5's images.edit endpoint.
+ *
+ * No style references are passed for this path — refs pull the model toward
+ * their aesthetic, which for photos means cartoon drift (e.g. a real dog
+ * becomes a generic cartoon puppy). The prompt carries 100% of the style
+ * guidance; composition is anchored by the input photo itself.
+ *
+ * Optimised for GPT Image 1.5 per lib/ai/PROMPT_OPTIMIZATION.md:
+ *   - Positive framing ("thick black outlines on white" beats "no color")
+ *   - Layered: structure fidelity first, then style, then constraints
+ *   - "Preserve" / "trace" / "do not reinterpret" used literally
+ *   - Final anchor "My prompt has full detail so no need to add more"
  */
-export const PHOTO_TO_COLORING_SYSTEM = `You are an expert at transforming photographs into children's coloring pages. Recreate the photograph as a simple line drawing while preserving the composition, subjects, and their positions.
+export const PHOTO_TO_COLORING_SYSTEM = `Convert the input photograph into a children's coloring book page. The output must be FAITHFUL to the photo — preserve every subject, their exact positions, proportions, and recognizable features. Do NOT add, remove, or reinterpret anything.
 
-Trace the main subjects from the photo using thick black ink outlines on white paper. Simplify every element into large, clean shapes that a child aged ${TARGET_AGE} can easily color with chunky crayons. Convert complex textures into smooth outlined areas. Keep the same arrangement and relative sizes from the original photo, but make every face friendly and cartoon-like.
+Style: clean line art, thick black outlines on a pure white background. Every visible feature — eyes, nose, mouth, clothing folds, fur texture, leaves, architectural lines — appears as an outlined shape with a completely white, unfilled interior. Coloring book aesthetic: printable, simple enough for a child aged ${TARGET_AGE} to color with chunky crayons, but every recognizable detail from the photo is preserved.
 
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
-Study the reference coloring pages below and match their exact style — thick uniform outlines, white unfilled interiors, cartoon-friendly aesthetic.
+Exclude: gradients, shadows, shading, textures, gray tones, fill, color, cartoon reinterpretation, changing the subject's identity, adding new subjects, removing subjects, changing the scene composition.
 
-Exclude: gradients, shadows, shading, textures, gray tones, fill, color, fine detail, hatching, crosshatching, scary or menacing features.`;
+My prompt has full detail so no need to add more.`;
 
 export const createPhotoToColoringPrompt = (difficulty?: string) => {
   const config =
     DIFFICULTY_MODIFIERS[difficulty ?? 'BEGINNER'] ??
     DIFFICULTY_MODIFIERS.BEGINNER;
 
-  return `Transform this photograph into a children's coloring page. Recreate the photo's composition as closely as possible while converting it to a clean line drawing.
+  return `Trace the uploaded photograph as a coloring book page. Preserve the exact composition, subject positions, and recognizable identity of everything in the photo — a pet stays the same pet, a person stays the same person, a landscape keeps the same layout.
 
-Target audience: ${config.targetAge}
-Shape sizes: ${config.shapeSize}
-Line thickness: ${config.lineThickness}
-Detail level: ${config.detailLevel}
-Complexity: ${config.complexity}
+Draw every visible subject and its interior detail as thick black outlines on pure white paper: facial features, hair direction, clothing shapes and folds, fur / feathers / scales as simplified line groups, foliage silhouettes, architectural edges. Keep interiors white and unfilled.
 
-Draw with thick black ink outlines on white paper. Simplify every element into large, clean shapes. Leave all areas completely white and unfilled. The result should look like someone carefully traced and simplified the photo into a child-friendly coloring book illustration.
+Target audience: ${config.targetAge}. Line thickness: ${config.lineThickness}. Complexity: ${config.complexity}.
 
-Match the exact style of the reference coloring pages provided above.`;
+Do not cartoonify, reinterpret, simplify away, or add features. The goal is a FAITHFUL line-art version of the input photo — recognizable as the same scene.
+
+My prompt has full detail so no need to add more.`;
 };
 
 // =============================================================================
