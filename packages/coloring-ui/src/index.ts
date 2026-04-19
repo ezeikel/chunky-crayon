@@ -116,6 +116,20 @@ export {
   DialogDescription,
 } from "./Dialog";
 
+// Create-form input primitives
+export {
+  InputModeProvider,
+  useInputMode,
+  type InputMode,
+  type InputModeState,
+  type InputModeActions,
+  type InputModeContextValue,
+} from "./InputMode";
+export {
+  default as InputModeSelector,
+  type InputModeSelectorLabels,
+} from "./InputModeSelector";
+
 // Async fill (Web Worker)
 export { asyncFloodFill, terminateFillWorker } from "./asyncFill";
 
