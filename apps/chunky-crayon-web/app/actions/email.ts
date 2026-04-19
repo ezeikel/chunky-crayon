@@ -272,7 +272,7 @@ export const sendPaymentFailedEmail = async ({
 export const sendSocialDigest = async ({
   coloringImageTitle,
   coloringImageUrl,
-  svgUrl,
+  dailyImageAssetUrl,
   dailyEntries,
   demoReelTitle,
   demoReelUrl,
@@ -281,7 +281,7 @@ export const sendSocialDigest = async ({
 }: {
   coloringImageTitle: string;
   coloringImageUrl: string;
-  svgUrl?: string;
+  dailyImageAssetUrl?: string;
   dailyEntries: SocialDigestEntry[];
   demoReelTitle?: string;
   demoReelUrl?: string;
@@ -306,7 +306,7 @@ export const sendSocialDigest = async ({
       SocialDigestEmail({
         coloringImageTitle,
         coloringImageUrl,
-        svgUrl,
+        dailyImageAssetUrl,
         dailyEntries,
         demoReelTitle,
         demoReelUrl,

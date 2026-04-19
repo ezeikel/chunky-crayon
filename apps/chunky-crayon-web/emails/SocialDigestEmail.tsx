@@ -23,7 +23,7 @@ type SocialDigestEmailProps = {
   // Daily image (static posts)
   coloringImageTitle: string;
   coloringImageUrl: string;
-  svgUrl?: string;
+  dailyImageAssetUrl?: string;
   dailyEntries: SocialDigestEntry[];
   // Demo reel (worker-produced)
   demoReelTitle?: string;
@@ -38,7 +38,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 const SocialDigestEmail = ({
   coloringImageTitle = "Today's Coloring Page",
   coloringImageUrl = 'https://chunkycrayon.com',
-  svgUrl,
+  dailyImageAssetUrl,
   dailyEntries = [],
   demoReelTitle,
   demoReelUrl,
@@ -82,12 +82,12 @@ const SocialDigestEmail = ({
               View on site
             </Link>
           </Text>
-          {svgUrl && (
+          {dailyImageAssetUrl && (
             <Section style={assetSection}>
               <Text style={paragraph}>
-                ✏️ Line Art (svg):{' '}
-                <Link href={svgUrl} style={inlineLink}>
-                  Download SVG
+                🖼️ Line Art:{' '}
+                <Link href={dailyImageAssetUrl} style={inlineLink}>
+                  Download Image
                 </Link>
               </Text>
             </Section>

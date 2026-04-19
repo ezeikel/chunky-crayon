@@ -203,7 +203,7 @@ export const GET = async (request: Request) => {
     const result = await sendSocialDigest({
       coloringImageTitle: coloringImage.title ?? 'Untitled',
       coloringImageUrl: `${baseUrl}/coloring/${coloringImage.id}`,
-      svgUrl: coloringImage.svgUrl ?? undefined,
+      dailyImageAssetUrl: coloringImage.url ?? undefined,
       dailyEntries,
       demoReelTitle: demoReelImage?.title ?? undefined,
       demoReelUrl:
