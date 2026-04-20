@@ -67,6 +67,24 @@ const TeacherHubPage = () => (
         </div>
       </Link>
 
+      <Link
+        href="/tools/birthday-invite"
+        className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
+      >
+        <div className="flex items-start gap-4">
+          <span className="text-4xl">🎂</span>
+          <div>
+            <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
+              Birthday Invite Maker
+            </h2>
+            <p className="text-muted-foreground">
+              Themed printable invites for class birthdays or end-of-term
+              parties. 1-up for big pinboards, 4-up for handouts.
+            </p>
+          </div>
+        </div>
+      </Link>
+
       <div className="p-6 bg-paper-cream rounded-2xl border-2 border-paper-cream-dark opacity-75">
         <div className="flex items-start gap-4">
           <span className="text-4xl">🔤</span>

@@ -39,9 +39,9 @@ const TOOLS: Tool[] = [
     slug: 'birthday-invite',
     title: 'Birthday Invite Maker',
     description:
-      'Themed printable invites your kid can help color in. Add party details, print 4-up.',
+      'Themed printable invites your kid can help color in. Add party details, print 1-up or 4-up.',
     emoji: '🎂',
-    available: false,
+    available: true,
   },
   {
     slug: 'abc-tracing',
