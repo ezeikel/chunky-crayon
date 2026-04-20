@@ -9,6 +9,7 @@ import {
 } from '@/app/data/coloring-image';
 import { getRelatedImages } from '@/app/data/gallery';
 import { auth } from '@/auth';
+import { ADMIN_EMAILS } from '@/constants';
 import ColoringPageContent from '@/components/ColoringPageContent/ColoringPageContent';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -96,6 +97,9 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
   }
 
   const isAuthenticated = !!session?.user?.id;
+  const isAdmin =
+    !!session?.user?.email && ADMIN_EMAILS.includes(session.user.email);
+  const showRegionDebugLink = process.env.NODE_ENV === 'development' || isAdmin;
   const relatedImages = await getRelatedImages(id, coloringImage.tags || [], 6);
 
   // JSON-LD ImageObject schema for SEO
@@ -148,6 +152,18 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
         isAuthenticated={isAuthenticated}
         title={coloringImage.title || tColoring('title')}
       />
+
+      {/* Admin/dev: inspect region store for this image */}
+      {showRegionDebugLink && (
+        <div className="flex justify-end">
+          <Link
+            href={`/dev/region-store/${id}`}
+            className="inline-flex items-center gap-x-2 rounded-full border-2 border-paper-cream-dark bg-white px-3 py-1.5 text-xs font-medium text-text-primary/70 hover:border-crayon-orange/50 hover:text-crayon-orange transition-colors"
+          >
+            🗺️ View region store
+          </Link>
+        </div>
+      )}
 
       {/* Related Coloring Pages */}
       {relatedImages.length > 0 && (

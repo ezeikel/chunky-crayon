@@ -3,6 +3,8 @@ import { connection } from 'next/server';
 import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
 import type { RegionStoreJson } from '@one-colored-pixel/coloring-core';
+import { auth } from '@/auth';
+import { ADMIN_EMAILS } from '@/constants';
 import RegionStoreViewer from './RegionStoreViewer';
 
 type PageProps = {
@@ -10,14 +12,21 @@ type PageProps = {
 };
 
 /**
- * Dev-only region store debug visualiser.
+ * Region store debug visualiser.
  *
  * Renders a coloring image's raster region map with per-region palette
- * colours and hover-for-label. Used to validate the PR 2 region store
- * pipeline before the client rewrite (PR 4). Gated to NODE_ENV=development.
+ * colours and hover-for-label. Used to validate the region store pipeline
+ * and inspect per-image region quality.
+ *
+ * Access: localhost (NODE_ENV=development) OR authenticated admin user in prod.
  */
 const RegionStoreDebugPage = async ({ params }: PageProps) => {
-  if (process.env.NODE_ENV === 'production') {
+  const session = await auth();
+  const isAdmin =
+    !!session?.user?.email && ADMIN_EMAILS.includes(session.user.email);
+  const isDev = process.env.NODE_ENV === 'development';
+
+  if (!isDev && !isAdmin) {
     notFound();
   }
 
