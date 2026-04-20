@@ -33,7 +33,7 @@ const TOOLS: Tool[] = [
     description:
       "Personalised coloring page with your child's name in bubble letters.",
     emoji: '🖍️',
-    available: false,
+    available: true,
   },
   {
     slug: 'birthday-invite',
