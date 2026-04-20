@@ -8,7 +8,7 @@
     "close": "閉じる",
     "done": "完了",
     "copy": "コピー",
-    "copied": "コピーしたよ！",
+    "copied": "コピーしました！",
     "credits": "クレジット",
     "creditsWithCount": "{count} クレジット",
     "loadMore": "もっと見る"
@@ -38,10 +38,10 @@
     "backToGallery": "ギャラリーに戻る"
   },
   "coloringPage": {
-    "title": "ぬりえ",
-    "defaultDescription": "Chunky Crayonの無料で印刷できるぬりえ",
+    "title": "塗り絵",
+    "defaultDescription": "Chunky Crayonの無料で印刷できる塗り絵",
     "progress": {
-      "colored": "ぬれたよ",
+      "colored": "塗れた",
       "percentage": "{percent}%",
       "milestones": {
         "25": "いいスタート！",
@@ -52,24 +52,24 @@
       "allDone": "完了！"
     },
     "sidebar": {
-      "colors": "いろ",
-      "tools": "どうぐ",
+      "colors": "色",
+      "tools": "道具",
       "size": "太さ",
-      "history": "りれき",
+      "history": "履歴",
       "zoom": "ズーム",
       "actions": "メニュー"
     },
     "tools": {
-      "pan": "うごかす",
+      "pan": "動かす",
       "fill": "ぬりつぶし",
       "brush": "ブラシ",
       "sticker": "シール",
-      "magicReveal": "まほうでひらく",
-      "magicAuto": "まほうおまかせ",
-      "magicBrush": "まほうブラシ",
-      "magicFill": "まほうぬりつぶし",
-      "autoColor": "おまかせぬり",
-      "magic": "まほう"
+      "magicReveal": "魔法で表示",
+      "magicAuto": "魔法おまかせ",
+      "magicBrush": "魔法ブラシ",
+      "magicFill": "魔法塗りつぶし",
+      "autoColor": "おまかせ塗り",
+      "magic": "魔法"
     },
     "brushTypes": {
       "crayon": "クレヨン",
@@ -77,8 +77,8 @@
       "eraser": "けしゴム",
       "glitter": "ラメ",
       "sparkle": "キラキラ",
-      "rainbow": "にじいろ",
-      "glow": "ひかる",
+      "rainbow": "虹色",
+      "glow": "光る",
       "neon": "ネオン",
       "pencil": "鉛筆",
       "paintbrush": "絵筆"
@@ -86,7 +86,7 @@
     "brushSizes": {
       "small": "細い",
       "medium": "ふつう",
-      "large": "ぶっとい"
+      "large": "太い"
     },
     "fillPatterns": {
       "solid": "ベタ",
@@ -95,23 +95,23 @@
       "diagonal": "ななめ",
       "checkerboard": "チェック",
       "hearts": "ハート",
-      "stars": "ほし",
+      "stars": "星",
       "zigzag": "ジグザグ"
     },
     "actions": {
-      "save": "ほぞん",
+      "save": "保存",
       "download": "ダウンロード",
       "share": "シェア",
       "print": "印刷",
       "preparing": "準備中...",
-      "doneSharing": "シェアしたよ",
-      "colorAgain": "もう一回ぬる",
-      "startOver": "はじめから"
+      "doneSharing": "シェア完了",
+      "colorAgain": "もう一度塗る",
+      "startOver": "最初から"
     },
     "toolbar": {
       "expand": "ツールバーをひらく",
       "collapse": "ツールバーをたたむ",
-      "moreTools": "もっとどうぐ",
+      "moreTools": "もっと道具",
       "less": "少なく"
     },
     "undoRedo": {
@@ -129,20 +129,20 @@
     },
     "zoomControls": {
       "zoomLevel": "ズーム: {level}%",
-      "zoomOut": "ちいさく",
-      "zoomOutAria": "ちいさくする（もっと見る）",
-      "zoomIn": "おおきく",
-      "zoomInAria": "おおきくする（もっと近く）",
-      "pan": "うごかす",
-      "panAria": "えのまわりをうごかす",
-      "reset": "ぜんたいを見る",
-      "resetAria": "ぜんたいにもどす"
+      "zoomOut": "小さく",
+      "zoomOutAria": "小さくする（もっと見る）",
+      "zoomIn": "大きく",
+      "zoomInAria": "大きくする（もっと近く）",
+      "pan": "動かす",
+      "panAria": "絵の周りを動かす",
+      "reset": "全体を見る",
+      "resetAria": "全体に戻す"
     },
     "muteToggle": {
-      "mute": "おとを消す",
-      "unmute": "おとを出す",
-      "turnOn": "おとをオン",
-      "turnOff": "おとをオフ"
+      "mute": "音を消す",
+      "unmute": "音を出す",
+      "turnOn": "音をオン",
+      "turnOff": "音をオフ"
     },
     "relatedPages": "もっとぬりえ"
   },
@@ -202,9 +202,9 @@
       "rose": "ローズ"
     },
     "essentials": {
-      "black": "くろ",
-      "white": "しろ",
-      "gray": "はいいろ",
+      "black": "黒",
+      "white": "白",
+      "gray": "灰色",
       "skinTone": "はだいろ"
     },
     "skinTones": {
@@ -328,14 +328,14 @@
     "continueWithApple": "Appleで続ける",
     "signInWithEmail": "メールでログイン",
     "sendingLink": "リンクを送信中…",
-    "chooseMethod": "ログイン方法をえらんでね",
+    "chooseMethod": "ログイン方法を選択してください",
     "orContinueWith": "または",
     "emailPlaceholder": "name@example.com",
     "termsAgreement": "続けると、利用規約とプライバシーポリシーに同意したことになります。",
     "verifyRequest": {
       "title": "メールをチェック！",
-      "description": "サインイン用の魔法のリンクを送りました。メールのリンクをタップして続けてね。",
-      "checkSpam": "見当たらない？迷惑メールも見てみてね。",
+      "description": "サインイン用のリンクを送信しました。メールのリンクをタップして続けてください。",
+      "checkSpam": "見当たらない場合は迷惑メールフォルダも確認してください。",
       "linkExpiry": "リンクは24時間で期限切れです。",
       "tryDifferentEmail": "別のメールを使う"
     },
@@ -357,17 +357,17 @@
     }
   },
   "errors": {
-    "generic": "うまくいきませんでした。もう一度ためしてね。",
+    "generic": "うまくいきませんでした。もう一度お試しください。",
     "notFound": "ページが見つかりません",
     "sharedArtworkNotFound": {
       "title": "作品が見つかりません",
-      "description": "この共有リンクは期限切れか、削除されたみたい。作った人に新しいリンクを聞いてね！",
+      "description": "この共有リンクは期限切れか、削除された可能性があります。作成者に新しいリンクをお聞きください。",
       "cta": "ぬりえをさがす"
     },
     "unauthorized": "続けるにはサインインしてね",
     "stripeLoadFailed": "Stripeの読み込みに失敗しました",
     "checkoutFailed": "お支払いの準備に失敗しました",
-    "unexpectedError": "予期しないエラーが発生しました。もう一度ためしてね。",
+    "unexpectedError": "予期しないエラーが発生しました。もう一度お試しください。",
     "redirectFailed": "お支払い画面へ移動できませんでした"
   },
   "breadcrumbs": {
@@ -378,8 +378,8 @@
     "forTeens": "ティーン向け",
     "forAdults": "大人向け",
     "ariaLabel": "パンくずリスト",
-    "daily": "きょうのぬりえ",
-    "community": "みんなのぬりえ",
+    "daily": "今日の塗り絵",
+    "community": "みんなの塗り絵",
     "holidays": "イベント・きせつ"
   },
   "jumpToNav": {
