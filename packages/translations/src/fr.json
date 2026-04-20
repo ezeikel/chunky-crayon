@@ -1,7 +1,7 @@
 {
   "common": {
     "loading": "Chargement...",
-    "error": "Oups, un souci est survenu",
+    "error": "Une erreur s'est produite",
     "retry": "Réessayer",
     "save": "Enregistrer",
     "cancel": "Annuler",
@@ -39,7 +39,7 @@
   },
   "coloringPage": {
     "title": "Page à colorier",
-    "defaultDescription": "Page à colorier imprimable gratuite de Chunky Crayon",
+    "defaultDescription": "Page à colorier imprimable gratuite",
     "progress": {
       "colored": "colorié",
       "percentage": "{percent}%",
@@ -72,7 +72,7 @@
       "magic": "Magie"
     },
     "brushTypes": {
-      "crayon": "Crayon",
+      "crayon": "Crayon de couleur",
       "marker": "Feutre",
       "eraser": "Gomme",
       "glitter": "Paillettes",
@@ -80,7 +80,7 @@
       "rainbow": "Arc-en-ciel",
       "glow": "Lueur",
       "neon": "Néon",
-      "pencil": "Crayon",
+      "pencil": "Crayon de papier",
       "paintbrush": "Pinceau"
     },
     "brushSizes": {
@@ -122,7 +122,7 @@
     },
     "colorPalette": {
       "selectColor": "Choisir la couleur {color}",
-      "magicToolsMessage": "Couleurs automatiques avec les outils magiques"
+      "magicToolsMessage": "Les couleurs sont choisies automatiquement avec les outils magiques"
     },
     "patternSelector": {
       "label": "Motif :"
@@ -331,7 +331,7 @@
     "chooseMethod": "Choisis ta méthode de connexion préférée",
     "orContinueWith": "Ou continuer avec",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "En continuant, tu acceptes nos Conditions d’utilisation et notre Politique de confidentialité.",
+    "termsAgreement": "En continuant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité.",
     "verifyRequest": {
       "title": "Vérifiez votre e-mail !",
       "description": "On vous a envoyé un lien magique pour vous connecter. Cliquez sur le lien dans votre e-mail pour continuer.",
@@ -357,17 +357,17 @@
     }
   },
   "errors": {
-    "generic": "Oups, quelque chose s’est mal passé. Réessaie.",
+    "generic": "Une erreur s'est produite. Veuillez réessayer.",
     "notFound": "Page introuvable",
     "sharedArtworkNotFound": {
       "title": "Dessin introuvable",
-      "description": "Ce lien de dessin partagé a peut-être expiré ou a été supprimé. Demande à l’artiste un nouveau lien !",
+      "description": "Ce lien de dessin partagé a peut-être expiré ou a été supprimé. Demandez à l'artiste un nouveau lien !",
       "cta": "Découvrir des coloriages"
     },
-    "unauthorized": "Connecte-toi pour continuer",
+    "unauthorized": "Connectez-vous pour continuer",
     "stripeLoadFailed": "Impossible de charger Stripe",
     "checkoutFailed": "Impossible de créer la session de paiement",
-    "unexpectedError": "Une erreur inattendue est survenue. Réessaie.",
+    "unexpectedError": "Une erreur inattendue est survenue. Veuillez réessayer.",
     "redirectFailed": "Impossible de rediriger vers le paiement"
   },
   "breadcrumbs": {
