@@ -4,6 +4,7 @@ import { GALLERY_CATEGORIES } from '@/constants';
 import { routing } from '@/i18n/routing';
 import { getAllTags, ALL_DIFFICULTIES } from '@/app/data/gallery';
 import { BRAND } from '@/lib/db';
+import { LANDING_PAGES } from '@/lib/seo/landing-pages';
 
 const baseUrl = 'https://chunkycrayon.com';
 
@@ -100,6 +101,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/gallery/difficulty/advanced',
     '/gallery/difficulty/expert',
   ];
+
+  // Add SEO long-tail landing pages (priority 0.85 — higher than gallery
+  // categories because they target specific parent/teacher queries with
+  // better intent-match than the generic category listings).
+  for (const landing of LANDING_PAGES) {
+    const path = `/coloring-pages/${landing.slug}`;
+    for (const locale of locales) {
+      urls.push({
+        url: `${baseUrl}/${locale}${path}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.85,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${baseUrl}/${l}${path}`]),
+          ),
+        },
+      });
+    }
+  }
 
   // Add static pages for each locale
   for (const page of staticPages) {
