@@ -1226,6 +1226,13 @@ const handleRequest = async (request: Request) => {
         );
       }
 
+      // Stories are capped at 60s; our reels are ~69s and fail Stories
+      // validation with error 2207082. The worker now uploads a trimmed
+      // 60s copy to demoReelStoryUrl. Fall back to the full reel for
+      // older images that predate this column — they'll fail to post to
+      // story (non-fatal) until they're re-produced.
+      const storyReelUrl = coloringImage.demoReelStoryUrl ?? reelUrl;
+
       // Per-platform results we'll merge into coloringImage.socialPostResults
       // at the end so the digest cron can read accurate auto-posted flags.
       const platformResults: SocialPostResults = {};
@@ -1280,7 +1287,7 @@ const handleRequest = async (request: Request) => {
         ) {
           try {
             const storyContainerId =
-              await createInstagramStoryVideoContainer(reelUrl);
+              await createInstagramStoryVideoContainer(storyReelUrl);
             await waitForMediaReady(storyContainerId);
             const storyId = await publishInstagramMedia(storyContainerId);
             platformResults.instagramStoryDemoReel = {
@@ -1336,7 +1343,7 @@ const handleRequest = async (request: Request) => {
           !alreadyPosted('facebookStoryDemoReel')
         ) {
           try {
-            const storyId = await postVideoToFacebookStory(reelUrl);
+            const storyId = await postVideoToFacebookStory(storyReelUrl);
             platformResults.facebookStoryDemoReel = {
               success: true,
               mediaId: storyId,

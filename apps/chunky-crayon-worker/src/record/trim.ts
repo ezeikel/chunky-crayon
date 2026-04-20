@@ -42,6 +42,41 @@ export async function trimWebmToMp4(opts: {
   return resolve(outputPath);
 }
 
+/**
+ * Trim the full demo reel mp4 down to 60 seconds for IG / FB Stories.
+ *
+ * Instagram Stories hard-caps at 60s via the Graph API v22.0+ — uploading
+ * our 69s reel as media_type=STORIES fails with error 2207082. Reels can
+ * go up to 90s so the full file stays as the primary. This helper
+ * produces a sibling *-story.mp4 file that keeps the first 60s (intro
+ * card + typing + most of the reveal) — the most attention-grabbing
+ * part anyway.
+ *
+ * Stream-copy (no re-encode) for speed — the source mp4 already has the
+ * right codec (H.264 yuv420p, +faststart).
+ */
+export async function trimReelForStory(opts: {
+  sourcePath: string;
+  outputPath: string;
+  /** Max duration in seconds for the story cut. Defaults to 60. */
+  durationSec?: number;
+}): Promise<string> {
+  const { sourcePath, outputPath, durationSec = 60 } = opts;
+  await runFfmpeg([
+    "-y",
+    "-i",
+    sourcePath,
+    "-t",
+    String(durationSec),
+    "-c",
+    "copy",
+    "-movflags",
+    "+faststart",
+    outputPath,
+  ]);
+  return resolve(outputPath);
+}
+
 async function runFfmpeg(args: string[]): Promise<void> {
   return new Promise((resolvePromise, rejectPromise) => {
     const proc = spawn("ffmpeg", args, { stdio: ["ignore", "pipe", "pipe"] });

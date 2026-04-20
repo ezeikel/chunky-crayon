@@ -7,7 +7,7 @@ import { resolve } from "node:path";
 
 import { recordColoringSession } from "./record/session.js";
 import { renderDemoReel } from "./video/render.js";
-import { trimWebmToMp4 } from "./record/trim.js";
+import { trimWebmToMp4, trimReelForStory } from "./record/trim.js";
 import { generateRegionStoreLocal } from "./record/region-store.js";
 import { db } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
@@ -535,6 +535,7 @@ async function runPublishReel(c: Context) {
   const localUrl = `http://localhost:${port}/tmp/${outputPath.split("/").pop()}`;
   let publishedUrl: string | undefined;
   let publishedCoverUrl: string | undefined;
+  let publishedStoryUrl: string | undefined;
   if (!body.dry_run) {
     try {
       const mp4Buffer = await readFile(outputPath);
@@ -560,11 +561,41 @@ async function runPublishReel(c: Context) {
         console.warn("[/publish/reel] no cover JPEG to upload");
       }
 
+      // Trim a 60s copy for IG / FB Stories. Stories reject videos >60s
+      // with error 2207082; our reel is ~69s. Stream-copy trim — ~1s.
+      // Non-fatal: if this fails, the story post handler falls back to
+      // the full reel URL (which will fail to post but that's OK —
+      // better than blocking the whole reel upload).
+      try {
+        const storyPath = `${WORKER_OUT_DIR}/${recording.imageId}-${stamp}-story.mp4`;
+        await trimReelForStory({
+          sourcePath: outputPath,
+          outputPath: storyPath,
+          durationSec: 60,
+        });
+        const storyBuffer = await readFile(storyPath);
+        const storyKey = `reels/demo/${recording.imageId}-${stamp}-story.mp4`;
+        const { url: storyUrl } = await put(storyKey, storyBuffer, {
+          contentType: "video/mp4",
+          access: "public",
+        });
+        publishedStoryUrl = storyUrl;
+        console.log(
+          `[/publish/reel] story (60s) uploaded to R2: ${storyUrl} (${storyBuffer.byteLength} bytes)`,
+        );
+      } catch (storyErr) {
+        console.error(
+          "[/publish/reel] story trim/upload failed (non-fatal):",
+          storyErr instanceof Error ? storyErr.message : storyErr,
+        );
+      }
+
       await db.coloringImage.update({
         where: { id: recording.imageId },
         data: {
           demoReelUrl: url,
           ...(publishedCoverUrl ? { demoReelCoverUrl: publishedCoverUrl } : {}),
+          ...(publishedStoryUrl ? { demoReelStoryUrl: publishedStoryUrl } : {}),
         },
       });
       console.log(`[/publish/reel] uploaded mp4 to R2: ${url}`);
