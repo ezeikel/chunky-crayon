@@ -33,7 +33,7 @@
       "actions": "기능"
     },
     "tools": {
-      "pan": "이동",
+      "pan": "화면 이동",
       "fill": "채우기",
       "brush": "브러시",
       "sticker": "스티커",
@@ -104,7 +104,7 @@
       "zoomOutAria": "축소 (더 넓게 보기)",
       "zoomIn": "확대",
       "zoomInAria": "확대 (더 가까이 보기)",
-      "pan": "이동",
+      "pan": "화면 이동",
       "panAria": "그림 위치 이동",
       "reset": "전체 보기",
       "resetAria": "전체 그림으로 돌아가기"
@@ -355,7 +355,7 @@
         "description": "컬러링 여정을 시작하세요",
         "cta": "무료로 시작",
         "features": [
-          "매일 2회 무료 생성",
+          "시작할 때 2회 무료 생성",
           "무료 라이브러리 접근",
           "온라인 컬러링 캔버스",
           "PDF 다운로드"
@@ -456,17 +456,17 @@
       "beginner": {
         "title": "초급",
         "shortLabel": "쉬움",
-        "description": "부드러운 패턴으로, 짧은 휴식 시간에 딱 좋아요"
+        "description": "부드러운 패턴으로 짧은 휴식 시간에 완벽한 선택"
       },
       "intermediate": {
         "title": "중급",
         "shortLabel": "보통",
-        "description": "적당한 디테일로 차분하게 몰입할 수 있어요"
+        "description": "적당한 디테일로 더 긴 시간 차분히 몰입하는 시간"
       },
       "advanced": {
         "title": "고급",
         "shortLabel": "어려움",
-        "description": "섬세한 디자인으로, 천천히 집중하는 시간이 필요해요"
+        "description": "천천히 집중할 때 보람을 주는 섬세한 디자인"
       },
       "expert": {
         "title": "전문가",
@@ -497,7 +497,7 @@
       },
       "animals": {
         "name": "동물",
-        "description": "정교하게 그려진 동물들"
+        "description": "섬세하게 표현된 야생동물"
       },
       "architecture": {
         "name": "건축",
@@ -533,7 +533,7 @@
       },
       "food": {
         "name": "음식",
-        "description": "풍성한 요리와 식탁 풍경"
+        "description": "풍성한 만찬과 요리의 풍경"
       }
     },
     "holidays": {
