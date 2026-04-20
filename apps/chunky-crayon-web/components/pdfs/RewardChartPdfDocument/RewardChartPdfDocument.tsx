@@ -10,12 +10,20 @@ import {
   Svg,
   Path,
 } from '@react-pdf/renderer';
-import { faStar } from '@fortawesome/pro-regular-svg-icons/faStar';
-import { faUnicorn } from '@fortawesome/pro-regular-svg-icons/faUnicorn';
-import { faRocket } from '@fortawesome/pro-regular-svg-icons/faRocket';
-import { faFish } from '@fortawesome/pro-regular-svg-icons/faFish';
-import { faPaw } from '@fortawesome/pro-regular-svg-icons/faPaw';
+import { faStar } from '@fortawesome/pro-thin-svg-icons/faStar';
+import { faHeart } from '@fortawesome/pro-thin-svg-icons/faHeart';
+import { faRocketLaunch } from '@fortawesome/pro-thin-svg-icons/faRocketLaunch';
+import { faFish } from '@fortawesome/pro-thin-svg-icons/faFish';
+import { faPaw } from '@fortawesome/pro-thin-svg-icons/faPaw';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+
+// Thin variants → better match for "colour this shape in" — the shapes
+// are mostly outline and the kid's crayon reads as the dominant fill.
+//
+// NOTE: `shuttle-space-vertical` (from fontawesome.com) isn't exported
+// by pro-thin 6.7.2 yet. `faRocketLaunch` is the closest vertical
+// space-themed thin icon; swap in faShuttleSpaceVertical when the Pro
+// bundle upgrades to a release that includes it.
 
 Font.register({
   family: 'Tondo Bold',
@@ -34,7 +42,7 @@ export type RewardChartTheme =
   | 'ocean'
   | 'dinosaur';
 
-type ShapeKind = 'star' | 'unicorn' | 'rocket' | 'fish' | 'paw';
+type ShapeKind = 'star' | 'heart' | 'rocket' | 'fish' | 'paw';
 
 type ThemeStyle = {
   primary: string; // header + outlines
@@ -56,7 +64,7 @@ const THEMES: Record<RewardChartTheme, ThemeStyle> = {
     primary: '#D05CAC',
     secondary: '#FCE4F5',
     accent: '#C34F9E',
-    shape: 'unicorn',
+    shape: 'heart',
     label: 'Unicorn Magic',
   },
   space: {
@@ -89,8 +97,8 @@ const THEMES: Record<RewardChartTheme, ThemeStyle> = {
 // regular, so path is a single string.
 const FA_ICONS: Record<ShapeKind, IconDefinition> = {
   star: faStar,
-  unicorn: faUnicorn,
-  rocket: faRocket,
+  heart: faHeart,
+  rocket: faRocketLaunch,
   fish: faFish,
   paw: faPaw,
 };
@@ -124,7 +132,7 @@ const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
 const SHAPE_LABEL: Record<ShapeKind, string> = {
   star: 'star',
-  unicorn: 'unicorn',
+  heart: 'heart',
   rocket: 'rocket',
   fish: 'fish',
   paw: 'paw print',
