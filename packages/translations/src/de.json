@@ -47,7 +47,7 @@
         "25": "Toller Start!",
         "50": "Halb geschafft!",
         "75": "Fast fertig!",
-        "100": "Wahnsinn!"
+        "100": "Fantastisch!"
       },
       "allDone": "Alles fertig!"
     },
@@ -74,7 +74,7 @@
     "brushTypes": {
       "crayon": "Wachsmaler",
       "marker": "Filzstift",
-      "eraser": "Radierer",
+      "eraser": "Radiergummi",
       "glitter": "Glitzer",
       "sparkle": "Funkeln",
       "rainbow": "Regenbogen",
@@ -104,7 +104,7 @@
       "share": "Teilen",
       "print": "Drucken",
       "preparing": "Wird vorbereitet...",
-      "doneSharing": "Fertig geteilt",
+      "doneSharing": "Teilen abgeschlossen",
       "colorAgain": "Nochmal ausmalen",
       "startOver": "Neu starten"
     },
@@ -139,8 +139,8 @@
       "resetAria": "Zurück zur Gesamtansicht"
     },
     "muteToggle": {
-      "mute": "Töne stumm",
-      "unmute": "Töne an",
+      "mute": "Töne stummschalten",
+      "unmute": "Töne aktivieren",
       "turnOn": "Töne einschalten",
       "turnOff": "Töne ausschalten"
     },
@@ -294,7 +294,7 @@
   },
   "billing": {
     "pageTitle": "Deine Abrechnung & dein Abo",
-    "pageSubtitle": "Verwalte dein Abo und kaufe extra Credits, um weiter tolle Ausmalbilder zu zaubern.",
+    "pageSubtitle": "Verwalte dein Abo und kaufe zusätzliche Credits, um weiter großartige Ausmalbilder zu erstellen.",
     "currentPlan": "Aktueller Plan",
     "currentCredits": "Aktuelle Credits: {count}",
     "renewsOn": "Dein Abo verlängert sich am {date}",
@@ -328,13 +328,13 @@
     "continueWithApple": "Weiter mit Apple",
     "signInWithEmail": "Mit E-Mail anmelden",
     "sendingLink": "Link wird gesendet...",
-    "chooseMethod": "Wähle deine Lieblings-Anmeldemethode",
+    "chooseMethod": "Wähle deine bevorzugte Anmeldemethode",
     "orContinueWith": "Oder weiter mit",
     "emailPlaceholder": "name@example.com",
     "termsAgreement": "Wenn du weitermachst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
     "verifyRequest": {
       "title": "Schau in deine E-Mails!",
-      "description": "Wir haben dir einen magischen Link zum Anmelden geschickt. Klicke auf den Link in deiner E-Mail, um weiterzumachen.",
+      "description": "Wir haben dir einen Anmeldelink geschickt. Klicke auf den Link in deiner E-Mail, um fortzufahren.",
       "checkSpam": "Nicht zu sehen? Schau in deinen Spam-Ordner.",
       "linkExpiry": "Der Link läuft in 24 Stunden ab.",
       "tryDifferentEmail": "Andere E-Mail verwenden"
@@ -357,7 +357,7 @@
     }
   },
   "errors": {
-    "generic": "Oh nein! Da ist etwas schiefgelaufen. Bitte versuch’s nochmal.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es noch einmal.",
     "notFound": "Seite nicht gefunden",
     "sharedArtworkNotFound": {
       "title": "Kunstwerk nicht gefunden",
