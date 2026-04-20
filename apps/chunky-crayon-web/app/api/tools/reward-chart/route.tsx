@@ -7,7 +7,9 @@ import RewardChartPdfDocument, {
 import { track } from '@/utils/analytics-server';
 import { TRACKING_EVENTS } from '@/constants';
 
-export const runtime = 'nodejs';
+// Node is the default runtime; explicit `export const runtime = 'nodejs'`
+// is rejected when cacheComponents is on (Next 16) — @react-pdf/renderer
+// needs node anyway, which we get by default.
 
 const VALID_THEMES: RewardChartTheme[] = [
   'stars',
