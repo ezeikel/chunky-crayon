@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateRandomBlogPost, getBlogTopicStats } from '@/app/actions/blog';
+import { sendAdminAlert } from '@/app/actions/email';
 
 export const maxDuration = 300; // Blog generation can take up to 5 minutes
 
@@ -15,6 +16,15 @@ export async function GET() {
     const stats = await getBlogTopicStats();
 
     if (stats.remainingCount === 0) {
+      const categoryLines = Object.entries(stats.categoryStats)
+        .map(([cat, c]) => `  - ${cat}: ${c.covered}/${c.total}`)
+        .join('\n');
+
+      await sendAdminAlert({
+        subject: 'Chunky Crayon: Blog topic list exhausted',
+        body: `The daily blog cron ran but all ${stats.totalTopics} topics in BLOG_TOPICS have been covered.\n\nNo new post was published today.\n\nCoverage:\n${categoryLines}\n\nNext step: run the deep-research script to add new topics.\n\n  cd apps/chunky-crayon-web\n  pnpm tsx -r dotenv/config scripts/research-blog-topics.ts\n\nThen merge scripts/research-blog-topics.output.json into constants.ts (BLOG_TOPICS).`,
+      });
+
       return NextResponse.json(
         {
           success: true,
