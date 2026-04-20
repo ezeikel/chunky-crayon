@@ -152,10 +152,16 @@ type SocialPostResults = {
   instagramReel?: PlatformResult;
   instagramDemoReel?: PlatformResult;
   instagramColoredStatic?: PlatformResult;
+  instagramStory?: PlatformResult;
+  instagramStoryDemoReel?: PlatformResult;
+  instagramStoryColoredStatic?: PlatformResult;
   facebookImage?: PlatformResult;
   facebookVideo?: PlatformResult;
   facebookDemoReel?: PlatformResult;
   facebookColoredStatic?: PlatformResult;
+  facebookStory?: PlatformResult;
+  facebookStoryDemoReel?: PlatformResult;
+  facebookStoryColoredStatic?: PlatformResult;
   pinterest?: PlatformResult;
   pinterestVideo?: PlatformResult;
   pinterestDemoReel?: PlatformResult;
@@ -460,6 +466,154 @@ const createInstagramReelContainer = async (
     );
   }
   return data.id;
+};
+
+/**
+ * Create an Instagram Story container (image).
+ *
+ * Stories support IMAGE or VIDEO. For vertical-friendly images (our SVG
+ * converter outputs 1080×1920), Meta accepts them directly. Follow with
+ * publishInstagramMedia to actually post.
+ *
+ * Stories last 24h and don't carry a caption (text overlays are a
+ * separate manual step in the app).
+ */
+const createInstagramStoryImageContainer = async (imageUrl: string) => {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        media_type: 'STORIES',
+        image_url: imageUrl,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+  const data = await response.json();
+  if (!data.id) {
+    throw new Error(
+      `failed to create IG Story image container: ${JSON.stringify(data)}`,
+    );
+  }
+  return data.id;
+};
+
+/**
+ * Create an Instagram Story container (video).
+ *
+ * Accepts vertical 9:16 mp4 (our reel output is 1080×1920). Stories
+ * auto-trim to 60s — our reels are ~69s so Meta will trim the tail.
+ * For a perfect fit we'd export a separate 60s cut, but for now the
+ * hook (first ~10s showing the kid typing) is what matters.
+ */
+const createInstagramStoryVideoContainer = async (videoUrl: string) => {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        media_type: 'STORIES',
+        video_url: videoUrl,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+  const data = await response.json();
+  if (!data.id) {
+    throw new Error(
+      `failed to create IG Story video container: ${JSON.stringify(data)}`,
+    );
+  }
+  return data.id;
+};
+
+/**
+ * Post an image to the Facebook Page's story.
+ *
+ * Uses the Page's /photo_stories edge. Requires pages_manage_posts +
+ * pages_read_engagement on the access token (same token scope used for
+ * feed posts).
+ */
+const postImageToFacebookStory = async (imageUrl: string) => {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/photo_stories`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: imageUrl,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+  const data = await response.json();
+  if (!data.id && !data.success) {
+    throw new Error(`failed to post FB Story image: ${JSON.stringify(data)}`);
+  }
+  return data.id ?? data.post_id ?? 'ok';
+};
+
+/**
+ * Post a video to the Facebook Page's story.
+ *
+ * Uses the two-step /video_stories upload + finish flow. FB requires
+ * vertical 9:16 video, max 60s. Our reels are 69s but FB usually
+ * trims the tail automatically.
+ */
+const postVideoToFacebookStory = async (videoUrl: string) => {
+  // Step 1: start upload session
+  const startRes = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/video_stories`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upload_phase: 'start',
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+  const startData = await startRes.json();
+  if (!startData.video_id || !startData.upload_url) {
+    throw new Error(
+      `FB Story: failed to start upload session: ${JSON.stringify(startData)}`,
+    );
+  }
+
+  // Step 2: upload the video by URL (Facebook fetches it)
+  const uploadRes = await fetch(startData.upload_url, {
+    method: 'POST',
+    headers: {
+      Authorization: `OAuth ${process.env.FACEBOOK_ACCESS_TOKEN}`,
+      file_url: videoUrl,
+    },
+  });
+  const uploadData = await uploadRes.json();
+  if (!uploadData.success) {
+    throw new Error(`FB Story: upload failed: ${JSON.stringify(uploadData)}`);
+  }
+
+  // Step 3: finalize + publish
+  const finishRes = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/video_stories`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upload_phase: 'finish',
+        video_id: startData.video_id,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+  const finishData = await finishRes.json();
+  if (!finishData.success && !finishData.post_id) {
+    throw new Error(`FB Story: finish failed: ${JSON.stringify(finishData)}`);
+  }
+  return finishData.post_id ?? startData.video_id;
 };
 
 const publishInstagramMedia = async (creationId: string) => {
@@ -1117,6 +1271,32 @@ const handleRequest = async (request: Request) => {
             error: errorMsg,
           };
         }
+
+        // Also post the reel to IG Story. Non-blocking — a failed story
+        // never fails the feed post (which is the real one).
+        if (
+          platformResults.instagramDemoReel?.success &&
+          !alreadyPosted('instagramStoryDemoReel')
+        ) {
+          try {
+            const storyContainerId =
+              await createInstagramStoryVideoContainer(reelUrl);
+            await waitForMediaReady(storyContainerId);
+            const storyId = await publishInstagramMedia(storyContainerId);
+            platformResults.instagramStoryDemoReel = {
+              success: true,
+              mediaId: storyId,
+              postedAt: new Date().toISOString(),
+            };
+            console.log('[DemoReel] IG Story posted:', storyId);
+          } catch (err) {
+            console.error('[DemoReel] IG Story failed (non-fatal):', err);
+            platformResults.instagramStoryDemoReel = {
+              success: false,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            };
+          }
+        }
       }
 
       // FB Reel (posted via the same video endpoint)
@@ -1147,6 +1327,29 @@ const handleRequest = async (request: Request) => {
             caption,
             error: errorMsg,
           };
+        }
+
+        // Also post to FB Story — non-blocking (story failure doesn't
+        // fail the feed post).
+        if (
+          platformResults.facebookDemoReel?.success &&
+          !alreadyPosted('facebookStoryDemoReel')
+        ) {
+          try {
+            const storyId = await postVideoToFacebookStory(reelUrl);
+            platformResults.facebookStoryDemoReel = {
+              success: true,
+              mediaId: storyId,
+              postedAt: new Date().toISOString(),
+            };
+            console.log('[DemoReel] FB Story posted:', storyId);
+          } catch (err) {
+            console.error('[DemoReel] FB Story failed (non-fatal):', err);
+            platformResults.facebookStoryDemoReel = {
+              success: false,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            };
+          }
         }
       }
 
@@ -1376,6 +1579,31 @@ const handleRequest = async (request: Request) => {
             error: errorMsg,
           };
         }
+
+        // Also post to IG Story — non-blocking.
+        if (
+          platformResults.instagramColoredStatic?.success &&
+          !csAlreadyPosted('instagramStoryColoredStatic')
+        ) {
+          try {
+            const storyContainerId =
+              await createInstagramStoryImageContainer(blankImageUrl);
+            await waitForMediaReady(storyContainerId, 20, 3000);
+            const storyId = await publishInstagramMedia(storyContainerId);
+            platformResults.instagramStoryColoredStatic = {
+              success: true,
+              mediaId: storyId,
+              postedAt: new Date().toISOString(),
+            };
+            console.log('[ColoredStatic] IG Story posted:', storyId);
+          } catch (err) {
+            console.error('[ColoredStatic] IG Story failed (non-fatal):', err);
+            platformResults.instagramStoryColoredStatic = {
+              success: false,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            };
+          }
+        }
       }
 
       // Facebook single-image post
@@ -1402,6 +1630,28 @@ const handleRequest = async (request: Request) => {
             caption,
             error: errorMsg,
           };
+        }
+
+        // Also post to FB Story — non-blocking.
+        if (
+          platformResults.facebookColoredStatic?.success &&
+          !csAlreadyPosted('facebookStoryColoredStatic')
+        ) {
+          try {
+            const storyId = await postImageToFacebookStory(blankImageUrl);
+            platformResults.facebookStoryColoredStatic = {
+              success: true,
+              mediaId: storyId,
+              postedAt: new Date().toISOString(),
+            };
+            console.log('[ColoredStatic] FB Story posted:', storyId);
+          } catch (err) {
+            console.error('[ColoredStatic] FB Story failed (non-fatal):', err);
+            platformResults.facebookStoryColoredStatic = {
+              success: false,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            };
+          }
         }
       }
 
@@ -1439,6 +1689,11 @@ const handleRequest = async (request: Request) => {
     // Per-platform results merged into coloringImage.socialPostResults at
     // the end so /api/social/digest reflects what actually posted.
     const staticPlatformResults: SocialPostResults = {};
+
+    // Existing results on the row (from earlier cron runs) — used to skip
+    // story re-posts if they already went out in a previous slot.
+    const existingStaticResults =
+      (coloringImage.socialPostResults as SocialPostResults | null) ?? {};
 
     // post to Instagram
     if (shouldPost('instagram')) {
@@ -1548,6 +1803,33 @@ const handleRequest = async (request: Request) => {
             caption: instagramCaptionForResults,
             error: errorMsg,
           };
+        }
+
+        // Also post the line-art image to IG Story — non-blocking. Uses
+        // the JPEG we already uploaded for the feed post.
+        if (
+          staticPlatformResults.instagramCarousel?.success &&
+          instagramImageUrl &&
+          !existingStaticResults.instagramStory?.success
+        ) {
+          try {
+            const storyContainerId =
+              await createInstagramStoryImageContainer(instagramImageUrl);
+            await waitForMediaReady(storyContainerId, 20, 3000);
+            const storyId = await publishInstagramMedia(storyContainerId);
+            staticPlatformResults.instagramStory = {
+              success: true,
+              mediaId: storyId,
+              postedAt: new Date().toISOString(),
+            };
+            console.log('[Instagram] Story posted:', storyId);
+          } catch (err) {
+            console.error('[Instagram] Story failed (non-fatal):', err);
+            staticPlatformResults.instagramStory = {
+              success: false,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            };
+          }
         }
       }
 
@@ -1674,6 +1956,25 @@ const handleRequest = async (request: Request) => {
           postedAt: new Date().toISOString(),
         };
         console.log('Successfully posted image to Facebook:', facebookImageId);
+
+        // Also post to FB Story — non-blocking.
+        if (!existingStaticResults.facebookStory?.success) {
+          try {
+            const storyId = await postImageToFacebookStory(facebookImageUrl);
+            staticPlatformResults.facebookStory = {
+              success: true,
+              mediaId: storyId,
+              postedAt: new Date().toISOString(),
+            };
+            console.log('[Facebook] Story posted:', storyId);
+          } catch (err) {
+            console.error('[Facebook] Story failed (non-fatal):', err);
+            staticPlatformResults.facebookStory = {
+              success: false,
+              error: err instanceof Error ? err.message : 'Unknown error',
+            };
+          }
+        }
       } catch (error) {
         console.error('Error posting image to Facebook:', error);
         const errorMsg =
