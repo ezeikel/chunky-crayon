@@ -6,7 +6,7 @@ import { faStar } from '@fortawesome/pro-duotone-svg-icons/faStar';
 import { faPalette } from '@fortawesome/pro-duotone-svg-icons/faPalette';
 import { faCakeCandles } from '@fortawesome/pro-duotone-svg-icons/faCakeCandles';
 import { faBookOpen } from '@fortawesome/pro-duotone-svg-icons/faBookOpen';
-import { faPartyHorn } from '@fortawesome/pro-duotone-svg-icons/faPartyHorn';
+import { faCalendarStar } from '@fortawesome/pro-duotone-svg-icons/faCalendarStar';
 import { faCheck } from '@fortawesome/pro-duotone-svg-icons/faCheck';
 
 const DUOTONE_STYLE = {
@@ -144,27 +144,27 @@ const TeacherHubPage = () => (
         </div>
       </Link>
 
-      <div className="p-6 bg-paper-cream rounded-2xl border-2 border-paper-cream-dark opacity-75">
+      <Link
+        href="/tools/seasonal-pack"
+        className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
+      >
         <div className="flex items-start gap-4">
           <FontAwesomeIcon
-            icon={faPartyHorn}
-            className="text-3xl mt-1 opacity-50"
+            icon={faCalendarStar}
+            className="text-3xl mt-1"
             style={DUOTONE_STYLE}
           />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
-              Seasonal Packs
+              Seasonal Coloring Packs
             </h2>
-            <p className="text-muted-foreground mb-1">
-              Halloween, Christmas, Valentine&apos;s, back-to-school bundles.
-              Coming soon.
+            <p className="text-muted-foreground">
+              Halloween, Christmas, Valentine&apos;s, Easter, Thanksgiving and
+              Back-to-school — 6–10 themed pages per pack.
             </p>
-            <span className="text-xs font-tondo font-bold text-crayon-orange">
-              Coming soon
-            </span>
           </div>
         </div>
-      </div>
+      </Link>
     </section>
 
     {/* What we promise */}

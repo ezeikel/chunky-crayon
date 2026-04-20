@@ -6,6 +6,7 @@ import { faStar } from '@fortawesome/pro-duotone-svg-icons/faStar';
 import { faMarker } from '@fortawesome/pro-duotone-svg-icons/faMarker';
 import { faCakeCandles } from '@fortawesome/pro-duotone-svg-icons/faCakeCandles';
 import { faBookOpen } from '@fortawesome/pro-duotone-svg-icons/faBookOpen';
+import { faCalendarStar } from '@fortawesome/pro-duotone-svg-icons/faCalendarStar';
 import { generateAlternates } from '@/lib/seo';
 
 type PageParams = { locale: string };
@@ -80,6 +81,14 @@ const TOOLS: Tool[] = [
     description:
       'A–Z alphabet tracing pages with themed pictures. 27-page PDF bundle, great for preschool and kindergarten.',
     icon: faBookOpen,
+    available: true,
+  },
+  {
+    slug: 'seasonal-pack',
+    title: 'Seasonal Coloring Packs',
+    description:
+      'Halloween, Christmas, Easter and more — ready-to-print bundles of themed coloring pages.',
+    icon: faCalendarStar,
     available: true,
   },
 ];

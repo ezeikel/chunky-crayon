@@ -160,6 +160,14 @@ const Footer = async ({ className }: FooterProps) => {
               </li>
               <li>
                 <Link
+                  href="/tools/seasonal-pack"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  Seasonal coloring packs
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/for-teachers"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
