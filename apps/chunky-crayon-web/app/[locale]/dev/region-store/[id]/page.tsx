@@ -21,6 +21,12 @@ type PageProps = {
  * Access: localhost (NODE_ENV=development) OR authenticated admin user in prod.
  */
 const RegionStoreDebugPage = async ({ params }: PageProps) => {
+  // Opt into dynamic rendering — auth() + DB read are per-request, and we
+  // want a fresh read that bypasses the getColoringImageBase cache (which
+  // doesn't select the new region store columns yet).
+  // Must come BEFORE auth() so Cache Components knows this page is dynamic.
+  await connection();
+
   const session = await auth();
   const isAdmin =
     !!session?.user?.email && ADMIN_EMAILS.includes(session.user.email);
@@ -29,11 +35,6 @@ const RegionStoreDebugPage = async ({ params }: PageProps) => {
   if (!isDev && !isAdmin) {
     notFound();
   }
-
-  // Opt into dynamic rendering under cacheComponents: we want a fresh DB read
-  // on every request, bypassing the getColoringImageBase cache which doesn't
-  // select the new region store columns yet.
-  await connection();
 
   const { id } = await params;
 
