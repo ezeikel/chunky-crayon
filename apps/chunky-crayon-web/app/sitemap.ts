@@ -66,6 +66,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/blog', priority: 0.7, changeFrequency: 'weekly' as const },
     { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
     { path: '/terms', priority: 0.3, changeFrequency: 'yearly' as const },
+    // Phase 2 growth pages — free tools + teacher hub
+    { path: '/tools', priority: 0.9, changeFrequency: 'weekly' as const },
+    {
+      path: '/tools/reward-chart',
+      priority: 0.9,
+      changeFrequency: 'monthly' as const,
+    },
+    {
+      path: '/for-teachers',
+      priority: 0.9,
+      changeFrequency: 'weekly' as const,
+    },
   ];
 
   // Age-based gallery pages

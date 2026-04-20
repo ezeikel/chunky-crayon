@@ -1,0 +1,150 @@
+import { Metadata } from 'next';
+import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title:
+    'Free Coloring Pages & Printables for Teachers (Preschool, K–2) | Chunky Crayon',
+  description:
+    'Free classroom printables for preschool and early primary teachers. Behavior charts, coloring pages, worksheets. No signup, no student data stored.',
+  alternates: {
+    canonical: 'https://chunkycrayon.com/en/for-teachers',
+  },
+  openGraph: {
+    title: 'Free Coloring Pages & Printables for Teachers',
+    description:
+      'No-signup, kid-safe printables for ages 3–8 classrooms. Reward charts, coloring pages, worksheets.',
+    type: 'website',
+  },
+};
+
+const TeacherHubPage = () => (
+  <div className="max-w-5xl mx-auto py-12 px-4">
+    <header className="text-center mb-12">
+      <h1 className="font-tondo text-4xl md:text-5xl font-extrabold mb-4 text-primary">
+        Free printables for your classroom.
+      </h1>
+      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        No signup. No ads to sidestep. No student data collected. Everything
+        here was built by a parent for preschool and early-primary teachers.
+      </p>
+    </header>
+
+    {/* Tool cards */}
+    <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <Link
+        href="/tools/reward-chart"
+        className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
+      >
+        <div className="flex items-start gap-4">
+          <span className="text-4xl">⭐</span>
+          <div>
+            <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
+              Classroom Job & Reward Chart
+            </h2>
+            <p className="text-muted-foreground">
+              Weekly chart with your students&apos; names (or class jobs) and up
+              to 7 tracked behaviors. Five themes, 5- or 7-day layouts.
+            </p>
+          </div>
+        </div>
+      </Link>
+
+      <Link
+        href="/gallery"
+        className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
+      >
+        <div className="flex items-start gap-4">
+          <span className="text-4xl">🎨</span>
+          <div>
+            <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
+              Coloring Page Gallery
+            </h2>
+            <p className="text-muted-foreground">
+              Hundreds of free AI-generated coloring pages for ages 3–8. Filter
+              by theme or difficulty. Print-ready PDFs.
+            </p>
+          </div>
+        </div>
+      </Link>
+
+      <div className="p-6 bg-paper-cream rounded-2xl border-2 border-paper-cream-dark opacity-75">
+        <div className="flex items-start gap-4">
+          <span className="text-4xl">🔤</span>
+          <div>
+            <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
+              ABC Tracing Worksheets
+            </h2>
+            <p className="text-muted-foreground mb-1">
+              A–Z alphabet tracing with themed coloring. Coming soon.
+            </p>
+            <span className="text-xs font-tondo font-bold text-crayon-orange">
+              Coming soon
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6 bg-paper-cream rounded-2xl border-2 border-paper-cream-dark opacity-75">
+        <div className="flex items-start gap-4">
+          <span className="text-4xl">🎉</span>
+          <div>
+            <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
+              Seasonal Packs
+            </h2>
+            <p className="text-muted-foreground mb-1">
+              Halloween, Christmas, Valentine&apos;s, back-to-school bundles.
+              Coming soon.
+            </p>
+            <span className="text-xs font-tondo font-bold text-crayon-orange">
+              Coming soon
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* What we promise */}
+    <section className="bg-paper-cream rounded-2xl p-8 md:p-12 mb-16">
+      <h2 className="font-tondo text-2xl md:text-3xl font-bold text-primary mb-6">
+        What we promise
+      </h2>
+      <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-muted-foreground">
+        <li className="flex gap-3">
+          <span className="text-crayon-orange">✓</span>
+          No student data stored. Ever. Typed names stay in the browser.
+        </li>
+        <li className="flex gap-3">
+          <span className="text-crayon-orange">✓</span>
+          No signup required to download any printable.
+        </li>
+        <li className="flex gap-3">
+          <span className="text-crayon-orange">✓</span>
+          No ads, no tracking pixels beyond analytics.
+        </li>
+        <li className="flex gap-3">
+          <span className="text-crayon-orange">✓</span>
+          Print-ready PDFs; works on any classroom printer.
+        </li>
+      </ul>
+    </section>
+
+    {/* Request a printable */}
+    <section className="text-center">
+      <h2 className="font-tondo text-2xl font-bold text-primary mb-3">
+        Need something we don&apos;t have yet?
+      </h2>
+      <p className="text-muted-foreground mb-4">
+        We build the printables teachers actually use. Tell us what would help
+        your classroom.
+      </p>
+      <a
+        href="mailto:hello@chunkycrayon.com?subject=Teacher%20printable%20request"
+        className="inline-block bg-btn-orange text-white font-tondo font-bold px-6 py-3 rounded-coloring-card shadow-btn-primary hover:scale-105 transition"
+      >
+        Email us your idea
+      </a>
+    </section>
+  </div>
+);
+
+export default TeacherHubPage;
