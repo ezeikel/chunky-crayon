@@ -33,7 +33,7 @@
       "actions": "Actions"
     },
     "tools": {
-      "pan": "Déplacer",
+      "pan": "Naviguer",
       "fill": "Remplissage",
       "brush": "Pinceau",
       "sticker": "Autocollant",
@@ -80,8 +80,8 @@
       "startOver": "Recommencer"
     },
     "toolbar": {
-      "expand": "Développer la barre d'outils",
-      "collapse": "Réduire la barre d'outils",
+      "expand": "Étendre la barre d'outils",
+      "collapse": "Replier la barre d'outils",
       "moreTools": "Plus d'outils",
       "less": "Moins"
     },
@@ -104,7 +104,7 @@
       "zoomOutAria": "Dézoomer (voir plus large)",
       "zoomIn": "Zoomer",
       "zoomInAria": "Zoomer (voir de plus près)",
-      "pan": "Déplacer",
+      "pan": "Naviguer",
       "panAria": "Se déplacer dans l'image",
       "reset": "Voir l'image entière",
       "resetAria": "Revenir à l'image complète"
@@ -344,7 +344,7 @@
     "subtitle": "Commencez gratuitement et passez à la version supérieure quand vous êtes prêt. Pas de frais cachés, annulation à tout moment.",
     "monthly": "Mensuel",
     "annual": "Annuel",
-    "savePercent": "-17%",
+    "savePercent": "Économisez 17%",
     "free": "Gratuit",
     "perMonth": "/mois",
     "perYear": "/an",
@@ -471,7 +471,7 @@
       "expert": {
         "title": "Expert",
         "shortLabel": "Expert",
-        "description": "Œuvres complexes pour un état de flux méditatif"
+        "description": "Œuvres complexes pour une immersion méditative profonde"
       }
     },
     "categories": {
@@ -532,7 +532,7 @@
         "description": "Machineries victoriennes et curieux engins"
       },
       "food": {
-        "name": "Nourriture",
+        "name": "Cuisine",
         "description": "Festins et scènes culinaires"
       }
     },
