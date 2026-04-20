@@ -281,8 +281,16 @@ export async function generateRegionStoreLocal(
   );
   console.log(`[region-store] R2 upload done: ${regionMapUrl}`);
 
+  // Retry the DB write — the Playwright+Remotion flow can starve the event
+  // loop during 3-min CPU-heavy region gen, which starves the Prisma-Neon
+  // keepalive ping, which lets Neon drop the WebSocket. The first write
+  // then hangs on a dead socket and hits our 30s timeout. Retrying forces
+  // Prisma to tear down the dead connection and establish a fresh one.
+  //
+  // 3 attempts with backoff (1s, 3s) — plenty for a transient socket
+  // issue, still fails fast if something genuinely broken.
   console.log(`[region-store] writing DB row for ${coloringImageId}`);
-  await withTimeout(
+  const writeDb = () =>
     db.coloringImage.update({
       where: { id: coloringImageId, brand: Brand.CHUNKY_CRAYON },
       data: {
@@ -292,10 +300,42 @@ export async function generateRegionStoreLocal(
         regionsJson: JSON.stringify(result.regionsJson),
         regionsGeneratedAt: new Date(),
       },
-    }),
-    30_000,
-    "db.coloringImage.update region fields",
-  );
+    });
+
+  const maxAttempts = 3;
+  let lastError: unknown = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await withTimeout(
+        writeDb(),
+        30_000,
+        `db.coloringImage.update attempt ${attempt}/${maxAttempts}`,
+      );
+      lastError = null;
+      if (attempt > 1) {
+        console.log(
+          `[region-store] DB write succeeded on attempt ${attempt} for ${coloringImageId}`,
+        );
+      }
+      break;
+    } catch (err) {
+      lastError = err;
+      console.warn(
+        `[region-store] DB write attempt ${attempt}/${maxAttempts} failed for ${coloringImageId}:`,
+        err instanceof Error ? err.message : err,
+      );
+      if (attempt < maxAttempts) {
+        // Force the engine to drop the stale connection so the next call
+        // establishes a new socket. $disconnect is safe even if mid-query
+        // because we've already caught the timeout.
+        await db.$disconnect().catch(() => {});
+        await new Promise((r) => setTimeout(r, attempt * 2_000));
+      }
+    }
+  }
+  if (lastError) {
+    throw lastError;
+  }
 
   console.log(
     `[region-store] saved for ${coloringImageId}: ${result.regionsJson.regions.length} regions, ${result.regionMapGzipped.byteLength} gz bytes`,
