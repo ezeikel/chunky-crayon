@@ -38,7 +38,7 @@
       "brush": "Pinsel",
       "sticker": "Sticker",
       "magicReveal": "Magisches Enthüllen",
-      "magicAuto": "Magisch Auto",
+      "magicAuto": "Auto-Magie",
       "magicBrush": "Magischer Pinsel",
       "magicFill": "Magisches Füllen",
       "autoColor": "Auto-Farbe",
@@ -355,8 +355,8 @@
         "description": "Starte deine Ausmal-Reise",
         "cta": "Kostenlos starten",
         "features": [
-          "2 kostenlose Kreationen täglich",
-          "Zugang zur kostenlosen Bibliothek",
+          "2 kostenlose Kreationen zum Start",
+          "Kostenlose Bibliothek",
           "Online-Ausmalleinwand",
           "PDF-Downloads"
         ]
@@ -459,7 +459,7 @@
         "description": "Sanfte Muster, perfekt für einen kurzen Moment der Ruhe"
       },
       "intermediate": {
-        "title": "Mittel",
+        "title": "Mittelstufe",
         "shortLabel": "Mittel",
         "description": "Moderate Details für eine längere, erdende Sitzung"
       },
@@ -532,7 +532,7 @@
         "description": "Viktorianische Maschinen und kuriose Apparaturen"
       },
       "food": {
-        "name": "Essen",
+        "name": "Kulinarisches",
         "description": "Festmahle und kulinarische Szenen"
       }
     },
