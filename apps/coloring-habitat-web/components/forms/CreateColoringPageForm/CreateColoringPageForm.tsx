@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { useTranslations } from "next-intl";
+import posthog from "posthog-js";
 import { createColoringImage } from "@/app/actions/coloring-image";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/utils/analytics-client";
@@ -51,6 +52,17 @@ const MultiModeForm = ({ className }: { className?: string }) => {
   return (
     <form
       action={async (formData) => {
+        // Attach the browser's PostHog distinct_id so server-side events
+        // (image_generation_completed, creation_analyzed) attribute to the
+        // same visitor as their $pageview events instead of 'server'.
+        const clientDistinctId =
+          typeof window !== "undefined" && posthog?.get_distinct_id
+            ? posthog.get_distinct_id()
+            : null;
+        if (clientDistinctId) {
+          formData.set("clientDistinctId", clientDistinctId);
+        }
+
         const inputType = formData.get("inputType") as InputMode;
         const desc = formData.get("description") as string;
 

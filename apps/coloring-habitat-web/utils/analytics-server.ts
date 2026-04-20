@@ -3,8 +3,9 @@ import { captureServerEvent } from "@/lib/posthog-server";
 export async function track(
   event: string,
   properties?: Record<string, unknown>,
+  clientDistinctId?: string,
 ) {
-  await captureServerEvent("server", event, properties);
+  await captureServerEvent(clientDistinctId || "server", event, properties);
 }
 
 export async function trackWithUser(

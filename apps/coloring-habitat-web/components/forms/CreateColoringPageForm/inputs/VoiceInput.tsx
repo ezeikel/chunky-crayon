@@ -138,16 +138,25 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
     }
   }, [state, transcription]);
 
+  // Fire VOICE_INPUT_COMPLETED when the transcription actually arrives.
+  // Firing it inside handleStopRecording captures a stale closure value
+  // (always empty) because transcription happens asynchronously in
+  // useVoiceRecorder after stopRecording() is called.
+  useEffect(() => {
+    if (state === "complete" && transcription) {
+      trackEvent(TRACKING_EVENTS.VOICE_INPUT_COMPLETED, {
+        transcription,
+        durationMs: duration * 1000,
+      });
+    }
+  }, [state, transcription, duration]);
+
   const handleStartRecording = async () => {
     await startRecording();
   };
 
   const handleStopRecording = () => {
     stopRecording();
-    trackEvent(TRACKING_EVENTS.VOICE_INPUT_COMPLETED, {
-      transcription: transcription || "",
-      durationMs: duration * 1000,
-    });
   };
 
   const handleCancel = () => {

@@ -49,6 +49,7 @@ export const track = async <
 >(
   event: TEvent,
   properties: EventProperties[TEvent],
+  clientDistinctId?: string,
 ) => {
   try {
     // Get user info from server session
@@ -80,7 +81,7 @@ export const track = async <
       }
 
       posthog.capture({
-        distinctId: userId || 'anonymous',
+        distinctId: userId || clientDistinctId || 'anonymous',
         event,
         properties: enrichedProperties,
       });

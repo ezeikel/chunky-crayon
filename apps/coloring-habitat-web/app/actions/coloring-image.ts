@@ -60,7 +60,11 @@ const LOCALE_LANGUAGE_MAP: Record<
  * - Can be switched via IMAGE_PROVIDER env var
  * - Automatically falls back on provider failures
  */
-const generateColoringImage = async (description: string, userId?: string) => {
+const generateColoringImage = async (
+  description: string,
+  userId?: string,
+  clientDistinctId?: string,
+) => {
   const providerConfig = getCurrentProviderConfig();
 
   try {
@@ -83,7 +87,11 @@ const generateColoringImage = async (description: string, userId?: string) => {
         trackingData,
       );
     } else {
-      await track(TRACKING_EVENTS.IMAGE_GENERATION_COMPLETED, trackingData);
+      await track(
+        TRACKING_EVENTS.IMAGE_GENERATION_COMPLETED,
+        trackingData,
+        clientDistinctId,
+      );
     }
 
     return {
@@ -111,7 +119,11 @@ const generateColoringImage = async (description: string, userId?: string) => {
         trackingData,
       );
     } else {
-      await track(TRACKING_EVENTS.IMAGE_GENERATION_FAILED, trackingData);
+      await track(
+        TRACKING_EVENTS.IMAGE_GENERATION_FAILED,
+        trackingData,
+        clientDistinctId,
+      );
     }
 
     // eslint-disable-next-line no-console
@@ -138,6 +150,7 @@ const generateColoringImageWithMetadata = async (
   generationType?: GenerationType,
   locale: string = "en",
   sourcePrompt?: string,
+  clientDistinctId?: string,
 ) => {
   // Get language info for the locale (default to English if unknown)
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
@@ -163,7 +176,11 @@ const generateColoringImageWithMetadata = async (
     url: imageUrl,
     tempFileName,
     imageBuffer,
-  } = await generateColoringImage(cleanedUpUserDescription as string, userId);
+  } = await generateColoringImage(
+    cleanedUpUserDescription as string,
+    userId,
+    clientDistinctId,
+  );
 
   if (!imageUrl || !imageBuffer) {
     throw new Error("Failed to generate an acceptable image");
@@ -284,6 +301,7 @@ export const createColoringImage = async (
     generationType:
       (formData.get("generationType") as GenerationType) || undefined,
     locale: (formData.get("locale") as string) || "en",
+    clientDistinctId: (formData.get("clientDistinctId") as string) || undefined,
   };
 
   const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
@@ -327,6 +345,7 @@ export const createColoringImage = async (
           rawFormData.generationType,
           rawFormData.locale,
           rawFormData.description,
+          rawFormData.clientDistinctId,
         );
       },
       {
@@ -475,6 +494,7 @@ export const createColoringImage = async (
     rawFormData.generationType,
     rawFormData.locale,
     rawFormData.description,
+    rawFormData.clientDistinctId,
   );
 
   after(async () => {
@@ -496,10 +516,14 @@ export const createColoringImage = async (
       (async () => {
         const imageAnalytics = await analyzeImageForAnalytics(result.url!);
         if (imageAnalytics) {
-          await track(TRACKING_EVENTS.CREATION_ANALYZED, {
-            coloringImageId: result.id,
-            ...imageAnalytics,
-          });
+          await track(
+            TRACKING_EVENTS.CREATION_ANALYZED,
+            {
+              coloringImageId: result.id,
+              ...imageAnalytics,
+            },
+            rawFormData.clientDistinctId,
+          );
         }
       })(),
 
