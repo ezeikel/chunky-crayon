@@ -1,5 +1,7 @@
 'use server';
 
+import { revalidateTag } from 'next/cache';
+import { db } from '@one-colored-pixel/db';
 import { createColoringImage } from '@/app/actions/coloring-image';
 
 const NAME_THEME_PROMPTS: Record<string, string> = {
@@ -14,6 +16,15 @@ const NAME_THEME_PROMPTS: Record<string, string> = {
     'happy cartoon dinosaurs (T-rex, stegosaurus, triceratops) playing around the letters',
   vehicles:
     'cheerful cartoon cars, fire trucks, planes and trains zooming around the letters',
+};
+
+const NAME_THEME_LABEL: Record<string, string> = {
+  animals: 'Cute Animals',
+  flowers: 'Flowers',
+  unicorns: 'Unicorns',
+  space: 'Space',
+  dinosaurs: 'Dinosaurs',
+  vehicles: 'Vehicles',
 };
 
 export type NameTheme = keyof typeof NAME_THEME_PROMPTS;
@@ -58,5 +69,24 @@ export const generateNamePage = async (
   const result = await createColoringImage(formData);
   if ('error' in result) return { error: result.error };
   if (!result.id) return { error: 'Image generation failed' };
+
+  // Vision-generated titles are unreliable for uncommon names — the model
+  // mis-reads "Erinma" as "Emma", "Keanu" as "Kevin", etc. We already know
+  // the exact name + theme on the server, so override the title directly
+  // and skip the vision round-trip. alt/description stay AI-generated so
+  // SEO + a11y still benefit from the analysis of the actual image.
+  const themeLabel = NAME_THEME_LABEL[theme] ?? 'Fun Theme';
+  const forcedTitle = `${name} Name Coloring Page — ${themeLabel}`;
+  try {
+    await db.coloringImage.update({
+      where: { id: result.id },
+      data: { title: forcedTitle },
+    });
+    revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
+  } catch (err) {
+    console.error('[generate-name-page] forced title update failed:', err);
+    // Non-fatal — the image still works, title is just the AI guess.
+  }
+
   return { id: result.id };
 };
