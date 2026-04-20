@@ -39,7 +39,7 @@
   },
   "coloringPage": {
     "title": "Página para colorear",
-    "defaultDescription": "Página para colorear imprimible gratis de Chunky Crayon",
+    "defaultDescription": "Página para colorear gratuita e imprimible de Chunky Crayon",
     "progress": {
       "colored": "coloreado",
       "percentage": "{percent}%",
@@ -76,7 +76,7 @@
       "marker": "Rotulador",
       "eraser": "Borrador",
       "glitter": "Purpurina",
-      "sparkle": "Brillitos",
+      "sparkle": "Destellos",
       "rainbow": "Arcoíris",
       "glow": "Resplandor",
       "neon": "Neón",
@@ -104,13 +104,13 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Compartido",
+      "doneSharing": "Listo",
       "colorAgain": "Colorear otra vez",
       "startOver": "Empezar de nuevo"
     },
     "toolbar": {
-      "expand": "Expandir barra",
-      "collapse": "Contraer barra",
+      "expand": "Expandir barra de herramientas",
+      "collapse": "Contraer barra de herramientas",
       "moreTools": "Más herramientas",
       "less": "Menos"
     },
@@ -122,7 +122,7 @@
     },
     "colorPalette": {
       "selectColor": "Seleccionar color {color}",
-      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas Mágicas"
+      "magicToolsMessage": "Los colores se eligen automáticamente con herramientas mágicas"
     },
     "patternSelector": {
       "label": "Patrón:"
@@ -209,7 +209,7 @@
     },
     "skinTones": {
       "light": "Claro",
-      "mediumLight": "Claro medio",
+      "mediumLight": "Medio claro",
       "medium": "Medio",
       "mediumDark": "Medio oscuro",
       "dark": "Oscuro",
@@ -334,7 +334,7 @@
     "termsAgreement": "Al continuar, aceptas nuestros Términos del servicio y Política de privacidad.",
     "verifyRequest": {
       "title": "¡Revisa tu correo!",
-      "description": "Te enviamos un enlace mágico para iniciar sesión. Toca el enlace de tu correo para continuar.",
+      "description": "Te enviamos un enlace mágico para iniciar sesión. Haz clic en el enlace de tu correo para continuar.",
       "checkSpam": "¿No lo ves? Revisa la carpeta de spam.",
       "linkExpiry": "El enlace caduca en 24 horas.",
       "tryDifferentEmail": "Usar otro correo"
@@ -373,7 +373,7 @@
   "breadcrumbs": {
     "home": "Inicio",
     "gallery": "Galería",
-    "forToddlers": "Para peques",
+    "forToddlers": "Para pequeños",
     "forKids": "Para niños",
     "forTeens": "Para adolescentes",
     "forAdults": "Para adultos",
