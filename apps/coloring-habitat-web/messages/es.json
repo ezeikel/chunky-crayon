@@ -36,7 +36,7 @@
       "pan": "Mover",
       "fill": "Rellenar",
       "brush": "Pincel",
-      "sticker": "Sticker",
+      "sticker": "Pegatina",
       "magicReveal": "Revelado mágico",
       "magicAuto": "Auto mágico",
       "magicBrush": "Pincel mágico",
@@ -48,7 +48,7 @@
       "crayon": "Crayón",
       "marker": "Marcador",
       "eraser": "Borrador",
-      "glitter": "Purpurina",
+      "glitter": "Brillantina",
       "sparkle": "Destello",
       "rainbow": "Arcoíris",
       "glow": "Resplandor",
@@ -355,7 +355,7 @@
         "description": "Comienza tu viaje de colorear",
         "cta": "Comenzar gratis",
         "features": [
-          "2 creaciones gratuitas para empezar",
+          "2 creaciones gratuitas",
           "Acceso a la biblioteca gratuita",
           "Lienzo de colorear en línea",
           "Descargas en PDF"
@@ -432,9 +432,9 @@
   },
   "gallery": {
     "pageTitle": "Galería de colorear | Coloring Habitat",
-    "pageDescription": "Explora nuestra creciente colección de páginas para colorear intrincadas para la relajación y el bienestar. Filtra por categoría, dificultad o temporada.",
+    "pageDescription": "Explora nuestra creciente colección de páginas para colorear intrincadas para la relajación y la atención plena. Filtra por categoría, dificultad o temporada.",
     "heroTitle": "Galería de colorear",
-    "heroSubtitle": "Explora páginas para colorear intrincadas pensadas para la relajación y el bienestar. Cada diseño te invita a bajar el ritmo y encontrar un momento de calma.",
+    "heroSubtitle": "Explora páginas para colorear intrincadas diseñadas para la relajación y la atención plena. Cada diseño te invita a bajar el ritmo y encontrar un momento de calma.",
     "browseByCategory": "Explorar por categoría",
     "browseByDifficulty": "Explorar por dificultad",
     "browseByHolidays": "Temporadas y festividades",
@@ -549,7 +549,7 @@
     },
     "seo": {
       "aboutTitle": "Un lugar tranquilo para colorear",
-      "aboutParagraph1": "Coloring Habitat es una creciente biblioteca de páginas para colorear intrincadas, diseñadas para adultos que quieren bajar el ritmo, encontrar calma y reconectar con una práctica creativa. Cada página está pensada para invitar a la concentración, tanto si tienes cinco minutos como toda una tarde tranquila.",
+      "aboutParagraph1": "Coloring Habitat es una creciente biblioteca de páginas para colorear intrincadas, diseñadas para adultos que quieren bajar el ritmo, encontrar calma y reconectar con una práctica creativa. Cada página está diseñada para invitar a la concentración, tanto si tienes cinco minutos como toda una tarde tranquila.",
       "aboutParagraph2": "Cada día se genera una nueva página para colorear. Suscríbete al correo diario para recibir un diseño nuevo en tu bandeja de entrada cada mañana, o explora la biblioteca completa cuando quieras. Colorea en línea con nuestro lienzo digital, o descarga un PDF en alta resolución para imprimir y colorear a mano.",
       "aboutParagraph3": "Las investigaciones en arteterapia sugieren que incluso sesiones cortas de colorear pueden reducir los niveles de cortisol, calmar los pensamientos acelerados y activar las mismas regiones del cerebro que la meditación. Coloring Habitat está diseñado para que sea fácil volver a esa práctica: un pequeño ritual diario para una mente más tranquila."
     }
