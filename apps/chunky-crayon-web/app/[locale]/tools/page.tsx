@@ -47,9 +47,9 @@ const TOOLS: Tool[] = [
     slug: 'abc-tracing',
     title: 'ABC Tracing Worksheets',
     description:
-      'A–Z alphabet tracing pages with themed coloring. Great for preschool and kindergarten.',
+      'A–Z alphabet tracing pages with themed pictures. 27-page PDF bundle, great for preschool and kindergarten.',
     emoji: '🔤',
-    available: false,
+    available: true,
   },
 ];
 

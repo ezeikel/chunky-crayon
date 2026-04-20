@@ -85,22 +85,23 @@ const TeacherHubPage = () => (
         </div>
       </Link>
 
-      <div className="p-6 bg-paper-cream rounded-2xl border-2 border-paper-cream-dark opacity-75">
+      <Link
+        href="/tools/abc-tracing"
+        className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
+      >
         <div className="flex items-start gap-4">
           <span className="text-4xl">🔤</span>
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
               ABC Tracing Worksheets
             </h2>
-            <p className="text-muted-foreground mb-1">
-              A–Z alphabet tracing with themed coloring. Coming soon.
+            <p className="text-muted-foreground">
+              27-page A–Z tracing bundle. Word + picture + handwriting row per
+              letter. Uppercase, lowercase, or both.
             </p>
-            <span className="text-xs font-tondo font-bold text-crayon-orange">
-              Coming soon
-            </span>
           </div>
         </div>
-      </div>
+      </Link>
 
       <div className="p-6 bg-paper-cream rounded-2xl border-2 border-paper-cream-dark opacity-75">
         <div className="flex items-start gap-4">
