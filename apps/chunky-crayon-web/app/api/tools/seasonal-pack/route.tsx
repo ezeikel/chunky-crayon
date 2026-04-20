@@ -1,8 +1,11 @@
 import ReactPDF from '@react-pdf/renderer';
 import { NextResponse } from 'next/server';
+import { db, GenerationType } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import SeasonalPackPdfDocument, {
+  PACKS,
+  type PackPage,
   type SeasonalPack,
-  type SeasonalPackPdfDocumentProps,
 } from '@/components/pdfs/SeasonalPackPdfDocument/SeasonalPackPdfDocument';
 import { track } from '@/utils/analytics-server';
 import { TRACKING_EVENTS } from '@/constants';
@@ -19,6 +22,51 @@ const VALID_PACKS: SeasonalPack[] = [
 type Body = {
   pack?: string;
   childName?: string;
+};
+
+/**
+ * Fetch coloring images for a seasonal pack, preferring the curated
+ * `seasonal-pack:{pack}` tag (if populated by the seed script) and
+ * falling back to the broader pack-topic tags so the tool works
+ * immediately off whatever is already in the gallery.
+ */
+const fetchPackImages = async (pack: SeasonalPack, limit: number) => {
+  const config = PACKS[pack];
+
+  // 1. Preferred: curated seasonal-pack tag
+  const curated = await db.coloringImage.findMany({
+    where: {
+      brand: BRAND,
+      userId: null,
+      tags: { has: `seasonal-pack:${pack}` },
+      svgUrl: { not: null },
+    },
+    select: { id: true, title: true, svgUrl: true, tags: true },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  if (curated.length >= limit) return curated;
+
+  // 2. Fallback: pull from general pack topic tags to fill up
+  const needed = limit - curated.length;
+  const existingIds = new Set(curated.map((i) => i.id));
+  const fallback = await db.coloringImage.findMany({
+    where: {
+      brand: BRAND,
+      userId: null,
+      id: { notIn: Array.from(existingIds) },
+      tags: { hasSome: config.tags },
+      svgUrl: { not: null },
+      // Prefer daily images — those are the curated daily scenes.
+      generationType: GenerationType.DAILY,
+    },
+    select: { id: true, title: true, svgUrl: true, tags: true },
+    orderBy: { createdAt: 'desc' },
+    take: needed,
+  });
+
+  return [...curated, ...fallback];
 };
 
 export async function POST(request: Request) {
@@ -39,18 +87,47 @@ export async function POST(request: Request) {
     );
   }
 
-  const props: SeasonalPackPdfDocumentProps = {
-    pack,
-    childName:
-      typeof body.childName === 'string' && body.childName.trim()
-        ? body.childName.slice(0, 40)
-        : undefined,
-  };
+  const config = PACKS[pack];
+  const images = await fetchPackImages(pack, config.targetPageCount);
+
+  if (images.length === 0) {
+    return NextResponse.json(
+      {
+        error: `No coloring pages available for the ${pack} pack yet. Run scripts/seed-seasonal-packs.ts to generate them.`,
+      },
+      { status: 503 },
+    );
+  }
+
+  // Fetch SVG content for each image in parallel. SVGs are small (~20-80KB)
+  // and served from R2; sequential fetches would add 3-5s per pack.
+  const pages: PackPage[] = await Promise.all(
+    images
+      .filter((i): i is typeof i & { svgUrl: string; title: string } =>
+        Boolean(i.svgUrl && i.title),
+      )
+      .map(async (img) => {
+        const res = await fetch(img.svgUrl);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch SVG for ${img.id}: ${res.status}`);
+        }
+        return { title: img.title, svgContent: await res.text() };
+      }),
+  );
+
+  const childName =
+    typeof body.childName === 'string' && body.childName.trim()
+      ? body.childName.slice(0, 40)
+      : undefined;
 
   const start = Date.now();
   try {
     const stream = await ReactPDF.renderToStream(
-      <SeasonalPackPdfDocument {...props} />,
+      <SeasonalPackPdfDocument
+        pack={pack}
+        pages={pages}
+        childName={childName}
+      />,
     );
 
     const chunks: Buffer[] = [];
@@ -63,7 +140,8 @@ export async function POST(request: Request) {
       tool: 'seasonal-pack',
       durationMs: Date.now() - start,
       pack,
-      hasName: !!props.childName,
+      pageCount: pages.length,
+      hasName: !!childName,
       bytes: pdfBuffer.length,
     });
 
