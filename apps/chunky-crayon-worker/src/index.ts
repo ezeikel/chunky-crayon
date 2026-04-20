@@ -6,7 +6,8 @@ import { readFile, stat, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import { recordColoringSession } from "./record/session.js";
-import { renderDemoReel } from "./video/render.js";
+import { recordImageColoringSession } from "./record/image-session.js";
+import { renderDemoReel, renderImageDemoReel } from "./video/render.js";
 import { trimWebmToMp4, trimReelForStory } from "./record/trim.js";
 import { generateRegionStoreLocal } from "./record/region-store.js";
 import { db } from "@one-colored-pixel/db";
@@ -621,6 +622,388 @@ async function runPublishReel(c: Context) {
   return c.json({
     ok: true,
     dry_run: !!body.dry_run,
+    recording: recordingPublic,
+    output: {
+      mp4Path: outputPath,
+      localUrl,
+      publishedUrl,
+      publishedCoverUrl,
+      durationSecs: durationInFrames / fps,
+    },
+  });
+}
+
+/**
+ * Image-mode variant of /publish/reel — drives the photo-upload create
+ * flow using a curated kid-safe photo from PhotoLibraryEntry, then
+ * composites through the ImageDemoReel Remotion composition.
+ *
+ * POST /publish/image-reel
+ * Body: {
+ *   photoUrl?: string,        // override library pick (testing only)
+ *   dry_run?: boolean,
+ *   sweep?: 'diagonal' | 'horizontal',
+ * }
+ *
+ * On success the final mp4 lands on coloringImage.demoReelUrl — same
+ * field as the text variant, so the downstream social post handler is
+ * variant-agnostic.
+ */
+app.post("/publish/image-reel", async (c) => {
+  const keepaliveTimer = setInterval(() => {
+    db.$queryRaw`SELECT 1`.catch((err) => {
+      console.warn(
+        "[keepalive] Neon ping failed:",
+        err instanceof Error ? err.message : err,
+      );
+    });
+  }, 60_000);
+
+  try {
+    return await runPublishImageReel(c);
+  } finally {
+    clearInterval(keepaliveTimer);
+  }
+});
+
+async function runPublishImageReel(c: Context) {
+  const body = await c.req
+    .json<{
+      photoUrl?: string;
+      dry_run?: boolean;
+      sweep?: "diagonal" | "horizontal";
+    }>()
+    .catch(
+      () =>
+        ({}) as {
+          photoUrl?: string;
+          dry_run?: boolean;
+          sweep?: "diagonal" | "horizontal";
+        },
+    );
+
+  const ccOrigin = process.env.CC_ORIGIN ?? "http://localhost:3000";
+
+  // Pick a library entry unless one was passed in. Raw SQL keeps this
+  // independent of the Prisma client regeneration cycle — the worker
+  // can tolerate a still-generating client during rollout.
+  let photoUrl = body.photoUrl;
+  let libraryEntryId: string | null = null;
+  if (!photoUrl) {
+    const rows = await db.$queryRaw<
+      Array<{ id: string; url: string }>
+    >`SELECT id, url
+      FROM photo_library_entries
+      WHERE brand = 'CHUNKY_CRAYON'
+        AND safe = true
+      ORDER BY "lastUsed" ASC NULLS FIRST, random()
+      LIMIT 1`;
+    if (rows.length === 0) {
+      return c.json(
+        {
+          error:
+            "photo_library_empty — run `pnpm ts-node apps/chunky-crayon-web/scripts/seed-photo-library.ts` first",
+        },
+        500,
+      );
+    }
+    libraryEntryId = rows[0].id;
+    photoUrl = rows[0].url;
+    console.log(
+      `[/publish/image-reel] picked library entry ${libraryEntryId}: ${photoUrl}`,
+    );
+  }
+
+  await mkdir(WORKER_OUT_DIR, { recursive: true });
+
+  // 1. Playwright — drive the image-upload create flow.
+  const recording = await recordImageColoringSession({
+    photoUrl: photoUrl as string,
+    origin: ccOrigin,
+    sweep: body.sweep ?? "diagonal",
+    outDir: WORKER_OUT_DIR,
+    onImageCreated: (id) => {
+      console.log(
+        `[/publish/image-reel] starting in-process region-store gen for ${id}`,
+      );
+      (async () => {
+        const pollUntil = Date.now() + 4 * 60_000;
+        let row: {
+          svgUrl: string | null;
+          title: string | null;
+          description: string | null;
+          tags: string[];
+        } | null = null;
+        while (Date.now() < pollUntil) {
+          row = await db.coloringImage.findUnique({
+            where: { id },
+            select: {
+              svgUrl: true,
+              title: true,
+              description: true,
+              tags: true,
+            },
+          });
+          if (row?.svgUrl) break;
+          await new Promise((r) => setTimeout(r, 2000));
+        }
+        if (!row?.svgUrl) {
+          console.warn(
+            `[/publish/image-reel] svgUrl never appeared for ${id} — skipping region gen`,
+          );
+          return;
+        }
+        try {
+          await generateRegionStoreLocal(id, row.svgUrl, {
+            title: row.title ?? "",
+            description: row.description ?? "",
+            tags: (row.tags as string[]) ?? [],
+          });
+        } catch (err) {
+          console.error(
+            `[/publish/image-reel] region-store gen failed for ${id}:`,
+            err instanceof Error ? err.message : err,
+          );
+        }
+      })();
+    },
+  });
+
+  // 2. Fetch the image's ambient sound + title (same as text variant).
+  const imageRow = await db.coloringImage.findUnique({
+    where: { id: recording.imageId },
+    select: { ambientSoundUrl: true, title: true },
+  });
+
+  const port = parseInt(process.env.PORT ?? "3030", 10);
+
+  let ambientSoundUrl: string | undefined;
+  if (imageRow?.ambientSoundUrl) {
+    try {
+      const res = await fetch(imageRow.ambientSoundUrl);
+      if (!res.ok) throw new Error(`ambient fetch ${res.status}`);
+      const buf = Buffer.from(await res.arrayBuffer());
+      const ambientPath = resolve(WORKER_OUT_DIR, `${Date.now()}-ambient.mp3`);
+      const { writeFile } = await import("node:fs/promises");
+      await writeFile(ambientPath, buf);
+      ambientSoundUrl = `http://localhost:${port}/tmp/${ambientPath.split("/").pop()}`;
+    } catch (err) {
+      console.warn(
+        "[/publish/image-reel] ambient download failed (continuing without music):",
+        err,
+      );
+    }
+  }
+
+  // 3. Voiceover — reuse the text-variant generator with an "image" hint.
+  let kidVoiceUrl: string | undefined;
+  let adultVoiceUrl: string | undefined;
+  try {
+    const script = await generateReelScript({
+      prompt: "photo upload",
+      imageTitle: imageRow?.title,
+    });
+
+    const kidPath = resolve(WORKER_OUT_DIR, `${Date.now()}-kid.mp3`);
+    const adultPath = resolve(WORKER_OUT_DIR, `${Date.now() + 1}-adult.mp3`);
+    const kidVoiceId = process.env.ELEVENLABS_KID_VOICE_ID;
+    const adultVoiceId = process.env.ELEVENLABS_ADULT_VOICE_ID;
+
+    if (kidVoiceId && adultVoiceId) {
+      await Promise.all([
+        generateVoiceClip({
+          text: script.kidLine,
+          voiceId: kidVoiceId,
+          outputPath: kidPath,
+        }),
+        generateVoiceClip({
+          text: script.adultLine,
+          voiceId: adultVoiceId,
+          outputPath: adultPath,
+        }),
+      ]);
+      kidVoiceUrl = `http://localhost:${port}/tmp/${kidPath.split("/").pop()}`;
+      adultVoiceUrl = `http://localhost:${port}/tmp/${adultPath.split("/").pop()}`;
+    }
+  } catch (err) {
+    console.error(
+      "[/publish/image-reel] voiceover generation failed (continuing):",
+      err,
+    );
+  }
+
+  // 4. Trim the raw webm. In image-mode the "typing" markers represent
+  //    the UPLOAD phase (photo-tab → Use This click).
+  const fps = 30;
+  const { typeStartMs, submitMs, brushReadyMs, sweepDoneMs } =
+    recording.flowMarkers;
+
+  // Upload clip: photo-mode-tab through "Use This" click + a short tail
+  // so the AI description reads on screen.
+  const UPLOAD_TAIL_SECS = 1.5;
+  const uploadStartSec = typeStartMs / 1000;
+  const uploadEndSec = submitMs / 1000 + UPLOAD_TAIL_SECS;
+  const uploadDurationSec = uploadEndSec - uploadStartSec;
+
+  // Reveal clip: same as text variant.
+  const POST_SWEEP_PAD_SECS = 1.5;
+  const revealStartSec = brushReadyMs / 1000;
+  const revealEndSec = sweepDoneMs / 1000 + POST_SWEEP_PAD_SECS;
+  const revealDurationSec = revealEndSec - revealStartSec;
+
+  const uploadPath = resolve(WORKER_OUT_DIR, `${Date.now()}-upload.mp4`);
+  const revealPath = resolve(WORKER_OUT_DIR, `${Date.now() + 1}-reveal.mp4`);
+  await Promise.all([
+    trimWebmToMp4({
+      sourcePath: recording.webmPath,
+      outputPath: uploadPath,
+      startSec: uploadStartSec,
+      durationSec: uploadDurationSec,
+    }),
+    trimWebmToMp4({
+      sourcePath: recording.webmPath,
+      outputPath: revealPath,
+      startSec: revealStartSec,
+      durationSec: revealDurationSec,
+    }),
+  ]);
+
+  const uploadVideoUrl = `http://localhost:${port}/tmp/${uploadPath.split("/").pop()}`;
+  const revealVideoUrl = `http://localhost:${port}/tmp/${revealPath.split("/").pop()}`;
+  const uploadDurationFrames = Math.round(uploadDurationSec * fps);
+  const revealDurationFrames = Math.round(revealDurationSec * fps);
+
+  // 5. PDF preview
+  let pdfPreviewUrl: string | undefined;
+  if (recording.pdfPreviewPng) {
+    const pdfPngPath = resolve(WORKER_OUT_DIR, `${Date.now()}-pdf-preview.png`);
+    const { writeFile } = await import("node:fs/promises");
+    await writeFile(pdfPngPath, recording.pdfPreviewPng);
+    pdfPreviewUrl = `http://localhost:${port}/tmp/${pdfPngPath.split("/").pop()}`;
+  }
+
+  // 5b. Source photo — download the R2 URL locally and serve it through
+  //     the /tmp proxy so Remotion's headless Chromium can fetch it
+  //     reliably (direct R2 fetches have intermittent TLS timeouts
+  //     inside the render context).
+  let sourcePhotoProxiedUrl: string | undefined;
+  try {
+    const res = await fetch(photoUrl as string);
+    if (!res.ok) throw new Error(`source-photo fetch ${res.status}`);
+    const buf = Buffer.from(await res.arrayBuffer());
+    const ext =
+      (photoUrl as string).match(/\.(jpg|jpeg|png|webp)(?:\?|$)/i)?.[1] ??
+      "jpg";
+    const photoPath = resolve(
+      WORKER_OUT_DIR,
+      `${Date.now()}-source-photo.${ext}`,
+    );
+    const { writeFile } = await import("node:fs/promises");
+    await writeFile(photoPath, buf);
+    sourcePhotoProxiedUrl = `http://localhost:${port}/tmp/${photoPath
+      .split("/")
+      .pop()}`;
+  } catch (err) {
+    console.warn(
+      "[/publish/image-reel] source-photo proxy failed (continuing without preview card):",
+      err instanceof Error ? err.message : err,
+    );
+  }
+
+  // 6. Render ImageDemoReel
+  const PDF_PREVIEW_SECS_VAL = pdfPreviewUrl ? 2.5 : 0;
+  const PHOTO_PREVIEW_SECS_VAL = sourcePhotoProxiedUrl ? 2.0 : 0;
+  const INTRO_SECS_LOCAL = 2.0;
+  const OUTRO_SECS_LOCAL = 2.0;
+  const introFrames = Math.round(INTRO_SECS_LOCAL * fps);
+  const photoPreviewFrames = Math.round(PHOTO_PREVIEW_SECS_VAL * fps);
+  const pdfPreviewFrames = Math.round(PDF_PREVIEW_SECS_VAL * fps);
+  const outroFrames = Math.round(OUTRO_SECS_LOCAL * fps);
+  const durationInFrames =
+    introFrames +
+    photoPreviewFrames +
+    uploadDurationFrames +
+    revealDurationFrames +
+    pdfPreviewFrames +
+    outroFrames;
+
+  const outputPath = resolve(WORKER_OUT_DIR, `${Date.now()}-image-reel.mp4`);
+  await renderImageDemoReel({
+    sourcePhotoUrl: sourcePhotoProxiedUrl,
+    uploadVideoUrl,
+    revealVideoUrl,
+    uploadDurationFrames,
+    revealDurationFrames,
+    durationInFrames,
+    outputPath,
+    ambientSoundUrl,
+    kidVoiceUrl,
+    adultVoiceUrl,
+    pdfPreviewUrl,
+  });
+
+  // 7. Upload to R2 + persist on the coloringImage row (same fields as
+  //    text variant — downstream social post handler is agnostic).
+  const localUrl = `http://localhost:${port}/tmp/${outputPath.split("/").pop()}`;
+  let publishedUrl: string | undefined;
+  let publishedCoverUrl: string | undefined;
+  if (!body.dry_run) {
+    try {
+      const mp4Buffer = await readFile(outputPath);
+      const stamp = Date.now();
+      const r2Key = `reels/image/${recording.imageId}-${stamp}.mp4`;
+      const { url } = await put(r2Key, mp4Buffer, {
+        contentType: "video/mp4",
+        access: "public",
+      });
+      publishedUrl = url;
+
+      if (recording.coverJpeg) {
+        const coverKey = `reels/image/${recording.imageId}-${stamp}-cover.jpg`;
+        const { url: coverUrl } = await put(coverKey, recording.coverJpeg, {
+          contentType: "image/jpeg",
+          access: "public",
+        });
+        publishedCoverUrl = coverUrl;
+      }
+
+      await db.coloringImage.update({
+        where: { id: recording.imageId },
+        data: {
+          demoReelUrl: url,
+          ...(publishedCoverUrl ? { demoReelCoverUrl: publishedCoverUrl } : {}),
+        },
+      });
+
+      // Mark the library entry as used so the rotation picks a different
+      // one next time.
+      if (libraryEntryId) {
+        await db.$executeRaw`UPDATE photo_library_entries
+          SET "lastUsed" = NOW()
+          WHERE id = ${libraryEntryId}`;
+      }
+    } catch (err) {
+      console.error("[/publish/image-reel] R2 upload / DB write failed:", err);
+      return c.json(
+        {
+          error: "upload_failed",
+          details: err instanceof Error ? err.message : String(err),
+          localUrl,
+        },
+        500,
+      );
+    }
+  }
+
+  const { coverJpeg: _coverJpeg, ...recordingPublic } = recording;
+  void _coverJpeg;
+
+  return c.json({
+    ok: true,
+    dry_run: !!body.dry_run,
+    variant: "image",
+    libraryEntryId,
+    sourcePhotoUrl: photoUrl,
     recording: recordingPublic,
     output: {
       mp4Path: outputPath,

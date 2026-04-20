@@ -3,6 +3,7 @@ import { renderMedia, selectComposition } from "@remotion/renderer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { DemoReelProps } from "./compositions/DemoReel";
+import type { ImageDemoReelProps } from "./compositions/ImageDemoReel";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -53,6 +54,55 @@ export async function renderDemoReel(
     fps: composition.fps,
     width: composition.width,
     height: composition.height,
+  });
+
+  await renderMedia({
+    composition,
+    serveUrl: bundleLocation,
+    codec: "h264",
+    outputLocation: opts.outputPath,
+    inputProps: opts,
+    timeoutInMilliseconds: 120_000,
+    onBrowserLog: ({ type, text }) => {
+      if (type === "error" || type === "warning") {
+        console.log(`[remotion-browser:${type}] ${text}`);
+      }
+    },
+  });
+
+  return opts.outputPath;
+}
+
+export type RenderImageDemoReelOptions = ImageDemoReelProps & {
+  outputPath: string;
+};
+
+/**
+ * Render the ImageDemoReel composition to an mp4 file. Mirrors
+ * renderDemoReel — only the composition id and prop shape differ.
+ */
+export async function renderImageDemoReel(
+  opts: RenderImageDemoReelOptions,
+): Promise<string> {
+  console.log("[render-image] bundling...");
+  const bundleLocation = await bundle({
+    entryPoint: ENTRY_POINT,
+    publicDir: PUBLIC_DIR,
+  });
+  console.log(`[render-image] bundled: ${bundleLocation}`);
+
+  console.log("[render-image] inputProps:", {
+    durationInFrames: opts.durationInFrames,
+    uploadDurationFrames: opts.uploadDurationFrames,
+    revealDurationFrames: opts.revealDurationFrames,
+    hasPdfPreview: !!opts.pdfPreviewUrl,
+  });
+
+  const composition = await selectComposition({
+    serveUrl: bundleLocation,
+    id: "ImageDemoReel",
+    inputProps: opts,
+    timeoutInMilliseconds: 120_000,
   });
 
   await renderMedia({

@@ -1,20 +1,22 @@
 import { Composition } from "remotion";
-import { staticFile } from "remotion";
 import {
   DemoReel,
   type DemoReelProps,
   PDF_PREVIEW_SECS,
+  INTRO_SECS,
+  OUTRO_SECS,
 } from "./compositions/DemoReel";
 import { AdVideo, type AdVideoProps } from "./compositions/AdVideo";
+import {
+  ImageDemoReel,
+  type ImageDemoReelProps,
+  PHOTO_PREVIEW_SECS,
+} from "./compositions/ImageDemoReel";
 
 const FPS = 30;
 // Ad videos render at Seedance's native 24fps to avoid frame-resampling
 // glitches when the i2v clips play inside the composition.
 const AD_FPS = 24;
-
-// Pacing constants — keep in sync with DemoReel + worker/index.ts.
-const INTRO_SECS = 1.0;
-const OUTRO_SECS = 2.0;
 
 /**
  * Defaults are intentionally empty strings / undefined for anything that's
@@ -43,6 +45,19 @@ export const RemotionRoot: React.FC = () => {
   const totalFrames =
     introFrames + typingFrames + revealFrames + pdfPreviewFrames + outroFrames;
 
+  // ImageDemoReel: the upload clip is shorter than the typing clip because
+  // setInputFiles bypasses the native file picker — the preview appears
+  // near-instantly. Default to 5s; real render overrides via inputProps.
+  const uploadFrames = Math.round(5 * FPS);
+  const photoPreviewFrames = Math.round(PHOTO_PREVIEW_SECS * FPS);
+  const imageTotalFrames =
+    introFrames +
+    photoPreviewFrames +
+    uploadFrames +
+    revealFrames +
+    pdfPreviewFrames +
+    outroFrames;
+
   return (
     <>
       <Composition
@@ -70,6 +85,34 @@ export const RemotionRoot: React.FC = () => {
           durationInFrames: props.durationInFrames,
         })}
       />
+
+      <Composition
+        id="ImageDemoReel"
+        component={ImageDemoReel}
+        durationInFrames={imageTotalFrames}
+        fps={FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            sourcePhotoUrl: undefined,
+            uploadVideoUrl: EMPTY_PLACEHOLDER,
+            revealVideoUrl: EMPTY_PLACEHOLDER,
+            uploadDurationFrames: uploadFrames,
+            revealDurationFrames: revealFrames,
+            durationInFrames: imageTotalFrames,
+            photoDescription: "",
+            ambientSoundUrl: undefined,
+            kidVoiceUrl: undefined,
+            adultVoiceUrl: undefined,
+            pdfPreviewUrl: undefined,
+          } satisfies ImageDemoReelProps
+        }
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames,
+        })}
+      />
+
       {/* Ad video composition — 15s 9:16 @24fps (matches Seedance 2 native
           output to avoid frame-resampling artifacts on b-roll). */}
       <Composition

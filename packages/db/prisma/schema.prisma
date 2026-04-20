@@ -423,6 +423,27 @@ model ApiToken {
   @@map("api_tokens")
 }
 
+// Curated kid-safe stock photos used as input for ImageDemoReel renders.
+// Populated via scripts/seed-photo-library.ts; consumed by the worker's
+// /publish/image-reel handler which picks a random entry whose lastUsed
+// is oldest / null. Stored in R2 under public/photo-library/{category}/.
+model PhotoLibraryEntry {
+  id        String    @id @default(cuid())
+  url       String // R2 URL of the source photo
+  category  String // "nature" | "animal" | "object" | "food" | "vehicle" | "person"
+  alt       String
+  safe      Boolean   @default(true) // false = excluded from rotation (moderation flag)
+  lastUsed  DateTime? // null until first use — ORDER BY NULLS FIRST picks unused entries first
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Multi-brand — kept CC-only for now but future-proofed.
+  brand Brand @default(CHUNKY_CRAYON)
+
+  @@index([brand, safe, lastUsed])
+  @@map("photo_library_entries")
+}
+
 // Per-user social account connections (for user-facing sharing to TikTok, Pinterest, etc.)
 model UserSocialAccount {
   id                String   @id @default(cuid())
