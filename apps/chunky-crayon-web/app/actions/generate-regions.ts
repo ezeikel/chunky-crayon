@@ -122,3 +122,48 @@ export async function checkRegionStoreReady(
   );
   return { ready };
 }
+
+/**
+ * Ask the Hetzner worker to (re)generate the region store for an image.
+ * Called by the client's retry button when the initial poll times out.
+ *
+ * Fire-and-forget — returns once the worker acknowledges (~10s budget).
+ * The client's existing poll will pick up the new regionMapUrl once the
+ * worker's background task completes (~60-90s for typical images).
+ */
+export async function requestRegionStoreRegeneration(
+  coloringImageId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const workerUrl = process.env.CHUNKY_CRAYON_WORKER_URL;
+  const workerSecret = process.env.WORKER_SECRET;
+  if (!workerUrl) {
+    return { ok: false, error: 'Worker not configured' };
+  }
+
+  try {
+    const res = await fetch(`${workerUrl}/generate/region-store`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {}),
+      },
+      body: JSON.stringify({ imageId: coloringImageId }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    const text = await res.text().catch(() => '');
+    console.log(
+      `[requestRegionStoreRegeneration] id=${coloringImageId} status=${res.status} body=${text.slice(0, 200)}`,
+    );
+    if (!res.ok && res.status !== 202) {
+      return { ok: false, error: `Worker returned ${res.status}: ${text}` };
+    }
+    return { ok: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(
+      `[requestRegionStoreRegeneration] id=${coloringImageId} failed:`,
+      message,
+    );
+    return { ok: false, error: message };
+  }
+}

@@ -33,8 +33,53 @@ import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 import { generateAmbientSoundForImage } from '@/app/actions/ambient-sound';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
-import { generateRegionStore } from '@/app/actions/generate-regions';
 import { generateColoredReference } from '@/app/actions/generate-colored-reference';
+
+/**
+ * Fire the Hetzner worker to generate a region store for this image.
+ *
+ * We used to call generateRegionStore() inline inside after(), but Vercel
+ * silently drops long-running after() tasks under CPU contention — e.g.
+ * image cmo72yn9k sat for 2h with no region store, no success log, no
+ * failure log. The worker has no timeout and persists until the DB write
+ * lands. Client polls checkRegionStoreReady to pick it up.
+ *
+ * Fire-and-forget: a short 10s network budget is enough for the worker
+ * to return the 202 Accepted. We ignore errors (logged) — if the worker
+ * is down, the next poll retry / admin alert / user retry button will
+ * cover it.
+ */
+const requestRegionStoreFromWorker = (imageId: string): void => {
+  const workerUrl = process.env.CHUNKY_CRAYON_WORKER_URL;
+  const workerSecret = process.env.WORKER_SECRET;
+  if (!workerUrl) {
+    console.error(
+      `[region-store] CHUNKY_CRAYON_WORKER_URL not set — cannot request worker generation for ${imageId}`,
+    );
+    return;
+  }
+  fetch(`${workerUrl}/generate/region-store`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {}),
+    },
+    body: JSON.stringify({ imageId }),
+    signal: AbortSignal.timeout(10_000),
+  })
+    .then(async (res) => {
+      const text = await res.text().catch(() => '');
+      console.log(
+        `[region-store] worker response for ${imageId}: ${res.status} ${text.slice(0, 200)}`,
+      );
+    })
+    .catch((err) => {
+      console.error(
+        `[region-store] worker request for ${imageId} failed:`,
+        err instanceof Error ? err.message : err,
+      );
+    });
+};
 
 /**
  * Locale to language mapping for image metadata generation.
@@ -416,28 +461,6 @@ export const createColoringImage = async (
           }
         })(),
 
-        // Generate the region store (gzipped pixel map + 4 palette variants)
-        // for the reveal-mask Magic Brush. Runs against the traced SVG, not
-        // the raster PNG, so regions match what the client renders.
-        (async () => {
-          const regionStoreResult = await generateRegionStore(
-            result.id,
-            result.svgUrl!,
-            {
-              title: result.title ?? '',
-              description: result.description ?? '',
-              tags: (result.tags as string[]) ?? [],
-            },
-          );
-          if (regionStoreResult.success) {
-            console.log(`[Pipeline] Region store generated for ${result.id}`);
-          } else {
-            console.error(
-              `[Pipeline] Failed to generate region store: ${regionStoreResult.error}`,
-            );
-          }
-        })(),
-
         // Generate AI-colored reference for Auto Color + Magic Brush
         (async () => {
           const refResult = await generateColoredReference(
@@ -471,6 +494,11 @@ export const createColoringImage = async (
           }
         })(),
       ]);
+
+      // Region store generation — offloaded to the Hetzner worker. See
+      // requestRegionStoreFromWorker() at the top of this file. Client
+      // polls checkRegionStoreReady until regionMapUrl lands.
+      requestRegionStoreFromWorker(result.id);
 
       // Invalidate cache so new data (fill points, ambient sound) is available
       revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
@@ -554,28 +582,6 @@ export const createColoringImage = async (
         }
       })(),
 
-      // Generate the region store (gzipped pixel map + 4 palette variants)
-      // for the reveal-mask Magic Brush. Runs against the traced SVG, not
-      // the raster PNG, so regions match what the client renders.
-      (async () => {
-        const regionStoreResult = await generateRegionStore(
-          result.id,
-          result.svgUrl!,
-          {
-            title: result.title ?? '',
-            description: result.description ?? '',
-            tags: (result.tags as string[]) ?? [],
-          },
-        );
-        if (regionStoreResult.success) {
-          console.log(`[Pipeline] Region store generated for ${result.id}`);
-        } else {
-          console.error(
-            `[Pipeline] Failed to generate region store: ${regionStoreResult.error}`,
-          );
-        }
-      })(),
-
       // Generate AI-colored reference for Auto Color + Magic Brush
       (async () => {
         const refResult = await generateColoredReference(
@@ -609,6 +615,11 @@ export const createColoringImage = async (
         }
       })(),
     ]);
+
+    // Region store generation — offloaded to the Hetzner worker. See
+    // requestRegionStoreFromWorker() at the top of this file. Client
+    // polls checkRegionStoreReady until regionMapUrl lands.
+    requestRegionStoreFromWorker(result.id);
 
     // Invalidate cache so new data (color map, ambient sound) is available
     revalidateTag(`coloring-image-${result.id}`, { expire: 0 });

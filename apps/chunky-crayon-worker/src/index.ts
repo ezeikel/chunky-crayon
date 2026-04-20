@@ -28,15 +28,21 @@ const POST_SWEEP_PAD_SECS = 1.5;
 const app = new Hono();
 app.use("*", logger());
 
-// Bearer auth for /publish/* — only trusted crons should call these.
-app.use("/publish/*", async (c, next) => {
+// Bearer auth for /publish/* and /generate/* — only trusted callers
+// (crons + the CC web app's after() hook) should hit these.
+const bearerAuth = async (
+  c: Context,
+  next: () => Promise<void>,
+): Promise<Response | void> => {
   const secret = process.env.WORKER_SECRET;
   if (!secret) return next(); // local dev convenience
   if (c.req.header("authorization") !== `Bearer ${secret}`) {
     return c.json({ error: "Unauthorized" }, 401);
   }
   return next();
-});
+};
+app.use("/publish/*", bearerAuth);
+app.use("/generate/*", bearerAuth);
 
 app.get("/health", (c) =>
   c.json({ status: "ok", service: "chunky-crayon-worker" }),
@@ -90,6 +96,99 @@ app.get("/tmp/:filename", async (c) => {
   } catch {
     return c.json({ error: "Not found" }, 404);
   }
+});
+
+/**
+ * Fire-and-forget region store generation for a freshly-created coloring
+ * image. Returns 202 immediately and runs generation in the background so
+ * the calling serverless function (CC web after() hook) can exit.
+ *
+ * The CC web app used to do this inline in after(), but Vercel's CPU
+ * contention silently drops long after() tasks — see the `cmo72yn9k…`
+ * incident (image 2h old, no region store, no logs). Hetzner box has no
+ * timeout, no drops, and persists until the DB write lands.
+ *
+ * On success: writes regionMapUrl/regionsJson/regionsGeneratedAt to DB.
+ * The client's existing checkRegionStoreReady poll picks it up.
+ *
+ * POST /generate/region-store
+ * Body: { imageId: string }
+ */
+app.post("/generate/region-store", async (c) => {
+  const body = await c.req
+    .json<{ imageId?: string }>()
+    .catch(() => ({ imageId: undefined }));
+  const imageId = body.imageId;
+  if (!imageId) {
+    return c.json({ error: "imageId is required" }, 400);
+  }
+
+  // Fetch the image row up-front so we can validate + pass sceneContext.
+  // Do this synchronously before 202 so we surface "not found" as a real
+  // error instead of a silent drop in the background.
+  const image = await db.coloringImage.findFirst({
+    where: { id: imageId },
+    select: {
+      id: true,
+      svgUrl: true,
+      title: true,
+      description: true,
+      tags: true,
+      regionMapUrl: true,
+    },
+  });
+  if (!image) {
+    return c.json({ error: `Image ${imageId} not found` }, 404);
+  }
+  if (!image.svgUrl) {
+    return c.json({ error: `Image ${imageId} has no svgUrl yet` }, 400);
+  }
+  if (image.regionMapUrl) {
+    // Already done — don't redo it unless explicitly requested.
+    return c.json({ ok: true, already_generated: true });
+  }
+
+  // Kick off the actual work. The keepalive is scoped to the async task.
+  // We don't await — return 202 to the caller right away.
+  void (async () => {
+    const keepaliveTimer = setInterval(() => {
+      db.$queryRaw`SELECT 1`.catch((err) => {
+        console.warn(
+          "[region-store keepalive] Neon ping failed:",
+          err instanceof Error ? err.message : err,
+        );
+      });
+    }, 60_000);
+
+    try {
+      console.log(
+        `[generate/region-store] start imageId=${imageId} title="${image.title}"`,
+      );
+      const result = await generateRegionStoreLocal(image.id, image.svgUrl!, {
+        title: image.title ?? "",
+        description: image.description ?? "",
+        tags: (image.tags as string[]) ?? [],
+      });
+      if (result.success) {
+        console.log(
+          `[generate/region-store] done imageId=${imageId} regions=${result.regionsJson.regions.length}`,
+        );
+      } else {
+        console.error(
+          `[generate/region-store] FAILED imageId=${imageId} error=${result.error}`,
+        );
+      }
+    } catch (err) {
+      console.error(
+        `[generate/region-store] THREW imageId=${imageId}:`,
+        err instanceof Error ? (err.stack ?? err.message) : err,
+      );
+    } finally {
+      clearInterval(keepaliveTimer);
+    }
+  })();
+
+  return c.json({ ok: true, accepted: true, imageId }, 202);
 });
 
 /**

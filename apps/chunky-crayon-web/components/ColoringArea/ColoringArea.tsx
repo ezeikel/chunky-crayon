@@ -44,7 +44,10 @@ import {
 } from '@one-colored-pixel/coloring-ui';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
 import { generateColoredReference } from '@/app/actions/generate-colored-reference';
-import { checkRegionStoreReady } from '@/app/actions/generate-regions';
+import {
+  checkRegionStoreReady,
+  requestRegionStoreRegeneration,
+} from '@/app/actions/generate-regions';
 import { useRouter } from 'next/navigation';
 import { detectAllRegions } from '@one-colored-pixel/canvas';
 
@@ -77,6 +80,13 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
     // Sticker selector modal state
     const [isStickerSelectorOpen, setIsStickerSelectorOpen] = useState(false);
+
+    // Region store wait state — surfaces to the magic-tool affordance when
+    // the background worker hasn't written regionMapUrl yet, and when it's
+    // taken too long so the user can kick off a retry.
+    const [regionStoreStatus, setRegionStoreStatus] = useState<
+      'ready' | 'waiting' | 'timeout' | 'retrying'
+    >(() => (coloringImage.regionMapUrl ? 'ready' : 'waiting'));
 
     const {
       hasUnsavedChanges,
@@ -194,11 +204,19 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         hasRegionMapUrl: !!coloringImage.regionMapUrl,
         willPoll: !coloringImage.regionMapUrl && !!coloringImage.id,
       });
-      if (coloringImage.regionMapUrl) return; // already have it
+      if (coloringImage.regionMapUrl) {
+        setRegionStoreStatus('ready');
+        return;
+      }
       if (!coloringImage.id) return;
+
+      setRegionStoreStatus('waiting');
       let stopped = false;
       const POLL_MS = 3000;
-      const MAX_ATTEMPTS = 200; // ~10 minutes total — complex images take longer
+      // Worker finishes typical images in 60-90s. After 90 attempts (~4.5min)
+      // it's either genuinely stuck or the worker is down — surface a retry
+      // UI instead of polling silently for 10 minutes.
+      const MAX_ATTEMPTS = 90;
       let attempts = 0;
       const tick = async () => {
         if (stopped) return;
@@ -211,6 +229,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           if (stopped) return;
           if (ready) {
             console.log('[ColoringArea] region store ready — refreshing RSC');
+            setRegionStoreStatus('ready');
             router.refresh();
             return; // stop polling
           }
@@ -221,8 +240,9 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           console.warn(
             '[ColoringArea] gave up waiting for region store after',
             attempts,
-            'attempts',
+            'attempts — surfacing retry UI',
           );
+          setRegionStoreStatus('timeout');
           return;
         }
         setTimeout(tick, POLL_MS);
@@ -233,6 +253,51 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         clearTimeout(t);
       };
     }, [coloringImage.id, coloringImage.regionMapUrl, router]);
+
+    // User-triggered retry — re-POSTs to the worker and resumes polling.
+    const handleRegionStoreRetry = useCallback(async () => {
+      if (!coloringImage.id) return;
+      setRegionStoreStatus('retrying');
+      try {
+        const { ok, error } = await requestRegionStoreRegeneration(
+          coloringImage.id,
+        );
+        if (!ok) {
+          console.error('[ColoringArea] retry failed:', error);
+          setRegionStoreStatus('timeout');
+          return;
+        }
+        // Resume polling. The useEffect above is keyed on regionMapUrl,
+        // which is still null, so it won't re-fire. Manually reset status
+        // to 'waiting' and let the retry poll below do its thing.
+        setRegionStoreStatus('waiting');
+        const POLL_MS = 3000;
+        const MAX_ATTEMPTS = 90;
+        let attempts = 0;
+        const tick = async () => {
+          attempts += 1;
+          try {
+            const { ready } = await checkRegionStoreReady(coloringImage.id!);
+            if (ready) {
+              setRegionStoreStatus('ready');
+              router.refresh();
+              return;
+            }
+          } catch (err) {
+            console.warn('[ColoringArea] retry poll failed:', err);
+          }
+          if (attempts >= MAX_ATTEMPTS) {
+            setRegionStoreStatus('timeout');
+            return;
+          }
+          setTimeout(tick, POLL_MS);
+        };
+        setTimeout(tick, POLL_MS);
+      } catch (err) {
+        console.error('[ColoringArea] retry threw:', err);
+        setRegionStoreStatus('timeout');
+      }
+    }, [coloringImage.id, router]);
 
     // Handle first canvas interaction - load and play ambient sound
     // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
@@ -1109,6 +1174,38 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
                 : undefined
             }
           />
+
+          {/* Region-store wait banner — the worker is generating it in
+           * the background. On timeout we surface a retry button so the
+           * user isn't stuck in a silent poll loop. */}
+          {regionStoreStatus === 'timeout' && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 max-w-xs">
+              <div className="bg-white/95 backdrop-blur rounded-2xl border-2 border-crayon-orange/40 px-4 py-3 shadow-lg text-center">
+                <p className="text-sm font-medium text-text-primary mb-2">
+                  Magic colours are taking a while
+                </p>
+                <p className="text-xs text-text-primary/70 mb-3">
+                  You can still colour by hand while we get things ready.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleRegionStoreRetry}
+                  className="inline-flex items-center gap-x-1.5 rounded-full bg-crayon-orange px-4 py-1.5 text-xs font-semibold text-white hover:bg-crayon-orange/90 transition-colors"
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          )}
+          {regionStoreStatus === 'retrying' && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 max-w-xs">
+              <div className="bg-white/95 backdrop-blur rounded-2xl border-2 border-crayon-orange/40 px-4 py-3 shadow-lg text-center">
+                <p className="text-sm font-medium text-text-primary">
+                  Trying again…
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Magic overlay — only shown on the LEGACY warm-up path
            * (on-demand fill-points gen / 5×5 colour-map generation for
