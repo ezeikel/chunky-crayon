@@ -1,5 +1,19 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faStar } from '@fortawesome/pro-duotone-svg-icons/faStar';
+import { faMarker } from '@fortawesome/pro-duotone-svg-icons/faMarker';
+import { faCakeCandles } from '@fortawesome/pro-duotone-svg-icons/faCakeCandles';
+import { faBookOpen } from '@fortawesome/pro-duotone-svg-icons/faBookOpen';
+
+// Duotone icon palette — mirrors the convention in InputModeSelector so
+// tool cards read as part of the same visual family.
+const DUOTONE_STYLE = {
+  '--fa-primary-color': 'hsl(var(--crayon-orange))',
+  '--fa-secondary-color': 'hsl(var(--crayon-teal))',
+  '--fa-secondary-opacity': '1',
+} as React.CSSProperties;
 
 export const metadata: Metadata = {
   title: 'Free Printable Tools for Parents & Teachers | Chunky Crayon',
@@ -14,7 +28,7 @@ type Tool = {
   slug: string;
   title: string;
   description: string;
-  emoji: string;
+  icon: IconDefinition;
   available: boolean;
 };
 
@@ -24,7 +38,7 @@ const TOOLS: Tool[] = [
     title: 'Reward Chart Maker',
     description:
       'Printable behavior / potty / bedtime chart. Pick a theme, add behaviors, download.',
-    emoji: '⭐',
+    icon: faStar,
     available: true,
   },
   {
@@ -32,7 +46,7 @@ const TOOLS: Tool[] = [
     title: 'Name Coloring Pages',
     description:
       "Personalised coloring page with your child's name in bubble letters.",
-    emoji: '🖍️',
+    icon: faMarker,
     available: true,
   },
   {
@@ -40,7 +54,7 @@ const TOOLS: Tool[] = [
     title: 'Birthday Invite Maker',
     description:
       'Themed printable invites your kid can help color in. Add party details, print 1-up or 4-up.',
-    emoji: '🎂',
+    icon: faCakeCandles,
     available: true,
   },
   {
@@ -48,7 +62,7 @@ const TOOLS: Tool[] = [
     title: 'ABC Tracing Worksheets',
     description:
       'A–Z alphabet tracing pages with themed pictures. 27-page PDF bundle, great for preschool and kindergarten.',
-    emoji: '🔤',
+    icon: faBookOpen,
     available: true,
   },
 ];
@@ -74,7 +88,11 @@ const ToolsHubPage = () => (
             className="h-full flex flex-col gap-3 p-6 bg-white rounded-2xl border-2 border-paper-cream-dark transition hover:border-crayon-orange hover:-translate-y-0.5"
           >
             <div className="flex items-start justify-between">
-              <span className="text-4xl">{tool.emoji}</span>
+              <FontAwesomeIcon
+                icon={tool.icon}
+                className="text-3xl"
+                style={DUOTONE_STYLE}
+              />
               {!tool.available && (
                 <span className="text-xs font-tondo font-bold text-crayon-orange bg-crayon-orange/10 px-2 py-1 rounded-full">
                   Coming soon

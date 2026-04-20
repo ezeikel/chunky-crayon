@@ -113,6 +113,61 @@ const Footer = async ({ className }: FooterProps) => {
               support@chunkycrayon.com
             </a>
           </div>
+
+          {/* Free Tools — internal linking for SEO + discoverability */}
+          <div>
+            <h3 className="font-bold text-lg mb-2">Free Tools</h3>
+            <ul className="flex flex-col gap-1.5">
+              <li>
+                <Link
+                  href="/tools"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  All tools
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/tools/name"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  Name coloring pages
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/tools/reward-chart"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  Reward chart maker
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/tools/birthday-invite"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  Birthday invite maker
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/tools/abc-tracing"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  ABC tracing worksheets
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/for-teachers"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  For teachers
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mt-12 pt-6 text-gray-400 text-sm gap-2">

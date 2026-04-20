@@ -1,5 +1,18 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/pro-duotone-svg-icons/faStar';
+import { faPalette } from '@fortawesome/pro-duotone-svg-icons/faPalette';
+import { faCakeCandles } from '@fortawesome/pro-duotone-svg-icons/faCakeCandles';
+import { faBookOpen } from '@fortawesome/pro-duotone-svg-icons/faBookOpen';
+import { faPartyHorn } from '@fortawesome/pro-duotone-svg-icons/faPartyHorn';
+import { faCheck } from '@fortawesome/pro-duotone-svg-icons/faCheck';
+
+const DUOTONE_STYLE = {
+  '--fa-primary-color': 'hsl(var(--crayon-orange))',
+  '--fa-secondary-color': 'hsl(var(--crayon-teal))',
+  '--fa-secondary-opacity': '1',
+} as React.CSSProperties;
 
 export const metadata: Metadata = {
   title:
@@ -36,7 +49,11 @@ const TeacherHubPage = () => (
         className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
       >
         <div className="flex items-start gap-4">
-          <span className="text-4xl">⭐</span>
+          <FontAwesomeIcon
+            icon={faStar}
+            className="text-3xl mt-1"
+            style={DUOTONE_STYLE}
+          />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
               Classroom Job & Reward Chart
@@ -54,7 +71,11 @@ const TeacherHubPage = () => (
         className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
       >
         <div className="flex items-start gap-4">
-          <span className="text-4xl">🎨</span>
+          <FontAwesomeIcon
+            icon={faPalette}
+            className="text-3xl mt-1"
+            style={DUOTONE_STYLE}
+          />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
               Coloring Page Gallery
@@ -72,7 +93,11 @@ const TeacherHubPage = () => (
         className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
       >
         <div className="flex items-start gap-4">
-          <span className="text-4xl">🎂</span>
+          <FontAwesomeIcon
+            icon={faCakeCandles}
+            className="text-3xl mt-1"
+            style={DUOTONE_STYLE}
+          />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
               Birthday Invite Maker
@@ -90,7 +115,11 @@ const TeacherHubPage = () => (
         className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
       >
         <div className="flex items-start gap-4">
-          <span className="text-4xl">🔤</span>
+          <FontAwesomeIcon
+            icon={faBookOpen}
+            className="text-3xl mt-1"
+            style={DUOTONE_STYLE}
+          />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
               ABC Tracing Worksheets
@@ -105,7 +134,11 @@ const TeacherHubPage = () => (
 
       <div className="p-6 bg-paper-cream rounded-2xl border-2 border-paper-cream-dark opacity-75">
         <div className="flex items-start gap-4">
-          <span className="text-4xl">🎉</span>
+          <FontAwesomeIcon
+            icon={faPartyHorn}
+            className="text-3xl mt-1 opacity-50"
+            style={DUOTONE_STYLE}
+          />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
               Seasonal Packs
@@ -129,19 +162,35 @@ const TeacherHubPage = () => (
       </h2>
       <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-muted-foreground">
         <li className="flex gap-3">
-          <span className="text-crayon-orange">✓</span>
+          <FontAwesomeIcon
+            icon={faCheck}
+            className="mt-1 shrink-0"
+            style={DUOTONE_STYLE}
+          />
           No student data stored. Ever. Typed names stay in the browser.
         </li>
         <li className="flex gap-3">
-          <span className="text-crayon-orange">✓</span>
+          <FontAwesomeIcon
+            icon={faCheck}
+            className="mt-1 shrink-0"
+            style={DUOTONE_STYLE}
+          />
           No signup required to download any printable.
         </li>
         <li className="flex gap-3">
-          <span className="text-crayon-orange">✓</span>
+          <FontAwesomeIcon
+            icon={faCheck}
+            className="mt-1 shrink-0"
+            style={DUOTONE_STYLE}
+          />
           No ads, no tracking pixels beyond analytics.
         </li>
         <li className="flex gap-3">
-          <span className="text-crayon-orange">✓</span>
+          <FontAwesomeIcon
+            icon={faCheck}
+            className="mt-1 shrink-0"
+            style={DUOTONE_STYLE}
+          />
           Print-ready PDFs; works on any classroom printer.
         </li>
       </ul>
