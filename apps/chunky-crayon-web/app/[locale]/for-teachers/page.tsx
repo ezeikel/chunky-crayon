@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { generateAlternates } from '@/lib/seo';
 import { faStar } from '@fortawesome/pro-duotone-svg-icons/faStar';
 import { faPalette } from '@fortawesome/pro-duotone-svg-icons/faPalette';
 import { faCakeCandles } from '@fortawesome/pro-duotone-svg-icons/faCakeCandles';
@@ -14,21 +15,32 @@ const DUOTONE_STYLE = {
   '--fa-secondary-opacity': '1',
 } as React.CSSProperties;
 
-export const metadata: Metadata = {
-  title:
-    'Free Coloring Pages & Printables for Teachers (Preschool, K–2) | Chunky Crayon',
-  description:
-    'Free classroom printables for preschool and early primary teachers. Behavior charts, coloring pages, worksheets. No signup, no student data stored.',
-  alternates: {
-    canonical: 'https://chunkycrayon.com/en/for-teachers',
-  },
-  openGraph: {
-    title: 'Free Coloring Pages & Printables for Teachers',
-    description:
-      'No-signup, kid-safe printables for ages 3–8 classrooms. Reward charts, coloring pages, worksheets.',
-    type: 'website',
-  },
-};
+type PageParams = { locale: string };
+
+const HUB_PATH = '/for-teachers';
+const HUB_DESCRIPTION =
+  'Free classroom printables for preschool and early primary teachers. Behavior charts, coloring pages, worksheets. No signup, no student data stored.';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<PageParams>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title:
+      'Free Coloring Pages & Printables for Teachers (Preschool, K–2) | Chunky Crayon',
+    description: HUB_DESCRIPTION,
+    alternates: generateAlternates(locale, HUB_PATH),
+    openGraph: {
+      title: 'Free Coloring Pages & Printables for Teachers',
+      description:
+        'No-signup, kid-safe printables for ages 3–8 classrooms. Reward charts, coloring pages, worksheets.',
+      type: 'website',
+      url: `https://chunkycrayon.com/${locale}${HUB_PATH}`,
+    },
+  };
+}
 
 const TeacherHubPage = () => (
   <div className="max-w-5xl mx-auto py-12 px-4">

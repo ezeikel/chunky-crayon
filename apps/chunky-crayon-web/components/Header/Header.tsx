@@ -16,6 +16,7 @@ import {
   faHeart,
   faBookOpen,
   faTrophy,
+  faToolbox,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
@@ -76,6 +77,11 @@ const getNavItems = (
     visibility: 'always',
   },
   {
+    label: t('tools'),
+    href: '/tools',
+    visibility: 'always',
+  },
+  {
     label: t('myArtwork'),
     href: '/account/my-artwork',
     visibility: 'authenticated',
@@ -118,6 +124,11 @@ const getMobileItems = (
       label: t('gallery'),
       iconName: faImages,
       href: '/gallery',
+    });
+    items.push({
+      label: t('tools'),
+      iconName: faToolbox,
+      href: '/tools',
     });
     items.push({
       label: t('blog'),
@@ -179,6 +190,11 @@ const getMobileItems = (
       label: t('gallery'),
       iconName: faImages,
       href: '/gallery',
+    });
+    items.push({
+      label: t('tools'),
+      iconName: faToolbox,
+      href: '/tools',
     });
     items.push({
       label: t('blog'),
