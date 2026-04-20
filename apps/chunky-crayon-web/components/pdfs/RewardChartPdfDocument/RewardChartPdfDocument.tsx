@@ -14,7 +14,7 @@ import { faStar } from '@fortawesome/pro-thin-svg-icons/faStar';
 import { faHeart } from '@fortawesome/pro-thin-svg-icons/faHeart';
 import { faRocketLaunch } from '@fortawesome/pro-thin-svg-icons/faRocketLaunch';
 import { faFish } from '@fortawesome/pro-thin-svg-icons/faFish';
-import { faPaw } from '@fortawesome/pro-thin-svg-icons/faPaw';
+import { faTRex } from '@fortawesome/pro-thin-svg-icons/faTRex';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 // Thin variants → better match for "colour this shape in" — the shapes
@@ -42,7 +42,7 @@ export type RewardChartTheme =
   | 'ocean'
   | 'dinosaur';
 
-type ShapeKind = 'star' | 'heart' | 'rocket' | 'fish' | 'paw';
+type ShapeKind = 'star' | 'heart' | 'rocket' | 'fish' | 'trex';
 
 type ThemeStyle = {
   primary: string; // header + outlines
@@ -85,7 +85,7 @@ const THEMES: Record<RewardChartTheme, ThemeStyle> = {
     primary: '#3E8948',
     secondary: '#E4F3DC',
     accent: '#3E8948',
-    shape: 'paw',
+    shape: 'trex',
     label: 'Dino Explorer',
   },
 };
@@ -100,7 +100,7 @@ const FA_ICONS: Record<ShapeKind, IconDefinition> = {
   heart: faHeart,
   rocket: faRocketLaunch,
   fish: faFish,
-  paw: faPaw,
+  trex: faTRex,
 };
 
 /**
@@ -135,7 +135,7 @@ const SHAPE_LABEL: Record<ShapeKind, string> = {
   heart: 'heart',
   rocket: 'rocket',
   fish: 'fish',
-  paw: 'paw print',
+  trex: 'T-Rex',
 };
 
 export type RewardChartPdfDocumentProps = {
