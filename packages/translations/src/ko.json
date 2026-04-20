@@ -64,7 +64,7 @@
       "fill": "채우기",
       "brush": "브러시",
       "sticker": "스티커",
-      "magicReveal": "마법 열기",
+      "magicReveal": "마법 공개",
       "magicAuto": "마법 자동",
       "magicBrush": "마법 브러시",
       "magicFill": "마법 채우기",
@@ -134,7 +134,7 @@
       "zoomIn": "확대",
       "zoomInAria": "확대(더 가까이 보기)",
       "pan": "이동",
-      "panAria": "그림을 이리저리 이동",
+      "panAria": "그림 위치 이동",
       "reset": "전체 보기",
       "resetAria": "전체 그림으로 돌아가기"
     },
@@ -328,7 +328,7 @@
     "continueWithApple": "Apple로 계속",
     "signInWithEmail": "이메일로 로그인",
     "sendingLink": "링크 보내는 중...",
-    "chooseMethod": "원하는 로그인 방법을 골라요",
+    "chooseMethod": "원하는 로그인 방법을 선택하세요",
     "orContinueWith": "또는 다음으로 계속",
     "emailPlaceholder": "name@example.com",
     "termsAgreement": "계속하면 서비스 이용약관과 개인정보처리방침에 동의하는 것으로 간주됩니다.",
@@ -340,7 +340,7 @@
       "tryDifferentEmail": "다른 이메일 사용하기"
     },
     "error": {
-      "title": "문제가 생겼어요",
+      "title": "문제가 발생했습니다",
       "tryAgain": "다시 로그인해 주세요. 문제가 계속되면 고객지원에 문의해 주세요.",
       "backToSignIn": "로그인으로 돌아가기",
       "goHome": "홈으로 가기"
@@ -365,10 +365,10 @@
       "cta": "컬러링 페이지 구경하기"
     },
     "unauthorized": "계속하려면 로그인해 주세요",
-    "stripeLoadFailed": "Stripe를 불러오지 못했어요",
+    "stripeLoadFailed": "Stripe를 불러오지 못했습니다",
     "checkoutFailed": "결제 세션을 생성하지 못했습니다",
     "unexpectedError": "예기치 못한 오류가 발생했어요. 다시 시도해 주세요.",
-    "redirectFailed": "결제 페이지로 이동하지 못했어요"
+    "redirectFailed": "결제 페이지로 이동하지 못했습니다"
   },
   "breadcrumbs": {
     "home": "홈",
