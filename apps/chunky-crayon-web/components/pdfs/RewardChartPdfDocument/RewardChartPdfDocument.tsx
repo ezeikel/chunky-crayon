@@ -8,9 +8,14 @@ import {
   Font,
   Link,
   Svg,
-  Polygon,
-  Circle,
+  Path,
 } from '@react-pdf/renderer';
+import { faStar } from '@fortawesome/pro-regular-svg-icons/faStar';
+import { faUnicorn } from '@fortawesome/pro-regular-svg-icons/faUnicorn';
+import { faRocket } from '@fortawesome/pro-regular-svg-icons/faRocket';
+import { faFish } from '@fortawesome/pro-regular-svg-icons/faFish';
+import { faPaw } from '@fortawesome/pro-regular-svg-icons/faPaw';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 Font.register({
   family: 'Tondo Bold',
@@ -29,7 +34,7 @@ export type RewardChartTheme =
   | 'ocean'
   | 'dinosaur';
 
-type ShapeKind = 'star' | 'heart' | 'rocket' | 'shell' | 'footprint';
+type ShapeKind = 'star' | 'unicorn' | 'rocket' | 'fish' | 'paw';
 
 type ThemeStyle = {
   primary: string; // header + outlines
@@ -51,7 +56,7 @@ const THEMES: Record<RewardChartTheme, ThemeStyle> = {
     primary: '#D05CAC',
     secondary: '#FCE4F5',
     accent: '#C34F9E',
-    shape: 'heart',
+    shape: 'unicorn',
     label: 'Unicorn Magic',
   },
   space: {
@@ -65,91 +70,52 @@ const THEMES: Record<RewardChartTheme, ThemeStyle> = {
     primary: '#0F7D9E',
     secondary: '#D6F1FA',
     accent: '#0F7D9E',
-    shape: 'shell',
+    shape: 'fish',
     label: 'Ocean Adventure',
   },
   dinosaur: {
     primary: '#3E8948',
     secondary: '#E4F3DC',
     accent: '#3E8948',
-    shape: 'footprint',
+    shape: 'paw',
     label: 'Dino Explorer',
   },
 };
 
+// Font Awesome Pro Regular icon definitions (the outline weights — best
+// for "color in the shape" reward stamps). Each FA icon exposes
+// `.icon = [width, height, ligatures, unicode, path]`, and path can be
+// a string (solid/regular) or [secondary, primary] (duotone). We use
+// regular, so path is a single string.
+const FA_ICONS: Record<ShapeKind, IconDefinition> = {
+  star: faStar,
+  unicorn: faUnicorn,
+  rocket: faRocket,
+  fish: faFish,
+  paw: faPaw,
+};
+
 /**
- * Each cell draws a single themed outline the kid colors in. Shapes are
- * hand-tuned to a 60×60 viewBox so they render identically across PDF
- * viewers — no font dependency (the previous Unicode-glyph approach
- * was invisible because React-PDF's default font didn't include them).
+ * Render a Font Awesome icon into a React-PDF <Svg>. React-PDF can't
+ * consume <FontAwesomeIcon> (which emits DOM SVG), but the raw icon
+ * object gives us the viewBox dimensions + path data directly, so we
+ * hand that to <Svg><Path /></Svg>. Stroke + no fill = a clean
+ * coloring outline the kid fills in.
  */
 const RewardShape: React.FC<{ shape: ShapeKind; color: string }> = ({
   shape,
   color,
 }) => {
+  const def = FA_ICONS[shape];
+  const [iconW, iconH, , , pathData] = def.icon;
+  const path = Array.isArray(pathData) ? pathData.join(' ') : pathData;
   const size = 34;
-  const strokeProps = {
-    stroke: color,
-    strokeWidth: 2,
-    fill: 'none',
-  } as const;
 
-  if (shape === 'heart') {
-    return (
-      <Svg width={size} height={size} viewBox="0 0 60 60">
-        <Polygon
-          points="30,50 8,28 8,18 18,12 30,22 42,12 52,18 52,28"
-          {...strokeProps}
-        />
-      </Svg>
-    );
-  }
-  if (shape === 'rocket') {
-    return (
-      <Svg width={size} height={size} viewBox="0 0 60 60">
-        {/* Simple rocket silhouette: body + fins + nose */}
-        <Polygon
-          points="30,6 38,22 38,42 46,50 34,50 34,54 26,54 26,50 14,50 22,42 22,22"
-          {...strokeProps}
-        />
-        <Circle cx="30" cy="24" r="3" {...strokeProps} />
-      </Svg>
-    );
-  }
-  if (shape === 'shell') {
-    return (
-      <Svg width={size} height={size} viewBox="0 0 60 60">
-        {/* Scallop shell outline */}
-        <Polygon
-          points="30,10 44,22 50,36 44,48 30,54 16,48 10,36 16,22"
-          {...strokeProps}
-        />
-        <Polygon points="30,10 30,54" {...strokeProps} />
-        <Polygon points="22,14 30,54 38,14" {...strokeProps} />
-      </Svg>
-    );
-  }
-  if (shape === 'footprint') {
-    return (
-      <Svg width={size} height={size} viewBox="0 0 60 60">
-        {/* 3-toed dino footprint */}
-        <Polygon
-          points="30,50 18,38 20,24 26,14 30,18 34,14 40,24 42,38"
-          {...strokeProps}
-        />
-        <Circle cx="22" cy="14" r="3" {...strokeProps} />
-        <Circle cx="30" cy="8" r="3" {...strokeProps} />
-        <Circle cx="38" cy="14" r="3" {...strokeProps} />
-      </Svg>
-    );
-  }
-  // 5-point star (default)
   return (
-    <Svg width={size} height={size} viewBox="0 0 60 60">
-      <Polygon
-        points="30,6 37,24 56,24 41,36 46,54 30,43 14,54 19,36 4,24 23,24"
-        {...strokeProps}
-      />
+    <Svg width={size} height={size} viewBox={`0 0 ${iconW} ${iconH}`}>
+      {/* Low fill opacity so the outline is clearly visible but a crayon
+          stroke easily covers it — this is a reward CHART, not decoration. */}
+      <Path d={path} fill={color} fillOpacity={0.25} />
     </Svg>
   );
 };
@@ -158,10 +124,10 @@ const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
 const SHAPE_LABEL: Record<ShapeKind, string> = {
   star: 'star',
-  heart: 'heart',
+  unicorn: 'unicorn',
   rocket: 'rocket',
-  shell: 'shell',
-  footprint: 'footprint',
+  fish: 'fish',
+  paw: 'paw print',
 };
 
 export type RewardChartPdfDocumentProps = {
