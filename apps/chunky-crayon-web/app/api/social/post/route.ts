@@ -8,7 +8,9 @@ import {
   generateInstagramCaption,
   generateFacebookCaption,
   generatePinterestCaption,
-  generateLinkedInCaption,
+  // generateLinkedInCaption — import kept nearby as a reminder; currently
+  // the digest email generates LinkedIn captions (manual-post workflow).
+  // Re-add when postToLinkedInPage gets wired back in.
   generateTikTokCaption,
   type InstagramPostType,
   type FacebookPostType,
@@ -138,7 +140,7 @@ const corsHeaders = {
  */
 type PlatformResult = {
   success: boolean;
-  /** IG/FB media ID, LinkedIn URN, etc. */
+  /** IG/FB media ID, LinkedIn URN (when auto-post is wired up), etc. */
   mediaId?: string;
   caption?: string;
   postedAt?: string; // ISO
@@ -157,6 +159,9 @@ type SocialPostResults = {
   pinterest?: PlatformResult;
   pinterestVideo?: PlatformResult;
   pinterestDemoReel?: PlatformResult;
+  // TODO(LinkedIn auto-post): currently unset — LinkedIn is manual-only
+  // (caption appears in the digest email for copy-paste). Re-enable when
+  // we wire postToLinkedInPage into handleRequest.
   linkedin?: PlatformResult;
   linkedinDemoReel?: PlatformResult;
   tiktok?: PlatformResult;
@@ -807,15 +812,19 @@ const postToPinterest = async (
 };
 
 /**
- * Post a single image + text to Chunky Crayon's LinkedIn company page.
+ * DORMANT — LinkedIn auto-post is not wired up yet.
  *
- * Uses the v2 /assets/registerUpload → upload → /ugcPosts flow, authored
- * as the organisation (not a personal profile).
+ * LinkedIn is currently a manual channel: the caption is generated in
+ * /api/social/digest so you can copy-paste it when posting by hand.
  *
- * Env required:
- *   LINKEDIN_ACCESS_TOKEN     — page/org-scoped OAuth token (needs
- *                                w_organization_social scope)
- *   LINKEDIN_ORGANIZATION_ID  — numeric org ID (e.g. 12345678)
+ * This helper is kept around because the v2 registerUpload → upload →
+ * /ugcPosts flow is fiddly to get right; when we eventually wire up
+ * auto-posting (needs LINKEDIN_ACCESS_TOKEN + LINKEDIN_ORGANIZATION_ID
+ * env vars and a working post branch inside handleRequest), this will
+ * save reimplementing the whole thing.
+ *
+ * TODO: wire this back up when we have tokens. Search for "LinkedIn is
+ * manual-only" comments in handleRequest for the call sites to restore.
  */
 const postToLinkedInPage = async (imageUrl: string, message: string) => {
   if (
@@ -911,6 +920,8 @@ const postToLinkedInPage = async (imageUrl: string, message: string) => {
   }
   return postData.id as string;
 };
+// Silence unused-helper warning while LinkedIn auto-post is dormant.
+void postToLinkedInPage;
 
 const handleRequest = async (request: Request) => {
   await connection();
@@ -928,7 +939,7 @@ const handleRequest = async (request: Request) => {
 
     const url = new URL(request.url);
     let coloringImageId = url.searchParams.get('coloring_image_id');
-    const platformFilter = url.searchParams.get('platform'); // optional: 'instagram', 'facebook', 'pinterest', 'linkedin', 'tiktok'
+    const platformFilter = url.searchParams.get('platform'); // optional: 'instagram', 'facebook', 'pinterest', 'tiktok'
     const typeFilter = url.searchParams.get('type'); // optional: 'carousel', 'reel', 'demo-reel'
 
     // if POST request, also check request body
@@ -1000,9 +1011,14 @@ const handleRequest = async (request: Request) => {
     // Triggered separately from the static image posts so it can:
     //   1. Kick the Hetzner worker to produce the mp4 if we don't have one
     //      on the row already (coloringImage.demoReelUrl).
-    //   2. Post as video across IG Reel, FB Reel, TikTok, LinkedIn,
-    //      Pinterest video pin — all using the `demo_reel` caption variant
-    //      so copy reflects the workflow, not the artwork.
+    //   2. Post as video across IG Reel, FB Reel, TikTok, Pinterest video
+    //      pin — all using the `demo_reel` caption variant so copy
+    //      reflects the workflow, not the artwork.
+    //
+    // TODO(LinkedIn auto-post): LinkedIn is manual-only right now; its
+    // caption is surfaced in the digest email. When we wire up auto-post,
+    // add a LinkedIn branch here using postToLinkedInPage (the helper is
+    // kept dormant above the handler).
     //
     // Runs as its own cron slot (type=demo-reel). Short-circuits the rest
     // of the handler so we don't double-post or fight with the static flow.
@@ -1012,7 +1028,6 @@ const handleRequest = async (request: Request) => {
         instagramReel: null as string | null,
         facebook: null as string | null,
         tiktok: null as string | null,
-        linkedin: null as string | null,
         pinterestVideo: null as string | null,
         errors: [] as string[],
       };
@@ -1181,41 +1196,11 @@ const handleRequest = async (request: Request) => {
         }
       }
 
-      // LinkedIn — reuses the same page helper; pass the mp4 URL directly.
-      // NOTE: postToLinkedInPage currently uploads as IMAGE. True LinkedIn
-      // video posts need a different registerUpload recipe
-      // (urn:li:digitalmediaRecipe:feedshare-video). TODO before first
-      // production run.
-      if (
-        shouldPost('linkedin') &&
-        !alreadyPosted('linkedinDemoReel') &&
-        process.env.LINKEDIN_ACCESS_TOKEN &&
-        process.env.LINKEDIN_ORGANIZATION_ID
-      ) {
-        const caption = await generateLinkedInCaption(
-          coloringImage,
-          'demo_reel',
-        );
-        try {
-          const postId = await postToLinkedInPage(reelUrl, caption);
-          demoResults.linkedin = postId;
-          platformResults.linkedinDemoReel = {
-            success: true,
-            mediaId: postId,
-            caption,
-            postedAt: new Date().toISOString(),
-          };
-        } catch (err) {
-          console.error('[DemoReel] LinkedIn failed:', err);
-          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-          demoResults.errors.push(`LinkedIn: ${errorMsg}`);
-          platformResults.linkedinDemoReel = {
-            success: false,
-            caption,
-            error: errorMsg,
-          };
-        }
-      }
+      // TODO(LinkedIn auto-post): dormant — LinkedIn is manual-only.
+      // Caption is generated in the digest email for copy-paste. To
+      // re-enable: add an `if (shouldPost('linkedin') && …)` branch
+      // calling postToLinkedInPage(reelUrl, caption) (helper kept
+      // dormant above handleRequest).
 
       // Pinterest video pin — prefer the worker-captured colored cover
       // (finished artwork). Fall back to a square line-art render if
@@ -1272,7 +1257,6 @@ const handleRequest = async (request: Request) => {
         demoResults.instagramReel ||
         demoResults.facebook ||
         demoResults.tiktok ||
-        demoResults.linkedin ||
         demoResults.pinterestVideo;
 
       return NextResponse.json(
@@ -1449,7 +1433,6 @@ const handleRequest = async (request: Request) => {
       facebookImage: null as string | null, // Image post when video is also posted
       pinterest: null as string | null,
       pinterestVideo: null as string | null, // Video pin for engagement
-      linkedin: null as string | null,
       errors: [] as string[],
     };
 
@@ -1795,56 +1778,12 @@ const handleRequest = async (request: Request) => {
       }
     }
 
-    // post to LinkedIn (company page, single image + professional caption)
-    if (
-      shouldPost('linkedin') &&
-      process.env.LINKEDIN_ACCESS_TOKEN &&
-      process.env.LINKEDIN_ORGANIZATION_ID
-    ) {
-      let linkedInCaptionForResults = '';
-      try {
-        console.log('[LinkedIn] Posting image...');
-
-        const linkedInBuffer = await convertSvgToJpeg(
-          coloringImage.svgUrl,
-          'instagram',
-        );
-        const linkedInImageUrl = await uploadToTempStorage(
-          linkedInBuffer,
-          'linkedin',
-        );
-        tempFiles.push(linkedInImageUrl.split('/').pop() || '');
-
-        const linkedInCaption = await generateLinkedInCaption(coloringImage);
-        linkedInCaptionForResults = linkedInCaption ?? '';
-        if (!linkedInCaption) {
-          throw new Error('failed to generate LinkedIn caption');
-        }
-
-        const linkedInPostId = await postToLinkedInPage(
-          linkedInImageUrl,
-          linkedInCaption,
-        );
-        results.linkedin = linkedInPostId;
-        staticPlatformResults.linkedin = {
-          success: true,
-          mediaId: linkedInPostId,
-          caption: linkedInCaptionForResults,
-          postedAt: new Date().toISOString(),
-        };
-        console.log('Successfully posted image to LinkedIn:', linkedInPostId);
-      } catch (error) {
-        console.error('Error posting image to LinkedIn:', error);
-        const errorMsg =
-          error instanceof Error ? error.message : 'Unknown error';
-        results.errors.push(`LinkedIn: ${errorMsg}`);
-        staticPlatformResults.linkedin = {
-          success: false,
-          caption: linkedInCaptionForResults,
-          error: errorMsg,
-        };
-      }
-    }
+    // TODO(LinkedIn auto-post): dormant — LinkedIn is manual-only.
+    // Caption is generated in the digest email for copy-paste. To
+    // re-enable: add an `if (shouldPost('linkedin') && …)` branch
+    // calling postToLinkedInPage(linkedInImageUrl, linkedInCaption)
+    // (helper kept dormant above handleRequest; imports + SocialPostResults
+    // entries kept around so the wiring is minimal).
 
     // Persist per-platform outcomes for the digest cron.
     if (Object.keys(staticPlatformResults).length > 0) {
@@ -1861,8 +1800,7 @@ const handleRequest = async (request: Request) => {
       results.facebook ||
       results.facebookImage ||
       results.pinterest ||
-      results.pinterestVideo ||
-      results.linkedin;
+      results.pinterestVideo;
 
     return NextResponse.json(
       {

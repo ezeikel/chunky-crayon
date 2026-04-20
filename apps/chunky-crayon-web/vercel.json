@@ -51,10 +51,6 @@
       "path": "/api/social/post?platform=pinterest",
       "schedule": "10 15 * * 1-5"
     },
-    {
-      "path": "/api/social/post?platform=linkedin",
-      "schedule": "15 15 * * 1-5"
-    },
 
     {
       "path": "/api/social/post?type=demo-reel&platform=instagram",
@@ -67,10 +63,6 @@
     {
       "path": "/api/social/post?type=demo-reel&platform=tiktok",
       "schedule": "10 18 * * 1-5"
-    },
-    {
-      "path": "/api/social/post?type=demo-reel&platform=linkedin",
-      "schedule": "15 18 * * 1-5"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
@@ -103,10 +95,6 @@
       "path": "/api/social/post?platform=pinterest",
       "schedule": "10 14 * * 0,6"
     },
-    {
-      "path": "/api/social/post?platform=linkedin",
-      "schedule": "15 14 * * 0,6"
-    },
 
     {
       "path": "/api/social/post?type=demo-reel&platform=instagram",
@@ -119,10 +107,6 @@
     {
       "path": "/api/social/post?type=demo-reel&platform=tiktok",
       "schedule": "10 17 * * 0,6"
-    },
-    {
-      "path": "/api/social/post?type=demo-reel&platform=linkedin",
-      "schedule": "15 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
