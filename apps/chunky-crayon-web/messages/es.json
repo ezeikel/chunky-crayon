@@ -337,7 +337,7 @@
       "coloringPages": "Dibujos para colorear de {category}",
       "relatedCategories": "Categorías relacionadas",
       "noPagesYet": "Aún no hay páginas de {category}",
-      "beTheFirst": "¡Sé quien primero cree una página para colorear de {category}!",
+      "beTheFirst": "¡Sé el primero en crear una página para colorear de {category}!",
       "createAPage": "Crear una página",
       "freeColoringPages": "Dibujos para colorear gratis de {category}",
       "lookingFor": "¿Buscas el dibujo perfecto de {category} para colorear? ¡Has llegado al lugar ideal! Nuestra colección tiene una gran variedad de diseños de {category} perfectos para niños y adultos.",
@@ -376,7 +376,7 @@
         "pageTitle": "Dibujos para colorear para pequeños",
         "featuredSection": "Dibujos sencillos para pequeños",
         "categoriesSection": "Categorías para pequeños",
-        "heroDescription": "¡Páginas simples y fáciles de colorear para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos las hacen perfectas para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
+        "heroDescription": "¡Dibujos simples y fáciles de colorear para manitas pequeñas! Con formas grandes, contornos marcados y objetos conocidos, son perfectos para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
         "whyTitle": "Perfecto para pequeños artistas",
         "why1Title": "Líneas grandes y marcadas",
         "why1Description": "¡Los contornos gruesos ayudan a las manitas pequeñas a no salirse de las líneas!",
@@ -423,7 +423,7 @@
         "why3Title": "Alivio del estrés",
         "why3Description": "Tómate un respiro de las pantallas y relájate coloreando.",
         "seoTitle": "Dibujos para colorear gratis para adolescentes",
-        "seoParagraph1": "¿Buscas dibujos para colorear que no sean \"demasiado infantiles\"? Nuestra colección para adolescentes tiene diseños geniales y detallados, perfectos para edades de 13 a 17 años. Desde personajes de anime y escenas gaming hasta mundos de fantasía y patrones abstractos, hay algo para cada estilo.",
+        "seoParagraph1": "¿Buscas dibujos para colorear que no sean \"demasiado infantiles\"? Nuestra colección para adolescentes tiene diseños geniales y detallados, perfectos para edades de 13 a 17 años. Desde personajes de anime y escenas de videojuegos hasta mundos de fantasía y patrones abstractos, hay algo para cada estilo.",
         "seoParagraph2": "Estos no son los dibujos de tu hermanito. Nuestros diseños para adolescentes tienen detalles elaborados, composiciones dinámicas y temas que conectan con sus intereses. Ideales para expresarte, relajarte en descansos de estudio o simplemente desconectar.",
         "seoParagraph3": "Crea tus propios dibujos personalizados describiendo exactamente lo que quieres. ¿Un dragón luchando contra un robot en el espacio? ¿Un retrato estilo anime? ¿Un mandala detallado con tus símbolos favoritos? ¡Descríbelo y nuestra IA lo hace realidad!",
         "popularTitle": "Temas populares para adolescentes",
@@ -455,7 +455,7 @@
     "heroTitle": "¡Planes para cada aventura de colorear!",
     "heroSubtitle": "Ya seas mamá o papá, un pequeño artista o un adulto que ama colorear, hay un plan de Chunky Crayon para ti. ¡No necesitas cuenta para empezar!",
     "monthly": "Mensual",
-    "annual": "Anual (ahorra 15%)",
+    "annual": "Anual (ahorra 17%)",
     "mostPopular": "Más popular",
     "buyNow": "Comprar ahora",
     "noCommitment": "Sin compromiso. Cancela cuando quieras.",
@@ -512,7 +512,7 @@
       },
       "rollover": {
         "question": "¿Los créditos se acumulan?",
-        "answer": "Algunos planes permiten acumular créditos sin usar. Mira los detalles del plan para más info."
+        "answer": "Los créditos de Splash se reinician cada mes. Rainbow permite acumular hasta 1 mes. Sparkle te da 2 meses de acumulación."
       },
       "audience": {
         "question": "¿Es para niños o para adultos?",
