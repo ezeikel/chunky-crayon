@@ -368,7 +368,7 @@
     "ageGroupPages": {
       "common": {
         "moreAgeGroups": "Mehr Altersgruppen",
-        "createSimplePages": "Einfache Seiten erstellen",
+        "createSimplePages": "Einfache Motive erstellen",
         "createYourOwn": "Eigene erstellen",
         "createYourDesign": "Dein Motiv erstellen"
       },
@@ -379,7 +379,7 @@
         "heroDescription": "Einfache Seiten für kleine Hände! Große Formen, kräftige Umrisse und bekannte Motive – perfekt für Kinder von 2–4 Jahren. Ideal zum Üben der Feinmotorik.",
         "whyTitle": "Perfekt für kleine Künstler",
         "why1Title": "Dicke, klare Linien",
-        "why1Description": "Dicke Linien machen es winzigen Händchen super leicht, innerhalb der Linien zu bleiben!",
+        "why1Description": "Dicke Linien machen es kleinen Händen super leicht, innerhalb der Linien zu bleiben!",
         "why2Title": "Einfache Formen",
         "why2Description": "Grundformen und bekannte Dinge, die Kleinkinder erkennen und lieben.",
         "why3Title": "Farben lernen",
@@ -405,7 +405,7 @@
         "why3Description": "Nutze unsere digitalen Malwerkzeuge direkt im Browser!",
         "seoTitle": "Kostenlose Ausmalbilder für Kinder",
         "seoParagraph1": "Suchst du die perfekten Ausmalbilder für deine Kinder? Chunky Crayon bietet eine riesige Sammlung kostenloser, druckbarer Ausmalbilder – speziell für Kinder von 4–12 Jahren. Von süßen Tieren bis zu actionreichen Superhelden ist für alle kleinen Künstler etwas dabei.",
-        "seoParagraph2": "Unsere Ausmalbilder haben klare, kräftige Linien – ideal für kleine Hände. Egal ob Wachsmaler, Buntstifte oder Filzstifte: Die Seiten sind so gestaltet, dass sie toll aussehen. Oder nutze unsere Online-Ausmaltools für kreativen Bildschirmspaß.",
+        "seoParagraph2": "Unsere Ausmalbilder haben klare, kräftige Linien – ideal für kleine Hände. Egal ob Wachsmaler, Buntstifte oder Filzstifte: Die Seiten sind so gestaltet, dass das Ergebnis toll aussieht. Oder nutze unsere Online-Ausmaltools für kreativen Bildschirmspaß.",
         "seoParagraph3": "Und das Beste: Kinder können ihre eigenen Ausmalbilder erstellen, indem sie einfach beschreiben, was sie ausmalen möchten. Ein Drache beim Fußball? Ein Einhorn im Weltraum? Was auch immer sie sich vorstellen – in Sekunden wird daraus ein echtes Ausmalbild!",
         "popularTitle": "Beliebte Kategorien für Kinder",
         "popularDescription": "Zu unseren beliebtesten Kinder-Kategorien gehören: Dinosaurier-Ausmalbilder, Einhorn-Ausmalbilder, Superhelden-Ausmalbilder, Tier-Ausmalbilder, Weltraum- und Raketen-Ausmalbilder sowie Fahrzeug-Ausmalbilder. Jede Kategorie steckt voller altersgerechter Motive."
@@ -424,7 +424,7 @@
         "why3Description": "Gönn dir eine Bildschirm-Pause und entspann beim kreativen Ausmalen.",
         "seoTitle": "Kostenlose Ausmalbilder für Jugendliche",
         "seoParagraph1": "Suchst du Ausmalbilder, die nicht „zu kindisch“ sind? Unsere Teen-Sammlung bietet coole, detailreiche Motive – perfekt für 13–17 Jahre. Von Anime-Figuren und Gaming-Szenen bis zu Fantasywelten und abstrakten Mustern ist für jeden Stil etwas dabei.",
-        "seoParagraph2": "Das sind nicht die Ausmalbilder deiner kleinen Geschwister. Unsere Teen-Designs haben filigrane Details, dynamische Kompositionen und Themen, die Jugendliche ansprechen. Perfekt für kreativen Ausdruck, zum Stress abbauen in Lernpausen oder einfach zum Chillen.",
+        "seoParagraph2": "Das sind nicht die Ausmalbilder deiner kleinen Geschwister. Unsere Teen-Designs haben filigrane Details, dynamische Kompositionen und Themen, die Jugendliche ansprechen. Perfekt für kreativen Ausdruck, zum Stressabbau in Lernpausen oder einfach zum Chillen.",
         "seoParagraph3": "Erstelle deine eigenen Ausmalbilder, indem du genau beschreibst, was du möchtest. Ein Drache, der im Weltraum gegen einen Roboter kämpft? Ein Anime-Porträt? Ein detailreiches Mandala mit deinen Lieblingssymbolen? Beschreib’s einfach – unsere KI macht es lebendig!",
         "popularTitle": "Beliebte Teen-Themen",
         "popularDescription": "Zu unseren beliebtesten Kategorien für Teens gehören: Anime- und Manga-Ausmalbilder, Fantasywesen-Ausmalbilder, Superhelden-Action-Szenen, Gaming-inspirierte Motive, Weltraum- und Sci-Fi-Designs sowie filigrane Musterseiten. Jede Kategorie bietet detailreiche, spannende Motive."
@@ -433,7 +433,7 @@
         "pageTitle": "Ausmalbilder für Erwachsene",
         "featuredSection": "Beliebte Ausmalbilder für Erwachsene",
         "categoriesSection": "Erwachsenen-Kategorien",
-        "heroDescription": "Entdecke die wohltuende Wirkung des Ausmalens für Erwachsene! Unsere Sammlung bietet filigrane Mandalas, schöne Naturmotive und detailreiche Muster – für Entspannung und Achtsamkeit. Perfekt zum Stressabbau nach einem langen Tag.",
+        "heroDescription": "Entdecke die wohltuende Wirkung des Ausmalens für Erwachsene! Unsere Sammlung bietet filigrane Mandalas, schöne Naturmotive und detailreiche Muster – entwickelt für Entspannung und Achtsamkeit. Perfekt zum Stressabbau nach einem langen Tag.",
         "whyTitle": "Vorteile des Ausmalens für Erwachsene",
         "why1Title": "Stressabbau",
         "why1Description": "Ausmalen aktiviert die Entspannungsreaktion, reduziert Ängste und fördert innere Ruhe.",
