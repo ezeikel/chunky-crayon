@@ -7,6 +7,9 @@ import {
   StyleSheet,
   Font,
   Link,
+  Svg,
+  Polygon,
+  Circle,
 } from '@react-pdf/renderer';
 
 Font.register({
@@ -26,11 +29,13 @@ export type RewardChartTheme =
   | 'ocean'
   | 'dinosaur';
 
+type ShapeKind = 'star' | 'heart' | 'rocket' | 'shell' | 'footprint';
+
 type ThemeStyle = {
   primary: string; // header + outlines
   secondary: string; // row highlights
-  accent: string; // sparkle accents
-  emoji: string; // hero emoji (rendered as text, uses font fallback)
+  accent: string; // shape outline
+  shape: ShapeKind; // reward shape drawn in each cell
   label: string; // theme label shown in header
 };
 
@@ -38,41 +43,126 @@ const THEMES: Record<RewardChartTheme, ThemeStyle> = {
   stars: {
     primary: '#F86A2F',
     secondary: '#FFE8D4',
-    accent: '#FFC857',
-    emoji: '★',
+    accent: '#F2A93B',
+    shape: 'star',
     label: 'Superstar',
   },
   unicorn: {
     primary: '#D05CAC',
     secondary: '#FCE4F5',
-    accent: '#9C6ADE',
-    emoji: '♥',
+    accent: '#C34F9E',
+    shape: 'heart',
     label: 'Unicorn Magic',
   },
   space: {
     primary: '#3A3D98',
     secondary: '#E3E6FF',
-    accent: '#00BFE0',
-    emoji: '★',
+    accent: '#3A3D98',
+    shape: 'rocket',
     label: 'Space Explorer',
   },
   ocean: {
     primary: '#0F7D9E',
     secondary: '#D6F1FA',
-    accent: '#4FC0C4',
-    emoji: '●',
+    accent: '#0F7D9E',
+    shape: 'shell',
     label: 'Ocean Adventure',
   },
   dinosaur: {
     primary: '#3E8948',
     secondary: '#E4F3DC',
-    accent: '#F7C04A',
-    emoji: '▲',
+    accent: '#3E8948',
+    shape: 'footprint',
     label: 'Dino Explorer',
   },
 };
 
+/**
+ * Each cell draws a single themed outline the kid colors in. Shapes are
+ * hand-tuned to a 60×60 viewBox so they render identically across PDF
+ * viewers — no font dependency (the previous Unicode-glyph approach
+ * was invisible because React-PDF's default font didn't include them).
+ */
+const RewardShape: React.FC<{ shape: ShapeKind; color: string }> = ({
+  shape,
+  color,
+}) => {
+  const size = 34;
+  const strokeProps = {
+    stroke: color,
+    strokeWidth: 2,
+    fill: 'none',
+  } as const;
+
+  if (shape === 'heart') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 60 60">
+        <Polygon
+          points="30,50 8,28 8,18 18,12 30,22 42,12 52,18 52,28"
+          {...strokeProps}
+        />
+      </Svg>
+    );
+  }
+  if (shape === 'rocket') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 60 60">
+        {/* Simple rocket silhouette: body + fins + nose */}
+        <Polygon
+          points="30,6 38,22 38,42 46,50 34,50 34,54 26,54 26,50 14,50 22,42 22,22"
+          {...strokeProps}
+        />
+        <Circle cx="30" cy="24" r="3" {...strokeProps} />
+      </Svg>
+    );
+  }
+  if (shape === 'shell') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 60 60">
+        {/* Scallop shell outline */}
+        <Polygon
+          points="30,10 44,22 50,36 44,48 30,54 16,48 10,36 16,22"
+          {...strokeProps}
+        />
+        <Polygon points="30,10 30,54" {...strokeProps} />
+        <Polygon points="22,14 30,54 38,14" {...strokeProps} />
+      </Svg>
+    );
+  }
+  if (shape === 'footprint') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 60 60">
+        {/* 3-toed dino footprint */}
+        <Polygon
+          points="30,50 18,38 20,24 26,14 30,18 34,14 40,24 42,38"
+          {...strokeProps}
+        />
+        <Circle cx="22" cy="14" r="3" {...strokeProps} />
+        <Circle cx="30" cy="8" r="3" {...strokeProps} />
+        <Circle cx="38" cy="14" r="3" {...strokeProps} />
+      </Svg>
+    );
+  }
+  // 5-point star (default)
+  return (
+    <Svg width={size} height={size} viewBox="0 0 60 60">
+      <Polygon
+        points="30,6 37,24 56,24 41,36 46,54 30,43 14,54 19,36 4,24 23,24"
+        {...strokeProps}
+      />
+    </Svg>
+  );
+};
+
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+
+const SHAPE_LABEL: Record<ShapeKind, string> = {
+  star: 'star',
+  heart: 'heart',
+  rocket: 'rocket',
+  shell: 'shell',
+  footprint: 'footprint',
+};
 
 export type RewardChartPdfDocumentProps = {
   childName: string;
@@ -134,10 +224,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  star: {
-    fontSize: 22,
-    opacity: 0.22,
-  },
   footer: {
     marginTop: 24,
     flexDirection: 'row',
@@ -192,8 +278,7 @@ const RewardChartPdfDocument = ({
             {themeStyle.label} Chart
           </Text>
           <Text style={styles.subhero}>
-            Color in a {themeStyle.emoji === '★' ? 'star' : 'shape'} every time
-            you earn it!
+            Color in a {SHAPE_LABEL[themeStyle.shape]} every time you earn it!
           </Text>
         </View>
 
@@ -245,9 +330,10 @@ const RewardChartPdfDocument = ({
                   key={d}
                   style={[styles.cellBox, { flex: 1, minHeight: 56 }]}
                 >
-                  <Text style={[styles.star, { color: themeStyle.accent }]}>
-                    {themeStyle.emoji}
-                  </Text>
+                  <RewardShape
+                    shape={themeStyle.shape}
+                    color={themeStyle.accent}
+                  />
                 </View>
               ))}
             </View>
