@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import { db } from '@one-colored-pixel/db';
@@ -20,7 +21,7 @@ type PageProps = {
  *
  * Access: localhost (NODE_ENV=development) OR authenticated admin user in prod.
  */
-const RegionStoreDebugPage = async ({ params }: PageProps) => {
+const RegionStoreDebugContent = async ({ params }: PageProps) => {
   // Opt into dynamic rendering — auth() + DB read are per-request, and we
   // want a fresh read that bypasses the getColoringImageBase cache (which
   // doesn't select the new region store columns yet).
@@ -111,5 +112,11 @@ const RegionStoreDebugPage = async ({ params }: PageProps) => {
     />
   );
 };
+
+const RegionStoreDebugPage = ({ params }: PageProps) => (
+  <Suspense fallback={<div className="p-8 font-mono text-sm">Loading…</div>}>
+    <RegionStoreDebugContent params={params} />
+  </Suspense>
+);
 
 export default RegionStoreDebugPage;
