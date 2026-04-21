@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Video generation test output
 /test-output/
+
+# Phase-2 ad video experiments — scratch, not committed
+/test-clips/

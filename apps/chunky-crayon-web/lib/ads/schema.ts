@@ -88,11 +88,31 @@ export type VideoScene = {
   caption?: string;
 };
 
+/**
+ * Music track config. ElevenLabs music-gen endpoint (same pipeline we
+ * already use for ambient sounds + demo reels). Remotion mixes the track
+ * underneath the clip at the specified volume.
+ */
+export type VideoMusic = {
+  /** ElevenLabs music-gen prompt. Keep it short and mood-led. */
+  prompt: string;
+  /** Seconds. Must match the sum of scene durations. */
+  durationSeconds: number;
+  /** 0-1, default 0.3. Parents who unmute should hear the clip, not the music. */
+  volume?: number;
+};
+
 export type VideoConfig = {
   /** Which of the 3 input modes this video ad shows off. */
   mode: 'text' | 'voice' | 'image';
   /** Ordered scene list — Remotion composes these in sequence. */
   scenes: VideoScene[];
+  /**
+   * Optional music track. Recommended for Stories/Reels placements where
+   * audio autoplays. Voiceover is deliberately not in the schema — we use
+   * on-screen captions via <TypeReveal> for "voice" instead.
+   */
+  music?: VideoMusic;
 };
 
 export type Campaign = {
