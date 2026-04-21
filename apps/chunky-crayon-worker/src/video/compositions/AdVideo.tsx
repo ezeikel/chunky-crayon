@@ -11,6 +11,8 @@ import {
 } from "remotion";
 import { linearTiming, TransitionSeries } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
+import { slide } from "@remotion/transitions/slide";
+import { measureText } from "@remotion/layout-utils";
 import { TONDO_FONT_CSS_URL } from "../fonts";
 
 // ==========================================================================
@@ -57,10 +59,12 @@ export type AdVideoProps = {
   /** Music track url. */
   musicUrl: string;
   /**
-   * Optional transition whoosh SFX. Plays at each scene boundary via
-   * short <Sequence>s. TODO: replace with curated Epidemic Sound clips.
+   * Optional transition whoosh SFX URLs — one per scene boundary. The
+   * render pipeline picks a random one from the pool per boundary so
+   * back-to-back transitions sound varied.
+   * Sourced from Epidemic Sound via PTP's library, stored in R2.
    */
-  transitionSfxUrl?: string;
+  transitionSfxUrls?: string[];
   /** Scene list from campaign.video.scenes. */
   scenes: AdScene[];
 };
@@ -90,13 +94,21 @@ const ROONEY = "Tondo, ui-rounded, system-ui, sans-serif";
 // Shared primitives
 // ==========================================================================
 
-function ChunkyCta({ text }: { text: string }) {
+function ChunkyCta({
+  text,
+  startFrame = 0,
+}: {
+  text: string;
+  startFrame?: number;
+}) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Spring entrance in first 18 frames (~0.6s @30fps)
+  // Spring entrance, delayed to startFrame so the outro can sequence
+  // coloured page → logo → CTA → URL underline instead of everything
+  // landing at once.
   const scale = spring({
-    frame,
+    frame: frame - startFrame,
     fps,
     config: { damping: 10, mass: 0.8, stiffness: 200 },
   });
@@ -125,8 +137,9 @@ function ChunkyCta({ text }: { text: string }) {
   );
 }
 
-// Word-stagger reveal. Each word fades+rises in sequence — keeps natural
-// line wrapping and hyphenation (unlike per-char which blocks ligatures).
+// Word-stagger reveal with spring physics. Each word rises from below and
+// bounces into place — subtle overshoot + settle, matches the brand's
+// "chunky" button physics. Keeps natural line wrapping.
 function StaggerText({
   text,
   fontSize = 96,
@@ -136,6 +149,7 @@ function StaggerText({
   startFrame = 0,
   perWordFrames = 3,
   font = TONDO,
+  fontWeight = 700,
 }: {
   text: string;
   fontSize?: number;
@@ -145,8 +159,10 @@ function StaggerText({
   startFrame?: number;
   perWordFrames?: number;
   font?: string;
+  fontWeight?: number;
 }) {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
   // Split on whitespace but keep it as tokens so layout reflows naturally.
   const tokens = text.split(/(\s+)/);
 
@@ -154,13 +170,12 @@ function StaggerText({
     <div
       style={{
         fontFamily: font,
-        fontWeight: 700,
+        fontWeight,
         fontSize,
         color,
         lineHeight,
         maxWidth,
         letterSpacing: "-0.02em",
-        wordSpacing: "0em",
       }}
     >
       {tokens.map((token, i) => {
@@ -172,31 +187,27 @@ function StaggerText({
           .slice(0, i)
           .filter((t) => !/^\s+$/.test(t)).length;
         const tokenFrame = startFrame + wordIndex * perWordFrames;
-        const opacity = interpolate(
-          frame,
-          [tokenFrame, tokenFrame + 8],
-          [0, 1],
-          {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          },
-        );
-        const translateY = interpolate(
-          frame,
-          [tokenFrame, tokenFrame + 8],
-          [16, 0],
-          {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          },
-        );
+
+        // Spring-bounce entrance per word. damping:12 + stiffness:120 gives
+        // a small overshoot that reads as playful without being silly.
+        const s = spring({
+          frame: frame - tokenFrame,
+          fps,
+          config: { damping: 12, mass: 0.9, stiffness: 120 },
+          durationInFrames: 20,
+        });
+        const opacity = Math.min(1, Math.max(0, s));
+        const translateY = (1 - s) * 32;
+        const scale = 0.92 + s * 0.08;
+
         return (
           <span
             key={i}
             style={{
               opacity,
               display: "inline-block",
-              transform: `translateY(${translateY}px)`,
+              transform: `translateY(${translateY}px) scale(${scale})`,
+              transformOrigin: "center bottom",
             }}
           >
             {token}
@@ -211,25 +222,64 @@ function StaggerText({
 // Scene renderers
 // ==========================================================================
 
+/**
+ * Auto-size a headline so it fits comfortably within maxWidth. Starts at a
+ * target size and shrinks by 6px increments until the longest word fits.
+ * Used by TextRevealScene so short headlines read as big + short ones
+ * don't overflow.
+ */
+function autoHeadlineSize(
+  text: string,
+  maxWidth: number,
+  targetSize = 108,
+  minSize = 56,
+): number {
+  const words = text.split(/\s+/).filter(Boolean);
+  const longest = words.reduce(
+    (acc, w) => (w.length > acc.length ? w : acc),
+    "",
+  );
+  for (let size = targetSize; size >= minSize; size -= 6) {
+    const { width } = measureText({
+      text: longest,
+      fontFamily: "Tondo, ui-rounded, system-ui, sans-serif",
+      fontSize: size,
+      fontWeight: "700",
+      letterSpacing: "-0.02em",
+    });
+    if (width <= maxWidth) return size;
+  }
+  return minSize;
+}
+
 function TextRevealScene({
   caption,
   background,
   color,
-  highlightColor,
   subhead,
 }: {
   caption: string;
   background: string;
   color: string;
+  /** Deprecated: underline sweep was dropped. Kept for backward compat. */
   highlightColor?: string;
   subhead?: string;
 }) {
   const frame = useCurrentFrame();
-  // Subhead appears after headline finishes typing (~frame 50)
-  const subheadOpacity = interpolate(frame, [50, 80], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
+  const { fps } = useVideoConfig();
+  const maxLineWidth = 920;
+  const headlineSize = autoHeadlineSize(caption, maxLineWidth);
+
+  // Subhead springs in after the headline has mostly landed — 0.6s at 24fps
+  // = frame 14 per word × ~12 words typical. So start at frame 28 (≈1.2s).
+  const subheadSpring = spring({
+    frame: frame - 28,
+    fps,
+    config: { damping: 14, mass: 0.7, stiffness: 100 },
+    durationInFrames: 18,
   });
+  const subheadOpacity = Math.min(1, Math.max(0, subheadSpring));
+  const subheadY = (1 - subheadSpring) * 16;
 
   return (
     <AbsoluteFill
@@ -240,61 +290,34 @@ function TextRevealScene({
         alignItems: "flex-start",
         justifyContent: "center",
         padding: 80,
-        gap: 48,
+        gap: 56,
       }}
     >
-      <div style={{ position: "relative", maxWidth: 920 }}>
-        <StaggerText
-          text={caption}
-          color={color}
-          fontSize={76}
-          lineHeight={1.08}
-          maxWidth={920}
-          perWordFrames={3}
-        />
-        {/* Crayon-orange underline sweep lands around frame 70 */}
-        {highlightColor && <UnderlineSweep color={highlightColor} />}
-      </div>
+      <StaggerText
+        text={caption}
+        color={color}
+        fontSize={headlineSize}
+        lineHeight={1.06}
+        maxWidth={maxLineWidth}
+        perWordFrames={3}
+      />
       {subhead && (
         <div
           style={{
             fontFamily: TONDO,
-            fontWeight: 400,
-            fontSize: 36,
-            lineHeight: 1.3,
+            fontWeight: 500,
+            fontSize: 42,
+            lineHeight: 1.28,
             color,
             maxWidth: 880,
-            opacity: subheadOpacity * 0.8,
+            opacity: subheadOpacity * 0.85,
+            transform: `translateY(${subheadY}px)`,
           }}
         >
           {subhead}
         </div>
       )}
     </AbsoluteFill>
-  );
-}
-
-function UnderlineSweep({ color }: { color: string }) {
-  const frame = useCurrentFrame();
-  // Sweep appears ~frame 60, animates width over 18 frames
-  const width = interpolate(frame, [60, 78], [0, 620], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: 140,
-        bottom: "44%",
-        height: 16,
-        width,
-        background: color,
-        borderRadius: 8,
-        transform: "rotate(-1deg)",
-        opacity: 0.85,
-      }}
-    />
   );
 }
 
@@ -470,6 +493,46 @@ function BrandOutroScene({
   logoUrl: string;
   coloredUrl?: string;
 }) {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  // Staggered entrances so the scene reads as a sequence, not a freeze:
+  //   0.0s — colored page fades+scales in
+  //   0.4s — logo + wordmark spring in
+  //   0.9s — CTA springs in (handled by <ChunkyCta />)
+  //   1.6s — URL underline starts sweeping in
+  //   throughout — subtle breathing on the CTA so the hold never feels static
+  const pageSpring = spring({
+    frame: frame - 0,
+    fps,
+    config: { damping: 14, mass: 0.9, stiffness: 100 },
+    durationInFrames: 24,
+  });
+  const pageOpacity = Math.min(1, Math.max(0, pageSpring));
+  const pageScale = 0.92 + pageSpring * 0.08;
+
+  const logoSpring = spring({
+    frame: frame - Math.round(fps * 0.4),
+    fps,
+    config: { damping: 12, mass: 0.8, stiffness: 120 },
+    durationInFrames: 20,
+  });
+  const logoOpacity = Math.min(1, Math.max(0, logoSpring));
+  const logoY = (1 - logoSpring) * 16;
+
+  // URL underline sweeps in from 1.6s, takes ~0.8s
+  const underlineStart = Math.round(fps * 1.6);
+  const underlineEnd = underlineStart + Math.round(fps * 0.8);
+  const underlineWidth = interpolate(
+    frame,
+    [underlineStart, underlineEnd],
+    [0, 260],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    },
+  );
+
   return (
     <AbsoluteFill
       style={{
@@ -492,6 +555,8 @@ function BrandOutroScene({
             boxShadow:
               "0 20px 0 rgba(0,0,0,0.08), 0 40px 80px rgba(0,0,0,0.12)",
             padding: 24,
+            opacity: pageOpacity,
+            transform: `scale(${pageScale})`,
           }}
         >
           <Img
@@ -505,6 +570,8 @@ function BrandOutroScene({
           display: "flex",
           alignItems: "center",
           gap: 24,
+          opacity: logoOpacity,
+          transform: `translateY(${logoY}px)`,
         }}
       >
         <Img src={logoUrl} style={{ width: 120, height: 120 }} />
@@ -520,17 +587,52 @@ function BrandOutroScene({
           chunkycrayon
         </div>
       </div>
-      <ChunkyCta text={cta} />
-      <div
-        style={{
-          fontFamily: ROONEY,
-          fontSize: 32,
-          color: CC.muted,
-        }}
-      >
-        chunkycrayon.com
+      {/* CTA enters at ~0.9s via <ChunkyCta> spring; subtle 2s breathing
+          keeps the rest of the hold from feeling static. */}
+      <BreathingWrap>
+        <ChunkyCta text={cta} startFrame={Math.round(fps * 0.9)} />
+      </BreathingWrap>
+      <div style={{ position: "relative" }}>
+        <div
+          style={{
+            fontFamily: ROONEY,
+            fontSize: 32,
+            color: CC.muted,
+          }}
+        >
+          chunkycrayon.com
+        </div>
+        {/* Crayon-orange underline sweeps under the URL */}
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            bottom: -8,
+            height: 4,
+            width: underlineWidth,
+            background: CC.orange,
+            borderRadius: 2,
+            transform: "translateX(-50%)",
+          }}
+        />
       </div>
     </AbsoluteFill>
+  );
+}
+
+/** Wraps children in a gentle sinusoidal scale breathe so the CTA never
+ *  holds completely static. Imperceptible on its own, but kills the
+ *  "frozen final screen" feel. */
+function BreathingWrap({ children }: { children: React.ReactNode }) {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  // One full breath every 2.4 seconds, ±1% scale
+  const period = fps * 2.4;
+  const scale = 1 + Math.sin((frame / period) * Math.PI * 2) * 0.01;
+  return (
+    <div style={{ transform: `scale(${scale})`, display: "inline-block" }}>
+      {children}
+    </div>
   );
 }
 
@@ -563,7 +665,7 @@ export function AdVideo(props: AdVideoProps) {
     coloredUrl,
     brollUrls,
     musicUrl,
-    transitionSfxUrl,
+    transitionSfxUrls,
     campaignId,
   } = props;
 
@@ -589,7 +691,28 @@ export function AdVideo(props: AdVideoProps) {
   // transition eats TRANSITION_FRAMES out of the NEXT sequence. So to keep
   // every sequence's on-screen time equal to scene.duration, we pad each
   // non-first sequence by TRANSITION_FRAMES.
-  const TRANSITION_FRAMES = 6;
+  // 15 frames @ 24fps = ~625ms — PTP's number. Long enough to register
+  // as a deliberate transition, short enough not to feel slow.
+  const TRANSITION_FRAMES = 15;
+
+  /**
+   * Picks a transition presentation for each scene boundary. PTP pattern:
+   * slide for hard cuts between different scene types, fade for softer
+   * continuations. For our 3-scene ads:
+   *   - hook → b-roll:  slide (dramatic reveal of real-world context)
+   *   - b-roll → outro: fade (settles into the CTA)
+   */
+  const pickPresentation = (fromKind: string, toKind: string) => {
+    // Slide between a text scene and anything visual — it's the big cut.
+    if (fromKind === "text-reveal" || fromKind === "line-art-draw") {
+      return slide({ direction: "from-right" });
+    }
+    // Broll or phone-mockup → outro: soft fade.
+    if (toKind === "brand-outro") {
+      return fade();
+    }
+    return fade();
+  };
 
   const renderSceneContent = (scene: AdScene, i: number): React.ReactNode => {
     switch (scene.kind) {
@@ -647,11 +770,13 @@ export function AdVideo(props: AdVideoProps) {
     const seqFrames = i === 0 ? sceneFrames : sceneFrames + TRANSITION_FRAMES;
 
     if (i > 0) {
+      const prevKind = scenes[i - 1].kind;
+      const currKind = scene.kind;
       children.push(
         <TransitionSeries.Transition
           key={`t-${i}`}
           timing={linearTiming({ durationInFrames: TRANSITION_FRAMES })}
-          presentation={fade()}
+          presentation={pickPresentation(prevKind, currKind)}
         />,
       );
     }
@@ -680,21 +805,28 @@ export function AdVideo(props: AdVideoProps) {
 
       {musicUrl && (
         <Sequence>
-          <Audio src={musicUrl} volume={0.3} />
+          {/* Music at 0.15 matches PTP — quiet bed so transition SFX punch
+              through and the ad doesn't feel over-scored. */}
+          <Audio src={musicUrl} volume={0.15} />
         </Sequence>
       )}
 
-      {/* Transition SFX — one short whoosh at each scene boundary. PTP
-          pattern: volume ~0.25 so it punctuates without drowning the
-          music. */}
-      {transitionSfxUrl &&
+      {/* Transition SFX — one short whoosh at each scene boundary. Each
+          boundary picks its own URL from the passed array (render
+          script randomises the pool for variety). Volume 0.4 so the
+          whoosh reads CLEARLY above the 0.15 music bed. */}
+      {transitionSfxUrls &&
+        transitionSfxUrls.length > 0 &&
         boundaryFrames.map((boundary, i) => (
           <Sequence
             key={`sfx-${i}`}
             from={Math.max(boundary - 5, 0)}
             durationInFrames={30}
           >
-            <Audio src={transitionSfxUrl} volume={0.25} />
+            <Audio
+              src={transitionSfxUrls[i % transitionSfxUrls.length]}
+              volume={0.4}
+            />
           </Sequence>
         ))}
     </AbsoluteFill>

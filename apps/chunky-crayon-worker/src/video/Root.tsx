@@ -8,6 +8,9 @@ import {
 import { AdVideo, type AdVideoProps } from "./compositions/AdVideo";
 
 const FPS = 30;
+// Ad videos render at Seedance's native 24fps to avoid frame-resampling
+// glitches when the i2v clips play inside the composition.
+const AD_FPS = 24;
 
 // Pacing constants — keep in sync with DemoReel + worker/index.ts.
 const INTRO_SECS = 1.0;
@@ -67,13 +70,13 @@ export const RemotionRoot: React.FC = () => {
           durationInFrames: props.durationInFrames,
         })}
       />
-      {/* Ad video composition — 15s 9:16 @30fps. All 3 campaigns render
-          from this same composition with different inputProps. */}
+      {/* Ad video composition — 15s 9:16 @24fps (matches Seedance 2 native
+          output to avoid frame-resampling artifacts on b-roll). */}
       <Composition
         id="AdVideo"
         component={AdVideo}
-        durationInFrames={15 * FPS}
-        fps={FPS}
+        durationInFrames={15 * AD_FPS}
+        fps={AD_FPS}
         width={1080}
         height={1920}
         defaultProps={
@@ -87,7 +90,7 @@ export const RemotionRoot: React.FC = () => {
             coloredUrl: undefined,
             brollUrls: {},
             musicUrl: EMPTY_PLACEHOLDER,
-            transitionSfxUrl: undefined,
+            transitionSfxUrls: undefined,
             scenes: [],
           } satisfies AdVideoProps
         }

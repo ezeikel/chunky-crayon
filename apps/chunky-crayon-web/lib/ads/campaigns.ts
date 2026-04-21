@@ -45,14 +45,19 @@ export const campaigns: Campaign[] = [
           start: 5,
           duration: 5,
           label:
-            'PROOF — kid hand colouring the real T-rex page (reuses validated test clip)',
+            'PROOF — over-the-shoulder kid colouring the T-rex page with a red crayon',
           kind: 'broll',
           broll: {
-            prompt:
-              "Photorealistic overhead shot, 9:16 vertical portrait. Wooden table, printed T-rex coloring page centered. Child's hand (age 4-5) colouring in a small star with a red wax crayon — visible strokes, star fills with red across the clip. Warm morning light, shallow DOF. No text. No faces.",
-            imageUrl:
-              'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/uploads/coloring-images/cmo8hw3o40000z36l46efmnwe/image.webp',
-            clipDuration: 5,
+            stableId: 'trex-over-shoulder-colouring',
+            model: 'kling-v3-pro',
+            referenceImageKey: 'trex',
+            template: 'over-shoulder-colouring',
+            templateVars: {
+              crayonColour: 'red',
+              referenceDesc: "the T-rex's body",
+              partialColouring:
+                "the T-rex's body is filled orange (but not completely — visible uneven strokes and one area still uncoloured), one star in the corner is filled yellow, one planet is filled blue",
+            },
           },
         },
         {
@@ -175,14 +180,19 @@ export const campaigns: Campaign[] = [
           start: 3,
           duration: 7,
           label:
-            'PROOF — kid hand colouring the real dragon page (same pattern as ad 1)',
+            'PROOF — over-the-shoulder kid colouring the dragon page with an orange crayon',
           kind: 'broll',
           broll: {
-            prompt:
-              "Photorealistic three-quarter shot, 9:16 vertical. Wooden table with printed dragon-and-bunny-at-tea-party coloring page. Child's hand (age 4-5) colouring in the dragon with a visible stroke of orange crayon — orange colour fills part of the dragon across the clip. Warm light, shallow DOF. No text. No faces.",
-            imageUrl:
-              'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/uploads/coloring-images/cmo8hypn80002z36lrab18enu/image.webp',
-            clipDuration: 5,
+            stableId: 'dragon-over-shoulder-colouring',
+            model: 'kling-v3-pro',
+            referenceImageKey: 'dragon',
+            template: 'over-shoulder-colouring',
+            templateVars: {
+              crayonColour: 'orange',
+              referenceDesc: "the dragon's body",
+              partialColouring:
+                "the dragon's body is partially filled orange (visible uneven strokes, a portion still uncoloured), the bunny has a light pink wash, the window behind is filled blue",
+            },
           },
         },
         {

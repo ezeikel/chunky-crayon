@@ -18,6 +18,7 @@
     "@remotion/bundler": "^4.0.0",
     "@remotion/cli": "^4.0.0",
     "@remotion/fonts": "^4.0.0",
+    "@remotion/layout-utils": "^4.0.450",
     "@remotion/paths": "^4.0.450",
     "@remotion/renderer": "^4.0.0",
     "@remotion/transitions": "^4.0.450",
