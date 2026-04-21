@@ -5,6 +5,7 @@ import {
   type DemoReelProps,
   PDF_PREVIEW_SECS,
 } from "./compositions/DemoReel";
+import { AdVideo, type AdVideoProps } from "./compositions/AdVideo";
 
 const FPS = 30;
 
@@ -40,30 +41,57 @@ export const RemotionRoot: React.FC = () => {
     introFrames + typingFrames + revealFrames + pdfPreviewFrames + outroFrames;
 
   return (
-    <Composition
-      id="DemoReel"
-      component={DemoReel}
-      durationInFrames={totalFrames}
-      fps={FPS}
-      width={1080}
-      height={1920}
-      defaultProps={
-        {
-          typingVideoUrl: EMPTY_PLACEHOLDER,
-          revealVideoUrl: EMPTY_PLACEHOLDER,
-          typingDurationFrames: typingFrames,
-          revealDurationFrames: revealFrames,
-          durationInFrames: totalFrames,
-          ambientSoundUrl: undefined,
-          kidVoiceUrl: undefined,
-          adultVoiceUrl: undefined,
-          pdfPreviewUrl: undefined,
-          prompt: "",
-        } satisfies DemoReelProps
-      }
-      calculateMetadata={({ props }) => ({
-        durationInFrames: props.durationInFrames,
-      })}
-    />
+    <>
+      <Composition
+        id="DemoReel"
+        component={DemoReel}
+        durationInFrames={totalFrames}
+        fps={FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            typingVideoUrl: EMPTY_PLACEHOLDER,
+            revealVideoUrl: EMPTY_PLACEHOLDER,
+            typingDurationFrames: typingFrames,
+            revealDurationFrames: revealFrames,
+            durationInFrames: totalFrames,
+            ambientSoundUrl: undefined,
+            kidVoiceUrl: undefined,
+            adultVoiceUrl: undefined,
+            pdfPreviewUrl: undefined,
+            prompt: "",
+          } satisfies DemoReelProps
+        }
+        calculateMetadata={({ props }) => ({
+          durationInFrames: props.durationInFrames,
+        })}
+      />
+      {/* Ad video composition — 15s 9:16 @30fps. All 3 campaigns render
+          from this same composition with different inputProps. */}
+      <Composition
+        id="AdVideo"
+        component={AdVideo}
+        durationInFrames={15 * FPS}
+        fps={FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            campaignId: "impossible-request-trex",
+            headline: "",
+            subhead: undefined,
+            cta: "",
+            logoUrl: EMPTY_PLACEHOLDER,
+            lineArtUrl: EMPTY_PLACEHOLDER,
+            coloredUrl: undefined,
+            brollUrls: {},
+            musicUrl: EMPTY_PLACEHOLDER,
+            transitionSfxUrl: undefined,
+            scenes: [],
+          } satisfies AdVideoProps
+        }
+      />
+    </>
   );
 };

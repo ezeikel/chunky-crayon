@@ -380,6 +380,12 @@ importers:
       '@react-pdf/renderer':
         specifier: ^4.3.0
         version: 4.3.0(react@19.1.0)
+      '@remotion/bundler':
+        specifier: ^4.0.0
+        version: 4.0.448(@swc/core@1.15.7(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)(bufferutil@4.0.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@remotion/renderer':
+        specifier: ^4.0.0
+        version: 4.0.448(bufferutil@4.0.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2
@@ -515,6 +521,9 @@ importers:
       react-wrap-balancer:
         specifier: ^1.1.1
         version: 1.1.1(react@19.1.0)
+      remotion:
+        specifier: ^4.0.0
+        version: 4.0.449(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       resend:
         specifier: ^4.5.1
         version: 4.8.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -693,9 +702,15 @@ importers:
       '@remotion/fonts':
         specifier: ^4.0.0
         version: 4.0.448(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@remotion/paths':
+        specifier: ^4.0.450
+        version: 4.0.450
       '@remotion/renderer':
         specifier: ^4.0.0
         version: 4.0.448(bufferutil@4.0.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@remotion/transitions':
+        specifier: ^4.0.450
+        version: 4.0.450(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       ai:
         specifier: ^6.0.27
         version: 6.0.106(zod@3.25.76)
@@ -5533,6 +5548,15 @@ packages:
       react: 19.1.0
       react-dom: 19.1.0
 
+  '@remotion/paths@4.0.448':
+    resolution: {integrity: sha512-B9qKJeMJVwFAl7OnNi4yxL0DivQoCf9i9Tf2iRARjEAaTyI7GJGKG7df5oyoLm5uBE333vXpmX9tN+TgwjDSjg==}
+
+  '@remotion/paths@4.0.449':
+    resolution: {integrity: sha512-twbV9Vu+Hvn7e+ZmA1TWVJ95JfF5ZJIYPXZTzUBUkLaeWHNkX9sYG21cWHvosOiFNzdvqJiIjvr9LMLgk3S4gg==}
+
+  '@remotion/paths@4.0.450':
+    resolution: {integrity: sha512-lba2CtloxUrZesHADSfRHu+BGp+imvtODopY6s3lBP1Zvi20gX+YG7dr3XaWBiXkYw1jsUSe65ModFrHfrqBBg==}
+
   '@remotion/player@4.0.448':
     resolution: {integrity: sha512-lXwiJvAqlaUTwt5NGoGma9Md5IF9nf4Zetn6OAaNk0zTiXegUN42IFBSmzKZC8qUwNV10IpeLsTlQQEv4ntU1Q==}
     peerDependencies:
@@ -5541,6 +5565,12 @@ packages:
 
   '@remotion/renderer@4.0.448':
     resolution: {integrity: sha512-ST3Gfa7Ai0G4hqkWvk6J438tRXCVypv+x8KqKdfbIUK4v7A12eg/a1hlu5Sms7ncpFOnm10BwdtoyNpAlf68eg==}
+    peerDependencies:
+      react: 19.1.0
+      react-dom: 19.1.0
+
+  '@remotion/shapes@4.0.449':
+    resolution: {integrity: sha512-6BNgb/SQltXSVqexAnKR+s5pn+sdxHudaBg4CUK9f+7/goFrtn/ympGJZt4MJtnT2NXjNb9Yr/22GgFc7XxiiQ==}
     peerDependencies:
       react: 19.1.0
       react-dom: 19.1.0
@@ -5556,6 +5586,12 @@ packages:
 
   '@remotion/studio@4.0.448':
     resolution: {integrity: sha512-6uGyBFze2cDApuCf8OkJSy+ZIlWjJxVUuU29JF3vQ9OCz+OMqcJt0L+SxfUGvKihlq4PxG7Y75BMJOGuCiEMoA==}
+    peerDependencies:
+      react: 19.1.0
+      react-dom: 19.1.0
+
+  '@remotion/transitions@4.0.450':
+    resolution: {integrity: sha512-zxjRV9QghYCNwoZ84T+EC/yLAVgx+JDusgFbyxDeK7xVlUPpWRfM4IQCF4/BsJM/o71NP1ccQdIAE8FtLAO2Ow==}
     peerDependencies:
       react: 19.1.0
       react-dom: 19.1.0
@@ -13422,6 +13458,12 @@ packages:
       react: 19.1.0
       react-dom: 19.1.0
 
+  remotion@4.0.449:
+    resolution: {integrity: sha512-8M2PO5rDm0sJ4CnkjVMJFbz504WPlRg8Q/eU4ND6/nubBXAHVB8LwpehukZ/3tXuDF2Wd7pneL2E137EJjxSrg==}
+    peerDependencies:
+      react: 19.1.0
+      react-dom: 19.1.0
+
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -20624,6 +20666,34 @@ snapshots:
       '@react-pdf/primitives': 4.1.1
       '@react-pdf/stylesheet': 6.1.0
 
+  '@remotion/bundler@4.0.448(@swc/core@1.15.7(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)(bufferutil@4.0.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@remotion/media-parser': 4.0.448
+      '@remotion/studio': 4.0.448(bufferutil@4.0.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@remotion/studio-shared': 4.0.448(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@rspack/core': 1.7.6(@swc/helpers@0.5.17)
+      '@rspack/plugin-react-refresh': 1.6.1(react-refresh@0.18.0)
+      esbuild: 0.25.0
+      loader-utils: 2.0.4
+      postcss: 8.5.1
+      postcss-value-parser: 4.2.0
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      react-refresh: 0.18.0
+      remotion: 4.0.448(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      source-map: 0.7.3
+      style-loader: 4.0.0(webpack@5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1))
+      webpack: 5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.25.0)
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/helpers'
+      - bufferutil
+      - supports-color
+      - uglify-js
+      - utf-8-validate
+      - webpack-cli
+      - webpack-hot-middleware
+
   '@remotion/bundler@4.0.448(@swc/helpers@0.5.17)(bufferutil@4.0.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@remotion/media-parser': 4.0.448
@@ -20716,6 +20786,12 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       remotion: 4.0.448(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
+  '@remotion/paths@4.0.448': {}
+
+  '@remotion/paths@4.0.449': {}
+
+  '@remotion/paths@4.0.450': {}
+
   '@remotion/player@4.0.448(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       react: 19.1.0
@@ -20745,6 +20821,12 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+
+  '@remotion/shapes@4.0.449(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@remotion/paths': 4.0.448
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   '@remotion/streaming@4.0.448': {}
 
@@ -20802,6 +20884,14 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+
+  '@remotion/transitions@4.0.450(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@remotion/paths': 4.0.449
+      '@remotion/shapes': 4.0.449(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      remotion: 4.0.449(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   '@remotion/web-renderer@4.0.448(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
@@ -30064,6 +30154,11 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
+  remotion@4.0.449(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
   require-directory@2.1.1: {}
 
   require-from-string@2.0.2: {}
@@ -31050,6 +31145,10 @@ snapshots:
 
   stubborn-utils@1.0.2: {}
 
+  style-loader@4.0.0(webpack@5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1)):
+    dependencies:
+      webpack: 5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1)
+
   style-loader@4.0.0(webpack@5.105.0(esbuild@0.25.0)):
     dependencies:
       webpack: 5.105.0(esbuild@0.25.0)
@@ -31159,6 +31258,17 @@ snapshots:
     dependencies:
       ansi-escapes: 4.3.2
       supports-hyperlinks: 2.3.0
+
+  terser-webpack-plugin@5.4.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.25.0)(webpack@5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.31
+      jest-worker: 27.5.1
+      schema-utils: 4.3.3
+      terser: 5.46.1
+      webpack: 5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1)
+    optionalDependencies:
+      '@swc/core': 1.15.7(@swc/helpers@0.5.17)
+      esbuild: 0.25.0
 
   terser-webpack-plugin@5.4.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1)(webpack@5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1)):
     dependencies:
@@ -31869,6 +31979,38 @@ snapshots:
   webpack-sources@3.3.4: {}
 
   webpack-virtual-modules@0.6.2: {}
+
+  webpack@5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.25.0):
+    dependencies:
+      '@types/eslint-scope': 3.7.7
+      '@types/estree': 1.0.8
+      '@types/json-schema': 7.0.15
+      '@webassemblyjs/ast': 1.14.1
+      '@webassemblyjs/wasm-edit': 1.14.1
+      '@webassemblyjs/wasm-parser': 1.14.1
+      acorn: 8.16.0
+      acorn-import-phases: 1.0.4(acorn@8.16.0)
+      browserslist: 4.28.2
+      chrome-trace-event: 1.0.4
+      enhanced-resolve: 5.20.1
+      es-module-lexer: 2.0.0
+      eslint-scope: 5.1.1
+      events: 3.3.0
+      glob-to-regexp: 0.4.1
+      graceful-fs: 4.2.11
+      json-parse-even-better-errors: 2.3.1
+      loader-runner: 4.3.1
+      mime-types: 2.1.35
+      neo-async: 2.6.2
+      schema-utils: 4.3.3
+      tapable: 2.3.2
+      terser-webpack-plugin: 5.4.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.25.0)(webpack@5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1))
+      watchpack: 2.5.1
+      webpack-sources: 3.3.4
+    transitivePeerDependencies:
+      - '@swc/core'
+      - esbuild
+      - uglify-js
 
   webpack@5.105.0(@swc/core@1.15.7(@swc/helpers@0.5.17))(esbuild@0.27.1):
     dependencies:

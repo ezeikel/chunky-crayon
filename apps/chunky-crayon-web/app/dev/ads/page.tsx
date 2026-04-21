@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { cacheLife } from 'next/cache';
 import { campaigns } from '@/lib/ads/campaigns';
@@ -19,8 +19,24 @@ async function loadAssets(): Promise<AdAsset[]> {
   }
 }
 
+async function renderedVideos(): Promise<Set<string>> {
+  'use cache';
+  cacheLife('minutes');
+  const present = new Set<string>();
+  for (const c of campaigns) {
+    const path = resolve(process.cwd(), 'public', 'ads', `${c.id}--video.mp4`);
+    try {
+      await stat(path);
+      present.add(c.id);
+    } catch {
+      // not rendered yet
+    }
+  }
+  return present;
+}
+
 async function CampaignGrid() {
-  const assets = await loadAssets();
+  const [assets, videos] = await Promise.all([loadAssets(), renderedVideos()]);
   const byKey = Object.fromEntries(assets.map((a) => [a.key, a])) as Record<
     string,
     AdAsset | undefined
@@ -37,6 +53,7 @@ async function CampaignGrid() {
     >
       {campaigns.map((c) => {
         const asset = byKey[c.asset.key];
+        const hasVideo = videos.has(c.id);
         return (
           <Link
             key={c.id}
@@ -56,16 +73,30 @@ async function CampaignGrid() {
           >
             <div
               style={{
-                aspectRatio: '4 / 5',
+                aspectRatio: hasVideo ? '9 / 16' : '4 / 5',
                 background: '#FDF6E3',
                 borderRadius: 8,
                 overflow: 'hidden',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                position: 'relative',
               }}
             >
-              {asset ? (
+              {hasVideo ? (
+                <video
+                  src={`/ads/${c.id}--video.mp4`}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+              ) : asset ? (
                 <img
                   src={asset.url}
                   alt=""
@@ -79,6 +110,24 @@ async function CampaignGrid() {
                 <span style={{ color: '#b4a58e', fontSize: 14 }}>
                   Not generated
                 </span>
+              )}
+              {hasVideo && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    background: 'rgba(0,0,0,0.7)',
+                    color: '#fff',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: '4px 8px',
+                    borderRadius: 999,
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  ▶ 15s VIDEO
+                </div>
               )}
             </div>
             <div
@@ -95,6 +144,7 @@ async function CampaignGrid() {
               Template: <code>{c.template}</code> · Asset:{' '}
               <code>{c.asset.key}</code>
               {c.asset.generateColoredVariant ? ' (with colored variant)' : ''}
+              {c.video ? ' · video' : ''}
             </div>
             <div
               style={{ fontSize: 13, color: '#8b7862', fontStyle: 'italic' }}

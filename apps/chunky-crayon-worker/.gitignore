@@ -5,3 +5,6 @@ dist
 recordings/
 out/
 *.log
+
+# Ad render staging scratch
+public/ad-assets/

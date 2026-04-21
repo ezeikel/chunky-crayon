@@ -116,4 +116,48 @@ export async function generateAmbientSound(prompt: string): Promise<Buffer> {
   return Buffer.from(await res.arrayBuffer());
 }
 
+/**
+ * Generate a short sound effect via ElevenLabs /v1/sound-generation.
+ *
+ * Used today for ad-video transition whooshes. TODO: swap to curated
+ * Epidemic Sound clips (matching the PTP pattern at
+ * parking-ticket-pal/apps/web/lib/music.ts) once we have a subscription
+ * — licensed library SFX are more consistent than AI-generated ones.
+ *
+ * @param prompt - Short descriptive phrase, e.g. "soft paper page turn whoosh"
+ * @param durationSeconds - 0.5-22 seconds (ElevenLabs limits)
+ * @returns MP3 audio buffer
+ */
+export async function generateSoundEffect(
+  prompt: string,
+  durationSeconds = 1,
+): Promise<Buffer> {
+  const apiKey = process.env.ELEVENLABS_API_KEY;
+  if (!apiKey) {
+    throw new Error('ELEVENLABS_API_KEY is not configured');
+  }
+
+  const res = await fetch('https://api.elevenlabs.io/v1/sound-generation', {
+    method: 'POST',
+    headers: {
+      'xi-api-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text: prompt,
+      duration_seconds: durationSeconds,
+      prompt_influence: 0.4,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(
+      `ElevenLabs sound generation failed (${res.status}): ${err}`,
+    );
+  }
+
+  return Buffer.from(await res.arrayBuffer());
+}
+
 export { COLO_VOICE_ID };
