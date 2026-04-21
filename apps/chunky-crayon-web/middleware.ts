@@ -131,6 +131,12 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Skip i18n for dev-only routes (ad previews etc.) — they aren't translated
+  // and need their own root layout. Gated to NODE_ENV=development at the page.
+  if (pathname.startsWith('/dev/')) {
+    return NextResponse.next();
+  }
+
   // Handle PostHog ingest routes first
   if (pathname.startsWith('/ingest')) {
     // Determine the correct PostHog host based on path
