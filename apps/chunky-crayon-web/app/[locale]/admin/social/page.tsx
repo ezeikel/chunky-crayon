@@ -1,9 +1,8 @@
 import { Suspense } from 'react';
-import { redirect } from 'next/navigation';
-import { auth } from '@/auth';
+import { connection } from 'next/server';
 import Loading from '@/components/Loading/Loading';
 import { db } from '@one-colored-pixel/db';
-import { ADMIN_EMAILS } from '@/constants';
+import { requireAdmin } from '@/lib/auth-guards';
 import SocialConnections from './SocialConnections';
 
 const getSocialTokenStatus = async () => {
@@ -31,12 +30,12 @@ const getSocialTokenStatus = async () => {
 };
 
 const AdminSocialContent = async () => {
-  const session = await auth();
+  // Cache Components: opt into dynamic render before auth() runs.
+  await connection();
 
-  // Check if user is authenticated and is an admin
-  if (!session?.user?.email || !ADMIN_EMAILS.includes(session.user.email)) {
-    redirect('/');
-  }
+  // User-facing admin dashboard — redirect on fail so a 404 doesn't look
+  // broken if someone bookmarked it before joining the admin list.
+  await requireAdmin('redirect');
 
   const tokenStatus = await getSocialTokenStatus();
 

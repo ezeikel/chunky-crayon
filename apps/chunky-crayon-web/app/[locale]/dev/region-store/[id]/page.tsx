@@ -4,8 +4,7 @@ import { connection } from 'next/server';
 import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
 import type { RegionStoreJson } from '@one-colored-pixel/coloring-core';
-import { auth } from '@/auth';
-import { ADMIN_EMAILS } from '@/constants';
+import { requireAdmin } from '@/lib/auth-guards';
 import RegionStoreViewer from './RegionStoreViewer';
 
 type PageProps = {
@@ -22,19 +21,13 @@ type PageProps = {
  * Access: localhost (NODE_ENV=development) OR authenticated admin user in prod.
  */
 const RegionStoreDebugContent = async ({ params }: PageProps) => {
-  // Opt into dynamic rendering — auth() + DB read are per-request, and we
-  // want a fresh read that bypasses the getColoringImageBase cache (which
-  // doesn't select the new region store columns yet).
-  // Must come BEFORE auth() so Cache Components knows this page is dynamic.
+  // Opt into dynamic rendering — must come BEFORE requireAdmin() so
+  // Cache Components knows this page is dynamic per request.
   await connection();
 
-  const session = await auth();
-  const isAdmin =
-    !!session?.user?.email && ADMIN_EMAILS.includes(session.user.email);
-  const isDev = process.env.NODE_ENV === 'development';
-
-  if (!isDev && !isAdmin) {
-    notFound();
+  // Gate: admin-only in prod; localhost bypasses via NODE_ENV check.
+  if (process.env.NODE_ENV !== 'development') {
+    await requireAdmin();
   }
 
   const { id } = await params;
