@@ -2,8 +2,8 @@ import {
   AbsoluteFill,
   Audio,
   Img,
+  OffthreadVideo,
   Sequence,
-  Video,
   interpolate,
   spring,
   useCurrentFrame,
@@ -637,12 +637,15 @@ function BreathingWrap({ children }: { children: React.ReactNode }) {
 }
 
 function BrollScene({ videoUrl }: { videoUrl: string }) {
-  // Trim first / last ~6 frames to skip Seedance's "settling" moments.
+  // OffthreadVideo instead of Video — the DOM <video> seeking used by
+  // Remotion's Video component produces micro-jitter on AI-generated
+  // clips whose PTS timing isn't perfectly CFR. OffthreadVideo uses
+  // ffmpeg to extract frames, which is seek-accurate. Same fix AM's
+  // ProductReel landed on for identical symptoms.
   return (
     <AbsoluteFill style={{ background: "#000" }}>
-      <Video
+      <OffthreadVideo
         src={videoUrl}
-        startFrom={6}
         style={{ width: "100%", height: "100%", objectFit: "cover" }}
       />
     </AbsoluteFill>
@@ -696,21 +699,14 @@ export function AdVideo(props: AdVideoProps) {
   const TRANSITION_FRAMES = 15;
 
   /**
-   * Picks a transition presentation for each scene boundary. PTP pattern:
-   * slide for hard cuts between different scene types, fade for softer
-   * continuations. For our 3-scene ads:
-   *   - hook → b-roll:  slide (dramatic reveal of real-world context)
-   *   - b-roll → outro: fade (settles into the CTA)
+   * Picks a transition presentation for each scene boundary.
+   *
+   * We use `fade()` everywhere. Slide into b-roll pulled the clip's opening
+   * still frame into view while the text was still on screen, which read
+   * as the text getting cut off mid-breath. A fade reads as a beat
+   * between scenes instead of an interruption.
    */
-  const pickPresentation = (fromKind: string, toKind: string) => {
-    // Slide between a text scene and anything visual — it's the big cut.
-    if (fromKind === "text-reveal" || fromKind === "line-art-draw") {
-      return slide({ direction: "from-right" });
-    }
-    // Broll or phone-mockup → outro: soft fade.
-    if (toKind === "brand-outro") {
-      return fade();
-    }
+  const pickPresentation = (_fromKind: string, _toKind: string) => {
     return fade();
   };
 

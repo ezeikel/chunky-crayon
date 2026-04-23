@@ -11,6 +11,7 @@ import cn from '@/utils/cn';
 import { Input } from '@/components/ui/input';
 import { joinColoringPageEmailList } from '@/app/actions/email';
 import { trackEvent } from '@/utils/analytics-client';
+import { trackSignUp } from '@/utils/pixels';
 import { TRACKING_EVENTS } from '@/constants';
 
 type JoinColoringPageEmailListFormProps = {
@@ -53,6 +54,10 @@ const JoinColoringPageEmailListForm = ({
       trackEvent(TRACKING_EVENTS.EMAIL_SIGNUP_COMPLETED, {
         location,
       });
+
+      // Fire Meta CompleteRegistration + Pinterest signup so ad platforms
+      // can optimize for signup conversions, not just landing page views.
+      trackSignUp({ method: 'email' });
 
       if (emailInputRef.current) {
         emailInputRef.current.value = '';

@@ -85,6 +85,20 @@ async function main() {
         await page.goto(url, { waitUntil: 'networkidle' });
         // Give any async images a beat
         await page.waitForTimeout(300);
+        // Hide the Next.js dev indicator overlay (and any other dev chrome)
+        // before screenshotting — it's injected as a separate root element
+        // outside our app tree.
+        await page.addStyleTag({
+          content: `
+            nextjs-portal,
+            [data-nextjs-dev-tools-button],
+            [data-nextjs-toast] { display: none !important; }
+            html { overflow: hidden !important; scrollbar-gutter: auto !important; }
+            body { overflow: hidden !important; margin: 0 !important; }
+            /* Kill any scrollbar reservation — ad canvas should be flush to edge. */
+            html::-webkit-scrollbar, body::-webkit-scrollbar { display: none !important; width: 0 !important; }
+          `,
+        });
         await page.screenshot({
           path: outPath,
           type: 'png',

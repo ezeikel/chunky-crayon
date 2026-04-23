@@ -5,23 +5,27 @@
 // Three variants exist — the render pipeline picks a random one per scene
 // boundary so the same ad doesn't use identical whooshes back-to-back.
 
-const { R2_PUBLIC_URL } = process.env;
-
-const TRANSITION_SFX = R2_PUBLIC_URL
-  ? [
-      `${R2_PUBLIC_URL}/social/sfx/transition/transition-01.mp3`,
-      `${R2_PUBLIC_URL}/social/sfx/transition/transition-02.mp3`,
-      `${R2_PUBLIC_URL}/social/sfx/transition/transition-03.mp3`,
-    ]
-  : [];
+// Reads R2_PUBLIC_URL lazily — ES module imports are hoisted, so at
+// import time dotenv.config() hasn't run yet in tsx scripts. Reading
+// inside the function means the env var is resolved at call time.
+function buildPool(): string[] {
+  const base = process.env.R2_PUBLIC_URL;
+  if (!base) return [];
+  return [
+    `${base}/social/sfx/transition/transition-01.mp3`,
+    `${base}/social/sfx/transition/transition-02.mp3`,
+    `${base}/social/sfx/transition/transition-03.mp3`,
+  ];
+}
 
 /** Pick a random transition whoosh from the pool. */
 export function getRandomTransitionSfx(): string | null {
-  if (!TRANSITION_SFX.length) return null;
-  return TRANSITION_SFX[Math.floor(Math.random() * TRANSITION_SFX.length)];
+  const pool = buildPool();
+  if (!pool.length) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 /** All transition SFX URLs (useful when we want per-boundary variety). */
 export function getAllTransitionSfx(): string[] {
-  return [...TRANSITION_SFX];
+  return buildPool();
 }

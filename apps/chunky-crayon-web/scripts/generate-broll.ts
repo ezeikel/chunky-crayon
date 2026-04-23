@@ -41,6 +41,7 @@ import { generateText } from 'ai';
 import { google } from '@ai-sdk/google';
 import { campaigns } from '../lib/ads/campaigns';
 import { expandBrollTemplate } from '../lib/ads/prompt-templates';
+import { judgeBrollClip, formatJudgementForCli } from '../lib/ads/judge';
 import type {
   AdAsset,
   BrollAsset,
@@ -248,6 +249,29 @@ async function generateOne(
   const localClipPath = await downloadClip(videoUrl, outDir);
   extractFrames(localClipPath, outDir);
 
+  // Run Opus judgement immediately so the human review step has pre-
+  // flagged issues. Judgement failure doesn't block the clip — user can
+  // still override via review CLI.
+  let judgement: BrollAsset['judgement'];
+  const framesDir = resolve(outDir, 'frames');
+  try {
+    console.log('  🧑‍⚖️  Opus judge (claude-opus-4-7)…');
+    const started = Date.now();
+    judgement = await judgeBrollClip(framesDir);
+    const seconds = ((Date.now() - started) / 1000).toFixed(1);
+    console.log(`  ✅ judged in ${seconds}s`);
+    console.log(
+      formatJudgementForCli(judgement)
+        .split('\n')
+        .map((l) => `  ${l}`)
+        .join('\n'),
+    );
+  } catch (err) {
+    console.warn(
+      `  ⚠️  judgement failed (non-blocking): ${(err as Error).message}`,
+    );
+  }
+
   return {
     stableId: spec.stableId,
     model,
@@ -257,6 +281,7 @@ async function generateOne(
     localClipPath: resolve(TEST_CLIPS, spec.stableId, 'clip.mp4'),
     generatedAt: new Date().toISOString(),
     seed,
+    judgement,
     reviewStatus: 'pending',
   };
 }

@@ -43,7 +43,7 @@ export const campaigns: Campaign[] = [
         },
         {
           start: 5,
-          duration: 5,
+          duration: 4,
           label:
             'PROOF — over-the-shoulder kid colouring the T-rex page with a red crayon',
           kind: 'broll',
@@ -61,8 +61,8 @@ export const campaigns: Campaign[] = [
           },
         },
         {
-          start: 10,
-          duration: 5,
+          start: 9,
+          duration: 6,
           label:
             'CTA — brand lockup + "Make their page" button spring-bounces in',
           kind: 'brand-outro',
@@ -93,16 +93,16 @@ export const campaigns: Campaign[] = [
       generateColoredVariant: true,
     },
     copy: {
-      headline: 'The 5pm\n“I’m bored”\nrescue.',
+      headline: 'Screen time,\nbut make it\ncrayons.',
       subhead:
-        'Print one coloring page. Or color it in the app. A new one every day.',
-      cta: 'Start free',
+        'Print a coloring page for the table. Or hand them your phone. Same page, zero guilt.',
+      cta: 'Try it free',
     },
     meta: {
       primaryText: [
-        'The 5pm “I’m bored” rescue. One printable coloring page. 20 minutes of quiet. Or color it in the app on the go. ☔',
-        'Raining again? Print a coloring page, or hand them your phone. 20 minutes of focused kid, your call on the format.',
-        'Crayons at home. Phone in the car. Same coloring page, either way. A new one every single day.',
+        'Screen time, but make it crayons. Print a coloring page for the table, or hand them your phone — same page, zero guilt. New one every day.',
+        'You’re in the car. They’re bored. You don’t want to hand them YouTube. Chunky Crayon is a coloring app that feels like paper — and you can print any page for free.',
+        'The screen-time dilemma, solved. Print one coloring page a day. Or color it in the app. Either way, 20 minutes of calm kid.',
       ],
     },
     video: {
@@ -112,9 +112,9 @@ export const campaigns: Campaign[] = [
           start: 0,
           duration: 4,
           label:
-            'HOOK — stacked type on crayon-orange, yellow highlight on "I\'m bored" at 2s, confetti burst',
+            'HOOK — stacked type on crayon-orange, yellow highlight on "crayons" at 2s, confetti burst',
           kind: 'text-reveal',
-          caption: 'The 5pm\n“I’m bored”\nrescue.',
+          caption: 'Screen time,\nbut make it\ncrayons.',
         },
         {
           start: 4,
@@ -178,7 +178,7 @@ export const campaigns: Campaign[] = [
         },
         {
           start: 3,
-          duration: 7,
+          duration: 4,
           label:
             'PROOF — over-the-shoulder kid colouring the dragon page with an orange crayon',
           kind: 'broll',
@@ -196,8 +196,8 @@ export const campaigns: Campaign[] = [
           },
         },
         {
-          start: 10,
-          duration: 5,
+          start: 7,
+          duration: 8,
           label:
             'CTA — colored dragon reveal + "Blank page to masterpiece." + "Try 2 free pages" button spring-bounces in',
           kind: 'brand-outro',

@@ -13,9 +13,15 @@
  * kind:'broll' carries its own BrollSpec.stableId; we look the clip up
  * by that id in broll-assets.json.
  *
+ * Review gate: by default, refuses to render any campaign whose b-roll
+ * hasn't been approved via scripts/review-broll.ts. Rejected clips fail
+ * hard. Pass --allow-pending to override for dev/debug renders (never
+ * for real ads).
+ *
  * Usage:
  *   pnpm tsx scripts/render-ad-videos.ts
  *   pnpm tsx scripts/render-ad-videos.ts --only=impossible-request-trex
+ *   pnpm tsx scripts/render-ad-videos.ts --allow-pending   # dev only
  */
 
 import { config } from 'dotenv';
@@ -85,6 +91,7 @@ async function resolveAssets(
   assets: AdAsset[],
   brollAssets: BrollAsset[],
   bundleLocation: string,
+  allowPending: boolean,
 ): Promise<ResolvedAssets> {
   const asset = assets.find((a) => a.key === campaign.asset.key);
   if (!asset) {
@@ -113,6 +120,16 @@ async function resolveAssets(
       if (!brollAsset) {
         throw new Error(
           `[${campaign.id}] scene ${i} requires broll "${stableId}" — run generate-broll.ts --only=${stableId}`,
+        );
+      }
+      if (brollAsset.reviewStatus === 'rejected') {
+        throw new Error(
+          `[${campaign.id}] broll "${stableId}" was rejected in review — regenerate via review-broll.ts (press r) before rendering`,
+        );
+      }
+      if (brollAsset.reviewStatus !== 'approved' && !allowPending) {
+        throw new Error(
+          `[${campaign.id}] broll "${stableId}" is ${brollAsset.reviewStatus} — run review-broll.ts to approve, or pass --allow-pending to override (not for real ads)`,
         );
       }
       const src = resolve(TEST_CLIPS, stableId, 'clip.mp4');
@@ -171,6 +188,7 @@ async function renderOne(
   assets: AdAsset[],
   brollAssets: BrollAsset[],
   bundleLocation: string,
+  allowPending: boolean,
 ) {
   if (!campaign.video) {
     console.log(`⏭️  ${campaign.id}: no video config, skipping`);
@@ -183,6 +201,7 @@ async function renderOne(
     assets,
     brollAssets,
     bundleLocation,
+    allowPending,
   );
 
   const inputProps = {
@@ -241,6 +260,7 @@ async function renderOne(
 async function main() {
   const args = new Set(process.argv.slice(2));
   const only = [...args].find((a) => a.startsWith('--only='))?.slice(7);
+  const allowPending = args.has('--allow-pending');
 
   const targets = only ? campaigns.filter((c) => c.id === only) : campaigns;
   if (only && targets.length === 0) {
@@ -264,9 +284,21 @@ async function main() {
   const bundleSeconds = ((Date.now() - bundleStarted) / 1000).toFixed(1);
   console.log(`✅ bundled at ${bundleLocation} in ${bundleSeconds}s`);
 
+  if (allowPending) {
+    console.log(
+      '⚠️  --allow-pending set: will render with pending/unreviewed broll. Not for real ads.',
+    );
+  }
+
   for (const campaign of targets) {
     try {
-      await renderOne(campaign, assets, brollAssets, bundleLocation);
+      await renderOne(
+        campaign,
+        assets,
+        brollAssets,
+        bundleLocation,
+        allowPending,
+      );
     } catch (err) {
       console.error(`❌ ${campaign.id}:`, err);
     }

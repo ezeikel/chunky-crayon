@@ -14,5 +14,87 @@
     "videoUrl": "https://v3b.fal.media/files/b/0a972c57/inZQDCudtldA7qRxQBZBd_video.mp4",
     "localClipPath": "/Users/ezeikel/Development/Personal/chunky-crayon/apps/chunky-crayon-web/test-clips/dragon-page-placed/clip.mp4",
     "generatedAt": "2026-04-21T18:01:22.813Z"
+  },
+  {
+    "stableId": "trex-over-shoulder-colouring",
+    "model": "kling-v3-pro",
+    "startStillUrl": "https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/uploads/ad-broll/trex-over-shoulder-colouring-start-1776809951960.png",
+    "videoUrl": "https://v3b.fal.media/files/b/0a97326d/sIN2lHiUfv0C0ci6VOXF2_output.mp4",
+    "localClipPath": "/Users/ezeikel/Development/Personal/chunky-crayon/apps/chunky-crayon-web/test-clips/trex-over-shoulder-colouring/clip.mp4",
+    "generatedAt": "2026-04-21T22:21:17.369Z",
+    "judgement": {
+      "verdict": "SHIP",
+      "criteria": {
+        "artworkStability": {
+          "pass": true,
+          "evidence": "Dinosaur, helmet, planets, and stars remain identical in position and detail across frames 1-5."
+        },
+        "compositionStability": {
+          "pass": true,
+          "evidence": "Page edges, water ring on table, and crayon pile stay locked in place across all 5 frames."
+        },
+        "handAnatomy": {
+          "pass": true,
+          "evidence": "The gripping hand shows a natural thumb-and-fingers crayon grip in frames 1-5 with no extra digits or morphing."
+        },
+        "colourPersistence": {
+          "pass": true,
+          "evidence": "Red crayon stroke added near the dinosaur's leg grows progressively from frame 1 through frame 5 and never disappears."
+        },
+        "motionPlausibility": {
+          "pass": true,
+          "evidence": "Arm makes small natural scribbling motions frame-to-frame consistent with a young child's coloring rhythm."
+        },
+        "aiGleam": {
+          "pass": true,
+          "evidence": "Wood table has realistic wear/water ring, crayon shavings are messily scattered in frames 1-5, and lighting looks like natural window light from an iPhone."
+        }
+      },
+      "judgedAt": "2026-04-21T22:21:17.368Z",
+      "model": "claude-opus-4-7"
+    },
+    "reviewStatus": "approved",
+    "reviewedAt": "2026-04-21T22:32:38.309Z"
+  },
+  {
+    "stableId": "dragon-over-shoulder-colouring",
+    "model": "kling-v3-pro",
+    "startStillUrl": "https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/uploads/ad-broll/dragon-over-shoulder-colouring-start-1776810095892.png",
+    "videoUrl": "https://v3b.fal.media/files/b/0a97327c/XFeo9Ch4nPxrYdzSO1Ess_output.mp4",
+    "localClipPath": "/Users/ezeikel/Development/Personal/chunky-crayon/apps/chunky-crayon-web/test-clips/dragon-over-shoulder-colouring/clip.mp4",
+    "generatedAt": "2026-04-21T22:23:39.888Z",
+    "judgement": {
+      "verdict": "SHIP",
+      "criteria": {
+        "artworkStability": {
+          "pass": true,
+          "evidence": "The dragon, window, and bunny illustrations remain consistent in shape and linework across frames 1-5 with no morphing of features."
+        },
+        "compositionStability": {
+          "pass": true,
+          "evidence": "Camera stays locked; the water ring, crumb, and crayon pile on the right hold the same positions across frames 1-5."
+        },
+        "handAnatomy": {
+          "pass": true,
+          "evidence": "The coloring hand shows a normal finger count and natural grip across frames 1-5, with no extra digits or impossible wrist angles."
+        },
+        "colourPersistence": {
+          "pass": true,
+          "evidence": "Orange fill on the dragon accumulates progressively (frames 1→5, notably new orange strokes below the belly in frames 3-5) and never disappears."
+        },
+        "motionPlausibility": {
+          "pass": true,
+          "evidence": "Arm and crayon motion progresses naturally from frame 1 to frame 5 with realistic small shifts, consistent with a child coloring."
+        },
+        "aiGleam": {
+          "pass": true,
+          "evidence": "Wood table shows authentic water ring, crumbs, and crayon shavings; lighting from the window is soft and natural, matching an iPhone snapshot aesthetic."
+        }
+      },
+      "judgedAt": "2026-04-21T22:23:39.887Z",
+      "model": "claude-opus-4-7"
+    },
+    "reviewStatus": "approved",
+    "reviewedAt": "2026-04-21T22:32:38.309Z"
   }
 ]
