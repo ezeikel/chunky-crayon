@@ -131,9 +131,12 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     name: Migrate Database
-    # Only run on push to main, not on PRs (PRs should not deploy).
-    # Both prior jobs must succeed; drift-check blocks bad migrations from reaching prod.
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Run on push to main OR on manual workflow_dispatch (from the same
+    # ref). Skip PRs. Both prior jobs must pass; drift-check blocks bad
+    # migrations from reaching prod.
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     needs: [validate-schema, check-drift]
 
     steps:
