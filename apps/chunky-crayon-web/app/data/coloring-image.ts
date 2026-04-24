@@ -35,10 +35,15 @@ export const getColoringImageBase = async (
   cacheLife('max');
   cacheTag('coloring-image', `coloring-image-${id}`);
 
-  // findUnique doesn't support compound filters so use findFirst to enforce brand
+  // Direct id lookup deliberately skips the `showInCommunity` filter
+  // that `brandWhere` enforces on list queries. Someone clicking a
+  // specific coloring-image link (hero polaroid, /start ad landing,
+  // shared URL, email) should always reach the image — even ad / demo
+  // images that are hidden from gallery feeds. Brand scope still
+  // applies so CC never serves a CH image.
   return db.coloringImage.findFirst({
     where: {
-      ...brandWhere,
+      brand: BRAND,
       id,
     },
     select: {

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { User } from '@one-colored-pixel/db/types';
 import {
@@ -328,8 +329,19 @@ const Header = async () => {
     <ScrollHeader>
       <Link
         href="/"
-        className="group flex items-center hover:scale-105 active:scale-95 transition-transform duration-200"
+        aria-label="Chunky Crayon — home"
+        className="group flex items-center gap-2 md:gap-2.5 hover:scale-105 active:scale-95 transition-transform duration-200"
       >
+        {/* Logo mark — same lockup used in Meta ads for brand continuity
+            when ad clickers land on the homepage. */}
+        <Image
+          src="/logos/cc-logo-no-bg.svg"
+          alt=""
+          width={32}
+          height={32}
+          priority
+          className="w-7 h-7 md:w-8 md:h-8 shrink-0"
+        />
         <h1 className="font-tondo text-2xl md:text-3xl font-bold text-gradient-orange tracking-tight">
           Chunky Crayon
         </h1>

@@ -94,7 +94,10 @@
   "homepage": {
     "heroEyebrow": "The first coloring app that takes requests.",
     "heroTitle": "Stop Googling \"dinosaur coloring page\" at 5pm.",
-    "heroSubtitle": "Your kid describes the scene. You get a printable coloring page in about 2 minutes. Print it, or color it in the app. 2 free pages to try — no account needed.",
+    "heroTitlePrefix": "Stop Googling ",
+    "heroTitleSuffix": " coloring page” at 5pm.",
+    "heroSubtitle": "Your kid describes the scene. You get a printable coloring page in about 2 minutes. Print it, or color it in the app. 2 free pages to try, no account needed.",
+    "heroThumbCaption": "Just like this one →",
     "heroCta": "Make their page",
     "cta": "Start Creating",
     "stats": {

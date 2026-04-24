@@ -39,9 +39,19 @@ const Footer = async ({ className }: FooterProps) => {
           <div className="mb-4">
             <Link
               href="/"
-              className="text-4xl font-bold"
+              aria-label="Chunky Crayon — home"
+              className="inline-flex items-center gap-3 text-4xl font-bold"
               style={{ fontFamily: 'Tondo, sans-serif' }}
             >
+              {/* Same lockup as header + Meta ads. Slightly bigger mark
+                  here since the footer isn't space-constrained. */}
+              <Image
+                src="/logos/cc-logo-no-bg.svg"
+                alt=""
+                width={44}
+                height={44}
+                className="w-10 h-10 md:w-11 md:h-11 shrink-0"
+              />
               {t('brand')}
             </Link>
           </div>
