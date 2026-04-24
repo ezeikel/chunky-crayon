@@ -1,9 +1,7 @@
 import { NextResponse, connection } from 'next/server';
 import { GenerationType } from '@one-colored-pixel/db';
-import {
-  createColoringImage,
-  isErrorResult,
-} from '@/app/actions/coloring-image';
+import { createColoringImage } from '@/app/actions/coloring-image';
+import { isErrorResult } from '@/app/actions/coloring-image-types';
 
 export const maxDuration = 300;
 

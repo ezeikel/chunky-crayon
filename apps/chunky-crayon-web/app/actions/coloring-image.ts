@@ -28,6 +28,11 @@ import { BRAND } from '@/lib/db';
 import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
 import { getAIDescription } from '@/lib/scene-generation';
 import type { ColoringImageSearchParams } from '@/types';
+import {
+  type CreateColoringImageResult,
+  isErrorResult,
+  isColoringImage,
+} from './coloring-image-types';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
@@ -178,18 +183,6 @@ const generateColoringImage = async (
     throw error;
   }
 };
-
-export type CreateColoringImageResult =
-  | Partial<ColoringImage>
-  | { error: string; credits: number };
-
-export const isErrorResult = (
-  result: CreateColoringImageResult,
-): result is { error: string; credits: number } => 'error' in result;
-
-const isColoringImage = (
-  result: CreateColoringImageResult,
-): result is Partial<ColoringImage> => !isErrorResult(result);
 
 const generateColoringImageWithMetadata = async (
   description: string,
