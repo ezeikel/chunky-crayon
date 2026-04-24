@@ -23,12 +23,16 @@ This project uses Neon PostgreSQL with branch-based development:
 
 ### Migrations
 
-**CRITICAL: Never use `prisma db push`** - it causes schema drift between the database and migration history.
+**CRITICAL rules — violating either causes dev↔prod drift:**
+
+1. **Never use `prisma db push`** — bypasses the migration history entirely.
+2. **Never hand-write migration files.** Always run `pnpm db:migrate` from `packages/db`. The CLI is the only thing that writes a row to dev's `_prisma_migrations` _and_ generates the correctly-hashed migration folder. Hand-writing the `migration.sql` file looks equivalent but leaves dev's `_prisma_migrations` empty for that migration — so when CI applies it to prod on merge, prod gets the row but dev never does. Result: same table exists on both, but `prisma migrate status` thinks dev is behind, and the next `pnpm db:migrate` on dev will fail with "drift detected."
+3. **Never run raw `ALTER TABLE` / `CREATE TABLE` directly on Neon** (via MCP, psql, Neon console, etc.) to change schema. Any schema change must start as a `schema.prisma` edit.
 
 #### Workflow
 
 1. **Make schema changes** in `packages/db/prisma/schema.prisma`
-2. **Create migration locally**: `cd packages/db && pnpm db:migrate`
+2. **Create migration locally**: `cd packages/db && pnpm db:migrate` — this generates the migration folder AND applies it to the dev Neon branch AND writes to dev's `_prisma_migrations`. Do not skip this step by writing the SQL file yourself.
 3. **Build the db package**: `pnpm build` (compiles TypeScript after Prisma generates client)
 4. **Commit & push** migration files to `main` branch
 5. **Auto-deploy**: GitHub Action runs `prisma migrate deploy` on production
@@ -45,6 +49,17 @@ This project uses Neon PostgreSQL with branch-based development:
 | `pnpm db:studio`   | Database GUI              | Debugging                       |
 
 **Important**: Always run `pnpm build` after `db:migrate` or `db:generate` to compile the updated Prisma client.
+
+#### Detecting drift
+
+To confirm dev and prod are in sync:
+
+```bash
+# From packages/db — compares local migrations folder with target DB:
+pnpm exec prisma migrate status
+```
+
+A CI check (see `.github/workflows/db-drift-check.yml`) runs `prisma migrate diff --exit-code` on every PR to catch any schema.prisma ↔ migrations folder mismatch before it reaches main.
 
 ## Project Structure
 
