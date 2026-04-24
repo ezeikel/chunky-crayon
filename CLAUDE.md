@@ -59,7 +59,7 @@ To confirm dev and prod are in sync:
 pnpm exec prisma migrate status
 ```
 
-A CI check (see `.github/workflows/db-drift-check.yml`) runs `prisma migrate diff --exit-code` on every PR to catch any schema.prisma ↔ migrations folder mismatch before it reaches main.
+A CI check (the `check-drift` job in `.github/workflows/database-migrations.yml`) runs `prisma migrate diff --exit-code` on every push to `main` and blocks the prod deploy if `schema.prisma` and `migrations/` have diverged.
 
 ## Project Structure
 
