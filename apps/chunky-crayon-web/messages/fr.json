@@ -229,7 +229,9 @@
           "answer": "Chaque page à colorier générée utilise 5 crédits. Les crédits se renouvellent chaque mois avec votre abonnement, et certaines formules permettent de reporter les crédits non utilisés. Vous pouvez aussi acheter des packs de crédits si vous avez besoin d’un petit boost de créativité !"
         }
       }
-    }
+    },
+    "heroEyebrow": "La 1re appli de coloriage qui réalise leurs souhaits.",
+    "heroCta": "Créer sa page"
   },
   "gallery": {
     "pageTitle": "Galerie de coloriages gratuits - Chunky Crayon",
@@ -1037,7 +1039,8 @@
         "fileTooLarge": "Cette image est trop grande ! Essaie-en une de moins de 10 Mo.",
         "invalidType": "Je ne peux pas lire ce type de fichier. Essaie une image JPEG, PNG ou WebP !",
         "processingFailed": "Hmm, je n’ai pas compris cette image. Essayons-en une autre !",
-        "cameraFailed": "Un souci est arrivé avec l’appareil photo. Réessayons !"
+        "cameraFailed": "Un souci est arrivé avec l’appareil photo. Réessayons !",
+        "heicUnsupported": "Les photos HEIC ne sont pas encore prises en charge. Enregistre d’abord en JPG ou PNG !"
       }
     },
     "placeholder": "ex. un bateau pirate qui navigue dans l’espace 🚀",
@@ -1056,7 +1059,11 @@
     "subtextNoCreditsSubscribed": "Besoin de plus de magie ? Recharge ou améliore pour garder la créativité en route !",
     "subtextNoCreditsNoSubscription": "Choisis un abonnement pour débloquer plus de créations",
     "subtextFallback": "Tu auras 15 crédits gratuits — de quoi créer 3 pages !",
-    "freeTriesChip": "{remaining, plural, =1 {# essai gratuit restant} other {# essais gratuits restants}}"
+    "freeTriesChip": "{remaining, plural, =1 {# essai gratuit restant} other {# essais gratuits restants}}",
+    "examplesLabel": "Essaie l’une de ces idées",
+    "exampleTrex": "Un T-rex astronaute sur un skateboard",
+    "exampleDragon": "Un dragon et un lapin à un goûter magique",
+    "exampleFoxes": "Une famille de renards en pique-nique"
   },
   "og": {
     "homepage": {

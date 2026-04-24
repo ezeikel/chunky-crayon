@@ -229,7 +229,9 @@
           "answer": "Cada página para colorear que generas usa 5 créditos. Los créditos se renuevan cada mes con tu suscripción, y algunos planes permiten acumular los créditos no usados. También puedes comprar packs de créditos si necesitas un empujoncito extra de creatividad."
         }
       }
-    }
+    },
+    "heroEyebrow": "La primera app de colorear que acepta pedidos.",
+    "heroCta": "Crea su página"
   },
   "gallery": {
     "pageTitle": "Galería de dibujos para colorear gratis - Chunky Crayon",
@@ -1037,7 +1039,8 @@
         "fileTooLarge": "¡Esa imagen es demasiado grande! Prueba una de menos de 10MB.",
         "invalidType": "No puedo leer ese tipo de archivo. ¡Prueba una imagen JPEG, PNG o WebP!",
         "processingFailed": "Mmm, no pude entender esa imagen. ¡Probemos con otra!",
-        "cameraFailed": "Algo salió mal con la cámara. ¡Intentémoslo de nuevo!"
+        "cameraFailed": "Algo salió mal con la cámara. ¡Intentémoslo de nuevo!",
+        "heicUnsupported": "Las fotos HEIC aún no son compatibles. ¡Guárdala primero como JPG o PNG!"
       }
     },
     "placeholder": "p. ej., un barco pirata navegando por el espacio 🚀",
@@ -1056,7 +1059,11 @@
     "subtextNoCreditsSubscribed": "¿Necesitas más magia? ¡Recarga o mejora tu plan para que la creatividad siga!",
     "subtextNoCreditsNoSubscription": "Elige una suscripción para desbloquear más creaciones",
     "subtextFallback": "Tendrás 15 créditos gratis — ¡suficientes para crear 3 páginas!",
-    "freeTriesChip": "{remaining, plural, =1 {Queda # intento gratis} other {Quedan # intentos gratis}}"
+    "freeTriesChip": "{remaining, plural, =1 {Queda # intento gratis} other {Quedan # intentos gratis}}",
+    "examplesLabel": "Prueba una de estas",
+    "exampleTrex": "Un T-rex astronauta en un monopatín",
+    "exampleDragon": "Un dragón y un conejito tomando el té",
+    "exampleFoxes": "Una familia de zorros de picnic"
   },
   "og": {
     "homepage": {

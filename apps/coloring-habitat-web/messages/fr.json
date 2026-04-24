@@ -335,7 +335,8 @@
         "fileTooLarge": "Image trop volumineuse. Veuillez utiliser une image de moins de 10 Mo.",
         "invalidType": "Format d'image invalide. Veuillez utiliser JPEG, PNG, WebP ou HEIC.",
         "processingFailed": "Impossible de traiter l'image. Veuillez réessayer.",
-        "cameraFailed": "L'appareil photo a échoué. Veuillez essayer d'importer une photo."
+        "cameraFailed": "L'appareil photo a échoué. Veuillez essayer d'importer une photo.",
+        "heicUnsupported": "Les images HEIC ne sont pas prises en charge. Enregistrez-les d’abord en JPG ou PNG."
       }
     }
   },

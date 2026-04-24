@@ -335,7 +335,8 @@
         "fileTooLarge": "Bild ist zu groß. Bitte verwende ein Bild unter 10 MB.",
         "invalidType": "Ungültiges Bildformat. Bitte verwende JPEG, PNG, WebP oder HEIC.",
         "processingFailed": "Das Bild konnte nicht verarbeitet werden. Bitte versuche es erneut.",
-        "cameraFailed": "Kamera fehlgeschlagen. Bitte versuche stattdessen ein Foto hochzuladen."
+        "cameraFailed": "Kamera fehlgeschlagen. Bitte versuche stattdessen ein Foto hochzuladen.",
+        "heicUnsupported": "HEIC-Bilder werden nicht unterstützt. Bitte zuerst als JPG oder PNG speichern."
       }
     }
   },

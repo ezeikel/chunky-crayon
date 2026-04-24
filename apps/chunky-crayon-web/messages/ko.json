@@ -229,7 +229,9 @@
           "answer": "색칠 도안 1장을 생성할 때 크레딧 5개가 사용돼요. 크레딧은 구독에 따라 매달 새로 충전되고, 일부 플랜은 남은 크레딧을 이월할 수 있어요. 더 필요하면 크레딧 팩을 추가로 구매할 수도 있답니다!"
         }
       }
-    }
+    },
+    "heroEyebrow": "요청하면 그려주는 첫 컬러링 앱!",
+    "heroCta": "우리 아이 페이지 만들기"
   },
   "gallery": {
     "pageTitle": "무료 색칠공부 갤러리 - Chunky Crayon",
@@ -1037,7 +1039,8 @@
         "fileTooLarge": "이미지가 너무 커요! 10MB보다 작은 걸로 해봐요.",
         "invalidType": "이 파일 형식은 읽을 수 없어요. JPEG, PNG, WebP 이미지를 사용해 주세요!",
         "processingFailed": "음… 이 이미지는 잘 이해가 안 돼요. 다른 걸로 해볼까요!",
-        "cameraFailed": "카메라에 문제가 생겼어요. 다시 해볼까요!"
+        "cameraFailed": "카메라에 문제가 생겼어요. 다시 해볼까요!",
+        "heicUnsupported": "아직 HEIC 사진은 지원하지 않아요. 먼저 JPG 또는 PNG로 저장해 주세요!"
       }
     },
     "placeholder": "예: 우주를 항해하는 해적선 🚀",
@@ -1056,7 +1059,11 @@
     "subtextNoCreditsSubscribed": "마법이 더 필요하신가요? 충전하거나 업그레이드해서 창작을 이어가요!",
     "subtextNoCreditsNoSubscription": "구독을 선택하고 더 많이 만들어요",
     "subtextFallback": "무료 크레딧 15개를 드려요 — 색칠공부 3장을 만들 수 있어요!",
-    "freeTriesChip": "{remaining, plural, =1 {무료 체험 #회 남음} other {무료 체험 #회 남음}}"
+    "freeTriesChip": "{remaining, plural, =1 {무료 체험 #회 남음} other {무료 체험 #회 남음}}",
+    "examplesLabel": "이렇게 해보세요",
+    "exampleTrex": "스케이트보드 타는 티라노 우주비행사",
+    "exampleDragon": "차 마시는 용과 토끼",
+    "exampleFoxes": "소풍 가는 여우 가족"
   },
   "og": {
     "homepage": {

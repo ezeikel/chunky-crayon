@@ -229,7 +229,9 @@
           "answer": "ぬりえを1枚生成するごとに5クレジット使います。クレジットはサブスクに合わせて毎月更新され、プランによっては未使用分の繰り越しも可能です。もっと作りたいときは、クレジットパックの購入もできます！"
         }
       }
-    }
+    },
+    "heroEyebrow": "リクエストできる、はじめてのぬりえアプリ。",
+    "heroCta": "ぬりえを作る"
   },
   "gallery": {
     "pageTitle": "無料ぬりえギャラリー - Chunky Crayon",
@@ -1037,7 +1039,8 @@
         "fileTooLarge": "画像が大きすぎるよ！10MBより小さいものを試してね。",
         "invalidType": "そのファイル形式は読めないよ。JPEG、PNG、WebPを試してね！",
         "processingFailed": "うーん、この画像はうまくわからなかったよ。別のにしてみよう！",
-        "cameraFailed": "カメラでエラーが起きたよ。もう一度やってみよう！"
+        "cameraFailed": "カメラでエラーが起きたよ。もう一度やってみよう！",
+        "heicUnsupported": "HEIC写真はまだ使えません。先にJPGかPNGで保存してね！"
       }
     },
     "placeholder": "例：宇宙を進む海賊船 🚀",
@@ -1056,7 +1059,11 @@
     "subtextNoCreditsSubscribed": "もっとまほうがほしい？追加またはアップグレードで、創作をつづけよう！",
     "subtextNoCreditsNoSubscription": "サブスクを選んで、もっと作れるようにしよう",
     "subtextFallback": "無料で15クレジットもらえるよ — ぬりえ3枚分！",
-    "freeTriesChip": "{remaining, plural, =1 {無料おためし 残り#回} other {無料おためし 残り#回}}"
+    "freeTriesChip": "{remaining, plural, =1 {無料おためし 残り#回} other {無料おためし 残り#回}}",
+    "examplesLabel": "どれか試してみてね",
+    "exampleTrex": "スケボーに乗ったTレックスの宇宙飛行士",
+    "exampleDragon": "お茶会をするドラゴンとうさぎ",
+    "exampleFoxes": "ピクニックをするキツネの家族"
   },
   "og": {
     "homepage": {

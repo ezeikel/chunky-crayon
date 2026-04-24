@@ -229,7 +229,9 @@
           "answer": "Jedes Ausmalbild, das du generierst, kostet 5 Credits. Deine Credits werden mit deinem Abo monatlich aufgefüllt, und bei manchen Plänen können ungenutzte Credits übertragen werden. Du kannst auch Credit-Pakete kaufen, wenn du einen extra Kreativ-Boost brauchst!"
         }
       }
-    }
+    },
+    "heroEyebrow": "Die erste Mal-App, die Wünsche erfüllt.",
+    "heroCta": "Ihre Seite erstellen"
   },
   "gallery": {
     "pageTitle": "Galerie kostenloser Ausmalbilder – Chunky Crayon",
@@ -1037,7 +1039,8 @@
         "fileTooLarge": "Dieses Bild ist zu groß! Nimm eins mit weniger als 10 MB.",
         "invalidType": "Diesen Dateityp kann ich nicht lesen. Probier ein JPEG-, PNG- oder WebP-Bild!",
         "processingFailed": "Hmm, dieses Bild konnte ich nicht verstehen. Lass uns ein anderes probieren!",
-        "cameraFailed": "Mit der Kamera ist etwas schiefgelaufen. Lass es uns nochmal versuchen!"
+        "cameraFailed": "Mit der Kamera ist etwas schiefgelaufen. Lass es uns nochmal versuchen!",
+        "heicUnsupported": "HEIC-Fotos werden noch nicht unterstützt. Bitte zuerst als JPG oder PNG speichern!"
       }
     },
     "placeholder": "z.B. ein Piratenschiff, das durch den Weltraum segelt 🚀",
@@ -1056,7 +1059,11 @@
     "subtextNoCreditsSubscribed": "Mehr Zauber gefällig? Lade auf oder upgrade, damit die Kreativität weitergeht!",
     "subtextNoCreditsNoSubscription": "Wähle ein Abo, um mehr Kreationen freizuschalten",
     "subtextFallback": "Du bekommst 15 Gratis-Credits — genug für 3 Seiten!",
-    "freeTriesChip": "{remaining, plural, =1 {# gratis Versuch übrig} other {# gratis Versuche übrig}}"
+    "freeTriesChip": "{remaining, plural, =1 {# gratis Versuch übrig} other {# gratis Versuche übrig}}",
+    "examplesLabel": "Probier eines davon",
+    "exampleTrex": "Ein T-Rex-Astronaut auf einem Skateboard",
+    "exampleDragon": "Ein Drache und ein Häschen beim Teekränzchen",
+    "exampleFoxes": "Eine Fuchsfamilie beim Picknick"
   },
   "og": {
     "homepage": {

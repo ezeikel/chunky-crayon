@@ -335,7 +335,8 @@
         "fileTooLarge": "画像が大きすぎます。10MB以下の画像を使用してください。",
         "invalidType": "無効な画像形式です。JPEG、PNG、WebP、またはHEICを使用してください。",
         "processingFailed": "画像を処理できませんでした。もう一度お試しください。",
-        "cameraFailed": "カメラが失敗しました。写真をアップロードしてみてください。"
+        "cameraFailed": "カメラが失敗しました。写真をアップロードしてみてください。",
+        "heicUnsupported": "HEIC画像は未対応です。先にJPGまたはPNGで保存してください。"
       }
     }
   },
