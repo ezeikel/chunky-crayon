@@ -1,6 +1,9 @@
 import { NextResponse, connection } from 'next/server';
 import { GenerationType } from '@one-colored-pixel/db';
-import { createColoringImage } from '@/app/actions/coloring-image';
+import {
+  createColoringImage,
+  isErrorResult,
+} from '@/app/actions/coloring-image';
 
 export const maxDuration = 300;
 
@@ -63,7 +66,7 @@ export async function POST(request: Request) {
   const result = await createColoringImage(formData);
   const elapsedMs = Date.now() - start;
 
-  if ('error' in result && result.error) {
+  if (isErrorResult(result)) {
     return NextResponse.json(
       { error: result.error, elapsedMs },
       { status: 500 },

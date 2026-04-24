@@ -179,11 +179,11 @@ const generateColoringImage = async (
   }
 };
 
-type CreateColoringImageResult =
+export type CreateColoringImageResult =
   | Partial<ColoringImage>
   | { error: string; credits: number };
 
-const isErrorResult = (
+export const isErrorResult = (
   result: CreateColoringImageResult,
 ): result is { error: string; credits: number } => 'error' in result;
 
