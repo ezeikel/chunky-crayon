@@ -21,6 +21,7 @@ import { writeFile, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { campaigns } from '../lib/ads/campaigns';
+import { adPurposeKey } from '../lib/coloring-image-purpose';
 import type { AdAsset, CampaignAsset } from '../lib/ads/schema';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -55,7 +56,11 @@ async function generateColoringPage(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       description: asset.prompt,
-      generationType: 'USER',
+      // SYSTEM + prefixed purposeKey marks this as a paid ad landing
+      // hero. getColoringImageForAdCampaign in app/data/coloring-image.ts
+      // resolves /start?utm_campaign=<key> back to this row.
+      generationType: 'SYSTEM',
+      purposeKey: adPurposeKey(asset.key),
     }),
   });
 

@@ -242,6 +242,7 @@ const generatePhotoColoringImageWithMetadata = async (
 const runPhotoPostProcessing = async (
   result: Partial<ColoringImage> & { id: string },
   userId: string | undefined,
+  durationMs: number,
 ) => {
   if (!result.url || !result.svgUrl) {
     return;
@@ -250,7 +251,7 @@ const runPhotoPostProcessing = async (
   const completedTrackingData = {
     coloringImageId: result.id,
     description: result.description ?? '',
-    durationMs: 0,
+    durationMs,
     creditsUsed: userId ? 5 : 0,
   };
   if (userId) {
@@ -359,6 +360,11 @@ export async function createColoringImageFromPhoto(
 ): Promise<CreateFromPhotoResult> {
   const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
 
+  // Capture end-to-end wait from when we start the credit-checked
+  // transaction through image generation + uploads. after() runs
+  // post-response so we stamp the elapsed time before handing off.
+  const startedAt = Date.now();
+
   if (userId) {
     const user = await db.user.findUnique({
       where: { id: userId },
@@ -398,7 +404,8 @@ export async function createColoringImageFromPhoto(
       },
     );
 
-    after(() => runPhotoPostProcessing(result, userId));
+    const authedDurationMs = Date.now() - startedAt;
+    after(() => runPhotoPostProcessing(result, userId, authedDurationMs));
 
     revalidateTag('all-coloring-images', { expire: 0 });
     revalidatePath('/');
@@ -411,7 +418,8 @@ export async function createColoringImageFromPhoto(
     locale,
   );
 
-  after(() => runPhotoPostProcessing(result, undefined));
+  const guestDurationMs = Date.now() - startedAt;
+  after(() => runPhotoPostProcessing(result, undefined, guestDurationMs));
 
   revalidateTag('all-coloring-images', { expire: 0 });
   revalidatePath('/');

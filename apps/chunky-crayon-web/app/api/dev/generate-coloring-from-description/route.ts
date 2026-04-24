@@ -32,6 +32,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as {
     description?: string;
     generationType?: string;
+    purposeKey?: string;
   };
 
   const description = body.description?.trim();
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
   const formData = new FormData();
   formData.append('description', description);
   formData.append('generationType', generationType);
+  if (body.purposeKey) formData.append('purposeKey', body.purposeKey);
 
   const start = Date.now();
   const result = await createColoringImage(formData);

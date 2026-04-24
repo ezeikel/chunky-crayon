@@ -198,6 +198,10 @@ const generateColoringImageWithMetadata = async (
   locale: string = 'en',
   sourcePrompt?: string,
   clientDistinctId?: string,
+  // System-purpose images (generationType !== USER) can carry a stable
+  // key so other parts of the app can look them up later. For AD images
+  // this is the campaign asset key ('trex' | 'foxes' | 'dragon').
+  purposeKey?: string,
 ) => {
   // Get language info for the locale (default to English if unknown)
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
@@ -290,6 +294,7 @@ const generateColoringImageWithMetadata = async (
       userId,
       profileId: activeProfile?.id,
       sourcePrompt: sourcePrompt || undefined,
+      purposeKey: purposeKey || undefined,
     },
   });
 
@@ -356,9 +361,17 @@ export const createColoringImage = async (
       (formData.get('generationType') as GenerationType) || undefined,
     locale: (formData.get('locale') as string) || 'en',
     clientDistinctId: (formData.get('clientDistinctId') as string) || undefined,
+    purposeKey: (formData.get('purposeKey') as string) || undefined,
   };
 
   const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
+
+  // Start timer BEFORE any work so the reported duration captures the
+  // full user-perceived wait (credit check → image gen → R2 upload). We
+  // stamp the end below, right after generation resolves but before the
+  // after() hook fires — after() runs post-response so timing taken
+  // inside it would be meaningless.
+  const startedAt = Date.now();
 
   // Check credits for authenticated users
   if (userId) {
@@ -400,6 +413,7 @@ export const createColoringImage = async (
           rawFormData.locale,
           rawFormData.description,
           rawFormData.clientDistinctId,
+          rawFormData.purposeKey,
         );
       },
       {
@@ -407,16 +421,17 @@ export const createColoringImage = async (
       },
     );
 
+    const durationMs = Date.now() - startedAt;
+
     after(async () => {
       if (!result.url || !result.svgUrl) {
         return;
       }
 
-      // Track creation completed
       await trackWithUser(userId, TRACKING_EVENTS.CREATION_COMPLETED, {
         coloringImageId: result.id,
         description: rawFormData.description,
-        durationMs: 0, // TODO: capture end-to-end timing
+        durationMs,
         creditsUsed: 5,
       });
 
@@ -518,20 +533,22 @@ export const createColoringImage = async (
     rawFormData.locale,
     rawFormData.description,
     rawFormData.clientDistinctId,
+    rawFormData.purposeKey,
   );
+
+  const durationMs = Date.now() - startedAt;
 
   after(async () => {
     if (!result.url || !result.svgUrl) {
       return;
     }
 
-    // Track creation completed (guest)
     await track(
       TRACKING_EVENTS.CREATION_COMPLETED,
       {
         coloringImageId: result.id,
         description: rawFormData.description,
-        durationMs: 0, // TODO: capture end-to-end timing
+        durationMs,
         creditsUsed: 0,
       },
       rawFormData.clientDistinctId,

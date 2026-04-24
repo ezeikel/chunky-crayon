@@ -1,13 +1,22 @@
 import { cacheLife, cacheTag } from 'next/cache';
-import { db, ColoringImage } from '@one-colored-pixel/db';
+import { db, ColoringImage, GenerationType } from '@one-colored-pixel/db';
 import { ACTIONS } from '@/constants';
 import type { ColoringImageSearchParams } from '@/types';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { BRAND } from '@/lib/db';
+import { adPurposeKey } from '@/lib/coloring-image-purpose';
 
-// Brand-scoped base where clause for all coloringImage queries
-const brandWhere = { brand: BRAND };
+// Brand-scoped base where clause for every coloringImage query. Relies
+// on `showInCommunity` for the public/private split — ad heroes, demo
+// fixtures, onboarding images are all flagged false at write time so
+// they never leak into galleries / daily pick / community feeds.
+// Callers that specifically need a hidden image must bypass this (see
+// getColoringImageForAdCampaign below).
+const brandWhere = {
+  brand: BRAND,
+  showInCommunity: true,
+};
 
 // Cached data fetching for coloring images using Next.js 16 Cache Components
 // Uses 'use cache' directive with cacheLife and cacheTag for:
@@ -312,4 +321,24 @@ export const getColoringImagesPaginated = async (
     cursor,
     limit,
   );
+};
+
+// Ad-campaign hero image lookup — lives outside the community feed
+// (showInCommunity=false). /start?utm_campaign=trex calls this with the
+// campaign key to load the exact image the visitor saw in the ad.
+// Returns null so callers can fall back to a default campaign.
+export const getColoringImageForAdCampaign = async (
+  campaignKey: string,
+): Promise<Partial<ColoringImage> | null> => {
+  'use cache';
+  cacheLife('max');
+  cacheTag('ad-coloring-image', `ad-coloring-image-${campaignKey}`);
+
+  return db.coloringImage.findFirst({
+    where: {
+      brand: BRAND,
+      generationType: GenerationType.SYSTEM,
+      purposeKey: adPurposeKey(campaignKey),
+    },
+  });
 };

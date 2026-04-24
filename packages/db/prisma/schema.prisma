@@ -180,6 +180,25 @@ model ColoringImage {
   // Multi-brand support
   brand Brand @default(CHUNKY_CRAYON)
 
+  // Stable, prefixed key for SYSTEM-purpose images. Convention:
+  //   ad:<campaign>       — paid ad landing heroes (e.g. 'ad:trex')
+  //   demo-reel           — Playwright-recorded product reel fixtures
+  //   onboarding-splash   — future onboarding images
+  //   legacy-weekly /     — one-off buckets for retired enum values
+  //   legacy-monthly        (historical interest only)
+  // Null for USER and DAILY rows. Query by prefix (LIKE 'ad:%') to find
+  // all images of a class, or exact match for a specific one.
+  purposeKey String?
+
+  // Controls public visibility. USER + DAILY images default true (they
+  // show in community galleries, daily pick, etc.). Ad heroes, demo
+  // reel fixtures, and onboarding splashes are set false so they never
+  // leak into user-facing feeds. Source-independent from generationType
+  // — a test seed can be SYSTEM with showInCommunity=true.
+  showInCommunity Boolean @default(true)
+
+  @@index([generationType, purposeKey])
+  @@index([showInCommunity])
   @@map("coloring_images")
 }
 
@@ -432,10 +451,11 @@ enum Brand {
 }
 
 enum GenerationType {
-  USER
-  DAILY
-  WEEKLY
-  MONTHLY
+  USER // Created by a real user clicking Create in the app.
+  DAILY // Daily cron scene. Kept distinct because scheduler, dedup, and content safety care about this category specifically.
+  WEEKLY // Retired — kept transitionally until the follow-up commit drops it after migrate-to-system-generation-type.ts has run against prod.
+  MONTHLY // Retired — same rationale as WEEKLY.
+  SYSTEM // Everything else programmatic — ads, demo reel fixtures, onboarding splashes, test seeds. Use purposeKey to distinguish.
 }
 
 enum Difficulty {
