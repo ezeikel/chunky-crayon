@@ -332,8 +332,8 @@ const DifficultyGalleryContent = async ({
           <p>
             Each coloring page can be colored online using our digital tools or
             downloaded and printed for traditional coloring with crayons,
-            colored pencils, or markers. Our AI-generated designs feature clean
-            lines and engaging details that make coloring fun and relaxing.
+            colored pencils, or markers. Every design features clean lines and
+            engaging details that make coloring fun and relaxing.
           </p>
         </div>
         <h3 className="font-tondo font-semibold text-xl text-text-primary mt-8 mb-3">

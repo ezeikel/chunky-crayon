@@ -171,7 +171,7 @@ export default async function LocaleLayout({ children, params }: Props) {
                   url: 'https://chunkycrayon.com',
                   name: 'Chunky Crayon',
                   description:
-                    'Create personalized coloring pages with AI. Free printable coloring pages for kids and adults.',
+                    'Create personalised coloring pages from any prompt. Free printable coloring pages for kids and adults.',
                   publisher: {
                     '@id': 'https://chunkycrayon.com/#organization',
                   },

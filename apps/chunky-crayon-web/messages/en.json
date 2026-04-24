@@ -198,15 +198,15 @@
         },
         "2": {
           "question": "Is it safe and appropriate for children?",
-          "answer": "Absolutely! Chunky Crayon is built by parents, for parents. All generated images are designed to be child-friendly with age-appropriate content. Our AI is specially tuned to create wholesome, fun coloring pages suitable for children of all ages."
+          "answer": "Absolutely. Chunky Crayon is built by parents, for parents. Every page we draw is child-friendly and age-appropriate, tuned for wholesome fun across a wide age range."
         },
         "3": {
           "question": "How do I create a coloring page?",
-          "answer": "It's as easy as 1-2-3! Just type what you want to color (e.g., \"a unicorn in a magical forest\"), click Generate, and wait about 30 seconds. Your unique coloring page will appear ready to download and print. You can also use voice input or upload a photo for inspiration!"
+          "answer": "It's as easy as 1-2-3. Just type what you want to color (e.g. \"a unicorn in a magical forest\"), click Generate, and wait about 2 minutes. Your coloring page will be ready to download and print. You can also use voice input or upload a photo for inspiration."
         },
         "4": {
           "question": "How long does it take to generate a page?",
-          "answer": "Most coloring pages are ready in about 30 seconds. Our friendly mascot Colo will keep you entertained while you wait! Complex scenes with lots of details might take a tiny bit longer."
+          "answer": "Most coloring pages are ready in about 2 minutes. Our friendly mascot Colo keeps you entertained while you wait. Complex scenes with lots of details might take a little longer."
         },
         "5": {
           "question": "Can I print the coloring pages?",
@@ -214,7 +214,7 @@
         },
         "6": {
           "question": "What if my child's request doesn't work?",
-          "answer": "Sometimes the AI might not get it quite right on the first try - that's part of the creative adventure! You can simply try again with slightly different words. Tips: be specific about what you want, and describe the scene clearly. If you're stuck, try our voice input - kids often explain things better by talking!"
+          "answer": "Sometimes the first try doesn't quite land. That's part of the creative adventure. Try again with slightly different words. Tips: be specific about what you want, and describe the scene clearly. If you're stuck, try voice input, kids often explain things better by talking."
         },
         "7": {
           "question": "Is Chunky Crayon free to use?",
@@ -233,6 +233,77 @@
           "answer": "Each coloring page you generate uses 5 credits. Credits refresh monthly with your subscription, and some plans allow unused credits to roll over. You can also purchase credit packs if you need a little extra creativity boost!"
         }
       }
+    }
+  },
+  "start": {
+    "eyebrow": "The first coloring app that takes requests.",
+    "cta": "Try it free",
+    "ctaSubtext": "2 free pages. No account needed.",
+    "tryColoring": "Try coloring this one",
+    "hero": {
+      "trex": {
+        "title": "“Mum, can I color a T-rex on a skateboard?”",
+        "subtitle": "Yeah, actually. Your kid describes the scene. You get a printable coloring page in about 2 minutes. Print it, or color it in the app."
+      },
+      "foxes": {
+        "title": "Screen time, but make it crayons.",
+        "subtitle": "The 5pm rescue, sorted. Print one coloring page for the table, or hand them your phone. Same page, zero guilt."
+      },
+      "dragon": {
+        "title": "From “dragon tea party” to a real coloring page.",
+        "subtitle": "Your kid describes any scene. We draw it. Print it, or color it in the app. Every page is one they actually want to color."
+      },
+      "default": {
+        "title": "Your kid describes it. We draw the coloring page.",
+        "subtitle": "A T-rex astronaut. A dragon tea party. A fox family picnic. Whatever they imagine, printable in about 2 minutes."
+      }
+    },
+    "problem": {
+      "title": "The 5pm “I’m bored” rescue.",
+      "body": "You’re tired. They want crayons. You want quiet. But the printed-out dinosaur page from last week has been colored three times already. Chunky Crayon makes a new one from whatever scene your kid describes, in about 2 minutes."
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "steps": {
+        "describe": {
+          "title": "They describe the scene",
+          "body": "Talk, type, or snap a photo. Whatever’s in their head."
+        },
+        "draw": {
+          "title": "We draw the coloring page",
+          "body": "About 2 minutes from prompt to printable."
+        },
+        "color": {
+          "title": "Print it or color in the app",
+          "body": "Crayons on the table. Finger on the phone. Your call."
+        }
+      }
+    },
+    "features": {
+      "title": "Everything in one app.",
+      "items": {
+        "unlimited": {
+          "title": "Any scene, any subject",
+          "body": "Dinosaur astronauts. Unicorn dentists. Siblings in space. If they can describe it, we can draw it."
+        },
+        "print": {
+          "title": "Print-ready or on-screen",
+          "body": "Every coloring page is a clean PDF plus an interactive canvas. Choose the one that fits the moment."
+        },
+        "daily": {
+          "title": "A fresh page every day",
+          "body": "Prefer surprises? A free new coloring page arrives in your inbox every day."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Free to try. Plans from £7.99/month.",
+      "body": "Start with 2 free generations, no account needed. Love it? Plans scale from occasional coloring to everyday use.",
+      "cta": "See all plans"
+    },
+    "finalCta": {
+      "title": "One coloring page away from 20 minutes of quiet.",
+      "body": "Type a scene. We’ll draw it. No account needed to try."
     }
   },
   "gallery": {
@@ -313,7 +384,7 @@
     },
     "seo": {
       "aboutTitle": "About Our Free Coloring Pages",
-      "aboutParagraph1": "Welcome to Chunky Crayon's free coloring page gallery! We offer a growing collection of printable coloring pages perfect for kids and adults alike. Our AI-powered tools help create unique, engaging coloring pages across a wide range of categories.",
+      "aboutParagraph1": "Welcome to Chunky Crayon's free coloring page gallery. A growing collection of printable coloring pages for kids and adults alike. Describe the scene you want and we'll draw a unique page across a wide range of categories.",
       "aboutParagraph2": "Every day, we add a new daily coloring page that you can color online using our digital tools or download and print for traditional coloring. Our community members also contribute their creative prompts, adding even more variety to our collection.",
       "aboutParagraph3": "Browse by category to find exactly what you're looking for, whether it's cute animal coloring pages, fantasy creatures like dragons and unicorns, or seasonal holiday themes. Each page is designed with clean lines that are perfect for coloring."
     },
@@ -345,7 +416,7 @@
       "createAPage": "Create a Page",
       "freeColoringPages": "Free {category} Coloring Pages",
       "lookingFor": "Looking for the perfect {category} coloring page? You've come to the right place! Our collection features a wide variety of {category} designs perfect for kids and adults alike.",
-      "eachPageDescription": "Each coloring page can be colored online using our digital tools or downloaded and printed for traditional coloring with crayons, colored pencils, or markers. Our AI-generated designs feature clean lines and engaging details that make coloring fun and relaxing.",
+      "eachPageDescription": "Each coloring page can be colored online using our digital tools or downloaded and printed for traditional coloring with crayons, colored pencils, or markers. Every design features clean lines and engaging details that make coloring fun and relaxing.",
       "popularThemes": "Popular {category} Themes",
       "includesPopular": "Our {category} category includes popular searches like:"
     },
@@ -429,7 +500,7 @@
         "seoTitle": "Free Coloring Pages for Teenagers",
         "seoParagraph1": "Looking for coloring pages that aren't \"too kiddy\"? Our teen collection features cool, detailed designs perfect for ages 13-17. From anime characters and gaming scenes to fantasy worlds and abstract patterns, there's something for every style.",
         "seoParagraph2": "These aren't your little sibling's coloring pages. Our teenage designs feature intricate details, dynamic compositions, and themes that resonate with teen interests. Perfect for creative expression, stress relief during study breaks, or just chilling.",
-        "seoParagraph3": "Create your own custom coloring pages by describing exactly what you want. Want a dragon fighting a robot in space? An anime-style portrait? A detailed mandala with your favorite symbols? Just describe it and our AI brings it to life!",
+        "seoParagraph3": "Create your own custom coloring pages by describing exactly what you want. Want a dragon fighting a robot in space? An anime-style portrait? A detailed mandala with your favorite symbols? Just describe it and we'll bring it to life.",
         "popularTitle": "Popular Teen Themes",
         "popularDescription": "Our most popular categories for teens include: anime and manga coloring pages, fantasy creature coloring pages, superhero action scenes, gaming-inspired art, space and sci-fi designs, and intricate pattern pages. Each category offers detailed, engaging designs."
       },
@@ -448,7 +519,7 @@
         "seoTitle": "Free Coloring Pages for Adults",
         "seoParagraph1": "Adult coloring has become a popular wellness activity, and for good reason. Studies show that coloring can reduce anxiety, improve focus, and provide a calming break from our screen-filled lives. Our collection offers beautiful, intricate designs perfect for grown-ups.",
         "seoParagraph2": "From detailed mandalas that promote mindfulness to peaceful nature scenes and elegant patterns, each page is designed to provide hours of relaxing creativity. Print on quality paper and use your favorite coloring tools - colored pencils, markers, or gel pens all work beautifully.",
-        "seoParagraph3": "Want something unique? Create your own custom coloring pages! Describe your perfect relaxation scene - a zen garden, an Art Nouveau pattern, or a detailed botanical illustration - and our AI will bring your vision to life.",
+        "seoParagraph3": "Want something unique? Create your own custom coloring pages. Describe your perfect relaxation scene (a zen garden, an Art Nouveau pattern, a detailed botanical illustration), and we'll bring your vision to life.",
         "popularTitle": "Popular Adult Coloring Themes",
         "popularDescription": "Explore our most popular adult categories: mandala coloring pages for meditation, intricate nature and botanical designs, geometric patterns, Art Deco and Art Nouveau styles, zentangle-inspired pages, and peaceful landscape scenes. Each offers a unique path to relaxation."
       }
@@ -467,7 +538,7 @@
     "creditsPerMonth": "credits/month",
     "included": {
       "title": "Every plan includes",
-      "aiCreation": "AI-powered coloring page creation",
+      "aiCreation": "Unlimited custom coloring page creation",
       "colorOnline": "Color online or download to print",
       "saveFavorites": "Save favorites to your account",
       "shareCreations": "Share creations with friends",
@@ -894,7 +965,7 @@
     "kidsPage": "Kids coloring page",
     "teenPage": "Teen coloring page",
     "adultPage": "Adult coloring page",
-    "ogImage": "Chunky Crayon AI-Generated Coloring Book Pages"
+    "ogImage": "Chunky Crayon Custom Coloring Book Pages"
   },
   "metadata": {
     "keywords": "coloring book pages, creative app for kids, personalized coloring pages, educational worksheets, fun learning activities, kids creativity app, interactive coloring app, digital coloring, printable coloring pages"
@@ -1074,7 +1145,7 @@
       "tagline": "Creative Coloring & Learning Fun",
       "features": {
         "pages": "10,000+ Pages",
-        "aiGenerated": "AI-Generated",
+        "aiGenerated": "Custom on Demand",
         "freePrintables": "Free Printables"
       }
     },

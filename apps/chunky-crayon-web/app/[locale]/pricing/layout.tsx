@@ -11,7 +11,7 @@ export async function generateMetadata({
   return {
     title: 'Pricing - Chunky Crayon',
     description:
-      'Choose the right plan for your family. Free coloring pages, premium features, and unlimited access to AI-generated coloring pages.',
+      'Choose the right plan for your family. Free coloring pages, premium features, and unlimited custom coloring pages.',
     keywords: [
       'coloring app pricing',
       'coloring pages subscription',

@@ -111,10 +111,9 @@ const CommunityGalleryContent = async () => {
             unique, reflecting the diverse imagination of our community members.
           </p>
           <p>
-            Want to contribute? Create your own coloring page using our
-            AI-powered generator. Simply describe what you&apos;d like to color,
-            and our tools will create a beautiful line drawing ready for
-            coloring.
+            Want to contribute? Create your own coloring page from any prompt.
+            Simply describe what you&apos;d like to color, and we&apos;ll draw a
+            beautiful line drawing ready for coloring.
           </p>
         </div>
       </section>

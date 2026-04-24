@@ -183,11 +183,11 @@ const DailyGalleryContent = async ({ locale }: { locale: string }) => {
         </h2>
         <div className="space-y-4 text-text-secondary leading-relaxed max-w-4xl">
           <p>
-            Never run out of coloring pages with our daily delivery service!
-            Each day, our AI generates a unique coloring page based on trending
-            themes, seasonal events, and creative inspiration. From cute animals
-            to fantastical creatures, you never know what tomorrow&apos;s page
-            will bring.
+            Never run out of coloring pages with our daily delivery service.
+            Every day, a unique coloring page arrives based on trending themes,
+            seasonal events, and creative inspiration. From cute animals to
+            fantastical creatures, you never know what tomorrow&apos;s page will
+            bring.
           </p>
           <p>
             Want to receive each daily page directly to your inbox? Sign up for
