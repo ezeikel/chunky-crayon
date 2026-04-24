@@ -129,13 +129,8 @@ const getEmailSubject = (generationType: GenerationType) => {
   const typeMap: Record<GenerationType, string> = {
     [GenerationType.DAILY]: 'Daily',
     [GenerationType.USER]: 'Custom',
-    // WEEKLY + MONTHLY are retired — we no longer generate them, but the
-    // enum retains them until the follow-up migration drops the values.
-    // SYSTEM images (ads, demos) shouldn't reach this email flow.
-    // All three fall back to 'Custom' to satisfy Record<enum, ...> and
-    // keep the email sendable if somehow invoked.
-    [GenerationType.WEEKLY]: 'Custom',
-    [GenerationType.MONTHLY]: 'Custom',
+    // SYSTEM images (ads, demos) shouldn't reach this email flow, but
+    // Record<enum, ...> requires full coverage. Fall back to 'Custom'.
     [GenerationType.SYSTEM]: 'Custom',
   };
 
@@ -151,8 +146,6 @@ const getEmailFilename = (generationType: GenerationType) => {
   const typeMap: Record<GenerationType, string> = {
     [GenerationType.DAILY]: 'Daily',
     [GenerationType.USER]: 'Custom',
-    [GenerationType.WEEKLY]: 'Custom',
-    [GenerationType.MONTHLY]: 'Custom',
     [GenerationType.SYSTEM]: 'Custom',
   };
 

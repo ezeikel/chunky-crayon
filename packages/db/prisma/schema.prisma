@@ -453,8 +453,6 @@ enum Brand {
 enum GenerationType {
   USER // Created by a real user clicking Create in the app.
   DAILY // Daily cron scene. Kept distinct because scheduler, dedup, and content safety care about this category specifically.
-  WEEKLY // Retired — kept transitionally until the follow-up commit drops it after migrate-to-system-generation-type.ts has run against prod.
-  MONTHLY // Retired — same rationale as WEEKLY.
   SYSTEM // Everything else programmatic — ads, demo reel fixtures, onboarding splashes, test seeds. Use purposeKey to distinguish.
 }
 

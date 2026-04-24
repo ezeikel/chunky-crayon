@@ -92,9 +92,10 @@
     }
   },
   "homepage": {
-    "heroTitle": "Unleash your child's",
-    "heroTitleSuffix": "today",
-    "heroSubtitle": "From vibrant coloring pages to imaginative adventures, Chunky Crayon transforms creativity into pure joy.",
+    "heroEyebrow": "The first coloring app that takes requests.",
+    "heroTitle": "Stop Googling \"dinosaur coloring page\" at 5pm.",
+    "heroSubtitle": "Your kid describes the scene. You get a printable coloring page in about 2 minutes. Print it, or color it in the app. 2 free pages to try — no account needed.",
+    "heroCta": "Make their page",
     "cta": "Start Creating",
     "stats": {
       "coloringPagesCreated": "Coloring Pages Created",
@@ -981,7 +982,11 @@
   "createForm": {
     "title": "Create Magic!",
     "tagline": "Type, talk, or snap a photo!",
-    "generatingMessage": "Ready in about 30 seconds!",
+    "generatingMessage": "Ready in about 2 minutes!",
+    "examplesLabel": "Try one of these",
+    "exampleTrex": "A T-rex astronaut on a skateboard",
+    "exampleDragon": "A dragon and bunny having a tea party",
+    "exampleFoxes": "A family of foxes having a picnic",
     "inputModes": {
       "type": "Type",
       "talk": "Talk",

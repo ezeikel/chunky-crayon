@@ -856,6 +856,7 @@ export const TRACKING_EVENTS = {
   CREATION_FAILED: 'creation_failed', // Generation failed
   CREATION_RETRIED: 'creation_retried', // User retried after failure
   CREATION_ANALYZED: 'creation_analyzed', // Image content analyzed for insights
+  EXAMPLE_PROMPT_CLICKED: 'example_prompt_clicked', // Clicked a pre-filled example pill on homepage/start
 
   // ===== INPUT MODE (Voice/Image/Text) =====
   INPUT_MODE_CHANGED: 'input_mode_changed', // User switches input mode

@@ -22,6 +22,7 @@ import {
   TextInput,
   VoiceInput,
   ImageInput,
+  ExamplePrompts,
   useInputMode,
   type InputMode,
 } from './inputs';
@@ -31,6 +32,10 @@ type CreateColoringPageFormProps = {
   className?: string;
   /** Size variant - 'large' for logged-in dashboard */
   size?: 'default' | 'large';
+  /** Where this form is mounted. Controls whether example prompt pills
+   *  render (guests on homepage/start only) and the location field sent
+   *  to PostHog on pill clicks. */
+  location?: 'homepage' | 'start';
 };
 
 // Loading overlay component that uses form status
@@ -63,7 +68,13 @@ const FormLoadingOverlay = ({
 };
 
 // Inner form component that uses the input mode context
-const MultiModeForm = ({ className }: { className?: string }) => {
+const MultiModeForm = ({
+  className,
+  location,
+}: {
+  className?: string;
+  location?: 'homepage' | 'start';
+}) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const locale = useLocale();
@@ -210,6 +221,14 @@ const MultiModeForm = ({ className }: { className?: string }) => {
       {mode === 'voice' && <VoiceInput />}
       {mode === 'image' && <ImageInput />}
 
+      {/* Example-prompt pills. Only shown to guests in text mode on the
+          acquisition surfaces (homepage / start) — logged-in users don't
+          need prompt scaffolding and the voice/image modes use their own
+          onboarding cues. */}
+      {isGuest && mode === 'text' && location && (
+        <ExamplePrompts location={location} />
+      )}
+
       {/* Shared bottom CTA — free-try chip + Create/auth fallback */}
       <FormCTA />
     </form>
@@ -219,6 +238,7 @@ const MultiModeForm = ({ className }: { className?: string }) => {
 const CreateColoringPageForm = ({
   className,
   size = 'default',
+  location,
 }: CreateColoringPageFormProps) => {
   const isLarge = size === 'large';
 
@@ -230,7 +250,7 @@ const CreateColoringPageForm = ({
       )}
     >
       <InputModeProvider>
-        <MultiModeForm className={className} />
+        <MultiModeForm className={className} location={location} />
       </InputModeProvider>
     </div>
   );

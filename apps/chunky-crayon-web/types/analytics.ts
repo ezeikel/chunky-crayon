@@ -53,6 +53,10 @@ export type EventProperties = {
     inputType: 'text' | 'voice' | 'image';
     characterCount: number;
   };
+  [TRACKING_EVENTS.EXAMPLE_PROMPT_CLICKED]: {
+    example: 'trex' | 'dragon' | 'foxes';
+    location: 'homepage' | 'start';
+  };
   [TRACKING_EVENTS.CREATION_COMPLETED]: {
     coloringImageId: string;
     description: string;

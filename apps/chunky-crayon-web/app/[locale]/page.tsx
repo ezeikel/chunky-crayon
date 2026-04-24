@@ -105,7 +105,7 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
                 </div>
               }
             >
-              <CreateColoringPageFormWrapper />
+              <CreateColoringPageFormWrapper location="homepage" />
             </Suspense>
           }
           formLarge={
@@ -116,7 +116,7 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
                 </div>
               }
             >
-              <CreateColoringPageFormWrapper size="large" />
+              <CreateColoringPageFormWrapper size="large" location="homepage" />
             </Suspense>
           }
           gallery={
