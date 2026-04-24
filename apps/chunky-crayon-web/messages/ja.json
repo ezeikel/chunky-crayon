@@ -231,7 +231,9 @@
       }
     },
     "heroEyebrow": "リクエストできる、はじめてのぬりえアプリ。",
-    "heroCta": "ぬりえを作る"
+    "heroCta": "ぬりえを作る",
+    "heroTitlePrefix": "もう検索しないで ",
+    "heroThumbCaption": "こんな感じだよ →"
   },
   "gallery": {
     "pageTitle": "無料ぬりえギャラリー - Chunky Crayon",

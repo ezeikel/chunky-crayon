@@ -231,7 +231,9 @@
       }
     },
     "heroEyebrow": "요청하면 그려주는 첫 컬러링 앱!",
-    "heroCta": "우리 아이 페이지 만들기"
+    "heroCta": "우리 아이 페이지 만들기",
+    "heroTitlePrefix": "구글 검색은 이제 그만! ",
+    "heroThumbCaption": "이것처럼요 →"
   },
   "gallery": {
     "pageTitle": "무료 색칠공부 갤러리 - Chunky Crayon",

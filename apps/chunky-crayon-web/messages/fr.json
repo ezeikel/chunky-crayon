@@ -231,7 +231,9 @@
       }
     },
     "heroEyebrow": "La 1re appli de coloriage qui réalise leurs souhaits.",
-    "heroCta": "Créer sa page"
+    "heroCta": "Créer sa page",
+    "heroTitlePrefix": "Arrêtez de chercher sur Google ",
+    "heroThumbCaption": "Comme celui-ci →"
   },
   "gallery": {
     "pageTitle": "Galerie de coloriages gratuits - Chunky Crayon",

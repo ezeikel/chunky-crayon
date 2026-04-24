@@ -231,7 +231,9 @@
       }
     },
     "heroEyebrow": "Die erste Mal-App, die Wünsche erfüllt.",
-    "heroCta": "Ihre Seite erstellen"
+    "heroCta": "Ihre Seite erstellen",
+    "heroTitlePrefix": "Hör auf zu googeln ",
+    "heroThumbCaption": "So wie dieses hier →"
   },
   "gallery": {
     "pageTitle": "Galerie kostenloser Ausmalbilder – Chunky Crayon",
