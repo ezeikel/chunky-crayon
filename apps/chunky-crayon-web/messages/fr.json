@@ -1105,5 +1105,76 @@
         "100": "Terminé !"
       }
     }
+  },
+  "start": {
+    "eyebrow": "La première appli de coloriage qui répond aux demandes.",
+    "cta": "Essayer gratuitement",
+    "ctaSubtext": "2 pages gratuites. Sans compte.",
+    "tryColoring": "Essaie de colorier celle-ci",
+    "hero": {
+      "trex": {
+        "title": "« Maman, je peux colorier un T-rex sur un skate ? »",
+        "subtitle": "Eh oui. Votre enfant décrit la scène. Vous obtenez une page à colorier imprimable en environ 2 minutes. Imprimez-la ou coloriez dans l’appli."
+      },
+      "foxes": {
+        "title": "Du temps d’écran, version crayons.",
+        "subtitle": "Le sauvetage de 17 h, réglé. Imprimez une page pour la table, ou donnez-lui votre téléphone. Même page, zéro culpabilité."
+      },
+      "dragon": {
+        "title": "De « goûter de dragons » à une vraie page à colorier.",
+        "subtitle": "Votre enfant décrit n’importe quelle scène. On la dessine. Imprimez-la ou coloriez dans l’appli. Chaque page est une page qu’il a vraiment envie de colorier."
+      },
+      "default": {
+        "title": "Votre enfant l’imagine. On dessine la page à colorier.",
+        "subtitle": "Un T-rex astronaute. Un goûter de dragons. Un pique-nique de renards. Tout ce qu’il imagine, imprimable en environ 2 minutes."
+      }
+    },
+    "problem": {
+      "title": "Le sauvetage de 17 h quand « je m’ennuie ».",
+      "body": "Vous êtes fatigué(e). Il veut des crayons. Vous voulez du calme. Mais la page de dinosaure imprimée la semaine dernière a déjà été coloriée trois fois. Chunky Crayon en crée une nouvelle à partir de la scène que votre enfant décrit, en environ 2 minutes."
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "steps": {
+        "describe": {
+          "title": "Ils décrivent la scène",
+          "body": "Parlez, tapez, ou prenez une photo. Tout ce qu’il a en tête."
+        },
+        "draw": {
+          "title": "On dessine la page à colorier",
+          "body": "Environ 2 minutes, de l’idée au PDF imprimable."
+        },
+        "color": {
+          "title": "Imprimez-la ou coloriez dans l’appli",
+          "body": "Crayons sur la table. Doigt sur le téléphone. À vous de choisir."
+        }
+      }
+    },
+    "features": {
+      "title": "Tout dans une seule appli.",
+      "items": {
+        "unlimited": {
+          "title": "N’importe quelle scène, n’importe quel sujet",
+          "body": "Dinosaures astronautes. Licornes dentistes. Frères et sœurs dans l’espace. S’ils peuvent le décrire, on peut le dessiner."
+        },
+        "print": {
+          "title": "Prêt à imprimer ou à l’écran",
+          "body": "Chaque page à colorier est un PDF propre + une toile interactive. Choisissez selon le moment."
+        },
+        "daily": {
+          "title": "Une nouvelle page chaque jour",
+          "body": "Vous aimez les surprises ? Une nouvelle page à colorier gratuite arrive chaque jour dans votre boîte mail."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Gratuit à essayer. Offres dès 7,99 £/mois.",
+      "body": "Commencez avec 2 créations gratuites, sans compte. Vous aimez ? Des offres adaptées, du coloriage occasionnel à l’usage quotidien.",
+      "cta": "Voir toutes les offres"
+    },
+    "finalCta": {
+      "title": "Une page à colorier de 20 minutes de calme.",
+      "body": "Décrivez une scène. On la dessine. Sans compte pour essayer."
+    }
   }
 }

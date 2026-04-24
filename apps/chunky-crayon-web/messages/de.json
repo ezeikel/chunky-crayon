@@ -1105,5 +1105,76 @@
         "100": "Fertig!"
       }
     }
+  },
+  "start": {
+    "eyebrow": "Die erste Mal-App, die Wünsche erfüllt.",
+    "cta": "Gratis testen",
+    "ctaSubtext": "2 Gratis-Seiten. Kein Konto nötig.",
+    "tryColoring": "Diese hier ausprobieren",
+    "hero": {
+      "trex": {
+        "title": "„Mama, kann ich einen T-Rex auf einem Skateboard ausmalen?“",
+        "subtitle": "Ja, echt. Dein Kind beschreibt die Szene. Du bekommst in ca. 2 Minuten eine druckbare Malvorlage. Ausdrucken oder in der App ausmalen."
+      },
+      "foxes": {
+        "title": "Bildschirmzeit, aber mit Buntstiften.",
+        "subtitle": "Die 17-Uhr-Rettung ist da. Druck eine Malvorlage für den Tisch aus – oder gib ihnen dein Handy. Gleiche Seite, null schlechtes Gewissen."
+      },
+      "dragon": {
+        "title": "Von „Drachen-Teeparty“ zur echten Malvorlage.",
+        "subtitle": "Dein Kind beschreibt eine Szene. Wir zeichnen sie. Ausdrucken oder in der App ausmalen. Jede Seite ist eine, die sie wirklich ausmalen wollen."
+      },
+      "default": {
+        "title": "Dein Kind beschreibt’s. Wir zeichnen die Malvorlage.",
+        "subtitle": "Ein T-Rex-Astronaut. Eine Drachen-Teeparty. Ein Fuchs-Familienpicknick. Was auch immer sie sich ausdenken – in ca. 2 Minuten druckbar."
+      }
+    },
+    "problem": {
+      "title": "Die 17-Uhr-„Mir ist langweilig“-Rettung.",
+      "body": "Du bist müde. Sie wollen Buntstifte. Du willst Ruhe. Aber die ausgedruckte Dino-Seite von letzter Woche wurde schon dreimal ausgemalt. Chunky Crayon macht in ca. 2 Minuten eine neue – aus jeder Szene, die dein Kind beschreibt."
+    },
+    "howItWorks": {
+      "title": "So funktioniert’s",
+      "steps": {
+        "describe": {
+          "title": "Sie beschreiben die Szene",
+          "body": "Sprechen, tippen oder ein Foto machen. Was auch immer in ihrem Kopf ist."
+        },
+        "draw": {
+          "title": "Wir zeichnen die Malvorlage",
+          "body": "In ca. 2 Minuten vom Wunsch zur druckbaren Seite."
+        },
+        "color": {
+          "title": "Drucken oder in der App ausmalen",
+          "body": "Buntstifte auf dem Tisch. Finger aufs Handy. Du entscheidest."
+        }
+      }
+    },
+    "features": {
+      "title": "Alles in einer App.",
+      "items": {
+        "unlimited": {
+          "title": "Jede Szene, jedes Thema",
+          "body": "Dino-Astronauten. Einhorn-Zahnärzte. Geschwister im Weltall. Wenn sie’s beschreiben können, können wir’s zeichnen."
+        },
+        "print": {
+          "title": "Zum Ausdrucken oder am Bildschirm",
+          "body": "Jede Malvorlage kommt als sauberes PDF und als interaktive Leinwand. Wähle, was gerade passt."
+        },
+        "daily": {
+          "title": "Jeden Tag eine neue Seite",
+          "body": "Lieber Überraschungen? Jeden Tag landet eine kostenlose neue Malvorlage in deinem Postfach."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Gratis testen. Ab £7.99/Monat.",
+      "body": "Starte mit 2 kostenlosen Generationen – ganz ohne Konto. Gefällt’s? Pläne für gelegentliches Ausmalen bis hin zu täglich.",
+      "cta": "Alle Pläne ansehen"
+    },
+    "finalCta": {
+      "title": "Nur eine Malvorlage entfernt von 20 Minuten Ruhe.",
+      "body": "Szene eintippen. Wir zeichnen sie. Zum Testen kein Konto nötig."
+    }
   }
 }

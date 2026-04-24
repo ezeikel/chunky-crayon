@@ -1105,5 +1105,76 @@
         "100": "¡Listo!"
       }
     }
+  },
+  "start": {
+    "eyebrow": "La primera app de colorear que acepta peticiones.",
+    "cta": "Pruébalo gratis",
+    "ctaSubtext": "2 páginas gratis. Sin cuenta.",
+    "tryColoring": "Prueba a colorear esta",
+    "hero": {
+      "trex": {
+        "title": "“Mamá, ¿puedo colorear un T-rex en monopatín?”",
+        "subtitle": "Sí, tal cual. Tu peque describe la escena. Tú tienes una página para imprimir en unos 2 minutos. Imprímela o coloréala en la app."
+      },
+      "foxes": {
+        "title": "Tiempo de pantalla, pero con ceras.",
+        "subtitle": "El salvavidas de las 5, resuelto. Imprime una página para la mesa o dales tu móvil. La misma página, cero culpa."
+      },
+      "dragon": {
+        "title": "De “fiesta del té con dragones” a una página real.",
+        "subtitle": "Tu peque describe cualquier escena. Nosotros la dibujamos. Imprímela o coloréala en la app. Cada página es la que de verdad quieren colorear."
+      },
+      "default": {
+        "title": "Tu peque lo describe. Nosotros dibujamos la página para colorear.",
+        "subtitle": "Un T-rex astronauta. Una fiesta del té con dragones. Un picnic de una familia de zorros. Lo que imaginen, imprimible en unos 2 minutos."
+      }
+    },
+    "problem": {
+      "title": "El salvavidas de las 5: “me aburro”.",
+      "body": "Tú estás cansado/a. Ellos quieren ceras. Tú quieres calma. Pero la página del dinosaurio de la semana pasada ya se ha coloreado tres veces. Chunky Crayon crea una nueva con la escena que tu peque describa, en unos 2 minutos."
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "steps": {
+        "describe": {
+          "title": "Ellos describen la escena",
+          "body": "Habla, escribe o haz una foto. Lo que tengan en la cabeza."
+        },
+        "draw": {
+          "title": "Nosotros dibujamos la página",
+          "body": "Del prompt a imprimir, en unos 2 minutos."
+        },
+        "color": {
+          "title": "Imprime o colorea en la app",
+          "body": "Ceras en la mesa. Dedo en el móvil. Tú eliges."
+        }
+      }
+    },
+    "features": {
+      "title": "Todo en una sola app.",
+      "items": {
+        "unlimited": {
+          "title": "Cualquier escena, cualquier tema",
+          "body": "Dinosaurios astronautas. Unicornios dentistas. Hermanos en el espacio. Si pueden describirlo, podemos dibujarlo."
+        },
+        "print": {
+          "title": "Lista para imprimir o en pantalla",
+          "body": "Cada página es un PDF limpio y un lienzo interactivo. Elige lo que mejor encaje en el momento."
+        },
+        "daily": {
+          "title": "Una página nueva cada día",
+          "body": "¿Te gustan las sorpresas? Una nueva página gratis llega a tu correo cada día."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Gratis para probar. Planes desde £7.99/mes.",
+      "body": "Empieza con 2 generaciones gratis, sin cuenta. ¿Te encanta? Planes para colorear de vez en cuando o a diario.",
+      "cta": "Ver todos los planes"
+    },
+    "finalCta": {
+      "title": "A una página de 20 minutos de calma.",
+      "body": "Escribe una escena. Nosotros la dibujamos. No necesitas cuenta para probar."
+    }
   }
 }
