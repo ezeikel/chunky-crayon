@@ -1,5 +1,6 @@
 import type { Viewport } from 'next';
 import { Suspense } from 'react';
+import { getTranslations } from 'next-intl/server';
 import CreateColoringPageFormWrapper from '@/components/forms/CreateColoringPageForm/CreateColoringPageFormWrapper';
 import AllColoringPageImages from '@/components/AllColoringPageImages/AllColoringPageImages';
 import GalleryPreview from '@/components/GalleryPreview';
@@ -9,6 +10,7 @@ import Loading from '@/components/Loading/Loading';
 import UnsubscribeToast from '@/components/UnsubscribeToast/UnsubscribeToast';
 import HomePageContent from '@/components/HomePageContent';
 import Intro from '@/components/Intro/Intro';
+import LandingDemo from '@/components/LandingDemo/LandingDemo';
 import JoinColoringPageEmailListForm from '@/components/forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 import { getMyColoState } from '@/app/actions/colo';
 import { getActiveProfile } from '@/app/actions/profiles';
@@ -36,6 +38,23 @@ const ColoStateLoader = async (): Promise<ColoState | null> => {
   return activeProfile ? await getMyColoState() : null;
 };
 
+// Async wrapper so the demo's translations are read inside a Suspense
+// boundary and don't block static prerender of the page shell.
+const LandingDemoSlot = async () => {
+  const t = await getTranslations('homepage.demo');
+  return (
+    <LandingDemo
+      title={t('title')}
+      body={t('body')}
+      idleLabel={t('idleLabel')}
+      drawingLabel={t('drawingLabel')}
+      drawingSubLabel={t('drawingSubLabel')}
+      playLabel={t('playLabel')}
+      pauseLabel={t('pauseLabel')}
+    />
+  );
+};
+
 // Wrapper component that passes coloState to HomePageContent
 const HomePageWithColoState = async ({
   searchParams,
@@ -47,6 +66,7 @@ const HomePageWithColoState = async ({
   recentCreations,
   intro,
   emailSignup,
+  demo,
 }: {
   searchParams: Promise<ColoringImageSearchParams>;
   form: React.ReactNode;
@@ -57,6 +77,7 @@ const HomePageWithColoState = async ({
   recentCreations: React.ReactNode;
   intro: React.ReactNode;
   emailSignup: React.ReactNode;
+  demo: React.ReactNode;
 }) => {
   const coloState = await ColoStateLoader();
 
@@ -71,6 +92,7 @@ const HomePageWithColoState = async ({
       recentCreations={recentCreations}
       intro={intro}
       emailSignup={emailSignup}
+      demo={demo}
     />
   );
 };
@@ -169,6 +191,11 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
               className="max-w-[429px]"
               location="hero"
             />
+          }
+          demo={
+            <Suspense fallback={null}>
+              <LandingDemoSlot />
+            </Suspense>
           }
         />
       </Suspense>

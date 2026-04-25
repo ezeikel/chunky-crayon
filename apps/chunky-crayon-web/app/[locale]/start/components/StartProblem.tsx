@@ -11,7 +11,7 @@ type StartProblemProps = {
 export default function StartProblem({ title, body }: StartProblemProps) {
   return (
     <section className="bg-paper-cream py-16 md:py-24">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 text-center">
         <h2 className="font-tondo font-bold text-text-primary text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.05] tracking-tight mb-6">
           <Balancer>{title}</Balancer>
         </h2>

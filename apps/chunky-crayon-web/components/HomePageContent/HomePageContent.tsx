@@ -27,6 +27,8 @@ type HomePageContentProps = {
   intro?: React.ReactNode;
   /** Daily email signup form for logged-out users - client component passed as prop */
   emailSignup?: React.ReactNode;
+  /** Interactive demo for logged-out users - server component passed as prop */
+  demo?: React.ReactNode;
 };
 
 const HomePageContent = ({
@@ -39,6 +41,7 @@ const HomePageContent = ({
   recentCreations,
   intro,
   emailSignup,
+  demo,
 }: HomePageContentProps) => {
   const { status } = useSession();
   const isLoggedIn = status === 'authenticated';
@@ -103,6 +106,11 @@ const HomePageContent = ({
         {/* Email signup: 3rd on mobile, bottom-left on desktop */}
         {emailSignup && <div className="order-3">{emailSignup}</div>}
       </div>
+
+      {/* Interactive demo - phone-frame walk-through of describe → draw →
+          finished page. Lands right after the hero so cold visitors who
+          aren't ready to commit to the form still see the product work. */}
+      {demo && <div className="w-full relative z-10">{demo}</div>}
 
       {/* Recent creations - shows images guests have created */}
       {recentCreations && (

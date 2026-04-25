@@ -22,7 +22,7 @@ export default function StartFinalCta({
 }: StartFinalCtaProps) {
   return (
     <section className="bg-crayon-orange/10 py-20 md:py-28">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      <div className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 text-center">
         <h2 className="font-tondo font-bold text-text-primary text-[clamp(1.75rem,5vw,3rem)] leading-[1.02] tracking-tight mb-5">
           <Balancer>{title}</Balancer>
         </h2>

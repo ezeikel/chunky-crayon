@@ -5,6 +5,7 @@ import { getColoringImageForAdCampaign } from '@/app/data/coloring-image';
 import StartHero from './components/StartHero';
 import StartProblem from './components/StartProblem';
 import StartHowItWorks from './components/StartHowItWorks';
+import LandingDemo from '@/components/LandingDemo/LandingDemo';
 import StartFeatures from './components/StartFeatures';
 import StartPricing from './components/StartPricing';
 import StartFinalCta from './components/StartFinalCta';
@@ -122,6 +123,15 @@ async function StartStaticBody() {
           },
         }}
       />
+      <LandingDemo
+        title={t('demo.title')}
+        body={t('demo.body')}
+        idleLabel={t('demo.idleLabel')}
+        drawingLabel={t('demo.drawingLabel')}
+        drawingSubLabel={t('demo.drawingSubLabel')}
+        playLabel={t('demo.playLabel')}
+        pauseLabel={t('demo.pauseLabel')}
+      />
       <StartFeatures
         title={t('features.title')}
         items={{
@@ -143,7 +153,7 @@ async function StartStaticBody() {
           that provides horizontal padding (the homepage uses PageWrap).
           /start sets per-section padding so we wrap them here to match
           the visual edge of StartFeatures / StartPricing above + below. */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="px-4 md:px-6 lg:px-8">
         <Testimonials />
       </div>
       <StartPricing
@@ -151,7 +161,7 @@ async function StartStaticBody() {
         body={t('pricing.body')}
         ctaLabel={t('pricing.cta')}
       />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="px-4 md:px-6 lg:px-8">
         <FAQ />
       </div>
       <StartFinalCta

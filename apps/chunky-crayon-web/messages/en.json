@@ -124,6 +124,15 @@
       "ctaText": "to keep your creations forever and unlock more!",
       "ctaButton": "Start Free"
     },
+    "demo": {
+      "title": "Watch a coloring page get made.",
+      "body": "Your kid says it. We draw it. About 2 minutes from prompt to printable, every time.",
+      "idleLabel": "Press play to watch a coloring page get drawn.",
+      "drawingLabel": "Drawing the scene",
+      "drawingSubLabel": "Hang tight, this takes a moment.",
+      "playLabel": "Play the demo",
+      "pauseLabel": "Pause"
+    },
     "unleashWords": {
       "creativity": "creativity",
       "imagination": "imagination",
@@ -278,6 +287,15 @@
           "body": "Crayons on the table. Finger on the phone. Your call."
         }
       }
+    },
+    "demo": {
+      "title": "Watch a coloring page get made.",
+      "body": "Your kid says it. We draw it. About 2 minutes from prompt to printable, every time.",
+      "idleLabel": "Press play to watch a coloring page get drawn.",
+      "drawingLabel": "Drawing the scene",
+      "drawingSubLabel": "Hang tight, this takes a moment.",
+      "playLabel": "Play the demo",
+      "pauseLabel": "Pause"
     },
     "features": {
       "title": "Everything in one app.",

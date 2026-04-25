@@ -38,7 +38,7 @@ export default function StartHero({
 
   return (
     <section className="relative py-12 md:py-20 lg:py-24 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <div className="px-4 md:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
         {/* Copy column */}
         <div className="order-2 lg:order-1">
           <p className="font-rooney-sans text-xs sm:text-sm font-bold uppercase tracking-[0.16em] text-crayon-orange mb-5">
