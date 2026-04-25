@@ -8,6 +8,7 @@ import { faCakeCandles } from '@fortawesome/pro-duotone-svg-icons/faCakeCandles'
 import { faBookOpen } from '@fortawesome/pro-duotone-svg-icons/faBookOpen';
 import { faCalendarStar } from '@fortawesome/pro-duotone-svg-icons/faCalendarStar';
 import { faCheck } from '@fortawesome/pro-duotone-svg-icons/faCheck';
+import TeacherHubViewTracker from '@/components/TeacherHubViewTracker';
 
 const DUOTONE_STYLE = {
   '--fa-primary-color': 'hsl(var(--crayon-orange))',
@@ -44,6 +45,7 @@ export async function generateMetadata({
 
 const TeacherHubPage = () => (
   <div className="max-w-5xl mx-auto py-12 px-4">
+    <TeacherHubViewTracker />
     <header className="text-center mb-12">
       <h1 className="font-tondo text-4xl md:text-5xl font-extrabold mb-4 text-primary">
         Free printables for your classroom.

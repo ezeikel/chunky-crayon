@@ -7,6 +7,7 @@ import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteSc
 import { getTagImages } from '@/app/data/gallery';
 import { generateAlternates } from '@/lib/seo';
 import { LANDING_PAGES, getLandingPageBySlug } from '@/lib/seo/landing-pages';
+import SeoLandingViewTracker from '@/components/SeoLandingViewTracker';
 
 type PageParams = { locale: string; slug: string };
 
@@ -69,6 +70,7 @@ const LandingPageContent = async ({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
+      <SeoLandingViewTracker slug={slug} />
       <PageWrap>
         <header className="text-center mb-10 max-w-3xl mx-auto">
           <h1 className="font-tondo text-3xl md:text-5xl font-extrabold mb-3 text-primary">
