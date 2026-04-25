@@ -1,0 +1,77 @@
+[
+  {
+    "url": "https://images.unsplash.com/photo-1506086679524-493c64fdfaa6?w=1200&q=80",
+    "category": "animal",
+    "alt": "Golden retriever puppy sitting in grass"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=1200&q=80",
+    "category": "animal",
+    "alt": "Orange butterfly resting on yellow flower"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1200&q=80",
+    "category": "animal",
+    "alt": "Tabby kitten with large eyes"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80",
+    "category": "nature",
+    "alt": "Forest trees with sunlight through leaves"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1200&q=80",
+    "category": "nature",
+    "alt": "Green mountains under blue sky"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1200&q=80",
+    "category": "nature",
+    "alt": "Field of yellow sunflowers"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1528825871115-3581a5387919?w=1200&q=80",
+    "category": "food",
+    "alt": "Red apples in wooden bowl"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1557499305-bd68d3bd6f19?w=1200&q=80",
+    "category": "food",
+    "alt": "Colorful cupcakes with frosting"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1200&q=80",
+    "category": "food",
+    "alt": "Stack of chocolate chip cookies"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=1200&q=80",
+    "category": "vehicle",
+    "alt": "Red classic car on country road"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+    "category": "vehicle",
+    "alt": "Yellow school bus"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1617526912000-92a4d2d32dcc?w=1200&q=80",
+    "category": "vehicle",
+    "alt": "Hot air balloon in sky"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&q=80",
+    "category": "object",
+    "alt": "Colorful rainbow gradient pattern"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=1200&q=80",
+    "category": "object",
+    "alt": "Wooden toy blocks in primary colors"
+  },
+  {
+    "url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&q=80",
+    "category": "object",
+    "alt": "Colorful balloons against blue sky"
+  }
+]

@@ -464,7 +464,7 @@ export async function recordColoringSession(
   throw new Error("No recorded video was produced");
 }
 
-async function waitForLineArt(page: Page): Promise<void> {
+export async function waitForLineArt(page: Page): Promise<void> {
   console.log(
     "[record] waitForLineArt: waiting for first canvas to be visible",
   );
@@ -560,7 +560,7 @@ async function waitForLineArt(page: Page): Promise<void> {
  * true. If dimensions are < 400, it's the stale 300×150 default and doesn't
  * count. Returns the "{w}×{h}" string on success, or null on timeout.
  */
-async function waitForRegionStoreReady(
+export async function waitForRegionStoreReady(
   page: Page,
   timeoutMs: number,
 ): Promise<string | null> {
@@ -589,7 +589,7 @@ async function waitForRegionStoreReady(
   });
 }
 
-async function selectMagicBrush(page: Page): Promise<void> {
+export async function selectMagicBrush(page: Page): Promise<void> {
   await page.waitForFunction(
     () => !!document.querySelector('[data-testid="tool-magic-reveal"]'),
     { timeout: 15_000, polling: 250 },
@@ -635,7 +635,7 @@ async function selectMagicBrush(page: Page): Promise<void> {
   throw new Error("Magic Brush failed to activate after 20 attempts");
 }
 
-async function waitForMagicColorsReady(page: Page): Promise<void> {
+export async function waitForMagicColorsReady(page: Page): Promise<void> {
   // The overlay only mounts AFTER the magic tool is active. Give the page a
   // moment for it to appear if it's going to, then poll until it's gone.
   await page.waitForTimeout(800);
@@ -670,7 +670,7 @@ async function waitForMagicColorsReady(page: Page): Promise<void> {
   );
 }
 
-async function selectLargeBrush(page: Page): Promise<void> {
+export async function selectLargeBrush(page: Page): Promise<void> {
   await page.evaluate(() => {
     document
       .querySelectorAll<HTMLButtonElement>('[data-testid="brush-size-large"]')
@@ -678,7 +678,7 @@ async function selectLargeBrush(page: Page): Promise<void> {
   });
 }
 
-async function sweepHorizontal(
+export async function sweepHorizontal(
   page: Page,
   box: { x: number; y: number; width: number; height: number },
   yieldMs: number,
@@ -709,7 +709,7 @@ async function sweepHorizontal(
   }
 }
 
-async function sweepDiagonal(
+export async function sweepDiagonal(
   page: Page,
   box: { x: number; y: number; width: number; height: number },
   yieldMs: number,

@@ -949,6 +949,21 @@ export const TRACKING_EVENTS = {
   LANDING_DEMO_PLAYED: 'landing_demo_played', // User pressed play on the phone-frame demo
   LANDING_DEMO_COMPLETED: 'landing_demo_completed', // Demo cycled through every scenario at least once
   LANDING_DEMO_CTA_CLICKED: 'landing_demo_cta_clicked', // "Color this one" CTA inside demo result frame
+
+  // ===== FREE TOOLS FUNNEL (Phase 2 growth) =====
+  TOOL_VIEWED: 'tool_viewed', // User viewed a /tools/* page
+  TOOL_SUBMITTED: 'tool_submitted', // User submitted a tool form
+  TOOL_COMPLETED: 'tool_completed', // Tool produced its output (PDF download, etc.)
+  TOOL_FAILED: 'tool_failed', // Tool failed to produce output
+  TEACHER_HUB_VIEWED: 'teacher_hub_viewed', // /for-teachers page viewed
+
+  // ===== SEO LANDING PAGES (long-tail /coloring-pages/[slug]) =====
+  // Distinct from LANDING_PAGE_VIEWED above which targets /start + / paid funnels.
+  SEO_LANDING_PAGE_VIEWED: 'seo_landing_page_viewed', // /coloring-pages/[slug] page view
+  SEO_LANDING_PAGE_CTA_CLICKED: 'seo_landing_page_cta_clicked', // CTA on /coloring-pages/[slug] clicked
+
+  // ===== SOCIAL POST ATTRIBUTION (alternating demo reel A/B) =====
+  DEMO_REEL_CLICKED: 'demo_reel_clicked', // Traffic arrives via ?utm_campaign=demo-reel
 } as const;
 
 // ===== SOCIAL PROOF / TESTIMONIALS =====

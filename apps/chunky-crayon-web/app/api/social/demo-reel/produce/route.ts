@@ -2,6 +2,10 @@
  * Kicks the Hetzner chunky-crayon-worker to produce today's demo reel
  * (Playwright recording of the actual create flow + Remotion compositing).
  *
+ * Variants:
+ *   ?variant=text   → /publish/reel       (default — types a prompt)
+ *   ?variant=image  → /publish/image-reel (uploads a kid-safe stock photo)
+ *
  * We DON'T await the worker's full 5-7 minute render — Vercel cron functions
  * cap at 300s and the worker can run longer. We fire the request, give the
  * worker enough time to at least accept the job, then return. The worker
@@ -16,6 +20,13 @@
 import { NextResponse, connection } from 'next/server';
 
 export const maxDuration = 60;
+
+type Variant = 'text' | 'image';
+
+const WORKER_PATH_BY_VARIANT: Record<Variant, string> = {
+  text: '/publish/reel',
+  image: '/publish/image-reel',
+};
 
 const handleRequest = async (request: Request) => {
   await connection();
@@ -35,13 +46,17 @@ const handleRequest = async (request: Request) => {
     );
   }
 
-  // Fire the worker. We give it 45s of connect/read budget — enough for
-  // the worker to accept the job, start Playwright, and respond with an
-  // ack if we change it to async mode later. For now the worker is
-  // synchronous so we'll time out here and rely on it writing demoReelUrl
-  // independently. That's fine — we only need this cron to trigger the job.
+  const url = new URL(request.url);
+  const variantParam = url.searchParams.get('variant');
+  const variant: Variant = variantParam === 'image' ? 'image' : 'text';
+  const workerPath = WORKER_PATH_BY_VARIANT[variant];
+
+  console.log(
+    `[demo-reel/produce] triggering worker: ${workerUrl}${workerPath} (variant=${variant})`,
+  );
+
   try {
-    await fetch(`${workerUrl}/publish/reel`, {
+    await fetch(`${workerUrl}${workerPath}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,8 +65,6 @@ const handleRequest = async (request: Request) => {
       body: JSON.stringify({}),
       signal: AbortSignal.timeout(45_000),
     }).catch((err) => {
-      // Expected: AbortError / timeout once the worker enters the long
-      // Playwright phase. That's our "fire and continue" signal.
       console.log(
         '[demo-reel/produce] worker fetch returned / timed out (expected):',
         err instanceof Error ? err.message : err,
@@ -63,6 +76,8 @@ const handleRequest = async (request: Request) => {
 
   return NextResponse.json({
     ok: true,
+    variant,
+    workerPath,
     message: 'Worker triggered. It will write demoReelUrl when done.',
   });
 };

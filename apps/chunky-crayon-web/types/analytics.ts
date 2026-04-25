@@ -410,4 +410,39 @@ export type EventProperties = {
     scenario: string; // campaign key shown when CTA was clicked
     coloringImageId: string;
   };
+
+  // ===== FREE TOOLS (Phase 2) =====
+  [TRACKING_EVENTS.TOOL_VIEWED]: {
+    tool: string;
+  };
+  [TRACKING_EVENTS.TOOL_SUBMITTED]: {
+    tool: string;
+    [key: string]: unknown;
+  };
+  [TRACKING_EVENTS.TOOL_COMPLETED]: {
+    tool: string;
+    durationMs: number;
+    [key: string]: unknown;
+  };
+  [TRACKING_EVENTS.TOOL_FAILED]: {
+    tool: string;
+    error: string;
+  };
+  [TRACKING_EVENTS.TEACHER_HUB_VIEWED]: Record<string, never>;
+
+  // ===== SEO LANDING PAGES (long-tail /coloring-pages/[slug]) =====
+  [TRACKING_EVENTS.SEO_LANDING_PAGE_VIEWED]: {
+    slug: string;
+    referrerHost?: string;
+  };
+  [TRACKING_EVENTS.SEO_LANDING_PAGE_CTA_CLICKED]: {
+    slug: string;
+    cta: string;
+  };
+
+  // ===== SOCIAL ATTRIBUTION =====
+  [TRACKING_EVENTS.DEMO_REEL_CLICKED]: {
+    variant: 'text' | 'image';
+    platform: string;
+  };
 };

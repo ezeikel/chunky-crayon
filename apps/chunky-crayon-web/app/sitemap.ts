@@ -4,6 +4,7 @@ import { GALLERY_CATEGORIES } from '@/constants';
 import { routing } from '@/i18n/routing';
 import { getAllTags, ALL_DIFFICULTIES } from '@/app/data/gallery';
 import { BRAND } from '@/lib/db';
+import { LANDING_PAGES } from '@/lib/seo/landing-pages';
 
 const baseUrl = 'https://chunkycrayon.com';
 
@@ -66,6 +67,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/blog', priority: 0.7, changeFrequency: 'weekly' as const },
     { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
     { path: '/terms', priority: 0.3, changeFrequency: 'yearly' as const },
+    // Phase 2 growth pages — free tools + teacher hub
+    { path: '/tools', priority: 0.9, changeFrequency: 'weekly' as const },
+    {
+      path: '/tools/reward-chart',
+      priority: 0.9,
+      changeFrequency: 'monthly' as const,
+    },
+    {
+      path: '/tools/name',
+      priority: 0.9,
+      changeFrequency: 'monthly' as const,
+    },
+    {
+      path: '/tools/birthday-invite',
+      priority: 0.9,
+      changeFrequency: 'monthly' as const,
+    },
+    {
+      path: '/tools/abc-tracing',
+      priority: 0.9,
+      changeFrequency: 'monthly' as const,
+    },
+    {
+      path: '/tools/seasonal-pack',
+      priority: 0.9,
+      changeFrequency: 'monthly' as const,
+    },
+    {
+      path: '/for-teachers',
+      priority: 0.9,
+      changeFrequency: 'weekly' as const,
+    },
   ];
 
   // Age-based gallery pages
@@ -83,6 +116,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/gallery/difficulty/advanced',
     '/gallery/difficulty/expert',
   ];
+
+  // Add SEO long-tail landing pages (priority 0.85 — higher than gallery
+  // categories because they target specific parent/teacher queries with
+  // better intent-match than the generic category listings).
+  for (const landing of LANDING_PAGES) {
+    const path = `/coloring-pages/${landing.slug}`;
+    for (const locale of locales) {
+      urls.push({
+        url: `${baseUrl}/${locale}${path}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.85,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${baseUrl}/${l}${path}`]),
+          ),
+        },
+      });
+    }
+  }
 
   // Add static pages for each locale
   for (const page of staticPages) {
