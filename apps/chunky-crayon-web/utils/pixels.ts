@@ -107,14 +107,31 @@ export const trackPixelEvent = (
 
 /**
  * Track when a user completes registration/signup
+ *
+ * Pass `eventId` (the user's database id) so Meta can deduplicate this
+ * client-side fire against the matching server-side CAPI fire from the
+ * NextAuth signIn callback. Without it, Meta counts the signup twice.
  */
-export const trackSignUp = (params?: { method?: string }) => {
-  trackFacebookEvent('CompleteRegistration', {
-    content_name: 'User Signup',
-    status: true,
-    ...params,
-  });
-  trackPinterestEvent('signup');
+export const trackSignUp = (params?: { method?: string; eventId?: string }) => {
+  const w = window as WindowWithPixels;
+  const { eventId, ...rest } = params ?? {};
+  if (w.fbq) {
+    w.fbq(
+      'track',
+      'CompleteRegistration',
+      {
+        content_name: 'User Signup',
+        status: true,
+        ...rest,
+      },
+      ...(eventId ? [{ eventID: eventId }] : []),
+    );
+  }
+  if (w.pintrk) {
+    w.pintrk('track', 'signup', {
+      ...(eventId && { event_id: eventId }),
+    });
+  }
 };
 
 /**

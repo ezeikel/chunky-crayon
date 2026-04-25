@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import type { NextAuthConfig } from 'next-auth';
+import { headers } from 'next/headers';
 import GoogleProvider from 'next-auth/providers/google';
 // TODO: re-enable when Apple/Facebook sign-in is implemented
 // import AppleProvider from 'next-auth/providers/apple';
@@ -8,6 +9,28 @@ import Resend from 'next-auth/providers/resend';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { db } from '@one-colored-pixel/db';
 import { getResendFromAddress } from '@/lib/email-config';
+import { sendSignupConversionEvents } from '@/lib/conversion-api';
+
+// Reads the client's IP + UA from the incoming request headers so we
+// can pass them to Meta/Pinterest CAPI for better identity matching.
+// Headers are only available inside server components / actions / route
+// handlers — the NextAuth signIn callback runs in that context, so this
+// is safe. Returns nullish strings when unavailable rather than empty
+// strings to keep the CAPI payload tidy.
+const readClientHints = async () => {
+  try {
+    const h = await headers();
+    return {
+      ipAddress:
+        h.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+        h.get('x-real-ip') ||
+        undefined,
+      userAgent: h.get('user-agent') || undefined,
+    };
+  } catch {
+    return { ipAddress: undefined, userAgent: undefined };
+  }
+};
 
 // TODO: re-enable when Apple sign-in is implemented
 // type AppleProfile = Profile & {
@@ -68,11 +91,25 @@ const config = {
           return true;
         }
 
-        await db.user.create({
+        const created = await db.user.create({
           data: {
             email: profile?.email as string,
             name: profile?.name as string,
           },
+        });
+
+        // Fire CompleteRegistration server-side via Meta/Pinterest CAPI.
+        // Browser PixelTracker fires the same event with userId as
+        // event_id; Meta deduplicates so we don't double-count. Wrapped
+        // in catch so a CAPI outage never blocks the signup itself.
+        const hints = await readClientHints();
+        sendSignupConversionEvents({
+          email: created.email!,
+          userId: created.id,
+          signupMethod: 'google',
+          ...hints,
+        }).catch((err) => {
+          console.error('[CAPI] signup conversion failed (google)', err);
         });
 
         return true;
@@ -118,10 +155,22 @@ const config = {
           return true;
         }
 
-        await db.user.create({
+        const created = await db.user.create({
           data: {
             email: userEmail,
           },
+        });
+
+        // Fire CompleteRegistration server-side. Same dedup pattern as
+        // the google path above.
+        const hints = await readClientHints();
+        sendSignupConversionEvents({
+          email: created.email!,
+          userId: created.id,
+          signupMethod: 'email',
+          ...hints,
+        }).catch((err) => {
+          console.error('[CAPI] signup conversion failed (resend)', err);
         });
 
         return true;
