@@ -233,7 +233,16 @@
     "heroEyebrow": "La 1re appli de coloriage qui réalise leurs souhaits.",
     "heroCta": "Créer sa page",
     "heroTitlePrefix": "Arrêtez de chercher sur Google ",
-    "heroThumbCaption": "Comme celui-ci →"
+    "heroThumbCaption": "Comme celui-ci →",
+    "demo": {
+      "title": "Regardez une page de coloriage se créer.",
+      "body": "Votre enfant le dit. On le dessine. Environ 2 minutes, de l’idée à l’imprimable, à chaque fois.",
+      "idleLabel": "Appuyez sur Lecture pour voir une page se dessiner.",
+      "drawingLabel": "On dessine la scène",
+      "drawingSubLabel": "Patience, ça prend un instant.",
+      "playLabel": "Lancer la démo",
+      "pauseLabel": "Pause"
+    }
   },
   "gallery": {
     "pageTitle": "Galerie de coloriages gratuits - Chunky Crayon",
@@ -1175,6 +1184,15 @@
     "finalCta": {
       "title": "Une page à colorier de 20 minutes de calme.",
       "body": "Décrivez une scène. On la dessine. Sans compte pour essayer."
+    },
+    "demo": {
+      "title": "Regardez une page à colorier se créer.",
+      "body": "Votre enfant le dit. On le dessine. Environ 2 minutes du texte à l’imprimable, à chaque fois.",
+      "idleLabel": "Appuyez sur Lecture pour voir une page à colorier se dessiner.",
+      "drawingLabel": "On dessine la scène",
+      "drawingSubLabel": "Patience, ça prend un petit moment.",
+      "playLabel": "Lancer la démo",
+      "pauseLabel": "Pause"
     }
   }
 }

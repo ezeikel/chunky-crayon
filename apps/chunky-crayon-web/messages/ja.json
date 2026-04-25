@@ -233,7 +233,16 @@
     "heroEyebrow": "リクエストできる、はじめてのぬりえアプリ。",
     "heroCta": "ぬりえを作る",
     "heroTitlePrefix": "もう検索しないで ",
-    "heroThumbCaption": "こんな感じだよ →"
+    "heroThumbCaption": "こんな感じだよ →",
+    "demo": {
+      "title": "ぬりえができあがる瞬間を見よう。",
+      "body": "お子さまが言ったら、私たちが描きます。プロンプトから印刷できるぬりえまで、いつでも約2分。",
+      "idleLabel": "再生を押して、ぬりえが描かれるところを見よう。",
+      "drawingLabel": "シーンを描いています",
+      "drawingSubLabel": "もう少し待ってね。すぐできるよ。",
+      "playLabel": "デモを再生",
+      "pauseLabel": "一時停止"
+    }
   },
   "gallery": {
     "pageTitle": "無料ぬりえギャラリー - Chunky Crayon",
@@ -1175,6 +1184,15 @@
     "finalCta": {
       "title": "静かな20分まで、あと1枚。",
       "body": "場面を入力。私たちが描きます。お試しはアカウント不要。"
+    },
+    "demo": {
+      "title": "ぬりえができるところを見てみよう。",
+      "body": "お子さまが言ったら、私たちが描くよ。入力から印刷できるぬりえまで、毎回だいたい2分。",
+      "idleLabel": "再生を押すと、ぬりえが描かれる様子を見られるよ。",
+      "drawingLabel": "シーンを描いています",
+      "drawingSubLabel": "もう少し待ってね。すぐできるよ。",
+      "playLabel": "デモを再生",
+      "pauseLabel": "一時停止"
     }
   }
 }

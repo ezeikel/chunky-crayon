@@ -233,7 +233,16 @@
     "heroEyebrow": "Die erste Mal-App, die Wünsche erfüllt.",
     "heroCta": "Ihre Seite erstellen",
     "heroTitlePrefix": "Hör auf zu googeln ",
-    "heroThumbCaption": "So wie dieses hier →"
+    "heroThumbCaption": "So wie dieses hier →",
+    "demo": {
+      "title": "Sieh zu, wie eine Malvorlage entsteht.",
+      "body": "Dein Kind sagt’s. Wir malen’s. In ca. 2 Minuten vom Prompt zur druckbaren Vorlage – jedes Mal.",
+      "idleLabel": "Drücke Play, um zuzusehen, wie eine Malvorlage gezeichnet wird.",
+      "drawingLabel": "Szene wird gezeichnet",
+      "drawingSubLabel": "Einen Moment, das dauert kurz.",
+      "playLabel": "Demo abspielen",
+      "pauseLabel": "Pause"
+    }
   },
   "gallery": {
     "pageTitle": "Galerie kostenloser Ausmalbilder – Chunky Crayon",
@@ -1175,6 +1184,15 @@
     "finalCta": {
       "title": "Nur eine Malvorlage entfernt von 20 Minuten Ruhe.",
       "body": "Szene eintippen. Wir zeichnen sie. Zum Testen kein Konto nötig."
+    },
+    "demo": {
+      "title": "Schau zu, wie eine Ausmalseite entsteht.",
+      "body": "Dein Kind sagt es. Wir zeichnen es. In ca. 2 Minuten vom Prompt bis zur druckbaren Seite – jedes Mal.",
+      "idleLabel": "Drück auf Play, um zuzusehen, wie eine Ausmalseite gezeichnet wird.",
+      "drawingLabel": "Szene wird gezeichnet",
+      "drawingSubLabel": "Einen Moment, das dauert kurz.",
+      "playLabel": "Demo abspielen",
+      "pauseLabel": "Pause"
     }
   }
 }

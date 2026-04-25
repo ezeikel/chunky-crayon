@@ -233,7 +233,16 @@
     "heroEyebrow": "La primera app de colorear que acepta pedidos.",
     "heroCta": "Crea su página",
     "heroTitlePrefix": "Deja de buscar en Google ",
-    "heroThumbCaption": "¡Como este →"
+    "heroThumbCaption": "¡Como este →",
+    "demo": {
+      "title": "Mira cómo se crea una página para colorear.",
+      "body": "Tu peque lo dice. Nosotros lo dibujamos. En unos 2 minutos, de idea a imprimible, siempre.",
+      "idleLabel": "Pulsa reproducir para ver cómo se dibuja una página para colorear.",
+      "drawingLabel": "Dibujando la escena",
+      "drawingSubLabel": "Espera un poquito, tarda un momento.",
+      "playLabel": "Reproducir demo",
+      "pauseLabel": "Pausa"
+    }
   },
   "gallery": {
     "pageTitle": "Galería de dibujos para colorear gratis - Chunky Crayon",
@@ -1175,6 +1184,15 @@
     "finalCta": {
       "title": "A una página de 20 minutos de calma.",
       "body": "Escribe una escena. Nosotros la dibujamos. No necesitas cuenta para probar."
+    },
+    "demo": {
+      "title": "Mira cómo se crea una página para colorear.",
+      "body": "Tu peque lo dice. Nosotros lo dibujamos. En unos 2 minutos, de idea a imprimible, siempre.",
+      "idleLabel": "Pulsa reproducir para ver cómo se dibuja una página para colorear.",
+      "drawingLabel": "Dibujando la escena",
+      "drawingSubLabel": "Espera un poquito, tardará un momento.",
+      "playLabel": "Reproducir la demo",
+      "pauseLabel": "Pausa"
     }
   }
 }

@@ -233,7 +233,16 @@
     "heroEyebrow": "요청하면 그려주는 첫 컬러링 앱!",
     "heroCta": "우리 아이 페이지 만들기",
     "heroTitlePrefix": "구글 검색은 이제 그만! ",
-    "heroThumbCaption": "이것처럼요 →"
+    "heroThumbCaption": "이것처럼요 →",
+    "demo": {
+      "title": "색칠놀이 도안이 만들어지는 걸 보세요.",
+      "body": "아이가 말하면, 우리가 그려요. 입력부터 인쇄용 도안까지 늘 약 2분이면 OK!",
+      "idleLabel": "재생을 눌러 도안이 그려지는 모습을 확인하세요.",
+      "drawingLabel": "장면을 그리고 있어요",
+      "drawingSubLabel": "잠깐만요, 조금만 기다려요.",
+      "playLabel": "데모 재생",
+      "pauseLabel": "일시정지"
+    }
   },
   "gallery": {
     "pageTitle": "무료 색칠공부 갤러리 - Chunky Crayon",
@@ -1175,6 +1184,15 @@
     "finalCta": {
       "title": "색칠놀이 한 장이면, 조용한 20분.",
       "body": "장면을 입력하세요. 우리가 그려드려요. 체험엔 계정이 필요 없어요."
+    },
+    "demo": {
+      "title": "색칠공부가 만들어지는 걸 구경해요.",
+      "body": "아이가 말하면, 우리가 그려요. 문장 입력부터 인쇄까지 언제나 약 2분!",
+      "idleLabel": "재생을 눌러 색칠공부가 그려지는 모습을 보세요.",
+      "drawingLabel": "장면을 그리고 있어요",
+      "drawingSubLabel": "조금만 기다려 주세요.",
+      "playLabel": "데모 재생",
+      "pauseLabel": "일시정지"
     }
   }
 }
