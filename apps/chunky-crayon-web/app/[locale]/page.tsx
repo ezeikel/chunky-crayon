@@ -51,6 +51,7 @@ const LandingDemoSlot = async () => {
       drawingSubLabel={t('drawingSubLabel')}
       playLabel={t('playLabel')}
       pauseLabel={t('pauseLabel')}
+      page="homepage"
     />
   );
 };

@@ -384,4 +384,30 @@ export type EventProperties = {
     descriptionLength: number;
     locale: string;
   };
+
+  // ===== PAID-AD LANDING =====
+  [TRACKING_EVENTS.LANDING_PAGE_VIEWED]: {
+    page: 'homepage' | 'start';
+    utmCampaign: string | null; // 'trex' | 'dragon' | 'foxes' | null
+    utmSource: string | null;
+    utmMedium: string | null;
+  };
+  [TRACKING_EVENTS.LANDING_HERO_POLAROID_CLICKED]: {
+    page: 'homepage' | 'start';
+    campaign: string; // 'trex' | 'dragon' | 'foxes' | 'default'
+    coloringImageId: string;
+  };
+  [TRACKING_EVENTS.LANDING_DEMO_PLAYED]: {
+    page: 'homepage' | 'start';
+    startingScenario: string; // campaign key the demo opens with
+  };
+  [TRACKING_EVENTS.LANDING_DEMO_COMPLETED]: {
+    page: 'homepage' | 'start';
+    scenarioCount: number; // how many distinct scenarios cycled through
+  };
+  [TRACKING_EVENTS.LANDING_DEMO_CTA_CLICKED]: {
+    page: 'homepage' | 'start';
+    scenario: string; // campaign key shown when CTA was clicked
+    coloringImageId: string;
+  };
 };

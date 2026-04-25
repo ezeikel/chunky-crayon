@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import Balancer from 'react-wrap-balancer';
@@ -5,6 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWandMagicSparkles } from '@fortawesome/pro-duotone-svg-icons';
 import type { ColoringImage } from '@one-colored-pixel/db/types';
 import cn from '@/utils/cn';
+import { useAnalytics } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 
 type StartHeroProps = {
   campaign: 'trex' | 'foxes' | 'dragon' | 'default';
@@ -35,6 +39,7 @@ export default function StartHero({
   image,
 }: StartHeroProps) {
   const hasImage = Boolean(image?.id && image?.url);
+  const { track } = useAnalytics();
 
   return (
     <section className="relative py-12 md:py-20 lg:py-24 overflow-hidden">
@@ -82,6 +87,13 @@ export default function StartHero({
             <Link
               href={`/coloring-image/${image.id}`}
               aria-label={tryColoringLabel}
+              onClick={() => {
+                track(TRACKING_EVENTS.LANDING_HERO_POLAROID_CLICKED, {
+                  page: 'start',
+                  campaign,
+                  coloringImageId: image.id ?? '',
+                });
+              }}
               className="group relative block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange focus-visible:ring-offset-4"
             >
               {/* Masking tape at top */}

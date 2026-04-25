@@ -13,6 +13,8 @@ import {
 } from 'framer-motion';
 import cn from '@/utils/cn';
 import AppStoreButtons from '@/components/AppStoreButtons';
+import { useAnalytics } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 
 // One entry per campaign currently represented in the purposeKey table.
 // Order matters — this is the visible cycle sequence on the homepage.
@@ -64,6 +66,7 @@ type PolaroidCardProps = {
   imageId: string;
   word: string;
   caption: string;
+  campaignKey: string;
   children: React.ReactNode;
 };
 
@@ -71,8 +74,10 @@ const PolaroidCard = ({
   imageId,
   word,
   caption,
+  campaignKey,
   children,
 }: PolaroidCardProps) => {
+  const { track } = useAnalytics();
   const card = (
     <motion.div
       initial={{ rotate: -3 }}
@@ -93,6 +98,13 @@ const PolaroidCard = ({
     <Link
       href={`/coloring-image/${imageId}`}
       aria-label={`See the ${word} coloring page`}
+      onClick={() => {
+        track(TRACKING_EVENTS.LANDING_HERO_POLAROID_CLICKED, {
+          page: 'homepage',
+          campaign: campaignKey,
+          coloringImageId: imageId,
+        });
+      }}
       className="block rounded-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange focus-visible:ring-offset-2"
     >
       {card}
@@ -219,6 +231,7 @@ export default function IntroClient({
           imageId={current.imageId}
           word={current.word}
           caption={cta}
+          campaignKey={current.campaignKey}
         >
           <div className="relative aspect-square rounded-sm overflow-hidden bg-paper-cream">
             <AnimatePresence mode="wait" initial={false}>

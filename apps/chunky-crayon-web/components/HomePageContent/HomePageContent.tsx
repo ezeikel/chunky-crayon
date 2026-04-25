@@ -5,6 +5,7 @@ import PageWrap from '@/components/PageWrap/PageWrap';
 import Loading from '@/components/Loading/Loading';
 import Testimonials from '@/components/Testimonials';
 import FAQ from '@/components/FAQ';
+import LandingPageViewTracker from '@/components/LandingPageViewTracker';
 import DashboardHeader from './DashboardHeader';
 import type { ColoState } from '@/lib/colo';
 
@@ -85,6 +86,10 @@ const HomePageContent = ({
   // Logged-out experience: marketing layout with Intro + form side-by-side
   return (
     <PageWrap className="bg-paper flex items-center gap-y-16 md:gap-y-20 relative overflow-hidden">
+      {/* Fires LANDING_PAGE_VIEWED for logged-out visitors only — keeps
+          the funnel dashboard symmetric with /start without polluting
+          the metric with the dashboard view a returning user gets. */}
+      <LandingPageViewTracker page="homepage" />
       {/* Decorative background shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-[10%] w-32 h-32 md:w-48 md:h-48 bg-crayon-pink-light/20 rounded-full blur-3xl" />

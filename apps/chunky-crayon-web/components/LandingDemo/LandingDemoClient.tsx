@@ -11,6 +11,8 @@ import {
   faMicrophone,
 } from '@fortawesome/pro-solid-svg-icons';
 import { faWandMagicSparkles } from '@fortawesome/pro-duotone-svg-icons';
+import { useAnalytics } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 
 export type LandingDemoScenario = {
   campaignKey: string;
@@ -31,6 +33,7 @@ type LandingDemoClientProps = {
   playLabel: string;
   pauseLabel: string;
   scenarios: LandingDemoScenario[];
+  page: 'homepage' | 'start';
 };
 
 // Phase durations — total cycle ~7s so a visitor sees one full
@@ -64,12 +67,20 @@ export default function LandingDemoClient({
   playLabel,
   pauseLabel,
   scenarios,
+  page,
 }: LandingDemoClientProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [step, setStep] = useState(0);
+  // Tracks how many distinct scenarios the user has watched complete a
+  // full cycle. Used to fire LANDING_DEMO_COMPLETED exactly once when
+  // every scenario has rolled past — set so we don't double-count when
+  // the loop wraps.
+  const seenRef = useRef<Set<number>>(new Set());
+  const completedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: false, margin: '-100px' });
+  const { track } = useAnalytics();
 
   const active = isPlaying && isInView;
   const phase = getPhase(active, elapsed);
@@ -82,7 +93,23 @@ export default function LandingDemoClient({
       setElapsed((prev) => {
         const next = prev + TICK_MS;
         if (next >= CYCLE_MS) {
-          setStep((s) => (s + 1) % scenarios.length);
+          // A full cycle of the current scenario just finished — record
+          // it, and if every scenario has rolled past at least once
+          // fire the completion event (once).
+          setStep((s) => {
+            seenRef.current.add(s);
+            if (
+              !completedRef.current &&
+              seenRef.current.size >= scenarios.length
+            ) {
+              completedRef.current = true;
+              track(TRACKING_EVENTS.LANDING_DEMO_COMPLETED, {
+                page,
+                scenarioCount: scenarios.length,
+              });
+            }
+            return (s + 1) % scenarios.length;
+          });
           return 0;
         }
         return next;
@@ -90,18 +117,35 @@ export default function LandingDemoClient({
     }, TICK_MS);
 
     return () => clearInterval(id);
-  }, [active, scenarios.length]);
+  }, [active, scenarios.length, page, track]);
 
   const handlePlay = useCallback(() => {
+    seenRef.current = new Set();
+    completedRef.current = false;
     setStep(0);
     setElapsed(0);
     setIsPlaying(true);
-  }, []);
+    track(TRACKING_EVENTS.LANDING_DEMO_PLAYED, {
+      page,
+      startingScenario: scenarios[0]?.campaignKey ?? 'unknown',
+    });
+  }, [page, scenarios, track]);
 
   const handlePause = useCallback(() => {
     setElapsed(0);
     setIsPlaying(false);
   }, []);
+
+  const handleResultCta = useCallback(
+    (s: LandingDemoScenario) => {
+      track(TRACKING_EVENTS.LANDING_DEMO_CTA_CLICKED, {
+        page,
+        scenario: s.campaignKey,
+        coloringImageId: s.imageId,
+      });
+    },
+    [page, track],
+  );
 
   return (
     <section className="bg-paper-cream py-16 md:py-24">
@@ -294,6 +338,7 @@ export default function LandingDemoClient({
                       </motion.div>
                       <Link
                         href={`/coloring-image/${scenario.imageId}`}
+                        onClick={() => handleResultCta(scenario)}
                         className="mt-3 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full bg-crayon-orange text-white font-tondo font-bold text-sm shadow-sm hover:bg-crayon-orange-dark transition-colors"
                       >
                         {scenario.ctaLabel}

@@ -11,6 +11,7 @@ import StartPricing from './components/StartPricing';
 import StartFinalCta from './components/StartFinalCta';
 import Testimonials from '@/components/Testimonials';
 import FAQ from '@/components/FAQ';
+import LandingPageViewTracker from '@/components/LandingPageViewTracker';
 
 // Known UTM campaign keys we build campaign-aware copy for. If a visitor
 // lands with an unknown/missing key we fall back to the 'default' variant
@@ -27,7 +28,11 @@ const resolveCampaign = (raw: string | undefined): CampaignKey | 'default' => {
 
 type StartPageProps = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ utm_campaign?: string }>;
+  searchParams: Promise<{
+    utm_campaign?: string;
+    utm_source?: string;
+    utm_medium?: string;
+  }>;
 };
 
 export async function generateMetadata({
@@ -55,9 +60,13 @@ export async function generateMetadata({
 async function StartHeroAsync({
   searchParams,
 }: {
-  searchParams: Promise<{ utm_campaign?: string }>;
+  searchParams: Promise<{
+    utm_campaign?: string;
+    utm_source?: string;
+    utm_medium?: string;
+  }>;
 }) {
-  const { utm_campaign } = await searchParams;
+  const { utm_campaign, utm_source, utm_medium } = await searchParams;
   const campaign = resolveCampaign(utm_campaign);
 
   // Fetch the campaign's coloring image so the hero can show it + the
@@ -70,16 +79,27 @@ async function StartHeroAsync({
   const t = await getTranslations('start');
 
   return (
-    <StartHero
-      campaign={campaign}
-      title={t(`hero.${campaign}.title`)}
-      subtitle={t(`hero.${campaign}.subtitle`)}
-      eyebrow={t('eyebrow')}
-      tryColoringLabel={t('tryColoring')}
-      ctaLabel={t('cta')}
-      ctaSubtext={t('ctaSubtext')}
-      image={image}
-    />
+    <>
+      {/* Fires LANDING_PAGE_VIEWED on mount with the utm context. Lives
+          here so it shares the same async boundary that resolves
+          searchParams — no double parse. */}
+      <LandingPageViewTracker
+        page="start"
+        utmCampaign={utm_campaign}
+        utmSource={utm_source}
+        utmMedium={utm_medium}
+      />
+      <StartHero
+        campaign={campaign}
+        title={t(`hero.${campaign}.title`)}
+        subtitle={t(`hero.${campaign}.subtitle`)}
+        eyebrow={t('eyebrow')}
+        tryColoringLabel={t('tryColoring')}
+        ctaLabel={t('cta')}
+        ctaSubtext={t('ctaSubtext')}
+        image={image}
+      />
+    </>
   );
 }
 
@@ -131,6 +151,7 @@ async function StartStaticBody() {
         drawingSubLabel={t('demo.drawingSubLabel')}
         playLabel={t('demo.playLabel')}
         pauseLabel={t('demo.pauseLabel')}
+        page="start"
       />
       <StartFeatures
         title={t('features.title')}

@@ -37,6 +37,9 @@ type LandingDemoProps = {
   drawingSubLabel: string;
   playLabel: string;
   pauseLabel: string;
+  // Where the demo is being rendered — scopes analytics events so we
+  // can compare engagement on the homepage hero vs paid-ad /start.
+  page: 'homepage' | 'start';
 };
 
 // Server wrapper: pre-fetches finished coloring pages for each scenario
