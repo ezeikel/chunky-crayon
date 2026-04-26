@@ -139,7 +139,7 @@ const generateColoringImage = async (
   }
 };
 
-const generateColoringImageWithMetadata = async (
+export const generateColoringImageWithMetadata = async (
   description: string,
   userId?: string,
   generationType?: GenerationType,
