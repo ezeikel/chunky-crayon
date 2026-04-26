@@ -949,6 +949,7 @@ export const TRACKING_EVENTS = {
   START_HERO_CANVAS_INTERACTED: 'start_hero_canvas_interacted', // First stroke on the embedded /start canvas (replaces the polaroid click as the engagement signal)
   START_HERO_COLOR_PICKED: 'start_hero_color_picked', // Visitor picked a swatch on the /start canvas
   START_HERO_TOOL_CHANGED: 'start_hero_tool_changed', // Visitor switched tools (crayon / magic / eraser) on /start
+  START_HERO_AUTO_REVEAL_CLICKED: 'start_hero_auto_reveal_clicked', // One-click magic auto-reveal — paints the entire pre-coloured canvas in one shot
   START_HERO_PDF_DOWNLOADED: 'start_hero_pdf_downloaded', // Visitor downloaded their /start canvas as a PDF
   START_HERO_CTA_CLICKED: 'start_hero_cta_clicked', // Primary signin CTA clicked from the /start hero
   LANDING_DEMO_PLAYED: 'landing_demo_played', // User pressed play on the phone-frame demo

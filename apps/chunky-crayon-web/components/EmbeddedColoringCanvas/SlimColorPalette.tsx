@@ -27,12 +27,14 @@ import cn from '@/utils/cn';
 const SWATCHES = COLORING_PALETTE.primary; // 8 high-saturation colors
 
 // `eraser` is a `brushType`, not an `activeTool` — selecting it sets
-// activeTool='brush' + brushType='eraser'. Magic reveal and crayon are
-// distinct activeTool values. Encoded here so the click handler can
-// flip both fields atomically.
+// activeTool='brush' + brushType='eraser'. `magic` is NOT a tool here:
+// it's a one-shot action that paints the entire pre-coloured canvas in
+// one click (via onMagicAutoColor). We deliberately don't use the
+// stroke-based magic-reveal tool on /start because paid-ad visitors
+// expected one click → "wow" reveal, not stroke-by-stroke discovery.
 type SlimTool =
   | { id: 'crayon'; label: string; icon: typeof faPaintbrushPencil }
-  | { id: 'magic-reveal'; label: string; icon: typeof faWandMagicSparkles }
+  | { id: 'magic'; label: string; icon: typeof faWandMagicSparkles }
   | { id: 'eraser'; label: string; icon: typeof faEraser };
 
 // FontAwesome Pro doesn't have a literal "crayon" icon. faPaintbrushPencil
@@ -42,7 +44,7 @@ type SlimTool =
 // elsewhere in the app.)
 const TOOLS: SlimTool[] = [
   { id: 'crayon', label: 'Crayon', icon: faPaintbrushPencil },
-  { id: 'magic-reveal', label: 'Magic', icon: faWandMagicSparkles },
+  { id: 'magic', label: 'Magic', icon: faWandMagicSparkles },
   { id: 'eraser', label: 'Eraser', icon: faEraser },
 ];
 
@@ -53,8 +55,10 @@ const BRUSH_SIZES: Array<{ size: BrushSize; px: number }> = [
 ];
 
 type SlimColorPaletteProps = {
-  /** Whether the magic-reveal tool should be enabled (region store ready). */
+  /** Whether the magic auto-color is available (region store ready). */
   magicAvailable: boolean;
+  /** Triggered when the Magic button is clicked — auto-colors the whole image in one shot. */
+  onMagicAutoColor: () => void;
   /** utm_campaign — forwarded to engagement events for attribution. */
   campaign: string;
   /**
@@ -69,6 +73,7 @@ type SlimColorPaletteProps = {
 
 const SlimColorPalette = ({
   magicAvailable,
+  onMagicAutoColor,
   campaign,
   trailingAction,
   className,
@@ -86,25 +91,27 @@ const SlimColorPalette = ({
   } = useColoringContext();
 
   // Derive a single "selected slim tool" from the underlying activeTool
-  // + brushType combo. This is what powers the highlighted button below.
+  // + brushType combo. Magic is action-not-tool so it's never "selected".
   const selectedSlimTool: SlimTool['id'] =
-    activeTool === 'magic-reveal'
-      ? 'magic-reveal'
-      : brushType === 'eraser'
-        ? 'eraser'
-        : 'crayon';
+    brushType === 'eraser' ? 'eraser' : 'crayon';
 
   const handleToolClick = (id: SlimTool['id']) => {
+    if (id === 'magic') {
+      // One-shot auto-reveal — never sticky, parent does the fill.
+      track(TRACKING_EVENTS.START_HERO_TOOL_CHANGED, {
+        campaign,
+        from: selectedSlimTool,
+        to: 'magic',
+      });
+      onMagicAutoColor();
+      return;
+    }
     if (id === selectedSlimTool) return; // no-op when re-selecting current
     track(TRACKING_EVENTS.START_HERO_TOOL_CHANGED, {
       campaign,
       from: selectedSlimTool,
       to: id,
     });
-    if (id === 'magic-reveal') {
-      setActiveTool('magic-reveal');
-      return;
-    }
     setActiveTool('brush');
     setBrushType(id === 'eraser' ? 'eraser' : 'crayon');
   };
@@ -121,8 +128,10 @@ const SlimColorPalette = ({
           the whole row aligns column-for-column. */}
       <div className="flex gap-2 items-center">
         {TOOLS.map((tool) => {
-          const disabled = tool.id === 'magic-reveal' && !magicAvailable;
-          const isActive = selectedSlimTool === tool.id;
+          const disabled = tool.id === 'magic' && !magicAvailable;
+          // Magic is a one-shot action, never sticky — so it never reads
+          // as "pressed". Crayon and eraser are real tool selections.
+          const isActive = tool.id !== 'magic' && selectedSlimTool === tool.id;
           return (
             <button
               key={tool.id}
@@ -165,10 +174,9 @@ const SlimColorPalette = ({
                   });
                 }
                 setSelectedColor(color.hex);
-                // Picking a color implies they want to paint, not erase
-                // or magic-reveal.
+                // Picking a color implies they want to paint, not erase.
                 if (brushType === 'eraser') setBrushType('crayon');
-                if (activeTool === 'magic-reveal') setActiveTool('brush');
+                if (activeTool !== 'brush') setActiveTool('brush');
               }}
               aria-label={color.name}
               aria-pressed={isActive}

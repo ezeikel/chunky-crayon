@@ -82,6 +82,40 @@ const EmbeddedColoringCanvas = ({
     return composite ? composite.toDataURL('image/png') : null;
   }, []);
 
+  const handleFirstInteraction = useCallback(() => {
+    if (hasTrackedInteractionRef.current) return;
+    hasTrackedInteractionRef.current = true;
+    track(TRACKING_EVENTS.START_HERO_CANVAS_INTERACTED, {
+      campaign,
+      coloringImageId: image.id ?? '',
+      msFromMount: Date.now() - mountTimeRef.current,
+    });
+  }, [campaign, image.id, track]);
+
+  // One-click auto-reveal: paints the entire pre-coloured canvas (built
+  // by ImageCanvas from the region store + active palette variant) onto
+  // the drawing canvas in one shot. Mirrors the body of
+  // handleRegionStoreAutoColor in ColoringArea.tsx, minus the history /
+  // unsaved-changes bookkeeping that doesn't apply to a marketing page.
+  // The setTransform reset is required because the drawing context has
+  // DPR scaling applied and drawImage needs raw pixel space.
+  const handleMagicAutoColor = useCallback(() => {
+    const drawing = canvasRef.current?.getCanvas();
+    const preColored = canvasRef.current?.getPreColoredCanvas();
+    const ctx = drawing?.getContext('2d');
+    if (!drawing || !preColored || !ctx) return;
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(preColored, 0, 0);
+    ctx.restore();
+    handleFirstInteraction();
+    track(TRACKING_EVENTS.START_HERO_AUTO_REVEAL_CLICKED, {
+      campaign,
+      coloringImageId: image.id ?? '',
+      msFromMount: Date.now() - mountTimeRef.current,
+    });
+  }, [campaign, image.id, track, handleFirstInteraction]);
+
   // Parse regionsJson from the DB string. Mirrors the parsing block in
   // ColoringArea.tsx — keep in sync if shape changes.
   const parsedRegionsJson = useMemo<RegionStoreJson | null>(() => {
@@ -127,16 +161,6 @@ const EmbeddedColoringCanvas = ({
       if (timer) clearTimeout(timer);
     };
   }, []);
-
-  const handleFirstInteraction = () => {
-    if (hasTrackedInteractionRef.current) return;
-    hasTrackedInteractionRef.current = true;
-    track(TRACKING_EVENTS.START_HERO_CANVAS_INTERACTED, {
-      campaign,
-      coloringImageId: image.id ?? '',
-      msFromMount: Date.now() - mountTimeRef.current,
-    });
-  };
 
   return (
     <div
@@ -191,6 +215,7 @@ const EmbeddedColoringCanvas = ({
       <div className="hidden md:flex w-full justify-center">
         <SlimColorPalette
           magicAvailable={regionStore.state.isReady}
+          onMagicAutoColor={handleMagicAutoColor}
           campaign={campaign}
           trailingAction={
             <ActionButtonSizeProvider value="tile">
@@ -243,6 +268,7 @@ const EmbeddedColoringCanvas = ({
           <div className="px-4 pb-2">
             <SlimColorPalette
               magicAvailable={regionStore.state.isReady}
+              onMagicAutoColor={handleMagicAutoColor}
               campaign={campaign}
               trailingAction={
                 <ActionButtonSizeProvider value="tile">

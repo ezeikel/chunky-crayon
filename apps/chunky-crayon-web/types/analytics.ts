@@ -409,8 +409,13 @@ export type EventProperties = {
   };
   [TRACKING_EVENTS.START_HERO_TOOL_CHANGED]: {
     campaign: string;
-    from: 'crayon' | 'magic-reveal' | 'eraser';
-    to: 'crayon' | 'magic-reveal' | 'eraser';
+    from: 'crayon' | 'magic' | 'eraser';
+    to: 'crayon' | 'magic' | 'eraser';
+  };
+  [TRACKING_EVENTS.START_HERO_AUTO_REVEAL_CLICKED]: {
+    campaign: string;
+    coloringImageId: string;
+    msFromMount: number;
   };
   [TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED]: {
     campaign: string;
