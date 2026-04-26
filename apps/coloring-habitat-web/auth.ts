@@ -5,6 +5,10 @@ import Resend from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@one-colored-pixel/db";
 import { getResendFromAddress } from "@/lib/email-config";
+import {
+  readClientMatchData,
+  sendSignupConversionEvents,
+} from "@/lib/conversion-api";
 
 const config = {
   adapter: PrismaAdapter(db),
@@ -42,12 +46,26 @@ const config = {
 
         if (existingUser) return true;
 
-        await db.user.create({
+        const created = await db.user.create({
           data: {
             email: profile?.email as string,
             name: profile?.name as string,
             brand: "COLORING_HABITAT",
           },
+        });
+
+        // Fire CompleteRegistration server-side via Meta/Pinterest CAPI.
+        // Browser PixelTracker fires the same event with userId as
+        // event_id; Meta deduplicates so we don't double-count. Wrapped
+        // in catch so a CAPI outage never blocks the signup itself.
+        const hints = await readClientMatchData();
+        sendSignupConversionEvents({
+          email: created.email!,
+          userId: created.id,
+          signupMethod: "google",
+          ...hints,
+        }).catch((err) => {
+          console.error("[CAPI] signup conversion failed (google)", err);
         });
 
         return true;
@@ -63,11 +81,23 @@ const config = {
 
         if (existingUser) return true;
 
-        await db.user.create({
+        const created = await db.user.create({
           data: {
             email: userEmail,
             brand: "COLORING_HABITAT",
           },
+        });
+
+        // Fire CompleteRegistration server-side. Same dedup pattern as
+        // the google path above.
+        const hints = await readClientMatchData();
+        sendSignupConversionEvents({
+          email: created.email!,
+          userId: created.id,
+          signupMethod: "email",
+          ...hints,
+        }).catch((err) => {
+          console.error("[CAPI] signup conversion failed (resend)", err);
         });
 
         return true;

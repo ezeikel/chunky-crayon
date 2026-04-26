@@ -107,14 +107,31 @@ export const trackPixelEvent = (
 
 /**
  * Track when a user completes registration/signup
+ *
+ * Pass `eventId` (the user's database id) so Meta can deduplicate this
+ * client-side fire against the matching server-side CAPI fire from the
+ * NextAuth signIn callback. Without it, Meta counts the signup twice.
  */
-export const trackSignUp = (params?: { method?: string }) => {
-  trackFacebookEvent("CompleteRegistration", {
-    content_name: "User Signup",
-    status: true,
-    ...params,
-  });
-  trackPinterestEvent("signup");
+export const trackSignUp = (params?: { method?: string; eventId?: string }) => {
+  const w = window as WindowWithPixels;
+  const { eventId, ...rest } = params ?? {};
+  if (w.fbq) {
+    w.fbq(
+      "track",
+      "CompleteRegistration",
+      {
+        content_name: "User Signup",
+        status: true,
+        ...rest,
+      },
+      ...(eventId ? [{ eventID: eventId }] : []),
+    );
+  }
+  if (w.pintrk) {
+    w.pintrk("track", "signup", {
+      ...(eventId && { event_id: eventId }),
+    });
+  }
 };
 
 /**
@@ -264,25 +281,31 @@ export const trackStartTrial = (params: {
 
 /**
  * Track when a user subscribes
+ *
+ * Pass `eventId` so Meta deduplicates this client-side fire against the
+ * matching server-side CAPI fire from the Stripe webhook (it uses
+ * `sub_${stripeSessionId}`).
  */
 export const trackSubscribe = (params: {
   planName: string;
   value: number;
   currency: string;
+  eventId?: string;
 }) => {
-  trackFacebookEvent("Subscribe", {
-    value: params.value / 100,
-    currency: params.currency,
-    content_name: `${params.planName} Subscription`,
-    predicted_ltv: (params.value / 100) * 12, // Estimated annual value
-  });
-
-  // Pinterest uses checkout for subscriptions
-  trackPinterestEvent("checkout", {
-    value: params.value / 100,
-    currency: params.currency,
-    order_quantity: 1,
-  });
+  const w = window as WindowWithPixels;
+  if (w.fbq) {
+    w.fbq(
+      "track",
+      "Subscribe",
+      {
+        value: params.value / 100,
+        currency: params.currency,
+        content_name: `${params.planName} Subscription`,
+        predicted_ltv: (params.value / 100) * 12, // Estimated annual value
+      },
+      ...(params.eventId ? [{ eventID: params.eventId }] : []),
+    );
+  }
 };
 
 /**

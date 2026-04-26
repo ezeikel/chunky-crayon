@@ -1,5 +1,6 @@
 "use server";
 
+import crypto from "crypto";
 import { redirect } from "next/navigation";
 import { getStripe } from "@/lib/stripe";
 import { getUserId } from "@/app/actions/user";
@@ -8,7 +9,12 @@ import { ACTIONS } from "@/constants";
 import {
   mapStripePriceToPlanName,
   getCreditAmountFromPlanName,
+  getCreditAmountFromPriceId,
 } from "@/utils/stripe";
+import {
+  readClientMatchData,
+  sendInitiateCheckoutConversionEvents,
+} from "@/lib/conversion-api";
 
 export const createCheckoutSession = async (
   priceId: string,
@@ -28,6 +34,13 @@ export const createCheckoutSession = async (
 
   const stripe = getStripe();
 
+  // Capture Meta match data (fbp/fbc cookies + IP/UA) and round-trip
+  // them via Stripe metadata. The webhook fires Purchase server-side
+  // from Stripe's IP — without this round-trip, Meta has no browser
+  // identity for the buyer and match quality drops sharply.
+  const matchData = await readClientMatchData();
+  const initiateCheckoutEventId = crypto.randomUUID();
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode,
@@ -40,7 +53,39 @@ export const createCheckoutSession = async (
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXTAUTH_URL}/account/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXTAUTH_URL}${cancelPath}`,
-      metadata: { userId },
+      metadata: {
+        userId,
+        ...(matchData.fbp && { fbp: matchData.fbp }),
+        ...(matchData.fbc && { fbc: matchData.fbc }),
+        ...(matchData.ipAddress && { client_ip_address: matchData.ipAddress }),
+        ...(matchData.userAgent && { client_user_agent: matchData.userAgent }),
+      },
+    });
+
+    // Fire InitiateCheckout server-side. Survives ad-blockers / iOS 14+
+    // tracking restrictions that suppress the browser pixel fire.
+    const planMapping =
+      mode === "subscription" ? mapStripePriceToPlanName(priceId) : null;
+    const creditAmount =
+      mode === "payment" ? getCreditAmountFromPriceId(priceId) : null;
+    const contentName = planMapping
+      ? `${planMapping.planName} Subscription`
+      : creditAmount
+        ? `${creditAmount} Credits Pack`
+        : "Checkout";
+    const value = session.amount_total ?? 0;
+    const currency = (session.currency ?? "gbp").toUpperCase();
+
+    sendInitiateCheckoutConversionEvents({
+      ...(user?.email && { email: user.email }),
+      userId,
+      value,
+      currency,
+      eventId: initiateCheckoutEventId,
+      contentName,
+      ...matchData,
+    }).catch((err) => {
+      console.error("[CAPI] InitiateCheckout failed", err);
     });
 
     return { id: session.id, url: session.url };

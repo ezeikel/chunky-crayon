@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import { setR2Hosts } from "@one-colored-pixel/coloring-ui";
 import { Toaster } from "@/components/ui/sonner";
 import UserIdentify from "@/components/UserIdentify";
+import PixelTracker from "@/components/PixelTracker/PixelTracker";
 
 // Configure R2 hosts for canvas CORS proxy. Matches both the production
 // custom domain and the R2 dev public URL so browser fetches stay
@@ -17,6 +18,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <UserIdentify />
+      <PixelTracker />
       {children}
       <Toaster />
     </SessionProvider>

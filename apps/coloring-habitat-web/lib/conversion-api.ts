@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from "crypto";
 
 // =============================================================================
 // HASHING UTILITIES (required by both APIs for PII)
@@ -6,9 +6,9 @@ import crypto from 'crypto';
 
 const hashSha256 = (value: string): string => {
   return crypto
-    .createHash('sha256')
+    .createHash("sha256")
     .update(value.toLowerCase().trim())
-    .digest('hex');
+    .digest("hex");
 };
 
 // =============================================================================
@@ -52,8 +52,8 @@ const buildPinterestUserData = (
   ...(params.userAgent && { client_user_agent: params.userAgent }),
 });
 
-const FB_API = 'https://graph.facebook.com/v21.0';
-const FB_EVENT_SOURCE_URL = 'https://chunkycrayon.com';
+const FB_API = "https://graph.facebook.com/v21.0";
+const FB_EVENT_SOURCE_URL = "https://coloringhabitat.com";
 
 const postFacebookEvent = async (
   event: Record<string, unknown>,
@@ -64,15 +64,15 @@ const postFacebookEvent = async (
 
   if (!pixelId || !accessToken) {
     console.log(`[FB CAPI] Missing credentials, skipping ${label}`);
-    return { success: false, error: 'Missing Facebook CAPI credentials' };
+    return { success: false, error: "Missing Facebook CAPI credentials" };
   }
 
   try {
     const response = await fetch(
       `${FB_API}/${pixelId}/events?access_token=${accessToken}`,
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           data: [event],
           ...(process.env.FACEBOOK_CAPI_TEST_CODE && {
@@ -122,7 +122,7 @@ export const sendFacebookConversionEvent = async ({
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
   return postFacebookEvent(
     {
-      event_name: 'Purchase',
+      event_name: "Purchase",
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
       event_source_url: FB_EVENT_SOURCE_URL,
@@ -138,11 +138,11 @@ export const sendFacebookConversionEvent = async ({
         currency: currency.toUpperCase(),
         value: value / 100,
         content_name: contentName,
-        content_type: 'product',
+        content_type: "product",
       },
-      action_source: 'website',
+      action_source: "website",
     },
-    'Purchase',
+    "Purchase",
   );
 };
 
@@ -177,7 +177,7 @@ export const sendFacebookSubscribeEvent = async ({
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
   return postFacebookEvent(
     {
-      event_name: 'Subscribe',
+      event_name: "Subscribe",
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
       event_source_url: FB_EVENT_SOURCE_URL,
@@ -195,9 +195,9 @@ export const sendFacebookSubscribeEvent = async ({
         content_name: `${planName} Subscription`,
         predicted_ltv: (value / 100) * predictedLtvMultiplier,
       },
-      action_source: 'website',
+      action_source: "website",
     },
-    'Subscribe',
+    "Subscribe",
   );
 };
 
@@ -232,7 +232,7 @@ export const sendFacebookInitiateCheckoutEvent = async ({
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
   return postFacebookEvent(
     {
-      event_name: 'InitiateCheckout',
+      event_name: "InitiateCheckout",
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
       event_source_url: FB_EVENT_SOURCE_URL,
@@ -248,11 +248,11 @@ export const sendFacebookInitiateCheckoutEvent = async ({
         currency: currency.toUpperCase(),
         value: value / 100,
         content_name: contentName,
-        content_type: 'product',
+        content_type: "product",
       },
-      action_source: 'website',
+      action_source: "website",
     },
-    'InitiateCheckout',
+    "InitiateCheckout",
   );
 };
 
@@ -261,8 +261,8 @@ export const sendFacebookInitiateCheckoutEvent = async ({
 // =============================================================================
 
 interface PinterestConversionEvent {
-  event_name: 'checkout';
-  action_source: 'web';
+  event_name: "checkout";
+  action_source: "web";
   event_time: number;
   event_id: string;
   event_source_url?: string;
@@ -296,13 +296,13 @@ export const sendPinterestConversionEvent = async ({
   const accessToken = process.env.PINTEREST_CAPI_ACCESS_TOKEN;
 
   if (!adAccountId || !accessToken) {
-    console.log('[Pinterest CAPI] Missing credentials, skipping');
-    return { success: false, error: 'Missing Pinterest CAPI credentials' };
+    console.log("[Pinterest CAPI] Missing credentials, skipping");
+    return { success: false, error: "Missing Pinterest CAPI credentials" };
   }
 
   const event: PinterestConversionEvent = {
-    event_name: 'checkout',
-    action_source: 'web',
+    event_name: "checkout",
+    action_source: "web",
     event_time: Math.floor(Date.now() / 1000),
     event_id: eventId,
     event_source_url: FB_EVENT_SOURCE_URL,
@@ -319,10 +319,10 @@ export const sendPinterestConversionEvent = async ({
     const response = await fetch(
       `https://api.pinterest.com/v5/ad_accounts/${adAccountId}/events`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ data: [event] }),
       },
@@ -331,14 +331,14 @@ export const sendPinterestConversionEvent = async ({
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('[Pinterest CAPI] Error:', data);
+      console.error("[Pinterest CAPI] Error:", data);
       return { success: false, error: data.message };
     }
 
-    console.log('[Pinterest CAPI] Checkout event sent:', eventId);
+    console.log("[Pinterest CAPI] Checkout event sent:", eventId);
     return { success: true };
   } catch (error) {
-    console.error('[Pinterest CAPI] Request failed:', error);
+    console.error("[Pinterest CAPI] Request failed:", error);
     return { success: false, error: String(error) };
   }
 };
@@ -362,11 +362,11 @@ export const sendFacebookCompleteRegistrationEvent = async ({
 }: {
   email: string;
   userId: string;
-  signupMethod?: 'google' | 'email';
+  signupMethod?: "google" | "email";
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
   return postFacebookEvent(
     {
-      event_name: 'CompleteRegistration',
+      event_name: "CompleteRegistration",
       event_time: Math.floor(Date.now() / 1000),
       event_id: userId,
       event_source_url: FB_EVENT_SOURCE_URL,
@@ -379,13 +379,13 @@ export const sendFacebookCompleteRegistrationEvent = async ({
         fbc,
       }),
       custom_data: {
-        content_name: 'User Signup',
+        content_name: "User Signup",
         ...(signupMethod && { signup_method: signupMethod }),
         status: true,
       },
-      action_source: 'website',
+      action_source: "website",
     },
-    'CompleteRegistration',
+    "CompleteRegistration",
   );
 };
 
@@ -409,13 +409,13 @@ export const sendPinterestSignupEvent = async ({
   const accessToken = process.env.PINTEREST_CAPI_ACCESS_TOKEN;
 
   if (!adAccountId || !accessToken) {
-    console.log('[Pinterest CAPI] Missing credentials, skipping signup');
-    return { success: false, error: 'Missing Pinterest CAPI credentials' };
+    console.log("[Pinterest CAPI] Missing credentials, skipping signup");
+    return { success: false, error: "Missing Pinterest CAPI credentials" };
   }
 
   const event = {
-    event_name: 'signup' as const,
-    action_source: 'web' as const,
+    event_name: "signup" as const,
+    action_source: "web" as const,
     event_time: Math.floor(Date.now() / 1000),
     event_id: userId,
     event_source_url: FB_EVENT_SOURCE_URL,
@@ -426,10 +426,10 @@ export const sendPinterestSignupEvent = async ({
     const response = await fetch(
       `https://api.pinterest.com/v5/ad_accounts/${adAccountId}/events`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ data: [event] }),
       },
@@ -438,14 +438,14 @@ export const sendPinterestSignupEvent = async ({
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('[Pinterest CAPI] signup error:', data);
+      console.error("[Pinterest CAPI] signup error:", data);
       return { success: false, error: data.message };
     }
 
-    console.log('[Pinterest CAPI] signup event sent:', userId);
+    console.log("[Pinterest CAPI] signup event sent:", userId);
     return { success: true };
   } catch (error) {
-    console.error('[Pinterest CAPI] signup request failed:', error);
+    console.error("[Pinterest CAPI] signup request failed:", error);
     return { success: false, error: String(error) };
   }
 };
@@ -515,7 +515,7 @@ export const sendSignupConversionEvents = async (
   params: {
     email: string;
     userId: string;
-    signupMethod?: 'google' | 'email';
+    signupMethod?: "google" | "email";
   } & ClientMatchData,
 ): Promise<void> => {
   await Promise.allSettled([
@@ -545,18 +545,18 @@ export const buildFbcFromFbclid = (fbclid: string | null | undefined) => {
 // where not available so callers can spread the result safely.
 export const readClientMatchData = async (): Promise<ClientMatchData> => {
   try {
-    const { headers } = await import('next/headers');
-    const { cookies } = await import('next/headers');
+    const { headers } = await import("next/headers");
+    const { cookies } = await import("next/headers");
     const h = await headers();
     const c = await cookies();
     return {
       ipAddress:
-        h.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-        h.get('x-real-ip') ||
+        h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        h.get("x-real-ip") ||
         undefined,
-      userAgent: h.get('user-agent') || undefined,
-      fbp: c.get('_fbp')?.value || undefined,
-      fbc: c.get('_fbc')?.value || undefined,
+      userAgent: h.get("user-agent") || undefined,
+      fbp: c.get("_fbp")?.value || undefined,
+      fbc: c.get("_fbc")?.value || undefined,
     };
   } catch {
     return {};

@@ -16,8 +16,8 @@ const BillingSuccessWrapper = async ({
 
   return (
     <BillingSuccess
-      amount={sessionData?.amount_total ? sessionData.amount_total / 100 : null}
-      currency={sessionData?.currency?.toUpperCase() || 'GBP'}
+      amount={sessionData?.amount_total ?? null}
+      currency={sessionData?.currency || 'gbp'}
       sessionId={sessionId}
       productType={sessionData?.productType}
       planName={sessionData?.planName}

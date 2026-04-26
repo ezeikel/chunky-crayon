@@ -1,5 +1,6 @@
 'use server';
 
+import crypto from 'crypto';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { db } from '@one-colored-pixel/db';
@@ -19,6 +20,10 @@ import {
 } from '@/utils/stripe';
 import { PLAN_CREDITS, ACTIONS } from '@/constants';
 import Stripe from 'stripe';
+import {
+  readClientMatchData,
+  sendInitiateCheckoutConversionEvents,
+} from '@/lib/conversion-api';
 import { getUserId } from './user';
 
 // Cacheable Stripe functions that don't require headers/cookies
@@ -108,6 +113,13 @@ export const createCheckoutSession = async (
     });
   }
 
+  // Capture Meta match data (fbp/fbc cookies + IP/UA) and round-trip
+  // them via Stripe metadata. The webhook fires Purchase server-side
+  // from Stripe's IP — without this round-trip, Meta has no browser
+  // identity for the buyer and match quality drops sharply.
+  const matchData = await readClientMatchData();
+  const initiateCheckoutEventId = crypto.randomUUID();
+
   // Build checkout session options
   const sessionOptions: Stripe.Checkout.SessionCreateParams = {
     payment_method_types: ['card'],
@@ -115,6 +127,13 @@ export const createCheckoutSession = async (
     mode,
     success_url: `${origin}/account/billing/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}${cancelPath || '/pricing'}`,
+    metadata: {
+      // Replayed in webhook for Purchase / Subscribe CAPI sends.
+      ...(matchData.fbp && { fbp: matchData.fbp }),
+      ...(matchData.fbc && { fbc: matchData.fbc }),
+      ...(matchData.ipAddress && { client_ip_address: matchData.ipAddress }),
+      ...(matchData.userAgent && { client_user_agent: matchData.userAgent }),
+    },
   };
 
   if (userId && user) {
@@ -130,6 +149,37 @@ export const createCheckoutSession = async (
   // Webhook will find/create user from the Stripe customer email
 
   const stripeSession = await stripe.checkout.sessions.create(sessionOptions);
+
+  // Fire InitiateCheckout server-side. Survives ad-blockers / iOS 14+
+  // tracking restrictions that suppress the browser pixel fire. Don't
+  // await — the user is about to be redirected to Stripe and we
+  // shouldn't block on Meta's response.
+  const planMapping =
+    mode === 'subscription' ? mapStripePriceToPlanName(priceId) : null;
+  const creditAmount =
+    mode === 'payment' ? getCreditAmountFromPriceId(priceId) : null;
+  const contentName = planMapping
+    ? `${planMapping.planName} Subscription`
+    : creditAmount
+      ? `${creditAmount} Credits Pack`
+      : 'Checkout';
+
+  // Pull amount from the freshly-created session so we don't have to
+  // re-derive it from price metadata.
+  const value = stripeSession.amount_total ?? 0;
+  const currency = (stripeSession.currency ?? 'gbp').toUpperCase();
+
+  sendInitiateCheckoutConversionEvents({
+    ...(user?.email && { email: user.email }),
+    ...(userId && { userId }),
+    value,
+    currency,
+    eventId: initiateCheckoutEventId,
+    contentName,
+    ...matchData,
+  }).catch((err) => {
+    console.error('[CAPI] InitiateCheckout failed', err);
+  });
 
   // update relevant paths
   revalidatePath('/account/billing');

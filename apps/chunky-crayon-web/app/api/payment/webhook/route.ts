@@ -19,7 +19,11 @@ import {
 import { FREE_CREDITS, PLAN_ROLLOVER_CAPS, TRACKING_EVENTS } from '@/constants';
 import { sendPaymentFailedEmail } from '@/app/actions/email';
 import { trackWithUser } from '@/utils/analytics-server';
-import { sendPurchaseConversionEvents } from '@/lib/conversion-api';
+import {
+  sendPurchaseConversionEvents,
+  sendSignupConversionEvents,
+  sendSubscribeConversionEvents,
+} from '@/lib/conversion-api';
 
 // Check if webhook event has already been processed (idempotency)
 const isEventProcessed = async (eventId: string): Promise<boolean> => {
@@ -76,7 +80,21 @@ export const POST = async (req: Request) => {
   if (stripeEvent.type === 'checkout.session.completed') {
     const session = stripeEvent.data.object;
 
+    // Meta match data round-tripped from createCheckoutSession via
+    // Stripe metadata. Stripe metadata values are strings.
+    const matchData = {
+      fbp: session.metadata?.fbp || undefined,
+      fbc: session.metadata?.fbc || undefined,
+      ipAddress: session.metadata?.client_ip_address || undefined,
+      userAgent: session.metadata?.client_user_agent || undefined,
+    };
+
     let user: (User & { subscriptions: Subscription[] }) | null = null;
+    // Track whether the webhook just created the user, so we can fire
+    // CompleteRegistration to Meta/Pinterest CAPI after-the-fact for
+    // guest-checkout signups (where there's no NextAuth signIn callback
+    // to do it for us).
+    let isNewUser = false;
 
     if (session.client_reference_id) {
       // Logged-in user flow: get user from client reference ID
@@ -142,6 +160,8 @@ export const POST = async (req: Request) => {
           },
           include: { subscriptions: true },
         });
+
+        isNewUser = true;
 
         console.log(
           `Created new user ${user.id} from guest checkout with email ${customerEmail} and ${FREE_CREDITS} free credits`,
@@ -223,14 +243,33 @@ export const POST = async (req: Request) => {
 
       // Send to Conversion APIs (Facebook + Pinterest)
       if (user.email) {
-        await sendPurchaseConversionEvents({
-          email: user.email,
-          userId: user.id,
-          value: priceAmount,
-          currency: 'GBP',
-          eventId: session.id,
-          contentName: `${planName} Subscription`,
-        });
+        await Promise.allSettled([
+          sendPurchaseConversionEvents({
+            email: user.email,
+            userId: user.id,
+            value: priceAmount,
+            currency: 'GBP',
+            eventId: session.id,
+            contentName: `${planName} Subscription`,
+            ...matchData,
+          }),
+          // Subscribe is distinct from Purchase in Meta — fire it
+          // alongside so the Subscribe column in Events Manager
+          // populates and Meta can optimize for subscription starts.
+          // Distinct event_id (sub_ prefix) so Meta doesn't merge it
+          // with the Purchase event.
+          sendSubscribeConversionEvents({
+            email: user.email,
+            userId: user.id,
+            value: priceAmount,
+            currency: 'GBP',
+            eventId: `sub_${session.id}`,
+            planName,
+            predictedLtvMultiplier:
+              billingPeriod === BillingPeriod.ANNUAL ? 1 : 12,
+            ...matchData,
+          }),
+        ]);
       }
     } else {
       // handle one-time credit purchase
@@ -329,11 +368,27 @@ export const POST = async (req: Request) => {
                     ? session.id
                     : `${session.id}_${item.price?.id}`,
                 contentName: `${creditAmount} Credits Pack`,
+                ...matchData,
               });
             }
           }
         }),
       );
+    }
+
+    // Fire CompleteRegistration when the webhook just created the user
+    // (guest checkout flow — no NextAuth signIn callback runs in that
+    // path). Server-side dedup against any future browser
+    // CompleteRegistration uses the user.id as event_id.
+    if (isNewUser && user.email) {
+      sendSignupConversionEvents({
+        email: user.email,
+        userId: user.id,
+        signupMethod: 'email',
+        ...matchData,
+      }).catch((err) => {
+        console.error('[CAPI] guest-checkout signup conversion failed', err);
+      });
     }
   } else if (stripeEvent.type === 'customer.subscription.updated') {
     const subscription = stripeEvent.data.object;
