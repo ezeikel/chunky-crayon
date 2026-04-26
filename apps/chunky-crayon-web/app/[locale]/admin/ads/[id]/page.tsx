@@ -10,10 +10,12 @@ import {
   AD_PURPOSE_PREFIX,
   getAdCampaignKey,
 } from '@/lib/coloring-image-purpose';
+import { campaignByAssetKey } from '@/lib/ads/campaigns';
 import { requireAdmin } from '@/lib/auth-guards';
 import Loading from '@/components/Loading/Loading';
 import AdControls from '../_components/AdControls';
 import AdPreviewFrame from '../_components/AdPreviewFrame';
+import CampaignCreativePanel from '../_components/CampaignCreativePanel';
 
 type Params = Promise<{ id: string }>;
 
@@ -47,6 +49,7 @@ const AdDetailContent = async ({ params }: { params: Params }) => {
   }
 
   const campaignKey = getAdCampaignKey(ad)!;
+  const campaign = campaignByAssetKey(campaignKey);
   const assetStates: Array<{ label: string; ready: boolean }> = [
     { label: 'Region store', ready: !!ad.regionMapUrl },
     { label: 'QR code', ready: !!ad.qrCodeUrl },
@@ -123,6 +126,13 @@ const AdDetailContent = async ({ params }: { params: Params }) => {
           </div>
 
           <AdControls id={ad.id} campaignKey={campaignKey} />
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="font-tondo text-lg font-bold mb-3">Ad creative</h2>
+        <div className="bg-white rounded-coloring-card border border-paper-cream-dark p-5">
+          <CampaignCreativePanel campaign={campaign} assetKey={campaignKey} />
         </div>
       </div>
 

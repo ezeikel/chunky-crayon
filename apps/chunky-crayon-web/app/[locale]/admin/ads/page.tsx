@@ -10,6 +10,7 @@ import {
   AD_PURPOSE_PREFIX,
   getAdCampaignKey,
 } from '@/lib/coloring-image-purpose';
+import { campaignByAssetKey } from '@/lib/ads/campaigns';
 import { requireAdmin } from '@/lib/auth-guards';
 import Loading from '@/components/Loading/Loading';
 
@@ -65,11 +66,15 @@ const AdsListContent = async () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {ads.map((ad) => {
             const campaignKey = getAdCampaignKey(ad);
+            const campaign = campaignKey
+              ? campaignByAssetKey(campaignKey)
+              : undefined;
             const assetStates: Array<{ label: string; ready: boolean }> = [
               { label: 'Region', ready: !!ad.regionMapUrl },
               { label: 'QR', ready: !!ad.qrCodeUrl },
               { label: 'Music', ready: !!ad.backgroundMusicUrl },
               { label: 'Colored ref', ready: !!ad.coloredReferenceUrl },
+              { label: 'Creative', ready: !!campaign },
             ];
             return (
               <Link

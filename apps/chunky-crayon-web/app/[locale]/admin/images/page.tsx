@@ -53,6 +53,7 @@ const AdminImagesContent = async ({
       select: {
         id: true,
         title: true,
+        sourcePrompt: true,
         url: true,
         svgUrl: true,
         regionMapUrl: true,
@@ -155,6 +156,14 @@ const AdminImagesContent = async ({
                 >
                   {img.title ?? '(no title)'}
                 </div>
+                {img.sourcePrompt ? (
+                  <div
+                    className="text-text-primary/70 line-clamp-2 italic"
+                    title={img.sourcePrompt}
+                  >
+                    “{img.sourcePrompt}”
+                  </div>
+                ) : null}
                 <div className="text-text-primary/50">
                   {img.User?.email ?? '(anonymous)'}
                 </div>

@@ -216,3 +216,12 @@ export const campaigns: Campaign[] = [
 export const campaignsById = Object.fromEntries(
   campaigns.map((c) => [c.id, c]),
 ) as Record<string, Campaign | undefined>;
+
+// Lookup by the coloring-image asset key (e.g. 'trex' → impossible-request-trex
+// campaign). Used by /admin/ads to tie a coloring_images row to its full
+// creative (video, copy, still images). Returns undefined for ad keys that
+// don't have a corresponding campaign in this file (e.g. ad-hoc tests
+// created via the admin UI).
+export const campaignByAssetKey = (assetKey: string): Campaign | undefined => {
+  return campaigns.find((c) => c.asset.key === assetKey);
+};
