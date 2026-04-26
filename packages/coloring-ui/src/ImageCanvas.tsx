@@ -273,6 +273,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       selectedSticker,
       pushToHistory,
       addDrawingAction,
+      drawingActions,
       zoom,
       panOffset,
       setZoom,
@@ -296,6 +297,14 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     // Ref for synchronous access to DPR (React state updates are async)
     // This solves the stale closure issue when replayAction is called from onCanvasReady
     const dprRef = useRef<number>(1);
+
+    // Mirror of drawingActions for the resize handler. The handler is
+    // stable (mounted once via ResizeObserver) but needs the latest
+    // stroke list when it fires. Putting drawingActions in the
+    // useEffect's dep list directly would tear down + re-mount the
+    // observer on every stroke — wasteful and brittle.
+    const drawingActionsRef = useRef(drawingActions);
+    drawingActionsRef.current = drawingActions;
 
     // Store the last position for smooth drawing
     const lastPosRef = useRef<{ x: number; y: number } | null>(null);
@@ -1061,11 +1070,14 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       return undefined;
     }, [coloringImage.svgUrl]);
 
-    // Build the pre-coloured canvas when the region store is ready or the
-    // palette variant changes. The pre-coloured canvas is at the drawing
-    // canvas's DPR-scaled resolution (not the region map's 1024×1024) so
-    // that 'source-in' compositing during brush dabs works without scaling.
-    useEffect(() => {
+    // Build the pre-coloured canvas at the drawing canvas's current
+    // DPR-scaled resolution (not the region map's logical size) so that
+    // 'source-in' compositing during magic-reveal brush dabs works without
+    // scaling. Extracted into a helper so we can also call it from the
+    // resize handler — otherwise the pre-coloured canvas would stay locked
+    // to the initial-mount dimensions and Magic Brush dabs would land in
+    // the wrong region after a resize.
+    const buildPreColouredCanvas = useCallback(() => {
       if (!regionStore?.isReady) return;
       const drawingCanvas = drawingCanvasRef.current;
       if (!drawingCanvas) return;
@@ -1075,7 +1087,6 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       const regionW = regionStore.width;
       const regionH = regionStore.height;
 
-      // Create or reuse the pre-coloured canvas
       if (!preColoredCanvasRef.current) {
         preColoredCanvasRef.current = document.createElement("canvas");
       }
@@ -1085,7 +1096,6 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       const pcCtx = pcCanvas.getContext("2d");
       if (!pcCtx) return;
 
-      // Build a colour lookup for the active palette variant
       const colorCache = new Map<
         number,
         { r: number; g: number; b: number } | null
@@ -1109,19 +1119,18 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         return rgb;
       };
 
-      // Paint every pixel with its region's colour. This runs on the main
-      // thread for now (~50-100ms for a 1024×1024 canvas at DPR 2 = 2048×2048).
-      // Can be moved to the BUILD_PRECOLORED worker for zero-jank if needed.
+      // Paint every pixel with its region's colour. ~50-100ms for a
+      // 1024×1024 canvas at DPR 2 = 2048×2048. Main thread is fine for
+      // now — can be moved to BUILD_PRECOLORED worker if jank reported.
       const imageData = pcCtx.createImageData(canvasW, canvasH);
       const data = imageData.data;
 
       for (let cy = 0; cy < canvasH; cy++) {
-        // Map canvas Y → region map Y
         const ry = Math.floor((cy / canvasH) * regionH);
         for (let cx = 0; cx < canvasW; cx++) {
           const rx = Math.floor((cx / canvasW) * regionW);
           const rid = regionStore.getRegionIdAt(rx, ry);
-          if (rid === 0) continue; // boundary — leave transparent
+          if (rid === 0) continue;
           const rgb = getRgb(rid);
           if (!rgb) continue;
           const i = (cy * canvasW + cx) * 4;
@@ -1134,7 +1143,6 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
       pcCtx.putImageData(imageData, 0, 0);
 
-      // Also create the temp dab canvas at the same size
       if (!tempDabCanvasRef.current) {
         tempDabCanvasRef.current = document.createElement("canvas");
       }
@@ -1144,7 +1152,15 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       console.log(
         `[ImageCanvas] Pre-coloured canvas built: ${canvasW}×${canvasH} for palette "${paletteVariant}"`,
       );
+    }, [regionStore, paletteVariant]);
+
+    // Trigger the build on regionStore/palette/dpr changes. Resize-driven
+    // rebuilds are handled inside the resize handler instead so they can
+    // run in the right order (after canvas dims are updated).
+    useEffect(() => {
+      buildPreColouredCanvas();
     }, [
+      buildPreColouredCanvas,
       regionStore?.isReady,
       regionStore?.width,
       regionStore?.height,
@@ -1152,7 +1168,26 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       dpr,
     ]);
 
-    // Handle resize
+    // Handle resize via ResizeObserver on the container.
+    //
+    // Why ResizeObserver instead of window.addEventListener('resize'):
+    // the old listener missed every layout shift that wasn't a literal
+    // window drag — parent flex reflow when a sibling mounts (the /start
+    // bottom sheet), scrollbar showing/hiding, mobile address-bar
+    // collapse, ancestor CSS class changes. The drawing canvas's CSS
+    // size could drift from its pixel buffer, and strokes would appear
+    // misaligned. ResizeObserver fires whenever the canvas's container
+    // box size changes, regardless of cause.
+    //
+    // Why action-replay instead of rasterized scale:
+    // the old handler did `drawImage(tempCanvas, 0, 0, oldW, oldH, 0,
+    // 0, newW, newH)` to stretch the previous pixel buffer into the new
+    // dimensions. That bilinear stretch blurs strokes and drifts
+    // sub-pixel positions, which against a freshly-redrawn (crisp,
+    // vector) SVG line art reads as "strokes jumped." Each action in
+    // `drawingActions` carries its own sourceWidth/sourceHeight, so
+    // `replayAction` (already used for cross-platform progress sync) can
+    // re-draw vector-style at the new dimensions — perfectly aligned.
     useEffect(() => {
       const drawingCanvas = drawingCanvasRef.current;
       const imageCanvas = imageCanvasRef.current;
@@ -1160,127 +1195,105 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       const imageCtx = imageCanvas?.getContext("2d");
       const container = containerRef.current;
 
-      if (drawingCanvas && imageCanvas && drawingCtx && imageCtx && container) {
-        const handleResize = () => {
-          if (!svgImage) return;
-
-          const newWidth = container.clientWidth;
-          const newHeight = newWidth / ratio;
-
-          const devicePixelRatio = window.devicePixelRatio || 1;
-          dprRef.current = devicePixelRatio; // Update ref synchronously
-          setDpr(devicePixelRatio);
-
-          // Capture existing drawing BEFORE resizing canvases
-          // We need to save it at the current resolution to scale it properly
-          let savedDrawing: ImageData | null = null;
-          const oldOffScreen = offScreenCanvasRef.current;
-          if (
-            oldOffScreen &&
-            oldOffScreen.width > 0 &&
-            oldOffScreen.height > 0
-          ) {
-            const oldCtx = oldOffScreen.getContext("2d");
-            if (oldCtx) {
-              savedDrawing = oldCtx.getImageData(
-                0,
-                0,
-                oldOffScreen.width,
-                oldOffScreen.height,
-              );
-            }
-          }
-          const oldWidth = oldOffScreen?.width || 0;
-          const oldHeight = oldOffScreen?.height || 0;
-
-          // Resize canvases to new dimensions
-          const newCanvasWidth = newWidth * devicePixelRatio;
-          const newCanvasHeight = newHeight * devicePixelRatio;
-
-          drawingCanvas.width = newCanvasWidth;
-          drawingCanvas.height = newCanvasHeight;
-          imageCanvas.width = newCanvasWidth;
-          imageCanvas.height = newCanvasHeight;
-
-          drawingCanvas.style.width = `${newWidth}px`;
-          drawingCanvas.style.height = `${newHeight}px`;
-          imageCanvas.style.width = `${newWidth}px`;
-          imageCanvas.style.height = `${newHeight}px`;
-
-          // IMPORTANT: Reset transform before applying new scale
-          // Setting canvas.width resets the context, but we need explicit scale
-          drawingCtx.setTransform(
-            devicePixelRatio,
-            0,
-            0,
-            devicePixelRatio,
-            0,
-            0,
-          );
-          imageCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-
-          // Redraw SVG on image canvas
-          drawImageOnCanvas(svgImage, imageCtx, newWidth, newHeight);
-
-          // Resize offscreen canvas and restore drawing at new resolution
-          if (offScreenCanvasRef.current) {
-            // Create temp canvas with old content for scaling
-            const tempCanvas = document.createElement("canvas");
-            if (savedDrawing && oldWidth > 0 && oldHeight > 0) {
-              tempCanvas.width = oldWidth;
-              tempCanvas.height = oldHeight;
-              const tempCtx = tempCanvas.getContext("2d");
-              if (tempCtx) {
-                tempCtx.putImageData(savedDrawing, 0, 0);
-              }
-            }
-
-            // Resize offscreen canvas to new dimensions
-            offScreenCanvasRef.current.width = newCanvasWidth;
-            offScreenCanvasRef.current.height = newCanvasHeight;
-            const offScreenCtx = offScreenCanvasRef.current.getContext("2d");
-
-            if (offScreenCtx && savedDrawing && oldWidth > 0 && oldHeight > 0) {
-              // Scale old drawing to new canvas size
-              // This preserves the visual appearance across resize
-              offScreenCtx.drawImage(
-                tempCanvas,
-                0,
-                0,
-                oldWidth,
-                oldHeight,
-                0,
-                0,
-                newCanvasWidth,
-                newCanvasHeight,
-              );
-
-              // Also draw scaled content to visible canvas
-              // Use CSS coordinates since context is scaled by DPR
-              drawingCtx.drawImage(
-                tempCanvas,
-                0,
-                0,
-                oldWidth,
-                oldHeight,
-                0,
-                0,
-                newWidth,
-                newHeight,
-              );
-            }
-          }
-        };
-
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-          window.removeEventListener("resize", handleResize);
-        };
+      if (
+        !drawingCanvas ||
+        !imageCanvas ||
+        !drawingCtx ||
+        !imageCtx ||
+        !container
+      ) {
+        return undefined;
       }
 
-      return undefined;
-    }, [ratio, svgImage]);
+      let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+      const performResize = () => {
+        if (!svgImage) return;
+
+        const newWidth = container.clientWidth;
+        if (newWidth <= 0) return; // container not yet laid out
+        const newHeight = newWidth / ratio;
+
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        const newCanvasWidth = newWidth * devicePixelRatio;
+        const newCanvasHeight = newHeight * devicePixelRatio;
+
+        // Skip no-op resizes — ResizeObserver fires on observe(), and
+        // mobile scroll can fire frequent same-size events. Comparing
+        // canvas pixel dims (not CSS) catches DPR changes too.
+        if (
+          drawingCanvas.width === newCanvasWidth &&
+          drawingCanvas.height === newCanvasHeight
+        ) {
+          return;
+        }
+
+        dprRef.current = devicePixelRatio;
+        setDpr(devicePixelRatio);
+
+        // Resize all three canvases (visible drawing, visible image,
+        // offscreen backup). Setting canvas.width/height clears its
+        // pixel buffer and resets the 2D context transform.
+        drawingCanvas.width = newCanvasWidth;
+        drawingCanvas.height = newCanvasHeight;
+        imageCanvas.width = newCanvasWidth;
+        imageCanvas.height = newCanvasHeight;
+
+        drawingCanvas.style.width = `${newWidth}px`;
+        drawingCanvas.style.height = `${newHeight}px`;
+        imageCanvas.style.width = `${newWidth}px`;
+        imageCanvas.style.height = `${newHeight}px`;
+
+        // Re-apply DPR transform so logical (CSS) coords map to physical
+        // pixels via the scale factor (matches the initial-mount setup).
+        drawingCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        imageCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+        if (offScreenCanvasRef.current) {
+          offScreenCanvasRef.current.width = newCanvasWidth;
+          offScreenCanvasRef.current.height = newCanvasHeight;
+        }
+
+        // Re-draw the line art at new dims.
+        drawImageOnCanvas(svgImage, imageCtx, newWidth, newHeight);
+
+        // Re-build the pre-coloured canvas at the new dims so Magic
+        // Brush dabs stay in the right region. Otherwise the pre-coloured
+        // layer would still be at the OLD canvas dims and source-in
+        // compositing in the dab loop would mis-align by the resize ratio.
+        buildPreColouredCanvas();
+
+        // Replay every recorded action at the new dims. Each action
+        // carries its sourceWidth/sourceHeight; `replayAction` scales
+        // accordingly. This is strictly more correct than the old
+        // rasterized scale (which blurred + drifted sub-pixel).
+        const actions = drawingActionsRef.current;
+        if (actions.length > 0) {
+          for (const action of actions) {
+            const sw = "sourceWidth" in action ? action.sourceWidth : undefined;
+            const sh =
+              "sourceHeight" in action ? action.sourceHeight : undefined;
+            replayAction(action, sw, sh);
+          }
+        }
+      };
+
+      const scheduleResize = () => {
+        // 150ms debounce — short enough to feel instant on a settled
+        // window drag, long enough to coalesce mid-scroll events from
+        // mobile address-bar collapse without thrashing the replay.
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(performResize, 150);
+      };
+
+      const observer = new ResizeObserver(scheduleResize);
+      observer.observe(container);
+
+      return () => {
+        observer.disconnect();
+        if (debounceTimer) clearTimeout(debounceTimer);
+      };
+    }, [ratio, svgImage, replayAction, buildPreColouredCanvas]);
 
     // Prevent scroll on touch for mobile
     // With touch-action: none on the canvas, most browsers handle this,
