@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { connection } from 'next/server';
 import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
-import { requireAdmin } from '@/lib/auth-guards';
 import Loading from '@/components/Loading/Loading';
 
 const PAGE_SIZE = 60;
@@ -20,10 +19,9 @@ const AdminImagesContent = async ({
 }: {
   searchParams: PageSearchParams;
 }) => {
-  // Must come before auth() / DB reads so Cache Components knows the page
-  // is dynamic per request.
+  // Must come before DB reads so Cache Components knows the page is
+  // dynamic per request. Admin gate is in /admin/layout.tsx.
   await connection();
-  await requireAdmin();
 
   const { page: pageParam, type, status } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
