@@ -89,12 +89,7 @@ const SlimColorPalette = ({
   };
 
   return (
-    <div
-      className={cn(
-        'hidden md:flex flex-col gap-3 items-center w-full',
-        className,
-      )}
-    >
+    <div className={cn('flex flex-col gap-3 items-center w-full', className)}>
       {/* Tools row */}
       <div className="flex gap-2">
         {TOOLS.map((tool) => {

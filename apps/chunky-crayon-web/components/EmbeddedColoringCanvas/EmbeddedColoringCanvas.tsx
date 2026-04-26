@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import type { ColoringImage } from '@one-colored-pixel/db/types';
 import {
   ImageCanvas,
-  MobileColoringDrawer,
   useRegionStore,
   type RegionStoreJson,
 } from '@one-colored-pixel/coloring-ui';
@@ -41,9 +40,14 @@ type EmbeddedColoringCanvasProps = {
  * marketing page). Reuses:
  * - ImageCanvas (the actual paint surface, from coloring-ui)
  * - useRegionStore (loads regionMapUrl + regionsJson for Magic Brush)
- * - MobileColoringDrawer (mobile tool sheet, gated by IntersectionObserver)
  * - useColoringContext (state from app-root provider — already wraps
  *   the entire app in app/providers.tsx)
+ *
+ * The compact SlimColorPalette below the canvas covers BOTH desktop
+ * and mobile — we deliberately don't render coloring-ui's full
+ * MobileColoringDrawer here because it expands into a huge bottom
+ * sheet (sticker tray, magic-auto, undo, fill patterns) that's way
+ * too much UI for a marketing landing.
  *
  * Tracking: fires START_HERO_CANVAS_INTERACTED exactly once per session
  * on first stroke (whichever canvas method is first invoked).
@@ -54,9 +58,7 @@ const EmbeddedColoringCanvas = ({
   className,
 }: EmbeddedColoringCanvasProps) => {
   const { track } = useAnalytics();
-  const containerRef = useRef<HTMLDivElement>(null);
   const hasTrackedInteractionRef = useRef(false);
-  const [isInViewport, setIsInViewport] = useState(false);
 
   // Parse regionsJson from the DB string. Mirrors the parsing block in
   // ColoringArea.tsx — keep in sync if shape changes.
@@ -80,32 +82,6 @@ const EmbeddedColoringCanvas = ({
     regionsJson: parsedRegionsJson ?? undefined,
   });
 
-  // Mobile tool drawer follows the canvas: only mounted when the canvas
-  // is in the viewport so it doesn't follow the user as they scroll
-  // into the marketing copy below. Debounce 200ms to prevent thrash on
-  // slow scroll. Threshold 0.2 = drawer appears when ~20% of the canvas
-  // is visible (gives the user time to reach for tools as the canvas
-  // scrolls into view rather than waiting until it's fully visible).
-  useEffect(() => {
-    const node = containerRef.current;
-    if (!node) return;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => {
-          setIsInViewport(entry.isIntersecting);
-        }, 200);
-      },
-      { threshold: 0.2 },
-    );
-    observer.observe(node);
-    return () => {
-      observer.disconnect();
-      if (timer) clearTimeout(timer);
-    };
-  }, []);
-
   const handleFirstInteraction = () => {
     if (hasTrackedInteractionRef.current) return;
     hasTrackedInteractionRef.current = true;
@@ -116,10 +92,7 @@ const EmbeddedColoringCanvas = ({
   };
 
   return (
-    <div
-      ref={containerRef}
-      className={cn('flex flex-col gap-4 items-center w-full', className)}
-    >
+    <div className={cn('flex flex-col gap-4 items-center w-full', className)}>
       {/* Canvas — masking-tape-on-paper styling so it visually matches
           the rest of the kid-friendly hero. The aspect-square keeps it
           stable across desktop + mobile without depending on dynamic
@@ -154,14 +127,10 @@ const EmbeddedColoringCanvas = ({
         </div>
       </div>
 
-      {/* Desktop palette (hidden on mobile) */}
+      {/* Compact palette — visible on both desktop and mobile.
+          Replaces coloring-ui's full MobileColoringDrawer which is too
+          heavyweight for a marketing landing. */}
       <SlimColorPalette magicAvailable={regionStore.state.isReady} />
-
-      {/* Mobile tool drawer — only mounted while canvas is in viewport.
-          Drives all state from the shared context (no isOpen prop). */}
-      {isInViewport && (
-        <MobileColoringDrawer className="md:hidden fixed bottom-0 left-0 right-0 z-50" />
-      )}
     </div>
   );
 };
