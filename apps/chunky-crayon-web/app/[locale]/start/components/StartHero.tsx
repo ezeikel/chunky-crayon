@@ -1,11 +1,14 @@
 'use client';
 
+import { useRef } from 'react';
 import Link from 'next/link';
 import Balancer from 'react-wrap-balancer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWandMagicSparkles } from '@fortawesome/pro-duotone-svg-icons';
 import type { ColoringImage } from '@one-colored-pixel/db/types';
 import cn from '@/utils/cn';
+import { useAnalytics } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 import EmbeddedColoringCanvas from '@/components/EmbeddedColoringCanvas';
 
 type StartHeroProps = {
@@ -42,6 +45,11 @@ export default function StartHero({
   image,
 }: StartHeroProps) {
   const hasImage = Boolean(image?.id && image?.url);
+  const { track } = useAnalytics();
+  // Mount time so the CTA click event carries time-from-mount —
+  // distinguishes "read copy → bounced to signin" (fast) from
+  // "engaged with canvas → then clicked signin" (slow + higher intent).
+  const mountTimeRef = useRef<number>(Date.now());
 
   return (
     <section className="relative py-12 md:py-20 lg:py-24 overflow-hidden">
@@ -66,6 +74,13 @@ export default function StartHero({
                 attribution + per-campaign onboarding variants). */}
             <Link
               href={`/signin?from=start&campaign=${campaign}`}
+              onClick={() =>
+                track(TRACKING_EVENTS.START_HERO_CTA_CLICKED, {
+                  campaign,
+                  cta: 'signin',
+                  msFromMount: Date.now() - mountTimeRef.current,
+                })
+              }
               className={cn(
                 'inline-flex items-center gap-2 font-tondo font-bold text-base md:text-lg text-white',
                 'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover',

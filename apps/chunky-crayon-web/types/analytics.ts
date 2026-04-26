@@ -420,6 +420,7 @@ export type EventProperties = {
   [TRACKING_EVENTS.START_HERO_CTA_CLICKED]: {
     campaign: string;
     cta: 'signin' | 'download-pdf';
+    msFromMount: number;
   };
   [TRACKING_EVENTS.LANDING_DEMO_PLAYED]: {
     page: 'homepage' | 'start';
