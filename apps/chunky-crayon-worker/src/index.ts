@@ -13,6 +13,9 @@ import { recordImageColoringSession } from "./record/image-session.js";
 import { renderDemoReel, renderImageDemoReel } from "./video/render.js";
 import { trimWebmToMp4, trimReelForStory } from "./record/trim.js";
 import { generateRegionStoreLocal } from "./record/region-store.js";
+import { generateAmbientSoundLocal } from "./record/ambient-sound.js";
+import { generateColoredReferenceLocal } from "./record/colored-reference.js";
+import { generateFillPointsLocal } from "./record/fill-points.js";
 import { db } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
 import { generateReelScript } from "./script/generate.js";
@@ -226,6 +229,208 @@ app.post("/generate/region-store", async (c) => {
     } catch (err) {
       console.error(
         `[generate/region-store] THREW imageId=${imageId}:`,
+        err instanceof Error ? (err.stack ?? err.message) : err,
+      );
+    } finally {
+      clearInterval(keepaliveTimer);
+    }
+  })();
+
+  return c.json({ ok: true, accepted: true, imageId }, 202);
+});
+
+/**
+ * Fire-and-forget ambient-sound generation. Same architecture as
+ * /generate/region-store — replaces the inline ElevenLabs music call
+ * inside the CC web app's after() hook so it survives Vercel after()
+ * drops.
+ *
+ * On success: writes ambientSoundUrl to DB. The web app's poll for
+ * coloring-image data picks it up.
+ *
+ * POST /generate/ambient-sound
+ * Body: { imageId: string }
+ */
+app.post("/generate/ambient-sound", async (c) => {
+  const body = await c.req
+    .json<{ imageId?: string }>()
+    .catch(() => ({ imageId: undefined }));
+  const imageId = body.imageId;
+  if (!imageId) {
+    return c.json({ error: "imageId is required" }, 400);
+  }
+
+  const image = await db.coloringImage.findFirst({
+    where: { id: imageId },
+    select: { id: true, ambientSoundUrl: true },
+  });
+  if (!image) {
+    return c.json({ error: `Image ${imageId} not found` }, 404);
+  }
+  if (image.ambientSoundUrl) {
+    return c.json({ ok: true, already_generated: true });
+  }
+
+  void (async () => {
+    const keepaliveTimer = setInterval(() => {
+      db.$queryRaw`SELECT 1`.catch((err) => {
+        console.warn(
+          "[ambient-sound keepalive] Neon ping failed:",
+          err instanceof Error ? err.message : err,
+        );
+      });
+    }, 60_000);
+
+    try {
+      console.log(`[generate/ambient-sound] start imageId=${imageId}`);
+      const result = await generateAmbientSoundLocal(imageId);
+      if (result.success) {
+        console.log(
+          `[generate/ambient-sound] done imageId=${imageId} url=${result.ambientSoundUrl}`,
+        );
+      } else {
+        console.error(
+          `[generate/ambient-sound] FAILED imageId=${imageId} error=${result.error}`,
+        );
+      }
+    } catch (err) {
+      Sentry.captureException(err, { extra: { imageId, op: "ambient-sound" } });
+      console.error(
+        `[generate/ambient-sound] THREW imageId=${imageId}:`,
+        err instanceof Error ? (err.stack ?? err.message) : err,
+      );
+    } finally {
+      clearInterval(keepaliveTimer);
+    }
+  })();
+
+  return c.json({ ok: true, accepted: true, imageId }, 202);
+});
+
+/**
+ * Fire-and-forget colored-reference generation. Same architecture as
+ * /generate/region-store. Replaces the inline Gemini image-to-image
+ * call inside the CC web app's after() hook.
+ *
+ * On success: writes coloredReferenceUrl to DB.
+ *
+ * POST /generate/colored-reference
+ * Body: { imageId: string }
+ */
+app.post("/generate/colored-reference", async (c) => {
+  const body = await c.req
+    .json<{ imageId?: string }>()
+    .catch(() => ({ imageId: undefined }));
+  const imageId = body.imageId;
+  if (!imageId) {
+    return c.json({ error: "imageId is required" }, 400);
+  }
+
+  const image = await db.coloringImage.findFirst({
+    where: { id: imageId },
+    select: { id: true, coloredReferenceUrl: true },
+  });
+  if (!image) {
+    return c.json({ error: `Image ${imageId} not found` }, 404);
+  }
+  if (image.coloredReferenceUrl) {
+    return c.json({ ok: true, already_generated: true });
+  }
+
+  void (async () => {
+    const keepaliveTimer = setInterval(() => {
+      db.$queryRaw`SELECT 1`.catch((err) => {
+        console.warn(
+          "[colored-reference keepalive] Neon ping failed:",
+          err instanceof Error ? err.message : err,
+        );
+      });
+    }, 60_000);
+
+    try {
+      console.log(`[generate/colored-reference] start imageId=${imageId}`);
+      const result = await generateColoredReferenceLocal(imageId);
+      if (result.success) {
+        console.log(
+          `[generate/colored-reference] done imageId=${imageId} url=${result.url}`,
+        );
+      } else {
+        console.error(
+          `[generate/colored-reference] FAILED imageId=${imageId} error=${result.error}`,
+        );
+      }
+    } catch (err) {
+      Sentry.captureException(err, {
+        extra: { imageId, op: "colored-reference" },
+      });
+      console.error(
+        `[generate/colored-reference] THREW imageId=${imageId}:`,
+        err instanceof Error ? (err.stack ?? err.message) : err,
+      );
+    } finally {
+      clearInterval(keepaliveTimer);
+    }
+  })();
+
+  return c.json({ ok: true, accepted: true, imageId }, 202);
+});
+
+/**
+ * Fire-and-forget region fill-points generation. Same architecture as
+ * /generate/region-store. Replaces the inline AI call inside the CC web
+ * app's after() hook for the legacy paint-bucket Magic Fill path.
+ *
+ * On success: writes fillPointsJson + fillPointsGeneratedAt to DB.
+ *
+ * POST /generate/fill-points
+ * Body: { imageId: string }
+ */
+app.post("/generate/fill-points", async (c) => {
+  const body = await c.req
+    .json<{ imageId?: string }>()
+    .catch(() => ({ imageId: undefined }));
+  const imageId = body.imageId;
+  if (!imageId) {
+    return c.json({ error: "imageId is required" }, 400);
+  }
+
+  const image = await db.coloringImage.findFirst({
+    where: { id: imageId },
+    select: { id: true, fillPointsJson: true },
+  });
+  if (!image) {
+    return c.json({ error: `Image ${imageId} not found` }, 404);
+  }
+  if (image.fillPointsJson) {
+    return c.json({ ok: true, already_generated: true });
+  }
+
+  void (async () => {
+    const keepaliveTimer = setInterval(() => {
+      db.$queryRaw`SELECT 1`.catch((err) => {
+        console.warn(
+          "[fill-points keepalive] Neon ping failed:",
+          err instanceof Error ? err.message : err,
+        );
+      });
+    }, 60_000);
+
+    try {
+      console.log(`[generate/fill-points] start imageId=${imageId}`);
+      const result = await generateFillPointsLocal(imageId);
+      if (result.success) {
+        console.log(`[generate/fill-points] done imageId=${imageId}`);
+      } else {
+        console.error(
+          `[generate/fill-points] FAILED imageId=${imageId} error=${result.error}`,
+        );
+      }
+    } catch (err) {
+      Sentry.captureException(err, {
+        extra: { imageId, op: "fill-points" },
+      });
+      console.error(
+        `[generate/fill-points] THREW imageId=${imageId}:`,
         err instanceof Error ? (err.stack ?? err.message) : err,
       );
     } finally {

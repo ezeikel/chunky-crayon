@@ -224,6 +224,40 @@ async function main() {
         "updatedAt" = ${generatedAt}
     `;
     console.log(`   ✅ upserted db row ${asset.id} (${purposeKey})`);
+
+    // Trigger the post-creation pipeline on the worker. Since this
+    // script INSERTs the row directly (bypassing createColoringImage),
+    // the pipeline never auto-fires for these images — that's why the
+    // first batch landed in prod with regionMapUrl/regionsJson/
+    // ambientSoundUrl all NULL. Fire-and-forget — worker writes back
+    // to the DB on its own.
+    const workerUrl = requireEnv('CHUNKY_CRAYON_WORKER_URL');
+    const workerSecret = process.env.WORKER_SECRET;
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {}),
+    };
+    const endpoints = [
+      'region-store',
+      'fill-points',
+      'colored-reference',
+      'ambient-sound',
+    ];
+    await Promise.allSettled(
+      endpoints.map((endpoint) =>
+        fetch(`${workerUrl}/generate/${endpoint}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ imageId: asset.id }),
+          signal: AbortSignal.timeout(10_000),
+        }).then(async (res) => {
+          const text = await res.text().catch(() => '');
+          console.log(
+            `   ↪︎ ${endpoint}: ${res.status} ${text.slice(0, 120)}`,
+          );
+        }),
+      ),
+    );
   }
 
   console.log('\n✨ done');
