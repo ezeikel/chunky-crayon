@@ -8,7 +8,8 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import { useColoringContext } from '@one-colored-pixel/coloring-ui';
 import type { BrushSize } from '@one-colored-pixel/coloring-ui';
-import { COLORING_PALETTE } from '@/constants';
+import { COLORING_PALETTE, TRACKING_EVENTS } from '@/constants';
+import { useAnalytics } from '@/utils/analytics-client';
 import cn from '@/utils/cn';
 
 // Slim palette for the /start landing page canvas. Deliberately stripped
@@ -17,9 +18,11 @@ import cn from '@/utils/cn';
 // to let a paid-ad visitor try the product without overwhelming the
 // marketing page above + below.
 //
-// Mobile users get the full MobileColoringDrawer instead (rendered
-// conditionally by EmbeddedColoringCanvas based on viewport visibility);
-// this palette is desktop-only via `hidden md:flex`.
+// Visible on both desktop and mobile (no `hidden md:flex`). We
+// previously rendered coloring-ui's full MobileColoringDrawer for
+// mobile but it expanded into a giant bottom sheet (sticker tray,
+// magic-auto, undo, fill patterns) that dominated the viewport.
+// Compact-everywhere is friendlier on a marketing landing.
 
 const SWATCHES = COLORING_PALETTE.primary; // 8 high-saturation colors
 
@@ -52,13 +55,25 @@ const BRUSH_SIZES: Array<{ size: BrushSize; px: number }> = [
 type SlimColorPaletteProps = {
   /** Whether the magic-reveal tool should be enabled (region store ready). */
   magicAvailable: boolean;
+  /** utm_campaign — forwarded to engagement events for attribution. */
+  campaign: string;
+  /**
+   * Optional button rendered at the end of the tools row (e.g. the
+   * Save / Download PDF button). Aligning it inline with the tools
+   * keeps the action group visually unified — matches the real
+   * coloring page's sidebar where save sits in the same grid as tools.
+   */
+  trailingAction?: React.ReactNode;
   className?: string;
 };
 
 const SlimColorPalette = ({
   magicAvailable,
+  campaign,
+  trailingAction,
   className,
 }: SlimColorPaletteProps) => {
+  const { track } = useAnalytics();
   const {
     selectedColor,
     setSelectedColor,
@@ -80,6 +95,12 @@ const SlimColorPalette = ({
         : 'crayon';
 
   const handleToolClick = (id: SlimTool['id']) => {
+    if (id === selectedSlimTool) return; // no-op when re-selecting current
+    track(TRACKING_EVENTS.START_HERO_TOOL_CHANGED, {
+      campaign,
+      from: selectedSlimTool,
+      to: id,
+    });
     if (id === 'magic-reveal') {
       setActiveTool('magic-reveal');
       return;
@@ -90,8 +111,15 @@ const SlimColorPalette = ({
 
   return (
     <div className={cn('flex flex-col gap-3 items-center w-full', className)}>
-      {/* Tools row */}
-      <div className="flex gap-2">
+      {/* Tools row + trailing action (save button) inline.
+          64×64 with rounded-coloring-card (24px radius = 37.5%) → reads
+          as a squircle. CC's brand radius-coloring-button is 24px which
+          on smaller (48px) buttons makes them look like full circles —
+          we use 64px here to match the real /coloring-image/[id]
+          MobileColoringDrawer tile look. Save button is paired with
+          ActionButtonSizeProvider value="tile" (64px) by the parent so
+          the whole row aligns column-for-column. */}
+      <div className="flex gap-2 items-center">
         {TOOLS.map((tool) => {
           const disabled = tool.id === 'magic-reveal' && !magicAvailable;
           const isActive = selectedSlimTool === tool.id;
@@ -102,10 +130,10 @@ const SlimColorPalette = ({
               disabled={disabled}
               onClick={() => handleToolClick(tool.id)}
               aria-label={tool.label}
+              title={tool.label}
               aria-pressed={isActive}
               className={cn(
-                'flex flex-col items-center gap-1 px-3 py-2 rounded-xl border-2 transition-all',
-                'font-rooney-sans text-xs font-bold',
+                'flex items-center justify-center w-16 h-16 rounded-coloring-card border-2 transition-all',
                 isActive
                   ? 'bg-crayon-orange text-white border-crayon-orange shadow-md'
                   : 'bg-white text-text-secondary border-paper-cream-dark hover:border-crayon-orange/50',
@@ -113,11 +141,11 @@ const SlimColorPalette = ({
                   'opacity-40 cursor-not-allowed hover:border-paper-cream-dark',
               )}
             >
-              <FontAwesomeIcon icon={tool.icon} className="text-base" />
-              {tool.label}
+              <FontAwesomeIcon icon={tool.icon} className="text-xl" />
             </button>
           );
         })}
+        {trailingAction}
       </div>
 
       {/* Color swatches */}
@@ -129,6 +157,13 @@ const SlimColorPalette = ({
               key={color.hex}
               type="button"
               onClick={() => {
+                if (selectedColor !== color.hex) {
+                  track(TRACKING_EVENTS.START_HERO_COLOR_PICKED, {
+                    campaign,
+                    color: color.hex,
+                    colorName: color.name,
+                  });
+                }
                 setSelectedColor(color.hex);
                 // Picking a color implies they want to paint, not erase
                 // or magic-reveal.
@@ -149,7 +184,8 @@ const SlimColorPalette = ({
         })}
       </div>
 
-      {/* Brush sizes */}
+      {/* Brush sizes — round to match the dot inside, mirrors the
+          /coloring-image/[id] brush-size selector. */}
       <div className="flex gap-2 items-center">
         {BRUSH_SIZES.map(({ size, px }) => {
           const isActive = brushSize === size;
@@ -159,6 +195,7 @@ const SlimColorPalette = ({
               type="button"
               onClick={() => setBrushSize(size)}
               aria-label={`${size} brush`}
+              title={`${size} brush`}
               aria-pressed={isActive}
               className={cn(
                 'flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all bg-white',

@@ -400,6 +400,26 @@ export type EventProperties = {
   [TRACKING_EVENTS.START_HERO_CANVAS_INTERACTED]: {
     campaign: string; // 'trex' | 'dragon' | 'foxes' | 'default'
     coloringImageId: string;
+    msFromMount: number; // time-to-first-stroke since component mount
+  };
+  [TRACKING_EVENTS.START_HERO_COLOR_PICKED]: {
+    campaign: string;
+    color: string; // hex
+    colorName: string;
+  };
+  [TRACKING_EVENTS.START_HERO_TOOL_CHANGED]: {
+    campaign: string;
+    from: 'crayon' | 'magic-reveal' | 'eraser';
+    to: 'crayon' | 'magic-reveal' | 'eraser';
+  };
+  [TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED]: {
+    campaign: string;
+    coloringImageId: string;
+    msFromMount: number;
+  };
+  [TRACKING_EVENTS.START_HERO_CTA_CLICKED]: {
+    campaign: string;
+    cta: 'signin' | 'download-pdf';
   };
   [TRACKING_EVENTS.LANDING_DEMO_PLAYED]: {
     page: 'homepage' | 'start';
