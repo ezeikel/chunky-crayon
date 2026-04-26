@@ -371,6 +371,18 @@ export const createColoringImage = async (
 
     const durationMs = Date.now() - startedAt;
 
+    // Fire ALL derived-asset pipeline endpoints to the Hetzner worker
+    // BEFORE returning the response. We previously kicked these off
+    // inside after(), but Vercel `after()` is best-effort and drops
+    // ~50% of long-running tasks under CPU contention — when after()
+    // dropped, the dangling fetches were killed before reaching the
+    // worker, so derived assets never generated. Awaiting the 4
+    // parallel acks here adds ~200-400ms of latency but guarantees the
+    // worker actually receives every request.
+    if (result.url && result.svgUrl) {
+      await requestAllPipelineFromWorker(result.id);
+    }
+
     after(async () => {
       if (!result.url || !result.svgUrl) {
         return;
@@ -383,20 +395,16 @@ export const createColoringImage = async (
         creditsUsed: 5,
       });
 
-      // Tasks that MUST stay inline because they affect the row's own
-      // base data (svgUrl) or write directly to PostHog with this
-      // request's tracking context. Lightweight; small drop risk if
-      // after() is killed but no worse than today.
+      // Lightweight follow-up tasks — analytics + base-data tweaks
+      // that don't strictly need to land before response. Tolerate
+      // the after() drop rate (small impact: tracking + retrace).
       await Promise.allSettled([
-        // Check SVG validity and retrace if needed
         (async () => {
           const { isValid } = await checkSvgImage(result.svgUrl!);
           if (!isValid) {
             await retraceImage(result.id, result.url!);
           }
         })(),
-
-        // Analyze image content for PostHog insights (using Gemini 3 Flash)
         (async () => {
           const imageAnalytics = await analyzeImageForAnalytics(result.url!);
           if (imageAnalytics && userId) {
@@ -408,14 +416,7 @@ export const createColoringImage = async (
         })(),
       ]);
 
-      // ALL derived assets (region store, fill points, colored
-      // reference, ambient sound) are now offloaded to the Hetzner
-      // worker. Inline AI calls inside after() drop ~50% of the time
-      // under Vercel CPU contention; the worker has no timeout, retries
-      // on its own, and writes back to the DB asynchronously.
-      requestAllPipelineFromWorker(result.id);
-
-      // Invalidate cache so new data (fill points, ambient sound) is available
+      // Invalidate cache so new data (fill points, music) becomes available
       revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
     });
 
@@ -438,6 +439,13 @@ export const createColoringImage = async (
 
   const durationMs = Date.now() - startedAt;
 
+  // Same sync-await pattern as the authenticated path above — fire the
+  // worker pipeline before returning so the requests can't be killed
+  // by Vercel function recycle.
+  if (result.url && result.svgUrl) {
+    await requestAllPipelineFromWorker(result.id);
+  }
+
   after(async () => {
     if (!result.url || !result.svgUrl) {
       return;
@@ -454,17 +462,13 @@ export const createColoringImage = async (
       rawFormData.clientDistinctId,
     );
 
-    // Run all post-processing tasks in parallel, independently
     await Promise.allSettled([
-      // Check SVG validity and retrace if needed
       (async () => {
         const { isValid } = await checkSvgImage(result.svgUrl!);
         if (!isValid) {
           await retraceImage(result.id, result.url!);
         }
       })(),
-
-      // Analyze image content for PostHog insights (using Gemini 3 Flash)
       (async () => {
         const imageAnalytics = await analyzeImageForAnalytics(result.url!);
         if (imageAnalytics) {
@@ -480,11 +484,7 @@ export const createColoringImage = async (
       })(),
     ]);
 
-    // ALL derived assets offloaded to the Hetzner worker. Same
-    // reliability rationale as the authenticated path above.
-    requestAllPipelineFromWorker(result.id);
-
-    // Invalidate cache so new data (color map, ambient sound) is available
+    // Invalidate cache so new data (color map, music) becomes available
     revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
   });
 

@@ -946,6 +946,7 @@ export const TRACKING_EVENTS = {
   // ===== PAID-AD LANDING (logged-out funnel) =====
   LANDING_PAGE_VIEWED: 'landing_page_viewed', // /start (or /) loaded with utm_campaign in scope
   LANDING_HERO_POLAROID_CLICKED: 'landing_hero_polaroid_clicked', // Hero polaroid → coloring-image page
+  START_HERO_CANVAS_INTERACTED: 'start_hero_canvas_interacted', // First stroke on the embedded /start canvas (replaces the polaroid click as the engagement signal)
   LANDING_DEMO_PLAYED: 'landing_demo_played', // User pressed play on the phone-frame demo
   LANDING_DEMO_COMPLETED: 'landing_demo_completed', // Demo cycled through every scenario at least once
   LANDING_DEMO_CTA_CLICKED: 'landing_demo_cta_clicked', // "Color this one" CTA inside demo result frame

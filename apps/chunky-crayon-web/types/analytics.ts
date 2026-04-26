@@ -397,6 +397,10 @@ export type EventProperties = {
     campaign: string; // 'trex' | 'dragon' | 'foxes' | 'default'
     coloringImageId: string;
   };
+  [TRACKING_EVENTS.START_HERO_CANVAS_INTERACTED]: {
+    campaign: string; // 'trex' | 'dragon' | 'foxes' | 'default'
+    coloringImageId: string;
+  };
   [TRACKING_EVENTS.LANDING_DEMO_PLAYED]: {
     page: 'homepage' | 'start';
     startingScenario: string; // campaign key the demo opens with

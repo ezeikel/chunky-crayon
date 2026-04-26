@@ -201,7 +201,11 @@ const generatePhotoColoringImageWithMetadata = async (
   }
 };
 
-const runPhotoPostProcessing = async (
+// Lighter follow-up tasks that don't strictly need to land before the
+// response. Tolerates Vercel after() drop rate (small impact: tracking +
+// retrace). The heavyweight worker pipeline kick is awaited inline in
+// the action below, BEFORE the response — see comment there.
+const runPhotoFollowUp = async (
   result: Partial<ColoringImage> & { id: string },
   userId: string | undefined,
   durationMs: number,
@@ -253,12 +257,6 @@ const runPhotoPostProcessing = async (
       }
     })(),
   ]);
-
-  // ALL derived assets (region store, fill points, colored reference,
-  // ambient sound) offloaded to the Hetzner worker. Inline AI calls
-  // inside after() drop ~50% of the time under Vercel CPU contention;
-  // worker has no timeout and writes back to the DB on its own.
-  requestAllPipelineFromWorker(result.id);
 
   revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
 };
@@ -323,7 +321,11 @@ export async function createColoringImageFromPhoto(
     );
 
     const authedDurationMs = Date.now() - startedAt;
-    after(() => runPhotoPostProcessing(result, userId, authedDurationMs));
+    // Fire pipeline before returning — see lib/worker.ts comment.
+    if (result.url && result.svgUrl) {
+      await requestAllPipelineFromWorker(result.id);
+    }
+    after(() => runPhotoFollowUp(result, userId, authedDurationMs));
 
     revalidateTag('all-coloring-images', { expire: 0 });
     revalidatePath('/');
@@ -337,7 +339,10 @@ export async function createColoringImageFromPhoto(
   );
 
   const guestDurationMs = Date.now() - startedAt;
-  after(() => runPhotoPostProcessing(result, undefined, guestDurationMs));
+  if (result.url && result.svgUrl) {
+    await requestAllPipelineFromWorker(result.id);
+  }
+  after(() => runPhotoFollowUp(result, undefined, guestDurationMs));
 
   revalidateTag('all-coloring-images', { expire: 0 });
   revalidatePath('/');

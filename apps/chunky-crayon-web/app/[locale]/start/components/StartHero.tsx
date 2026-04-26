@@ -1,14 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import Balancer from 'react-wrap-balancer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWandMagicSparkles } from '@fortawesome/pro-duotone-svg-icons';
 import type { ColoringImage } from '@one-colored-pixel/db/types';
 import cn from '@/utils/cn';
-import { useAnalytics } from '@/utils/analytics-client';
-import { TRACKING_EVENTS } from '@/constants';
+import EmbeddedColoringCanvas from '@/components/EmbeddedColoringCanvas';
 
 type StartHeroProps = {
   campaign: 'trex' | 'foxes' | 'dragon' | 'default';
@@ -22,24 +20,28 @@ type StartHeroProps = {
 };
 
 // First-view hero for paid ad traffic. Copy is campaign-aware so
-// whatever hook drove the click gets echoed immediately on land. The
-// polaroid-style image on the right is the real coloring page for
-// that campaign (or T-rex by default) — clicking it opens the
-// coloring-image page so visitors can actually play with the product.
-// The primary conversion event is the "Try it free" CTA which routes
-// to /signin with a return-to hint; secondary is the polaroid link.
+// whatever hook drove the click gets echoed immediately on land.
+//
+// Right column is an embedded coloring canvas pre-loaded with the
+// campaign image. Replaces the static polaroid that lived here before:
+// only 1 of 258 paid Meta visitors clicked the polaroid through to
+// /coloring-image/[id], so we removed the click and put the canvas
+// inline instead. After the visitor's first stroke we fire
+// START_HERO_CANVAS_INTERACTED for funnel analysis.
+//
+// Primary CTA copy stays as the campaign-translated label — the
+// conversion framing changes from "try this thing" (pre-engagement) to
+// "save what you just made" (post-engagement) via the copy itself.
 export default function StartHero({
   campaign,
   title,
   subtitle,
   eyebrow,
-  tryColoringLabel,
   ctaLabel,
   ctaSubtext,
   image,
 }: StartHeroProps) {
   const hasImage = Boolean(image?.id && image?.url);
-  const { track } = useAnalytics();
 
   return (
     <section className="relative py-12 md:py-20 lg:py-24 overflow-hidden">
@@ -80,47 +82,14 @@ export default function StartHero({
           </div>
         </div>
 
-        {/* Image column — polaroid-style card. Only links to the
-            coloring-image page when we actually have the image row. */}
+        {/* Canvas column — embedded coloring surface. Only render when
+            the campaign image actually loaded; if the lookup returns
+            null (e.g. unknown utm_campaign that resolveCampaign falls
+            back on but image fetch fails) we leave the column empty
+            rather than crash. */}
         <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
           {hasImage && image ? (
-            <Link
-              href={`/coloring-image/${image.id}`}
-              aria-label={tryColoringLabel}
-              onClick={() => {
-                track(TRACKING_EVENTS.LANDING_HERO_POLAROID_CLICKED, {
-                  page: 'start',
-                  campaign,
-                  coloringImageId: image.id ?? '',
-                });
-              }}
-              className="group relative block rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange focus-visible:ring-offset-4"
-            >
-              {/* Masking tape at top */}
-              <div
-                aria-hidden
-                className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 h-6 w-28 rotate-[-3deg] bg-crayon-yellow-light/85 shadow-sm"
-                style={{
-                  backgroundImage:
-                    'repeating-linear-gradient(45deg, transparent 0 3px, rgba(0,0,0,0.05) 3px 4px)',
-                }}
-              />
-              <div className="relative bg-white rounded-sm p-3 pb-5 shadow-[0_12px_28px_rgba(0,0,0,0.08),0_2px_4px_rgba(0,0,0,0.04)] border border-black/5 rotate-[-2deg] group-hover:rotate-0 group-hover:scale-[1.02] transition-transform duration-300">
-                <div className="relative aspect-square w-[280px] sm:w-[340px] md:w-[400px] rounded-sm overflow-hidden bg-paper-cream">
-                  <Image
-                    src={image.url!}
-                    alt={image.alt ?? ''}
-                    fill
-                    sizes="(max-width: 640px) 280px, (max-width: 768px) 340px, 400px"
-                    className="object-contain"
-                    priority
-                  />
-                </div>
-                <p className="font-tondo italic text-center text-base text-text-muted mt-3 group-hover:text-crayon-orange transition-colors">
-                  {tryColoringLabel} →
-                </p>
-              </div>
-            </Link>
+            <EmbeddedColoringCanvas image={image} campaign={campaign} />
           ) : null}
         </div>
       </div>
