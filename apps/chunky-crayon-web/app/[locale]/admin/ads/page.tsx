@@ -10,12 +10,13 @@ import {
   AD_PURPOSE_PREFIX,
   getAdCampaignKey,
 } from '@/lib/coloring-image-purpose';
+import { requireAdmin } from '@/lib/auth-guards';
 import Loading from '@/components/Loading/Loading';
 
 const AdsListContent = async () => {
-  // Cache Components: opt into dynamic render before DB reads.
-  // Admin gate is in /admin/layout.tsx — no per-page guard needed.
+  // Cache Components: opt into dynamic render before auth() runs.
   await connection();
+  await requireAdmin('notFound');
 
   const ads = await db.coloringImage.findMany({
     where: {

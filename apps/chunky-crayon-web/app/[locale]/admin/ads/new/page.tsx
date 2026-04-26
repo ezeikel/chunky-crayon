@@ -1,9 +1,18 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/pro-duotone-svg-icons';
+import { requireAdmin } from '@/lib/auth-guards';
+import Loading from '@/components/Loading/Loading';
 import CreateAdForm from '../_components/CreateAdForm';
 
-const NewAdPage = () => {
+const NewAdContent = async () => {
+  // Cache Components: gate inside Suspense so cookies()/auth() doesn't
+  // trip the "uncached data outside <Suspense>" prerender check.
+  await connection();
+  await requireAdmin('notFound');
+
   return (
     <div className="max-w-2xl">
       <Link
@@ -22,5 +31,11 @@ const NewAdPage = () => {
     </div>
   );
 };
+
+const NewAdPage = () => (
+  <Suspense fallback={<Loading size="lg" />}>
+    <NewAdContent />
+  </Suspense>
+);
 
 export default NewAdPage;

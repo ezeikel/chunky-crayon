@@ -1,15 +1,21 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBullhorn,
   faImages,
   faShareNodes,
 } from '@fortawesome/pro-duotone-svg-icons';
+import { requireAdmin } from '@/lib/auth-guards';
+import Loading from '@/components/Loading/Loading';
 
-// Top-level admin landing. Layout already gates this on ADMIN role, so
-// no requireAdmin() needed here. Each card links into a section managed
-// from the sidebar — keep cards in lockstep with the sidebar's ITEMS
-// list so the dashboard stays a useful overview.
+// Top-level admin landing. Layout is purely structural — auth gate
+// runs here so it lives inside a Suspense boundary (required by
+// Cache Components / `cacheComponents: true`). Each card links into
+// a section managed from the sidebar — keep the cards in lockstep
+// with the sidebar's ITEMS list so the dashboard stays a useful
+// overview.
 const SECTIONS = [
   {
     href: '/admin/ads',
@@ -31,7 +37,10 @@ const SECTIONS = [
   },
 ];
 
-const AdminDashboardPage = () => {
+const DashboardContent = async () => {
+  await connection();
+  await requireAdmin('notFound');
+
   return (
     <div>
       <h1 className="font-tondo text-3xl font-bold mb-2">Admin</h1>
@@ -64,5 +73,11 @@ const AdminDashboardPage = () => {
     </div>
   );
 };
+
+const AdminDashboardPage = () => (
+  <Suspense fallback={<Loading size="lg" />}>
+    <DashboardContent />
+  </Suspense>
+);
 
 export default AdminDashboardPage;

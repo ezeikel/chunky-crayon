@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { connection } from 'next/server';
 import Loading from '@/components/Loading/Loading';
 import { db } from '@one-colored-pixel/db';
+import { requireAdmin } from '@/lib/auth-guards';
 import SocialConnections from './SocialConnections';
 
 const getSocialTokenStatus = async () => {
@@ -29,9 +30,9 @@ const getSocialTokenStatus = async () => {
 };
 
 const AdminSocialContent = async () => {
-  // Cache Components: opt into dynamic render before DB reads.
-  // Admin gate is in /admin/layout.tsx — no per-page guard needed.
+  // Cache Components: opt into dynamic render before auth() runs.
   await connection();
+  await requireAdmin('notFound');
 
   const tokenStatus = await getSocialTokenStatus();
 

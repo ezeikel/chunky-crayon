@@ -10,16 +10,20 @@ import {
   AD_PURPOSE_PREFIX,
   getAdCampaignKey,
 } from '@/lib/coloring-image-purpose';
+import { requireAdmin } from '@/lib/auth-guards';
 import Loading from '@/components/Loading/Loading';
 import AdControls from '../_components/AdControls';
 import AdPreviewFrame from '../_components/AdPreviewFrame';
 
 type Params = Promise<{ id: string }>;
 
-const AdDetailContent = async ({ id }: { id: string }) => {
-  // Cache Components: opt into dynamic before DB read.
-  // Admin gate is in /admin/layout.tsx.
+const AdDetailContent = async ({ params }: { params: Params }) => {
+  // Cache Components: `await params` is itself uncached data, so it
+  // must happen inside the Suspense boundary (this Content component)
+  // rather than in the page-level scope.
+  const { id } = await params;
   await connection();
+  await requireAdmin('notFound');
 
   const ad = await db.coloringImage.findUnique({
     where: { id },
@@ -130,13 +134,10 @@ const AdDetailContent = async ({ id }: { id: string }) => {
   );
 };
 
-const AdDetailPage = async ({ params }: { params: Params }) => {
-  const { id } = await params;
-  return (
-    <Suspense fallback={<Loading size="lg" />}>
-      <AdDetailContent id={id} />
-    </Suspense>
-  );
-};
+const AdDetailPage = ({ params }: { params: Params }) => (
+  <Suspense fallback={<Loading size="lg" />}>
+    <AdDetailContent params={params} />
+  </Suspense>
+);
 
 export default AdDetailPage;
