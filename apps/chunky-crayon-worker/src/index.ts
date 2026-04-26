@@ -1,4 +1,7 @@
 import "dotenv/config";
+// MUST stay above every other import. @sentry/node patches the runtime on
+// init (HTTP, fs, etc.) — anything imported before this won't be traced.
+import { Sentry } from "./instrument.js";
 import { Hono, type Context } from "hono";
 import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
@@ -28,6 +31,27 @@ const POST_SWEEP_PAD_SECS = 1.5;
 
 const app = new Hono();
 app.use("*", logger());
+
+// Catch any uncaught error from a route handler and forward to Sentry
+// before returning the 500. Without this, Hono swallows + logs but
+// nothing reaches our error tracker — exactly the visibility gap that
+// hid the silent region-store/fillPoints failures.
+app.onError((err, c) => {
+  Sentry.captureException(err, {
+    extra: {
+      method: c.req.method,
+      path: c.req.path,
+      url: c.req.url,
+    },
+  });
+  console.error(`[onError] ${c.req.method} ${c.req.path}:`, err);
+  return c.json(
+    {
+      error: err instanceof Error ? err.message : "Internal server error",
+    },
+    500,
+  );
+});
 
 // Bearer auth for /publish/* and /generate/* — only trusted callers
 // (crons + the CC web app's after() hook) should hit these.

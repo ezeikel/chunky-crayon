@@ -7,13 +7,13 @@ runbook.
 
 ## This worker
 
-| | |
-|---|---|
-| **Port** | 3030 |
-| **Box dir** | `/opt/chunky-crayon/` (full monorepo clone) |
-| **Worker subdir** | `apps/chunky-crayon-worker/` |
-| **Systemd unit** | `chunky-crayon-worker.service` |
-| **Runtime** | Bun under `xvfb-run` (Playwright needs a virtual display) |
+|                   |                                                           |
+| ----------------- | --------------------------------------------------------- |
+| **Port**          | 3030                                                      |
+| **Box dir**       | `/opt/chunky-crayon/` (full monorepo clone)               |
+| **Worker subdir** | `apps/chunky-crayon-worker/`                              |
+| **Systemd unit**  | `chunky-crayon-worker.service`                            |
+| **Runtime**       | Bun under `xvfb-run` (Playwright needs a virtual display) |
 
 ## First-time setup on the box
 
@@ -34,6 +34,7 @@ runbook.
 - `FACEBOOK_PAGE_ID`, `FACEBOOK_PAGE_ACCESS_TOKEN`
 - `INSTAGRAM_ACCOUNT_ID`
 - Any other social platform tokens (TikTok, Pinterest) once wired in
+- `SENTRY_DSN` — `chunky-crayon-worker` Sentry project DSN (omit to disable error reporting)
 
 ## Deploying changes
 
