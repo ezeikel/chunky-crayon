@@ -6,7 +6,7 @@
  *
  * How it works per row:
  *   1. For every R2 URL on the source row (url, svgUrl, qrCodeUrl,
- *      regionMapUrl, coloredReferenceUrl, ambientSoundUrl,
+ *      regionMapUrl, coloredReferenceUrl, backgroundMusicUrl,
  *      svgTopologyUrl), `fetch()` the asset from dev's public URL
  *      and re-`put()` it to prod's bucket via @one-colored-pixel/storage
  *      (which reads the R2_* env vars). Prod R2's `put()` returns the
@@ -70,7 +70,7 @@ const R2_URL_FIELDS = [
   'url',
   'svgUrl',
   'qrCodeUrl',
-  'ambientSoundUrl',
+  'backgroundMusicUrl',
   'animationUrl',
   'demoReelUrl',
   'demoReelCoverUrl',
@@ -206,7 +206,7 @@ const main = async () => {
         url: row.url,
         svgUrl: row.svgUrl,
         qrCodeUrl: row.qrCodeUrl,
-        ambientSoundUrl: row.ambientSoundUrl,
+        backgroundMusicUrl: row.backgroundMusicUrl,
         animationUrl: row.animationUrl,
         demoReelUrl: row.demoReelUrl,
         demoReelCoverUrl: row.demoReelCoverUrl,
@@ -250,7 +250,7 @@ const main = async () => {
             url: rewritten.url,
             svgUrl: rewritten.svgUrl,
             qrCodeUrl: rewritten.qrCodeUrl,
-            ambientSoundUrl: rewritten.ambientSoundUrl,
+            backgroundMusicUrl: rewritten.backgroundMusicUrl,
             animationUrl: rewritten.animationUrl,
             demoReelUrl: rewritten.demoReelUrl,
             demoReelCoverUrl: rewritten.demoReelCoverUrl,

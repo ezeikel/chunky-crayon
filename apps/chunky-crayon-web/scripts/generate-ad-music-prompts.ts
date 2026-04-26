@@ -2,7 +2,7 @@
 
 /**
  * One-off: generate high-quality ElevenLabs music prompts for each ad
- * campaign using the existing `createAmbientPrompt` pipeline (Claude +
+ * campaign using the existing `createMusicPrompt` pipeline (Claude +
  * MUSIC_PROMPT_SYSTEM). Prints the results — copy into campaigns.ts
  * video.music.prompt fields.
  *
@@ -24,7 +24,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 config({ path: resolve(__dirname, '..', '.env.local') });
 
-import { createAmbientPrompt } from '../lib/audio/prompts';
+import { createMusicPrompt } from '../lib/audio/prompts';
 
 type MusicSource = {
   id: string;
@@ -71,7 +71,7 @@ async function main() {
   for (const src of SOURCES) {
     console.log(`── ${src.id} ──`);
     const started = Date.now();
-    const prompt = await createAmbientPrompt(
+    const prompt = await createMusicPrompt(
       src.title,
       src.description,
       src.tags,

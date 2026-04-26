@@ -1,7 +1,7 @@
 /**
  * In-process colored-reference generation for the worker.
  *
- * Same architecture as record/region-store.ts and record/ambient-sound.ts —
+ * Same architecture as record/region-store.ts and record/background-music.ts —
  * runs the AI image-to-image colorization on the Hetzner box so the CC web
  * app's after() hook doesn't drop the work under Vercel CPU contention.
  *

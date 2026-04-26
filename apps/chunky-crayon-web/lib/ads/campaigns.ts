@@ -70,7 +70,7 @@ export const campaigns: Campaign[] = [
       ],
       music: {
         // Generated via scripts/generate-ad-music-prompts.ts
-        // (uses createAmbientPrompt → Claude + MUSIC_PROMPT_SYSTEM)
+        // (uses createMusicPrompt → Claude + MUSIC_PROMPT_SYSTEM)
         prompt:
           'A warm living room exhale: a felt piano plays a slow, tender three-note motif in F major around 68 BPM, doubled by a soft kalimba shimmer. Underneath, a bowed cello hums a patient, grounding pedal tone while a music box adds a tiny sparkle on the upbeats—like quiet wonder crystallizing. A harp glissando appears once, gentle as a smile, then fades. No urgency, just unhurried recognition and tender delight. Instrumental only, no vocals, no drums, no harsh transitions, seamless calm loop for children.',
         durationSeconds: 15,

@@ -2,32 +2,32 @@
  * Script to generate ambient sounds for existing coloring images
  *
  * Usage:
- *   pnpm tsx apps/chunky-crayon-web/scripts/generate-ambient-sounds.ts [limit]
+ *   pnpm tsx apps/chunky-crayon-web/scripts/generate-background-music.ts [limit]
  *
  * Examples:
- *   pnpm tsx apps/chunky-crayon-web/scripts/generate-ambient-sounds.ts       # Process 5 images (default)
- *   pnpm tsx apps/chunky-crayon-web/scripts/generate-ambient-sounds.ts 10    # Process 10 images
- *   pnpm tsx apps/chunky-crayon-web/scripts/generate-ambient-sounds.ts 0     # Process all images
+ *   pnpm tsx apps/chunky-crayon-web/scripts/generate-background-music.ts       # Process 5 images (default)
+ *   pnpm tsx apps/chunky-crayon-web/scripts/generate-background-music.ts 10    # Process 10 images
+ *   pnpm tsx apps/chunky-crayon-web/scripts/generate-background-music.ts 0     # Process all images
  */
 
 // Note: Run with dotenv preload:
-// DOTENV_CONFIG_PATH=apps/chunky-crayon-web/.env.local pnpm tsx -r dotenv/config apps/chunky-crayon-web/scripts/generate-ambient-sounds.ts [limit]
+// DOTENV_CONFIG_PATH=apps/chunky-crayon-web/.env.local pnpm tsx -r dotenv/config apps/chunky-crayon-web/scripts/generate-background-music.ts [limit]
 
 import { db } from '@one-colored-pixel/db';
 import { put } from '@one-colored-pixel/storage';
-import { generateAmbientSound } from '../lib/elevenlabs';
-import { createAmbientPrompt } from '../lib/audio/prompts';
+import { generateBackgroundMusic } from '../lib/elevenlabs';
+import { createMusicPrompt } from '../lib/audio/prompts';
 
 // Parse limit from command line args
 const limitArg = process.argv[2];
 const limit = limitArg === '0' ? undefined : parseInt(limitArg || '5', 10);
 
-async function generateAmbientSoundsForImages() {
+async function generateBackgroundMusicForImages() {
   console.log(`\n🎵 Generating ambient sounds for coloring images...\n`);
 
   // Find images without ambient sounds
   const images = await db.coloringImage.findMany({
-    where: { ambientSoundUrl: null },
+    where: { backgroundMusicUrl: null },
     select: { id: true, title: true, description: true, tags: true },
     take: limit,
     orderBy: { createdAt: 'desc' },
@@ -49,7 +49,7 @@ async function generateAmbientSoundsForImages() {
 
     try {
       // Generate the ambient sound prompt (async — calls Claude)
-      const prompt = await createAmbientPrompt(
+      const prompt = await createMusicPrompt(
         image.title,
         image.description,
         image.tags,
@@ -57,21 +57,25 @@ async function generateAmbientSoundsForImages() {
       console.log(`  Prompt: ${prompt.slice(0, 80)}...`);
 
       // Generate the ambient sound using ElevenLabs
-      const audioBuffer = await generateAmbientSound(prompt);
+      const audioBuffer = await generateBackgroundMusic(prompt);
       console.log(`  Generated ${audioBuffer.length} bytes of audio`);
 
       // Upload to blob storage
       const audioFileName = `uploads/coloring-images/${image.id}/ambient.mp3`;
-      const { url: ambientSoundUrl } = await put(audioFileName, audioBuffer, {
-        access: 'public',
-        contentType: 'audio/mpeg',
-      });
-      console.log(`  Uploaded to: ${ambientSoundUrl}`);
+      const { url: backgroundMusicUrl } = await put(
+        audioFileName,
+        audioBuffer,
+        {
+          access: 'public',
+          contentType: 'audio/mpeg',
+        },
+      );
+      console.log(`  Uploaded to: ${backgroundMusicUrl}`);
 
       // Update the database
       await db.coloringImage.update({
         where: { id: image.id },
-        data: { ambientSoundUrl },
+        data: { backgroundMusicUrl },
       });
 
       processed++;
@@ -96,7 +100,7 @@ async function generateAmbientSoundsForImages() {
 }
 
 // Run the script
-generateAmbientSoundsForImages()
+generateBackgroundMusicForImages()
   .then(() => {
     console.log('Script completed.');
     process.exit(0);

@@ -42,7 +42,7 @@ export type ColoringImage = {
   url?: string;
   svgUrl?: string;
   qrCodeUrl?: string;
-  ambientSoundUrl?: string;
+  backgroundMusicUrl?: string;
   colorMapJson?: string; // Pre-computed grid color map JSON (legacy)
   fillPointsJson?: string; // Region-aware fill points JSON (preferred)
   tags: string[];

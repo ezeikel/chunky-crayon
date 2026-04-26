@@ -58,7 +58,7 @@ async function migrateColoringImages() {
       url: true,
       svgUrl: true,
       qrCodeUrl: true,
-      ambientSoundUrl: true,
+      backgroundMusicUrl: true,
     },
   });
 
@@ -77,8 +77,8 @@ async function migrateColoringImages() {
     if (isVercelBlobUrl(image.qrCodeUrl)) {
       updates.qrCodeUrl = convertToR2Url(image.qrCodeUrl!);
     }
-    if (isVercelBlobUrl(image.ambientSoundUrl)) {
-      updates.ambientSoundUrl = convertToR2Url(image.ambientSoundUrl!);
+    if (isVercelBlobUrl(image.backgroundMusicUrl)) {
+      updates.backgroundMusicUrl = convertToR2Url(image.backgroundMusicUrl!);
     }
 
     if (Object.keys(updates).length > 0) {

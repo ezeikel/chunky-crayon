@@ -57,8 +57,8 @@ const fireWorkerGenerate = (
 export const requestRegionStoreFromWorker = (imageId: string): void =>
   fireWorkerGenerate('region-store', imageId, 'region-store');
 
-export const requestAmbientSoundFromWorker = (imageId: string): void =>
-  fireWorkerGenerate('ambient-sound', imageId, 'ambient-sound');
+export const requestBackgroundMusicFromWorker = (imageId: string): void =>
+  fireWorkerGenerate('background-music', imageId, 'background-music');
 
 export const requestColoredReferenceFromWorker = (imageId: string): void =>
   fireWorkerGenerate('colored-reference', imageId, 'colored-reference');
@@ -81,5 +81,5 @@ export const requestAllPipelineFromWorker = (imageId: string): void => {
   requestRegionStoreFromWorker(imageId);
   requestFillPointsFromWorker(imageId);
   requestColoredReferenceFromWorker(imageId);
-  requestAmbientSoundFromWorker(imageId);
+  requestBackgroundMusicFromWorker(imageId);
 };

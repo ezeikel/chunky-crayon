@@ -50,8 +50,8 @@ const ColoringPageContent = ({
   console.log("[ColoringPageContent] Received coloringImage:", {
     id: coloringImage?.id,
     title: coloringImage?.title,
-    ambientSoundUrl: coloringImage?.ambientSoundUrl,
-    hasAmbientSoundUrl: !!coloringImage?.ambientSoundUrl,
+    backgroundMusicUrl: coloringImage?.backgroundMusicUrl,
+    hasBackgroundMusicUrl: !!coloringImage?.backgroundMusicUrl,
   });
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 /**
  * Prompt templates for audio generation (SERVER-ONLY)
  *
- * `createAmbientPrompt` asks Claude to write a scene-tailored ElevenLabs
+ * `createMusicPrompt` asks Claude to write a scene-tailored ElevenLabs
  * Music API prompt for the coloring page. If Claude fails, falls back to a
  * simple scene-led template so generation never crashes.
  *
@@ -42,7 +42,7 @@ const CLAUDE_SONNET_4_5 = 'claude-sonnet-4-5-20250929';
  * language, scene-driven). Returns a single-paragraph string ready for
  * `/v1/music`.
  */
-export async function createAmbientPrompt(
+export async function createMusicPrompt(
   title: string,
   description: string,
   tags: string[],

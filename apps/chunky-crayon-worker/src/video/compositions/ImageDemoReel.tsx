@@ -42,7 +42,7 @@ export type ImageDemoReelProps = {
   /** Optional AI-generated image description captured during recording. */
   photoDescription?: string;
   /** Optional ambient music URL (ducked under everything). */
-  ambientSoundUrl?: string;
+  backgroundMusicUrl?: string;
   /** Optional kid voiceover — plays over the upload section. */
   kidVoiceUrl?: string;
   /** Optional adult narrator — plays over the reveal section. */
@@ -70,7 +70,7 @@ export const ImageDemoReel: React.FC<ImageDemoReelProps> = ({
   revealVideoUrl,
   uploadDurationFrames,
   revealDurationFrames,
-  ambientSoundUrl,
+  backgroundMusicUrl,
   kidVoiceUrl,
   adultVoiceUrl,
   pdfPreviewUrl,
@@ -168,8 +168,8 @@ export const ImageDemoReel: React.FC<ImageDemoReelProps> = ({
         <OutroCard />
       </Sequence>
 
-      {ambientSoundUrl ? (
-        <Audio src={ambientSoundUrl} volume={0.18} loop />
+      {backgroundMusicUrl ? (
+        <Audio src={backgroundMusicUrl} volume={0.18} loop />
       ) : null}
     </AbsoluteFill>
   );

@@ -13,7 +13,7 @@ import { recordImageColoringSession } from "./record/image-session.js";
 import { renderDemoReel, renderImageDemoReel } from "./video/render.js";
 import { trimWebmToMp4, trimReelForStory } from "./record/trim.js";
 import { generateRegionStoreLocal } from "./record/region-store.js";
-import { generateAmbientSoundLocal } from "./record/ambient-sound.js";
+import { generateBackgroundMusicLocal } from "./record/background-music.js";
 import { generateColoredReferenceLocal } from "./record/colored-reference.js";
 import { generateFillPointsLocal } from "./record/fill-points.js";
 import { db } from "@one-colored-pixel/db";
@@ -240,18 +240,18 @@ app.post("/generate/region-store", async (c) => {
 });
 
 /**
- * Fire-and-forget ambient-sound generation. Same architecture as
+ * Fire-and-forget background-music generation. Same architecture as
  * /generate/region-store — replaces the inline ElevenLabs music call
  * inside the CC web app's after() hook so it survives Vercel after()
  * drops.
  *
- * On success: writes ambientSoundUrl to DB. The web app's poll for
+ * On success: writes backgroundMusicUrl to DB. The web app's poll for
  * coloring-image data picks it up.
  *
- * POST /generate/ambient-sound
+ * POST /generate/background-music
  * Body: { imageId: string }
  */
-app.post("/generate/ambient-sound", async (c) => {
+app.post("/generate/background-music", async (c) => {
   const body = await c.req
     .json<{ imageId?: string }>()
     .catch(() => ({ imageId: undefined }));
@@ -262,12 +262,12 @@ app.post("/generate/ambient-sound", async (c) => {
 
   const image = await db.coloringImage.findFirst({
     where: { id: imageId },
-    select: { id: true, ambientSoundUrl: true },
+    select: { id: true, backgroundMusicUrl: true },
   });
   if (!image) {
     return c.json({ error: `Image ${imageId} not found` }, 404);
   }
-  if (image.ambientSoundUrl) {
+  if (image.backgroundMusicUrl) {
     return c.json({ ok: true, already_generated: true });
   }
 
@@ -275,28 +275,30 @@ app.post("/generate/ambient-sound", async (c) => {
     const keepaliveTimer = setInterval(() => {
       db.$queryRaw`SELECT 1`.catch((err) => {
         console.warn(
-          "[ambient-sound keepalive] Neon ping failed:",
+          "[background-music keepalive] Neon ping failed:",
           err instanceof Error ? err.message : err,
         );
       });
     }, 60_000);
 
     try {
-      console.log(`[generate/ambient-sound] start imageId=${imageId}`);
-      const result = await generateAmbientSoundLocal(imageId);
+      console.log(`[generate/background-music] start imageId=${imageId}`);
+      const result = await generateBackgroundMusicLocal(imageId);
       if (result.success) {
         console.log(
-          `[generate/ambient-sound] done imageId=${imageId} url=${result.ambientSoundUrl}`,
+          `[generate/background-music] done imageId=${imageId} url=${result.backgroundMusicUrl}`,
         );
       } else {
         console.error(
-          `[generate/ambient-sound] FAILED imageId=${imageId} error=${result.error}`,
+          `[generate/background-music] FAILED imageId=${imageId} error=${result.error}`,
         );
       }
     } catch (err) {
-      Sentry.captureException(err, { extra: { imageId, op: "ambient-sound" } });
+      Sentry.captureException(err, {
+        extra: { imageId, op: "background-music" },
+      });
       console.error(
-        `[generate/ambient-sound] THREW imageId=${imageId}:`,
+        `[generate/background-music] THREW imageId=${imageId}:`,
         err instanceof Error ? (err.stack ?? err.message) : err,
       );
     } finally {
@@ -594,10 +596,10 @@ async function runPublishReel(c: Context) {
   //    ambient track; we layer it as ducked music in Remotion.
   const imageRow = await db.coloringImage.findUnique({
     where: { id: recording.imageId },
-    select: { ambientSoundUrl: true, title: true },
+    select: { backgroundMusicUrl: true, title: true },
   });
   console.log(
-    `[/publish/reel] ambientSoundUrl(raw): ${imageRow?.ambientSoundUrl ?? "(none)"}  title: ${imageRow?.title ?? "(none)"}`,
+    `[/publish/reel] backgroundMusicUrl(raw): ${imageRow?.backgroundMusicUrl ?? "(none)"}  title: ${imageRow?.title ?? "(none)"}`,
   );
 
   const port = parseInt(process.env.PORT ?? "3030", 10);
@@ -605,18 +607,18 @@ async function runPublishReel(c: Context) {
   // Download the ambient mp3 locally so Remotion's headless Chromium loads it
   // via our /tmp server (avoids CORS/cross-origin hangs + timeouts that crash
   // the compositor).
-  let ambientSoundUrl: string | undefined;
-  if (imageRow?.ambientSoundUrl) {
+  let backgroundMusicUrl: string | undefined;
+  if (imageRow?.backgroundMusicUrl) {
     try {
-      const res = await fetch(imageRow.ambientSoundUrl);
+      const res = await fetch(imageRow.backgroundMusicUrl);
       if (!res.ok) throw new Error(`ambient fetch ${res.status}`);
       const buf = Buffer.from(await res.arrayBuffer());
       const ambientPath = resolve(WORKER_OUT_DIR, `${Date.now()}-ambient.mp3`);
       const { writeFile } = await import("node:fs/promises");
       await writeFile(ambientPath, buf);
-      ambientSoundUrl = `http://localhost:${port}/tmp/${ambientPath.split("/").pop()}`;
+      backgroundMusicUrl = `http://localhost:${port}/tmp/${ambientPath.split("/").pop()}`;
       console.log(
-        `[/publish/reel] ambient proxied: ${ambientSoundUrl} (${buf.length} bytes)`,
+        `[/publish/reel] ambient proxied: ${backgroundMusicUrl} (${buf.length} bytes)`,
       );
     } catch (err) {
       console.warn(
@@ -754,7 +756,7 @@ async function runPublishReel(c: Context) {
     revealDurationFrames,
     durationInFrames,
     outputPath,
-    ambientSoundUrl,
+    backgroundMusicUrl,
     kidVoiceUrl,
     adultVoiceUrl,
     pdfPreviewUrl,
@@ -1001,21 +1003,21 @@ async function runPublishImageReel(c: Context) {
   // 2. Fetch the image's ambient sound + title (same as text variant).
   const imageRow = await db.coloringImage.findUnique({
     where: { id: recording.imageId },
-    select: { ambientSoundUrl: true, title: true },
+    select: { backgroundMusicUrl: true, title: true },
   });
 
   const port = parseInt(process.env.PORT ?? "3030", 10);
 
-  let ambientSoundUrl: string | undefined;
-  if (imageRow?.ambientSoundUrl) {
+  let backgroundMusicUrl: string | undefined;
+  if (imageRow?.backgroundMusicUrl) {
     try {
-      const res = await fetch(imageRow.ambientSoundUrl);
+      const res = await fetch(imageRow.backgroundMusicUrl);
       if (!res.ok) throw new Error(`ambient fetch ${res.status}`);
       const buf = Buffer.from(await res.arrayBuffer());
       const ambientPath = resolve(WORKER_OUT_DIR, `${Date.now()}-ambient.mp3`);
       const { writeFile } = await import("node:fs/promises");
       await writeFile(ambientPath, buf);
-      ambientSoundUrl = `http://localhost:${port}/tmp/${ambientPath.split("/").pop()}`;
+      backgroundMusicUrl = `http://localhost:${port}/tmp/${ambientPath.split("/").pop()}`;
     } catch (err) {
       console.warn(
         "[/publish/image-reel] ambient download failed (continuing without music):",
@@ -1165,7 +1167,7 @@ async function runPublishImageReel(c: Context) {
     revealDurationFrames,
     durationInFrames,
     outputPath,
-    ambientSoundUrl,
+    backgroundMusicUrl,
     kidVoiceUrl,
     adultVoiceUrl,
     pdfPreviewUrl,

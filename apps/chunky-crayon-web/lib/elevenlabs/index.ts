@@ -84,10 +84,10 @@ export async function generateColoVoice(
  * to produce a looping 90s track. Called via raw fetch because the music
  * endpoint is not yet exposed by the installed `elevenlabs` SDK (v1.59).
  *
- * @param prompt - Scene-aware music description (see createAmbientPrompt)
+ * @param prompt - Scene-aware music description (see createMusicPrompt)
  * @returns MP3 audio buffer (90 seconds, designed to loop seamlessly)
  */
-export async function generateAmbientSound(prompt: string): Promise<Buffer> {
+export async function generateBackgroundMusic(prompt: string): Promise<Buffer> {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) {
     throw new Error('ELEVENLABS_API_KEY is not configured');

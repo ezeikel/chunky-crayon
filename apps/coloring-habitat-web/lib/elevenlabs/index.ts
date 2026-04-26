@@ -12,10 +12,10 @@
  * to produce a 90s instrumental track designed to loop seamlessly under the
  * coloring experience.
  *
- * @param prompt - Scene-aware music description (see createAmbientPrompt)
+ * @param prompt - Scene-aware music description (see createMusicPrompt)
  * @returns MP3 audio buffer
  */
-export async function generateAmbientSound(prompt: string): Promise<Buffer> {
+export async function generateBackgroundMusic(prompt: string): Promise<Buffer> {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) {
     throw new Error("ELEVENLABS_API_KEY is not configured");

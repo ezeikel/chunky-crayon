@@ -15,7 +15,7 @@ const PLAN_FEATURES: Record<
     canUseCamera: boolean;
     maxProfiles: number;
     hasMagicBrush: boolean;
-    hasAmbientSound: boolean;
+    hasBackgroundMusic: boolean;
     hasPrioritySupport: boolean;
     hasCommercialUse: boolean;
   }
@@ -27,7 +27,7 @@ const PLAN_FEATURES: Record<
     canUseCamera: false,
     maxProfiles: 1,
     hasMagicBrush: false,
-    hasAmbientSound: false,
+    hasBackgroundMusic: false,
     hasPrioritySupport: false,
     hasCommercialUse: false,
   },
@@ -38,7 +38,7 @@ const PLAN_FEATURES: Record<
     canUseCamera: true,
     maxProfiles: 3,
     hasMagicBrush: true,
-    hasAmbientSound: true,
+    hasBackgroundMusic: true,
     hasPrioritySupport: false,
     hasCommercialUse: false,
   },
@@ -49,7 +49,7 @@ const PLAN_FEATURES: Record<
     canUseCamera: true,
     maxProfiles: 5,
     hasMagicBrush: true,
-    hasAmbientSound: true,
+    hasBackgroundMusic: true,
     hasPrioritySupport: true,
     hasCommercialUse: false,
   },
@@ -60,7 +60,7 @@ const PLAN_FEATURES: Record<
     canUseCamera: true,
     maxProfiles: 10,
     hasMagicBrush: true,
-    hasAmbientSound: true,
+    hasBackgroundMusic: true,
     hasPrioritySupport: true,
     hasCommercialUse: true,
   },

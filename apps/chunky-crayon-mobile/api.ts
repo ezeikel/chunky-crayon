@@ -731,7 +731,7 @@ export type PlanFeatures = {
   canUseCamera: boolean;
   maxProfiles: number;
   hasMagicBrush: boolean;
-  hasAmbientSound: boolean;
+  hasBackgroundMusic: boolean;
   hasPrioritySupport: boolean;
   hasCommercialUse: boolean;
 };

@@ -4,13 +4,13 @@ import { put } from '@one-colored-pixel/storage';
 import { revalidatePath } from 'next/cache';
 import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
-import { generateAmbientSound } from '@/lib/elevenlabs';
-import { createAmbientPrompt } from '@/lib/audio/prompts';
+import { generateBackgroundMusic } from '@/lib/elevenlabs';
+import { createMusicPrompt } from '@/lib/audio/prompts';
 
-export type GenerateAmbientSoundResult =
+export type GenerateBackgroundMusicResult =
   | {
       success: true;
-      ambientSoundUrl: string;
+      backgroundMusicUrl: string;
     }
   | {
       success: false;
@@ -26,9 +26,9 @@ export type GenerateAmbientSoundResult =
  * @param coloringImageId - The ID of the coloring image
  * @returns The URL of the generated ambient sound
  */
-export async function generateAmbientSoundForImage(
+export async function generateBackgroundMusicForImage(
   coloringImageId: string,
-): Promise<GenerateAmbientSoundResult> {
+): Promise<GenerateBackgroundMusicResult> {
   try {
     // Fetch the coloring image
     const coloringImage = await db.coloringImage.findFirst({
@@ -38,7 +38,7 @@ export async function generateAmbientSoundForImage(
         title: true,
         description: true,
         tags: true,
-        ambientSoundUrl: true,
+        backgroundMusicUrl: true,
       },
     });
 
@@ -47,12 +47,15 @@ export async function generateAmbientSoundForImage(
     }
 
     // Skip if already has ambient sound
-    if (coloringImage.ambientSoundUrl) {
-      return { success: true, ambientSoundUrl: coloringImage.ambientSoundUrl };
+    if (coloringImage.backgroundMusicUrl) {
+      return {
+        success: true,
+        backgroundMusicUrl: coloringImage.backgroundMusicUrl,
+      };
     }
 
     // Generate the ambient sound prompt (async — calls Claude)
-    const prompt = await createAmbientPrompt(
+    const prompt = await createMusicPrompt(
       coloringImage.title,
       coloringImage.description,
       coloringImage.tags,
@@ -60,15 +63,15 @@ export async function generateAmbientSoundForImage(
 
     // eslint-disable-next-line no-console
     console.log(
-      `[AmbientSound] Generating for "${coloringImage.title}": ${prompt}`,
+      `[BackgroundMusic] Generating for "${coloringImage.title}": ${prompt}`,
     );
 
     // Generate the ambient sound using ElevenLabs
-    const audioBuffer = await generateAmbientSound(prompt);
+    const audioBuffer = await generateBackgroundMusic(prompt);
 
     // Upload to blob storage
     const audioFileName = `uploads/coloring-images/${coloringImageId}/ambient.mp3`;
-    const { url: ambientSoundUrl } = await put(audioFileName, audioBuffer, {
+    const { url: backgroundMusicUrl } = await put(audioFileName, audioBuffer, {
       access: 'public',
       contentType: 'audio/mpeg',
     });
@@ -76,21 +79,21 @@ export async function generateAmbientSoundForImage(
     // Update the database
     await db.coloringImage.update({
       where: { id: coloringImageId },
-      data: { ambientSoundUrl },
+      data: { backgroundMusicUrl },
     });
 
     // eslint-disable-next-line no-console
     console.log(
-      `[AmbientSound] Generated ambient sound for "${coloringImage.title}": ${ambientSoundUrl}`,
+      `[BackgroundMusic] Generated ambient sound for "${coloringImage.title}": ${backgroundMusicUrl}`,
     );
 
     // Revalidate the coloring page
     revalidatePath(`/color/${coloringImageId}`);
 
-    return { success: true, ambientSoundUrl };
+    return { success: true, backgroundMusicUrl };
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('[AmbientSound] Error generating ambient sound:', error);
+    console.error('[BackgroundMusic] Error generating ambient sound:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -107,12 +110,12 @@ export async function generateAmbientSoundForImage(
  * @param limit - Maximum number of images to process
  * @returns Number of images processed
  */
-export async function generateAmbientSoundsForExistingImages(
+export async function generateBackgroundMusicForExistingImages(
   limit: number = 10,
 ): Promise<{ processed: number; failed: number }> {
   // Find images without ambient sounds
   const images = await db.coloringImage.findMany({
-    where: { brand: BRAND, ambientSoundUrl: null },
+    where: { brand: BRAND, backgroundMusicUrl: null },
     select: { id: true, title: true },
     take: limit,
     orderBy: { createdAt: 'desc' },
@@ -124,10 +127,10 @@ export async function generateAmbientSoundsForExistingImages(
   for (const image of images) {
     // eslint-disable-next-line no-console
     console.log(
-      `[AmbientSound] Processing ${processed + 1}/${images.length}: "${image.title}"`,
+      `[BackgroundMusic] Processing ${processed + 1}/${images.length}: "${image.title}"`,
     );
 
-    const result = await generateAmbientSoundForImage(image.id);
+    const result = await generateBackgroundMusicForImage(image.id);
 
     if (result.success) {
       processed++;
@@ -135,7 +138,7 @@ export async function generateAmbientSoundsForExistingImages(
       failed++;
       // eslint-disable-next-line no-console
       console.error(
-        `[AmbientSound] Failed for "${image.title}": ${result.error}`,
+        `[BackgroundMusic] Failed for "${image.title}": ${result.error}`,
       );
     }
 

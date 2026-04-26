@@ -41,7 +41,7 @@ export type DemoReelProps = {
   /** Total composition length in frames (computed by render.ts). */
   durationInFrames: number;
   /** Optional ambient music URL (ducked under everything). */
-  ambientSoundUrl?: string;
+  backgroundMusicUrl?: string;
   /** Optional kid voiceover — plays over the typing section. */
   kidVoiceUrl?: string;
   /** Optional adult narrator — plays over the reveal section. */
@@ -67,7 +67,7 @@ export const DemoReel: React.FC<DemoReelProps> = ({
   revealVideoUrl,
   typingDurationFrames,
   revealDurationFrames,
-  ambientSoundUrl,
+  backgroundMusicUrl,
   kidVoiceUrl,
   adultVoiceUrl,
   pdfPreviewUrl,
@@ -154,8 +154,8 @@ export const DemoReel: React.FC<DemoReelProps> = ({
       </Sequence>
 
       {/* Ducked ambient music across the full composition */}
-      {ambientSoundUrl ? (
-        <Audio src={ambientSoundUrl} volume={0.18} loop />
+      {backgroundMusicUrl ? (
+        <Audio src={backgroundMusicUrl} volume={0.18} loop />
       ) : null}
     </AbsoluteFill>
   );

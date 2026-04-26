@@ -1,5 +1,5 @@
 /**
- * In-process ambient-sound generation for the worker.
+ * In-process background-music generation for the worker.
  *
  * The CC web app used to do this inline in its after() server-action hook,
  * but Vercel silently drops long after() tasks (see comment in
@@ -7,7 +7,7 @@
  * the Hetzner box has no timeout, no drops, persists until the DB write
  * lands.
  *
- * Ported from apps/chunky-crayon-web/app/actions/ambient-sound.ts +
+ * Ported from apps/chunky-crayon-web/app/actions/background-music.ts +
  * apps/chunky-crayon-web/lib/elevenlabs/index.ts +
  * apps/chunky-crayon-web/lib/audio/prompts.ts.
  *
@@ -95,7 +95,7 @@ const buildFallbackPrompt = (
   ].join(" ");
 };
 
-const createAmbientPromptViaClaude = async (
+const createMusicPromptViaClaude = async (
   title: string,
   description: string,
   tags: string[],
@@ -110,7 +110,7 @@ const createAmbientPromptViaClaude = async (
     if (cleaned.length > 0) return cleaned;
   } catch (error) {
     console.warn(
-      "[ambient-sound] Claude prompt generation failed, using fallback:",
+      "[background-music] Claude prompt generation failed, using fallback:",
       error instanceof Error ? error.message : error,
     );
   }
@@ -146,18 +146,18 @@ const generateAmbientMusic = async (prompt: string): Promise<Buffer> => {
   return Buffer.from(await res.arrayBuffer());
 };
 
-export type GenerateAmbientSoundResult =
-  | { success: true; ambientSoundUrl: string }
+export type GenerateBackgroundMusicResult =
+  | { success: true; backgroundMusicUrl: string }
   | { success: false; error: string };
 
 /**
  * Generate ambient music for a coloring image, upload to R2, write URL to
- * the DB. Idempotent — early-returns success if `ambientSoundUrl` is
+ * the DB. Idempotent — early-returns success if `backgroundMusicUrl` is
  * already set on the row.
  */
-export const generateAmbientSoundLocal = async (
+export const generateBackgroundMusicLocal = async (
   coloringImageId: string,
-): Promise<GenerateAmbientSoundResult> => {
+): Promise<GenerateBackgroundMusicResult> => {
   try {
     const coloringImage = await db.coloringImage.findFirst({
       where: { id: coloringImageId },
@@ -166,7 +166,7 @@ export const generateAmbientSoundLocal = async (
         title: true,
         description: true,
         tags: true,
-        ambientSoundUrl: true,
+        backgroundMusicUrl: true,
       },
     });
 
@@ -174,41 +174,41 @@ export const generateAmbientSoundLocal = async (
       return { success: false, error: "Coloring image not found" };
     }
 
-    if (coloringImage.ambientSoundUrl) {
+    if (coloringImage.backgroundMusicUrl) {
       return {
         success: true,
-        ambientSoundUrl: coloringImage.ambientSoundUrl,
+        backgroundMusicUrl: coloringImage.backgroundMusicUrl,
       };
     }
 
-    const prompt = await createAmbientPromptViaClaude(
+    const prompt = await createMusicPromptViaClaude(
       coloringImage.title ?? "",
       coloringImage.description ?? "",
       (coloringImage.tags as string[]) ?? [],
     );
     console.log(
-      `[ambient-sound] Generating for "${coloringImage.title}": ${prompt}`,
+      `[background-music] Generating for "${coloringImage.title}": ${prompt}`,
     );
 
     const audioBuffer = await generateAmbientMusic(prompt);
 
     const audioFileName = `uploads/coloring-images/${coloringImageId}/ambient.mp3`;
-    const { url: ambientSoundUrl } = await put(audioFileName, audioBuffer, {
+    const { url: backgroundMusicUrl } = await put(audioFileName, audioBuffer, {
       access: "public",
       contentType: "audio/mpeg",
     });
 
     await db.coloringImage.update({
       where: { id: coloringImageId },
-      data: { ambientSoundUrl },
+      data: { backgroundMusicUrl },
     });
 
     console.log(
-      `[ambient-sound] Generated for "${coloringImage.title}": ${ambientSoundUrl}`,
+      `[background-music] Generated for "${coloringImage.title}": ${backgroundMusicUrl}`,
     );
-    return { success: true, ambientSoundUrl };
+    return { success: true, backgroundMusicUrl };
   } catch (error) {
-    console.error("[ambient-sound] Error:", error);
+    console.error("[background-music] Error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",

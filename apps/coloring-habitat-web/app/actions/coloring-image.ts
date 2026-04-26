@@ -31,7 +31,7 @@ import { getAIDescription } from "@/lib/scene-generation";
 import type { ColoringImageSearchParams } from "@/types";
 import { getUserId } from "@/app/actions/user";
 import { checkSvgImage, retraceImage, traceImage } from "@/utils/traceImage";
-import { generateAmbientSoundForImage } from "@/app/actions/ambient-sound";
+import { generateBackgroundMusicForImage } from "@/app/actions/background-music";
 import { generateRegionFillPoints } from "@/app/actions/generate-color-map";
 import { generateRegionStore } from "@/app/actions/generate-regions";
 import { generateColoredReference } from "@/app/actions/generate-colored-reference";
@@ -444,7 +444,7 @@ export const createColoringImage = async (
 
         // Generate ambient sound for the coloring experience
         (async () => {
-          const soundResult = await generateAmbientSoundForImage(result.id);
+          const soundResult = await generateBackgroundMusicForImage(result.id);
           if (soundResult.success) {
             console.log(`[Pipeline] Ambient sound generated for ${result.id}`);
           } else {
@@ -592,7 +592,7 @@ export const createColoringImage = async (
 
       // Generate ambient sound for the coloring experience
       (async () => {
-        const soundResult = await generateAmbientSoundForImage(result.id);
+        const soundResult = await generateBackgroundMusicForImage(result.id);
         if (soundResult.success) {
           console.log(`[Pipeline] Ambient sound generated for ${result.id}`);
         } else {
@@ -653,7 +653,7 @@ export async function getColoringImageBase(
       url: true,
       svgUrl: true,
       qrCodeUrl: true,
-      ambientSoundUrl: true,
+      backgroundMusicUrl: true,
     },
   });
 }

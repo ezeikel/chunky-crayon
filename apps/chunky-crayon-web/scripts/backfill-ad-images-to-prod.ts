@@ -229,7 +229,7 @@ async function main() {
     // script INSERTs the row directly (bypassing createColoringImage),
     // the pipeline never auto-fires for these images — that's why the
     // first batch landed in prod with regionMapUrl/regionsJson/
-    // ambientSoundUrl all NULL. Fire-and-forget — worker writes back
+    // backgroundMusicUrl all NULL. Fire-and-forget — worker writes back
     // to the DB on its own.
     const workerUrl = requireEnv('CHUNKY_CRAYON_WORKER_URL');
     const workerSecret = process.env.WORKER_SECRET;
@@ -241,7 +241,7 @@ async function main() {
       'region-store',
       'fill-points',
       'colored-reference',
-      'ambient-sound',
+      'background-music',
     ];
     await Promise.allSettled(
       endpoints.map((endpoint) =>

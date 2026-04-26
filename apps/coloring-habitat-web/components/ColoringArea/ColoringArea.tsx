@@ -217,18 +217,18 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // TODO: Improve ElevenLabs ambient sound prompts - current sounds are low quality/not fitting
     const handleFirstInteraction = useCallback(async () => {
       console.log("[ColoringArea] handleFirstInteraction called", {
-        hasAmbientUrl: !!coloringImage.ambientSoundUrl,
-        ambientUrl: coloringImage.ambientSoundUrl,
+        hasAmbientUrl: !!coloringImage.backgroundMusicUrl,
+        ambientUrl: coloringImage.backgroundMusicUrl,
         alreadyInitialized: ambientInitializedRef.current,
       });
-      if (coloringImage.ambientSoundUrl && !ambientInitializedRef.current) {
+      if (coloringImage.backgroundMusicUrl && !ambientInitializedRef.current) {
         ambientInitializedRef.current = true;
         console.log("[ColoringArea] Loading ambient sound...");
-        await loadAmbient(coloringImage.ambientSoundUrl);
+        await loadAmbient(coloringImage.backgroundMusicUrl);
         console.log("[ColoringArea] Playing ambient sound...");
         playAmbient();
       }
-    }, [coloringImage.ambientSoundUrl, loadAmbient, playAmbient]);
+    }, [coloringImage.backgroundMusicUrl, loadAmbient, playAmbient]);
 
     // Cleanup: stop ambient sound when component unmounts
     useEffect(() => {
