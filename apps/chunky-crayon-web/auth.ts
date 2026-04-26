@@ -12,6 +12,15 @@ import {
   readClientMatchData,
   sendSignupConversionEvents,
 } from '@/lib/conversion-api';
+import { ADMIN_EMAILS } from '@/constants';
+
+// Bootstrap source for `User.role`: anyone whose email is in the
+// hardcoded ADMIN_EMAILS constant gets ADMIN on signin (and is demoted
+// back to USER if removed from the list). DB role is the runtime source
+// of truth thereafter — `requireAdmin()` reads it from the session
+// rather than re-checking the constant on every request.
+const isAdminEmail = (email: string | null | undefined): boolean =>
+  !!email && ADMIN_EMAILS.includes(email);
 
 // TODO: re-enable when Apple sign-in is implemented
 // type AppleProfile = Profile & {
@@ -69,6 +78,17 @@ const config = {
           : null;
 
         if (existingUser) {
+          // Sync ADMIN_EMAILS membership on every signin so adding/
+          // removing an email from the env var takes effect on next
+          // login without needing a DB write elsewhere.
+          const shouldBeAdmin = isAdminEmail(existingUser.email);
+          const isAdmin = existingUser.role === 'ADMIN';
+          if (shouldBeAdmin !== isAdmin) {
+            await db.user.update({
+              where: { id: existingUser.id },
+              data: { role: shouldBeAdmin ? 'ADMIN' : 'USER' },
+            });
+          }
           return true;
         }
 
@@ -76,6 +96,7 @@ const config = {
           data: {
             email: profile?.email as string,
             name: profile?.name as string,
+            role: isAdminEmail(profile?.email as string) ? 'ADMIN' : 'USER',
           },
         });
 
@@ -133,12 +154,22 @@ const config = {
         });
 
         if (existingUser) {
+          // Same ADMIN_EMAILS sync as the google branch.
+          const shouldBeAdmin = isAdminEmail(existingUser.email);
+          const isAdmin = existingUser.role === 'ADMIN';
+          if (shouldBeAdmin !== isAdmin) {
+            await db.user.update({
+              where: { id: existingUser.id },
+              data: { role: shouldBeAdmin ? 'ADMIN' : 'USER' },
+            });
+          }
           return true;
         }
 
         const created = await db.user.create({
           data: {
             email: userEmail,
+            role: isAdminEmail(userEmail) ? 'ADMIN' : 'USER',
           },
         });
 
@@ -158,6 +189,17 @@ const config = {
       }
 
       return false;
+    },
+    // Expose `user.role` on the session so server/client code can gate
+    // on it without a second DB roundtrip. With session strategy
+    // 'database' the `user` arg here is the full DB row, including the
+    // `role` column we just added.
+    async session({ session, user }) {
+      if (session.user) {
+        session.user.dbId = user.id;
+        session.user.role = (user as { role?: 'USER' | 'ADMIN' }).role;
+      }
+      return session;
     },
   },
   secret: process.env.NEXT_AUTH_SECRET,

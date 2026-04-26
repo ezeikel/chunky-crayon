@@ -14,15 +14,20 @@ import { ADMIN_EMAILS } from '@/constants';
  * Returns the admin's email on success (you can assume it's non-null in
  * the rest of the handler).
  *
- * If we ever outgrow ADMIN_EMAILS (multi-admin team, tiered perms) swap
- * the check here — every admin route uses this one helper.
+ * Source of truth: `User.role` (DB column) exposed on `session.user.role`
+ * via the NextAuth session callback in auth.ts. The role is bootstrapped
+ * from the ADMIN_EMAILS constant on signin; the email-list check below
+ * is a belt-and-braces fallback for sessions issued before the role
+ * column existed (drops out once those sessions roll over).
  */
 export const requireAdmin = async (
   onFail: 'notFound' | 'redirect' = 'notFound',
 ): Promise<string> => {
   const session = await auth();
   const email = session?.user?.email;
-  const isAdmin = !!email && ADMIN_EMAILS.includes(email);
+  const isAdmin =
+    session?.user?.role === 'ADMIN' ||
+    (!!email && ADMIN_EMAILS.includes(email));
 
   if (!isAdmin) {
     if (onFail === 'redirect') redirect('/');

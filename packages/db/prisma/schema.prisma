@@ -39,7 +39,17 @@ model User {
   // Multi-brand support
   brand Brand @default(CHUNKY_CRAYON)
 
+  // Admin gating for /admin/*. Default USER for everyone; flip to ADMIN
+  // either manually or via the ADMIN_EMAILS env var auto-promotion in the
+  // NextAuth signIn callback (auth.ts).
+  role UserRole @default(USER)
+
   @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
 
 model Subscription {
