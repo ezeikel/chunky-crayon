@@ -71,9 +71,10 @@ const AdsListContent = async () => {
               { label: 'Colored ref', ready: !!ad.coloredReferenceUrl },
             ];
             return (
-              <div
+              <Link
                 key={ad.id}
-                className="bg-white rounded-coloring-card border border-paper-cream-dark overflow-hidden flex flex-col"
+                href={`/admin/ads/${ad.id}`}
+                className="bg-white rounded-coloring-card border border-paper-cream-dark overflow-hidden flex flex-col hover:border-crayon-orange hover:shadow-md transition-all"
               >
                 <div className="relative aspect-square bg-paper-cream">
                   {ad.url ? (
@@ -110,7 +111,7 @@ const AdsListContent = async () => {
                     ))}
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
