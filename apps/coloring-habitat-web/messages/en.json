@@ -445,7 +445,7 @@
         },
         "creditsPerPage": {
           "question": "How many pages can I make?",
-          "answer": "Each page costs about 5 credits. That's around 60 pages a month on Grove, 160 on Sanctuary, and 400 on Oasis."
+          "answer": "Text or photo pages cost 5 credits. Voice mode (a guided conversation about what you'd like to colour) costs 10 credits per page. So Grove = ~60 text/photo or ~30 voice pages a month. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Mix to your rhythm."
         },
         "audience": {
           "question": "Is Coloring Habitat for me?",

@@ -239,7 +239,7 @@
         },
         "10": {
           "question": "How do credits work?",
-          "answer": "Each coloring page you generate uses 5 credits. Credits refresh monthly with your subscription, and some plans allow unused credits to roll over. You can also purchase credit packs if you need a little extra creativity boost!"
+          "answer": "Most coloring pages use 5 credits — when you type a prompt or upload a photo. Voice mode (where you have a quick chat with Chunky Crayon) uses 10 credits per page. Credits refresh monthly with your subscription, and some plans allow unused credits to roll over. You can also purchase credit packs if you need a little extra creativity boost!"
         }
       }
     }
@@ -610,7 +610,7 @@
       },
       "creditsPerPage": {
         "question": "How many pages can I make?",
-        "answer": "Each page costs about 5 credits. Splash = ~50 pages/month, Rainbow = ~100, Sparkle = ~200."
+        "answer": "Text or photo pages cost 5 credits. Voice-mode pages (have a quick chat with Chunky Crayon) cost 10 credits. So Splash = ~50 text/photo pages or ~25 voice pages a month. Rainbow = ~100 / ~50. Sparkle = ~200 / ~100. Mix and match however you like."
       },
       "audience": {
         "question": "Is this for kids or adults?",
