@@ -12,6 +12,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",
     "@hono/node-server": "^1.19.11",
+    "@one-colored-pixel/canvas": "workspace:*",
     "@one-colored-pixel/coloring-core": "workspace:*",
     "@one-colored-pixel/db": "workspace:*",
     "@one-colored-pixel/storage": "workspace:*",

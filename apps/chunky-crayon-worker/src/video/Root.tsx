@@ -12,6 +12,11 @@ import {
   type ImageDemoReelProps,
   PHOTO_PREVIEW_SECS,
 } from "./compositions/ImageDemoReel";
+import {
+  BrushPlaybackSpike,
+  BRUSH_SPIKE_FPS,
+  BRUSH_SPIKE_DURATION_FRAMES,
+} from "./spikes/BrushPlaybackSpike";
 
 const FPS = 30;
 // Ad videos render at Seedance's native 24fps to avoid frame-resampling
@@ -111,6 +116,18 @@ export const RemotionRoot: React.FC = () => {
         calculateMetadata={({ props }) => ({
           durationInFrames: props.durationInFrames,
         })}
+      />
+
+      {/* Phase 0 spike — frame-deterministic brush playback validation.
+          Hardcoded fixture; not used in real renders. Delete once
+          BrushPlaybackSpike is ported into ImageCanvas (Phase 3). */}
+      <Composition
+        id="BrushPlaybackSpike"
+        component={BrushPlaybackSpike}
+        durationInFrames={BRUSH_SPIKE_DURATION_FRAMES}
+        fps={BRUSH_SPIKE_FPS}
+        width={1080}
+        height={1920}
       />
 
       {/* Ad video composition — 15s 9:16 @24fps (matches Seedance 2 native

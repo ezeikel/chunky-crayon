@@ -17,6 +17,11 @@ export {
   dilateBoundaries,
 } from "./floodFill";
 export { drawTexturedStroke } from "./brushTextures";
+export {
+  buildPreColoredCanvas,
+  paintMagicRevealStamp,
+  type MagicRevealRegionStore,
+} from "./magicReveal";
 export { createFillPattern, getPatternFillColor } from "./fillPatterns";
 
 // Region detection (browser)
