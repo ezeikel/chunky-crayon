@@ -628,5 +628,11 @@
       "error": "Algo salió mal",
       "errorDescription": "No pudimos añadirte a la lista. Inténtalo de nuevo."
     }
+  },
+  "og": {
+    "homepage": {
+      "tagline": "Páginas para colorear para adultos, creadas a demanda.",
+      "alt": "Coloring Habitat — páginas para colorear para adultos, creadas a demanda."
+    }
   }
 }

@@ -628,5 +628,11 @@
       "error": "問題が発生しました",
       "errorDescription": "リストに追加できませんでした。もう一度お試しください。"
     }
+  },
+  "og": {
+    "homepage": {
+      "tagline": "大人のぬり絵を、必要なときに。",
+      "alt": "Coloring Habitat — 大人のぬり絵を、必要なときに。"
+    }
   }
 }

@@ -628,5 +628,11 @@
       "error": "문제가 발생했어요",
       "errorDescription": "목록에 추가하지 못했어요. 다시 시도해 주세요."
     }
+  },
+  "og": {
+    "homepage": {
+      "tagline": "성인용 컬러링 페이지, 필요할 때마다.",
+      "alt": "Coloring Habitat — 필요할 때마다 만드는 성인용 컬러링 페이지."
+    }
   }
 }

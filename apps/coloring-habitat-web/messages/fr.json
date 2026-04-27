@@ -628,5 +628,11 @@
       "error": "Une erreur est survenue",
       "errorDescription": "Impossible de vous ajouter à la liste. Veuillez réessayer."
     }
+  },
+  "og": {
+    "homepage": {
+      "tagline": "Coloriages pour adultes, à la demande.",
+      "alt": "Coloring Habitat — coloriages pour adultes, à la demande."
+    }
   }
 }

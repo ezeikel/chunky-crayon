@@ -1083,7 +1083,8 @@
         "pages": "1만+ 도안",
         "aiGenerated": "AI 생성",
         "freePrintables": "무료 출력"
-      }
+      },
+      "alt": "Chunky Crayon — 몇 초 만에 만드는 맞춤 컬러링 페이지."
     },
     "coloringImage": {
       "notFound": "색칠 도안을 찾을 수 없어요"

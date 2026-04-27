@@ -1083,7 +1083,8 @@
         "pages": "10,000枚以上",
         "aiGenerated": "AIで生成",
         "freePrintables": "無料プリント"
-      }
+      },
+      "alt": "Chunky Crayon — たった数秒で作れる、オリジナルぬりえ。"
     },
     "coloringImage": {
       "notFound": "ぬりえが見つかりません"

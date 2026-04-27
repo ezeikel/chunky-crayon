@@ -628,5 +628,11 @@
       "error": "Etwas ist schiefgelaufen",
       "errorDescription": "Wir konnten dich nicht zur Liste hinzufügen. Bitte versuche es erneut."
     }
+  },
+  "og": {
+    "homepage": {
+      "tagline": "Malvorlagen für Erwachsene, nach Bedarf erstellt.",
+      "alt": "Coloring Habitat — Malvorlagen für Erwachsene, nach Bedarf erstellt."
+    }
   }
 }
