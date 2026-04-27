@@ -88,7 +88,7 @@ export const ImageInputCard = ({
           >
             +
           </div>
-          <div>Drop a photo to colour</div>
+          <div>Drop a photo to color</div>
         </div>
 
         {/* Preview state — scales in via previewProgress */}

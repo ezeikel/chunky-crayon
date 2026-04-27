@@ -37,7 +37,7 @@ export const PromptInputCard = ({
   typedText,
   showCaret = true,
   caretVisible = true,
-  placeholder = "What would you like to colour today?",
+  placeholder = "What would you like to color today?",
 }: PromptInputCardProps) => {
   const isEmpty = typedText.length === 0;
 

@@ -251,7 +251,7 @@ export const TextDemoReelV2: React.FC<TextDemoReelV2Props> = ({
 
       <Sequence from={F_HOOK_START} durationInFrames={F_HOOK_DUR}>
         <HookCard
-          line1="What if you could colour"
+          line1="What if you could color"
           line2="anything?"
           durationFrames={F_HOOK_DUR}
         />

@@ -34,6 +34,12 @@ import {
   IMAGE_REEL_DURATION_FRAMES,
   type ImageDemoReelV2Props,
 } from "./v2/ImageDemoReelV2";
+import {
+  VoiceDemoReelV2,
+  VOICE_REEL_FPS,
+  VOICE_REEL_DURATION_FRAMES,
+  type VoiceDemoReelV2Props,
+} from "./v2/VoiceDemoReelV2";
 import koalaRegionsJson from "./spikes/fixtures/koala-regions.json";
 import type { RegionStoreJson } from "./v2/lib/loadFixture";
 import { staticFile } from "remotion";
@@ -223,6 +229,39 @@ export const RemotionRoot: React.FC = () => {
             kidVoiceUrl: staticFile("spike/koala-kid-voice.mp3"),
             adultVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
           } satisfies TextDemoReelV2Props
+        }
+      />
+
+      {/* Phase 9 — V2 voice variant reel. Same beat skeleton, Beat 3
+          mocks the 2-turn voice conversation visually. Studio preview
+          uses Q1 audio cached from prod R2 + a Q2 generated for the
+          koala fixture via scripts/generate-spike-q2.ts. Real renders
+          pass per-render Q1/Q2 URLs via inputProps. */}
+      <Composition
+        id="VoiceDemoReelV2"
+        component={VoiceDemoReelV2}
+        durationInFrames={VOICE_REEL_DURATION_FRAMES}
+        fps={VOICE_REEL_FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            firstAnswer: "a koala",
+            secondAnswer: "building a sandcastle at the beach",
+            finishedImageUrl: staticFile("spike/koala.svg"),
+            regionMapUrl: staticFile("spike/koala.regions.bin.gz"),
+            regionMapWidth: 1024,
+            regionMapHeight: 1024,
+            regionsJson: koalaRegionsJson as unknown as RegionStoreJson,
+            svgUrl: staticFile("spike/koala.svg"),
+            paletteVariant: "cute",
+            q1AudioUrl: staticFile("spike/koala-q1.mp3"),
+            q2AudioUrl: staticFile("spike/koala-q2.mp3"),
+            a1AudioUrl: staticFile("spike/koala-a1.mp3"),
+            a2AudioUrl: staticFile("spike/koala-a2.mp3"),
+            backgroundMusicUrl: staticFile("spike/koala-ambient.mp3"),
+            adultVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
+          } satisfies VoiceDemoReelV2Props
         }
       />
 
