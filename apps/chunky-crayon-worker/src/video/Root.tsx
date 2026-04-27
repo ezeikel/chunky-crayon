@@ -22,6 +22,21 @@ import {
   V2_SHOWCASE_FPS,
   V2_SHOWCASE_DURATION_FRAMES,
 } from "./v2/V2ComponentShowcase";
+import {
+  TextDemoReelV2,
+  TEXT_REEL_FPS,
+  TEXT_REEL_DURATION_FRAMES,
+  type TextDemoReelV2Props,
+} from "./v2/TextDemoReelV2";
+import {
+  ImageDemoReelV2,
+  IMAGE_REEL_FPS,
+  IMAGE_REEL_DURATION_FRAMES,
+  type ImageDemoReelV2Props,
+} from "./v2/ImageDemoReelV2";
+import koalaRegionsJson from "./spikes/fixtures/koala-regions.json";
+import type { RegionStoreJson } from "./v2/lib/loadFixture";
+import { staticFile } from "remotion";
 
 const FPS = 30;
 // Ad videos render at Seedance's native 24fps to avoid frame-resampling
@@ -146,6 +161,69 @@ export const RemotionRoot: React.FC = () => {
         fps={V2_SHOWCASE_FPS}
         width={1080}
         height={1920}
+      />
+
+      {/* Phase 4 — V2 image variant reel. Same skeleton as TextDemoReelV2,
+          with Beat 3 swapped for the photo upload flow. Defaults use a
+          local Unsplash sample + the koala fixture so studio preview is
+          same-origin. */}
+      <Composition
+        id="ImageDemoReelV2"
+        component={ImageDemoReelV2}
+        durationInFrames={IMAGE_REEL_DURATION_FRAMES}
+        fps={IMAGE_REEL_FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            sourcePhotoUrl: staticFile("spike/sample-photo.jpg"),
+            photoFilename: "puppy.jpg",
+            finishedImageUrl: staticFile("spike/koala.svg"),
+            regionMapUrl: staticFile("spike/koala.regions.bin.gz"),
+            regionMapWidth: 1024,
+            regionMapHeight: 1024,
+            regionsJson: koalaRegionsJson as unknown as RegionStoreJson,
+            svgUrl: staticFile("spike/koala.svg"),
+            paletteVariant: "cute",
+            backgroundMusicUrl: staticFile("spike/koala-ambient.mp3"),
+            kidVoiceUrl: staticFile("spike/koala-kid-voice.mp3"),
+            adultVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
+          } satisfies ImageDemoReelV2Props
+        }
+      />
+
+      {/* Phase 4 — V2 text variant reel. Real renders pass inputProps
+          from worker /publish/v2 with per-image fixture URLs; defaults
+          point at the koala beach fixture so we can scrub locally. */}
+      <Composition
+        id="TextDemoReelV2"
+        component={TextDemoReelV2}
+        durationInFrames={TEXT_REEL_DURATION_FRAMES}
+        fps={TEXT_REEL_FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            prompt: "a koala building a sandcastle at the beach",
+            // Same-origin static fixtures keep studio preview free of CORS.
+            // Real worker renders pass prod R2 URLs via inputProps; the
+            // worker proxies those locally before invoking Remotion (same
+            // pattern as ambient music — see worker/src/index.ts /tmp serve).
+            finishedImageUrl: staticFile("spike/koala.svg"),
+            regionMapUrl: staticFile("spike/koala.regions.bin.gz"),
+            regionMapWidth: 1024,
+            regionMapHeight: 1024,
+            regionsJson: koalaRegionsJson as unknown as RegionStoreJson,
+            svgUrl: staticFile("spike/koala.svg"),
+            paletteVariant: "cute",
+            // Same-origin audio for studio preview. Real renders pass
+            // prod R2 / /tmp URLs via inputProps from the worker; the
+            // worker proxies them locally before invoking Remotion.
+            backgroundMusicUrl: staticFile("spike/koala-ambient.mp3"),
+            kidVoiceUrl: staticFile("spike/koala-kid-voice.mp3"),
+            adultVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
+          } satisfies TextDemoReelV2Props
+        }
       />
 
       {/* Ad video composition — 15s 9:16 @24fps (matches Seedance 2 native

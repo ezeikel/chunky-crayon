@@ -48,7 +48,7 @@ export const ImageInputCard = ({
       <div
         style={{
           position: "relative",
-          minHeight: 320,
+          aspectRatio: "1 / 1",
           borderRadius: RADII.card,
           background: showPreview ? COLORS.textInverted : COLORS.bgCream,
           border: `3px ${showPreview ? "solid" : "dashed"} ${
