@@ -40,7 +40,7 @@
   },
   "coloringPage": {
     "title": "Página para colorear",
-    "defaultDescription": "Página para colorear gratuita e imprimible de Chunky Crayon",
+    "defaultDescription": "Página para colorear gratuita e imprimible",
     "progress": {
       "colored": "coloreado",
       "percentage": "{percent}%",
@@ -105,7 +105,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Listo",
+      "doneSharing": "Compartir listo",
       "colorAgain": "Colorear otra vez",
       "startOver": "Empezar de nuevo"
     },
@@ -123,7 +123,7 @@
     },
     "colorPalette": {
       "selectColor": "Seleccionar color {color}",
-      "magicToolsMessage": "Los colores se eligen automáticamente con herramientas mágicas"
+      "magicToolsMessage": "Los colores se eligen automáticamente con herramientas Mágicas"
     },
     "patternSelector": {
       "label": "Patrón:"
@@ -332,7 +332,7 @@
     "chooseMethod": "Elige tu forma favorita de iniciar sesión",
     "orContinueWith": "O continúa con",
     "emailPlaceholder": "nombre@ejemplo.com",
-    "termsAgreement": "Al continuar, aceptas nuestros Términos del servicio y Política de privacidad.",
+    "termsAgreement": "Al continuar, aceptas nuestros Términos de Servicio y Política de Privacidad.",
     "verifyRequest": {
       "title": "¡Revisa tu correo!",
       "description": "Te enviamos un enlace mágico para iniciar sesión. Haz clic en el enlace de tu correo para continuar.",
@@ -369,12 +369,12 @@
     "stripeLoadFailed": "No se pudo cargar Stripe",
     "checkoutFailed": "No se pudo crear la sesión de pago",
     "unexpectedError": "Ocurrió un error inesperado. Inténtalo de nuevo.",
-    "redirectFailed": "No se pudo ir al pago"
+    "redirectFailed": "No se pudo redirigir al pago"
   },
   "breadcrumbs": {
     "home": "Inicio",
     "gallery": "Galería",
-    "forToddlers": "Para pequeños",
+    "forToddlers": "Para los más pequeños",
     "forKids": "Para niños",
     "forTeens": "Para adolescentes",
     "forAdults": "Para adultos",
