@@ -5,7 +5,7 @@ import { Sentry } from "./instrument.js";
 import { Hono, type Context } from "hono";
 import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
-import { readFile, stat, mkdir } from "node:fs/promises";
+import { readFile, stat, mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import { recordColoringSession } from "./record/session.js";
@@ -1314,6 +1314,7 @@ type V2Row = {
   regionMapWidth: number | null;
   regionMapHeight: number | null;
   regionsJson: unknown;
+  backgroundMusicUrl: string | null;
 };
 
 // Poll the DB until svgUrl + url + regionMapUrl + regionsJson are all
@@ -1343,6 +1344,7 @@ const waitForRowReady = async (
         regionMapWidth: true,
         regionMapHeight: true,
         regionsJson: true,
+        backgroundMusicUrl: true,
       },
     });
     if (!row) return null;
@@ -1380,6 +1382,114 @@ const waitForRowReady = async (
   }
 
   return { notReady: lastFlags };
+};
+
+/**
+ * Generate the per-render audio bundle (background music + kid + adult
+ * voiceover) for a V2 reel. Mirrors the V1 flow at /publish/reel — every
+ * render gets its own ambient track (proxied from the row's
+ * `backgroundMusicUrl`) and its own freshly-TTS'd voice clips.
+ *
+ * Non-fatal: any individual piece can fail and we still return what we have.
+ * Reels render fine without music or without voice; they just feel less
+ * polished. Failure cases are logged (Sentry catches uncaughts via onError).
+ */
+const buildV2ReelAudio = async (args: {
+  imageId: string;
+  prompt: string;
+  imageTitle: string | null;
+  ambientUrl: string | null;
+  port: number;
+  /**
+   * 'text' / 'image' / 'voice' — only used for log prefixes and to skip
+   * the kid voiceover for the voice variant (which already has its own
+   * Q1/Q2/A1/A2 conversation audio).
+   */
+  variant: V2Variant;
+}): Promise<{
+  backgroundMusicUrl?: string;
+  kidVoiceUrl?: string;
+  adultVoiceUrl?: string;
+}> => {
+  const { imageId, prompt, imageTitle, ambientUrl, port, variant } = args;
+  const tag = `[/publish/v2:${variant}]`;
+
+  let backgroundMusicUrl: string | undefined;
+  if (ambientUrl) {
+    try {
+      const res = await fetch(ambientUrl);
+      if (!res.ok) throw new Error(`ambient fetch ${res.status}`);
+      const buf = Buffer.from(await res.arrayBuffer());
+      const ambientPath = resolve(
+        WORKER_OUT_DIR,
+        `${Date.now()}-${imageId}-ambient.mp3`,
+      );
+      await writeFile(ambientPath, buf);
+      backgroundMusicUrl = `http://localhost:${port}/tmp/${ambientPath.split("/").pop()}`;
+      console.log(
+        `${tag} ambient proxied: ${backgroundMusicUrl} (${buf.length} bytes)`,
+      );
+    } catch (err) {
+      console.warn(
+        `${tag} ambient download failed (continuing without music):`,
+        err,
+      );
+    }
+  }
+
+  let kidVoiceUrl: string | undefined;
+  let adultVoiceUrl: string | undefined;
+  try {
+    const script = await generateReelScript({ prompt, imageTitle });
+    console.log(`${tag} script:`, script);
+
+    const kidVoiceId = process.env.ELEVENLABS_KID_VOICE_ID;
+    const adultVoiceId = process.env.ELEVENLABS_ADULT_VOICE_ID;
+    if (!kidVoiceId || !adultVoiceId) {
+      console.log(`${tag} skipping voiceover — ELEVENLABS_*_VOICE_ID not set`);
+      return { backgroundMusicUrl };
+    }
+
+    const stamp = Date.now();
+    const adultPath = resolve(WORKER_OUT_DIR, `${stamp}-${imageId}-adult.mp3`);
+
+    if (variant === "voice") {
+      // Voice reel already has Q1/Q2/A1/A2; only the adult outro line is needed.
+      await generateVoiceClip({
+        text: script.adultLine,
+        voiceId: adultVoiceId,
+        outputPath: adultPath,
+      });
+      adultVoiceUrl = `http://localhost:${port}/tmp/${adultPath.split("/").pop()}`;
+      console.log(`${tag} adult outro voice ready: ${adultVoiceUrl}`);
+    } else {
+      const kidPath = resolve(
+        WORKER_OUT_DIR,
+        `${stamp + 1}-${imageId}-kid.mp3`,
+      );
+      await Promise.all([
+        generateVoiceClip({
+          text: script.kidLine,
+          voiceId: kidVoiceId,
+          outputPath: kidPath,
+        }),
+        generateVoiceClip({
+          text: script.adultLine,
+          voiceId: adultVoiceId,
+          outputPath: adultPath,
+        }),
+      ]);
+      kidVoiceUrl = `http://localhost:${port}/tmp/${kidPath.split("/").pop()}`;
+      adultVoiceUrl = `http://localhost:${port}/tmp/${adultPath.split("/").pop()}`;
+      console.log(
+        `${tag} voice clips ready: kid=${kidVoiceUrl} adult=${adultVoiceUrl}`,
+      );
+    }
+  } catch (err) {
+    console.error(`${tag} voiceover generation failed (continuing):`, err);
+  }
+
+  return { backgroundMusicUrl, kidVoiceUrl, adultVoiceUrl };
 };
 
 app.post("/publish/v2", async (c) => {
@@ -1447,6 +1557,23 @@ app.post("/publish/v2", async (c) => {
       ? JSON.parse(row.regionsJson)
       : row.regionsJson;
 
+  // Generate the per-render audio bundle (ambient music + kid + adult
+  // voice) before kicking off the render — same flow as V1's /publish/reel.
+  // The comp passes through audio URLs as inputProps; `undefined` skips
+  // the corresponding `<Audio>` tag inside the reel composition.
+  const promptForScript =
+    variant === "image"
+      ? "photo upload" // matches V1 image-reel hint
+      : (row.description ?? row.title ?? "");
+  const reelAudio = await buildV2ReelAudio({
+    imageId: row.id,
+    prompt: promptForScript,
+    imageTitle: row.title,
+    ambientUrl: row.backgroundMusicUrl,
+    port,
+    variant,
+  });
+
   // Branch on variant: build the right inputProps + call the right
   // renderer. Audio fixtures (voice variant) generate before render so
   // the comp's delayRender boundary doesn't time out fetching them.
@@ -1464,6 +1591,9 @@ app.post("/publish/v2", async (c) => {
         regionsJson: parsedRegionsJson,
         svgUrl: proxiedSvg,
         paletteVariant: "cute",
+        backgroundMusicUrl: reelAudio.backgroundMusicUrl,
+        kidVoiceUrl: reelAudio.kidVoiceUrl,
+        adultVoiceUrl: reelAudio.adultVoiceUrl,
         outputPath,
         durationInFrames: TEXT_REEL_DURATION_FRAMES,
         fps: TEXT_REEL_FPS,
@@ -1501,6 +1631,9 @@ app.post("/publish/v2", async (c) => {
         regionsJson: parsedRegionsJson,
         svgUrl: proxiedSvg,
         paletteVariant: "cute",
+        backgroundMusicUrl: reelAudio.backgroundMusicUrl,
+        kidVoiceUrl: reelAudio.kidVoiceUrl,
+        adultVoiceUrl: reelAudio.adultVoiceUrl,
         outputPath,
         durationInFrames: IMAGE_REEL_DURATION_FRAMES,
         fps: IMAGE_REEL_FPS,
@@ -1549,6 +1682,8 @@ app.post("/publish/v2", async (c) => {
         q2AudioUrl: pQ2,
         a1AudioUrl: pA1,
         a2AudioUrl: pA2,
+        backgroundMusicUrl: reelAudio.backgroundMusicUrl,
+        adultVoiceUrl: reelAudio.adultVoiceUrl,
         outputPath,
         durationInFrames: VOICE_REEL_DURATION_FRAMES,
         fps: VOICE_REEL_FPS,
