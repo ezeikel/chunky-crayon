@@ -738,3 +738,13 @@ export const THEME_MAP: ThemeMap = {
     locations: ["a space station", "a distant galaxy"],
   },
 };
+
+// ─── Voice mode ────────────────────────────────────────────────────────────
+//
+// Cached Q1 audio for the 2-turn voice flow. CH's calm-companion phrasing.
+// Generated once via `scripts/generate-voice-q1.ts` and uploaded to prod R2.
+//
+// See `docs/voice-mode/README.md` for the full Q1/Q2 flow.
+export const VOICE_Q1_TEXT = "[softly] Tell us what you'd like to colour.";
+export const VOICE_Q1_AUDIO_URL =
+  "https://assets.coloringhabitat.com/voice-tts/0cdef0af7942f4f4ed47b15a1349aa564426262cedc7b0200af325c6d70256b6.mp3";

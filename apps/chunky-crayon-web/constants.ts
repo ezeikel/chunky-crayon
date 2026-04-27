@@ -4060,3 +4060,17 @@ export const BLOG_AUTHORS: BlogAuthor[] = [
     bio: 'Tom is a dad blogger and freelance writer who shares practical tips for fun family activities.',
   },
 ];
+
+// ─── Voice mode ────────────────────────────────────────────────────────────
+//
+// Cached Q1 audio for the 2-turn voice flow ("Tell us what you want to
+// colour."). Generated once via `scripts/generate-voice-q1.ts` and uploaded
+// to prod R2 — the URL resolves the same in dev and prod since we point at
+// `assets.chunkycrayon.com`. If the Q1 copy, voice id, or TTS model changes,
+// re-run the generate script and update this URL (the cache key includes
+// all three so a new file gets uploaded to a new path).
+//
+// See `docs/voice-mode/README.md` for the full Q1/Q2 flow.
+export const VOICE_Q1_TEXT = '[warm] Tell us what you want to colour.';
+export const VOICE_Q1_AUDIO_URL =
+  'https://assets.chunkycrayon.com/voice-tts/fb5e5f11aab81d0a2a93632ec3e737869706515e0edd1e7494a70a4fe175cdba.mp3';
