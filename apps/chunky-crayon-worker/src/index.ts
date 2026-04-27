@@ -1438,6 +1438,15 @@ app.post("/publish/v2", async (c) => {
   const stamp = Date.now();
   const outputPath = `${WORKER_OUT_DIR}/${row.id}-v2-${variant}-${stamp}.mp4`;
 
+  // The `regionsJson` column is `String` in Prisma (Postgres `text`), not
+  // `Json`. Prisma returns it as a raw string — the comp's loadFixture
+  // expects a parsed object with `.regions: [...]`. Parse here so each
+  // variant branch passes the right shape.
+  const parsedRegionsJson =
+    typeof row.regionsJson === "string"
+      ? JSON.parse(row.regionsJson)
+      : row.regionsJson;
+
   // Branch on variant: build the right inputProps + call the right
   // renderer. Audio fixtures (voice variant) generate before render so
   // the comp's delayRender boundary doesn't time out fetching them.
@@ -1452,8 +1461,7 @@ app.post("/publish/v2", async (c) => {
         regionMapUrl: proxiedRegionMap,
         regionMapWidth: row.regionMapWidth ?? 1024,
         regionMapHeight: row.regionMapHeight ?? 1024,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        regionsJson: row.regionsJson as any,
+        regionsJson: parsedRegionsJson,
         svgUrl: proxiedSvg,
         paletteVariant: "cute",
         outputPath,
@@ -1490,8 +1498,7 @@ app.post("/publish/v2", async (c) => {
         regionMapUrl: proxiedRegionMap,
         regionMapWidth: row.regionMapWidth ?? 1024,
         regionMapHeight: row.regionMapHeight ?? 1024,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        regionsJson: row.regionsJson as any,
+        regionsJson: parsedRegionsJson,
         svgUrl: proxiedSvg,
         paletteVariant: "cute",
         outputPath,
@@ -1535,8 +1542,7 @@ app.post("/publish/v2", async (c) => {
         regionMapUrl: proxiedRegionMap,
         regionMapWidth: row.regionMapWidth ?? 1024,
         regionMapHeight: row.regionMapHeight ?? 1024,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        regionsJson: row.regionsJson as any,
+        regionsJson: parsedRegionsJson,
         svgUrl: proxiedSvg,
         paletteVariant: "cute",
         q1AudioUrl: pQ1,
