@@ -614,6 +614,41 @@ export const getAllColoringImagesStatic = async () => {
   return getAllColoringImagesBase('all', undefined);
 };
 
+/**
+ * Server-side helper for the demo-reel produce cron (text variant).
+ * Generates a fresh AI scene description (same source as daily images),
+ * runs the standard pipeline, and tags the row SYSTEM + purposeKey
+ * 'demo-reel' so it stays out of community feeds. Skips credit checks
+ * (no userId).
+ *
+ * Returns the created coloringImage row, or null if generation failed.
+ */
+export const generateDemoReelImageFromAIDescription =
+  async (): Promise<Partial<ColoringImage> | null> => {
+    const description = await getAIDescription();
+
+    const result = await generateColoringImageWithMetadata(
+      description,
+      undefined,
+      GenerationType.SYSTEM,
+      'en',
+      description,
+      undefined,
+      'demo-reel',
+    );
+
+    if (!result.url || !result.svgUrl) {
+      console.error('[demo-reel] text generation incomplete:', result);
+      return null;
+    }
+
+    // Fire derived-asset pipeline so region store + bg music are ready by
+    // the time the reel renderer pulls the row.
+    await requestAllPipelineFromWorker(result.id);
+
+    return result;
+  };
+
 export const generateColoringImageOnly = async (
   generationType: GenerationType,
 ): Promise<Partial<ColoringImage>> => {

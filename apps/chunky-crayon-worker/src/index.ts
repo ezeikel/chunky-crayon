@@ -1246,6 +1246,69 @@ async function runPublishImageReel(c: Context) {
   });
 }
 
+/**
+ * POST /publish/v2
+ *
+ * Phase 1 stub for Demo Reels V2 (~/.claude/plans/demo-reels-v2.md).
+ * Receives { coloringImageId, variant } from the new produce-v2 cron route.
+ * The web app already generated the source image and wrote the row; the
+ * worker's job here is just to render the V2 Remotion composition and
+ * upload the result.
+ *
+ * Phase 1 (this PR): acknowledge the job, log it, 200. The actual V2
+ * Remotion render lands in Phase 4 — until then, if this endpoint fires
+ * in production, the produce-v2 cron is wired but reels won't actually
+ * publish. That's intentional: Phase 1 is purely additive, V1 routes
+ * stay live for the cutover window.
+ */
+type V2Variant = "text" | "image" | "voice";
+const isV2Variant = (v: unknown): v is V2Variant =>
+  v === "text" || v === "image" || v === "voice";
+
+app.post("/publish/v2", async (c) => {
+  const body = await c.req
+    .json<{ coloringImageId?: string; variant?: string }>()
+    .catch(() => ({}) as { coloringImageId?: string; variant?: string });
+
+  const { coloringImageId, variant } = body;
+
+  if (!coloringImageId || typeof coloringImageId !== "string") {
+    return c.json({ error: "coloringImageId required" }, 400);
+  }
+  if (!isV2Variant(variant)) {
+    return c.json(
+      { error: `variant must be text|image|voice, got ${String(variant)}` },
+      400,
+    );
+  }
+
+  // Sanity check: row exists. Catches misrouted IDs immediately rather
+  // than failing deep inside the renderer (Phase 4).
+  const row = await db.coloringImage.findUnique({
+    where: { id: coloringImageId },
+    select: { id: true, title: true, svgUrl: true },
+  });
+  if (!row) {
+    return c.json({ error: `coloringImage ${coloringImageId} not found` }, 404);
+  }
+
+  console.log(
+    `[/publish/v2] received: variant=${variant} coloringImageId=${coloringImageId} title="${row.title ?? "(none)"}"`,
+  );
+  console.log(
+    "[/publish/v2] Phase 1 stub — render not implemented yet; nothing will publish",
+  );
+
+  return c.json({
+    ok: true,
+    variant,
+    coloringImageId,
+    title: row.title,
+    rendered: false,
+    reason: "Phase 1 stub — Remotion render lands in Phase 4",
+  });
+});
+
 const port = parseInt(process.env.PORT ?? "3030", 10);
 serve({ fetch: app.fetch, port, hostname: "0.0.0.0" }, () => {
   console.log(`[chunky-crayon-worker] listening on http://0.0.0.0:${port}`);

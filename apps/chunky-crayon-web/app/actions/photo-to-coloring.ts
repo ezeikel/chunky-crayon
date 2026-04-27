@@ -47,6 +47,11 @@ const generatePhotoColoringImageWithMetadata = async (
   photoBase64: string,
   userId?: string,
   locale: string = 'en',
+  // System-purpose images (e.g. demo-reel cron) override defaults to mark
+  // the row as SYSTEM + carry a stable lookup key. User-uploaded photos
+  // keep the existing USER + null purposeKey behaviour.
+  generationType: GenerationType = GenerationType.USER,
+  purposeKey?: string,
 ) => {
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
 
@@ -130,7 +135,8 @@ const generatePhotoColoringImageWithMetadata = async (
         description: imageMetadata.description,
         alt: imageMetadata.alt,
         tags: imageMetadata.tags,
-        generationType: GenerationType.USER,
+        generationType,
+        purposeKey: purposeKey || undefined,
         userId,
         profileId: activeProfile?.id,
       },
@@ -346,5 +352,49 @@ export async function createColoringImageFromPhoto(
 
   revalidateTag('all-coloring-images', { expire: 0 });
   revalidatePath('/');
+  return result;
+}
+
+/**
+ * Server-side helper for the demo-reel produce cron. Fetches a public
+ * photo URL, base64-encodes it, runs it through the same generation
+ * pipeline as the user-facing flow, but tagged SYSTEM + purposeKey so it
+ * doesn't appear in community feeds. Skips credit checks (no userId) and
+ * skips the after() user-tracking hook — derived-asset pipeline still
+ * fires so the reel renderer has region store + voiceover ready.
+ *
+ * Returns the created coloringImage row, or null if generation failed.
+ */
+export async function generateDemoReelImageFromPhotoUrl(
+  photoUrl: string,
+): Promise<Partial<ColoringImage> | null> {
+  const photoResp = await fetch(photoUrl, { cache: 'no-store' });
+  if (!photoResp.ok) {
+    console.error(
+      `[demo-reel] photo fetch failed: ${photoResp.status} ${photoUrl}`,
+    );
+    return null;
+  }
+  const buf = Buffer.from(await photoResp.arrayBuffer());
+  const photoBase64 = buf.toString('base64');
+
+  const result = await generatePhotoColoringImageWithMetadata(
+    photoBase64,
+    undefined,
+    'en',
+    GenerationType.SYSTEM,
+    'demo-reel',
+  );
+
+  if (!result.url || !result.svgUrl) {
+    console.error('[demo-reel] photo generation incomplete:', result);
+    return null;
+  }
+
+  // Same as the user paths — fire the derived-asset pipeline so the reel
+  // renderer can read region store + colored reference + background music
+  // when it's ready to compose.
+  await requestAllPipelineFromWorker(result.id);
+
   return result;
 }
