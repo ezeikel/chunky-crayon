@@ -38,7 +38,7 @@
       "brush": "Pincel",
       "sticker": "Sticker",
       "magicReveal": "Revelado mágico",
-      "magicAuto": "Auto mágico",
+      "magicAuto": "Automático mágico",
       "magicBrush": "Pincel mágico",
       "magicFill": "Relleno mágico",
       "autoColor": "Color automático",
@@ -104,8 +104,8 @@
       "zoomOutAria": "Alejar (ver más)",
       "zoomIn": "Acercar",
       "zoomInAria": "Acercar (ver de cerca)",
-      "pan": "Mover",
-      "panAria": "Mover por la imagen",
+      "pan": "Desplazar",
+      "panAria": "Desplazarse por la imagen",
       "reset": "Ver imagen completa",
       "resetAria": "Volver a la imagen completa"
     },
@@ -356,7 +356,7 @@
         "description": "Comienza tu viaje de colorear",
         "cta": "Comenzar gratis",
         "features": [
-          "2 creaciones gratuitas para empezar",
+          "2 creaciones gratuitas para comenzar",
           "Acceso a la biblioteca gratuita",
           "Lienzo de colorear en línea",
           "Descargas en PDF"
@@ -433,9 +433,9 @@
   },
   "gallery": {
     "pageTitle": "Galería de colorear | Coloring Habitat",
-    "pageDescription": "Explora nuestra creciente colección de páginas para colorear intrincadas para la relajación y el bienestar. Filtra por categoría, dificultad o temporada.",
+    "pageDescription": "Explora nuestra creciente colección de páginas para colorear intrincadas para la relajación y la atención plena. Filtra por categoría, dificultad o temporada.",
     "heroTitle": "Galería de colorear",
-    "heroSubtitle": "Explora páginas para colorear intrincadas pensadas para la relajación y el bienestar. Cada diseño te invita a bajar el ritmo y encontrar un momento de calma.",
+    "heroSubtitle": "Explora páginas para colorear intrincadas para la relajación y la atención plena. Cada diseño está hecho para ayudarte a bajar el ritmo y encontrar un momento de tranquilidad.",
     "browseByCategory": "Explorar por categoría",
     "browseByDifficulty": "Explorar por dificultad",
     "browseByHolidays": "Temporadas y festividades",
@@ -462,7 +462,7 @@
       "intermediate": {
         "title": "Intermedio",
         "shortLabel": "Medio",
-        "description": "Detalle moderado para una sesión más larga y tranquilizadora"
+        "description": "Detalle moderado para una sesión más larga y relajante"
       },
       "advanced": {
         "title": "Avanzado",
@@ -510,7 +510,7 @@
       },
       "flowers": {
         "name": "Flores",
-        "description": "Florales delicados para una concentración suave"
+        "description": "Motivos florales delicados para una concentración suave"
       },
       "ocean": {
         "name": "Océano",
@@ -518,7 +518,7 @@
       },
       "patterns": {
         "name": "Patrones",
-        "description": "Motivos repetitivos para colorear meditativamente"
+        "description": "Motivos repetitivos para colorear meditativo"
       },
       "wildlife": {
         "name": "Vida salvaje",
