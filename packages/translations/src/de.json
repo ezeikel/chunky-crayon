@@ -40,15 +40,15 @@
   },
   "coloringPage": {
     "title": "Ausmalbild",
-    "defaultDescription": "Gratis Ausmalbild zum Ausdrucken von Chunky Crayon",
+    "defaultDescription": "Kostenloses Ausmalbild zum Ausdrucken",
     "progress": {
       "colored": "ausgemalt",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "Toller Start!",
+        "25": "Guter Start!",
         "50": "Halb geschafft!",
         "75": "Fast fertig!",
-        "100": "Wahnsinn!"
+        "100": "Geschafft!"
       },
       "allDone": "Alles fertig!"
     },
@@ -105,7 +105,7 @@
       "share": "Teilen",
       "print": "Drucken",
       "preparing": "Wird vorbereitet...",
-      "doneSharing": "Fertig geteilt",
+      "doneSharing": "Teilen beendet",
       "colorAgain": "Nochmal ausmalen",
       "startOver": "Neu starten"
     },
@@ -140,8 +140,8 @@
       "resetAria": "Zurück zur Gesamtansicht"
     },
     "muteToggle": {
-      "mute": "Töne stumm",
-      "unmute": "Töne an",
+      "mute": "Töne stummschalten",
+      "unmute": "Töne aktivieren",
       "turnOn": "Töne einschalten",
       "turnOff": "Töne ausschalten"
     },
@@ -295,13 +295,13 @@
   },
   "billing": {
     "pageTitle": "Deine Abrechnung & dein Abo",
-    "pageSubtitle": "Verwalte dein Abo und kaufe extra Credits, um weiter tolle Ausmalbilder zu zaubern.",
+    "pageSubtitle": "Verwalte dein Abo und kaufe zusätzliche Credits, um weiter Ausmalbilder zu erstellen.",
     "currentPlan": "Aktueller Plan",
     "currentCredits": "Aktuelle Credits: {count}",
     "renewsOn": "Dein Abo verlängert sich am {date}",
     "manageSubscription": "Abo verwalten",
     "noActiveSubscription": "Kein aktives Abo",
-    "noSubscriptionDescription": "Wähle einen Plan, um tolle Ausmalbilder zu erstellen.",
+    "noSubscriptionDescription": "Wähle einen Plan, um Ausmalbilder zu erstellen.",
     "viewPlans": "Pläne ansehen",
     "buyMoreCredits": "Mehr Credits kaufen",
     "credits": "{count} Credits",
@@ -329,7 +329,7 @@
     "continueWithApple": "Weiter mit Apple",
     "signInWithEmail": "Mit E-Mail anmelden",
     "sendingLink": "Link wird gesendet...",
-    "chooseMethod": "Wähle deine Lieblings-Anmeldemethode",
+    "chooseMethod": "Wähle deine bevorzugte Anmeldemethode",
     "orContinueWith": "Oder weiter mit",
     "emailPlaceholder": "name@example.com",
     "termsAgreement": "Wenn du weitermachst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
@@ -358,7 +358,7 @@
     }
   },
   "errors": {
-    "generic": "Oh nein! Da ist etwas schiefgelaufen. Bitte versuch’s nochmal.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "notFound": "Seite nicht gefunden",
     "sharedArtworkNotFound": {
       "title": "Kunstwerk nicht gefunden",
