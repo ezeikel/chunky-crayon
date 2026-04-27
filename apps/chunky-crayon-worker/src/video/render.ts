@@ -18,6 +18,26 @@ const ENTRY_POINT = path.join(__dirname, "index.ts");
 // resolves to `http://localhost:<bundle-port>/fonts/foo.ttf`.
 const PUBLIC_DIR = path.resolve(__dirname, "../../public");
 
+// Workspace packages (e.g. @one-colored-pixel/canvas) emit ESM dist with
+// extensionless relative imports. Webpack 5 in strict ESM mode rejects
+// these with "Did you mean 'floodFill.js'?". The remotion.config.ts has the
+// same override, but that's only loaded by the Remotion CLI — programmatic
+// bundle() calls need it threaded through explicitly.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const webpackOverride = (current: any) => ({
+  ...current,
+  module: {
+    ...current.module,
+    rules: [
+      ...(current.module?.rules ?? []),
+      {
+        test: /\.m?js$/,
+        resolve: { fullySpecified: false },
+      },
+    ],
+  },
+});
+
 export type RenderDemoReelOptions = DemoReelProps & {
   /** Output mp4 path. */
   outputPath: string;
@@ -35,6 +55,7 @@ export async function renderDemoReel(
   const bundleLocation = await bundle({
     entryPoint: ENTRY_POINT,
     publicDir: PUBLIC_DIR,
+    webpackOverride,
   });
   console.log(`[render] bundled: ${bundleLocation}`);
 
@@ -150,6 +171,7 @@ async function renderV2Composition(args: {
   const bundleLocation = await bundle({
     entryPoint: ENTRY_POINT,
     publicDir: PUBLIC_DIR,
+    webpackOverride,
   });
 
   const composition = await selectComposition({
@@ -201,6 +223,7 @@ export async function renderImageDemoReel(
   const bundleLocation = await bundle({
     entryPoint: ENTRY_POINT,
     publicDir: PUBLIC_DIR,
+    webpackOverride,
   });
   console.log(`[render-image] bundled: ${bundleLocation}`);
 
