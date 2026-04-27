@@ -56,10 +56,12 @@ const AdminImagesContent = async ({
         sourcePrompt: true,
         url: true,
         svgUrl: true,
+        coloredReferenceUrl: true,
         regionMapUrl: true,
         regionsGeneratedAt: true,
         generationType: true,
         createdAt: true,
+        updatedAt: true,
         User: { select: { email: true, name: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -117,6 +119,7 @@ const AdminImagesContent = async ({
         {images.map((img) => {
           const thumb = img.svgUrl || img.url;
           const hasRegion = !!img.regionMapUrl;
+          const ogPreviewUrl = `/en/coloring-image/${img.id}/opengraph-image?v=${img.updatedAt.getTime()}`;
           return (
             <div
               key={img.id}
@@ -149,6 +152,18 @@ const AdminImagesContent = async ({
                   {img.generationType}
                 </span>
               </Link>
+
+              {/* OG preview — shows the actual rendered Open Graph card */}
+              <div className="relative aspect-[1200/630] bg-paper-cream border-t border-paper-cream-dark">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={ogPreviewUrl}
+                  alt="OG preview"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+
               <div className="p-2 flex flex-col gap-y-1 text-xs">
                 <div
                   className="font-medium line-clamp-2"

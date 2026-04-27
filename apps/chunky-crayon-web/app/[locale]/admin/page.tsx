@@ -6,6 +6,7 @@ import {
   faBullhorn,
   faImages,
   faShareNodes,
+  faShareFromSquare,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { requireAdmin } from '@/lib/auth-guards';
 import Loading from '@/components/Loading/Loading';
@@ -28,6 +29,12 @@ const SECTIONS = [
     label: 'Images',
     icon: faImages,
     description: 'Browse all coloring images, filter by type/status.',
+  },
+  {
+    href: '/admin/og',
+    label: 'OG previews',
+    icon: faShareFromSquare,
+    description: 'Preview the hero collage and per-landing-page social cards.',
   },
   {
     href: '/admin/social',

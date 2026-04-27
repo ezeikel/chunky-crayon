@@ -8,6 +8,7 @@ import {
   faImages,
   faBullhorn,
   faShareNodes,
+  faShareFromSquare,
 } from '@fortawesome/pro-duotone-svg-icons';
 import cn from '@/utils/cn';
 
@@ -25,6 +26,12 @@ const ITEMS: Array<{
   { href: '/admin', label: 'Dashboard', icon: faGauge, match: 'exact' },
   { href: '/admin/ads', label: 'Ads', icon: faBullhorn, match: 'prefix' },
   { href: '/admin/images', label: 'Images', icon: faImages, match: 'prefix' },
+  {
+    href: '/admin/og',
+    label: 'OG previews',
+    icon: faShareFromSquare,
+    match: 'prefix',
+  },
   {
     href: '/admin/social',
     label: 'Social',
