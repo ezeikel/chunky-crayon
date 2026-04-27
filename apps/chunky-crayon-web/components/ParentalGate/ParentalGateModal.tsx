@@ -42,7 +42,14 @@ const getRandomProblem = (): MathProblem => {
 type ParentalGateModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /**
+   * Where to navigate on success. Empty string when `onSuccess` is set
+   * (callback mode — see `openGate({ onSuccess })` overload). Both forms
+   * never coexist: one or the other is the success action.
+   */
   targetPath: string;
+  /** Callback to fire on success instead of navigating. */
+  onSuccess?: () => void;
 };
 
 // Default problem to avoid Math.random() during SSR
@@ -52,6 +59,7 @@ const ParentalGateModal = ({
   open,
   onOpenChange,
   targetPath,
+  onSuccess,
 }: ParentalGateModalProps) => {
   const t = useTranslations('parentalGate');
   const router = useRouter();
@@ -76,17 +84,18 @@ const ParentalGateModal = ({
       const numericAnswer = parseInt(userAnswer, 10);
 
       if (numericAnswer === problem.answer) {
-        // Correct! Navigate to target
+        // Correct! Either fire the callback (in-page action) or navigate.
         onOpenChange(false);
 
-        // Handle external links (mailto:, http://, https://)
-        if (
+        if (onSuccess) {
+          onSuccess();
+        } else if (
           targetPath.startsWith('mailto:') ||
           targetPath.startsWith('http://') ||
           targetPath.startsWith('https://')
         ) {
           window.open(targetPath, '_blank', 'noopener,noreferrer');
-        } else {
+        } else if (targetPath) {
           router.push(targetPath);
         }
       } else {
@@ -105,7 +114,7 @@ const ParentalGateModal = ({
         }, 1500);
       }
     },
-    [userAnswer, problem.answer, targetPath, router, onOpenChange],
+    [userAnswer, problem.answer, targetPath, onSuccess, router, onOpenChange],
   );
 
   const iconStyle = {

@@ -10,7 +10,15 @@ import {
 import ParentalGateModal from './ParentalGateModal';
 
 type ParentalGateContextType = {
-  openGate: (targetPath: string) => void;
+  /**
+   * Open the gate and (on success) navigate to `targetPath` OR call
+   * `onSuccess`. Use the path form for "open external link" type uses
+   * (the original use case) and the callback form for in-page actions
+   * like enabling voice mode.
+   */
+  openGate: (
+    target: string | { onSuccess: () => void; reason?: string },
+  ) => void;
 };
 
 const ParentalGateContext = createContext<ParentalGateContextType | null>(null);
@@ -39,11 +47,23 @@ export const ParentalGateProvider = ({
 }: ParentalGateProviderProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [targetPath, setTargetPath] = useState('');
+  const [onSuccess, setOnSuccess] = useState<(() => void) | null>(null);
 
-  const openGate = useCallback((path: string) => {
-    setTargetPath(path);
-    setIsOpen(true);
-  }, []);
+  const openGate = useCallback<ParentalGateContextType['openGate']>(
+    (target) => {
+      if (typeof target === 'string') {
+        setTargetPath(target);
+        setOnSuccess(null);
+      } else {
+        setTargetPath('');
+        // Wrap the callback in a thunk because useState resolves a function
+        // initialiser, not a function value.
+        setOnSuccess(() => target.onSuccess);
+      }
+      setIsOpen(true);
+    },
+    [],
+  );
 
   return (
     <ParentalGateContext.Provider value={{ openGate }}>
@@ -52,6 +72,7 @@ export const ParentalGateProvider = ({
         open={isOpen}
         onOpenChange={setIsOpen}
         targetPath={targetPath}
+        onSuccess={onSuccess ?? undefined}
       />
     </ParentalGateContext.Provider>
   );

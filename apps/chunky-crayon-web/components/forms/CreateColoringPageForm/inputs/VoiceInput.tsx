@@ -16,10 +16,16 @@ import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
 import { useInputMode } from './InputModeContext';
+import { useParentalGate } from '@/components/ParentalGate';
 import {
   useVoiceConversation,
   type VoiceConversationError,
 } from '../hooks/useVoiceConversation';
+
+// localStorage key — one-tap gate sticks for the session, but uses
+// `sessionStorage` semantics: cleared on tab close. Voice mode is a
+// foot-gun for kid safety so we make parents re-verify each session.
+const VOICE_GATE_PASSED_KEY = 'voice_mode_gate_passed';
 
 type VoiceInputProps = {
   className?: string;
@@ -73,6 +79,7 @@ const ERROR_COPY: Record<VoiceConversationError, string> = {
 const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
   const { canGenerate } = useUser();
   const { setDescription, setIsProcessing, setIsBusy } = useInputMode();
+  const { openGate } = useParentalGate();
   const handedOffRef = useRef(false);
 
   const {
@@ -87,6 +94,36 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
     stopRecording,
     reset,
   } = useVoiceConversation();
+
+  // Wraps `start()` with a one-time-per-session parental gate. Once the
+  // gate is passed, the flag persists in sessionStorage so subsequent
+  // voice taps in the same tab don't re-prompt. Closing the tab clears
+  // the flag — a fresh visit re-prompts.
+  const startWithGate = () => {
+    let alreadyPassed = false;
+    try {
+      alreadyPassed = sessionStorage.getItem(VOICE_GATE_PASSED_KEY) === 'true';
+    } catch {
+      // sessionStorage can be unavailable (private browsing, etc.) — fall
+      // through to gating every time, which is the safer default.
+    }
+
+    if (alreadyPassed) {
+      void start();
+      return;
+    }
+
+    openGate({
+      onSuccess: () => {
+        try {
+          sessionStorage.setItem(VOICE_GATE_PASSED_KEY, 'true');
+        } catch {
+          /* see above — non-fatal */
+        }
+        void start();
+      },
+    });
+  };
 
   // Mirror combined description into InputModeContext so the loading
   // overlay (parent form's <ColoLoading>) shows what the user said.
@@ -346,7 +383,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
 
       <button
         type="button"
-        onClick={start}
+        onClick={startWithGate}
         disabled={!canGenerate}
         className={cn(
           'w-24 h-24 rounded-full flex items-center justify-center',
