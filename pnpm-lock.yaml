@@ -702,6 +702,15 @@ importers:
       '@ai-sdk/anthropic':
         specifier: ^3.0.64
         version: 3.0.69(zod@3.25.76)
+      '@fortawesome/fontawesome-svg-core':
+        specifier: ^6.7.2
+        version: 6.7.2
+      '@fortawesome/pro-duotone-svg-icons':
+        specifier: ^6.7.2
+        version: 6.7.2
+      '@fortawesome/react-fontawesome':
+        specifier: ^0.2.6
+        version: 0.2.6(@fortawesome/fontawesome-svg-core@6.7.2)(react@19.1.0)
       '@hono/node-server':
         specifier: ^1.19.11
         version: 1.19.14(hono@4.11.9)
@@ -711,6 +720,9 @@ importers:
       '@one-colored-pixel/coloring-core':
         specifier: workspace:*
         version: link:../../packages/coloring-core
+      '@one-colored-pixel/coloring-ui':
+        specifier: workspace:*
+        version: link:../../packages/coloring-ui
       '@one-colored-pixel/db':
         specifier: workspace:*
         version: link:../../packages/db

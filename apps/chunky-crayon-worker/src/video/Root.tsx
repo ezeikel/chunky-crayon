@@ -17,6 +17,11 @@ import {
   BRUSH_SPIKE_FPS,
   BRUSH_SPIKE_DURATION_FRAMES,
 } from "./spikes/BrushPlaybackSpike";
+import {
+  V2ComponentShowcase,
+  V2_SHOWCASE_FPS,
+  V2_SHOWCASE_DURATION_FRAMES,
+} from "./v2/V2ComponentShowcase";
 
 const FPS = 30;
 // Ad videos render at Seedance's native 24fps to avoid frame-resampling
@@ -126,6 +131,19 @@ export const RemotionRoot: React.FC = () => {
         component={BrushPlaybackSpike}
         durationInFrames={BRUSH_SPIKE_DURATION_FRAMES}
         fps={BRUSH_SPIKE_FPS}
+        width={1080}
+        height={1920}
+      />
+
+      {/* Phase 2 — V2 component showcase. Mounts every V2 building block
+          (palette row, prompt input card, image input card, canvas reveal)
+          with token-driven brand styling for visual validation. Not part
+          of any real reel; remove once V2 reel comps replace it (Phase 4). */}
+      <Composition
+        id="V2ComponentShowcase"
+        component={V2ComponentShowcase}
+        durationInFrames={V2_SHOWCASE_DURATION_FRAMES}
+        fps={V2_SHOWCASE_FPS}
         width={1080}
         height={1920}
       />
