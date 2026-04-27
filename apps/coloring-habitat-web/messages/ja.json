@@ -11,8 +11,8 @@
     "error": "エラーが発生しました"
   },
   "coloringPage": {
-    "title": "ぬりえページ",
-    "relatedPages": "その他のぬりえページ",
+    "title": "塗り絵ページ",
+    "relatedPages": "その他の塗り絵ページ",
     "defaultDescription": "Coloring Habitatの無料大人向けぬりえページ",
     "progress": {
       "colored": "着色済み",
@@ -353,10 +353,10 @@
     "plans": {
       "bloom": {
         "name": "Bloom",
-        "description": "ぬりえの旅を始めましょう",
+        "description": "塗り絵の旅を始めましょう",
         "cta": "無料で始める",
         "features": [
-          "毎日2回無料作成",
+          "最初に2回無料作成",
           "無料ライブラリへのアクセス",
           "オンラインぬりえキャンバス",
           "PDFダウンロード"
@@ -364,18 +364,18 @@
       },
       "grove": {
         "name": "Grove",
-        "description": "カジュアルなぬりえ愛好者向け",
+        "description": "カジュアルな塗り絵愛好者向け",
         "cta": "無料トライアル開始",
         "features": [
           "月300クレジット",
-          "すべてのぬりえ機能",
+          "すべての塗り絵機能",
           "HD PDFダウンロード",
           "ギャラリーに保存"
         ]
       },
       "sanctuary": {
         "name": "Sanctuary",
-        "description": "定期的なぬりえ愛好者向け",
+        "description": "定期的な塗り絵愛好者向け",
         "cta": "無料トライアル開始",
         "features": [
           "月800クレジット",
@@ -533,7 +533,7 @@
         "description": "ヴィクトリア朝の機械と不思議な装置"
       },
       "food": {
-        "name": "食べもの",
+        "name": "フード",
         "description": "豪華な料理や食卓の風景"
       }
     },
