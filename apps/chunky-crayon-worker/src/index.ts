@@ -1304,6 +1304,84 @@ type V2Variant = "text" | "image" | "voice";
 const isV2Variant = (v: unknown): v is V2Variant =>
   v === "text" || v === "image" || v === "voice";
 
+type V2Row = {
+  id: string;
+  title: string | null;
+  description: string | null;
+  url: string;
+  svgUrl: string;
+  regionMapUrl: string;
+  regionMapWidth: number | null;
+  regionMapHeight: number | null;
+  regionsJson: unknown;
+};
+
+// Poll the DB until svgUrl + url + regionMapUrl + regionsJson are all
+// populated, or until `timeoutMs` elapses. Returns:
+//   - null if the row doesn't exist (404)
+//   - { notReady: {...} } if the row exists but timed out unready (400)
+//   - V2Row if ready
+const waitForRowReady = async (
+  coloringImageId: string,
+  timeoutMs: number,
+): Promise<V2Row | { notReady: Record<string, boolean> } | null> => {
+  const startedAt = Date.now();
+  let lastFlags: Record<string, boolean> = {};
+  let attempts = 0;
+
+  while (Date.now() - startedAt < timeoutMs) {
+    attempts++;
+    const row = await db.coloringImage.findUnique({
+      where: { id: coloringImageId },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        url: true,
+        svgUrl: true,
+        regionMapUrl: true,
+        regionMapWidth: true,
+        regionMapHeight: true,
+        regionsJson: true,
+      },
+    });
+    if (!row) return null;
+
+    const flags = {
+      hasSvg: !!row.svgUrl,
+      hasUrl: !!row.url,
+      hasRegionMap: !!row.regionMapUrl,
+      hasRegionsJson: !!row.regionsJson,
+    };
+    lastFlags = flags;
+
+    if (
+      flags.hasSvg &&
+      flags.hasUrl &&
+      flags.hasRegionMap &&
+      flags.hasRegionsJson
+    ) {
+      if (attempts > 1) {
+        console.log(
+          `[/publish/v2] row ready for ${coloringImageId} after ${attempts} polls (${Math.round((Date.now() - startedAt) / 1000)}s)`,
+        );
+      }
+      return row as V2Row;
+    }
+
+    // Log on first miss so it's clear we're waiting (not crashing).
+    if (attempts === 1) {
+      console.log(
+        `[/publish/v2] row ${coloringImageId} not ready yet, polling: ${JSON.stringify(flags)}`,
+      );
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 5_000));
+  }
+
+  return { notReady: lastFlags };
+};
+
 app.post("/publish/v2", async (c) => {
   const body = await c.req
     .json<{ coloringImageId?: string; variant?: string }>()
@@ -1321,35 +1399,21 @@ app.post("/publish/v2", async (c) => {
     );
   }
 
-  // Pull everything the V2 comps need off the row in one query.
-  const row = await db.coloringImage.findUnique({
-    where: { id: coloringImageId },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      url: true, // colored webp — outro hero
-      svgUrl: true, // line art SVG
-      regionMapUrl: true,
-      regionMapWidth: true,
-      regionMapHeight: true,
-      regionsJson: true,
-    },
-  });
+  // produce-v2 fires this endpoint immediately after creating the row,
+  // but the derived assets (svg trace, region store, colored webp) are
+  // generated asynchronously by other worker endpoints over the next
+  // ~3-5min. Poll until the row has everything we need, then proceed.
+  // Bail after 8min — by then something is wrong upstream and the caller
+  // is long gone anyway (45s ack timeout on the web side).
+  const row = await waitForRowReady(coloringImageId, 8 * 60 * 1000);
   if (!row) {
     return c.json({ error: `coloringImage ${coloringImageId} not found` }, 404);
   }
-
-  if (!row.svgUrl || !row.url || !row.regionMapUrl || !row.regionsJson) {
+  if ("notReady" in row) {
     return c.json(
       {
-        error: "row not ready for reel render",
-        details: {
-          hasSvg: !!row.svgUrl,
-          hasUrl: !!row.url,
-          hasRegionMap: !!row.regionMapUrl,
-          hasRegionsJson: !!row.regionsJson,
-        },
+        error: "row not ready for reel render after timeout",
+        details: row.notReady,
       },
       400,
     );
