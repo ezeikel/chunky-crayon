@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getTranslationsForLocale } from '@/i18n/messages';
 import { loadOGFonts, OG_FONT_CONFIG } from '@/lib/og/fonts';
+import { loadOGLogo } from '@/lib/og/logo';
 import { colors, OG_WIDTH, OG_HEIGHT, crayonColors } from '@/lib/og/constants';
 import { getColoringImageForOG } from '@/lib/og/data';
 
@@ -29,9 +30,10 @@ export default async function Image({ params }: Props) {
   const { id, locale } = await params;
   const t = (getTranslationsForLocale(locale) as any).og;
 
-  const [fonts, coloringImage] = await Promise.all([
+  const [fonts, coloringImage, logo] = await Promise.all([
     loadOGFonts(),
     getColoringImageForOG(id),
+    loadOGLogo(),
   ]);
 
   const [tondoBold, rooneySansRegular, rooneySansBold] = fonts;
@@ -78,6 +80,9 @@ export default async function Image({ params }: Props) {
     );
   }
 
+  // Use line art so the OG card is an honest preview of what the user gets
+  // in-app. The coloredReferenceUrl JPEG looks great in feeds but isn't
+  // reproducible via flood-fill — see docs/plans/active/REGION_PALETTE_FROM_JPEG.md
   const imageUrl = coloringImage.svgUrl || coloringImage.url;
   const difficultyKey = coloringImage.difficulty;
   const difficultyColor = difficultyKey
@@ -299,30 +304,29 @@ export default async function Image({ params }: Props) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '12px',
               marginTop: 'auto',
               paddingTop: '16px',
             }}
           >
-            <span
-              style={{
-                fontFamily: OG_FONT_CONFIG.tondo.name,
-                fontSize: '24px',
-                fontWeight: 700,
-                color: colors.crayonOrange,
-              }}
-            >
-              Chunky
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logo}
+              alt=""
+              width={40}
+              height={40}
+              style={{ width: '40px', height: '40px' }}
+            />
             <span
               style={{
                 fontFamily: OG_FONT_CONFIG.tondo.name,
                 fontSize: '24px',
                 fontWeight: 700,
                 color: colors.textPrimary,
+                lineHeight: 1,
               }}
             >
-              Crayon
+              Chunky Crayon
             </span>
           </div>
         </div>

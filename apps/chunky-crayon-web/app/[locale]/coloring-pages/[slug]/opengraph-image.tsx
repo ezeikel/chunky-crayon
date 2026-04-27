@@ -1,5 +1,4 @@
 import { ImageResponse } from 'next/og';
-import { getTranslationsForLocale } from '@/i18n/messages';
 import { loadOGFonts, OG_FONT_CONFIG } from '@/lib/og/fonts';
 import { loadOGLogo } from '@/lib/og/logo';
 import { colors, OG_WIDTH, OG_HEIGHT, crayonColors } from '@/lib/og/constants';
@@ -7,10 +6,11 @@ import {
   getFeaturedColoringImagesForOG,
   type FeaturedOGImage,
 } from '@/lib/og/data';
+import { getLandingPageBySlug } from '@/lib/seo/landing-pages';
 
 export const runtime = 'nodejs';
 
-export const alt = 'Chunky Crayon — custom coloring pages, made in seconds.';
+export const alt = 'Free printable coloring pages — Chunky Crayon';
 export const size = {
   width: OG_WIDTH,
   height: OG_HEIGHT,
@@ -18,20 +18,31 @@ export const size = {
 export const contentType = 'image/png';
 
 type Props = {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 };
 
 const TILE_ROTATIONS = [-2, 1, -1, 2, -1, 1.5];
 
 export default async function Image({ params }: Props) {
-  const { locale } = await params;
-  const t = (getTranslationsForLocale(locale) as any).og.homepage;
+  const { slug } = await params;
+  const config = getLandingPageBySlug(slug);
+
+  const tagline = config?.tagline ?? 'Custom coloring pages, made in seconds.';
+  const headline = config?.title ?? 'Free Printable Coloring Pages';
+  const primaryTag = config?.tags[0];
 
   const [fonts, featured, logo] = await Promise.all([
     loadOGFonts(),
-    getFeaturedColoringImagesForOG(6),
+    getFeaturedColoringImagesForOG(6, primaryTag),
     loadOGLogo(),
   ]);
+
+  // If a tag-filtered query came back empty, retry without the filter so the
+  // card still showcases real work rather than falling back to text.
+  const images =
+    featured.length > 0 || !primaryTag
+      ? featured
+      : await getFeaturedColoringImagesForOG(6);
 
   const [tondoBold, rooneySansRegular, rooneySansBold] = fonts;
   const fontExports = [
@@ -55,14 +66,14 @@ export default async function Image({ params }: Props) {
     },
   ];
 
-  if (featured.length === 0) {
-    return new ImageResponse(renderTextFallback(t.tagline, logo), {
+  if (images.length === 0) {
+    return new ImageResponse(renderTextFallback(headline, tagline, logo), {
       ...size,
       fonts: fontExports,
     });
   }
 
-  return new ImageResponse(renderCollage(featured, t.tagline, logo), {
+  return new ImageResponse(renderCollage(images, headline, tagline, logo), {
     ...size,
     fonts: fontExports,
   });
@@ -70,6 +81,7 @@ export default async function Image({ params }: Props) {
 
 const renderCollage = (
   images: FeaturedOGImage[],
+  headline: string,
   tagline: string,
   logo: string,
 ) => (
@@ -85,7 +97,6 @@ const renderCollage = (
       overflow: 'hidden',
     }}
   >
-    {/* Top crayon stripe */}
     <div
       style={{
         position: 'absolute',
@@ -101,7 +112,6 @@ const renderCollage = (
       ))}
     </div>
 
-    {/* Decorative corner blob */}
     <div
       style={{
         position: 'absolute',
@@ -110,12 +120,12 @@ const renderCollage = (
         width: '320px',
         height: '320px',
         borderRadius: '50%',
-        backgroundColor: colors.crayonYellowLight,
+        backgroundColor: colors.crayonPinkLight,
         opacity: 0.4,
       }}
     />
 
-    {/* Left: collage grid */}
+    {/* Left: collage */}
     <div
       style={{
         display: 'flex',
@@ -157,7 +167,7 @@ const renderCollage = (
       ))}
     </div>
 
-    {/* Right: brand + tagline */}
+    {/* Right: headline + tagline + brand */}
     <div
       style={{
         display: 'flex',
@@ -166,58 +176,74 @@ const renderCollage = (
         flex: 1,
         paddingLeft: '40px',
         paddingRight: '8px',
-        gap: '20px',
+        gap: '18px',
         zIndex: 1,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+      <h1
+        style={{
+          fontFamily: OG_FONT_CONFIG.tondo.name,
+          fontSize: '38px',
+          fontWeight: 700,
+          color: colors.textPrimary,
+          lineHeight: 1.15,
+          margin: 0,
+          display: '-webkit-box',
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
+        {headline}
+      </h1>
+
+      <p
+        style={{
+          fontSize: '22px',
+          fontWeight: 400,
+          color: colors.textSecondary,
+          lineHeight: 1.35,
+          margin: 0,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
+        {tagline}
+      </p>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginTop: 'auto',
+          paddingTop: '20px',
+        }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={logo}
           alt=""
-          width={88}
-          height={88}
-          style={{ width: '88px', height: '88px' }}
+          width={44}
+          height={44}
+          style={{ width: '44px', height: '44px' }}
         />
         <span
           style={{
             fontFamily: OG_FONT_CONFIG.tondo.name,
-            fontSize: '60px',
+            fontSize: '28px',
             fontWeight: 700,
             color: colors.textPrimary,
-            letterSpacing: '-1px',
             lineHeight: 1,
           }}
         >
           Chunky Crayon
         </span>
       </div>
-
-      <p
-        style={{
-          fontSize: '34px',
-          fontWeight: 700,
-          color: colors.textPrimary,
-          lineHeight: 1.2,
-          margin: 0,
-        }}
-      >
-        {tagline}
-      </p>
-
-      <span
-        style={{
-          fontSize: '22px',
-          fontWeight: 600,
-          color: colors.crayonOrangeDark,
-          marginTop: '8px',
-        }}
-      >
-        chunkycrayon.com
-      </span>
     </div>
 
-    {/* Bottom crayon stripe */}
     <div
       style={{
         position: 'absolute',
@@ -235,7 +261,11 @@ const renderCollage = (
   </div>
 );
 
-const renderTextFallback = (tagline: string, logo: string) => (
+const renderTextFallback = (
+  headline: string,
+  tagline: string,
+  logo: string,
+) => (
   <div
     style={{
       width: '100%',
@@ -247,8 +277,7 @@ const renderTextFallback = (tagline: string, logo: string) => (
       background: `linear-gradient(145deg, ${colors.bgCream} 0%, ${colors.crayonSkyLight} 40%, ${colors.bgCreamDark} 100%)`,
       fontFamily: OG_FONT_CONFIG.rooneySans.name,
       padding: '60px',
-      position: 'relative',
-      overflow: 'hidden',
+      textAlign: 'center',
     }}
   >
     <div
@@ -266,41 +295,36 @@ const renderTextFallback = (tagline: string, logo: string) => (
       ))}
     </div>
 
-    <div
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img
+      src={logo}
+      alt=""
+      width={88}
+      height={88}
+      style={{ width: '88px', height: '88px', marginBottom: '16px' }}
+    />
+
+    <h1
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px',
+        fontFamily: OG_FONT_CONFIG.tondo.name,
+        fontSize: '52px',
+        fontWeight: 700,
+        color: colors.textPrimary,
+        margin: 0,
+        maxWidth: '900px',
+        lineHeight: 1.15,
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={logo}
-        alt=""
-        width={104}
-        height={104}
-        style={{ width: '104px', height: '104px' }}
-      />
-      <span
-        style={{
-          fontFamily: OG_FONT_CONFIG.tondo.name,
-          fontSize: '72px',
-          fontWeight: 700,
-          color: colors.textPrimary,
-          letterSpacing: '-1px',
-          lineHeight: 1,
-        }}
-      >
-        Chunky Crayon
-      </span>
-    </div>
+      {headline}
+    </h1>
 
     <p
       style={{
-        fontSize: '32px',
-        fontWeight: 600,
+        fontSize: '28px',
+        fontWeight: 400,
         color: colors.textSecondary,
-        marginTop: '16px',
+        marginTop: '20px',
+        maxWidth: '900px',
       }}
     >
       {tagline}

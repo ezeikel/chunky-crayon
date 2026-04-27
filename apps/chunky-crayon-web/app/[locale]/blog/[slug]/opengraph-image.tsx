@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getTranslationsForLocale } from '@/i18n/messages';
 import { loadOGFonts, OG_FONT_CONFIG } from '@/lib/og/fonts';
+import { loadOGLogo } from '@/lib/og/logo';
 import { colors, OG_WIDTH, OG_HEIGHT, crayonColors } from '@/lib/og/constants';
 import { getBlogPostForOG } from '@/lib/og/data';
 import { urlFor } from '@/lib/sanity';
@@ -22,9 +23,10 @@ export default async function Image({ params }: Props) {
   const { slug, locale } = await params;
   const t = (getTranslationsForLocale(locale) as any).og;
 
-  const [fonts, post] = await Promise.all([
+  const [fonts, post, logo] = await Promise.all([
     loadOGFonts(),
     getBlogPostForOG(slug),
+    loadOGLogo(),
   ]);
 
   const [tondoBold, rooneySansRegular, rooneySansBold] = fonts;
@@ -384,36 +386,35 @@ export default async function Image({ params }: Props) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '12px',
               marginTop: 'auto',
               paddingTop: '16px',
             }}
           >
-            <span
-              style={{
-                fontFamily: OG_FONT_CONFIG.tondo.name,
-                fontSize: '24px',
-                fontWeight: 700,
-                color: colors.crayonOrange,
-              }}
-            >
-              Chunky
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logo}
+              alt=""
+              width={40}
+              height={40}
+              style={{ width: '40px', height: '40px' }}
+            />
             <span
               style={{
                 fontFamily: OG_FONT_CONFIG.tondo.name,
                 fontSize: '24px',
                 fontWeight: 700,
                 color: colors.textPrimary,
+                lineHeight: 1,
               }}
             >
-              Crayon
+              Chunky Crayon
             </span>
             <span
               style={{
                 fontSize: '18px',
                 color: colors.textMuted,
-                marginLeft: '8px',
+                marginLeft: '4px',
               }}
             >
               {t.blogPost.blog}

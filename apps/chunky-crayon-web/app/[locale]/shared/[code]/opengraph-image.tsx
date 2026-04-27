@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getTranslationsForLocale } from '@/i18n/messages';
 import { loadOGFonts, OG_FONT_CONFIG } from '@/lib/og/fonts';
+import { loadOGLogo } from '@/lib/og/logo';
 import { colors, OG_WIDTH, OG_HEIGHT, crayonColors } from '@/lib/og/constants';
 import { getSharedArtworkForOG } from '@/lib/og/data';
 
@@ -21,9 +22,10 @@ export default async function Image({ params }: Props) {
   const { code, locale } = await params;
   const t = (getTranslationsForLocale(locale) as any).og;
 
-  const [fonts, artwork] = await Promise.all([
+  const [fonts, artwork, logo] = await Promise.all([
     loadOGFonts(),
     getSharedArtworkForOG(code),
+    loadOGLogo(),
   ]);
 
   const [tondoBold, rooneySansRegular, rooneySansBold] = fonts;
@@ -276,29 +278,28 @@ export default async function Image({ params }: Props) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '10px',
               marginTop: '8px',
             }}
           >
-            <span
-              style={{
-                fontFamily: OG_FONT_CONFIG.tondo.name,
-                fontSize: '20px',
-                fontWeight: 700,
-                color: colors.crayonOrange,
-              }}
-            >
-              Chunky
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logo}
+              alt=""
+              width={32}
+              height={32}
+              style={{ width: '32px', height: '32px' }}
+            />
             <span
               style={{
                 fontFamily: OG_FONT_CONFIG.tondo.name,
                 fontSize: '20px',
                 fontWeight: 700,
                 color: colors.textPrimary,
+                lineHeight: 1,
               }}
             >
-              Crayon
+              Chunky Crayon
             </span>
           </div>
         </div>

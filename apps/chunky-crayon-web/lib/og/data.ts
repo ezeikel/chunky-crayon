@@ -18,6 +18,7 @@ export type ColoringImageOGData = {
   tags: string[];
   url: string | null;
   svgUrl: string | null;
+  coloredReferenceUrl: string | null;
   difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT' | null;
 };
 
@@ -36,6 +37,7 @@ export async function getColoringImageForOG(
       tags: true,
       url: true,
       svgUrl: true,
+      coloredReferenceUrl: true,
       difficulty: true,
     },
   });
@@ -49,8 +51,58 @@ export async function getColoringImageForOG(
     tags: image.tags,
     url: image.url,
     svgUrl: image.svgUrl,
+    coloredReferenceUrl: image.coloredReferenceUrl,
     difficulty: image.difficulty,
   };
+}
+
+// Featured coloring images for collage-style OG (homepage / landing pages)
+export type FeaturedOGImage = {
+  id: string;
+  imageUrl: string;
+  title: string;
+};
+
+/**
+ * Fetch a small set of recent, public coloring images for collage OG cards.
+ *
+ * We deliberately use the **line art** (`svgUrl ?? url`) — not the
+ * `coloredReferenceUrl` JPEG — so the OG card is an honest preview of what
+ * the user actually gets in-app. The JPEG is a beautiful diffusion render
+ * we can't reproduce with flood-fill, so showing it would mislead users
+ * about the in-product experience.
+ *
+ * Tracked roadmap to use the real region-fill render here once we have a
+ * pre-rendered "regions painted" PNG: docs/plans/active/REGION_PALETTE_FROM_JPEG.md
+ */
+export async function getFeaturedColoringImagesForOG(
+  limit = 6,
+  filterTag?: string,
+): Promise<FeaturedOGImage[]> {
+  const images = await db.coloringImage.findMany({
+    where: {
+      brand: BRAND,
+      showInCommunity: true,
+      ...(filterTag ? { tags: { has: filterTag } } : {}),
+      OR: [{ svgUrl: { not: null } }, { url: { not: null } }],
+    },
+    select: {
+      id: true,
+      title: true,
+      svgUrl: true,
+      url: true,
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  return images
+    .map((i) => ({
+      id: i.id,
+      title: i.title,
+      imageUrl: (i.svgUrl ?? i.url) as string,
+    }))
+    .filter((i) => !!i.imageUrl);
 }
 
 // Blog post data for OG

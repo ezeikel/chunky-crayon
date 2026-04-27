@@ -12,6 +12,13 @@ export const size = {
 };
 export const contentType = "image/png";
 
+const difficultyColors: Record<string, string> = {
+  BEGINNER: colors.sage,
+  INTERMEDIATE: colors.primaryLight,
+  ADVANCED: colors.terracotta,
+  EXPERT: colors.lavenderDark,
+};
+
 export default async function Image({
   params,
 }: {
@@ -25,10 +32,35 @@ export default async function Image({
   ]);
 
   const [jakartaRegular, jakartaBold, jakartaExtraBold] = fonts;
+  const fontExports = [
+    {
+      name: OG_FONT_CONFIG.jakarta.name,
+      data: jakartaRegular,
+      weight: 400 as const,
+      style: "normal" as const,
+    },
+    {
+      name: OG_FONT_CONFIG.jakarta.name,
+      data: jakartaBold,
+      weight: 700 as const,
+      style: "normal" as const,
+    },
+    {
+      name: OG_FONT_CONFIG.jakarta.name,
+      data: jakartaExtraBold,
+      weight: 800 as const,
+      style: "normal" as const,
+    },
+  ];
 
   const title = image?.title || "Coloring Page";
-  const difficulty = image?.difficulty || "";
+  const description = image?.description || null;
+  const difficulty = image?.difficulty || null;
   const tags = image?.tags?.slice(0, 3) || [];
+  // Use line art so the OG card honestly previews what's reproducible in-app.
+  // See docs/plans/active/REGION_PALETTE_FROM_JPEG.md
+  const imageUrl = image?.svgUrl || image?.url || null;
+  const difficultyColor = difficulty ? difficultyColors[difficulty] : null;
 
   return new ImageResponse(
     (
@@ -37,12 +69,9 @@ export default async function Image({
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: `linear-gradient(145deg, ${colors.bgCream} 0%, ${colors.sageLight} 40%, ${colors.bgCreamDark} 100%)`,
+          background: `linear-gradient(145deg, ${colors.bgCream} 0%, ${colors.sageLight} 50%, ${colors.bgCreamDark} 100%)`,
           fontFamily: OG_FONT_CONFIG.jakarta.name,
-          padding: "60px",
+          padding: "48px",
           position: "relative",
           overflow: "hidden",
         }}
@@ -63,24 +92,12 @@ export default async function Image({
           ))}
         </div>
 
-        {/* Decorative circles */}
-        <div
-          style={{
-            position: "absolute",
-            top: "-60px",
-            right: "-60px",
-            width: "200px",
-            height: "200px",
-            borderRadius: "50%",
-            backgroundColor: colors.sageLight,
-            opacity: 0.5,
-          }}
-        />
+        {/* Decorative blob */}
         <div
           style={{
             position: "absolute",
             bottom: "-80px",
-            left: "-80px",
+            right: "-80px",
             width: "240px",
             height: "240px",
             borderRadius: "50%",
@@ -89,102 +106,179 @@ export default async function Image({
           }}
         />
 
-        {/* Brand */}
+        {/* Left: image preview */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "12px",
-            marginBottom: "40px",
-            zIndex: 1,
+            justifyContent: "center",
+            width: "420px",
+            height: "100%",
+            flexShrink: 0,
           }}
         >
-          <span
-            style={{
-              fontSize: "28px",
-              fontWeight: 800,
-              color: colors.primary,
-            }}
-          >
-            Coloring Habitat
-          </span>
-        </div>
-
-        {/* Title */}
-        <h1
-          style={{
-            fontSize: "56px",
-            fontWeight: 800,
-            color: colors.textPrimary,
-            textAlign: "center",
-            maxWidth: "900px",
-            lineHeight: 1.1,
-            letterSpacing: "-1px",
-            margin: 0,
-            zIndex: 1,
-          }}
-        >
-          {title}
-        </h1>
-
-        {/* Difficulty badge */}
-        {difficulty && (
-          <span
-            style={{
-              marginTop: "24px",
-              fontSize: "18px",
-              fontWeight: 600,
-              color: colors.primary,
-              background: `${colors.primaryLight}30`,
-              padding: "8px 20px",
-              borderRadius: "100px",
-              zIndex: 1,
-            }}
-          >
-            {difficulty}
-          </span>
-        )}
-
-        {/* Tags */}
-        {tags.length > 0 && (
           <div
             style={{
               display: "flex",
-              gap: "10px",
-              marginTop: "16px",
-              zIndex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              width: "380px",
+              height: "380px",
+              backgroundColor: colors.bgWhite,
+              borderRadius: "24px",
+              boxShadow:
+                "0 8px 32px rgba(45, 106, 79, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08)",
+              padding: "20px",
+              overflow: "hidden",
             }}
           >
-            {tags.map((tag, i) => (
-              <span
-                key={i}
+            {imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageUrl}
+                alt={title}
                 style={{
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  color: colors.textSecondary,
-                  background: colors.bgWhite,
-                  padding: "6px 16px",
-                  borderRadius: "100px",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: colors.bgCreamDark,
+                  borderRadius: "16px",
+                  fontSize: "60px",
                 }}
               >
-                {tag}
-              </span>
-            ))}
+                🌿
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
-        {/* URL */}
-        <p
+        {/* Right: content */}
+        <div
           style={{
-            fontSize: "18px",
-            color: colors.primary,
-            marginTop: "32px",
-            fontWeight: 600,
-            zIndex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            flex: 1,
+            paddingLeft: "48px",
+            paddingRight: "16px",
+            gap: "18px",
           }}
         >
-          coloringhabitat.com
-        </p>
+          {difficulty && difficultyColor && (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "50%",
+                  backgroundColor: difficultyColor,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 600,
+                  color: colors.textSecondary,
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+              >
+                {difficulty}
+              </span>
+            </div>
+          )}
+
+          <h1
+            style={{
+              fontSize: "48px",
+              fontWeight: 800,
+              color: colors.textPrimary,
+              lineHeight: 1.15,
+              margin: 0,
+              letterSpacing: "-1px",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {title}
+          </h1>
+
+          {description && (
+            <p
+              style={{
+                fontSize: "20px",
+                fontWeight: 400,
+                color: colors.textSecondary,
+                lineHeight: 1.4,
+                margin: 0,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
+              {description}
+            </p>
+          )}
+
+          {tags.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+                marginTop: "4px",
+              }}
+            >
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    color: colors.primaryDark,
+                    background: `${colors.sage}40`,
+                    padding: "6px 16px",
+                    borderRadius: "100px",
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginTop: "auto",
+              paddingTop: "16px",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "24px",
+                fontWeight: 800,
+                color: colors.primary,
+              }}
+            >
+              Coloring Habitat
+            </span>
+          </div>
+        </div>
 
         {/* Bottom accent bar */}
         <div
@@ -205,26 +299,7 @@ export default async function Image({
     ),
     {
       ...size,
-      fonts: [
-        {
-          name: OG_FONT_CONFIG.jakarta.name,
-          data: jakartaRegular,
-          weight: 400 as const,
-          style: "normal" as const,
-        },
-        {
-          name: OG_FONT_CONFIG.jakarta.name,
-          data: jakartaBold,
-          weight: 700 as const,
-          style: "normal" as const,
-        },
-        {
-          name: OG_FONT_CONFIG.jakarta.name,
-          data: jakartaExtraBold,
-          weight: 800 as const,
-          style: "normal" as const,
-        },
-      ],
+      fonts: fontExports,
     },
   );
 }

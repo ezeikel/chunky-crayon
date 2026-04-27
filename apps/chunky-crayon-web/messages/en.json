@@ -1160,12 +1160,8 @@
   },
   "og": {
     "homepage": {
-      "tagline": "Creative Coloring & Learning Fun",
-      "features": {
-        "pages": "10,000+ Pages",
-        "aiGenerated": "Custom on Demand",
-        "freePrintables": "Free Printables"
-      }
+      "tagline": "Custom coloring pages, made in seconds.",
+      "alt": "Chunky Crayon — custom coloring pages, made in seconds."
     },
     "coloringImage": {
       "notFound": "Coloring Page Not Found"

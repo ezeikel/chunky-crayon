@@ -626,5 +626,11 @@
     "showCommunityDescription": "Display artwork shared by other members in the gallery",
     "communityEnabled": "Community gallery images enabled",
     "communityDisabled": "Community gallery images disabled"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "Adult coloring pages, made on demand.",
+      "alt": "Coloring Habitat — adult coloring pages, made on demand."
+    }
   }
 }
