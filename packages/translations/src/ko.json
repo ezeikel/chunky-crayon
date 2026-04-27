@@ -61,7 +61,7 @@
       "actions": "작업"
     },
     "tools": {
-      "pan": "이동",
+      "pan": "화면 이동",
       "fill": "채우기",
       "brush": "브러시",
       "sticker": "스티커",
@@ -77,9 +77,9 @@
       "marker": "마커",
       "eraser": "지우개",
       "glitter": "글리터",
-      "sparkle": "반짝이",
+      "sparkle": "스파클",
       "rainbow": "무지개",
-      "glow": "빛나는",
+      "glow": "글로우",
       "neon": "네온",
       "pencil": "연필",
       "paintbrush": "붓"
@@ -145,7 +145,7 @@
       "turnOn": "소리 켜기",
       "turnOff": "소리 끄기"
     },
-    "relatedPages": "색칠공부 더 보기"
+    "relatedPages": "색칠놀이 더 보기"
   },
   "shareModal": {
     "title": "작품 공유하기",
@@ -362,7 +362,7 @@
     "notFound": "페이지를 찾을 수 없습니다",
     "sharedArtworkNotFound": {
       "title": "그림을 찾을 수 없어요",
-      "description": "공유된 그림 링크가 만료되었거나 삭제되었을 수 있어요. 그림 만든 사람에게 새 링크를 부탁해 보세요!",
+      "description": "공유된 그림 링크가 만료되었거나 삭제되었을 수 있어요. 작가에게 새 링크를 부탁해 보세요!",
       "cta": "컬러링 페이지 구경하기"
     },
     "unauthorized": "계속하려면 로그인해 주세요",
