@@ -354,7 +354,7 @@
       "createAPage": "Seite erstellen",
       "freeColoringPages": "Kostenlose {category} Ausmalbilder",
       "lookingFor": "Du suchst das perfekte {category}-Ausmalbild? Dann bist du hier genau richtig! Unsere Sammlung bietet viele {category}-Motive – für Groß und Klein.",
-      "eachPageDescription": "Jedes Ausmalbild kannst du online mit unseren digitalen Tools ausmalen oder herunterladen und ausdrucken – ganz klassisch mit Wachsmalern, Buntstiften oder Filzstiften. Unsere KI-Designs haben klare Linien und liebevolle Details – so macht Ausmalen Spaß und entspannt.",
+      "eachPageDescription": "Jedes Ausmalbild kannst du online mit unseren digitalen Tools ausmalen oder herunterladen und ausdrucken – ganz klassisch mit Wachsmalern, Buntstiften oder Filzstiften. Jedes Design hat klare Linien und liebevolle Details – so macht Ausmalen Spaß und entspannt.",
       "popularThemes": "Beliebte {category}-Themen",
       "includesPopular": "In unserer Kategorie {category} findest du beliebte Suchen wie:"
     },
@@ -392,7 +392,7 @@
         "heroDescription": "Einfache Seiten für kleine Hände! Große Formen, kräftige Umrisse und bekannte Motive – perfekt für Kinder von 2–4 Jahren. Ideal zum Üben der Feinmotorik.",
         "whyTitle": "Perfekt für kleine Künstler",
         "why1Title": "Dicke, klare Linien",
-        "why1Description": "Dicke Linien machen es winzigen Händchen super leicht, innerhalb der Linien zu bleiben!",
+        "why1Description": "Dicke Umrisse machen es kleinen Händchen ganz leicht, in den Linien zu bleiben!",
         "why2Title": "Einfache Formen",
         "why2Description": "Grundformen und bekannte Dinge, die Kleinkinder erkennen und lieben.",
         "why3Title": "Farben lernen",
@@ -438,7 +438,7 @@
         "seoTitle": "Kostenlose Ausmalbilder für Jugendliche",
         "seoParagraph1": "Suchst du Ausmalbilder, die nicht „zu kindisch“ sind? Unsere Teen-Sammlung bietet coole, detailreiche Motive – perfekt für 13–17 Jahre. Von Anime-Figuren und Gaming-Szenen bis zu Fantasywelten und abstrakten Mustern ist für jeden Stil etwas dabei.",
         "seoParagraph2": "Das sind nicht die Ausmalbilder deiner kleinen Geschwister. Unsere Teen-Designs haben filigrane Details, dynamische Kompositionen und Themen, die Jugendliche ansprechen. Perfekt für kreativen Ausdruck, zum Stress abbauen in Lernpausen oder einfach zum Chillen.",
-        "seoParagraph3": "Erstelle deine eigenen Ausmalbilder, indem du genau beschreibst, was du möchtest. Ein Drache, der im Weltraum gegen einen Roboter kämpft? Ein Anime-Porträt? Ein detailreiches Mandala mit deinen Lieblingssymbolen? Beschreib’s einfach – unsere KI macht es lebendig!",
+        "seoParagraph3": "Erstelle deine eigenen Ausmalbilder, indem du genau beschreibst, was du möchtest. Ein Drache, der im Weltraum gegen einen Roboter kämpft? Ein Anime-Porträt? Ein detailreiches Mandala mit deinen Lieblingssymbolen? Beschreib's einfach – wir machen es lebendig!",
         "popularTitle": "Beliebte Teen-Themen",
         "popularDescription": "Zu unseren beliebtesten Kategorien für Teens gehören: Anime- und Manga-Ausmalbilder, Fantasywesen-Ausmalbilder, Superhelden-Action-Szenen, Gaming-inspirierte Motive, Weltraum- und Sci-Fi-Designs sowie filigrane Musterseiten. Jede Kategorie bietet detailreiche, spannende Motive."
       },
@@ -457,7 +457,7 @@
         "seoTitle": "Kostenlose Ausmalbilder für Erwachsene",
         "seoParagraph1": "Ausmalen für Erwachsene ist zu einer beliebten Wellness-Aktivität geworden – und das aus gutem Grund. Studien zeigen, dass Ausmalen Angst reduzieren, die Konzentration verbessern und eine beruhigende Pause vom bildschirmlastigen Alltag bieten kann. Unsere Sammlung bietet wunderschöne, filigrane Motive – perfekt für Erwachsene.",
         "seoParagraph2": "Von detailreichen Mandalas für mehr Achtsamkeit bis zu ruhigen Naturmotiven und eleganten Mustern: Jede Seite ist für stundenlange, entspannte Kreativität gemacht. Drucke auf gutem Papier und nutze deine Lieblingsstifte – Buntstifte, Filzstifte oder Gelstifte funktionieren wunderbar.",
-        "seoParagraph3": "Du willst etwas Einzigartiges? Erstelle deine eigenen Ausmalbilder! Beschreibe deine perfekte Entspannungsszene – einen Zen-Garten, ein Jugendstil-Muster oder eine detailreiche botanische Illustration – und unsere KI bringt deine Idee zum Leben.",
+        "seoParagraph3": "Du willst etwas Einzigartiges? Erstelle deine eigenen Ausmalbilder! Beschreibe deine perfekte Entspannungsszene – einen Zen-Garten, ein Jugendstil-Muster oder eine detailreiche botanische Illustration – und wir bringen deine Idee zum Leben.",
         "popularTitle": "Beliebte Ausmal-Themen für Erwachsene",
         "popularDescription": "Entdecke unsere beliebtesten Erwachsenen-Kategorien: Mandala-Ausmalbilder zum Meditieren, filigrane Natur- und Pflanzenmotive, geometrische Muster, Art-Déco- und Jugendstil-Designs, zentangle-inspirierte Seiten und ruhige Landschaften. Jede bietet einen eigenen Weg zur Entspannung."
       }
@@ -533,7 +533,7 @@
       },
       "gettingStarted": {
         "question": "Wie lege ich los?",
-        "answer": "Einfach einen Plan wählen und sofort Malvorlagen erstellen!"
+        "answer": "Einfach einen Plan wählen und sofort Ausmalbilder erstellen!"
       },
       "subtitle": "Alles, was du über unsere Pläne wissen musst",
       "creditsPerPage": {
