@@ -69,6 +69,15 @@ export type ColoringAreaHandle = {
 const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
   ({ coloringImage, isAuthenticated = false }, ref) => {
     const canvasRef = useRef<ImageCanvasHandle>(null);
+    // Wrapper around the canvas — used by IntersectionObserver below to
+    // gate the mobile drawer's visibility. Without this the drawer
+    // stays pinned to the bottom of the screen even when the user has
+    // scrolled past the canvas to read tips/comments/related content.
+    const canvasWrapperRef = useRef<HTMLDivElement>(null);
+    // Default true so the drawer paints on first mount (the canvas
+    // starts in view). Flipped by the IntersectionObserver as the user
+    // scrolls.
+    const [isCanvasInViewport, setIsCanvasInViewport] = useState(true);
     // Store the "after" states for redo - keyed by timestamp
     const redoStatesRef = useRef<Map<number, ImageData>>(new Map());
     // Track if canvas is ready
@@ -144,6 +153,32 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         referenceColor.loadReference(coloringImage.coloredReferenceUrl);
       }
     }, [coloringImage.coloredReferenceUrl]);
+
+    // Hide the mobile drawer when the user scrolls past the canvas.
+    // Same pattern as EmbeddedColoringCanvas on /start: threshold 0.2
+    // (drawer reappears when ~20% of the canvas re-enters the viewport),
+    // 200ms debounce to prevent flicker during slow scroll. Without this
+    // the drawer stays pinned to the bottom of the screen even when
+    // the user is reading tips/comments below the canvas.
+    useEffect(() => {
+      const node = canvasWrapperRef.current;
+      if (!node) return;
+      let timer: ReturnType<typeof setTimeout> | null = null;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(() => {
+            setIsCanvasInViewport(entry.isIntersecting);
+          }, 200);
+        },
+        { threshold: 0.2 },
+      );
+      observer.observe(node);
+      return () => {
+        observer.disconnect();
+        if (timer) clearTimeout(timer);
+      };
+    }, []);
 
     // Magic Color Map (legacy fallback when no colored reference)
     const {
@@ -1144,7 +1179,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         </div>
 
         {/* Canvas - Shared between mobile and desktop */}
-        <div className="relative flex-1 flex items-center justify-center md:block">
+        <div
+          ref={canvasWrapperRef}
+          className="relative flex-1 flex items-center justify-center md:block"
+        >
           <ImageCanvas
             ref={canvasRef}
             coloringImage={coloringImage}
@@ -1279,13 +1317,17 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           )}
         </div>
 
-        {/* Fixed bottom drawer for mobile - Vaul-based draggable bottom sheet */}
-        <MobileColoringDrawer
-          className="md:hidden"
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onStickerToolSelect={openStickerSelector}
-        />
+        {/* Fixed bottom drawer for mobile - Vaul-based draggable bottom sheet.
+            Gated by IntersectionObserver above so it hides when the user
+            scrolls past the canvas (e.g. reading tips/comments below). */}
+        {isCanvasInViewport && (
+          <MobileColoringDrawer
+            className="md:hidden"
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            onStickerToolSelect={openStickerSelector}
+          />
+        )}
 
         {/* Sticker selector modal */}
         <StickerSelector
