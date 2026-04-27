@@ -778,7 +778,7 @@ export const generateColoringImageOnly = async (
  *
  * See `docs/voice-mode/README.md` for the full spec.
  */
-export const VOICE_CREDIT_COST = 10;
+const VOICE_CREDIT_COST = 10;
 
 export const createColoringImageFromVoiceConversation = async (opts: {
   firstAnswer: string;

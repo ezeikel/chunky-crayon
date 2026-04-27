@@ -16,3 +16,5 @@ export const isErrorResult = (
 export const isColoringImage = (
   result: CreateColoringImageResult,
 ): result is Partial<ColoringImage> => !isErrorResult(result);
+
+export const VOICE_CREDIT_COST = 10;

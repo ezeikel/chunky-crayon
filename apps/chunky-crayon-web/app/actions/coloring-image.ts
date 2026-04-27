@@ -32,6 +32,7 @@ import {
   type CreateColoringImageResult,
   isErrorResult,
   isColoringImage,
+  VOICE_CREDIT_COST,
 } from './coloring-image-types';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
@@ -700,8 +701,6 @@ export const generateColoringImageOnly = async (
  * ever want richer combination, this is where to add a small Claude
  * "beautify" pass before passing to image gen.
  */
-export const VOICE_CREDIT_COST = 10;
-
 export const createColoringImageFromVoiceConversation = async (opts: {
   firstAnswer: string;
   secondAnswer: string;
