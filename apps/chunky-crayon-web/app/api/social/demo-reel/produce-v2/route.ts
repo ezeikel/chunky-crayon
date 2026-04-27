@@ -65,33 +65,37 @@ const handleRequest = async (request: Request) => {
   }
 
   const url = new URL(request.url);
-  const variantParam = url.searchParams.get('variant') ?? 'text';
-  const variant: Variant = isVariant(variantParam) ? variantParam : 'text';
+  const variantParam = url.searchParams.get('variant');
 
-  console.log(`[demo-reel/produce-v2] variant=${variant}`);
-
-  if (variant === 'voice') {
-    // Voice mode redesign + reel comp tracked as Phase 7. Until then, the
-    // rotation slot is a no-op. Returning 200 keeps the cron green.
-    console.warn(
-      '[demo-reel/produce-v2] voice variant not yet implemented — skipping',
-    );
-    return NextResponse.json({
-      ok: false,
-      variant,
-      reason: 'voice variant not yet implemented (Phase 7)',
-    });
+  // Variant resolution:
+  //   1. Explicit `?variant=text|image|voice` wins (manual override + tests)
+  //   2. Otherwise compute the next variant from the DB rotation — read
+  //      the most-recent successful V2 reel's `demoReelVariant`, pick the
+  //      next in TEXT → IMAGE → VOICE → TEXT cycle.
+  let variant: Variant;
+  if (variantParam && isVariant(variantParam)) {
+    variant = variantParam;
+    console.log(`[demo-reel/produce-v2] variant=${variant} (from query)`);
+  } else {
+    variant = await pickNextVariantFromRotation();
+    console.log(`[demo-reel/produce-v2] variant=${variant} (from rotation)`);
   }
 
   let coloringImageId: string;
   let libraryEntryId: string | null = null;
 
-  if (variant === 'text') {
+  if (variant === 'text' || variant === 'voice') {
+    // Both text + voice variants use AI-generated scene descriptions as
+    // the source. Voice variant just lets the worker reverse-engineer
+    // plausible kid utterances from the resulting image at render time —
+    // no separate "voice prompt" needed at this step.
     const result = await generateDemoReelImageFromAIDescription();
     if (!result?.id) {
-      console.error('[demo-reel/produce-v2] text generation returned no id');
+      console.error(
+        `[demo-reel/produce-v2] ${variant} generation returned no id`,
+      );
       return NextResponse.json(
-        { error: 'text generation failed' },
+        { error: `${variant} generation failed` },
         { status: 500 },
       );
     }
@@ -179,3 +183,37 @@ const handleRequest = async (request: Request) => {
 
 export const GET = handleRequest;
 export const POST = handleRequest;
+
+/**
+ * Pick the next variant in the TEXT → IMAGE → VOICE → TEXT cycle by
+ * reading the most recent successful V2 reel's `demoReelVariant` from
+ * the DB. If no V2 reels exist yet, defaults to TEXT (the safest variant —
+ * no photo library or voice infra dependencies).
+ *
+ * Self-correcting: if a render fails the row's variant doesn't get set,
+ * so the next cron picks the same variant again until one succeeds. This
+ * means a broken variant won't permanently block the rotation — it'll
+ * just retry until fixed.
+ */
+async function pickNextVariantFromRotation(): Promise<Variant> {
+  const recent = await db.coloringImage.findFirst({
+    where: {
+      brand: 'CHUNKY_CRAYON',
+      demoReelVariant: { not: null },
+    },
+    orderBy: { createdAt: 'desc' },
+    select: { demoReelVariant: true },
+  });
+
+  switch (recent?.demoReelVariant) {
+    case 'TEXT':
+      return 'image';
+    case 'IMAGE':
+      return 'voice';
+    case 'VOICE':
+      return 'text';
+    default:
+      // First V2 reel ever, or all prior reels failed before writeback.
+      return 'text';
+  }
+}

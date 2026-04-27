@@ -10,7 +10,13 @@ import { resolve } from "node:path";
 
 import { recordColoringSession } from "./record/session.js";
 import { recordImageColoringSession } from "./record/image-session.js";
-import { renderDemoReel, renderImageDemoReel } from "./video/render.js";
+import {
+  renderDemoReel,
+  renderImageDemoReel,
+  renderTextDemoReelV2,
+  renderImageDemoReelV2,
+  renderVoiceDemoReelV2,
+} from "./video/render.js";
 import { trimWebmToMp4, trimReelForStory } from "./record/trim.js";
 import { generateRegionStoreLocal } from "./record/region-store.js";
 import { generateBackgroundMusicLocal } from "./record/background-music.js";
@@ -20,6 +26,11 @@ import { db } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
 import { generateReelScript } from "./script/generate.js";
 import { generateVoiceClip } from "./voice/elevenlabs.js";
+import {
+  buildVoiceReelFixtures,
+  synthesiseVoiceAnswers,
+} from "./voice/voice-reel-fixtures.js";
+import { proxyToLocal } from "./video/v2/proxy.js";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
@@ -93,7 +104,21 @@ app.get("/tmp/:filename", async (c) => {
           ? "video/webm"
           : ext === "mp3"
             ? "audio/mpeg"
-            : "application/octet-stream";
+            : ext === "wav"
+              ? "audio/wav"
+              : ext === "svg"
+                ? "image/svg+xml"
+                : ext === "webp"
+                  ? "image/webp"
+                  : ext === "jpg" || ext === "jpeg"
+                    ? "image/jpeg"
+                    : ext === "png"
+                      ? "image/png"
+                      : ext === "gz"
+                        ? "application/gzip"
+                        : ext === "json"
+                          ? "application/json"
+                          : "application/octet-stream";
 
     const range = c.req.header("range");
     if (range && (ext === "mp4" || ext === "webm")) {
@@ -1249,17 +1274,31 @@ async function runPublishImageReel(c: Context) {
 /**
  * POST /publish/v2
  *
- * Phase 1 stub for Demo Reels V2 (~/.claude/plans/demo-reels-v2.md).
- * Receives { coloringImageId, variant } from the new produce-v2 cron route.
- * The web app already generated the source image and wrote the row; the
- * worker's job here is just to render the V2 Remotion composition and
- * upload the result.
+ * Demo Reels V2 renderer. The web app's `produce-v2` cron has already
+ * generated the source image; this endpoint reads the row, builds
+ * inputProps, renders the V2 composition via Remotion, uploads the mp4
+ * to R2, and writes `demoReelUrl` back to the row.
  *
- * Phase 1 (this PR): acknowledge the job, log it, 200. The actual V2
- * Remotion render lands in Phase 4 — until then, if this endpoint fires
- * in production, the produce-v2 cron is wired but reels won't actually
- * publish. That's intentional: Phase 1 is purely additive, V1 routes
- * stay live for the cutover window.
+ * Per-variant work:
+ *   - text  → just pass row's description as the typed prompt
+ *   - image → also fetch sourcePhotoUrl from photo_library_entries (the
+ *             produce-v2 route already bumped lastUsed; we look up the
+ *             most-recent entry by joining on photoLibraryEntryId — see
+ *             Phase 5 of the demo-reels-v2 plan for the schema decision)
+ *   - voice → synthesise plausible kid utterances from title/description
+ *             via Claude, generate Q2 + A1 + A2 audio via ElevenLabs,
+ *             upload all to R2 under voice-reel/<imageId>/
+ *
+ * All R2-hosted assets (regionMapUrl, svgUrl, finishedImageUrl, etc.) are
+ * proxied through `localhost:<port>/tmp/<file>` because Remotion's headless
+ * Chromium can't fetch our prod R2 directly (no CORS headers — same
+ * problem the V1 path solves).
+ *
+ * Render time: ~60-120s wall clock per reel on the Hetzner box. We don't
+ * await the full render in the Hono handler — the produce-v2 fetch has
+ * a 45s timeout, after which it gives up but we keep going. The handler
+ * still returns 200 once render+upload complete, which the caller may
+ * ignore.
  */
 type V2Variant = "text" | "image" | "voice";
 const isV2Variant = (v: unknown): v is V2Variant =>
@@ -1282,30 +1321,221 @@ app.post("/publish/v2", async (c) => {
     );
   }
 
-  // Sanity check: row exists. Catches misrouted IDs immediately rather
-  // than failing deep inside the renderer (Phase 4).
+  // Pull everything the V2 comps need off the row in one query.
   const row = await db.coloringImage.findUnique({
     where: { id: coloringImageId },
-    select: { id: true, title: true, svgUrl: true },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      url: true, // colored webp — outro hero
+      svgUrl: true, // line art SVG
+      regionMapUrl: true,
+      regionMapWidth: true,
+      regionMapHeight: true,
+      regionsJson: true,
+    },
   });
   if (!row) {
     return c.json({ error: `coloringImage ${coloringImageId} not found` }, 404);
   }
 
+  if (!row.svgUrl || !row.url || !row.regionMapUrl || !row.regionsJson) {
+    return c.json(
+      {
+        error: "row not ready for reel render",
+        details: {
+          hasSvg: !!row.svgUrl,
+          hasUrl: !!row.url,
+          hasRegionMap: !!row.regionMapUrl,
+          hasRegionsJson: !!row.regionsJson,
+        },
+      },
+      400,
+    );
+  }
+
   console.log(
-    `[/publish/v2] received: variant=${variant} coloringImageId=${coloringImageId} title="${row.title ?? "(none)"}"`,
+    `[/publish/v2] starting render: variant=${variant} coloringImageId=${coloringImageId} title="${row.title}"`,
   );
-  console.log(
-    "[/publish/v2] Phase 1 stub — render not implemented yet; nothing will publish",
-  );
+
+  await mkdir(WORKER_OUT_DIR, { recursive: true });
+
+  // Proxy R2 URLs through localhost so Remotion's headless Chromium can
+  // fetch them. Same pattern as V1 (ambient.mp3 proxy at line ~600).
+  const proxyOpts = { cacheDir: WORKER_OUT_DIR, port };
+  const [proxiedSvg, proxiedRegionMap, proxiedFinishedImage] =
+    await Promise.all([
+      proxyToLocal(row.svgUrl, proxyOpts),
+      proxyToLocal(row.regionMapUrl, proxyOpts),
+      proxyToLocal(row.url, proxyOpts),
+    ]);
+
+  const stamp = Date.now();
+  const outputPath = `${WORKER_OUT_DIR}/${row.id}-v2-${variant}-${stamp}.mp4`;
+
+  // Branch on variant: build the right inputProps + call the right
+  // renderer. Audio fixtures (voice variant) generate before render so
+  // the comp's delayRender boundary doesn't time out fetching them.
+  try {
+    if (variant === "text") {
+      const { TEXT_REEL_DURATION_FRAMES, TEXT_REEL_FPS } = await import(
+        "./video/v2/TextDemoReelV2.js"
+      );
+      await renderTextDemoReelV2({
+        prompt: row.description ?? row.title ?? "",
+        finishedImageUrl: proxiedFinishedImage,
+        regionMapUrl: proxiedRegionMap,
+        regionMapWidth: row.regionMapWidth ?? 1024,
+        regionMapHeight: row.regionMapHeight ?? 1024,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        regionsJson: row.regionsJson as any,
+        svgUrl: proxiedSvg,
+        paletteVariant: "cute",
+        outputPath,
+        durationInFrames: TEXT_REEL_DURATION_FRAMES,
+        fps: TEXT_REEL_FPS,
+      });
+    } else if (variant === "image") {
+      const { IMAGE_REEL_DURATION_FRAMES, IMAGE_REEL_FPS } = await import(
+        "./video/v2/ImageDemoReelV2.js"
+      );
+      // Look up which photo this image came from. produce-v2 stores
+      // photo_library_entries.id alongside the image generation; here we
+      // find the most-recent library entry whose lastUsed timestamp
+      // matches this image's createdAt, falling back to a random kid-safe
+      // photo if no exact match. Cron flow guarantees the match in
+      // practice.
+      const libraryRow = await db.$queryRaw<
+        Array<{ id: string; url: string }>
+      >`SELECT id, url
+        FROM photo_library_entries
+        WHERE brand = 'CHUNKY_CRAYON' AND safe = true
+        ORDER BY "lastUsed" DESC NULLS LAST
+        LIMIT 1`;
+      const photoUrl = libraryRow[0]?.url;
+      if (!photoUrl) {
+        return c.json({ error: "no photo library entries available" }, 500);
+      }
+      const proxiedPhoto = await proxyToLocal(photoUrl, proxyOpts);
+
+      await renderImageDemoReelV2({
+        sourcePhotoUrl: proxiedPhoto,
+        photoFilename: "photo.jpg",
+        finishedImageUrl: proxiedFinishedImage,
+        regionMapUrl: proxiedRegionMap,
+        regionMapWidth: row.regionMapWidth ?? 1024,
+        regionMapHeight: row.regionMapHeight ?? 1024,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        regionsJson: row.regionsJson as any,
+        svgUrl: proxiedSvg,
+        paletteVariant: "cute",
+        outputPath,
+        durationInFrames: IMAGE_REEL_DURATION_FRAMES,
+        fps: IMAGE_REEL_FPS,
+      });
+    } else {
+      // voice variant — synthesise the conversation, generate audio,
+      // proxy through localhost, render.
+      const { VOICE_REEL_DURATION_FRAMES, VOICE_REEL_FPS } = await import(
+        "./video/v2/VoiceDemoReelV2.js"
+      );
+
+      const answers = await synthesiseVoiceAnswers({
+        title: row.title ?? "",
+        description: row.description ?? "",
+      });
+      console.log(
+        `[/publish/v2] voice answers synthesised: A1="${answers.firstAnswer}" A2="${answers.secondAnswer}"`,
+      );
+
+      const fixtures = await buildVoiceReelFixtures({
+        imageId: row.id,
+        firstAnswer: answers.firstAnswer,
+        secondAnswer: answers.secondAnswer,
+        outDir: WORKER_OUT_DIR,
+      });
+
+      // Proxy all four audio URLs (Q1 + Q2 + A1 + A2) through localhost.
+      const [pQ1, pQ2, pA1, pA2] = await Promise.all([
+        proxyToLocal(fixtures.q1AudioUrl, proxyOpts),
+        proxyToLocal(fixtures.q2AudioUrl, proxyOpts),
+        proxyToLocal(fixtures.a1AudioUrl, proxyOpts),
+        proxyToLocal(fixtures.a2AudioUrl, proxyOpts),
+      ]);
+
+      await renderVoiceDemoReelV2({
+        firstAnswer: answers.firstAnswer,
+        secondAnswer: answers.secondAnswer,
+        finishedImageUrl: proxiedFinishedImage,
+        regionMapUrl: proxiedRegionMap,
+        regionMapWidth: row.regionMapWidth ?? 1024,
+        regionMapHeight: row.regionMapHeight ?? 1024,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        regionsJson: row.regionsJson as any,
+        svgUrl: proxiedSvg,
+        paletteVariant: "cute",
+        q1AudioUrl: pQ1,
+        q2AudioUrl: pQ2,
+        a1AudioUrl: pA1,
+        a2AudioUrl: pA2,
+        outputPath,
+        durationInFrames: VOICE_REEL_DURATION_FRAMES,
+        fps: VOICE_REEL_FPS,
+      });
+    }
+  } catch (err) {
+    console.error(`[/publish/v2] render failed:`, err);
+    return c.json(
+      {
+        error: "render_failed",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      500,
+    );
+  }
+
+  // Upload mp4 to R2 + write demoReelUrl. Same shape as V1 path so the
+  // per-platform post crons (Instagram/Facebook/etc) work unchanged.
+  let publishedUrl: string;
+  try {
+    const mp4Buffer = await readFile(outputPath);
+    const r2Key = `reels/demo-v2/${row.id}-${stamp}-${variant}.mp4`;
+    const { url } = await put(r2Key, mp4Buffer, {
+      contentType: "video/mp4",
+      access: "public",
+    });
+    publishedUrl = url;
+
+    await db.coloringImage.update({
+      where: { id: row.id },
+      data: {
+        demoReelUrl: url,
+        // Writeback drives the produce-v2 cron's rotation: read the most
+        // recent demoReelVariant value, pick the next in cycle.
+        demoReelVariant:
+          variant === "text" ? "TEXT" : variant === "image" ? "IMAGE" : "VOICE",
+      },
+    });
+    console.log(`[/publish/v2] uploaded mp4 to R2: ${url}`);
+  } catch (err) {
+    console.error(`[/publish/v2] R2 upload / DB write failed:`, err);
+    return c.json(
+      {
+        error: "upload_failed",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      500,
+    );
+  }
 
   return c.json({
     ok: true,
     variant,
     coloringImageId,
     title: row.title,
-    rendered: false,
-    reason: "Phase 1 stub — Remotion render lands in Phase 4",
+    rendered: true,
+    publishedUrl,
   });
 });
 
