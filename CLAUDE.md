@@ -66,6 +66,7 @@ A CI check (the `check-drift` job in `.github/workflows/database-migrations.yml`
 - **Monorepo** using Turborepo + pnpm workspaces (parent brand: One Colored Pixel)
 - `apps/chunky-crayon-web` - Next.js 16 web application (Chunky Crayon - kids coloring)
 - `apps/chunky-crayon-mobile` - React Native mobile app (Chunky Crayon)
+- `apps/chunky-crayon-worker` - **Bun + Hono service on Hetzner** for Playwright-recorded demo reels (text + image variants) and region-store generation. Deployed via GitHub Action SSH. See [`docs/demo-reels/`](./docs/demo-reels/README.md). Easy to miss in greps because it's a separate runtime.
 - `apps/coloring-habitat-web` - Next.js 16 web application (Coloring Habitat - adult coloring)
 - `packages/db` - Prisma database client (`@one-colored-pixel/db`)
 - `packages/storage` - R2 storage client (`@one-colored-pixel/storage`)
@@ -202,3 +203,24 @@ Note: Prebuild regenerates native `ios/` and `android/` folders. Only run when a
 ## GitHub CLI
 
 Use `gh` CLI when referencing GitHub repos that I own or public repos (e.g., `gh repo view`, `gh issue list`, `gh pr list`).
+
+## Investigating before deleting
+
+We've twice nuked production data ("photo_library_entries" → empty table on dev + prod, R2 photos gone) because investigation grepped only the web app and concluded "nothing uses this." Things were used — by `apps/chunky-crayon-worker/`, which is a separate Bun service that doesn't show up in app-scoped greps.
+
+Before declaring an apparently-unused table, R2 prefix, env var, migration, or piece of seed data "safe to drop", **run all six checks**:
+
+1. Grep the **whole repo** including `apps/chunky-crayon-worker/`, `apps/chunky-crayon-mobile/`, `packages/`, and **all `scripts/` folders**. Default greps from app dirs miss the worker.
+2. Search `vercel.json` for cron paths that hit it. A cron is a real consumer.
+3. Check `apps/*/src/app/api/` route handlers AND `apps/*/app/actions/` server actions for raw SQL strings (`$queryRaw`, `$executeRaw`) that mention the table.
+4. **If a seed script + JSON exists in git, the table is intentional even if currently empty.** The seed is the spec; empty data is not the same as unused.
+5. **If the migration is committed to git, the table is intentional.** Don't delete a table whose migration sits on `main`.
+6. Check `.github/workflows/` — sometimes things are referenced only by CI.
+
+When in doubt, leave it alone and ask. Rule of thumb: a kept-but-empty table costs nothing; a wrongly-dropped table costs hours of "why did X stop working?" plus another round of cleanup.
+
+## Documentation
+
+`docs/` holds permanent reference for systems whose moving parts span multiple services / files / runtimes. Add a doc when answering "how does X work?" requires holding state across more than one of: web app, worker, DB schema, R2, cron, CI. See [`docs/README.md`](./docs/README.md) for the index and the format.
+
+When you ship something with a non-obvious "why" or a multi-runtime architecture (cron → worker → DB → post crons), write the doc as part of the same PR. Future-you and future-Claude will both miss the context otherwise.
