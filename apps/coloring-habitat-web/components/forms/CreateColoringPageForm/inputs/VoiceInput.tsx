@@ -1,26 +1,37 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useTranslations } from "next-intl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faMicrophone,
+  faMicrophoneLines,
   faStop,
   faRotateRight,
-  faSpinner,
-} from "@fortawesome/free-solid-svg-icons";
+  faSpinnerThird,
+  faFaceDizzy,
+  faMicrophoneSlash,
+} from "@fortawesome/pro-duotone-svg-icons";
 import useUser from "@/hooks/useUser";
 import { trackEvent } from "@/utils/analytics-client";
 import { TRACKING_EVENTS } from "@/constants";
 import { Button } from "@/components/ui/button";
-import SubmitButton from "@/components/buttons/SubmitButton/SubmitButton";
-import { cn } from "@/lib/utils";
+import cn from "@/utils/cn";
 import { useInputMode } from "./InputModeContext";
-import { useVoiceRecorder } from "../hooks/useVoiceRecorder";
+import {
+  useVoiceConversation,
+  type VoiceConversationError,
+} from "../hooks/useVoiceConversation";
 
 type VoiceInputProps = {
   className?: string;
+  /**
+   * Called when both transcripts are captured and the user is ready to
+   * submit. Parent form runs the actual `createColoringImageFromVoiceConversation`
+   * server action — the hook itself is transcript-only.
+   */
+  onComplete?: (firstAnswer: string, secondAnswer: string) => void;
 };
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
 const AudioLevelIndicator = ({ level }: { level: number }) => {
   const bars = Array.from({ length: 5 }, (_, i) => {
@@ -31,7 +42,7 @@ const AudioLevelIndicator = ({ level }: { level: number }) => {
         key={i}
         className={cn(
           "w-2 rounded-full transition-all duration-100",
-          isActive ? "bg-primary" : "bg-muted",
+          isActive ? "bg-crayon-orange" : "bg-paper-cream-dark",
         )}
         style={{
           height: `${20 + i * 8}px`,
@@ -40,299 +51,128 @@ const AudioLevelIndicator = ({ level }: { level: number }) => {
       />
     );
   });
-
   return <div className="flex items-end gap-1.5 h-12">{bars}</div>;
 };
 
-const CountdownTimer = ({
-  duration,
-  maxDuration,
-}: {
-  duration: number;
-  maxDuration: number;
-}) => {
-  const remaining = maxDuration - duration;
-  const percentage = (duration / maxDuration) * 100;
-  const isLow = remaining <= 5;
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <span
-        className={cn(
-          "text-2xl font-bold tabular-nums",
-          isLow ? "text-destructive animate-pulse" : "text-foreground",
-        )}
-      >
-        {remaining}s
-      </span>
-      <div className="w-32 h-2.5 bg-muted rounded-full overflow-hidden">
-        <div
-          className={cn(
-            "h-full rounded-full transition-all duration-100",
-            isLow ? "bg-destructive" : "bg-primary",
-          )}
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
-    </div>
-  );
+// Friendly error copy. We deliberately don't echo the moderation
+// `code` — kids see "let's try a different idea" not "blocklisted".
+// Adult-tone error copy. CH users are mindful adults; measured phrasing
+// rather than the kid-speak from CC.
+const ERROR_COPY: Record<VoiceConversationError, string> = {
+  permission_denied: "Microphone access is needed for voice mode.",
+  not_supported: "Voice mode isn't supported on this browser.",
+  q1_audio_failed: "The audio didn’t play. Try again?",
+  stt_failed: "I didn't catch that. Try again?",
+  follow_up_failed: "Something went wrong. Try again?",
+  follow_up_blocked: "Let’s try a different idea.",
+  q2_audio_failed: "The audio didn’t play. Try again?",
+  timeout: "Timed out. Let’s start fresh.",
+  requires_signin: "Sign in to use voice mode.",
 };
 
-const VoiceInput = ({ className }: VoiceInputProps) => {
-  const t = useTranslations("createForm.voiceInput");
-  const tf = useTranslations("createForm.textInput");
+// ─── Component ──────────────────────────────────────────────────────────────
 
-  const {
-    canGenerate,
-    blockedReason,
-    hasActiveSubscription,
-    handleAuthAction,
-    isGuest,
-    remainingGenerations,
-  } = useUser();
-
-  const { description, setDescription, setIsProcessing } = useInputMode();
-
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
+const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
+  const { canGenerate } = useUser();
+  const { setDescription, setIsProcessing, setIsBusy } = useInputMode();
+  const handedOffRef = useRef(false);
 
   const {
     state,
-    transcription,
     error,
+    firstAnswer,
+    secondAnswer,
     audioLevel,
-    duration,
-    maxDuration,
-    silenceDuration,
-    isSilenceDetected,
-    startRecording,
-    stopRecording,
-    cancelRecording,
-    reset,
+    silenceDetected,
     isSupported,
-  } = useVoiceRecorder();
+    start,
+    stopRecording,
+    reset,
+  } = useVoiceConversation();
 
+  // Mirror combined description into InputModeContext so the loading
+  // overlay (parent form's <ColoLoading>) shows what the user said.
   useEffect(() => {
-    if (transcription) {
-      setDescription(transcription);
+    if (firstAnswer && secondAnswer) {
+      setDescription(`${firstAnswer} ${secondAnswer}`.trim());
+    } else if (firstAnswer) {
+      setDescription(firstAnswer);
     }
-  }, [transcription, setDescription]);
+  }, [firstAnswer, secondAnswer, setDescription]);
 
+  // Tell the parent form we're busy so the bottom CTA hides during the
+  // conversation. The hook owns the entire submit flow; the global CTA
+  // would just confuse things mid-conversation.
   useEffect(() => {
-    setIsProcessing(state === "processing");
-  }, [state, setIsProcessing]);
+    const busy = state !== "idle" && state !== "error";
+    setIsBusy(busy);
+    setIsProcessing(state === "processing_q2");
+    return () => {
+      setIsBusy(false);
+      setIsProcessing(false);
+    };
+  }, [state, setIsBusy, setIsProcessing]);
 
+  // Track when voice mode is actually used.
   useEffect(() => {
-    if (state === "recording") {
+    if (state === "recording_a1") {
       trackEvent(TRACKING_EVENTS.VOICE_INPUT_STARTED, {
         location: "create_form",
       });
     }
   }, [state]);
 
+  // Hand off to the parent when both transcripts are ready. Refs guard
+  // against double-firing if the parent re-renders this component.
   useEffect(() => {
-    if (state === "complete" && transcription && submitButtonRef.current) {
-      const timer = setTimeout(() => {
-        submitButtonRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [state, transcription]);
-
-  // Fire VOICE_INPUT_COMPLETED when the transcription actually arrives.
-  // Firing it inside handleStopRecording captures a stale closure value
-  // (always empty) because transcription happens asynchronously in
-  // useVoiceRecorder after stopRecording() is called.
-  useEffect(() => {
-    if (state === "complete" && transcription) {
+    if (state === "ready_to_submit" && firstAnswer && secondAnswer) {
+      if (handedOffRef.current) return;
+      handedOffRef.current = true;
+      // VOICE_INPUT_COMPLETED schema is shared with the legacy one-shot
+      // voice mode; map our two transcripts into the existing fields so
+      // analytics keeps working without a schema migration.
+      const transcription = `${firstAnswer} ${secondAnswer}`.trim();
       trackEvent(TRACKING_EVENTS.VOICE_INPUT_COMPLETED, {
         transcription,
-        durationMs: duration * 1000,
+        durationMs: 0,
+        confidence: "medium",
       });
+      onComplete?.(firstAnswer, secondAnswer);
     }
-  }, [state, transcription, duration]);
-
-  const handleStartRecording = async () => {
-    await startRecording();
-  };
-
-  const handleStopRecording = () => {
-    stopRecording();
-  };
-
-  const handleCancel = () => {
-    cancelRecording();
-    trackEvent(TRACKING_EVENTS.VOICE_INPUT_CANCELLED, {
-      durationMs: duration * 1000,
-      reason: "user_cancelled",
-    });
-  };
-
-  const handleRetry = () => {
-    reset();
-  };
-
-  const canRecord = canGenerate;
-
-  const getButtonConfig = () => {
-    if (canGenerate) {
-      if (isGuest) {
-        return {
-          text: tf("createPageFree", { count: remainingGenerations }),
-          isSubmit: true,
-        };
-      }
-      return { text: tf("createPage"), isSubmit: true };
+    if (state === "idle" || state === "error") {
+      handedOffRef.current = false;
     }
+  }, [state, firstAnswer, secondAnswer, onComplete]);
 
-    if (blockedReason === "guest_limit_reached") {
-      return {
-        text: tf("signUpFree"),
-        action: () => {
-          trackEvent(TRACKING_EVENTS.GUEST_SIGNUP_CLICKED, {
-            location: "voice_input",
-          });
-          handleAuthAction("signin");
-        },
-        subtext: tf("signUpSubtext"),
-        isSubmit: false,
-      };
-    }
-
-    if (blockedReason === "no_credits") {
-      return {
-        text: hasActiveSubscription ? tf("buyCredits") : tf("viewPlans"),
-        action: () => handleAuthAction("billing"),
-        subtext: hasActiveSubscription
-          ? tf("buyCreditsSubtext")
-          : tf("subscribeSubtext"),
-        isSubmit: false,
-      };
-    }
-
-    return {
-      text: tf("getStarted"),
-      action: () => handleAuthAction("signin"),
-      subtext: tf("signInSubtext"),
-      isSubmit: false,
-    };
-  };
-
-  const buttonConfig = getButtonConfig();
+  // ── Render branches by state ─────────────────────────────────────────────
 
   if (!isSupported) {
     return (
       <div
-        className={cn("flex flex-col items-center gap-4 py-8", className)}
+        className={cn("flex flex-col items-center gap-4 py-4", className)}
         role="tabpanel"
         id="voice-input-panel"
         aria-labelledby="voice-mode-tab"
       >
-        <p className="text-center text-muted-foreground font-semibold">
-          {t("notSupported")}
-        </p>
-        <p className="text-center text-sm text-muted-foreground">
-          {t("trySafari")}
+        <FontAwesomeIcon
+          icon={faMicrophoneSlash}
+          size="4x"
+          style={
+            {
+              "--fa-primary-color": "hsl(var(--crayon-orange))",
+              "--fa-secondary-color": "hsl(var(--crayon-teal))",
+              "--fa-secondary-opacity": "1",
+            } as React.CSSProperties
+          }
+        />
+        <p className="text-center text-text-primary font-tondo font-bold text-xl md:text-2xl">
+          {ERROR_COPY.not_supported}
         </p>
       </div>
     );
   }
 
   if (state === "error") {
-    const errorMessages: Record<string, string> = {
-      permission_denied: t("errors.permissionDenied"),
-      not_supported: t("errors.notSupported"),
-      transcription_failed: t("errors.transcriptionFailed"),
-      recording_failed: t("errors.recordingFailed"),
-      timeout: t("errors.timeout"),
-    };
-
-    return (
-      <div
-        className={cn("flex flex-col items-center gap-4 py-8", className)}
-        role="tabpanel"
-        id="voice-input-panel"
-        aria-labelledby="voice-mode-tab"
-      >
-        <p className="text-center text-foreground font-semibold">
-          {errorMessages[error || "recording_failed"]}
-        </p>
-        <Button onClick={handleRetry} variant="outline">
-          <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
-          {t("tryAgain")}
-        </Button>
-      </div>
-    );
-  }
-
-  if (state === "recording") {
-    const autoStopCountdown = isSilenceDetected
-      ? Math.max(0, Math.ceil(4 - silenceDuration))
-      : null;
-
-    return (
-      <div
-        className={cn("flex flex-col items-center gap-6 py-4", className)}
-        role="tabpanel"
-        id="voice-input-panel"
-        aria-labelledby="voice-mode-tab"
-      >
-        <p
-          className={cn(
-            "text-center font-semibold text-lg transition-all duration-300",
-            isSilenceDetected ? "text-primary" : "text-foreground",
-          )}
-        >
-          {isSilenceDetected
-            ? t("allDone", { seconds: autoStopCountdown ?? 0 })
-            : t("listening")}
-        </p>
-
-        <AudioLevelIndicator level={audioLevel} />
-        <CountdownTimer duration={duration} maxDuration={maxDuration} />
-
-        <div className="flex gap-3">
-          <Button onClick={handleCancel} variant="outline">
-            {t("cancel")}
-          </Button>
-          <Button
-            onClick={handleStopRecording}
-            className={cn(
-              "px-8 transition-all duration-300",
-              isSilenceDetected && "animate-pulse",
-            )}
-          >
-            <FontAwesomeIcon icon={faStop} className="mr-2" />
-            {isSilenceDetected ? t("imDone") : t("doneTalking")}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (state === "processing" || state === "requesting_permission") {
-    return (
-      <div
-        className={cn("flex flex-col items-center gap-4 py-8", className)}
-        role="tabpanel"
-        id="voice-input-panel"
-        aria-labelledby="voice-mode-tab"
-      >
-        <FontAwesomeIcon
-          icon={faSpinner}
-          className="text-5xl animate-spin text-primary"
-        />
-        <p className="text-center text-foreground font-semibold">
-          {state === "requesting_permission"
-            ? t("gettingMicReady")
-            : t("understanding")}
-        </p>
-      </div>
-    );
-  }
-
-  if (state === "complete" && transcription) {
-    const isDescriptionReady = description.trim().length > 0;
-
     return (
       <div
         className={cn("flex flex-col items-center gap-5 py-4", className)}
@@ -340,107 +180,203 @@ const VoiceInput = ({ className }: VoiceInputProps) => {
         id="voice-input-panel"
         aria-labelledby="voice-mode-tab"
       >
-        <div className="relative w-full max-w-sm">
-          <div className="bg-secondary border border-border rounded-2xl px-5 py-4 text-center">
-            <p className="text-foreground text-lg leading-relaxed">
-              &ldquo;{transcription}&rdquo;
-            </p>
-          </div>
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-secondary border-b border-r border-border rotate-45" />
+        <FontAwesomeIcon
+          icon={faFaceDizzy}
+          size="4x"
+          style={
+            {
+              "--fa-primary-color": "hsl(var(--crayon-orange))",
+              "--fa-secondary-color": "hsl(var(--crayon-yellow))",
+              "--fa-secondary-opacity": "1",
+            } as React.CSSProperties
+          }
+        />
+        <p className="text-center text-text-primary font-tondo font-bold text-xl md:text-2xl">
+          {error ? ERROR_COPY[error] : ERROR_COPY.timeout}
+        </p>
+        <Button
+          onClick={reset}
+          className="font-tondo font-bold text-base md:text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-full px-8 py-4 h-auto"
+        >
+          <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
+          Try again
+        </Button>
+      </div>
+    );
+  }
+
+  // ── Q1 / Q2 audio playing — passive, just a soft indicator ──────────────
+  if (state === "q1_playing" || state === "q2_playing") {
+    return (
+      <div
+        className={cn("flex flex-col items-center gap-4 py-6", className)}
+        role="tabpanel"
+        id="voice-input-panel"
+        aria-labelledby="voice-mode-tab"
+      >
+        <div className="relative">
+          <FontAwesomeIcon
+            icon={faMicrophoneLines}
+            size="4x"
+            className="opacity-50"
+            style={
+              {
+                "--fa-primary-color": "hsl(var(--crayon-orange))",
+                "--fa-secondary-color": "hsl(var(--crayon-orange))",
+                "--fa-secondary-opacity": "0.6",
+              } as React.CSSProperties
+            }
+          />
         </div>
+        <p className="text-center text-text-primary font-tondo font-bold text-lg">
+          Listen
+        </p>
+      </div>
+    );
+  }
 
-        <div className="flex flex-col items-center gap-3 mt-2">
-          {buttonConfig.isSubmit ? (
-            <SubmitButton
-              ref={submitButtonRef}
-              text={t("createColoringPage")}
-              className="text-lg px-8 py-6 rounded-lg"
-              disabled={!isDescriptionReady}
-            />
-          ) : (
-            <Button
-              onClick={buttonConfig.action}
-              className="text-lg px-8 py-6 rounded-lg h-auto"
-              type="button"
-            >
-              {buttonConfig.text}
-            </Button>
+  // ── processing_q2 — dynamic Q2 generation in flight ─────────────────────
+  if (state === "processing_q2") {
+    return (
+      <div
+        className={cn("flex flex-col items-center gap-4 py-6", className)}
+        role="tabpanel"
+        id="voice-input-panel"
+        aria-labelledby="voice-mode-tab"
+      >
+        <FontAwesomeIcon
+          icon={faSpinnerThird}
+          className="text-5xl animate-spin"
+          style={
+            {
+              "--fa-primary-color": "hsl(var(--crayon-orange))",
+              "--fa-secondary-color": "hsl(var(--crayon-teal))",
+              "--fa-secondary-opacity": "0.6",
+            } as React.CSSProperties
+          }
+        />
+        <p className="text-center text-text-primary font-tondo font-bold">
+          One moment
+        </p>
+      </div>
+    );
+  }
+
+  // ── recording_a1 / recording_a2 — mic active, audio bars + countdown ────
+  if (state === "recording_a1" || state === "recording_a2") {
+    return (
+      <div
+        className={cn("flex flex-col items-center gap-5 py-4", className)}
+        role="tabpanel"
+        id="voice-input-panel"
+        aria-labelledby="voice-mode-tab"
+      >
+        <p
+          className={cn(
+            "text-center font-tondo font-bold text-lg transition-all duration-300",
+            silenceDetected ? "text-crayon-teal" : "text-text-primary",
           )}
+        >
+          {silenceDetected ? "Take your time" : "Listening"}
+        </p>
 
-          {buttonConfig.subtext && (
-            <p className="text-sm text-center text-muted-foreground">
-              {buttonConfig.subtext}
-            </p>
-          )}
+        <AudioLevelIndicator level={audioLevel} />
 
-          <button
-            type="button"
-            onClick={handleRetry}
-            className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+        <div className="flex gap-3 w-full">
+          <Button
+            onClick={reset}
+            variant="outline"
+            className="font-tondo font-bold text-base md:text-lg border-2 border-paper-cream-dark text-text-primary hover:bg-paper-cream rounded-full py-4 h-auto flex-1"
           >
-            {t("notQuiteRight")}
-          </button>
+            Cancel
+          </Button>
+          <Button
+            onClick={stopRecording}
+            className={cn(
+              "font-tondo font-bold text-base md:text-lg text-white rounded-full py-4 h-auto flex-[2] transition-all duration-300 hover:scale-105 active:scale-95",
+              silenceDetected
+                ? "bg-btn-teal shadow-btn-secondary animate-pulse"
+                : "bg-btn-orange shadow-btn-primary",
+            )}
+          >
+            <FontAwesomeIcon icon={faStop} className="mr-2" />
+            Done
+          </Button>
         </div>
       </div>
     );
   }
 
-  // Idle state
+  // ── ready_to_submit — handed off to parent; show a hold message ─────────
+  if (state === "ready_to_submit") {
+    return (
+      <div
+        className={cn("flex flex-col items-center gap-4 py-6", className)}
+        role="tabpanel"
+        id="voice-input-panel"
+        aria-labelledby="voice-mode-tab"
+      >
+        <FontAwesomeIcon
+          icon={faSpinnerThird}
+          className="text-5xl animate-spin"
+          style={
+            {
+              "--fa-primary-color": "hsl(var(--crayon-orange))",
+              "--fa-secondary-color": "hsl(var(--crayon-pink))",
+              "--fa-secondary-opacity": "0.6",
+            } as React.CSSProperties
+          }
+        />
+        <p className="text-center text-text-primary font-tondo font-bold">
+          Creating your page
+        </p>
+      </div>
+    );
+  }
+
+  // ── idle — the entry point. Big bouncy mic, tap to start. ───────────────
   return (
     <div
-      className={cn("flex flex-col items-center gap-6 py-4", className)}
+      className={cn("flex flex-col items-center gap-5 py-2", className)}
       role="tabpanel"
       id="voice-input-panel"
       aria-labelledby="voice-mode-tab"
     >
-      <p className="text-center text-foreground font-semibold text-lg">
-        {canRecord
-          ? t("tapToDescribe")
-          : blockedReason === "guest_limit_reached"
-            ? t("guestLimitReached")
-            : blockedReason === "no_credits"
-              ? t("noCredits")
-              : t("signInToRecord")}
+      <p className="text-center text-text-primary font-tondo font-bold text-xl md:text-2xl">
+        Speak to colour
       </p>
 
       <button
         type="button"
-        onClick={handleStartRecording}
-        disabled={!canRecord}
+        onClick={start}
+        disabled={!canGenerate}
         className={cn(
           "w-24 h-24 rounded-full flex items-center justify-center",
           "transition-all duration-200 ease-out",
-          "focus:outline-none focus-visible:ring-4 focus-visible:ring-primary focus-visible:ring-offset-2",
-          canRecord
-            ? "bg-primary text-white hover:scale-110 active:scale-95 cursor-pointer shadow-lg"
-            : "bg-muted cursor-not-allowed",
+          "focus:outline-none focus-visible:ring-4 focus-visible:ring-crayon-orange focus-visible:ring-offset-2",
+          canGenerate
+            ? "bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-110 active:scale-95 cursor-pointer"
+            : "bg-paper-cream-dark cursor-not-allowed",
         )}
-        aria-label="Start recording"
+        style={
+          {
+            "--fa-primary-color": canGenerate
+              ? "white"
+              : "hsl(var(--text-muted))",
+            "--fa-secondary-color": canGenerate
+              ? "rgba(255, 255, 255, 0.8)"
+              : "hsl(var(--text-muted))",
+            "--fa-secondary-opacity": "1",
+          } as React.CSSProperties
+        }
+        aria-label="Start voice conversation"
       >
         <FontAwesomeIcon
-          icon={faMicrophone}
-          className={cn("text-4xl", canRecord && "animate-pulse")}
+          icon={faMicrophoneLines}
+          size="3x"
+          className={cn(canGenerate && "animate-pulse")}
         />
       </button>
-
-      <p className="text-sm text-muted-foreground text-center">
-        {t("maxSeconds", { seconds: maxDuration })}
-      </p>
-
-      {!canRecord && (
-        <>
-          {!buttonConfig.isSubmit && (
-            <Button onClick={buttonConfig.action} type="button">
-              {buttonConfig.text}
-            </Button>
-          )}
-          {buttonConfig.subtext && (
-            <p className="text-sm text-center text-muted-foreground">
-              {buttonConfig.subtext}
-            </p>
-          )}
-        </>
-      )}
     </div>
   );
 };

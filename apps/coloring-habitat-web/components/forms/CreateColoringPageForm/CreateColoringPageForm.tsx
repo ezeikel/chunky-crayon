@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { useTranslations, useLocale } from "next-intl";
 import posthog from "posthog-js";
-import { createColoringImage } from "@/app/actions/coloring-image";
+import {
+  createColoringImage,
+  createColoringImageFromVoiceConversation,
+} from "@/app/actions/coloring-image";
 import { createColoringImageFromPhoto } from "@/app/actions/photo-to-coloring";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/utils/analytics-client";
@@ -122,7 +125,49 @@ const MultiModeForm = ({ className }: { className?: string }) => {
 
       <div className="p-5">
         {mode === "text" && <TextInput />}
-        {mode === "voice" && <VoiceInput />}
+        {mode === "voice" && (
+          <VoiceInput
+            onComplete={async (firstAnswer, secondAnswer) => {
+              // Voice path bypasses the form action — two transcripts +
+              // 10-credit cost via a different server action.
+              const clientDistinctId =
+                typeof window !== "undefined" && posthog?.get_distinct_id
+                  ? posthog.get_distinct_id()
+                  : undefined;
+
+              const desc = `${firstAnswer} ${secondAnswer}`.trim();
+
+              trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
+                description: desc,
+                inputType: "voice",
+                characterCount: desc.length,
+              });
+
+              const coloringImage =
+                await createColoringImageFromVoiceConversation({
+                  firstAnswer,
+                  secondAnswer,
+                  locale,
+                  clientDistinctId,
+                });
+
+              if ("error" in coloringImage) {
+                console.error(coloringImage.error);
+                return;
+              }
+
+              trackLead({
+                contentName: desc || "Coloring Page",
+                contentCategory: "coloring_page_creation",
+              });
+              signalGalleryRefresh("image-created");
+
+              if (coloringImage.id) {
+                router.push(`/coloring-image/${coloringImage.id}`);
+              }
+            }}
+          />
+        )}
         {mode === "image" && <ImageInput />}
       </div>
     </form>

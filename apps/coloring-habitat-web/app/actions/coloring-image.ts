@@ -151,6 +151,9 @@ const generateColoringImageWithMetadata = async (
   locale: string = "en",
   sourcePrompt?: string,
   clientDistinctId?: string,
+  // Stable lookup key for SYSTEM-purpose images. Voice mode uses 'voice'
+  // so analytics + admin can split voice gens from text/image.
+  purposeKey?: string,
 ) => {
   // Get language info for the locale (default to English if unknown)
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;
@@ -235,6 +238,7 @@ const generateColoringImageWithMetadata = async (
       generationType: generationType || GenerationType.USER,
       userId,
       sourcePrompt: sourcePrompt || undefined,
+      purposeKey: purposeKey || undefined,
       brand: Brand.COLORING_HABITAT,
     },
   });
@@ -763,4 +767,154 @@ export const generateColoringImageOnly = async (
   }
 
   return coloringImage;
+};
+
+/**
+ * Voice-mode generation — server action used by the 2-turn voice flow on
+ * Coloring Habitat. Mirrors `createColoringImageFromVoiceConversation`
+ * on Chunky Crayon: debits 10 credits (vs 5 for text/image), tags the row
+ * `purposeKey: 'voice'`, anon-blocked. Combined description is a simple
+ * concat of the two transcripts.
+ *
+ * See `docs/voice-mode/README.md` for the full spec.
+ */
+export const VOICE_CREDIT_COST = 10;
+
+export const createColoringImageFromVoiceConversation = async (opts: {
+  firstAnswer: string;
+  secondAnswer: string;
+  locale?: string;
+  clientDistinctId?: string;
+}): Promise<CreateColoringImageResult> => {
+  const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
+  if (!userId) {
+    return {
+      error: "voice_mode_requires_signin",
+      credits: 0,
+    };
+  }
+
+  const startedAt = Date.now();
+
+  const description =
+    `${opts.firstAnswer.trim()} ${opts.secondAnswer.trim()}`.trim();
+  if (!description) {
+    return { error: "empty_description", credits: 0 };
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { credits: true },
+  });
+  if (!user || user.credits < VOICE_CREDIT_COST) {
+    return {
+      error: "Insufficient credits",
+      credits: user?.credits || 0,
+    };
+  }
+
+  const result = await db.$transaction(
+    async (tx) => {
+      await tx.user.update({
+        where: { id: userId },
+        data: { credits: { decrement: VOICE_CREDIT_COST } },
+      });
+
+      await tx.creditTransaction.create({
+        data: {
+          userId,
+          amount: -VOICE_CREDIT_COST,
+          type: CreditTransactionType.GENERATION,
+        },
+      });
+
+      return generateColoringImageWithMetadata(
+        description,
+        userId,
+        GenerationType.USER,
+        opts.locale ?? "en",
+        description,
+        opts.clientDistinctId,
+        "voice",
+      );
+    },
+    { timeout: 120000 },
+  );
+
+  const durationMs = Date.now() - startedAt;
+
+  // Fire the derived-asset pipeline in after() — same shape as CH's
+  // `createColoringImage` authed path. Not waiting because voice users
+  // navigate to the coloring page immediately and the pipeline catches
+  // up there.
+  after(async () => {
+    if (!result.url || !result.svgUrl) return;
+
+    await trackWithUser(userId, TRACKING_EVENTS.CREATION_COMPLETED, {
+      coloringImageId: result.id,
+      description,
+      durationMs,
+      creditsUsed: VOICE_CREDIT_COST,
+    });
+
+    await Promise.allSettled([
+      (async () => {
+        const regionStoreResult = await generateRegionStore(
+          result.id,
+          result.svgUrl!,
+          {
+            title: result.title ?? "",
+            description: result.description ?? "",
+            tags: (result.tags as string[]) ?? [],
+          },
+        );
+        if (!regionStoreResult.success) {
+          console.error(
+            `[voice] region store failed: ${regionStoreResult.error}`,
+          );
+        }
+      })(),
+      (async () => {
+        const refResult = await generateColoredReference(
+          result.id,
+          result.url!,
+          {
+            title: result.title ?? undefined,
+            description: result.description ?? undefined,
+          },
+        );
+        if (!refResult.success) {
+          console.error(`[voice] colored reference failed: ${refResult.error}`);
+        }
+      })(),
+      (async () => {
+        const soundResult = await generateBackgroundMusicForImage(result.id);
+        if (!soundResult.success) {
+          console.error(
+            `[voice] background music failed: ${soundResult.error}`,
+          );
+        }
+      })(),
+      (async () => {
+        try {
+          const animationPrompt = await generateAnimationPromptFromImage(
+            result.url!,
+          );
+          await db.coloringImage.update({
+            where: { id: result.id },
+            data: { animationPrompt },
+          });
+        } catch (error) {
+          console.error(`[voice] animation prompt failed:`, error);
+        }
+      })(),
+    ]);
+
+    revalidateTag(`coloring-image-${result.id}`, { expire: 0 });
+  });
+
+  revalidateTag("all-coloring-images", { expire: 0 });
+  revalidatePath("/");
+
+  return result;
 };

@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
 import { useLocale } from 'next-intl';
 import posthog from 'posthog-js';
-import { createColoringImage } from '@/app/actions/coloring-image';
+import {
+  createColoringImage,
+  createColoringImageFromVoiceConversation,
+} from '@/app/actions/coloring-image';
 import { createColoringImageFromPhoto } from '@/app/actions/photo-to-coloring';
 import { generateLoadingAudio } from '@/app/actions/loading-audio';
 import cn from '@/utils/cn';
@@ -218,7 +221,84 @@ const MultiModeForm = ({
 
       {/* Render active input based on mode */}
       {mode === 'text' && <TextInput />}
-      {mode === 'voice' && <VoiceInput />}
+      {mode === 'voice' && (
+        <VoiceInput
+          onComplete={async (firstAnswer, secondAnswer) => {
+            // Voice path bypasses the standard form action — it has two
+            // transcripts to combine and uses a different server action
+            // that debits 10 credits instead of 5. Cleanup (tracking,
+            // navigation) is the same as the text/image paths so we
+            // mirror it here.
+            const clientDistinctId =
+              typeof window !== 'undefined' && posthog?.get_distinct_id
+                ? posthog.get_distinct_id()
+                : undefined;
+
+            const desc = `${firstAnswer} ${secondAnswer}`.trim();
+
+            // Start loading audio gen in parallel — same as text path.
+            if (desc) {
+              setAudioState('preparing');
+              generateLoadingAudio(desc, locale)
+                .then((result) => {
+                  setAudioUrl(result.audioUrl);
+                  trackEvent(TRACKING_EVENTS.LOADING_AUDIO_GENERATED, {
+                    script: result.script,
+                    durationMs: result.durationMs,
+                    descriptionLength: desc.length,
+                    locale,
+                  });
+                })
+                .catch((error) => {
+                  console.error('[LoadingAudio] Failed:', error);
+                  setAudioState('done');
+                  trackEvent(TRACKING_EVENTS.LOADING_AUDIO_FAILED, {
+                    error:
+                      error instanceof Error ? error.message : 'Unknown error',
+                    descriptionLength: desc.length,
+                    locale,
+                  });
+                });
+            }
+
+            trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
+              description: desc,
+              inputType: 'voice',
+              characterCount: desc.length,
+            });
+
+            const coloringImage =
+              await createColoringImageFromVoiceConversation({
+                firstAnswer,
+                secondAnswer,
+                locale,
+                clientDistinctId,
+              });
+
+            if ('error' in coloringImage) {
+              console.error(coloringImage.error);
+              setAudioUrl(null);
+              setAudioState('idle');
+              return;
+            }
+
+            // Voice mode requires a signed-in user, so guest tracking
+            // doesn't apply here — but keep Lead + gallery refresh in sync
+            // with the standard path.
+            trackLead({
+              contentName: desc || 'Coloring Page',
+              contentCategory: 'coloring_page_creation',
+            });
+            signalGalleryRefresh('image-created');
+
+            setAudioUrl(null);
+            setAudioState('idle');
+            if (coloringImage.id) {
+              router.push(`/coloring-image/${coloringImage.id}`);
+            }
+          }}
+        />
+      )}
       {mode === 'image' && <ImageInput />}
 
       {/* Example-prompt pills. Only shown to guests in text mode on the
