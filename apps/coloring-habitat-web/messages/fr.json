@@ -33,7 +33,7 @@
       "actions": "Actions"
     },
     "tools": {
-      "pan": "Naviguer",
+      "pan": "Déplacer",
       "fill": "Remplissage",
       "brush": "Pinceau",
       "sticker": "Autocollant",
@@ -104,8 +104,8 @@
       "zoomOutAria": "Dézoomer (voir plus large)",
       "zoomIn": "Zoomer",
       "zoomInAria": "Zoomer (voir de plus près)",
-      "pan": "Naviguer",
-      "panAria": "Se déplacer dans l'image",
+      "pan": "Déplacer",
+      "panAria": "Déplacer la vue dans l'image",
       "reset": "Voir l'image entière",
       "resetAria": "Revenir à l'image complète"
     },
@@ -393,7 +393,7 @@
         "features": [
           "2 000 crédits/mois",
           "Tout dans Sanctuary",
-          "Report de crédits 2 mois",
+          "Report de crédits sur 2 mois",
           "Licence d'utilisation commerciale",
           "Collections exclusives",
           "Palettes de couleurs personnalisées",
@@ -414,7 +414,7 @@
         },
         "creditsPerPage": {
           "question": "Combien de pages puis-je créer ?",
-          "answer": "Chaque page coûte environ 5 crédits. Cela représente environ 60 pages par mois avec Grove, 160 avec Sanctuary et 400 avec Oasis."
+          "answer": "Chaque page coûte environ 5 crédits. Cela représente environ 60 pages par mois avec Grove, 160 par mois avec Sanctuary et 400 par mois avec Oasis."
         },
         "audience": {
           "question": "Coloring Habitat est-il fait pour moi ?",
@@ -530,10 +530,10 @@
       },
       "steampunk": {
         "name": "Steampunk",
-        "description": "Machineries victoriennes et curieux engins"
+        "description": "Mécanismes victoriens et curieux engins"
       },
       "food": {
-        "name": "Cuisine",
+        "name": "Nourriture",
         "description": "Festins et scènes culinaires"
       }
     },
