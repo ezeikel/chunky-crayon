@@ -678,3 +678,120 @@ export const generateColoringImageOnly = async (
 
   return coloringImage;
 };
+
+/**
+ * Voice-mode generation — server action used by the 2-turn voice flow
+ * (`POST /api/voice/follow-up` provided the warm Q2; client collected
+ * both transcripts; this action now turns the combined description into
+ * a coloring page).
+ *
+ * Differs from `createColoringImage` in three ways:
+ *   1. **10 credits** instead of 5 — voice has ~2× unit cost (TTS
+ *      dominates) so the credit cost reflects that. See
+ *      `docs/voice-mode/README.md#pricing--unit-economics`.
+ *   2. **Anon-blocked** — voice mode requires a signed-in account for
+ *      moderation footprint + parental gate reasons.
+ *   3. **`purposeKey: 'voice'`** — analytics + admin can split voice gens
+ *      from text/image gens in the same `coloring_images` table.
+ *
+ * The combined description is just `firstAnswer + ' ' + secondAnswer` —
+ * a kid plus follow-up reads cleanly already (e.g. "a dragon" + "breathing
+ * fire over a castle" = "a dragon breathing fire over a castle"). If we
+ * ever want richer combination, this is where to add a small Claude
+ * "beautify" pass before passing to image gen.
+ */
+export const VOICE_CREDIT_COST = 10;
+
+export const createColoringImageFromVoiceConversation = async (opts: {
+  firstAnswer: string;
+  secondAnswer: string;
+  locale?: string;
+  clientDistinctId?: string;
+}): Promise<CreateColoringImageResult> => {
+  const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
+  if (!userId) {
+    return {
+      error: 'voice_mode_requires_signin',
+      credits: 0,
+    };
+  }
+
+  const startedAt = Date.now();
+
+  const description =
+    `${opts.firstAnswer.trim()} ${opts.secondAnswer.trim()}`.trim();
+  if (!description) {
+    return { error: 'empty_description', credits: 0 };
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { credits: true },
+  });
+  if (!user || user.credits < VOICE_CREDIT_COST) {
+    return {
+      error: 'Insufficient credits',
+      credits: user?.credits || 0,
+    };
+  }
+
+  // Same transactional credit-debit + generation pattern as `createColoringImage`.
+  // `purposeKey: 'voice'` flags voice-sourced rows for analytics/admin.
+  const result = await db.$transaction(
+    async (tx) => {
+      await tx.user.update({
+        where: { id: userId },
+        data: { credits: { decrement: VOICE_CREDIT_COST } },
+      });
+
+      await tx.creditTransaction.create({
+        data: {
+          userId,
+          amount: -VOICE_CREDIT_COST,
+          type: CreditTransactionType.GENERATION,
+        },
+      });
+
+      return generateColoringImageWithMetadata(
+        description,
+        userId,
+        GenerationType.USER,
+        opts.locale ?? 'en',
+        description, // sourcePrompt — also the description for voice
+        opts.clientDistinctId,
+        'voice', // purposeKey — splits voice gens from text/image
+      );
+    },
+    {
+      timeout: 120000,
+    },
+  );
+
+  const durationMs = Date.now() - startedAt;
+
+  // Same pre-response derived-asset-pipeline kick as the text path so
+  // region store + bg music start generating before this returns.
+  if (result.url && result.svgUrl) {
+    await requestAllPipelineFromWorker(result.id);
+  }
+
+  after(async () => {
+    if (!result.url || !result.svgUrl) return;
+
+    // CREATION_COMPLETED uses a fixed schema across text/image/voice;
+    // voice-source is implicit from the `purposeKey: 'voice'` on the row.
+    await trackWithUser(userId, TRACKING_EVENTS.CREATION_COMPLETED, {
+      coloringImageId: result.id,
+      description,
+      durationMs,
+      creditsUsed: VOICE_CREDIT_COST,
+    });
+  });
+
+  // Match the cache invalidation shape of `createColoringImage` so the
+  // gallery / homepage re-render with the new image.
+  revalidateTag('all-coloring-images', { expire: 0 });
+  revalidatePath('/');
+
+  return result;
+};

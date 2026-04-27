@@ -204,6 +204,48 @@ Note: Prebuild regenerates native `ios/` and `android/` folders. Only run when a
 
 Use `gh` CLI when referencing GitHub repos that I own or public repos (e.g., `gh repo view`, `gh issue list`, `gh pr list`).
 
+## Server actions are the source of truth; routes + crons wrap them
+
+All business logic lives in server actions (`app/actions/*.ts`). HTTP endpoints (`app/api/*/route.ts`) and cron routes are thin wrappers that:
+
+- Authenticate the caller (cookie session for user routes; `CRON_SECRET` bearer for crons)
+- Parse / validate the request body
+- Call the server action
+- Return the action's result
+
+**Why:**
+
+- **Mobile parity.** React Native can't call Next.js server actions over the wire — only HTTP. If the endpoint _is_ the implementation, web and mobile duplicate the logic. If the endpoint _wraps_ a server action, web calls the action directly, mobile hits the wrapping HTTP endpoint, and both share one source of truth.
+- **Type safety.** Server-action arguments are typed at the call site. JSON request bodies are untyped strings until validated. The action enforces the contract; the route just plumbs JSON to it.
+- **Testability.** Actions are plain async functions — easy to call from scripts, tests, admin tools, or even other actions. Routes locked behind HTTP can't be reused.
+- **Reusability.** Daily image cron, admin "regenerate" buttons, and the user-facing create button can all call the same `createColoringImage` action. We've already seen this pay off — `generateColoringImageOnly` is wrapped by the daily cron route AND by `generateDemoReelImageFromAIDescription`.
+
+**The pattern:**
+
+```ts
+// app/actions/voice.ts
+"use server";
+export async function generateVoiceFollowUp(firstAnswer: string) {
+  // moderation, Claude, TTS — all the real work happens here
+}
+
+// app/api/voice/follow-up/route.ts
+import { generateVoiceFollowUp } from "@/app/actions/voice";
+export const POST = async (req: Request) => {
+  const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
+  if (!userId) return NextResponse.json({ error: "unauth" }, { status: 401 });
+  const { firstAnswer } = await req.json();
+  return NextResponse.json(await generateVoiceFollowUp(firstAnswer));
+};
+```
+
+**When NOT to use this pattern:**
+
+- Endpoints that exist purely to serve external systems (webhooks from Stripe, Resend, Cloudflare R2 lifecycle events) — these aren't business logic, they're integration boundaries. Keep webhook handlers in routes; if there's substantive logic to run from the webhook, factor that into an action the route calls.
+- One-off dev/admin endpoints under `/api/dev/*` that exist as a quick way to poke at infra — fine to keep inline; promote to actions only if reused.
+
+If you find yourself adding more than ~10 lines of business logic to a route handler, stop and extract it into an action.
+
 ## Investigating before deleting
 
 We've twice nuked production data ("photo_library_entries" → empty table on dev + prod, R2 photos gone) because investigation grepped only the web app and concluded "nothing uses this." Things were used — by `apps/chunky-crayon-worker/`, which is a separate Bun service that doesn't show up in app-scoped greps.
