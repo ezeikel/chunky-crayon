@@ -38,7 +38,7 @@
       "brush": "Pinsel",
       "sticker": "Sticker",
       "magicReveal": "Magisches Enthüllen",
-      "magicAuto": "Magisch Auto",
+      "magicAuto": "Auto-Magie",
       "magicBrush": "Magischer Pinsel",
       "magicFill": "Magisches Füllen",
       "autoColor": "Auto-Farbe",
@@ -61,7 +61,7 @@
     },
     "fillPatterns": {
       "solid": "Einfarbig",
-      "dots": "Punkte",
+      "dots": "Tupfen",
       "stripes": "Streifen",
       "diagonal": "Diagonal",
       "checkerboard": "Schachbrett",
@@ -353,10 +353,10 @@
     "plans": {
       "bloom": {
         "name": "Bloom",
-        "description": "Starte deine Ausmal-Reise",
+        "description": "Beginne deine Ausmal-Reise",
         "cta": "Kostenlos starten",
         "features": [
-          "2 kostenlose Kreationen täglich",
+          "2 kostenlose Kreationen zum Einstieg",
           "Zugang zur kostenlosen Bibliothek",
           "Online-Ausmalleinwand",
           "PDF-Downloads"
@@ -460,7 +460,7 @@
         "description": "Sanfte Muster, perfekt für einen kurzen Moment der Ruhe"
       },
       "intermediate": {
-        "title": "Mittel",
+        "title": "Fortgeschrittene",
         "shortLabel": "Mittel",
         "description": "Moderate Details für eine längere, erdende Sitzung"
       },
@@ -486,7 +486,7 @@
       },
       "geometric": {
         "name": "Geometrisch",
-        "description": "Präzise Muster und Parkettierungen"
+        "description": "Präzise Muster und geometrische Formen"
       },
       "landscapes": {
         "name": "Landschaften",
@@ -533,7 +533,7 @@
         "description": "Viktorianische Maschinen und kuriose Apparaturen"
       },
       "food": {
-        "name": "Essen",
+        "name": "Kulinarisches",
         "description": "Festmahle und kulinarische Szenen"
       }
     },
