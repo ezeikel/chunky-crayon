@@ -148,18 +148,83 @@ seeing their idea come to life) and let the video carry the wow factor.
 The hero is the kid's idea, not the workflow.`;
 };
 
-/** Variant-specific hook example for the IG/TikTok caption — keeps the
- *  hook concrete to what the viewer sees instead of generic "AI magic". */
-const variantHookHint = (
+/**
+ * The mandatory verb for line-1 of caption hooks. The variant of the reel
+ * dictates which input the kid used — captions MUST acknowledge it on
+ * the first line so the hook reads true to what the viewer is watching.
+ *
+ * Pass these into the caption prompt as a non-negotiable requirement, not
+ * as a hint, otherwise Claude defaults to generic "we just released …"
+ * openers that ignore the variant entirely.
+ */
+const variantHookRequirement = (
   variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
-): string => {
+): {
+  /** What action the kid took. Use these exact verbs / phrasings on line 1. */
+  inputAction: string;
+  /** Concrete examples Claude should mimic on line 1. */
+  examples: string[];
+  /** What to avoid — common Claude failure modes. */
+  forbidden: string[];
+} => {
   if (variant === 'IMAGE') {
-    return `Hook the photo-to-page moment: "Upload a photo, get a coloring page" / "Snap a pic of your dog → coloring page". Avoid generic transformation framing — the magic IS the photo upload.`;
+    return {
+      inputAction: 'uploaded a photo',
+      examples: [
+        '"snap a pic, get a coloring page"',
+        '"upload a photo and watch it become a coloring page"',
+        '"your kid uploads a photo of their dog → coloring page"',
+      ],
+      forbidden: [
+        '"we made…", "we released…", "we added…" — these IGNORE the photo upload, which is THE story',
+        '"check out this coloring page" — same problem',
+        '"AI", "tech", "automatic" — banned everywhere',
+      ],
+    };
   }
   if (variant === 'VOICE') {
-    return `Hook the talk-to-it moment: "Tell us what to draw" / "She just SAID 'space dragon' and got a coloring page". Avoid generic transformation framing — the magic IS the voice input.`;
+    return {
+      inputAction: 'said aloud',
+      examples: [
+        '"she SAID it and got a coloring page"',
+        '"talk to it, get a coloring page back"',
+        '"your kid says \'space dragon\' → coloring page"',
+      ],
+      forbidden: [
+        '"we made…", "we released…", "we added…" — these IGNORE the voice input, which is THE story',
+        '"typed", "uploaded" — wrong variant',
+        '"AI", "voice AI", "tech" — banned everywhere',
+      ],
+    };
   }
-  return `Hook the type-and-go moment: "Type 3 words → coloring page appears" / "Tell us what to draw and it shows up". Keep the example specific to the kid's idea, not the tech.`;
+  return {
+    inputAction: 'typed a short idea',
+    examples: [
+      '"type 3 words, get a coloring page"',
+      '"your kid types it → coloring page appears"',
+      "\"typed 'bumblebee garden' → here's the page\"",
+    ],
+    forbidden: [
+      '"we made…", "we released…", "we added…" — these read as marketing, not a demo',
+      '"snapped", "uploaded", "said" — wrong variant',
+      '"AI", "tech", "automatic" — banned everywhere',
+    ],
+  };
+};
+
+/** Render the variant requirement as a prompt block — used by IG / FB / TikTok addendums. */
+const renderVariantRequirement = (
+  variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
+): string => {
+  const req = variantHookRequirement(variant);
+  return `
+HARD REQUIREMENT — LINE 1 MUST reference that the kid ${req.inputAction}.
+
+Good line-1 patterns to mimic:
+${req.examples.map((e) => `  - ${e}`).join('\n')}
+
+DO NOT use these openers (they ignore the input and read like generic marketing):
+${req.forbidden.map((f) => `  - ${f}`).join('\n')}`;
 };
 
 const buildInstagramDemoReelAddendum = (
@@ -168,10 +233,12 @@ const buildInstagramDemoReelAddendum = (
 ${buildDemoReelFraming(variant)}
 
 REEL — product-demo hook, optimized for saves + shares:
+${renderVariantRequirement(variant)}
 
 REQUIREMENTS:
-1. HOOK (first line, <60 chars): tease the moment the page appears.
-   ${variantHookHint(variant)}
+1. HOOK (first line, <60 chars): see the HARD REQUIREMENT above. The
+   line MUST reference the kid's input action verbatim. Failure mode:
+   generic "we made / we released" openers that ignore the variant.
    Avoid: "So satisfying", "ASMR", "animation" framing, anything tech-y.
 2. BENEFIT (1 line): why a parent cares — free, instant, any idea their kid has.
 3. SAVE TRIGGER: "Save this for the next 'I'm bored' moment".
@@ -198,9 +265,12 @@ const buildFacebookDemoReelAddendum = (
 ${buildDemoReelFraming(variant)}
 
 FACEBOOK VIDEO — product demo framed for parents/grandparents:
+${renderVariantRequirement(variant)}
 
 REQUIREMENTS:
-1. Warm opener acknowledging the workflow: ${opener}
+1. Warm opener acknowledging the workflow — line 1 MUST reference the
+   kid's input action (per HARD REQUIREMENT above). Mimic the example:
+   ${opener}
 2. SHARE TRIGGER: "Tag a parent who'd love this" / "Share with the grandparents".
 3. CTA: "Free at chunkycrayon.com — no signup needed to try it".
 4. 2-3 hashtags max, family-friendly (#Parenting #KidsActivities).
@@ -225,9 +295,12 @@ const buildTikTokDemoReelAddendum = (
 ${buildDemoReelFraming(variant)}
 
 TIKTOK — authentic product-demo energy:
+${renderVariantRequirement(variant)}
 
 REQUIREMENTS:
-1. Lead with the transformation in present tense, lowercase, e.g. ${lead}.
+1. Line 1 MUST follow the HARD REQUIREMENT above (lowercase, references
+   the kid's input action). Use this template as the structural model:
+   ${lead}
 2. Keep it short, lowercase, conversational — no corporate voice.
 3. One cheeky aside is fine ("this is unfair to crayons").
 4. 5-8 hashtags: #fyp #parentsoftiktok #kidsactivities #coloringpage
