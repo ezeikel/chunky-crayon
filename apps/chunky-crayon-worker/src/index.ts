@@ -25,6 +25,7 @@ import { generateFillPointsLocal } from "./record/fill-points.js";
 import { db } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
 import { generateReelScript } from "./script/generate.js";
+import { shortenPromptForReel } from "./script/short-prompt.js";
 import { generateVoiceClip } from "./voice/elevenlabs.js";
 import {
   buildVoiceReelFixtures,
@@ -1557,17 +1558,28 @@ app.post("/publish/v2", async (c) => {
       ? JSON.parse(row.regionsJson)
       : row.regionsJson;
 
+  // Resolve the ~8-word "kid-typed" version of this image's title +
+  // description. Same string is:
+  //   - typed into the on-screen textarea (text variant only)
+  //   - read verbatim by the kid voiceover (text + image variants)
+  // Voice variant gets its own A1/A2 conversation audio, so we don't use
+  // shortPrompt for that variant's script generation. Compute once anyway
+  // because reelAudio still needs *some* prompt for the adult outro line.
+  const shortPrompt = await shortenPromptForReel({
+    title: row.title,
+    description: row.description,
+  });
+  console.log(
+    `[/publish/v2] shortPrompt resolved: "${shortPrompt}" (variant=${variant})`,
+  );
+
   // Generate the per-render audio bundle (ambient music + kid + adult
   // voice) before kicking off the render — same flow as V1's /publish/reel.
   // The comp passes through audio URLs as inputProps; `undefined` skips
   // the corresponding `<Audio>` tag inside the reel composition.
-  const promptForScript =
-    variant === "image"
-      ? "photo upload" // matches V1 image-reel hint
-      : (row.description ?? row.title ?? "");
   const reelAudio = await buildV2ReelAudio({
     imageId: row.id,
-    prompt: promptForScript,
+    prompt: shortPrompt,
     imageTitle: row.title,
     ambientUrl: row.backgroundMusicUrl,
     port,
@@ -1583,7 +1595,7 @@ app.post("/publish/v2", async (c) => {
         "./video/v2/TextDemoReelV2.js"
       );
       await renderTextDemoReelV2({
-        prompt: row.description ?? row.title ?? "",
+        prompt: shortPrompt,
         finishedImageUrl: proxiedFinishedImage,
         regionMapUrl: proxiedRegionMap,
         regionMapWidth: row.regionMapWidth ?? 1024,

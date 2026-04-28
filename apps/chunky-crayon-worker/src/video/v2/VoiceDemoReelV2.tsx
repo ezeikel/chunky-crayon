@@ -55,6 +55,7 @@ import {
   type RegionStoreJson,
   type PaletteVariant,
 } from "./lib/loadFixture";
+import { TONDO_FONT_CSS_URL } from "../fonts";
 
 // =============================================================================
 // Beat timeline. 30fps. Voice variant has a longer Beat 3 because real
@@ -287,6 +288,10 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
 
   return (
     <AbsoluteFill style={{ background: COLORS.bgCream }}>
+      {/* Tondo fonts embedded as base64 in a static CSS file — no HTTP
+          font fetches, no delayRender race across render tabs. */}
+      <link rel="stylesheet" href={TONDO_FONT_CSS_URL} />
+
       {/* ── Beats 1 + 2 — identical to text/image variants ──────────── */}
       <Sequence from={F_INTRO_START} durationInFrames={F_INTRO_DUR}>
         <IntroCard durationFrames={F_INTRO_DUR} />

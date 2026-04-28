@@ -43,6 +43,7 @@ import {
   type RegionStoreJson,
   type PaletteVariant,
 } from "./lib/loadFixture";
+import { TONDO_FONT_CSS_URL } from "../fonts";
 
 // =============================================================================
 // Beat timeline — identical to TextDemoReelV2 so per-platform post crons
@@ -227,6 +228,10 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
 
   return (
     <AbsoluteFill style={{ background: COLORS.bgCream }}>
+      {/* Tondo fonts embedded as base64 in a static CSS file — no HTTP
+          font fetches, no delayRender race across render tabs. */}
+      <link rel="stylesheet" href={TONDO_FONT_CSS_URL} />
+
       {/* ── Beats 1 + 2 — identical to text variant ───────────────────── */}
       <Sequence from={F_INTRO_START} durationInFrames={F_INTRO_DUR}>
         <IntroCard durationFrames={F_INTRO_DUR} />
