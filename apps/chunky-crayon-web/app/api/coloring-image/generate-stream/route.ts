@@ -34,7 +34,10 @@ import { REFERENCE_IMAGES, prompts } from '@/lib/ai';
 import { persistGeneratedColoringImage } from '@/lib/coloring-image/persist';
 import { requestAllPipelineFromWorker } from '@/lib/worker';
 
-export const runtime = 'nodejs';
+// runtime defaults to 'nodejs' on Next 16; declaring it explicitly is
+// rejected when cacheComponents is enabled (which it is on CC). We need
+// node anyway for sharp + traceImage + Prisma writes in the persist
+// pipeline — leaving the runtime implicit is the right call.
 export const maxDuration = 300; // Vercel max; gen + stream can run ~3-4min
 
 // Per-mode credit costs. Voice runs richer pipelines (Deepgram + Claude
