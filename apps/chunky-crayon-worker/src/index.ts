@@ -24,6 +24,7 @@ import { generateColoredReferenceLocal } from "./record/colored-reference.js";
 import { generateFillPointsLocal } from "./record/fill-points.js";
 import { db } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
+import sharp from "sharp";
 import { generateReelScript } from "./script/generate.js";
 import { shortenPromptForReel } from "./script/short-prompt.js";
 import { generateVoiceClip } from "./voice/elevenlabs.js";
@@ -1731,9 +1732,13 @@ app.post("/publish/v2", async (c) => {
     );
   }
 
-  // Upload mp4 to R2 + write demoReelUrl. Same shape as V1 path so the
-  // per-platform post crons (Instagram/Facebook/etc) work unchanged.
+  // Upload mp4 + cover JPEG to R2 + write demoReelUrl/CoverUrl/StoryUrl.
+  // Same shape as V1 path so the per-platform post crons work unchanged.
+  // Cover + story aren't blocking — if either fails, we still ship the reel
+  // and let post-time fallbacks handle missing fields (post route already
+  // handles `?? undefined` for cover and falls back to demoReelUrl for story).
   let publishedUrl: string;
+  let publishedCoverUrl: string | undefined;
   try {
     const mp4Buffer = await readFile(outputPath);
     const r2Key = `reels/demo-v2/${row.id}-${stamp}-${variant}.mp4`;
@@ -1742,18 +1747,48 @@ app.post("/publish/v2", async (c) => {
       access: "public",
     });
     publishedUrl = url;
+    console.log(`[/publish/v2] uploaded mp4 to R2: ${url}`);
+
+    // Cover: convert the row's finished colored image (webp) to JPEG and
+    // upload. Pinterest requires JPEG, IG renders any image fine. Falls
+    // back gracefully if conversion fails — post route already handles
+    // missing demoReelCoverUrl by using a default IG/FB video frame.
+    try {
+      const coloredResp = await fetch(row.url);
+      if (!coloredResp.ok)
+        throw new Error(`fetch row.url ${coloredResp.status}`);
+      const coloredBuf = Buffer.from(await coloredResp.arrayBuffer());
+      const jpegBuf = await sharp(coloredBuf).jpeg({ quality: 88 }).toBuffer();
+      const coverKey = `reels/demo-v2/${row.id}-${stamp}-${variant}-cover.jpg`;
+      const { url: coverUrl } = await put(coverKey, jpegBuf, {
+        contentType: "image/jpeg",
+        access: "public",
+      });
+      publishedCoverUrl = coverUrl;
+      console.log(
+        `[/publish/v2] uploaded cover to R2: ${coverUrl} (${jpegBuf.byteLength} bytes)`,
+      );
+    } catch (err) {
+      console.warn(
+        "[/publish/v2] cover upload failed (continuing without):",
+        err instanceof Error ? err.message : err,
+      );
+    }
 
     await db.coloringImage.update({
       where: { id: row.id },
       data: {
         demoReelUrl: url,
+        // V2 reels are ~28s — well under IG Stories' 60s cap. Use the same
+        // URL for stories; no separate trim like V1 needed.
+        demoReelStoryUrl: url,
+        ...(publishedCoverUrl ? { demoReelCoverUrl: publishedCoverUrl } : {}),
         // Writeback drives the produce-v2 cron's rotation: read the most
         // recent demoReelVariant value, pick the next in cycle.
         demoReelVariant:
           variant === "text" ? "TEXT" : variant === "image" ? "IMAGE" : "VOICE",
       },
     });
-    console.log(`[/publish/v2] uploaded mp4 to R2: ${url}`);
   } catch (err) {
     console.error(`[/publish/v2] R2 upload / DB write failed:`, err);
     return c.json(
@@ -1772,6 +1807,7 @@ app.post("/publish/v2", async (c) => {
     title: row.title,
     rendered: true,
     publishedUrl,
+    publishedCoverUrl,
   });
 });
 
