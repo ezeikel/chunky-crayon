@@ -1,5 +1,7 @@
 # Demo Reels
 
+> **Note:** the live system is V2 (synthetic Remotion-only). See [V2.md](./V2.md) for current architecture, gotchas, and operations. The doc below describes V1 for historical context only — the V1 produce/publish routes still exist in the codebase but no cron points at them anymore.
+
 Vertical (1080x1920) videos posted to Instagram, Facebook, TikTok, and Pinterest. Each reel records the actual Chunky Crayon create flow in a real browser, then composites the recording into a polished short with intro/outro cards, voiceover, and ambient music.
 
 There are two variants. Both run on the same Hetzner worker; they differ only in how they create the source coloring image.
