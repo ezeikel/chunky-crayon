@@ -32,6 +32,7 @@
     "dotenv": "^17.2.2",
     "elevenlabs": "^1.59.0",
     "hono": "^4.0.0",
+    "openai": "^6.33.0",
     "playwright": "^1.59.0",
     "remotion": "^4.0.0",
     "sharp": "^0.34.1",

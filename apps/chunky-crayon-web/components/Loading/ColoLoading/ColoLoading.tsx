@@ -31,6 +31,13 @@ type ColoLoadingProps = {
   isLoading: boolean;
   /** Callback when audio finishes playing */
   onAudioComplete?: () => void;
+  /**
+   * data:image/png;base64,... URL of the most recent partial frame from
+   * the streaming SSE flow. When present, render it below Colo so the
+   * kid sees the page appearing before navigation. When absent, the
+   * mascot + cycling messages carry the load.
+   */
+  partialImageUrl?: string;
   className?: string;
 };
 
@@ -40,6 +47,7 @@ const ColoLoading = ({
   description,
   isLoading,
   onAudioComplete,
+  partialImageUrl,
   className,
 }: ColoLoadingProps) => {
   const t = useTranslations('coloLoading');
@@ -222,6 +230,30 @@ const ColoLoading = ({
           </p>
         )}
       </div>
+
+      {/* Partial image preview — only renders once the streaming SSE
+          flow has emitted at least one partial frame from OpenAI. The
+          first partial currently lands ~3 minutes into the wait, so for
+          most of the load this stays absent and the mascot carries the
+          UX. When it lands, render the image with a soft border so it
+          reads like "your coloring page is appearing!" rather than a
+          pop-up. */}
+      {partialImageUrl && (
+        <div className="mt-6 flex flex-col items-center gap-2 animate-fade-in">
+          <p className="font-tondo font-medium text-sm text-crayon-orange">
+            ✨ Your coloring page is appearing…
+          </p>
+          {/* Plain <img> rather than next/image: the data: URL changes on
+              each partial and next/image's optimization pipeline is
+              wrong for that. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={partialImageUrl}
+            alt="Coloring page preview"
+            className="w-64 h-64 rounded-2xl shadow-xl border-4 border-white object-cover"
+          />
+        </div>
+      )}
     </div>
   );
 };

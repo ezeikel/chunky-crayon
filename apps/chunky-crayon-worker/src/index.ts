@@ -34,6 +34,11 @@ import {
 import { proxyToLocal } from "./video/v2/proxy.js";
 import { buildDemoReelCover } from "./video/v2/cover.js";
 import { pickBestPalette } from "./video/v2/palette.js";
+import { streamSSE } from "hono/streaming";
+import {
+  streamColoringImage,
+  type StreamColoringImageInput,
+} from "./coloring-image/stream.js";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
@@ -489,6 +494,98 @@ app.post("/generate/fill-points", async (c) => {
  * On success (non-dry-run) the final mp4 is uploaded to R2 and written back
  * to coloringImage.demoReelUrl for the social post handler to pick up.
  */
+
+/**
+ * POST /generate/coloring-image-stream
+ *
+ * SSE streaming endpoint for user-facing coloring-image generation.
+ *
+ * Body (JSON):
+ *   prompt:             fully-baked prompt (Vercel side adds style block + closed-contours)
+ *   referenceImageUrls: up to 4 R2 URLs of style reference images
+ *   size?:              defaults '1024x1024'
+ *   quality?:           defaults 'high'
+ *   partialImages?:     defaults 3 (OpenAI may emit fewer)
+ *
+ * Emits SSE events:
+ *   event: partial          data: { type: 'partial', index, b64_json }
+ *   event: image_completed  data: { type: 'image_completed', b64_json }
+ *   event: error            data: { type: 'error', message }
+ *
+ * Vercel side handles auth + credit debit + post-completion persist.
+ * This endpoint is a thin OpenAI streaming adapter only — see
+ * coloring-image/stream.ts for the rationale.
+ */
+app.post("/generate/coloring-image-stream", async (c) => {
+  const body = await c.req
+    .json<Partial<StreamColoringImageInput>>()
+    .catch(() => ({}) as Partial<StreamColoringImageInput>);
+
+  if (!body.prompt || typeof body.prompt !== "string") {
+    return c.json({ error: "prompt required" }, 400);
+  }
+  if (
+    !body.referenceImageUrls ||
+    !Array.isArray(body.referenceImageUrls) ||
+    body.referenceImageUrls.length === 0
+  ) {
+    return c.json(
+      { error: "referenceImageUrls required (at least 1, max 4)" },
+      400,
+    );
+  }
+  if (body.referenceImageUrls.length > 4) {
+    return c.json({ error: "max 4 reference images" }, 400);
+  }
+
+  const input: StreamColoringImageInput = {
+    prompt: body.prompt,
+    referenceImageUrls: body.referenceImageUrls,
+    size: body.size,
+    quality: body.quality,
+    partialImages: body.partialImages,
+  };
+
+  console.log(
+    `[/generate/coloring-image-stream] starting: refs=${input.referenceImageUrls.length} q=${input.quality ?? "high"}`,
+  );
+
+  return streamSSE(
+    c,
+    async (stream) => {
+      try {
+        await streamColoringImage(stream, input);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(
+          "[/generate/coloring-image-stream] error during stream:",
+          message,
+        );
+        await stream.writeSSE({
+          event: "error",
+          data: JSON.stringify({ type: "error", message }),
+        });
+      }
+    },
+    async (err, stream) => {
+      // Hono's onError — fired if streamSSE itself blows up before our
+      // handler. Best-effort emit, then the stream closes.
+      console.error(
+        "[/generate/coloring-image-stream] hono onError:",
+        err.message,
+      );
+      try {
+        await stream.writeSSE({
+          event: "error",
+          data: JSON.stringify({ type: "error", message: err.message }),
+        });
+      } catch {
+        /* connection already gone */
+      }
+    },
+  );
+});
+
 app.post("/publish/reel", async (c) => {
   // Neon WebSocket keepalive — scoped to this handler only.
   //

@@ -143,6 +143,8 @@ Characters: cartoon-like, friendly, approachable faces. Hair and fur rendered as
 
 Technical: high contrast between black outlines and white space. Every enclosed shape left completely white and unfilled. Smooth, continuous line work suitable for printing on standard paper. No duplicate elements unless the description asks for them.
 
+Outlines must be CLOSED CONTOURS — every shape is fully sealed, with no breaks, gaps, or unconnected line endings. Where one region meets another, the boundary line is unbroken from end to end. This is critical: every region must be fully enclosed so the page can be filled in cleanly without colour bleeding across shapes.
+
 ${COPYRIGHTED_CHARACTER_INSTRUCTIONS}
 
 My prompt has full detail so no need to add more.`;

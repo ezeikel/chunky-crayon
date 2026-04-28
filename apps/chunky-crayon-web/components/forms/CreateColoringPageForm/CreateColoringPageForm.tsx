@@ -30,6 +30,12 @@ import {
   type InputMode,
 } from './inputs';
 import FormCTA from './FormCTA';
+import { submitTextStreaming } from './submitTextStreaming';
+import type { ColoringImage } from '@one-colored-pixel/db';
+
+type ColoringImageActionResult =
+  | Partial<ColoringImage>
+  | { error: string; credits?: number };
 
 type CreateColoringPageFormProps = {
   className?: string;
@@ -46,10 +52,15 @@ const FormLoadingOverlay = ({
   description,
   audioUrl,
   audioState,
+  partialImageUrl,
 }: {
   description: string;
   audioUrl: string | null;
   audioState: AudioState;
+  /** When the streaming SSE flow emits a partial image, the form sets a
+   *  data:URL here. ColoLoading renders it as a preview "your coloring
+   *  page is appearing" so the kid sees progress before navigation. */
+  partialImageUrl?: string | null;
 }) => {
   const { pending } = useFormStatus();
 
@@ -65,6 +76,7 @@ const FormLoadingOverlay = ({
       audioUrl={audioUrl ?? undefined}
       audioState={audioState}
       description={description}
+      partialImageUrl={partialImageUrl ?? undefined}
       onAudioComplete={handleAudioComplete}
     />
   );
@@ -84,6 +96,9 @@ const MultiModeForm = ({
   const { mode, description, imageBase64 } = useInputMode();
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioState, setAudioState] = useState<AudioState>('idle');
+  // Set when the SSE stream emits a partial image; passed into the
+  // loading overlay so the kid sees the page appear before navigation.
+  const [partialImageUrl, setPartialImageUrl] = useState<string | null>(null);
   const {
     isGuest,
     guestGenerationsUsed,
@@ -145,15 +160,38 @@ const MultiModeForm = ({
           characterCount: desc?.length || 0,
         });
 
-        const coloringImage =
-          inputType === 'image' && imageBase64
-            ? await createColoringImageFromPhoto(imageBase64, locale)
-            : await createColoringImage(formData);
+        let coloringImage: ColoringImageActionResult;
+
+        if (inputType === 'image' && imageBase64) {
+          coloringImage = await createColoringImageFromPhoto(
+            imageBase64,
+            locale,
+          );
+        } else {
+          // Text path — call the streaming SSE endpoint so the user sees
+          // partial frames before final. This keeps the form action
+          // pending while the stream runs (useFormStatus().pending stays
+          // true) and only resolves when we get { type: 'final' } or an
+          // error event.
+          const streamResult = await submitTextStreaming({
+            description: desc,
+            locale,
+            clientDistinctId,
+            onPartial: (b64) => {
+              setPartialImageUrl(`data:image/png;base64,${b64}`);
+            },
+          });
+          // Normalize stream result to the shared ColoringImageActionResult
+          // shape so the rest of the action treats text + photo uniformly.
+          coloringImage =
+            'error' in streamResult ? streamResult : { id: streamResult.id };
+        }
 
         if ('error' in coloringImage) {
           console.error(coloringImage.error);
           setAudioUrl(null);
           setAudioState('idle');
+          setPartialImageUrl(null);
           return;
         }
 
@@ -194,9 +232,10 @@ const MultiModeForm = ({
         // Signal galleries to refresh when user navigates back
         signalGalleryRefresh('image-created');
 
-        // Reset audio state before navigation
+        // Reset audio + partial state before navigation
         setAudioUrl(null);
         setAudioState('idle');
+        setPartialImageUrl(null);
         if (coloringImage.id) {
           router.push(`/coloring-image/${coloringImage.id}`);
         }
@@ -209,6 +248,7 @@ const MultiModeForm = ({
         description={description}
         audioUrl={audioUrl}
         audioState={audioState}
+        partialImageUrl={partialImageUrl}
       />
 
       {/* Hidden inputs for form submission */}

@@ -27,6 +27,7 @@ export const MODEL_IDS = {
 
   // OpenAI Image models
   GPT_IMAGE_1_5: "gpt-image-1.5",
+  GPT_IMAGE_2: "gpt-image-2",
 
   // FLUX Image models via Replicate (faster, cheaper)
   FLUX_SCHNELL: "black-forest-labs/flux-schnell",
@@ -57,7 +58,7 @@ let _imageQualityModel: ImageModel | null = null;
 
 export function getImageModel(): ImageModel {
   if (!_imageModel) {
-    _imageModel = openai.image(MODEL_IDS.GPT_IMAGE_1_5);
+    _imageModel = openai.image(MODEL_IDS.GPT_IMAGE_2);
   }
   return _imageModel;
 }

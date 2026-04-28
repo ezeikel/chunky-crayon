@@ -122,8 +122,8 @@ async function getStyleReferenceFiles(
 
 function createOpenAIProvider(config: ImageGenerationConfig): ProviderConfig {
   return {
-    id: MODEL_IDS.GPT_IMAGE_1_5,
-    name: "OpenAI GPT Image 1.5",
+    id: MODEL_IDS.GPT_IMAGE_2,
+    name: "OpenAI GPT Image 2",
     provider: "openai",
     costPerImage: 0.08,
     supportsReferenceImages: true,
@@ -144,7 +144,7 @@ function createOpenAIProvider(config: ImageGenerationConfig): ProviderConfig {
 
       const client = new OpenAI();
       const result = await client.images.edit({
-        model: MODEL_IDS.GPT_IMAGE_1_5,
+        model: MODEL_IDS.GPT_IMAGE_2,
         image: styleFiles,
         prompt: styledPrompt,
         size: "1024x1024",
@@ -429,7 +429,7 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
 
     try {
       const result = await client.images.edit({
-        model: MODEL_IDS.GPT_IMAGE_1_5,
+        model: MODEL_IDS.GPT_IMAGE_2,
         image: [imageFile],
         prompt,
         size: "1024x1024",
@@ -457,7 +457,7 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
         tempFileName,
         generationTimeMs,
         provider: "openai",
-        model: MODEL_IDS.GPT_IMAGE_1_5,
+        model: MODEL_IDS.GPT_IMAGE_2,
         imageBuffer: outputBuffer,
       };
     } catch (error) {
@@ -504,7 +504,7 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
 
     try {
       const result = await client.images.edit({
-        model: MODEL_IDS.GPT_IMAGE_1_5,
+        model: MODEL_IDS.GPT_IMAGE_2,
         image: allImages,
         prompt,
         size: "1024x1024",
@@ -534,7 +534,7 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
         tempFileName,
         generationTimeMs,
         provider: "openai",
-        model: MODEL_IDS.GPT_IMAGE_1_5,
+        model: MODEL_IDS.GPT_IMAGE_2,
         imageBuffer: outputBuffer,
       };
     } catch (error) {
