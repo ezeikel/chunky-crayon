@@ -113,81 +113,164 @@ Remember: Write as Chunky Crayon the brand. Output ONLY the final post text with
  * Magic Brush reveals the colors. Captions should sell the *product*, not
  * the artwork — that's what the static image posts are for.
  */
-const DEMO_REEL_FRAMING = `
+/**
+ * Build the per-render reel framing — varies by which input the kid uses.
+ * The framing is what the caption opener hooks on, so getting the input
+ * mode right is what makes a TikTok caption read true vs. like AI slop.
+ *
+ * Hard rule: do NOT use the words "AI", "artificial intelligence", "tech",
+ * "magic brush", or any reference to the underlying model. Parents are
+ * AI-skeptical right now — frame the magic in human terms (the kid asks,
+ * a coloring page appears, watch the colors fill in).
+ */
+const buildDemoReelFraming = (
+  variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
+): string => {
+  const inputLine =
+    variant === 'IMAGE'
+      ? 'A kid uploads a photo (something around them, a pet, a memory)'
+      : variant === 'VOICE'
+        ? 'A kid says out loud what they want to colour'
+        : 'A kid types a short idea';
+
+  return `
 This video is a real product demo recorded from chunkycrayon.com:
-1. A kid types a short prompt
-2. Our AI draws a printable coloring page in seconds
-3. Magic Brush sweeps across and colors it in automatically
+1. ${inputLine}
+2. A printable coloring page appears in seconds
+3. The colors sweep across and fill it in automatically
 
-The caption must frame this as "watch our AI turn an idea into a coloring
-page" — NOT as "animated line-art" or "a video of a coloring page". The
-hero is the workflow, not the drawing.`;
+The caption must frame this as the kid's idea coming to life — NOT as
+"animated line-art", NOT as "a video of a coloring page", and NOT as
+anything tech-y. Do NOT use the words "AI", "artificial intelligence",
+"automatic", "tech", or "magic brush". Parents are wary of AI marketing;
+talk about the OUTCOME (a free printable, a screen-free activity, kids
+seeing their idea come to life) and let the video carry the wow factor.
+The hero is the kid's idea, not the workflow.`;
+};
 
-const INSTAGRAM_DEMO_REEL_ADDENDUM = `
-${DEMO_REEL_FRAMING}
+/** Variant-specific hook example for the IG/TikTok caption — keeps the
+ *  hook concrete to what the viewer sees instead of generic "AI magic". */
+const variantHookHint = (
+  variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
+): string => {
+  if (variant === 'IMAGE') {
+    return `Hook the photo-to-page moment: "Upload a photo, get a coloring page" / "Snap a pic of your dog → coloring page". Avoid generic transformation framing — the magic IS the photo upload.`;
+  }
+  if (variant === 'VOICE') {
+    return `Hook the talk-to-it moment: "Tell us what to draw" / "She just SAID 'space dragon' and got a coloring page". Avoid generic transformation framing — the magic IS the voice input.`;
+  }
+  return `Hook the type-and-go moment: "Type 3 words → coloring page appears" / "Tell us what to draw and it shows up". Keep the example specific to the kid's idea, not the tech.`;
+};
+
+const buildInstagramDemoReelAddendum = (
+  variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
+): string => `
+${buildDemoReelFraming(variant)}
 
 REEL — product-demo hook, optimized for saves + shares:
 
 REQUIREMENTS:
-1. HOOK (first line, <60 chars): something that teases the transformation.
-   Good: "Kid types 3 words → coloring page appears." /
-         "Watch AI turn 'space dinosaur' into a coloring page."
-   Avoid: "So satisfying", "ASMR", "animation" framing.
+1. HOOK (first line, <60 chars): tease the moment the page appears.
+   ${variantHookHint(variant)}
+   Avoid: "So satisfying", "ASMR", "animation" framing, anything tech-y.
 2. BENEFIT (1 line): why a parent cares — free, instant, any idea their kid has.
 3. SAVE TRIGGER: "Save this for the next 'I'm bored' moment".
 4. CTA: "Try it free at chunkycrayon.com".
-5. 8-12 discovery hashtags mixing #reels with niche parent tags
-   (#kidsactivities #aiforkids #coloringpage #screenfreeplay).
+5. 8-12 discovery hashtags. Use parent + creativity tags, no tech ones —
+   e.g. #kidsactivities #screenfreeplay #coloringpage #freeprintable
+   #toddleractivities #preschool #kidscrafts #parentingwin.
+   Do NOT use #aiforkids or any AI/tech-related hashtag.
 6. Short — under 220 chars before hashtags. Reel captions get clipped.
 
 Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text without any labels or section markers.`;
 
-const FACEBOOK_DEMO_REEL_ADDENDUM = `
-${DEMO_REEL_FRAMING}
+const buildFacebookDemoReelAddendum = (
+  variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
+): string => {
+  const opener =
+    variant === 'IMAGE'
+      ? `"We had to show you this — your kid uploads a photo, and a free coloring page of it appears."`
+      : variant === 'VOICE'
+        ? `"We had to show you this — your kid says what they want to draw, and a free coloring page appears."`
+        : `"We had to show you this — your kid types an idea and a free coloring page appears."`;
+
+  return `
+${buildDemoReelFraming(variant)}
 
 FACEBOOK VIDEO — product demo framed for parents/grandparents:
 
 REQUIREMENTS:
-1. Warm opener acknowledging the workflow: "We had to show you this —
-   your kid types an idea, and our AI draws a free coloring page for them."
+1. Warm opener acknowledging the workflow: ${opener}
 2. SHARE TRIGGER: "Tag a parent who'd love this" / "Share with the grandparents".
 3. CTA: "Free at chunkycrayon.com — no signup needed to try it".
 4. 2-3 hashtags max, family-friendly (#Parenting #KidsActivities).
+5. Do NOT mention "AI", "artificial intelligence", "tech", "automatic",
+   or "magic brush". Parents are AI-skeptical; describe the kid's idea
+   coming to life, not the underlying tech.
 
 Remember: Write as Chunky Crayon the brand. Output ONLY the final post text without any labels or section markers.`;
+};
 
-const TIKTOK_DEMO_REEL_ADDENDUM = `
-${DEMO_REEL_FRAMING}
+const buildTikTokDemoReelAddendum = (
+  variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
+): string => {
+  const lead =
+    variant === 'IMAGE'
+      ? `"snapped a pic → coloring page → watch the colors fill in"`
+      : variant === 'VOICE'
+        ? `"said it out loud → coloring page → watch the colors fill in"`
+        : `"typed an idea → coloring page → watch the colors fill in"`;
+
+  return `
+${buildDemoReelFraming(variant)}
 
 TIKTOK — authentic product-demo energy:
 
 REQUIREMENTS:
-1. Lead with the transformation in present tense: "kid types a prompt
-   → ai draws the coloring page → watch it color itself".
+1. Lead with the transformation in present tense, lowercase, e.g. ${lead}.
 2. Keep it short, lowercase, conversational — no corporate voice.
 3. One cheeky aside is fine ("this is unfair to crayons").
-4. 5-8 hashtags: #fyp #parentsoftiktok #kidsactivities #aiforkids #coloringpage.
+4. 5-8 hashtags: #fyp #parentsoftiktok #kidsactivities #coloringpage
+   #screenfreeplay #kidstok. Do NOT use #aiforkids or any AI/tech tag.
 5. End with "free at chunkycrayon.com".
+6. Do NOT mention "AI", "artificial intelligence", "automatic", "tech",
+   or "magic brush". Talk about the kid's idea coming to life.
 
 Remember: Output ONLY the final caption text without any labels.`;
+};
 
-const LINKEDIN_DEMO_REEL_ADDENDUM = `
-${DEMO_REEL_FRAMING}
+const buildLinkedinDemoReelAddendum = (
+  variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
+): string => {
+  const inputDesc =
+    variant === 'IMAGE'
+      ? 'a child uploads a photo of something around them, and a printable coloring page of that photo appears'
+      : variant === 'VOICE'
+        ? 'a child says aloud what they want to colour, and a printable coloring page of that idea appears'
+        : 'a child types a short idea, and a printable coloring page of that idea appears';
+
+  return `
+${buildDemoReelFraming(variant)}
 
 LINKEDIN — professional framing for educators, early-years pros, working parents:
 
 REQUIREMENTS:
-1. Open with the observation, not the pitch: "We've been watching how
-   kids interact with generative AI, and this is what convinced us we
-   were onto something."
-2. Explain the workflow in one sentence (prompt → AI → Magic Brush).
+1. Open with the observation, not the pitch: lead with what we've noticed
+   about how young kids interact with creative tools and what we built in
+   response.
+2. Explain the workflow in one sentence: ${inputDesc}, then sweeps of color
+   fill it in so they can see what's possible before they pick up a crayon.
 3. Tie it to a professional theme — screen-free follow-through, agency,
    creativity, reducing prep time for educators.
 4. CTA: "Free to try at chunkycrayon.com — we'd love your feedback".
 5. 3-5 professional hashtags (#EarlyYears #EdTech #ScreenFreePlay #Parenting).
 6. 150-220 words.
+7. Do NOT use the words "AI", "artificial intelligence", "GenAI", "machine
+   learning", or "magic brush". Even on LinkedIn the parents/educators
+   audience reacts better to outcome-led language than tech-led language.
 
 Remember: Output ONLY the final post text without any labels.`;
+};
 
 /**
  * Shared "colored static after the demo reel" framing. We post this AFTER
@@ -263,7 +346,9 @@ export const generateInstagramCaption = async (
   } else if (postType === 'reel') {
     systemPrompt += INSTAGRAM_REEL_ADDENDUM;
   } else if (postType === 'demo_reel') {
-    systemPrompt += INSTAGRAM_DEMO_REEL_ADDENDUM;
+    systemPrompt += buildInstagramDemoReelAddendum(
+      coloringImage.demoReelVariant,
+    );
   } else if (postType === 'colored_static') {
     systemPrompt += INSTAGRAM_COLORED_STATIC_ADDENDUM;
   }
@@ -299,7 +384,9 @@ export const generateFacebookCaption = async (
   } else if (postType === 'image_with_video') {
     systemPrompt += FACEBOOK_IMAGE_WITH_VIDEO_ADDENDUM;
   } else if (postType === 'demo_reel') {
-    systemPrompt += FACEBOOK_DEMO_REEL_ADDENDUM;
+    systemPrompt += buildFacebookDemoReelAddendum(
+      coloringImage.demoReelVariant,
+    );
   } else if (postType === 'colored_static') {
     systemPrompt += FACEBOOK_COLORED_STATIC_ADDENDUM;
   }
@@ -341,7 +428,7 @@ export const generateTikTokCaption = async (
 ): Promise<string> => {
   let systemPrompt = TIKTOK_CAPTION_SYSTEM;
   if (postType === 'demo_reel') {
-    systemPrompt += TIKTOK_DEMO_REEL_ADDENDUM;
+    systemPrompt += buildTikTokDemoReelAddendum(coloringImage.demoReelVariant);
   }
 
   try {
@@ -370,7 +457,9 @@ export const generateLinkedInCaption = async (
 ): Promise<string> => {
   let systemPrompt = LINKEDIN_CAPTION_SYSTEM;
   if (postType === 'demo_reel') {
-    systemPrompt += LINKEDIN_DEMO_REEL_ADDENDUM;
+    systemPrompt += buildLinkedinDemoReelAddendum(
+      coloringImage.demoReelVariant,
+    );
   }
 
   try {
