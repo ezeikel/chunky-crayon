@@ -18,7 +18,8 @@
       "wavingWand": "Waving my wand...",
       "coloringOutsideLines": "Coloring outside the lines (oops!)..."
     },
-    "pageLoading": "Getting your crayons ready!"
+    "pageLoading": "Getting your crayons ready!",
+    "partialAppearing": "Your coloring page is appearing…"
   },
   "colo": {
     "dashboard": {

@@ -3,12 +3,26 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faPencilPaintbrush,
+  faPalette,
+  faPenSwirl,
+  faSparkles,
+  faStars,
+  faMagnifyingGlass,
+  faGift,
+  faWandMagicSparkles,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import cn from '@/utils/cn';
 
 // Audio state for visual feedback
 export type AudioState = 'idle' | 'preparing' | 'playing' | 'done';
 
-// Keys for loading messages - mapped to translations
+// Keys for loading messages - mapped to translations.
+// Icons + messages are paired by index so the icon visually represents
+// the same idea the audio narrates, and the index cycles together.
 const LOADING_MESSAGE_KEYS = [
   'sharpeningCrayons',
   'mixingColors',
@@ -19,6 +33,20 @@ const LOADING_MESSAGE_KEYS = [
   'wavingWand',
   'coloringOutsideLines',
 ] as const;
+
+// Visual alphabet for kids 3-8 who can't read the cycling messages
+// fast enough. Each icon paired with the message at the same index.
+// Uses FA pro-duotone — emojis read as cheap and inconsistent across OS.
+const LOADING_ICONS: IconDefinition[] = [
+  faPencilPaintbrush, // sharpeningCrayons — pencil + brush together
+  faPalette, // mixingColors
+  faPenSwirl, // drawingLines — pen with a swirl trail
+  faSparkles, // addingSparkles
+  faStars, // almostThere — bright + close
+  faWandMagicSparkles, // creatingMasterpiece
+  faMagnifyingGlass, // wavingWand reused as "checking the details" — wand isn't standard FA
+  faGift, // coloringOutsideLines — final reveal feels like unwrapping
+];
 
 type ColoLoadingProps = {
   /** Audio URL to play (from ElevenLabs) */
@@ -67,18 +95,21 @@ const ColoLoading = ({
     return externalAudioState;
   })();
 
-  // Cycle through loading messages (only when not speaking)
+  // Cycle through loading messages + matched icons. Slower cadence (4s)
+  // because target audience is 3-8 — they parse the icon, not the words.
+  // Stop cycling once the partial image arrives — at that point the
+  // partial IS the focal point and a swap-icon would distract.
   useEffect(() => {
-    if (!isLoading || isPlaying) return;
+    if (!isLoading || isPlaying || partialImageUrl) return;
 
     const interval = setInterval(() => {
       setCurrentMessageIndex(
         (prev) => (prev + 1) % LOADING_MESSAGE_KEYS.length,
       );
-    }, 3000);
+    }, 4000);
 
     return () => clearInterval(interval);
-  }, [isLoading, isPlaying]);
+  }, [isLoading, isPlaying, partialImageUrl]);
 
   // Play audio when URL is available
   useEffect(() => {
@@ -207,9 +238,36 @@ const ColoLoading = ({
       {isPlaying && (
         <div className="mb-4 px-6 py-3 bg-white rounded-2xl shadow-lg border-2 border-crayon-orange-light relative">
           <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-l-2 border-t-2 border-crayon-orange-light rotate-45" />
-          <p className="font-tondo font-medium text-lg text-crayon-orange text-center">
-            🎨 {t('coloSpeaking')} 🎨
-          </p>
+          <FontAwesomeIcon
+            icon={faPalette}
+            className="text-crayon-orange text-xl mr-2"
+          />
+          <span className="font-tondo font-medium text-lg text-crayon-orange">
+            {t('coloSpeaking')}
+          </span>
+        </div>
+      )}
+
+      {/* Cycling activity icon — kids 3-8 read the icon, not the text.
+          Re-mounted with a key so the scale-in CSS animation re-fires on
+          every swap. Hidden when Colo is speaking (audio narrates) and
+          when the partial image has landed (the image is the focal
+          point). */}
+      {!isPlaying && !partialImageUrl && (
+        <div
+          key={`loading-icon-${currentMessageIndex}`}
+          className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-lg border-2 border-crayon-orange-light animate-icon-pop"
+        >
+          <FontAwesomeIcon
+            icon={LOADING_ICONS[currentMessageIndex]}
+            className="text-4xl text-crayon-orange"
+            // FA duotone secondary uses --fa-secondary-* CSS vars; lean
+            // pink-light to colour the back-layer warmly.
+            style={{
+              ['--fa-secondary-color' as string]: 'rgb(255 192 192 / 1)',
+              ['--fa-secondary-opacity' as string]: 0.8,
+            }}
+          />
         </div>
       )}
 
@@ -240,9 +298,15 @@ const ColoLoading = ({
           pop-up. */}
       {partialImageUrl && (
         <div className="mt-6 flex flex-col items-center gap-2 animate-fade-in">
-          <p className="font-tondo font-medium text-sm text-crayon-orange">
-            ✨ Your coloring page is appearing…
-          </p>
+          <div className="flex items-center gap-2">
+            <FontAwesomeIcon
+              icon={faSparkles}
+              className="text-crayon-orange text-base"
+            />
+            <p className="font-tondo font-medium text-sm text-crayon-orange">
+              {t('partialAppearing')}
+            </p>
+          </div>
           {/* Plain <img> rather than next/image: the data: URL changes on
               each partial and next/image's optimization pipeline is
               wrong for that. */}
