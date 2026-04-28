@@ -18,7 +18,8 @@
       "wavingWand": "Je agite ma baguette...",
       "coloringOutsideLines": "Je dépasse un peu (oups !)..."
     },
-    "pageLoading": "Je prépare tes crayons !"
+    "pageLoading": "Je prépare tes crayons !",
+    "partialAppearing": "Ton coloriage apparaît…"
   },
   "colo": {
     "dashboard": {

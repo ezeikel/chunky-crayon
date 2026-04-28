@@ -18,7 +18,8 @@
       "wavingWand": "Ich schwinge meinen Zauberstab...",
       "coloringOutsideLines": "Außerhalb der Linien malen (ups!)..."
     },
-    "pageLoading": "Ich mache deine Buntstifte startklar!"
+    "pageLoading": "Ich mache deine Buntstifte startklar!",
+    "partialAppearing": "Dein Ausmalbild erscheint…"
   },
   "colo": {
     "dashboard": {
