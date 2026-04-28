@@ -24,7 +24,6 @@ import { generateColoredReferenceLocal } from "./record/colored-reference.js";
 import { generateFillPointsLocal } from "./record/fill-points.js";
 import { db } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
-import sharp from "sharp";
 import { generateReelScript } from "./script/generate.js";
 import { shortenPromptForReel } from "./script/short-prompt.js";
 import { generateVoiceClip } from "./voice/elevenlabs.js";
@@ -33,6 +32,8 @@ import {
   synthesiseVoiceAnswers,
 } from "./voice/voice-reel-fixtures.js";
 import { proxyToLocal } from "./video/v2/proxy.js";
+import { buildDemoReelCover } from "./video/v2/cover.js";
+import { pickBestPalette } from "./video/v2/palette.js";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
@@ -1578,6 +1579,20 @@ app.post("/publish/v2", async (c) => {
       ? JSON.parse(row.regionsJson)
       : row.regionsJson;
 
+  // Pick the healthiest palette variant ONCE so the cover thumbnail and
+  // the on-camera Magic Brush reveal stay visually consistent. Default
+  // is `realistic` — most natural-looking thumbnail for social — with
+  // automatic fallback when that variant collapsed to <3 distinct hexes
+  // during region-store generation. See `palette.ts` for the heuristic.
+  const palettePick = pickBestPalette(parsedRegionsJson, {
+    preferred: "realistic",
+    minDistinctColors: 3,
+  });
+  console.log(
+    `[/publish/v2] palette: chose "${palettePick.variant}" (${palettePick.distinctColors} distinct${palettePick.fellBack ? `; fell back from realistic` : ""}) — counts=${JSON.stringify(palettePick.counts)}`,
+  );
+  const bestPalette = palettePick.variant;
+
   // Resolve the ~8-word "kid-typed" version of this image's title +
   // description. Same string is:
   //   - typed into the on-screen textarea (text variant only)
@@ -1622,7 +1637,7 @@ app.post("/publish/v2", async (c) => {
         regionMapHeight: row.regionMapHeight ?? 1024,
         regionsJson: parsedRegionsJson,
         svgUrl: proxiedSvg,
-        paletteVariant: "cute",
+        paletteVariant: bestPalette,
         backgroundMusicUrl: reelAudio.backgroundMusicUrl,
         kidVoiceUrl: reelAudio.kidVoiceUrl,
         adultVoiceUrl: reelAudio.adultVoiceUrl,
@@ -1662,7 +1677,7 @@ app.post("/publish/v2", async (c) => {
         regionMapHeight: row.regionMapHeight ?? 1024,
         regionsJson: parsedRegionsJson,
         svgUrl: proxiedSvg,
-        paletteVariant: "cute",
+        paletteVariant: bestPalette,
         backgroundMusicUrl: reelAudio.backgroundMusicUrl,
         kidVoiceUrl: reelAudio.kidVoiceUrl,
         adultVoiceUrl: reelAudio.adultVoiceUrl,
@@ -1709,7 +1724,7 @@ app.post("/publish/v2", async (c) => {
         regionMapHeight: row.regionMapHeight ?? 1024,
         regionsJson: parsedRegionsJson,
         svgUrl: proxiedSvg,
-        paletteVariant: "cute",
+        paletteVariant: bestPalette,
         q1AudioUrl: pQ1,
         q2AudioUrl: pQ2,
         a1AudioUrl: pA1,
@@ -1749,16 +1764,24 @@ app.post("/publish/v2", async (c) => {
     publishedUrl = url;
     console.log(`[/publish/v2] uploaded mp4 to R2: ${url}`);
 
-    // Cover: convert the row's finished colored image (webp) to JPEG and
-    // upload. Pinterest requires JPEG, IG renders any image fine. Falls
-    // back gracefully if conversion fails — post route already handles
+    // Cover: build the same flat-fill region-store composite the viewer
+    // sees at the end of the Magic Brush sweep — line art over palette
+    // colours. Mirrors V1's runtime canvas composite (drawing canvas +
+    // image canvas multiply blend) but reconstructed in pure Node from
+    // the same R2 inputs the Remotion comp uses.
+    //
+    // Falls back gracefully on failure; post route already handles a
     // missing demoReelCoverUrl by using a default IG/FB video frame.
     try {
-      const coloredResp = await fetch(row.url);
-      if (!coloredResp.ok)
-        throw new Error(`fetch row.url ${coloredResp.status}`);
-      const coloredBuf = Buffer.from(await coloredResp.arrayBuffer());
-      const jpegBuf = await sharp(coloredBuf).jpeg({ quality: 88 }).toBuffer();
+      const jpegBuf = await buildDemoReelCover({
+        regionMapUrl: row.regionMapUrl,
+        regionMapWidth: row.regionMapWidth ?? 1024,
+        regionMapHeight: row.regionMapHeight ?? 1024,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        regionsJson: parsedRegionsJson as any,
+        svgUrl: row.svgUrl,
+        paletteVariant: bestPalette,
+      });
       const coverKey = `reels/demo-v2/${row.id}-${stamp}-${variant}-cover.jpg`;
       const { url: coverUrl } = await put(coverKey, jpegBuf, {
         contentType: "image/jpeg",
@@ -1766,7 +1789,7 @@ app.post("/publish/v2", async (c) => {
       });
       publishedCoverUrl = coverUrl;
       console.log(
-        `[/publish/v2] uploaded cover to R2: ${coverUrl} (${jpegBuf.byteLength} bytes)`,
+        `[/publish/v2] uploaded cover to R2: ${coverUrl} (${jpegBuf.byteLength} bytes, region-store fill)`,
       );
     } catch (err) {
       console.warn(
