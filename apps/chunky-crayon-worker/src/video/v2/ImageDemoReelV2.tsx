@@ -282,8 +282,14 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
           <Audio src={staticFile("v2-sfx/pop.mp3")} volume={0.7} />
         </Sequence>
 
-        {/* Kid voiceover narrates the upload scene. */}
-        {kidVoiceUrl ? <Audio src={kidVoiceUrl} volume={1} /> : null}
+        {/* Adult-narrator reaction line — starts AFTER the photo finishes
+            its drop-in (frame 60), so the viewer sees the photo land
+            before they hear "oh, a meadow…". Audio is on the inputProps
+            field still named `kidVoiceUrl` for parity with the text reel
+            comp; the worker sends the adult-spoken file in for image mode. */}
+        <Sequence from={60}>
+          {kidVoiceUrl ? <Audio src={kidVoiceUrl} volume={1} /> : null}
+        </Sequence>
       </Sequence>
 
       {/* ── Beat 4: canvas + toolbar + palette — identical to text ───── */}
