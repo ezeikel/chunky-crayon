@@ -663,6 +663,7 @@ async function runPublishReel(c: Context) {
     const script = await generateReelScript({
       prompt: prompt as string,
       imageTitle: imageRow?.title,
+      mode: "text",
     });
     console.log("[/publish/reel] script:", script);
 
@@ -674,7 +675,7 @@ async function runPublishReel(c: Context) {
     if (kidVoiceId && adultVoiceId) {
       await Promise.all([
         generateVoiceClip({
-          text: script.kidLine,
+          text: script.earlyLine,
           voiceId: kidVoiceId,
           outputPath: kidPath,
         }),
@@ -1057,8 +1058,9 @@ async function runPublishImageReel(c: Context) {
   let adultVoiceUrl: string | undefined;
   try {
     const script = await generateReelScript({
-      prompt: "photo upload",
+      prompt: imageRow?.title ?? "photo upload",
       imageTitle: imageRow?.title,
+      mode: "image",
     });
 
     const kidPath = resolve(WORKER_OUT_DIR, `${Date.now()}-kid.mp3`);
@@ -1067,10 +1069,13 @@ async function runPublishImageReel(c: Context) {
     const adultVoiceId = process.env.ELEVENLABS_ADULT_VOICE_ID;
 
     if (kidVoiceId && adultVoiceId) {
+      // Image mode: earlyVoice is "adult" so both lines use adult voice id.
+      const earlyVoiceId =
+        script.earlyVoice === "adult" ? adultVoiceId : kidVoiceId;
       await Promise.all([
         generateVoiceClip({
-          text: script.kidLine,
-          voiceId: kidVoiceId,
+          text: script.earlyLine,
+          voiceId: earlyVoiceId,
           outputPath: kidPath,
         }),
         generateVoiceClip({
@@ -1441,7 +1446,15 @@ const buildV2ReelAudio = async (args: {
   let kidVoiceUrl: string | undefined;
   let adultVoiceUrl: string | undefined;
   try {
-    const script = await generateReelScript({ prompt, imageTitle });
+    // Voice reel already has its own Q1/Q2/A1/A2 conversation audio — it
+    // only needs the adult outro line, no kid early line. Treat voice as
+    // "text" for script generation; we'll just discard script.earlyLine.
+    const scriptMode = variant === "image" ? "image" : "text";
+    const script = await generateReelScript({
+      prompt,
+      imageTitle,
+      mode: scriptMode,
+    });
     console.log(`${tag} script:`, script);
 
     const kidVoiceId = process.env.ELEVENLABS_KID_VOICE_ID;
@@ -1455,7 +1468,6 @@ const buildV2ReelAudio = async (args: {
     const adultPath = resolve(WORKER_OUT_DIR, `${stamp}-${imageId}-adult.mp3`);
 
     if (variant === "voice") {
-      // Voice reel already has Q1/Q2/A1/A2; only the adult outro line is needed.
       await generateVoiceClip({
         text: script.adultLine,
         voiceId: adultVoiceId,
@@ -1464,15 +1476,20 @@ const buildV2ReelAudio = async (args: {
       adultVoiceUrl = `http://localhost:${port}/tmp/${adultPath.split("/").pop()}`;
       console.log(`${tag} adult outro voice ready: ${adultVoiceUrl}`);
     } else {
-      const kidPath = resolve(
+      // text + image: generate the early line + adult outro in parallel.
+      // For image variant, earlyVoice='adult' so the "kid" slot is actually
+      // adult-spoken (parent-y reaction to the photo).
+      const earlyPath = resolve(
         WORKER_OUT_DIR,
-        `${stamp + 1}-${imageId}-kid.mp3`,
+        `${stamp + 1}-${imageId}-early.mp3`,
       );
+      const earlyVoiceId =
+        script.earlyVoice === "adult" ? adultVoiceId : kidVoiceId;
       await Promise.all([
         generateVoiceClip({
-          text: script.kidLine,
-          voiceId: kidVoiceId,
-          outputPath: kidPath,
+          text: script.earlyLine,
+          voiceId: earlyVoiceId,
+          outputPath: earlyPath,
         }),
         generateVoiceClip({
           text: script.adultLine,
@@ -1480,10 +1497,12 @@ const buildV2ReelAudio = async (args: {
           outputPath: adultPath,
         }),
       ]);
-      kidVoiceUrl = `http://localhost:${port}/tmp/${kidPath.split("/").pop()}`;
+      // Comp prop is still called `kidVoiceUrl` for both variants — only the
+      // speaker behind the file changes (kid for text, adult for image).
+      kidVoiceUrl = `http://localhost:${port}/tmp/${earlyPath.split("/").pop()}`;
       adultVoiceUrl = `http://localhost:${port}/tmp/${adultPath.split("/").pop()}`;
       console.log(
-        `${tag} voice clips ready: kid=${kidVoiceUrl} adult=${adultVoiceUrl}`,
+        `${tag} voice clips ready: early(${script.earlyVoice})=${kidVoiceUrl} adult=${adultVoiceUrl}`,
       );
     }
   } catch (err) {

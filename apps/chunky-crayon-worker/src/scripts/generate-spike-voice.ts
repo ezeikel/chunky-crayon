@@ -37,13 +37,14 @@ async function main() {
   const script = await generateReelScript({
     prompt: PROMPT,
     imageTitle: TITLE,
+    mode: "text",
   });
   console.log("[generate-spike-voice] script:", script);
 
   console.log("[generate-spike-voice] generating kid clip…");
   const kidPath = `${OUT_DIR}/koala-kid-voice.mp3`;
   await generateVoiceClip({
-    text: script.kidLine,
+    text: script.earlyLine,
     voiceId: kidVoiceId,
     outputPath: kidPath,
   });

@@ -79,16 +79,16 @@ export const SHADOWS = {
 } as const;
 
 /**
- * Fonts — must be registered with Remotion via `loadFont()` before any
- * composition that uses them renders. See `apps/chunky-crayon-worker/src/
- * video/fonts.ts` for the existing setup.
- *
- * Stack values match `--font-coloring-heading` / `--font-coloring-body`
- * in global.css.
+ * Fonts — Tondo is the only family shipped to the worker (loaded as
+ * base64-inlined CSS via `<link>` from `../fonts.ts`). The live web app
+ * uses Rooney Sans for body copy, but it isn't packaged for the worker;
+ * defaulting body to Tondo keeps every reel rendering chunky and on-brand
+ * instead of falling back to system sans (was the V2 outro card bug).
+ * AdVideo.tsx made the same call for the same reason.
  */
 export const FONTS = {
   heading: '"Tondo", ui-rounded, system-ui, sans-serif',
-  body: '"Rooney Sans", ui-rounded, system-ui, sans-serif',
+  body: '"Tondo", ui-rounded, system-ui, sans-serif',
 } as const;
 
 /** Font weights tuned for kids brand (chunky, confident). */
