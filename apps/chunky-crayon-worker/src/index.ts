@@ -524,30 +524,44 @@ app.post("/generate/coloring-image-stream", async (c) => {
   if (!body.prompt || typeof body.prompt !== "string") {
     return c.json({ error: "prompt required" }, 400);
   }
-  if (
-    !body.referenceImageUrls ||
-    !Array.isArray(body.referenceImageUrls) ||
-    body.referenceImageUrls.length === 0
-  ) {
+
+  const hasRefs =
+    Array.isArray(body.referenceImageUrls) &&
+    body.referenceImageUrls.length > 0;
+  const hasInline =
+    Array.isArray(body.imagesInline) && body.imagesInline.length > 0;
+
+  if (!hasRefs && !hasInline) {
     return c.json(
-      { error: "referenceImageUrls required (at least 1, max 4)" },
+      {
+        error:
+          "either referenceImageUrls (text/voice path) or imagesInline (photo path) required",
+      },
       400,
     );
   }
-  if (body.referenceImageUrls.length > 4) {
+  if (hasRefs && body.referenceImageUrls!.length > 4) {
     return c.json({ error: "max 4 reference images" }, 400);
+  }
+  if (hasInline && body.imagesInline!.length > 4) {
+    return c.json({ error: "max 4 inline images" }, 400);
   }
 
   const input: StreamColoringImageInput = {
     prompt: body.prompt,
     referenceImageUrls: body.referenceImageUrls,
+    imagesInline: body.imagesInline,
     size: body.size,
     quality: body.quality,
     partialImages: body.partialImages,
   };
 
   console.log(
-    `[/generate/coloring-image-stream] starting: refs=${input.referenceImageUrls.length} q=${input.quality ?? "high"}`,
+    `[/generate/coloring-image-stream] starting: ${
+      hasInline
+        ? `inlineImages=${body.imagesInline!.length}`
+        : `refs=${body.referenceImageUrls!.length}`
+    } q=${input.quality ?? "high"}`,
   );
 
   return streamSSE(

@@ -37,7 +37,13 @@ import { requestAllPipelineFromWorker } from '@/lib/worker';
 export const runtime = 'nodejs';
 export const maxDuration = 300; // Vercel max; gen + stream can run ~3-4min
 
-const TEXT_CREDIT_COST = 5;
+// Per-mode credit costs. Voice runs richer pipelines (Deepgram + Claude
+// follow-up + ElevenLabs), so it's gated higher than text/photo.
+const CREDIT_COST: Record<'text' | 'photo' | 'voice', number> = {
+  text: 5,
+  photo: 5,
+  voice: 10,
+};
 
 // ---------------------------------------------------------------------------
 // SSE writer
@@ -145,30 +151,71 @@ const refundCredits = async (userId: string, amount: number): Promise<void> => {
 // Route handler
 // ---------------------------------------------------------------------------
 
+type StreamBody = {
+  /** Selects which input pipeline runs upstream of the OpenAI call. */
+  mode?: 'text' | 'photo' | 'voice';
+  /** text + voice: the kid's typed/spoken description. */
+  description?: string;
+  /** photo: base64 of the kid's uploaded photo. Mutually exclusive with
+   *  description; we pass the photo to images.edit and rely on
+   *  PHOTO_TO_COLORING_SYSTEM to convert it. */
+  photoBase64?: string;
+  /** voice: the two-turn answers the user gave to Q1/Q2. We concatenate
+   *  them into the description used by the prompt. */
+  firstAnswer?: string;
+  secondAnswer?: string;
+  locale?: string;
+  clientDistinctId?: string;
+};
+
 export const POST = async (request: Request) => {
   const userId = await getUserId(ACTIONS.CREATE_COLORING_IMAGE);
   if (!userId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as {
-    description?: string;
-    locale?: string;
-    clientDistinctId?: string;
-  };
-  if (!body.description || typeof body.description !== 'string') {
-    return NextResponse.json(
-      { error: 'description required' },
-      { status: 400 },
-    );
+  const body = (await request.json().catch(() => ({}))) as StreamBody;
+  const mode: 'text' | 'photo' | 'voice' = body.mode ?? 'text';
+
+  // Per-mode body validation. Builds the description string up-front so
+  // the rest of the handler can stay generic.
+  let description: string;
+  if (mode === 'text') {
+    if (!body.description || typeof body.description !== 'string') {
+      return NextResponse.json(
+        { error: 'description required for text mode' },
+        { status: 400 },
+      );
+    }
+    description = body.description.trim();
+  } else if (mode === 'voice') {
+    const a1 = body.firstAnswer?.trim() ?? '';
+    const a2 = body.secondAnswer?.trim() ?? '';
+    if (!a1 || !a2) {
+      return NextResponse.json(
+        { error: 'firstAnswer + secondAnswer required for voice mode' },
+        { status: 400 },
+      );
+    }
+    description = `${a1} ${a2}`.trim();
+  } else {
+    if (!body.photoBase64 || typeof body.photoBase64 !== 'string') {
+      return NextResponse.json(
+        { error: 'photoBase64 required for photo mode' },
+        { status: 400 },
+      );
+    }
+    description = ''; // photo mode has no kid-typed description
   }
+
+  const creditCost = CREDIT_COST[mode];
 
   // Pre-flight credit check.
   const user = await db.user.findUnique({
     where: { id: userId },
     select: { credits: true },
   });
-  if (!user || user.credits < TEXT_CREDIT_COST) {
+  if (!user || user.credits < creditCost) {
     return NextResponse.json(
       { error: 'insufficient_credits', credits: user?.credits ?? 0 },
       { status: 402 },
@@ -177,21 +224,65 @@ export const POST = async (request: Request) => {
 
   const activeProfile = await getActiveProfile();
 
-  // Build the fully-baked prompt — style block + closed-contours + the
-  // user's description. Difficulty modifier applied if profile has one
-  // other than BEGINNER (matches createColoringImage server action).
-  const corePrompt =
-    activeProfile?.difficulty && activeProfile.difficulty !== 'BEGINNER'
-      ? prompts.createDifficultyAwarePrompt(
-          body.description,
-          activeProfile.difficulty,
-        )
-      : prompts.createColoringImagePrompt(body.description);
-  const styledPrompt = `The provided images show the target coloring book style. Match their line weight, simplicity, and outline-only aesthetic.\n\n${corePrompt}`;
+  // Build the fully-baked prompt + image inputs based on mode.
+  let workerBody: {
+    prompt: string;
+    referenceImageUrls?: string[];
+    imagesInline?: { b64: string; ext: 'png' | 'jpeg' | 'webp' }[];
+    size: '1024x1024';
+    quality: 'high';
+    partialImages: 3;
+  };
+
+  if (mode === 'photo') {
+    // Photo path: NO style refs (they cause cartoon drift on photos).
+    // The photo IS the input image. Prompt is the photo-to-coloring
+    // system+user prompt with optional difficulty modifier.
+    const photoPrompt = `${prompts.PHOTO_TO_COLORING_SYSTEM}\n\n${prompts.createPhotoToColoringPrompt(
+      activeProfile?.difficulty && activeProfile.difficulty !== 'BEGINNER'
+        ? activeProfile.difficulty
+        : undefined,
+    )}`;
+
+    // Strip any data URL prefix and detect the file extension for the
+    // worker. Browsers tend to upload as image/jpeg or image/png; we
+    // don't accept HEIC etc on the client so this stays simple.
+    const raw = body.photoBase64!.replace(/^data:image\/(\w+);base64,/, '');
+    const extMatch = body.photoBase64!.match(/^data:image\/(\w+);base64,/);
+    const ext = (extMatch?.[1] ?? 'png') as 'png' | 'jpeg' | 'webp';
+
+    workerBody = {
+      prompt: photoPrompt,
+      imagesInline: [{ b64: raw, ext }],
+      size: '1024x1024',
+      quality: 'high',
+      partialImages: 3,
+    };
+  } else {
+    // Text + voice paths: build the prompt the same way (concatenated
+    // description + style block + closed-contours), use shared style
+    // reference images.
+    const corePrompt =
+      activeProfile?.difficulty && activeProfile.difficulty !== 'BEGINNER'
+        ? prompts.createDifficultyAwarePrompt(
+            description,
+            activeProfile.difficulty,
+          )
+        : prompts.createColoringImagePrompt(description);
+    const styledPrompt = `The provided images show the target coloring book style. Match their line weight, simplicity, and outline-only aesthetic.\n\n${corePrompt}`;
+
+    workerBody = {
+      prompt: styledPrompt,
+      referenceImageUrls: REFERENCE_IMAGES.slice(0, 4),
+      size: '1024x1024',
+      quality: 'high',
+      partialImages: 3,
+    };
+  }
 
   // Debit credits BEFORE the long stream so concurrent requests can't
   // race to exhaust a balance. We refund on stream failure below.
-  await debitCredits(userId, TEXT_CREDIT_COST);
+  await debitCredits(userId, creditCost);
 
   const startedAt = Date.now();
 
@@ -207,9 +298,9 @@ export const POST = async (request: Request) => {
         if (creditsRefunded) return;
         creditsRefunded = true;
         try {
-          await refundCredits(userId, TEXT_CREDIT_COST);
+          await refundCredits(userId, creditCost);
           console.log(
-            `[generate-stream] refunded ${TEXT_CREDIT_COST} credits to ${userId} (${reason})`,
+            `[generate-stream] refunded ${creditCost} credits to ${userId} (${reason})`,
           );
         } catch (err) {
           console.error('[generate-stream] credit refund failed:', err);
@@ -231,13 +322,7 @@ export const POST = async (request: Request) => {
                 ? { Authorization: `Bearer ${workerSecret}` }
                 : {}),
             },
-            body: JSON.stringify({
-              prompt: styledPrompt,
-              referenceImageUrls: REFERENCE_IMAGES.slice(0, 4),
-              size: '1024x1024',
-              quality: 'high',
-              partialImages: 3,
-            }),
+            body: JSON.stringify(workerBody),
           },
         );
 
@@ -269,18 +354,21 @@ export const POST = async (request: Request) => {
             const imageBuffer = Buffer.from(evt.b64_json, 'base64');
 
             try {
-              // body.description is checked before stream open above;
-              // captured into a const so TS can narrow it across the
-              // ReadableStream start() closure.
-              const safeDescription = body.description as string;
               const persisted = await persistGeneratedColoringImage({
                 imageBuffer,
-                description: safeDescription,
+                // For photo mode there's no kid description to thread through
+                // as sourcePrompt; persist accepts an empty string and won't
+                // populate sourcePrompt in that case.
+                description,
                 userId,
                 profileId: activeProfile?.id ?? undefined,
                 generationType: GenerationType.USER,
                 locale: body.locale ?? 'en',
                 clientDistinctId: body.clientDistinctId,
+                // purposeKey splits voice-sourced rows from text/image so
+                // analytics + admin filters can isolate them. Matches the
+                // legacy createColoringImageFromVoiceConversation behavior.
+                purposeKey: mode === 'voice' ? 'voice' : undefined,
               });
 
               // Fire derived-asset pipeline (region store, colored ref,
@@ -301,9 +389,9 @@ export const POST = async (request: Request) => {
               const durationMs = Date.now() - startedAt;
               await trackWithUser(userId, TRACKING_EVENTS.CREATION_COMPLETED, {
                 coloringImageId: persisted.id,
-                description: safeDescription,
+                description,
                 durationMs,
-                creditsUsed: TEXT_CREDIT_COST,
+                creditsUsed: creditCost,
               });
 
               controller.close();

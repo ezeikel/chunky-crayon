@@ -57,7 +57,12 @@ const LOCALE_LANGUAGE_MAP: Record<
 export type PersistColoringImageOptions = {
   /** Raw image buffer from the provider (PNG bytes typical for gpt-image-2). */
   imageBuffer: Buffer;
-  /** Original user-supplied description, used as sourcePrompt. */
+  /**
+   * Original user-supplied description, used as sourcePrompt. Empty
+   * string is allowed — for photo mode the kid uploaded a picture and
+   * never wrote a description; we leave sourcePrompt null in that case
+   * (the AI vision metadata pass produces title/alt/tags from the image).
+   */
   description: string;
   /** Authenticated user id (always present for user-facing flows). */
   userId: string;

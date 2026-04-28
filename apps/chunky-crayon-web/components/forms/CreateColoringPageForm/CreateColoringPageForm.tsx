@@ -5,11 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
 import { useLocale } from 'next-intl';
 import posthog from 'posthog-js';
-import {
-  createColoringImage,
-  createColoringImageFromVoiceConversation,
-} from '@/app/actions/coloring-image';
-import { createColoringImageFromPhoto } from '@/app/actions/photo-to-coloring';
 import { generateLoadingAudio } from '@/app/actions/loading-audio';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
@@ -30,7 +25,7 @@ import {
   type InputMode,
 } from './inputs';
 import FormCTA from './FormCTA';
-import { submitTextStreaming } from './submitTextStreaming';
+import { submitColoringImageStreaming } from './submitColoringImageStreaming';
 import type { ColoringImage } from '@one-colored-pixel/db';
 
 type ColoringImageActionResult =
@@ -162,30 +157,31 @@ const MultiModeForm = ({
 
         let coloringImage: ColoringImageActionResult;
 
-        if (inputType === 'image' && imageBase64) {
-          coloringImage = await createColoringImageFromPhoto(
-            imageBase64,
-            locale,
-          );
-        } else {
-          // Text path — call the streaming SSE endpoint so the user sees
-          // partial frames before final. This keeps the form action
-          // pending while the stream runs (useFormStatus().pending stays
-          // true) and only resolves when we get { type: 'final' } or an
-          // error event.
-          const streamResult = await submitTextStreaming({
-            description: desc,
-            locale,
-            clientDistinctId,
-            onPartial: (b64) => {
-              setPartialImageUrl(`data:image/png;base64,${b64}`);
-            },
-          });
-          // Normalize stream result to the shared ColoringImageActionResult
-          // shape so the rest of the action treats text + photo uniformly.
-          coloringImage =
-            'error' in streamResult ? streamResult : { id: streamResult.id };
-        }
+        // Both text + photo use the streaming SSE pipeline. The mode
+        // param tells the server which input prompt + reference set to
+        // use upstream of the OpenAI call. useFormStatus().pending stays
+        // true throughout the SSE stream so the loading overlay shows.
+        const onPartial = (b64: string) => {
+          setPartialImageUrl(`data:image/png;base64,${b64}`);
+        };
+        const streamResult =
+          inputType === 'image' && imageBase64
+            ? await submitColoringImageStreaming({
+                mode: 'photo',
+                photoBase64: imageBase64,
+                locale,
+                clientDistinctId,
+                onPartial,
+              })
+            : await submitColoringImageStreaming({
+                mode: 'text',
+                description: desc,
+                locale,
+                clientDistinctId,
+                onPartial,
+              });
+        coloringImage =
+          'error' in streamResult ? streamResult : { id: streamResult.id };
 
         if ('error' in coloringImage) {
           console.error(coloringImage.error);
@@ -307,18 +303,22 @@ const MultiModeForm = ({
               characterCount: desc.length,
             });
 
-            const coloringImage =
-              await createColoringImageFromVoiceConversation({
-                firstAnswer,
-                secondAnswer,
-                locale,
-                clientDistinctId,
-              });
+            const streamResult = await submitColoringImageStreaming({
+              mode: 'voice',
+              firstAnswer,
+              secondAnswer,
+              locale,
+              clientDistinctId: clientDistinctId ?? null,
+              onPartial: (b64) => {
+                setPartialImageUrl(`data:image/png;base64,${b64}`);
+              },
+            });
 
-            if ('error' in coloringImage) {
-              console.error(coloringImage.error);
+            if ('error' in streamResult) {
+              console.error(streamResult.error);
               setAudioUrl(null);
               setAudioState('idle');
+              setPartialImageUrl(null);
               return;
             }
 
@@ -333,9 +333,8 @@ const MultiModeForm = ({
 
             setAudioUrl(null);
             setAudioState('idle');
-            if (coloringImage.id) {
-              router.push(`/coloring-image/${coloringImage.id}`);
-            }
+            setPartialImageUrl(null);
+            router.push(`/coloring-image/${streamResult.id}`);
           }}
         />
       )}

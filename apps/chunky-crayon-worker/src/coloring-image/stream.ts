@@ -34,10 +34,18 @@ export type StreamColoringImageInput = {
    */
   prompt: string;
   /**
-   * Reference image URLs (R2-hosted style guides). Up to 4. Worker
-   * fetches each as a File before calling images.edit.
+   * Reference image URLs (R2-hosted) for the text/voice paths — style
+   * guide images. Worker fetches each as a File before calling
+   * images.edit. Up to 4. Mutually exclusive with imagesInline.
    */
-  referenceImageUrls: string[];
+  referenceImageUrls?: string[];
+  /**
+   * Inline base64-encoded images for the photo path — the kid's
+   * uploaded photo itself. Sent inline because the photo is in the
+   * browser, not yet in R2. Worker decodes and wraps each as a File.
+   * Mutually exclusive with referenceImageUrls.
+   */
+  imagesInline?: { b64: string; ext: "png" | "jpeg" | "webp" }[];
   /** Currently always 1024x1024 + high but kept overridable for future. */
   size?: "1024x1024" | "1024x1536" | "1536x1024" | "auto";
   quality?: "low" | "medium" | "high" | "auto";
@@ -60,6 +68,17 @@ const fetchReferenceFiles = async (urls: string[]): Promise<File[]> => {
       return new File([buf], `ref-${i}.${ext}`, { type: `image/${ext}` });
     }),
   );
+};
+
+const decodeInlineFiles = (
+  inline: { b64: string; ext: "png" | "jpeg" | "webp" }[],
+): File[] => {
+  return inline.map((entry, i) => {
+    const buf = Buffer.from(entry.b64, "base64");
+    return new File([new Uint8Array(buf)], `inline-${i}.${entry.ext}`, {
+      type: `image/${entry.ext}`,
+    });
+  });
 };
 
 const writeJsonEvent = async (
@@ -85,7 +104,19 @@ export const streamColoringImage = async (
   if (!apiKey) throw new Error("OPENAI_API_KEY not set on worker");
   const client = new OpenAI({ apiKey });
 
-  const refs = await fetchReferenceFiles(input.referenceImageUrls);
+  // Resolve the input image set: inline base64 (photo path) wins over
+  // referenceImageUrls (text/voice paths). Caller should send exactly one;
+  // we tolerate both being absent only because OpenAI requires at least 1.
+  let imageFiles: File[];
+  if (input.imagesInline && input.imagesInline.length > 0) {
+    imageFiles = decodeInlineFiles(input.imagesInline);
+  } else if (input.referenceImageUrls && input.referenceImageUrls.length > 0) {
+    imageFiles = await fetchReferenceFiles(input.referenceImageUrls);
+  } else {
+    throw new Error(
+      "[stream] either imagesInline or referenceImageUrls must be provided",
+    );
+  }
 
   // openai SDK 6 returns an async iterable when stream:true. Each event
   // is one of:
@@ -93,7 +124,7 @@ export const streamColoringImage = async (
   //   ImageEditCompletedEvent    { type: 'image_edit.completed';      b64_json }
   const oaiStream = await client.images.edit({
     model: "gpt-image-2",
-    image: refs,
+    image: imageFiles,
     prompt: input.prompt,
     size: input.size ?? "1024x1024",
     quality: input.quality ?? "high",

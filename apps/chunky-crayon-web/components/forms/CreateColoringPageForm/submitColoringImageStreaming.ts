@@ -1,5 +1,5 @@
 /**
- * Client-side SSE consumer for the text-input create flow.
+ * Client-side SSE consumer for the create flow.
  *
  * Posts to /api/coloring-image/generate-stream and reads the SSE response.
  * Calls onPartial() for each `partial` event, resolves with the new
@@ -7,16 +7,39 @@
  *
  * The promise stays pending while the SSE stream is open so that
  * <form>'s useFormStatus().pending remains true throughout the long wait.
+ *
+ * Modes:
+ *   - 'text':  description is the kid's typed prompt.
+ *   - 'photo': photoBase64 is the kid's uploaded photo (as data URL or
+ *              raw base64). Photo mode skips style refs server-side.
+ *   - 'voice': firstAnswer + secondAnswer are the two voice answers.
+ *              Server concatenates them into a description.
  */
-export type SubmitTextStreamingArgs = {
-  description: string;
-  locale: string;
-  clientDistinctId: string | null;
-  /** Called for each partial-image SSE event with the raw base64 PNG. */
-  onPartial?: (b64: string, index: number) => void;
-};
+export type SubmitStreamingArgs =
+  | {
+      mode: 'text';
+      description: string;
+      locale: string;
+      clientDistinctId: string | null;
+      onPartial?: (b64: string, index: number) => void;
+    }
+  | {
+      mode: 'photo';
+      photoBase64: string;
+      locale: string;
+      clientDistinctId: string | null;
+      onPartial?: (b64: string, index: number) => void;
+    }
+  | {
+      mode: 'voice';
+      firstAnswer: string;
+      secondAnswer: string;
+      locale: string;
+      clientDistinctId: string | null;
+      onPartial?: (b64: string, index: number) => void;
+    };
 
-export type SubmitTextStreamingResult =
+export type SubmitStreamingResult =
   | { id: string }
   | { error: string; credits?: number };
 
@@ -59,25 +82,41 @@ async function* readSSE(
         yield JSON.parse(dataLine) as ServerEvent;
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.warn('[submitTextStreaming] failed to parse SSE block:', err);
+        console.warn('[submitStreaming] failed to parse SSE block:', err);
       }
     }
   }
 }
 
-export const submitTextStreaming = async (
-  args: SubmitTextStreamingArgs,
-): Promise<SubmitTextStreamingResult> => {
+const buildPayload = (args: SubmitStreamingArgs): Record<string, unknown> => {
+  const base = {
+    mode: args.mode,
+    locale: args.locale,
+    clientDistinctId: args.clientDistinctId ?? undefined,
+  };
+  if (args.mode === 'text') {
+    return { ...base, description: args.description };
+  }
+  if (args.mode === 'photo') {
+    return { ...base, photoBase64: args.photoBase64 };
+  }
+  // voice
+  return {
+    ...base,
+    firstAnswer: args.firstAnswer,
+    secondAnswer: args.secondAnswer,
+  };
+};
+
+export const submitColoringImageStreaming = async (
+  args: SubmitStreamingArgs,
+): Promise<SubmitStreamingResult> => {
   let resp: Response;
   try {
     resp = await fetch('/api/coloring-image/generate-stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        description: args.description,
-        locale: args.locale,
-        clientDistinctId: args.clientDistinctId ?? undefined,
-      }),
+      body: JSON.stringify(buildPayload(args)),
     });
   } catch (err) {
     return {
