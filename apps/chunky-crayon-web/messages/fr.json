@@ -1271,5 +1271,32 @@
       "subtitle": "L’abonnement revient moins cher si vous créez plus que quelques pages par mois. Et en plus : profils pour frères et sœurs, et des crédits qui s’accumulent.",
       "cta": "Voir les offres"
     }
+  },
+  "feedback": {
+    "title": "Comment peut-on aider ?",
+    "subtitle": "On lit chaque message et on vous répond vite.",
+    "types": {
+      "bug": {
+        "label": "Signaler un bug",
+        "placeholder": "Qu’est-ce qui n’a pas marché ? Si vous pouvez, dites-nous ce que vous faisiez…"
+      },
+      "idea": {
+        "label": "Suggérer une fonctionnalité",
+        "placeholder": "Qu’aimeriez-vous voir ? En quoi ça aiderait ?"
+      },
+      "help": {
+        "label": "Obtenir de l’aide",
+        "placeholder": "Avec quoi avez-vous besoin d’aide ?"
+      },
+      "other": {
+        "label": "Autre chose",
+        "placeholder": "Que souhaitez-vous nous dire ?"
+      }
+    },
+    "emailPlaceholder": "Votre e-mail (facultatif, pour vous répondre)",
+    "sendButton": "Envoyer le message",
+    "sending": "Envoi…",
+    "successTitle": "Merci pour votre retour !",
+    "successMessage": "Merci de prendre le temps de nous aider à nous améliorer."
   }
 }

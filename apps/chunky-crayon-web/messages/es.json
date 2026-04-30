@@ -1271,5 +1271,32 @@
       "subtitle": "La suscripción sale más barata si haces más de unas pocas páginas al mes. Además, perfiles extra para hermanos y créditos que se acumulan.",
       "cta": "Ver planes"
     }
+  },
+  "feedback": {
+    "title": "¿Cómo podemos ayudarte?",
+    "subtitle": "Leemos cada mensaje y te respondemos pronto.",
+    "types": {
+      "bug": {
+        "label": "Reportar un error",
+        "placeholder": "¿Qué salió mal? Si puedes, cuéntanos qué estabas haciendo..."
+      },
+      "idea": {
+        "label": "Sugerir una función",
+        "placeholder": "¿Qué te encantaría ver? ¿Cómo ayudaría?"
+      },
+      "help": {
+        "label": "Obtener ayuda",
+        "placeholder": "¿Con qué necesitas ayuda?"
+      },
+      "other": {
+        "label": "Algo más",
+        "placeholder": "¿Qué te gustaría contarnos?"
+      }
+    },
+    "emailPlaceholder": "Tu correo (opcional, para responderte)",
+    "sendButton": "Enviar mensaje",
+    "sending": "Enviando...",
+    "successTitle": "¡Gracias por tus comentarios!",
+    "successMessage": "Agradecemos que te tomes un momento para ayudarnos a mejorar."
   }
 }

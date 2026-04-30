@@ -1271,5 +1271,32 @@
       "subtitle": "Ein Abo ist günstiger, wenn du mehr als nur ein paar Seiten im Monat machst. Plus Extra-Profile für Geschwister und Credits, die sich ansammeln.",
       "cta": "Pläne ansehen"
     }
+  },
+  "feedback": {
+    "title": "Wie können wir helfen?",
+    "subtitle": "Wir lesen jede Nachricht und melden uns schnell bei dir.",
+    "types": {
+      "bug": {
+        "label": "Fehler melden",
+        "placeholder": "Was ist schiefgelaufen? Wenn du kannst, sag uns, was du gerade gemacht hast ..."
+      },
+      "idea": {
+        "label": "Funktion vorschlagen",
+        "placeholder": "Was würdest du dir wünschen? Wie würde es helfen?"
+      },
+      "help": {
+        "label": "Hilfe bekommen",
+        "placeholder": "Wobei brauchst du Hilfe?"
+      },
+      "other": {
+        "label": "Etwas anderes",
+        "placeholder": "Was möchtest du uns sagen?"
+      }
+    },
+    "emailPlaceholder": "Deine E-Mail (optional, für Rückfragen)",
+    "sendButton": "Nachricht senden",
+    "sending": "Wird gesendet ...",
+    "successTitle": "Danke für dein Feedback!",
+    "successMessage": "Danke, dass du dir Zeit nimmst, uns zu verbessern."
   }
 }
