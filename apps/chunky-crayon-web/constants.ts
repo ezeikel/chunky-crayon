@@ -820,18 +820,18 @@ export const SOCIAL_LINKS = [
     href: 'https://pinterest.com/getchunkycrayon',
     icon: faPinterest,
   },
-  {
-    id: 'x',
-    label: 'X',
-    href: 'https://x.com/chunkycrayon',
-    icon: faXTwitter,
-  },
-  {
-    id: 'threads',
-    label: 'Threads',
-    href: 'https://threads.net/@getchunkycrayon',
-    icon: faThreads,
-  },
+  // {
+  //   id: 'x',
+  //   label: 'X',
+  //   href: 'https://x.com/chunkycrayon',
+  //   icon: faXTwitter,
+  // },
+  // {
+  //   id: 'threads',
+  //   label: 'Threads',
+  //   href: 'https://threads.net/@getchunkycrayon',
+  //   icon: faThreads,
+  // },
   // {
   //   id: 'youtube',
   //   label: 'YouTube',

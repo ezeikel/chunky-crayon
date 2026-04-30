@@ -6,7 +6,7 @@ import { getTranslations } from 'next-intl/server';
 import { cacheLife } from 'next/cache';
 import cn from '@/utils/cn';
 import { SOCIAL_LINKS } from '@/constants';
-import AppStoreButtons from '@/components/AppStoreButtons';
+import AppStoreSection from '@/components/AppStoreSection';
 import JoinColoringPageEmailListForm from '@/components/forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 
 // Cache the year calculation separately from translations
@@ -84,12 +84,7 @@ const Footer = async ({ className }: FooterProps) => {
               ))}
             </ul>
           </div>
-          <div className="mt-6">
-            <h3 className="font-bold text-lg mb-2">
-              {t('sections.getTheApp')}
-            </h3>
-            <AppStoreButtons location="footer" />
-          </div>
+          <AppStoreSection label={t('sections.getTheApp')} />
         </div>
         <div className="flex-1 min-w-[220px] flex flex-col gap-8">
           <div>
