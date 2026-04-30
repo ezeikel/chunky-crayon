@@ -510,7 +510,10 @@
       "credits1000": "1.000 Credits/Monat (~200 Seiten)",
       "allFeatures": "Alle Plattform-Funktionen",
       "noRollover": "Credits werden monatlich zurückgesetzt",
-      "prioritySupport": "Prioritäts-Support"
+      "prioritySupport": "Prioritäts-Support",
+      "profiles3": "Bis zu 3 Kinderprofile",
+      "profiles5": "Bis zu 5 Kinderprofile",
+      "profiles10": "Bis zu 10 Kinderprofile"
     },
     "creditPacks": {
       "title": "Brauchst du extra Credits?",
@@ -540,6 +543,18 @@
       "creditsPerPage": {
         "question": "Wie viele Seiten kann ich erstellen?",
         "answer": "Jede Seite kostet etwa 5 Credits. Splash = ~50 Seiten/Monat, Rainbow = ~100, Sparkle = ~200."
+      },
+      "multipleKids": {
+        "question": "Können mehrere Kinder ein Abo nutzen?",
+        "answer": "Ja — und genau hier machen viele Apps es falsch. Ein Chunky Crayon-Abo enthält eigene Profile für jedes Kind (Splash 3, Rainbow 5, Sparkle 10). Seiten, Sticker und Colo-Maskottchen bleiben getrennt. Kein Extra-Abo pro Kind nötig."
+      },
+      "trialMechanics": {
+        "question": "Was passiert nach dem 7-tägigen Gratis-Test?",
+        "answer": "Deine Karte wird mit dem Preis des Plans belastet. Wir mailen dir 24 Stunden vorher, damit es keine Überraschung gibt. Kündige jederzeit während des Tests — dann zahlst du nichts."
+      },
+      "printPaper": {
+        "question": "Brauche ich etwas zum Ausdrucken zu Hause?",
+        "answer": "Einen Drucker und Papier. Die Seiten werden als PDF heruntergeladen und passen ohne Anpassen auf A4 oder US Letter."
       }
     },
     "included": {
@@ -549,7 +564,19 @@
       "saveFavorites": "Favoriten in deinem Konto speichern",
       "shareCreations": "Kunstwerke mit Freund*innen teilen",
       "collectStickers": "Sticker sammeln & Belohnungen verdienen",
-      "mobileApps": "Apps für iOS & Android"
+      "mobileApps": "Apps für iOS & Android",
+      "familySharing": "Ein Abo, eigene Profile für jedes Kind"
+    },
+    "trialMicroCopy": "Danach {price}/Monat. Jederzeit vorher kündigen.",
+    "trustStrip": {
+      "rating": "★★★★★ 4,9 aus 183 Bewertungen",
+      "cancel": "Jederzeit kündbar"
+    },
+    "finalCta": {
+      "title": "Wähl einen Plan. Mal heute noch was aus.",
+      "subtitle": "Sie beschreiben es, wir zeichnen es, du druckst es aus oder gibst ihnen das iPad. 7 Tage gratis, jederzeit kündbar.",
+      "primary": "7 Tage gratis testen",
+      "secondary": "Pläne nochmal vergleichen"
     }
   },
   "blog": {
@@ -1175,6 +1202,10 @@
         "daily": {
           "title": "Jeden Tag eine neue Seite",
           "body": "Lieber Überraschungen? Jeden Tag landet eine kostenlose neue Malvorlage in deinem Postfach."
+        },
+        "family": {
+          "title": "Ein Abo, jedes Kind",
+          "body": "Eigene Profile für jedes Kind im selben Abo. Ihre Seiten, Sticker und Belohnungen bleiben ihnen. Bis zu 10 Profile mit Sparkle."
         }
       }
     },

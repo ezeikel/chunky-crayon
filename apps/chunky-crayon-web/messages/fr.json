@@ -510,7 +510,10 @@
       "credits1000": "1 000 crédits/mois (~200 pages)",
       "allFeatures": "Toutes les fonctionnalités",
       "noRollover": "Crédits réinitialisés chaque mois",
-      "prioritySupport": "Assistance prioritaire"
+      "prioritySupport": "Assistance prioritaire",
+      "profiles3": "Jusqu’à 3 profils enfant",
+      "profiles5": "Jusqu’à 5 profils enfant",
+      "profiles10": "Jusqu’à 10 profils enfant"
     },
     "creditPacks": {
       "title": "Besoin de crédits en plus ?",
@@ -540,6 +543,18 @@
       "creditsPerPage": {
         "question": "Combien de pages puis-je créer ?",
         "answer": "Chaque page coûte environ 5 crédits. Splash = ~50 pages/mois, Rainbow = ~100, Sparkle = ~200."
+      },
+      "multipleKids": {
+        "question": "Plusieurs enfants peuvent-ils utiliser un seul abonnement ?",
+        "answer": "Oui — et c’est là que la plupart des applis se trompent. Un seul forfait Chunky Crayon inclut des profils séparés pour chaque enfant (Splash 3, Rainbow 5, Sparkle 10). Leurs pages, stickers et mascottes Colo restent bien séparés. Pas besoin d’un abonnement par enfant."
+      },
+      "trialMechanics": {
+        "question": "Que se passe-t-il après l’essai gratuit de 7 jours ?",
+        "answer": "Votre carte est débitée du prix du forfait. Nous vous envoyons un e-mail 24 h avant, pour éviter toute surprise. Annulez à tout moment pendant l’essai et vous ne serez pas débité."
+      },
+      "printPaper": {
+        "question": "Faut-il quelque chose pour imprimer à la maison ?",
+        "answer": "Une imprimante et du papier. Les pages se téléchargent en PDF et s’adaptent au format A4 ou US Letter sans redimensionnement."
       }
     },
     "included": {
@@ -549,7 +564,19 @@
       "saveFavorites": "Enregistre tes favoris sur ton compte",
       "shareCreations": "Partage tes créations avec tes amis",
       "collectStickers": "Collectionne des stickers et gagne des récompenses",
-      "mobileApps": "Apps iOS et Android"
+      "mobileApps": "Apps iOS et Android",
+      "familySharing": "Un abonnement, des profils séparés pour chaque enfant"
+    },
+    "trialMicroCopy": "Puis {price}/mois. Annulez à tout moment avant.",
+    "trustStrip": {
+      "rating": "★★★★★ 4,9 sur 183 avis",
+      "cancel": "Annulez à tout moment"
+    },
+    "finalCta": {
+      "title": "Choisissez un forfait. Coloriez aujourd’hui.",
+      "subtitle": "Ils décrivent, nous dessinons : à vous d’imprimer ou de leur passer l’iPad. Gratuit 7 jours, annulez à tout moment.",
+      "primary": "Commencer l’essai gratuit de 7 jours",
+      "secondary": "Recomparer les forfaits"
     }
   },
   "blog": {
@@ -1175,6 +1202,10 @@
         "daily": {
           "title": "Une nouvelle page chaque jour",
           "body": "Vous aimez les surprises ? Une nouvelle page à colorier gratuite arrive chaque jour dans votre boîte mail."
+        },
+        "family": {
+          "title": "Un abonnement, tous les enfants",
+          "body": "Des profils séparés pour chaque enfant, avec le même abonnement. Leurs pages, stickers et récompenses restent à eux. Jusqu’à 10 profils avec Sparkle."
         }
       }
     },

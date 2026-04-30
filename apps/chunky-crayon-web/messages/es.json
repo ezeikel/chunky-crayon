@@ -510,7 +510,10 @@
       "credits1000": "1.000 créditos/mes (~200 páginas)",
       "allFeatures": "Todas las funciones de la plataforma",
       "noRollover": "Los créditos se reinician cada mes",
-      "prioritySupport": "Soporte prioritario"
+      "prioritySupport": "Soporte prioritario",
+      "profiles3": "Hasta 3 perfiles de peques",
+      "profiles5": "Hasta 5 perfiles de peques",
+      "profiles10": "Hasta 10 perfiles de peques"
     },
     "creditPacks": {
       "title": "¿Necesitas créditos extra?",
@@ -540,6 +543,18 @@
       "creditsPerPage": {
         "question": "¿Cuántas páginas puedo crear?",
         "answer": "Cada página cuesta unas 5 créditos. Splash = ~50 páginas/mes, Rainbow = ~100, Sparkle = ~200."
+      },
+      "multipleKids": {
+        "question": "¿Varios peques pueden usar una sola suscripción?",
+        "answer": "Sí — y aquí es donde muchas apps se equivocan. Un plan de Chunky Crayon incluye perfiles separados para cada peque (Splash 3, Rainbow 5, Sparkle 10). Sus páginas, stickers y mascotas Colo se guardan por separado. Sin comprar una suscripción para cada uno."
+      },
+      "trialMechanics": {
+        "question": "¿Qué pasa después de la prueba gratis de 7 días?",
+        "answer": "Se te cobrará el precio del plan en tu tarjeta. Te enviamos un email 24 horas antes para que no sea una sorpresa. Cancela cuando quieras durante la prueba y no te cobraremos nada."
+      },
+      "printPaper": {
+        "question": "¿Necesito algo para imprimir en casa?",
+        "answer": "Una impresora y papel. Las páginas se descargan como PDF y encajan en A4 o Carta (EE. UU.) sin ajustar el tamaño."
       }
     },
     "included": {
@@ -549,7 +564,19 @@
       "saveFavorites": "Guarda tus favoritos en tu cuenta",
       "shareCreations": "Comparte tus creaciones con amigos",
       "collectStickers": "Colecciona stickers y gana premios",
-      "mobileApps": "Apps para iOS y Android"
+      "mobileApps": "Apps para iOS y Android",
+      "familySharing": "Una suscripción, perfiles separados para cada peque"
+    },
+    "trialMicroCopy": "Luego {price}/mes. Cancela cuando quieras antes.",
+    "trustStrip": {
+      "rating": "★★★★★ 4,9 de 183 reseñas",
+      "cancel": "Cancela cuando quieras"
+    },
+    "finalCta": {
+      "title": "Elige un plan. Colorea algo hoy.",
+      "subtitle": "Ellos lo describen, nosotros lo dibujamos, tú lo imprimes o les pasas el iPad. Gratis 7 días, cancela cuando quieras.",
+      "primary": "Empieza la prueba gratis de 7 días",
+      "secondary": "Comparar planes otra vez"
     }
   },
   "blog": {
@@ -1175,6 +1202,10 @@
         "daily": {
           "title": "Una página nueva cada día",
           "body": "¿Te gustan las sorpresas? Una nueva página gratis llega a tu correo cada día."
+        },
+        "family": {
+          "title": "Una suscripción, cada peque",
+          "body": "Perfiles separados para cada niño en el mismo plan. Sus páginas, pegatinas y recompensas son solo suyas. Hasta 10 perfiles en Sparkle."
         }
       }
     },

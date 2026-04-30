@@ -510,7 +510,10 @@
       "credits1000": "月1,000クレジット（約200ページ）",
       "allFeatures": "すべての機能が使える",
       "noRollover": "クレジットは毎月リセット",
-      "prioritySupport": "優先サポート"
+      "prioritySupport": "優先サポート",
+      "profiles3": "子どもプロフィール最大3つ",
+      "profiles5": "子どもプロフィール最大5つ",
+      "profiles10": "子どもプロフィール最大10つ"
     },
     "creditPacks": {
       "title": "クレジットを追加しますか？",
@@ -540,6 +543,18 @@
       "creditsPerPage": {
         "question": "何ページ作れますか？",
         "answer": "1ページにつき約5クレジットです。Splash＝月約50ページ、Rainbow＝約100、Sparkle＝約200。"
+      },
+      "multipleKids": {
+        "question": "1つのサブスクを複数の子どもで使えますか？",
+        "answer": "はい。ここが多くのアプリと違うところ。Chunky Crayonの1プランで、子どもごとに別プロフィールを作れます（Splash 3、Rainbow 5、Sparkle 10）。ぬりえ・ステッカー・Coloのマスコットもそれぞれ別々。子どもごとに購入は不要です。"
+      },
+      "trialMechanics": {
+        "question": "7日間の無料トライアル後はどうなりますか？",
+        "answer": "プラン料金がカードに請求されます。24時間前にメールでお知らせするので安心です。トライアル中はいつでも解約でき、料金は一切かかりません。"
+      },
+      "printPaper": {
+        "question": "家で印刷するのに必要なものは？",
+        "answer": "プリンターと紙だけ。ページはPDFでダウンロードでき、サイズ変更なしでA4またはUSレターにぴったりです。"
       }
     },
     "included": {
@@ -549,7 +564,19 @@
       "saveFavorites": "お気に入りをアカウントに保存",
       "shareCreations": "作った作品をお友だちとシェア",
       "collectStickers": "ステッカーを集めてごほうびゲット",
-      "mobileApps": "iOS・Androidアプリ"
+      "mobileApps": "iOS・Androidアプリ",
+      "familySharing": "1つのサブスクで、子どもごとに別プロフィール"
+    },
+    "trialMicroCopy": "その後は月{price}。それまでにいつでも解約OK。",
+    "trustStrip": {
+      "rating": "★★★★★ 4.9（183件のレビュー）",
+      "cancel": "いつでも解約OK"
+    },
+    "finalCta": {
+      "title": "プランを選んで、今日からぬりえ。",
+      "subtitle": "お子さまが言う→わたしたちが描く→印刷するかiPadを渡すだけ。7日間無料、いつでも解約OK。",
+      "primary": "7日間無料トライアルを始める",
+      "secondary": "もう一度プランを比較"
     }
   },
   "blog": {
@@ -1175,6 +1202,10 @@
         "daily": {
           "title": "毎日、新しい1枚",
           "body": "サプライズが好き？無料の新しいぬりえが毎日メールで届きます。"
+        },
+        "family": {
+          "title": "1つのプランで、みんなOK",
+          "body": "同じプランでお子さまごとにプロフィールを分けられます。ぬりえ、ステッカー、ほうびはそれぞれのもの。Sparkleなら最大10プロフィール。"
         }
       }
     },
