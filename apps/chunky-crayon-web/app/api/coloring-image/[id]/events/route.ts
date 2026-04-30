@@ -17,7 +17,13 @@ import { db } from '@one-colored-pixel/db';
 import { getUserId } from '@/app/actions/user';
 import { ACTIONS } from '@/constants';
 
-export const maxDuration = 600; // 10 minutes — matches worker's hard cap
+// Vercel Pro caps Serverless Function maxDuration at 300s. The worker's
+// generation can run longer than that for complex images, but the
+// browser's EventSource auto-reconnects on drop, so a 300s cap just
+// means SSE silently reconnects every ~5 min. Each reconnect re-reads
+// the row's current state via the `state` event, so the user never
+// sees a regression — the partial image / status catches up.
+export const maxDuration = 300;
 
 type RouteContext = {
   params: Promise<{ id: string }>;

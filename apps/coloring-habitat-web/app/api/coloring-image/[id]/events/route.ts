@@ -3,7 +3,9 @@ import { db } from "@one-colored-pixel/db";
 import { getUserId } from "@/app/actions/user";
 import { ACTIONS } from "@/constants";
 
-export const maxDuration = 600;
+// Vercel Pro caps maxDuration at 300s. EventSource auto-reconnects on
+// drop, so a 300s cap is fine — see CC route for the full rationale.
+export const maxDuration = 300;
 
 type RouteContext = {
   params: Promise<{ id: string }>;
