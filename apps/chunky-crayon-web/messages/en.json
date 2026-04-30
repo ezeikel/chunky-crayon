@@ -575,7 +575,7 @@
       "splash": {
         "name": "Splash",
         "tagline": "Best for one child.",
-        "audience": "About a page a day. Less than one box of crayons a month."
+        "audience": "About two pages a week. Less than one box of crayons a month."
       },
       "rainbow": {
         "name": "Rainbow",
@@ -589,9 +589,9 @@
       }
     },
     "features": {
-      "credits250": "~50 pages a month, about a page a day",
-      "credits500": "~100 pages a month, a full library every month",
-      "credits1000": "~200 pages a month, never run out",
+      "credits250": "~50 pages a month, about two a week",
+      "credits500": "~100 pages a month, about a page a day",
+      "credits1000": "~200 pages a month, a few a day with room to spare",
       "allFeatures": "All platform features",
       "noRollover": "Credits reset each month",
       "rollover1Month": "Credits stack up. Keep one extra month",
