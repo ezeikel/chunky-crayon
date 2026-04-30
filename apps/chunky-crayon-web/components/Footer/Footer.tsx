@@ -106,12 +106,24 @@ const Footer = async ({ className }: FooterProps) => {
 
           <div>
             <h3 className="font-bold text-lg mb-2">{t('sections.support')}</h3>
-            <a
-              href="mailto:support@chunkycrayon.com"
-              className="text-gray-300 text-base hover:text-white transition-colors"
-            >
-              support@chunkycrayon.com
-            </a>
+            <ul className="flex flex-col gap-1.5">
+              <li>
+                <a
+                  href="mailto:support@chunkycrayon.com"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  support@chunkycrayon.com
+                </a>
+              </li>
+              <li>
+                <Link
+                  href="/color-as-you-go"
+                  className="text-gray-300 text-base hover:text-white transition-colors"
+                >
+                  {t('links.colorAsYouGo')}
+                </Link>
+              </li>
+            </ul>
           </div>
 
           {/* Free Tools — internal linking for SEO + discoverability */}

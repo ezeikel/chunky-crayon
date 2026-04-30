@@ -5,22 +5,13 @@ import Loading from '@/components/Loading/Loading';
 import { SubscriptionStatus } from '@one-colored-pixel/db/types';
 import ColorAsYouGoClient from './ColorAsYouGoClient';
 
-// Server shell. We do the subscriber-redirect here so subs never see
-// the inferior public-pack pricing — they go straight to /account/billing
-// where the cheaper member packs live. Doing this server-side avoids
-// flashing the public packs for one render before the redirect kicks
-// in client-side.
-const ColorAsYouGoPage = async () => {
-  const user = await getCurrentUser();
-
-  const isSubscriber = user?.subscriptions?.some(
-    (sub) => sub.status === SubscriptionStatus.ACTIVE,
-  );
-
-  if (isSubscriber) {
-    redirect('/account/billing');
-  }
-
+// Server shell — fully static, no auth read here. Auth + the
+// subscriber-redirect happen inside <ColorAsYouGoGate /> below, which
+// is wrapped in Suspense. With Cache Components on, calling
+// getCurrentUser() at page level blocks the prerender (it reads the
+// auth cookie). Pushing it into a Suspense-bounded child keeps the
+// page prerenderable; only the user-specific branch is dynamic.
+const ColorAsYouGoPage = () => {
   return (
     <Suspense
       fallback={
@@ -29,9 +20,25 @@ const ColorAsYouGoPage = async () => {
         </div>
       }
     >
-      <ColorAsYouGoClient isLoggedIn={!!user} />
+      <ColorAsYouGoGate />
     </Suspense>
   );
+};
+
+const ColorAsYouGoGate = async () => {
+  const user = await getCurrentUser();
+
+  const isSubscriber = user?.subscriptions?.some(
+    (sub) => sub.status === SubscriptionStatus.ACTIVE,
+  );
+
+  if (isSubscriber) {
+    // Subs see the cheaper member packs in /account/billing — never
+    // the inferior public pricing.
+    redirect('/account/billing');
+  }
+
+  return <ColorAsYouGoClient isLoggedIn={!!user} />;
 };
 
 export default ColorAsYouGoPage;
