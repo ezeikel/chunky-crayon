@@ -98,7 +98,28 @@ export const GET = async (
 
   // Pass the upstream stream straight through. We don't parse / re-encode
   // events here — the wire format is identical to what the browser wants.
-  return new Response(upstream.body, {
+  //
+  // Wrap the upstream body in a TransformStream that swallows aborts so
+  // mobile-network disconnects (4G→wifi handoff, screen lock) don't
+  // raise "failed to pipe response" Sentry noise. Client disconnect is
+  // the EXPECTED end of the stream, not an error. AbortError still
+  // propagates to upstream via request.signal so the worker releases
+  // its LISTEN subscriber slot — we just don't bubble it as a 5xx.
+  const passthrough = new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      controller.enqueue(chunk);
+    },
+  });
+  upstream.body.pipeTo(passthrough.writable).catch((err) => {
+    // Aborts include client navigations away, mobile network drops, and
+    // our own request.signal forwarding. None are real errors.
+    if (err?.name === 'AbortError' || request.signal.aborted) {
+      return;
+    }
+    console.warn('[sse-passthrough] upstream pipe error:', err);
+  });
+
+  return new Response(passthrough.readable, {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-store, no-transform',

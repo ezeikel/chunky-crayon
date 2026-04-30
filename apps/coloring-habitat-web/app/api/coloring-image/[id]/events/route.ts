@@ -74,7 +74,20 @@ export const GET = async (
     );
   }
 
-  return new Response(upstream.body, {
+  // Wrap body in a TransformStream that swallows aborts so mobile
+  // disconnects don't raise "failed to pipe response" Sentry noise.
+  // See CC version for full rationale.
+  const passthrough = new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      controller.enqueue(chunk);
+    },
+  });
+  upstream.body.pipeTo(passthrough.writable).catch((err) => {
+    if (err?.name === "AbortError" || request.signal.aborted) return;
+    console.warn("[sse-passthrough] upstream pipe error:", err);
+  });
+
+  return new Response(passthrough.readable, {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-store, no-transform",

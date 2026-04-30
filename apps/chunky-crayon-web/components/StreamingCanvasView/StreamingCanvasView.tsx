@@ -168,40 +168,93 @@ const StreamingCanvasView = ({
 
   const [iconIndex, setIconIndex] = useState(0);
 
-  // SSE — open once, close on terminal state. EventSource auto-reconnects
-  // on network blips so we don't need to babysit retries.
+  // SSE with mobile-resume support.
+  //
+  // The base behaviour is simple: open one EventSource, listen for
+  // `state` events, close on terminal state (READY → router.refresh,
+  // FAILED → leave on screen).
+  //
+  // The complication is mobile lifecycle. iOS Safari + Chrome mobile
+  // suspend tabs aggressively when the screen locks or the app
+  // backgrounds — they kill the underlying TCP socket WITHOUT firing
+  // the EventSource's reconnect logic. When the user comes back, the
+  // EventSource is in CLOSED state forever and the UI freezes on the
+  // last partial frame they saw, even though the worker has long since
+  // moved on.
+  //
+  // Fix: hold the ES in a ref, listen for `visibilitychange` and
+  // `online`. On either signal, if the ES is closed, tear it down
+  // and create a new one. The worker's SSE handler emits the row's
+  // current state on connect, so the UI catches up in <1s. Status
+  // already in a terminal state? Skip the reopen.
+  const esRef = useRef<EventSource | null>(null);
+  const statusRef = useRef<StreamingStatus>(initialStatus);
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
+
   useEffect(() => {
     if (initialStatus === 'READY' || initialStatus === 'FAILED') return;
 
     const url = `/api/coloring-image/${encodeURIComponent(coloringImageId)}/events`;
-    const es = new EventSource(url);
 
-    es.addEventListener('state', (e: MessageEvent) => {
-      try {
-        const data = JSON.parse(e.data) as StateEvent;
-        setStatus(data.status);
-        setPartialUrl(data.streamingPartialUrl);
-        setProgress(data.streamingProgress);
-        if (data.failureReason) setFailureReason(data.failureReason);
-
-        if (data.status === 'READY') {
-          es.close();
-          router.refresh();
-        } else if (data.status === 'FAILED') {
-          es.close();
-        }
-      } catch (err) {
-        console.error('[StreamingCanvasView] failed to parse event:', err);
+    const open = () => {
+      // No-op if we already have an open / connecting ES, or if status
+      // moved to terminal between events.
+      if (statusRef.current === 'READY' || statusRef.current === 'FAILED') {
+        return;
       }
-    });
+      if (esRef.current && esRef.current.readyState !== EventSource.CLOSED) {
+        return;
+      }
 
-    es.addEventListener('error', (e) => {
-      // eslint-disable-next-line no-console
-      console.warn('[StreamingCanvasView] SSE error', e);
-    });
+      const es = new EventSource(url);
+      esRef.current = es;
+
+      es.addEventListener('state', (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data) as StateEvent;
+          setStatus(data.status);
+          setPartialUrl(data.streamingPartialUrl);
+          setProgress(data.streamingProgress);
+          if (data.failureReason) setFailureReason(data.failureReason);
+
+          if (data.status === 'READY') {
+            es.close();
+            router.refresh();
+          } else if (data.status === 'FAILED') {
+            es.close();
+          }
+        } catch (err) {
+          console.error('[StreamingCanvasView] failed to parse event:', err);
+        }
+      });
+
+      es.addEventListener('error', () => {
+        // EventSource flips to CLOSED on iOS Safari when the tab
+        // backgrounds. We rely on the visibilitychange / online
+        // handlers below to re-open; nothing useful to do here.
+      });
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') open();
+    };
+    const handleOnline = () => {
+      open();
+    };
+
+    open();
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('online', handleOnline);
 
     return () => {
-      es.close();
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('online', handleOnline);
+      if (esRef.current) {
+        esRef.current.close();
+        esRef.current = null;
+      }
     };
   }, [coloringImageId, initialStatus, router]);
 

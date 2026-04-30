@@ -7,7 +7,7 @@
  * image as it lands behind a centered "Creating your coloring page…"
  * panel, swaps to the cached canvas on READY via `router.refresh()`.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -55,38 +55,74 @@ const StreamingCanvasView = ({
     initialFailureReason,
   );
 
+  // SSE with mobile-resume support — see CC version for full rationale.
+  // Tab background / screen lock / network drop on iOS Safari + Chrome
+  // mobile flips EventSource to CLOSED without auto-reconnect; we
+  // reopen it on visibilitychange + online events.
+  const esRef = useRef<EventSource | null>(null);
+  const statusRef = useRef<StreamingStatus>(initialStatus);
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
+
   useEffect(() => {
     if (initialStatus === "READY" || initialStatus === "FAILED") return;
 
     const url = `/api/coloring-image/${encodeURIComponent(coloringImageId)}/events`;
-    const es = new EventSource(url);
 
-    es.addEventListener("state", (e: MessageEvent) => {
-      try {
-        const data = JSON.parse(e.data) as StateEvent;
-        setStatus(data.status);
-        setPartialUrl(data.streamingPartialUrl);
-        setProgress(data.streamingProgress);
-        if (data.failureReason) setFailureReason(data.failureReason);
-
-        if (data.status === "READY") {
-          es.close();
-          router.refresh();
-        } else if (data.status === "FAILED") {
-          es.close();
-        }
-      } catch (err) {
-        console.error("[StreamingCanvasView] failed to parse event:", err);
+    const open = () => {
+      if (statusRef.current === "READY" || statusRef.current === "FAILED") {
+        return;
       }
-    });
+      if (esRef.current && esRef.current.readyState !== EventSource.CLOSED) {
+        return;
+      }
 
-    es.addEventListener("error", (e) => {
-      // eslint-disable-next-line no-console
-      console.warn("[StreamingCanvasView] SSE error", e);
-    });
+      const es = new EventSource(url);
+      esRef.current = es;
+
+      es.addEventListener("state", (e: MessageEvent) => {
+        try {
+          const data = JSON.parse(e.data) as StateEvent;
+          setStatus(data.status);
+          setPartialUrl(data.streamingPartialUrl);
+          setProgress(data.streamingProgress);
+          if (data.failureReason) setFailureReason(data.failureReason);
+
+          if (data.status === "READY") {
+            es.close();
+            router.refresh();
+          } else if (data.status === "FAILED") {
+            es.close();
+          }
+        } catch (err) {
+          console.error("[StreamingCanvasView] failed to parse event:", err);
+        }
+      });
+
+      es.addEventListener("error", () => {
+        // visibilitychange / online listeners below handle reopen.
+      });
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") open();
+    };
+    const handleOnline = () => {
+      open();
+    };
+
+    open();
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("online", handleOnline);
 
     return () => {
-      es.close();
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("online", handleOnline);
+      if (esRef.current) {
+        esRef.current.close();
+        esRef.current = null;
+      }
     };
   }, [coloringImageId, initialStatus, router]);
 
