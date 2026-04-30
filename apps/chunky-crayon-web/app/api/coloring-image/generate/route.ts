@@ -2,7 +2,11 @@ import { NextRequest, NextResponse, connection } from 'next/server';
 import { GenerationType } from '@one-colored-pixel/db';
 import { generateColoringImageOnly } from '@/app/actions/coloring-image';
 
-export const maxDuration = 120; // Gemini typically takes 10-30s per generation
+// Pipeline: Sonnet description clean-up + gpt-image-2 generation +
+// metadata vision call + potrace + WebP encode + R2 uploads + DB
+// inserts. Each stage is 5-30s; 120s left no headroom and we were
+// timing out. 300s = Vercel Pro cap, gives the worst-case run room.
+export const maxDuration = 300;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
