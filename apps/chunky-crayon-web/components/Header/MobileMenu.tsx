@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 import { signOutAction } from '@/app/actions/auth';
 import cn from '@/lib/utils';
 import { ParentalGateLink } from '@/components/ParentalGate';
+import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
 import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
 import MobileLanguageSelector from '@/components/LanguageSwitcher/MobileLanguageSelector';
 import { setActiveProfile } from '@/app/actions/profiles';
@@ -20,18 +21,23 @@ type MobileMenuProps = {
   items: MobileNavItem[];
   profiles?: ProfileWithStats[];
   activeProfile?: ProfileWithStats | null;
+  userEmail?: string;
+  userName?: string;
 };
 
 const MobileMenu = ({
   items,
   profiles = [],
   activeProfile,
+  userEmail,
+  userName,
 }: MobileMenuProps) => {
   const router = useRouter();
   const t = useTranslations('navigation');
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // Only render portal after component mounts (client-side)
   useEffect(() => {
@@ -68,6 +74,28 @@ const MobileMenu = ({
       '--fa-secondary-color': 'hsl(var(--crayon-teal))',
       '--fa-secondary-opacity': '0.8',
     } as React.CSSProperties;
+
+    if (item.isFeedback) {
+      return (
+        <button
+          type="button"
+          className="flex items-center gap-3 p-3 w-full text-left font-tondo font-medium text-text-primary hover:bg-paper-cream rounded-xl transition-all duration-200 active:scale-95"
+          onClick={() => {
+            setIsOpen(false);
+            setFeedbackOpen(true);
+          }}
+        >
+          {item.iconName && (
+            <FontAwesomeIcon
+              icon={item.iconName}
+              className="text-xl"
+              style={iconStyle}
+            />
+          )}
+          {item.label}
+        </button>
+      );
+    }
 
     if (item.action === 'signout') {
       return (
@@ -175,6 +203,13 @@ const MobileMenu = ({
 
   return (
     <div className="lg:hidden">
+      <FeedbackDialog
+        userEmail={userEmail}
+        userName={userName}
+        open={feedbackOpen}
+        onOpenChange={setFeedbackOpen}
+        trigger={<span className="hidden" />}
+      />
       <button
         type="button"
         onClick={() => setIsOpen(true)}

@@ -14,6 +14,7 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,6 +23,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { ParentalGateLink } from '@/components/ParentalGate';
+import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
 import formatNumber from '@/utils/formatNumber';
 
 type DropdownItemConfig = {
@@ -32,6 +34,7 @@ type DropdownItemConfig = {
   external?: boolean;
   requiresParentalGate?: boolean;
   isSignOut?: boolean;
+  isFeedback?: boolean;
 };
 
 const DROPDOWN_ITEMS: DropdownItemConfig[] = [
@@ -55,8 +58,7 @@ const DROPDOWN_ITEMS: DropdownItemConfig[] = [
   {
     icon: faHeadset,
     labelKey: 'support',
-    href: 'mailto:support@chunkycrayon.com',
-    external: true,
+    isFeedback: true,
     requiresParentalGate: true,
   },
   {
@@ -88,55 +90,62 @@ type HeaderDropdownProps = {
 
 const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
   const t = useTranslations('navigation');
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="flex items-center gap-3 font-tondo font-bold px-4 py-2 rounded-full bg-paper-cream hover:bg-paper-cream-dark transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
-        >
-          {/* User section */}
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon
-              icon={faCircleUser}
-              className="text-xl"
-              style={iconStyle}
-            />
-            <span className="text-text-primary">
-              {user?.name?.split(' ')[0] || t('account')}
-            </span>
-          </div>
-          {/* Divider */}
-          <div className="w-px h-5 bg-paper-cream-dark" />
-          {/* Credits section */}
-          <div className="flex items-center gap-1.5">
-            <FontAwesomeIcon
-              icon={faCoins}
-              className="text-lg"
-              style={coinsStyle}
-            />
-            <span className="text-text-primary">
-              {formatNumber(user.credits || 0)}
-            </span>
-          </div>
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        {DROPDOWN_ITEMS.map((item) => {
-          if (item.separator) {
-            return <DropdownMenuSeparator key="dropdown-separator" />;
-          }
+    <>
+      <FeedbackDialog
+        userEmail={user?.email || undefined}
+        userName={user?.name || undefined}
+        open={feedbackOpen}
+        onOpenChange={setFeedbackOpen}
+        trigger={<span className="hidden" />}
+      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="flex items-center gap-3 font-tondo font-bold px-4 py-2 rounded-full bg-paper-cream hover:bg-paper-cream-dark transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
+          >
+            {/* User section */}
+            <div className="flex items-center gap-2">
+              <FontAwesomeIcon
+                icon={faCircleUser}
+                className="text-xl"
+                style={iconStyle}
+              />
+              <span className="text-text-primary">
+                {user?.name?.split(' ')[0] || t('account')}
+              </span>
+            </div>
+            {/* Divider */}
+            <div className="w-px h-5 bg-paper-cream-dark" />
+            {/* Credits section */}
+            <div className="flex items-center gap-1.5">
+              <FontAwesomeIcon
+                icon={faCoins}
+                className="text-lg"
+                style={coinsStyle}
+              />
+              <span className="text-text-primary">
+                {formatNumber(user.credits || 0)}
+              </span>
+            </div>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          {DROPDOWN_ITEMS.map((item) => {
+            if (item.separator) {
+              return <DropdownMenuSeparator key="dropdown-separator" />;
+            }
 
-          const label = item.labelKey ? t(item.labelKey) : '';
+            const label = item.labelKey ? t(item.labelKey) : '';
 
-          // Items that require parental gate
-          if (item.requiresParentalGate && item.href) {
-            return (
-              <DropdownMenuItem key={item.labelKey} asChild>
-                <ParentalGateLink
-                  href={item.href}
-                  className="flex items-center gap-3 w-full text-left"
+            if (item.isFeedback) {
+              return (
+                <DropdownMenuItem
+                  key={item.labelKey}
+                  onClick={() => setFeedbackOpen(true)}
                 >
                   <FontAwesomeIcon
                     icon={item.icon!}
@@ -144,66 +153,84 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
                     style={iconStyle}
                   />
                   {label}
-                </ParentalGateLink>
-              </DropdownMenuItem>
-            );
-          }
+                </DropdownMenuItem>
+              );
+            }
 
-          // External links (like Support mailto)
-          if (item.external && item.href) {
-            return (
-              <DropdownMenuItem key={item.labelKey} asChild>
-                <a href={item.href} target="_blank" rel="noopener noreferrer">
+            if (item.requiresParentalGate && item.href) {
+              return (
+                <DropdownMenuItem key={item.labelKey} asChild>
+                  <ParentalGateLink
+                    href={item.href}
+                    className="flex items-center gap-3 w-full text-left"
+                  >
+                    <FontAwesomeIcon
+                      icon={item.icon!}
+                      className="text-lg"
+                      style={iconStyle}
+                    />
+                    {label}
+                  </ParentalGateLink>
+                </DropdownMenuItem>
+              );
+            }
+
+            // External links (like Support mailto)
+            if (item.external && item.href) {
+              return (
+                <DropdownMenuItem key={item.labelKey} asChild>
+                  <a href={item.href} target="_blank" rel="noopener noreferrer">
+                    <FontAwesomeIcon
+                      icon={item.icon!}
+                      className="text-lg"
+                      style={iconStyle}
+                    />
+                    {label}
+                  </a>
+                </DropdownMenuItem>
+              );
+            }
+
+            // Regular internal links
+            if (item.href) {
+              return (
+                <DropdownMenuItem key={item.labelKey} asChild>
+                  <Link href={item.href}>
+                    <FontAwesomeIcon
+                      icon={item.icon!}
+                      className="text-lg"
+                      style={iconStyle}
+                    />
+                    {label}
+                  </Link>
+                </DropdownMenuItem>
+              );
+            }
+
+            // Sign out action
+            if (item.isSignOut) {
+              return (
+                <DropdownMenuItem
+                  key={item.labelKey}
+                  onClick={async () => {
+                    await signOutAction();
+                  }}
+                >
                   <FontAwesomeIcon
                     icon={item.icon!}
                     className="text-lg"
                     style={iconStyle}
                   />
                   {label}
-                </a>
-              </DropdownMenuItem>
-            );
-          }
+                </DropdownMenuItem>
+              );
+            }
 
-          // Regular internal links
-          if (item.href) {
-            return (
-              <DropdownMenuItem key={item.labelKey} asChild>
-                <Link href={item.href}>
-                  <FontAwesomeIcon
-                    icon={item.icon!}
-                    className="text-lg"
-                    style={iconStyle}
-                  />
-                  {label}
-                </Link>
-              </DropdownMenuItem>
-            );
-          }
-
-          // Sign out action
-          if (item.isSignOut) {
-            return (
-              <DropdownMenuItem
-                key={item.labelKey}
-                onClick={async () => {
-                  await signOutAction();
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={item.icon!}
-                  className="text-lg"
-                  style={iconStyle}
-                />
-                {label}
-              </DropdownMenuItem>
-            );
-          }
-
-          return null;
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+            return null;
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };
 

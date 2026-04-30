@@ -1015,6 +1015,9 @@ export const TRACKING_EVENTS = {
 
   // ===== A/B EXPERIMENTS =====
   EXPERIMENT_EXPOSED: 'experiment_exposed',
+
+  // ===== FEEDBACK =====
+  FEEDBACK_SUBMITTED: 'feedback_submitted',
 } as const;
 
 // ===== SOCIAL PROOF / TESTIMONIALS =====

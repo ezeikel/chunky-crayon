@@ -1230,6 +1230,33 @@
     "subtextNoCreditsNoSubscription": "Pick a subscription, or buy a few credits to keep going.",
     "subtextFallback": "You'll get 15 free credits, enough to create 3 pages!"
   },
+  "feedback": {
+    "title": "How can we help?",
+    "subtitle": "We read every message and get back to you quickly.",
+    "types": {
+      "bug": {
+        "label": "Report a bug",
+        "placeholder": "What went wrong? If you can, tell us what you were doing..."
+      },
+      "idea": {
+        "label": "Suggest a feature",
+        "placeholder": "What would you love to see? How would it help?"
+      },
+      "help": {
+        "label": "Get help",
+        "placeholder": "What do you need help with?"
+      },
+      "other": {
+        "label": "Something else",
+        "placeholder": "What would you like to tell us?"
+      }
+    },
+    "emailPlaceholder": "Your email (optional, for follow-up)",
+    "sendButton": "Send message",
+    "sending": "Sending...",
+    "successTitle": "Thanks for your feedback!",
+    "successMessage": "We appreciate you taking the time to help us improve."
+  },
   "og": {
     "homepage": {
       "tagline": "Custom coloring pages, made in seconds.",

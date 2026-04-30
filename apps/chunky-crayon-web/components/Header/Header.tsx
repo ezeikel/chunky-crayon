@@ -34,6 +34,7 @@ import HeaderColoIndicator from './HeaderColoIndicator';
 import MobileMenu from './MobileMenu';
 import ScrollHeader from './ScrollHeader';
 import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
+import HeaderFeedbackTrigger from './HeaderFeedbackTrigger';
 
 export type Visibility = 'always' | 'authenticated' | 'unauthenticated';
 
@@ -44,6 +45,7 @@ export type NavItem = {
   liClass?: string;
   component?: (user: Partial<User>) => React.ReactNode;
   visibility: Visibility;
+  isFeedback?: boolean;
 };
 
 export type MobileNavItem = {
@@ -53,6 +55,7 @@ export type MobileNavItem = {
   liClass?: string;
   action?: 'signout';
   requiresParentalGate?: boolean;
+  isFeedback?: boolean;
 };
 
 const handleSignOut = async () => {
@@ -103,7 +106,7 @@ const getNavItems = (
   },
   {
     label: t('support'),
-    href: 'mailto:support@chunkycrayon.com',
+    isFeedback: true,
     visibility: 'unauthenticated',
   },
 ];
@@ -172,7 +175,7 @@ const getMobileItems = (
     items.push({
       label: t('support'),
       iconName: faHeadset,
-      href: 'mailto:support@chunkycrayon.com',
+      isFeedback: true,
       requiresParentalGate: true,
     });
     items.push({
@@ -221,20 +224,17 @@ const getMobileItems = (
 };
 
 const renderNavLink = (item: NavItem, user: Partial<User> | null) => {
-  // Clean text-only nav links (like Bluey's approach)
   const linkClass =
     'font-tondo font-bold text-lg text-text-secondary hover:text-crayon-orange transition-colors';
 
-  if (item.href?.startsWith('mailto:')) {
+  if (item.isFeedback) {
     return (
-      <a
-        href={item.href}
-        target="_blank"
-        rel="noopener noreferrer"
+      <HeaderFeedbackTrigger
+        label={item.label}
         className={linkClass}
-      >
-        {item.label}
-      </a>
+        userEmail={user?.email || undefined}
+        userName={user?.name || undefined}
+      />
     );
   }
 
@@ -246,7 +246,6 @@ const renderNavLink = (item: NavItem, user: Partial<User> | null) => {
     );
   }
 
-  // Functional components (Credits, Dropdown) render their own UI
   return item.component?.(user as Partial<User>);
 };
 
@@ -315,6 +314,8 @@ const Header = async () => {
             items={mobileItems}
             profiles={profiles}
             activeProfile={activeProfile}
+            userEmail={user?.email || undefined}
+            userName={user?.name || undefined}
           />
         </div>
       );

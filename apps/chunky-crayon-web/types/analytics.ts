@@ -490,4 +490,13 @@ export type EventProperties = {
     variant: string;
     [key: string]: unknown;
   };
+
+  // ===== FEEDBACK =====
+  [TRACKING_EVENTS.FEEDBACK_SUBMITTED]: {
+    feedback_type: 'bug' | 'idea' | 'help' | 'other';
+    feedback_message: string;
+    user_email?: string;
+    user_name?: string;
+    page_url?: string;
+  };
 };
