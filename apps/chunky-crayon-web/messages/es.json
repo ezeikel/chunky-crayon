@@ -578,7 +578,8 @@
       "primary": "Empieza la prueba gratis de 7 días",
       "secondary": "Comparar planes otra vez"
     },
-    "perYear": "/año"
+    "perYear": "/año",
+    "notReadyForPlan": "¿Aún no quieres un plan? Colorea cuando quieras"
   },
   "blog": {
     "title": "El blog de Chunky Crayon",
@@ -1103,7 +1104,8 @@
     "examplesLabel": "Prueba una de estas",
     "exampleTrex": "Un T-rex astronauta en un monopatín",
     "exampleDragon": "Un dragón y un conejito tomando el té",
-    "exampleFoxes": "Una familia de zorros de picnic"
+    "exampleFoxes": "Una familia de zorros de picnic",
+    "linkColorAsYouGo": "O colorea sobre la marcha (sin suscripción)"
   },
   "og": {
     "homepage": {
@@ -1227,6 +1229,33 @@
       "drawingSubLabel": "Espera un poquito, tardará un momento.",
       "playLabel": "Reproducir la demo",
       "pauseLabel": "Pausa"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "Colorea donde quieras.",
+    "heroSubtitle": "Compra unos créditos cuando los necesites. Sin suscripción. Sin compromiso. Solo colorear.",
+    "credits": "{count} créditos",
+    "buyNow": "Conseguir créditos",
+    "loading": "Cargando...",
+    "failedToCheckout": "No pudimos ir al pago. ¿Intentar de nuevo?",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "Inicio",
+        "tagline": "Unas 10 páginas para colorear. Ideal para una tarde de lluvia."
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "Media semana",
+        "tagline": "Unas 40 páginas para colorear. Para una semana de \"me aburro\"."
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "Vacaciones",
+        "tagline": "Unas 100 páginas para colorear. Vacaciones escolares, resueltas."
+      }
+    },
+    "subscribePitch": {
+      "title": "¿Colorear cada semana?",
+      "subtitle": "La suscripción sale más barata si haces más de unas pocas páginas al mes. Además, perfiles extra para hermanos y créditos que se acumulan.",
+      "cta": "Ver planes"
     }
   }
 }

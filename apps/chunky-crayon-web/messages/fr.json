@@ -578,7 +578,8 @@
       "primary": "Commencer l’essai gratuit de 7 jours",
       "secondary": "Recomparer les forfaits"
     },
-    "perYear": "/an"
+    "perYear": "/an",
+    "notReadyForPlan": "Pas prêt(e) pour un abonnement ? Coloriez à votre rythme"
   },
   "blog": {
     "title": "Le blog Chunky Crayon",
@@ -1103,7 +1104,8 @@
     "examplesLabel": "Essaie l’une de ces idées",
     "exampleTrex": "Un T-rex astronaute sur un skateboard",
     "exampleDragon": "Un dragon et un lapin à un goûter magique",
-    "exampleFoxes": "Une famille de renards en pique-nique"
+    "exampleFoxes": "Une famille de renards en pique-nique",
+    "linkColorAsYouGo": "Ou coloriez au fil de l’eau (sans abonnement)"
   },
   "og": {
     "homepage": {
@@ -1227,6 +1229,33 @@
       "drawingSubLabel": "Patience, ça prend un petit moment.",
       "playLabel": "Lancer la démo",
       "pauseLabel": "Pause"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "Coloriez au fil de vos envies.",
+    "heroSubtitle": "Achetez quelques crédits quand vous en avez besoin. Pas d’abonnement. Sans engagement. Juste du coloriage.",
+    "credits": "{count} crédits",
+    "buyNow": "Obtenir des crédits",
+    "loading": "Chargement...",
+    "failedToCheckout": "Accès au paiement impossible. Réessayer ?",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "Découverte",
+        "tagline": "Env. 10 coloriages. Parfait pour un après-midi pluvieux."
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "Vacances scolaires",
+        "tagline": "Env. 40 coloriages. De quoi tenir une semaine de « Je m’ennuie »."
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "Grandes vacances",
+        "tagline": "Env. 100 coloriages. Toute la pause scolaire, c’est réglé."
+      }
+    },
+    "subscribePitch": {
+      "title": "Du coloriage chaque semaine ?",
+      "subtitle": "L’abonnement revient moins cher si vous créez plus que quelques pages par mois. Et en plus : profils pour frères et sœurs, et des crédits qui s’accumulent.",
+      "cta": "Voir les offres"
     }
   }
 }

@@ -578,7 +578,8 @@
       "primary": "7일 무료 체험 시작",
       "secondary": "플랜 다시 비교하기"
     },
-    "perYear": "/년"
+    "perYear": "/년",
+    "notReadyForPlan": "아직 요금제가 부담되나요? 필요할 때마다 색칠해요"
   },
   "blog": {
     "title": "Chunky Crayon 블로그",
@@ -1103,7 +1104,8 @@
     "examplesLabel": "이렇게 해보세요",
     "exampleTrex": "스케이트보드 타는 티라노 우주비행사",
     "exampleDragon": "차 마시는 용과 토끼",
-    "exampleFoxes": "소풍 가는 여우 가족"
+    "exampleFoxes": "소풍 가는 여우 가족",
+    "linkColorAsYouGo": "또는 바로 색칠하기 (구독 없이)"
   },
   "og": {
     "homepage": {
@@ -1227,6 +1229,33 @@
       "drawingSubLabel": "조금만 기다려 주세요.",
       "playLabel": "데모 재생",
       "pauseLabel": "일시정지"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "언제 어디서나 색칠해요.",
+    "heroSubtitle": "필요할 때 크레딧만 조금씩 구매하세요. 구독 없음. 약정 없음. 오직 색칠만!",
+    "credits": "{count} 크레딧",
+    "buyNow": "크레딧 받기",
+    "loading": "불러오는 중...",
+    "failedToCheckout": "결제로 이동할 수 없어요. 다시 시도할까요?",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "스타터",
+        "tagline": "색칠 페이지 약 10장. 비 오는 오후에 딱!"
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "방학 중간",
+        "tagline": "색칠 페이지 약 40장. “심심해~” 일주일 해결!"
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "휴가",
+        "tagline": "색칠 페이지 약 100장. 긴 방학도 걱정 끝!"
+      }
+    },
+    "subscribePitch": {
+      "title": "매주 색칠하나요?",
+      "subtitle": "한 달에 몇 장 이상 만든다면 구독이 더 저렴해요. 형제자매용 추가 프로필과 차곡차곡 쌓이는 크레딧도 함께!",
+      "cta": "요금제 보기"
     }
   }
 }

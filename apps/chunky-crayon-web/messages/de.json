@@ -578,7 +578,8 @@
       "primary": "7 Tage gratis testen",
       "secondary": "Pläne nochmal vergleichen"
     },
-    "perYear": "/Jahr"
+    "perYear": "/Jahr",
+    "notReadyForPlan": "Noch nicht bereit für ein Abo? Male einfach los"
   },
   "blog": {
     "title": "Der Chunky Crayon Blog",
@@ -1103,7 +1104,8 @@
     "examplesLabel": "Probier eines davon",
     "exampleTrex": "Ein T-Rex-Astronaut auf einem Skateboard",
     "exampleDragon": "Ein Drache und ein Häschen beim Teekränzchen",
-    "exampleFoxes": "Eine Fuchsfamilie beim Picknick"
+    "exampleFoxes": "Eine Fuchsfamilie beim Picknick",
+    "linkColorAsYouGo": "Oder male direkt los (ohne Abo)"
   },
   "og": {
     "homepage": {
@@ -1227,6 +1229,33 @@
       "drawingSubLabel": "Einen Moment, das dauert kurz.",
       "playLabel": "Demo abspielen",
       "pauseLabel": "Pause"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "Male einfach drauflos.",
+    "heroSubtitle": "Hol dir ein paar Credits, wenn du sie brauchst. Kein Abo. Keine Verpflichtung. Einfach ausmalen.",
+    "credits": "{count} Credits",
+    "buyNow": "Credits holen",
+    "loading": "Lädt...",
+    "failedToCheckout": "Checkout nicht erreichbar. Nochmal versuchen?",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "Starter",
+        "tagline": "Ca. 10 Ausmalbilder. Perfekt für einen Regentag."
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "Ferienhalbzeit",
+        "tagline": "Ca. 40 Ausmalbilder. Reicht für eine Woche „Mir ist langweilig“."
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "Ferien",
+        "tagline": "Ca. 100 Ausmalbilder. Die ganzen Ferien sind gerettet."
+      }
+    },
+    "subscribePitch": {
+      "title": "Jede Woche ausmalen?",
+      "subtitle": "Ein Abo ist günstiger, wenn du mehr als nur ein paar Seiten im Monat machst. Plus Extra-Profile für Geschwister und Credits, die sich ansammeln.",
+      "cta": "Pläne ansehen"
     }
   }
 }

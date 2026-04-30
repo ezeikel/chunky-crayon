@@ -578,7 +578,8 @@
       "primary": "7日間無料トライアルを始める",
       "secondary": "もう一度プランを比較"
     },
-    "perYear": "／年"
+    "perYear": "／年",
+    "notReadyForPlan": "プランはまだ？気軽にぬりえを楽しもう"
   },
   "blog": {
     "title": "Chunky Crayonブログ",
@@ -1103,7 +1104,8 @@
     "examplesLabel": "どれか試してみてね",
     "exampleTrex": "スケボーに乗ったTレックスの宇宙飛行士",
     "exampleDragon": "お茶会をするドラゴンとうさぎ",
-    "exampleFoxes": "ピクニックをするキツネの家族"
+    "exampleFoxes": "ピクニックをするキツネの家族",
+    "linkColorAsYouGo": "または作りながら塗る（サブスク不要）"
   },
   "og": {
     "homepage": {
@@ -1227,6 +1229,33 @@
       "drawingSubLabel": "もう少し待ってね。すぐできるよ。",
       "playLabel": "デモを再生",
       "pauseLabel": "一時停止"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "おでかけ先でもぬりえ。",
+    "heroSubtitle": "必要な分だけクレジットを購入。サブスクなし。縛りなし。ぬるだけ。",
+    "credits": "{count} クレジット",
+    "buyNow": "クレジットを入手",
+    "loading": "読み込み中...",
+    "failedToCheckout": "お支払い画面を開けませんでした。もう一度？",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "はじめて",
+        "tagline": "約10枚分。雨の日のおうち時間に。"
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "お休み中",
+        "tagline": "約40枚分。「ひま〜」な1週間に。"
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "なが〜い休み",
+        "tagline": "約100枚分。長いお休みもこれで安心。"
+      }
+    },
+    "subscribePitch": {
+      "title": "毎週ぬりえする？",
+      "subtitle": "月に数枚以上作るならサブスクがおトク。きょうだい用プロフィール追加や、たまるクレジットも。",
+      "cta": "プランを見る"
     }
   }
 }
