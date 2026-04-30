@@ -244,6 +244,12 @@
       "drawingSubLabel": "Patience, ça prend un instant.",
       "playLabel": "Lancer la démo",
       "pauseLabel": "Pause"
+    },
+    "experiments": {
+      "landingHero": {
+        "outcome": "20 minutes de calme commencent avec une page à colorier.",
+        "empathy": "« Je m’ennuie » vient de trouver son adversaire."
+      }
     }
   },
   "gallery": {
@@ -571,7 +577,8 @@
     "trialMicroCopy": "Puis {price}/mois. Annulez à tout moment avant.",
     "trustStrip": {
       "rating": "★★★★★ 4,9 sur 183 avis",
-      "cancel": "Annulez à tout moment"
+      "cancel": "Annulez à tout moment",
+      "guarantee": "Garantie satisfait ou remboursé 30 jours"
     },
     "finalCta": {
       "title": "Choisissez un forfait. Coloriez aujourd’hui.",
@@ -1230,6 +1237,12 @@
       "drawingSubLabel": "Patience, ça prend un petit moment.",
       "playLabel": "Lancer la démo",
       "pauseLabel": "Pause"
+    },
+    "experiments": {
+      "startCta": {
+        "urgency": "2 pages gratuites aujourd’hui — sans carte, sans piège.",
+        "proof": "Rejoignez 200+ parents. 2 pages gratuites pour commencer."
+      }
     }
   },
   "colorAsYouGo": {

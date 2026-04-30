@@ -244,6 +244,12 @@
       "drawingSubLabel": "Espera un poquito, tarda un momento.",
       "playLabel": "Reproducir demo",
       "pauseLabel": "Pausa"
+    },
+    "experiments": {
+      "landingHero": {
+        "outcome": "20 minutos de calma empiezan con una página para colorear.",
+        "empathy": "“Me aburro” acaba de encontrar su rival."
+      }
     }
   },
   "gallery": {
@@ -571,7 +577,8 @@
     "trialMicroCopy": "Luego {price}/mes. Cancela cuando quieras antes.",
     "trustStrip": {
       "rating": "★★★★★ 4,9 de 183 reseñas",
-      "cancel": "Cancela cuando quieras"
+      "cancel": "Cancela cuando quieras",
+      "guarantee": "Garantía de devolución de dinero de 30 días"
     },
     "finalCta": {
       "title": "Elige un plan. Colorea algo hoy.",
@@ -1230,6 +1237,12 @@
       "drawingSubLabel": "Espera un poquito, tardará un momento.",
       "playLabel": "Reproducir la demo",
       "pauseLabel": "Pausa"
+    },
+    "experiments": {
+      "startCta": {
+        "urgency": "2 páginas gratis hoy — sin tarjeta, sin truco.",
+        "proof": "Únete a 200+ familias. 2 páginas gratis para empezar."
+      }
     }
   },
   "colorAsYouGo": {

@@ -244,6 +244,12 @@
       "drawingSubLabel": "もう少し待ってね。すぐできるよ。",
       "playLabel": "デモを再生",
       "pauseLabel": "一時停止"
+    },
+    "experiments": {
+      "landingHero": {
+        "outcome": "たった1枚のぬりえで、静かな20分がはじまる。",
+        "empathy": "「ひま〜」に、ついに強敵あらわる。"
+      }
     }
   },
   "gallery": {
@@ -571,7 +577,8 @@
     "trialMicroCopy": "その後は月{price}。それまでにいつでも解約OK。",
     "trustStrip": {
       "rating": "★★★★★ 4.9（183件のレビュー）",
-      "cancel": "いつでも解約OK"
+      "cancel": "いつでも解約OK",
+      "guarantee": "30日間返金保証"
     },
     "finalCta": {
       "title": "プランを選んで、今日からぬりえ。",
@@ -1230,6 +1237,12 @@
       "drawingSubLabel": "もう少し待ってね。すぐできるよ。",
       "playLabel": "デモを再生",
       "pauseLabel": "一時停止"
+    },
+    "experiments": {
+      "startCta": {
+        "urgency": "今日だけ無料2ページ — カード不要、条件なし。",
+        "proof": "200人以上の保護者が参加。まずは無料2ページ。"
+      }
     }
   },
   "colorAsYouGo": {

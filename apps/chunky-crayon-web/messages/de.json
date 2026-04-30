@@ -244,6 +244,12 @@
       "drawingSubLabel": "Einen Moment, das dauert kurz.",
       "playLabel": "Demo abspielen",
       "pauseLabel": "Pause"
+    },
+    "experiments": {
+      "landingHero": {
+        "outcome": "20 Minuten Ruhe beginnen mit einer Malseite.",
+        "empathy": "„Mir ist langweilig“ hat gerade seinen Meister gefunden."
+      }
     }
   },
   "gallery": {
@@ -571,7 +577,8 @@
     "trialMicroCopy": "Danach {price}/Monat. Jederzeit vorher kündigen.",
     "trustStrip": {
       "rating": "★★★★★ 4,9 aus 183 Bewertungen",
-      "cancel": "Jederzeit kündbar"
+      "cancel": "Jederzeit kündbar",
+      "guarantee": "30 Tage Geld-zurück-Garantie"
     },
     "finalCta": {
       "title": "Wähl einen Plan. Mal heute noch was aus.",
@@ -1230,6 +1237,12 @@
       "drawingSubLabel": "Einen Moment, das dauert kurz.",
       "playLabel": "Demo abspielen",
       "pauseLabel": "Pause"
+    },
+    "experiments": {
+      "startCta": {
+        "urgency": "2 Gratis-Seiten heute — keine Karte, kein Haken.",
+        "proof": "Schon 200+ Eltern dabei. Starte mit 2 Gratis-Seiten."
+      }
     }
   },
   "colorAsYouGo": {

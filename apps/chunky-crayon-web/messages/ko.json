@@ -244,6 +244,12 @@
       "drawingSubLabel": "잠깐만요, 조금만 기다려요.",
       "playLabel": "데모 재생",
       "pauseLabel": "일시정지"
+    },
+    "experiments": {
+      "landingHero": {
+        "outcome": "색칠 한 장이면 20분의 조용한 시간이 시작돼요.",
+        "empathy": "“심심해”가 드디어 상대를 만났어요."
+      }
     }
   },
   "gallery": {
@@ -571,7 +577,8 @@
     "trialMicroCopy": "그 후 월 {price}. 그 전 언제든 취소 가능.",
     "trustStrip": {
       "rating": "★★★★★ 리뷰 183개 중 4.9점",
-      "cancel": "언제든 취소 가능"
+      "cancel": "언제든 취소 가능",
+      "guarantee": "30일 환불 보장"
     },
     "finalCta": {
       "title": "플랜을 고르고, 오늘 바로 색칠해요.",
@@ -1230,6 +1237,12 @@
       "drawingSubLabel": "조금만 기다려 주세요.",
       "playLabel": "데모 재생",
       "pauseLabel": "일시정지"
+    },
+    "experiments": {
+      "startCta": {
+        "urgency": "오늘 무료 2장 — 카드 필요 없고, 숨은 조건도 없어요.",
+        "proof": "200명+ 부모님이 함께해요. 무료 2장으로 시작!"
+      }
     }
   },
   "colorAsYouGo": {
