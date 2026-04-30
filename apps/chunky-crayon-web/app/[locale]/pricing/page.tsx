@@ -12,7 +12,12 @@ import {
   faShareNodes,
   faStar,
   faMobileScreen,
+  faPeopleRoof,
 } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faCheck,
+  faStar as faStarSolid,
+} from '@fortawesome/pro-solid-svg-icons';
 import { PlanName, BillingPeriod } from '@one-colored-pixel/db/types';
 import { PlanInterval, SUBSCRIPTION_PLANS, TRACKING_EVENTS } from '@/constants';
 import { trackEvent } from '@/utils/analytics-client';
@@ -165,11 +170,23 @@ const PricingPage = () => {
           </div>
 
           {/* Trust strip — sits between toggle and the rest of the page so
-              cold paid visitors see ★ rating + risk reversal before any
-              prices, in line with standard pricing-page CRO patterns. */}
+              cold paid visitors see star rating + risk reversal before
+              any prices, in line with standard pricing-page CRO
+              patterns. Stars render via FontAwesome solid so they
+              inherit the brand orange and stay consistent across
+              fonts. */}
           <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-6 text-sm text-text-secondary">
-            <span className="font-semibold text-crayon-orange">
-              {t('trustStrip.rating')}
+            <span className="inline-flex items-center gap-2 font-semibold text-crayon-orange">
+              <span className="inline-flex gap-0.5" aria-hidden>
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <FontAwesomeIcon
+                    key={i}
+                    icon={faStarSolid}
+                    className="text-sm"
+                  />
+                ))}
+              </span>
+              <span>{t('trustStrip.rating')}</span>
             </span>
             <span aria-hidden className="opacity-40">
               ·
@@ -204,8 +221,19 @@ const PricingPage = () => {
                 )}
               >
                 {plan.mostPopular && (
-                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-crayon-orange text-white text-sm font-tondo font-bold px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap">
-                    ✨ {t('mostPopular')}
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-crayon-orange text-white text-sm font-tondo font-bold px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap inline-flex items-center gap-1.5">
+                    <FontAwesomeIcon
+                      icon={faSparkles}
+                      className="text-xs"
+                      style={
+                        {
+                          '--fa-primary-color': '#ffffff',
+                          '--fa-secondary-color': '#fde68a',
+                          '--fa-secondary-opacity': '1',
+                        } as React.CSSProperties
+                      }
+                    />
+                    {t('mostPopular')}
                   </span>
                 )}
                 <CardHeader className="pt-8">
@@ -234,13 +262,16 @@ const PricingPage = () => {
                     {plan.featureKeys.map((featureKey) => (
                       <li
                         key={featureKey}
-                        className="flex items-start gap-2 text-text-primary"
+                        className="flex items-start gap-2.5 text-text-primary"
                       >
                         <span
-                          className="text-crayon-orange font-bold leading-relaxed"
                           aria-hidden
+                          className="mt-1 inline-flex w-5 h-5 shrink-0 items-center justify-center rounded-full bg-crayon-orange/15 text-crayon-orange"
                         >
-                          ✓
+                          <FontAwesomeIcon
+                            icon={faCheck}
+                            className="text-[10px]"
+                          />
                         </span>
                         <span className="leading-snug">
                           {t(`features.${featureKey}`)}
@@ -287,6 +318,7 @@ const PricingPage = () => {
             {[
               { icon: faSparkles, key: 'aiCreation' },
               { icon: faPalette, key: 'colorOnline' },
+              { icon: faPeopleRoof, key: 'familySharing' },
               { icon: faBookmark, key: 'saveFavorites' },
               { icon: faShareNodes, key: 'shareCreations' },
               { icon: faStar, key: 'collectStickers' },
