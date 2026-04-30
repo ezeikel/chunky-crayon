@@ -31,10 +31,18 @@ type VoiceInputProps = {
   className?: string;
   /**
    * Called when both transcripts are captured and the user is ready to
-   * submit. Parent form runs the actual `createColoringImageFromVoiceConversation`
+   * submit. Parent form runs the actual `createPendingColoringImage`
    * server action — the hook itself is transcript-only.
+   *
+   * Return a `VoiceConversationError` code if the submission fails so
+   * the user sees the matching error UI (e.g. moderation_blocked →
+   * "Let's try a different idea!"). Returning void/undefined means
+   * success — the parent will handle navigation.
    */
-  onComplete?: (firstAnswer: string, secondAnswer: string) => void;
+  onComplete?: (
+    firstAnswer: string,
+    secondAnswer: string,
+  ) => Promise<VoiceConversationError | void> | VoiceConversationError | void;
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -89,10 +97,12 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
     secondAnswer,
     audioLevel,
     silenceDetected,
+    lastPrerecordedTranscript,
     isSupported,
     start,
     stopRecording,
     reset,
+    fail,
   } = useVoiceConversation();
 
   // Wraps `start()` with a one-time-per-session parental gate. Once the
@@ -157,27 +167,40 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
     }
   }, [state]);
 
-  // Hand off to the parent when both transcripts are ready. Refs guard
-  // against double-firing if the parent re-renders this component.
+  // Hand off to the parent when both transcripts are ready. On success
+  // we reset back to idle (the parent has navigated away by then; this
+  // just clears stale state in case the form stays mounted in Next.js's
+  // client router cache). On failure (moderation block, server error)
+  // the parent returns an error code and we flip the hook into the
+  // matching error state so the user sees "Let's try a different idea!"
+  // / "Try again?" copy with a Try Again button. Refs guard against
+  // double-firing.
   useEffect(() => {
     if (state === 'ready_to_submit' && firstAnswer && secondAnswer) {
       if (handedOffRef.current) return;
       handedOffRef.current = true;
-      // VOICE_INPUT_COMPLETED schema is shared with the legacy one-shot
-      // voice mode; map our two transcripts into the existing fields so
-      // analytics keeps working without a schema migration.
       const transcription = `${firstAnswer} ${secondAnswer}`.trim();
       trackEvent(TRACKING_EVENTS.VOICE_INPUT_COMPLETED, {
         transcription,
         durationMs: 0,
         confidence: 'medium',
       });
-      onComplete?.(firstAnswer, secondAnswer);
+      void Promise.resolve(onComplete?.(firstAnswer, secondAnswer)).then(
+        (result) => {
+          if (result) {
+            // Parent reported a failure — show the matching error UI.
+            fail(result);
+          } else {
+            // Success — reset state. Parent has navigated away.
+            reset();
+          }
+        },
+      );
     }
     if (state === 'idle' || state === 'error') {
       handedOffRef.current = false;
     }
-  }, [state, firstAnswer, secondAnswer, onComplete]);
+  }, [state, firstAnswer, secondAnswer, onComplete, reset, fail]);
 
   // ── Render branches by state ─────────────────────────────────────────────
 
@@ -230,6 +253,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
           {error ? ERROR_COPY[error] : ERROR_COPY.timeout}
         </p>
         <Button
+          type="button"
           onClick={reset}
           className="font-tondo font-bold text-base md:text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-full px-8 py-4 h-auto"
         >
@@ -270,6 +294,21 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
     );
   }
 
+  // Dev-only transcript readout. With the streaming WS gone there's
+  // only one transcript per turn (prerecorded), so this just confirms
+  // what the server heard. Hidden in production.
+  const transcriptComparison =
+    process.env.NODE_ENV !== 'production' && lastPrerecordedTranscript ? (
+      <div className="w-full flex flex-col gap-2 px-4 py-3 bg-paper-cream/60 border-2 border-dashed border-paper-cream-dark rounded-xl">
+        <p className="font-mono text-xs text-text-muted uppercase tracking-wide">
+          dev · last transcript
+        </p>
+        <p className="font-tondo text-sm text-text-primary break-words">
+          {lastPrerecordedTranscript}
+        </p>
+      </div>
+    ) : null;
+
   // ── processing_q2 — dynamic Q2 generation in flight ─────────────────────
   if (state === 'processing_q2') {
     return (
@@ -293,6 +332,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
         <p className="text-center text-text-primary font-tondo font-bold">
           Hmm, let me think…
         </p>
+        {transcriptComparison}
       </div>
     );
   }
@@ -319,6 +359,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
 
         <div className="flex gap-3 w-full">
           <Button
+            type="button"
             onClick={reset}
             variant="outline"
             className="font-tondo font-bold text-base md:text-lg border-2 border-paper-cream-dark text-text-primary hover:bg-paper-cream rounded-full py-4 h-auto flex-1"
@@ -326,6 +367,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
             Cancel
           </Button>
           <Button
+            type="button"
             onClick={stopRecording}
             className={cn(
               'font-tondo font-bold text-base md:text-lg text-white rounded-full py-4 h-auto flex-[2] transition-all duration-300 hover:scale-105 active:scale-95',
@@ -365,6 +407,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
         <p className="text-center text-text-primary font-tondo font-bold">
           Painting your page…
         </p>
+        {transcriptComparison}
       </div>
     );
   }

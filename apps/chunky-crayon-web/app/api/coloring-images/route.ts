@@ -27,6 +27,7 @@ const getColoringImagesForApi = async (
     where: {
       brand: BRAND,
       userId: null, // Only public/community images
+      status: 'READY', // Skip GENERATING / FAILED rows
     },
     select: {
       id: true,

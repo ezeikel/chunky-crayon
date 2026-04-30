@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from 'next/cache';
+import { connection } from 'next/server';
 import { db, ColoringImage, GenerationType } from '@one-colored-pixel/db';
 import { ACTIONS } from '@/constants';
 import type { ColoringImageSearchParams } from '@/types';
@@ -13,9 +14,16 @@ import { adPurposeKey } from '@/lib/coloring-image-purpose';
 // they never leak into galleries / daily pick / community feeds.
 // Callers that specifically need a hidden image must bypass this (see
 // getColoringImageForAdCampaign below).
+//
+// Adding `status: READY` keeps in-flight rows the canvas-as-loader
+// pipeline inserts (status=GENERATING) out of every list query. Single-id
+// finds like getColoringImageBase intentionally don't filter on status —
+// the image page branches on status to show streaming vs canvas, so it
+// needs to see GENERATING rows.
 const brandWhere = {
   brand: BRAND,
   showInCommunity: true,
+  status: 'READY' as const,
 };
 
 // Cached data fetching for coloring images using Next.js 16 Cache Components
@@ -73,6 +81,47 @@ export const getColoringImage = async (
 ): Promise<Partial<ColoringImage> | null> => {
   const { id } = await params;
   return getColoringImageBase(id);
+};
+
+/**
+ * Uncached lightweight status check. Image page uses this BEFORE the
+ * cached `getColoringImageBase` so we can branch on streaming vs READY
+ * without baking a stale GENERATING snapshot into Next's cache for a
+ * week.
+ *
+ * `sourcePrompt` is included so the streaming page can show Colo a real
+ * description ("a dinosaur breathing fire") instead of a generic
+ * "Coloring page". Photo mode rows have no sourcePrompt (the kid
+ * uploaded a picture) — page falls back to the i18n title in that case.
+ */
+export const getColoringImageStatus = async (
+  id: string,
+): Promise<{
+  status: 'GENERATING' | 'READY' | 'FAILED';
+  streamingPartialUrl: string | null;
+  streamingProgress: number;
+  failureReason: string | null;
+  brand: string;
+  sourcePrompt: string | null;
+} | null> => {
+  // Signal dynamic rendering — Next 16's cacheComponents otherwise rejects
+  // any `new Date()` Prisma uses internally with the "current-time access
+  // before request data" error. This function MUST be uncached so the
+  // image page picks up status flips from GENERATING → READY without a
+  // week-long stale snapshot.
+  await connection();
+  const row = await db.coloringImage.findFirst({
+    where: { brand: BRAND, id },
+    select: {
+      status: true,
+      streamingPartialUrl: true,
+      streamingProgress: true,
+      failureReason: true,
+      brand: true,
+      sourcePrompt: true,
+    },
+  });
+  return row;
 };
 
 // Export for components that have a plain string ID (uses cached version)

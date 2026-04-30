@@ -1013,6 +1013,15 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       const imageCtx = imageCanvas?.getContext("2d");
       const container = containerRef.current;
 
+      // svgUrl can briefly be null when this component mounts via the
+      // canvas-as-loader streaming path before the page-cache snapshot
+      // catches up. The streaming view shouldn't even render this canvas
+      // — the page route branches on status — but if a stale snapshot
+      // slips through, we just bail rather than crash. Once the cache
+      // refreshes and the parent re-renders, this effect runs again
+      // with a real URL.
+      if (!coloringImage.svgUrl) return;
+
       if (drawingCanvas && imageCanvas && drawingCtx && imageCtx && container) {
         const img = new Image();
 

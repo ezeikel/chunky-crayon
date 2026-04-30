@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server';
 import {
   getColoringImageById,
   getAllColoringImagesStatic,
+  getColoringImageStatus,
 } from '@/app/data/coloring-image';
 import { getRelatedImages } from '@/app/data/gallery';
 import { auth } from '@/auth';
@@ -13,6 +14,7 @@ import { ADMIN_EMAILS } from '@/constants';
 import ColoringPageContent from '@/components/ColoringPageContent/ColoringPageContent';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import StreamingCanvasView from '@/components/StreamingCanvasView/StreamingCanvasView';
 
 type ColoringImagePageProps = {
   params: Promise<{
@@ -85,6 +87,56 @@ export async function generateMetadata({
 
 const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
   const { id } = await params;
+
+  // Status check first (uncached) — branches the page between the
+  // canvas-as-loader streaming view and the normal render. We can't fold
+  // status into `getColoringImageById` because that's `'use cache'` with
+  // cacheLife max; a GENERATING snapshot would stick for a week even
+  // after the row hits READY.
+  const statusRow = await getColoringImageStatus(id);
+  if (!statusRow) {
+    notFound();
+  }
+
+  if (statusRow.status !== 'READY') {
+    const [tNav, tColoring] = await Promise.all([
+      getTranslations('navigation'),
+      getTranslations('coloringPage'),
+    ]);
+    // <StreamingCanvasView> renders the same 3-column shell
+    // <ColoringPageContent> does (palette + canvas + tools), with the
+    // real canvas swapped for a placeholder card holding the blurred
+    // partial image + Colo overlay. When the row hits READY, EventSource
+    // fires `router.refresh()` and this branch falls through to the
+    // cached canvas render — no navigation, just a server re-render.
+    return (
+      <PageWrap className="flex flex-col gap-y-6 lg:px-6">
+        <Breadcrumbs
+          items={[
+            { label: tNav('home'), href: '/' },
+            { label: tNav('gallery'), href: '/gallery' },
+            { label: tColoring('title') },
+          ]}
+        />
+        <StreamingCanvasView
+          coloringImageId={id}
+          initialStatus={statusRow.status}
+          initialPartialUrl={statusRow.streamingPartialUrl}
+          initialProgress={statusRow.streamingProgress}
+          initialFailureReason={statusRow.failureReason}
+          // Prefer the kid's actual prompt so Colo's voiceover script
+          // talks about THE thing they asked for ("a dinosaur breathing
+          // fire!") instead of the generic page title. Photo mode has
+          // no sourcePrompt — in that case the i18n title is the best
+          // we can do without a vision pass on the photo (could add
+          // one later, but it'd add ~2s latency before voiceover plays).
+          fallbackTitle={statusRow.sourcePrompt || tColoring('title')}
+        />
+      </PageWrap>
+    );
+  }
+
+  // READY path — original render below. Cached.
   const [coloringImage, session, tNav, tColoring] = await Promise.all([
     getColoringImageById(id),
     auth(),

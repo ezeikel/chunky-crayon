@@ -26,15 +26,22 @@ export async function loadGalleryImages(
 ): Promise<PaginatedImagesResponse> {
   const limit = GALLERY_PAGE_SIZE;
 
-  let whereClause: Prisma.ColoringImageWhereInput = { brand: BRAND };
+  // Every branch below needs status=READY so streaming-pipeline rows in
+  // GENERATING / FAILED don't leak into infinite-scroll gallery loads.
+  const baseWhere = {
+    brand: BRAND,
+    status: 'READY' as const,
+  };
+
+  let whereClause: Prisma.ColoringImageWhereInput = baseWhere;
 
   switch (galleryType) {
     case 'community':
-      whereClause = { brand: BRAND, userId: null };
+      whereClause = { ...baseWhere, userId: null };
       break;
 
     case 'daily':
-      whereClause = { brand: BRAND, generationType: GenerationType.DAILY };
+      whereClause = { ...baseWhere, generationType: GenerationType.DAILY };
       break;
 
     case 'category':
@@ -46,7 +53,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
-        brand: BRAND,
+        ...baseWhere,
         OR: [
           { tags: { hasSome: category.tags } },
           ...category.tags.map((tag) => ({
@@ -69,7 +76,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
-        brand: BRAND,
+        ...baseWhere,
         difficulty,
         userId: null,
       };
@@ -80,7 +87,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
-        brand: BRAND,
+        ...baseWhere,
         tags: { has: tagSlug },
         userId: null,
       };

@@ -33,13 +33,18 @@
     "elevenlabs": "^1.59.0",
     "hono": "^4.0.0",
     "openai": "^6.33.0",
+    "oslllo-potrace": "^4.0.0",
+    "pg": "^8.20.0",
     "playwright": "^1.59.0",
+    "qrcode": "^1.5.3",
     "remotion": "^4.0.0",
     "sharp": "^0.34.1",
     "zod": "^3.25.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@types/pg": "^8.20.0",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "react": "^19.2.0",

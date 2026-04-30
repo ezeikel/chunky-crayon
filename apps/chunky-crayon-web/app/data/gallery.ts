@@ -4,8 +4,12 @@ import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
 import { BRAND } from '@/lib/db';
 import type { GalleryImage, PaginatedImagesResponse } from './coloring-image';
 
-// Brand-scoped base where clause for all gallery queries
-const brandWhere = { brand: BRAND };
+// Brand-scoped + ready-status base where clause for all gallery queries.
+// Filtering on status=READY hides the in-flight rows the canvas-as-loader
+// pipeline inserts before generation finishes — galleries only ever show
+// finished images. FAILED rows also stay out (no point showing rows the
+// user couldn't see anyway).
+const brandWhere = { brand: BRAND, status: 'READY' as const };
 
 // Re-export Difficulty enum for use in components
 export { Difficulty } from '@one-colored-pixel/db';

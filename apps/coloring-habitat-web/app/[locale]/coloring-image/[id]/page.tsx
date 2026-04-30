@@ -10,7 +10,9 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import {
   getAllColoringImagesStatic,
   getColoringImageById,
+  getColoringImageStatus,
 } from "@/app/data/coloring-image";
+import StreamingCanvasView from "@/components/StreamingCanvasView/StreamingCanvasView";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -57,6 +59,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const ColoringImagePage = async ({ params }: Props) => {
   const { id } = await params;
+
+  // Status check first (uncached) — branches the page between the
+  // canvas-as-loader streaming view and the normal cached render. We
+  // can't fold status into `getColoringImageById` because that's
+  // `'use cache'` with cacheLife max; a GENERATING snapshot would stick
+  // for a week even after the row hits READY.
+  const statusRow = await getColoringImageStatus(id);
+  if (!statusRow) {
+    notFound();
+  }
+
+  if (statusRow.status !== "READY") {
+    const tColoring = await getTranslations("navigation");
+    return (
+      <main className="bg-background py-8">
+        <div className="mx-auto max-w-[100vw] px-6">
+          <StreamingCanvasView
+            coloringImageId={id}
+            initialStatus={statusRow.status}
+            initialPartialUrl={statusRow.streamingPartialUrl}
+            initialProgress={statusRow.streamingProgress}
+            initialFailureReason={statusRow.failureReason}
+            fallbackTitle={tColoring("home")}
+          />
+        </div>
+      </main>
+    );
+  }
+
   const t = await getTranslations("navigation");
 
   // Uses cached getColoringImageById ('use cache' directive) so the page

@@ -1,11 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFormStatus } from 'react-dom';
 import { useLocale } from 'next-intl';
-import posthog from 'posthog-js';
-import { generateLoadingAudio } from '@/app/actions/loading-audio';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
@@ -13,7 +10,7 @@ import { trackLead } from '@/utils/pixels';
 import useUser from '@/hooks/useUser';
 import useRecentCreations from '@/hooks/useRecentCreations';
 import { signalGalleryRefresh } from '@/utils/galleryRefresh';
-import { ColoLoading, type AudioState } from '@/components/Loading/ColoLoading';
+import { createPendingColoringImage } from '@/app/actions/createPendingColoringImage';
 import {
   InputModeProvider,
   InputModeSelector,
@@ -25,12 +22,6 @@ import {
   type InputMode,
 } from './inputs';
 import FormCTA from './FormCTA';
-import { submitColoringImageStreaming } from './submitColoringImageStreaming';
-import type { ColoringImage } from '@one-colored-pixel/db';
-
-type ColoringImageActionResult =
-  | Partial<ColoringImage>
-  | { error: string; credits?: number };
 
 type CreateColoringPageFormProps = {
   className?: string;
@@ -40,41 +31,6 @@ type CreateColoringPageFormProps = {
    *  render (guests on homepage/start only) and the location field sent
    *  to PostHog on pill clicks. */
   location?: 'homepage' | 'start';
-};
-
-// Loading overlay component that uses form status
-const FormLoadingOverlay = ({
-  description,
-  audioUrl,
-  audioState,
-  partialImageUrl,
-}: {
-  description: string;
-  audioUrl: string | null;
-  audioState: AudioState;
-  /** When the streaming SSE flow emits a partial image, the form sets a
-   *  data:URL here. ColoLoading renders it as a preview "your coloring
-   *  page is appearing" so the kid sees progress before navigation. */
-  partialImageUrl?: string | null;
-}) => {
-  const { pending } = useFormStatus();
-
-  const handleAudioComplete = () => {
-    trackEvent(TRACKING_EVENTS.LOADING_AUDIO_PLAYED, {
-      descriptionLength: description.length,
-    });
-  };
-
-  return (
-    <ColoLoading
-      isLoading={pending}
-      audioUrl={audioUrl ?? undefined}
-      audioState={audioState}
-      description={description}
-      partialImageUrl={partialImageUrl ?? undefined}
-      onAudioComplete={handleAudioComplete}
-    />
-  );
 };
 
 // Inner form component that uses the input mode context
@@ -89,11 +45,6 @@ const MultiModeForm = ({
   const router = useRouter();
   const locale = useLocale();
   const { mode, description, imageBase64 } = useInputMode();
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [audioState, setAudioState] = useState<AudioState>('idle');
-  // Set when the SSE stream emits a partial image; passed into the
-  // loading overlay so the kid sees the page appear before navigation.
-  const [partialImageUrl, setPartialImageUrl] = useState<string | null>(null);
   const {
     isGuest,
     guestGenerationsUsed,
@@ -102,52 +53,51 @@ const MultiModeForm = ({
   } = useUser();
   const { addCreation } = useRecentCreations();
 
+  /**
+   * Common post-success bookkeeping: tracking, recents, gallery
+   * refresh, navigation. Shared between the form-action (text/photo)
+   * and voice's onComplete paths so behaviour stays consistent.
+   *
+   * Loading audio + Colo voiceover are NOT triggered here anymore —
+   * the destination page (`/coloring-image/[id]`) owns the streaming
+   * canvas overlay end-to-end. The form's job is to debit credits,
+   * INSERT the GENERATING row, kick off the worker job, and navigate.
+   */
+  const onCreated = (
+    id: string,
+    desc: string,
+    inputType: 'text' | 'voice' | 'image',
+  ) => {
+    trackLead({
+      contentName: desc || 'Coloring Page',
+      contentCategory: 'coloring_page_creation',
+    });
+    signalGalleryRefresh('image-created');
+
+    if (isGuest) {
+      trackEvent(TRACKING_EVENTS.GUEST_GENERATION_USED, {
+        generationNumber: guestGenerationsUsed + 1,
+        generationsRemaining: guestGenerationsRemaining - 1,
+        inputType,
+      });
+      if (guestGenerationsRemaining - 1 === 0) {
+        trackEvent(TRACKING_EVENTS.GUEST_LIMIT_REACHED, {
+          totalGenerations: guestGenerationsUsed + 1,
+          lastInputType: inputType,
+        });
+      }
+      incrementGuestGeneration();
+      addCreation(id);
+    }
+
+    router.push(`/coloring-image/${id}`);
+  };
+
   return (
     <form
       action={async (formData) => {
-        // Attach the browser's PostHog distinct_id so server-side events
-        // (image_generation_completed, creation_completed) attribute to the
-        // same visitor as their $pageview events instead of 'anonymous'.
-        const clientDistinctId =
-          typeof window !== 'undefined' && posthog?.get_distinct_id
-            ? posthog.get_distinct_id()
-            : null;
-        if (clientDistinctId) {
-          formData.set('clientDistinctId', clientDistinctId);
-        }
-
-        // Get description from context (already set by input components)
         const inputType = formData.get('inputType') as InputMode;
         const desc = formData.get('description') as string;
-
-        // Start audio generation IMMEDIATELY (fire-and-forget, runs in parallel)
-        // This is called synchronously at the start of the action, not via useEffect
-        if (desc) {
-          // Show "preparing" state while audio generates
-          setAudioState('preparing');
-
-          generateLoadingAudio(desc, locale)
-            .then((result) => {
-              setAudioUrl(result.audioUrl);
-              // Note: The ColoLoading component will set its own "playing" state
-              // when it detects the audioUrl and starts playback
-              trackEvent(TRACKING_EVENTS.LOADING_AUDIO_GENERATED, {
-                script: result.script,
-                durationMs: result.durationMs,
-                descriptionLength: desc.length,
-                locale,
-              });
-            })
-            .catch((error) => {
-              console.error('[LoadingAudio] Failed:', error);
-              setAudioState('done'); // Skip to done state on error
-              trackEvent(TRACKING_EVENTS.LOADING_AUDIO_FAILED, {
-                error: error instanceof Error ? error.message : 'Unknown error',
-                descriptionLength: desc.length,
-                locale,
-              });
-            });
-        }
 
         trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
           description: desc,
@@ -155,98 +105,46 @@ const MultiModeForm = ({
           characterCount: desc?.length || 0,
         });
 
-        let coloringImage: ColoringImageActionResult;
-
-        // Both text + photo use the streaming SSE pipeline. The mode
-        // param tells the server which input prompt + reference set to
-        // use upstream of the OpenAI call. useFormStatus().pending stays
-        // true throughout the SSE stream so the loading overlay shows.
-        const onPartial = (b64: string) => {
-          setPartialImageUrl(`data:image/png;base64,${b64}`);
-        };
-        const streamResult =
-          inputType === 'image' && imageBase64
-            ? await submitColoringImageStreaming({
-                mode: 'photo',
-                photoBase64: imageBase64,
-                locale,
-                clientDistinctId,
-                onPartial,
-              })
-            : await submitColoringImageStreaming({
-                mode: 'text',
-                description: desc,
-                locale,
-                clientDistinctId,
-                onPartial,
-              });
-        coloringImage =
-          'error' in streamResult ? streamResult : { id: streamResult.id };
-
-        if ('error' in coloringImage) {
-          console.error(coloringImage.error);
-          setAudioUrl(null);
-          setAudioState('idle');
-          setPartialImageUrl(null);
+        // Voice has its own onComplete handler; bail here so the form
+        // action doesn't fire when keyboard-Enter happens during a voice
+        // session.
+        if (inputType === 'voice') {
           return;
         }
 
-        // Track and increment guest generation counter if user is a guest
-        if (isGuest) {
-          const inputType = formData.get('inputType') as
-            | 'text'
-            | 'voice'
-            | 'image';
-          trackEvent(TRACKING_EVENTS.GUEST_GENERATION_USED, {
-            generationNumber: guestGenerationsUsed + 1,
-            generationsRemaining: guestGenerationsRemaining - 1,
-            inputType: inputType || 'text',
-          });
-
-          // Check if this was their last free generation
-          if (guestGenerationsRemaining - 1 === 0) {
-            trackEvent(TRACKING_EVENTS.GUEST_LIMIT_REACHED, {
-              totalGenerations: guestGenerationsUsed + 1,
-              lastInputType: inputType || 'text',
-            });
-          }
-
-          incrementGuestGeneration();
+        // Empty-text guard. FormCTA's `disabled` prevents this in the
+        // happy path; pressing Enter bypasses that. Photo mode skips
+        // this — its "description" is the photo itself.
+        if (inputType !== 'image' && (!desc || desc.trim().length === 0)) {
+          return;
         }
 
-        // Store in recent creations for guests to find later
-        if (isGuest && coloringImage.id) {
-          addCreation(coloringImage.id);
+        const result =
+          inputType === 'image' && imageBase64
+            ? await createPendingColoringImage({
+                mode: 'photo',
+                photoBase64: imageBase64,
+                locale,
+              })
+            : await createPendingColoringImage({
+                mode: 'text',
+                description: desc,
+                locale,
+              });
+
+        if (!result.ok) {
+          // No overlay on this surface anymore — the destination page
+          // would have shown FAILED, but here we never got that far.
+          // Console + PostHog for diagnostics; user can retry.
+          console.error('[CreateColoringPageForm] create failed:', result);
+          return;
         }
 
-        // Track Lead event for Facebook/Pinterest pixels (successful content creation)
-        trackLead({
-          contentName: desc || 'Coloring Page',
-          contentCategory: 'coloring_page_creation',
-        });
-
-        // Signal galleries to refresh when user navigates back
-        signalGalleryRefresh('image-created');
-
-        // Reset audio + partial state before navigation
-        setAudioUrl(null);
-        setAudioState('idle');
-        setPartialImageUrl(null);
-        if (coloringImage.id) {
-          router.push(`/coloring-image/${coloringImage.id}`);
-        }
+        onCreated(result.id, desc, inputType === 'image' ? 'image' : 'text');
       }}
       ref={formRef}
       className={cn('flex flex-col gap-y-4', className)}
     >
-      {/* Colo loading overlay with voice - audio URL is managed here */}
-      <FormLoadingOverlay
-        description={description}
-        audioUrl={audioUrl}
-        audioState={audioState}
-        partialImageUrl={partialImageUrl}
-      />
-
       {/* Hidden inputs for form submission */}
       <input type="hidden" name="inputType" value={mode} />
       <input type="hidden" name="description" value={description} />
@@ -260,42 +158,7 @@ const MultiModeForm = ({
       {mode === 'voice' && (
         <VoiceInput
           onComplete={async (firstAnswer, secondAnswer) => {
-            // Voice path bypasses the standard form action — it has two
-            // transcripts to combine and uses a different server action
-            // that debits 10 credits instead of 5. Cleanup (tracking,
-            // navigation) is the same as the text/image paths so we
-            // mirror it here.
-            const clientDistinctId =
-              typeof window !== 'undefined' && posthog?.get_distinct_id
-                ? posthog.get_distinct_id()
-                : undefined;
-
             const desc = `${firstAnswer} ${secondAnswer}`.trim();
-
-            // Start loading audio gen in parallel — same as text path.
-            if (desc) {
-              setAudioState('preparing');
-              generateLoadingAudio(desc, locale)
-                .then((result) => {
-                  setAudioUrl(result.audioUrl);
-                  trackEvent(TRACKING_EVENTS.LOADING_AUDIO_GENERATED, {
-                    script: result.script,
-                    durationMs: result.durationMs,
-                    descriptionLength: desc.length,
-                    locale,
-                  });
-                })
-                .catch((error) => {
-                  console.error('[LoadingAudio] Failed:', error);
-                  setAudioState('done');
-                  trackEvent(TRACKING_EVENTS.LOADING_AUDIO_FAILED, {
-                    error:
-                      error instanceof Error ? error.message : 'Unknown error',
-                    descriptionLength: desc.length,
-                    locale,
-                  });
-                });
-            }
 
             trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
               description: desc,
@@ -303,38 +166,34 @@ const MultiModeForm = ({
               characterCount: desc.length,
             });
 
-            const streamResult = await submitColoringImageStreaming({
+            const result = await createPendingColoringImage({
               mode: 'voice',
               firstAnswer,
               secondAnswer,
               locale,
-              clientDistinctId: clientDistinctId ?? null,
-              onPartial: (b64) => {
-                setPartialImageUrl(`data:image/png;base64,${b64}`);
-              },
             });
 
-            if ('error' in streamResult) {
-              console.error(streamResult.error);
-              setAudioUrl(null);
-              setAudioState('idle');
-              setPartialImageUrl(null);
-              return;
+            if (!result.ok) {
+              console.error(
+                '[CreateColoringPageForm] voice create failed:',
+                result,
+              );
+              // Map server-action error codes to the voice hook's error
+              // codes so VoiceInput can render its existing friendly UI
+              // ("Let's try a different idea!" / "Try again?") instead
+              // of leaving the user stranded on "Painting your page…".
+              switch (result.error) {
+                case 'moderation_blocked':
+                  return 'follow_up_blocked';
+                case 'unauthorized':
+                  return 'requires_signin';
+                default:
+                  return 'follow_up_failed';
+              }
             }
 
-            // Voice mode requires a signed-in user, so guest tracking
-            // doesn't apply here — but keep Lead + gallery refresh in sync
-            // with the standard path.
-            trackLead({
-              contentName: desc || 'Coloring Page',
-              contentCategory: 'coloring_page_creation',
-            });
-            signalGalleryRefresh('image-created');
-
-            setAudioUrl(null);
-            setAudioState('idle');
-            setPartialImageUrl(null);
-            router.push(`/coloring-image/${streamResult.id}`);
+            onCreated(result.id, desc, 'voice');
+            return undefined;
           }}
         />
       )}

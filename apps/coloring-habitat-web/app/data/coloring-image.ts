@@ -5,12 +5,19 @@ import type { ColoringImageSearchParams } from "@/types";
 import { getUserId } from "@/app/actions/user";
 import { BRAND } from "@/lib/db";
 
-// Brand-scoped base where clause for all coloringImage queries
-const brandWhere = { brand: BRAND };
+// Brand-scoped + ready-status base where clause for all list queries.
+// status=READY hides canvas-as-loader rows in flight (GENERATING) + failed
+// rows. Single-id finds intentionally don't filter — image page needs to
+// see GENERATING rows to render the streaming canvas view.
+const brandWhere = { brand: BRAND, status: "READY" as const };
 
 // Cached data fetching for coloring images using Next.js 16 Cache Components
 
-// Base cached function for fetching a single coloring image
+// Base cached function for fetching a single coloring image.
+// Single-id lookups intentionally skip the `status: READY` filter that
+// `brandWhere` enforces on list queries — the image page needs to see
+// GENERATING rows so it can render the streaming canvas view, and
+// fetched-by-id paths should always work even for hidden ad/seed rows.
 export const getColoringImageBase = async (
   id: string,
 ): Promise<Partial<ColoringImage> | null> => {
@@ -18,10 +25,9 @@ export const getColoringImageBase = async (
   cacheLife("max");
   cacheTag("coloring-image", `coloring-image-${id}`);
 
-  // findUnique doesn't support compound filters so use findFirst to enforce brand
   return db.coloringImage.findFirst({
     where: {
-      ...brandWhere,
+      brand: BRAND,
       id,
     },
     select: {
@@ -52,6 +58,33 @@ export const getColoringImage = async (
 ): Promise<Partial<ColoringImage> | null> => {
   const { id } = await params;
   return getColoringImageBase(id);
+};
+
+/**
+ * Uncached lightweight status check — used by the image page to branch
+ * between StreamingCanvasView and the cached canvas render. See CC
+ * version for full rationale.
+ */
+export const getColoringImageStatus = async (
+  id: string,
+): Promise<{
+  status: "GENERATING" | "READY" | "FAILED";
+  streamingPartialUrl: string | null;
+  streamingProgress: number;
+  failureReason: string | null;
+  brand: string;
+} | null> => {
+  const row = await db.coloringImage.findFirst({
+    where: { brand: BRAND, id },
+    select: {
+      status: true,
+      streamingPartialUrl: true,
+      streamingProgress: true,
+      failureReason: true,
+      brand: true,
+    },
+  });
+  return row;
 };
 
 // Export for components that have a plain string ID (uses cached version)

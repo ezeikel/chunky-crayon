@@ -21,15 +21,22 @@ export async function loadGalleryImages(
 ): Promise<PaginatedImagesResponse> {
   const limit = GALLERY_PAGE_SIZE;
 
-  let whereClause: Prisma.ColoringImageWhereInput = { brand: BRAND };
+  // Every branch needs status=READY so canvas-as-loader rows in flight
+  // (GENERATING / FAILED) don't leak into infinite-scroll gallery loads.
+  const baseWhere = {
+    brand: BRAND,
+    status: "READY" as const,
+  };
+
+  let whereClause: Prisma.ColoringImageWhereInput = baseWhere;
 
   switch (galleryType) {
     case "all":
-      whereClause = { brand: BRAND };
+      whereClause = baseWhere;
       break;
 
     case "daily":
-      whereClause = { brand: BRAND, generationType: GenerationType.DAILY };
+      whereClause = { ...baseWhere, generationType: GenerationType.DAILY };
       break;
 
     case "category":
@@ -41,7 +48,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
-        brand: BRAND,
+        ...baseWhere,
         OR: [
           { tags: { hasSome: category.tags } },
           ...category.tags.map((tag) => ({
@@ -65,7 +72,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
-        brand: BRAND,
+        ...baseWhere,
         difficulty,
       };
       break;
@@ -75,7 +82,7 @@ export async function loadGalleryImages(
         return { images: [], nextCursor: null, hasMore: false };
       }
       whereClause = {
-        brand: BRAND,
+        ...baseWhere,
         tags: { has: tagSlug },
       };
       break;

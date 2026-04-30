@@ -156,11 +156,29 @@ model ColoringImage {
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
   generationType     GenerationType   @default(USER)
-  User               User?            @relation(fields: [userId], references: [id])
-  userId             String?
-  profile            Profile?         @relation(fields: [profileId], references: [id])
-  profileId          String? // Which profile created this image
-  savedArtworks      SavedArtwork[] // Colored versions saved by users
+
+  // Streaming-generation lifecycle. Rows are inserted GENERATING by
+  // createPendingColoringImage so the destination page can render
+  // immediately while the Hetzner worker streams partial frames in.
+  // Worker flips to READY on persist completion or FAILED on error.
+  // Existing rows default READY so the migration is back-compat.
+  status              ColoringImageStatus @default(READY)
+  // R2 URL of the latest partial frame from the OpenAI stream. Worker
+  // uploads each partial here and calls pg_notify so listeners can
+  // re-render. Null once the row hits READY (final url + svgUrl take over).
+  streamingPartialUrl String?
+  // 0–3, count of partial frames received so far. Drives loader progress UX.
+  streamingProgress   Int                 @default(0)
+  // Human-readable reason for FAILED rows. Surfaced in the retry UI.
+  failureReason       String?
+  // In-memory id the worker uses to track this generation. Useful for
+  // debugging + cancellation; not part of any API contract.
+  workerJobId         String?
+  User                User?               @relation(fields: [userId], references: [id])
+  userId              String?
+  profile             Profile?            @relation(fields: [profileId], references: [id])
+  profileId           String? // Which profile created this image
+  savedArtworks       SavedArtwork[] // Colored versions saved by users
 
   // LEGACY: 5x5 grid color map. Modern Magic Brush / Auto-Color use the region
   // store (regionMapUrl + regionsJson) for per-pixel region-accurate reveal.
@@ -217,6 +235,10 @@ model ColoringImage {
 
   @@index([generationType, purposeKey])
   @@index([showInCommunity])
+  // Gallery + list queries filter on status=READY everywhere; this index
+  // keeps those plans cheap. The cleanup cron also queries status=GENERATING
+  // ordered by createdAt — composite covers both.
+  @@index([status, createdAt])
   @@map("coloring_images")
 }
 
@@ -493,6 +515,20 @@ enum GenerationType {
   USER // Created by a real user clicking Create in the app.
   DAILY // Daily cron scene. Kept distinct because scheduler, dedup, and content safety care about this category specifically.
   SYSTEM // Everything else programmatic — ads, demo reel fixtures, onboarding splashes, test seeds. Use purposeKey to distinguish.
+}
+
+// Lifecycle of a ColoringImage row in the streaming-generation pipeline.
+// GENERATING rows are inserted up-front by createPendingColoringImage so
+// the user can navigate to /coloring-image/[id] immediately and watch the
+// stream paint in. Rows transition to READY when the worker finishes
+// persisting (R2 upload, SVG trace, region store kickoff). FAILED rows
+// represent generations that errored or got swept by the stale-cleanup
+// cron after sitting in GENERATING for >15 min. Existing rows default to
+// READY so the migration is back-compat.
+enum ColoringImageStatus {
+  GENERATING
+  READY
+  FAILED
 }
 
 // Which input variant the demo reel was rendered for. Set by the worker

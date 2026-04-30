@@ -22,6 +22,7 @@ import { generateRegionStoreLocal } from "./record/region-store.js";
 import { generateBackgroundMusicLocal } from "./record/background-music.js";
 import { generateColoredReferenceLocal } from "./record/colored-reference.js";
 import { generateFillPointsLocal } from "./record/fill-points.js";
+import { revalidateVercelCache } from "./coloring-image/revalidate.js";
 import { db } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
 import { generateReelScript } from "./script/generate.js";
@@ -39,6 +40,11 @@ import {
   streamColoringImage,
   type StreamColoringImageInput,
 } from "./coloring-image/stream.js";
+import {
+  startColoringImageJob,
+  type StartJobInput,
+} from "./coloring-image/jobs.js";
+import { subscribe } from "./coloring-image/listener.js";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
@@ -90,6 +96,13 @@ const bearerAuth = async (
 };
 app.use("/publish/*", bearerAuth);
 app.use("/generate/*", bearerAuth);
+// /jobs/* is the canvas-as-loader pipeline trigger (Vercel POSTs after
+// inserting the GENERATING row). /sse/* is the browser-facing streaming
+// endpoint — it sees the worker through a Vercel SSE passthrough that
+// already auth-checks the user, so /sse here trusts that proxy. Bearer
+// covers /sse anyway in case anything else tries to hit it directly.
+app.use("/jobs/*", bearerAuth);
+app.use("/sse/*", bearerAuth);
 
 app.get("/health", (c) =>
   c.json({ status: "ok", service: "chunky-crayon-worker" }),
@@ -254,6 +267,7 @@ app.post("/generate/region-store", async (c) => {
         console.log(
           `[generate/region-store] done imageId=${imageId} regions=${result.regionsJson.regions.length}`,
         );
+        await revalidateVercelCache(imageId, "generate/region-store");
       } else {
         console.error(
           `[generate/region-store] FAILED imageId=${imageId} error=${result.error}`,
@@ -321,6 +335,7 @@ app.post("/generate/background-music", async (c) => {
         console.log(
           `[generate/background-music] done imageId=${imageId} url=${result.backgroundMusicUrl}`,
         );
+        await revalidateVercelCache(imageId, "generate/background-music");
       } else {
         console.error(
           `[generate/background-music] FAILED imageId=${imageId} error=${result.error}`,
@@ -389,6 +404,7 @@ app.post("/generate/colored-reference", async (c) => {
         console.log(
           `[generate/colored-reference] done imageId=${imageId} url=${result.url}`,
         );
+        await revalidateVercelCache(imageId, "generate/colored-reference");
       } else {
         console.error(
           `[generate/colored-reference] FAILED imageId=${imageId} error=${result.error}`,
@@ -455,6 +471,7 @@ app.post("/generate/fill-points", async (c) => {
       const result = await generateFillPointsLocal(imageId);
       if (result.success) {
         console.log(`[generate/fill-points] done imageId=${imageId}`);
+        await revalidateVercelCache(imageId, "generate/fill-points");
       } else {
         console.error(
           `[generate/fill-points] FAILED imageId=${imageId} error=${result.error}`,
@@ -1942,6 +1959,213 @@ app.post("/publish/v2", async (c) => {
     rendered: true,
     publishedUrl,
     publishedCoverUrl,
+  });
+});
+
+/**
+ * POST /jobs/coloring-image/start
+ *
+ * Canvas-as-loader entrypoint. Vercel side has already:
+ *   - auth-checked the user
+ *   - debited credits
+ *   - INSERT'd a coloring_images row with status=GENERATING
+ *   - built the fully-baked OpenAI prompt + style refs
+ *
+ * Body: StartJobInput (see coloring-image/jobs.ts).
+ *
+ * Returns 202 immediately. The OpenAI stream + persist runs detached so
+ * that browser tab close / refresh don't kill generation. Browsers watch
+ * progress via /sse/coloring-image/:id (proxied through Vercel).
+ */
+app.post("/jobs/coloring-image/start", async (c) => {
+  const body = await c.req
+    .json<Partial<StartJobInput>>()
+    .catch(() => ({}) as Partial<StartJobInput>);
+
+  if (!body.coloringImageId || typeof body.coloringImageId !== "string") {
+    return c.json({ error: "coloringImageId required" }, 400);
+  }
+  if (!body.prompt || typeof body.prompt !== "string") {
+    return c.json({ error: "prompt required" }, 400);
+  }
+  if (
+    !body.brand ||
+    (body.brand !== "CHUNKY_CRAYON" && body.brand !== "COLORING_HABITAT")
+  ) {
+    return c.json(
+      { error: "brand must be CHUNKY_CRAYON or COLORING_HABITAT" },
+      400,
+    );
+  }
+  if (typeof body.creditCost !== "number" || body.creditCost < 0) {
+    return c.json({ error: "creditCost must be a non-negative number" }, 400);
+  }
+
+  const hasRefs =
+    Array.isArray(body.referenceImageUrls) &&
+    body.referenceImageUrls.length > 0;
+  const hasInline =
+    Array.isArray(body.imagesInline) && body.imagesInline.length > 0;
+  if (!hasRefs && !hasInline) {
+    return c.json(
+      {
+        error:
+          "either referenceImageUrls (text/voice) or imagesInline (photo) required",
+      },
+      400,
+    );
+  }
+
+  const input: StartJobInput = {
+    coloringImageId: body.coloringImageId,
+    prompt: body.prompt,
+    referenceImageUrls: body.referenceImageUrls,
+    imagesInline: body.imagesInline,
+    description: body.description ?? "",
+    locale: body.locale,
+    brand: body.brand,
+    creditCost: body.creditCost,
+    size: body.size,
+    quality: body.quality,
+    partialImages: body.partialImages,
+  };
+
+  console.log(
+    `[/jobs/coloring-image/start] queued ${input.coloringImageId} (${
+      hasInline
+        ? `inline=${body.imagesInline!.length}`
+        : `refs=${body.referenceImageUrls!.length}`
+    })`,
+  );
+
+  startColoringImageJob(input);
+
+  return c.json({ ok: true, coloringImageId: input.coloringImageId }, 202);
+});
+
+/**
+ * GET /sse/coloring-image/:id
+ *
+ * Browser-facing SSE — proxied through Vercel `/api/coloring-image/[id]/events`
+ * (which auth-checks the user). Emits an event every time the row's
+ * pg_notify fires, plus an initial event with current row state so a
+ * late-arriving subscriber doesn't have to wait for the next update.
+ *
+ * Closes when status hits READY or FAILED.
+ *
+ * Event shape:
+ *   { type: 'state', status, streamingPartialUrl, streamingProgress,
+ *     url, svgUrl, failureReason }
+ */
+app.get("/sse/coloring-image/:id", async (c) => {
+  const id = c.req.param("id");
+  if (!id) return c.json({ error: "id required" }, 400);
+
+  return streamSSE(c, async (stream) => {
+    type Unsub = () => void;
+    // Hold the unsubscribe in a ref-style object so TS doesn't narrow
+    // away its callable type after the closure assignment inside subscribe().
+    const unsubRef: { fn: Unsub | null } = { fn: null };
+    let closed = false;
+
+    const readAndEmit = async (): Promise<"keep" | "stop"> => {
+      const row = await db.coloringImage.findUnique({
+        where: { id },
+        select: {
+          status: true,
+          streamingPartialUrl: true,
+          streamingProgress: true,
+          url: true,
+          svgUrl: true,
+          failureReason: true,
+        },
+      });
+
+      if (!row) {
+        await stream.writeSSE({
+          event: "error",
+          data: JSON.stringify({ type: "error", message: "not_found" }),
+        });
+        return "stop";
+      }
+
+      await stream.writeSSE({
+        event: "state",
+        data: JSON.stringify({ type: "state", ...row }),
+      });
+
+      // Terminal states close the stream — caller's EventSource sees the
+      // close and stops trying to reconnect. State is already in the row,
+      // so refreshing the page reads it directly without reopening SSE.
+      if (row.status === "READY" || row.status === "FAILED") {
+        return "stop";
+      }
+      return "keep";
+    };
+
+    // Initial emit — covers the case where the browser opens SSE after
+    // the worker already advanced past 1+ partials, so we don't show a
+    // blank canvas until the next notify lands.
+    try {
+      const initial = await readAndEmit();
+      if (initial === "stop") return;
+    } catch (err) {
+      console.error(`[/sse/${id}] initial read failed:`, err);
+      await stream.writeSSE({
+        event: "error",
+        data: JSON.stringify({
+          type: "error",
+          message: err instanceof Error ? err.message : String(err),
+        }),
+      });
+      return;
+    }
+
+    // Hold the stream open until terminal-state OR client disconnects.
+    // streamSSE resolves the inner promise => closes the response. We
+    // gate progression on a manual deferred so notify-driven re-emits
+    // can flag completion.
+    const done = new Promise<void>((resolve) => {
+      const handle = async () => {
+        if (closed) return;
+        try {
+          const next = await readAndEmit();
+          if (next === "stop") {
+            closed = true;
+            resolve();
+          }
+        } catch (err) {
+          console.error(`[/sse/${id}] re-read failed:`, err);
+          // Don't close — let the next notify retry. Browsers tolerate
+          // intermittent gaps.
+        }
+      };
+
+      void subscribe(id, handle).then((u: Unsub) => {
+        if (closed) {
+          // We already finished (e.g. row was terminal on initial read);
+          // unsubscribe immediately.
+          u();
+          return;
+        }
+        unsubRef.fn = u;
+      });
+
+      // Hard cap — browsers also have their own EventSource timeout, but
+      // a worker holding open dead connections forever is a leak waiting
+      // to happen. 10 min covers worst-case generation + a buffer.
+      setTimeout(
+        () => {
+          if (closed) return;
+          closed = true;
+          resolve();
+        },
+        10 * 60 * 1000,
+      );
+    });
+
+    await done;
+    if (unsubRef.fn) unsubRef.fn();
   });
 });
 

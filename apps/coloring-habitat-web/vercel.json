@@ -19,6 +19,10 @@
       "schedule": "0 7 * * *"
     },
     {
+      "path": "/api/cron/cleanup-stuck-generations",
+      "schedule": "*/5 * * * *"
+    },
+    {
       "path": "/api/email-list/send-latest",
       "schedule": "10 7 * * *"
     },

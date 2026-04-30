@@ -29,6 +29,7 @@ const handleRequest = async (request: Request) => {
         brand: BRAND,
         generationType,
         createdAt: { gte: todayStart },
+        status: 'READY', // Don't email a half-baked daily image
       },
       orderBy: {
         createdAt: 'desc',

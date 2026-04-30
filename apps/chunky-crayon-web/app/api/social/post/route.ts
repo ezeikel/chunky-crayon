@@ -1138,6 +1138,7 @@ const handleRequest = async (request: Request) => {
           brand: BRAND,
           generationType: GenerationType.DAILY,
           createdAt: { gte: todayStart },
+          status: 'READY', // skip in-flight rows from canvas-as-loader
         },
         orderBy: {
           createdAt: 'desc',
@@ -1198,6 +1199,7 @@ const handleRequest = async (request: Request) => {
             brand: BRAND,
             demoReelUrl: { not: null },
             createdAt: { gte: todayStart },
+            status: 'READY',
           },
           orderBy: { createdAt: 'desc' },
         });
@@ -1504,6 +1506,7 @@ const handleRequest = async (request: Request) => {
             brand: BRAND,
             demoReelUrl: { not: null },
             createdAt: { gte: todayStart },
+            status: 'READY',
           },
           orderBy: { createdAt: 'desc' },
         });

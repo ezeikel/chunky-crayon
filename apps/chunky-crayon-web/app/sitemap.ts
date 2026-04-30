@@ -14,6 +14,7 @@ async function getAllPublicImages() {
     where: {
       brand: BRAND,
       userId: null, // Only public images
+      status: 'READY', // Skip GENERATING / FAILED rows
     },
     select: {
       id: true,

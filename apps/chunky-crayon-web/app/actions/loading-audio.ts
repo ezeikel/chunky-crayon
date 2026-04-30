@@ -55,7 +55,13 @@ export async function generateLoadingAudio(
   locale: string = 'en',
 ): Promise<LoadingAudioResult> {
   const startTime = Date.now();
+  // eslint-disable-next-line no-console
+  console.log(
+    `[LoadingAudio] action invoked description="${description}" locale=${locale}`,
+  );
   const userId = await getUserId(ACTIONS.GENERATE_LOADING_AUDIO);
+  // eslint-disable-next-line no-console
+  console.log(`[LoadingAudio] auth check complete userId=${userId ?? 'null'}`);
 
   // Get language info for the locale (default to English if unknown)
   const languageInfo = LOCALE_LANGUAGE_MAP[locale] || LOCALE_LANGUAGE_MAP.en;

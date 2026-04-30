@@ -20,7 +20,7 @@ async function getSampleData() {
 
   // Get a sample coloring image
   const coloringImage = await db.coloringImage.findFirst({
-    where: { brand: BRAND },
+    where: { brand: BRAND, status: 'READY' },
     select: { id: true, title: true },
     orderBy: { createdAt: 'desc' },
   });

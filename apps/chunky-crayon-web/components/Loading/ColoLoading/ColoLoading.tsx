@@ -139,6 +139,20 @@ const ColoLoading = ({
     }
   }, [isLoading]);
 
+  // Lock body scroll while the fullscreen overlay is visible. Without
+  // this you can scroll the page underneath, which breaks the "modal"
+  // illusion and lets users tap things they shouldn't be tapping
+  // mid-generation. Restore on unmount/finish so we never strand the
+  // page in a frozen state.
+  useEffect(() => {
+    if (!isLoading) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isLoading]);
+
   // Determine what message to show based on audio state
   const getMessage = () => {
     // If we're playing audio, show nothing - let Colo speak
@@ -199,18 +213,32 @@ const ColoLoading = ({
           priority
         />
 
-        {/* Sparkle effects around Colo (hide when speaking) */}
+        {/* Sparkle effects around Colo (hide when speaking).
+            FA duotone instead of emojis — emojis read inconsistently
+            across OS + feel cheap relative to the brand. */}
         {!isPlaying && (
           <>
-            <div className="absolute -top-4 -right-4 text-2xl animate-pulse">
-              ✨
-            </div>
-            <div
-              className="absolute -bottom-2 -left-4 text-xl animate-pulse"
-              style={{ animationDelay: '-0.5s' }}
-            >
-              🌟
-            </div>
+            <FontAwesomeIcon
+              icon={faSparkles}
+              className="absolute -top-4 -right-4 text-2xl animate-pulse text-crayon-yellow"
+              style={
+                {
+                  '--fa-secondary-color': 'hsl(var(--crayon-orange))',
+                  '--fa-secondary-opacity': 0.9,
+                } as React.CSSProperties
+              }
+            />
+            <FontAwesomeIcon
+              icon={faStars}
+              className="absolute -bottom-2 -left-4 text-xl animate-pulse text-crayon-pink"
+              style={
+                {
+                  animationDelay: '-0.5s',
+                  '--fa-secondary-color': 'hsl(var(--crayon-purple))',
+                  '--fa-secondary-opacity': 0.9,
+                } as React.CSSProperties
+              }
+            />
           </>
         )}
 

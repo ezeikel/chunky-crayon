@@ -29,8 +29,10 @@ export const ALL_DIFFICULTIES = Object.values(Difficulty) as Difficulty[];
 
 export const GALLERY_PAGE_SIZE = 24;
 
-// Brand-scoped base where clause
-const brandWhere = { brand: BRAND };
+// Brand-scoped + ready-status base where clause for all list queries.
+// Filtering on status=READY hides canvas-as-loader rows in flight; FAILED
+// rows also stay out (no point showing rows the user couldn't see anyway).
+const brandWhere = { brand: BRAND, status: "READY" as const };
 
 // ===== ALL GALLERY IMAGES =====
 // Public gallery images for the main gallery page (brand-filtered)

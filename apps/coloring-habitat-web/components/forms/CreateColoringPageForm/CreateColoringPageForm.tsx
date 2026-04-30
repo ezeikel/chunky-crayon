@@ -2,21 +2,14 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useFormStatus } from "react-dom";
-import { useTranslations, useLocale } from "next-intl";
-import posthog from "posthog-js";
-import {
-  createColoringImage,
-  createColoringImageFromVoiceConversation,
-} from "@/app/actions/coloring-image";
-import { createColoringImageFromPhoto } from "@/app/actions/photo-to-coloring";
+import { useLocale } from "next-intl";
+import { createPendingColoringImage } from "@/app/actions/createPendingColoringImage";
 import { cn } from "@/lib/utils";
 import { trackEvent } from "@/utils/analytics-client";
 import { TRACKING_EVENTS } from "@/constants";
 import { trackLead } from "@/utils/pixels";
 import useUser from "@/hooks/useUser";
 import { signalGalleryRefresh } from "@/utils/galleryRefresh";
-import Loading from "@/components/Loading";
 import {
   InputModeProvider,
   InputModeSelector,
@@ -31,22 +24,6 @@ type CreateColoringPageFormProps = {
   className?: string;
 };
 
-const FormLoadingOverlay = () => {
-  const { pending } = useFormStatus();
-  const t = useTranslations("createForm.loading");
-
-  if (!pending) return null;
-
-  return (
-    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 rounded-2xl bg-background/90 backdrop-blur-sm">
-      <Loading size="lg" text={t("creating")} />
-      <p className="text-sm text-muted-foreground animate-pulse">
-        {t("readyIn")}
-      </p>
-    </div>
-  );
-};
-
 const MultiModeForm = ({ className }: { className?: string }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
@@ -54,20 +31,41 @@ const MultiModeForm = ({ className }: { className?: string }) => {
   const { mode, description, imageBase64 } = useInputMode();
   const { isGuest, remainingGenerations, recordGuestGeneration } = useUser();
 
+  /**
+   * Common post-success bookkeeping. Loading UX is now owned by the
+   * destination page (StreamingCanvasView), so this just tracks +
+   * navigates.
+   */
+  const onCreated = (
+    id: string,
+    desc: string,
+    inputType: "text" | "voice" | "image",
+  ) => {
+    trackLead({
+      contentName: desc || "Coloring Page",
+      contentCategory: "coloring_page_creation",
+    });
+    signalGalleryRefresh("image-created");
+
+    if (isGuest) {
+      trackEvent(TRACKING_EVENTS.GUEST_GENERATION_USED, {
+        generationsRemaining: remainingGenerations - 1,
+        inputType,
+      });
+      if (remainingGenerations - 1 === 0) {
+        trackEvent(TRACKING_EVENTS.GUEST_LIMIT_REACHED, {
+          lastInputType: inputType,
+        });
+      }
+      recordGuestGeneration();
+    }
+
+    router.push(`/coloring-image/${id}`);
+  };
+
   return (
     <form
       action={async (formData) => {
-        // Attach the browser's PostHog distinct_id so server-side events
-        // (image_generation_completed, creation_analyzed) attribute to the
-        // same visitor as their $pageview events instead of 'server'.
-        const clientDistinctId =
-          typeof window !== "undefined" && posthog?.get_distinct_id
-            ? posthog.get_distinct_id()
-            : null;
-        if (clientDistinctId) {
-          formData.set("clientDistinctId", clientDistinctId);
-        }
-
         const inputType = formData.get("inputType") as InputMode;
         const desc = formData.get("description") as string;
 
@@ -77,47 +75,33 @@ const MultiModeForm = ({ className }: { className?: string }) => {
           characterCount: desc?.length || 0,
         });
 
-        const coloringImage =
-          inputType === "image" && imageBase64
-            ? await createColoringImageFromPhoto(imageBase64, locale)
-            : await createColoringImage(formData);
+        if (inputType === "voice") return;
+        if (inputType !== "image" && (!desc || desc.trim().length === 0))
+          return;
 
-        if ("error" in coloringImage) {
-          console.error(coloringImage.error);
+        const result =
+          inputType === "image" && imageBase64
+            ? await createPendingColoringImage({
+                mode: "photo",
+                photoBase64: imageBase64,
+                locale,
+              })
+            : await createPendingColoringImage({
+                mode: "text",
+                description: desc,
+                locale,
+              });
+
+        if (!result.ok) {
+          console.error("[CreateColoringPageForm] create failed:", result);
           return;
         }
 
-        if (isGuest) {
-          trackEvent(TRACKING_EVENTS.GUEST_GENERATION_USED, {
-            generationsRemaining: remainingGenerations - 1,
-            inputType: inputType || "text",
-          });
-
-          if (remainingGenerations - 1 === 0) {
-            trackEvent(TRACKING_EVENTS.GUEST_LIMIT_REACHED, {
-              lastInputType: inputType || "text",
-            });
-          }
-
-          recordGuestGeneration();
-        }
-
-        trackLead({
-          contentName: desc || "Coloring Page",
-          contentCategory: "coloring_page_creation",
-        });
-
-        signalGalleryRefresh("image-created");
-
-        if (coloringImage.id) {
-          router.push(`/coloring-image/${coloringImage.id}`);
-        }
+        onCreated(result.id, desc, inputType === "image" ? "image" : "text");
       }}
       ref={formRef}
       className={cn("flex flex-col gap-y-4", className)}
     >
-      <FormLoadingOverlay />
-
       <input type="hidden" name="inputType" value={mode} />
       <input type="hidden" name="description" value={description} />
 
@@ -128,13 +112,6 @@ const MultiModeForm = ({ className }: { className?: string }) => {
         {mode === "voice" && (
           <VoiceInput
             onComplete={async (firstAnswer, secondAnswer) => {
-              // Voice path bypasses the form action — two transcripts +
-              // 10-credit cost via a different server action.
-              const clientDistinctId =
-                typeof window !== "undefined" && posthog?.get_distinct_id
-                  ? posthog.get_distinct_id()
-                  : undefined;
-
               const desc = `${firstAnswer} ${secondAnswer}`.trim();
 
               trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
@@ -143,28 +120,22 @@ const MultiModeForm = ({ className }: { className?: string }) => {
                 characterCount: desc.length,
               });
 
-              const coloringImage =
-                await createColoringImageFromVoiceConversation({
-                  firstAnswer,
-                  secondAnswer,
-                  locale,
-                  clientDistinctId,
-                });
+              const result = await createPendingColoringImage({
+                mode: "voice",
+                firstAnswer,
+                secondAnswer,
+                locale,
+              });
 
-              if ("error" in coloringImage) {
-                console.error(coloringImage.error);
+              if (!result.ok) {
+                console.error(
+                  "[CreateColoringPageForm] voice create failed:",
+                  result,
+                );
                 return;
               }
 
-              trackLead({
-                contentName: desc || "Coloring Page",
-                contentCategory: "coloring_page_creation",
-              });
-              signalGalleryRefresh("image-created");
-
-              if (coloringImage.id) {
-                router.push(`/coloring-image/${coloringImage.id}`);
-              }
+              onCreated(result.id, desc, "voice");
             }}
           />
         )}
