@@ -589,13 +589,13 @@
       }
     },
     "features": {
-      "credits250": "~50 pages a month — about a page a day",
-      "credits500": "~100 pages a month — full library every month",
-      "credits1000": "~200 pages a month — never run out",
+      "credits250": "~50 pages a month, about a page a day",
+      "credits500": "~100 pages a month, a full library every month",
+      "credits1000": "~200 pages a month, never run out",
       "allFeatures": "All platform features",
       "noRollover": "Credits reset each month",
-      "rollover1Month": "Credits stack up — keep one extra month",
-      "rollover2Months": "Credits stack up — keep two extra months",
+      "rollover1Month": "Credits stack up. Keep one extra month",
+      "rollover2Months": "Credits stack up. Keep two extra months",
       "prioritySupport": "Priority support",
       "commercialUse": "Commercial use license",
       "profiles3": "Up to 3 kid profiles",
