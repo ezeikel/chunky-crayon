@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import posthog from 'posthog-js';
+import { useFeatureFlagEnabled } from 'posthog-js/react';
 import { toast } from 'sonner';
 import cn from '@/utils/cn';
 import {
@@ -16,6 +17,11 @@ type AppStoreButtonsProps = {
 };
 
 const AppStoreButtons = ({ className, location }: AppStoreButtonsProps) => {
+  const showAppStore = useFeatureFlagEnabled('show-app-store-button');
+  const showPlayStore = useFeatureFlagEnabled('show-play-store-button');
+
+  if (!showAppStore && !showPlayStore) return null;
+
   const handleAppStoreClick = () => {
     posthog.capture(TRACKING_EVENTS.APP_STORE_CLICKED, {
       button_location: location,
@@ -46,34 +52,38 @@ const AppStoreButtons = ({ className, location }: AppStoreButtonsProps) => {
 
   return (
     <div className={cn('flex items-center gap-3', className)}>
-      <button
-        type="button"
-        onClick={handleAppStoreClick}
-        className="transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange focus-visible:ring-offset-2 rounded-lg"
-        aria-label="Download on the App Store"
-      >
-        <Image
-          src={APP_STORE_IMAGES.APPLE.DARK}
-          alt="Download on the App Store"
-          width={135}
-          height={40}
-          className="h-10 w-auto"
-        />
-      </button>
-      <button
-        type="button"
-        onClick={handlePlayStoreClick}
-        className="transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange focus-visible:ring-offset-2 rounded-lg"
-        aria-label="Get it on Google Play"
-      >
-        <Image
-          src={APP_STORE_IMAGES.GOOGLE.DARK}
-          alt="Get it on Google Play"
-          width={135}
-          height={40}
-          className="h-10 w-auto"
-        />
-      </button>
+      {showAppStore && (
+        <button
+          type="button"
+          onClick={handleAppStoreClick}
+          className="transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange focus-visible:ring-offset-2 rounded-lg"
+          aria-label="Download on the App Store"
+        >
+          <Image
+            src={APP_STORE_IMAGES.APPLE.DARK}
+            alt="Download on the App Store"
+            width={135}
+            height={40}
+            className="h-10 w-auto"
+          />
+        </button>
+      )}
+      {showPlayStore && (
+        <button
+          type="button"
+          onClick={handlePlayStoreClick}
+          className="transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange focus-visible:ring-offset-2 rounded-lg"
+          aria-label="Get it on Google Play"
+        >
+          <Image
+            src={APP_STORE_IMAGES.GOOGLE.DARK}
+            alt="Get it on Google Play"
+            width={135}
+            height={40}
+            className="h-10 w-auto"
+          />
+        </button>
+      )}
     </div>
   );
 };
