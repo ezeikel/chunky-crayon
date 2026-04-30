@@ -675,15 +675,15 @@
     "packs": {
       "PUBLIC_CREDITS_50": {
         "name": "Starter",
-        "tagline": "About 10 coloring pages. Try it on a rainy afternoon."
+        "tagline": "About 10 coloring pages. A rainy afternoon, sorted."
       },
       "PUBLIC_CREDITS_200": {
-        "name": "Half-term",
+        "name": "Weekend",
         "tagline": "About 40 coloring pages. Enough for a week of \"I'm bored\"."
       },
       "PUBLIC_CREDITS_500": {
-        "name": "Holiday",
-        "tagline": "About 100 coloring pages. The whole school break, sorted."
+        "name": "Vacation",
+        "tagline": "About 100 coloring pages. A whole school break, sorted."
       }
     },
     "subscribePitch": {

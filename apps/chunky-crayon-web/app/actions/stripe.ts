@@ -18,7 +18,12 @@ import {
   mapStripePriceToPlanName,
   mapStripeStatusToSubscriptionStatus,
 } from '@/utils/stripe';
-import { PLAN_CREDITS, ACTIONS, CREDIT_PACKS_MEMBER } from '@/constants';
+import {
+  PLAN_CREDITS,
+  ACTIONS,
+  CREDIT_PACKS_MEMBER,
+  CREDIT_PACKS_PUBLIC,
+} from '@/constants';
 import Stripe from 'stripe';
 import {
   readClientMatchData,
@@ -89,11 +94,6 @@ export const createCheckoutSession = async (
 
   const userId = await getUserId(ACTIONS.CREATE_CHECKOUT_SESSION);
 
-  // For one-time payments (credit packs), require authentication
-  if (mode === 'payment' && !userId) {
-    return { id: '', error: 'You must be logged in to purchase credits.' };
-  }
-
   // Get user details if logged in
   let user = null;
   let existingSubscription = null;
@@ -113,14 +113,22 @@ export const createCheckoutSession = async (
     });
   }
 
-  // Member-pack gate: the cheaper subscriber-only packs can't be bought
-  // by users without an active subscription. Defence-in-depth alongside
-  // /account/billing only rendering them to subscribers — a non-sub
-  // would have to scrape the price ID and POST it manually to hit this.
+  // Pack-level gating for one-time payments. Two rules:
+  //   1. Member packs require an active subscription (cheaper per-credit
+  //      pricing is the subscriber perk — defence-in-depth alongside the
+  //      member-only Billing UI).
+  //   2. Public packs (Color As You Go) are open to logged-in users AND
+  //      guests. Guest flow mirrors subscription guest checkout: Stripe
+  //      collects email at checkout, webhook finds-or-creates the User
+  //      row from session.customer.
+  // Anything else (e.g. an unknown priceId) is rejected.
+  const isPublicPack = CREDIT_PACKS_PUBLIC.some(
+    (pack) => pack.stripePriceEnv === priceId,
+  );
+  const isMemberPack = CREDIT_PACKS_MEMBER.some(
+    (pack) => pack.stripePriceEnv === priceId,
+  );
   if (mode === 'payment') {
-    const isMemberPack = CREDIT_PACKS_MEMBER.some(
-      (pack) => pack.stripePriceEnv === priceId,
-    );
     if (isMemberPack) {
       const hasActiveSubscription =
         existingSubscription?.status === SubscriptionStatus.ACTIVE;
@@ -131,6 +139,8 @@ export const createCheckoutSession = async (
             'This pack is for active subscribers. Try Color As You Go instead.',
         };
       }
+    } else if (!isPublicPack) {
+      return { id: '', error: 'Unknown credit pack.' };
     }
   }
 
@@ -165,6 +175,15 @@ export const createCheckoutSession = async (
       ...(matchData.userAgent && { client_user_agent: matchData.userAgent }),
     },
   };
+
+  // Subscription mode auto-creates a Stripe Customer (it has to — to
+  // hold the recurring charge). One-time payments don't, so guest
+  // credit-pack checkouts wouldn't leave us anything to find-or-create
+  // a User from. Force customer creation for guest payment flows so
+  // the webhook can resolve session.customer → email → User row.
+  if (mode === 'payment' && !userId) {
+    sessionOptions.customer_creation = 'always';
+  }
 
   // Attach the 7-day trial for eligible subscription checkouts. Card
   // collection stays 'always' (the default for subscription mode) so

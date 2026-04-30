@@ -48,18 +48,6 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
   }, [isLoggedIn]);
 
   const handlePurchase = async (pack: CreditPack) => {
-    if (!isLoggedIn) {
-      // Stripe one-time payment flow requires a userId in our checkout
-      // action. Send guests through sign-in first; they land back here
-      // ready to buy. Subscription flow supports guest checkout because
-      // Stripe creates the customer record itself, but for credit packs
-      // we need the User row to grant credits to.
-      router.push(
-        `/signin?callbackUrl=${encodeURIComponent('/color-as-you-go')}`,
-      );
-      return;
-    }
-
     setLoadingPack(pack.key);
 
     trackEvent(TRACKING_EVENTS.COLOR_AS_YOU_GO_PACK_CLICKED, {
