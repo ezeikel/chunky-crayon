@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { isHeic, heicTo } from 'heic-to';
 import { describeImage } from '@/app/actions/input-processing';
 
 // =============================================================================
@@ -19,8 +20,7 @@ export type ImageInputError =
   | 'file_too_large'
   | 'invalid_type'
   | 'processing_failed'
-  | 'camera_failed'
-  | 'heic_unsupported';
+  | 'camera_failed';
 
 export type ImageInputSource = 'camera' | 'file_picker';
 
@@ -231,32 +231,47 @@ export function useImageInput(): ImageInputResult {
       // Reset input value so same file can be selected again
       event.target.value = '';
 
-      // HEIC/HEIF can't be decoded by <canvas> on Chrome/Firefox/most mobile
-      // webviews. Call it out explicitly instead of failing inside resize().
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        setError('file_too_large');
+        setState('error');
+        return;
+      }
+
+      // Convert HEIC/HEIF → JPEG before processing (browsers can't decode natively)
+      let input: File = file;
       const lowered = file.name.toLowerCase();
       if (
         HEIC_TYPES.includes(file.type) ||
         lowered.endsWith('.heic') ||
         lowered.endsWith('.heif')
       ) {
-        setError('heic_unsupported');
-        setState('error');
-        return;
+        try {
+          if (await isHeic(file)) {
+            const jpegBlob = await heicTo({
+              blob: file,
+              type: 'image/jpeg',
+              quality: 0.9,
+            });
+            input = new File(
+              [jpegBlob],
+              file.name.replace(/\.[^.]+$/, '.jpg'),
+              { type: 'image/jpeg' },
+            );
+          }
+        } catch {
+          setError('invalid_type');
+          setState('error');
+          return;
+        }
       }
 
-      // Validate file type
+      // Validate file type (after potential HEIC conversion)
       if (
-        !ALLOWED_TYPES.includes(file.type) &&
-        !file.type.startsWith('image/')
+        !ALLOWED_TYPES.includes(input.type) &&
+        !input.type.startsWith('image/')
       ) {
         setError('invalid_type');
-        setState('error');
-        return;
-      }
-
-      // Validate file size
-      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-        setError('file_too_large');
         setState('error');
         return;
       }
@@ -267,7 +282,7 @@ export function useImageInput(): ImageInputResult {
 
       try {
         // Resize and convert image
-        const resizedBlob = await resizeImage(file);
+        const resizedBlob = await resizeImage(input);
         processedBlobRef.current = resizedBlob;
 
         // Create preview URL

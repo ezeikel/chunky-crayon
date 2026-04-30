@@ -135,7 +135,6 @@ const ImageInput = ({ className }: ImageInputProps) => {
       invalid_type: 'imageInput.errors.invalidType',
       processing_failed: 'imageInput.errors.processingFailed',
       camera_failed: 'imageInput.errors.cameraFailed',
-      heic_unsupported: 'imageInput.errors.heicUnsupported',
     };
     const errorKey = errorMessageKeys[error || 'processing_failed'];
 
