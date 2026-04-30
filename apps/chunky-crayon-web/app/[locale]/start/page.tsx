@@ -97,6 +97,10 @@ async function StartHeroAsync({
         tryColoringLabel={t('tryColoring')}
         ctaLabel={t('cta')}
         ctaSubtext={t('ctaSubtext')}
+        experimentCtaSubtext={{
+          urgency: t('experiments.startCta.urgency'),
+          proof: t('experiments.startCta.proof'),
+        }}
         image={image}
       />
     </>

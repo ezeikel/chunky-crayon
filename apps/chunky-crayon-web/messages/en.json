@@ -100,6 +100,12 @@
     "heroTitleSuffix": " coloring page” at 5pm.",
     "heroSubtitle": "Your kid describes the scene. You get a printable coloring page in about 2 minutes. Print it, or color it in the app. 2 free pages to try, no account needed.",
     "heroThumbCaption": "Just like this one →",
+    "experiments": {
+      "landingHero": {
+        "outcome": "20 minutes of quiet starts with one coloring page.",
+        "empathy": "“I’m bored” just met its match."
+      }
+    },
     "heroCta": "Make their page",
     "cta": "Start Creating",
     "stats": {
@@ -251,6 +257,12 @@
     "cta": "Try it free",
     "ctaSubtext": "2 free pages. No account needed.",
     "tryColoring": "Try coloring this one",
+    "experiments": {
+      "startCta": {
+        "urgency": "2 free pages today — no card, no catch.",
+        "proof": "Join 200+ parents. 2 free pages to start."
+      }
+    },
     "hero": {
       "trex": {
         "title": "“Mum, can I color a T-rex on a skateboard?”",
@@ -561,7 +573,8 @@
     "creditsPerMonth": "credits/month",
     "trustStrip": {
       "rating": "4.9 from 183 reviews",
-      "cancel": "Cancel any time"
+      "cancel": "Cancel any time",
+      "guarantee": "30-day money-back guarantee"
     },
     "included": {
       "title": "Every plan unlocks",

@@ -9,6 +9,7 @@ import type { ColoringImage } from '@one-colored-pixel/db/types';
 import cn from '@/utils/cn';
 import { useAnalytics } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
+import { Experiment } from '@/components/experiment/Experiment';
 import EmbeddedColoringCanvas from '@/components/EmbeddedColoringCanvas';
 
 type StartHeroProps = {
@@ -19,6 +20,7 @@ type StartHeroProps = {
   tryColoringLabel: string;
   ctaLabel: string;
   ctaSubtext: string;
+  experimentCtaSubtext?: { urgency: string; proof: string };
   image: Partial<ColoringImage> | null;
 };
 
@@ -42,6 +44,7 @@ export default function StartHero({
   eyebrow,
   ctaLabel,
   ctaSubtext,
+  experimentCtaSubtext,
   image,
 }: StartHeroProps) {
   const hasImage = Boolean(image?.id && image?.url);
@@ -92,7 +95,20 @@ export default function StartHero({
               {ctaLabel}
             </Link>
             <p className="font-rooney-sans text-sm text-text-muted max-w-xs">
-              {ctaSubtext}
+              {experimentCtaSubtext ? (
+                <Experiment
+                  flag="exp-start-cta"
+                  variants={{
+                    control: ctaSubtext,
+                    urgency: experimentCtaSubtext.urgency,
+                    proof: experimentCtaSubtext.proof,
+                  }}
+                  defaultVariant="control"
+                  exposureProperties={{ page: 'start' }}
+                />
+              ) : (
+                ctaSubtext
+              )}
             </p>
           </div>
         </div>

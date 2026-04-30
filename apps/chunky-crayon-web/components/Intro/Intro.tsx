@@ -73,6 +73,10 @@ const Intro = async ({ className }: IntroProps) => {
       subtitle={t('heroSubtitle')}
       cta={t('heroThumbCaption')}
       cycle={finalCycle}
+      experimentHeadlines={{
+        outcome: t('experiments.landingHero.outcome'),
+        empathy: t('experiments.landingHero.empathy'),
+      }}
     />
   );
 };

@@ -1012,6 +1012,9 @@ export const TRACKING_EVENTS = {
 
   // ===== SOCIAL POST ATTRIBUTION (alternating demo reel A/B) =====
   DEMO_REEL_CLICKED: 'demo_reel_clicked', // Traffic arrives via ?utm_campaign=demo-reel
+
+  // ===== A/B EXPERIMENTS =====
+  EXPERIMENT_EXPOSED: 'experiment_exposed',
 } as const;
 
 // ===== SOCIAL PROOF / TESTIMONIALS =====

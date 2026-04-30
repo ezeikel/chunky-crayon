@@ -40,6 +40,7 @@ import StaggerItem from '@/components/motion/StaggerItem';
 import CrayonScribble from '@/components/Intro/CrayonScribble';
 import { trackViewContent, trackInitiateCheckout } from '@/utils/pixels';
 import FAQ from '@/components/FAQ/FAQ';
+import { Experiment } from '@/components/experiment/Experiment';
 
 // Stable seed per plan key so the price underline is the same shape on
 // every render — without this each navigation re-renders a different
@@ -192,29 +193,53 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
             ))}
           </div>
 
-          {/* Trust strip — sits between toggle and the rest of the page so
-              cold paid visitors see star rating + risk reversal before
-              any prices, in line with standard pricing-page CRO
-              patterns. Stars render via FontAwesome solid so they
-              inherit the brand orange and stay consistent across
-              fonts. */}
           <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-6 text-sm text-text-secondary">
-            <span className="inline-flex items-center gap-2 font-semibold text-crayon-orange">
-              <span className="inline-flex gap-0.5" aria-hidden>
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <FontAwesomeIcon
-                    key={i}
-                    icon={faStarSolid}
-                    className="text-sm"
-                  />
-                ))}
-              </span>
-              <span>{t('trustStrip.rating')}</span>
-            </span>
-            <span aria-hidden className="opacity-40">
-              ·
-            </span>
-            <span>{t('trustStrip.cancel')}</span>
+            <Experiment
+              flag="exp-pricing-trust"
+              defaultVariant="control"
+              variants={{
+                control: (
+                  <>
+                    <span className="inline-flex items-center gap-2 font-semibold text-crayon-orange">
+                      <span className="inline-flex gap-0.5" aria-hidden>
+                        {[0, 1, 2, 3, 4].map((i) => (
+                          <FontAwesomeIcon
+                            key={i}
+                            icon={faStarSolid}
+                            className="text-sm"
+                          />
+                        ))}
+                      </span>
+                      <span>{t('trustStrip.rating')}</span>
+                    </span>
+                    <span aria-hidden className="opacity-40">
+                      ·
+                    </span>
+                    <span>{t('trustStrip.cancel')}</span>
+                  </>
+                ),
+                guarantee: (
+                  <>
+                    <span className="inline-flex items-center gap-2 font-semibold text-crayon-orange">
+                      <span className="inline-flex gap-0.5" aria-hidden>
+                        {[0, 1, 2, 3, 4].map((i) => (
+                          <FontAwesomeIcon
+                            key={i}
+                            icon={faStarSolid}
+                            className="text-sm"
+                          />
+                        ))}
+                      </span>
+                      <span>{t('trustStrip.rating')}</span>
+                    </span>
+                    <span aria-hidden className="opacity-40">
+                      ·
+                    </span>
+                    <span>{t('trustStrip.guarantee')}</span>
+                  </>
+                ),
+              }}
+            />
           </div>
         </header>
       </FadeIn>

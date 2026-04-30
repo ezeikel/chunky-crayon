@@ -15,6 +15,7 @@ import cn from '@/utils/cn';
 import AppStoreButtons from '@/components/AppStoreButtons';
 import { useAnalytics } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
+import { Experiment } from '@/components/experiment/Experiment';
 
 // One entry per campaign currently represented in the purposeKey table.
 // Order matters — this is the visible cycle sequence on the homepage.
@@ -56,6 +57,8 @@ type IntroClientProps = {
   subtitle: string;
   cta: string;
   cycle: IntroCycleItem[];
+  /** A/B experiment variant headlines — when provided, wraps the h1 in an Experiment. */
+  experimentHeadlines?: { outcome: string; empathy: string };
 };
 
 // Tilted polaroid-style card. Wraps in a Next Link when imageId is set
@@ -125,6 +128,7 @@ export default function IntroClient({
   subtitle,
   cta,
   cycle,
+  experimentHeadlines,
 }: IntroClientProps) {
   const [idx, setIdx] = useState(0);
   const reduceMotion = useReducedMotion();
@@ -167,39 +171,78 @@ export default function IntroClient({
         style={{ animationDelay: ENTRANCE.headline }}
         className="font-tondo font-bold text-text-primary text-[clamp(2.25rem,6vw,4rem)] leading-[0.95] tracking-tight mb-7 [word-break:break-word] animate-[fadeUp_500ms_ease-out_both] opacity-0"
       >
-        <Balancer>
-          {headlinePrefix}
-          {/* motion.span with layout prop — lets Framer animate the
-              horizontal shift when shorter/longer words swap in. No
-              reserved slot, no empty gap on "T-rex". The trade is that
-              surrounding text reflows slightly every 3s, but Framer
-              smooths it so it reads as intentional rather than janky. */}
-          <MotionConfig
-            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span
-                key={current.word}
-                layout="position"
-                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduceMotion ? undefined : { opacity: 0, y: -10 }}
-                className="relative inline-block align-baseline whitespace-nowrap"
-              >
-                {/* Opening quote stays the dark headline colour — it's
-                    punctuation, not part of the emphasised subject. */}
-                “<span className="text-crayon-orange">{current.word}</span>
-                {!reduceMotion && (
-                  <CrayonScribble
-                    seed={wordSeed(current.word)}
-                    className="absolute left-0 right-0 -bottom-1 w-full h-[14px] pointer-events-none text-crayon-orange/80"
-                  />
-                )}
-              </motion.span>
-            </AnimatePresence>
-          </MotionConfig>
-          {headlineSuffix}
-        </Balancer>
+        {experimentHeadlines ? (
+          <Experiment
+            flag="exp-landing-hero"
+            defaultVariant="control"
+            variants={{
+              control: (
+                <Balancer>
+                  {headlinePrefix}
+                  <MotionConfig
+                    transition={{
+                      duration: 0.35,
+                      ease: [0.25, 0.1, 0.25, 1],
+                    }}
+                  >
+                    <AnimatePresence mode="popLayout" initial={false}>
+                      <motion.span
+                        key={current.word}
+                        layout="position"
+                        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={reduceMotion ? undefined : { opacity: 0, y: -10 }}
+                        className="relative inline-block align-baseline whitespace-nowrap"
+                      >
+                        &ldquo;
+                        <span className="text-crayon-orange">
+                          {current.word}
+                        </span>
+                        {!reduceMotion && (
+                          <CrayonScribble
+                            seed={wordSeed(current.word)}
+                            className="absolute left-0 right-0 -bottom-1 w-full h-[14px] pointer-events-none text-crayon-orange/80"
+                          />
+                        )}
+                      </motion.span>
+                    </AnimatePresence>
+                  </MotionConfig>
+                  {headlineSuffix}
+                </Balancer>
+              ),
+              outcome: <Balancer>{experimentHeadlines.outcome}</Balancer>,
+              empathy: <Balancer>{experimentHeadlines.empathy}</Balancer>,
+            }}
+          />
+        ) : (
+          <Balancer>
+            {headlinePrefix}
+            <MotionConfig
+              transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={current.word}
+                  layout="position"
+                  initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduceMotion ? undefined : { opacity: 0, y: -10 }}
+                  className="relative inline-block align-baseline whitespace-nowrap"
+                >
+                  &ldquo;
+                  <span className="text-crayon-orange">{current.word}</span>
+                  {!reduceMotion && (
+                    <CrayonScribble
+                      seed={wordSeed(current.word)}
+                      className="absolute left-0 right-0 -bottom-1 w-full h-[14px] pointer-events-none text-crayon-orange/80"
+                    />
+                  )}
+                </motion.span>
+              </AnimatePresence>
+            </MotionConfig>
+            {headlineSuffix}
+          </Balancer>
+        )}
       </h1>
 
       <p

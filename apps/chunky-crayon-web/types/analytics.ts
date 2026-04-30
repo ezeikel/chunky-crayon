@@ -483,4 +483,11 @@ export type EventProperties = {
     variant: 'text' | 'image';
     platform: string;
   };
+
+  // ===== A/B EXPERIMENTS =====
+  [TRACKING_EVENTS.EXPERIMENT_EXPOSED]: {
+    flag: string;
+    variant: string;
+    [key: string]: unknown;
+  };
 };
