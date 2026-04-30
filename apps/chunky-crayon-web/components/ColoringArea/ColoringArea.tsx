@@ -9,6 +9,12 @@ import {
   forwardRef,
   useImperativeHandle,
 } from 'react';
+import Image from 'next/image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faWandMagicSparkles,
+  faSpinnerThird,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { ColoringImage } from '@one-colored-pixel/db/types';
 import { ImageCanvas, ImageCanvasHandle } from '@one-colored-pixel/coloring-ui';
 import { ColoringToolbar } from '@one-colored-pixel/coloring-ui';
@@ -1213,34 +1219,78 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             }
           />
 
-          {/* Region-store wait banner — the worker is generating it in
-           * the background. On timeout we surface a retry button so the
-           * user isn't stuck in a silent poll loop. */}
+          {/* Region-store wait banner. Surfaces after ~4.5 min of
+           * polling for the worker's region store. Matches the
+           * on-canvas sidebars (white/95 backdrop-blur surface,
+           * paper-cream-dark border, FA duotone, font-tondo) but
+           * scaled up to a clear tap target — 80px Colo, gentle pulse
+           * + halo to draw the eye, big magic-wand button. Almost no
+           * copy for 3-8 year olds. */}
           {regionStoreStatus === 'timeout' && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 max-w-xs">
-              <div className="bg-white/95 backdrop-blur rounded-2xl border-2 border-crayon-orange/40 px-4 py-3 shadow-lg text-center">
-                <p className="text-sm font-medium text-text-primary mb-2">
-                  Magic colours are taking a while
-                </p>
-                <p className="text-xs text-text-primary/70 mb-3">
-                  You can still colour by hand while we get things ready.
-                </p>
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+              <div className="relative pointer-events-auto">
+                {/* Soft pulsing halo so the card draws attention without
+                 * shouting — same idea as the bouncy mic on the create
+                 * form's idle state. */}
+                <div className="absolute inset-0 rounded-3xl bg-crayon-orange/20 animate-ping" />
                 <button
                   type="button"
                   onClick={handleRegionStoreRetry}
-                  className="inline-flex items-center gap-x-1.5 rounded-full bg-crayon-orange px-4 py-1.5 text-xs font-semibold text-white hover:bg-crayon-orange/90 transition-colors"
+                  className="relative flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-3xl border-2 border-paper-cream-dark pl-3 pr-4 py-2.5 shadow-lg hover:shadow-btn-primary hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
                 >
-                  Try again
+                  <Image
+                    src="/images/colo.svg"
+                    alt=""
+                    width={56}
+                    height={56}
+                    className="size-14 animate-bounce"
+                  />
+                  <div className="flex flex-col items-start gap-0.5">
+                    <span className="font-tondo font-bold text-base text-text-primary leading-tight">
+                      Wake me up!
+                    </span>
+                    <div className="flex items-center gap-1.5 rounded-full bg-btn-orange px-3 py-1 shadow-btn-primary">
+                      <FontAwesomeIcon
+                        icon={faWandMagicSparkles}
+                        className="text-sm"
+                        style={
+                          {
+                            '--fa-primary-color': 'white',
+                            '--fa-secondary-color': 'white',
+                            '--fa-secondary-opacity': '0.7',
+                          } as React.CSSProperties
+                        }
+                      />
+                      <span className="font-tondo font-bold text-xs text-white">
+                        Tap
+                      </span>
+                    </div>
+                  </div>
                 </button>
               </div>
             </div>
           )}
           {regionStoreStatus === 'retrying' && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 max-w-xs">
-              <div className="bg-white/95 backdrop-blur rounded-2xl border-2 border-crayon-orange/40 px-4 py-3 shadow-lg text-center">
-                <p className="text-sm font-medium text-text-primary">
-                  Trying again…
-                </p>
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+              <div className="flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-3xl border-2 border-paper-cream-dark pl-3 pr-4 py-2.5 shadow-lg">
+                <Image
+                  src="/images/colo.svg"
+                  alt=""
+                  width={56}
+                  height={56}
+                  className="size-14"
+                />
+                <FontAwesomeIcon
+                  icon={faSpinnerThird}
+                  className="text-2xl animate-spin"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                      '--fa-secondary-color': 'hsl(var(--crayon-pink))',
+                      '--fa-secondary-opacity': '0.6',
+                    } as React.CSSProperties
+                  }
+                />
               </div>
             </div>
           )}

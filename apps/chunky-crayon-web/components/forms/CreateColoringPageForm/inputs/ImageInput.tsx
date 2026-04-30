@@ -11,6 +11,9 @@ import {
   faSpinnerThird,
   faCheck,
   faCloudArrowUp,
+  faFaceDizzy,
+  faPencil,
+  faCamera,
 } from '@fortawesome/pro-duotone-svg-icons';
 import useUser from '@/hooks/useUser';
 import { trackEvent } from '@/utils/analytics-client';
@@ -143,8 +146,18 @@ const ImageInput = ({ className }: ImageInputProps) => {
         id="image-input-panel"
         aria-labelledby="image-mode-tab"
       >
-        <div className="text-5xl">😅</div>
-        <p className="text-center text-text-primary font-tondo font-bold">
+        <FontAwesomeIcon
+          icon={faFaceDizzy}
+          className="text-6xl"
+          style={
+            {
+              '--fa-primary-color': 'hsl(var(--crayon-orange))',
+              '--fa-secondary-color': 'hsl(var(--crayon-teal))',
+              '--fa-secondary-opacity': '0.6',
+            } as React.CSSProperties
+          }
+        />
+        <p className="text-center text-text-primary font-tondo font-bold text-lg">
           {t(errorKey)}
         </p>
         <Button
@@ -249,7 +262,17 @@ const ImageInput = ({ className }: ImageInputProps) => {
               </div>
             )}
             <p className="text-center text-text-primary font-tondo text-base leading-relaxed">
-              {isChildDrawing ? '✏️ ' : '📸 '}
+              <FontAwesomeIcon
+                icon={isChildDrawing ? faPencil : faCamera}
+                className="mr-2"
+                style={
+                  {
+                    '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                    '--fa-secondary-color': 'hsl(var(--crayon-teal))',
+                    '--fa-secondary-opacity': '0.6',
+                  } as React.CSSProperties
+                }
+              />
               <span className="font-bold">{t('imageInput.iSee')}</span>{' '}
               {aiDescription}
             </p>

@@ -555,6 +555,7 @@
     "trialMicroCopy": "Then {price}/month. Cancel any time before then.",
     "noCommitment": "No commitment. One-click cancel.",
     "perMonth": "/mo",
+    "perYear": "/yr",
     "creditsPerMonth": "credits/month",
     "trustStrip": {
       "rating": "4.9 from 183 reviews",
