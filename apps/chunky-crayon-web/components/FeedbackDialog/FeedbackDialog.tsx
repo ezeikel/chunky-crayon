@@ -152,15 +152,29 @@ const FeedbackDialog = ({
     setIsSubmitting(true);
 
     try {
+      const pageUrl =
+        typeof window !== 'undefined' ? window.location.href : undefined;
+
       posthog?.capture(TRACKING_EVENTS.FEEDBACK_SUBMITTED, {
         feedback_type: selectedType,
         feedback_message: message,
         user_email: email || undefined,
         user_name: userName || undefined,
-        page_url:
-          typeof window !== 'undefined' ? window.location.href : undefined,
+        page_url: pageUrl,
         $set: email ? { email } : undefined,
       });
+
+      fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          feedbackType: selectedType,
+          message,
+          email: email || undefined,
+          userName: userName || undefined,
+          pageUrl,
+        }),
+      }).catch(() => {});
 
       setView('success');
       setTimeout(() => {

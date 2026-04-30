@@ -397,6 +397,64 @@ export const sendSocialDigest = async ({
  * Send an admin alert email when a cron job fails or skips.
  * Uses SOCIAL_DIGEST_EMAIL as the recipient.
  */
+export type FeedbackPayload = {
+  feedbackType: 'bug' | 'idea' | 'help' | 'other';
+  message: string;
+  email?: string;
+  userName?: string;
+  pageUrl?: string;
+};
+
+const FEEDBACK_TYPE_LABELS: Record<FeedbackPayload['feedbackType'], string> = {
+  bug: '🐛 Bug Report',
+  idea: '💡 Feature Request',
+  help: '❓ Help Request',
+  other: '💬 Other',
+};
+
+export const sendFeedbackEmail = async (
+  payload: FeedbackPayload,
+): Promise<void> => {
+  const adminEmail = process.env.SOCIAL_DIGEST_EMAIL;
+
+  if (!adminEmail) {
+    console.warn('[Feedback] SOCIAL_DIGEST_EMAIL not configured, skipping');
+    return;
+  }
+
+  const { feedbackType, message, email, userName, pageUrl } = payload;
+  const label = FEEDBACK_TYPE_LABELS[feedbackType];
+  const subject = `[CC Feedback] ${label}`;
+
+  const lines = [
+    `Type: ${label}`,
+    '',
+    `Message:`,
+    message,
+    '',
+    userName ? `From: ${userName}` : null,
+    email ? `Email: ${email}` : null,
+    pageUrl ? `Page: ${pageUrl}` : null,
+    '',
+    `Sent at: ${new Date().toISOString()}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  try {
+    await resend.emails.send({
+      from: getResendFromAddress('feedback', 'Chunky Crayon Feedback'),
+      to: adminEmail,
+      replyTo: email || undefined,
+      subject,
+      text: lines,
+    });
+    console.log(`[Feedback] Sent: ${subject}`);
+  } catch (error) {
+    console.error('[Feedback] Failed to send:', error);
+  }
+};
+
 export const sendAdminAlert = async ({
   subject,
   body,
