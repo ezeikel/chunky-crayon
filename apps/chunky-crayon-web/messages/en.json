@@ -550,6 +550,7 @@
     "heroSubtitle": "Try any plan free for 7 days. Pick the one that fits after they fall in love.",
     "monthly": "Monthly",
     "annual": "Annual (2 months free)",
+    "notReadyForPlan": "Not ready for a plan? Color as you go",
     "mostPopular": "Most Popular",
     "buyNow": "Start 7-day free trial",
     "trialMicroCopy": "Then {price}/month. Cancel any time before then.",
@@ -662,6 +663,33 @@
       "artEducation": "Art Education",
       "activitiesForKids": "Activities for Kids",
       "seasonalHolidays": "Seasonal & Holidays"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "Color as you go.",
+    "heroSubtitle": "Buy a few credits when you need them. No subscription. No commitment. Just coloring.",
+    "credits": "{count} credits",
+    "buyNow": "Get credits",
+    "loading": "Loading...",
+    "failedToCheckout": "Couldn't get to checkout. Try again?",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "Starter",
+        "tagline": "About 10 coloring pages. Try it on a rainy afternoon."
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "Half-term",
+        "tagline": "About 40 coloring pages. Enough for a week of \"I'm bored\"."
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "Holiday",
+        "tagline": "About 100 coloring pages. The whole school break, sorted."
+      }
+    },
+    "subscribePitch": {
+      "title": "Coloring every week?",
+      "subtitle": "A subscription works out cheaper if you make more than a few pages a month. Plus extra profiles for siblings and credits that stack up.",
+      "cta": "See plans"
     }
   },
   "adultGate": {
@@ -1171,8 +1199,8 @@
     },
     "placeholder": "What do you want to color?",
     "placeholderGuestLimit": "You've used your {maxTries} free tries! Sign up for 15 more credits.",
-    "placeholderNoCreditsSubscribed": "You're out of credits — top up or upgrade your plan!",
-    "placeholderNoCreditsNoSubscription": "You've used your free credits — choose a plan to continue creating!",
+    "placeholderNoCreditsSubscribed": "You're out of credits. Top up or upgrade your plan!",
+    "placeholderNoCreditsNoSubscription": "You've used your free credits. Pick a plan or color as you go!",
     "placeholderSignIn": "Sign in to start creating magical coloring pages!",
     "buttonCreate": "Create",
     "buttonCreateGuest": "Create",
@@ -1180,12 +1208,13 @@
     "buttonSignUp": "Sign up for 15 free credits",
     "buttonBuyCredits": "Buy more credits",
     "buttonViewPlans": "View plans",
+    "linkColorAsYouGo": "Or color as you go (no subscription)",
     "buttonGetStarted": "Get started for free",
     "subtextGuestLimit": "You've seen the magic! Sign up to keep creating.",
-    "subtextNoCredits": "You're out of credits — top up or upgrade!",
+    "subtextNoCredits": "You're out of credits. Top up or upgrade!",
     "subtextNoCreditsSubscribed": "Need more magic? Top up or upgrade to keep the creativity going!",
-    "subtextNoCreditsNoSubscription": "Choose a subscription to unlock more creations",
-    "subtextFallback": "You'll get 15 free credits — enough to create 3 pages!"
+    "subtextNoCreditsNoSubscription": "Pick a subscription, or buy a few credits to keep going.",
+    "subtextFallback": "You'll get 15 free credits, enough to create 3 pages!"
   },
   "og": {
     "homepage": {

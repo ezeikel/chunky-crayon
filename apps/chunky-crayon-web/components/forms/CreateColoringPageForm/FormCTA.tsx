@@ -49,6 +49,13 @@ const FormCTA = ({ className }: FormCTAProps) => {
 
   // Signed-in user without credits / signed-out guest past limit etc.
   if (!canGenerate) {
+    // Non-subscribers without credits get sent to /pricing (subscription
+    // pitch) — that page has its own inline escape-hatch to
+    // /color-as-you-go. We additionally show a secondary inline link
+    // below the primary CTA so the lighter-touch path isn't buried.
+    const isNoCreditsNonSubscriber =
+      blockedReason === 'no_credits' && !hasActiveSubscription;
+
     const config =
       blockedReason === 'guest_limit_reached'
         ? {
@@ -71,7 +78,8 @@ const FormCTA = ({ className }: FormCTAProps) => {
               subtext: hasActiveSubscription
                 ? t('subtextNoCreditsSubscribed')
                 : t('subtextNoCreditsNoSubscription'),
-              action: () => handleAuthAction('billing'),
+              action: () =>
+                handleAuthAction(hasActiveSubscription ? 'billing' : 'pricing'),
             }
           : {
               text: t('buttonGetStarted'),
@@ -91,6 +99,14 @@ const FormCTA = ({ className }: FormCTAProps) => {
         <p className="font-tondo text-sm text-center text-text-muted">
           {config.subtext}
         </p>
+        {isNoCreditsNonSubscriber && (
+          <a
+            href="/color-as-you-go"
+            className="font-tondo text-sm text-center text-text-muted hover:text-crayon-orange underline-offset-4 hover:underline transition-colors"
+          >
+            {t('linkColorAsYouGo')}
+          </a>
+        )}
       </div>
     );
   }

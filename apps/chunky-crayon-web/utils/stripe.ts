@@ -40,9 +40,14 @@ const stripeHelpers = createStripeHelpers({
     },
   ],
   creditPacks: [
+    // Member packs (subscriber-only, surfaced in /account/billing)
     { env: 'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100', credits: 100 },
     { env: 'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_500', credits: 500 },
     { env: 'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000', credits: 1000 },
+    // Color As You Go public packs (no subscription required)
+    { env: 'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_50', credits: 50 },
+    { env: 'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_200', credits: 200 },
+    { env: 'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_500', credits: 500 },
   ],
 });
 

@@ -5,7 +5,11 @@ import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
-import { SUBSCRIPTION_PLANS, CREDIT_PACKS, TRACKING_EVENTS } from '@/constants';
+import {
+  SUBSCRIPTION_PLANS,
+  CREDIT_PACKS_MEMBER,
+  TRACKING_EVENTS,
+} from '@/constants';
 import { trackEvent } from '@/utils/analytics-client';
 import {
   Card,
@@ -313,7 +317,7 @@ const Billing = ({ user }: BillingProps) => {
             {t('buyMoreCredits')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {CREDIT_PACKS.map((pack) => (
+            {CREDIT_PACKS_MEMBER.map((pack) => (
               <Card key={pack.name}>
                 <CardHeader>
                   <CardTitle>{pack.name}</CardTitle>

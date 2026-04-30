@@ -642,6 +642,9 @@ export const CREDIT_PACK_AMOUNTS = {
   CREDITS_100: 100,
   CREDITS_500: 500,
   CREDITS_1000: 1000,
+  PUBLIC_CREDITS_50: 50,
+  PUBLIC_CREDITS_200: 200,
+  PUBLIC_CREDITS_500: 500,
 } as const;
 
 export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
@@ -735,7 +738,10 @@ export type CreditPack = {
   stripePriceEnv: string;
 };
 
-export const CREDIT_PACKS: CreditPack[] = [
+// Subscriber-only packs surfaced in /account/billing as a member perk.
+// Per-credit prices intentionally beat every public pack so subscribers
+// get a tangible "you save more by being a member" signal.
+export const CREDIT_PACKS_MEMBER: CreditPack[] = [
   {
     key: 'CREDITS_100',
     name: '100 Credits Pack',
@@ -756,6 +762,36 @@ export const CREDIT_PACKS: CreditPack[] = [
     credits: CREDIT_PACK_AMOUNTS.CREDITS_1000,
     price: '£20.00',
     stripePriceEnv: process.env.NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000 as string,
+  },
+];
+
+// Color As You Go — public packs for non-subscribers. Per-credit prices
+// are deliberately worse than every subscription tier so heavy usage
+// still funnels to a sub. Surfaced on /color-as-you-go.
+export const CREDIT_PACKS_PUBLIC: CreditPack[] = [
+  {
+    key: 'PUBLIC_CREDITS_50',
+    name: 'Color As You Go - 50 Credits',
+    credits: CREDIT_PACK_AMOUNTS.PUBLIC_CREDITS_50,
+    price: '£2.49',
+    stripePriceEnv: process.env
+      .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_50 as string,
+  },
+  {
+    key: 'PUBLIC_CREDITS_200',
+    name: 'Color As You Go - 200 Credits',
+    credits: CREDIT_PACK_AMOUNTS.PUBLIC_CREDITS_200,
+    price: '£8.99',
+    stripePriceEnv: process.env
+      .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_200 as string,
+  },
+  {
+    key: 'PUBLIC_CREDITS_500',
+    name: 'Color As You Go - 500 Credits',
+    credits: CREDIT_PACK_AMOUNTS.PUBLIC_CREDITS_500,
+    price: '£19.99',
+    stripePriceEnv: process.env
+      .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_500 as string,
   },
 ];
 
@@ -896,6 +932,8 @@ export const TRACKING_EVENTS = {
   PRICING_INTERVAL_TOGGLED: 'pricing_interval_toggled', // Monthly/Annual toggle
   PRICING_PLAN_CLICKED: 'pricing_plan_clicked', // Plan CTA clicked
   PRICING_CREDITS_CLICKED: 'pricing_credits_clicked', // Credit pack clicked
+  COLOR_AS_YOU_GO_PAGE_VIEWED: 'color_as_you_go_page_viewed', // /color-as-you-go loaded
+  COLOR_AS_YOU_GO_PACK_CLICKED: 'color_as_you_go_pack_clicked', // Public pack CTA clicked
 
   // ===== CHECKOUT & PAYMENTS (Revenue) =====
   CHECKOUT_STARTED: 'checkout_started', // Redirecting to Stripe

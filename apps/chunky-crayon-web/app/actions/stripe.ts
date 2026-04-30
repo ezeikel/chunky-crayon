@@ -18,7 +18,7 @@ import {
   mapStripePriceToPlanName,
   mapStripeStatusToSubscriptionStatus,
 } from '@/utils/stripe';
-import { PLAN_CREDITS, ACTIONS } from '@/constants';
+import { PLAN_CREDITS, ACTIONS, CREDIT_PACKS_MEMBER } from '@/constants';
 import Stripe from 'stripe';
 import {
   readClientMatchData,
@@ -111,6 +111,27 @@ export const createCheckoutSession = async (
     existingSubscription = await db.subscription.findFirst({
       where: { user: { id: userId } },
     });
+  }
+
+  // Member-pack gate: the cheaper subscriber-only packs can't be bought
+  // by users without an active subscription. Defence-in-depth alongside
+  // /account/billing only rendering them to subscribers — a non-sub
+  // would have to scrape the price ID and POST it manually to hit this.
+  if (mode === 'payment') {
+    const isMemberPack = CREDIT_PACKS_MEMBER.some(
+      (pack) => pack.stripePriceEnv === priceId,
+    );
+    if (isMemberPack) {
+      const hasActiveSubscription =
+        existingSubscription?.status === SubscriptionStatus.ACTIVE;
+      if (!hasActiveSubscription) {
+        return {
+          id: '',
+          error:
+            'This pack is for active subscribers. Try Color As You Go instead.',
+        };
+      }
+    }
   }
 
   // Trial eligibility — only attach the 7-day free trial when the user

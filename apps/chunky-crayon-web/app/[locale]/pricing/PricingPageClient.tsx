@@ -380,6 +380,21 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
         })}
       </StaggerChildren>
 
+      {/* Escape hatch for visitors who aren't ready for a plan but
+          would still pay for a one-off. Sits below the plan grid so it
+          doesn't compete with the subscription pitch — anyone who
+          scrolled past three plan cards thinking "too much commitment"
+          gets one last chance before bouncing. */}
+      <FadeIn direction="up" delay={0.05} className="mt-10 text-center">
+        <a
+          href="/color-as-you-go"
+          className="inline-flex items-center gap-1.5 font-tondo font-bold text-base text-text-primary hover:text-crayon-orange transition-colors underline underline-offset-4 decoration-crayon-orange/40 hover:decoration-crayon-orange"
+        >
+          {t('notReadyForPlan')}
+          <span aria-hidden>→</span>
+        </a>
+      </FadeIn>
+
       {/* What every plan unlocks — moved BELOW the plans, rewritten as
           outcomes. Visitors who've already seen prices now read this
           as "what I get" rather than "what's expected of me". */}

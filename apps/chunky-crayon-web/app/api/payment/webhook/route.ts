@@ -275,49 +275,11 @@ export const POST = async (req: Request) => {
         ]);
       }
     } else {
-      // handle one-time credit purchase
-      // verify user has an active subscription
-      const hasActiveSubscription = user.subscriptions.some(
-        (sub: Subscription) => sub.status === SubscriptionStatus.ACTIVE,
-      );
-
-      if (!hasActiveSubscription) {
-        console.error(
-          `User ${user.id} attempted to purchase credits without an active subscription`,
-        );
-
-        // Refund the payment since credits can't be added without subscription
-        if (session.payment_intent) {
-          try {
-            const paymentIntentId =
-              typeof session.payment_intent === 'string'
-                ? session.payment_intent
-                : session.payment_intent.id;
-
-            await stripe.refunds.create({
-              payment_intent: paymentIntentId,
-              reason: 'requested_by_customer',
-            });
-
-            console.log(
-              `Refunded payment ${paymentIntentId} - no active subscription`,
-            );
-
-            // TODO: Send email to user explaining the refund
-          } catch (refundError) {
-            console.error('Failed to refund payment:', refundError);
-          }
-        }
-
-        return Response.json(
-          {
-            error:
-              'Active subscription required for credit purchases. Payment refunded.',
-          },
-          { status: 400 },
-        );
-      }
-
+      // handle one-time credit purchase. Credits are granted regardless
+      // of subscription status — the createCheckoutSession action gates
+      // member-pack price IDs to subscribers, so anything that reaches
+      // the webhook has been authorised at session-create time. If
+      // Stripe took the money, we honour it.
       const lineItems = await stripe.checkout.sessions.listLineItems(
         session.id,
       );
