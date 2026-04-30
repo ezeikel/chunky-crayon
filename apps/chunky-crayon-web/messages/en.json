@@ -546,39 +546,43 @@
   },
   "pricing": {
     "pageTitle": "Pricing - Chunky Crayon",
-    "heroTitle": "More than just coloring pages",
-    "heroSubtitle": "Create, color online, collect stickers, and share with friends. Pick a plan that fits your family.",
+    "heroTitle": "One coloring page away from 20 minutes of quiet.",
+    "heroSubtitle": "Pick a plan, then color anything they can describe. Cancel any time, with one click.",
     "monthly": "Monthly",
-    "annual": "Annual (save 17%)",
+    "annual": "Annual (save 2 months)",
     "mostPopular": "Most Popular",
-    "buyNow": "Buy Now",
-    "noCommitment": "No commitment. Cancel anytime.",
+    "buyNow": "Start with {plan}",
+    "noCommitment": "No commitment. One-click cancel.",
     "perMonth": "/mo",
     "creditsPerMonth": "credits/month",
+    "trustStrip": {
+      "rating": "★★★★★ 4.9 from 183 reviews",
+      "cancel": "Cancel any time"
+    },
     "included": {
-      "title": "Every plan includes",
-      "aiCreation": "Unlimited custom coloring page creation",
-      "colorOnline": "Color online or download to print",
-      "saveFavorites": "Save favorites to your account",
-      "shareCreations": "Share creations with friends",
-      "collectStickers": "Collect stickers & earn rewards",
-      "mobileApps": "iOS & Android apps"
+      "title": "Every plan unlocks",
+      "aiCreation": "Pages from anything they describe",
+      "colorOnline": "Print at home or color on screen",
+      "saveFavorites": "Keep every page forever",
+      "shareCreations": "Send pages to grandparents",
+      "collectStickers": "Stickers and rewards as they color",
+      "mobileApps": "Apps for iPhone and Android"
     },
     "plans": {
       "splash": {
         "name": "Splash",
-        "tagline": "Great for occasional creators",
-        "audience": "Try the full platform at our entry price"
+        "tagline": "A coloring page on the days you need one.",
+        "audience": "Less than one box of crayons. About 50 pages a month."
       },
       "rainbow": {
         "name": "Rainbow",
-        "tagline": "Perfect for creative families",
-        "audience": "Our most popular plan for regular use"
+        "tagline": "A coloring page whenever they ask. Plus the leftover for tomorrow.",
+        "audience": "About 100 pages a month. Most families pick this one."
       },
       "sparkle": {
         "name": "Sparkle",
-        "tagline": "For serious creators",
-        "audience": "Best value for heavy users and small businesses"
+        "tagline": "For when they want one of everything.",
+        "audience": "About 200 pages a month. Plus the right to use them in your shop or classroom."
       }
     },
     "features": {
@@ -599,28 +603,38 @@
       "pack1000": "1,000 Credits Pack"
     },
     "faq": {
-      "title": "Frequently Asked Questions",
-      "subtitle": "Everything you need to know about our plans",
+      "title": "Before you pick",
+      "subtitle": "Everything worth knowing about plans, credits, and cancelling.",
       "cancelAnytime": {
-        "question": "Can I cancel anytime?",
-        "answer": "Yes! Cancel your subscription anytime, no questions asked."
+        "question": "Can I cancel any time?",
+        "answer": "Yes. One click in your account, no questions asked. The pages you've already made stay yours."
       },
       "rollover": {
-        "question": "Do credits roll over?",
-        "answer": "Splash credits reset each month. Rainbow rolls over up to 1 month. Sparkle gives you 2 months of rollover."
+        "question": "What happens to unused pages?",
+        "answer": "Splash pages reset each month. Rainbow rolls them over for a month. Sparkle gives you two months. Make as many as you can while they're around."
       },
       "creditsPerPage": {
-        "question": "How many pages can I make?",
-        "answer": "Text or photo pages cost 5 credits. Voice-mode pages (have a quick chat with Chunky Crayon) cost 10 credits. So Splash = ~50 text/photo pages or ~25 voice pages a month. Rainbow = ~100 / ~50. Sparkle = ~200 / ~100. Mix and match however you like."
+        "question": "How many pages can I actually make?",
+        "answer": "Typing or snapping a photo costs 5 credits. Talking to Chunky Crayon costs 10 (because it listens, transcribes, and draws). Splash gives you about 50 typed pages a month. Rainbow about 100. Sparkle about 200. Mix and match."
       },
       "audience": {
-        "question": "Is this for kids or adults?",
-        "answer": "Both! Chunky Crayon is perfect for families, kids, and grown-ups who love to color."
+        "question": "Is this just for kids?",
+        "answer": "It works for any age. Toddlers describe a fox in a hat, parents print the page. Adults make their own and color them on the iPad before bed. Same product, different humans."
+      },
+      "printPaper": {
+        "question": "Do I need anything to print at home?",
+        "answer": "A printer and paper. Pages download as a PDF that fits A4 or US Letter without resizing."
       },
       "gettingStarted": {
-        "question": "How do I get started?",
-        "answer": "Pick a plan and start creating coloring pages instantly!"
+        "question": "How do I start?",
+        "answer": "Pick a plan, sign in, and your first page is two minutes away."
       }
+    },
+    "finalCta": {
+      "title": "Pick a plan. Color something today.",
+      "subtitle": "They describe it, we draw it, you print it or hand them the iPad. Cancel any time.",
+      "primary": "Start with Rainbow",
+      "secondary": "Compare plans again"
     }
   },
   "blog": {

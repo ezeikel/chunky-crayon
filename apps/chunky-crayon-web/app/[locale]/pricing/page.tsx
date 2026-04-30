@@ -163,6 +163,19 @@ const PricingPage = () => {
               </button>
             ))}
           </div>
+
+          {/* Trust strip — sits between toggle and the rest of the page so
+              cold paid visitors see ★ rating + risk reversal before any
+              prices, in line with standard pricing-page CRO patterns. */}
+          <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-6 text-sm text-text-secondary">
+            <span className="font-semibold text-crayon-orange">
+              {t('trustStrip.rating')}
+            </span>
+            <span aria-hidden className="opacity-40">
+              ·
+            </span>
+            <span>{t('trustStrip.cancel')}</span>
+          </div>
         </header>
       </FadeIn>
 
@@ -270,9 +283,9 @@ const PricingPage = () => {
                     onClick={() => handlePurchase(plan)}
                     disabled={loadingPlan === planName}
                   >
-                    {t('buyNow')}
+                    {t('buyNow', { plan: planName })}
                   </Button>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm text-text-secondary">
                     {t('noCommitment')}
                   </span>
                 </CardFooter>
