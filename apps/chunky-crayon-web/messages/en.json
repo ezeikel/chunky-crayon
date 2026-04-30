@@ -549,7 +549,7 @@
     "heroTitle": "One coloring page away from 20 minutes of quiet.",
     "heroSubtitle": "Try any plan free for 7 days. Pick the one that fits after they fall in love.",
     "monthly": "Monthly",
-    "annual": "Annual (save 2 months)",
+    "annual": "Annual (2 months free)",
     "mostPopular": "Most Popular",
     "buyNow": "Start 7-day free trial",
     "trialMicroCopy": "Then {price}/month. Cancel any time before then.",
@@ -574,28 +574,28 @@
     "plans": {
       "splash": {
         "name": "Splash",
-        "tagline": "A coloring page on the days you need one.",
-        "audience": "Less than one box of crayons. About 50 pages a month."
+        "tagline": "Best for one child.",
+        "audience": "About a page a day. Less than one box of crayons a month."
       },
       "rainbow": {
         "name": "Rainbow",
-        "tagline": "A coloring page whenever they ask. Plus the leftover for tomorrow.",
-        "audience": "About 100 pages a month. Most families pick this one."
+        "tagline": "Best for up to 3 kids.",
+        "audience": "Enough for siblings to each pick their own. Most families land here."
       },
       "sparkle": {
         "name": "Sparkle",
-        "tagline": "For when they want one of everything.",
-        "audience": "About 200 pages a month. Plus the right to use them in your shop or classroom."
+        "tagline": "Family or classroom.",
+        "audience": "Up to 10 separate profiles. Never run out, share with the whole house."
       }
     },
     "features": {
-      "credits250": "250 credits/month (~50 pages)",
-      "credits500": "500 credits/month (~100 pages)",
-      "credits1000": "1,000 credits/month (~200 pages)",
+      "credits250": "~50 pages a month — about a page a day",
+      "credits500": "~100 pages a month — full library every month",
+      "credits1000": "~200 pages a month — never run out",
       "allFeatures": "All platform features",
-      "noRollover": "Credits reset monthly",
-      "rollover1Month": "Unused credits roll over (1 month)",
-      "rollover2Months": "Extended rollover (2 months)",
+      "noRollover": "Credits reset each month",
+      "rollover1Month": "Credits stack up — keep one extra month",
+      "rollover2Months": "Credits stack up — keep two extra months",
       "prioritySupport": "Priority support",
       "commercialUse": "Commercial use license",
       "profiles3": "Up to 3 kid profiles",
@@ -617,7 +617,7 @@
       },
       "rollover": {
         "question": "What happens to unused pages?",
-        "answer": "Splash pages reset each month. Rainbow rolls them over for a month. Sparkle gives you two months. Make as many as you can while they're around."
+        "answer": "Splash credits reset each month. Rainbow stacks up one extra month. Sparkle stacks up two. So if you don't use them this month, they're still there next."
       },
       "creditsPerPage": {
         "question": "How many pages can I actually make?",
