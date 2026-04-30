@@ -17,7 +17,10 @@ import {
   getCreditAmountFromPlanName,
 } from '@/utils/stripe';
 import { FREE_CREDITS, PLAN_ROLLOVER_CAPS, TRACKING_EVENTS } from '@/constants';
-import { sendPaymentFailedEmail } from '@/app/actions/email';
+import {
+  sendPaymentFailedEmail,
+  sendTrialEndingEmail,
+} from '@/app/actions/email';
 import { trackWithUser } from '@/utils/analytics-server';
 import {
   sendPurchaseConversionEvents,
@@ -608,6 +611,65 @@ export const POST = async (req: Request) => {
           stripeCustomerId: subscription.user.stripeCustomerId,
         });
       }
+    }
+  } else if (stripeEvent.type === 'customer.subscription.trial_will_end') {
+    // Stripe fires this 3 days before the trial ends by default. We'd
+    // prefer 1 day so the reminder lands close enough to be useful —
+    // but adjusting the lead time requires changing our Stripe webhook
+    // settings (Workbench → Webhooks → Trial behaviour). Kept here as
+    // 3-days-out reminder until that's done; copy framing already says
+    // "your trial ends soon" rather than "tomorrow" to stay accurate.
+    const subscription = stripeEvent.data.object as Stripe.Subscription;
+    const stripeCustomerId = subscription.customer as string;
+
+    // Look up the user via the linked DB Subscription row. We rely on
+    // checkout.session.completed having already created the row — for
+    // any reason that hasn't happened yet, we'll skip the email rather
+    // than email a stranger.
+    const dbSubscription = await db.subscription.findFirst({
+      where: { externalId: subscription.id },
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true,
+            stripeCustomerId: true,
+          },
+        },
+      },
+    });
+
+    if (dbSubscription?.user.email && dbSubscription.user.stripeCustomerId) {
+      // Pull the amount from the subscription's first item — for a
+      // simple single-line subscription this is the plan price. We
+      // format pence → pounds and prefix with the right symbol so the
+      // email reads "£13.99" not "1399 GBP".
+      const item = subscription.items.data[0];
+      const unitAmount = item?.price?.unit_amount ?? 0;
+      const currency = (item?.price?.currency ?? 'gbp').toUpperCase();
+      const amountPounds = (unitAmount / 100).toFixed(2);
+      const symbol = currency === 'GBP' ? '£' : currency === 'USD' ? '$' : '';
+      const amount = `${symbol}${amountPounds}`;
+
+      const trialEndDate = subscription.trial_end
+        ? new Date(subscription.trial_end * 1000)
+        : null;
+      const chargeDate = trialEndDate
+        ? trialEndDate.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })
+        : 'soon';
+
+      await sendTrialEndingEmail({
+        email: dbSubscription.user.email,
+        userName: dbSubscription.user.name,
+        planName: dbSubscription.planName,
+        chargeDate,
+        amount,
+        stripeCustomerId,
+      });
     }
   } else {
     // Log unhandled events but don't treat as error

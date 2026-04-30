@@ -11,6 +11,7 @@ import { getUnsubscribeUrl } from '@/lib/unsubscribe';
 import DailyColoringEmail from '@/emails/DailyColoringEmail';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
+import TrialEndingEmail from '@/emails/TrialEndingEmail';
 import SocialDigestEmail from '@/emails/SocialDigestEmail';
 import { stripe } from '@/lib/stripe';
 import { getResendFromAddress } from '@/lib/email-config';
@@ -261,6 +262,59 @@ export const sendPaymentFailedEmail = async ({
     return { success: true };
   } catch (error) {
     console.error(`Failed to send payment failed email to ${email}:`, error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+};
+
+// Send the 7-day trial reminder ~24h before the first charge lands.
+// Triggered from the Stripe `customer.subscription.trial_will_end`
+// webhook (configured to fire 1 day before in stripe-webhook config).
+// Includes a billing portal link so the user can cancel in one click.
+export const sendTrialEndingEmail = async ({
+  email,
+  userName,
+  planName,
+  chargeDate,
+  amount,
+  stripeCustomerId,
+}: {
+  email: string;
+  userName?: string | null;
+  planName: string;
+  chargeDate: string;
+  amount: string;
+  stripeCustomerId: string;
+}): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: stripeCustomerId,
+      return_url: `${baseUrl}/account/billing`,
+    });
+
+    const emailHtml = await render(
+      TrialEndingEmail({
+        userName: userName || undefined,
+        planName,
+        chargeDate,
+        amount,
+        billingPortalUrl: portalSession.url,
+      }),
+    );
+
+    await resend.emails.send({
+      from: getResendFromAddress('billing', 'Chunky Crayon'),
+      to: email,
+      subject: `Your trial ends tomorrow — ${amount} on ${chargeDate}`,
+      html: emailHtml,
+    });
+
+    console.log(`📧 Sent trial ending email to: ${email}`);
+    return { success: true };
+  } catch (error) {
+    console.error(`Failed to send trial ending email to ${email}:`, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

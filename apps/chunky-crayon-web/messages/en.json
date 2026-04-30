@@ -547,11 +547,12 @@
   "pricing": {
     "pageTitle": "Pricing - Chunky Crayon",
     "heroTitle": "One coloring page away from 20 minutes of quiet.",
-    "heroSubtitle": "Pick a plan, then color anything they can describe. Cancel any time, with one click.",
+    "heroSubtitle": "Try any plan free for 7 days. Pick the one that fits after they fall in love.",
     "monthly": "Monthly",
     "annual": "Annual (save 2 months)",
     "mostPopular": "Most Popular",
-    "buyNow": "Start with {plan}",
+    "buyNow": "Start 7-day free trial",
+    "trialMicroCopy": "Then {price}/month. Cancel any time before then.",
     "noCommitment": "No commitment. One-click cancel.",
     "perMonth": "/mo",
     "creditsPerMonth": "credits/month",
@@ -621,6 +622,10 @@
         "question": "Is this just for kids?",
         "answer": "It works for any age. Toddlers describe a fox in a hat, parents print the page. Adults make their own and color them on the iPad before bed. Same product, different humans."
       },
+      "trialMechanics": {
+        "question": "What happens after the 7-day free trial?",
+        "answer": "Your card gets charged the plan price. We email you 24 hours before so it's never a surprise. Cancel any time during the trial and you won't be charged at all."
+      },
       "printPaper": {
         "question": "Do I need anything to print at home?",
         "answer": "A printer and paper. Pages download as a PDF that fits A4 or US Letter without resizing."
@@ -632,8 +637,8 @@
     },
     "finalCta": {
       "title": "Pick a plan. Color something today.",
-      "subtitle": "They describe it, we draw it, you print it or hand them the iPad. Cancel any time.",
-      "primary": "Start with Rainbow",
+      "subtitle": "They describe it, we draw it, you print it or hand them the iPad. Free for 7 days, cancel any time.",
+      "primary": "Start 7-day free trial",
       "secondary": "Compare plans again"
     }
   },

@@ -113,6 +113,15 @@ export const createCheckoutSession = async (
     });
   }
 
+  // Trial eligibility — only attach the 7-day free trial when the user
+  // has never had ANY prior Stripe subscription (regardless of trial
+  // status). Stripe doesn't enforce one-trial-per-customer; we do it
+  // here. Guest checkouts always get the trial — the webhook later
+  // links the resulting Stripe customer to a User row, and any future
+  // checkout by that user will hit the eligibility gate via this same
+  // query against the linked Subscription history.
+  const isTrialEligible = mode === 'subscription' && !existingSubscription;
+
   // Capture Meta match data (fbp/fbc cookies + IP/UA) and round-trip
   // them via Stripe metadata. The webhook fires Purchase server-side
   // from Stripe's IP — without this round-trip, Meta has no browser
@@ -135,6 +144,23 @@ export const createCheckoutSession = async (
       ...(matchData.userAgent && { client_user_agent: matchData.userAgent }),
     },
   };
+
+  // Attach the 7-day trial for eligible subscription checkouts. Card
+  // collection stays 'always' (the default for subscription mode) so
+  // we charge automatically when the trial ends; missing-card behaviour
+  // is irrelevant when card is required upfront, but we set it anyway
+  // for defence-in-depth.
+  if (isTrialEligible) {
+    sessionOptions.subscription_data = {
+      trial_period_days: 7,
+      trial_settings: {
+        end_behavior: {
+          missing_payment_method: 'cancel',
+        },
+      },
+    };
+    sessionOptions.payment_method_collection = 'always';
+  }
 
   if (userId && user) {
     // Logged-in user flow

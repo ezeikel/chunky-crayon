@@ -179,47 +179,11 @@ const PricingPage = () => {
         </header>
       </FadeIn>
 
-      {/* What's Included Section */}
-      <FadeIn direction="up" delay={0.1} className="mb-12">
-        <section className="text-center">
-          <h2 className="font-tondo text-2xl font-bold mb-6 text-primary">
-            {t('included.title')}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            {[
-              { icon: faSparkles, key: 'aiCreation' },
-              { icon: faPalette, key: 'colorOnline' },
-              { icon: faBookmark, key: 'saveFavorites' },
-              { icon: faShareNodes, key: 'shareCreations' },
-              { icon: faStar, key: 'collectStickers' },
-              { icon: faMobileScreen, key: 'mobileApps' },
-            ].map(({ icon, key }) => (
-              <div
-                key={key}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-paper-cream/50 border border-paper-cream-dark"
-              >
-                <FontAwesomeIcon
-                  icon={icon}
-                  className="text-2xl text-crayon-orange"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                      '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                      '--fa-secondary-opacity': '1',
-                    } as React.CSSProperties
-                  }
-                />
-                <span className="text-sm text-text-secondary text-center">
-                  {t(`included.${key}`)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-      </FadeIn>
-
+      {/* Plans — moved ABOVE "Every plan unlocks" so cold paid visitors
+          see prices before features. The order swap is the single
+          biggest CRO move on this page. */}
       <StaggerChildren
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch"
         staggerDelay={0.15}
         delay={0.2}
       >
@@ -233,59 +197,75 @@ const PricingPage = () => {
             <StaggerItem key={plan.key} className="h-full">
               <Card
                 className={cn(
-                  'flex flex-col h-full border-2 transition-shadow',
+                  'flex flex-col h-full border-2 rounded-3xl transition-all duration-300',
                   plan.mostPopular
-                    ? 'border-orange shadow-lg scale-105 relative z-10'
-                    : 'border-border',
+                    ? 'border-crayon-orange shadow-2xl shadow-crayon-orange/20 lg:scale-[1.06] lg:-translate-y-2 relative z-10 bg-white ring-2 ring-crayon-orange/30 ring-offset-4 ring-offset-paper'
+                    : 'border-paper-cream-dark hover:border-crayon-orange/40 bg-white/90',
                 )}
               >
                 {plan.mostPopular && (
-                  <span className="absolute -top-4 right-1/2 translate-x-1/2 bg-orange text-white text-xs font-bold px-3 py-1 rounded-full shadow">
-                    {t('mostPopular')}
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-crayon-orange text-white text-sm font-tondo font-bold px-5 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+                    ✨ {t('mostPopular')}
                   </span>
                 )}
-                <CardHeader>
-                  <CardTitle className="flex flex-col gap-1">
-                    <span className="text-center mb-4">
-                      <span className="font-tondo">{planName}</span>
-                    </span>
-                    <span className="text-base font-normal text-muted-foreground">
+                <CardHeader className="pt-8">
+                  <CardTitle className="flex flex-col gap-1 text-center">
+                    <span className="font-tondo text-2xl mb-2">{planName}</span>
+                    <span className="text-base font-normal text-text-secondary leading-snug">
                       {planTagline}
                     </span>
                   </CardTitle>
-                  <CardDescription className="mt-2 text-lg font-bold text-primary">
-                    {plan.price}{' '}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      {t('perMonth')}
+                  <CardDescription className="mt-4 text-center">
+                    <span className="block">
+                      <span className="text-3xl font-tondo font-bold text-text-primary">
+                        {plan.price}
+                      </span>
+                      <span className="text-base font-normal text-text-secondary ml-1">
+                        {t('perMonth')}
+                      </span>
                     </span>
                   </CardDescription>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {formatNumber(parseInt(plan.credits, 10))}{' '}
-                    {t('creditsPerMonth')}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
+                  <div className="mt-3 text-sm text-text-secondary text-center max-w-[18rem] mx-auto">
                     {planAudience}
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col gap-2">
-                  <ul className="mb-2 space-y-1">
+                  <ul className="mb-2 space-y-2">
                     {plan.featureKeys.map((featureKey) => (
-                      <li key={featureKey} className="flex items-center gap-2">
-                        <span className="text-green-600">✓</span>
-                        <span>{t(`features.${featureKey}`)}</span>
+                      <li
+                        key={featureKey}
+                        className="flex items-start gap-2 text-text-primary"
+                      >
+                        <span
+                          className="text-crayon-orange font-bold leading-relaxed"
+                          aria-hidden
+                        >
+                          ✓
+                        </span>
+                        <span className="leading-snug">
+                          {t(`features.${featureKey}`)}
+                        </span>
                       </li>
                     ))}
                   </ul>
                 </CardContent>
-                <CardFooter className="flex flex-col gap-2">
+                <CardFooter className="flex flex-col gap-2 pb-6">
                   <Button
-                    className="w-full text-lg py-2 bg-orange hover:bg-orange/90 text-white"
+                    className={cn(
+                      'w-full text-base font-tondo font-bold py-6 rounded-full text-white transition-transform',
+                      plan.mostPopular
+                        ? 'bg-crayon-orange hover:bg-crayon-orange-dark hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-crayon-orange/30'
+                        : 'bg-text-primary hover:bg-text-primary/90 hover:scale-[1.02] active:scale-[0.98]',
+                    )}
                     onClick={() => handlePurchase(plan)}
                     disabled={loadingPlan === planName}
                   >
-                    {t('buyNow', { plan: planName })}
+                    {t('buyNow')}
                   </Button>
-                  <span className="text-sm text-text-secondary">
+                  <span className="text-xs text-text-secondary text-center">
+                    {t('trialMicroCopy', { price: plan.price })}
+                  </span>
+                  <span className="text-sm text-text-secondary text-center mt-1">
                     {t('noCommitment')}
                   </span>
                 </CardFooter>
@@ -294,8 +274,84 @@ const PricingPage = () => {
           );
         })}
       </StaggerChildren>
+
+      {/* What every plan unlocks — moved BELOW the plans, rewritten as
+          outcomes. Visitors who've already seen prices now read this
+          as "what I get" rather than "what's expected of me". */}
+      <FadeIn direction="up" delay={0.1} className="mt-20">
+        <section className="text-center">
+          <h2 className="font-tondo text-2xl md:text-3xl font-bold mb-8 text-text-primary">
+            {t('included.title')}
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            {[
+              { icon: faSparkles, key: 'aiCreation' },
+              { icon: faPalette, key: 'colorOnline' },
+              { icon: faBookmark, key: 'saveFavorites' },
+              { icon: faShareNodes, key: 'shareCreations' },
+              { icon: faStar, key: 'collectStickers' },
+              { icon: faMobileScreen, key: 'mobileApps' },
+            ].map(({ icon, key }) => (
+              <div
+                key={key}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/60 border border-paper-cream-dark hover:border-crayon-orange/40 transition-colors"
+              >
+                <FontAwesomeIcon
+                  icon={icon}
+                  className="text-2xl text-crayon-orange"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                      '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+                      '--fa-secondary-opacity': '1',
+                    } as React.CSSProperties
+                  }
+                />
+                <span className="text-sm text-text-secondary text-center leading-snug">
+                  {t(`included.${key}`)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </FadeIn>
+
       {/* FAQ Section */}
       <FAQ namespace="pricing" className="mt-16 max-w-4xl mx-auto" />
+
+      {/* Final CTA — closing moment for visitors who scrolled the whole
+          page unconvinced. Repeats the primary trial CTA + a secondary
+          link back to the plan grid for those still comparing. */}
+      <FadeIn direction="up" className="mt-20">
+        <section className="text-center max-w-2xl mx-auto">
+          <h2 className="font-tondo text-3xl md:text-4xl font-bold mb-4 text-text-primary">
+            {t('finalCta.title')}
+          </h2>
+          <p className="text-lg text-text-secondary mb-8 leading-relaxed">
+            {t('finalCta.subtitle')}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button
+              className="font-tondo font-bold text-base text-white bg-crayon-orange hover:bg-crayon-orange-dark px-8 py-6 rounded-full shadow-lg shadow-crayon-orange/30 hover:scale-[1.02] active:scale-[0.98] transition-transform"
+              onClick={() => {
+                const recommended = plans.find((p) => p.mostPopular);
+                if (recommended) handlePurchase(recommended);
+              }}
+            >
+              {t('finalCta.primary')}
+            </Button>
+            <button
+              type="button"
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="font-tondo font-bold text-sm text-text-secondary hover:text-crayon-orange underline-offset-4 hover:underline transition-colors"
+            >
+              {t('finalCta.secondary')}
+            </button>
+          </div>
+        </section>
+      </FadeIn>
     </div>
   );
 };
