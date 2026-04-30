@@ -305,13 +305,13 @@
           "title": "Any scene, any subject",
           "body": "Dinosaur astronauts. Unicorn dentists. Siblings in space. If they can describe it, we can draw it."
         },
+        "family": {
+          "title": "One subscription, every kid",
+          "body": "Separate profiles for each child on the same plan. Their pages, stickers, and rewards stay theirs. Up to 10 profiles on Sparkle."
+        },
         "print": {
           "title": "Print-ready or on-screen",
           "body": "Every coloring page is a clean PDF plus an interactive canvas. Choose the one that fits the moment."
-        },
-        "daily": {
-          "title": "A fresh page every day",
-          "body": "Prefer surprises? A free new coloring page arrives in your inbox every day."
         }
       }
     },
@@ -567,6 +567,7 @@
       "saveFavorites": "Keep every page forever",
       "shareCreations": "Send pages to grandparents",
       "collectStickers": "Stickers and rewards as they color",
+      "familySharing": "One subscription, separate profiles for each kid",
       "mobileApps": "Apps for iPhone and Android"
     },
     "plans": {
@@ -595,7 +596,10 @@
       "rollover1Month": "Unused credits roll over (1 month)",
       "rollover2Months": "Extended rollover (2 months)",
       "prioritySupport": "Priority support",
-      "commercialUse": "Commercial use license"
+      "commercialUse": "Commercial use license",
+      "profiles3": "Up to 3 kid profiles",
+      "profiles5": "Up to 5 kid profiles",
+      "profiles10": "Up to 10 kid profiles"
     },
     "creditPacks": {
       "title": "Need extra credits?",
@@ -621,6 +625,10 @@
       "audience": {
         "question": "Is this just for kids?",
         "answer": "It works for any age. Toddlers describe a fox in a hat, parents print the page. Adults make their own and color them on the iPad before bed. Same product, different humans."
+      },
+      "multipleKids": {
+        "question": "Can multiple kids use one subscription?",
+        "answer": "Yes — and this is the part most apps get wrong. One Chunky Crayon plan covers separate profiles for each kid (Splash 3, Rainbow 5, Sparkle 10). Their pages, stickers, and Colo mascots stay separate. No buying a sub each."
       },
       "trialMechanics": {
         "question": "What happens after the 7-day free trial?",

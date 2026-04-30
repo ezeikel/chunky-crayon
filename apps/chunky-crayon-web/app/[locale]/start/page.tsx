@@ -160,13 +160,13 @@ async function StartStaticBody() {
             title: t('features.items.unlimited.title'),
             body: t('features.items.unlimited.body'),
           },
+          family: {
+            title: t('features.items.family.title'),
+            body: t('features.items.family.body'),
+          },
           print: {
             title: t('features.items.print.title'),
             body: t('features.items.print.body'),
-          },
-          daily: {
-            title: t('features.items.daily.title'),
-            body: t('features.items.daily.body'),
           },
         }}
       />

@@ -7,16 +7,18 @@ type StartFeaturesProps = {
   title: string;
   items: {
     unlimited: Feature;
+    family: Feature;
     print: Feature;
-    daily: Feature;
   };
 };
 
 // Three cards of product features. Kept deliberately short — landing
 // pages drop people fast if they're reading bullet-point lists. Parents
-// who want more go to /pricing.
+// who want more go to /pricing. Family-sharing message sits in the
+// middle slot because it's the strongest differentiator vs Disney /
+// Crayola / Mama Bear which charge per child.
 export default function StartFeatures({ title, items }: StartFeaturesProps) {
-  const features = [items.unlimited, items.print, items.daily];
+  const features = [items.unlimited, items.family, items.print];
 
   return (
     <section className="bg-paper-cream py-16 md:py-24">
