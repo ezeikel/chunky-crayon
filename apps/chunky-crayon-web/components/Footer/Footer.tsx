@@ -30,7 +30,7 @@ const Footer = async ({ className }: FooterProps) => {
   return (
     <footer
       className={cn(
-        'bg-[#2f2f2f] text-white pt-12 pb-6 px-4 mt-auto',
+        'bg-[#2f2f2f] text-white pt-12 pb-6 px-6 sm:px-8 mt-auto',
         className,
       )}
     >
