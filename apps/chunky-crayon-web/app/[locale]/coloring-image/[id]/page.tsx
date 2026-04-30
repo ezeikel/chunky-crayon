@@ -24,13 +24,26 @@ type ColoringImagePageProps = {
 };
 
 // Static generation - all coloring image pages are pre-rendered at build time
-// Uses WebSocket connections to Neon (not HTTP fetch) which works with prerender
+// Uses WebSocket connections to Neon (not HTTP fetch) which works with prerender.
+//
+// We catch + log here rather than throwing because a transient DB failure during
+// build (e.g. a stale pooler connection right after a schema migration, the P2022
+// `column "(not available)" does not exist` we hit on 2026-04-30) will fail the
+// entire Vercel deploy. Pages can render on-demand via ISR if `generateStaticParams`
+// returns empty — the cost is "first hit pays the SSR latency", not a broken site.
 export const generateStaticParams = async () => {
-  const images = await getAllColoringImagesStatic();
-
-  return images.map((image) => ({
-    id: image.id,
-  }));
+  try {
+    const images = await getAllColoringImagesStatic();
+    return images.map((image) => ({
+      id: image.id,
+    }));
+  } catch (err) {
+    console.error(
+      '[coloring-image] generateStaticParams failed — falling back to ISR-only:',
+      err,
+    );
+    return [];
+  }
 };
 
 export async function generateMetadata({
