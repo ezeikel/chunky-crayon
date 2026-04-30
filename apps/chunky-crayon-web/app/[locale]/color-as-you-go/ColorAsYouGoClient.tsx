@@ -51,7 +51,10 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
     setLoadingPack(pack.key);
 
     trackEvent(TRACKING_EVENTS.COLOR_AS_YOU_GO_PACK_CLICKED, {
-      packKey: pack.key,
+      packKey: pack.key as
+        | 'PUBLIC_CREDITS_50'
+        | 'PUBLIC_CREDITS_200'
+        | 'PUBLIC_CREDITS_500',
       credits: pack.credits,
       price: pack.price,
     });

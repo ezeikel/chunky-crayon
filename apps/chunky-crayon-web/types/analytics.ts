@@ -223,6 +223,14 @@ export type EventProperties = {
     creditAmount: number;
     price: string;
   };
+  [TRACKING_EVENTS.COLOR_AS_YOU_GO_PAGE_VIEWED]: {
+    isLoggedIn: boolean;
+  };
+  [TRACKING_EVENTS.COLOR_AS_YOU_GO_PACK_CLICKED]: {
+    packKey: 'PUBLIC_CREDITS_50' | 'PUBLIC_CREDITS_200' | 'PUBLIC_CREDITS_500';
+    credits: number;
+    price: string;
+  };
 
   // ===== CHECKOUT =====
   [TRACKING_EVENTS.CHECKOUT_STARTED]: {
