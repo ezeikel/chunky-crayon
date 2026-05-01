@@ -39,12 +39,26 @@ export async function generateMetadata({
   params,
 }: StartPageProps): Promise<Metadata> {
   const { locale } = await params;
+  const title = 'The Coloring App That Takes Requests | Chunky Crayon';
+  const description =
+    'Your kid describes the scene. You get a printable coloring page in about 2 minutes. 2 free pages to try, no account needed.';
+  const url = `https://chunkycrayon.com/${locale}/start`;
   return {
-    title: 'Start | Chunky Crayon',
-    description:
-      'Your kid describes the scene. You get a printable coloring page in about 2 minutes. Print it, or color it in the app. 2 free pages to try, no account needed.',
+    title,
+    description,
     alternates: {
-      canonical: `https://chunkycrayon.com/${locale}/start`,
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
     // Paid-traffic landing — no reason to index it. Keeps the URL out of
     // SEO and prevents organic visitors from hitting the campaign-aware
