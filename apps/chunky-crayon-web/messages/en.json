@@ -78,12 +78,22 @@
       "about": "About",
       "connect": "Connect",
       "getTheApp": "Get the App",
-      "support": "Support"
+      "support": "Support",
+      "freeTools": "Free Tools"
     },
     "links": {
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service",
       "colorAsYouGo": "Color as you go"
+    },
+    "freeTools": {
+      "allTools": "All tools",
+      "nameColoringPages": "Name coloring pages",
+      "rewardChartMaker": "Reward chart maker",
+      "birthdayInviteMaker": "Birthday invite maker",
+      "abcTracingWorksheets": "ABC tracing worksheets",
+      "seasonalColoringPacks": "Seasonal coloring packs",
+      "forTeachers": "For teachers"
     },
     "appStore": {
       "downloadOnAppStore": "Download on the App Store",
@@ -589,17 +599,17 @@
     "plans": {
       "splash": {
         "name": "Splash",
-        "tagline": "Best for one child.",
+        "tagline": "Best for up to 2 kids.",
         "audience": "About two pages a week. Less than one box of crayons a month."
       },
       "rainbow": {
         "name": "Rainbow",
-        "tagline": "Best for up to 3 kids.",
+        "tagline": "Best for up to 4 kids.",
         "audience": "Enough for siblings to each pick their own. Most families land here."
       },
       "sparkle": {
         "name": "Sparkle",
-        "tagline": "Family or classroom.",
+        "tagline": "Best for up to 10 kids.",
         "audience": "Up to 10 separate profiles. Never run out, share with the whole house."
       }
     },
@@ -613,8 +623,8 @@
       "rollover2Months": "Credits stack up. Keep two extra months",
       "prioritySupport": "Priority support",
       "commercialUse": "Commercial use license",
-      "profiles3": "Up to 3 kid profiles",
-      "profiles5": "Up to 5 kid profiles",
+      "profiles2": "Up to 2 kid profiles",
+      "profiles4": "Up to 4 kid profiles",
       "profiles10": "Up to 10 kid profiles"
     },
     "creditPacks": {
