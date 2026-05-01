@@ -1,9 +1,11 @@
 import Image from 'next/image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSparkles, faStar } from '@fortawesome/pro-duotone-svg-icons';
 import PageWrap from '@/components/PageWrap/PageWrap';
 
 export default function ColoringImageLoading() {
   // Use a consistent message (Next.js 16 doesn't allow Math.random in server components)
-  const message = 'Getting your crayons ready! 🖍️';
+  const message = 'Getting your crayons ready!';
 
   return (
     <PageWrap className="bg-gradient-to-b from-paper-cream via-white to-paper-cream flex flex-col justify-center items-center gap-6">
@@ -31,15 +33,15 @@ export default function ColoringImageLoading() {
           priority
         />
         {/* Sparkles around Colo */}
-        <span className="absolute -top-3 -right-3 text-xl animate-pulse">
-          ✨
-        </span>
-        <span
-          className="absolute -bottom-1 -left-3 text-lg animate-pulse"
+        <FontAwesomeIcon
+          icon={faSparkles}
+          className="absolute -top-3 -right-3 text-xl text-crayon-yellow animate-pulse"
+        />
+        <FontAwesomeIcon
+          icon={faStar}
+          className="absolute -bottom-1 -left-3 text-lg text-crayon-orange animate-pulse"
           style={{ animationDelay: '-0.5s' }}
-        >
-          🌟
-        </span>
+        />
       </div>
 
       {/* Loading message */}

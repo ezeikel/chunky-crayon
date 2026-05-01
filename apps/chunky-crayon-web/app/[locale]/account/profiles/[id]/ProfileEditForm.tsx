@@ -4,6 +4,15 @@ import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBaby,
+  faChild,
+  faChildReaching,
+  faGamepad,
+  faPalette,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { AgeGroup, Difficulty } from '@one-colored-pixel/db/types';
 import cn from '@/utils/cn';
 import { Button } from '@/components/ui/button';
@@ -24,7 +33,8 @@ type AgeGroupOption = {
   value: AgeGroup;
   labelKey: string;
   descriptionKey: string;
-  emoji: string;
+  icon: IconDefinition;
+  color: string;
 };
 
 const AGE_GROUP_OPTIONS: AgeGroupOption[] = [
@@ -32,31 +42,36 @@ const AGE_GROUP_OPTIONS: AgeGroupOption[] = [
     value: AgeGroup.TODDLER,
     labelKey: 'ageGroups.toddler',
     descriptionKey: 'ageGroups.toddlerDescription',
-    emoji: '👶',
+    icon: faBaby,
+    color: 'text-crayon-purple',
   },
   {
     value: AgeGroup.CHILD,
     labelKey: 'ageGroups.child',
     descriptionKey: 'ageGroups.childDescription',
-    emoji: '🧒',
+    icon: faChild,
+    color: 'text-crayon-orange',
   },
   {
     value: AgeGroup.TWEEN,
     labelKey: 'ageGroups.tween',
     descriptionKey: 'ageGroups.tweenDescription',
-    emoji: '🧑',
+    icon: faChildReaching,
+    color: 'text-crayon-pink',
   },
   {
     value: AgeGroup.TEEN,
     labelKey: 'ageGroups.teen',
     descriptionKey: 'ageGroups.teenDescription',
-    emoji: '🧑‍🎨',
+    icon: faGamepad,
+    color: 'text-crayon-blue',
   },
   {
     value: AgeGroup.ADULT,
     labelKey: 'ageGroups.adult',
     descriptionKey: 'ageGroups.adultDescription',
-    emoji: '🎨',
+    icon: faPalette,
+    color: 'text-crayon-green',
   },
 ];
 
@@ -222,7 +237,15 @@ const ProfileEditForm = ({ profile, canDelete }: ProfileEditFormProps) => {
                     : 'border-paper-cream-dark hover:border-gray-300',
                 )}
               >
-                <span className="text-2xl">{option.emoji}</span>
+                <FontAwesomeIcon
+                  icon={option.icon}
+                  className={cn(
+                    'text-2xl',
+                    ageGroup === option.value
+                      ? 'text-crayon-orange'
+                      : option.color,
+                  )}
+                />
                 <span
                   className={cn(
                     'font-tondo text-xs font-bold',

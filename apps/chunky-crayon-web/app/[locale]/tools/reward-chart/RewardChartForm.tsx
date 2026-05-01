@@ -2,6 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faStar,
+  faHorseHead,
+  faRocket,
+  faFish,
+  faDinosaur,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
@@ -12,14 +21,14 @@ type Theme = 'stars' | 'unicorn' | 'space' | 'ocean' | 'dinosaur';
 const THEMES: Array<{
   key: Theme;
   label: string;
-  emoji: string;
+  icon: IconDefinition;
   swatch: string;
 }> = [
-  { key: 'stars', label: 'Superstar', emoji: '⭐', swatch: '#F86A2F' },
-  { key: 'unicorn', label: 'Unicorn', emoji: '🦄', swatch: '#D05CAC' },
-  { key: 'space', label: 'Space', emoji: '🚀', swatch: '#3A3D98' },
-  { key: 'ocean', label: 'Ocean', emoji: '🐠', swatch: '#0F7D9E' },
-  { key: 'dinosaur', label: 'Dinosaur', emoji: '🦖', swatch: '#3E8948' },
+  { key: 'stars', label: 'Superstar', icon: faStar, swatch: '#F86A2F' },
+  { key: 'unicorn', label: 'Unicorn', icon: faHorseHead, swatch: '#D05CAC' },
+  { key: 'space', label: 'Space', icon: faRocket, swatch: '#3A3D98' },
+  { key: 'ocean', label: 'Ocean', icon: faFish, swatch: '#0F7D9E' },
+  { key: 'dinosaur', label: 'Dinosaur', icon: faDinosaur, swatch: '#3E8948' },
 ];
 
 const DEFAULT_BEHAVIORS = [
@@ -165,7 +174,7 @@ const RewardChartForm = () => {
                   active ? { backgroundColor: t.swatch } : { color: t.swatch }
                 }
               >
-                <span className="text-xl">{t.emoji}</span>
+                <FontAwesomeIcon icon={t.icon} className="text-xl" />
                 <span className="font-tondo font-bold">{t.label}</span>
               </button>
             );

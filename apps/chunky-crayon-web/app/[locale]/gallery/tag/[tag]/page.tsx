@@ -190,7 +190,10 @@ const TagGalleryContent = async ({
         />
       ) : (
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">🏷️</div>
+          <FontAwesomeIcon
+            icon={faTag}
+            className="text-6xl mb-4 text-crayon-orange"
+          />
           <h2 className="font-tondo font-semibold text-xl text-text-primary mb-2">
             No {tag} pages yet
           </h2>

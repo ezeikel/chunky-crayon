@@ -2,6 +2,21 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faSparkles,
+  faTrophy,
+  faHelmetSafety,
+  faCrown,
+  faScarf,
+  faHatCowboy,
+  faPalette,
+  faMask,
+  faGlasses,
+  faDinosaur,
+  faFlower,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { ColoAvatar } from '@/components/ColoAvatar';
 import type { ColoState } from '@/lib/colo';
 import {
@@ -10,6 +25,19 @@ import {
   DropdownMenuContent,
 } from '@/components/ui/dropdown-menu';
 import cn from '@/utils/cn';
+
+const getAccessoryIcon = (accessoryId: string): IconDefinition | null => {
+  if (accessoryId.includes('helmet')) return faHelmetSafety;
+  if (accessoryId.includes('crown')) return faCrown;
+  if (accessoryId.includes('scarf')) return faScarf;
+  if (accessoryId.includes('hat')) return faHatCowboy;
+  if (accessoryId.includes('beret')) return faPalette;
+  if (accessoryId.includes('cape')) return faMask;
+  if (accessoryId.includes('glasses')) return faGlasses;
+  if (accessoryId.includes('spikes')) return faDinosaur;
+  if (accessoryId.includes('flower')) return faFlower;
+  return null;
+};
 
 type HeaderColoIndicatorProps = {
   coloState: ColoState | null;
@@ -50,9 +78,10 @@ const HeaderColoIndicator = ({
           {/* Evolution sparkle indicator when close to next stage */}
           {coloState.progressToNext &&
             coloState.progressToNext.percentage >= 80 && (
-              <span className="absolute -top-1 -right-1 text-xs animate-pulse">
-                ✨
-              </span>
+              <FontAwesomeIcon
+                icon={faSparkles}
+                className="absolute -top-1 -right-1 text-xs text-crayon-yellow animate-pulse"
+              />
             )}
         </button>
       </DropdownMenuTrigger>
@@ -107,7 +136,10 @@ const HeaderColoIndicator = ({
         {/* Max stage message */}
         {!coloState.nextStage && (
           <div className="mt-4 pt-4 border-t border-gray-100 text-center">
-            <span className="text-2xl">🏆</span>
+            <FontAwesomeIcon
+              icon={faTrophy}
+              className="text-2xl text-crayon-yellow"
+            />
             <p className="font-tondo text-sm text-text-muted mt-1">
               {t('indicator.maxStage')}
             </p>
@@ -123,23 +155,23 @@ const HeaderColoIndicator = ({
               })}
             </p>
             <div className="flex flex-wrap gap-1">
-              {coloState.accessories.slice(0, 6).map((accessoryId) => (
-                <span
-                  key={accessoryId}
-                  className="w-6 h-6 rounded-full bg-crayon-orange-light/20 flex items-center justify-center text-xs"
-                  title={accessoryId}
-                >
-                  {accessoryId.includes('helmet') && '🪖'}
-                  {accessoryId.includes('crown') && '👑'}
-                  {accessoryId.includes('scarf') && '🧣'}
-                  {accessoryId.includes('hat') && '🎩'}
-                  {accessoryId.includes('beret') && '🎨'}
-                  {accessoryId.includes('cape') && '🦸'}
-                  {accessoryId.includes('glasses') && '✨'}
-                  {accessoryId.includes('spikes') && '🦖'}
-                  {accessoryId.includes('flower') && '🌸'}
-                </span>
-              ))}
+              {coloState.accessories.slice(0, 6).map((accessoryId) => {
+                const accessoryIcon = getAccessoryIcon(accessoryId);
+                return (
+                  <span
+                    key={accessoryId}
+                    className="w-6 h-6 rounded-full bg-crayon-orange-light/20 flex items-center justify-center text-xs"
+                    title={accessoryId}
+                  >
+                    {accessoryIcon && (
+                      <FontAwesomeIcon
+                        icon={accessoryIcon}
+                        className="text-crayon-orange"
+                      />
+                    )}
+                  </span>
+                );
+              })}
               {coloState.accessories.length > 6 && (
                 <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-500">
                   +{coloState.accessories.length - 6}

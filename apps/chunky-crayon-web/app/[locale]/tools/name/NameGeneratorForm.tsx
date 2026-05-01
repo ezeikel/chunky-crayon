@@ -4,6 +4,16 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { toast } from 'sonner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faPaw,
+  faFlower,
+  faHorseHead,
+  faRocket,
+  faDinosaur,
+  faCar,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
@@ -13,13 +23,43 @@ import {
   type NameTheme,
 } from '@/app/actions/tools/generate-name-page';
 
-const THEMES: Array<{ key: NameTheme; label: string; emoji: string }> = [
-  { key: 'animals', label: 'Animals', emoji: '🦁' },
-  { key: 'flowers', label: 'Flowers', emoji: '🌸' },
-  { key: 'unicorns', label: 'Unicorns', emoji: '🦄' },
-  { key: 'space', label: 'Space', emoji: '🚀' },
-  { key: 'dinosaurs', label: 'Dinosaurs', emoji: '🦖' },
-  { key: 'vehicles', label: 'Vehicles', emoji: '🚗' },
+const THEMES: Array<{
+  key: NameTheme;
+  label: string;
+  icon: IconDefinition;
+  color: string;
+}> = [
+  {
+    key: 'animals',
+    label: 'Animals',
+    icon: faPaw,
+    color: 'text-crayon-orange',
+  },
+  {
+    key: 'flowers',
+    label: 'Flowers',
+    icon: faFlower,
+    color: 'text-crayon-pink',
+  },
+  {
+    key: 'unicorns',
+    label: 'Unicorns',
+    icon: faHorseHead,
+    color: 'text-crayon-purple',
+  },
+  { key: 'space', label: 'Space', icon: faRocket, color: 'text-crayon-blue' },
+  {
+    key: 'dinosaurs',
+    label: 'Dinosaurs',
+    icon: faDinosaur,
+    color: 'text-crayon-green',
+  },
+  {
+    key: 'vehicles',
+    label: 'Vehicles',
+    icon: faCar,
+    color: 'text-crayon-orange',
+  },
 ];
 
 const NameGeneratorForm = () => {
@@ -119,7 +159,10 @@ const NameGeneratorForm = () => {
                     : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
                 )}
               >
-                <span className="text-xl">{t.emoji}</span>
+                <FontAwesomeIcon
+                  icon={t.icon}
+                  className={cn('text-xl', active ? 'text-white' : t.color)}
+                />
                 <span>{t.label}</span>
               </button>
             );

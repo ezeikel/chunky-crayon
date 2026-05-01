@@ -3,6 +3,15 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBaby,
+  faChild,
+  faChildReaching,
+  faGamepad,
+  faPalette,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { AgeGroup } from '@one-colored-pixel/db/types';
 import {
   Dialog,
@@ -31,7 +40,8 @@ type AgeGroupOption = {
     | 'tweenDescription'
     | 'teenDescription'
     | 'adultDescription';
-  emoji: string;
+  icon: IconDefinition;
+  color: string;
 };
 
 const AGE_GROUP_OPTIONS: AgeGroupOption[] = [
@@ -39,31 +49,36 @@ const AGE_GROUP_OPTIONS: AgeGroupOption[] = [
     value: AgeGroup.TODDLER,
     labelKey: 'toddler',
     descriptionKey: 'toddlerDescription',
-    emoji: '👶',
+    icon: faBaby,
+    color: 'text-crayon-purple',
   },
   {
     value: AgeGroup.CHILD,
     labelKey: 'child',
     descriptionKey: 'childDescription',
-    emoji: '🧒',
+    icon: faChild,
+    color: 'text-crayon-orange',
   },
   {
     value: AgeGroup.TWEEN,
     labelKey: 'tween',
     descriptionKey: 'tweenDescription',
-    emoji: '🧑',
+    icon: faChildReaching,
+    color: 'text-crayon-pink',
   },
   {
     value: AgeGroup.TEEN,
     labelKey: 'teen',
     descriptionKey: 'teenDescription',
-    emoji: '🧑‍🎨',
+    icon: faGamepad,
+    color: 'text-crayon-blue',
   },
   {
     value: AgeGroup.ADULT,
     labelKey: 'adult',
     descriptionKey: 'adultDescription',
-    emoji: '🎨',
+    icon: faPalette,
+    color: 'text-crayon-green',
   },
 ];
 
@@ -185,7 +200,15 @@ const CreateProfileModal = ({
                       : 'border-paper-cream-dark hover:border-gray-300',
                   )}
                 >
-                  <span className="text-2xl">{option.emoji}</span>
+                  <FontAwesomeIcon
+                    icon={option.icon}
+                    className={cn(
+                      'text-2xl',
+                      ageGroup === option.value
+                        ? 'text-crayon-orange'
+                        : option.color,
+                    )}
+                  />
                   <span
                     className={cn(
                       'font-tondo text-xs font-bold',

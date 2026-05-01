@@ -4,7 +4,11 @@ import Image from 'next/image';
 import { connection } from 'next/server';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faArrowLeft,
+  faCheck,
+  faEllipsis,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { db } from '@one-colored-pixel/db';
 import {
   AD_PURPOSE_PREFIX,
@@ -119,7 +123,11 @@ const AdDetailContent = async ({ params }: { params: Params }) => {
                       : 'bg-amber-100 text-amber-700'
                   }`}
                 >
-                  {ready ? '✓ ready' : '… pending'}
+                  <FontAwesomeIcon
+                    icon={ready ? faCheck : faEllipsis}
+                    className="mr-1"
+                  />
+                  {ready ? 'ready' : 'pending'}
                 </span>
               </div>
             ))}

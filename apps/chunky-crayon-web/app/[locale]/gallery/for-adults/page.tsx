@@ -7,6 +7,11 @@ import {
   faPalette,
   faArrowRight,
   faSparkles,
+  faSpa,
+  faBullseye,
+  faBaby,
+  faChildReaching,
+  faGamepad,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { getTranslations } from 'next-intl/server';
 import PageWrap from '@/components/PageWrap/PageWrap';
@@ -256,7 +261,10 @@ const ForAdultsContent = async ({ locale }: { locale: string }) => {
         </h2>
         <div className="grid md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="text-4xl mb-3">🧘</div>
+            <FontAwesomeIcon
+              icon={faSpa}
+              className="text-4xl mb-3 text-crayon-green"
+            />
             <h3 className="font-tondo font-semibold text-lg mb-2">
               {t('why1Title')}
             </h3>
@@ -265,7 +273,10 @@ const ForAdultsContent = async ({ locale }: { locale: string }) => {
             </p>
           </div>
           <div className="text-center">
-            <div className="text-4xl mb-3">🎯</div>
+            <FontAwesomeIcon
+              icon={faBullseye}
+              className="text-4xl mb-3 text-crayon-purple"
+            />
             <h3 className="font-tondo font-semibold text-lg mb-2">
               {t('why2Title')}
             </h3>
@@ -274,7 +285,10 @@ const ForAdultsContent = async ({ locale }: { locale: string }) => {
             </p>
           </div>
           <div className="text-center">
-            <div className="text-4xl mb-3">✨</div>
+            <FontAwesomeIcon
+              icon={faSparkles}
+              className="text-4xl mb-3 text-crayon-pink"
+            />
             <h3 className="font-tondo font-semibold text-lg mb-2">
               {t('why3Title')}
             </h3>
@@ -314,7 +328,7 @@ const ForAdultsContent = async ({ locale }: { locale: string }) => {
             href="/gallery/for-toddlers"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-paper-cream hover:bg-crayon-purple/10 border border-paper-cream-dark hover:border-crayon-purple/30 transition-colors"
           >
-            <span>👶</span>
+            <FontAwesomeIcon icon={faBaby} className="text-crayon-purple" />
             <span>{breadcrumbsT('forToddlers')}</span>
             <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
           </Link>
@@ -322,7 +336,10 @@ const ForAdultsContent = async ({ locale }: { locale: string }) => {
             href="/gallery/for-kids"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-paper-cream hover:bg-crayon-orange/10 border border-paper-cream-dark hover:border-crayon-orange/30 transition-colors"
           >
-            <span>👦</span>
+            <FontAwesomeIcon
+              icon={faChildReaching}
+              className="text-crayon-orange"
+            />
             <span>{breadcrumbsT('forKids')}</span>
             <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
           </Link>
@@ -330,7 +347,7 @@ const ForAdultsContent = async ({ locale }: { locale: string }) => {
             href="/gallery/for-teens"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-paper-cream hover:bg-crayon-blue/10 border border-paper-cream-dark hover:border-crayon-blue/30 transition-colors"
           >
-            <span>🎮</span>
+            <FontAwesomeIcon icon={faGamepad} className="text-crayon-blue" />
             <span>{breadcrumbsT('forTeens')}</span>
             <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
           </Link>

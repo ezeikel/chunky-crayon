@@ -10,6 +10,7 @@ import {
   faGift,
   faClock,
   faCheck,
+  faStar,
 } from '@fortawesome/pro-solid-svg-icons';
 import cn from '@/utils/cn';
 import type { ChallengeWithProgress } from '@/lib/challenges';
@@ -194,7 +195,9 @@ const ChallengeWidget = ({
                 transition={{ duration: 0.5 }}
                 className="text-4xl mb-2"
               >
-                {challenge.rewardType === 'sticker' ? '🌟' : '🎁'}
+                <FontAwesomeIcon
+                  icon={challenge.rewardType === 'sticker' ? faStar : faGift}
+                />
               </motion.div>
               <p className="font-tondo font-bold text-lg">Reward Claimed!</p>
               <p className="text-sm text-white/80">

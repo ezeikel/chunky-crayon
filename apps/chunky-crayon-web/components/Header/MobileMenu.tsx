@@ -5,7 +5,14 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faXmark, faCheck } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faBars,
+  faXmark,
+  faCheck,
+  faPaintbrush,
+  faPalette,
+  faSparkles,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { useTranslations } from 'next-intl';
 import { signOutAction } from '@/app/actions/auth';
 import cn from '@/lib/utils';
@@ -356,24 +363,21 @@ const MobileMenu = ({
 
             {/* Fun decoration at bottom */}
             <div className="p-4 flex justify-center gap-2 opacity-50">
-              <span
-                className="text-2xl animate-float"
+              <FontAwesomeIcon
+                icon={faPaintbrush}
+                className="text-2xl text-crayon-orange animate-float"
                 style={{ animationDelay: '0s' }}
-              >
-                🖍️
-              </span>
-              <span
-                className="text-2xl animate-float"
+              />
+              <FontAwesomeIcon
+                icon={faPalette}
+                className="text-2xl text-crayon-purple animate-float"
                 style={{ animationDelay: '0.2s' }}
-              >
-                🎨
-              </span>
-              <span
-                className="text-2xl animate-float"
+              />
+              <FontAwesomeIcon
+                icon={faSparkles}
+                className="text-2xl text-crayon-yellow animate-float"
                 style={{ animationDelay: '0.4s' }}
-              >
-                ✨
-              </span>
+              />
             </div>
           </div>,
           document.body,

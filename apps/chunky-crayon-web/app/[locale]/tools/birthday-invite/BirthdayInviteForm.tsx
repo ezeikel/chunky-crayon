@@ -2,6 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faRainbow,
+  faHorseHead,
+  faDinosaur,
+  faRocket,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
@@ -9,11 +17,31 @@ import cn from '@/utils/cn';
 
 type Theme = 'rainbow' | 'unicorn' | 'dinosaur' | 'space';
 
-const THEMES: Array<{ key: Theme; label: string; emoji: string }> = [
-  { key: 'rainbow', label: 'Rainbow', emoji: '🌈' },
-  { key: 'unicorn', label: 'Unicorn', emoji: '🦄' },
-  { key: 'dinosaur', label: 'Dinosaur', emoji: '🦖' },
-  { key: 'space', label: 'Space', emoji: '🚀' },
+const THEMES: Array<{
+  key: Theme;
+  label: string;
+  icon: IconDefinition;
+  color: string;
+}> = [
+  {
+    key: 'rainbow',
+    label: 'Rainbow',
+    icon: faRainbow,
+    color: 'text-crayon-pink',
+  },
+  {
+    key: 'unicorn',
+    label: 'Unicorn',
+    icon: faHorseHead,
+    color: 'text-crayon-purple',
+  },
+  {
+    key: 'dinosaur',
+    label: 'Dinosaur',
+    icon: faDinosaur,
+    color: 'text-crayon-green',
+  },
+  { key: 'space', label: 'Space', icon: faRocket, color: 'text-crayon-blue' },
 ];
 
 const BirthdayInviteForm = () => {
@@ -234,7 +262,10 @@ const BirthdayInviteForm = () => {
                     : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
                 )}
               >
-                <span className="text-xl">{t.emoji}</span>
+                <FontAwesomeIcon
+                  icon={t.icon}
+                  className={cn('text-xl', active ? 'text-white' : t.color)}
+                />
                 <span>{t.label}</span>
               </button>
             );

@@ -166,7 +166,10 @@ const DailyGalleryContent = async ({ locale }: { locale: string }) => {
         />
       ) : (
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">📅</div>
+          <FontAwesomeIcon
+            icon={faCalendarStar}
+            className="text-6xl mb-4 text-crayon-orange"
+          />
           <h2 className="font-tondo font-semibold text-xl text-text-primary mb-2">
             No daily pages yet
           </h2>

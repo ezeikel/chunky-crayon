@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPalette } from '@fortawesome/pro-duotone-svg-icons';
 import { urlFor } from '@/lib/sanity';
 import cn from '@/utils/cn';
 
@@ -56,7 +58,10 @@ const BlogPostCard = ({ post, className }: BlogPostCardProps) => {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-6xl opacity-30">🎨</span>
+              <FontAwesomeIcon
+                icon={faPalette}
+                className="text-6xl opacity-30 text-crayon-orange"
+              />
             </div>
           )}
         </div>

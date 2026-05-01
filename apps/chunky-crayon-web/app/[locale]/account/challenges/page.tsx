@@ -9,6 +9,7 @@ import {
   faGift,
   faCheck,
   faSparkles,
+  faStar,
 } from '@fortawesome/pro-duotone-svg-icons';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -241,7 +242,14 @@ const ChallengesPage = () => {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="text-6xl mb-4"
               >
-                {claimedReward.type === 'sticker' ? '🌟' : '🎁'}
+                <FontAwesomeIcon
+                  icon={claimedReward.type === 'sticker' ? faStar : faGift}
+                  className={
+                    claimedReward.type === 'sticker'
+                      ? 'text-crayon-yellow'
+                      : 'text-crayon-pink'
+                  }
+                />
               </motion.div>
               <h2 className="font-tondo font-bold text-2xl text-text-primary mb-2">
                 Reward Claimed!

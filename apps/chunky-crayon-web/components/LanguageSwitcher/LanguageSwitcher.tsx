@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, type Locale } from '@/i18n/routing';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe } from '@fortawesome/pro-duotone-svg-icons';
+import { faGlobe, faCheck } from '@fortawesome/pro-duotone-svg-icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,16 +24,6 @@ const LANGUAGE_NAMES: Record<Locale, string> = {
   de: 'Deutsch',
   fr: 'Français',
   es: 'Español',
-};
-
-// Flag emojis for visual distinction
-const LANGUAGE_FLAGS: Record<Locale, string> = {
-  en: '🇬🇧',
-  ja: '🇯🇵',
-  ko: '🇰🇷',
-  de: '🇩🇪',
-  fr: '🇫🇷',
-  es: '🇪🇸',
 };
 
 const LOCALES: Locale[] = ['en', 'ja', 'ko', 'de', 'fr', 'es'];
@@ -103,7 +93,11 @@ const LanguageSwitcher = ({
         )}
         {variant === 'compact' && (
           <>
-            <span className="text-lg">{LANGUAGE_FLAGS[locale]}</span>
+            <FontAwesomeIcon
+              icon={faGlobe}
+              className="text-base"
+              style={iconStyle}
+            />
             <span className="text-sm uppercase">{locale}</span>
           </>
         )}
@@ -118,10 +112,12 @@ const LanguageSwitcher = ({
               locale === loc && 'bg-crayon-orange/10 text-crayon-orange',
             )}
           >
-            <span className="text-lg">{LANGUAGE_FLAGS[loc]}</span>
             <span className="flex-1">{LANGUAGE_NAMES[loc]}</span>
             {locale === loc && (
-              <span className="text-crayon-orange text-sm">✓</span>
+              <FontAwesomeIcon
+                icon={faCheck}
+                className="text-crayon-orange text-sm"
+              />
             )}
           </DropdownMenuItem>
         ))}

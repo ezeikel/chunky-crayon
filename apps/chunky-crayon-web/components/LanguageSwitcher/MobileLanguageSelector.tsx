@@ -2,6 +2,8 @@
 
 import { useParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGlobe } from '@fortawesome/pro-duotone-svg-icons';
 import { usePathname, useRouter, type Locale } from '@/i18n/routing';
 import cn from '@/utils/cn';
 
@@ -13,16 +15,6 @@ const LANGUAGE_NAMES: Record<Locale, string> = {
   de: 'Deutsch',
   fr: 'Français',
   es: 'Español',
-};
-
-// Flag emojis for visual distinction
-const LANGUAGE_FLAGS: Record<Locale, string> = {
-  en: '🇬🇧',
-  ja: '🇯🇵',
-  ko: '🇰🇷',
-  de: '🇩🇪',
-  fr: '🇫🇷',
-  es: '🇪🇸',
 };
 
 const LOCALES: Locale[] = ['en', 'ja', 'ko', 'de', 'fr', 'es'];
@@ -62,7 +54,7 @@ const MobileLanguageSelector = ({
     <div className="space-y-3">
       {/* Section header */}
       <div className="flex items-center gap-2 px-1">
-        <span className="text-lg">🌐</span>
+        <FontAwesomeIcon icon={faGlobe} className="text-lg text-crayon-blue" />
         <span className="font-tondo font-bold text-sm text-text-secondary">
           {t('language')}
         </span>
@@ -89,10 +81,10 @@ const MobileLanguageSelector = ({
               aria-label={`${t('switchTo')} ${LANGUAGE_NAMES[loc]}`}
               aria-pressed={isActive}
             >
-              <span className="text-xl leading-none">
-                {LANGUAGE_FLAGS[loc]}
-              </span>
               <span className="font-bold uppercase text-xs">{loc}</span>
+              <span className="text-[10px] text-text-tertiary">
+                {LANGUAGE_NAMES[loc]}
+              </span>
             </button>
           );
         })}

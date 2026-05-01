@@ -1,3 +1,5 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faNewspaper } from '@fortawesome/pro-duotone-svg-icons';
 import BlogPostCard from './BlogPostCard';
 import cn from '@/utils/cn';
 
@@ -29,7 +31,10 @@ const BlogGrid = ({ posts, className }: BlogGridProps) => {
   if (posts.length === 0) {
     return (
       <div className="text-center py-16">
-        <span className="text-6xl mb-4 block">📝</span>
+        <FontAwesomeIcon
+          icon={faNewspaper}
+          className="text-6xl mb-4 block text-crayon-orange"
+        />
         <h3 className="font-tondo font-bold text-xl text-text-primary mb-2">
           No posts yet
         </h3>

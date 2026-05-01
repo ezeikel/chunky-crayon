@@ -1,7 +1,11 @@
 'use client';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSparkles } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faSparkles,
+  faPalette,
+  faStar,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { useTranslations } from 'next-intl';
 import { ColoAvatar } from '@/components/ColoAvatar';
 import type { ColoState } from '@/lib/colo';
@@ -38,13 +42,15 @@ const DashboardHeader = ({ coloState }: DashboardHeaderProps) => {
           {/* Sparkle - extra sparkle when close to evolution */}
           {coloState?.progressToNext &&
           coloState.progressToNext.percentage >= 80 ? (
-            <span className="absolute -top-2 -right-2 text-xl animate-bounce">
-              ✨
-            </span>
+            <FontAwesomeIcon
+              icon={faSparkles}
+              className="absolute -top-2 -right-2 text-xl text-crayon-yellow animate-bounce"
+            />
           ) : (
-            <span className="absolute -top-1 -right-1 text-lg animate-pulse">
-              ✨
-            </span>
+            <FontAwesomeIcon
+              icon={faSparkles}
+              className="absolute -top-1 -right-1 text-lg text-crayon-yellow animate-pulse"
+            />
           )}
         </div>
       </div>
@@ -77,11 +83,15 @@ const DashboardHeader = ({ coloState }: DashboardHeaderProps) => {
                   coloState.progressToNext.required -
                   coloState.progressToNext.current,
               })}{' '}
-              🎨
+              <FontAwesomeIcon
+                icon={faPalette}
+                className="text-crayon-orange"
+              />
             </>
           ) : (
             <>
-              {t('dashboard.proudOfYou', { stageName: translatedStageName })} 🌟
+              {t('dashboard.proudOfYou', { stageName: translatedStageName })}{' '}
+              <FontAwesomeIcon icon={faStar} className="text-crayon-yellow" />
             </>
           )}
         </p>

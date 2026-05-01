@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMap } from '@fortawesome/pro-duotone-svg-icons';
 import {
   getColoringImageById,
   getAllColoringImagesStatic,
@@ -225,7 +227,8 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
             href={`/dev/region-store/${id}`}
             className="inline-flex items-center gap-x-2 rounded-full border-2 border-paper-cream-dark bg-white px-3 py-1.5 text-xs font-medium text-text-primary/70 hover:border-crayon-orange/50 hover:text-crayon-orange transition-colors"
           >
-            🗺️ View region store
+            <FontAwesomeIcon icon={faMap} className="text-text-tertiary" />
+            View region store
           </Link>
         </div>
       )}

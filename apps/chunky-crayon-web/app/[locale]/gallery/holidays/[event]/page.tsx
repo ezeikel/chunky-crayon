@@ -3,16 +3,31 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faTreeChristmas,
+  faPumpkin,
+  faRabbit,
+  faTurkey,
+  faHeart,
+  faSnowflake,
+  faFlower,
+  faSun,
+  faLeaf,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
 import { getTagImages } from '@/app/data/gallery';
 import { generateAlternates } from '@/lib/seo';
+import cn from '@/lib/utils';
 
 type HolidayEvent = {
   slug: string;
   name: string;
-  emoji: string;
+  icon: IconDefinition;
+  color: string;
   tags: string[];
   description: string;
   seoTitle: string;
@@ -23,7 +38,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'christmas',
     name: 'Christmas',
-    emoji: '🎄',
+    icon: faTreeChristmas,
+    color: 'text-crayon-green',
     tags: ['christmas', 'santa', 'holiday'],
     description:
       'Festive Christmas coloring pages featuring Santa, snowmen, ornaments, and holiday cheer.',
@@ -34,7 +50,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'halloween',
     name: 'Halloween',
-    emoji: '🎃',
+    icon: faPumpkin,
+    color: 'text-crayon-orange',
     tags: ['halloween', 'pumpkin', 'spooky'],
     description:
       'Spooky and fun Halloween coloring pages with pumpkins, friendly ghosts, and costumes.',
@@ -45,7 +62,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'easter',
     name: 'Easter',
-    emoji: '🐰',
+    icon: faRabbit,
+    color: 'text-crayon-purple',
     tags: ['easter', 'bunny', 'eggs'],
     description:
       'Cheerful Easter coloring pages with bunnies, decorated eggs, and spring flowers.',
@@ -56,7 +74,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'thanksgiving',
     name: 'Thanksgiving',
-    emoji: '🦃',
+    icon: faTurkey,
+    color: 'text-crayon-orange',
     tags: ['thanksgiving', 'autumn'],
     description:
       'Thanksgiving coloring pages featuring turkeys, autumn leaves, and harvest themes.',
@@ -67,7 +86,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'valentines-day',
     name: "Valentine's Day",
-    emoji: '💝',
+    icon: faHeart,
+    color: 'text-crayon-pink',
     tags: ['valentine', 'hearts', 'love'],
     description:
       "Valentine's Day coloring pages with hearts, flowers, and messages of love and friendship.",
@@ -78,7 +98,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'winter',
     name: 'Winter',
-    emoji: '❄️',
+    icon: faSnowflake,
+    color: 'text-crayon-blue',
     tags: ['winter', 'snow'],
     description:
       'Winter-themed coloring pages with snowflakes, snowmen, and cozy winter scenes.',
@@ -89,7 +110,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'spring',
     name: 'Spring',
-    emoji: '🌸',
+    icon: faFlower,
+    color: 'text-crayon-pink',
     tags: ['spring'],
     description:
       'Spring coloring pages with blooming flowers, butterflies, and sunny outdoor scenes.',
@@ -100,7 +122,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'summer',
     name: 'Summer',
-    emoji: '☀️',
+    icon: faSun,
+    color: 'text-crayon-yellow',
     tags: ['summer'],
     description:
       'Summer coloring pages featuring beach scenes, sunshine, and outdoor adventures.',
@@ -111,7 +134,8 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
   {
     slug: 'autumn',
     name: 'Autumn',
-    emoji: '🍂',
+    icon: faLeaf,
+    color: 'text-crayon-orange',
     tags: ['autumn'],
     description:
       'Autumn coloring pages with falling leaves, harvest scenes, and cozy fall themes.',
@@ -237,7 +261,10 @@ const HolidayGalleryContent = async ({
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">{event.emoji}</span>
+          <FontAwesomeIcon
+            icon={event.icon}
+            className={cn('text-4xl', event.color)}
+          />
           <div>
             <h1 className="font-tondo font-bold text-3xl md:text-4xl text-text-primary">
               {event.name} Coloring Pages
@@ -265,7 +292,7 @@ const HolidayGalleryContent = async ({
               href={`/gallery/holidays/${e.slug}`}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-paper-cream hover:bg-crayon-orange/10 border border-paper-cream-dark hover:border-crayon-orange/30 transition-colors text-sm"
             >
-              <span>{e.emoji}</span>
+              <FontAwesomeIcon icon={e.icon} className={e.color} />
               {e.name}
             </Link>
           ))}
@@ -289,7 +316,10 @@ const HolidayGalleryContent = async ({
         />
       ) : (
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">{event.emoji}</div>
+          <FontAwesomeIcon
+            icon={event.icon}
+            className={cn('text-6xl mb-4', event.color)}
+          />
           <h2 className="font-tondo font-semibold text-xl text-text-primary mb-2">
             No {event.name.toLowerCase()} coloring pages yet
           </h2>

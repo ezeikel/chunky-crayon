@@ -3,6 +3,15 @@
 import { useState, useCallback, useEffect, useId } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faHeart,
+  faStar,
+  faSparkles,
+  faEgg,
+  faPalette,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import cn from '@/utils/cn';
 import type { ColoStage, ColoState } from '@/lib/colo';
 import { COLO_STAGES } from '@/lib/colo';
@@ -99,11 +108,17 @@ const stageColors: Record<ColoStage, { from: string; to: string }> = {
   6: { from: 'from-orange-300', to: 'to-amber-500' }, // Master - golden
 };
 
-// Particle emojis for reactions
-const PARTICLE_EMOJIS: Record<ParticleType, string> = {
-  heart: '❤️',
-  star: '⭐',
-  sparkle: '✨',
+// Particle icons for reactions
+const PARTICLE_ICONS: Record<ParticleType, IconDefinition> = {
+  heart: faHeart,
+  star: faStar,
+  sparkle: faSparkles,
+};
+
+const PARTICLE_COLORS: Record<ParticleType, string> = {
+  heart: 'text-crayon-pink',
+  star: 'text-crayon-yellow',
+  sparkle: 'text-crayon-yellow',
 };
 
 // Available reaction animations
@@ -266,16 +281,18 @@ const ColoAvatar = ({
     >
       {/* Floating reaction particles */}
       {particles.map((particle) => (
-        <span
+        <FontAwesomeIcon
           key={particle.id}
-          className="absolute pointer-events-none text-lg animate-reaction-float z-20"
+          icon={PARTICLE_ICONS[particle.type]}
+          className={cn(
+            'absolute pointer-events-none text-lg animate-reaction-float z-20',
+            PARTICLE_COLORS[particle.type],
+          )}
           style={{
             left: `calc(50% + ${particle.x}px)`,
             top: `calc(50% + ${particle.y}px)`,
           }}
-        >
-          {PARTICLE_EMOJIS[particle.type]}
-        </span>
+        />
       ))}
 
       {/* Main avatar container - uses button only when interactive */}
@@ -314,19 +331,18 @@ const ColoAvatar = ({
             >
               {stage}
             </span>
-            {/* Stage emoji based on evolution */}
-            <span
+            {/* Stage icon based on evolution */}
+            <FontAwesomeIcon
+              icon={stage <= 4 ? faEgg : faStar}
               className={cn(
-                'leading-none',
+                'leading-none text-white',
                 size === 'xs'
                   ? 'text-[10px]'
                   : size === 'sm'
                     ? 'text-xs'
                     : 'text-sm',
               )}
-            >
-              {stage <= 2 ? '🥚' : stage <= 4 ? '🐣' : '🌟'}
-            </span>
+            />
           </div>
         ) : (
           /* Actual Colo image */
@@ -388,8 +404,9 @@ const ColoAvatar = ({
               </p>
             )}
             {enableTapReactions && (
-              <p className="text-crayon-yellow text-[10px] mt-1">
-                {t('avatar.tapMe')} 🎨
+              <p className="text-crayon-yellow text-[10px] mt-1 inline-flex items-center gap-1">
+                {t('avatar.tapMe')}
+                <FontAwesomeIcon icon={faPalette} />
               </p>
             )}
             {/* Tooltip arrow */}

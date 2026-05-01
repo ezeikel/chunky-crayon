@@ -2,6 +2,12 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faPaintbrush,
+  faSparkles,
+  faFaceFrown,
+} from '@fortawesome/pro-duotone-svg-icons';
 
 function MagicLinkRedirectContent() {
   const searchParams = useSearchParams();
@@ -58,7 +64,10 @@ function MagicLinkRedirectContent() {
     <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
       {status === 'loading' && (
         <>
-          <div className="text-6xl mb-4">🖍️</div>
+          <FontAwesomeIcon
+            icon={faPaintbrush}
+            className="text-6xl mb-4 text-crayon-orange"
+          />
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
             Signing you in...
           </h1>
@@ -73,7 +82,10 @@ function MagicLinkRedirectContent() {
 
       {status === 'success' && (
         <>
-          <div className="text-6xl mb-4">✨</div>
+          <FontAwesomeIcon
+            icon={faSparkles}
+            className="text-6xl mb-4 text-crayon-yellow"
+          />
           <h1 className="text-2xl font-bold text-gray-800 mb-2">
             You&apos;re signed in!
           </h1>
@@ -88,7 +100,10 @@ function MagicLinkRedirectContent() {
 
       {status === 'error' && (
         <>
-          <div className="text-6xl mb-4">😕</div>
+          <FontAwesomeIcon
+            icon={faFaceFrown}
+            className="text-6xl mb-4 text-crayon-pink"
+          />
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Oops!</h1>
           <p className="text-gray-600 mb-4">
             {error || 'Something went wrong with your magic link.'}
@@ -106,7 +121,10 @@ function MagicLinkRedirectContent() {
 function LoadingFallback() {
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-      <div className="text-6xl mb-4">🖍️</div>
+      <FontAwesomeIcon
+        icon={faPaintbrush}
+        className="text-6xl mb-4 text-crayon-orange"
+      />
       <h1 className="text-2xl font-bold text-gray-800 mb-2">Loading...</h1>
       <div className="mt-6">
         <div className="animate-spin rounded-full h-8 w-8 border-4 border-pink-500 border-t-transparent mx-auto"></div>

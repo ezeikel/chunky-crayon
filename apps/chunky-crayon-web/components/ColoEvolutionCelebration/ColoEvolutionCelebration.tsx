@@ -2,10 +2,39 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faSparkles,
+  faStar,
+  faHelmetSafety,
+  faCrown,
+  faScarf,
+  faHatCowboy,
+  faPalette,
+  faMask,
+  faGlasses,
+  faDinosaur,
+  faFlower,
+  faPartyHorn,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { ColoAvatar } from '@/components/ColoAvatar';
 import Confetti from '@/components/Confetti/Confetti';
 import type { ColoStage, EvolutionResult } from '@/lib/colo';
 import { COLO_STAGES, getAccessory } from '@/lib/colo';
+
+const getAccessoryIcon = (accessoryId: string): IconDefinition | null => {
+  if (accessoryId.includes('helmet')) return faHelmetSafety;
+  if (accessoryId.includes('crown')) return faCrown;
+  if (accessoryId.includes('scarf')) return faScarf;
+  if (accessoryId.includes('hat')) return faHatCowboy;
+  if (accessoryId.includes('beret')) return faPalette;
+  if (accessoryId.includes('cape')) return faMask;
+  if (accessoryId.includes('glasses')) return faGlasses;
+  if (accessoryId.includes('spikes')) return faDinosaur;
+  if (accessoryId.includes('flower')) return faFlower;
+  return null;
+};
 
 type ColoEvolutionCelebrationProps = {
   /** Evolution result from server action */
@@ -135,10 +164,22 @@ const ColoEvolutionCelebration = ({
                       transition={{ delay: 0.7, duration: 1.5, repeat: 2 }}
                       className="absolute inset-0 flex items-center justify-center text-4xl"
                     >
-                      <span className="absolute -top-4 left-1/4">✨</span>
-                      <span className="absolute -top-2 right-1/4">🌟</span>
-                      <span className="absolute -bottom-4 left-1/3">⭐</span>
-                      <span className="absolute -bottom-2 right-1/3">✨</span>
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        className="absolute -top-4 left-1/4 text-crayon-yellow"
+                      />
+                      <FontAwesomeIcon
+                        icon={faStar}
+                        className="absolute -top-2 right-1/4 text-crayon-orange"
+                      />
+                      <FontAwesomeIcon
+                        icon={faStar}
+                        className="absolute -bottom-4 left-1/3 text-crayon-yellow"
+                      />
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        className="absolute -bottom-2 right-1/3 text-crayon-pink"
+                      />
                     </motion.div>
                   </div>
 
@@ -196,16 +237,16 @@ const ColoEvolutionCelebration = ({
                         >
                           {/* Accessory icon placeholder */}
                           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-crayon-orange-light to-crayon-orange flex items-center justify-center text-2xl">
-                            {/* Map accessory to emoji for placeholder */}
-                            {accessoryId.includes('helmet') && '🪖'}
-                            {accessoryId.includes('crown') && '👑'}
-                            {accessoryId.includes('scarf') && '🧣'}
-                            {accessoryId.includes('hat') && '🎩'}
-                            {accessoryId.includes('beret') && '🎨'}
-                            {accessoryId.includes('cape') && '🦸'}
-                            {accessoryId.includes('glasses') && '✨'}
-                            {accessoryId.includes('spikes') && '🦖'}
-                            {accessoryId.includes('flower') && '🌸'}
+                            {(() => {
+                              const accessoryIcon =
+                                getAccessoryIcon(accessoryId);
+                              return accessoryIcon ? (
+                                <FontAwesomeIcon
+                                  icon={accessoryIcon}
+                                  className="text-white"
+                                />
+                              ) : null;
+                            })()}
                           </div>
                           <p className="font-tondo font-medium text-text-primary">
                             {accessory.name}
@@ -248,7 +289,7 @@ const ColoEvolutionCelebration = ({
                 className="mt-6 px-8 py-3 bg-gradient-to-r from-crayon-orange to-crayon-orange-light text-white font-tondo font-bold text-lg rounded-full shadow-lg hover:shadow-xl transition-shadow"
                 onClick={onDismiss}
               >
-                Awesome! 🎉
+                Awesome! <FontAwesomeIcon icon={faPartyHorn} className="ml-1" />
               </motion.button>
             </motion.div>
           </motion.div>

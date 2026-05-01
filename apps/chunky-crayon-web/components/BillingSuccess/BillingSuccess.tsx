@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPalette, faSparkles } from '@fortawesome/pro-duotone-svg-icons';
 import { PlanName } from '@one-colored-pixel/db/types';
 import PurchaseTracking from '@/app/[locale]/account/billing/PurchaseTracking';
 
@@ -19,10 +21,15 @@ const BillingSuccess = ({
   planName,
   creditAmount,
 }: BillingSuccessProps) => {
-  const headline =
+  const headlineText =
     productType === 'subscription'
-      ? `You're all set${planName ? `, ${planName} pal` : ''}! 🎨`
-      : `Credits added! ✨`;
+      ? `You're all set${planName ? `, ${planName} pal` : ''}!`
+      : 'Credits added!';
+  const headlineIcon = productType === 'subscription' ? faPalette : faSparkles;
+  const headlineIconColor =
+    productType === 'subscription'
+      ? 'text-crayon-orange'
+      : 'text-crayon-yellow';
   const body =
     productType === 'subscription'
       ? 'Your plan is active and your crayons are ready. Time to make something colourful!'
@@ -31,8 +38,9 @@ const BillingSuccess = ({
   return (
     <div className="max-w-lg mx-auto py-16 px-4 text-center">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-crayon-orange mb-4">
-          {headline}
+        <h1 className="text-3xl font-bold text-crayon-orange mb-4 flex items-center justify-center gap-2">
+          <span>{headlineText}</span>
+          <FontAwesomeIcon icon={headlineIcon} className={headlineIconColor} />
         </h1>
         <p className="text-text-secondary">{body}</p>
         {amount !== null && (

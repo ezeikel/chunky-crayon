@@ -2,6 +2,11 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { connection } from 'next/server';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faMap,
+  faTriangleExclamation,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth-guards';
@@ -146,7 +151,11 @@ const AdminImagesContent = async ({
                       : 'bg-amber-500/90 text-white'
                   }`}
                 >
-                  {hasRegion ? '🗺️ region' : '⚠ no region'}
+                  <FontAwesomeIcon
+                    icon={hasRegion ? faMap : faTriangleExclamation}
+                    className="mr-1"
+                  />
+                  {hasRegion ? 'region' : 'no region'}
                 </span>
                 <span className="absolute top-2 left-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-black/60 text-white">
                   {img.generationType}
@@ -189,7 +198,8 @@ const AdminImagesContent = async ({
                   href={`/dev/region-store/${img.id}`}
                   className="mt-1 inline-flex items-center justify-center gap-x-1 rounded-full border border-paper-cream-dark px-2 py-1 text-[11px] font-medium text-text-primary/80 hover:border-crayon-orange/50 hover:text-crayon-orange transition-colors"
                 >
-                  🗺️ View region store
+                  <FontAwesomeIcon icon={faMap} />
+                  View region store
                 </Link>
               </div>
             </div>

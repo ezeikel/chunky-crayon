@@ -5,6 +5,8 @@ import posthog from 'posthog-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/pro-duotone-svg-icons';
 import {
   SUBSCRIPTION_PLANS,
   CREDIT_PACKS_MEMBER,
@@ -395,7 +397,10 @@ const Billing = ({ user }: BillingProps) => {
                   <ul className="mb-2 space-y-1">
                     {plan.featureKeys.map((featureKey) => (
                       <li key={featureKey} className="flex items-center gap-2">
-                        <span className="text-green-600">✓</span>
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-green-600"
+                        />
                         <span>{tPricing(`features.${featureKey}`)}</span>
                       </li>
                     ))}

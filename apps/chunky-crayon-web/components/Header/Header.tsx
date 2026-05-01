@@ -290,18 +290,24 @@ const Header = async () => {
             <HeaderDropdown user={user} signOutAction={handleSignOut} />
           </nav>
 
-          {/* Kid-facing items - shown on larger desktops; available via dropdown / mobile menu otherwise */}
-          <div className="hidden xl:flex items-center gap-2">
+          {/* Kid-facing items - challenge stays visible everywhere; Colo + sticker hide below xl to prevent header wrap */}
+          <div className="flex items-center gap-2">
             {/* Challenge indicator */}
             <HeaderChallengeIndicator challengeData={currentChallenge} />
             {/* Colo mascot indicator */}
-            {coloState && <HeaderColoIndicator coloState={coloState} />}
+            {coloState && (
+              <div className="hidden xl:flex">
+                <HeaderColoIndicator coloState={coloState} />
+              </div>
+            )}
             {/* Sticker indicator */}
             {stickerStats && (
-              <HeaderStickerIndicator
-                totalUnlocked={stickerStats.totalUnlocked}
-                newCount={stickerStats.newCount}
-              />
+              <div className="hidden xl:flex">
+                <HeaderStickerIndicator
+                  totalUnlocked={stickerStats.totalUnlocked}
+                  newCount={stickerStats.newCount}
+                />
+              </div>
             )}
           </div>
 

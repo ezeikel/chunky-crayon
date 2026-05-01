@@ -3,7 +3,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { connection } from 'next/server';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faPlus,
+  faCheck,
+  faEllipsis,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
 import {
@@ -112,7 +116,11 @@ const AdsListContent = async () => {
                             : 'bg-amber-100 text-amber-700'
                         }`}
                       >
-                        {ready ? '✓' : '…'} {label}
+                        <FontAwesomeIcon
+                          icon={ready ? faCheck : faEllipsis}
+                          className="mr-1"
+                        />
+                        {label}
                       </span>
                     ))}
                   </div>

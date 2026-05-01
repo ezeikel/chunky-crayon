@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, type Locale } from '@/i18n/routing';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck } from '@fortawesome/pro-duotone-svg-icons';
+import { faCheck, faGlobe } from '@fortawesome/pro-duotone-svg-icons';
 import {
   Card,
   CardHeader,
@@ -22,16 +22,6 @@ const LANGUAGE_NAMES: Record<Locale, string> = {
   de: 'Deutsch',
   fr: 'Français',
   es: 'Español',
-};
-
-// Flag emojis for visual distinction
-const LANGUAGE_FLAGS: Record<Locale, string> = {
-  en: '🇬🇧',
-  ja: '🇯🇵',
-  ko: '🇰🇷',
-  de: '🇩🇪',
-  fr: '🇫🇷',
-  es: '🇪🇸',
 };
 
 const LOCALES: Locale[] = ['en', 'ja', 'ko', 'de', 'fr', 'es'];
@@ -56,7 +46,10 @@ const LanguageSettings = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="text-xl">🌐</span>
+          <FontAwesomeIcon
+            icon={faGlobe}
+            className="text-xl text-crayon-blue"
+          />
           <span>{t('languagePreference.title')}</span>
         </CardTitle>
         <CardDescription>{t('languagePreference.description')}</CardDescription>
@@ -92,9 +85,6 @@ const LanguageSettings = () => {
                     />
                   </span>
                 )}
-                <span className="text-2xl leading-none">
-                  {LANGUAGE_FLAGS[loc]}
-                </span>
                 <span className="font-bold text-sm">{LANGUAGE_NAMES[loc]}</span>
               </button>
             );

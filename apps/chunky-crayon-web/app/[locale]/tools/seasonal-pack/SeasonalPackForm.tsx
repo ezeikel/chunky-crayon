@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faPumpkin,
+  faTreeChristmas,
+  faHeart,
+  faRabbit,
+  faTurkey,
+  faBackpack,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
@@ -18,15 +28,52 @@ type Pack =
 const PACKS: Array<{
   key: Pack;
   label: string;
-  emoji: string;
+  icon: IconDefinition;
+  color: string;
   count: number;
 }> = [
-  { key: 'halloween', label: 'Halloween', emoji: '🎃', count: 8 },
-  { key: 'christmas', label: 'Christmas', emoji: '🎄', count: 10 },
-  { key: 'valentine', label: "Valentine's", emoji: '💝', count: 6 },
-  { key: 'easter', label: 'Easter', emoji: '🐰', count: 8 },
-  { key: 'thanksgiving', label: 'Thanksgiving', emoji: '🦃', count: 8 },
-  { key: 'back-to-school', label: 'Back to School', emoji: '🎒', count: 10 },
+  {
+    key: 'halloween',
+    label: 'Halloween',
+    icon: faPumpkin,
+    color: 'text-crayon-orange',
+    count: 8,
+  },
+  {
+    key: 'christmas',
+    label: 'Christmas',
+    icon: faTreeChristmas,
+    color: 'text-crayon-green',
+    count: 10,
+  },
+  {
+    key: 'valentine',
+    label: "Valentine's",
+    icon: faHeart,
+    color: 'text-crayon-pink',
+    count: 6,
+  },
+  {
+    key: 'easter',
+    label: 'Easter',
+    icon: faRabbit,
+    color: 'text-crayon-purple',
+    count: 8,
+  },
+  {
+    key: 'thanksgiving',
+    label: 'Thanksgiving',
+    icon: faTurkey,
+    color: 'text-crayon-orange',
+    count: 8,
+  },
+  {
+    key: 'back-to-school',
+    label: 'Back to School',
+    icon: faBackpack,
+    color: 'text-crayon-blue',
+    count: 10,
+  },
 ];
 
 const SeasonalPackForm = () => {
@@ -106,7 +153,10 @@ const SeasonalPackForm = () => {
                     : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
                 )}
               >
-                <span className="text-3xl">{p.emoji}</span>
+                <FontAwesomeIcon
+                  icon={p.icon}
+                  className={cn('text-3xl', active ? 'text-white' : p.color)}
+                />
                 <span className="font-tondo font-bold text-sm">{p.label}</span>
                 <span
                   className={cn(

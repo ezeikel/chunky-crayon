@@ -32,6 +32,9 @@
   --color-crayon-sky: hsl(var(--crayon-sky));
   --color-crayon-sky-light: hsl(var(--crayon-sky-light));
   --color-crayon-sky-dark: hsl(var(--crayon-sky-dark));
+  --color-crayon-blue: hsl(var(--crayon-blue));
+  --color-crayon-blue-light: hsl(var(--crayon-blue-light));
+  --color-crayon-blue-dark: hsl(var(--crayon-blue-dark));
 
   /* Shared Coloring UI theme (maps to brand-specific colors) */
   --color-coloring-accent: hsl(var(--crayon-orange));
@@ -317,6 +320,9 @@
     --crayon-sky: 30 50% 85%;
     --crayon-sky-light: 30 55% 92%;
     --crayon-sky-dark: 30 45% 75%;
+    --crayon-blue: 210 70% 62%;
+    --crayon-blue-light: 210 75% 78%;
+    --crayon-blue-dark: 210 65% 50%;
     --social-facebook: 214 89% 52%;
     --social-facebook-dark: 214 89% 42%;
     --text-primary: 20 20% 22%;
