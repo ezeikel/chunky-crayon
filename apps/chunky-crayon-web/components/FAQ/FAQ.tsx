@@ -27,6 +27,7 @@ const PRICING_FAQ_IDS = [
   'cancelAnytime',
   'rollover',
   'creditsPerPage',
+  'multipleKids',
   'audience',
   'gettingStarted',
 ] as const;

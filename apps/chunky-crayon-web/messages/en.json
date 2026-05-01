@@ -249,7 +249,7 @@
         },
         "8": {
           "question": "What's included in the subscription plans?",
-          "answer": "Our plans range from Splash (perfect for casual coloring) to Sparkle (for super-creative families). All plans include: coloring page generation, high-quality PDF downloads, voice and photo input modes, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights."
+          "answer": "Our plans range from Splash (best for up to 2 kids) to Sparkle (best for up to 10 kids). All plans include: coloring page generation, high-quality PDF downloads, voice and photo input modes, separate profiles for each kid, and access to new features as we add them. Higher tiers include credit rollover and commercial use rights. Not ready for a subscription? Try Color as you go and buy credit packs as you need them."
         },
         "9": {
           "question": "Can I use pages for my classroom or nursery?",
@@ -257,7 +257,7 @@
         },
         "10": {
           "question": "How do credits work?",
-          "answer": "Most coloring pages use 5 credits — when you type a prompt or upload a photo. Voice mode (where you have a quick chat with Chunky Crayon) uses 10 credits per page. Credits refresh monthly with your subscription, and some plans allow unused credits to roll over. You can also purchase credit packs if you need a little extra creativity boost!"
+          "answer": "Most coloring pages use 5 credits, when you type a prompt or upload a photo. Voice mode (where you have a quick chat with Chunky Crayon) uses 10 credits per page. Subscription plans refresh credits monthly, and higher tiers let unused credits roll over. Don't want a subscription? Color as you go: pick up a credit pack and only pay for what you use."
         }
       }
     }
@@ -269,7 +269,7 @@
     "tryColoring": "Try coloring this one",
     "experiments": {
       "startCta": {
-        "urgency": "2 free pages today — no card, no catch.",
+        "urgency": "2 free pages today, no card, no catch.",
         "proof": "Join 200+ parents. 2 free pages to start."
       }
     },
@@ -654,7 +654,7 @@
       },
       "multipleKids": {
         "question": "Can multiple kids use one subscription?",
-        "answer": "Yes — and this is the part most apps get wrong. One Chunky Crayon plan covers separate profiles for each kid (Splash 3, Rainbow 5, Sparkle 10). Their pages, stickers, and Colo mascots stay separate. No buying a sub each."
+        "answer": "Yes, and this is the part most apps get wrong. One Chunky Crayon plan covers separate profiles for each kid (Splash 2, Rainbow 4, Sparkle 10). Their pages, stickers, and Colo mascots stay separate. No buying a sub each."
       },
       "trialMechanics": {
         "question": "What happens after the 7-day free trial?",
@@ -1270,7 +1270,7 @@
   "og": {
     "homepage": {
       "tagline": "Custom coloring pages, made in seconds.",
-      "alt": "Chunky Crayon — custom coloring pages, made in seconds."
+      "alt": "Chunky Crayon, custom coloring pages made in seconds."
     },
     "coloringImage": {
       "notFound": "Coloring Page Not Found"
