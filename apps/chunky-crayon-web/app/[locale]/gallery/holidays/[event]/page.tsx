@@ -111,7 +111,7 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
     slug: 'spring',
     name: 'Spring',
     icon: faFlower,
-    color: 'text-crayon-pink',
+    color: 'text-crayon-green',
     tags: ['spring'],
     description:
       'Spring coloring pages with blooming flowers, butterflies, and sunny outdoor scenes.',
@@ -135,7 +135,7 @@ const HOLIDAY_EVENTS: HolidayEvent[] = [
     slug: 'autumn',
     name: 'Autumn',
     icon: faLeaf,
-    color: 'text-crayon-orange',
+    color: 'text-crayon-yellow',
     tags: ['autumn'],
     description:
       'Autumn coloring pages with falling leaves, harvest scenes, and cozy fall themes.',

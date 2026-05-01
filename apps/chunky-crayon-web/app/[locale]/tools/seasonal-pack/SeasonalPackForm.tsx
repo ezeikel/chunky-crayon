@@ -64,7 +64,7 @@ const PACKS: Array<{
     key: 'thanksgiving',
     label: 'Thanksgiving',
     icon: faTurkey,
-    color: 'text-crayon-orange',
+    color: 'text-crayon-yellow',
     count: 8,
   },
   {

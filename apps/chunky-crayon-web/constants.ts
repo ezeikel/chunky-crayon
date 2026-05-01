@@ -3913,8 +3913,8 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'ufo',
     ],
     icon: faRocket,
-    color: 'text-crayon-purple',
-    bgColor: 'bg-crayon-purple/10',
+    color: 'text-crayon-blue',
+    bgColor: 'bg-crayon-blue/10',
   },
   {
     id: 'underwater',
@@ -4068,8 +4068,8 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'android',
     ],
     icon: faRobot,
-    color: 'text-crayon-yellow',
-    bgColor: 'bg-crayon-yellow/10',
+    color: 'text-crayon-blue',
+    bgColor: 'bg-crayon-blue/10',
   },
   {
     id: 'food',

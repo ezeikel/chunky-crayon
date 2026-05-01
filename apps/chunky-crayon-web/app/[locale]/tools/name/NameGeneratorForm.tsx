@@ -58,7 +58,7 @@ const THEMES: Array<{
     key: 'vehicles',
     label: 'Vehicles',
     icon: faCar,
-    color: 'text-crayon-orange',
+    color: 'text-crayon-yellow',
   },
 ];
 
