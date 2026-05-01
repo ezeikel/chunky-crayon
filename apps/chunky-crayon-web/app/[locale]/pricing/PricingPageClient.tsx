@@ -252,7 +252,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
           gallery row. */}
       {adImages.length > 0 && (
         <FadeIn direction="up" delay={0.05} className="mb-12">
-          <div className="flex justify-center items-end gap-4 sm:gap-6 max-w-3xl mx-auto px-4">
+          <div className="flex justify-center items-end gap-2 sm:gap-6 max-w-3xl mx-auto px-4">
             {adImages.map((img, i) => {
               const rotations = [
                 '-rotate-[4deg]',
@@ -267,12 +267,12 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                     rotations[i % rotations.length],
                   )}
                 >
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-sm overflow-hidden bg-paper-cream">
+                  <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-sm overflow-hidden bg-paper-cream">
                     <Image
                       src={img.src}
                       alt={img.alt}
                       fill
-                      sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 128px"
+                      sizes="(max-width: 640px) 80px, (max-width: 768px) 112px, 128px"
                       className="object-contain"
                     />
                   </div>
