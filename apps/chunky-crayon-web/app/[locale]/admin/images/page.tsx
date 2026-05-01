@@ -11,6 +11,8 @@ import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
 import { requireAdmin } from '@/lib/auth-guards';
 import Loading from '@/components/Loading/Loading';
+import FeaturedForOGToggle from './FeaturedForOGToggle';
+import RegenerateOGButton from './RegenerateOGButton';
 
 const PAGE_SIZE = 60;
 
@@ -18,6 +20,7 @@ type PageSearchParams = Promise<{
   page?: string;
   type?: 'all' | 'user' | 'daily';
   status?: 'all' | 'ready' | 'missing';
+  featured?: 'all' | 'yes' | 'no';
 }>;
 
 const AdminImagesContent = async ({
@@ -30,7 +33,7 @@ const AdminImagesContent = async ({
   await connection();
   await requireAdmin('notFound');
 
-  const { page: pageParam, type, status } = await searchParams;
+  const { page: pageParam, type, status, featured } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? '1', 10) || 1);
   const skip = (page - 1) * PAGE_SIZE;
 
@@ -48,12 +51,20 @@ const AdminImagesContent = async ({
         ? { regionMapUrl: null }
         : {};
 
-  const [images, totalCount] = await Promise.all([
+  const featuredFilter =
+    featured === 'yes'
+      ? { featuredForOG: true }
+      : featured === 'no'
+        ? { featuredForOG: false }
+        : {};
+
+  const [images, totalCount, featuredCount] = await Promise.all([
     db.coloringImage.findMany({
       where: {
         brand: BRAND,
         ...generationTypeFilter,
         ...regionFilter,
+        ...featuredFilter,
       },
       select: {
         id: true,
@@ -65,6 +76,7 @@ const AdminImagesContent = async ({
         regionMapUrl: true,
         regionsGeneratedAt: true,
         generationType: true,
+        featuredForOG: true,
         createdAt: true,
         updatedAt: true,
         User: { select: { email: true, name: true } },
@@ -78,7 +90,11 @@ const AdminImagesContent = async ({
         brand: BRAND,
         ...generationTypeFilter,
         ...regionFilter,
+        ...featuredFilter,
       },
+    }),
+    db.coloringImage.count({
+      where: { brand: BRAND, featuredForOG: true },
     }),
   ]);
 
@@ -86,11 +102,17 @@ const AdminImagesContent = async ({
 
   return (
     <>
-      <div className="mb-6">
-        <h1 className="font-tondo text-3xl font-bold mb-2">Images</h1>
-        <p className="text-muted-foreground">
-          {totalCount.toLocaleString()} total · page {page}/{totalPages}
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="font-tondo text-3xl font-bold mb-2">Images</h1>
+          <p className="text-muted-foreground">
+            {totalCount.toLocaleString()} total · page {page}/{totalPages} ·{' '}
+            <span className="text-crayon-orange font-medium">
+              {featuredCount} featured for OG
+            </span>
+          </p>
+        </div>
+        <RegenerateOGButton />
       </div>
 
       {/* Filters */}
@@ -104,7 +126,7 @@ const AdminImagesContent = async ({
             { value: 'daily', label: 'Daily' },
           ]}
           queryKey="type"
-          currentSearchParams={{ type, status }}
+          currentSearchParams={{ type, status, featured }}
         />
         <FilterGroup
           label="Region store"
@@ -115,7 +137,18 @@ const AdminImagesContent = async ({
             { value: 'missing', label: 'Missing' },
           ]}
           queryKey="status"
-          currentSearchParams={{ type, status }}
+          currentSearchParams={{ type, status, featured }}
+        />
+        <FilterGroup
+          label="OG"
+          current={featured ?? 'all'}
+          options={[
+            { value: 'all', label: 'All' },
+            { value: 'yes', label: 'Featured' },
+            { value: 'no', label: 'Not featured' },
+          ]}
+          queryKey="featured"
+          currentSearchParams={{ type, status, featured }}
         />
       </div>
 
@@ -160,6 +193,10 @@ const AdminImagesContent = async ({
                 <span className="absolute top-2 left-2 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-black/60 text-white">
                   {img.generationType}
                 </span>
+                <FeaturedForOGToggle
+                  coloringImageId={img.id}
+                  initialFeatured={img.featuredForOG}
+                />
               </Link>
 
               {/* OG preview — shows the actual rendered Open Graph card */}
@@ -211,7 +248,7 @@ const AdminImagesContent = async ({
       <div className="flex items-center justify-center gap-2 mt-8 text-sm">
         {page > 1 && (
           <Link
-            href={buildHref({ type, status, page: page - 1 })}
+            href={buildHref({ type, status, featured, page: page - 1 })}
             className="px-3 py-1.5 rounded-full border-2 border-paper-cream-dark hover:border-crayon-orange/50"
           >
             ← Prev
@@ -222,7 +259,7 @@ const AdminImagesContent = async ({
         </span>
         {page < totalPages && (
           <Link
-            href={buildHref({ type, status, page: page + 1 })}
+            href={buildHref({ type, status, featured, page: page + 1 })}
             className="px-3 py-1.5 rounded-full border-2 border-paper-cream-dark hover:border-crayon-orange/50"
           >
             Next →
@@ -243,8 +280,12 @@ const FilterGroup = ({
   label: string;
   current: string;
   options: { value: string; label: string }[];
-  queryKey: 'type' | 'status';
-  currentSearchParams: { type?: string; status?: string };
+  queryKey: 'type' | 'status' | 'featured';
+  currentSearchParams: {
+    type?: string;
+    status?: string;
+    featured?: string;
+  };
 }) => (
   <div className="flex items-center gap-1">
     <span className="text-text-primary/60 font-medium">{label}:</span>
@@ -275,11 +316,13 @@ const FilterGroup = ({
 const buildHref = (params: {
   type?: string;
   status?: string;
+  featured?: string;
   page?: number;
 }): string => {
   const qs = new URLSearchParams();
   if (params.type) qs.set('type', params.type);
   if (params.status) qs.set('status', params.status);
+  if (params.featured) qs.set('featured', params.featured);
   if (params.page && params.page > 1) qs.set('page', String(params.page));
   const s = qs.toString();
   return s ? `/admin/images?${s}` : '/admin/images';

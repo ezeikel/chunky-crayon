@@ -233,8 +233,15 @@ model ColoringImage {
   // — a test seed can be SYSTEM with showInCommunity=true.
   showInCommunity Boolean @default(true)
 
+  // Curated pool for OG images. The /api/cron/regenerate-og cron picks
+  // 6 images at random from rows where featuredForOG=true; if fewer
+  // than 6 are flagged it falls back to most-recent showInCommunity.
+  // Toggle via the /admin/images grid.
+  featuredForOG Boolean @default(false)
+
   @@index([generationType, purposeKey])
   @@index([showInCommunity])
+  @@index([featuredForOG])
   // Gallery + list queries filter on status=READY everywhere; this index
   // keeps those plans cheap. The cleanup cron also queries status=GENERATING
   // ordered by createdAt — composite covers both.

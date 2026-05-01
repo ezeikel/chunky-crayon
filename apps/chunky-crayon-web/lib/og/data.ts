@@ -64,7 +64,14 @@ export type FeaturedOGImage = {
 };
 
 /**
- * Fetch a small set of recent, public coloring images for collage OG cards.
+ * Fetch a small set of public coloring images for collage OG cards.
+ *
+ * Selection rules (in order):
+ *  1. Take all rows where `featuredForOG = true` (admin-curated favourites)
+ *  2. If fewer than `limit` are flagged, top up with most-recent
+ *     `showInCommunity = true` rows (excluding ones already picked)
+ *  3. Shuffle the curated subset so the daily OG cron rotates through
+ *     different combinations when more than `limit` are flagged
  *
  * We deliberately use the **line art** (`svgUrl ?? url`) — not the
  * `coloredReferenceUrl` JPEG — so the OG card is an honest preview of what
@@ -79,24 +86,46 @@ export async function getFeaturedColoringImagesForOG(
   limit = 6,
   filterTag?: string,
 ): Promise<FeaturedOGImage[]> {
-  const images = await db.coloringImage.findMany({
-    where: {
-      brand: BRAND,
-      showInCommunity: true,
-      ...(filterTag ? { tags: { has: filterTag } } : {}),
-      OR: [{ svgUrl: { not: null } }, { url: { not: null } }],
-    },
-    select: {
-      id: true,
-      title: true,
-      svgUrl: true,
-      url: true,
-    },
+  const baseWhere = {
+    brand: BRAND,
+    showInCommunity: true,
+    ...(filterTag ? { tags: { has: filterTag } } : {}),
+    OR: [{ svgUrl: { not: null } }, { url: { not: null } }],
+  };
+
+  const featured = await db.coloringImage.findMany({
+    where: { ...baseWhere, featuredForOG: true },
+    select: { id: true, title: true, svgUrl: true, url: true },
     orderBy: { createdAt: 'desc' },
-    take: limit,
   });
 
-  return images
+  // Random shuffle so a flagged pool of >limit gets rotation across cron
+  // runs. Fisher-Yates on a copy.
+  const shuffled = [...featured];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  let picks = shuffled.slice(0, limit);
+
+  // Top-up from most-recent if not enough flagged. The seen-id guard
+  // prevents the same row appearing twice when featured is small.
+  if (picks.length < limit) {
+    const seen = new Set(picks.map((p) => p.id));
+    const fill = await db.coloringImage.findMany({
+      where: {
+        ...baseWhere,
+        featuredForOG: false,
+        id: { notIn: [...seen] },
+      },
+      select: { id: true, title: true, svgUrl: true, url: true },
+      orderBy: { createdAt: 'desc' },
+      take: limit - picks.length,
+    });
+    picks = [...picks, ...fill];
+  }
+
+  return picks
     .map((i) => ({
       id: i.id,
       title: i.title,
