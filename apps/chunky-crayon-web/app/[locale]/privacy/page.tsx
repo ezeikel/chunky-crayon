@@ -2,10 +2,23 @@ import type { Metadata } from 'next';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import CachedLastUpdateDate from '@/components/CachedLastUpdateDate/CachedLastUpdateDate';
 
+const TITLE = 'Privacy Policy | Chunky Crayon';
+const DESCRIPTION =
+  'How Chunky Crayon collects, uses, and protects your data. Built for kids, designed for parents, COPPA and GDPR-K compliant.';
+
 export const metadata: Metadata = {
-  title: 'Privacy Policy - Chunky Crayon',
-  description:
-    'Privacy Policy for Chunky Crayon - Learn how we collect, use, and protect your data.',
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 const PrivacyPolicy = () => (

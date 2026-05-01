@@ -2,10 +2,23 @@ import type { Metadata } from 'next';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import CachedLastUpdateDate from '@/components/CachedLastUpdateDate/CachedLastUpdateDate';
 
+const TITLE = 'Terms of Service | Chunky Crayon';
+const DESCRIPTION =
+  'Terms and conditions for using Chunky Crayon. Subscription plans, cancellations, and the rules everyone agrees to before coloring.';
+
 export const metadata: Metadata = {
-  title: 'Terms of Service - Chunky Crayon',
-  description:
-    'Terms of Service for Chunky Crayon - Learn about our terms, conditions, and subscription plans.',
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 const TermsOfService = () => (

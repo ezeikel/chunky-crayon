@@ -27,9 +27,14 @@ export default async function Image({ params }: Props) {
   const { locale } = await params;
   const t = (getTranslationsForLocale(locale) as any).og.homepage;
 
+  // Wrap the DB query in a catch — if Neon hiccups during a cold start,
+  // we'd rather render the text-only fallback than serve a blank image
+  // back to Meta / X / LinkedIn. A blank cached at Meta is much harder
+  // to recover from than a slightly-less-pretty render, and Meta caches
+  // the first thing it sees per URL.
   const [fonts, featured, logo] = await Promise.all([
     loadOGFonts(),
-    getFeaturedColoringImagesForOG(6),
+    getFeaturedColoringImagesForOG(6).catch(() => [] as FeaturedOGImage[]),
     loadOGLogo(),
   ]);
 
