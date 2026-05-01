@@ -90,11 +90,6 @@ const getNavItems = (
     visibility: 'authenticated',
   },
   {
-    label: t('challenges'),
-    href: '/account/challenges',
-    visibility: 'authenticated',
-  },
-  {
     label: t('blog'),
     href: '/blog',
     visibility: 'unauthenticated',
@@ -295,8 +290,8 @@ const Header = async () => {
             <HeaderDropdown user={user} signOutAction={handleSignOut} />
           </nav>
 
-          {/* Kid-facing items - ALWAYS visible for 3-8 year olds */}
-          <div className="flex items-center gap-2">
+          {/* Kid-facing items - shown on larger desktops; available via dropdown / mobile menu otherwise */}
+          <div className="hidden xl:flex items-center gap-2">
             {/* Challenge indicator */}
             <HeaderChallengeIndicator challengeData={currentChallenge} />
             {/* Colo mascot indicator */}

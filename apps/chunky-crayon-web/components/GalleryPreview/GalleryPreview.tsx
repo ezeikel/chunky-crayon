@@ -175,7 +175,7 @@ const CategoryPreview = async () => {
             href={`/gallery/${category.slug}`}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-paper-cream-dark hover:border-crayon-blue/50 hover:bg-crayon-blue/5 transition-colors text-sm"
           >
-            <span>{category.emoji}</span>
+            <FontAwesomeIcon icon={category.icon} className={category.color} />
             <span className="font-medium text-text-primary">
               {categoryT(category.id)}
             </span>

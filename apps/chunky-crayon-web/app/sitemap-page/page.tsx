@@ -1,7 +1,18 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSitemap } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faSitemap,
+  faBaby,
+  faChildReaching,
+  faGamepad,
+  faPalette,
+  faStar,
+  faStars,
+  faMedal,
+  faCrown,
+} from '@fortawesome/pro-duotone-svg-icons';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { GALLERY_CATEGORIES } from '@/constants';
@@ -18,7 +29,7 @@ export const metadata: Metadata = {
 
 type SitemapSection = {
   title: string;
-  links: { label: string; href: string }[];
+  links: { label: ReactNode; href: string }[];
 };
 
 const SitemapPage = () => {
@@ -42,22 +53,86 @@ const SitemapPage = () => {
     {
       title: 'Browse by Age',
       links: [
-        { label: '👶 For Toddlers (Ages 2-4)', href: '/gallery/for-toddlers' },
-        { label: '👦 For Kids (Ages 4-12)', href: '/gallery/for-kids' },
-        { label: '🎮 For Teens (Ages 13-17)', href: '/gallery/for-teens' },
-        { label: '🎨 For Adults (18+)', href: '/gallery/for-adults' },
+        {
+          label: (
+            <>
+              <FontAwesomeIcon icon={faBaby} className="text-crayon-purple" />
+              <span>For Toddlers (Ages 2-4)</span>
+            </>
+          ),
+          href: '/gallery/for-toddlers',
+        },
+        {
+          label: (
+            <>
+              <FontAwesomeIcon
+                icon={faChildReaching}
+                className="text-crayon-orange"
+              />
+              <span>For Kids (Ages 4-12)</span>
+            </>
+          ),
+          href: '/gallery/for-kids',
+        },
+        {
+          label: (
+            <>
+              <FontAwesomeIcon icon={faGamepad} className="text-crayon-blue" />
+              <span>For Teens (Ages 13-17)</span>
+            </>
+          ),
+          href: '/gallery/for-teens',
+        },
+        {
+          label: (
+            <>
+              <FontAwesomeIcon icon={faPalette} className="text-crayon-green" />
+              <span>For Adults (18+)</span>
+            </>
+          ),
+          href: '/gallery/for-adults',
+        },
       ],
     },
     {
       title: 'Browse by Difficulty',
       links: [
-        { label: '⭐ Beginner (Easy)', href: '/gallery/difficulty/beginner' },
         {
-          label: '🌟 Intermediate (Medium)',
+          label: (
+            <>
+              <FontAwesomeIcon icon={faStar} className="text-crayon-green" />
+              <span>Beginner (Easy)</span>
+            </>
+          ),
+          href: '/gallery/difficulty/beginner',
+        },
+        {
+          label: (
+            <>
+              <FontAwesomeIcon icon={faStars} className="text-crayon-orange" />
+              <span>Intermediate (Medium)</span>
+            </>
+          ),
           href: '/gallery/difficulty/intermediate',
         },
-        { label: '🏅 Advanced (Hard)', href: '/gallery/difficulty/advanced' },
-        { label: '👑 Expert (Very Hard)', href: '/gallery/difficulty/expert' },
+        {
+          label: (
+            <>
+              <FontAwesomeIcon icon={faMedal} className="text-crayon-blue" />
+              <span>Advanced (Hard)</span>
+            </>
+          ),
+          href: '/gallery/difficulty/advanced',
+        },
+        {
+          label: (
+            <>
+              <FontAwesomeIcon icon={faCrown} className="text-crayon-purple" />
+              <span>Expert (Very Hard)</span>
+            </>
+          ),
+          href: '/gallery/difficulty/expert',
+        },
       ],
     },
     {
@@ -70,7 +145,12 @@ const SitemapPage = () => {
     {
       title: 'Coloring Page Categories',
       links: GALLERY_CATEGORIES.map((category) => ({
-        label: `${category.emoji} ${category.name} Coloring Pages`,
+        label: (
+          <>
+            <FontAwesomeIcon icon={category.icon} className={category.color} />
+            <span>{category.name} Coloring Pages</span>
+          </>
+        ),
         href: `/gallery/${category.slug}`,
       })),
     },

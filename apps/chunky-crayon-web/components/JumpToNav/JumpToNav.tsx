@@ -8,12 +8,13 @@ import {
   faChevronUp,
   faArrowUp,
 } from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import cn from '@/lib/utils';
 
 type JumpToSection = {
   id: string;
   label: string;
-  icon?: string;
+  icon?: IconDefinition;
 };
 
 type JumpToNavProps = {
@@ -124,7 +125,12 @@ const JumpToNav = ({ sections, className }: JumpToNavProps) => {
                     : 'text-text-secondary',
                 )}
               >
-                {section.icon && <span>{section.icon}</span>}
+                {section.icon && (
+                  <FontAwesomeIcon
+                    icon={section.icon}
+                    className="text-text-tertiary"
+                  />
+                )}
                 {section.label}
               </button>
             ))}
@@ -153,7 +159,16 @@ const JumpToNav = ({ sections, className }: JumpToNavProps) => {
                 : 'bg-white text-text-secondary border-paper-cream-dark hover:border-crayon-orange/30 hover:bg-crayon-orange/5',
             )}
           >
-            {section.icon && <span>{section.icon}</span>}
+            {section.icon && (
+              <FontAwesomeIcon
+                icon={section.icon}
+                className={
+                  activeSection === section.id
+                    ? 'text-white'
+                    : 'text-text-tertiary'
+                }
+              />
+            )}
             {section.label}
           </button>
         ))}

@@ -171,7 +171,7 @@ const TagGalleryContent = async ({
                 href={`/gallery/${cat.slug}`}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-paper-cream hover:bg-crayon-orange/10 border border-paper-cream-dark hover:border-crayon-orange/30 transition-colors text-sm"
               >
-                <span>{cat.emoji}</span>
+                <FontAwesomeIcon icon={cat.icon} className={cat.color} />
                 <span>{cat.name}</span>
               </Link>
             ))}

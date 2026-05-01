@@ -13,6 +13,7 @@ import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { getFeaturedImages, getCategoryCounts } from '@/app/data/gallery';
+import cn from '@/lib/utils';
 
 export async function generateMetadata({
   params,
@@ -152,9 +153,19 @@ const CategoryCards = async ({ locale }: { locale: string }) => {
           <Link
             key={category.id}
             href={`/gallery/${category.slug}`}
-            className="group p-4 rounded-2xl bg-white border-2 border-paper-cream-dark hover:border-crayon-blue/50 hover:shadow-md transition-all"
+            className="group p-4 rounded-2xl bg-white border-2 border-paper-cream-dark hover:border-crayon-blue/50 hover:shadow-md transition-all text-center"
           >
-            <div className="text-3xl mb-2">{category.emoji}</div>
+            <div
+              className={cn(
+                'w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3',
+                category.bgColor,
+              )}
+            >
+              <FontAwesomeIcon
+                icon={category.icon}
+                className={cn('text-xl', category.color)}
+              />
+            </div>
             <h3 className="font-tondo font-semibold text-text-primary group-hover:text-crayon-blue transition-colors">
               {categoryT(category.id)}
             </h3>

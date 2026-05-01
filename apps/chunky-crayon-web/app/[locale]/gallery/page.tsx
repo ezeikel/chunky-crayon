@@ -15,6 +15,10 @@ import {
   faMedal,
   faCrown,
   faGaugeSimple,
+  faBaby,
+  faChildReaching,
+  faGamepad,
+  faPalette,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import PageWrap from '@/components/PageWrap/PageWrap';
@@ -187,35 +191,45 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
   );
 };
 
+const AGE_GROUP_CARDS: {
+  slug: string;
+  icon: IconDefinition;
+  key: 'toddlers' | 'kids' | 'teens' | 'adults';
+  color: string;
+  bgColor: string;
+}[] = [
+  {
+    slug: 'for-toddlers',
+    icon: faBaby,
+    key: 'toddlers',
+    color: 'text-crayon-purple',
+    bgColor: 'bg-crayon-purple/10',
+  },
+  {
+    slug: 'for-kids',
+    icon: faChildReaching,
+    key: 'kids',
+    color: 'text-crayon-orange',
+    bgColor: 'bg-crayon-orange/10',
+  },
+  {
+    slug: 'for-teens',
+    icon: faGamepad,
+    key: 'teens',
+    color: 'text-crayon-blue',
+    bgColor: 'bg-crayon-blue/10',
+  },
+  {
+    slug: 'for-adults',
+    icon: faPalette,
+    key: 'adults',
+    color: 'text-crayon-green',
+    bgColor: 'bg-crayon-green/10',
+  },
+];
+
 const AgeGroupCards = async ({ locale }: { locale: string }) => {
   const t = await getTranslations({ locale, namespace: 'gallery' });
-
-  const ageGroups = [
-    {
-      slug: 'for-toddlers',
-      emoji: '👶',
-      key: 'toddlers' as const,
-      color: 'crayon-purple',
-    },
-    {
-      slug: 'for-kids',
-      emoji: '👦',
-      key: 'kids' as const,
-      color: 'crayon-orange',
-    },
-    {
-      slug: 'for-teens',
-      emoji: '🎮',
-      key: 'teens' as const,
-      color: 'crayon-blue',
-    },
-    {
-      slug: 'for-adults',
-      emoji: '🎨',
-      key: 'adults' as const,
-      color: 'crayon-green',
-    },
-  ];
 
   return (
     <section className="mb-12">
@@ -223,13 +237,23 @@ const AgeGroupCards = async ({ locale }: { locale: string }) => {
         {t('browseByAge')}
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {ageGroups.map((group) => (
+        {AGE_GROUP_CARDS.map((group) => (
           <Link
             key={group.slug}
             href={`/gallery/${group.slug}`}
-            className={`group p-4 rounded-2xl bg-white border-2 border-paper-cream-dark hover:border-${group.color}/50 hover:shadow-md transition-all text-center`}
+            className="group p-4 rounded-2xl bg-white border-2 border-paper-cream-dark hover:shadow-md transition-all text-center"
           >
-            <div className="text-4xl mb-2">{group.emoji}</div>
+            <div
+              className={cn(
+                'w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3',
+                group.bgColor,
+              )}
+            >
+              <FontAwesomeIcon
+                icon={group.icon}
+                className={cn('text-xl', group.color)}
+              />
+            </div>
             <h3 className="font-tondo font-semibold text-text-primary">
               {t(`ageGroups.${group.key}.title`)}
             </h3>
@@ -366,10 +390,20 @@ const CategoryCards = async ({ locale }: { locale: string }) => {
           <Link
             key={category.id}
             href={`/gallery/${category.slug}`}
-            className="group p-4 rounded-2xl bg-white border-2 border-paper-cream-dark hover:border-crayon-orange/50 hover:shadow-md transition-all"
+            className="group p-4 rounded-2xl bg-white border-2 border-paper-cream-dark hover:shadow-md transition-all text-center"
           >
-            <div className="text-3xl mb-2">{category.emoji}</div>
-            <h3 className="font-tondo font-semibold text-text-primary group-hover:text-crayon-orange transition-colors">
+            <div
+              className={cn(
+                'w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3',
+                category.bgColor,
+              )}
+            >
+              <FontAwesomeIcon
+                icon={category.icon}
+                className={cn('text-xl', category.color)}
+              />
+            </div>
+            <h3 className="font-tondo font-semibold text-text-primary">
               {t(`categories.${category.id}`)}
             </h3>
             <p className="text-xs text-text-tertiary mt-1">

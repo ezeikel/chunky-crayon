@@ -3,6 +3,13 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faFilter,
+  faImages,
+  faLink,
+  faBookOpen,
+} from '@fortawesome/pro-duotone-svg-icons';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import DifficultyFilter from '@/components/DifficultyFilter';
@@ -18,6 +25,7 @@ import {
 } from '@/app/data/gallery';
 import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
 import { Difficulty } from '@one-colored-pixel/db';
+import cn from '@/lib/utils';
 
 type PageParams = {
   locale: string;
@@ -111,7 +119,7 @@ const RelatedCategories = ({
             href={`/gallery/${cat.slug}`}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-paper-cream hover:bg-crayon-orange/10 border border-paper-cream-dark hover:border-crayon-orange/30 transition-colors text-sm"
           >
-            <span>{cat.emoji}</span>
+            <FontAwesomeIcon icon={cat.icon} className={cat.color} />
             <span>{categoryT(cat.id)}</span>
           </Link>
         ))}
@@ -229,10 +237,10 @@ const CategoryGalleryContent = async ({
       {/* Jump to Navigation */}
       <JumpToNav
         sections={[
-          { id: 'filters', label: jumpToNavT('filters'), icon: '🎯' },
-          { id: 'gallery', label: jumpToNavT('gallery'), icon: '🖼️' },
-          { id: 'related', label: jumpToNavT('related'), icon: '🔗' },
-          { id: 'about', label: jumpToNavT('about'), icon: '📖' },
+          { id: 'filters', label: jumpToNavT('filters'), icon: faFilter },
+          { id: 'gallery', label: jumpToNavT('gallery'), icon: faImages },
+          { id: 'related', label: jumpToNavT('related'), icon: faLink },
+          { id: 'about', label: jumpToNavT('about'), icon: faBookOpen },
         ]}
         className="mb-6"
       />
@@ -240,7 +248,10 @@ const CategoryGalleryContent = async ({
       {/* Header */}
       <div id="top" className="mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">{category.emoji}</span>
+          <FontAwesomeIcon
+            icon={category.icon}
+            className={cn('text-4xl', category.color)}
+          />
           <h1 className="font-tondo font-bold text-3xl md:text-4xl text-text-primary">
             {t('coloringPages', { category: categoryT(category.id) })}
           </h1>
@@ -280,7 +291,10 @@ const CategoryGalleryContent = async ({
           />
         ) : (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">{category.emoji}</div>
+            <FontAwesomeIcon
+              icon={category.icon}
+              className={cn('text-6xl mb-4', category.color)}
+            />
             <h2 className="font-tondo font-semibold text-xl text-text-primary mb-2">
               {t('noPagesYet', {
                 category: categoryT(category.id).toLowerCase(),

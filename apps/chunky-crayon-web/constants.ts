@@ -7,6 +7,24 @@ import {
   faPinterest,
   faXTwitter,
 } from '@fortawesome/free-brands-svg-icons';
+import {
+  faPaw,
+  faWandMagicSparkles,
+  faDragon,
+  faHorseHead,
+  faCrown,
+  faMask,
+  faDinosaur,
+  faRocket,
+  faFishFins,
+  faCar,
+  faSkullCrossbones,
+  faFlower,
+  faTreeChristmas,
+  faRobot,
+  faPizzaSlice,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 export const MAX_IMAGE_GENERATION_ATTEMPTS = 3;
 
@@ -3711,7 +3729,9 @@ export type GalleryCategory = {
   description: string;
   keywords: string[]; // SEO keywords this category targets
   tags: string[]; // Tags from AI-generated metadata that map to this category
-  emoji: string;
+  icon: IconDefinition;
+  color: string; // Tailwind text color class for the icon
+  bgColor: string; // Tailwind bg color class for the icon container
 };
 
 // SEO-optimized gallery categories targeting popular search terms
@@ -3745,7 +3765,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'bird',
       'fish',
     ],
-    emoji: '🐾',
+    icon: faPaw,
+    color: 'text-crayon-orange',
+    bgColor: 'bg-crayon-orange/10',
   },
   {
     id: 'fantasy',
@@ -3770,7 +3792,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'giant',
       'genie',
     ],
-    emoji: '✨',
+    icon: faWandMagicSparkles,
+    color: 'text-crayon-purple',
+    bgColor: 'bg-crayon-purple/10',
   },
   {
     id: 'dragons',
@@ -3783,7 +3807,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'baby dragon coloring',
     ],
     tags: ['dragon', 'dragons', 'fire-breathing', 'mythical'],
-    emoji: '🐉',
+    icon: faDragon,
+    color: 'text-crayon-green',
+    bgColor: 'bg-crayon-green/10',
   },
   {
     id: 'unicorns',
@@ -3792,7 +3818,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
     description: 'Beautiful unicorn and rainbow coloring pages',
     keywords: ['unicorn coloring pages', 'rainbow unicorn', 'magical horse'],
     tags: ['unicorn', 'unicorns', 'rainbow', 'magical horse', 'pegasus'],
-    emoji: '🦄',
+    icon: faHorseHead,
+    color: 'text-crayon-pink',
+    bgColor: 'bg-crayon-pink/10',
   },
   {
     id: 'princesses',
@@ -3814,7 +3842,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'crown',
       'throne',
     ],
-    emoji: '👑',
+    icon: faCrown,
+    color: 'text-crayon-purple',
+    bgColor: 'bg-crayon-purple/10',
   },
   {
     id: 'superheroes',
@@ -3831,7 +3861,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'cape',
       'mask',
     ],
-    emoji: '🦸',
+    icon: faMask,
+    color: 'text-crayon-yellow',
+    bgColor: 'bg-crayon-yellow/10',
   },
   {
     id: 'dinosaurs',
@@ -3853,7 +3885,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'brontosaurus',
       'pterodactyl',
     ],
-    emoji: '🦕',
+    icon: faDinosaur,
+    color: 'text-crayon-green',
+    bgColor: 'bg-crayon-green/10',
   },
   {
     id: 'space',
@@ -3878,7 +3912,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'spaceship',
       'ufo',
     ],
-    emoji: '🚀',
+    icon: faRocket,
+    color: 'text-crayon-purple',
+    bgColor: 'bg-crayon-purple/10',
   },
   {
     id: 'underwater',
@@ -3903,7 +3939,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'coral',
       'reef',
     ],
-    emoji: '🌊',
+    icon: faFishFins,
+    color: 'text-crayon-green',
+    bgColor: 'bg-crayon-green/10',
   },
   {
     id: 'vehicles',
@@ -3929,7 +3967,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'bus',
       'transport',
     ],
-    emoji: '🚗',
+    icon: faCar,
+    color: 'text-crayon-orange',
+    bgColor: 'bg-crayon-orange/10',
   },
   {
     id: 'pirates',
@@ -3950,7 +3990,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'parrot',
       'skull',
     ],
-    emoji: '🏴‍☠️',
+    icon: faSkullCrossbones,
+    color: 'text-crayon-purple',
+    bgColor: 'bg-crayon-purple/10',
   },
   {
     id: 'nature',
@@ -3974,7 +4016,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'plant',
       'botanical',
     ],
-    emoji: '🌸',
+    icon: faFlower,
+    color: 'text-crayon-green',
+    bgColor: 'bg-crayon-green/10',
   },
   {
     id: 'holidays',
@@ -4000,7 +4044,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'snow',
       'santa',
     ],
-    emoji: '🎄',
+    icon: faTreeChristmas,
+    color: 'text-crayon-pink',
+    bgColor: 'bg-crayon-pink/10',
   },
   {
     id: 'robots',
@@ -4021,7 +4067,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'cyborg',
       'android',
     ],
-    emoji: '🤖',
+    icon: faRobot,
+    color: 'text-crayon-yellow',
+    bgColor: 'bg-crayon-yellow/10',
   },
   {
     id: 'food',
@@ -4045,7 +4093,9 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
       'sweet',
       'cupcake',
     ],
-    emoji: '🍕',
+    icon: faPizzaSlice,
+    color: 'text-crayon-orange',
+    bgColor: 'bg-crayon-orange/10',
   },
 ];
 

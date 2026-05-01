@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
@@ -15,6 +16,7 @@ import {
 } from '@/app/data/gallery';
 import { getCategoryBySlug } from '@/constants';
 import { generateAlternates } from '@/lib/seo';
+import cn from '@/lib/utils';
 
 type PageParams = {
   locale: string;
@@ -144,7 +146,10 @@ const ComboGalleryContent = async ({
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-4xl">{category.emoji}</span>
+          <FontAwesomeIcon
+            icon={category.icon}
+            className={cn('text-4xl', category.color)}
+          />
           <div>
             <h1 className="font-tondo font-bold text-3xl md:text-4xl text-text-primary">
               {diffLabel} {categoryT(category.id)} Coloring Pages
@@ -200,7 +205,10 @@ const ComboGalleryContent = async ({
         />
       ) : (
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">{category.emoji}</div>
+          <FontAwesomeIcon
+            icon={category.icon}
+            className={cn('text-6xl mb-4', category.color)}
+          />
           <h2 className="font-tondo font-semibold text-xl text-text-primary mb-2">
             No {diffLabel.toLowerCase()} {category.name.toLowerCase()} pages yet
           </h2>
