@@ -24,6 +24,17 @@ const LANGUAGE_NAMES: Record<Locale, string> = {
   es: 'Español',
 };
 
+// Flag emojis are intentional — Unicode flags are the universal cross-platform
+// representation of a country, and FontAwesome pro-duotone has no flag set.
+const LANGUAGE_FLAGS: Record<Locale, string> = {
+  en: '🇬🇧',
+  ja: '🇯🇵',
+  ko: '🇰🇷',
+  de: '🇩🇪',
+  fr: '🇫🇷',
+  es: '🇪🇸',
+};
+
 const LOCALES: Locale[] = ['en', 'ja', 'ko', 'de', 'fr', 'es'];
 
 const LanguageSettings = () => {
@@ -85,6 +96,9 @@ const LanguageSettings = () => {
                     />
                   </span>
                 )}
+                <span className="text-2xl leading-none">
+                  {LANGUAGE_FLAGS[loc]}
+                </span>
                 <span className="font-bold text-sm">{LANGUAGE_NAMES[loc]}</span>
               </button>
             );

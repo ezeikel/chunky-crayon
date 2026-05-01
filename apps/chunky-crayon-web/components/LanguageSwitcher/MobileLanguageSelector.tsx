@@ -17,6 +17,17 @@ const LANGUAGE_NAMES: Record<Locale, string> = {
   es: 'Español',
 };
 
+// Flag emojis are intentional — Unicode flags are the universal cross-platform
+// representation of a country, and FontAwesome pro-duotone has no flag set.
+const LANGUAGE_FLAGS: Record<Locale, string> = {
+  en: '🇬🇧',
+  ja: '🇯🇵',
+  ko: '🇰🇷',
+  de: '🇩🇪',
+  fr: '🇫🇷',
+  es: '🇪🇸',
+};
+
 const LOCALES: Locale[] = ['en', 'ja', 'ko', 'de', 'fr', 'es'];
 
 type MobileLanguageSelectorProps = {
@@ -81,10 +92,10 @@ const MobileLanguageSelector = ({
               aria-label={`${t('switchTo')} ${LANGUAGE_NAMES[loc]}`}
               aria-pressed={isActive}
             >
-              <span className="font-bold uppercase text-xs">{loc}</span>
-              <span className="text-[10px] text-text-tertiary">
-                {LANGUAGE_NAMES[loc]}
+              <span className="text-xl leading-none">
+                {LANGUAGE_FLAGS[loc]}
               </span>
+              <span className="font-bold uppercase text-xs">{loc}</span>
             </button>
           );
         })}

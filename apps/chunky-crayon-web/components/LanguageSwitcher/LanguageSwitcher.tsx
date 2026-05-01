@@ -26,6 +26,17 @@ const LANGUAGE_NAMES: Record<Locale, string> = {
   es: 'Español',
 };
 
+// Flag emojis are intentional — Unicode flags are the universal cross-platform
+// representation of a country, and FontAwesome pro-duotone has no flag set.
+const LANGUAGE_FLAGS: Record<Locale, string> = {
+  en: '🇬🇧',
+  ja: '🇯🇵',
+  ko: '🇰🇷',
+  de: '🇩🇪',
+  fr: '🇫🇷',
+  es: '🇪🇸',
+};
+
 const LOCALES: Locale[] = ['en', 'ja', 'ko', 'de', 'fr', 'es'];
 
 type LanguageSwitcherProps = {
@@ -93,11 +104,7 @@ const LanguageSwitcher = ({
         )}
         {variant === 'compact' && (
           <>
-            <FontAwesomeIcon
-              icon={faGlobe}
-              className="text-base"
-              style={iconStyle}
-            />
+            <span className="text-lg">{LANGUAGE_FLAGS[locale]}</span>
             <span className="text-sm uppercase">{locale}</span>
           </>
         )}
@@ -112,6 +119,7 @@ const LanguageSwitcher = ({
               locale === loc && 'bg-crayon-orange/10 text-crayon-orange',
             )}
           >
+            <span className="text-lg">{LANGUAGE_FLAGS[loc]}</span>
             <span className="flex-1">{LANGUAGE_NAMES[loc]}</span>
             {locale === loc && (
               <FontAwesomeIcon
