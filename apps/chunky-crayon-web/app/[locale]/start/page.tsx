@@ -40,7 +40,7 @@ export async function generateMetadata({
 }: StartPageProps): Promise<Metadata> {
   const { locale } = await params;
   return {
-    title: 'Start — Chunky Crayon',
+    title: 'Start | Chunky Crayon',
     description:
       'Your kid describes the scene. You get a printable coloring page in about 2 minutes. Print it, or color it in the app. 2 free pages to try, no account needed.',
     alternates: {
