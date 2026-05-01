@@ -207,7 +207,7 @@ const getMobileItems = (
     items.push({
       label: t('support'),
       iconName: faHeadset,
-      href: 'mailto:support@chunkycrayon.com',
+      isFeedback: true,
     });
     items.push({
       label: t('signIn'),
