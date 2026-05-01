@@ -137,6 +137,36 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Bots (Meta / X / LinkedIn / Slack / WhatsApp scrapers, plus Googlebot)
+  // shouldn't get the locale-detection redirect: they often don't follow
+  // redirects-with-Set-Cookie, which results in blank ad previews. Rewrite
+  // them straight to /en/<path> so the page renders inline. Match the
+  // common bot UA tokens — this is a bots-only escape hatch, real browsers
+  // still hit the next-intl detection path.
+  const userAgent = request.headers.get('user-agent') || '';
+  const isBot =
+    /facebookexternalhit|facebookcatalog|meta-externalagent|twitterbot|linkedinbot|slackbot|whatsapp|telegrambot|discordbot|googlebot|bingbot|pinterestbot|applebot/i.test(
+      userAgent,
+    );
+
+  if (
+    isBot &&
+    !pathname.startsWith('/en') &&
+    !pathname.startsWith('/de') &&
+    !pathname.startsWith('/fr') &&
+    !pathname.startsWith('/es') &&
+    !pathname.startsWith('/ja') &&
+    !pathname.startsWith('/ko') &&
+    !pathname.startsWith('/api') &&
+    !pathname.startsWith('/_next') &&
+    !pathname.startsWith('/_vercel') &&
+    !pathname.startsWith('/ingest')
+  ) {
+    const rewriteUrl = url.clone();
+    rewriteUrl.pathname = `/en${pathname === '/' ? '' : pathname}`;
+    return NextResponse.rewrite(rewriteUrl);
+  }
+
   // Handle PostHog ingest routes first
   if (pathname.startsWith('/ingest')) {
     // Determine the correct PostHog host based on path
