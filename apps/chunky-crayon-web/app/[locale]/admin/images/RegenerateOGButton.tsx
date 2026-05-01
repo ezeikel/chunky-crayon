@@ -19,7 +19,10 @@ const RegenerateOGButton = () => {
       if ('error' in result) {
         toast.error(`OG regeneration failed: ${result.error}`);
       } else {
-        toast.success('OG image regenerated. Re-scrape in Meta debugger.');
+        toast.success(
+          'OG regeneration kicked off. Wait ~30s, then re-scrape in Meta debugger.',
+          { duration: 6000 },
+        );
       }
     });
   };

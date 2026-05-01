@@ -1,8 +1,10 @@
 'use server';
 
+import { after } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { db } from '@one-colored-pixel/db';
 import { requireAdmin } from '@/lib/auth-guards';
+import { regenerateOGImages } from '@/lib/og/regenerate';
 
 /**
  * Toggle the `featuredForOG` flag on a coloring image. Used by the
@@ -38,39 +40,34 @@ export const setFeaturedForOG = async (
 };
 
 /**
- * Trigger an immediate OG regeneration via the existing cron endpoint.
- * Lets admins push featured changes live without waiting for the daily
- * 02:00 UTC cron run. Uses fetch with the cron auth header rather than
- * importing the cron handler directly because the cron route depends on
- * Node-only APIs (Buffer/R2 SDK) that we want isolated to that file.
+ * Trigger an OG regeneration. Returns immediately so the action stays
+ * under the 10s server-action timeout — the actual render+upload work
+ * (~17s) runs via `after()`, which Vercel keeps alive past the response.
+ *
+ * The user sees an instant "regeneration started" toast. The R2 PNG
+ * actually updates ~20s later. They re-scrape Meta's debugger after
+ * the toast and Meta will pick up the fresh image.
  */
 export const regenerateOGNow = async (): Promise<
-  { ok: true; results: unknown } | { error: string }
+  { ok: true } | { error: string }
 > => {
   await requireAdmin('notFound');
 
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) {
-    return { error: 'CRON_SECRET not configured' };
-  }
-
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.chunkycrayon.com';
-
-  try {
-    const res = await fetch(`${baseUrl}/api/cron/regenerate-og`, {
-      headers: { authorization: `Bearer ${cronSecret}` },
-      cache: 'no-store',
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      return { error: `cron returned ${res.status}: ${JSON.stringify(json)}` };
+  after(async () => {
+    try {
+      const results = await regenerateOGImages();
+      const failed = Object.entries(results)
+        .filter(([, r]) => r.error)
+        .map(([k, r]) => `${k}: ${r.error}`);
+      if (failed.length > 0) {
+        console.error('[regenerateOGNow] partial failure:', failed.join('; '));
+      } else {
+        console.log('[regenerateOGNow] done', results);
+      }
+    } catch (err) {
+      console.error('[regenerateOGNow] failed:', err);
     }
-    return { ok: true, results: json };
-  } catch (err) {
-    console.error('[regenerateOGNow] failed:', err);
-    return {
-      error: err instanceof Error ? err.message : 'Unknown error',
-    };
-  }
+  });
+
+  return { ok: true };
 };

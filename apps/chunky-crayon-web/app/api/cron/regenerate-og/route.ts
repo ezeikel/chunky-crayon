@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { put } from '@one-colored-pixel/storage';
-import { renderStartOGImageResponse } from '@/lib/og/renders/start';
-import { renderHomepageOGImageResponse } from '@/lib/og/renders/homepage';
-import { getTranslationsForLocale } from '@/i18n/messages';
+import { regenerateOGImages } from '@/lib/og/regenerate';
 
 export const maxDuration = 60;
 
@@ -20,60 +17,18 @@ export const maxDuration = 60;
  * Schedule: daily at 02:00 UTC (cheap; collage doesn't need to update
  * faster than that). Triggered manually via curl with `Authorization:
  * Bearer $CRON_SECRET` to seed after deploy or after a copy change.
+ *
+ * The actual render+upload work lives in lib/og/regenerate.ts so the
+ * admin "Regenerate OG now" server action can call it directly without
+ * an HTTP round trip.
  */
-
-const OG_PATHS = {
-  homepage: 'og/homepage.png',
-  start: 'og/start.png',
-} as const;
-
-const fetchPngBuffer = async (response: Response): Promise<Buffer> => {
-  const arrayBuffer = await response.arrayBuffer();
-  return Buffer.from(arrayBuffer);
-};
-
 export const GET = async (request: NextRequest) => {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const results: Record<string, { url?: string; error?: string }> = {};
-
-  // Homepage OG — uses 'en' tagline. Other locales fall back to dynamic
-  // generator (low traffic, OK to be slower there).
-  try {
-    const homepageT = (getTranslationsForLocale('en') as any).og.homepage;
-    const homepageResponse = await renderHomepageOGImageResponse(
-      homepageT.tagline,
-    );
-    const homepageBuffer = await fetchPngBuffer(homepageResponse);
-    const { url } = await put(OG_PATHS.homepage, homepageBuffer, {
-      contentType: 'image/png',
-      allowOverwrite: true,
-    });
-    results.homepage = { url };
-  } catch (err) {
-    console.error('[regenerate-og] homepage failed:', err);
-    results.homepage = {
-      error: err instanceof Error ? err.message : 'unknown',
-    };
-  }
-
-  // Start OG — fixed copy, no locale parameter
-  try {
-    const startResponse = await renderStartOGImageResponse();
-    const startBuffer = await fetchPngBuffer(startResponse);
-    const { url } = await put(OG_PATHS.start, startBuffer, {
-      contentType: 'image/png',
-      allowOverwrite: true,
-    });
-    results.start = { url };
-  } catch (err) {
-    console.error('[regenerate-og] start failed:', err);
-    results.start = { error: err instanceof Error ? err.message : 'unknown' };
-  }
-
+  const results = await regenerateOGImages();
   const ok = Object.values(results).every((r) => !r.error);
   return NextResponse.json({ ok, results }, { status: ok ? 200 : 500 });
 };
