@@ -123,14 +123,16 @@ const Footer = async ({ className }: FooterProps) => {
 
           {/* Free Tools — internal linking for SEO + discoverability */}
           <div>
-            <h3 className="font-bold text-lg mb-2">Free Tools</h3>
+            <h3 className="font-bold text-lg mb-2">
+              {t('sections.freeTools')}
+            </h3>
             <ul className="flex flex-col gap-1.5">
               <li>
                 <Link
                   href="/tools"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  All tools
+                  {t('freeTools.allTools')}
                 </Link>
               </li>
               <li>
@@ -138,7 +140,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/tools/name"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  Name coloring pages
+                  {t('freeTools.nameColoringPages')}
                 </Link>
               </li>
               <li>
@@ -146,7 +148,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/tools/reward-chart"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  Reward chart maker
+                  {t('freeTools.rewardChartMaker')}
                 </Link>
               </li>
               <li>
@@ -154,7 +156,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/tools/birthday-invite"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  Birthday invite maker
+                  {t('freeTools.birthdayInviteMaker')}
                 </Link>
               </li>
               <li>
@@ -162,7 +164,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/tools/abc-tracing"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  ABC tracing worksheets
+                  {t('freeTools.abcTracingWorksheets')}
                 </Link>
               </li>
               <li>
@@ -170,7 +172,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/tools/seasonal-pack"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  Seasonal coloring packs
+                  {t('freeTools.seasonalColoringPacks')}
                 </Link>
               </li>
               <li>
@@ -178,7 +180,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/for-teachers"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  For teachers
+                  {t('freeTools.forTeachers')}
                 </Link>
               </li>
             </ul>
