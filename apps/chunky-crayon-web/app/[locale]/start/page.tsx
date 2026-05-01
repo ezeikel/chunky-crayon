@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { getColoringImageForAdCampaign } from '@/app/data/coloring-image';
+import { getOGImageUrl } from '@/lib/og/r2-url';
 import StartHero from './components/StartHero';
 import StartProblem from './components/StartProblem';
 import StartHowItWorks from './components/StartHowItWorks';
@@ -43,6 +44,7 @@ export async function generateMetadata({
   const description =
     'Your kid describes the scene. You get a printable coloring page in about 2 minutes. 2 free pages to try, no account needed.';
   const url = `https://chunkycrayon.com/${locale}/start`;
+  const ogImage = getOGImageUrl('start');
   return {
     title,
     description,
@@ -54,11 +56,14 @@ export async function generateMetadata({
       description,
       type: 'website',
       url,
+      // Pre-rendered PNG on R2. See lib/og/r2-url.ts.
+      images: ogImage ?? undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: ogImage ?? undefined,
     },
     // Paid-traffic landing — no reason to index it. Keeps the URL out of
     // SEO and prevents organic visitors from hitting the campaign-aware

@@ -17,6 +17,7 @@ import Footer from '@/components/Footer/Footer';
 import { tondo, rooneySans } from '@/fonts';
 import Providers from '../providers';
 import { routing } from '@/i18n/routing';
+import { getOGImageUrl } from '@/lib/og/r2-url';
 import '@/global.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
@@ -55,7 +56,13 @@ export async function generateMetadata({
         'Chunky Crayon is a vibrant and interactive app designed for kids and parents to generate unique, personalized coloring book pages and fun educational worksheets.',
       url: `https://chunkycrayon.com/${locale}`,
       siteName: 'Chunky Crayon',
-      // images are auto-generated from opengraph-image.tsx
+      // Pre-rendered PNG on R2 — fast static response avoids the 15s
+      // Satori render that timed out Meta's scraper. The convention
+      // route at app/[locale]/opengraph-image.tsx remains as a fallback
+      // (Next will only emit it when no openGraph.images is set, so
+      // wrapping in `?? undefined` lets the convention route win in
+      // dev/preview where R2_PUBLIC_URL may not be set).
+      images: getOGImageUrl('homepage') ?? undefined,
       locale: locale === 'en' ? 'en_GB' : locale,
       type: 'website',
     },
@@ -64,7 +71,7 @@ export async function generateMetadata({
       title: 'Chunky Crayon - Creative Coloring & Learning Fun',
       description:
         'Chunky Crayon is a vibrant and interactive app designed for kids and parents to generate unique, personalized coloring book pages and fun educational worksheets.',
-      // images are auto-generated from opengraph-image.tsx
+      images: getOGImageUrl('homepage') ?? undefined,
     },
     alternates: {
       canonical: `https://chunkycrayon.com/${locale}`,

@@ -17,6 +17,9 @@
     },
     "app/api/coloring-image/generate/route.ts": {
       "maxDuration": 300
+    },
+    "app/api/cron/regenerate-og/route.ts": {
+      "maxDuration": 60
     }
   },
   "crons": [
@@ -35,6 +38,10 @@
     {
       "path": "/api/cron/cleanup-stuck-generations",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/regenerate-og",
+      "schedule": "0 2 * * *"
     },
     {
       "path": "/api/email-list/send-latest",
