@@ -78,7 +78,8 @@
       "about": "このアプリについて",
       "connect": "つながる",
       "getTheApp": "アプリを入手",
-      "support": "サポート"
+      "support": "サポート",
+      "freeTools": "無料ツール"
     },
     "links": {
       "privacyPolicy": "プライバシーポリシー",
@@ -91,6 +92,15 @@
       "comingSoon": "もうすぐ！",
       "iosComingSoon": "iOSアプリ準備中。お楽しみに！",
       "androidComingSoon": "Androidアプリ準備中。お楽しみに！"
+    },
+    "freeTools": {
+      "allTools": "すべてのツール",
+      "nameColoringPages": "おなまえぬりえ",
+      "rewardChartMaker": "ごほうび表メーカー",
+      "birthdayInviteMaker": "おたんじょうび招待状メーカー",
+      "abcTracingWorksheets": "ABCなぞりワークシート",
+      "seasonalColoringPacks": "季節のぬりえパック",
+      "forTeachers": "先生向け"
     }
   },
   "homepage": {
@@ -520,7 +530,9 @@
       "prioritySupport": "優先サポート",
       "profiles3": "子どもプロフィール最大3つ",
       "profiles5": "子どもプロフィール最大5つ",
-      "profiles10": "子どもプロフィール最大10つ"
+      "profiles10": "子どもプロフィール最大10つ",
+      "profiles2": "子どもプロフィール最大2つ",
+      "profiles4": "子どもプロフィール最大4つ"
     },
     "creditPacks": {
       "title": "クレジットを追加しますか？",

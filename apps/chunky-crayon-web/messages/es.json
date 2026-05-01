@@ -78,7 +78,8 @@
       "about": "Acerca de",
       "connect": "Conecta",
       "getTheApp": "Descarga la app",
-      "support": "Ayuda"
+      "support": "Ayuda",
+      "freeTools": "Herramientas gratis"
     },
     "links": {
       "privacyPolicy": "Política de privacidad",
@@ -91,6 +92,15 @@
       "comingSoon": "¡Muy pronto!",
       "iosComingSoon": "Nuestra app para iOS ya viene. ¡Muy pronto!",
       "androidComingSoon": "Nuestra app para Android ya viene. ¡Muy pronto!"
+    },
+    "freeTools": {
+      "allTools": "Todas las herramientas",
+      "nameColoringPages": "Coloreables con nombres",
+      "rewardChartMaker": "Creador de tablas de recompensas",
+      "birthdayInviteMaker": "Creador de invitaciones de cumple",
+      "abcTracingWorksheets": "Fichas para trazar el abecedario",
+      "seasonalColoringPacks": "Packs para colorear de temporada",
+      "forTeachers": "Para profes"
     }
   },
   "homepage": {
@@ -520,7 +530,9 @@
       "prioritySupport": "Soporte prioritario",
       "profiles3": "Hasta 3 perfiles de peques",
       "profiles5": "Hasta 5 perfiles de peques",
-      "profiles10": "Hasta 10 perfiles de peques"
+      "profiles10": "Hasta 10 perfiles de peques",
+      "profiles2": "Hasta 2 perfiles infantiles",
+      "profiles4": "Hasta 4 perfiles infantiles"
     },
     "creditPacks": {
       "title": "¿Necesitas créditos extra?",

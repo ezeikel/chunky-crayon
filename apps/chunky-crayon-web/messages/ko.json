@@ -78,7 +78,8 @@
       "about": "소개",
       "connect": "소통",
       "getTheApp": "앱 받기",
-      "support": "지원"
+      "support": "지원",
+      "freeTools": "무료 도구"
     },
     "links": {
       "privacyPolicy": "개인정보 처리방침",
@@ -91,6 +92,15 @@
       "comingSoon": "곧 만나요!",
       "iosComingSoon": "iOS 앱이 곧 나와요. 조금만 기다려 주세요!",
       "androidComingSoon": "Android 앱이 곧 나와요. 조금만 기다려 주세요!"
+    },
+    "freeTools": {
+      "allTools": "모든 도구",
+      "nameColoringPages": "이름 색칠공부",
+      "rewardChartMaker": "칭찬 스티커판 만들기",
+      "birthdayInviteMaker": "생일 초대장 만들기",
+      "abcTracingWorksheets": "ABC 따라쓰기 워크시트",
+      "seasonalColoringPacks": "계절 색칠 팩",
+      "forTeachers": "선생님용"
     }
   },
   "homepage": {
@@ -520,7 +530,9 @@
       "prioritySupport": "우선 지원",
       "profiles3": "최대 아이 프로필 3개",
       "profiles5": "최대 아이 프로필 5개",
-      "profiles10": "최대 아이 프로필 10개"
+      "profiles10": "최대 아이 프로필 10개",
+      "profiles2": "아이 프로필 최대 2개",
+      "profiles4": "아이 프로필 최대 4개"
     },
     "creditPacks": {
       "title": "크레딧이 더 필요하신가요?",

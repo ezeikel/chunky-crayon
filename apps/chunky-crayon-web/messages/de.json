@@ -78,7 +78,8 @@
       "about": "Über uns",
       "connect": "Kontakt",
       "getTheApp": "App holen",
-      "support": "Hilfe"
+      "support": "Hilfe",
+      "freeTools": "Kostenlose Tools"
     },
     "links": {
       "privacyPolicy": "Datenschutz",
@@ -91,6 +92,15 @@
       "comingSoon": "Bald da!",
       "iosComingSoon": "Unsere iOS-App kommt bald. Bleib dran!",
       "androidComingSoon": "Unsere Android-App kommt bald. Bleib dran!"
+    },
+    "freeTools": {
+      "allTools": "Alle Tools",
+      "nameColoringPages": "Ausmalbilder mit Namen",
+      "rewardChartMaker": "Belohnungsplan erstellen",
+      "birthdayInviteMaker": "Geburtstagseinladungen erstellen",
+      "abcTracingWorksheets": "ABC-Nachspurbögen",
+      "seasonalColoringPacks": "Saisonale Ausmalpakete",
+      "forTeachers": "Für Lehrkräfte"
     }
   },
   "homepage": {
@@ -520,7 +530,9 @@
       "prioritySupport": "Prioritäts-Support",
       "profiles3": "Bis zu 3 Kinderprofile",
       "profiles5": "Bis zu 5 Kinderprofile",
-      "profiles10": "Bis zu 10 Kinderprofile"
+      "profiles10": "Bis zu 10 Kinderprofile",
+      "profiles2": "Bis zu 2 Kinderprofile",
+      "profiles4": "Bis zu 4 Kinderprofile"
     },
     "creditPacks": {
       "title": "Brauchst du extra Credits?",
