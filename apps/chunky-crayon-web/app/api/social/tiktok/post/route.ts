@@ -4,7 +4,6 @@ import { BRAND } from '@/lib/db';
 import { auth } from '@/auth';
 import { ADMIN_EMAILS } from '@/constants';
 import { generateTikTokCaption } from '@/app/actions/social';
-import { sendAdminAlert } from '@/app/actions/email';
 
 /**
  * Get TikTok access token from database.
@@ -189,13 +188,39 @@ const postVideoToTikTok = async (
   return result;
 };
 
+type ForwardedBody = {
+  videoUrl?: string;
+  caption?: string;
+  coloringImageId?: string;
+};
+
+const parseBody = async (request: Request): Promise<ForwardedBody> => {
+  if (request.method !== 'POST') return {};
+  try {
+    return (await request.json()) as ForwardedBody;
+  } catch {
+    return {};
+  }
+};
+
 /**
- * Posts the most recent daily coloring page animation to TikTok.
- * Accepts either CRON_SECRET (for cron jobs) or admin session (for manual triggers).
+ * Posts a video to TikTok. Two callers in production today:
  *
- * Exported as both GET and POST. Vercel cron hits this with GET, manual
- * dashboard triggers use POST. Body is unused — auth comes from the
- * Authorization header / session cookie either way.
+ *   1. The unified social cron at /api/social/post?type=demo-reel&platform=tiktok
+ *      forwards a POST with body { videoUrl, caption, coloringImageId } where
+ *      videoUrl is the demo reel mp4 in R2 and caption is already generated
+ *      upstream. This is the LIVE path — fires 18:10 UTC weekdays / 17:10 UTC
+ *      weekends. Use the body values directly; don't re-query the DB.
+ *
+ *   2. Admin "post to TikTok" buttons in the dashboard hit this with POST and
+ *      either an explicit body or no body. With no body, fall through to the
+ *      legacy DB lookup (animationUrl on today's daily image). Keep this path
+ *      working so the admin UI doesn't regress, even though the cron-driven
+ *      animation flow has been retired in favour of demo reels.
+ *
+ * Auth: CRON_SECRET bearer (for the unified cron forwarder) OR admin session
+ * (for the dashboard button). Both flows set credentials in the request, so
+ * no separate body-vs-cron distinction is needed.
  */
 const handle = async (request: Request) => {
   try {
@@ -219,7 +244,34 @@ const handle = async (request: Request) => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Only post today's image — prevents re-posting stale content
+    const body = await parseBody(request);
+
+    // Forwarded path — caller already chose the video and generated the
+    // caption. Skip the DB lookup entirely, just post.
+    if (body.videoUrl) {
+      const caption = body.caption ?? '';
+      console.log(
+        `[TikTok] Posting forwarded video (coloringImageId=${body.coloringImageId ?? 'unknown'}): ${body.videoUrl}`,
+      );
+      const result = await postVideoToTikTok(body.videoUrl, caption);
+      return NextResponse.json({
+        success: true,
+        publishId: result.publishId,
+        status: result.status,
+        coloringImageId: body.coloringImageId,
+        caption,
+        message:
+          result.status === 'PUBLISH_COMPLETE'
+            ? 'Video posted successfully to TikTok!'
+            : 'Video upload initiated, still processing...',
+      });
+    }
+
+    // Legacy DB-lookup path — admin "post to TikTok" button with no explicit
+    // video. Posts the most recent daily image's animationUrl. Daily images
+    // don't get animations any more (we ship demo reels via the forwarded
+    // path above), so this path is mostly dormant; kept so the admin UI
+    // doesn't 500 if hit.
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
 
@@ -237,10 +289,6 @@ const handle = async (request: Request) => {
       const message =
         'No daily coloring image with animation generated today - skipping TikTok';
       console.warn(`[TikTok] ${message}`);
-      await sendAdminAlert({
-        subject: 'TikTok post skipped - no daily image',
-        body: `The TikTok posting cron was skipped because no DAILY coloring image with animation was generated today.\n\nCheck the Vercel function logs for /api/coloring-image/generate and /api/coloring-image/animate.`,
-      });
       return NextResponse.json(
         { success: false, message, skipped: true },
         { status: 200 },
@@ -249,10 +297,7 @@ const handle = async (request: Request) => {
 
     console.log('[TikTok] Posting animation for:', coloringImage.title);
 
-    // Generate TikTok-optimized caption
     const caption = await generateTikTokCaption(coloringImage);
-
-    // Post to TikTok
     const result = await postVideoToTikTok(coloringImage.animationUrl, caption);
 
     return NextResponse.json({
@@ -278,5 +323,4 @@ const handle = async (request: Request) => {
   }
 };
 
-export const GET = handle;
 export const POST = handle;

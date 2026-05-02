@@ -129,14 +129,6 @@
     },
 
     {
-      "path": "/api/social/tiktok/post",
-      "schedule": "20 15 * * 1-5"
-    },
-    {
-      "path": "/api/social/tiktok/post",
-      "schedule": "20 14 * * 0,6"
-    },
-    {
       "path": "/api/social/digest",
       "schedule": "45 18 * * 1-5"
     },
