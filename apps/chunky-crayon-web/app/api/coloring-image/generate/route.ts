@@ -1,12 +1,22 @@
-import { NextRequest, NextResponse, connection } from 'next/server';
-import { GenerationType } from '@one-colored-pixel/db';
-import { generateColoringImageOnly } from '@/app/actions/coloring-image';
+import { NextResponse } from 'next/server';
 
-// Pipeline: Sonnet description clean-up + gpt-image-2 generation +
-// metadata vision call + potrace + WebP encode + R2 uploads + DB
-// inserts. Each stage is 5-30s; 120s left no headroom and we were
-// timing out. 300s = Vercel Pro cap, gives the worst-case run room.
-export const maxDuration = 300;
+/**
+ * Daily coloring-image cron — thin trigger.
+ *
+ * The full pipeline (Perplexity Sonar scene gen + Claude cleanup +
+ * gpt-image-2 + metadata vision call + SVG trace + R2 upload + Prisma
+ * row + region-store/background-music/colored-reference/fill-points)
+ * lives on the Hetzner worker at POST /generate/daily-image. This route
+ * is a thin trigger that returns 202 immediately.
+ *
+ * Worker handles failures via Resend admin alert — see
+ * apps/chunky-crayon-worker/src/coloring-image/daily-pipeline.ts.
+ *
+ * Note: the legacy route accepted a `type` query param to switch
+ * GenerationType. The worker endpoint is DAILY-specific. If we need
+ * other generation types over HTTP later, add new worker endpoints
+ * rather than re-introducing the on-Vercel pipeline here.
+ */
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,62 +24,67 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-const isValidGenerationType = (type: string): type is GenerationType =>
-  Object.values(GenerationType).includes(type as any);
+const fireWorker = async (): Promise<{
+  ok: boolean;
+  status: number;
+  body: string;
+}> => {
+  const workerUrl = process.env.CHUNKY_CRAYON_WORKER_URL;
+  const workerSecret = process.env.WORKER_SECRET;
 
-const handleRequest = async (request: NextRequest) => {
-  await connection();
+  if (!workerUrl) {
+    throw new Error('CHUNKY_CRAYON_WORKER_URL not set');
+  }
 
+  const res = await fetch(`${workerUrl}/generate/daily-image`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {}),
+    },
+    body: JSON.stringify({}),
+    signal: AbortSignal.timeout(10_000),
+  });
+  const body = await res.text().catch(() => '');
+  return { ok: res.ok, status: res.status, body };
+};
+
+const handle = async (): Promise<Response> => {
   try {
-    let generationType: GenerationType = GenerationType.DAILY; // Default
-
-    if (request.method === 'GET') {
-      // get type from query parameter
-      const url = new URL(request.url);
-      const typeParam = url.searchParams.get('type');
-
-      if (typeParam && isValidGenerationType(typeParam)) {
-        generationType = typeParam;
-      }
-    } else if (request.method === 'POST') {
-      // get type from request body
-      try {
-        const body = await request.json();
-        if (body.type && isValidGenerationType(body.type)) {
-          generationType = body.type as GenerationType;
-        }
-      } catch {
-        // if body parsing fails, use default
-      }
+    const { ok, status, body } = await fireWorker();
+    if (!ok) {
+      console.error(
+        `[coloring-image/generate] worker rejected: ${status} ${body.slice(0, 200)}`,
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'worker rejected daily-image trigger',
+          workerStatus: status,
+        },
+        { status: 502, headers: corsHeaders },
+      );
     }
-
-    const coloringImage = await generateColoringImageOnly(generationType);
-
     return NextResponse.json(
       {
         success: true,
-        coloringImage,
-        generationType,
-        message: `Successfully generated ${generationType.toLowerCase()} coloring image`,
+        accepted: true,
+        message: 'daily-image cron handed off to worker',
       },
-      {
-        headers: corsHeaders,
-      },
+      { status: 202, headers: corsHeaders },
     );
-  } catch (error) {
-    console.error('Error generating coloring image:', error);
+  } catch (err) {
+    console.error('[coloring-image/generate] failed to reach worker:', err);
     return NextResponse.json(
       {
-        error: 'Failed to generate coloring image',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        success: false,
+        error: 'failed to reach worker',
+        details: err instanceof Error ? err.message : 'unknown',
       },
-      {
-        status: 500,
-        headers: corsHeaders,
-      },
+      { status: 502, headers: corsHeaders },
     );
   }
 };
 
-export const GET = handleRequest;
-export const POST = handleRequest;
+export const GET = handle;
+export const POST = handle;

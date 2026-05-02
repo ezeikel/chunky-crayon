@@ -140,6 +140,22 @@ export {
 export { BLOG_CATEGORIES, BLOG_TOPICS, BLOG_AUTHORS } from "./blog/topics";
 export type { BlogCategory, BlogTopic, BlogAuthor } from "./blog/topics";
 
+// Daily scene generation (Perplexity Sonar) + image metadata prompts
+export {
+  CLEAN_UP_DESCRIPTION_SYSTEM,
+  createImageMetadataSystemPrompt,
+  IMAGE_METADATA_SYSTEM,
+  IMAGE_METADATA_PROMPT,
+  SCENE_DESCRIPTION_SYSTEM,
+  createDailyScenePrompt,
+} from "./scene/prompts";
+export {
+  SEASONAL_EVENTS,
+  getUpcomingEvents,
+  getCurrentSeason,
+} from "./scene/seasonal-calendar";
+export type { SeasonalEvent } from "./scene/seasonal-calendar";
+
 // Utilities
 export { default as formatNumber } from "./utils/formatNumber";
 export { default as streamToBuffer } from "./utils/streamToBuffer";

@@ -1207,13 +1207,18 @@ export const FAQ_ITEMS: FAQItem[] = [
 ];
 
 // ===== BLOG TOPICS (for automated SEO content generation) =====
-// Hoisted to @one-colored-pixel/coloring-core so the worker can read them too.
-export {
-  BLOG_CATEGORIES,
-  BLOG_TOPICS,
-  type BlogCategory,
-  type BlogTopic,
-} from '@one-colored-pixel/coloring-core';
+//
+// Runtime values (BLOG_CATEGORIES, BLOG_TOPICS) live in
+// @one-colored-pixel/coloring-core so the worker can use them. Importing
+// the runtime values here would pull coloring-core (and transitively
+// `sharp`) into client bundles that import `@/constants` — this file is
+// imported by client components for unrelated values like TRACKING_EVENTS.
+//
+// Server-side callers should import from coloring-core directly:
+//   import { BLOG_TOPICS, BLOG_CATEGORIES } from '@one-colored-pixel/coloring-core';
+//
+// Types are safe to re-export — they're erased at compile time.
+export type { BlogCategory, BlogTopic } from '@one-colored-pixel/coloring-core';
 
 // ===== GALLERY CATEGORIES (for SEO landing pages) =====
 
@@ -1604,11 +1609,10 @@ export const getCategoriesForTag = (tag: string): GalleryCategory[] =>
     cat.tags.some((t) => tag.toLowerCase().includes(t.toLowerCase())),
   );
 
-// Authors for generated blog posts — hoisted to @one-colored-pixel/coloring-core
-export {
-  BLOG_AUTHORS,
-  type BlogAuthor,
-} from '@one-colored-pixel/coloring-core';
+// Authors for generated blog posts — runtime value lives in
+// @one-colored-pixel/coloring-core; import there directly (see the
+// BLOG_TOPICS comment block above for why).
+export type { BlogAuthor } from '@one-colored-pixel/coloring-core';
 
 // ─── Voice mode ────────────────────────────────────────────────────────────
 //

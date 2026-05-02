@@ -16,7 +16,11 @@ import {
 } from '@/lib/ai';
 import { del } from '@one-colored-pixel/storage';
 import { writeClient, client, coveredTopicsQuery } from '@/lib/sanity';
-import { BLOG_TOPICS, BLOG_AUTHORS, type BlogTopic } from '@/constants';
+import {
+  BLOG_TOPICS,
+  BLOG_AUTHORS,
+  type BlogTopic,
+} from '@one-colored-pixel/coloring-core';
 
 type GenerateBlogPostResult = {
   success: boolean;

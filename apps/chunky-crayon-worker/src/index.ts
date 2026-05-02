@@ -46,6 +46,7 @@ import {
 } from "./coloring-image/jobs.js";
 import { subscribe } from "./coloring-image/listener.js";
 import { runBlogCron } from "./blog/pipeline.js";
+import { runDailyImageCron } from "./coloring-image/daily-pipeline.js";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
@@ -640,6 +641,28 @@ app.post("/generate/blog-post", async (c) => {
     // Should never reach here — runBlogCron catches everything — but
     // guard anyway so an uncaught throw doesn't crash the worker.
     console.error("[/generate/blog-post] uncaught:", err);
+  });
+
+  return c.json({ ok: true, accepted: true }, 202);
+});
+
+/**
+ * POST /generate/daily-image
+ *
+ * Daily coloring-image cron, fire-and-forget. Vercel's
+ * /api/coloring-image/generate is a thin trigger that POSTs here and
+ * returns 202; this endpoint runs the full pipeline (Perplexity Sonar
+ * scene gen + Claude cleanup + dedup + content blocklist + gpt-image-2
+ * + metadata vision call + SVG trace + R2 upload + Prisma row insert
+ * + region-store/background-music/colored-reference/fill-points).
+ *
+ * Failures alert via Resend; Vercel never sees the result of the work.
+ */
+app.post("/generate/daily-image", async (c) => {
+  console.log("[/generate/daily-image] kickoff");
+
+  runDailyImageCron().catch((err) => {
+    console.error("[/generate/daily-image] uncaught:", err);
   });
 
   return c.json({ ok: true, accepted: true }, 202);

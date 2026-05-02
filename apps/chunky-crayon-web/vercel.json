@@ -15,9 +15,6 @@
     "app/api/social/demo-reel/produce/route.ts": {
       "maxDuration": 60
     },
-    "app/api/coloring-image/generate/route.ts": {
-      "maxDuration": 300
-    },
     "app/api/cron/regenerate-og/route.ts": {
       "maxDuration": 60
     }

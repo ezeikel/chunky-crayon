@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
-import { generateRandomBlogPost, getBlogTopicStats } from '@/app/actions/blog';
-import { sendAdminAlert } from '@/app/actions/email';
 
-export const maxDuration = 300; // Blog generation can take up to 5 minutes
+/**
+ * Daily blog cron — thin trigger.
+ *
+ * The full pipeline (Sanity covered-topic check, Claude meta + content +
+ * image-prompt, gpt-image-2, Sanity asset upload, post create) lives on
+ * the Hetzner worker at POST /generate/blog-post — it has no timeout and
+ * gpt-image-2's ~3-4min latency exceeded Vercel's 300s ceiling. This
+ * route just kicks off the worker job and returns 202.
+ *
+ * If the worker fails partway, it sends an admin alert via Resend — see
+ * apps/chunky-crayon-worker/src/blog/pipeline.ts.
+ *
+ * `maxDuration` removed: the route exits in <1s now.
+ */
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,66 +21,69 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-export async function GET() {
+const fireWorker = async (): Promise<{
+  ok: boolean;
+  status: number;
+  body: string;
+}> => {
+  const workerUrl = process.env.CHUNKY_CRAYON_WORKER_URL;
+  const workerSecret = process.env.WORKER_SECRET;
+
+  if (!workerUrl) {
+    throw new Error('CHUNKY_CRAYON_WORKER_URL not set');
+  }
+
+  const res = await fetch(`${workerUrl}/generate/blog-post`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {}),
+    },
+    body: JSON.stringify({}),
+    // 10s budget for the worker's 202 ack — we don't wait for the
+    // pipeline to finish (worker handles that async + alerts on failure).
+    signal: AbortSignal.timeout(10_000),
+  });
+  const body = await res.text().catch(() => '');
+  return { ok: res.ok, status: res.status, body };
+};
+
+const handle = async (): Promise<Response> => {
   try {
-    // First check if there are uncovered topics
-    const stats = await getBlogTopicStats();
-
-    if (stats.remainingCount === 0) {
-      const categoryLines = Object.entries(stats.categoryStats)
-        .map(([cat, c]) => `  - ${cat}: ${c.covered}/${c.total}`)
-        .join('\n');
-
-      await sendAdminAlert({
-        subject: 'Chunky Crayon: Blog topic list exhausted',
-        body: `The daily blog cron ran but all ${stats.totalTopics} topics in BLOG_TOPICS have been covered.\n\nNo new post was published today.\n\nCoverage:\n${categoryLines}\n\nNext step: run the deep-research script to add new topics.\n\n  cd apps/chunky-crayon-web\n  pnpm tsx -r dotenv/config scripts/research-blog-topics.ts\n\nThen merge scripts/research-blog-topics.output.json into constants.ts (BLOG_TOPICS).`,
-      });
-
-      return NextResponse.json(
-        {
-          success: true,
-          message: 'All topics have been covered',
-          stats,
-        },
-        { headers: corsHeaders },
+    const { ok, status, body } = await fireWorker();
+    if (!ok) {
+      console.error(
+        `[blog/generate] worker rejected: ${status} ${body.slice(0, 200)}`,
       );
-    }
-
-    // Generate a new blog post
-    const result = await generateRandomBlogPost();
-
-    if (!result.success) {
       return NextResponse.json(
         {
           success: false,
-          error: result.error,
+          error: 'worker rejected blog cron trigger',
+          workerStatus: status,
         },
-        { status: 500, headers: corsHeaders },
+        { status: 502, headers: corsHeaders },
       );
     }
-
     return NextResponse.json(
       {
         success: true,
-        postId: result.postId,
-        slug: result.slug,
-        message: 'Successfully generated blog post',
-        remainingTopics: stats.remainingCount - 1,
+        accepted: true,
+        message: 'blog cron handed off to worker',
       },
-      { headers: corsHeaders },
+      { status: 202, headers: corsHeaders },
     );
-  } catch (error) {
-    console.error('Error generating blog post:', error);
+  } catch (err) {
+    console.error('[blog/generate] failed to reach worker:', err);
     return NextResponse.json(
       {
-        error: 'Failed to generate blog post',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        success: false,
+        error: 'failed to reach worker',
+        details: err instanceof Error ? err.message : 'unknown',
       },
-      { status: 500, headers: corsHeaders },
+      { status: 502, headers: corsHeaders },
     );
   }
-}
+};
 
-export async function POST() {
-  return GET();
-}
+export const GET = handle;
+export const POST = handle;

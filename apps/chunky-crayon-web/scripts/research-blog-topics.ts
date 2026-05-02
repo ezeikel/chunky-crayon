@@ -23,7 +23,7 @@ import { generateText, Output } from 'ai';
 import { perplexity } from '@ai-sdk/perplexity';
 import { z } from 'zod';
 import { createClient } from 'next-sanity';
-import { BLOG_TOPICS, type BlogTopic } from '../constants';
+import { BLOG_TOPICS, type BlogTopic } from '@one-colored-pixel/coloring-core';
 
 const TARGET_PER_CATEGORY = 30; // ~6 months per category at 1/day across 6 cats = long runway
 const MODEL_ID = 'sonar-deep-research';
