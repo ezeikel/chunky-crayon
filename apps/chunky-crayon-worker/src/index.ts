@@ -661,9 +661,35 @@ app.post("/generate/blog-post", async (c) => {
 app.post("/generate/daily-image", async (c) => {
   console.log("[/generate/daily-image] kickoff");
 
-  runDailyImageCron().catch((err) => {
-    console.error("[/generate/daily-image] uncaught:", err);
-  });
+  // Neon WebSocket keepalive — same rationale as /publish/reel above.
+  // The daily-cron pipeline sits ~3.5min idle between the row insert
+  // (right after metadata) and the region-store DB write (after R2
+  // upload). The PrismaNeon adapter's WebSocket gets dropped during
+  // that gap and the next update hangs on a half-open socket — we
+  // saw exactly this on the first prod run: region-store update timed
+  // out after 30s with attempt 1/3, never recovered.
+  //
+  // 60s SELECT 1 keeps the socket warm. We start it on kickoff and
+  // clear it after the pipeline resolves so Neon's compute can
+  // auto-suspend between jobs.
+  const keepaliveTimer = setInterval(() => {
+    db.$queryRaw`SELECT 1`.catch((err) => {
+      console.warn(
+        "[keepalive] Neon ping failed:",
+        err instanceof Error ? err.message : err,
+      );
+    });
+  }, 60_000);
+
+  // Don't await — fire and forget. But chain a .finally() so we still
+  // clear the interval after the pipeline resolves (or rejects).
+  runDailyImageCron()
+    .catch((err) => {
+      console.error("[/generate/daily-image] uncaught:", err);
+    })
+    .finally(() => {
+      clearInterval(keepaliveTimer);
+    });
 
   return c.json({ ok: true, accepted: true }, 202);
 });
