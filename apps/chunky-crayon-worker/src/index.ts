@@ -45,6 +45,7 @@ import {
   type StartJobInput,
 } from "./coloring-image/jobs.js";
 import { subscribe } from "./coloring-image/listener.js";
+import { runBlogCron } from "./blog/pipeline.js";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
@@ -615,6 +616,33 @@ app.post("/generate/coloring-image-stream", async (c) => {
       }
     },
   );
+});
+
+/**
+ * POST /generate/blog-post
+ *
+ * Daily blog cron, fire-and-forget. Vercel's /api/blog/generate is now a
+ * thin trigger that POSTs here and returns 202; this endpoint runs the
+ * full pipeline (Sanity covered-topic check → Claude meta + content +
+ * image prompt → openai.images.edit gpt-image-2 → Sanity upload →
+ * publish post). Worker has no timeout, so v2's ~3-4min latency is fine.
+ *
+ * Failures are surfaced via sendAdminAlert (Resend); Vercel never sees
+ * the result of the actual work, just the 202 ack.
+ */
+app.post("/generate/blog-post", async (c) => {
+  console.log("[/generate/blog-post] kickoff");
+
+  // Don't await — fire and forget. Pipeline owns its own error handling
+  // and admin alerts. Returning 202 immediately keeps Vercel's cron
+  // function under 1s.
+  runBlogCron().catch((err) => {
+    // Should never reach here — runBlogCron catches everything — but
+    // guard anyway so an uncaught throw doesn't crash the worker.
+    console.error("[/generate/blog-post] uncaught:", err);
+  });
+
+  return c.json({ ok: true, accepted: true }, 202);
 });
 
 app.post("/publish/reel", async (c) => {

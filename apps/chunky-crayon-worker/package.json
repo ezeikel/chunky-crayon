@@ -27,6 +27,7 @@
     "@remotion/paths": "^4.0.450",
     "@remotion/renderer": "^4.0.0",
     "@remotion/transitions": "^4.0.450",
+    "@sanity/client": "^7.3.0",
     "@sentry/bun": "^10.50.0",
     "ai": "^6.0.27",
     "dotenv": "^17.2.2",
@@ -38,6 +39,7 @@
     "playwright": "^1.59.0",
     "qrcode": "^1.5.3",
     "remotion": "^4.0.0",
+    "resend": "^4.5.1",
     "sharp": "^0.34.1",
     "zod": "^3.25.0"
   },

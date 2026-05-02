@@ -128,6 +128,18 @@ export {
   type GenerateRegionStoreResult,
 } from "./actions/generate-regions";
 
+// Blog content generation (prompts + topic/author catalogue)
+export {
+  BLOG_POST_SYSTEM,
+  createBlogPostPrompt,
+  BLOG_META_SYSTEM,
+  createBlogMetaPrompt,
+  BLOG_IMAGE_PROMPT_SYSTEM,
+  createBlogImagePromptPrompt,
+} from "./blog/prompts";
+export { BLOG_CATEGORIES, BLOG_TOPICS, BLOG_AUTHORS } from "./blog/topics";
+export type { BlogCategory, BlogTopic, BlogAuthor } from "./blog/topics";
+
 // Utilities
 export { default as formatNumber } from "./utils/formatNumber";
 export { default as streamToBuffer } from "./utils/streamToBuffer";
