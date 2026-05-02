@@ -25,7 +25,6 @@ import {
   CreditTransactionType,
 } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
-import { getRandomDescriptionSmart as getRandomDescription } from '@/utils/random';
 import { getAIDescription } from '@/lib/scene-generation';
 import type { ColoringImageSearchParams } from '@/types';
 import {
@@ -649,36 +648,6 @@ export const generateDemoReelImageFromAIDescription =
 
     return result;
   };
-
-export const generateColoringImageOnly = async (
-  generationType: GenerationType,
-): Promise<Partial<ColoringImage>> => {
-  let description: string;
-
-  if (generationType === GenerationType.DAILY) {
-    // For daily images: use Perplexity Sonar for seasonal/trending scene,
-    // with fallback to static random on any failure
-    description = await getAIDescription();
-  } else {
-    description = getRandomDescription();
-  }
-
-  const formData = new FormData();
-
-  formData.append('description', description);
-  formData.append('generationType', generationType);
-
-  const coloringImage = await createColoringImage(formData);
-
-  if (!isColoringImage(coloringImage)) {
-    throw new Error(
-      coloringImage.error ||
-        `Error generating ${generationType.toLowerCase()} coloring image`,
-    );
-  }
-
-  return coloringImage;
-};
 
 /**
  * Voice-mode generation — server action used by the 2-turn voice flow
