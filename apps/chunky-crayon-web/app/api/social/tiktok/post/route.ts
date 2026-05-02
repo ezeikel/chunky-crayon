@@ -190,11 +190,14 @@ const postVideoToTikTok = async (
 };
 
 /**
- * POST /api/social/tiktok/post
  * Posts the most recent daily coloring page animation to TikTok.
  * Accepts either CRON_SECRET (for cron jobs) or admin session (for manual triggers).
+ *
+ * Exported as both GET and POST. Vercel cron hits this with GET, manual
+ * dashboard triggers use POST. Body is unused — auth comes from the
+ * Authorization header / session cookie either way.
  */
-export const POST = async (request: Request) => {
+const handle = async (request: Request) => {
   try {
     // Check for cron secret OR admin session
     const authHeader = request.headers.get('authorization');
@@ -274,3 +277,6 @@ export const POST = async (request: Request) => {
     );
   }
 };
+
+export const GET = handle;
+export const POST = handle;
