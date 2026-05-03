@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { faShare, faSpinner } from '@fortawesome/pro-duotone-svg-icons';
 import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import AdultGate from '@/components/AdultGate';
+import Portal from '@/components/Portal';
 import SocialShare from '@/components/SocialShare/SocialShare';
 import { uploadArtworkForSharing } from '@/app/actions/share-artwork';
 
@@ -65,80 +66,73 @@ const ShareButton = ({
     setShareImageUrl(imageUrl);
   }, [imageUrl]);
 
-  // Show adult gate modal
-  if (state === 'gate') {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-          onClick={handleCancel}
-          aria-hidden="true"
-        />
-        {/* Gate */}
-        <AdultGate
-          onSuccess={handleGateSuccess}
-          onCancel={handleCancel}
-          className="relative z-10"
-        />
-      </div>
-    );
-  }
-
-  // Show uploading state
-  if (state === 'uploading') {
-    return (
+  // Always render the button so the action-row slot stays filled when
+  // an overlay is open. Overlays are rendered alongside via Portal so
+  // they escape the sidebar's containing block (a parent backdrop-blur
+  // ancestor was previously trapping `position: fixed` to the sidebar
+  // column). The button itself reflects the current state.
+  return (
+    <>
       <ActionButton
         size="tile"
         tone="tool"
-        icon={faSpinner}
-        label={t('preparing')}
-        disabled
+        icon={state === 'uploading' ? faSpinner : faShare}
+        label={state === 'uploading' ? t('preparing') : t('idle')}
+        onClick={handleShareClick}
+        disabled={
+          state === 'uploading' || state === 'gate' || state === 'sharing'
+        }
         className={className}
       />
-    );
-  }
 
-  // Show social share options after gate passed - as modal overlay
-  if (state === 'sharing') {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-          onClick={handleClose}
-          aria-hidden="true"
-        />
-        {/* Share panel */}
-        <div className="relative z-10 bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full">
-          <SocialShare
-            url={url}
-            title={title}
-            description={description}
-            imageUrl={shareImageUrl}
-          />
-          <button
-            type="button"
-            onClick={handleClose}
-            className="mt-4 w-full text-center text-sm text-text-secondary hover:text-text-primary underline"
-          >
-            {t('doneSharing')}
-          </button>
-        </div>
-      </div>
-    );
-  }
+      {state === 'gate' && (
+        <Portal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={handleCancel}
+              aria-hidden="true"
+            />
+            {/* Gate */}
+            <AdultGate
+              onSuccess={handleGateSuccess}
+              onCancel={handleCancel}
+              className="relative z-10"
+            />
+          </div>
+        </Portal>
+      )}
 
-  // Default: show share button
-  return (
-    <ActionButton
-      size="tile"
-      tone="tool"
-      icon={faShare}
-      label={t('idle')}
-      onClick={handleShareClick}
-      className={className}
-    />
+      {state === 'sharing' && (
+        <Portal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={handleClose}
+              aria-hidden="true"
+            />
+            {/* Share panel */}
+            <div className="relative z-10 bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full">
+              <SocialShare
+                url={url}
+                title={title}
+                description={description}
+                imageUrl={shareImageUrl}
+              />
+              <button
+                type="button"
+                onClick={handleClose}
+                className="mt-4 w-full text-center text-sm text-text-secondary hover:text-text-primary underline"
+              >
+                {t('doneSharing')}
+              </button>
+            </div>
+          </div>
+        </Portal>
+      )}
+    </>
   );
 };
 

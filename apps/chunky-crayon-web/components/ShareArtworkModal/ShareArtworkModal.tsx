@@ -15,6 +15,7 @@ import {
 import { faLockOpen, faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { faTiktok } from '@fortawesome/free-brands-svg-icons';
 import AdultGate from '@/components/AdultGate';
+import Portal from '@/components/Portal';
 import TikTokPostComposer from '@/components/TikTokPostComposer';
 import { createShare } from '@/app/actions/share';
 import type { ShareExpiration } from '@/lib/share';
@@ -151,235 +152,239 @@ const ShareArtworkModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={handleCancel}
-        aria-hidden="true"
-      />
+    <Portal>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={handleCancel}
+          aria-hidden="true"
+        />
 
-      {/* Modal Content */}
-      <div className="relative z-10 w-full max-w-md">
-        {state === 'gate' && (
-          <AdultGate onSuccess={handleGateSuccess} onCancel={handleCancel} />
-        )}
+        {/* Modal Content */}
+        <div className="relative z-10 w-full max-w-md">
+          {state === 'gate' && (
+            <AdultGate onSuccess={handleGateSuccess} onCancel={handleCancel} />
+          )}
 
-        {state === 'options' && (
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-crayon-purple to-crayon-pink flex items-center justify-center">
-                  <FontAwesomeIcon
-                    icon={faLink}
-                    className="text-white text-lg"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-text-primary">
-                    {t('title')}
-                  </h3>
-                  <p className="text-sm text-text-secondary truncate max-w-[200px]">
-                    {artworkTitle}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="p-2 text-text-secondary hover:text-text-primary transition-colors"
-                aria-label={tCommon('close')}
-              >
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
-            </div>
-
-            {/* Privacy note */}
-            <div className="flex items-start gap-2 p-3 bg-paper-cream rounded-xl mb-4">
-              <FontAwesomeIcon
-                icon={faLockOpen}
-                className="text-crayon-green mt-0.5"
-                style={
-                  {
-                    '--fa-primary-color': 'hsl(var(--crayon-green))',
-                    '--fa-secondary-color': 'hsl(var(--crayon-blue))',
-                    '--fa-secondary-opacity': '0.5',
-                  } as React.CSSProperties
-                }
-              />
-              <p className="text-sm text-text-secondary">{t('privacyNote')}</p>
-            </div>
-
-            {/* Expiration options */}
-            <div className="mb-4">
-              <p className="text-sm font-medium text-text-primary mb-2">
-                {t('expiresIn')}
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {EXPIRATION_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setSelectedExpiration(option.value)}
-                    className={cn(
-                      'flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all',
-                      selectedExpiration === option.value
-                        ? 'border-crayon-purple bg-crayon-purple/5'
-                        : 'border-paper-cream-dark hover:border-crayon-purple/50',
-                    )}
-                  >
+          {state === 'options' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-crayon-purple to-crayon-pink flex items-center justify-center">
                     <FontAwesomeIcon
-                      icon={option.icon}
-                      className={cn(
-                        'text-lg',
-                        selectedExpiration === option.value
-                          ? 'text-crayon-purple'
-                          : 'text-text-secondary',
-                      )}
+                      icon={faLink}
+                      className="text-white text-lg"
                     />
-                    <span
-                      className={cn(
-                        'text-xs font-medium',
-                        selectedExpiration === option.value
-                          ? 'text-crayon-purple'
-                          : 'text-text-secondary',
-                      )}
-                    >
-                      {t(`expiration.${option.labelKey}`)}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Error message */}
-            {error && (
-              <p className="text-sm text-crayon-pink text-center mb-4">
-                {error}
-              </p>
-            )}
-
-            {/* Create button */}
-            <button
-              type="button"
-              onClick={handleCreateShare}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-white bg-gradient-to-r from-crayon-purple to-crayon-pink hover:opacity-90 active:scale-95 transition-all"
-            >
-              <FontAwesomeIcon icon={faLink} />
-              {t('createLink')}
-            </button>
-          </div>
-        )}
-
-        {state === 'generating' && (
-          <div className="bg-white rounded-2xl shadow-xl p-6">
-            <div className="flex flex-col items-center py-8">
-              <FontAwesomeIcon
-                icon={faSpinnerThird}
-                className="text-4xl text-crayon-purple animate-spin mb-4"
-              />
-              <p className="text-text-secondary">{t('creating')}</p>
-            </div>
-          </div>
-        )}
-
-        {state === 'success' && shareUrl && (
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
-            {/* Success header */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-crayon-green to-crayon-blue flex items-center justify-center mb-3">
-                <FontAwesomeIcon
-                  icon={faCheck}
-                  className="text-white text-2xl"
-                />
-              </div>
-              <h3 className="text-xl font-bold text-text-primary">
-                {t('success.title')}
-              </h3>
-              <p className="text-sm text-text-secondary text-center mt-1">
-                {t('success.subtitle')}
-              </p>
-            </div>
-
-            {/* Link display */}
-            <div className="flex items-center gap-2 p-3 bg-paper-cream rounded-xl mb-4">
-              <input
-                type="text"
-                value={shareUrl}
-                readOnly
-                className="flex-1 bg-transparent text-sm text-text-primary truncate outline-none"
-              />
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                className={cn(
-                  'flex items-center gap-1 px-3 py-1.5 rounded-lg font-medium text-sm transition-all',
-                  copied
-                    ? 'bg-crayon-green text-white'
-                    : 'bg-crayon-purple text-white hover:bg-crayon-purple-dark',
-                )}
-              >
-                <FontAwesomeIcon icon={copied ? faCheck : faCopy} />
-                {copied ? tCommon('copied') : tCommon('copy')}
-              </button>
-            </div>
-
-            {/* Share to TikTok (feature flagged for TikTok API review) */}
-            {tiktokEnabled && (
-              <div className="mb-4">
-                <p className="text-sm font-medium text-text-primary mb-2">
-                  Share on social media
-                </p>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-text-primary">
+                      {t('title')}
+                    </h3>
+                    <p className="text-sm text-text-secondary truncate max-w-[200px]">
+                      {artworkTitle}
+                    </p>
+                  </div>
+                </div>
                 <button
                   type="button"
-                  onClick={handleTikTokClick}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                  onClick={handleCancel}
+                  className="p-2 text-text-secondary hover:text-text-primary transition-colors"
+                  aria-label={tCommon('close')}
                 >
-                  <FontAwesomeIcon icon={faTiktok} />
-                  {hasTikTok ? 'Share to TikTok' : 'Connect TikTok'}
+                  <FontAwesomeIcon icon={faTimes} />
                 </button>
               </div>
-            )}
 
-            {/* Done button */}
-            <button
-              type="button"
-              onClick={handleDone}
-              className="w-full text-center text-sm text-text-secondary hover:text-text-primary underline"
-            >
-              {t('done')}
-            </button>
-          </div>
-        )}
+              {/* Privacy note */}
+              <div className="flex items-start gap-2 p-3 bg-paper-cream rounded-xl mb-4">
+                <FontAwesomeIcon
+                  icon={faLockOpen}
+                  className="text-crayon-green mt-0.5"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--crayon-green))',
+                      '--fa-secondary-color': 'hsl(var(--crayon-blue))',
+                      '--fa-secondary-opacity': '0.5',
+                    } as React.CSSProperties
+                  }
+                />
+                <p className="text-sm text-text-secondary">
+                  {t('privacyNote')}
+                </p>
+              </div>
 
-        {state === 'tiktok' && tiktokEnabled && artworkImageUrl && (
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-text-primary">
-                Share to TikTok
-              </h3>
+              {/* Expiration options */}
+              <div className="mb-4">
+                <p className="text-sm font-medium text-text-primary mb-2">
+                  {t('expiresIn')}
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {EXPIRATION_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setSelectedExpiration(option.value)}
+                      className={cn(
+                        'flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all',
+                        selectedExpiration === option.value
+                          ? 'border-crayon-purple bg-crayon-purple/5'
+                          : 'border-paper-cream-dark hover:border-crayon-purple/50',
+                      )}
+                    >
+                      <FontAwesomeIcon
+                        icon={option.icon}
+                        className={cn(
+                          'text-lg',
+                          selectedExpiration === option.value
+                            ? 'text-crayon-purple'
+                            : 'text-text-secondary',
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          'text-xs font-medium',
+                          selectedExpiration === option.value
+                            ? 'text-crayon-purple'
+                            : 'text-text-secondary',
+                        )}
+                      >
+                        {t(`expiration.${option.labelKey}`)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Error message */}
+              {error && (
+                <p className="text-sm text-crayon-pink text-center mb-4">
+                  {error}
+                </p>
+              )}
+
+              {/* Create button */}
               <button
                 type="button"
-                onClick={() => setState('success')}
-                className="p-2 text-text-secondary hover:text-text-primary transition-colors"
-                aria-label={tCommon('close')}
+                onClick={handleCreateShare}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-white bg-gradient-to-r from-crayon-purple to-crayon-pink hover:opacity-90 active:scale-95 transition-all"
               >
-                <FontAwesomeIcon icon={faTimes} />
+                <FontAwesomeIcon icon={faLink} />
+                {t('createLink')}
               </button>
             </div>
-            <TikTokPostComposer
-              artworkId={artworkId}
-              artworkTitle={artworkTitle}
-              artworkImageUrl={artworkImageUrl}
-              hasVideo={false}
-              onClose={handleDone}
-              onDisconnect={handleTikTokDisconnect}
-            />
-          </div>
-        )}
+          )}
+
+          {state === 'generating' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="flex flex-col items-center py-8">
+                <FontAwesomeIcon
+                  icon={faSpinnerThird}
+                  className="text-4xl text-crayon-purple animate-spin mb-4"
+                />
+                <p className="text-text-secondary">{t('creating')}</p>
+              </div>
+            </div>
+          )}
+
+          {state === 'success' && shareUrl && (
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
+              {/* Success header */}
+              <div className="flex flex-col items-center mb-6">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-crayon-green to-crayon-blue flex items-center justify-center mb-3">
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    className="text-white text-2xl"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-text-primary">
+                  {t('success.title')}
+                </h3>
+                <p className="text-sm text-text-secondary text-center mt-1">
+                  {t('success.subtitle')}
+                </p>
+              </div>
+
+              {/* Link display */}
+              <div className="flex items-center gap-2 p-3 bg-paper-cream rounded-xl mb-4">
+                <input
+                  type="text"
+                  value={shareUrl}
+                  readOnly
+                  className="flex-1 bg-transparent text-sm text-text-primary truncate outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className={cn(
+                    'flex items-center gap-1 px-3 py-1.5 rounded-lg font-medium text-sm transition-all',
+                    copied
+                      ? 'bg-crayon-green text-white'
+                      : 'bg-crayon-purple text-white hover:bg-crayon-purple-dark',
+                  )}
+                >
+                  <FontAwesomeIcon icon={copied ? faCheck : faCopy} />
+                  {copied ? tCommon('copied') : tCommon('copy')}
+                </button>
+              </div>
+
+              {/* Share to TikTok (feature flagged for TikTok API review) */}
+              {tiktokEnabled && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-text-primary mb-2">
+                    Share on social media
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleTikTokClick}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black text-white text-sm font-medium hover:opacity-90 transition-opacity"
+                  >
+                    <FontAwesomeIcon icon={faTiktok} />
+                    {hasTikTok ? 'Share to TikTok' : 'Connect TikTok'}
+                  </button>
+                </div>
+              )}
+
+              {/* Done button */}
+              <button
+                type="button"
+                onClick={handleDone}
+                className="w-full text-center text-sm text-text-secondary hover:text-text-primary underline"
+              >
+                {t('done')}
+              </button>
+            </div>
+          )}
+
+          {state === 'tiktok' && tiktokEnabled && artworkImageUrl && (
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-text-primary">
+                  Share to TikTok
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setState('success')}
+                  className="p-2 text-text-secondary hover:text-text-primary transition-colors"
+                  aria-label={tCommon('close')}
+                >
+                  <FontAwesomeIcon icon={faTimes} />
+                </button>
+              </div>
+              <TikTokPostComposer
+                artworkId={artworkId}
+                artworkTitle={artworkTitle}
+                artworkImageUrl={artworkImageUrl}
+                hasVideo={false}
+                onClose={handleDone}
+                onDisconnect={handleTikTokDisconnect}
+              />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Portal>
   );
 };
 
