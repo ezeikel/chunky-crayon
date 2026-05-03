@@ -40,8 +40,13 @@ const variantIcons: Record<PaletteVariant, IconDefinition> = {
  */
 const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
   const t = useTranslations("coloringPage");
-  const { selectedColor, setSelectedColor, paletteVariant, setPaletteVariant } =
-    useColoringContext();
+  const {
+    selectedColor,
+    setSelectedColor,
+    paletteVariant,
+    setPaletteVariant,
+    activeTool,
+  } = useColoringContext();
   const { playSound } = useSound();
 
   const colors = COLORING_PALETTE_VARIANTS[paletteVariant];
@@ -62,6 +67,12 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
               key={variant}
               type="button"
               onClick={() => {
+                if (variant !== paletteVariant) {
+                  trackEvent(TRACKING_EVENTS.PALETTE_VARIANT_CHANGED, {
+                    fromVariant: paletteVariant,
+                    toVariant: variant,
+                  });
+                }
                 setPaletteVariant(variant);
                 playSound("tap");
               }}
@@ -104,6 +115,7 @@ const DesktopColorPalette = ({ className }: DesktopColorPaletteProps) => {
                   color: color.hex,
                   colorName: color.name,
                   colorIndex: index,
+                  tool: activeTool,
                 });
                 setSelectedColor(color.hex);
                 playSound("tap");

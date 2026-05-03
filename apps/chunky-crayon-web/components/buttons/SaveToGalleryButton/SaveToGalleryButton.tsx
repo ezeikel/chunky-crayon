@@ -8,6 +8,8 @@ import Confetti from '@/components/Confetti';
 import { StickerReward } from '@/components/StickerReward';
 import { ColoEvolutionCelebration } from '@/components/ColoEvolutionCelebration';
 import { ActionButton, useSound } from '@one-colored-pixel/coloring-ui';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 import cn from '@/utils/cn';
 import type { Sticker } from '@/lib/stickers';
 import type { EvolutionResult } from '@/lib/colo';
@@ -40,6 +42,10 @@ const SaveToGalleryButton = ({
   const handleSave = useCallback(async () => {
     setState('saving');
     setErrorMessage(null);
+
+    trackEvent(TRACKING_EVENTS.SAVE_TO_GALLERY_CLICKED, {
+      coloringImageId,
+    });
 
     try {
       const dataUrl = getCanvasDataUrl();

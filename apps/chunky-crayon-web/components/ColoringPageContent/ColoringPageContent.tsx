@@ -19,6 +19,8 @@ import PrintButton from '@/components/buttons/PrintButton';
 import ShareButton from '@/components/buttons/ShareButton/ShareButton';
 import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton/SaveToGalleryButton';
 import { trackViewContent } from '@/utils/pixels';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 
 type ColoringPageContentProps = {
   coloringImage: Partial<ColoringImage>;
@@ -61,6 +63,29 @@ const ColoringPageContent = ({
       contentId: coloringImage.id,
       contentName: coloringImage.title || undefined,
     });
+
+    // Session start. PAGE_VIEWED fires once per page open with a
+    // generic source label. Pair with PAGE_COLORED on unmount so we
+    // can compute median session duration in PostHog later.
+    if (coloringImage.id) {
+      trackEvent(TRACKING_EVENTS.PAGE_VIEWED, {
+        coloringImageId: coloringImage.id,
+        source: 'direct',
+      });
+    }
+
+    const sessionStart = Date.now();
+
+    return () => {
+      // Session end. Stickiness signal — predicts subscription
+      // willingness more reliably than any single funnel event.
+      if (coloringImage.id) {
+        trackEvent(TRACKING_EVENTS.PAGE_COLORED, {
+          coloringImageId: coloringImage.id,
+          sessionDurationMs: Date.now() - sessionStart,
+        });
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

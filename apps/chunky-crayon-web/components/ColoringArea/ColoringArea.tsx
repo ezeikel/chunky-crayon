@@ -42,6 +42,8 @@ import {
   useRegionStore,
   type RegionStoreJson,
 } from '@one-colored-pixel/coloring-ui';
+import { trackEvent } from '@/utils/analytics-client';
+import { TRACKING_EVENTS } from '@/constants';
 import { useMagicColorMap } from '@/hooks/useMagicColorMap';
 import type { GridColorMap, FillPointsData } from '@/lib/ai';
 import {
@@ -523,6 +525,15 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
 
       const drawingCtx = drawingCanvas.getContext('2d');
       if (!drawingCtx) return;
+
+      // Tracks one-click auto-color usage in the actual coloring page
+      // (the homepage hero version has its own start_hero_auto_reveal
+      // event). Pair with subsequent CANVAS_UNDO events to validate
+      // whether the auto-coloring is producing pages kids accept.
+      trackEvent(TRACKING_EVENTS.AUTO_COLOR_USED, {
+        coloringImageId: coloringImage.id,
+        paletteVariant,
+      });
 
       setIsAutoColoring(true);
 

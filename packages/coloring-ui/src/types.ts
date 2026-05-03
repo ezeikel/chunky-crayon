@@ -308,10 +308,23 @@ export type RegionStoreJson = {
   regions: RegionStoreRegion[];
 };
 
-// Tracking events used by coloring UI components
+// Tracking events used by coloring UI components.
+// Mirror of `apps/*/constants.ts` TRACKING_EVENTS for the events fired
+// from inside the shared package. The CC + CH analytics types live in
+// each app's `types/analytics.ts`; this constant is just to avoid
+// hand-typed string keys at call sites.
 export const TRACKING_EVENTS = {
   PAGE_COLOR_SELECTED: "page_color_selected",
   PAGE_STROKE_MADE: "page_stroke_made",
+  PAGE_COLORED: "page_colored",
+  PAGE_FIRST_STROKE: "page_first_stroke",
+  TOOL_SELECTED: "tool_selected",
+  BRUSH_SIZE_CHANGED: "brush_size_changed",
+  BRUSH_TYPE_CHANGED: "brush_type_changed",
+  PALETTE_VARIANT_CHANGED: "palette_variant_changed",
+  CANVAS_UNDO: "canvas_undo",
+  CANVAS_REDO: "canvas_redo",
+  AUTO_COLOR_USED: "auto_color_used",
   CREATION_SUBMITTED: "creation_submitted",
   CTA_CLICKED: "cta_clicked",
 } as const;

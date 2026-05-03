@@ -72,6 +72,7 @@ const ColorPalette = ({ className }: ColorPaletteProps) => {
       color: hex,
       colorName: name,
       colorIndex: index,
+      tool: activeTool,
     });
     setSelectedColor(hex);
     addRecentColor(hex);

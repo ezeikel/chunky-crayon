@@ -149,6 +149,10 @@ export type EventProperties = {
   [TRACKING_EVENTS.PAGE_COLORED]: {
     coloringImageId: string;
     sessionDurationMs: number;
+    strokeCount?: number; // Total brush/fill/magic strokes during the session
+    stickerCount?: number; // Total stickers placed
+    paletteVariant?: 'realistic' | 'pastel' | 'cute' | 'surprise';
+    finalTool?: string; // Last tool the user had selected
   };
   [TRACKING_EVENTS.PAGE_COLOR_SELECTED]: {
     coloringImageId?: string; // Optional when color palette is used outside image context
@@ -177,6 +181,45 @@ export type EventProperties = {
   [TRACKING_EVENTS.PAGE_SHARED]: {
     coloringImageId: string;
     shareMethod: 'link' | 'social';
+  };
+  [TRACKING_EVENTS.PAGE_FIRST_STROKE]: {
+    coloringImageId?: string;
+    msFromMount: number; // Time from page open to first stroke. Engagement signal.
+    tool?: string;
+  };
+  [TRACKING_EVENTS.TOOL_SELECTED]: {
+    coloringImageId?: string;
+    tool: string; // crayon|marker|pencil|paintbrush|glitter|fill|eraser|sticker|magic-reveal|magic-auto
+    previousTool?: string;
+  };
+  [TRACKING_EVENTS.BRUSH_SIZE_CHANGED]: {
+    coloringImageId?: string;
+    fromSize: string;
+    toSize: string;
+  };
+  [TRACKING_EVENTS.BRUSH_TYPE_CHANGED]: {
+    coloringImageId?: string;
+    fromType: string;
+    toType: string;
+  };
+  [TRACKING_EVENTS.PALETTE_VARIANT_CHANGED]: {
+    coloringImageId?: string;
+    fromVariant: 'realistic' | 'pastel' | 'cute' | 'surprise';
+    toVariant: 'realistic' | 'pastel' | 'cute' | 'surprise';
+  };
+  [TRACKING_EVENTS.CANVAS_UNDO]: {
+    coloringImageId?: string;
+    afterTool?: string; // What tool was last used before undo. High undo-after-magic-auto = quality issue.
+  };
+  [TRACKING_EVENTS.CANVAS_REDO]: {
+    coloringImageId?: string;
+  };
+  [TRACKING_EVENTS.AUTO_COLOR_USED]: {
+    coloringImageId?: string;
+    paletteVariant?: 'realistic' | 'pastel' | 'cute' | 'surprise';
+  };
+  [TRACKING_EVENTS.SAVE_TO_GALLERY_CLICKED]: {
+    coloringImageId: string;
   };
 
   // ===== DOWNLOAD & PRINT =====

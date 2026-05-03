@@ -253,6 +253,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const offScreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const hasInteractedRef = useRef(false);
+    // Timestamp of mount + flag for "first stroke this session." Used to
+    // fire PAGE_FIRST_STROKE on the very first stroke after the canvas
+    // mounts so we can measure time-to-first-stroke (engagement signal).
+    const mountTimeRef = useRef<number>(Date.now());
+    const firstStrokeFiredRef = useRef(false);
 
     // ── Pre-coloured canvas for magic-reveal brush ──
     // Holds the region-coloured image at the drawing canvas's DPR-scaled
@@ -1924,6 +1929,17 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         stickerId: selectedSticker.id,
         stickerName: selectedSticker.name,
       });
+
+      // First-stroke timing (kid placed sticker first instead of
+      // drawing). See companion fire on the brush stroke path.
+      if (!firstStrokeFiredRef.current) {
+        firstStrokeFiredRef.current = true;
+        trackEvent(TRACKING_EVENTS.PAGE_FIRST_STROKE, {
+          coloringImageId: coloringImage.id,
+          msFromMount: Date.now() - mountTimeRef.current,
+          tool: "sticker",
+        });
+      }
     };
 
     // =========================================================================
@@ -2221,7 +2237,24 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         color: selectedColor,
         brushSize,
         brushType,
+        // Attribute every stroke to the tool that produced it. Without
+        // this property, brush / fill / magic-reveal / magic-auto strokes
+        // collapse to `tool: null` in PostHog and we can't tell tool
+        // usage apart.
+        tool: activeTool,
       });
+
+      // Fire once per session — measures how long it takes a kid to
+      // go from "page loaded" to "actually drawing." Slow first-stroke
+      // = UX confusion or hesitation; fast = onboarding is working.
+      if (!firstStrokeFiredRef.current) {
+        firstStrokeFiredRef.current = true;
+        trackEvent(TRACKING_EVENTS.PAGE_FIRST_STROKE, {
+          coloringImageId: coloringImage.id,
+          msFromMount: Date.now() - mountTimeRef.current,
+          tool: activeTool,
+        });
+      }
     };
 
     return (

@@ -929,11 +929,20 @@ export const TRACKING_EVENTS = {
 
   // ===== COLORING PAGE ENGAGEMENT =====
   PAGE_VIEWED: 'page_viewed', // Coloring page viewed
-  PAGE_COLORED: 'page_colored', // User started coloring
+  PAGE_COLORED: 'page_colored', // Session ended (page closed/unmounted) — has duration + stroke count
   PAGE_COLOR_SELECTED: 'page_color_selected', // Color picked
   PAGE_STROKE_MADE: 'page_stroke_made', // Drawing stroke completed
   PAGE_SAVED: 'page_saved', // Saved to gallery
   PAGE_SHARED: 'page_shared', // Shared via link
+  PAGE_FIRST_STROKE: 'page_first_stroke', // First stroke after page mount — measures time-to-engage
+  TOOL_SELECTED: 'tool_selected', // Tile click in toolbar (crayon, marker, fill, magic-reveal, etc.)
+  BRUSH_SIZE_CHANGED: 'brush_size_changed', // Switched between small/medium/large
+  BRUSH_TYPE_CHANGED: 'brush_type_changed', // Switched between crayon/marker/pencil/paintbrush/glitter
+  PALETTE_VARIANT_CHANGED: 'palette_variant_changed', // Switched between realistic/pastel/cute/surprise
+  CANVAS_UNDO: 'canvas_undo', // Undo button clicked
+  CANVAS_REDO: 'canvas_redo', // Redo button clicked
+  AUTO_COLOR_USED: 'auto_color_used', // Magic auto-color (one-click) used inside the coloring page
+  SAVE_TO_GALLERY_CLICKED: 'save_to_gallery_clicked', // Logged-in users save artwork to gallery
 
   // ===== DOWNLOAD & PRINT (Key Conversions) =====
   DOWNLOAD_PDF_CLICKED: 'download_pdf_clicked', // PDF download initiated

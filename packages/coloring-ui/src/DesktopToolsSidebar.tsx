@@ -16,8 +16,9 @@ import {
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CanvasAction, useColoringContext } from "./context";
-import { BRUSH_SIZES, type BrushSize } from "./types";
+import { BRUSH_SIZES, TRACKING_EVENTS, type BrushSize } from "./types";
 import { useSound } from "./useSound";
+import { trackEvent } from "./analytics-client";
 import {
   ActionButtonSizeProvider,
   type ActionButtonSize,
@@ -239,6 +240,18 @@ const DesktopToolsSidebar = ({
     : regularToolsAll.filter((tool) => tool.id !== "sticker");
 
   const handleToolSelect = (toolId: ToolId) => {
+    // Track every tile click — the `tool` value is the canonical
+    // toolId (matches the tile shown), distinct from the underlying
+    // activeTool which collapses brush sub-types into "brush".
+    const previousTool: string =
+      activeTool === "brush" ? brushType : activeTool;
+    if (toolId !== previousTool) {
+      trackEvent(TRACKING_EVENTS.TOOL_SELECTED, {
+        tool: toolId,
+        previousTool,
+      });
+    }
+
     switch (toolId) {
       case "crayon":
       case "marker":
@@ -246,6 +259,12 @@ const DesktopToolsSidebar = ({
       case "paintbrush":
       case "glitter":
       case "eraser":
+        if (brushType !== toolId) {
+          trackEvent(TRACKING_EVENTS.BRUSH_TYPE_CHANGED, {
+            fromType: brushType,
+            toType: toolId,
+          });
+        }
         setActiveTool("brush");
         setBrushType(toolId);
         break;
@@ -276,12 +295,23 @@ const DesktopToolsSidebar = ({
 
   const handleUndo = () => {
     const action = undo();
-    if (action && onUndo) onUndo(action);
+    if (action) {
+      // Capture which tool the undone action came from. Spike of
+      // undo-after-magic-auto is the canonical "auto-color quality
+      // problem" signal.
+      trackEvent(TRACKING_EVENTS.CANVAS_UNDO, {
+        afterTool: action.type,
+      });
+      if (onUndo) onUndo(action);
+    }
   };
 
   const handleRedo = () => {
     const action = redo();
-    if (action && onRedo) onRedo(action);
+    if (action) {
+      trackEvent(TRACKING_EVENTS.CANVAS_REDO, {});
+      if (onRedo) onRedo(action);
+    }
   };
 
   const ZOOM_STEP = 0.5;
@@ -429,6 +459,12 @@ const DesktopToolsSidebar = ({
                 type="button"
                 key={size}
                 onClick={() => {
+                  if (size !== brushSize) {
+                    trackEvent(TRACKING_EVENTS.BRUSH_SIZE_CHANGED, {
+                      fromSize: brushSize,
+                      toSize: size,
+                    });
+                  }
                   setBrushSize(size);
                   playSound("tap");
                 }}
