@@ -15,6 +15,10 @@ import TrialEndingEmail from '@/emails/TrialEndingEmail';
 import SocialDigestEmail from '@/emails/SocialDigestEmail';
 import { stripe } from '@/lib/stripe';
 import { getResendFromAddress } from '@/lib/email-config';
+import {
+  readClientMatchData,
+  sendLeadConversionEvents,
+} from '@/lib/conversion-api';
 
 export type SocialDigestEntry = {
   platform: string;
@@ -90,6 +94,26 @@ export const joinColoringPageEmailList = async (
       subject: 'Welcome to Chunky Crayon! 🎨',
       html: welcomeEmailHtml,
     });
+
+    // Server-side Lead event. Mirrors the browser trackLead fire from
+    // JoinColoringPageEmailListForm so Meta still gets the signal when
+    // the pixel is blocked (iOS in-app browsers, ad blockers). eventId
+    // = email matches the client fire so Meta deduplicates. Fire-and-
+    // forget; CAPI failures must never block the signup itself.
+    void (async () => {
+      try {
+        const match = await readClientMatchData();
+        await sendLeadConversionEvents({
+          email,
+          eventId: email,
+          contentName: 'Email List Signup',
+          contentCategory: 'email_list',
+          ...match,
+        });
+      } catch (err) {
+        console.error('[joinColoringPageEmailList] Lead CAPI failed:', err);
+      }
+    })();
 
     return { success: true, email };
   } catch (error) {

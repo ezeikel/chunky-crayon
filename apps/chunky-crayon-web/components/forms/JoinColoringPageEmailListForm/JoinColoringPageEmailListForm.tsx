@@ -11,7 +11,7 @@ import cn from '@/utils/cn';
 import { Input } from '@/components/ui/input';
 import { joinColoringPageEmailList } from '@/app/actions/email';
 import { trackEvent } from '@/utils/analytics-client';
-import { trackSignUp } from '@/utils/pixels';
+import { trackLead } from '@/utils/pixels';
 import { TRACKING_EVENTS } from '@/constants';
 
 type JoinColoringPageEmailListFormProps = {
@@ -55,9 +55,19 @@ const JoinColoringPageEmailListForm = ({
         location,
       });
 
-      // Fire Meta CompleteRegistration + Pinterest signup so ad platforms
-      // can optimize for signup conversions, not just landing page views.
-      trackSignUp({ method: 'email' });
+      // Fire Meta Lead + Pinterest lead. Email-list captures are
+      // top-of-funnel intent ("send me stuff"), not product registrations
+      // — Lead is the right standard event. CompleteRegistration is
+      // reserved for actual account signups (auth.ts). eventId = email
+      // so this client fire dedups against the matching CAPI fire from
+      // joinColoringPageEmailList.
+      if (state.email) {
+        trackLead({
+          contentName: 'Email List Signup',
+          contentCategory: 'email_list',
+          eventId: state.email,
+        });
+      }
 
       if (emailInputRef.current) {
         emailInputRef.current.value = '';
