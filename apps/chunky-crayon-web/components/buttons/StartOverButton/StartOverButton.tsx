@@ -3,12 +3,8 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faArrowsRotate,
-  faTrashCan,
-  faCheck,
-  faXmark,
-} from '@fortawesome/pro-solid-svg-icons';
+import { faTrashCan, faCheck, faXmark } from '@fortawesome/pro-solid-svg-icons';
+import { faArrowsRotate } from '@fortawesome/pro-duotone-svg-icons';
 import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import {
   Dialog,
@@ -53,7 +49,7 @@ const StartOverButton = ({
     <>
       <ActionButton
         size="tile"
-        tone="secondary"
+        tone="tool"
         icon={faArrowsRotate}
         label={t('idle')}
         onClick={() => setOpen(true)}

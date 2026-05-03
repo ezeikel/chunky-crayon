@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { ColoringImage } from '@one-colored-pixel/db/types';
-import { faFloppyDisk } from '@fortawesome/pro-solid-svg-icons';
+import { faFloppyDisk } from '@fortawesome/pro-duotone-svg-icons';
 import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import { pdf } from '@react-pdf/renderer';
 import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/ColoringPageDocument';
@@ -119,7 +119,7 @@ const SaveButtonContent = ({
     return (
       <ActionButton
         size="tile"
-        tone="secondary"
+        tone="tool"
         icon={faFloppyDisk}
         label={t('loading')}
         disabled
@@ -132,7 +132,7 @@ const SaveButtonContent = ({
     return (
       <ActionButton
         size="tile"
-        tone="secondary"
+        tone="tool"
         icon={faFloppyDisk}
         label={t('error')}
         disabled
@@ -145,7 +145,7 @@ const SaveButtonContent = ({
     return (
       <ActionButton
         size="tile"
-        tone="secondary"
+        tone="tool"
         icon={faFloppyDisk}
         label={t('saving')}
         disabled
@@ -158,7 +158,7 @@ const SaveButtonContent = ({
     return (
       <ActionButton
         size="tile"
-        tone="secondary"
+        tone="tool"
         icon={faFloppyDisk}
         label={t('error')}
         disabled
@@ -170,7 +170,7 @@ const SaveButtonContent = ({
   return (
     <ActionButton
       size="tile"
-      tone="accent"
+      tone="tool"
       icon={faFloppyDisk}
       label={t('idle')}
       onClick={handleSave}

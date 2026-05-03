@@ -33,7 +33,12 @@ export type ActionButtonTone =
   /** Success state */
   | "success"
   /** Neutral outline */
-  | "outline";
+  | "outline"
+  /** Matches the inactive tool-tile look: white background, soft
+   * border in the surface-dark token, neutral text colour. Use for
+   * action-row buttons that should sit visually equal to the tool
+   * tiles above them (e.g. Save, Print, Start Over). */
+  | "tool";
 
 /**
  * Visual scale.
@@ -84,6 +89,9 @@ const toneClasses: Record<ActionButtonTone, string> = {
   success: "bg-coloring-success text-white hover:bg-coloring-success/90",
   outline:
     "bg-white text-coloring-muted border-2 border-current hover:bg-coloring-surface-dark",
+  // Matches DesktopToolsSidebar tool-tile inactive state:
+  //   bg-white + 1px border-coloring-surface-dark + neutral text.
+  tool: "bg-white text-coloring-text-primary border border-coloring-surface-dark hover:bg-coloring-surface",
 };
 
 const base =

@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { faShare, faSpinner, faCheck } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faShare,
+  faSpinner,
+  faCheck,
+} from "@fortawesome/pro-duotone-svg-icons";
 import { ActionButton } from "@one-colored-pixel/coloring-ui";
 import { uploadArtworkForSharing } from "@/app/actions/share-artwork";
 
@@ -61,7 +65,7 @@ const ShareButton = ({
   if (state === "uploading") {
     return (
       <ActionButton
-        tone="accent"
+        tone="tool"
         icon={faSpinner}
         label="Preparing..."
         disabled
@@ -84,7 +88,7 @@ const ShareButton = ({
 
   return (
     <ActionButton
-      tone="accent"
+      tone="tool"
       icon={faShare}
       label="Share"
       onClick={handleShare}

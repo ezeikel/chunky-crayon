@@ -116,7 +116,7 @@ const SaveButtonContent = ({
   if (isLoading) {
     return (
       <ActionButton
-        tone="secondary"
+        tone="tool"
         icon={faFloppyDisk}
         label={t("loading")}
         disabled
@@ -128,7 +128,7 @@ const SaveButtonContent = ({
   if (error || !imageSvg || !qrCodeSvg) {
     return (
       <ActionButton
-        tone="secondary"
+        tone="tool"
         icon={faFloppyDisk}
         label={t("error")}
         disabled
@@ -140,7 +140,7 @@ const SaveButtonContent = ({
   if (generatingState === "generating") {
     return (
       <ActionButton
-        tone="secondary"
+        tone="tool"
         icon={faFloppyDisk}
         label={t("saving")}
         disabled
@@ -152,7 +152,7 @@ const SaveButtonContent = ({
   if (generatingState === "error") {
     return (
       <ActionButton
-        tone="secondary"
+        tone="tool"
         icon={faFloppyDisk}
         label={t("error")}
         disabled
@@ -163,7 +163,7 @@ const SaveButtonContent = ({
 
   return (
     <ActionButton
-      tone="accent"
+      tone="tool"
       icon={faFloppyDisk}
       label={t("idle")}
       onClick={handleSave}

@@ -123,7 +123,7 @@ const PrintButtonContent = ({
   if (isLoading) {
     return (
       <ActionButton
-        tone="secondary"
+        tone="tool"
         icon={faPrint}
         label={t("loading")}
         disabled
@@ -135,7 +135,7 @@ const PrintButtonContent = ({
   if (error || !imageSvg || !qrCodeSvg) {
     return (
       <ActionButton
-        tone="secondary"
+        tone="tool"
         icon={faPrint}
         label={t("error")}
         disabled
@@ -147,7 +147,7 @@ const PrintButtonContent = ({
   if (printingState === "preparing") {
     return (
       <ActionButton
-        tone="secondary"
+        tone="tool"
         icon={faPrint}
         label={t("printing")}
         disabled
@@ -159,7 +159,7 @@ const PrintButtonContent = ({
   if (printingState === "error") {
     return (
       <ActionButton
-        tone="secondary"
+        tone="tool"
         icon={faPrint}
         label={t("error")}
         disabled
@@ -170,7 +170,7 @@ const PrintButtonContent = ({
 
   return (
     <ActionButton
-      tone="accent"
+      tone="tool"
       icon={faPrint}
       label={t("idle")}
       onClick={handlePrint}

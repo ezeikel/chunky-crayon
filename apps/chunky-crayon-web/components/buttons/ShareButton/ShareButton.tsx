@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { faShare, faSpinner } from '@fortawesome/pro-solid-svg-icons';
+import { faShare, faSpinner } from '@fortawesome/pro-duotone-svg-icons';
 import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import AdultGate from '@/components/AdultGate';
 import SocialShare from '@/components/SocialShare/SocialShare';
@@ -90,7 +90,7 @@ const ShareButton = ({
     return (
       <ActionButton
         size="tile"
-        tone="accent"
+        tone="tool"
         icon={faSpinner}
         label={t('preparing')}
         disabled
@@ -133,7 +133,7 @@ const ShareButton = ({
   return (
     <ActionButton
       size="tile"
-      tone="accent"
+      tone="tool"
       icon={faShare}
       label={t('idle')}
       onClick={handleShareClick}
