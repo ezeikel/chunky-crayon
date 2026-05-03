@@ -260,6 +260,11 @@
         "outcome": "20 minutes de calme commencent avec une page à colorier.",
         "empathy": "« Je m’ennuie » vient de trouver son adversaire."
       }
+    },
+    "pricing": {
+      "title": "Essai gratuit. Forfaits dès 7,99 £/mois.",
+      "body": "Commencez avec 2 générations gratuites, sans compte. Choisissez l’abonnement adapté à votre famille, ou prenez un pack de crédits et coloriez à votre rythme.",
+      "cta": "Voir tous les forfaits"
     }
   },
   "gallery": {
