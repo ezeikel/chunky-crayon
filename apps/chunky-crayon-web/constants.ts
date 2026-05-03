@@ -950,6 +950,7 @@ export const TRACKING_EVENTS = {
   PRICING_INTERVAL_TOGGLED: 'pricing_interval_toggled', // Monthly/Annual toggle
   PRICING_PLAN_CLICKED: 'pricing_plan_clicked', // Plan CTA clicked
   PRICING_CREDITS_CLICKED: 'pricing_credits_clicked', // Credit pack clicked
+  FAQ_OPENED: 'faq_opened', // FAQ accordion item opened (intent signal)
   COLOR_AS_YOU_GO_PAGE_VIEWED: 'color_as_you_go_page_viewed', // /color-as-you-go loaded
   COLOR_AS_YOU_GO_PACK_CLICKED: 'color_as_you_go_pack_clicked', // Public pack CTA clicked
 

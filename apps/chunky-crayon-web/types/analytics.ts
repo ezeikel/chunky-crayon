@@ -223,6 +223,11 @@ export type EventProperties = {
     creditAmount: number;
     price: string;
   };
+  [TRACKING_EVENTS.FAQ_OPENED]: {
+    faq_id: string;
+    faq_namespace: 'homepage' | 'pricing';
+    faq_question?: string;
+  };
   [TRACKING_EVENTS.COLOR_AS_YOU_GO_PAGE_VIEWED]: {
     isLoggedIn: boolean;
   };

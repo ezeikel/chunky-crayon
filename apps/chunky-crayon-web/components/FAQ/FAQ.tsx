@@ -7,6 +7,9 @@ import { faCircleQuestion } from '@fortawesome/pro-duotone-svg-icons';
 import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 import { FadeIn, StaggerChildren, StaggerItem } from '@/components/motion';
+import { trackEvent } from '@/utils/analytics-client';
+import { trackViewContent } from '@/utils/pixels';
+import { TRACKING_EVENTS } from '@/constants';
 
 // FAQ item IDs for homepage (general FAQ)
 const HOMEPAGE_FAQ_IDS = [
@@ -95,10 +98,6 @@ const FAQ = ({ className, namespace = 'homepage' }: FAQProps) => {
     '--fa-secondary-opacity': '1',
   } as React.CSSProperties;
 
-  const handleToggle = (id: string) => {
-    setOpenId(openId === id ? null : id);
-  };
-
   // Get the appropriate FAQ IDs based on namespace
   const faqIds = namespace === 'pricing' ? PRICING_FAQ_IDS : HOMEPAGE_FAQ_IDS;
 
@@ -115,6 +114,30 @@ const FAQ = ({ className, namespace = 'homepage' }: FAQProps) => {
       namespace === 'pricing' ? `faq.${id}.answer` : `faq.items.${id}.answer`,
     ),
   }));
+
+  const handleToggle = (id: string) => {
+    const isOpening = openId !== id;
+    setOpenId(isOpening ? id : null);
+
+    // Fire on open only — closing isn't an intent signal. PostHog gets
+    // the granular event for funnel analysis; Meta/Pinterest get
+    // ViewContent so the algorithm has a mid-funnel signal stronger
+    // than "landed on the page" but weaker than InitiateCheckout.
+    // Browser-only (no CAPI) — these are low-PII engagement signals.
+    if (isOpening) {
+      const item = faqItems.find((i) => i.id === id);
+      trackEvent(TRACKING_EVENTS.FAQ_OPENED, {
+        faq_id: id,
+        faq_namespace: namespace,
+        faq_question: item?.question,
+      });
+      trackViewContent({
+        contentType: namespace === 'pricing' ? 'pricing_faq' : 'homepage_faq',
+        contentId: `${namespace}_${id}`,
+        contentName: item?.question,
+      });
+    }
+  };
 
   // JSON-LD structured data for FAQPage schema
   const faqSchema = {

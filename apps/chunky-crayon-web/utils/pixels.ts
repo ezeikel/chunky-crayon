@@ -165,7 +165,12 @@ export const trackInitiateCheckout = (params: {
  * Track when a user views important content (pricing, product pages)
  */
 export const trackViewContent = (params: {
-  contentType: 'pricing' | 'coloring_page' | 'gallery';
+  contentType:
+    | 'pricing'
+    | 'coloring_page'
+    | 'gallery'
+    | 'pricing_faq'
+    | 'homepage_faq';
   contentId?: string;
   contentName?: string;
   value?: number;
