@@ -644,7 +644,11 @@
     "placeholder": "답을 입력하세요",
     "submit": "계속",
     "error": "조금만 더! 다시 해볼까요?",
-    "cancel": "뒤로 가기"
+    "cancel": "뒤로 가기",
+    "explanation": "부모님만 열 수 있도록 간단한 수학 문제를 사용해요.",
+    "whatIs": "뭐예요?",
+    "check": "네, 맞았어요",
+    "errorWithAttempts": "아직 아니에요 ({attempts}번 시도). 천천히 해도 돼요."
   },
   "stickers": {
     "categories": {
@@ -1333,5 +1337,36 @@
     "sending": "보내는 중...",
     "successTitle": "피드백 고마워요!",
     "successMessage": "시간 내어 도와주셔서 정말 감사해요. 더 멋지게 개선할게요!"
+  },
+  "startOverButton": {
+    "idle": "처음부터",
+    "modalTitle": "페이지를 지울까요?",
+    "modalBody": "칠한 색이 모두 사라지고 새 하얀 페이지로 시작해요.",
+    "confirm": "응, 새 페이지",
+    "cancel": "계속 색칠하기"
+  },
+  "shareButton": {
+    "idle": "공유하기",
+    "preparing": "예쁘게 포장 중...",
+    "doneSharing": "완료!"
+  },
+  "shareModal": {
+    "title": "그림 공유하기",
+    "privacyNote": "링크가 있는 누구나 이 페이지를 볼 수 있어요. 이름, 이메일 등 어떤 정보도 공유하지 않아요.",
+    "expiresIn": "링크 유효기간:",
+    "expiration": {
+      "7days": "1주",
+      "30days": "1개월",
+      "never": "영원히"
+    },
+    "createLink": "링크 만들기",
+    "creating": "링크 만드는 중...",
+    "success": {
+      "title": "링크 준비 완료",
+      "subtitle": "보여주고 싶은 사람에게 보내세요."
+    },
+    "done": "완료",
+    "error": "실패했어요. 잠시 후 다시 시도해 주세요.",
+    "socialShare": "또는 올리기"
   }
 }

@@ -644,7 +644,11 @@
     "placeholder": "答えを入力",
     "submit": "つづける",
     "error": "ちょっと違うみたい。もう一度！",
-    "cancel": "もどる"
+    "cancel": "もどる",
+    "explanation": "親御さんだけが開けられるように、かんたんな計算問題を出しています。",
+    "whatIs": "これは？",
+    "check": "うん、わかった",
+    "errorWithAttempts": "まだちがうよ（{attempts}回目）。あわてなくて大丈夫。"
   },
   "stickers": {
     "categories": {
@@ -1333,5 +1337,36 @@
     "sending": "送信中…",
     "successTitle": "フィードバックありがとうございます！",
     "successMessage": "お時間をいただき、アプリ改善にご協力いただきありがとうございます。"
+  },
+  "startOverButton": {
+    "idle": "最初から",
+    "modalTitle": "ページを消す？",
+    "modalBody": "塗った色が全部消えて、まっさらなページから始まるよ。",
+    "confirm": "うん、まっさらにする",
+    "cancel": "このまま塗る"
+  },
+  "shareButton": {
+    "idle": "シェア",
+    "preparing": "まとめてるよ…",
+    "doneSharing": "できたよ"
+  },
+  "shareModal": {
+    "title": "この作品をシェア",
+    "privacyNote": "リンクを知っている人は誰でも見られます。お名前やメールなどは共有しません。",
+    "expiresIn": "リンクの有効期限：",
+    "expiration": {
+      "7days": "1週間",
+      "30days": "1か月",
+      "never": "ずっと"
+    },
+    "createLink": "リンクを作る",
+    "creating": "リンクを作っています…",
+    "success": {
+      "title": "リンクができたよ",
+      "subtitle": "見せたい人に送ってね。"
+    },
+    "done": "完了",
+    "error": "うまくできなかったよ。少ししてからもう一度試してね。",
+    "socialShare": "または投稿する"
   }
 }

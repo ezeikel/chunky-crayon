@@ -644,7 +644,11 @@
     "placeholder": "Escribe tu respuesta",
     "submit": "Continuar",
     "error": "Casi, pero no. ¡Inténtalo de nuevo!",
-    "cancel": "Volver"
+    "cancel": "Volver",
+    "explanation": "Usamos un pequeño problema de matemáticas para que esto solo lo abran los padres.",
+    "whatIs": "¿Cuánto es",
+    "check": "Sí, lo tengo",
+    "errorWithAttempts": "Aún no es correcto ({attempts} intentos). Tómate tu tiempo."
   },
   "stickers": {
     "categories": {
@@ -1333,5 +1337,36 @@
     "sending": "Enviando...",
     "successTitle": "¡Gracias por tus comentarios!",
     "successMessage": "Agradecemos que te tomes un momento para ayudarnos a mejorar."
+  },
+  "startOverButton": {
+    "idle": "Empezar de nuevo",
+    "modalTitle": "¿Borrar la página?",
+    "modalBody": "Se borrarán todos tus colores y volverás a empezar con una página en blanco.",
+    "confirm": "Sí, página nueva",
+    "cancel": "Seguir coloreando"
+  },
+  "shareButton": {
+    "idle": "Compartir",
+    "preparing": "¡Lo estamos preparando...!",
+    "doneSharing": "¡Listo!"
+  },
+  "shareModal": {
+    "title": "Comparte este dibujo",
+    "privacyNote": "Cualquiera con el enlace puede ver esta página. No compartimos nombres, correos ni nada más.",
+    "expiresIn": "El enlace funciona por:",
+    "expiration": {
+      "7days": "1 semana",
+      "30days": "1 mes",
+      "never": "Para siempre"
+    },
+    "createLink": "Crear enlace",
+    "creating": "Creando tu enlace...",
+    "success": {
+      "title": "¡Enlace listo!",
+      "subtitle": "Envíalo a quien quieras enseñárselo."
+    },
+    "done": "Listo",
+    "error": "No funcionó. Inténtalo de nuevo en un momento.",
+    "socialShare": "O publícalo"
   }
 }

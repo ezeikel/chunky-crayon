@@ -644,7 +644,11 @@
     "placeholder": "Antwort eingeben",
     "submit": "Weiter",
     "error": "Das stimmt noch nicht ganz. Versuch’s nochmal!",
-    "cancel": "Zurück"
+    "cancel": "Zurück",
+    "explanation": "Wir nutzen eine kleine Rechenaufgabe, damit das nur Eltern öffnen können.",
+    "whatIs": "Was ist",
+    "check": "Ja, hab ich!",
+    "errorWithAttempts": "Noch nicht ganz ({attempts} Versuche). Lass dir Zeit."
   },
   "stickers": {
     "categories": {
@@ -1333,5 +1337,36 @@
     "sending": "Wird gesendet ...",
     "successTitle": "Danke für dein Feedback!",
     "successMessage": "Danke, dass du dir Zeit nimmst, uns zu verbessern."
+  },
+  "startOverButton": {
+    "idle": "Neu starten",
+    "modalTitle": "Seite löschen?",
+    "modalBody": "Alle Farben verschwinden und du startest mit einer leeren Seite.",
+    "confirm": "Ja, neue Seite",
+    "cancel": "Weiter ausmalen"
+  },
+  "shareButton": {
+    "idle": "Teilen",
+    "preparing": "Wird eingepackt...",
+    "doneSharing": "Fertig"
+  },
+  "shareModal": {
+    "title": "Dieses Kunstwerk teilen",
+    "privacyNote": "Alle mit dem Link können diese Seite sehen. Wir teilen keine Namen, E-Mails oder sonst etwas.",
+    "expiresIn": "Link gültig für:",
+    "expiration": {
+      "7days": "1 Woche",
+      "30days": "1 Monat",
+      "never": "Für immer"
+    },
+    "createLink": "Link erstellen",
+    "creating": "Link wird erstellt...",
+    "success": {
+      "title": "Link ist bereit",
+      "subtitle": "Schick ihn an alle, denen du es zeigen willst."
+    },
+    "done": "Fertig",
+    "error": "Das hat nicht geklappt. Versuch es gleich nochmal.",
+    "socialShare": "Oder posten"
   }
 }

@@ -644,7 +644,11 @@
     "placeholder": "Entre ta réponse",
     "submit": "Continuer",
     "error": "Ce n’est pas tout à fait ça. Réessaie !",
-    "cancel": "Retour"
+    "cancel": "Retour",
+    "explanation": "On utilise un petit calcul pour que seuls les parents puissent ouvrir.",
+    "whatIs": "Ça fait",
+    "check": "Oui, c'est bon",
+    "errorWithAttempts": "Toujours pas ({attempts} essais). Prends ton temps."
   },
   "stickers": {
     "categories": {
@@ -1333,5 +1337,36 @@
     "sending": "Envoi…",
     "successTitle": "Merci pour votre retour !",
     "successMessage": "Merci de prendre le temps de nous aider à nous améliorer."
+  },
+  "startOverButton": {
+    "idle": "Recommencer",
+    "modalTitle": "Effacer la page ?",
+    "modalBody": "Toutes tes couleurs disparaissent et tu repars avec une page blanche.",
+    "confirm": "Oui, page toute neuve",
+    "cancel": "Continuer à colorier"
+  },
+  "shareButton": {
+    "idle": "Partager",
+    "preparing": "On emballe tout...",
+    "doneSharing": "C’est fait"
+  },
+  "shareModal": {
+    "title": "Partager ce dessin",
+    "privacyNote": "Toute personne avec le lien peut voir cette page. Nous ne partageons ni noms, ni e-mails, ni rien d’autre.",
+    "expiresIn": "Lien valable :",
+    "expiration": {
+      "7days": "1 semaine",
+      "30days": "1 mois",
+      "never": "Pour toujours"
+    },
+    "createLink": "Créer le lien",
+    "creating": "Création du lien...",
+    "success": {
+      "title": "Lien prêt",
+      "subtitle": "Envoie-le à qui tu veux montrer."
+    },
+    "done": "C’est fait",
+    "error": "Ça n’a pas marché. Réessaie dans un instant.",
+    "socialShare": "Ou publie-le"
   }
 }
