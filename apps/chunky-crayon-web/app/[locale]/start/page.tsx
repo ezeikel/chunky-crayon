@@ -8,8 +8,8 @@ import StartProblem from './components/StartProblem';
 import StartHowItWorks from './components/StartHowItWorks';
 import LandingDemo from '@/components/LandingDemo/LandingDemo';
 import StartFeatures from './components/StartFeatures';
-import StartPricing from './components/StartPricing';
 import StartFinalCta from './components/StartFinalCta';
+import PricingTeaser from '@/components/PricingTeaser';
 import Testimonials from '@/components/Testimonials';
 import FAQ from '@/components/FAQ';
 import LandingPageViewTracker from '@/components/LandingPageViewTracker';
@@ -196,14 +196,15 @@ async function StartStaticBody() {
       {/* Testimonials + FAQ are designed to be rendered inside a parent
           that provides horizontal padding (the homepage uses PageWrap).
           /start sets per-section padding so we wrap them here to match
-          the visual edge of StartFeatures / StartPricing above + below. */}
+          the visual edge of StartFeatures / PricingTeaser above + below. */}
       <div className="px-4 md:px-6 lg:px-8">
         <Testimonials />
       </div>
-      <StartPricing
+      <PricingTeaser
         title={t('pricing.title')}
         body={t('pricing.body')}
         ctaLabel={t('pricing.cta')}
+        location="start"
       />
       <div className="px-4 md:px-6 lg:px-8">
         <FAQ />

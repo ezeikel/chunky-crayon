@@ -104,6 +104,11 @@
     }
   },
   "homepage": {
+    "pricing": {
+      "title": "Free to try. Plans from £7.99/month.",
+      "body": "Start with 2 free generations, no account needed. Pick a subscription that fits your family, or grab a credit pack and Color as you go.",
+      "cta": "See all plans"
+    },
     "heroEyebrow": "The first coloring app that takes requests.",
     "heroTitle": "Stop Googling \"dinosaur coloring page\" at 5pm.",
     "heroTitlePrefix": "Stop Googling ",

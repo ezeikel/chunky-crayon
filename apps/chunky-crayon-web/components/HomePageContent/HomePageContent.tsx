@@ -1,10 +1,12 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Loading from '@/components/Loading/Loading';
 import Testimonials from '@/components/Testimonials';
 import FAQ from '@/components/FAQ';
+import PricingTeaser from '@/components/PricingTeaser';
 import LandingPageViewTracker from '@/components/LandingPageViewTracker';
 import DashboardHeader from './DashboardHeader';
 import type { ColoState } from '@/lib/colo';
@@ -45,6 +47,7 @@ const HomePageContent = ({
   demo,
 }: HomePageContentProps) => {
   const { status } = useSession();
+  const t = useTranslations('homepage.pricing');
   const isLoggedIn = status === 'authenticated';
   const isLoading = status === 'loading';
 
@@ -134,6 +137,18 @@ const HomePageContent = ({
       {galleryPreview && (
         <div className="w-full relative z-10">{galleryPreview}</div>
       )}
+
+      {/* Pricing teaser - one-line "see all plans" link, just before
+          FAQ. Mirrors /start so visitors who land on / from organic
+          or direct see the same path-to-pricing cue. */}
+      <div className="w-full relative z-10">
+        <PricingTeaser
+          title={t('title')}
+          body={t('body')}
+          ctaLabel={t('cta')}
+          location="homepage"
+        />
+      </div>
 
       {/* FAQ section */}
       <FAQ className="relative z-10" />

@@ -228,6 +228,9 @@ export type EventProperties = {
     faq_namespace: 'homepage' | 'pricing';
     faq_question?: string;
   };
+  [TRACKING_EVENTS.PRICING_TEASER_CLICKED]: {
+    location: 'homepage' | 'start';
+  };
   [TRACKING_EVENTS.COLOR_AS_YOU_GO_PAGE_VIEWED]: {
     isLoggedIn: boolean;
   };
