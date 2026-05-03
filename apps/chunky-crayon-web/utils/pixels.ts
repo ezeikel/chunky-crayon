@@ -195,23 +195,39 @@ export const trackViewContent = (params: {
 
 /**
  * Track when a user generates a lead action (e.g., creating content, starting trial)
+ *
+ * Pass `eventId` (typically the coloringImageId from the create action)
+ * so Meta deduplicates this client fire against the matching CAPI fire
+ * from createPendingColoringImage. Without it, Meta double-counts.
  */
 export const trackLead = (params: {
   contentName: string;
   contentCategory?: string;
   value?: number;
   currency?: string;
+  eventId?: string;
 }) => {
-  trackFacebookEvent('Lead', {
+  const w = window as WindowWithPixels;
+  const fbParams = {
     content_name: params.contentName,
     content_category: params.contentCategory,
     value: params.value,
     currency: params.currency,
-  });
-
-  trackPinterestEvent('lead', {
-    lead_type: params.contentCategory || 'content_creation',
-  });
+  };
+  if (w.fbq) {
+    w.fbq(
+      'track',
+      'Lead',
+      fbParams,
+      ...(params.eventId ? [{ eventID: params.eventId }] : []),
+    );
+  }
+  if (w.pintrk) {
+    w.pintrk('track', 'lead', {
+      lead_type: params.contentCategory || 'content_creation',
+      ...(params.eventId && { event_id: params.eventId }),
+    });
+  }
 };
 
 /**

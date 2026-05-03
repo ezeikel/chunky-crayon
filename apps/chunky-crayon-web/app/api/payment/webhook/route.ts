@@ -85,11 +85,20 @@ export const POST = async (req: Request) => {
 
     // Meta match data round-tripped from createCheckoutSession via
     // Stripe metadata. Stripe metadata values are strings.
+    // Stripe Checkout fills in customer_details.{phone,name} when the
+    // user provides them — passing those to CAPI lifts Match Quality
+    // (more match keys = better lookalike seeding + attribution).
+    const customerName = session.customer_details?.name?.trim();
+    const [firstName, ...lastNameParts] = customerName?.split(/\s+/) ?? [];
+    const lastName = lastNameParts.join(' ') || undefined;
     const matchData = {
       fbp: session.metadata?.fbp || undefined,
       fbc: session.metadata?.fbc || undefined,
       ipAddress: session.metadata?.client_ip_address || undefined,
       userAgent: session.metadata?.client_user_agent || undefined,
+      phone: session.customer_details?.phone || undefined,
+      firstName: firstName || undefined,
+      lastName,
     };
 
     let user: (User & { subscriptions: Subscription[] }) | null = null;

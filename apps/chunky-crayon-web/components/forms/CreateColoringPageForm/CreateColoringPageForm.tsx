@@ -71,6 +71,7 @@ const MultiModeForm = ({
     trackLead({
       contentName: desc || 'Coloring Page',
       contentCategory: 'coloring_page_creation',
+      eventId: id,
     });
     signalGalleryRefresh('image-created');
 

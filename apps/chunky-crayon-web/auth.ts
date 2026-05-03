@@ -104,10 +104,19 @@ const config = {
         // Browser PixelTracker fires the same event with userId as
         // event_id; Meta deduplicates so we don't double-count. Wrapped
         // in catch so a CAPI outage never blocks the signup itself.
+        // Pull first/last name from the Google profile (given_name /
+        // family_name) — extra match keys push Meta's Match Quality
+        // from ~6/10 to ~8/10, which materially improves attribution
+        // and lookalike audience seeding.
         const hints = await readClientMatchData();
+        const googleProfile = profile as
+          | { given_name?: string; family_name?: string }
+          | undefined;
         sendSignupConversionEvents({
           email: created.email!,
           userId: created.id,
+          firstName: googleProfile?.given_name,
+          lastName: googleProfile?.family_name,
           signupMethod: 'google',
           ...hints,
         }).catch((err) => {

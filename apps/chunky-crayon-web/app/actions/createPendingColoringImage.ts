@@ -35,6 +35,10 @@ import {
   generateQuickTitleFromVoice,
   generateQuickTitleFromPhoto,
 } from '@/app/actions/quickTitle';
+import {
+  readClientMatchData,
+  sendLeadConversionEvents,
+} from '@/lib/conversion-api';
 
 // Mode-specific credit cost. Voice runs richer pipelines upstream
 // (Deepgram STT + Claude follow-up + ElevenLabs TTS) so it costs more.
@@ -364,6 +368,37 @@ export const createPendingColoringImage = async (
     }
 
     await postToWorker(workerBody);
+
+    // Server-side Lead event for Meta + Pinterest. Mirrors the browser
+    // trackLead fire from CreateColoringPageForm — gives Meta the
+    // intent signal even when the browser pixel is blocked (iOS
+    // in-app browsers, ad blockers). eventId = pending.id matches the
+    // client fire so Meta deduplicates. Fire-and-forget; CAPI failures
+    // must never block image creation.
+    void (async () => {
+      try {
+        const match = await readClientMatchData();
+        const email = userId
+          ? ((
+              await db.user.findUnique({
+                where: { id: userId },
+                select: { email: true },
+              })
+            )?.email ?? undefined)
+          : undefined;
+        await sendLeadConversionEvents({
+          email,
+          userId: userId ?? undefined,
+          eventId: pending.id,
+          contentName: description || 'Coloring Page',
+          contentCategory: 'coloring_page_creation',
+          ...match,
+        });
+      } catch (err) {
+        console.error('[createPendingColoringImage] Lead CAPI failed:', err);
+      }
+    })();
+
     return { ok: true, id: pending.id };
   } catch (err) {
     console.error('[createPendingColoringImage]', err);
