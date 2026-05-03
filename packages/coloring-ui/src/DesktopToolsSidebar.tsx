@@ -578,7 +578,12 @@ const DesktopToolsSidebar = ({
         <>
           <div className="h-px bg-coloring-surface-dark" />
           <ActionButtonSizeProvider value={actionSlotSize}>
-            <div className="flex flex-wrap items-start justify-between gap-2">
+            {/* 3-col grid matches the tool grid above so action tiles
+             * line up column-for-column. Wraps to a second row when
+             * there are 4+ actions (e.g. authenticated users see a 5th
+             * SaveToGallery tile). w-fit keeps the grid tight to the
+             * tile width instead of stretching across the sidebar. */}
+            <div className={cn("grid grid-cols-3 w-fit", gridGap)}>
               {actions}
             </div>
           </ActionButtonSizeProvider>
