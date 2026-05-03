@@ -95,6 +95,11 @@ const nextConfig: NextConfig = {
     '@resvg/resvg-js',
     'playwright',
   ],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
 };
 
 // sentry configuration options
