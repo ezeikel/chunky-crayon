@@ -45,7 +45,13 @@ const getInitialsBg = (translationKey: string): string => {
   return INITIALS_BG_PALETTE[hash % INITIALS_BG_PALETTE.length];
 };
 
-const StarRating = ({ rating }: { rating: number }) => {
+// Renders 5 stars with `floor(rating)` filled + the rest outlined.
+// Aggregate ratings like 4.6 floor to 4 filled stars; the precise
+// number sits next to the icons so the at-a-glance read is "4 out of
+// 5" while the literal value stays accurate. Matches Amazon /
+// Trustpilot / App Store convention. Exported for reuse on the
+// pricing trust strip.
+export const StarRating = ({ rating }: { rating: number }) => {
   const filledStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-color': 'hsl(var(--crayon-orange))',
@@ -58,6 +64,8 @@ const StarRating = ({ rating }: { rating: number }) => {
     '--fa-secondary-opacity': '1',
   } as React.CSSProperties;
 
+  const filled = Math.floor(rating);
+
   return (
     <div className="flex gap-0.5">
       {[...Array(5)].map((_, i) => (
@@ -65,7 +73,7 @@ const StarRating = ({ rating }: { rating: number }) => {
           key={i}
           icon={faStar}
           className="w-4 h-4"
-          style={i < rating ? filledStyle : emptyStyle}
+          style={i < filled ? filledStyle : emptyStyle}
         />
       ))}
     </div>
@@ -178,7 +186,7 @@ const SocialProofHeader = () => {
 
         {/* Rating */}
         <div className="flex items-center gap-2">
-          <StarRating rating={Math.round(SOCIAL_PROOF_STATS.averageRating)} />
+          <StarRating rating={SOCIAL_PROOF_STATS.averageRating} />
           <span className="font-bold text-text-primary">
             {SOCIAL_PROOF_STATS.averageRating}
           </span>

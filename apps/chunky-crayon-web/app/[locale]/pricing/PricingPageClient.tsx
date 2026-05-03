@@ -15,12 +15,14 @@ import {
   faMobileScreen,
   faPeopleRoof,
 } from '@fortawesome/pro-duotone-svg-icons';
-import {
-  faCheck,
-  faStar as faStarSolid,
-} from '@fortawesome/pro-solid-svg-icons';
+import { faCheck } from '@fortawesome/pro-solid-svg-icons';
 import { PlanName, BillingPeriod } from '@one-colored-pixel/db/types';
-import { PlanInterval, SUBSCRIPTION_PLANS, TRACKING_EVENTS } from '@/constants';
+import {
+  PlanInterval,
+  SOCIAL_PROOF_STATS,
+  SUBSCRIPTION_PLANS,
+  TRACKING_EVENTS,
+} from '@/constants';
 import { trackEvent } from '@/utils/analytics-client';
 import {
   Card,
@@ -40,7 +42,7 @@ import StaggerItem from '@/components/motion/StaggerItem';
 import CrayonScribble from '@/components/Intro/CrayonScribble';
 import { trackViewContent, trackInitiateCheckout } from '@/utils/pixels';
 import FAQ from '@/components/FAQ/FAQ';
-import Testimonials from '@/components/Testimonials';
+import Testimonials, { StarRating } from '@/components/Testimonials';
 import { Experiment } from '@/components/experiment/Experiment';
 
 // Stable seed per plan key so the price underline is the same shape on
@@ -211,15 +213,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                       }}
                       className="inline-flex items-center gap-2 font-semibold text-crayon-orange hover:text-crayon-orange-dark hover:underline underline-offset-4 decoration-2 transition-colors cursor-pointer"
                     >
-                      <span className="inline-flex gap-0.5" aria-hidden>
-                        {[0, 1, 2, 3, 4].map((i) => (
-                          <FontAwesomeIcon
-                            key={i}
-                            icon={faStarSolid}
-                            className="text-sm"
-                          />
-                        ))}
-                      </span>
+                      <StarRating rating={SOCIAL_PROOF_STATS.averageRating} />
                       <span>{t('trustStrip.rating')}</span>
                     </a>
                     <span aria-hidden className="opacity-40">
@@ -240,15 +234,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                       }}
                       className="inline-flex items-center gap-2 font-semibold text-crayon-orange hover:text-crayon-orange-dark hover:underline underline-offset-4 decoration-2 transition-colors cursor-pointer"
                     >
-                      <span className="inline-flex gap-0.5" aria-hidden>
-                        {[0, 1, 2, 3, 4].map((i) => (
-                          <FontAwesomeIcon
-                            key={i}
-                            icon={faStarSolid}
-                            className="text-sm"
-                          />
-                        ))}
-                      </span>
+                      <StarRating rating={SOCIAL_PROOF_STATS.averageRating} />
                       <span>{t('trustStrip.rating')}</span>
                     </a>
                     <span aria-hidden className="opacity-40">
