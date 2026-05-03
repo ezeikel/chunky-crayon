@@ -162,37 +162,55 @@
           "name": "田中 美咲",
           "role": "2児のママ",
           "quote": "子どもたちが本当に大好き！自分だけの魔法の世界を作って、何時間でもぬっています。もうスクリーン時間でケンカしなくなりました！",
-          "avatar": "/images/testimonials/avatar-1.svg"
+          "avatar": "/images/testimonials/avatar-1.svg",
+          "location": "イギリス・ブリストル"
         },
         "2": {
           "name": "鈴木 健太",
           "role": "3児のパパ",
           "quote": "やっと、創造力とテクノロジーを健やかに組み合わせたものに出会えました。娘が「ユニコーンのプリンセスのお城」を作って、完璧でした！",
-          "avatar": "/images/testimonials/avatar-2.svg"
+          "avatar": "/images/testimonials/avatar-2.svg",
+          "location": "米国・テキサス州オースティン"
         },
         "3": {
           "name": "山田 あゆみ",
           "role": "小学校の先生",
           "quote": "授業で創作作文のお題に使っています。子どもが欲しいものを言葉で伝えて、それをぬりえに。みんな夢中です！",
-          "avatar": "/images/testimonials/avatar-3.svg"
+          "avatar": "/images/testimonials/avatar-3.svg",
+          "location": "イギリス・リーズ"
         },
         "4": {
           "name": "佐藤 正雄",
           "role": "おじいちゃん",
           "quote": "孫たちが、いっしょに新しいぬりえを作るために毎週末遊びに来るように。最高のふれあい時間です！",
-          "avatar": "/images/testimonials/avatar-4.svg"
+          "avatar": "/images/testimonials/avatar-4.svg",
+          "location": "イギリス・マンチェスター"
         },
         "5": {
           "name": "高橋 由美",
           "role": "チャイルドマインダー",
           "quote": "見ている子どもたちが夢中です。ドラゴン、妖精、ロケット…想像したものがなんでも形になります！",
-          "avatar": "/images/testimonials/avatar-5.svg"
+          "avatar": "/images/testimonials/avatar-5.svg",
+          "location": "米国・オレゴン州ポートランド"
         },
         "6": {
           "name": "伊藤 大輔",
           "role": "パパ＆デザイナー",
           "quote": "デザイナーとして品質に感動。パパとしては、息子のアイデアがぬりえになって笑顔になるのを見るのが大好きです！",
-          "avatar": "/images/testimonials/avatar-6.svg"
+          "avatar": "/images/testimonials/avatar-6.svg",
+          "location": "米国・コロラド州デンバー"
+        },
+        "7": {
+          "name": "プリヤ・シャー",
+          "role": "チャイルドマインダー",
+          "location": "イギリス・バーミンガム",
+          "quote": "3〜7歳の子を5人見ています。前はみんなに同じ恐竜のページを印刷して、泣いちゃうことも。今はそれぞれの「大好き」が入ったページに（エイデンははたらく車、ザラはユニコーン、ベンはBluey）。本当に助かってます。"
+        },
+        "8": {
+          "name": "トム・ウィテカー",
+          "role": "アイリス（3歳）のパパ",
+          "location": "イギリス・シェフィールド",
+          "quote": "うちはアプリで塗るより印刷がメイン。アイリスの小さな指だとスマホ画面はケンカになりがちで、iPadでも3歳にはちょっと難しい。印刷は最高です。くっきり出て、大きくて、しっかり塗れます。"
         }
       }
     },

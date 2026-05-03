@@ -162,37 +162,55 @@
           "name": "Anna M.",
           "role": "Mama von 2",
           "quote": "Meine Kinder lieben das total! Sie verbringen Stunden damit, ihre eigenen magischen Welten zu erfinden und auszumalen. Keine Bildschirmzeit-Diskussionen mehr!",
-          "avatar": "/images/testimonials/avatar-1.svg"
+          "avatar": "/images/testimonials/avatar-1.svg",
+          "location": "Bristol, UK"
         },
         "2": {
           "name": "Markus S.",
           "role": "Papa von 3",
           "quote": "Endlich etwas, das Kreativität und Technik auf eine gesunde Weise verbindet. Meine Tochter hat ein Einhorn-Prinzessinnen-Schloss gemacht – einfach perfekt!",
-          "avatar": "/images/testimonials/avatar-2.svg"
+          "avatar": "/images/testimonials/avatar-2.svg",
+          "location": "Austin, Texas"
         },
         "3": {
           "name": "Julia K.",
           "role": "Grundschullehrerin",
           "quote": "Ich nutze das im Unterricht für kreative Schreibimpulse. Die Kinder beschreiben, was sie wollen, und malen dann ihre Werke aus. Sie sind total begeistert!",
-          "avatar": "/images/testimonials/avatar-3.svg"
+          "avatar": "/images/testimonials/avatar-3.svg",
+          "location": "Leeds, UK"
         },
         "4": {
           "name": "Hans W.",
           "role": "Opa",
           "quote": "Meine Enkel kommen jetzt jedes Wochenende vorbei, nur um zusammen neue Ausmalbilder zu machen. So eine schöne gemeinsame Zeit!",
-          "avatar": "/images/testimonials/avatar-4.svg"
+          "avatar": "/images/testimonials/avatar-4.svg",
+          "location": "Manchester, UK"
         },
         "5": {
           "name": "Sabine B.",
           "role": "Tagesmutter",
           "quote": "Die Kinder, die ich betreue, bekommen gar nicht genug davon. Drachen, Feen, Raketen – was sie sich ausdenken, wird lebendig!",
-          "avatar": "/images/testimonials/avatar-5.svg"
+          "avatar": "/images/testimonials/avatar-5.svg",
+          "location": "Portland, Oregon"
         },
         "6": {
           "name": "Stefan H.",
           "role": "Papa & Designer",
           "quote": "Als Designer schätze ich die Qualität. Als Papa liebe ich es, wenn das Gesicht meines Sohnes strahlt, sobald seine Ideen zu Ausmalbildern werden!",
-          "avatar": "/images/testimonials/avatar-6.svg"
+          "avatar": "/images/testimonials/avatar-6.svg",
+          "location": "Denver, Colorado"
+        },
+        "7": {
+          "name": "Priya Shah",
+          "role": "Tagesmutter",
+          "location": "Birmingham, UK",
+          "quote": "Ich betreue fünf Kinder im Alter von 3 bis 7. Früher habe ich für alle die gleiche Dino-Seite ausgedruckt – und es gab Tränen. Jetzt bekommt jedes Kind eine Seite mit seiner echten Lieblingssache (Aidens Bagger, Zaras Einhörner, Bens Bluey). Ein Lebensretter."
+        },
+        "8": {
+          "name": "Tom Whitaker",
+          "role": "Papa von Iris, 3",
+          "location": "Sheffield, UK",
+          "quote": "Wir drucken meistens, statt in der App auszumalen. Iris’ kleine Finger auf dem Handy sind ein Kampf, und selbst das iPad ist für ihr Alter noch etwas fummelig. Aber das Drucken ist super: Die Seiten kommen schön scharf raus und groß genug zum richtigen Ausmalen."
         }
       }
     },

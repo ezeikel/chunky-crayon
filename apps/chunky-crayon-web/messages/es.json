@@ -162,37 +162,55 @@
           "name": "María G.",
           "role": "Mamá de 2",
           "quote": "¡A mis peques les encanta! Pasan horas creando y coloreando sus propios mundos mágicos. ¡Se acabaron las peleas por el tiempo de pantalla!",
-          "avatar": "/images/testimonials/avatar-1.svg"
+          "avatar": "/images/testimonials/avatar-1.svg",
+          "location": "Bristol, Reino Unido"
         },
         "2": {
           "name": "Carlos R.",
           "role": "Papá de 3",
           "quote": "Por fin algo que combina creatividad y tecnología de forma saludable. Mi hija hizo un castillo de princesa unicornio y ¡quedó perfecto!",
-          "avatar": "/images/testimonials/avatar-2.svg"
+          "avatar": "/images/testimonials/avatar-2.svg",
+          "location": "Austin, TX"
         },
         "3": {
           "name": "Laura M.",
           "role": "Maestra de primaria",
           "quote": "Lo uso en clase como inspiración para escribir. Los niños describen lo que quieren, y luego colorean sus creaciones. ¡Están súper motivados!",
-          "avatar": "/images/testimonials/avatar-3.svg"
+          "avatar": "/images/testimonials/avatar-3.svg",
+          "location": "Leeds, Reino Unido"
         },
         "4": {
           "name": "Antonio L.",
           "role": "Abuelo",
           "quote": "Mis nietos vienen todos los fines de semana solo para crear nuevas páginas para colorear juntos. ¡Qué momento tan bonito para compartir!",
-          "avatar": "/images/testimonials/avatar-4.svg"
+          "avatar": "/images/testimonials/avatar-4.svg",
+          "location": "Manchester, Reino Unido"
         },
         "5": {
           "name": "Carmen S.",
           "role": "Cuidadora infantil",
           "quote": "Los peques que cuido no se cansan. Dragones, hadas, cohetes... ¡todo lo que imaginan cobra vida!",
-          "avatar": "/images/testimonials/avatar-5.svg"
+          "avatar": "/images/testimonials/avatar-5.svg",
+          "location": "Portland, OR"
         },
         "6": {
           "name": "Pablo F.",
           "role": "Papá y diseñador",
           "quote": "Como diseñador, valoro la calidad. Como papá, me encanta ver la carita de mi hijo iluminarse cuando sus ideas se convierten en páginas para colorear.",
-          "avatar": "/images/testimonials/avatar-6.svg"
+          "avatar": "/images/testimonials/avatar-6.svg",
+          "location": "Denver, CO"
+        },
+        "7": {
+          "name": "Priya Shah",
+          "role": "Cuidadora infantil",
+          "location": "Birmingham, Reino Unido",
+          "quote": "Cuido a cinco peques de 3 a 7 años. Antes imprimía la misma página de dinosaurio para todos y acababa en lágrimas. Ahora cada uno tiene una página con su obsesión real (las excavadoras de Aiden, los unicornios de Zara, Bluey de Ben). Un salvavidas."
+        },
+        "8": {
+          "name": "Tom Whitaker",
+          "role": "Papá de Iris, 3",
+          "location": "Sheffield, Reino Unido",
+          "quote": "Casi siempre imprimimos en vez de colorear en la app. Los deditos de Iris en la pantalla del móvil son una lucha, y hasta el iPad se le hace un poco complicado para su edad. Pero la parte de imprimir es genial. Las páginas salen nítidas y lo bastante grandes para colorear bien."
         }
       }
     },

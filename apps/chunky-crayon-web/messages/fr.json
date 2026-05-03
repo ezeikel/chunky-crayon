@@ -162,37 +162,55 @@
           "name": "Sophie M.",
           "role": "Maman de 2",
           "quote": "Mes enfants adorent ! Ils passent des heures à créer et colorier leurs propres mondes magiques. Fini les batailles de temps d'écran !",
-          "avatar": "/images/testimonials/avatar-1.svg"
+          "avatar": "/images/testimonials/avatar-1.svg",
+          "location": "Bristol, Royaume-Uni"
         },
         "2": {
           "name": "Thomas D.",
           "role": "Papa de 3",
           "quote": "Enfin quelque chose qui mêle créativité et technologie de façon saine. Ma fille a créé un château de princesse licorne, c'était parfait !",
-          "avatar": "/images/testimonials/avatar-2.svg"
+          "avatar": "/images/testimonials/avatar-2.svg",
+          "location": "Austin, Texas"
         },
         "3": {
           "name": "Camille R.",
           "role": "Enseignante en primaire",
           "quote": "Je l'utilise en classe pour lancer l'écriture créative. Les enfants décrivent ce qu'ils veulent, puis colorient leurs créations. Ils sont à fond !",
-          "avatar": "/images/testimonials/avatar-3.svg"
+          "avatar": "/images/testimonials/avatar-3.svg",
+          "location": "Leeds, Royaume-Uni"
         },
         "4": {
           "name": "Jean-Pierre L.",
           "role": "Grand-père",
           "quote": "Mes petits-enfants viennent tous les week-ends maintenant juste pour créer de nouvelles pages à colorier ensemble. Un vrai moment de complicité !",
-          "avatar": "/images/testimonials/avatar-4.svg"
+          "avatar": "/images/testimonials/avatar-4.svg",
+          "location": "Manchester, Royaume-Uni"
         },
         "5": {
           "name": "Claire B.",
           "role": "Assistante maternelle",
           "quote": "Les enfants que je garde en redemandent. Dragons, fées, fusées… tout ce qu'ils imaginent prend vie !",
-          "avatar": "/images/testimonials/avatar-5.svg"
+          "avatar": "/images/testimonials/avatar-5.svg",
+          "location": "Portland, Oregon"
         },
         "6": {
           "name": "Nicolas P.",
           "role": "Papa & designer",
           "quote": "En tant que designer, j'apprécie la qualité. En tant que papa, j'adore voir le sourire de mon fils quand ses idées deviennent des pages à colorier !",
-          "avatar": "/images/testimonials/avatar-6.svg"
+          "avatar": "/images/testimonials/avatar-6.svg",
+          "location": "Denver, Colorado"
+        },
+        "7": {
+          "name": "Priya Shah",
+          "role": "Assistante maternelle",
+          "location": "Birmingham, Royaume-Uni",
+          "quote": "Je garde cinq enfants de 3 à 7 ans. Avant, j’imprimais la même page de dinosaures pour tout le monde et c’était les larmes. Maintenant, chacun a une page sur sa vraie passion (les pelleteuses d’Aiden, les licornes de Zara, Bluey de Ben). Un vrai sauveur."
+        },
+        "8": {
+          "name": "Tom Whitaker",
+          "role": "Papa d’Iris, 3 ans",
+          "location": "Sheffield, Royaume-Uni",
+          "quote": "On imprime surtout plutôt que de colorier dans l’app. Les petits doigts d’Iris sur un écran de téléphone, c’est la bagarre, et même l’iPad est un peu trop délicat pour son âge. Par contre, l’impression est géniale. Les pages sortent nettes et assez grandes pour un vrai coloriage."
         }
       }
     },
