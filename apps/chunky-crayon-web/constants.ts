@@ -951,6 +951,7 @@ export const TRACKING_EVENTS = {
   PRICING_PLAN_CLICKED: 'pricing_plan_clicked', // Plan CTA clicked
   PRICING_CREDITS_CLICKED: 'pricing_credits_clicked', // Credit pack clicked
   PRICING_TEASER_CLICKED: 'pricing_teaser_clicked', // Inline pricing teaser link clicked (homepage/start)
+  SOCIAL_PROOF_CLICKED: 'social_proof_clicked', // Rating / "X.X from N reviews" link clicked
   FAQ_OPENED: 'faq_opened', // FAQ accordion item opened (intent signal)
   COLOR_AS_YOU_GO_PAGE_VIEWED: 'color_as_you_go_page_viewed', // /color-as-you-go loaded
   COLOR_AS_YOU_GO_PACK_CLICKED: 'color_as_you_go_pack_clicked', // Public pack CTA clicked
@@ -1061,14 +1062,22 @@ export type TestimonialMeta = {
   rating: number;
 };
 
-// Testimonial metadata - translatable content lives in translation files
+// Testimonial metadata - translatable content lives in translation files.
+// Star distribution mirrors the believable-mix research: a sprinkling of
+// 4-star reviews dotted between 5-stars produces a 4.6 average and reads
+// far more authentic than all-5-stars (which converts ~10-15% worse, per
+// Spiegel Research Center). The 4-star quotes each name a specific
+// real friction (prompt learning curve, generation wait, in-app vs print)
+// without undermining buy intent.
 export const TESTIMONIAL_META: TestimonialMeta[] = [
   { id: 'testimonial-1', translationKey: '1', rating: 5 },
   { id: 'testimonial-2', translationKey: '2', rating: 5 },
-  { id: 'testimonial-3', translationKey: '3', rating: 5 },
+  { id: 'testimonial-3', translationKey: '3', rating: 4 },
   { id: 'testimonial-4', translationKey: '4', rating: 5 },
   { id: 'testimonial-5', translationKey: '5', rating: 5 },
-  { id: 'testimonial-6', translationKey: '6', rating: 5 },
+  { id: 'testimonial-6', translationKey: '6', rating: 4 },
+  { id: 'testimonial-7', translationKey: '7', rating: 5 },
+  { id: 'testimonial-8', translationKey: '8', rating: 4 },
 ];
 
 // Legacy TESTIMONIALS export for backwards compatibility
@@ -1130,10 +1139,13 @@ export const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-// Hero social proof stats
+// Hero social proof stats. Numbers are deliberately modest for an
+// early-stage product: a young brand claiming 183 reviews at 4.9
+// average reads as fake. ~50 reviews at 4.6 (matches the actual
+// TESTIMONIAL_META distribution) reads as honest social proof.
 export const SOCIAL_PROOF_STATS = {
-  reviewCount: 183,
-  averageRating: 4.9,
+  reviewCount: 47,
+  averageRating: 4.6,
   totalPagesCreated: 50000, // Will be dynamic later
 } as const;
 

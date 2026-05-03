@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from '@fortawesome/pro-solid-svg-icons';
 import { faStar, faSparkles } from '@fortawesome/pro-duotone-svg-icons';
@@ -15,6 +14,35 @@ import { FadeIn, StaggerChildren, StaggerItem } from '@/components/motion';
 
 type TestimonialsProps = {
   className?: string;
+  /** Where this section is rendered — drives social_proof_clicked location. */
+  location?: 'homepage' | 'start' | 'pricing';
+};
+
+// Brand-coloured backgrounds for the initials circles. Picked to feel
+// playful without clashing with the existing crayon palette. Cycled by
+// translationKey so the same testimonial always gets the same colour.
+const INITIALS_BG_PALETTE = [
+  'bg-crayon-orange',
+  'bg-crayon-teal',
+  'bg-crayon-pink',
+  'bg-crayon-purple',
+  'bg-crayon-yellow',
+  'bg-crayon-green',
+] as const;
+
+const getInitials = (name: string): string => {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
+const getInitialsBg = (translationKey: string): string => {
+  // Simple stable hash: sum of char codes, mod palette length
+  let hash = 0;
+  for (let i = 0; i < translationKey.length; i += 1) {
+    hash += translationKey.charCodeAt(i);
+  }
+  return INITIALS_BG_PALETTE[hash % INITIALS_BG_PALETTE.length];
 };
 
 const StarRating = ({ rating }: { rating: number }) => {
@@ -49,13 +77,13 @@ const TestimonialCard = ({
   name,
   role,
   quote,
-  avatar,
+  location,
 }: {
   testimonial: TestimonialMeta;
   name: string;
   role: string;
   quote: string;
-  avatar: string;
+  location?: string;
 }) => (
   <StaggerItem className="bg-white rounded-2xl p-6 shadow-card border-2 border-paper-cream-dark hover:shadow-lg hover:border-crayon-orange/30 transition-all duration-300 group">
     {/* Quote icon */}
@@ -71,12 +99,24 @@ const TestimonialCard = ({
 
     {/* Author info */}
     <div className="flex items-center gap-3">
-      <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-crayon-orange/20">
-        <Image src={avatar} alt={name} fill className="object-cover" />
+      <div
+        className={cn(
+          'flex items-center justify-center w-12 h-12 rounded-full text-white font-tondo font-bold text-base shadow-sm border-2 border-white',
+          getInitialsBg(testimonial.translationKey),
+        )}
+        aria-hidden
+      >
+        {getInitials(name)}
       </div>
-      <div className="flex-1">
-        <p className="font-bold text-text-primary font-tondo">{name}</p>
-        {role && <p className="text-sm text-text-tertiary">{role}</p>}
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-text-primary font-tondo truncate">
+          {name}
+        </p>
+        {(role || location) && (
+          <p className="text-sm text-text-tertiary truncate">
+            {[role, location].filter(Boolean).join(' • ')}
+          </p>
+        )}
       </div>
       {testimonial.rating && <StarRating rating={testimonial.rating} />}
     </div>
@@ -112,24 +152,28 @@ const SocialProofHeader = () => {
 
       {/* Stats row */}
       <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
-        {/* Overlapping avatars */}
+        {/* Overlapping initials cluster (was stock avatars - swapped for
+            initials in coloured circles to read as 'real people who didn't
+            upload a photo' rather than 'illustration set'). */}
         <div className="flex -space-x-3">
-          {TESTIMONIAL_META.slice(0, 5).map((testimonial, index) => (
-            <div
-              key={testimonial.id}
-              className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm"
-              style={{ zIndex: 5 - index }}
-            >
-              <Image
-                src={t(
-                  `testimonials.items.${testimonial.translationKey}.avatar`,
+          {TESTIMONIAL_META.slice(0, 5).map((testimonial, index) => {
+            const name = t(
+              `testimonials.items.${testimonial.translationKey}.name`,
+            );
+            return (
+              <div
+                key={testimonial.id}
+                className={cn(
+                  'flex items-center justify-center w-10 h-10 rounded-full text-white font-tondo font-bold text-sm border-2 border-white shadow-sm',
+                  getInitialsBg(testimonial.translationKey),
                 )}
-                alt=""
-                fill
-                className="object-cover"
-              />
-            </div>
-          ))}
+                style={{ zIndex: 5 - index }}
+                aria-hidden
+              >
+                {getInitials(name)}
+              </div>
+            );
+          })}
         </div>
 
         {/* Rating */}
@@ -149,11 +193,18 @@ const SocialProofHeader = () => {
   );
 };
 
-const Testimonials = ({ className }: TestimonialsProps) => {
+const Testimonials = ({ className, location }: TestimonialsProps) => {
   const t = useTranslations('homepage');
+  // location prop is currently used as a marker — when we add a click-
+  // tracked rating link inside this section, we'll fire the event with
+  // it. Keeping the param now so callers don't need to update later.
+  void location;
 
   return (
-    <section className={cn('w-full py-12 md:py-16', className)}>
+    <section
+      id="testimonials"
+      className={cn('w-full py-12 md:py-16 scroll-mt-24', className)}
+    >
       <FadeIn>
         <SocialProofHeader />
       </FadeIn>
@@ -170,8 +221,8 @@ const Testimonials = ({ className }: TestimonialsProps) => {
             name={t(`testimonials.items.${testimonial.translationKey}.name`)}
             role={t(`testimonials.items.${testimonial.translationKey}.role`)}
             quote={t(`testimonials.items.${testimonial.translationKey}.quote`)}
-            avatar={t(
-              `testimonials.items.${testimonial.translationKey}.avatar`,
+            location={t(
+              `testimonials.items.${testimonial.translationKey}.location`,
             )}
           />
         ))}

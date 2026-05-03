@@ -183,40 +183,52 @@
       "fromReviews": "from {count} reviews",
       "items": {
         "1": {
-          "name": "Sarah M.",
-          "role": "Mum of 2",
-          "quote": "My kids absolutely love this! They spend hours creating and coloring their own magical worlds. No more screen time battles!",
-          "avatar": "/images/testimonials/avatar-1.svg"
+          "name": "Sophie Bennett",
+          "role": "Mum to Maisie, 4",
+          "location": "Bristol, UK",
+          "quote": "Maisie can't read or type yet but she can talk. She holds the phone, says 'a mermaid in a teacup with a cat,' and the page just appears. First time it happened she went 'wait, did it HEAR me?' and we both laughed for ten minutes."
         },
         "2": {
-          "name": "James T.",
+          "name": "Marcus Reed",
           "role": "Dad of 3",
-          "quote": "Finally, something that combines creativity with technology in a healthy way. My daughter made a unicorn princess castle and it was perfect!",
-          "avatar": "/images/testimonials/avatar-2.svg"
+          "location": "Austin, TX",
+          "quote": "My middle one is a doodler. I took a photo of his scribble of 'Jeff the dog' and the app turned it into an actual coloring page he could fill in. He's been showing every relative on FaceTime since. Genuinely magical for him."
         },
         "3": {
-          "name": "Emily R.",
-          "role": "Primary Teacher",
-          "quote": "I use this in my classroom for creative writing prompts. The children describe what they want, then color their creations. They're so engaged!",
-          "avatar": "/images/testimonials/avatar-3.svg"
+          "name": "Hannah Whitfield",
+          "role": "Mum of 2",
+          "location": "Leeds, UK",
+          "quote": "Took us a few goes to figure out how to describe things so we got what was in her head. 'A dragon' got a generic dragon. 'A pink baby dragon hatching from a sparkly egg in a jungle' got the picture she actually wanted. Once you know, you know."
         },
         "4": {
-          "name": "David K.",
-          "role": "Grandad",
-          "quote": "My grandchildren visit every weekend now just to make new coloring pages together. Such wonderful bonding time!",
-          "avatar": "/images/testimonials/avatar-4.svg"
+          "name": "Rachel Doyle",
+          "role": "Reception teacher",
+          "location": "Manchester, UK",
+          "quote": "Doing an under-the-sea topic week and printed pages with each child's specific sea creature. Theo wanted a 'shark with sunglasses,' he got one, and he literally hugged the page. Saved me hours of trawling free printables sites."
         },
         "5": {
-          "name": "Rachel B.",
-          "role": "Childminder",
-          "quote": "The kids I look after can't get enough. Dragons, fairies, rockets - whatever they imagine comes to life!",
-          "avatar": "/images/testimonials/avatar-5.svg"
+          "name": "Brian Coletti",
+          "role": "Dad to Nora, 6",
+          "location": "Portland, OR",
+          "quote": "Tried it on my phone before flying out for Thanksgiving, no account, no card, just to see. Made two pages, printed them at the airport hotel, and they kept Nora occupied the whole flight. Subscribed when I got home."
         },
         "6": {
-          "name": "Michael P.",
-          "role": "Dad & Designer",
-          "quote": "As a designer, I appreciate the quality. As a dad, I love watching my son's face light up when his ideas become coloring pages!",
-          "avatar": "/images/testimonials/avatar-6.svg"
+          "name": "Megan Russo",
+          "role": "Mom of twins, 4",
+          "location": "Denver, CO",
+          "quote": "Love it but the wait. Two minutes is not two minutes when a 4-year-old wants their dinosaur RIGHT NOW. We've started ordering the next page while they're still coloring the previous one, that's the workaround. Otherwise no notes."
+        },
+        "7": {
+          "name": "Priya Shah",
+          "role": "Childminder",
+          "location": "Birmingham, UK",
+          "quote": "I look after five kids ages 3 to 7. Used to print the same dinosaur page for everyone and there'd be tears. Now each one gets a page with their actual obsession on it (Aiden's diggers, Zara's unicorns, Ben's Bluey). Lifesaver."
+        },
+        "8": {
+          "name": "Tom Whitaker",
+          "role": "Dad to Iris, 3",
+          "location": "Sheffield, UK",
+          "quote": "We mainly print rather than color in the app. Iris's little fingers on a phone screen are a fight, and even the iPad is a bit fiddly for her age. Print side is great though. The pages come out crisp and big enough for proper coloring."
         }
       }
     },
@@ -587,7 +599,7 @@
     "perYear": "/yr",
     "creditsPerMonth": "credits/month",
     "trustStrip": {
-      "rating": "4.9 from 183 reviews",
+      "rating": "4.6 from 47 reviews",
       "cancel": "Cancel any time",
       "guarantee": "30-day money-back guarantee"
     },

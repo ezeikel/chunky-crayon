@@ -231,6 +231,10 @@ export type EventProperties = {
   [TRACKING_EVENTS.PRICING_TEASER_CLICKED]: {
     location: 'homepage' | 'start';
   };
+  [TRACKING_EVENTS.SOCIAL_PROOF_CLICKED]: {
+    location: 'homepage' | 'pricing' | 'start';
+    surface: 'trust_strip' | 'testimonial_header';
+  };
   [TRACKING_EVENTS.COLOR_AS_YOU_GO_PAGE_VIEWED]: {
     isLoggedIn: boolean;
   };

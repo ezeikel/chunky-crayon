@@ -40,6 +40,7 @@ import StaggerItem from '@/components/motion/StaggerItem';
 import CrayonScribble from '@/components/Intro/CrayonScribble';
 import { trackViewContent, trackInitiateCheckout } from '@/utils/pixels';
 import FAQ from '@/components/FAQ/FAQ';
+import Testimonials from '@/components/Testimonials';
 import { Experiment } from '@/components/experiment/Experiment';
 
 // Stable seed per plan key so the price underline is the same shape on
@@ -200,7 +201,16 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
               variants={{
                 control: (
                   <>
-                    <span className="inline-flex items-center gap-2 font-semibold text-crayon-orange">
+                    <a
+                      href="#testimonials"
+                      onClick={() => {
+                        trackEvent(TRACKING_EVENTS.SOCIAL_PROOF_CLICKED, {
+                          location: 'pricing',
+                          surface: 'trust_strip',
+                        });
+                      }}
+                      className="inline-flex items-center gap-2 font-semibold text-crayon-orange hover:text-crayon-orange-dark hover:underline underline-offset-4 decoration-2 transition-colors cursor-pointer"
+                    >
                       <span className="inline-flex gap-0.5" aria-hidden>
                         {[0, 1, 2, 3, 4].map((i) => (
                           <FontAwesomeIcon
@@ -211,7 +221,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                         ))}
                       </span>
                       <span>{t('trustStrip.rating')}</span>
-                    </span>
+                    </a>
                     <span aria-hidden className="opacity-40">
                       ·
                     </span>
@@ -220,7 +230,16 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                 ),
                 guarantee: (
                   <>
-                    <span className="inline-flex items-center gap-2 font-semibold text-crayon-orange">
+                    <a
+                      href="#testimonials"
+                      onClick={() => {
+                        trackEvent(TRACKING_EVENTS.SOCIAL_PROOF_CLICKED, {
+                          location: 'pricing',
+                          surface: 'trust_strip',
+                        });
+                      }}
+                      className="inline-flex items-center gap-2 font-semibold text-crayon-orange hover:text-crayon-orange-dark hover:underline underline-offset-4 decoration-2 transition-colors cursor-pointer"
+                    >
                       <span className="inline-flex gap-0.5" aria-hidden>
                         {[0, 1, 2, 3, 4].map((i) => (
                           <FontAwesomeIcon
@@ -231,7 +250,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                         ))}
                       </span>
                       <span>{t('trustStrip.rating')}</span>
-                    </span>
+                    </a>
                     <span aria-hidden className="opacity-40">
                       ·
                     </span>
@@ -461,6 +480,11 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
           </div>
         </section>
       </FadeIn>
+
+      {/* Testimonials — anchor target #testimonials so the trust-strip
+          rating link above can scroll here. Deliberately above FAQ:
+          social proof FIRST, objection handling AFTER. */}
+      <Testimonials location="pricing" className="mt-16" />
 
       {/* FAQ Section */}
       <FAQ namespace="pricing" className="mt-16 max-w-4xl mx-auto" />
