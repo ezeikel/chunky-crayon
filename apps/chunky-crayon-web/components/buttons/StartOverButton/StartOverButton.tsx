@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faCheck, faXmark } from '@fortawesome/pro-solid-svg-icons';
+import {
+  faArrowsRotate,
+  faTrashCan,
+  faCheck,
+  faXmark,
+} from '@fortawesome/pro-solid-svg-icons';
 import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import {
   Dialog,
@@ -23,11 +28,13 @@ type StartOverButtonProps = {
 /**
  * "Start Over" action with a kid-friendly confirm modal.
  *
- * Tapping the trash-can tile opens a centred modal with a big green tick
+ * Tapping the refresh tile opens a centred modal with a big green tick
  * (confirm) and a big red cross (cancel). This is a destructive action that
  * wipes user colouring — the explicit modal is safer than an inline swap and
  * works identically on mobile, tablet, and desktop because it uses the
- * shared `<Dialog>` primitive.
+ * shared `<Dialog>` primitive. The action button uses a refresh-arrow icon
+ * (reads as "fresh start"); the modal keeps the trash icon to make the
+ * destructive consequence unmissable in the moment of confirmation.
  */
 const StartOverButton = ({
   onStartOver,
@@ -47,7 +54,7 @@ const StartOverButton = ({
       <ActionButton
         size="tile"
         tone="secondary"
-        icon={faTrashCan}
+        icon={faArrowsRotate}
         label={t('idle')}
         onClick={() => setOpen(true)}
         disabled={disabled}

@@ -412,10 +412,16 @@
     "modalTitle": "처음부터 할까요?",
     "modalBody": "색칠한 게 전부 지워져요. 괜찮아요?"
   },
-  "downloadPDFButton": {
+  "saveButton": {
+    "idle": "저장",
+    "loading": "불러오는 중...",
+    "saving": "저장 중...",
+    "error": "어머!"
+  },
+  "printButton": {
     "idle": "인쇄",
     "loading": "불러오는 중...",
-    "creating": "만드는 중...",
+    "printing": "여는 중...",
     "error": "어머!"
   },
   "difficulty": {

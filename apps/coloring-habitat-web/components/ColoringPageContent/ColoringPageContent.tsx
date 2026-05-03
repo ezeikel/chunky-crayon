@@ -14,7 +14,8 @@ import {
   type DesktopToolsSidebarLabels,
 } from "@one-colored-pixel/coloring-ui";
 import StartOverButton from "@/components/buttons/StartOverButton/StartOverButton";
-import DownloadPDFButton from "@/components/buttons/DownloadPDFButton/DownloadPDFButton";
+import SaveButton from "@/components/buttons/SaveButton";
+import PrintButton from "@/components/buttons/PrintButton";
 import ShareButton from "@/components/buttons/ShareButton";
 import SaveToGalleryButton from "@/components/buttons/SaveToGalleryButton";
 import { trackViewContent } from "@/utils/pixels";
@@ -170,7 +171,11 @@ const ColoringPageContent = ({
             actions={
               <>
                 <StartOverButton onStartOver={handleStartOver} />
-                <DownloadPDFButton
+                <PrintButton
+                  coloringImage={coloringImage}
+                  getCanvasDataUrl={getCanvasDataUrl}
+                />
+                <SaveButton
                   coloringImage={coloringImage}
                   getCanvasDataUrl={getCanvasDataUrl}
                 />

@@ -17,7 +17,8 @@ import StickerSelector from "@/components/StickerSelector";
 import ProgressIndicator from "@/components/ProgressIndicator";
 import { MuteToggle } from "@one-colored-pixel/coloring-ui";
 import { ZoomControls } from "@one-colored-pixel/coloring-ui";
-import DownloadPDFButton from "@/components/buttons/DownloadPDFButton/DownloadPDFButton";
+import SaveButton from "@/components/buttons/SaveButton";
+import PrintButton from "@/components/buttons/PrintButton";
 import StartOverButton from "@/components/buttons/StartOverButton/StartOverButton";
 import ShareButton from "@/components/buttons/ShareButton";
 import SaveToGalleryButton from "@/components/buttons/SaveToGalleryButton";
@@ -1060,7 +1061,11 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           {/* Action buttons - Desktop style (md-lg only, hidden on xl+ where sidebar has them) */}
           <div className="hidden md:flex xl:hidden flex-wrap items-center justify-center gap-3">
             <StartOverButton onStartOver={handleStartOver} />
-            <DownloadPDFButton
+            <PrintButton
+              coloringImage={coloringImage}
+              getCanvasDataUrl={getCanvasDataUrl}
+            />
+            <SaveButton
               coloringImage={coloringImage}
               getCanvasDataUrl={getCanvasDataUrl}
             />
@@ -1082,7 +1087,11 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           {/* Mobile Action buttons - Compact row with icon-only buttons */}
           <div className="md:hidden flex items-center justify-center gap-3 py-2 px-2">
             <StartOverButton onStartOver={handleStartOver} />
-            <DownloadPDFButton
+            <PrintButton
+              coloringImage={coloringImage}
+              getCanvasDataUrl={getCanvasDataUrl}
+            />
+            <SaveButton
               coloringImage={coloringImage}
               getCanvasDataUrl={getCanvasDataUrl}
             />

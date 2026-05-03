@@ -412,10 +412,16 @@
     "modalTitle": "¿Empezar de nuevo?",
     "modalBody": "Esto borrará todo tu dibujo. ¿Seguro?"
   },
-  "downloadPDFButton": {
+  "saveButton": {
+    "idle": "Guardar",
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "error": "¡Ups!"
+  },
+  "printButton": {
     "idle": "Imprimir",
     "loading": "Cargando...",
-    "creating": "Creando...",
+    "printing": "Abriendo...",
     "error": "¡Ups!"
   },
   "difficulty": {

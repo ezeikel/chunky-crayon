@@ -188,10 +188,16 @@
     "modalTitle": "Start over?",
     "modalBody": "This will wipe all your colouring. Are you sure?"
   },
-  "downloadPDFButton": {
+  "saveButton": {
+    "idle": "Save",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "error": "Oops!"
+  },
+  "printButton": {
     "idle": "Print",
     "loading": "Loading...",
-    "creating": "Creating...",
+    "printing": "Opening...",
     "error": "Oops!"
   },
   "colors": {

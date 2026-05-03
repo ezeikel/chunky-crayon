@@ -191,6 +191,7 @@ export type EventProperties = {
   };
   [TRACKING_EVENTS.PRINT_CLICKED]: {
     coloringImageId?: string;
+    title?: string;
     hasColoring?: boolean;
   };
 

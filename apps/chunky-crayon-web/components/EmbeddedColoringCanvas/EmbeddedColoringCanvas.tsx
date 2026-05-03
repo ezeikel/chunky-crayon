@@ -12,7 +12,7 @@ import {
 import { useAnalytics } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import cn from '@/utils/cn';
-import DownloadPDFButton from '@/components/buttons/DownloadPDFButton/DownloadPDFButton';
+import SaveButton from '@/components/buttons/SaveButton';
 import SlimColorPalette from './SlimColorPalette';
 
 type EmbeddedColoringCanvasProps = {
@@ -74,7 +74,7 @@ const EmbeddedColoringCanvas = ({
   const [isInViewport, setIsInViewport] = useState(false);
 
   // Snapshot of the painted canvas at click time, used by the
-  // DownloadPDFButton to embed the visitor's coloured version into the
+  // SaveButton to embed the visitor's coloured version into the
   // PDF (instead of just the line art). Mirrors the helper exposed on
   // ColoringArea — see ColoringArea.tsx getCanvasDataUrl.
   const getCanvasDataUrl = useCallback((): string | null => {
@@ -206,9 +206,9 @@ const EmbeddedColoringCanvas = ({
           rendered inline with the tools row (via SlimColorPalette's
           trailingAction slot) so the whole controls block reads as one
           unified group. ActionButtonSizeProvider scopes
-          DownloadPDFButton (internally an ActionButton) to tile-compact
+          SaveButton (internally an ActionButton) to tile-compact
           (48px) — same square as the tool buttons.
-          Capture-phase listener fires before DownloadPDFButton's own
+          Capture-phase listener fires before SaveButton's own
           click handler so we can attribute the download to the
           campaign; the button itself ALSO fires DOWNLOAD_PDF_CLICKED
           for the global PDF funnel. */}
@@ -228,7 +228,7 @@ const EmbeddedColoringCanvas = ({
                   })
                 }
               >
-                <DownloadPDFButton
+                <SaveButton
                   coloringImage={image}
                   getCanvasDataUrl={getCanvasDataUrl}
                 />
@@ -281,7 +281,7 @@ const EmbeddedColoringCanvas = ({
                       })
                     }
                   >
-                    <DownloadPDFButton
+                    <SaveButton
                       coloringImage={image}
                       getCanvasDataUrl={getCanvasDataUrl}
                     />

@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { ColoringImage } from "@one-colored-pixel/db/types";
-import { faImage } from "@fortawesome/pro-solid-svg-icons";
+import { faPrint } from "@fortawesome/pro-solid-svg-icons";
 import { ActionButton } from "@one-colored-pixel/coloring-ui";
 import { pdf } from "@react-pdf/renderer";
 import ColoringPageDocument from "@/components/pdfs/ColoringPageDocument/ColoringPageDocument";
@@ -13,36 +13,30 @@ import { TRACKING_EVENTS } from "@/constants";
 import { fetchSvg } from "@one-colored-pixel/canvas";
 import { proxyR2Url } from "@/utils/proxyR2Url";
 
-const formatTitleForFileName = (title: string | undefined): string => {
-  if (!title) {
-    return "coloring-habitat";
-  }
+// Print = open the same A4 PDF the Save button generates in a new
+// window and trigger the browser's native print dialog. Mirrors the
+// CC PrintButton; see comments there for popup-blocker rationale.
 
-  return `${title.toLowerCase().replace(/\s+/g, "-")}-coloring-page.pdf`;
-};
-
-type SaveButtonProps = {
+type PrintButtonProps = {
   coloringImage: Partial<ColoringImage>;
   getCanvasDataUrl?: () => string | null;
   className?: string;
 };
 
-type GeneratingState = "idle" | "generating" | "error";
+type PrintingState = "idle" | "preparing" | "error";
 
-const DownloadPDFButtonContent = ({
+const PrintButtonContent = ({
   coloringImage,
   getCanvasDataUrl,
   className,
-}: SaveButtonProps) => {
-  const t = useTranslations("downloadPDFButton");
+}: PrintButtonProps) => {
+  const t = useTranslations("printButton");
   const [imageSvg, setImageSvg] = useState<string | null>(null);
   const [qrCodeSvg, setQrCodeSvg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [generatingState, setGeneratingState] =
-    useState<GeneratingState>("idle");
+  const [printingState, setPrintingState] = useState<PrintingState>("idle");
 
-  // Fetch SVG data in the parent component (where hooks are supported)
   useEffect(() => {
     if (!coloringImage?.svgUrl || !coloringImage?.qrCodeUrl) {
       setError("Missing SVG URLs");
@@ -68,24 +62,26 @@ const DownloadPDFButtonContent = ({
     loadSvgs();
   }, [coloringImage?.svgUrl, coloringImage?.qrCodeUrl]);
 
-  // Generate PDF on-demand when clicked (captures fresh canvas data at click time)
   const handlePrint = useCallback(async () => {
     if (!imageSvg || !qrCodeSvg) return;
 
-    setGeneratingState("generating");
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      setPrintingState("error");
+      setTimeout(() => setPrintingState("idle"), 2000);
+      return;
+    }
+
+    setPrintingState("preparing");
 
     try {
-      // Capture fresh canvas data at click time (not at render time!)
-      // This is the key fix - getCanvasDataUrl is called when user clicks,
-      // so we get the current colored state, not stale/empty data
       const coloredImageDataUrl = getCanvasDataUrl?.() || null;
 
-      trackEvent(TRACKING_EVENTS.DOWNLOAD_PDF_CLICKED, {
+      trackEvent(TRACKING_EVENTS.PRINT_CLICKED, {
         coloringImageId: coloringImage.id as string,
         title: coloringImage.title,
       });
 
-      // Create PDF document with current canvas state
       const doc = (
         <ColoringPageDocument
           imageSvg={imageSvg}
@@ -95,38 +91,40 @@ const DownloadPDFButtonContent = ({
         />
       );
 
-      // Generate PDF blob on-demand
       const blob = await pdf(doc).toBlob();
       const url = URL.createObjectURL(blob);
 
-      // Trigger download
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = formatTitleForFileName(coloringImage.title);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      printWindow.location.href = url;
+      printWindow.onload = () => {
+        setTimeout(() => {
+          try {
+            printWindow.focus();
+            printWindow.print();
+          } catch {
+            // print() can throw on some embedded PDF viewers; the
+            // user can still trigger Cmd+P / browser-menu print.
+          }
+        }, 500);
+      };
 
-      // Clean up blob URL
-      URL.revokeObjectURL(url);
-      setGeneratingState("idle");
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+
+      setPrintingState("idle");
     } catch (err) {
-      console.error("Failed to generate PDF:", err);
-      setGeneratingState("error");
-      // Reset error state after 2 seconds
-      setTimeout(() => setGeneratingState("idle"), 2000);
+      console.error("Failed to prepare print PDF:", err);
+      printWindow.close();
+      setPrintingState("error");
+      setTimeout(() => setPrintingState("idle"), 2000);
     }
   }, [imageSvg, qrCodeSvg, coloringImage, getCanvasDataUrl]);
 
-  if (!coloringImage) {
-    return null;
-  }
+  if (!coloringImage) return null;
 
   if (isLoading) {
     return (
       <ActionButton
-        tone="accent"
-        icon={faImage}
+        tone="secondary"
+        icon={faPrint}
         label={t("loading")}
         disabled
         className={className}
@@ -137,8 +135,8 @@ const DownloadPDFButtonContent = ({
   if (error || !imageSvg || !qrCodeSvg) {
     return (
       <ActionButton
-        tone="accent"
-        icon={faImage}
+        tone="secondary"
+        icon={faPrint}
         label={t("error")}
         disabled
         className={className}
@@ -146,23 +144,23 @@ const DownloadPDFButtonContent = ({
     );
   }
 
-  if (generatingState === "generating") {
+  if (printingState === "preparing") {
     return (
       <ActionButton
-        tone="accent"
-        icon={faImage}
-        label={t("creating")}
+        tone="secondary"
+        icon={faPrint}
+        label={t("printing")}
         disabled
         className={className}
       />
     );
   }
 
-  if (generatingState === "error") {
+  if (printingState === "error") {
     return (
       <ActionButton
-        tone="accent"
-        icon={faImage}
+        tone="secondary"
+        icon={faPrint}
         label={t("error")}
         disabled
         className={className}
@@ -173,7 +171,7 @@ const DownloadPDFButtonContent = ({
   return (
     <ActionButton
       tone="accent"
-      icon={faImage}
+      icon={faPrint}
       label={t("idle")}
       onClick={handlePrint}
       className={className}
@@ -181,10 +179,8 @@ const DownloadPDFButtonContent = ({
   );
 };
 
-// @react-pdf/renderer uses browser APIs during render, so we need to prevent server-side rendering
-const DownloadPDFButton = dynamic(
-  () => Promise.resolve(DownloadPDFButtonContent),
-  { ssr: false },
-);
+const PrintButton = dynamic(() => Promise.resolve(PrintButtonContent), {
+  ssr: false,
+});
 
-export default DownloadPDFButton;
+export default PrintButton;

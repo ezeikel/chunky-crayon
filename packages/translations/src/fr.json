@@ -412,10 +412,16 @@
     "modalTitle": "Recommencer ?",
     "modalBody": "Cela effacera tout ton coloriage. Tu es sûr ?"
   },
-  "downloadPDFButton": {
+  "saveButton": {
+    "idle": "Enregistrer",
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "error": "Oups !"
+  },
+  "printButton": {
     "idle": "Imprimer",
     "loading": "Chargement...",
-    "creating": "Création...",
+    "printing": "Ouverture...",
     "error": "Oups !"
   },
   "difficulty": {

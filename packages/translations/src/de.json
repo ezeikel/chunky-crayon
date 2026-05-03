@@ -412,10 +412,16 @@
     "modalTitle": "Neu anfangen?",
     "modalBody": "Dein ganzes Bild wird gelöscht. Bist du sicher?"
   },
-  "downloadPDFButton": {
+  "saveButton": {
+    "idle": "Speichern",
+    "loading": "Lädt...",
+    "saving": "Wird gespeichert...",
+    "error": "Ups!"
+  },
+  "printButton": {
     "idle": "Drucken",
     "loading": "Lädt...",
-    "creating": "Wird erstellt...",
+    "printing": "Wird geöffnet...",
     "error": "Ups!"
   },
   "difficulty": {
