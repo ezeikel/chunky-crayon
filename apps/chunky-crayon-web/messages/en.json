@@ -1,25 +1,25 @@
 {
   "coloLoading": {
-    "title": "Creating your page!",
-    "titleSpeaking": "I'm so excited!",
-    "coloSpeaking": "Colo is talking! Listen up!",
+    "title": "Drawing your page...",
+    "titleSpeaking": "Colo's got something to say",
+    "coloSpeaking": "Listen, Colo's talking!",
     "audioStates": {
       "idle": "Getting ready...",
-      "preparing": "Colo is waking up!",
+      "preparing": "Colo's getting ready...",
       "done": "Drawing your picture..."
     },
     "messages": {
-      "sharpeningCrayons": "Sharpening crayons...",
-      "mixingColors": "Mixing colors...",
-      "drawingLines": "Drawing lines...",
-      "addingSparkles": "Adding magic sparkles...",
-      "almostThere": "Almost there...",
-      "creatingMasterpiece": "Creating your masterpiece...",
-      "wavingWand": "Waving my wand...",
-      "coloringOutsideLines": "Coloring outside the lines (oops!)..."
+      "sharpeningCrayons": "Sharpening the crayons...",
+      "mixingColors": "Mixing some new colors...",
+      "drawingLines": "Drawing the outlines...",
+      "addingSparkles": "Sneaking in some sparkles...",
+      "almostThere": "Putting on the finishing touches...",
+      "creatingMasterpiece": "Making it just right...",
+      "wavingWand": "Checking everything looks good...",
+      "coloringOutsideLines": "Trying not to color outside the lines..."
     },
     "pageLoading": "Getting your crayons ready!",
-    "partialAppearing": "Your coloring page is appearing…"
+    "partialAppearing": "Look, your page is appearing!"
   },
   "colo": {
     "dashboard": {
@@ -734,13 +734,45 @@
     }
   },
   "adultGate": {
-    "title": "Are you a grown-up?",
-    "subtitle": "This section is for parents and guardians",
-    "instructions": "Please solve this simple math problem to continue:",
-    "placeholder": "Enter your answer",
-    "submit": "Continue",
-    "error": "That's not quite right. Try again!",
-    "cancel": "Go back"
+    "title": "Quick check, are you a grown-up?",
+    "explanation": "We use a small math problem so this only opens for parents.",
+    "whatIs": "What's",
+    "placeholder": "Type the answer",
+    "check": "Yep, I've got it",
+    "cancel": "Maybe later",
+    "error": "Hmm, not quite. Have another go.",
+    "errorWithAttempts": "Still not right ({attempts} tries). Take your time."
+  },
+  "startOverButton": {
+    "idle": "Start Over",
+    "modalTitle": "Wipe the page?",
+    "modalBody": "All your colors go away and you start with a blank page.",
+    "confirm": "Yep, fresh page",
+    "cancel": "Keep coloring"
+  },
+  "shareButton": {
+    "idle": "Share",
+    "preparing": "Wrapping it up...",
+    "doneSharing": "All done"
+  },
+  "shareModal": {
+    "title": "Share this artwork",
+    "privacyNote": "Anyone with the link can see this page. We don't share names, emails, or anything else.",
+    "expiresIn": "Link works for:",
+    "expiration": {
+      "7days": "1 week",
+      "30days": "1 month",
+      "never": "Forever"
+    },
+    "createLink": "Make the link",
+    "creating": "Making your link...",
+    "success": {
+      "title": "Link's ready",
+      "subtitle": "Send it to anyone you want to show."
+    },
+    "done": "All done",
+    "error": "That didn't work. Try again in a moment.",
+    "socialShare": "Or post it"
   },
   "stickers": {
     "categories": {
@@ -1051,16 +1083,16 @@
     "keepColoring": "Keep Coloring",
     "previousSticker": "Previous sticker",
     "nextSticker": "Next sticker",
-    "newSticker": "New Sticker!",
-    "newStickers": "New Stickers!",
-    "ofCount": "{current} of {total}",
-    "addToStickerBook": "Add to Sticker Book",
+    "newSticker": "New sticker!",
+    "newStickers": "New stickers!",
+    "ofCount": "Sticker {current} of {total}",
+    "addToStickerBook": "Pop it in my book",
     "goToSticker": "Go to sticker {number}",
     "rarity": {
       "common": "Common",
       "uncommon": "Uncommon",
       "rare": "Rare",
-      "legendary": "Legendary"
+      "legendary": "One in a million"
     }
   },
   "seo": {
@@ -1258,31 +1290,31 @@
     "subtextFallback": "You'll get 15 free credits, enough to create 3 pages!"
   },
   "feedback": {
-    "title": "How can we help?",
-    "subtitle": "We read every message and get back to you quickly.",
+    "title": "What's on your mind?",
+    "subtitle": "We read every message. Honest.",
     "types": {
       "bug": {
-        "label": "Report a bug",
-        "placeholder": "What went wrong? If you can, tell us what you were doing..."
+        "label": "Something's broken",
+        "placeholder": "What did you try, and what happened instead?"
       },
       "idea": {
-        "label": "Suggest a feature",
-        "placeholder": "What would you love to see? How would it help?"
+        "label": "I've got an idea",
+        "placeholder": "What would you love to see? It's ok to dream big."
       },
       "help": {
-        "label": "Get help",
-        "placeholder": "What do you need help with?"
+        "label": "I need a hand",
+        "placeholder": "What are you stuck on?"
       },
       "other": {
         "label": "Something else",
-        "placeholder": "What would you like to tell us?"
+        "placeholder": "Anything you'd like to tell us, good or bad."
       }
     },
-    "emailPlaceholder": "Your email (optional, for follow-up)",
-    "sendButton": "Send message",
+    "emailPlaceholder": "Your email (optional, only if you want a reply)",
+    "sendButton": "Send it over",
     "sending": "Sending...",
-    "successTitle": "Thanks for your feedback!",
-    "successMessage": "We appreciate you taking the time to help us improve."
+    "successTitle": "Got it, thank you",
+    "successMessage": "We'll take a look and write back if it makes sense."
   },
   "og": {
     "homepage": {
