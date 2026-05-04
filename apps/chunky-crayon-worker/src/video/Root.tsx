@@ -266,7 +266,8 @@ export const RemotionRoot: React.FC = () => {
       />
 
       {/* Ad video composition — 15s 9:16 @24fps (matches Seedance 2 native
-          output to avoid frame-resampling artifacts on b-roll). */}
+          output to avoid frame-resampling artifacts on b-roll). Best for
+          Stories, Reels, TikTok, and Pinterest video pins. */}
       <Composition
         id="AdVideo"
         component={AdVideo}
@@ -287,6 +288,38 @@ export const RemotionRoot: React.FC = () => {
             musicUrl: EMPTY_PLACEHOLDER,
             transitionSfxUrls: undefined,
             scenes: [],
+            format: "stories",
+          } satisfies AdVideoProps
+        }
+      />
+
+      {/* Meta-feed variant — 15s 4:5 @24fps. Required because Meta masks
+          9:16 video on Mobile Feed, IG Feed, IG Explore, and IG Profile
+          Feed (cropping the top + bottom 12% — kills the headline and
+          URL underline). Same component, same scene logic, just renders
+          at 1080×1350 with proportional sizing inside. The format prop
+          flows down through scene components via getVideoDims(format). */}
+      <Composition
+        id="AdVideoMetaFeed"
+        component={AdVideo}
+        durationInFrames={15 * AD_FPS}
+        fps={AD_FPS}
+        width={1080}
+        height={1350}
+        defaultProps={
+          {
+            campaignId: "impossible-request-trex",
+            headline: "",
+            subhead: undefined,
+            cta: "",
+            logoUrl: EMPTY_PLACEHOLDER,
+            lineArtUrl: EMPTY_PLACEHOLDER,
+            coloredUrl: undefined,
+            brollUrls: {},
+            musicUrl: EMPTY_PLACEHOLDER,
+            transitionSfxUrls: undefined,
+            scenes: [],
+            format: "meta-feed",
           } satisfies AdVideoProps
         }
       />

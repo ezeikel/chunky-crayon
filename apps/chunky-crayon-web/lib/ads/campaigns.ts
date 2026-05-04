@@ -180,18 +180,21 @@ export const campaigns: Campaign[] = [
           start: 3,
           duration: 4,
           label:
-            'PROOF — over-the-shoulder kid colouring the dragon page with an orange crayon',
+            'PROOF — over-the-shoulder kid colouring the dragon page with a green crayon',
           kind: 'broll',
           broll: {
-            stableId: 'dragon-over-shoulder-colouring',
+            // v2 — palette aligned with gpt-image-2 colored variant (green
+            // dragon, yellow bunny, blue table, etc) so the b-roll → outro
+            // cross-fade in AdVideo doesn't read as two different scenes.
+            stableId: 'dragon-over-shoulder-colouring-v2',
             model: 'kling-v3-pro',
             referenceImageKey: 'dragon',
             template: 'over-shoulder-colouring',
             templateVars: {
-              crayonColour: 'orange',
+              crayonColour: 'green',
               referenceDesc: "the dragon's body",
               partialColouring:
-                "the dragon's body is partially filled orange (visible uneven strokes, a portion still uncoloured), the bunny has a light pink wash, the window behind is filled blue",
+                "the dragon's body is partially filled green (visible uneven crayon strokes, a portion of the belly and tail still uncoloured), the bunny has a soft yellow wash, the table is partly painted blue, the curtains are coloured yellow with red ties, the sky outside the window is light blue",
             },
           },
         },

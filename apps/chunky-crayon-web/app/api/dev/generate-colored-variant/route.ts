@@ -6,7 +6,7 @@ export const maxDuration = 300;
 
 /**
  * Dev-only: given the URL of a line-art coloring page, generate a "colored
- * in by a child with crayons" variant via GPT Image 1.5 `images.edit`.
+ * in by a child with crayons" variant via GPT Image 2 `images.edit`.
  *
  * Used by scripts/generate-ad-assets.ts to produce the "after" panel of the
  * before-after ad template. Writes the result to R2 under
@@ -62,13 +62,27 @@ export async function POST(request: Request) {
     type: `image/${ext}`,
   });
 
-  const prompt = `Take this black-and-white line-art coloring page and produce the exact same image, same composition and line work, but colored in as if by a happy young child using wax crayons. Cheerful bright colors. Slightly imperfect colouring — a little outside the lines in places, uneven saturation, visible crayon texture. Keep all the original outlines visible on top of the color. White paper background unchanged.`;
+  // Layered prompt per PROMPT_OPTIMIZATION.md (apps/chunky-crayon-web/lib/ai):
+  // scene -> style -> medium -> texture -> constraints. Positive framing only;
+  // GPT Image 2 ignores repeated negatives. Trailing "full detail" line stops
+  // the model adding its own creative liberties to the composition.
+  const prompt = `Subject: the exact same scene as the source line-art coloring page, identical composition, identical character poses, identical line work — every original black outline preserved on top of the colored fill.
+
+Style: a young child has colored this in using chunky wax crayons. Authentic, joyful, slightly messy.
+
+Medium: visible crayon texture with grainy waxy strokes inside each region. Bold cheerful colors — primary reds, yellows, blues, greens — with a few soft pastels mixed in. Each shape filled with a single dominant color, not blended.
+
+Imperfections that make it feel real: occasional strokes go a little outside the line, color saturation varies stroke to stroke, small areas of white paper showing through where the crayon didn't fully cover, no pencil sketches or shading layers.
+
+Background: the original white paper remains white — only the foreground shapes get colored.
+
+My prompt has full detail so no need to add more.`;
 
   const client = new OpenAI();
   let result;
   try {
     result = await client.images.edit({
-      model: 'gpt-image-1',
+      model: 'gpt-image-2',
       image: [sourceFile],
       prompt,
       size: '1024x1024',

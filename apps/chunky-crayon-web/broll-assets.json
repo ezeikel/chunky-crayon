@@ -57,44 +57,13 @@
     "reviewedAt": "2026-04-21T22:32:38.309Z"
   },
   {
-    "stableId": "dragon-over-shoulder-colouring",
+    "stableId": "dragon-over-shoulder-colouring-v2",
     "model": "kling-v3-pro",
-    "startStillUrl": "https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/uploads/ad-broll/dragon-over-shoulder-colouring-start-1776810095892.png",
-    "videoUrl": "https://v3b.fal.media/files/b/0a97327c/XFeo9Ch4nPxrYdzSO1Ess_output.mp4",
-    "localClipPath": "/Users/ezeikel/Development/Personal/chunky-crayon/apps/chunky-crayon-web/test-clips/dragon-over-shoulder-colouring/clip.mp4",
-    "generatedAt": "2026-04-21T22:23:39.888Z",
-    "judgement": {
-      "verdict": "SHIP",
-      "criteria": {
-        "artworkStability": {
-          "pass": true,
-          "evidence": "The dragon, window, and bunny illustrations remain consistent in shape and linework across frames 1-5 with no morphing of features."
-        },
-        "compositionStability": {
-          "pass": true,
-          "evidence": "Camera stays locked; the water ring, crumb, and crayon pile on the right hold the same positions across frames 1-5."
-        },
-        "handAnatomy": {
-          "pass": true,
-          "evidence": "The coloring hand shows a normal finger count and natural grip across frames 1-5, with no extra digits or impossible wrist angles."
-        },
-        "colourPersistence": {
-          "pass": true,
-          "evidence": "Orange fill on the dragon accumulates progressively (frames 1→5, notably new orange strokes below the belly in frames 3-5) and never disappears."
-        },
-        "motionPlausibility": {
-          "pass": true,
-          "evidence": "Arm and crayon motion progresses naturally from frame 1 to frame 5 with realistic small shifts, consistent with a child coloring."
-        },
-        "aiGleam": {
-          "pass": true,
-          "evidence": "Wood table shows authentic water ring, crumbs, and crayon shavings; lighting from the window is soft and natural, matching an iPhone snapshot aesthetic."
-        }
-      },
-      "judgedAt": "2026-04-21T22:23:39.887Z",
-      "model": "claude-opus-4-7"
-    },
+    "startStillUrl": "https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/uploads/ad-broll/dragon-over-shoulder-colouring-v2-start-1777908701757.png",
+    "videoUrl": "https://v3b.fal.media/files/b/0a98df9f/LHzDI-xbHDQchf2c4PUxC_output.mp4",
+    "localClipPath": "/Users/ezeikel/Development/Personal/chunky-crayon/apps/chunky-crayon-web/test-clips/dragon-over-shoulder-colouring-v2/clip.mp4",
+    "generatedAt": "2026-05-04T15:33:31.222Z",
     "reviewStatus": "approved",
-    "reviewedAt": "2026-04-21T22:32:38.309Z"
+    "reviewedAt": "2026-05-04T15:38:10.000Z"
   }
 ]

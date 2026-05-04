@@ -13,10 +13,10 @@ export type AdTemplate = 'hero' | 'app-screen' | 'before-after';
 export type CampaignAsset = {
   /** Stable key used in ad-assets.json (e.g. 'trex', 'foxes'). */
   key: string;
-  /** What goes to GPT Image 1.5 / Gemini to generate the line-art page. */
+  /** What goes to GPT Image 2 / Gemini to generate the line-art page. */
   prompt: string;
   /**
-   * Optional: when true, also generate a GPT Image 1.5 `images.edit`
+   * Optional: when true, also generate a GPT Image 2 `images.edit`
    * "colored-in by a child" variant and store it as coloredUrl in the
    * assets file. Used for Before/After templates.
    */
@@ -217,7 +217,7 @@ export type AdAsset = {
   /** Line-art page (svg). */
   svgUrl: string;
   /**
-   * Optional: colored-in variant produced via GPT Image 1.5 `images.edit`.
+   * Optional: colored-in variant produced via GPT Image 2 `images.edit`.
    * Only present when the campaign asset sets generateColoredVariant: true.
    */
   coloredUrl?: string;

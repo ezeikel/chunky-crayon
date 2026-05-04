@@ -13,6 +13,8 @@ import { linearTiming, TransitionSeries } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { slide } from "@remotion/transitions/slide";
 import { measureText } from "@remotion/layout-utils";
+import { useMemo } from "react";
+import { RoughGenerator } from "roughjs/bin/generator";
 import { TONDO_FONT_CSS_URL } from "../fonts";
 
 // ==========================================================================
@@ -39,9 +41,34 @@ export type AdScene = {
   };
 };
 
+/**
+ * Per-platform aspect ratios. `stories` matches Seedance's native i2v
+ * output (1080×1920) so b-roll plays full-bleed. `meta-feed` is Meta's
+ * tallest non-9:16 placement spec (4:5 = 1080×1350) — required for the
+ * mobile feed + Explore + Profile placements that mask 9:16 video.
+ *
+ * Adding a new format = one row in VIDEO_DIMS + a Composition entry in
+ * Root.tsx + a FORMATS row in scripts/render-ad-videos.ts. The scene
+ * components scale around the format prop automatically.
+ */
+export type AdVideoFormat = "stories" | "meta-feed";
+
+export const VIDEO_DIMS: Record<AdVideoFormat, { w: number; h: number }> = {
+  stories: { w: 1080, h: 1920 },
+  "meta-feed": { w: 1080, h: 1350 },
+};
+
+export const getVideoDims = (format: AdVideoFormat) => VIDEO_DIMS[format];
+
 export type AdVideoProps = {
   /** Campaign id — used for the asset filename lookups. */
   campaignId: string;
+  /**
+   * Which platform this render targets. Drives the canvas dimensions
+   * and the proportional sizing inside each scene. Defaults to `stories`
+   * (9:16) since that's where most of our impressions live.
+   */
+  format?: AdVideoFormat;
   /** Kid-quote / pain-point headline. Used by text-reveal scenes. */
   headline: string;
   /** Optional subhead under the headline. Used by text-reveal scenes. */
@@ -257,6 +284,7 @@ function TextRevealScene({
   background,
   color,
   subhead,
+  format,
 }: {
   caption: string;
   background: string;
@@ -264,10 +292,15 @@ function TextRevealScene({
   /** Deprecated: underline sweep was dropped. Kept for backward compat. */
   highlightColor?: string;
   subhead?: string;
+  format: AdVideoFormat;
 }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const maxLineWidth = 920;
+  const { w: canvasWidth } = getVideoDims(format);
+  // Headline width = canvas width minus 80px padding each side.
+  // 1080w → 920, 1080w (4:5) → 920 same, but keeps the formula honest if
+  // we add a narrower format like square later.
+  const maxLineWidth = canvasWidth - 160;
   const headlineSize = autoHeadlineSize(caption, maxLineWidth);
 
   // Subhead springs in after the headline has mostly landed — 0.6s at 24fps
@@ -309,7 +342,7 @@ function TextRevealScene({
             fontSize: 42,
             lineHeight: 1.28,
             color,
-            maxWidth: 880,
+            maxWidth: maxLineWidth - 40,
             opacity: subheadOpacity * 0.85,
             transform: `translateY(${subheadY}px)`,
           }}
@@ -324,11 +357,18 @@ function TextRevealScene({
 function LineArtDrawScene({
   svgUrl,
   caption,
+  format,
 }: {
   svgUrl: string;
   caption: string;
+  format: AdVideoFormat;
 }) {
   const frame = useCurrentFrame();
+  const { h: canvasHeight } = getVideoDims(format);
+  // Card scales with canvas height — was 720 on a 1920 canvas (~37.5%).
+  // On 4:5 / 1350 that gives ~506, which leaves room for the caption
+  // below without crowding the bottom edge.
+  const cardSize = Math.round(canvasHeight * 0.375);
   // Fake a draw-on effect: fade+scale the image in, caption overlays at end
   const opacity = interpolate(frame, [0, 30], [0, 1], {
     extrapolateRight: "clamp",
@@ -352,8 +392,8 @@ function LineArtDrawScene({
     >
       <div
         style={{
-          width: 720,
-          height: 720,
+          width: cardSize,
+          height: cardSize,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -366,12 +406,16 @@ function LineArtDrawScene({
           style={{ width: "100%", height: "100%", objectFit: "contain" }}
         />
       </div>
+      {/* Headline timing: scene is 3s = 72 frames @ 24fps. Each word's
+          spring takes 20 frames to settle. With startFrame=25 and
+          perWordFrames=3, last of 6 words starts at frame 40 and settles
+          at frame 60 — leaving ~0.5s read time before the b-roll cut. */}
       <StaggerText
         text={caption}
         color={CC.ink}
         fontSize={56}
-        startFrame={45}
-        perWordFrames={4}
+        startFrame={25}
+        perWordFrames={3}
       />
     </AbsoluteFill>
   );
@@ -381,13 +425,22 @@ function PhoneMockupScene({
   lineArtUrl,
   coloredUrl,
   durationSeconds,
+  format,
 }: {
   lineArtUrl: string;
   coloredUrl?: string;
   durationSeconds: number;
+  format: AdVideoFormat;
 }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const { h: canvasHeight } = getVideoDims(format);
+  // Phone scales with canvas height. Originally 720×1200 on a 1920 canvas
+  // (~62.5% height, 0.6 aspect). Keeping the 0.6 aspect and scaling height
+  // means the phone always fills ~62.5% of canvas vertically — leaves a
+  // safe-zone band top + bottom. On 4:5 (1350h): 843×507.
+  const phoneHeight = Math.round(canvasHeight * 0.625);
+  const phoneWidth = Math.round(phoneHeight * 0.6);
   const totalFrames = Math.round(durationSeconds * fps);
 
   // Phone frame itself fades/scales in over the first 0.6s.
@@ -421,8 +474,8 @@ function PhoneMockupScene({
     >
       <div
         style={{
-          width: 720,
-          height: 1200,
+          width: phoneWidth,
+          height: phoneHeight,
           background: "#1a0f08",
           borderRadius: 72,
           padding: 24,
@@ -484,17 +537,100 @@ function PhoneMockupScene({
   );
 }
 
+/**
+ * Hand-drawn squiggle underline using the same roughjs config as the
+ * marketing-site CrayonScribble component (bowing 3, roughness 2.4,
+ * strokeWidth 4). Computes the SVG path string once via RoughGenerator's
+ * pure-JS API — no DOM dependency, safe inside Remotion's headless render.
+ *
+ * `revealPct` (0..1) clips the squiggle left-to-right via SVG clipPath so
+ * the caller can drive the sweep-in animation with a single interpolated
+ * value (mirroring the old flat-bar's expanding-width behaviour).
+ */
+function RoughUnderline({
+  width,
+  height = 18,
+  revealPct,
+  seed = 7,
+  color,
+}: {
+  width: number;
+  height?: number;
+  revealPct: number;
+  seed?: number;
+  color: string;
+}) {
+  // Memoised so we don't re-run the rough generator every frame; the
+  // path is deterministic for a given seed + dimensions.
+  const pathData = useMemo(() => {
+    const generator = new RoughGenerator();
+    const drawable = generator.line(2, height - 9, width - 2, height - 7, {
+      bowing: 3,
+      roughness: 2.4,
+      strokeWidth: 4,
+      seed,
+    });
+    // Each Drawable holds multiple "ops" (one per overlapping pass). Merge
+    // them into a single path string — strokes will overlap visually,
+    // which is what gives the crayon-like double-line effect.
+    return drawable.sets.map((opSet) => generator.opsToPath(opSet)).join(" ");
+  }, [width, height, seed]);
+  const clipId = `rough-underline-clip-${seed}`;
+  const filterId = `rough-underline-grain-${seed}`;
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      style={{ display: "block", overflow: "visible" }}
+    >
+      <defs>
+        {/* Subtle paper-grain turbulence — matches CrayonScribble */}
+        <filter id={filterId}>
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.9"
+            numOctaves={2}
+            seed={seed}
+          />
+          <feDisplacementMap in="SourceGraphic" scale="0.8" />
+        </filter>
+        {/* Animated reveal — clipRect grows left-to-right with revealPct */}
+        <clipPath id={clipId}>
+          <rect x={0} y={0} width={width * revealPct} height={height} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clipId})`} filter={`url(#${filterId})`}>
+        <path
+          d={pathData}
+          stroke={color}
+          strokeWidth={4}
+          fill="none"
+          strokeLinecap="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
 function BrandOutroScene({
   cta,
   logoUrl,
   coloredUrl,
+  format,
 }: {
   cta: string;
   logoUrl: string;
   coloredUrl?: string;
+  format: AdVideoFormat;
 }) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const { h: canvasHeight } = getVideoDims(format);
+  // Colored card scales with canvas height. Originally 520 on a 1920
+  // canvas (~27%). On 4:5 (1350h) that's ~365 — leaves room for the
+  // logo, CTA, and underlined URL stack underneath without crowding.
+  const cardSize = Math.round(canvasHeight * 0.27);
 
   // Staggered entrances so the scene reads as a sequence, not a freeze:
   //   0.0s — colored page fades+scales in
@@ -520,13 +656,14 @@ function BrandOutroScene({
   const logoOpacity = Math.min(1, Math.max(0, logoSpring));
   const logoY = (1 - logoSpring) * 16;
 
-  // URL underline sweeps in from 1.6s, takes ~0.8s
+  // URL underline sweeps in from 1.6s, takes ~0.8s. revealPct drives
+  // RoughUnderline's clipPath left-to-right reveal.
   const underlineStart = Math.round(fps * 1.6);
   const underlineEnd = underlineStart + Math.round(fps * 0.8);
-  const underlineWidth = interpolate(
+  const underlineRevealPct = interpolate(
     frame,
     [underlineStart, underlineEnd],
-    [0, 260],
+    [0, 1],
     {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
@@ -548,8 +685,8 @@ function BrandOutroScene({
       {coloredUrl && (
         <div
           style={{
-            width: 520,
-            height: 520,
+            width: cardSize,
+            height: cardSize,
             background: "#fff",
             borderRadius: 32,
             boxShadow:
@@ -602,19 +739,23 @@ function BrandOutroScene({
         >
           chunkycrayon.com
         </div>
-        {/* Crayon-orange underline sweeps under the URL */}
+        {/* Hand-drawn crayon-orange squiggle underline — same roughjs
+            config as the marketing-site CrayonScribble. revealPct drives
+            the sweep-in over 0.8s starting at 1.6s. */}
         <div
           style={{
             position: "absolute",
             left: "50%",
-            bottom: -8,
-            height: 4,
-            width: underlineWidth,
-            background: CC.orange,
-            borderRadius: 2,
+            bottom: -14,
             transform: "translateX(-50%)",
           }}
-        />
+        >
+          <RoughUnderline
+            width={260}
+            revealPct={underlineRevealPct}
+            color={CC.orange}
+          />
+        </div>
       </div>
     </AbsoluteFill>
   );
@@ -670,6 +811,7 @@ export function AdVideo(props: AdVideoProps) {
     musicUrl,
     transitionSfxUrls,
     campaignId,
+    format = "stories",
   } = props;
 
   // Background + highlight colours for text-reveal scenes by campaign.
@@ -724,6 +866,7 @@ export function AdVideo(props: AdVideoProps) {
             color={style.color}
             highlightColor={style.highlight}
             subhead={subhead}
+            format={format}
           />
         );
       }
@@ -732,6 +875,7 @@ export function AdVideo(props: AdVideoProps) {
           <LineArtDrawScene
             svgUrl={lineArtUrl}
             caption={scene.caption ?? "They dream it. We draw it."}
+            format={format}
           />
         );
       case "phone-mockup":
@@ -740,6 +884,7 @@ export function AdVideo(props: AdVideoProps) {
             lineArtUrl={lineArtUrl}
             coloredUrl={coloredUrl}
             durationSeconds={scene.duration}
+            format={format}
           />
         );
       case "broll":
@@ -750,6 +895,7 @@ export function AdVideo(props: AdVideoProps) {
             cta={cta}
             logoUrl={logoUrl}
             coloredUrl={coloredUrl}
+            format={format}
           />
         );
     }

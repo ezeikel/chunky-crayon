@@ -183,6 +183,26 @@ async function resolveAssets(
   };
 }
 
+// Per-platform formats. Same scenes, different canvas dimensions.
+//   stories   → 1080x1920 (9:16). Default. Stories, Reels, TikTok, Pinterest video pin.
+//   meta-feed → 1080x1350 (4:5). Mandatory for Meta Mobile Feed / IG Feed /
+//               Explore / Profile Feed — those placements mask 9:16 video,
+//               cropping the top + bottom 12% (kills the headline + URL).
+const VIDEO_FORMATS = [
+  {
+    key: 'stories' as const,
+    compositionId: 'AdVideo',
+    suffix: '--video.mp4',
+    label: 'Stories 9:16',
+  },
+  {
+    key: 'meta-feed' as const,
+    compositionId: 'AdVideoMetaFeed',
+    suffix: '--video-meta.mp4',
+    label: 'Meta Feed 4:5',
+  },
+];
+
 async function renderOne(
   campaign: Campaign,
   assets: AdAsset[],
@@ -204,20 +224,6 @@ async function renderOne(
     allowPending,
   );
 
-  const inputProps = {
-    campaignId: campaign.id,
-    headline: campaign.copy.headline,
-    subhead: campaign.copy.subhead,
-    cta: campaign.copy.cta,
-    logoUrl: resolved.logoUrl,
-    lineArtUrl: resolved.lineArtUrl,
-    coloredUrl: resolved.coloredUrl,
-    brollUrls: resolved.brollUrls,
-    musicUrl: resolved.musicUrl,
-    transitionSfxUrls: resolved.transitionSfxUrls,
-    scenes: campaign.video.scenes,
-  };
-
   console.log(`   assets:`, {
     broll: Object.keys(resolved.brollUrls).length,
     music: !!resolved.musicUrl,
@@ -228,33 +234,57 @@ async function renderOne(
     console.log(`   sfx urls:`, resolved.transitionSfxUrls);
   }
 
-  const composition = await selectComposition({
-    serveUrl: bundleLocation,
-    id: 'AdVideo',
-    inputProps,
-    timeoutInMilliseconds: 120_000,
-  });
+  for (const format of VIDEO_FORMATS) {
+    const inputProps = {
+      campaignId: campaign.id,
+      headline: campaign.copy.headline,
+      subhead: campaign.copy.subhead,
+      cta: campaign.copy.cta,
+      logoUrl: resolved.logoUrl,
+      lineArtUrl: resolved.lineArtUrl,
+      coloredUrl: resolved.coloredUrl,
+      brollUrls: resolved.brollUrls,
+      musicUrl: resolved.musicUrl,
+      transitionSfxUrls: resolved.transitionSfxUrls,
+      scenes: campaign.video.scenes,
+      // Routes scene components to size proportionally for this canvas.
+      format: format.key,
+    };
 
-  const outputPath = resolve(WEB_PUBLIC, 'ads', `${campaign.id}--video.mp4`);
-  console.log(`   rendering → ${outputPath}`);
-  const started = Date.now();
+    const composition = await selectComposition({
+      serveUrl: bundleLocation,
+      id: format.compositionId,
+      inputProps,
+      timeoutInMilliseconds: 120_000,
+    });
 
-  await renderMedia({
-    composition,
-    serveUrl: bundleLocation,
-    codec: 'h264',
-    outputLocation: outputPath,
-    inputProps,
-    timeoutInMilliseconds: 180_000,
-    onBrowserLog: ({ type, text }) => {
-      if (type === 'error' || type === 'warning') {
-        console.log(`   [remotion-browser:${type}] ${text}`);
-      }
-    },
-  });
+    const outputPath = resolve(
+      WEB_PUBLIC,
+      'ads',
+      `${campaign.id}${format.suffix}`,
+    );
+    console.log(`   📐 ${format.label} → ${outputPath}`);
+    const started = Date.now();
 
-  const seconds = ((Date.now() - started) / 1000).toFixed(1);
-  console.log(`✅ ${campaign.id}: rendered in ${seconds}s`);
+    await renderMedia({
+      composition,
+      serveUrl: bundleLocation,
+      codec: 'h264',
+      outputLocation: outputPath,
+      inputProps,
+      timeoutInMilliseconds: 180_000,
+      onBrowserLog: ({ type, text }) => {
+        if (type === 'error' || type === 'warning') {
+          console.log(`   [remotion-browser:${type}] ${text}`);
+        }
+      },
+    });
+
+    const seconds = ((Date.now() - started) / 1000).toFixed(1);
+    console.log(`   ✅ ${format.label} rendered in ${seconds}s`);
+  }
+
+  console.log(`✅ ${campaign.id}: all formats rendered`);
 }
 
 async function main() {
@@ -280,6 +310,24 @@ async function main() {
   const bundleLocation = await bundle({
     entryPoint: WORKER_ENTRY,
     publicDir: WORKER_PUBLIC,
+    // packages/canvas emits ESM without .js extensions on its internal
+    // imports. Node + Next can resolve those, but Remotion's webpack runs
+    // with `fullySpecified: true` (strict ESM) and rejects them. Setting
+    // resolve.fullySpecified = false on .js files restores the lenient
+    // behaviour without needing to rewrite every import in the package.
+    webpackOverride: (current) => ({
+      ...current,
+      module: {
+        ...current.module,
+        rules: [
+          ...(current.module?.rules ?? []),
+          {
+            test: /\.m?js$/,
+            resolve: { fullySpecified: false },
+          },
+        ],
+      },
+    }),
   });
   const bundleSeconds = ((Date.now() - bundleStarted) / 1000).toFixed(1);
   console.log(`✅ bundled at ${bundleLocation} in ${bundleSeconds}s`);
