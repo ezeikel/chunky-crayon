@@ -13,6 +13,8 @@ import { useAnalytics } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import cn from '@/utils/cn';
 import SaveButton from '@/components/buttons/SaveButton';
+import { Experiment } from '@/components/experiment/Experiment';
+import TapPromptOverlay from '@/components/TapPromptOverlay';
 import SlimColorPalette from './SlimColorPalette';
 
 type EmbeddedColoringCanvasProps = {
@@ -26,6 +28,12 @@ type EmbeddedColoringCanvasProps = {
    * START_HERO_CANVAS_INTERACTED event for attribution.
    */
   campaign: string;
+  /**
+   * Translated label for the tap-prompt overlay (e.g. "Tap to color").
+   * Shown over the canvas in the `exp-start-hero-tap-prompt=both`
+   * variant; hidden after the visitor's first interaction.
+   */
+  tapPromptLabel?: string;
   className?: string;
 };
 
@@ -58,6 +66,7 @@ type EmbeddedColoringCanvasProps = {
 const EmbeddedColoringCanvas = ({
   image,
   campaign,
+  tapPromptLabel,
   className,
 }: EmbeddedColoringCanvasProps) => {
   const { track } = useAnalytics();
@@ -72,6 +81,11 @@ const EmbeddedColoringCanvas = ({
   // when the canvas scrolls into view, hides as visitor reads further
   // down the marketing page. Desktop palette renders inline always.
   const [isInViewport, setIsInViewport] = useState(false);
+  // Drives the tap-prompt overlay visibility. Flips to true the moment
+  // the visitor first interacts with the canvas (regardless of which
+  // method) so the overlay fades out, revealing the artwork they're
+  // about to color.
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   // Snapshot of the painted canvas at click time, used by the
   // SaveButton to embed the visitor's coloured version into the
@@ -83,6 +97,7 @@ const EmbeddedColoringCanvas = ({
   }, []);
 
   const handleFirstInteraction = useCallback(() => {
+    setHasInteracted(true);
     if (hasTrackedInteractionRef.current) return;
     hasTrackedInteractionRef.current = true;
     track(TRACKING_EVENTS.START_HERO_CANVAS_INTERACTED, {
@@ -198,6 +213,29 @@ const EmbeddedColoringCanvas = ({
                   : undefined
               }
             />
+            {/* A/B test: tap-prompt overlay on top of the canvas. Only
+                renders in the `both` variant of exp-start-hero-tap-prompt;
+                the control variant renders nothing here so the canvas is
+                untouched. Cold-traffic visitors don't realize the canvas
+                is interactive (only ~14% touch it on mobile); the
+                pulse + label make the affordance obvious. Hidden after
+                the visitor's first interaction. */}
+            {tapPromptLabel && (
+              <Experiment
+                flag="exp-start-hero-tap-prompt"
+                defaultVariant="control"
+                exposureProperties={{ campaign }}
+                variants={{
+                  control: null,
+                  both: (
+                    <TapPromptOverlay
+                      hidden={hasInteracted}
+                      label={tapPromptLabel}
+                    />
+                  ),
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

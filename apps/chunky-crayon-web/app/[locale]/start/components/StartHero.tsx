@@ -42,6 +42,7 @@ export default function StartHero({
   title,
   subtitle,
   eyebrow,
+  tryColoringLabel,
   ctaLabel,
   ctaSubtext,
   experimentCtaSubtext,
@@ -120,7 +121,11 @@ export default function StartHero({
             rather than crash. */}
         <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
           {hasImage && image ? (
-            <EmbeddedColoringCanvas image={image} campaign={campaign} />
+            <EmbeddedColoringCanvas
+              image={image}
+              campaign={campaign}
+              tapPromptLabel={tryColoringLabel}
+            />
           ) : null}
         </div>
       </div>
