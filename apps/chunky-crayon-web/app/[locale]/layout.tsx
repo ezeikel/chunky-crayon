@@ -9,7 +9,6 @@ import { notFound } from 'next/navigation';
 import cn from '@/utils/cn';
 import Header from '@/components/Header/Header';
 import { Toaster } from '@/components/ui/sonner';
-import DevToolbar from '@/components/dev/DevToolbar';
 import BasicHeader from '@/components/BasicHeader/BasicHeader';
 import Footer from '@/components/Footer/Footer';
 import PixelLoaders from '@/components/PixelLoaders/PixelLoaders';
@@ -216,7 +215,6 @@ export default async function LocaleLayout({ children, params }: Props) {
           </Providers>
         </NextIntlClientProvider>
         <Toaster />
-        <DevToolbar />
         <Analytics />
       </body>
     </html>
