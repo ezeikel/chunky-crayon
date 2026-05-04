@@ -441,7 +441,7 @@
         "seoTitle": "Coloriages gratuits pour tout-petits",
         "seoParagraph1": "Vous initiez votre tout-petit au coloriage ? Notre collection de coloriages simples est parfaite pour les enfants de 2 à 4 ans. Chaque dessin propose de grandes zones faciles à colorier, avec des contours bien marqués pour aider au développement de la motricité fine.",
         "seoParagraph2": "Nos coloriages pour tout-petits mettent en avant des choses qu’ils adorent : animaux mignons, nourriture appétissante, véhicules colorés et jolies scènes de nature. Les dessins simples évitent la frustration et encouragent l’imagination.",
-        "seoParagraph3": "Toutes les pages peuvent être imprimées sur du papier A4 standard ou coloriées en ligne avec nos outils numériques faciles à utiliser. Parfait pour les moments calmes, les jours de pluie, ou les activités à la maison et à la maternelle.",
+        "seoParagraph3": "Toutes les pages peuvent être imprimées sur du papier A4 standard ou coloriées en ligne avec nos outils numériques faciles à utiliser. Parfait pour les moments calmes, les jours de pluie, ou les activités d'apprentissage à la maison et à la maternelle.",
         "benefitsTitle": "Les bienfaits du coloriage pour les tout-petits",
         "benefitsDescription": "Le coloriage aide les tout-petits à développer des compétences importantes : coordination œil-main, reconnaissance des couleurs, force de préhension, attention et concentration, et expression créative. Commencez avec nos dessins les plus simples et regardez votre petit artiste grandir !"
       },
@@ -474,7 +474,7 @@
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins faits pour vos passions !",
         "why2Title": "Art détaillé",
         "why2Description": "Des dessins minutieux qui mettent au défi vos talents et sont magnifiques une fois finis.",
-        "why3Title": "Décompression",
+        "why3Title": "Anti-stress",
         "why3Description": "Faites une pause loin des écrans et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop enfantins » ? Notre collection ado propose des dessins cool et détaillés, parfaits pour les 13 à 17 ans. Personnages d'anime, scènes de gaming, mondes fantastiques, motifs abstraits… il y en a pour tous les styles.",
@@ -489,7 +489,7 @@
         "categoriesSection": "Catégories adultes",
         "heroDescription": "Découvrez les bienfaits thérapeutiques du coloriage pour adultes ! Notre collection propose des mandalas complexes, de belles scènes de nature et des motifs détaillés pensés pour la détente et la pleine conscience. Parfait pour décompresser après une longue journée.",
         "whyTitle": "Les bienfaits du coloriage pour adultes",
-        "why1Title": "Décompression",
+        "why1Title": "Anti-stress",
         "why1Description": "Le coloriage favorise la détente, réduit l’anxiété et apaise l’esprit.",
         "why2Title": "Pleine conscience",
         "why2Description": "Restez dans l’instant présent avec une activité méditative, sans écran.",
@@ -509,9 +509,9 @@
     "heroTitle": "Des formules pour chaque aventure coloriage !",
     "heroSubtitle": "Créez, coloriez en ligne, collectionnez des autocollants et partagez avec vos amis. Choisissez la formule qui convient à votre famille.",
     "monthly": "Mensuel",
-    "annual": "Annuel (économisez 17 %)",
+    "annual": "Annuel (2 mois gratuits)",
     "mostPopular": "La plus populaire",
-    "buyNow": "Acheter",
+    "buyNow": "Démarrer l'essai gratuit de 7 jours",
     "noCommitment": "Sans engagement. Annulez à tout moment.",
     "perMonth": "/mois",
     "creditsPerMonth": "crédits/mois",
@@ -588,7 +588,7 @@
       },
       "multipleKids": {
         "question": "Plusieurs enfants peuvent-ils utiliser un seul abonnement ?",
-        "answer": "Oui — et c’est là que la plupart des applis se trompent. Un seul forfait Chunky Crayon inclut des profils séparés pour chaque enfant (Splash 3, Rainbow 5, Sparkle 10). Leurs pages, stickers et mascottes Colo restent bien séparés. Pas besoin d’un abonnement par enfant."
+        "answer": "Oui — et c'est là que la plupart des applis se trompent. Un seul forfait Chunky Crayon inclut des profils séparés pour chaque enfant (Splash 2, Rainbow 4, Sparkle 10). Leurs pages, stickers et mascottes Colo restent bien séparés. Pas besoin d'un abonnement par enfant."
       },
       "trialMechanics": {
         "question": "Que se passe-t-il après l’essai gratuit de 7 jours ?",
