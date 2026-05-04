@@ -1,18 +1,30 @@
 import type { AdAsset, Campaign } from '@/lib/ads/schema';
 import {
-  AD_H,
-  AD_W,
   CC,
+  CanvasFormat,
   ChunkyButton,
   PaletteDots,
   ROONEY,
   TONDO,
+  getCanvasDims,
 } from './primitives';
 
-type Props = { campaign: Campaign; asset: AdAsset };
+type Props = { campaign: Campaign; asset: AdAsset; format?: CanvasFormat };
 
-export default function AdAppScreen({ campaign, asset }: Props) {
+export default function AdAppScreen({
+  campaign,
+  asset,
+  format = 'meta-feed',
+}: Props) {
   const { headline, subhead, cta } = campaign.copy;
+  const { w: AD_W, h: AD_H } = getCanvasDims(format);
+  // Phone was at top:650 / 520x600 in the 1080x1350 original. Anchor and
+  // dimensions scale to canvas height so the phone stays centered between
+  // headline and CTA in any format.
+  const phoneTop = Math.round(AD_H * 0.481);
+  const phoneW = Math.round(AD_H * 0.385);
+  const phoneH = Math.round(AD_H * 0.444);
+  const sidePad = AD_W < 1080 ? 44 : 56;
 
   return (
     <div
@@ -47,7 +59,7 @@ export default function AdAppScreen({ campaign, asset }: Props) {
       <div
         style={{
           position: 'relative',
-          padding: '72px 56px 0',
+          padding: `72px ${sidePad}px 0`,
           fontFamily: TONDO,
           fontWeight: 700,
           fontSize: 132,
@@ -73,11 +85,11 @@ export default function AdAppScreen({ campaign, asset }: Props) {
         <div
           style={{
             position: 'relative',
-            padding: '28px 56px 0',
+            padding: `28px ${sidePad}px 0`,
             fontSize: 30,
             fontWeight: 500,
             lineHeight: 1.35,
-            maxWidth: 900,
+            maxWidth: AD_W - sidePad * 2,
             color: 'rgba(255,255,255,0.92)',
           }}
         >
@@ -90,10 +102,10 @@ export default function AdAppScreen({ campaign, asset }: Props) {
         style={{
           position: 'absolute',
           left: '50%',
-          top: 650,
+          top: phoneTop,
           transform: 'translateX(-50%) rotate(-3deg)',
-          width: 520,
-          height: 600,
+          width: phoneW,
+          height: phoneH,
           background: '#1a0f08',
           borderRadius: 48,
           padding: 18,
@@ -231,7 +243,7 @@ export default function AdAppScreen({ campaign, asset }: Props) {
           left: 0,
           right: 0,
           bottom: 56,
-          padding: '0 56px',
+          padding: `0 ${sidePad}px`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',

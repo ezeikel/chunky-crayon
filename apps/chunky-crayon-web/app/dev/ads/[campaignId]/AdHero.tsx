@@ -1,25 +1,41 @@
 import type { AdAsset, Campaign } from '@/lib/ads/schema';
 import {
-  AD_H,
-  AD_W,
   CC,
+  CanvasFormat,
   ChunkyButton,
   Crayon,
   ROONEY,
   TONDO,
+  getCanvasDims,
 } from './primitives';
 
-type Props = { campaign: Campaign; asset: AdAsset };
+type Props = { campaign: Campaign; asset: AdAsset; format?: CanvasFormat };
 
-export default function AdHero({ campaign, asset }: Props) {
+export default function AdHero({
+  campaign,
+  asset,
+  format = 'meta-feed',
+}: Props) {
   const { headline, subhead, cta, proofQuote } = campaign.copy;
+  const { w, h } = getCanvasDims(format);
+
+  // Card was at top:690 / size 520 in the 1080x1350 original. Scale both
+  // anchor and size proportionally to canvas height so all formats land
+  // the card in the same visual region (~51% from top, ~38% of height).
+  const cardSize = Math.round(h * 0.385);
+  const cardTop = Math.round(h * 0.51);
+  const proofTop = Math.round(h * 0.467);
+  const crayonTop = Math.round(h * 0.83);
+  // Headline padding shrinks slightly on narrower canvases (Pinterest 1000w)
+  // so the closing quote of "skateboard?" doesn't clip the right edge.
+  const sidePad = w < 1080 ? 44 : 56;
 
   return (
     <div
       data-ad-canvas="true"
       style={{
-        width: AD_W,
-        height: AD_H,
+        width: w,
+        height: h,
         position: 'relative',
         overflow: 'hidden',
         background: CC.surface,
@@ -36,7 +52,7 @@ export default function AdHero({ campaign, asset }: Props) {
       />
 
       {/* Brand lockup */}
-      <div style={{ position: 'relative', padding: '56px 56px 0' }}>
+      <div style={{ position: 'relative', padding: `56px ${sidePad}px 0` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
           <img
             src="/logos/cc-logo-no-bg.svg"
@@ -66,7 +82,7 @@ export default function AdHero({ campaign, asset }: Props) {
       <div
         style={{
           position: 'relative',
-          padding: '56px 56px 0',
+          padding: `56px ${sidePad}px 0`,
           fontFamily: TONDO,
           fontWeight: 700,
           fontSize: 88,
@@ -84,12 +100,12 @@ export default function AdHero({ campaign, asset }: Props) {
         <div
           style={{
             position: 'relative',
-            padding: '32px 56px 0',
+            padding: `32px ${sidePad}px 0`,
             fontSize: 34,
             fontWeight: 500,
             lineHeight: 1.3,
             color: CC.muted,
-            maxWidth: 900,
+            maxWidth: w - sidePad * 2,
           }}
         >
           {subhead}
@@ -103,13 +119,13 @@ export default function AdHero({ campaign, asset }: Props) {
             position: 'absolute',
             left: 0,
             right: 0,
-            top: 630,
+            top: proofTop,
             textAlign: 'center',
             fontSize: 24,
             fontStyle: 'italic',
             color: CC.muted,
             fontWeight: 500,
-            padding: '0 56px',
+            padding: `0 ${sidePad}px`,
           }}
         >
           {proofQuote}
@@ -121,10 +137,10 @@ export default function AdHero({ campaign, asset }: Props) {
         style={{
           position: 'absolute',
           left: '50%',
-          top: 690,
+          top: cardTop,
           transform: 'translateX(-50%) rotate(-3deg)',
-          width: 520,
-          height: 520,
+          width: cardSize,
+          height: cardSize,
           background: '#fff',
           borderRadius: 16,
           boxShadow: '0 14px 0 rgba(0,0,0,0.07), 0 30px 60px rgba(0,0,0,0.12)',
@@ -157,10 +173,10 @@ export default function AdHero({ campaign, asset }: Props) {
       </div>
 
       {/* Crayon scatter — flanking the card, above the CTA zone */}
-      <div style={{ position: 'absolute', left: 80, top: 1120 }}>
+      <div style={{ position: 'absolute', left: 80, top: crayonTop }}>
         <Crayon color={CC.pink} dark={CC.pinkDark} length={150} rotate={18} />
       </div>
-      <div style={{ position: 'absolute', right: 80, top: 1130 }}>
+      <div style={{ position: 'absolute', right: 80, top: crayonTop + 10 }}>
         <Crayon
           color={CC.green}
           dark={CC.greenDark}
@@ -169,17 +185,20 @@ export default function AdHero({ campaign, asset }: Props) {
         />
       </div>
 
-      {/* CTA band — full safe zone at bottom */}
+      {/* CTA band — full safe zone at bottom. flex-shrink lets the right
+          text block compress on narrower canvases (Pinterest 1000w) so the
+          CTA button never gets pushed off the right edge. */}
       <div
         style={{
           position: 'absolute',
           left: 0,
           right: 0,
           bottom: 0,
-          padding: '0 56px 48px',
+          padding: `0 ${sidePad}px 48px`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          gap: 24,
         }}
       >
         <ChunkyButton bg={CC.orange} shadow={CC.orangeDark} fontSize={42}>
@@ -194,6 +213,8 @@ export default function AdHero({ campaign, asset }: Props) {
             fontSize: 22,
             color: CC.muted,
             fontWeight: 600,
+            flexShrink: 0,
+            textAlign: 'right',
           }}
         >
           <span>🖨 Print it</span>

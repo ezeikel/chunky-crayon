@@ -19,8 +19,24 @@ export const CC = {
   paper: '#FFFDF4',
 } as const;
 
-export const AD_W = 1080;
-export const AD_H = 1350;
+// Canvas dimensions are now per-format. AdHero / AdAppScreen / AdBeforeAfter
+// receive a `format` prop and call getCanvasDims(format) to size themselves
+// for the platform we're exporting to. Adding a new export size = one new
+// entry in CANVAS_DIMS.
+export type CanvasFormat = 'meta-feed' | 'stories' | 'pinterest';
+
+export const CANVAS_DIMS: Record<CanvasFormat, { w: number; h: number }> = {
+  'meta-feed': { w: 1080, h: 1350 },
+  stories: { w: 1080, h: 1920 },
+  pinterest: { w: 1000, h: 1500 },
+};
+
+export const getCanvasDims = (format: CanvasFormat) => CANVAS_DIMS[format];
+
+// Back-compat exports — some templates still import these for the legacy
+// 4:5 sizing as a default. Prefer getCanvasDims(format) in new code.
+export const AD_W = CANVAS_DIMS['meta-feed'].w;
+export const AD_H = CANVAS_DIMS['meta-feed'].h;
 
 export const TONDO = 'var(--font-tondo), ui-rounded, system-ui, sans-serif';
 export const ROONEY =

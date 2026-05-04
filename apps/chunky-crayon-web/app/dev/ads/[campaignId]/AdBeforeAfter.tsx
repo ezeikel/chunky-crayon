@@ -1,18 +1,28 @@
 import type { AdAsset, Campaign } from '@/lib/ads/schema';
 import {
-  AD_H,
-  AD_W,
   CC,
+  CanvasFormat,
   ChunkyButton,
   Crayon,
   ROONEY,
   TONDO,
+  getCanvasDims,
 } from './primitives';
 
-type Props = { campaign: Campaign; asset: AdAsset };
+type Props = { campaign: Campaign; asset: AdAsset; format?: CanvasFormat };
 
-export default function AdBeforeAfter({ campaign, asset }: Props) {
+export default function AdBeforeAfter({
+  campaign,
+  asset,
+  format = 'meta-feed',
+}: Props) {
   const { headline, cta, eyebrow } = campaign.copy;
+  const { w: AD_W, h: AD_H } = getCanvasDims(format);
+  // Card row was top:560 bottom:340 in the 1080x1350 original. Scale anchors
+  // proportionally so before/after cards stay roughly centered.
+  const cardRowTop = Math.round(AD_H * 0.415);
+  const cardRowBottom = Math.round(AD_H * 0.252);
+  const sidePad = AD_W < 1080 ? 44 : 56;
   // After-card uses colored variant if generated, else falls back to line art
   // (visibly the same as before — warns author during review).
   const afterImage = asset.coloredUrl ?? asset.url;
@@ -53,8 +63,8 @@ export default function AdBeforeAfter({ campaign, asset }: Props) {
         style={{
           position: 'absolute',
           top: 130,
-          left: 56,
-          right: 56,
+          left: sidePad,
+          right: sidePad,
           fontFamily: TONDO,
           fontWeight: 700,
           fontSize: 108,
@@ -96,8 +106,8 @@ export default function AdBeforeAfter({ campaign, asset }: Props) {
           position: 'absolute',
           left: 40,
           right: 40,
-          top: 560,
-          bottom: 340,
+          top: cardRowTop,
+          bottom: cardRowBottom,
           paddingTop: 30,
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
@@ -265,7 +275,7 @@ export default function AdBeforeAfter({ campaign, asset }: Props) {
           left: 0,
           right: 0,
           bottom: 0,
-          padding: '0 56px 48px',
+          padding: `0 ${sidePad}px 48px`,
         }}
       >
         <div

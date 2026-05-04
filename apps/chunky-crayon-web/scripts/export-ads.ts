@@ -74,7 +74,10 @@ async function main() {
       for (const format of formats) {
         const filename = `${campaign.id}--${format.key}.png`;
         const outPath = resolve(OUTPUT_DIR, filename);
-        const url = `${DEV_BASE}/dev/ads/${campaign.id}`;
+        // ?format=<key> tells the page to size the canvas for this platform.
+        // Without it, the page defaults to meta-feed (1080x1350) and the
+        // Playwright viewport mismatches the rendered div, clipping content.
+        const url = `${DEV_BASE}/dev/ads/${campaign.id}?format=${format.key}`;
 
         const started = Date.now();
         const context = await browser.newContext({
