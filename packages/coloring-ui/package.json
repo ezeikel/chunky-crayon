@@ -26,6 +26,7 @@
     "@one-colored-pixel/db": "workspace:*",
     "clsx": "^2.1.1",
     "posthog-js": "^1.238.0",
+    "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.0"
   },
   "peerDependencies": {

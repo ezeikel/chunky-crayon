@@ -49,6 +49,23 @@
   --color-coloring-magic-from: hsl(var(--crayon-purple));
   --color-coloring-magic-to: hsl(var(--crayon-pink));
 
+  /* Feedback variants — saturated CC palette (used by Toaster + status surfaces) */
+  --color-coloring-success-bg: hsl(var(--crayon-green));
+  --color-coloring-success-bg-dark: hsl(var(--crayon-green-dark));
+  --color-coloring-success-on: #ffffff;
+  --color-coloring-error-bg: hsl(var(--crayon-pink));
+  --color-coloring-error-bg-dark: hsl(var(--crayon-pink-dark));
+  --color-coloring-error-on: #ffffff;
+  --color-coloring-warning-bg: hsl(var(--crayon-yellow));
+  --color-coloring-warning-bg-dark: hsl(var(--crayon-yellow-dark));
+  --color-coloring-warning-on: hsl(var(--text-primary));
+  --color-coloring-info-bg: hsl(var(--crayon-blue));
+  --color-coloring-info-bg-dark: hsl(var(--crayon-blue-dark));
+  --color-coloring-info-on: #ffffff;
+  --color-coloring-loading-bg: hsl(var(--crayon-purple));
+  --color-coloring-loading-bg-dark: hsl(var(--crayon-purple-dark));
+  --color-coloring-loading-on: #ffffff;
+
   /* Coloring UI brand tokens — Chunky Crayon (kids: chunky, bouncy) */
   --radius-coloring-button: 1.5rem;
   --radius-coloring-card: 1.5rem;
@@ -693,9 +710,57 @@
   --fa-secondary-opacity: 0.5;
 }
 
-/* Sonner Toast */
-[data-sonner-toast] [data-description] {
-  color: hsl(var(--text-secondary)) !important;
+/* Sonner Toast — themed via packages/coloring-ui/src/Toaster.tsx */
+@keyframes toast-icon-pop {
+  0% { opacity: 0; transform: scale(0.4) rotate(-8deg); }
+  60% { opacity: 1; transform: scale(1.15) rotate(4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.toast-icon-pop {
+  animation: toast-icon-pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Toaster icon wrapper — sonner clamps [data-icon] to 16x16, which fights
+   our 2.25rem FA icons and collapses the gap. Match the wrapper to the icon
+   size so flex `gap` actually creates breathing room between icon and text. */
+[data-sonner-toast] [data-icon] {
+  width: 1.875rem !important;
+  height: 1.875rem !important;
+  margin: 0 !important;
+}
+[data-sonner-toast][data-type="loading"] [data-icon] {
+  width: 2rem !important;
+  height: 2rem !important;
+}
+[data-sonner-toast] [data-icon] svg {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+}
+
+/* Toaster close button — bigger, vertically centered. Overrides sonner's
+   default 20×20 corner-anchored button that sits at the top-left/right. */
+[data-sonner-toast] [data-close-button] {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  top: 50% !important;
+  left: auto !important;
+  right: 0.75rem !important;
+  transform: translateY(-50%) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  opacity: 0.65;
+  transition: opacity 150ms ease;
+}
+[data-sonner-toast] [data-close-button]:hover {
+  opacity: 1;
+}
+[data-sonner-toast] [data-close-button] svg {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  stroke-width: 2.5 !important;
 }
 
 /* Magic colors loading bar — sweeps a coloured fill back and forth across

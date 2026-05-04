@@ -103,6 +103,7 @@ export {
   type MagicColorOverlayMessages,
 } from "./MagicColorOverlay";
 export { default as CompletionCelebration } from "./CompletionCelebration";
+export { Toaster, toast } from "./Toaster";
 export {
   Dialog,
   DialogPortal,
