@@ -40,15 +40,15 @@
   },
   "coloringPage": {
     "title": "색칠하기",
-    "defaultDescription": "무료 인쇄용 색칠하기 페이지",
+    "defaultDescription": "무료 프린트 색칠공부 페이지",
     "progress": {
       "colored": "색칠됨",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "잘 시작했어요!",
+        "25": "좋은 시작이에요!",
         "50": "절반 완성했어요!",
         "75": "거의 완성했어요!",
-        "100": "완성했어요!"
+        "100": "대단해요!"
       },
       "allDone": "완료!"
     },
@@ -145,7 +145,7 @@
       "turnOn": "소리 켜기",
       "turnOff": "소리 끄기"
     },
-    "relatedPages": "색칠놀이 더 보기"
+    "relatedPages": "색칠하기 더 보기"
   },
   "shareModal": {
     "title": "작품 공유하기",
@@ -304,7 +304,7 @@
     "noSubscriptionDescription": "플랜을 선택하고 멋진 색칠놀이 그림 만들기를 시작해요.",
     "viewPlans": "플랜 보기",
     "buyMoreCredits": "크레딧 더 사기",
-    "credits": "크레딧 {count}개",
+    "credits": "{count} 크레딧",
     "buyNow": "지금 구매",
     "loading": "불러오는 중...",
     "availablePlans": "이용 가능한 플랜",
@@ -362,7 +362,7 @@
     "notFound": "페이지를 찾을 수 없습니다",
     "sharedArtworkNotFound": {
       "title": "그림을 찾을 수 없어요",
-      "description": "공유된 그림 링크가 만료되었거나 삭제되었을 수 있어요. 작가에게 새 링크를 부탁해 보세요!",
+      "description": "공유된 그림 링크가 만료되었거나 삭제되었을 수 있어요. 작가에게 새 링크를 요청해 보세요!",
       "cta": "컬러링 페이지 구경하기"
     },
     "unauthorized": "계속하려면 로그인해 주세요",
@@ -379,8 +379,8 @@
     "forTeens": "청소년용",
     "forAdults": "어른용",
     "ariaLabel": "경로",
-    "daily": "매일 색칠놀이",
-    "community": "커뮤니티 색칠놀이",
+    "daily": "매일 색칠하기",
+    "community": "커뮤니티 색칠하기",
     "holidays": "명절 & 계절"
   },
   "jumpToNav": {
