@@ -2,7 +2,7 @@
   "common": {
     "loading": "Cargando...",
     "error": "Algo salió mal",
-    "retry": "Inténtalo de nuevo",
+    "retry": "Reintentar",
     "save": "Guardar",
     "cancel": "Cancelar",
     "close": "Cerrar",
@@ -73,7 +73,7 @@
       "magic": "Magia"
     },
     "brushTypes": {
-      "crayon": "Cera",
+      "crayon": "Crayón",
       "marker": "Rotulador",
       "eraser": "Borrador",
       "glitter": "Purpurina",
@@ -105,7 +105,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Compartir listo",
+      "doneSharing": "Listo para compartir",
       "colorAgain": "Colorear otra vez",
       "startOver": "Empezar de nuevo"
     },
@@ -123,7 +123,7 @@
     },
     "colorPalette": {
       "selectColor": "Seleccionar color {color}",
-      "magicToolsMessage": "Los colores se eligen automáticamente con herramientas Mágicas"
+      "magicToolsMessage": "Los colores se seleccionan automáticamente con las herramientas mágicas"
     },
     "patternSelector": {
       "label": "Patrón:"
@@ -313,7 +313,7 @@
     "manageInPortal": "Gestiona tu suscripción en el portal del cliente",
     "noCommitment": "Sin compromiso. Cancela cuando quieras.",
     "perMonth": "/mes",
-    "noSubscriptionForCredits": "Necesitas una suscripción activa para comprar créditos",
+    "noSubscriptionForCredits": "Se requiere una suscripción activa para comprar créditos",
     "noSubscriptionFound": "No se encontró una suscripción activa",
     "failedToChangeSubscription": "No se pudo cambiar la suscripción",
     "failedToCheckout": "No se pudo ir al pago",
@@ -353,7 +353,7 @@
       "oauth": "Hubo un problema al iniciar sesión con tu cuenta. Inténtalo de nuevo.",
       "email": "Hubo un problema al enviar el correo de inicio de sesión. Inténtalo de nuevo.",
       "credentials": "Credenciales no válidas. Revisa tu correo e inténtalo de nuevo.",
-      "sessionRequired": "Inicia sesión para entrar a esta página.",
+      "sessionRequired": "Inicia sesión para acceder a esta página.",
       "default": "Ocurrió un error inesperado. Inténtalo de nuevo."
     }
   },
@@ -362,7 +362,7 @@
     "notFound": "Página no encontrada",
     "sharedArtworkNotFound": {
       "title": "Dibujo no encontrado",
-      "description": "Este enlace de dibujo compartido puede haber caducado o haberse eliminado. ¡Pídele al artista un enlace nuevo!",
+      "description": "Este enlace puede haber caducado o sido eliminado. ¡Pide un enlace nuevo al artista!",
       "cta": "Explorar páginas para colorear"
     },
     "unauthorized": "Inicia sesión para continuar",
