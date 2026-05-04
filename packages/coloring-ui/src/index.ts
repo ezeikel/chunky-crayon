@@ -104,6 +104,7 @@ export {
 } from "./MagicColorOverlay";
 export { default as CompletionCelebration } from "./CompletionCelebration";
 export { Toaster, toast } from "./Toaster";
+export { Button, buttonVariants, type ButtonProps } from "./Button";
 export {
   Dialog,
   DialogPortal,
