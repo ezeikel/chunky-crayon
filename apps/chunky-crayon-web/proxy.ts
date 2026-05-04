@@ -118,11 +118,6 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Skip i18n for Plausible analytics proxy routes
-  if (pathname.startsWith('/js/') || pathname.startsWith('/proxy/')) {
-    return NextResponse.next();
-  }
-
   // Skip i18n for OG image routes - they should be served directly
   if (
     pathname.includes('opengraph-image') ||

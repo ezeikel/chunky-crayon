@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/react';
 import { VercelToolbar } from '@vercel/toolbar/next';
 import { config } from '@fortawesome/fontawesome-svg-core';
-import PlausibleProvider from 'next-plausible';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -110,7 +109,6 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale}>
       <head>
-        <PlausibleProvider domain="chunkycrayon.com" />
         {/* Pixel + Pinterest tag loaders. Lives in a Client Component
             so we can use Script onLoad to fire init/PageView without an
             inline-script body containing template-literal env interpolation

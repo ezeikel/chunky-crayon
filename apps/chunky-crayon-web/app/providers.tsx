@@ -1,7 +1,6 @@
 'use client';
 
 import { SessionProvider } from 'next-auth/react';
-import PlausibleProvider from 'next-plausible';
 import {
   ColoringContextProvider,
   setR2Hosts,
@@ -19,17 +18,15 @@ setR2Hosts([
 ]);
 
 const Providers = ({ children }: { children: React.ReactNode }) => (
-  <PlausibleProvider domain="chunkycrayon.com" trackOutboundLinks>
-    <ColoringContextProvider variant="kids" storagePrefix="chunky-crayon">
-      <SessionProvider>
-        <ParentalGateProvider>
-          <UserIdentify />
-          <PixelTracker />
-          {children}
-        </ParentalGateProvider>
-      </SessionProvider>
-    </ColoringContextProvider>
-  </PlausibleProvider>
+  <ColoringContextProvider variant="kids" storagePrefix="chunky-crayon">
+    <SessionProvider>
+      <ParentalGateProvider>
+        <UserIdentify />
+        <PixelTracker />
+        {children}
+      </ParentalGateProvider>
+    </SessionProvider>
+  </ColoringContextProvider>
 );
 
 export default Providers;

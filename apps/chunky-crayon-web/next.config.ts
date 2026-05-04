@@ -1,5 +1,4 @@
 import { withSentryConfig } from '@sentry/nextjs';
-import { withPlausibleProxy } from 'next-plausible';
 import type { NextConfig } from 'next';
 import withVercelToolbar from '@vercel/toolbar/plugins/next';
 import createNextIntlPlugin from 'next-intl/plugin';
@@ -118,10 +117,7 @@ const sentryOptions = {
 // Create the next-intl plugin (points to i18n/request.ts)
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
-// Apply Plausible proxy FIRST (before intl) so rewrites aren't affected by locale routing
-const configWithPlausible = withPlausibleProxy()(nextConfig);
-
-const configWithIntl = withNextIntl(configWithPlausible);
+const configWithIntl = withNextIntl(nextConfig);
 
 const configWithSentry = withSentryConfig(configWithIntl, sentryOptions);
 
