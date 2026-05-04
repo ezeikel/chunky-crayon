@@ -33,7 +33,7 @@
       "actions": "Actions"
     },
     "tools": {
-      "pan": "Déplacer",
+      "pan": "Panoramique",
       "fill": "Remplissage",
       "brush": "Pinceau",
       "sticker": "Autocollant",
@@ -49,7 +49,7 @@
       "marker": "Feutre",
       "eraser": "Gomme",
       "glitter": "Paillettes",
-      "sparkle": "Étincelle",
+      "sparkle": "Étincelles",
       "rainbow": "Arc-en-ciel",
       "glow": "Lueur",
       "neon": "Néon"
@@ -104,7 +104,7 @@
       "zoomOutAria": "Dézoomer (voir plus large)",
       "zoomIn": "Zoomer",
       "zoomInAria": "Zoomer (voir de plus près)",
-      "pan": "Déplacer",
+      "pan": "Panoramique",
       "panAria": "Déplacer la vue dans l'image",
       "reset": "Voir l'image entière",
       "resetAria": "Revenir à l'image complète"
@@ -414,7 +414,7 @@
         },
         "creditsPerPage": {
           "question": "Combien de pages puis-je créer ?",
-          "answer": "Chaque page coûte environ 5 crédits. Cela représente environ 60 pages par mois avec Grove, 160 par mois avec Sanctuary et 400 par mois avec Oasis."
+          "answer": "Les pages texte ou photo coûtent 5 crédits. Le mode vocal (une conversation guidée sur ce que vous aimeriez colorier) coûte 10 crédits par page. Donc Grove = ~60 pages texte/photo ou ~30 pages vocales par mois. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Adaptez selon votre rythme."
         },
         "audience": {
           "question": "Coloring Habitat est-il fait pour moi ?",
@@ -530,10 +530,10 @@
       },
       "steampunk": {
         "name": "Steampunk",
-        "description": "Mécanismes victoriens et curieux engins"
+        "description": "Mécanismes victoriens et ingénieux assemblages"
       },
       "food": {
-        "name": "Nourriture",
+        "name": "Cuisine",
         "description": "Festins et scènes culinaires"
       }
     },
