@@ -40,7 +40,7 @@
   },
   "coloringPage": {
     "title": "Ausmalbild",
-    "defaultDescription": "Kostenloses Ausmalbild zum Ausdrucken",
+    "defaultDescription": "Kostenloses druckbares Ausmalbild",
     "progress": {
       "colored": "ausgemalt",
       "percentage": "{percent}%",
@@ -48,7 +48,7 @@
         "25": "Guter Start!",
         "50": "Halb geschafft!",
         "75": "Fast fertig!",
-        "100": "Geschafft!"
+        "100": "Fantastisch!"
       },
       "allDone": "Alles fertig!"
     },
@@ -73,9 +73,9 @@
       "magic": "Magie"
     },
     "brushTypes": {
-      "crayon": "Wachsmaler",
+      "crayon": "Wachsmalstift",
       "marker": "Filzstift",
-      "eraser": "Radierer",
+      "eraser": "Radiergummi",
       "glitter": "Glitzer",
       "sparkle": "Funkeln",
       "rainbow": "Regenbogen",
@@ -106,7 +106,7 @@
       "print": "Drucken",
       "preparing": "Wird vorbereitet...",
       "doneSharing": "Teilen beendet",
-      "colorAgain": "Nochmal ausmalen",
+      "colorAgain": "Neu ausmalen",
       "startOver": "Neu starten"
     },
     "toolbar": {
@@ -301,7 +301,7 @@
     "renewsOn": "Dein Abo verlängert sich am {date}",
     "manageSubscription": "Abo verwalten",
     "noActiveSubscription": "Kein aktives Abo",
-    "noSubscriptionDescription": "Wähle einen Plan, um Ausmalbilder zu erstellen.",
+    "noSubscriptionDescription": "Wählen Sie einen Plan, um großartige Ausmalbilder zu erstellen.",
     "viewPlans": "Pläne ansehen",
     "buyMoreCredits": "Mehr Credits kaufen",
     "credits": "{count} Credits",
@@ -310,7 +310,7 @@
     "availablePlans": "Verfügbare Pläne",
     "changePlan": "Plan wechseln",
     "currentPlanBadge": "Aktueller Plan",
-    "manageInPortal": "Verwalte dein Abo im Kundenportal",
+    "manageInPortal": "Verwalten Sie Ihr Abo im Kundenportal",
     "noCommitment": "Keine Bindung. Jederzeit kündbar.",
     "perMonth": "/Monat",
     "noSubscriptionForCredits": "Für den Credit-Kauf ist ein aktives Abo nötig",
@@ -353,12 +353,12 @@
       "oauth": "Es gab ein Problem beim Anmelden mit deinem Konto. Bitte versuche es noch einmal.",
       "email": "Beim Senden der Anmelde-E-Mail ist etwas schiefgelaufen. Bitte versuche es noch einmal.",
       "credentials": "Ungültige Zugangsdaten. Bitte prüfe deine E-Mail und versuche es erneut.",
-      "sessionRequired": "Bitte melde dich an, um diese Seite zu öffnen.",
+      "sessionRequired": "Bitte melde dich an, um auf diese Seite zuzugreifen.",
       "default": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es noch einmal."
     }
   },
   "errors": {
-    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
     "notFound": "Seite nicht gefunden",
     "sharedArtworkNotFound": {
       "title": "Kunstwerk nicht gefunden",
@@ -368,7 +368,7 @@
     "unauthorized": "Bitte melde dich an, um weiterzumachen",
     "stripeLoadFailed": "Stripe konnte nicht geladen werden",
     "checkoutFailed": "Checkout-Sitzung konnte nicht erstellt werden",
-    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuch’s nochmal.",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "redirectFailed": "Weiterleitung zum Checkout fehlgeschlagen"
   },
   "breadcrumbs": {
