@@ -40,7 +40,7 @@
   },
   "coloringPage": {
     "title": "Page à colorier",
-    "defaultDescription": "Page à colorier imprimable gratuite de Chunky Crayon",
+    "defaultDescription": "Page à colorier imprimable gratuite",
     "progress": {
       "colored": "colorié",
       "percentage": "{percent}%",
@@ -73,7 +73,7 @@
       "magic": "Magie"
     },
     "brushTypes": {
-      "crayon": "Crayon",
+      "crayon": "Crayon de couleur",
       "marker": "Feutre",
       "eraser": "Gomme",
       "glitter": "Paillettes",
@@ -81,7 +81,7 @@
       "rainbow": "Arc-en-ciel",
       "glow": "Lueur",
       "neon": "Néon",
-      "pencil": "Crayon",
+      "pencil": "Crayon de papier",
       "paintbrush": "Pinceau"
     },
     "brushSizes": {
@@ -123,7 +123,7 @@
     },
     "colorPalette": {
       "selectColor": "Choisir la couleur {color}",
-      "magicToolsMessage": "Couleurs automatiques avec les outils magiques"
+      "magicToolsMessage": "Les couleurs sont choisies automatiquement avec les outils magiques"
     },
     "patternSelector": {
       "label": "Motif :"
@@ -198,7 +198,7 @@
       "lavender": "Lavande",
       "peach": "Pêche",
       "navy": "Bleu marine",
-      "forest": "Vert forêt",
+      "forest": "Forêt",
       "gold": "Or",
       "rose": "Rose"
     },
@@ -341,7 +341,7 @@
       "tryDifferentEmail": "Utiliser un autre e-mail"
     },
     "error": {
-      "title": "Oups, un souci",
+      "title": "Une erreur est survenue",
       "tryAgain": "Essayez de vous reconnecter. Si le problème continue, contactez l’assistance.",
       "backToSignIn": "Retour à la connexion",
       "goHome": "Aller à l’accueil"
