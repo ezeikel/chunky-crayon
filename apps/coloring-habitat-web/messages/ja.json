@@ -75,7 +75,7 @@
       "share": "共有",
       "print": "印刷",
       "preparing": "準備中...",
-      "doneSharing": "共有完了",
+      "doneSharing": "共有を終了",
       "colorAgain": "もう一度塗る",
       "startOver": "最初からやり直す"
     },
@@ -83,7 +83,7 @@
       "expand": "ツールバーを展開",
       "collapse": "ツールバーを折りたたむ",
       "moreTools": "その他のツール",
-      "less": "閉じる"
+      "less": "少なく"
     },
     "undoRedo": {
       "undo": "元に戻す",
@@ -433,9 +433,9 @@
   },
   "gallery": {
     "pageTitle": "塗り絵ギャラリー | Coloring Habitat",
-    "pageDescription": "リラックスとマインドフルネスのための、細かくデザインされた塗り絵ページを集めたコレクションをご覧ください。カテゴリー、難易度、季節で絞り込めます。",
+    "pageDescription": "リラックスとマインドフルネスのための、緻密にデザインされた塗り絵ページの充実したコレクションをご覧ください。カテゴリー、難易度、季節で絞り込めます。",
     "heroTitle": "塗り絵ギャラリー",
-    "heroSubtitle": "リラックスとマインドフルネスのために丁寧にデザインされた塗り絵ページをご覧ください。ひと息つき、静かな時間を見つけるためのデザインです。",
+    "heroSubtitle": "リラックスとマインドフルネスのために丁寧にデザインされた塗り絵ページをご覧ください。ひと息つき、静かな時間を見つけるお手伝いをします。",
     "browseByCategory": "カテゴリーで探す",
     "browseByDifficulty": "難易度で探す",
     "browseByHolidays": "季節と行事",
@@ -456,12 +456,12 @@
     "difficulty": {
       "beginner": {
         "title": "初級",
-        "shortLabel": "やさしい",
+        "shortLabel": "かんたん",
         "description": "やさしいパターンで、短いリラックスタイムにぴったり"
       },
       "intermediate": {
         "title": "中級",
-        "shortLabel": "ふつう",
+        "shortLabel": "ちゅう",
         "description": "少し細かい部分もあり、じっくり落ち着きたいときに"
       },
       "advanced": {
@@ -533,8 +533,8 @@
         "description": "ヴィクトリア朝の機械と不思議な装置"
       },
       "food": {
-        "name": "フード",
-        "description": "豪華な料理や食卓の風景"
+        "name": "食べ物",
+        "description": "料理と食卓の風景"
       }
     },
     "holidays": {
