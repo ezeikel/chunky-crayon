@@ -38,7 +38,7 @@
       "brush": "Pincel",
       "sticker": "Sticker",
       "magicReveal": "Revelado mágico",
-      "magicAuto": "Automático mágico",
+      "magicAuto": "Auto mágico",
       "magicBrush": "Pincel mágico",
       "magicFill": "Relleno mágico",
       "autoColor": "Color automático",
@@ -104,7 +104,7 @@
       "zoomOutAria": "Alejar (ver más)",
       "zoomIn": "Acercar",
       "zoomInAria": "Acercar (ver de cerca)",
-      "pan": "Desplazar",
+      "pan": "Mover",
       "panAria": "Desplazarse por la imagen",
       "reset": "Ver imagen completa",
       "resetAria": "Volver a la imagen completa"
@@ -414,7 +414,7 @@
         },
         "creditsPerPage": {
           "question": "¿Cuántas páginas puedo crear?",
-          "answer": "Cada página cuesta unos 5 créditos. Eso son unas 60 páginas al mes en Grove, 160 en Sanctuary y 400 en Oasis."
+          "answer": "Las páginas de texto o foto cuestan 5 créditos. El modo de voz (una conversación guiada sobre lo que quieres colorear) cuesta 10 créditos por página. Así que Grove = ~60 páginas de texto/foto o ~30 de voz al mes. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Combina según tu ritmo."
         },
         "audience": {
           "question": "¿Coloring Habitat es para mí?",
@@ -451,7 +451,7 @@
       "pagesSuffix": "páginas"
     },
     "filters": {
-      "all": "Todas"
+      "all": "Todo"
     },
     "difficulty": {
       "beginner": {
