@@ -126,7 +126,13 @@ const SlimColorPalette = ({
           MobileColoringDrawer tile look. Save button is paired with
           ActionButtonSizeProvider value="tile" (64px) by the parent so
           the whole row aligns column-for-column. */}
-      <div className="flex gap-2 items-center">
+      {/* 5-column grid (3 tools + 2 trailing actions). Each cell is
+          aspect-square and capped at 64px max width — so on wide
+          containers buttons hit their natural chunky size, on narrow
+          containers they all shrink uniformly to fit the row in one
+          line. trailingAction is rendered as a fragment of <button>
+          children so they participate as direct grid cells. */}
+      <div className="grid grid-cols-5 gap-2 w-full max-w-md mx-auto">
         {TOOLS.map((tool) => {
           const disabled = tool.id === 'magic' && !magicAvailable;
           // Magic is a one-shot action, never sticky — so it never reads
@@ -142,7 +148,7 @@ const SlimColorPalette = ({
               title={tool.label}
               aria-pressed={isActive}
               className={cn(
-                'flex items-center justify-center w-16 h-16 rounded-coloring-card border-2 transition-all',
+                'flex items-center justify-center w-full aspect-square max-w-16 rounded-coloring-card border-2 transition-all',
                 isActive
                   ? 'bg-crayon-orange text-white border-crayon-orange shadow-md'
                   : 'bg-white text-text-secondary border-paper-cream-dark hover:border-crayon-orange/50',

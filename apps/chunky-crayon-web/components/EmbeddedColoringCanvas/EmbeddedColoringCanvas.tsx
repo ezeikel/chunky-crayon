@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ColoringImage } from '@one-colored-pixel/db/types';
 import {
-  ActionButtonSizeProvider,
   ImageCanvas,
   useRegionStore,
   type ImageCanvasHandle,
@@ -257,42 +256,48 @@ const EmbeddedColoringCanvas = ({
           onMagicAutoColor={handleMagicAutoColor}
           campaign={campaign}
           trailingAction={
-            // Tools stay chunky (64px); actions sit alongside at 64px on
-            // desktop. onClickCapture wrappers fire the hero-specific
-            // event before each button's own global event
-            // (DOWNLOAD_PDF_CLICKED / PRINT_CLICKED).
-            <ActionButtonSizeProvider value="tile">
-              <div className="flex items-center gap-2">
-                <div
-                  onClickCapture={() =>
-                    track(TRACKING_EVENTS.START_HERO_PDF_PRINTED, {
-                      campaign,
-                      coloringImageId: image.id ?? '',
-                      msFromMount: Date.now() - mountTimeRef.current,
-                    })
-                  }
-                >
-                  <PrintButton
-                    coloringImage={image}
-                    getCanvasDataUrl={getCanvasDataUrl}
-                  />
-                </div>
-                <div
-                  onClickCapture={() =>
-                    track(TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED, {
-                      campaign,
-                      coloringImageId: image.id ?? '',
-                      msFromMount: Date.now() - mountTimeRef.current,
-                    })
-                  }
-                >
-                  <SaveButton
-                    coloringImage={image}
-                    getCanvasDataUrl={getCanvasDataUrl}
-                  />
-                </div>
+            // Print + Save rendered as direct grid cells (parent
+            // SlimColorPalette uses grid grid-cols-5). Wrapper divs
+            // get the cell sizing (w-full aspect-square max-w-16);
+            // the !w-full !h-full overrides force the buttons to fill
+            // their cells (their internal size="tile" hardcodes 64px
+            // which would otherwise overflow on narrow phones).
+            // onClickCapture fires the hero-specific event before
+            // each button's own global event.
+            <>
+              <div
+                className="w-full aspect-square max-w-16"
+                onClickCapture={() =>
+                  track(TRACKING_EVENTS.START_HERO_PDF_PRINTED, {
+                    campaign,
+                    coloringImageId: image.id ?? '',
+                    msFromMount: Date.now() - mountTimeRef.current,
+                  })
+                }
+              >
+                <PrintButton
+                  coloringImage={image}
+                  getCanvasDataUrl={getCanvasDataUrl}
+                  className="!w-full !h-full"
+                />
               </div>
-            </ActionButtonSizeProvider>
+              <div
+                className="w-full aspect-square max-w-16"
+                onClickCapture={() =>
+                  track(TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED, {
+                    campaign,
+                    coloringImageId: image.id ?? '',
+                    msFromMount: Date.now() - mountTimeRef.current,
+                  })
+                }
+              >
+                <SaveButton
+                  coloringImage={image}
+                  getCanvasDataUrl={getCanvasDataUrl}
+                  className="!w-full !h-full"
+                />
+              </div>
+            </>
           }
         />
       </div>
@@ -330,86 +335,45 @@ const EmbeddedColoringCanvas = ({
               onMagicAutoColor={handleMagicAutoColor}
               campaign={campaign}
               trailingAction={
-                // Adaptive size: 5 tiles (3 tools 64px + 2 actions) need
-                // ~360px content + 32px page padding = 392px viewport
-                // minimum to fit one row with 64px actions. Below that
-                // we drop actions to 48px (still ≥ iOS 44px touch
-                // target). Threshold: min-[400px] catches iPhone 14
-                // (393px → just barely fits 48px) up to comfortably
-                // chunky on iPhone Pro Max (430px). Two wrappers
-                // toggled by media query — duplicate DOM but the
-                // hidden one is unmounted by display:none. Cleaner
-                // than a runtime resize-observer for one breakpoint.
+                // Print + Save rendered as direct grid cells (parent
+                // SlimColorPalette uses grid grid-cols-5). Wrapper
+                // divs get the cell sizing (w-full aspect-square
+                // max-w-16); the !w-full !h-full overrides force the
+                // buttons to fill their cells. All 5 buttons (3 tools
+                // + 2 actions) shrink uniformly when the row would
+                // overflow, cap at 64px when there's room.
                 <>
-                  {/* Compact (48px) — narrow phones (< 400px) */}
-                  <div className="flex min-[400px]:hidden">
-                    <ActionButtonSizeProvider value="tile-compact">
-                      <div className="flex items-center gap-2">
-                        <div
-                          onClickCapture={() =>
-                            track(TRACKING_EVENTS.START_HERO_PDF_PRINTED, {
-                              campaign,
-                              coloringImageId: image.id ?? '',
-                              msFromMount: Date.now() - mountTimeRef.current,
-                            })
-                          }
-                        >
-                          <PrintButton
-                            coloringImage={image}
-                            getCanvasDataUrl={getCanvasDataUrl}
-                          />
-                        </div>
-                        <div
-                          onClickCapture={() =>
-                            track(TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED, {
-                              campaign,
-                              coloringImageId: image.id ?? '',
-                              msFromMount: Date.now() - mountTimeRef.current,
-                            })
-                          }
-                        >
-                          <SaveButton
-                            coloringImage={image}
-                            getCanvasDataUrl={getCanvasDataUrl}
-                          />
-                        </div>
-                      </div>
-                    </ActionButtonSizeProvider>
+                  <div
+                    className="w-full aspect-square max-w-16"
+                    onClickCapture={() =>
+                      track(TRACKING_EVENTS.START_HERO_PDF_PRINTED, {
+                        campaign,
+                        coloringImageId: image.id ?? '',
+                        msFromMount: Date.now() - mountTimeRef.current,
+                      })
+                    }
+                  >
+                    <PrintButton
+                      coloringImage={image}
+                      getCanvasDataUrl={getCanvasDataUrl}
+                      className="!w-full !h-full"
+                    />
                   </div>
-                  {/* Chunky (64px) — phones 400px+ */}
-                  <div className="hidden min-[400px]:flex">
-                    <ActionButtonSizeProvider value="tile">
-                      <div className="flex items-center gap-2">
-                        <div
-                          onClickCapture={() =>
-                            track(TRACKING_EVENTS.START_HERO_PDF_PRINTED, {
-                              campaign,
-                              coloringImageId: image.id ?? '',
-                              msFromMount: Date.now() - mountTimeRef.current,
-                            })
-                          }
-                        >
-                          <PrintButton
-                            coloringImage={image}
-                            getCanvasDataUrl={getCanvasDataUrl}
-                          />
-                        </div>
-                        <div
-                          onClickCapture={() =>
-                            track(TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED, {
-                              campaign,
-                              coloringImageId: image.id ?? '',
-                              msFromMount: Date.now() - mountTimeRef.current,
-                            })
-                          }
-                        >
-                          <SaveButton
-                            coloringImage={image}
-                            getCanvasDataUrl={getCanvasDataUrl}
-                          />
-                        </div>
-                      </div>
-                    </ActionButtonSizeProvider>
+                  <div
+                    className="w-full aspect-square max-w-16"
+                    onClickCapture={() =>
+                      track(TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED, {
+                        campaign,
+                        coloringImageId: image.id ?? '',
+                        msFromMount: Date.now() - mountTimeRef.current,
+                      })
+                    }
+                  >
+                    <SaveButton
+                      coloringImage={image}
+                      getCanvasDataUrl={getCanvasDataUrl}
+                      className="!w-full !h-full"
+                    />
                   </div>
                 </>
               }
