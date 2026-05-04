@@ -1023,6 +1023,7 @@ export const TRACKING_EVENTS = {
   START_HERO_TOOL_CHANGED: 'start_hero_tool_changed', // Visitor switched tools (crayon / magic / eraser) on /start
   START_HERO_AUTO_REVEAL_CLICKED: 'start_hero_auto_reveal_clicked', // One-click magic auto-reveal — paints the entire pre-coloured canvas in one shot
   START_HERO_PDF_DOWNLOADED: 'start_hero_pdf_downloaded', // Visitor downloaded their /start canvas as a PDF
+  START_HERO_PDF_PRINTED: 'start_hero_pdf_printed', // Visitor opened the print dialog for their /start canvas
   START_HERO_CTA_CLICKED: 'start_hero_cta_clicked', // Primary signin CTA clicked from the /start hero
   LANDING_DEMO_PLAYED: 'landing_demo_played', // User pressed play on the phone-frame demo
   LANDING_DEMO_COMPLETED: 'landing_demo_completed', // Demo cycled through every scenario at least once

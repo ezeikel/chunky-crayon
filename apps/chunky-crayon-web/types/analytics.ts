@@ -486,6 +486,11 @@ export type EventProperties = {
     coloringImageId: string;
     msFromMount: number;
   };
+  [TRACKING_EVENTS.START_HERO_PDF_PRINTED]: {
+    campaign: string;
+    coloringImageId: string;
+    msFromMount: number;
+  };
   [TRACKING_EVENTS.START_HERO_CTA_CLICKED]: {
     campaign: string;
     cta: 'signin' | 'download-pdf';
