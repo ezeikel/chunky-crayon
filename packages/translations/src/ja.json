@@ -62,7 +62,7 @@
     },
     "tools": {
       "pan": "動かす",
-      "fill": "ぬりつぶし",
+      "fill": "塗りつぶし",
       "brush": "ブラシ",
       "sticker": "シール",
       "magicReveal": "魔法で表示",
@@ -75,11 +75,11 @@
     "brushTypes": {
       "crayon": "クレヨン",
       "marker": "マーカー",
-      "eraser": "けしゴム",
+      "eraser": "消しゴム",
       "glitter": "ラメ",
       "sparkle": "キラキラ",
       "rainbow": "虹色",
-      "glow": "光る",
+      "glow": "グロー",
       "neon": "ネオン",
       "pencil": "鉛筆",
       "paintbrush": "絵筆"
@@ -91,8 +91,8 @@
     },
     "fillPatterns": {
       "solid": "塗りつぶし",
-      "dots": "みずたま",
-      "stripes": "しましま",
+      "dots": "ミズタマ",
+      "stripes": "シマシマ",
       "diagonal": "ななめ",
       "checkerboard": "チェック",
       "hearts": "ハート",
@@ -126,7 +126,7 @@
       "magicToolsMessage": "マジックツールで色が自動選択されます"
     },
     "patternSelector": {
-      "label": "もよう:"
+      "label": "模様:"
     },
     "zoomControls": {
       "zoomLevel": "ズーム: {level}%",
@@ -322,12 +322,12 @@
     "subscribe": "サブスク登録"
   },
   "auth": {
-    "signIn": "ログイン",
+    "signIn": "サインイン",
     "signUp": "新規登録",
-    "signOut": "ログアウト",
+    "signOut": "サインアウト",
     "continueWithGoogle": "Googleで続ける",
     "continueWithApple": "Appleで続ける",
-    "signInWithEmail": "メールでログイン",
+    "signInWithEmail": "メールでサインイン",
     "sendingLink": "リンクを送信中…",
     "chooseMethod": "ログイン方法を選択してください",
     "orContinueWith": "または",
