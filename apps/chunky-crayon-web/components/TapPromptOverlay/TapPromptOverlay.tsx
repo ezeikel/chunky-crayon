@@ -1,7 +1,7 @@
 'use client';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHandPointer } from '@fortawesome/pro-duotone-svg-icons';
+import { faHandPointer } from '@fortawesome/pro-solid-svg-icons';
 import cn from '@/utils/cn';
 
 type TapPromptOverlayProps = {
@@ -39,29 +39,25 @@ const TapPromptOverlay = ({
       className,
     )}
   >
-    {/* Finger + ripple. Two stacked rings ping at 1s offsets so the prompt
-        always reads as moving, even at the moment a single ring expires. */}
+    {/* Finger + ripple. Filled-orange button styling matches the other
+        primary CTAs on the page so the brain reads "tap me," not "play
+        video" (an earlier white-circle/orange-icon variant looked like
+        a media play button). Two stacked rings ping at 0.8s offsets so
+        motion is always present even at the moment one ring expires. */}
     <div className="relative flex flex-col items-center gap-3">
       <div className="relative">
         <span
-          className="absolute inset-0 rounded-full bg-crayon-orange/35 animate-ping"
+          className="absolute inset-0 rounded-full bg-crayon-orange/55 animate-ping"
           style={{ animationDuration: '1.6s' }}
         />
         <span
-          className="absolute inset-0 rounded-full bg-crayon-orange/25 animate-ping"
+          className="absolute inset-0 rounded-full bg-crayon-orange/35 animate-ping"
           style={{ animationDuration: '1.6s', animationDelay: '0.8s' }}
         />
-        <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-lg border-2 border-crayon-orange">
+        <div className="relative flex items-center justify-center w-16 h-16 rounded-full bg-crayon-orange shadow-btn-primary">
           <FontAwesomeIcon
             icon={faHandPointer}
-            className="text-2xl text-crayon-orange"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
-            }
+            className="text-2xl text-white"
           />
         </div>
       </div>
