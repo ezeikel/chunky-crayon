@@ -349,7 +349,7 @@
       "fantasy": "Fantasie & Magie",
       "dragons": "Drachen",
       "unicorns": "Einhörner",
-      "princesses": "Prinzessinnen & Königliches",
+      "princesses": "Prinzessinnen & Königsfamilie",
       "superheroes": "Superhelden",
       "dinosaurs": "Dinosaurier",
       "space": "Weltraum & Astronauten",
@@ -509,9 +509,9 @@
     "heroTitle": "Mehr als nur Ausmalbilder",
     "heroSubtitle": "Erstellen, online ausmalen, Sticker sammeln und mit Freunden teilen. Wähle den Plan, der zu deiner Familie passt.",
     "monthly": "Monatlich",
-    "annual": "Jährlich (17% sparen)",
+    "annual": "Jährlich (2 Monate gratis)",
     "mostPopular": "Am beliebtesten",
-    "buyNow": "Jetzt kaufen",
+    "buyNow": "7-Tage-Test starten",
     "noCommitment": "Keine Bindung. Jederzeit kündbar.",
     "perMonth": "/Monat",
     "creditsPerMonth": "Credits/Monat",
@@ -571,7 +571,7 @@
       },
       "rollover": {
         "question": "Werden Credits übernommen?",
-        "answer": "Splash-Credits werden monatlich zurückgesetzt. Rainbow-Credits werden bis zu 1 Monat übernommen. Sparkle bietet 2 Monate Credit-Übernahme."
+        "answer": "Splash-Credits werden jeden Monat zurückgesetzt. Bei Rainbow bleiben sie einen Extra-Monat erhalten. Bei Sparkle sogar zwei. Was du diesen Monat nicht nutzt, ist nächsten Monat noch da."
       },
       "audience": {
         "question": "Ist das für Kinder oder Erwachsene?",
@@ -588,7 +588,7 @@
       },
       "multipleKids": {
         "question": "Können mehrere Kinder ein Abo nutzen?",
-        "answer": "Ja — und genau hier machen viele Apps es falsch. Ein Chunky Crayon-Abo enthält eigene Profile für jedes Kind (Splash 3, Rainbow 5, Sparkle 10). Seiten, Sticker und Colo-Maskottchen bleiben getrennt. Kein Extra-Abo pro Kind nötig."
+        "answer": "Ja — und genau hier machen viele Apps es falsch. Ein Chunky Crayon-Abo enthält eigene Profile für jedes Kind (Splash 2, Rainbow 4, Sparkle 10). Seiten, Sticker und Colo-Maskottchen bleiben getrennt. Kein Extra-Abo pro Kind nötig."
       },
       "trialMechanics": {
         "question": "Was passiert nach dem 7-tägigen Gratis-Test?",
