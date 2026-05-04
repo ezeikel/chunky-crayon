@@ -75,7 +75,7 @@
       "share": "Teilen",
       "print": "Drucken",
       "preparing": "Vorbereiten...",
-      "doneSharing": "Geteilt",
+      "doneSharing": "Fertig geteilt",
       "colorAgain": "Nochmal ausmalen",
       "startOver": "Neu beginnen"
     },
@@ -414,7 +414,7 @@
         },
         "creditsPerPage": {
           "question": "Wie viele Seiten kann ich erstellen?",
-          "answer": "Jede Seite kostet etwa 5 Credits. Das sind rund 60 Seiten pro Monat bei Grove, 160 bei Sanctuary und 400 bei Oasis."
+          "answer": "Text- oder Fotoseiten kosten 5 Credits. Sprachmodus (ein geführtes Gespräch über das, was du ausmalen möchtest) kostet 10 Credits pro Seite. Also Grove = ~60 Text/Foto oder ~30 Sprachseiten pro Monat. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Kombiniere nach deinem Rhythmus."
         },
         "audience": {
           "question": "Ist Coloring Habitat das Richtige für mich?",
@@ -460,7 +460,7 @@
         "description": "Sanfte Muster, perfekt für einen kurzen Moment der Ruhe"
       },
       "intermediate": {
-        "title": "Fortgeschrittene",
+        "title": "Mittelstufe",
         "shortLabel": "Mittel",
         "description": "Moderate Details für eine längere, erdende Sitzung"
       },
@@ -472,7 +472,7 @@
       "expert": {
         "title": "Experte",
         "shortLabel": "Experte",
-        "description": "Filigrane Werke für tiefe, meditative Flow-Zustände"
+        "description": "Filigrane Werke für tiefen, meditativen Flow"
       }
     },
     "categories": {
@@ -486,7 +486,7 @@
       },
       "geometric": {
         "name": "Geometrisch",
-        "description": "Präzise Muster und geometrische Formen"
+        "description": "Präzise Muster und Tessellationen"
       },
       "landscapes": {
         "name": "Landschaften",
@@ -533,7 +533,7 @@
         "description": "Viktorianische Maschinen und kuriose Apparaturen"
       },
       "food": {
-        "name": "Kulinarisches",
+        "name": "Essen",
         "description": "Festmahle und kulinarische Szenen"
       }
     },
