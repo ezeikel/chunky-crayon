@@ -45,10 +45,10 @@
       "colored": "색칠됨",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "좋은 시작이에요!",
-        "50": "절반 완성했어요!",
-        "75": "거의 완성했어요!",
-        "100": "대단해요!"
+        "25": "좋은 시작!",
+        "50": "절반 완성!",
+        "75": "거의 완성!",
+        "100": "완벽해요!"
       },
       "allDone": "완료!"
     },
@@ -311,7 +311,7 @@
     "changePlan": "플랜 변경",
     "currentPlanBadge": "현재 플랜",
     "manageInPortal": "고객 포털에서 구독을 관리하세요",
-    "noCommitment": "약정 없어요. 언제든 취소 가능해요.",
+    "noCommitment": "약정 없음. 언제든 취소 가능.",
     "perMonth": "/월",
     "noSubscriptionForCredits": "크레딧 구매는 활성 구독이 필요해요",
     "noSubscriptionFound": "활성 구독을 찾을 수 없어요",
@@ -334,10 +334,10 @@
     "emailPlaceholder": "name@example.com",
     "termsAgreement": "계속하면 서비스 이용약관과 개인정보처리방침에 동의하는 것으로 간주됩니다.",
     "verifyRequest": {
-      "title": "이메일을 확인해요!",
-      "description": "로그인할 수 있는 마법 링크를 보냈어요. 이메일의 링크를 눌러 계속해 주세요.",
+      "title": "이메일을 확인하세요",
+      "description": "로그인할 수 있는 마법 링크를 보냈습니다. 이메일의 링크를 클릭해 계속하세요.",
       "checkSpam": "안 보이나요? 스팸함도 확인해 주세요.",
-      "linkExpiry": "링크는 24시간 후 만료돼요.",
+      "linkExpiry": "링크는 24시간 후 만료됩니다.",
       "tryDifferentEmail": "다른 이메일 사용하기"
     },
     "error": {
@@ -362,7 +362,7 @@
     "notFound": "페이지를 찾을 수 없습니다",
     "sharedArtworkNotFound": {
       "title": "그림을 찾을 수 없어요",
-      "description": "공유된 그림 링크가 만료되었거나 삭제되었을 수 있어요. 작가에게 새 링크를 요청해 보세요!",
+      "description": "공유된 그림 링크가 만료되었거나 삭제되었을 수 있습니다. 작가에게 새 링크를 요청해 보세요.",
       "cta": "컬러링 페이지 구경하기"
     },
     "unauthorized": "계속하려면 로그인해 주세요",
