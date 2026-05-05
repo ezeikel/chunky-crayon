@@ -359,6 +359,10 @@ export const sendTrialEndingEmail = async ({
 // with existing callers; the email subject + UI copy are the user-visible
 // rename.
 export const sendSocialDigest = async ({
+  blogTitle,
+  blogExcerpt,
+  blogImageUrl,
+  blogUrl,
   coloringImageTitle,
   coloringImageUrl,
   dailyImageAssetUrl,
@@ -372,6 +376,10 @@ export const sendSocialDigest = async ({
   statReelCoverUrl,
   statReelEntries,
 }: {
+  blogTitle?: string;
+  blogExcerpt?: string;
+  blogImageUrl?: string;
+  blogUrl?: string;
   coloringImageTitle: string;
   coloringImageUrl: string;
   dailyImageAssetUrl?: string;
@@ -401,6 +409,10 @@ export const sendSocialDigest = async ({
 
     const emailHtml = await render(
       SocialDigestEmail({
+        blogTitle,
+        blogExcerpt,
+        blogImageUrl,
+        blogUrl,
         coloringImageTitle,
         coloringImageUrl,
         dailyImageAssetUrl,

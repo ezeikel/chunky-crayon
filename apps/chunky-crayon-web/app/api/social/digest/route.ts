@@ -1,6 +1,8 @@
 import { NextResponse, connection } from 'next/server';
+import { groq } from 'next-sanity';
 import { db, GenerationType } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
+import { client as sanityClient, urlFor } from '@/lib/sanity';
 import {
   generateInstagramCaption,
   generateFacebookCaption,
@@ -10,6 +12,31 @@ import {
 } from '@/app/actions/social';
 import { sendSocialDigest, sendAdminAlert } from '@/app/actions/email';
 import type { SocialDigestEntry } from '@/app/actions/email';
+
+// Today's blog post — fetched separately from Sanity since the brief
+// fires AFTER the blog cron (06:00 UTC) but the row sits in Sanity, not
+// the Prisma daily-image flow. If the blog cron hasn't completed by 08:30
+// UTC (rare — usually finishes ~06:05) the brief simply omits the blog
+// section.
+const todaysBlogPostQuery = groq`
+  *[_type == "post" && status == "published"
+    && publishedAt >= $todayStart && publishedAt < $tomorrowStart]
+    | order(publishedAt desc)[0] {
+      title,
+      slug,
+      excerpt,
+      featuredImage {
+        asset->,
+        alt
+      }
+    }
+`;
+type TodaysBlogPost = {
+  title?: string;
+  slug?: { current?: string };
+  excerpt?: string;
+  featuredImage?: { asset?: unknown; alt?: string } | null;
+};
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 
@@ -122,6 +149,35 @@ export const GET = async (request: Request) => {
       orderBy: { createdAt: 'desc' },
     });
 
+    // Fetch today's published blog post from Sanity, if any. The blog cron
+    // fires at 06:00 UTC and usually finishes within minutes, so by 08:30
+    // UTC (when the brief fires) it should be live. If it isn't (cron
+    // failed, all topics covered, etc.) the brief omits the section
+    // gracefully — null result means no blog to surface.
+    const tomorrowStart = new Date(todayStart);
+    tomorrowStart.setUTCDate(tomorrowStart.getUTCDate() + 1);
+    let blogPost: TodaysBlogPost | null = null;
+    try {
+      blogPost = await sanityClient.fetch<TodaysBlogPost | null>(
+        todaysBlogPostQuery,
+        {
+          todayStart: todayStart.toISOString(),
+          tomorrowStart: tomorrowStart.toISOString(),
+        },
+      );
+    } catch (err) {
+      console.warn('[Digest] Sanity blog fetch failed:', err);
+    }
+
+    const blogImageUrl =
+      blogPost?.featuredImage?.asset && blogPost.title
+        ? urlFor(blogPost.featuredImage).width(1104).height(580).url()
+        : undefined;
+    const blogUrl =
+      blogPost?.slug?.current && blogPost.title
+        ? `${baseUrl}/blog/${blogPost.slug.current}`
+        : undefined;
+
     console.log('[Digest] Generating captions for:', coloringImage.title);
     if (demoReelImage) {
       console.log(
@@ -129,6 +185,9 @@ export const GET = async (request: Request) => {
         demoReelImage.title,
         demoReelImage.id,
       );
+    }
+    if (blogPost) {
+      console.log('[Digest] Blog post for today:', blogPost.title);
     }
 
     // Generate all captions in parallel
@@ -251,6 +310,10 @@ export const GET = async (request: Request) => {
 
     // Send digest email
     const result = await sendSocialDigest({
+      blogTitle: blogPost?.title,
+      blogExcerpt: blogPost?.excerpt,
+      blogImageUrl,
+      blogUrl,
       coloringImageTitle: coloringImage.title ?? 'Untitled',
       coloringImageUrl: `${baseUrl}/coloring/${coloringImage.id}`,
       dailyImageAssetUrl: coloringImage.url ?? undefined,

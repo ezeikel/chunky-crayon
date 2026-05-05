@@ -5,6 +5,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -24,6 +25,11 @@ type SocialDigestEntry = {
 };
 
 type SocialDigestEmailProps = {
+  // Today's blog post (optional — skipped if blog cron didn't produce one)
+  blogTitle?: string;
+  blogExcerpt?: string;
+  blogImageUrl?: string;
+  blogUrl?: string;
   // Daily image (static posts)
   coloringImageTitle: string;
   coloringImageUrl: string;
@@ -45,6 +51,10 @@ type SocialDigestEmailProps = {
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 
 const SocialDigestEmail = ({
+  blogTitle,
+  blogExcerpt,
+  blogImageUrl,
+  blogUrl,
   coloringImageTitle = "Today's Coloring Page",
   coloringImageUrl = 'https://chunkycrayon.com',
   dailyImageAssetUrl,
@@ -85,6 +95,36 @@ const SocialDigestEmail = ({
             times shown. Anything marked manual needs a hand.
           </Text>
         </Section>
+
+        {/* ── Section 0: Today's blog post (optional) ── */}
+        {(blogTitle || blogUrl) && (
+          <Section style={infoSection}>
+            <Heading as="h2" style={sectionTitle}>
+              📝 Today&apos;s Blog Post
+            </Heading>
+            {blogTitle && (
+              <Text style={paragraph}>
+                <strong>{blogTitle}</strong>
+              </Text>
+            )}
+            {blogImageUrl && (
+              <Img
+                src={blogImageUrl}
+                width="552"
+                alt={blogTitle ?? 'Featured image'}
+                style={blogImage}
+              />
+            )}
+            {blogExcerpt && <Text style={paragraph}>{blogExcerpt}</Text>}
+            {blogUrl && (
+              <Text style={paragraph}>
+                <Link href={blogUrl} style={inlineLink}>
+                  Read on site
+                </Link>
+              </Text>
+            )}
+          </Section>
+        )}
 
         {/* ── Section 1: Daily Image (static posts) ── */}
         <Section style={infoSection}>
@@ -306,6 +346,15 @@ const heroNote = {
   color: '#888888',
   margin: '12px 0 0',
   fontStyle: 'italic' as const,
+};
+
+const blogImage = {
+  width: '100%',
+  maxWidth: '552px',
+  height: 'auto',
+  borderRadius: '12px',
+  margin: '12px 0',
+  display: 'block',
 };
 
 const infoSection = {
