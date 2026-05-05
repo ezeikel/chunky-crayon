@@ -177,7 +177,7 @@ const SeasonalPackForm = () => {
           htmlFor="childName"
           className="font-tondo font-bold text-text-primary"
         >
-          Child&apos;s name (optional — prints on the cover)
+          Child&apos;s name (optional, prints on the cover)
         </label>
         <input
           id="childName"

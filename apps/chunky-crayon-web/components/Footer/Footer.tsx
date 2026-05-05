@@ -39,7 +39,7 @@ const Footer = async ({ className }: FooterProps) => {
           <div className="mb-4">
             <Link
               href="/"
-              aria-label="Chunky Crayon — home"
+              aria-label="Chunky Crayon home"
               className="inline-flex items-center gap-3 text-4xl font-bold"
               style={{ fontFamily: 'Tondo, sans-serif' }}
             >

@@ -10,7 +10,7 @@ import { getLandingPageBySlug } from '@/lib/seo/landing-pages';
 
 export const runtime = 'nodejs';
 
-export const alt = 'Free printable coloring pages — Chunky Crayon';
+export const alt = 'Free printable coloring pages | Chunky Crayon';
 export const size = {
   width: OG_WIDTH,
   height: OG_HEIGHT,

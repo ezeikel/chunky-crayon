@@ -73,8 +73,8 @@ const RewardChartPage = async ({ params }: { params: Promise<PageParams> }) => {
             <li>Hit Download. Print. Stick it on the fridge.</li>
           </ol>
           <p className="pt-4">
-            Nothing is saved on our servers — your child&apos;s name never
-            leaves your browser.
+            Nothing is saved on our servers. Your child&apos;s name never leaves
+            your browser.
           </p>
         </section>
       </div>

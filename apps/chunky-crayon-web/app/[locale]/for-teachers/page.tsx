@@ -95,8 +95,8 @@ const TeacherHubPage = () => (
               Coloring Page Gallery
             </h2>
             <p className="text-muted-foreground">
-              Hundreds of free AI-generated coloring pages for ages 3–8. Filter
-              by theme or difficulty. Print-ready PDFs.
+              Hundreds of free printable coloring pages for ages 3–8. Filter by
+              theme or difficulty. Print-ready PDFs.
             </p>
           </div>
         </div>
@@ -162,7 +162,7 @@ const TeacherHubPage = () => (
             </h2>
             <p className="text-muted-foreground">
               Halloween, Christmas, Valentine&apos;s, Easter, Thanksgiving and
-              Back-to-school — 6–10 themed pages per pack.
+              Back-to-school. 6–10 themed pages per pack.
             </p>
           </div>
         </div>

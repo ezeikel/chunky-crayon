@@ -56,7 +56,7 @@ const BirthdayInvitePage = async ({
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Add your child&apos;s name, age, and party details. Pick a theme.
-            Download a ready-to-print PDF — 1 big invite per page, or 4 small
+            Download a ready-to-print PDF: 1 big invite per page, or 4 small
             ones to cut out.
           </p>
         </header>
@@ -76,7 +76,7 @@ const BirthdayInvitePage = async ({
             <li>Let your kid colour in the shapes before handing them out.</li>
           </ol>
           <p className="pt-4">
-            Nothing you type is stored on our servers — your party details stay
+            Nothing you type is stored on our servers. Your party details stay
             in your browser.
           </p>
         </section>

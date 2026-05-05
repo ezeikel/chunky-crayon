@@ -320,7 +320,7 @@ const RewardChartPdfDocument = ({
             <Text style={[styles.brandText, { color: themeStyle.primary }]}>
               Chunky Crayon
             </Text>{' '}
-            — make your own AI coloring pages at{' '}
+            . Make your own custom coloring pages at{' '}
             <Link src="https://chunkycrayon.com">chunkycrayon.com</Link>
           </Text>
           <Text style={[styles.brandText, { color: themeStyle.primary }]}>

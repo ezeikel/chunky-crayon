@@ -7,7 +7,7 @@ type PageParams = { locale: string };
 
 const TOOL_NAME = 'Seasonal Coloring Packs';
 const TOOL_DESCRIPTION =
-  'Free printable seasonal coloring page bundles — Halloween, Christmas, Valentine’s, Easter, Thanksgiving and Back-to-school. 6–10 themed pages per pack. No signup.';
+  'Free printable seasonal coloring page bundles for Halloween, Christmas, Valentine’s, Easter, Thanksgiving and Back-to-school. 6–10 themed pages per pack. No signup.';
 const TOOL_PATH = '/tools/seasonal-pack';
 
 export async function generateMetadata({
@@ -18,7 +18,7 @@ export async function generateMetadata({
   const { locale } = await params;
   return {
     title:
-      'Free Seasonal Coloring Packs — Halloween, Christmas, Easter & More | Chunky Crayon',
+      'Free Seasonal Coloring Packs: Halloween, Christmas, Easter & More | Chunky Crayon',
     description: TOOL_DESCRIPTION,
     alternates: generateAlternates(locale, TOOL_PATH),
     openGraph: {
@@ -70,32 +70,32 @@ const SeasonalPackPage = async ({
           </h2>
           <ul className="list-disc pl-6 space-y-1">
             <li>
-              <strong>Halloween</strong> — 8 friendly-spooky pages (pumpkin,
+              <strong>Halloween</strong>: 8 friendly-spooky pages (pumpkin,
               ghost, bat, spider, witch hat, candy, moon, cat)
             </li>
             <li>
-              <strong>Christmas</strong> — 10 festive pages (tree, gift, candy
+              <strong>Christmas</strong>: 10 festive pages (tree, gift, candy
               cane, snowman, bell, star, snowflake, stocking, sleigh, holly)
             </li>
             <li>
-              <strong>Valentine&apos;s</strong> — 6 love-themed pages (hearts,
+              <strong>Valentine&apos;s</strong>: 6 love-themed pages (hearts,
               flowers, ribbons, love letters)
             </li>
             <li>
-              <strong>Easter</strong> — 8 spring pages (egg, rabbit, flowers,
+              <strong>Easter</strong>: 8 spring pages (egg, rabbit, flowers,
               carrot, tree)
             </li>
             <li>
-              <strong>Thanksgiving</strong> — 8 autumn/harvest pages (turkey,
+              <strong>Thanksgiving</strong>: 8 autumn/harvest pages (turkey,
               pie, pumpkin, corn, wheat, apple)
             </li>
             <li>
-              <strong>Back-to-school</strong> — 10 classroom-essential pages
+              <strong>Back-to-school</strong>: 10 classroom-essential pages
               (backpack, pencil, crayon, book, apple, ruler, scissors)
             </li>
           </ul>
           <p className="pt-4">
-            Nothing is saved on our servers — your child&apos;s name (if you add
+            Nothing is saved on our servers. Your child&apos;s name (if you add
             one) stays in your browser.
           </p>
         </section>

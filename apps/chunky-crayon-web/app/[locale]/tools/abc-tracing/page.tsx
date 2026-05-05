@@ -24,7 +24,7 @@ export async function generateMetadata({
     openGraph: {
       title: 'Free Printable ABC Tracing Worksheets (A–Z)',
       description:
-        'Preschool alphabet bundle — 26 letter pages + cover. Trace the letter, learn the word, colour the picture.',
+        'Preschool alphabet bundle: 26 letter pages plus cover. Trace the letter, learn the word, colour the picture.',
       type: 'website',
       url: `https://chunkycrayon.com/${locale}${TOOL_PATH}`,
     },
@@ -52,7 +52,7 @@ const AbcTracingPage = async ({ params }: { params: Promise<PageParams> }) => {
             Free ABC Tracing Worksheets
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A full A–Z bundle of printable tracing pages — each letter paired
+            A full A–Z bundle of printable tracing pages. Each letter is paired
             with a word, a picture to colour, and a row for handwriting
             practice. Perfect for preschool and early primary.
           </p>
@@ -71,7 +71,7 @@ const AbcTracingPage = async ({ params }: { params: Promise<PageParams> }) => {
             <li>A row of smaller letters to trace for handwriting practice</li>
           </ul>
           <p className="pt-4">
-            No signup. Names stay in your browser — nothing is stored on our
+            No signup. Names stay in your browser, nothing is stored on our
             servers.
           </p>
         </section>

@@ -69,8 +69,8 @@ const NameToolPage = async ({ params }: { params: Promise<PageParams> }) => {
             <li>Quiet-time on long car journeys</li>
           </ul>
           <p className="pt-4">
-            Your child&apos;s name is only sent to the AI to build the image —
-            we don&apos;t store it separately.
+            Your child&apos;s name is only used to build the image. We
+            don&apos;t store it separately.
           </p>
         </section>
       </div>

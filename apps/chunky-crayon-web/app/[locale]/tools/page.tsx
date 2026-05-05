@@ -87,7 +87,7 @@ const TOOLS: Tool[] = [
     slug: 'seasonal-pack',
     title: 'Seasonal Coloring Packs',
     description:
-      'Halloween, Christmas, Easter and more — ready-to-print bundles of themed coloring pages.',
+      'Halloween, Christmas, Easter and more. Ready-to-print bundles of themed coloring pages.',
     icon: faCalendarStar,
     available: true,
   },
@@ -120,7 +120,7 @@ const ToolsHubPage = async ({ params }: { params: Promise<PageParams> }) => {
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Quick, no-signup printables for parents, grandparents, and teachers
-            of young kids (ages 3–8). All COPPA-safe — nothing you type is saved
+            of young kids (ages 3–8). All COPPA-safe, nothing you type is saved
             on our servers.
           </p>
         </header>

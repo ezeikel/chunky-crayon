@@ -5,7 +5,7 @@ const BasicHeader = () => (
   <header className="flex items-center justify-between px-4 md:px-6 py-3 sticky top-0 z-50 bg-white/95 backdrop-blur-sm">
     <Link
       href="/"
-      aria-label="Chunky Crayon — home"
+      aria-label="Chunky Crayon home"
       className="group flex items-center gap-2 md:gap-2.5"
     >
       <Image

@@ -100,7 +100,7 @@ const LandingPageContent = async ({
           />
         ) : (
           <div className="text-center text-muted-foreground py-16">
-            Our fresh pages are loading in daily. Come back soon — or{' '}
+            Our fresh pages are loading in daily. Come back soon, or{' '}
             <Link href="/" className="underline text-crayon-orange font-tondo">
               generate a custom one now
             </Link>
