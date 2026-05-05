@@ -45,6 +45,7 @@ import { LightLeak } from "@remotion/light-leaks";
 import { COLORS, FONTS, FONT_WEIGHTS, SPRINGS } from "../../v2/tokens/brand";
 import { TONDO_FONT_CSS_URL } from "../../fonts";
 import { PlasmaShader } from "../shared/PlasmaShader";
+import { CenterReveal } from "../reveal/CenterReveal";
 import {
   computeBeats,
   DEFAULT_HOOK_VOICE_SECONDS,
@@ -297,9 +298,12 @@ export const Template1ShockStat: React.FC<Template1ShockStatProps> = ({
         })}
       </div>
 
-      {/* ===== Stat reveal — huge number with chromatic aberration =====
-          Visible from reveal start through the payoff beat, then fades
-          out at outro start to hand the centre over to the C logo. */}
+      {/* ===== Centre reveal — kind-aware =====
+          Stats render the chromatic-aberration big number, myths render a
+          TRUE/FALSE stamp. CenterReveal dispatches based on reel.kind so
+          the same template can host any kind without forking. Visible from
+          reveal start through the payoff beat, then fades out at outro
+          start to hand the centre over to the C logo. */}
       {frame >= beats.revealStart && (
         <AbsoluteFill
           style={{
@@ -309,57 +313,17 @@ export const Template1ShockStat: React.FC<Template1ShockStatProps> = ({
             opacity: numberOutroFade,
           }}
         >
-          {/* Three brand-coloured copies offset for chromatic aberration:
-              base orangeDark sits on top, pink + teal ghost-trail behind. */}
-          <div
-            style={{
-              position: "relative",
-              transform: `scale(${numberScale})`,
-            }}
-          >
-            {/* Pink channel offset (left) */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 280,
-                color: COLORS.pinkDark,
-                opacity: 0.85,
-                transform: `translate(${-aberrationStrength}px, 0)`,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-            {/* Teal channel offset (right) */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 280,
-                color: COLORS.tealDark,
-                opacity: 0.85,
-                transform: `translate(${aberrationStrength}px, 0)`,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-            {/* Brand-orange base — focal point */}
-            <div
-              style={{
-                position: "relative",
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 280,
-                color: COLORS.orangeDark,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-          </div>
+          <CenterReveal
+            kind={reel.kind}
+            text={reel.centerBlock}
+            scale={numberScale}
+            aberrationOffsetPx={aberrationStrength}
+            fontFamily={FONTS.heading}
+            fontSize={280}
+            primaryColor={COLORS.orangeDark}
+            aberrationLeftColor={COLORS.pinkDark}
+            aberrationRightColor={COLORS.tealDark}
+          />
         </AbsoluteFill>
       )}
 

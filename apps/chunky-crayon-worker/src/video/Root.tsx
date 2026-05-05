@@ -68,6 +68,7 @@ import {
   SHOCK_STAT_SAMPLE,
   WARM_STAT_SAMPLE,
   QUIET_STAT_SAMPLE,
+  WARM_MYTH_SAMPLE,
 } from "./content-reel/spike/sample-stats";
 
 const FPS = 30;
@@ -382,6 +383,35 @@ export const RemotionRoot: React.FC = () => {
         }
         calculateMetadata={({ props }) => ({
           durationInFrames: computeQuietReelDuration(
+            props.hookVoiceSeconds,
+            props.payoffVoiceSeconds,
+          ),
+        })}
+      />
+
+      {/* Phase A2 — Myth fixture rendering through the Warm template.
+          Same template, different reel.kind → reveal beat dispatches to
+          VerdictStamp instead of BigNumberWithAberration. Useful for
+          eyeballing the kind-aware switch in Studio. */}
+      <Composition
+        id="ContentReelWarmMythSpike"
+        component={Template2WarmInsight}
+        durationInFrames={WARM_REEL_DEFAULT_DURATION_FRAMES}
+        fps={WARM_REEL_FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            reel: WARM_MYTH_SAMPLE,
+            hookVoiceUrl: staticFile("spike/koala-kid-voice.mp3"),
+            hookVoiceSeconds: 4.99,
+            payoffVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
+            payoffVoiceSeconds: 3.55,
+            backgroundMusicUrl: staticFile("spike/koala-ambient.mp3"),
+          } satisfies Template2WarmInsightProps
+        }
+        calculateMetadata={({ props }) => ({
+          durationInFrames: computeWarmReelDuration(
             props.hookVoiceSeconds,
             props.payoffVoiceSeconds,
           ),

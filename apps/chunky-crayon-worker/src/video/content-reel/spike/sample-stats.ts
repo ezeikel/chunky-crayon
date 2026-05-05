@@ -75,3 +75,21 @@ export const QUIET_STAT_SAMPLE: ContentReel = {
   sourceUrl: "https://journals.sagepub.com/home/ecr",
   category: "fine-motor",
 };
+
+/**
+ * Phase A2 myth fixture — used to preview the kind-aware reveal beat
+ * (VerdictStamp) in Studio. Sourced from one of the high-confidence
+ * candidates the C-myth research run promoted into the DB.
+ */
+export const WARM_MYTH_SAMPLE: ContentReel = {
+  id: "myth-think-strict-parenting-raises-the-best-behaved-kids",
+  kind: "myth",
+  hook: "Think strict parenting raises the best-behaved kids?",
+  payoff:
+    "Authoritative parenting — warm yet firm — leads to better outcomes than authoritarian styles, which correlate with more behaviour problems in 2025 longitudinal research.",
+  centerBlock: "False",
+  coverTeaser: "True or false: strict parenting raises the best-behaved kids.",
+  sourceTitle: "NCBI / Authoritative parenting outcomes review",
+  sourceUrl: "https://www.ncbi.nlm.nih.gov/books/NBK568743/",
+  category: "common-misconception",
+};

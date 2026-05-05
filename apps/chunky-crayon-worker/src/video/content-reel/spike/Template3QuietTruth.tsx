@@ -51,6 +51,7 @@ import { LightLeak } from "@remotion/light-leaks";
 import { COLORS, FONTS, FONT_WEIGHTS, SPRINGS } from "../../v2/tokens/brand";
 import { TONDO_FONT_CSS_URL } from "../../fonts";
 import { PlasmaShader } from "../shared/PlasmaShader";
+import { CenterReveal } from "../reveal/CenterReveal";
 import {
   computeBeats,
   DEFAULT_HOOK_VOICE_SECONDS,
@@ -304,9 +305,11 @@ export const Template3QuietTruth: React.FC<Template3QuietTruthProps> = ({
         })}
       </div>
 
-      {/* ===== Stat reveal — huge number with chromatic aberration =====
-          Visible from reveal start through the payoff beat, then fades
-          out at outro start to hand the centre over to the C logo. */}
+      {/* ===== Centre reveal — kind-aware =====
+          Stat → big number with chromatic aberration in purpleDark anchor;
+          Quiet uses 200px (smaller than Templates 1/2) so the source line
+          below carries proportional weight. Myth → TRUE/FALSE stamp in
+          purpleDark. CenterReveal dispatches based on reel.kind. */}
       {frame >= beats.revealStart && (
         <AbsoluteFill
           style={{
@@ -316,60 +319,17 @@ export const Template3QuietTruth: React.FC<Template3QuietTruthProps> = ({
             opacity: numberStayOpacity * numberOutroFade,
           }}
         >
-          {/* Three brand-coloured copies offset for chromatic aberration:
-              base purpleDark sits on top, pink + teal ghost-trail behind.
-              Smaller font (200px) than Templates 1/2 so the source line
-              below carries proportional weight — Quiet treatment leans on
-              authority, not size. */}
-          <div
-            style={{
-              position: "relative",
-              transform: `scale(${numberScale})`,
-            }}
-          >
-            {/* Pink channel offset (left) */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 200,
-                color: COLORS.pinkDark,
-                opacity: 0.7,
-                transform: `translate(${-aberrationStrength}px, 0)`,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-            {/* Teal channel offset (right) */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 200,
-                color: COLORS.teal,
-                opacity: 0.7,
-                transform: `translate(${aberrationStrength}px, 0)`,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-            {/* Brand-purple base — authoritative focal point */}
-            <div
-              style={{
-                position: "relative",
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 200,
-                color: COLORS.purpleDark,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-          </div>
+          <CenterReveal
+            kind={reel.kind}
+            text={reel.centerBlock}
+            scale={numberScale}
+            aberrationOffsetPx={aberrationStrength}
+            fontFamily={FONTS.heading}
+            fontSize={200}
+            primaryColor={COLORS.purpleDark}
+            aberrationLeftColor={COLORS.pinkDark}
+            aberrationRightColor={COLORS.teal}
+          />
         </AbsoluteFill>
       )}
 

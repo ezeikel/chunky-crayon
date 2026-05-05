@@ -50,6 +50,7 @@ import { LightLeak } from "@remotion/light-leaks";
 import { COLORS, FONTS, FONT_WEIGHTS, SPRINGS } from "../../v2/tokens/brand";
 import { TONDO_FONT_CSS_URL } from "../../fonts";
 import { PlasmaShader } from "../shared/PlasmaShader";
+import { CenterReveal } from "../reveal/CenterReveal";
 import {
   computeBeats,
   DEFAULT_HOOK_VOICE_SECONDS,
@@ -303,9 +304,11 @@ export const Template2WarmInsight: React.FC<Template2WarmInsightProps> = ({
         })}
       </div>
 
-      {/* ===== Stat reveal — huge number with chromatic aberration =====
-          Visible from reveal start through the payoff beat, then fades
-          out at outro start to hand the centre over to the C logo. */}
+      {/* ===== Centre reveal — kind-aware =====
+          Stat → big number with chromatic aberration. Myth → TRUE/FALSE
+          stamp in pinkDark to match Warm's anchor. CenterReveal dispatches
+          based on reel.kind. Visible from reveal through outro, then
+          fades out at outro start to hand the centre to the C logo. */}
       {frame >= beats.revealStart && (
         <AbsoluteFill
           style={{
@@ -315,58 +318,17 @@ export const Template2WarmInsight: React.FC<Template2WarmInsightProps> = ({
             opacity: numberStayOpacity * numberOutroFade,
           }}
         >
-          {/* Three brand-coloured copies offset for chromatic aberration:
-              base pinkDark sits on top, orange + purple ghost-trail behind.
-              Pink anchor reads warmer/softer than Template 1's orange. */}
-          <div
-            style={{
-              position: "relative",
-              transform: `scale(${numberScale})`,
-            }}
-          >
-            {/* Orange channel offset (left) */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 240,
-                color: COLORS.orange,
-                opacity: 0.85,
-                transform: `translate(${-aberrationStrength}px, 0)`,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-            {/* Purple channel offset (right) */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 240,
-                color: COLORS.purpleDark,
-                opacity: 0.85,
-                transform: `translate(${aberrationStrength}px, 0)`,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-            {/* Brand-pink base — softer focal point than Template 1 */}
-            <div
-              style={{
-                position: "relative",
-                fontFamily: FONTS.heading,
-                fontWeight: 900,
-                fontSize: 240,
-                color: COLORS.pinkDark,
-              }}
-            >
-              {reel.centerBlock}
-            </div>
-          </div>
+          <CenterReveal
+            kind={reel.kind}
+            text={reel.centerBlock}
+            scale={numberScale}
+            aberrationOffsetPx={aberrationStrength}
+            fontFamily={FONTS.heading}
+            fontSize={240}
+            primaryColor={COLORS.pinkDark}
+            aberrationLeftColor={COLORS.orange}
+            aberrationRightColor={COLORS.purpleDark}
+          />
         </AbsoluteFill>
       )}
 
