@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { connection } from "next/server";
 import { db, ColoringImage } from "@one-colored-pixel/db";
 import { ACTIONS } from "@/constants";
 import type { ColoringImageSearchParams } from "@/types";
@@ -74,6 +75,12 @@ export const getColoringImageStatus = async (
   failureReason: string | null;
   brand: string;
 } | null> => {
+  // Signal dynamic rendering — Next 16's cacheComponents otherwise rejects
+  // any `new Date()` Prisma uses internally with the "current-time access
+  // before request data" error. This function MUST be uncached so the
+  // image page picks up status flips from GENERATING → READY without a
+  // week-long stale snapshot.
+  await connection();
   const row = await db.coloringImage.findFirst({
     where: { brand: BRAND, id },
     select: {
