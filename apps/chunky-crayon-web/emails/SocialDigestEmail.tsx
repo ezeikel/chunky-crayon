@@ -14,9 +14,13 @@ import {
 type SocialDigestEntry = {
   platform: string;
   caption: string;
-  autoPosted: boolean;
+  /** Will the cron auto-post this entry today? false = needs manual posting. */
+  willAutoPost: boolean;
   assetType: 'image' | 'video';
   assetUrl?: string;
+  /** When the cron is scheduled to fire today, in UTC HH:MM. Undefined for
+   *  manual-only entries. */
+  scheduledTimeUtc?: string;
 };
 
 type SocialDigestEmailProps = {
@@ -30,6 +34,11 @@ type SocialDigestEmailProps = {
   demoReelUrl?: string;
   demoReelCoverUrl?: string;
   demoReelEntries: SocialDigestEntry[];
+  // Stat reel (placeholder; populated once stats-reel produce cron exists)
+  statReelTitle?: string;
+  statReelUrl?: string;
+  statReelCoverUrl?: string;
+  statReelEntries?: SocialDigestEntry[];
   timestamp: string;
 };
 
@@ -44,6 +53,10 @@ const SocialDigestEmail = ({
   demoReelUrl,
   demoReelCoverUrl,
   demoReelEntries = [],
+  statReelTitle,
+  statReelUrl,
+  statReelCoverUrl,
+  statReelEntries = [],
   timestamp = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -53,7 +66,7 @@ const SocialDigestEmail = ({
 }: SocialDigestEmailProps) => (
   <Html>
     <Head />
-    <Preview>Social Media Digest - {coloringImageTitle}</Preview>
+    <Preview>Today&apos;s Posting Brief - {coloringImageTitle}</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header */}
@@ -65,8 +78,12 @@ const SocialDigestEmail = ({
 
         {/* Hero */}
         <Section style={hero}>
-          <Heading style={heroTitle}>Social Media Digest</Heading>
+          <Heading style={heroTitle}>Today&apos;s Posting Brief</Heading>
           <Text style={heroSubtitle}>{timestamp}</Text>
+          <Text style={heroNote}>
+            Assets ready, captions drafted. Auto-posts fire later today at the
+            times shown. Anything marked manual needs a hand.
+          </Text>
         </Section>
 
         {/* ── Section 1: Daily Image (static posts) ── */}
@@ -98,11 +115,16 @@ const SocialDigestEmail = ({
           <Section key={`daily-${index}`} style={platformCard}>
             <Text style={platformHeader}>
               <span style={platformName}>{entry.platform}</span>
-              <span style={entry.autoPosted ? badgeAuto : badgeManual}>
-                {entry.autoPosted ? 'auto-posted' : 'manual'}
+              <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
+                {entry.willAutoPost ? 'auto-posting' : 'manual'}
               </span>
             </Text>
-            <Text style={assetTypeText}>Asset: {entry.assetType}</Text>
+            <Text style={assetTypeText}>
+              Asset: {entry.assetType}
+              {entry.willAutoPost && entry.scheduledTimeUtc
+                ? ` · scheduled ${entry.scheduledTimeUtc} UTC`
+                : ''}
+            </Text>
             <Text style={captionBlock}>{entry.caption}</Text>
           </Section>
         ))}
@@ -145,11 +167,69 @@ const SocialDigestEmail = ({
               <Section key={`reel-${index}`} style={platformCard}>
                 <Text style={platformHeader}>
                   <span style={platformName}>{entry.platform}</span>
-                  <span style={entry.autoPosted ? badgeAuto : badgeManual}>
-                    {entry.autoPosted ? 'auto-posted' : 'manual'}
+                  <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
+                    {entry.willAutoPost ? 'auto-posting' : 'manual'}
                   </span>
                 </Text>
-                <Text style={assetTypeText}>Asset: {entry.assetType}</Text>
+                <Text style={assetTypeText}>
+                  Asset: {entry.assetType}
+                  {entry.willAutoPost && entry.scheduledTimeUtc
+                    ? ` · scheduled ${entry.scheduledTimeUtc} UTC`
+                    : ''}
+                </Text>
+                <Text style={captionBlock}>{entry.caption}</Text>
+              </Section>
+            ))}
+          </>
+        )}
+
+        {/* ── Section 3: Stat Reel (placeholder until produce cron exists) ── */}
+        {(statReelUrl || (statReelEntries && statReelEntries.length > 0)) && (
+          <>
+            <Hr style={hr} />
+            <Section style={infoSection}>
+              <Heading as="h2" style={sectionTitle}>
+                📊 Stat Reel
+              </Heading>
+              {statReelTitle && (
+                <Text style={paragraph}>
+                  <strong>{statReelTitle}</strong>
+                </Text>
+              )}
+              <Section style={assetSection}>
+                {statReelUrl && (
+                  <Text style={paragraph}>
+                    🎬 Video (mp4):{' '}
+                    <Link href={statReelUrl} style={inlineLink}>
+                      Download Video (1080×1920)
+                    </Link>
+                  </Text>
+                )}
+                {statReelCoverUrl && (
+                  <Text style={paragraph}>
+                    📸 Cover (jpg):{' '}
+                    <Link href={statReelCoverUrl} style={inlineLink}>
+                      Download Cover Image
+                    </Link>
+                  </Text>
+                )}
+              </Section>
+            </Section>
+
+            {statReelEntries?.map((entry, index) => (
+              <Section key={`stat-${index}`} style={platformCard}>
+                <Text style={platformHeader}>
+                  <span style={platformName}>{entry.platform}</span>
+                  <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
+                    {entry.willAutoPost ? 'auto-posting' : 'manual'}
+                  </span>
+                </Text>
+                <Text style={assetTypeText}>
+                  Asset: {entry.assetType}
+                  {entry.willAutoPost && entry.scheduledTimeUtc
+                    ? ` · scheduled ${entry.scheduledTimeUtc} UTC`
+                    : ''}
+                </Text>
                 <Text style={captionBlock}>{entry.caption}</Text>
               </Section>
             ))}
@@ -160,7 +240,7 @@ const SocialDigestEmail = ({
 
         {/* Footer */}
         <Section style={footer}>
-          <Text style={footerText}>Chunky Crayon - Social Media Digest</Text>
+          <Text style={footerText}>Chunky Crayon - Daily Posting Brief</Text>
           <Text style={footerCopyright}>
             &copy; {new Date().getFullYear()} Chunky Crayon. Internal
             notification.
@@ -219,6 +299,13 @@ const heroSubtitle = {
   fontSize: '16px',
   color: '#666666',
   margin: '0',
+};
+
+const heroNote = {
+  fontSize: '13px',
+  color: '#888888',
+  margin: '12px 0 0',
+  fontStyle: 'italic' as const,
 };
 
 const infoSection = {

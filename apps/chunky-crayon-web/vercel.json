@@ -105,7 +105,7 @@
 
     {
       "path": "/api/social/digest",
-      "schedule": "0 2 * * *"
+      "schedule": "30 8 * * *"
     },
     {
       "path": "/api/admin/tokens",

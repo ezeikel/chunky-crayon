@@ -13,10 +13,61 @@ import type { SocialDigestEntry } from '@/app/actions/email';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 
+// Maps each `socialPostResults` key to the cron schedule that fires it.
+// Mirrors the cron entries in apps/chunky-crayon-web/vercel.json — when you
+// move a cron, update this table too.
+//
+// Day strings: 'weekday' = Mon-Fri, 'weekend' = Sat+Sun, 'next-day-weekday'
+// = the cron fires Tue-Sat UTC because the post is *for* the previous
+// weekday's audience (e.g. 00:30 UTC Wed = 8:30pm Tue ET).
+type ScheduledSlot = {
+  /** UTC HH:MM when the cron fires */
+  utc: string;
+  /** Which days of week the slot is active (UTC, not local) */
+  days: 'weekday' | 'weekend' | 'next-day-weekday' | 'next-day-weekend';
+};
+const POST_SCHEDULE: Record<string, ScheduledSlot> = {
+  // Weekday demo-reel slots (afternoon UTC = US workday morning/lunch)
+  facebookDemoReel: { utc: '13:00', days: 'weekday' },
+  pinterestDemoReel: { utc: '13:02', days: 'weekday' },
+  instagramDemoReel: { utc: '17:00', days: 'weekday' },
+  pinterest: { utc: '18:00', days: 'weekday' }, // weekday Pinterest static
+  // Weekday late-night slots (00:30+ UTC = US Eastern evening prior calendar day)
+  instagramCarousel: { utc: '00:30', days: 'next-day-weekday' },
+  tiktokDemoReel: { utc: '00:32', days: 'next-day-weekday' },
+};
+
+const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
+  instagramDemoReel: { utc: '17:00', days: 'weekend' },
+  facebookDemoReel: { utc: '17:02', days: 'weekend' },
+  tiktokDemoReel: { utc: '17:04', days: 'weekend' },
+  pinterestDemoReel: { utc: '17:06', days: 'weekend' },
+  instagramCarousel: { utc: '17:08', days: 'weekend' },
+  pinterest: { utc: '17:10', days: 'weekend' },
+};
+
+/**
+ * Returns the UTC HH:MM today's cron will fire for `key`, or undefined if
+ * no cron is scheduled for the current day-of-week.
+ *
+ * Used by the brief email to show "scheduled HH:MM UTC" alongside captions.
+ */
+const scheduledTimeFor = (key: string): string | undefined => {
+  const todayDay = new Date().getUTCDay(); // 0=Sun, 6=Sat
+  const isWeekend = todayDay === 0 || todayDay === 6;
+  const table = isWeekend ? POST_SCHEDULE_WEEKEND : POST_SCHEDULE;
+  return table[key]?.utc;
+};
+
 /**
  * GET /api/social/digest
- * Sends a social media digest email with all platform captions for today's coloring page.
- * Runs at :25 after all platform crons finish.
+ * Sends the daily posting brief email — fires in the morning before any
+ * platform cron, lists what's scheduled to auto-post today, and includes
+ * raw assets + captions for anything you want to post manually.
+ *
+ * Renamed from "social digest" — the previous version ran in the evening
+ * after posts had landed and showed past-tense "auto-posted" badges.
+ * The route URL stays the same for cron config compat.
  */
 export const GET = async (request: Request) => {
   await connection();
@@ -110,46 +161,45 @@ export const GET = async (request: Request) => {
     const videoAssetUrl =
       coloringImage.demoReelUrl ?? coloringImage.animationUrl ?? undefined;
 
-    // PTP-style: read per-platform success from socialPostResults JSON.
-    // Static posts store results on the DAILY image; demo-reel posts store
-    // results on the WORKER-CREATED image. Merge both for accurate badges.
-    type PostResult = { success?: boolean } | undefined;
-    const dailyResults = (coloringImage.socialPostResults ?? {}) as Record<
-      string,
-      PostResult
-    >;
-    const reelResults = (demoReelImage?.socialPostResults ?? {}) as Record<
-      string,
-      PostResult
-    >;
-    const wasAutoPosted = (key: string): boolean =>
-      !!dailyResults[key]?.success || !!reelResults[key]?.success;
+    // willAutoPost: true if there's a cron scheduled for this platform/type
+    // today. False = manual-only (LinkedIn, currently colored-static which
+    // we paused earlier). When the entry has a cron, scheduledTimeUtc tells
+    // the recipient when it'll fire so they can plan around it.
+    const slotFor = (
+      key: string,
+    ): { willAutoPost: boolean; scheduledTimeUtc?: string } => {
+      const utc = scheduledTimeFor(key);
+      return utc
+        ? { willAutoPost: true, scheduledTimeUtc: utc }
+        : { willAutoPost: false };
+    };
 
     // Split entries into two groups: daily image (static posts) and
-    // demo reel (worker-produced video + colored-static CTA).
+    // demo reel (worker-produced video). Each carries its scheduled UTC
+    // post time when there's a cron; manual entries (LinkedIn) have none.
     const dailyEntries: SocialDigestEntry[] = [
       {
         platform: 'Instagram Carousel',
         caption: instagramCarouselCaption,
-        autoPosted: wasAutoPosted('instagramCarousel'),
+        ...slotFor('instagramCarousel'),
         assetType: 'image',
       },
       {
         platform: 'Facebook Image',
         caption: facebookImageCaption,
-        autoPosted: wasAutoPosted('facebookImage'),
+        ...slotFor('facebookImage'),
         assetType: 'image',
       },
       {
         platform: 'Pinterest Image',
         caption: pinterestCaption,
-        autoPosted: wasAutoPosted('pinterest'),
+        ...slotFor('pinterest'),
         assetType: 'image',
       },
       {
         platform: 'LinkedIn',
         caption: linkedinCaption,
-        autoPosted: wasAutoPosted('linkedin'),
+        willAutoPost: false, // LinkedIn is manual-only
         assetType: 'image',
       },
     ];
@@ -158,43 +208,43 @@ export const GET = async (request: Request) => {
       {
         platform: 'Instagram Reel',
         caption: instagramDemoReelCaption,
-        autoPosted: wasAutoPosted('instagramDemoReel'),
+        ...slotFor('instagramDemoReel'),
         assetType: 'video',
       },
       {
         platform: 'Facebook Reel',
         caption: facebookDemoReelCaption,
-        autoPosted: wasAutoPosted('facebookDemoReel'),
+        ...slotFor('facebookDemoReel'),
         assetType: 'video',
       },
       {
         platform: 'TikTok',
         caption: tiktokDemoReelCaption,
-        autoPosted: false,
+        ...slotFor('tiktokDemoReel'),
         assetType: 'video',
       },
       {
         platform: 'LinkedIn Reel',
         caption: linkedinDemoReelCaption,
-        autoPosted: wasAutoPosted('linkedinDemoReel'),
+        willAutoPost: false, // LinkedIn is manual-only
         assetType: 'video',
       },
       {
         platform: 'Pinterest Video',
         caption: pinterestCaption,
-        autoPosted: wasAutoPosted('pinterestDemoReel'),
+        ...slotFor('pinterestDemoReel'),
         assetType: 'video',
       },
       {
         platform: 'Instagram Static (blank)',
         caption: instagramColoredStaticCaption,
-        autoPosted: wasAutoPosted('instagramColoredStatic'),
+        ...slotFor('instagramColoredStatic'),
         assetType: 'image',
       },
       {
         platform: 'Facebook Static (blank)',
         caption: facebookColoredStaticCaption,
-        autoPosted: wasAutoPosted('facebookColoredStatic'),
+        ...slotFor('facebookColoredStatic'),
         assetType: 'image',
       },
     ];

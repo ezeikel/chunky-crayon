@@ -23,9 +23,13 @@ import {
 export type SocialDigestEntry = {
   platform: string;
   caption: string;
-  autoPosted: boolean;
+  /** Will the cron auto-post this entry today? false = needs manual posting. */
+  willAutoPost: boolean;
   assetType: 'image' | 'video';
   assetUrl?: string;
+  /** When the cron is scheduled to fire today, in UTC HH:MM. Undefined for
+   *  manual-only entries. */
+  scheduledTimeUtc?: string;
 };
 
 // TODO: Route through Mailtrap on localhost (NODE_ENV === 'development')
@@ -346,7 +350,14 @@ export const sendTrialEndingEmail = async ({
   }
 };
 
-// Send social media digest email
+// Send the daily posting brief email.
+//
+// Renamed from "social digest" — this fires in the morning before posts go out,
+// so it's a forward-looking brief of what will post today (and gives you the
+// raw assets + captions for anything that needs manual posting), not a recap
+// of yesterday. Function name kept as `sendSocialDigest` for back-compat
+// with existing callers; the email subject + UI copy are the user-visible
+// rename.
 export const sendSocialDigest = async ({
   coloringImageTitle,
   coloringImageUrl,
@@ -356,6 +367,10 @@ export const sendSocialDigest = async ({
   demoReelUrl,
   demoReelCoverUrl,
   demoReelEntries,
+  statReelTitle,
+  statReelUrl,
+  statReelCoverUrl,
+  statReelEntries,
 }: {
   coloringImageTitle: string;
   coloringImageUrl: string;
@@ -365,6 +380,10 @@ export const sendSocialDigest = async ({
   demoReelUrl?: string;
   demoReelCoverUrl?: string;
   demoReelEntries: SocialDigestEntry[];
+  statReelTitle?: string;
+  statReelUrl?: string;
+  statReelCoverUrl?: string;
+  statReelEntries?: SocialDigestEntry[];
 }): Promise<{ success: boolean; error?: string }> => {
   const digestEmail = process.env.SOCIAL_DIGEST_EMAIL;
 
@@ -390,6 +409,10 @@ export const sendSocialDigest = async ({
         demoReelUrl,
         demoReelCoverUrl,
         demoReelEntries,
+        statReelTitle,
+        statReelUrl,
+        statReelCoverUrl,
+        statReelEntries,
         timestamp,
       }),
     );
@@ -402,14 +425,14 @@ export const sendSocialDigest = async ({
     await resend.emails.send({
       from: getResendFromAddress('no-reply', 'Chunky Crayon'),
       to: digestEmail,
-      subject: `Social Digest - ${dayName} ${day} ${month}`,
+      subject: `Posting Brief - ${dayName} ${day} ${month}`,
       html: emailHtml,
     });
 
-    console.log(`📧 Sent social digest email to: ${digestEmail}`);
+    console.log(`📧 Sent posting brief email to: ${digestEmail}`);
     return { success: true };
   } catch (error) {
-    console.error('Failed to send social digest email:', error);
+    console.error('Failed to send posting brief email:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
