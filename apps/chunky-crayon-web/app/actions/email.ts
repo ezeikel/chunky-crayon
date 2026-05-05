@@ -371,10 +371,7 @@ export const sendSocialDigest = async ({
   demoReelUrl,
   demoReelCoverUrl,
   demoReelEntries,
-  statReelTitle,
-  statReelUrl,
-  statReelCoverUrl,
-  statReelEntries,
+  contentReel,
 }: {
   blogTitle?: string;
   blogExcerpt?: string;
@@ -388,10 +385,15 @@ export const sendSocialDigest = async ({
   demoReelUrl?: string;
   demoReelCoverUrl?: string;
   demoReelEntries: SocialDigestEntry[];
-  statReelTitle?: string;
-  statReelUrl?: string;
-  statReelCoverUrl?: string;
-  statReelEntries?: SocialDigestEntry[];
+  contentReel?: {
+    id: string;
+    kind: 'STAT' | 'FACT' | 'TIP' | 'MYTH';
+    hook: string;
+    sourceTitle?: string;
+    sourceUrl?: string;
+    reelUrl?: string;
+    coverUrl?: string;
+  };
 }): Promise<{ success: boolean; error?: string }> => {
   const digestEmail = process.env.SOCIAL_DIGEST_EMAIL;
 
@@ -421,10 +423,7 @@ export const sendSocialDigest = async ({
         demoReelUrl,
         demoReelCoverUrl,
         demoReelEntries,
-        statReelTitle,
-        statReelUrl,
-        statReelCoverUrl,
-        statReelEntries,
+        contentReel,
         timestamp,
       }),
     );

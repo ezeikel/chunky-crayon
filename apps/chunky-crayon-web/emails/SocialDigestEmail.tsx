@@ -40,11 +40,18 @@ type SocialDigestEmailProps = {
   demoReelUrl?: string;
   demoReelCoverUrl?: string;
   demoReelEntries: SocialDigestEntry[];
-  // Stat reel (placeholder; populated once stats-reel produce cron exists)
-  statReelTitle?: string;
-  statReelUrl?: string;
-  statReelCoverUrl?: string;
-  statReelEntries?: SocialDigestEntry[];
+  // Content reel — researched stats / facts / tips / myth-busts (replaces
+  // the old "Stat Reel" placeholder once content-reels publish cron is live).
+  // Optional — section only renders when contentReel is supplied.
+  contentReel?: {
+    id: string;
+    kind: 'STAT' | 'FACT' | 'TIP' | 'MYTH';
+    hook: string;
+    sourceTitle?: string;
+    sourceUrl?: string;
+    reelUrl?: string;
+    coverUrl?: string;
+  };
   timestamp: string;
 };
 
@@ -63,10 +70,7 @@ const SocialDigestEmail = ({
   demoReelUrl,
   demoReelCoverUrl,
   demoReelEntries = [],
-  statReelTitle,
-  statReelUrl,
-  statReelCoverUrl,
-  statReelEntries = [],
+  contentReel,
   timestamp = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -223,56 +227,54 @@ const SocialDigestEmail = ({
           </>
         )}
 
-        {/* ── Section 3: Stat Reel (placeholder until produce cron exists) ── */}
-        {(statReelUrl || (statReelEntries && statReelEntries.length > 0)) && (
+        {/* ── Section 3: Content Reel — today's stat / fact / tip / myth ── */}
+        {contentReel && (
           <>
             <Hr style={hr} />
             <Section style={infoSection}>
               <Heading as="h2" style={sectionTitle}>
-                📊 Stat Reel
+                {contentReel.kind === 'MYTH'
+                  ? "🧐 Today's Myth-Bust"
+                  : contentReel.kind === 'TIP'
+                    ? "💡 Today's Tip"
+                    : contentReel.kind === 'FACT'
+                      ? "🧠 Today's Fact"
+                      : "📊 Today's Stat"}
               </Heading>
-              {statReelTitle && (
+              <Text style={paragraph}>
+                <strong>{contentReel.hook}</strong>
+              </Text>
+              {contentReel.sourceTitle && (
                 <Text style={paragraph}>
-                  <strong>{statReelTitle}</strong>
+                  Source:{' '}
+                  {contentReel.sourceUrl ? (
+                    <Link href={contentReel.sourceUrl} style={inlineLink}>
+                      {contentReel.sourceTitle}
+                    </Link>
+                  ) : (
+                    contentReel.sourceTitle
+                  )}
                 </Text>
               )}
               <Section style={assetSection}>
-                {statReelUrl && (
+                {contentReel.reelUrl && (
                   <Text style={paragraph}>
                     🎬 Video (mp4):{' '}
-                    <Link href={statReelUrl} style={inlineLink}>
-                      Download Video (1080×1920)
+                    <Link href={contentReel.reelUrl} style={inlineLink}>
+                      Download Reel (1080×1920)
                     </Link>
                   </Text>
                 )}
-                {statReelCoverUrl && (
+                {contentReel.coverUrl && (
                   <Text style={paragraph}>
                     📸 Cover (jpg):{' '}
-                    <Link href={statReelCoverUrl} style={inlineLink}>
+                    <Link href={contentReel.coverUrl} style={inlineLink}>
                       Download Cover Image
                     </Link>
                   </Text>
                 )}
               </Section>
             </Section>
-
-            {statReelEntries?.map((entry, index) => (
-              <Section key={`stat-${index}`} style={platformCard}>
-                <Text style={platformHeader}>
-                  <span style={platformName}>{entry.platform}</span>
-                  <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
-                    {entry.willAutoPost ? 'auto-posting' : 'manual'}
-                  </span>
-                </Text>
-                <Text style={assetTypeText}>
-                  Asset: {entry.assetType}
-                  {entry.willAutoPost && entry.scheduledTimeUtc
-                    ? ` · scheduled ${entry.scheduledTimeUtc} UTC`
-                    : ''}
-                </Text>
-                <Text style={captionBlock}>{entry.caption}</Text>
-              </Section>
-            ))}
           </>
         )}
 

@@ -149,6 +149,19 @@ export const GET = async (request: Request) => {
       orderBy: { createdAt: 'desc' },
     });
 
+    // Today's ContentReel — the daily-publish cron fires at 05:00 UTC and
+    // sets `postedAt` after the worker uploads the rendered mp4 + cover.
+    // By 08:30 UTC (digest time) it should be ready. If it isn't (cron
+    // failed, no candidates available) the brief omits the section.
+    const contentReel = await db.contentReel.findFirst({
+      where: {
+        brand: BRAND,
+        postedAt: { gte: todayStart },
+        reelUrl: { not: null },
+      },
+      orderBy: { postedAt: 'desc' },
+    });
+
     // Fetch today's published blog post from Sanity, if any. The blog cron
     // fires at 06:00 UTC and usually finishes within minutes, so by 08:30
     // UTC (when the brief fires) it should be live. If it isn't (cron
@@ -326,6 +339,23 @@ export const GET = async (request: Request) => {
         coloringImage.demoReelCoverUrl ??
         undefined,
       demoReelEntries,
+      // Content reel — researched stats/facts/tips/myth-busts. Lower
+      // signal-density than demo reels, so we surface only the basics:
+      // hook, kind, source, asset URLs. Manual posting (today) doesn't
+      // need cross-platform captions because the auto-publish cron is
+      // the intended path; the brief's content-reel section is for
+      // editorial review.
+      contentReel: contentReel
+        ? {
+            id: contentReel.id,
+            kind: contentReel.kind,
+            hook: contentReel.hook,
+            sourceTitle: contentReel.sourceTitle ?? undefined,
+            sourceUrl: contentReel.sourceUrl ?? undefined,
+            reelUrl: contentReel.reelUrl ?? undefined,
+            coverUrl: contentReel.coverUrl ?? undefined,
+          }
+        : undefined,
     });
 
     if (!result.success) {
