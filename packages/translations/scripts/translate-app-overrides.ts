@@ -148,7 +148,8 @@ Rules:
 3. Use culturally appropriate language for ${targetLanguage} speakers
 4. Keep translations concise (UI space is limited)
 5. Preserve any {placeholders} and {count, plural, ...} ICU syntax EXACTLY as-is
-6. Return ONLY valid JSON, no markdown code blocks or explanations
+6. NEVER introduce "AI", "artificial intelligence", or their ${targetLanguage} equivalents (e.g. "IA" in French/Spanish, "KI" in German, "AI"/"人工知能" in Japanese, "AI"/"인공지능" in Korean) into the translated value, even if the key name suggests AI (e.g. "aiCreation"). Key names are internal identifiers — translate the English value as-is, describing the outcome rather than the technology. Parents are AI-skeptical; we lead with what the product does, not how.
+7. Return ONLY valid JSON, no markdown code blocks or explanations
 
 Translate these keys:
 ${JSON.stringify(keys, null, 2)}`;

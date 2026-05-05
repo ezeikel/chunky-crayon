@@ -61,7 +61,8 @@ Rules:
 5. Preserve any {placeholders} and {count, plural, ...} ICU syntax EXACTLY as-is
 6. Use clear, universally understood language suitable for all ages
 7. For color names, use common {{TARGET_LANGUAGE}} equivalents
-8. Return ONLY valid JSON, no markdown code blocks or explanations
+8. NEVER introduce "AI", "artificial intelligence", or their {{TARGET_LANGUAGE}} equivalents (e.g. "IA" in French/Spanish, "KI" in German, "AI"/"人工知能" in Japanese, "AI"/"인공지능" in Korean) into the translated value, even if the key name suggests AI (e.g. "aiCreation"). Key names are internal identifiers — translate the English value as-is, describing the outcome rather than the technology. Parents are AI-skeptical; we lead with what the product does, not how.
+9. Return ONLY valid JSON, no markdown code blocks or explanations
 
 Target Language: {{TARGET_LANGUAGE}} ({{NATIVE_NAME}})
 
