@@ -1,0 +1,518 @@
+/**
+ * Template 3 — Quiet Truth
+ *
+ * Used for parenting-tip / child-development stats. The "considered,
+ * journal-like" treatment that plays well in a content rotation after a
+ * loud Shock reel — slower, cooler palette, smaller number, source-led
+ * authority. Same beat structure + shared components as Templates 1 and
+ * 2; differences are the cool palette (sky-light + purple), purpleDark
+ * number anchor, slower spring without overshoot, and a soft cool-blue
+ * light-leak.
+ *
+ * Beats (voice-aware, see ../shared/timing.ts):
+ *   intro      brand mark slides in (1.0s)
+ *   hook       problem-first hook narration (voice + 0.4s buffer)
+ *   reveal     huge number scales up with chromatic aberration (1.5s, fixed)
+ *   payoff     adult narrator delivers the resolution (voice + 0.4s buffer)
+ *   outro      source attribution + CTA fade in (1.5s, fixed)
+ *
+ * Voice + music handling:
+ *   - `<Audio>` tags live at the COMPOSITION ROOT, NOT inside `<Sequence>`.
+ *     Remotion truncates audio that's a child of a bounded Sequence — that
+ *     is the demo-reel cut-off bug we're avoiding here.
+ *   - Beat durations are computed from voice clip durations + 0.4s buffer,
+ *     so animations finish naturally and we never cut a sentence.
+ *   - Background music is continuous, ducked under voice via volume.
+ *
+ * Effects layered:
+ *   - Backbone: real GLSL plasma shader (../shared/PlasmaShader),
+ *     animation-math (spring + interpolate), randomness (frame-deterministic).
+ *   - Spice: chromatic aberration on the stat number (three colour-channel
+ *     copies with mix-blend; HTML-in-canvas upgrade in a follow-up task),
+ *     light-leak burst at reveal (radial gradient; @remotion/light-leaks
+ *     upgrade in a follow-up task).
+ *
+ * Font: Tondo (loaded via TONDO_FONT_CSS_URL link tag).
+ */
+
+import {
+  AbsoluteFill,
+  Audio,
+  Img,
+  Sequence,
+  interpolate,
+  random,
+  spring,
+  staticFile,
+  useCurrentFrame,
+  useVideoConfig,
+} from "remotion";
+import { LightLeak } from "@remotion/light-leaks";
+import { COLORS, FONTS, FONT_WEIGHTS, SPRINGS } from "../../v2/tokens/brand";
+import { TONDO_FONT_CSS_URL } from "../../fonts";
+import { PlasmaShader } from "../shared/PlasmaShader";
+import {
+  computeBeats,
+  DEFAULT_HOOK_VOICE_SECONDS,
+  DEFAULT_PAYOFF_VOICE_SECONDS,
+} from "../shared/timing";
+import type { ContentReel } from "../shared/types";
+
+export type Template3QuietTruthProps = {
+  reel: ContentReel;
+  /** ElevenLabs-generated narration for the hook beat. */
+  hookVoiceUrl?: string;
+  /** Hook voice clip length in seconds. Drives beat duration. */
+  hookVoiceSeconds?: number;
+  /** ElevenLabs-generated narration for the payoff beat. */
+  payoffVoiceUrl?: string;
+  /** Payoff voice clip length in seconds. */
+  payoffVoiceSeconds?: number;
+  /** Background music URL, looped + ducked across the reel. */
+  backgroundMusicUrl?: string;
+};
+
+export const QUIET_REEL_FPS = 30;
+
+/**
+ * Compute total composition duration from voice durations.
+ * Studio preview + Root.tsx defaults call this with sensible defaults so
+ * scrubbing works without real audio files; the worker passes real values
+ * from the ElevenLabs response when rendering for production.
+ */
+export const computeQuietReelDuration = (
+  hookVoiceSeconds: number = DEFAULT_HOOK_VOICE_SECONDS,
+  payoffVoiceSeconds: number = DEFAULT_PAYOFF_VOICE_SECONDS,
+): number =>
+  computeBeats({ fps: QUIET_REEL_FPS, hookVoiceSeconds, payoffVoiceSeconds })
+    .totalFrames;
+
+export const QUIET_REEL_DEFAULT_DURATION_FRAMES = computeQuietReelDuration();
+
+export const Template3QuietTruth: React.FC<Template3QuietTruthProps> = ({
+  reel,
+  hookVoiceUrl,
+  hookVoiceSeconds = DEFAULT_HOOK_VOICE_SECONDS,
+  payoffVoiceUrl,
+  payoffVoiceSeconds = DEFAULT_PAYOFF_VOICE_SECONDS,
+  backgroundMusicUrl,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  const beats = computeBeats({ fps, hookVoiceSeconds, payoffVoiceSeconds });
+
+  // ===== Brand-mark outro — at outroStart, the number fades out and a
+  //       large centre C logo springs in. See Template 1 for the
+  //       hook-first reasoning behind no top-left brand stamp.
+  const brandSpring = spring({
+    frame: frame - beats.outroStart,
+    fps,
+    config: SPRINGS.snappy,
+    durationInFrames: 24,
+  });
+  const brandOpacity = brandSpring;
+  const brandScale = interpolate(brandSpring, [0, 1], [0.8, 1]);
+
+  // Number fades out at the outro hand-off so the centre real-estate
+  // belongs to the logo, not the stat the viewer has already absorbed.
+  const numberOutroFade = interpolate(
+    frame,
+    [beats.outroStart, beats.outroStart + 12],
+    [1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+
+  // ===== Hook text — types in word-by-word during the hook beat =====
+  const hookWords = reel.hook.split(" ");
+  // Reveal happens across the first ~70% of the hook beat so the visual
+  // settles slightly before the voice trails off.
+  const hookRevealFrames = Math.floor(beats.hookDur * 0.7);
+  const framesPerWord = Math.max(
+    4,
+    Math.floor(hookRevealFrames / hookWords.length),
+  );
+
+  // ===== Stat reveal — number scales up with chromatic aberration =====
+  const revealLocalFrame = frame - beats.revealStart;
+  // Scale runs across the first ~70% of the reveal beat
+  const numberScale = spring({
+    frame: revealLocalFrame,
+    fps,
+    config: SPRINGS.snappy,
+    durationInFrames: Math.floor(beats.revealDur * 0.7),
+  });
+  // Chromatic aberration: spike at snap, settle to zero. Film-grain
+  // flicker layer carries ongoing motion so no frame reads as static.
+  const aberrationStrength = interpolate(
+    revealLocalFrame,
+    [0, Math.floor(beats.revealDur * 0.27), Math.floor(beats.revealDur * 0.83)],
+    [0, 12, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  // (Light-leak animation is handled by @remotion/light-leaks — see the
+  // <LightLeak> below. The package self-animates within the duration we
+  // pass it; we don't need a manual opacity envelope.)
+
+  // ===== Payoff text — fades in at the start of the payoff beat =====
+  const payoffOpacity = interpolate(
+    frame,
+    [beats.payoffStart, beats.payoffStart + 12],
+    [0, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+
+  // ===== Source + CTA — fade in at outro start, hold to end =====
+  const outroOpacity = interpolate(
+    frame,
+    [beats.outroStart, beats.outroStart + 18],
+    [0, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+
+  // Hook-visual stays on screen until reveal starts, then fades out fast.
+  const hookFadeOut = interpolate(
+    frame,
+    [beats.hookEnd - 8, beats.hookEnd],
+    [1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  // Number stays on screen at full opacity through the entire reel —
+  // source/CTA fade in below at outro without disturbing it. No outro
+  // shrink/fade animation; the eye shouldn't be drawn back to the
+  // number once the payoff is delivered.
+  const numberStayOpacity = 1;
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: COLORS.bgCream }}>
+      {/* Tondo font — base64-inlined, no fetch */}
+      <link rel="stylesheet" href={TONDO_FONT_CSS_URL} />
+
+      {/* ===== Plasma background — real GLSL shader.
+          Sky-light + purple is the coolest of the three templates' palettes
+          — reads as "considered / journal" against Template 1's pink+teal
+          (dramatic) and Template 2's yellow+green (warm/garden). */}
+      <PlasmaShader
+        colorBg={COLORS.bgCream}
+        colorWarm={COLORS.skyLight}
+        colorCool={COLORS.purple}
+        colorTint={COLORS.sky}
+      />
+
+      {/* Subtle paper-grain texture for tactile warmth (static layer) */}
+      <AbsoluteFill
+        style={{
+          backgroundImage: `repeating-linear-gradient(
+            45deg,
+            rgba(0,0,0,0.012) 0px,
+            rgba(0,0,0,0.012) 1px,
+            transparent 1px,
+            transparent 4px
+          )`,
+          mixBlendMode: "multiply",
+          opacity: 0.7,
+        }}
+      />
+
+      {/* Film-grain flicker — re-randomises every 2 frames (15Hz). Keeps
+          the whole composition feeling subtly alive even when nothing
+          else is animating. */}
+      <AbsoluteFill
+        style={{
+          backgroundImage: `repeating-linear-gradient(
+            -30deg,
+            rgba(0,0,0,0.018) 0px,
+            rgba(0,0,0,0.018) 1px,
+            transparent 1px,
+            transparent 5px
+          )`,
+          mixBlendMode: "multiply",
+          opacity: 0.55,
+          transform: `translate(${(random(`grain-x-${Math.floor(frame / 2)}`) - 0.5) * 6}px, ${(random(`grain-y-${Math.floor(frame / 2)}`) - 0.5) * 6}px)`,
+        }}
+      />
+
+      {/* ===== Light-leak burst — real WebGL streak via @remotion/light-leaks.
+          Tuned for "flash at the reveal moment" not "wash the whole reel."
+          The package's full-strength effect bathes the entire frame, which
+          obliterates the plasma + foreground text. We dial it back hard:
+          - Duration shortened to half the reveal beat so it's a brief
+            sweep rather than a sustained glow.
+          - Wrapped in opacity 0.35 so the foreground stays readable.
+          - Sequence ends BEFORE the payoff beat so payoff text fades in
+            against a clean background.
+          seed=3 picks one streak variant; rotate per stat-category later. */}
+      <Sequence
+        from={beats.revealStart}
+        durationInFrames={Math.floor(beats.revealDur * 0.6)}
+      >
+        <AbsoluteFill style={{ mixBlendMode: "screen", opacity: 0.18 }}>
+          <LightLeak
+            durationInFrames={Math.floor(beats.revealDur * 0.6)}
+            seed={7}
+            hueShift={200}
+          />
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* ===== Hook text — visible during hook beat, fades out at end ===== */}
+      <div
+        style={{
+          position: "absolute",
+          top: 380,
+          left: 80,
+          right: 80,
+          fontFamily: FONTS.heading,
+          fontWeight: FONT_WEIGHTS.heading,
+          fontSize: 80,
+          lineHeight: 1.1,
+          color: COLORS.textPrimary,
+          opacity: hookFadeOut,
+        }}
+      >
+        {hookWords.map((word, i) => {
+          const wordStartFrame = beats.hookStart + i * framesPerWord;
+          const wordOpacity = interpolate(
+            frame,
+            [wordStartFrame, wordStartFrame + 6],
+            [0, 1],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+          );
+          const wordY = interpolate(
+            frame,
+            [wordStartFrame, wordStartFrame + 8],
+            [12, 0],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+          );
+          // Subtle per-word entry glitch
+          const glitchSeed = random(`hook-${i}-${Math.floor(frame / 3)}`);
+          const glitchX =
+            frame < wordStartFrame + 10 ? (glitchSeed - 0.5) * 4 : 0;
+          return (
+            <span
+              key={i}
+              style={{
+                opacity: wordOpacity,
+                transform: `translate3d(${glitchX}px, ${wordY}px, 0)`,
+                display: "inline-block",
+                marginRight: 14,
+              }}
+            >
+              {word}
+            </span>
+          );
+        })}
+      </div>
+
+      {/* ===== Stat reveal — huge number with chromatic aberration =====
+          Visible from reveal start through the payoff beat, then fades
+          out at outro start to hand the centre over to the C logo. */}
+      {frame >= beats.revealStart && (
+        <AbsoluteFill
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity: numberStayOpacity * numberOutroFade,
+          }}
+        >
+          {/* Three brand-coloured copies offset for chromatic aberration:
+              base purpleDark sits on top, pink + teal ghost-trail behind.
+              Smaller font (200px) than Templates 1/2 so the source line
+              below carries proportional weight — Quiet treatment leans on
+              authority, not size. */}
+          <div
+            style={{
+              position: "relative",
+              transform: `scale(${numberScale})`,
+            }}
+          >
+            {/* Pink channel offset (left) */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                fontFamily: FONTS.heading,
+                fontWeight: 900,
+                fontSize: 200,
+                color: COLORS.pinkDark,
+                opacity: 0.7,
+                transform: `translate(${-aberrationStrength}px, 0)`,
+              }}
+            >
+              {reel.centerBlock}
+            </div>
+            {/* Teal channel offset (right) */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                fontFamily: FONTS.heading,
+                fontWeight: 900,
+                fontSize: 200,
+                color: COLORS.teal,
+                opacity: 0.7,
+                transform: `translate(${aberrationStrength}px, 0)`,
+              }}
+            >
+              {reel.centerBlock}
+            </div>
+            {/* Brand-purple base — authoritative focal point */}
+            <div
+              style={{
+                position: "relative",
+                fontFamily: FONTS.heading,
+                fontWeight: 900,
+                fontSize: 200,
+                color: COLORS.purpleDark,
+              }}
+            >
+              {reel.centerBlock}
+            </div>
+          </div>
+        </AbsoluteFill>
+      )}
+
+      {/* ===== Outro brand reveal — large C logo replaces the number at
+          outro, sits in the same centre real-estate as the closing credit. */}
+      {frame >= beats.outroStart && (
+        <AbsoluteFill
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity: brandOpacity,
+          }}
+        >
+          <Img
+            src={staticFile("/logos/cc-logo-no-bg.svg")}
+            style={{
+              width: 280,
+              height: "auto",
+              transform: `scale(${brandScale})`,
+            }}
+          />
+        </AbsoluteFill>
+      )}
+
+      {/* ===== Payoff text — fades in at the start of the payoff beat,
+          stays visible through the outro. Static text, no captions —
+          the viewer reads the script themselves; word-highlight on top
+          of script they're already reading is busy and confuses watch. */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 360,
+          left: 80,
+          right: 80,
+          fontFamily: FONTS.body,
+          fontWeight: FONT_WEIGHTS.emphasis,
+          fontSize: 48,
+          lineHeight: 1.25,
+          color: COLORS.textPrimary,
+          textAlign: "center",
+          opacity: payoffOpacity,
+        }}
+      >
+        {reel.payoff}
+      </div>
+
+      {/* ===== Source attribution — outro fade.
+          textSecondary (not textMuted) so it stays legible against the
+          warm plasma background. Skipped when `sourceTitle` is missing —
+          tips don't always cite a source. */}
+      {reel.sourceTitle ? (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 200,
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            fontFamily: FONTS.body,
+            fontWeight: FONT_WEIGHTS.emphasis,
+            fontSize: 28,
+            color: COLORS.textSecondary,
+            opacity: outroOpacity,
+            letterSpacing: 1,
+          }}
+        >
+          Source: {reel.sourceTitle}
+        </div>
+      ) : null}
+
+      {/* ===== CTA — outro fade. Purple-dark to match this template's
+          number anchor; reads as "authority" not "playful." */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 100,
+          left: 0,
+          right: 0,
+          textAlign: "center",
+          fontFamily: FONTS.body,
+          fontWeight: FONT_WEIGHTS.emphasis,
+          fontSize: 32,
+          color: COLORS.purpleDark,
+          opacity: outroOpacity,
+        }}
+      >
+        chunkycrayon.com
+      </div>
+
+      {/* ===========================================================
+          Audio routing — voice never gets cut off.
+
+          The demo-reel cut-off bug came from putting <Audio> inside
+          <Sequence durationInFrames={N}>. Remotion truncates audio at
+          the sequence's end frame, so a voice longer than its beat got
+          chopped mid-sentence.
+
+          The fix:
+            1. Total composition frames are COMPUTED from voice
+               durations + buffers (computeBeats above), so the
+               composition itself outlasts every voice.
+            2. Each voice is mounted in <Sequence from={beatStart}>
+               WITHOUT durationInFrames. That shifts the audio's t=0
+               to the beat start, but its end is bounded only by the
+               outer composition (the AbsoluteFill we're returning),
+               which by design is long enough.
+            3. Background music is at the absolute root, looped, so it
+               wraps the whole reel without any beat boundary.
+          ========================================================== */}
+
+      {hookVoiceUrl ? (
+        <Sequence from={beats.hookVoiceStart}>
+          <Audio src={hookVoiceUrl} volume={1} />
+        </Sequence>
+      ) : null}
+
+      {payoffVoiceUrl ? (
+        <Sequence from={beats.payoffVoiceStart}>
+          <Audio src={payoffVoiceUrl} volume={1} />
+        </Sequence>
+      ) : null}
+
+      {/* SFX — Quiet template stays restrained: silence through the
+          hook (journal feel), then a soft swish + chime pair carries
+          the stat reveal, and a quiet swoosh lifts the logo at outro.
+          Different swoosh-family clip on the logo so the two reveals
+          don't sound identical. All volumes pulled below Templates 1/2
+          since the mix here is intentionally hushed. Chime capped to ~1s
+          so it doesn't bleed into the payoff voice. */}
+      <Sequence from={beats.revealStart}>
+        <Audio src={staticFile("v2-sfx/swish.mp3")} volume={0.35} />
+      </Sequence>
+      <Sequence from={beats.revealStart}>
+        <Audio src={staticFile("v2-sfx/chime.mp3")} volume={0.4} endAt={30} />
+      </Sequence>
+      <Sequence from={beats.outroStart}>
+        <Audio src={staticFile("v2-sfx/textbox-swoosh.wav")} volume={0.3} />
+      </Sequence>
+
+      {backgroundMusicUrl ? (
+        <Audio src={backgroundMusicUrl} volume={0.18} loop />
+      ) : null}
+    </AbsoluteFill>
+  );
+};

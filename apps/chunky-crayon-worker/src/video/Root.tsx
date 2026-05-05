@@ -43,6 +43,32 @@ import {
 import koalaRegionsJson from "./spikes/fixtures/koala-regions.json";
 import type { RegionStoreJson } from "./v2/lib/loadFixture";
 import { staticFile } from "remotion";
+import {
+  Template1ShockStat,
+  SHOCK_REEL_FPS,
+  SHOCK_REEL_DEFAULT_DURATION_FRAMES,
+  computeShockReelDuration,
+  type Template1ShockStatProps,
+} from "./content-reel/spike/Template1ShockStat";
+import {
+  Template2WarmInsight,
+  WARM_REEL_FPS,
+  WARM_REEL_DEFAULT_DURATION_FRAMES,
+  computeWarmReelDuration,
+  type Template2WarmInsightProps,
+} from "./content-reel/spike/Template2WarmInsight";
+import {
+  Template3QuietTruth,
+  QUIET_REEL_FPS,
+  QUIET_REEL_DEFAULT_DURATION_FRAMES,
+  computeQuietReelDuration,
+  type Template3QuietTruthProps,
+} from "./content-reel/spike/Template3QuietTruth";
+import {
+  SHOCK_STAT_SAMPLE,
+  WARM_STAT_SAMPLE,
+  QUIET_STAT_SAMPLE,
+} from "./content-reel/spike/sample-stats";
 
 const FPS = 30;
 // Ad videos render at Seedance's native 24fps to avoid frame-resampling
@@ -263,6 +289,103 @@ export const RemotionRoot: React.FC = () => {
             adultVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
           } satisfies VoiceDemoReelV2Props
         }
+      />
+
+      {/* Phase 0 spike — Content Reel Template 1 (Shock). 9:16 @30fps,
+          duration computed from voice clip lengths so animations finish
+          and we never cut a sentence. See ~/.claude/plans/content-reels.md
+          and ../content-reel/shared/timing.ts for the timing model.
+
+          Studio defaults reuse the koala demo-reel fixtures so we can
+          verify the cut-off bug fix without re-rendering ElevenLabs:
+          - hookVoiceUrl       = koala-kid-voice.mp3   (4.99s)
+          - payoffVoiceUrl     = koala-adult-voice.mp3 (3.55s)
+          - backgroundMusicUrl = koala-ambient.mp3
+          The words don't match the stat script — that's fine for timing
+          verification. Real renders pass per-stat ElevenLabs URLs. */}
+      <Composition
+        id="ContentReelShockSpike"
+        component={Template1ShockStat}
+        durationInFrames={SHOCK_REEL_DEFAULT_DURATION_FRAMES}
+        fps={SHOCK_REEL_FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            reel: SHOCK_STAT_SAMPLE,
+            hookVoiceUrl: staticFile("spike/koala-kid-voice.mp3"),
+            hookVoiceSeconds: 4.99,
+            payoffVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
+            payoffVoiceSeconds: 3.55,
+            backgroundMusicUrl: staticFile("spike/koala-ambient.mp3"),
+          } satisfies Template1ShockStatProps
+        }
+        calculateMetadata={({ props }) => ({
+          durationInFrames: computeShockReelDuration(
+            props.hookVoiceSeconds,
+            props.payoffVoiceSeconds,
+          ),
+        })}
+      />
+
+      {/* Phase 0 spike — Content Reel Template 2 (Warm Insight). Same beat
+          structure as Template 1; different palette + softer light-leak
+          for fine-motor / creativity / family-bonding stats. The yellow +
+          green plasma reads as garden/morning vs Template 1's pink + teal
+          evening — visibly distinct in a social-grid thumbnail. */}
+      <Composition
+        id="ContentReelWarmSpike"
+        component={Template2WarmInsight}
+        durationInFrames={WARM_REEL_DEFAULT_DURATION_FRAMES}
+        fps={WARM_REEL_FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            reel: WARM_STAT_SAMPLE,
+            hookVoiceUrl: staticFile("spike/koala-kid-voice.mp3"),
+            hookVoiceSeconds: 4.99,
+            payoffVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
+            payoffVoiceSeconds: 3.55,
+            backgroundMusicUrl: staticFile("spike/koala-ambient.mp3"),
+          } satisfies Template2WarmInsightProps
+        }
+        calculateMetadata={({ props }) => ({
+          durationInFrames: computeWarmReelDuration(
+            props.hookVoiceSeconds,
+            props.payoffVoiceSeconds,
+          ),
+        })}
+      />
+
+      {/* Phase 0 spike — Content Reel Template 3 (Quiet Truth). Same beats
+          as Templates 1 and 2; cool sky-light + purple palette, smaller
+          200px number with purpleDark anchor, snappy spring (no overshoot)
+          for a considered/journal feel. Plays well in rotation after the
+          loud Shock template. */}
+      <Composition
+        id="ContentReelQuietSpike"
+        component={Template3QuietTruth}
+        durationInFrames={QUIET_REEL_DEFAULT_DURATION_FRAMES}
+        fps={QUIET_REEL_FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            reel: QUIET_STAT_SAMPLE,
+            hookVoiceUrl: staticFile("spike/koala-kid-voice.mp3"),
+            hookVoiceSeconds: 4.99,
+            payoffVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
+            payoffVoiceSeconds: 3.55,
+            backgroundMusicUrl: staticFile("spike/koala-ambient.mp3"),
+          } satisfies Template3QuietTruthProps
+        }
+        calculateMetadata={({ props }) => ({
+          durationInFrames: computeQuietReelDuration(
+            props.hookVoiceSeconds,
+            props.payoffVoiceSeconds,
+          ),
+        })}
       />
 
       {/* Ad video composition — 15s 9:16 @24fps (matches Seedance 2 native

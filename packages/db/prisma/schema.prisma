@@ -35,6 +35,9 @@ model User {
   mobileDeviceSessions MobileDeviceSession[]
   // User-linked social accounts (for sharing artwork to TikTok, Pinterest, etc.)
   socialAccounts       UserSocialAccount[]
+  // Bundles this user has purchased — entitles them to download/colour the
+  // bundle's pages. One row per Stripe checkout, immutable post-creation.
+  bundlePurchases      BundlePurchase[]
 
   // Multi-brand support
   brand Brand @default(CHUNKY_CRAYON)
@@ -239,9 +242,19 @@ model ColoringImage {
   // Toggle via the /admin/images grid.
   featuredForOG Boolean @default(false)
 
+  // Bundle membership. When set, the page belongs to a paid bundle and is
+  // gated by BundlePurchase entitlement — never shown in free galleries.
+  // Convention: bundle pages are SYSTEM generationType + purposeKey
+  // 'bundle:<slug>' + showInCommunity=false. The bundleId/bundleOrder
+  // pair gives ordered access without a join table.
+  bundleId    String?
+  bundleOrder Int?
+  bundle      Bundle? @relation(fields: [bundleId], references: [id])
+
   @@index([generationType, purposeKey])
   @@index([showInCommunity])
   @@index([featuredForOG])
+  @@index([bundleId, bundleOrder])
   // Gallery + list queries filter on status=READY everywhere; this index
   // keeps those plans cheap. The cleanup cron also queries status=GENERATING
   // ordered by createdAt — composite covers both.
@@ -593,6 +606,98 @@ enum BillingPeriod {
   ANNUAL
 }
 
+// Premade themed coloring bundles sold as one-off Stripe Products
+// (not subscriptions). Each bundle is ~10 pages of cohesive line art with
+// a story arc. Pages are stored as ColoringImage rows with bundleId set
+// and showInCommunity=false so they never leak into the free gallery.
+//
+// Listing images (hero, page grids, brand card) are pre-rendered by the
+// chunky-crayon-worker listing image generator and stored on R2. URLs
+// land here so the product page + Stripe checkout can pull them.
+model Bundle {
+  id      String @id @default(cuid())
+  slug    String @unique // e.g. "dino-dance-party" — used in URLs and R2 paths
+  name    String // "Dino Dance Party"
+  tagline String // marketing one-liner, used on product page + listing images
+
+  // Number of pages this bundle is supposed to contain. Source of truth is
+  // pages.count(); pageCount is denormalised for fast listing queries.
+  pageCount Int @default(10)
+
+  // Pricing in pence (GBP). 499 = £4.99. Avoids float rounding bugs and
+  // matches Stripe's smallest-currency-unit convention.
+  pricePence Int    @default(499)
+  currency   String @default("gbp")
+
+  // Stripe linkage — populated by the bundle creation script after the
+  // listing images have been generated. One Product per bundle, one Price
+  // per Product (no tier variants for now).
+  stripeProductId String? @unique
+  stripePriceId   String? @unique
+
+  // Pre-rendered listing image URLs (R2). All 1200×1200 JPEGs served via
+  // the assets.chunkycrayon.com CDN host.
+  listingHeroUrl      String?
+  listingPageGrid1Url String?
+  listingPageGrid2Url String?
+  listingPageGrid3Url String?
+  listingBrandCardUrl String?
+
+  // Visibility on the public site. Bundles are drafted with published=false
+  // so we can stage them, generate art, render listings, then flip to true
+  // when ready to sell. Not the same as Stripe Product activeness — Stripe
+  // can be live while published=false (e.g. preview links for friends).
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+
+  // Multi-brand support — a Bundle is brand-specific (CC kid bundles vs
+  // CH adult bundles will have different SKUs even if themes overlap).
+  brand Brand @default(CHUNKY_CRAYON)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pages     ColoringImage[]
+  purchases BundlePurchase[]
+
+  @@index([brand, published])
+  @@map("bundles")
+}
+
+// Records that a user has bought access to a Bundle. Acts as the
+// entitlement check at fetch time — bundle pages are only readable
+// for users with a matching BundlePurchase row.
+//
+// One row per Stripe checkout. Refunds set refundedAt; we keep the row
+// rather than deleting so we can show "previously purchased" history and
+// audit refund patterns. Access checks must filter refundedAt IS NULL.
+model BundlePurchase {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bundleId String
+  bundle   Bundle @relation(fields: [bundleId], references: [id])
+
+  // Stripe identifiers for reconciliation against the Stripe Dashboard
+  // and webhook events.
+  stripeCheckoutSessionId String  @unique
+  stripePaymentIntentId   String?
+
+  // Captured price at purchase time so historical purchases survive
+  // future bundle reprice without retroactive change.
+  pricePence Int
+  currency   String @default("gbp")
+
+  purchasedAt DateTime  @default(now())
+  refundedAt  DateTime?
+
+  @@unique([userId, bundleId]) // a user can only own a bundle once
+  @@index([userId])
+  @@index([bundleId])
+  @@map("bundle_purchases")
+}
+
 // Platform where the subscription was purchased
 enum SubscriptionPlatform {
   STRIPE // Web subscriptions
@@ -617,4 +722,124 @@ enum SubscriptionEventType {
   REFUNDED
   TRANSFERRED // RevenueCat: subscription transferred to another user
   EXPIRED
+}
+
+// ContentReel — researched social-media reels (stats / facts / tips / myth-busts)
+// rendered by the worker's Remotion compositions. Replaces the in-memory
+// Stat fixtures used during the Phase 0 spike. See
+// ~/.claude/plans/content-reels.md for the full schema rationale.
+//
+// One row = one reel = one daily post. The publish cron picks today's row
+// by rotating kind (stat→fact→tip→myth) and selecting the oldest fact-checked,
+// not-posted-in-30-days candidate within that kind.
+model ContentReel {
+  id String @id @default(cuid())
+
+  // Discriminant — drives reveal-beat treatment in the reel template AND
+  // fact-check rules at publish time. Must align with ContentReelKind in
+  // apps/chunky-crayon-worker/src/video/content-reel/shared/types.ts.
+  kind ContentReelKind
+
+  // Voice-friendly declarative line for the reel hook beat.
+  hook        String @db.Text
+  // Voice-friendly declarative line for the payoff/reveal narration.
+  payoff      String @db.Text
+  // The dramatic reveal block — interpretation depends on kind:
+  //   stat: "7+ hrs" | "-15%"            (numeric)
+  //   fact: "Brain regions involved"     (short phrase)
+  //   tip:  "Color before bedtime"       (action phrase)
+  //   myth: "False" | "True"             (verdict)
+  centerBlock String
+
+  // Question-shaped string for the Satori cover JPEG. Generated by Claude
+  // at write-time per kind; falls back to `hook` if missing. Cached here
+  // because regenerating per render would burn Claude credits and drift.
+  coverTeaser String? @db.Text
+
+  // Source — required for stat/fact/myth at publish time, nullable so
+  // tip rows (no citation needed) can persist. Publish gate enforces
+  // the per-kind requirement.
+  sourceTitle String?
+  sourceUrl   String?
+
+  // Drives default template selection (shock/warm/quiet). Override is
+  // allowed when the category-default mapping doesn't fit a specific item.
+  category         ContentReelCategory
+  templateOverride ContentReelTemplate?
+
+  // Per-word caption tracks for ElevenLabs-timed voice clips.
+  // CaptionToken[] shape — see types.ts. Kept as Json so ElevenLabs's
+  // response can be persisted without a joined table.
+  hookTokens   Json?
+  payoffTokens Json?
+
+  // Perplexity Sonar verification state. Mandatory for stat/fact/myth
+  // BEFORE publish; optional for tip. Re-checked weekly by the
+  // fact-check cron — items with factCheckedAt > 180d old get re-verified
+  // and may be downgraded if newer research contradicts the claim.
+  factCheckedAt       DateTime?
+  factCheckConfidence FactCheckConfidence?
+  factCheckNotes      String?              @db.Text
+
+  // Scheduling state. Set by the publish cron when a row is selected
+  // for that day's slot. Used by the dedup-window query: "give me
+  // candidates not posted in the last 30d." Null until first publish.
+  postedAt          DateTime?
+  // Per-platform post outcomes — same shape as ColoringImage.socialPostResults.
+  // Useful for the morning Posting Brief email (which platform did this go to,
+  // did any retries fire, what's the ig/fb media id).
+  socialPostResults Json?
+
+  // Multi-brand support — defaults to CHUNKY_CRAYON. Coloring Habitat
+  // gets its own catalogue when CH starts shipping content reels; same
+  // schema, different rows.
+  brand Brand @default(CHUNKY_CRAYON)
+
+  // R2 URLs for the rendered artefacts. Worker writes these on
+  // /jobs/content-reel/publish completion; null until rendered.
+  reelUrl  String?
+  coverUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Hot query: publish cron picks "give me the oldest factCheckedAt where
+  // confidence=high, kind=K, brand=B, postedAt<30d-ago-or-null" — composite
+  // index keeps that plan cheap as the catalogue grows.
+  @@index([kind, brand, factCheckConfidence, postedAt])
+  // Fact-check cron: "find rows where factCheckedAt < 180d-ago to re-check"
+  @@index([factCheckedAt])
+  @@map("content_reels")
+}
+
+enum ContentReelKind {
+  STAT
+  FACT
+  TIP
+  MYTH
+}
+
+enum ContentReelTemplate {
+  SHOCK
+  WARM
+  QUIET
+}
+
+enum ContentReelCategory {
+  SCREEN_TIME
+  ATTENTION
+  ANXIETY
+  FINE_MOTOR
+  CREATIVITY
+  FAMILY_BONDING
+  PARENTING_TIP
+  BRAIN_DEVELOPMENT
+  SLEEP
+  COMMON_MISCONCEPTION
+}
+
+enum FactCheckConfidence {
+  HIGH
+  MEDIUM
+  LOW
 }
