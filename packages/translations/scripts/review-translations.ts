@@ -246,6 +246,7 @@ Review each translation for:
 3. **UI Fit** - Is the text concise enough for buttons, labels, and mobile UI? (max ~40 chars for buttons)
 4. **Consistency** - Are similar concepts translated the same way throughout?
 5. **Accuracy** - Does it convey the same meaning as the English?
+6. **No AI mentions** - The translated value MUST NOT contain "AI", "artificial intelligence", or their ${locale.name} equivalents (e.g. "IA" in French/Spanish, "KI" in German, "AI"/"人工知能" in Japanese, "AI"/"인공지능" in Korean). Even if the key name suggests AI (e.g. "aiCreation"), the value should describe the outcome, not the technology. Parents are AI-skeptical; we lead with what the product does, not how. Flag any AI mention as **warning** severity (use category "accuracy") so it gets auto-fixed, and provide a suggested fix that drops the AI reference while preserving the surrounding meaning. Exception: legal pages, technical docs, or admin/dev keys where naming the technology is required.
 
 ## IMPORTANT: Provide Fixes
 For EVERY issue you find, you MUST provide a "suggested" fix. The system will automatically apply your suggestions for warnings and minor issues.
