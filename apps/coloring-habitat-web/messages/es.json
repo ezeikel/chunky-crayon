@@ -18,10 +18,10 @@
       "colored": "coloreado",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "Buen comienzo",
-        "50": "A mitad de camino",
-        "75": "Casi terminado",
-        "100": "Increíble"
+        "25": "¡Buen comienzo!",
+        "50": "¡A mitad de camino!",
+        "75": "¡Casi terminado!",
+        "100": "¡Increíble!"
       }
     },
     "sidebar": {
@@ -414,7 +414,7 @@
         },
         "creditsPerPage": {
           "question": "¿Cuántas páginas puedo crear?",
-          "answer": "Las páginas de texto o foto cuestan 5 créditos. El modo de voz (una conversación guiada sobre lo que quieres colorear) cuesta 10 créditos por página. Así que Grove = ~60 páginas de texto/foto o ~30 de voz al mes. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Combina según tu ritmo."
+          "answer": "Las páginas de texto o foto cuestan 5 créditos. El modo de voz (una conversación guiada sobre lo que quieres colorear) cuesta 10 créditos por página. Así que Grove = ~60 páginas de texto/foto o ~30 de voz al mes. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Combínalas a tu ritmo."
         },
         "audience": {
           "question": "¿Coloring Habitat es para mí?",
@@ -451,7 +451,7 @@
       "pagesSuffix": "páginas"
     },
     "filters": {
-      "all": "Todo"
+      "all": "Todos"
     },
     "difficulty": {
       "beginner": {
@@ -518,7 +518,7 @@
       },
       "patterns": {
         "name": "Patrones",
-        "description": "Motivos repetitivos para colorear meditativo"
+        "description": "Motivos repetitivos para un coloreado meditativo"
       },
       "wildlife": {
         "name": "Vida salvaje",
