@@ -40,12 +40,12 @@
   },
   "coloringPage": {
     "title": "塗り絵",
-    "defaultDescription": "無料で印刷できる塗り絵",
+    "defaultDescription": "無料の印刷用ぬりえページ",
     "progress": {
       "colored": "塗れた",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "いいスタート！",
+        "25": "いいはじまり！",
         "50": "半分できた！",
         "75": "もうすぐ完成！",
         "100": "すごい！"
@@ -69,7 +69,7 @@
       "magicAuto": "魔法オート",
       "magicBrush": "魔法ブラシ",
       "magicFill": "魔法塗りつぶし",
-      "autoColor": "オート塗り",
+      "autoColor": "自動ぬり",
       "magic": "魔法"
     },
     "brushTypes": {
@@ -91,8 +91,8 @@
     },
     "fillPatterns": {
       "solid": "塗りつぶし",
-      "dots": "ミズタマ",
-      "stripes": "シマシマ",
+      "dots": "みずたま",
+      "stripes": "しましま",
       "diagonal": "ななめ",
       "checkerboard": "チェック",
       "hearts": "ハート",
@@ -135,9 +135,9 @@
       "zoomIn": "大きく",
       "zoomInAria": "大きくする（もっと近く）",
       "pan": "動かす",
-      "panAria": "絵の周りを動かす",
+      "panAria": "絵を動かして見る",
       "reset": "全体を見る",
-      "resetAria": "全体に戻す"
+      "resetAria": "全体表示に戻す"
     },
     "muteToggle": {
       "mute": "音を消す",
