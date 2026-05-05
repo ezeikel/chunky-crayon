@@ -77,15 +77,6 @@
     },
 
     {
-      "path": "/api/social/post?type=colored-static&platform=instagram",
-      "schedule": "30 18 * * 1-5"
-    },
-    {
-      "path": "/api/social/post?type=colored-static&platform=facebook",
-      "schedule": "35 18 * * 1-5"
-    },
-
-    {
       "path": "/api/social/post?platform=instagram&type=carousel",
       "schedule": "0 14 * * 0,6"
     },
@@ -109,15 +100,6 @@
     {
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
       "schedule": "20 17 * * 0,6"
-    },
-
-    {
-      "path": "/api/social/post?type=colored-static&platform=instagram",
-      "schedule": "30 17 * * 0,6"
-    },
-    {
-      "path": "/api/social/post?type=colored-static&platform=facebook",
-      "schedule": "35 17 * * 0,6"
     },
 
     {
