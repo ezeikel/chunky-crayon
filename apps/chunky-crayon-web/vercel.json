@@ -51,38 +51,31 @@
     },
 
     {
-      "path": "/api/social/post?platform=instagram&type=carousel",
-      "schedule": "0 15 * * 1-5"
+      "path": "/api/social/post?type=demo-reel&platform=facebook",
+      "schedule": "0 13 * * 1-5"
     },
     {
-      "path": "/api/social/post?platform=pinterest",
-      "schedule": "10 15 * * 1-5"
+      "path": "/api/social/post?type=demo-reel&platform=pinterest",
+      "schedule": "2 13 * * 1-5"
     },
 
     {
       "path": "/api/social/post?type=demo-reel&platform=instagram",
+      "schedule": "0 17 * * 1-5"
+    },
+
+    {
+      "path": "/api/social/post?platform=pinterest",
       "schedule": "0 18 * * 1-5"
-    },
-    {
-      "path": "/api/social/post?type=demo-reel&platform=facebook",
-      "schedule": "5 18 * * 1-5"
-    },
-    {
-      "path": "/api/social/post?type=demo-reel&platform=tiktok",
-      "schedule": "10 18 * * 1-5"
-    },
-    {
-      "path": "/api/social/post?type=demo-reel&platform=pinterest",
-      "schedule": "20 18 * * 1-5"
     },
 
     {
       "path": "/api/social/post?platform=instagram&type=carousel",
-      "schedule": "0 14 * * 0,6"
+      "schedule": "30 0 * * 2-6"
     },
     {
-      "path": "/api/social/post?platform=pinterest",
-      "schedule": "10 14 * * 0,6"
+      "path": "/api/social/post?type=demo-reel&platform=tiktok",
+      "schedule": "32 0 * * 2-6"
     },
 
     {
@@ -91,24 +84,28 @@
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=facebook",
-      "schedule": "5 17 * * 0,6"
+      "schedule": "2 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=tiktok",
-      "schedule": "10 17 * * 0,6"
+      "schedule": "4 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
-      "schedule": "20 17 * * 0,6"
+      "schedule": "6 17 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?platform=instagram&type=carousel",
+      "schedule": "8 17 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?platform=pinterest",
+      "schedule": "10 17 * * 0,6"
     },
 
     {
       "path": "/api/social/digest",
-      "schedule": "45 18 * * 1-5"
-    },
-    {
-      "path": "/api/social/digest",
-      "schedule": "45 17 * * 0,6"
+      "schedule": "0 2 * * *"
     },
     {
       "path": "/api/admin/tokens",
