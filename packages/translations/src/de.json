@@ -45,10 +45,10 @@
       "colored": "ausgemalt",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "Guter Start!",
-        "50": "Halb geschafft!",
+        "25": "Guter Anfang!",
+        "50": "Hälfte geschafft!",
         "75": "Fast fertig!",
-        "100": "Fantastisch!"
+        "100": "Toll gemacht!"
       },
       "allDone": "Alles fertig!"
     },
@@ -79,7 +79,7 @@
       "glitter": "Glitzer",
       "sparkle": "Funkeln",
       "rainbow": "Regenbogen",
-      "glow": "Leuchten",
+      "glow": "Glühen",
       "neon": "Neon",
       "pencil": "Bleistift",
       "paintbrush": "Pinsel"
@@ -91,7 +91,7 @@
     },
     "fillPatterns": {
       "solid": "Einfarbig",
-      "dots": "Punkte",
+      "dots": "Tupfen",
       "stripes": "Streifen",
       "diagonal": "Diagonal",
       "checkerboard": "Karo",
@@ -106,7 +106,7 @@
       "print": "Drucken",
       "preparing": "Wird vorbereitet...",
       "doneSharing": "Teilen beendet",
-      "colorAgain": "Neu ausmalen",
+      "colorAgain": "Nochmal ausmalen",
       "startOver": "Neu starten"
     },
     "toolbar": {
@@ -123,17 +123,17 @@
     },
     "colorPalette": {
       "selectColor": "Farbe {color} auswählen",
-      "magicToolsMessage": "Bei Magie-Werkzeugen werden Farben automatisch gewählt"
+      "magicToolsMessage": "Mit Magie-Werkzeugen werden Farben automatisch gewählt"
     },
     "patternSelector": {
       "label": "Muster:"
     },
     "zoomControls": {
       "zoomLevel": "Zoomstufe: {level}%",
-      "zoomOut": "Rauszoomen",
-      "zoomOutAria": "Rauszoomen (mehr sehen)",
-      "zoomIn": "Reinzoomen",
-      "zoomInAria": "Reinzoomen (näher dran)",
+      "zoomOut": "Verkleinern",
+      "zoomOutAria": "Verkleinern (mehr sehen)",
+      "zoomIn": "Vergrößern",
+      "zoomInAria": "Vergrößern (näher dran)",
       "pan": "Bewegen",
       "panAria": "Im Bild bewegen",
       "reset": "Ganzes Bild sehen",
@@ -332,10 +332,10 @@
     "chooseMethod": "Wähle deine bevorzugte Anmeldemethode",
     "orContinueWith": "Oder weiter mit",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "Wenn du weitermachst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
+    "termsAgreement": "Durch Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
     "verifyRequest": {
       "title": "Schau in deine E-Mails!",
-      "description": "Wir haben dir einen magischen Link zum Anmelden geschickt. Klicke auf den Link in deiner E-Mail, um weiterzumachen.",
+      "description": "Wir haben dir einen Anmelde-Link geschickt. Klicke auf den Link in deiner E-Mail, um weiterzumachen.",
       "checkSpam": "Nicht zu sehen? Schau in deinen Spam-Ordner.",
       "linkExpiry": "Der Link läuft in 24 Stunden ab.",
       "tryDifferentEmail": "Andere E-Mail verwenden"
