@@ -38,7 +38,7 @@
       "brush": "Pinsel",
       "sticker": "Sticker",
       "magicReveal": "Magisches Enthüllen",
-      "magicAuto": "Auto-Magie",
+      "magicAuto": "Magisches Auto",
       "magicBrush": "Magischer Pinsel",
       "magicFill": "Magisches Füllen",
       "autoColor": "Auto-Farbe",
@@ -364,7 +364,7 @@
       },
       "grove": {
         "name": "Grove",
-        "description": "Für Gelegenheitsausmaler",
+        "description": "Für entspannte Ausmaler",
         "cta": "Kostenlos testen",
         "features": [
           "300 Credits/Monat",
@@ -414,7 +414,7 @@
         },
         "creditsPerPage": {
           "question": "Wie viele Seiten kann ich erstellen?",
-          "answer": "Text- oder Fotoseiten kosten 5 Credits. Sprachmodus (ein geführtes Gespräch über das, was du ausmalen möchtest) kostet 10 Credits pro Seite. Also Grove = ~60 Text/Foto oder ~30 Sprachseiten pro Monat. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Kombiniere nach deinem Rhythmus."
+          "answer": "Text- oder Fotoseiten kosten 5 Credits. Sprachmodus (ein geführtes Gespräch über das, was du ausmalen möchtest) kostet 10 Credits pro Seite. Das bedeutet Grove = ~60 Text/Foto oder ~30 Sprachseiten pro Monat. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Mische nach deinem Rhythmus."
         },
         "audience": {
           "question": "Ist Coloring Habitat das Richtige für mich?",
@@ -436,8 +436,8 @@
     "pageDescription": "Stöbere in unserer wachsenden Sammlung filigraner Ausmalseiten für Entspannung und Achtsamkeit. Filtere nach Kategorie, Schwierigkeit oder Saison.",
     "heroTitle": "Ausmal-Galerie",
     "heroSubtitle": "Stöbere in filigranen Ausmalseiten für Entspannung und Achtsamkeit. Jedes Design lädt dich ein, zur Ruhe zu kommen und einen stillen Moment zu finden.",
-    "browseByCategory": "Nach Kategorie entdecken",
-    "browseByDifficulty": "Nach Schwierigkeit entdecken",
+    "browseByCategory": "Nach Kategorie durchsuchen",
+    "browseByDifficulty": "Nach Schwierigkeit durchsuchen",
     "browseByHolidays": "Jahreszeiten & Feiertage",
     "dailyPage": "Seite des Tages",
     "viewAllDaily": "Alle Tagesseiten ansehen",
@@ -462,7 +462,7 @@
       "intermediate": {
         "title": "Mittelstufe",
         "shortLabel": "Mittel",
-        "description": "Moderate Details für eine längere, erdende Sitzung"
+        "description": "Moderate Details für eine längere, erdende Ausmalzeit"
       },
       "advanced": {
         "title": "Fortgeschritten",
@@ -486,7 +486,7 @@
       },
       "geometric": {
         "name": "Geometrisch",
-        "description": "Präzise Muster und Tessellationen"
+        "description": "Präzise Muster und nahtlose Parkettierung"
       },
       "landscapes": {
         "name": "Landschaften",
@@ -533,7 +533,7 @@
         "description": "Viktorianische Maschinen und kuriose Apparaturen"
       },
       "food": {
-        "name": "Essen",
+        "name": "Kulinarisches",
         "description": "Festmahle und kulinarische Szenen"
       }
     },
