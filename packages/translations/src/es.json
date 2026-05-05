@@ -2,7 +2,7 @@
   "common": {
     "loading": "Cargando...",
     "error": "Algo salió mal",
-    "retry": "Reintentar",
+    "retry": "Intentar de nuevo",
     "save": "Guardar",
     "cancel": "Cancelar",
     "close": "Cerrar",
@@ -40,7 +40,7 @@
   },
   "coloringPage": {
     "title": "Página para colorear",
-    "defaultDescription": "Página para colorear gratuita e imprimible",
+    "defaultDescription": "Página para colorear gratuita e imprimible de Chunky Crayon",
     "progress": {
       "colored": "coloreado",
       "percentage": "{percent}%",
@@ -76,8 +76,8 @@
       "crayon": "Crayón",
       "marker": "Rotulador",
       "eraser": "Borrador",
-      "glitter": "Purpurina",
-      "sparkle": "Destellos",
+      "glitter": "Brillos",
+      "sparkle": "Chispas",
       "rainbow": "Arcoíris",
       "glow": "Resplandor",
       "neon": "Neón",
@@ -105,7 +105,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Listo para compartir",
+      "doneSharing": "Compartido",
       "colorAgain": "Colorear otra vez",
       "startOver": "Empezar de nuevo"
     },
@@ -198,7 +198,7 @@
       "lavender": "Lavanda",
       "peach": "Melocotón",
       "navy": "Azul marino",
-      "forest": "Verde bosque",
+      "forest": "Bosque",
       "gold": "Dorado",
       "rose": "Rosa"
     },
@@ -329,7 +329,7 @@
     "continueWithApple": "Continuar con Apple",
     "signInWithEmail": "Iniciar sesión con email",
     "sendingLink": "Enviando enlace...",
-    "chooseMethod": "Elige tu forma favorita de iniciar sesión",
+    "chooseMethod": "Elige tu método preferido para iniciar sesión",
     "orContinueWith": "O continúa con",
     "emailPlaceholder": "nombre@ejemplo.com",
     "termsAgreement": "Al continuar, aceptas nuestros Términos de Servicio y Política de Privacidad.",
@@ -374,7 +374,7 @@
   "breadcrumbs": {
     "home": "Inicio",
     "gallery": "Galería",
-    "forToddlers": "Para los más pequeños",
+    "forToddlers": "Para bebés",
     "forKids": "Para niños",
     "forTeens": "Para adolescentes",
     "forAdults": "Para adultos",
