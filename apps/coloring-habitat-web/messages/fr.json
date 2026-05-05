@@ -2,26 +2,26 @@
   "startOverButton": {
     "idle": "Recommencer",
     "confirm": "Oui, recommencer",
-    "cancel": "Continuer le coloriage"
+    "cancel": "Continuer à colorier"
   },
   "downloadPDFButton": {
     "idle": "Imprimer",
-    "loading": "Chargement...",
-    "creating": "Création...",
-    "error": "Erreur !"
+    "loading": "Chargement…",
+    "creating": "Création…",
+    "error": "Indisponible"
   },
   "coloringPage": {
     "title": "Page de coloriage",
-    "relatedPages": "Plus de pages de coloriage",
-    "defaultDescription": "Page de coloriage gratuite pour adultes de Coloring Habitat",
+    "relatedPages": "Autres pages de coloriage",
+    "defaultDescription": "Page de coloriage adulte gratuite de Coloring Habitat",
     "progress": {
       "colored": "colorié",
       "percentage": "{percent}%",
       "milestones": {
         "25": "Bon début !",
-        "50": "À mi-chemin !",
-        "75": "Presque terminé !",
-        "100": "Magnifique !"
+        "50": "À mi-parcours !",
+        "75": "Presque fini !",
+        "100": "Incroyable !"
       }
     },
     "sidebar": {
@@ -33,23 +33,23 @@
       "actions": "Actions"
     },
     "tools": {
-      "pan": "Panoramique",
-      "fill": "Remplissage",
+      "pan": "Déplacer",
+      "fill": "Remplir",
       "brush": "Pinceau",
       "sticker": "Autocollant",
       "magicReveal": "Révélation magique",
       "magicAuto": "Auto magique",
       "magicBrush": "Pinceau magique",
       "magicFill": "Remplissage magique",
-      "autoColor": "Coloriage auto",
-      "magic": "Magique"
+      "autoColor": "Coloration auto",
+      "magic": "Magie"
     },
     "brushTypes": {
       "crayon": "Crayon",
       "marker": "Feutre",
       "eraser": "Gomme",
       "glitter": "Paillettes",
-      "sparkle": "Étincelles",
+      "sparkle": "Scintillant",
       "rainbow": "Arc-en-ciel",
       "glow": "Lueur",
       "neon": "Néon"
@@ -63,7 +63,7 @@
       "solid": "Uni",
       "dots": "Pois",
       "stripes": "Rayures",
-      "diagonal": "Diagonales",
+      "diagonal": "Diagonale",
       "checkerboard": "Damier",
       "hearts": "Cœurs",
       "stars": "Étoiles",
@@ -76,13 +76,13 @@
       "print": "Imprimer",
       "preparing": "Préparation...",
       "doneSharing": "Partage terminé",
-      "colorAgain": "Colorier à nouveau",
+      "colorAgain": "Recolorier",
       "startOver": "Recommencer"
     },
     "toolbar": {
-      "expand": "Étendre la barre d'outils",
-      "collapse": "Replier la barre d'outils",
-      "moreTools": "Plus d'outils",
+      "expand": "Déployer la barre d’outils",
+      "collapse": "Réduire la barre d’outils",
+      "moreTools": "Plus d’outils",
       "less": "Moins"
     },
     "undoRedo": {
@@ -93,7 +93,7 @@
     },
     "colorPalette": {
       "selectColor": "Sélectionner la couleur {color}",
-      "magicToolsMessage": "Les couleurs sont choisies automatiquement avec les outils magiques"
+      "magicToolsMessage": "Les couleurs sont choisies automatiquement avec les outils Magie"
     },
     "patternSelector": {
       "label": "Motif :"
@@ -101,30 +101,30 @@
     "zoomControls": {
       "zoomLevel": "Niveau de zoom : {level}%",
       "zoomOut": "Dézoomer",
-      "zoomOutAria": "Dézoomer (voir plus large)",
+      "zoomOutAria": "Dézoomer (voir plus)",
       "zoomIn": "Zoomer",
       "zoomInAria": "Zoomer (voir de plus près)",
-      "pan": "Panoramique",
-      "panAria": "Déplacer la vue dans l'image",
-      "reset": "Voir l'image entière",
-      "resetAria": "Revenir à l'image complète"
+      "pan": "Déplacer",
+      "panAria": "Se déplacer dans l’image",
+      "reset": "Voir l’image entière",
+      "resetAria": "Revenir à l’image entière"
     },
     "muteToggle": {
-      "mute": "Couper les sons",
-      "unmute": "Activer les sons",
-      "turnOn": "Activer les sons",
-      "turnOff": "Couper les sons"
+      "mute": "Couper le son",
+      "unmute": "Rétablir le son",
+      "turnOn": "Activer le son",
+      "turnOff": "Désactiver le son"
     }
   },
   "homepage": {
     "hero": {
-      "title": "Coloriez votre chemin vers la sérénité",
+      "title": "Coloriez pour retrouver le calme",
       "subtitle": "Créez des pages de coloriage détaillées en quelques secondes. Coloriez en ligne ou imprimez chez vous. Votre dose quotidienne de pleine conscience créative.",
-      "trustBadge1": "Plus de 1 000 pages gratuites",
-      "trustBadge2": "Aucun compte requis",
-      "trustBadge3": "Adopté par plus de 50 000 personnes",
-      "freeCreations": "2 créations gratuites par jour · Aucun compte requis",
-      "users": "Plus de 50 000 utilisateurs"
+      "trustBadge1": "Gratuit pour commencer",
+      "trustBadge2": "Sans compte",
+      "trustBadge3": "Imprimer ou colorier en ligne",
+      "freeCreations": "2 créations gratuites pour commencer · Sans compte",
+      "users": "Parcourir la galerie"
     },
     "showcase": {
       "title": "Pages de coloriage populaires",
@@ -139,104 +139,102 @@
         "nature": "Nature",
         "geometric": "Géométrique",
         "landscapes": "Paysages",
-        "fantasy": "Fantaisie",
+        "fantasy": "Fantastique",
         "animals": "Animaux"
       }
     },
     "stats": {
       "pagesCreated": "Pages de coloriage créées",
-      "dailyPages": "Pages quotidiennes",
+      "dailyPages": "Pages du jour",
       "freeLibraryPages": "Pages gratuites de la bibliothèque",
       "categories": "Catégories"
     },
     "features": {
-      "badge": "Comment ça fonctionne",
+      "badge": "Comment ça marche",
       "title": "Votre boîte à outils de bien-être créatif",
-      "subtitle": "La recherche montre que le coloriage active les mêmes voies neuronales apaisantes que la méditation. Nous rendons la pratique créative quotidienne accessible et naturelle.",
-      "stressReduction": "de réduction du stress constatée",
+      "subtitle": "Les recherches montrent que le coloriage active les mêmes circuits neuronaux apaisants que la méditation. Nous vous aidons à créer facilement une pratique créative au quotidien.",
+      "stressReduction": "de réduction du stress rapportée",
       "step": "Étape {number}",
       "steps": {
         "1": {
           "title": "Décrivez votre vision",
-          "description": "Saisissez un texte, dictez à voix haute ou téléversez une photo. Nous transformons votre imagination en un motif unique et détaillé."
+          "description": "Saisissez une consigne, parlez à voix haute ou téléchargez une photo. Nous transformons votre imagination en un design unique et détaillé."
         },
         "2": {
-          "title": "Coloriez en ligne ou imprimez",
-          "description": "Utilisez notre toile numérique apaisante, ou téléchargez des PDF haute résolution pour vos crayons et feutres préférés."
+          "title": "Coloriez en numérique ou imprimez",
+          "description": "Utilisez notre toile en ligne apaisante, ou téléchargez des PDF haute résolution pour vos crayons préférés."
         },
         "3": {
           "title": "Enregistrez et partagez",
-          "description": "Conservez une galerie personnelle de vos œuvres terminées, ou partagez vos créations avec la communauté."
+          "description": "Gardez une galerie personnelle de vos œuvres terminées, ou partagez vos créations avec la communauté."
         },
         "4": {
-          "title": "Créez une habitude quotidienne",
-          "description": "Une page de coloriage gratuite chaque matin. Cinq minutes de calme pour bien commencer votre journée."
+          "title": "Installez une habitude quotidienne",
+          "description": "Une page gratuite chaque matin. Cinq minutes de calme pour bien commencer la journée."
         }
       }
     },
     "galleryPreview": {
-      "title": "Populaires cette semaine",
-      "subtitle": "Des pages gratuites issues de notre bibliothèque grandissante, appréciées par la communauté.",
+      "title": "Populaire cette semaine",
+      "subtitle": "Des pages gratuites de notre bibliothèque grandissante, plébiscitées par la communauté.",
       "viewAll": "Tout voir",
       "viewAllPages": "Voir toutes les pages",
-      "addToFavourites": "Ajouter aux favoris",
-      "removeFromFavourites": "Retirer des favoris",
-      "dailyPage": "Coloriage du jour",
+      "dailyPage": "La page du jour",
       "colorNow": "Colorier maintenant"
     },
     "testimonials": {
-      "fromReviews": "sur {count} avis",
+      "fromReviews": "d’après {count} avis",
       "pagesColored": "{count} pages coloriées"
     },
     "newsletter": {
       "badge": "Coloriage quotidien gratuit",
       "title": "Une page gratuite, chaque matin",
-      "subtitle": "Rejoignez plus de 12 000 personnes qui commencent leur journée par un moment de calme créatif. Directement dans votre boîte de réception.",
+      "subtitle": "Commencez la journée par un moment de calme créatif. Une nouvelle page de coloriage dans votre boîte mail chaque matin.",
       "emailPlaceholder": "votre@email.com",
-      "subscribe": "S'abonner",
-      "subscribed": "Abonné",
-      "noSpam": "Aucun spam, jamais. Désabonnement possible à tout moment."
+      "subscribe": "S’abonner",
+      "subscribed": "Abonné(e)",
+      "noSpam": "Zéro spam. Désinscription à tout moment."
     },
     "faq": {
-      "title": "Questions et réponses",
+      "title": "Questions & réponses",
       "items": {
         "1": {
           "question": "Comment fonctionne Coloring Habitat ?",
-          "answer": "Décrivez ce que vous souhaitez colorier à l'aide d'un texte, de la voix ou d'une photo. Nous générons une page de coloriage détaillée et élaborée en environ 30 secondes. Coloriez-la en ligne avec nos outils numériques ou téléchargez un PDF haute résolution pour l'imprimer chez vous."
+          "answer": "Décrivez ce que vous voulez colorier par texte, voix ou photo. Nous générons une page de coloriage détaillée en environ 30 secondes. Coloriez-la en ligne avec nos outils numériques ou téléchargez un PDF haute résolution à imprimer chez vous."
         },
         "2": {
           "question": "Est-ce vraiment gratuit ?",
-          "answer": "Vous bénéficiez de 2 créations de pages gratuites chaque jour, sans avoir besoin de compte. Inscrivez-vous (également gratuitement) pour accéder à notre bibliothèque complète de plus de 1 000 pages et recevoir une page de coloriage quotidienne dans votre boîte de réception chaque matin."
+          "answer": "Vous avez 2 créations de pages gratuites pour commencer, sans compte. Inscrivez-vous (gratuit aussi) pour parcourir notre bibliothèque grandissante et recevoir chaque matin une nouvelle page de coloriage dans votre boîte mail."
         },
         "3": {
-          "question": "Qu'est-ce qui différencie cette application des autres applications de coloriage ?",
-          "answer": "Coloring Habitat est conçu pour les personnes en quête de détente en pleine conscience. Chaque motif est raffiné et élaboré, et l'expérience est entièrement sans publicité et apaisante."
+          "question": "Qu’est-ce qui vous distingue des autres applis de coloriage ?",
+          "answer": "Coloring Habitat est conçu pour celles et ceux qui recherchent une relaxation en pleine conscience. Chaque design est sophistiqué et détaillé, et l’expérience est entièrement sans publicité, pensée pour apaiser."
         },
         "4": {
           "question": "Puis-je imprimer les pages de coloriage ?",
-          "answer": "Chaque page peut être téléchargée en PDF haute résolution, parfaitement dimensionnée pour le format A4 ou Lettre US. De nombreux utilisateurs apprécient l'expérience tactile du coloriage avec de vrais crayons, stylos et feutres."
+          "answer": "Chaque page peut être téléchargée en PDF haute résolution, au format A4 ou US Letter. Imprimez la vôtre et coloriez avec de vrais crayons, stylos et feutres — ou coloriez en ligne sans passer par l’imprimante."
         },
         "5": {
-          "question": "Existe-t-il une application mobile ?",
-          "answer": "Les applications natives iOS et Android arrivent bientôt. Notre application web est entièrement responsive et fonctionne parfaitement sur les téléphones et tablettes en attendant."
+          "question": "Y aura-t-il une application mobile ?",
+          "answer": "Des apps iOS et Android natives arrivent bientôt. En attendant, notre application web est totalement responsive et fonctionne parfaitement sur téléphone et tablette."
         }
       }
     },
     "cta": {
-      "title": "Prêt à trouver votre sérénité ?",
-      "subtitle": "Rejoignez des milliers de personnes qui ont intégré le coloriage dans leur routine de bien-être quotidienne.",
-      "startColoring": "Commencer à colorier gratuitement",
+      "title": "Prêt(e) à retrouver le calme ?",
+      "subtitle": "Faites du coloriage un rituel quotidien de bien-être. Cinq minutes par jour suffisent.",
+      "startColoring": "Commencer gratuitement",
       "viewPlans": "Voir les offres",
-      "getTheApp": "Obtenir l'application",
-      "downloadOnAppStore": "Télécharger sur l'",
-      "appStore": "App Store",
+      "getTheApp": "Obtenir l’app",
+      "downloadOnAppStore": "Télécharger sur",
+      "appStore": "l’App Store",
       "getItOn": "Disponible sur",
       "googlePlay": "Google Play"
     }
   },
   "footer": {
     "brand": "Coloring Habitat",
-    "tagline": "Coloriage en pleine conscience pour tous. Créez, coloriez et trouvez votre sérénité.",
+    "tagline": "Coloriage en pleine conscience pour tous. Créez, coloriez, et retrouvez votre calme.",
     "copyright": "© {year} Coloring Habitat. Tous droits réservés.",
     "sections": {
       "explore": "Explorer",
@@ -259,93 +257,126 @@
       "cookies": "Cookies"
     }
   },
+  "blog": {
+    "title": "Le blog Coloring Habitat",
+    "subtitle": "Bien-être, techniques et inspiration pour un coloriage en pleine conscience",
+    "allPosts": "Tous les articles",
+    "all": "Tous",
+    "byAuthor": "Par {author}",
+    "comingSoon": "Bientôt disponible",
+    "comingSoonDescription": "Nous préparons des articles sur la science du coloriage au service du bien-être, des guides de techniques et de l’inspiration créative.",
+    "metaTitle": "Blog | Coloring Habitat",
+    "metaDescription": "Conseils bien-être, techniques de coloriage et inspiration créative pour un coloriage en pleine conscience. Découvrez la science derrière le coloriage pour réduire le stress.",
+    "home": "Accueil",
+    "blog": "Blog",
+    "postNotFound": "Article introuvable | Coloring Habitat",
+    "minRead": "{count} min de lecture",
+    "moreFromBlog": "Plus d’articles du blog",
+    "categoryNotFound": "Catégorie introuvable | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Blog Coloring Habitat",
+    "categoryDescription": "Parcourez tous les articles {category} sur le blog Coloring Habitat.",
+    "noCategoryPosts": "Aucun article dans cette catégorie pour le moment",
+    "checkBackSoon": "Revenez bientôt pour de nouveaux articles !"
+  },
+  "email": {
+    "signup": {
+      "title": "Une page gratuite, chaque matin",
+      "subtitle": "Recevez une page de coloriage <free>gratuite</free> chaque jour dans votre boîte mail.",
+      "placeholder": "votre@email.com",
+      "join": "S’abonner",
+      "success": "C’est fait",
+      "successDescription": "Votre première page de coloriage arrivera demain matin.",
+      "error": "Une erreur est survenue",
+      "errorDescription": "Impossible de vous ajouter à la liste. Veuillez réessayer."
+    }
+  },
   "createForm": {
     "inputModes": {
-      "type": "Saisir",
+      "type": "Écrire",
       "talk": "Parler",
       "photo": "Photo"
     },
     "loading": {
-      "creating": "Création de votre page de coloriage...",
-      "readyIn": "Prêt dans environ 30 secondes"
+      "creating": "Création de votre page à colorier...",
+      "readyIn": "Prête dans environ 30 secondes"
     },
     "textInput": {
-      "placeholder": "ex. un jardin japonais serein avec des carpes koï et des cerisiers en fleurs...",
-      "guestLimitPlaceholder": "Vous avez utilisé vos 2 créations gratuites aujourd'hui. Inscrivez-vous pour continuer !",
-      "noCreditsSubscribed": "Vous n'avez plus de crédits. Achetez-en pour continuer à créer !",
-      "noCreditsUnsubscribed": "Vous n'avez plus de crédits. Abonnez-vous pour plus de créations !",
-      "signInPlaceholder": "Connectez-vous pour créer des pages de coloriage",
+      "placeholder": "ex. un paisible jardin japonais avec des carpes koï et des fleurs de cerisier...",
+      "guestLimitPlaceholder": "Vous avez utilisé vos 2 créations gratuites aujourd’hui. Inscrivez-vous pour continuer à créer !",
+      "noCreditsSubscribed": "Vous n’avez plus de crédits. Achetez-en pour continuer à créer !",
+      "noCreditsUnsubscribed": "Vous n’avez plus de crédits. Abonnez-vous pour plus de créations !",
+      "signInPlaceholder": "Connectez-vous pour commencer à créer des pages à colorier",
       "createPage": "Créer ma page",
       "createPageFree": "Créer ma page ({count} gratuites restantes)",
-      "signUpFree": "S'inscrire gratuitement",
+      "signUpFree": "S’inscrire gratuitement",
       "signUpSubtext": "Créez un compte pour débloquer plus de créations",
       "buyCredits": "Acheter des crédits",
-      "viewPlans": "Voir les forfaits",
-      "buyCreditsSubtext": "Obtenez plus de crédits pour continuer",
+      "viewPlans": "Voir les offres",
+      "buyCreditsSubtext": "Obtenez plus de crédits pour continuer à créer",
       "subscribeSubtext": "Abonnez-vous pour une créativité illimitée",
       "getStarted": "Commencer",
-      "signInSubtext": "Connectez-vous pour commencer"
+      "signInSubtext": "Connectez-vous pour commencer à créer"
     },
     "voiceInput": {
-      "tapToDescribe": "Appuyez pour décrire votre page",
+      "tapToDescribe": "Touchez pour décrire votre page",
       "maxSeconds": "Max {seconds} secondes",
       "guestLimitReached": "Vous avez utilisé vos créations gratuites. Inscrivez-vous pour continuer !",
-      "noCredits": "Vous n'avez plus de crédits.",
+      "noCredits": "Vous n’avez plus de crédits.",
       "signInToRecord": "Connectez-vous pour enregistrer",
-      "listening": "Écoute en cours...",
+      "listening": "Écoute...",
       "allDone": "Terminé ? Arrêt dans {seconds}s...",
       "cancel": "Annuler",
-      "imDone": "Terminé",
-      "doneTalking": "J'ai fini de parler",
-      "notSupported": "L'enregistrement vocal n'est pas pris en charge dans ce navigateur.",
+      "imDone": "J’ai terminé",
+      "doneTalking": "J’ai fini de parler",
+      "notSupported": "L’enregistrement vocal n’est pas pris en charge par ce navigateur.",
       "trySafari": "Essayez Chrome ou Safari pour une meilleure expérience.",
       "tryAgain": "Réessayer",
-      "gettingMicReady": "Préparation du microphone...",
-      "understanding": "Compréhension de ce que vous avez dit...",
-      "createColoringPage": "Créer ma page de coloriage",
-      "notQuiteRight": "Pas tout à fait correct ? Réessayer",
+      "gettingMicReady": "Préparation du micro...",
+      "understanding": "Analyse de ce que vous avez dit...",
+      "createColoringPage": "Créer ma page à colorier",
+      "notQuiteRight": "Pas tout à fait ? Réessayez",
       "errors": {
-        "permissionDenied": "L'accès au microphone a été refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.",
-        "notSupported": "L'enregistrement vocal n'est pas pris en charge dans ce navigateur.",
-        "transcriptionFailed": "Impossible de comprendre l'enregistrement. Veuillez réessayer.",
-        "recordingFailed": "L'enregistrement a échoué. Veuillez réessayer.",
-        "timeout": "L'enregistrement a expiré. Veuillez réessayer."
+        "permissionDenied": "L’accès au micro a été refusé. Autorisez l’accès dans les paramètres de votre navigateur.",
+        "notSupported": "L’enregistrement vocal n’est pas pris en charge par ce navigateur.",
+        "transcriptionFailed": "Impossible de comprendre l’enregistrement. Veuillez réessayer.",
+        "recordingFailed": "Échec de l’enregistrement. Veuillez réessayer.",
+        "timeout": "Délai d’enregistrement dépassé. Veuillez réessayer."
       }
     },
     "imageInput": {
-      "takeOrUpload": "Prenez une photo ou importez une image",
-      "guestLimitReached": "Vous avez utilisé vos créations gratuites. Inscrivez-vous !",
-      "noCredits": "Vous n'avez plus de crédits.",
+      "takeOrUpload": "Prendre une photo ou importer une image",
+      "guestLimitReached": "Vous avez utilisé vos créations gratuites. Inscrivez-vous pour continuer !",
+      "noCredits": "Vous n’avez plus de crédits.",
       "signInToUpload": "Connectez-vous pour importer",
       "camera": "Appareil photo",
       "upload": "Importer",
       "dragAndDrop": "ou glissez-déposez une image",
-      "dropHere": "Déposez ici !",
+      "dropHere": "Déposez-la ici !",
       "shareImage": "Partagez un dessin, une photo ou toute image à transformer",
-      "greatPicture": "Belle image !",
+      "greatPicture": "Très belle image !",
       "pickAnother": "En choisir une autre",
-      "useThis": "Utiliser celle-ci",
+      "useThis": "Utiliser",
       "processingPhoto": "Traitement de votre photo...",
-      "analyzingImage": "Analyse de l'image...",
+      "analyzingImage": "Analyse de l’image...",
       "iSee": "Je vois :",
-      "createColoringPage": "Créer ma page de coloriage",
-      "notQuiteRight": "Pas tout à fait correct ? Réessayer",
+      "createColoringPage": "Créer ma page à colorier",
+      "notQuiteRight": "Pas tout à fait ? Réessayez",
       "tryAgain": "Réessayer",
       "errors": {
-        "fileTooLarge": "Image trop volumineuse. Veuillez utiliser une image de moins de 10 Mo.",
-        "invalidType": "Format d'image invalide. Veuillez utiliser JPEG, PNG, WebP ou HEIC.",
-        "processingFailed": "Impossible de traiter l'image. Veuillez réessayer.",
-        "cameraFailed": "L'appareil photo a échoué. Veuillez essayer d'importer une photo.",
-        "heicUnsupported": "Les images HEIC ne sont pas prises en charge. Enregistrez-les d’abord en JPG ou PNG."
+        "fileTooLarge": "L’image est trop volumineuse. Utilisez une image de moins de 10 Mo.",
+        "invalidType": "Format d’image invalide. Utilisez JPEG, PNG ou WebP.",
+        "processingFailed": "Impossible de traiter l’image. Veuillez réessayer.",
+        "cameraFailed": "Échec de l’appareil photo. Essayez plutôt d’importer une photo.",
+        "heicUnsupported": "Les images HEIC ne sont pas prises en charge. Enregistrez d’abord en JPG ou PNG."
       }
     }
   },
   "pricing": {
-    "title": "Des tarifs simples et honnêtes",
-    "subtitle": "Commencez gratuitement et passez à la version supérieure quand vous êtes prêt. Pas de frais cachés, annulation à tout moment.",
+    "title": "Une tarification simple et transparente",
+    "subtitle": "Commencez gratuitement, puis passez à l’offre supérieure quand vous êtes prêt. Aucun frais caché, résiliable à tout moment.",
     "monthly": "Mensuel",
     "annual": "Annuel",
-    "savePercent": "Économisez 17%",
+    "savePercent": "Économisez 17 %",
     "free": "Gratuit",
     "perMonth": "/mois",
     "perYear": "/an",
@@ -353,78 +384,106 @@
     "plans": {
       "bloom": {
         "name": "Bloom",
-        "description": "Commencez votre aventure coloriage",
+        "description": "Commencez votre voyage créatif",
         "cta": "Commencer gratuitement",
-        "features": [
-          "2 créations gratuites pour commencer",
-          "Accès à la bibliothèque gratuite",
-          "Toile de coloriage en ligne",
-          "Téléchargements PDF"
-        ]
+        "features": {
+          "0": "2 créations offertes pour démarrer",
+          "1": "Accès à la bibliothèque gratuite",
+          "2": "Toile de coloriage en ligne",
+          "3": "Téléchargements PDF"
+        }
       },
       "grove": {
         "name": "Grove",
-        "description": "Pour les coloristes occasionnels",
-        "cta": "Essai gratuit",
-        "features": [
-          "300 crédits/mois",
-          "Toutes les fonctionnalités",
-          "Téléchargements PDF HD",
-          "Enregistrer dans la galerie"
-        ]
+        "description": "Pour coloristes occasionnels",
+        "cta": "Démarrer l’essai gratuit",
+        "features": {
+          "0": "300 crédits/mois",
+          "1": "Toutes les fonctions de coloriage",
+          "2": "Téléchargements PDF HD",
+          "3": "Enregistrer dans la galerie"
+        }
       },
       "sanctuary": {
         "name": "Sanctuary",
-        "description": "Pour les coloristes réguliers",
-        "cta": "Essai gratuit",
-        "features": [
-          "800 crédits/mois",
-          "Tout dans Grove",
-          "Report de crédits 1 mois",
-          "Génération prioritaire",
-          "Page quotidienne par email",
-          "Support prioritaire"
-        ]
+        "description": "Pour coloristes réguliers",
+        "cta": "Démarrer l’essai gratuit",
+        "features": {
+          "0": "800 crédits/mois",
+          "1": "Tout ce qui est inclus dans Grove",
+          "2": "Report de crédits sur 1 mois",
+          "3": "Génération prioritaire",
+          "4": "Page quotidienne par e-mail",
+          "5": "Support prioritaire"
+        }
       },
       "oasis": {
         "name": "Oasis",
-        "description": "L'expérience bien-être complète",
-        "cta": "Essai gratuit",
-        "features": [
-          "2 000 crédits/mois",
-          "Tout dans Sanctuary",
-          "Report de crédits sur 2 mois",
-          "Licence d'utilisation commerciale",
-          "Collections exclusives",
-          "Palettes de couleurs personnalisées",
-          "Ambiances sonores"
-        ]
+        "description": "L’expérience bien-être complète",
+        "cta": "Démarrer l’essai gratuit",
+        "features": {
+          "0": "2 000 crédits/mois",
+          "1": "Tout ce qui est inclus dans Sanctuary",
+          "2": "Report de crédits sur 2 mois",
+          "3": "Licence d’usage commercial",
+          "4": "Collections exclusives",
+          "5": "Palettes de couleurs personnalisées",
+          "6": "Paysages sonores ambiants"
+        }
       }
     },
     "faq": {
-      "title": "Questions sur les formules",
+      "title": "Questions sur les offres",
       "items": {
         "cancelAnytime": {
-          "question": "Puis-je annuler à tout moment ?",
-          "answer": "Oui. Annulez votre abonnement quand vous voulez depuis les paramètres de votre compte. Sans questions, sans culpabilité."
+          "question": "Puis-je résilier à tout moment ?",
+          "answer": "Oui. Résiliez votre abonnement à tout moment depuis les réglages de votre compte. Sans questions, sans culpabilité."
         },
         "rollover": {
-          "question": "Les crédits se reportent-ils ?",
-          "answer": "Les crédits Grove se réinitialisent chaque mois. Sanctuary reporte jusqu'à 1 mois. Oasis vous donne 2 mois de report — vous n'êtes jamais pressé de les utiliser."
+          "question": "Les crédits sont-ils reportés ?",
+          "answer": "Les crédits Grove sont réinitialisés chaque mois. Sanctuary permet un report jusqu’à 1 mois. Oasis vous offre 2 mois de report — pour ne jamais être pressé de les utiliser."
         },
         "creditsPerPage": {
           "question": "Combien de pages puis-je créer ?",
-          "answer": "Les pages texte ou photo coûtent 5 crédits. Le mode vocal (une conversation guidée sur ce que vous aimeriez colorier) coûte 10 crédits par page. Donc Grove = ~60 pages texte/photo ou ~30 pages vocales par mois. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Adaptez selon votre rythme."
+          "answer": "Les pages texte ou photo coûtent 5 crédits. Le mode vocal (une conversation guidée sur ce que vous aimeriez colorier) coûte 10 crédits par page. Donc Grove = ~60 pages texte/photo ou ~30 pages vocales par mois. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. À mixer selon votre rythme."
         },
         "audience": {
           "question": "Coloring Habitat est-il fait pour moi ?",
-          "answer": "Nous avons conçu Coloring Habitat pour toute personne souhaitant ralentir, trouver le calme et profiter de la détente créative. Si le coloriage vous semble ressourçant, vous êtes au bon endroit."
+          "answer": "Nous avons conçu Coloring Habitat pour toute personne qui souhaite ralentir, retrouver le calme et savourer une détente créative. Si le coloriage vous semble réparateur, vous êtes au bon endroit."
         },
         "gettingStarted": {
-          "question": "Comment commencer ?",
-          "answer": "Choisissez une formule et commencez à créer. Bloom est gratuit — pas besoin de compte pour l'essayer."
+          "question": "Comment démarrer ?",
+          "answer": "Choisissez une offre et commencez à créer. Bloom est gratuit — aucun compte n’est nécessaire pour l’essayer."
         }
       }
+    }
+  },
+  "billing": {
+    "pageTitle": "Facturation",
+    "pageSubtitle": "Gérez votre abonnement et vos crédits",
+    "currentPlan": "Forfait actuel",
+    "currentCredits": "Il vous reste <strong>{credits} crédits</strong>.",
+    "renewsOn": "Renouvellement le {date}",
+    "manageSubscription": "Gérer l’abonnement",
+    "noActiveSubscription": "Aucun abonnement actif",
+    "noActiveSubscriptionDescription": "Choisissez un forfait ci-dessous pour commencer avec Coloring Habitat.",
+    "availablePlans": "Forfaits disponibles",
+    "mostPopular": "Le plus populaire",
+    "perMonth": "/mois",
+    "creditsPerMonth": "{credits} crédits/mois",
+    "cancelAnytime": "Annulez à tout moment, sans engagement",
+    "manageInPortal": "Gérer dans le portail de facturation",
+    "loading": "Chargement...",
+    "changePlan": "Changer de forfait",
+    "subscribe": "S’abonner",
+    "viewPlans": "Voir les forfaits",
+    "errors": {
+      "noActiveSubscription": "Aucun abonnement actif trouvé.",
+      "changeSubscriptionFailed": "Impossible de modifier l’abonnement. Veuillez réessayer.",
+      "checkoutFailed": "Impossible de démarrer le paiement. Veuillez réessayer.",
+      "portalFailed": "Impossible d’ouvrir la gestion de l’abonnement.",
+      "checkoutSessionFailed": "Impossible de créer la session de paiement",
+      "redirectFailed": "Impossible de rediriger vers le paiement"
     }
   },
   "breadcrumbs": {
@@ -432,17 +491,17 @@
     "gallery": "Galerie"
   },
   "gallery": {
-    "pageTitle": "Galerie de coloriages | Coloring Habitat",
-    "pageDescription": "Parcourez notre collection croissante de pages de coloriage complexes pour la détente et la pleine conscience. Filtrez par catégorie, difficulté ou saison.",
-    "heroTitle": "Galerie de coloriages",
-    "heroSubtitle": "Parcourez des pages de coloriage complexes pour la détente et la pleine conscience. Chaque design vous invite à ralentir et à trouver un moment de calme.",
-    "browseByCategory": "Explorer par catégorie",
-    "browseByDifficulty": "Explorer par difficulté",
+    "pageTitle": "Galerie de coloriage | Coloring Habitat",
+    "pageDescription": "Découvrez notre collection grandissante de coloriages détaillés pour la détente et la pleine conscience. Filtrez par catégorie, niveau ou saison.",
+    "heroTitle": "Galerie de coloriage",
+    "heroSubtitle": "Parcourez des coloriages détaillés pour la détente et la pleine conscience. Chaque design est pensé pour vous aider à ralentir et à retrouver un moment de calme.",
+    "browseByCategory": "Parcourir par catégorie",
+    "browseByDifficulty": "Parcourir par niveau",
     "browseByHolidays": "Saisons et fêtes",
-    "dailyPage": "Page du jour",
-    "viewAllDaily": "Voir toutes les pages quotidiennes",
+    "dailyPage": "Coloriage du jour",
+    "viewAllDaily": "Voir tous les coloriages du jour",
     "communityCreations": "Pages à la une",
-    "viewAllCommunity": "Voir toutes les pages à la une",
+    "viewAllCommunity": "Tout voir",
     "startColoring": "Colorier cette page",
     "stats": {
       "totalPages": "Pages dans la bibliothèque",
@@ -451,34 +510,34 @@
       "pagesSuffix": "pages"
     },
     "filters": {
-      "all": "Toutes"
+      "all": "Tout"
     },
     "difficulty": {
       "beginner": {
         "title": "Débutant",
         "shortLabel": "Facile",
-        "description": "Motifs doux, parfaits pour un moment rapide de calme"
+        "description": "Motifs doux, parfaits pour un bref moment de calme"
       },
       "intermediate": {
         "title": "Intermédiaire",
         "shortLabel": "Moyen",
-        "description": "Détail modéré pour une séance apaisante plus longue"
+        "description": "Un niveau de détail modéré pour une séance plus longue et apaisante"
       },
       "advanced": {
         "title": "Avancé",
         "shortLabel": "Difficile",
-        "description": "Designs détaillés qui récompensent une concentration sans hâte"
+        "description": "Des designs détaillés qui récompensent une attention sans hâte"
       },
       "expert": {
         "title": "Expert",
         "shortLabel": "Expert",
-        "description": "Œuvres complexes pour une immersion méditative profonde"
+        "description": "Des pièces complexes pour un flux méditatif profond"
       }
     },
     "categories": {
       "mandalas": {
         "name": "Mandalas",
-        "description": "Motifs symétriques pour une concentration apaisée"
+        "description": "Motifs symétriques pour une concentration paisible"
       },
       "nature": {
         "name": "Nature",
@@ -486,19 +545,19 @@
       },
       "geometric": {
         "name": "Géométrique",
-        "description": "Motifs précis et pavages"
+        "description": "Motifs précis et tessellations"
       },
       "landscapes": {
         "name": "Paysages",
         "description": "Montagnes, océans et horizons lointains"
       },
       "fantasy": {
-        "name": "Fantastique",
+        "name": "Fantasy",
         "description": "Créatures mythiques et mondes enchantés"
       },
       "animals": {
         "name": "Animaux",
-        "description": "Faune aux détails raffinés"
+        "description": "Faune en détails complexes"
       },
       "architecture": {
         "name": "Architecture",
@@ -506,11 +565,11 @@
       },
       "abstract": {
         "name": "Abstrait",
-        "description": "Designs libres pour l'expression créative"
+        "description": "Designs libres pour l’expression créative"
       },
       "flowers": {
         "name": "Fleurs",
-        "description": "Fleurs délicates pour une concentration douce"
+        "description": "Fleurs délicates pour une attention douce"
       },
       "ocean": {
         "name": "Océan",
@@ -518,11 +577,11 @@
       },
       "patterns": {
         "name": "Motifs",
-        "description": "Motifs répétés pour un coloriage méditatif"
+        "description": "Motifs répétitifs pour un coloriage méditatif"
       },
       "wildlife": {
-        "name": "Faune sauvage",
-        "description": "Animaux dans leurs habitats naturels"
+        "name": "Vie sauvage",
+        "description": "Animaux dans leur habitat naturel"
       },
       "mythology": {
         "name": "Mythologie",
@@ -530,7 +589,7 @@
       },
       "steampunk": {
         "name": "Steampunk",
-        "description": "Mécanismes victoriens et ingénieux assemblages"
+        "description": "Machines victoriennes et curieuses inventions"
       },
       "food": {
         "name": "Cuisine",
@@ -549,90 +608,29 @@
       "autumn": "Automne"
     },
     "seo": {
-      "aboutTitle": "Un lieu tranquille pour colorier",
-      "aboutParagraph1": "Coloring Habitat est une bibliothèque grandissante de pages de coloriage complexes, pensée pour les adultes qui souhaitent ralentir, trouver le calme et renouer avec une pratique créative. Chaque page invite à la concentration — que vous ayez cinq minutes ou un après-midi tranquille.",
-      "aboutParagraph2": "Une toute nouvelle page de coloriage est générée chaque jour. Abonnez-vous à l'e-mail quotidien pour recevoir un nouveau design dans votre boîte mail chaque matin, ou parcourez la bibliothèque complète à tout moment. Coloriez en ligne sur notre toile numérique, ou téléchargez un PDF haute résolution pour imprimer et colorier à la main.",
-      "aboutParagraph3": "La recherche en art-thérapie suggère que même de courtes séances de coloriage peuvent réduire le cortisol, apaiser les pensées agitées et activer les mêmes régions du cerveau que la méditation. Coloring Habitat est conçu pour rendre cette pratique facile à retrouver — un petit rituel quotidien pour un esprit plus serein."
+      "aboutTitle": "Un lieu paisible pour colorier",
+      "aboutParagraph1": "Coloring Habitat est une bibliothèque grandissante de coloriages détaillés, conçus pour les adultes qui souhaitent ralentir, retrouver le calme et renouer avec une pratique créative. Chaque page est pensée pour inviter à la concentration — que vous ayez cinq minutes ou un après-midi tranquille.",
+      "aboutParagraph2": "Une toute nouvelle page de coloriage est générée chaque jour. Abonnez-vous à l’e-mail quotidien pour recevoir un nouveau design dans votre boîte de réception chaque matin, ou parcourez la bibliothèque complète à tout moment. Coloriez en ligne sur notre toile numérique, ou téléchargez un PDF haute résolution à imprimer et à colorier à la main.",
+      "aboutParagraph3": "Des recherches en art-thérapie suggèrent que même de courtes séances de coloriage peuvent réduire le taux de cortisol, apaiser les pensées envahissantes et activer les mêmes régions du cerveau que la méditation. Coloring Habitat est conçu pour faciliter le retour à cette pratique — un petit rituel quotidien pour un esprit plus serein."
     }
   },
   "accountSettings": {
     "account": "Compte",
-    "accountDetails": "Vos détails de compte",
-    "email": "Email",
+    "accountDetails": "Les détails de votre compte",
+    "email": "E-mail",
     "name": "Nom",
-    "noEmail": "Aucun email défini",
-    "galleryPreferences": "Préférences de galerie",
-    "galleryControl": "Contrôlez votre expérience galerie",
-    "showCommunityArtwork": "Afficher les œuvres communautaires",
-    "showCommunityDescription": "Afficher les œuvres partagées par les autres membres dans la galerie",
+    "noEmail": "Aucun e-mail défini",
+    "galleryPreferences": "Préférences de la galerie",
+    "galleryControl": "Contrôlez votre expérience de la galerie",
+    "showCommunityArtwork": "Afficher les créations de la communauté",
+    "showCommunityDescription": "Afficher dans la galerie les créations partagées par d’autres membres",
     "communityEnabled": "Images de la galerie communautaire activées",
     "communityDisabled": "Images de la galerie communautaire désactivées"
   },
-  "blog": {
-    "title": "Le blog Coloring Habitat",
-    "subtitle": "Bien-être, techniques et inspiration pour une coloration en pleine conscience",
-    "allPosts": "Tous les articles",
-    "all": "Tous",
-    "byAuthor": "Par {author}",
-    "comingSoon": "Bientôt",
-    "comingSoonDescription": "Nous préparons des articles sur la science du coloriage pour le bien-être, des guides techniques et de l'inspiration créative.",
-    "metaTitle": "Blog | Coloring Habitat",
-    "metaDescription": "Conseils bien-être, techniques de coloriage et inspiration créative pour un coloriage en pleine conscience. Découvrez la science du coloriage pour soulager le stress.",
-    "home": "Accueil",
-    "blog": "Blog",
-    "postNotFound": "Article introuvable | Coloring Habitat",
-    "minRead": "{count} min de lecture",
-    "moreFromBlog": "Plus d'articles",
-    "categoryNotFound": "Catégorie introuvable | Coloring Habitat",
-    "categoryMetaTitle": "{category} | Blog Coloring Habitat",
-    "categoryDescription": "Parcourez tous les articles de {category} sur le blog Coloring Habitat.",
-    "noCategoryPosts": "Pas encore d'articles dans cette catégorie",
-    "checkBackSoon": "Revenez bientôt pour de nouveaux articles !"
-  },
-  "billing": {
-    "pageTitle": "Facturation",
-    "pageSubtitle": "Gérez votre abonnement et vos crédits",
-    "currentPlan": "Forfait actuel",
-    "currentCredits": "Il vous reste <strong>{credits} crédits</strong>.",
-    "renewsOn": "Renouvellement le {date}",
-    "manageSubscription": "Gérer l’abonnement",
-    "noActiveSubscription": "Aucun abonnement actif",
-    "noActiveSubscriptionDescription": "Choisissez un forfait ci-dessous pour commencer avec Coloring Habitat.",
-    "availablePlans": "Forfaits disponibles",
-    "mostPopular": "Le plus populaire",
-    "perMonth": "/mois",
-    "creditsPerMonth": "{credits} crédits/mois",
-    "cancelAnytime": "Annulez à tout moment, sans engagement",
-    "manageInPortal": "Gérer dans le portail de facturation",
-    "loading": "Chargement…",
-    "changePlan": "Changer de forfait",
-    "subscribe": "S’abonner",
-    "viewPlans": "Voir les forfaits",
-    "errors": {
-      "noActiveSubscription": "Aucun abonnement actif trouvé.",
-      "changeSubscriptionFailed": "Impossible de changer d’abonnement. Veuillez réessayer.",
-      "checkoutFailed": "Impossible de lancer le paiement. Veuillez réessayer.",
-      "portalFailed": "Impossible d’ouvrir la gestion de l’abonnement.",
-      "checkoutSessionFailed": "Impossible de créer la session de paiement",
-      "redirectFailed": "Impossible de rediriger vers le paiement"
-    }
-  },
-  "email": {
-    "signup": {
-      "title": "Une page gratuite, chaque matin",
-      "subtitle": "Recevez une page de coloriage <free>gratuite</free> chaque jour dans votre boîte mail.",
-      "placeholder": "votre@email.com",
-      "join": "S’abonner",
-      "success": "C’est bon",
-      "successDescription": "Votre première page de coloriage arrivera demain matin.",
-      "error": "Une erreur est survenue",
-      "errorDescription": "Impossible de vous ajouter à la liste. Veuillez réessayer."
-    }
-  },
   "og": {
     "homepage": {
-      "tagline": "Coloriages pour adultes, à la demande.",
-      "alt": "Coloring Habitat — coloriages pour adultes, à la demande."
+      "tagline": "Pages de coloriage pour adultes, à la demande.",
+      "alt": "Coloring Habitat — pages de coloriage pour adultes, à la demande."
     }
   }
 }

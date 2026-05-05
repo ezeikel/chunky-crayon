@@ -1,27 +1,27 @@
 {
   "startOverButton": {
-    "idle": "Neu beginnen",
-    "confirm": "Ja, neu beginnen",
+    "idle": "Neu starten",
+    "confirm": "Ja, neu starten",
     "cancel": "Weiter ausmalen"
   },
   "downloadPDFButton": {
     "idle": "Drucken",
-    "loading": "Laden...",
-    "creating": "Erstellen...",
-    "error": "Hoppla!"
+    "loading": "Wird geladen...",
+    "creating": "Wird erstellt...",
+    "error": "Nicht verfügbar"
   },
   "coloringPage": {
-    "title": "Ausmalseite",
-    "relatedPages": "Weitere Ausmalseiten",
-    "defaultDescription": "Kostenlose Ausmalseite für Erwachsene von Coloring Habitat",
+    "title": "Ausmalbild",
+    "relatedPages": "Weitere Ausmalbilder",
+    "defaultDescription": "Kostenloses Ausmalbild für Erwachsene von Coloring Habitat",
     "progress": {
       "colored": "ausgemalt",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "Guter Anfang!",
-        "50": "Schon halb fertig!",
-        "75": "Fast geschafft!",
-        "100": "Wunderbar!"
+        "25": "Super Start!",
+        "50": "Halb geschafft!",
+        "75": "Fast fertig!",
+        "100": "Fantastisch!"
       }
     },
     "sidebar": {
@@ -37,11 +37,11 @@
       "fill": "Füllen",
       "brush": "Pinsel",
       "sticker": "Sticker",
-      "magicReveal": "Magisches Enthüllen",
-      "magicAuto": "Auto-Magie",
-      "magicBrush": "Magischer Pinsel",
-      "magicFill": "Magisches Füllen",
-      "autoColor": "Auto-Farbe",
+      "magicReveal": "Magisch: Aufdecken",
+      "magicAuto": "Magisch: Auto",
+      "magicBrush": "Magisch: Pinsel",
+      "magicFill": "Magisch: Füllen",
+      "autoColor": "Auto-Kolorieren",
       "magic": "Magie"
     },
     "brushTypes": {
@@ -57,11 +57,11 @@
     "brushSizes": {
       "small": "Fein",
       "medium": "Normal",
-      "large": "Breit"
+      "large": "Kräftig"
     },
     "fillPatterns": {
       "solid": "Einfarbig",
-      "dots": "Tupfen",
+      "dots": "Punkte",
       "stripes": "Streifen",
       "diagonal": "Diagonal",
       "checkerboard": "Schachbrett",
@@ -74,26 +74,26 @@
       "download": "Herunterladen",
       "share": "Teilen",
       "print": "Drucken",
-      "preparing": "Vorbereiten...",
-      "doneSharing": "Fertig geteilt",
-      "colorAgain": "Nochmal ausmalen",
+      "preparing": "Wird vorbereitet...",
+      "doneSharing": "Teilen abgeschlossen",
+      "colorAgain": "Nochmals ausmalen",
       "startOver": "Neu beginnen"
     },
     "toolbar": {
-      "expand": "Werkzeugleiste erweitern",
-      "collapse": "Werkzeugleiste einklappen",
+      "expand": "Symbolleiste einblenden",
+      "collapse": "Symbolleiste ausblenden",
       "moreTools": "Mehr Werkzeuge",
       "less": "Weniger"
     },
     "undoRedo": {
       "undo": "Rückgängig",
       "undoShortcut": "Rückgängig (Strg+Z)",
-      "redo": "Wiederherstellen",
-      "redoShortcut": "Wiederherstellen (Strg+Y)"
+      "redo": "Wiederholen",
+      "redoShortcut": "Wiederholen (Strg+Y)"
     },
     "colorPalette": {
-      "selectColor": "Farbe {color} auswählen",
-      "magicToolsMessage": "Farben werden automatisch mit Magie-Werkzeugen gewählt"
+      "selectColor": "Farbe {color} wählen",
+      "magicToolsMessage": "Bei Magie-Werkzeugen werden Farben automatisch gewählt"
     },
     "patternSelector": {
       "label": "Muster:"
@@ -103,31 +103,31 @@
       "zoomOut": "Verkleinern",
       "zoomOutAria": "Verkleinern (mehr sehen)",
       "zoomIn": "Vergrößern",
-      "zoomInAria": "Vergrößern (näher sehen)",
-      "pan": "Bewegen",
+      "zoomInAria": "Vergrößern (näher heranzoomen)",
+      "pan": "Verschieben",
       "panAria": "Im Bild bewegen",
-      "reset": "Ganzes Bild sehen",
-      "resetAria": "Zurück zum ganzen Bild"
+      "reset": "Ganzes Bild anzeigen",
+      "resetAria": "Zur Gesamtansicht zurückkehren"
     },
     "muteToggle": {
-      "mute": "Ton ausschalten",
-      "unmute": "Ton einschalten",
+      "mute": "Ton stummschalten",
+      "unmute": "Stummschaltung aufheben",
       "turnOn": "Ton einschalten",
       "turnOff": "Ton ausschalten"
     }
   },
   "homepage": {
     "hero": {
-      "title": "Male dich zur Ruhe",
-      "subtitle": "Erstelle detaillierte Ausmalseiten in Sekunden. Online ausmalen oder zu Hause ausdrucken. Deine tägliche Dosis kreative Achtsamkeit.",
-      "trustBadge1": "1.000+ kostenlose Seiten",
+      "title": "Finde Ruhe beim Ausmalen",
+      "subtitle": "Erstelle in Sekunden detailreiche Ausmalbilder. Online ausmalen oder zu Hause drucken. Deine tägliche Dosis kreativer Achtsamkeit.",
+      "trustBadge1": "Kostenlos starten",
       "trustBadge2": "Kein Konto nötig",
-      "trustBadge3": "Über 50.000 zufriedene Nutzer",
-      "freeCreations": "2 kostenlose Kreationen täglich · Kein Konto nötig",
-      "users": "50.000+ Nutzer"
+      "trustBadge3": "Drucken oder online ausmalen",
+      "freeCreations": "2 kostenlose Kreationen zum Start · Kein Konto nötig",
+      "users": "Galerie ansehen"
     },
     "showcase": {
-      "title": "Beliebte Ausmalseiten",
+      "title": "Beliebte Ausmalbilder",
       "showAll": "Alle Seiten anzeigen",
       "free": "Kostenlos",
       "printReady": "Druckfertiges PDF",
@@ -144,44 +144,42 @@
       }
     },
     "stats": {
-      "pagesCreated": "Ausmalseiten erstellt",
-      "dailyPages": "Seiten pro Tag",
-      "freeLibraryPages": "Kostenlose Seiten in der Bibliothek",
+      "pagesCreated": "Erstellte Ausmalbilder",
+      "dailyPages": "Tägliche Seiten",
+      "freeLibraryPages": "Kostenlose Bibliotheksseiten",
       "categories": "Kategorien"
     },
     "features": {
-      "badge": "So funktioniert's",
-      "title": "Dein kreatives Wellness-Toolkit",
-      "subtitle": "Forschung zeigt, dass Ausmalen die gleichen beruhigenden Nervenbahnen aktiviert wie Meditation. Wir machen es mühelos, eine tägliche kreative Praxis aufzubauen.",
-      "stressReduction": "Stressreduktion berichtet",
+      "badge": "So funktioniert’s",
+      "title": "Dein Toolkit für kreatives Wohlbefinden",
+      "subtitle": "Studien zeigen: Ausmalen aktiviert ähnliche beruhigende neuronale Wege wie Meditation. Wir machen es leicht, eine tägliche kreative Praxis aufzubauen.",
+      "stressReduction": "berichten von weniger Stress",
       "step": "Schritt {number}",
       "steps": {
         "1": {
-          "title": "Beschreibe deine Vision",
-          "description": "Tippe eine Beschreibung, sprich laut oder lade ein Foto hoch. Wir verwandeln deine Vorstellung in ein einzigartiges, detailliertes Design."
+          "title": "Beschreibe deine Idee",
+          "description": "Gib einen Prompt ein, sprich ihn ein oder lade ein Foto hoch. Wir verwandeln deine Vorstellung in ein einzigartiges, detailreiches Design."
         },
         "2": {
           "title": "Digital ausmalen oder drucken",
-          "description": "Nutze unsere beruhigende Online-Leinwand oder lade hochauflösende PDFs für deine Lieblingsbuntstifte herunter."
+          "description": "Nutze unsere ruhige Online-Leinwand oder lade hochauflösende PDFs für deine liebsten echten Stifte herunter."
         },
         "3": {
           "title": "Speichern und teilen",
           "description": "Bewahre eine persönliche Galerie deiner fertigen Werke auf oder teile deine Kreationen mit der Community."
         },
         "4": {
-          "title": "Baue eine tägliche Gewohnheit auf",
-          "description": "Jeden Morgen eine kostenlose Ausmalseite. Fünf Minuten Ruhe für einen guten Start in den Tag."
+          "title": "Tägliche Routine aufbauen",
+          "description": "Jeden Morgen ein kostenloses Ausmalbild. Fünf Minuten Ruhe für einen guten Start in den Tag."
         }
       }
     },
     "galleryPreview": {
-      "title": "Beliebt diese Woche",
-      "subtitle": "Kostenlose Seiten aus unserer wachsenden Bibliothek, beliebt in der Community.",
-      "viewAll": "Alle anzeigen",
-      "viewAllPages": "Alle Seiten anzeigen",
-      "addToFavourites": "Zu Favoriten hinzufügen",
-      "removeFromFavourites": "Aus Favoriten entfernen",
-      "dailyPage": "Heutige Ausmalseite",
+      "title": "Diese Woche beliebt",
+      "subtitle": "Kostenlose Seiten aus unserer wachsenden Bibliothek — von der Community geliebt.",
+      "viewAll": "Alle ansehen",
+      "viewAllPages": "Alle Seiten ansehen",
+      "dailyPage": "Heutiges Ausmalbild",
       "colorNow": "Jetzt ausmalen"
     },
     "testimonials": {
@@ -189,66 +187,66 @@
       "pagesColored": "{count} Seiten ausgemalt"
     },
     "newsletter": {
-      "badge": "Tägliches kostenloses Ausmalen",
+      "badge": "Täglich kostenlos ausmalen",
       "title": "Jeden Morgen eine kostenlose Seite",
-      "subtitle": "Schließe dich 12.000+ Menschen an, die ihren Tag mit einem Moment kreativer Ruhe beginnen. Direkt in dein Postfach.",
-      "emailPlaceholder": "deine@email.de",
+      "subtitle": "Starte den Tag mit einem Moment kreativer Ruhe. Jeden Morgen ein neues Ausmalbild in deinem Posteingang.",
+      "emailPlaceholder": "deine@email.com",
       "subscribe": "Abonnieren",
       "subscribed": "Abonniert",
-      "noSpam": "Kein Spam, nie. Jederzeit abbestellbar."
+      "noSpam": "Kein Spam. Jederzeit abmelden."
     },
     "faq": {
       "title": "Fragen & Antworten",
       "items": {
         "1": {
           "question": "Wie funktioniert Coloring Habitat?",
-          "answer": "Beschreibe, was du ausmalen möchtest – per Text, Sprache oder Foto. Wir erstellen eine detaillierte Ausmalseite in etwa 30 Sekunden. Male sie online mit unseren digitalen Werkzeugen aus oder lade ein hochauflösendes PDF zum Ausdrucken herunter."
+          "answer": "Beschreibe, was du ausmalen möchtest — per Text, Sprache oder Foto. Wir generieren in etwa 30 Sekunden ein detailliertes, filigranes Ausmalbild. Male es online mit unseren digitalen Tools aus oder lade ein hochauflösendes PDF herunter und drucke es zu Hause."
         },
         "2": {
           "question": "Ist es wirklich kostenlos?",
-          "answer": "Du erhältst täglich 2 kostenlose Seitenerstellungen, kein Konto nötig. Registriere dich (ebenfalls kostenlos), um unsere gesamte Bibliothek mit über 1.000 Seiten und eine tägliche Ausmalseite per E-Mail freizuschalten."
+          "answer": "Du erhältst 2 kostenlose Seitenerstellungen zum Start — ganz ohne Konto. Mit einer Anmeldung (ebenfalls kostenlos) kannst du unsere wachsende Bibliothek durchsuchen und bekommst jeden Morgen ein frisches Ausmalbild in deinen Posteingang."
         },
         "3": {
-          "question": "Was unterscheidet dies von anderen Ausmal-Apps?",
-          "answer": "Coloring Habitat ist für Menschen konzipiert, die achtsame Entspannung suchen. Jedes Design ist anspruchsvoll und detailliert, und das Erlebnis ist komplett werbefrei und beruhigend."
+          "question": "Was unterscheidet das von anderen Ausmal-Apps?",
+          "answer": "Coloring Habitat ist für Menschen gemacht, die achtsame Entspannung suchen. Jedes Design ist anspruchsvoll und detailreich — und das Erlebnis ist komplett werbefrei und beruhigend."
         },
         "4": {
-          "question": "Kann ich die Ausmalseiten drucken?",
-          "answer": "Jede Seite kann als hochauflösendes PDF heruntergeladen werden, perfekt für A4-Papier. Viele Nutzer lieben das haptische Erlebnis des Ausmalens mit echten Buntstiften und Filzstiften."
+          "question": "Kann ich die Ausmalbilder drucken?",
+          "answer": "Jede Seite lässt sich als hochauflösendes PDF herunterladen — perfekt skaliert für A4 oder US Letter. Druck sie aus und male mit echten Stiften, Finelinern und Markern — oder male online und spare dir den Drucker."
         },
         "5": {
           "question": "Gibt es eine mobile App?",
-          "answer": "Native iOS- und Android-Apps kommen bald. Unsere Web-App ist vollständig responsiv und funktioniert wunderbar auf Handys und Tablets."
+          "answer": "Native iOS- und Android-Apps kommen bald. Bis dahin ist unsere Web-App vollständig responsiv und funktioniert wunderbar auf Smartphones und Tablets."
         }
       }
     },
     "cta": {
       "title": "Bereit, deine Ruhe zu finden?",
-      "subtitle": "Schließe dich Tausenden an, die Ausmalen zu einem Teil ihrer täglichen Wellness-Routine gemacht haben.",
-      "startColoring": "Jetzt kostenlos ausmalen",
-      "viewPlans": "Pakete ansehen",
-      "getTheApp": "Hol dir die App",
+      "subtitle": "Mach Ausmalen zu einem Teil deiner täglichen Wohlfühlroutine. Fünf Minuten am Tag reichen.",
+      "startColoring": "Kostenlos starten",
+      "viewPlans": "Pläne ansehen",
+      "getTheApp": "App holen",
       "downloadOnAppStore": "Laden im",
       "appStore": "App Store",
-      "getItOn": "Jetzt bei",
+      "getItOn": "Erhältlich bei",
       "googlePlay": "Google Play"
     }
   },
   "footer": {
     "brand": "Coloring Habitat",
-    "tagline": "Achtsames Ausmalen für alle. Erstellen, ausmalen und Ruhe finden.",
+    "tagline": "Achtsames Ausmalen für alle. Gestalten, ausmalen, zur Ruhe kommen.",
     "copyright": "© {year} Coloring Habitat. Alle Rechte vorbehalten.",
     "sections": {
       "explore": "Entdecken",
       "company": "Unternehmen",
-      "support": "Hilfe",
+      "support": "Support",
       "legal": "Rechtliches"
     },
     "links": {
       "gallery": "Galerie",
       "create": "Erstellen",
       "categories": "Kategorien",
-      "dailyPage": "Tägliche Seite",
+      "dailyPage": "Tagesseite",
       "about": "Über uns",
       "pricing": "Preise",
       "blog": "Blog",
@@ -259,29 +257,62 @@
       "cookies": "Cookies"
     }
   },
+  "blog": {
+    "title": "Der Coloring Habitat Blog",
+    "subtitle": "Wohlbefinden, Techniken und Inspiration für achtsames Ausmalen",
+    "allPosts": "Alle Beiträge",
+    "all": "Alle",
+    "byAuthor": "Von {author}",
+    "comingSoon": "Bald verfügbar",
+    "comingSoonDescription": "Wir arbeiten an Artikeln über die Wissenschaft des Ausmalens für das Wohlbefinden, Technik-Guides und kreative Inspiration.",
+    "metaTitle": "Blog | Coloring Habitat",
+    "metaDescription": "Wellness-Tipps, Ausmaltechniken und kreative Inspiration für achtsames Ausmalen. Entdecke die Wissenschaft hinter Ausmalen zur Stressreduktion.",
+    "home": "Startseite",
+    "blog": "Blog",
+    "postNotFound": "Beitrag nicht gefunden | Coloring Habitat",
+    "minRead": "{count} Min. Lesezeit",
+    "moreFromBlog": "Mehr aus dem Blog",
+    "categoryNotFound": "Kategorie nicht gefunden | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Coloring Habitat Blog",
+    "categoryDescription": "Alle Artikel in {category} im Coloring Habitat Blog ansehen.",
+    "noCategoryPosts": "Noch keine Beiträge in dieser Kategorie",
+    "checkBackSoon": "Schau bald wieder vorbei für neue Artikel!"
+  },
+  "email": {
+    "signup": {
+      "title": "Jeden Morgen eine kostenlose Seite",
+      "subtitle": "Erhalte jeden Tag eine <free>kostenlose</free> Malvorlage in deinem Posteingang.",
+      "placeholder": "deine@email.com",
+      "join": "Abonnieren",
+      "success": "Du bist dabei",
+      "successDescription": "Deine erste Malvorlage kommt morgen früh.",
+      "error": "Etwas ist schiefgelaufen",
+      "errorDescription": "Wir konnten dich nicht zur Liste hinzufügen. Bitte versuche es erneut."
+    }
+  },
   "createForm": {
     "inputModes": {
-      "type": "Eingeben",
+      "type": "Tippen",
       "talk": "Sprechen",
       "photo": "Foto"
     },
     "loading": {
       "creating": "Deine Ausmalseite wird erstellt...",
-      "readyIn": "In etwa 30 Sekunden fertig"
+      "readyIn": "In ca. 30 Sekunden fertig"
     },
     "textInput": {
-      "placeholder": "z.B. ein ruhiger japanischer Garten mit Koi und Kirschblüten...",
-      "guestLimitPlaceholder": "Du hast deine 2 kostenlosen Kreationen heute verbraucht. Registriere dich, um weiterzumachen!",
-      "noCreditsSubscribed": "Deine Credits sind aufgebraucht. Kaufe mehr, um weiterzumachen!",
-      "noCreditsUnsubscribed": "Deine Credits sind aufgebraucht. Abonniere für mehr Kreationen!",
+      "placeholder": "z. B. ein ruhiger japanischer Garten mit Koi und Kirschblüten...",
+      "guestLimitPlaceholder": "Du hast heute deine 2 Gratis-Erstellungen genutzt. Registriere dich, um weiter zu erstellen!",
+      "noCreditsSubscribed": "Du hast keine Credits mehr. Kaufe weitere, um weiter zu erstellen!",
+      "noCreditsUnsubscribed": "Du hast keine Credits mehr. Abonniere für mehr Erstellungen!",
       "signInPlaceholder": "Melde dich an, um Ausmalseiten zu erstellen",
       "createPage": "Meine Seite erstellen",
-      "createPageFree": "Meine Seite erstellen ({count} kostenlos übrig)",
+      "createPageFree": "Meine Seite erstellen ({count} gratis übrig)",
       "signUpFree": "Kostenlos registrieren",
-      "signUpSubtext": "Erstelle ein Konto für mehr Kreationen",
+      "signUpSubtext": "Erstelle ein Konto und schalte mehr Erstellungen frei",
       "buyCredits": "Credits kaufen",
-      "viewPlans": "Pakete ansehen",
-      "buyCreditsSubtext": "Hol dir mehr Credits zum Weitermachen",
+      "viewPlans": "Tarife ansehen",
+      "buyCreditsSubtext": "Hol dir mehr Credits, um weiter zu erstellen",
       "subscribeSubtext": "Abonniere für unbegrenzte Kreativität",
       "getStarted": "Loslegen",
       "signInSubtext": "Melde dich an, um zu starten"
@@ -289,60 +320,60 @@
     "voiceInput": {
       "tapToDescribe": "Tippe, um deine Seite zu beschreiben",
       "maxSeconds": "Max. {seconds} Sekunden",
-      "guestLimitReached": "Du hast deine kostenlosen Kreationen verbraucht. Registriere dich, um weiterzumachen!",
-      "noCredits": "Deine Credits sind aufgebraucht.",
-      "signInToRecord": "Melde dich an, um aufzunehmen",
-      "listening": "Hört zu...",
-      "allDone": "Fertig? Stoppt in {seconds}s...",
+      "guestLimitReached": "Du hast deine Gratis-Erstellungen genutzt. Registriere dich, um weiterzumachen!",
+      "noCredits": "Du hast keine Credits mehr.",
+      "signInToRecord": "Zum Aufnehmen anmelden",
+      "listening": "Ich höre zu...",
+      "allDone": "Fertig? Stoppe in {seconds}s...",
       "cancel": "Abbrechen",
-      "imDone": "Fertig",
+      "imDone": "Ich bin fertig",
       "doneTalking": "Fertig gesprochen",
-      "notSupported": "Sprachaufnahme wird in diesem Browser nicht unterstützt.",
-      "trySafari": "Probiere Chrome oder Safari für das beste Erlebnis.",
-      "tryAgain": "Nochmal versuchen",
+      "notSupported": "Sprachaufnahmen werden in diesem Browser nicht unterstützt.",
+      "trySafari": "Für das beste Erlebnis nutze Chrome oder Safari.",
+      "tryAgain": "Erneut versuchen",
       "gettingMicReady": "Mikrofon wird vorbereitet...",
-      "understanding": "Verstehe, was du gesagt hast...",
+      "understanding": "Ich verstehe, was du gesagt hast...",
       "createColoringPage": "Meine Ausmalseite erstellen",
-      "notQuiteRight": "Nicht ganz richtig? Nochmal versuchen",
+      "notQuiteRight": "Nicht ganz richtig? Versuch’s noch mal",
       "errors": {
-        "permissionDenied": "Mikrofonzugriff wurde verweigert. Bitte erlaube den Zugriff in deinen Browsereinstellungen.",
-        "notSupported": "Sprachaufnahme wird in diesem Browser nicht unterstützt.",
-        "transcriptionFailed": "Die Aufnahme konnte nicht verstanden werden. Bitte versuche es erneut.",
+        "permissionDenied": "Zugriff auf das Mikrofon wurde verweigert. Bitte erlaube den Zugriff in den Browser-Einstellungen.",
+        "notSupported": "Sprachaufnahmen werden in diesem Browser nicht unterstützt.",
+        "transcriptionFailed": "Die Aufnahme wurde nicht verstanden. Bitte versuche es erneut.",
         "recordingFailed": "Aufnahme fehlgeschlagen. Bitte versuche es erneut.",
-        "timeout": "Aufnahme hat das Zeitlimit überschritten. Bitte versuche es erneut."
+        "timeout": "Die Aufnahme hat zu lange gedauert. Bitte versuche es erneut."
       }
     },
     "imageInput": {
       "takeOrUpload": "Foto aufnehmen oder Bild hochladen",
-      "guestLimitReached": "Du hast deine kostenlosen Kreationen verbraucht. Registriere dich!",
-      "noCredits": "Deine Credits sind aufgebraucht.",
-      "signInToUpload": "Melde dich an zum Hochladen",
+      "guestLimitReached": "Du hast deine Gratis-Erstellungen genutzt. Registriere dich, um weiterzumachen!",
+      "noCredits": "Du hast keine Credits mehr.",
+      "signInToUpload": "Zum Hochladen anmelden",
       "camera": "Kamera",
       "upload": "Hochladen",
-      "dragAndDrop": "oder Bild hierher ziehen",
+      "dragAndDrop": "oder ein Bild per Drag & Drop hinzufügen",
       "dropHere": "Hier ablegen!",
-      "shareImage": "Teile eine Zeichnung, ein Foto oder ein beliebiges Bild",
+      "shareImage": "Teile eine Zeichnung, ein Foto oder ein beliebiges Bild zum Umwandeln",
       "greatPicture": "Tolles Bild!",
-      "pickAnother": "Anderes wählen",
+      "pickAnother": "Anderes auswählen",
       "useThis": "Dieses verwenden",
       "processingPhoto": "Dein Foto wird verarbeitet...",
       "analyzingImage": "Bild wird analysiert...",
       "iSee": "Ich sehe:",
       "createColoringPage": "Meine Ausmalseite erstellen",
-      "notQuiteRight": "Nicht ganz richtig? Nochmal versuchen",
-      "tryAgain": "Nochmal versuchen",
+      "notQuiteRight": "Nicht ganz richtig? Versuch’s noch mal",
+      "tryAgain": "Erneut versuchen",
       "errors": {
-        "fileTooLarge": "Bild ist zu groß. Bitte verwende ein Bild unter 10 MB.",
-        "invalidType": "Ungültiges Bildformat. Bitte verwende JPEG, PNG, WebP oder HEIC.",
+        "fileTooLarge": "Das Bild ist zu groß. Bitte nutze ein Bild unter 10 MB.",
+        "invalidType": "Ungültiges Bildformat. Bitte nutze JPEG, PNG oder WebP.",
         "processingFailed": "Das Bild konnte nicht verarbeitet werden. Bitte versuche es erneut.",
-        "cameraFailed": "Kamera fehlgeschlagen. Bitte versuche stattdessen ein Foto hochzuladen.",
+        "cameraFailed": "Kamera fehlgeschlagen. Bitte lade stattdessen ein Foto hoch.",
         "heicUnsupported": "HEIC-Bilder werden nicht unterstützt. Bitte zuerst als JPG oder PNG speichern."
       }
     }
   },
   "pricing": {
-    "title": "Einfache, ehrliche Preise",
-    "subtitle": "Starte kostenlos und upgrade, wenn du bereit bist. Keine versteckten Gebühren, jederzeit kündbar.",
+    "title": "Einfach. Transparent. Fair.",
+    "subtitle": "Starte kostenlos und upgrade, wenn du bereit bist. Keine versteckten Kosten, jederzeit kündbar.",
     "monthly": "Monatlich",
     "annual": "Jährlich",
     "savePercent": "17% sparen",
@@ -353,52 +384,52 @@
     "plans": {
       "bloom": {
         "name": "Bloom",
-        "description": "Beginne deine Ausmal-Reise",
+        "description": "Starte deine Ausmalreise",
         "cta": "Kostenlos starten",
-        "features": [
-          "2 kostenlose Kreationen zum Einstieg",
-          "Zugang zur kostenlosen Bibliothek",
-          "Online-Ausmalleinwand",
-          "PDF-Downloads"
-        ]
+        "features": {
+          "0": "2 kostenlose Kreationen zum Start",
+          "1": "Zugang zur kostenlosen Bibliothek",
+          "2": "Online-Ausmalfläche",
+          "3": "PDF-Downloads"
+        }
       },
       "grove": {
         "name": "Grove",
-        "description": "Für Gelegenheitsausmaler",
+        "description": "Für gelegentliches Ausmalen",
         "cta": "Kostenlos testen",
-        "features": [
-          "300 Credits/Monat",
-          "Alle Ausmal-Funktionen",
-          "HD-PDF-Downloads",
-          "In Galerie speichern"
-        ]
+        "features": {
+          "0": "300 Credits/Monat",
+          "1": "Alle Ausmalfunktionen",
+          "2": "HD-PDF-Downloads",
+          "3": "In der Galerie speichern"
+        }
       },
       "sanctuary": {
         "name": "Sanctuary",
-        "description": "Für regelmäßige Ausmaler",
+        "description": "Für regelmäßiges Ausmalen",
         "cta": "Kostenlos testen",
-        "features": [
-          "800 Credits/Monat",
-          "Alles aus Grove",
-          "1 Monat Credit-Übertrag",
-          "Prioritäts-Generierung",
-          "Tägliche E-Mail-Seite",
-          "Prioritäts-Support"
-        ]
+        "features": {
+          "0": "800 Credits/Monat",
+          "1": "Alles aus Grove",
+          "2": "Credits bis zu 1 Monat übertragbar",
+          "3": "Priorisierte Generierung",
+          "4": "Tägliche Seite per E-Mail",
+          "5": "Priorisierter Support"
+        }
       },
       "oasis": {
         "name": "Oasis",
-        "description": "Das komplette Wellness-Erlebnis",
+        "description": "Das komplette Wohlfühl-Erlebnis",
         "cta": "Kostenlos testen",
-        "features": [
-          "2.000 Credits/Monat",
-          "Alles aus Sanctuary",
-          "2 Monate Credit-Übertrag",
-          "Kommerzielle Nutzungslizenz",
-          "Exklusive Sammlungen",
-          "Individuelle Farbpaletten",
-          "Ambient-Klangwelten"
-        ]
+        "features": {
+          "0": "2.000 Credits/Monat",
+          "1": "Alles aus Sanctuary",
+          "2": "Credits bis zu 2 Monate übertragbar",
+          "3": "Lizenz zur kommerziellen Nutzung",
+          "4": "Exklusive Kollektionen",
+          "5": "Individuelle Farbpaletten",
+          "6": "Atmosphärische Klangwelten"
+        }
       }
     },
     "faq": {
@@ -406,25 +437,53 @@
       "items": {
         "cancelAnytime": {
           "question": "Kann ich jederzeit kündigen?",
-          "answer": "Ja. Kündige dein Abo jederzeit über deine Kontoeinstellungen. Keine Fragen, kein schlechtes Gewissen."
+          "answer": "Ja. Du kannst dein Abo jederzeit in den Kontoeinstellungen kündigen. Ohne Nachfragen, ohne schlechtes Gewissen."
         },
         "rollover": {
           "question": "Werden Credits übertragen?",
-          "answer": "Grove-Credits werden jeden Monat zurückgesetzt. Sanctuary überträgt bis zu 1 Monat. Oasis gibt dir 2 Monate Übertrag — so bist du nie unter Zeitdruck."
+          "answer": "Grove-Credits werden monatlich zurückgesetzt. Sanctuary überträgt bis zu 1 Monat. Oasis bietet 2 Monate Übertrag — damit du keinen Druck hast, sie sofort zu nutzen."
         },
         "creditsPerPage": {
           "question": "Wie viele Seiten kann ich erstellen?",
-          "answer": "Text- oder Fotoseiten kosten 5 Credits. Sprachmodus (ein geführtes Gespräch über das, was du ausmalen möchtest) kostet 10 Credits pro Seite. Also Grove = ~60 Text/Foto oder ~30 Sprachseiten pro Monat. Sanctuary = ~160 / ~80. Oasis = ~400 / ~200. Kombiniere nach deinem Rhythmus."
+          "answer": "Text- oder Fotoseiten kosten 5 Credits. Der Sprachmodus (ein geführtes Gespräch darüber, was du ausmalen möchtest) kostet 10 Credits pro Seite. Das heißt: Grove = ca. 60 Text-/Foto- oder ca. 30 Sprachseiten pro Monat. Sanctuary = ca. 160 / ca. 80. Oasis = ca. 400 / ca. 200. Kombiniere nach deinem Rhythmus."
         },
         "audience": {
           "question": "Ist Coloring Habitat das Richtige für mich?",
-          "answer": "Wir haben Coloring Habitat für alle gestaltet, die langsamer machen, Ruhe finden und kreative Entspannung genießen möchten. Wenn Ausmalen für dich wohltuend klingt, bist du hier richtig."
+          "answer": "Wir haben Coloring Habitat für alle entwickelt, die entschleunigen, Ruhe finden und kreative Entspannung genießen möchten. Wenn Ausmalen für dich wohltuend klingt, bist du hier richtig."
         },
         "gettingStarted": {
-          "question": "Wie fange ich an?",
-          "answer": "Wähle einen Plan und leg los. Bloom ist kostenlos — du brauchst nicht mal ein Konto, um es auszuprobieren."
+          "question": "Wie lege ich los?",
+          "answer": "Wähle einen Plan und beginne zu gestalten. Bloom ist kostenlos — zum Ausprobieren brauchst du kein Konto."
         }
       }
+    }
+  },
+  "billing": {
+    "pageTitle": "Abrechnung",
+    "pageSubtitle": "Verwalte dein Abo und deine Credits",
+    "currentPlan": "Aktueller Plan",
+    "currentCredits": "Du hast noch <strong>{credits} Credits</strong> übrig.",
+    "renewsOn": "Verlängert sich am {date}",
+    "manageSubscription": "Abo verwalten",
+    "noActiveSubscription": "Kein aktives Abo",
+    "noActiveSubscriptionDescription": "Wähle unten einen Plan, um mit Coloring Habitat zu starten.",
+    "availablePlans": "Verfügbare Pläne",
+    "mostPopular": "Am beliebtesten",
+    "perMonth": "/Monat",
+    "creditsPerMonth": "{credits} Credits/Monat",
+    "cancelAnytime": "Jederzeit kündbar, ohne Bindung",
+    "manageInPortal": "Im Abrechnungsportal verwalten",
+    "loading": "Wird geladen...",
+    "changePlan": "Plan wechseln",
+    "subscribe": "Abonnieren",
+    "viewPlans": "Pläne ansehen",
+    "errors": {
+      "noActiveSubscription": "Kein aktives Abo gefunden.",
+      "changeSubscriptionFailed": "Abo konnte nicht geändert werden. Bitte versuche es erneut.",
+      "checkoutFailed": "Checkout konnte nicht gestartet werden. Bitte versuche es erneut.",
+      "portalFailed": "Abo-Verwaltung konnte nicht geöffnet werden.",
+      "checkoutSessionFailed": "Checkout-Sitzung konnte nicht erstellt werden",
+      "redirectFailed": "Weiterleitung zum Checkout fehlgeschlagen"
     }
   },
   "breadcrumbs": {
@@ -432,22 +491,22 @@
     "gallery": "Galerie"
   },
   "gallery": {
-    "pageTitle": "Ausmal-Galerie | Coloring Habitat",
-    "pageDescription": "Stöbere in unserer wachsenden Sammlung filigraner Ausmalseiten für Entspannung und Achtsamkeit. Filtere nach Kategorie, Schwierigkeit oder Saison.",
-    "heroTitle": "Ausmal-Galerie",
-    "heroSubtitle": "Stöbere in filigranen Ausmalseiten für Entspannung und Achtsamkeit. Jedes Design lädt dich ein, zur Ruhe zu kommen und einen stillen Moment zu finden.",
-    "browseByCategory": "Nach Kategorie entdecken",
-    "browseByDifficulty": "Nach Schwierigkeit entdecken",
+    "pageTitle": "Malgalerie | Coloring Habitat",
+    "pageDescription": "Entdecken Sie unsere wachsende Sammlung detailreicher Ausmalbilder für Entspannung und Achtsamkeit. Filtern Sie nach Kategorie, Schwierigkeitsgrad oder Saison.",
+    "heroTitle": "Malgalerie",
+    "heroSubtitle": "Stöbern Sie in detailreichen Ausmalbildern für Entspannung und Achtsamkeit. Jedes Motiv hilft Ihnen, langsamer zu werden und einen ruhigeren Moment zu finden.",
+    "browseByCategory": "Nach Kategorie",
+    "browseByDifficulty": "Nach Schwierigkeitsgrad",
     "browseByHolidays": "Jahreszeiten & Feiertage",
-    "dailyPage": "Seite des Tages",
+    "dailyPage": "Ausmalbild des Tages",
     "viewAllDaily": "Alle Tagesseiten ansehen",
     "communityCreations": "Empfohlene Seiten",
-    "viewAllCommunity": "Alle empfohlenen ansehen",
+    "viewAllCommunity": "Alle Empfehlungen ansehen",
     "startColoring": "Diese Seite ausmalen",
     "stats": {
       "totalPages": "Seiten in der Bibliothek",
-      "communityPages": "Kostenlose Seiten",
-      "dailyPages": "Täglich generierte Seiten",
+      "communityPages": "Kostenlose Bibliotheksseiten",
+      "dailyPages": "Erstellte Tagesseiten",
       "pagesSuffix": "Seiten"
     },
     "filters": {
@@ -460,25 +519,25 @@
         "description": "Sanfte Muster, perfekt für einen kurzen Moment der Ruhe"
       },
       "intermediate": {
-        "title": "Mittelstufe",
+        "title": "Fortgeschritten",
         "shortLabel": "Mittel",
-        "description": "Moderate Details für eine längere, erdende Sitzung"
+        "description": "Moderate Details für eine längere, erdende Auszeit"
       },
       "advanced": {
-        "title": "Fortgeschritten",
+        "title": "Anspruchsvoll",
         "shortLabel": "Schwer",
-        "description": "Detailreiche Designs, die konzentriertes Arbeiten belohnen"
+        "description": "Detailreiche Motive, die sich mit ungeteilter Aufmerksamkeit entfalten"
       },
       "expert": {
         "title": "Experte",
         "shortLabel": "Experte",
-        "description": "Filigrane Werke für tiefen, meditativen Flow"
+        "description": "Filigrane Motive für einen tiefen, meditativen Flow"
       }
     },
     "categories": {
       "mandalas": {
         "name": "Mandalas",
-        "description": "Symmetrische Muster für stille Konzentration"
+        "description": "Symmetrische Muster für ruhigen Fokus"
       },
       "nature": {
         "name": "Natur",
@@ -490,11 +549,11 @@
       },
       "landscapes": {
         "name": "Landschaften",
-        "description": "Berge, Meere und ferne Horizonte"
+        "description": "Berge, Ozeane und ferne Horizonte"
       },
       "fantasy": {
         "name": "Fantasy",
-        "description": "Mythische Kreaturen und verzauberte Welten"
+        "description": "Mythische Wesen und verzauberte Welten"
       },
       "animals": {
         "name": "Tiere",
@@ -506,15 +565,15 @@
       },
       "abstract": {
         "name": "Abstrakt",
-        "description": "Freie Designs für kreativen Ausdruck"
+        "description": "Freie Formen für kreativen Ausdruck"
       },
       "flowers": {
         "name": "Blumen",
-        "description": "Zarte Blüten für sanfte Konzentration"
+        "description": "Zarte Blüten für sanften Fokus"
       },
       "ocean": {
         "name": "Ozean",
-        "description": "Unterwasserszenen und Meeresbewohner"
+        "description": "Unterwasserwelten und Meeresleben"
       },
       "patterns": {
         "name": "Muster",
@@ -522,11 +581,11 @@
       },
       "wildlife": {
         "name": "Wildtiere",
-        "description": "Tiere in ihren natürlichen Lebensräumen"
+        "description": "Tiere in ihrem natürlichen Lebensraum"
       },
       "mythology": {
         "name": "Mythologie",
-        "description": "Alte Mythen und legendäre Gestalten"
+        "description": "Alte Mythen und legendäre Figuren"
       },
       "steampunk": {
         "name": "Steampunk",
@@ -550,9 +609,9 @@
     },
     "seo": {
       "aboutTitle": "Ein ruhiger Ort zum Ausmalen",
-      "aboutParagraph1": "Coloring Habitat ist eine wachsende Bibliothek filigraner Ausmalseiten, gestaltet für Erwachsene, die zur Ruhe kommen, Gelassenheit finden und sich mit einer kreativen Praxis verbinden möchten. Jede Seite lädt zur Konzentration ein — ob du nun fünf Minuten oder einen ruhigen Nachmittag Zeit hast.",
-      "aboutParagraph2": "Jeden Tag wird eine brandneue Ausmalseite erstellt. Abonniere die tägliche E-Mail, um jeden Morgen ein neues Design im Posteingang zu erhalten, oder stöbere jederzeit in der gesamten Bibliothek. Male online auf unserer digitalen Leinwand oder lade ein hochauflösendes PDF herunter, um es auszudrucken und von Hand auszumalen.",
-      "aboutParagraph3": "Forschung in der Kunsttherapie legt nahe, dass schon kurze Ausmal-Sitzungen den Cortisolspiegel senken, rasende Gedanken beruhigen und dieselben Gehirnregionen aktivieren können wie Meditation. Coloring Habitat macht es einfach, zu dieser Praxis zurückzukehren — ein kleines, tägliches Ritual für einen ruhigeren Geist."
+      "aboutParagraph1": "Coloring Habitat ist eine wachsende Bibliothek detailreicher Ausmalbilder für Erwachsene, die entschleunigen, Ruhe finden und wieder in eine kreative Praxis eintauchen möchten. Jede Seite lädt zum Fokussieren ein — ob für fünf Minuten oder einen stillen Nachmittag.",
+      "aboutParagraph2": "Jeden Tag wird ein neues Ausmalbild generiert. Abonnieren Sie die tägliche E-Mail und erhalten Sie jeden Morgen ein frisches Motiv in Ihrem Postfach, oder stöbern Sie jederzeit in der gesamten Bibliothek. Malen Sie online auf unserer digitalen Leinwand oder laden Sie ein hochauflösendes PDF zum Ausdrucken und Ausmalen von Hand herunter.",
+      "aboutParagraph3": "Forschung aus der Kunsttherapie legt nahe, dass schon kurze Ausmalsessions den Cortisolspiegel senken, kreisende Gedanken beruhigen und dieselben Gehirnregionen aktivieren können wie Meditation. Coloring Habitat ist darauf ausgelegt, diese Praxis leicht zugänglich zu machen — ein kleines tägliches Ritual für einen ruhigeren Geist."
     }
   },
   "accountSettings": {
@@ -560,79 +619,18 @@
     "accountDetails": "Deine Kontodetails",
     "email": "E-Mail",
     "name": "Name",
-    "noEmail": "Keine E-Mail festgelegt",
+    "noEmail": "Keine E-Mail hinterlegt",
     "galleryPreferences": "Galerie-Einstellungen",
-    "galleryControl": "Dein Galerie-Erlebnis steuern",
-    "showCommunityArtwork": "Community-Kunstwerke anzeigen",
-    "showCommunityDescription": "Kunstwerke anderer Mitglieder in der Galerie anzeigen",
-    "communityEnabled": "Community-Galeriebilder aktiviert",
-    "communityDisabled": "Community-Galeriebilder deaktiviert"
-  },
-  "blog": {
-    "title": "Der Coloring Habitat Blog",
-    "subtitle": "Wohlbefinden, Techniken und Inspiration fürs achtsame Ausmalen",
-    "allPosts": "Alle Beiträge",
-    "all": "Alle",
-    "byAuthor": "Von {author}",
-    "comingSoon": "Demnächst",
-    "comingSoonDescription": "Wir arbeiten an Artikeln über die Wissenschaft des Ausmalens für das Wohlbefinden, Techniktipps und kreative Inspiration.",
-    "metaTitle": "Blog | Coloring Habitat",
-    "metaDescription": "Tipps für Wohlbefinden, Ausmal-Techniken und kreative Inspiration für achtsames Ausmalen. Entdecke die Wissenschaft hinter dem Ausmalen zur Stressbewältigung.",
-    "home": "Startseite",
-    "blog": "Blog",
-    "postNotFound": "Beitrag nicht gefunden | Coloring Habitat",
-    "minRead": "{count} Min. Lesezeit",
-    "moreFromBlog": "Mehr aus dem Blog",
-    "categoryNotFound": "Kategorie nicht gefunden | Coloring Habitat",
-    "categoryMetaTitle": "{category} | Coloring Habitat Blog",
-    "categoryDescription": "Entdecke alle Artikel zu {category} im Coloring Habitat Blog.",
-    "noCategoryPosts": "Noch keine Beiträge in dieser Kategorie",
-    "checkBackSoon": "Schau bald wieder für neue Artikel vorbei!"
-  },
-  "billing": {
-    "pageTitle": "Abrechnung",
-    "pageSubtitle": "Verwalte dein Abo und deine Credits",
-    "currentPlan": "Aktueller Plan",
-    "currentCredits": "Du hast noch <strong>{credits} Credits</strong>.",
-    "renewsOn": "Verlängert sich am {date}",
-    "manageSubscription": "Abo verwalten",
-    "noActiveSubscription": "Kein aktives Abo",
-    "noActiveSubscriptionDescription": "Wähle unten einen Plan, um mit Coloring Habitat zu starten.",
-    "availablePlans": "Verfügbare Pläne",
-    "mostPopular": "Am beliebtesten",
-    "perMonth": "/Monat",
-    "creditsPerMonth": "{credits} Credits/Monat",
-    "cancelAnytime": "Jederzeit kündbar, keine Bindung",
-    "manageInPortal": "Im Abrechnungsportal verwalten",
-    "loading": "Wird geladen...",
-    "changePlan": "Plan wechseln",
-    "subscribe": "Abonnieren",
-    "viewPlans": "Pläne ansehen",
-    "errors": {
-      "noActiveSubscription": "Kein aktives Abo gefunden.",
-      "changeSubscriptionFailed": "Abo konnte nicht geändert werden. Bitte versuche es erneut.",
-      "checkoutFailed": "Checkout konnte nicht gestartet werden. Bitte versuche es erneut.",
-      "portalFailed": "Abo-Verwaltung konnte nicht geöffnet werden.",
-      "checkoutSessionFailed": "Checkout-Sitzung konnte nicht erstellt werden",
-      "redirectFailed": "Weiterleitung zum Checkout fehlgeschlagen"
-    }
-  },
-  "email": {
-    "signup": {
-      "title": "Eine kostenlose Seite, jeden Morgen",
-      "subtitle": "Jeden Tag eine <free>kostenlose</free> Malvorlage per E-Mail erhalten.",
-      "placeholder": "deine@email.com",
-      "join": "Abonnieren",
-      "success": "Du bist dabei",
-      "successDescription": "Deine erste Malvorlage kommt morgen früh.",
-      "error": "Etwas ist schiefgelaufen",
-      "errorDescription": "Wir konnten dich nicht zur Liste hinzufügen. Bitte versuche es erneut."
-    }
+    "galleryControl": "Gestalte dein Galerie-Erlebnis",
+    "showCommunityArtwork": "Community-Kunst anzeigen",
+    "showCommunityDescription": "In der Galerie Werke anzeigen, die andere Mitglieder geteilt haben",
+    "communityEnabled": "Community-Bilder in der Galerie aktiviert",
+    "communityDisabled": "Community-Bilder in der Galerie deaktiviert"
   },
   "og": {
     "homepage": {
-      "tagline": "Malvorlagen für Erwachsene, nach Bedarf erstellt.",
-      "alt": "Coloring Habitat — Malvorlagen für Erwachsene, nach Bedarf erstellt."
+      "tagline": "Malvorlagen für Erwachsene, auf Abruf erstellt.",
+      "alt": "Coloring Habitat — Malvorlagen für Erwachsene, auf Abruf erstellt."
     }
   }
 }

@@ -1,26 +1,27 @@
 {
   "common": {
     "loading": "불러오는 중...",
-    "error": "문제가 발생했습니다",
-    "retry": "다시 해보기",
+    "error": "문제가 발생했어요",
+    "retry": "다시 시도",
     "save": "저장",
     "cancel": "취소",
     "close": "닫기",
     "done": "완료",
     "copy": "복사",
-    "copied": "복사됨",
+    "copied": "복사됨!",
     "credits": "크레딧",
     "creditsWithCount": "{count} 크레딧",
-    "loadMore": "더 보기"
+    "loadMore": "더 불러오기"
   },
   "navigation": {
     "home": "홈",
     "gallery": "갤러리",
+    "tools": "무료 도구",
     "myArtwork": "내 작품",
-    "challenges": "도전 과제",
+    "challenges": "도전",
     "blog": "블로그",
     "pricing": "요금제",
-    "support": "고객센터",
+    "support": "고객지원",
     "signIn": "로그인",
     "signOut": "로그아웃",
     "billing": "결제",
@@ -28,73 +29,73 @@
     "stickerBook": "스티커북",
     "account": "계정",
     "menu": "메뉴",
-    "currentlyActive": "현재 사용 중",
-    "switchTo": "전환하기",
+    "currentlyActive": "현재 활성",
+    "switchTo": "전환",
     "selectProfile": "프로필 선택",
     "manageProfiles": "프로필 관리",
     "openMenu": "메뉴 열기",
     "closeMenu": "메뉴 닫기",
-    "navigationMenu": "내비게이션 메뉴",
-    "backToGallery": "갤러리로 돌아가기",
-    "tools": "무료 도구"
+    "navigationMenu": "탐색 메뉴",
+    "backToGallery": "갤러리로 돌아가기"
   },
   "coloringPage": {
-    "title": "색칠하기",
-    "defaultDescription": "무료 프린트 색칠공부 페이지",
+    "title": "색칠 페이지",
+    "relatedPages": "더 많은 색칠 페이지",
+    "defaultDescription": "Chunky Crayon의 무료 인쇄용 색칠 페이지",
     "progress": {
       "colored": "색칠됨",
       "percentage": "{percent}%",
+      "allDone": "완료!",
       "milestones": {
         "25": "좋은 시작이에요!",
-        "50": "절반 완성했어요!",
-        "75": "거의 완성했어요!",
-        "100": "대단해요!"
-      },
-      "allDone": "완료!"
+        "50": "반쯤 왔어요!",
+        "75": "거의 다 됐어요!",
+        "100": "최고예요!"
+      }
     },
     "sidebar": {
-      "colors": "색",
+      "colors": "색상",
       "tools": "도구",
       "size": "크기",
       "history": "기록",
-      "zoom": "확대",
+      "zoom": "확대/축소",
       "actions": "작업"
     },
     "tools": {
-      "pan": "화면 이동",
+      "pan": "이동",
       "fill": "채우기",
       "brush": "브러시",
       "sticker": "스티커",
-      "magicReveal": "마법 공개",
-      "magicAuto": "마법 자동",
-      "magicBrush": "마법 브러시",
-      "magicFill": "마법 채우기",
+      "magicReveal": "매직 리빌",
+      "magicAuto": "매직 자동",
+      "magicBrush": "매직 브러시",
+      "magicFill": "매직 채우기",
       "autoColor": "자동 색칠",
-      "magic": "마법"
+      "magic": "매직"
     },
     "brushTypes": {
       "crayon": "크레용",
       "marker": "마커",
+      "pencil": "연필",
+      "paintbrush": "붓",
       "eraser": "지우개",
       "glitter": "글리터",
-      "sparkle": "스파클",
+      "sparkle": "반짝이",
       "rainbow": "무지개",
       "glow": "글로우",
-      "neon": "네온",
-      "pencil": "연필",
-      "paintbrush": "붓"
+      "neon": "네온"
     },
     "brushSizes": {
-      "small": "얇게",
+      "small": "가는",
       "medium": "보통",
-      "large": "굵게"
+      "large": "굵은"
     },
     "fillPatterns": {
       "solid": "단색",
-      "dots": "땡땡이",
+      "dots": "물방울무늬",
       "stripes": "줄무늬",
       "diagonal": "대각선",
-      "checkerboard": "바둑판무늬",
+      "checkerboard": "체커무늬",
       "hearts": "하트",
       "stars": "별",
       "zigzag": "지그재그"
@@ -106,14 +107,14 @@
       "print": "인쇄",
       "preparing": "준비 중...",
       "doneSharing": "공유 완료",
-      "colorAgain": "다시 색칠",
+      "colorAgain": "다시 색칠하기",
       "startOver": "처음부터"
     },
     "toolbar": {
       "expand": "도구 모음 펼치기",
       "collapse": "도구 모음 접기",
-      "moreTools": "도구 더보기",
-      "less": "줄이기"
+      "moreTools": "도구 더 보기",
+      "less": "간단히"
     },
     "undoRedo": {
       "undo": "실행 취소",
@@ -122,35 +123,34 @@
       "redoShortcut": "다시 실행 (Ctrl+Y)"
     },
     "colorPalette": {
-      "selectColor": "{color} 색 선택",
-      "magicToolsMessage": "마법 도구는 색을 자동으로 선택합니다"
+      "selectColor": "{color} 색상 선택",
+      "magicToolsMessage": "매직 도구에서는 색상이 자동으로 선택돼요"
     },
     "patternSelector": {
-      "label": "무늬:"
+      "label": "패턴:"
     },
     "zoomControls": {
-      "zoomLevel": "확대 비율: {level}%",
+      "zoomLevel": "확대/축소: {level}%",
       "zoomOut": "축소",
-      "zoomOutAria": "축소(더 넓게 보기)",
+      "zoomOutAria": "축소 (더 보기)",
       "zoomIn": "확대",
-      "zoomInAria": "확대(더 가까이 보기)",
+      "zoomInAria": "확대 (가까이 보기)",
       "pan": "이동",
-      "panAria": "그림 위치 이동",
+      "panAria": "그림을 이리저리 이동",
       "reset": "전체 보기",
-      "resetAria": "전체 그림으로 돌아가기"
+      "resetAria": "전체 화면으로 돌아가기"
     },
     "muteToggle": {
       "mute": "소리 끄기",
       "unmute": "소리 켜기",
       "turnOn": "소리 켜기",
       "turnOff": "소리 끄기"
-    },
-    "relatedPages": "색칠하기 더 보기"
+    }
   },
   "shareModal": {
-    "title": "작품 공유하기",
-    "privacyNote": "이 링크를 가진 사람은 누구나 이 작품을 볼 수 있어요. 개인정보는 공유되지 않아요.",
-    "expiresIn": "링크 만료까지:",
+    "title": "작품 공유",
+    "privacyNote": "이 링크가 있는 사람은 누구나 이 작품을 볼 수 있습니다. 개인정보는 공유되지 않습니다.",
+    "expiresIn": "링크 만료:",
     "expiration": {
       "7days": "7일",
       "30days": "30일",
@@ -159,21 +159,21 @@
     "createLink": "공유 링크 만들기",
     "creating": "공유 링크 만드는 중...",
     "success": {
-      "title": "링크가 만들어졌어요!",
-      "subtitle": "가족과 친구에게 이 링크를 공유해요"
+      "title": "링크가 생성되었습니다!",
+      "subtitle": "이 링크를 가족과 친구에게 공유하세요"
     },
     "done": "완료",
-    "error": "공유 링크 생성 실패",
+    "error": "공유 링크 생성에 실패했습니다",
     "socialShare": "소셜 미디어에 공유"
   },
   "saveToGallery": {
     "idle": "갤러리에 저장",
     "saving": "저장 중...",
-    "saved": "저장 완료!",
+    "saved": "저장됨!",
     "tryAgain": "다시 시도",
     "errors": {
-      "captureArtwork": "그림을 저장할 수 없어요",
-      "generic": "문제가 생겼어요. 다시 시도해 주세요."
+      "captureArtwork": "작품을 캡처할 수 없습니다",
+      "generic": "문제가 발생했습니다. 다시 시도해 주세요."
     }
   },
   "shareButton": {
@@ -181,47 +181,66 @@
     "preparing": "준비 중...",
     "doneSharing": "공유 완료"
   },
+  "startOverButton": {
+    "idle": "처음부터",
+    "confirm": "네, 처음부터",
+    "cancel": "계속 색칠하기",
+    "modalTitle": "처음부터 할까요?",
+    "modalBody": "지금까지 색칠한 내용이 모두 지워집니다. 정말 괜찮나요?"
+  },
+  "saveButton": {
+    "idle": "저장",
+    "loading": "불러오는 중...",
+    "saving": "저장 중...",
+    "error": "앗!"
+  },
+  "printButton": {
+    "idle": "인쇄",
+    "loading": "로딩 중...",
+    "printing": "여는 중...",
+    "error": "문제가 발생했어요!"
+  },
   "colors": {
     "primary": {
       "cherryRed": "체리 레드",
-      "sunsetOrange": "노을 오렌지",
-      "sunshineYellow": "햇살 노랑",
-      "grassGreen": "풀빛 초록",
-      "skyBlue": "하늘색",
-      "grapePurple": "포도 보라",
-      "bubblegumPink": "버블껌 핑크",
-      "chocolateBrown": "초코 브라운"
+      "sunsetOrange": "선셋 오렌지",
+      "sunshineYellow": "선샤인 옐로",
+      "grassGreen": "그라스 그린",
+      "skyBlue": "스카이 블루",
+      "grapePurple": "그레이프 퍼플",
+      "bubblegumPink": "버블검 핑크",
+      "chocolateBrown": "초콜릿 브라운"
     },
     "secondary": {
       "coral": "코랄",
       "mint": "민트",
       "lavender": "라벤더",
-      "peach": "복숭아색",
+      "peach": "피치",
       "navy": "네이비",
-      "forest": "숲 초록",
+      "forest": "포레스트",
       "gold": "골드",
       "rose": "로즈"
     },
     "essentials": {
       "black": "검정",
-      "white": "하양",
+      "white": "흰색",
       "gray": "회색",
       "skinTone": "피부색"
     },
     "skinTones": {
-      "light": "밝은",
-      "mediumLight": "살짝 밝은",
+      "light": "밝음",
+      "mediumLight": "중간 밝음",
       "medium": "중간",
-      "mediumDark": "살짝 어두운",
-      "dark": "어두운",
-      "deep": "진한"
+      "mediumDark": "중간 어두움",
+      "dark": "어두움",
+      "deep": "진함"
     }
   },
   "shareArtwork": {
-    "title": "그림 공유하기",
-    "linkCreated": "링크가 만들어졌어요!",
-    "sharePrompt": "가족과 친구에게 이 링크를 공유해 주세요",
-    "privacyNotice": "이 링크가 있는 누구나 이 그림을 볼 수 있어요. 개인정보는 공유되지 않아요.",
+    "title": "작품 공유",
+    "linkCreated": "링크가 생성되었습니다!",
+    "sharePrompt": "이 링크를 가족과 친구에게 공유하세요",
+    "privacyNotice": "이 링크가 있는 사람은 누구나 이 작품을 볼 수 있어요. 개인 정보는 공유되지 않습니다.",
     "expiresIn": "링크 만료:",
     "expiration": {
       "7days": "7일",
@@ -232,9 +251,9 @@
     "creating": "공유 링크 만드는 중...",
     "close": "닫기",
     "copy": "복사",
-    "copied": "복사했어요!",
+    "copied": "복사됨!",
     "done": "완료",
-    "error": "공유 링크를 만들지 못했어요"
+    "error": "공유 링크를 만들지 못했습니다"
   },
   "account": {
     "profiles": "프로필",
@@ -244,82 +263,82 @@
   },
   "settings": {
     "pageTitle": "설정",
-    "pageSubtitle": "계정 설정을 관리해요",
+    "pageSubtitle": "계정 환경설정을 관리하세요",
     "parentalControls": {
       "title": "자녀 보호",
-      "description": "앱에서 보이는 콘텐츠를 조절해요"
+      "description": "앱 사용 시 표시되는 콘텐츠를 관리합니다"
     },
     "communityImages": {
-      "label": "커뮤니티 그림 보기",
-      "description": "켜면 갤러리에서 다른 사용자가 만든 색칠놀이를 볼 수 있어요. 끄면 내 작품만 보여요.",
-      "enabled": "커뮤니티 그림이 켜졌어요",
-      "disabled": "커뮤니티 그림이 꺼졌어요"
+      "label": "커뮤니티 이미지 표시",
+      "description": "켜면 갤러리에 다른 사용자가 만든 색칠 페이지가 표시됩니다. 끄면 내 작품만 표시됩니다.",
+      "enabled": "커뮤니티 이미지 사용",
+      "disabled": "커뮤니티 이미지 사용 안 함"
     },
     "languagePreference": {
       "title": "언어",
-      "description": "앱에서 사용할 언어를 선택해요"
+      "description": "앱에서 사용할 언어를 선택하세요"
     },
     "audio": {
       "title": "오디오",
-      "description": "효과음과 배경음악을 설정해요",
+      "description": "효과음과 배경 음악을 설정합니다",
       "sfx": {
         "label": "효과음",
-        "description": "붓질, 탭 등 색칠하는 소리"
+        "description": "브러시 칠하기, 탭 등 색칠 소리"
       },
       "ambient": {
-        "label": "배경음악",
-        "description": "색칠하는 동안 편안한 음악"
+        "label": "배경 음악",
+        "description": "색칠하는 동안 편안한 배경 사운드"
       }
     },
-    "communityGalleryEnabled": "커뮤니티 갤러리 이미지 활성화됨",
-    "communityGalleryDisabled": "커뮤니티 갤러리 이미지 비활성화됨",
+    "communityGalleryEnabled": "커뮤니티 갤러리 이미지 사용",
+    "communityGalleryDisabled": "커뮤니티 갤러리 이미지 사용 안 함",
     "noEmail": "이메일이 설정되지 않았습니다"
   },
   "email": {
     "signup": {
-      "title": "매일 무료 색칠놀이!",
-      "subtitle": "매일 받은편지함으로 <free>무료</free> 색칠 도안을 받아보세요.",
+      "title": "매일 무료 컬러링!",
+      "subtitle": "매일 받은편지함에서 <free>무료</free> 컬러링 페이지를 받아보세요.",
       "placeholder": "parent@example.com",
-      "join": "가입하기",
-      "success": "성공!",
-      "successDescription": "이메일 목록에 성공적으로 가입했어요!",
-      "error": "문제가 발생했어요",
-      "errorDescription": "이메일 목록 가입에 실패했어요. 다시 시도해 주세요."
+      "join": "가입",
+      "success": "완료!",
+      "successDescription": "이메일 목록에 성공적으로 가입했습니다!",
+      "error": "문제가 발생했습니다",
+      "errorDescription": "이메일 목록 가입에 실패했습니다. 다시 시도해 주세요."
     },
     "unsubscribe": {
       "success": "구독 해지됨",
-      "successDescription": "메일링 목록에서 삭제되었어요. 떠나신다니 아쉬워요!",
-      "invalid": "잘못된 링크",
-      "invalidDescription": "이 구독 해지 링크가 올바르지 않거나 만료되었어요."
+      "successDescription": "메일링 리스트에서 삭제되었습니다. 떠나신다니 아쉬워요!",
+      "invalid": "유효하지 않은 링크",
+      "invalidDescription": "이 구독 해지 링크는 유효하지 않거나 만료되었습니다."
     }
   },
   "billing": {
     "pageTitle": "결제 및 구독",
-    "pageSubtitle": "구독을 관리하고 추가 크레딧을 구매해 멋진 색칠놀이 그림을 계속 만들어 보세요.",
+    "pageSubtitle": "구독을 관리하고 추가 크레딧을 구매하여 멋진 컬러링 페이지를 계속 만들어 보세요.",
     "currentPlan": "현재 플랜",
     "currentCredits": "현재 크레딧: {count}",
-    "renewsOn": "구독은 {date}에 갱신돼요",
+    "renewsOn": "구독은 {date}에 갱신됩니다",
     "manageSubscription": "구독 관리",
     "noActiveSubscription": "활성 구독 없음",
-    "noSubscriptionDescription": "플랜을 선택하고 멋진 색칠놀이 그림 만들기를 시작해요.",
+    "noSubscriptionDescription": "플랜을 선택하고 멋진 컬러링 페이지 만들기를 시작하세요.",
     "viewPlans": "플랜 보기",
-    "buyMoreCredits": "크레딧 더 사기",
-    "credits": "{count} 크레딧",
+    "buyMoreCredits": "크레딧 더 구매",
+    "credits": "크레딧 {count}개",
     "buyNow": "지금 구매",
-    "loading": "불러오는 중...",
+    "loading": "로딩 중...",
     "availablePlans": "이용 가능한 플랜",
     "changePlan": "플랜 변경",
+    "subscribe": "구독하기",
     "currentPlanBadge": "현재 플랜",
     "manageInPortal": "고객 포털에서 구독을 관리하세요",
-    "noCommitment": "약정 없어요. 언제든 취소 가능해요.",
+    "noCommitment": "약정 없음. 언제든지 취소할 수 있어요.",
     "perMonth": "/월",
-    "noSubscriptionForCredits": "크레딧 구매는 활성 구독이 필요해요",
-    "noSubscriptionFound": "활성 구독을 찾을 수 없어요",
-    "failedToChangeSubscription": "구독 변경에 실패했어요",
-    "failedToCheckout": "결제 화면으로 이동하지 못했어요",
-    "failedToPurchaseCredits": "크레딧 구매에 실패했어요",
-    "failedToOpenPortal": "고객 포털을 열지 못했어요",
-    "subscribe": "구독하기"
+    "noSubscriptionForCredits": "크레딧 구매를 위해 활성 구독이 필요합니다",
+    "noSubscriptionFound": "활성 구독을 찾을 수 없습니다",
+    "failedToChangeSubscription": "구독 변경에 실패했습니다",
+    "failedToCheckout": "결제로 이동하지 못했습니다",
+    "failedToPurchaseCredits": "크레딧 구매에 실패했습니다",
+    "failedToOpenPortal": "고객 포털을 열지 못했습니다"
   },
   "auth": {
     "signIn": "로그인",
@@ -332,13 +351,13 @@
     "chooseMethod": "원하는 로그인 방법을 선택하세요",
     "orContinueWith": "또는 다음으로 계속",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "계속하면 서비스 이용약관과 개인정보처리방침에 동의하는 것으로 간주됩니다.",
+    "termsAgreement": "계속하면 서비스 이용약관 및 개인정보처리방침에 동의하게 됩니다.",
     "verifyRequest": {
-      "title": "이메일을 확인해요!",
-      "description": "로그인할 수 있는 마법 링크를 보냈어요. 이메일의 링크를 눌러 계속해 주세요.",
-      "checkSpam": "안 보이나요? 스팸함도 확인해 주세요.",
-      "linkExpiry": "링크는 24시간 후 만료돼요.",
-      "tryDifferentEmail": "다른 이메일 사용하기"
+      "title": "이메일을 확인하세요!",
+      "description": "로그인용 매직 링크를 보냈어요. 이메일의 링크를 눌러 계속하세요.",
+      "checkSpam": "보이지 않나요? 스팸함을 확인해 보세요.",
+      "linkExpiry": "링크는 24시간 후 만료됩니다.",
+      "tryDifferentEmail": "다른 이메일 사용"
     },
     "error": {
       "title": "문제가 발생했습니다",
@@ -347,41 +366,41 @@
       "goHome": "홈으로 가기"
     },
     "errors": {
-      "configuration": "서버 설정에 문제가 있어요. 잠시 후 다시 시도해 주세요.",
-      "accessDenied": "접근이 거부됐어요. 로그인 권한이 없어요.",
-      "verification": "로그인 링크가 만료되었거나 이미 사용됐어요. 새 링크를 요청해 주세요.",
-      "oauth": "계정으로 로그인하는 중 문제가 생겼어요. 다시 시도해 주세요.",
-      "email": "로그인 이메일을 보내는 중 문제가 생겼어요. 다시 시도해 주세요.",
-      "credentials": "정보가 올바르지 않아요. 이메일을 확인하고 다시 시도해 주세요.",
-      "sessionRequired": "이 페이지를 보려면 로그인해 주세요.",
-      "default": "예상치 못한 오류가 발생했어요. 다시 시도해 주세요."
+      "configuration": "서버 설정에 문제가 있습니다. 잠시 후 다시 시도해 주세요.",
+      "accessDenied": "접근이 거부되었습니다. 로그인 권한이 없습니다.",
+      "verification": "로그인 링크가 만료되었거나 이미 사용되었습니다. 새 링크를 요청해 주세요.",
+      "oauth": "계정으로 로그인하는 중 문제가 발생했습니다. 다시 시도해 주세요.",
+      "email": "로그인 이메일을 보내는 중 문제가 발생했습니다. 다시 시도해 주세요.",
+      "credentials": "정보가 올바르지 않습니다. 이메일을 확인하고 다시 시도해 주세요.",
+      "sessionRequired": "이 페이지에 접근하려면 로그인해 주세요.",
+      "default": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요."
     }
   },
   "errors": {
     "generic": "문제가 발생했습니다. 다시 시도해 주세요.",
     "notFound": "페이지를 찾을 수 없습니다",
     "sharedArtworkNotFound": {
-      "title": "그림을 찾을 수 없어요",
-      "description": "공유된 그림 링크가 만료되었거나 삭제되었을 수 있어요. 작가에게 새 링크를 요청해 보세요!",
-      "cta": "컬러링 페이지 구경하기"
+      "title": "작품을 찾을 수 없습니다",
+      "description": "이 공유 작품 링크는 만료되었거나 삭제되었을 수 있습니다. 작가에게 새 링크를 요청해 주세요!",
+      "cta": "컬러링 페이지 둘러보기"
     },
     "unauthorized": "계속하려면 로그인해 주세요",
     "stripeLoadFailed": "Stripe를 불러오지 못했습니다",
-    "checkoutFailed": "결제 세션을 생성하지 못했습니다",
-    "unexpectedError": "예기치 못한 오류가 발생했어요. 다시 시도해 주세요.",
-    "redirectFailed": "결제 페이지로 이동하지 못했습니다"
+    "checkoutFailed": "결제 세션 생성에 실패했습니다",
+    "unexpectedError": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.",
+    "redirectFailed": "결제로 이동하지 못했습니다"
   },
   "breadcrumbs": {
     "home": "홈",
     "gallery": "갤러리",
-    "forToddlers": "아기용",
+    "daily": "오늘의 색칠 페이지",
+    "community": "커뮤니티 색칠 페이지",
+    "forToddlers": "유아용",
     "forKids": "어린이용",
     "forTeens": "청소년용",
-    "forAdults": "어른용",
-    "ariaLabel": "경로",
-    "daily": "매일 색칠하기",
-    "community": "커뮤니티 색칠하기",
-    "holidays": "명절 & 계절"
+    "forAdults": "성인용",
+    "holidays": "휴일 및 계절",
+    "ariaLabel": "이동 경로"
   },
   "jumpToNav": {
     "jumpToSection": "섹션으로 이동",
@@ -399,30 +418,11 @@
     "hoursAgo": "{count}시간 전"
   },
   "language": {
-    "switchLanguage": "언어 바꾸기",
+    "switchLanguage": "언어 전환",
     "currentLanguage": "현재 언어",
     "selectLanguage": "언어 선택",
     "language": "언어",
-    "switchTo": "다음 언어로 바꾸기"
-  },
-  "startOverButton": {
-    "idle": "처음부터",
-    "confirm": "네, 처음부터 할래요",
-    "cancel": "계속 색칠하기",
-    "modalTitle": "처음부터 할까요?",
-    "modalBody": "색칠한 게 전부 지워져요. 괜찮아요?"
-  },
-  "saveButton": {
-    "idle": "저장",
-    "loading": "불러오는 중...",
-    "saving": "저장 중...",
-    "error": "어머!"
-  },
-  "printButton": {
-    "idle": "인쇄",
-    "loading": "불러오는 중...",
-    "printing": "여는 중...",
-    "error": "어머!"
+    "switchTo": "다음으로 전환"
   },
   "difficulty": {
     "easy": "쉬움",
@@ -430,7 +430,7 @@
     "hard": "어려움"
   },
   "gallery": {
-    "categoryNotFound": "카테고리를 찾을 수 없습니다",
-    "difficultyNotFound": "난이도를 찾을 수 없습니다"
+    "categoryNotFound": "카테고리를 찾을 수 없음",
+    "difficultyNotFound": "난이도를 찾을 수 없음"
   }
 }

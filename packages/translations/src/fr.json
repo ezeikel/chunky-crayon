@@ -16,41 +16,42 @@
   "navigation": {
     "home": "Accueil",
     "gallery": "Galerie",
-    "myArtwork": "Mes dessins",
+    "tools": "Outils gratuits",
+    "myArtwork": "Mes créations",
     "challenges": "Défis",
     "blog": "Blog",
     "pricing": "Tarifs",
-    "support": "Aide",
+    "support": "Assistance",
     "signIn": "Se connecter",
     "signOut": "Se déconnecter",
     "billing": "Facturation",
     "settings": "Paramètres",
-    "stickerBook": "Livre d’autocollants",
+    "stickerBook": "Album d’autocollants",
     "account": "Compte",
     "menu": "Menu",
     "currentlyActive": "Actuellement actif",
     "switchTo": "Passer à",
-    "selectProfile": "Choisir un profil",
+    "selectProfile": "Sélectionner un profil",
     "manageProfiles": "Gérer les profils",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
     "navigationMenu": "Menu de navigation",
-    "backToGallery": "Retour à la galerie",
-    "tools": "Outils gratuits"
+    "backToGallery": "Retour à la galerie"
   },
   "coloringPage": {
     "title": "Page à colorier",
-    "defaultDescription": "Page à colorier imprimable gratuite",
+    "relatedPages": "Plus de pages à colorier",
+    "defaultDescription": "Page à colorier gratuite à imprimer de Chunky Crayon",
     "progress": {
       "colored": "colorié",
       "percentage": "{percent}%",
+      "allDone": "Terminé !",
       "milestones": {
-        "25": "Super début !",
+        "25": "Bon début !",
         "50": "À mi-chemin !",
         "75": "Presque fini !",
         "100": "Incroyable !"
-      },
-      "allDone": "Terminé !"
+      }
     },
     "sidebar": {
       "colors": "Couleurs",
@@ -64,7 +65,7 @@
       "pan": "Déplacer",
       "fill": "Remplir",
       "brush": "Pinceau",
-      "sticker": "Sticker",
+      "sticker": "Autocollant",
       "magicReveal": "Révélation magique",
       "magicAuto": "Auto magique",
       "magicBrush": "Pinceau magique",
@@ -73,16 +74,16 @@
       "magic": "Magie"
     },
     "brushTypes": {
-      "crayon": "Crayon de couleur",
+      "crayon": "Crayon",
       "marker": "Feutre",
+      "pencil": "Crayon à papier",
+      "paintbrush": "Pinceau",
       "eraser": "Gomme",
       "glitter": "Paillettes",
       "sparkle": "Scintillant",
       "rainbow": "Arc-en-ciel",
       "glow": "Lueur",
-      "neon": "Néon",
-      "pencil": "Crayon de papier",
-      "paintbrush": "Pinceau"
+      "neon": "Néon"
     },
     "brushSizes": {
       "small": "Fin",
@@ -122,8 +123,8 @@
       "redoShortcut": "Rétablir (Ctrl+Y)"
     },
     "colorPalette": {
-      "selectColor": "Choisir la couleur {color}",
-      "magicToolsMessage": "Les couleurs sont choisies automatiquement avec les outils magiques"
+      "selectColor": "Sélectionner la couleur {color}",
+      "magicToolsMessage": "Les couleurs sont choisies automatiquement avec les outils Magie"
     },
     "patternSelector": {
       "label": "Motif :"
@@ -137,19 +138,18 @@
       "pan": "Déplacer",
       "panAria": "Se déplacer dans l’image",
       "reset": "Voir toute l’image",
-      "resetAria": "Revenir à l’image entière"
+      "resetAria": "Revenir à l’image complète"
     },
     "muteToggle": {
-      "mute": "Désactiver le son",
-      "unmute": "Réactiver les sons",
-      "turnOn": "Activer les sons",
-      "turnOff": "Désactiver les sons"
-    },
-    "relatedPages": "Plus de pages à colorier"
+      "mute": "Couper le son",
+      "unmute": "Activer le son",
+      "turnOn": "Activer le son",
+      "turnOff": "Désactiver le son"
+    }
   },
   "shareModal": {
     "title": "Partager l’œuvre",
-    "privacyNote": "Toute personne avec ce lien peut voir cette œuvre. Aucune information personnelle n’est partagée.",
+    "privacyNote": "Toute personne disposant de ce lien peut voir cette œuvre. Aucune information personnelle n’est partagée.",
     "expiresIn": "Le lien expire dans :",
     "expiration": {
       "7days": "7 jours",
@@ -172,14 +172,33 @@
     "saved": "Enregistré !",
     "tryAgain": "Réessayer",
     "errors": {
-      "captureArtwork": "Impossible de capturer ton dessin",
-      "generic": "Oups, un souci. Réessaie."
+      "captureArtwork": "Impossible de capturer votre œuvre",
+      "generic": "Une erreur s'est produite. Veuillez réessayer."
     }
   },
   "shareButton": {
     "idle": "Partager",
     "preparing": "Préparation...",
     "doneSharing": "Partage terminé"
+  },
+  "startOverButton": {
+    "idle": "Recommencer",
+    "confirm": "Oui, recommencer",
+    "cancel": "Continuer à colorier",
+    "modalTitle": "Recommencer ?",
+    "modalBody": "Cela effacera tout votre coloriage. Êtes-vous sûr ?"
+  },
+  "saveButton": {
+    "idle": "Enregistrer",
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "error": "Oups !"
+  },
+  "printButton": {
+    "idle": "Imprimer",
+    "loading": "Chargement...",
+    "printing": "Ouverture...",
+    "error": "Oups !"
   },
   "colors": {
     "primary": {
@@ -189,8 +208,8 @@
       "grassGreen": "Vert herbe",
       "skyBlue": "Bleu ciel",
       "grapePurple": "Violet raisin",
-      "bubblegumPink": "Rose bubble-gum",
-      "chocolateBrown": "Marron chocolat"
+      "bubblegumPink": "Rose chewing-gum",
+      "chocolateBrown": "Brun chocolat"
     },
     "secondary": {
       "coral": "Corail",
@@ -198,7 +217,7 @@
       "lavender": "Lavande",
       "peach": "Pêche",
       "navy": "Bleu marine",
-      "forest": "Forêt",
+      "forest": "Vert forêt",
       "gold": "Or",
       "rose": "Rose"
     },
@@ -221,7 +240,7 @@
     "title": "Partager l’œuvre",
     "linkCreated": "Lien créé !",
     "sharePrompt": "Partagez ce lien avec votre famille et vos amis",
-    "privacyNotice": "Toute personne avec ce lien peut voir cette œuvre. Aucune information personnelle n’est partagée.",
+    "privacyNotice": "Toute personne ayant ce lien peut voir cette œuvre. Aucune information personnelle n’est partagée.",
     "expiresIn": "Le lien expire dans :",
     "expiration": {
       "7days": "7 jours",
@@ -229,159 +248,159 @@
       "never": "N’expire jamais"
     },
     "createLink": "Créer un lien de partage",
-    "creating": "Création du lien de partage...",
+    "creating": "Création du lien de partage…",
     "close": "Fermer",
     "copy": "Copier",
     "copied": "Copié !",
     "done": "Terminé",
-    "error": "Impossible de créer le lien de partage"
+    "error": "Échec de la création du lien de partage"
   },
   "account": {
     "profiles": "Profils",
     "billing": "Facturation",
     "settings": "Paramètres",
-    "myArtwork": "Mes dessins"
+    "myArtwork": "Mes créations"
   },
   "settings": {
-    "pageTitle": "Réglages",
+    "pageTitle": "Paramètres",
     "pageSubtitle": "Gérez les préférences de votre compte",
     "parentalControls": {
       "title": "Contrôle parental",
-      "description": "Choisissez quels contenus sont visibles dans l’app"
+      "description": "Contrôlez le contenu visible lors de l’utilisation de l’application"
     },
     "communityImages": {
       "label": "Afficher les images de la communauté",
-      "description": "Si activé, vous verrez dans la galerie des coloriages créés par d’autres utilisateurs. Si désactivé, seules vos créations s’affichent.",
+      "description": "Si activé, vous verrez dans la galerie des pages à colorier créées par d’autres utilisateurs. Si désactivé, seules vos créations sont affichées.",
       "enabled": "Images de la communauté activées",
       "disabled": "Images de la communauté désactivées"
     },
     "languagePreference": {
       "title": "Langue",
-      "description": "Choisissez la langue de l'app"
+      "description": "Choisissez la langue de l’application"
     },
     "audio": {
       "title": "Audio",
-      "description": "Gérez les effets sonores et la musique de fond",
+      "description": "Contrôlez les effets sonores et la musique de fond",
       "sfx": {
-        "label": "Effets Sonores",
-        "description": "Bruits de pinceaux, de tapotements et autres sons de coloriage"
+        "label": "Effets sonores",
+        "description": "Coups de pinceau, tapotements et autres sons de coloriage"
       },
       "ambient": {
-        "label": "Musique de Fond",
-        "description": "Sons d'ambiance relaxants pendant le coloriage"
+        "label": "Musique de fond",
+        "description": "Sons d’ambiance relaxants pendant le coloriage"
       }
     },
     "communityGalleryEnabled": "Images de la galerie communautaire activées",
     "communityGalleryDisabled": "Images de la galerie communautaire désactivées",
-    "noEmail": "Aucun email défini"
+    "noEmail": "Aucune adresse e-mail"
   },
   "email": {
     "signup": {
       "title": "Coloriage gratuit chaque jour !",
       "subtitle": "Recevez une page de coloriage <free>gratuite</free> dans votre boîte mail chaque jour.",
-      "placeholder": "parent@example.com",
+      "placeholder": "parent@exemple.com",
       "join": "S'inscrire",
-      "success": "C'est fait !",
-      "successDescription": "Vous êtes bien inscrit(e) à la liste e-mail !",
-      "error": "Oups, une erreur",
-      "errorDescription": "Impossible de s'inscrire à la liste e-mail. Réessayez."
+      "success": "Succès !",
+      "successDescription": "Vous avez bien rejoint la liste e-mail !",
+      "error": "Une erreur s'est produite",
+      "errorDescription": "Impossible de rejoindre la liste e-mail. Veuillez réessayer."
     },
     "unsubscribe": {
-      "success": "Désinscription réussie",
-      "successDescription": "Vous avez été retiré(e) de notre liste d'envoi. Vous allez nous manquer !",
+      "success": "Désabonné",
+      "successDescription": "Vous avez été retiré de notre liste d’envoi. Nous sommes tristes de vous voir partir !",
       "invalid": "Lien invalide",
-      "invalidDescription": "Ce lien de désinscription est invalide ou a expiré."
+      "invalidDescription": "Ce lien de désabonnement est invalide ou a expiré."
     }
   },
   "billing": {
     "pageTitle": "Votre facturation et abonnement",
-    "pageSubtitle": "Gérez votre abonnement et achetez des crédits pour continuer à créer de superbes coloriages.",
+    "pageSubtitle": "Gérez votre abonnement et achetez des crédits supplémentaires pour continuer à créer de superbes pages à colorier.",
     "currentPlan": "Forfait actuel",
     "currentCredits": "Crédits actuels : {count}",
     "renewsOn": "Votre abonnement se renouvelle le {date}",
     "manageSubscription": "Gérer l’abonnement",
     "noActiveSubscription": "Aucun abonnement actif",
-    "noSubscriptionDescription": "Choisissez un forfait pour commencer à créer de superbes coloriages.",
+    "noSubscriptionDescription": "Choisissez un forfait pour commencer à créer de superbes pages à colorier.",
     "viewPlans": "Voir les forfaits",
-    "buyMoreCredits": "Acheter des crédits",
+    "buyMoreCredits": "Acheter plus de crédits",
     "credits": "{count} crédits",
-    "buyNow": "Acheter",
+    "buyNow": "Acheter maintenant",
     "loading": "Chargement...",
     "availablePlans": "Forfaits disponibles",
     "changePlan": "Changer de forfait",
+    "subscribe": "S’abonner",
     "currentPlanBadge": "Forfait actuel",
     "manageInPortal": "Gérez votre abonnement dans le portail client",
-    "noCommitment": "Sans engagement. Annulez quand vous voulez.",
+    "noCommitment": "Sans engagement. Annulez à tout moment.",
     "perMonth": "/mois",
     "noSubscriptionForCredits": "Abonnement actif requis pour acheter des crédits",
     "noSubscriptionFound": "Aucun abonnement actif trouvé",
-    "failedToChangeSubscription": "Impossible de changer d’abonnement",
-    "failedToCheckout": "Redirection vers le paiement impossible",
-    "failedToPurchaseCredits": "Impossible d’acheter des crédits",
-    "failedToOpenPortal": "Impossible d’ouvrir le portail client",
-    "subscribe": "S’abonner"
+    "failedToChangeSubscription": "Échec du changement d’abonnement",
+    "failedToCheckout": "Échec de la redirection vers le paiement",
+    "failedToPurchaseCredits": "Échec de l’achat de crédits",
+    "failedToOpenPortal": "Échec de l’ouverture du portail client"
   },
   "auth": {
     "signIn": "Se connecter",
-    "signUp": "S’inscrire",
+    "signUp": "S'inscrire",
     "signOut": "Se déconnecter",
     "continueWithGoogle": "Continuer avec Google",
     "continueWithApple": "Continuer avec Apple",
-    "signInWithEmail": "Se connecter avec e-mail",
-    "sendingLink": "Envoi du lien...",
-    "chooseMethod": "Choisissez votre méthode de connexion préférée",
+    "signInWithEmail": "Se connecter par e-mail",
+    "sendingLink": "Envoi du lien…",
+    "chooseMethod": "Choisissez votre méthode de connexion",
     "orContinueWith": "Ou continuer avec",
-    "emailPlaceholder": "name@example.com",
+    "emailPlaceholder": "nom@exemple.com",
     "termsAgreement": "En continuant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité.",
     "verifyRequest": {
-      "title": "Vérifiez votre e-mail !",
-      "description": "On vous a envoyé un lien magique pour vous connecter. Cliquez sur le lien dans votre e-mail pour continuer.",
-      "checkSpam": "Vous ne le voyez pas ? Regardez dans vos spams.",
+      "title": "Vérifiez vos e-mails !",
+      "description": "Nous vous avons envoyé un lien magique pour vous connecter. Cliquez sur le lien dans votre e-mail pour continuer.",
+      "checkSpam": "Vous ne le voyez pas ? Vérifiez vos spams.",
       "linkExpiry": "Le lien expire dans 24 heures.",
-      "tryDifferentEmail": "Utiliser un autre e-mail"
+      "tryDifferentEmail": "Utiliser une autre adresse e-mail"
     },
     "error": {
-      "title": "Une erreur est survenue",
-      "tryAgain": "Essayez de vous reconnecter. Si le problème continue, contactez l’assistance.",
+      "title": "Un problème est survenu",
+      "tryAgain": "Veuillez réessayer de vous connecter. Si le problème persiste, contactez l'assistance.",
       "backToSignIn": "Retour à la connexion",
-      "goHome": "Aller à l’accueil"
+      "goHome": "Aller à l'accueil"
     },
     "errors": {
-      "configuration": "Il y a un problème de configuration du serveur. Réessayez plus tard.",
-      "accessDenied": "Accès refusé. Vous n’avez pas la permission de vous connecter.",
-      "verification": "Le lien de connexion a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
-      "oauth": "Un problème est survenu lors de la connexion avec votre compte. Réessayez.",
-      "email": "Un problème est survenu lors de l’envoi de l’e-mail de connexion. Réessayez.",
+      "configuration": "Il y a un problème de configuration du serveur. Veuillez réessayer plus tard.",
+      "accessDenied": "Accès refusé. Vous n'avez pas l'autorisation de vous connecter.",
+      "verification": "Le lien de connexion a expiré ou a déjà été utilisé. Veuillez en demander un nouveau.",
+      "oauth": "Un problème est survenu lors de la connexion avec votre compte. Veuillez réessayer.",
+      "email": "Un problème est survenu lors de l'envoi de l'e-mail de connexion. Veuillez réessayer.",
       "credentials": "Identifiants invalides. Vérifiez votre e-mail et réessayez.",
-      "sessionRequired": "Connectez-vous pour accéder à cette page.",
-      "default": "Une erreur inattendue est survenue. Réessayez."
+      "sessionRequired": "Veuillez vous connecter pour accéder à cette page.",
+      "default": "Une erreur inattendue s'est produite. Veuillez réessayer."
     }
   },
   "errors": {
-    "generic": "Quelque chose s'est mal passé. Veuillez réessayer.",
+    "generic": "Une erreur s’est produite. Veuillez réessayer.",
     "notFound": "Page introuvable",
     "sharedArtworkNotFound": {
-      "title": "Dessin introuvable",
-      "description": "Ce lien de dessin partagé a peut-être expiré ou a été supprimé. Demandez à l'artiste un nouveau lien !",
-      "cta": "Découvrir des coloriages"
+      "title": "Illustration introuvable",
+      "description": "Ce lien d’illustration partagée a peut-être expiré ou a été supprimé. Demandez un nouveau lien à l’artiste !",
+      "cta": "Explorer les coloriages"
     },
     "unauthorized": "Veuillez vous connecter pour continuer",
     "stripeLoadFailed": "Impossible de charger Stripe",
     "checkoutFailed": "Impossible de créer la session de paiement",
-    "unexpectedError": "Une erreur inattendue est survenue. Veuillez réessayer.",
+    "unexpectedError": "Une erreur inattendue s’est produite. Veuillez réessayer.",
     "redirectFailed": "Impossible de rediriger vers le paiement"
   },
   "breadcrumbs": {
     "home": "Accueil",
     "gallery": "Galerie",
+    "daily": "Pages à colorier du jour",
+    "community": "Pages à colorier de la communauté",
     "forToddlers": "Pour les tout-petits",
     "forKids": "Pour les enfants",
     "forTeens": "Pour les ados",
     "forAdults": "Pour les adultes",
-    "ariaLabel": "Fil d’Ariane",
-    "daily": "Coloriages du jour",
-    "community": "Coloriages de la communauté",
-    "holidays": "Fêtes & saisons"
+    "holidays": "Fêtes et saisons",
+    "ariaLabel": "Fil d’Ariane"
   },
   "jumpToNav": {
     "jumpToSection": "Aller à la section",
@@ -403,26 +422,7 @@
     "currentLanguage": "Langue actuelle",
     "selectLanguage": "Choisir une langue",
     "language": "Langue",
-    "switchTo": "Passer en"
-  },
-  "startOverButton": {
-    "idle": "Recommencer",
-    "confirm": "Oui, recommencer",
-    "cancel": "Continuer à colorier",
-    "modalTitle": "Recommencer ?",
-    "modalBody": "Cela effacera tout ton coloriage. Tu es sûr ?"
-  },
-  "saveButton": {
-    "idle": "Enregistrer",
-    "loading": "Chargement...",
-    "saving": "Enregistrement...",
-    "error": "Oups !"
-  },
-  "printButton": {
-    "idle": "Imprimer",
-    "loading": "Chargement...",
-    "printing": "Ouverture...",
-    "error": "Oups !"
+    "switchTo": "Passer à"
   },
   "difficulty": {
     "easy": "Facile",

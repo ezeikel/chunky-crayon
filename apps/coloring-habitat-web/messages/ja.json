@@ -1,47 +1,47 @@
 {
   "startOverButton": {
     "idle": "最初からやり直す",
-    "confirm": "はい、やり直します",
-    "cancel": "続けて塗る"
+    "confirm": "はい、やり直す",
+    "cancel": "塗り続ける"
   },
   "downloadPDFButton": {
     "idle": "印刷",
     "loading": "読み込み中...",
     "creating": "作成中...",
-    "error": "エラーが発生しました"
+    "error": "利用不可"
   },
   "coloringPage": {
-    "title": "塗り絵ページ",
-    "relatedPages": "その他の塗り絵ページ",
-    "defaultDescription": "Coloring Habitatの無料大人向けぬりえページ",
+    "title": "ぬりえ",
+    "relatedPages": "ほかのぬりえ",
+    "defaultDescription": "Coloring Habitatの無料大人向けぬりえ",
     "progress": {
-      "colored": "着色済み",
+      "colored": "完了",
       "percentage": "{percent}%",
       "milestones": {
-        "25": "いい調子です！",
-        "50": "半分まで来ました！",
-        "75": "もうすぐ完成です！",
-        "100": "素晴らしい！"
+        "25": "いい出だしです",
+        "50": "半分まで来ました",
+        "75": "もう少しです",
+        "100": "素晴らしいです"
       }
     },
     "sidebar": {
-      "colors": "カラー",
+      "colors": "色",
       "tools": "ツール",
       "size": "サイズ",
       "history": "履歴",
       "zoom": "ズーム",
-      "actions": "アクション"
+      "actions": "操作"
     },
     "tools": {
       "pan": "移動",
       "fill": "塗りつぶし",
       "brush": "ブラシ",
       "sticker": "ステッカー",
-      "magicReveal": "マジックリビール",
-      "magicAuto": "マジックオート",
+      "magicReveal": "マジック表示",
+      "magicAuto": "マジック自動",
       "magicBrush": "マジックブラシ",
-      "magicFill": "マジック塗りつぶし",
-      "autoColor": "自動着色",
+      "magicFill": "マジック塗り",
+      "autoColor": "自動彩色",
       "magic": "マジック"
     },
     "brushTypes": {
@@ -49,24 +49,24 @@
       "marker": "マーカー",
       "eraser": "消しゴム",
       "glitter": "グリッター",
-      "sparkle": "スパークル",
+      "sparkle": "きらめき",
       "rainbow": "レインボー",
       "glow": "グロー",
       "neon": "ネオン"
     },
     "brushSizes": {
-      "small": "細い",
+      "small": "細め",
       "medium": "標準",
-      "large": "太い"
+      "large": "太め"
     },
     "fillPatterns": {
-      "solid": "べた塗り",
-      "dots": "ドット",
+      "solid": "単色",
+      "dots": "水玉",
       "stripes": "ストライプ",
-      "diagonal": "斜線",
-      "checkerboard": "チェック",
+      "diagonal": "斜め",
+      "checkerboard": "市松",
       "hearts": "ハート",
-      "stars": "スター",
+      "stars": "星",
       "zigzag": "ジグザグ"
     },
     "actions": {
@@ -75,67 +75,67 @@
       "share": "共有",
       "print": "印刷",
       "preparing": "準備中...",
-      "doneSharing": "共有を終了",
+      "doneSharing": "共有しました",
       "colorAgain": "もう一度塗る",
-      "startOver": "最初からやり直す"
+      "startOver": "最初から"
     },
     "toolbar": {
       "expand": "ツールバーを展開",
       "collapse": "ツールバーを折りたたむ",
-      "moreTools": "その他のツール",
+      "moreTools": "他のツール",
       "less": "少なく"
     },
     "undoRedo": {
       "undo": "元に戻す",
-      "undoShortcut": "元に戻す（Ctrl+Z）",
+      "undoShortcut": "元に戻す (Ctrl+Z)",
       "redo": "やり直す",
-      "redoShortcut": "やり直す（Ctrl+Y）"
+      "redoShortcut": "やり直す (Ctrl+Y)"
     },
     "colorPalette": {
       "selectColor": "{color}色を選択",
-      "magicToolsMessage": "マジックツール使用時は色が自動で選ばれます"
+      "magicToolsMessage": "マジックツールでは色が自動で選ばれます"
     },
     "patternSelector": {
-      "label": "パターン："
+      "label": "パターン:"
     },
     "zoomControls": {
-      "zoomLevel": "ズームレベル：{level}%",
+      "zoomLevel": "ズーム: {level}%",
       "zoomOut": "縮小",
       "zoomOutAria": "縮小（全体を見る）",
       "zoomIn": "拡大",
-      "zoomInAria": "拡大（近づいて見る）",
+      "zoomInAria": "拡大（近くを見る）",
       "pan": "移動",
-      "panAria": "画像内を移動する",
-      "reset": "全体を表示",
-      "resetAria": "全体表示に戻る"
+      "panAria": "画像内を移動",
+      "reset": "全体表示",
+      "resetAria": "全体表示に戻す"
     },
     "muteToggle": {
-      "mute": "消音にする",
-      "unmute": "音声をオンにする",
-      "turnOn": "音声をオンにする",
-      "turnOff": "音声をオフにする"
+      "mute": "消音",
+      "unmute": "消音解除",
+      "turnOn": "音をオン",
+      "turnOff": "音をオフ"
     }
   },
   "homepage": {
     "hero": {
-      "title": "色を塗って、心を整える",
-      "subtitle": "精密なぬりえページを数秒で作成。オンラインで塗るも、印刷して楽しむも自由自在。毎日のクリエイティブなマインドフルネスをお届けします。",
-      "trustBadge1": "1,000以上の無料ページ",
+      "title": "塗り絵で心を整える",
+      "subtitle": "数秒で繊細な塗り絵を作成。オンラインで彩る、または自宅で印刷。毎日のクリエイティブ・マインドフルネスを。",
+      "trustBadge1": "無料で開始",
       "trustBadge2": "アカウント不要",
-      "trustBadge3": "50,000人以上が利用中",
-      "freeCreations": "毎日2作品まで無料 · アカウント不要",
-      "users": "50,000人以上のユーザー"
+      "trustBadge3": "印刷もオンラインも",
+      "freeCreations": "無料作成2回から · アカウント不要",
+      "users": "ギャラリーを見る"
     },
     "showcase": {
-      "title": "人気のぬりえページ",
-      "showAll": "すべてのページを見る",
+      "title": "人気の塗り絵",
+      "showAll": "すべて表示",
       "free": "無料",
-      "printReady": "印刷用PDF対応",
+      "printReady": "印刷用PDF",
       "addToFavorites": "お気に入りに追加",
       "removeFromFavorites": "お気に入りから削除",
       "filters": {
         "all": "すべて",
-        "mandalas": "曼荼羅",
+        "mandalas": "マンダラ",
         "nature": "自然",
         "geometric": "幾何学",
         "landscapes": "風景",
@@ -144,119 +144,150 @@
       }
     },
     "stats": {
-      "pagesCreated": "作成されたぬりえページ",
+      "pagesCreated": "作成された塗り絵",
       "dailyPages": "デイリーページ",
-      "freeLibraryPages": "無料ライブラリのページ",
+      "freeLibraryPages": "無料ライブラリ",
       "categories": "カテゴリー"
     },
     "features": {
-      "badge": "ご利用方法",
-      "title": "あなたのクリエイティブ・ウェルネスツールキット",
-      "subtitle": "研究によると、ぬりえは瞑想と同じリラクゼーション効果をもたらす神経経路を活性化します。私たちは、毎日のクリエイティブな習慣づくりを簡単にします。",
-      "stressReduction": "ストレス軽減を報告",
+      "badge": "使い方",
+      "title": "創造的ウェルネスのツールキット",
+      "subtitle": "研究では、塗り絵は瞑想と同じ鎮静系の神経回路を活性化すると示されています。日々のクリエイティブ習慣を、手間なく続けられるようにします。",
+      "stressReduction": "ストレス軽減を実感",
       "step": "ステップ {number}",
       "steps": {
         "1": {
           "title": "イメージを伝える",
-          "description": "テキストで入力、音声で話す、または写真をアップロード。あなたの想像を繊細でユニークなデザインに仕上げます。"
+          "description": "プロンプト入力、音声、または写真アップロード。想像を、唯一の繊細なデザインに仕上げます。"
         },
         "2": {
-          "title": "デジタルで塗る、または印刷する",
-          "description": "心安らぐオンラインキャンバスで塗るか、高解像度PDFをダウンロードしてお好みの色鉛筆でお楽しみください。"
+          "title": "デジタルで塗る、または印刷",
+          "description": "落ち着くオンラインキャンバスで塗るか、高解像度PDFをダウンロードしてお気に入りの色鉛筆で。"
         },
         "3": {
-          "title": "保存して共有する",
-          "description": "完成した作品をギャラリーに保存したり、コミュニティと共有したりできます。"
+          "title": "保存して共有",
+          "description": "完成作品を自分のギャラリーに保存、またはコミュニティに共有できます。"
         },
         "4": {
-          "title": "毎日の習慣にする",
-          "description": "毎朝、無料のぬりえページをお届けします。一日の始まりに5分間の穏やかな時間を。"
+          "title": "毎日の習慣に",
+          "description": "毎朝無料で1枚。1日を整える、5分の静けさを。"
         }
       }
     },
     "galleryPreview": {
-      "title": "今週の人気ページ",
-      "subtitle": "コミュニティで人気の、充実し続けるライブラリの無料ページです。",
+      "title": "今週の人気",
+      "subtitle": "増え続けるライブラリの無料ページ。コミュニティで愛されています。",
       "viewAll": "すべて見る",
       "viewAllPages": "すべてのページを見る",
-      "addToFavourites": "お気に入りに追加",
-      "removeFromFavourites": "お気に入りから削除",
       "dailyPage": "今日の塗り絵",
       "colorNow": "今すぐ塗る"
     },
     "testimonials": {
       "fromReviews": "{count}件のレビューより",
-      "pagesColored": "{count}ページ着色済み"
+      "pagesColored": "{count}ページを彩りました"
     },
     "newsletter": {
-      "badge": "毎日の無料ぬりえ",
-      "title": "毎朝、無料ページをお届け",
-      "subtitle": "12,000人以上の方が、クリエイティブで穏やかなひとときで一日をスタートしています。メールで直接お届けします。",
+      "badge": "毎日無料の塗り絵",
+      "title": "毎朝、無料で1枚",
+      "subtitle": "一日の始まりに、創造的な静けさを。毎朝、新しい塗り絵をメールでお届けします。",
       "emailPlaceholder": "your@email.com",
-      "subscribe": "登録する",
+      "subscribe": "登録",
       "subscribed": "登録済み",
-      "noSpam": "スパムは一切ありません。いつでも配信停止できます。"
+      "noSpam": "スパムは一切なし。いつでも解除できます。"
     },
     "faq": {
-      "title": "よくあるご質問",
+      "title": "よくある質問",
       "items": {
         "1": {
-          "question": "Coloring Habitatはどのように使いますか？",
-          "answer": "テキスト、音声、または写真で塗りたいものを伝えてください。約30秒で繊細で精密なぬりえページを生成します。オンラインのデジタルツールで塗るか、高解像度PDFをダウンロードして印刷してお楽しみください。"
+          "question": "Coloring Habitatの使い方は？",
+          "answer": "塗りたい内容を、テキスト・音声・写真で伝えてください。約30秒で、精緻な塗り絵を生成します。デジタルツールでオンライン着色、または高解像度PDFをダウンロードして自宅で印刷できます。"
         },
         "2": {
           "question": "本当に無料ですか？",
-          "answer": "毎日2ページまで無料で作成でき、アカウントも不要です。無料登録していただくと、1,000以上のページが揃ったライブラリへのフルアクセスと、毎朝届くぬりえページをご利用いただけます。"
+          "answer": "開始時に無料で2回作成でき、アカウントも不要です。登録（無料）すると、増え続けるライブラリを閲覧でき、毎朝新しい塗り絵がメールで届きます。"
         },
         "3": {
-          "question": "他のぬりえアプリとの違いは何ですか？",
-          "answer": "Coloring Habitatは、マインドフルなリラクゼーションを求める方のために設計されています。すべてのデザインは洗練された繊細な仕上がりで、完全に広告のない心地よい体験をお届けします。"
+          "question": "他の塗り絵アプリとの違いは？",
+          "answer": "Coloring Habitatは、マインドフルなリラックスを求める方のために設計されています。デザインは洗練されていて繊細。体験は完全広告なしで、静かに整えられます。"
         },
         "4": {
-          "question": "ぬりえページを印刷できますか？",
-          "answer": "すべてのページを高解像度PDFとしてダウンロードでき、A4用紙に最適なサイズです。色鉛筆やペン、マーカーで実際に塗る触覚的な体験を楽しまれる方も多くいらっしゃいます。"
+          "question": "塗り絵は印刷できますか？",
+          "answer": "すべてのページを高解像度PDFでダウンロードでき、A4/USレターに最適なサイズです。印刷して色鉛筆・ペン・マーカーで塗ることも、オンラインで塗ってプリンターなしで楽しむこともできます。"
         },
         "5": {
           "question": "モバイルアプリはありますか？",
-          "answer": "iOS・Android向けのネイティブアプリは近日公開予定です。現在、Webアプリはスマートフォンやタブレットでも快適にご利用いただけるレスポンシブ対応となっております。"
+          "answer": "iOS/Androidのネイティブアプリは近日公開予定です。それまでの間も、Webアプリはレスポンシブ対応で、スマホやタブレットでも快適に使えます。"
         }
       }
     },
     "cta": {
-      "title": "心の安らぎを見つけませんか？",
-      "subtitle": "ぬりえを毎日のウェルネス習慣に取り入れている多くの方々に加わりましょう。",
+      "title": "心を整える準備はできましたか？",
+      "subtitle": "塗り絵を毎日のウェルネス習慣に。必要なのは1日5分だけ。",
       "startColoring": "無料で始める",
       "viewPlans": "プランを見る",
       "getTheApp": "アプリを入手",
-      "downloadOnAppStore": "からダウンロード",
+      "downloadOnAppStore": "こちらからダウンロード：",
       "appStore": "App Store",
-      "getItOn": "で入手",
+      "getItOn": "入手先",
       "googlePlay": "Google Play"
     }
   },
   "footer": {
     "brand": "Coloring Habitat",
-    "tagline": "すべての人にマインドフルなぬりえを。作って、塗って、心の安らぎを見つけましょう。",
-    "copyright": "© {year} Coloring Habitat. 無断転載禁止。",
+    "tagline": "誰もが楽しめるマインドフルな塗り絵。創って、彩って、心を整える。",
+    "copyright": "© {year} Coloring Habitat. All rights reserved.",
     "sections": {
       "explore": "探す",
       "company": "会社情報",
       "support": "サポート",
-      "legal": "法的情報"
+      "legal": "法務"
     },
     "links": {
       "gallery": "ギャラリー",
-      "create": "作成する",
-      "categories": "カテゴリー",
+      "create": "作成",
+      "categories": "カテゴリ",
       "dailyPage": "今日のページ",
-      "about": "について",
-      "pricing": "料金プラン",
+      "about": "概要",
+      "pricing": "料金",
       "blog": "ブログ",
       "contactUs": "お問い合わせ",
-      "faq": "よくあるご質問",
-      "privacy": "プライバシーポリシー",
+      "faq": "よくある質問",
+      "privacy": "プライバシー",
       "terms": "利用規約",
       "cookies": "Cookie"
+    }
+  },
+  "blog": {
+    "title": "Coloring Habitat ブログ",
+    "subtitle": "マインドフルな塗り絵のためのウェルネス、テクニック、インスピレーション",
+    "allPosts": "すべての記事",
+    "all": "すべて",
+    "byAuthor": "著者：{author}",
+    "comingSoon": "近日公開",
+    "comingSoonDescription": "ウェルネスのための塗り絵の科学、テクニックガイド、創作のインスピレーションに関する記事を準備中です。",
+    "metaTitle": "ブログ | Coloring Habitat",
+    "metaDescription": "マインドフルな塗り絵のためのウェルネスのヒント、塗り絵テクニック、創作のインスピレーション。ストレス軽減に役立つ塗り絵の科学を紹介します。",
+    "home": "ホーム",
+    "blog": "ブログ",
+    "postNotFound": "記事が見つかりません | Coloring Habitat",
+    "minRead": "約{count}分で読めます",
+    "moreFromBlog": "ブログのその他の記事",
+    "categoryNotFound": "カテゴリが見つかりません | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Coloring Habitat ブログ",
+    "categoryDescription": "Coloring Habitat ブログの{category}記事をすべて表示します。",
+    "noCategoryPosts": "このカテゴリの記事はまだありません",
+    "checkBackSoon": "新しい記事をお楽しみに！"
+  },
+  "email": {
+    "signup": {
+      "title": "毎朝、無料ページを1枚",
+      "subtitle": "毎日、受信箱に<free>無料</free>の塗り絵ページをお届けします。",
+      "placeholder": "your@email.com",
+      "join": "登録する",
+      "success": "登録完了",
+      "successDescription": "最初の塗り絵ページは明日の朝に届きます。",
+      "error": "エラーが発生しました",
+      "errorDescription": "登録できませんでした。もう一度お試しください。"
     }
   },
   "createForm": {
@@ -266,83 +297,83 @@
       "photo": "写真"
     },
     "loading": {
-      "creating": "ぬりえページを作成中...",
-      "readyIn": "約30秒で完成します"
+      "creating": "塗り絵を作成しています…",
+      "readyIn": "約30秒で完成"
     },
     "textInput": {
-      "placeholder": "例：鯉と桜のある静かな日本庭園...",
-      "guestLimitPlaceholder": "本日の無料作成2回分を使い切りました。登録してさらに作成しましょう！",
+      "placeholder": "例：鯉と桜のある静かな日本庭園…",
+      "guestLimitPlaceholder": "本日の無料作成（2回）を使い切りました。登録して続けましょう！",
       "noCreditsSubscribed": "クレジットが不足しています。追加購入して作成を続けましょう！",
-      "noCreditsUnsubscribed": "クレジットが不足しています。プランに登録してさらに作成しましょう！",
-      "signInPlaceholder": "ログインしてぬりえページを作成しましょう",
+      "noCreditsUnsubscribed": "クレジットが不足しています。サブスクで作成回数を増やしましょう！",
+      "signInPlaceholder": "サインインして塗り絵の作成を始めましょう",
       "createPage": "ページを作成",
-      "createPageFree": "ページを作成（残り{count}回無料）",
+      "createPageFree": "ページを作成（無料残り{count}回）",
       "signUpFree": "無料で登録",
-      "signUpSubtext": "アカウントを作成してさらに作成を解放",
-      "buyCredits": "クレジットを購入",
+      "signUpSubtext": "アカウント作成でより多く作成できます",
+      "buyCredits": "クレジット購入",
       "viewPlans": "プランを見る",
-      "buyCreditsSubtext": "クレジットを追加して作成を続ける",
-      "subscribeSubtext": "無制限のクリエイティビティのために登録",
-      "getStarted": "始める",
-      "signInSubtext": "ログインして始める"
+      "buyCreditsSubtext": "クレジットを追加して作成を続けましょう",
+      "subscribeSubtext": "サブスクで創作が無制限に",
+      "getStarted": "はじめる",
+      "signInSubtext": "サインインして作成を開始"
     },
     "voiceInput": {
-      "tapToDescribe": "タップしてページを説明してください",
+      "tapToDescribe": "タップして内容を話してください",
       "maxSeconds": "最大{seconds}秒",
       "guestLimitReached": "無料作成分を使い切りました。登録して続けましょう！",
       "noCredits": "クレジットが不足しています。",
-      "signInToRecord": "ログインして録音する",
-      "listening": "聞いています...",
-      "allDone": "完了ですか？{seconds}秒後に停止します...",
+      "signInToRecord": "録音するにはサインインしてください",
+      "listening": "聞き取り中…",
+      "allDone": "以上ですか？{seconds}秒後に停止します…",
       "cancel": "キャンセル",
       "imDone": "完了",
-      "doneTalking": "話し終わりました",
-      "notSupported": "このブラウザでは音声録音がサポートされていません。",
-      "trySafari": "ChromeまたはSafariをお試しください。",
-      "tryAgain": "もう一度試す",
-      "gettingMicReady": "マイクを準備中...",
-      "understanding": "おっしゃったことを理解中...",
-      "createColoringPage": "ぬりえページを作成",
-      "notQuiteRight": "違いましたか？もう一度試す",
+      "doneTalking": "話し終わり",
+      "notSupported": "このブラウザでは音声録音に対応していません。",
+      "trySafari": "快適に使うにはChromeまたはSafariをお試しください。",
+      "tryAgain": "もう一度",
+      "gettingMicReady": "マイクを準備しています…",
+      "understanding": "内容を解析しています…",
+      "createColoringPage": "塗り絵を作成",
+      "notQuiteRight": "少し違いますか？もう一度",
       "errors": {
-        "permissionDenied": "マイクへのアクセスが拒否されました。ブラウザの設定でアクセスを許可してください。",
-        "notSupported": "このブラウザでは音声録音がサポートされていません。",
-        "transcriptionFailed": "録音を理解できませんでした。もう一度お試しください。",
+        "permissionDenied": "マイクへのアクセスが拒否されました。ブラウザの設定で許可してください。",
+        "notSupported": "このブラウザでは音声録音に対応していません。",
+        "transcriptionFailed": "録音内容を聞き取れませんでした。もう一度お試しください。",
         "recordingFailed": "録音に失敗しました。もう一度お試しください。",
         "timeout": "録音がタイムアウトしました。もう一度お試しください。"
       }
     },
     "imageInput": {
-      "takeOrUpload": "写真を撮るか画像をアップロード",
+      "takeOrUpload": "写真を撮る／画像をアップロード",
       "guestLimitReached": "無料作成分を使い切りました。登録して続けましょう！",
       "noCredits": "クレジットが不足しています。",
-      "signInToUpload": "ログインしてアップロード",
+      "signInToUpload": "アップロードするにはサインインしてください",
       "camera": "カメラ",
       "upload": "アップロード",
       "dragAndDrop": "または画像をドラッグ＆ドロップ",
       "dropHere": "ここにドロップ！",
-      "shareImage": "絵、写真、または任意の画像を共有して変換",
-      "greatPicture": "素敵な写真です！",
+      "shareImage": "絵や写真などの画像を共有して変換できます",
+      "greatPicture": "いい写真です！",
       "pickAnother": "別の画像を選ぶ",
       "useThis": "これを使う",
-      "processingPhoto": "写真を処理中...",
-      "analyzingImage": "画像を分析中...",
-      "iSee": "見えるもの：",
-      "createColoringPage": "ぬりえページを作成",
-      "notQuiteRight": "違いましたか？もう一度試す",
-      "tryAgain": "もう一度試す",
+      "processingPhoto": "写真を処理しています…",
+      "analyzingImage": "画像を解析しています…",
+      "iSee": "認識内容：",
+      "createColoringPage": "塗り絵を作成",
+      "notQuiteRight": "少し違いますか？もう一度",
+      "tryAgain": "もう一度",
       "errors": {
-        "fileTooLarge": "画像が大きすぎます。10MB以下の画像を使用してください。",
-        "invalidType": "無効な画像形式です。JPEG、PNG、WebP、またはHEICを使用してください。",
+        "fileTooLarge": "画像が大きすぎます。10MB未満の画像をご利用ください。",
+        "invalidType": "無効な画像形式です。JPEG、PNG、WebPをご利用ください。",
         "processingFailed": "画像を処理できませんでした。もう一度お試しください。",
-        "cameraFailed": "カメラが失敗しました。写真をアップロードしてみてください。",
-        "heicUnsupported": "HEIC画像は未対応です。先にJPGまたはPNGで保存してください。"
+        "cameraFailed": "カメラが使用できませんでした。代わりに写真をアップロードしてください。",
+        "heicUnsupported": "HEIC画像には対応していません。JPGまたはPNGで保存してからお試しください。"
       }
     }
   },
   "pricing": {
-    "title": "シンプルで正直な料金",
-    "subtitle": "無料で始めて、準備ができたらアップグレード。隠れた料金なし、いつでもキャンセル可能。",
+    "title": "シンプルで誠実な料金",
+    "subtitle": "無料で始めて、必要なときにアップグレード。追加料金なし、いつでも解約できます。",
     "monthly": "月額",
     "annual": "年額",
     "savePercent": "17%お得",
@@ -353,78 +384,106 @@
     "plans": {
       "bloom": {
         "name": "Bloom",
-        "description": "塗り絵の旅を始めましょう",
+        "description": "塗り絵の旅を始めよう",
         "cta": "無料で始める",
-        "features": [
-          "最初に2回無料作成",
-          "無料ライブラリへのアクセス",
-          "オンラインぬりえキャンバス",
-          "PDFダウンロード"
-        ]
+        "features": {
+          "0": "開始用に無料作成2回",
+          "1": "無料ライブラリにアクセス",
+          "2": "オンライン塗り絵キャンバス",
+          "3": "PDFダウンロード"
+        }
       },
       "grove": {
         "name": "Grove",
-        "description": "カジュアルな塗り絵愛好者向け",
-        "cta": "無料トライアル開始",
-        "features": [
-          "月300クレジット",
-          "すべての塗り絵機能",
-          "HD PDFダウンロード",
-          "ギャラリーに保存"
-        ]
+        "description": "気軽に楽しみたい方へ",
+        "cta": "無料トライアルを開始",
+        "features": {
+          "0": "300クレジット/月",
+          "1": "全塗り絵機能",
+          "2": "HD PDFダウンロード",
+          "3": "ギャラリーに保存"
+        }
       },
       "sanctuary": {
         "name": "Sanctuary",
-        "description": "定期的な塗り絵愛好者向け",
-        "cta": "無料トライアル開始",
-        "features": [
-          "月800クレジット",
-          "Groveのすべて",
-          "1ヶ月クレジット繰り越し",
-          "優先生成",
-          "毎日のメールページ",
-          "優先サポート"
-        ]
+        "description": "習慣的に楽しむ方へ",
+        "cta": "無料トライアルを開始",
+        "features": {
+          "0": "800クレジット/月",
+          "1": "Groveの全内容",
+          "2": "クレジット繰り越し1か月",
+          "3": "優先生成",
+          "4": "毎日のメールページ",
+          "5": "優先サポート"
+        }
       },
       "oasis": {
         "name": "Oasis",
-        "description": "完全なウェルネス体験",
-        "cta": "無料トライアル開始",
-        "features": [
-          "月2,000クレジット",
-          "Sanctuaryのすべて",
-          "2ヶ月クレジット繰り越し",
-          "商用利用ライセンス",
-          "限定コレクション",
-          "カスタムカラーパレット",
-          "アンビエントサウンド"
-        ]
+        "description": "心身を整えるフル体験",
+        "cta": "無料トライアルを開始",
+        "features": {
+          "0": "2,000クレジット/月",
+          "1": "Sanctuaryの全内容",
+          "2": "クレジット繰り越し2か月",
+          "3": "商用利用ライセンス",
+          "4": "限定コレクション",
+          "5": "カスタムカラーパレット",
+          "6": "アンビエント・サウンドスケープ"
+        }
       }
     },
     "faq": {
-      "title": "プランについてのご質問",
+      "title": "プランに関する質問",
       "items": {
         "cancelAnytime": {
           "question": "いつでも解約できますか？",
-          "answer": "はい。アカウント設定からいつでも解約できます。理由を聞かれることもなく、気まずさもありません。"
+          "answer": "はい。アカウント設定からいつでも解約できます。理由は不要です。"
         },
         "rollover": {
           "question": "クレジットは繰り越せますか？",
-          "answer": "Groveのクレジットは毎月リセットされます。Sanctuaryは1か月まで繰り越し可能、Oasisは2か月分の繰り越しができるので、急いで使う必要はありません。"
+          "answer": "Groveのクレジットは毎月リセットされます。Sanctuaryは最大1か月繰り越し、Oasisは2か月繰り越し可能。急いで使い切る必要はありません。"
         },
         "creditsPerPage": {
           "question": "何ページ作れますか？",
-          "answer": "1ページあたり約5クレジットです。Groveなら月に約60ページ、Sanctuaryで160ページ、Oasisで400ページ作れます。"
+          "answer": "テキストまたは写真のページは5クレジット。音声モード（作りたい塗り絵をガイド付きで会話しながら決める）では1ページ10クレジットです。目安：Grove＝テキスト/写真約60枚、音声約30枚/月。Sanctuary＝約160/約80。Oasis＝約400/約200。あなたのペースで組み合わせられます。"
         },
         "audience": {
-          "question": "Coloring Habitatは自分に合っていますか？",
-          "answer": "Coloring Habitatは、少しペースを落として穏やかな時間を過ごし、創造的なリラックスを楽しみたい方のためにデザインされています。塗り絵に癒やしを感じる方なら、きっとぴったりです。"
+          "question": "Coloring Habitatは私に合っていますか？",
+          "answer": "Coloring Habitatは、ゆっくりと心を整え、穏やかに創作を楽しみたいすべての方のために作りました。塗り絵が癒しになりそうなら、きっと合っています。"
         },
         "gettingStarted": {
-          "question": "どうやって始めればいいですか？",
-          "answer": "プランを選んで作成を始めましょう。Bloomは無料で、アカウントを作らなくても試せます。"
+          "question": "どう始めればいいですか？",
+          "answer": "プランを選んで、すぐに作成を始められます。Bloomは無料で、試すのにアカウント登録は不要です。"
         }
       }
+    }
+  },
+  "billing": {
+    "pageTitle": "お支払い",
+    "pageSubtitle": "サブスクリプションとクレジットを管理",
+    "currentPlan": "現在のプラン",
+    "currentCredits": "残り<strong>{credits}クレジット</strong>です。",
+    "renewsOn": "{date}に更新",
+    "manageSubscription": "サブスクリプション管理",
+    "noActiveSubscription": "有効なサブスクリプションがありません",
+    "noActiveSubscriptionDescription": "下のプランから選んで、Coloring Habitatを始めましょう。",
+    "availablePlans": "利用可能なプラン",
+    "mostPopular": "人気No.1",
+    "perMonth": "/月",
+    "creditsPerMonth": "{credits}クレジット/月",
+    "cancelAnytime": "いつでも解約可（縛りなし）",
+    "manageInPortal": "ポータルで管理",
+    "loading": "読み込み中...",
+    "changePlan": "プラン変更",
+    "subscribe": "登録する",
+    "viewPlans": "プランを見る",
+    "errors": {
+      "noActiveSubscription": "有効なサブスクリプションが見つかりません。",
+      "changeSubscriptionFailed": "サブスクリプションの変更に失敗しました。もう一度お試しください。",
+      "checkoutFailed": "購入手続きを開始できませんでした。もう一度お試しください。",
+      "portalFailed": "サブスクリプション管理を開けませんでした。",
+      "checkoutSessionFailed": "購入セッションの作成に失敗しました",
+      "redirectFailed": "購入手続きへ移動できませんでした"
     }
   },
   "breadcrumbs": {
@@ -433,16 +492,16 @@
   },
   "gallery": {
     "pageTitle": "塗り絵ギャラリー | Coloring Habitat",
-    "pageDescription": "リラックスとマインドフルネスのための、緻密にデザインされた塗り絵ページの充実したコレクションをご覧ください。カテゴリー、難易度、季節で絞り込めます。",
+    "pageDescription": "リラックスとマインドフルネスのための繊細な塗り絵を集めました。カテゴリ、難易度、季節で絞り込めます。",
     "heroTitle": "塗り絵ギャラリー",
-    "heroSubtitle": "リラックスとマインドフルネスのために丁寧にデザインされた塗り絵ページをご覧ください。ひと息つき、静かな時間を見つけるお手伝いをします。",
-    "browseByCategory": "カテゴリーで探す",
+    "heroSubtitle": "リラックスとマインドフルネスのための繊細な塗り絵を探す。どのデザインも、歩みをゆるめ、静かなひとときを見つけるために作られています。",
+    "browseByCategory": "カテゴリで探す",
     "browseByDifficulty": "難易度で探す",
-    "browseByHolidays": "季節と行事",
+    "browseByHolidays": "季節・行事",
     "dailyPage": "今日の塗り絵",
-    "viewAllDaily": "デイリーページをすべて見る",
-    "communityCreations": "おすすめのページ",
-    "viewAllCommunity": "おすすめをすべて見る",
+    "viewAllDaily": "毎日のページをすべて見る",
+    "communityCreations": "注目のページ",
+    "viewAllCommunity": "注目をすべて見る",
     "startColoring": "このページを塗る",
     "stats": {
       "totalPages": "ライブラリのページ数",
@@ -457,36 +516,36 @@
       "beginner": {
         "title": "初級",
         "shortLabel": "かんたん",
-        "description": "やさしいパターンで、短いリラックスタイムにぴったり"
+        "description": "やさしい模様で、短いひとときの落ち着きに"
       },
       "intermediate": {
         "title": "中級",
-        "shortLabel": "ちゅう",
-        "description": "少し細かい部分もあり、じっくり落ち着きたいときに"
+        "shortLabel": "ふつう",
+        "description": "ほどよい細かさで、じっくり整える時間に"
       },
       "advanced": {
         "title": "上級",
         "shortLabel": "むずかしい",
-        "description": "細部まで描き込まれた、集中して向き合いたいデザイン"
+        "description": "ゆっくり向き合うほど味わい深い緻密さ"
       },
       "expert": {
-        "title": "エキスパート",
-        "shortLabel": "エキスパート",
-        "description": "瞑想のように深く没入できる、とても緻密な作品"
+        "title": "達人",
+        "shortLabel": "達人",
+        "description": "深い没入へ誘う、極めて繊細な作品"
       }
     },
     "categories": {
       "mandalas": {
-        "name": "マンダラ",
-        "description": "静かに集中できる対称的なパターン"
+        "name": "曼荼羅",
+        "description": "静かな集中へ導く対称模様"
       },
       "nature": {
         "name": "自然",
-        "description": "植物や自然の美しい風景"
+        "description": "植物や自然の美しさ"
       },
       "geometric": {
         "name": "幾何学",
-        "description": "緻密なパターンとテッセレーション"
+        "description": "精緻なパターンと反復模様"
       },
       "landscapes": {
         "name": "風景",
@@ -494,19 +553,19 @@
       },
       "fantasy": {
         "name": "ファンタジー",
-        "description": "神話の生き物と魔法の世界"
+        "description": "神秘の生き物と魔法の世界"
       },
       "animals": {
         "name": "動物",
-        "description": "緻密に描かれた動物たち"
+        "description": "緻密に描かれた野生動物"
       },
       "architecture": {
         "name": "建築",
-        "description": "建物、大聖堂、歴史的な場所"
+        "description": "建物、大聖堂、歴史的な空間"
       },
       "abstract": {
         "name": "抽象",
-        "description": "自由な発想で表現を楽しめるデザイン"
+        "description": "自由な発想で楽しむデザイン"
       },
       "flowers": {
         "name": "花",
@@ -518,7 +577,7 @@
       },
       "patterns": {
         "name": "パターン",
-        "description": "瞑想のように塗れる繰り返しのモチーフ"
+        "description": "瞑想的に塗れる反復モチーフ"
       },
       "wildlife": {
         "name": "野生動物",
@@ -526,19 +585,19 @@
       },
       "mythology": {
         "name": "神話",
-        "description": "古代の神話と伝説の人物"
+        "description": "古代神話と伝説の人物"
       },
       "steampunk": {
         "name": "スチームパンク",
-        "description": "ヴィクトリア朝の機械と不思議な装置"
+        "description": "ヴィクトリア調の機械と不思議な装置"
       },
       "food": {
         "name": "食べ物",
-        "description": "料理と食卓の風景"
+        "description": "ごちそうと食のシーン"
       }
     },
     "holidays": {
-      "title": "季節と行事",
+      "title": "季節・行事",
       "christmas": "クリスマス",
       "halloween": "ハロウィン",
       "easter": "イースター",
@@ -549,90 +608,29 @@
       "autumn": "秋"
     },
     "seo": {
-      "aboutTitle": "静かに塗り絵を楽しむ場所",
-      "aboutParagraph1": "Coloring Habitatは、少し立ち止まり、心を落ち着け、創作の時間を取り戻したい大人のために作られた、緻密な塗り絵ページのライブラリです。ひとつひとつのページは、5分でも、静かな午後の時間でも、集中して楽しんでいただけるように作られています。",
-      "aboutParagraph2": "毎日、新しい塗り絵ページを作成しています。デイリーメールを購読すれば、毎朝新しいデザインが受信箱に届きます。いつでもライブラリ全体をご覧いただけます。デジタルキャンバスでオンラインで塗ることも、高解像度PDFをダウンロードして印刷し、手で塗ることもできます。",
-      "aboutParagraph3": "アートセラピーの研究では、短時間の塗り絵でもコルチゾール値を下げ、忙しい思考を静め、瞑想と同じ脳の領域を活性化できることが示されています。Coloring Habitatは、そうした実践に気軽に戻って来られるように作られています — 穏やかな心のための、ちいさな日々の習慣です。"
+      "aboutTitle": "静かに塗れる場所",
+      "aboutParagraph1": "Coloring Habitat は、ゆっくりと落ち着きを取り戻し、創作の時間へつながり直したい大人のための、繊細な塗り絵ライブラリです。5分でも、静かな午後でも。どのページも自然に集中へ招くよう丁寧に作られています。",
+      "aboutParagraph2": "新しい塗り絵は毎日生成されます。デイリーメールに登録すれば、毎朝受信箱に新作が届きます。もちろん、いつでも全ライブラリを閲覧できます。デジタルキャンバスでオンライン着色することも、高解像度PDFをダウンロードして印刷し、手で塗ることもできます。",
+      "aboutParagraph3": "アートセラピーの研究では、短い塗り絵の時間でもコルチゾールを抑え、思考の高ぶりを鎮め、瞑想と同じ脳領域を活性化する可能性が示されています。Coloring Habitat は、その習慣に気軽に戻れるよう設計されています。心を整えるための、小さな毎日の儀式として。"
     }
   },
   "accountSettings": {
     "account": "アカウント",
-    "accountDetails": "アカウントの詳細",
-    "email": "メール",
+    "accountDetails": "アカウント詳細",
+    "email": "メールアドレス",
     "name": "名前",
-    "noEmail": "メールが設定されていません",
+    "noEmail": "未設定",
     "galleryPreferences": "ギャラリー設定",
-    "galleryControl": "ギャラリー体験を管理",
+    "galleryControl": "ギャラリー表示を管理",
     "showCommunityArtwork": "コミュニティ作品を表示",
-    "showCommunityDescription": "ギャラリーで他のメンバーが共有した作品を表示",
-    "communityEnabled": "コミュニティギャラリー画像を有効化",
-    "communityDisabled": "コミュニティギャラリー画像を無効化"
-  },
-  "blog": {
-    "title": "Coloring Habitat ブログ",
-    "subtitle": "マインドフルな塗り絵のウェルネス、テクニック、インスピレーション",
-    "allPosts": "すべての記事",
-    "all": "すべて",
-    "byAuthor": "著者：{author}",
-    "comingSoon": "近日公開",
-    "comingSoonDescription": "塗り絵がもたらすウェルネス効果、テクニックガイド、クリエイティブなインスピレーションに関する記事を準備中です。",
-    "metaTitle": "ブログ | Coloring Habitat",
-    "metaDescription": "マインドフルな塗り絵のためのウェルネスのヒント、塗り絵のテクニック、クリエイティブなインスピレーション。塗り絵がストレス解消に役立つ科学的根拠をご紹介。",
-    "home": "ホーム",
-    "blog": "ブログ",
-    "postNotFound": "記事が見つかりません | Coloring Habitat",
-    "minRead": "約{count}分で読めます",
-    "moreFromBlog": "ブログの他の記事",
-    "categoryNotFound": "カテゴリーが見つかりません | Coloring Habitat",
-    "categoryMetaTitle": "{category} | Coloring Habitat ブログ",
-    "categoryDescription": "Coloring Habitat ブログの {category} 関連記事をすべてご覧ください。",
-    "noCategoryPosts": "このカテゴリーにはまだ記事がありません",
-    "checkBackSoon": "新しい記事をお楽しみに！"
-  },
-  "billing": {
-    "pageTitle": "請求",
-    "pageSubtitle": "サブスクリプションとクレジットを管理",
-    "currentPlan": "現在のプラン",
-    "currentCredits": "<strong>{credits} クレジット</strong>残っています。",
-    "renewsOn": "{date}に更新",
-    "manageSubscription": "サブスクリプション管理",
-    "noActiveSubscription": "有効なサブスクリプションはありません",
-    "noActiveSubscriptionDescription": "下のプランから選んでColoring Habitatを始めましょう。",
-    "availablePlans": "利用可能なプラン",
-    "mostPopular": "人気No.1",
-    "perMonth": "/月",
-    "creditsPerMonth": "{credits} クレジット/月",
-    "cancelAnytime": "いつでも解約可能（契約縛りなし）",
-    "manageInPortal": "請求ポータルで管理",
-    "loading": "読み込み中...",
-    "changePlan": "プラン変更",
-    "subscribe": "申し込む",
-    "viewPlans": "プランを見る",
-    "errors": {
-      "noActiveSubscription": "有効なサブスクリプションが見つかりません。",
-      "changeSubscriptionFailed": "サブスクリプションの変更に失敗しました。もう一度お試しください。",
-      "checkoutFailed": "決済の開始に失敗しました。もう一度お試しください。",
-      "portalFailed": "サブスクリプション管理を開けませんでした。",
-      "checkoutSessionFailed": "決済セッションの作成に失敗しました",
-      "redirectFailed": "決済画面への遷移に失敗しました"
-    }
-  },
-  "email": {
-    "signup": {
-      "title": "毎朝、無料の1枚を",
-      "subtitle": "毎日、受信箱に<free>無料</free>の塗り絵をお届けします。",
-      "placeholder": "your@email.com",
-      "join": "登録する",
-      "success": "登録完了",
-      "successDescription": "最初の塗り絵は明日の朝に届きます。",
-      "error": "問題が発生しました",
-      "errorDescription": "リストに追加できませんでした。もう一度お試しください。"
-    }
+    "showCommunityDescription": "他のメンバーが共有した作品をギャラリーに表示します",
+    "communityEnabled": "コミュニティ作品の表示：オン",
+    "communityDisabled": "コミュニティ作品の表示：オフ"
   },
   "og": {
     "homepage": {
-      "tagline": "大人のぬり絵を、必要なときに。",
-      "alt": "Coloring Habitat — 大人のぬり絵を、必要なときに。"
+      "tagline": "大人の塗り絵を、オンデマンドで。",
+      "alt": "Coloring Habitat — 大人の塗り絵を、オンデマンドで。"
     }
   }
 }

@@ -1,8 +1,8 @@
 {
   "common": {
-    "loading": "Lädt...",
+    "loading": "Wird geladen...",
     "error": "Etwas ist schiefgelaufen",
-    "retry": "Nochmal versuchen",
+    "retry": "Erneut versuchen",
     "save": "Speichern",
     "cancel": "Abbrechen",
     "close": "Schließen",
@@ -16,11 +16,12 @@
   "navigation": {
     "home": "Start",
     "gallery": "Galerie",
+    "tools": "Gratis-Tools",
     "myArtwork": "Meine Kunstwerke",
-    "challenges": "Challenges",
+    "challenges": "Herausforderungen",
     "blog": "Blog",
     "pricing": "Preise",
-    "support": "Hilfe",
+    "support": "Support",
     "signIn": "Anmelden",
     "signOut": "Abmelden",
     "billing": "Abrechnung",
@@ -28,29 +29,29 @@
     "stickerBook": "Stickerbuch",
     "account": "Konto",
     "menu": "Menü",
-    "currentlyActive": "Gerade aktiv",
+    "currentlyActive": "Aktiv",
     "switchTo": "Wechseln zu",
     "selectProfile": "Profil auswählen",
     "manageProfiles": "Profile verwalten",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "navigationMenu": "Navigationsmenü",
-    "backToGallery": "Zurück zur Galerie",
-    "tools": "Kostenlose Tools"
+    "backToGallery": "Zurück zur Galerie"
   },
   "coloringPage": {
-    "title": "Ausmalbild",
-    "defaultDescription": "Kostenloses druckbares Ausmalbild",
+    "title": "Malvorlage",
+    "relatedPages": "Weitere Malvorlagen",
+    "defaultDescription": "Kostenlose druckbare Malvorlage von Chunky Crayon",
     "progress": {
       "colored": "ausgemalt",
       "percentage": "{percent}%",
+      "allDone": "Fertig!",
       "milestones": {
-        "25": "Guter Anfang!",
-        "50": "Hälfte geschafft!",
+        "25": "Toller Start!",
+        "50": "Halbzeit!",
         "75": "Fast fertig!",
-        "100": "Toll gemacht!"
-      },
-      "allDone": "Alles fertig!"
+        "100": "Fantastisch!"
+      }
     },
     "sidebar": {
       "colors": "Farben",
@@ -65,36 +66,36 @@
       "fill": "Füllen",
       "brush": "Pinsel",
       "sticker": "Sticker",
-      "magicReveal": "Magisch enthüllen",
-      "magicAuto": "Magie-Auto",
-      "magicBrush": "Magie-Pinsel",
-      "magicFill": "Magie-Füllen",
-      "autoColor": "Auto ausmalen",
+      "magicReveal": "Magisch aufdecken",
+      "magicAuto": "Magisch automatisch",
+      "magicBrush": "Magischer Pinsel",
+      "magicFill": "Magisch füllen",
+      "autoColor": "Automatisch färben",
       "magic": "Magie"
     },
     "brushTypes": {
       "crayon": "Wachsmalstift",
       "marker": "Filzstift",
-      "eraser": "Radiergummi",
+      "pencil": "Bleistift",
+      "paintbrush": "Pinsel",
+      "eraser": "Radierer",
       "glitter": "Glitzer",
       "sparkle": "Funkeln",
       "rainbow": "Regenbogen",
-      "glow": "Glühen",
-      "neon": "Neon",
-      "pencil": "Bleistift",
-      "paintbrush": "Pinsel"
+      "glow": "Leuchten",
+      "neon": "Neon"
     },
     "brushSizes": {
       "small": "Fein",
       "medium": "Normal",
-      "large": "Breit"
+      "large": "Dick"
     },
     "fillPatterns": {
       "solid": "Einfarbig",
-      "dots": "Tupfen",
+      "dots": "Punkte",
       "stripes": "Streifen",
       "diagonal": "Diagonal",
-      "checkerboard": "Karo",
+      "checkerboard": "Schachbrett",
       "hearts": "Herzen",
       "stars": "Sterne",
       "zigzag": "Zickzack"
@@ -105,13 +106,13 @@
       "share": "Teilen",
       "print": "Drucken",
       "preparing": "Wird vorbereitet...",
-      "doneSharing": "Teilen beendet",
-      "colorAgain": "Nochmal ausmalen",
+      "doneSharing": "Teilen abgeschlossen",
+      "colorAgain": "Nochmals ausmalen",
       "startOver": "Neu starten"
     },
     "toolbar": {
-      "expand": "Werkzeugleiste öffnen",
-      "collapse": "Werkzeugleiste schließen",
+      "expand": "Werkzeugleiste ausklappen",
+      "collapse": "Werkzeugleiste einklappen",
       "moreTools": "Mehr Werkzeuge",
       "less": "Weniger"
     },
@@ -123,7 +124,7 @@
     },
     "colorPalette": {
       "selectColor": "Farbe {color} auswählen",
-      "magicToolsMessage": "Mit Magie-Werkzeugen werden Farben automatisch gewählt"
+      "magicToolsMessage": "Bei Magie-Werkzeugen werden die Farben automatisch gewählt"
     },
     "patternSelector": {
       "label": "Muster:"
@@ -133,31 +134,30 @@
       "zoomOut": "Verkleinern",
       "zoomOutAria": "Verkleinern (mehr sehen)",
       "zoomIn": "Vergrößern",
-      "zoomInAria": "Vergrößern (näher dran)",
-      "pan": "Bewegen",
+      "zoomInAria": "Vergrößern (näher ansehen)",
+      "pan": "Verschieben",
       "panAria": "Im Bild bewegen",
-      "reset": "Ganzes Bild sehen",
-      "resetAria": "Zurück zur Gesamtansicht"
+      "reset": "Ganzes Bild anzeigen",
+      "resetAria": "Zur Vollansicht zurückkehren"
     },
     "muteToggle": {
-      "mute": "Töne stummschalten",
-      "unmute": "Töne aktivieren",
-      "turnOn": "Töne einschalten",
-      "turnOff": "Töne ausschalten"
-    },
-    "relatedPages": "Mehr Ausmalbilder"
+      "mute": "Sounds stummschalten",
+      "unmute": "Stummschaltung aufheben",
+      "turnOn": "Sounds einschalten",
+      "turnOff": "Sounds ausschalten"
+    }
   },
   "shareModal": {
     "title": "Kunstwerk teilen",
-    "privacyNote": "Jede Person mit diesem Link kann dieses Kunstwerk sehen. Es werden keine persönlichen Daten geteilt.",
+    "privacyNote": "Jeder mit diesem Link kann dieses Kunstwerk ansehen. Es werden keine persönlichen Daten geteilt.",
     "expiresIn": "Link läuft ab in:",
     "expiration": {
       "7days": "7 Tage",
       "30days": "30 Tage",
       "never": "Läuft nie ab"
     },
-    "createLink": "Teilen-Link erstellen",
-    "creating": "Teilen-Link wird erstellt...",
+    "createLink": "Freigabelink erstellen",
+    "creating": "Freigabelink wird erstellt...",
     "success": {
       "title": "Link erstellt!",
       "subtitle": "Teile diesen Link mit Familie und Freunden"
@@ -168,18 +168,37 @@
   },
   "saveToGallery": {
     "idle": "In Galerie speichern",
-    "saving": "Speichert...",
+    "saving": "Wird gespeichert...",
     "saved": "Gespeichert!",
-    "tryAgain": "Nochmal versuchen",
+    "tryAgain": "Erneut versuchen",
     "errors": {
-      "captureArtwork": "Dein Bild konnte nicht gespeichert werden",
-      "generic": "Oh nein! Etwas ist schiefgelaufen. Bitte versuch es nochmal."
+      "captureArtwork": "Dein Bild konnte nicht erfasst werden",
+      "generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
     }
   },
   "shareButton": {
     "idle": "Teilen",
     "preparing": "Wird vorbereitet...",
-    "doneSharing": "Geteilt!"
+    "doneSharing": "Teilen abgeschlossen"
+  },
+  "startOverButton": {
+    "idle": "Von vorn anfangen",
+    "confirm": "Ja, von vorn anfangen",
+    "cancel": "Weiter ausmalen",
+    "modalTitle": "Von vorn anfangen?",
+    "modalBody": "Dadurch wird deine gesamte Ausmalung gelöscht. Bist du sicher?"
+  },
+  "saveButton": {
+    "idle": "Speichern",
+    "loading": "Wird geladen...",
+    "saving": "Wird gespeichert...",
+    "error": "Hoppla!"
+  },
+  "printButton": {
+    "idle": "Drucken",
+    "loading": "Wird geladen...",
+    "printing": "Wird geöffnet...",
+    "error": "Hoppla!"
   },
   "colors": {
     "primary": {
@@ -190,14 +209,14 @@
       "skyBlue": "Himmelblau",
       "grapePurple": "Traubenlila",
       "bubblegumPink": "Kaugummipink",
-      "chocolateBrown": "Schokobraun"
+      "chocolateBrown": "Schokoladenbraun"
     },
     "secondary": {
       "coral": "Koralle",
-      "mint": "Minze",
+      "mint": "Mint",
       "lavender": "Lavendel",
       "peach": "Pfirsich",
-      "navy": "Navyblau",
+      "navy": "Marineblau",
       "forest": "Waldgrün",
       "gold": "Gold",
       "rose": "Rosa"
@@ -221,87 +240,87 @@
     "title": "Kunstwerk teilen",
     "linkCreated": "Link erstellt!",
     "sharePrompt": "Teile diesen Link mit Familie und Freunden",
-    "privacyNotice": "Jeder mit diesem Link kann das Kunstwerk ansehen. Es werden keine persönlichen Daten geteilt.",
+    "privacyNotice": "Jeder mit diesem Link kann dieses Kunstwerk ansehen. Es werden keine persönlichen Daten geteilt.",
     "expiresIn": "Link läuft ab in:",
     "expiration": {
       "7days": "7 Tage",
       "30days": "30 Tage",
       "never": "Läuft nie ab"
     },
-    "createLink": "Teilen-Link erstellen",
-    "creating": "Teilen-Link wird erstellt...",
+    "createLink": "Freigabelink erstellen",
+    "creating": "Freigabelink wird erstellt...",
     "close": "Schließen",
     "copy": "Kopieren",
     "copied": "Kopiert!",
     "done": "Fertig",
-    "error": "Teilen-Link konnte nicht erstellt werden"
+    "error": "Freigabelink konnte nicht erstellt werden"
   },
   "account": {
     "profiles": "Profile",
-    "billing": "Zahlung",
+    "billing": "Abrechnung",
     "settings": "Einstellungen",
     "myArtwork": "Meine Kunstwerke"
   },
   "settings": {
     "pageTitle": "Einstellungen",
-    "pageSubtitle": "Verwalte deine Kontoeinstellungen",
+    "pageSubtitle": "Kontoeinstellungen verwalten",
     "parentalControls": {
       "title": "Kindersicherung",
-      "description": "Lege fest, welche Inhalte in der App angezeigt werden"
+      "description": "Bestimmen, welche Inhalte in der App sichtbar sind"
     },
     "communityImages": {
       "label": "Community-Bilder anzeigen",
-      "description": "Wenn aktiviert, siehst du in der Galerie Ausmalbilder von anderen Nutzer*innen. Wenn deaktiviert, werden nur deine eigenen Werke gezeigt.",
+      "description": "Wenn aktiviert, siehst du in der Galerie Ausmalbilder von anderen Nutzer:innen. Wenn deaktiviert, werden nur deine eigenen Werke angezeigt.",
       "enabled": "Community-Bilder aktiviert",
       "disabled": "Community-Bilder deaktiviert"
     },
     "languagePreference": {
       "title": "Sprache",
-      "description": "Wähle deine Sprache für die App"
+      "description": "Bevorzugte Sprache für die App wählen"
     },
     "audio": {
       "title": "Audio",
-      "description": "Steuer die Soundeffekte und Hintergrundmusik",
+      "description": "Soundeffekte und Hintergrundmusik steuern",
       "sfx": {
         "label": "Soundeffekte",
-        "description": "Pinselgeräusche, Tippen und andere Malgeräusche"
+        "description": "Pinselstriche, Tippgeräusche und andere Sounds"
       },
       "ambient": {
         "label": "Hintergrundmusik",
-        "description": "Entspannende Klänge beim Malen"
+        "description": "Entspannende Klänge beim Ausmalen"
       }
     },
     "communityGalleryEnabled": "Community-Galeriebilder aktiviert",
     "communityGalleryDisabled": "Community-Galeriebilder deaktiviert",
-    "noEmail": "Keine E-Mail festgelegt"
+    "noEmail": "Keine E-Mail hinterlegt"
   },
   "email": {
     "signup": {
-      "title": "Gratis Malspaß täglich!",
-      "subtitle": "Hol dir jeden Tag eine <free>kostenlose</free> Malvorlage in dein Postfach.",
-      "placeholder": "parent@example.com",
-      "join": "Mitmachen",
-      "success": "Geschafft!",
-      "successDescription": "Du bist jetzt in der E-Mail-Liste!",
+      "title": "Gratis Malbild täglich!",
+      "subtitle": "Erhalte jeden Tag eine <free>kostenlose</free> Malvorlage in deinem Posteingang.",
+      "placeholder": "elternteil@beispiel.de",
+      "join": "Anmelden",
+      "success": "Erfolgreich!",
+      "successDescription": "Du hast dich erfolgreich für die E-Mail-Liste angemeldet!",
       "error": "Etwas ist schiefgelaufen",
-      "errorDescription": "Anmeldung zur E-Mail-Liste fehlgeschlagen. Bitte versuch es noch mal."
+      "errorDescription": "Anmeldung für die E-Mail-Liste fehlgeschlagen. Bitte versuche es erneut."
     },
     "unsubscribe": {
       "success": "Abgemeldet",
-      "successDescription": "Du wurdest aus unserer Mailingliste entfernt. Schade, dass du gehst!",
+      "successDescription": "Du wurdest von unserer Mailingliste entfernt. Schade, dass du gehst!",
       "invalid": "Ungültiger Link",
       "invalidDescription": "Dieser Abmeldelink ist ungültig oder abgelaufen."
     }
   },
   "billing": {
-    "pageTitle": "Deine Abrechnung & dein Abo",
-    "pageSubtitle": "Verwalte dein Abo und kaufe zusätzliche Credits, um weiter Ausmalbilder zu erstellen.",
+    "pageTitle": "Abrechnung & Abo",
+    "pageSubtitle": "Verwalte dein Abo und kaufe zusätzliche Credits, um weiter tolle Ausmalbilder zu erstellen.",
     "currentPlan": "Aktueller Plan",
     "currentCredits": "Aktuelle Credits: {count}",
     "renewsOn": "Dein Abo verlängert sich am {date}",
     "manageSubscription": "Abo verwalten",
     "noActiveSubscription": "Kein aktives Abo",
-    "noSubscriptionDescription": "Wählen Sie einen Plan, um großartige Ausmalbilder zu erstellen.",
+    "noSubscriptionDescription": "Wähle einen Plan, um tolle Ausmalbilder zu erstellen.",
     "viewPlans": "Pläne ansehen",
     "buyMoreCredits": "Mehr Credits kaufen",
     "credits": "{count} Credits",
@@ -309,94 +328,94 @@
     "loading": "Wird geladen...",
     "availablePlans": "Verfügbare Pläne",
     "changePlan": "Plan wechseln",
+    "subscribe": "Abonnieren",
     "currentPlanBadge": "Aktueller Plan",
-    "manageInPortal": "Verwalten Sie Ihr Abo im Kundenportal",
+    "manageInPortal": "Verwalte dein Abo im Kundenportal",
     "noCommitment": "Keine Bindung. Jederzeit kündbar.",
     "perMonth": "/Monat",
-    "noSubscriptionForCredits": "Für den Credit-Kauf ist ein aktives Abo nötig",
+    "noSubscriptionForCredits": "Aktives Abo erforderlich, um Credits zu kaufen",
     "noSubscriptionFound": "Kein aktives Abo gefunden",
     "failedToChangeSubscription": "Abo konnte nicht geändert werden",
     "failedToCheckout": "Weiterleitung zur Kasse fehlgeschlagen",
     "failedToPurchaseCredits": "Credits konnten nicht gekauft werden",
-    "failedToOpenPortal": "Kundenportal konnte nicht geöffnet werden",
-    "subscribe": "Abonnieren"
+    "failedToOpenPortal": "Kundenportal konnte nicht geöffnet werden"
   },
   "auth": {
     "signIn": "Anmelden",
     "signUp": "Registrieren",
     "signOut": "Abmelden",
-    "continueWithGoogle": "Weiter mit Google",
-    "continueWithApple": "Weiter mit Apple",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "continueWithApple": "Mit Apple fortfahren",
     "signInWithEmail": "Mit E-Mail anmelden",
     "sendingLink": "Link wird gesendet...",
     "chooseMethod": "Wähle deine bevorzugte Anmeldemethode",
-    "orContinueWith": "Oder weiter mit",
-    "emailPlaceholder": "name@example.com",
-    "termsAgreement": "Durch Fortfahren stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
+    "orContinueWith": "Oder fortfahren mit",
+    "emailPlaceholder": "name@beispiel.de",
+    "termsAgreement": "Wenn du fortfährst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
     "verifyRequest": {
-      "title": "Schau in deine E-Mails!",
-      "description": "Wir haben dir einen Anmelde-Link geschickt. Klicke auf den Link in deiner E-Mail, um weiterzumachen.",
-      "checkSpam": "Nicht zu sehen? Schau in deinen Spam-Ordner.",
+      "title": "E-Mail prüfen!",
+      "description": "Wir haben dir einen magischen Link zum Anmelden gesendet. Klicke auf den Link in deiner E-Mail, um fortzufahren.",
+      "checkSpam": "Nicht zu sehen? Prüfe deinen Spam-Ordner.",
       "linkExpiry": "Der Link läuft in 24 Stunden ab.",
       "tryDifferentEmail": "Andere E-Mail verwenden"
     },
     "error": {
       "title": "Etwas ist schiefgelaufen",
-      "tryAgain": "Bitte versuche die Anmeldung erneut. Wenn das Problem bleibt, kontaktiere den Support.",
+      "tryAgain": "Bitte versuche, dich erneut anzumelden. Wenn das Problem weiterhin besteht, kontaktiere den Support.",
       "backToSignIn": "Zurück zur Anmeldung",
       "goHome": "Zur Startseite"
     },
     "errors": {
-      "configuration": "Es gibt ein Problem mit der Server-Konfiguration. Bitte versuche es später noch einmal.",
+      "configuration": "Es gibt ein Problem mit der Serverkonfiguration. Bitte versuche es später erneut.",
       "accessDenied": "Zugriff verweigert. Du hast keine Berechtigung, dich anzumelden.",
-      "verification": "Der Anmeldelink ist abgelaufen oder wurde schon benutzt. Bitte fordere einen neuen an.",
-      "oauth": "Es gab ein Problem beim Anmelden mit deinem Konto. Bitte versuche es noch einmal.",
-      "email": "Beim Senden der Anmelde-E-Mail ist etwas schiefgelaufen. Bitte versuche es noch einmal.",
-      "credentials": "Ungültige Zugangsdaten. Bitte prüfe deine E-Mail und versuche es erneut.",
+      "verification": "Der Anmeldelink ist abgelaufen oder wurde bereits verwendet. Bitte fordere einen neuen an.",
+      "oauth": "Beim Anmelden mit deinem Konto ist ein Problem aufgetreten. Bitte versuche es erneut.",
+      "email": "Beim Senden der Anmelde-E-Mail ist ein Problem aufgetreten. Bitte versuche es erneut.",
+      "credentials": "Ungültige Anmeldedaten. Bitte prüfe deine E-Mail und versuche es erneut.",
       "sessionRequired": "Bitte melde dich an, um auf diese Seite zuzugreifen.",
-      "default": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es noch einmal."
+      "default": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
     }
   },
   "errors": {
-    "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "notFound": "Seite nicht gefunden",
     "sharedArtworkNotFound": {
-      "title": "Kunstwerk nicht gefunden",
-      "description": "Dieser geteilte Link ist vielleicht abgelaufen oder wurde entfernt. Bitte die Künstlerin oder den Künstler um einen neuen Link!",
+      "title": "Bild nicht gefunden",
+      "description": "Dieser geteilte Bild-Link ist möglicherweise abgelaufen oder wurde entfernt. Bitte den Künstler um einen neuen Link!",
       "cta": "Malvorlagen entdecken"
     },
-    "unauthorized": "Bitte melde dich an, um weiterzumachen",
+    "unauthorized": "Bitte melde dich an, um fortzufahren",
     "stripeLoadFailed": "Stripe konnte nicht geladen werden",
     "checkoutFailed": "Checkout-Sitzung konnte nicht erstellt werden",
-    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
     "redirectFailed": "Weiterleitung zum Checkout fehlgeschlagen"
   },
   "breadcrumbs": {
-    "home": "Start",
+    "home": "Startseite",
     "gallery": "Galerie",
+    "daily": "Tägliche Malvorlagen",
+    "community": "Community-Malvorlagen",
     "forToddlers": "Für Kleinkinder",
     "forKids": "Für Kinder",
     "forTeens": "Für Teenager",
     "forAdults": "Für Erwachsene",
-    "ariaLabel": "Brotkrümelnavigation",
-    "daily": "Tägliche Ausmalbilder",
-    "community": "Community-Ausmalbilder",
-    "holidays": "Feiertage & Jahreszeiten"
+    "holidays": "Feiertage & Jahreszeiten",
+    "ariaLabel": "Breadcrumb-Navigation"
   },
   "jumpToNav": {
     "jumpToSection": "Zum Abschnitt springen",
-    "backToTop": "Zurück nach oben"
+    "backToTop": "Nach oben"
   },
   "time": {
     "today": "Heute",
     "yesterday": "Gestern",
-    "daysAgo": "vor {count} Tagen",
+    "daysAgo": "Vor {count} Tagen",
     "lastWeek": "Letzte Woche",
-    "weeksAgo": "vor {count} Wochen",
-    "monthsAgo": "vor {count} Monaten",
+    "weeksAgo": "Vor {count} Wochen",
+    "monthsAgo": "Vor {count} Monaten",
     "justNow": "Gerade eben",
-    "minutesAgo": "vor {count} Minuten",
-    "hoursAgo": "vor {count} Stunden"
+    "minutesAgo": "Vor {count} Minuten",
+    "hoursAgo": "Vor {count} Stunden"
   },
   "language": {
     "switchLanguage": "Sprache wechseln",
@@ -405,25 +424,6 @@
     "language": "Sprache",
     "switchTo": "Wechseln zu"
   },
-  "startOverButton": {
-    "idle": "Neu anfangen",
-    "confirm": "Ja, neu anfangen",
-    "cancel": "Weiter ausmalen",
-    "modalTitle": "Neu anfangen?",
-    "modalBody": "Dein ganzes Bild wird gelöscht. Bist du sicher?"
-  },
-  "saveButton": {
-    "idle": "Speichern",
-    "loading": "Lädt...",
-    "saving": "Wird gespeichert...",
-    "error": "Ups!"
-  },
-  "printButton": {
-    "idle": "Drucken",
-    "loading": "Lädt...",
-    "printing": "Wird geöffnet...",
-    "error": "Ups!"
-  },
   "difficulty": {
     "easy": "Einfach",
     "medium": "Mittel",
@@ -431,6 +431,6 @@
   },
   "gallery": {
     "categoryNotFound": "Kategorie nicht gefunden",
-    "difficultyNotFound": "Schwierigkeit nicht gefunden"
+    "difficultyNotFound": "Schwierigkeitsgrad nicht gefunden"
   }
 }

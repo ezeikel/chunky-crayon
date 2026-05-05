@@ -1,36 +1,36 @@
 {
   "coloLoading": {
-    "title": "¡Creando tu página!",
-    "titleSpeaking": "¡Qué emoción!",
-    "coloSpeaking": "¡Colo está hablando! ¡Escucha!",
+    "title": "¡Dibujando tu página...!",
+    "titleSpeaking": "Colo tiene algo que decir",
+    "coloSpeaking": "¡Escucha, Colo está hablando!",
     "audioStates": {
-      "idle": "Preparándose...",
-      "preparing": "¡Colo se está despertando!",
-      "done": "Dibujando tu imagen..."
+      "idle": "Preparando todo...",
+      "preparing": "¡Colo se está preparando...!",
+      "done": "Dibujando tu dibujo..."
     },
     "messages": {
-      "sharpeningCrayons": "Sacando punta a los crayones...",
-      "mixingColors": "Mezclando colores...",
-      "drawingLines": "Dibujando líneas...",
-      "addingSparkles": "Agregando brillitos mágicos...",
-      "almostThere": "Casi listo...",
-      "creatingMasterpiece": "Creando tu obra maestra...",
-      "wavingWand": "Agitando mi varita...",
-      "coloringOutsideLines": "Coloreando fuera de las líneas (¡ups!)..."
+      "sharpeningCrayons": "Afilando los crayones...",
+      "mixingColors": "Mezclando nuevos colores...",
+      "drawingLines": "Dibujando los contornos...",
+      "addingSparkles": "Colando un poco de brillo...",
+      "almostThere": "Dando los últimos toques...",
+      "creatingMasterpiece": "Dejándolo perfecto...",
+      "wavingWand": "Comprobando que todo se vea bien...",
+      "coloringOutsideLines": "Intentando no salirme de las líneas..."
     },
     "pageLoading": "¡Preparando tus crayones!",
-    "partialAppearing": "Tu página para colorear está apareciendo…"
+    "partialAppearing": "¡Mira, tu página está apareciendo!"
   },
   "colo": {
     "dashboard": {
       "greeting": "¿Qué quieres colorear hoy?",
-      "wantsToGrow": "¡{stageName} quiere crecer! Guarda {count} dibujos más para evolucionar.",
+      "wantsToGrow": "¡{stageName} quiere crecer! ¡Guarda {count} dibujos más para evolucionar!",
       "proudOfYou": "¡Tu {stageName} está muy orgulloso de ti!"
     },
     "indicator": {
       "next": "Siguiente: {stageName}",
       "saveToEvolve": "¡Guarda {count} dibujos más para evolucionar!",
-      "maxStage": "¡Has llegado a la etapa más alta!",
+      "maxStage": "¡Has llegado al nivel más alto!",
       "accessories": "Accesorios ({count})"
     },
     "avatar": {
@@ -43,7 +43,7 @@
         "description": "¡Empezando la aventura de colorear!"
       },
       "2": {
-        "name": "Colo Pequeñito",
+        "name": "Colo Peque",
         "description": "¡Crece con cada dibujo!"
       },
       "3": {
@@ -56,23 +56,23 @@
       },
       "5": {
         "name": "Colo Artista",
-        "description": "¡Un artista de verdad en camino!"
+        "description": "¡Un verdadero artista en camino!"
       },
       "6": {
         "name": "Colo Maestro",
-        "description": "¡El gran maestro del color!"
+        "description": "¡El gran maestro del coloreado!"
       }
     }
   },
   "footer": {
     "brand": "Chunky Crayon",
     "tagline": "Sueña. Crea. Colorea.",
-    "aboutText": "¡Donde la imaginación cobra vida! Convierte tus ideas más locas en páginas para colorear mágicas.",
+    "aboutText": "¡Aquí la imaginación cobra vida! Convierte tus ideas más locas en páginas para colorear mágicas.",
     "madeBy": "Hecho con <heart>♡</heart> en <location>South London</location>",
     "copyright": "© {year} Chunky Crayon. Todos los derechos reservados.",
     "newsletter": {
-      "title": "Página para colorear gratis, todos los días",
-      "subtitle": "Únete a las familias que reciben una nueva página para colorear en su buzón cada mañana."
+      "title": "Una página para colorear gratis cada día",
+      "subtitle": "Únete a las familias que reciben cada mañana una nueva página para colorear en su correo."
     },
     "sections": {
       "about": "Acerca de",
@@ -84,45 +84,60 @@
     "links": {
       "privacyPolicy": "Política de privacidad",
       "termsOfService": "Términos de servicio",
-      "colorAsYouGo": "Colorea donde quieras"
-    },
-    "appStore": {
-      "downloadOnAppStore": "Descargar en App Store",
-      "getOnGooglePlay": "Consíguelo en Google Play",
-      "comingSoon": "¡Muy pronto!",
-      "iosComingSoon": "Nuestra app para iOS ya viene. ¡Muy pronto!",
-      "androidComingSoon": "Nuestra app para Android ya viene. ¡Muy pronto!"
+      "colorAsYouGo": "Colorea sobre la marcha"
     },
     "freeTools": {
       "allTools": "Todas las herramientas",
-      "nameColoringPages": "Coloreables con nombres",
+      "nameColoringPages": "Páginas para colorear con nombre",
       "rewardChartMaker": "Creador de tablas de recompensas",
       "birthdayInviteMaker": "Creador de invitaciones de cumple",
       "abcTracingWorksheets": "Fichas para trazar el abecedario",
-      "seasonalColoringPacks": "Packs para colorear de temporada",
-      "forTeachers": "Para profes"
+      "seasonalColoringPacks": "Packs para colorear por temporada",
+      "forTeachers": "Para docentes"
+    },
+    "appStore": {
+      "downloadOnAppStore": "Descárgala en App Store",
+      "getOnGooglePlay": "Consíguela en Google Play",
+      "comingSoon": "¡Muy pronto!",
+      "iosComingSoon": "Nuestra app para iOS está en camino. ¡Atento!",
+      "androidComingSoon": "Nuestra app para Android está en camino. ¡Atento!"
     }
   },
   "homepage": {
-    "heroTitle": "Despierta la",
-    "heroTitleSuffix": "hoy",
-    "heroSubtitle": "Desde páginas para colorear llenas de color hasta aventuras imaginativas, Chunky Crayon convierte la creatividad en pura alegría.",
+    "pricing": {
+      "title": "Pruébalo gratis. Planes desde £7.99/mes.",
+      "body": "Empieza con 2 generaciones gratis, sin cuenta. Elige una suscripción para tu familia o compra un pack de créditos y Colorea sobre la marcha.",
+      "cta": "Ver todos los planes"
+    },
+    "heroEyebrow": "La primera app de colorear que acepta peticiones.",
+    "heroTitle": "Deja de buscar en Google \"dibujo para colorear de dinosaurio\" a las 5pm.",
+    "heroTitlePrefix": "Deja de buscar en Google ",
+    "heroTitleSuffix": " dibujo para colorear” a las 5pm.",
+    "heroSubtitle": "Tu peque describe la escena. Tú recibes una lámina para imprimir en unos 2 minutos. Imprímela o coloréala en la app. 2 páginas gratis para probar, sin cuenta.",
+    "heroThumbCaption": "Como esta →",
+    "experiments": {
+      "landingHero": {
+        "outcome": "20 minutos de calma empiezan con una lámina para colorear.",
+        "empathy": "“Me aburro” acaba de encontrar su rival."
+      }
+    },
+    "heroCta": "Crear su página",
     "cta": "Empezar a crear",
     "stats": {
       "coloringPagesCreated": "Páginas creadas",
       "dailyPages": "Páginas diarias",
-      "freeLibraryPages": "Páginas gratis"
+      "freeLibraryPages": "Biblioteca gratis"
     },
     "galleryPreview": {
       "freeColoringPages": "Páginas gratis",
       "exploreGallery": "Explorar galería",
-      "todaysDailyPage": "Página diaria de hoy",
+      "todaysDailyPage": "Página de hoy",
       "latestDailyPage": "Última página diaria",
       "seeAll": "Ver todo",
       "communityPages": "Páginas de la comunidad",
       "colorNow": "Colorear ahora",
       "browseCategories": "Ver categorías",
-      "viewAll": "Ver todas",
+      "viewAll": "Ver todo",
       "dailyColoringPageAlt": "Página diaria para colorear",
       "coloringPageAlt": "Página para colorear"
     },
@@ -131,6 +146,15 @@
       "ctaHighlight": "Empieza gratis",
       "ctaText": "para guardar tus creaciones para siempre y desbloquear más.",
       "ctaButton": "Empezar gratis"
+    },
+    "demo": {
+      "title": "Mira cómo se crea una página para colorear.",
+      "body": "Tu peque lo dice. Nosotros lo dibujamos. En unos 2 minutos, de la idea a una página lista para imprimir, siempre.",
+      "idleLabel": "Dale a reproducir para ver cómo se dibuja una página para colorear.",
+      "drawingLabel": "Dibujando la escena",
+      "drawingSubLabel": "Un momentito, esto tarda un poco.",
+      "playLabel": "Reproducir demo",
+      "pauseLabel": "Pausar"
     },
     "unleashWords": {
       "creativity": "creatividad",
@@ -145,7 +169,7 @@
       "learning": "aprendizaje",
       "wonder": "asombro",
       "dreams": "sueños",
-      "playtime": "tiempo de juego",
+      "playtime": "hora de jugar",
       "innovation": "innovación",
       "magic": "magia",
       "curiosity": "curiosidad",
@@ -155,84 +179,78 @@
       "excitement": "emoción"
     },
     "testimonials": {
-      "title": "Las familias de todas partes lo adoran",
+      "title": "Familias de todas partes lo adoran",
       "fromReviews": "de {count} reseñas",
       "items": {
         "1": {
-          "name": "María G.",
-          "role": "Mamá de 2",
-          "quote": "¡A mis peques les encanta! Pasan horas creando y coloreando sus propios mundos mágicos. ¡Se acabaron las peleas por el tiempo de pantalla!",
-          "avatar": "/images/testimonials/avatar-1.svg",
-          "location": "Bristol, Reino Unido"
+          "name": "Sophie Bennett",
+          "role": "Mamá de Maisie, 4",
+          "location": "Bristol, Reino Unido",
+          "quote": "Maisie aún no sabe leer ni escribir, pero sí hablar. Sostiene el móvil y dice: «una sirena en una tacita con un gato», y la página aparece. La primera vez dijo: «espera, ¿me ha OÍDO?» y nos reímos diez minutos."
         },
         "2": {
-          "name": "Carlos R.",
+          "name": "Marcus Reed",
           "role": "Papá de 3",
-          "quote": "Por fin algo que combina creatividad y tecnología de forma saludable. Mi hija hizo un castillo de princesa unicornio y ¡quedó perfecto!",
-          "avatar": "/images/testimonials/avatar-2.svg",
-          "location": "Austin, TX"
+          "location": "Austin, TX",
+          "quote": "El del medio es un garabateador. Hice una foto de su dibujo de «Jeff el perro» y la app lo convirtió en una página para colorear de verdad. Desde entonces se la enseña a toda la familia por FaceTime. Para él, magia pura."
         },
         "3": {
-          "name": "Laura M.",
-          "role": "Maestra de primaria",
-          "quote": "Lo uso en clase como inspiración para escribir. Los niños describen lo que quieren, y luego colorean sus creaciones. ¡Están súper motivados!",
-          "avatar": "/images/testimonials/avatar-3.svg",
-          "location": "Leeds, Reino Unido"
+          "name": "Hannah Whitfield",
+          "role": "Mamá de 2",
+          "location": "Leeds, Reino Unido",
+          "quote": "Nos costó un par de intentos aprender a describir las cosas para conseguir lo que tenía en la cabeza. «Un dragón» dio un dragón genérico. «Un bebé dragón rosa saliendo de un huevo brillante en la jungla» dio la imagen que de verdad quería. Cuando lo pillas, lo pillas."
         },
         "4": {
-          "name": "Antonio L.",
-          "role": "Abuelo",
-          "quote": "Mis nietos vienen todos los fines de semana solo para crear nuevas páginas para colorear juntos. ¡Qué momento tan bonito para compartir!",
-          "avatar": "/images/testimonials/avatar-4.svg",
-          "location": "Manchester, Reino Unido"
+          "name": "Rachel Doyle",
+          "role": "Maestra de infantil",
+          "location": "Manchester, Reino Unido",
+          "quote": "Semana del tema del mar e imprimí páginas con la criatura marina específica de cada peque. Theo quería «un tiburón con gafas de sol», lo tuvo, y abrazó la hoja. Me ahorró horas de buscar imprimibles gratis."
         },
         "5": {
-          "name": "Carmen S.",
-          "role": "Cuidadora infantil",
-          "quote": "Los peques que cuido no se cansan. Dragones, hadas, cohetes... ¡todo lo que imaginan cobra vida!",
-          "avatar": "/images/testimonials/avatar-5.svg",
-          "location": "Portland, OR"
+          "name": "Brian Coletti",
+          "role": "Papá de Nora, 6",
+          "location": "Portland, OR",
+          "quote": "Lo probé en el móvil antes de viajar por Acción de Gracias: sin cuenta ni tarjeta, solo por ver. Hice dos páginas, las imprimí en el hotel del aeropuerto y Nora estuvo entretenida todo el vuelo. Me suscribí al volver a casa."
         },
         "6": {
-          "name": "Pablo F.",
-          "role": "Papá y diseñador",
-          "quote": "Como diseñador, valoro la calidad. Como papá, me encanta ver la carita de mi hijo iluminarse cuando sus ideas se convierten en páginas para colorear.",
-          "avatar": "/images/testimonials/avatar-6.svg",
-          "location": "Denver, CO"
+          "name": "Megan Russo",
+          "role": "Mamá de gemelos, 4",
+          "location": "Denver, CO",
+          "quote": "Me encanta, pero la espera… Dos minutos no son dos minutos cuando un peque de 4 quiere su dinosaurio YA. Hemos empezado a pedir la siguiente página mientras aún colorean la anterior. Ese es el truco. Por lo demás, perfecto."
         },
         "7": {
           "name": "Priya Shah",
           "role": "Cuidadora infantil",
           "location": "Birmingham, Reino Unido",
-          "quote": "Cuido a cinco peques de 3 a 7 años. Antes imprimía la misma página de dinosaurio para todos y acababa en lágrimas. Ahora cada uno tiene una página con su obsesión real (las excavadoras de Aiden, los unicornios de Zara, Bluey de Ben). Un salvavidas."
+          "quote": "Cuido a cinco peques de 3 a 7. Antes imprimía la misma página de dinosaurio para todos y había lágrimas. Ahora cada uno tiene una página con su obsesión real (las excavadoras de Aiden, los unicornios de Zara, el Bluey de Ben). Un salvavidas."
         },
         "8": {
           "name": "Tom Whitaker",
           "role": "Papá de Iris, 3",
           "location": "Sheffield, Reino Unido",
-          "quote": "Casi siempre imprimimos en vez de colorear en la app. Los deditos de Iris en la pantalla del móvil son una lucha, y hasta el iPad se le hace un poco complicado para su edad. Pero la parte de imprimir es genial. Las páginas salen nítidas y lo bastante grandes para colorear bien."
+          "quote": "Casi siempre imprimimos en vez de colorear en la app. Los deditos de Iris en una pantalla son una lucha, y hasta el iPad se le hace un poco complicado. Pero la parte de imprimir es genial: salen nítidas y lo bastante grandes para colorear bien."
         }
       }
     },
     "faq": {
       "title": "Preguntas frecuentes",
-      "subtitle": "Todo lo que necesitas saber para crear páginas mágicas para colorear con Chunky Crayon",
+      "subtitle": "Todo lo que necesitas para crear páginas mágicas para colorear con Chunky Crayon",
       "items": {
         "1": {
           "question": "¿Qué es Chunky Crayon?",
-          "answer": "Chunky Crayon es un generador mágico de páginas para colorear, pensado para niños y familias. Solo describe lo que quieres colorear (por ejemplo, \"un dragón en una merienda\" o \"mi superhéroe favorito en la luna\") y creamos una página única, lista para imprimir, en segundos. ¡Perfecto para días de lluvia, ratitos tranquilos o para despertar la imaginación!"
+          "answer": "Chunky Crayon es un generador mágico de páginas para colorear, pensado para peques y familias. Solo tienes que describir lo que quieres colorear —como «un dragón tomando el té» o «mi superhéroe favorito en la luna»— y creamos una página única, lista para imprimir, en segundos. Ideal para días de lluvia, ratitos de calma o para despertar la imaginación."
         },
         "2": {
-          "question": "¿Es seguro y adecuado para niños?",
-          "answer": "¡Sí! Chunky Crayon está hecho por padres, para padres. Todas las imágenes se crean con contenido apto para peques. Nuestra IA está ajustada especialmente para generar páginas sanas, divertidas y adecuadas para todas las edades."
+          "question": "¿Es seguro y apropiado para niños?",
+          "answer": "Sí, totalmente. Chunky Crayon lo han creado madres y padres, para madres y padres. Cada página que dibujamos es apta para peques y adecuada para su edad, pensada para una diversión sana en un amplio rango de edades."
         },
         "3": {
           "question": "¿Cómo creo una página para colorear?",
-          "answer": "¡Es facilísimo! Escribe lo que quieres colorear (por ejemplo, \"un unicornio en un bosque mágico\"), pulsa Generar y espera unos 30 segundos. Tu página única aparecerá lista para descargar e imprimir. ¡También puedes usar la voz o subir una foto para inspirarte!"
+          "answer": "Es tan fácil como 1-2-3. Escribe lo que quieres colorear (por ejemplo, «un unicornio en un bosque mágico»), pulsa Generar y espera unos 2 minutos. Tu página estará lista para descargar e imprimir. También puedes usar entrada por voz o subir una foto como inspiración."
         },
         "4": {
           "question": "¿Cuánto tarda en generarse una página?",
-          "answer": "La mayoría de las páginas están listas en unos 30 segundos. ¡Nuestra simpática mascota Colo te acompañará mientras esperas! Las escenas muy detalladas pueden tardar un poquito más."
+          "answer": "La mayoría de páginas están listas en unos 2 minutos. Nuestra simpática mascota, Colo, te entretiene mientras esperas. Las escenas complejas con muchos detalles pueden tardar un poquito más."
         },
         "5": {
           "question": "¿Puedo imprimir las páginas para colorear?",
@@ -240,80 +258,142 @@
         },
         "6": {
           "question": "¿Y si la petición de mi hijo no sale bien?",
-          "answer": "A veces la IA no acierta a la primera, ¡y eso también es parte de la aventura creativa! Puedes intentarlo de nuevo con otras palabras. Consejos: sé específico y describe bien la escena. Si te atascas, prueba con la entrada por voz: ¡muchas veces los peques lo explican mejor hablando!"
+          "answer": "A veces, a la primera no queda perfecto. Es parte de la aventura creativa. Prueba de nuevo con palabras un poco distintas. Consejo: sé específico y describe bien la escena. Si te atascas, prueba la entrada por voz: a los peques se les da mejor explicarlo hablando."
         },
         "7": {
           "question": "¿Chunky Crayon es gratis?",
-          "answer": "Puedes probar Chunky Crayon con 2 generaciones gratis, ¡sin cuenta! Después, puedes crear una cuenta gratuita para conseguir 15 créditos extra, o elegir uno de nuestros planes de suscripción asequibles para diversión creativa sin límites."
+          "answer": "Puedes probar Chunky Crayon con 2 generaciones gratis: ¡sin cuenta! Después, puedes crear una cuenta gratis para conseguir 15 créditos extra, o elegir uno de nuestros planes de suscripción asequibles para diversión creativa sin límites."
         },
         "8": {
           "question": "¿Qué incluyen los planes de suscripción?",
-          "answer": "Nuestros planes van desde Crayon (ideal para colorear de vez en cuando) hasta Studio (para familias o profes súper creativos). Todos incluyen: generación ilimitada de páginas para colorear, descargas en PDF de alta calidad, modos de voz y foto, y acceso a nuevas funciones a medida que las añadimos. Los niveles superiores incluyen acumulación de créditos y derechos de uso comercial."
+          "answer": "Nuestros planes van desde Splash (ideal para hasta 2 peques) hasta Sparkle (ideal para hasta 10). Todos incluyen: generación de páginas para colorear, descargas en PDF de alta calidad, modos de voz y foto, perfiles separados para cada peque y acceso a nuevas funciones a medida que las añadimos. Los niveles superiores incluyen acumulación de créditos y derechos de uso comercial. ¿Aún no quieres suscribirte? Prueba Colorea sobre la marcha y compra packs de créditos cuando lo necesites."
         },
         "9": {
           "question": "¿Puedo usar las páginas en mi clase o guardería?",
-          "answer": "¡Sí! A profes y cuidadores les encanta Chunky Crayon. Nuestros planes Crayon y Rainbow son perfectos para uso personal y educativo. Si tienes un negocio o quieres distribuir páginas de forma comercial, echa un vistazo a Masterpiece o Studio, que incluyen licencia comercial."
+          "answer": "¡Sí! A profes y cuidadores infantiles les encanta Chunky Crayon. Nuestros planes Splash y Rainbow son perfectos para uso personal y educativo. Si tienes un negocio o quieres distribuir páginas comercialmente, consulta nuestro plan Sparkle, que incluye licencia comercial."
         },
         "10": {
           "question": "¿Cómo funcionan los créditos?",
-          "answer": "Cada página para colorear que generas usa 5 créditos. Los créditos se renuevan cada mes con tu suscripción, y algunos planes permiten acumular los créditos no usados. También puedes comprar packs de créditos si necesitas un empujoncito extra de creatividad."
+          "answer": "La mayoría de páginas para colorear cuestan 5 créditos, cuando escribes una petición o subes una foto. El modo voz (donde tienes una charla rápida con Chunky Crayon) usa 10 créditos por página. Los planes de suscripción renuevan créditos cada mes, y los niveles superiores permiten acumular los no usados. ¿No quieres suscripción? Colorea sobre la marcha: compra un pack de créditos y paga solo por lo que uses."
+        }
+      }
+    }
+  },
+  "start": {
+    "eyebrow": "La primera app para colorear que acepta pedidos.",
+    "cta": "Pruébala gratis",
+    "ctaSubtext": "2 páginas gratis. Sin cuenta.",
+    "tryColoring": "Prueba a colorear esta",
+    "experiments": {
+      "startCta": {
+        "urgency": "2 páginas gratis hoy. Sin tarjeta, sin trampa.",
+        "proof": "Únete a 200+ familias. 2 páginas gratis para empezar."
+      }
+    },
+    "hero": {
+      "trex": {
+        "title": "“Mamá, ¿puedo colorear un T-rex en monopatín?”",
+        "subtitle": "Sí, tal cual. Tu peque describe la escena. Tú recibes una página para imprimir en unos 2 minutos. Imprímela o coloréala en la app."
+      },
+      "foxes": {
+        "title": "Tiempo de pantalla, pero con ceras.",
+        "subtitle": "Rescate de las 5, listo. Imprime una página para la mesa o dales el móvil. La misma página, cero culpa."
+      },
+      "dragon": {
+        "title": "De “fiesta del té con dragones” a una página real para colorear.",
+        "subtitle": "Tu peque describe cualquier escena. Nosotros la dibujamos. Imprímela o coloréala en la app. Cada página es una que de verdad quieren colorear."
+      },
+      "default": {
+        "title": "Tu peque lo describe. Nosotros dibujamos la página para colorear.",
+        "subtitle": "Un T-rex astronauta. Una fiesta del té con dragones. Un picnic de una familia de zorros. Lo que imaginen, imprimible en unos 2 minutos."
+      }
+    },
+    "problem": {
+      "title": "El rescate de las 5: “me aburro”.",
+      "body": "Tú estás cansado/a. Ellos quieren ceras. Tú quieres silencio. Pero la hoja del dinosaurio que imprimiste la semana pasada ya está coloreada tres veces. Chunky Crayon crea una nueva con la escena que describa tu peque, en unos 2 minutos."
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "steps": {
+        "describe": {
+          "title": "Describen la escena",
+          "body": "Habla, escribe o haz una foto. Lo que tengan en la cabeza."
+        },
+        "draw": {
+          "title": "Dibujamos la página",
+          "body": "En unos 2 minutos: de la idea a lista para imprimir."
+        },
+        "color": {
+          "title": "Imprime o colorea en la app",
+          "body": "Ceras en la mesa. Dedo en el móvil. Tú eliges."
         }
       }
     },
-    "heroEyebrow": "La primera app de colorear que acepta pedidos.",
-    "heroCta": "Crea su página",
-    "heroTitlePrefix": "Deja de buscar en Google ",
-    "heroThumbCaption": "¡Como este →",
     "demo": {
       "title": "Mira cómo se crea una página para colorear.",
-      "body": "Tu peque lo dice. Nosotros lo dibujamos. En unos 2 minutos, de idea a imprimible, siempre.",
-      "idleLabel": "Pulsa reproducir para ver cómo se dibuja una página para colorear.",
+      "body": "Tu peque lo dice. Nosotros lo dibujamos. En unos 2 minutos: de la idea a lista para imprimir, siempre.",
+      "idleLabel": "Dale a reproducir para ver cómo se dibuja una página para colorear.",
       "drawingLabel": "Dibujando la escena",
-      "drawingSubLabel": "Espera un poquito, tarda un momento.",
+      "drawingSubLabel": "Espera un poquito, esto tarda un momento.",
       "playLabel": "Reproducir demo",
-      "pauseLabel": "Pausa"
+      "pauseLabel": "Pausar"
     },
-    "experiments": {
-      "landingHero": {
-        "outcome": "20 minutos de calma empiezan con una página para colorear.",
-        "empathy": "“Me aburro” acaba de encontrar su rival."
+    "features": {
+      "title": "Todo en una sola app.",
+      "items": {
+        "unlimited": {
+          "title": "Cualquier escena, cualquier tema",
+          "body": "Dinosaurios astronautas. Unicornios dentistas. Hermanos en el espacio. Si lo pueden describir, lo podemos dibujar."
+        },
+        "family": {
+          "title": "Una suscripción, cada peque",
+          "body": "Perfiles separados para cada niño/a en el mismo plan. Sus páginas, pegatinas y recompensas se quedan con ellos. Hasta 10 perfiles en Sparkle."
+        },
+        "print": {
+          "title": "Lista para imprimir o en pantalla",
+          "body": "Cada página para colorear incluye un PDF limpio y un lienzo interactivo. Elige lo que mejor encaje en ese momento."
+        }
       }
     },
     "pricing": {
-      "title": "Pruébalo gratis. Planes desde £7.99/mes.",
-      "body": "Empieza con 2 creaciones gratis, sin necesidad de cuenta. Elige una suscripción para tu familia o consigue un pack de créditos y colorea a tu ritmo.",
+      "title": "Pruébala gratis. Planes desde £7.99/mes.",
+      "body": "Empieza con 2 generaciones gratis, sin cuenta. ¿Te encanta? Elige una suscripción que va de colorear de vez en cuando a usarla a diario, o compra un pack de créditos y colorea a tu ritmo.",
       "cta": "Ver todos los planes"
+    },
+    "finalCta": {
+      "title": "A una página para colorear de 20 minutos de tranquilidad.",
+      "body": "Escribe una escena. La dibujamos. No necesitas cuenta para probar."
     }
   },
   "gallery": {
-    "pageTitle": "Galería de dibujos para colorear gratis - Chunky Crayon",
-    "pageDescription": "Explora nuestra colección gratis de dibujos para colorear imprimibles. Animales, dragones, unicornios, princesas y mucho más. ¡Nuevas páginas cada día!",
-    "heroTitle": "Dibujos para colorear gratis",
-    "heroSubtitle": "Descubre miles de dibujos para colorear imprimibles gratis. De animalitos adorables a dragones mágicos: encuentra la página perfecta para colorear online o imprimir en casa.",
-    "browseByCategory": "Explorar por categoría",
-    "browseByDifficulty": "Explorar por dificultad",
-    "browseByAge": "Explorar por edad",
-    "dailyPage": "Dibujo del día",
-    "viewAllDaily": "Ver todos los dibujos diarios",
+    "pageTitle": "Galería de páginas para colorear gratis - Chunky Crayon",
+    "pageDescription": "Explora nuestra colección gratuita de páginas para colorear imprimibles. Encuentra animales, dragones, unicornios, princesas y mucho más. ¡Nuevas páginas cada día!",
+    "heroTitle": "Páginas para colorear gratis",
+    "heroSubtitle": "Descubre miles de páginas para colorear imprimibles gratis. Desde animalitos adorables hasta dragones mágicos: encuentra la página perfecta para colorear online o imprimir en casa.",
+    "browseByCategory": "Ver por categoría",
+    "browseByDifficulty": "Ver por dificultad",
+    "browseByAge": "Ver por edad",
+    "dailyPage": "La página del día",
+    "viewAllDaily": "Ver todas las páginas diarias",
     "communityCreations": "Creaciones de la comunidad",
-    "viewAllCommunity": "Ver todos los dibujos de la comunidad",
+    "viewAllCommunity": "Ver todas las páginas de la comunidad",
     "startColoring": "Empezar a colorear",
     "stats": {
-      "totalPages": "Total de páginas",
+      "totalPages": "Páginas totales",
       "communityPages": "Páginas de la comunidad",
       "dailyPages": "Páginas diarias",
       "pagesSuffix": "páginas"
     },
     "ageGroups": {
       "toddlers": {
-        "title": "Para pequeños",
+        "title": "Para peques",
         "ages": "De 2 a 4 años",
         "description": "Formas simples, líneas gruesas"
       },
       "kids": {
         "title": "Para niños",
         "ages": "De 4 a 12 años",
-        "description": "Divertido y entretenido"
+        "description": "Divertidas y entretenidas"
       },
       "teens": {
         "title": "Para adolescentes",
@@ -323,7 +403,7 @@
       "adults": {
         "title": "Para adultos",
         "ages": "18+",
-        "description": "Relajante y detallado"
+        "description": "Relajantes y complejas"
       }
     },
     "difficulty": {
@@ -341,7 +421,7 @@
       },
       "expert": {
         "title": "Experto",
-        "description": "Patrones muy elaborados"
+        "description": "Patrones intrincados"
       }
     },
     "categories": {
@@ -362,13 +442,13 @@
       "food": "Comida y dulces"
     },
     "seo": {
-      "aboutTitle": "Sobre nuestros dibujos para colorear gratis",
-      "aboutParagraph1": "¡Bienvenido a la galería de dibujos para colorear gratis de Chunky Crayon! Una colección en crecimiento de páginas imprimibles para niños y adultos por igual. Describe la escena que quieres y crearemos una página única en una gran variedad de categorías.",
-      "aboutParagraph2": "Cada día añadimos un nuevo dibujo diario que puedes colorear online con nuestras herramientas digitales o descargar e imprimir para usar de forma tradicional. Además, los miembros de la comunidad aportan sus ideas creativas, sumando aún más variedad a la colección.",
+      "aboutTitle": "Sobre nuestras páginas para colorear gratis",
+      "aboutParagraph1": "¡Bienvenido/a a la galería gratuita de páginas para colorear de Chunky Crayon! Una colección en crecimiento de páginas imprimibles para peques y adultos. Describe la escena que quieres y crearemos una página única en un montón de categorías.",
+      "aboutParagraph2": "Cada día añadimos una nueva página para colorear diaria que puedes colorear online con nuestras herramientas digitales o descargar e imprimir para colorear a la manera tradicional. Nuestra comunidad también aporta sus ideas creativas, sumando aún más variedad a la colección.",
       "aboutParagraph3": "Explora por categoría para encontrar justo lo que buscas: animalitos adorables, criaturas de fantasía como dragones y unicornios, o temas de fiestas y temporadas. Cada página está diseñada con líneas limpias, perfectas para colorear."
     },
     "jumpToNav": {
-      "jumpTo": "Saltar a:",
+      "jumpTo": "Ir a:",
       "selectSection": "Elegir sección",
       "backToTop": "Volver arriba",
       "filters": "Filtros",
@@ -388,267 +468,311 @@
       "filterByDifficulty": "Filtrar por dificultad"
     },
     "categoryPage": {
-      "coloringPages": "Dibujos para colorear de {category}",
+      "coloringPages": "Páginas para colorear de {category}",
       "relatedCategories": "Categorías relacionadas",
       "noPagesYet": "Aún no hay páginas de {category}",
       "beTheFirst": "¡Sé el primero en crear una página para colorear de {category}!",
       "createAPage": "Crear una página",
-      "freeColoringPages": "Dibujos para colorear gratis de {category}",
-      "lookingFor": "¿Buscas el dibujo perfecto de {category} para colorear? ¡Has llegado al lugar ideal! Nuestra colección tiene una gran variedad de diseños de {category} perfectos para toda la familia.",
-      "eachPageDescription": "Cada dibujo se puede colorear online con nuestras herramientas digitales o descargar e imprimir para colorear con ceras, lápices de colores o rotuladores. Cada diseño tiene líneas limpias y detalles divertidos para que colorear sea entretenido y relajante.",
+      "freeColoringPages": "Páginas para colorear gratis de {category}",
+      "lookingFor": "¿Buscas la página para colorear de {category} perfecta? ¡Estás en el lugar indicado! Nuestra colección tiene un montón de diseños de {category}, ideales para peques y adultos.",
+      "eachPageDescription": "Puedes colorear cada página online con nuestras herramientas digitales o descargarla e imprimirla para colorear de forma tradicional con ceras, lápices de colores o rotuladores. Cada diseño tiene líneas limpias y detalles divertidos para que colorear sea entretenido y relajante.",
       "popularThemes": "Temas populares de {category}",
       "includesPopular": "Nuestra categoría de {category} incluye búsquedas populares como:"
     },
     "categoryDescriptions": {
-      "animals": "Dibujos de animales adorables y salvajes para niños y adultos",
+      "animals": "Páginas para colorear de animales tiernos y salvajes para peques y adultos",
       "fantasy": "Criaturas mágicas y mundos encantados para colorear",
-      "dragons": "Increíbles dragones para colorear con detalles de fuego",
-      "unicorns": "Unicornios mágicos con arcoíris y brillos",
-      "princesses": "Princesas reales y castillos para colorear",
-      "superheroes": "Superhéroes llenos de acción para colorear",
-      "dinosaurs": "Dinosaurios prehistóricos para colorear",
-      "space": "Aventuras espaciales y astronautas para colorear",
+      "dragons": "Páginas épicas de dragones con detalles llenos de fuego",
+      "unicorns": "Páginas mágicas de unicornios con arcoíris y brillo",
+      "princesses": "Páginas para colorear de princesas reales y castillos",
+      "superheroes": "Páginas para colorear de superhéroes llenas de acción",
+      "dinosaurs": "Páginas para colorear de dinosaurios prehistóricos",
+      "space": "Aventuras espaciales y páginas para colorear de astronautas",
       "underwater": "Criaturas del océano y mundos submarinos para colorear",
-      "vehicles": "Coches, camiones, aviones y más vehículos para colorear",
-      "pirates": "Aventuras de piratas para colorear",
-      "nature": "Naturaleza preciosa y flores para colorear",
-      "holidays": "Dibujos festivos de fiestas y temporadas",
-      "robots": "Robots futuristas y tecnología para colorear",
-      "food": "Comida deliciosa y dulces para colorear"
+      "vehicles": "Páginas para colorear de coches, camiones, aviones y más",
+      "pirates": "Páginas para colorear de aventuras piratas",
+      "nature": "Bonitas páginas para colorear de naturaleza y flores",
+      "holidays": "Páginas festivas de fiestas y temporadas para colorear",
+      "robots": "Páginas para colorear de robots futuristas y tecnología",
+      "food": "Deliciosas páginas para colorear de comida y dulces"
     },
     "infiniteScroll": {
-      "allPagesViewed": "¡Ya has visto todos los dibujos para colorear!"
+      "allPagesViewed": "¡Ya has visto todas las páginas para colorear!"
     },
     "ageGroupPages": {
       "common": {
-        "moreAgeGroups": "Más grupos de edad",
-        "createSimplePages": "Crear páginas sencillas",
-        "createYourOwn": "Crea el tuyo",
+        "moreAgeGroups": "Más edades",
+        "createSimplePages": "Crear páginas simples",
+        "createYourOwn": "Crea la tuya",
         "createYourDesign": "Crea tu diseño"
       },
       "toddlers": {
-        "pageTitle": "Dibujos para colorear para pequeños",
-        "featuredSection": "Dibujos sencillos para pequeños",
-        "categoriesSection": "Categorías para pequeños",
-        "heroDescription": "¡Dibujos simples y fáciles de colorear para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos los hacen perfectos para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
-        "whyTitle": "Perfecto para pequeños artistas",
+        "pageTitle": "Páginas para colorear para peques",
+        "featuredSection": "Páginas simples para peques",
+        "categoriesSection": "Categorías ideales para peques",
+        "heroDescription": "¡Páginas simples y fáciles de colorear, pensadas para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos: perfectas para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
+        "whyTitle": "Perfectas para pequeños artistas",
         "why1Title": "Líneas grandes y marcadas",
-        "why1Description": "¡Los contornos gruesos ayudan a las manitas pequeñas a no salirse de las líneas!",
-        "why2Title": "Formas simples",
-        "why2Description": "Formas básicas y objetos conocidos que a los peques les encantan.",
-        "why3Title": "Aprende los colores",
-        "why3Description": "¡Genial para aprender colores y desarrollar la creatividad!",
-        "seoTitle": "Dibujos para colorear gratis para pequeños",
-        "seoParagraph1": "¿Vas a iniciar a tu peque en el coloreado? Nuestra colección de dibujos sencillos es perfecta para niños de 2 a 4 años. Cada diseño tiene zonas grandes y fáciles de colorear, con contornos marcados que ayudan a desarrollar la motricidad fina.",
-        "seoParagraph2": "Nuestros dibujos para peques se centran en objetos familiares que les encantan: animalitos adorables, comida rica, vehículos coloridos y bonitas escenas de naturaleza. Los diseños simples reducen la frustración y animan a crear.",
-        "seoParagraph3": "Todas las páginas se pueden imprimir en papel A4 o colorear online con nuestras herramientas digitales, súper fáciles de usar. Perfectas para ratitos tranquilos, días de lluvia o actividades en casa o en preescolar.",
-        "benefitsTitle": "Beneficios de colorear para los más pequeños",
-        "benefitsDescription": "Colorear ayuda a desarrollar habilidades importantes como: coordinación mano-ojo, reconocimiento de colores, fuerza de agarre, atención y concentración, y expresión creativa. ¡Empieza con los diseños más sencillos y mira cómo crece tu peque!"
+        "why1Description": "Los contornos gruesos ayudan a las manitas pequeñas a no salirse de la línea.",
+        "why2Title": "Formas sencillas",
+        "why2Description": "Formas básicas y objetos conocidos que los peques reconocen y adoran.",
+        "why3Title": "Aprender colores",
+        "why3Description": "¡Geniales para aprender los colores y desarrollar la creatividad!",
+        "seoTitle": "Páginas para colorear gratis para peques",
+        "seoParagraph1": "¿Vas a empezar a colorear con tu peque? Nuestra colección de páginas simples es perfecta para niños de 2 a 4 años. Cada diseño tiene zonas grandes y fáciles de colorear con contornos marcados que ayudan a desarrollar la motricidad fina.",
+        "seoParagraph2": "Nuestras páginas para peques se centran en cosas que les encantan: animalitos adorables, comida rica, vehículos de colores y bonitos paisajes de naturaleza. Los diseños sencillos reducen la frustración y animan la creatividad.",
+        "seoParagraph3": "Todas las páginas se pueden imprimir en papel A4 o colorear online con nuestras herramientas digitales fáciles de usar. Perfectas para ratitos tranquilos, días de lluvia o actividades en casa o en infantil.",
+        "benefitsTitle": "Beneficios de colorear para peques",
+        "benefitsDescription": "Colorear ayuda a los peques a desarrollar habilidades importantes como: coordinación ojo-mano, reconocimiento de colores, fuerza de agarre, atención y concentración, y expresión creativa. ¡Empieza con nuestros diseños más simples y mira cómo progresa!"
       },
       "kids": {
-        "pageTitle": "Dibujos para colorear para niños",
-        "featuredSection": "Dibujos populares para niños",
-        "categoriesSection": "Explorar categorías infantiles",
-        "heroDescription": "¡Dibujos divertidos y entretenidos para niños de 4 a 12 años! Dinosaurios, unicornios, superhéroes y más. Fáciles de colorear online o imprimir en casa para horas de diversión creativa.",
+        "pageTitle": "Páginas para colorear para niños",
+        "featuredSection": "Páginas populares para niños",
+        "categoriesSection": "Explorar categorías para niños",
+        "heroDescription": "¡Páginas divertidas y entretenidas, perfectas para niños de 4 a 12 años! Dinosaurios, unicornios, superhéroes y más. Fáciles de colorear online o imprimir en casa para diversión creativa sin fin.",
         "whyTitle": "Por qué a los niños les encanta Chunky Crayon",
-        "why1Title": "Crea lo que quieras",
-        "why1Description": "¡Los niños pueden describir sus ideas más locas y verlas convertirse en dibujos para colorear!",
+        "why1Title": "Crea cualquier cosa",
+        "why1Description": "Los niños pueden describir sus ideas más locas y verlas convertidas en páginas para colorear.",
         "why2Title": "Imprime y colorea",
         "why2Description": "Descarga PDFs de alta calidad listos para imprimir en papel A4.",
         "why3Title": "Colorea online",
-        "why3Description": "¡Usa nuestras herramientas para colorear en el navegador!",
-        "seoTitle": "Dibujos para colorear gratis para niños",
-        "seoParagraph1": "¿Buscas los dibujos perfectos para tus hijos? Chunky Crayon ofrece una enorme colección de dibujos para colorear gratis e imprimibles, pensados especialmente para niños de 4 a 12 años. Desde animales adorables hasta superhéroes llenos de acción, hay algo para cada pequeño artista.",
-        "seoParagraph2": "Nuestros dibujos tienen líneas limpias y marcadas, fáciles de colorear para manitas pequeñas. Ya sea con ceras, lápices de colores o rotuladores, están diseñados para que el resultado quede genial. También puedes usar nuestras herramientas online para colorear digitalmente.",
-        "seoParagraph3": "Y lo mejor: los niños pueden crear sus propios dibujos únicos describiendo lo que quieren colorear. ¿Un dragón jugando al fútbol? ¿Un unicornio en el espacio? ¡Lo que imaginen puede hacerse realidad en segundos!",
+        "why3Description": "¡Usa nuestras herramientas digitales de coloreado directamente en el navegador!",
+        "seoTitle": "Páginas para colorear gratis para niños",
+        "seoParagraph1": "¿Buscas las páginas para colorear perfectas para tus hijos? Chunky Crayon ofrece una enorme colección gratuita de páginas imprimibles, pensadas especialmente para niños de 4 a 12 años. Desde animalitos adorables hasta superhéroes llenos de acción: hay de todo para cada pequeño artista.",
+        "seoParagraph2": "Nuestras páginas tienen líneas limpias y marcadas, fáciles de colorear para manitas pequeñas. Ya sea con ceras, lápices de colores o rotuladores, están diseñadas para que queden genial. También puedes usar nuestras herramientas de coloreado online para crear en pantalla.",
+        "seoParagraph3": "Y lo mejor: los niños pueden crear sus propias páginas únicas describiendo lo que quieren colorear. ¿Un dragón jugando al fútbol? ¿Un unicornio en el espacio? ¡Lo que imaginen puede convertirse en una página real en segundos!",
         "popularTitle": "Categorías populares para niños",
-        "popularDescription": "Nuestras categorías infantiles más populares incluyen: dinosaurios, unicornios, superhéroes, animales, espacio y cohetes, y vehículos. Cada categoría está llena de diseños adecuados para su edad."
+        "popularDescription": "Nuestras categorías más populares para niños incluyen: páginas de dinosaurios, unicornios, superhéroes, animales, espacio y cohetes, y vehículos. Cada categoría está llena de diseños apropiados para su edad."
       },
       "teens": {
-        "pageTitle": "Dibujos para colorear para adolescentes",
-        "featuredSection": "Dibujos populares para adolescentes",
+        "pageTitle": "Páginas para colorear para adolescentes",
+        "featuredSection": "Páginas populares para adolescentes",
         "categoriesSection": "Categorías para adolescentes",
-        "heroDescription": "¡Dibujos geniales y detallados para adolescentes! De anime y videojuegos a fantasía y ciencia ficción, expresa tu creatividad con diseños a tu estilo. Perfectos para relajarte y expresarte creativamente.",
-        "whyTitle": "Hecho para adolescentes creativos",
+        "heroDescription": "¡Páginas geniales y detalladas, hechas para adolescentes! De anime y videojuegos a fantasía y ciencia ficción: expresa tu creatividad con diseños que van con tu estilo. Perfectas para desconectar y crear.",
+        "whyTitle": "Hechas para adolescentes creativos",
         "why1Title": "Temas geniales",
-        "why1Description": "¡Diseños de anime, videojuegos, fantasía y sci-fi que se adaptan a tus gustos!",
+        "why1Description": "¡Diseños de anime, videojuegos, fantasía y ciencia ficción que van con tus gustos!",
         "why2Title": "Arte detallado",
-        "why2Description": "Diseños elaborados que ponen a prueba tus habilidades y quedan increíbles.",
-        "why3Title": "Alivio del estrés",
-        "why3Description": "Tómate un respiro de las pantallas y relájate coloreando.",
-        "seoTitle": "Dibujos para colorear gratis para adolescentes",
-        "seoParagraph1": "¿Buscas dibujos para colorear que no sean \"demasiado infantiles\"? Nuestra colección para adolescentes tiene diseños geniales y detallados, perfectos para edades de 13 a 17 años. Desde personajes de anime y escenas de videojuegos hasta mundos de fantasía y patrones abstractos, hay algo para cada estilo.",
-        "seoParagraph2": "Estos no son los dibujos de tu hermanito. Nuestros diseños para adolescentes tienen detalles elaborados, composiciones dinámicas y temas que conectan con sus intereses. Ideales para expresarte, relajarte en descansos de estudio o simplemente desconectar.",
-        "seoParagraph3": "Crea tus propios dibujos personalizados describiendo exactamente lo que quieres. ¿Un dragón luchando contra un robot en el espacio? ¿Un retrato estilo anime? ¿Un mandala detallado con tus símbolos favoritos? ¡Descríbelo y haremos realidad tu idea!",
+        "why2Description": "Diseños intrincados que ponen a prueba tus habilidades y quedan increíbles al terminar.",
+        "why3Title": "Antiestrés",
+        "why3Description": "Descansa de las pantallas y relájate coloreando.",
+        "seoTitle": "Páginas para colorear gratis para adolescentes",
+        "seoParagraph1": "¿Buscas páginas para colorear que no sean \"demasiado infantiles\"? Nuestra colección para adolescentes tiene diseños geniales y detallados, perfectos para edades de 13 a 17 años. De personajes anime y escenas gamer a mundos de fantasía y patrones abstractos: hay un estilo para cada quien.",
+        "seoParagraph2": "Estas no son las páginas de tu hermanito. Nuestros diseños para adolescentes tienen detalles intrincados, composiciones dinámicas y temas que conectan con sus intereses. Perfectas para expresarte, relajarte en los descansos de estudio o simplemente desconectar.",
+        "seoParagraph3": "Crea tus propias páginas personalizadas describiendo exactamente lo que quieres. ¿Un dragón luchando contra un robot en el espacio? ¿Un retrato estilo anime? ¿Un mandala detallado con tus símbolos favoritos? Solo descríbelo y lo haremos realidad.",
         "popularTitle": "Temas populares para adolescentes",
-        "popularDescription": "Nuestras categorías más populares para adolescentes incluyen: anime y manga, criaturas de fantasía, escenas de acción de superhéroes, arte inspirado en videojuegos, diseños espaciales y sci-fi, y páginas de patrones muy detallados. Cada categoría ofrece diseños entretenidos y con mucho detalle."
+        "popularDescription": "Nuestras categorías más populares para adolescentes incluyen: páginas de anime y manga, criaturas de fantasía, escenas de acción de superhéroes, arte inspirado en videojuegos, diseños espaciales y de ciencia ficción, y páginas de patrones intrincados. Cada categoría ofrece diseños detallados y entretenidos."
       },
       "adults": {
-        "pageTitle": "Dibujos para colorear para adultos",
-        "featuredSection": "Dibujos populares para adultos",
+        "pageTitle": "Páginas para colorear para adultos",
+        "featuredSection": "Páginas populares para adultos",
         "categoriesSection": "Categorías para adultos",
-        "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas elaborados, preciosas escenas de naturaleza y patrones detallados pensados para la relajación y la atención plena. Perfecto para aliviar el estrés tras un día largo.",
+        "heroDescription": "Descubre los beneficios terapéuticos de colorear para adultos. Nuestra colección incluye mandalas intrincados, escenas de naturaleza y patrones detallados diseñados para relajarte y estar en calma. Perfectas para soltar el estrés tras un día largo.",
         "whyTitle": "Beneficios de colorear para adultos",
         "why1Title": "Alivio del estrés",
         "why1Description": "Colorear activa la respuesta de relajación, reduce la ansiedad y aporta calma.",
-        "why2Title": "Atención plena",
-        "why2Description": "Céntrate en el presente y disfruta de una actividad meditativa y sin pantallas.",
+        "why2Title": "Mindfulness",
+        "why2Description": "Conéctate con el presente y disfruta de una actividad meditativa, sin pantallas.",
         "why3Title": "Creatividad",
         "why3Description": "Exprésate con tus colores y crea obras preciosas.",
-        "seoTitle": "Dibujos para colorear gratis para adultos",
-        "seoParagraph1": "Colorear para adultos se ha convertido en una actividad de bienestar muy popular, y con razón. Los estudios muestran que colorear puede reducir la ansiedad, mejorar la concentración y dar un descanso relajante de nuestras vidas llenas de pantallas. Nuestra colección ofrece diseños bonitos y elaborados, perfectos para adultos.",
-        "seoParagraph2": "Desde mandalas detallados que fomentan la atención plena hasta escenas tranquilas de naturaleza y patrones elegantes, cada página está pensada para darte horas de creatividad relajante. Imprime en papel de buena calidad y usa tus herramientas favoritas: lápices de colores, rotuladores o plumas de gel funcionan perfectamente.",
-        "seoParagraph3": "¿Quieres algo único? ¡Crea tus propios dibujos personalizados! Describe tu escena ideal para relajarte: un jardín zen, un patrón Art Nouveau o una ilustración botánica detallada, y haremos realidad tu idea.",
-        "popularTitle": "Temas populares de coloreado para adultos",
-        "popularDescription": "Explora nuestras categorías más populares para adultos: dibujos de mandalas para meditar, diseños elaborados de naturaleza y botánica, patrones geométricos, estilos Art Deco y Art Nouveau, páginas inspiradas en zentangles y paisajes tranquilos. Cada una ofrece un camino único hacia la relajación."
+        "seoTitle": "Páginas para colorear gratis para adultos",
+        "seoParagraph1": "Colorear para adultos se ha vuelto una actividad de bienestar muy popular, y con razón. Los estudios muestran que colorear puede reducir la ansiedad, mejorar el enfoque y dar un descanso calmante de una vida llena de pantallas. Nuestra colección ofrece diseños bonitos e intrincados, perfectos para adultos.",
+        "seoParagraph2": "Desde mandalas detallados que ayudan al mindfulness hasta escenas tranquilas de naturaleza y patrones elegantes, cada página está pensada para horas de creatividad relajante. Imprime en papel de buena calidad y usa tus herramientas favoritas: lápices de colores, rotuladores o bolígrafos de gel quedan genial.",
+        "seoParagraph3": "¿Quieres algo único? Crea tus propias páginas personalizadas. Describe tu escena perfecta para relajarte (un jardín zen, un patrón Art Nouveau, una ilustración botánica detallada) y daremos vida a tu idea.",
+        "popularTitle": "Temas populares para colorear (adultos)",
+        "popularDescription": "Explora nuestras categorías más populares para adultos: mandalas para meditar, diseños botánicos y de naturaleza intrincados, patrones geométricos, estilos Art Déco y Art Nouveau, páginas inspiradas en zentangle y paisajes tranquilos. Cada una ofrece un camino distinto hacia la relajación."
       }
     }
   },
   "pricing": {
     "pageTitle": "Precios - Chunky Crayon",
-    "heroTitle": "¡Planes para cada aventura de colorear!",
-    "heroSubtitle": "Ya seas mamá o papá, un pequeño artista o un adulto que ama colorear, hay un plan de Chunky Crayon para ti. ¡No necesitas cuenta para empezar!",
+    "heroTitle": "A una página de colorear de 20 minutos de calma.",
+    "heroSubtitle": "Prueba cualquier plan gratis por 7 días. Luego elige el ideal cuando se enamoren.",
     "monthly": "Mensual",
     "annual": "Anual (2 meses gratis)",
+    "notReadyForPlan": "¿Aún no quieres un plan? Colorea sobre la marcha",
     "mostPopular": "Más popular",
-    "buyNow": "Iniciar prueba gratis de 7 días",
-    "noCommitment": "Sin compromiso. Cancela cuando quieras.",
+    "buyNow": "Empieza la prueba gratis de 7 días",
+    "trialMicroCopy": "Luego {price}/mes. Cancela cuando quieras antes de eso.",
+    "noCommitment": "Sin compromiso. Cancelación en un clic.",
     "perMonth": "/mes",
+    "perYear": "/año",
     "creditsPerMonth": "créditos/mes",
+    "trustStrip": {
+      "rating": "4,6 de 47 reseñas",
+      "cancel": "Cancela cuando quieras",
+      "guarantee": "Garantía de devolución de 30 días"
+    },
+    "included": {
+      "title": "Cada plan desbloquea",
+      "aiCreation": "Páginas de lo que te describan",
+      "colorOnline": "Imprime en casa o colorea en pantalla",
+      "saveFavorites": "Guarda cada página para siempre",
+      "shareCreations": "Envía páginas a los abuelos",
+      "collectStickers": "Pegatinas y recompensas al colorear",
+      "familySharing": "Una suscripción, perfiles separados por peque",
+      "mobileApps": "Apps para iPhone y Android"
+    },
     "plans": {
       "splash": {
-        "name": "Plan Splash",
-        "tagline": "Empieza tu aventura de colorear",
-        "audience": "Ideal para colorear de vez en cuando y pequeños artistas"
+        "name": "Splash",
+        "tagline": "Ideal para hasta 2 peques.",
+        "audience": "Unas dos páginas por semana. Menos que una caja de ceras al mes."
       },
       "rainbow": {
-        "name": "Plan Rainbow",
-        "tagline": "Diversión para toda la familia",
-        "audience": "Genial para familias creativas y hermanitos"
+        "name": "Rainbow",
+        "tagline": "Ideal para hasta 4 peques.",
+        "audience": "Para que cada hermano elija la suya. La mayoría de familias elige este."
       },
       "sparkle": {
-        "name": "Plan Sparkle",
-        "tagline": "Para amantes del color",
-        "audience": "Perfecto para familias creativas que aman colorear"
+        "name": "Sparkle",
+        "tagline": "Ideal para hasta 10 peques.",
+        "audience": "Hasta 10 perfiles separados. Que no se acabe nunca: para toda la casa."
       }
     },
     "features": {
-      "textPrompts": "Crea páginas para colorear con instrucciones de texto",
-      "wordsNumbers": "Crea páginas para colorear con palabras, nombres y números",
-      "adjustments": "Ajusta color, contraste y brillo",
-      "photoToColoring": "Convierte fotos en páginas para colorear",
-      "allSplashFeatures": "Todas las funciones del Plan Splash",
-      "advancedEditing": "Funciones de edición avanzadas",
-      "earlyAccess": "Acceso anticipado a nuevos modelos y funciones",
-      "rollover1Month": "Los créditos se acumulan (hasta 1 mes)",
-      "allRainbowFeatures": "Todas las funciones del Plan Rainbow",
-      "bulkGeneration": "Generación en lote",
-      "commercialUse": "Uso comercial",
-      "rollover2Months": "Los créditos se acumulan (hasta 2 meses)",
-      "credits250": "250 créditos/mes (~50 páginas)",
-      "credits500": "500 créditos/mes (~100 páginas)",
-      "credits1000": "1.000 créditos/mes (~200 páginas)",
+      "credits250": "~50 páginas al mes, unas dos por semana",
+      "credits500": "~100 páginas al mes, más o menos una al día",
+      "credits1000": "~200 páginas al mes, varias al día y de sobra",
       "allFeatures": "Todas las funciones de la plataforma",
       "noRollover": "Los créditos se reinician cada mes",
+      "rollover1Month": "Los créditos se acumulan. Guarda 1 mes extra",
+      "rollover2Months": "Los créditos se acumulan. Guarda 2 meses extra",
       "prioritySupport": "Soporte prioritario",
-      "profiles3": "Hasta 3 perfiles de peques",
-      "profiles5": "Hasta 5 perfiles de peques",
-      "profiles10": "Hasta 10 perfiles de peques",
+      "commercialUse": "Licencia de uso comercial",
       "profiles2": "Hasta 2 perfiles infantiles",
-      "profiles4": "Hasta 4 perfiles infantiles"
+      "profiles4": "Hasta 4 perfiles infantiles",
+      "profiles10": "Hasta 10 perfiles infantiles"
     },
     "creditPacks": {
-      "title": "¿Necesitas créditos extra?",
-      "pack100": "Paquete de 100 créditos",
-      "pack500": "Paquete de 500 créditos",
-      "pack1000": "Paquete de 1.000 créditos"
+      "title": "¿Necesitas más créditos?",
+      "pack100": "Pack de 100 créditos",
+      "pack500": "Pack de 500 créditos",
+      "pack1000": "Pack de 1.000 créditos"
     },
     "faq": {
-      "title": "Preguntas frecuentes",
+      "title": "Antes de elegir",
+      "subtitle": "Todo lo que vale la pena saber sobre planes, créditos y cancelación.",
       "cancelAnytime": {
         "question": "¿Puedo cancelar cuando quiera?",
-        "answer": "¡Sí! Puedes cancelar tu suscripción en cualquier momento, sin preguntas."
+        "answer": "Sí. Un clic en tu cuenta, sin preguntas. Las páginas que ya creaste siguen siendo tuyas."
       },
       "rollover": {
-        "question": "¿Los créditos se acumulan?",
-        "answer": "Los créditos de Splash se reinician cada mes. Rainbow permite acumular hasta 1 mes. Sparkle te da 2 meses de acumulación."
+        "question": "¿Qué pasa con las páginas no usadas?",
+        "answer": "Los créditos de Splash se reinician cada mes. Rainbow acumula 1 mes extra. Sparkle acumula 2. Así que si no los usas este mes, siguen ahí el siguiente."
+      },
+      "creditsPerPage": {
+        "question": "¿Cuántas páginas puedo crear de verdad?",
+        "answer": "Escribir o hacer una foto cuesta 5 créditos. Hablar con Chunky Crayon cuesta 10 (porque escucha, transcribe y dibuja). Splash te da unas 50 páginas escritas al mes. Rainbow unas 100. Sparkle unas 200. Puedes combinarlas como quieras."
       },
       "audience": {
-        "question": "¿Es para niños o para adultos?",
-        "answer": "¡Para ambos! Chunky Crayon es perfecto para familias, peques y adultos a quienes les encanta colorear."
-      },
-      "gettingStarted": {
-        "question": "¿Cómo empiezo?",
-        "answer": "¡Elige un plan y empieza a crear páginas para colorear al instante!"
-      },
-      "subtitle": "Todo lo que necesitas saber sobre nuestros planes",
-      "creditsPerPage": {
-        "question": "¿Cuántas páginas puedo crear?",
-        "answer": "Cada página cuesta unas 5 créditos. Splash = ~50 páginas/mes, Rainbow = ~100, Sparkle = ~200."
+        "question": "¿Esto es solo para niños?",
+        "answer": "Funciona para cualquier edad. Los peques describen un zorro con sombrero y los padres imprimen la página. Los adultos crean las suyas y las colorean en el iPad antes de dormir. Mismo producto, distintas personas."
       },
       "multipleKids": {
-        "question": "¿Varios peques pueden usar una sola suscripción?",
-        "answer": "Sí — y aquí es donde muchas apps se equivocan. Un plan de Chunky Crayon incluye perfiles separados para cada peque (Splash 2, Rainbow 4, Sparkle 10). Sus páginas, stickers y mascotas Colo se guardan por separado. Sin comprar una suscripción para cada uno."
+        "question": "¿Varios niños pueden usar una sola suscripción?",
+        "answer": "Sí, y aquí es donde muchas apps fallan. Un plan de Chunky Crayon incluye perfiles separados para cada peque (Splash 2, Rainbow 4, Sparkle 10). Sus páginas, pegatinas y mascotas Colo quedan por separado. Sin pagar una suscripción por cada uno."
       },
       "trialMechanics": {
         "question": "¿Qué pasa después de la prueba gratis de 7 días?",
-        "answer": "Se te cobrará el precio del plan en tu tarjeta. Te enviamos un email 24 horas antes para que no sea una sorpresa. Cancela cuando quieras durante la prueba y no te cobraremos nada."
+        "answer": "Se cobra a tu tarjeta el precio del plan. Te avisamos por email 24 horas antes para que no sea una sorpresa. Cancela cuando quieras durante la prueba y no se te cobrará nada."
       },
       "printPaper": {
         "question": "¿Necesito algo para imprimir en casa?",
-        "answer": "Una impresora y papel. Las páginas se descargan como PDF y encajan en A4 o Carta (EE. UU.) sin ajustar el tamaño."
+        "answer": "Una impresora y papel. Las páginas se descargan en PDF y encajan en A4 o US Letter sin ajustar."
+      },
+      "gettingStarted": {
+        "question": "¿Cómo empiezo?",
+        "answer": "Elige un plan, inicia sesión y tu primera página estará lista en dos minutos."
       }
-    },
-    "included": {
-      "title": "Todos los planes incluyen",
-      "aiCreation": "Crea páginas para colorear con IA",
-      "colorOnline": "Colorea online o descarga para imprimir",
-      "saveFavorites": "Guarda tus favoritos en tu cuenta",
-      "shareCreations": "Comparte tus creaciones con amigos",
-      "collectStickers": "Colecciona stickers y gana premios",
-      "mobileApps": "Apps para iOS y Android",
-      "familySharing": "Una suscripción, perfiles separados para cada peque"
-    },
-    "trialMicroCopy": "Luego {price}/mes. Cancela cuando quieras antes.",
-    "trustStrip": {
-      "rating": "★★★★★ 4,9 de 183 reseñas",
-      "cancel": "Cancela cuando quieras",
-      "guarantee": "Garantía de devolución de dinero de 30 días"
     },
     "finalCta": {
       "title": "Elige un plan. Colorea algo hoy.",
-      "subtitle": "Ellos lo describen, nosotros lo dibujamos, tú lo imprimes o les pasas el iPad. Gratis 7 días, cancela cuando quieras.",
+      "subtitle": "Ellos lo describen, nosotros lo dibujamos, y tú lo imprimes o les pasas el iPad. Gratis 7 días, cancela cuando quieras.",
       "primary": "Empieza la prueba gratis de 7 días",
       "secondary": "Comparar planes otra vez"
-    },
-    "perYear": "/año",
-    "notReadyForPlan": "¿Aún no quieres un plan? Colorea cuando quieras"
+    }
   },
   "blog": {
     "title": "El blog de Chunky Crayon",
-    "subtitle": "Consejos, ideas e inspiración para colorear de forma creativa",
-    "allPosts": "Todas las publicaciones",
+    "subtitle": "Consejos, ideas e inspiración para colorear con creatividad",
+    "allPosts": "Todas las entradas",
     "byAuthor": "Por {author}",
     "categories": {
       "colouringTips": "Consejos para colorear",
-      "mindfulnessRelaxation": "Atención plena y relax",
+      "mindfulnessRelaxation": "Mindfulness y relax",
       "artEducation": "Educación artística",
       "activitiesForKids": "Actividades para peques",
-      "seasonalHolidays": "Temporadas y festivos"
+      "seasonalHolidays": "Temporadas y fiestas"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "Colorea donde quieras.",
+    "heroSubtitle": "Compra unos créditos cuando los necesites. Sin suscripción. Sin compromiso. Solo colorear.",
+    "credits": "{count} créditos",
+    "buyNow": "Conseguir créditos",
+    "loading": "Cargando...",
+    "failedToCheckout": "No se pudo ir al pago. ¿Intentar de nuevo?",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "Inicio",
+        "tagline": "Unas 10 láminas para colorear. Tarde de lluvia: solucionado."
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "Fin de semana",
+        "tagline": "Unas 40 láminas para colorear. Para una semana de \"me aburro\"."
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "Vacaciones",
+        "tagline": "Unas 100 láminas para colorear. Unas vacaciones escolares enteras: solucionadas."
+      }
+    },
+    "subscribePitch": {
+      "title": "¿Colorear cada semana?",
+      "subtitle": "La suscripción sale más barata si haces más de unas pocas láminas al mes. Además, perfiles extra para hermanos y créditos que se acumulan.",
+      "cta": "Ver planes"
     }
   },
   "adultGate": {
-    "title": "¿Eres un adulto?",
-    "subtitle": "Esta sección es para padres y tutores",
-    "instructions": "Resuelve este problema de matemáticas para continuar:",
-    "placeholder": "Escribe tu respuesta",
-    "submit": "Continuar",
-    "error": "Casi, pero no. ¡Inténtalo de nuevo!",
-    "cancel": "Volver",
-    "explanation": "Usamos un pequeño problema de matemáticas para que esto solo lo abran los padres.",
+    "title": "Un momento, ¿eres una persona adulta?",
+    "explanation": "Usamos una cuenta sencilla para que solo lo abran madres y padres.",
     "whatIs": "¿Cuánto es",
+    "placeholder": "Escribe la respuesta",
     "check": "Sí, lo tengo",
-    "errorWithAttempts": "Aún no es correcto ({attempts} intentos). Tómate tu tiempo."
+    "cancel": "Quizá más tarde",
+    "error": "Mmm, casi. Inténtalo otra vez.",
+    "errorWithAttempts": "Aún no ({attempts} intentos). Tómate tu tiempo."
+  },
+  "startOverButton": {
+    "idle": "Empezar de nuevo",
+    "modalTitle": "¿Borrar la página?",
+    "modalBody": "Se borrarán todos tus colores y empezarás con una página en blanco.",
+    "confirm": "Sí, página nueva",
+    "cancel": "Seguir coloreando"
+  },
+  "shareButton": {
+    "idle": "Compartir",
+    "preparing": "Preparándolo...",
+    "doneSharing": "¡Listo!"
+  },
+  "shareModal": {
+    "title": "Comparte este dibujo",
+    "privacyNote": "Cualquiera con el enlace puede ver esta página. No compartimos nombres, correos ni nada más.",
+    "expiresIn": "El enlace dura:",
+    "expiration": {
+      "7days": "1 semana",
+      "30days": "1 mes",
+      "never": "Para siempre"
+    },
+    "createLink": "Crear enlace",
+    "creating": "Creando tu enlace...",
+    "success": {
+      "title": "Enlace listo",
+      "subtitle": "Envíalo a quien quieras enseñárselo."
+    },
+    "done": "Listo",
+    "error": "No funcionó. Inténtalo de nuevo en un momento.",
+    "socialShare": "O publícalo"
   },
   "stickers": {
     "categories": {
@@ -671,7 +795,7 @@
       "circle": "Círculo",
       "square": "Cuadrado",
       "triangle": "Triángulo",
-      "diamond": "Rombo",
+      "diamond": "Diamante",
       "flower": "Flor",
       "sun": "Sol",
       "rainbow": "Arcoíris",
@@ -680,7 +804,7 @@
       "leaf": "Hoja",
       "smile": "Sonrisa",
       "loveEyes": "Ojitos de amor",
-      "cool": "Guay",
+      "cool": "Genial",
       "wink": "Guiño",
       "crown": "Corona",
       "unicorn": "Unicornio",
@@ -691,9 +815,9 @@
     }
   },
   "stickerBook": {
-    "title": "Libro de pegatinas",
+    "title": "Álbum de pegatinas",
     "subtitle": "¡Consigue pegatinas coloreando!",
-    "pageTitle": "Libro de pegatinas - Chunky Crayon",
+    "pageTitle": "Álbum de pegatinas - Chunky Crayon",
     "pageDescription": "Mira tu colección de pegatinas y descubre cuáles puedes desbloquear.",
     "loadError": "No se pudieron cargar las pegatinas. Inténtalo de nuevo.",
     "filters": {
@@ -701,7 +825,7 @@
       "milestones": "Logros",
       "categories": "Categorías",
       "explore": "Explorar",
-      "special": "Especial"
+      "special": "Especiales"
     },
     "emptyState": "Aún no hay pegatinas en esta categoría.",
     "countFormat": "{count}/{total}",
@@ -715,7 +839,7 @@
     },
     "detail": {
       "lockedName": "???",
-      "lockedDescription": "¡Esta pegatina aún está bloqueada!",
+      "lockedDescription": "¡Esta pegatina sigue bloqueada!",
       "unlockedOn": "Desbloqueada el {date}",
       "howToUnlock": "Cómo desbloquear:",
       "rarity": {
@@ -735,38 +859,38 @@
   "stickerCatalog": {
     "first-steps": {
       "name": "Primeros pasos",
-      "description": "¡Guarda tu primera obra coloreada!",
+      "description": "¡Guarda tu primer dibujo coloreado!",
       "unlockMessage": "¡Lo lograste! ¡Tu primera obra maestra está guardada!"
     },
     "getting-started": {
-      "name": "Empezando",
-      "description": "¡Vas genial! Guarda 5 obras.",
-      "unlockMessage": "¡Cinco obras! ¡Te estás convirtiendo en artista!"
+      "name": "Para empezar",
+      "description": "¡Vas genial! Guarda 5 dibujos.",
+      "unlockMessage": "¡Cinco dibujos! ¡Te estás volviendo artista!"
     },
     "high-five": {
       "name": "Choca esos cinco",
-      "description": "Guarda 10 obras preciosas en tu galería.",
-      "unlockMessage": "¡Choca esos cinco! ¡Diez obras increíbles!"
+      "description": "Guarda 10 dibujos preciosos en tu galería.",
+      "unlockMessage": "¡Choca esos cinco! ¡Diez dibujos increíbles!"
     },
     "perfect-ten": {
-      "name": "Diez perfecto",
-      "description": "¡Un verdadero artista! Guarda 25 obras.",
-      "unlockMessage": "¡25 obras! ¡Eres una estrella del color!"
+      "name": "Diez perfectos",
+      "description": "¡Un artista de verdad! Guarda 25 dibujos.",
+      "unlockMessage": "¡25 dibujos! ¡Eres una estrella del color!"
     },
     "super-artist": {
       "name": "Súper artista",
-      "description": "¡Increíble dedicación! Guarda 50 obras.",
+      "description": "¡Increíble dedicación! Guarda 50 dibujos.",
       "unlockMessage": "¡50 obras maestras! ¡Eres un súper artista!"
     },
     "master-creator": {
       "name": "Creador maestro",
-      "description": "¡Nivel legendario! Guarda 75 obras.",
-      "unlockMessage": "¡75 obras! ¡Un verdadero creador maestro!"
+      "description": "¡Nivel legendario! Guarda 75 dibujos.",
+      "unlockMessage": "¡75 dibujos! ¡Un verdadero creador maestro!"
     },
     "century-club": {
       "name": "Club de los 100",
-      "description": "¡El logro máximo! Guarda 100 obras.",
-      "unlockMessage": "¡100 obras! ¡Bienvenido al Club de los 100!"
+      "description": "¡El logro máximo! Guarda 100 dibujos.",
+      "unlockMessage": "¡100 dibujos! ¡Bienvenido al Club de los 100!"
     },
     "animal-friend": {
       "name": "Amigo animal",
@@ -786,12 +910,12 @@
     "nature-lover": {
       "name": "Amante de la naturaleza",
       "description": "¡Colorea tu primera página de naturaleza!",
-      "unlockMessage": "¡La naturaleza es hermosa, igual que tu arte!"
+      "unlockMessage": "¡La naturaleza es preciosa, como tu arte!"
     },
     "vehicle-driver": {
       "name": "Conductor de vehículos",
       "description": "¡Colorea tu primera página de vehículos!",
-      "unlockMessage": "¡Bip bip! ¡Qué buenas ruedas!"
+      "unlockMessage": "¡Pip pip! ¡Qué buenas ruedas!"
     },
     "dino-hunter": {
       "name": "Cazador de dinos",
@@ -800,13 +924,13 @@
     },
     "ocean-diver": {
       "name": "Buzo del océano",
-      "description": "¡Colorea tu primera página de vida marina!",
+      "description": "¡Colorea tu primera página del mar!",
       "unlockMessage": "¡Splash! ¡Aventura bajo el mar!"
     },
     "food-lover": {
       "name": "Amante de la comida",
       "description": "¡Colorea tu primera página de comida!",
-      "unlockMessage": "¡Mmm! ¡Se ve delicioso!"
+      "unlockMessage": "¡Mmm! ¡Qué rico se ve!"
     },
     "sports-star": {
       "name": "Estrella del deporte",
@@ -815,12 +939,12 @@
     },
     "holiday-spirit": {
       "name": "Espíritu festivo",
-      "description": "¡Colorea tu primera página de fiestas!",
+      "description": "¡Colorea tu primera página de fiesta!",
       "unlockMessage": "¡A celebrar! ¡Espíritu festivo desbloqueado!"
     },
     "animal-master": {
       "name": "Maestro de animales",
-      "description": "¡Colorea 10 páginas de animales para ser un verdadero experto!",
+      "description": "¡Colorea 10 páginas de animales y conviértete en un experto!",
       "unlockMessage": "¡Eres el mejor amigo de los animales!"
     },
     "fantasy-master": {
@@ -830,13 +954,13 @@
     },
     "space-master": {
       "name": "Maestro del espacio",
-      "description": "¡Colorea 10 páginas del espacio para convertirte en astronauta!",
-      "unlockMessage": "¡Eres un explorador espacial de verdad!"
+      "description": "¡Colorea 10 páginas del espacio para ser astronauta!",
+      "unlockMessage": "¡Eres un explorador espacial certificado!"
     },
     "category-explorer": {
       "name": "Explorador de categorías",
       "description": "¡Prueba algo nuevo! Colorea páginas de 3 categorías diferentes.",
-      "unlockMessage": "¡La variedad le da magia al arte!"
+      "unlockMessage": "¡La variedad le da color al arte!"
     },
     "world-traveler": {
       "name": "Viajero del mundo",
@@ -847,8 +971,8 @@
   "stickerSelector": {
     "title": "Elige una pegatina",
     "close": "Cerrar",
-    "selected": "Elegida:",
-    "helpText": "Toca el dibujo para poner tu pegatina"
+    "selected": "Seleccionada:",
+    "helpText": "Toca el lienzo para poner tu pegatina"
   },
   "profiles": {
     "pageTitle": "Gestionar perfiles",
@@ -866,13 +990,13 @@
       "tweenDescription": "9-12 años",
       "teen": "Adolescente",
       "teenDescription": "13-17 años",
-      "adult": "Adulto",
+      "adult": "Adulto/a",
       "adultDescription": "18+"
     },
     "form": {
       "name": "Nombre",
       "namePlaceholder": "p. ej., Emma",
-      "nameRequired": "Introduce un nombre",
+      "nameRequired": "Escribe un nombre",
       "ageGroup": "Grupo de edad",
       "avatar": "Avatar",
       "difficultyLevel": "Nivel de dificultad",
@@ -886,17 +1010,17 @@
     "delete": {
       "title": "¿Eliminar perfil?",
       "dangerZone": "Zona de peligro",
-      "warning": "Eliminar este perfil lo borrará para siempre. Las páginas para colorear creadas con este perfil seguirán en tu cuenta.",
-      "confirmText": "Esto eliminará el perfil para siempre. Las páginas para colorear creadas con este perfil seguirán en tu cuenta.",
+      "warning": "Al eliminar este perfil, se borrará para siempre. Las páginas para colorear creadas por este perfil seguirán en tu cuenta.",
+      "confirmText": "Esto eliminará el perfil para siempre. Las páginas para colorear creadas por este perfil seguirán en tu cuenta.",
       "deleteProfile": "Eliminar perfil",
       "deleting": "Eliminando...",
       "deleted": "\"{name}\" eliminado",
       "coloringPages": "{count, plural, =1 {1 página para colorear} other {# páginas para colorear}}"
     },
     "manager": {
-      "aboutProfiles": "Sobre los perfiles",
+      "aboutProfiles": "Acerca de los perfiles",
       "ownCollection": "Cada perfil tiene su propia colección de páginas",
-      "personalizedDifficulty": "La dificultad se ajusta para cada perfil",
+      "personalizedDifficulty": "La dificultad se ajusta por perfil",
       "maxProfiles": "Puedes tener hasta {max} perfiles en tu cuenta",
       "switchAnytime": "Cambia de perfil cuando quieras desde el menú superior",
       "profilesUsed": "{count} de {max} perfiles usados",
@@ -912,10 +1036,10 @@
       "success": "¡Perfil creado!",
       "addProfile": "Añadir perfil",
       "maxReached": "Se alcanzó el máximo de perfiles",
-      "maxReachedDescription": "Has alcanzado el máximo de {max} perfiles. Elimina un perfil para añadir uno nuevo.",
+      "maxReachedDescription": "Alcanzaste el máximo de {max} perfiles. Elimina un perfil para añadir uno nuevo.",
       "nameLabel": "Nombre",
       "namePlaceholder": "p. ej., Emma",
-      "nameError": "Introduce un nombre",
+      "nameError": "Escribe un nombre",
       "ageGroupLabel": "Grupo de edad",
       "avatarLabel": "Avatar"
     }
@@ -931,23 +1055,23 @@
   "socialShare": {
     "shareOn": "Compartir en {platform}",
     "download": "Descargar dibujo",
-    "downloadAria": "Descargar tu dibujo coloreado",
+    "downloadAria": "Descarga tu dibujo coloreado",
     "facebookAria": "Compartir en Facebook",
     "xAria": "Compartir en X (Twitter)",
-    "pinterestAria": "Guardar en Pinterest",
+    "pinterestAria": "Pinear en Pinterest",
     "whatsappAria": "Compartir en WhatsApp"
   },
   "parentalGate": {
-    "title": "¡Solo para adultos!",
-    "subtitle": "Resuelve este problema de matemáticas para continuar",
-    "description": "Para asegurarnos de que un adulto está ayudando, responde esta pregunta:",
+    "title": "¡Solo adultos!",
+    "subtitle": "Resuelve este problema de mates para continuar",
+    "description": "Para asegurarnos de que un adulto está ayudando, responde a esta pregunta:",
     "question": "¿Cuánto es {num1} + {num2}?",
     "placeholder": "Tu respuesta",
     "submit": "Comprobar respuesta",
     "cancel": "Cancelar",
     "error": "¡Casi! Prueba con otro...",
     "incorrect": "No es correcto. Inténtalo de nuevo.",
-    "hint": "¡Pídele ayuda a mamá, papá o a un tutor!"
+    "hint": "¡Pídele ayuda a un padre, madre o tutor!"
   },
   "stickerReward": {
     "congratulations": "¡Felicidades!",
@@ -961,46 +1085,46 @@
     "nextSticker": "Siguiente pegatina",
     "newSticker": "¡Nueva pegatina!",
     "newStickers": "¡Nuevas pegatinas!",
-    "ofCount": "{current} de {total}",
-    "addToStickerBook": "Añadir al álbum",
+    "ofCount": "Pegatina {current} de {total}",
+    "addToStickerBook": "Guárdala en mi álbum",
     "goToSticker": "Ir a la pegatina {number}",
     "rarity": {
       "common": "Común",
       "uncommon": "Poco común",
       "rare": "Rara",
-      "legendary": "Legendaria"
+      "legendary": "Una entre un millón"
     }
   },
   "seo": {
     "home": {
-      "title": "Chunky Crayon - Colorear y aprender jugando",
-      "description": "Chunky Crayon es una app colorida e interactiva para peques y familias: crea páginas para colorear únicas y personalizadas, y divertidas fichas educativas. Convierte texto, voz e imágenes en páginas para imprimir, o colorea en digital en nuestra web y en iOS y Android."
+      "title": "Chunky Crayon - Colorea, crea y aprende",
+      "description": "Chunky Crayon es una app divertida e interactiva para peques y familias: crea páginas para colorear únicas y fichas educativas. Convierte textos, voz e imágenes en láminas imprimibles, o colorea en digital en web, iOS y Android."
     },
     "gallery": {
-      "title": "Galería gratis de dibujos para colorear - Chunky Crayon",
-      "description": "Explora nuestra colección gratis de dibujos para colorear e imprimir. Encuentra animales, dragones, unicornios, princesas y mucho más. ¡Nuevas páginas cada día!"
+      "title": "Galería de páginas para colorear gratis - Chunky Crayon",
+      "description": "Explora nuestra colección gratis de páginas para colorear imprimibles. Animales, dragones, unicornios, princesas y mucho más. ¡Nuevas páginas cada día!"
     }
   },
   "altText": {
     "mascot": "Colo, la simpática mascota crayón",
     "dailyPage": "Página para colorear del día",
     "coloringPage": "Página para colorear",
-    "ogImage": "Páginas para colorear con IA de Chunky Crayon",
-    "toddlerPage": "Página para colorear para peques",
-    "kidsPage": "Página para colorear para niños",
-    "teenPage": "Página para colorear para adolescentes",
-    "adultPage": "Página para colorear para adultos"
+    "toddlerPage": "Página para colorear (peques)",
+    "kidsPage": "Página para colorear (niños)",
+    "teenPage": "Página para colorear (adolescentes)",
+    "adultPage": "Página para colorear (adultos)",
+    "ogImage": "Páginas de libro para colorear personalizadas de Chunky Crayon"
   },
   "metadata": {
-    "keywords": "páginas para colorear, app creativa para niños, páginas para colorear personalizadas, fichas educativas, actividades divertidas de aprendizaje, app de creatividad infantil, app interactiva para colorear, colorear digital, páginas para colorear imprimibles"
+    "keywords": "páginas de libro para colorear, app creativa para niños, páginas para colorear personalizadas, fichas educativas, actividades divertidas para aprender, app de creatividad infantil, app interactiva para colorear, colorear en digital, páginas para colorear imprimibles"
   },
   "myArtwork": {
-    "pageTitle": "Mi arte",
-    "pageSubtitle": "Todas tus creaciones coloreadas guardadas en un solo lugar. ¡Toca cualquier dibujo para colorearlo otra vez o hacer una nueva versión!",
+    "pageTitle": "Mis dibujos",
+    "pageSubtitle": "Todas tus creaciones guardadas en un solo lugar. Toca cualquier dibujo para colorearlo otra vez o hacer una nueva versión.",
     "emptyState": {
-      "title": "¡Aún no hay arte guardado!",
-      "description": "Empieza a colorear y guarda tus creaciones para verlas aquí. ¡Tu arte se guardará para siempre!",
-      "cta": "Explorar páginas para colorear"
+      "title": "¡Aún no hay dibujos guardados!",
+      "description": "Empieza a colorear y guarda tus creaciones para verlas aquí. ¡Tus dibujos se guardarán para siempre!",
+      "cta": "Ver páginas para colorear"
     },
     "grid": {
       "coloredBy": "Coloreado por {name}",
@@ -1008,11 +1132,11 @@
       "deleteArtwork": "Borrar dibujo",
       "shareArtwork": "Compartir dibujo",
       "shareWithFamily": "Compartir con la familia",
-      "colorAgain": "Colorear de nuevo",
-      "savedArtwork": "Arte guardado"
+      "colorAgain": "Colorear otra vez",
+      "savedArtwork": "Dibujos guardados"
     },
     "filters": {
-      "all": "Todo",
+      "all": "Todos",
       "recent": "Recientes",
       "favorites": "Favoritos"
     },
@@ -1029,47 +1153,62 @@
       "title": "¿Borrar dibujo?",
       "description": "¿Seguro que quieres borrar este dibujo? ¡No se puede deshacer!",
       "confirm": "Sí, borrar",
-      "cancel": "No, conservar"
+      "cancel": "No, conservarlo"
     }
   },
   "challenges": {
-    "pageTitle": "Desafíos semanales",
-    "pageSubtitle": "¡Completa divertidos desafíos de colorear cada semana para ganar stickers y accesorios exclusivos para tu Colo!",
+    "pageTitle": "Retos semanales",
+    "pageSubtitle": "¡Completa retos de colorear cada semana y gana stickers y accesorios exclusivos para tu Colo!",
     "breadcrumbs": {
       "home": "Inicio",
       "account": "Cuenta",
-      "challenges": "Desafíos"
+      "challenges": "Retos"
     },
     "currentChallenge": {
-      "title": "El desafío de esta semana"
+      "title": "El reto de esta semana"
     },
     "noActive": {
-      "title": "No hay desafío activo",
-      "description": "¡Vuelve pronto para el próximo desafío semanal!"
+      "title": "No hay reto activo",
+      "description": "¡Vuelve pronto para el próximo reto semanal!"
     },
     "history": {
-      "title": "Desafíos anteriores",
+      "title": "Retos anteriores",
       "completed": "Completado",
-      "expired": "Vencido",
+      "expired": "Caducado",
       "progress": "{progress} / {requirement} completados"
     },
     "reward": {
       "claimed": "¡Recompensa reclamada!",
-      "stickerAdded": "¡Un nuevo sticker se agregó a tu álbum de stickers!",
-      "accessoryAdded": "¡Un nuevo accesorio se agregó a tu Colo!"
+      "stickerAdded": "¡Se agregó un nuevo sticker a tu álbum de stickers!",
+      "accessoryAdded": "¡Se agregó un nuevo accesorio a tu Colo!"
     }
   },
   "recentCreations": {
     "title": "Tus creaciones recientes",
-    "imageAlt": "Tu dibujo para colorear",
+    "imageAlt": "Tu página para colorear",
     "ctaHighlight": "Empieza gratis",
     "ctaMessage": "para guardar tus creaciones para siempre y desbloquear más.",
     "ctaButton": "Empieza gratis"
   },
+  "coloringPage": {
+    "progress": {
+      "allDone": "¡Listo!",
+      "milestones": {
+        "25": "¡Gran comienzo!",
+        "50": "¡Ya vas por la mitad!",
+        "75": "¡Casi terminas!",
+        "100": "¡Listo!"
+      }
+    }
+  },
   "createForm": {
     "title": "¡Crea magia!",
-    "tagline": "¡Escribe, habla o haz una foto!",
-    "generatingMessage": "¡Listo en unos 30 segundos!",
+    "tagline": "¡Escribe, habla o saca una foto!",
+    "generatingMessage": "¡Listo en unos 2 minutos!",
+    "examplesLabel": "Prueba uno de estos",
+    "exampleTrex": "Un T-rex astronauta en monopatín",
+    "exampleDragon": "Un dragón y un conejito en una merienda con té",
+    "exampleFoxes": "Una familia de zorros de picnic",
     "inputModes": {
       "type": "Escribir",
       "talk": "Hablar",
@@ -1078,91 +1217,109 @@
     },
     "voiceInput": {
       "startRecording": "Empezar a grabar",
-      "stopRecording": "Detener grabación",
-      "tapToRecord": "¡Toca el micrófono y dime qué quieres colorear!",
-      "signInToRecord": "¡Inicia sesión para empezar a grabar!",
+      "stopRecording": "Dejar de grabar",
+      "tapToRecord": "¡Toca y dime qué quieres colorear!",
+      "signInToRecord": "¡Inicia sesión para grabar!",
       "notSupported": "¡Ups! Tu navegador no admite grabación de voz.",
       "notSupportedHint": "Prueba Chrome, Safari o Firefox en un dispositivo con micrófono.",
       "tryAgain": "Intentar de nuevo",
-      "listening": "¡Te escucho! ¡Dime qué quieres colorear!",
-      "allDone": "¿Listo? Toca el botón o terminaré en {countdown}...",
+      "listening": "¡Te escucho!",
+      "allDone": "¿Listo? {countdown}s…",
       "cancel": "Cancelar",
       "doneTalking": "Terminé de hablar",
       "imDone": "¡Ya terminé!",
       "gettingMicReady": "Preparando tu micrófono...",
       "understanding": "Entendiendo lo que dijiste...",
       "makeMyColoringPage": "🎨 ¡Crea mi página para colorear!",
-      "notQuiteRight": "¿No era eso? Inténtalo de nuevo",
+      "notQuiteRight": "¿No quedó del todo bien? Inténtalo de nuevo",
       "maxDuration": "Hasta {seconds} segundos",
       "errors": {
-        "permissionDenied": "No pude acceder a tu micrófono. ¡Permite el acceso y vuelve a intentarlo!",
-        "notSupported": "¡Ups! Tu navegador no admite grabación de voz. ¡Prueba Chrome o Safari!",
-        "transcriptionFailed": "Mmm, no entendí eso. ¡Probemos de nuevo!",
-        "recordingFailed": "Algo salió mal con la grabación. ¡Inténtalo de nuevo!",
-        "timeout": "La grabación fue demasiado larga. ¡Prueba un mensaje más corto!"
+        "permissionDenied": "¡Necesito tu micrófono!",
+        "notSupported": "¡Prueba con otro navegador!",
+        "transcriptionFailed": "¡No entendí eso!",
+        "recordingFailed": "¡Ups! ¡Intentémoslo de nuevo!",
+        "timeout": "¡Eso fue un poco largo!"
       }
     },
     "imageInput": {
-      "takePhotoOrUpload": "¡Haz una foto o sube una imagen!",
+      "takePhotoOrUpload": "¡Saca o elige una foto!",
       "signInToUpload": "¡Inicia sesión para subir imágenes!",
       "camera": "Cámara",
       "upload": "Subir",
-      "takePhoto": "Hacer una foto",
+      "takePhoto": "Sacar una foto",
       "uploadImage": "Subir una imagen",
       "dropHere": "¡Suéltala aquí!",
-      "dragAndDrop": "O arrastra y suelta una imagen aquí",
+      "dragAndDrop": "o suelta una aquí",
       "shareDrawing": "¡Comparte un dibujo o cualquier foto que quieras colorear!",
-      "greatPicture": "¡Qué buena imagen! ¿Es esta la que quieres?",
+      "greatPicture": "¡Qué foto tan bonita! ¿Es esta la que quieres?",
       "pickAnother": "Elegir otra",
       "useThis": "¡Usar esta!",
       "iSee": "Veo:",
       "makeMyColoringPage": "🎨 ¡Crea mi página para colorear!",
-      "notQuiteRight": "¿No era eso? Inténtalo de nuevo",
+      "notQuiteRight": "¿No quedó del todo bien? Inténtalo de nuevo",
       "capturing": "Preparando tu foto...",
-      "processing": "Mirando tu imagen...",
+      "processing": "Mirando tu foto...",
       "tryAgain": "Intentar de nuevo",
       "altImagePreview": "Vista previa de la imagen seleccionada",
       "altUploadedImage": "Tu imagen subida",
       "errors": {
-        "fileTooLarge": "¡Esa imagen es demasiado grande! Prueba una de menos de 10MB.",
-        "invalidType": "No puedo leer ese tipo de archivo. ¡Prueba una imagen JPEG, PNG o WebP!",
-        "processingFailed": "Mmm, no pude entender esa imagen. ¡Probemos con otra!",
-        "cameraFailed": "Algo salió mal con la cámara. ¡Intentémoslo de nuevo!",
-        "heicUnsupported": "Las fotos HEIC aún no son compatibles. ¡Guárdala primero como JPG o PNG!"
+        "fileTooLarge": "¡Demasiado grande! Prueba con una más pequeña.",
+        "invalidType": "¡Prueba con otra imagen!",
+        "processingFailed": "¡No salió! ¡Prueba con otra!",
+        "cameraFailed": "¡La cámara se atascó! ¡Intenta de nuevo!",
+        "heicUnsupported": "Aún no se admiten fotos HEIC. ¡Guárdala primero como JPG o PNG!"
       }
     },
-    "placeholder": "p. ej., un barco pirata navegando por el espacio 🚀",
-    "placeholderGuestLimit": "¡Ya usaste tus {maxTries} intentos gratis! Regístrate para conseguir 15 créditos más.",
-    "placeholderNoCreditsSubscribed": "Te quedaste sin créditos — ¡recarga o mejora tu plan!",
-    "placeholderNoCreditsNoSubscription": "Ya usaste tus créditos gratis — ¡elige un plan para seguir creando!",
-    "placeholderSignIn": "¡Inicia sesión para empezar a crear páginas mágicas para colorear!",
-    "buttonCreate": "Crear página para colorear",
-    "buttonCreateGuest": "Crear ({remaining} {remaining, plural, =1 {intento} other {intentos}} gratis restantes)",
+    "placeholder": "¿Qué quieres colorear?",
+    "placeholderGuestLimit": "¡Ya usaste tus {maxTries} intentos gratis! Regístrate para 15 créditos más.",
+    "placeholderNoCreditsSubscribed": "Te quedaste sin créditos. ¡Recarga o mejora tu plan!",
+    "placeholderNoCreditsNoSubscription": "Ya usaste tus créditos gratis. ¡Elige un plan o colorea cuando quieras!",
+    "placeholderSignIn": "¡Inicia sesión para crear páginas mágicas para colorear!",
+    "buttonCreate": "Crear",
+    "buttonCreateGuest": "Crear",
+    "freeTriesChip": "{remaining, plural, =1 {Queda # intento gratis} other {Quedan # intentos gratis}}",
     "buttonSignUp": "Regístrate y consigue 15 créditos gratis",
     "buttonBuyCredits": "Comprar más créditos",
     "buttonViewPlans": "Ver planes",
+    "linkColorAsYouGo": "O colorea cuando quieras (sin suscripción)",
     "buttonGetStarted": "Empezar gratis",
     "subtextGuestLimit": "¡Ya viste la magia! Regístrate para seguir creando.",
-    "subtextNoCredits": "Te quedaste sin créditos — ¡recarga o mejora tu plan!",
-    "subtextNoCreditsSubscribed": "¿Necesitas más magia? ¡Recarga o mejora tu plan para que la creatividad siga!",
-    "subtextNoCreditsNoSubscription": "Elige una suscripción para desbloquear más creaciones",
-    "subtextFallback": "Tendrás 15 créditos gratis — ¡suficientes para crear 3 páginas!",
-    "freeTriesChip": "{remaining, plural, =1 {Queda # intento gratis} other {Quedan # intentos gratis}}",
-    "examplesLabel": "Prueba una de estas",
-    "exampleTrex": "Un T-rex astronauta en un monopatín",
-    "exampleDragon": "Un dragón y un conejito tomando el té",
-    "exampleFoxes": "Una familia de zorros de picnic",
-    "linkColorAsYouGo": "O colorea sobre la marcha (sin suscripción)"
+    "subtextNoCredits": "Te quedaste sin créditos. ¡Recarga o mejora!",
+    "subtextNoCreditsSubscribed": "¿Necesitas más magia? ¡Recarga o mejora para que siga la creatividad!",
+    "subtextNoCreditsNoSubscription": "Elige una suscripción o compra algunos créditos para seguir.",
+    "subtextFallback": "¡Recibirás 15 créditos gratis, suficientes para crear 3 páginas!"
+  },
+  "feedback": {
+    "title": "¿Qué tienes en mente?",
+    "subtitle": "Leemos cada mensaje. De verdad.",
+    "types": {
+      "bug": {
+        "label": "Algo no funciona",
+        "placeholder": "¿Qué intentaste hacer y qué pasó en su lugar?"
+      },
+      "idea": {
+        "label": "Tengo una idea",
+        "placeholder": "¿Qué te encantaría ver? Está bien soñar en grande."
+      },
+      "help": {
+        "label": "Necesito ayuda",
+        "placeholder": "¿En qué te atascaste?"
+      },
+      "other": {
+        "label": "Otra cosa",
+        "placeholder": "Cuéntanos lo que quieras, bueno o malo."
+      }
+    },
+    "emailPlaceholder": "Tu email (opcional, solo si quieres respuesta)",
+    "sendButton": "Enviar",
+    "sending": "Enviando...",
+    "successTitle": "¡Listo, gracias!",
+    "successMessage": "Lo revisaremos y te responderemos si hace falta."
   },
   "og": {
     "homepage": {
-      "tagline": "Diversión creativa para colorear y aprender",
-      "features": {
-        "pages": "Más de 10.000 páginas",
-        "aiGenerated": "Generado por IA",
-        "freePrintables": "Imprimibles gratis"
-      },
-      "alt": "Chunky Crayon — páginas para colorear personalizadas, en segundos."
+      "tagline": "Páginas para colorear a medida, en segundos.",
+      "alt": "Chunky Crayon, páginas para colorear a medida en segundos."
     },
     "coloringImage": {
       "notFound": "No se encontró la página para colorear"
@@ -1173,7 +1330,7 @@
       "blog": "Blog"
     },
     "sharedArtwork": {
-      "notFound": "No se encontró la obra",
+      "notFound": "No se encontró la ilustración",
       "createdBy": "Creado por"
     },
     "difficulty": {
@@ -1182,191 +1339,5 @@
       "advanced": "Avanzado",
       "expert": "Experto"
     }
-  },
-  "coloringPage": {
-    "progress": {
-      "allDone": "¡Listo!",
-      "milestones": {
-        "25": "¡Gran comienzo!",
-        "50": "¡A mitad de camino!",
-        "75": "¡Casi listo!",
-        "100": "¡Listo!"
-      }
-    }
-  },
-  "start": {
-    "eyebrow": "La primera app de colorear que acepta peticiones.",
-    "cta": "Pruébalo gratis",
-    "ctaSubtext": "2 páginas gratis. Sin cuenta.",
-    "tryColoring": "Prueba a colorear esta",
-    "hero": {
-      "trex": {
-        "title": "“Mamá, ¿puedo colorear un T-rex en monopatín?”",
-        "subtitle": "Sí, tal cual. Tu peque describe la escena. Tú tienes una página para imprimir en unos 2 minutos. Imprímela o coloréala en la app."
-      },
-      "foxes": {
-        "title": "Tiempo de pantalla, pero con ceras.",
-        "subtitle": "El salvavidas de las 5, resuelto. Imprime una página para la mesa o dales tu móvil. La misma página, cero culpa."
-      },
-      "dragon": {
-        "title": "De “fiesta del té con dragones” a una página real.",
-        "subtitle": "Tu peque describe cualquier escena. Nosotros la dibujamos. Imprímela o coloréala en la app. Cada página es la que de verdad quieren colorear."
-      },
-      "default": {
-        "title": "Tu peque lo describe. Nosotros dibujamos la página para colorear.",
-        "subtitle": "Un T-rex astronauta. Una fiesta del té con dragones. Un picnic de una familia de zorros. Lo que imaginen, imprimible en unos 2 minutos."
-      }
-    },
-    "problem": {
-      "title": "El salvavidas de las 5: “me aburro”.",
-      "body": "Tú estás cansado/a. Ellos quieren ceras. Tú quieres calma. Pero la página del dinosaurio de la semana pasada ya se ha coloreado tres veces. Chunky Crayon crea una nueva con la escena que tu peque describa, en unos 2 minutos."
-    },
-    "howItWorks": {
-      "title": "Cómo funciona",
-      "steps": {
-        "describe": {
-          "title": "Ellos describen la escena",
-          "body": "Habla, escribe o haz una foto. Lo que tengan en la cabeza."
-        },
-        "draw": {
-          "title": "Nosotros dibujamos la página",
-          "body": "Del prompt a imprimir, en unos 2 minutos."
-        },
-        "color": {
-          "title": "Imprime o colorea en la app",
-          "body": "Ceras en la mesa. Dedo en el móvil. Tú eliges."
-        }
-      }
-    },
-    "features": {
-      "title": "Todo en una sola app.",
-      "items": {
-        "unlimited": {
-          "title": "Cualquier escena, cualquier tema",
-          "body": "Dinosaurios astronautas. Unicornios dentistas. Hermanos en el espacio. Si pueden describirlo, podemos dibujarlo."
-        },
-        "print": {
-          "title": "Lista para imprimir o en pantalla",
-          "body": "Cada página es un PDF limpio y un lienzo interactivo. Elige lo que mejor encaje en el momento."
-        },
-        "daily": {
-          "title": "Una página nueva cada día",
-          "body": "¿Te gustan las sorpresas? Una nueva página gratis llega a tu correo cada día."
-        },
-        "family": {
-          "title": "Una suscripción, cada peque",
-          "body": "Perfiles separados para cada niño en el mismo plan. Sus páginas, pegatinas y recompensas son solo suyas. Hasta 10 perfiles en Sparkle."
-        }
-      }
-    },
-    "pricing": {
-      "title": "Gratis para probar. Planes desde £7.99/mes.",
-      "body": "Empieza con 2 generaciones gratis, sin cuenta. ¿Te encanta? Planes para colorear de vez en cuando o a diario.",
-      "cta": "Ver todos los planes"
-    },
-    "finalCta": {
-      "title": "A una página de 20 minutos de calma.",
-      "body": "Escribe una escena. Nosotros la dibujamos. No necesitas cuenta para probar."
-    },
-    "demo": {
-      "title": "Mira cómo se crea una página para colorear.",
-      "body": "Tu peque lo dice. Nosotros lo dibujamos. En unos 2 minutos, de idea a imprimible, siempre.",
-      "idleLabel": "Pulsa reproducir para ver cómo se dibuja una página para colorear.",
-      "drawingLabel": "Dibujando la escena",
-      "drawingSubLabel": "Espera un poquito, tardará un momento.",
-      "playLabel": "Reproducir la demo",
-      "pauseLabel": "Pausa"
-    },
-    "experiments": {
-      "startCta": {
-        "urgency": "2 páginas gratis hoy — sin tarjeta, sin truco.",
-        "proof": "Únete a 200+ familias. 2 páginas gratis para empezar."
-      }
-    }
-  },
-  "colorAsYouGo": {
-    "heroTitle": "Colorea donde quieras.",
-    "heroSubtitle": "Compra unos créditos cuando los necesites. Sin suscripción. Sin compromiso. Solo colorear.",
-    "credits": "{count} créditos",
-    "buyNow": "Conseguir créditos",
-    "loading": "Cargando...",
-    "failedToCheckout": "No pudimos ir al pago. ¿Intentar de nuevo?",
-    "packs": {
-      "PUBLIC_CREDITS_50": {
-        "name": "Inicio",
-        "tagline": "Unas 10 páginas para colorear. Ideal para una tarde de lluvia."
-      },
-      "PUBLIC_CREDITS_200": {
-        "name": "Media semana",
-        "tagline": "Unas 40 páginas para colorear. Para una semana de \"me aburro\"."
-      },
-      "PUBLIC_CREDITS_500": {
-        "name": "Vacaciones",
-        "tagline": "Unas 100 páginas para colorear. Vacaciones escolares, resueltas."
-      }
-    },
-    "subscribePitch": {
-      "title": "¿Colorear cada semana?",
-      "subtitle": "La suscripción sale más barata si haces más de unas pocas páginas al mes. Además, perfiles extra para hermanos y créditos que se acumulan.",
-      "cta": "Ver planes"
-    }
-  },
-  "feedback": {
-    "title": "¿Cómo podemos ayudarte?",
-    "subtitle": "Leemos cada mensaje y te respondemos pronto.",
-    "types": {
-      "bug": {
-        "label": "Reportar un error",
-        "placeholder": "¿Qué salió mal? Si puedes, cuéntanos qué estabas haciendo..."
-      },
-      "idea": {
-        "label": "Sugerir una función",
-        "placeholder": "¿Qué te encantaría ver? ¿Cómo ayudaría?"
-      },
-      "help": {
-        "label": "Obtener ayuda",
-        "placeholder": "¿Con qué necesitas ayuda?"
-      },
-      "other": {
-        "label": "Algo más",
-        "placeholder": "¿Qué te gustaría contarnos?"
-      }
-    },
-    "emailPlaceholder": "Tu correo (opcional, para responderte)",
-    "sendButton": "Enviar mensaje",
-    "sending": "Enviando...",
-    "successTitle": "¡Gracias por tus comentarios!",
-    "successMessage": "Agradecemos que te tomes un momento para ayudarnos a mejorar."
-  },
-  "startOverButton": {
-    "idle": "Empezar de nuevo",
-    "modalTitle": "¿Borrar la página?",
-    "modalBody": "Se borrarán todos tus colores y volverás a empezar con una página en blanco.",
-    "confirm": "Sí, página nueva",
-    "cancel": "Seguir coloreando"
-  },
-  "shareButton": {
-    "idle": "Compartir",
-    "preparing": "¡Lo estamos preparando...!",
-    "doneSharing": "¡Listo!"
-  },
-  "shareModal": {
-    "title": "Comparte este dibujo",
-    "privacyNote": "Cualquiera con el enlace puede ver esta página. No compartimos nombres, correos ni nada más.",
-    "expiresIn": "El enlace funciona por:",
-    "expiration": {
-      "7days": "1 semana",
-      "30days": "1 mes",
-      "never": "Para siempre"
-    },
-    "createLink": "Crear enlace",
-    "creating": "Creando tu enlace...",
-    "success": {
-      "title": "¡Enlace listo!",
-      "subtitle": "Envíalo a quien quieras enseñárselo."
-    },
-    "done": "Listo",
-    "error": "No funcionó. Inténtalo de nuevo en un momento.",
-    "socialShare": "O publícalo"
   }
 }

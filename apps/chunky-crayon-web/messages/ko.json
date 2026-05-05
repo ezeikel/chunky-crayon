@@ -1,78 +1,78 @@
 {
   "coloLoading": {
-    "title": "페이지 만드는 중!",
-    "titleSpeaking": "너무 신난다!",
-    "coloSpeaking": "Colo가 말하고 있어! 잘 들어봐!",
+    "title": "그림을 만들고 있어요...",
+    "titleSpeaking": "콜로가 할 말이 있어요",
+    "coloSpeaking": "들어보세요, 콜로가 말하고 있어요!",
     "audioStates": {
-      "idle": "준비 중...",
-      "preparing": "Colo가 깨어나는 중!",
-      "done": "그림 그리는 중..."
+      "idle": "준비 중이에요...",
+      "preparing": "콜로가 준비하고 있어요...",
+      "done": "그림을 그리고 있어요..."
     },
     "messages": {
-      "sharpeningCrayons": "크레용 깎는 중...",
-      "mixingColors": "색을 섞는 중...",
-      "drawingLines": "선 그리는 중...",
-      "addingSparkles": "마법 반짝이 추가 중...",
-      "almostThere": "거의 다 됐어...",
-      "creatingMasterpiece": "멋진 작품 만드는 중...",
-      "wavingWand": "마법 지팡이 휘두르는 중...",
-      "coloringOutsideLines": "선 밖으로 칠하는 중(앗!)..."
+      "sharpeningCrayons": "크레용을 뾰족하게 다듬는 중...",
+      "mixingColors": "새 색을 섞고 있어요...",
+      "drawingLines": "윤곽선을 그리고 있어요...",
+      "addingSparkles": "반짝이를 살짝 뿌리는 중...",
+      "almostThere": "마무리 손질 중이에요...",
+      "creatingMasterpiece": "딱 예쁘게 만들고 있어요...",
+      "wavingWand": "잘 되었는지 확인 중이에요...",
+      "coloringOutsideLines": "선 밖으로 안 나가게 칠하는 중..."
     },
-    "pageLoading": "크레용 준비하는 중!",
-    "partialAppearing": "색칠놀이 페이지가 나타나고 있어요…"
+    "pageLoading": "크레용을 준비할게요!",
+    "partialAppearing": "봐요, 그림이 나타나고 있어요!"
   },
   "colo": {
     "dashboard": {
-      "greeting": "오늘은 뭐를 색칠해 볼까?",
-      "wantsToGrow": "{stageName}가 더 크고 싶대! 그림을 {count}개 더 저장하면 진화해!",
-      "proudOfYou": "{stageName}가 너를 정말 자랑스러워해!"
+      "greeting": "오늘은 무엇을 색칠해 볼까요?",
+      "wantsToGrow": "{stageName}가 자라고 싶어 해요! 그림을 {count}개 더 저장하면 진화해요!",
+      "proudOfYou": "너무 잘했어! {stageName}가 너를 정말 자랑스러워해요!"
     },
     "indicator": {
       "next": "다음: {stageName}",
-      "saveToEvolve": "그림을 {count}개 더 저장하면 진화해!",
-      "maxStage": "최고 단계에 도착했어!",
+      "saveToEvolve": "그림을 {count}개 더 저장하면 진화해요!",
+      "maxStage": "최고 단계에 도달했어요!",
       "accessories": "액세서리 ({count})"
     },
     "avatar": {
-      "tapMe": "날 톡!",
-      "artworks": "그림"
+      "tapMe": "나를 눌러줘!",
+      "artworks": "작품"
     },
     "stages": {
       "1": {
         "name": "아기 콜로",
-        "description": "색칠 모험을 막 시작했어!"
+        "description": "색칠 모험을 이제 막 시작했어요!"
       },
       "2": {
         "name": "꼬마 콜로",
-        "description": "그림마다 쑥쑥 크는 중!"
+        "description": "작품마다 쑥쑥 자라고 있어요!"
       },
       "3": {
-        "name": "쑥쑥 콜로",
-        "description": "콜로가 얼마나 컸는지 봐!"
+        "name": "성장하는 콜로",
+        "description": "콜로가 얼마나 자랐는지 봐요!"
       },
       "4": {
         "name": "행복한 콜로",
-        "description": "예쁜 그림이 가득해서 너무 행복해!"
+        "description": "예쁜 작품들 덕분에 너무 행복해요!"
       },
       "5": {
-        "name": "예술가 콜로",
-        "description": "진짜 예술가로 자라는 중!"
+        "name": "아티스트 콜로",
+        "description": "진짜 아티스트로 자라는 중이에요!"
       },
       "6": {
         "name": "마스터 콜로",
-        "description": "최고의 색칠 마스터!"
+        "description": "최고의 색칠 마스터예요!"
       }
     }
   },
   "footer": {
     "brand": "Chunky Crayon",
     "tagline": "꿈꾸고. 만들고. 색칠해요.",
-    "aboutText": "상상이 살아나는 곳! 반짝이는 아이디어를 마법 같은 색칠놀이로 바꿔요.",
-    "madeBy": "<location>South London</location>에서 <heart>♡</heart>를 담아 만들었어요",
-    "copyright": "© {year} Chunky Crayon. All rights reserved.",
+    "aboutText": "상상이 살아나는 곳! 가장 멋진 아이디어를 마법 같은 색칠놀이로 바꿔요.",
+    "madeBy": "<location>런던 남부</location>에서 <heart>♡</heart>로 만들었어요",
+    "copyright": "© {year} Chunky Crayon. 판권 소유.",
     "newsletter": {
       "title": "매일 무료 색칠 페이지",
-      "subtitle": "매일 아침 받은편지함에 새로운 색칠 페이지를 받아보는 가족들과 함께하세요."
+      "subtitle": "매일 아침, 새 색칠 페이지를 메일함으로 받는 가족 대열에 함께해요."
     },
     "sections": {
       "about": "소개",
@@ -82,55 +82,79 @@
       "freeTools": "무료 도구"
     },
     "links": {
-      "privacyPolicy": "개인정보 처리방침",
+      "privacyPolicy": "개인정보처리방침",
       "termsOfService": "서비스 이용약관",
-      "colorAsYouGo": "언제 어디서나 색칠해요"
+      "colorAsYouGo": "바로바로 색칠하기"
+    },
+    "freeTools": {
+      "allTools": "모든 도구",
+      "nameColoringPages": "이름 색칠 페이지",
+      "rewardChartMaker": "칭찬 스티커판 만들기",
+      "birthdayInviteMaker": "생일 초대장 만들기",
+      "abcTracingWorksheets": "ABC 따라쓰기 워크시트",
+      "seasonalColoringPacks": "시즌 색칠 팩",
+      "forTeachers": "선생님용"
     },
     "appStore": {
       "downloadOnAppStore": "App Store에서 다운로드",
       "getOnGooglePlay": "Google Play에서 받기",
       "comingSoon": "곧 만나요!",
-      "iosComingSoon": "iOS 앱이 곧 나와요. 조금만 기다려 주세요!",
-      "androidComingSoon": "Android 앱이 곧 나와요. 조금만 기다려 주세요!"
-    },
-    "freeTools": {
-      "allTools": "모든 도구",
-      "nameColoringPages": "이름 색칠공부",
-      "rewardChartMaker": "칭찬 스티커판 만들기",
-      "birthdayInviteMaker": "생일 초대장 만들기",
-      "abcTracingWorksheets": "ABC 따라쓰기 워크시트",
-      "seasonalColoringPacks": "계절 색칠 팩",
-      "forTeachers": "선생님용"
+      "iosComingSoon": "iOS 앱이 곧 출시돼요. 기대해 주세요!",
+      "androidComingSoon": "Android 앱이 곧 출시돼요. 기대해 주세요!"
     }
   },
   "homepage": {
-    "heroTitle": "우리 아이의",
-    "heroTitleSuffix": "오늘 펼쳐보세요",
-    "heroSubtitle": "알록달록 색칠놀이부터 상상 가득 모험까지, Chunky Crayon이 창의력을 순수한 기쁨으로 바꿔줘요.",
+    "pricing": {
+      "title": "무료로 체험. 월 £7.99부터.",
+      "body": "계정 없이 무료 생성 2회로 시작해요. 우리 가족에 맞는 구독을 고르거나, 크레딧 팩으로 필요할 때마다 색칠해요.",
+      "cta": "요금제 모두 보기"
+    },
+    "heroEyebrow": "요청을 받는 최초의 컬러링 앱.",
+    "heroTitle": "오후 5시에 \"공룡 색칠공부\" 검색은 이제 그만.",
+    "heroTitlePrefix": "",
+    "heroTitleSuffix": " 색칠공부”를 오후 5시에 검색하는 건 이제 그만.",
+    "heroSubtitle": "아이가 장면을 말하면, 약 2분 만에 인쇄 가능한 색칠공부가 뚝딱! 출력하거나 앱에서 바로 색칠해요. 무료 2장 체험, 계정 없이도 OK.",
+    "heroThumbCaption": "이렇게요 →",
+    "experiments": {
+      "landingHero": {
+        "outcome": "고요한 20분은 색칠공부 한 장에서 시작돼요.",
+        "empathy": "“심심해”에 딱 맞는 해결책!"
+      }
+    },
+    "heroCta": "우리 아이 페이지 만들기",
     "cta": "만들기 시작",
     "stats": {
-      "coloringPagesCreated": "만든 색칠 도안",
-      "dailyPages": "오늘의 도안",
-      "freeLibraryPages": "무료 도안"
+      "coloringPagesCreated": "만든 색칠공부",
+      "dailyPages": "오늘의 페이지",
+      "freeLibraryPages": "무료 라이브러리"
     },
     "galleryPreview": {
-      "freeColoringPages": "무료 색칠 도안",
+      "freeColoringPages": "무료 색칠공부",
       "exploreGallery": "갤러리 둘러보기",
-      "todaysDailyPage": "오늘의 오늘의 도안",
-      "latestDailyPage": "최신 오늘의 도안",
+      "todaysDailyPage": "오늘의 데일리 페이지",
+      "latestDailyPage": "최신 데일리 페이지",
       "seeAll": "전체 보기",
-      "communityPages": "커뮤니티 도안",
+      "communityPages": "커뮤니티 페이지",
       "colorNow": "지금 색칠하기",
       "browseCategories": "카테고리 보기",
-      "viewAll": "전체 보기",
-      "dailyColoringPageAlt": "오늘의 색칠 도안",
-      "coloringPageAlt": "색칠 도안"
+      "viewAll": "모두 보기",
+      "dailyColoringPageAlt": "데일리 색칠공부",
+      "coloringPageAlt": "색칠공부"
     },
     "recentCreations": {
-      "title": "최근 작품",
+      "title": "최근 만든 작품",
       "ctaHighlight": "무료로 시작하고",
-      "ctaText": "작품을 영원히 보관하며 더 많은 기능을 열어보세요!",
+      "ctaText": "작품을 영원히 저장하고 더 많은 기능도 열어보세요!",
       "ctaButton": "무료로 시작"
+    },
+    "demo": {
+      "title": "색칠공부가 만들어지는 과정을 확인해요.",
+      "body": "아이가 말하면, 우리가 그려요. 프롬프트부터 인쇄까지 늘 약 2분!",
+      "idleLabel": "재생을 눌러 색칠공부가 그려지는 걸 보세요.",
+      "drawingLabel": "장면 그리는 중",
+      "drawingSubLabel": "잠시만요, 곧 완성돼요.",
+      "playLabel": "데모 재생",
+      "pauseLabel": "일시정지"
     },
     "unleashWords": {
       "creativity": "창의력",
@@ -143,10 +167,10 @@
       "art": "미술",
       "joy": "기쁨",
       "learning": "배움",
-      "wonder": "신기함",
+      "wonder": "경이로움",
       "dreams": "꿈",
       "playtime": "놀이 시간",
-      "innovation": "새로움",
+      "innovation": "새로운 아이디어",
       "magic": "마법",
       "curiosity": "호기심",
       "expression": "표현",
@@ -155,154 +179,210 @@
       "excitement": "설렘"
     },
     "testimonials": {
-      "title": "온 가족이 사랑하는 Chunky Crayon",
-      "fromReviews": "리뷰 {count}개에서",
+      "title": "전 세계 가족들이 사랑해요",
+      "fromReviews": "리뷰 {count}개 기준",
       "items": {
         "1": {
-          "name": "김지연",
-          "role": "두 아이 엄마",
-          "quote": "아이들이 정말 좋아해요! 몇 시간이고 자기만의 마법 세계를 만들고 색칠해요. 이제 화면 시간으로 실랑이할 일이 없네요!",
-          "avatar": "/images/testimonials/avatar-1.svg",
-          "location": "영국 브리스톨"
+          "name": "Sophie Bennett",
+          "role": "메이지(4)의 엄마",
+          "location": "영국 브리스톨",
+          "quote": "메이지는 아직 글을 읽거나 타이핑은 못 하지만 말은 잘해요. 휴대폰을 들고 “고양이가 들어 있는 찻잔 속 인어”라고 말하면, 페이지가 바로 나타나요. 처음 그랬을 때는 “잠깐, 내 말을 들은 거야?” 하더니 우리 둘 다 10분은 웃었어요."
         },
         "2": {
-          "name": "박준호",
-          "role": "세 아이 아빠",
-          "quote": "드디어 창의력과 기술을 건강하게 잘 섞은 앱을 찾았어요. 딸아이가 유니콘 공주 성을 만들었는데 완벽했어요!",
-          "avatar": "/images/testimonials/avatar-2.svg",
-          "location": "미국 텍사스주 오스틴"
+          "name": "Marcus Reed",
+          "role": "세 아이의 아빠",
+          "location": "미국 텍사스 오스틴",
+          "quote": "둘째는 낙서쟁이예요. ‘강아지 제프’라고 끄적인 낙서를 사진 찍어 올렸더니 앱이 진짜 색칠공부로 바꿔줬어요. 그 뒤로 계속 페이스타임으로 친척들한테 자랑 중이에요. 아이에겐 정말 마법 같았죠."
         },
         "3": {
-          "name": "이수진",
-          "role": "초등 교사",
-          "quote": "교실에서 글쓰기 아이디어로 활용해요. 아이들이 원하는 걸 말하면, 그걸 색칠하죠. 몰입도가 정말 좋아요!",
-          "avatar": "/images/testimonials/avatar-3.svg",
-          "location": "영국 리즈"
+          "name": "Hannah Whitfield",
+          "role": "두 아이의 엄마",
+          "location": "영국 리즈",
+          "quote": "머릿속에 있는 걸 어떻게 설명해야 원하는 그림이 나오는지 몇 번 해보며 감을 잡았어요. “용”이라고 하면 평범한 용이 나오고, “정글에서 반짝이는 알에서 막 태어나는 분홍 아기 용”이라고 하면 정말 원하던 그림이 나와요. 한 번 알면 쉬워요."
         },
         "4": {
-          "name": "최영수",
-          "role": "할아버지",
-          "quote": "손주들이 이제 주말마다 와서 같이 새 색칠 도안을 만들어요. 정말 소중한 교감 시간이랍니다!",
-          "avatar": "/images/testimonials/avatar-4.svg",
-          "location": "영국 맨체스터"
+          "name": "Rachel Doyle",
+          "role": "리셉션(유치원) 교사",
+          "location": "영국 맨체스터",
+          "quote": "바다 주간 수업에서 아이들마다 원하는 해양 생물로 페이지를 뽑아줬어요. 테오는 “선글라스 낀 상어”를 원했는데 진짜로 나와서, 페이지를 꼭 안아버렸어요. 무료 프린트 사이트 뒤지느라 날리던 시간을 엄청 아꼈죠."
         },
         "5": {
-          "name": "정미영",
-          "role": "아이 돌봄 선생님",
-          "quote": "제가 돌보는 아이들이 푹 빠졌어요. 용, 요정, 로켓… 상상하는 건 뭐든 살아나요!",
-          "avatar": "/images/testimonials/avatar-5.svg",
-          "location": "미국 오리건주 포틀랜드"
+          "name": "Brian Coletti",
+          "role": "노라(6)의 아빠",
+          "location": "미국 오리건 포틀랜드",
+          "quote": "추수감사절 여행 떠나기 전에 그냥 시험해보려고 폰에서 해봤어요. 계정도 카드도 없이요. 두 장 만들고 공항 호텔에서 출력했더니 비행 내내 노라가 정말 잘 놀았어요. 집에 오자마자 구독했죠."
         },
         "6": {
-          "name": "한동욱",
-          "role": "아빠 & 디자이너",
-          "quote": "디자이너로서 퀄리티가 마음에 들어요. 아빠로서는, 아이디어가 색칠 도안이 될 때 아들 얼굴이 반짝이는 걸 보는 게 최고예요!",
-          "avatar": "/images/testimonials/avatar-6.svg",
-          "location": "미국 콜로라도주 덴버"
+          "name": "Megan Russo",
+          "role": "4살 쌍둥이 엄마",
+          "location": "미국 콜로라도 덴버",
+          "quote": "너무 좋은데 기다림이 문제예요. 4살이 공룡을 ‘지금 당장’ 원할 때 2분은 2분이 아니거든요. 그래서 하나 색칠하는 동안 다음 페이지를 미리 주문해요. 그거 말곤 완벽!"
         },
         "7": {
-          "name": "프리야 샤",
-          "role": "아이 돌보미",
+          "name": "Priya Shah",
+          "role": "아이 돌봄 선생님",
           "location": "영국 버밍엄",
-          "quote": "저는 3~7살 아이 5명을 돌봐요. 예전엔 똑같은 공룡 그림을 모두에게 출력했다가 울음바다가 됐죠. 지금은 아이마다 진짜 푹 빠진 걸로 한 장씩 받아요(에이든의 굴착기, 자라의 유니콘, 벤의 블루이). 진짜 살렸어요."
+          "quote": "3~7살 아이 다섯 명을 돌봐요. 예전엔 모두에게 똑같은 공룡 페이지를 뽑아줬더니 울음바다가 됐죠. 이제는 각자 좋아하는 걸로 딱 맞춘 페이지가 나와요(에이든의 굴착기, 자라의 유니콘, 벤의 블루이). 구세주예요."
         },
         "8": {
-          "name": "톰 휘태커",
-          "role": "3살 아이리스 아빠",
+          "name": "Tom Whitaker",
+          "role": "아이리스(3)의 아빠",
           "location": "영국 셰필드",
-          "quote": "저희는 앱에서 색칠하기보단 주로 출력해요. 아이리스는 휴대폰 화면에서 작은 손가락으로 하는 게 힘들고, 아이패드도 나이에 비해 조금 버거워요. 그래도 출력은 정말 좋아요. 페이지가 선명하게 나오고, 제대로 색칠하기에 충분히 크게 나와요."
+          "quote": "우리는 앱에서 색칠하기보다 주로 출력해서 써요. 아이리스 작은 손으로 폰 화면에서 색칠하는 건 힘들고, 아이패드도 나이에 비해 좀 불편하더라고요. 하지만 출력은 정말 좋아요. 선도 또렷하고 크기도 넉넉해서 제대로 색칠할 수 있어요."
         }
       }
     },
     "faq": {
       "title": "자주 묻는 질문",
-      "subtitle": "Chunky Crayon으로 마법 같은 색칠 도안을 만드는 데 필요한 모든 것",
+      "subtitle": "Chunky Crayon으로 마법 같은 색칠공부를 만드는 데 필요한 모든 것",
       "items": {
         "1": {
-          "question": "Chunky Crayon은 무엇인가요?",
-          "answer": "Chunky Crayon은 아이와 가족을 위한 마법 같은 색칠 도안 생성기예요. \"티파티 하는 용\"이나 \"달 위의 내가 좋아하는 슈퍼히어로\"처럼 색칠하고 싶은 걸 말해주기만 하면, 몇 초 만에 세상에 하나뿐인 인쇄용 색칠 도안을 만들어 드려요. 비 오는 날, 조용한 시간, 아이의 상상력을 깨우고 싶을 때 딱이에요!"
+          "question": "Chunky Crayon이 뭔가요?",
+          "answer": "Chunky Crayon은 아이와 가족을 위한 마법 같은 색칠공부 생성기예요. “티파티 하는 용”이나 “달에 있는 내가 좋아하는 슈퍼히어로”처럼 색칠하고 싶은 걸 말해주면, 몇 초 만에 세상에 하나뿐인 인쇄용 색칠공부를 만들어 드려요. 비 오는 날, 조용한 시간, 상상력에 불을 붙일 때 딱!"
         },
         "2": {
-          "question": "아이들이 사용해도 안전하고 적절한가요?",
-          "answer": "물론이죠! Chunky Crayon은 부모가 부모를 위해 만들었어요. 생성되는 이미지는 모두 아이에게 안전하고 연령에 맞는 내용으로 제작돼요. AI도 아이들이 즐길 수 있는 건강하고 재미있는 색칠 도안을 만들도록 특별히 조정했답니다."
+          "question": "아이에게 안전하고 적절한가요?",
+          "answer": "물론이죠. Chunky Crayon은 부모가 부모를 위해 만들었어요. 우리가 그리는 모든 페이지는 아이에게 안전하고, 연령에 맞게 즐겁도록 조정되어 있어요."
         },
         "3": {
-          "question": "색칠 도안은 어떻게 만들어요?",
-          "answer": "1-2-3만 하면 끝! 색칠하고 싶은 내용을 입력하고(예: \"마법의 숲에 있는 유니콘\"), 생성하기를 누른 뒤 약 30초만 기다리면 돼요. 바로 다운로드·인쇄할 수 있는 나만의 색칠 도안이 나타나요. 음성으로 말하거나 사진을 올려서 아이디어를 얻을 수도 있어요!"
+          "question": "색칠공부는 어떻게 만들어요?",
+          "answer": "1-2-3처럼 쉬워요. 색칠하고 싶은 내용을 입력하고(예: “마법의 숲 속 유니콘”), 생성 버튼을 누른 뒤 약 2분만 기다리면 끝! 다운로드해서 출력할 수 있어요. 음성 입력이나 사진 업로드로도 만들 수 있어요."
         },
         "4": {
-          "question": "도안 생성에는 얼마나 걸리나요?",
-          "answer": "대부분 약 30초면 완성돼요. 기다리는 동안 귀여운 마스코트 콜로(Colo)가 즐겁게 해줄 거예요! 디테일이 많은 장면은 조금 더 걸릴 수 있어요."
+          "question": "페이지 생성에는 얼마나 걸리나요?",
+          "answer": "대부분 약 2분이면 완성돼요. 기다리는 동안 귀여운 마스코트 콜로가 함께해요. 디테일이 많은 복잡한 장면은 조금 더 걸릴 수 있어요."
         },
         "5": {
-          "question": "색칠 도안을 인쇄할 수 있나요?",
-          "answer": "네! 만든 색칠 도안은 고화질 PDF로 다운로드할 수 있어서 집에서 인쇄하기 좋아요. A4 용지에 맞게 최적화되어 있고, 크레용, 색연필, 사인펜으로 색칠해도 예쁘게 나와요."
+          "question": "색칠공부를 출력할 수 있나요?",
+          "answer": "네! 만든 색칠공부는 모두 고화질 PDF로 다운로드할 수 있어 집에서 출력하기 딱 좋아요. A4 용지에 맞게 최적화되어 있고, 크레파스/색연필/사인펜 모두 잘 어울려요."
         },
         "6": {
-          "question": "아이 요청이 잘 안 되면 어떻게 하나요?",
-          "answer": "가끔 AI가 한 번에 딱 맞게 이해하지 못할 때가 있어요—그것도 창작 모험의 일부랍니다! 단어를 조금 바꿔 다시 시도해보세요. 팁: 원하는 것을 구체적으로 말하고, 장면을 또렷하게 설명해 주세요. 막히면 음성 입력도 추천해요—아이들은 말로 설명할 때 더 잘 표현하거든요!"
+          "question": "아이의 요청이 잘 안 나오면 어떡하죠?",
+          "answer": "가끔 첫 시도에 딱 맞지 않을 때가 있어요. 그것도 창작 모험의 일부랍니다. 단어를 조금 바꿔 다시 시도해보세요. 팁: 원하는 요소를 구체적으로 말하고, 장면을 또렷하게 설명해요. 막히면 음성 입력도 추천해요—아이들은 말로 더 잘 설명하거든요."
         },
         "7": {
           "question": "Chunky Crayon은 무료인가요?",
-          "answer": "계정 없이도 무료로 2번 생성해 볼 수 있어요! 그다음에는 무료 계정에 가입해 보너스 크레딧 15개를 받거나, 무제한으로 즐길 수 있는 합리적인 구독 플랜을 선택할 수 있어요."
+          "answer": "무료 생성 2회로 Chunky Crayon을 체험할 수 있어요—계정도 필요 없어요! 그 다음에는 무료 계정을 만들고 보너스 크레딧 15개를 받거나, 부담 없는 구독 플랜으로 무제한 창작 놀이를 즐길 수 있어요."
         },
         "8": {
           "question": "구독 플랜에는 무엇이 포함되나요?",
-          "answer": "플랜은 가볍게 즐기기 좋은 Crayon부터, 아주 창의적인 가족이나 선생님을 위한 Studio까지 있어요. 모든 플랜에는 무제한 색칠 도안 생성, 고화질 PDF 다운로드, 음성·사진 입력 모드, 그리고 새 기능 업데이트 접근이 포함돼요. 상위 플랜에는 크레딧 이월과 상업적 사용 권한도 포함돼요."
+          "answer": "플랜은 Splash(최대 2명에게 추천)부터 Sparkle(최대 10명에게 추천)까지 있어요. 모든 플랜에는 색칠공부 생성, 고화질 PDF 다운로드, 음성/사진 입력 모드, 아이별 개별 프로필, 그리고 추가되는 신규 기능 이용이 포함돼요. 상위 플랜에는 크레딧 이월과 상업적 사용 권한도 포함돼요. 구독이 부담스럽다면? Color as you go로 필요할 때 크레딧 팩을 구매해 사용해요."
         },
         "9": {
-          "question": "교실이나 어린이집에서 사용해도 되나요?",
-          "answer": "네! 선생님과 돌봄 교사분들도 Chunky Crayon을 정말 좋아해요. Crayon과 Rainbow 플랜은 개인 및 교육용으로 딱 좋아요. 사업 운영이나 상업적으로 배포하려면 상업용 라이선스가 포함된 Masterpiece 또는 Studio 플랜을 확인해 주세요."
+          "question": "교실이나 어린이집에서 써도 되나요?",
+          "answer": "네! 선생님과 돌봄 선생님들이 Chunky Crayon을 정말 좋아해요. Splash와 Rainbow 플랜은 개인/교육용으로 딱 좋아요. 사업 목적으로 배포하거나 상업적으로 사용하려면, 상업용 라이선스가 포함된 Sparkle 플랜을 확인해 주세요."
         },
         "10": {
           "question": "크레딧은 어떻게 사용되나요?",
-          "answer": "색칠 도안 1장을 생성할 때 크레딧 5개가 사용돼요. 크레딧은 구독에 따라 매달 새로 충전되고, 일부 플랜은 남은 크레딧을 이월할 수 있어요. 더 필요하면 크레딧 팩을 추가로 구매할 수도 있답니다!"
+          "answer": "대부분의 색칠공부는 프롬프트 입력 또는 사진 업로드로 만들 때 5크레딧이 사용돼요. 음성 모드(Chunky Crayon과 짧게 대화하는 방식)는 페이지당 10크레딧이 들어요. 구독 플랜은 매달 크레딧이 갱신되고, 상위 플랜은 남은 크레딧을 이월할 수 있어요. 구독이 싫다면? Color as you go: 크레딧 팩을 사서 쓴 만큼만 결제하면 돼요."
+        }
+      }
+    }
+  },
+  "start": {
+    "eyebrow": "요청대로 그려주는 첫 번째 색칠 앱.",
+    "cta": "무료로 시작하기",
+    "ctaSubtext": "무료 2장. 가입 필요 없음.",
+    "tryColoring": "이걸로 색칠해보기",
+    "experiments": {
+      "startCta": {
+        "urgency": "오늘 무료 2장. 카드 없이, 조건 없이.",
+        "proof": "부모 200+명이 함께해요. 시작은 무료 2장."
+      }
+    },
+    "hero": {
+      "trex": {
+        "title": "“엄마, 스케이트보드 타는 티라노 색칠해도 돼?”",
+        "subtitle": "응, 진짜로! 아이가 장면을 말하면 약 2분 안에 프린트할 색칠놀이가 뚝딱. 출력하거나 앱에서 바로 색칠하세요."
+      },
+      "foxes": {
+        "title": "스크린 타임, 크레파스처럼 즐겁게.",
+        "subtitle": "오후 5시 구원템, 해결! 식탁엔 출력 한 장, 아니면 휴대폰을 쥐여주세요. 같은 그림, 죄책감은 제로."
+      },
+      "dragon": {
+        "title": "“용 티파티”가 진짜 색칠놀이로.",
+        "subtitle": "아이가 어떤 장면이든 말하면 우리가 그려요. 출력하거나 앱에서 색칠! 아이가 진짜로 색칠하고 싶어 하는 그림만 만들어요."
+      },
+      "default": {
+        "title": "아이가 말하면, 우리가 색칠놀이를 그려요.",
+        "subtitle": "티라노 우주비행사. 용 티파티. 여우 가족 소풍. 상상하는 건 뭐든, 약 2분이면 출력 가능!"
+      }
+    },
+    "problem": {
+      "title": "오후 5시 “심심해!” 탈출.",
+      "body": "부모는 지쳤고, 아이는 크레파스를 찾고, 당신은 잠깐의 고요가 필요하죠. 근데 지난주 공룡 프린트는 벌써 세 번이나 색칠했어요. Chunky Crayon은 아이가 말한 장면으로 새 색칠놀이를 약 2분 만에 만들어줘요."
+    },
+    "howItWorks": {
+      "title": "이용 방법",
+      "steps": {
+        "describe": {
+          "title": "아이가 장면을 말해요",
+          "body": "말로도, 글로도, 사진으로도. 머릿속 상상 그대로!"
+        },
+        "draw": {
+          "title": "우리가 색칠놀이로 그려요",
+          "body": "입력부터 출력용까지 약 2분!"
+        },
+        "color": {
+          "title": "출력하거나 앱에서 색칠해요",
+          "body": "식탁엔 크레파스, 휴대폰엔 손가락. 선택은 당신!"
         }
       }
     },
-    "heroEyebrow": "요청하면 그려주는 첫 컬러링 앱!",
-    "heroCta": "우리 아이 페이지 만들기",
-    "heroTitlePrefix": "구글 검색은 이제 그만! ",
-    "heroThumbCaption": "이것처럼요 →",
     "demo": {
-      "title": "색칠놀이 도안이 만들어지는 걸 보세요.",
-      "body": "아이가 말하면, 우리가 그려요. 입력부터 인쇄용 도안까지 늘 약 2분이면 OK!",
-      "idleLabel": "재생을 눌러 도안이 그려지는 모습을 확인하세요.",
+      "title": "색칠놀이가 만들어지는 걸 확인하세요.",
+      "body": "아이가 말하면, 우리가 그려요. 언제나 입력부터 출력용까지 약 2분!",
+      "idleLabel": "재생을 눌러 색칠놀이가 그려지는 걸 보세요.",
       "drawingLabel": "장면을 그리고 있어요",
-      "drawingSubLabel": "잠깐만요, 조금만 기다려요.",
+      "drawingSubLabel": "잠깐만요, 조금만 기다려주세요.",
       "playLabel": "데모 재생",
       "pauseLabel": "일시정지"
     },
-    "experiments": {
-      "landingHero": {
-        "outcome": "색칠 한 장이면 20분의 조용한 시간이 시작돼요.",
-        "empathy": "“심심해”가 드디어 상대를 만났어요."
+    "features": {
+      "title": "하나의 앱에 다 담았어요.",
+      "items": {
+        "unlimited": {
+          "title": "어떤 장면이든, 어떤 주제든",
+          "body": "공룡 우주비행사. 유니콘 치과의사. 우주에 있는 남매. 설명할 수만 있다면, 그릴 수 있어요."
+        },
+        "family": {
+          "title": "구독 하나로 모든 아이",
+          "body": "같은 요금제에서 아이별 프로필을 따로 만들어요. 그림, 스티커, 보상은 각자 그대로! Sparkle에서 최대 10개 프로필."
+        },
+        "print": {
+          "title": "출력용도, 화면용도 OK",
+          "body": "모든 색칠놀이는 깔끔한 PDF와 인터랙티브 캔버스로 제공돼요. 상황에 맞게 골라요."
+        }
       }
     },
     "pricing": {
-      "title": "무료로 체험하세요. 월 £7.99부터.",
-      "body": "무료 생성 2회로 시작해요. 계정 없이도 OK! 우리 가족에게 딱 맞는 구독을 고르거나, 크레딧 팩으로 필요할 때마다 색칠해요.",
+      "title": "무료로 체험. 월 £7.99부터.",
+      "body": "무료 생성 2회로 시작하세요. 가입 필요 없음. 마음에 들면 가끔 색칠부터 매일 사용까지 맞춤 구독을 고르거나, 크레딧 팩으로 필요할 때마다 색칠해요.",
       "cta": "요금제 모두 보기"
+    },
+    "finalCta": {
+      "title": "색칠놀이 한 장이면, 고요한 20분.",
+      "body": "장면을 입력해 보세요. 우리가 그려드려요. 체험은 가입 없이 가능!"
     }
   },
   "gallery": {
-    "pageTitle": "무료 색칠공부 갤러리 - Chunky Crayon",
-    "pageDescription": "무료로 출력할 수 있는 색칠공부를 모아봤어요. 동물, 드래곤, 유니콘, 공주님 등 매일 새 페이지가 추가돼요!",
-    "heroTitle": "무료 색칠공부",
-    "heroSubtitle": "무료로 출력 가능한 색칠공부 수천 장을 만나보세요. 귀여운 동물부터 마법 같은 드래곤까지, 온라인으로 색칠하거나 집에서 출력해 즐길 수 있어요.",
+    "pageTitle": "무료 색칠공부 도안 갤러리 - Chunky Crayon",
+    "pageDescription": "무료로 출력 가능한 색칠공부 도안을 둘러보세요. 동물, 드래곤, 유니콘, 공주 등 다양한 도안이 있어요. 매일 새 도안이 추가돼요!",
+    "heroTitle": "무료 색칠공부 도안",
+    "heroSubtitle": "수천 개의 무료 출력용 색칠공부 도안을 만나보세요. 귀여운 동물부터 마법의 드래곤까지, 온라인으로 색칠하거나 집에서 출력해 즐길 완벽한 도안을 찾아보세요.",
     "browseByCategory": "카테고리별 보기",
     "browseByDifficulty": "난이도별 보기",
-    "browseByAge": "연령별 보기",
-    "dailyPage": "오늘의 데일리 색칠공부",
-    "viewAllDaily": "데일리 전체 보기",
+    "browseByAge": "연령대별 보기",
+    "dailyPage": "오늘의 데일리 색칠 도안",
+    "viewAllDaily": "데일리 도안 모두 보기",
     "communityCreations": "커뮤니티 작품",
-    "viewAllCommunity": "커뮤니티 전체 보기",
+    "viewAllCommunity": "커뮤니티 도안 모두 보기",
     "startColoring": "색칠 시작",
     "stats": {
-      "totalPages": "전체 페이지",
-      "communityPages": "커뮤니티 페이지",
-      "dailyPages": "데일리 페이지",
-      "pagesSuffix": "페이지"
+      "totalPages": "전체 도안",
+      "communityPages": "커뮤니티 도안",
+      "dailyPages": "데일리 도안",
+      "pagesSuffix": "개"
     },
     "ageGroups": {
       "toddlers": {
@@ -313,17 +393,17 @@
       "kids": {
         "title": "어린이용",
         "ages": "4-12세",
-        "description": "재미있고 몰입감 가득"
+        "description": "재미있고 몰입감 있게"
       },
       "teens": {
         "title": "청소년용",
         "ages": "13-17세",
-        "description": "멋지고 디테일한 디자인"
+        "description": "멋지고 디테일한 그림"
       },
       "adults": {
         "title": "성인용",
-        "ages": "18세+",
-        "description": "힐링 & 섬세함"
+        "ages": "18세 이상",
+        "description": "편안하고 섬세하게"
       }
     },
     "difficulty": {
@@ -336,8 +416,8 @@
         "description": "적당한 디테일"
       },
       "advanced": {
-        "title": "상급",
-        "description": "디테일한 디자인"
+        "title": "고급",
+        "description": "디테일한 그림"
       },
       "expert": {
         "title": "전문가",
@@ -354,21 +434,21 @@
       "dinosaurs": "공룡",
       "space": "우주 & 우주비행사",
       "underwater": "바닷속 & 바다",
-      "vehicles": "탈것 & 교통",
+      "vehicles": "탈것 & 교통수단",
       "pirates": "해적",
       "nature": "자연 & 꽃",
-      "holidays": "휴일 & 계절",
+      "holidays": "명절 & 계절",
       "robots": "로봇 & 기술",
       "food": "음식 & 디저트"
     },
     "seo": {
-      "aboutTitle": "무료 색칠공부 소개",
-      "aboutParagraph1": "Chunky Crayon의 무료 색칠공부 갤러리에 오신 걸 환영해요! 아이부터 어른까지 즐길 수 있는 출력용 색칠공부가 계속 늘어나고 있어요. 원하는 장면을 설명해 주시면 다양한 카테고리에서 특별한 페이지를 그려드려요.",
-      "aboutParagraph2": "매일 새로운 데일리 색칠공부가 추가돼요. 디지털 도구로 온라인에서 색칠하거나, 다운로드해서 출력해 크레용/색연필/마커로 즐길 수도 있어요. 커뮤니티에서 올려주신 창의적인 프롬프트 덕분에 더 다양한 그림을 만날 수 있답니다.",
-      "aboutParagraph3": "카테고리별로 찾아보며 원하는 그림을 딱 골라보세요. 귀여운 동물부터 드래곤, 유니콘 같은 판타지 친구들, 계절/휴일 테마까지! 모든 페이지는 색칠하기 좋은 깔끔한 선으로 디자인했어요."
+      "aboutTitle": "무료 색칠공부 도안 소개",
+      "aboutParagraph1": "Chunky Crayon의 무료 색칠공부 도안 갤러리에 오신 것을 환영해요. 아이부터 어른까지 함께 즐길 수 있는 출력용 색칠 도안이 계속 늘어나고 있어요. 원하는 장면을 말해주면 다양한 카테고리로 딱 하나뿐인 도안을 그려드려요.",
+      "aboutParagraph2": "매일 새로운 데일리 색칠 도안을 추가해요. 디지털 도구로 온라인에서 색칠하거나, 다운로드해 출력해서 크레용으로 즐길 수도 있어요. 커뮤니티 회원들이 올린 창의적인 프롬프트도 더해져 도안이 더욱 다양해져요.",
+      "aboutParagraph3": "카테고리별로 둘러보며 원하는 도안을 바로 찾아보세요. 귀여운 동물, 드래곤·유니콘 같은 판타지 친구들, 계절·명절 테마까지! 모든 도안은 색칠하기 좋은 깔끔한 선으로 디자인되었어요."
     },
     "jumpToNav": {
-      "jumpTo": "바로 가기:",
+      "jumpTo": "바로가기:",
       "selectSection": "섹션 선택",
       "backToTop": "맨 위로",
       "filters": "필터",
@@ -380,7 +460,7 @@
       "all": "전체",
       "beginner": "초급",
       "intermediate": "중급",
-      "advanced": "상급",
+      "advanced": "고급",
       "expert": "전문가",
       "easy": "쉬움",
       "medium": "보통",
@@ -388,267 +468,311 @@
       "filterByDifficulty": "난이도로 필터"
     },
     "categoryPage": {
-      "coloringPages": "{category} 색칠공부",
+      "coloringPages": "{category} 색칠공부 도안",
       "relatedCategories": "관련 카테고리",
-      "noPagesYet": "{category} 페이지가 아직 없어요",
-      "beTheFirst": "첫 번째 {category} 색칠공부의 주인공이 되어보세요!",
-      "createAPage": "페이지 만들기",
-      "freeColoringPages": "무료 {category} 색칠공부",
-      "lookingFor": "딱 맞는 {category} 색칠공부를 찾고 있나요? 여기에서 만나보세요! 아이부터 어른까지 즐길 수 있는 다양한 {category} 디자인을 모아뒀어요.",
-      "eachPageDescription": "각 색칠공부는 디지털 도구로 온라인에서 색칠하거나, 다운로드해 출력해서 크레용/색연필/마커로 즐길 수 있어요. 모든 디자인은 선이 깔끔하고 디테일이 살아 있어 재미있고 편안하게 색칠할 수 있답니다.",
+      "noPagesYet": "아직 {category} 도안이 없어요",
+      "beTheFirst": "첫 {category} 색칠 도안을 만들어보세요!",
+      "createAPage": "도안 만들기",
+      "freeColoringPages": "무료 {category} 색칠공부 도안",
+      "lookingFor": "딱 맞는 {category} 색칠 도안을 찾고 계신가요? 잘 오셨어요! 우리 컬렉션에는 아이와 어른 모두에게 딱 좋은 다양한 {category} 도안이 가득해요.",
+      "eachPageDescription": "각 도안은 디지털 도구로 온라인에서 색칠하거나, 다운로드해 출력해서 크레용·색연필·사인펜으로 전통적인 색칠도 할 수 있어요. 모든 디자인은 깔끔한 선과 재미있는 디테일로 색칠이 즐겁고 편안해져요.",
       "popularThemes": "인기 {category} 테마",
-      "includesPopular": "{category} 카테고리의 인기 검색어는 다음과 같아요:"
+      "includesPopular": "{category} 카테고리에는 이런 인기 검색이 있어요:"
     },
     "categoryDescriptions": {
-      "animals": "아이와 어른 모두 즐기는 귀엽고 야생적인 동물 색칠공부",
+      "animals": "아이와 어른이 함께 즐기는 귀엽고 야생적인 동물 색칠 도안",
       "fantasy": "마법 같은 판타지 친구들과 신비한 세계를 색칠해요",
-      "dragons": "불꽃 디테일이 멋진 드래곤 색칠공부",
-      "unicorns": "무지개와 반짝이가 가득한 유니콘 색칠공부",
-      "princesses": "공주님과 성 색칠공부",
-      "superheroes": "액션 가득한 슈퍼히어로 색칠공부",
-      "dinosaurs": "선사시대 공룡 색칠공부",
-      "space": "우주 모험과 우주비행사 색칠공부",
+      "dragons": "불꽃 디테일이 멋진 드래곤 색칠 도안",
+      "unicorns": "무지개와 반짝임 가득한 유니콘 색칠 도안",
+      "princesses": "공주와 성이 나오는 왕실 색칠 도안",
+      "superheroes": "액션 가득한 슈퍼히어로 색칠 도안",
+      "dinosaurs": "선사시대 공룡 색칠 도안",
+      "space": "우주 모험과 우주비행사 색칠 도안",
       "underwater": "바다 생물과 바닷속 세계를 색칠해요",
-      "vehicles": "자동차, 트럭, 비행기 등 탈것 색칠공부",
-      "pirates": "모험 가득한 해적 색칠공부",
-      "nature": "아름다운 자연과 꽃 색칠공부",
-      "holidays": "축제 분위기의 휴일 & 계절 색칠공부",
-      "robots": "미래적인 로봇과 기술 색칠공부",
-      "food": "맛있는 음식과 달콤한 디저트 색칠공부"
+      "vehicles": "자동차, 트럭, 비행기 등 탈것 색칠 도안",
+      "pirates": "모험 가득한 해적 색칠 도안",
+      "nature": "아름다운 자연과 꽃 색칠 도안",
+      "holidays": "즐거운 명절·계절 색칠 도안",
+      "robots": "미래적인 로봇과 기술 색칠 도안",
+      "food": "맛있는 음식과 달콤한 디저트 색칠 도안"
     },
     "infiniteScroll": {
-      "allPagesViewed": "모든 색칠공부를 다 봤어요!"
+      "allPagesViewed": "모든 색칠 도안을 다 봤어요!"
     },
     "ageGroupPages": {
       "common": {
-        "moreAgeGroups": "다른 연령 보기",
-        "createSimplePages": "쉬운 페이지 만들기",
-        "createYourOwn": "내가 만들기",
+        "moreAgeGroups": "다른 연령대 더 보기",
+        "createSimplePages": "쉬운 도안 만들기",
+        "createYourOwn": "내 도안 만들기",
         "createYourDesign": "내 디자인 만들기"
       },
       "toddlers": {
-        "pageTitle": "유아용 색칠공부",
-        "featuredSection": "쉽고 간단한 유아 색칠공부",
-        "categoriesSection": "유아 친화 카테고리",
-        "heroDescription": "작은 손을 위한 특별한 색칠공부예요! 큰 도형과 굵은 테두리, 친숙한 사물로 2-4세 아이가 쉽게 색칠할 수 있어요. 소근육 발달에도 도움이 돼요.",
-        "whyTitle": "꼬마 예술가에게 딱이에요",
-        "why1Title": "굵고 선명한 선",
-        "why1Description": "굵은 테두리라서 작은 손으로도 예쁘게 색칠할 수 있어요!",
+        "pageTitle": "유아용 색칠공부 도안",
+        "featuredSection": "간단한 유아 색칠 도안",
+        "categoriesSection": "유아에게 좋은 카테고리",
+        "heroDescription": "작은 손에도 딱! 쉽고 간단하게 색칠할 수 있도록 만들었어요. 큰 모양, 굵은 테두리, 익숙한 사물로 2-4세 아이에게 잘 맞아요. 소근육 발달에도 좋아요.",
+        "whyTitle": "작은 예술가에게 딱 좋아요",
+        "why1Title": "굵고 큰 선",
+        "why1Description": "두꺼운 테두리로 작은 손도 선 밖으로 나가지 않기 쉬워요!",
         "why2Title": "단순한 모양",
-        "why2Description": "유아가 알아보고 좋아하는 기본 도형과 친숙한 사물들!",
+        "why2Description": "유아가 알아보고 좋아하는 기본 도형과 익숙한 사물이에요.",
         "why3Title": "색깔 배우기",
-        "why3Description": "색을 배우고 상상력을 키우기에 좋아요!",
-        "seoTitle": "유아용 무료 색칠공부",
-        "seoParagraph1": "우리 아이 첫 색칠놀이를 시작하나요? 2-4세를 위한 간단한 색칠공부가 준비돼 있어요. 넓게 색칠할 수 있는 공간과 굵은 선으로, 아이가 소근육을 자연스럽게 키울 수 있어요.",
-        "seoParagraph2": "유아용 색칠공부는 아이들이 사랑하는 친숙한 소재로 가득해요. 귀여운 동물, 맛있는 음식, 다채로운 탈것, 예쁜 자연 풍경까지! 단순한 디자인이라 좌절감은 줄이고, 창의력은 쑥쑥 키워줘요.",
-        "seoParagraph3": "모든 페이지는 A4 용지에 출력하거나, 쉬운 디지털 도구로 온라인에서 색칠할 수 있어요. 조용한 시간, 비 오는 날, 집이나 어린이집/유치원 활동에 딱 좋아요.",
-        "benefitsTitle": "유아 색칠놀이의 좋은 점",
-        "benefitsDescription": "색칠놀이는 손-눈 협응, 색 인지, 잡는 힘, 집중력, 창의적 표현 등 중요한 능력을 키워줘요. 가장 쉬운 그림부터 시작해서 아이가 자라는 모습을 지켜보세요!"
+        "why3Description": "색을 배우고 창의력을 키우기에 좋아요!",
+        "seoTitle": "유아용 무료 색칠공부 도안",
+        "seoParagraph1": "우리 아이 첫 색칠공부를 시작하나요? 2-4세 아이를 위한 쉬운 색칠 도안을 모았어요. 넓은 칠하기 공간과 굵은 선으로 소근육 발달에 도움을 줘요.",
+        "seoParagraph2": "유아 도안은 아이가 좋아하는 익숙한 소재에 집중했어요. 귀여운 동물, 맛있는 음식, 알록달록한 탈것, 아름다운 자연 풍경까지! 단순한 디자인이라 답답함은 줄이고 상상력은 쑥쑥 키워줘요.",
+        "seoParagraph3": "모든 도안은 A4 용지로 출력하거나, 사용하기 쉬운 디지털 도구로 온라인에서 색칠할 수 있어요. 조용한 시간, 비 오는 날, 집이나 유치원 학습 활동에 딱이에요.",
+        "benefitsTitle": "유아 색칠공부의 장점",
+        "benefitsDescription": "색칠공부는 눈-손 협응, 색 인지, 손 힘, 집중력, 창의적 표현 등 중요한 능력 발달에 도움을 줘요. 가장 쉬운 도안부터 시작해 아이의 성장을 함께 지켜보세요!"
       },
       "kids": {
-        "pageTitle": "어린이용 색칠공부",
-        "featuredSection": "인기 어린이 색칠공부",
+        "pageTitle": "어린이용 색칠공부 도안",
+        "featuredSection": "인기 어린이 색칠 도안",
         "categoriesSection": "어린이 카테고리 둘러보기",
-        "heroDescription": "4-12세 아이를 위한 재미있는 색칠공부! 공룡, 유니콘, 슈퍼히어로 등 가득해요. 온라인으로 쉽게 색칠하거나 집에서 출력해 끝없이 창의력을 펼쳐보세요.",
+        "heroDescription": "4-12세 아이에게 딱 맞는 재미있는 색칠 도안! 공룡, 유니콘, 슈퍼히어로 등 다양해요. 온라인으로 쉽게 색칠하거나 집에서 출력해 끝없는 창의 놀이를 즐겨요.",
         "whyTitle": "아이들이 Chunky Crayon을 좋아하는 이유",
-        "why1Title": "뭐든 만들 수 있어요",
-        "why1Description": "아이가 상상하는 기발한 아이디어를 말하면, 바로 색칠공부로 뚝딱 만들어져요!",
+        "why1Title": "뭐든 만들기",
+        "why1Description": "아이의 엉뚱한 상상도 말로만 하면, 진짜 색칠 도안이 돼요!",
         "why2Title": "출력해서 색칠",
-        "why2Description": "일반 A4에 바로 출력 가능한 고화질 PDF로 다운로드해요.",
-        "why3Title": "온라인 색칠",
-        "why3Description": "브라우저에서 바로 디지털 도구로 색칠해요!",
-        "seoTitle": "어린이용 무료 색칠공부",
-        "seoParagraph1": "아이에게 딱 맞는 색칠공부를 찾고 있나요? Chunky Crayon에는 4-12세 아이를 위해 만든 무료 출력용 색칠공부가 정말 많아요. 귀여운 동물부터 박진감 넘치는 슈퍼히어로까지, 모든 꼬마 예술가를 위한 그림이 있어요.",
-        "seoParagraph2": "우리 색칠공부는 선이 깔끔하고 굵어서 작은 손도 쉽게 색칠할 수 있어요. 크레용, 색연필, 마커 어떤 도구로도 예쁘게 완성되도록 만들었답니다. 화면에서 즐기고 싶다면 온라인 색칠 도구도 사용할 수 있어요.",
-        "seoParagraph3": "무엇보다 좋은 건, 아이가 원하는 그림을 말로 설명하면 세상에 하나뿐인 색칠공부를 만들 수 있다는 거예요! 축구하는 드래곤? 우주에 있는 유니콘? 상상하는 대로 몇 초 만에 뚝딱 색칠공부 완성!",
+        "why2Description": "일반 A4에 바로 출력 가능한 고화질 PDF를 다운로드하세요.",
+        "why3Title": "온라인으로 색칠",
+        "why3Description": "브라우저에서 바로 디지털 색칠 도구를 사용해요!",
+        "seoTitle": "어린이용 무료 색칠공부 도안",
+        "seoParagraph1": "아이에게 딱 맞는 색칠공부 도안을 찾고 계신가요? Chunky Crayon에는 4-12세 아이를 위해 만든 무료 출력용 색칠 도안이 가득해요. 귀여운 동물부터 액션 가득한 슈퍼히어로까지, 모든 어린이 작가를 위한 도안이 있어요.",
+        "seoParagraph2": "우리 도안은 깔끔하고 굵은 선으로 작은 손도 쉽게 색칠할 수 있어요. 크레용, 색연필, 사인펜 등 어떤 도구로도 예쁘게 완성되도록 디자인했어요. 화면으로 즐기고 싶다면 온라인 색칠 도구도 사용할 수 있어요.",
+        "seoParagraph3": "가장 좋은 점! 아이가 색칠하고 싶은 것을 말로 설명하면, 세상에 하나뿐인 도안이 바로 만들어져요. 축구하는 드래곤? 우주에 있는 유니콘? 상상하는 대로 몇 초 만에 색칠 도안이 됩니다!",
         "popularTitle": "어린이 인기 카테고리",
-        "popularDescription": "어린이에게 인기 많은 카테고리는 공룡, 유니콘, 슈퍼히어로, 동물, 우주/로켓, 탈것 색칠공부예요. 각 카테고리에는 아이 연령에 맞는 그림이 가득해요."
+        "popularDescription": "아이들에게 인기 많은 카테고리: 공룡 색칠 도안, 유니콘 색칠 도안, 슈퍼히어로 색칠 도안, 동물 색칠 도안, 우주·로켓 색칠 도안, 탈것 색칠 도안. 각 카테고리에는 아이 연령에 맞는 도안이 가득해요."
       },
       "teens": {
-        "pageTitle": "청소년용 색칠공부",
-        "featuredSection": "인기 청소년 색칠공부",
+        "pageTitle": "청소년용 색칠공부 도안",
+        "featuredSection": "인기 청소년 색칠 도안",
         "categoriesSection": "청소년 카테고리",
-        "heroDescription": "청소년을 위한 멋지고 디테일한 색칠공부! 애니, 게임부터 판타지, SF까지 내 취향대로 창의력을 표현해 보세요. 스트레스 해소와 자기표현에도 좋아요.",
-        "whyTitle": "창의적인 청소년을 위해",
+        "heroDescription": "10대를 위한 멋지고 디테일한 색칠 도안! 애니·게임부터 판타지·SF까지, 내 스타일에 맞는 디자인으로 창의력을 표현해요. 스트레스 해소와 자기표현에 딱 좋아요.",
+        "whyTitle": "창의적인 10대를 위해",
         "why1Title": "멋진 테마",
-        "why1Description": "애니, 게임, 판타지, SF까지 관심사에 딱 맞는 디자인!",
-        "why2Title": "디테일한 그림",
-        "why2Description": "실력을 시험하는 섬세한 디자인으로, 완성하면 정말 멋져요!",
+        "why1Description": "애니, 게임, 판타지, SF 등 취향에 딱 맞는 디자인!",
+        "why2Title": "디테일한 아트",
+        "why2Description": "완성하면 더 멋진, 손맛 있는 섬세한 도안이에요.",
         "why3Title": "스트레스 해소",
-        "why3Description": "스크린에서 잠시 벗어나 창의적인 색칠로 스트레스를 풀어보세요.",
-        "seoTitle": "청소년용 무료 색칠공부",
-        "seoParagraph1": "\"너무 유치한\" 색칠공부는 싫나요? 13-17세를 위한 청소년 컬렉션에는 멋지고 디테일한 그림이 가득해요. 애니 캐릭터, 게임 장면, 판타지 세계, 추상 패턴까지 스타일별로 골라 즐길 수 있어요.",
-        "seoParagraph2": "어린이용과는 다른 특별한 색칠공부예요. 섬세한 디테일, 역동적인 구도, 청소년 취향을 담은 테마로 구성했어요. 창의적 표현은 물론, 공부하다 쉬는 시간이나 그냥 편히 쉴 때도 딱이에요.",
-        "seoParagraph3": "원하는 내용을 정확히 설명해서 나만의 커스텀 색칠공부도 만들 수 있어요. 우주에서 로봇과 싸우는 드래곤? 애니 스타일 초상화? 좋아하는 상징이 들어간 디테일한 만다라? 설명만 하면 바로 만들어줘요!",
-        "popularTitle": "인기 청소년 테마",
-        "popularDescription": "청소년에게 인기 많은 카테고리는 애니/망가, 판타지 생물, 슈퍼히어로 액션, 게임 감성 아트, 우주 & SF, 디테일한 패턴 페이지예요. 각 카테고리마다 몰입감 있는 디자인이 준비돼 있어요."
+        "why3Description": "스크린에서 잠깐 벗어나, 색칠로 마음을 쉬어가요.",
+        "seoTitle": "청소년용 무료 색칠공부 도안",
+        "seoParagraph1": "\"너무 유치한\" 색칠 도안은 싫나요? 13-17세를 위한 멋지고 디테일한 청소년 컬렉션을 만나보세요. 애니 캐릭터와 게임 장면부터 판타지 세계, 추상 패턴까지 스타일별로 준비했어요.",
+        "seoParagraph2": "동생들용 색칠 도안이 아니에요. 섬세한 디테일, 역동적인 구도, 10대 취향을 저격하는 테마로 채웠어요. 창의적 표현은 물론, 공부 쉬는 시간 스트레스 해소나 편하게 쉬고 싶을 때도 좋아요.",
+        "seoParagraph3": "원하는 걸 그대로 말해 맞춤 색칠 도안을 만들 수 있어요. 우주에서 로봇과 싸우는 드래곤? 애니 스타일 초상화? 좋아하는 상징이 들어간 디테일한 만다라? 설명만 하면 멋지게 완성해드려요.",
+        "popularTitle": "청소년 인기 테마",
+        "popularDescription": "청소년에게 인기 많은 카테고리: 애니·만화 색칠 도안, 판타지 생물 도안, 슈퍼히어로 액션 장면, 게임 감성 아트, 우주·SF 디자인, 섬세한 패턴 도안. 디테일하고 몰입감 있는 디자인을 만나보세요."
       },
       "adults": {
-        "pageTitle": "성인용 컬러링 페이지",
-        "featuredSection": "인기 성인 컬러링 페이지",
+        "pageTitle": "성인용 색칠공부 도안",
+        "featuredSection": "인기 성인 색칠 도안",
         "categoriesSection": "성인 카테고리",
-        "heroDescription": "성인 컬러링의 치유 효과를 발견해 보세요! 섬세한 만다라, 아름다운 자연 풍경, 정교한 패턴이 마음을 편안하게 하고 집중력을 높여줘요. 긴 하루를 마무리하며 스트레스를 풀기에 완벽해요.",
-        "whyTitle": "성인 컬러링의 장점",
+        "heroDescription": "성인 색칠의 힐링 효과를 느껴보세요! 섬세한 만다라, 아름다운 자연 풍경, 디테일한 패턴 등 휴식과 마음챙김을 위한 도안을 모았어요. 바쁜 하루 끝 스트레스 해소에 딱 좋아요.",
+        "whyTitle": "성인 색칠의 장점",
         "why1Title": "스트레스 해소",
         "why1Description": "색칠은 이완 반응을 도와 불안을 줄이고 마음을 편안하게 해줘요.",
         "why2Title": "마음챙김",
-        "why2Description": "지금 이 순간에 집중하며, 화면 없이 즐기는 명상 같은 활동이에요.",
+        "why2Description": "지금 이 순간에 집중하며, 스크린 없이 즐기는 명상 같은 시간이 돼요.",
         "why3Title": "창의력",
-        "why3Description": "색 선택으로 나를 표현하고 멋진 작품을 완성해 보세요.",
-        "seoTitle": "성인용 무료 컬러링 페이지",
-        "seoParagraph1": "성인 컬러링은 인기 있는 웰니스 활동이에요. 연구에 따르면 색칠은 불안을 줄이고 집중력을 높이며, 화면에 둘러싸인 일상에서 편안한 휴식을 줄 수 있다고 해요. 저희 컬렉션에는 어른을 위한 아름답고 섬세한 디자인이 준비돼 있어요.",
-        "seoParagraph2": "마음챙김에 좋은 정교한 만다라부터 고요한 자연 풍경, 우아한 패턴까지, 각 페이지는 몇 시간이고 편안하게 창의력을 발휘할 수 있도록 디자인했어요. 좋은 종이에 출력하고 색연필, 마커, 젤펜 등 좋아하는 도구로 즐겨보세요.",
-        "seoParagraph3": "특별한 그림을 원하나요? 나만의 맞춤 컬러링을 만들어보세요! 원하는 힐링 장면을 설명해 주세요. 젠 가든, 아르누보 패턴, 섬세한 식물 일러스트까지, 상상을 현실로 만들어드려요.",
-        "popularTitle": "인기 성인 컬러링 테마",
-        "popularDescription": "가장 인기 있는 성인 카테고리를 둘러보세요: 명상에 좋은 만다라, 섬세한 자연·식물 디자인, 기하학적 패턴, 아르데코 & 아르누보 스타일, 젠탱글 스타일 페이지, 평화로운 풍경까지! 각각 특별한 방식으로 마음의 평안을 가져다줘요."
+        "why3Description": "색 선택으로 나를 표현하고, 멋진 작품을 완성해요.",
+        "seoTitle": "성인용 무료 색칠공부 도안",
+        "seoParagraph1": "성인 색칠은 인기 있는 웰니스 활동이에요. 연구에 따르면 색칠은 불안을 낮추고 집중력을 높이며, 스크린으로 가득한 일상 속에서 차분한 휴식을 제공해요. 우리 컬렉션에는 어른을 위한 아름답고 섬세한 도안이 준비되어 있어요.",
+        "seoParagraph2": "마음챙김에 좋은 디테일한 만다라부터, 고요한 자연 풍경과 우아한 패턴까지—각 도안은 오랜 시간 편안한 창의력을 즐기도록 디자인됐어요. 좋은 종이에 출력해 색연필, 마커, 젤펜 등 좋아하는 도구로 칠해보세요. 모두 잘 어울려요.",
+        "seoParagraph3": "특별한 도안이 필요하신가요? 맞춤 색칠 도안을 만들어보세요. 원하는 힐링 장면(젠 가든, 아르누보 패턴, 디테일한 식물 일러스트 등)을 설명하면, 상상을 도안으로 만들어드려요.",
+        "popularTitle": "성인 인기 색칠 테마",
+        "popularDescription": "성인 인기 카테고리를 만나보세요: 명상용 만다라 색칠 도안, 섬세한 자연·보태니컬 디자인, 기하학 패턴, 아르데코·아르누보 스타일, 젠탱글 감성 도안, 평화로운 풍경 도안. 각 테마가 다른 방식으로 휴식을 선물해요."
       }
     }
   },
   "pricing": {
     "pageTitle": "요금제 - Chunky Crayon",
-    "heroTitle": "모든 색칠 모험을 위한 플랜!",
-    "heroSubtitle": "부모님, 꼬마 예술가, 혹은 색칠을 좋아하는 어른까지—누구나 딱 맞는 Chunky Crayon 플랜이 있어요. 계정 없이도 바로 시작할 수 있어요!",
+    "heroTitle": "조용한 20분, 색칠 한 장이면 시작돼요.",
+    "heroSubtitle": "어떤 요금제든 7일 무료 체험. 푹 빠진 뒤 우리 집에 맞게 고르세요.",
     "monthly": "월간",
     "annual": "연간 (2개월 무료)",
+    "notReadyForPlan": "아직 요금제는 부담되나요? 필요할 때마다 색칠하기",
     "mostPopular": "가장 인기",
     "buyNow": "7일 무료 체험 시작",
-    "noCommitment": "약정 없어요. 언제든 취소 가능!",
+    "trialMicroCopy": "이후 월 {price}. 그전엔 언제든 취소 가능.",
+    "noCommitment": "약정 없음. 원클릭 취소.",
     "perMonth": "/월",
+    "perYear": "/년",
     "creditsPerMonth": "크레딧/월",
+    "trustStrip": {
+      "rating": "리뷰 47개, 평점 4.6",
+      "cancel": "언제든 취소",
+      "guarantee": "30일 환불 보장"
+    },
+    "included": {
+      "title": "모든 요금제에 포함",
+      "aiCreation": "아이 말대로 뚝딱 만들어지는 색칠 페이지",
+      "colorOnline": "집에서 출력하거나 화면에서 색칠",
+      "saveFavorites": "만든 페이지는 영원히 보관",
+      "shareCreations": "할머니·할아버지께도 보내기",
+      "collectStickers": "색칠할수록 스티커와 보상",
+      "familySharing": "구독 1개로 아이마다 개별 프로필",
+      "mobileApps": "iPhone·Android 앱"
+    },
     "plans": {
       "splash": {
-        "name": "스플래시 플랜",
-        "tagline": "색칠 모험을 시작해요",
-        "audience": "가볍게 즐기는 분과 꼬마 작가에게 딱!"
+        "name": "Splash",
+        "tagline": "최대 2명에게 딱 좋아요.",
+        "audience": "주 2장 정도. 한 달에 크레용 한 상자보다 적게 써요."
       },
       "rainbow": {
-        "name": "레인보우 플랜",
-        "tagline": "온 가족이 함께 즐겨요",
-        "audience": "창의적인 가족과 형제자매에게 좋아요"
+        "name": "Rainbow",
+        "tagline": "최대 4명에게 딱 좋아요.",
+        "audience": "형제자매가 각자 고를 만큼 충분해요. 대부분 가족은 여기!"
       },
       "sparkle": {
-        "name": "스파클 플랜",
-        "tagline": "색칠을 사랑하는 당신에게",
-        "audience": "색칠을 사랑하는 창의적인 가족에게 딱!"
+        "name": "Sparkle",
+        "tagline": "최대 10명에게 딱 좋아요.",
+        "audience": "개별 프로필 최대 10개. 넉넉하게, 온 가족이 함께 써요."
       }
     },
     "features": {
-      "textPrompts": "텍스트 프롬프트로 색칠 페이지 만들기",
-      "wordsNumbers": "단어, 이름, 숫자로 색칠 페이지 만들기",
-      "adjustments": "색상, 대비, 밝기 조절",
-      "photoToColoring": "사진을 색칠 페이지로 바꾸기",
-      "allSplashFeatures": "스플래시 플랜의 모든 기능",
-      "advancedEditing": "고급 편집 기능",
-      "earlyAccess": "새 모델과 기능을 먼저 사용",
-      "rollover1Month": "크레딧 이월 (최대 1개월)",
-      "allRainbowFeatures": "레인보우 플랜의 모든 기능",
-      "bulkGeneration": "일괄 생성",
-      "commercialUse": "상업적 사용",
-      "rollover2Months": "크레딧 이월 (최대 2개월)",
-      "credits250": "월 250 크레딧(~50장)",
-      "credits500": "월 500 크레딧(~100장)",
-      "credits1000": "월 1,000 크레딧(~200장)",
-      "allFeatures": "플랫폼의 모든 기능",
-      "noRollover": "크레딧은 매달 초기화돼요",
+      "credits250": "월 ~50장, 주 2장 정도",
+      "credits500": "월 ~100장, 하루 1장 정도",
+      "credits1000": "월 ~200장, 하루 몇 장씩 넉넉하게",
+      "allFeatures": "모든 기능 포함",
+      "noRollover": "크레딧은 매달 초기화",
+      "rollover1Month": "크레딧 적립. 1개월분 더 보관",
+      "rollover2Months": "크레딧 적립. 2개월분 더 보관",
       "prioritySupport": "우선 지원",
-      "profiles3": "최대 아이 프로필 3개",
-      "profiles5": "최대 아이 프로필 5개",
-      "profiles10": "최대 아이 프로필 10개",
+      "commercialUse": "상업적 사용 라이선스",
       "profiles2": "아이 프로필 최대 2개",
-      "profiles4": "아이 프로필 최대 4개"
+      "profiles4": "아이 프로필 최대 4개",
+      "profiles10": "아이 프로필 최대 10개"
     },
     "creditPacks": {
       "title": "크레딧이 더 필요하신가요?",
-      "pack100": "100 크레딧 팩",
-      "pack500": "500 크레딧 팩",
-      "pack1000": "1,000 크레딧 팩"
+      "pack100": "크레딧 100개 팩",
+      "pack500": "크레딧 500개 팩",
+      "pack1000": "크레딧 1,000개 팩"
     },
     "faq": {
-      "title": "자주 묻는 질문",
+      "title": "고르기 전에",
+      "subtitle": "요금제, 크레딧, 취소까지 꼭 알아둘 내용만 모았어요.",
       "cancelAnytime": {
         "question": "언제든 취소할 수 있나요?",
-        "answer": "네! 언제든지 구독을 취소할 수 있어요. 이유를 묻지 않아요."
+        "answer": "네. 계정에서 한 번 클릭이면 끝, 이유도 묻지 않아요. 이미 만든 페이지는 계속 내 것이에요."
       },
       "rollover": {
-        "question": "크레딧이 이월되나요?",
-        "answer": "Splash 크레딧은 매월 초기화되고, Rainbow는 최대 1개월 이월, Sparkle은 2개월까지 이월 가능해요."
+        "question": "안 쓴 페이지(크레딧)는 어떻게 되나요?",
+        "answer": "Splash는 매달 초기화돼요. Rainbow는 1개월분, Sparkle은 2개월분까지 적립돼요. 이번 달에 안 쓰면 다음 달에도 남아 있어요."
+      },
+      "creditsPerPage": {
+        "question": "실제로 몇 장을 만들 수 있나요?",
+        "answer": "문장을 입력하거나 사진을 찍으면 5크레딧. Chunky Crayon에게 말로 부탁하면 10크레딧이에요(듣고, 글로 옮기고, 그려주니까요). Splash는 월 약 50장, Rainbow는 약 100장, Sparkle은 약 200장. 원하는 대로 섞어 쓰세요."
       },
       "audience": {
-        "question": "아이용인가요, 어른용인가요?",
-        "answer": "둘 다예요! Chunky Crayon은 가족, 아이들, 그리고 색칠을 좋아하는 어른 모두에게 딱이에요."
+        "question": "아이들만 쓰는 앱인가요?",
+        "answer": "모든 연령에 좋아요. 유아는 '모자 쓴 여우'를 말하고, 부모는 출력해 주고요. 어른은 자기 그림을 만들어 iPad로 자기 전 색칠하기도 해요. 같은 앱, 다른 사용자!"
+      },
+      "multipleKids": {
+        "question": "한 구독으로 아이 여러 명이 쓸 수 있나요?",
+        "answer": "네, 그리고 이게 대부분 앱이 놓치는 부분이에요. Chunky Crayon 요금제 하나로 아이마다 개별 프로필을 만들 수 있어요(Splash 2, Rainbow 4, Sparkle 10). 페이지, 스티커, Colo 마스코트도 따로 저장돼요. 아이마다 따로 구독할 필요 없어요."
+      },
+      "trialMechanics": {
+        "question": "7일 무료 체험이 끝나면 어떻게 되나요?",
+        "answer": "등록한 카드로 요금제가 결제돼요. 24시간 전에 이메일로 알려드려서 깜짝 결제는 없어요. 체험 기간 중 언제든 취소하면 결제되지 않아요."
+      },
+      "printPaper": {
+        "question": "집에서 출력하려면 준비물이 있나요?",
+        "answer": "프린터와 종이만 있으면 돼요. 페이지는 PDF로 내려받아 A4나 US Letter에 크기 조정 없이 맞아요."
       },
       "gettingStarted": {
         "question": "어떻게 시작하나요?",
-        "answer": "플랜만 고르면 바로 색칠 페이지를 만들 수 있어요!"
-      },
-      "subtitle": "플랜에 대해 궁금한 점을 한눈에",
-      "creditsPerPage": {
-        "question": "페이지는 몇 장 만들 수 있나요?",
-        "answer": "페이지 1장은 약 5크레딧이 필요해요. Splash=월 약 50장, Rainbow=약 100장, Sparkle=약 200장이에요."
-      },
-      "multipleKids": {
-        "question": "한 구독으로 여러 아이가 쓸 수 있나요?",
-        "answer": "네 — 그리고 대부분의 앱이 놓치는 부분이죠. Chunky Crayon 하나의 플랜으로 아이마다 따로 프로필을 쓸 수 있어요(Splash 2, Rainbow 4, Sparkle 10). 아이들의 색칠 페이지, 스티커, Colo 마스코트는 서로 분리돼요. 아이마다 구독을 또 살 필요 없어요."
-      },
-      "trialMechanics": {
-        "question": "7일 무료 체험 후에는 어떻게 되나요?",
-        "answer": "등록된 카드로 플랜 가격이 결제돼요. 깜짝 결제가 없도록 24시간 전에 이메일로 알려드려요. 체험 기간 중 언제든 취소하면 결제되지 않아요."
-      },
-      "printPaper": {
-        "question": "집에서 출력하려면 뭐가 필요하나요?",
-        "answer": "프린터와 종이만 있으면 돼요. 페이지는 PDF로 다운로드되며, 크기 조정 없이 A4 또는 US Letter에 딱 맞아요."
+        "answer": "요금제를 고르고 로그인하면, 첫 페이지까지 2분이면 충분해요."
       }
     },
-    "included": {
-      "title": "모든 플랜 포함",
-      "aiCreation": "AI로 색칠공부 페이지 만들기",
-      "colorOnline": "온라인으로 색칠하거나 인쇄용 다운로드",
-      "saveFavorites": "마음에 드는 작품을 계정에 저장",
-      "shareCreations": "친구와 작품 공유하기",
-      "collectStickers": "스티커 모으고 보상 받기",
-      "mobileApps": "iOS & Android 앱",
-      "familySharing": "구독 1개로 아이별 개별 프로필"
-    },
-    "trialMicroCopy": "그 후 월 {price}. 그 전 언제든 취소 가능.",
-    "trustStrip": {
-      "rating": "★★★★★ 리뷰 183개 중 4.9점",
-      "cancel": "언제든 취소 가능",
-      "guarantee": "30일 환불 보장"
-    },
     "finalCta": {
-      "title": "플랜을 고르고, 오늘 바로 색칠해요.",
-      "subtitle": "아이가 설명하면, 우리는 그려요. 출력하거나 iPad로 바로 건네주세요. 7일 무료, 언제든 취소 가능.",
+      "title": "요금제를 고르고, 오늘 바로 색칠해요.",
+      "subtitle": "아이가 말하면 우리가 그려요. 출력하거나 iPad로 건네주세요. 7일 무료, 언제든 취소 가능.",
       "primary": "7일 무료 체험 시작",
-      "secondary": "플랜 다시 비교하기"
-    },
-    "perYear": "/년",
-    "notReadyForPlan": "아직 요금제가 부담되나요? 필요할 때마다 색칠해요"
+      "secondary": "요금제 다시 비교하기"
+    }
   },
   "blog": {
     "title": "Chunky Crayon 블로그",
-    "subtitle": "즐거운 색칠 놀이를 위한 팁, 아이디어, 영감",
+    "subtitle": "재미있는 색칠 활동을 위한 팁, 아이디어, 영감",
     "allPosts": "전체 글",
-    "byAuthor": "{author} 글",
+    "byAuthor": "{author} 작성",
     "categories": {
-      "colouringTips": "색칠 팁",
+      "colouringTips": "색칠 꿀팁",
       "mindfulnessRelaxation": "마음챙김 & 휴식",
       "artEducation": "미술 교육",
-      "activitiesForKids": "아이 활동",
+      "activitiesForKids": "아이들 활동",
       "seasonalHolidays": "계절 & 기념일"
     }
   },
+  "colorAsYouGo": {
+    "heroTitle": "언제 어디서나 색칠해요.",
+    "heroSubtitle": "필요할 때 크레딧만 조금씩. 구독도 약정도 없이, 그냥 색칠만!",
+    "credits": "{count} 크레딧",
+    "buyNow": "크레딧 받기",
+    "loading": "불러오는 중...",
+    "failedToCheckout": "결제로 넘어가지 못했어요. 다시 해볼까요?",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "스타터",
+        "tagline": "색칠 10장 정도. 비 오는 오후도 문제없어요."
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "주말",
+        "tagline": "색칠 40장 정도. \"심심해\" 한 주는 거뜬!"
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "방학",
+        "tagline": "색칠 100장 정도. 긴 방학도 든든해요."
+      }
+    },
+    "subscribePitch": {
+      "title": "매주 색칠하나요?",
+      "subtitle": "한 달에 몇 장 이상 만든다면 구독이 더 알뜰해요. 형제자매용 추가 프로필과 쌓이는 크레딧까지!",
+      "cta": "요금제 보기"
+    }
+  },
   "adultGate": {
-    "title": "어른이신가요?",
-    "subtitle": "이곳은 부모님과 보호자 전용이에요",
-    "instructions": "계속하려면 쉬운 수학 문제를 풀어주세요:",
-    "placeholder": "답을 입력하세요",
-    "submit": "계속",
-    "error": "조금만 더! 다시 해볼까요?",
-    "cancel": "뒤로 가기",
-    "explanation": "부모님만 열 수 있도록 간단한 수학 문제를 사용해요.",
-    "whatIs": "뭐예요?",
-    "check": "네, 맞았어요",
-    "errorWithAttempts": "아직 아니에요 ({attempts}번 시도). 천천히 해도 돼요."
+    "title": "잠깐! 어른 맞으신가요?",
+    "explanation": "부모님만 열 수 있도록 간단한 수학 문제를 드려요.",
+    "whatIs": "얼마일까요?",
+    "placeholder": "정답을 입력하세요",
+    "check": "네, 알겠어요",
+    "cancel": "나중에 할게요",
+    "error": "음, 아직 아니에요. 다시 해볼까요?",
+    "errorWithAttempts": "아직 정답이 아니에요 ({attempts}번 시도). 천천히 해보세요."
+  },
+  "startOverButton": {
+    "idle": "처음부터",
+    "modalTitle": "그림을 지울까요?",
+    "modalBody": "칠한 색이 모두 사라지고, 빈 페이지에서 다시 시작해요.",
+    "confirm": "네, 새 페이지로",
+    "cancel": "계속 칠할래요"
+  },
+  "shareButton": {
+    "idle": "공유",
+    "preparing": "예쁘게 포장 중...",
+    "doneSharing": "완료!"
+  },
+  "shareModal": {
+    "title": "그림 공유하기",
+    "privacyNote": "링크를 가진 누구나 이 페이지를 볼 수 있어요. 이름, 이메일 등 어떤 정보도 공유하지 않아요.",
+    "expiresIn": "링크 유효 기간:",
+    "expiration": {
+      "7days": "1주",
+      "30days": "1개월",
+      "never": "영원히"
+    },
+    "createLink": "링크 만들기",
+    "creating": "링크 만드는 중...",
+    "success": {
+      "title": "링크가 준비됐어요",
+      "subtitle": "보여주고 싶은 사람에게 보내세요."
+    },
+    "done": "완료",
+    "error": "잘 안 됐어요. 잠시 후 다시 시도해 주세요.",
+    "socialShare": "또는 올리기"
   },
   "stickers": {
     "categories": {
@@ -665,22 +789,22 @@
       "glowingStar": "빛나는 별",
       "shootingStar": "별똥별",
       "redHeart": "빨간 하트",
-      "pinkHeart": "분홍 하트",
+      "pinkHeart": "핑크 하트",
       "sparkleHeart": "반짝 하트",
       "rainbowHeart": "무지개 하트",
       "circle": "동그라미",
       "square": "네모",
       "triangle": "세모",
-      "diamond": "마름모",
+      "diamond": "다이아몬드",
       "flower": "꽃",
       "sun": "해",
       "rainbow": "무지개",
       "cloud": "구름",
       "butterfly": "나비",
-      "leaf": "잎",
-      "smile": "미소",
+      "leaf": "나뭇잎",
+      "smile": "웃는 얼굴",
       "loveEyes": "하트 눈",
-      "cool": "멋짐",
+      "cool": "쿨",
       "wink": "윙크",
       "crown": "왕관",
       "unicorn": "유니콘",
@@ -692,13 +816,13 @@
   },
   "stickerBook": {
     "title": "스티커북",
-    "subtitle": "색칠하면 스티커가 쏙!",
+    "subtitle": "색칠하면 스티커를 모을 수 있어요!",
     "pageTitle": "스티커북 - Chunky Crayon",
-    "pageDescription": "내 스티커를 모아 보고, 어떤 스티커를 잠금 해제할 수 있는지 확인해요!",
+    "pageDescription": "모은 스티커를 보고, 어떤 스티커를 열 수 있는지 확인해요!",
     "loadError": "스티커를 불러올 수 없어요. 다시 시도해 주세요.",
     "filters": {
       "all": "전체",
-      "milestones": "달성",
+      "milestones": "달성 보상",
       "categories": "카테고리",
       "explore": "탐험",
       "special": "특별"
@@ -707,26 +831,26 @@
     "countFormat": "{count}/{total}",
     "newBadge": "새로움 {count}",
     "progress": {
-      "label": "스티커 모음",
-      "complete": "대단해요! 스티커를 모두 모았어요!",
+      "label": "스티커 모으기",
+      "complete": "대단해요! 스티커를 전부 모았어요!",
       "almostThere": "거의 다 왔어요! 정말 잘하고 있어요!",
-      "halfway": "절반까지 왔어요! 계속 가요!",
+      "halfway": "반 왔어요! 계속해요!",
       "greatStart": "좋은 시작이에요!"
     },
     "detail": {
       "lockedName": "???",
       "lockedDescription": "이 스티커는 아직 잠겨 있어요!",
-      "unlockedOn": "{date}에 잠금 해제",
-      "howToUnlock": "잠금 해제 방법:",
+      "unlockedOn": "{date}에 해금",
+      "howToUnlock": "해금 방법:",
       "rarity": {
         "common": "일반",
         "uncommon": "희귀",
-        "rare": "레어",
+        "rare": "매우 희귀",
         "legendary": "전설"
       },
       "unlockConditions": {
         "artworkCount": "갤러리에 작품 {count}개 저장하기",
-        "firstCategory": "첫 {category} 페이지 색칠하기",
+        "firstCategory": "{category} 페이지를 처음으로 색칠하기",
         "categoryCount": "{category} 페이지 {count}개 색칠하기",
         "special": "서로 다른 카테고리 {count}개 탐험하기"
       }
@@ -736,12 +860,12 @@
     "first-steps": {
       "name": "첫걸음",
       "description": "처음으로 색칠한 작품을 저장해요!",
-      "unlockMessage": "해냈어요! 첫 작품이 저장됐어요!"
+      "unlockMessage": "해냈어요! 첫 걸작을 저장했어요!"
     },
     "getting-started": {
-      "name": "시작이 좋아요",
+      "name": "시작했어요",
       "description": "잘하고 있어요! 작품 5개를 저장해요.",
-      "unlockMessage": "작품 5개! 멋진 예술가가 되고 있어요!"
+      "unlockMessage": "작품 5개! 멋진 화가가 되고 있어요!"
     },
     "high-five": {
       "name": "하이파이브",
@@ -749,19 +873,19 @@
       "unlockMessage": "하이파이브! 멋진 작품 10개!"
     },
     "perfect-ten": {
-      "name": "완벽한 10",
-      "description": "진짜 예술가예요! 작품 25개를 저장해요.",
-      "unlockMessage": "작품 25개! 색칠 스타가 됐어요!"
+      "name": "완벽한 열",
+      "description": "진짜 예술가! 작품 25개를 저장해요.",
+      "unlockMessage": "작품 25개! 넌 색칠 스타야!"
     },
     "super-artist": {
       "name": "슈퍼 아티스트",
       "description": "대단한 열정! 작품 50개를 저장해요.",
-      "unlockMessage": "명작 50개! 슈퍼 아티스트예요!"
+      "unlockMessage": "걸작 50개! 넌 슈퍼 아티스트!"
     },
     "master-creator": {
-      "name": "마스터 크리에이터",
-      "description": "전설이 되었어요! 작품 75개를 저장해요.",
-      "unlockMessage": "작품 75개! 진정한 마스터 크리에이터!"
+      "name": "마스터 창작자",
+      "description": "전설 달성! 작품 75개를 저장해요.",
+      "unlockMessage": "작품 75개! 진정한 마스터 창작자!"
     },
     "century-club": {
       "name": "100개 클럽",
@@ -771,7 +895,7 @@
     "animal-friend": {
       "name": "동물 친구",
       "description": "첫 동물 페이지를 색칠해요!",
-      "unlockMessage": "새로운 동물 친구가 생겼어요!"
+      "unlockMessage": "새 동물 친구가 생겼어요!"
     },
     "fantasy-dreamer": {
       "name": "판타지 꿈꾸미",
@@ -781,22 +905,22 @@
     "space-explorer": {
       "name": "우주 탐험가",
       "description": "첫 우주 페이지를 색칠해요!",
-      "unlockMessage": "3, 2, 1... 출발! 우주 탐험 완료!"
+      "unlockMessage": "3, 2, 1... 발사! 우주 탐험 완료!"
     },
     "nature-lover": {
       "name": "자연 사랑꾼",
       "description": "첫 자연 페이지를 색칠해요!",
-      "unlockMessage": "자연은 아름다워요, 너의 그림처럼요!"
+      "unlockMessage": "자연도 예쁘고, 네 그림도 예뻐요!"
     },
     "vehicle-driver": {
       "name": "탈것 드라이버",
       "description": "첫 탈것 페이지를 색칠해요!",
-      "unlockMessage": "빵빵! 멋진 바퀴네요!"
+      "unlockMessage": "빵빵! 멋진 바퀴다!"
     },
     "dino-hunter": {
-      "name": "공룡 헌터",
+      "name": "공룡 사냥꾼",
       "description": "첫 공룡 페이지를 색칠해요!",
-      "unlockMessage": "크아아! 공룡을 찾았어요!"
+      "unlockMessage": "어흥! 공룡을 찾았어요!"
     },
     "ocean-diver": {
       "name": "바다 다이버",
@@ -804,44 +928,44 @@
       "unlockMessage": "첨벙! 바닷속 모험 시작!"
     },
     "food-lover": {
-      "name": "먹방 러버",
+      "name": "음식 사랑꾼",
       "description": "첫 음식 페이지를 색칠해요!",
       "unlockMessage": "냠냠! 정말 맛있어 보여요!"
     },
     "sports-star": {
       "name": "스포츠 스타",
       "description": "첫 스포츠 페이지를 색칠해요!",
-      "unlockMessage": "골! 스포츠 스타가 됐어요!"
+      "unlockMessage": "골! 넌 스포츠 스타!"
     },
     "holiday-spirit": {
       "name": "축제 기분",
       "description": "첫 기념일 페이지를 색칠해요!",
-      "unlockMessage": "축하해요! 축제 기분 잠금 해제!"
+      "unlockMessage": "신난다! 축제 기분 해금!"
     },
     "animal-master": {
       "name": "동물 마스터",
-      "description": "동물 페이지 10개를 색칠해서 진짜 동물 박사가 되어봐요!",
-      "unlockMessage": "넌 최고의 동물 친구예요!"
+      "description": "동물 페이지 10개를 색칠해 진짜 동물 박사가 돼요!",
+      "unlockMessage": "넌 최고의 동물 친구!"
     },
     "fantasy-master": {
       "name": "판타지 마스터",
-      "description": "판타지 페이지 10개를 색칠해서 마법의 힘을 잠금 해제해요!",
-      "unlockMessage": "너의 판타지 파워는 전설급이에요!"
+      "description": "판타지 페이지 10개를 색칠해 마법의 힘을 열어요!",
+      "unlockMessage": "네 판타지 파워는 전설급이야!"
     },
     "space-master": {
       "name": "우주 마스터",
-      "description": "우주 페이지 10개를 색칠해서 우주비행사가 되어봐요!",
+      "description": "우주 페이지 10개를 색칠해 우주비행사가 돼요!",
       "unlockMessage": "공인 우주 탐험가가 됐어요!"
     },
     "category-explorer": {
       "name": "카테고리 탐험가",
-      "description": "새로운 걸 해봐요! 3가지 다른 카테고리의 페이지를 색칠해요.",
-      "unlockMessage": "다양함이 예술을 더 맛있게 해요!"
+      "description": "새로운 걸 해봐요! 서로 다른 카테고리 3개에서 색칠해요.",
+      "unlockMessage": "다양할수록 더 멋진 그림!"
     },
     "world-traveler": {
-      "name": "세계 여행자",
-      "description": "5가지 다른 카테고리의 페이지를 색칠해요!",
-      "unlockMessage": "모든 색칠 세계를 탐험했어요!"
+      "name": "세상 여행자",
+      "description": "서로 다른 카테고리 5개에서 색칠해요!",
+      "unlockMessage": "색칠 세계를 잔뜩 탐험했어요!"
     }
   },
   "stickerSelector": {
@@ -859,13 +983,13 @@
     },
     "ageGroups": {
       "toddler": "유아",
-      "toddlerDescription": "2-4세",
+      "toddlerDescription": "2~4세",
       "child": "어린이",
-      "childDescription": "5-8세",
+      "childDescription": "5~8세",
       "tween": "초등 고학년",
-      "tweenDescription": "9-12세",
+      "tweenDescription": "9~12세",
       "teen": "청소년",
-      "teenDescription": "13-17세",
+      "teenDescription": "13~17세",
       "adult": "성인",
       "adultDescription": "18세 이상"
     },
@@ -876,11 +1000,11 @@
       "ageGroup": "연령대",
       "avatar": "아바타",
       "difficultyLevel": "난이도",
-      "saveChanges": "변경 저장",
+      "saveChanges": "변경사항 저장",
       "saving": "저장 중...",
       "cancel": "취소",
       "profileUpdated": "프로필이 업데이트됐어요!",
-      "profileSwitched": "프로필이 바뀌었어요!",
+      "profileSwitched": "프로필이 전환됐어요!",
       "unnamed": "이름 없음"
     },
     "delete": {
@@ -891,14 +1015,14 @@
       "deleteProfile": "프로필 삭제",
       "deleting": "삭제 중...",
       "deleted": "\"{name}\" 삭제됨",
-      "coloringPages": "{count, plural, =1 {색칠 페이지 1장} other {색칠 페이지 #장}}"
+      "coloringPages": "{count, plural, =1 {색칠 페이지 1개} other {색칠 페이지 #개}}"
     },
     "manager": {
       "aboutProfiles": "프로필이란?",
-      "ownCollection": "각 프로필마다 색칠 페이지 컬렉션이 따로 있어요",
+      "ownCollection": "각 프로필마다 색칠 페이지 모음이 따로 있어요",
       "personalizedDifficulty": "난이도 설정은 프로필별로 달라요",
       "maxProfiles": "계정에 최대 {max}개의 프로필을 만들 수 있어요",
-      "switchAnytime": "상단 메뉴에서 언제든 프로필을 바꿀 수 있어요",
+      "switchAnytime": "헤더 메뉴에서 언제든 프로필을 바꿀 수 있어요",
       "profilesUsed": "{max}개 중 {count}개 사용 중",
       "colorings": "{count, plural, =1 {색칠 1개} other {색칠 #개}}",
       "edit": "{name} 수정",
@@ -906,13 +1030,13 @@
     },
     "create": {
       "title": "프로필 만들기",
-      "subtitle": "가족에 새 꼬마 아티스트를 추가해요",
+      "subtitle": "우리 가족에 새 꼬마 예술가를 추가해요",
       "button": "프로필 만들기",
       "creating": "만드는 중...",
       "success": "프로필이 만들어졌어요!",
       "addProfile": "프로필 추가",
       "maxReached": "프로필 최대치 도달",
-      "maxReachedDescription": "최대 {max}개의 프로필을 모두 사용 중이에요. 새 프로필을 추가하려면 기존 프로필을 삭제해 주세요.",
+      "maxReachedDescription": "최대 {max}개의 프로필을 모두 만들었어요. 새 프로필을 추가하려면 기존 프로필을 삭제해 주세요.",
       "nameLabel": "이름",
       "namePlaceholder": "예: 엠마",
       "nameError": "이름을 입력해 주세요",
@@ -929,70 +1053,70 @@
     "threads": "스레드"
   },
   "socialShare": {
-    "shareOn": "{platform}에 공유",
-    "download": "그림 저장",
-    "downloadAria": "색칠한 그림 저장하기",
-    "facebookAria": "Facebook에 공유",
-    "xAria": "X(Twitter)에 공유",
+    "shareOn": "{platform}에 공유하기",
+    "download": "작품 다운로드",
+    "downloadAria": "색칠한 작품 다운로드",
+    "facebookAria": "Facebook에 공유하기",
+    "xAria": "X(트위터)에 공유하기",
     "pinterestAria": "Pinterest에 핀하기",
-    "whatsappAria": "WhatsApp에 공유"
+    "whatsappAria": "WhatsApp에 공유하기"
   },
   "parentalGate": {
     "title": "어른만 들어올 수 있어요!",
     "subtitle": "계속하려면 이 수학 문제를 풀어주세요",
-    "description": "어른이 함께하는지 확인하려고 해요. 이 질문에 답해 주세요:",
-    "question": "{num1} + {num2}는 얼마일까요?",
-    "placeholder": "정답을 입력하세요",
-    "submit": "정답 확인",
+    "description": "어른이 함께하는지 확인하려면, 이 질문에 답해주세요:",
+    "question": "{num1} + {num2}는 얼마인가요?",
+    "placeholder": "답을 입력하세요",
+    "submit": "답 확인",
     "cancel": "취소",
-    "error": "아직 아니에요! 다른 문제로 다시 해볼까요...",
-    "incorrect": "정답이 아니에요. 다시 시도해 주세요.",
-    "hint": "부모님이나 보호자에게 도움을 부탁해요!"
+    "error": "아직 정답이 아니에요! 다른 문제로 다시 해볼까요...",
+    "incorrect": "정답이 아니에요. 다시 시도해주세요.",
+    "hint": "부모님이나 보호자에게 도움을 요청해요!"
   },
   "stickerReward": {
     "congratulations": "축하해요!",
     "youEarned": "스티커를 받았어요!",
     "stickerName": "{name}",
-    "tapToContinue": "눌러서 계속",
-    "addedToBook": "스티커북에 추가했어요!",
+    "tapToContinue": "탭해서 계속하기",
+    "addedToBook": "스티커북에 추가됐어요!",
     "viewStickerBook": "스티커북 보기",
     "keepColoring": "계속 색칠하기",
     "previousSticker": "이전 스티커",
     "nextSticker": "다음 스티커",
     "newSticker": "새 스티커!",
-    "newStickers": "새 스티커!",
-    "ofCount": "{current}/{total}",
-    "addToStickerBook": "스티커북에 추가",
-    "goToSticker": "스티커 {number}로 이동",
+    "newStickers": "새 스티커들!",
+    "ofCount": "스티커 {total}개 중 {current}번째",
+    "addToStickerBook": "내 스티커북에 쏙!",
+    "goToSticker": "스티커 {number}(으)로 이동",
     "rarity": {
       "common": "흔해요",
-      "uncommon": "조금 희귀해요",
+      "uncommon": "조금 드물어요",
       "rare": "희귀해요",
-      "legendary": "전설이에요"
+      "legendary": "백만 분의 1"
     }
   },
   "seo": {
     "home": {
-      "title": "Chunky Crayon - 창의 색칠놀이 & 신나는 학습",
-      "description": "Chunky Crayon은 아이와 부모를 위해 만든 알록달록한 인터랙티브 앱이에요. 특별하고 맞춤형 색칠공부 페이지와 재미있는 학습 워크시트를 만들 수 있어요. 텍스트, 음성, 이미지 프롬프트를 프린트용 색칠 페이지로 바꾸거나, 웹·iOS·Android 앱에서 디지털로 색칠해 보세요."
+      "title": "Chunky Crayon - 창의적인 색칠과 학습 놀이",
+      "description": "Chunky Crayon은 아이와 부모가 함께 특별하고 맞춤형 색칠공부 페이지와 재미있는 학습 워크시트를 만들 수 있는 생동감 넘치는 인터랙티브 앱이에요. 텍스트, 음성, 이미지 프롬프트를 인쇄용 색칠 페이지로 바꾸거나, 웹·iOS·Android 앱에서 디지털 색칠도 즐겨보세요."
     },
     "gallery": {
       "title": "무료 색칠공부 갤러리 - Chunky Crayon",
-      "description": "프린트 가능한 무료 색칠공부 페이지 모음을 둘러보세요. 동물, 드래곤, 유니콘, 공주 등 다양한 그림이 있어요. 매일 새 페이지가 추가돼요!"
+      "description": "무료 인쇄용 색칠공부 페이지 모음을 둘러보세요. 동물, 드래곤, 유니콘, 공주 등 다양한 테마가 가득해요. 매일 새 페이지가 추가돼요!"
     }
   },
   "altText": {
-    "mascot": "친구 같은 크레용 마스코트 콜로",
+    "mascot": "친근한 크레용 마스코트 콜로",
     "dailyPage": "오늘의 색칠 페이지",
     "coloringPage": "색칠 페이지",
-    "ogImage": "Chunky Crayon AI가 만든 색칠책 페이지",
     "toddlerPage": "유아용 색칠 페이지",
     "kidsPage": "어린이용 색칠 페이지",
     "teenPage": "청소년용 색칠 페이지",
-    "adultPage": "성인용 색칠 페이지"
+    "adultPage": "성인용 색칠 페이지",
+    "ogImage": "Chunky Crayon 맞춤 색칠책 페이지"
   },
   "metadata": {
-    "keywords": "색칠공부 도안, 아이들을 위한 창의력 앱, 맞춤형 색칠공부 도안, 교육 워크시트, 재미있는 학습 활동, 어린이 창의력 앱, 인터랙티브 색칠 앱, 디지털 색칠, 출력용 색칠공부 도안"
+    "keywords": "색칠공부 페이지, 어린이 창의력 앱, 맞춤 색칠공부 페이지, 교육 워크시트, 재미있는 학습 활동, 어린이 창의력 앱, 인터랙티브 색칠 앱, 디지털 색칠, 인쇄용 색칠공부 페이지"
   },
   "myArtwork": {
     "pageTitle": "내 작품",
@@ -1003,12 +1127,12 @@
       "cta": "색칠 페이지 둘러보기"
     },
     "grid": {
-      "coloredBy": "{name}가 색칠했어요",
+      "coloredBy": "{name}의 색칠",
       "viewArtwork": "작품 보기",
       "deleteArtwork": "작품 삭제",
       "shareArtwork": "작품 공유",
       "shareWithFamily": "가족과 공유",
-      "colorAgain": "다시 색칠하기",
+      "colorAgain": "다시 색칠",
       "savedArtwork": "저장된 작품"
     },
     "filters": {
@@ -1021,20 +1145,20 @@
       "oldest": "오래된순"
     },
     "stickerCard": {
-      "title": "스티커 북",
+      "title": "스티커북",
       "newBadge": "{count} NEW",
       "stickersCollected": "스티커 {total}개 중 {collected}개 모았어요"
     },
     "deleteDialog": {
       "title": "작품을 삭제할까요?",
-      "description": "이 작품을 정말 삭제할까요? 삭제하면 되돌릴 수 없어요!",
-      "confirm": "네, 삭제할게요",
-      "cancel": "아니요, 남길게요"
+      "description": "이 작품을 삭제할까요? 삭제하면 되돌릴 수 없어요!",
+      "confirm": "네, 삭제",
+      "cancel": "아니요, 유지할게요"
     }
   },
   "challenges": {
     "pageTitle": "주간 챌린지",
-    "pageSubtitle": "매주 신나는 색칠 챌린지를 완료하고 특별한 스티커와 액세서리를 Colo에 모아봐요!",
+    "pageSubtitle": "매주 재미있는 색칠 챌린지를 완료하고, 콜로를 위한 특별 스티커와 액세서리를 받아요!",
     "breadcrumbs": {
       "home": "홈",
       "account": "계정",
@@ -1044,32 +1168,47 @@
       "title": "이번 주 챌린지"
     },
     "noActive": {
-      "title": "진행 중인 챌린지 없음",
-      "description": "다음 주간 챌린지를 곧 만나러 다시 와주세요!"
+      "title": "진행 중인 챌린지가 없어요",
+      "description": "다음 주간 챌린지도 곧 찾아올게요!"
     },
     "history": {
       "title": "지난 챌린지",
       "completed": "완료",
-      "expired": "기간 만료",
+      "expired": "만료",
       "progress": "{progress} / {requirement} 완료"
     },
     "reward": {
-      "claimed": "보상 받았어요!",
+      "claimed": "보상 받기 완료!",
       "stickerAdded": "새 스티커가 스티커북에 추가됐어요!",
-      "accessoryAdded": "새 액세서리가 Colo에 추가됐어요!"
+      "accessoryAdded": "새 액세서리가 콜로에 추가됐어요!"
     }
   },
   "recentCreations": {
-    "title": "최근에 만든 작품",
+    "title": "최근 만든 작품",
     "imageAlt": "내 색칠 페이지",
-    "ctaHighlight": "무료로 시작하고",
-    "ctaMessage": "작품을 영원히 보관하고 더 많은 기능을 열어봐요!",
-    "ctaButton": "무료로 시작하기"
+    "ctaHighlight": "무료로 시작",
+    "ctaMessage": "해서 작품을 영원히 보관하고 더 많은 기능을 열어보세요!",
+    "ctaButton": "무료로 시작"
+  },
+  "coloringPage": {
+    "progress": {
+      "allDone": "완성!",
+      "milestones": {
+        "25": "좋은 시작!",
+        "50": "반쯤 했어요!",
+        "75": "거의 다 됐어요!",
+        "100": "완성!"
+      }
+    }
   },
   "createForm": {
     "title": "마법 만들기!",
-    "tagline": "입력, 말하기, 사진으로!",
-    "generatingMessage": "약 30초면 완성!",
+    "tagline": "입력, 말하기, 사진 찍기!",
+    "generatingMessage": "약 2분이면 완성!",
+    "examplesLabel": "이렇게 해보세요",
+    "exampleTrex": "스케이트보드 타는 티라노 우주비행사",
+    "exampleDragon": "티파티 하는 용과 토끼",
+    "exampleFoxes": "피크닉하는 여우 가족",
     "inputModes": {
       "type": "입력",
       "talk": "말하기",
@@ -1079,44 +1218,44 @@
     "voiceInput": {
       "startRecording": "녹음 시작",
       "stopRecording": "녹음 중지",
-      "tapToRecord": "마이크를 탭하고 색칠하고 싶은 걸 말해줘!",
+      "tapToRecord": "눌러서 어떤 걸 색칠할지 말해줘!",
       "signInToRecord": "로그인하고 녹음을 시작해요!",
       "notSupported": "앗! 이 브라우저는 음성 녹음을 지원하지 않아요.",
-      "notSupportedHint": "마이크가 있는 기기에서 Chrome, Safari, Firefox를 사용해 보세요.",
+      "notSupportedHint": "마이크가 있는 기기에서 Chrome, Safari 또는 Firefox를 사용해 보세요.",
       "tryAgain": "다시 시도",
-      "listening": "듣고 있어요! 색칠하고 싶은 걸 말해줘!",
-      "allDone": "다 말했나요? 버튼을 누르거나 {countdown} 후에 제가 마칠게요...",
+      "listening": "듣고 있어요!",
+      "allDone": "다 말했나요? {countdown}s…",
       "cancel": "취소",
       "doneTalking": "말하기 끝",
-      "imDone": "끝!",
+      "imDone": "끝났어요!",
       "gettingMicReady": "마이크 준비 중...",
       "understanding": "말한 내용을 이해하는 중...",
-      "makeMyColoringPage": "🎨 내 색칠공부 만들기!",
+      "makeMyColoringPage": "🎨 내 색칠 페이지 만들기!",
       "notQuiteRight": "조금 아쉬운가요? 다시 해봐요",
       "maxDuration": "최대 {seconds}초",
       "errors": {
-        "permissionDenied": "마이크에 접근할 수 없어요. 마이크 권한을 허용하고 다시 시도해 주세요!",
-        "notSupported": "앗! 이 브라우저는 음성 녹음을 지원하지 않아요. Chrome이나 Safari를 사용해 보세요!",
-        "transcriptionFailed": "음… 잘 못 알아들었어요. 다시 해볼까요!",
-        "recordingFailed": "녹음 중 문제가 생겼어요. 다시 시도해 주세요!",
-        "timeout": "녹음이 너무 길었어요. 더 짧게 말해줘!"
+        "permissionDenied": "마이크 사용이 필요해요!",
+        "notSupported": "다른 브라우저로 해봐요!",
+        "transcriptionFailed": "잘 못 들었어요!",
+        "recordingFailed": "앗! 다시 해볼까요!",
+        "timeout": "조금 길었어요!"
       }
     },
     "imageInput": {
-      "takePhotoOrUpload": "사진을 찍거나 업로드해요!",
-      "signInToUpload": "로그인하고 이미지를 업로드해요!",
+      "takePhotoOrUpload": "사진 찍거나 골라주세요!",
+      "signInToUpload": "로그인하고 이미지를 올려요!",
       "camera": "카메라",
       "upload": "업로드",
       "takePhoto": "사진 찍기",
       "uploadImage": "이미지 업로드",
-      "dropHere": "여기에 놓아줘!",
-      "dragAndDrop": "또는 이미지를 여기에 드래그 앤 드롭하세요",
-      "shareDrawing": "그림이나 색칠하고 싶은 사진을 올려줘!",
-      "greatPicture": "멋진 사진이에요! 이걸로 할까요?",
+      "dropHere": "여기에 놓아주세요!",
+      "dragAndDrop": "또는 여기로 드래그해서 놓기",
+      "shareDrawing": "그림이나 색칠하고 싶은 사진을 공유해요!",
+      "greatPicture": "멋진 사진이네요! 이걸로 할까요?",
       "pickAnother": "다른 거 고르기",
-      "useThis": "이걸로!",
-      "iSee": "이게 보여요:",
-      "makeMyColoringPage": "🎨 내 색칠공부 만들기!",
+      "useThis": "이걸로 할래요!",
+      "iSee": "이렇게 보여요:",
+      "makeMyColoringPage": "🎨 내 색칠 페이지 만들기!",
       "notQuiteRight": "조금 아쉬운가요? 다시 해봐요",
       "capturing": "사진 준비 중...",
       "processing": "사진을 살펴보는 중...",
@@ -1124,48 +1263,66 @@
       "altImagePreview": "선택한 이미지 미리보기",
       "altUploadedImage": "업로드한 이미지",
       "errors": {
-        "fileTooLarge": "이미지가 너무 커요! 10MB보다 작은 걸로 해봐요.",
-        "invalidType": "이 파일 형식은 읽을 수 없어요. JPEG, PNG, WebP 이미지를 사용해 주세요!",
-        "processingFailed": "음… 이 이미지는 잘 이해가 안 돼요. 다른 걸로 해볼까요!",
-        "cameraFailed": "카메라에 문제가 생겼어요. 다시 해볼까요!",
-        "heicUnsupported": "아직 HEIC 사진은 지원하지 않아요. 먼저 JPG 또는 PNG로 저장해 주세요!"
+        "fileTooLarge": "너무 커요! 더 작은 걸로 해봐요.",
+        "invalidType": "다른 사진으로 해봐요!",
+        "processingFailed": "잘 안 됐어요! 다른 걸로 해봐요!",
+        "cameraFailed": "카메라가 멈췄어요! 다시 해봐요!",
+        "heicUnsupported": "아직 HEIC 사진은 지원하지 않아요. 먼저 JPG나 PNG로 저장해 주세요!"
       }
     },
-    "placeholder": "예: 우주를 항해하는 해적선 🚀",
-    "placeholderGuestLimit": "{maxTries}번의 무료 사용을 모두 썼어요! 가입하고 크레딧 15개를 더 받으세요.",
-    "placeholderNoCreditsSubscribed": "크레딧이 없어요 — 충전하거나 요금제를 업그레이드해요!",
-    "placeholderNoCreditsNoSubscription": "무료 크레딧을 모두 썼어요 — 계속 만들려면 요금제를 선택해요!",
-    "placeholderSignIn": "로그인하고 마법 같은 색칠공부를 만들어요!",
-    "buttonCreate": "색칠공부 만들기",
-    "buttonCreateGuest": "만들기 (무료 {remaining} {remaining, plural, =1 {회} other {회}} 남음)",
-    "buttonSignUp": "가입하고 무료 크레딧 15개 받기",
+    "placeholder": "무엇을 색칠하고 싶나요?",
+    "placeholderGuestLimit": "무료 {maxTries}번을 다 썼어요! 가입하면 15크레딧을 더 받아요.",
+    "placeholderNoCreditsSubscribed": "크레딧이 없어요. 충전하거나 플랜을 업그레이드해요!",
+    "placeholderNoCreditsNoSubscription": "무료 크레딧을 다 썼어요. 플랜을 고르거나 필요할 때마다 색칠해요!",
+    "placeholderSignIn": "로그인하고 마법 같은 색칠 페이지를 만들어요!",
+    "buttonCreate": "만들기",
+    "buttonCreateGuest": "만들기",
+    "freeTriesChip": "{remaining, plural, =1 {무료 1번 남음} other {무료 #번 남음}}",
+    "buttonSignUp": "가입하고 무료 15크레딧 받기",
     "buttonBuyCredits": "크레딧 더 사기",
-    "buttonViewPlans": "요금제 보기",
+    "buttonViewPlans": "플랜 보기",
+    "linkColorAsYouGo": "또는 필요할 때마다 색칠하기(구독 없음)",
     "buttonGetStarted": "무료로 시작하기",
     "subtextGuestLimit": "마법을 봤죠! 가입하고 계속 만들어요.",
-    "subtextNoCredits": "크레딧이 없어요 — 충전하거나 업그레이드해요!",
-    "subtextNoCreditsSubscribed": "마법이 더 필요하신가요? 충전하거나 업그레이드해서 창작을 이어가요!",
-    "subtextNoCreditsNoSubscription": "구독을 선택하고 더 많이 만들어요",
-    "subtextFallback": "무료 크레딧 15개를 드려요 — 색칠공부 3장을 만들 수 있어요!",
-    "freeTriesChip": "{remaining, plural, =1 {무료 체험 #회 남음} other {무료 체험 #회 남음}}",
-    "examplesLabel": "이렇게 해보세요",
-    "exampleTrex": "스케이트보드 타는 티라노 우주비행사",
-    "exampleDragon": "차 마시는 용과 토끼",
-    "exampleFoxes": "소풍 가는 여우 가족",
-    "linkColorAsYouGo": "또는 바로 색칠하기 (구독 없이)"
+    "subtextNoCredits": "크레딧이 없어요. 충전하거나 업그레이드해요!",
+    "subtextNoCreditsSubscribed": "마법이 더 필요하신가요? 충전하거나 업그레이드해서 계속 만들어요!",
+    "subtextNoCreditsNoSubscription": "구독을 고르거나, 크레딧을 조금 사서 계속해요.",
+    "subtextFallback": "무료 15크레딧으로 3장을 만들 수 있어요!"
+  },
+  "feedback": {
+    "title": "어떤 생각이 드나요?",
+    "subtitle": "모든 메시지를 다 읽어요. 진짜예요.",
+    "types": {
+      "bug": {
+        "label": "뭔가 고장났어요",
+        "placeholder": "무엇을 해보셨고, 대신 어떤 일이 일어났나요?"
+      },
+      "idea": {
+        "label": "아이디어가 있어요",
+        "placeholder": "어떤 기능이 있으면 좋을까요? 크게 꿈꿔도 좋아요."
+      },
+      "help": {
+        "label": "도움이 필요해요",
+        "placeholder": "어디에서 막혔나요?"
+      },
+      "other": {
+        "label": "기타",
+        "placeholder": "좋은 점도 아쉬운 점도 뭐든 들려주세요."
+      }
+    },
+    "emailPlaceholder": "이메일 (선택, 답장을 원하실 때만)",
+    "sendButton": "보내기",
+    "sending": "보내는 중...",
+    "successTitle": "받았어요, 고마워요",
+    "successMessage": "확인해보고 필요하면 답장드릴게요."
   },
   "og": {
     "homepage": {
-      "tagline": "창의력 쑥쑥! 색칠하며 배우는 즐거움",
-      "features": {
-        "pages": "1만+ 도안",
-        "aiGenerated": "AI 생성",
-        "freePrintables": "무료 출력"
-      },
-      "alt": "Chunky Crayon — 몇 초 만에 만드는 맞춤 컬러링 페이지."
+      "tagline": "몇 초 만에 나만의 색칠공부!",
+      "alt": "Chunky Crayon, 몇 초 만에 만드는 나만의 색칠공부."
     },
     "coloringImage": {
-      "notFound": "색칠 도안을 찾을 수 없어요"
+      "notFound": "색칠공부를 찾을 수 없어요"
     },
     "blogPost": {
       "notFound": "블로그 글을 찾을 수 없어요",
@@ -1180,193 +1337,7 @@
       "beginner": "초급",
       "intermediate": "중급",
       "advanced": "고급",
-      "expert": "전문가"
+      "expert": "최고급"
     }
-  },
-  "coloringPage": {
-    "progress": {
-      "allDone": "완성!",
-      "milestones": {
-        "25": "좋은 시작!",
-        "50": "반이나 했어요!",
-        "75": "거의 다 됐어요!",
-        "100": "완성!"
-      }
-    }
-  },
-  "start": {
-    "eyebrow": "요청대로 그려주는 첫 색칠앱.",
-    "cta": "무료로 써보기",
-    "ctaSubtext": "무료 2장. 계정 없이 바로.",
-    "tryColoring": "이거 색칠해보기",
-    "hero": {
-      "trex": {
-        "title": "“엄마, 스케이트보드 타는 티렉스 색칠해도 돼?”",
-        "subtitle": "응, 진짜로! 아이가 장면을 말하면 약 2분 안에 출력 가능한 색칠놀이가 완성돼요. 출력해서 하거나, 앱에서 바로 색칠하세요."
-      },
-      "foxes": {
-        "title": "스크린 타임도, 크레용처럼.",
-        "subtitle": "오후 5시 구원템, 완료. 테이블엔 출력 1장, 아니면 휴대폰을 쥐여줘도 OK. 같은 페이지라 죄책감은 제로."
-      },
-      "dragon": {
-        "title": "“용 다과회”가 진짜 색칠놀이로.",
-        "subtitle": "아이가 어떤 장면이든 말하면, 우리가 그려요. 출력하거나 앱에서 색칠하세요. 아이가 진짜로 하고 싶어 하는 페이지만 생겨요."
-      },
-      "default": {
-        "title": "아이가 말하면, 우리가 색칠놀이로 그려요.",
-        "subtitle": "티렉스 우주비행사. 용 다과회. 여우 가족 소풍. 뭐든 상상하는 대로, 약 2분이면 출력 가능!"
-      }
-    },
-    "problem": {
-      "title": "오후 5시 “심심해” 긴급 처방.",
-      "body": "당신은 피곤하고, 아이는 크레용을 찾고, 당신은 조용함이 필요하죠. 그런데 지난주 공룡 프린트는 벌써 세 번이나 색칠했어요. Chunky Crayon은 아이가 말한 장면 그대로, 약 2분 만에 새 색칠놀이를 만들어줘요."
-    },
-    "howItWorks": {
-      "title": "이용 방법",
-      "steps": {
-        "describe": {
-          "title": "아이가 장면을 말해요",
-          "body": "말로, 글로, 사진으로. 머릿속 그대로요."
-        },
-        "draw": {
-          "title": "우리가 색칠놀이를 그려요",
-          "body": "요청부터 출력까지 약 2분."
-        },
-        "color": {
-          "title": "출력하거나 앱에서 색칠해요",
-          "body": "테이블엔 크레용, 휴대폰엔 손가락. 선택은 당신!"
-        }
-      }
-    },
-    "features": {
-      "title": "한 앱에 다 담았어요.",
-      "items": {
-        "unlimited": {
-          "title": "어떤 장면이든, 어떤 주제든",
-          "body": "공룡 우주비행사. 유니콘 치과의사. 우주 속 남매. 말로만 설명할 수 있으면, 그려줄 수 있어요."
-        },
-        "print": {
-          "title": "출력도, 화면에서도",
-          "body": "모든 색칠놀이는 깔끔한 PDF와 인터랙티브 캔버스로 제공돼요. 상황에 맞게 고르세요."
-        },
-        "daily": {
-          "title": "매일 새 페이지",
-          "body": "깜짝 선물을 좋아하나요? 매일 무료 새 색칠놀이가 이메일로 도착해요."
-        },
-        "family": {
-          "title": "구독 하나로, 아이 모두",
-          "body": "한 플랜에서 아이마다 프로필을 따로 만들어요. 색칠 페이지, 스티커, 보상은 각자 그대로! Sparkle에서는 최대 10개 프로필까지 가능해요."
-        }
-      }
-    },
-    "pricing": {
-      "title": "무료로 시작. 월 £7.99부터.",
-      "body": "계정 없이 무료 생성 2번으로 시작하세요. 마음에 들면 가끔 색칠부터 매일 사용까지, 플랜을 골라 쓸 수 있어요.",
-      "cta": "전체 요금제 보기"
-    },
-    "finalCta": {
-      "title": "색칠놀이 한 장이면, 조용한 20분.",
-      "body": "장면을 입력하세요. 우리가 그려드려요. 체험엔 계정이 필요 없어요."
-    },
-    "demo": {
-      "title": "색칠공부가 만들어지는 걸 구경해요.",
-      "body": "아이가 말하면, 우리가 그려요. 문장 입력부터 인쇄까지 언제나 약 2분!",
-      "idleLabel": "재생을 눌러 색칠공부가 그려지는 모습을 보세요.",
-      "drawingLabel": "장면을 그리고 있어요",
-      "drawingSubLabel": "조금만 기다려 주세요.",
-      "playLabel": "데모 재생",
-      "pauseLabel": "일시정지"
-    },
-    "experiments": {
-      "startCta": {
-        "urgency": "오늘 무료 2장 — 카드 필요 없고, 숨은 조건도 없어요.",
-        "proof": "200명+ 부모님이 함께해요. 무료 2장으로 시작!"
-      }
-    }
-  },
-  "colorAsYouGo": {
-    "heroTitle": "언제 어디서나 색칠해요.",
-    "heroSubtitle": "필요할 때 크레딧만 조금씩 구매하세요. 구독 없음. 약정 없음. 오직 색칠만!",
-    "credits": "{count} 크레딧",
-    "buyNow": "크레딧 받기",
-    "loading": "불러오는 중...",
-    "failedToCheckout": "결제로 이동할 수 없어요. 다시 시도할까요?",
-    "packs": {
-      "PUBLIC_CREDITS_50": {
-        "name": "스타터",
-        "tagline": "색칠 페이지 약 10장. 비 오는 오후에 딱!"
-      },
-      "PUBLIC_CREDITS_200": {
-        "name": "방학 중간",
-        "tagline": "색칠 페이지 약 40장. “심심해~” 일주일 해결!"
-      },
-      "PUBLIC_CREDITS_500": {
-        "name": "휴가",
-        "tagline": "색칠 페이지 약 100장. 긴 방학도 걱정 끝!"
-      }
-    },
-    "subscribePitch": {
-      "title": "매주 색칠하나요?",
-      "subtitle": "한 달에 몇 장 이상 만든다면 구독이 더 저렴해요. 형제자매용 추가 프로필과 차곡차곡 쌓이는 크레딧도 함께!",
-      "cta": "요금제 보기"
-    }
-  },
-  "feedback": {
-    "title": "무엇을 도와드릴까요?",
-    "subtitle": "모든 메시지를 꼼꼼히 읽고 빠르게 답장드려요.",
-    "types": {
-      "bug": {
-        "label": "버그 신고",
-        "placeholder": "어떤 문제가 있었나요? 가능하면 무엇을 하고 있었는지도 알려주세요..."
-      },
-      "idea": {
-        "label": "기능 제안",
-        "placeholder": "어떤 기능이 있으면 좋을까요? 어떻게 도움이 될까요?"
-      },
-      "help": {
-        "label": "도움 받기",
-        "placeholder": "어떤 도움이 필요하신가요?"
-      },
-      "other": {
-        "label": "기타",
-        "placeholder": "전하고 싶은 이야기가 있나요?"
-      }
-    },
-    "emailPlaceholder": "이메일(선택, 답변용)",
-    "sendButton": "메시지 보내기",
-    "sending": "보내는 중...",
-    "successTitle": "피드백 고마워요!",
-    "successMessage": "시간 내어 도와주셔서 정말 감사해요. 더 멋지게 개선할게요!"
-  },
-  "startOverButton": {
-    "idle": "처음부터",
-    "modalTitle": "페이지를 지울까요?",
-    "modalBody": "칠한 색이 모두 사라지고 새 하얀 페이지로 시작해요.",
-    "confirm": "응, 새 페이지",
-    "cancel": "계속 색칠하기"
-  },
-  "shareButton": {
-    "idle": "공유하기",
-    "preparing": "예쁘게 포장 중...",
-    "doneSharing": "완료!"
-  },
-  "shareModal": {
-    "title": "그림 공유하기",
-    "privacyNote": "링크가 있는 누구나 이 페이지를 볼 수 있어요. 이름, 이메일 등 어떤 정보도 공유하지 않아요.",
-    "expiresIn": "링크 유효기간:",
-    "expiration": {
-      "7days": "1주",
-      "30days": "1개월",
-      "never": "영원히"
-    },
-    "createLink": "링크 만들기",
-    "creating": "링크 만드는 중...",
-    "success": {
-      "title": "링크 준비 완료",
-      "subtitle": "보여주고 싶은 사람에게 보내세요."
-    },
-    "done": "완료",
-    "error": "실패했어요. 잠시 후 다시 시도해 주세요.",
-    "socialShare": "또는 올리기"
   }
 }

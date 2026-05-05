@@ -22,7 +22,15 @@ const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env.local in apps/web
 dotenv.config({
-  path: path.join(__dirname, "..", "..", "..", "apps", "web", ".env.local"),
+  path: path.join(
+    __dirname,
+    "..",
+    "..",
+    "..",
+    "apps",
+    "chunky-crayon-web",
+    ".env.local",
+  ),
 });
 
 import { generateObject } from "ai";
