@@ -91,7 +91,8 @@ const FormCTA = ({ className }: FormCTAProps) => {
       <div className={cn('flex flex-col gap-3', className)}>
         <Button
           onClick={config.action}
-          className="font-tondo font-bold text-base md:text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-full py-4 h-auto"
+          size="lg"
+          className="rounded-full hover:scale-105 active:scale-95"
           type="button"
         >
           {config.text}

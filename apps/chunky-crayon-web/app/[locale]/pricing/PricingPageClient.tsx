@@ -386,12 +386,8 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                 </CardContent>
                 <CardFooter className="flex flex-col gap-2 pb-6">
                   <Button
-                    className={cn(
-                      'w-full text-base font-tondo font-bold py-6 rounded-full text-white transition-transform',
-                      plan.mostPopular
-                        ? 'bg-crayon-orange hover:bg-crayon-orange-dark hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-crayon-orange/30'
-                        : 'bg-text-primary hover:bg-text-primary/90 hover:scale-[1.02] active:scale-[0.98]',
-                    )}
+                    variant={plan.mostPopular ? 'default' : 'neutral'}
+                    className="w-full text-base py-6 rounded-full hover:scale-[1.02] active:scale-[0.98]"
                     onClick={() => handlePurchase(plan)}
                     disabled={loadingPlan === planName}
                   >
@@ -488,7 +484,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button
-              className="font-tondo font-bold text-base text-white bg-crayon-orange hover:bg-crayon-orange-dark px-8 py-6 rounded-full shadow-lg shadow-crayon-orange/30 hover:scale-[1.02] active:scale-[0.98] transition-transform"
+              className="px-8 py-6 rounded-full hover:scale-[1.02] active:scale-[0.98]"
               onClick={() => {
                 const recommended = plans.find((p) => p.mostPopular);
                 if (recommended) handlePurchase(recommended);

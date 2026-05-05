@@ -302,11 +302,7 @@ const BirthdayInviteForm = () => {
         </div>
       </div>
 
-      <Button
-        type="submit"
-        disabled={submitting}
-        className="w-full text-lg py-4 bg-btn-orange hover:bg-crayon-orange text-white font-tondo font-bold shadow-btn-primary rounded-coloring-card"
-      >
+      <Button type="submit" disabled={submitting} size="lg" className="w-full">
         {submitting ? 'Making your invite…' : 'Download PDF'}
       </Button>
     </form>

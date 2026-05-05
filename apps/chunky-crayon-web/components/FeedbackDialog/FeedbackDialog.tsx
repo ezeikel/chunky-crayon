@@ -316,7 +316,7 @@ const FeedbackDialog = ({
                   <Button
                     type="submit"
                     disabled={isSubmitting || !message.trim()}
-                    className="w-full h-12 rounded-xl bg-gradient-to-r from-crayon-orange to-crayon-orange-dark text-white font-tondo font-bold shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-[1.02] active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full hover:scale-[1.02] active:scale-95"
                   >
                     {isSubmitting ? (
                       <>

@@ -155,12 +155,8 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
                   <Button
                     onClick={() => handlePurchase(pack)}
                     disabled={loadingPack !== null}
-                    className={cn(
-                      'w-full font-tondo font-bold',
-                      isMostPopular
-                        ? 'bg-crayon-orange hover:bg-crayon-orange/90 text-white'
-                        : 'bg-text-primary hover:bg-text-primary/90 text-white',
-                    )}
+                    variant={isMostPopular ? 'default' : 'neutral'}
+                    className="w-full"
                   >
                     {loadingPack === pack.key ? t('loading') : t('buyNow')}
                   </Button>
@@ -190,11 +186,7 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
           <p className="text-base text-text-secondary mb-6 leading-relaxed">
             {t('subscribePitch.subtitle')}
           </p>
-          <Button
-            onClick={() => router.push('/pricing')}
-            variant="outline"
-            className="font-tondo font-bold border-2 border-crayon-orange text-crayon-orange hover:bg-crayon-orange hover:text-white"
-          >
+          <Button onClick={() => router.push('/pricing')} variant="outline">
             {t('subscribePitch.cta')}
           </Button>
         </div>

@@ -255,7 +255,8 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
         <Button
           type="button"
           onClick={reset}
-          className="font-tondo font-bold text-base md:text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-full px-8 py-4 h-auto"
+          size="lg"
+          className="rounded-full px-8 hover:scale-105 active:scale-95"
         >
           <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
           Try again
@@ -361,19 +362,20 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
           <Button
             type="button"
             onClick={reset}
-            variant="outline"
-            className="font-tondo font-bold text-base md:text-lg border-2 border-paper-cream-dark text-text-primary hover:bg-paper-cream rounded-full py-4 h-auto flex-1"
+            variant="outline-muted"
+            size="lg"
+            className="rounded-full flex-1"
           >
             Cancel
           </Button>
           <Button
             type="button"
             onClick={stopRecording}
+            variant={silenceDetected ? 'secondary' : 'default'}
+            size="lg"
             className={cn(
-              'font-tondo font-bold text-base md:text-lg text-white rounded-full py-4 h-auto flex-[2] transition-all duration-300 hover:scale-105 active:scale-95',
-              silenceDetected
-                ? 'bg-btn-teal shadow-btn-secondary animate-pulse'
-                : 'bg-btn-orange shadow-btn-primary',
+              'rounded-full flex-[2] hover:scale-105 active:scale-95',
+              silenceDetected && 'animate-pulse',
             )}
           >
             <FontAwesomeIcon icon={faStop} className="mr-2" />

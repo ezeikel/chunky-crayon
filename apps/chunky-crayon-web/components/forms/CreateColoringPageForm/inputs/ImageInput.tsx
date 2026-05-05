@@ -161,7 +161,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
         </p>
         <Button
           onClick={handleRetry}
-          className="font-tondo font-bold text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-coloring-card"
+          className="hover:scale-105 active:scale-95"
         >
           <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
           {t('imageInput.tryAgain')}
@@ -220,17 +220,14 @@ const ImageInput = ({ className }: ImageInputProps) => {
         </div>
 
         <div className="flex gap-3">
-          <Button
-            onClick={clearImage}
-            variant="outline"
-            className="font-tondo font-bold border-2 border-paper-cream-dark text-text-primary hover:bg-paper-cream rounded-coloring-card"
-          >
+          <Button onClick={clearImage} variant="outline-muted">
             <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
             {t('imageInput.pickAnother')}
           </Button>
           <Button
             onClick={processImage}
-            className="font-tondo font-bold text-white bg-btn-teal shadow-btn-secondary hover:shadow-btn-secondary-hover hover:scale-105 active:scale-95 transition-all duration-200 px-8 rounded-coloring-card"
+            variant="secondary"
+            className="px-8 hover:scale-105 active:scale-95"
           >
             <FontAwesomeIcon icon={faCheck} className="mr-2" />
             {t('imageInput.useThis')}
