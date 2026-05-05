@@ -55,10 +55,6 @@
       "schedule": "0 15 * * 1-5"
     },
     {
-      "path": "/api/social/post?platform=facebook",
-      "schedule": "5 15 * * 1-5"
-    },
-    {
       "path": "/api/social/post?platform=pinterest",
       "schedule": "10 15 * * 1-5"
     },
@@ -92,10 +88,6 @@
     {
       "path": "/api/social/post?platform=instagram&type=carousel",
       "schedule": "0 14 * * 0,6"
-    },
-    {
-      "path": "/api/social/post?platform=facebook",
-      "schedule": "5 14 * * 0,6"
     },
     {
       "path": "/api/social/post?platform=pinterest",
