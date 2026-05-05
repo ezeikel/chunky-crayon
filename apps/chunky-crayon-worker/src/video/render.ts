@@ -257,3 +257,84 @@ export async function renderImageDemoReel(
 
   return opts.outputPath;
 }
+
+// ─── Content reel renderer ─────────────────────────────────────────────
+//
+// Picks one of ContentReelShockSpike / WarmSpike / QuietSpike based on
+// the reel's category-derived template, threads the voice + music URLs
+// through, renders to mp4. The composition's calculateMetadata expands
+// durationInFrames from the voice clip lengths so callers don't need to
+// pre-compute it.
+//
+// PlasmaShader needs WebGL inside Chromium → chromiumOptions: { gl:
+// 'angle' }. Without this, the second frame blacks out.
+
+export type RenderContentReelOptions = {
+  template: "shock" | "warm" | "quiet";
+  reel: Record<string, unknown>;
+  hookVoiceUrl: string;
+  hookVoiceSeconds: number;
+  payoffVoiceUrl: string;
+  payoffVoiceSeconds: number;
+  backgroundMusicUrl?: string;
+  outputPath: string;
+};
+
+const CONTENT_REEL_COMPOSITION_ID = {
+  shock: "ContentReelShockSpike",
+  warm: "ContentReelWarmSpike",
+  quiet: "ContentReelQuietSpike",
+} as const;
+
+export async function renderContentReel(
+  opts: RenderContentReelOptions,
+): Promise<string> {
+  const compositionId = CONTENT_REEL_COMPOSITION_ID[opts.template];
+  const inputProps = {
+    reel: opts.reel,
+    hookVoiceUrl: opts.hookVoiceUrl,
+    hookVoiceSeconds: opts.hookVoiceSeconds,
+    payoffVoiceUrl: opts.payoffVoiceUrl,
+    payoffVoiceSeconds: opts.payoffVoiceSeconds,
+    backgroundMusicUrl: opts.backgroundMusicUrl,
+  } satisfies Record<string, unknown>;
+
+  console.log(`[render:content-reel:${compositionId}] bundling…`);
+  const bundleLocation = await bundle({
+    entryPoint: ENTRY_POINT,
+    publicDir: PUBLIC_DIR,
+    webpackOverride,
+  });
+
+  const composition = await selectComposition({
+    serveUrl: bundleLocation,
+    id: compositionId,
+    inputProps,
+    timeoutInMilliseconds: 120_000,
+  });
+
+  console.log(`[render:content-reel:${compositionId}] composition resolved:`, {
+    durationInFrames: composition.durationInFrames,
+    fps: composition.fps,
+  });
+
+  await renderMedia({
+    composition,
+    serveUrl: bundleLocation,
+    codec: "h264",
+    outputLocation: opts.outputPath,
+    inputProps,
+    timeoutInMilliseconds: 240_000,
+    chromiumOptions: { gl: "angle" },
+    onBrowserLog: ({ type, text }) => {
+      if (type === "error" || type === "warning") {
+        console.log(`[remotion-browser:${type}] ${text}`);
+      }
+    },
+  });
+
+  console.log(
+    `[render:content-reel:${compositionId}] wrote ${opts.outputPath}`,
+  );
+  return opts.outputPath;
+}

@@ -2040,6 +2040,136 @@ app.post("/publish/v2", async (c) => {
 });
 
 /**
+ * POST /jobs/content-reel/publish
+ *
+ * Render + publish a single ContentReel by id. Caller (Vercel daily
+ * cron) supplies just `{ id }`; worker reads the row, generates voice
+ * clips via ElevenLabs, renders the appropriate Remotion template (Shock /
+ * Warm / Quiet, dispatched per category), builds a Satori cover JPEG,
+ * uploads both to R2, writes back reelUrl/coverUrl/postedAt onto the row.
+ *
+ * Mirrors /publish/v2's shape but for the simpler stat/fact/tip/myth
+ * pipeline — no Playwright recording, no canvas reveal, no region
+ * store. Just voice + Remotion + Satori.
+ *
+ * Body: { id: string }
+ * Returns: { reelUrl, coverUrl, template, durationSecs }
+ */
+/**
+ * POST /jobs/content-reel/refresh-fact-checks
+ *
+ * Weekly cron — re-verifies any ContentReel row whose factCheckedAt is
+ * older than 180 days. Items downgraded to LOW or `recommendation: drop`
+ * go inactive automatically because the publish gate filters them out;
+ * the worker logs a warning so operators see the breadcrumb.
+ *
+ * Returns the refresh summary (totals, drops list) so the Vercel cron
+ * can include it in any admin alerting downstream.
+ */
+app.post("/jobs/content-reel/refresh-fact-checks", async (c) => {
+  const { refreshStaleFactChecks } = await import(
+    "./content-reel/refreshFactChecks.js"
+  );
+  try {
+    const summary = await refreshStaleFactChecks();
+    return c.json({ ok: true, ...summary });
+  } catch (err) {
+    console.error(`[/jobs/content-reel/refresh-fact-checks] failed:`, err);
+    return c.json(
+      {
+        ok: false,
+        error: "refresh_failed",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      500,
+    );
+  }
+});
+
+/**
+ * POST /jobs/content-reel/pick-and-publish
+ *
+ * Daily-publish entrypoint — Vercel cron triggers this once per day.
+ * Worker reads the DB, picks today's reel via rotation + 30d dedup,
+ * then runs the full publish pipeline (voice → render → cover → R2 →
+ * DB writeback).
+ *
+ * Body (optional): { brand?: "CHUNKY_CRAYON" | "COLORING_HABITAT" }
+ *
+ * Returns 202 with job acceptance immediately; full render runs detached
+ * so the Vercel cron's <60s window doesn't block the worker. Caller
+ * receives reelUrl/coverUrl on the row when DB writeback completes.
+ */
+app.post("/jobs/content-reel/pick-and-publish", async (c) => {
+  const body = (await c.req
+    .json<{ brand?: unknown }>()
+    .catch(() => ({}) as { brand?: unknown })) as { brand?: unknown };
+  const brand =
+    body.brand === "COLORING_HABITAT" ? "COLORING_HABITAT" : "CHUNKY_CRAYON";
+
+  const { pickTodaysContentReel } = await import("./content-reel/pick.js");
+  const { publishContentReel } = await import("./content-reel/publish.js");
+  const port = parseInt(process.env.PORT ?? "3030", 10);
+
+  const reel = await pickTodaysContentReel({ brand });
+  if (!reel) {
+    console.warn(
+      `[/jobs/content-reel/pick-and-publish] no candidates for brand=${brand}`,
+    );
+    return c.json({ ok: false, error: "no_candidates" }, 200);
+  }
+
+  // Detached render — same fire-and-forget pattern as daily-image. The
+  // ack response confirms the worker accepted the job; the render runs
+  // in the background and updates the row when complete.
+  publishContentReel({ id: reel.id, port }).catch((err) => {
+    console.error(
+      `[/jobs/content-reel/pick-and-publish] detached publish failed for ${reel.id}:`,
+      err,
+    );
+  });
+
+  return c.json(
+    {
+      ok: true,
+      accepted: true,
+      id: reel.id,
+      kind: reel.kind,
+    },
+    202,
+  );
+});
+
+app.post("/jobs/content-reel/publish", async (c) => {
+  const body = (await c.req
+    .json<{ id?: unknown }>()
+    .catch(() => ({}) as { id?: unknown })) as { id?: unknown };
+  const id = typeof body.id === "string" ? body.id : "";
+  if (!id) {
+    return c.json({ error: "id required (string)" }, 400);
+  }
+
+  // Lazy import — keeps the dotted Remotion bundler off the cold path
+  // for routes that don't render content reels.
+  const { publishContentReel } = await import("./content-reel/publish.js");
+  const port = parseInt(process.env.PORT ?? "3030", 10);
+
+  try {
+    const result = await publishContentReel({ id, port });
+    return c.json({ ok: true, ...result });
+  } catch (err) {
+    console.error(`[/jobs/content-reel/publish] failed:`, err);
+    return c.json(
+      {
+        error: "publish_failed",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      500,
+    );
+  }
+});
+
+/**
  * POST /jobs/coloring-image/start
  *
  * Canvas-as-loader entrypoint. Vercel side has already:

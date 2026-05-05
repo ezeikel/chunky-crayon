@@ -20,6 +20,7 @@ import {
   SHOCK_STAT_SAMPLE,
   WARM_STAT_SAMPLE,
   QUIET_STAT_SAMPLE,
+  WARM_MYTH_SAMPLE,
 } from "../src/video/content-reel/spike/sample-stats";
 
 const OUTPUT_DIR = join(process.cwd(), "tmp", "content-reel-cover-preview");
@@ -31,6 +32,10 @@ async function main() {
     { template: "shock" as const, reel: SHOCK_STAT_SAMPLE },
     { template: "warm" as const, reel: WARM_STAT_SAMPLE },
     { template: "quiet" as const, reel: QUIET_STAT_SAMPLE },
+    // Myth fixture renders through the Warm template — same plasma palette,
+    // different reveal beat (VerdictStamp). Confirms cover pill text picks
+    // the kind-aware "Tap to see the answer" copy.
+    { template: "warm" as const, reel: WARM_MYTH_SAMPLE },
   ];
 
   for (const { template, reel } of cases) {

@@ -188,6 +188,20 @@ export async function buildContentReelCover(
     blockLen <= 3 ? 360 : blockLen <= 4 ? 280 : blockLen <= 6 ? 220 : 180;
   const aberrationOffset = Math.round(numberFontSize * 0.025);
 
+  // Pill copy mirrors the reel's kind so the affordance reads correctly
+  // — "see the number" makes no sense for a myth-bust where the centre
+  // block is "TRUE" or "FALSE". Keep this short; long pill text wraps
+  // and the play triangle gets squashed. The verb stays "tap" for IG/FB
+  // alignment (TikTok says "swipe" but the cover renders identically
+  // across platforms — pick the most-common gesture).
+  const pillByKind: Record<ContentReel["kind"], string> = {
+    stat: "Tap to see the number",
+    fact: "Tap to see the fact",
+    tip: "Tap to see the tip",
+    myth: "Tap to see the answer",
+  };
+  const pillText = pillByKind[reel.kind];
+
   const fontConfig = [
     {
       name: "Tondo",
@@ -286,7 +300,7 @@ export async function buildContentReelCover(
           >
             <polygon points="6,4 24,14 6,24" fill={palette.teaserPillText} />
           </svg>
-          Tap to see the number
+          {pillText}
         </div>
       </div>
 

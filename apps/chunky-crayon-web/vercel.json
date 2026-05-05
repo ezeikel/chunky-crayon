@@ -33,6 +33,14 @@
       "schedule": "0 8 * * *"
     },
     {
+      "path": "/api/cron/content-reel/publish",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/content-reel/refresh-fact-checks",
+      "schedule": "0 3 * * 0"
+    },
+    {
       "path": "/api/cron/cleanup-stuck-generations",
       "schedule": "*/5 * * * *"
     },
