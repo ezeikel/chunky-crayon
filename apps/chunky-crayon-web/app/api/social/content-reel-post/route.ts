@@ -22,13 +22,13 @@
  */
 import { NextResponse } from 'next/server';
 import { db } from '@one-colored-pixel/db';
-import { generateText } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
+import {
+  generateContentReelCaption,
+  type ContentReelCaptionInput,
+} from '@/lib/content-reel/captions';
 import { BRAND } from '@/lib/db';
 
 export const maxDuration = 300;
-
-type ContentReelKindDb = 'STAT' | 'FACT' | 'TIP' | 'MYTH';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -55,77 +55,6 @@ const fetchWithTimeout = async (
   } finally {
     clearTimeout(timeout);
   }
-};
-
-// ── Caption generation ────────────────────────────────────────────────
-
-const claude = anthropic('claude-sonnet-4-6');
-
-type CaptionPlatform = 'instagram' | 'facebook' | 'pinterest';
-
-const CAPTION_SYSTEM = `You write social-media captions for Chunky Crayon, a parenting brand that posts research-backed reels about kids, coloring, screen time, and brain development.
-
-Voice rules:
-- US-friendly spelling (color, vacation, organize)
-- No em dashes — use commas or fresh sentences
-- No "AI" framing
-- Plain conversational parent-to-parent voice
-- Never condescending`;
-
-const CAPTION_PROMPTS: Record<
-  CaptionPlatform,
-  (reel: ContentReelInput) => string
-> = {
-  instagram: (reel) =>
-    [
-      `Write an Instagram Reels caption for this ${reel.kind} content reel.`,
-      `Hook: ${reel.hook}`,
-      `Payoff: ${reel.payoff}`,
-      `Source: ${reel.sourceTitle ?? 'parenting research'}`,
-      '',
-      'Format: 1-2 short paragraphs, then a question to drive comments, then 5-8 relevant hashtags on a separate line. Total under 200 words. Mention the source briefly. Do not include any URLs in the body — IG strips them.',
-    ].join('\n'),
-  facebook: (reel) =>
-    [
-      `Write a Facebook Reels caption for this ${reel.kind} content reel.`,
-      `Hook: ${reel.hook}`,
-      `Payoff: ${reel.payoff}`,
-      `Source: ${reel.sourceTitle ?? 'parenting research'}`,
-      `Source URL: ${reel.sourceUrl ?? 'omit'}`,
-      '',
-      'Format: 2-3 short paragraphs in conversational parent-voice, then a question for engagement, then the source URL on its own line at the end. Total under 250 words. No hashtags (FB downranks them).',
-    ].join('\n'),
-  pinterest: (reel) =>
-    [
-      `Write a Pinterest pin description for this ${reel.kind} content reel.`,
-      `Hook: ${reel.hook}`,
-      `Payoff: ${reel.payoff}`,
-      `Source: ${reel.sourceTitle ?? 'parenting research'}`,
-      '',
-      'Format: 1-2 short paragraphs that read as helpful + searchable. Lean into keywords parents actually search for (kids, parenting, screen time, etc.). Total under 400 chars. No hashtags. No URLs in body.',
-    ].join('\n'),
-};
-
-type ContentReelInput = {
-  id: string;
-  kind: ContentReelKindDb;
-  hook: string;
-  payoff: string;
-  sourceTitle?: string;
-  sourceUrl?: string;
-};
-
-const generateCaption = async (
-  platform: CaptionPlatform,
-  reel: ContentReelInput,
-): Promise<string> => {
-  const result = await generateText({
-    model: claude,
-    system: CAPTION_SYSTEM,
-    prompt: CAPTION_PROMPTS[platform](reel),
-    temperature: 0.6,
-  });
-  return result.text.trim();
 };
 
 // ── Platform posting (cloned from /api/social/post) ────────────────────
@@ -426,8 +355,11 @@ const handleInner = async (request: Request): Promise<Response> => {
     );
   }
 
-  const reelInput: ContentReelInput = {
-    id: reel.id,
+  // The auto-post route only handles platforms with a working API path.
+  // TikTok content-reel posting is paused (manual via brief — see
+  // /api/social/digest), so it's NOT in this list.
+  type AutoPostPlatform = 'instagram' | 'facebook' | 'pinterest';
+  const reelInput: ContentReelCaptionInput = {
     kind: reel.kind,
     hook: reel.hook,
     payoff: reel.payoff,
@@ -435,22 +367,22 @@ const handleInner = async (request: Request): Promise<Response> => {
     sourceUrl: reel.sourceUrl ?? undefined,
   };
 
-  const shouldPost = (p: CaptionPlatform) =>
+  const shouldPost = (p: AutoPostPlatform) =>
     !platformFilter || platformFilter === p;
 
   const results: Record<string, unknown> = {};
   const errors: string[] = [];
 
   // Generate captions in parallel for the platforms we'll post to.
-  const platformsToPost: CaptionPlatform[] = (
-    ['instagram', 'facebook', 'pinterest'] as CaptionPlatform[]
+  const platformsToPost: AutoPostPlatform[] = (
+    ['instagram', 'facebook', 'pinterest'] as AutoPostPlatform[]
   ).filter(shouldPost);
   const captions = await Promise.all(
-    platformsToPost.map((p) => generateCaption(p, reelInput)),
+    platformsToPost.map((p) => generateContentReelCaption(p, reelInput)),
   );
   const captionByPlatform = Object.fromEntries(
     platformsToPost.map((p, i) => [p, captions[i]]),
-  ) as Record<CaptionPlatform, string>;
+  ) as Record<AutoPostPlatform, string>;
 
   // Post to each platform sequentially — easier to debug than parallel.
   if (shouldPost('instagram')) {

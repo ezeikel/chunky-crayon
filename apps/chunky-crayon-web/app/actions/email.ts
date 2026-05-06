@@ -393,6 +393,13 @@ export const sendSocialDigest = async ({
     sourceUrl?: string;
     reelUrl?: string;
     coverUrl?: string;
+    /**
+     * Per-platform entries (caption + scheduled UTC fire time + manual
+     * flag). TikTok rows always carry willAutoPost=false because we post
+     * TikTok manually via this brief; the rest auto-fire from the
+     * /api/social/content-reel-post crons.
+     */
+    entries?: SocialDigestEntry[];
   };
 }): Promise<{ success: boolean; error?: string }> => {
   const digestEmail = process.env.SOCIAL_DIGEST_EMAIL;

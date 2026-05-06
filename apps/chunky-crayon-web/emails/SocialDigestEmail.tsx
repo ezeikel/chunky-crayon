@@ -51,6 +51,13 @@ type SocialDigestEmailProps = {
     sourceUrl?: string;
     reelUrl?: string;
     coverUrl?: string;
+    /**
+     * Per-platform entries with caption + scheduled UTC time + manual
+     * flag. Same shape as demoReelEntries; the email renders one card
+     * per platform so TikTok (manual) and IG/FB/Pinterest (auto) all
+     * share a consistent UI.
+     */
+    entries?: SocialDigestEntry[];
   };
   timestamp: string;
 };
@@ -275,6 +282,29 @@ const SocialDigestEmail = ({
                 )}
               </Section>
             </Section>
+
+            {/* Per-platform breakdown — caption + scheduled UTC fire time
+                + manual flag. TikTok always renders here as manual since
+                we don't auto-post TikTok content reels (you upload via
+                the app yourself). IG/FB/Pinterest auto-fire at the times
+                listed. */}
+            {contentReel.entries?.map((entry, index) => (
+              <Section key={`content-reel-${index}`} style={platformCard}>
+                <Text style={platformHeader}>
+                  <span style={platformName}>{entry.platform}</span>
+                  <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
+                    {entry.willAutoPost ? 'auto-posting' : 'manual'}
+                  </span>
+                </Text>
+                <Text style={assetTypeText}>
+                  Asset: {entry.assetType}
+                  {entry.willAutoPost && entry.scheduledTimeUtc
+                    ? ` · scheduled ${entry.scheduledTimeUtc} UTC`
+                    : ''}
+                </Text>
+                <Text style={captionBlock}>{entry.caption}</Text>
+              </Section>
+            ))}
           </>
         )}
 

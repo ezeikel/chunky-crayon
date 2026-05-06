@@ -10,6 +10,10 @@ import {
   generateLinkedInCaption,
   generateTikTokCaption,
 } from '@/app/actions/social';
+import {
+  generateContentReelCaption,
+  type ContentReelCaptionInput,
+} from '@/lib/content-reel/captions';
 import { sendSocialDigest, sendAdminAlert } from '@/app/actions/email';
 import type { SocialDigestEntry } from '@/app/actions/email';
 
@@ -61,16 +65,26 @@ const POST_SCHEDULE: Record<string, ScheduledSlot> = {
   pinterest: { utc: '18:00', days: 'weekday' }, // weekday Pinterest static
   // Weekday late-night slots (00:30+ UTC = US Eastern evening prior calendar day)
   instagramCarousel: { utc: '00:30', days: 'next-day-weekday' },
-  tiktokDemoReel: { utc: '00:32', days: 'next-day-weekday' },
+  // Content-reel slots (daily, 7d/wk — see vercel.json content-reel-post crons)
+  facebookContentReel: { utc: '13:05', days: 'weekday' },
+  pinterestContentReel: { utc: '13:07', days: 'weekday' },
+  instagramContentReel: { utc: '17:05', days: 'weekday' },
+  // tiktokDemoReel + tiktokContentReel intentionally omitted — TikTok auto-
+  // posting is paused; brief surfaces caption + asset for manual upload via
+  // the TikTok app (sandbox API only writes drafts anyway, half-manual).
 };
 
 const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
   instagramDemoReel: { utc: '17:00', days: 'weekend' },
   facebookDemoReel: { utc: '17:02', days: 'weekend' },
-  tiktokDemoReel: { utc: '17:04', days: 'weekend' },
   pinterestDemoReel: { utc: '17:06', days: 'weekend' },
   instagramCarousel: { utc: '17:08', days: 'weekend' },
   pinterest: { utc: '17:10', days: 'weekend' },
+  // Content-reel slots (daily, same UTC times as weekday — picked once and
+  // applied to all 7 days, see vercel.json).
+  facebookContentReel: { utc: '13:05', days: 'weekend' },
+  pinterestContentReel: { utc: '13:07', days: 'weekend' },
+  instagramContentReel: { utc: '17:05', days: 'weekend' },
 };
 
 /**
@@ -228,6 +242,37 @@ export const GET = async (request: Request) => {
       generateLinkedInCaption(coloringImage, 'demo_reel'),
     ]);
 
+    // Pre-generate content-reel captions for the brief so the recipient
+    // can copy-paste for manual platforms (TikTok). The auto-post route
+    // generates these again at fire time, accepting the small duplicate
+    // Claude cost — keeps each surface independent and means a brief-
+    // failure doesn't block the post route or vice versa.
+    let contentReelCaptions: Record<
+      'instagram' | 'facebook' | 'pinterest' | 'tiktok',
+      string
+    > | null = null;
+    if (contentReel) {
+      const reelCaptionInput: ContentReelCaptionInput = {
+        kind: contentReel.kind,
+        hook: contentReel.hook,
+        payoff: contentReel.payoff,
+        sourceTitle: contentReel.sourceTitle ?? undefined,
+        sourceUrl: contentReel.sourceUrl ?? undefined,
+      };
+      const [ig, fb, pin, tt] = await Promise.all([
+        generateContentReelCaption('instagram', reelCaptionInput),
+        generateContentReelCaption('facebook', reelCaptionInput),
+        generateContentReelCaption('pinterest', reelCaptionInput),
+        generateContentReelCaption('tiktok', reelCaptionInput),
+      ]);
+      contentReelCaptions = {
+        instagram: ig,
+        facebook: fb,
+        pinterest: pin,
+        tiktok: tt,
+      };
+    }
+
     // Prefer the product-demo reel as the video asset — the Veo animation
     // cron is dormant, so animationUrl will usually be null for new images.
     const videoAssetUrl =
@@ -321,6 +366,38 @@ export const GET = async (request: Request) => {
       },
     ];
 
+    // Content-reel platform entries — IG/FB/Pinterest auto-post via
+    // /api/social/content-reel-post crons; TikTok is manual via this
+    // brief (sandbox API limitations + you upload from the app yourself).
+    const contentReelEntries: SocialDigestEntry[] = contentReelCaptions
+      ? [
+          {
+            platform: 'Instagram Reel',
+            caption: contentReelCaptions.instagram,
+            ...slotFor('instagramContentReel'),
+            assetType: 'video',
+          },
+          {
+            platform: 'Facebook Reel',
+            caption: contentReelCaptions.facebook,
+            ...slotFor('facebookContentReel'),
+            assetType: 'video',
+          },
+          {
+            platform: 'Pinterest Video',
+            caption: contentReelCaptions.pinterest,
+            ...slotFor('pinterestContentReel'),
+            assetType: 'video',
+          },
+          {
+            platform: 'TikTok',
+            caption: contentReelCaptions.tiktok,
+            willAutoPost: false, // TikTok is manual-only — upload via app
+            assetType: 'video',
+          },
+        ]
+      : [];
+
     // Send digest email
     const result = await sendSocialDigest({
       blogTitle: blogPost?.title,
@@ -354,6 +431,7 @@ export const GET = async (request: Request) => {
             sourceUrl: contentReel.sourceUrl ?? undefined,
             reelUrl: contentReel.reelUrl ?? undefined,
             coverUrl: contentReel.coverUrl ?? undefined,
+            entries: contentReelEntries,
           }
         : undefined,
     });

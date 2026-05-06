@@ -94,10 +94,6 @@
       "path": "/api/social/post?platform=instagram&type=carousel",
       "schedule": "30 0 * * 2-6"
     },
-    {
-      "path": "/api/social/post?type=demo-reel&platform=tiktok",
-      "schedule": "32 0 * * 2-6"
-    },
 
     {
       "path": "/api/social/post?type=demo-reel&platform=instagram",
@@ -106,10 +102,6 @@
     {
       "path": "/api/social/post?type=demo-reel&platform=facebook",
       "schedule": "2 17 * * 0,6"
-    },
-    {
-      "path": "/api/social/post?type=demo-reel&platform=tiktok",
-      "schedule": "4 17 * * 0,6"
     },
     {
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
