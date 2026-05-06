@@ -266,8 +266,17 @@ export async function renderImageDemoReel(
 // durationInFrames from the voice clip lengths so callers don't need to
 // pre-compute it.
 //
-// PlasmaShader needs WebGL inside Chromium → chromiumOptions: { gl:
-// 'angle' }. Without this, the second frame blacks out.
+// PlasmaShader needs a WebGL context in headless Chromium. We use
+// SwiftShader (software WebGL) instead of ANGLE because:
+//   - ANGLE requires GPU hardware passthrough or Mesa drivers that
+//     aren't installed on the Hetzner box (verified May 2026 — the
+//     first prod render failed with "Failed to get WebGL context"
+//     even with gl=angle, because the box has no GPU and no Mesa).
+//   - SwiftShader is bundled with Chromium, runs entirely on CPU, and
+//     works on any Linux machine with no extra setup. ~2x slower than
+//     hardware/ANGLE but our renders are short and bursty.
+// Local dev (Mac) accepts angle too, but SwiftShader works there as
+// well, so picking it for both keeps environment parity.
 
 export type RenderContentReelOptions = {
   template: "shock" | "warm" | "quiet";
@@ -325,7 +334,7 @@ export async function renderContentReel(
     outputLocation: opts.outputPath,
     inputProps,
     timeoutInMilliseconds: 240_000,
-    chromiumOptions: { gl: "angle" },
+    chromiumOptions: { gl: "swiftshader" },
     onBrowserLog: ({ type, text }) => {
       if (type === "error" || type === "warning") {
         console.log(`[remotion-browser:${type}] ${text}`);
