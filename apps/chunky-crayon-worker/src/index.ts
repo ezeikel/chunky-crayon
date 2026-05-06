@@ -34,6 +34,7 @@ import {
 } from "./voice/voice-reel-fixtures.js";
 import { proxyToLocal } from "./video/v2/proxy.js";
 import { buildDemoReelCover } from "./video/v2/cover.js";
+import { buildDemoReelHookCover } from "./video/v2/hook-cover.js";
 import { pickBestPalette } from "./video/v2/palette.js";
 import { streamSSE } from "hono/streaming";
 import {
@@ -1702,6 +1703,12 @@ type V2Row = {
   regionMapHeight: number | null;
   regionsJson: unknown;
   backgroundMusicUrl: string | null;
+  // Hook-cover inputs. sourcePrompt is the TEXT-variant input shown on
+  // the cover. demoReelInputPhotoUrl is set by produce-v2's IMAGE
+  // branch — null on older rows; the worker falls back to the
+  // photo_library lookup result there.
+  sourcePrompt: string | null;
+  demoReelInputPhotoUrl: string | null;
 };
 
 // Poll the DB until svgUrl + url + regionMapUrl + regionsJson are all
@@ -1732,6 +1739,8 @@ const waitForRowReady = async (
         regionMapHeight: true,
         regionsJson: true,
         backgroundMusicUrl: true,
+        sourcePrompt: true,
+        demoReelInputPhotoUrl: true,
       },
     });
     if (!row) return null;
@@ -2000,6 +2009,15 @@ app.post("/publish/v2", async (c) => {
     variant,
   });
 
+  // Per-variant hook-cover inputs, populated inside the variant
+  // branches below and read by the post-render hook-cover step. We
+  // keep these out here so the cover-build code doesn't have to
+  // re-derive them (transcript needs the synthesised voice answers,
+  // photo URL needs the library lookup).
+  let hookCoverPrompt: string | null = row.sourcePrompt ?? null;
+  let hookCoverInputPhotoUrl: string | null = row.demoReelInputPhotoUrl ?? null;
+  let hookCoverTranscript: string | null = null;
+
   // Branch on variant: build the right inputProps + call the right
   // renderer. Audio fixtures (voice variant) generate before render so
   // the comp's delayRender boundary doesn't time out fetching them.
@@ -2045,6 +2063,13 @@ app.post("/publish/v2", async (c) => {
       if (!photoUrl) {
         return c.json({ error: "no photo library entries available" }, 500);
       }
+      // produce-v2 already writes demoReelInputPhotoUrl, but older rows
+      // (or any case where that step was skipped) won't have it. Use
+      // the library lookup as a backstop so the hook cover always has
+      // a photo to render.
+      if (!hookCoverInputPhotoUrl) {
+        hookCoverInputPhotoUrl = photoUrl;
+      }
       const proxiedPhoto = await proxyToLocal(photoUrl, proxyOpts);
 
       await renderImageDemoReelV2({
@@ -2078,6 +2103,11 @@ app.post("/publish/v2", async (c) => {
       console.log(
         `[/publish/v2] voice answers synthesised: A1="${answers.firstAnswer}" A2="${answers.secondAnswer}"`,
       );
+      // The first answer is the kid's opening utterance — most
+      // attention-grabbing line for the cover. cleanTranscriptForCover
+      // (called inside buildDemoReelHookCover) strips fillers and
+      // truncates at the word boundary.
+      hookCoverTranscript = answers.firstAnswer;
 
       const fixtures = await buildVoiceReelFixtures({
         imageId: row.id,
@@ -2177,6 +2207,43 @@ app.post("/publish/v2", async (c) => {
       );
     }
 
+    // Hook cover — input → blurred outcome stop-scroll thumbnail used
+    // by IG Reel feed + FB feed video posts. Same fall-through-on-fail
+    // behaviour as the resolution cover: if it fails, post route falls
+    // back to the resolution cover (or auto-extracted frame for FB).
+    let publishedHookCoverUrl: string | undefined;
+    try {
+      const variantUpper =
+        variant === "text" ? "TEXT" : variant === "image" ? "IMAGE" : "VOICE";
+      const hookJpegBuf = await buildDemoReelHookCover({
+        variant: variantUpper,
+        prompt: hookCoverPrompt,
+        inputPhotoUrl: hookCoverInputPhotoUrl,
+        transcript: hookCoverTranscript,
+        regionMapUrl: row.regionMapUrl,
+        regionMapWidth: row.regionMapWidth ?? 1024,
+        regionMapHeight: row.regionMapHeight ?? 1024,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        regionsJson: parsedRegionsJson as any,
+        svgUrl: row.svgUrl,
+        paletteVariant: bestPalette,
+      });
+      const hookKey = `reels/demo-v2/${row.id}-${stamp}-${variant}-hook-cover.jpg`;
+      const { url: hookUrl } = await put(hookKey, hookJpegBuf, {
+        contentType: "image/jpeg",
+        access: "public",
+      });
+      publishedHookCoverUrl = hookUrl;
+      console.log(
+        `[/publish/v2] uploaded hook cover to R2: ${hookUrl} (${hookJpegBuf.byteLength} bytes, variant=${variant})`,
+      );
+    } catch (err) {
+      console.warn(
+        "[/publish/v2] hook cover upload failed (continuing without):",
+        err instanceof Error ? err.message : err,
+      );
+    }
+
     await db.coloringImage.update({
       where: { id: row.id },
       data: {
@@ -2185,6 +2252,20 @@ app.post("/publish/v2", async (c) => {
         // URL for stories; no separate trim like V1 needed.
         demoReelStoryUrl: url,
         ...(publishedCoverUrl ? { demoReelCoverUrl: publishedCoverUrl } : {}),
+        ...(publishedHookCoverUrl
+          ? { demoReelHookCoverUrl: publishedHookCoverUrl }
+          : {}),
+        // Voice transcript captured at render time so the post-time hook
+        // cover (if regenerated) and the social digest can echo it back
+        // for review. IMAGE photo URL gets written by produce-v2; we
+        // fall through to the library backstop above so older rows
+        // self-heal on next render.
+        ...(hookCoverTranscript
+          ? { demoReelInputTranscript: hookCoverTranscript }
+          : {}),
+        ...(hookCoverInputPhotoUrl && variant === "image"
+          ? { demoReelInputPhotoUrl: hookCoverInputPhotoUrl }
+          : {}),
         // Writeback drives the produce-v2 cron's rotation: read the most
         // recent demoReelVariant value, pick the next in cycle.
         demoReelVariant:

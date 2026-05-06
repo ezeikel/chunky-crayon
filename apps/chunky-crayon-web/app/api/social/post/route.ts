@@ -678,23 +678,61 @@ const postVideoToFacebookPage = async (
   videoUrl: string,
   description: string,
   title: string,
+  coverUrl?: string | null,
 ) => {
-  const response = await fetch(
-    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/videos`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        file_url: videoUrl,
-        description,
-        title,
-        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
-      }),
-    },
-  );
+  // FB Graph /videos: file_url accepts a hosted MP4, but the custom
+  // thumbnail (`thumb`) MUST be sent as a multipart binary upload —
+  // no `thumb_url` JSON equivalent. So we fetch the cover JPEG
+  // server-side and attach it as a Blob in FormData. If coverUrl is
+  // null/undefined or the fetch fails, fall through to the JSON-only
+  // path so the post still goes out — FB will auto-extract a frame
+  // thumbnail in that case.
+  const url = `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/videos`;
+  const accessToken = process.env.FACEBOOK_ACCESS_TOKEN ?? '';
 
+  if (coverUrl) {
+    try {
+      const coverRes = await fetch(coverUrl);
+      if (!coverRes.ok) {
+        throw new Error(`cover fetch returned ${coverRes.status}`);
+      }
+      const coverBlob = await coverRes.blob();
+      const form = new FormData();
+      form.append('file_url', videoUrl);
+      form.append('description', description);
+      form.append('title', title);
+      form.append('access_token', accessToken);
+      form.append('thumb', coverBlob, 'cover.jpg');
+      const response = await fetch(url, { method: 'POST', body: form });
+      const data = await response.json();
+      if (!data.id) {
+        console.error(
+          'Facebook video API response (multipart with thumb):',
+          data,
+        );
+        throw new Error(
+          `Failed to post video to Facebook: ${JSON.stringify(data)}`,
+        );
+      }
+      return data.id;
+    } catch (err) {
+      console.warn(
+        '[FB video] thumb upload failed, retrying without:',
+        err instanceof Error ? err.message : String(err),
+      );
+    }
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      file_url: videoUrl,
+      description,
+      title,
+      access_token: accessToken,
+    }),
+  });
   const data = await response.json();
   if (!data.id) {
     console.error('Facebook video API response:', data);
@@ -1256,10 +1294,17 @@ const handleRequest = async (request: Request) => {
           'demo_reel',
         );
         try {
+          // IG Reel feed cover: prefer the stop-scroll hook cover
+          // (input → blurred outcome) over the finished-colored canvas.
+          // Falls through to demoReelCoverUrl for older rows.
+          const igFeedCover =
+            coloringImage.demoReelHookCoverUrl ??
+            coloringImage.demoReelCoverUrl ??
+            undefined;
           const containerId = await createInstagramReelContainer(
             reelUrl,
             caption,
-            coloringImage.demoReelCoverUrl ?? undefined,
+            igFeedCover,
           );
           await waitForMediaReady(containerId);
           const mediaId = await publishInstagramMedia(containerId);
@@ -1315,10 +1360,21 @@ const handleRequest = async (request: Request) => {
           'demo_reel',
         );
         try {
+          // FB feed cover: prefer the new "stop-scroll" hook cover
+          // (input → blurred outcome) over the finished-colored canvas.
+          // Stories already use the resolution cover (see story call
+          // below). Falls through to demoReelCoverUrl, then to no cover
+          // (FB auto-extracts a frame), so older rows without the new
+          // field still get the resolution thumbnail.
+          const fbFeedCover =
+            coloringImage.demoReelHookCoverUrl ??
+            coloringImage.demoReelCoverUrl ??
+            null;
           const postId = await postVideoToFacebookPage(
             reelUrl,
             caption,
             coloringImage.title ?? 'Chunky Crayon demo',
+            fbFeedCover,
           );
           demoResults.facebook = postId;
           platformResults.facebookDemoReel = {
