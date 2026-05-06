@@ -138,20 +138,58 @@ const postVideoToFacebookPage = async (
   videoUrl: string,
   description: string,
   title: string,
+  coverUrl: string | null | undefined,
 ): Promise<string> => {
-  const response = await fetch(
-    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/videos`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        file_url: videoUrl,
-        description,
-        title,
-        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
-      }),
-    },
-  );
+  // FB Graph /videos: `file_url` accepts a hosted MP4 URL but `thumb`
+  // (the custom thumbnail) MUST be sent as a multipart binary upload —
+  // there's no `thumb_url` equivalent. So we fetch the cover JPEG
+  // server-side, attach it as a Blob in FormData, and let FB process
+  // the rest. If coverUrl is missing or the fetch fails, fall back to
+  // a JSON-only call so we never block a post on missing artwork —
+  // FB will auto-generate a frame thumbnail in that case.
+  const url = `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/videos`;
+  const accessToken = process.env.FACEBOOK_ACCESS_TOKEN ?? '';
+
+  if (coverUrl) {
+    try {
+      const coverRes = await fetch(coverUrl);
+      if (!coverRes.ok) {
+        throw new Error(`cover fetch returned ${coverRes.status}`);
+      }
+      const coverBlob = await coverRes.blob();
+      const form = new FormData();
+      form.append('file_url', videoUrl);
+      form.append('description', description);
+      form.append('title', title);
+      form.append('access_token', accessToken);
+      form.append('thumb', coverBlob, 'cover.jpg');
+      const response = await fetch(url, { method: 'POST', body: form });
+      const data = await response.json();
+      if (!data.id) {
+        console.error('[ContentReel/FB] video API response (multipart):', data);
+        throw new Error(`failed to post FB video: ${JSON.stringify(data)}`);
+      }
+      return data.id;
+    } catch (err) {
+      // Cover-related failure — log and fall through to JSON path so
+      // the post still goes out without a custom thumbnail.
+      console.warn(
+        '[ContentReel/FB] thumb upload failed, retrying without:',
+        err instanceof Error ? err.message : String(err),
+      );
+    }
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      file_url: videoUrl,
+      description,
+      title,
+      access_token: accessToken,
+    }),
+  });
   const data = await response.json();
   if (!data.id) {
     console.error('[ContentReel/FB] video API response:', data);
@@ -415,11 +453,15 @@ const handleInner = async (request: Request): Promise<Response> => {
 
   if (shouldPost('facebook')) {
     try {
-      // FB title from hook; description gets the full caption.
+      // FB title from hook; description gets the full caption. Cover
+      // JPEG passed as the custom thumbnail (multipart-form `thumb`)
+      // so the FB feed shows our designed cover instead of an
+      // auto-extracted black/blank frame.
       const fbId = await postVideoToFacebookPage(
         reel.reelUrl,
         captionByPlatform.facebook,
         reel.hook.slice(0, 90),
+        reel.coverUrl,
       );
       results.facebook = {
         success: true,
