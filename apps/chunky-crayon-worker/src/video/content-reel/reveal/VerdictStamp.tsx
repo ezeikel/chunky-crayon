@@ -58,6 +58,8 @@ export const VerdictStamp: React.FC<Props> = ({
           lineHeight: 1,
           letterSpacing: 4,
           color: primaryColor,
+          whiteSpace: "nowrap",
+          textAlign: "center",
         }}
       >
         {upper}
