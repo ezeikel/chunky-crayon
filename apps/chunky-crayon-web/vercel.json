@@ -37,8 +37,16 @@
       "schedule": "0 5 * * *"
     },
     {
+      "path": "/api/social/content-reel-post",
+      "schedule": "30 5 * * *"
+    },
+    {
       "path": "/api/cron/content-reel/refresh-fact-checks",
       "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/cron/content-reel/retry-failed-platforms",
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/cron/cleanup-stuck-generations",
