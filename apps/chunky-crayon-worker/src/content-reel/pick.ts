@@ -58,15 +58,27 @@ export async function pickTodaysContentReel(
 
   const cutoff = new Date(Date.now() - DEDUP_WINDOW_MS);
 
-  // Try each kind in rotation order from `startIdx`. First HIGH-confidence,
-  // not-recently-posted candidate wins.
+  // Try each kind in rotation order from `startIdx`. First publishable,
+  // not-recently-posted candidate wins. Per-kind confidence threshold:
+  //
+  //   stat / fact / myth → HIGH only (peer-reviewed or institutional
+  //                                   source required; brand risk)
+  //   tip                → HIGH or MEDIUM (advice-giving content has a
+  //                                   lower bar — common parenting
+  //                                   wisdom is fine even without a
+  //                                   peer-reviewed cite)
+  //
+  // LOW is never auto-publishable for any kind — those are flagged for
+  // editorial review or already declined to be aired.
   for (let i = 0; i < ROTATION.length; i++) {
     const kind = ROTATION[(startIdx + i) % ROTATION.length];
+    const acceptableConfidences: Array<"HIGH" | "MEDIUM"> =
+      kind === "TIP" ? ["HIGH", "MEDIUM"] : ["HIGH"];
     const row = await db.contentReel.findFirst({
       where: {
         brand,
         kind,
-        factCheckConfidence: "HIGH",
+        factCheckConfidence: { in: acceptableConfidences },
         OR: [{ postedAt: null }, { postedAt: { lt: cutoff } }],
       },
       // Oldest factCheckedAt first — older verified items get aired

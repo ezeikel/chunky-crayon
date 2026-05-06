@@ -24,6 +24,7 @@
  * dedicated scripts.
  */
 
+import { anthropic } from "@ai-sdk/anthropic";
 import { perplexity } from "@ai-sdk/perplexity";
 import { generateText, Output } from "ai";
 import { z } from "zod";
@@ -140,25 +141,45 @@ For each stat:
 };
 
 // ---------------------------------------------------------------------------
-// Research call. Uses sonar-pro (not deep-research) by default for cost
-// — deep-research is overkill for brainstorming candidate drafts. The
-// individual fact-check pass uses sonar-pro again on each item, which
-// is where we want the precision.
+// Research call. Tier defaults to sonar-pro (cheap, fast) — fine for
+// myths/tips/stats where Sonar's brainstorm + per-item verify catches
+// most issues.
+//
+// Deep-research is the right tool for FACTS specifically because:
+//   - Facts brand-risk is high (a wrong "did you know?" damages trust)
+//   - sonar-pro tends to invent plausible Harvard/NIH URLs that fail
+//     verification (we saw 0/5 publishable in earlier batches)
+//   - deep-research grounds each claim against real fetched sources, so
+//     the URLs survive the fact-check verify pass
+//
+// Cost: sonar-pro ~$0.005/call. Deep-research ~$0.30-1.20/call. Worth
+// the upgrade for facts; overkill for everything else.
 // ---------------------------------------------------------------------------
 
 const sonarPro = perplexity("sonar-pro");
+const sonarDeepResearch = perplexity("sonar-deep-research");
+
+const MODEL_BY_KIND: Record<ContentReelKind, typeof sonarPro> = {
+  stat: sonarPro,
+  myth: sonarPro,
+  tip: sonarPro,
+  // Facts get deep-research because brainstorm-and-cite is the failure
+  // mode (sonar-pro invents URLs). DR fetches and grounds.
+  fact: sonarDeepResearch,
+};
 
 export async function researchCandidates(opts: {
   kind: ContentReelKind;
   count: number;
 }): Promise<ContentReelDraft[]> {
   const { kind, count } = opts;
+  const model = MODEL_BY_KIND[kind];
   const prompt = KIND_PROMPTS[kind].replace(/\{\{COUNT\}\}/g, String(count));
 
   // Try structured output first.
   try {
     const result = await generateText({
-      model: sonarPro,
+      model,
       output: Output.object({ schema: draftsSchema }),
       system: RESEARCH_SYSTEM,
       prompt,
@@ -174,20 +195,92 @@ export async function researchCandidates(opts: {
     );
   }
 
-  // Fallback: ask for raw text, parse manually.
+  // Fallback: ask for raw text, parse manually. Same per-kind model.
   const result = await generateText({
-    model: sonarPro,
+    model,
     system: `${RESEARCH_SYSTEM}\n\nIMPORTANT: Respond with valid JSON matching: { "drafts": [...] }. No prose outside the JSON.`,
     prompt,
     temperature: 0.7,
   });
 
+  // Strip Sonar deep-research's chain-of-thought wrapper. DR responses
+  // start with <think>...</think> reasoning blocks before the body; the
+  // sonar-pro tier doesn't include these. Multiline + greedy match because
+  // the think block is huge (often 5-10k chars of reasoning).
   const cleaned = result.text
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
     .trim()
     .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/i, "");
-  const parsed = draftsSchema.parse(JSON.parse(cleaned));
-  return parsed.drafts;
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  // Try direct JSON parse first — sonar-pro usually returns clean JSON.
+  // Find the first { and last } to extract just the JSON payload.
+  const firstBrace = cleaned.indexOf("{");
+  const lastBrace = cleaned.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    try {
+      const jsonText = cleaned.slice(firstBrace, lastBrace + 1);
+      const parsed = draftsSchema.parse(JSON.parse(jsonText));
+      return parsed.drafts;
+    } catch (err) {
+      console.warn(
+        "[research] direct JSON parse failed, escalating to Claude extraction:",
+        err instanceof Error ? err.message : err,
+      );
+    }
+  }
+
+  // Last-resort fallback for sonar-deep-research, which often returns
+  // long markdown reports instead of JSON. Hand the prose to Claude with
+  // a tight extractor prompt — Claude is reliable at structured output
+  // from long inputs. Cost: ~$0.01-0.05 per extraction. Worth it because
+  // DR was already a $0.30-1.20 call we don't want to throw away.
+  return extractDraftsFromProse({ prose: cleaned, kind, count });
+}
+
+const claudeExtractor = anthropic("claude-sonnet-4-6");
+
+async function extractDraftsFromProse(opts: {
+  prose: string;
+  kind: ContentReelKind;
+  count: number;
+}): Promise<ContentReelDraft[]> {
+  const { prose, kind, count } = opts;
+
+  const result = await generateText({
+    model: claudeExtractor,
+    output: Output.object({ schema: draftsSchema }),
+    system:
+      "You extract structured ContentReel drafts from a research report. " +
+      "Output valid JSON only. Each draft must have id (kebab-case slug), " +
+      "hook, payoff, centerBlock, sourceTitle, sourceUrl, category. " +
+      "Skip items that lack a real source URL. US-friendly spelling.",
+    prompt: [
+      `Extract up to ${count} ${kind}-kind ContentReel drafts from this research report.`,
+      "",
+      "Each draft should have:",
+      "- hook: a voice-friendly setup line (problem-first for stats/myths, question-form for facts/tips)",
+      "- payoff: the resolution narration (~1-2 sentences with the key finding)",
+      "- centerBlock: for stats a number ('7+ hrs'); for facts a short bold phrase; for tips a 3-5 word action; for myths 'False' or 'True'",
+      "- sourceTitle / sourceUrl: the strongest cited source. SKIP items where no real URL is given.",
+      "- category: pick from screen-time, attention, anxiety, fine-motor, creativity, family-bonding, parenting-tip, brain-development, sleep, common-misconception",
+      "",
+      "RESEARCH REPORT:",
+      prose,
+    ].join("\n"),
+    temperature: 0.2,
+  });
+
+  if (!result.output?.drafts?.length) {
+    throw new Error(
+      `[research] Claude extraction returned 0 drafts from ${prose.length}-char prose`,
+    );
+  }
+  console.log(
+    `[research] Claude extracted ${result.output.drafts.length} drafts from prose`,
+  );
+  return result.output.drafts;
 }
 
 /**

@@ -57,14 +57,31 @@ async function main() {
   const raw = await readFile(path, "utf-8");
   const entries: AuditEntry[] = JSON.parse(raw);
 
-  const publishable = entries.filter(
-    (e) =>
-      e.verdict?.confidence === "high" &&
-      e.verdict?.recommendation === "publish",
-  );
+  // Per-kind threshold:
+  //   stat / fact / myth → confidence=HIGH AND recommendation=publish.
+  //                        Brand risk on these is high; we're conservative.
+  //   tip                → confidence=HIGH or MEDIUM, recommendation=publish
+  //                        OR recommendation=revise. Tips are advice, not
+  //                        research claims, so Sonar's "revise this source"
+  //                        verdict often just means "couldn't find a
+  //                        peer-reviewed cite" — acceptable for tip kind.
+  //                        LOW is still rejected (tip is wrong / contested).
+  // Persist Sonar's actual confidence (not always 'high'). Picker
+  // enforces final publish gate per-kind.
+  const isPublishable = (e: AuditEntry): boolean => {
+    if (!e.verdict) return false;
+    if (e.reel.kind === "tip") {
+      if (e.verdict.recommendation === "drop") return false;
+      return e.verdict.confidence !== "low";
+    }
+    return (
+      e.verdict.recommendation === "publish" && e.verdict.confidence === "high"
+    );
+  };
+  const publishable = entries.filter(isPublishable);
 
   console.log(
-    `[upsert] ${publishable.length}/${entries.length} entries cleared HIGH/publish`,
+    `[upsert] ${publishable.length}/${entries.length} entries publishable`,
   );
 
   let upserted = 0;
@@ -76,7 +93,7 @@ async function main() {
       sourceTitle: verdict.strongestSource.title || reel.sourceTitle,
       sourceUrl: verdict.strongestSource.url || reel.sourceUrl,
       factCheckedAt: new Date().toISOString().slice(0, 10),
-      factCheckConfidence: "high",
+      factCheckConfidence: verdict.confidence,
       factCheckNotes: verdict.concerns ?? undefined,
     };
     const data = toPrismaCreate(reelWithSource);
@@ -85,7 +102,9 @@ async function main() {
       create: data,
       update: data,
     });
-    console.log(`[upsert] ${reelWithSource.id}`);
+    console.log(
+      `[upsert] ${reelWithSource.id} (confidence=${verdict.confidence})`,
+    );
     upserted++;
   }
 

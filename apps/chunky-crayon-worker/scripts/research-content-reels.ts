@@ -131,15 +131,26 @@ async function main() {
   console.log(`\n[research] saved verification audit to ${verifiedPath}`);
 
   // ── 3. Upsert publishable items ───────────────────────────────────
-  const publishable = verified.filter(
-    (v) =>
-      v.verdict &&
-      v.verdict.confidence === "high" &&
-      v.verdict.recommendation === "publish",
-  );
+  // Per-kind confidence threshold:
+  //   stat/fact/myth → HIGH only (peer-reviewed or institutional source
+  //                              required; brand-risk if wrong is high)
+  //   tip            → MEDIUM accepted (common parenting wisdom is fine;
+  //                              Sonar's "no peer-reviewed study found"
+  //                              concern is expected for advice-giving
+  //                              content). The publish gate still
+  //                              filters non-HIGH at posting time, so a
+  //                              MEDIUM tip won't auto-post unless
+  //                              someone manually upgrades it via review.
+  const minConfidence: "high" | "medium" = kind === "tip" ? "medium" : "high";
+  const isPublishable = (v: (typeof verified)[number]) => {
+    if (!v.verdict || v.verdict.recommendation !== "publish") return false;
+    if (minConfidence === "high") return v.verdict.confidence === "high";
+    return v.verdict.confidence !== "low";
+  };
+  const publishable = verified.filter(isPublishable);
 
   console.log(
-    `\n[research] ${publishable.length}/${verified.length} drafts cleared HIGH/publish`,
+    `\n[research] ${publishable.length}/${verified.length} drafts cleared ${minConfidence === "high" ? "HIGH" : "MEDIUM+"}/publish`,
   );
 
   let upserted = 0;
@@ -152,7 +163,12 @@ async function main() {
       sourceTitle: verdict.strongestSource.title || reel.sourceTitle,
       sourceUrl: verdict.strongestSource.url || reel.sourceUrl,
       factCheckedAt: new Date().toISOString().slice(0, 10),
-      factCheckConfidence: "high",
+      // Persist Sonar's actual verdict — not always 'high'. Tip rows can
+      // legitimately come back 'medium' (no peer-reviewed source, but the
+      // advice is widely-supported parenting wisdom). The publish gate
+      // still gates HIGH-only, so MEDIUM tips need a manual upgrade
+      // before they auto-publish.
+      factCheckConfidence: verdict.confidence,
       factCheckNotes: verdict.concerns ?? undefined,
     };
     const data = toPrismaCreate(reelWithSource);
