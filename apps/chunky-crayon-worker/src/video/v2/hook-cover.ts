@@ -45,12 +45,17 @@ const FRAME_WIDTH = 1080;
 const FRAME_HEIGHT = 1920;
 const TOP_HALF_HEIGHT = 900; // 47% of frame; bottom half slightly bigger so the line-art "outcome" feels weighty
 const BOTTOM_HALF_HEIGHT = FRAME_HEIGHT - TOP_HALF_HEIGHT;
+// Brand strip vertical footprint: 28+28 padding + 64 logo height = 120.
+// Used to compute the inner-card explicit height below (Satori needs a
+// concrete height for justify-center to behave).
+const BRAND_STRIP_HEIGHT = 120;
 // Pixelation factor — outcome downscaled to 1/PIXELATION before being
-// upscaled back. 16 reads as "I can see what kind of thing it is, but
-// not the details" at 1080 width — the curiosity-gap sweet spot.
-// First pass at 24 read as "is that a blob?" — too aggressive, the
-// viewer needs enough detail to want to see more.
-const PIXELATION = 16;
+// upscaled back. 22 chosen empirically against busy GPT-Image scenes
+// (capybara/animals/objects) — at 16 the detail leaked through and
+// the curiosity gap collapsed. Simple subjects (single puppy on
+// grass) at 22 still read as "fluffy thing on green", which is the
+// floor of the curiosity-gap sweet spot.
+const PIXELATION = 22;
 
 // Module-cached fonts + brand mark. Loaded once per worker process,
 // re-used across all hook-cover renders.
@@ -116,6 +121,22 @@ async function loadCcLogoDataUri(): Promise<string> {
  * before render — useful for fallback decisions ("if extracted
  * transcript is <10 chars after cleaning, fall back to sourcePrompt").
  */
+/**
+ * Word-boundary-safe truncate. Cuts at the last space before maxChars
+ * and appends "…". Doesn't mid-word. Used for both TEXT prompts
+ * (which are GPT-Image-verbose paragraphs by default) and VOICE
+ * transcripts (after filler-strip).
+ */
+function truncateForCover(raw: string, maxChars: number): string {
+  if (raw.length <= maxChars) return raw;
+  const sliced = raw.slice(0, maxChars - 1);
+  const lastSpace = sliced.lastIndexOf(" ");
+  // Don't allow a tiny first word ("a…") — only honour the boundary
+  // if it leaves at least 20 chars before it. Otherwise hard-cut.
+  const cutAt = lastSpace > 20 ? lastSpace : maxChars - 1;
+  return raw.slice(0, cutAt).trimEnd() + "…";
+}
+
 export function cleanTranscriptForCover(raw: string, maxChars = 60): string {
   let cleaned = raw.trim();
   // Strip up to 3 leading filler words. Common in toddler-voice utterances:
@@ -126,12 +147,18 @@ export function cleanTranscriptForCover(raw: string, maxChars = 60): string {
     if (next === cleaned) break;
     cleaned = next.trim();
   }
-  if (cleaned.length <= maxChars) return cleaned;
-  // Word-boundary truncation. -1 leaves room for the "…" we append.
-  const sliced = cleaned.slice(0, maxChars - 1);
-  const lastSpace = sliced.lastIndexOf(" ");
-  const cutAt = lastSpace > 20 ? lastSpace : maxChars - 1;
-  return cleaned.slice(0, cutAt).trimEnd() + "…";
+  return truncateForCover(cleaned, maxChars);
+}
+
+/**
+ * Same shape as cleanTranscriptForCover but without filler-stripping —
+ * GPT-Image prompts don't start with "um". Used by the TEXT variant
+ * to chop the verbose prompt down to a hook-sized line. 80 chars is
+ * roughly two lines at fontSize=50, which fills the card well without
+ * pushing into 7-line paragraph territory.
+ */
+function cleanPromptForCover(raw: string, maxChars = 80): string {
+  return truncateForCover(raw.trim(), maxChars);
 }
 
 type RegionStoreRegion = {
@@ -447,7 +474,7 @@ function pickInnerForVariant(opts: BuildHookCoverOptions): unknown {
  * font.
  */
 function innerText(prompt: string): unknown {
-  const cleaned = (prompt || "a coloring page").trim();
+  const cleaned = cleanPromptForCover(prompt || "a coloring page");
   // Auto-shrink driven by char-length-vs-line-width estimate. Tondo
   // Bold averages ~0.55em per char in Satori's renderer; with
   // max-width 880px after horizontal padding, a single line at
@@ -459,12 +486,14 @@ function innerText(prompt: string): unknown {
   //   ≤80 chars  → 50  (multi-line, still legible at thumbnail)
   //   else        → 40  (long-form prompts — wraps to ~3 lines)
   const len = cleaned.length;
-  // Tondo Bold averages ~0.62em/char in Satori (wider than the Helvetica
-  // baseline I'd estimated). Ramped these down so single-line prompts
-  // actually fit on one line at the chosen size — "a running puppy" (15
-  // chars) at 100px wraps; at 78 it doesn't.
+  // Tondo Bold averages ~0.62em/char in Satori. Earlier ramp under-
+  // sized long prompts (the 80-char truncated capybara prompt was
+  // rendering at 50px, taking ~150px of vertical space in an ~780px
+  // card and reading as floaty). Bumped the upper end so multi-line
+  // truncated prompts command the card and the implicit padding above
+  // and below feels deliberate.
   const fontSize =
-    len <= 12 ? 100 : len <= 18 ? 78 : len <= 28 ? 62 : len <= 50 ? 50 : 40;
+    len <= 12 ? 100 : len <= 18 ? 80 : len <= 28 ? 68 : len <= 50 ? 60 : 54;
 
   return {
     type: "div",
@@ -472,7 +501,13 @@ function innerText(prompt: string): unknown {
       style: {
         display: "flex",
         flexDirection: "column",
+        // Explicit height + flexGrow:1 — Satori doesn't always honour
+        // flexGrow alone for child sizing, so the card was rendering
+        // at intrinsic content height (~150px tall, content bunched
+        // toward the top of the available 806px space). Stating both
+        // makes the centring deterministic.
         flexGrow: 1,
+        height: TOP_HALF_HEIGHT - BRAND_STRIP_HEIGHT,
         alignItems: "center",
         justifyContent: "center",
         paddingLeft: 80,
@@ -603,7 +638,10 @@ function innerVoice(rawTranscript: string): unknown {
       style: {
         display: "flex",
         flexDirection: "column",
+        // Explicit height to make Satori's centring deterministic — see
+        // innerText for the same reasoning.
         flexGrow: 1,
+        height: TOP_HALF_HEIGHT - BRAND_STRIP_HEIGHT,
         alignItems: "center",
         justifyContent: "center",
         paddingLeft: 80,
