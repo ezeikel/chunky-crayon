@@ -94,6 +94,9 @@ export const POST = async (req: Request) => {
     const matchData = {
       fbp: session.metadata?.fbp || undefined,
       fbc: session.metadata?.fbc || undefined,
+      epik: session.metadata?.epik || undefined,
+      anonymousId: session.metadata?.anonymous_id || undefined,
+      eventSourceUrl: session.metadata?.event_source_url || undefined,
       ipAddress: session.metadata?.client_ip_address || undefined,
       userAgent: session.metadata?.client_user_agent || undefined,
       phone: session.customer_details?.phone || undefined,
@@ -262,6 +265,7 @@ export const POST = async (req: Request) => {
             value: priceAmount,
             currency: 'GBP',
             eventId: session.id,
+            orderId: session.id,
             contentName: `${planName} Subscription`,
             ...matchData,
           }),
@@ -276,6 +280,7 @@ export const POST = async (req: Request) => {
             value: priceAmount,
             currency: 'GBP',
             eventId: `sub_${session.id}`,
+            orderId: session.id,
             planName,
             predictedLtvMultiplier:
               billingPeriod === BillingPeriod.ANNUAL ? 1 : 12,
@@ -338,6 +343,10 @@ export const POST = async (req: Request) => {
                 value: priceAmount,
                 currency: 'GBP',
                 eventId:
+                  lineItems.data.length === 1
+                    ? session.id
+                    : `${session.id}_${item.price?.id}`,
+                orderId:
                   lineItems.data.length === 1
                     ? session.id
                     : `${session.id}_${item.price?.id}`,

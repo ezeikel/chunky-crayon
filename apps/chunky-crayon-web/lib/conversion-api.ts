@@ -19,11 +19,21 @@ const hashSha256 = (value: string): string => {
 // fbp / fbc are Meta's primary match keys (browser id and click id from
 // the _fbp / _fbc cookies set by the Pixel). Without them Meta has to
 // match purely on hashed email/external_id, which is materially weaker.
+// epik is the Pinterest equivalent of fbc — Pinterest's click ID,
+// stored in the `_epik` cookie by the Pinterest Tag and the strongest
+// match key Pinterest accepts. Without it Pinterest's Event Quality
+// score caps at "Fair".
+// eventSourceUrl is the actual page URL the event fired from. Pinterest
+// + Meta both use this to score event quality higher than a hardcoded
+// site URL.
 type ClientMatchData = {
   ipAddress?: string;
   userAgent?: string;
   fbp?: string;
   fbc?: string;
+  epik?: string;
+  anonymousId?: string;
+  eventSourceUrl?: string;
 };
 
 // Identity fields Meta hashes for matching. Adding phone + first/last
@@ -38,30 +48,48 @@ type IdentityData = {
   lastName?: string;
 };
 
-const buildFacebookUserData = (params: IdentityData & ClientMatchData) => ({
-  ...(params.email && { em: hashSha256(params.email) }),
-  ...(params.userId && { external_id: hashSha256(params.userId) }),
-  ...(params.phone && { ph: hashSha256(params.phone.replace(/\D/g, '')) }),
-  ...(params.firstName && { fn: hashSha256(params.firstName) }),
-  ...(params.lastName && { ln: hashSha256(params.lastName) }),
-  ...(params.ipAddress && { client_ip_address: params.ipAddress }),
-  ...(params.userAgent && { client_user_agent: params.userAgent }),
-  ...(params.fbp && { fbp: params.fbp }),
-  ...(params.fbc && { fbc: params.fbc }),
-});
+const buildFacebookUserData = (params: IdentityData & ClientMatchData) => {
+  const externalId = params.userId ?? params.anonymousId;
+  return {
+    ...(params.email && { em: hashSha256(params.email) }),
+    ...(externalId && { external_id: hashSha256(externalId) }),
+    ...(params.phone && { ph: hashSha256(params.phone.replace(/\D/g, '')) }),
+    ...(params.firstName && { fn: hashSha256(params.firstName) }),
+    ...(params.lastName && { ln: hashSha256(params.lastName) }),
+    ...(params.ipAddress && { client_ip_address: params.ipAddress }),
+    ...(params.userAgent && { client_user_agent: params.userAgent }),
+    ...(params.fbp && { fbp: params.fbp }),
+    ...(params.fbc && { fbc: params.fbc }),
+  };
+};
 
-const buildPinterestUserData = (params: IdentityData & ClientMatchData) => ({
-  ...(params.email && { em: [hashSha256(params.email)] }),
-  ...(params.userId && { external_id: [hashSha256(params.userId)] }),
-  ...(params.phone && { ph: [hashSha256(params.phone.replace(/\D/g, ''))] }),
-  ...(params.firstName && { fn: [hashSha256(params.firstName)] }),
-  ...(params.lastName && { ln: [hashSha256(params.lastName)] }),
-  ...(params.ipAddress && { client_ip_address: params.ipAddress }),
-  ...(params.userAgent && { client_user_agent: params.userAgent }),
-});
+// external_id falls back to the anonymous-visitor cookie (cc_anon_id)
+// when no logged-in userId is present. Pinterest weights any stable
+// identifier here for cross-event stitching, so a hashed first-party
+// anonymous ID materially lifts Lead-event coverage from the ~15% that
+// only logged-in users provide.
+const buildPinterestUserData = (params: IdentityData & ClientMatchData) => {
+  const externalId = params.userId ?? params.anonymousId;
+  return {
+    ...(params.email && { em: [hashSha256(params.email)] }),
+    ...(externalId && { external_id: [hashSha256(externalId)] }),
+    ...(params.phone && { ph: [hashSha256(params.phone.replace(/\D/g, ''))] }),
+    ...(params.firstName && { fn: [hashSha256(params.firstName)] }),
+    ...(params.lastName && { ln: [hashSha256(params.lastName)] }),
+    ...(params.ipAddress && { client_ip_address: params.ipAddress }),
+    ...(params.userAgent && { client_user_agent: params.userAgent }),
+    ...(params.epik && { click_id: params.epik }),
+  };
+};
 
 const FB_API = 'https://graph.facebook.com/v21.0';
-const FB_EVENT_SOURCE_URL = 'https://chunkycrayon.com';
+const DEFAULT_EVENT_SOURCE_URL = 'https://chunkycrayon.com';
+
+// Prefer the actual page URL the user was on when the event fired
+// (lifts Meta + Pinterest event quality scores). Fall back to the
+// brand homepage so events are never rejected for a missing field.
+const resolveEventSourceUrl = (clientUrl?: string) =>
+  clientUrl ?? DEFAULT_EVENT_SOURCE_URL;
 
 const postFacebookEvent = async (
   event: Record<string, unknown>,
@@ -119,10 +147,8 @@ export const sendFacebookConversionEvent = async ({
   currency,
   eventId,
   contentName,
-  ipAddress,
-  userAgent,
-  fbp,
-  fbc,
+  orderId,
+  ...match
 }: {
   email: string;
   userId: string;
@@ -133,29 +159,28 @@ export const sendFacebookConversionEvent = async ({
   currency: string;
   eventId: string;
   contentName: string;
+  orderId?: string;
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
   return postFacebookEvent(
     {
       event_name: 'Purchase',
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
-      event_source_url: FB_EVENT_SOURCE_URL,
+      event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
       user_data: buildFacebookUserData({
         email,
         userId,
         phone,
         firstName,
         lastName,
-        ipAddress,
-        userAgent,
-        fbp,
-        fbc,
+        ...match,
       }),
       custom_data: {
         currency: currency.toUpperCase(),
         value: value / 100,
         content_name: contentName,
         content_type: 'product',
+        ...(orderId && { order_id: orderId }),
       },
       action_source: 'website',
     },
@@ -182,10 +207,8 @@ export const sendFacebookSubscribeEvent = async ({
   eventId,
   planName,
   predictedLtvMultiplier = 12,
-  ipAddress,
-  userAgent,
-  fbp,
-  fbc,
+  orderId,
+  ...match
 }: {
   email: string;
   userId: string;
@@ -197,29 +220,28 @@ export const sendFacebookSubscribeEvent = async ({
   eventId: string;
   planName: string;
   predictedLtvMultiplier?: number;
+  orderId?: string;
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
   return postFacebookEvent(
     {
       event_name: 'Subscribe',
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
-      event_source_url: FB_EVENT_SOURCE_URL,
+      event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
       user_data: buildFacebookUserData({
         email,
         userId,
         phone,
         firstName,
         lastName,
-        ipAddress,
-        userAgent,
-        fbp,
-        fbc,
+        ...match,
       }),
       custom_data: {
         currency: currency.toUpperCase(),
         value: value / 100,
         content_name: `${planName} Subscription`,
         predicted_ltv: (value / 100) * predictedLtvMultiplier,
+        ...(orderId && { order_id: orderId }),
       },
       action_source: 'website',
     },
@@ -247,10 +269,7 @@ export const sendFacebookInitiateCheckoutEvent = async ({
   currency,
   eventId,
   contentName,
-  ipAddress,
-  userAgent,
-  fbp,
-  fbc,
+  ...match
 }: {
   email?: string;
   userId?: string;
@@ -267,17 +286,14 @@ export const sendFacebookInitiateCheckoutEvent = async ({
       event_name: 'InitiateCheckout',
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
-      event_source_url: FB_EVENT_SOURCE_URL,
+      event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
       user_data: buildFacebookUserData({
         email,
         userId,
         phone,
         firstName,
         lastName,
-        ipAddress,
-        userAgent,
-        fbp,
-        fbc,
+        ...match,
       }),
       custom_data: {
         currency: currency.toUpperCase(),
@@ -307,6 +323,7 @@ interface PinterestConversionEvent {
     value: string;
     content_name?: string;
     num_items?: number;
+    order_id?: string;
   };
 }
 
@@ -320,8 +337,8 @@ export const sendPinterestConversionEvent = async ({
   currency,
   eventId,
   contentName,
-  ipAddress,
-  userAgent,
+  orderId,
+  ...match
 }: {
   email: string;
   userId: string;
@@ -332,6 +349,7 @@ export const sendPinterestConversionEvent = async ({
   currency: string;
   eventId: string;
   contentName: string;
+  orderId?: string;
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
   const adAccountId = process.env.PINTEREST_AD_ACCOUNT_ID;
   const accessToken = process.env.PINTEREST_CAPI_ACCESS_TOKEN;
@@ -346,21 +364,21 @@ export const sendPinterestConversionEvent = async ({
     action_source: 'web',
     event_time: Math.floor(Date.now() / 1000),
     event_id: eventId,
-    event_source_url: FB_EVENT_SOURCE_URL,
+    event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
     user_data: buildPinterestUserData({
       email,
       userId,
       phone,
       firstName,
       lastName,
-      ipAddress,
-      userAgent,
+      ...match,
     }),
     custom_data: {
       currency: currency.toUpperCase(),
       value: (value / 100).toFixed(2),
       content_name: contentName,
       num_items: 1,
+      ...(orderId && { order_id: orderId }),
     },
   };
 
@@ -408,10 +426,7 @@ export const sendFacebookLeadEvent = async ({
   eventId,
   contentName,
   contentCategory,
-  ipAddress,
-  userAgent,
-  fbp,
-  fbc,
+  ...match
 }: {
   email?: string;
   userId?: string;
@@ -424,14 +439,11 @@ export const sendFacebookLeadEvent = async ({
       event_name: 'Lead',
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
-      event_source_url: FB_EVENT_SOURCE_URL,
+      event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
       user_data: buildFacebookUserData({
         email,
         userId,
-        ipAddress,
-        userAgent,
-        fbp,
-        fbc,
+        ...match,
       }),
       custom_data: {
         content_name: contentName,
@@ -450,13 +462,18 @@ export const sendFacebookLeadEvent = async ({
 export const sendPinterestLeadEvent = async ({
   email,
   userId,
+  phone,
+  firstName,
+  lastName,
   eventId,
   leadType,
-  ipAddress,
-  userAgent,
+  ...match
 }: {
   email?: string;
   userId?: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
   eventId: string;
   leadType: string;
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
@@ -473,8 +490,15 @@ export const sendPinterestLeadEvent = async ({
     action_source: 'web' as const,
     event_time: Math.floor(Date.now() / 1000),
     event_id: eventId,
-    event_source_url: FB_EVENT_SOURCE_URL,
-    user_data: buildPinterestUserData({ email, userId, ipAddress, userAgent }),
+    event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
+    user_data: buildPinterestUserData({
+      email,
+      userId,
+      phone,
+      firstName,
+      lastName,
+      ...match,
+    }),
     custom_data: { lead_type: leadType },
   };
 
@@ -522,10 +546,7 @@ export const sendFacebookViewContentEvent = async ({
   contentName,
   value,
   currency,
-  ipAddress,
-  userAgent,
-  fbp,
-  fbc,
+  ...match
 }: {
   email?: string;
   userId?: string;
@@ -541,14 +562,11 @@ export const sendFacebookViewContentEvent = async ({
       event_name: 'ViewContent',
       event_time: Math.floor(Date.now() / 1000),
       event_id: eventId,
-      event_source_url: FB_EVENT_SOURCE_URL,
+      event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
       user_data: buildFacebookUserData({
         email,
         userId,
-        ipAddress,
-        userAgent,
-        fbp,
-        fbc,
+        ...match,
       }),
       custom_data: {
         content_type: contentType,
@@ -577,11 +595,8 @@ export const sendFacebookCompleteRegistrationEvent = async ({
   phone,
   firstName,
   lastName,
-  ipAddress,
-  userAgent,
-  fbp,
-  fbc,
   signupMethod,
+  ...match
 }: {
   email: string;
   userId: string;
@@ -595,17 +610,14 @@ export const sendFacebookCompleteRegistrationEvent = async ({
       event_name: 'CompleteRegistration',
       event_time: Math.floor(Date.now() / 1000),
       event_id: userId,
-      event_source_url: FB_EVENT_SOURCE_URL,
+      event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
       user_data: buildFacebookUserData({
         email,
         userId,
         phone,
         firstName,
         lastName,
-        ipAddress,
-        userAgent,
-        fbp,
-        fbc,
+        ...match,
       }),
       custom_data: {
         content_name: 'User Signup',
@@ -631,8 +643,7 @@ export const sendPinterestSignupEvent = async ({
   phone,
   firstName,
   lastName,
-  ipAddress,
-  userAgent,
+  ...match
 }: {
   email: string;
   userId: string;
@@ -653,15 +664,14 @@ export const sendPinterestSignupEvent = async ({
     action_source: 'web' as const,
     event_time: Math.floor(Date.now() / 1000),
     event_id: userId,
-    event_source_url: FB_EVENT_SOURCE_URL,
+    event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
     user_data: buildPinterestUserData({
       email,
       userId,
       phone,
       firstName,
       lastName,
-      ipAddress,
-      userAgent,
+      ...match,
     }),
   };
 
@@ -708,6 +718,10 @@ export const sendPurchaseConversionEvents = async (
     currency: string;
     eventId: string;
     contentName: string;
+    // Stripe session.id (or unique transaction id). Pinterest uses this
+    // to dedup checkout events between Tag and CAPI fires; without it
+    // Pinterest's Event Quality flags Order ID coverage at 0%.
+    orderId?: string;
   } & ClientMatchData,
 ): Promise<void> => {
   // Fire both in parallel - don't block webhook response
@@ -734,6 +748,7 @@ export const sendSubscribeConversionEvents = async (
     eventId: string;
     planName: string;
     predictedLtvMultiplier?: number;
+    orderId?: string;
   } & ClientMatchData,
 ): Promise<void> => {
   await Promise.allSettled([sendFacebookSubscribeEvent(params)]);
@@ -766,6 +781,9 @@ export const sendLeadConversionEvents = async (
   params: {
     email?: string;
     userId?: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
     eventId: string;
     contentName: string;
     contentCategory?: string;
@@ -832,15 +850,22 @@ export const buildFbcFromFbclid = (fbclid: string | null | undefined) => {
   return `fb.1.${Date.now()}.${fbclid}`;
 };
 
-// Reads the Meta match-data hints from a Next.js Request-context. Pull
-// IP + UA from headers, fbp/fbc from cookies. Both `headers()` and
-// `cookies()` are dynamic — only call from a request scope (server
-// action, route handler, NextAuth callback). Returns undefined fields
-// where not available so callers can spread the result safely.
+// Cookie name for the first-party anonymous visitor ID. Set by
+// proxy.ts on first visit; used as a fallback external_id for Meta
+// + Pinterest CAPI when no logged-in userId is available. Lifts
+// Lead-event match coverage from "logged-in users only" to
+// "anyone who's visited the site once."
+export const ANONYMOUS_ID_COOKIE = 'cc_anon_id';
+
+// Reads the Meta + Pinterest match-data hints from a Next.js Request-
+// context. Pull IP + UA from headers, fbp/fbc/_epik/anon-id from
+// cookies, page URL from referer. Both `headers()` and `cookies()`
+// are dynamic — only call from a request scope (server action, route
+// handler, NextAuth callback). Returns undefined fields where not
+// available so callers can spread the result safely.
 export const readClientMatchData = async (): Promise<ClientMatchData> => {
   try {
-    const { headers } = await import('next/headers');
-    const { cookies } = await import('next/headers');
+    const { headers, cookies } = await import('next/headers');
     const h = await headers();
     const c = await cookies();
     return {
@@ -851,6 +876,9 @@ export const readClientMatchData = async (): Promise<ClientMatchData> => {
       userAgent: h.get('user-agent') || undefined,
       fbp: c.get('_fbp')?.value || undefined,
       fbc: c.get('_fbc')?.value || undefined,
+      epik: c.get('_epik')?.value || undefined,
+      anonymousId: c.get(ANONYMOUS_ID_COOKIE)?.value || undefined,
+      eventSourceUrl: h.get('referer') || undefined,
     };
   } catch {
     return {};

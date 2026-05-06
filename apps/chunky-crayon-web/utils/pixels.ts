@@ -243,6 +243,10 @@ export const trackPurchase = (params: {
   value: number;
   currency: string;
   eventId: string;
+  // Stripe session id (or unique transaction id). Pinterest uses
+  // order_id to dedup Tag and CAPI checkouts; without it Pinterest's
+  // Event Quality flags Order ID coverage at 0%.
+  orderId?: string;
   productType: 'subscription' | 'credits';
   planName?: string;
   creditAmount?: number;
@@ -263,6 +267,7 @@ export const trackPurchase = (params: {
         currency: params.currency,
         content_type: 'product',
         content_name: contentName,
+        ...(params.orderId && { order_id: params.orderId }),
       },
       { eventID: params.eventId },
     );
@@ -275,6 +280,7 @@ export const trackPurchase = (params: {
       currency: params.currency,
       order_quantity: 1,
       event_id: params.eventId,
+      ...(params.orderId && { order_id: params.orderId }),
     });
   }
 };
@@ -326,6 +332,58 @@ export const trackSubscribe = (params: {
       },
       ...(params.eventId ? [{ eventID: params.eventId }] : []),
     );
+  }
+};
+
+/**
+ * Track when a user keeps the output of a coloring page — downloaded
+ * a PDF, printed it, or saved an in-app coloring. This is the
+ * canonical paid-ad lead signal: "user got value", not "user clicked
+ * something." Internal PostHog events stay granular
+ * (download_pdf_clicked, print_clicked, etc.) for product analytics —
+ * this fires *in addition* to those, mapping all three actions to a
+ * single Meta `Lead` and Pinterest `lead` so the ad platforms have
+ * one event with enough volume to optimize against.
+ *
+ * Pass `eventId` so the matching server-side CAPI fire from
+ * `recordResourceSaved` deduplicates against this browser fire. Reuse
+ * the same eventId (e.g. `${method}_${coloringImageId}_${timestamp}`)
+ * across both fires.
+ */
+export const trackResourceSaved = (params: {
+  method: 'download' | 'print' | 'save';
+  surface:
+    | 'start_hero'
+    | 'coloring_page'
+    | 'tool'
+    | 'app_canvas'
+    | 'gallery'
+    | 'other';
+  contentType?: 'pdf' | 'image' | 'coloring_page';
+  contentName?: string;
+  eventId?: string;
+}) => {
+  const w = window as WindowWithPixels;
+  const fbParams = {
+    content_name: params.contentName ?? 'Coloring Page',
+    content_category: 'resource_saved',
+    method: params.method,
+    surface: params.surface,
+    ...(params.contentType && { content_type: params.contentType }),
+  };
+  if (w.fbq) {
+    w.fbq(
+      'track',
+      'Lead',
+      fbParams,
+      ...(params.eventId ? [{ eventID: params.eventId }] : []),
+    );
+  }
+  if (w.pintrk) {
+    w.pintrk('track', 'lead', {
+      lead_type: 'resource_saved',
+      ...(params.eventId && { event_id: params.eventId }),
+    });
   }
 };
 

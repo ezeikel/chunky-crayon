@@ -23,11 +23,14 @@ const PurchaseTracking = ({
   creditAmount,
 }: PurchaseTrackingProps) => {
   useEffect(() => {
-    // Facebook + Pinterest pixels with event ID for dedup
+    // Facebook + Pinterest pixels with event ID for dedup. eventId is
+    // the Stripe checkout session id, which is also the canonical order
+    // id for Pinterest order_id dedup against the CAPI Purchase fire.
     trackPurchase({
       value,
       currency,
       eventId,
+      orderId: eventId,
       productType,
       planName,
       creditAmount,

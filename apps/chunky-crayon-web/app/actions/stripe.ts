@@ -168,9 +168,17 @@ export const createCheckoutSession = async (
     success_url: `${origin}/account/billing/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}${cancelPath || '/pricing'}`,
     metadata: {
-      // Replayed in webhook for Purchase / Subscribe CAPI sends.
+      // Replayed in webhook for Purchase / Subscribe CAPI sends. Stripe
+      // metadata values are strings — passing the raw cookie/header
+      // value through is fine because lib/conversion-api.ts re-hashes
+      // identity-PII server-side before sending to Meta/Pinterest.
       ...(matchData.fbp && { fbp: matchData.fbp }),
       ...(matchData.fbc && { fbc: matchData.fbc }),
+      ...(matchData.epik && { epik: matchData.epik }),
+      ...(matchData.anonymousId && { anonymous_id: matchData.anonymousId }),
+      ...(matchData.eventSourceUrl && {
+        event_source_url: matchData.eventSourceUrl,
+      }),
       ...(matchData.ipAddress && { client_ip_address: matchData.ipAddress }),
       ...(matchData.userAgent && { client_user_agent: matchData.userAgent }),
     },

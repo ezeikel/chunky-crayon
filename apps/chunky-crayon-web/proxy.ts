@@ -4,6 +4,33 @@ import createIntlMiddleware from 'next-intl/middleware';
 import { jwtVerify } from 'jose';
 import { routing } from './i18n/routing';
 
+// First-party anonymous visitor ID. Read by lib/conversion-api.ts and
+// forwarded to Meta + Pinterest CAPI as a hashed external_id fallback
+// when no logged-in user exists. Lifts Pinterest Event Quality (Lead
+// External ID coverage was 15% — only logged-in users) and gives Meta
+// extra cross-event stitching for guest-checkout funnels.
+const ANONYMOUS_ID_COOKIE = 'cc_anon_id';
+const ANONYMOUS_ID_MAX_AGE = 60 * 60 * 24 * 365 * 2; // 2 years
+
+const generateAnonymousId = (): string => {
+  // crypto.randomUUID is available in the edge runtime.
+  return crypto.randomUUID();
+};
+
+const ensureAnonymousId = (
+  request: NextRequest,
+  response: NextResponse,
+): void => {
+  if (request.cookies.get(ANONYMOUS_ID_COOKIE)) return;
+  response.cookies.set(ANONYMOUS_ID_COOKIE, generateAnonymousId(), {
+    maxAge: ANONYMOUS_ID_MAX_AGE,
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: false,
+  });
+};
+
 // Create the intl middleware
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -186,8 +213,15 @@ export default async function middleware(request: NextRequest) {
     });
   }
 
-  // Handle i18n routing for all other routes
-  return intlMiddleware(request);
+  // Handle i18n routing for all other routes. Set the anonymous-id
+  // cookie on the response when missing — this is the only branch that
+  // serves real human visitors, so we scope cookie-set to here to avoid
+  // tagging bots / mobile-API / PostHog-ingest traffic.
+  const intlResponse = await intlMiddleware(request);
+  if (intlResponse instanceof NextResponse) {
+    ensureAnonymousId(request, intlResponse);
+  }
+  return intlResponse;
 }
 
 export const config = {
