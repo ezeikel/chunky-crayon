@@ -81,6 +81,14 @@ export type PublishContentReelOptions = {
   id: string;
   /** Worker's local HTTP port — used to serve voice clips into Remotion. */
   port: number;
+  /**
+   * Optional one-shot voice override. Useful for A/B testing voices
+   * without a worker restart — production uses the env-var pair
+   * (ELEVENLABS_CONTENT_REEL_HOOK/PAYOFF_VOICE_ID), this lets editorial
+   * compare candidates against a single reel. Falls back to env if unset.
+   */
+  hookVoiceIdOverride?: string;
+  payoffVoiceIdOverride?: string;
 };
 
 export type PublishContentReelResult = {
@@ -94,7 +102,7 @@ export type PublishContentReelResult = {
 export async function publishContentReel(
   opts: PublishContentReelOptions,
 ): Promise<PublishContentReelResult> {
-  const { id, port } = opts;
+  const { id, port, hookVoiceIdOverride, payoffVoiceIdOverride } = opts;
   const tag = `[publishContentReel:${id}]`;
 
   // ── 1. Read the row ──────────────────────────────────────────────
@@ -106,14 +114,23 @@ export async function publishContentReel(
   console.log(`${tag} kind=${reel.kind} template=${template}`);
 
   // ── 2. Voice synthesis ──────────────────────────────────────────
-  // ElevenLabs IDs come from the same env vars as demo reels — we keep
-  // the same voice cast so audiences hear one consistent brand voice
-  // across content + demo reels.
-  const kidVoiceId = process.env.ELEVENLABS_KID_VOICE_ID;
-  const adultVoiceId = process.env.ELEVENLABS_ADULT_VOICE_ID;
-  if (!kidVoiceId || !adultVoiceId) {
+  // Content reels can use a DIFFERENT voice cast than demo reels — the
+  // two surfaces are stylistically distinct (research-y info-card vs
+  // playful product walkthrough), and the audience benefits from hearing
+  // a separate "explainer" voice on content reels. Fall back to the
+  // demo-reel voice IDs when the content-specific overrides aren't set
+  // so existing deploys don't break before the new env vars land.
+  const hookVoiceId =
+    hookVoiceIdOverride ??
+    process.env.ELEVENLABS_CONTENT_REEL_HOOK_VOICE_ID ??
+    process.env.ELEVENLABS_KID_VOICE_ID;
+  const payoffVoiceId =
+    payoffVoiceIdOverride ??
+    process.env.ELEVENLABS_CONTENT_REEL_PAYOFF_VOICE_ID ??
+    process.env.ELEVENLABS_ADULT_VOICE_ID;
+  if (!hookVoiceId || !payoffVoiceId) {
     throw new Error(
-      `${tag} ELEVENLABS_KID_VOICE_ID / ADULT_VOICE_ID must be set`,
+      `${tag} ELEVENLABS_CONTENT_REEL_HOOK_VOICE_ID / PAYOFF_VOICE_ID (or KID/ADULT fallbacks) must be set`,
     );
   }
   await mkdir(WORKER_OUT_DIR, { recursive: true });
@@ -126,12 +143,12 @@ export async function publishContentReel(
   await Promise.all([
     generateVoiceClip({
       text: reel.hook,
-      voiceId: kidVoiceId,
+      voiceId: hookVoiceId,
       outputPath: hookPath,
     }),
     generateVoiceClip({
       text: reel.payoff,
-      voiceId: adultVoiceId,
+      voiceId: payoffVoiceId,
       outputPath: payoffPath,
     }),
   ]);

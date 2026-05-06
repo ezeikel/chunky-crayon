@@ -47,6 +47,12 @@ import {
 import { subscribe } from "./coloring-image/listener.js";
 import { runBlogCron } from "./blog/pipeline.js";
 import { runDailyImageCron } from "./coloring-image/daily-pipeline.js";
+import {
+  generateBundlePage,
+  BundlePageQAFailedError,
+} from "./bundles/generate-page.js";
+import { generateAllBundlePages } from "./bundles/generate-all.js";
+import { getBundleProfile } from "@one-colored-pixel/coloring-core";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
@@ -690,6 +696,174 @@ app.post("/generate/daily-image", async (c) => {
     .finally(() => {
       clearInterval(keepaliveTimer);
     });
+
+  return c.json({ ok: true, accepted: true }, 202);
+});
+
+/**
+ * POST /generate/bundle-page
+ *
+ * Generate a single page of a coloring bundle (e.g. Dino Dance Party page 7).
+ * Synchronous — caller waits for QA-gated retry loop to finish (~3-15 min
+ * depending on retry count). Use this from admin UI for individual page
+ * regenerates; use /generate/bundle-all-pages for the initial 10-page run.
+ *
+ * Body: { bundleSlug, pageNumber, forceRegenerate? }
+ */
+app.post("/generate/bundle-page", async (c) => {
+  const body = await c.req.json<{
+    bundleSlug: string;
+    pageNumber: number;
+    forceRegenerate?: boolean;
+  }>();
+
+  const profile = getBundleProfile(body.bundleSlug);
+  if (!profile) {
+    return c.json({ error: `Unknown bundle slug: ${body.bundleSlug}` }, 404);
+  }
+  const pagePrompt = profile.pagePrompts[body.pageNumber - 1];
+  if (!pagePrompt) {
+    return c.json(
+      { error: `No prompt for page ${body.pageNumber} in ${body.bundleSlug}` },
+      400,
+    );
+  }
+
+  const bundleRow = await db.bundle.findUnique({
+    where: { slug: body.bundleSlug },
+    select: { id: true },
+  });
+  if (!bundleRow) {
+    return c.json(
+      { error: `Bundle row not seeded yet: ${body.bundleSlug}` },
+      404,
+    );
+  }
+
+  if (!body.forceRegenerate) {
+    const existing = await db.coloringImage.findFirst({
+      where: {
+        bundleId: bundleRow.id,
+        bundleOrder: body.pageNumber,
+        status: "READY",
+      },
+      select: { id: true, url: true, svgUrl: true },
+    });
+    if (existing) {
+      return c.json({
+        ok: true,
+        coloringImageId: existing.id,
+        url: existing.url,
+        svgUrl: existing.svgUrl,
+        skipped: true,
+        reason: "page already exists — pass forceRegenerate=true to overwrite",
+      });
+    }
+  }
+
+  const heroRefsBaseUrl = `${process.env.R2_PUBLIC_URL}/bundles/${body.bundleSlug}/hero-refs`;
+
+  try {
+    const result = await generateBundlePage({
+      bundle: profile,
+      bundleId: bundleRow.id,
+      pageNumber: body.pageNumber,
+      pagePrompt,
+      heroRefsBaseUrl,
+    });
+    return c.json({
+      ok: true,
+      coloringImageId: result.coloringImageId,
+      url: result.url,
+      svgUrl: result.svgUrl,
+      qaPassed: result.qaPassed,
+      qaAttempts: result.qaAttempts,
+      attemptUrls: result.attemptUrls,
+    });
+  } catch (err) {
+    if (err instanceof BundlePageQAFailedError) {
+      return c.json(
+        {
+          error: "QA exhausted after 3 attempts",
+          topIssue: err.lastQA.topIssue,
+          heroChecks: err.lastQA.heroChecks,
+          anatomyIssues: err.lastQA.anatomyIssues,
+          attemptUrls: err.attemptUrls,
+        },
+        422,
+      );
+    }
+    throw err;
+  }
+});
+
+/**
+ * POST /generate/bundle-all-pages
+ *
+ * Fire-and-forget batch run of every page in a bundle. Returns 202
+ * immediately — wall-clock is ~30-45 min. Idempotent: existing READY
+ * pages skip unless forceRegenerate=true.
+ *
+ * Body: { bundleSlug, startFrom?, stopAt?, forceRegenerate? }
+ */
+app.post("/generate/bundle-all-pages", async (c) => {
+  const body = await c.req.json<{
+    bundleSlug: string;
+    startFrom?: number;
+    stopAt?: number;
+    forceRegenerate?: boolean;
+  }>();
+
+  const profile = getBundleProfile(body.bundleSlug);
+  if (!profile) {
+    return c.json({ error: `Unknown bundle slug: ${body.bundleSlug}` }, 404);
+  }
+  const bundleRow = await db.bundle.findUnique({
+    where: { slug: body.bundleSlug },
+    select: { id: true },
+  });
+  if (!bundleRow) {
+    return c.json(
+      { error: `Bundle row not seeded yet: ${body.bundleSlug}` },
+      404,
+    );
+  }
+
+  const heroRefsBaseUrl = `${process.env.R2_PUBLIC_URL}/bundles/${body.bundleSlug}/hero-refs`;
+
+  // Same Neon-keepalive pattern as /generate/daily-image — bundle batch
+  // runs idle ~3-15 min between page generations during QA + retry, more
+  // than enough to lose the WebSocket if we don't ping.
+  const keepaliveTimer = setInterval(() => {
+    db.$queryRaw`SELECT 1`.catch((err) => {
+      console.warn(
+        "[keepalive] Neon ping failed:",
+        err instanceof Error ? err.message : err,
+      );
+    });
+  }, 60_000);
+
+  generateAllBundlePages({
+    bundle: profile,
+    bundleId: bundleRow.id,
+    pagePrompts: profile.pagePrompts,
+    heroRefsBaseUrl,
+    startFrom: body.startFrom,
+    stopAt: body.stopAt,
+    forceRegenerate: body.forceRegenerate,
+  })
+    .then((result) => {
+      console.log(
+        `[/generate/bundle-all-pages] done — ${result.generated}/${profile.pagePrompts.length} generated, ${result.skipped} skipped, ${result.failed} failed`,
+      );
+    })
+    .catch((err) => {
+      console.error("[/generate/bundle-all-pages] uncaught:", err);
+      Sentry.captureException(err, {
+        extra: { bundleSlug: body.bundleSlug },
+      });
+    })
+    .finally(() => clearInterval(keepaliveTimer));
 
   return c.json({ ok: true, accepted: true }, 202);
 });
@@ -2142,12 +2316,31 @@ app.post("/jobs/content-reel/pick-and-publish", async (c) => {
 
 app.post("/jobs/content-reel/publish", async (c) => {
   const body = (await c.req
-    .json<{ id?: unknown }>()
-    .catch(() => ({}) as { id?: unknown })) as { id?: unknown };
+    .json<{
+      id?: unknown;
+      hookVoiceId?: unknown;
+      payoffVoiceId?: unknown;
+    }>()
+    .catch(
+      () =>
+        ({}) as {
+          id?: unknown;
+          hookVoiceId?: unknown;
+          payoffVoiceId?: unknown;
+        },
+    )) as {
+    id?: unknown;
+    hookVoiceId?: unknown;
+    payoffVoiceId?: unknown;
+  };
   const id = typeof body.id === "string" ? body.id : "";
   if (!id) {
     return c.json({ error: "id required (string)" }, 400);
   }
+  const hookVoiceIdOverride =
+    typeof body.hookVoiceId === "string" ? body.hookVoiceId : undefined;
+  const payoffVoiceIdOverride =
+    typeof body.payoffVoiceId === "string" ? body.payoffVoiceId : undefined;
 
   // Lazy import — keeps the dotted Remotion bundler off the cold path
   // for routes that don't render content reels.
@@ -2155,7 +2348,12 @@ app.post("/jobs/content-reel/publish", async (c) => {
   const port = parseInt(process.env.PORT ?? "3030", 10);
 
   try {
-    const result = await publishContentReel({ id, port });
+    const result = await publishContentReel({
+      id,
+      port,
+      hookVoiceIdOverride,
+      payoffVoiceIdOverride,
+    });
     return c.json({ ok: true, ...result });
   } catch (err) {
     console.error(`[/jobs/content-reel/publish] failed:`, err);
