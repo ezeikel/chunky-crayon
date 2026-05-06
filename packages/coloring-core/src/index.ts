@@ -156,6 +156,18 @@ export {
 } from "./scene/seasonal-calendar";
 export type { SeasonalEvent } from "./scene/seasonal-calendar";
 
+// Bundles — hero character profiles + page QA gate. Shared between web
+// (admin UI, retry endpoint) and worker (page generation pipeline).
+export {
+  DINO_DANCE_PARTY,
+  HERO_BUNDLES,
+  getBundleProfile,
+  getHero,
+} from "./bundles/profiles";
+export type { Hero, HeroBundle } from "./bundles/profiles";
+export { qaBundlePage, qaResultSchema } from "./bundles/qa";
+export type { QAResult } from "./bundles/qa";
+
 // Utilities
 export { default as formatNumber } from "./utils/formatNumber";
 export { default as streamToBuffer } from "./utils/streamToBuffer";
