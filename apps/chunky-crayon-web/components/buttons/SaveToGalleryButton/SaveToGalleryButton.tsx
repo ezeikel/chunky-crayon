@@ -9,6 +9,8 @@ import { StickerReward } from '@/components/StickerReward';
 import { ColoEvolutionCelebration } from '@/components/ColoEvolutionCelebration';
 import { ActionButton, useSound } from '@one-colored-pixel/coloring-ui';
 import { trackEvent } from '@/utils/analytics-client';
+import { trackResourceSaved } from '@/utils/pixels';
+import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
 import cn from '@/utils/cn';
 import type { Sticker } from '@/lib/stickers';
@@ -61,6 +63,22 @@ const SaveToGalleryButton = ({
       if (result.success) {
         setState('success');
         playSound('save');
+
+        // Canonical paid-ad lead signal — only fire on confirmed save
+        // (the click event already went to PostHog above for product
+        // analytics; ads care about completed value, not clicks).
+        const resourceEventId = `save_${coloringImageId}_${Date.now()}`;
+        trackResourceSaved({
+          method: 'save',
+          surface: 'gallery',
+          contentType: 'image',
+          eventId: resourceEventId,
+        });
+        void recordResourceSaved({
+          method: 'save',
+          surface: 'gallery',
+          eventId: resourceEventId,
+        });
 
         // Store evolution result if Colo evolved or got new accessories
         const hasEvolution =

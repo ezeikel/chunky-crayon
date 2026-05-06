@@ -609,6 +609,8 @@ export const ACTIONS = {
   // Saved artwork actions
   SAVE_ARTWORK: 'save artwork',
   GET_SAVED_ARTWORKS: 'get saved artworks',
+  // Conversion tracking actions
+  RECORD_RESOURCE_SAVED: 'record resource saved',
 };
 
 export type PlanInterval = 'monthly' | 'annual';

@@ -9,6 +9,8 @@ import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import { pdf } from '@react-pdf/renderer';
 import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/ColoringPageDocument';
 import { trackEvent } from '@/utils/analytics-client';
+import { trackResourceSaved } from '@/utils/pixels';
+import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
 import { fetchSvg } from '@one-colored-pixel/canvas';
 import { proxyR2Url } from '@/utils/proxyR2Url';
@@ -87,6 +89,22 @@ const PrintButtonContent = ({
       trackEvent(TRACKING_EVENTS.PRINT_CLICKED, {
         coloringImageId: coloringImage.id as string,
         title: coloringImage.title,
+      });
+
+      // Canonical paid-ad lead signal — see SaveButton for rationale.
+      const resourceEventId = `print_${coloringImage.id}_${Date.now()}`;
+      trackResourceSaved({
+        method: 'print',
+        surface: 'coloring_page',
+        contentType: 'pdf',
+        contentName: coloringImage.title,
+        eventId: resourceEventId,
+      });
+      void recordResourceSaved({
+        method: 'print',
+        surface: 'coloring_page',
+        contentName: coloringImage.title,
+        eventId: resourceEventId,
       });
 
       const doc = (

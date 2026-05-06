@@ -32,6 +32,7 @@ export const getUserId = async (action?: string) => {
     action === ACTIONS.CREATE_COLORING_IMAGE ||
     action === ACTIONS.CREATE_CHECKOUT_SESSION ||
     action === ACTIONS.GET_ACTIVE_PROFILE ||
+    action === ACTIONS.RECORD_RESOURCE_SAVED ||
     action === 'track analytics event'
   ) {
     return userId;

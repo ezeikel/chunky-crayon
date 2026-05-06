@@ -9,6 +9,8 @@ import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import { pdf } from '@react-pdf/renderer';
 import ColoringPageDocument from '@/components/pdfs/ColoringPageDocument/ColoringPageDocument';
 import { trackEvent } from '@/utils/analytics-client';
+import { trackResourceSaved } from '@/utils/pixels';
+import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
 import { fetchSvg } from '@one-colored-pixel/canvas';
 import { proxyR2Url } from '@/utils/proxyR2Url';
@@ -83,6 +85,25 @@ const SaveButtonContent = ({
       trackEvent(TRACKING_EVENTS.DOWNLOAD_PDF_CLICKED, {
         coloringImageId: coloringImage.id as string,
         title: coloringImage.title,
+      });
+
+      // Canonical paid-ad lead signal. Browser fires Meta Lead +
+      // Pinterest lead with this event_id; recordResourceSaved fires
+      // the same id server-side via CAPI so Meta/Pinterest dedup the
+      // pair. Fire-and-forget; never block the save.
+      const resourceEventId = `download_${coloringImage.id}_${Date.now()}`;
+      trackResourceSaved({
+        method: 'download',
+        surface: 'coloring_page',
+        contentType: 'pdf',
+        contentName: coloringImage.title,
+        eventId: resourceEventId,
+      });
+      void recordResourceSaved({
+        method: 'download',
+        surface: 'coloring_page',
+        contentName: coloringImage.title,
+        eventId: resourceEventId,
       });
 
       const doc = (
