@@ -267,16 +267,22 @@ export async function renderImageDemoReel(
 // pre-compute it.
 //
 // PlasmaShader needs a WebGL context in headless Chromium. We use
-// SwiftShader (software WebGL) instead of ANGLE because:
-//   - ANGLE requires GPU hardware passthrough or Mesa drivers that
-//     aren't installed on the Hetzner box (verified May 2026 — the
-//     first prod render failed with "Failed to get WebGL context"
-//     even with gl=angle, because the box has no GPU and no Mesa).
-//   - SwiftShader is bundled with Chromium, runs entirely on CPU, and
-//     works on any Linux machine with no extra setup. ~2x slower than
-//     hardware/ANGLE but our renders are short and bursty.
-// Local dev (Mac) accepts angle too, but SwiftShader works there as
-// well, so picking it for both keeps environment parity.
+// `swangle` (Remotion's name for --use-gl=angle + --use-angle=swiftshader)
+// because:
+//   - The Hetzner box has no GPU. Plain --gl=angle and plain
+//     --gl=swiftshader both fail with "Failed to get WebGL context"
+//     (verified May 2026). The first because there's no driver to bind
+//     to; the second because modern Chromium routes WebGL through
+//     ANGLE — bypassing ANGLE leaves WebGL with no backend.
+//   - `swangle` chains them: ANGLE wraps the WebGL API, SwiftShader
+//     provides the software backend ANGLE compiles to. Same combo
+//     PTP's Stagehand/Playwright instance uses successfully on this
+//     same box (`ps auxw | grep chrome` → `--use-angle=swiftshader-webgl`).
+//   - libvk_swiftshader.so + vk_swiftshader_icd.json are already
+//     bundled in the Playwright Chromium install at
+//     /root/.cache/ms-playwright/chromium-1217/chrome-linux64/.
+// Slower than hardware-backed WebGL but our renders are short and the
+// daily cron only fires once.
 
 export type RenderContentReelOptions = {
   template: "shock" | "warm" | "quiet";
@@ -334,7 +340,7 @@ export async function renderContentReel(
     outputLocation: opts.outputPath,
     inputProps,
     timeoutInMilliseconds: 240_000,
-    chromiumOptions: { gl: "swiftshader" },
+    chromiumOptions: { gl: "swangle" },
     onBrowserLog: ({ type, text }) => {
       if (type === "error" || type === "warning") {
         console.log(`[remotion-browser:${type}] ${text}`);
