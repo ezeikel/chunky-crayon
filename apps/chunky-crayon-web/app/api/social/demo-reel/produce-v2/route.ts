@@ -137,6 +137,15 @@ const handleRequest = async (request: Request) => {
     }
     coloringImageId = result.id;
 
+    // Capture the source photo URL on the row so the worker can use it
+    // when generating the per-platform hook cover. Without this the
+    // input photo is forgotten after produce — the ColoringImage row
+    // only ever held the AI-generated line-art, not the original.
+    await db.coloringImage.update({
+      where: { id: coloringImageId },
+      data: { demoReelInputPhotoUrl: photoUrl },
+    });
+
     // Bump lastUsed so this entry rotates to the back of the queue. V1 worker
     // did this at the very end of its render — moving it to the produce step
     // keeps rotation correct even if the worker render fails partway through.
