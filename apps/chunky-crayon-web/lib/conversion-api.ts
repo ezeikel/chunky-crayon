@@ -250,6 +250,75 @@ export const sendFacebookSubscribeEvent = async ({
 };
 
 // =============================================================================
+// FACEBOOK: START TRIAL
+// =============================================================================
+
+// Fired alongside Subscribe when the resulting subscription is on a
+// 7-day trial (Stripe `subscription.status === 'trialing'`). Meta
+// tracks StartTrial as a distinct standard event with its own
+// optimization category — for subscription products this is usually
+// a better optimization target than Purchase/Subscribe, since the
+// trial start is the first signal of real intent and lets Meta
+// optimize for "people who start trials" before any money has changed
+// hands. Use a `trial_${session.id}` event_id so this doesn't merge
+// with the Purchase or Subscribe event for the same checkout.
+export const sendFacebookStartTrialEvent = async ({
+  email,
+  userId,
+  phone,
+  firstName,
+  lastName,
+  value,
+  currency,
+  eventId,
+  planName,
+  predictedLtvMultiplier = 12,
+  orderId,
+  ...match
+}: {
+  email: string;
+  userId: string;
+  phone?: string;
+  firstName?: string;
+  lastName?: string;
+  value: number;
+  currency: string;
+  eventId: string;
+  planName: string;
+  predictedLtvMultiplier?: number;
+  orderId?: string;
+} & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
+  return postFacebookEvent(
+    {
+      event_name: 'StartTrial',
+      event_time: Math.floor(Date.now() / 1000),
+      event_id: eventId,
+      event_source_url: resolveEventSourceUrl(match.eventSourceUrl),
+      user_data: buildFacebookUserData({
+        email,
+        userId,
+        phone,
+        firstName,
+        lastName,
+        ...match,
+      }),
+      custom_data: {
+        currency: currency.toUpperCase(),
+        value: value / 100,
+        content_name: `${planName} Trial`,
+        // Predicted LTV improves Meta's value-based optimization. Same
+        // multiplier strategy as Subscribe — caller passes 12 for
+        // monthly plans, 1 for annual.
+        predicted_ltv: (value / 100) * predictedLtvMultiplier,
+        ...(orderId && { order_id: orderId }),
+      },
+      action_source: 'website',
+    },
+    'StartTrial',
+  );
+};
+
+// =============================================================================
 // FACEBOOK: INITIATE CHECKOUT
 // =============================================================================
 
@@ -752,6 +821,37 @@ export const sendSubscribeConversionEvents = async (
   } & ClientMatchData,
 ): Promise<void> => {
   await Promise.allSettled([sendFacebookSubscribeEvent(params)]);
+};
+
+// StartTrial wrapper. Fires Meta StartTrial + Pinterest lead
+// (lead_type: trial_started) in parallel. Use alongside
+// sendPurchaseConversionEvents + sendSubscribeConversionEvents for
+// subscription checkouts that result in a 7-day trial. Meta gets a
+// dedicated optimization category for trial starts; Pinterest reuses
+// its lead event with a distinct lead_type so it can be filtered in
+// reporting.
+export const sendStartTrialConversionEvents = async (
+  params: {
+    email: string;
+    userId: string;
+    phone?: string;
+    firstName?: string;
+    lastName?: string;
+    value: number;
+    currency: string;
+    eventId: string;
+    planName: string;
+    predictedLtvMultiplier?: number;
+    orderId?: string;
+  } & ClientMatchData,
+): Promise<void> => {
+  await Promise.allSettled([
+    sendFacebookStartTrialEvent(params),
+    sendPinterestLeadEvent({
+      ...params,
+      leadType: 'trial_started',
+    }),
+  ]);
 };
 
 // InitiateCheckout wrapper. Meta-only for the same reason as Subscribe

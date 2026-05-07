@@ -11,6 +11,7 @@ type BillingSuccessProps = {
   productType?: 'subscription' | 'credits';
   planName?: PlanName;
   creditAmount?: number;
+  isTrial?: boolean;
 };
 
 const BillingSuccess = ({
@@ -20,6 +21,7 @@ const BillingSuccess = ({
   productType = 'subscription',
   planName,
   creditAmount,
+  isTrial = false,
 }: BillingSuccessProps) => {
   const headlineText =
     productType === 'subscription'
@@ -72,6 +74,7 @@ const BillingSuccess = ({
           productType={productType}
           planName={planName}
           creditAmount={creditAmount}
+          isTrial={isTrial}
         />
       )}
     </div>

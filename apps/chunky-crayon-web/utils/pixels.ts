@@ -305,24 +305,49 @@ export const trackPurchase = (params: {
 };
 
 /**
- * Track when a user starts a subscription trial
+ * Track when a user starts a subscription trial.
+ *
+ * Fires alongside Purchase + Subscribe when checkout results in the
+ * 7-day trial. Meta has a dedicated StartTrial optimization category
+ * (often a stronger paid-ad target than Purchase for subscription
+ * products). Pinterest reuses `lead` with `lead_type: 'trial_started'`
+ * so the event is filterable in Pinterest reporting.
+ *
+ * Pass `eventId` (the Stripe session id) so Meta deduplicates this
+ * client fire against the server CAPI fire from the webhook
+ * (`trial_${session.id}`). Pinterest dedup also keys on event_id.
  */
 export const trackStartTrial = (params: {
   planName: string;
   value: number;
   currency: string;
+  eventId?: string;
+  predictedLtvMultiplier?: number;
 }) => {
-  trackFacebookEvent('StartTrial', {
+  const w = window as WindowWithPixels;
+  const ltvMultiplier = params.predictedLtvMultiplier ?? 12;
+  const fbParams = {
     value: params.value / 100,
     currency: params.currency,
     content_name: `${params.planName} Trial`,
-    predicted_ltv: params.value / 100,
-  });
+    predicted_ltv: (params.value / 100) * ltvMultiplier,
+  };
+  if (w.fbq) {
+    w.fbq(
+      'track',
+      'StartTrial',
+      fbParams,
+      ...(params.eventId ? [{ eventID: params.eventId }] : []),
+    );
+  }
 
   // Pinterest doesn't have a direct trial event, use lead
-  trackPinterestEvent('lead', {
-    lead_type: 'trial_started',
-  });
+  if (w.pintrk) {
+    w.pintrk('track', 'lead', {
+      lead_type: 'trial_started',
+      ...(params.eventId && { event_id: params.eventId }),
+    });
+  }
 };
 
 /**

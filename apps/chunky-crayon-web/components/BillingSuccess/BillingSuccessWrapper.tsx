@@ -22,6 +22,7 @@ const BillingSuccessWrapper = async ({
       productType={sessionData?.productType}
       planName={sessionData?.planName}
       creditAmount={sessionData?.creditAmount}
+      isTrial={sessionData?.isTrial ?? false}
     />
   );
 };

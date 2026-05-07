@@ -25,6 +25,7 @@ import { trackWithUser } from '@/utils/analytics-server';
 import {
   sendPurchaseConversionEvents,
   sendSignupConversionEvents,
+  sendStartTrialConversionEvents,
   sendSubscribeConversionEvents,
 } from '@/lib/conversion-api';
 
@@ -258,6 +259,12 @@ export const POST = async (req: Request) => {
 
       // Send to Conversion APIs (Facebook + Pinterest)
       if (user.email) {
+        // When the resulting Stripe subscription is on the 7-day
+        // trial, also fire StartTrial. Meta has a dedicated optimization
+        // category for trial starts — usually a stronger signal than
+        // Purchase/Subscribe alone for subscription products.
+        const isTrialing = subscription.status === 'trialing';
+
         await Promise.allSettled([
           sendPurchaseConversionEvents({
             email: user.email,
@@ -286,6 +293,22 @@ export const POST = async (req: Request) => {
               billingPeriod === BillingPeriod.ANNUAL ? 1 : 12,
             ...matchData,
           }),
+          ...(isTrialing
+            ? [
+                sendStartTrialConversionEvents({
+                  email: user.email,
+                  userId: user.id,
+                  value: priceAmount,
+                  currency: 'GBP',
+                  eventId: `trial_${session.id}`,
+                  orderId: session.id,
+                  planName,
+                  predictedLtvMultiplier:
+                    billingPeriod === BillingPeriod.ANNUAL ? 1 : 12,
+                  ...matchData,
+                }),
+              ]
+            : []),
         ]);
       }
     } else {

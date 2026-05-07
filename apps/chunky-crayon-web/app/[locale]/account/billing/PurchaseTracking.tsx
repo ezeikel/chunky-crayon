@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { trackPurchase, trackSubscribe } from '@/utils/pixels';
+import { trackPurchase, trackStartTrial, trackSubscribe } from '@/utils/pixels';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 
@@ -12,6 +12,10 @@ type PurchaseTrackingProps = {
   productType: 'subscription' | 'credits';
   planName?: string;
   creditAmount?: number;
+  // True when the resulting Stripe subscription is in `trialing`
+  // status — we also fire Meta StartTrial + Pinterest trial_started
+  // lead for these. Resolved server-side in getStripeSession.
+  isTrial?: boolean;
 };
 
 const PurchaseTracking = ({
@@ -21,6 +25,7 @@ const PurchaseTracking = ({
   productType,
   planName,
   creditAmount,
+  isTrial = false,
 }: PurchaseTrackingProps) => {
   useEffect(() => {
     // Facebook + Pinterest pixels with event ID for dedup. eventId is
@@ -45,6 +50,18 @@ const PurchaseTracking = ({
         currency,
         eventId: `sub_${eventId}`,
       });
+
+      // StartTrial fires only when the resulting subscription is on
+      // the 7-day trial. eventId matches the webhook CAPI fire
+      // (`trial_${session.id}`) so Meta deduplicates.
+      if (isTrial) {
+        trackStartTrial({
+          planName,
+          value,
+          currency,
+          eventId: `trial_${eventId}`,
+        });
+      }
     }
 
     // PostHog + Vercel analytics

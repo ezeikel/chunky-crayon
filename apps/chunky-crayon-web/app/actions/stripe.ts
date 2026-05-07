@@ -48,6 +48,7 @@ export const getStripeSession = async (sessionId: string) => {
 
     let planName: PlanName | undefined;
     let creditAmount: number | undefined;
+    let isTrial = false;
     const priceId = session.line_items?.data[0]?.price?.id;
 
     if (priceId) {
@@ -59,12 +60,28 @@ export const getStripeSession = async (sessionId: string) => {
       }
     }
 
+    // Resolve trial state for the success page so it can fire Meta
+    // StartTrial alongside Purchase + Subscribe. The webhook already
+    // handles this server-side; this lets the browser fire dedup
+    // against the CAPI fire via shared eventId (`trial_${sessionId}`).
+    if (productType === 'subscription' && session.subscription) {
+      try {
+        const subscription = await stripe.subscriptions.retrieve(
+          session.subscription as string,
+        );
+        isTrial = subscription.status === 'trialing';
+      } catch (err) {
+        console.error('Error fetching subscription for trial check:', err);
+      }
+    }
+
     return {
       amount_total: session.amount_total,
       currency: session.currency,
       productType,
       planName,
       creditAmount,
+      isTrial,
     };
   } catch (error) {
     console.error('Error fetching Stripe session:', error);
