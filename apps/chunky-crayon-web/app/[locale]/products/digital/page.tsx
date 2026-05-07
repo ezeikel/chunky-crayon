@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { connection } from 'next/server';
 import {
   listPublishedBundles,
   listingImagesForBundle,
@@ -11,13 +11,13 @@ import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { checkFeatureFlag } from '@/flags';
 
-type BundlesIndexProps = {
+type DigitalProductsIndexProps = {
   params: Promise<{ locale: string }>;
 };
 
 export async function generateMetadata({
   params,
-}: BundlesIndexProps): Promise<Metadata> {
+}: DigitalProductsIndexProps): Promise<Metadata> {
   const { locale } = await params;
   const baseUrl = 'https://chunkycrayon.com';
   const url = `${baseUrl}/${locale}/products/digital`;
@@ -40,17 +40,10 @@ export async function generateMetadata({
   };
 }
 
-const BundlesIndexPage = async ({ params }: BundlesIndexProps) => {
-  // Opt into dynamic rendering — the flag check is per-request and
-  // not safe to bake into static HTML.
-  await connection();
-
+const DigitalProductsIndexPage = async ({
+  params,
+}: DigitalProductsIndexProps) => {
   const { locale } = await params;
-
-  const enabled = await checkFeatureFlag('bundles-shop');
-  if (!enabled) notFound();
-
-  const bundles = await listPublishedBundles();
 
   return (
     <PageWrap>
@@ -72,50 +65,68 @@ const BundlesIndexPage = async ({ params }: BundlesIndexProps) => {
           </p>
         </header>
 
-        {bundles.length === 0 ? (
-          <div className="text-center text-brown-500 py-16">
-            New bundles coming soon.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {bundles.map((bundle) => {
-              const hero = listingImagesForBundle(bundle)[0];
-              return (
-                <Link
-                  key={bundle.id}
-                  href={`/${locale}/products/digital/${bundle.slug}`}
-                  className="group flex flex-col gap-3 rounded-2xl border-2 border-brown-700/10 bg-cream p-4 hover:border-crayon-orange transition"
-                >
-                  {hero ? (
-                    <div className="relative aspect-square w-full overflow-hidden rounded-xl">
-                      <Image
-                        src={hero}
-                        alt={bundle.name}
-                        fill
-                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : null}
-                  <div className="flex items-baseline justify-between gap-2">
-                    <h2 className="font-heading text-xl text-crayon-orange-dark group-hover:underline">
-                      {bundle.name}
-                    </h2>
-                    <span className="font-heading text-xl text-brown-700">
-                      £{(bundle.pricePence / 100).toFixed(2)}
-                    </span>
-                  </div>
-                  <p className="text-sm text-brown-500 line-clamp-2">
-                    {bundle.tagline}
-                  </p>
-                </Link>
-              );
-            })}
-          </div>
-        )}
+        <Suspense fallback={null}>
+          <DigitalProductsGrid locale={locale} />
+        </Suspense>
       </div>
     </PageWrap>
   );
 };
 
-export default BundlesIndexPage;
+// Dynamic island for Cache Components — flag check + DB read live here so
+// the page shell can prerender. notFound() inside a Suspense child still
+// short-circuits the whole route to /not-found, so the gate works.
+const DigitalProductsGrid = async ({ locale }: { locale: string }) => {
+  const enabled = await checkFeatureFlag('bundles-shop');
+  if (!enabled) notFound();
+
+  const bundles = await listPublishedBundles();
+
+  if (bundles.length === 0) {
+    return (
+      <div className="text-center text-brown-500 py-16">
+        New bundles coming soon.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {bundles.map((bundle) => {
+        const hero = listingImagesForBundle(bundle)[0];
+        return (
+          <Link
+            key={bundle.id}
+            href={`/${locale}/products/digital/${bundle.slug}`}
+            className="group flex flex-col gap-3 rounded-2xl border-2 border-brown-700/10 bg-cream p-4 hover:border-crayon-orange transition"
+          >
+            {hero ? (
+              <div className="relative aspect-square w-full overflow-hidden rounded-xl">
+                <Image
+                  src={hero}
+                  alt={bundle.name}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
+            ) : null}
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 className="font-heading text-xl text-crayon-orange-dark group-hover:underline">
+                {bundle.name}
+              </h2>
+              <span className="font-heading text-xl text-brown-700">
+                £{(bundle.pricePence / 100).toFixed(2)}
+              </span>
+            </div>
+            <p className="text-sm text-brown-500 line-clamp-2">
+              {bundle.tagline}
+            </p>
+          </Link>
+        );
+      })}
+    </div>
+  );
+};
+
+export default DigitalProductsIndexPage;

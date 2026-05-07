@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { connection } from 'next/server';
 import { getPublishedBundle, listingImagesForBundle } from '@/app/data/bundle';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -14,17 +14,17 @@ type BundleProductPageProps = {
   }>;
 };
 
-// Dynamic rendering. We deliberately don't `generateStaticParams` here
-// because:
-//   1. The page is flag-gated and 404s when `bundles-shop` is off, so
-//      static prerender has nothing useful to cache anyway.
-//   2. Next 16 + Cache Components rejects an empty `generateStaticParams`
-//      result, and prod currently has zero published bundles (dev DB
-//      has them, prod doesn't), so listPublishedBundles() → [] → build
-//      fail. See ~/.claude/.../feedback_no_force_dynamic_in_next16.md.
-//   3. Once bundles ship for real, swap to a hybrid: ISR with static
-//      params for the small set of published bundles + the flag check
-//      still gating render.
+// Cache Components static-first pattern:
+//   - The page itself is the static shell. It awaits ONLY params (a
+//     synchronous prop pass), nothing dynamic.
+//   - All dynamic access (flag check, DB lookup) is inside <Suspense>
+//     via the BundleContent island below. Without this split, Next 16
+//     fails the build with "Uncached data was accessed outside of
+//     <Suspense>" because the providers tree at the layout level can't
+//     stream and dynamic-at-page-top blocks the shell.
+//
+// We deliberately don't generateStaticParams — see
+// ~/.claude/.../feedback_empty_generate_static_params_breaks_cache_components.md.
 
 export async function generateMetadata({
   params,
@@ -64,19 +64,31 @@ export async function generateMetadata({
 }
 
 const BundleProductPage = async ({ params }: BundleProductPageProps) => {
-  // Opt into dynamic rendering. Without this, Cache Components treats
-  // the page as statically renderable and complains about the missing
-  // generateStaticParams. The flag check below would also force this
-  // dynamic anyway, but explicit is clearer.
-  await connection();
-
   const { locale, slug } = await params;
 
+  return (
+    <PageWrap>
+      <Suspense fallback={null}>
+        <BundleContent locale={locale} slug={slug} />
+      </Suspense>
+    </PageWrap>
+  );
+};
+
+// Dynamic island — does the flag check + DB lookup + 404 routing. Must
+// be inside the page's <Suspense> boundary so Cache Components can
+// prerender the shell and stream this in.
+const BundleContent = async ({
+  locale,
+  slug,
+}: {
+  locale: string;
+  slug: string;
+}) => {
   const enabled = await checkFeatureFlag('bundles-shop');
   if (!enabled) notFound();
 
   const bundle = await getPublishedBundle(slug);
-
   if (!bundle) {
     notFound();
   }
@@ -84,7 +96,7 @@ const BundleProductPage = async ({ params }: BundleProductPageProps) => {
   const images = listingImagesForBundle(bundle);
 
   return (
-    <PageWrap>
+    <>
       <Breadcrumbs
         items={[
           { href: `/${locale}`, label: 'Home' },
@@ -104,7 +116,7 @@ const BundleProductPage = async ({ params }: BundleProductPageProps) => {
           images,
         }}
       />
-    </PageWrap>
+    </>
   );
 };
 
