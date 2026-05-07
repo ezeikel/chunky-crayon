@@ -58,6 +58,21 @@ const nextConfig: NextConfig = {
       revalidate: 60 * 60 * 24, // 24 hours - daily background revalidation
       expire: 60 * 60 * 24 * 30, // 30 days max
     },
+    // Comics list — new strip lands once a week (Sunday). Revalidate
+    // every 6h to be safe, expire after a month so search engines see
+    // fresh sitemaps. Tag-invalidated when a strip goes POSTED.
+    'comics-list': {
+      stale: 60 * 60, // 1 hour
+      revalidate: 60 * 60 * 6, // 6 hours
+      expire: 60 * 60 * 24 * 30, // 30 days max
+    },
+    // Individual strip pages — once posted, content never changes.
+    // Long expiry; tag-invalidated only if the row is deleted.
+    'comic-strip': {
+      stale: 60 * 60 * 24, // 1 day
+      revalidate: 60 * 60 * 24 * 7, // 7 days
+      expire: 60 * 60 * 24 * 365, // 1 year max
+    },
   },
   images: {
     remotePatterns: [

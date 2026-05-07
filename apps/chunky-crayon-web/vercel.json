@@ -17,6 +17,9 @@
     },
     "app/api/social/digest/route.ts": {
       "maxDuration": 300
+    },
+    "app/api/social/comic-strip-post/route.ts": {
+      "maxDuration": 300
     }
   },
   "crons": [
@@ -134,6 +137,22 @@
     {
       "path": "/api/blog/generate",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/comic-strip",
+      "schedule": "0 6 * * 0"
+    },
+    {
+      "path": "/api/social/comic-strip-post?platform=facebook",
+      "schedule": "0 13 * * 0"
+    },
+    {
+      "path": "/api/social/comic-strip-post?platform=pinterest",
+      "schedule": "2 13 * * 0"
+    },
+    {
+      "path": "/api/social/comic-strip-post?platform=instagram",
+      "schedule": "0 17 * * 0"
     }
   ]
 }
