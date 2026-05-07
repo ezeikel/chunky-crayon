@@ -1,0 +1,711 @@
+{
+  "generatedAt": "2026-05-05T10:08:47.676Z",
+  "model": "sonar-deep-research",
+  "elapsedSeconds": 174.9,
+  "ccBundlePriceGbp": 4.99,
+  "cocoWyoBundles": [
+    {
+      "name": "Simple Art: Bold and Easy Designs for Relaxation with Minimalist Features Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/simple-art-coloring-book",
+      "pageCount": 52,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Minimalist designs",
+      "aestheticDescription": "Bold and easy designs for relaxation with minimalist features"
+    },
+    {
+      "name": "Hygge Place: Bold and Easy Designs for Relaxation with Cozy Little Corners Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/hygge-place-coloring-book",
+      "pageCount": 52,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Cozy home environments",
+      "aestheticDescription": "Bold and easy designs featuring cozy little corners and hygge aesthetic"
+    },
+    {
+      "name": "Fashion Vibes: Bold and Easy Designs for Relaxation Featuring Cute Clothing Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/fashion-vibes-coloring-book",
+      "pageCount": 52,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Fashion and clothing",
+      "aestheticDescription": "Bold illustrations of cute clothing and accessories with trendy designs"
+    },
+    {
+      "name": "Glow Cosmetics: Simple and Big Designs for Relaxation Featuring Cosmetic Items Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/glow-cosmetics-coloring-book",
+      "pageCount": 6,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Cosmetics and beauty",
+      "aestheticDescription": "Simple and big designs featuring cosmetics items like makeup and skincare products"
+    },
+    {
+      "name": "Little Corner Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/little-corner-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Cozy corner scenes",
+      "aestheticDescription": "Cute and cozy illustrations of comfortable spaces and relaxation spots"
+    },
+    {
+      "name": "Cozy Friends Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/cozy-friends-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Animal friends",
+      "aestheticDescription": "Adorable animal characters in cozy, calming settings with soft features"
+    },
+    {
+      "name": "Stress Relief Bold and Easy Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/stress-relief-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Stress relief",
+      "aestheticDescription": "Simple designs with bold lines intended to help with anxiety and relaxation"
+    },
+    {
+      "name": "Spooky Cutie Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/collections/spooky/spooky-cutie-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Halloween themes",
+      "aestheticDescription": "Cute and spooky illustrations featuring animals celebrating Halloween"
+    },
+    {
+      "name": "Cozy Christmas Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/cozy-christmas-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Christmas holiday",
+      "aestheticDescription": "Festive holiday scenes with cute animals and cozy Christmas decorations"
+    },
+    {
+      "name": "Mystical World Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/mystical-world-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Fantasy and mystical creatures",
+      "aestheticDescription": "Intricate illustrations featuring mystical creatures, mandalas, fairies and magical landscapes"
+    },
+    {
+      "name": "Little Cuddles Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/little-cuddles-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 12.99,
+      "targetAge": "All ages",
+      "theme": "Animal cuddles",
+      "aestheticDescription": "Adorable animal characters in cozy daily activities, spiral-bound format"
+    },
+    {
+      "name": "Comfy Days Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/comfy-days-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Relaxing moments",
+      "aestheticDescription": "Cute illustrations depicting comfortable, everyday moments of relaxation"
+    },
+    {
+      "name": "Girl Moments Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/girl-moments-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Women's daily life",
+      "aestheticDescription": "Warm illustrations of familiar daily activities from a female perspective"
+    },
+    {
+      "name": "Girl Moments Coloring Book Vol 2",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/girl-moments-coloring-book-vol-2",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Women's daily life",
+      "aestheticDescription": "Continuation of cozy moments celebrating everyday female experiences"
+    },
+    {
+      "name": "Cozy Cuties Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/products/cozy-cuties-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Cute animals",
+      "aestheticDescription": "Snuggly animal characters in cozy, comforting scenes with simple designs"
+    },
+    {
+      "name": "Coco Wyo Bundle",
+      "source": "etsy",
+      "url": "https://www.etsy.com/market/coco_wyo_bundle",
+      "pageCount": 89,
+      "priceGbp": 12.99,
+      "targetAge": "Adults",
+      "theme": "General bundle",
+      "aestheticDescription": "Collection of multiple Coco Wyo coloring books offered as a bundle"
+    },
+    {
+      "name": "Coco Wyo Ocean",
+      "source": "etsy",
+      "url": "https://www.etsy.com/market/coco_wyo_ocean",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Ocean themes",
+      "aestheticDescription": "Coloring pages featuring ocean scenes, sea creatures and underwater adventures"
+    },
+    {
+      "name": "Coco Wyo Texture Book",
+      "source": "etsy",
+      "url": "https://www.etsy.com/market/coco_wyo_texture_book",
+      "pageCount": 6,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Textures practice",
+      "aestheticDescription": "Practice sheets for drawing different textures with alcohol markers"
+    },
+    {
+      "name": "Into Gardens Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://www.scribd.com/document/889302839/Into-Gardens-Coco-Wyo",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Garden themes",
+      "aestheticDescription": "Illustrations of garden scenes with flowers, plants and outdoor spaces"
+    },
+    {
+      "name": "Comfy Patterns: Lovely Cozy Pattern Coloring Book",
+      "source": "etsy",
+      "url": "https://www.etsy.com/il-en/listing/1750547297/comfy-patterns-lovely-cozy-pattern",
+      "pageCount": 6,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Pattern designs",
+      "aestheticDescription": "Lovely cozy pattern designs for coloring"
+    },
+    {
+      "name": "Coco Wyo Coloring Checklist",
+      "source": "cocowyo.com",
+      "url": "https://www.scribd.com/document/961103702/Coco-Wyo-20241125-143336-0000",
+      "pageCount": 21,
+      "priceGbp": 0,
+      "targetAge": "Adults",
+      "theme": "Checklist",
+      "aestheticDescription": "Coloring checklist featuring various locations and activities for coloring"
+    },
+    {
+      "name": "Coco Wyo Digital Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/collections/digital",
+      "pageCount": 6,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Digital coloring",
+      "aestheticDescription": "Digital coloring book featuring adorable animal characters with seasonal charm"
+    },
+    {
+      "name": "Freebies",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/pages/freebies",
+      "pageCount": 40,
+      "priceGbp": 0,
+      "targetAge": "Adults",
+      "theme": "Free content",
+      "aestheticDescription": "Free collection of hand-drawn coloring pages featuring delightful animal characters"
+    },
+    {
+      "name": "Little Spooky Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/collections/spooky",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Halloween themes",
+      "aestheticDescription": "Spooky cute coloring book featuring animals celebrating Halloween"
+    },
+    {
+      "name": "Cozy Corner Coloring Book",
+      "source": "cocowyo.com",
+      "url": "https://cocowyo.com/collections/new-release/comfy-corner-coloring-book",
+      "pageCount": 40,
+      "priceGbp": 3.99,
+      "targetAge": "Adults",
+      "theme": "Cozy home environments",
+      "aestheticDescription": "Coloring book featuring cozy corner scenes and comfortable home settings"
+    }
+  ],
+  "themeClusters": [
+    {
+      "cluster": "Animals and Friends",
+      "cocoWyoBundleNames": [
+        "Cozy Friends Coloring Book",
+        "Little Cuddles Coloring Book",
+        "Spooky Cutie Coloring Book",
+        "Cozy Cuties Coloring Book",
+        "Little Spooky Coloring Book"
+      ],
+      "saturation": "oversaturated",
+      "notes": "Coco Wyo has multiple entries focused on cute animal characters in various settings. This is clearly their most prominent theme with numerous iterations."
+    },
+    {
+      "cluster": "Cozy Home Environments",
+      "cocoWyoBundleNames": [
+        "Hygge Place",
+        "Little Corner Coloring Book",
+        "Comfy Days Coloring Book",
+        "Cozy Corner Coloring Book"
+      ],
+      "saturation": "oversaturated",
+      "notes": "Coco Wyo has several books centered around cozy home spaces and \"hygge\" aesthetics. This is another heavily covered theme."
+    },
+    {
+      "cluster": "Women Lifestyle",
+      "cocoWyoBundleNames": [
+        "Girl Moments Coloring Book",
+        "Girl Moments Coloring Book Vol 2"
+      ],
+      "saturation": "well-covered",
+      "notes": "Coco Wyo has two books specifically targeting women's daily life moments, indicating demand but room for differentiation."
+    },
+    {
+      "cluster": "Holiday Seasonal",
+      "cocoWyoBundleNames": [
+        "Cozy Christmas Coloring Book",
+        "Spooky Cutie Coloring Book",
+        "Little Spooky Coloring Book"
+      ],
+      "saturation": "well-covered",
+      "notes": "Coco Wyo covers major holidays like Christmas and Halloween, but there are many seasonal opportunities they haven't fully tapped."
+    },
+    {
+      "cluster": "Fashion Beauty",
+      "cocoWyoBundleNames": ["Fashion Vibes", "Glow Cosmetics"],
+      "saturation": "undersaturated",
+      "notes": "Coco Wyo has limited offerings in fashion and beauty themes, presenting an opportunity to expand with more specialized content."
+    },
+    {
+      "cluster": "Patterns Abstract",
+      "cocoWyoBundleNames": ["Comfy Patterns", "Simple Art", "Texture Book"],
+      "saturation": "undersaturated",
+      "notes": "While they touch on patterns and textures, Coco Wyo doesn't have a dedicated focus on abstract designs."
+    },
+    {
+      "cluster": "Fantasy Magical",
+      "cocoWyoBundleNames": ["Mystical World Coloring Book"],
+      "saturation": "gap",
+      "notes": "Only one entry in this category suggests significant whitespace for creative fantasy themes."
+    },
+    {
+      "cluster": "Outdoor Nature",
+      "cocoWyoBundleNames": ["Into Gardens Coloring Book"],
+      "saturation": "gap",
+      "notes": "Limited outdoor/nature focused books beyond the garden theme indicates opportunity for growth."
+    },
+    {
+      "cluster": "Children's Themes",
+      "cocoWyoBundleNames": [
+        "Little Cuddles Coloring Book (marketed to all ages)"
+      ],
+      "saturation": "gap",
+      "notes": "Coco Wyo's primary focus is adults, with only one book marketed more broadly, representing a major whitespace for children-specific content."
+    }
+  ],
+  "ccBundleProposals": [
+    {
+      "cocoWyoBundleName": "Cozy Friends Coloring Book",
+      "ccBundleName": "Crayon Critters",
+      "ccTagline": "Adorable animal adventures with our friendly crayon mascot Colo",
+      "ccTheme": "Anthropomorphic animal characters",
+      "ccPageCount": 10,
+      "ccTwist": "Features our Chunky Crayon mascot Colo interacting with animals in British countryside settings, creating a cohesive story across pages",
+      "ccPagePrompts": [
+        "Colo the crayon character sharing a tea party with a badger and hedgehog in an English garden filled with daffodils at sunset",
+        "Colo helping a fox cub find its way home through a misty Cotswold countryside during golden hour",
+        "A sleepy sloth holding Colo's hand as they swing through rainforest trees with colorful butterflies surrounding them",
+        "Colo racing a hare along Hadrian's Wall with Roman ruins in the background under a dramatic sky",
+        "Colo and a group of ducklings following a river through London's parks with recognizable landmarks in the distance",
+        "A puffin wearing a tiny Union Jack hat guiding Colo across grassy cliffs with seagulls flying overhead",
+        "Colo teaching a squirrel how to gather nuts in a Scottish autumn forest with colorful leaves swirling around",
+        "A penguin wearing a scarf showing Colo how to ice skate on a frozen pond in winter with snowflakes falling",
+        "Colo and a rabbit family decorating a garden for a spring festival with flowers blooming everywhere",
+        "Colo having a picnic with a group of sheep on rolling green hills under a rainbow in the distance"
+      ],
+      "whyItWorks": "Combines the popular animal theme with British cultural elements and a cohesive storyline that children love, while featuring our brand mascot for recognition."
+    },
+    {
+      "cocoWyoBundleName": "Girl Moments Coloring Book",
+      "ccBundleName": "Everyday Joy",
+      "ccTagline": "Celebrating the magic in ordinary moments with diverse children from around the world",
+      "ccTheme": "Diverse daily life experiences",
+      "ccPageCount": 10,
+      "ccTwist": "Features children from diverse backgrounds engaging in culturally specific activities across global settings",
+      "ccPagePrompts": [
+        "A young girl with hijab enjoying a traditional Moroccan mint tea ceremony with her grandmother in a colorful courtyard garden",
+        "A boy with Down syndrome leading a wheelchair dance party in a London community center with colorful balloons everywhere",
+        "A First Nations child learning traditional beadwork from elders in a Canadian longhouse with colorful patterns",
+        "A girl with vitiligo baking Anzac biscuits with her family in an Australian kitchen decorated with eucalyptus",
+        "Two boys with autism spectrum disorder building an elaborate train station in a Japanese style room with paper lanterns",
+        "A child with a prosthetic limb climbing a cherry blossom tree in full bloom at a Japanese spring festival",
+        "A young girl with wheelchair dancing in a Diwali celebration with colorful rangoli patterns and lights everywhere",
+        "A French-Moroccan child writing letters to pen pals with colorful stationery and global stamps in a Parisian apartment",
+        "A child with albinism celebrating Kwanzaa with family members creating colorful unity candles together",
+        "A non-binary child with hearing aids exploring a museum filled with artifacts from diverse cultures around the world"
+      ],
+      "whyItWorks": "Addresses inclusivity which is missing in Coco Wyo's generic representations, while providing educational cultural exposure parents value."
+    },
+    {
+      "cocoWyoBundleName": "Hygge Place",
+      "ccBundleName": "Home Sweet Places",
+      "ccTagline": "Exploring cozy homes and gathering spaces from around the globe",
+      "ccTheme": "International home environments",
+      "ccPageCount": 10,
+      "ccTwist": "Showcasing unique home environments from different countries with Colo exploring each one",
+      "ccPagePrompts": [
+        "Colo wearing traditional Scottish dress sitting by a cozy fireplace in a stone cottage with tartan patterns everywhere",
+        "A Japanese tatami room with Colo trying tea ceremony while cherry blossoms float through an open window",
+        "A colorful Moroccan riad courtyard with Colo sitting on cushions surrounded by intricate tile patterns and fountains",
+        "A Scandinavian home with cozy hygge elements where Colo warms up by the fire after building snow forts outside",
+        "A Brazilian favela home with vibrant colors where Colo joins a community music session with a samba band",
+        "A Mongolian ger with colorful textiles where Colo sits with children drinking milk tea and watching the sunset",
+        "A Maasai village home with Colo learning traditional beadwork from community members against a savanna backdrop",
+        "An Inuit igloo with Colo exploring how the community works together to keep warm in the Arctic environment",
+        "A rural Indian home with colorful rangoli designs where Colo participates in a traditional cooking lesson",
+        "A Dutch canal house where Colo joins a family gathering with stroopwafels and hot chocolate by the water"
+      ],
+      "whyItWorks": "Provides educational content about global homes while maintaining the cozy aesthetic Coco Wyo fans love, but with diverse cultural perspectives missing in their offerings."
+    },
+    {
+      "cocoWyoBundleName": "Cozy Christmas Coloring Book",
+      "ccBundleName": "Holiday Magic Around the World",
+      "ccTagline": "Celebrating diverse holiday traditions with Colo on a global adventure",
+      "ccTheme": "International holiday celebrations",
+      "ccPageCount": 10,
+      "ccTwist": "Showcasing holiday traditions from around the world beyond just Christmas",
+      "ccPagePrompts": [
+        "Colo joining Día de los Muertos celebrations in Mexico with colorful marigolds and sugar skull decorations",
+        "Colo experiencing Chinese New Year with dragon dancers and red lanterns in a bustling city street",
+        "A Kwanzaa celebration where Colo learns about the seven principles with a family gathered around the kinara candle holder",
+        "Colo participating in a Diwali festival with colorful rangoli patterns and rows of lit oil lamps in India",
+        "A Hanukkah celebration where Colo helps light the menorah with a family gathered around the table full of latkes",
+        "Colo joining a Boxing Day celebration in Jamaica with traditional Jonkanoo parades and colorful costumes",
+        "A Greek Christmas where Colo helps bake Christopsomo bread decorated with religious symbols at a family gathering",
+        "Colo experiencing Eid al-Fitr celebrations in Dubai with a festive meal shared with family and friends",
+        "A Norwegian Christmas where Colo joins a family preparing traditional rice porridge with a hidden almond",
+        "A Hawaiian celebration of Lei Day where Colo helps make flower leis and participates in hula dancing"
+      ],
+      "whyItWorks": "Addresses the growing demand for diverse holiday content that extends beyond traditional Christmas themes, serving multicultural families."
+    },
+    {
+      "cocoWyoBundleName": "Mystical World Coloring Book",
+      "ccBundleName": "Mythical Creatures United",
+      "ccTagline": "Cultural legends from around the world brought to life with Colo",
+      "ccTheme": "Global mythology and folklore",
+      "ccPageCount": 10,
+      "ccTwist": "Showcasing mythical creatures from different cultural traditions, not just Western fantasy",
+      "ccPagePrompts": [
+        "Colo meeting a Chinese dragon dancing during Lunar New Year celebrations in a city street with red lanterns",
+        "A Welsh Tylwyth Teg fairy guiding Colo through an ancient standing stone circle in the misty Welsh countryside",
+        "Colo riding on the back of a Japanese Qilin through the streets of Kyoto with colorful temples in the background",
+        "A Ghanaian Asiman spirit guiding Colo through the night sky with stars connecting traditional Adinkra symbols",
+        "Colo visiting a Slavic Domovoi house spirit who helps care for a traditional Russian home with intricate wooden carvings",
+        "A Mexican Alebrije spirit animal leading Colo through a vibrant market filled with colorful folk art",
+        "Colo learning about the Rainbow Serpent from Aboriginal Australians under a starry outback sky with dot painting patterns",
+        "A Scottish Kelpie water spirit showing Colo the mysteries of a loch with castles in the distance",
+        "Colo visiting a Polynesian Moko spirit guide who teaches about navigation by stars across the ocean",
+        "A Brazilian Curupira forest spirit protecting animals with backward feet while walking through the rainforest with Colo"
+      ],
+      "whyItWorks": "Fills Coco Wyo's fantasy gap with educational content that introduces children to global mythology, promoting cultural understanding."
+    },
+    {
+      "cocoWyoBundleName": "Spooky Cutie Coloring Book",
+      "ccBundleName": "Spooky Scares for Kids",
+      "ccTagline": "Gently spooky adventures with Colo that aren't too scary",
+      "ccTheme": "Child-friendly spooky themes",
+      "ccPageCount": 10,
+      "ccTwist": "Designed specifically for children with gentle spookiness that won't cause nightmares",
+      "ccPagePrompts": [
+        "Colo having a friendly tea party with a vampire bat who only drinks tomato juice and loves gardening",
+        "A ghost child playing hide and seek with Colo in an old library filled with flying books and comfortable chairs",
+        "Colo trick-or-treating with a friendly werewolf who only howls at the moon to sing lullabies",
+        "A witch's cat guiding Colo through a magical garden where pumpkins grow candy instead of seeds",
+        "Colo helping a mummy learn to dance at an Egyptian party with colorful scarves and joyful music",
+        "A friendly skeleton teaching Colo how to bone-joggle with musical bones in a safe, colorful graveyard",
+        "Colo and a baby dragon roasting marshmallows over a gentle fire in a magical forest clearing",
+        "A ghost pirate ship where Colo joins a crew of friendly spirits searching for treasure under a starry sky",
+        "Colo attending a monster sleepover with cute creatures sharing scary stories that turn out funny",
+        "A Frankenstein's monster cooking class where Colo learns to make monster-shaped cookies with friendly ingredients"
+      ],
+      "whyItWorks": "Addresses the lack of child-appropriate spooky content that's not too scary while still capturing Halloween fun that parents appreciate."
+    },
+    {
+      "cocoWyoBundleName": "Glow Cosmetics",
+      "ccBundleName": "Crayon Creations",
+      "ccTagline": "Creative expression through art and imagination",
+      "ccTheme": "Artistic self-expression",
+      "ccPageCount": 10,
+      "ccTwist": "Focuses on art-making activities rather than commercial products, featuring Colo as an artist",
+      "ccPagePrompts": [
+        "Colo hosting an outdoor chalk art festival where children create colorful murals on sidewalks with varied textures",
+        "A pottery studio where Colo and children learn to make clay creations with colorful glazes and patterns",
+        "Colo leading a wearable art workshop where children design and create their own costumes with fabric",
+        "A street art mural project where Colo helps children paint a community wall with positive messages and bright colors",
+        "Colo teaching paper quilling techniques to create 3D art with colorful rolled paper strips",
+        "A nature art workshop where Colo guides children in creating temporary land art with leaves, stones and flowers",
+        "Colo and children collaborating on a giant collage using recycled materials and colorful magazine cutouts",
+        "A printmaking session where Colo shows children how to create colorful patterns using potatoes and fabric",
+        "Colo organizing a light painting workshop where children create magical images with LED lights in the dark",
+        "A textile art project where Colo helps children create batik designs on fabric with colorful wax patterns"
+      ],
+      "whyItWorks": "Reframes the beauty theme into positive artistic self-expression that encourages creativity rather than product consumption."
+    },
+    {
+      "cocoWyoBundleName": "None",
+      "ccBundleName": "Transportation Town",
+      "ccTagline": "Around the world by transportation with Colo",
+      "ccTheme": "Global transportation methods",
+      "ccPageCount": 10,
+      "ccTwist": "Showcasing unique transportation methods from different countries with Colo experiencing each one",
+      "ccPagePrompts": [
+        "Colo riding a double-decker bus through London with colorful landmarks passing by the windows",
+        "A cable car ascending the steep hills of Rio de Janeiro with Colo taking in the panoramic city views and Christ the Redeemer",
+        "Colo traveling on a tuk-tuk through Bangkok streets with colorful markets and food stalls lining the route",
+        "A Japanese bullet train where Colo watches cherry blossoms fly by while enjoying traditional snacks with friendly passengers",
+        "Colo on a traditional gondola in Venice with colorful buildings lining the canal and bridges passing overhead",
+        "A camel caravan journey through the Sahara Desert with Colo watching the stars appear as the sun sets",
+        "Colo riding a rickshaw through the colorful streets of Delhi with vibrant markets and temple spires",
+        "A Venetian water bus where Colo glides along canals with colorful buildings and laundry hanging from windows",
+        "Colo traveling on a dog sled across the snowy landscapes of Alaska with the Northern Lights dancing in the sky",
+        "A Mongolian horseback riding adventure where Colo joins nomadic herders across the vast grasslands"
+      ],
+      "whyItWorks": "Addresses a complete whitespace in Coco Wyo's offerings while providing educational content about transportation methods worldwide that children find fascinating."
+    }
+  ],
+  "marketingNotes": "Coco Wyo has established a strong presence with pricing typically set at approximately £3.99 per digital coloring book, with occasional bundles priced higher at around £12.99. This consistent pricing strategy appears to have been well-received by their customer base, as evidenced by their impressive 4.9-star rating from over 6,000 reviews. Their Instagram following of approximately 500,000 indicates significant social media engagement, likely driven by their focus on relaxation and stress relief themes that resonate with adult coloring enthusiasts.\n\nReview analysis shows that customers particularly praise Coco Wyo's bold and easy designs that make coloring accessible for beginners, as well as their high-quality paper that prevents bleed-through with markers. The cozy and comforting aesthetic is frequently mentioned as a key selling point that creates a relaxing coloring experience. Customers also appreciate the variety of themes available, from seasonal offerings to more specific interests like fashion and cosmetics.\n\nHowever, some criticisms have emerged in community discussions, particularly on Reddit, where there have been accusations of copying existing designs and potentially using AI-generated art. While Coco Wyo maintains their illustrations are hand-drawn, some customers have noted unusual elements like hands with too many fingers or inconsistent details. There's also criticism about the lack of cultural diversity in their representations, with most characters appearing generic and Western-focused.\n\nTheir Instagram and Pinterest content primarily focuses on the therapeutic benefits of coloring, with \"before and after\" colored pages showing the transformation from line art to vibrant creations. They frequently use hashtags like #coloringtherapy and #mindfulcoloring to position their products as stress-relief tools. TikTok content often features time-lapse coloring videos that demonstrate the meditative aspect of the activity.\n\nThe \"Cozy Cuties,\" \"Little Corner,\" and \"Cozy Friends\" series appear to be their strongest sellers, consistently appearing in Amazon's bestseller lists for adult coloring books. Their collaboration with Penguin Random House for physical books (\"Cozy Cuties,\" \"Cozy Corner,\" \"Cozy Christmas\") suggests these are particularly successful themes.\n\nNotably, their physical books published through Random House have received some criticism regarding binding quality, with some customers reporting pages tearing easily. This presents an opportunity for Chunky Crayon to emphasize the quality of their digital delivery system while acknowledging the potential issues with physical products.\n\nCoco Wyo's marketing heavily targets adults seeking stress relief, which creates a significant whitespace for children-focused content. Their Instagram aesthetic is very consistent - pastel colors, cute animals in cozy settings, and minimal text - making their brand highly recognizable but also somewhat repetitive across their product line.\n\nThe \"Coco Wyo Coloring Community\" Facebook group with over 10,000 members indicates strong community engagement, suggesting that Chunky Crayon should consider building similar community features around their products. Their successful use of seasonal content (Halloween, Christmas) suggests that Chunky Crayon should develop a content calendar aligned with children's seasonal interests and school schedules.",
+  "sources": [
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "as004yTApJuJehTO",
+      "url": "https://www.etsy.com/market/coco_wyo_bundle"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "U2O1QYlWhDvoj3XL",
+      "url": "https://www.etsy.com/shop/CocoWyoColoring"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "aePibEnBP5wqug6n",
+      "url": "https://cocowyo.com/pages/freebies"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "AmeROdVuWG8Zku0H",
+      "url": "https://cocowyo.com/blogs/diy/8-must-try-coloring-effects"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "kAQKw9vrWF1v88ig",
+      "url": "https://kleur-v-kind.com/en/kleurplaat-coco-wyo/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "82C9SkeGhZWFfd1U",
+      "url": "https://cocowyo.com"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "A4DEiKGgmDCUkXRh",
+      "url": "https://cocowyo.com/blogs/product-guide"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "59C2YrNOWLNIKTml",
+      "url": "https://cocowyo.com/collections/spooky"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "Z0TeSrkA7plQ0KsA",
+      "url": "https://www.youtube.com/watch?v=WFPlYp0cMHU"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "eT0COmgpqe5u256d",
+      "url": "https://cocowyo.com/collections/digital"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "xPFLYTPsVdGvXiiL",
+      "url": "https://cocowyo.com/blogs/coloring-book-guide/how-to-choose-coloring-book-for-adults-relaxation"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "dKUCZuLf9QYQfVgc",
+      "url": "https://intheplayroom.co.uk/coco-wyo-coloring-books/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "BdikpnijhTxGAzVu",
+      "url": "https://www.etsy.com/market/cocowyo_bundle"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "9EJg8duVJpmJdErn",
+      "url": "https://shop.tiktok.com/us/k/coco-wyo-coloring-books-bundle"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "PI0NJSwnSQAqMh06",
+      "url": "https://www.lemon8-app.com/@lalamvck/7476300547968991787?region=us"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "l5vCP46pii9dB7cF",
+      "url": "https://cocowyo.com/blogs/coloring-book-guide/how-to-choose-coloring-books-for-beginner"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "5KTMtK7DCxzxOn4p",
+      "url": "https://cocowyo.com/collections/seasonal"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "Ec9P0Jk5iaMobguu",
+      "url": "https://www.etsy.com/market/coco_wyo_ocean"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "sAwjXK4iTCim8ZXE",
+      "url": "https://cocowyo.com/collections/new-release"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "RfFMEZAAdZDbU7EC",
+      "url": "https://www.youtube.com/watch?v=8L7D5n63rd4"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "mysoqvFsT8Sfc4er",
+      "url": "https://cocowyo.com/pages/faq"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "n3PUchpHtP6Q60Ih",
+      "url": "https://cocowyo.com/products/fashion-vibes-coloring-book"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "SQXDUGql93kZFYEy",
+      "url": "https://cocowyo.com/pages/gallery"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "yTZJcSq84A3D48xb",
+      "url": "https://www.accio.com/business/best-selling-adult-coloring-books"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "NKPt7THjkLmZ2LTr",
+      "url": "https://www.youtube.com/watch?v=jGUHrOf4DIQ"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "rmfqDyrQ7L2mk5gY",
+      "url": "https://www.etsy.com/il-en/listing/1750547297/comfy-patterns-lovely-cozy-pattern"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "EYwLvsBOwoYb3uY1",
+      "url": "https://www.etsy.com/market/coco_wyo_texture_book"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "9cS0EiDp0bMHkp60",
+      "url": "https://www.scribd.com/document/961103702/Coco-Wyo-20241125-143336-0000"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "7lIX4mnPQieYPIYP",
+      "url": "https://cocowyo.com/products/girl-moments-coloring-book"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "vRZASMT7DKALVjo2",
+      "url": "https://www.scribd.com/document/889302839/Into-Gardens-Coco-Wyo"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "Th9sZ57V3roBkQTw",
+      "url": "https://cocowyo.com/products/girl-moments-coloring-book-vol-2"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "3HGIL7eTS5WIkM7f",
+      "url": "https://cocowyo.com/collections/all"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "aW5xg4qEw2FDkhEq",
+      "url": "https://cocowyo.com/products/cozy-cuties-coloring-book"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "cef2eDCGtiSz4Xlb",
+      "url": "https://bookriot.com/bold-and-cozy-coloring-coco-wyo-controversies/"
+    }
+  ]
+}

@@ -576,6 +576,7 @@ export const ACTIONS = {
   DESCRIBE_IMAGE: 'describe image',
   MAGIC_COLOR: 'magic color',
   CREATE_CHECKOUT_SESSION: 'create a checkout session',
+  CREATE_BUNDLE_CHECKOUT_SESSION: 'create a bundle checkout session',
   GET_CURRENT_USER: 'get the current user',
   GET_ENTITLEMENTS: 'get entitlements',
   GET_USER_CREDITS: 'get the user credits',

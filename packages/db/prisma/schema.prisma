@@ -646,6 +646,12 @@ model Bundle {
   listingPageGrid3Url String?
   listingBrandCardUrl String?
 
+  // Polished colored render of the bundle's "face character" (e.g. Rex
+  // for Dino Dance Party). Generated once via gpt-image-2 from the
+  // locked line-art ref, with shaded fills + transparent background.
+  // Featured on the BrandCard listing image. Falls back to Colo if null.
+  brandCharacterUrl String?
+
   // Visibility on the public site. Bundles are drafted with published=false
   // so we can stage them, generate art, render listings, then flip to true
   // when ready to sell. Not the same as Stripe Product activeness — Stripe

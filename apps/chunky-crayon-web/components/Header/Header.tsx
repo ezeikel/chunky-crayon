@@ -21,6 +21,7 @@ import {
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
 import { getProfiles, getActiveProfile } from '@/app/actions/profiles';
+import { checkFeatureFlag } from '@/flags';
 import { getMyStickerStats } from '@/app/actions/stickers';
 import { getMyColoState } from '@/app/actions/colo';
 import { getMyCurrentChallenge } from '@/app/actions/challenges';
@@ -68,6 +69,7 @@ const handleSignOut = async () => {
 // Note: Credits are now shown in the Combined Profile Pill (HeaderDropdown)
 const getNavItems = (
   t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>,
+  showProducts: boolean,
 ): NavItem[] => [
   {
     label: t('home'),
@@ -84,6 +86,19 @@ const getNavItems = (
     href: '/tools',
     visibility: 'always',
   },
+  // Products entry — gated behind the `bundles-shop` PostHog flag while
+  // we finish the v0 design pass + buy flow. Flip the flag on for the
+  // public release once the product page redesign + thank-you page +
+  // Stripe webhook + PDF generation are all wired.
+  ...(showProducts
+    ? ([
+        {
+          label: 'Products',
+          href: '/products',
+          visibility: 'always',
+        },
+      ] as const)
+    : []),
   {
     label: t('myArtwork'),
     href: '/account/my-artwork',
@@ -257,8 +272,17 @@ const Header = async () => {
   const coloState = user ? await getMyColoState() : null;
   const currentChallenge = user ? await getMyCurrentChallenge() : null;
 
+  // Bundles shop is gated until the v0 product page redesign + buy flow
+  // (Stripe webhook, thank-you page, PDF generation) ship. Flip the
+  // PostHog `bundles-shop` flag on once everything's wired.
+  const showProducts = await checkFeatureFlag(
+    'bundles-shop',
+    user?.id ?? 'server-side-check',
+    false,
+  );
+
   const renderItems = () => {
-    const navItems = getNavItems(t);
+    const navItems = getNavItems(t, showProducts);
     const visibleItems = navItems.filter((item) => {
       switch (item.visibility) {
         case 'always':

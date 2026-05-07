@@ -1,0 +1,843 @@
+{
+  "generatedAt": "2026-05-05T10:28:08.085Z",
+  "model": "sonar-deep-research",
+  "elapsedSeconds": 256.6,
+  "targetAge": "3-8",
+  "ccBundlePriceGbp": 4.99,
+  "bestsellerThemes": [
+    {
+      "theme": "Dinosaurs",
+      "evidence": [
+        "1. Amazon US Children's Coloring Books Top 100: 'Dinosaur Coloring Book for Kids' frequently appears in top positions, including a title ranked ​97,000​​ which outsells many others [2][33]. YouTube analysis shows dinosaur coloring books are ​consistent bestsellers month after month​ [28].",
+        "2. Etsy search for 'kids coloring pages' shows numerous shops specializing in dinosaur themes, with many sellers offering ​dino-themed bundles as top sellers [6][7]. On Teachers Pay Teachers, 'dinosaur coloring' yields numerous educational resources with thousands of downloads [39]."
+      ],
+      "ageSweetSpot": "3-6 years",
+      "genderLean": "boy-skewing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Dinosaurs represent powerful creatures that capture children's imagination with their size, diversity, and perceived danger. Kids love the dramatic action of roaring, stomping, and eating (pretending to be dinosaurs), which coloring allows them to engage with safely. The fascination often begins around age 3 when children start showing interest in prehistoric creatures and continues through kindergarten years.",
+      "whyParentsBuyIt": "Parents appreciate that dinosaur coloring books provide an educational opportunity to discuss natural history, size comparison, and different species while keeping children engaged. They're seen as gender-appropriate for boys while still being acceptable for girls, making them a versatile gift option. The strong interest children show in dinosaurs makes these books reliable for keeping kids occupied.",
+      "occasionFit": ["rainy day", "birthday", "educational activity"]
+    },
+    {
+      "theme": "Unicorns",
+      "evidence": [
+        "1. Amazon US coloring books show 'Unicorn Coloring Book for Kids' as a ​consistent top seller​, with one Unicorn Dinosaur theme book ranking ​above 50,000 in sales [9][19]. YouTube analysis specifically mentions 'Unicorns' as dominating the charts on Etsy [28].",
+        "2. Etsy search reveals 'Unicorn Coloring Pages' as a highly popular category with numerous bestsellers like '150 Christmas Coloring Pages for Kids' which includes unicorn themes [6][7][12]. Twinkl's free resources heavily feature unicorn coloring pages among top downloads for preschoolers [20]."
+      ],
+      "ageSweetSpot": "4-7 years",
+      "genderLean": "girl-skewing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Unicorns combine elements of familiar horses with magical features like rainbows and sparkles that create unlimited imaginative possibilities. Children are drawn to the fantasy element and the sense of wonder these mythical creatures represent. The colorful nature of unicorn designs appeals to children's developing sense of aesthetics and color exploration.",
+      "whyParentsBuyIt": "Parents view unicorn coloring books as promoting creativity and fantasy play, which supports cognitive development. They're perceived as 'girly' but not overly gendered, making them acceptable gifts. Many parents appreciate that these books often feature positive themes like friendship and magic, which align with values they want to encourage.",
+      "occasionFit": ["birthday", "sleepover", "rainy day"]
+    },
+    {
+      "theme": "Princesses",
+      "evidence": [
+        "1. Amazon US shows 'Princess, Unicorn, Fairy, and Mermaid Cute Coloring Book for Kids, ages four to eight' as a ​consistent bestseller month after month [28][46].",
+        "2. YouTube analysis specifically lists 'Princess' as one of the dominating themes on Etsy and Amazon alongside unicorns and mermaids [28]. Teachers Pay Teachers has numerous princess-themed coloring resources popular in early education settings [19][40]."
+      ],
+      "ageSweetSpot": "4-7 years",
+      "genderLean": "girl-skewing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Princess coloring books allow children to engage with stories and characters they see in media, creating a sense of connection to familiar narratives. Children enjoy the detailed dresses, crowns, and castle settings that provide rich opportunities for color exploration. The role-playing aspect of imagining themselves as princesses appeals to their developing sense of identity and social roles.",
+      "whyParentsBuyIt": "While some parents have concerns about stereotyping, many appreciate that modern princess coloring books often emphasize positive attributes like kindness, bravery, and intelligence. These books provide safe fantasy play that parents can engage with through storytelling. They're popular birthday gifts that children reliably enjoy.",
+      "occasionFit": ["birthday", "sleepover", "dress-up day"]
+    },
+    {
+      "theme": "Vehicles and Transportation",
+      "evidence": [
+        "1. Amazon listings show 'Vehicles Coloring Book: For Kids With Animals Ages 4-8' as a popular item with specific vehicle themes [29][33]. YouTube analysis mentions vehicles as part of the 'massive demand' for kids' coloring books [28].",
+        "2. Teachers Pay Teachers features numerous vehicle-themed coloring pages that are standard resources in early childhood education [19][44]. Walmart carries specific 'Space Coloring Book' and vehicle-themed coloring books targeting boys [33][44]."
+      ],
+      "ageSweetSpot": "3-6 years",
+      "genderLean": "boy-skewing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Children are fascinated by the movement and functionality of vehicles, which represents power and exploration in their world. Coloring different vehicles allows them to recreate familiar experiences (car rides, emergency vehicles) and imagine new adventures. The mechanical details provide interesting shapes and patterns to color while the recognizable forms build confidence in their drawing skills.",
+      "whyParentsBuyIt": "Parents appreciate that vehicle coloring books often incorporate educational elements about transportation systems, safety, and community helpers. These themes are seen as developmentally appropriate for boys while not excluding girls, making them versatile. The familiar nature of vehicles makes these books reliable for keeping children engaged during quiet time.",
+      "occasionFit": ["rainy day", "road trip", "birthday"]
+    },
+    {
+      "theme": "Space and Outer Space",
+      "evidence": [
+        "1. Amazon US features 'Space Coloring Book Kids Coloring Book Featuring full-page drawings planets astronauts spaceships aliens meteors rockets sun moon stars more' with solid sales rankings [33][37]. This theme appears consistently in the top 100 children's coloring books.",
+        "2. Etsy search reveals multiple space-themed coloring book bundles as bestsellers [31][37]. Twinkl offers space coloring resources as part of their educational preschool materials [20]. Teachers Pay Teachers shows space coloring books as popular educational resources [39]."
+      ],
+      "ageSweetSpot": "5-8 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "moderate",
+      "whyKidsLoveIt": "Space represents the ultimate adventure with its mysterious planets, astronauts, and rockets that spark children's imagination about what lies beyond Earth. The colorful nature of space scenes with stars, galaxies, and planets provides endless creative opportunities. Children enjoy the sense of wonder and possibility that space exploration represents, which coloring allows them to personalize.",
+      "whyParentsBuyIt": "Parents value space coloring books for their educational potential about astronomy, science, and exploration. These books are seen as intellectually stimulating while still being fun, making them ideal for developing curiosity. They're gender-neutral enough to appeal to all children while addressing common interests in rockets and space travel.",
+      "occasionFit": ["rainy day", "educational activity", "summer learning"]
+    },
+    {
+      "theme": "Ocean and Marine Life",
+      "evidence": [
+        "1. Amazon listings include 'Ocean Life Coloring Book for Kids: Ocean Kids Coloring Book, Sea Creatures life Kids Coloring Book' as a specific category with good sales [35].",
+        "2. Etsy search shows ocean-themed coloring pages among popular bundles [6][12]. Teachers Pay Teachers has numerous ocean coloring resources that are frequently downloaded by educators [39][40]. Twinkl features ocean coloring as part of their preschool curriculum materials [20]."
+      ],
+      "ageSweetSpot": "4-7 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "moderate",
+      "whyKidsLoveIt": "Children are fascinated by the variety of sea creatures and the mysterious underwater world that differs from their everyday experience. Coloring ocean scenes allows them to explore vibrant marine life with fish, whales, and coral reefs that offer rich color opportunities. The connection to water play makes these themes particularly engaging for young children who enjoy bathtime and swimming.",
+      "whyParentsBuyIt": "Parents appreciate the educational value of ocean coloring books in teaching about marine biology, ecosystems, and environmental awareness. These books often incorporate conservation messages that align with values parents want to instill. The gender-neutral nature of sea creatures makes them suitable for all children while providing calming, water-related imagery that can help with relaxation.",
+      "occasionFit": ["rainy day", "summer activity", "educational activity"]
+    },
+    {
+      "theme": "Insects and Bugs",
+      "evidence": [
+        "1. Amazon US features 'Insect Coloring Book for Toddlers & Kids Ages 2, 3, 4 & 5 Featuring Dragonflies, Bees, Butterflies, Ladybugs' as a specific category [43][47].",
+        "2. Etsy search reveals numerous bug-themed coloring pages as bestsellers, particularly butterfly designs [6][47]. Teachers Pay Teachers shows insect coloring books as popular educational resources for preschool and early elementary [19]."
+      ],
+      "ageSweetSpot": "3-6 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "moderate",
+      "whyKidsLoveIt": "Children enjoy the bright colors and interesting shapes of insects and bugs they encounter in their daily environments. Coloring these creatures allows them to explore tiny worlds at their own scale, making them feel powerful by controlling the size through their artwork. The transformation aspects of insects (like caterpillar to butterfly) fascinate children and provide narrative opportunities in their coloring.",
+      "whyParentsBuyIt": "Parents value insect coloring books for teaching about nature, life cycles, and environmental awareness in an engaging way. These books often lead to outdoor exploration activities that extend learning beyond the page. The educational component makes them feel like productive screen-free time, and the gender-neutral appeal means they work for all children.",
+      "occasionFit": ["spring activity", "nature study", "rainy day"]
+    },
+    {
+      "theme": "Weather and Seasons",
+      "evidence": [
+        "1. Amazon features seasonal coloring books prominently, with specific weather-related themes like 'Fall Coloring Book' [27][59]. YouTube analysis mentions seasonal themes as part of the massive demand for kids' coloring books [28].",
+        "2. Teachers Pay Teachers shows weather coloring pages as standard educational resources with thousands of downloads [40][41]. Twinkl features seasonal coloring as core preschool materials [20][23]. Pinterest shows strong engagement with weather-themed coloring pages for preschoolers."
+      ],
+      "ageSweetSpot": "3-6 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Children experience weather daily and have strong emotional reactions to different weather conditions, making it personally relevant. Coloring weather scenes allows them to express their feelings about sunny days, rainy days, and snow days through color choices. The changing nature of seasons provides variety and connection to the passage of time in their lives.",
+      "whyParentsBuyIt": "Parents appreciate weather and seasonal coloring books because they directly connect to children's everyday experiences and natural curiosity. These books serve as conversation starters about science concepts and provide opportunities to discuss appropriate clothing and safety for different weather. The seasonal nature means parents can purchase themed bundles throughout the year, making them recurring purchases.",
+      "occasionFit": [
+        "seasonal activity",
+        "weather discussion",
+        "holiday preparation"
+      ]
+    },
+    {
+      "theme": "Fairy Tales and Nursery Rhymes",
+      "evidence": [
+        "1. Amazon US features 'Fairy Tale Coloring Book with Stickers' by Crayola as a popular option for keeping 'young colorists entertained for hours' with scenes from 'Little Red Riding Hood, Jack and the Beanstalk' and more [46].",
+        "2. Etsy search shows numerous fairy tale coloring book bundles as bestsellers [6][68]. Teachers Pay Teachers has extensive fairy tale coloring resources that are standard in early childhood education [19][42]. Monday Mandala offers free fairy tale coloring pages that receive significant downloads [42]."
+      ],
+      "ageSweetSpot": "4-7 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "moderate",
+      "whyKidsLoveIt": "Children are drawn to the familiar stories and characters they've heard in books or seen in media, creating a sense of connection and security. Coloring fairy tale scenes allows them to participate in the narrative and imagine alternative endings or perspectives. The dramatic elements of these stories (wolves, castles, witches) provide exciting coloring opportunities that spark imagination.",
+      "whyParentsBuyIt": "Parents value fairy tale coloring books because they reinforce literary exposure and cultural knowledge while providing creative play. These books often contain moral lessons that parents can discuss with children during coloring sessions. The familiar nature of these stories makes them reliable for keeping children engaged, and they're gender-neutral enough to appeal to all children.",
+      "occasionFit": ["bedtime activity", "rainy day", "literacy development"]
+    },
+    {
+      "theme": "Food and Desserts",
+      "evidence": [
+        "1. Amazon features specific dessert-themed coloring books, and Etsy shows '150 Christmas Coloring Pages for Kids and Adults' with dessert elements among top sellers [6][38].",
+        "2. Teachers Pay Teachers has numerous food coloring resources that are popular in early education [34][38]. Pinterest shows strong engagement with dessert coloring pages for young children. Monkey Pen offers free dessert coloring pages that receive significant downloads [38]."
+      ],
+      "ageSweetSpot": "4-7 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "open",
+      "whyKidsLoveIt": "Children have strong positive associations with food, especially sweet treats, making dessert coloring particularly appealing. Coloring familiar foods allows them to engage with items they enjoy eating while exercising creativity in imagining new flavors and presentations. The bright colors of fruits and desserts provide satisfying visual results that boost confidence in their artistic abilities.",
+      "whyParentsBuyIt": "Parents appreciate that food coloring books can be used to discuss healthy eating habits and food groups in a non-confrontational way. These books often lead to related activities like cooking or grocery shopping discussions. The gender-neutral appeal and universal relevance of food make these books versatile purchases that work for all children.",
+      "occasionFit": ["rainy day", "cooking activity", "birthday celebration"]
+    },
+    {
+      "theme": "Monsters and Aliens",
+      "evidence": [
+        "1. Amazon US lists 'Monster Truck Coloring Book' as a consistent bestseller [28]. Etsy search shows 'Monster Coloring Pages' as a popular category with numerous bestsellers [58][62].",
+        "2. Teachers Pay Teachers features monster-themed coloring pages as popular resources for early childhood education [28][58]. Homemade-Gifts-Made-Easy offers free monster coloring pages that receive significant engagement from parents [58]."
+      ],
+      "ageSweetSpot": "4-7 years",
+      "genderLean": "boy-skewing",
+      "competitiveDensity": "moderate",
+      "whyKidsLoveIt": "Monsters represent controlled fear that children can explore safely through coloring, transforming something potentially scary into a friendly or funny character. The imaginative nature of monsters allows for creative color choices without realism constraints, encouraging bold experimentation. Children enjoy the power fantasy of creating their own monsters with unique features and abilities.",
+      "whyParentsBuyIt": "Parents appreciate that monster coloring books help children process fears in a safe context while encouraging creativity. These books often incorporate humor that makes potentially scary themes approachable. While slightly more boy-skewed, modern monster designs have become more gender-inclusive, making them acceptable purchases for all children.",
+      "occasionFit": ["Halloween", "rainy day", "imaginative play"]
+    },
+    {
+      "theme": "Sports",
+      "evidence": [
+        "1. Amazon features 'Crayola Sports Coloring Pages' as a popular category, with specific sports themes ranking well [44].",
+        "2. Etsy search shows sports-themed coloring pages among popular bundles for boys [48]. Teachers Pay Teachers has numerous sports coloring resources that are frequently downloaded by educators [19][48]. Crayola offers free printable sports coloring pages that receive significant engagement [44]."
+      ],
+      "ageSweetSpot": "5-8 years",
+      "genderLean": "boy-skewing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Children who participate in or watch sports enjoy representing their favorite activities through coloring, creating a connection to real-world experiences. The action-oriented nature of sports scenes provides dynamic coloring opportunities with players in motion. Team affiliations and favorite athletes give children personal investment in the coloring subjects.",
+      "whyParentsBuyIt": "Parents value sports coloring books for promoting physical activity interest and healthy competition values. These books often lead to discussions about teamwork, fair play, and sportsmanship. While more boy-skewed, many parents appreciate that sports coloring can encourage girls' interest in athletics as well.",
+      "occasionFit": ["after practice", "sports season", "rainy day"]
+    },
+    {
+      "theme": "Alphabet and Numbers",
+      "evidence": [
+        "1. Amazon US features 'Alphabet and Numbers Coloring Pages' as part of HP’s free printable resources [45]. Etsy search shows numerous alphabet-themed coloring pages as bestsellers [6][41].",
+        "2. Teachers Pay Teachers has extensive alphabet and number coloring resources that are standard in preschool curricula [19][41]. Crayola offers free alphabet coloring pages with letter formation practice that are highly popular [41]."
+      ],
+      "ageSweetSpot": "3-5 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Children enjoy the satisfaction of recognizing letters and numbers they're learning, with coloring providing a multisensory reinforcement of these concepts. The structured nature of alphabet and number pages gives them clear boundaries that build confidence in their coloring abilities. Many children take pride in coloring their own name or age, creating personal connections to the pages.",
+      "whyParentsBuyIt": "Parents highly value alphabet and number coloring books because they directly support early literacy and numeracy development in an engaging format. These books provide measurable learning outcomes that make screen-free time feel productive. The educational component justifies the purchase as more than just entertainment, and the gender-neutral nature makes them suitable for all children.",
+      "occasionFit": [
+        "learning activity",
+        "pre-school preparation",
+        "daily practice"
+      ]
+    },
+    {
+      "theme": "Animals and Pets",
+      "evidence": [
+        "1. Amazon US features 'Animals, Vehicles & Food Themes' coloring book bundle as a value-packed bestseller [25]. YouTube analysis specifically mentions 'animals' as part of the massive demand for kids' coloring books [28].",
+        "2. Etsy search shows numerous animal-themed coloring pages as bestsellers across multiple shops [6][25]. Teachers Pay Teachers has extensive animal coloring resources that are standard in early childhood education [19][39]."
+      ],
+      "ageSweetSpot": "3-6 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Children have natural curiosity about animals, whether pets they know or wild creatures they see in books. Coloring animals allows them to explore different textures, patterns, and colors found in the animal kingdom. The emotional connection children feel with animals makes these coloring experiences personally meaningful and often leads to storytelling during the activity.",
+      "whyParentsBuyIt": "Parents appreciate animal coloring books for teaching about biodiversity, habitats, and caring for living things. These books often lead to related activities like zoo visits or nature walks that extend learning. The universal appeal of animals makes these books reliable purchases that work for all children regardless of gender preferences.",
+      "occasionFit": ["rainy day", "zoo visit preparation", "pets discussion"]
+    },
+    {
+      "theme": "Holiday-Specific Themes",
+      "evidence": [
+        "1. Amazon features seasonal coloring books prominently, with specific holiday themes like 'Christmas Coloring' ranking highly [27][31]. YouTube analysis mentions holiday themes as part of the massive demand for kids' coloring books [28].",
+        "2. Etsy search shows holiday-themed coloring pages among the most popular bundles, particularly for Christmas and Halloween [6][31]. Teachers Pay Teachers has holiday-specific coloring resources that are standard seasonal materials for educators [19][39]. Twinkl features holiday coloring as part of their preschool curriculum materials [20]."
+      ],
+      "ageSweetSpot": "3-7 years",
+      "genderLean": "broadly-appealing",
+      "competitiveDensity": "saturated",
+      "whyKidsLoveIt": "Children associate holidays with excitement, special foods, and family traditions, making holiday-themed coloring personally relevant and emotionally engaging. Coloring holiday scenes allows them to participate in the celebration even before the actual event, building anticipation. The familiar symbols of each holiday (turkeys for Thanksgiving, eggs for Easter) provide recognizable forms that build confidence in their coloring abilities.",
+      "whyParentsBuyIt": "Parents purchase holiday-themed coloring books to build anticipation for upcoming celebrations and extend holiday activities beyond the main event. These books serve as appropriate party favors or quiet activities during busy holiday preparations. The time-limited nature of holidays creates recurring purchasing opportunities throughout the year as parents prepare for each celebration.",
+      "occasionFit": ["holiday preparation", "party favor", "seasonal activity"]
+    }
+  ],
+  "ccBundleProposals": [
+    {
+      "ccBundleName": "Dino Dance Party",
+      "primaryTheme": "Dinosaurs",
+      "ccTagline": "Roaring dinosaurs showing off their best dance moves for kids who love to move",
+      "ageSweetSpot": "3-6 years",
+      "ccPageCount": 10,
+      "ccTwist": "Each page features a progression from simple shapes to complex dance poses, with Colo appearing as a tiny DJ dinosaur on pages 1 and 10, and includes a story arc of dinosaurs preparing for and enjoying a dance party from afternoon to night",
+      "ccPagePrompts": [
+        "A T-rex in a chef's hat sliding pizza dough across a giant kitchen counter while baby raptors steal toppings",
+        "A stegosaurus breaking into an energetic dance routine at a dinosaur disco with glowing lava lamps",
+        "A velociraptor showing off breakdancing skills on a prehistoric skateboard ramp",
+        "A baby triceratops practicing dance moves with balloons tied to its horns",
+        "A pterodactyl flying through a rainbow while holding disco balls in its claws",
+        "A brachiosaurus stretching its long neck to reach the highest dance trophy on a shelf",
+        "A dino band playing rock music with instruments made from bones and rocks",
+        "A group of tiny dinosaurs having a conga line around a volcano that's gently erupting colorful confetti",
+        "A shy ankylosaurus finally joining the dance party with glow-in-the-dark stickers already on its shell",
+        "A T-rex and triceratops doing a friendship dance under a moonlit prehistoric sky"
+      ],
+      "whyItWorks": "Combines the ever-popular dinosaur theme with movement that appeals to active children while providing parents with a creative alternative to typical dinosaur coloring books that often focus on roaring or eating."
+    },
+    {
+      "ccBundleName": "Unicorn Rainbow Rally",
+      "primaryTheme": "Unicorns",
+      "ccTagline": "Magical unicorns racing through colorful skies to collect rainbow treasures",
+      "ageSweetSpot": "4-7 years",
+      "ccPageCount": 10,
+      "ccTwist": "Features a narrative journey where unicorns collect different colors of the rainbow, with Colo appearing as a tiny rainbow guide on pages 3 and 8, and complexity increases from simple cloud shapes to detailed rainbow landscapes",
+      "ccPagePrompts": [
+        "A baby unicorn sliding down a rainbow waterslide with sparkling water made of glitter",
+        "Two unicorns having a race through cotton candy clouds with jellybean obstacles",
+        "A unicorn using its magical horn to turn gray rain clouds into colorful rain showers",
+        "A unicorn helping a lost star find its way back to the night sky with a trail of glowing hoof prints",
+        "A group of unicorns building a rainbow bridge across a chocolate river in the sky",
+        "A unicorn with butterfly wings collecting sparkling dewdrops that turn into gemstones",
+        "A shy unicorn discovering its special color-changing ability when helping friends",
+        "A unicorn fashion show in the clouds with outfits made of different colored light",
+        "A unicorn using its magic to create a surprise birthday party for a friend with floating presents",
+        "A team of unicorns working together to create the most magnificent rainbow the world has ever seen"
+      ],
+      "whyItWorks": "Takes the popular unicorn theme beyond static princess scenes into active adventure that encourages storytelling, while giving parents an educational opportunity to discuss colors and cooperation."
+    },
+    {
+      "ccBundleName": "Superhero Vehicle Squad",
+      "primaryTheme": "Vehicles",
+      "ccTagline": "Everyday vehicles with special powers saving the day in colorful city adventures",
+      "ageSweetSpot": "4-7 years",
+      "ccPageCount": 10,
+      "ccTwist": "Each vehicle has a unique superpower revealed across the story arc from morning to night, with Colo appearing as a superhero sidekick crayon on pages 2 and 9, and pages progress from simple vehicle shapes to complex action scenes",
+      "ccPagePrompts": [
+        "A fire truck with extendable ladder arms rescuing kittens from a tree while spraying rainbow water",
+        "A school bus with rocket boosters taking kids on a field trip to the moon",
+        "A police car with super speed chasing down runaway balloons before they float away",
+        "A construction truck with giant magnet hands building a castle out of colorful blocks",
+        "An ambulance with healing lights helping injured teddy bears at a stuffed animal hospital",
+        "A garbage truck with recycling powers turning trash into colorful playground equipment",
+        "A delivery van with invisibility cloaking delivering surprise presents to all the houses on the street",
+        "A ice cream truck with flavor-changing powers making everyone's favorite treat appear with a honk",
+        "A submarine with glowing lights exploring a city made of coral and sea creatures",
+        "All the vehicles working together to create a magnificent fireworks display for the whole town"
+      ],
+      "whyItWorks": "Transcends basic vehicle coloring by adding imaginative superhero elements that spark creativity while addressing parents' desire for stories with positive messages about helping others."
+    },
+    {
+      "ccBundleName": "Space Adventure Crew",
+      "primaryTheme": "Space",
+      "ccTagline": "Friendly astronauts exploring colorful galaxies with amazing space discoveries",
+      "ageSweetSpot": "5-8 years",
+      "ccPageCount": 10,
+      "ccTwist": "Follows a narrative of space exploration from leaving Earth to discovering new planets, with Colo appearing as a space explorer crayon on pages 4 and 7, and complexity increases from simple rocket shapes to detailed space environments",
+      "ccPagePrompts": [
+        "A rocket ship blasting off with colorful smoke trails that form smiling faces in the sky",
+        "Astronauts bouncing in zero gravity while trying to catch floating cookies and juice boxes",
+        "A space rover discovering friendly alien plants that change color when touched",
+        "Astronauts building a snowman on Mars using red sand and glittery ice crystals",
+        "A spaceship navigating through an asteroid field made of giant colorful candy pieces",
+        "Astronauts having a space picnic on a floating island with views of multiple planets",
+        "A space telescope revealing hidden galaxies shaped like animals in the night sky",
+        "Astronauts teaching alien friends how to play Earth games with space-themed twists",
+        "A spaceship caught in a friendly space whale's bubble bath of sparkling stardust",
+        "Astronauts planting a garden on a new planet with flowers that glow in the dark"
+      ],
+      "whyItWorks": "Makes space exploration tangible and friendly for young children while providing parents with educational opportunities to discuss science concepts in an engaging way."
+    },
+    {
+      "ccBundleName": "Ocean Rescue Team",
+      "primaryTheme": "Ocean",
+      "ccTagline": "Sea creatures working together to clean and protect their colorful underwater home",
+      "ageSweetSpot": "4-7 years",
+      "ccPageCount": 10,
+      "ccTwist": "Features a conservation-themed story of ocean creatures helping each other, with Colo appearing as a diving crayon on pages 1 and 10, and pages progress from simple sea creatures to complex underwater ecosystems",
+      "ccPagePrompts": [
+        "A friendly octopus using its eight arms to clean up ocean trash while singing a song",
+        "A turtle with a shell decorated like a treasure map leading friends to hidden coral gardens",
+        "Dolphins creating rainbow water fountains that refresh the entire ocean",
+        "A crab building a castle out of seashells to provide homes for tiny fish friends",
+        "A whale spouting water that turns into floating bubbles containing sea creature messages",
+        "A group of fish forming colorful patterns to communicate with creatures across the ocean",
+        "A stingray using its wings to fan away pollution and reveal beautiful underwater gardens",
+        "A mermaid sharing stories of the ocean's past with younger sea creatures",
+        "A seal balancing multiple beach balls on its nose while teaching friends to play",
+        "All the ocean creatures working together to create a magnificent underwater celebration"
+      ],
+      "whyItWorks": "Combines ocean fascination with gentle environmental messaging that parents appreciate, while keeping the focus on fun, colorful action that children love."
+    },
+    {
+      "ccBundleName": "Butterfly Garden Adventure",
+      "primaryTheme": "Insects and Bugs",
+      "ccTagline": "Magical caterpillars transforming into amazing butterflies on a colorful journey",
+      "ageSweetSpot": "3-6 years",
+      "ccPageCount": 10,
+      "ccTwist": "Follows the life cycle of butterflies with a magical twist, with Colo appearing as a garden friend on pages 3 and 8, and complexity increases from simple caterpillar shapes to detailed butterfly wing patterns",
+      "ccPagePrompts": [
+        "A caterpillar wearing tiny roller skates racing through a garden of giant flowers",
+        "A group of caterpillars having a picnic on a leaf with dewdrop drinks and pollen cookies",
+        "A shy caterpillar discovering its special ability to change colors like a chameleon",
+        "Caterpillars building a cocoon castle out of silk and flower petals",
+        "A magical transformation moment with swirling colors and sparkling light",
+        "A newly emerged butterfly testing its wings with jumps and small flights",
+        "Butterflies painting the sky with colorful wing dust that creates rainbows",
+        "A butterfly using its long tongue to rescue honey from a tricky flower",
+        "A group of butterflies creating a living kaleidoscope with their wing patterns",
+        "Butterflies hosting a garden party for all the insects with flower music and nectar treats"
+      ],
+      "whyItWorks": "Makes the educational aspect of insect life cycles engaging through magical transformation while providing parents with a positive message about growth and change."
+    },
+    {
+      "ccBundleName": "Weather Wonders Expedition",
+      "primaryTheme": "Weather and Seasons",
+      "ccTagline": "Friendly cloud characters creating amazing weather adventures for curious kids",
+      "ageSweetSpot": "3-6 years",
+      "ccPageCount": 10,
+      "ccTwist": "Personifies weather elements as friendly characters on a journey through different weather conditions, with Colo appearing as a weather reporter crayon on pages 2 and 9, and pages progress from simple weather symbols to detailed weather scenes",
+      "ccPagePrompts": [
+        "A raincloud having a tea party with sunbeams while gentle rain falls on growing flowers",
+        "Snowflakes arranging themselves into intricate patterns before landing on the ground",
+        "A rainbow bridge connecting two mountains with friendly creatures traveling across it",
+        "A wind spirit playing with kites and leaves in a colorful autumn park",
+        "A thundercloud putting on a light show with lightning shaped like animals",
+        "A sunny day character spreading warm rays that make flowers bloom instantly",
+        "A fog bank slowly revealing hidden treasures as it drifts through a forest",
+        "A hailstorm creating a temporary ice sculpture garden that sparkles in the sun",
+        "A tornado gently collecting lost items and returning them to their owners",
+        "All weather characters working together to create the perfect day for a birthday party"
+      ],
+      "whyItWorks": "Transforms weather education into friendly character adventures that children can relate to, while giving parents tools to discuss weather safety and science in a positive way."
+    },
+    {
+      "ccBundleName": "Fairy Tale Fix-It Crew",
+      "primaryTheme": "Fairy Tales and Nursery Rhymes",
+      "ccTagline": "Creative kids solving classic story problems with colorful imagination",
+      "ageSweetSpot": "4-7 years",
+      "ccPageCount": 10,
+      "ccTwist": "Reimagines classic fairy tales with child protagonists solving problems, with Colo appearing as a storybook friend on pages 5 and 10, and complexity increases from simple story elements to detailed narrative scenes",
+      "ccPagePrompts": [
+        "Kids building a better ladder for Rapunzel using colorful construction toys instead of hair",
+        "A group of children creating a safe path for Little Red Riding Hood to visit Grandma",
+        "Fixing Humpty Dumpty with colorful bandages and a special healing hug",
+        "Building a sturdy house for the Three Little Pigs using creative recycled materials",
+        "Creating a friendly solution for the Three Billy Goats Gruff to cross the bridge",
+        "Designing a special basket for Little Red Riding Hood that keeps cookies fresh",
+        "Helping Jack plant magical beans that grow into a safe playground instead of a giant's castle",
+        "Creating a comfortable bed for the Princess and the Pea using soft clouds and rainbow blankets",
+        "Building a fast car for the Tortoise so he can race the Hare on equal terms",
+        "Kids throwing a friendship party where all the fairy tale characters resolve their problems together"
+      ],
+      "whyItWorks": "Takes familiar stories in new directions that empower children while providing parents with opportunities to discuss problem-solving and creative thinking."
+    },
+    {
+      "ccBundleName": "Dessert Island Adventure",
+      "primaryTheme": "Food and Desserts",
+      "ccTagline": "Colorful characters exploring a magical island made entirely of sweet treats",
+      "ageSweetSpot": "4-7 years",
+      "ccPageCount": 10,
+      "ccTwist": "Features a narrative journey across different dessert landscapes, with Colo appearing as a chef crayon on pages 1 and 10, and complexity increases from simple food shapes to detailed dessert environments",
+      "ccPagePrompts": [
+        "A chocolate river flowing through a candy cane forest with gumdrop stepping stones",
+        "A mountain of ice cream with rainbow sprinkles that changes flavor with each scoop",
+        "A cookie bridge connecting two gingerbread houses with candy window decorations",
+        "A cotton candy cloud factory where characters make fluffy clouds from sugar",
+        "A lollipop forest with colorful swirled trees that play music when wind blows",
+        "A jellybean pond where friendly fish made of gummy bears swim",
+        "A cake castle with frosting walls and candy cane towers protected by chocolate guards",
+        "A popcorn waterfall creating fluffy white clouds that taste like butter",
+        "A marshmallow beach with chocolate sand and gummy worm seashells",
+        "A grand dessert feast where all the food characters celebrate with a colorful dance party"
+      ],
+      "whyItWorks": "Combines food fascination with imaginative play that children love, while providing parents with a non-confrontational way to discuss moderation and healthy eating habits."
+    },
+    {
+      "ccBundleName": "Monster Friends Playdate",
+      "primaryTheme": "Monsters and Aliens",
+      "ccTagline": "Friendly monsters having fun adventures that show being different is wonderful",
+      "ageSweetSpot": "4-7 years",
+      "ccPageCount": 10,
+      "ccTwist": "Portrays monsters as friendly characters engaging in everyday activities with a twist, with Colo appearing as a monster friend on pages 3 and 8, and pages progress from simple monster shapes to detailed play scenarios",
+      "ccPagePrompts": [
+        "A three-eyed monster having trouble brushing all their teeth with a giant toothbrush",
+        "Monsters playing tag in a field of giant glowing mushrooms",
+        "A shy monster sharing their special sparkly slime with new friends",
+        "Building a blanket fort that's extra strong for monsters with multiple arms",
+        "A monster with tentacle hair trying to get it styled at a space salon",
+        "Monsters having a picnic with galaxy sandwiches and starfruit juice",
+        "A monster race where everyone wins because they help each other across the finish line",
+        "A monster movie night with glow-in-the-dark snacks and cosmic popcorn",
+        "Monsters creating a symphony using sounds from their unique features",
+        "A group of monsters throwing a welcome party for a new friend with all their favorite activities"
+      ],
+      "whyItWorks": "Uses the monster theme to subtly address diversity and inclusion in a way children understand, while providing parents with opportunities to discuss acceptance and friendship."
+    }
+  ],
+  "marketIntelligence": "Existing children's coloring books reveal clear price and page-count expectations that must be considered for the £4.99 price point. Amazon data shows that for kids' coloring books, parents expect 30-40 pages at $5.99-$6.99, 50 pages at $6.99-$7.99, and 70+ pages at $7.99-$8.99 [49][53]. This creates a challenge for a 10-page digital bundle at £4.99, as it appears to have fewer pages than physical books. However, digital bundles compensate with instant access, reusability, and online coloring features that physical books lack. The lower page count makes sense for digital given the 'impulse purchase' nature of digital products and the fact that children may color the same pages multiple times using different tools [66][67].\n\nRecurring parent complaints about existing kids' coloring books focus on multiple pain points: paper quality that bleeds through with markers [57], designs that are either too simple for older children or too complex for younger ones within the same book [52], lack of educational content that justifies the purchase beyond entertainment [61], and themes that reinforce limiting gender stereotypes [64]. Parents frequently express frustration that free printables often lack the quality and uniqueness of paid options, creating hesitation about whether to pay for something they could get for free [6][51]. The most common complaint appears to be the mismatch between age ranges and actual content difficulty, with books labeled for 'ages 3-8' containing images too complex for the younger end of that spectrum [57][61].\n\nTeachers and nurseries primarily print coloring pages that serve clear educational purposes, particularly those that reinforce curriculum objectives like alphabet recognition, number practice, seasonal themes, or social-emotional learning [19][21][40]. Seasonal and holiday-themed coloring pages see the highest usage as they align with classroom themes [20][21]. Teachers prefer single-page printables that can be easily incorporated into lesson plans rather than full coloring books, and they prioritize clean, simple designs with clear outlines that young children can color successfully [21][40]. Preschool teachers specifically look for coloring pages with large, simple shapes and minimal detail that match the fine motor skills of 3-5 year olds [57]. The most frequently printed coloring pages relate to current classroom themes, particularly animals, weather, community helpers, and basic shapes [21].\n\nA sellable £4.99 bundle must overcome the 'free printable' barrier by offering unique value that free options don't provide. Successful paid bundles distinguish themselves through a cohesive story arc that engages children beyond single pages, professionally designed illustrations with consistent quality, and special features like online coloring functionality that adds reusability [65][66]. Bundles that offer age-appropriate complexity progression (starting simple and becoming more detailed) address the common complaint about mismatched difficulty levels [57][61]. The inclusion of diverse characters without making diversity the main theme creates inclusive content that parents appreciate without feeling lectured [64][65]. Most importantly, successful bundles solve specific parent pain points: providing quiet time during busy moments, supporting educational goals, or fitting particular occasions like birthdays or holidays [67]. The online + print functionality must be positioned as a key benefit - allowing children to color the same pages multiple times digitally while still having the option for physical coloring.",
+  "launchLineup": {
+    "tightenedAt": "2026-05-05",
+    "notes": "Hand-tightened launch set of 5. Pipeline auto-wraps these with GPT_IMAGE_STYLE_BLOCK ('coloring book page, clean line art, thick black outlines, 5-7 colorable areas, closed contours'), so prompts here describe the SCENE only — subject, action, setting, mood. Each bundle has a story arc and complexity ramp (page 1 simplest, page 10 most detailed) to address the #1 parent complaint about ages 3-8 books being mismatched in difficulty. Colo cameos kept minimal so prompts read as scenes, not mascot ads.",
+    "bundles": [
+      {
+        "ccBundleName": "Dino Dance Party",
+        "primaryTheme": "Dinosaurs",
+        "ccTagline": "Stomping, spinning, roaring dinosaurs throwing the silliest dance party",
+        "ageSweetSpot": "3-6 years",
+        "ccPageCount": 10,
+        "storyArc": "A T-rex finds a giant boombox in a jungle clearing → invites friends → party builds through the day → ends under the stars",
+        "complexityRamp": "Page 1 single big dinosaur centered. Pages 2-5 add 1-2 friends. Pages 6-9 build the party scene. Page 10 the full crew under a starry sky.",
+        "ccPagePrompts": [
+          "A friendly cartoon T-rex with tiny arms standing in a jungle clearing, wearing oversized headphones, mouth wide open in a happy roar, palm trees behind",
+          "A stegosaurus shaking its tail-spikes to the beat on a flat rock stage, plates wiggling, baby pterodactyls clapping in the sky",
+          "A cheeky velociraptor breakdancing on its claws, one foot spinning, palm leaves and bananas flying around it",
+          "A baby triceratops standing on its hind legs, balloons tied to its three horns, big smile, jungle flowers around its feet",
+          "A long-necked brachiosaurus stretching up to grab a glittering disco ball hanging from a vine, neck curved into an S-shape",
+          "A pterodactyl swooping through a rainbow with a trail of sparkles, holding a microphone in one claw, clouds shaped like music notes",
+          "A dinosaur band playing instruments made of bones and rocks: a drum-bone kit, a guitar made from a giant rib, an ankylosaurus on horn",
+          "A conga line of small dinosaurs winding around a friendly volcano that puffs out heart-shaped smoke clouds and confetti",
+          "A shy ankylosaurus finally joining the dance, glow-stick stickers all over its armored back, friends cheering around it",
+          "The whole dinosaur crew posing together under a starry prehistoric sky, Colo the crayon spinning records as DJ on a tall rock"
+        ],
+        "whyItWorks": "Dinos are the #1 saturated bestseller for boys 3-6, but every existing book is roar-eat-stomp. 'Dance party' is silly, action-packed, and gives a 10-page story arc no static dino book offers."
+      },
+      {
+        "ccBundleName": "Unicorn Rainbow Rally",
+        "primaryTheme": "Unicorns",
+        "ccTagline": "A wild unicorn race across the sky to bring back the missing rainbow colors",
+        "ageSweetSpot": "4-7 years",
+        "ccPageCount": 10,
+        "storyArc": "The rainbow has lost its colors → unicorns race across the sky to find each color → final spread is the restored rainbow",
+        "complexityRamp": "Page 1 a single baby unicorn. Pages 2-7 each add a color and a new sky landscape. Pages 8-10 build the full team and finale.",
+        "ccPagePrompts": [
+          "A baby unicorn with a fluffy mane and a swirly horn, standing on a cloud, looking up at a sky where the rainbow has gone all gray",
+          "A unicorn galloping fast across cotton-candy clouds, mane streaming behind it, the color RED glowing inside a floating bubble ahead",
+          "A unicorn sliding down a tall waterslide of bright orange juice, hooves up, water spraying everywhere, oranges floating in the splash",
+          "A unicorn with butterfly wings catching a yellow shooting star in its mane, sunflowers and bees around it on a fluffy hilltop",
+          "Two unicorns racing neck-and-neck through a leafy green forest in the sky, jellybean obstacles bouncing under their hooves",
+          "A unicorn dipping its horn into a bright blue lake, dragonflies circling above, water lilies making a perfect ring around it",
+          "A unicorn floating through a deep purple night sky filled with planets and stars, mane sparkling, a tiny moon on its forehead",
+          "A unicorn with a pink mane catching the last color, a glowing pink heart, in its hooves while doing a cartwheel mid-air",
+          "All seven unicorns lined up on the edge of a giant cloud, each holding a color in a bubble, ready to release them at once",
+          "The full rainbow restored across the sky, all seven unicorns leaping over it together, Colo the crayon riding on the lead unicorn's back, cheering"
+        ],
+        "whyItWorks": "Unicorns are saturated for girls 4-7 but mostly static princess scenes. 'Rally' gives kinetic action, each page introduces a color (educational hook for parents), and the missing-rainbow quest pulls kids through all 10 pages."
+      },
+      {
+        "ccBundleName": "Superhero Vehicle Squad",
+        "primaryTheme": "Vehicles",
+        "ccTagline": "Everyday trucks with secret superpowers saving the town one block at a time",
+        "ageSweetSpot": "4-7 years",
+        "ccPageCount": 10,
+        "storyArc": "Morning in the town → emergency strikes → each vehicle uses its secret power to help → the squad celebrates as the sun sets",
+        "complexityRamp": "Page 1 single vehicle, simple street. Pages 2-8 add action and townscape detail. Pages 9-10 are full squad scenes.",
+        "ccPagePrompts": [
+          "A friendly fire truck with a big smile on its grille, parked in front of a small town fire station, sun rising behind it, ready to start the day",
+          "A school bus with rocket boosters firing out the back, kids' faces in every window cheering, lifting off a grassy field, books flying happily inside",
+          "A cheerful police car using a giant magnet on its roof to pull a runaway bunch of balloons back down to a crying child",
+          "A construction digger with extending stretchy arms scooping up colorful blocks and stacking them into a wobbly castle on a building site",
+          "An ambulance shining gentle healing lights over a row of injured teddy bears tucked into tiny beds outside a stuffed-animal hospital",
+          "A garbage truck with sparkle vents, swallowing trash and shooting out a fresh new colorful slide that lands gently in a playground",
+          "A delivery van going invisible (just outline of dotted lines) leaving a wrapped present on every doorstep down a long suburban street",
+          "An ice-cream truck honking, every kid on the block running out, three flavors floating in colorful clouds above the truck windows",
+          "A submarine with bright headlights gliding through an underwater city made of coral towers, jellyfish street lamps lighting the way",
+          "All the vehicle heroes parked together at sunset on a grassy hill, fireworks above them, Colo the crayon waving from the top of the fire truck ladder"
+        ],
+        "whyItWorks": "Vehicles are saturated for boys 3-6 but ours add a secret-power twist that lifts every page above generic 'fire truck on a road.' Strong gift potential, easy to imagine the bundle preview."
+      },
+      {
+        "ccBundleName": "Dessert Island Adventure",
+        "primaryTheme": "Food and Desserts",
+        "ccTagline": "An island made of cake, cookies, and candy waiting to be explored",
+        "ageSweetSpot": "4-7 years",
+        "ccPageCount": 10,
+        "storyArc": "A tiny boat lands on Dessert Island → kids and animal friends explore each landmark → discover the giant cake castle at the heart of the island → big feast finale",
+        "complexityRamp": "Page 1 the island shoreline, simple. Pages 2-8 each landmark gets richer. Pages 9-10 the castle and feast.",
+        "ccPagePrompts": [
+          "A small wooden boat with a sail shaped like an ice-cream cone landing on a beach made of marshmallows and chocolate sand, palm trees with cookies for leaves",
+          "A wide flowing chocolate river with gumdrop stepping stones, a curious bear cub dipping a paw in to taste, sprinkle-fish jumping out",
+          "A tall ice-cream-scoop mountain with rainbow sprinkles, three friends climbing it with little ropes, footprint scoops behind them",
+          "A cookie bridge stretching across a milk lake between two gingerbread houses, a fox in a chef's hat carrying a tray across",
+          "A lollipop forest with swirled-rainbow trees, a small girl spinning underneath, the whole forest jingling like wind chimes",
+          "A jellybean pond with gummy-bear fish leaping out, a frog catching one mid-air with its tongue, lily pads made of cookies",
+          "A tall cotton-candy cloud factory with friendly creatures cranking the machine, big fluffy pink and blue clouds drifting up out of the chimney",
+          "A popcorn waterfall pouring into a buttery valley below, kids in raincoats catching popcorn in baskets, a smiling sun shining above",
+          "A grand cake castle with frosting walls, candy-cane towers, and a chocolate-bar drawbridge being lowered, friends arriving on a sugar-cube path",
+          "A long feast table inside the cake castle, every food friend from the island sharing a giant celebration cake, Colo the crayon raising a tiny fork at the head of the table"
+        ],
+        "whyItWorks": "Food/dessert is the OPEN-whitespace bestseller theme — high kid demand, low competition. Pure visual fantasy, every prompt is a kid-magnet, no educational pretense to defend."
+      },
+      {
+        "ccBundleName": "Space Adventure Crew",
+        "primaryTheme": "Space",
+        "ccTagline": "Kids on a wild trip through the galaxy meeting friendly aliens and silly planets",
+        "ageSweetSpot": "5-8 years",
+        "ccPageCount": 10,
+        "storyArc": "Three kid astronauts blast off from Earth → visit a chain of strange planets → make alien friends → return home with a souvenir from each planet",
+        "complexityRamp": "Page 1 single rocket. Pages 2-9 each planet gets richer. Page 10 the return-home crew shot with all alien friends waving.",
+        "ccPagePrompts": [
+          "A chunky friendly rocket on a launchpad with three smiling kid astronauts waving from the windows, smoke clouds curling out the bottom shaped like cartoon faces",
+          "Three astronauts somersaulting in zero gravity inside their spaceship, cookies and juice boxes floating past them, a surprised cat-shaped helmet drifting by",
+          "A space rover crunching across a red planet, a friendly three-eyed alien plant tipping its leaves to wave, two moons in the sky behind",
+          "An astronaut building a snow alien on Mars from glittery red sand, scarf made of stars, alien snowballs piled neatly nearby",
+          "A spaceship dodging through an asteroid belt where every asteroid is a giant piece of candy, a swirly lollipop one nearly clipping the wing",
+          "Three astronauts having a picnic on a small floating island shaped like a hamburger, three different planets visible in the sky around them",
+          "A telescope on a dark hilltop showing galaxies shaped like animals: a kitten galaxy, a turtle galaxy, a giraffe galaxy, the kids leaning in to look",
+          "Astronauts teaching a group of friendly tentacled aliens how to play hopscotch on a chalk grid drawn in moondust, aliens hopping happily",
+          "A spaceship bobbing inside a giant friendly space-whale's bubble, the whale smiling, sparkles drifting around the ship like bath foam",
+          "The crew arriving back on Earth, alien friends waving from a rainbow portal in the sky, Colo the crayon sitting on top of the rocket holding a 'WELCOME HOME' sign"
+        ],
+        "whyItWorks": "Space is moderate-density and broadly appealing — good ratio of demand to crowding. Story-arc journey gives parents an educational hook (planets, telescope, gravity) without leaning preachy."
+      }
+    ]
+  },
+  "sources": [
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "ADdQ1XGKWWHHm0mC",
+      "url": "https://www.youtube.com/watch?v=NEOzjyZUcRI"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "EdyXdwiJlTa5OQVg",
+      "url": "https://www.youtube.com/watch?v=4eyw-GD77Vs"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "s5iPSmngUCgB4XRL",
+      "url": "https://www.readbrightly.com/must-have-books-for-3-year-olds/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "PedlaXvjGKGAgCo9",
+      "url": "https://www.youtube.com/watch?v=hXv8kAJrqEM&vl=en-US"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "Zlb8pOz77hLEJc9w",
+      "url": "https://www.chroniclebooks.com/collections/ages-3-5"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "A2NoBcZvGGtLcDK8",
+      "url": "https://www.etsy.com/market/best_selling_kids_coloring_pages"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "FYkw09RxTS2dpo4T",
+      "url": "https://www.etsy.com/market/best_selling_colouring_books"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "46do6EABDHD0JEG1",
+      "url": "https://raspiee.com/blogs/news/coloring-book-trends-2025"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "YNsL6y2osKgdq2uk",
+      "url": "https://www.target.com/s/dinosaur+coloring"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "21rOzpqGYtPddBWt",
+      "url": "https://www.etsy.com/market/best_selling_coloring_page"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "98jPkcdYhOBpDIcC",
+      "url": "https://www.etsy.com/market/toddler_coloring"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "mwyRsl4Vvidp0H33",
+      "url": "https://www.etsy.com/market/best_selling_coloring_kids_books"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "6HARQrhFX4gi2pk3",
+      "url": "https://www.walmart.com/ip/Unicorn-Dinosaurs-Coloring-Books-Unicorn-Dinosaurs-Coloring-Books-Horse-Dinosaur-Activity-Book-Toddlers-Adult-Age-Childrens-Books-Animals-Kids-Ages-3/347471018"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "ryqJ25ATJ9P1uw4R",
+      "url": "https://colleamoi.com/blogue/6-fun-colouring-ideas-for-your-kids/?lang=en"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "WCMesBSoDc6e1zaq",
+      "url": "https://www.momjunction.com/articles/best-coloring-books-for-kids_00630139/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "68YSoosht37m3bpL",
+      "url": "https://www.scarymommy.com/coloring-book-for-new-parents"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "EDGfqd8CDQ5HRmM7",
+      "url": "https://newhorizonacademy.net/creative-coloring-activities-child-love/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "9Df0L8McXmaVeWvF",
+      "url": "http://www.momentsaday.com/colouring-books-with-positive-themes/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "TOQj1wifEcyCdZTr",
+      "url": "https://www.teacherspayteachers.com/browse/tpt-sellers/teacher-tools/lessons/elementary/art/coloring-pages"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "VulSuiLu3HJj0L39",
+      "url": "https://www.twinkl.com/collection/pre-k-coloring"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "0VLKi7ezXtQj3JsH",
+      "url": "https://www.revtrak.com/child-care/blog/preschool-themes"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "ZNbtIYy0YEz9OzEB",
+      "url": "https://www.teacherspayteachers.com/browse/art/coloring-pages?search=best+seller"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "14hS3HXOlnRuU5ec",
+      "url": "https://www.twinkl.com/resources/free-resources-parents/crafts-and-recipes-free-resources-parents/colouring-activities-free-resources-parents"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "i9gXgsIWS5F4EmCK",
+      "url": "https://www.preschool-plan-it.com/preschool-themes.html"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "Oyy9ZEzeqvFgk8GW",
+      "url": "https://www.etsy.com/nz/listing/4410743631/kids-coloring-book-bundle-110-printable"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "pe0lWM4qHP1j9uqU",
+      "url": "https://www.accio.com/business/coloring_books_trending"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "8KcDHfKhez7eepwl",
+      "url": "https://itskimmi.com/collections/seasonal-coloring-books"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "2EgywmIngRaqUfpo",
+      "url": "https://www.youtube.com/watch?v=syWL_bAd5ek"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "Zt9mBFXIyskm7rbb",
+      "url": "https://www.walmart.com/ip/Vehicles-Coloring-Book-Kids-Animals-Ages-4-8-Dinosaur-Cat-Bear-Tractor-Truck-Car-Construction-Vehicle-Boys-Girls-Kindergarten-Paperback/640452199"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "yXbh56YJw98Id9Oi",
+      "url": "https://www.etsy.com/listing/1779087250/mini-coloring-book-set-halloween"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "DqXV45o4fJVzdXZV",
+      "url": "https://www.youtube.com/watch?v=3-MhcWt0VMY"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "btLGQrUo7Ys1hPDK",
+      "url": "https://www.walmart.com/ip/space-coloring-book-kids-coloring-book-Featuring-full-page-drawings-planets-astronauts-spaceships-aliens-meteors-rockets-sun-moon-stars-more-Provides-9798652021023/794197142"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "rkWehFwQsYwtMZxi",
+      "url": "https://easydrawingguides.com/desserts-coloring-pages/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "iBx90mOB411rdWqM",
+      "url": "https://www.walmart.com/ip/Ocean-Life-Coloring-Book-Kids-Ocean-Kids-Coloring-Book-Sea-Creatures-life-Kids-Coloring-Book-Relaxation-Sea-Animals-Marine-Life-Best-Relaxing-Colorin/410158280"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "YrQAnYyndFamvxvH",
+      "url": "https://www.cutecoloringpagesforkids.com/weather-coloring-pages/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "OeSnVjaxHwHPuLIY",
+      "url": "https://www.interstellarseller.com/products/earth-and-space-coloring-book-for-adults-and-children-with-nasa-photos"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "r9SHA8XhWgLur0vh",
+      "url": "https://monkeypen.com/collections/sweet-dessert-coloring-pages-and-books"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "rSmhIDkGrHyms3TA",
+      "url": "https://www.teacherspayteachers.com/browse/free?search=ocean+coloring+book"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "g3D6scfapqiqAv7e",
+      "url": "https://www.teacherspayteachers.com/browse/free?search=weather+coloring+pages"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "ZMlJEXEB2rXnTvwF",
+      "url": "https://www.crayola.com/words-and-letters"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "ccv6m0za4qnnoKx0",
+      "url": "https://mondaymandala.com/fairy-tale-coloring-pages/"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "BFYpuqO5FsoERtdx",
+      "url": "https://www.walmart.com/ip/Coloring-Bugs-Insect-Coloring-Book-Toddlers-Kids-Ages-2-3-4-5-Featuring-Dragonflies-Bees-Butterflies-Ladybugs-Insects-Paperback-9798589848687/433831507"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "m6DToI7uCdBMX7Ap",
+      "url": "https://www.crayola.com/sports"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "SouaBGycGv1a0r4m",
+      "url": "https://printables.hp.com/au/en/printable/default/alphabet-numbers-colouring-pages-hp-james-gulliver-hancock"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "UcvAmusFYedBOgVg",
+      "url": "https://www.crayola.com/products/coloring-books-and-paper/fairy-tales-coloring-book-041080"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "KUmTRjwUwbjs3mCm",
+      "url": "https://www.etsy.com/listing/4354064738/bug-parade-coloring-book-for-kids"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "MdEKctlm6IUUgX0m",
+      "url": "https://www.homemade-gifts-made-easy.com/sports-coloring-pages.html"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "xbxNFD0uTHXULx7c",
+      "url": "https://www.kdpeasy.com/blog/kdp-coloring-book-pricing"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "0KAejGTLYvkoxRb4",
+      "url": "https://www.youtube.com/watch?v=H6S_bFUpo6s"
+    },
+    {
+      "type": "source",
+      "sourceType": "url",
+      "id": "1Jg7c3pN05kzO6qh",
+      "url": "https://www.youtube.com/watch?v=Tj_effBhnqw"
+    }
+  ]
+}
