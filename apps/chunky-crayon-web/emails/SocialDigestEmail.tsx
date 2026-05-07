@@ -59,6 +59,19 @@ type SocialDigestEmailProps = {
      */
     entries?: SocialDigestEntry[];
   };
+  // Weekly 4-panel comic strip — Sunday-only. Optional; section omitted
+  // if no strip exists in the past 7 days.
+  comicStrip?: {
+    id: string;
+    title: string;
+    theme: string;
+    assembledUrl?: string;
+    panel1Url?: string;
+    panel2Url?: string;
+    panel3Url?: string;
+    panel4Url?: string;
+    entries?: SocialDigestEntry[];
+  };
   timestamp: string;
 };
 
@@ -78,6 +91,7 @@ const SocialDigestEmail = ({
   demoReelCoverUrl,
   demoReelEntries = [],
   contentReel,
+  comicStrip,
   timestamp = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -290,6 +304,88 @@ const SocialDigestEmail = ({
                 listed. */}
             {contentReel.entries?.map((entry, index) => (
               <Section key={`content-reel-${index}`} style={platformCard}>
+                <Text style={platformHeader}>
+                  <span style={platformName}>{entry.platform}</span>
+                  <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
+                    {entry.willAutoPost ? 'auto-posting' : 'manual'}
+                  </span>
+                </Text>
+                <Text style={assetTypeText}>
+                  Asset: {entry.assetType}
+                  {entry.willAutoPost && entry.scheduledTimeUtc
+                    ? ` · scheduled ${entry.scheduledTimeUtc} UTC`
+                    : ''}
+                </Text>
+                <Text style={captionBlock}>{entry.caption}</Text>
+              </Section>
+            ))}
+          </>
+        )}
+
+        {/* ── Section 4: Comic strip — this week's 4-panel comic ── */}
+        {comicStrip && (
+          <>
+            <Hr style={hr} />
+            <Section style={infoSection}>
+              <Heading as="h2" style={sectionTitle}>
+                🎨 This Week&apos;s Comic Strip
+              </Heading>
+              <Text style={paragraph}>
+                <strong>{comicStrip.title}</strong> ·{' '}
+                {comicStrip.theme.toLowerCase().replace(/_/g, ' ')}
+              </Text>
+              {comicStrip.assembledUrl && (
+                <Img
+                  src={comicStrip.assembledUrl}
+                  alt={comicStrip.title}
+                  width="552"
+                  style={{
+                    width: '100%',
+                    maxWidth: '552px',
+                    height: 'auto',
+                    borderRadius: '12px',
+                    margin: '12px 0',
+                  }}
+                />
+              )}
+              <Section style={assetSection}>
+                {comicStrip.assembledUrl && (
+                  <Text style={paragraph}>
+                    🖼️ Strip (assembled 2x2):{' '}
+                    <Link href={comicStrip.assembledUrl} style={inlineLink}>
+                      Download strip.png
+                    </Link>
+                  </Text>
+                )}
+                {comicStrip.panel1Url && (
+                  <Text style={paragraph}>
+                    🎬 Individual panels (TikTok carousel):{' '}
+                    {[
+                      comicStrip.panel1Url,
+                      comicStrip.panel2Url,
+                      comicStrip.panel3Url,
+                      comicStrip.panel4Url,
+                    ]
+                      .filter((u): u is string => !!u)
+                      .map((url, idx) => (
+                        <span key={url}>
+                          <Link href={url} style={inlineLink}>
+                            Panel {idx + 1}
+                          </Link>
+                          {idx < 3 ? ' · ' : ''}
+                        </span>
+                      ))}
+                  </Text>
+                )}
+              </Section>
+            </Section>
+
+            {/* Per-platform breakdown — IG/FB/Pinterest auto-fire Sunday
+                afternoon (only on Sunday — the brief still shows them on
+                other days for reference). TikTok is always manual: post
+                the panels as a carousel via the TikTok app. */}
+            {comicStrip.entries?.map((entry, index) => (
+              <Section key={`comic-strip-${index}`} style={platformCard}>
                 <Text style={platformHeader}>
                   <span style={platformName}>{entry.platform}</span>
                   <span style={entry.willAutoPost ? badgeAuto : badgeManual}>

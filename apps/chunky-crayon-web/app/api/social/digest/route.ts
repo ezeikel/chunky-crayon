@@ -16,6 +16,7 @@ import {
 } from '@/lib/content-reel/captions';
 import { sendSocialDigest, sendAdminAlert } from '@/app/actions/email';
 import type { SocialDigestEntry } from '@/app/actions/email';
+import { buildComicStripCaption } from '@/lib/comic-strip/captions';
 
 // Today's blog post — fetched separately from Sanity since the brief
 // fires AFTER the blog cron (06:00 UTC) but the row sits in Sanity, not
@@ -180,10 +181,25 @@ export const GET = async (request: Request) => {
       orderBy: { postedAt: 'desc' },
     });
 
-    // Comic strip section temporarily disabled — depends on parallel-
-    // session work (ComicStrip Prisma model + lib/comic-strip/captions.ts)
-    // that hasn't shipped to prod yet. Will be re-enabled in the parallel
-    // session's full feature commit.
+    // Today's comic strip — only included on Sunday morning briefs.
+    // Generation cron fires 06:00 UTC, brief fires 08:30 UTC, posts
+    // start at 13:00 UTC — so the Sunday brief is the actionable
+    // window: review the strip, re-roll if needed, grab assets for
+    // manual TikTok posting before auto-posts fire. Mon-Sat the strip's
+    // already out; including it would just be noise.
+    //
+    // Filtering by createdAt >= todayStart is naturally Sunday-only
+    // because that's the only day the generation cron runs — and it
+    // self-corrects if we ever fire an off-schedule generation.
+    const comicStrip = await db.comicStrip.findFirst({
+      where: {
+        brand: BRAND,
+        status: { in: ['READY', 'POSTED'] },
+        assembledUrl: { not: null },
+        createdAt: { gte: todayStart },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
 
     // Fetch today's published blog post from Sanity, if any. The blog cron
     // fires at 06:00 UTC and usually finishes within minutes, so by 08:30
@@ -444,13 +460,45 @@ export const GET = async (request: Request) => {
             : []),
         ];
 
-    // === COMIC STRIP SECTION TEMPORARILY REMOVED ===
-    // The comicStripEntries[] array + comic-strip block in the
-    // sendSocialDigest call below were stripped because they reference
-    // ComicStrip schema fields and lib/comic-strip/captions.ts that
-    // aren't yet on prod (parallel-session work). Re-add when that
-    // session ships — the original block is in git at commit a9d6d8b.
-    // ================================================
+    // Comic-strip platform entries — IG/FB/Pinterest auto-post via
+    // /api/social/comic-strip-post crons (Sunday only). TikTok is manual:
+    // we surface the assembled strip + per-panel downloads + caption so
+    // we can post the carousel via the TikTok app.
+    const comicStripEntries: SocialDigestEntry[] = comicStrip
+      ? (() => {
+          const captionInput = {
+            title: comicStrip.title,
+            baseCaption: comicStrip.caption ?? comicStrip.title,
+            theme: comicStrip.theme,
+          };
+          return [
+            {
+              platform: 'Instagram Carousel',
+              caption: buildComicStripCaption('instagram', captionInput),
+              ...slotFor('instagramComicStrip'),
+              assetType: 'image' as const,
+            },
+            {
+              platform: 'Facebook',
+              caption: buildComicStripCaption('facebook', captionInput),
+              ...slotFor('facebookComicStrip'),
+              assetType: 'image' as const,
+            },
+            {
+              platform: 'Pinterest',
+              caption: buildComicStripCaption('pinterest', captionInput),
+              ...slotFor('pinterestComicStrip'),
+              assetType: 'image' as const,
+            },
+            {
+              platform: 'TikTok',
+              caption: buildComicStripCaption('tiktok', captionInput),
+              willAutoPost: false, // TikTok comic strips are manual carousel
+              assetType: 'image' as const,
+            },
+          ];
+        })()
+      : [];
 
     // Content-reel platform entries — IG/FB/Pinterest auto-post via
     // /api/social/content-reel-post crons; TikTok is manual via this
@@ -486,10 +534,9 @@ export const GET = async (request: Request) => {
 
     // Final bail: nothing to ship at all. Only happens if every section
     // is empty — daily image missing AND demo reel missing AND no
-    // content reel AND no blog post. (Comic strip omitted while that
-    // section is awaiting parallel-session ship — see marker above.)
+    // content reel AND no blog post AND no comic strip.
     const hasAnyContent =
-      coloringImage || demoReelImage || contentReel || blogPost;
+      coloringImage || demoReelImage || contentReel || blogPost || comicStrip;
     if (!hasAnyContent) {
       const message =
         'No content of any kind ready for today — skipping digest';
@@ -542,8 +589,19 @@ export const GET = async (request: Request) => {
             entries: contentReelEntries,
           }
         : undefined,
-      // comicStrip: omitted while parallel-session work is in progress.
-      // Re-add when that ships — original block at git commit a9d6d8b.
+      comicStrip: comicStrip
+        ? {
+            id: comicStrip.id,
+            title: comicStrip.title,
+            theme: comicStrip.theme,
+            assembledUrl: comicStrip.assembledUrl ?? undefined,
+            panel1Url: comicStrip.panel1Url ?? undefined,
+            panel2Url: comicStrip.panel2Url ?? undefined,
+            panel3Url: comicStrip.panel3Url ?? undefined,
+            panel4Url: comicStrip.panel4Url ?? undefined,
+            entries: comicStripEntries,
+          }
+        : undefined,
     });
 
     if (!result.success) {

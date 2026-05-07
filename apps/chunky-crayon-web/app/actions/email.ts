@@ -372,6 +372,7 @@ export const sendSocialDigest = async ({
   demoReelCoverUrl,
   demoReelEntries,
   contentReel,
+  comicStrip,
 }: {
   blogTitle?: string;
   blogExcerpt?: string;
@@ -398,6 +399,28 @@ export const sendSocialDigest = async ({
      * flag). TikTok rows always carry willAutoPost=false because we post
      * TikTok manually via this brief; the rest auto-fire from the
      * /api/social/content-reel-post crons.
+     */
+    entries?: SocialDigestEntry[];
+  };
+  /**
+   * Weekly 4-panel comic strip — Sunday-only generation, posts later
+   * Sunday afternoon. Optional: brief omits the section if no strip
+   * exists in the past 7 days.
+   */
+  comicStrip?: {
+    id: string;
+    title: string;
+    theme: string;
+    /** R2 URL of the 2x2 assembled strip — primary asset. */
+    assembledUrl?: string;
+    /** Individual panel URLs — exposed for download (TikTok manual carousel). */
+    panel1Url?: string;
+    panel2Url?: string;
+    panel3Url?: string;
+    panel4Url?: string;
+    /**
+     * Per-platform entries. TikTok always renders as manual (we post
+     * TikTok comic carousels by hand from this brief).
      */
     entries?: SocialDigestEntry[];
   };
@@ -431,6 +454,7 @@ export const sendSocialDigest = async ({
         demoReelCoverUrl,
         demoReelEntries,
         contentReel,
+        comicStrip,
         timestamp,
       }),
     );
