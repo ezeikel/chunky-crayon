@@ -135,21 +135,18 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
   const frame = useCurrentFrame();
   const { fps, width: vWidth } = useVideoConfig();
 
-  // IMAGE delays the early voice so the photo can drop in before the
-  // narrator reacts. Single source of truth — used both by
-  // computeV2Beats (so the input beat is long enough) and by the
-  // <Audio from={...}> sequence below (so the voice actually starts
-  // at the same offset). Mismatching these is what caused the audio
-  // cut-off bug — beats expected the voice to start at inputStart,
-  // but the comp had a hardcoded `+ 60` offset.
-  const PHOTO_LEAD_IN_SECS = 2.0;
-  const photoLeadInFrames = Math.round(PHOTO_LEAD_IN_SECS * fps);
-
-  // Voice-aware beat boundaries — see TextDemoReelV2 for rationale.
+  // Voice-aware beat boundaries — same recipe as content-reel/spike
+  // templates and TextDemoReelV2: input beat = voice + 0.4s buffer,
+  // voice starts at inputStart (no offsets). The photo drop-in
+  // animation plays in parallel under the narration; if the script's
+  // first words feel premature relative to the photo landing, fix the
+  // script wording, don't introduce a hardcoded delay before the
+  // voice. (Earlier `+ 60` offset broke this — the audio expected to
+  // play 2s after the beat boundary, but the beat sized for `voice +
+  // buffer` cut off ~1.6s of voice when the scene transitioned.)
   const beats = computeV2Beats({
     fps,
     inputVoiceSeconds: kidVoiceSeconds,
-    inputVoiceLeadInSecs: PHOTO_LEAD_IN_SECS,
     revealVoiceSeconds: adultVoiceSeconds,
   });
 
@@ -386,7 +383,7 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
         <Audio src={staticFile("v2-sfx/pop.mp3")} volume={0.7} />
       </Sequence>
       {kidVoiceUrl ? (
-        <Sequence from={beats.inputVoiceStart + photoLeadInFrames}>
+        <Sequence from={beats.inputVoiceStart}>
           <Audio src={kidVoiceUrl} volume={1} />
         </Sequence>
       ) : null}
