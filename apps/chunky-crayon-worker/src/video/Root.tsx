@@ -231,11 +231,15 @@ export const RemotionRoot: React.FC = () => {
         // Voice-aware total — duration grows to fit kid + adult voice
         // clips. Real worker renders pass exact ffprobe'd durations via
         // inputProps. Studio preview falls back to V2_DEFAULT_*.
+        // IMAGE has a 2s photo drop-in before the narrator speaks; the
+        // beat sizing must account for that lead-in or the voice gets
+        // cut off when the scene transitions.
         calculateMetadata={({ props }) => ({
           durationInFrames: computeV2Beats({
             fps: IMAGE_REEL_FPS,
             inputVoiceSeconds:
               props.kidVoiceSeconds ?? V2_DEFAULT_INPUT_VOICE_SECONDS,
+            inputVoiceLeadInSecs: 2.0,
             revealVoiceSeconds:
               props.adultVoiceSeconds ?? V2_DEFAULT_REVEAL_VOICE_SECONDS,
           }).totalFrames,

@@ -2137,6 +2137,12 @@ app.post("/publish/v2", async (c) => {
         fps: IMAGE_REEL_FPS,
         inputVoiceSeconds:
           reelAudio.kidVoiceSeconds ?? V2_DEFAULT_INPUT_VOICE_SECONDS,
+        // IMAGE comp delays the voice by 60 frames (2s) so the photo
+        // can drop in before the narrator reacts. Without telling
+        // computeV2Beats about that lead-in, the input beat sized for
+        // `voice + 0.4s` is too short — voice gets cut off when the
+        // scene transitions to the canvas reveal.
+        inputVoiceLeadInSecs: 2.0,
         revealVoiceSeconds:
           reelAudio.adultVoiceSeconds ?? V2_DEFAULT_REVEAL_VOICE_SECONDS,
       });

@@ -92,6 +92,21 @@ export type ComputeV2BeatsInput = {
    */
   inputVoiceSeconds: number;
   /**
+   * Seconds the input voice waits AFTER the input scene starts before
+   * actually playing. IMAGE delays the early voice by ~2s so the photo
+   * can drop-in before the narrator reacts. Without accounting for
+   * this, computeV2Beats sizes the input beat for `voice + buffer` —
+   * but the voice doesn't start until `inputStart + leadIn`, so the
+   * scene cuts the voice off after `inputDur - leadIn` seconds.
+   *
+   * TEXT: 0 (voice starts at inputStart).
+   * IMAGE: 2.0 (60-frame photo drop-in delay).
+   * VOICE: 0 (sub-phase windows already account for sequencing).
+   *
+   * Default 0.
+   */
+  inputVoiceLeadInSecs?: number;
+  /**
    * Voice-clip duration during the REVEAL scene (adult narrator).
    */
   revealVoiceSeconds: number;
@@ -119,6 +134,7 @@ export const V2_INPUT_DEFAULT_MIN_SECS = 6.0;
 export function computeV2Beats({
   fps,
   inputVoiceSeconds,
+  inputVoiceLeadInSecs = 0,
   revealVoiceSeconds,
   revealMinSecs = V2_REVEAL_DEFAULT_MIN_SECS,
 }: ComputeV2BeatsInput): V2BeatTimings {
@@ -132,11 +148,13 @@ export function computeV2Beats({
   const hookDur = f(V2_HOOK_SECS);
   const hookEnd = hookStart + hookDur;
 
-  // Input beat flexes with voice length, with a floor for the visual
-  // animation chain (card slide-in + swoosh + typing tween + settle).
+  // Input beat flexes with voice length, accounting for any pre-voice
+  // lead-in (e.g. IMAGE's 2s photo drop-in delay before the narrator
+  // reacts). Floor stays at V2_INPUT_DEFAULT_MIN_SECS for the visual
+  // animation chain (card slide-in + swoosh + tween + settle).
   const inputDurSecs = Math.max(
     V2_INPUT_DEFAULT_MIN_SECS,
-    inputVoiceSeconds + V2_POST_VOICE_BUFFER_SECS,
+    inputVoiceLeadInSecs + inputVoiceSeconds + V2_POST_VOICE_BUFFER_SECS,
   );
   const inputStart = hookEnd;
   const inputDur = f(inputDurSecs);
