@@ -46,9 +46,11 @@ export type ComicCastMember = {
   referenceImageUrl: string;
 };
 
+// Prod R2 (custom domain). Override via COMIC_CAST_REF_BASE_URL env if a
+// non-prod environment needs to point at a different bucket.
 const REF_BASE =
   process.env.COMIC_CAST_REF_BASE_URL ||
-  "https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/reference-images/comic-cast";
+  "https://assets.chunkycrayon.com/reference-images/comic-cast";
 
 export const COMIC_STRIP_CAST: readonly ComicCastMember[] = [
   {
