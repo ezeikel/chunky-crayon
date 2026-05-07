@@ -90,10 +90,18 @@ async function pickTheme(): Promise<ComicStripTheme> {
 // Script generation + QC
 // =============================================================================
 
+const sceneSchema = z.object({
+  id: z.string(),
+  setting: z.string(),
+  fixedProps: z.array(z.string()),
+  panels: z.array(z.number().int().min(1).max(4)).min(1).max(4),
+});
+
 const scriptSchema = z.object({
   title: z.string().min(3).max(80),
   theme: z.enum(ALL_THEMES as [ComicStripTheme, ...ComicStripTheme[]]),
   logline: z.string(),
+  scenes: z.array(sceneSchema).min(1).max(4),
   panels: z
     .array(
       z.object({
@@ -105,6 +113,7 @@ const scriptSchema = z.object({
         setting: z.string(),
         action: z.string(),
         expressions: z.string(),
+        propStateChange: z.string().nullable(),
         dialogue: z
           .array(
             z.object({
@@ -120,6 +129,44 @@ const scriptSchema = z.object({
   caption: z.string(),
 });
 type Script = z.infer<typeof scriptSchema>;
+type Scene = z.infer<typeof sceneSchema>;
+
+/**
+ * Find which scene contains a given panel number. Throws if the script's
+ * scenes array doesn't cover the panel — which should never happen for a
+ * QC-passed script (sceneConsistency Test 1) but is worth defensive-coding
+ * since the script is JSON from an LLM.
+ */
+function sceneForPanel(script: Script, panelNumber: number): Scene {
+  const scene = script.scenes.find((s) => s.panels.includes(panelNumber));
+  if (!scene) {
+    throw new Error(
+      `[comic-strip] no scene contains panel ${panelNumber} — scenes: ${JSON.stringify(script.scenes.map((s) => ({ id: s.id, panels: s.panels })))}`,
+    );
+  }
+  return scene;
+}
+
+/**
+ * Collect prop-state-changes from earlier panels in the same scene so the
+ * current panel renders the cumulative state. e.g. if panel 3 ate the cake,
+ * panel 4 (same scene) sees ["cake eaten, plate now empty"] and must
+ * reflect that.
+ */
+function cumulativeStateChangesForPanel(
+  script: Script,
+  panelNumber: number,
+  scene: Scene,
+): string[] {
+  return script.panels
+    .filter(
+      (p) =>
+        p.panel < panelNumber &&
+        scene.panels.includes(p.panel) &&
+        !!p.propStateChange,
+    )
+    .map((p) => p.propStateChange as string);
+}
 
 async function writeScript(theme: ComicStripTheme): Promise<Script> {
   const recent = await db.comicStrip.findMany({
@@ -201,11 +248,27 @@ async function fetchAsFile(url: string, name: string): Promise<File> {
   return new File([buf], `${name}.${ext}`, { type: `image/${ext}` });
 }
 
+function bufferToFile(buffer: Buffer, name: string): File {
+  // Wrap a Buffer in a File so we can pass it to OpenAI's images.edit
+  // alongside fetched cast refs. PNG is the format we always upload.
+  // Cast Buffer → Uint8Array so the BlobPart type is satisfied (Buffer's
+  // ArrayBufferLike includes SharedArrayBuffer which Blob rejects).
+  return new File([new Uint8Array(buffer)], `${name}.png`, {
+    type: "image/png",
+  });
+}
+
 async function generatePanelImage(
   client: OpenAI,
   panel: PanelScript,
+  scene: Scene,
+  cumulativeStateChanges: readonly string[],
+  isSceneStart: boolean,
+  priorScenePanelBuffers: readonly Buffer[],
 ): Promise<Buffer> {
-  const refs = await Promise.all(
+  // Cast reference images (canonical character refs from R2). Always
+  // included so the model has the character bible at hand.
+  const castRefs = await Promise.all(
     panel.cast.map((id) => {
       const member = COMIC_STRIP_CAST.find((c) => c.id === id);
       if (!member) throw new Error(`Unknown cast id: ${id}`);
@@ -213,7 +276,31 @@ async function generatePanelImage(
     }),
   );
 
-  const prompt = buildPanelImagePrompt(panel);
+  // Continuity references — earlier panels of THIS scene, so banner text,
+  // furniture, and color palette stay locked. Skip if this panel starts a
+  // new scene (those earlier panels belong to a different setting and
+  // would mislead the model).
+  const continuityRefs = isSceneStart
+    ? []
+    : priorScenePanelBuffers.map((buf, i) =>
+        bufferToFile(buf, `prior-panel-${i + 1}`),
+      );
+
+  // gpt-image-2 caps at 16 reference images. Cast (≤2) + continuity (≤3)
+  // = 5 max. Plenty of headroom; explicit cap as a safety check.
+  const refs = [...castRefs, ...continuityRefs];
+  if (refs.length > 16) {
+    throw new Error(
+      `[comic-strip] panel ${panel.panel} has ${refs.length} refs, over the gpt-image-2 limit of 16`,
+    );
+  }
+
+  const prompt = buildPanelImagePrompt({
+    panel,
+    scene,
+    cumulativeStateChanges,
+    isSceneStart,
+  });
   const result = await client.images.edit({
     model: IMAGE_MODEL,
     image: refs,
@@ -276,6 +363,10 @@ async function judgePanel(
 async function generateAndApprovePanel(
   client: OpenAI,
   panel: PanelScript,
+  scene: Scene,
+  cumulativeStateChanges: readonly string[],
+  isSceneStart: boolean,
+  priorScenePanelBuffers: readonly Buffer[],
 ): Promise<{
   buffer: Buffer;
   qc: PanelQcResult;
@@ -285,7 +376,14 @@ async function generateAndApprovePanel(
   let lastBuffer: Buffer | null = null;
   let lastQc: PanelQcResult | null = null;
   for (let attempt = 0; attempt <= PANEL_RETRIES; attempt += 1) {
-    const buffer = await generatePanelImage(client, panel);
+    const buffer = await generatePanelImage(
+      client,
+      panel,
+      scene,
+      cumulativeStateChanges,
+      isSceneStart,
+      priorScenePanelBuffers,
+    );
     const qc = await judgePanel(panel, buffer);
     console.log(
       `[comic-strip] panel ${panel.panel} attempt ${attempt + 1}: passed=${qc.passed}, issues=${qc.issues.length}`,
@@ -408,16 +506,45 @@ export async function runComicStripCron(): Promise<void> {
       qcPassed: boolean;
     }> = [];
 
+    // Track which panel each rendered buffer belongs to so we can hand
+    // back the right "prior panels of this scene" continuity refs as we
+    // walk through the strip.
+    const renderedByPanelNumber = new Map<number, Buffer>();
+    let previousScene: Scene | null = null;
+
     for (const panel of script.panels) {
+      const scene = sceneForPanel(script, panel.panel);
+      const isSceneStart = !previousScene || previousScene.id !== scene.id;
+
+      // Continuity refs = earlier panels of the same scene that have
+      // already rendered. Empty when starting a new scene.
+      const priorScenePanelBuffers = isSceneStart
+        ? []
+        : scene.panels
+            .filter((n) => n < panel.panel && renderedByPanelNumber.has(n))
+            .map((n) => renderedByPanelNumber.get(n) as Buffer);
+
+      const cumulativeStateChanges = cumulativeStateChangesForPanel(
+        script,
+        panel.panel,
+        scene,
+      );
+
       console.log(
-        `[comic-strip] panel ${panel.panel} cast=${panel.cast.join(",")}`,
+        `[comic-strip] panel ${panel.panel} cast=${panel.cast.join(",")} scene=${scene.id}${isSceneStart ? " (scene-start)" : ""}${priorScenePanelBuffers.length ? ` prior-refs=${priorScenePanelBuffers.length}` : ""}${cumulativeStateChanges.length ? ` state-changes=${cumulativeStateChanges.length}` : ""}`,
       );
       const { buffer, qc, attempts, qcPassed } = await generateAndApprovePanel(
         client,
         panel,
+        scene,
+        cumulativeStateChanges,
+        isSceneStart,
+        priorScenePanelBuffers,
       );
       panelBuffers.push(buffer);
+      renderedByPanelNumber.set(panel.panel, buffer);
       qcRecords.push({ panel: panel.panel, attempts, qc, qcPassed });
+      previousScene = scene;
     }
 
     console.log("[comic-strip] uploading panels...");

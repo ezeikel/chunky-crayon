@@ -184,7 +184,11 @@ export {
   createComicScriptPrompt,
   buildPanelImagePrompt,
 } from "./comic/prompts";
-export type { PanelScript } from "./comic/prompts";
+export type {
+  PanelScript,
+  Scene,
+  BuildPanelImagePromptInput,
+} from "./comic/prompts";
 
 // Comic strip QC — script gate (text) + panel gate (vision).
 export {

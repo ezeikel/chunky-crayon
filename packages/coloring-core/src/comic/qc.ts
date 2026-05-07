@@ -24,6 +24,7 @@ export const scriptQcResultSchema = z.object({
     voiceConsistency: z.number().int().min(0).max(10),
     jokeClarity: z.number().int().min(0).max(10),
     causeAndEffect: z.number().int().min(0).max(10),
+    sceneConsistency: z.number().int().min(0).max(10),
     safety: z.number().int().min(0).max(10),
   }),
   issues: z.array(z.string()),
@@ -73,6 +74,26 @@ causeAndEffect (0-10):
 
   Deduct heavily and call it out in the issues array if any test fails.
 
+sceneConsistency (0-10):
+  Read the "scenes" array AND every panel's "setting", "action", "propStateChange", and "visualGag" field. Check that:
+
+  Test 1 — Scene coverage: Does every panel number 1-4 appear in exactly one scene's "panels" array? No duplicates, no gaps. Deduct heavily if missing.
+
+  Test 2 — Setting alignment: Does each panel's "setting" string match the setting of its parent scene? Panels in the same scene should describe the same place. If panel 1's setting says "kitchen with cake" and panel 3 (same scene) says "outdoor field", that's drift → ≤ 4.
+
+  Test 3 — Fixed-prop persistence: Banners, signs, and signage TEXT named in scene.fixedProps must NOT be re-invented in panel actions or visualGag fields.
+    - Bad: scene.fixedProps says 'banner reading "HAPPY PAGE DAY"', panel 3 action mentions 'banner reading "HAPPY ART DAY"' → ≤ 3. Banner text should never change inside a scene.
+    - Good: scene.fixedProps establishes the banner; subsequent panels reference "the banner" without re-naming the text.
+
+  Test 4 — Prop-state-change consistency: If a panel has a propStateChange (e.g. "cake eaten, plate now empty"), every later panel in the SAME scene must reflect that change in its action / visualGag.
+    - Bad: panel 3 propStateChange = "cake eaten", panel 4 action mentions "cake on the table" → ≤ 3. The cake should be GONE.
+    - Bad: panel 3 propStateChange = "cup knocked over", panel 4 action treats cup as upright → ≤ 4.
+    - Good: panel 3 says "cake eaten", panel 4 visualGag is "empty cake plate with crumbs" → 9+.
+
+  Test 5 — Scene cuts must be explicit: If panels 1-2 are in scene A and panels 3-4 are in scene B, the scenes array must declare two scenes with different settings/fixedProps. Don't sneak a scene change inside a single scene block.
+
+  Deduct -3 per test failure. Cumulative.
+
 safety (0-10):
   - 10 = wholesome, kind. Smudge silly never destructive, Pip anxious never pathetic, Sticky rule-bound never bossy.
   - Deduct for any character being put down by another, fear without resolution, food themes that could read as junk-food-glorifying, or unclear consent moments.
@@ -80,7 +101,7 @@ safety (0-10):
 </scoring-rubric>
 
 <pass-threshold>
-passed = true ONLY if ALL of: formatCompliance ≥ 8, voiceConsistency ≥ 7, jokeClarity ≥ 7, causeAndEffect ≥ 7, safety ≥ 8.
+passed = true ONLY if ALL of: formatCompliance ≥ 8, voiceConsistency ≥ 7, jokeClarity ≥ 7, causeAndEffect ≥ 7, sceneConsistency ≥ 7, safety ≥ 8.
 Otherwise passed = false.
 </pass-threshold>
 
@@ -93,6 +114,7 @@ Single JSON object only — no markdown, no commentary, no preamble:
     "voiceConsistency": 0-10,
     "jokeClarity": 0-10,
     "causeAndEffect": 0-10,
+    "sceneConsistency": 0-10,
     "safety": 0-10
   },
   "issues": ["specific problems — empty array if passed"],

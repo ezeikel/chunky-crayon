@@ -46,6 +46,25 @@ Hard rules:
 - Names appear in dialogue when characters address each other ("Pip!" "Sticky!"), not in narration
 </format>
 
+<scene-grouping>
+Group consecutive panels that share a setting and props into a SCENE. Most strips are one scene (all four panels in the same place). Some have a CUT — e.g. panels 1-2 in the kitchen, panels 3-4 outside.
+
+For every scene, declare its FIXED VISUAL ELEMENTS — the things that MUST stay identical across every panel in that scene. Things that don't change inside a scene:
+- Banner / sign text (if a banner says "HAPPY PAGE DAY" in panel 1, every other panel in the same scene shows the SAME text — never re-invent it)
+- Furniture / props (if there's a round wooden table in panel 1, panel 3 of the same scene shows the same round wooden table)
+- Background decorations (banners, balloons, posters, weather, time of day)
+- Color palette of the environment
+
+Things that DO change inside a scene (and SHOULD evolve panel-to-panel):
+- Character poses, expressions, positions
+- The state of CONSUMABLE props as the action progresses (a cake gets eaten → in later panels in the same scene, the cake plate is empty / has crumbs / the cake is GONE — it must NOT magically reappear)
+- Damage / mess / new objects introduced by an action
+
+The cardinal rule: if a panel's action consumes / destroys / moves a prop, EVERY subsequent panel in that scene reflects the new state. A cake eaten in panel 3 is GONE in panel 4. A cup knocked over in panel 2 stays knocked over in panel 3. There's no resetting.
+
+Scenes that CHANGE require an explicit cut. Don't drift — declare it.
+</scene-grouping>
+
 <cause-and-effect-rigor>
 This is the hardest rule and the one most often violated. Read it twice.
 
@@ -96,13 +115,25 @@ Respond with a single JSON object, no markdown wrapper, no commentary:
   "title": "string (3-6 words, sparkles if it fits the theme)",
   "theme": "RULE_BREAKING | SNACK_TIME | WEATHER | ART_MISHAP | BEDTIME | HOLIDAY | FRIENDSHIP | WEEKEND | SCHOOL | ADVENTURE",
   "logline": "string (one sentence summary for QC and admin)",
+  "scenes": [
+    {
+      "id": "string (kebab-case, e.g. 'party-room' or 'aftermath')",
+      "setting": "string (where this scene happens, in the page-world)",
+      "fixedProps": [
+        "concrete prop / banner / sign / decoration that appears identically across every panel of this scene. Be specific: 'banner reading HAPPY PAGE DAY in rainbow letters', not just 'a banner'. Banner text MUST be quoted verbatim and NEVER changes."
+      ],
+      "panels": [1, 2, 3]      // 1-indexed panel numbers belonging to this scene
+    },
+    // 1-2 scenes total. Single-scene strips have one entry covering all 4 panels.
+  ],
   "panels": [
     {
       "panel": 1,
       "cast": ["colo" | "pip" | "smudge" | "sticky"], // 1 or 2 ids
-      "setting": "string (where in the page-world)",
+      "setting": "string (where in the page-world — should match this panel's scene.setting)",
       "action": "string (what's happening, in present tense, 1-2 sentences)",
       "expressions": "string (the FACES we need — 'Colo: focused half-smile. Sticky: calm.')",
+      "propStateChange": "string | null (if this panel's action permanently changes a prop's state — e.g. 'cake eaten, plate now empty with crumbs' — describe it. Subsequent panels in the same scene MUST reflect this.)",
       "dialogue": [
         { "speaker": "colo" | "pip" | "smudge" | "sticky", "text": "string (≤8 words)" }
       ] | null,
@@ -145,24 +176,59 @@ Respond with the JSON only.`;
 
 /**
  * Build the per-panel prompt fed to gpt-image-2. Combines the panel's
- * action + expressions + dialogue into a single concrete prompt string,
- * appended with the universal style block and a recap of the participating
- * characters' signature traits.
+ * action + expressions + dialogue with its parent scene's fixed props
+ * and the cumulative state changes from earlier panels in the same scene.
  *
- * The image generation call separately passes each cast member's reference
- * image as conditioning — this prompt is the textual side.
+ * The image generation call separately passes:
+ *   - Each cast member's reference image (canonical character refs)
+ *   - The previous panels' rendered images from THIS strip (continuity refs)
+ *
+ * This text-side prompt + image-side conditioning together give gpt-image-2
+ * everything it needs to keep banners, props, and prop-state-changes
+ * consistent within a scene.
  */
+export type Scene = {
+  id: string;
+  setting: string;
+  fixedProps: readonly string[];
+  panels: readonly number[];
+};
+
 export type PanelScript = {
   panel: number;
   cast: readonly ComicCastId[];
   setting: string;
   action: string;
   expressions: string;
+  /** Prop-state change introduced by this panel's action, if any. */
+  propStateChange: string | null;
   dialogue: readonly { speaker: ComicCastId; text: string }[] | null;
   visualGag: string | null;
 };
 
-export const buildPanelImagePrompt = (panel: PanelScript): string => {
+export type BuildPanelImagePromptInput = {
+  panel: PanelScript;
+  /** The scene this panel belongs to — its fixedProps must appear in the rendered image. */
+  scene: Scene;
+  /**
+   * Prop-state changes that have already happened in earlier panels of THIS
+   * scene. Each must be reflected in this panel's render (e.g. "cake eaten,
+   * plate now empty"). Empty for the first panel of a scene.
+   */
+  cumulativeStateChanges: readonly string[];
+  /**
+   * Whether this is the first panel of a NEW scene (i.e. previous panel
+   * was in a different scene). If so, the model is told to fully reset
+   * the setting rather than carry over from the prior panel image.
+   */
+  isSceneStart: boolean;
+};
+
+export const buildPanelImagePrompt = (
+  input: BuildPanelImagePromptInput,
+): string => {
+  const { panel, scene, cumulativeStateChanges, isSceneStart } = input;
+
   const characterTraits = panel.cast
     .map((id) => {
       const member = COMIC_STRIP_CAST.find((c) => c.id === id);
@@ -182,6 +248,18 @@ export const buildPanelImagePrompt = (panel: PanelScript): string => {
 
   const gagBlock = panel.visualGag ? `\n\nVISUAL GAG: ${panel.visualGag}` : "";
 
+  const fixedPropsBlock = scene.fixedProps.length
+    ? `\n\nFIXED VISUAL ELEMENTS — these props MUST appear EXACTLY as described, identical to any earlier panel in this scene. Banner / sign text in particular must be rendered VERBATIM:\n- ${scene.fixedProps.join("\n- ")}`
+    : "";
+
+  const stateChangesBlock = cumulativeStateChanges.length
+    ? `\n\nSCENE STATE — these things HAVE ALREADY HAPPENED earlier in this scene and must be reflected here. Do NOT reset them:\n- ${cumulativeStateChanges.join("\n- ")}`
+    : "";
+
+  const continuityBlock = isSceneStart
+    ? `\n\nThis panel STARTS A NEW SCENE — establish the setting fresh. Earlier panel images (if any are provided as references) belong to a different scene and should NOT influence the setting here.`
+    : `\n\nVISUAL CONTINUITY — additional reference images of the prior panels in this same scene have been provided. Match the banner text, props, furniture, and color palette to those images. Only the characters' poses, expressions, and the prop-state-changes listed above should differ.`;
+
   return `Comic strip panel ${panel.panel} of 4. Setting: ${panel.setting}.
 
 ACTION: ${panel.action}
@@ -189,7 +267,7 @@ ACTION: ${panel.action}
 EXPRESSIONS: ${panel.expressions}
 
 CHARACTERS IN THIS PANEL (each must show ALL their signature traits):
-- ${characterTraits}${dialogueBlock}${gagBlock}
+- ${characterTraits}${fixedPropsBlock}${stateChangesBlock}${continuityBlock}${dialogueBlock}${gagBlock}
 
 Both characters fully visible, no overlap, no cropping. Comic-strip panel framing with thin black border.
 
