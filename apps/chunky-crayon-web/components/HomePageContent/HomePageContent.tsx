@@ -32,6 +32,8 @@ type HomePageContentProps = {
   emailSignup?: React.ReactNode;
   /** Interactive demo for logged-out users - server component passed as prop */
   demo?: React.ReactNode;
+  /** Latest weekly comic strip card — server component, optional, renders below hero. */
+  latestComicStrip?: React.ReactNode;
 };
 
 const HomePageContent = ({
@@ -45,6 +47,7 @@ const HomePageContent = ({
   intro,
   emailSignup,
   demo,
+  latestComicStrip,
 }: HomePageContentProps) => {
   const { status } = useSession();
   const t = useTranslations('homepage.pricing');
@@ -114,6 +117,13 @@ const HomePageContent = ({
         {/* Email signup: 3rd on mobile, bottom-left on desktop */}
         {emailSignup && <div className="order-3">{emailSignup}</div>}
       </div>
+
+      {/* Latest weekly comic strip — kid-friendly engagement content,
+          drives organic returns and SEO. Renders nothing if no strip
+          has been posted yet. */}
+      {latestComicStrip && (
+        <div className="w-full relative z-10">{latestComicStrip}</div>
+      )}
 
       {/* Interactive demo - phone-frame walk-through of describe → draw →
           finished page. Lands right after the hero so cold visitors who

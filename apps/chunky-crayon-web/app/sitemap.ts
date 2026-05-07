@@ -26,6 +26,19 @@ async function getAllPublicImages() {
   });
 }
 
+// Get all posted comic strips — public detail pages.
+async function getAllPostedComicStrips() {
+  try {
+    return await db.comicStrip.findMany({
+      where: { brand: 'CHUNKY_CRAYON', status: 'POSTED' },
+      orderBy: { postedAt: 'desc' },
+      select: { slug: true, postedAt: true, updatedAt: true },
+    });
+  } catch {
+    return [];
+  }
+}
+
 // Get all published blog posts
 async function getAllBlogPosts() {
   // Sanity client may not be configured in all environments
@@ -66,6 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     { path: '/pricing', priority: 0.8, changeFrequency: 'weekly' as const },
     { path: '/blog', priority: 0.7, changeFrequency: 'weekly' as const },
+    { path: '/comics', priority: 0.8, changeFrequency: 'weekly' as const },
     { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
     { path: '/terms', priority: 0.3, changeFrequency: 'yearly' as const },
     // Phase 2 growth pages — free tools + teacher hub
@@ -256,10 +270,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Fetch dynamic content
-  const [images, blogPosts, tags] = await Promise.all([
+  const [images, blogPosts, tags, comicStrips] = await Promise.all([
     getAllPublicImages(),
     getAllBlogPosts(),
     getAllTags(),
+    getAllPostedComicStrips(),
   ]);
 
   // Add tag pages for each locale
@@ -317,6 +332,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
               l,
               `${baseUrl}/${l}/blog/${post.slug.current}`,
             ]),
+          ),
+        },
+      });
+    }
+  }
+
+  // Add comic strips for each locale. Higher priority than coloring images
+  // because each strip is a unique narrative URL with stable content.
+  for (const strip of comicStrips) {
+    for (const locale of locales) {
+      urls.push({
+        url: `${baseUrl}/${locale}/comics/${strip.slug}`,
+        lastModified: strip.postedAt ?? strip.updatedAt,
+        changeFrequency: 'monthly',
+        priority: 0.7,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${baseUrl}/${l}/comics/${strip.slug}`]),
           ),
         },
       });

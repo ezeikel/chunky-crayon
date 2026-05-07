@@ -6,6 +6,7 @@ import AllColoringPageImages from '@/components/AllColoringPageImages/AllColorin
 import GalleryPreview from '@/components/GalleryPreview';
 import SocialProofStats from '@/components/SocialProofStats';
 import RecentCreations from '@/components/RecentCreations';
+import LatestComicStripCard from '@/components/LatestComicStripCard/LatestComicStripCard';
 import Loading from '@/components/Loading/Loading';
 import UnsubscribeToast from '@/components/UnsubscribeToast/UnsubscribeToast';
 import HomePageContent from '@/components/HomePageContent';
@@ -68,6 +69,7 @@ const HomePageWithColoState = async ({
   intro,
   emailSignup,
   demo,
+  latestComicStrip,
 }: {
   searchParams: Promise<ColoringImageSearchParams>;
   form: React.ReactNode;
@@ -79,6 +81,7 @@ const HomePageWithColoState = async ({
   intro: React.ReactNode;
   emailSignup: React.ReactNode;
   demo: React.ReactNode;
+  latestComicStrip: React.ReactNode;
 }) => {
   const coloState = await ColoStateLoader();
 
@@ -94,6 +97,7 @@ const HomePageWithColoState = async ({
       intro={intro}
       emailSignup={emailSignup}
       demo={demo}
+      latestComicStrip={latestComicStrip}
     />
   );
 };
@@ -196,6 +200,11 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
           demo={
             <Suspense fallback={null}>
               <LandingDemoSlot />
+            </Suspense>
+          }
+          latestComicStrip={
+            <Suspense fallback={null}>
+              <LatestComicStripCard />
             </Suspense>
           }
         />
