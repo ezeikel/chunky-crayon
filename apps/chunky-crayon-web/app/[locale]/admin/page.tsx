@@ -7,6 +7,7 @@ import {
   faImages,
   faShareNodes,
   faShareFromSquare,
+  faComment,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { requireAdmin } from '@/lib/auth-guards';
 import Loading from '@/components/Loading/Loading';
@@ -41,6 +42,13 @@ const SECTIONS = [
     label: 'Social',
     icon: faShareNodes,
     description: 'Manage Pinterest and TikTok posting tokens.',
+  },
+  {
+    href: '/admin/comic-strips',
+    label: 'Comic strips',
+    icon: faComment,
+    description:
+      'Generate the weekly 4-panel comic strip on demand and post to IG / FB / Pinterest.',
   },
 ];
 

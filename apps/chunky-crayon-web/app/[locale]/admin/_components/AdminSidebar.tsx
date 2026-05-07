@@ -9,6 +9,7 @@ import {
   faBullhorn,
   faShareNodes,
   faShareFromSquare,
+  faComment,
 } from '@fortawesome/pro-duotone-svg-icons';
 import cn from '@/utils/cn';
 
@@ -36,6 +37,12 @@ const ITEMS: Array<{
     href: '/admin/social',
     label: 'Social',
     icon: faShareNodes,
+    match: 'prefix',
+  },
+  {
+    href: '/admin/comic-strips',
+    label: 'Comic strips',
+    icon: faComment,
     match: 'prefix',
   },
 ];

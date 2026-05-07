@@ -11,6 +11,7 @@ import {
   faHeadset,
   faCoins,
   faNewspaper,
+  faShieldHalved,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useTranslations } from 'next-intl';
@@ -29,12 +30,16 @@ import formatNumber from '@/utils/formatNumber';
 type DropdownItemConfig = {
   icon?: IconDefinition;
   labelKey?: string;
+  /** Hardcoded label, used when there's no i18n key (e.g. internal-only "Admin"). */
+  label?: string;
   href?: string;
   separator?: boolean;
   external?: boolean;
   requiresParentalGate?: boolean;
   isSignOut?: boolean;
   isFeedback?: boolean;
+  /** Only render when the current user has this role. */
+  adminOnly?: boolean;
 };
 
 const DROPDOWN_ITEMS: DropdownItemConfig[] = [
@@ -60,6 +65,16 @@ const DROPDOWN_ITEMS: DropdownItemConfig[] = [
     labelKey: 'support',
     isFeedback: true,
     requiresParentalGate: true,
+  },
+  {
+    separator: true,
+    adminOnly: true,
+  },
+  {
+    icon: faShieldHalved,
+    label: 'Admin',
+    href: '/admin',
+    adminOnly: true,
   },
   {
     separator: true,
@@ -134,12 +149,16 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52">
-          {DROPDOWN_ITEMS.map((item) => {
+          {DROPDOWN_ITEMS.filter(
+            (item) => !item.adminOnly || user?.role === 'ADMIN',
+          ).map((item, idx) => {
             if (item.separator) {
-              return <DropdownMenuSeparator key="dropdown-separator" />;
+              return (
+                <DropdownMenuSeparator key={`dropdown-separator-${idx}`} />
+              );
             }
 
-            const label = item.labelKey ? t(item.labelKey) : '';
+            const label = item.label ?? (item.labelKey ? t(item.labelKey) : '');
 
             if (item.isFeedback) {
               return (

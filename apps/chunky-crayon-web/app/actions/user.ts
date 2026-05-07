@@ -96,6 +96,7 @@ export const getCurrentUser = async (): Promise<Prisma.UserGetPayload<{
     image: true;
     stripeCustomerId: true;
     credits: true;
+    role: true;
     subscriptions: {
       select: {
         id: true;
@@ -125,6 +126,7 @@ export const getCurrentUser = async (): Promise<Prisma.UserGetPayload<{
       image: true,
       stripeCustomerId: true,
       credits: true,
+      role: true,
       subscriptions: {
         select: {
           id: true,
