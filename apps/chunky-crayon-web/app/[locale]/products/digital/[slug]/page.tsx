@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import {
-  getPublishedBundle,
-  listingImagesForBundle,
-  listPublishedBundles,
-} from '@/app/data/bundle';
+import { connection } from 'next/server';
+import { getPublishedBundle, listingImagesForBundle } from '@/app/data/bundle';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { checkFeatureFlag } from '@/flags';
@@ -17,21 +14,17 @@ type BundleProductPageProps = {
   }>;
 };
 
-// Static generation — bundles are a small, slow-changing set. Same
-// fail-soft behaviour as coloring-image pages: a build-time DB blip
-// shouldn't fail the deploy. Returning [] falls back to ISR.
-export const generateStaticParams = async () => {
-  try {
-    const bundles = await listPublishedBundles();
-    return bundles.map((b) => ({ slug: b.slug }));
-  } catch (err) {
-    console.error(
-      '[bundles] generateStaticParams failed — falling back to ISR-only:',
-      err,
-    );
-    return [];
-  }
-};
+// Dynamic rendering. We deliberately don't `generateStaticParams` here
+// because:
+//   1. The page is flag-gated and 404s when `bundles-shop` is off, so
+//      static prerender has nothing useful to cache anyway.
+//   2. Next 16 + Cache Components rejects an empty `generateStaticParams`
+//      result, and prod currently has zero published bundles (dev DB
+//      has them, prod doesn't), so listPublishedBundles() → [] → build
+//      fail. See ~/.claude/.../feedback_no_force_dynamic_in_next16.md.
+//   3. Once bundles ship for real, swap to a hybrid: ISR with static
+//      params for the small set of published bundles + the flag check
+//      still gating render.
 
 export async function generateMetadata({
   params,
@@ -71,6 +64,12 @@ export async function generateMetadata({
 }
 
 const BundleProductPage = async ({ params }: BundleProductPageProps) => {
+  // Opt into dynamic rendering. Without this, Cache Components treats
+  // the page as statically renderable and complains about the missing
+  // generateStaticParams. The flag check below would also force this
+  // dynamic anyway, but explicit is clearer.
+  await connection();
+
   const { locale, slug } = await params;
 
   const enabled = await checkFeatureFlag('bundles-shop');

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
 import {
   listPublishedBundles,
   listingImagesForBundle,
@@ -40,6 +41,10 @@ export async function generateMetadata({
 }
 
 const BundlesIndexPage = async ({ params }: BundlesIndexProps) => {
+  // Opt into dynamic rendering — the flag check is per-request and
+  // not safe to bake into static HTML.
+  await connection();
+
   const { locale } = await params;
 
   const enabled = await checkFeatureFlag('bundles-shop');

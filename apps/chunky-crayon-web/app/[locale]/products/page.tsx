@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBookOpen,
@@ -65,6 +66,10 @@ const CATEGORIES = [
 ] as const;
 
 const ProductsIndexPage = async ({ params }: ProductsIndexProps) => {
+  // Opt into dynamic rendering — the flag check is per-request and
+  // not safe to bake into static HTML.
+  await connection();
+
   const { locale } = await params;
 
   // Gated until the buy flow + v0 product page redesign land.
