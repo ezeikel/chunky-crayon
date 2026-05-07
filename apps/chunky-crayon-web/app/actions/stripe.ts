@@ -76,6 +76,11 @@ export const createCheckoutSession = async (
   priceId: string,
   mode: 'payment' | 'subscription',
   cancelPath?: string,
+  // Caller-provided id used for the InitiateCheckout CAPI fire below.
+  // Pass the same id to the browser's `trackInitiateCheckout({ eventId })`
+  // call so Meta deduplicates client + server. If omitted we fall back
+  // to a server-generated UUID (matches the pre-dedup behaviour).
+  initiateCheckoutEventId?: string,
 ): Promise<{
   id: string;
   error?: string;
@@ -158,7 +163,7 @@ export const createCheckoutSession = async (
   // from Stripe's IP — without this round-trip, Meta has no browser
   // identity for the buyer and match quality drops sharply.
   const matchData = await readClientMatchData();
-  const initiateCheckoutEventId = crypto.randomUUID();
+  const checkoutEventId = initiateCheckoutEventId ?? crypto.randomUUID();
 
   // Build checkout session options
   const sessionOptions: Stripe.Checkout.SessionCreateParams = {
@@ -248,7 +253,7 @@ export const createCheckoutSession = async (
     ...(userId && { userId }),
     value,
     currency,
-    eventId: initiateCheckoutEventId,
+    eventId: checkoutEventId,
     contentName,
     ...matchData,
   }).catch((err) => {

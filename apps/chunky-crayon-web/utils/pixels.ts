@@ -135,7 +135,17 @@ export const trackSignUp = (params?: { method?: string; eventId?: string }) => {
 };
 
 /**
- * Track when a user initiates checkout
+ * Track when a user initiates checkout.
+ *
+ * Meta-only by design. Pinterest's `checkout` event is its Purchase
+ * fire — there's no separate InitiateCheckout, so firing `pintrk
+ * 'checkout'` here AND from `trackPurchase` would double-count
+ * Pinterest Purchases.
+ *
+ * Pass `eventId` so this client fire deduplicates against the matching
+ * server CAPI fire from `createCheckoutSession`. Generate the id at
+ * the call site (`crypto.randomUUID()`) and pass the same id to
+ * `createCheckoutSession({ initiateCheckoutEventId })`.
  */
 export const trackInitiateCheckout = (params: {
   value: number;
@@ -143,8 +153,10 @@ export const trackInitiateCheckout = (params: {
   productType: 'subscription' | 'credits';
   planName?: string;
   creditAmount?: number;
+  eventId?: string;
 }) => {
-  trackFacebookEvent('InitiateCheckout', {
+  const w = window as WindowWithPixels;
+  const fbParams = {
     value: params.value / 100, // Convert from pence to pounds/dollars
     currency: params.currency,
     content_type: 'product',
@@ -152,13 +164,15 @@ export const trackInitiateCheckout = (params: {
       params.productType === 'subscription'
         ? `${params.planName} Subscription`
         : `${params.creditAmount} Credits`,
-  });
-
-  trackPinterestEvent('checkout', {
-    value: params.value / 100,
-    currency: params.currency,
-    order_quantity: 1,
-  });
+  };
+  if (w.fbq) {
+    w.fbq(
+      'track',
+      'InitiateCheckout',
+      fbParams,
+      ...(params.eventId ? [{ eventID: params.eventId }] : []),
+    );
+  }
 };
 
 /**

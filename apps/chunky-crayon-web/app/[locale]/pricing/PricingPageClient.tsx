@@ -113,13 +113,18 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
       price: plan.price,
     });
 
-    // Track checkout initiation for Facebook/Pinterest pixels
+    // Track checkout initiation for the Meta Pixel. Pinterest has no
+    // distinct InitiateCheckout — its `checkout` event is the Purchase
+    // fire. Generate the eventId here and pass to createCheckoutSession
+    // so the server CAPI fire dedups against this client fire.
     const priceInPence = parseInt(plan.price.replace(/[^0-9]/g, ''), 10) * 100;
+    const initiateCheckoutEventId = crypto.randomUUID();
     trackInitiateCheckout({
       value: priceInPence,
       currency: 'GBP',
       productType: 'subscription',
       planName: plan.key,
+      eventId: initiateCheckoutEventId,
     });
 
     try {
@@ -133,6 +138,8 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
       const session = await createCheckoutSession(
         plan.stripePriceEnv,
         'subscription',
+        undefined,
+        initiateCheckoutEventId,
       );
 
       if (!session || !session.id) {

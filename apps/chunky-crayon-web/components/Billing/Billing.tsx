@@ -124,13 +124,20 @@ const Billing = ({ user }: BillingProps) => {
       price: plan.price,
     });
 
-    // Track checkout initiation for Facebook/Pinterest pixels
+    // Track checkout initiation for the Meta Pixel. Pinterest has no
+    // distinct InitiateCheckout — its `checkout` event fires on actual
+    // purchase via trackPurchase. Generate the eventId here and pass
+    // the same value to createCheckoutSession so the server CAPI fire
+    // deduplicates against this client fire (Meta would otherwise
+    // double-count InitiateCheckout).
     const priceInPence = parseInt(plan.price.replace(/[^0-9]/g, ''), 10) * 100;
+    const initiateCheckoutEventId = crypto.randomUUID();
     trackInitiateCheckout({
       value: priceInPence,
       currency: 'GBP',
       productType: 'subscription',
       planName: plan.planName,
+      eventId: initiateCheckoutEventId,
     });
 
     try {
@@ -144,6 +151,7 @@ const Billing = ({ user }: BillingProps) => {
         plan.stripePriceEnv,
         'subscription',
         '/account/billing',
+        initiateCheckoutEventId,
       );
 
       if (!session || !session.id) {
@@ -185,13 +193,15 @@ const Billing = ({ user }: BillingProps) => {
       price: pack.price,
     });
 
-    // Track checkout initiation for Facebook/Pinterest pixels
+    // Meta-only InitiateCheckout — see handlePlanPurchase for rationale.
     const priceInPence = parseInt(pack.price.replace(/[^0-9]/g, ''), 10) * 100;
+    const initiateCheckoutEventId = crypto.randomUUID();
     trackInitiateCheckout({
       value: priceInPence,
       currency: 'GBP',
       productType: 'credits',
       creditAmount: pack.credits,
+      eventId: initiateCheckoutEventId,
     });
 
     try {
@@ -201,6 +211,8 @@ const Billing = ({ user }: BillingProps) => {
       const session = await createCheckoutSession(
         pack.stripePriceEnv,
         'payment',
+        undefined,
+        initiateCheckoutEventId,
       );
 
       if (!session) throw new Error('Failed to create checkout session');

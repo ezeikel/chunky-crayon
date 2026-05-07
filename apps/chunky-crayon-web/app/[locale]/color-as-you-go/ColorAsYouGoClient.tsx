@@ -59,14 +59,19 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
       price: pack.price,
     });
 
+    // Meta-only InitiateCheckout (Pinterest's `checkout` is the
+    // Purchase fire). Generate eventId here and pass to
+    // createCheckoutSession so the server CAPI fire dedups.
     const priceInPence = Math.round(
       parseFloat(pack.price.replace(/[^0-9.]/g, '')) * 100,
     );
+    const initiateCheckoutEventId = crypto.randomUUID();
     trackInitiateCheckout({
       value: priceInPence,
       currency: 'GBP',
       productType: 'credits',
       creditAmount: pack.credits,
+      eventId: initiateCheckoutEventId,
     });
 
     try {
@@ -77,6 +82,7 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
         pack.stripePriceEnv,
         'payment',
         '/color-as-you-go',
+        initiateCheckoutEventId,
       );
 
       if (!session || !session.id) {
