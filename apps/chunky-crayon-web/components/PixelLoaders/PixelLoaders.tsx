@@ -17,11 +17,31 @@ import Script from 'next/script';
  * Pixel IDs are read from NEXT_PUBLIC_* env vars at build time so they
  * inline as plain string literals here — no template-literal injection
  * into a script body.
+ *
+ * Gated to production only via NEXT_PUBLIC_VERCEL_ENV — preview deploys
+ * + local dev would otherwise pollute Meta/Pinterest event streams with
+ * test traffic, fragmenting reporting and confusing optimization.
+ * Server-side CAPI fires are already gated by credential presence
+ * (Pixel ID + access token live only in the production env), so they
+ * naturally skip in non-prod.
+ *
+ * Requires NEXT_PUBLIC_VERCEL_ENV to be set on the Vercel project.
+ * Vercel auto-injects VERCEL_ENV (production | preview | development)
+ * but NEXT_PUBLIC_VERCEL_ENV must be added explicitly — Vercel doesn't
+ * mirror system vars to NEXT_PUBLIC_* automatically.
  */
 const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
 const PINTEREST_TAG_ID = process.env.NEXT_PUBLIC_PINTEREST_TAG_ID;
+const IS_PRODUCTION =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ||
+  // Local-only escape hatch for testing the actual pixel fire against
+  // Meta/Pinterest test event modes. Set NEXT_PUBLIC_FORCE_PIXEL_LOAD=1
+  // explicitly when needed; never commit it set.
+  process.env.NEXT_PUBLIC_FORCE_PIXEL_LOAD === '1';
 
 const PixelLoaders = () => {
+  if (!IS_PRODUCTION) return null;
+
   return (
     <>
       {FB_PIXEL_ID && (
