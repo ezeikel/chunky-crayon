@@ -256,9 +256,24 @@ export const buildPanelImagePrompt = (
     ? `\n\nSCENE STATE — these things HAVE ALREADY HAPPENED earlier in this scene and must be reflected here. Do NOT reset them:\n- ${cumulativeStateChanges.join("\n- ")}`
     : "";
 
+  const castNames = panel.cast
+    .map((id) => COMIC_STRIP_CAST.find((c) => c.id === id)?.name ?? id)
+    .join(" and ");
   const continuityBlock = isSceneStart
     ? `\n\nThis panel STARTS A NEW SCENE — establish the setting fresh. Earlier panel images (if any are provided as references) belong to a different scene and should NOT influence the setting here.`
-    : `\n\nVISUAL CONTINUITY — additional reference images of the prior panels in this same scene have been provided. Match the banner text, props, furniture, and color palette to those images. Only the characters' poses, expressions, and the prop-state-changes listed above should differ.`;
+    : `\n\nVISUAL CONTINUITY — additional reference images of EARLIER PANELS in this same scene have been provided. Use them ONLY to lock the SETTING. From those earlier panels, copy:
+  - Banner / sign text (verbatim)
+  - Props, furniture, mountain shapes, room layouts
+  - Color palette and lighting
+
+From those earlier panels, IGNORE:
+  - Which characters appeared (each panel has its own cast)
+  - Any speech bubbles or dialogue (each panel has its own dialogue)
+  - Character poses, expressions, and positions
+
+CRITICAL: the cast in THIS panel is EXACTLY ${panel.cast.length === 1 ? "one character" : `${panel.cast.length} characters`}: ${castNames}. ${panel.cast.length < 4 ? "Any other characters who appeared in the earlier panels (Colo, Pip, Smudge, or Sticky) MUST NOT be in this panel — they have left the scene or are off-frame. Only the listed cast appears here." : ""}
+
+CRITICAL: speech bubbles in THIS panel are ONLY the ones listed below in the SPEECH BUBBLES section. ANY speech bubbles you saw in the earlier-panel references DO NOT carry over — they were said in a previous moment. Do not reproduce them. Do not add extra bubbles for off-panel characters.`;
 
   return `Comic strip panel ${panel.panel} of 4. Setting: ${panel.setting}.
 
