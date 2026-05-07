@@ -32,6 +32,9 @@ import {
 } from '@one-colored-pixel/coloring-core';
 import { generateText, Output } from 'ai';
 import sharp from 'sharp';
+// oslllo-potrace ships untyped (no @types/oslllo-potrace + no .d.ts);
+// the @ts-expect-error here was unused because the import resolves
+// to `any` cleanly. Removed to unblock the prod build.
 import potrace from 'oslllo-potrace';
 
 const args = process.argv.slice(2);
