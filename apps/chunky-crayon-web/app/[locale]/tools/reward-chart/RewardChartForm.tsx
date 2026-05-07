@@ -12,6 +12,8 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { trackEvent } from '@/utils/analytics-client';
+import { trackResourceSaved, trackViewContent } from '@/utils/pixels';
+import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
@@ -50,6 +52,7 @@ const RewardChartForm = () => {
 
   useEffect(() => {
     trackEvent(TRACKING_EVENTS.TOOL_VIEWED, { tool: 'reward-chart' });
+    trackViewContent({ contentType: 'tool', contentName: 'reward-chart' });
   }, []);
 
   const updateBehavior = (idx: number, value: string) => {
@@ -117,6 +120,21 @@ const RewardChartForm = () => {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+
+      const resourceEventId = `tool_reward-chart_${Date.now()}`;
+      trackResourceSaved({
+        method: 'download',
+        surface: 'tool',
+        contentType: 'pdf',
+        contentName: 'reward-chart',
+        eventId: resourceEventId,
+      });
+      void recordResourceSaved({
+        method: 'download',
+        surface: 'tool',
+        contentName: 'reward-chart',
+        eventId: resourceEventId,
+      });
 
       toast.success('Your reward chart is ready!');
     } catch (err) {

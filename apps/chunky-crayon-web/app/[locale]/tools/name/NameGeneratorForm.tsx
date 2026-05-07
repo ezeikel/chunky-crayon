@@ -15,6 +15,8 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { trackEvent } from '@/utils/analytics-client';
+import { trackResourceSaved, trackViewContent } from '@/utils/pixels';
+import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
@@ -71,6 +73,7 @@ const NameGeneratorForm = () => {
 
   useEffect(() => {
     trackEvent(TRACKING_EVENTS.TOOL_VIEWED, { tool: 'name' });
+    trackViewContent({ contentType: 'tool', contentName: 'name' });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,6 +106,26 @@ const NameGeneratorForm = () => {
         durationMs: 0,
         coloringImageId: result.id,
       });
+
+      // The name tool generates a real coloringImage row, so the lead
+      // is "page generated" (mirrors createPendingColoringImage's Lead
+      // pattern). Use the coloringImageId as the resource event id so
+      // it stays unique per generation.
+      const resourceEventId = `tool_name_${result.id}`;
+      trackResourceSaved({
+        method: 'save',
+        surface: 'tool',
+        contentType: 'coloring_page',
+        contentName: `name-${theme}`,
+        eventId: resourceEventId,
+      });
+      void recordResourceSaved({
+        method: 'save',
+        surface: 'tool',
+        contentName: `name-${theme}`,
+        eventId: resourceEventId,
+      });
+
       router.push(`/coloring-image/${result.id}`);
     } catch (err) {
       console.error(err);

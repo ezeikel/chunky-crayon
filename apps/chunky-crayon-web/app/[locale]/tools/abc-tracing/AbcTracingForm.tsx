@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { trackEvent } from '@/utils/analytics-client';
+import { trackResourceSaved, trackViewContent } from '@/utils/pixels';
+import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
@@ -22,6 +24,7 @@ const AbcTracingForm = () => {
 
   useEffect(() => {
     trackEvent(TRACKING_EVENTS.TOOL_VIEWED, { tool: 'abc-tracing' });
+    trackViewContent({ contentType: 'tool', contentName: 'abc-tracing' });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,6 +66,21 @@ const AbcTracingForm = () => {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+
+      const resourceEventId = `tool_abc-tracing_${Date.now()}`;
+      trackResourceSaved({
+        method: 'download',
+        surface: 'tool',
+        contentType: 'pdf',
+        contentName: 'abc-tracing',
+        eventId: resourceEventId,
+      });
+      void recordResourceSaved({
+        method: 'download',
+        surface: 'tool',
+        contentName: 'abc-tracing',
+        eventId: resourceEventId,
+      });
 
       toast.success('Your tracing bundle is ready!');
     } catch (err) {

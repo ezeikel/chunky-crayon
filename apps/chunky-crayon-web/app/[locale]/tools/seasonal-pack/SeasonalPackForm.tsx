@@ -13,6 +13,8 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { trackEvent } from '@/utils/analytics-client';
+import { trackResourceSaved, trackViewContent } from '@/utils/pixels';
+import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
 import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
@@ -83,6 +85,7 @@ const SeasonalPackForm = () => {
 
   useEffect(() => {
     trackEvent(TRACKING_EVENTS.TOOL_VIEWED, { tool: 'seasonal-pack' });
+    trackViewContent({ contentType: 'tool', contentName: 'seasonal-pack' });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,6 +119,21 @@ const SeasonalPackForm = () => {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+
+      const resourceEventId = `tool_seasonal-pack_${pack}_${Date.now()}`;
+      trackResourceSaved({
+        method: 'download',
+        surface: 'tool',
+        contentType: 'pdf',
+        contentName: `seasonal-pack-${pack}`,
+        eventId: resourceEventId,
+      });
+      void recordResourceSaved({
+        method: 'download',
+        surface: 'tool',
+        contentName: `seasonal-pack-${pack}`,
+        eventId: resourceEventId,
+      });
 
       toast.success('Your pack is ready!');
     } catch (err) {
