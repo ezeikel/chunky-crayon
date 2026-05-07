@@ -63,13 +63,14 @@ export async function generateMetadata({
   };
 }
 
-const BundleProductPage = async ({ params }: BundleProductPageProps) => {
-  const { locale, slug } = await params;
-
+// Synchronous page handler — only renders the static shell. Awaiting
+// `params` here would itself count as a dynamic access and bust the
+// Cache Components prerender. The dynamic island unwraps params instead.
+const BundleProductPage = ({ params }: BundleProductPageProps) => {
   return (
     <PageWrap>
       <Suspense fallback={null}>
-        <BundleContent locale={locale} slug={slug} />
+        <BundleContent params={params} />
       </Suspense>
     </PageWrap>
   );
@@ -79,12 +80,11 @@ const BundleProductPage = async ({ params }: BundleProductPageProps) => {
 // be inside the page's <Suspense> boundary so Cache Components can
 // prerender the shell and stream this in.
 const BundleContent = async ({
-  locale,
-  slug,
+  params,
 }: {
-  locale: string;
-  slug: string;
+  params: Promise<{ locale: string; slug: string }>;
 }) => {
+  const { locale, slug } = await params;
   const enabled = await checkFeatureFlag('bundles-shop');
   if (!enabled) notFound();
 
