@@ -14,6 +14,9 @@
     },
     "app/api/cron/regenerate-og/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/social/digest/route.ts": {
+      "maxDuration": 300
     }
   },
   "crons": [
