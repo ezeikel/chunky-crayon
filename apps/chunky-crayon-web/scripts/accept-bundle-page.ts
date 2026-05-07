@@ -32,7 +32,6 @@ import {
 } from '@one-colored-pixel/coloring-core';
 import { generateText, Output } from 'ai';
 import sharp from 'sharp';
-// @ts-expect-error - oslllo-potrace has no types
 import potrace from 'oslllo-potrace';
 
 const args = process.argv.slice(2);
