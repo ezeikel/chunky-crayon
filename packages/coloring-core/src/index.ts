@@ -168,6 +168,35 @@ export type { Hero, HeroBundle } from "./bundles/profiles";
 export { qaBundlePage, qaResultSchema } from "./bundles/qa";
 export type { QAResult } from "./bundles/qa";
 
+// Comic strip cast — recurring characters used in 4-panel weekly strips.
+// Shared between web (cron trigger, admin) and worker (script + panel
+// generation pipeline).
+export {
+  COMIC_STRIP_CAST,
+  COMIC_CAST_BY_ID,
+  COMIC_STYLE_BLOCK,
+} from "./comic/cast";
+export type { ComicCastMember, ComicCastId } from "./comic/cast";
+
+// Comic strip prompts — script writing + per-panel image prompt assembly.
+export {
+  COMIC_SCRIPT_SYSTEM,
+  createComicScriptPrompt,
+  buildPanelImagePrompt,
+} from "./comic/prompts";
+export type { PanelScript } from "./comic/prompts";
+
+// Comic strip QC — script gate (text) + panel gate (vision).
+export {
+  scriptQcResultSchema,
+  SCRIPT_QC_SYSTEM,
+  createScriptQcPrompt,
+  panelQcResultSchema,
+  PANEL_QC_SYSTEM,
+  createPanelQcPrompt,
+} from "./comic/qc";
+export type { ScriptQcResult, PanelQcResult } from "./comic/qc";
+
 // Utilities
 export { default as formatNumber } from "./utils/formatNumber";
 export { default as streamToBuffer } from "./utils/streamToBuffer";
