@@ -45,31 +45,36 @@ import {
 } from "./lib/loadFixture";
 import { TONDO_FONT_CSS_URL } from "../fonts";
 
+import {
+  computeV2Beats,
+  V2_DEFAULT_INPUT_VOICE_SECONDS,
+  V2_DEFAULT_REVEAL_VOICE_SECONDS,
+} from "./lib/timing";
+
 // =============================================================================
-// Beat timeline — identical to TextDemoReelV2 so per-platform post crons
-// can swap variants freely without retiming captions / SFX banks.
+// Beat timeline — identical structure to TextDemoReelV2 (voice-aware via
+// computeV2Beats) so per-platform post crons can swap variants freely
+// without retiming captions / SFX banks.
 // =============================================================================
 export const IMAGE_REEL_FPS = 30;
 
-const F_INTRO_START = 0;
-const F_INTRO_DUR = 45;
-const F_HOOK_START = F_INTRO_START + F_INTRO_DUR;
-const F_HOOK_DUR = 60;
-const F_INPUT_START = F_HOOK_START + F_HOOK_DUR;
-const F_INPUT_DUR = 180;
-const F_REVEAL_START = F_INPUT_START + F_INPUT_DUR;
-const F_REVEAL_DUR = 240;
-const F_OUTRO_START = F_REVEAL_START + F_REVEAL_DUR;
-const F_OUTRO_DUR = 90;
+export const IMAGE_REEL_DEFAULT_DURATION_FRAMES = computeV2Beats({
+  fps: IMAGE_REEL_FPS,
+  inputVoiceSeconds: V2_DEFAULT_INPUT_VOICE_SECONDS,
+  revealVoiceSeconds: V2_DEFAULT_REVEAL_VOICE_SECONDS,
+}).totalFrames;
 
-export const IMAGE_REEL_DURATION_FRAMES = F_OUTRO_START + F_OUTRO_DUR;
+/** @deprecated kept for back-compat — see TextDemoReelV2 for the same comment. */
+export const IMAGE_REEL_DURATION_FRAMES = IMAGE_REEL_DEFAULT_DURATION_FRAMES;
 
-// Reveal config — kept in sync with TextDemoReelV2 for consistency.
+// Reveal config — kept in sync with TextDemoReelV2 for consistency. Stamp
+// speed is fixed; reveal beat duration grows with adult-voice length.
 const STAMPS_PER_ROW = 24;
 const ROWS = 24;
 const TOTAL_STAMPS = STAMPS_PER_ROW * ROWS;
-const REVEAL_SPEED_FACTOR = TOTAL_STAMPS / F_REVEAL_DUR;
 const STAMP_PATH = makeBoustrophedonPath(STAMPS_PER_ROW, ROWS);
+const REVEAL_REFERENCE_FRAMES = 240;
+const REVEAL_SPEED_FACTOR = TOTAL_STAMPS / REVEAL_REFERENCE_FRAMES;
 
 // =============================================================================
 // Input props
@@ -90,10 +95,22 @@ export type ImageDemoReelV2Props = {
 
   // ── Audio (optional) ───────────────────────────────────────────────────
   backgroundMusicUrl?: string;
-  /** Kid voiceover narrating the upload + intro section. */
+  /**
+   * Kid voiceover narrating the upload + intro section. (Note: the
+   * IMAGE comp's "kid" voice is actually generated with the adult
+   * voice id — see worker's script.earlyVoice handling. Field name
+   * kept for parity with the TEXT comp.)
+   */
   kidVoiceUrl?: string;
   /** Adult narrator voiceover for the reveal/outro. */
   adultVoiceUrl?: string;
+  /**
+   * Kid (early) voice clip duration in seconds. Drives the INPUT beat
+   * length so the photo-upload scene doesn't end mid-sentence.
+   */
+  kidVoiceSeconds?: number;
+  /** Adult voice clip duration in seconds. Drives the REVEAL beat. */
+  adultVoiceSeconds?: number;
 };
 
 // =============================================================================
@@ -112,9 +129,18 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
   backgroundMusicUrl,
   kidVoiceUrl,
   adultVoiceUrl,
+  kidVoiceSeconds = V2_DEFAULT_INPUT_VOICE_SECONDS,
+  adultVoiceSeconds = V2_DEFAULT_REVEAL_VOICE_SECONDS,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width: vWidth } = useVideoConfig();
+
+  // Voice-aware beat boundaries — see TextDemoReelV2 for rationale.
+  const beats = computeV2Beats({
+    fps,
+    inputVoiceSeconds: kidVoiceSeconds,
+    revealVoiceSeconds: adultVoiceSeconds,
+  });
 
   const [fixture, setFixture] = useState<CanvasRevealFixture | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -192,7 +218,7 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
   // Frames 0–24 of the input scene: empty drop zone slides up via spring.
   // Frames 30–60: photo "drops in" — previewProgress climbs 0 → 1.
   // Frames 60+: held with filename strip visible.
-  const inputLocal = frame - F_INPUT_START;
+  const inputLocal = frame - beats.inputStart;
   const cardEntry = spring({
     frame: inputLocal,
     fps,
@@ -205,7 +231,7 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
   });
 
   // ── Toolbar appears at the start of the reveal scene ────────────────────
-  const toolbarLocal = frame - F_REVEAL_START;
+  const toolbarLocal = frame - beats.revealStart;
   const toolbarEntry = spring({
     frame: toolbarLocal,
     fps,
@@ -220,7 +246,7 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
   });
 
   // ── Canvas reveal ───────────────────────────────────────────────────────
-  const revealLocal = frame - F_REVEAL_START;
+  const revealLocal = frame - beats.revealStart;
   const stampCount = Math.max(
     0,
     Math.min(TOTAL_STAMPS, Math.floor(revealLocal * REVEAL_SPEED_FACTOR)),
@@ -233,20 +259,21 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
       <link rel="stylesheet" href={TONDO_FONT_CSS_URL} />
 
       {/* ── Beats 1 + 2 — identical to text variant ───────────────────── */}
-      <Sequence from={F_INTRO_START} durationInFrames={F_INTRO_DUR}>
-        <IntroCard durationFrames={F_INTRO_DUR} />
+      <Sequence from={beats.introStart} durationInFrames={beats.introDur}>
+        <IntroCard durationFrames={beats.introDur} />
       </Sequence>
 
-      <Sequence from={F_HOOK_START} durationInFrames={F_HOOK_DUR}>
+      <Sequence from={beats.hookStart} durationInFrames={beats.hookDur}>
         <HookCard
           line1="Turn any photo into"
           line2="a coloring page"
-          durationFrames={F_HOOK_DUR}
+          durationFrames={beats.hookDur}
         />
       </Sequence>
 
-      {/* ── Beat 3: photo upload scene ───────────────────────────────── */}
-      <Sequence from={F_INPUT_START} durationInFrames={F_INPUT_DUR}>
+      {/* ── Beat 3: photo upload scene (visual only — voice audio mounts
+              at the composition root below) ───────────────────────────── */}
+      <Sequence from={beats.inputStart} durationInFrames={beats.inputDur}>
         <AbsoluteFill
           style={{
             background: COLORS.bgCream,
@@ -271,29 +298,10 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
             />
           </div>
         </AbsoluteFill>
-
-        {/* Swoosh as the empty drop-zone card slides up. Same swoosh as
-            text variant's prompt card so both reels feel of-a-piece. */}
-        <Audio src={staticFile("v2-sfx/textbox-swoosh.wav")} volume={0.6} />
-
-        {/* Pop SFX when the photo lands in the preview state. Bounded
-            sequence keeps it from bleeding into Beat 4. */}
-        <Sequence from={28} durationInFrames={20}>
-          <Audio src={staticFile("v2-sfx/pop.mp3")} volume={0.7} />
-        </Sequence>
-
-        {/* Adult-narrator reaction line — starts AFTER the photo finishes
-            its drop-in (frame 60), so the viewer sees the photo land
-            before they hear "oh, a meadow…". Audio is on the inputProps
-            field still named `kidVoiceUrl` for parity with the text reel
-            comp; the worker sends the adult-spoken file in for image mode. */}
-        <Sequence from={60}>
-          {kidVoiceUrl ? <Audio src={kidVoiceUrl} volume={1} /> : null}
-        </Sequence>
       </Sequence>
 
       {/* ── Beat 4: canvas + toolbar + palette — identical to text ───── */}
-      <Sequence from={F_REVEAL_START} durationInFrames={F_REVEAL_DUR}>
+      <Sequence from={beats.revealStart} durationInFrames={beats.revealDur}>
         <AbsoluteFill
           style={{
             background: COLORS.bgCream,
@@ -340,26 +348,57 @@ export const ImageDemoReelV2: React.FC<ImageDemoReelV2Props> = ({
             <PaletteRow selectedIndex={null} limit={12} />
           </div>
         </AbsoluteFill>
-
-        {/* Same swish + kids-yay layered entrance as text variant. */}
-        <Audio src={staticFile("v2-sfx/swish.mp3")} volume={0.6} />
-        <Audio src={staticFile("v2-sfx/kids-yay.mp3")} volume={0.6} />
-
-        {/* Pencil-on-paper draw loop under the brush sweep. */}
-        <Sequence from={20} durationInFrames={F_REVEAL_DUR - 20}>
-          <Audio src={staticFile("v2-sfx/draw.mp3")} volume={0.45} loop />
-        </Sequence>
-
-        {adultVoiceUrl ? <Audio src={adultVoiceUrl} volume={1} /> : null}
       </Sequence>
 
       {/* ── Beat 5: outro ─────────────────────────────────────────────── */}
-      <Sequence from={F_OUTRO_START} durationInFrames={F_OUTRO_DUR}>
+      <Sequence from={beats.outroStart} durationInFrames={beats.outroDur}>
         <OutroCard
           finishedImageUrl={finishedImageUrl}
-          durationFrames={F_OUTRO_DUR}
+          durationFrames={beats.outroDur}
         />
       </Sequence>
+
+      {/* ===========================================================
+          AUDIO — voice + SFX live at COMPOSITION ROOT, never inside
+          a bounded <Sequence durationInFrames=…>. Same fix as
+          TextDemoReelV2 — see the audio-routing comment there for
+          full rationale.
+          =========================================================== */}
+
+      {/* Beat 3 (input/upload): swoosh on card entrance, pop when the
+          photo preview lands, kid (= adult voice for IMAGE mode) voice
+          starting after photo finishes its drop-in (frame 60). */}
+      <Sequence from={beats.inputStart}>
+        <Audio src={staticFile("v2-sfx/textbox-swoosh.wav")} volume={0.6} />
+      </Sequence>
+      <Sequence from={beats.inputStart + 28} durationInFrames={20}>
+        <Audio src={staticFile("v2-sfx/pop.mp3")} volume={0.7} />
+      </Sequence>
+      {kidVoiceUrl ? (
+        <Sequence from={beats.inputVoiceStart + 60}>
+          <Audio src={kidVoiceUrl} volume={1} />
+        </Sequence>
+      ) : null}
+
+      {/* Beat 4 (canvas reveal): swish + kids "yay" on entrance, pencil
+          draw loop, adult narrator. */}
+      <Sequence from={beats.revealStart}>
+        <Audio src={staticFile("v2-sfx/swish.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence from={beats.revealStart}>
+        <Audio src={staticFile("v2-sfx/kids-yay.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence
+        from={beats.revealStart + 20}
+        durationInFrames={beats.revealDur - 20}
+      >
+        <Audio src={staticFile("v2-sfx/draw.mp3")} volume={0.45} loop />
+      </Sequence>
+      {adultVoiceUrl ? (
+        <Sequence from={beats.revealVoiceStart}>
+          <Audio src={adultVoiceUrl} volume={1} />
+        </Sequence>
+      ) : null}
 
       {/* Ducked ambient music across the full reel. */}
       {backgroundMusicUrl ? (

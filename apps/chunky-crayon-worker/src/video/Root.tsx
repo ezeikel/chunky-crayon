@@ -42,6 +42,11 @@ import {
 } from "./v2/VoiceDemoReelV2";
 import koalaRegionsJson from "./spikes/fixtures/koala-regions.json";
 import type { RegionStoreJson } from "./v2/lib/loadFixture";
+import {
+  computeV2Beats,
+  V2_DEFAULT_INPUT_VOICE_SECONDS,
+  V2_DEFAULT_REVEAL_VOICE_SECONDS,
+} from "./v2/lib/timing";
 import { staticFile } from "remotion";
 import {
   Template1ShockStat,
@@ -223,6 +228,18 @@ export const RemotionRoot: React.FC = () => {
             adultVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
           } satisfies ImageDemoReelV2Props
         }
+        // Voice-aware total — duration grows to fit kid + adult voice
+        // clips. Real worker renders pass exact ffprobe'd durations via
+        // inputProps. Studio preview falls back to V2_DEFAULT_*.
+        calculateMetadata={({ props }) => ({
+          durationInFrames: computeV2Beats({
+            fps: IMAGE_REEL_FPS,
+            inputVoiceSeconds:
+              props.kidVoiceSeconds ?? V2_DEFAULT_INPUT_VOICE_SECONDS,
+            revealVoiceSeconds:
+              props.adultVoiceSeconds ?? V2_DEFAULT_REVEAL_VOICE_SECONDS,
+          }).totalFrames,
+        })}
       />
 
       {/* Phase 4 — V2 text variant reel. Real renders pass inputProps
@@ -257,6 +274,15 @@ export const RemotionRoot: React.FC = () => {
             adultVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
           } satisfies TextDemoReelV2Props
         }
+        calculateMetadata={({ props }) => ({
+          durationInFrames: computeV2Beats({
+            fps: TEXT_REEL_FPS,
+            inputVoiceSeconds:
+              props.kidVoiceSeconds ?? V2_DEFAULT_INPUT_VOICE_SECONDS,
+            revealVoiceSeconds:
+              props.adultVoiceSeconds ?? V2_DEFAULT_REVEAL_VOICE_SECONDS,
+          }).totalFrames,
+        })}
       />
 
       {/* Phase 9 — V2 voice variant reel. Same beat skeleton, Beat 3
@@ -290,6 +316,27 @@ export const RemotionRoot: React.FC = () => {
             adultVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
           } satisfies VoiceDemoReelV2Props
         }
+        calculateMetadata={({ props }) => {
+          // Sum the conversation: idle + q1 + a1 + thinking + q2 + a2
+          // + tail buffer. Mirrors totalVoiceInputSecs() inside the
+          // VoiceDemoReelV2 comp + the worker's voiceInputSecs.
+          const inputVoiceSeconds =
+            0.6 +
+            (props.q1AudioSeconds ?? 2.0) +
+            (props.a1AudioSeconds ?? 2.7) +
+            0.8 +
+            (props.q2AudioSeconds ?? 2.9) +
+            (props.a2AudioSeconds ?? 5.9) +
+            0.4;
+          return {
+            durationInFrames: computeV2Beats({
+              fps: VOICE_REEL_FPS,
+              inputVoiceSeconds,
+              revealVoiceSeconds:
+                props.adultVoiceSeconds ?? V2_DEFAULT_REVEAL_VOICE_SECONDS,
+            }).totalFrames,
+          };
+        }}
       />
 
       {/* Phase 0 spike — Content Reel Template 1 (Shock). 9:16 @30fps,

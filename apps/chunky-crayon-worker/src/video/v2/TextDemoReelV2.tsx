@@ -44,31 +44,51 @@ import {
   type PaletteVariant,
 } from "./lib/loadFixture";
 import { TONDO_FONT_CSS_URL } from "../fonts";
+import {
+  computeV2Beats,
+  V2_DEFAULT_INPUT_VOICE_SECONDS,
+  V2_DEFAULT_REVEAL_VOICE_SECONDS,
+} from "./lib/timing";
 
 // =============================================================================
 // Beat timeline (frames @ 30fps)
 // =============================================================================
 export const TEXT_REEL_FPS = 30;
 
-const F_INTRO_START = 0;
-const F_INTRO_DUR = 45;
-const F_HOOK_START = F_INTRO_START + F_INTRO_DUR;
-const F_HOOK_DUR = 60;
-const F_CREATE_START = F_HOOK_START + F_HOOK_DUR;
-const F_CREATE_DUR = 180; // prompt-typing scene total
-const F_REVEAL_START = F_CREATE_START + F_CREATE_DUR;
-const F_REVEAL_DUR = 240; // canvas reveal at 4x speed (~8s of 24×24 = 576 stamps)
-const F_OUTRO_START = F_REVEAL_START + F_REVEAL_DUR;
-const F_OUTRO_DUR = 90;
+/**
+ * Default total duration when voice clips aren't supplied (Studio
+ * preview, fallback). Matches the legacy fixed-beat total of 615
+ * frames (~20.5s). Worker-driven renders override via
+ * calculateMetadata using the actual ffprobe'd voice durations.
+ */
+export const TEXT_REEL_DEFAULT_DURATION_FRAMES = computeV2Beats({
+  fps: TEXT_REEL_FPS,
+  inputVoiceSeconds: V2_DEFAULT_INPUT_VOICE_SECONDS,
+  revealVoiceSeconds: V2_DEFAULT_REVEAL_VOICE_SECONDS,
+}).totalFrames;
 
-export const TEXT_REEL_DURATION_FRAMES = F_OUTRO_START + F_OUTRO_DUR;
+/**
+ * @deprecated Kept for back-compat with renderTextDemoReelV2 callers
+ * that destructure this. New callers should rely on calculateMetadata.
+ */
+export const TEXT_REEL_DURATION_FRAMES = TEXT_REEL_DEFAULT_DURATION_FRAMES;
 
-// Reveal config — kept in sync with Phase 0 spike values.
+// Reveal config — kept in sync with Phase 0 spike values. Stamp speed
+// is fixed (the brush should always sweep at the same rate); the
+// reveal beat duration grows with adult-voice length, so the canvas
+// finishes drawing well before the voice does and the stamps just
+// settle for the remainder.
 const STAMPS_PER_ROW = 24;
 const ROWS = 24;
 const TOTAL_STAMPS = STAMPS_PER_ROW * ROWS;
-const REVEAL_SPEED_FACTOR = TOTAL_STAMPS / F_REVEAL_DUR; // ≈ 2.4 stamps/frame
 const STAMP_PATH = makeBoustrophedonPath(STAMPS_PER_ROW, ROWS);
+/**
+ * Reference reveal duration the stamp speed was tuned against (~8s
+ * @ 30fps = 240 frames, matches the legacy F_REVEAL_DUR). Stamps per
+ * frame stays 2.4 regardless of beat length.
+ */
+const REVEAL_REFERENCE_FRAMES = 240;
+const REVEAL_SPEED_FACTOR = TOTAL_STAMPS / REVEAL_REFERENCE_FRAMES;
 
 // =============================================================================
 // Input props (from worker /publish/v2 OR defaultProps in Root)
@@ -102,6 +122,18 @@ export type TextDemoReelV2Props = {
    * as the kid voice, different ElevenLabs voice id.
    */
   adultVoiceUrl?: string;
+  /**
+   * Kid voice clip duration in seconds. Drives the INPUT beat length
+   * so the typing scene doesn't end mid-sentence. Probed by the worker
+   * via ffprobe before render. Defaults to a sensible voice length
+   * for Studio preview.
+   */
+  kidVoiceSeconds?: number;
+  /**
+   * Adult voice clip duration in seconds. Drives the REVEAL beat
+   * length when the narration is longer than the visual brush sweep.
+   */
+  adultVoiceSeconds?: number;
 };
 
 // =============================================================================
@@ -119,9 +151,21 @@ export const TextDemoReelV2: React.FC<TextDemoReelV2Props> = ({
   backgroundMusicUrl,
   kidVoiceUrl,
   adultVoiceUrl,
+  kidVoiceSeconds = V2_DEFAULT_INPUT_VOICE_SECONDS,
+  adultVoiceSeconds = V2_DEFAULT_REVEAL_VOICE_SECONDS,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width: vWidth } = useVideoConfig();
+
+  // Voice-aware beat boundaries — replaces the old hardcoded F_*
+  // constants. INPUT (typing scene) flexes to fit the kid voice;
+  // REVEAL extends if the adult voice is longer than the brush sweep.
+  // See ./lib/timing.ts for the rationale.
+  const beats = computeV2Beats({
+    fps,
+    inputVoiceSeconds: kidVoiceSeconds,
+    revealVoiceSeconds: adultVoiceSeconds,
+  });
 
   const [fixture, setFixture] = useState<CanvasRevealFixture | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -198,8 +242,8 @@ export const TextDemoReelV2: React.FC<TextDemoReelV2Props> = ({
   // ── Create scene (prompt typing) ────────────────────────────────────────
   // Type out the prompt over the first 75% of the create scene, hold the
   // completed text for the remainder so the viewer registers the input.
-  const createLocal = frame - F_CREATE_START;
-  const typingDuration = Math.floor(F_CREATE_DUR * 0.6);
+  const createLocal = frame - beats.inputStart;
+  const typingDuration = Math.floor(beats.inputDur * 0.6);
   const typedChars = Math.min(
     prompt.length,
     Math.floor((createLocal / typingDuration) * prompt.length),
@@ -222,7 +266,7 @@ export const TextDemoReelV2: React.FC<TextDemoReelV2Props> = ({
   // not the prompt scene. It slides up from below when Beat 4 begins, and
   // the magic-reveal cell pops with a spring shortly after to draw the eye
   // before the brush starts moving.
-  const toolbarLocal = frame - F_REVEAL_START;
+  const toolbarLocal = frame - beats.revealStart;
   const toolbarEntry = spring({
     frame: toolbarLocal,
     fps,
@@ -237,7 +281,7 @@ export const TextDemoReelV2: React.FC<TextDemoReelV2Props> = ({
   });
 
   // ── Canvas reveal ───────────────────────────────────────────────────────
-  const revealLocal = frame - F_REVEAL_START;
+  const revealLocal = frame - beats.revealStart;
   const stampCount = Math.max(
     0,
     Math.min(TOTAL_STAMPS, Math.floor(revealLocal * REVEAL_SPEED_FACTOR)),
@@ -250,20 +294,21 @@ export const TextDemoReelV2: React.FC<TextDemoReelV2Props> = ({
       <link rel="stylesheet" href={TONDO_FONT_CSS_URL} />
 
       {/* ── Beats 1 + 2: intro and hook ───────────────────────────────── */}
-      <Sequence from={F_INTRO_START} durationInFrames={F_INTRO_DUR}>
-        <IntroCard durationFrames={F_INTRO_DUR} />
+      <Sequence from={beats.introStart} durationInFrames={beats.introDur}>
+        <IntroCard durationFrames={beats.introDur} />
       </Sequence>
 
-      <Sequence from={F_HOOK_START} durationInFrames={F_HOOK_DUR}>
+      <Sequence from={beats.hookStart} durationInFrames={beats.hookDur}>
         <HookCard
           line1="What if you could color"
           line2="anything?"
-          durationFrames={F_HOOK_DUR}
+          durationFrames={beats.hookDur}
         />
       </Sequence>
 
-      {/* ── Beat 3: prompt typing only ────────────────────────────────── */}
-      <Sequence from={F_CREATE_START} durationInFrames={F_CREATE_DUR}>
+      {/* ── Beat 3: prompt typing only (visual only — voice audio mounts
+              at the composition root below) ───────────────────────────── */}
+      <Sequence from={beats.inputStart} durationInFrames={beats.inputDur}>
         <AbsoluteFill
           style={{
             background: COLORS.bgCream,
@@ -288,27 +333,10 @@ export const TextDemoReelV2: React.FC<TextDemoReelV2Props> = ({
             />
           </div>
         </AbsoluteFill>
-
-        {/* Swoosh tags the prompt card's entrance — synced with the
-            spring slide-up. Plays once at the start of the sequence. */}
-        <Audio src={staticFile("v2-sfx/textbox-swoosh.wav")} volume={0.6} />
-
-        {/* Keyboard typing SFX during the active typing window. Bounded
-            by a Sequence so it stops when the typing animation finishes
-            instead of trailing under the toolbar/canvas scene. Starts
-            after the swoosh + card entrance so the textbox is on screen
-            before keys start clicking. */}
-        <Sequence from={14} durationInFrames={typingDuration}>
-          <Audio src={staticFile("v2-sfx/keyboard-typing.mp3")} volume={0.4} />
-        </Sequence>
-
-        {/* Kid voiceover narrates the typing scene — same role as V1
-            DemoReel.tsx's kid voice over typing clip. */}
-        {kidVoiceUrl ? <Audio src={kidVoiceUrl} volume={1} /> : null}
       </Sequence>
 
       {/* ── Beat 4: canvas + toolbar + palette together ───────────────── */}
-      <Sequence from={F_REVEAL_START} durationInFrames={F_REVEAL_DUR}>
+      <Sequence from={beats.revealStart} durationInFrames={beats.revealDur}>
         <AbsoluteFill
           style={{
             background: COLORS.bgCream,
@@ -358,31 +386,64 @@ export const TextDemoReelV2: React.FC<TextDemoReelV2Props> = ({
             <PaletteRow selectedIndex={null} limit={12} />
           </div>
         </AbsoluteFill>
-
-        {/* Swish + kids "yay!" land together on canvas-reveal entrance —
-            swoosh tags the cut, cheer celebrates the page appearing.
-            Different swoosh from Beat 3's textbox-swoosh so consecutive
-            transitions don't feel identical. */}
-        <Audio src={staticFile("v2-sfx/swish.mp3")} volume={0.6} />
-        <Audio src={staticFile("v2-sfx/kids-yay.mp3")} volume={0.6} />
-
-        {/* Light pencil-on-paper draw sound underneath the actual brush
-            sweep. Looped because the sweep runs longer than one clip. */}
-        <Sequence from={20} durationInFrames={F_REVEAL_DUR - 20}>
-          <Audio src={staticFile("v2-sfx/draw.mp3")} volume={0.45} loop />
-        </Sequence>
-
-        {/* Adult narrator over the reveal section. */}
-        {adultVoiceUrl ? <Audio src={adultVoiceUrl} volume={1} /> : null}
       </Sequence>
 
       {/* ── Beat 5: outro hero + CTA ──────────────────────────────────── */}
-      <Sequence from={F_OUTRO_START} durationInFrames={F_OUTRO_DUR}>
+      <Sequence from={beats.outroStart} durationInFrames={beats.outroDur}>
         <OutroCard
           finishedImageUrl={finishedImageUrl}
-          durationFrames={F_OUTRO_DUR}
+          durationFrames={beats.outroDur}
         />
       </Sequence>
+
+      {/* ===========================================================
+          AUDIO — voice + SFX live at the COMPOSITION ROOT, never
+          inside a bounded <Sequence durationInFrames=…>. Remotion
+          truncates audio that's a child of a bounded sequence at the
+          sequence's end frame, which is exactly the bug that cut off
+          the first voiceover mid-sentence on demo reels.
+
+          The fix mirrors what content-reel/spike templates do:
+            - <Sequence from={beatStart}> with NO durationInFrames
+              shifts t=0 to the beat boundary but doesn't bound the end.
+            - Total composition length is computed from voice durations
+              (computeV2Beats), so the comp itself outlasts every voice.
+            - Music goes at absolute root, looped, ducked.
+          =========================================================== */}
+
+      {/* Beat 3 (typing): swoosh on prompt-card entrance, keyboard SFX
+          while typing animates, kid voiceover narrating the input. */}
+      <Sequence from={beats.inputStart}>
+        <Audio src={staticFile("v2-sfx/textbox-swoosh.wav")} volume={0.6} />
+      </Sequence>
+      <Sequence from={beats.inputStart + 14} durationInFrames={typingDuration}>
+        <Audio src={staticFile("v2-sfx/keyboard-typing.mp3")} volume={0.4} />
+      </Sequence>
+      {kidVoiceUrl ? (
+        <Sequence from={beats.inputVoiceStart}>
+          <Audio src={kidVoiceUrl} volume={1} />
+        </Sequence>
+      ) : null}
+
+      {/* Beat 4 (canvas reveal): swish + kids "yay" on entrance, pencil
+          draw loop underneath, adult narrator over the reveal. */}
+      <Sequence from={beats.revealStart}>
+        <Audio src={staticFile("v2-sfx/swish.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence from={beats.revealStart}>
+        <Audio src={staticFile("v2-sfx/kids-yay.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence
+        from={beats.revealStart + 20}
+        durationInFrames={beats.revealDur - 20}
+      >
+        <Audio src={staticFile("v2-sfx/draw.mp3")} volume={0.45} loop />
+      </Sequence>
+      {adultVoiceUrl ? (
+        <Sequence from={beats.revealVoiceStart}>
+          <Audio src={adultVoiceUrl} volume={1} />
+        </Sequence>
+      ) : null}
 
       {/* Ducked ambient music across the full reel — same volume (0.18)
           and loop behaviour as V1 DemoReel.tsx. */}

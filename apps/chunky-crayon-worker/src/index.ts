@@ -36,6 +36,11 @@ import { proxyToLocal } from "./video/v2/proxy.js";
 import { buildDemoReelCover } from "./video/v2/cover.js";
 import { buildDemoReelHookCover } from "./video/v2/hook-cover.js";
 import { pickBestPalette } from "./video/v2/palette.js";
+import { probeAudioDurationOrFallback } from "./lib/audioDuration.js";
+import {
+  V2_DEFAULT_INPUT_VOICE_SECONDS,
+  V2_DEFAULT_REVEAL_VOICE_SECONDS,
+} from "./video/v2/lib/timing.js";
 import { streamSSE } from "hono/streaming";
 import {
   streamColoringImage,
@@ -48,6 +53,7 @@ import {
 import { subscribe } from "./coloring-image/listener.js";
 import { runBlogCron } from "./blog/pipeline.js";
 import { runDailyImageCron } from "./coloring-image/daily-pipeline.js";
+import { runComicStripCron } from "./comic-strip/pipeline.js";
 import {
   generateBundlePage,
   BundlePageQAFailedError,
@@ -697,6 +703,29 @@ app.post("/generate/daily-image", async (c) => {
     .finally(() => {
       clearInterval(keepaliveTimer);
     });
+
+  return c.json({ ok: true, accepted: true }, 202);
+});
+
+/**
+ * POST /generate/comic-strip
+ *
+ * Weekly comic-strip cron (fire-and-forget). Vercel's
+ * /api/cron/comic-strip is a thin trigger that POSTs here and returns 202.
+ * This endpoint runs the full pipeline (Claude script + script QC, 4×
+ * gpt-image-2 panel renders + per-panel vision QC, sharp 2x2 composite,
+ * R2 uploads, Prisma row).
+ *
+ * Auth: bearer CRON_SECRET (handled by /generate/* middleware above).
+ */
+app.post("/generate/comic-strip", async (c) => {
+  console.log("[/generate/comic-strip] kickoff");
+
+  runComicStripCron().catch((err) => {
+    // Pipeline catches its own errors and emails admin; this guard is just
+    // belt-and-braces so an uncaught throw never crashes the worker process.
+    console.error("[/generate/comic-strip] uncaught:", err);
+  });
 
   return c.json({ ok: true, accepted: true }, 202);
 });
@@ -1806,6 +1835,15 @@ const buildV2ReelAudio = async (args: {
   backgroundMusicUrl?: string;
   kidVoiceUrl?: string;
   adultVoiceUrl?: string;
+  /**
+   * Probed duration of kidVoiceUrl in seconds, or undefined if no kid
+   * voice was generated (voice variant) or probe failed. Threaded to
+   * the comp via inputProps so the INPUT beat sizes itself around the
+   * actual clip — fixes the "first voiceover gets cut off" bug.
+   */
+  kidVoiceSeconds?: number;
+  /** Probed duration of adultVoiceUrl in seconds. */
+  adultVoiceSeconds?: number;
 }> => {
   const { imageId, prompt, imageTitle, ambientUrl, port, variant } = args;
   const tag = `[/publish/v2:${variant}]`;
@@ -1857,6 +1895,7 @@ const buildV2ReelAudio = async (args: {
     const stamp = Date.now();
     const adultPath = resolve(WORKER_OUT_DIR, `${stamp}-${imageId}-adult.mp3`);
 
+    let earlyPath: string | undefined;
     if (variant === "voice") {
       await generateVoiceClip({
         text: script.adultLine,
@@ -1869,10 +1908,7 @@ const buildV2ReelAudio = async (args: {
       // text + image: generate the early line + adult outro in parallel.
       // For image variant, earlyVoice='adult' so the "kid" slot is actually
       // adult-spoken (parent-y reaction to the photo).
-      const earlyPath = resolve(
-        WORKER_OUT_DIR,
-        `${stamp + 1}-${imageId}-early.mp3`,
-      );
+      earlyPath = resolve(WORKER_OUT_DIR, `${stamp + 1}-${imageId}-early.mp3`);
       const earlyVoiceId =
         script.earlyVoice === "adult" ? adultVoiceId : kidVoiceId;
       await Promise.all([
@@ -1895,6 +1931,40 @@ const buildV2ReelAudio = async (args: {
         `${tag} voice clips ready: early(${script.earlyVoice})=${kidVoiceUrl} adult=${adultVoiceUrl}`,
       );
     }
+
+    // Probe each clip's actual duration so the comp can size beats
+    // around the real audio length. Fixes the "first voiceover gets
+    // cut off" bug — without this, the INPUT scene is hardcoded to
+    // 6s and any voice ≥5.5s clips at scene transition.
+    let kidVoiceSeconds: number | undefined;
+    let adultVoiceSeconds: number | undefined;
+    if (earlyPath && kidVoiceUrl) {
+      kidVoiceSeconds = await probeAudioDurationOrFallback(
+        earlyPath,
+        V2_DEFAULT_INPUT_VOICE_SECONDS,
+        `${tag} probe-early`,
+      );
+    }
+    if (adultVoiceUrl) {
+      adultVoiceSeconds = await probeAudioDurationOrFallback(
+        adultPath,
+        V2_DEFAULT_REVEAL_VOICE_SECONDS,
+        `${tag} probe-adult`,
+      );
+    }
+    if (kidVoiceSeconds !== undefined || adultVoiceSeconds !== undefined) {
+      console.log(
+        `${tag} probed durations: kid=${kidVoiceSeconds?.toFixed(2)}s adult=${adultVoiceSeconds?.toFixed(2)}s`,
+      );
+    }
+
+    return {
+      backgroundMusicUrl,
+      kidVoiceUrl,
+      adultVoiceUrl,
+      kidVoiceSeconds,
+      adultVoiceSeconds,
+    };
   } catch (err) {
     console.error(`${tag} voiceover generation failed (continuing):`, err);
   }
@@ -2023,8 +2093,20 @@ app.post("/publish/v2", async (c) => {
   // the comp's delayRender boundary doesn't time out fetching them.
   try {
     if (variant === "text") {
-      const { TEXT_REEL_DURATION_FRAMES, TEXT_REEL_FPS } = await import(
-        "./video/v2/TextDemoReelV2.js"
+      const { computeV2Beats } = await import("./video/v2/lib/timing.js");
+      const { TEXT_REEL_FPS } = await import("./video/v2/TextDemoReelV2.js");
+      // Voice-aware total duration — sized so neither voice is cut off.
+      // computeV2Beats handles the floor case (input beat ≥6s, reveal ≥8s)
+      // and adds a 0.4s post-voice buffer.
+      const beats = computeV2Beats({
+        fps: TEXT_REEL_FPS,
+        inputVoiceSeconds:
+          reelAudio.kidVoiceSeconds ?? V2_DEFAULT_INPUT_VOICE_SECONDS,
+        revealVoiceSeconds:
+          reelAudio.adultVoiceSeconds ?? V2_DEFAULT_REVEAL_VOICE_SECONDS,
+      });
+      console.log(
+        `[/publish/v2:text] computed total: ${beats.totalFrames} frames (input=${beats.inputDur}, reveal=${beats.revealDur})`,
       );
       await renderTextDemoReelV2({
         prompt: shortPrompt,
@@ -2038,14 +2120,14 @@ app.post("/publish/v2", async (c) => {
         backgroundMusicUrl: reelAudio.backgroundMusicUrl,
         kidVoiceUrl: reelAudio.kidVoiceUrl,
         adultVoiceUrl: reelAudio.adultVoiceUrl,
+        kidVoiceSeconds: reelAudio.kidVoiceSeconds,
+        adultVoiceSeconds: reelAudio.adultVoiceSeconds,
         outputPath,
-        durationInFrames: TEXT_REEL_DURATION_FRAMES,
+        durationInFrames: beats.totalFrames,
         fps: TEXT_REEL_FPS,
       });
     } else if (variant === "image") {
-      const { IMAGE_REEL_DURATION_FRAMES, IMAGE_REEL_FPS } = await import(
-        "./video/v2/ImageDemoReelV2.js"
-      );
+      const { IMAGE_REEL_FPS } = await import("./video/v2/ImageDemoReelV2.js");
       // Look up which photo this image came from. produce-v2 stores
       // photo_library_entries.id alongside the image generation; here we
       // find the most-recent library entry whose lastUsed timestamp
@@ -2072,6 +2154,19 @@ app.post("/publish/v2", async (c) => {
       }
       const proxiedPhoto = await proxyToLocal(photoUrl, proxyOpts);
 
+      const { computeV2Beats: computeImageBeats } = await import(
+        "./video/v2/lib/timing.js"
+      );
+      const imageBeats = computeImageBeats({
+        fps: IMAGE_REEL_FPS,
+        inputVoiceSeconds:
+          reelAudio.kidVoiceSeconds ?? V2_DEFAULT_INPUT_VOICE_SECONDS,
+        revealVoiceSeconds:
+          reelAudio.adultVoiceSeconds ?? V2_DEFAULT_REVEAL_VOICE_SECONDS,
+      });
+      console.log(
+        `[/publish/v2:image] computed total: ${imageBeats.totalFrames} frames (input=${imageBeats.inputDur}, reveal=${imageBeats.revealDur})`,
+      );
       await renderImageDemoReelV2({
         sourcePhotoUrl: proxiedPhoto,
         photoFilename: "photo.jpg",
@@ -2085,16 +2180,16 @@ app.post("/publish/v2", async (c) => {
         backgroundMusicUrl: reelAudio.backgroundMusicUrl,
         kidVoiceUrl: reelAudio.kidVoiceUrl,
         adultVoiceUrl: reelAudio.adultVoiceUrl,
+        kidVoiceSeconds: reelAudio.kidVoiceSeconds,
+        adultVoiceSeconds: reelAudio.adultVoiceSeconds,
         outputPath,
-        durationInFrames: IMAGE_REEL_DURATION_FRAMES,
+        durationInFrames: imageBeats.totalFrames,
         fps: IMAGE_REEL_FPS,
       });
     } else {
       // voice variant — synthesise the conversation, generate audio,
       // proxy through localhost, render.
-      const { VOICE_REEL_DURATION_FRAMES, VOICE_REEL_FPS } = await import(
-        "./video/v2/VoiceDemoReelV2.js"
-      );
+      const { VOICE_REEL_FPS } = await import("./video/v2/VoiceDemoReelV2.js");
 
       const answers = await synthesiseVoiceAnswers({
         title: row.title ?? "",
@@ -2124,6 +2219,30 @@ app.post("/publish/v2", async (c) => {
         proxyToLocal(fixtures.a2AudioUrl, proxyOpts),
       ]);
 
+      // Voice-aware total: sum of conversation clip durations +
+      // thinking pause + tail buffer + reveal voice. Without this,
+      // F_INPUT_DUR was a hardcoded 16s and longer real-voice
+      // conversations clipped at scene transition.
+      const { computeV2Beats: computeVoiceBeats } = await import(
+        "./video/v2/lib/timing.js"
+      );
+      const voiceInputSecs =
+        0.6 +
+        fixtures.q1AudioSeconds +
+        fixtures.a1AudioSeconds +
+        0.8 +
+        fixtures.q2AudioSeconds +
+        fixtures.a2AudioSeconds +
+        0.4;
+      const voiceBeats = computeVoiceBeats({
+        fps: VOICE_REEL_FPS,
+        inputVoiceSeconds: voiceInputSecs,
+        revealVoiceSeconds:
+          reelAudio.adultVoiceSeconds ?? V2_DEFAULT_REVEAL_VOICE_SECONDS,
+      });
+      console.log(
+        `[/publish/v2:voice] computed total: ${voiceBeats.totalFrames} frames (input=${voiceBeats.inputDur}, reveal=${voiceBeats.revealDur})`,
+      );
       await renderVoiceDemoReelV2({
         firstAnswer: answers.firstAnswer,
         secondAnswer: answers.secondAnswer,
@@ -2140,8 +2259,13 @@ app.post("/publish/v2", async (c) => {
         a2AudioUrl: pA2,
         backgroundMusicUrl: reelAudio.backgroundMusicUrl,
         adultVoiceUrl: reelAudio.adultVoiceUrl,
+        q1AudioSeconds: fixtures.q1AudioSeconds,
+        q2AudioSeconds: fixtures.q2AudioSeconds,
+        a1AudioSeconds: fixtures.a1AudioSeconds,
+        a2AudioSeconds: fixtures.a2AudioSeconds,
+        adultVoiceSeconds: reelAudio.adultVoiceSeconds,
         outputPath,
-        durationInFrames: VOICE_REEL_DURATION_FRAMES,
+        durationInFrames: voiceBeats.totalFrames,
         fps: VOICE_REEL_FPS,
       });
     }

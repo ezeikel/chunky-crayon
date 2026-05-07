@@ -61,47 +61,67 @@ import { TONDO_FONT_CSS_URL } from "../fonts";
 // Beat timeline. 30fps. Voice variant has a longer Beat 3 because real
 // audio durations don't compress past human speech speed — measured:
 //   Q1 ≈ 2.0s, A1 ≈ 2.7s, Q2 ≈ 2.9s, A2 ≈ 5.9s.
-// Sum ≈ 13.5s + thinking + tails. We pad Beat 3 to 16s so A2 plays in
-// full before the cut to canvas. Total reel runs ~28.5s — still fine
-// for short-form (Reels/TikTok cap is 60-90s; ideal range is 15-30s).
+// Sum ≈ 13.5s + thinking + tails. The koala-spike fixture defaults
+// pad to 16s so A2 plays in full. Real voice clips are now passed
+// in as durations (q1AudioSeconds etc.) so the input beat flexes.
 // =============================================================================
+import { computeV2Beats, V2_DEFAULT_REVEAL_VOICE_SECONDS } from "./lib/timing";
+
 export const VOICE_REEL_FPS = 30;
 
-const F_INTRO_START = 0;
-const F_INTRO_DUR = 45;
-const F_HOOK_START = F_INTRO_START + F_INTRO_DUR;
-const F_HOOK_DUR = 60;
-const F_INPUT_START = F_HOOK_START + F_HOOK_DUR;
-const F_INPUT_DUR = 480; // 16s — fits A2 fully before cut to canvas
-const F_REVEAL_START = F_INPUT_START + F_INPUT_DUR;
-const F_REVEAL_DUR = 240;
-const F_OUTRO_START = F_REVEAL_START + F_REVEAL_DUR;
-const F_OUTRO_DUR = 90;
+// Default per-clip durations for Studio preview / koala-spike fixture.
+// Real renders override these via the worker's ffprobe pass.
+const DEFAULT_Q1_SECS = 2.0;
+const DEFAULT_A1_SECS = 2.7;
+const DEFAULT_Q2_SECS = 2.9;
+const DEFAULT_A2_SECS = 5.9;
+const VOICE_THINKING_SECS = 0.8;
+const VOICE_TAIL_BUFFER_SECS = 0.4;
 
-export const VOICE_REEL_DURATION_FRAMES = F_OUTRO_START + F_OUTRO_DUR;
+/**
+ * Sum of conversation timing for the input beat. Mirrors the V_* sub-
+ * phase windows: idle + q1 + a1 + thinking + q2 + a2 + tail buffer.
+ */
+function totalVoiceInputSecs(
+  q1: number,
+  a1: number,
+  q2: number,
+  a2: number,
+): number {
+  const VOICE_IDLE_SECS = 0.6;
+  return (
+    VOICE_IDLE_SECS +
+    q1 +
+    a1 +
+    VOICE_THINKING_SECS +
+    q2 +
+    a2 +
+    VOICE_TAIL_BUFFER_SECS
+  );
+}
 
-// Frame windows for each conversation sub-phase, LOCAL to F_INPUT_*.
-// Sized to match measured audio durations of the koala spike fixtures
-// (see scripts/generate-spike-q2.ts). Real renders may need adjustment
-// per-image — we'll measure durations server-side and pass them in via
-// inputProps when wiring the worker (Phase 10 cron rotation).
-//
-// No transcript bubbles — voice mode is for kids who can't yet read.
-// The conversation reads through audio + the mic/orb/spinner/bars visual.
-const V_MIC_IDLE_END = 18; //   0.0-0.6s   mic idle
-const V_Q1_END = 84; //   0.6-2.8s   Q1 audio (~2.0s + 0.2s tail)
-const V_A1_REC_END = 174; //   2.8-5.8s   A1 recording — kid says "a koala"
-const V_THINKING_END = 198; //   5.8-6.6s   short thinking spinner
-const V_Q2_END = 294; //   6.6-9.8s   Q2 audio (~2.9s + tail)
-// 9.8s onward (~6.2s) — A2 recording. Kid voice (~5.9s) plays in full
-// then cuts to canvas at 16s.
+export const VOICE_REEL_DEFAULT_DURATION_FRAMES = computeV2Beats({
+  fps: VOICE_REEL_FPS,
+  inputVoiceSeconds: totalVoiceInputSecs(
+    DEFAULT_Q1_SECS,
+    DEFAULT_A1_SECS,
+    DEFAULT_Q2_SECS,
+    DEFAULT_A2_SECS,
+  ),
+  revealVoiceSeconds: V2_DEFAULT_REVEAL_VOICE_SECONDS,
+}).totalFrames;
 
-// Reveal config — kept in sync with text/image variants.
+/** @deprecated kept for back-compat — see TextDemoReelV2 for rationale. */
+export const VOICE_REEL_DURATION_FRAMES = VOICE_REEL_DEFAULT_DURATION_FRAMES;
+
+// Reveal config — kept in sync with text/image variants. Stamp speed
+// fixed; reveal beat duration grows with adult-voice length.
 const STAMPS_PER_ROW = 24;
 const ROWS = 24;
 const TOTAL_STAMPS = STAMPS_PER_ROW * ROWS;
-const REVEAL_SPEED_FACTOR = TOTAL_STAMPS / F_REVEAL_DUR;
 const STAMP_PATH = makeBoustrophedonPath(STAMPS_PER_ROW, ROWS);
+const REVEAL_REFERENCE_FRAMES = 240;
+const REVEAL_SPEED_FACTOR = TOTAL_STAMPS / REVEAL_REFERENCE_FRAMES;
 
 // =============================================================================
 // Input props
@@ -133,6 +153,15 @@ export type VoiceDemoReelV2Props = {
   backgroundMusicUrl?: string;
   /** Adult voiceover for the reveal/outro. */
   adultVoiceUrl?: string;
+  /** Per-clip durations in seconds — drive sub-phase windows so each
+   *  audio clip plays in full before the next phase. Probed by the
+   *  worker via ffprobe; defaults are tuned to the koala-spike fixtures
+   *  for Studio preview. */
+  q1AudioSeconds?: number;
+  a1AudioSeconds?: number;
+  q2AudioSeconds?: number;
+  a2AudioSeconds?: number;
+  adultVoiceSeconds?: number;
 };
 
 // =============================================================================
@@ -154,9 +183,39 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
   a2AudioUrl,
   backgroundMusicUrl,
   adultVoiceUrl,
+  q1AudioSeconds = DEFAULT_Q1_SECS,
+  a1AudioSeconds = DEFAULT_A1_SECS,
+  q2AudioSeconds = DEFAULT_Q2_SECS,
+  a2AudioSeconds = DEFAULT_A2_SECS,
+  adultVoiceSeconds = V2_DEFAULT_REVEAL_VOICE_SECONDS,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width: vWidth } = useVideoConfig();
+
+  // Outer-beat boundaries (intro/hook/input/reveal/outro) — input beat
+  // sums all four conversation clips + thinking + buffer, reveal flexes
+  // for adult voice. See ./lib/timing.ts for shared math.
+  const inputVoiceSeconds = totalVoiceInputSecs(
+    q1AudioSeconds,
+    a1AudioSeconds,
+    q2AudioSeconds,
+    a2AudioSeconds,
+  );
+  const beats = computeV2Beats({
+    fps,
+    inputVoiceSeconds,
+    revealVoiceSeconds: adultVoiceSeconds,
+  });
+
+  // Sub-phase boundaries within the input beat — drive the visual
+  // mic-idle / Q-orb-pulse / A-recording-bars transitions so the
+  // graphic phases stay in sync with the actual audio playback.
+  const fSec = (s: number) => Math.round(s * fps);
+  const V_MIC_IDLE_END = fSec(0.6);
+  const V_Q1_END = V_MIC_IDLE_END + fSec(q1AudioSeconds + 0.2);
+  const V_A1_REC_END = V_Q1_END + fSec(a1AudioSeconds + 0.3);
+  const V_THINKING_END = V_A1_REC_END + fSec(VOICE_THINKING_SECS);
+  const V_Q2_END = V_THINKING_END + fSec(q2AudioSeconds + 0.2);
 
   const [fixture, setFixture] = useState<CanvasRevealFixture | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -230,7 +289,7 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
   }
 
   // ── Voice scene phase + intensity (frame-local within F_INPUT_*) ───────
-  const inputLocal = frame - F_INPUT_START;
+  const inputLocal = frame - beats.inputStart;
   let phase: VoicePhase;
   if (inputLocal < V_MIC_IDLE_END) phase = "mic_idle";
   else if (inputLocal < V_Q1_END) phase = "q1_playing";
@@ -246,7 +305,7 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
     const t = (inputLocal - V_Q1_END) / (V_A1_REC_END - V_Q1_END);
     intensity = 0.4 + 0.6 * Math.abs(Math.sin(t * Math.PI * 4));
   } else if (phase === "recording_a2") {
-    const t = (inputLocal - V_Q2_END) / (F_INPUT_DUR - V_Q2_END);
+    const t = (inputLocal - V_Q2_END) / (beats.inputDur - V_Q2_END);
     intensity = 0.4 + 0.6 * Math.abs(Math.sin(t * Math.PI * 3));
   }
 
@@ -267,7 +326,7 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
   }
 
   // ── Beat 4 reveal — same as text/image variants ────────────────────────
-  const toolbarLocal = frame - F_REVEAL_START;
+  const toolbarLocal = frame - beats.revealStart;
   const toolbarEntry = spring({
     frame: toolbarLocal,
     fps,
@@ -280,7 +339,7 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
     config: SPRINGS.bouncy,
     durationInFrames: 24,
   });
-  const revealLocal = frame - F_REVEAL_START;
+  const revealLocal = frame - beats.revealStart;
   const stampCount = Math.max(
     0,
     Math.min(TOTAL_STAMPS, Math.floor(revealLocal * REVEAL_SPEED_FACTOR)),
@@ -293,20 +352,21 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
       <link rel="stylesheet" href={TONDO_FONT_CSS_URL} />
 
       {/* ── Beats 1 + 2 — identical to text/image variants ──────────── */}
-      <Sequence from={F_INTRO_START} durationInFrames={F_INTRO_DUR}>
-        <IntroCard durationFrames={F_INTRO_DUR} />
+      <Sequence from={beats.introStart} durationInFrames={beats.introDur}>
+        <IntroCard durationFrames={beats.introDur} />
       </Sequence>
 
-      <Sequence from={F_HOOK_START} durationInFrames={F_HOOK_DUR}>
+      <Sequence from={beats.hookStart} durationInFrames={beats.hookDur}>
         <HookCard
           line1="Just say what you want"
           line2="to color"
-          durationFrames={F_HOOK_DUR}
+          durationFrames={beats.hookDur}
         />
       </Sequence>
 
-      {/* ── Beat 3 — voice conversation scene ───────────────────────── */}
-      <Sequence from={F_INPUT_START} durationInFrames={F_INPUT_DUR}>
+      {/* ── Beat 3 — voice conversation scene (visual only — voice
+              audio mounts at the composition root below) ───────────── */}
+      <Sequence from={beats.inputStart} durationInFrames={beats.inputDur}>
         <AbsoluteFill
           style={{
             background: COLORS.bgCream,
@@ -326,43 +386,10 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
             />
           </div>
         </AbsoluteFill>
-
-        {/* Q1 — adult question. Plays during the q1_playing phase. */}
-        <Sequence
-          from={V_MIC_IDLE_END}
-          durationInFrames={V_Q1_END - V_MIC_IDLE_END}
-        >
-          <Audio src={q1AudioUrl} volume={1} />
-        </Sequence>
-
-        {/* A1 — kid's first answer. Plays during recording_a1. Bounded
-            sequence so it doesn't bleed into the bubble/thinking phases. */}
-        {a1AudioUrl && (
-          <Sequence from={V_Q1_END} durationInFrames={V_A1_REC_END - V_Q1_END}>
-            <Audio src={a1AudioUrl} volume={1} />
-          </Sequence>
-        )}
-
-        {/* Q2 — adult follow-up. Plays during the q2_playing phase. */}
-        <Sequence
-          from={V_THINKING_END}
-          durationInFrames={V_Q2_END - V_THINKING_END}
-        >
-          <Audio src={q2AudioUrl} volume={1} />
-        </Sequence>
-
-        {/* A2 — kid's elaboration. Plays during recording_a2 and trails
-            slightly into the second transcript bubble (kid voice can
-            naturally finish over the bubble pop-in). */}
-        {a2AudioUrl && (
-          <Sequence from={V_Q2_END} durationInFrames={F_INPUT_DUR - V_Q2_END}>
-            <Audio src={a2AudioUrl} volume={1} />
-          </Sequence>
-        )}
       </Sequence>
 
       {/* ── Beat 4: canvas + toolbar + palette — identical to other variants ── */}
-      <Sequence from={F_REVEAL_START} durationInFrames={F_REVEAL_DUR}>
+      <Sequence from={beats.revealStart} durationInFrames={beats.revealDur}>
         <AbsoluteFill
           style={{
             background: COLORS.bgCream,
@@ -409,22 +436,70 @@ export const VoiceDemoReelV2: React.FC<VoiceDemoReelV2Props> = ({
             <PaletteRow selectedIndex={null} limit={12} />
           </div>
         </AbsoluteFill>
-
-        <Audio src={staticFile("v2-sfx/swish.mp3")} volume={0.6} />
-        <Audio src={staticFile("v2-sfx/kids-yay.mp3")} volume={0.6} />
-        <Sequence from={20} durationInFrames={F_REVEAL_DUR - 20}>
-          <Audio src={staticFile("v2-sfx/draw.mp3")} volume={0.45} loop />
-        </Sequence>
-        {adultVoiceUrl ? <Audio src={adultVoiceUrl} volume={1} /> : null}
       </Sequence>
 
       {/* ── Beat 5: outro ─────────────────────────────────────────────── */}
-      <Sequence from={F_OUTRO_START} durationInFrames={F_OUTRO_DUR}>
+      <Sequence from={beats.outroStart} durationInFrames={beats.outroDur}>
         <OutroCard
           finishedImageUrl={finishedImageUrl}
-          durationFrames={F_OUTRO_DUR}
+          durationFrames={beats.outroDur}
         />
       </Sequence>
+
+      {/* ===========================================================
+          AUDIO — voice + SFX live at COMPOSITION ROOT, never inside
+          a bounded <Sequence durationInFrames=…>. Same fix as
+          TextDemoReelV2 — see the audio-routing comment there.
+
+          Sub-phase boundaries are computed from per-clip ffprobe'd
+          durations (V_*_END), so a longer-than-default Q1 still gets
+          enough air before A1 begins. Without this, longer Q1 clips
+          got cut off mid-question — the bug we're fixing.
+          =========================================================== */}
+
+      {/* Q1 — adult question. */}
+      <Sequence from={beats.inputStart + V_MIC_IDLE_END}>
+        <Audio src={q1AudioUrl} volume={1} />
+      </Sequence>
+
+      {/* A1 — kid's first answer. */}
+      {a1AudioUrl && (
+        <Sequence from={beats.inputStart + V_Q1_END}>
+          <Audio src={a1AudioUrl} volume={1} />
+        </Sequence>
+      )}
+
+      {/* Q2 — adult follow-up. */}
+      <Sequence from={beats.inputStart + V_THINKING_END}>
+        <Audio src={q2AudioUrl} volume={1} />
+      </Sequence>
+
+      {/* A2 — kid's elaboration. */}
+      {a2AudioUrl && (
+        <Sequence from={beats.inputStart + V_Q2_END}>
+          <Audio src={a2AudioUrl} volume={1} />
+        </Sequence>
+      )}
+
+      {/* Beat 4 (canvas reveal): swish + kids "yay" on entrance, pencil
+          draw loop, adult narrator. */}
+      <Sequence from={beats.revealStart}>
+        <Audio src={staticFile("v2-sfx/swish.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence from={beats.revealStart}>
+        <Audio src={staticFile("v2-sfx/kids-yay.mp3")} volume={0.6} />
+      </Sequence>
+      <Sequence
+        from={beats.revealStart + 20}
+        durationInFrames={beats.revealDur - 20}
+      >
+        <Audio src={staticFile("v2-sfx/draw.mp3")} volume={0.45} loop />
+      </Sequence>
+      {adultVoiceUrl ? (
+        <Sequence from={beats.revealVoiceStart}>
+          <Audio src={adultVoiceUrl} volume={1} />
+        </Sequence>
+      ) : null}
 
       {backgroundMusicUrl ? (
         <Audio src={backgroundMusicUrl} volume={0.18} loop />

@@ -116,7 +116,20 @@ export type VoiceReelFixturesResult = {
   a2AudioUrl: string;
   /** Q2 text — useful for logging + DB analytics. */
   q2Text: string;
+  /**
+   * Probed durations in seconds for each conversation clip. Q1 is the
+   * cached fixture (~2.0s). Q2/A1/A2 ffprobed before R2 upload. Used
+   * by the V2 voice comp to size sub-phase windows around the actual
+   * audio length so the first voiceover doesn't get cut off.
+   */
+  q1AudioSeconds: number;
+  q2AudioSeconds: number;
+  a1AudioSeconds: number;
+  a2AudioSeconds: number;
 };
+
+/** Cached fixture Q1 duration — measured once, ~2.0s for the koala spike. */
+const Q1_AUDIO_SECONDS = 2.0;
 
 /**
  * Build all per-render audio fixtures for a voice demo reel. Generates
@@ -166,6 +179,22 @@ export async function buildVoiceReelFixtures(opts: {
     }),
   ]);
 
+  // Probe each clip's actual duration BEFORE the local files are
+  // unlinked. Used downstream to size visual sub-phase windows so the
+  // first voiceover doesn't get cut off when the kid talks longer than
+  // the koala-spike defaults.
+  const { probeAudioDurationOrFallback } = await import(
+    "../lib/audioDuration.js"
+  );
+  const [q2AudioSeconds, a1AudioSeconds, a2AudioSeconds] = await Promise.all([
+    probeAudioDurationOrFallback(q2Path, 2.9, "[voice-fixtures] probe-q2"),
+    probeAudioDurationOrFallback(a1Path, 2.7, "[voice-fixtures] probe-a1"),
+    probeAudioDurationOrFallback(a2Path, 5.9, "[voice-fixtures] probe-a2"),
+  ]);
+  console.log(
+    `[voice-fixtures] probed: q2=${q2AudioSeconds.toFixed(2)}s a1=${a1AudioSeconds.toFixed(2)}s a2=${a2AudioSeconds.toFixed(2)}s`,
+  );
+
   // Upload to R2 under voice-reel/<imageId>/ — keyed by imageId so each
   // run owns its own fixtures and we never stomp.
   const [q2Buffer, a1Buffer, a2Buffer] = await Promise.all([
@@ -199,6 +228,10 @@ export async function buildVoiceReelFixtures(opts: {
     a1AudioUrl: a1Upload.url,
     a2AudioUrl: a2Upload.url,
     q2Text,
+    q1AudioSeconds: Q1_AUDIO_SECONDS,
+    q2AudioSeconds,
+    a1AudioSeconds,
+    a2AudioSeconds,
   };
 }
 
