@@ -8,6 +8,7 @@ import { faCakeCandles } from '@fortawesome/pro-duotone-svg-icons/faCakeCandles'
 import { faBookOpen } from '@fortawesome/pro-duotone-svg-icons/faBookOpen';
 import { faCalendarStar } from '@fortawesome/pro-duotone-svg-icons/faCalendarStar';
 import { generateAlternates } from '@/lib/seo';
+import ViewContentTracker from '@/components/ViewContentTracker/ViewContentTracker';
 
 type PageParams = { locale: string };
 
@@ -109,6 +110,7 @@ const ToolsHubPage = async ({ params }: { params: Promise<PageParams> }) => {
 
   return (
     <>
+      <ViewContentTracker contentType="tools_index" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}

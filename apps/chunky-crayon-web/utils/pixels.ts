@@ -184,7 +184,12 @@ export const trackViewContent = (params: {
     | 'coloring_page'
     | 'gallery'
     | 'pricing_faq'
-    | 'homepage_faq';
+    | 'homepage_faq'
+    | 'homepage'
+    | 'start_hero'
+    | 'create'
+    | 'tools_index'
+    | 'tool';
   contentId?: string;
   contentName?: string;
   value?: number;

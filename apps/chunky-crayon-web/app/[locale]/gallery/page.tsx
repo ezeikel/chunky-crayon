@@ -23,6 +23,7 @@ import {
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import ViewContentTracker from '@/components/ViewContentTracker/ViewContentTracker';
 import {
   getTodaysDailyImage,
   getFeaturedImages,
@@ -533,6 +534,7 @@ const GalleryPage = async ({
 
   return (
     <PageWrap>
+      <ViewContentTracker contentType="gallery" />
       <Suspense fallback={<LoadingSkeleton />}>
         <GalleryContent locale={locale} />
       </Suspense>
