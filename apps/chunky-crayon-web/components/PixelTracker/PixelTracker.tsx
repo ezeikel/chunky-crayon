@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { trackSignUp } from '@/utils/pixels';
+import { getSignupMethod } from '@/app/actions/auth';
 
 type SessionUser = {
   // Some session enrichment paths populate `dbId`; the default NextAuth
@@ -44,13 +45,21 @@ const PixelTracker = () => {
 
     if (!alreadyTracked) {
       const sessionUser = session.user as SessionUser;
-      trackSignUp({
-        method: 'oauth',
-        eventId: sessionUser.dbId ?? sessionUser.id,
-      });
 
-      localStorage.setItem(storageKey, 'true');
-      hasTrackedRef.current = true;
+      // Resolve the real signup provider (google | email) so the
+      // browser custom_data matches what the server CAPI fire sent —
+      // Meta fragments funnel reports when client and server disagree
+      // on signup_method. One DB read per signup ever (gated by
+      // localStorage flag below).
+      void (async () => {
+        const method = (await getSignupMethod()) ?? 'oauth';
+        trackSignUp({
+          method,
+          eventId: sessionUser.dbId ?? sessionUser.id,
+        });
+        localStorage.setItem(storageKey, 'true');
+        hasTrackedRef.current = true;
+      })();
     }
   }, [session, status]);
 
