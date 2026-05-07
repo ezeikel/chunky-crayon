@@ -53,7 +53,6 @@ import {
 import { subscribe } from "./coloring-image/listener.js";
 import { runBlogCron } from "./blog/pipeline.js";
 import { runDailyImageCron } from "./coloring-image/daily-pipeline.js";
-import { runComicStripCron } from "./comic-strip/pipeline.js";
 import {
   generateBundlePage,
   BundlePageQAFailedError,
@@ -703,29 +702,6 @@ app.post("/generate/daily-image", async (c) => {
     .finally(() => {
       clearInterval(keepaliveTimer);
     });
-
-  return c.json({ ok: true, accepted: true }, 202);
-});
-
-/**
- * POST /generate/comic-strip
- *
- * Weekly comic-strip cron (fire-and-forget). Vercel's
- * /api/cron/comic-strip is a thin trigger that POSTs here and returns 202.
- * This endpoint runs the full pipeline (Claude script + script QC, 4×
- * gpt-image-2 panel renders + per-panel vision QC, sharp 2x2 composite,
- * R2 uploads, Prisma row).
- *
- * Auth: bearer CRON_SECRET (handled by /generate/* middleware above).
- */
-app.post("/generate/comic-strip", async (c) => {
-  console.log("[/generate/comic-strip] kickoff");
-
-  runComicStripCron().catch((err) => {
-    // Pipeline catches its own errors and emails admin; this guard is just
-    // belt-and-braces so an uncaught throw never crashes the worker process.
-    console.error("[/generate/comic-strip] uncaught:", err);
-  });
 
   return c.json({ ok: true, accepted: true }, 202);
 });
