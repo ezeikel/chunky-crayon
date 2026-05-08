@@ -120,6 +120,37 @@ const createIGCarouselContainer = async (
   return data.id;
 };
 
+/**
+ * Poll an IG media container until it's FINISHED (image processed and ready
+ * to publish). Required before either (a) attaching a child to a carousel
+ * container, or (b) publishing a carousel. Without this, fast curls hit
+ * the publish endpoint with code 9007 ("Media is not ready to be
+ * published. Please wait a moment.") — that's the bug we kept hitting.
+ */
+const waitForIGContainer = async (
+  containerId: string,
+  maxAttempts = 30,
+  intervalMs = 5000,
+): Promise<void> => {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const response = await fetchWithTimeout(
+      `https://graph.facebook.com/v22.0/${containerId}?fields=status_code,status&access_token=${process.env.FACEBOOK_ACCESS_TOKEN}`,
+      {},
+      30000,
+    );
+    const data = await response.json();
+    console.log(
+      `[ComicStrip/IG] container ${containerId} status: ${data.status_code || data.status}`,
+    );
+    if (data.status_code === 'FINISHED' || data.status === 'FINISHED') return;
+    if (data.status_code === 'ERROR' || data.status === 'ERROR') {
+      throw new Error(`IG media processing failed: ${JSON.stringify(data)}`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+  throw new Error('IG media processing timed out');
+};
+
 const publishIGMedia = async (creationId: string): Promise<string> => {
   const response = await fetchWithTimeout(
     `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media_publish`,
@@ -149,9 +180,15 @@ const postInstagramCarousel = async (
   const childIds = await Promise.all(
     panelUrls.map(createIGImageContainerForCarousel),
   );
-  // 2. Wrap them in a CAROUSEL container.
+  // 2. Wait for every child to finish processing (FINISHED status). Without
+  //    this, the carousel container creation can race ahead and the publish
+  //    call hits code 9007 ('Media is not ready to be published').
+  await Promise.all(childIds.map((id) => waitForIGContainer(id)));
+  // 3. Wrap them in a CAROUSEL container.
   const carouselId = await createIGCarouselContainer(childIds, caption);
-  // 3. Publish.
+  // 4. Wait for the carousel container itself to be ready.
+  await waitForIGContainer(carouselId);
+  // 5. Publish.
   return publishIGMedia(carouselId);
 };
 
