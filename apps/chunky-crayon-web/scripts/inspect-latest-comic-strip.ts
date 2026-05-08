@@ -9,11 +9,15 @@ async function main() {
     console.log('no strip');
     process.exit(0);
   }
+
+  // Read createdAt/updatedAt — added to the select below.
   console.log('id:', row.id);
   console.log('slug:', row.slug);
   console.log('title:', row.title);
   console.log('theme:', row.theme);
   console.log('status:', row.status);
+  console.log('createdAt:', row.createdAt);
+  console.log('updatedAt:', row.updatedAt);
   console.log('caption:', row.caption);
   console.log('panel1Url:', row.panel1Url);
   console.log('panel2Url:', row.panel2Url);
