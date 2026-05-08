@@ -190,7 +190,8 @@ export type {
   BuildPanelImagePromptInput,
 } from "./comic/prompts";
 
-// Comic strip QC — script gate (text) + panel gate (vision).
+// Comic strip QC — script gate (text) + panel gate (vision) +
+// whole-strip gate (vision, final pass after all panels render).
 export {
   scriptQcResultSchema,
   SCRIPT_QC_SYSTEM,
@@ -198,8 +199,15 @@ export {
   panelQcResultSchema,
   PANEL_QC_SYSTEM,
   createPanelQcPrompt,
+  wholeStripQcResultSchema,
+  WHOLE_STRIP_QC_SYSTEM,
+  createWholeStripQcPrompt,
 } from "./comic/qc";
-export type { ScriptQcResult, PanelQcResult } from "./comic/qc";
+export type {
+  ScriptQcResult,
+  PanelQcResult,
+  WholeStripQcResult,
+} from "./comic/qc";
 
 // Utilities
 export { default as formatNumber } from "./utils/formatNumber";

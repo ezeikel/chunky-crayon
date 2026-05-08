@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",
+    "@ai-sdk/google": "^3.0.35",
+    "@ai-sdk/openai": "^3.0.38",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/pro-duotone-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.6",

@@ -20,7 +20,7 @@
  * cron picks it up (mirrors ContentReel pattern).
  */
 
-import { generateObject, generateText, Output } from "ai";
+import { generateObject } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import OpenAI from "openai";
 import sharp from "sharp";
@@ -35,10 +35,16 @@ import {
   panelQcResultSchema,
   PANEL_QC_SYSTEM,
   createPanelQcPrompt,
+  wholeStripQcResultSchema,
+  WHOLE_STRIP_QC_SYSTEM,
+  createWholeStripQcPrompt,
   type ComicCastId,
   type PanelScript,
   type PanelQcResult,
+  type ScriptQcResult,
+  type WholeStripQcResult,
 } from "@one-colored-pixel/coloring-core";
+import { judgeWithThree, type VotedVerdict } from "./jury.js";
 import {
   db,
   Brand,
@@ -50,7 +56,6 @@ import { sendAdminAlert } from "../lib/email.js";
 import { z } from "zod";
 
 const WRITER_MODEL = anthropic("claude-opus-4-7");
-const QC_MODEL = anthropic("claude-opus-4-7");
 const IMAGE_MODEL = "gpt-image-2";
 const IMAGE_SIZE = "1024x1024" as const;
 const SCRIPT_RETRIES = 2;
@@ -189,50 +194,53 @@ async function writeScript(theme: ComicStripTheme): Promise<Script> {
   return object;
 }
 
-async function judgeScript(script: Script) {
-  const { text } = await generateText({
-    model: QC_MODEL,
-    system: SCRIPT_QC_SYSTEM,
-    prompt: createScriptQcPrompt(script),
-  });
-
-  let parsed: unknown;
-  try {
-    const cleaned = text
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/```\s*$/i, "")
-      .trim();
-    parsed = JSON.parse(cleaned);
-  } catch (err) {
-    console.error(
-      `[comic-strip] script QC raw text could not be parsed as JSON:\n---\n${text}\n---`,
-    );
-    throw err;
-  }
-
-  const result = scriptQcResultSchema.safeParse(parsed);
-  if (!result.success) {
-    console.error(
-      `[comic-strip] script QC parsed but failed schema:\n---\n${text}\n---\nIssues:`,
-      result.error.issues,
-    );
-    throw new Error("script QC schema validation failed");
-  }
-  return result.data;
+async function judgeScript(
+  script: Script,
+): Promise<VotedVerdict<ScriptQcResult>> {
+  return judgeWithThree(
+    {
+      system: SCRIPT_QC_SYSTEM,
+      prompt: createScriptQcPrompt(script),
+    },
+    scriptQcResultSchema,
+    (r) => r.passed,
+  );
 }
 
-async function writeAndApproveScript(theme: ComicStripTheme): Promise<Script> {
+/** Combine all dissenting judges' issues into a single suggestion bundle. */
+function summariseDissent(verdict: VotedVerdict<ScriptQcResult>): string {
+  return verdict.verdicts
+    .map((v) => {
+      if (!v.ok) return `[${v.judge}] error: ${v.error}`;
+      const passed = v.result.passed;
+      const issuesStr = v.result.issues.length
+        ? v.result.issues.join("; ")
+        : "(no issues listed)";
+      const sugg = v.result.suggestion
+        ? ` suggestion: ${v.result.suggestion}`
+        : "";
+      return `[${v.judge}] passed=${passed} issues: ${issuesStr}${sugg}`;
+    })
+    .join("\n");
+}
+
+async function writeAndApproveScript(theme: ComicStripTheme): Promise<{
+  script: Script;
+  juryVerdict: VotedVerdict<ScriptQcResult>;
+}> {
   for (let attempt = 0; attempt <= SCRIPT_RETRIES; attempt += 1) {
     const script = await writeScript(theme);
-    const verdict = await judgeScript(script);
+    const juryVerdict = await judgeScript(script);
     console.log(
-      `[comic-strip] script attempt ${attempt + 1}: passed=${verdict.passed}, issues=${verdict.issues.length}`,
+      `[comic-strip] script attempt ${attempt + 1}: jury=${juryVerdict.passingCount}/3 passed=${juryVerdict.passed}`,
     );
-    if (verdict.passed) return script;
-    console.warn(`[comic-strip] script rejected:`, verdict.issues);
+    if (juryVerdict.passed) return { script, juryVerdict };
+    console.warn(
+      `[comic-strip] script rejected by jury:\n${summariseDissent(juryVerdict)}`,
+    );
   }
   throw new Error(
-    `[comic-strip] script failed QC after ${SCRIPT_RETRIES + 1} attempts`,
+    `[comic-strip] script failed jury after ${SCRIPT_RETRIES + 1} attempts`,
   );
 }
 
@@ -316,48 +324,27 @@ async function generatePanelImage(
 async function judgePanel(
   panel: PanelScript,
   imageBuffer: Buffer,
-): Promise<PanelQcResult> {
-  // Use generateText + manual JSON parse so we can log Claude's raw output
-  // when validation fails. generateObject swallows the raw text, making the
-  // "{}" failures impossible to debug.
-  const { text } = await generateText({
-    model: QC_MODEL,
-    system: PANEL_QC_SYSTEM,
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: createPanelQcPrompt(panel) },
-          { type: "image", image: imageBuffer },
-        ],
-      },
-    ],
-  });
-
-  let parsed: unknown;
-  try {
-    // Strip optional markdown fence if Claude wraps it
-    const cleaned = text
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/```\s*$/i, "")
-      .trim();
-    parsed = JSON.parse(cleaned);
-  } catch (err) {
-    console.error(
-      `[comic-strip] panel ${panel.panel} QC raw text could not be parsed as JSON:\n---\n${text}\n---`,
-    );
-    throw err;
-  }
-
-  const result = panelQcResultSchema.safeParse(parsed);
-  if (!result.success) {
-    console.error(
-      `[comic-strip] panel ${panel.panel} QC parsed but failed schema:\n---\n${text}\n---\nIssues:`,
-      result.error.issues,
-    );
-    throw new Error(`panel ${panel.panel} QC schema validation failed`);
-  }
-  return result.data;
+  priorApprovedPanels: ReadonlyArray<{ panel: PanelScript; buffer: Buffer }>,
+): Promise<VotedVerdict<PanelQcResult>> {
+  // Order matters: prior approved panels first, then the panel under
+  // judgement. The QC prompt tells the judges that earlier images are
+  // ground truth and the LAST image is the one to score.
+  const images = [
+    ...priorApprovedPanels.map((p) => ({ buffer: p.buffer })),
+    { buffer: imageBuffer },
+  ];
+  return judgeWithThree(
+    {
+      system: PANEL_QC_SYSTEM,
+      prompt: createPanelQcPrompt(
+        panel,
+        priorApprovedPanels.map((p) => p.panel),
+      ),
+      images,
+    },
+    panelQcResultSchema,
+    (r) => r.passed,
+  );
 }
 
 async function generateAndApprovePanel(
@@ -367,14 +354,18 @@ async function generateAndApprovePanel(
   cumulativeStateChanges: readonly string[],
   isSceneStart: boolean,
   priorScenePanelBuffers: readonly Buffer[],
+  /** Earlier panels of THIS strip that already passed jury — fed to the
+   *  judges as continuity ground-truth. NOT the same as priorScenePanelBuffers
+   *  (which feeds gpt-image-2 for image generation continuity). */
+  priorApprovedPanels: ReadonlyArray<{ panel: PanelScript; buffer: Buffer }>,
 ): Promise<{
   buffer: Buffer;
-  qc: PanelQcResult;
+  juryVerdict: VotedVerdict<PanelQcResult>;
   attempts: number;
   qcPassed: boolean;
 }> {
   let lastBuffer: Buffer | null = null;
-  let lastQc: PanelQcResult | null = null;
+  let lastVerdict: VotedVerdict<PanelQcResult> | null = null;
   for (let attempt = 0; attempt <= PANEL_RETRIES; attempt += 1) {
     const buffer = await generatePanelImage(
       client,
@@ -384,32 +375,51 @@ async function generateAndApprovePanel(
       isSceneStart,
       priorScenePanelBuffers,
     );
-    const qc = await judgePanel(panel, buffer);
+    const juryVerdict = await judgePanel(panel, buffer, priorApprovedPanels);
     console.log(
-      `[comic-strip] panel ${panel.panel} attempt ${attempt + 1}: passed=${qc.passed}, issues=${qc.issues.length}`,
+      `[comic-strip] panel ${panel.panel} attempt ${attempt + 1}: jury=${juryVerdict.passingCount}/3 passed=${juryVerdict.passed}`,
     );
     lastBuffer = buffer;
-    lastQc = qc;
-    if (qc.passed) {
-      return { buffer, qc, attempts: attempt + 1, qcPassed: true };
+    lastVerdict = juryVerdict;
+    if (juryVerdict.passed) {
+      return { buffer, juryVerdict, attempts: attempt + 1, qcPassed: true };
     }
-    console.warn(`[comic-strip] panel ${panel.panel} rejected:`, qc.issues);
+    const issues = juryVerdict.verdicts
+      .filter((v) => v.ok && !v.result.passed)
+      .map((v) => (v.ok ? `[${v.judge}] ${v.result.issues.join("; ")}` : ""))
+      .join("\n");
+    console.warn(
+      `[comic-strip] panel ${panel.panel} rejected by jury:\n${issues}`,
+    );
   }
-  // All retries exhausted — keep the last attempt as a partial. The strip
-  // gets marked QC_FAILED at the row level so social-posting skips it,
-  // but the assets stay in R2 for manual inspection / admin override.
   console.warn(
     `[comic-strip] panel ${panel.panel} exhausted ${PANEL_RETRIES + 1} attempts; keeping last attempt as partial`,
   );
-  if (!lastBuffer || !lastQc) {
+  if (!lastBuffer || !lastVerdict) {
     throw new Error(`panel ${panel.panel} produced no buffers`);
   }
   return {
     buffer: lastBuffer,
-    qc: lastQc,
+    juryVerdict: lastVerdict,
     attempts: PANEL_RETRIES + 1,
     qcPassed: false,
   };
+}
+
+async function judgeWholeStrip(
+  title: string,
+  script: Script,
+  panelBuffers: readonly Buffer[],
+): Promise<VotedVerdict<WholeStripQcResult>> {
+  return judgeWithThree(
+    {
+      system: WHOLE_STRIP_QC_SYSTEM,
+      prompt: createWholeStripQcPrompt(title, script),
+      images: panelBuffers.map((buf) => ({ buffer: buf })),
+    },
+    wholeStripQcResultSchema,
+    (r) => r.passed,
+  );
 }
 
 // =============================================================================
@@ -472,10 +482,11 @@ export async function runComicStripCron(): Promise<void> {
     const theme = await pickTheme();
     console.log(`[comic-strip] theme=${theme}`);
 
-    console.log("[comic-strip] writing + judging script...");
-    const script = await writeAndApproveScript(theme);
+    console.log("[comic-strip] writing + judging script with 3-judge jury...");
+    const { script, juryVerdict: scriptJury } =
+      await writeAndApproveScript(theme);
     console.log(
-      `[comic-strip] script approved: "${script.title}" (${script.theme})`,
+      `[comic-strip] script approved: "${script.title}" (${script.theme}) jury=${scriptJury.passingCount}/3`,
     );
 
     const slug = makeSlug(theme, script.title);
@@ -496,13 +507,13 @@ export async function runComicStripCron(): Promise<void> {
     stripId = row.id;
     console.log(`[comic-strip] row created id=${row.id} slug=${slug}`);
 
-    console.log("[comic-strip] generating panels...");
+    console.log("[comic-strip] generating panels with 3-judge jury...");
     const client = new OpenAI();
     const panelBuffers: Buffer[] = [];
     const qcRecords: Array<{
       panel: number;
       attempts: number;
-      qc: PanelQcResult;
+      juryVerdict: VotedVerdict<PanelQcResult>;
       qcPassed: boolean;
     }> = [];
 
@@ -510,6 +521,9 @@ export async function runComicStripCron(): Promise<void> {
     // back the right "prior panels of this scene" continuity refs as we
     // walk through the strip.
     const renderedByPanelNumber = new Map<number, Buffer>();
+    // Approved panels = those that passed jury, used as ground truth
+    // when judging later panels (cumulative consistency check).
+    const approvedPanels: Array<{ panel: PanelScript; buffer: Buffer }> = [];
     let previousScene: Scene | null = null;
 
     for (const panel of script.panels) {
@@ -531,19 +545,25 @@ export async function runComicStripCron(): Promise<void> {
       );
 
       console.log(
-        `[comic-strip] panel ${panel.panel} cast=${panel.cast.join(",")} scene=${scene.id}${isSceneStart ? " (scene-start)" : ""}${priorScenePanelBuffers.length ? ` prior-refs=${priorScenePanelBuffers.length}` : ""}${cumulativeStateChanges.length ? ` state-changes=${cumulativeStateChanges.length}` : ""}`,
+        `[comic-strip] panel ${panel.panel} cast=${panel.cast.join(",")} scene=${scene.id}${isSceneStart ? " (scene-start)" : ""}${priorScenePanelBuffers.length ? ` gen-refs=${priorScenePanelBuffers.length}` : ""}${approvedPanels.length ? ` jury-prior=${approvedPanels.length}` : ""}${cumulativeStateChanges.length ? ` state-changes=${cumulativeStateChanges.length}` : ""}`,
       );
-      const { buffer, qc, attempts, qcPassed } = await generateAndApprovePanel(
-        client,
-        panel,
-        scene,
-        cumulativeStateChanges,
-        isSceneStart,
-        priorScenePanelBuffers,
-      );
+      const { buffer, juryVerdict, attempts, qcPassed } =
+        await generateAndApprovePanel(
+          client,
+          panel,
+          scene,
+          cumulativeStateChanges,
+          isSceneStart,
+          priorScenePanelBuffers,
+          approvedPanels,
+        );
       panelBuffers.push(buffer);
       renderedByPanelNumber.set(panel.panel, buffer);
-      qcRecords.push({ panel: panel.panel, attempts, qc, qcPassed });
+      qcRecords.push({ panel: panel.panel, attempts, juryVerdict, qcPassed });
+      // Only include passed panels in the cumulative-judging context for
+      // the next panel. A failed panel's image is still kept (partial)
+      // but isn't used as ground truth.
+      if (qcPassed) approvedPanels.push({ panel, buffer });
       previousScene = scene;
     }
 
@@ -556,13 +576,35 @@ export async function runComicStripCron(): Promise<void> {
     const stripBuffer = await assembleStrip(panelBuffers);
     const assembledUrl = await uploadAssembled(slug, stripBuffer);
 
-    // If any panel exhausted retries, mark the strip QC_FAILED so the
-    // social cron skips it — but the panels are persisted so the admin
-    // can inspect / override / regenerate individual panels.
+    // Final jury — judge the whole strip together. Catches "each panel
+    // looked fine in isolation but they don't read as a coherent comic".
     const anyPanelFailedQc = qcRecords.some((r) => !r.qcPassed);
-    const finalStatus = anyPanelFailedQc
-      ? ComicStripStatus.QC_FAILED
-      : ComicStripStatus.READY;
+    let wholeStripJury: VotedVerdict<WholeStripQcResult> | null = null;
+    if (!anyPanelFailedQc) {
+      console.log("[comic-strip] judging whole strip with 3-judge jury...");
+      wholeStripJury = await judgeWholeStrip(
+        script.title,
+        script,
+        panelBuffers,
+      );
+      console.log(
+        `[comic-strip] whole-strip jury=${wholeStripJury.passingCount}/3 passed=${wholeStripJury.passed}`,
+      );
+      if (!wholeStripJury.passed) {
+        const issues = wholeStripJury.verdicts
+          .filter((v) => v.ok && !v.result.passed)
+          .map((v) =>
+            v.ok ? `[${v.judge}] ${v.result.issues.join("; ")}` : "",
+          )
+          .join("\n");
+        console.warn(`[comic-strip] whole strip rejected by jury:\n${issues}`);
+      }
+    }
+
+    const finalStatus =
+      anyPanelFailedQc || (wholeStripJury && !wholeStripJury.passed)
+        ? ComicStripStatus.QC_FAILED
+        : ComicStripStatus.READY;
 
     await db.comicStrip.update({
       where: { id: row.id },
@@ -572,22 +614,35 @@ export async function runComicStripCron(): Promise<void> {
         panel3Url,
         panel4Url,
         assembledUrl,
-        qcResults: qcRecords,
+        qcResults: { panels: qcRecords, scriptJury, wholeStripJury },
         status: finalStatus,
       },
     });
 
     const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-    if (anyPanelFailedQc) {
+    const wholeStripFailed = wholeStripJury !== null && !wholeStripJury.passed;
+    if (anyPanelFailedQc || wholeStripFailed) {
       const failedPanels = qcRecords
         .filter((r) => !r.qcPassed)
         .map((r) => r.panel);
+      const reason = anyPanelFailedQc
+        ? `panels failing jury: ${failedPanels.join(",")}`
+        : "whole-strip jury rejected coherence";
       console.warn(
-        `[comic-strip] done in ${elapsed}s — slug=${slug} status=QC_FAILED (panels failing QC: ${failedPanels.join(",")})`,
+        `[comic-strip] done in ${elapsed}s — slug=${slug} status=QC_FAILED (${reason})`,
       );
+      const wholeStripIssues =
+        wholeStripJury && !wholeStripJury.passed
+          ? wholeStripJury.verdicts
+              .filter((v) => v.ok && !v.result.passed)
+              .map((v) =>
+                v.ok ? `[${v.judge}] ${v.result.issues.join("; ")}` : "",
+              )
+              .join("\n")
+          : "";
       await sendAdminAlert({
         subject: `Comic strip QC partial: "${script.title}"`,
-        body: `Strip generated but some panels exhausted QC retries. Manual review required.\n\nSlug: ${slug}\nTitle: ${script.title}\nFailed panels: ${failedPanels.join(", ")}\nStrip URL: ${assembledUrl}`,
+        body: `Strip generated but failed multi-judge QC. Manual review required.\n\nSlug: ${slug}\nTitle: ${script.title}\nReason: ${reason}\n${wholeStripIssues ? `\nWhole-strip jury issues:\n${wholeStripIssues}\n` : ""}\nStrip URL: ${assembledUrl}`,
       }).catch(() => {});
     } else {
       console.log(

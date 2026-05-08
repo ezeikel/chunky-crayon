@@ -202,10 +202,110 @@ Single JSON object only — no markdown, no commentary, no preamble:
 }
 </output-format>`;
 
-export const createPanelQcPrompt = (panelScript: unknown) =>
-  `Judge this panel against its script.
+/**
+ * Build the user prompt for panel QC.
+ *
+ * When `priorPanelScripts` is non-empty, we're judging cumulatively —
+ * the panel must honor its own script AND stay consistent with the
+ * panels that already passed jury earlier. Tells the judge it can use
+ * those earlier panels' images (passed alongside) as ground truth for
+ * setting / banner / character look.
+ */
+export const createPanelQcPrompt = (
+  panelScript: unknown,
+  priorPanelScripts: ReadonlyArray<unknown> = [],
+) => {
+  if (priorPanelScripts.length === 0) {
+    return `Judge this panel against its script.
 
 Script for this panel:
 ${JSON.stringify(panelScript, null, 2)}
 
 The rendered panel image is attached. Return the JSON only.`;
+  }
+  return `Judge this panel against its script AND for consistency with the prior panels in this strip.
+
+The earlier ${priorPanelScripts.length === 1 ? "panel" : `${priorPanelScripts.length} panels`} (image${priorPanelScripts.length === 1 ? "" : "s"}) ${priorPanelScripts.length === 1 ? "is" : "are"} attached BEFORE this panel's image as reference. Those earlier panels already passed jury — treat them as ground truth for character look, banner text, props, and setting.
+
+Earlier panel script${priorPanelScripts.length === 1 ? "" : "s"} (in order):
+${priorPanelScripts.map((s, i) => `Panel ${i + 1}:\n${JSON.stringify(s, null, 2)}`).join("\n\n")}
+
+Script for THIS panel (the one being judged):
+${JSON.stringify(panelScript, null, 2)}
+
+In addition to the standard checks, judge:
+- Character look matches the prior approved panels (e.g. Sticky in this panel must look like Sticky in earlier panels — don't accept a substituted character that "looks roughly right")
+- Banner / sign text matches verbatim if the same banner appears in earlier panels
+- Prop-state-changes from earlier panels are reflected here (a cake eaten earlier should NOT be whole again here)
+
+Return the JSON only.`;
+};
+
+// =============================================================================
+// Whole-strip QC — final pass after all 4 panels render. Catches the
+// "each panel looked fine but the strip doesn't read right" failure mode.
+// =============================================================================
+
+export const wholeStripQcResultSchema = z.object({
+  passed: z.boolean(),
+  checks: z.object({
+    coherentStory: z.boolean(),
+    castConsistencyAcrossPanels: z.boolean(),
+    bannerAndPropConsistency: z.boolean(),
+    propStateChangesPropagate: z.boolean(),
+    dialogueLandsTheJoke: z.boolean(),
+  }),
+  issues: z.array(z.string()),
+});
+export type WholeStripQcResult = z.infer<typeof wholeStripQcResultSchema>;
+
+export const WHOLE_STRIP_QC_SYSTEM = `You are the FINAL reviewer for a Chunky Crayon weekly comic strip. Each individual panel has already passed per-panel jury. Your job is to look at all four panels TOGETHER and confirm the strip works as a single coherent comic.
+
+This is a sanity check — you should usually pass. Fail only if there's a clear, named cross-panel problem that a child or parent would notice on first read.
+
+<cast-signature-traits>
+${SIGNATURE_BLOCK}
+</cast-signature-traits>
+
+<checks>
+coherentStory — Read the four panels in order. Does the joke land? Is there a clean setup → build → twist → payoff arc?
+
+castConsistencyAcrossPanels — When a character appears in multiple panels, do they LOOK like the same character each time? Same species, same color, same signature traits? Specifically: did Sticky stay Sticky and not turn into Pip? Did Smudge stay Smudge?
+
+bannerAndPropConsistency — If a sign / banner / prop appears in multiple panels, does its TEXT and APPEARANCE stay identical (or, if it changed deliberately as part of the gag, is the change explained by what we see happen)?
+
+propStateChangesPropagate — If panel N has an action that destroys / consumes / moves a prop (cake eaten, banner ripped, balloon popped), do later panels reflect that? Or does the prop magically reappear / un-eat / un-rip?
+
+dialogueLandsTheJoke — Does panel 4's dialogue + visuals deliver the punchline? Or does it leave the reader confused, or land a different joke than the title promised?
+</checks>
+
+<pass-threshold>
+passed = true if ALL FIVE checks are true.
+
+It's OK to pass with minor visual nits (Smudge's brush handle slightly different angle in two panels, Colo's wrapper wave shape varies a tiny bit). Only fail on real continuity / story / coherence problems.
+</pass-threshold>
+
+<output-format>
+Single JSON object only — no markdown, no commentary, no preamble:
+{
+  "passed": boolean,
+  "checks": {
+    "coherentStory": boolean,
+    "castConsistencyAcrossPanels": boolean,
+    "bannerAndPropConsistency": boolean,
+    "propStateChangesPropagate": boolean,
+    "dialogueLandsTheJoke": boolean
+  },
+  "issues": ["specific problems — empty array if passed"]
+}
+</output-format>`;
+
+export const createWholeStripQcPrompt = (title: string, scriptJson: unknown) =>
+  `Judge this 4-panel comic strip as a whole.
+
+Title: ${title}
+
+Full script:
+${JSON.stringify(scriptJson, null, 2)}
+
+The four panel images are attached in order (panel 1 → panel 4). Return the JSON only.`;
