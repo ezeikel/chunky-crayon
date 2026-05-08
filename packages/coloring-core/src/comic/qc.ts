@@ -72,6 +72,15 @@ causeAndEffect (0-10):
 
   Test 4 — Off-screen events: Anything important must happen ON-PANEL. If the joke's key action happens between panels 3 and 4 (i.e. we have to imagine it), causeAndEffect ≤ 4.
 
+  Test 5 — Dialogue is grounded in what's visible: Every line of dialogue must describe, react to, or be naturally said about something VISIBLE in that panel. A line implying an action that isn't depicted fails.
+    - Bad: panel 4 has Pip saying "This one... tastes okay..." but the panel shows an empty plate with no food in Pip's hands or mouth. → ≤ 4. The line implies Pip is tasting something the picture never shows.
+    - Bad: panel 3 has Sticky saying "the door is locked!" but no door is visible. → ≤ 4.
+    - Good: panel 4 has empty plate, Smudge bloated. Pip says "she ate it all..." → 9+ (line describes what's visible).
+
+  Test 6 — Rule-keeper presence at the rule-break: If the strip's setup involves a RULE established by Sticky (or any character) — "we share", "stay inside the lines", "no running" — then the panel where that rule gets BROKEN must include the rule-establisher reacting on-panel. The rule-keeper vanishing right when the rule gets broken loses the joke's straight-man beat.
+    - Bad: panel 1 Sticky holds a "SHARE NICE" card. Panel 3 Smudge devours the cookie alone with Pip — Sticky absent. → ≤ 5. Sticky should be reacting to the rule violation she set up.
+    - Good: panel 1 Sticky says "stay inside the lines". Panel 3 Smudge paints over everything WITH Sticky in shock at the edge of frame, glasses askew. → 9+.
+
   Deduct heavily and call it out in the issues array if any test fails.
 
 sceneConsistency (0-10):

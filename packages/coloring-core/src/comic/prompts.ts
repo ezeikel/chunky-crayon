@@ -229,6 +229,21 @@ export const buildPanelImagePrompt = (
 ): string => {
   const { panel, scene, cumulativeStateChanges, isSceneStart } = input;
 
+  // Each character gets a "must appear" + "no substitution" line. We
+  // hit a real bug where the model swapped Sticky for Pip in panel 3
+  // because both are yellow + Pip was in the prior panel's continuity
+  // ref. Listing the canonical species + a hard "do not substitute"
+  // rule keeps the model from silently picking the wrong character.
+  const requiredCharacterBlock = panel.cast
+    .map((id) => {
+      const member = COMIC_STRIP_CAST.find((c) => c.id === id);
+      if (!member) throw new Error(`Unknown cast id: ${id}`);
+      const otherCast = COMIC_STRIP_CAST.filter((c) => c.id !== id)
+        .map((c) => c.name)
+        .join(", ");
+      return `${member.name} (${member.species}) MUST APPEAR in this panel. ${member.name} is recognised by: ${member.signatureDetails.join("; ")}. Do not substitute ${member.name} for ${otherCast}.`;
+    })
+    .join("\n\n");
   const characterTraits = panel.cast
     .map((id) => {
       const member = COMIC_STRIP_CAST.find((c) => c.id === id);
@@ -281,7 +296,11 @@ ACTION: ${panel.action}
 
 EXPRESSIONS: ${panel.expressions}
 
-CHARACTERS IN THIS PANEL (each must show ALL their signature traits):
+REQUIRED CHARACTERS — each named character below MUST APPEAR. Do not swap any of them for a different cast member, even if a different character was in the prior-panel reference image:
+
+${requiredCharacterBlock}
+
+Recap of signature traits (each character must show ALL of theirs):
 - ${characterTraits}${fixedPropsBlock}${stateChangesBlock}${continuityBlock}${dialogueBlock}${gagBlock}
 
 Both characters fully visible, no overlap, no cropping. Comic-strip panel framing with thin black border.
