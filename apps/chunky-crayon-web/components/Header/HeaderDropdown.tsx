@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { User } from '@one-colored-pixel/db/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -12,10 +13,12 @@ import {
   faCoins,
   faNewspaper,
   faShieldHalved,
+  faPlus,
+  faUsers,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -25,7 +28,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ParentalGateLink } from '@/components/ParentalGate';
 import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
+import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
+import ProfileUI from '@/components/ProfileUI/ProfileUI';
+import { ProfileProvider, useProfile } from '@/contexts/ProfileContext';
+import { setActiveProfile } from '@/app/actions/profiles';
 import formatNumber from '@/utils/formatNumber';
+import type { ProfileWithStats } from '@/lib/profiles/service';
 
 type DropdownItemConfig = {
   icon?: IconDefinition;
@@ -100,12 +108,39 @@ const coinsStyle = {
 
 type HeaderDropdownProps = {
   user: Partial<User>;
+  profiles: ProfileWithStats[];
+  activeProfile: ProfileWithStats | null;
   signOutAction: () => Promise<void>;
 };
 
-const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
+const MAX_PROFILES = 10;
+
+// Inner component — has access to ProfileContext for the create-profile modal.
+const HeaderDropdownInner = ({
+  user,
+  signOutAction,
+}: {
+  user: Partial<User>;
+  signOutAction: () => Promise<void>;
+}) => {
   const t = useTranslations('navigation');
+  const tProfiles = useTranslations('profiles');
+  const router = useRouter();
+  const { profiles, activeProfile, openCreateModal } = useProfile();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const otherProfiles = profiles.filter((p) => p.id !== activeProfile?.id);
+  const canAddMore = profiles.length < MAX_PROFILES;
+  const hasProfiles = profiles.length > 0;
+
+  const handleSwitchProfile = (profileId: string) => {
+    if (profileId === activeProfile?.id) return;
+    startTransition(async () => {
+      await setActiveProfile(profileId);
+      router.refresh();
+    });
+  };
 
   return (
     <>
@@ -120,17 +155,34 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            className="flex items-center gap-3 font-tondo font-bold px-4 py-2 rounded-full bg-paper-cream hover:bg-paper-cream-dark transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
+            className={`flex items-center gap-3 font-tondo font-bold px-4 py-2 rounded-full bg-paper-cream hover:bg-paper-cream-dark transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm ${
+              isPending ? 'opacity-50 pointer-events-none' : ''
+            }`}
+            aria-label={
+              activeProfile
+                ? `Account menu — active profile: ${activeProfile.name}`
+                : 'Account menu'
+            }
           >
-            {/* User section */}
+            {/* User / active-profile section */}
             <div className="flex items-center gap-2">
-              <FontAwesomeIcon
-                icon={faCircleUser}
-                className="text-xl"
-                style={iconStyle}
-              />
+              {activeProfile ? (
+                <ProfileAvatar
+                  avatarId={activeProfile.avatarId}
+                  name={activeProfile.name}
+                  size="xs"
+                />
+              ) : (
+                <FontAwesomeIcon
+                  icon={faCircleUser}
+                  className="text-xl"
+                  style={iconStyle}
+                />
+              )}
               <span className="text-text-primary">
-                {user?.name?.split(' ')[0] || t('account')}
+                {activeProfile?.name ||
+                  user?.name?.split(' ')[0] ||
+                  t('account')}
               </span>
             </div>
             {/* Divider */}
@@ -148,7 +200,92 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
             </div>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuContent align="end" className="w-60">
+          {/* Active profile card — only render if there are profiles. New
+              users without one see the rest of the menu unchanged. */}
+          {hasProfiles && activeProfile && (
+            <div className="px-3 py-2 bg-crayon-orange/10 rounded-lg mx-1 mb-1">
+              <div className="flex items-center gap-3">
+                <ProfileAvatar
+                  avatarId={activeProfile.avatarId}
+                  name={activeProfile.name}
+                  size="sm"
+                />
+                <div>
+                  <p className="font-tondo font-bold text-sm text-crayon-orange">
+                    {activeProfile.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {t('currentlyActive')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Other profiles for quick switch */}
+          {otherProfiles.length > 0 && (
+            <>
+              <p className="px-3 py-1 text-xs text-gray-400 font-tondo">
+                {t('switchTo')}
+              </p>
+              {otherProfiles.map((profile) => (
+                <DropdownMenuItem
+                  key={profile.id}
+                  onClick={() => handleSwitchProfile(profile.id)}
+                  className="flex items-center gap-3 cursor-pointer"
+                >
+                  <ProfileAvatar
+                    avatarId={profile.avatarId}
+                    name={profile.name}
+                    size="xs"
+                  />
+                  <span className="font-tondo font-bold text-sm">
+                    {profile.name}
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </>
+          )}
+
+          {/* Add profile */}
+          {hasProfiles && canAddMore && (
+            <DropdownMenuItem
+              onClick={openCreateModal}
+              className="flex items-center gap-3 cursor-pointer"
+            >
+              <FontAwesomeIcon
+                icon={faPlus}
+                className="text-lg"
+                style={iconStyle}
+              />
+              <span className="font-tondo font-bold text-sm">
+                {tProfiles('create.addProfile')}
+              </span>
+            </DropdownMenuItem>
+          )}
+
+          {/* Manage profiles */}
+          {hasProfiles && (
+            <DropdownMenuItem asChild>
+              <ParentalGateLink
+                href="/account/profiles"
+                className="flex items-center gap-3 w-full"
+              >
+                <FontAwesomeIcon
+                  icon={faUsers}
+                  className="text-lg"
+                  style={iconStyle}
+                />
+                <span className="font-tondo font-bold text-sm">
+                  {t('manageProfiles')}
+                </span>
+              </ParentalGateLink>
+            </DropdownMenuItem>
+          )}
+
+          {hasProfiles && <DropdownMenuSeparator />}
+
           {DROPDOWN_ITEMS.filter(
             (item) => !item.adminOnly || user?.role === 'ADMIN',
           ).map((item, idx) => {
@@ -252,5 +389,18 @@ const HeaderDropdown = ({ user, signOutAction }: HeaderDropdownProps) => {
     </>
   );
 };
+
+const HeaderDropdown = ({
+  user,
+  profiles,
+  activeProfile,
+  signOutAction,
+}: HeaderDropdownProps) => (
+  <ProfileProvider profiles={profiles} activeProfile={activeProfile}>
+    <HeaderDropdownInner user={user} signOutAction={signOutAction} />
+    {/* Renders CreateProfileModal + ProfileSwitcher modals at portal root */}
+    <ProfileUI />
+  </ProfileProvider>
+);
 
 export default HeaderDropdown;

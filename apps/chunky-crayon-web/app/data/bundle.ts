@@ -1,5 +1,6 @@
 import { cacheLife, cacheTag } from 'next/cache';
 import { db } from '@one-colored-pixel/db';
+import { getBundleProfile } from '@one-colored-pixel/coloring-core';
 import { BRAND } from '@/lib/db';
 
 /**
@@ -138,4 +139,56 @@ export function listingImagesForBundle(bundle: PublicBundle): string[] {
     bundle.listingPageGrid3Url,
     bundle.listingBrandCardUrl,
   ].filter((u): u is string => Boolean(u));
+}
+
+export type BundleCastMember = {
+  id: string;
+  name: string;
+  species: string;
+  imageUrl: string;
+  funFact: string;
+};
+
+/**
+ * If the hero has a hand-written funFact, use it. Otherwise format the
+ * first signatureDetail into a sentence so we always have *something* to
+ * show on the cast switcher. signatureDetails are written for the QA
+ * prompt (lowercase, descriptive) so we capitalise + add a period.
+ */
+function deriveFunFact(hero: {
+  name: string;
+  funFact?: string;
+  signatureDetails: readonly string[];
+}): string {
+  if (hero.funFact) return hero.funFact;
+  const first = hero.signatureDetails[0];
+  if (!first) return '';
+  const capitalised = first.charAt(0).toUpperCase() + first.slice(1);
+  return `${hero.name} has ${capitalised.toLowerCase()}.`;
+}
+
+/**
+ * Build the "Meet the cast" data for a bundle by combining the static
+ * hero profile (id/name/species lives in @one-colored-pixel/coloring-core)
+ * with the transparent PNG URL on R2. Returns [] for bundles that don't
+ * have a hero profile registered yet.
+ *
+ * Image path convention is set by scripts/remove-bundle-hero-backgrounds.ts:
+ * `bundles/{slug}/hero-refs/{heroId}-transparent.png`. Run that script
+ * after a bundle's hero refs are seeded so this URL resolves.
+ */
+export function bundleHeroesForCast(slug: string): BundleCastMember[] {
+  const profile = getBundleProfile(slug);
+  if (!profile) return [];
+
+  const r2Public = process.env.R2_PUBLIC_URL;
+  if (!r2Public) return [];
+
+  return profile.heroes.map((hero) => ({
+    id: hero.id,
+    name: hero.name,
+    species: hero.species,
+    imageUrl: `${r2Public}/bundles/${slug}/hero-refs/${hero.id}-transparent.png`,
+    funFact: deriveFunFact(hero),
+  }));
 }

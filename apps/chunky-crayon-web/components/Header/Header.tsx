@@ -29,7 +29,6 @@ import { getMyCurrentChallenge } from '@/app/actions/challenges';
 import { signOut } from '@/auth';
 import formatNumber from '@/utils/formatNumber';
 import HeaderDropdown from './HeaderDropdown';
-import HeaderProfileIndicator from './HeaderProfileIndicator';
 import HeaderStickerIndicator from './HeaderStickerIndicator';
 import HeaderChallengeIndicator from './HeaderChallengeIndicator';
 import HeaderColoIndicator from './HeaderColoIndicator';
@@ -322,12 +321,12 @@ const Header = async () => {
                 {renderNavLink(item, user)}
               </div>
             ))}
-            {/* Profile indicator for multi-profile support */}
-            <HeaderProfileIndicator
+            <HeaderDropdown
+              user={user}
               profiles={profiles}
               activeProfile={activeProfile}
+              signOutAction={handleSignOut}
             />
-            <HeaderDropdown user={user} signOutAction={handleSignOut} />
           </nav>
 
           {/* Kid-facing items - challenge stays visible everywhere; Colo + sticker hide below xl to prevent header wrap */}

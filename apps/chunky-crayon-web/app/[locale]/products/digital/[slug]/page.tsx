@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getPublishedBundle, listingImagesForBundle } from '@/app/data/bundle';
+import {
+  getPublishedBundle,
+  listingImagesForBundle,
+  bundleHeroesForCast,
+} from '@/app/data/bundle';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { checkFeatureFlag } from '@/flags';
@@ -94,6 +98,7 @@ const BundleContent = async ({
   }
 
   const images = listingImagesForBundle(bundle);
+  const heroes = bundleHeroesForCast(bundle.slug);
 
   return (
     <>
@@ -114,6 +119,7 @@ const BundleContent = async ({
           pricePence: bundle.pricePence,
           currency: bundle.currency,
           images,
+          heroes,
         }}
       />
     </>

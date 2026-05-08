@@ -37,6 +37,12 @@ export type Hero = {
    * page the hero appears on.
    */
   referenceSheetPrompt: string;
+  /**
+   * One short, kid-friendly line of personality. Surfaced on the bundle
+   * product page's "Meet the cast" switcher so kids can put a face to the
+   * name. Optional — UI falls back to a formatted signatureDetail if absent.
+   */
+  funFact?: string;
 };
 
 export type HeroBundle = {
@@ -75,6 +81,8 @@ export const DINO_DANCE_PARTY: HeroBundle = {
         "stubby T-rex arms with three rounded fingers",
       ],
       referenceSheetPrompt: `A friendly cartoon T-rex character standing centered on a plain white background, facing slightly to the side in a relaxed pose. Big rounded snout with a happy half-smile, wide eyes with chunky pupils, three small rounded ridge-bumps along the back. Wearing oversized round headphones with a thick band over the head, like a DJ. Stubby T-rex arms with three rounded fingers, sturdy legs with three toes, thick tail with two stripe-bands near the tip. No background, no scenery — just the character on plain white. Children's coloring book reference sheet for a single hero character.`,
+      funFact:
+        "Rex picks every song at the dance party. He never takes his headphones off, not even to sleep.",
     },
     {
       id: "spike",
@@ -87,6 +95,8 @@ export const DINO_DANCE_PARTY: HeroBundle = {
         "stubby legs with three rounded toes",
       ],
       referenceSheetPrompt: `A friendly cartoon stegosaurus character standing centered on a plain white background, facing slightly to the side. Round body, small round head with a gentle smile, six heart-shaped back plates running down the spine and getting smaller toward the tail. Stubby legs with three rounded toes each, thick tail with two rounded soft-edge spikes near the tip. No background, no scenery — just the character on plain white. Children's coloring book reference sheet for a single hero character.`,
+      funFact:
+        "Spike counts the heart-shaped plates on his back when he's nervous. There are six. Always six.",
     },
     {
       id: "zip",
@@ -99,6 +109,8 @@ export const DINO_DANCE_PARTY: HeroBundle = {
         "pointy snout with one small visible tooth",
       ],
       referenceSheetPrompt: `A friendly cartoon velociraptor character standing centered on a plain white background, facing slightly to the side. Slim two-legged body in a relaxed pose, pointy snout with a cheeky grin showing one small tooth, wide eye with a chunky pupil. A small tuft of three rounded feathers on top of the head, like a punk crest. Two striped wrist bands are required — one on each arm — drawn as thick wide bands with three or four horizontal stripes, clearly visible at each wrist. Long whippy tail with a slight curl at the tip. Three-fingered hands, three-toed feet. No background, no scenery — just the character on plain white. Children's coloring book reference sheet for a single hero character.`,
+      funFact:
+        "Zip is the fastest dancer on the dance floor. Her feather mohawk bounces when she spins.",
     },
     {
       id: "dots",
@@ -111,6 +123,8 @@ export const DINO_DANCE_PARTY: HeroBundle = {
         "four stubby legs with three round toes each",
       ],
       referenceSheetPrompt: `A friendly cartoon ankylosaurus dinosaur character standing centered on a plain white background in profile view, facing slightly toward the viewer. This is a DINOSAUR, not a turtle and not a tortoise. Dinosaur head shape clearly visible at the front: a low-slung snout with wide nostrils, big friendly eye, small horn nubs at the back of the head. Body posture is low and wide on four clearly visible stubby legs, each with three round toes. The back is covered in a smooth dome of armor — the armor edge is a single smooth curved line all the way around the back, with no spiky scales or triangular plates. Big round polka-dot spots scattered evenly across the armor. The tail extends out behind the body and ends in a soft rounded ball-shaped club at the very tip. Gentle smile. No background, no scenery — just the character on plain white. Children's coloring book reference sheet for a single hero character.`,
+      funFact:
+        "Dots taps his round tail club to keep the beat. He thinks he's the band, the rest of the cast disagree.",
     },
   ],
   pageCast: {
