@@ -36,7 +36,6 @@ async function main() {
     bundleSlug: slug,
     bundleId: bundle.id,
     bundleName: bundle.name,
-    bundlePrefix: "Bundle 01:", // TODO: derive from a Bundle.prefix field once we have a 2nd bundle
     tagline: bundle.tagline,
     pageCount: bundle.pageCount,
   });

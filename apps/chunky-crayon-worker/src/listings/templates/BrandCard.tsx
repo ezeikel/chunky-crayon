@@ -1,22 +1,20 @@
 /**
- * BrandCard listing image — the "Hey there!" welcome page that ships
- * alongside Hero + 3 page grids in a Coco-Wyo-style listing set.
+ * BrandCard listing image v3 — Warm welcome page.
  *
  * Layout (1200×1200):
- *   - Tiled bg (cream + crayon scribbles)
- *   - Centered "Hey there!" headline in Tondo Bold (sentence case)
- *   - Welcome paragraph below
- *   - Featured bundle character (e.g. colored Rex) bottom half, large
- *   - C logo bottom-right corner (replaces wordmark)
+ *   - Soft cream background with subtle pattern
+ *   - "Hey there!" headline with hand-drawn squiggle underline
+ *   - Friendly, concise welcome message
+ *   - Featured bundle character (e.g. colored Rex) bottom centre, large
+ *   - Decorative floating elements (hearts, stars) for warmth
  *
- * Character sourcing: prefers `brandCharacterUrl` (the bundle's polished
- * colored mascot, e.g. Rex for Dino Dance Party). Falls back to the Colo
- * waving SVG when a bundle hasn't generated its character yet.
+ * No logo — the character provides the brand presence.
  */
 
 import satori from "satori";
 import { LISTING_SIZE, PALETTE } from "../palette";
 import { buildFontConfig, type ListingFonts } from "../fonts";
+import { buildSquiggleDataUri } from "../squiggle";
 
 export type BrandCardInput = {
   bundleName: string;
@@ -27,9 +25,20 @@ export type BrandCardInput = {
 };
 
 export async function renderBrandCard(input: BrandCardInput): Promise<string> {
-  // Character sized to 560px = ~47% of canvas height. Bigger than v1 (380),
-  // gives the welcome page warmth Wyo's frog-on-haystack has.
-  const CHARACTER_SIZE = 560;
+  // Character sized to leave breathing room between sign-off and image.
+  // 410pt char at bottom 60 starts at y = 1200 - 60 - 410 = 730. Body
+  // block ends ~y=620 (post-sign-off), so ~110pt of clear cream between
+  // "Happy coloring!" and the character.
+  const CHARACTER_SIZE = 410;
+
+  // Generate a warm underline squiggle for the headline
+  const headlineSquiggle = buildSquiggleDataUri({
+    width: 480,
+    height: 36,
+    color: PALETTE.crayonPink,
+    strokeWidth: 10,
+    seed: 42,
+  });
 
   return satori(
     <div
@@ -43,7 +52,7 @@ export async function renderBrandCard(input: BrandCardInput): Promise<string> {
         fontFamily: "Tondo",
       }}
     >
-      {/* Tiled background — single PNG covers full canvas */}
+      {/* Tiled background */}
       <img
         src={input.bgDataUri}
         width={LISTING_SIZE}
@@ -51,83 +60,177 @@ export async function renderBrandCard(input: BrandCardInput): Promise<string> {
         style={{ position: "absolute", top: 0, left: 0 }}
       />
 
-      {/* Headline — sentence case, larger, slightly higher on canvas */}
+      {/* Decorative floating hearts — adds warmth like CocoWyo */}
       <div
         style={{
+          position: "absolute",
+          top: 180,
+          left: 100,
           display: "flex",
-          marginTop: 100,
-          fontFamily: "Tondo",
-          fontWeight: 700,
-          fontSize: 138,
-          lineHeight: 1,
-          color: PALETTE.crayonOrangeDark,
+          fontSize: 36,
+          color: PALETTE.crayonPinkLight,
+          transform: "rotate(-12deg)",
         }}
       >
-        Hey there!
+        {"♥"}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: 240,
+          right: 120,
+          display: "flex",
+          fontSize: 28,
+          color: PALETTE.crayonYellowLight,
+          transform: "rotate(15deg)",
+        }}
+      >
+        {"★"}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: 420,
+          left: 80,
+          display: "flex",
+          fontSize: 24,
+          color: PALETTE.crayonYellow,
+          transform: "rotate(-8deg)",
+        }}
+      >
+        {"✦"}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: 380,
+          right: 90,
+          display: "flex",
+          fontSize: 32,
+          color: PALETTE.crayonPink,
+          transform: "rotate(10deg)",
+        }}
+      >
+        {"♥"}
       </div>
 
-      {/* Welcome paragraph */}
+      {/* Headline — Tondo Bold with squiggle underline */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          width: 940,
-          marginTop: 36,
+          alignItems: "center",
+          marginTop: 90,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            fontFamily: "Tondo",
+            fontWeight: 700,
+            fontSize: 120,
+            lineHeight: 1,
+            color: PALETTE.crayonOrangeDark,
+          }}
+        >
+          Hey there!
+        </div>
+        <img
+          src={headlineSquiggle}
+          width={420}
+          height={32}
+          style={{ marginTop: -8 }}
+        />
+      </div>
+
+      {/* Welcome paragraph — clear typographic rhythm with a separated
+          sign-off block so the closing reads as a flourish, not a 5th
+          line of paragraph. Whole block lives in top half of card,
+          ending around y=620 so it clears the character at y=720. */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: 900,
+          marginTop: 28,
           textAlign: "center",
           fontFamily: "Tondo",
           fontWeight: 400,
-          fontSize: 38,
+          fontSize: 30,
           lineHeight: 1.35,
           color: PALETTE.brown,
         }}
       >
         <div style={{ display: "flex", justifyContent: "center" }}>
-          A big warm thank you for picking up
+          Thanks for picking up
         </div>
         <div
           style={{
             display: "flex",
             justifyContent: "center",
             fontWeight: 700,
-            color: PALETTE.crayonOrangeDark,
-            marginTop: 6,
+            color: "#A06FB0",
+            marginTop: 8,
+            fontSize: 46,
+            letterSpacing: 0.5,
           }}
         >
           {input.bundleName}!
         </div>
         <div
-          style={{ display: "flex", justifyContent: "center", marginTop: 18 }}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 36,
+            fontSize: 28,
+            lineHeight: 1.5,
+          }}
         >
-          We hope it brings hours of cozy, creative fun.
+          Print every page, color them online,
         </div>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            fontSize: 28,
+            lineHeight: 1.5,
+          }}
+        >
+          do both. Whatever your tiny artist wants.
+        </div>
+        {/* Sign-off — wider top margin separates from body. No
+            "Chunky Crayon" attribution because the character below
+            IS the brand presence. */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: 56,
+            fontWeight: 700,
+            color: PALETTE.crayonOrangeDark,
+            fontSize: 36,
+          }}
+        >
           Happy coloring!
         </div>
       </div>
 
-      {/* Featured character — bottom centre, large */}
-      <img
-        src={input.characterDataUri}
-        width={CHARACTER_SIZE}
-        height={CHARACTER_SIZE}
+      {/* Featured character — bottom centre, slightly larger with shadow */}
+      <div
         style={{
           position: "absolute",
-          bottom: 40,
+          bottom: 30,
           left: (LISTING_SIZE - CHARACTER_SIZE) / 2,
+          display: "flex",
+          filter: "drop-shadow(4px 6px 8px rgba(92, 58, 33, 0.15))",
         }}
-      />
-
-      {/* C logo — bottom right corner, replaces the wordmark */}
-      <img
-        src={input.ccLogoDataUri}
-        width={96}
-        height={96}
-        style={{
-          position: "absolute",
-          bottom: 40,
-          right: 48,
-        }}
-      />
+      >
+        <img
+          src={input.characterDataUri}
+          width={CHARACTER_SIZE}
+          height={CHARACTER_SIZE}
+        />
+      </div>
     </div>,
     {
       width: LISTING_SIZE,

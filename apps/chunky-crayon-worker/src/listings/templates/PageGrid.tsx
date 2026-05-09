@@ -1,11 +1,16 @@
 /**
- * PageGrid listing image — 2x2 sheet of bundle page thumbnails with a
- * Wyo-style header strip ("PDF DOWNLOAD ♥ {BUNDLE NAME}") and per-page
- * captions. One template renders 3 sheets per bundle (pages 1-4, 5-8,
- * 9-10) by passing different `pageSlice` and `sheetIndex` values.
+ * PageGrid listing image v2 — CocoWyo-inspired scattered page preview.
  *
- * The last sheet (9-10) only has 2 pages, so the remaining slots are
- * filled with a friendly "Happy coloring!" message + C logo.
+ * Layout (1200×1200):
+ *   - Soft cream background with subtle pattern
+ *   - Header: "PDF DOWNLOAD" badge + bundle name in playful type
+ *   - 4 pages displayed with organic rotations and shadows — NOT a
+ *     rigid 2x2 grid, but scattered like photos on a table
+ *   - Each page has a soft shadow and slight tilt for depth
+ *   - Footer with logo + sheet indicator
+ *
+ * The scattered layout gives warmth and personality, suggesting a
+ * curated collection rather than a sterile product shot.
  */
 
 import satori from "satori";
@@ -29,30 +34,21 @@ export type PageGridInput = {
   fonts: ListingFonts;
 };
 
-const HEADER_HEIGHT = 110;
-const FRAME_PAD = 50;
-const GRID_GAP = 30;
+// 2x2 positions for the 4-page layout. Tilts kept to ±2° so rotation
+// envelopes stay inside the gap. Y gap between rows is wide enough that
+// caption text below row 1 doesn't crash into row 2 thumbs.
+const SCATTER_POSITIONS = [
+  { x: 95, y: 200, rotate: -2 },
+  { x: 645, y: 200, rotate: 2 },
+  { x: 95, y: 720, rotate: 2 },
+  { x: 645, y: 720, rotate: -2 },
+];
+
+const THUMB_SIZE = 460;
 
 export async function renderPageGrid(input: PageGridInput): Promise<string> {
-  // Vertical budget walkthrough so the grid stops cutting off:
-  //   Canvas:                      1200
-  //   Header strip block ends at:   110
-  //   Top pad after header:          60   → grid starts at y = 170
-  //   Footer strip occupies:        100 from bottom → grid must end ≤ 1100
-  //   Available for grid+captions: 1100 - 170 = 930
-  //   2 thumbs vertically + GRID_GAP + 2× caption (≈45 each) ≤ 930
-  //   → THUMB ≤ (930 - 30 - 90) / 2 = 405
-  //
-  // Pick THUMB_SIZE = 400 with breathing room. The grid width then is
-  // 2×400 + 30 = 830, centered horizontally on the canvas.
-  const THUMB_SIZE = 400;
-  const THUMB_AREA_TOP = HEADER_HEIGHT + 60;
-  const GRID_WIDTH = THUMB_SIZE * 2 + GRID_GAP;
-  const THUMB_AREA_LEFT = (LISTING_SIZE - GRID_WIDTH) / 2;
-  const THUMB_AREA_WIDTH = GRID_WIDTH;
-
-  // Pad thumbnails out to 4 slots so the 2x2 always renders. Empty slots
-  // become a "Happy coloring!" decorative card on the last sheet.
+  // Pad thumbnails out to 4 slots. Empty slots become a "Happy coloring!"
+  // decorative card on the last sheet.
   const slots: Array<
     { kind: "thumb"; bundleOrder: number; dataUri: string } | { kind: "empty" }
   > = [];
@@ -80,7 +76,7 @@ export async function renderPageGrid(input: PageGridInput): Promise<string> {
         fontFamily: "Tondo",
       }}
     >
-      {/* Tiled bg */}
+      {/* Tiled background */}
       <img
         src={input.bgDataUri}
         width={LISTING_SIZE}
@@ -88,20 +84,19 @@ export async function renderPageGrid(input: PageGridInput): Promise<string> {
         style={{ position: "absolute", top: 0, left: 0 }}
       />
 
-      {/* Header strip — Wyo-style "PDF DOWNLOAD ♥ BUNDLE NAME". Tondo
-          Bold (our standard body font) for "PDF DOWNLOAD" and the heart;
-          bundle name stays in Bubblegum Sans purple to mirror the Hero
-          title treatment. */}
+      {/* Header — small eyebrow ("PDF DOWNLOAD") above the bundle
+          name. Eyebrow is ~40% of the headline size + muted brown so
+          it reads as a category label. */}
       <div
         style={{
           position: "absolute",
-          top: 38,
+          top: 50,
           left: 0,
           right: 0,
           display: "flex",
-          alignItems: "baseline",
-          justifyContent: "center",
-          gap: 18,
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 10,
         }}
       >
         <span
@@ -109,29 +104,21 @@ export async function renderPageGrid(input: PageGridInput): Promise<string> {
             display: "flex",
             fontFamily: "Tondo",
             fontWeight: 700,
-            fontSize: 44,
-            letterSpacing: 1.5,
-            color: PALETTE.crayonOrangeDark,
+            fontSize: 18,
+            letterSpacing: 6,
+            color: PALETTE.brownLight,
+            textTransform: "uppercase",
           }}
         >
-          PDF DOWNLOAD
+          PDF Download
         </span>
         <span
           style={{
             display: "flex",
             fontFamily: "Tondo",
             fontWeight: 700,
-            fontSize: 44,
-            color: "#E5639A",
-          }}
-        >
-          ♥
-        </span>
-        <span
-          style={{
-            display: "flex",
-            fontFamily: "Bubblegum Sans",
-            fontSize: 52,
+            fontSize: 56,
+            letterSpacing: 1,
             color: "#A06FB0",
           }}
         >
@@ -139,128 +126,107 @@ export async function renderPageGrid(input: PageGridInput): Promise<string> {
         </span>
       </div>
 
-      {/* 2x2 grid */}
-      <div
-        style={{
-          position: "absolute",
-          top: THUMB_AREA_TOP,
-          left: THUMB_AREA_LEFT,
-          display: "flex",
-          flexWrap: "wrap",
-          width: THUMB_AREA_WIDTH,
-          gap: GRID_GAP,
-        }}
-      >
-        {slots.map((slot, idx) =>
-          slot.kind === "thumb" ? (
+      {/* Scattered page thumbnails */}
+      {slots.map((slot, idx) => {
+        const pos = SCATTER_POSITIONS[idx];
+        return slot.kind === "thumb" ? (
+          <div
+            key={`thumb-${slot.bundleOrder}`}
+            style={{
+              position: "absolute",
+              top: pos.y,
+              left: pos.x,
+              display: "flex",
+              flexDirection: "column",
+              width: THUMB_SIZE,
+              transform: `rotate(${pos.rotate}deg)`,
+            }}
+          >
             <div
-              key={`thumb-${slot.bundleOrder}`}
               style={{
                 display: "flex",
-                flexDirection: "column",
-                width: THUMB_SIZE,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  width: THUMB_SIZE,
-                  height: THUMB_SIZE,
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: 22,
-                  border: `5px solid ${PALETTE.brown}`,
-                  padding: 18,
-                  boxSizing: "border-box",
-                }}
-              >
-                <img
-                  src={slot.dataUri}
-                  width={THUMB_SIZE - 46}
-                  height={THUMB_SIZE - 46}
-                  style={{ borderRadius: 14 }}
-                />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: 10,
-                  fontFamily: "Tondo",
-                  fontWeight: 700,
-                  fontSize: 22,
-                  color: PALETTE.brownLight,
-                  letterSpacing: 0.5,
-                }}
-              >
-                Chunky Crayon · Page {slot.bundleOrder}
-              </div>
-            </div>
-          ) : (
-            <div
-              key={`empty-${idx}`}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
                 width: THUMB_SIZE,
                 height: THUMB_SIZE,
                 backgroundColor: "#FFFFFF",
-                borderRadius: 22,
-                border: `5px dashed ${PALETTE.crayonOrangeLight}`,
-                padding: 30,
+                borderRadius: 18,
+                border: `4px solid ${PALETTE.brown}`,
+                padding: 16,
                 boxSizing: "border-box",
+                boxShadow: `
+                  4px 4px 0 0 rgba(92, 58, 33, 0.12),
+                  8px 8px 16px -4px rgba(92, 58, 33, 0.1)
+                `,
               }}
             >
               <img
-                src={input.ccLogoDataUri}
-                width={140}
-                height={140}
-                style={{ marginBottom: 24 }}
+                src={slot.dataUri}
+                width={THUMB_SIZE - 40}
+                height={THUMB_SIZE - 40}
+                style={{ borderRadius: 12 }}
               />
-              <div
-                style={{
-                  display: "flex",
-                  fontFamily: "Bubblegum Sans",
-                  fontSize: 50,
-                  color: PALETTE.crayonOrangeDark,
-                  textAlign: "center",
-                }}
-              >
-                Happy coloring!
-              </div>
             </div>
-          ),
-        )}
-      </div>
-
-      {/* Footer — C logo + sheet count cue. Wordmark dropped — logo is
-          enough brand signal. */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 28,
-          left: 0,
-          right: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 18,
-        }}
-      >
-        <img src={input.ccLogoDataUri} width={56} height={56} />
-        <div
-          style={{
-            display: "flex",
-            fontFamily: "Tondo",
-            fontWeight: 400,
-            fontSize: 22,
-            color: PALETTE.brownLight,
-          }}
-        >
-          Sheet {input.sheetIndex} of {input.totalSheets}
-        </div>
-      </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 12,
+                fontFamily: "Tondo",
+                fontWeight: 700,
+                fontSize: 20,
+                color: PALETTE.brownLight,
+                letterSpacing: 0.5,
+                fontStyle: "italic",
+              }}
+            >
+              Page {slot.bundleOrder}
+            </div>
+          </div>
+        ) : (
+          <div
+            key={`empty-${idx}`}
+            style={{
+              position: "absolute",
+              top: pos.y,
+              left: pos.x,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              width: THUMB_SIZE,
+              height: THUMB_SIZE,
+              backgroundColor: "#FFFFFF",
+              borderRadius: 18,
+              border: `4px dashed ${PALETTE.crayonOrangeLight}`,
+              padding: 30,
+              boxSizing: "border-box",
+              transform: `rotate(${pos.rotate}deg)`,
+              boxShadow: `
+                4px 4px 0 0 rgba(92, 58, 33, 0.08),
+                8px 8px 16px -4px rgba(92, 58, 33, 0.06)
+              `,
+            }}
+          >
+            <img
+              src={input.ccLogoDataUri}
+              width={100}
+              height={100}
+              style={{ marginBottom: 16 }}
+            />
+            <div
+              style={{
+                display: "flex",
+                fontFamily: "Tondo",
+                fontWeight: 700,
+                fontSize: 36,
+                color: PALETTE.crayonOrangeDark,
+                textAlign: "center",
+              }}
+            >
+              Happy coloring!
+            </div>
+          </div>
+        );
+      })}
     </div>,
     {
       width: LISTING_SIZE,
