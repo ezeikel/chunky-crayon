@@ -18,6 +18,7 @@ import {
   faTrophy,
   faToolbox,
   faComment,
+  faStore,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
@@ -130,6 +131,7 @@ const getMobileItems = (
   user: Partial<User> | null,
   t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>,
   tCommon: Awaited<ReturnType<typeof getTranslations<'common'>>>,
+  showProducts: boolean,
 ): MobileNavItem[] => {
   const items: MobileNavItem[] = [];
   if (user) {
@@ -153,6 +155,13 @@ const getMobileItems = (
       iconName: faToolbox,
       href: '/tools',
     });
+    if (showProducts) {
+      items.push({
+        label: 'Products',
+        iconName: faStore,
+        href: '/products',
+      });
+    }
     items.push({
       label: t('blog'),
       iconName: faNewspaper,
@@ -224,6 +233,13 @@ const getMobileItems = (
       iconName: faToolbox,
       href: '/tools',
     });
+    if (showProducts) {
+      items.push({
+        label: 'Products',
+        iconName: faStore,
+        href: '/products',
+      });
+    }
     items.push({
       label: t('blog'),
       iconName: faNewspaper,
@@ -278,7 +294,6 @@ const Header = async () => {
   const t = await getTranslations('navigation');
   const tCommon = await getTranslations('common');
   const user = await getCurrentUser();
-  const mobileItems = getMobileItems(user, t, tCommon);
 
   // Fetch profiles, sticker stats, challenge, and Colo state for authenticated users
   const profiles = user ? (await getProfiles()) || [] : [];
@@ -287,14 +302,15 @@ const Header = async () => {
   const coloState = user ? await getMyColoState() : null;
   const currentChallenge = user ? await getMyCurrentChallenge() : null;
 
-  // Bundles shop is gated until the v0 product page redesign + buy flow
-  // (Stripe webhook, thank-you page, PDF generation) ship. Flip the
-  // PostHog `bundles-shop` flag on once everything's wired.
+  // Bundles shop flag — gates the Products entry in both desktop nav
+  // and mobile menu. Computed before mobileItems is built.
   const showProducts = await checkFeatureFlag(
     'bundles-shop',
     user?.id ?? 'server-side-check',
     false,
   );
+
+  const mobileItems = getMobileItems(user, t, tCommon, showProducts);
 
   const renderItems = () => {
     const navItems = getNavItems(t, showProducts);
