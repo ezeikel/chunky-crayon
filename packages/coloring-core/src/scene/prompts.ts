@@ -5,6 +5,8 @@
  * import them too — the web app re-exports for back-compat.
  */
 
+import { NO_EM_DASHES_RULE } from "../utils/copy";
+
 const TARGET_AGE = "3-8 years old";
 
 const COPYRIGHTED_CHARACTER_INSTRUCTIONS = `If the description includes a copyrighted name like Spiderman, then describe the character's physical appearance in detail instead. Describe their costume, logos, accessories, mask, eyes, muscles, etc. Specify that this must be in black and white only and simplify any complex details so that the image remains simple and avoids any complicated shapes or patterns. Update the original description replacing the copyrighted character name with this detailed description of the character. If the description does not include any copyrighted characters, then please ignore this step.`;
@@ -24,8 +26,10 @@ export const CLEAN_UP_DESCRIPTION_SYSTEM = `<role>Children's coloring page descr
 </constraints>
 
 <output_format>
-Output a single English sentence of 10-40 words describing the scene. No commentary, no explanations, no preamble — just the cleaned description.
+Output a single English sentence of 10-40 words describing the scene. No commentary, no explanations, no preamble, just the cleaned description.
 </output_format>
+
+<copy_rules>${NO_EM_DASHES_RULE}</copy_rules>
 
 <examples>
 <input>un dragón volando sobre un castillo</input>
@@ -60,7 +64,9 @@ IMPORTANT LANGUAGE REQUIREMENT:
 - Only translate the title, nothing else`
       : "";
 
-  return `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.${languageInstruction}`;
+  return `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.${languageInstruction}
+
+${NO_EM_DASHES_RULE}`;
 };
 
 export const IMAGE_METADATA_SYSTEM = createImageMetadataSystemPrompt();
@@ -77,7 +83,9 @@ Generate delightful, imaginative scene descriptions for daily coloring pages. Ev
 
 FORBIDDEN: violence, weapons, scary elements (ghosts, skeletons, monsters), death, danger, negative emotions, romance, adult themes, politics, real-world tragedies.
 
-OUTPUT: A vivid 1-2 sentence scene description that reads naturally as an image generation prompt. Example: "A cheerful elephant wearing rain boots, splashing in puddles while a family of frogs watches from lily pads in a rainy garden."`;
+OUTPUT: A vivid 1-2 sentence scene description that reads naturally as an image generation prompt. Example: "A cheerful elephant wearing rain boots, splashing in puddles while a family of frogs watches from lily pads in a rainy garden."
+
+${NO_EM_DASHES_RULE}`;
 
 const SEED_CHARACTERS = [
   "dragon",

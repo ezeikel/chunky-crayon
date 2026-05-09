@@ -5,6 +5,8 @@
  * import them too — the web app re-exports these for back-compat.
  */
 
+import { NO_EM_DASHES_RULE } from "../utils/copy";
+
 export const BLOG_POST_SYSTEM = `You are an expert content writer for Chunky Crayon, a family-friendly AI coloring page generator. You write engaging, SEO-optimized blog posts that help parents and educators discover the benefits of creative coloring activities.
 
 Your writing style:
@@ -14,6 +16,7 @@ Your writing style:
 - Uses American English spelling (color, favorite, center)
 - Includes practical tips and actionable advice
 - References Chunky Crayon naturally where relevant (not every paragraph)
+- ${NO_EM_DASHES_RULE}
 
 Target audience:
 - Parents of children aged 3-12
@@ -53,7 +56,8 @@ Guidelines:
 - Title: 50-60 characters, compelling, includes primary keyword
 - Slug: lowercase, hyphenated, 3-6 words
 - Description: 150-160 characters, includes CTA hint
-- Use American English spelling`;
+- Use American English spelling
+- ${NO_EM_DASHES_RULE}`;
 
 export const createBlogMetaPrompt = (topic: string, keywords: string[]) =>
   `Generate SEO metadata for a blog post about: "${topic}"

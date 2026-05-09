@@ -21,6 +21,7 @@ import {
   createDailyScenePrompt,
   getUpcomingEvents,
   getCurrentSeason,
+  stripEmDashes,
 } from "@one-colored-pixel/coloring-core";
 import { db, Brand } from "@one-colored-pixel/db";
 
@@ -418,7 +419,7 @@ export async function generateDailyScene(): Promise<string> {
     console.log(
       `[daily-scene] accepted on attempt ${attempt}: "${description}"`,
     );
-    return description;
+    return stripEmDashes(description);
   }
 
   const fallback = pickStaticFallback();

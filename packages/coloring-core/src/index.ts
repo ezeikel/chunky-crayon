@@ -217,3 +217,4 @@ export {
   createRandomDescriptionGenerator,
   type RandomSeedConfig,
 } from "./utils/random";
+export { stripEmDashes, NO_EM_DASHES_RULE } from "./utils/copy";

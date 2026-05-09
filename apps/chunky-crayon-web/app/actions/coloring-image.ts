@@ -16,6 +16,7 @@ import {
   generateColoringPageImage,
   getCurrentProviderConfig,
 } from '@/lib/ai';
+import { stripEmDashes } from '@one-colored-pixel/coloring-core';
 import { ACTIONS, TRACKING_EVENTS } from '@/constants';
 import { track, trackWithUser } from '@/utils/analytics-server';
 import {
@@ -234,9 +235,9 @@ export const generateColoringImageWithMetadata = async (
   // Note: animationPrompt is generated in after() hook with image visibility
   const coloringImage = await db.coloringImage.create({
     data: {
-      title: imageMetadata.title,
-      description: imageMetadata.description,
-      alt: imageMetadata.alt,
+      title: stripEmDashes(imageMetadata.title),
+      description: stripEmDashes(imageMetadata.description),
+      alt: stripEmDashes(imageMetadata.alt),
       tags: imageMetadata.tags,
       generationType: generationType || GenerationType.USER,
       userId,

@@ -15,9 +15,8 @@
  *   instead of silently rendering an empty hook.
  */
 
+import { stripEmDashes } from "@one-colored-pixel/coloring-core";
 import type { ContentReel as PrismaContentReel } from "@one-colored-pixel/db";
-
-import { stripEmDashes } from "./copy";
 import type {
   CaptionToken,
   ContentReel,

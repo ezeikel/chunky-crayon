@@ -26,6 +26,7 @@
 
 import { anthropic } from "@ai-sdk/anthropic";
 import { perplexity } from "@ai-sdk/perplexity";
+import { NO_EM_DASHES_RULE } from "@one-colored-pixel/coloring-core";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 
@@ -75,6 +76,7 @@ Generate engaging candidates that meet ALL of these:
 - Have a clear "tap to learn" hook for parents
 - Are NOT condescending or fear-mongering
 - Use US-friendly spelling and phrasing
+- ${NO_EM_DASHES_RULE}
 
 Output valid JSON only. Each draft must include a hook, payoff, center block, source title, source URL, and category.`;
 

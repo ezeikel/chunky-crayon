@@ -12,6 +12,7 @@ import {
   createBlogImagePromptPrompt,
   BLOG_TOPICS,
   BLOG_AUTHORS,
+  stripEmDashes,
   type BlogTopic,
 } from "@one-colored-pixel/coloring-core";
 import {
@@ -63,7 +64,11 @@ async function generateMeta(topic: string, keywords: string[]) {
   });
   if (!output)
     throw new Error("[blog-cron] meta generation returned no output");
-  return output;
+  return {
+    ...output,
+    title: stripEmDashes(output.title),
+    excerpt: stripEmDashes(output.excerpt),
+  };
 }
 
 async function generateContent(
@@ -79,7 +84,7 @@ async function generateContent(
   });
   if (!output)
     throw new Error("[blog-cron] content generation returned no output");
-  return output;
+  return { ...output, content: stripEmDashes(output.content) };
 }
 
 async function generateImagePromptFromClaude(topic: string, postTitle: string) {

@@ -7,6 +7,7 @@ import {
 } from '@/lib/ai/prompts';
 import { getUpcomingEvents, getCurrentSeason } from '@/lib/seasonal-calendar';
 import { getRandomDescriptionSmart } from '@/utils/random';
+import { stripEmDashes } from '@one-colored-pixel/coloring-core';
 import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
 
@@ -436,7 +437,7 @@ export async function generateDailyScene(): Promise<string> {
       `[SceneGen] Scene accepted on attempt ${attempt}:`,
       description,
     );
-    return description;
+    return stripEmDashes(description);
   }
 
   // All attempts failed — fall back to static random

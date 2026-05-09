@@ -14,6 +14,7 @@ import {
   createTikTokCaptionPrompt,
   createLinkedInCaptionPrompt,
 } from '@/lib/ai';
+import { stripEmDashes } from '@one-colored-pixel/coloring-core';
 import { ColoringImage } from '@one-colored-pixel/db';
 
 /**
@@ -436,7 +437,7 @@ export const generateInstagramCaption = async (
     ),
   });
 
-  return text;
+  return stripEmDashes(text);
 };
 
 export type FacebookPostType =
@@ -474,7 +475,7 @@ export const generateFacebookCaption = async (
     ),
   });
 
-  return text;
+  return stripEmDashes(text);
 };
 
 export const generatePinterestCaption = async (
@@ -490,7 +491,7 @@ export const generatePinterestCaption = async (
     ),
   });
 
-  return text;
+  return stripEmDashes(text);
 };
 
 export type TikTokPostType = 'image' | 'demo_reel';
@@ -515,7 +516,7 @@ export const generateTikTokCaption = async (
       ),
     });
 
-    return text.trim();
+    return stripEmDashes(text);
   } catch (error) {
     console.error('[TikTok] Caption generation failed:', error);
     return `${coloringImage.title ?? 'New coloring page'} 🎨 Free coloring page! #coloringpage #kidscrafts #artforkids #freecoloringpage`;
@@ -546,7 +547,7 @@ export const generateLinkedInCaption = async (
       ),
     });
 
-    return text.trim();
+    return stripEmDashes(text);
   } catch (error) {
     console.error('[LinkedIn] Caption generation failed:', error);
     throw error;
@@ -644,5 +645,5 @@ Remember: The fact is already displayed on the graphic. Your caption should comp
     prompt,
   });
 
-  return text;
+  return stripEmDashes(text);
 };

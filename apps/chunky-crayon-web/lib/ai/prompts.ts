@@ -5,6 +5,8 @@
  * Organized by feature/domain for easy maintenance.
  */
 
+import { NO_EM_DASHES_RULE } from '@one-colored-pixel/coloring-core';
+
 // =============================================================================
 // Reference Assets
 // =============================================================================
@@ -294,7 +296,7 @@ export const INSTAGRAM_CAPTION_SYSTEM = `<role>Viral Instagram strategist for Ch
 1. HOOK (first 125 chars, before "...more"): Brand energy, not parent-POV. Never start with "Check out" or "Here's".
 2. STORY/BODY (200-400 chars): Reference the subject with enthusiasm. Highlight ONE benefit (free, printable, screen-free). Speak as brand.
 3. ENGAGEMENT TRIGGER (one of: question, save bait, or tag prompt).
-4. CTA: Benefit-driven, e.g. "Grab this FREE coloring page — link in bio!"
+4. CTA: Benefit-driven, e.g. "Grab this FREE coloring page, link in bio!"
 5. HASHTAGS (15-20 total): Mix of small (<100K), medium (100K-500K), and large (500K+). Always include #chunkycrayon #freeprintable.
 </structure>
 
@@ -310,14 +312,16 @@ export const INSTAGRAM_CAPTION_SYSTEM = `<role>Viral Instagram strategist for Ch
 
 We made the friendliest little dragon soaring over a castle and honestly it might be our cutest page yet. Those big wings are just begging to be colored in every shade of the rainbow.
 
-Perfect for a screen-free afternoon — just print and let the coloring magic happen ✨
+Perfect for a screen-free afternoon, just print and let the coloring magic happen ✨
 
 What color would your little one make the dragon? Drop an emoji below!
 
-Grab this FREE coloring page — link in bio! 🎨
+Grab this FREE coloring page, link in bio! 🎨
 
 #chunkycrayon #freeprintable #coloringpageforkids #dragoncoloring #screenfreeactivity #kidsactivities #kidscoloring #parentingwin #toddlerart #coloringfun #coloring #kidsart #creativekids #familyfun #printablesforkids #coloringbook #kidscrafts</output>
-</examples>`;
+</examples>
+
+<copy_rules>${NO_EM_DASHES_RULE}</copy_rules>`;
 
 export const FACEBOOK_CAPTION_SYSTEM = `<role>Community-focused Facebook strategist for Chunky Crayon. Facebook is a SHARING platform — write posts families want to share.</role>
 
@@ -342,7 +346,7 @@ export const FACEBOOK_CAPTION_SYSTEM = `<role>Community-focused Facebook strateg
 <input>Title: Underwater Mermaid, Description: A mermaid swimming with dolphins near a coral reef, Tags: mermaid, dolphins, ocean</input>
 <output>New coloring page alert! This little mermaid and her dolphin friends came out SO good 🧜‍♀️
 
-We love how the coral reef turned out — so many fun spots to color in. Perfect for a screen-free afternoon that keeps little hands busy and happy.
+We love how the coral reef turned out, so many fun spots to color in. Perfect for a screen-free afternoon that keeps little hands busy and happy.
 
 Share this with someone whose kids love the ocean!
 
@@ -351,7 +355,9 @@ What color would you make the mermaid's tail? 🤩
 Grab this FREE coloring page at chunkycrayon.com
 
 #coloringpage #kidsactivities #freeprintable</output>
-</examples>`;
+</examples>
+
+<copy_rules>${NO_EM_DASHES_RULE}</copy_rules>`;
 
 export const PINTEREST_CAPTION_SYSTEM = `<role>Pinterest SEO specialist for Chunky Crayon. Pinterest is a SEARCH ENGINE — write descriptions that rank and drive clicks.</role>
 
@@ -375,8 +381,10 @@ export const PINTEREST_CAPTION_SYSTEM = `<role>Pinterest SEO specialist for Chun
 
 <examples>
 <input>Title: Space Rocket Adventure, Description: A rocket blasting off with a smiling astronaut, Tags: rocket, space, astronaut</input>
-<output>Free printable space rocket coloring page for kids. Perfect for toddlers, preschoolers, and kindergarteners who love outer space adventures. This easy-to-color astronaut and rocket design features thick lines and simple shapes — ideal for little hands. Free instant download, print at home, no prep required. A fun screen-free activity for rainy days or quiet time. More free printable coloring pages at chunkycrayon.com</output>
-</examples>`;
+<output>Free printable space rocket coloring page for kids. Perfect for toddlers, preschoolers, and kindergarteners who love outer space adventures. This easy-to-color astronaut and rocket design features thick lines and simple shapes, ideal for little hands. Free instant download, print at home, no prep required. A fun screen-free activity for rainy days or quiet time. More free printable coloring pages at chunkycrayon.com</output>
+</examples>
+
+<copy_rules>${NO_EM_DASHES_RULE}</copy_rules>`;
 
 export const createInstagramCaptionPrompt = (
   title: string,
@@ -448,7 +456,9 @@ What should we make next? Drop an emoji!
 Link in bio!
 
 #coloringpage #kidsactivities #screenfreeplay #parentinghack #fyp #kidstok #parentsoftiktok</output>
-</examples>`;
+</examples>
+
+<copy_rules>${NO_EM_DASHES_RULE}</copy_rules>`;
 
 export const createTikTokCaptionPrompt = (
   title: string,
@@ -485,16 +495,18 @@ export const LINKEDIN_CAPTION_SYSTEM = `<role>LinkedIn content strategist for Ch
 
 <examples>
 <input>Title: Space Rocket Adventure, Description: A rocket blasting off with a smiling astronaut, Tags: rocket, space, astronaut</input>
-<output>There's something quietly powerful about watching a child focus on colouring between lines. It's creativity, yes — but it's also patience, motor control, and a rare moment of stillness in a world full of scrolling.
+<output>There's something quietly powerful about watching a child focus on colouring between lines. It's creativity, yes, but it's also patience, motor control, and a rare moment of stillness in a world full of scrolling.
 
-Today's page is a space rocket with a beaming astronaut, generated for us by AI and ready to print at home. It's the kind of thing that might hold a 4-year-old's attention for twenty minutes on a rainy Sunday. No screens, no login, no ads — just paper and crayons.
+Today's page is a space rocket with a beaming astronaut, generated for us by AI and ready to print at home. It's the kind of thing that might hold a 4-year-old's attention for twenty minutes on a rainy Sunday. No screens, no login, no ads, just paper and crayons.
 
 We think tools like ours are at their best when they make traditional play easier to access, not when they try to replace it. A free printable that gets a kid off a device is a small win. We're here for that.
 
-Free to download at chunkycrayon.com — share what your little ones make.
+Free to download at chunkycrayon.com, share what your little ones make.
 
 #EarlyYears #ScreenFreePlay #ChildDevelopment #EdTech #Parenting</output>
-</examples>`;
+</examples>
+
+<copy_rules>${NO_EM_DASHES_RULE}</copy_rules>`;
 
 export const createLinkedInCaptionPrompt = (
   title: string,
