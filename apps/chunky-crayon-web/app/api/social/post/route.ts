@@ -15,7 +15,6 @@ import {
   type InstagramPostType,
   type FacebookPostType,
 } from '@/app/actions/social';
-import { sendAdminAlert } from '@/app/actions/email';
 
 export const maxDuration = 180; // Increased for carousel creation
 
@@ -1167,16 +1166,26 @@ const handleRequest = async (request: Request) => {
         throw new Error(`Coloring image with ID ${coloringImageId} not found`);
       }
     } else {
-      // Only post today's image — prevents re-posting stale content when generation fails
-      const todayStart = new Date();
-      todayStart.setUTCHours(0, 0, 0, 0);
+      // The IG Carousel slot fires at 00:30 UTC (8:30pm US Eastern,
+      // peak parent engagement) — that's the NEXT calendar day in UTC,
+      // so a strict "createdAt >= todayStart" filter never finds an
+      // image. The original intent was to post the previous day's
+      // coloring page (which by 8:30pm ET has been coloured during
+      // the day). Look back up to 48h for the most recent READY DAILY
+      // image so the cron actually finds something.
+      //
+      // Carousel-specific guard below also requires a saved colored
+      // version (the 3rd slide), so a missing colored version skips
+      // the post silently — exactly the behaviour we want.
+      const lookback = new Date();
+      lookback.setUTCDate(lookback.getUTCDate() - 2);
 
       coloringImage = await db.coloringImage.findFirst({
         where: {
           brand: BRAND,
           generationType: GenerationType.DAILY,
-          createdAt: { gte: todayStart },
-          status: 'READY', // skip in-flight rows from canvas-as-loader
+          createdAt: { gte: lookback },
+          status: 'READY',
         },
         orderBy: {
           createdAt: 'desc',
@@ -1185,13 +1194,12 @@ const handleRequest = async (request: Request) => {
     }
 
     if (!coloringImage?.svgUrl) {
+      // Skip silently — log to Vercel for debugging but don't email.
+      // The Posting Brief at 08:30 UTC is the canonical "what's queued
+      // for today" surface; per-cron admin alerts were redundant noise.
       const message =
-        'No daily coloring image generated today - skipping social posts';
+        'No recent DAILY coloring image found - skipping social posts';
       console.warn(`[Social] ${message}`);
-      await sendAdminAlert({
-        subject: 'Social posts skipped - no daily image',
-        body: `The social media posting cron was skipped because no DAILY coloring image was generated today.\n\nThis likely means the image generation cron at 08:00 UTC failed. Check the Vercel function logs for /api/coloring-image/generate.`,
-      });
       return NextResponse.json(
         { success: false, message, skipped: true },
         { headers: corsHeaders },
