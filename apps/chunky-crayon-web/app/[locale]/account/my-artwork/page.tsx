@@ -6,35 +6,24 @@ import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPalette,
-  faHeart,
   faArrowRight,
   faBookOpen,
   faStar,
   faPaintbrush,
+  faDownload,
+  faGift,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { differenceInDays, isToday, isYesterday, format } from 'date-fns';
-
-// Simple time display - friendly for kids, useful for parents
-const getFriendlyTime = (date: Date): string => {
-  const now = new Date();
-  const days = differenceInDays(now, date);
-
-  if (isToday(date)) return 'Today';
-  if (isYesterday(date)) return 'Yesterday';
-  if (days < 7) return `${days} days ago`;
-  if (days < 14) return 'Last week';
-  // Show month name for older items (e.g., "Dec" or "Nov 2024" if different year)
-  const isSameYear = date.getFullYear() === now.getFullYear();
-  return isSameYear ? format(date, 'MMM d') : format(date, 'MMM yyyy');
-};
 import { auth } from '@/auth';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import CrayonScribble from '@/components/Intro/CrayonScribble';
 import Loading from '@/components/Loading/Loading';
 import ChallengeWidget from '@/components/ChallengeCard/ChallengeWidget';
 import { getUserSavedArtwork } from '@/app/actions/saved-artwork';
 import { getMyStickerStats } from '@/app/actions/stickers';
 import { getMyCurrentChallenge } from '@/app/actions/challenges';
+import { listMyBundlePurchases } from '@/app/data/bundle';
 import DeleteArtworkButton from './DeleteArtworkButton';
 import ShareArtworkButton from './ShareArtworkButton';
 
@@ -43,200 +32,357 @@ export const metadata: Metadata = {
   description: 'View and manage your saved coloring artwork.',
 };
 
-// Sticker stats card component
+// Friendly relative time. Today / Yesterday / N days ago / Last week /
+// "Mar 12" / "Mar 12 2024" — matches Coco-Wyo-style warm copy without
+// being precious about exact timestamps.
+const getFriendlyTime = (date: Date): string => {
+  const now = new Date();
+  const days = differenceInDays(now, date);
+
+  if (isToday(date)) return 'Today';
+  if (isYesterday(date)) return 'Yesterday';
+  if (days < 7) return `${days} days ago`;
+  if (days < 14) return 'Last week';
+  const isSameYear = date.getFullYear() === now.getFullYear();
+  return isSameYear ? format(date, 'MMM d') : format(date, 'MMM yyyy');
+};
+
+const formatPrice = (pricePence: number, currency: string) => {
+  const symbol =
+    currency.toLowerCase() === 'gbp'
+      ? '£'
+      : currency.toLowerCase() === 'usd'
+        ? '$'
+        : currency.toLowerCase() === 'eur'
+          ? '€'
+          : '';
+  return `${symbol}${(pricePence / 100).toFixed(2)}`;
+};
+
+// Accent palette cycled across cards — same trio as /products/digital so
+// the visual language carries through. Bundle cards on this page reuse
+// the same chrome so a buyer who lands here from the thank-you page
+// sees a familiar object (white card body + accent footer strip).
+const CARD_ACCENTS = [
+  {
+    bg: 'bg-crayon-yellow-light/50',
+    border: 'border-crayon-orange/20',
+    hoverBorder: 'group-hover:border-crayon-orange',
+    price: 'text-crayon-orange-dark',
+    button: 'bg-crayon-orange hover:bg-crayon-orange-dark',
+  },
+  {
+    bg: 'bg-crayon-pink-light/50',
+    border: 'border-crayon-pink/20',
+    hoverBorder: 'group-hover:border-crayon-pink',
+    price: 'text-crayon-pink-dark',
+    button: 'bg-crayon-pink hover:bg-crayon-pink-dark',
+  },
+  {
+    bg: 'bg-crayon-purple-light/50',
+    border: 'border-crayon-purple/20',
+    hoverBorder: 'group-hover:border-crayon-purple',
+    price: 'text-crayon-purple-dark',
+    button: 'bg-crayon-purple hover:bg-crayon-purple-dark',
+  },
+] as const;
+
+// ─── Sticker stats card ──────────────────────────────────────────────
 const StickerStatsCard = async () => {
   const stats = await getMyStickerStats();
-
-  // Don't show if user has no stickers yet
-  if (!stats || stats.totalUnlocked === 0) {
-    return null;
-  }
+  if (!stats || stats.totalUnlocked === 0) return null;
 
   const progressPercent = Math.round(
     (stats.totalUnlocked / stats.totalPossible) * 100,
   );
 
-  const iconStyle = {
-    '--fa-primary-color': 'hsl(var(--crayon-orange))',
-    '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-    '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
-
   return (
     <Link
       href="/account/stickers"
-      className="block mb-4 p-4 md:p-6 bg-gradient-to-r from-crayon-orange/5 to-crayon-yellow/5 rounded-2xl border-2 border-crayon-orange/20 hover:border-crayon-orange/40 hover:shadow-lg transition-all group"
+      className="group block rounded-3xl border-3 border-text-primary/10 bg-bg-white hover:border-crayon-orange hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
     >
-      <div className="flex items-center gap-4 md:gap-6">
-        {/* Icon */}
-        <div className="shrink-0 w-14 h-14 md:w-16 md:h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+      <div className="flex items-center gap-4 p-5 lg:p-6">
+        <div className="shrink-0 w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-crayon-orange/10 flex items-center justify-center">
           <FontAwesomeIcon
             icon={faBookOpen}
-            className="text-2xl md:text-3xl"
-            style={iconStyle}
+            className="text-2xl lg:text-3xl text-crayon-orange"
           />
         </div>
 
-        {/* Stats */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-tondo font-bold text-lg md:text-xl text-text-primary">
+            <h3 className="font-tondo font-bold text-lg lg:text-xl text-text-primary">
               Sticker Book
             </h3>
             {stats.newCount > 0 && (
-              <span className="flex items-center gap-1 px-2 py-0.5 bg-crayon-orange text-white text-xs font-bold rounded-full animate-pulse">
+              <span className="flex items-center gap-1 px-2 py-0.5 bg-crayon-orange text-white text-xs font-bold rounded-full">
                 <FontAwesomeIcon icon={faStar} className="text-[10px]" />
-                {stats.newCount} NEW
+                {stats.newCount} new
               </span>
             )}
           </div>
-          <p className="text-sm text-text-secondary mb-2">
+          <p className="text-sm text-text-secondary font-rooney-sans mb-2">
             {stats.totalUnlocked} of {stats.totalPossible} stickers collected
           </p>
-          {/* Progress bar */}
           <div className="h-2 bg-paper-cream rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-crayon-orange to-crayon-yellow rounded-full transition-all duration-500"
+              className="h-full bg-crayon-orange rounded-full transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
         </div>
 
-        {/* Arrow */}
-        <div className="shrink-0 text-text-muted group-hover:text-crayon-orange transition-colors">
-          <FontAwesomeIcon icon={faArrowRight} className="text-lg" />
-        </div>
+        <FontAwesomeIcon
+          icon={faArrowRight}
+          className="shrink-0 text-text-muted group-hover:text-crayon-orange transition-colors"
+        />
       </div>
     </Link>
   );
 };
 
-// Weekly challenge section component
+// ─── Weekly challenge ────────────────────────────────────────────────
 const ChallengeSection = async () => {
   const challengeData = await getMyCurrentChallenge();
-
-  // Don't show if no active challenge
-  if (!challengeData) {
-    return null;
-  }
+  if (!challengeData) return null;
 
   return (
-    <div className="mb-8">
-      <ChallengeWidget
-        challengeData={challengeData}
-        weeklyChallengeId={challengeData.weeklyChallengeId}
-        className="hover:shadow-lg transition-shadow"
-      />
+    <ChallengeWidget
+      challengeData={challengeData}
+      weeklyChallengeId={challengeData.weeklyChallengeId}
+      className="hover:shadow-card-hover transition-shadow"
+    />
+  );
+};
+
+// ─── My Bundles section ──────────────────────────────────────────────
+const MyBundlesSection = async ({ userId }: { userId: string }) => {
+  const purchases = await listMyBundlePurchases(userId);
+  if (purchases.length === 0) return null;
+
+  return (
+    <section className="mt-12 lg:mt-16">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+        <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary relative inline-block">
+          Your Bundles
+          <CrayonScribble
+            seed={42}
+            className="absolute -bottom-2 left-0 w-full h-3 text-crayon-pink/60"
+          />
+        </h2>
+        <Link
+          href="/products/digital"
+          className="self-start sm:self-auto inline-flex items-center gap-2 font-tondo font-bold text-base px-5 py-2.5 rounded-full bg-bg-white border-3 border-crayon-orange/30 text-crayon-orange-dark hover:border-crayon-orange hover:bg-crayon-yellow-light/40 transition-all duration-200"
+        >
+          <FontAwesomeIcon icon={faGift} className="text-sm" />
+          Browse all bundles
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {purchases.map((purchase, idx) => (
+          <BundlePurchaseCard
+            key={purchase.id}
+            purchase={purchase}
+            accent={CARD_ACCENTS[idx % CARD_ACCENTS.length]}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const BundlePurchaseCard = ({
+  purchase,
+  accent,
+}: {
+  purchase: Awaited<ReturnType<typeof listMyBundlePurchases>>[number];
+  accent: (typeof CARD_ACCENTS)[number];
+}) => {
+  const isRefunded = !!purchase.refundedAt;
+  const downloadHref = `/api/bundles/${purchase.bundle.slug}/download`;
+  const productHref = `/products/digital/${purchase.bundle.slug}`;
+
+  return (
+    <div
+      className={`
+        group relative flex flex-col overflow-hidden rounded-3xl border-3 bg-bg-white
+        ${accent.border} ${isRefunded ? 'opacity-60' : `${accent.hoverBorder} hover:shadow-card-hover hover:-translate-y-1`}
+        transition-all duration-200
+      `}
+    >
+      <Link href={productHref} className="block">
+        {purchase.bundle.listingHeroUrl ? (
+          <div className="relative aspect-square w-full overflow-hidden bg-bg-white">
+            <Image
+              src={purchase.bundle.listingHeroUrl}
+              alt={purchase.bundle.name}
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            />
+          </div>
+        ) : (
+          <div className="relative aspect-square w-full overflow-hidden bg-bg-white flex items-center justify-center">
+            <FontAwesomeIcon
+              icon={faGift}
+              className="text-4xl text-text-primary/20"
+            />
+          </div>
+        )}
+      </Link>
+
+      <div className={`p-4 lg:p-5 ${accent.bg} border-t-2 ${accent.border}`}>
+        <h3 className="font-tondo text-lg lg:text-xl font-bold text-text-primary line-clamp-1">
+          {purchase.bundle.name}
+        </h3>
+        <p className="mt-1 text-xs text-text-secondary font-rooney-sans uppercase tracking-wide">
+          Bought {getFriendlyTime(new Date(purchase.purchasedAt))}
+          {' · '}
+          <span className={accent.price}>
+            {formatPrice(purchase.pricePence, purchase.currency)}
+          </span>
+        </p>
+
+        <div className="mt-3">
+          {isRefunded ? (
+            <span className="inline-flex items-center gap-2 font-tondo font-bold text-sm px-4 py-2 rounded-full bg-text-primary/5 text-text-secondary">
+              Refunded
+            </span>
+          ) : (
+            <a
+              href={downloadHref}
+              className={`inline-flex items-center gap-2 font-tondo font-bold text-sm px-4 py-2 rounded-full text-white shadow-btn-primary transition-colors ${accent.button}`}
+            >
+              <FontAwesomeIcon icon={faDownload} className="text-xs" />
+              Download
+            </a>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
+// ─── Artwork grid ────────────────────────────────────────────────────
 const ArtworkGrid = async () => {
   const session = await auth();
-
-  if (!session?.user) {
-    redirect('/signin');
-  }
+  if (!session?.user) redirect('/signin');
 
   const savedArtwork = await getUserSavedArtwork();
 
   if (savedArtwork.length === 0) {
     return (
-      <div className="text-center py-16">
-        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-crayon-pink/10 flex items-center justify-center">
-          <FontAwesomeIcon
-            icon={faPalette}
-            className="text-4xl text-crayon-pink"
+      <section className="mt-12 lg:mt-16">
+        <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary mb-6 relative inline-block">
+          Your Artwork
+          <CrayonScribble
+            seed={17}
+            className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
           />
-        </div>
-        <h2 className="font-tondo font-bold text-2xl text-text-primary mb-2">
-          No saved artwork yet!
         </h2>
-        <p className="text-text-secondary mb-6 max-w-md mx-auto">
-          Start coloring and save your creations to see them here. Your artwork
-          will be saved forever!
-        </p>
-        <Link
-          href="/gallery"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange text-white font-semibold rounded-full hover:bg-crayon-orange-dark transition-colors"
-        >
-          Browse Coloring Pages
-          <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
-        </Link>
-      </div>
+        <div className="text-center py-12 lg:py-16 rounded-3xl border-2 border-dashed border-border-light bg-paper-cream">
+          <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-crayon-pink/10 border-2 border-crayon-pink/20 flex items-center justify-center">
+            <FontAwesomeIcon
+              icon={faPalette}
+              className="text-3xl text-crayon-pink"
+            />
+          </div>
+          <h3 className="font-tondo font-bold text-xl lg:text-2xl text-text-primary mb-2">
+            No saved artwork yet
+          </h3>
+          <p className="text-text-secondary font-rooney-sans mb-6 max-w-md mx-auto">
+            Color a page and tap save to see it here. Your artwork stays
+            forever, ready to share or print.
+          </p>
+          <Link
+            href="/gallery"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange hover:bg-crayon-orange-dark text-white font-tondo font-bold rounded-full shadow-btn-primary transition-colors"
+          >
+            Browse coloring pages
+            <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
+          </Link>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
-      {savedArtwork.map((artwork) => (
-        <div
-          key={artwork.id}
-          className="group relative bg-white rounded-2xl border-2 border-paper-cream-dark overflow-hidden hover:border-crayon-pink/50 hover:shadow-lg transition-all"
-        >
-          {/* Artwork Image */}
-          <Link
-            href={`/coloring-image/${artwork.coloringImageId}`}
-            className="block aspect-square relative"
+    <section className="mt-12 lg:mt-16">
+      <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary mb-6 relative inline-block">
+        Your Artwork
+        <CrayonScribble
+          seed={17}
+          className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
+        />
+      </h2>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+        {savedArtwork.map((artwork) => (
+          <div
+            key={artwork.id}
+            className="group relative bg-bg-white rounded-2xl border-3 border-text-primary/10 overflow-hidden hover:border-crayon-pink hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
           >
-            <Image
-              src={artwork.imageUrl}
-              alt={artwork.title || 'Saved artwork'}
-              fill
-              className="object-contain p-2"
-            />
-          </Link>
-
-          {/* Title and Time */}
-          <div className="p-3 border-t border-paper-cream-dark">
-            <h3 className="font-tondo font-semibold text-sm text-text-primary truncate">
-              {artwork.title}
-            </h3>
-            <span className="font-tondo text-xs text-text-muted">
-              {getFriendlyTime(new Date(artwork.createdAt))}
-            </span>
-          </div>
-
-          {/* Big Action Buttons - always visible on mobile, hover-reveal on desktop */}
-          <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/0 md:bg-black/0 md:opacity-0 md:group-hover:opacity-100 md:group-hover:bg-black/20 transition-all duration-200 pointer-events-none">
-            <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
-              {/* Color Again Button - big circular */}
-              <Link
-                href={`/coloring-image/${artwork.coloringImageId}`}
-                className="flex items-center justify-center size-10 md:size-14 rounded-full bg-crayon-teal text-white shadow-lg hover:bg-crayon-teal-dark hover:scale-110 active:scale-95 transition-all duration-200"
-                title="Color again"
-              >
-                <FontAwesomeIcon
-                  icon={faPaintbrush}
-                  className="text-sm md:text-lg"
-                />
-              </Link>
-              {/* Share Button - big circular */}
-              <ShareArtworkButton
-                artworkId={artwork.id}
-                artworkTitle={artwork.title || 'My Artwork'}
-                artworkImageUrl={artwork.imageUrl}
+            <Link
+              href={`/coloring-image/${artwork.coloringImageId}`}
+              className="block aspect-square relative"
+            >
+              <Image
+                src={artwork.imageUrl}
+                alt={artwork.title || 'Saved artwork'}
+                fill
+                className="object-contain p-2"
               />
-              {/* Delete Button - big circular */}
-              <DeleteArtworkButton artworkId={artwork.id} />
+            </Link>
+
+            <div className="p-3 border-t-2 border-text-primary/5 bg-paper-cream/40">
+              <h3 className="font-tondo font-bold text-sm text-text-primary truncate">
+                {artwork.title}
+              </h3>
+              <span className="font-rooney-sans text-xs text-text-muted">
+                {getFriendlyTime(new Date(artwork.createdAt))}
+              </span>
+            </div>
+
+            {/* Hover-reveal action buttons (always visible on mobile) */}
+            <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/0 md:bg-black/0 md:opacity-0 md:group-hover:opacity-100 md:group-hover:bg-black/20 transition-all duration-200 pointer-events-none">
+              <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
+                <Link
+                  href={`/coloring-image/${artwork.coloringImageId}`}
+                  className="flex items-center justify-center size-10 md:size-14 rounded-full bg-crayon-teal text-white shadow-lg hover:bg-crayon-teal-dark hover:scale-110 active:scale-95 transition-all duration-200"
+                  title="Color again"
+                >
+                  <FontAwesomeIcon
+                    icon={faPaintbrush}
+                    className="text-sm md:text-lg"
+                  />
+                </Link>
+                <ShareArtworkButton
+                  artworkId={artwork.id}
+                  artworkTitle={artwork.title || 'My Artwork'}
+                  artworkImageUrl={artwork.imageUrl}
+                />
+                <DeleteArtworkButton artworkId={artwork.id} />
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </section>
   );
 };
 
-const MyArtworkPage = () => {
-  const iconStyle = {
-    '--fa-primary-color': 'hsl(var(--crayon-pink))',
-    '--fa-secondary-color': 'hsl(var(--crayon-purple))',
-    '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+// ─── Bundles wrapper that resolves userId for the section ────────────
+const MyBundlesWrapper = async () => {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+  return <MyBundlesSection userId={session.user.id} />;
+};
 
+// ─── Page ────────────────────────────────────────────────────────────
+const MyArtworkPage = () => {
   return (
     <PageWrap>
-      {/* Breadcrumbs */}
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
@@ -246,35 +392,36 @@ const MyArtworkPage = () => {
         className="mb-6"
       />
 
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <FontAwesomeIcon
-            icon={faHeart}
-            className="text-3xl"
-            style={iconStyle}
+      {/* Hero header — matches /products/digital aesthetic */}
+      <header className="text-center py-8 lg:py-12">
+        <h1 className="font-tondo text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary relative inline-block">
+          My Artwork
+          <CrayonScribble
+            seed={73}
+            className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
           />
-          <h1 className="font-tondo font-bold text-3xl md:text-4xl text-text-primary">
-            My Artwork
-          </h1>
-        </div>
-        <p className="text-text-secondary max-w-lg mx-auto">
-          All your saved coloring creations in one place. Click on any artwork
-          to color it again or make a new version!
+        </h1>
+        <p className="mt-6 max-w-xl mx-auto text-lg text-text-secondary font-rooney-sans">
+          Everything you've made and bought, in one place.
         </p>
+      </header>
+
+      {/* Stats + challenge + bundles + artwork — section order matches
+          the user's mental model: progress (stickers / challenge), then
+          owned content (bundles), then made content (artwork). */}
+      <div className="space-y-4 lg:space-y-5">
+        <Suspense fallback={null}>
+          <StickerStatsCard />
+        </Suspense>
+        <Suspense fallback={null}>
+          <ChallengeSection />
+        </Suspense>
       </div>
 
-      {/* Sticker Stats Card (only shows when user has stickers) */}
       <Suspense fallback={null}>
-        <StickerStatsCard />
+        <MyBundlesWrapper />
       </Suspense>
 
-      {/* Weekly Challenge Widget (only shows when there's an active challenge) */}
-      <Suspense fallback={null}>
-        <ChallengeSection />
-      </Suspense>
-
-      {/* Artwork Grid */}
       <Suspense fallback={<Loading size="lg" />}>
         <ArtworkGrid />
       </Suspense>

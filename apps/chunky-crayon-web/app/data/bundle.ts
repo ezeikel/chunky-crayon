@@ -141,6 +141,54 @@ export function listingImagesForBundle(bundle: PublicBundle): string[] {
   ].filter((u): u is string => Boolean(u));
 }
 
+export type MyBundlePurchase = {
+  id: string;
+  purchasedAt: Date;
+  refundedAt: Date | null;
+  pricePence: number;
+  currency: string;
+  bundle: {
+    slug: string;
+    name: string;
+    tagline: string;
+    pageCount: number;
+    listingHeroUrl: string | null;
+  };
+};
+
+/**
+ * List a user's bundle purchases for their My Artwork page. Most recent
+ * first. Refunded purchases stay in the list (rendered in a muted /
+ * "refunded" state) — the buyer should see their full purchase history,
+ * not have rows silently disappear after a refund. Not cached: per-user
+ * data, low traffic, cache-by-user would just inflate the cache without
+ * benefit.
+ */
+export async function listMyBundlePurchases(
+  userId: string,
+): Promise<MyBundlePurchase[]> {
+  return db.bundlePurchase.findMany({
+    where: { userId },
+    orderBy: { purchasedAt: 'desc' },
+    select: {
+      id: true,
+      purchasedAt: true,
+      refundedAt: true,
+      pricePence: true,
+      currency: true,
+      bundle: {
+        select: {
+          slug: true,
+          name: true,
+          tagline: true,
+          pageCount: true,
+          listingHeroUrl: true,
+        },
+      },
+    },
+  });
+}
+
 export type ThankYouPurchase = {
   /** BundlePurchase id — used to construct download tokens. */
   id: string;
