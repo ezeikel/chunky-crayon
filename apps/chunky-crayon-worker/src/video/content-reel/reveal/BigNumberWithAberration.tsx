@@ -1,30 +1,35 @@
 /**
- * Reveal-beat number with three-channel chromatic aberration.
+ * Reveal-beat number rendered to a `<canvas>` instead of layered HTML
+ * divs. Sister component to BigNumberWithAberration — same props, same
+ * sizing semantics, different paint pipeline.
  *
- * Sizing strategy: measure-based fit. The text renders once at the
- * caller's baseline fontSize, we measure its natural width via a ref
- * after layout, then scale the whole stack down by
- * `min(1, maxWidth / naturalWidth)` so anything wider than the frame
- * shrinks to fit. Anything narrower stays at baseline.
+ * Why try canvas:
+ *   - True per-channel separation. The HTML-div version uses opaque
+ *     coloured text + opacity blending, which compositionally renders
+ *     each channel as a tinted alpha mask. A canvas can use proper
+ *     screen / lighter blending (`globalCompositeOperation = 'screen'`
+ *     or `'lighter'`) so the three colour channels combine the way
+ *     real chromatic aberration does — bright white in the overlap
+ *     region, additive on the fringes.
+ *   - Sub-pixel offset control. CSS transforms snap to device pixels
+ *     in headless Chromium; canvas drawText takes float positions,
+ *     so a 1.4px offset stays 1.4px instead of 1px-or-2px.
  *
- * Why measure rather than the old length-based tier table:
- *   - "88% by age 5" (13 chars) overflowed at the Warm template's
- *     fontSize=240. The tier table fixed that case but failed
- *     compositionally — adding "MOSTLY FALSE" or "12 IN 100" needed
- *     new buckets, and the buckets ignored that "%" is half a char
- *     wide while "M" is wide.
- *   - Measuring lets one primitive serve all reveal strings (numbers,
- *     %ages, multi-word stats, future verdicts) without per-string
- *     tuning. cover.tsx wants to adopt the same primitive.
+ * Same fit-scale logic as the div version: measure once via
+ * ctx.measureText, compute scale to fit `maxWidth`, draw at the
+ * scaled font size.
  *
- * Centring: the parent box has fixed width (`maxWidth`) and uses flex
- * justifyContent=center. The scale transform's origin is `center
- * center`, so the chromatic-aberration ghosts and the anchor stay
- * pixel-aligned at any scale. The ghost translate offsets are
- * multiplied by the same fit-scale so the aberration spread tracks the
- * shrunk text instead of staying at its baseline absolute pixel value.
+ * Caveats:
+ *   - `<canvas>` doesn't paint until after mount + first effect run.
+ *     Remotion renders each frame as a fresh component instance, so
+ *     useEffect fires on every frame. Cheap (one paint per frame, no
+ *     state churn).
+ *   - Font must be loaded BEFORE we measure. The TONDO_FONT_CSS_URL
+ *     is loaded by the parent template via <link rel="stylesheet">;
+ *     by the time this component mounts the font is ready (Tondo
+ *     loads as base64 in CSS, no network delay).
  */
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 type Props = {
   /** The string to render — e.g. "7+ hrs", "-15%", "88% by age 5". */
@@ -44,13 +49,11 @@ type Props = {
   aberrationRightColor: string;
   /** Aberration channel opacity (0.85 in original templates). */
   aberrationOpacity?: number;
-  /**
-   * Available horizontal space inside the 1080px frame. Defaults to
-   * 980 (50px side padding × 2). Templates with tighter columns can
-   * override.
-   */
+  /** Available horizontal space inside the 1080px frame. */
   maxWidth?: number;
 };
+
+const CANVAS_PAD = 80; // px on each side, leaves room for the aberration spread
 
 export const BigNumberWithAberration: React.FC<Props> = ({
   text,
@@ -64,34 +67,89 @@ export const BigNumberWithAberration: React.FC<Props> = ({
   aberrationOpacity = 0.85,
   maxWidth = 980,
 }) => {
-  const measureRef = useRef<HTMLDivElement>(null);
-  const [fitScale, setFitScale] = useState(1);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Measure natural width once after layout; if the unscaled text is
-  // wider than maxWidth, scale down. Runs every render but the read
-  // is cheap (one offsetWidth lookup) and Remotion re-renders each
-  // frame anyway.
-  useLayoutEffect(() => {
-    const el = measureRef.current;
-    if (!el) return;
-    const natural = el.offsetWidth;
-    if (natural === 0) return;
-    const next = Math.min(1, maxWidth / natural);
-    if (Math.abs(next - fitScale) > 0.001) setFitScale(next);
-  }, [text, fontSize, maxWidth, fitScale]);
+  // Pre-measure on a hidden offscreen canvas to compute fit scale +
+  // canvas dimensions. This runs synchronously every render — cheap.
+  const measureCanvas =
+    typeof document !== "undefined" ? document.createElement("canvas") : null;
+  const measureCtx = measureCanvas?.getContext("2d") ?? null;
+  let fitScale = 1;
+  let actualFontSize = fontSize;
+  let textWidth = 0;
+  if (measureCtx) {
+    measureCtx.font = `900 ${fontSize}px ${fontFamily}`;
+    const baseWidth = measureCtx.measureText(text).width;
+    if (baseWidth > 0) {
+      fitScale = Math.min(1, maxWidth / baseWidth);
+      actualFontSize = fontSize * fitScale;
+      measureCtx.font = `900 ${actualFontSize}px ${fontFamily}`;
+      textWidth = measureCtx.measureText(text).width;
+    }
+  }
 
-  // Aberration offsets must scale with the text — otherwise a ±18px
-  // ghost on a 95px-tall string looks like a chunky duplicate, not a
-  // chromatic shimmer.
   const scaledAberration = aberrationOffsetPx * fitScale;
+  // Canvas dims: text width + room for left/right ghost spread + pad.
+  const canvasWidth =
+    Math.ceil(textWidth + Math.abs(scaledAberration) * 2) + CANVAS_PAD * 2;
+  const canvasHeight = Math.ceil(actualFontSize * 1.4); // 1.4x font for ascenders/descenders
 
-  const baseTextStyle: React.CSSProperties = {
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // High-DPI: render at 2x and let CSS scale down for crisp text.
+    // Headless Chromium's devicePixelRatio is 1 by default; force 2 for
+    // sharper output, especially noticeable at smaller fitScale values.
+    const dpr = 2;
+    canvas.width = canvasWidth * dpr;
+    canvas.height = canvasHeight * dpr;
+    canvas.style.width = `${canvasWidth}px`;
+    canvas.style.height = `${canvasHeight}px`;
+    ctx.scale(dpr, dpr);
+
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.font = `900 ${actualFontSize}px ${fontFamily}`;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+
+    const centerX = canvasWidth / 2;
+    const centerY = canvasHeight / 2;
+    const drawX = centerX - textWidth / 2;
+
+    // Three-pass paint: aberration ghosts first (with screen blend so
+    // overlapping channels combine additively, like a real RGB split),
+    // anchor on top in source-over so it stays solid.
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = aberrationOpacity;
+
+    ctx.fillStyle = aberrationLeftColor;
+    ctx.fillText(text, drawX - scaledAberration, centerY);
+
+    ctx.fillStyle = aberrationRightColor;
+    ctx.fillText(text, drawX + scaledAberration, centerY);
+
+    ctx.restore();
+
+    // Anchor — full opacity, normal blend, on top.
+    ctx.fillStyle = primaryColor;
+    ctx.fillText(text, drawX, centerY);
+  }, [
+    text,
+    actualFontSize,
     fontFamily,
-    fontWeight: 900,
-    fontSize,
-    whiteSpace: "nowrap",
-    lineHeight: 1,
-  };
+    primaryColor,
+    aberrationLeftColor,
+    aberrationRightColor,
+    aberrationOpacity,
+    scaledAberration,
+    textWidth,
+    canvasWidth,
+    canvasHeight,
+  ]);
 
   return (
     <div
@@ -100,79 +158,11 @@ export const BigNumberWithAberration: React.FC<Props> = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        // Reserves the layout slot at baseline height so the surrounding
-        // composition doesn't reflow when fitScale changes between
-        // frames.
-        height: fontSize,
+        height: fontSize, // reserve baseline slot, same as div version
         transform: `scale(${scale})`,
       }}
     >
-      <div
-        style={{
-          position: "relative",
-          transform: `scale(${fitScale})`,
-          transformOrigin: "center center",
-        }}
-      >
-        {/* Hidden measurement element — same font + size as the visible
-            text, used purely to read offsetWidth. position: absolute
-            keeps it out of the layout flow. */}
-        <div
-          ref={measureRef}
-          aria-hidden
-          style={{
-            ...baseTextStyle,
-            position: "absolute",
-            visibility: "hidden",
-            pointerEvents: "none",
-          }}
-        >
-          {text}
-        </div>
-
-        {/* Aberration left ghost. */}
-        <div
-          style={{
-            ...baseTextStyle,
-            position: "absolute",
-            top: 0,
-            left: 0,
-            color: aberrationLeftColor,
-            opacity: aberrationOpacity,
-            transform: `translate(${-scaledAberration}px, 0)`,
-          }}
-        >
-          {text}
-        </div>
-
-        {/* Aberration right ghost. */}
-        <div
-          style={{
-            ...baseTextStyle,
-            position: "absolute",
-            top: 0,
-            left: 0,
-            color: aberrationRightColor,
-            opacity: aberrationOpacity,
-            transform: `translate(${scaledAberration}px, 0)`,
-          }}
-        >
-          {text}
-        </div>
-
-        {/* Anchor — defines layout box. The two ghosts above are
-            absolute-positioned and read their dimensions from this
-            element's flow. */}
-        <div
-          style={{
-            ...baseTextStyle,
-            position: "relative",
-            color: primaryColor,
-          }}
-        >
-          {text}
-        </div>
-      </div>
+      <canvas ref={canvasRef} />
     </div>
   );
 };
