@@ -7,6 +7,7 @@ import GalleryPreview from '@/components/GalleryPreview';
 import SocialProofStats from '@/components/SocialProofStats';
 import RecentCreations from '@/components/RecentCreations';
 import LatestComicStripCard from '@/components/LatestComicStripCard/LatestComicStripCard';
+import FeaturedBundles from '@/components/FeaturedBundles';
 import Loading from '@/components/Loading/Loading';
 import UnsubscribeToast from '@/components/UnsubscribeToast/UnsubscribeToast';
 import HomePageContent from '@/components/HomePageContent';
@@ -30,6 +31,7 @@ export const viewport: Viewport = {
 };
 
 type HomePageProps = {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<ColoringImageSearchParams>;
 };
 
@@ -82,6 +84,7 @@ const HomePageWithColoState = async ({
   emailSignup: React.ReactNode;
   demo: React.ReactNode;
   latestComicStrip: React.ReactNode;
+  featuredBundles: React.ReactNode;
 }) => {
   const coloState = await ColoStateLoader();
 
@@ -98,13 +101,15 @@ const HomePageWithColoState = async ({
       emailSignup={emailSignup}
       demo={demo}
       latestComicStrip={latestComicStrip}
+      featuredBundles={featuredBundles}
     />
   );
 };
 
 // Main page - static shell with client-side auth-aware layout
 // Uses PPR: static page with dynamic pockets in Suspense boundaries
-const HomePage = async ({ searchParams }: HomePageProps) => {
+const HomePage = async ({ params, searchParams }: HomePageProps) => {
+  const { locale } = await params;
   return (
     <>
       {/* Toast handler for unsubscribe */}
@@ -205,6 +210,22 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
           latestComicStrip={
             <Suspense fallback={null}>
               <LatestComicStripCard />
+            </Suspense>
+          }
+          featuredBundles={
+            <Suspense
+              fallback={
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 max-w-5xl mx-auto">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="aspect-[4/5] bg-paper-cream rounded-2xl animate-pulse"
+                    />
+                  ))}
+                </div>
+              }
+            >
+              <FeaturedBundles locale={locale} />
             </Suspense>
           }
         />

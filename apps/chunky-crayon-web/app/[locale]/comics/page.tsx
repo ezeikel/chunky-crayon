@@ -3,8 +3,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cacheLife, cacheTag } from 'next/cache';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComment } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faCalendarStar,
+  faUsers,
+  faChildReaching,
+} from '@fortawesome/pro-duotone-svg-icons';
 import PageWrap from '@/components/PageWrap/PageWrap';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import CrayonScribble from '@/components/Intro/CrayonScribble';
 import { db } from '@one-colored-pixel/db';
 
 type ComicStripCard = {
@@ -74,27 +80,49 @@ const formatTheme = (theme: string): string =>
     .map((w) => w[0].toUpperCase() + w.slice(1))
     .join(' ');
 
-const ComicsIndexPage = async () => {
+// Features strip content
+const COMIC_FEATURES = [
+  {
+    icon: faCalendarStar,
+    title: 'New Episode Every Sunday',
+    description: 'Fresh adventures to look forward to each week',
+  },
+  {
+    icon: faUsers,
+    title: 'Meet Colo & Friends',
+    description: 'Follow the adventures of our crayon crew',
+  },
+  {
+    icon: faChildReaching,
+    title: 'Made for Ages 3-8',
+    description: 'Simple stories with positive messages',
+  },
+];
+
+const ComicsIndexPage = async ({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) => {
+  const { locale } = await params;
   const strips = await getStrips();
 
   return (
-    <PageWrap className="max-w-6xl mx-auto">
-      <header className="text-center mb-10">
-        <FontAwesomeIcon
-          icon={faComment}
-          className="text-5xl mb-4"
-          style={
-            {
-              '--fa-primary-color': 'hsl(var(--crayon-orange))',
-              '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-              '--fa-secondary-opacity': '0.8',
-            } as React.CSSProperties
-          }
-        />
-        <h1 className="font-tondo text-4xl md:text-5xl font-bold mb-3 text-text-primary">
-          Weekly Comic Strips
+    <PageWrap className="max-w-6xl mx-auto bg-bg-cream">
+      <Breadcrumbs
+        items={[{ href: `/${locale}`, label: 'Home' }, { label: 'Comics' }]}
+      />
+
+      {/* Hero Header */}
+      <header className="text-center py-8 lg:py-12">
+        <h1 className="font-tondo text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary relative inline-block">
+          Weekly Comics
+          <CrayonScribble
+            seed={77}
+            className="absolute -bottom-2 left-0 w-full h-3 text-crayon-teal/60"
+          />
         </h1>
-        <p className="font-rooney-sans text-lg text-text-secondary max-w-2xl mx-auto">
+        <p className="mt-6 max-w-xl mx-auto text-lg text-text-secondary font-rooney-sans">
           A new 4-panel comic every Sunday, starring Colo, Pip, Smudge, and
           Sticky. Made for ages 3 to 8.
         </p>
@@ -147,6 +175,40 @@ const ComicsIndexPage = async () => {
           ))}
         </div>
       )}
+
+      {/* Features Strip */}
+      <section className="mt-16 lg:mt-24 py-10 lg:py-14 -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 bg-paper-cream rounded-3xl border-2 border-border-light">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
+            {COMIC_FEATURES.map((feature, idx) => (
+              <div
+                key={feature.title}
+                className="flex flex-col items-center text-center p-4"
+              >
+                {/* Icon with chunky border */}
+                <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl bg-bg-white border-3 border-text-primary/10 flex items-center justify-center mb-4 shadow-card">
+                  <FontAwesomeIcon
+                    icon={feature.icon}
+                    className={`text-2xl lg:text-3xl ${
+                      idx === 0
+                        ? 'text-crayon-orange'
+                        : idx === 1
+                          ? 'text-crayon-teal'
+                          : 'text-crayon-pink'
+                    }`}
+                  />
+                </div>
+                <h3 className="font-tondo text-lg lg:text-xl font-bold text-text-primary mb-1">
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-text-secondary font-rooney-sans leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </PageWrap>
   );
 };

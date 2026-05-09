@@ -34,6 +34,8 @@ type HomePageContentProps = {
   demo?: React.ReactNode;
   /** Latest weekly comic strip card — server component, optional, renders below hero. */
   latestComicStrip?: React.ReactNode;
+  /** Featured product bundles — server component, optional, drives product sales on homepage. */
+  featuredBundles?: React.ReactNode;
 };
 
 const HomePageContent = ({
@@ -48,6 +50,7 @@ const HomePageContent = ({
   emailSignup,
   demo,
   latestComicStrip,
+  featuredBundles,
 }: HomePageContentProps) => {
   const { status } = useSession();
   const t = useTranslations('homepage.pricing');
@@ -118,17 +121,15 @@ const HomePageContent = ({
         {emailSignup && <div className="order-3">{emailSignup}</div>}
       </div>
 
-      {/* Latest weekly comic strip — kid-friendly engagement content,
-          drives organic returns and SEO. Renders nothing if no strip
-          has been posted yet. */}
-      {latestComicStrip && (
-        <div className="w-full relative z-10">{latestComicStrip}</div>
-      )}
-
       {/* Interactive demo - phone-frame walk-through of describe → draw →
           finished page. Lands right after the hero so cold visitors who
           aren't ready to commit to the form still see the product work. */}
       {demo && <div className="w-full relative z-10">{demo}</div>}
+
+      {/* Featured bundles - drives product sales, placed high for conversions */}
+      {featuredBundles && (
+        <div className="w-full relative z-10">{featuredBundles}</div>
+      )}
 
       {/* Recent creations - shows images guests have created */}
       {recentCreations && (
@@ -146,6 +147,13 @@ const HomePageContent = ({
       {/* Gallery preview - free coloring pages library with CTAs */}
       {galleryPreview && (
         <div className="w-full relative z-10">{galleryPreview}</div>
+      )}
+
+      {/* Latest weekly comic strip — kid-friendly engagement content,
+          moved lower to prioritize conversion-focused sections above.
+          Renders nothing if no strip has been posted yet. */}
+      {latestComicStrip && (
+        <div className="w-full relative z-10">{latestComicStrip}</div>
       )}
 
       {/* Pricing teaser - one-line "see all plans" link, just before

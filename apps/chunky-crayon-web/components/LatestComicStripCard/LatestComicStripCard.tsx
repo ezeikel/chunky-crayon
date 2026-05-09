@@ -46,6 +46,9 @@ const formatTheme = (theme: string): string =>
  * Server-rendered card surfacing the most recent posted comic strip on
  * the home page. Renders nothing if no strip has been posted yet.
  *
+ * Designed as a compact teaser — smaller visual footprint since it appears
+ * lower on the page after conversion-focused sections.
+ *
  * Cache: shares the comics-list tag, so revalidating after a new post
  * also refreshes this card. cacheLife('comics-list') = 6h revalidate.
  */
@@ -54,49 +57,69 @@ const LatestComicStripCard = async () => {
   if (!strip) return null;
 
   return (
-    <Link
-      href={`/comics/${strip.slug}`}
-      className="group flex flex-col sm:flex-row items-stretch gap-0 sm:gap-6 rounded-3xl overflow-hidden border-2 border-paper-cream-dark bg-white hover:border-crayon-orange transition-all hover:scale-[1.005] active:scale-[0.99] shadow-sm hover:shadow-md max-w-3xl mx-auto"
-    >
-      <div className="w-full sm:w-48 aspect-square flex-shrink-0 bg-paper-cream relative">
-        <Image
-          src={strip.assembledUrl}
-          alt={strip.title}
-          fill
-          sizes="(max-width: 640px) 100vw, 192px"
-          className="object-cover"
-          unoptimized
-        />
-      </div>
-      <div className="flex-1 p-5 sm:p-6 flex flex-col justify-center min-w-0">
-        <div className="flex items-center gap-2 mb-2">
-          <FontAwesomeIcon
-            icon={faComment}
-            className="text-base"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                '--fa-secondary-opacity': '0.8',
-              } as React.CSSProperties
-            }
+    <div className="max-w-2xl mx-auto">
+      {/* Section label */}
+      <p className="text-center text-sm font-mono uppercase tracking-wide text-text-tertiary mb-3">
+        Latest Comic Strip
+      </p>
+
+      <Link
+        href={`/comics/${strip.slug}`}
+        className="group flex items-center gap-4 rounded-2xl overflow-hidden border border-paper-cream-dark bg-white hover:border-crayon-teal/50 transition-all hover:shadow-sm px-4 py-3"
+      >
+        {/* Smaller thumbnail */}
+        <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-paper-cream rounded-xl relative overflow-hidden">
+          <Image
+            src={strip.assembledUrl}
+            alt={strip.title}
+            fill
+            sizes="80px"
+            className="object-cover"
+            unoptimized
           />
-          <span className="text-xs font-mono uppercase tracking-wide text-text-secondary">
-            New comic · {formatTheme(strip.theme)}
-          </span>
         </div>
-        <h2 className="font-tondo font-bold text-xl sm:text-2xl text-text-primary group-hover:text-crayon-orange transition-colors mb-2">
-          {strip.title}
-        </h2>
-        <p className="font-rooney-sans text-sm text-text-secondary">
-          A new 4-panel comic from Colo and friends — read it{' '}
-          <span className="inline-flex items-center gap-1 text-crayon-orange-dark font-bold">
-            here
-            <FontAwesomeIcon icon={faChevronRight} className="text-xs" />
-          </span>
-        </p>
-      </div>
-    </Link>
+
+        {/* Compact content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <FontAwesomeIcon
+              icon={faComment}
+              size="sm"
+              style={
+                {
+                  '--fa-primary-color': 'hsl(var(--crayon-teal))',
+                  '--fa-secondary-color': 'hsl(var(--crayon-orange))',
+                  '--fa-secondary-opacity': '0.8',
+                } as React.CSSProperties
+              }
+            />
+            <span className="text-xs text-text-tertiary">
+              {formatTheme(strip.theme)}
+            </span>
+          </div>
+          <h3 className="font-tondo font-bold text-base sm:text-lg text-text-primary group-hover:text-crayon-teal transition-colors line-clamp-1">
+            {strip.title}
+          </h3>
+        </div>
+
+        {/* Arrow indicator */}
+        <FontAwesomeIcon
+          icon={faChevronRight}
+          className="text-text-tertiary group-hover:text-crayon-teal group-hover:translate-x-0.5 transition-all flex-shrink-0"
+          size="sm"
+        />
+      </Link>
+
+      {/* View all link */}
+      <p className="text-center mt-3">
+        <Link
+          href="/comics"
+          className="text-sm font-rooney-sans text-text-secondary hover:text-crayon-teal transition-colors"
+        >
+          See all comics
+        </Link>
+      </p>
+    </div>
   );
 };
 
