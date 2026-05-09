@@ -1,6 +1,7 @@
 'use server';
 
 import { Readable } from 'stream';
+import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
 import { GenerationType, ColoringImage } from '@one-colored-pixel/db';
@@ -13,6 +14,7 @@ import WelcomeEmail from '@/emails/WelcomeEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
 import TrialEndingEmail from '@/emails/TrialEndingEmail';
 import SocialDigestEmail from '@/emails/SocialDigestEmail';
+import BundlePurchaseEmail from '@/emails/BundlePurchaseEmail';
 import { stripe } from '@/lib/stripe';
 import { getResendFromAddress } from '@/lib/email-config';
 import {
@@ -32,12 +34,109 @@ export type SocialDigestEntry = {
   scheduledTimeUtc?: string;
 };
 
-// TODO: Route through Mailtrap on localhost (NODE_ENV === 'development')
-// instead of real Resend to avoid spamming inboxes during dev. Apply same
-// pattern to CH.
 const resend = new Resend(process.env.RESEND_API_KEY);
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 const audienceId = process.env.RESEND_DAILY_EMAIL_SEGMENT_ID!;
+
+/**
+ * Build a Mailtrap SMTP transport for local dev. Returns null in prod
+ * or when MAILTRAP env vars are missing — callers should fall back to
+ * Resend in that case.
+ *
+ * Mirrors the pattern PTP uses (apps/web/lib/email.ts). New email
+ * sends should go through `sendEmail()` below to pick this up
+ * automatically. Existing direct `resend.emails.send` calls scattered
+ * through this file still hit Resend on localhost — migrate them as
+ * we touch them, no big-bang refactor.
+ */
+const getMailtrapTransport = (): nodemailer.Transporter | null => {
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    process.env.MAILTRAP_HOST &&
+    process.env.MAILTRAP_PORT
+  ) {
+    return nodemailer.createTransport({
+      host: process.env.MAILTRAP_HOST,
+      port: parseInt(process.env.MAILTRAP_PORT, 10),
+      auth: {
+        user: process.env.MAILTRAP_USER,
+        pass: process.env.MAILTRAP_PASS,
+      },
+    });
+  }
+  return null;
+};
+
+type SendEmailInput = {
+  to: string | string[];
+  subject: string;
+  html: string;
+  text?: string;
+  /** Pass an explicit From, otherwise getResendFromAddress() default is used. */
+  from?: string;
+  replyTo?: string;
+  attachments?: { filename: string; content: Buffer; contentType?: string }[];
+  headers?: Record<string, string>;
+};
+
+/**
+ * Single send wrapper that auto-routes through Mailtrap on localhost
+ * when configured, and Resend in prod. Use this for any new email send;
+ * the file's existing direct `resend.emails.send` calls predate this
+ * wrapper and will be migrated lazily.
+ */
+export const sendEmail = async (
+  input: SendEmailInput,
+): Promise<{ success: boolean; messageId?: string; error?: string }> => {
+  const fromAddress = input.from ?? getResendFromAddress('hi', 'Chunky Crayon');
+
+  const mailtrap = getMailtrapTransport();
+  if (mailtrap) {
+    try {
+      const result = await mailtrap.sendMail({
+        from: fromAddress,
+        to: input.to,
+        subject: input.subject,
+        html: input.html,
+        text: input.text,
+        replyTo: input.replyTo,
+        attachments: input.attachments,
+        headers: input.headers,
+      });
+      return { success: true, messageId: result.messageId };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown Mailtrap error';
+      console.error('[email] mailtrap send failed:', message);
+      return { success: false, error: message };
+    }
+  }
+
+  try {
+    const result = await resend.emails.send({
+      from: fromAddress,
+      to: input.to,
+      subject: input.subject,
+      html: input.html,
+      text: input.text,
+      replyTo: input.replyTo,
+      headers: input.headers,
+      attachments: input.attachments?.map((att) => ({
+        filename: att.filename,
+        content: att.content,
+      })),
+    });
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+    return { success: true, messageId: result.data?.id };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Unknown Resend error';
+    console.error('[email] resend send failed:', message);
+    return { success: false, error: message };
+  }
+};
 
 function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -373,6 +472,7 @@ export const sendSocialDigest = async ({
   demoReelEntries,
   contentReel,
   comicStrip,
+  pipelineStatus,
 }: {
   blogTitle?: string;
   blogExcerpt?: string;
@@ -424,6 +524,17 @@ export const sendSocialDigest = async ({
      */
     entries?: SocialDigestEntry[];
   };
+  /**
+   * Pipeline status panel rendered at the top of the brief — one
+   * entry per content section. Replaces per-cron admin-alert emails;
+   * partial-failure days are visible inline instead of arriving as
+   * a separate "X cron skipped" email at 1am.
+   */
+  pipelineStatus?: Array<{
+    label: string;
+    status: 'ok' | 'missing' | 'skipped';
+    note?: string;
+  }>;
 }): Promise<{ success: boolean; error?: string }> => {
   const digestEmail = process.env.SOCIAL_DIGEST_EMAIL;
 
@@ -455,6 +566,7 @@ export const sendSocialDigest = async ({
         demoReelEntries,
         contentReel,
         comicStrip,
+        pipelineStatus,
         timestamp,
       }),
     );
@@ -542,6 +654,63 @@ export const sendFeedbackEmail = async (
   } catch (error) {
     console.error('[Feedback] Failed to send:', error);
   }
+};
+
+export const sendBundlePurchaseEmail = async ({
+  to,
+  buyerName,
+  bundleName,
+  bundleSlug,
+  bundleTagline,
+  pageCount,
+  priceDisplay,
+  coverImageUrl,
+  downloadUrl,
+}: {
+  to: string;
+  buyerName?: string;
+  bundleName: string;
+  bundleSlug: string;
+  bundleTagline: string;
+  pageCount: number;
+  priceDisplay: string;
+  coverImageUrl: string;
+  downloadUrl: string;
+}): Promise<{ success: boolean; messageId?: string; error?: string }> => {
+  const productPageUrl = `${baseUrl}/products/digital/${bundleSlug}`;
+
+  const html = await render(
+    BundlePurchaseEmail({
+      buyerName,
+      bundleName,
+      bundleTagline,
+      pageCount,
+      priceDisplay,
+      coverImageUrl,
+      downloadUrl,
+      productPageUrl,
+    }),
+  );
+  const text = await render(
+    BundlePurchaseEmail({
+      buyerName,
+      bundleName,
+      bundleTagline,
+      pageCount,
+      priceDisplay,
+      coverImageUrl,
+      downloadUrl,
+      productPageUrl,
+    }),
+    { plainText: true },
+  );
+
+  return sendEmail({
+    to,
+    subject: `Your ${bundleName} bundle is ready!`,
+    html,
+    text,
+  });
 };
 
 export const sendAdminAlert = async ({

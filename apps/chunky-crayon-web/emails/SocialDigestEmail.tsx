@@ -72,7 +72,27 @@ type SocialDigestEmailProps = {
     panel4Url?: string;
     entries?: SocialDigestEntry[];
   };
+  /**
+   * Pipeline status panel. One entry per content section; flags ✅
+   * for sections that produced something today and ⚠️ for sections
+   * whose generation cron didn't yield a row. Optional — falls back
+   * to no status panel if not supplied (e.g. preview, legacy callers).
+   *
+   * Shown right after the hero so partial-failure days are visible
+   * without scrolling. Replaces per-cron admin alert emails — one
+   * Posting Brief, all status info inline.
+   */
+  pipelineStatus?: PipelineStatusEntry[];
   timestamp: string;
+};
+
+export type PipelineStatusEntry = {
+  /** Display label, e.g. "Daily image" / "Demo reel" / "Content reel". */
+  label: string;
+  /** ok = produced today; missing = expected but absent; skipped = not expected today (e.g. comic-strip on Mon-Sat). */
+  status: 'ok' | 'missing' | 'skipped';
+  /** Optional one-liner clarifying why something is missing/skipped. */
+  note?: string;
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
@@ -92,6 +112,7 @@ const SocialDigestEmail = ({
   demoReelEntries = [],
   contentReel,
   comicStrip,
+  pipelineStatus,
   timestamp = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -120,6 +141,45 @@ const SocialDigestEmail = ({
             times shown. Anything marked manual needs a hand.
           </Text>
         </Section>
+
+        {/* ── Pipeline status panel ──
+            One row per content section. ✅ produced today, ⚠️ expected
+            but missing (cron failed / no candidates / etc.), ⏭ skipped
+            (not expected today, e.g. comic strip Mon-Sat).
+
+            Replaces the per-cron admin-alert emails: failures show up
+            here inline so the brief is the single source of truth for
+            "what happened and what's missing today". */}
+        {pipelineStatus && pipelineStatus.length > 0 && (
+          <Section style={infoSection}>
+            <Heading as="h2" style={sectionTitle}>
+              Pipeline status
+            </Heading>
+            {pipelineStatus.map((item, idx) => {
+              const icon =
+                item.status === 'ok'
+                  ? '✅'
+                  : item.status === 'missing'
+                    ? '⚠️'
+                    : '⏭';
+              const color =
+                item.status === 'ok'
+                  ? '#0F8C5A'
+                  : item.status === 'missing'
+                    ? '#C75A3D'
+                    : '#888';
+              return (
+                <Text
+                  key={`pipeline-${idx}`}
+                  style={{ ...paragraph, color, margin: '0 0 4px' }}
+                >
+                  {icon} <strong>{item.label}</strong>
+                  {item.note ? ` — ${item.note}` : ''}
+                </Text>
+              );
+            })}
+          </Section>
+        )}
 
         {/* ── Section 0: Today's blog post (optional) ── */}
         {(blogTitle || blogUrl) && (

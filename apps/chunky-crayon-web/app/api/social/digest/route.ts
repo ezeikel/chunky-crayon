@@ -532,6 +532,56 @@ export const GET = async (request: Request) => {
         ]
       : [];
 
+    // Build the pipeline status panel — one entry per content section.
+    // Replaces per-cron admin-alert emails: if a generation cron failed,
+    // the brief flags it inline at the top instead of sending a 1am
+    // "X cron skipped" email. Comic strip flags 'skipped' on Mon-Sat
+    // (its generation cron is Sunday-only by design).
+    const isSunday = new Date().getUTCDay() === 0;
+    const pipelineStatus: Array<{
+      label: string;
+      status: 'ok' | 'missing' | 'skipped';
+      note?: string;
+    }> = [
+      {
+        label: 'Daily coloring image',
+        status: coloringImage ? 'ok' : 'missing',
+        note: coloringImage
+          ? undefined
+          : 'check /api/coloring-image/generate cron at 08:00 UTC',
+      },
+      {
+        label: 'Demo reel',
+        status: demoReelImage ? 'ok' : 'missing',
+        note: demoReelImage
+          ? undefined
+          : 'check /api/social/demo-reel/produce-v2 cron at 06:00 UTC',
+      },
+      {
+        label: 'Content reel',
+        status: contentReel ? 'ok' : 'missing',
+        note: contentReel
+          ? undefined
+          : 'check /api/cron/content-reel/publish at 05:00 UTC',
+      },
+      {
+        label: 'Blog post',
+        status: blogPost ? 'ok' : 'missing',
+        note: blogPost
+          ? undefined
+          : 'check /api/blog/generate cron at 06:00 UTC',
+      },
+      {
+        label: 'Comic strip',
+        status: comicStrip ? 'ok' : isSunday ? 'missing' : 'skipped',
+        note: !comicStrip
+          ? isSunday
+            ? 'check /api/cron/comic-strip at 06:00 UTC Sunday'
+            : 'Sunday-only generation'
+          : undefined,
+      },
+    ];
+
     // Final bail: nothing to ship at all. Only happens if every section
     // is empty — daily image missing AND demo reel missing AND no
     // content reel AND no blog post AND no comic strip.
@@ -602,6 +652,7 @@ export const GET = async (request: Request) => {
             entries: comicStripEntries,
           }
         : undefined,
+      pipelineStatus,
     });
 
     if (!result.success) {
