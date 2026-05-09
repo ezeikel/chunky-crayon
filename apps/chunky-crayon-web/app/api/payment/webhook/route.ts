@@ -743,6 +743,34 @@ export const POST = async (req: Request) => {
         stripeCustomerId,
       });
     }
+  } else if (stripeEvent.type === 'charge.refunded') {
+    // Refunds revoke bundle access. Look up by paymentIntent — credits
+    // and subscriptions also fire charge.refunded but we leave their
+    // existing handling alone (refunds for credits don't claw back
+    // generated coloring images, and subs are managed separately).
+    // Bundle handling: set refundedAt; download endpoint + thank-you
+    // page both gate on this flag, so access is revoked at next
+    // request. PDFs already cached on R2 stay there but are no longer
+    // reachable by buyer.
+    const charge = stripeEvent.data.object;
+    const paymentIntentId =
+      typeof charge.payment_intent === 'string'
+        ? charge.payment_intent
+        : charge.payment_intent?.id;
+
+    if (paymentIntentId) {
+      // Idempotent: re-firing this event is a no-op since refundedAt
+      // is just overwritten with the same (or newer) timestamp.
+      const updated = await db.bundlePurchase.updateMany({
+        where: { stripePaymentIntentId: paymentIntentId },
+        data: { refundedAt: new Date() },
+      });
+      if (updated.count > 0) {
+        console.log(
+          `[refund] revoked ${updated.count} bundle purchase(s) for payment intent ${paymentIntentId}`,
+        );
+      }
+    }
   } else {
     // Log unhandled events but don't treat as error
     console.log(`Unhandled webhook event type: ${stripeEvent.type}`);
