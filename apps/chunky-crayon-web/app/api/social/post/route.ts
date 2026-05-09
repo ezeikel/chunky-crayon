@@ -133,6 +133,68 @@ const corsHeaders = {
 };
 
 /**
+ * Returns midnight of `date`'s calendar day in `timeZone`, as a UTC
+ * Date instance. Used to scope cron lookups to the audience's day
+ * rather than UTC's (so 00:30 UTC Wed = 8:30pm Tue ET still picks up
+ * Tuesday's image).
+ *
+ * Implementation: format `date` in the target timezone, extract the
+ * Y/M/D parts, then compute the UTC instant that corresponds to
+ * 00:00 in the target timezone. The DST-correct way without pulling
+ * in a TZ library — Intl.DateTimeFormat handles the offset for us.
+ */
+const startOfDayInTimezone = (date: Date, timeZone: string): Date => {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+  const partMap: Record<string, string> = {};
+  for (const p of parts) {
+    if (p.type !== 'literal') partMap[p.type] = p.value;
+  }
+  const year = Number(partMap.year);
+  const month = Number(partMap.month);
+  const day = Number(partMap.day);
+  // Naive ISO at midnight of the target day, treated as UTC for now.
+  const naiveMidnight = Date.UTC(year, month - 1, day, 0, 0, 0);
+  // Recover the true UTC instant by subtracting the offset Intl applied.
+  // Re-format the naive midnight in the target tz; the difference between
+  // its parts and the naive parts == the timezone offset for that day
+  // (DST-correct because Intl resolves it for us).
+  const naiveDate = new Date(naiveMidnight);
+  const naiveParts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).formatToParts(naiveDate);
+  const naiveMap: Record<string, string> = {};
+  for (const p of naiveParts) {
+    if (p.type !== 'literal') naiveMap[p.type] = p.value;
+  }
+  const naiveTzMs = Date.UTC(
+    Number(naiveMap.year),
+    Number(naiveMap.month) - 1,
+    Number(naiveMap.day),
+    Number(naiveMap.hour === '24' ? '00' : naiveMap.hour),
+    Number(naiveMap.minute),
+    Number(naiveMap.second),
+  );
+  const offsetMs = naiveTzMs - naiveMidnight;
+  return new Date(naiveMidnight - offsetMs);
+};
+
+/**
  * Per-platform post outcome stored in coloringImage.socialPostResults.
  * Each platform gets its own key — autoPosted in the digest reflects
  * `success`, not a hardcoded assumption.
@@ -1166,26 +1228,28 @@ const handleRequest = async (request: Request) => {
         throw new Error(`Coloring image with ID ${coloringImageId} not found`);
       }
     } else {
-      // The IG Carousel cron fires at 00:30 UTC = 8:30pm US Eastern
-      // (peak parent engagement after dinner). At that moment the UTC
-      // calendar day has just rolled over but the daily-image cron
-      // doesn't run until 08:00 UTC, so "today's" image won't exist.
-      // The post is intended to be YESTERDAY's coloring page (which
-      // by 8:30pm ET should have been coloured during the day).
+      // Audience-timezone scoped lookup. Posts are timed for US Eastern
+      // (peak parent engagement after dinner) — at 00:30 UTC Wed that
+      // is still Tuesday 8:30pm ET, so from the audience's POV "today"
+      // is Tuesday and Tuesday's daily image (generated 08:00 UTC =
+      // 04:00 ET) is what we want.
       //
-      // Filter to yesterday's UTC calendar day exactly — half-open
-      // [yesterdayStart, todayStart). Sharp window prevents the cron
-      // from picking up older stragglers and re-posting them.
-      const todayStart = new Date();
-      todayStart.setUTCHours(0, 0, 0, 0);
-      const yesterdayStart = new Date(todayStart);
-      yesterdayStart.setUTCDate(yesterdayStart.getUTCDate() - 1);
+      // Filtering by ET-day instead of UTC-day removes the
+      // off-by-one we'd otherwise need (yesterday-UTC lookups, fuzzy
+      // 48h windows). Sharp half-open window: [todayStartET, tomorrowStartET).
+      const AUDIENCE_TZ = 'America/New_York';
+      const todayStartAudience = startOfDayInTimezone(new Date(), AUDIENCE_TZ);
+      const tomorrowStartAudience = new Date(todayStartAudience);
+      tomorrowStartAudience.setUTCDate(tomorrowStartAudience.getUTCDate() + 1);
 
       coloringImage = await db.coloringImage.findFirst({
         where: {
           brand: BRAND,
           generationType: GenerationType.DAILY,
-          createdAt: { gte: yesterdayStart, lt: todayStart },
+          createdAt: {
+            gte: todayStartAudience,
+            lt: tomorrowStartAudience,
+          },
           status: 'READY',
         },
         orderBy: {
