@@ -4,13 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faDownload,
-  faEnvelope,
-  faCircleCheck,
-} from '@fortawesome/pro-duotone-svg-icons';
+import { faDownload, faCircleCheck } from '@fortawesome/pro-duotone-svg-icons';
 import { getBundlePurchaseBySessionId } from '@/app/data/bundle';
-import { getCurrentUser } from '@/app/actions/user';
+import { signBundleDownloadToken } from '@/lib/bundle-download-token';
 import { checkFeatureFlag } from '@/flags';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -61,7 +57,6 @@ const ThankYouContent = async ({
   }
 
   const purchase = await getBundlePurchaseBySessionId(sessionId);
-  const user = await getCurrentUser();
 
   // Webhook race: Stripe sends the buyer here immediately on payment
   // success, but the BundlePurchase row only lands when our webhook
@@ -83,12 +78,16 @@ const ThankYouContent = async ({
           : '';
   const priceDisplay = `${symbol}${(purchase.pricePence / 100).toFixed(2)}`;
 
-  // Inline download is only safe to expose if the viewer is the buyer.
-  // Logged-in buyers fall straight through. Guests (no session at all)
-  // didn't authenticate to view this page so we can't trust who's
-  // looking — they get the "check your email" CTA instead.
-  const isOwner = !!user && user.id === purchase.user.id;
-  const downloadHref = `/api/bundles/${purchase.bundle.slug}/download`;
+  // Sign a download token server-side so guests can download from this
+  // page directly (they have no session cookie, but knowing a real
+  // session_id and arriving via Stripe's redirect is good enough proof
+  // of ownership for this 14-day window). Logged-in buyers also use the
+  // tokened URL — same code path, same token expiry, simpler than
+  // branching on auth state. The session-cookie auth path on the
+  // download endpoint stays as a fallback for return visitors who hit
+  // /api/bundles/[slug]/download without a token.
+  const downloadToken = await signBundleDownloadToken(purchase.id);
+  const downloadHref = `/api/bundles/${purchase.bundle.slug}/download?token=${encodeURIComponent(downloadToken)}`;
 
   return (
     <>
@@ -139,16 +138,15 @@ const ThankYouContent = async ({
           </div>
         )}
 
-        {/* Download / email CTA */}
+        {/* Download CTA — single path for both logged-in buyers and
+            guests, gated by the JWT signed above. Refunded purchases
+            short-circuit to the refunded state (the download endpoint
+            also checks refundedAt, so this is just a UX nicety to skip
+            the misleading button). */}
         {purchase.refundedAt ? (
           <RefundedState locale={locale} slug={purchase.bundle.slug} />
-        ) : isOwner ? (
-          <DownloadCta href={downloadHref} priceDisplay={priceDisplay} />
         ) : (
-          <CheckEmailCta
-            email={purchase.user.email}
-            priceDisplay={priceDisplay}
-          />
+          <DownloadCta href={downloadHref} priceDisplay={priceDisplay} />
         )}
 
         {/* What's next */}
@@ -203,31 +201,6 @@ const DownloadCta = ({
     </a>
     <p className="mt-4 text-sm text-text-secondary font-rooney-sans">
       Order total: <strong>{priceDisplay}</strong>
-    </p>
-  </div>
-);
-
-// CTA shown to guests (no session) — direct them to the email which has
-// the signed token. Don't expose a generic download URL since we can't
-// trust the viewer is the buyer.
-const CheckEmailCta = ({
-  email,
-  priceDisplay,
-}: {
-  email: string | null;
-  priceDisplay: string;
-}) => (
-  <div className="text-center">
-    <div className="inline-flex items-center gap-3 font-tondo font-bold text-lg px-8 py-4 rounded-full bg-crayon-yellow-light/40 border-3 border-crayon-orange/30 text-text-primary">
-      <FontAwesomeIcon
-        icon={faEnvelope}
-        className="text-xl text-crayon-orange"
-      />
-      Check your email{email ? ` at ${email}` : ''}
-    </div>
-    <p className="mt-4 text-sm text-text-secondary font-rooney-sans">
-      Your download link is on its way. Order total:{' '}
-      <strong>{priceDisplay}</strong>
     </p>
   </div>
 );
