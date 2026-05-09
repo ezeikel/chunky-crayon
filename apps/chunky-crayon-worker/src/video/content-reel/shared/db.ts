@@ -17,6 +17,7 @@
 
 import type { ContentReel as PrismaContentReel } from "@one-colored-pixel/db";
 
+import { stripEmDashes } from "./copy";
 import type {
   CaptionToken,
   ContentReel,
@@ -159,10 +160,12 @@ export function toPrismaCreate(reel: ContentReel) {
   return {
     id: reel.id,
     kind: KIND_TO_DB[reel.kind],
-    hook: reel.hook,
-    payoff: reel.payoff,
-    centerBlock: reel.centerBlock,
-    coverTeaser: reel.coverTeaser ?? null,
+    // User-facing copy — strip em dashes (parents read them as AI-generated).
+    // factCheckNotes is internal so it stays untouched.
+    hook: stripEmDashes(reel.hook),
+    payoff: stripEmDashes(reel.payoff),
+    centerBlock: stripEmDashes(reel.centerBlock),
+    coverTeaser: reel.coverTeaser ? stripEmDashes(reel.coverTeaser) : null,
     sourceTitle: reel.sourceTitle ?? null,
     sourceUrl: reel.sourceUrl ?? null,
     category: CATEGORY_TO_DB[reel.category],

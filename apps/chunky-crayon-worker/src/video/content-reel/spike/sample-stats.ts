@@ -86,7 +86,7 @@ export const WARM_MYTH_SAMPLE: ContentReel = {
   kind: "myth",
   hook: "Think strict parenting raises the best-behaved kids?",
   payoff:
-    "Authoritative parenting — warm yet firm — leads to better outcomes than authoritarian styles, which correlate with more behaviour problems in 2025 longitudinal research.",
+    "Authoritative parenting, warm yet firm, leads to better outcomes than authoritarian styles, which correlate with more behavior problems in 2025 longitudinal research.",
   centerBlock: "False",
   coverTeaser: "True or false: strict parenting raises the best-behaved kids.",
   sourceTitle: "NCBI / Authoritative parenting outcomes review",
