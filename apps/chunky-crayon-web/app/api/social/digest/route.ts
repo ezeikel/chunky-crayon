@@ -58,39 +58,48 @@ type ScheduledSlot = {
   /** Which days of week the slot is active (UTC, not local) */
   days: 'weekday' | 'weekend' | 'next-day-weekday' | 'next-day-weekend';
 };
+// Schedule rationale (researched via Perplexity 2026-05-09, sources:
+// Hootsuite/Sprout/Later/Buffer): parents-of-3-8 audience, 60% US +
+// 40% UK. Reels and demo videos peak 20:00-22:00 UTC (US afternoon
+// into evening, UK 9-11pm bedtime scroll). Pinterest peaks late
+// evening (20:00-23:00 UTC) for discovery. Content reels (parenting
+// tips/stats) peak US lunch 17:00 UTC for shareable saves. Times are
+// staggered across platforms within a window so no two posts land
+// at the same minute.
 const POST_SCHEDULE: Record<string, ScheduledSlot> = {
-  // Weekday demo-reel slots (afternoon UTC = US workday morning/lunch)
-  facebookDemoReel: { utc: '13:00', days: 'weekday' },
-  pinterestDemoReel: { utc: '13:02', days: 'weekday' },
-  instagramDemoReel: { utc: '17:00', days: 'weekday' },
-  pinterest: { utc: '18:00', days: 'weekday' }, // weekday Pinterest static
-  // Weekday late-night slots (00:30+ UTC = US Eastern evening prior calendar day)
-  instagramCarousel: { utc: '00:30', days: 'next-day-weekday' },
-  // Content-reel slots (daily, 7d/wk — see vercel.json content-reel-post crons)
-  facebookContentReel: { utc: '13:05', days: 'weekday' },
-  pinterestContentReel: { utc: '13:07', days: 'weekday' },
-  instagramContentReel: { utc: '17:05', days: 'weekday' },
+  // Weekday slots — spread across US afternoon-evening peak.
+  facebookDemoReel: { utc: '20:00', days: 'weekday' }, // US 3pm ET / UK 8pm
+  instagramDemoReel: { utc: '21:00', days: 'weekday' }, // US 4pm ET / UK 9pm — IG Reels peak
+  pinterestDemoReel: { utc: '21:30', days: 'weekday' },
+  pinterest: { utc: '23:00', days: 'weekday' }, // late-eve discovery peak
+  instagramCarousel: { utc: '00:30', days: 'next-day-weekday' }, // US 7:30pm ET (yesterday's coloured)
+  // Content-reel slots (daily 7d/wk) — different rhythm, US lunch saves.
+  facebookContentReel: { utc: '17:00', days: 'weekday' }, // US 12pm ET lunch
+  instagramContentReel: { utc: '18:30', days: 'weekday' }, // US 1:30pm ET
+  pinterestContentReel: { utc: '22:00', days: 'weekday' }, // late-eve discovery
   // tiktokDemoReel + tiktokContentReel intentionally omitted — TikTok auto-
   // posting is paused; brief surfaces caption + asset for manual upload via
   // the TikTok app (sandbox API only writes drafts anyway, half-manual).
 };
 
 const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
-  instagramDemoReel: { utc: '17:00', days: 'weekend' },
-  facebookDemoReel: { utc: '17:02', days: 'weekend' },
-  pinterestDemoReel: { utc: '17:06', days: 'weekend' },
-  instagramCarousel: { utc: '17:08', days: 'weekend' },
-  pinterest: { utc: '17:10', days: 'weekend' },
-  // Content-reel slots (daily, same UTC times as weekday — picked once and
-  // applied to all 7 days, see vercel.json).
-  facebookContentReel: { utc: '13:05', days: 'weekend' },
-  pinterestContentReel: { utc: '13:07', days: 'weekend' },
-  instagramContentReel: { utc: '17:05', days: 'weekend' },
-  // Comic strip — Sunday only. Generation 06:00 UTC, posts that afternoon.
-  // The brief fires 08:30 UTC so the strip is already in DB by then.
-  facebookComicStrip: { utc: '13:00', days: 'weekend' },
-  pinterestComicStrip: { utc: '13:02', days: 'weekend' },
-  instagramComicStrip: { utc: '17:00', days: 'weekend' },
+  // Weekend slots — earlier window, parents-with-kids browsing afternoon.
+  // Stagger so no platform receives two posts within an hour.
+  instagramCarousel: { utc: '16:00', days: 'weekend' }, // US 11am ET
+  facebookDemoReel: { utc: '17:30', days: 'weekend' }, // US 12:30pm ET
+  instagramDemoReel: { utc: '19:00', days: 'weekend' }, // US 2pm ET
+  pinterestDemoReel: { utc: '20:30', days: 'weekend' },
+  pinterest: { utc: '22:30', days: 'weekend' }, // weekend Pinterest static
+  // Content-reel slots — keep 7d/wk timing aligned with weekday lunch logic.
+  facebookContentReel: { utc: '17:00', days: 'weekend' },
+  instagramContentReel: { utc: '18:30', days: 'weekend' },
+  pinterestContentReel: { utc: '22:00', days: 'weekend' },
+  // Comic strip — Sunday only. Generation 06:00 UTC, posts that evening.
+  // Separated from content-reel times (17:00/18:30/22:00) so two
+  // different posts don't land on the same platform within minutes.
+  facebookComicStrip: { utc: '19:30', days: 'weekend' },
+  instagramComicStrip: { utc: '21:30', days: 'weekend' },
+  pinterestComicStrip: { utc: '23:00', days: 'weekend' },
 };
 
 /**
