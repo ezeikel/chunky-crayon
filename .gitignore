@@ -55,3 +55,21 @@ android/.gradle/
 packages/db/src/generated/
 .playwright-mcp/
 apps/chunky-crayon-web/.env.local.bak-*
+
+# IDE / editor state
+.claude/
+.cursor/
+
+# Worker temp output (mp4s, mp3s, intermediate render artifacts)
+apps/chunky-crayon-worker/tmp/
+
+# Storybook build artifacts + logs
+packages/coloring-ui/storybook-static/
+packages/coloring-ui/debug-storybook.log
+
+# Translations review reports — generated, not source
+packages/translations/reports/
+
+# Debug screenshots at repo root (ad-*.png, footer-*.png, pricing-*.png, etc.)
+/*.png
+/*.jpg
