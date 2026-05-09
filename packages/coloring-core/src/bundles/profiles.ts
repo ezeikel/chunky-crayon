@@ -168,8 +168,100 @@ export const DINO_DANCE_PARTY: HeroBundle = {
   ],
 };
 
+// ─── Stub bundles (research-output prompts only) ────────────────────
+//
+// These four are the launch lineup from research-kids-coloring-bestsellers.
+// Each has its 10 page prompts wired up but NO heroes / pageCast yet —
+// the per-character work (signatureDetails, referenceSheetPrompt,
+// funFact) hasn't been done. They're registered so:
+//   1. The orchestrator + seed scripts know what slugs to expect
+//   2. Anyone listing HERO_BUNDLES sees the real launch lineup
+//   3. Future per-bundle launch sessions can fill in heroes + pageCast
+//      using DINO_DANCE_PARTY as the reference shape
+//
+// Generating pages from these as-is will fall back to brand-style refs
+// only (no character continuity), which is acceptable for early
+// scene-test runs but won't pass QA's signature-detail checks. Don't
+// ship a bundle to prod with empty heroes — fill them in first.
+
+export const UNICORN_RAINBOW_RALLY: HeroBundle = {
+  slug: "unicorn-rainbow-rally",
+  heroes: [], // TODO: define 3-4 unicorns with signatureDetails + funFact
+  pageCast: {}, // TODO: map heroes to pages 1-10
+  pagePrompts: [
+    "A baby unicorn with a fluffy mane and a swirly horn, standing on a cloud, looking up at a sky where the rainbow has gone all gray",
+    "A unicorn galloping fast across cotton-candy clouds, mane streaming behind it, the color RED glowing inside a floating bubble ahead",
+    "A unicorn sliding down a tall waterslide of bright orange juice, hooves up, water spraying everywhere, oranges floating in the splash",
+    "A unicorn with butterfly wings catching a yellow shooting star in its mane, sunflowers and bees around it on a fluffy hilltop",
+    "Two unicorns racing neck-and-neck through a leafy green forest in the sky, jellybean obstacles bouncing under their hooves",
+    "A unicorn dipping its horn into a bright blue lake, dragonflies circling above, water lilies making a perfect ring around it",
+    "A unicorn floating through a deep purple night sky filled with planets and stars, mane sparkling, a tiny moon on its forehead",
+    "A unicorn with a pink mane catching the last color, a glowing pink heart, in its hooves while doing a cartwheel mid-air",
+    "All seven unicorns lined up on the edge of a giant cloud, each holding a color in a bubble, ready to release them at once",
+    "The full rainbow restored across the sky, all seven unicorns leaping over it together, Colo the crayon riding on the lead unicorn's back, cheering",
+  ],
+};
+
+export const SUPERHERO_VEHICLE_SQUAD: HeroBundle = {
+  slug: "superhero-vehicle-squad",
+  heroes: [], // TODO: define vehicle heroes (fire truck, school bus, police car, ambulance, etc.)
+  pageCast: {},
+  pagePrompts: [
+    "A friendly fire truck with a big smile on its grille, parked in front of a small town fire station, sun rising behind it, ready to start the day",
+    "A school bus with rocket boosters firing out the back, kids' faces in every window cheering, lifting off a grassy field, books flying happily inside",
+    "A cheerful police car using a giant magnet on its roof to pull a runaway bunch of balloons back down to a crying child",
+    "A construction digger with extending stretchy arms scooping up colorful blocks and stacking them into a wobbly castle on a building site",
+    "An ambulance shining gentle healing lights over a row of injured teddy bears tucked into tiny beds outside a stuffed-animal hospital",
+    "A garbage truck with sparkle vents, swallowing trash and shooting out a fresh new colorful slide that lands gently in a playground",
+    "A delivery van going invisible (just outline of dotted lines) leaving a wrapped present on every doorstep down a long suburban street",
+    "An ice-cream truck honking, every kid on the block running out, three flavors floating in colorful clouds above the truck windows",
+    "A submarine with bright headlights gliding through an underwater city made of coral towers, jellyfish street lamps lighting the way",
+    "All the vehicle heroes parked together at sunset on a grassy hill, fireworks above them, Colo the crayon waving from the top of the fire truck ladder",
+  ],
+};
+
+export const DESSERT_ISLAND_ADVENTURE: HeroBundle = {
+  slug: "dessert-island-adventure",
+  heroes: [], // TODO: define explorer kids + animal friends (bear cub, fox chef, frog, etc.)
+  pageCast: {},
+  pagePrompts: [
+    "A small wooden boat with a sail shaped like an ice-cream cone landing on a beach made of marshmallows and chocolate sand, palm trees with cookies for leaves",
+    "A wide flowing chocolate river with gumdrop stepping stones, a curious bear cub dipping a paw in to taste, sprinkle-fish jumping out",
+    "A tall ice-cream-scoop mountain with rainbow sprinkles, three friends climbing it with little ropes, footprint scoops behind them",
+    "A cookie bridge stretching across a milk lake between two gingerbread houses, a fox in a chef's hat carrying a tray across",
+    "A lollipop forest with swirled-rainbow trees, a small girl spinning underneath, the whole forest jingling like wind chimes",
+    "A jellybean pond with gummy-bear fish leaping out, a frog catching one mid-air with its tongue, lily pads made of cookies",
+    "A tall cotton-candy cloud factory with friendly creatures cranking the machine, big fluffy pink and blue clouds drifting up out of the chimney",
+    "A popcorn waterfall pouring into a buttery valley below, kids in raincoats catching popcorn in baskets, a smiling sun shining above",
+    "A grand cake castle with frosting walls, candy-cane towers, and a chocolate-bar drawbridge being lowered, friends arriving on a sugar-cube path",
+    "A long feast table inside the cake castle, every food friend from the island sharing a giant celebration cake, Colo the crayon raising a tiny fork at the head of the table",
+  ],
+};
+
+export const SPACE_ADVENTURE_CREW: HeroBundle = {
+  slug: "space-adventure-crew",
+  heroes: [], // TODO: define 3 kid astronauts (consistent suits, helmets, name patches)
+  pageCast: {},
+  pagePrompts: [
+    "A chunky friendly rocket on a launchpad with three smiling kid astronauts waving from the windows, smoke clouds curling out the bottom shaped like cartoon faces",
+    "Three astronauts somersaulting in zero gravity inside their spaceship, cookies and juice boxes floating past them, a surprised cat-shaped helmet drifting by",
+    "A space rover crunching across a red planet, a friendly three-eyed alien plant tipping its leaves to wave, two moons in the sky behind",
+    "An astronaut building a snow alien on Mars from glittery red sand, scarf made of stars, alien snowballs piled neatly nearby",
+    "A spaceship dodging through an asteroid belt where every asteroid is a giant piece of candy, a swirly lollipop one nearly clipping the wing",
+    "Three astronauts having a picnic on a small floating island shaped like a hamburger, three different planets visible in the sky around them",
+    "A telescope on a dark hilltop showing galaxies shaped like animals: a kitten galaxy, a turtle galaxy, a giraffe galaxy, the kids leaning in to look",
+    "Astronauts teaching a group of friendly tentacled aliens how to play hopscotch on a chalk grid drawn in moondust, aliens hopping happily",
+    "A spaceship bobbing inside a giant friendly space-whale's bubble, the whale smiling, sparkles drifting around the ship like bath foam",
+    "The crew arriving back on Earth, alien friends waving from a rainbow portal in the sky, Colo the crayon sitting on top of the rocket holding a 'WELCOME HOME' sign",
+  ],
+};
+
 export const HERO_BUNDLES: Record<string, HeroBundle> = {
   [DINO_DANCE_PARTY.slug]: DINO_DANCE_PARTY,
+  [UNICORN_RAINBOW_RALLY.slug]: UNICORN_RAINBOW_RALLY,
+  [SUPERHERO_VEHICLE_SQUAD.slug]: SUPERHERO_VEHICLE_SQUAD,
+  [DESSERT_ISLAND_ADVENTURE.slug]: DESSERT_ISLAND_ADVENTURE,
+  [SPACE_ADVENTURE_CREW.slug]: SPACE_ADVENTURE_CREW,
 };
 
 export function getBundleProfile(slug: string): HeroBundle | undefined {

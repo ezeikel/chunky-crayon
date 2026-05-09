@@ -160,6 +160,10 @@ export type { SeasonalEvent } from "./scene/seasonal-calendar";
 // (admin UI, retry endpoint) and worker (page generation pipeline).
 export {
   DINO_DANCE_PARTY,
+  UNICORN_RAINBOW_RALLY,
+  SUPERHERO_VEHICLE_SQUAD,
+  DESSERT_ISLAND_ADVENTURE,
+  SPACE_ADVENTURE_CREW,
   HERO_BUNDLES,
   getBundleProfile,
   getHero,
