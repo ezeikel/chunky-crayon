@@ -1166,25 +1166,26 @@ const handleRequest = async (request: Request) => {
         throw new Error(`Coloring image with ID ${coloringImageId} not found`);
       }
     } else {
-      // The IG Carousel slot fires at 00:30 UTC (8:30pm US Eastern,
-      // peak parent engagement) — that's the NEXT calendar day in UTC,
-      // so a strict "createdAt >= todayStart" filter never finds an
-      // image. The original intent was to post the previous day's
-      // coloring page (which by 8:30pm ET has been coloured during
-      // the day). Look back up to 48h for the most recent READY DAILY
-      // image so the cron actually finds something.
+      // The IG Carousel cron fires at 00:30 UTC = 8:30pm US Eastern
+      // (peak parent engagement after dinner). At that moment the UTC
+      // calendar day has just rolled over but the daily-image cron
+      // doesn't run until 08:00 UTC, so "today's" image won't exist.
+      // The post is intended to be YESTERDAY's coloring page (which
+      // by 8:30pm ET should have been coloured during the day).
       //
-      // Carousel-specific guard below also requires a saved colored
-      // version (the 3rd slide), so a missing colored version skips
-      // the post silently — exactly the behaviour we want.
-      const lookback = new Date();
-      lookback.setUTCDate(lookback.getUTCDate() - 2);
+      // Filter to yesterday's UTC calendar day exactly — half-open
+      // [yesterdayStart, todayStart). Sharp window prevents the cron
+      // from picking up older stragglers and re-posting them.
+      const todayStart = new Date();
+      todayStart.setUTCHours(0, 0, 0, 0);
+      const yesterdayStart = new Date(todayStart);
+      yesterdayStart.setUTCDate(yesterdayStart.getUTCDate() - 1);
 
       coloringImage = await db.coloringImage.findFirst({
         where: {
           brand: BRAND,
           generationType: GenerationType.DAILY,
-          createdAt: { gte: lookback },
+          createdAt: { gte: yesterdayStart, lt: todayStart },
           status: 'READY',
         },
         orderBy: {
@@ -1768,6 +1769,8 @@ const handleRequest = async (request: Request) => {
     // story re-posts if they already went out in a previous slot.
     const existingStaticResults =
       (coloringImage.socialPostResults as SocialPostResults | null) ?? {};
+    const staticAlreadyPosted = (key: keyof SocialPostResults) =>
+      !!existingStaticResults[key]?.success;
 
     // post to Instagram
     if (shouldPost('instagram')) {
@@ -1792,8 +1795,14 @@ const handleRequest = async (request: Request) => {
       }
 
       // Post 1: Image post (single image or carousel with colored example)
-      // Video is handled separately as a Reel for proper 9:16 display
-      if (shouldPostInstagramType('carousel')) {
+      // Video is handled separately as a Reel for proper 9:16 display.
+      // Dedup: skip if this image's IG carousel slot already succeeded
+      // in a prior run — prevents the 48h-lookback from re-posting the
+      // same image two nights in a row.
+      if (
+        shouldPostInstagramType('carousel') &&
+        !staticAlreadyPosted('instagramCarousel')
+      ) {
         let instagramCaptionForResults = '';
         try {
           let instagramMediaId: string;
@@ -1946,7 +1955,7 @@ const handleRequest = async (request: Request) => {
     }
 
     // post to Facebook
-    if (shouldPost('facebook')) {
+    if (shouldPost('facebook') && !staticAlreadyPosted('facebookImage')) {
       // convert svg to jpeg for Facebook
       const facebookBuffer = await convertSvgToJpeg(
         coloringImage.svgUrl,
@@ -2063,7 +2072,7 @@ const handleRequest = async (request: Request) => {
     }
 
     // post to Pinterest
-    if (shouldPost('pinterest')) {
+    if (shouldPost('pinterest') && !staticAlreadyPosted('pinterest')) {
       // Post 1: Image pin (static coloring page for search traffic)
       let pinterestImageCaptionForResults = '';
       try {
