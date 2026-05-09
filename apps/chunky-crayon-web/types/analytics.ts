@@ -290,22 +290,26 @@ export type EventProperties = {
 
   // ===== CHECKOUT =====
   [TRACKING_EVENTS.CHECKOUT_STARTED]: {
-    productType: 'subscription' | 'credits';
+    productType: 'subscription' | 'credits' | 'bundle';
     planName?: PlanName;
     creditAmount?: number;
+    bundleSlug?: string;
+    bundleId?: string;
     value: number; // Price in pence
     currency: string;
   };
   [TRACKING_EVENTS.CHECKOUT_COMPLETED]: {
-    productType: 'subscription' | 'credits';
+    productType: 'subscription' | 'credits' | 'bundle';
     planName?: PlanName;
     creditAmount?: number;
+    bundleSlug?: string;
+    bundleId?: string;
     value: number;
     currency: string;
     transactionId: string;
   };
   [TRACKING_EVENTS.CHECKOUT_ABANDONED]: {
-    productType: 'subscription' | 'credits';
+    productType: 'subscription' | 'credits' | 'bundle';
     planName?: PlanName;
   };
 

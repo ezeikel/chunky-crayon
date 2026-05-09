@@ -141,6 +141,65 @@ export function listingImagesForBundle(bundle: PublicBundle): string[] {
   ].filter((u): u is string => Boolean(u));
 }
 
+export type ThankYouPurchase = {
+  /** BundlePurchase id — used to construct download tokens. */
+  id: string;
+  /** When refunded, the page shows a refund-state message instead of
+   *  the download CTA. */
+  refundedAt: Date | null;
+  /** Snapshot price + currency at purchase time. */
+  pricePence: number;
+  currency: string;
+  /** Bundle metadata needed to render the page. */
+  bundle: {
+    slug: string;
+    name: string;
+    tagline: string;
+    pageCount: number;
+    listingHeroUrl: string | null;
+  };
+  /** Buyer — used for the "Thanks, {firstName}!" greeting + auth check. */
+  user: {
+    id: string;
+    email: string | null;
+    name: string | null;
+  };
+};
+
+/**
+ * Look up the purchase Stripe redirected to via success_url. Stripe
+ * fires checkout.session.completed asynchronously (typically within a
+ * second or two), so the row may not exist yet when the buyer hits
+ * the success page. Returning null lets the page render a "processing"
+ * fallback that auto-refreshes.
+ *
+ * Not cached — each session id is unique to a single purchase, and
+ * cache-by-session-id would just inflate the cache for one-time hits.
+ */
+export async function getBundlePurchaseBySessionId(
+  sessionId: string,
+): Promise<ThankYouPurchase | null> {
+  return db.bundlePurchase.findUnique({
+    where: { stripeCheckoutSessionId: sessionId },
+    select: {
+      id: true,
+      refundedAt: true,
+      pricePence: true,
+      currency: true,
+      bundle: {
+        select: {
+          slug: true,
+          name: true,
+          tagline: true,
+          pageCount: true,
+          listingHeroUrl: true,
+        },
+      },
+      user: { select: { id: true, email: true, name: true } },
+    },
+  });
+}
+
 export type BundleCastMember = {
   id: string;
   name: string;

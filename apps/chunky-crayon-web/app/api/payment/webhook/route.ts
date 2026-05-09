@@ -28,6 +28,7 @@ import {
   sendStartTrialConversionEvents,
   sendSubscribeConversionEvents,
 } from '@/lib/conversion-api';
+import { fulfilBundlePurchase } from '@/app/actions/bundle-fulfilment';
 
 // Check if webhook event has already been processed (idempotency)
 const isEventProcessed = async (eventId: string): Promise<boolean> => {
@@ -310,6 +311,74 @@ export const POST = async (req: Request) => {
               ]
             : []),
         ]);
+      }
+    } else if (session.metadata?.bundleSlug && session.metadata?.bundleId) {
+      // Bundle purchase. createBundleCheckoutSession sets these metadata
+      // keys, so their presence is the discriminator for "this Stripe
+      // session was for a bundle". Insert the BundlePurchase row, kick
+      // off async fulfilment (PDF render + R2 upload + email), fire
+      // Purchase CAPI. Webhook returns 200 fast — fulfilment runs
+      // detached so we don't block Stripe's redirect.
+      const bundleSlug = session.metadata.bundleSlug;
+      const bundleId = session.metadata.bundleId;
+
+      // Idempotent insert. Stripe can re-deliver checkout.session.completed
+      // (we mark events processed at the top of this route, but belt-and-
+      // braces); the @@unique([userId, bundleId]) on BundlePurchase means
+      // a duplicate webhook can't double-charge entitlement.
+      const purchase = await db.bundlePurchase.upsert({
+        where: { userId_bundleId: { userId: user.id, bundleId } },
+        create: {
+          userId: user.id,
+          bundleId,
+          stripeCheckoutSessionId: session.id,
+          stripePaymentIntentId: session.payment_intent as string | null,
+          pricePence: session.amount_total ?? 0,
+          currency: session.currency ?? 'gbp',
+        },
+        update: {
+          // If the user re-bought after a refund, refresh the Stripe ids
+          // and clear refundedAt so the entitlement is live again.
+          stripeCheckoutSessionId: session.id,
+          stripePaymentIntentId: session.payment_intent as string | null,
+          pricePence: session.amount_total ?? 0,
+          currency: session.currency ?? 'gbp',
+          refundedAt: null,
+        },
+      });
+
+      // Fire-and-forget fulfilment. PDF render is 1-5s, well under the
+      // Stripe 30s webhook timeout, but no reason to block the redirect
+      // when we can return 200 right now.
+      fulfilBundlePurchase(purchase.id).catch((err) => {
+        console.error(
+          `[bundle-webhook] fulfilment failed for ${purchase.id}:`,
+          err,
+        );
+      });
+
+      await trackWithUser(user.id, TRACKING_EVENTS.CHECKOUT_COMPLETED, {
+        productType: 'bundle',
+        bundleSlug,
+        bundleId,
+        value: session.amount_total ?? 0,
+        currency: session.currency ?? 'gbp',
+        transactionId: session.id,
+      });
+
+      // Server-side Purchase to Meta/Pinterest. eventId = session.id so
+      // any future browser-side Purchase pixel can dedupe against this.
+      if (user.email) {
+        await sendPurchaseConversionEvents({
+          email: user.email,
+          userId: user.id,
+          value: session.amount_total ?? 0,
+          currency: (session.currency ?? 'gbp').toUpperCase(),
+          eventId: session.id,
+          orderId: session.id,
+          contentName: `${bundleSlug} Bundle`,
+          ...matchData,
+        });
       }
     } else {
       // handle one-time credit purchase. Credits are granted regardless
