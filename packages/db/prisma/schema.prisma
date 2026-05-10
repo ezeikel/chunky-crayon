@@ -629,14 +629,18 @@ model Bundle {
 
   // Pricing in pence (GBP). 499 = £4.99. Avoids float rounding bugs and
   // matches Stripe's smallest-currency-unit convention.
-  pricePence Int    @default(499)
-  currency   String @default("gbp")
-
-  // Stripe linkage — populated by the bundle creation script after the
-  // listing images have been generated. One Product per bundle, one Price
-  // per Product (no tier variants for now).
-  stripeProductId String? @unique
-  stripePriceId   String? @unique
+  // `pricePence` + `stripePriceId` are the canonical GBP price (the
+  // `currency` column stays "gbp" for the listing's base currency).
+  // `pricePenceUsd` + `stripePriceIdUsd` are the optional USD twin —
+  // when both are set, US visitors check out in USD against the USD
+  // Stripe Price. When null, the bundle is GBP-only and US visitors
+  // see / pay GBP. New bundles should populate both for parity.
+  pricePence       Int     @default(499)
+  pricePenceUsd    Int?
+  currency         String  @default("gbp")
+  stripeProductId  String? @unique
+  stripePriceId    String? @unique
+  stripePriceIdUsd String? @unique
 
   // Pre-rendered listing image URLs (R2). All 1200×1200 JPEGs served via
   // the assets.chunkycrayon.com CDN host.

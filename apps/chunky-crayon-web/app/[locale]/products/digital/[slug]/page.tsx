@@ -5,10 +5,12 @@ import {
   getPublishedBundle,
   listingImagesForBundle,
   bundleHeroesForCast,
+  pickBundlePrice,
 } from '@/app/data/bundle';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { checkFeatureFlag } from '@/flags';
+import { getCurrencyForRequest } from '@/lib/currency.server';
 import BundleProductPageClient from './BundleProductPageClient';
 
 type BundleProductPageProps = {
@@ -95,13 +97,17 @@ const BundleContent = async ({
   const enabled = await checkFeatureFlag('bundles-shop');
   if (!enabled) notFound();
 
-  const bundle = await getPublishedBundle(slug);
+  const [bundle, currency] = await Promise.all([
+    getPublishedBundle(slug),
+    getCurrencyForRequest(),
+  ]);
   if (!bundle) {
     notFound();
   }
 
   const images = listingImagesForBundle(bundle);
   const heroes = bundleHeroesForCast(bundle.slug);
+  const localized = pickBundlePrice(bundle, currency);
 
   return (
     <>
@@ -119,8 +125,8 @@ const BundleContent = async ({
           name: bundle.name,
           tagline: bundle.tagline,
           pageCount: bundle.pageCount,
-          pricePence: bundle.pricePence,
-          currency: bundle.currency,
+          pricePence: localized.pricePence,
+          currency: localized.currency,
           images,
           heroes,
         }}

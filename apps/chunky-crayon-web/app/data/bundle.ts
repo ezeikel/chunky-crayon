@@ -19,9 +19,15 @@ export type PublicBundle = {
   name: string;
   tagline: string;
   pageCount: number;
+  // GBP is the canonical baseline. `currency` stays "gbp" for the row's
+  // base price. `pricePenceUsd` + `stripePriceIdUsd` are the optional
+  // USD twin — when present, US visitors check out in USD; otherwise
+  // the bundle falls back to GBP everywhere.
   pricePence: number;
+  pricePenceUsd: number | null;
   currency: string;
   stripePriceId: string | null;
+  stripePriceIdUsd: string | null;
   // Listing images — already 1200x1200 JPEG on R2.
   listingHeroUrl: string | null;
   listingPageGrid1Url: string | null;
@@ -29,6 +35,36 @@ export type PublicBundle = {
   listingPageGrid3Url: string | null;
   listingBrandCardUrl: string | null;
 };
+
+/**
+ * Pick the right bundle price for the visitor's currency. Returns the
+ * GBP price when no USD twin exists or when the visitor's currency is
+ * GBP. The returned `currency` field is always Stripe-style lowercase
+ * ("gbp" / "usd") to match how Stripe + downstream emails format it.
+ */
+export function pickBundlePrice(
+  bundle: PublicBundle,
+  visitorCurrency: 'GBP' | 'USD',
+): {
+  pricePence: number;
+  currency: 'gbp' | 'usd';
+  stripePriceId: string | null;
+} {
+  const wantUsd = visitorCurrency === 'USD';
+  const hasUsd = bundle.pricePenceUsd != null && bundle.stripePriceIdUsd;
+  if (wantUsd && hasUsd) {
+    return {
+      pricePence: bundle.pricePenceUsd as number,
+      currency: 'usd',
+      stripePriceId: bundle.stripePriceIdUsd,
+    };
+  }
+  return {
+    pricePence: bundle.pricePence,
+    currency: 'gbp',
+    stripePriceId: bundle.stripePriceId,
+  };
+}
 
 /**
  * List every published bundle for the current brand, ordered by most
@@ -49,8 +85,10 @@ export async function listPublishedBundles(): Promise<PublicBundle[]> {
       tagline: true,
       pageCount: true,
       pricePence: true,
+      pricePenceUsd: true,
       currency: true,
       stripePriceId: true,
+      stripePriceIdUsd: true,
       listingHeroUrl: true,
       listingPageGrid1Url: true,
       listingPageGrid2Url: true,
@@ -81,8 +119,10 @@ export async function getPublishedBundle(
       tagline: true,
       pageCount: true,
       pricePence: true,
+      pricePenceUsd: true,
       currency: true,
       stripePriceId: true,
+      stripePriceIdUsd: true,
       listingHeroUrl: true,
       listingPageGrid1Url: true,
       listingPageGrid2Url: true,
@@ -115,8 +155,10 @@ export async function getBundleForAdminPreview(
       tagline: true,
       pageCount: true,
       pricePence: true,
+      pricePenceUsd: true,
       currency: true,
       stripePriceId: true,
+      stripePriceIdUsd: true,
       listingHeroUrl: true,
       listingPageGrid1Url: true,
       listingPageGrid2Url: true,

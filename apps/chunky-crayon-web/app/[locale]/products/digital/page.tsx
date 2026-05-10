@@ -14,11 +14,14 @@ import {
 import {
   listPublishedBundles,
   listingImagesForBundle,
+  pickBundlePrice,
 } from '@/app/data/bundle';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import CrayonScribble from '@/components/Intro/CrayonScribble';
 import { checkFeatureFlag } from '@/flags';
+import { getCurrencyForRequest } from '@/lib/currency.server';
+import { CURRENCY_SYMBOL } from '@/lib/currency';
 
 type DigitalProductsIndexProps = {
   params: Promise<{ locale: string }>;
@@ -118,7 +121,10 @@ const DigitalProductsGrid = async ({
   const enabled = await checkFeatureFlag('bundles-shop');
   if (!enabled) notFound();
 
-  const bundles = await listPublishedBundles();
+  const [bundles, currency] = await Promise.all([
+    listPublishedBundles(),
+    getCurrencyForRequest(),
+  ]);
 
   return (
     <>
@@ -154,10 +160,19 @@ const DigitalProductsGrid = async ({
             {bundles.map((bundle, idx) => {
               const hero = listingImagesForBundle(bundle)[0];
               const accent = CARD_ACCENTS[idx % CARD_ACCENTS.length];
+              const localized = pickBundlePrice(bundle, currency);
               return (
                 <BundleCard
                   key={bundle.id}
-                  bundle={bundle}
+                  bundle={{
+                    id: bundle.id,
+                    slug: bundle.slug,
+                    name: bundle.name,
+                    tagline: bundle.tagline,
+                    pageCount: bundle.pageCount,
+                    pricePence: localized.pricePence,
+                    currency: localized.currency,
+                  }}
                   hero={hero}
                   accent={accent}
                   locale={locale}
@@ -273,18 +288,10 @@ const BundleCard = ({ bundle, hero, accent, locale }: BundleCardProps) => {
         )}
         <div className="mt-3 flex items-center justify-between">
           <span className={`font-tondo text-xl font-bold ${accent.price}`}>
-            {(() => {
-              const cur = bundle.currency.toUpperCase();
-              const symbol =
-                cur === 'GBP'
-                  ? '£'
-                  : cur === 'USD'
-                    ? '$'
-                    : cur === 'EUR'
-                      ? '€'
-                      : '';
-              return `${symbol}${(bundle.pricePence / 100).toFixed(2)}`;
-            })()}
+            {bundle.currency === 'usd'
+              ? CURRENCY_SYMBOL.USD
+              : CURRENCY_SYMBOL.GBP}
+            {(bundle.pricePence / 100).toFixed(2)}
           </span>
           <span className="text-xs text-text-secondary font-rooney-sans uppercase tracking-wide">
             {bundle.pageCount} pages

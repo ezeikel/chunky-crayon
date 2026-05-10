@@ -11,6 +11,7 @@ import {
   readClientMatchData,
   sendInitiateCheckoutConversionEvents,
 } from '@/lib/conversion-api';
+import { getCurrencyForRequest } from '@/lib/currency.server';
 
 /**
  * Create a Stripe Checkout Session for buying a bundle. One-time payment,
@@ -34,17 +35,22 @@ export const createBundleCheckoutSession = async (
   const headersList = await headers();
   const origin = headersList.get('origin');
 
-  const bundle = await db.bundle.findUnique({
-    where: { slug: bundleSlug },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      pricePence: true,
-      stripePriceId: true,
-      published: true,
-    },
-  });
+  const [bundle, visitorCurrency] = await Promise.all([
+    db.bundle.findUnique({
+      where: { slug: bundleSlug },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        pricePence: true,
+        pricePenceUsd: true,
+        stripePriceId: true,
+        stripePriceIdUsd: true,
+        published: true,
+      },
+    }),
+    getCurrencyForRequest(),
+  ]);
 
   if (!bundle) {
     return { id: '', error: `Bundle not found: ${bundleSlug}` };
@@ -52,7 +58,22 @@ export const createBundleCheckoutSession = async (
   if (!bundle.published) {
     return { id: '', error: 'Bundle is not yet available for purchase.' };
   }
-  if (!bundle.stripePriceId) {
+
+  // Pick GBP vs USD price for the visitor. Falls back to GBP if the
+  // bundle has no USD twin so a US visitor can still buy (just in GBP).
+  const useUsd =
+    visitorCurrency === 'USD' &&
+    bundle.pricePenceUsd != null &&
+    bundle.stripePriceIdUsd != null;
+  const checkoutPriceId = useUsd
+    ? bundle.stripePriceIdUsd
+    : bundle.stripePriceId;
+  const checkoutPricePence = useUsd
+    ? (bundle.pricePenceUsd as number)
+    : bundle.pricePence;
+  const checkoutCurrency = useUsd ? 'USD' : 'GBP';
+
+  if (!checkoutPriceId) {
     return {
       id: '',
       error:
@@ -87,7 +108,7 @@ export const createBundleCheckoutSession = async (
 
   const sessionOptions: Stripe.Checkout.SessionCreateParams = {
     payment_method_types: ['card'],
-    line_items: [{ price: bundle.stripePriceId, quantity: 1 }],
+    line_items: [{ price: checkoutPriceId, quantity: 1 }],
     mode: 'payment',
     // Always create a Stripe customer so the webhook can resolve guest
     // checkouts back to a User row by email.
@@ -129,8 +150,10 @@ export const createBundleCheckoutSession = async (
   sendInitiateCheckoutConversionEvents({
     ...(user?.email && { email: user.email }),
     ...(userId && { userId }),
-    value: stripeSession.amount_total ?? bundle.pricePence,
-    currency: (stripeSession.currency ?? 'gbp').toUpperCase(),
+    value: stripeSession.amount_total ?? checkoutPricePence,
+    currency: (
+      stripeSession.currency ?? checkoutCurrency.toLowerCase()
+    ).toUpperCase(),
     eventId: checkoutEventId,
     contentName: `${bundle.name} Bundle`,
     ...matchData,
