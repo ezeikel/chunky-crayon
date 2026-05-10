@@ -62,11 +62,16 @@ console.log(`[backfill-prod]   DB host: ${host}`);
 console.log(`[backfill-prod]   R2 bucket: ${bucket}`);
 console.log(`[backfill-prod] Continuing in 3 seconds (Ctrl+C to abort)...\n`);
 
-await new Promise((r) => setTimeout(r, 3000));
-
 // Strip our wrapper-only flag from argv so the underlying script's parser
 // doesn't choke on it.
 process.argv = process.argv.filter((a) => !a.startsWith('--prod-env-file='));
 
-// Dynamic import — ALL the env-reading happens after this line.
-await import('./backfill-region-stores');
+// IIFE because tsx still compiles to CJS where top-level await isn't allowed.
+(async () => {
+  await new Promise((r) => setTimeout(r, 3000));
+  // Dynamic import — ALL the env-reading happens after this line.
+  await import('./backfill-region-stores');
+})().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

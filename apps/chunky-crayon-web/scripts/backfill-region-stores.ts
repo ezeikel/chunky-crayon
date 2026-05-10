@@ -76,6 +76,10 @@ function parseArgs(argv: string[]): Args {
       args.id = arg.slice('--id='.length);
     } else if (arg.startsWith('--bundle=')) {
       args.bundleSlug = arg.slice('--bundle='.length);
+    } else if (!arg.startsWith('--')) {
+      // Non-flag positional (e.g. `dotenv_config_path=.env.local` consumed
+      // by `-r dotenv/config`). Silently ignore.
+      continue;
     } else {
       console.error(`Unknown argument: ${arg}`);
       process.exit(1);
