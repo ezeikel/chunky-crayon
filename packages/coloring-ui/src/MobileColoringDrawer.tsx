@@ -23,6 +23,7 @@ import {
   faIceCream,
   faDice,
 } from "@fortawesome/pro-duotone-svg-icons";
+import { faHandPointer } from "@fortawesome/pro-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CanvasAction, useColoringContext } from "./context";
 import {
@@ -210,6 +211,15 @@ const MobileColoringDrawer = ({
   // force-snap again; the user is in control.
   const hasAutoSnappedRef = useRef(false);
 
+  // First-visit-only pulsing hand on the drag handle. Same vocabulary as
+  // the canvas TapPromptOverlay — pulsing orange ring around faHandPointer
+  // — so the page reads as one consistent "this is interactive" language.
+  // Dismisses on first drag or click of the handle, persisted via
+  // localStorage so it never reappears on subsequent visits. Starts off
+  // and flips on after the localStorage check on mount to avoid a flash
+  // for repeat visitors.
+  const [showHandleHint, setShowHandleHint] = useState(false);
+
   // Spring config — feels good already, keep as-is.
   const springConfig = {
     type: "spring" as const,
@@ -256,6 +266,9 @@ const MobileColoringDrawer = ({
     _: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo,
   ) => {
+    // First drag dismisses the pulsing-hand hint — once they've grabbed
+    // the handle, the affordance has done its job.
+    dismissHandleHint();
     // Dragging up (negative delta.y) grows the sheet.
     const currentHeight = height.get();
     const newHeight = Math.max(
@@ -275,6 +288,7 @@ const MobileColoringDrawer = ({
   // Tap on the handle cycles peek → half → full → peek so non-draggers
   // (mouse, accessibility) can still reach every state.
   const handleToggle = () => {
+    dismissHandleHint();
     snapTo(((currentSnap + 1) % 3) as SnapIndex);
   };
 
@@ -295,6 +309,31 @@ const MobileColoringDrawer = ({
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Handle hint visibility — first visit only. Same vocabulary as the
+  // canvas tap prompt so the page reads as one consistent affordance
+  // language. Skipped if the user has already interacted with the
+  // handle on a prior visit.
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem("coloring-drawer-handle-hinted")) return;
+    } catch {
+      // Storage disabled — show the hint anyway, first interaction will
+      // still dismiss it for the session.
+    }
+    setShowHandleHint(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const dismissHandleHint = () => {
+    if (!showHandleHint) return;
+    setShowHandleHint(false);
+    try {
+      window.localStorage.setItem("coloring-drawer-handle-hinted", "1");
+    } catch {
+      // ignore
+    }
+  };
 
   // Show fill type selector when fill tool is active
   const showFillTypeSelector = activeTool === "fill";
@@ -453,6 +492,44 @@ const MobileColoringDrawer = ({
                   affordance than the old 12x1.5 hairline. */}
               <div className="w-14 h-[5px] rounded-full bg-coloring-surface-dark/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)]" />
             </motion.div>
+            {/* First-visit pulsing hand — same vocabulary as the canvas
+                TapPromptOverlay so the page reads as one consistent
+                "this is interactive" language. Rendered OUTSIDE the
+                drawer container because the container's overflow-hidden
+                (load-bearing for rounded-t-3xl corner masking during
+                animation) would clip a hint floating above the pill.
+                Anchored to the drawer's top edge via fixed positioning;
+                disappears on first interaction (drag or click) and is
+                persisted via localStorage. */}
+            {showHandleHint && (
+              <div
+                aria-hidden
+                className="pointer-events-none fixed left-0 right-0 z-50 flex justify-center"
+                style={{
+                  bottom: `calc(${snapPoints[0]}px - 8px)`,
+                }}
+              >
+                <div className="relative">
+                  <span
+                    className="absolute inset-0 rounded-full bg-crayon-orange/55 animate-ping"
+                    style={{ animationDuration: "1.6s" }}
+                  />
+                  <span
+                    className="absolute inset-0 rounded-full bg-crayon-orange/35 animate-ping"
+                    style={{
+                      animationDuration: "1.6s",
+                      animationDelay: "0.8s",
+                    }}
+                  />
+                  <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-crayon-orange shadow-btn-primary">
+                    <FontAwesomeIcon
+                      icon={faHandPointer}
+                      className="text-base text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Scrollable content area */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pb-4">
