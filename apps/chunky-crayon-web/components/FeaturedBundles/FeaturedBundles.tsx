@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faShoppingBag } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faArrowRight,
+  faShoppingBag,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { listPublishedBundles, type PublicBundle } from '@/app/data/bundle';
-import CrayonScribble from '@/components/Intro/CrayonScribble';
 import { checkFeatureFlag } from '@/flags';
 
 type FeaturedBundlesProps = {
@@ -36,12 +38,8 @@ const FeaturedBundles = async ({ locale }: FeaturedBundlesProps) => {
     <section className="w-full">
       {/* Section Header */}
       <div className="text-center mb-8 lg:mb-10">
-        <h2 className="font-tondo text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary relative inline-block">
+        <h2 className="font-tondo text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary">
           Shop Coloring Bundles
-          <CrayonScribble
-            seed={99}
-            className="absolute -bottom-1.5 left-0 w-full h-2.5 text-crayon-pink/60"
-          />
         </h2>
         <p className="mt-4 text-text-secondary font-rooney-sans max-w-lg mx-auto">
           Themed 10-page coloring sets with recurring characters. Print at home

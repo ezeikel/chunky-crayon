@@ -72,6 +72,7 @@ const HomePageWithColoState = async ({
   emailSignup,
   demo,
   latestComicStrip,
+  featuredBundles,
 }: {
   searchParams: Promise<ColoringImageSearchParams>;
   form: React.ReactNode;

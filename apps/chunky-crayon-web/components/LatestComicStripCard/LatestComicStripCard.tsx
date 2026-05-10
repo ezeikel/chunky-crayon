@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cacheLife, cacheTag } from 'next/cache';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faComment, faChevronRight } from '@fortawesome/pro-duotone-svg-icons';
+import { faArrowRight, faComment } from '@fortawesome/pro-duotone-svg-icons';
 import { db } from '@one-colored-pixel/db';
 
 type LatestStrip = {
@@ -43,11 +43,9 @@ const formatTheme = (theme: string): string =>
     .join(' ');
 
 /**
- * Server-rendered card surfacing the most recent posted comic strip on
- * the home page. Renders nothing if no strip has been posted yet.
- *
- * Designed as a compact teaser — smaller visual footprint since it appears
- * lower on the page after conversion-focused sections.
+ * Server-rendered section surfacing the most recent posted comic strip on
+ * the home page. Mirrors the FeaturedBundles section structure so both
+ * read as peer content lanes.
  *
  * Cache: shares the comics-list tag, so revalidating after a new post
  * also refreshes this card. cacheLife('comics-list') = 6h revalidate.
@@ -57,69 +55,76 @@ const LatestComicStripCard = async () => {
   if (!strip) return null;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      {/* Section label */}
-      <p className="text-center text-sm font-mono uppercase tracking-wide text-text-tertiary mb-3">
-        Latest Comic Strip
-      </p>
+    <section className="w-full">
+      {/* Section Header */}
+      <div className="text-center mb-8 lg:mb-10">
+        <h2 className="font-tondo text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary">
+          This Week's Comic Strip
+        </h2>
+        <p className="mt-4 text-text-secondary font-rooney-sans max-w-lg mx-auto">
+          Four panels of crayon-cast adventures, fresh every Sunday. Read,
+          laugh, then color the cast in.
+        </p>
+      </div>
 
-      <Link
-        href={`/comics/${strip.slug}`}
-        className="group flex items-center gap-4 rounded-2xl overflow-hidden border border-paper-cream-dark bg-white hover:border-crayon-teal/50 transition-all hover:shadow-sm px-4 py-3"
-      >
-        {/* Smaller thumbnail */}
-        <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-paper-cream rounded-xl relative overflow-hidden">
-          <Image
-            src={strip.assembledUrl}
-            alt={strip.title}
-            fill
-            sizes="80px"
-            className="object-cover"
-            unoptimized
-          />
-        </div>
-
-        {/* Compact content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <FontAwesomeIcon
-              icon={faComment}
-              size="sm"
-              style={
-                {
-                  '--fa-primary-color': 'hsl(var(--crayon-teal))',
-                  '--fa-secondary-color': 'hsl(var(--crayon-orange))',
-                  '--fa-secondary-opacity': '0.8',
-                } as React.CSSProperties
-              }
+      {/* Hero Card */}
+      <div className="max-w-2xl mx-auto">
+        <Link
+          href={`/comics/${strip.slug}`}
+          className="group block rounded-2xl overflow-hidden border-2 border-paper-cream-dark bg-white hover:border-crayon-teal/50 hover:shadow-card-hover hover:-translate-y-1 transition-all"
+        >
+          {/* Image */}
+          <div className="aspect-square bg-paper-cream relative overflow-hidden">
+            <Image
+              src={strip.assembledUrl}
+              alt={strip.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 672px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              unoptimized
             />
-            <span className="text-xs text-text-tertiary">
-              {formatTheme(strip.theme)}
-            </span>
           </div>
-          <h3 className="font-tondo font-bold text-base sm:text-lg text-text-primary group-hover:text-crayon-teal transition-colors line-clamp-1">
-            {strip.title}
-          </h3>
-        </div>
 
-        {/* Arrow indicator */}
-        <FontAwesomeIcon
-          icon={faChevronRight}
-          className="text-text-tertiary group-hover:text-crayon-teal group-hover:translate-x-0.5 transition-all flex-shrink-0"
-          size="sm"
-        />
-      </Link>
+          {/* Content */}
+          <div className="p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <FontAwesomeIcon
+                icon={faComment}
+                size="sm"
+                style={
+                  {
+                    '--fa-primary-color': 'hsl(var(--crayon-teal))',
+                    '--fa-secondary-color': 'hsl(var(--crayon-orange))',
+                    '--fa-secondary-opacity': '0.8',
+                  } as React.CSSProperties
+                }
+              />
+              <span className="text-xs font-rooney-sans uppercase tracking-wide text-text-tertiary">
+                {formatTheme(strip.theme)}
+              </span>
+            </div>
+            <h3 className="font-tondo font-bold text-xl text-text-primary group-hover:text-crayon-teal transition-colors line-clamp-1">
+              {strip.title}
+            </h3>
+          </div>
+        </Link>
+      </div>
 
-      {/* View all link */}
-      <p className="text-center mt-3">
+      {/* View All Link */}
+      <div className="text-center mt-8">
         <Link
           href="/comics"
-          className="text-sm font-rooney-sans text-text-secondary hover:text-crayon-teal transition-colors"
+          className="inline-flex items-center gap-2 font-tondo font-bold text-crayon-teal hover:text-crayon-teal-dark transition-colors group"
         >
-          See all comics
+          See All Comics
+          <FontAwesomeIcon
+            icon={faArrowRight}
+            size="sm"
+            className="transition-transform group-hover:translate-x-0.5"
+          />
         </Link>
-      </p>
-    </div>
+      </div>
+    </section>
   );
 };
 
