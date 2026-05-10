@@ -12,6 +12,7 @@ import {
   TRACKING_EVENTS,
   type CreditPack,
 } from '@/constants';
+import { type Currency, DEFAULT_CURRENCY } from '@/lib/currency';
 import { trackEvent } from '@/utils/analytics-client';
 import { trackInitiateCheckout } from '@/utils/pixels';
 import { createCheckoutSession } from '@/app/actions/stripe';
@@ -33,9 +34,13 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
 
 type ColorAsYouGoClientProps = {
   isLoggedIn: boolean;
+  currency?: Currency;
 };
 
-const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
+const ColorAsYouGoClient = ({
+  isLoggedIn,
+  currency = DEFAULT_CURRENCY,
+}: ColorAsYouGoClientProps) => {
   const t = useTranslations('colorAsYouGo');
   const tErrors = useTranslations('errors');
   const router = useRouter();
@@ -48,6 +53,7 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
   }, [isLoggedIn]);
 
   const handlePurchase = async (pack: CreditPack) => {
+    const priceEntry = pack.prices[currency];
     setLoadingPack(pack.key);
 
     trackEvent(TRACKING_EVENTS.COLOR_AS_YOU_GO_PACK_CLICKED, {
@@ -56,19 +62,19 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
         | 'PUBLIC_CREDITS_200'
         | 'PUBLIC_CREDITS_500',
       credits: pack.credits,
-      price: pack.price,
+      price: priceEntry.display,
     });
 
     // Meta-only InitiateCheckout (Pinterest's `checkout` is the
     // Purchase fire). Generate eventId here and pass to
     // createCheckoutSession so the server CAPI fire dedups.
-    const priceInPence = Math.round(
-      parseFloat(pack.price.replace(/[^0-9.]/g, '')) * 100,
+    const priceInMinorUnits = Math.round(
+      parseFloat(priceEntry.display.replace(/[^0-9.]/g, '')) * 100,
     );
     const initiateCheckoutEventId = crypto.randomUUID();
     trackInitiateCheckout({
-      value: priceInPence,
-      currency: 'GBP',
+      value: priceInMinorUnits,
+      currency,
       productType: 'credits',
       creditAmount: pack.credits,
       eventId: initiateCheckoutEventId,
@@ -79,7 +85,7 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
       if (!stripe) throw new Error('Stripe failed to load');
 
       const session = await createCheckoutSession(
-        pack.stripePriceEnv,
+        priceEntry.stripePriceEnv,
         'payment',
         '/color-as-you-go',
         initiateCheckoutEventId,
@@ -144,7 +150,7 @@ const ColorAsYouGoClient = ({ isLoggedIn }: ColorAsYouGoClientProps) => {
                   <CardDescription className="mt-4 text-center">
                     <span className="block">
                       <span className="text-3xl font-tondo font-bold text-text-primary">
-                        {pack.price}
+                        {pack.prices[currency].display}
                       </span>
                     </span>
                     <span className="block mt-1 text-sm text-text-secondary">

@@ -12,6 +12,7 @@ import {
   CREDIT_PACKS_MEMBER,
   TRACKING_EVENTS,
 } from '@/constants';
+import { type Currency, DEFAULT_CURRENCY } from '@/lib/currency';
 import { trackEvent } from '@/utils/analytics-client';
 import {
   Card,
@@ -61,9 +62,10 @@ type BillingProps = {
       };
     };
   }>;
+  currency?: Currency;
 };
 
-const Billing = ({ user }: BillingProps) => {
+const Billing = ({ user, currency = DEFAULT_CURRENCY }: BillingProps) => {
   const t = useTranslations('billing');
   const tPricing = useTranslations('pricing');
   const [loadingPlan, setLoadingPlan] = useState<PlanName | null>(null);
@@ -130,11 +132,12 @@ const Billing = ({ user }: BillingProps) => {
     // the same value to createCheckoutSession so the server CAPI fire
     // deduplicates against this client fire (Meta would otherwise
     // double-count InitiateCheckout).
-    const priceInPence = parseInt(plan.price.replace(/[^0-9]/g, ''), 10) * 100;
+    const priceInMinorUnits =
+      parseInt(plan.price.replace(/[^0-9]/g, ''), 10) * 100;
     const initiateCheckoutEventId = crypto.randomUUID();
     trackInitiateCheckout({
-      value: priceInPence,
-      currency: 'GBP',
+      value: priceInMinorUnits,
+      currency,
       productType: 'subscription',
       planName: plan.planName,
       eventId: initiateCheckoutEventId,
@@ -194,11 +197,12 @@ const Billing = ({ user }: BillingProps) => {
     });
 
     // Meta-only InitiateCheckout — see handlePlanPurchase for rationale.
-    const priceInPence = parseInt(pack.price.replace(/[^0-9]/g, ''), 10) * 100;
+    const priceInMinorUnits =
+      parseInt(pack.price.replace(/[^0-9]/g, ''), 10) * 100;
     const initiateCheckoutEventId = crypto.randomUUID();
     trackInitiateCheckout({
-      value: priceInPence,
-      currency: 'GBP',
+      value: priceInMinorUnits,
+      currency,
       productType: 'credits',
       creditAmount: pack.credits,
       eventId: initiateCheckoutEventId,
@@ -331,30 +335,41 @@ const Billing = ({ user }: BillingProps) => {
             {t('buyMoreCredits')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {CREDIT_PACKS_MEMBER.map((pack) => (
-              <Card key={pack.name}>
-                <CardHeader>
-                  <CardTitle>{pack.name}</CardTitle>
-                  <CardDescription>
-                    {t('credits', { count: formatNumber(pack.credits) })}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-primary">
-                    {pack.price}
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full bg-orange hover:bg-orange/90 text-white"
-                    onClick={() => handleCreditPurchase(pack)}
-                    disabled={loadingCredits === pack.name}
-                  >
-                    {loadingCredits === pack.name ? t('loading') : t('buyNow')}
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+            {CREDIT_PACKS_MEMBER.map((pack) => {
+              const packPrice = pack.prices[currency];
+              return (
+                <Card key={pack.name}>
+                  <CardHeader>
+                    <CardTitle>{pack.name}</CardTitle>
+                    <CardDescription>
+                      {t('credits', { count: formatNumber(pack.credits) })}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold text-primary">
+                      {packPrice.display}
+                    </p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full bg-orange hover:bg-orange/90 text-white"
+                      onClick={() =>
+                        handleCreditPurchase({
+                          ...pack,
+                          price: packPrice.display,
+                          stripePriceEnv: packPrice.stripePriceEnv,
+                        })
+                      }
+                      disabled={loadingCredits === pack.name}
+                    >
+                      {loadingCredits === pack.name
+                        ? t('loading')
+                        : t('buyNow')}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })}
           </div>
         </section>
       )}
@@ -369,6 +384,7 @@ const Billing = ({ user }: BillingProps) => {
             const planTranslationKey = planKeyMap[plan.key];
             const planName = tPricing(`plans.${planTranslationKey}.name`);
             const planTagline = tPricing(`plans.${planTranslationKey}.tagline`);
+            const planPrice = plan.prices[currency];
 
             return (
               <Card
@@ -395,7 +411,7 @@ const Billing = ({ user }: BillingProps) => {
                     </span>
                   </CardTitle>
                   <CardDescription className="mt-2 text-lg font-bold text-primary">
-                    {plan.price}{' '}
+                    {planPrice.display}{' '}
                     <span className="text-sm font-normal text-muted-foreground">
                       {t('perMonth')}
                     </span>
@@ -425,12 +441,12 @@ const Billing = ({ user }: BillingProps) => {
                       hasActiveSubscription
                         ? handlePlanChange({
                             planName: plan.key,
-                            stripePriceEnv: plan.stripePriceEnv,
+                            stripePriceEnv: planPrice.stripePriceEnv,
                           })
                         : handlePurchase({
                             planName: plan.key,
-                            stripePriceEnv: plan.stripePriceEnv,
-                            price: plan.price,
+                            stripePriceEnv: planPrice.stripePriceEnv,
+                            price: planPrice.display,
                           })
                     }
                     disabled={

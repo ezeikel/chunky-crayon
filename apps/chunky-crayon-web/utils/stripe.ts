@@ -15,7 +15,10 @@ export {
   calculateDaysRemaining,
 };
 
-// App-specific Stripe config
+// App-specific Stripe config. Multi-currency: each plan registers a
+// (monthlyEnv, annualEnv) pair per supported currency. The webhook
+// resolves an incoming priceId to the right plan regardless of whether
+// the subscription was bought in GBP or USD.
 const stripeHelpers = createStripeHelpers({
   plans: [
     { name: PlanName.SPLASH, monthlyCredits: 250, rolloverCap: 0 },
@@ -24,30 +27,90 @@ const stripeHelpers = createStripeHelpers({
   ],
   priceEnvMappings: [
     {
-      monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY',
-      annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL',
       planName: PlanName.SPLASH,
+      currencies: [
+        {
+          monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY_GBP',
+          annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL_GBP',
+        },
+        {
+          monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY_USD',
+          annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL_USD',
+        },
+      ],
     },
     {
-      monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY',
-      annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL',
       planName: PlanName.RAINBOW,
+      currencies: [
+        {
+          monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY_GBP',
+          annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL_GBP',
+        },
+        {
+          monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY_USD',
+          annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL_USD',
+        },
+      ],
     },
     {
-      monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY',
-      annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL',
       planName: PlanName.SPARKLE,
+      currencies: [
+        {
+          monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY_GBP',
+          annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL_GBP',
+        },
+        {
+          monthlyEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY_USD',
+          annualEnv: 'NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL_USD',
+        },
+      ],
     },
   ],
   creditPacks: [
     // Member packs (subscriber-only, surfaced in /account/billing)
-    { env: 'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100', credits: 100 },
-    { env: 'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_500', credits: 500 },
-    { env: 'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000', credits: 1000 },
+    {
+      credits: 100,
+      envs: [
+        'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100_GBP',
+        'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100_USD',
+      ],
+    },
+    {
+      credits: 500,
+      envs: [
+        'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_500_GBP',
+        'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_500_USD',
+      ],
+    },
+    {
+      credits: 1000,
+      envs: [
+        'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000_GBP',
+        'NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000_USD',
+      ],
+    },
     // Color As You Go public packs (no subscription required)
-    { env: 'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_50', credits: 50 },
-    { env: 'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_200', credits: 200 },
-    { env: 'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_500', credits: 500 },
+    {
+      credits: 50,
+      envs: [
+        'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_50_GBP',
+        'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_50_USD',
+      ],
+    },
+    {
+      credits: 200,
+      envs: [
+        'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_200_GBP',
+        'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_200_USD',
+      ],
+    },
+    {
+      credits: 500,
+      envs: [
+        'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_500_GBP',
+        'NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_500_USD',
+      ],
+    },
   ],
 });
 

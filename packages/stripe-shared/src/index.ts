@@ -19,20 +19,47 @@ export type PlanConfig = {
   rolloverCap: number;
 };
 
-export type PriceEnvMapping = {
-  /** Env var name for monthly price ID */
+/**
+ * Single currency variant of a plan's monthly/annual env var pair.
+ * Used inside PriceEnvMapping.currencies for multi-currency setups.
+ */
+export type PriceEnvCurrencyVariant = {
+  /** Env var name for monthly price ID in this currency */
   monthlyEnv: string;
-  /** Env var name for annual price ID */
+  /** Env var name for annual price ID in this currency */
   annualEnv: string;
+};
+
+export type PriceEnvMapping = {
   /** Plan name this price maps to */
   planName: string;
+  /**
+   * Single-currency env vars (legacy / single-currency apps).
+   * If `currencies` is provided, these are ignored.
+   */
+  monthlyEnv?: string;
+  annualEnv?: string;
+  /**
+   * Multi-currency env vars. Each entry registers one currency's
+   * price IDs. `mapStripePriceToPlanName` walks all entries when
+   * resolving a Stripe priceId to a plan.
+   */
+  currencies?: PriceEnvCurrencyVariant[];
 };
 
 export type CreditPackMapping = {
-  /** Env var name for this credit pack's price ID */
-  env: string;
   /** Number of credits in the pack */
   credits: number;
+  /**
+   * Single-currency env var (legacy / single-currency apps).
+   * If `envs` is provided, this is ignored.
+   */
+  env?: string;
+  /**
+   * Multi-currency env vars. Each string is the env var name for one
+   * currency's Stripe price ID for this pack.
+   */
+  envs?: string[];
 };
 
 export type StripeAppConfig = {
@@ -101,18 +128,32 @@ export const calculateDaysRemaining = (currentPeriodEnd: Date): number => {
 /**
  * Create app-specific Stripe helpers from a plan configuration.
  *
- * @example
+ * @example Single-currency (legacy)
  * ```ts
- * const stripeHelpers = createStripeHelpers({
- *   plans: [
- *     { name: "SPLASH", monthlyCredits: 250, rolloverCap: 0 },
- *     { name: "RAINBOW", monthlyCredits: 500, rolloverCap: 500 },
- *   ],
+ * createStripeHelpers({
+ *   plans: [{ name: "GROVE", monthlyCredits: 250, rolloverCap: 0 }],
  *   priceEnvMappings: [
- *     { monthlyEnv: "NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY", annualEnv: "NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL", planName: "SPLASH" },
+ *     { planName: "GROVE", monthlyEnv: "STRIPE_PRICE_GROVE_MONTHLY", annualEnv: "STRIPE_PRICE_GROVE_ANNUAL" },
+ *   ],
+ *   creditPacks: [{ env: "STRIPE_PRICE_CREDITS_100", credits: 100 }],
+ * });
+ * ```
+ *
+ * @example Multi-currency
+ * ```ts
+ * createStripeHelpers({
+ *   plans: [{ name: "SPLASH", monthlyCredits: 250, rolloverCap: 0 }],
+ *   priceEnvMappings: [
+ *     {
+ *       planName: "SPLASH",
+ *       currencies: [
+ *         { monthlyEnv: "STRIPE_PRICE_SPLASH_MONTHLY_GBP", annualEnv: "STRIPE_PRICE_SPLASH_ANNUAL_GBP" },
+ *         { monthlyEnv: "STRIPE_PRICE_SPLASH_MONTHLY_USD", annualEnv: "STRIPE_PRICE_SPLASH_ANNUAL_USD" },
+ *       ],
+ *     },
  *   ],
  *   creditPacks: [
- *     { env: "NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100", credits: 100 },
+ *     { credits: 100, envs: ["STRIPE_PRICE_CREDITS_100_GBP", "STRIPE_PRICE_CREDITS_100_USD"] },
  *   ],
  * });
  * ```
@@ -128,20 +169,32 @@ export function createStripeHelpers(config: StripeAppConfig) {
 
   function mapStripePriceToPlanName(priceId: string): PriceMapping {
     for (const mapping of config.priceEnvMappings) {
-      const monthlyPriceId = process.env[mapping.monthlyEnv];
-      const annualPriceId = process.env[mapping.annualEnv];
+      // Multi-currency mappings have a `currencies` array of variants;
+      // legacy single-currency mappings use `monthlyEnv`/`annualEnv`
+      // directly. Normalize both into a single iterable so the match
+      // logic stays in one place.
+      const variants: PriceEnvCurrencyVariant[] = mapping.currencies?.length
+        ? mapping.currencies
+        : mapping.monthlyEnv && mapping.annualEnv
+          ? [{ monthlyEnv: mapping.monthlyEnv, annualEnv: mapping.annualEnv }]
+          : [];
 
-      if (priceId === monthlyPriceId) {
-        return {
-          planName: mapping.planName,
-          billingPeriod: "MONTHLY" as BillingPeriod,
-        };
-      }
-      if (priceId === annualPriceId) {
-        return {
-          planName: mapping.planName,
-          billingPeriod: "ANNUAL" as BillingPeriod,
-        };
+      for (const variant of variants) {
+        const monthlyPriceId = process.env[variant.monthlyEnv];
+        const annualPriceId = process.env[variant.annualEnv];
+
+        if (monthlyPriceId && priceId === monthlyPriceId) {
+          return {
+            planName: mapping.planName,
+            billingPeriod: "MONTHLY" as BillingPeriod,
+          };
+        }
+        if (annualPriceId && priceId === annualPriceId) {
+          return {
+            planName: mapping.planName,
+            billingPeriod: "ANNUAL" as BillingPeriod,
+          };
+        }
       }
     }
     throw new Error(`Unknown price ID: ${priceId}`);
@@ -158,8 +211,13 @@ export function createStripeHelpers(config: StripeAppConfig) {
   function getCreditAmountFromPriceId(priceId?: string): number | null {
     if (!priceId) return null;
     for (const pack of config.creditPacks) {
-      if (priceId === process.env[pack.env]) {
-        return pack.credits;
+      // Multi-currency packs use `envs` (array); legacy single-currency
+      // packs use `env`. Walk whichever is provided.
+      const envs = pack.envs?.length ? pack.envs : pack.env ? [pack.env] : [];
+      for (const env of envs) {
+        if (priceId === process.env[env]) {
+          return pack.credits;
+        }
       }
     }
     return null;

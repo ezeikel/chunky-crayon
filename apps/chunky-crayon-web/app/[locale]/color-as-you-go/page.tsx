@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { getCurrentUser } from '@/app/actions/user';
+import { getCurrencyForRequest } from '@/lib/currency.server';
 import Loading from '@/components/Loading/Loading';
 import { SubscriptionStatus } from '@one-colored-pixel/db/types';
 import ColorAsYouGoClient from './ColorAsYouGoClient';
@@ -11,7 +12,11 @@ import ColorAsYouGoClient from './ColorAsYouGoClient';
 // getCurrentUser() at page level blocks the prerender (it reads the
 // auth cookie). Pushing it into a Suspense-bounded child keeps the
 // page prerenderable; only the user-specific branch is dynamic.
-const ColorAsYouGoPage = () => {
+type ColorAsYouGoPageProps = {
+  searchParams: Promise<{ currency?: string }>;
+};
+
+const ColorAsYouGoPage = ({ searchParams }: ColorAsYouGoPageProps) => {
   return (
     <Suspense
       fallback={
@@ -20,13 +25,21 @@ const ColorAsYouGoPage = () => {
         </div>
       }
     >
-      <ColorAsYouGoGate />
+      <ColorAsYouGoGate searchParams={searchParams} />
     </Suspense>
   );
 };
 
-const ColorAsYouGoGate = async () => {
-  const user = await getCurrentUser();
+const ColorAsYouGoGate = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ currency?: string }>;
+}) => {
+  const search = await searchParams;
+  const [user, currency] = await Promise.all([
+    getCurrentUser(),
+    getCurrencyForRequest(search.currency),
+  ]);
 
   const isSubscriber = user?.subscriptions?.some(
     (sub) => sub.status === SubscriptionStatus.ACTIVE,
@@ -38,7 +51,7 @@ const ColorAsYouGoGate = async () => {
     redirect('/account/billing');
   }
 
-  return <ColorAsYouGoClient isLoggedIn={!!user} />;
+  return <ColorAsYouGoClient isLoggedIn={!!user} currency={currency} />;
 };
 
 export default ColorAsYouGoPage;

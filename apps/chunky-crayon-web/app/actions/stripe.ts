@@ -144,11 +144,16 @@ export const createCheckoutSession = async (
   //      collects email at checkout, webhook finds-or-creates the User
   //      row from session.customer.
   // Anything else (e.g. an unknown priceId) is rejected.
-  const isPublicPack = CREDIT_PACKS_PUBLIC.some(
-    (pack) => pack.stripePriceEnv === priceId,
+  // Match across all currencies — a USD or GBP priceId both qualify.
+  const isPublicPack = CREDIT_PACKS_PUBLIC.some((pack) =>
+    Object.values(pack.prices).some(
+      (entry) => entry.stripePriceEnv === priceId,
+    ),
   );
-  const isMemberPack = CREDIT_PACKS_MEMBER.some(
-    (pack) => pack.stripePriceEnv === priceId,
+  const isMemberPack = CREDIT_PACKS_MEMBER.some((pack) =>
+    Object.values(pack.prices).some(
+      (entry) => entry.stripePriceEnv === priceId,
+    ),
   );
   if (mode === 'payment') {
     if (isMemberPack) {

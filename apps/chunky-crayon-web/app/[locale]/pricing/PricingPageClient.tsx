@@ -23,6 +23,7 @@ import {
   SUBSCRIPTION_PLANS,
   TRACKING_EVENTS,
 } from '@/constants';
+import { type Currency, DEFAULT_CURRENCY } from '@/lib/currency';
 import { trackEvent } from '@/utils/analytics-client';
 import {
   Card,
@@ -75,9 +76,13 @@ export type AdCampaignThumb = {
 
 type PricingPageClientProps = {
   adImages?: AdCampaignThumb[];
+  currency?: Currency;
 };
 
-const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
+const PricingPageClient = ({
+  adImages = [],
+  currency = DEFAULT_CURRENCY,
+}: PricingPageClientProps) => {
   const t = useTranslations('pricing');
   const tErrors = useTranslations('errors');
   const [interval, setInterval] = useState<PlanInterval>('monthly');
@@ -103,6 +108,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
   const handlePurchase = async (plan: (typeof plans)[0]) => {
     const planTranslationKey = planKeyMap[plan.key];
     const planName = t(`plans.${planTranslationKey}.name`);
+    const priceEntry = plan.prices[currency];
     setLoadingPlan(planName);
 
     // Type-safe PostHog event tracking
@@ -110,18 +116,19 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
       planName: plan.key,
       planInterval:
         interval === 'monthly' ? BillingPeriod.MONTHLY : BillingPeriod.ANNUAL,
-      price: plan.price,
+      price: priceEntry.display,
     });
 
     // Track checkout initiation for the Meta Pixel. Pinterest has no
     // distinct InitiateCheckout — its `checkout` event is the Purchase
     // fire. Generate the eventId here and pass to createCheckoutSession
     // so the server CAPI fire dedups against this client fire.
-    const priceInPence = parseInt(plan.price.replace(/[^0-9]/g, ''), 10) * 100;
+    const priceInMinorUnits =
+      parseInt(priceEntry.display.replace(/[^0-9]/g, ''), 10) * 100;
     const initiateCheckoutEventId = crypto.randomUUID();
     trackInitiateCheckout({
-      value: priceInPence,
-      currency: 'GBP',
+      value: priceInMinorUnits,
+      currency,
       productType: 'subscription',
       planName: plan.key,
       eventId: initiateCheckoutEventId,
@@ -136,7 +143,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
       }
 
       const session = await createCheckoutSession(
-        plan.stripePriceEnv,
+        priceEntry.stripePriceEnv,
         'subscription',
         undefined,
         initiateCheckoutEventId,
@@ -349,7 +356,7 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                     <span className="block">
                       <span className="relative inline-block">
                         <span className="relative z-10 text-3xl font-tondo font-bold text-text-primary">
-                          {plan.price}
+                          {plan.prices[currency].display}
                         </span>
                         {/* Hand-drawn underline behind the price.
                             Decorative; absolute-positioned so it doesn't
@@ -401,7 +408,9 @@ const PricingPageClient = ({ adImages = [] }: PricingPageClientProps) => {
                     {t('buyNow')}
                   </Button>
                   <span className="text-xs text-text-secondary text-center">
-                    {t('trialMicroCopy', { price: plan.price })}
+                    {t('trialMicroCopy', {
+                      price: plan.prices[currency].display,
+                    })}
                   </span>
                   <span className="text-sm text-text-secondary text-center mt-1">
                     {t('noCommitment')}
