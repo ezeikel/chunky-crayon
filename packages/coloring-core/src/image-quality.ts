@@ -26,19 +26,19 @@ export const IMAGE_QUALITY_TIERS: Record<ImageQuality, ImageQualityTier> = {
   low: {
     quality: "low",
     label: "Fast",
-    approxWait: "~10 seconds",
+    approxWait: "Ready before they get bored",
     description: "Quick page, ready in seconds.",
   },
   medium: {
     quality: "medium",
     label: "Better",
-    approxWait: "~1 minute",
+    approxWait: "A minute, and it'll look sharper",
     description: "More polish, still fast.",
   },
   high: {
     quality: "high",
     label: "Best",
-    approxWait: "~3 minutes",
+    approxWait: "Three minutes. Comes out gorgeous",
     description: "Full detail. Worth the wait.",
   },
 };
@@ -53,18 +53,23 @@ export const DEFAULT_QUALITY_FOR_FREE: ImageQuality = "low";
 export const DEFAULT_QUALITY_FOR_SUBSCRIBER: ImageQuality = "high";
 
 /**
- * Which quality tiers a given user can pick. Free + guest users are capped at
- * `medium`; `high` is a subscription perk. System-generated content (daily
- * cron, blog images, etc) is unconstrained — it just passes the quality it
- * wants directly to the provider.
+ * Which quality tiers a given user can pick. Currently every user can pick
+ * every tier — the speed/quality choice is the whole point of the picker, so
+ * we don't gate it. Subscription becomes a value perk elsewhere (more daily
+ * generations, sticker collections, etc.) rather than gating the speed knob.
+ *
+ * The arrays are still tier-keyed in case we ever want to gate, e.g. an
+ * "Insane" tier later. Today they're identical.
  */
 export const ALLOWED_QUALITY_FOR_GUEST: readonly ImageQuality[] = [
   "low",
   "medium",
+  "high",
 ];
 export const ALLOWED_QUALITY_FOR_FREE: readonly ImageQuality[] = [
   "low",
   "medium",
+  "high",
 ];
 export const ALLOWED_QUALITY_FOR_SUBSCRIBER: readonly ImageQuality[] = [
   "low",

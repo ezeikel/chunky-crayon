@@ -3,10 +3,8 @@
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import {
-  type ImageQuality,
-  resolveDefaultQuality,
-} from '@one-colored-pixel/coloring-core/image-quality';
+import { useFeatureFlagEnabled } from 'posthog-js/react';
+import { type ImageQuality } from '@one-colored-pixel/coloring-core/image-quality';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
@@ -59,15 +57,20 @@ const MultiModeForm = ({
   } = useUser();
   const { addCreation } = useRecentCreations();
 
-  // Quality tier — guests/free default to 'low' so cold paid traffic doesn't
-  // bounce on the 3-min wait that 'high' produces. Subscribers default to
-  // 'high' for the polished output they're paying for. The QualityPicker
-  // restores the user's last choice from localStorage on mount (provided
-  // their tier still allows it).
+  // Quality tier. UI generations always default to 'low' so cold paid traffic
+  // doesn't bounce on long generation waits — first real test confirmed
+  // 'low' produces a great-looking page in ~75s vs 200s+ for 'high'. System
+  // generations (cron, blog, ad assets, bundle pages) stay on 'high' since
+  // they don't go through this form.
+  //
+  // The picker is feature-flagged off (PostHog: 'quality-tier-picker'). Flip
+  // the flag on to expose the slider to a subset of users for A/B testing
+  // or to all users if real complaints about quality come in. Hidden today
+  // by default — the speed/quality choice is the kind of decision users
+  // shouldn't have to make at the moment they're trying to create.
   const isSubscriber = Boolean(hasActiveSubscription);
-  const [quality, setQuality] = useState<ImageQuality>(() =>
-    resolveDefaultQuality({ isSubscriber }),
-  );
+  const showQualityPicker = useFeatureFlagEnabled('quality-tier-picker');
+  const [quality, setQuality] = useState<ImageQuality>('low');
 
   /**
    * Common post-success bookkeeping: tracking, recents, gallery
@@ -246,14 +249,16 @@ const MultiModeForm = ({
         <ExamplePrompts location={location} />
       )}
 
-      {/* Quality tier picker — Fast/Better/Best. Free + guest users see
-          'Best' locked behind a subscription. Default is tier-appropriate
-          ('low' for free/guest so they don't bounce on the 3-min wait). */}
-      <QualityPicker
-        value={quality}
-        onChange={setQuality}
-        isSubscriber={isSubscriber}
-      />
+      {/* Quality tier picker — feature-flagged off. UI gens default to
+          'low' regardless. Re-enable the 'quality-tier-picker' flag in
+          PostHog to expose the slider. */}
+      {showQualityPicker && (
+        <QualityPicker
+          value={quality}
+          onChange={setQuality}
+          isSubscriber={isSubscriber}
+        />
+      )}
 
       {/* Shared bottom CTA — free-try chip + Create/auth fallback */}
       <FormCTA />
