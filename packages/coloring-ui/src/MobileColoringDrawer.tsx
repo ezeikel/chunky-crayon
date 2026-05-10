@@ -504,9 +504,14 @@ const MobileColoringDrawer = ({
             {showHandleHint && (
               <div
                 aria-hidden
-                className="pointer-events-none fixed left-0 right-0 z-50 flex justify-center"
+                className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center"
                 style={{
-                  bottom: `calc(${snapPoints[0]}px - 8px)`,
+                  // Lift roughly half the icon height above the drawer's
+                  // top edge so the body clears the rounded corner band
+                  // and the ping rings don't feel pinched. z-[60] keeps
+                  // it stacked above the drawer (z-50) instead of being
+                  // visually clipped by it.
+                  bottom: `calc(${snapPoints[0]}px - 22px)`,
                 }}
               >
                 <div className="relative">
