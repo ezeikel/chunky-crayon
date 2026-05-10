@@ -252,12 +252,39 @@ const MobileColoringDrawer = ({
     left: number;
     width: number;
   } | null>(null);
-  // Ref to the hint block + observed height. A ResizeObserver tracks
-  // the rendered hint height (which depends on label wrap, font, etc)
-  // so the hint can sit exactly N px above the handle regardless of
-  // the contents — no magic offsets that break when the label changes.
-  const hintRef = useRef<HTMLDivElement>(null);
+  // Hint block rendered height + the ResizeObserver wired via ref
+  // callback (not useEffect) so the observer attaches the moment the
+  // hint mounts — even when the mount is gated by handleRect, which
+  // arrives in a later render than showHandleHint and would otherwise
+  // miss a useEffect's stale-deps closure. The observer also tracks
+  // the *outer visual size* (offsetWidth/Height) which captures the
+  // animate-ping rings' scaled bounds, not just the bbox of the hand
+  // — that's what was making the hint appear to overlap even when the
+  // measured height looked correct.
   const [hintHeight, setHintHeight] = useState(0);
+  const observerRef = useRef<ResizeObserver | null>(null);
+  const hintRefCallback = (node: HTMLDivElement | null) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+    if (!node) {
+      setHintHeight(0);
+      return;
+    }
+    if (typeof ResizeObserver === "undefined") {
+      setHintHeight(node.offsetHeight);
+      return;
+    }
+    const ro = new ResizeObserver(() => {
+      setHintHeight(node.offsetHeight);
+    });
+    ro.observe(node);
+    observerRef.current = ro;
+    // Read once immediately so the first layout pass uses the real
+    // measurement rather than the bootstrap fallback.
+    setHintHeight(node.offsetHeight);
+  };
 
   // Spring config — feels good already, keep as-is.
   const springConfig = {
@@ -408,27 +435,6 @@ const MobileColoringDrawer = ({
   useMotionValueEvent(height, "change", () => {
     if (showHandleHint) updateHandleRect();
   });
-
-  // Measure the hint block's rendered height so we can position it
-  // pixel-precise above the handle (no magic constants — the hint and
-  // handle naturally avoid each other regardless of label length, font
-  // load, dynamic content). ResizeObserver fires both on initial paint
-  // and any subsequent layout change.
-  useEffect(() => {
-    if (!showHandleHint) return;
-    const node = hintRef.current;
-    if (!node || typeof ResizeObserver === "undefined") {
-      // Fallback: read once if RO is missing.
-      if (node) setHintHeight(node.getBoundingClientRect().height);
-      return;
-    }
-    const ro = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) setHintHeight(entry.contentRect.height);
-    });
-    ro.observe(node);
-    return () => ro.disconnect();
-  }, [showHandleHint, handleHintLabel]);
 
   // Show fill type selector when fill tool is active
   const showFillTypeSelector = activeTool === "fill";
@@ -922,28 +928,24 @@ const MobileColoringDrawer = ({
         typeof window !== "undefined" &&
         createPortal(
           // Anchored to the handle's actual viewport rect; ResizeObserver
-          // tracks the hint's rendered height so it sits a fixed 12px
-          // above the handle regardless of label length / font / dynamic
-          // content. translateX(-50%) only handles horizontal centring;
-          // the vertical position is computed from measured height to
-          // guarantee the hint and handle never overlap.
+          // (wired via ref callback) tracks the hint's rendered offset
+          // height so the bounding box sits a fixed 12px above the
+          // handle regardless of label length / font / dynamic content.
+          // hintHeight is set synchronously by the ref callback the
+          // moment the node mounts, so the first paint already has the
+          // real measurement — no bootstrap flash.
           <div
-            ref={hintRef}
+            ref={hintRefCallback}
             aria-hidden
             className="pointer-events-none fixed z-[60]"
             style={{
-              // Use translateY(-100%) until the ResizeObserver lands the
-              // first measurement, then switch to a precise top offset.
-              // This avoids the one-frame flash at the wrong position
-              // and avoids the dependency-staleness gotcha of comparing
-              // hintHeight === 0 inside the same render.
-              top:
-                hintHeight > 0
-                  ? handleRect.top - hintHeight - 12
-                  : handleRect.top - 12,
+              top: handleRect.top - hintHeight - 12,
               left: handleRect.left + handleRect.width / 2,
-              transform:
-                hintHeight > 0 ? "translateX(-50%)" : "translate(-50%, -100%)",
+              transform: "translateX(-50%)",
+              // Hide for the single frame between mount and the ref
+              // callback firing. setHintHeight in the callback runs
+              // synchronously, so this is at most one paint.
+              visibility: hintHeight > 0 ? "visible" : "hidden",
             }}
           >
             <div className="relative flex flex-col items-center gap-2">
@@ -952,13 +954,21 @@ const MobileColoringDrawer = ({
                   {handleHintLabel}
                 </span>
               )}
-              <div className="relative">
+              {/* Fixed 64x64 footprint sized to contain the
+                  fully-expanded animate-ping rings (which scale ~2x
+                  from a 36px base = ~72px peak; clamping at 64 looks
+                  identical because the ring is already nearly
+                  transparent at peak scale). This means the
+                  ResizeObserver on the outer hint sees the rings'
+                  extent, not just the hand bbox — so the gap above
+                  the handle stays correct even mid-pulse. */}
+              <div className="relative w-16 h-16 flex items-center justify-center">
                 <span
-                  className="absolute inset-0 rounded-full bg-crayon-orange/55 animate-ping"
+                  className="absolute w-9 h-9 rounded-full bg-crayon-orange/55 animate-ping"
                   style={{ animationDuration: "1.6s" }}
                 />
                 <span
-                  className="absolute inset-0 rounded-full bg-crayon-orange/35 animate-ping"
+                  className="absolute w-9 h-9 rounded-full bg-crayon-orange/35 animate-ping"
                   style={{
                     animationDuration: "1.6s",
                     animationDelay: "0.8s",
