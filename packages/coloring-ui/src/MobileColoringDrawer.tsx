@@ -240,51 +240,18 @@ const MobileColoringDrawer = ({
   // for repeat visitors.
   const [showHandleHint, setShowHandleHint] = useState(false);
 
-  // Ref to the drag handle DOM node + its tracked viewport rect. The
-  // hint renders via createPortal(document.body) so it can escape the
-  // drawer's overflow-hidden / stacking context — but that means we
-  // need to position it manually relative to the handle. Updated on
-  // mount, on window resize, and whenever the drawer height animates
-  // (so the hint follows when peek/half/full snap changes).
-  const handleRef = useRef<HTMLDivElement>(null);
-  const [handleRect, setHandleRect] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  } | null>(null);
-  // Hint block rendered height + the ResizeObserver wired via ref
-  // callback (not useEffect) so the observer attaches the moment the
-  // hint mounts — even when the mount is gated by handleRect, which
-  // arrives in a later render than showHandleHint and would otherwise
-  // miss a useEffect's stale-deps closure. The observer also tracks
-  // the *outer visual size* (offsetWidth/Height) which captures the
-  // animate-ping rings' scaled bounds, not just the bbox of the hand
-  // — that's what was making the hint appear to overlap even when the
-  // measured height looked correct.
-  const [hintHeight, setHintHeight] = useState(0);
-  const observerRef = useRef<ResizeObserver | null>(null);
-  const hintRefCallback = (node: HTMLDivElement | null) => {
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-      observerRef.current = null;
-    }
-    if (!node) {
-      setHintHeight(0);
-      return;
-    }
-    if (typeof ResizeObserver === "undefined") {
-      setHintHeight(node.offsetHeight);
-      return;
-    }
-    const ro = new ResizeObserver(() => {
-      setHintHeight(node.offsetHeight);
-    });
-    ro.observe(node);
-    observerRef.current = ro;
-    // Read once immediately so the first layout pass uses the real
-    // measurement rather than the bootstrap fallback.
-    setHintHeight(node.offsetHeight);
-  };
+  // Live drawer height tracked into React state so the hint can
+  // re-render its position on every framer animation tick. We can't use
+  // viewport-relative top measurements because iOS Safari's collapsing
+  // URL bar shifts visual viewport without firing resize — but the
+  // drawer is position:fixed bottom:0, so its top edge is exactly
+  // `drawerHeight` px from the visual viewport bottom. Anchoring the
+  // hint with `bottom: drawerHeight + gap` (also bottom-relative to
+  // visual viewport via position:fixed) means both elements move
+  // together when Safari's chrome collapses or expands.
+  const [drawerHeightLive, setDrawerHeightLive] = useState<number>(
+    snapPoints[0],
+  );
 
   // Spring config — feels good already, keep as-is.
   const springConfig = {
@@ -412,28 +379,13 @@ const MobileColoringDrawer = ({
     }
   };
 
-  // Keep the portal-rendered hint glued to the handle. The hint lives
-  // at document.body via createPortal (so it escapes the drawer's
-  // overflow-hidden) — that means we have to position it manually
-  // against the handle's actual rect. Recalc on:
-  //   - mount + when the hint becomes visible
-  //   - window resize / orientation change
-  //   - drawer height changes (peek -> half -> full snap animations)
-  // useMotionValueEvent handles the third case without polling.
-  const updateHandleRect = () => {
-    const node = handleRef.current;
-    if (!node) return;
-    const r = node.getBoundingClientRect();
-    setHandleRect({ top: r.top, left: r.left, width: r.width });
-  };
-  useEffect(() => {
-    if (!showHandleHint) return;
-    updateHandleRect();
-    window.addEventListener("resize", updateHandleRect);
-    return () => window.removeEventListener("resize", updateHandleRect);
-  }, [showHandleHint]);
-  useMotionValueEvent(height, "change", () => {
-    if (showHandleHint) updateHandleRect();
+  // Keep the live drawer height in React state so the hint's
+  // bottom-anchored position re-renders during framer height
+  // animations (peek -> half -> full snap). The framer motionValue
+  // itself updates the inline style on the drawer's motion.div, but
+  // we need a re-render to reposition the portal hint as well.
+  useMotionValueEvent(height, "change", (latest) => {
+    setDrawerHeightLive(latest);
   });
 
   // Show fill type selector when fill tool is active
@@ -571,7 +523,6 @@ const MobileColoringDrawer = ({
 
               {/* Drag handle - drag or click to toggle expanded/collapsed */}
               <motion.div
-                ref={handleRef}
                 role="button"
                 tabIndex={0}
                 className="flex items-center justify-center pt-3 pb-2 w-full cursor-grab active:cursor-grabbing touch-none select-none"
@@ -924,28 +875,25 @@ const MobileColoringDrawer = ({
         persisted via localStorage. SSR-safe via the typeof window check.
         */}
       {showHandleHint &&
-        handleRect &&
         typeof window !== "undefined" &&
         createPortal(
-          // Anchored to the handle's actual viewport rect; ResizeObserver
-          // (wired via ref callback) tracks the hint's rendered offset
-          // height so the bounding box sits a fixed 12px above the
-          // handle regardless of label length / font / dynamic content.
-          // hintHeight is set synchronously by the ref callback the
-          // moment the node mounts, so the first paint already has the
-          // real measurement — no bootstrap flash.
+          // Anchored to the visual viewport BOTTOM via position:fixed +
+          // bottom: (drawerHeight + gap). Crucially this avoids any
+          // viewport-top measurements — iOS Safari's collapsing URL
+          // bar shifts the visual viewport top without firing resize,
+          // so any approach that captures handle.top via
+          // getBoundingClientRect goes stale and the hint drifts to
+          // the middle of the canvas. The drawer itself is bottom:0,
+          // so anchoring to the same edge keeps the two locked
+          // together regardless of Safari chrome state.
+          //
+          // drawerHeightLive updates every framer tick so the hint
+          // smoothly tracks the snap animations (peek -> half -> full).
           <div
-            ref={hintRefCallback}
             aria-hidden
-            className="pointer-events-none fixed z-[60]"
+            className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center"
             style={{
-              top: handleRect.top - hintHeight - 12,
-              left: handleRect.left + handleRect.width / 2,
-              transform: "translateX(-50%)",
-              // Hide for the single frame between mount and the ref
-              // callback firing. setHintHeight in the callback runs
-              // synchronously, so this is at most one paint.
-              visibility: hintHeight > 0 ? "visible" : "hidden",
+              bottom: drawerHeightLive + 12,
             }}
           >
             <div className="relative flex flex-col items-center gap-2">
