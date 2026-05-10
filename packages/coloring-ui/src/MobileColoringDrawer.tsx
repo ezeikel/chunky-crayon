@@ -272,14 +272,10 @@ const MobileColoringDrawer = ({
     snapTo(nearestSnap(height.get(), info.velocity.y));
   };
 
-  // Tap on the handle jumps straight to full when collapsed (peek/half),
-  // and back to peek when already full. Cycling through three states
-  // felt like in-between-ness for no reason — a click means "show me
-  // everything" or "get out of the way." Dragging is still the way to
-  // land on the half state, which is where most coloring happens
-  // (palette + colors visible, canvas mostly unobscured).
+  // Tap on the handle cycles peek → half → full → peek so non-draggers
+  // (mouse, accessibility) can still reach every state.
   const handleToggle = () => {
-    snapTo(currentSnap === 2 ? 0 : 2);
+    snapTo(((currentSnap + 1) % 3) as SnapIndex);
   };
 
   // Once-on-mount bounce — handle floats up ~8px and back over 600ms
@@ -446,7 +442,11 @@ const MobileColoringDrawer = ({
                 }
               }}
               aria-label={
-                currentSnap === 2 ? "Collapse toolbar" : "Expand toolbar"
+                currentSnap === 0
+                  ? "Expand toolbar"
+                  : currentSnap === 2
+                    ? "Collapse toolbar"
+                    : "Expand toolbar more"
               }
             >
               {/* Bigger, slightly shadowed pill — clearer "drag me"
