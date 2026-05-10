@@ -20,6 +20,9 @@
     },
     "app/api/social/comic-strip-post/route.ts": {
       "maxDuration": 300
+    },
+    "app/api/cron/recover-stuck-content/route.ts": {
+      "maxDuration": 180
     }
   },
   "crons": [
@@ -64,6 +67,10 @@
       "schedule": "*/5 * * * *"
     },
     {
+      "path": "/api/cron/recover-stuck-content",
+      "schedule": "0 * * * *"
+    },
+    {
       "path": "/api/cron/regenerate-og",
       "schedule": "0 2 * * *"
     },
@@ -74,7 +81,7 @@
 
     {
       "path": "/api/social/demo-reel/produce-v2",
-      "schedule": "0 6 * * *"
+      "schedule": "0 5 * * *"
     },
 
     {
@@ -139,7 +146,7 @@
     },
     {
       "path": "/api/cron/comic-strip",
-      "schedule": "0 6 * * 0"
+      "schedule": "0 5 * * 0"
     },
     {
       "path": "/api/social/comic-strip-post?platform=facebook",
