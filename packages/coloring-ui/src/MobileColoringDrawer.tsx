@@ -252,6 +252,12 @@ const MobileColoringDrawer = ({
     left: number;
     width: number;
   } | null>(null);
+  // Ref to the hint block + observed height. A ResizeObserver tracks
+  // the rendered hint height (which depends on label wrap, font, etc)
+  // so the hint can sit exactly N px above the handle regardless of
+  // the contents — no magic offsets that break when the label changes.
+  const hintRef = useRef<HTMLDivElement>(null);
+  const [hintHeight, setHintHeight] = useState(0);
 
   // Spring config — feels good already, keep as-is.
   const springConfig = {
@@ -402,6 +408,27 @@ const MobileColoringDrawer = ({
   useMotionValueEvent(height, "change", () => {
     if (showHandleHint) updateHandleRect();
   });
+
+  // Measure the hint block's rendered height so we can position it
+  // pixel-precise above the handle (no magic constants — the hint and
+  // handle naturally avoid each other regardless of label length, font
+  // load, dynamic content). ResizeObserver fires both on initial paint
+  // and any subsequent layout change.
+  useEffect(() => {
+    if (!showHandleHint) return;
+    const node = hintRef.current;
+    if (!node || typeof ResizeObserver === "undefined") {
+      // Fallback: read once if RO is missing.
+      if (node) setHintHeight(node.getBoundingClientRect().height);
+      return;
+    }
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) setHintHeight(entry.contentRect.height);
+    });
+    ro.observe(node);
+    return () => ro.disconnect();
+  }, [showHandleHint, handleHintLabel]);
 
   // Show fill type selector when fill tool is active
   const showFillTypeSelector = activeTool === "fill";
@@ -894,21 +921,37 @@ const MobileColoringDrawer = ({
         handleRect &&
         typeof window !== "undefined" &&
         createPortal(
-          // Anchored to the handle's actual viewport rect, so the hint
-          // follows when the drawer animates between snap points or the
-          // window resizes. translate(-50%, -100%) sits the bottom of
-          // the block flush above the handle; the negative bottom margin
-          // adds an 8px gap.
+          // Anchored to the handle's actual viewport rect; ResizeObserver
+          // tracks the hint's rendered height so it sits a fixed 12px
+          // above the handle regardless of label length / font / dynamic
+          // content. translateX(-50%) only handles horizontal centring;
+          // the vertical position is computed from measured height to
+          // guarantee the hint and handle never overlap.
           <div
+            ref={hintRef}
             aria-hidden
             className="pointer-events-none fixed z-[60]"
             style={{
-              top: handleRect.top - 8,
+              // Use translateY(-100%) until the ResizeObserver lands the
+              // first measurement, then switch to a precise top offset.
+              // This avoids the one-frame flash at the wrong position
+              // and avoids the dependency-staleness gotcha of comparing
+              // hintHeight === 0 inside the same render.
+              top:
+                hintHeight > 0
+                  ? handleRect.top - hintHeight - 12
+                  : handleRect.top - 12,
               left: handleRect.left + handleRect.width / 2,
-              transform: "translate(-50%, -100%)",
+              transform:
+                hintHeight > 0 ? "translateX(-50%)" : "translate(-50%, -100%)",
             }}
           >
             <div className="relative flex flex-col items-center gap-2">
+              {handleHintLabel && (
+                <span className="font-tondo font-bold text-xs sm:text-sm text-coloring-text-primary bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-md border border-coloring-surface-dark whitespace-nowrap">
+                  {handleHintLabel}
+                </span>
+              )}
               <div className="relative">
                 <span
                   className="absolute inset-0 rounded-full bg-crayon-orange/55 animate-ping"
@@ -928,11 +971,6 @@ const MobileColoringDrawer = ({
                   />
                 </div>
               </div>
-              {handleHintLabel && (
-                <span className="font-tondo font-bold text-xs sm:text-sm text-coloring-text-primary bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-md border border-coloring-surface-dark whitespace-nowrap">
-                  {handleHintLabel}
-                </span>
-              )}
             </div>
           </div>,
           document.body,
