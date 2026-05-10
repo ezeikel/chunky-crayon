@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Drawer } from "vaul";
 import { motion, useMotionValue, animate, type PanInfo } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -448,410 +449,415 @@ const MobileColoringDrawer = ({
   // -------------------------------------------------------------------------
 
   return (
-    <Drawer.Root open modal={false} dismissible={false}>
-      <Drawer.Portal>
-        <Drawer.Content aria-describedby={undefined} asChild>
-          <motion.div
-            className={cn(
-              "fixed bottom-0 left-0 right-0 z-50 mx-2",
-              "flex flex-col overflow-hidden",
-              "bg-white rounded-t-3xl",
-              "border-2 border-b-0 border-coloring-surface-dark",
-              "shadow-[0_-4px_16px_rgba(0,0,0,0.15)]",
-              // Safe area padding for notched devices
-              "pb-safe",
-              className,
-            )}
-            style={{ height }}
-          >
-            {/* Accessible title - visually hidden */}
-            <Drawer.Title className="sr-only">Coloring Tools</Drawer.Title>
-
-            {/* Drag handle - drag or click to toggle expanded/collapsed */}
+    <>
+      <Drawer.Root open modal={false} dismissible={false}>
+        <Drawer.Portal>
+          <Drawer.Content aria-describedby={undefined} asChild>
             <motion.div
-              role="button"
-              tabIndex={0}
-              className="flex items-center justify-center pt-3 pb-2 w-full cursor-grab active:cursor-grabbing touch-none select-none"
-              onPan={handlePan}
-              onPanEnd={handlePanEnd}
-              onTap={handleToggle}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  handleToggle();
-                }
-              }}
-              aria-label={
-                currentSnap === 0
-                  ? "Expand toolbar"
-                  : currentSnap === 2
-                    ? "Collapse toolbar"
-                    : "Expand toolbar more"
-              }
+              className={cn(
+                "fixed bottom-0 left-0 right-0 z-50 mx-2",
+                "flex flex-col overflow-hidden",
+                "bg-white rounded-t-3xl",
+                "border-2 border-b-0 border-coloring-surface-dark",
+                "shadow-[0_-4px_16px_rgba(0,0,0,0.15)]",
+                // Safe area padding for notched devices
+                "pb-safe",
+                className,
+              )}
+              style={{ height }}
             >
-              {/* Bigger, slightly shadowed pill — clearer "drag me"
-                  affordance than the old 12x1.5 hairline. */}
-              <div className="w-14 h-[5px] rounded-full bg-coloring-surface-dark/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)]" />
-            </motion.div>
-            {/* First-visit pulsing hand — same vocabulary as the canvas
-                TapPromptOverlay so the page reads as one consistent
-                "this is interactive" language. Rendered OUTSIDE the
-                drawer container because the container's overflow-hidden
-                (load-bearing for rounded-t-3xl corner masking during
-                animation) would clip a hint floating above the pill.
-                Anchored to the drawer's top edge via fixed positioning;
-                disappears on first interaction (drag or click) and is
-                persisted via localStorage. */}
-            {showHandleHint && (
-              <div
-                aria-hidden
-                className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center"
-                style={{
-                  // Lift roughly half the icon height above the drawer's
-                  // top edge so the body clears the rounded corner band
-                  // and the ping rings don't feel pinched. z-[60] keeps
-                  // it stacked above the drawer (z-50) instead of being
-                  // visually clipped by it.
-                  bottom: `calc(${snapPoints[0]}px - 22px)`,
-                }}
-              >
-                <div className="relative">
-                  <span
-                    className="absolute inset-0 rounded-full bg-crayon-orange/55 animate-ping"
-                    style={{ animationDuration: "1.6s" }}
-                  />
-                  <span
-                    className="absolute inset-0 rounded-full bg-crayon-orange/35 animate-ping"
-                    style={{
-                      animationDuration: "1.6s",
-                      animationDelay: "0.8s",
-                    }}
-                  />
-                  <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-crayon-orange shadow-btn-primary">
-                    <FontAwesomeIcon
-                      icon={faHandPointer}
-                      className="text-base text-white"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+              {/* Accessible title - visually hidden */}
+              <Drawer.Title className="sr-only">Coloring Tools</Drawer.Title>
 
-            {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pb-4">
-              {/* Tools — icon-only chunky-card grid, matching desktop sidebar */}
-              <div className="mb-4">
-                <div className="grid grid-cols-5 gap-2">
-                  {tools.map((tool) => {
-                    const isActive = isToolActive(tool.id);
-                    if (tool.isMagic) {
-                      // Magic tools — purple→pink gradient background + sparkle
-                      // decoration, mirroring desktop.
+              {/* Drag handle - drag or click to toggle expanded/collapsed */}
+              <motion.div
+                role="button"
+                tabIndex={0}
+                className="flex items-center justify-center pt-3 pb-2 w-full cursor-grab active:cursor-grabbing touch-none select-none"
+                onPan={handlePan}
+                onPanEnd={handlePanEnd}
+                onTap={handleToggle}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleToggle();
+                  }
+                }}
+                aria-label={
+                  currentSnap === 0
+                    ? "Expand toolbar"
+                    : currentSnap === 2
+                      ? "Collapse toolbar"
+                      : "Expand toolbar more"
+                }
+              >
+                {/* Bigger, slightly shadowed pill — clearer "drag me"
+                  affordance than the old 12x1.5 hairline. */}
+                <div className="w-14 h-[5px] rounded-full bg-coloring-surface-dark/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)]" />
+              </motion.div>
+
+              {/* Scrollable content area */}
+              <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pb-4">
+                {/* Tools — icon-only chunky-card grid, matching desktop sidebar */}
+                <div className="mb-4">
+                  <div className="grid grid-cols-5 gap-2">
+                    {tools.map((tool) => {
+                      const isActive = isToolActive(tool.id);
+                      if (tool.isMagic) {
+                        // Magic tools — purple→pink gradient background + sparkle
+                        // decoration, mirroring desktop.
+                        return (
+                          <button
+                            key={tool.id}
+                            type="button"
+                            onClick={() => handleToolSelect(tool.id)}
+                            className={cn(
+                              "relative aspect-square w-full rounded-coloring-card",
+                              "flex items-center justify-center",
+                              "transition-all duration-coloring-base ease-coloring active:scale-95",
+                              isActive
+                                ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
+                                : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
+                            )}
+                            aria-label={tool.label}
+                            aria-pressed={isActive}
+                          >
+                            <FontAwesomeIcon icon={tool.icon} size="xl" />
+                            <FontAwesomeIcon
+                              icon={faSparkles}
+                              size="lg"
+                              aria-hidden
+                              className={cn(
+                                "absolute -top-2 -right-2 drop-shadow-sm",
+                                isActive
+                                  ? "text-white"
+                                  : "text-coloring-magic-from",
+                              )}
+                            />
+                          </button>
+                        );
+                      }
                       return (
                         <button
                           key={tool.id}
                           type="button"
                           onClick={() => handleToolSelect(tool.id)}
                           className={cn(
-                            "relative aspect-square w-full rounded-coloring-card",
+                            "aspect-square w-full rounded-coloring-card border-2",
                             "flex items-center justify-center",
-                            "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            isActive
-                              ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
-                              : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
-                          )}
-                          aria-label={tool.label}
-                          aria-pressed={isActive}
-                        >
-                          <FontAwesomeIcon icon={tool.icon} size="xl" />
-                          <FontAwesomeIcon
-                            icon={faSparkles}
-                            size="lg"
-                            aria-hidden
-                            className={cn(
-                              "absolute -top-2 -right-2 drop-shadow-sm",
-                              isActive
-                                ? "text-white"
-                                : "text-coloring-magic-from",
-                            )}
-                          />
-                        </button>
-                      );
-                    }
-                    return (
-                      <button
-                        key={tool.id}
-                        type="button"
-                        onClick={() => handleToolSelect(tool.id)}
-                        className={cn(
-                          "aspect-square w-full rounded-coloring-card border-2",
-                          "flex items-center justify-center",
-                          "transition-all duration-coloring-base ease-coloring active:scale-95",
-                          isActive
-                            ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-                            : "bg-white border-coloring-surface-dark text-coloring-text-primary",
-                        )}
-                        aria-label={tool.label}
-                        aria-pressed={isActive}
-                      >
-                        <FontAwesomeIcon icon={tool.icon} size="xl" />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Palette variant switcher — swaps the swatch grid and drives
-               * the magic-tool palette too, matching desktop's single-knob UX.
-               * Hidden at peek so the canvas dominates; appears at half. */}
-              {currentSnap >= 1 && (
-                <div className="mb-3">
-                  <div className="grid grid-cols-4 gap-2">
-                    {PALETTE_VARIANTS.map((variant) => {
-                      const isActive = paletteVariant === variant;
-                      return (
-                        <button
-                          key={variant}
-                          type="button"
-                          onClick={() => {
-                            setPaletteVariant(variant);
-                            playSound("tap");
-                          }}
-                          aria-label={variant}
-                          title={variant}
-                          aria-pressed={isActive}
-                          className={cn(
-                            "flex items-center justify-center h-12 rounded-coloring-card border-2",
                             "transition-all duration-coloring-base ease-coloring active:scale-95",
                             isActive
                               ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
                               : "bg-white border-coloring-surface-dark text-coloring-text-primary",
                           )}
+                          aria-label={tool.label}
+                          aria-pressed={isActive}
                         >
-                          <FontAwesomeIcon
-                            icon={variantIcons[variant]}
-                            size="lg"
-                          />
+                          <FontAwesomeIcon icon={tool.icon} size="xl" />
                         </button>
                       );
                     })}
                   </div>
                 </div>
-              )}
 
-              {/* Colors — grid driven by the current palette variant.
-                  Half-snap+ only so peek stays canvas-dominant. */}
-              {currentSnap >= 1 && (
-                <div className="mb-4">
-                  <div className="grid grid-cols-8 gap-1.5 py-1">
-                    {colors.map((color) => {
-                      const isSelected = selectedColor === color.hex;
-                      return (
-                        <button
-                          key={color.hex}
-                          type="button"
-                          onClick={() => {
-                            setSelectedColor(color.hex);
-                            playSound("tap");
-                          }}
-                          className={cn(
-                            "aspect-square w-full rounded-full border-2",
-                            "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            isSelected
-                              ? "ring-2 ring-coloring-accent ring-offset-1 border-white"
-                              : "border-coloring-surface-dark",
-                          )}
-                          style={{ backgroundColor: color.hex }}
-                          aria-label={`Select ${color.name} color`}
-                          aria-pressed={isSelected}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Brush Size Section — full-snap only when brush tool active */}
-              {currentSnap >= 2 && showBrushSizeSelector && (
-                <div className="mb-4">
-                  <div className="flex gap-2">
-                    {(
-                      Object.entries(BRUSH_SIZES) as [
-                        BrushSize,
-                        (typeof BRUSH_SIZES)[BrushSize],
-                      ][]
-                    ).map(([size, config]) => {
-                      const isSelected = brushSize === size;
-                      const displayColor =
-                        brushType === "eraser" ? "#9E9E9E" : selectedColor;
-                      // Scale icon size based on brush size (min 8, max 24)
-                      const dotSize = Math.max(
-                        8,
-                        Math.min(24, config.radius * 1.5),
-                      );
-
-                      return (
-                        <button
-                          key={size}
-                          type="button"
-                          onClick={() => {
-                            setBrushSize(size);
-                            playSound("tap");
-                          }}
-                          className={cn(
-                            "shrink-0 size-14 rounded-coloring-card border-2",
-                            "flex items-center justify-center",
-                            "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            isSelected
-                              ? "bg-coloring-accent border-transparent shadow-btn-primary"
-                              : "bg-white border-coloring-surface-dark",
-                          )}
-                          aria-label={`${config.name} brush size`}
-                          aria-pressed={isSelected}
-                        >
-                          <span
-                            className="rounded-full transition-colors"
-                            style={{
-                              width: dotSize,
-                              height: dotSize,
-                              backgroundColor: isSelected
-                                ? "#FFFFFF"
-                                : displayColor,
+                {/* Palette variant switcher — swaps the swatch grid and drives
+                 * the magic-tool palette too, matching desktop's single-knob UX.
+                 * Hidden at peek so the canvas dominates; appears at half. */}
+                {currentSnap >= 1 && (
+                  <div className="mb-3">
+                    <div className="grid grid-cols-4 gap-2">
+                      {PALETTE_VARIANTS.map((variant) => {
+                        const isActive = paletteVariant === variant;
+                        return (
+                          <button
+                            key={variant}
+                            type="button"
+                            onClick={() => {
+                              setPaletteVariant(variant);
+                              playSound("tap");
                             }}
-                          />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Fill Type — icon-only tiles matching tools */}
-              {currentSnap >= 2 && showFillTypeSelector && (
-                <div className="mb-4">
-                  <div className="flex gap-2">
-                    {fillTypes.map((fill) => {
-                      const isActive = fillType === fill.type;
-                      return (
-                        <button
-                          key={fill.type}
-                          type="button"
-                          onClick={() => {
-                            if (fill.type === "solid") {
-                              setSelectedPattern("solid");
-                            } else if (selectedPattern === "solid") {
-                              setSelectedPattern("dots");
-                            }
-                            playSound("tap");
-                          }}
-                          className={cn(
-                            "size-14 rounded-coloring-card border-2",
-                            "flex items-center justify-center",
-                            "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            isActive
-                              ? "bg-coloring-accent border-transparent shadow-btn-primary"
-                              : "bg-white border-coloring-surface-dark",
-                          )}
-                          aria-label={fill.label}
-                          aria-pressed={isActive}
-                        >
-                          <FontAwesomeIcon
-                            icon={fill.icon}
-                            size="xl"
+                            aria-label={variant}
+                            title={variant}
+                            aria-pressed={isActive}
                             className={cn(
+                              "flex items-center justify-center h-12 rounded-coloring-card border-2",
+                              "transition-all duration-coloring-base ease-coloring active:scale-95",
                               isActive
-                                ? "text-white"
-                                : "text-coloring-text-primary",
+                                ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
+                                : "bg-white border-coloring-surface-dark text-coloring-text-primary",
                             )}
-                          />
-                        </button>
-                      );
-                    })}
+                          >
+                            <FontAwesomeIcon
+                              icon={variantIcons[variant]}
+                              size="lg"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Pattern — icon-only tile grid */}
-              {currentSnap >= 2 && showPatternSelector && (
-                <div className="mb-4">
-                  <div className="grid grid-cols-5 gap-2">
-                    {patternTypes.map((pattern) => {
-                      const isActive = selectedPattern === pattern.type;
-                      return (
-                        <button
-                          key={pattern.type}
-                          type="button"
-                          onClick={() => {
-                            setSelectedPattern(pattern.type);
-                            playSound("tap");
-                          }}
-                          className={cn(
-                            "aspect-square w-full rounded-coloring-card border-2",
-                            "flex items-center justify-center",
-                            "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            isActive
-                              ? "bg-coloring-accent border-transparent shadow-btn-primary"
-                              : "bg-white border-coloring-surface-dark",
-                          )}
-                          aria-label={pattern.label}
-                          aria-pressed={isActive}
-                        >
-                          <FontAwesomeIcon
-                            icon={pattern.icon}
-                            size="xl"
+                {/* Colors — grid driven by the current palette variant.
+                  Half-snap+ only so peek stays canvas-dominant. */}
+                {currentSnap >= 1 && (
+                  <div className="mb-4">
+                    <div className="grid grid-cols-8 gap-1.5 py-1">
+                      {colors.map((color) => {
+                        const isSelected = selectedColor === color.hex;
+                        return (
+                          <button
+                            key={color.hex}
+                            type="button"
+                            onClick={() => {
+                              setSelectedColor(color.hex);
+                              playSound("tap");
+                            }}
                             className={cn(
-                              isActive
-                                ? "text-white"
-                                : "text-coloring-text-primary",
+                              "aspect-square w-full rounded-full border-2",
+                              "transition-all duration-coloring-base ease-coloring active:scale-95",
+                              isSelected
+                                ? "ring-2 ring-coloring-accent ring-offset-1 border-white"
+                                : "border-coloring-surface-dark",
                             )}
+                            style={{ backgroundColor: color.hex }}
+                            aria-label={`Select ${color.name} color`}
+                            aria-pressed={isSelected}
                           />
-                        </button>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* History Section — Undo/Redo, full-snap only */}
-              {currentSnap >= 2 && (
-                <div className="mb-4">
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={handleUndo}
-                      disabled={!canUndo}
-                      className={cn(
-                        "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
-                        "flex items-center justify-center",
-                        "transition-all duration-coloring-base ease-coloring active:scale-95",
-                        !canUndo && "opacity-50 cursor-not-allowed",
-                      )}
-                      aria-label="Undo"
-                    >
-                      <UndoIcon className="size-6 text-coloring-text-primary" />
-                    </button>
+                {/* Brush Size Section — full-snap only when brush tool active */}
+                {currentSnap >= 2 && showBrushSizeSelector && (
+                  <div className="mb-4">
+                    <div className="flex gap-2">
+                      {(
+                        Object.entries(BRUSH_SIZES) as [
+                          BrushSize,
+                          (typeof BRUSH_SIZES)[BrushSize],
+                        ][]
+                      ).map(([size, config]) => {
+                        const isSelected = brushSize === size;
+                        const displayColor =
+                          brushType === "eraser" ? "#9E9E9E" : selectedColor;
+                        // Scale icon size based on brush size (min 8, max 24)
+                        const dotSize = Math.max(
+                          8,
+                          Math.min(24, config.radius * 1.5),
+                        );
 
-                    <button
-                      type="button"
-                      onClick={handleRedo}
-                      disabled={!canRedo}
-                      className={cn(
-                        "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
-                        "flex items-center justify-center",
-                        "transition-all duration-coloring-base ease-coloring active:scale-95",
-                        !canRedo && "opacity-50 cursor-not-allowed",
-                      )}
-                      aria-label="Redo"
-                    >
-                      <RedoIcon className="size-6 text-coloring-text-primary" />
-                    </button>
+                        return (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() => {
+                              setBrushSize(size);
+                              playSound("tap");
+                            }}
+                            className={cn(
+                              "shrink-0 size-14 rounded-coloring-card border-2",
+                              "flex items-center justify-center",
+                              "transition-all duration-coloring-base ease-coloring active:scale-95",
+                              isSelected
+                                ? "bg-coloring-accent border-transparent shadow-btn-primary"
+                                : "bg-white border-coloring-surface-dark",
+                            )}
+                            aria-label={`${config.name} brush size`}
+                            aria-pressed={isSelected}
+                          >
+                            <span
+                              className="rounded-full transition-colors"
+                              style={{
+                                width: dotSize,
+                                height: dotSize,
+                                backgroundColor: isSelected
+                                  ? "#FFFFFF"
+                                  : displayColor,
+                              }}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+
+                {/* Fill Type — icon-only tiles matching tools */}
+                {currentSnap >= 2 && showFillTypeSelector && (
+                  <div className="mb-4">
+                    <div className="flex gap-2">
+                      {fillTypes.map((fill) => {
+                        const isActive = fillType === fill.type;
+                        return (
+                          <button
+                            key={fill.type}
+                            type="button"
+                            onClick={() => {
+                              if (fill.type === "solid") {
+                                setSelectedPattern("solid");
+                              } else if (selectedPattern === "solid") {
+                                setSelectedPattern("dots");
+                              }
+                              playSound("tap");
+                            }}
+                            className={cn(
+                              "size-14 rounded-coloring-card border-2",
+                              "flex items-center justify-center",
+                              "transition-all duration-coloring-base ease-coloring active:scale-95",
+                              isActive
+                                ? "bg-coloring-accent border-transparent shadow-btn-primary"
+                                : "bg-white border-coloring-surface-dark",
+                            )}
+                            aria-label={fill.label}
+                            aria-pressed={isActive}
+                          >
+                            <FontAwesomeIcon
+                              icon={fill.icon}
+                              size="xl"
+                              className={cn(
+                                isActive
+                                  ? "text-white"
+                                  : "text-coloring-text-primary",
+                              )}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pattern — icon-only tile grid */}
+                {currentSnap >= 2 && showPatternSelector && (
+                  <div className="mb-4">
+                    <div className="grid grid-cols-5 gap-2">
+                      {patternTypes.map((pattern) => {
+                        const isActive = selectedPattern === pattern.type;
+                        return (
+                          <button
+                            key={pattern.type}
+                            type="button"
+                            onClick={() => {
+                              setSelectedPattern(pattern.type);
+                              playSound("tap");
+                            }}
+                            className={cn(
+                              "aspect-square w-full rounded-coloring-card border-2",
+                              "flex items-center justify-center",
+                              "transition-all duration-coloring-base ease-coloring active:scale-95",
+                              isActive
+                                ? "bg-coloring-accent border-transparent shadow-btn-primary"
+                                : "bg-white border-coloring-surface-dark",
+                            )}
+                            aria-label={pattern.label}
+                            aria-pressed={isActive}
+                          >
+                            <FontAwesomeIcon
+                              icon={pattern.icon}
+                              size="xl"
+                              className={cn(
+                                isActive
+                                  ? "text-white"
+                                  : "text-coloring-text-primary",
+                              )}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* History Section — Undo/Redo, full-snap only */}
+                {currentSnap >= 2 && (
+                  <div className="mb-4">
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={handleUndo}
+                        disabled={!canUndo}
+                        className={cn(
+                          "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
+                          "flex items-center justify-center",
+                          "transition-all duration-coloring-base ease-coloring active:scale-95",
+                          !canUndo && "opacity-50 cursor-not-allowed",
+                        )}
+                        aria-label="Undo"
+                      >
+                        <UndoIcon className="size-6 text-coloring-text-primary" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleRedo}
+                        disabled={!canRedo}
+                        className={cn(
+                          "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
+                          "flex items-center justify-center",
+                          "transition-all duration-coloring-base ease-coloring active:scale-95",
+                          !canRedo && "opacity-50 cursor-not-allowed",
+                        )}
+                        aria-label="Redo"
+                      >
+                        <RedoIcon className="size-6 text-coloring-text-primary" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+      {/* First-visit pulsing hand — same vocabulary as the canvas
+        TapPromptOverlay so the page reads as one consistent "this is
+        interactive" language. Rendered via createPortal to document.body
+        so it lives at the body root, completely outside the drawer's
+        stacking + clipping context (the drawer's overflow-hidden,
+        load-bearing for rounded-t-3xl corner masking during animation,
+        was clipping the hint when it lived inside Drawer.Content even
+        with z-index escalation). Anchored to the drawer's top edge via
+        fixed positioning; disappears on first interaction and is
+        persisted via localStorage. SSR-safe via the typeof window check.
+        */}
+      {showHandleHint &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <div
+            aria-hidden
+            className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center"
+            style={{
+              // Lift roughly half the icon height above the drawer's top
+              // edge so the icon body clears the rounded corner band and
+              // the ping rings don't feel pinched.
+              bottom: `calc(${snapPoints[0]}px - 22px)`,
+            }}
+          >
+            <div className="relative">
+              <span
+                className="absolute inset-0 rounded-full bg-crayon-orange/55 animate-ping"
+                style={{ animationDuration: "1.6s" }}
+              />
+              <span
+                className="absolute inset-0 rounded-full bg-crayon-orange/35 animate-ping"
+                style={{
+                  animationDuration: "1.6s",
+                  animationDelay: "0.8s",
+                }}
+              />
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-crayon-orange shadow-btn-primary">
+                <FontAwesomeIcon
+                  icon={faHandPointer}
+                  className="text-base text-white"
+                />
+              </div>
             </div>
-          </motion.div>
-        </Drawer.Content>
-      </Drawer.Portal>
-    </Drawer.Root>
+          </div>,
+          document.body,
+        )}
+    </>
   );
 };
 
