@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Drawer } from "vaul";
-import { motion, useMotionValue, animate, type PanInfo } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  animate,
+  type PanInfo,
+} from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPencil,
@@ -219,6 +225,11 @@ const MobileColoringDrawer = ({
   // expanding when you focus a text field. After the first tap we don't
   // force-snap again; the user is in control.
   const hasAutoSnappedRef = useRef(false);
+  // Tracks whether the user has clicked the drag handle yet. The very
+  // first click jumps straight to full — most users wanted "show me
+  // everything" not "show me a bit more." After that, taps cycle
+  // peek → half → full → peek as normal.
+  const hasFirstHandleClickFiredRef = useRef(false);
 
   // First-visit-only pulsing hand on the drag handle. Same vocabulary as
   // the canvas TapPromptOverlay — pulsing orange ring around faHandPointer
@@ -228,6 +239,19 @@ const MobileColoringDrawer = ({
   // and flips on after the localStorage check on mount to avoid a flash
   // for repeat visitors.
   const [showHandleHint, setShowHandleHint] = useState(false);
+
+  // Ref to the drag handle DOM node + its tracked viewport rect. The
+  // hint renders via createPortal(document.body) so it can escape the
+  // drawer's overflow-hidden / stacking context — but that means we
+  // need to position it manually relative to the handle. Updated on
+  // mount, on window resize, and whenever the drawer height animates
+  // (so the hint follows when peek/half/full snap changes).
+  const handleRef = useRef<HTMLDivElement>(null);
+  const [handleRect, setHandleRect] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
 
   // Spring config — feels good already, keep as-is.
   const springConfig = {
@@ -276,8 +300,11 @@ const MobileColoringDrawer = ({
     info: PanInfo,
   ) => {
     // First drag dismisses the pulsing-hand hint — once they've grabbed
-    // the handle, the affordance has done its job.
+    // the handle, the affordance has done its job. Also marks the
+    // first-click flag so a later click cycles normally rather than
+    // jumping back to full unexpectedly.
     dismissHandleHint();
+    hasFirstHandleClickFiredRef.current = true;
     // Dragging up (negative delta.y) grows the sheet.
     const currentHeight = height.get();
     const newHeight = Math.max(
@@ -294,10 +321,18 @@ const MobileColoringDrawer = ({
     snapTo(nearestSnap(height.get(), info.velocity.y));
   };
 
-  // Tap on the handle cycles peek → half → full → peek so non-draggers
-  // (mouse, accessibility) can still reach every state.
+  // Tap on the handle. First click jumps to full so the user sees every
+  // tool at once — that's the action that pays for the affordance hint.
+  // After the first click, subsequent taps cycle peek → half → full →
+  // peek so non-draggers (mouse, accessibility) can still reach every
+  // state.
   const handleToggle = () => {
     dismissHandleHint();
+    if (!hasFirstHandleClickFiredRef.current) {
+      hasFirstHandleClickFiredRef.current = true;
+      snapTo(2);
+      return;
+    }
     snapTo(((currentSnap + 1) % 3) as SnapIndex);
   };
 
@@ -343,6 +378,30 @@ const MobileColoringDrawer = ({
       // ignore
     }
   };
+
+  // Keep the portal-rendered hint glued to the handle. The hint lives
+  // at document.body via createPortal (so it escapes the drawer's
+  // overflow-hidden) — that means we have to position it manually
+  // against the handle's actual rect. Recalc on:
+  //   - mount + when the hint becomes visible
+  //   - window resize / orientation change
+  //   - drawer height changes (peek -> half -> full snap animations)
+  // useMotionValueEvent handles the third case without polling.
+  const updateHandleRect = () => {
+    const node = handleRef.current;
+    if (!node) return;
+    const r = node.getBoundingClientRect();
+    setHandleRect({ top: r.top, left: r.left, width: r.width });
+  };
+  useEffect(() => {
+    if (!showHandleHint) return;
+    updateHandleRect();
+    window.addEventListener("resize", updateHandleRect);
+    return () => window.removeEventListener("resize", updateHandleRect);
+  }, [showHandleHint]);
+  useMotionValueEvent(height, "change", () => {
+    if (showHandleHint) updateHandleRect();
+  });
 
   // Show fill type selector when fill tool is active
   const showFillTypeSelector = activeTool === "fill";
@@ -479,6 +538,7 @@ const MobileColoringDrawer = ({
 
               {/* Drag handle - drag or click to toggle expanded/collapsed */}
               <motion.div
+                ref={handleRef}
                 role="button"
                 tabIndex={0}
                 className="flex items-center justify-center pt-3 pb-2 w-full cursor-grab active:cursor-grabbing touch-none select-none"
@@ -831,19 +891,21 @@ const MobileColoringDrawer = ({
         persisted via localStorage. SSR-safe via the typeof window check.
         */}
       {showHandleHint &&
+        handleRect &&
         typeof window !== "undefined" &&
         createPortal(
+          // Anchored to the handle's actual viewport rect, so the hint
+          // follows when the drawer animates between snap points or the
+          // window resizes. translate(-50%, -100%) sits the bottom of
+          // the block flush above the handle; the negative bottom margin
+          // adds an 8px gap.
           <div
             aria-hidden
-            className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center"
+            className="pointer-events-none fixed z-[60]"
             style={{
-              // Lift the WHOLE block (hand + optional label) above the
-              // drawer top edge. Account for label height so the hand
-              // doesn't get pushed back into the drawer when a label
-              // is provided.
-              bottom: handleHintLabel
-                ? `calc(${snapPoints[0]}px + 8px)`
-                : `calc(${snapPoints[0]}px - 22px)`,
+              top: handleRect.top - 8,
+              left: handleRect.left + handleRect.width / 2,
+              transform: "translate(-50%, -100%)",
             }}
           >
             <div className="relative flex flex-col items-center gap-2">
@@ -867,7 +929,7 @@ const MobileColoringDrawer = ({
                 </div>
               </div>
               {handleHintLabel && (
-                <span className="font-tondo font-bold text-xs sm:text-sm text-coloring-text-primary bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-md border border-coloring-surface-dark">
+                <span className="font-tondo font-bold text-xs sm:text-sm text-coloring-text-primary bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-md border border-coloring-surface-dark whitespace-nowrap">
                   {handleHintLabel}
                 </span>
               )}
