@@ -105,7 +105,7 @@
   },
   "homepage": {
     "pricing": {
-      "title": "Pruébalo gratis. Planes desde £7.99/mes.",
+      "title": "Pruébalo gratis. Planes desde {price}/mes.",
       "body": "Empieza con 2 generaciones gratis, sin cuenta. Elige una suscripción para tu familia o compra un pack de créditos y Colorea sobre la marcha.",
       "cta": "Ver todos los planes"
     },
@@ -356,7 +356,7 @@
       }
     },
     "pricing": {
-      "title": "Pruébala gratis. Planes desde £7.99/mes.",
+      "title": "Pruébala gratis. Planes desde {price}/mes.",
       "body": "Empieza con 2 generaciones gratis, sin cuenta. ¿Te encanta? Elige una suscripción que va de colorear de vez en cuando a usarla a diario, o compra un pack de créditos y colorea a tu ritmo.",
       "cta": "Ver todos los planes"
     },

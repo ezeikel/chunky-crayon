@@ -3,6 +3,9 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { getColoringImageForAdCampaign } from '@/app/data/coloring-image';
 import { getOGImageUrl } from '@/lib/og/r2-url';
+import { getCurrencyForRequest } from '@/lib/currency.server';
+import { SUBSCRIPTION_PLANS } from '@/constants';
+import { PlanName } from '@one-colored-pixel/db/types';
 import StartHero from './components/StartHero';
 import StartProblem from './components/StartProblem';
 import StartHowItWorks from './components/StartHowItWorks';
@@ -144,7 +147,16 @@ function HeroFallback() {
 // reads headers() internally, so we can't cache this — it's fast enough
 // to re-render per request in practice.
 async function StartStaticBody() {
-  const t = await getTranslations('start');
+  const [t, currency] = await Promise.all([
+    getTranslations('start'),
+    getCurrencyForRequest(),
+  ]);
+
+  // Splash monthly is the entry-point price the teaser advertises.
+  const splashMonthly = SUBSCRIPTION_PLANS.monthly.find(
+    (p) => p.key === PlanName.SPLASH,
+  );
+  const teaserPrice = splashMonthly?.prices[currency].display ?? '';
 
   return (
     <>
@@ -201,7 +213,7 @@ async function StartStaticBody() {
         <Testimonials />
       </div>
       <PricingTeaser
-        title={t('pricing.title')}
+        title={t('pricing.title', { price: teaserPrice })}
         body={t('pricing.body')}
         ctaLabel={t('pricing.cta')}
         location="start"

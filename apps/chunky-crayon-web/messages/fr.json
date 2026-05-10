@@ -105,7 +105,7 @@
   },
   "homepage": {
     "pricing": {
-      "title": "Essai gratuit. Abonnements dès 7,99 £/mois.",
+      "title": "Essai gratuit. Abonnements dès {price}/mois.",
       "body": "Commencez avec 2 créations gratuites, sans compte. Choisissez un abonnement adapté à votre famille, ou prenez un pack de crédits et coloriez au rythme de vos envies.",
       "cta": "Voir tous les forfaits"
     },
@@ -356,7 +356,7 @@
       }
     },
     "pricing": {
-      "title": "Essai gratuit. Forfaits dès 7,99 £/mois.",
+      "title": "Essai gratuit. Forfaits dès {price}/mois.",
       "body": "Commencez avec 2 créations gratuites, sans compte. Vous adorez ? Choisissez un abonnement qui s’adapte, du coloriage occasionnel à l’usage quotidien, ou prenez un pack de crédits et coloriez au fil de l’eau.",
       "cta": "Voir tous les forfaits"
     },

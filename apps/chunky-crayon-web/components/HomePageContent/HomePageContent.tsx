@@ -36,6 +36,11 @@ type HomePageContentProps = {
   latestComicStrip?: React.ReactNode;
   /** Featured product bundles — server component, optional, drives product sales on homepage. */
   featuredBundles?: React.ReactNode;
+  /** Pre-rendered pricing teaser title with localized price interpolated.
+   * Server resolves currency + the Splash monthly price so the title can
+   * say "Plans from $7.99/month" for US visitors and "Plans from £7.99/month"
+   * elsewhere. */
+  pricingTeaserTitle?: string;
 };
 
 const HomePageContent = ({
@@ -51,6 +56,7 @@ const HomePageContent = ({
   demo,
   latestComicStrip,
   featuredBundles,
+  pricingTeaserTitle,
 }: HomePageContentProps) => {
   const { status } = useSession();
   const t = useTranslations('homepage.pricing');
@@ -161,7 +167,7 @@ const HomePageContent = ({
           or direct see the same path-to-pricing cue. */}
       <div className="w-full relative z-10">
         <PricingTeaser
-          title={t('title')}
+          title={pricingTeaserTitle ?? t('title', { price: '' })}
           body={t('body')}
           ctaLabel={t('cta')}
           location="homepage"

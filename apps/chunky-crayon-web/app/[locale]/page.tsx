@@ -16,6 +16,9 @@ import LandingDemo from '@/components/LandingDemo/LandingDemo';
 import JoinColoringPageEmailListForm from '@/components/forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 import { getMyColoState } from '@/app/actions/colo';
 import { getActiveProfile } from '@/app/actions/profiles';
+import { getCurrencyForRequest } from '@/lib/currency.server';
+import { SUBSCRIPTION_PLANS } from '@/constants';
+import { PlanName } from '@one-colored-pixel/db/types';
 import type { ColoringImageSearchParams } from '@/types';
 import type { ColoState } from '@/lib/colo';
 
@@ -87,7 +90,21 @@ const HomePageWithColoState = async ({
   latestComicStrip: React.ReactNode;
   featuredBundles: React.ReactNode;
 }) => {
-  const coloState = await ColoStateLoader();
+  const search = (await searchParams) as ColoringImageSearchParams & {
+    currency?: string;
+  };
+  const [coloState, t, currency] = await Promise.all([
+    ColoStateLoader(),
+    getTranslations('homepage.pricing'),
+    getCurrencyForRequest(search.currency),
+  ]);
+
+  // Splash monthly is the entry-point price the teaser advertises.
+  const splashMonthly = SUBSCRIPTION_PLANS.monthly.find(
+    (p) => p.key === PlanName.SPLASH,
+  );
+  const teaserPrice = splashMonthly?.prices[currency].display ?? '';
+  const pricingTeaserTitle = t('title', { price: teaserPrice });
 
   return (
     <HomePageContent
@@ -103,6 +120,7 @@ const HomePageWithColoState = async ({
       demo={demo}
       latestComicStrip={latestComicStrip}
       featuredBundles={featuredBundles}
+      pricingTeaserTitle={pricingTeaserTitle}
     />
   );
 };

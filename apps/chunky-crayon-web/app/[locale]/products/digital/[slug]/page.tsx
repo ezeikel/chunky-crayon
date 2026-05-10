@@ -43,7 +43,10 @@ export async function generateMetadata({
   const baseUrl = 'https://chunkycrayon.com';
   const url = `${baseUrl}/${locale}/products/digital/${bundle.slug}`;
   const title = `${bundle.name} | ${bundle.pageCount}-Page Coloring Bundle - Chunky Crayon`;
-  const description = `${bundle.tagline} Print at home, color online, replay forever. £${(bundle.pricePence / 100).toFixed(2)}.`;
+  const cur = bundle.currency.toUpperCase();
+  const symbol =
+    cur === 'GBP' ? '£' : cur === 'USD' ? '$' : cur === 'EUR' ? '€' : '';
+  const description = `${bundle.tagline} Print at home, color online, replay forever. ${symbol}${(bundle.pricePence / 100).toFixed(2)}.`;
   const ogImage = bundle.listingHeroUrl ?? undefined;
 
   return {

@@ -45,12 +45,24 @@ const BillingSuccess = ({
           <FontAwesomeIcon icon={headlineIcon} className={headlineIconColor} />
         </h1>
         <p className="text-text-secondary">{body}</p>
-        {amount !== null && (
-          <p className="text-sm text-text-secondary mt-2">
-            Amount charged: {currency === 'gbp' ? '£' : currency.toUpperCase()}{' '}
-            {(amount / 100).toFixed(2)}
-          </p>
-        )}
+        {amount !== null &&
+          (() => {
+            const cur = currency.toLowerCase();
+            const symbol =
+              cur === 'gbp'
+                ? '£'
+                : cur === 'usd'
+                  ? '$'
+                  : cur === 'eur'
+                    ? '€'
+                    : `${currency.toUpperCase()} `;
+            return (
+              <p className="text-sm text-text-secondary mt-2">
+                Amount charged: {symbol}
+                {(amount / 100).toFixed(2)}
+              </p>
+            );
+          })()}
       </div>
       <div className="flex flex-col gap-4">
         <Link

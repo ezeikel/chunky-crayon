@@ -105,7 +105,7 @@
   },
   "homepage": {
     "pricing": {
-      "title": "Kostenlos testen. Ab 7,99 £/Monat.",
+      "title": "Kostenlos testen. Ab {price}/Monat.",
       "body": "Starte mit 2 kostenlosen Generierungen, ganz ohne Konto. Wähle ein Abo, das zu deiner Familie passt, oder hol dir ein Credit-Paket und male flexibel los.",
       "cta": "Alle Pläne ansehen"
     },
@@ -356,7 +356,7 @@
       }
     },
     "pricing": {
-      "title": "Gratis testen. Ab £7,99/Monat.",
+      "title": "Gratis testen. Ab {price}/Monat.",
       "body": "Starte mit 2 Gratis-Generierungen, kein Konto nötig. Gefällt’s euch? Wähl ein Abo – von gelegentlichem Malen bis täglich – oder hol dir ein Credit‑Paket und male nach Bedarf.",
       "cta": "Alle Pläne ansehen"
     },

@@ -221,6 +221,7 @@ type BundleCardProps = {
     tagline: string | null;
     pricePence: number;
     pageCount: number;
+    currency: string;
   };
   hero: string | undefined;
   accent: (typeof CARD_ACCENTS)[number];
@@ -272,7 +273,18 @@ const BundleCard = ({ bundle, hero, accent, locale }: BundleCardProps) => {
         )}
         <div className="mt-3 flex items-center justify-between">
           <span className={`font-tondo text-xl font-bold ${accent.price}`}>
-            £{(bundle.pricePence / 100).toFixed(2)}
+            {(() => {
+              const cur = bundle.currency.toUpperCase();
+              const symbol =
+                cur === 'GBP'
+                  ? '£'
+                  : cur === 'USD'
+                    ? '$'
+                    : cur === 'EUR'
+                      ? '€'
+                      : '';
+              return `${symbol}${(bundle.pricePence / 100).toFixed(2)}`;
+            })()}
           </span>
           <span className="text-xs text-text-secondary font-rooney-sans uppercase tracking-wide">
             {bundle.pageCount} pages
