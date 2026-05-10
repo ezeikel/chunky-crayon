@@ -19,6 +19,9 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import sharp from "sharp";
 import potrace from "oslllo-potrace";
+import { generateRegionStoreLocal } from "../record/region-store.js";
+import { generateColoredReferenceLocal } from "../record/colored-reference.js";
+import { generateFillPointsLocal } from "../record/fill-points.js";
 
 const imageMetadataSchema = z.object({
   title: z.string().describe("SEO-friendly title for the coloring page"),
@@ -161,6 +164,35 @@ export const persistBundlePage = async ({
   console.log(
     `[bundle-persist] page ${bundleOrder} of ${bundleSlug} → ${coloringImageId}`,
   );
+
+  // Magic Brush requires a region store + colored reference + fill points
+  // per page. Fire and forget — same pattern as the daily-image pipeline.
+  // We don't gate the persist on these completing because:
+  //  - region-store is the slowest (~30-90s) and we don't want it on the
+  //    QA gate's critical path
+  //  - the orchestrator polls on `status: READY` which is already set
+  //  - if any of these fail, the page still loads (Magic Brush just
+  //    falls back to legacy fillPointsJson or no Magic Brush)
+  const sceneContext = {
+    title: imageMetadata.title,
+    description: imageMetadata.description,
+    tags: imageMetadata.tags,
+  };
+  void Promise.allSettled([
+    generateRegionStoreLocal(coloringImageId, svgUrl, sceneContext),
+    generateColoredReferenceLocal(coloringImageId),
+    generateFillPointsLocal(coloringImageId),
+  ]).then((results) => {
+    results.forEach((r, i) => {
+      const name = ["region-store", "colored-reference", "fill-points"][i];
+      if (r.status === "rejected") {
+        console.warn(
+          `[bundle-persist] ${name} failed for ${coloringImageId}:`,
+          r.reason,
+        );
+      }
+    });
+  });
 
   return { coloringImageId, url: imageUrl, svgUrl };
 };

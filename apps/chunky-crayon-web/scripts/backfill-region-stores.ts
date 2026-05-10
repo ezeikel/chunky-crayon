@@ -56,6 +56,7 @@ type Args = {
   limit: number;
   force: boolean;
   id: string | null;
+  bundleSlug: string | null;
 };
 
 function parseArgs(argv: string[]): Args {
@@ -64,6 +65,7 @@ function parseArgs(argv: string[]): Args {
     limit: Infinity,
     force: false,
     id: null,
+    bundleSlug: null,
   };
   for (const arg of argv.slice(2)) {
     if (arg === '--dry-run') args.dryRun = true;
@@ -72,6 +74,8 @@ function parseArgs(argv: string[]): Args {
       args.limit = parseInt(arg.slice('--limit='.length), 10);
     } else if (arg.startsWith('--id=')) {
       args.id = arg.slice('--id='.length);
+    } else if (arg.startsWith('--bundle=')) {
+      args.bundleSlug = arg.slice('--bundle='.length);
     } else {
       console.error(`Unknown argument: ${arg}`);
       process.exit(1);
@@ -239,11 +243,28 @@ async function main() {
   if (args.id) console.log(`[Backfill] Targeted ID: ${args.id}`);
   if (args.force) console.log(`[Backfill] Force: re-process existing stores`);
 
+  // Resolve --bundle=<slug> to bundleId at query time so we can filter
+  // bundle pages cleanly without a join.
+  let bundleId: string | null = null;
+  if (args.bundleSlug) {
+    const bundle = await db.bundle.findUnique({
+      where: { slug: args.bundleSlug },
+      select: { id: true },
+    });
+    if (!bundle) {
+      console.error(`No Bundle row found for slug: ${args.bundleSlug}`);
+      process.exit(1);
+    }
+    bundleId = bundle.id;
+    console.log(`[Backfill] Filter: bundle=${args.bundleSlug} (${bundleId})`);
+  }
+
   const candidates = await db.coloringImage.findMany({
     where: {
       brand: BRAND,
       svgUrl: { not: null },
       ...(args.id ? { id: args.id } : {}),
+      ...(bundleId ? { bundleId } : {}),
       ...(args.force || args.id ? {} : { regionMapUrl: null }),
     },
     orderBy: { createdAt: 'desc' },

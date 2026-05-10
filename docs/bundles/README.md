@@ -26,6 +26,8 @@ A bundle is:
 | Worker endpoints          | `apps/chunky-crayon-worker/src/routes/generate.ts` (`/generate/bundle-all-pages`)    |
 | Theme research + scaffold | `apps/chunky-crayon-web/scripts/research-bundle-ideas.ts`                            |
 | Launch orchestrator       | `apps/chunky-crayon-web/scripts/launch-bundle.ts`                                    |
+| Dev → prod promoter       | `apps/chunky-crayon-web/scripts/promote-bundle.ts`                                   |
+| Region-store backfill     | `apps/chunky-crayon-web/scripts/backfill-region-stores.ts` (`--bundle=<slug>`)       |
 | Hero refs script          | `apps/chunky-crayon-web/scripts/generate-bundle-hero-refs.ts`                        |
 | Bundle row seeder         | `apps/chunky-crayon-web/scripts/seed-bundle.ts`                                      |
 | Bg removal scripts        | `apps/chunky-crayon-web/scripts/remove-bundle-{hero,character}-backgrounds.ts`       |
@@ -219,7 +221,67 @@ UPDATE bundles SET published = true WHERE slug = 'unicorn-rainbow-rally';
 
 Run this against **dev** first (visit on localhost), then **prod**.
 
-### Step 4: Live-mode Stripe
+### Step 4: Promote dev → prod
+
+Once a bundle is verified in dev, promote it to prod with `promote-bundle.ts`. This script copies the entire dev R2 prefix to prod, mirrors the Bundle + ColoringImage rows into prod DB, and creates the live Stripe product in one shot.
+
+```bash
+cd apps/chunky-crayon-web
+
+# Pull a prod env file (one-time per promotion session):
+vercel env pull .env.production.local --environment=production
+
+# Dry-run first:
+pnpm tsx -r dotenv/config scripts/promote-bundle.ts \
+  --slug=bakery-buddy-bakers \
+  --prod-env-file=.env.production.local \
+  --dry \
+  dotenv_config_path=.env.local
+
+# When dry looks right, drop --dry:
+pnpm tsx -r dotenv/config scripts/promote-bundle.ts \
+  --slug=bakery-buddy-bakers \
+  --prod-env-file=.env.production.local \
+  dotenv_config_path=.env.local
+```
+
+What it does:
+
+1. Reads dev Bundle row + its 10 ColoringImage rows
+2. Copies every R2 object under `bundles/{slug}/` from dev bucket to prod bucket (listings, hero-refs, brand-character, all 10 pages' webp + svg). Skip-if-exists.
+3. Copies per-image assets that live outside the bundle prefix (regionMap, qrCode, coloredReference) by URL. Skipped silently if absent.
+4. Upserts prod Bundle row with hostnames rewritten from dev R2_PUBLIC_URL to prod R2_PUBLIC_URL. Always starts as `published: false`.
+5. Upserts each ColoringImage row in prod (preserves `id`s — same uuid in dev and prod for a given bundle page).
+6. Creates / updates Stripe product in **live mode** using `STRIPE_SECRET_KEY` from the prod env file. Writes live IDs to prod Bundle row.
+
+Guards: refuses to run if dev and prod R2 buckets or DATABASE_URLs are identical.
+
+After promotion, prod has the bundle in DRAFT. To go live:
+
+```sql
+UPDATE bundles SET published = true WHERE slug = 'bakery-buddy-bakers';
+```
+
+`--skip-stripe` skips just the Stripe step (e.g. when re-running to refresh listings without touching the product). `--dry` runs the whole flow with no R2 writes / DB writes / Stripe calls.
+
+#### Region-store backfill (Magic Brush)
+
+Bundle page generation now triggers region-store + colored-reference + fill-points generation as part of the persist step (fire-and-forget). For pages generated before that change, backfill them:
+
+```bash
+# Just the bundle in question:
+pnpm tsx -r dotenv/config scripts/backfill-region-stores.ts \
+  --bundle=dino-dance-party \
+  dotenv_config_path=.env.local
+
+# Or specifically prod for an already-promoted bundle (use prod env file):
+DATABASE_URL=<prod-url> R2_BUCKET=<prod-bucket> ... \
+  pnpm tsx scripts/backfill-region-stores.ts --bundle=dino-dance-party
+```
+
+Without region maps, Magic Brush silently falls back to legacy `fillPointsJson` (which usually exists) — pages still load, just without per-pixel region accuracy on the magic brush.
+
+### Step 5: Live-mode Stripe (legacy single-step path)
 
 The orchestrator uses whatever `STRIPE_SECRET_KEY` is in `.env.local` — usually test mode. To create the live-mode product, swap to live keys and re-run with `--skip-pages` (pages already exist) and a fresh slug check:
 
