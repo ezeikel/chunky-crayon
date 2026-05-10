@@ -210,6 +210,7 @@ export type {
   PanelScript,
   Scene,
   BuildPanelImagePromptInput,
+  RejectedAttempt,
 } from "./comic/prompts";
 
 // Comic strip QC — script gate (text) + panel gate (vision) +

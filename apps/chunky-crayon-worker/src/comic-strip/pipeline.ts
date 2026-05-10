@@ -43,6 +43,7 @@ import {
   type PanelQcResult,
   type ScriptQcResult,
   type WholeStripQcResult,
+  type RejectedAttempt,
 } from "@one-colored-pixel/coloring-core";
 import { judgeWithThree, type VotedVerdict } from "./jury.js";
 import {
@@ -60,6 +61,15 @@ const IMAGE_MODEL = "gpt-image-2";
 const IMAGE_SIZE = "1024x1024" as const;
 const SCRIPT_RETRIES = 2;
 const PANEL_RETRIES = 3;
+/**
+ * Per-theme: 1 initial draft + SCRIPT_RETRIES revisions = 3 attempts.
+ * THEME_RETRIES extra themes mean a stuck theme doesn't kill the whole run —
+ * if Opus produces 3 structurally-broken drafts on theme A (e.g.
+ * keeps forgetting the rule-keeper in a RULE_BREAKING gag), we reroll to a
+ * fresh theme and try again. Total budget: (THEME_RETRIES + 1) themes ×
+ * (SCRIPT_RETRIES + 1) script attempts. Defaults give 6 total LLM calls.
+ */
+const THEME_RETRIES = 1;
 
 // =============================================================================
 // Theme rotation
@@ -78,16 +88,27 @@ const ALL_THEMES: readonly ComicStripTheme[] = [
   "ADVENTURE",
 ];
 
-async function pickTheme(): Promise<ComicStripTheme> {
+async function pickTheme(
+  excluding: readonly ComicStripTheme[] = [],
+): Promise<ComicStripTheme> {
   const recent = await db.comicStrip.findMany({
     where: { brand: Brand.CHUNKY_CRAYON },
     orderBy: { createdAt: "desc" },
     take: 4,
     select: { theme: true },
   });
-  const recentSet = new Set(recent.map((r) => r.theme));
-  const eligible = ALL_THEMES.filter((t) => !recentSet.has(t));
-  const pool = eligible.length > 0 ? eligible : ALL_THEMES;
+  const blocked = new Set([...recent.map((r) => r.theme), ...excluding]);
+  const eligible = ALL_THEMES.filter((t) => !blocked.has(t));
+  // Fall back through exclusions in order: prefer eligible (not recent + not excluded),
+  // else not-excluded, else any. We never want to throw "no themes available"
+  // because the catalogue is small and a duplicate is acceptable in
+  // worst-case recovery.
+  const pool =
+    eligible.length > 0
+      ? eligible
+      : ALL_THEMES.filter((t) => !excluding.includes(t)).length > 0
+        ? ALL_THEMES.filter((t) => !excluding.includes(t))
+        : ALL_THEMES;
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
@@ -173,7 +194,10 @@ function cumulativeStateChangesForPanel(
     .map((p) => p.propStateChange as string);
 }
 
-async function writeScript(theme: ComicStripTheme): Promise<Script> {
+async function writeScript(
+  theme: ComicStripTheme,
+  priorAttempts: readonly RejectedAttempt[] = [],
+): Promise<Script> {
   const recent = await db.comicStrip.findMany({
     where: { brand: Brand.CHUNKY_CRAYON },
     orderBy: { createdAt: "desc" },
@@ -188,10 +212,35 @@ async function writeScript(theme: ComicStripTheme): Promise<Script> {
       theme,
       recent.map((r) => r.title),
       recent.map((r) => r.theme),
+      priorAttempts,
     ),
     schema: scriptSchema,
   });
   return object;
+}
+
+/**
+ * Compress a Script + the dissenting jury verdict into a RejectedAttempt
+ * we can feed back into the next writer prompt. We keep panel summaries
+ * short — title + one line per panel — so 2-3 prior attempts don't bloat
+ * the context window.
+ */
+function buildRejectedAttempt(
+  script: Script,
+  juryVerdict: VotedVerdict<ScriptQcResult>,
+): RejectedAttempt {
+  return {
+    title: script.title,
+    logline: script.logline,
+    panelSummaries: script.panels.map((p) => {
+      const cast = p.cast.join("+");
+      const dialogueStr = p.dialogue
+        ? p.dialogue.map((d) => `${d.speaker}: "${d.text}"`).join(" / ")
+        : "(no dialogue)";
+      return `${cast} — ${p.action} | ${dialogueStr}`;
+    }),
+    juryFeedback: summariseDissent(juryVerdict),
+  };
 }
 
 async function judgeScript(
@@ -224,23 +273,69 @@ function summariseDissent(verdict: VotedVerdict<ScriptQcResult>): string {
     .join("\n");
 }
 
-async function writeAndApproveScript(theme: ComicStripTheme): Promise<{
+/**
+ * Try to produce an approved script for ONE theme, with feedback-aware
+ * retries. Each retry sees every prior rejected attempt's jury feedback
+ * (compressed via buildRejectedAttempt) so the writer can correct
+ * concretely instead of producing minor variants of the same broken draft.
+ *
+ * Returns null on exhaustion so the caller can decide whether to reroll
+ * the theme. Throwing here would force the cron to fail entirely; the
+ * theme-reroll loop wants a recoverable signal.
+ */
+async function writeAndApproveScriptForTheme(theme: ComicStripTheme): Promise<{
   script: Script;
   juryVerdict: VotedVerdict<ScriptQcResult>;
-}> {
+} | null> {
+  const priorAttempts: RejectedAttempt[] = [];
   for (let attempt = 0; attempt <= SCRIPT_RETRIES; attempt += 1) {
-    const script = await writeScript(theme);
+    const script = await writeScript(theme, priorAttempts);
     const juryVerdict = await judgeScript(script);
     console.log(
-      `[comic-strip] script attempt ${attempt + 1}: jury=${juryVerdict.passingCount}/3 passed=${juryVerdict.passed}`,
+      `[comic-strip] theme=${theme} script attempt ${attempt + 1}/${SCRIPT_RETRIES + 1}: jury=${juryVerdict.passingCount}/3 passed=${juryVerdict.passed}${priorAttempts.length ? ` (with ${priorAttempts.length} prior attempt${priorAttempts.length === 1 ? "" : "s"} as feedback)` : ""}`,
     );
     if (juryVerdict.passed) return { script, juryVerdict };
     console.warn(
       `[comic-strip] script rejected by jury:\n${summariseDissent(juryVerdict)}`,
     );
+    priorAttempts.push(buildRejectedAttempt(script, juryVerdict));
+  }
+  return null;
+}
+
+/**
+ * Try to produce an approved script. Loops over up to (THEME_RETRIES + 1)
+ * themes — when one theme exhausts its retries, we pick a fresh theme
+ * (excluding any we've already tried) and start over. This handles the
+ * failure mode where Opus locks onto a structurally-broken script for
+ * one theme: the rule-keeper-presence violation we hit on 2026-05-10 was
+ * a RULE_BREAKING-specific issue that fresh-themed retries dodge entirely.
+ *
+ * Returns the chosen theme alongside the script — the caller needs to
+ * persist whichever theme actually produced the approved script, not the
+ * theme it started with.
+ */
+async function writeAndApproveScript(initialTheme: ComicStripTheme): Promise<{
+  script: Script;
+  juryVerdict: VotedVerdict<ScriptQcResult>;
+  theme: ComicStripTheme;
+}> {
+  const triedThemes: ComicStripTheme[] = [];
+  let theme = initialTheme;
+  for (let themeAttempt = 0; themeAttempt <= THEME_RETRIES; themeAttempt += 1) {
+    triedThemes.push(theme);
+    const result = await writeAndApproveScriptForTheme(theme);
+    if (result) return { ...result, theme };
+    if (themeAttempt < THEME_RETRIES) {
+      const next = await pickTheme(triedThemes);
+      console.warn(
+        `[comic-strip] theme=${theme} exhausted after ${SCRIPT_RETRIES + 1} attempts; rerolling to theme=${next}`,
+      );
+      theme = next;
+    }
   }
   throw new Error(
-    `[comic-strip] script failed jury after ${SCRIPT_RETRIES + 1} attempts`,
+    `[comic-strip] script failed jury across ${triedThemes.length} themes (${triedThemes.join(", ")}), each ${SCRIPT_RETRIES + 1} attempts`,
   );
 }
 
@@ -479,17 +574,20 @@ export async function runComicStripCron(): Promise<void> {
   let stripId: string | null = null;
   try {
     console.log("[comic-strip] picking theme...");
-    const theme = await pickTheme();
-    console.log(`[comic-strip] theme=${theme}`);
+    const initialTheme = await pickTheme();
+    console.log(`[comic-strip] theme=${initialTheme}`);
 
     console.log("[comic-strip] writing + judging script with 3-judge jury...");
-    const { script, juryVerdict: scriptJury } =
-      await writeAndApproveScript(theme);
+    const {
+      script,
+      juryVerdict: scriptJury,
+      theme: approvedTheme,
+    } = await writeAndApproveScript(initialTheme);
     console.log(
-      `[comic-strip] script approved: "${script.title}" (${script.theme}) jury=${scriptJury.passingCount}/3`,
+      `[comic-strip] script approved: "${script.title}" (${approvedTheme}${approvedTheme !== initialTheme ? `, rerolled from ${initialTheme}` : ""}) jury=${scriptJury.passingCount}/3`,
     );
 
-    const slug = makeSlug(theme, script.title);
+    const slug = makeSlug(approvedTheme, script.title);
 
     // Insert GENERATING row early so we can update it as we go and
     // surface progress in admin UI later.
@@ -498,7 +596,7 @@ export async function runComicStripCron(): Promise<void> {
         slug,
         title: script.title,
         scriptJson: script,
-        theme,
+        theme: approvedTheme,
         caption: script.caption,
         status: ComicStripStatus.GENERATING,
         brand: Brand.CHUNKY_CRAYON,

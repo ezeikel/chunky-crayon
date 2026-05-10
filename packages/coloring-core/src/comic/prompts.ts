@@ -145,10 +145,29 @@ Respond with a single JSON object, no markdown wrapper, no commentary:
 }
 </output-format>`;
 
+/**
+ * One earlier rejected attempt. We pass these back into the prompt on retry
+ * so the writer can correct concretely instead of producing variants of the
+ * same broken structure.
+ *
+ * `juryFeedback` is the dissent summary — judges' issues + suggestions,
+ * already collapsed into one string by the worker (see summariseDissent).
+ */
+export type RejectedAttempt = {
+  /** The Script object the writer produced. We send title + logline + panel summaries — the full JSON is too noisy. */
+  title: string;
+  logline: string;
+  /** One-line per panel: "P1 (cast): action. dialogue." — concise enough to reason about without flooding context. */
+  panelSummaries: readonly string[];
+  /** Dissent summary from the script jury — verbatim issues + suggestions. */
+  juryFeedback: string;
+};
+
 export const createComicScriptPrompt = (
   theme: string,
   recentTitles: readonly string[] = [],
   recentThemes: readonly string[] = [],
+  priorAttempts: readonly RejectedAttempt[] = [],
 ) =>
   `Write this week's Chunky Crayon comic strip.
 
@@ -169,6 +188,30 @@ ${
   recentThemes.length > 0
     ? `<recent-themes>${recentThemes.join(", ")}</recent-themes>
 Avoid back-to-back theme repeats.`
+    : ""
+}
+
+${
+  priorAttempts.length > 0
+    ? `<previous-rejected-attempts>
+You wrote ${priorAttempts.length} earlier draft${priorAttempts.length === 1 ? "" : "s"} that the script jury rejected. Each is shown with the jury's specific complaints. Don't repeat the same structural mistakes — apply each suggestion concretely. The judges are strict and consistent; their feedback is the spec.
+
+${priorAttempts
+  .map(
+    (a, i) => `<attempt index="${i + 1}">
+  <title>${a.title}</title>
+  <logline>${a.logline}</logline>
+  <panels>
+${a.panelSummaries.map((p, idx) => `    P${idx + 1}: ${p}`).join("\n")}
+  </panels>
+  <jury-feedback>
+${a.juryFeedback}
+  </jury-feedback>
+</attempt>`,
+  )
+  .join("\n\n")}
+</previous-rejected-attempts>
+Write a NEW strip that addresses every concern above. If a judge said the rule-keeper must be on-panel during the rule-break, put them there. If a judge said the joke depended on reading text, redesign so it lands visually. Do not produce another minor variant of the rejected drafts.`
     : ""
 }
 
