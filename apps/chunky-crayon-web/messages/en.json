@@ -1199,7 +1199,8 @@
         "75": "Nearly there!",
         "100": "All done!"
       }
-    }
+    },
+    "tapToColor": "Tap to color"
   },
   "createForm": {
     "title": "Create Magic!",

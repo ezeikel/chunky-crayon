@@ -25,6 +25,7 @@ import {
   faPizzaSlice,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import type { Currency } from '@/lib/currency';
 
 export const MAX_IMAGE_GENERATION_ATTEMPTS = 3;
 
@@ -616,14 +617,27 @@ export const ACTIONS = {
 
 export type PlanInterval = 'monthly' | 'annual';
 
+export type PriceEntry = {
+  display: string; // e.g '£7.99' or '$7.99'
+  stripePriceEnv: string; // env var name resolved to a Stripe Price ID
+};
+
 export type SubscriptionPlan = {
   key: PlanName;
-  price: string; // e.g '£7.99'
   credits: string;
   featureKeys: string[]; // Translation keys for features (e.g. 'textPrompts', 'advancedEditing')
-  stripePriceEnv: string; // e.g 'NEXT_PUBLIC_STRIPE_PRICE_CRAYON_MONTHLY'
+  prices: Record<Currency, PriceEntry>;
   mostPopular?: boolean;
 };
+
+// Pull the right localized price entry for a plan or credit pack. Both
+// types share the `prices` shape so this works for both.
+export const getPriceForCurrency = <
+  T extends { prices: Record<Currency, PriceEntry> },
+>(
+  item: T,
+  currency: Currency,
+): PriceEntry => item.prices[currency];
 
 // Monthly credit allotment per plan (same for monthly and annual billing)
 // Annual subscribers get the same monthly credits via cron job, just billed yearly
@@ -672,15 +686,23 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
   monthly: [
     {
       key: PlanName.SPLASH,
-      price: '£7.99',
       credits: `${PLAN_CREDITS[PlanName.SPLASH][BillingPeriod.MONTHLY]} credits/month`,
       featureKeys: ['credits250', 'profiles2', 'allFeatures', 'noRollover'],
-      stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY as string,
+      prices: {
+        GBP: {
+          display: '£7.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY_GBP as string,
+        },
+        USD: {
+          display: '$7.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_MONTHLY_USD as string,
+        },
+      },
     },
     {
       key: PlanName.RAINBOW,
-      price: '£13.99',
       credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.MONTHLY]} credits/month`,
       featureKeys: [
         'credits500',
@@ -689,13 +711,22 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'rollover1Month',
         'prioritySupport',
       ],
-      stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY as string,
+      prices: {
+        GBP: {
+          display: '£13.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY_GBP as string,
+        },
+        USD: {
+          display: '$13.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_MONTHLY_USD as string,
+        },
+      },
       mostPopular: true,
     },
     {
       key: PlanName.SPARKLE,
-      price: '£24.99',
       credits: `${PLAN_CREDITS[PlanName.SPARKLE][BillingPeriod.MONTHLY]} credits/month`,
       featureKeys: [
         'credits1000',
@@ -704,22 +735,40 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'rollover2Months',
         'commercialUse',
       ],
-      stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY as string,
+      prices: {
+        GBP: {
+          display: '£24.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY_GBP as string,
+        },
+        USD: {
+          display: '$24.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_MONTHLY_USD as string,
+        },
+      },
     },
   ],
   annual: [
     {
       key: PlanName.SPLASH,
-      price: '£79.99',
       credits: `${PLAN_CREDITS[PlanName.SPLASH][BillingPeriod.ANNUAL]} credits/month`,
       featureKeys: ['credits250', 'profiles2', 'allFeatures', 'noRollover'],
-      stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL as string,
+      prices: {
+        GBP: {
+          display: '£79.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL_GBP as string,
+        },
+        USD: {
+          display: '$79.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_SPLASH_ANNUAL_USD as string,
+        },
+      },
     },
     {
       key: PlanName.RAINBOW,
-      price: '£139.99',
       credits: `${PLAN_CREDITS[PlanName.RAINBOW][BillingPeriod.ANNUAL]} credits/month`,
       featureKeys: [
         'credits500',
@@ -728,13 +777,22 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'rollover1Month',
         'prioritySupport',
       ],
-      stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL as string,
+      prices: {
+        GBP: {
+          display: '£139.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL_GBP as string,
+        },
+        USD: {
+          display: '$139.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_RAINBOW_ANNUAL_USD as string,
+        },
+      },
       mostPopular: true,
     },
     {
       key: PlanName.SPARKLE,
-      price: '£249.99',
       credits: `${PLAN_CREDITS[PlanName.SPARKLE][BillingPeriod.ANNUAL]} credits/month`,
       featureKeys: [
         'credits1000',
@@ -743,8 +801,18 @@ export const SUBSCRIPTION_PLANS: Record<PlanInterval, SubscriptionPlan[]> = {
         'rollover2Months',
         'commercialUse',
       ],
-      stripePriceEnv: process.env
-        .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL as string,
+      prices: {
+        GBP: {
+          display: '£249.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL_GBP as string,
+        },
+        USD: {
+          display: '$249.99',
+          stripePriceEnv: process.env
+            .NEXT_PUBLIC_STRIPE_PRICE_SPARKLE_ANNUAL_USD as string,
+        },
+      },
     },
   ],
 };
@@ -755,8 +823,7 @@ export type CreditPack = {
   key: keyof typeof CREDIT_PACK_AMOUNTS;
   name: string;
   credits: number;
-  price: string;
-  stripePriceEnv: string;
+  prices: Record<Currency, PriceEntry>;
 };
 
 // Subscriber-only packs surfaced in /account/billing as a member perk.
@@ -767,22 +834,52 @@ export const CREDIT_PACKS_MEMBER: CreditPack[] = [
     key: 'CREDITS_100',
     name: '100 Credits Pack',
     credits: CREDIT_PACK_AMOUNTS.CREDITS_100,
-    price: '£3.00',
-    stripePriceEnv: process.env.NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100 as string,
+    prices: {
+      GBP: {
+        display: '£3.00',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100_GBP as string,
+      },
+      USD: {
+        display: '$3.00',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_CREDITS_100_USD as string,
+      },
+    },
   },
   {
     key: 'CREDITS_500',
     name: '500 Credits Pack',
     credits: CREDIT_PACK_AMOUNTS.CREDITS_500,
-    price: '£12.00',
-    stripePriceEnv: process.env.NEXT_PUBLIC_STRIPE_PRICE_CREDITS_500 as string,
+    prices: {
+      GBP: {
+        display: '£12.00',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_CREDITS_500_GBP as string,
+      },
+      USD: {
+        display: '$12.00',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_CREDITS_500_USD as string,
+      },
+    },
   },
   {
     key: 'CREDITS_1000',
     name: '1,000 Credits Pack',
     credits: CREDIT_PACK_AMOUNTS.CREDITS_1000,
-    price: '£20.00',
-    stripePriceEnv: process.env.NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000 as string,
+    prices: {
+      GBP: {
+        display: '£20.00',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000_GBP as string,
+      },
+      USD: {
+        display: '$20.00',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_CREDITS_1000_USD as string,
+      },
+    },
   },
 ];
 
@@ -794,25 +891,52 @@ export const CREDIT_PACKS_PUBLIC: CreditPack[] = [
     key: 'PUBLIC_CREDITS_50',
     name: 'Color As You Go - 50 Credits',
     credits: CREDIT_PACK_AMOUNTS.PUBLIC_CREDITS_50,
-    price: '£2.49',
-    stripePriceEnv: process.env
-      .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_50 as string,
+    prices: {
+      GBP: {
+        display: '£2.49',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_50_GBP as string,
+      },
+      USD: {
+        display: '$2.49',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_50_USD as string,
+      },
+    },
   },
   {
     key: 'PUBLIC_CREDITS_200',
     name: 'Color As You Go - 200 Credits',
     credits: CREDIT_PACK_AMOUNTS.PUBLIC_CREDITS_200,
-    price: '£8.99',
-    stripePriceEnv: process.env
-      .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_200 as string,
+    prices: {
+      GBP: {
+        display: '£8.99',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_200_GBP as string,
+      },
+      USD: {
+        display: '$8.99',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_200_USD as string,
+      },
+    },
   },
   {
     key: 'PUBLIC_CREDITS_500',
     name: 'Color As You Go - 500 Credits',
     credits: CREDIT_PACK_AMOUNTS.PUBLIC_CREDITS_500,
-    price: '£19.99',
-    stripePriceEnv: process.env
-      .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_500 as string,
+    prices: {
+      GBP: {
+        display: '£19.99',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_500_GBP as string,
+      },
+      USD: {
+        display: '$19.99',
+        stripePriceEnv: process.env
+          .NEXT_PUBLIC_STRIPE_PRICE_PUBLIC_CREDITS_500_USD as string,
+      },
+    },
   },
 ];
 
@@ -1024,6 +1148,8 @@ export const TRACKING_EVENTS = {
   LANDING_PAGE_VIEWED: 'landing_page_viewed', // /start (or /) loaded with utm_campaign in scope
   LANDING_HERO_POLAROID_CLICKED: 'landing_hero_polaroid_clicked', // Hero polaroid → coloring-image page
   START_HERO_CANVAS_INTERACTED: 'start_hero_canvas_interacted', // First stroke on the embedded /start canvas (replaces the polaroid click as the engagement signal)
+  COLORING_PAGE_TAP_PROMPT_SHOWN: 'coloring_page_tap_prompt_shown', // Mobile-only "Tap to color" hint rendered on /coloring-image/[id] for first-time visitors
+  COLORING_PAGE_TAP_PROMPT_DISMISSED: 'coloring_page_tap_prompt_dismissed', // Visitor's first canvas interaction dismissed the hint
   START_HERO_COLOR_PICKED: 'start_hero_color_picked', // Visitor picked a swatch on the /start canvas
   START_HERO_TOOL_CHANGED: 'start_hero_tool_changed', // Visitor switched tools (crayon / magic / eraser) on /start
   START_HERO_AUTO_REVEAL_CLICKED: 'start_hero_auto_reveal_clicked', // One-click magic auto-reveal — paints the entire pre-coloured canvas in one shot

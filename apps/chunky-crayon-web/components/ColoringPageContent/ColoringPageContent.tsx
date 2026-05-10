@@ -178,6 +178,7 @@ const ColoringPageContent = ({
               ref={coloringAreaRef}
               coloringImage={coloringImage}
               isAuthenticated={isAuthenticated}
+              tapPromptLabel={t('tapToColor')}
             />
           </div>
         </div>

@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Drawer } from "vaul";
-import {
-  motion,
-  useMotionValue,
-  useTransform,
-  animate,
-  type PanInfo,
-} from "framer-motion";
+import { motion, useMotionValue, animate, type PanInfo } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPencil,
@@ -197,67 +191,110 @@ const MobileColoringDrawer = ({
   const colors = COLORING_PALETTE_VARIANTS[paletteVariant];
   const { playSound } = useSound();
 
-  // Heights matching mobile app
-  const collapsedHeight = 200; // Tools + Colors visible
-  const expandedHeight = 450; // All sections visible
+  // Three snap points (peek / half / full). Heights in px so behaviour is
+  // predictable across devices.
+  // - PEEK 120px:  drag handle + tools row only. The default — keeps the
+  //                canvas dominant, the 60% of users who came to print don't
+  //                need to drag.
+  // - HALF 340px:  adds palette-variant switcher + color swatches. Where
+  //                most coloring happens.
+  // - FULL 560px:  adds brush sizes / fill / patterns / undo-redo.
+  const snapPoints = [120, 340, 560] as const;
+  type SnapIndex = 0 | 1 | 2;
 
-  // Framer Motion height value
-  const height = useMotionValue(collapsedHeight);
+  const height = useMotionValue<number>(snapPoints[0]);
+  const [currentSnap, setCurrentSnap] = useState<SnapIndex>(0);
+  // Tracks whether the user has tapped a tool yet. Auto-snap-up on first
+  // tool tap teaches the gesture implicitly — like an iOS keyboard
+  // expanding when you focus a text field. After the first tap we don't
+  // force-snap again; the user is in control.
+  const hasAutoSnappedRef = useRef(false);
 
-  // Track expanded state for conditional rendering
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  // Snap threshold - percentage of range where we snap to the other state
-  const snapThreshold = 0.4;
-  const midPoint =
-    collapsedHeight + (expandedHeight - collapsedHeight) * snapThreshold;
-
-  // Spring config for natural snapping animation
+  // Spring config — feels good already, keep as-is.
   const springConfig = {
     type: "spring" as const,
     stiffness: 400,
     damping: 30,
   };
 
-  // Handle drag on the handle bar
+  /**
+   * Pick the closest snap point to the current height, biased by the
+   * user's flick direction. If they're flicking hard (|velocity.y| > 400)
+   * we prefer the next snap in the flick direction even if it's not the
+   * mathematically nearest — matches iOS bottom-sheet feel.
+   */
+  const nearestSnap = (currentHeight: number, velocityY: number): SnapIndex => {
+    const flickThreshold = 400;
+    let closest: SnapIndex = 0;
+    let closestDistance = Infinity;
+    snapPoints.forEach((point, index) => {
+      const distance = Math.abs(point - currentHeight);
+      if (distance < closestDistance) {
+        closest = index as SnapIndex;
+        closestDistance = distance;
+      }
+    });
+    if (Math.abs(velocityY) > flickThreshold) {
+      // Flick UP = grow drawer (negative velocity in framer pan space).
+      // Flick DOWN = shrink drawer.
+      if (velocityY < 0 && closest < 2) {
+        return Math.max(closest, currentSnap + 1) as SnapIndex;
+      }
+      if (velocityY > 0 && closest > 0) {
+        return Math.min(closest, currentSnap - 1) as SnapIndex;
+      }
+    }
+    return closest;
+  };
+
+  const snapTo = (index: SnapIndex) => {
+    animate(height, snapPoints[index], springConfig);
+    setCurrentSnap(index);
+  };
+
   const handlePan = (
     _: MouseEvent | TouchEvent | PointerEvent,
     info: PanInfo,
   ) => {
-    // Dragging up (negative offset.y) should increase height
+    // Dragging up (negative delta.y) grows the sheet.
     const currentHeight = height.get();
     const newHeight = Math.max(
-      collapsedHeight,
-      Math.min(expandedHeight, currentHeight - info.delta.y),
+      snapPoints[0],
+      Math.min(snapPoints[2], currentHeight - info.delta.y),
     );
     height.set(newHeight);
   };
 
-  // Handle drag end - snap to nearest state with spring animation
-  const handlePanEnd = () => {
-    const currentHeight = height.get();
-
-    if (currentHeight > midPoint) {
-      // Snap to expanded
-      animate(height, expandedHeight, springConfig);
-      setIsExpanded(true);
-    } else {
-      // Snap to collapsed
-      animate(height, collapsedHeight, springConfig);
-      setIsExpanded(false);
-    }
+  const handlePanEnd = (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => {
+    snapTo(nearestSnap(height.get(), info.velocity.y));
   };
 
-  // Handle click to toggle
+  // Tap on the handle cycles peek → half → full → peek so non-draggers
+  // (mouse, accessibility) can still reach every state.
   const handleToggle = () => {
-    if (isExpanded) {
-      animate(height, collapsedHeight, springConfig);
-      setIsExpanded(false);
-    } else {
-      animate(height, expandedHeight, springConfig);
-      setIsExpanded(true);
-    }
+    snapTo(((currentSnap + 1) % 3) as SnapIndex);
   };
+
+  // Once-on-mount bounce — handle floats up ~8px and back over 600ms
+  // when the drawer first appears. Catches the eye, confirms it's
+  // interactive without copy. Only runs at peek state on mount.
+  const [hasBounced, setHasBounced] = useState(false);
+  useEffect(() => {
+    if (hasBounced) return;
+    const id = window.setTimeout(() => {
+      const peek = snapPoints[0];
+      animate(height, [peek, peek + 8, peek], {
+        duration: 0.6,
+        ease: "easeInOut",
+      });
+      setHasBounced(true);
+    }, 400);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Show fill type selector when fill tool is active
   const showFillTypeSelector = activeTool === "fill";
@@ -329,6 +366,15 @@ const MobileColoringDrawer = ({
         break;
     }
     playSound("pop");
+
+    // First time the user taps a tool from peek state, auto-snap up to
+    // half so the colour palette becomes visible. Teaches the gesture
+    // implicitly without copy. Only fires once per mount; after that the
+    // user is in control of the sheet.
+    if (!hasAutoSnappedRef.current && currentSnap === 0) {
+      hasAutoSnappedRef.current = true;
+      snapTo(1);
+    }
   };
 
   const isToolActive = (toolId: string) => {
@@ -395,9 +441,17 @@ const MobileColoringDrawer = ({
                   handleToggle();
                 }
               }}
-              aria-label={isExpanded ? "Collapse toolbar" : "Expand toolbar"}
+              aria-label={
+                currentSnap === 0
+                  ? "Expand toolbar"
+                  : currentSnap === 2
+                    ? "Collapse toolbar"
+                    : "Expand toolbar more"
+              }
             >
-              <div className="w-12 h-1.5 rounded-full bg-coloring-surface-dark" />
+              {/* Bigger, slightly shadowed pill — clearer "drag me"
+                  affordance than the old 12x1.5 hairline. */}
+              <div className="w-14 h-[5px] rounded-full bg-coloring-surface-dark/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)]" />
             </motion.div>
 
             {/* Scrollable content area */}
@@ -465,71 +519,77 @@ const MobileColoringDrawer = ({
               </div>
 
               {/* Palette variant switcher — swaps the swatch grid and drives
-               * the magic-tool palette too, matching desktop's single-knob UX. */}
-              <div className="mb-3">
-                <div className="grid grid-cols-4 gap-2">
-                  {PALETTE_VARIANTS.map((variant) => {
-                    const isActive = paletteVariant === variant;
-                    return (
-                      <button
-                        key={variant}
-                        type="button"
-                        onClick={() => {
-                          setPaletteVariant(variant);
-                          playSound("tap");
-                        }}
-                        aria-label={variant}
-                        title={variant}
-                        aria-pressed={isActive}
-                        className={cn(
-                          "flex items-center justify-center h-12 rounded-coloring-card border-2",
-                          "transition-all duration-coloring-base ease-coloring active:scale-95",
-                          isActive
-                            ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-                            : "bg-white border-coloring-surface-dark text-coloring-text-primary",
-                        )}
-                      >
-                        <FontAwesomeIcon
-                          icon={variantIcons[variant]}
-                          size="lg"
+               * the magic-tool palette too, matching desktop's single-knob UX.
+               * Hidden at peek so the canvas dominates; appears at half. */}
+              {currentSnap >= 1 && (
+                <div className="mb-3">
+                  <div className="grid grid-cols-4 gap-2">
+                    {PALETTE_VARIANTS.map((variant) => {
+                      const isActive = paletteVariant === variant;
+                      return (
+                        <button
+                          key={variant}
+                          type="button"
+                          onClick={() => {
+                            setPaletteVariant(variant);
+                            playSound("tap");
+                          }}
+                          aria-label={variant}
+                          title={variant}
+                          aria-pressed={isActive}
+                          className={cn(
+                            "flex items-center justify-center h-12 rounded-coloring-card border-2",
+                            "transition-all duration-coloring-base ease-coloring active:scale-95",
+                            isActive
+                              ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
+                              : "bg-white border-coloring-surface-dark text-coloring-text-primary",
+                          )}
+                        >
+                          <FontAwesomeIcon
+                            icon={variantIcons[variant]}
+                            size="lg"
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Colors — grid driven by the current palette variant.
+                  Half-snap+ only so peek stays canvas-dominant. */}
+              {currentSnap >= 1 && (
+                <div className="mb-4">
+                  <div className="grid grid-cols-8 gap-1.5 py-1">
+                    {colors.map((color) => {
+                      const isSelected = selectedColor === color.hex;
+                      return (
+                        <button
+                          key={color.hex}
+                          type="button"
+                          onClick={() => {
+                            setSelectedColor(color.hex);
+                            playSound("tap");
+                          }}
+                          className={cn(
+                            "aspect-square w-full rounded-full border-2",
+                            "transition-all duration-coloring-base ease-coloring active:scale-95",
+                            isSelected
+                              ? "ring-2 ring-coloring-accent ring-offset-1 border-white"
+                              : "border-coloring-surface-dark",
+                          )}
+                          style={{ backgroundColor: color.hex }}
+                          aria-label={`Select ${color.name} color`}
+                          aria-pressed={isSelected}
                         />
-                      </button>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Colors — grid driven by the current palette variant */}
-              <div className="mb-4">
-                <div className="grid grid-cols-8 gap-1.5 py-1">
-                  {colors.map((color) => {
-                    const isSelected = selectedColor === color.hex;
-                    return (
-                      <button
-                        key={color.hex}
-                        type="button"
-                        onClick={() => {
-                          setSelectedColor(color.hex);
-                          playSound("tap");
-                        }}
-                        className={cn(
-                          "aspect-square w-full rounded-full border-2",
-                          "transition-all duration-coloring-base ease-coloring active:scale-95",
-                          isSelected
-                            ? "ring-2 ring-coloring-accent ring-offset-1 border-white"
-                            : "border-coloring-surface-dark",
-                        )}
-                        style={{ backgroundColor: color.hex }}
-                        aria-label={`Select ${color.name} color`}
-                        aria-pressed={isSelected}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Brush Size Section - only when expanded and brush tool active */}
-              {isExpanded && showBrushSizeSelector && (
+              {/* Brush Size Section — full-snap only when brush tool active */}
+              {currentSnap >= 2 && showBrushSizeSelector && (
                 <div className="mb-4">
                   <div className="flex gap-2">
                     {(
@@ -584,7 +644,7 @@ const MobileColoringDrawer = ({
               )}
 
               {/* Fill Type — icon-only tiles matching tools */}
-              {isExpanded && showFillTypeSelector && (
+              {currentSnap >= 2 && showFillTypeSelector && (
                 <div className="mb-4">
                   <div className="flex gap-2">
                     {fillTypes.map((fill) => {
@@ -629,7 +689,7 @@ const MobileColoringDrawer = ({
               )}
 
               {/* Pattern — icon-only tile grid */}
-              {isExpanded && showPatternSelector && (
+              {currentSnap >= 2 && showPatternSelector && (
                 <div className="mb-4">
                   <div className="grid grid-cols-5 gap-2">
                     {patternTypes.map((pattern) => {
@@ -669,8 +729,8 @@ const MobileColoringDrawer = ({
                 </div>
               )}
 
-              {/* History Section - Undo/Redo - only when expanded */}
-              {isExpanded && (
+              {/* History Section — Undo/Redo, full-snap only */}
+              {currentSnap >= 2 && (
                 <div className="mb-4">
                   <div className="flex gap-3">
                     <button

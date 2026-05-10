@@ -17,6 +17,7 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import { ColoringImage } from '@one-colored-pixel/db/types';
 import { ImageCanvas, ImageCanvasHandle } from '@one-colored-pixel/coloring-ui';
+import TapPromptOverlay from '@/components/TapPromptOverlay';
 import { ColoringToolbar } from '@one-colored-pixel/coloring-ui';
 import { MobileColoringDrawer } from '@one-colored-pixel/coloring-ui';
 import StickerSelector from '@/components/StickerSelector';
@@ -63,6 +64,13 @@ import { detectAllRegions } from '@one-colored-pixel/canvas';
 type ColoringAreaProps = {
   coloringImage: Partial<ColoringImage>;
   isAuthenticated?: boolean;
+  /**
+   * Translated label for the mobile-only "Tap to color" overlay shown on
+   * a visitor's first arrival. Omit on surfaces that shouldn't render
+   * the prompt (e.g. preview screens). Persisted via localStorage so
+   * repeat visitors don't see it again.
+   */
+  tapPromptLabel?: string;
 };
 
 export type ColoringAreaHandle = {
@@ -76,7 +84,7 @@ export type ColoringAreaHandle = {
 };
 
 const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
-  ({ coloringImage, isAuthenticated = false }, ref) => {
+  ({ coloringImage, isAuthenticated = false, tapPromptLabel }, ref) => {
     const canvasRef = useRef<ImageCanvasHandle>(null);
     // Wrapper around the canvas — used by IntersectionObserver below to
     // gate the mobile drawer's visibility. Without this the drawer
@@ -87,6 +95,15 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // starts in view). Flipped by the IntersectionObserver as the user
     // scrolls.
     const [isCanvasInViewport, setIsCanvasInViewport] = useState(true);
+    // Mobile-only "Tap to color" overlay state. Cold-traffic visitors
+    // don't realize the canvas is interactive (PostHog: 59% of mobile
+    // landings on /coloring-image/[id] do nothing). The prompt pulses
+    // a finger over the canvas + a one-line label. Dismisses on first
+    // interaction; persisted via localStorage so repeat visitors don't
+    // see it. Starts off-by-default and flips on after the
+    // localStorage check on mount to avoid a flash.
+    const [showTapPrompt, setShowTapPrompt] = useState(false);
+    const [tapPromptDismissed, setTapPromptDismissed] = useState(false);
     // Store the "after" states for redo - keyed by timestamp
     const redoStatesRef = useRef<Map<number, ImageData>>(new Map());
     // Track if canvas is ready
@@ -162,6 +179,24 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         referenceColor.loadReference(coloringImage.coloredReferenceUrl);
       }
     }, [coloringImage.coloredReferenceUrl]);
+
+    // Tap-prompt visibility — only on first visit per device, only on
+    // mobile (CSS gates desktop). The localStorage check happens on
+    // mount so the prompt doesn't flash for repeat visitors. Skipped
+    // entirely if no label was passed (e.g. preview surfaces).
+    useEffect(() => {
+      if (!tapPromptLabel) return;
+      try {
+        if (window.localStorage.getItem('coloring-page-tap-prompted')) return;
+      } catch {
+        // Private mode / storage disabled — fall through and show the
+        // prompt; first-interaction will still dismiss it.
+      }
+      setShowTapPrompt(true);
+      trackEvent(TRACKING_EVENTS.COLORING_PAGE_TAP_PROMPT_SHOWN, {
+        coloringImageId: coloringImage.id ?? '',
+      });
+    }, [tapPromptLabel, coloringImage.id]);
 
     // Hide the mobile drawer when the user scrolls past the canvas.
     // Same pattern as EmbeddedColoringCanvas on /start: threshold 0.2
@@ -348,6 +383,22 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // TODO: Trigger ambient sound on ANY page interaction (color pick, button click), not just canvas stroke
     // TODO: Improve ElevenLabs ambient sound prompts - current sounds are low quality/not fitting
     const handleFirstInteraction = useCallback(async () => {
+      // Tap-prompt dismissal. Once any stroke / fill / magic action
+      // fires, the visitor knows the canvas is interactive — fade the
+      // prompt out and persist the dismissal so they never see it again.
+      if (showTapPrompt && !tapPromptDismissed) {
+        setTapPromptDismissed(true);
+        try {
+          window.localStorage.setItem('coloring-page-tap-prompted', '1');
+        } catch {
+          // Storage disabled — fine, prompt is already hidden for this
+          // session via the dismissed flag.
+        }
+        trackEvent(TRACKING_EVENTS.COLORING_PAGE_TAP_PROMPT_DISMISSED, {
+          coloringImageId: coloringImage.id ?? '',
+        });
+      }
+
       console.log('[ColoringArea] handleFirstInteraction called', {
         hasAmbientUrl: !!coloringImage.backgroundMusicUrl,
         ambientUrl: coloringImage.backgroundMusicUrl,
@@ -360,7 +411,14 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         console.log('[ColoringArea] Playing ambient sound...');
         playAmbient();
       }
-    }, [coloringImage.backgroundMusicUrl, loadAmbient, playAmbient]);
+    }, [
+      coloringImage.backgroundMusicUrl,
+      coloringImage.id,
+      loadAmbient,
+      playAmbient,
+      showTapPrompt,
+      tapPromptDismissed,
+    ]);
 
     // Cleanup: stop ambient sound when component unmounts
     useEffect(() => {
@@ -1230,6 +1288,20 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
                 : undefined
             }
           />
+
+          {/* Mobile-only "Tap to color" hint. Cold-traffic visitors don't
+              realize the canvas is interactive — 59% of mobile landings
+              do nothing per PostHog. The overlay is pointer-events-none
+              so it doesn't block strokes; first interaction fades it
+              out and persists the dismissal. */}
+          {tapPromptLabel && showTapPrompt && (
+            <div className="md:hidden absolute inset-0 pointer-events-none">
+              <TapPromptOverlay
+                hidden={tapPromptDismissed}
+                label={tapPromptLabel}
+              />
+            </div>
+          )}
 
           {/* Region-store wait banner. Surfaces after ~4.5 min of
            * polling for the worker's region store. Matches the

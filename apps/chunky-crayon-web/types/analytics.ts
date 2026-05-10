@@ -493,6 +493,12 @@ export type EventProperties = {
     coloringImageId: string;
     msFromMount: number; // time-to-first-stroke since component mount
   };
+  [TRACKING_EVENTS.COLORING_PAGE_TAP_PROMPT_SHOWN]: {
+    coloringImageId: string;
+  };
+  [TRACKING_EVENTS.COLORING_PAGE_TAP_PROMPT_DISMISSED]: {
+    coloringImageId: string;
+  };
   [TRACKING_EVENTS.START_HERO_COLOR_PICKED]: {
     campaign: string;
     color: string; // hex
