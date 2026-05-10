@@ -98,6 +98,48 @@ After auto-write, sanity-check the heroes (referenceSheetPrompts especially — 
 
 Cost: ~$0.10 per research run. Env vars: `PERPLEXITY_API_KEY` + `ANTHROPIC_API_KEY`.
 
+### Restoring a previous flesh-out (--from-dump)
+
+Every flesh-out call dumps its raw response to `apps/chunky-crayon-web/scripts/out/flesh-out-{slug}.json` _before_ parsing. This means:
+
+- A failed parse (Opus wrapping quirk, schema drift) doesn't lose the response
+- A `--no-write` dry-run that produces a great profile can be replayed into the codebase later without re-burning Sonar + Claude calls
+
+To replay a saved flesh-out into `profiles.ts`:
+
+```bash
+pnpm tsx -r dotenv/config scripts/research-bundle-ideas.ts \
+  --from-dump=scripts/out/flesh-out-bakery-buddy-bakers.json \
+  --slug=bakery-buddy-bakers \
+  --name="Bakery Buddy Bakers" \
+  --tagline="Mix, bake, and decorate with four adorable bakers" \
+  dotenv_config_path=.env.local
+```
+
+The `--slug` / `--name` / `--tagline` flags are required because the dump only stores the fleshed profile (heroes + pageCast + pagePrompts), not the candidate metadata. Same `y/N` confirm + same auto-write to `profiles.ts` and `index.ts`. Zero API calls.
+
+## Status of the launch slate
+
+Six bundles are registered in `HERO_BUNDLES` as of the latest commit. Their state:
+
+| Slug                       | Heroes filled? | pagePrompts filled? | Live in Stripe? | Notes                                  |
+| -------------------------- | -------------- | ------------------- | --------------- | -------------------------------------- |
+| `dino-dance-party`         | ✅             | ✅                  | ✅              | First bundle, fully shipped            |
+| `bakery-buddy-bakers`      | ✅             | ✅                  | ❌              | Ready for `launch-bundle.ts` real run  |
+| `unicorn-rainbow-rally`    | ❌ stub        | ✅                  | ❌              | Heroes need writing or research re-run |
+| `superhero-vehicle-squad`  | ❌ stub        | ✅                  | ❌              | Heroes need writing or research re-run |
+| `dessert-island-adventure` | ❌ stub        | ✅                  | ❌              | Heroes need writing or research re-run |
+| `space-adventure-crew`     | ❌ stub        | ✅                  | ❌              | Heroes need writing or research re-run |
+
+The four stubs already have `pagePrompts` written — the prompts reference specific characters by description ("a baby unicorn with a swirly horn"). Two paths to finish a stub:
+
+1. **Hand-write heroes** in `profiles.ts` to match the existing prompts. Use `DINO_DANCE_PARTY` as the shape reference. Keeps the existing prompts intact.
+2. **Re-run `research-bundle-ideas.ts` with a hint** like `--hint="unicorns racing across the sky to bring back lost rainbow colors, cast of 4"`, pick the matching candidate, auto-write. Will overwrite the existing `pagePrompts` with fresh ones.
+
+Path 1 is faster and honors the in-flight prompts. Path 2 is easier when the existing prompts no longer match where you want the bundle to go.
+
+`launch-bundle.ts` rejects bundles with empty `heroes[]` at Step 1 — fill them before running.
+
 ## Launching a new bundle
 
 ### Step 1: Define the profile
