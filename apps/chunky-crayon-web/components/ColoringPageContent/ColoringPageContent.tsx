@@ -179,6 +179,7 @@ const ColoringPageContent = ({
               coloringImage={coloringImage}
               isAuthenticated={isAuthenticated}
               tapPromptLabel={t('tapToColor')}
+              handleHintLabel={t('dragForTools')}
             />
           </div>
         </div>

@@ -1200,7 +1200,8 @@
         "100": "All done!"
       }
     },
-    "tapToColor": "Tap to color"
+    "tapToColor": "Tap to color",
+    "dragForTools": "Drag for tools"
   },
   "createForm": {
     "title": "Create Magic!",

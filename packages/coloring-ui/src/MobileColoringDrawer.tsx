@@ -47,6 +47,13 @@ type MobileColoringDrawerProps = {
   onUndo?: (action: CanvasAction) => void;
   onRedo?: (action: CanvasAction) => void;
   onStickerToolSelect?: () => void;
+  /**
+   * Translated label shown under the pulsing hand affordance on the
+   * drag handle for first-time visitors (e.g. "Drag for tools"). Omit
+   * to render the hand without a label. Persisted dismissal lives in
+   * localStorage('coloring-drawer-handle-hinted').
+   */
+  handleHintLabel?: string;
 };
 
 type ToolConfig = {
@@ -171,6 +178,7 @@ const MobileColoringDrawer = ({
   onUndo,
   onRedo,
   onStickerToolSelect,
+  handleHintLabel,
 }: MobileColoringDrawerProps) => {
   const {
     activeTool,
@@ -829,30 +837,40 @@ const MobileColoringDrawer = ({
             aria-hidden
             className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center"
             style={{
-              // Lift roughly half the icon height above the drawer's top
-              // edge so the icon body clears the rounded corner band and
-              // the ping rings don't feel pinched.
-              bottom: `calc(${snapPoints[0]}px - 22px)`,
+              // Lift the WHOLE block (hand + optional label) above the
+              // drawer top edge. Account for label height so the hand
+              // doesn't get pushed back into the drawer when a label
+              // is provided.
+              bottom: handleHintLabel
+                ? `calc(${snapPoints[0]}px + 8px)`
+                : `calc(${snapPoints[0]}px - 22px)`,
             }}
           >
-            <div className="relative">
-              <span
-                className="absolute inset-0 rounded-full bg-crayon-orange/55 animate-ping"
-                style={{ animationDuration: "1.6s" }}
-              />
-              <span
-                className="absolute inset-0 rounded-full bg-crayon-orange/35 animate-ping"
-                style={{
-                  animationDuration: "1.6s",
-                  animationDelay: "0.8s",
-                }}
-              />
-              <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-crayon-orange shadow-btn-primary">
-                <FontAwesomeIcon
-                  icon={faHandPointer}
-                  className="text-base text-white"
+            <div className="relative flex flex-col items-center gap-2">
+              <div className="relative">
+                <span
+                  className="absolute inset-0 rounded-full bg-crayon-orange/55 animate-ping"
+                  style={{ animationDuration: "1.6s" }}
                 />
+                <span
+                  className="absolute inset-0 rounded-full bg-crayon-orange/35 animate-ping"
+                  style={{
+                    animationDuration: "1.6s",
+                    animationDelay: "0.8s",
+                  }}
+                />
+                <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-crayon-orange shadow-btn-primary">
+                  <FontAwesomeIcon
+                    icon={faHandPointer}
+                    className="text-base text-white"
+                  />
+                </div>
               </div>
+              {handleHintLabel && (
+                <span className="font-tondo font-bold text-xs sm:text-sm text-coloring-text-primary bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-md border border-coloring-surface-dark">
+                  {handleHintLabel}
+                </span>
+              )}
             </div>
           </div>,
           document.body,

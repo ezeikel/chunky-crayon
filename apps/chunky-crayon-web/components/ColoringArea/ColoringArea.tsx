@@ -71,6 +71,12 @@ type ColoringAreaProps = {
    * repeat visitors don't see it again.
    */
   tapPromptLabel?: string;
+  /**
+   * Translated label shown under the pulsing hand on the mobile drawer
+   * handle for first-time visitors (e.g. "Drag for tools"). Forwarded
+   * to MobileColoringDrawer.
+   */
+  handleHintLabel?: string;
 };
 
 export type ColoringAreaHandle = {
@@ -84,7 +90,10 @@ export type ColoringAreaHandle = {
 };
 
 const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
-  ({ coloringImage, isAuthenticated = false, tapPromptLabel }, ref) => {
+  (
+    { coloringImage, isAuthenticated = false, tapPromptLabel, handleHintLabel },
+    ref,
+  ) => {
     const canvasRef = useRef<ImageCanvasHandle>(null);
     // Wrapper around the canvas — used by IntersectionObserver below to
     // gate the mobile drawer's visibility. Without this the drawer
@@ -1468,6 +1477,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             onUndo={handleUndo}
             onRedo={handleRedo}
             onStickerToolSelect={openStickerSelector}
+            handleHintLabel={handleHintLabel}
           />
         )}
 
