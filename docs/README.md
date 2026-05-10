@@ -4,6 +4,7 @@ Permanent reference for how moving parts of this monorepo work. Each topic has i
 
 | Topic                      | Path                                                 | What's in it                                                                                                                      |
 | -------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Bundles**                | [bundles/](./bundles/README.md)                      | Themed coloring bundles — profile spec, launch orchestrator, listing images, Stripe products, end-to-end runbook                  |
 | **Daily content crons**    | [crons/](./crons/README.md)                          | Blog + daily-image crons — Vercel thin trigger, Hetzner worker pipeline, fire-and-forget, env requirements                        |
 | **Social posting**         | [social-posting/](./social-posting/README.md)        | Auto-posting to IG/FB/Pinterest/TikTok — schedule, paused features (handlers intact), Daily Posting Brief email, engagement audit |
 | **Demo reels**             | [demo-reels/](./demo-reels/README.md)                | Vertical video crons (text + image variants), Hetzner worker, photo library, common failure modes                                 |
