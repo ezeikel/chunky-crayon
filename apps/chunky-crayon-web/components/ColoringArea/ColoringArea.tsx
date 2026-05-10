@@ -1314,7 +1314,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
               <TapPromptOverlay
                 hidden={tapPromptDismissed}
                 label={tapPromptLabel}
-                className="!items-start pt-12"
+                className="!items-start pt-6"
               />
             </div>
           )}

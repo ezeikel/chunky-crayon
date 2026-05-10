@@ -954,15 +954,14 @@ const MobileColoringDrawer = ({
                   {handleHintLabel}
                 </span>
               )}
-              {/* Fixed 64x64 footprint sized to contain the
-                  fully-expanded animate-ping rings (which scale ~2x
-                  from a 36px base = ~72px peak; clamping at 64 looks
-                  identical because the ring is already nearly
-                  transparent at peak scale). This means the
-                  ResizeObserver on the outer hint sees the rings'
-                  extent, not just the hand bbox — so the gap above
-                  the handle stays correct even mid-pulse. */}
-              <div className="relative w-16 h-16 flex items-center justify-center">
+              {/* 44x44 footprint — matches the visible ring extent at
+                  the most opaque part of the pulse. The rings *visually*
+                  extend a few px past this at peak but they're nearly
+                  fully transparent there, so trimming the bbox here
+                  removes wasted vertical space without showing a hard
+                  edge. ResizeObserver-driven positioning (above) uses
+                  this measurement to keep a 12px gap to the handle. */}
+              <div className="relative w-11 h-11 flex items-center justify-center">
                 <span
                   className="absolute w-9 h-9 rounded-full bg-crayon-orange/55 animate-ping"
                   style={{ animationDuration: "1.6s" }}
