@@ -207,19 +207,22 @@ const MobileColoringDrawer = ({
   const colors = COLORING_PALETTE_VARIANTS[paletteVariant];
   const { playSound } = useSound();
 
-  // Three snap points (peek / half / full). Heights in px so behaviour is
-  // predictable across devices.
-  // - PEEK 120px:  drag handle + tools row only. The default — keeps the
-  //                canvas dominant, the 60% of users who came to print don't
-  //                need to drag.
-  // - HALF 340px:  adds palette-variant switcher + color swatches. Where
-  //                most coloring happens.
+  // Four snap points. Heights in px so behaviour is predictable across
+  // devices.
+  // - MIN  40px:   drag handle only — minimum footprint for users who
+  //                want full canvas visibility while coloring.
+  //                Drag-down only (not part of the click cycle).
+  // - PEEK 120px:  drag handle + tools row. Default mount state.
+  // - HALF 340px:  adds palette-variant switcher + color swatches.
   // - FULL 560px:  adds brush sizes / fill / patterns / undo-redo.
-  const snapPoints = [120, 340, 560] as const;
-  type SnapIndex = 0 | 1 | 2;
+  const snapPoints = [40, 120, 340, 560] as const;
+  type SnapIndex = 0 | 1 | 2 | 3;
+  // Default mount state is PEEK (index 1), not MIN. MIN is a power-user
+  // drag-down destination, not the first thing a new user should see.
+  const DEFAULT_SNAP: SnapIndex = 1;
 
-  const height = useMotionValue<number>(snapPoints[0]);
-  const [currentSnap, setCurrentSnap] = useState<SnapIndex>(0);
+  const height = useMotionValue<number>(snapPoints[DEFAULT_SNAP]);
+  const [currentSnap, setCurrentSnap] = useState<SnapIndex>(DEFAULT_SNAP);
   // Tracks whether the user has tapped a tool yet. Auto-snap-up on first
   // tool tap teaches the gesture implicitly — like an iOS keyboard
   // expanding when you focus a text field. After the first tap we don't
@@ -250,7 +253,7 @@ const MobileColoringDrawer = ({
   // visual viewport via position:fixed) means both elements move
   // together when Safari's chrome collapses or expands.
   const [drawerHeightLive, setDrawerHeightLive] = useState<number>(
-    snapPoints[0],
+    snapPoints[DEFAULT_SNAP],
   );
 
   // Spring config — feels good already, keep as-is.
@@ -278,9 +281,10 @@ const MobileColoringDrawer = ({
       }
     });
     if (Math.abs(velocityY) > flickThreshold) {
-      // Flick UP = grow drawer (negative velocity in framer pan space).
-      // Flick DOWN = shrink drawer.
-      if (velocityY < 0 && closest < 2) {
+      // Flick UP = grow drawer (negative delta in framer pan space).
+      // Flick DOWN = shrink.
+      const maxIndex = (snapPoints.length - 1) as SnapIndex;
+      if (velocityY < 0 && closest < maxIndex) {
         return Math.max(closest, currentSnap + 1) as SnapIndex;
       }
       if (velocityY > 0 && closest > 0) {
@@ -305,11 +309,12 @@ const MobileColoringDrawer = ({
     // jumping back to full unexpectedly.
     dismissHandleHint();
     hasFirstHandleClickFiredRef.current = true;
-    // Dragging up (negative delta.y) grows the sheet.
+    // Dragging up (negative delta.y) grows the sheet. Clamp between
+    // MIN (snapPoints[0]) and FULL (snapPoints[snapPoints.length-1]).
     const currentHeight = height.get();
     const newHeight = Math.max(
       snapPoints[0],
-      Math.min(snapPoints[2], currentHeight - info.delta.y),
+      Math.min(snapPoints[snapPoints.length - 1], currentHeight - info.delta.y),
     );
     height.set(newHeight);
   };
@@ -321,29 +326,30 @@ const MobileColoringDrawer = ({
     snapTo(nearestSnap(height.get(), info.velocity.y));
   };
 
-  // Tap on the handle. First click jumps to full so the user sees every
+  // Tap on the handle. First click jumps to FULL so the user sees every
   // tool at once — that's the action that pays for the affordance hint.
-  // After the first click, subsequent taps cycle peek → half → full →
-  // peek so non-draggers (mouse, accessibility) can still reach every
-  // state.
+  // After the first click, taps cycle through every snap so MIN is
+  // reachable via click as well as drag:
+  //   PEEK(1) → HALF(2) → FULL(3) → MIN(0) → PEEK(1) → ...
   const handleToggle = () => {
     dismissHandleHint();
     if (!hasFirstHandleClickFiredRef.current) {
       hasFirstHandleClickFiredRef.current = true;
-      snapTo(2);
+      snapTo(3);
       return;
     }
-    snapTo(((currentSnap + 1) % 3) as SnapIndex);
+    const next = ((currentSnap + 1) % snapPoints.length) as SnapIndex;
+    snapTo(next);
   };
 
   // Once-on-mount bounce — handle floats up ~8px and back over 600ms
   // when the drawer first appears. Catches the eye, confirms it's
-  // interactive without copy. Only runs at peek state on mount.
+  // interactive without copy. Only runs at the default mount state.
   const [hasBounced, setHasBounced] = useState(false);
   useEffect(() => {
     if (hasBounced) return;
     const id = window.setTimeout(() => {
-      const peek = snapPoints[0];
+      const peek = snapPoints[DEFAULT_SNAP];
       animate(height, [peek, peek + 8, peek], {
         duration: 0.6,
         ease: "easeInOut",
@@ -459,13 +465,13 @@ const MobileColoringDrawer = ({
     }
     playSound("pop");
 
-    // First time the user taps a tool from peek state, auto-snap up to
-    // half so the colour palette becomes visible. Teaches the gesture
-    // implicitly without copy. Only fires once per mount; after that the
-    // user is in control of the sheet.
-    if (!hasAutoSnappedRef.current && currentSnap === 0) {
+    // First time the user taps a tool while the drawer is below HALF
+    // (i.e. at MIN or PEEK), auto-snap up to HALF so the colour palette
+    // becomes visible. Teaches the gesture implicitly without copy.
+    // Only fires once per mount; after that the user is in control.
+    if (!hasAutoSnappedRef.current && currentSnap < 2) {
       hasAutoSnappedRef.current = true;
-      snapTo(1);
+      snapTo(2);
     }
   };
 
@@ -535,10 +541,10 @@ const MobileColoringDrawer = ({
                   }
                 }}
                 aria-label={
-                  currentSnap === 0
-                    ? "Expand toolbar"
-                    : currentSnap === 2
-                      ? "Collapse toolbar"
+                  currentSnap === 3
+                    ? "Collapse toolbar"
+                    : currentSnap <= 1
+                      ? "Expand toolbar"
                       : "Expand toolbar more"
                 }
               >
