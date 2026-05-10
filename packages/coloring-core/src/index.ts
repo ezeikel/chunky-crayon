@@ -26,7 +26,24 @@ export type {
   DifficultyConfig,
   ProviderConfig,
   ImageGenerationConfig,
+  GenerateOptions,
 } from "./image-providers";
+
+// Image quality tiers — kid-friendly Fast/Better/Best mapping over GPT
+// Image 2's quality parameter. Drives the QualityPicker in the create form
+// and the default-resolution logic on the server.
+export {
+  IMAGE_QUALITY_TIERS,
+  DEFAULT_QUALITY_FOR_GUEST,
+  DEFAULT_QUALITY_FOR_FREE,
+  DEFAULT_QUALITY_FOR_SUBSCRIBER,
+  ALLOWED_QUALITY_FOR_GUEST,
+  ALLOWED_QUALITY_FOR_FREE,
+  ALLOWED_QUALITY_FOR_SUBSCRIBER,
+  resolveDefaultQuality,
+  clampQuality,
+} from "./image-quality";
+export type { ImageQuality, ImageQualityTier } from "./image-quality";
 
 // Video generation
 export {

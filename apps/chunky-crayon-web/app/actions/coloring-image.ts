@@ -72,11 +72,14 @@ const generateColoringImage = async (
   userId?: string,
   difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT',
   clientDistinctId?: string,
+  quality?: 'low' | 'medium' | 'high',
 ) => {
   const providerConfig = getCurrentProviderConfig();
 
   try {
-    const result = await generateColoringPageImage(description, difficulty);
+    const result = await generateColoringPageImage(description, difficulty, {
+      quality,
+    });
 
     // Track successful generation with timing
     const trackingData = {
@@ -85,6 +88,7 @@ const generateColoringImage = async (
       generationTimeMs: result.generationTimeMs,
       promptLength: description.length,
       referenceImageCount: providerConfig.supportsReferenceImages ? 8 : 0,
+      quality,
       success: true as const,
     };
 
@@ -116,6 +120,7 @@ const generateColoringImage = async (
       generationTimeMs: 0, // We don't have timing on complete failure
       promptLength: description.length,
       referenceImageCount: providerConfig.supportsReferenceImages ? 8 : 0,
+      quality,
       success: false as const,
       error: error instanceof Error ? error.message : 'Unknown error',
     };

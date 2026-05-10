@@ -425,6 +425,9 @@ export type EventProperties = {
     generationTimeMs: number;
     promptLength: number;
     referenceImageCount: number;
+    /** Quality tier used (low/medium/high). Optional because legacy
+     *  events from before the quality picker shipped won't have it. */
+    quality?: 'low' | 'medium' | 'high';
     success: true;
   };
   [TRACKING_EVENTS.IMAGE_GENERATION_FAILED]: {
@@ -433,8 +436,28 @@ export type EventProperties = {
     generationTimeMs: number;
     promptLength: number;
     referenceImageCount: number;
+    quality?: 'low' | 'medium' | 'high';
     success: false;
     error: string;
+  };
+  [TRACKING_EVENTS.GENERATION_STARTED]: {
+    /** Mode the user picked on the create form. */
+    mode: 'text' | 'photo' | 'voice';
+    /** Quality tier the user picked at submit time. */
+    quality: 'low' | 'medium' | 'high';
+    /** Length of the typed prompt (text mode only — empty string for
+     *  photo/voice). */
+    promptLength: number;
+    /** Whether the user is on a paid plan. */
+    isSubscriber: boolean;
+  };
+  [TRACKING_EVENTS.QUALITY_TIER_SELECTED]: {
+    /** New tier the user just clicked. */
+    quality: 'low' | 'medium' | 'high';
+    /** Tier that was selected before this click (for cohort analysis). */
+    previousQuality: 'low' | 'medium' | 'high' | null;
+    /** Whether the user is on a paid plan (drives lock state). */
+    isSubscriber: boolean;
   };
 
   // ===== LOADING EXPERIENCE (Colo mascot voice) =====

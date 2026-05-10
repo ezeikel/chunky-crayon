@@ -55,7 +55,10 @@ export type StartJobInput = {
   /** Vercel side already debited this many credits — worker refunds on FAILED. */
   creditCost: number;
   size?: "1024x1024";
-  quality?: "high";
+  /** GPT Image 2 quality tier. Vercel side resolves the user's choice
+   *  (clamped to their allowed tier) before sending. Defaults to 'high'
+   *  for backwards-compat with cron-driven jobs that don't pass it. */
+  quality?: "low" | "medium" | "high";
   partialImages?: 0 | 1 | 2 | 3;
 };
 

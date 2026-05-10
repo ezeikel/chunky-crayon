@@ -1,8 +1,12 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
+import {
+  type ImageQuality,
+  resolveDefaultQuality,
+} from '@one-colored-pixel/coloring-core/image-quality';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
@@ -22,6 +26,7 @@ import {
   type InputMode,
 } from './inputs';
 import FormCTA from './FormCTA';
+import QualityPicker from './QualityPicker/QualityPicker';
 
 type CreateColoringPageFormProps = {
   className?: string;
@@ -50,8 +55,19 @@ const MultiModeForm = ({
     guestGenerationsUsed,
     guestGenerationsRemaining,
     incrementGuestGeneration,
+    hasActiveSubscription,
   } = useUser();
   const { addCreation } = useRecentCreations();
+
+  // Quality tier — guests/free default to 'low' so cold paid traffic doesn't
+  // bounce on the 3-min wait that 'high' produces. Subscribers default to
+  // 'high' for the polished output they're paying for. The QualityPicker
+  // restores the user's last choice from localStorage on mount (provided
+  // their tier still allows it).
+  const isSubscriber = Boolean(hasActiveSubscription);
+  const [quality, setQuality] = useState<ImageQuality>(() =>
+    resolveDefaultQuality({ isSubscriber }),
+  );
 
   /**
    * Common post-success bookkeeping: tracking, recents, gallery
@@ -120,17 +136,31 @@ const MultiModeForm = ({
           return;
         }
 
+        // Perceived-wait tracking. Pair with image_generation_completed
+        // (server-side) to compute the gap between "user pressed go" and
+        // "image is ready". This is the metric that actually drives the
+        // mobile bounce — model latency alone misses the scene-gen +
+        // SVG-trace + R2-upload steps.
+        trackEvent(TRACKING_EVENTS.GENERATION_STARTED, {
+          mode: inputType === 'image' ? 'photo' : 'text',
+          quality,
+          promptLength: desc?.length || 0,
+          isSubscriber,
+        });
+
         const result =
           inputType === 'image' && imageBase64
             ? await createPendingColoringImage({
                 mode: 'photo',
                 photoBase64: imageBase64,
                 locale,
+                quality,
               })
             : await createPendingColoringImage({
                 mode: 'text',
                 description: desc,
                 locale,
+                quality,
               });
 
         if (!result.ok) {
@@ -167,11 +197,19 @@ const MultiModeForm = ({
               characterCount: desc.length,
             });
 
+            trackEvent(TRACKING_EVENTS.GENERATION_STARTED, {
+              mode: 'voice',
+              quality,
+              promptLength: desc.length,
+              isSubscriber,
+            });
+
             const result = await createPendingColoringImage({
               mode: 'voice',
               firstAnswer,
               secondAnswer,
               locale,
+              quality,
             });
 
             if (!result.ok) {
@@ -207,6 +245,15 @@ const MultiModeForm = ({
       {isGuest && mode === 'text' && location && (
         <ExamplePrompts location={location} />
       )}
+
+      {/* Quality tier picker — Fast/Better/Best. Free + guest users see
+          'Best' locked behind a subscription. Default is tier-appropriate
+          ('low' for free/guest so they don't bounce on the 3-min wait). */}
+      <QualityPicker
+        value={quality}
+        onChange={setQuality}
+        isSubscriber={isSubscriber}
+      />
 
       {/* Shared bottom CTA — free-try chip + Create/auth fallback */}
       <FormCTA />

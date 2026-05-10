@@ -1,6 +1,7 @@
 import { put } from "@one-colored-pixel/storage";
 import { generateText } from "ai";
 import { models, MODEL_IDS } from "./models";
+import type { ImageQuality } from "./image-quality";
 import OpenAI from "openai";
 
 /**
@@ -36,6 +37,18 @@ export type DifficultyConfig = {
   additionalRules: string[];
 };
 
+/**
+ * Options forwarded to a provider's generate() call. Kept as a single
+ * options bag rather than positional args so we can add more knobs (size,
+ * partialImages, etc.) without breaking call sites.
+ */
+export type GenerateOptions = {
+  /** Quality tier passed to OpenAI's images.edit. Defaults to 'high' if
+   *  the provider doesn't receive it (preserves cron / system-generated
+   *  content that runs without UI involvement). */
+  quality?: ImageQuality;
+};
+
 export type ProviderConfig = {
   id: string;
   name: string;
@@ -45,6 +58,7 @@ export type ProviderConfig = {
   generate: (
     description: string,
     difficulty?: Difficulty,
+    options?: GenerateOptions,
   ) => Promise<{
     imageBuffer: Buffer;
     generationTimeMs: number;
@@ -127,7 +141,11 @@ function createOpenAIProvider(config: ImageGenerationConfig): ProviderConfig {
     provider: "openai",
     costPerImage: 0.08,
     supportsReferenceImages: true,
-    generate: async (description: string, difficulty?: Difficulty) => {
+    generate: async (
+      description: string,
+      difficulty?: Difficulty,
+      options?: GenerateOptions,
+    ) => {
       const startTime = Date.now();
 
       const prompt =
@@ -142,13 +160,19 @@ function createOpenAIProvider(config: ImageGenerationConfig): ProviderConfig {
         4,
       );
 
+      // Default to 'high' so cron + system-generated content (daily image,
+      // bundle pages, ad assets) keeps its current quality. UI paths
+      // explicitly pass `low` for new + free users to cut wait time from
+      // ~3 min to ~10 s.
+      const quality = options?.quality ?? "high";
+
       const client = new OpenAI();
       const result = await client.images.edit({
         model: MODEL_IDS.GPT_IMAGE_2,
         image: styleFiles,
         prompt: styledPrompt,
         size: "1024x1024",
-        quality: "high",
+        quality,
       });
 
       const generationTimeMs = Date.now() - startTime;
@@ -170,7 +194,13 @@ function createGeminiProvider(config: ImageGenerationConfig): ProviderConfig {
     provider: "google",
     costPerImage: 0.18,
     supportsReferenceImages: true,
-    generate: async (description: string, difficulty?: Difficulty) => {
+    generate: async (
+      description: string,
+      difficulty?: Difficulty,
+      // Gemini doesn't have an analogous quality knob — accept the option
+      // for type-compatibility with ProviderConfig but ignore it.
+      _options?: GenerateOptions,
+    ) => {
       const startTime = Date.now();
 
       let prompt = config.createGeminiColoringImagePrompt(description);
@@ -300,12 +330,14 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
   async function generateColoringPageImage(
     description: string,
     difficulty?: Difficulty,
+    options?: GenerateOptions,
   ): Promise<GenerationResult> {
     const primaryConfig = PROVIDERS[PRIMARY_PROVIDER];
     const fallbackConfig = PROVIDERS[FALLBACK_PROVIDER];
 
+    const qualityNote = options?.quality ? ` quality: ${options.quality}` : "";
     console.log(
-      `[ImageGeneration] Using ${primaryConfig.name} (primary)${difficulty ? ` with difficulty: ${difficulty}` : ""}`,
+      `[ImageGeneration] Using ${primaryConfig.name} (primary)${difficulty ? ` with difficulty: ${difficulty}` : ""}${qualityNote}`,
     );
 
     let lastPrimaryError: Error | null = null;
@@ -315,6 +347,7 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
         const { imageBuffer, generationTimeMs } = await primaryConfig.generate(
           description,
           difficulty,
+          options,
         );
 
         const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
@@ -376,6 +409,7 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
       const { imageBuffer, generationTimeMs } = await fallbackConfig.generate(
         description,
         difficulty,
+        options,
       );
 
       const tempFileName = `temp/${Date.now()}-${Math.random().toString(36).substring(2)}.png`;

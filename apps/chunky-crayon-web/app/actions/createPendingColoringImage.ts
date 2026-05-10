@@ -26,6 +26,11 @@
  */
 import { db, GenerationType, Brand } from '@one-colored-pixel/db';
 import { CreditTransactionType } from '@one-colored-pixel/db';
+import {
+  type ImageQuality,
+  clampQuality,
+  resolveDefaultQuality,
+} from '@one-colored-pixel/coloring-core/image-quality';
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { ACTIONS } from '@/constants';
@@ -57,7 +62,7 @@ const BRAND: Brand = 'CHUNKY_CRAYON';
 // Input + result types
 // ----------------------------------------------------------------------------
 
-export type CreatePendingArgs =
+export type CreatePendingArgs = (
   | { mode: 'text'; description: string; locale: string }
   | { mode: 'photo'; photoBase64: string; locale: string }
   | {
@@ -65,7 +70,13 @@ export type CreatePendingArgs =
       firstAnswer: string;
       secondAnswer: string;
       locale: string;
-    };
+    }
+) & {
+  /** Quality tier the user picked in the form. Server clamps to the user's
+   *  allowed tiers (free/guest get capped at 'medium'). When omitted,
+   *  resolves to a tier-appropriate default. */
+  quality?: ImageQuality;
+};
 
 export type CreatePendingResult =
   | { ok: true; id: string }
@@ -125,7 +136,7 @@ type WorkerBody = {
   referenceImageUrls?: string[];
   imagesInline?: { b64: string; ext: 'png' | 'jpeg' | 'webp' }[];
   size: '1024x1024';
-  quality: 'high';
+  quality: ImageQuality;
   partialImages: 3;
 };
 
@@ -218,16 +229,25 @@ export const createPendingColoringImage = async (
     }
   }
 
-  // Credit pre-flight + debit. Debited up-front so concurrent submissions
-  // can't both succeed against a near-empty balance. Refund happens via
-  // the worker's markFailed path when the job ends FAILED.
-  // Guests skip credits entirely — they get N free generations gated
-  // client-side; voice mode would have already returned unauthorized.
+  // Credit pre-flight + debit + subscriber check (used to clamp quality).
+  // Debited up-front so concurrent submissions can't both succeed against
+  // a near-empty balance. Refund happens via the worker's markFailed path
+  // when the job ends FAILED. Guests skip credits entirely — they get N
+  // free generations gated client-side; voice mode would have already
+  // returned unauthorized.
   const cost = CREDIT_COST[modeForCost];
+  let isSubscriber = false;
   if (userId) {
     const user = await db.user.findUnique({
       where: { id: userId },
-      select: { credits: true },
+      select: {
+        credits: true,
+        subscriptions: {
+          where: { OR: [{ status: 'ACTIVE' }, { status: 'TRIALING' }] },
+          select: { id: true },
+          take: 1,
+        },
+      },
     });
     if (!user || user.credits < cost) {
       return {
@@ -236,8 +256,17 @@ export const createPendingColoringImage = async (
         credits: user?.credits ?? 0,
       };
     }
+    isSubscriber = user.subscriptions.length > 0;
     await debitCredits(userId, cost);
   }
+
+  // Resolve final quality. If the user passed one, clamp it to what their
+  // tier is allowed (free/guest capped at 'medium'). If they didn't, fall
+  // back to the tier-appropriate default ('low' for free/guest, 'high'
+  // for subscribers).
+  const resolvedQuality: ImageQuality = args.quality
+    ? clampQuality({ requested: args.quality, isSubscriber })
+    : resolveDefaultQuality({ isSubscriber });
 
   // Quick title + subject for the streaming-canvas view. The page reads
   // `title` for its heading and `sourcePrompt` for Colo's voiceover script.
@@ -341,7 +370,7 @@ export const createPendingColoringImage = async (
         creditCost: userId ? cost : 0,
         imagesInline: [{ b64: raw, ext }],
         size: '1024x1024',
-        quality: 'high',
+        quality: resolvedQuality,
         partialImages: 3,
       };
     } else {
@@ -362,7 +391,7 @@ export const createPendingColoringImage = async (
         creditCost: userId ? cost : 0,
         referenceImageUrls: REFERENCE_IMAGES.slice(0, 4),
         size: '1024x1024',
-        quality: 'high',
+        quality: resolvedQuality,
         partialImages: 3,
       };
     }

@@ -1009,6 +1009,8 @@ export const TRACKING_EVENTS = {
   // ===== AI/LLM OBSERVABILITY =====
   IMAGE_GENERATION_COMPLETED: 'image_generation_completed', // Image generated with timing
   IMAGE_GENERATION_FAILED: 'image_generation_failed', // Image generation failed
+  GENERATION_STARTED: 'generation_started', // User pressed Submit on the create form (client-side, fires before any server work). Pair with IMAGE_GENERATION_COMPLETED to measure perceived wait.
+  QUALITY_TIER_SELECTED: 'quality_tier_selected', // User picked Fast/Better/Best on the QualityPicker
 
   // ===== LOADING EXPERIENCE (Colo mascot voice) =====
   LOADING_AUDIO_GENERATED: 'loading_audio_generated', // Colo voice audio generated

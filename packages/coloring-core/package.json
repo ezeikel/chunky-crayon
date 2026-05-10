@@ -8,6 +8,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./image-quality": {
+      "import": "./dist/image-quality.js",
+      "require": "./dist/image-quality.js",
+      "types": "./dist/image-quality.d.ts"
     }
   },
   "scripts": {
