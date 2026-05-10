@@ -256,12 +256,126 @@ export const SPACE_ADVENTURE_CREW: HeroBundle = {
   ],
 };
 
+export const BAKERY_BUDDY_BAKERS: HeroBundle = {
+  slug: "bakery-buddy-bakers",
+  heroes: [
+    {
+      id: "whisk-bunny-baker",
+      name: "Whisk",
+      species: "Bunny Baker",
+      signatureDetails: [
+        "long floppy ears with a small bow tied around the base of the left ear",
+        "tall puffy chef's hat sitting between the ears",
+        "apron with a heart-shaped pocket on the front",
+        "holds a metal whisk in one paw",
+        "fluffy round cottontail peeking out behind",
+        "tiny flour puff drawn near the whisk to show motion",
+      ],
+      referenceSheetPrompt:
+        "Children's coloring book reference sheet for a single hero character. Whisk is a cheerful cartoon bunny baker drawn in clean bold black line art, centered on a plain white background, facing slightly to the side, standing upright in a friendly pose. Whisk has long floppy ears with a small bow tied around the base of the left ear, a tall puffy chef's hat resting between the ears, large round friendly eyes, and a small triangular nose with a tiny smile. Whisk wears a baker's apron with a heart-shaped pocket on the front, holds a metal whisk in one paw, and has a fluffy round cottontail peeking out behind. A tiny flour puff is drawn near the whisk to show playful motion. Simple cartoon shapes, thick even outlines, no shading, no color fill, no background scenery, kid-safe and friendly for ages three to eight.",
+      funFact:
+        "Whisk can whip up cream so fast that flour clouds dance through the whole kitchen!",
+    },
+    {
+      id: "cinnamon-fox-baker",
+      name: "Cinnamon",
+      species: "Fox Baker",
+      signatureDetails: [
+        "pointy fox ears with fluffy tufts of fur inside",
+        "tall classic chef's hat with a band at the base",
+        "bushy fox tail with a fluffy white tip curling behind",
+        "double-breasted chef's coat with two rows of round buttons",
+        "small recipe card tucked into the front pocket",
+        "neat triangle nose and a confident smile",
+      ],
+      referenceSheetPrompt:
+        "Children's coloring book reference sheet for a single hero character. Cinnamon is a friendly cartoon fox head baker drawn in clean bold black line art, centered on a plain white background, facing slightly to the side, standing upright in a confident teaching pose. Cinnamon has pointy fox ears with fluffy tufts of fur inside, a tall classic chef's hat with a band at its base, large kind eyes, a neat triangle nose, and a warm confident smile. Cinnamon wears a double-breasted chef's coat with two rows of round buttons and has a small recipe card tucked into the front pocket. A bushy fox tail with a fluffy white tip curls behind. Simple rounded cartoon shapes, thick even outlines, no shading, no color fill, no background scenery, kid-safe and friendly for ages three to eight.",
+      funFact:
+        "Cinnamon keeps a secret recipe book full of cookies even the moon would line up to taste!",
+    },
+    {
+      id: "sprinkle-mouse-baker",
+      name: "Sprinkle",
+      species: "Mouse Baker",
+      signatureDetails: [
+        "tiny round mouse ears with a sprinkle-shaped pin on one ear",
+        "small chef's hat that flops slightly to one side",
+        "long thin tail curling behind",
+        "ruffled apron tied with a big bow at the back",
+        "holds a small piping bag with a star tip",
+        "little whiskers and a round button nose",
+      ],
+      referenceSheetPrompt:
+        "Children's coloring book reference sheet for a single hero character. Sprinkle is an adorable cartoon mouse decorator drawn in clean bold black line art, centered on a plain white background, facing slightly to the side, standing upright in a cheerful pose. Sprinkle has tiny round mouse ears with a sprinkle-shaped pin on one ear, a small chef's hat that flops slightly to one side, big sparkly eyes, a round button nose, and little whiskers. Sprinkle wears a ruffled apron tied with a big bow at the back and holds a small piping bag with a star tip. A long thin tail curls behind. Simple rounded cartoon shapes, thick even outlines, no shading, no color fill, no background scenery, kid-safe and friendly for ages three to eight.",
+      funFact:
+        "Sprinkle can balance on one paw atop a stool to reach the very top of any tall cake!",
+    },
+    {
+      id: "dough-bear-baker",
+      name: "Dough",
+      species: "Bear Baker",
+      signatureDetails: [
+        "round bear ears on top of a sturdy head",
+        "chef's hat that looks slightly small on his big head",
+        "thick apron with a wheat sheaf patch on the chest",
+        "rolled-up sleeves showing strong fuzzy arms",
+        "holds a wooden rolling pin or tray of bread",
+        "small round nose and a gentle warm smile",
+      ],
+      referenceSheetPrompt:
+        "Children's coloring book reference sheet for a single hero character. Dough is a big gentle cartoon bear baker drawn in clean bold black line art, centered on a plain white background, facing slightly to the side, standing upright in a kind helpful pose. Dough has round bear ears on top of a sturdy head, a chef's hat that looks slightly small on his big head, friendly half-moon eyes, a small round nose, and a gentle warm smile. Dough wears a thick apron with a wheat sheaf patch on the chest, has rolled-up sleeves showing strong fuzzy arms, and holds a wooden rolling pin in one paw. Simple rounded cartoon shapes, thick even outlines, no shading, no color fill, no background scenery, kid-safe and friendly for ages three to eight.",
+      funFact:
+        "Dough gives the warmest bear hugs and the squishiest bread loaves in the whole bakery!",
+    },
+  ],
+  pageCast: {
+    1: ["whisk-bunny-baker"],
+    2: ["cinnamon-fox-baker", "dough-bear-baker"],
+    3: ["sprinkle-mouse-baker"],
+    4: [
+      "whisk-bunny-baker",
+      "cinnamon-fox-baker",
+      "sprinkle-mouse-baker",
+      "dough-bear-baker",
+    ],
+    5: ["dough-bear-baker", "cinnamon-fox-baker"],
+    6: ["whisk-bunny-baker", "sprinkle-mouse-baker"],
+    7: ["cinnamon-fox-baker", "whisk-bunny-baker"],
+    8: [
+      "whisk-bunny-baker",
+      "cinnamon-fox-baker",
+      "sprinkle-mouse-baker",
+      "dough-bear-baker",
+    ],
+    9: ["sprinkle-mouse-baker", "cinnamon-fox-baker", "dough-bear-baker"],
+    10: [
+      "whisk-bunny-baker",
+      "cinnamon-fox-baker",
+      "sprinkle-mouse-baker",
+      "dough-bear-baker",
+    ],
+  },
+  pagePrompts: [
+    "Whisk the bunny baker stirs a giant mixing bowl with his metal whisk, ears flopping with the motion. Puffy flour clouds and tiny dough splashes float around him as he giggles. Clean cartoon line art, no shading, kid-friendly bakery scene.",
+    "Cinnamon the fox baker leans over a big wooden table, gently showing Dough the bear how to knead a soft mound of bread dough. Dough presses with strong paws while Cinnamon points kindly. Friendly cartoon line art, no shading.",
+    "Sprinkle the mouse baker stands on a tall wooden stool to decorate a three-tier layer cake, piping swirly frosting and dotting it with sprinkles. Her tail balances behind her. Cute cartoon line art, no shading, kid-friendly.",
+    "Whisk, Cinnamon, Sprinkle, and Dough crowd around an open oven wearing big puffy oven mitts, lifting out a tray of round cookies together. Steam swirls drift up. Cheerful cartoon line art, no shading, kid-friendly.",
+    "Dough the bear baker carries a tall tray of warm bread loaves with both paws while Cinnamon the fox swings open the shop window with a welcoming smile. A small bird perches nearby. Friendly cartoon line art, no shading.",
+    "Whisk and Sprinkle stand side by side at a counter frosting a row of cupcakes. Whisk swirls big loops while Sprinkle adds tiny stars and zigzags, both giggling. Playful cartoon line art, no shading, kid-friendly.",
+    "Cinnamon the fox rolls out a flat sheet of dough with a wooden rolling pin while Whisk the bunny presses cookie cutters shaped like ducks, stars, and bears into it. Friendly cartoon line art, no shading.",
+    "All four bakers, Whisk, Cinnamon, Sprinkle, and Dough, arrange pies, cookies, and cakes in the bakery display window. Each holds a different treat with proud smiles. Cozy cartoon line art, no shading.",
+    "Sprinkle carefully places candles on a tall birthday cake while Cinnamon adds a frosting flower and Dough holds the cake plate steady. Tiny confetti shapes float around. Friendly cartoon line art, no shading.",
+    "Whisk, Cinnamon, Sprinkle, and Dough sit together at a small bakery table sharing a plate of fresh treats and steaming mugs of cocoa. They laugh and clink mugs in a happy break. Warm cartoon line art, no shading.",
+  ],
+};
+
 export const HERO_BUNDLES: Record<string, HeroBundle> = {
   [DINO_DANCE_PARTY.slug]: DINO_DANCE_PARTY,
   [UNICORN_RAINBOW_RALLY.slug]: UNICORN_RAINBOW_RALLY,
   [SUPERHERO_VEHICLE_SQUAD.slug]: SUPERHERO_VEHICLE_SQUAD,
   [DESSERT_ISLAND_ADVENTURE.slug]: DESSERT_ISLAND_ADVENTURE,
   [SPACE_ADVENTURE_CREW.slug]: SPACE_ADVENTURE_CREW,
+  [BAKERY_BUDDY_BAKERS.slug]: BAKERY_BUDDY_BAKERS,
 };
 
 export function getBundleProfile(slug: string): HeroBundle | undefined {

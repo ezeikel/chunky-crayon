@@ -38,9 +38,17 @@
  *
  *   # Skip the auto-write step entirely (print only):
  *   ... --no-write
+ *
+ *   # Restore from a previous dump (skips Sonar + Claude entirely;
+ *   # uses the saved JSON from a prior dry-run). Requires extra flags
+ *   # to supply the candidate metadata Sonar would have provided:
+ *   ... --from-dump=scripts/out/flesh-out-bakery-buddy-bakers.json \
+ *       --slug=bakery-buddy-bakers \
+ *       --name="Bakery Buddy Bakers" \
+ *       --tagline="Mix, bake, and decorate with four adorable bakers in their cozy sweet shop"
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
@@ -51,7 +59,7 @@ import { z } from 'zod';
 import { HERO_BUNDLES } from '@one-colored-pixel/coloring-core';
 
 const PERPLEXITY_MODEL = 'sonar';
-const CLAUDE_MODEL = 'claude-sonnet-4-6';
+const CLAUDE_MODEL = 'claude-opus-4-7';
 
 const PROFILES_PATH = join(
   __dirname,
@@ -87,16 +95,16 @@ const candidateSchema = z.object({
         oneLiner: z.string(),
       }),
     )
-    .min(3)
-    .max(4),
+    .describe('Exactly 3-4 hero sketches per candidate.'),
   pageIdeas: z
     .array(z.string())
-    .length(10)
-    .describe('One sentence per page, 10 total. Action-oriented scenes.'),
+    .describe(
+      'Exactly 10 entries: one sentence per page, action-oriented scenes.',
+    ),
 });
 
 const candidatesSchema = z.object({
-  candidates: z.array(candidateSchema).length(3),
+  candidates: z.array(candidateSchema).describe('Exactly 3 candidate themes.'),
 });
 
 type Candidate = z.infer<typeof candidateSchema>;
@@ -107,10 +115,8 @@ const heroSchema = z.object({
   species: z.string(),
   signatureDetails: z
     .array(z.string())
-    .min(4)
-    .max(6)
     .describe(
-      'Concise visual anchors that MUST appear on every page. Each one is a checkbox in the QA gate.',
+      'Exactly 4-6 concise visual anchors that MUST appear on every page. Each one is a checkbox in the QA gate.',
     ),
   referenceSheetPrompt: z
     .string()
@@ -121,7 +127,11 @@ const heroSchema = z.object({
 });
 
 const fleshedSchema = z.object({
-  heroes: z.array(heroSchema).min(3).max(4),
+  heroes: z
+    .array(heroSchema)
+    .describe(
+      'Exactly 3-4 heroes — match the count from the picked candidate.',
+    ),
   pageCast: z
     .record(z.string(), z.array(z.string()))
     .describe(
@@ -129,9 +139,8 @@ const fleshedSchema = z.object({
     ),
   pagePrompts: z
     .array(z.string())
-    .length(10)
     .describe(
-      'Polished page-by-page scene prompts, 1-indexed. Each ~30-50 words.',
+      'Exactly 10 polished page-by-page scene prompts, 1-indexed. Each ~30-50 words.',
     ),
 });
 
@@ -197,9 +206,27 @@ Output strict JSON matching the schema. No commentary outside the JSON.`;
   const { object } = await generateObject({
     model: anthropic(CLAUDE_MODEL),
     schema: candidatesSchema,
-    system: `You convert messy research notes into strict JSON matching the provided schema. Preserve every concrete detail; do NOT invent new themes. If the source has 3 themes, the output has 3 themes.`,
+    system: `You convert messy research notes into strict JSON matching the provided schema. Preserve every concrete detail; do NOT invent new themes. The output must have EXACTLY 3 candidates, each with EXACTLY 3-4 heroSketches and EXACTLY 10 pageIdeas.`,
     prompt: `Research notes:\n\n${sonarText}\n\nReshape into the schema. Keep the original themes' content; only fix structure / formatting / spelling.`,
   });
+
+  if (object.candidates.length !== 3) {
+    throw new Error(
+      `[research] expected 3 candidates, got ${object.candidates.length}`,
+    );
+  }
+  for (const c of object.candidates) {
+    if (c.heroSketches.length < 3 || c.heroSketches.length > 4) {
+      throw new Error(
+        `[research] ${c.slug}: expected 3-4 heroSketches, got ${c.heroSketches.length}`,
+      );
+    }
+    if (c.pageIdeas.length !== 10) {
+      throw new Error(
+        `[research] ${c.slug}: expected 10 pageIdeas, got ${c.pageIdeas.length}`,
+      );
+    }
+  }
 
   return object.candidates;
 }
@@ -257,12 +284,78 @@ ${c.pageIdeas.map((p, i) => `${i + 1}. ${p}`).join('\n')}
 
 Flesh this out into a full HeroBundle profile.`;
 
-  const { object } = await generateObject({
+  // NOTE: Opus 4.7 + generateObject sometimes wraps the response as
+  // `{ input: { ...actualObject } }` — an artifact of how the SDK
+  // exposes the schema as a tool. Falling back to generateText +
+  // manual parse + auto-unwrap is more robust here. We also dump the
+  // raw response to disk so a failed run is recoverable without
+  // re-burning the API call.
+  const { text: rawText } = await generateText({
     model: anthropic(CLAUDE_MODEL),
-    schema: fleshedSchema,
-    system,
+    system: `${system}\n\nIMPORTANT: Respond with ONLY a single JSON object matching this shape: { "heroes": [...], "pageCast": {...}, "pagePrompts": [...] }. Do NOT wrap it in any outer key like "input" or "result". No commentary, no markdown fences, just the JSON object.`,
     prompt,
   });
+
+  // Dump for recovery. The script tolerates re-runs cheaply, but a
+  // dumped copy means we don't lose a good response to a parse blip.
+  const dumpPath = join(__dirname, `out/flesh-out-${c.slug}.json`);
+  try {
+    mkdirSync(join(__dirname, 'out'), { recursive: true });
+    writeFileSync(dumpPath, rawText);
+    console.log(`[flesh-out] raw response dumped to ${dumpPath}`);
+  } catch (err) {
+    console.warn(`[flesh-out] could not dump raw response:`, err);
+  }
+
+  let parsed: unknown;
+  try {
+    // Strip ```json ... ``` fences if present.
+    const cleaned = rawText
+      .trim()
+      .replace(/^```(?:json)?\n?/, '')
+      .replace(/\n?```$/, '');
+    parsed = JSON.parse(cleaned);
+  } catch (err) {
+    throw new Error(
+      `[flesh-out] could not parse JSON. Raw text dumped at ${dumpPath}. Error: ${err}`,
+    );
+  }
+
+  // Auto-unwrap `{ input: { ... } }` and similar wrappers.
+  if (
+    parsed &&
+    typeof parsed === 'object' &&
+    'input' in parsed &&
+    typeof (parsed as { input: unknown }).input === 'object'
+  ) {
+    parsed = (parsed as { input: unknown }).input;
+  }
+
+  const result = fleshedSchema.safeParse(parsed);
+  if (!result.success) {
+    throw new Error(
+      `[flesh-out] response did not match schema. Raw dumped at ${dumpPath}. Issues: ${JSON.stringify(result.error.issues, null, 2)}`,
+    );
+  }
+  const object = result.data;
+
+  if (object.heroes.length < 3 || object.heroes.length > 4) {
+    throw new Error(
+      `[flesh-out] expected 3-4 heroes, got ${object.heroes.length}`,
+    );
+  }
+  for (const h of object.heroes) {
+    if (h.signatureDetails.length < 4 || h.signatureDetails.length > 6) {
+      throw new Error(
+        `[flesh-out] ${h.id}: expected 4-6 signatureDetails, got ${h.signatureDetails.length}`,
+      );
+    }
+  }
+  if (object.pagePrompts.length !== 10) {
+    throw new Error(
+      `[flesh-out] expected 10 pagePrompts, got ${object.pagePrompts.length}`,
+    );
+  }
 
   return object;
 }
@@ -368,43 +461,9 @@ function spliceIntoProfilesFile(c: Candidate, entry: string): void {
   console.log(`[write] index.ts: added ${constName} export`);
 }
 
-async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-  const hint = args
-    .find((a) => a.startsWith('--hint='))
-    ?.split('=')
-    .slice(1)
-    .join('=');
-  const noWrite = args.includes('--no-write');
-
-  if (!process.env.PERPLEXITY_API_KEY) {
-    throw new Error('PERPLEXITY_API_KEY not set');
-  }
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY not set');
-  }
-
-  console.log('\n=== Bundle theme research ===\n');
-  if (hint) console.log(`Hint: ${hint}\n`);
-
-  const candidates = await researchCandidates(hint);
-  printCandidates(candidates);
-
-  const choice = await ask(
-    'Pick a candidate to flesh out (1, 2, 3) or "skip" to abort: ',
-  );
-  const idx = parseInt(choice, 10) - 1;
-  if (Number.isNaN(idx) || idx < 0 || idx >= candidates.length) {
-    console.log('No candidate picked. Exiting.');
-    return;
-  }
-  const picked = candidates[idx]!;
-  console.log(`\n→ Fleshing out: ${picked.themeName} (${picked.slug})\n`);
-
-  const fleshed = await fleshOutCandidate(picked);
-
+function printScaffold(slug: string, fleshed: Fleshed): void {
   console.log(`\n${'='.repeat(72)}`);
-  console.log(`Scaffolded profile: ${picked.slug}`);
+  console.log(`Scaffolded profile: ${slug}`);
   console.log(`${'='.repeat(72)}\n`);
   console.log('Heroes:');
   fleshed.heroes.forEach((h) => {
@@ -418,7 +477,13 @@ async function main(): Promise<void> {
     .forEach(([p, ids]) => console.log(`  ${p}: [${ids.join(', ')}]`));
   console.log(`\nPage prompts:`);
   fleshed.pagePrompts.forEach((p, i) => console.log(`  ${i + 1}. ${p}`));
+}
 
+async function confirmAndWrite(
+  picked: Candidate,
+  fleshed: Fleshed,
+  noWrite: boolean,
+): Promise<void> {
   if (noWrite) {
     console.log(
       `\n[--no-write] skipping auto-write. Copy the entry into profiles.ts manually.`,
@@ -449,6 +514,118 @@ async function main(): Promise<void> {
   console.log(
     `       --slug=${picked.slug} \\\n       --name=${JSON.stringify(picked.themeName)} \\\n       --tagline=${JSON.stringify(picked.tagline)} \\\n       --dry \\\n       dotenv_config_path=.env.local`,
   );
+}
+
+async function runFromDump(
+  dumpPath: string,
+  slug: string,
+  name: string,
+  tagline: string,
+  noWrite: boolean,
+): Promise<void> {
+  console.log(`\n=== Bundle scaffold from dump ===`);
+  console.log(`[from-dump] reading ${dumpPath}\n`);
+
+  const raw = readFileSync(dumpPath, 'utf8');
+  let parsed: unknown;
+  try {
+    const cleaned = raw
+      .trim()
+      .replace(/^```(?:json)?\n?/, '')
+      .replace(/\n?```$/, '');
+    parsed = JSON.parse(cleaned);
+  } catch (err) {
+    throw new Error(`[from-dump] could not parse ${dumpPath}: ${err}`);
+  }
+  if (
+    parsed &&
+    typeof parsed === 'object' &&
+    'input' in parsed &&
+    typeof (parsed as { input: unknown }).input === 'object'
+  ) {
+    parsed = (parsed as { input: unknown }).input;
+  }
+  const result = fleshedSchema.safeParse(parsed);
+  if (!result.success) {
+    throw new Error(
+      `[from-dump] dump did not match schema: ${JSON.stringify(result.error.issues, null, 2)}`,
+    );
+  }
+  const fleshed = result.data;
+
+  // The dump is just the fleshed object — we still need a Candidate to
+  // drive formatting + the next-steps printout. Synthesize a minimal
+  // one from the CLI flags.
+  const picked: Candidate = {
+    themeName: name,
+    slug,
+    tagline,
+    rationale: '(restored from dump — original rationale not preserved)',
+    heroSketches: fleshed.heroes.map((h) => ({
+      name: h.name,
+      species: h.species,
+      oneLiner: h.funFact,
+    })),
+    pageIdeas: fleshed.pagePrompts,
+  };
+
+  printScaffold(slug, fleshed);
+  await confirmAndWrite(picked, fleshed, noWrite);
+}
+
+async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  const get = (flag: string) =>
+    args
+      .find((a) => a.startsWith(`${flag}=`))
+      ?.split('=')
+      .slice(1)
+      .join('=');
+
+  const hint = get('--hint');
+  const fromDump = get('--from-dump');
+  const noWrite = args.includes('--no-write');
+
+  if (fromDump) {
+    const slug = get('--slug');
+    const name = get('--name');
+    const tagline = get('--tagline');
+    if (!slug || !name || !tagline) {
+      throw new Error(
+        '--from-dump requires --slug, --name, and --tagline (the dump file only stores the fleshed profile, not the candidate metadata).',
+      );
+    }
+    await runFromDump(fromDump, slug, name, tagline, noWrite);
+    return;
+  }
+
+  if (!process.env.PERPLEXITY_API_KEY) {
+    throw new Error('PERPLEXITY_API_KEY not set');
+  }
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error('ANTHROPIC_API_KEY not set');
+  }
+
+  console.log('\n=== Bundle theme research ===\n');
+  if (hint) console.log(`Hint: ${hint}\n`);
+
+  const candidates = await researchCandidates(hint);
+  printCandidates(candidates);
+
+  const choice = await ask(
+    'Pick a candidate to flesh out (1, 2, 3) or "skip" to abort: ',
+  );
+  const idx = parseInt(choice, 10) - 1;
+  if (Number.isNaN(idx) || idx < 0 || idx >= candidates.length) {
+    console.log('No candidate picked. Exiting.');
+    return;
+  }
+  const picked = candidates[idx]!;
+  console.log(`\n→ Fleshing out: ${picked.themeName} (${picked.slug})\n`);
+
+  const fleshed = await fleshOutCandidate(picked);
+  printScaffold(picked.slug, fleshed);
+  await confirmAndWrite(picked, fleshed, noWrite);
 }
 
 main().catch((e) => {
