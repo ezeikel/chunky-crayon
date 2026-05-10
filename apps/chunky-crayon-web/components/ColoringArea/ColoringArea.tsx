@@ -1302,12 +1302,19 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
               realize the canvas is interactive — 59% of mobile landings
               do nothing per PostHog. The overlay is pointer-events-none
               so it doesn't block strokes; first interaction fades it
-              out and persists the dismissal. */}
+              out and persists the dismissal.
+              `!items-start pt-12` overrides the component's default
+              center-vertical so the hint sits near the top of the
+              canvas — keeps it from colliding with the drawer's
+              "Drag for tools" hint, which lives just above the handle
+              at the bottom. Both hints are visible simultaneously
+              without stacking on each other on small viewports. */}
           {tapPromptLabel && showTapPrompt && (
             <div className="md:hidden absolute inset-0 pointer-events-none">
               <TapPromptOverlay
                 hidden={tapPromptDismissed}
                 label={tapPromptLabel}
+                className="!items-start pt-12"
               />
             </div>
           )}
