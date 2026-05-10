@@ -16,27 +16,28 @@ A bundle is:
 
 ## Where things live
 
-| Thing                     | Path                                                                                 |
-| ------------------------- | ------------------------------------------------------------------------------------ |
-| Bundle profiles           | `packages/coloring-core/src/bundles/profiles.ts`                                     |
-| QA gate (vision)          | `packages/coloring-core/src/bundles/qa.ts`                                           |
-| Page generation pipeline  | `apps/chunky-crayon-worker/src/bundles/`                                             |
-| Listing image templates   | `apps/chunky-crayon-worker/src/listings/templates/{Hero,BrandCard,PageGrid}.tsx`     |
-| Listing build scripts     | `apps/chunky-crayon-worker/src/scripts/build-listing-*.ts`                           |
-| Worker endpoints          | `apps/chunky-crayon-worker/src/routes/generate.ts` (`/generate/bundle-all-pages`)    |
-| Theme research + scaffold | `apps/chunky-crayon-web/scripts/research-bundle-ideas.ts`                            |
-| Launch orchestrator       | `apps/chunky-crayon-web/scripts/launch-bundle.ts`                                    |
-| Dev → prod promoter       | `apps/chunky-crayon-web/scripts/promote-bundle.ts`                                   |
-| Region-store backfill     | `apps/chunky-crayon-web/scripts/backfill-region-stores.ts` (`--bundle=<slug>`)       |
-| Hero refs script          | `apps/chunky-crayon-web/scripts/generate-bundle-hero-refs.ts`                        |
-| Bundle row seeder         | `apps/chunky-crayon-web/scripts/seed-bundle.ts`                                      |
-| Bg removal scripts        | `apps/chunky-crayon-web/scripts/remove-bundle-{hero,character}-backgrounds.ts`       |
-| Brand character           | `apps/chunky-crayon-web/scripts/generate-bundle-brand-character.ts`                  |
-| Stripe product creator    | `apps/chunky-crayon-web/scripts/create-stripe-bundle-product.ts`                     |
-| Product page              | `apps/chunky-crayon-web/app/[locale]/products/digital/[slug]/page.tsx`               |
-| Webhook (purchase)        | `apps/chunky-crayon-web/app/api/payment/webhook/route.ts` (`charge.refunded` branch) |
-| My Bundles UI             | `apps/chunky-crayon-web/app/[locale]/account/my-artwork/page.tsx`                    |
-| Download token (JWT)      | `apps/chunky-crayon-web/app/api/bundles/[slug]/download/route.ts`                    |
+| Thing                        | Path                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| Bundle profiles              | `packages/coloring-core/src/bundles/profiles.ts`                                     |
+| QA gate (vision)             | `packages/coloring-core/src/bundles/qa.ts`                                           |
+| Page generation pipeline     | `apps/chunky-crayon-worker/src/bundles/`                                             |
+| Listing image templates      | `apps/chunky-crayon-worker/src/listings/templates/{Hero,BrandCard,PageGrid}.tsx`     |
+| Listing build scripts        | `apps/chunky-crayon-worker/src/scripts/build-listing-*.ts`                           |
+| Worker endpoints             | `apps/chunky-crayon-worker/src/routes/generate.ts` (`/generate/bundle-all-pages`)    |
+| Theme research + scaffold    | `apps/chunky-crayon-web/scripts/research-bundle-ideas.ts`                            |
+| Launch orchestrator          | `apps/chunky-crayon-web/scripts/launch-bundle.ts`                                    |
+| Dev → prod promoter          | `apps/chunky-crayon-web/scripts/promote-bundle.ts`                                   |
+| Region-store backfill (dev)  | `apps/chunky-crayon-web/scripts/backfill-region-stores.ts` (`--bundle=<slug>`)       |
+| Region-store backfill (prod) | `apps/chunky-crayon-web/scripts/backfill-region-stores-prod.ts` (loads prod env)     |
+| Hero refs script             | `apps/chunky-crayon-web/scripts/generate-bundle-hero-refs.ts`                        |
+| Bundle row seeder            | `apps/chunky-crayon-web/scripts/seed-bundle.ts`                                      |
+| Bg removal scripts           | `apps/chunky-crayon-web/scripts/remove-bundle-{hero,character}-backgrounds.ts`       |
+| Brand character              | `apps/chunky-crayon-web/scripts/generate-bundle-brand-character.ts`                  |
+| Stripe product creator       | `apps/chunky-crayon-web/scripts/create-stripe-bundle-product.ts`                     |
+| Product page                 | `apps/chunky-crayon-web/app/[locale]/products/digital/[slug]/page.tsx`               |
+| Webhook (purchase)           | `apps/chunky-crayon-web/app/api/payment/webhook/route.ts` (`charge.refunded` branch) |
+| My Bundles UI                | `apps/chunky-crayon-web/app/[locale]/account/my-artwork/page.tsx`                    |
+| Download token (JWT)         | `apps/chunky-crayon-web/app/api/bundles/[slug]/download/route.ts`                    |
 
 ## Architecture
 
@@ -266,18 +267,40 @@ UPDATE bundles SET published = true WHERE slug = 'bakery-buddy-bakers';
 
 #### Region-store backfill (Magic Brush)
 
-Bundle page generation now triggers region-store + colored-reference + fill-points generation as part of the persist step (fire-and-forget). For pages generated before that change, backfill them:
+Bundle page generation now triggers region-store + colored-reference + fill-points generation as part of the persist step (fire-and-forget). For pages generated before that change, backfill them.
+
+**Backfill against dev**:
 
 ```bash
-# Just the bundle in question:
 pnpm tsx -r dotenv/config scripts/backfill-region-stores.ts \
   --bundle=dino-dance-party \
+  --dry-run \
   dotenv_config_path=.env.local
 
-# Or specifically prod for an already-promoted bundle (use prod env file):
-DATABASE_URL=<prod-url> R2_BUCKET=<prod-bucket> ... \
-  pnpm tsx scripts/backfill-region-stores.ts --bundle=dino-dance-party
+# Drop --dry-run for the real run.
 ```
+
+**Backfill against prod** (uses a thin wrapper that loads prod env BEFORE the db client initializes):
+
+```bash
+# Pull a prod env file once per session:
+vercel env pull .env.production.local --environment=production
+
+# Dry-run:
+pnpm tsx scripts/backfill-region-stores-prod.ts \
+  --prod-env-file=.env.production.local \
+  --bundle=dino-dance-party \
+  --dry-run
+
+# Real run:
+pnpm tsx scripts/backfill-region-stores-prod.ts \
+  --prod-env-file=.env.production.local \
+  --bundle=dino-dance-party
+```
+
+The prod wrapper prints the resolved DB host + R2 bucket and waits 3 seconds before continuing, so you can confirm you're pointed at the right environment before any work starts.
+
+All other flags (`--bundle`, `--limit`, `--id`, `--force`, `--dry-run`) work the same on both.
 
 Without region maps, Magic Brush silently falls back to legacy `fillPointsJson` (which usually exists) — pages still load, just without per-pixel region accuracy on the magic brush.
 
