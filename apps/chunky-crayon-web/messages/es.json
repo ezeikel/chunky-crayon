@@ -1199,7 +1199,9 @@
         "75": "¡Casi terminas!",
         "100": "¡Listo!"
       }
-    }
+    },
+    "tapToColor": "Toca para colorear",
+    "dragForTools": "Arrastra para ver herramientas"
   },
   "createForm": {
     "title": "¡Crea magia!",

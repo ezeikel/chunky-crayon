@@ -1199,7 +1199,9 @@
         "75": "Presque fini !",
         "100": "C’est fini !"
       }
-    }
+    },
+    "tapToColor": "Touchez pour colorier",
+    "dragForTools": "Faites glisser pour les outils"
   },
   "createForm": {
     "title": "Crée de la magie !",

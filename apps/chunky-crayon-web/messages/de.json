@@ -1199,7 +1199,9 @@
         "75": "Fast geschafft!",
         "100": "Fertig!"
       }
-    }
+    },
+    "tapToColor": "Zum Ausmalen tippen",
+    "dragForTools": "Für Werkzeuge ziehen"
   },
   "createForm": {
     "title": "Zauber erstellen!",
