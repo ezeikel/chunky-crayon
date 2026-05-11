@@ -21,8 +21,11 @@ import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton/SaveTo
 import { trackViewContent } from '@/utils/pixels';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
-import { FocusModeProvider } from '@/components/FocusMode';
-import FocusModeExitButton from '@/components/FocusMode/FocusModeExitButton';
+import {
+  FocusModeProvider,
+  FocusModeExitButton,
+  FocusModeOverlay,
+} from '@/components/FocusMode';
 
 type ColoringPageContentProps = {
   coloringImage: Partial<ColoringImage>;
@@ -135,6 +138,7 @@ const ColoringPageContent = ({
     // color pick. FocusModeExitButton is fixed-positioned and only
     // renders when focus mode is active.
     <FocusModeProvider>
+      <FocusModeOverlay />
       <FocusModeExitButton />
       {/* Container query context for responsive layout */}
       <div className="flex flex-col gap-y-4 @container">
@@ -180,8 +184,11 @@ const ColoringPageContent = ({
               <MuteToggle />
             </div>
 
-            {/* Coloring Area - clean white card matching gallery aesthetic */}
-            <div className="bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 @[1600px]:p-8 shadow-sm">
+            {/* Coloring Area - clean white card matching gallery aesthetic.
+                `focus-mode-canvas-card` is a CSS hook that promotes this
+                element to position:fixed at the top of the viewport when
+                focus mode is active (mobile only). */}
+            <div className="bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 @[1600px]:p-8 shadow-sm focus-mode-canvas-card">
               <ColoringArea
                 ref={coloringAreaRef}
                 coloringImage={coloringImage}

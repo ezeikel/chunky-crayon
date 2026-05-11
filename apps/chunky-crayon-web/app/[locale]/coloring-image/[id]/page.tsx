@@ -127,7 +127,6 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
     return (
       <PageWrap className="flex flex-col gap-y-6 lg:px-6">
         <Breadcrumbs
-          className="focus-mode-hide"
           items={[
             { label: tNav('home'), href: '/' },
             { label: tNav('gallery'), href: '/gallery' },
@@ -207,7 +206,6 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
 
       {/* Breadcrumbs */}
       <Breadcrumbs
-        className="focus-mode-hide"
         items={[
           { label: tNav('home'), href: '/' },
           { label: tNav('gallery'), href: '/gallery' },

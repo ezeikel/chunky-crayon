@@ -677,35 +677,48 @@
   animation: magic-progress 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
-/* Focus mode — toggled by FocusModeProvider as a `data-focus-mode`
-   attribute on <html>. Hides the global header and any element with
-   the `.focus-mode-hide` class (used for breadcrumbs on the canvas
-   page). Mobile-only (the provider gates the toggle) but the CSS is
-   constrained to <md so a stale attribute on desktop can't
-   accidentally hide anything during a window resize.
-   The selector targets `header` (any descendant) because the layout
-   wraps it in NextIntlClientProvider + Providers + Suspense — direct
-   child selectors don't match. There's only one top-level <header>
-   in our app shell so this is safe. */
-header,
-.focus-mode-hide {
-  transition:
-    opacity 250ms ease-out,
-    transform 250ms ease-out,
-    max-height 250ms ease-out,
-    margin 250ms ease-out,
-    padding 250ms ease-out;
-}
+/* Focus mode — a real full-screen modal on mobile that takes over
+   the viewport so coloring isn't competing with header / breadcrumbs
+   / page scroll. Implementation:
+   - <html data-focus-mode> locks body scroll (the page chrome stays in
+     the DOM but is unreachable).
+   - FocusModeOverlay renders a fixed inset-0 backdrop at z-[55].
+   - The canvas-card wrapper in ColoringArea is promoted to
+     position:fixed inset-x-0 top-0 via `.focus-mode-canvas-wrap`,
+     pinning the canvas to the top of the viewport above the backdrop.
+   - The existing MobileColoringDrawer is already fixed:bottom-0;
+     focus mode just bumps its z-index above the backdrop.
+   - The X button (FocusModeExitButton) is the only escape and sits at
+     z-[70].
+   Mobile only — gated by max-width:767px and the provider's matchMedia.
+*/
 @media (max-width: 767px) {
-  html[data-focus-mode] header,
-  html[data-focus-mode] .focus-mode-hide {
-    opacity: 0;
-    transform: translateY(-12px);
-    pointer-events: none;
-    max-height: 0;
+  html[data-focus-mode],
+  html[data-focus-mode] body {
+    /* Lock background scroll while focus mode is active so the page
+       chrome behind the overlay can't move and accidentally peek
+       through. position:fixed on body would lose scroll position;
+       overflow:hidden on html+body is the lighter touch. */
     overflow: hidden;
-    margin: 0;
-    padding: 0;
-    border: 0;
+  }
+  /* Pin the canvas card to the top of the viewport above the backdrop
+     scrim (z-[55]) so it punches through cleanly. inset-x-0 + padding
+     leaves a small visual gutter on the sides matching the regular
+     page layout. The drawer (already position:fixed bottom-0 z-50)
+     gets its z-index bumped via the same selector below. */
+  html[data-focus-mode] .focus-mode-canvas-card {
+    position: fixed;
+    inset: env(safe-area-inset-top, 16px) 16px auto 16px;
+    z-index: 56;
+    max-height: calc(100dvh - 160px);
+    overflow: hidden;
+  }
+  /* Bump the mobile drawer above the focus-mode backdrop. The drawer is
+     coloring-ui's MobileColoringDrawer with hardcoded z-50; we can't
+     change it inline because it's a shared package, so override here
+     via a more specific selector targeting fixed bottom-0 elements
+     inside the drawer's Drawer.Content slot. */
+  html[data-focus-mode] [data-vaul-drawer] {
+    z-index: 56;
   }
 }
