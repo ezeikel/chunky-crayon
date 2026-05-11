@@ -62,7 +62,7 @@
       "actions": "Actions"
     },
     "tools": {
-      "pan": "Déplacer",
+      "pan": "Navigation",
       "fill": "Remplir",
       "brush": "Pinceau",
       "sticker": "Autocollant",
@@ -75,8 +75,8 @@
     },
     "brushTypes": {
       "crayon": "Crayon",
-      "marker": "Feutre",
-      "pencil": "Crayon à papier",
+      "marker": "Marqueur",
+      "pencil": "Crayon",
       "paintbrush": "Pinceau",
       "eraser": "Gomme",
       "glitter": "Paillettes",
@@ -92,7 +92,7 @@
     },
     "fillPatterns": {
       "solid": "Uni",
-      "dots": "Pois",
+      "dots": "À pois",
       "stripes": "Rayures",
       "diagonal": "Diagonal",
       "checkerboard": "Damier",
@@ -135,7 +135,7 @@
       "zoomOutAria": "Dézoomer (voir plus)",
       "zoomIn": "Zoomer",
       "zoomInAria": "Zoomer (voir de plus près)",
-      "pan": "Déplacer",
+      "pan": "Naviguer",
       "panAria": "Se déplacer dans l’image",
       "reset": "Voir toute l’image",
       "resetAria": "Revenir à l’image complète"
@@ -347,7 +347,7 @@
     "continueWithGoogle": "Continuer avec Google",
     "continueWithApple": "Continuer avec Apple",
     "signInWithEmail": "Se connecter par e-mail",
-    "sendingLink": "Envoi du lien…",
+    "sendingLink": "Envoi en cours…",
     "chooseMethod": "Choisissez votre méthode de connexion",
     "orContinueWith": "Ou continuer avec",
     "emailPlaceholder": "nom@exemple.com",
