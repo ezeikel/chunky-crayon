@@ -21,11 +21,7 @@ import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton/SaveTo
 import { trackViewContent } from '@/utils/pixels';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
-import {
-  FocusModeProvider,
-  FocusModeOverlay,
-  FocusModeToggleButton,
-} from '@/components/FocusMode';
+import { FocusModeProvider, FocusModeOverlay } from '@/components/FocusMode';
 
 type ColoringPageContentProps = {
   coloringImage: Partial<ColoringImage>;
@@ -186,11 +182,8 @@ const ColoringPageContent = ({
             {/* Coloring Area - clean white card matching gallery aesthetic.
                 `focus-mode-canvas-card` is a CSS hook that promotes this
                 element to position:fixed at the top of the viewport when
-                focus mode is active (mobile only). `relative` is the
-                anchor for FocusModeToggleButton which sits absolute
-                inside the card. */}
-            <div className="relative bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 @[1600px]:p-8 shadow-sm focus-mode-canvas-card">
-              <FocusModeToggleButton />
+                focus mode is active (mobile only). */}
+            <div className="bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 @[1600px]:p-8 shadow-sm focus-mode-canvas-card">
               <ColoringArea
                 ref={coloringAreaRef}
                 coloringImage={coloringImage}

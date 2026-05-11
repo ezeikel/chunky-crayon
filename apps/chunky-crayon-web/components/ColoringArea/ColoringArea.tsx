@@ -18,6 +18,7 @@ import {
 import { ColoringImage } from '@one-colored-pixel/db/types';
 import { ImageCanvas, ImageCanvasHandle } from '@one-colored-pixel/coloring-ui';
 import TapPromptOverlay from '@/components/TapPromptOverlay';
+import { FocusModeToggleButton } from '@/components/FocusMode';
 import { ColoringToolbar } from '@one-colored-pixel/coloring-ui';
 import { MobileColoringDrawer } from '@one-colored-pixel/coloring-ui';
 import StickerSelector from '@/components/StickerSelector';
@@ -1249,7 +1250,11 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           />
         </div>
 
-        {/* Mobile Top Bar - Minimal with progress, mute, and zoom */}
+        {/* Mobile Top Bar - Minimal with progress, mute, zoom, and
+            focus-toggle. FocusModeToggleButton sits at the end so it
+            shares spacing with ZoomControls and never collides with
+            them — placing it absolute on the canvas card was landing
+            it on top of these. */}
         <div className="md:hidden flex items-center justify-between gap-3 px-1">
           {/* Left side: Progress bar needs flex-1 to expand and give ProgressIndicator width */}
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -1261,6 +1266,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             <MuteToggle />
           </div>
           <ZoomControls className="shadow-sm shrink-0" />
+          <FocusModeToggleButton />
         </div>
 
         {/* Canvas - Shared between mobile and desktop */}

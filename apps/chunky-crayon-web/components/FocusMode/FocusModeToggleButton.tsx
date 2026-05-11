@@ -6,19 +6,15 @@ import { useFocusMode } from './FocusModeProvider';
 import cn from '@/utils/cn';
 
 /**
- * Single button that toggles focus mode. Lives INSIDE the canvas card
- * at top-right (absolute-positioned within the card), so it follows
- * the card whether the card is in normal flow or promoted to
- * position:fixed in focus mode. No floating fixed-positioning, no
- * collision with the canvas — the button is part of the card.
+ * Inline button that toggles focus mode. Designed to sit in the mobile
+ * top bar alongside MuteToggle / ZoomControls so it shares their
+ * spacing language instead of overlapping anything. Icon swaps based
+ * on state: faExpand when off (enter), faXmark when on (exit). Same
+ * position, same hit target across both modes.
  *
- * Mobile only via md:hidden — desktop has the full chrome and tool
- * sidebar, focus mode is not useful there.
- *
- * Icon swaps based on state: faExpand when normal, faXmark when in
- * focus mode. Same position, same size, same hit target.
+ * Mobile only via md:hidden — desktop never uses focus mode.
  */
-const FocusModeToggleButton = () => {
+const FocusModeToggleButton = ({ className }: { className?: string }) => {
   const { isFocusMode, enterFocus, exitFocus } = useFocusMode();
 
   return (
@@ -27,11 +23,11 @@ const FocusModeToggleButton = () => {
       onClick={isFocusMode ? exitFocus : enterFocus}
       aria-label={isFocusMode ? 'Exit focus mode' : 'Enter focus mode'}
       className={cn(
-        'md:hidden absolute z-10 top-2 right-2',
-        'flex items-center justify-center w-9 h-9 rounded-full',
-        'bg-white/95 backdrop-blur-sm text-coloring-text-primary',
-        'shadow-md border border-coloring-surface-dark',
+        'md:hidden shrink-0 flex items-center justify-center w-9 h-9 rounded-full',
+        'bg-white text-coloring-text-primary',
+        'shadow-sm border border-coloring-surface-dark/40',
         'active:scale-95 transition-transform duration-150',
+        className,
       )}
     >
       <FontAwesomeIcon
