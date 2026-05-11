@@ -299,187 +299,172 @@ const PricingPageClient = ({
   const renderSubscriptionsSection = (section: SectionPosition) => {
     const isPrimary = section === 'primary';
     return (
-      <div>
-        {/* Interval toggle (Monthly/Annual). Only show when subs are
-            primary — when secondary, we render only monthly to keep
-            the section condensed. */}
-        {isPrimary && (
-          <div className="flex justify-center items-center gap-4 mb-6">
-            {(['monthly', 'annual'] as PlanInterval[]).map((key) => (
-              <button
-                key={key}
-                type="button"
-                className={cn(
-                  'px-4 py-2 rounded-full font-semibold transition',
-                  interval === key
-                    ? 'bg-orange text-white shadow'
-                    : 'bg-orange/10 text-orange hover:bg-orange/20',
-                )}
-                onClick={() => {
-                  if (interval !== key) {
-                    trackEvent(TRACKING_EVENTS.PRICING_INTERVAL_TOGGLED, {
-                      fromInterval: interval,
-                      toInterval: key,
-                    });
-                    setInterval(key);
-                  }
-                }}
-                aria-pressed={interval === key}
-              >
-                {intervalLabels[key]}
-              </button>
-            ))}
-          </div>
+      <StaggerChildren
+        className={cn(
+          'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch',
+          !isPrimary && 'gap-6 max-w-4xl',
         )}
+        staggerDelay={isPrimary ? 0.15 : 0.05}
+        delay={isPrimary ? 0.2 : 0}
+      >
+        {plans.map((plan) => {
+          const planTranslationKey = planKeyMap[plan.key];
+          const planName = t(`plans.${planTranslationKey}.name`);
+          const planTagline = t(`plans.${planTranslationKey}.tagline`);
+          const planAudience = t(`plans.${planTranslationKey}.audience`);
 
-        <StaggerChildren
-          className={cn(
-            'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch',
-            !isPrimary && 'gap-4 max-w-3xl',
-          )}
-          staggerDelay={isPrimary ? 0.15 : 0.05}
-          delay={isPrimary ? 0.2 : 0}
-        >
-          {plans.map((plan) => {
-            const planTranslationKey = planKeyMap[plan.key];
-            const planName = t(`plans.${planTranslationKey}.name`);
-            const planTagline = t(`plans.${planTranslationKey}.tagline`);
-            const planAudience = t(`plans.${planTranslationKey}.audience`);
-
-            return (
-              <StaggerItem key={plan.key} className="h-full">
-                <Card
+          return (
+            <StaggerItem key={plan.key} className="h-full">
+              <Card
+                className={cn(
+                  'flex flex-col h-full border-2 rounded-3xl transition-all duration-300',
+                  plan.mostPopular && isPrimary
+                    ? 'border-crayon-orange shadow-2xl shadow-crayon-orange/20 lg:scale-[1.06] lg:-translate-y-2 relative z-10 bg-white ring-2 ring-crayon-orange/30 ring-offset-4 ring-offset-paper'
+                    : 'border-paper-cream-dark hover:border-crayon-orange/40 bg-white/90 hover:-translate-y-1 transition-transform duration-300',
+                )}
+              >
+                {plan.mostPopular && isPrimary && (
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 -rotate-[3deg] bg-gradient-to-br from-crayon-orange to-crayon-orange-dark text-white text-sm font-tondo font-bold px-6 py-2 rounded-full shadow-[0_6px_16px_rgba(218,115,83,0.35)] whitespace-nowrap inline-flex items-center gap-2 ring-2 ring-white/40">
+                    <FontAwesomeIcon
+                      icon={faSparkles}
+                      className="text-sm"
+                      style={
+                        {
+                          '--fa-primary-color': '#ffffff',
+                          '--fa-secondary-color': '#fde68a',
+                          '--fa-secondary-opacity': '1',
+                        } as React.CSSProperties
+                      }
+                    />
+                    {t('mostPopular')}
+                  </span>
+                )}
+                <CardHeader className={cn(isPrimary ? 'pt-8' : 'pt-5')}>
+                  <CardTitle className="flex flex-col gap-1 text-center">
+                    <span
+                      className={cn(
+                        'font-tondo mb-2',
+                        isPrimary ? 'text-2xl' : 'text-xl',
+                      )}
+                    >
+                      {planName}
+                    </span>
+                    <span
+                      className={cn(
+                        'font-normal text-text-secondary leading-snug',
+                        isPrimary ? 'text-base' : 'text-sm',
+                      )}
+                    >
+                      {planTagline}
+                    </span>
+                  </CardTitle>
+                  <CardDescription
+                    className={cn(isPrimary ? 'mt-4' : 'mt-2', 'text-center')}
+                  >
+                    <span className="block">
+                      <span className="relative inline-block">
+                        <span
+                          className={cn(
+                            'relative z-10 font-tondo font-bold text-text-primary',
+                            isPrimary ? 'text-3xl' : 'text-2xl',
+                          )}
+                        >
+                          {plan.prices[currency].display}
+                        </span>
+                        <CrayonScribble
+                          seed={planSeeds[plan.key]}
+                          className="absolute left-0 right-0 -bottom-1 w-full h-[10px] pointer-events-none text-crayon-orange/70"
+                        />
+                      </span>
+                      <span className="text-base font-normal text-text-secondary ml-1.5">
+                        {interval === 'annual' ? t('perYear') : t('perMonth')}
+                      </span>
+                    </span>
+                  </CardDescription>
+                  {isPrimary && (
+                    <div className="mt-3 text-sm text-text-secondary text-center max-w-[18rem] mx-auto">
+                      {planAudience}
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent
                   className={cn(
-                    'flex flex-col h-full border-2 rounded-3xl transition-all duration-300',
-                    plan.mostPopular && isPrimary
-                      ? 'border-crayon-orange shadow-2xl shadow-crayon-orange/20 lg:scale-[1.06] lg:-translate-y-2 relative z-10 bg-white ring-2 ring-crayon-orange/30 ring-offset-4 ring-offset-paper'
-                      : 'border-paper-cream-dark hover:border-crayon-orange/40 bg-white/90 hover:-translate-y-1 transition-transform duration-300',
+                    'flex-1 flex flex-col gap-2',
+                    !isPrimary && 'pb-2',
                   )}
                 >
-                  {plan.mostPopular && isPrimary && (
-                    <span className="absolute -top-4 left-1/2 -translate-x-1/2 -rotate-[3deg] bg-gradient-to-br from-crayon-orange to-crayon-orange-dark text-white text-sm font-tondo font-bold px-6 py-2 rounded-full shadow-[0_6px_16px_rgba(218,115,83,0.35)] whitespace-nowrap inline-flex items-center gap-2 ring-2 ring-white/40">
-                      <FontAwesomeIcon
-                        icon={faSparkles}
-                        className="text-sm"
-                        style={
-                          {
-                            '--fa-primary-color': '#ffffff',
-                            '--fa-secondary-color': '#fde68a',
-                            '--fa-secondary-opacity': '1',
-                          } as React.CSSProperties
-                        }
-                      />
-                      {t('mostPopular')}
-                    </span>
-                  )}
-                  <CardHeader className={cn(isPrimary ? 'pt-8' : 'pt-5')}>
-                    <CardTitle className="flex flex-col gap-1 text-center">
-                      <span
-                        className={cn(
-                          'font-tondo mb-2',
-                          isPrimary ? 'text-2xl' : 'text-xl',
-                        )}
-                      >
-                        {planName}
-                      </span>
-                      {isPrimary && (
-                        <span className="text-base font-normal text-text-secondary leading-snug">
-                          {planTagline}
-                        </span>
-                      )}
-                    </CardTitle>
-                    <CardDescription
-                      className={cn(isPrimary ? 'mt-4' : 'mt-2', 'text-center')}
-                    >
-                      <span className="block">
-                        <span className="relative inline-block">
-                          <span
-                            className={cn(
-                              'relative z-10 font-tondo font-bold text-text-primary',
-                              isPrimary ? 'text-3xl' : 'text-2xl',
-                            )}
-                          >
-                            {plan.prices[currency].display}
-                          </span>
-                          <CrayonScribble
-                            seed={planSeeds[plan.key]}
-                            className="absolute left-0 right-0 -bottom-1 w-full h-[10px] pointer-events-none text-crayon-orange/70"
-                          />
-                        </span>
-                        <span className="text-base font-normal text-text-secondary ml-1.5">
-                          {interval === 'annual' ? t('perYear') : t('perMonth')}
-                        </span>
-                      </span>
-                    </CardDescription>
-                    {isPrimary && (
-                      <div className="mt-3 text-sm text-text-secondary text-center max-w-[18rem] mx-auto">
-                        {planAudience}
-                      </div>
-                    )}
-                  </CardHeader>
-                  {isPrimary && (
-                    <CardContent className="flex-1 flex flex-col gap-2">
-                      <ul className="mb-2 space-y-2">
-                        {plan.featureKeys.map((featureKey) => (
-                          <li
-                            key={featureKey}
-                            className="flex items-start gap-2.5 text-text-primary"
-                          >
-                            <span
-                              aria-hidden
-                              className="mt-1 inline-flex w-5 h-5 shrink-0 items-center justify-center rounded-full bg-crayon-orange/15 text-crayon-orange"
-                            >
-                              <FontAwesomeIcon
-                                icon={faCheck}
-                                className="text-[10px]"
-                              />
-                            </span>
-                            <span className="leading-snug">
-                              {t(`features.${featureKey}`)}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  )}
-                  <CardFooter
+                  <ul
                     className={cn(
-                      'flex flex-col gap-2',
-                      isPrimary ? 'pb-6' : 'pb-4',
+                      'mb-2',
+                      isPrimary ? 'space-y-2' : 'space-y-1.5',
                     )}
                   >
-                    <Button
-                      variant={
-                        plan.mostPopular && isPrimary ? 'default' : 'neutral'
-                      }
-                      className={cn(
-                        'w-full rounded-full hover:scale-[1.02] active:scale-[0.98]',
-                        isPrimary ? 'text-base py-6' : 'text-sm py-4',
-                      )}
-                      onClick={() => handlePlanPurchase(plan, section)}
-                      disabled={loadingPlan === planName}
-                    >
-                      {t('buyNow')}
-                    </Button>
-                    {isPrimary && (
-                      <>
-                        <span className="text-xs text-text-secondary text-center">
-                          {t('trialMicroCopy', {
-                            price: plan.prices[currency].display,
-                          })}
+                    {plan.featureKeys.map((featureKey) => (
+                      <li
+                        key={featureKey}
+                        className={cn(
+                          'flex items-start gap-2.5 text-text-primary',
+                          !isPrimary && 'text-sm',
+                        )}
+                      >
+                        <span
+                          aria-hidden
+                          className={cn(
+                            'inline-flex shrink-0 items-center justify-center rounded-full bg-crayon-orange/15 text-crayon-orange',
+                            isPrimary ? 'mt-1 w-5 h-5' : 'mt-0.5 w-4 h-4',
+                          )}
+                        >
+                          <FontAwesomeIcon
+                            icon={faCheck}
+                            className={cn(
+                              isPrimary ? 'text-[10px]' : 'text-[8px]',
+                            )}
+                          />
                         </span>
-                        <span className="text-sm text-text-secondary text-center mt-1">
-                          {t('noCommitment')}
+                        <span className="leading-snug">
+                          {t(`features.${featureKey}`)}
                         </span>
-                      </>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter
+                  className={cn(
+                    'flex flex-col gap-2',
+                    isPrimary ? 'pb-6' : 'pb-4',
+                  )}
+                >
+                  <Button
+                    variant={
+                      plan.mostPopular && isPrimary ? 'default' : 'neutral'
+                    }
+                    className={cn(
+                      'w-full rounded-full hover:scale-[1.02] active:scale-[0.98]',
+                      isPrimary ? 'text-base py-6' : 'text-sm py-4',
                     )}
-                  </CardFooter>
-                </Card>
-              </StaggerItem>
-            );
-          })}
-        </StaggerChildren>
-      </div>
+                    onClick={() => handlePlanPurchase(plan, section)}
+                    disabled={loadingPlan === planName}
+                  >
+                    {t('buyNow')}
+                  </Button>
+                  {isPrimary && (
+                    <>
+                      <span className="text-xs text-text-secondary text-center">
+                        {t('trialMicroCopy', {
+                          price: plan.prices[currency].display,
+                        })}
+                      </span>
+                      <span className="text-sm text-text-secondary text-center mt-1">
+                        {t('noCommitment')}
+                      </span>
+                    </>
+                  )}
+                </CardFooter>
+              </Card>
+            </StaggerItem>
+          );
+        })}
+      </StaggerChildren>
     );
   };
 
@@ -596,6 +581,40 @@ const PricingPageClient = ({
           <p className="font-rooney-sans text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed">
             {t('heroSubtitle')}
           </p>
+
+          {/* Monthly / Annual toggle. Lives in the header so it sits
+              clear of the subscription card grid (otherwise it visually
+              collides with the "Most Popular" ribbon on the centered
+              Rainbow card). Hidden in packs-primary variant where the
+              subscription tier is condensed + monthly-only. */}
+          {variant === 'subscriptions_primary' && (
+            <div className="flex justify-center items-center gap-4 mt-6">
+              {(['monthly', 'annual'] as PlanInterval[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={cn(
+                    'px-4 py-2 rounded-full font-semibold transition',
+                    interval === key
+                      ? 'bg-orange text-white shadow'
+                      : 'bg-orange/10 text-orange hover:bg-orange/20',
+                  )}
+                  onClick={() => {
+                    if (interval !== key) {
+                      trackEvent(TRACKING_EVENTS.PRICING_INTERVAL_TOGGLED, {
+                        fromInterval: interval,
+                        toInterval: key,
+                      });
+                      setInterval(key);
+                    }
+                  }}
+                  aria-pressed={interval === key}
+                >
+                  {intervalLabels[key]}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Secondary CTA in the hero gives visitors who already know
               they want the other option an early path. */}
