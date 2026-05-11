@@ -574,7 +574,7 @@ const PricingPageClient = ({
   return (
     <div className="max-w-5xl mx-auto py-12 px-4">
       <FadeIn direction="up" duration={0.6}>
-        <header className="text-center mb-16">
+        <header className="text-center mb-12">
           <h1 className="font-tondo font-bold text-text-primary text-[clamp(2.25rem,5.5vw,4rem)] leading-[1.05] tracking-tight mb-4 max-w-3xl mx-auto">
             {t('heroTitle')}
           </h1>
@@ -582,51 +582,7 @@ const PricingPageClient = ({
             {t('heroSubtitle')}
           </p>
 
-          {/* Monthly / Annual toggle. Lives in the header so it sits
-              clear of the subscription card grid (otherwise it visually
-              collides with the "Most Popular" ribbon on the centered
-              Rainbow card). Hidden in packs-primary variant where the
-              subscription tier is condensed + monthly-only. */}
-          {variant === 'subscriptions_primary' && (
-            <div className="flex justify-center items-center gap-4 mt-6">
-              {(['monthly', 'annual'] as PlanInterval[]).map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={cn(
-                    'px-4 py-2 rounded-full font-semibold transition',
-                    interval === key
-                      ? 'bg-orange text-white shadow'
-                      : 'bg-orange/10 text-orange hover:bg-orange/20',
-                  )}
-                  onClick={() => {
-                    if (interval !== key) {
-                      trackEvent(TRACKING_EVENTS.PRICING_INTERVAL_TOGGLED, {
-                        fromInterval: interval,
-                        toInterval: key,
-                      });
-                      setInterval(key);
-                    }
-                  }}
-                  aria-pressed={interval === key}
-                >
-                  {intervalLabels[key]}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Secondary CTA in the hero gives visitors who already know
-              they want the other option an early path. */}
-          <button
-            type="button"
-            onClick={handleSecondaryCtaClick}
-            className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-crayon-orange hover:text-crayon-orange-dark underline-offset-4 hover:underline transition-colors"
-          >
-            {t(secondaryCtaKey)} <span aria-hidden>→</span>
-          </button>
-
-          <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-6 text-sm text-text-secondary">
+          <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-8 text-sm text-text-secondary">
             <Experiment
               flag="exp-pricing-trust"
               defaultVariant="control"
@@ -680,9 +636,11 @@ const PricingPageClient = ({
       </FadeIn>
 
       {/* Anchor strip — actual coloring pages from the live ad
-          campaigns. Visual continuity with paid traffic. */}
+          campaigns. Sits between trust strip and the
+          toggle / pricing decision so the page reads:
+          copy → social proof → product proof → choice. */}
       {adImages.length > 0 && (
-        <FadeIn direction="up" delay={0.05} className="mb-12">
+        <FadeIn direction="up" delay={0.05} className="mb-14">
           <div className="flex justify-center items-end gap-2 sm:gap-6 max-w-3xl mx-auto px-4">
             {adImages.map((img, i) => {
               const rotations = [
@@ -713,6 +671,50 @@ const PricingPageClient = ({
           </div>
         </FadeIn>
       )}
+
+      {/* Toggle + secondary path — sit directly above the
+          primary pricing cards so they read as controls for
+          the decision below, not part of the hero. Toggle is
+          subscriptions-only (packs are one-off). */}
+      <FadeIn direction="up" delay={0.1} className="mb-10">
+        <div className="flex flex-col items-center gap-3">
+          {variant === 'subscriptions_primary' && (
+            <div className="flex justify-center items-center gap-4">
+              {(['monthly', 'annual'] as PlanInterval[]).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={cn(
+                    'px-4 py-2 rounded-full font-semibold transition',
+                    interval === key
+                      ? 'bg-orange text-white shadow'
+                      : 'bg-orange/10 text-orange hover:bg-orange/20',
+                  )}
+                  onClick={() => {
+                    if (interval !== key) {
+                      trackEvent(TRACKING_EVENTS.PRICING_INTERVAL_TOGGLED, {
+                        fromInterval: interval,
+                        toInterval: key,
+                      });
+                      setInterval(key);
+                    }
+                  }}
+                  aria-pressed={interval === key}
+                >
+                  {intervalLabels[key]}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleSecondaryCtaClick}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-crayon-orange hover:text-crayon-orange-dark underline-offset-4 hover:underline transition-colors"
+          >
+            {t(secondaryCtaKey)} <span aria-hidden>→</span>
+          </button>
+        </div>
+      </FadeIn>
 
       {/* PRIMARY section */}
       {primarySectionType === 'subscriptions'
