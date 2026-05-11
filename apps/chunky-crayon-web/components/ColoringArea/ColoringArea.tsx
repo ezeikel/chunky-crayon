@@ -1250,14 +1250,14 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           />
         </div>
 
-        {/* Mobile Top Bar - Minimal with progress, mute, zoom, and
-            focus-toggle. FocusModeToggleButton sits at the end so it
-            shares spacing with ZoomControls and never collides with
-            them — placing it absolute on the canvas card was landing
-            it on top of these. */}
-        <div className="md:hidden flex items-center justify-between gap-3 px-1">
-          {/* Left side: Progress bar needs flex-1 to expand and give ProgressIndicator width */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+        {/* Mobile Top Bar — split into two rows so the progress bar
+            gets full horizontal width and the controls don't squeeze
+            against it on narrow phones. Row 1: progress + mute.
+            Row 2: zoom pill (with focus-mode toggle grouped inside
+            via the `trailing` slot so they read as one visual unit). */}
+        <div className="md:hidden flex flex-col gap-2 px-1">
+          {/* Row 1: full-width progress + mute */}
+          <div className="flex items-center gap-2">
             <ProgressIndicator
               getCanvas={getCanvas}
               getBoundaryCanvas={getBoundaryCanvas}
@@ -1265,8 +1265,13 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             />
             <MuteToggle />
           </div>
-          <ZoomControls className="shadow-sm shrink-0" />
-          <FocusModeToggleButton />
+          {/* Row 2: zoom + focus toggle, right-aligned */}
+          <div className="flex justify-end">
+            <ZoomControls
+              className="shadow-sm"
+              trailing={<FocusModeToggleButton />}
+            />
+          </div>
         </div>
 
         {/* Canvas - Shared between mobile and desktop */}

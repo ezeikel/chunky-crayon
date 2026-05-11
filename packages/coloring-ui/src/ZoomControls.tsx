@@ -9,6 +9,13 @@ import cn from "./cn";
 
 type ZoomControlsProps = {
   className?: string;
+  /**
+   * Slot rendered inside the same pill, after the reset-view button.
+   * Used to group consumer-supplied buttons (e.g. mobile focus-mode
+   * toggle) into the zoom controls' visual chrome so they don't read
+   * as a separate floating control.
+   */
+  trailing?: React.ReactNode;
 };
 
 const ZoomInIcon = ({ className }: { className?: string }) => (
@@ -110,7 +117,7 @@ const ZoomIndicator = ({
 
 const ZOOM_STEP = 0.5;
 
-const ZoomControls = ({ className }: ZoomControlsProps) => {
+const ZoomControls = ({ className, trailing }: ZoomControlsProps) => {
   const {
     zoom,
     setZoom,
@@ -236,6 +243,11 @@ const ZoomControls = ({ className }: ZoomControlsProps) => {
           <HomeIcon className="size-5 sm:size-6" />
         </button>
       )}
+
+      {/* Consumer slot for grouping additional controls inside the
+          same pill (e.g. mobile focus-mode toggle). Rendered last so
+          it sits at the right edge after the reset-view button. */}
+      {trailing}
     </div>
   );
 };
