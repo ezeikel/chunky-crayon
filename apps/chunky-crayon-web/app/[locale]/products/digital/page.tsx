@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faFileLines,
@@ -241,6 +242,12 @@ const LocalizedBundleGrid = async ({
   bundles,
   locale,
 }: LocalizedBundleGridProps) => {
+  // Force this island to be dynamic-per-request. Cache Components
+  // otherwise prerenders this whole subtree at build time even though
+  // we read x-vercel-ip-country inside getCurrencyForRequest — the
+  // analyzer doesn't treat the header read as enough of a dynamic
+  // signal on its own. connection() is the explicit opt-out.
+  await connection();
   const currency = await getCurrencyForRequest();
 
   return (
