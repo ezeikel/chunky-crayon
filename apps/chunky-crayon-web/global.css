@@ -682,8 +682,12 @@
    the `.focus-mode-hide` class (used for breadcrumbs on the canvas
    page). Mobile-only (the provider gates the toggle) but the CSS is
    constrained to <md so a stale attribute on desktop can't
-   accidentally hide anything during a window resize. */
-body > header,
+   accidentally hide anything during a window resize.
+   The selector targets `header` (any descendant) because the layout
+   wraps it in NextIntlClientProvider + Providers + Suspense — direct
+   child selectors don't match. There's only one top-level <header>
+   in our app shell so this is safe. */
+header,
 .focus-mode-hide {
   transition:
     opacity 250ms ease-out,
@@ -693,7 +697,7 @@ body > header,
     padding 250ms ease-out;
 }
 @media (max-width: 767px) {
-  html[data-focus-mode] body > header,
+  html[data-focus-mode] header,
   html[data-focus-mode] .focus-mode-hide {
     opacity: 0;
     transform: translateY(-12px);
