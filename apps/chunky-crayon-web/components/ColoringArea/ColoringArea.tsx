@@ -18,7 +18,7 @@ import {
 import { ColoringImage } from '@one-colored-pixel/db/types';
 import { ImageCanvas, ImageCanvasHandle } from '@one-colored-pixel/coloring-ui';
 import TapPromptOverlay from '@/components/TapPromptOverlay';
-import { FocusModeToggleButton } from '@/components/FocusMode';
+import { FocusModeToggleButton, useFocusMode } from '@/components/FocusMode';
 import { ColoringToolbar } from '@one-colored-pixel/coloring-ui';
 import { MobileColoringDrawer } from '@one-colored-pixel/coloring-ui';
 import StickerSelector from '@/components/StickerSelector';
@@ -114,6 +114,13 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     // localStorage check on mount to avoid a flash.
     const [showTapPrompt, setShowTapPrompt] = useState(false);
     const [tapPromptDismissed, setTapPromptDismissed] = useState(false);
+    // Focus mode auto-enter ref. The first stroke is the strongest
+    // "user is here to color" signal — flip them into focus mode once
+    // so the canvas claims the full viewport. After that, the toggle
+    // button is the way in/out. Gated by localStorage so repeat
+    // visitors aren't surprised on each visit.
+    const focusModeAutoEnteredRef = useRef(false);
+    const { enterFocus: enterFocusMode } = useFocusMode();
     // Store the "after" states for redo - keyed by timestamp
     const redoStatesRef = useRef<Map<number, ImageData>>(new Map());
     // Track if canvas is ready
@@ -409,6 +416,33 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         });
       }
 
+      // Focus mode auto-enter on first stroke. First-stroke is the
+      // commitment signal — the user is actively coloring, so we
+      // promote the canvas to full viewport. Only fires once per
+      // device (localStorage flag) so it isn't surprising on repeat
+      // visits, and only once per mount via the ref guard.
+      // enterFocusMode itself is a no-op on desktop (matchMedia gate
+      // inside the provider).
+      if (!focusModeAutoEnteredRef.current) {
+        focusModeAutoEnteredRef.current = true;
+        let alreadyAutoEntered = false;
+        try {
+          alreadyAutoEntered = !!window.localStorage.getItem(
+            'focus-mode-auto-entered',
+          );
+        } catch {
+          // Storage disabled — fall through and enter; user can exit.
+        }
+        if (!alreadyAutoEntered) {
+          try {
+            window.localStorage.setItem('focus-mode-auto-entered', '1');
+          } catch {
+            // ignore
+          }
+          enterFocusMode();
+        }
+      }
+
       console.log('[ColoringArea] handleFirstInteraction called', {
         hasAmbientUrl: !!coloringImage.backgroundMusicUrl,
         ambientUrl: coloringImage.backgroundMusicUrl,
@@ -428,6 +462,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       playAmbient,
       showTapPrompt,
       tapPromptDismissed,
+      enterFocusMode,
     ]);
 
     // Cleanup: stop ambient sound when component unmounts
