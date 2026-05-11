@@ -702,15 +702,17 @@
     overflow: hidden;
   }
   /* Pin the canvas card to the top of the viewport above the backdrop
-     scrim (z-[55]) so it punches through cleanly. inset-x-0 + padding
-     leaves a small visual gutter on the sides matching the regular
-     page layout. The drawer (already position:fixed bottom-0 z-50)
-     gets its z-index bumped via the same selector below. */
+     scrim (z-[55]) so it punches through cleanly. Top offset clears
+     the floating X exit button (z-[70], ~40px tall + safe-area + 16px
+     visual gap) so the X and the canvas never touch. */
   html[data-focus-mode] .focus-mode-canvas-card {
     position: fixed;
-    inset: env(safe-area-inset-top, 16px) 16px auto 16px;
+    top: calc(max(env(safe-area-inset-top, 0px), 16px) + 40px + 12px);
+    left: 16px;
+    right: 16px;
+    bottom: auto;
     z-index: 56;
-    max-height: calc(100dvh - 160px);
+    max-height: calc(100dvh - 200px);
     overflow: hidden;
   }
   /* Bump the mobile drawer above the focus-mode backdrop. The drawer is

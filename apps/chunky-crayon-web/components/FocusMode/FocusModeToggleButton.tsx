@@ -9,13 +9,25 @@ import cn from '@/utils/cn';
  * Inline button that toggles focus mode. Rendered inside ZoomControls
  * via its `trailing` slot so it visually belongs to the zoom-controls
  * pill instead of floating as a separate button. Matches the zoom
- * button sizing/styling exactly. Icon swaps based on state: faExpand
- * when off (enter), faXmark when on (exit).
+ * button sizing/styling exactly.
+ *
+ * When `hideInFocusMode` is true the button renders only in normal
+ * view — in focus mode the exit affordance lives elsewhere (a
+ * floating X top-right of viewport via FocusModeFloatingExit) so the
+ * canvas card's chrome stays clean.
  *
  * Mobile only via md:hidden — desktop never uses focus mode.
  */
-const FocusModeToggleButton = ({ className }: { className?: string }) => {
+const FocusModeToggleButton = ({
+  className,
+  hideInFocusMode = false,
+}: {
+  className?: string;
+  hideInFocusMode?: boolean;
+}) => {
   const { isFocusMode, enterFocus, exitFocus } = useFocusMode();
+
+  if (hideInFocusMode && isFocusMode) return null;
 
   return (
     <button

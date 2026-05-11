@@ -1265,11 +1265,13 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             />
             <MuteToggle />
           </div>
-          {/* Row 2: zoom + focus toggle, right-aligned */}
-          <div className="flex justify-end">
+          {/* Row 2: zoom + focus toggle (when not in focus mode),
+              centered. In focus mode the toggle moves out to a
+              floating top-right X — see FocusModeFloatingExit below. */}
+          <div className="flex justify-center">
             <ZoomControls
               className="shadow-sm"
-              trailing={<FocusModeToggleButton />}
+              trailing={<FocusModeToggleButton hideInFocusMode />}
             />
           </div>
         </div>

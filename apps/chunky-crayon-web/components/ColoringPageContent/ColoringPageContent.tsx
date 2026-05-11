@@ -21,7 +21,11 @@ import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton/SaveTo
 import { trackViewContent } from '@/utils/pixels';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
-import { FocusModeProvider, FocusModeOverlay } from '@/components/FocusMode';
+import {
+  FocusModeProvider,
+  FocusModeOverlay,
+  FocusModeFloatingExit,
+} from '@/components/FocusMode';
 
 type ColoringPageContentProps = {
   coloringImage: Partial<ColoringImage>;
@@ -135,6 +139,7 @@ const ColoringPageContent = ({
     // renders when focus mode is active.
     <FocusModeProvider>
       <FocusModeOverlay />
+      <FocusModeFloatingExit />
       {/* Container query context for responsive layout */}
       <div className="flex flex-col gap-y-4 @container">
         {/* Title with progress/mute underneath on desktop */}
