@@ -99,6 +99,13 @@ jobs:
           # Prisma 7 removed --shadow-database-url on the CLI; shadow DB
           # is now configured via prisma.config.ts, which reads this env var.
           SHADOW_DATABASE_URL: 'postgresql://prisma:prisma@localhost:5432/shadow'
+          # Prisma 7's schema engine errors with an empty
+          # `Error: Error in Schema engine:` when `datasource.url` resolves
+          # to undefined, even though `migrate diff --from-migrations`
+          # only needs the shadow DB. Point DATABASE_URL at the same
+          # local shadow DB to keep the engine happy; the diff itself
+          # doesn't connect to it.
+          DATABASE_URL: 'postgresql://prisma:prisma@localhost:5432/shadow'
         run: |
           set +e
           pnpm exec prisma migrate diff \

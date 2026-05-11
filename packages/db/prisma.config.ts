@@ -8,22 +8,8 @@ dotenv.config({
   path: path.resolve(__dirname, "../../apps/chunky-crayon-web/.env.local"),
 });
 
-// Migrations need a session-mode Postgres connection. Neon's pooled
-// host runs PgBouncer in transaction mode, which doesn't support the
-// advisory locks Prisma Migrate uses — pooled connections error out
-// with `P1017 Server has closed the connection`. So:
-//
-//   - prisma.config.ts datasource (this file) = unpooled URL,
-//     used only by CLI commands like `prisma migrate dev/deploy`.
-//   - Runtime app (packages/db/src/client.ts) keeps reading
-//     `process.env.DATABASE_URL` = pooled URL via @prisma/adapter-neon.
-//
-// Fall back to `DATABASE_URL` when the unpooled var isn't set so
-// preview environments or test setups that don't distinguish still
-// work — at the cost of failing exactly the same way the pooled URL
-// would on actual migrations.
-const migrationUrl =
-  process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+// Get DATABASE_URL from process.env (works both locally and on Vercel)
+const databaseUrl = process.env.DATABASE_URL;
 
 // Shadow DB is only used by `prisma migrate diff --from-migrations ...`
 // in the CI drift-check job. Local dev + `prisma migrate deploy` don't
@@ -36,7 +22,7 @@ export default defineConfig({
     path: "./prisma/migrations",
   },
   datasource: {
-    url: migrationUrl,
+    url: databaseUrl,
     ...(shadowDatabaseUrl ? { shadowDatabaseUrl } : {}),
   },
 });
