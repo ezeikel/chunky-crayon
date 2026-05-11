@@ -102,10 +102,11 @@ jobs:
           # Prisma 7's schema engine errors with an empty
           # `Error: Error in Schema engine:` when `datasource.url` resolves
           # to undefined, even though `migrate diff --from-migrations`
-          # only needs the shadow DB. Point DATABASE_URL at the same
-          # local shadow DB to keep the engine happy; the diff itself
-          # doesn't connect to it.
-          DATABASE_URL: 'postgresql://prisma:prisma@localhost:5432/shadow'
+          # only needs the shadow DB. Point DATABASE_URL at the postgres
+          # service container's default `postgres` DB to keep the engine
+          # happy. Must differ from SHADOW_DATABASE_URL or Prisma rejects
+          # them as the same database.
+          DATABASE_URL: 'postgresql://prisma:prisma@localhost:5432/postgres'
         run: |
           set +e
           pnpm exec prisma migrate diff \
