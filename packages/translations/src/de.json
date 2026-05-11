@@ -78,7 +78,7 @@
       "marker": "Filzstift",
       "pencil": "Bleistift",
       "paintbrush": "Pinsel",
-      "eraser": "Radierer",
+      "eraser": "Radiergummi",
       "glitter": "Glitzer",
       "sparkle": "Funkeln",
       "rainbow": "Regenbogen",
@@ -141,10 +141,10 @@
       "resetAria": "Zur Vollansicht zurückkehren"
     },
     "muteToggle": {
-      "mute": "Sounds stummschalten",
-      "unmute": "Stummschaltung aufheben",
-      "turnOn": "Sounds einschalten",
-      "turnOff": "Sounds ausschalten"
+      "mute": "Töne stumm schalten",
+      "unmute": "Töne aktivieren",
+      "turnOn": "Töne einschalten",
+      "turnOff": "Töne ausschalten"
     }
   },
   "shareModal": {
@@ -203,13 +203,13 @@
   "colors": {
     "primary": {
       "cherryRed": "Kirschrot",
-      "sunsetOrange": "Sonnenuntergangsorange",
+      "sunsetOrange": "Sonnenuntergang-Orange",
       "sunshineYellow": "Sonnengelb",
       "grassGreen": "Grasgrün",
       "skyBlue": "Himmelblau",
       "grapePurple": "Traubenlila",
-      "bubblegumPink": "Kaugummipink",
-      "chocolateBrown": "Schokoladenbraun"
+      "bubblegumPink": "Kaugummi-Pink",
+      "chocolateBrown": "Schokoladen-Braun"
     },
     "secondary": {
       "coral": "Koralle",
