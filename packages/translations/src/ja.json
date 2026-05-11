@@ -81,20 +81,20 @@
       "eraser": "消しゴム",
       "glitter": "ラメ",
       "sparkle": "キラキラ",
-      "rainbow": "にじいろ",
-      "glow": "発光",
+      "rainbow": "虹色",
+      "glow": "光る",
       "neon": "ネオン"
     },
     "brushSizes": {
-      "small": "細",
+      "small": "細い",
       "medium": "普通",
-      "large": "太"
+      "large": "太い"
     },
     "fillPatterns": {
       "solid": "単色",
       "dots": "水玉",
-      "stripes": "しま",
-      "diagonal": "ななめ",
+      "stripes": "縞模様",
+      "diagonal": "斜め",
       "checkerboard": "チェック",
       "hearts": "ハート",
       "stars": "星",
@@ -136,9 +136,9 @@
       "zoomIn": "拡大",
       "zoomInAria": "拡大 (近くを見る)",
       "pan": "移動",
-      "panAria": "絵の周りを移動",
+      "panAria": "絵を動かす",
       "reset": "全体を見る",
-      "resetAria": "全体表示に戻す"
+      "resetAria": "全体表示に戻る"
     },
     "muteToggle": {
       "mute": "音を消す",
