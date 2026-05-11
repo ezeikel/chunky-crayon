@@ -691,6 +691,16 @@
       "subtitle": "Sie beschreiben es, wir zeichnen es, du druckst es oder gibst ihnen das iPad. 7 Tage gratis, jederzeit kündbar.",
       "primary": "7 Tage gratis testen",
       "secondary": "Pläne nochmal vergleichen"
+    },
+    "secondary": {
+      "packsHeader": "Noch nicht bereit für ein Abo?",
+      "packsBody": "Teste einmalige Credit-Pakete. Du zahlst nur, was du nutzt – ohne Monatsplan.",
+      "subscriptionsHeader": "Malt ihr regelmäßig?",
+      "subscriptionsBody": "Spare mit einem Monatsplan. Alle Funktionen unbegrenzt, weniger pro Seite.",
+      "ctaSeePacks": "Credit-Pakete ansehen",
+      "ctaSeePlans": "Monatspläne ansehen",
+      "packCardCredits": "{count} Credits",
+      "packCardCta": "Paket kaufen"
     }
   },
   "blog": {

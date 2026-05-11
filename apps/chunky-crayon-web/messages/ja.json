@@ -691,6 +691,16 @@
       "subtitle": "子どもが言う。私たちが描く。印刷するかiPadを渡すだけ。7日間無料、いつでも解約OK。",
       "primary": "7日間無料で始める",
       "secondary": "もう一度プラン比較"
+    },
+    "secondary": {
+      "packsHeader": "まだ定期プランは迷う？",
+      "packsBody": "追加クレジットを単発で。使った分だけのお支払いで、月額なし。",
+      "subscriptionsHeader": "よくぬりえする？",
+      "subscriptionsBody": "月額プランでおトクに。全機能が使えて、1枚あたりがお安く。",
+      "ctaSeePacks": "クレジットを見る",
+      "ctaSeePlans": "月額プランを見る",
+      "packCardCredits": "{count} credits",
+      "packCardCta": "購入する"
     }
   },
   "blog": {

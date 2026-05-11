@@ -691,6 +691,16 @@
       "subtitle": "Ils décrivent, on dessine, vous imprimez ou vous leur donnez l’iPad. Gratuit 7 jours, annulez à tout moment.",
       "primary": "Démarrer l’essai gratuit de 7 jours",
       "secondary": "Recomparer les forfaits"
+    },
+    "secondary": {
+      "packsHeader": "Pas prêt(e) à vous abonner ?",
+      "packsBody": "Essayez des packs de crédits à l’unité. Payez seulement ce que vous utilisez, sans abonnement mensuel.",
+      "subscriptionsHeader": "Vous coloriez souvent ?",
+      "subscriptionsBody": "Économisez avec un forfait mensuel. Toutes les fonctionnalités, moins cher par page.",
+      "ctaSeePacks": "Voir les packs de crédits",
+      "ctaSeePlans": "Voir les forfaits mensuels",
+      "packCardCredits": "{count} crédits",
+      "packCardCta": "Acheter le pack"
     }
   },
   "blog": {

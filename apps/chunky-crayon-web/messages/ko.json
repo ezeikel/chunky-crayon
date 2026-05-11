@@ -691,6 +691,16 @@
       "subtitle": "아이가 말하면 우리가 그려요. 출력하거나 iPad로 건네주세요. 7일 무료, 언제든 취소 가능.",
       "primary": "7일 무료 체험 시작",
       "secondary": "요금제 다시 비교하기"
+    },
+    "secondary": {
+      "packsHeader": "구독은 아직 고민 중이신가요?",
+      "packsBody": "필요할 때만 크레딧 팩을 구매해 보세요. 사용한 만큼만 결제하고, 매달 요금은 없어요.",
+      "subscriptionsHeader": "자주 색칠하나요?",
+      "subscriptionsBody": "월간 플랜으로 더 알뜰하게! 모든 기능을 마음껏, 페이지당 비용은 더 낮아요.",
+      "ctaSeePacks": "크레딧 팩 보기",
+      "ctaSeePlans": "월간 플랜 보기",
+      "packCardCredits": "{count} 크레딧",
+      "packCardCta": "팩 구매"
     }
   },
   "blog": {

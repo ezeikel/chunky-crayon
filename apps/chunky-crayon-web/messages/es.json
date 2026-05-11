@@ -691,6 +691,16 @@
       "subtitle": "Ellos lo describen, nosotros lo dibujamos, y tú lo imprimes o les pasas el iPad. Gratis 7 días, cancela cuando quieras.",
       "primary": "Empieza la prueba gratis de 7 días",
       "secondary": "Comparar planes otra vez"
+    },
+    "secondary": {
+      "packsHeader": "¿Aún no quieres suscribirte?",
+      "packsBody": "Prueba paquetes de créditos. Paga solo lo que uses, sin plan mensual.",
+      "subscriptionsHeader": "¿Coloreáis a menudo?",
+      "subscriptionsBody": "Ahorra con un plan mensual. Todo ilimitado, menos por página.",
+      "ctaSeePacks": "Ver paquetes de créditos",
+      "ctaSeePlans": "Ver planes mensuales",
+      "packCardCredits": "{count} créditos",
+      "packCardCta": "Comprar paquete"
     }
   },
   "blog": {
