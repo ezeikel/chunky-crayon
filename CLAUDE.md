@@ -111,11 +111,14 @@ A CI check (the `check-drift` job in `.github/workflows/database-migrations.yml`
 
 ## Vercel Deployment
 
-Each app has its own Vercel project. **Important**: Run Vercel CLI from the app directory, not the repo root.
+Each app has its own Vercel project. **Important**: Run Vercel CLI from the app directory, not the repo root. Each app dir has its own `vercel.json` paired with its Vercel project link in `apps/<app>/.vercel/project.json`.
 
 - **Chunky Crayon**: `chunky-crayon-web` — linked in `apps/chunky-crayon-web`
-- **Coloring Habitat**: `coloring-habitat-web` — linked in `apps/coloring-habitat-web` (also linked at repo root)
+- **Coloring Habitat**: `coloring-habitat-web` — linked in `apps/coloring-habitat-web`
 - **Env vars**: `cd apps/<app-name> && vercel env ls`
+- **Deploy**: `cd apps/<app-name> && vercel deploy --prod`
+
+**Never link Vercel at the repo root.** This is a monorepo with multiple Vercel projects — a root-level `.vercel/project.json` can only point at one, so it overwrites whatever app you re-link from there. If the CLI errors with a duplicated path (e.g. `apps/cc-web/apps/cc-web`), that's a CLI version bug — upgrade with `npm i -g vercel@latest`, don't re-link at root.
 
 ### Monorepo Constraints
 
