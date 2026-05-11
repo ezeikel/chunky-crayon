@@ -109,9 +109,9 @@ const CARD_ACCENTS = [
   },
 ];
 
-// Dynamic island for Cache Components — flag check + DB read + breadcrumbs
-// (which need locale) live here so the page shell can prerender. notFound()
-// inside a Suspense child still short-circuits the whole route to /not-found.
+// Outer Suspense child — cacheable. Flag check, DB read, breadcrumbs,
+// header, "What's in a bundle" strip. notFound() inside a Suspense
+// child still short-circuits the whole route to /not-found.
 const DigitalProductsGrid = async ({
   params,
 }: {
@@ -121,10 +121,7 @@ const DigitalProductsGrid = async ({
   const enabled = await checkFeatureFlag('bundles-shop');
   if (!enabled) notFound();
 
-  const [bundles, currency] = await Promise.all([
-    listPublishedBundles(),
-    getCurrencyForRequest(),
-  ]);
+  const bundles = await listPublishedBundles();
 
   return (
     <>
@@ -151,35 +148,38 @@ const DigitalProductsGrid = async ({
         </p>
       </header>
 
-      {/* Bundle Grid or Empty State */}
+      {/* Bundle Grid or Empty State. Inner Suspense isolates the
+          dynamic-per-request currency read so the surrounding shell +
+          cached bundle data stay prerenderable. */}
       <section className="max-w-5xl mx-auto px-4 pb-8">
         {bundles.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {bundles.map((bundle, idx) => {
-              const hero = listingImagesForBundle(bundle)[0];
-              const accent = CARD_ACCENTS[idx % CARD_ACCENTS.length];
-              const localized = pickBundlePrice(bundle, currency);
-              return (
-                <BundleCard
-                  key={bundle.id}
-                  bundle={{
-                    id: bundle.id,
-                    slug: bundle.slug,
-                    name: bundle.name,
-                    tagline: bundle.tagline,
-                    pageCount: bundle.pageCount,
-                    pricePence: localized.pricePence,
-                    currency: localized.currency,
-                  }}
-                  hero={hero}
-                  accent={accent}
-                  locale={locale}
-                />
-              );
-            })}
-          </div>
+          <Suspense
+            fallback={
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {bundles.map((bundle, idx) => (
+                  <BundleCard
+                    key={bundle.id}
+                    bundle={{
+                      id: bundle.id,
+                      slug: bundle.slug,
+                      name: bundle.name,
+                      tagline: bundle.tagline,
+                      pageCount: bundle.pageCount,
+                      pricePence: bundle.pricePence,
+                      currency: bundle.currency,
+                    }}
+                    hero={listingImagesForBundle(bundle)[0]}
+                    accent={CARD_ACCENTS[idx % CARD_ACCENTS.length]}
+                    locale={locale}
+                  />
+                ))}
+              </div>
+            }
+          >
+            <LocalizedBundleGrid bundles={bundles} locale={locale} />
+          </Suspense>
         )}
       </section>
 
@@ -224,6 +224,50 @@ const DigitalProductsGrid = async ({
         </div>
       </section>
     </>
+  );
+};
+
+// Inner dynamic island — runs per-request to read x-vercel-ip-country
+// and pick the right localized price per bundle. Lives inside its own
+// <Suspense> so the surrounding cached shell + bundle data still
+// prerender. The Suspense fallback above shows GBP prices instantly;
+// this swaps in the localized version once headers resolve.
+type LocalizedBundleGridProps = {
+  bundles: Awaited<ReturnType<typeof listPublishedBundles>>;
+  locale: string;
+};
+
+const LocalizedBundleGrid = async ({
+  bundles,
+  locale,
+}: LocalizedBundleGridProps) => {
+  const currency = await getCurrencyForRequest();
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      {bundles.map((bundle, idx) => {
+        const hero = listingImagesForBundle(bundle)[0];
+        const accent = CARD_ACCENTS[idx % CARD_ACCENTS.length];
+        const localized = pickBundlePrice(bundle, currency);
+        return (
+          <BundleCard
+            key={bundle.id}
+            bundle={{
+              id: bundle.id,
+              slug: bundle.slug,
+              name: bundle.name,
+              tagline: bundle.tagline,
+              pageCount: bundle.pageCount,
+              pricePence: localized.pricePence,
+              currency: localized.currency,
+            }}
+            hero={hero}
+            accent={accent}
+            locale={locale}
+          />
+        );
+      })}
+    </div>
   );
 };
 
