@@ -1084,9 +1084,16 @@ export const TRACKING_EVENTS = {
   // ===== PRICING & CONVERSION FUNNEL =====
   PRICING_PAGE_VIEWED: 'pricing_page_viewed', // Pricing page loaded
   PRICING_INTERVAL_TOGGLED: 'pricing_interval_toggled', // Monthly/Annual toggle
-  PRICING_PLAN_CLICKED: 'pricing_plan_clicked', // Plan CTA clicked
-  PRICING_CREDITS_CLICKED: 'pricing_credits_clicked', // Credit pack clicked
+  // Fires for BOTH subscription plan AND credit pack clicks on /pricing.
+  // Distinguish via the `productType: 'subscription' | 'pack'` property.
+  PRICING_PLAN_CLICKED: 'pricing_plan_clicked',
+  PRICING_CREDITS_CLICKED: 'pricing_credits_clicked', // Legacy: credit pack clicked (pre-experiment)
   PRICING_TEASER_CLICKED: 'pricing_teaser_clicked', // Inline pricing teaser link clicked (homepage/start)
+  // Layout experiment events — A/B between subscriptions-primary and packs-primary.
+  // Flag: pricing-page-layout (PostHog project 110135).
+  PRICING_VARIANT_ASSIGNED: 'pricing_variant_assigned', // Fires once per page load with `variant`
+  PRICING_SECONDARY_SECTION_VIEWED: 'pricing_secondary_section_viewed', // Secondary section scrolled into view
+  PRICING_SECONDARY_CTA_CLICKED: 'pricing_secondary_cta_clicked', // Secondary section header CTA clicked
   SOCIAL_PROOF_CLICKED: 'social_proof_clicked', // Rating / "X.X from N reviews" link clicked
   FAQ_OPENED: 'faq_opened', // FAQ accordion item opened (intent signal)
   COLOR_AS_YOU_GO_PAGE_VIEWED: 'color_as_you_go_page_viewed', // /color-as-you-go loaded

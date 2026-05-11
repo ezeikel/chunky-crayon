@@ -258,14 +258,41 @@ export type EventProperties = {
     fromInterval: 'monthly' | 'annual';
     toInterval: 'monthly' | 'annual';
   };
-  [TRACKING_EVENTS.PRICING_PLAN_CLICKED]: {
-    planName: PlanName;
-    planInterval: BillingPeriod;
-    price: string;
-  };
+  [TRACKING_EVENTS.PRICING_PLAN_CLICKED]:
+    | {
+        productType: 'subscription';
+        planName: PlanName;
+        planInterval: BillingPeriod;
+        price: string;
+        variant?: 'subscriptions_primary' | 'packs_primary';
+        section?: 'primary' | 'secondary';
+      }
+    | {
+        productType: 'pack';
+        packKey:
+          | 'PUBLIC_CREDITS_50'
+          | 'PUBLIC_CREDITS_200'
+          | 'PUBLIC_CREDITS_500';
+        credits: number;
+        price: string;
+        variant?: 'subscriptions_primary' | 'packs_primary';
+        section?: 'primary' | 'secondary';
+      };
   [TRACKING_EVENTS.PRICING_CREDITS_CLICKED]: {
     creditAmount: number;
     price: string;
+  };
+  [TRACKING_EVENTS.PRICING_VARIANT_ASSIGNED]: {
+    variant: 'subscriptions_primary' | 'packs_primary';
+  };
+  [TRACKING_EVENTS.PRICING_SECONDARY_SECTION_VIEWED]: {
+    variant: 'subscriptions_primary' | 'packs_primary';
+    // Which kind of product is being shown in the secondary slot.
+    secondaryType: 'subscription' | 'pack';
+  };
+  [TRACKING_EVENTS.PRICING_SECONDARY_CTA_CLICKED]: {
+    variant: 'subscriptions_primary' | 'packs_primary';
+    secondaryType: 'subscription' | 'pack';
   };
   [TRACKING_EVENTS.FAQ_OPENED]: {
     faq_id: string;

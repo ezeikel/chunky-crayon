@@ -119,8 +119,11 @@ const Billing = ({ user, currency = DEFAULT_CURRENCY }: BillingProps) => {
   }) => {
     setLoadingPlan(plan.planName);
 
-    // Type-safe PostHog event tracking
+    // Type-safe PostHog event tracking. PRICING_PLAN_CLICKED is shared
+    // with the /pricing layout experiment so it's a discriminated union
+    // — `productType: 'subscription'` selects the plan-shape branch.
     trackEvent(TRACKING_EVENTS.PRICING_PLAN_CLICKED, {
+      productType: 'subscription',
       planName: plan.planName,
       planInterval: BillingPeriod.MONTHLY,
       price: plan.price,

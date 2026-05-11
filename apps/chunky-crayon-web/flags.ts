@@ -26,6 +26,28 @@ export async function checkFeatureFlag(
   }
 }
 
+/**
+ * Helper to resolve a multivariate feature flag server-side.
+ * Returns the variant key (e.g. 'subscriptions_primary') or the default
+ * if the flag can't be resolved.
+ */
+export async function getFeatureFlagVariant<T extends string>(
+  flagKey: string,
+  distinctId: string,
+  defaultVariant: T,
+): Promise<T> {
+  try {
+    const variant = await posthog.getFeatureFlag(flagKey, distinctId);
+    if (typeof variant === 'string' && variant.length > 0) {
+      return variant as T;
+    }
+    return defaultVariant;
+  } catch (error) {
+    console.error(`Error fetching PostHog variant flag "${flagKey}":`, error);
+    return defaultVariant;
+  }
+}
+
 // Add feature flag functions here as needed
 // Example:
 // export async function myNewFeatureFlag(): Promise<boolean> {

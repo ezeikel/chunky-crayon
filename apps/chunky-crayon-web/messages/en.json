@@ -691,6 +691,16 @@
       "subtitle": "They describe it, we draw it, you print it or hand them the iPad. Free for 7 days, cancel any time.",
       "primary": "Start 7-day free trial",
       "secondary": "Compare plans again"
+    },
+    "secondary": {
+      "packsHeader": "Not ready to subscribe?",
+      "packsBody": "Try one-off credit packs. Pay only for what you use, no monthly plan.",
+      "subscriptionsHeader": "Coloring regularly?",
+      "subscriptionsBody": "Save with a monthly plan. Unlimited features, less per page.",
+      "ctaSeePacks": "See credit packs",
+      "ctaSeePlans": "See monthly plans",
+      "packCardCredits": "{count} credits",
+      "packCardCta": "Buy pack"
     }
   },
   "blog": {
