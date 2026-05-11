@@ -676,7 +676,7 @@ const PricingPageClient = ({
           primary pricing cards so they read as controls for
           the decision below, not part of the hero. Toggle is
           subscriptions-only (packs are one-off). */}
-      <FadeIn direction="up" delay={0.1} className="mb-10">
+      <FadeIn direction="up" delay={0.1} className="mb-16">
         <div className="flex flex-col items-center gap-3">
           {variant === 'subscriptions_primary' && (
             <div className="flex justify-center items-center gap-4">
