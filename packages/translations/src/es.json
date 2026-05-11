@@ -41,7 +41,7 @@
   "coloringPage": {
     "title": "Página para colorear",
     "relatedPages": "Más páginas para colorear",
-    "defaultDescription": "Página para colorear imprimible gratis de Chunky Crayon",
+    "defaultDescription": "Página para colorear gratuita de Chunky Crayon",
     "progress": {
       "colored": "coloreado",
       "percentage": "{percent}%",
@@ -74,10 +74,10 @@
       "magic": "Magia"
     },
     "brushTypes": {
-      "crayon": "Cera",
+      "crayon": "Crayón",
       "marker": "Rotulador",
       "pencil": "Lápiz",
-      "paintbrush": "Brocha",
+      "paintbrush": "Pincel",
       "eraser": "Borrador",
       "glitter": "Purpurina",
       "sparkle": "Brillo",
@@ -204,7 +204,7 @@
     "primary": {
       "cherryRed": "Rojo cereza",
       "sunsetOrange": "Naranja atardecer",
-      "sunshineYellow": "Amarillo brillante",
+      "sunshineYellow": "Amarillo sol",
       "grassGreen": "Verde hierba",
       "skyBlue": "Azul cielo",
       "grapePurple": "Morado uva",
@@ -395,7 +395,7 @@
     "gallery": "Galería",
     "daily": "Páginas para colorear diarias",
     "community": "Páginas para colorear de la comunidad",
-    "forToddlers": "Para peques",
+    "forToddlers": "Para pequeños",
     "forKids": "Para niños",
     "forTeens": "Para adolescentes",
     "forAdults": "Para adultos",
