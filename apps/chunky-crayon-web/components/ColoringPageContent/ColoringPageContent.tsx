@@ -23,8 +23,8 @@ import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import {
   FocusModeProvider,
-  FocusModeExitButton,
   FocusModeOverlay,
+  FocusModeToggleButton,
 } from '@/components/FocusMode';
 
 type ColoringPageContentProps = {
@@ -139,7 +139,6 @@ const ColoringPageContent = ({
     // renders when focus mode is active.
     <FocusModeProvider>
       <FocusModeOverlay />
-      <FocusModeExitButton />
       {/* Container query context for responsive layout */}
       <div className="flex flex-col gap-y-4 @container">
         {/* Title with progress/mute underneath on desktop */}
@@ -187,8 +186,11 @@ const ColoringPageContent = ({
             {/* Coloring Area - clean white card matching gallery aesthetic.
                 `focus-mode-canvas-card` is a CSS hook that promotes this
                 element to position:fixed at the top of the viewport when
-                focus mode is active (mobile only). */}
-            <div className="bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 @[1600px]:p-8 shadow-sm focus-mode-canvas-card">
+                focus mode is active (mobile only). `relative` is the
+                anchor for FocusModeToggleButton which sits absolute
+                inside the card. */}
+            <div className="relative bg-white rounded-2xl border-2 border-paper-cream-dark p-4 md:p-6 @[1600px]:p-8 shadow-sm focus-mode-canvas-card">
+              <FocusModeToggleButton />
               <ColoringArea
                 ref={coloringAreaRef}
                 coloringImage={coloringImage}

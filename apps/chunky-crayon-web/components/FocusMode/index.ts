@@ -3,4 +3,4 @@ export {
   useFocusMode,
 } from './FocusModeProvider';
 export { default as FocusModeOverlay } from './FocusModeOverlay';
-export { default as FocusModeExitButton } from './FocusModeExitButton';
+export { default as FocusModeToggleButton } from './FocusModeToggleButton';
