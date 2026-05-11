@@ -18,6 +18,7 @@ import {
 import { ColoringImage } from '@one-colored-pixel/db/types';
 import { ImageCanvas, ImageCanvasHandle } from '@one-colored-pixel/coloring-ui';
 import TapPromptOverlay from '@/components/TapPromptOverlay';
+import { useFocusMode } from '@/components/FocusMode';
 import { ColoringToolbar } from '@one-colored-pixel/coloring-ui';
 import { MobileColoringDrawer } from '@one-colored-pixel/coloring-ui';
 import StickerSelector from '@/components/StickerSelector';
@@ -147,6 +148,7 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setHasAutoColored,
       paletteVariant,
       pushToHistory,
+      selectedColor,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
@@ -206,6 +208,23 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         coloringImageId: coloringImage.id ?? '',
       });
     }, [tapPromptLabel, coloringImage.id]);
+
+    // Focus mode auto-enter on first color pick. selectedColor defaults
+    // to '#212121' (black) on mount — when the user picks anything from
+    // the palette, we treat that as their commitment signal and remove
+    // the page chrome (header + breadcrumbs) so the canvas claims full
+    // viewport. Mobile-only is enforced inside enterFocus() itself.
+    // Fires once per session — subsequent color picks just change the
+    // brush color.
+    const { enterFocus } = useFocusMode();
+    const hasEnteredFocusRef = useRef(false);
+    useEffect(() => {
+      if (hasEnteredFocusRef.current) return;
+      // '#212121' is the default; anything else means a real pick.
+      if (!selectedColor || selectedColor === '#212121') return;
+      hasEnteredFocusRef.current = true;
+      enterFocus();
+    }, [selectedColor, enterFocus]);
 
     // Hide the mobile drawer when the user scrolls past the canvas.
     // Same pattern as EmbeddedColoringCanvas on /start: threshold 0.2

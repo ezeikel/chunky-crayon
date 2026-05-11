@@ -676,3 +676,32 @@
 .animate-magic-progress {
   animation: magic-progress 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
+
+/* Focus mode — toggled by FocusModeProvider as a `data-focus-mode`
+   attribute on <html>. Hides the global header and any element with
+   the `.focus-mode-hide` class (used for breadcrumbs on the canvas
+   page). Mobile-only (the provider gates the toggle) but the CSS is
+   constrained to <md so a stale attribute on desktop can't
+   accidentally hide anything during a window resize. */
+body > header,
+.focus-mode-hide {
+  transition:
+    opacity 250ms ease-out,
+    transform 250ms ease-out,
+    max-height 250ms ease-out,
+    margin 250ms ease-out,
+    padding 250ms ease-out;
+}
+@media (max-width: 767px) {
+  html[data-focus-mode] body > header,
+  html[data-focus-mode] .focus-mode-hide {
+    opacity: 0;
+    transform: translateY(-12px);
+    pointer-events: none;
+    max-height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
