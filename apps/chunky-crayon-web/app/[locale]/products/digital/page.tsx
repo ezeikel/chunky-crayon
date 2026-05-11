@@ -118,6 +118,13 @@ const DigitalProductsGrid = async ({
 }: {
   params: Promise<{ locale: string }>;
 }) => {
+  // Force this Suspense child to be dynamic-per-request so the inner
+  // <LocalizedBundleGrid> actually re-evaluates per visitor.
+  // Calling connection() deeper in the tree (inside LocalizedBundleGrid)
+  // did not bust the prerender — Cache Components' analyzer needs the
+  // dynamic signal at the page-level Suspense boundary itself.
+  await connection();
+
   const { locale } = await params;
   const enabled = await checkFeatureFlag('bundles-shop');
   if (!enabled) notFound();
@@ -242,12 +249,6 @@ const LocalizedBundleGrid = async ({
   bundles,
   locale,
 }: LocalizedBundleGridProps) => {
-  // Force this island to be dynamic-per-request. Cache Components
-  // otherwise prerenders this whole subtree at build time even though
-  // we read x-vercel-ip-country inside getCurrencyForRequest — the
-  // analyzer doesn't treat the header read as enough of a dynamic
-  // signal on its own. connection() is the explicit opt-out.
-  await connection();
   const currency = await getCurrencyForRequest();
 
   return (
