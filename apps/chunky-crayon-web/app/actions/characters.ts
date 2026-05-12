@@ -30,19 +30,41 @@ import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { moderateVoiceText } from '@/lib/moderation';
 import { verifyParentGateToken } from '@/app/actions/parent-gate';
-import { extractCharacterTraits } from '@/lib/characters/trait-extraction';
 import { buildCharacterPortraitPrompt } from '@/lib/characters/portrait-prompt';
+import {
+  buildShortPromptFromPicks,
+  buildExtractedFromPicks,
+} from '@/lib/characters/build-prompt-from-picks';
+import type {
+  ColorKey,
+  SpeciesKey,
+  TraitKey,
+} from '@/lib/characters/picker-catalog';
+import {
+  COLOR_OPTIONS,
+  MAX_TRAITS,
+  SPECIES_OPTIONS,
+  TRAIT_OPTIONS,
+} from '@/lib/characters/picker-catalog';
 
 // ────────────────────────────────────────────────────────────────────────────
 // Types
 // ────────────────────────────────────────────────────────────────────────────
 
 export type CreateCharacterInput = {
-  /** 1-24 chars; PII — never indexed / never logged as event property. */
+  /** 1-24 chars; PII — never indexed / never logged as event property.
+   *  Kids never type this themselves — the create flow auto-generates a
+   *  fun name from a curated pool keyed to species+traits. Parents can
+   *  override before submit. */
   name: string;
-  /** Free-text description; ≤ 240 chars. Moderated upstream. */
-  shortPrompt: string;
-  /** Optional override of the LLM-suggested voice persona. */
+  /** Required: which creature is the character. */
+  species: SpeciesKey;
+  /** Required: primary colour. Drives gpt-image-2's strongest cue. */
+  color: ColorKey;
+  /** 0..MAX_TRAITS personality picks. Become Character.traits verbatim. */
+  traits: readonly TraitKey[];
+  /** Optional override of the suggested voice persona (derived from
+   *  the first trait when omitted). */
   voicePersona?: string;
 };
 
@@ -56,7 +78,6 @@ export type CreateCharacterResult =
         | 'invalid_input'
         | 'moderation_blocked'
         | 'limit_reached'
-        | 'extraction_failed'
         | 'worker_unavailable'
         | 'unknown';
       message?: string;
@@ -114,6 +135,10 @@ const postToWorker = async (body: CharacterWorkerBody): Promise<void> => {
 /**
  * Create a new character for the active profile.
  *
+ * Driven by the icon-first picker UI. The kid taps species + colour +
+ * up to 3 traits; we deterministically construct the shortPrompt and
+ * structured trait list — no LLM extraction call needed.
+ *
  * Free for all signed-in users up to MAX_PER_PROFILE; the only cost gate
  * is the cap. No guests (action needs userId + profile).
  *
@@ -124,12 +149,11 @@ const postToWorker = async (body: CharacterWorkerBody): Promise<void> => {
  * and `deleteCharacter` (destructive) where the trust line is real.
  *
  * Flow:
- *   1. Auth → input shape.
+ *   1. Auth → input shape (validate picks against the catalogues).
  *   2. Cap check against the active profile.
- *   3. Moderate name + short prompt.
- *   4. Trait extraction (LLM) → moderate the extracted output too
- *      (rare but observed in bundle work — clean input can still produce
- *      unsafe output).
+ *   3. Moderate the auto-generated name (kid taps a button, but the
+ *      name still becomes a DB row + appears in UI, so moderate it).
+ *   4. Build extracted structure from picks (synchronous, no LLM).
  *   5. INSERT Character row with status=GENERATING.
  *   6. POST to worker. On failure: flip the row to FAILED and return error.
  *   7. revalidate /characters and return characterId.
@@ -143,9 +167,9 @@ export const createCharacter = async (
     return { ok: false, error: 'unauthorized' };
   }
 
-  // 1b. Input shape
+  // 1b. Input shape — validate the structured picks against the catalogues
+  //     so a tampered client can't smuggle an unknown species through.
   const name = input.name?.trim();
-  const shortPrompt = input.shortPrompt?.trim();
   if (!name || name.length > 24) {
     return {
       ok: false,
@@ -153,12 +177,19 @@ export const createCharacter = async (
       message: 'name must be 1-24 chars',
     };
   }
-  if (!shortPrompt || shortPrompt.length > 240) {
-    return {
-      ok: false,
-      error: 'invalid_input',
-      message: 'shortPrompt must be 1-240 chars',
-    };
+  if (!SPECIES_OPTIONS.some((s) => s.key === input.species)) {
+    return { ok: false, error: 'invalid_input', message: 'unknown species' };
+  }
+  if (!COLOR_OPTIONS.some((c) => c.key === input.color)) {
+    return { ok: false, error: 'invalid_input', message: 'unknown color' };
+  }
+  if (!Array.isArray(input.traits) || input.traits.length > MAX_TRAITS) {
+    return { ok: false, error: 'invalid_input', message: 'too many traits' };
+  }
+  for (const t of input.traits) {
+    if (!TRAIT_OPTIONS.some((opt) => opt.key === t)) {
+      return { ok: false, error: 'invalid_input', message: 'unknown trait' };
+    }
   }
 
   // 2. Active profile + cap
@@ -174,49 +205,25 @@ export const createCharacter = async (
     return { ok: false, error: 'limit_reached' };
   }
 
-  // 3. Moderate user input
+  // 3. Moderate the name only — the picks are from a closed catalogue,
+  //    so there's nothing user-typed to moderate beyond the name.
   const nameMod = await moderateVoiceText(name);
   if (!nameMod.ok) {
     return { ok: false, error: 'moderation_blocked', message: nameMod.code };
   }
-  const promptMod = await moderateVoiceText(shortPrompt);
-  if (!promptMod.ok) {
-    return { ok: false, error: 'moderation_blocked', message: promptMod.code };
-  }
 
-  // 4. Trait extraction
-  let extracted;
-  try {
-    extracted = await extractCharacterTraits({
-      name,
-      shortPrompt,
-      userId,
-    });
-  } catch (err) {
-    console.error('[createCharacter] trait extraction failed:', err);
-    return {
-      ok: false,
-      error: 'extraction_failed',
-      message: err instanceof Error ? err.message : 'unknown',
-    };
-  }
+  // 4. Build the extracted structure from picks. No LLM call.
+  const extracted = buildExtractedFromPicks({
+    species: input.species,
+    color: input.color,
+    traits: input.traits,
+  });
 
-  // 4b. Moderate the LLM output too — clean input can still produce
-  //     offside output (rare but observed in bundles).
-  const extractedBlob = [
-    extracted.species,
-    ...extracted.traits,
-    ...extracted.signatureDetails,
-    extracted.referenceSheetPrompt,
-  ].join(' \n ');
-  const extractedMod = await moderateVoiceText(extractedBlob.slice(0, 4000));
-  if (!extractedMod.ok) {
-    return {
-      ok: false,
-      error: 'moderation_blocked',
-      message: `extracted:${extractedMod.code}`,
-    };
-  }
+  const shortPrompt = buildShortPromptFromPicks({
+    species: input.species,
+    color: input.color,
+    traits: input.traits,
+  });
 
   const portraitPrompt = buildCharacterPortraitPrompt({ name, extracted });
 

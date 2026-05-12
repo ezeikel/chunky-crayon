@@ -1,29 +1,36 @@
 'use client';
 
 /**
- * Three-step character create flow.
+ * Icon-first character create flow. Five tap-driven steps:
  *
- *   1. Name + species pill picker.
- *   2. Short prompt (≤ 240 chars) with example prompt pills.
- *   3. Voice persona picker.
+ *   1. Species   — 4x2 icon grid (dragon, puppy, kitten, unicorn, robot,
+ *                  kid, fairy, monster).
+ *   2. Colour    — 6 chunky brand-palette swatches.
+ *   3. Traits    — 8 icon chips, multi-select up to 3.
+ *   4. Name      — auto-generated from species+traits; chunky shuffle button;
+ *                  parent-only "change" link reveals a text input.
+ *   5. Voice     — persona picker (icon tiles, optional).
  *
- * Then submits to `createCharacter`. On success: closes the modal and lets
- * the parent (the page) revalidate. On failure: shows the inline error
- * so the parent can retry without losing typed input.
+ * No textarea anywhere. No free-text required to finish — every step is
+ * tappable, including the name step (shuffle to keep, type only if you
+ * want a custom name).
  *
- * Why no parent gate here:
- *   The caller is already authenticated as the account holder. NextAuth's
- *   cookie IS the trust boundary — a subtraction question on top of that
- *   adds friction without adding security. Parent gates stay on actions
- *   where the trust line is real (custom voice line = 1-credit purchase,
- *   character delete = destructive). See feedback note saved alongside
- *   this change.
+ * On submit we send structured picks to `createCharacter`; the server
+ * constructs the shortPrompt deterministically. See
+ * lib/characters/build-prompt-from-picks.ts for the prompt assembly.
  *
- * No em dashes. No "AI" word. US/UK-neutral copy. Tap targets ≥ 44pt.
+ * Why no parent gate:
+ *   Creation is functionally the same as making a coloring page (kid
+ *   describes thing → we draw it). The signed-in cookie IS the trust
+ *   line. Parent gates stay on custom voice (1 credit) + delete.
+ *
+ * No em dashes. No "AI" word. US/UK-neutral. Tap targets ≥ 44pt.
  */
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShuffle, faPen } from '@fortawesome/pro-duotone-svg-icons';
 import {
   Dialog,
   DialogContent,
@@ -33,7 +40,19 @@ import {
 } from '@/components/ui/dialog';
 import { createCharacter } from '@/app/actions/characters';
 import { trackEvent } from '@/utils/analytics-client';
-import { TRACKING_EVENTS, CHARACTER_LIMITS } from '@/constants';
+import { TRACKING_EVENTS } from '@/constants';
+import {
+  COLOR_OPTIONS,
+  MAX_TRAITS,
+  SPECIES_OPTIONS,
+  TRAIT_OPTIONS,
+  type ColorKey,
+  type SpeciesKey,
+  type TraitKey,
+} from '@/lib/characters/picker-catalog';
+import { generateCharacterName } from '@/lib/characters/name-generator';
+import { VOICE_PERSONAS } from '@/lib/characters/voice-personas';
+import type { VoicePersonaKey } from '@/lib/characters/voice-persona-types';
 import cn from '@/utils/cn';
 
 type Props = {
@@ -41,57 +60,50 @@ type Props = {
   onClose: () => void;
 };
 
-type Step = 'name' | 'prompt' | 'voice';
+type Step = 'species' | 'color' | 'traits' | 'name' | 'voice';
 
-// Curated species pills. Order matters: first is the kid-favourite default;
-// last is the catch-all open-ended option. Keep this list ≤ 8 — wider
-// picker becomes a scrolling overwhelm for 3-8 year olds.
-const SPECIES_PILLS = [
-  'dragon',
-  'puppy',
-  'kitten',
-  'unicorn',
-  'robot',
-  'kid',
-  'fairy',
-  'monster',
-] as const;
+const STEPS: readonly Step[] = ['species', 'color', 'traits', 'name', 'voice'];
 
-// Example prompt pills. Picked to model the "name + 2-3 visual details +
-// 1 personality hint" shape we want, so parents copy that pattern.
-const EXAMPLE_PROMPTS = [
-  'small purple dragon with tiny horns and a yellow scarf who loves biscuits',
-  'fluffy white puppy with a blue collar and floppy ears who is always sleepy',
-  'kid with curly hair and red trainers who loves rockets',
-  'tiny robot with a green antenna and squeaky wheels who is super silly',
-] as const;
+const STEP_TITLES: Record<Step, string> = {
+  species: 'Pick your friend',
+  color: 'Pick a colour',
+  traits: 'What are they like?',
+  name: 'Give them a name',
+  voice: 'Pick a voice',
+};
 
-// Voice persona keys + display labels. Keys must match the enum in
-// lib/characters/trait-extraction.ts.
-const VOICE_OPTIONS: { key: string; label: string }[] = [
-  { key: 'warm-girl-7yo', label: 'Warm girl' },
-  { key: 'warm-boy-7yo', label: 'Warm boy' },
-  { key: 'playful-girl-5yo', label: 'Playful girl' },
-  { key: 'playful-boy-5yo', label: 'Playful boy' },
-  { key: 'sleepy-neutral', label: 'Sleepy' },
-  { key: 'brave-neutral', label: 'Brave' },
-  { key: 'silly-neutral', label: 'Silly' },
-  { key: 'gentle-neutral', label: 'Gentle' },
+/**
+ * Voice persona keys + emoji faces. Decoupled from voice-personas.ts so
+ * that file stays server-safe (env-var reads). The keys MUST stay
+ * aligned with VoicePersonaKey.
+ */
+const VOICE_TILES: { key: VoicePersonaKey; face: string; label: string }[] = [
+  { key: 'warm-girl-7yo', face: '😊', label: 'Warm' },
+  { key: 'warm-boy-7yo', face: '🙂', label: 'Cosy' },
+  { key: 'playful-girl-5yo', face: '😄', label: 'Bouncy' },
+  { key: 'playful-boy-5yo', face: '🤪', label: 'Playful' },
+  { key: 'sleepy-neutral', face: '😴', label: 'Sleepy' },
+  { key: 'brave-neutral', face: '😤', label: 'Brave' },
+  { key: 'silly-neutral', face: '🤣', label: 'Silly' },
+  { key: 'gentle-neutral', face: '🤗', label: 'Gentle' },
 ];
 
 const CreateCharacterModal = ({ open, onClose }: Props) => {
   const router = useRouter();
-  const [step, setStep] = useState<Step>('name');
-  const [name, setName] = useState('');
-  const [species, setSpecies] = useState<string | null>(null);
-  const [shortPrompt, setShortPrompt] = useState('');
-  const [voicePersona, setVoicePersona] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>('species');
+  const [species, setSpecies] = useState<SpeciesKey | null>(null);
+  const [color, setColor] = useState<ColorKey | null>(null);
+  const [traits, setTraits] = useState<TraitKey[]>([]);
+  const [name, setName] = useState<string>('');
+  const [showNameEdit, setShowNameEdit] = useState(false);
+  const [voicePersona, setVoicePersona] = useState<VoicePersonaKey | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
   const [hasTrackedStart, setHasTrackedStart] = useState(false);
   const [pending, startTransition] = useTransition();
 
-  // Fire CREATE_STARTED once per modal open. Matches the old gated flow's
-  // behaviour (where the event fired when the user passed the gate).
+  // Track CREATE_STARTED once per modal open.
   useEffect(() => {
     if (open && !hasTrackedStart) {
       trackEvent(TRACKING_EVENTS.CHARACTER_CREATE_STARTED, {});
@@ -99,11 +111,25 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     }
   }, [open, hasTrackedStart]);
 
+  // When we enter the name step (or any prereq changes), seed the name.
+  // Don't clobber a name the parent has manually typed.
+  useEffect(() => {
+    if (step !== 'name' || !species) return;
+    if (!name || !showNameEdit) {
+      setName(generateCharacterName({ species, traits }));
+    }
+    // showNameEdit is intentionally NOT in the dep array — toggling it
+    // shouldn't re-roll the name. species/traits are intentional.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, species, traits]);
+
   const reset = () => {
-    setStep('name');
-    setName('');
+    setStep('species');
     setSpecies(null);
-    setShortPrompt('');
+    setColor(null);
+    setTraits([]);
+    setName('');
+    setShowNameEdit(false);
     setVoicePersona(null);
     setError(null);
     setHasTrackedStart(false);
@@ -111,54 +137,88 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
 
   const handleOpenChange = (next: boolean) => {
     if (!next) {
-      // Brief delay so the close animation doesn't reset the visible step
       setTimeout(reset, 200);
       onClose();
     }
   };
 
-  const handleSubmit = () => {
-    if (!name.trim() || name.trim().length > 24) {
-      setError('Name must be 1 to 24 characters.');
-      return;
-    }
-    const promptToSend = shortPrompt.trim();
-    if (!promptToSend || promptToSend.length > 240) {
-      setError('Description must be 1 to 240 characters.');
-      return;
-    }
+  const stepIndex = STEPS.indexOf(step);
 
+  const goNext = () => {
+    setError(null);
+    const next = STEPS[stepIndex + 1];
+    if (next) setStep(next);
+  };
+
+  const goBack = () => {
+    setError(null);
+    const prev = STEPS[stepIndex - 1];
+    if (prev) setStep(prev);
+  };
+
+  const canAdvance = useMemo(() => {
+    switch (step) {
+      case 'species':
+        return species !== null;
+      case 'color':
+        return color !== null;
+      case 'traits':
+        return true; // Traits are optional
+      case 'name':
+        return name.trim().length > 0 && name.trim().length <= 24;
+      case 'voice':
+        return true;
+      default:
+        return false;
+    }
+  }, [step, species, color, name]);
+
+  const handleShuffleName = () => {
+    if (!species) return;
+    setName(generateCharacterName({ species, traits }));
+  };
+
+  const toggleTrait = (t: TraitKey) => {
+    setTraits((prev) => {
+      if (prev.includes(t)) return prev.filter((x) => x !== t);
+      if (prev.length >= MAX_TRAITS) return prev;
+      return [...prev, t];
+    });
+  };
+
+  const handleSubmit = () => {
+    if (!species || !color) {
+      setError('Please finish all the steps.');
+      return;
+    }
+    if (!name.trim()) {
+      setError('Give your friend a name.');
+      return;
+    }
     setError(null);
     startTransition(async () => {
-      // Composing the description: species pill picked → prepend it to give
-      // the LLM a strong nudge. If user picked "monster" but prompt already
-      // says "dragon", trait extraction will still pick the better-supported
-      // species.
-      const composed = species ? `${species}: ${promptToSend}` : promptToSend;
-
       const result = await createCharacter({
         name: name.trim(),
-        shortPrompt: composed,
+        species,
+        color,
+        traits,
         voicePersona: voicePersona ?? undefined,
       });
-
       if (result.ok) {
         trackEvent(TRACKING_EVENTS.CHARACTER_CREATE_SUBMITTED, {
           characterId: result.characterId,
-          species: species ?? undefined,
+          species,
           voicePersona: voicePersona ?? undefined,
         });
         handleOpenChange(false);
         router.refresh();
       } else {
-        // Friendly error mapping. Don't leak the raw enum to kids.
         const friendly: Record<string, string> = {
           unauthorized: 'Please sign in first.',
           no_active_profile: 'Pick a profile before making a character.',
-          invalid_input: 'Check the name and description.',
-          moderation_blocked: "We can't use that one. Try a different idea.",
+          invalid_input: 'Something went wrong. Try again.',
+          moderation_blocked: "We can't use that name. Try a different one.",
           limit_reached: "You've got a full house. Try removing one first.",
-          extraction_failed: 'Something went wrong drawing your friend.',
           worker_unavailable: 'Something went wrong drawing your friend.',
           unknown: 'Something went wrong. Please try again.',
         };
@@ -173,210 +233,259 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Make a friend</DialogTitle>
-          <DialogDescription>
-            Build a character your kid will see in coloring pages.
+          <DialogTitle className="text-2xl text-center">
+            {STEP_TITLES[step]}
+          </DialogTitle>
+          {/* Screen-reader description only — visually hidden via the
+              Dialog primitive's default styling for DialogDescription. */}
+          <DialogDescription className="sr-only">
+            Step {stepIndex + 1} of {STEPS.length} in making your character.
           </DialogDescription>
         </DialogHeader>
 
+        {/* Progress dots */}
+        <div className="flex justify-center gap-2 my-3" aria-hidden>
+          {STEPS.map((s, i) => (
+            <span
+              key={s}
+              className={cn(
+                'w-2.5 h-2.5 rounded-full transition-colors',
+                i === stepIndex
+                  ? 'bg-crayon-orange'
+                  : i < stepIndex
+                    ? 'bg-crayon-orange/50'
+                    : 'bg-paper-cream-dark',
+              )}
+            />
+          ))}
+        </div>
+
+        {/* ─── Species ─────────────────────────────────────────────── */}
+        {step === 'species' ? (
+          <div className="grid grid-cols-4 gap-3">
+            {SPECIES_OPTIONS.map((s) => {
+              const selected = species === s.key;
+              return (
+                <button
+                  type="button"
+                  key={s.key}
+                  onClick={() => setSpecies(s.key)}
+                  aria-pressed={selected}
+                  aria-label={s.label}
+                  className={cn(
+                    'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all min-h-[88px]',
+                    selected
+                      ? 'border-crayon-orange bg-crayon-orange/10 scale-105'
+                      : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
+                  )}
+                >
+                  <FontAwesomeIcon
+                    icon={s.icon}
+                    className={cn(
+                      'text-3xl',
+                      selected ? 'text-crayon-orange' : 'text-neutral-700',
+                    )}
+                  />
+                  <span className="text-[10px] font-bold text-neutral-600">
+                    {s.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {/* ─── Colour ──────────────────────────────────────────────── */}
+        {step === 'color' ? (
+          <div className="grid grid-cols-3 gap-3">
+            {COLOR_OPTIONS.map((c) => {
+              const selected = color === c.key;
+              return (
+                <button
+                  type="button"
+                  key={c.key}
+                  onClick={() => setColor(c.key)}
+                  aria-pressed={selected}
+                  aria-label={c.label}
+                  className={cn(
+                    'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all min-h-[88px]',
+                    selected
+                      ? 'border-crayon-orange scale-105'
+                      : 'border-paper-cream-dark hover:border-crayon-orange',
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'w-12 h-12 rounded-full shadow-inner',
+                      c.swatchClass,
+                    )}
+                  />
+                  <span className="text-[10px] font-bold text-neutral-600">
+                    {c.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {/* ─── Traits ──────────────────────────────────────────────── */}
+        {step === 'traits' ? (
+          <div className="space-y-3">
+            <p className="text-center text-xs text-neutral-500">
+              Pick up to {MAX_TRAITS}. Or none — totally fine.
+            </p>
+            <div className="grid grid-cols-4 gap-3">
+              {TRAIT_OPTIONS.map((t) => {
+                const selected = traits.includes(t.key);
+                const atCap = !selected && traits.length >= MAX_TRAITS;
+                return (
+                  <button
+                    type="button"
+                    key={t.key}
+                    onClick={() => toggleTrait(t.key)}
+                    aria-pressed={selected}
+                    aria-label={t.label}
+                    disabled={atCap}
+                    className={cn(
+                      'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all min-h-[88px]',
+                      selected
+                        ? 'border-crayon-orange bg-crayon-orange/10 scale-105'
+                        : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
+                      atCap && 'opacity-40 cursor-not-allowed',
+                    )}
+                  >
+                    <FontAwesomeIcon
+                      icon={t.icon}
+                      className={cn(
+                        'text-2xl',
+                        selected ? 'text-crayon-orange' : 'text-neutral-700',
+                      )}
+                    />
+                    <span className="text-[10px] font-bold text-neutral-600">
+                      {t.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        {/* ─── Name ────────────────────────────────────────────────── */}
         {step === 'name' ? (
-          <div className="space-y-4">
-            <label className="block">
-              <span className="block text-sm font-bold mb-2">
-                What's their name?
-              </span>
+          <div className="flex flex-col items-center gap-4 py-2">
+            <p className="text-center text-3xl font-display">{name}</p>
+            <button
+              type="button"
+              onClick={handleShuffleName}
+              className="inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-5 py-3 text-base font-bold min-h-[44px] hover:scale-105 active:scale-95 transition-transform"
+            >
+              <FontAwesomeIcon icon={faShuffle} />
+              Try another
+            </button>
+            {!showNameEdit ? (
+              <button
+                type="button"
+                onClick={() => setShowNameEdit(true)}
+                className="text-xs text-neutral-500 underline inline-flex items-center gap-1"
+              >
+                <FontAwesomeIcon icon={faPen} />
+                Type a custom name
+              </button>
+            ) : (
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value.slice(0, 24))}
-                autoComplete="off"
                 autoFocus
-                className="w-full rounded-2xl border-2 border-paper-cream-dark px-4 py-3 text-lg"
-                placeholder="Rex"
-                aria-label="Character name"
+                className="w-full rounded-2xl border-2 border-paper-cream-dark px-4 py-3 text-lg text-center"
+                placeholder="Type a name"
+                aria-label="Custom character name"
               />
-              <span className="block text-[10px] text-neutral-400 mt-1">
-                {name.length}/24
-              </span>
-            </label>
-
-            <div>
-              <span className="block text-sm font-bold mb-2">
-                What kind of friend? (optional)
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {SPECIES_PILLS.map((s) => (
-                  <button
-                    type="button"
-                    key={s}
-                    onClick={() =>
-                      setSpecies((prev) => (prev === s ? null : s))
-                    }
-                    className={cn(
-                      'rounded-full px-4 py-2 text-sm border-2 transition-colors min-h-[44px]',
-                      species === s
-                        ? 'bg-crayon-orange text-white border-crayon-orange'
-                        : 'bg-white text-neutral-700 border-paper-cream-dark hover:border-crayon-orange',
-                    )}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => handleOpenChange(false)}
-                className="rounded-full px-5 py-3 text-sm border-2 border-paper-cream-dark min-h-[44px]"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (!name.trim()) {
-                    setError('Give your friend a name.');
-                    return;
-                  }
-                  setError(null);
-                  setStep('prompt');
-                }}
-                className="rounded-full px-5 py-3 text-sm font-bold bg-black text-white min-h-[44px]"
-              >
-                Next
-              </button>
-            </div>
+            )}
           </div>
         ) : null}
 
-        {step === 'prompt' ? (
-          <div className="space-y-4">
-            <label className="block">
-              <span className="block text-sm font-bold mb-2">
-                Describe your friend
-              </span>
-              <textarea
-                value={shortPrompt}
-                onChange={(e) => setShortPrompt(e.target.value.slice(0, 240))}
-                rows={3}
-                autoFocus
-                className="w-full rounded-2xl border-2 border-paper-cream-dark px-4 py-3 text-base resize-none"
-                placeholder="What do they look like? What do they love?"
-                aria-label="Character description"
-              />
-              <span className="block text-[10px] text-neutral-400 mt-1">
-                {shortPrompt.length}/240
-              </span>
-            </label>
-
-            <div>
-              <span className="block text-xs text-neutral-500 mb-2">
-                Need a starter?
-              </span>
-              <div className="flex flex-col gap-2">
-                {EXAMPLE_PROMPTS.map((p) => (
-                  <button
-                    type="button"
-                    key={p}
-                    onClick={() => setShortPrompt(p)}
-                    className="rounded-2xl border-2 border-paper-cream-dark bg-white px-4 py-2 text-xs text-left hover:border-crayon-orange transition-colors"
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex justify-between gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setStep('name')}
-                className="rounded-full px-5 py-3 text-sm border-2 border-paper-cream-dark min-h-[44px]"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (!shortPrompt.trim()) {
-                    setError('Tell us a little about your friend.');
-                    return;
-                  }
-                  setError(null);
-                  setStep('voice');
-                }}
-                className="rounded-full px-5 py-3 text-sm font-bold bg-black text-white min-h-[44px]"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        ) : null}
-
+        {/* ─── Voice ───────────────────────────────────────────────── */}
         {step === 'voice' ? (
-          <div className="space-y-4">
-            <div>
-              <span className="block text-sm font-bold mb-2">
-                Pick a voice (optional)
-              </span>
-              <span className="block text-xs text-neutral-500 mb-2">
-                Don't worry, you can change this later.
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                {VOICE_OPTIONS.map((v) => (
-                  <button
-                    type="button"
-                    key={v.key}
-                    onClick={() =>
-                      setVoicePersona((prev) => (prev === v.key ? null : v.key))
-                    }
-                    className={cn(
-                      'rounded-2xl px-4 py-3 text-sm border-2 transition-colors min-h-[44px]',
-                      voicePersona === v.key
-                        ? 'bg-crayon-orange text-white border-crayon-orange'
-                        : 'bg-white text-neutral-700 border-paper-cream-dark hover:border-crayon-orange',
-                    )}
-                  >
+          <div className="grid grid-cols-4 gap-3">
+            {VOICE_TILES.map((v) => {
+              const selected = voicePersona === v.key;
+              return (
+                <button
+                  type="button"
+                  key={v.key}
+                  onClick={() =>
+                    setVoicePersona((prev) => (prev === v.key ? null : v.key))
+                  }
+                  aria-pressed={selected}
+                  aria-label={`${v.label} voice`}
+                  title={VOICE_PERSONAS[v.key]?.description}
+                  className={cn(
+                    'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all min-h-[88px]',
+                    selected
+                      ? 'border-crayon-orange bg-crayon-orange/10 scale-105'
+                      : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
+                  )}
+                >
+                  <span className="text-3xl">{v.face}</span>
+                  <span className="text-[10px] font-bold text-neutral-600">
                     {v.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <p className="text-xs text-neutral-500">
-              We'll draw {name.trim() || 'your friend'} for you. This takes
-              about 30 seconds. Up to {CHARACTER_LIMITS.MAX_PER_PROFILE} friends
-              per profile.
-            </p>
-
-            <div className="flex justify-between gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setStep('prompt')}
-                disabled={pending}
-                className="rounded-full px-5 py-3 text-sm border-2 border-paper-cream-dark min-h-[44px] disabled:opacity-50"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={pending}
-                className="rounded-full px-5 py-3 text-sm font-bold bg-black text-white min-h-[44px] disabled:opacity-50"
-              >
-                {pending ? 'Drawing…' : 'Make my friend'}
-              </button>
-            </div>
+                  </span>
+                </button>
+              );
+            })}
           </div>
         ) : null}
 
+        {/* ─── Footer (nav + submit) ─────────────────────────────── */}
         {error ? (
-          <p className="text-xs text-red-700 mt-2" role="alert">
+          <p className="text-xs text-red-700 text-center mt-2" role="alert">
             {error}
           </p>
         ) : null}
+
+        <div className="flex justify-between gap-3 pt-4">
+          {stepIndex > 0 ? (
+            <button
+              type="button"
+              onClick={goBack}
+              disabled={pending}
+              className="rounded-full px-5 py-3 text-sm border-2 border-paper-cream-dark min-h-[44px] disabled:opacity-50"
+            >
+              Back
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => handleOpenChange(false)}
+              className="rounded-full px-5 py-3 text-sm border-2 border-paper-cream-dark min-h-[44px]"
+            >
+              Cancel
+            </button>
+          )}
+
+          {step === 'voice' ? (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={pending || !canAdvance}
+              className="rounded-full px-6 py-3 text-sm font-bold bg-black text-white min-h-[44px] disabled:opacity-50"
+            >
+              {pending ? 'Drawing…' : 'Make my friend'}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={goNext}
+              disabled={!canAdvance}
+              className="rounded-full px-6 py-3 text-sm font-bold bg-black text-white min-h-[44px] disabled:opacity-50"
+            >
+              Next
+            </button>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
