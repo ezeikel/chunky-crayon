@@ -27,7 +27,7 @@ export type OutfitKey =
   | 'pyjamas'
   | 'party'
   | 'raincoat'
-  | 'swimsuit';
+  | 'chef';
 
 export type OutfitDefinition = {
   key: OutfitKey;
@@ -71,9 +71,9 @@ export const OUTFIT_LIBRARY: readonly OutfitDefinition[] = [
     unlockCost: 5,
   },
   {
-    key: 'swimsuit',
-    label: 'Swimsuit',
-    imagePath: '/characters/outfits/swimsuit.svg',
+    key: 'chef',
+    label: 'Chef',
+    imagePath: '/characters/outfits/chef.svg',
     unlockCost: 5,
   },
 ] as const;
