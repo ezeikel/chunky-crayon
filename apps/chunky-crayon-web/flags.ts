@@ -53,3 +53,36 @@ export async function getFeatureFlagVariant<T extends string>(
 // export async function myNewFeatureFlag(): Promise<boolean> {
 //   return checkFeatureFlag('my-new-feature', 'server-side-check', false);
 // }
+
+/**
+ * Persistent characters feature (kid-created recurring figures with portraits,
+ * outfits, and voice). Gates the /characters routes, the nav link, the picker
+ * inside CreateColoringPageForm, and the action-layer guards in createCharacter
+ * / createPendingColoringImage. Default off; admin + ezeikelpemberton see it via
+ * the PostHog cohort.
+ */
+export async function charactersFeatureEnabled(
+  distinctId?: string,
+): Promise<boolean> {
+  return checkFeatureFlag(
+    'characters-feature',
+    distinctId ?? 'server-side-check',
+    false,
+  );
+}
+
+/**
+ * Marketing surfaces for characters — home-page "Meet your characters" section
+ * and the /start landing-page hook. Held separate from the core feature flag
+ * so the surfaces can be ramped independently of the feature itself (e.g. ship
+ * the feature dark, then turn marketing on once retention signal is good).
+ */
+export async function charactersMarketingEnabled(
+  distinctId?: string,
+): Promise<boolean> {
+  return checkFeatureFlag(
+    'characters-marketing',
+    distinctId ?? 'server-side-check',
+    false,
+  );
+}

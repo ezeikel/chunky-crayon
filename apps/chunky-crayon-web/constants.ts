@@ -1198,6 +1198,42 @@ export const TRACKING_EVENTS = {
 
   // ===== FEEDBACK =====
   FEEDBACK_SUBMITTED: 'feedback_submitted',
+
+  // ===== CHARACTERS (persistent kid-created figures) =====
+  // Lifecycle: create → READY → use in coloring page / profile actions.
+  // Names are PII: only characterId is sent as a property, never name.
+  CHARACTER_CREATE_STARTED: 'character_create_started', // Modal opened, parent gate not yet passed
+  CHARACTER_CREATE_SUBMITTED: 'character_create_submitted', // Form submitted to server action
+  CHARACTER_CREATE_COMPLETED: 'character_create_completed', // Worker flipped row READY
+  CHARACTER_CREATE_FAILED: 'character_create_failed', // Generation FAILED
+  CHARACTER_PARENT_GATE_SHOWN: 'character_parent_gate_shown',
+  CHARACTER_PARENT_GATE_PASSED: 'character_parent_gate_passed',
+  CHARACTER_PARENT_GATE_FAILED: 'character_parent_gate_failed',
+  CHARACTER_GRID_VIEWED: 'character_grid_viewed', // /characters list page rendered
+  CHARACTER_PROFILE_VIEWED: 'character_profile_viewed', // /characters/[id] rendered
+  CHARACTER_FED: 'character_fed', // Feed pill tapped (cosmetic + voice line)
+  CHARACTER_EXERCISED: 'character_exercised',
+  CHARACTER_DRESSED: 'character_dressed', // Outfit equipped
+  CHARACTER_OUTFIT_UNLOCKED: 'character_outfit_unlocked', // 5 credits spent
+  CHARACTER_VOICE_PLAYED: 'character_voice_played', // Cached preset line played
+  CHARACTER_VOICE_GENERATED: 'character_voice_generated', // First-play synthesis or custom line (1 credit)
+  CHARACTER_PICKED_FOR_PAGE: 'character_picked_for_page', // Picker selection in CreateColoringPageForm
+  CHARACTER_USED_IN_PAGE: 'character_used_in_page', // Server-side; fires inside createPendingColoringImage so it survives mobile
+  CHARACTER_LANDING_HERO_VIEWED: 'character_landing_hero_viewed', // /start CharactersHookSection scrolled into view
+} as const;
+
+// Limits for the Characters feature. Sourced as constants so action-layer
+// gates, UI copy ("you've got a full house"), and analytics share one truth.
+export const CHARACTER_LIMITS = {
+  /** Hard cap per profile. UI hides the add-tile beyond this. */
+  MAX_PER_PROFILE: 8,
+  /** v1 — gpt-image-2 multi-subject fidelity is fragile (bundles confirmed). */
+  MAX_PER_SCENE: 1,
+  /** Outfit unlock charge. Equipping an already-unlocked outfit is free. */
+  OUTFIT_UNLOCK_CREDIT_COST: 5,
+  /** Parent-gated custom voice line (free-text). Presets are free after first synth. */
+  CUSTOM_VOICE_CREDIT_COST: 1,
+  CUSTOM_VOICE_MAX_CHARS: 80,
 } as const;
 
 // ===== SOCIAL PROOF / TESTIMONIALS =====

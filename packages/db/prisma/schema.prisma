@@ -38,6 +38,8 @@ model User {
   // Bundles this user has purchased — entitles them to download/colour the
   // bundle's pages. One row per Stripe checkout, immutable post-creation.
   bundlePurchases      BundlePurchase[]
+  // Persistent characters scoped per profile (max 8/profile enforced at action).
+  characters           Character[]
 
   // Multi-brand support
   brand Brand @default(CHUNKY_CRAYON)
@@ -261,6 +263,11 @@ model ColoringImage {
   // are never publicly indexable.
   slugBase String?
 
+  // Characters featured in this page (v1: at most one). Used for "made with
+  // Rex" filtering and analytics. Cascade-delete with the character row so
+  // a deleted character doesn't leave dangling usages.
+  characterUsages CharacterUsage[]
+
   @@index([generationType, purposeKey])
   @@index([showInCommunity])
   @@index([featuredForOG])
@@ -390,6 +397,7 @@ model Profile {
   savedArtworks     SavedArtwork[] // Saved colored artwork for this profile
   userStickers      UserSticker[] // Stickers earned by this profile
   challengeProgress ProfileChallengeProgress[] // Weekly challenge progress
+  characters        Character[] // Persistent characters owned by this profile
 
   @@map("profiles")
 }
@@ -1189,4 +1197,118 @@ model EmailSubscriber {
   // array column gives sub-millisecond lookup even at 100K rows.
   @@index([lists], type: Gin)
   @@map("email_subscribers")
+}
+
+// Persistent, recurring kid-created characters. Each character is a named
+// figure with a colored portrait + line-art twin generated once via
+// gpt-image-2, then reused as a reference image on subsequent coloring-page
+// generations so the same character shows up consistently across pages.
+// Mirrors the HeroBundle.Hero pattern in packages/coloring-core/src/bundles —
+// `signatureDetails` is the visual-fidelity QA gate. Profile-scoped (siblings
+// each get their own roster). Names are private: never indexed, never in OG,
+// never sent to PostHog as a property.
+model Character {
+  id        String  @id @default(cuid())
+  brand     Brand   @default(CHUNKY_CRAYON)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  name                 String // local-only, never publicly indexed
+  species              String // "dragon", "puppy", "robot", "kid", "fairy"
+  shortPrompt          String // user-supplied free text, ≤ 240 chars
+  traits               String[] // LLM-extracted: ["brave","sleepy","loves muffins"]
+  signatureDetails     String[] // LLM-extracted QA gate (mirrors Hero.signatureDetails)
+  referenceSheetPrompt String // built prompt used for portrait gen
+
+  // Both portraits are 1024² on R2 under uploads/characters/${id}/.
+  // - portraitUrl: colored (white bg) — used as reference image when this
+  //   character is included in a coloring-page generation.
+  // - portraitLineArtUrl: line-art twin (potrace from the same raster) —
+  //   used in the /characters grid + profile UI.
+  portraitUrl        String?
+  portraitLineArtUrl String?
+  status             CharacterStatus @default(GENERATING)
+  failureReason      String?
+
+  voiceId      String? // ElevenLabs voice id (curated kid-safe pool)
+  voicePersona String? // "warm-girl-7yo" — copy used in parent UI
+
+  // Equipped outfit overlay (line-art SVG composited onto the line-art
+  // portrait client-side). Null = no outfit equipped.
+  equippedOutfitId String?
+  equippedOutfit   CharacterOutfit? @relation("Equipped", fields: [equippedOutfitId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  outfits    CharacterOutfit[]    @relation("OwnedBy")
+  voiceLines CharacterVoiceLine[]
+  usages     CharacterUsage[]
+
+  @@index([userId, brand])
+  @@index([profileId])
+  @@map("characters")
+}
+
+// Lifecycle for the portrait generation pipeline. Worker flips GENERATING
+// → READY on successful gpt-image-2 + potrace + R2 upload, or FAILED with
+// a human-readable reason on error.
+enum CharacterStatus {
+  GENERATING
+  READY
+  FAILED
+}
+
+// Outfit overlays — hand-drawn line-art SVGs aligned to a fixed pivot.
+// v1 library: wizard, astronaut, pyjamas, party, raincoat, chef.
+// Stored under apps/chunky-crayon-web/public/characters/outfits/ and
+// imageUrl points to the public asset path.
+model CharacterOutfit {
+  id          String    @id @default(cuid())
+  characterId String
+  character   Character @relation("OwnedBy", fields: [characterId], references: [id], onDelete: Cascade)
+  key         String // "wizard" | "astronaut" | "pyjamas" | "party" | "raincoat" | "chef"
+  imageUrl    String // line-art SVG/webp path
+  unlockedAt  DateTime  @default(now())
+
+  // Reverse side of the Character.equippedOutfit relation.
+  equippedBy Character[] @relation("Equipped")
+
+  @@unique([characterId, key])
+  @@map("character_outfits")
+}
+
+// ElevenLabs-synthesised voice clips. Preset slots (hi/feed/exercise/dress/
+// bye) are cached lazily on first play so subsequent plays are free.
+// Custom lines are parent-gated, 1 credit each, capped at 80 chars.
+model CharacterVoiceLine {
+  id          String    @id @default(cuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  slot        String // "hi" | "feed" | "exercise" | "dress" | "bye" | "custom"
+  text        String
+  audioUrl    String // R2 mp3 under uploads/characters/${characterId}/voice/
+  createdAt   DateTime  @default(now())
+
+  @@index([characterId, slot])
+  @@map("character_voice_lines")
+}
+
+// Join row recording that a character appeared on a coloring image. v1
+// caps at one character per image (enforced at the action layer); the
+// unique constraint here is belt-and-braces. Used for "made with Rex"
+// filtering and to measure feature engagement.
+model CharacterUsage {
+  id              String        @id @default(cuid())
+  characterId     String
+  character       Character     @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  coloringImageId String
+  coloringImage   ColoringImage @relation(fields: [coloringImageId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+
+  @@unique([characterId, coloringImageId])
+  @@index([coloringImageId])
+  @@map("character_usages")
 }
