@@ -639,4 +639,73 @@ export type EventProperties = {
     user_name?: string;
     page_url?: string;
   };
+
+  // ===== CHARACTERS =====
+  // characterId only — never the character's name (PII rule).
+  [TRACKING_EVENTS.CHARACTER_CREATE_STARTED]: Record<string, never>;
+  [TRACKING_EVENTS.CHARACTER_CREATE_SUBMITTED]: {
+    characterId: string;
+    species?: string;
+    voicePersona?: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_CREATE_COMPLETED]: {
+    characterId: string;
+    species?: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_CREATE_FAILED]: {
+    characterId?: string;
+    reason: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_PARENT_GATE_SHOWN]: {
+    scope: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_PARENT_GATE_PASSED]: {
+    scope: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_PARENT_GATE_FAILED]: {
+    scope: string;
+    attempts: number;
+  };
+  [TRACKING_EVENTS.CHARACTER_GRID_VIEWED]: {
+    count: number;
+  };
+  [TRACKING_EVENTS.CHARACTER_PROFILE_VIEWED]: {
+    characterId: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_FED]: {
+    characterId: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_EXERCISED]: {
+    characterId: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_DRESSED]: {
+    characterId: string;
+    outfitKey: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_OUTFIT_UNLOCKED]: {
+    characterId: string;
+    outfitKey: string;
+    creditsSpent: number;
+  };
+  [TRACKING_EVENTS.CHARACTER_VOICE_PLAYED]: {
+    characterId: string;
+    slot: string;
+    cached: boolean;
+  };
+  [TRACKING_EVENTS.CHARACTER_VOICE_GENERATED]: {
+    characterId: string;
+    slot: string;
+    isCustom: boolean;
+  };
+  [TRACKING_EVENTS.CHARACTER_PICKED_FOR_PAGE]: {
+    characterId: string;
+    location: 'create_form';
+  };
+  [TRACKING_EVENTS.CHARACTER_USED_IN_PAGE]: {
+    characterId: string;
+    coloringImageId: string;
+  };
+  [TRACKING_EVENTS.CHARACTER_LANDING_HERO_VIEWED]: {
+    surface: 'home' | 'start';
+  };
 };

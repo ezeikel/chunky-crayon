@@ -19,6 +19,7 @@ import {
   faToolbox,
   faComment,
   faStore,
+  faUserAstronaut,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
@@ -71,6 +72,7 @@ const handleSignOut = async () => {
 const getNavItems = (
   t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>,
   showProducts: boolean,
+  showCharacters: boolean,
 ): NavItem[] => [
   {
     label: t('home'),
@@ -105,6 +107,18 @@ const getNavItems = (
         },
       ] as const)
     : []),
+  // Characters — gated behind `characters-feature` flag. Shows for
+  // signed-in users only (the feature itself requires auth on submit;
+  // routing logged-out kids to a sign-in wall would be a worse UX).
+  ...(showCharacters
+    ? ([
+        {
+          label: 'Characters',
+          href: '/characters',
+          visibility: 'authenticated',
+        },
+      ] as const)
+    : []),
   {
     label: t('myArtwork'),
     href: '/account/my-artwork',
@@ -132,6 +146,7 @@ const getMobileItems = (
   t: Awaited<ReturnType<typeof getTranslations<'navigation'>>>,
   tCommon: Awaited<ReturnType<typeof getTranslations<'common'>>>,
   showProducts: boolean,
+  showCharacters: boolean,
 ): MobileNavItem[] => {
   const items: MobileNavItem[] = [];
   if (user) {
@@ -160,6 +175,13 @@ const getMobileItems = (
         label: 'Products',
         iconName: faStore,
         href: '/products',
+      });
+    }
+    if (showCharacters) {
+      items.push({
+        label: 'Characters',
+        iconName: faUserAstronaut,
+        href: '/characters',
       });
     }
     items.push({
@@ -309,11 +331,24 @@ const Header = async () => {
     user?.id ?? 'server-side-check',
     false,
   );
+  // Characters feature flag — gates the /characters entry. Mirrors
+  // showProducts; default off in prod.
+  const showCharacters = await checkFeatureFlag(
+    'characters-feature',
+    user?.id ?? 'server-side-check',
+    false,
+  );
 
-  const mobileItems = getMobileItems(user, t, tCommon, showProducts);
+  const mobileItems = getMobileItems(
+    user,
+    t,
+    tCommon,
+    showProducts,
+    showCharacters,
+  );
 
   const renderItems = () => {
-    const navItems = getNavItems(t, showProducts);
+    const navItems = getNavItems(t, showProducts, showCharacters);
     const visibleItems = navItems.filter((item) => {
       switch (item.visibility) {
         case 'always':

@@ -1351,5 +1351,74 @@
       "advanced": "Advanced",
       "expert": "Expert"
     }
+  },
+  "characters": {
+    "pageTitle": "Meet your friends",
+    "pageSubtitle": "Make a friend who shows up in every coloring page.",
+    "comingSoonTitle": "Characters are on the way",
+    "comingSoonBody": "Hang tight, we're getting this ready for you.",
+    "emptyTitle": "Let's make your first friend!",
+    "emptyBody": "Pick a name, describe what they look like, and we'll draw them for you. They'll show up in your coloring pages.",
+    "addFriendCta": "Make a friend",
+    "fullHouse": "You've got a full house. Remove one to make room for someone new.",
+    "tile": {
+      "drawing": "Drawing",
+      "retry": "Retry",
+      "drawingPlaceholder": "We're drawing your new friend",
+      "failedPlaceholder": "Something went wrong",
+      "gettingReady": "Getting ready"
+    },
+    "modal": {
+      "title": "Make a friend",
+      "subtitle": "Build a character your kid will see in coloring pages.",
+      "name": {
+        "label": "What's their name?",
+        "placeholder": "Rex"
+      },
+      "species": {
+        "label": "What kind of friend? (optional)"
+      },
+      "prompt": {
+        "label": "Describe your friend",
+        "placeholder": "What do they look like? What do they love?",
+        "examplesLabel": "Need a starter?"
+      },
+      "voice": {
+        "label": "Pick a voice (optional)",
+        "hint": "Don't worry, you can change this later."
+      },
+      "footer": "We'll draw {name} for you. This takes about 30 seconds. Up to {max} friends per profile.",
+      "next": "Next",
+      "back": "Back",
+      "cancel": "Cancel",
+      "submit": "Make my friend",
+      "submitting": "Drawing…",
+      "errors": {
+        "nameRequired": "Give your friend a name.",
+        "promptRequired": "Tell us a little about your friend.",
+        "unauthorized": "Please sign in first.",
+        "noActiveProfile": "Pick a profile before making a character.",
+        "parentGateRequired": "The grown-up check needs to pass again.",
+        "invalidInput": "Check the name and description.",
+        "moderationBlocked": "We can't use that one. Try a different idea.",
+        "limitReached": "You've got a full house. Try removing one first.",
+        "extractionFailed": "Something went wrong drawing your friend.",
+        "workerUnavailable": "Something went wrong drawing your friend.",
+        "unknown": "Something went wrong. Please try again."
+      }
+    },
+    "parentGate": {
+      "header": "Grown-up check",
+      "questionPrefix": "What is",
+      "questionInfix": "minus",
+      "placeholder": "Type the answer",
+      "submit": "Submit",
+      "checking": "Checking…",
+      "tryAgain": "That's not quite right. Try again.",
+      "needsNumber": "Please enter a number.",
+      "lockedPrefix": "Take a breath and try again in",
+      "lockedSuffix": "s.",
+      "cancel": "Cancel"
+    }
   }
 }
