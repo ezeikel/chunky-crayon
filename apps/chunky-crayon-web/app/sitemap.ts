@@ -1,7 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { db } from '@one-colored-pixel/db';
 import { GALLERY_CATEGORIES } from '@/constants';
-import { routing } from '@/i18n/routing';
+// `routing.locales` was previously the source of truth here; sitemap is now
+// English-only (see comment in sitemap()). Reinstate the import when you
+// want to fan out URLs across locales again.
 import { getAllTags, ALL_DIFFICULTIES } from '@/app/data/gallery';
 import { BRAND } from '@/lib/db';
 import { LANDING_PAGES } from '@/lib/seo/landing-pages';
@@ -65,7 +67,20 @@ async function getAllBlogPosts() {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const locales = routing.locales;
+  // ENGLISH-ONLY SITEMAP (decided 2026-05-12).
+  //
+  // We have ~11 locales wired up but we're not actively marketing in any of
+  // them, translations are AI-generated, and Google was ranking thin Korean
+  // /ja /es tag pages for accidental low-competition queries — which Google's
+  // 2024+ updates have been demoting hard. Sitemapping only /en consolidates
+  // ranking signal into the language we actually optimise for. Non-English
+  // routes still work for users who navigate via the locale switcher; they
+  // just stop competing with each other for crawl budget and authority.
+  //
+  // Reverse this by changing `sitemapLocales` back to `routing.locales` when
+  // we have a real strategy to target a non-English market.
+  const sitemapLocales = ['en'] as const;
+  const locales = sitemapLocales; // Alias the existing variable to minimise diff.
   const urls: MetadataRoute.Sitemap = [];
 
   // Static pages with their priorities and change frequencies
