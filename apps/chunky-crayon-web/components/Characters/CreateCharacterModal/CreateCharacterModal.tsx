@@ -1,21 +1,28 @@
 'use client';
 
 /**
- * Four-step character create flow.
+ * Three-step character create flow.
  *
- *   1. Parent gate — HMAC token minting via <ParentGate />.
- *   2. Name + species pill picker.
- *   3. Short prompt (≤ 240 chars) with example prompt pills.
- *   4. Voice persona picker.
+ *   1. Name + species pill picker.
+ *   2. Short prompt (≤ 240 chars) with example prompt pills.
+ *   3. Voice persona picker.
  *
  * Then submits to `createCharacter`. On success: closes the modal and lets
  * the parent (the page) revalidate. On failure: shows the inline error
  * so the parent can retry without losing typed input.
  *
+ * Why no parent gate here:
+ *   The caller is already authenticated as the account holder. NextAuth's
+ *   cookie IS the trust boundary — a subtraction question on top of that
+ *   adds friction without adding security. Parent gates stay on actions
+ *   where the trust line is real (custom voice line = 1-credit purchase,
+ *   character delete = destructive). See feedback note saved alongside
+ *   this change.
+ *
  * No em dashes. No "AI" word. US/UK-neutral copy. Tap targets ≥ 44pt.
  */
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dialog,
@@ -24,7 +31,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import ParentGate from '@/components/ParentGate/ParentGate';
 import { createCharacter } from '@/app/actions/characters';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS, CHARACTER_LIMITS } from '@/constants';
@@ -35,7 +41,7 @@ type Props = {
   onClose: () => void;
 };
 
-type Step = 'gate' | 'name' | 'prompt' | 'voice';
+type Step = 'name' | 'prompt' | 'voice';
 
 // Curated species pills. Order matters: first is the kid-favourite default;
 // last is the catch-all open-ended option. Keep this list ≤ 8 — wider
@@ -75,23 +81,32 @@ const VOICE_OPTIONS: { key: string; label: string }[] = [
 
 const CreateCharacterModal = ({ open, onClose }: Props) => {
   const router = useRouter();
-  const [step, setStep] = useState<Step>('gate');
-  const [parentGateToken, setParentGateToken] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>('name');
   const [name, setName] = useState('');
   const [species, setSpecies] = useState<string | null>(null);
   const [shortPrompt, setShortPrompt] = useState('');
   const [voicePersona, setVoicePersona] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hasTrackedStart, setHasTrackedStart] = useState(false);
   const [pending, startTransition] = useTransition();
 
+  // Fire CREATE_STARTED once per modal open. Matches the old gated flow's
+  // behaviour (where the event fired when the user passed the gate).
+  useEffect(() => {
+    if (open && !hasTrackedStart) {
+      trackEvent(TRACKING_EVENTS.CHARACTER_CREATE_STARTED, {});
+      setHasTrackedStart(true);
+    }
+  }, [open, hasTrackedStart]);
+
   const reset = () => {
-    setStep('gate');
-    setParentGateToken(null);
+    setStep('name');
     setName('');
     setSpecies(null);
     setShortPrompt('');
     setVoicePersona(null);
     setError(null);
+    setHasTrackedStart(false);
   };
 
   const handleOpenChange = (next: boolean) => {
@@ -102,17 +117,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     }
   };
 
-  const handleGatePass = (token: string) => {
-    setParentGateToken(token);
-    setStep('name');
-    trackEvent(TRACKING_EVENTS.CHARACTER_CREATE_STARTED, {});
-  };
-
   const handleSubmit = () => {
-    if (!parentGateToken) {
-      setError('Please pass the grown-up check first.');
-      return;
-    }
     if (!name.trim() || name.trim().length > 24) {
       setError('Name must be 1 to 24 characters.');
       return;
@@ -135,7 +140,6 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
         name: name.trim(),
         shortPrompt: composed,
         voicePersona: voicePersona ?? undefined,
-        parentGateToken,
       });
 
       if (result.ok) {
@@ -151,7 +155,6 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
         const friendly: Record<string, string> = {
           unauthorized: 'Please sign in first.',
           no_active_profile: 'Pick a profile before making a character.',
-          parent_gate_required: 'The grown-up check needs to pass again.',
           invalid_input: 'Check the name and description.',
           moderation_blocked: "We can't use that one. Try a different idea.",
           limit_reached: "You've got a full house. Try removing one first.",
@@ -162,10 +165,6 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
         setError(
           friendly[result.error] ?? 'Something went wrong. Please try again.',
         );
-        if (result.error === 'parent_gate_required') {
-          setStep('gate');
-          setParentGateToken(null);
-        }
       }
     });
   };
@@ -179,14 +178,6 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
             Build a character your kid will see in coloring pages.
           </DialogDescription>
         </DialogHeader>
-
-        {step === 'gate' ? (
-          <ParentGate
-            scope="character:create"
-            onPass={handleGatePass}
-            onCancel={() => handleOpenChange(false)}
-          />
-        ) : null}
 
         {step === 'name' ? (
           <div className="space-y-4">

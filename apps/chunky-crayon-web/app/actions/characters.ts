@@ -40,12 +40,10 @@ import { buildCharacterPortraitPrompt } from '@/lib/characters/portrait-prompt';
 export type CreateCharacterInput = {
   /** 1-24 chars; PII — never indexed / never logged as event property. */
   name: string;
-  /** Parent's free-text description; ≤ 240 chars. Moderated upstream. */
+  /** Free-text description; ≤ 240 chars. Moderated upstream. */
   shortPrompt: string;
   /** Optional override of the LLM-suggested voice persona. */
   voicePersona?: string;
-  /** HMAC token issued by `issueParentGateToken('character:create')`. */
-  parentGateToken: string;
 };
 
 export type CreateCharacterResult =
@@ -55,7 +53,6 @@ export type CreateCharacterResult =
       error:
         | 'unauthorized'
         | 'no_active_profile'
-        | 'parent_gate_required'
         | 'invalid_input'
         | 'moderation_blocked'
         | 'limit_reached'
@@ -118,10 +115,16 @@ const postToWorker = async (body: CharacterWorkerBody): Promise<void> => {
  * Create a new character for the active profile.
  *
  * Free for all signed-in users up to MAX_PER_PROFILE; the only cost gate
- * is the cap. Parent-gated; no guests allowed.
+ * is the cap. No guests (action needs userId + profile).
+ *
+ * No parent gate: creation is the same kind of operation as making a
+ * coloring page (kid describes thing → we draw it). Gating it would
+ * imply it's more sensitive than scene generation, which it isn't.
+ * Parent gates stay on `generateCustomVoiceLine` (1-credit purchase)
+ * and `deleteCharacter` (destructive) where the trust line is real.
  *
  * Flow:
- *   1. Auth → parent gate → input shape.
+ *   1. Auth → input shape.
  *   2. Cap check against the active profile.
  *   3. Moderate name + short prompt.
  *   4. Trait extraction (LLM) → moderate the extracted output too
@@ -140,16 +143,7 @@ export const createCharacter = async (
     return { ok: false, error: 'unauthorized' };
   }
 
-  // 1b. Parent gate
-  const gateOk = await verifyParentGateToken(
-    input.parentGateToken,
-    'character:create',
-  );
-  if (!gateOk) {
-    return { ok: false, error: 'parent_gate_required' };
-  }
-
-  // 1c. Input shape
+  // 1b. Input shape
   const name = input.name?.trim();
   const shortPrompt = input.shortPrompt?.trim();
   if (!name || name.length > 24) {

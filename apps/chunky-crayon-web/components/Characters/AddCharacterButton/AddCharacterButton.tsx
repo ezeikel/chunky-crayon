@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { faPlus } from '@fortawesome/pro-duotone-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import useUser from '@/hooks/useUser';
 import CreateCharacterModal from '@/components/Characters/CreateCharacterModal/CreateCharacterModal';
 
 type Props = {
@@ -16,7 +18,20 @@ type Props = {
   disabled?: boolean;
 };
 
+/**
+ * "Make a friend" button that does the right thing based on auth state:
+ *   - Signed in → opens the create modal.
+ *   - Guest → routes to /signin?callbackUrl=/characters so they bounce
+ *     back to the right page after auth. Matches the pattern used by
+ *     other paid/auth-only CTAs in CC (don't dead-end the user).
+ *
+ * While `useUser` is still loading we keep the button enabled and
+ * default-treat the user as guest — clicking before auth resolves still
+ * funnels them to /signin, which is harmless.
+ */
 const AddCharacterButton = ({ variant = 'tile', disabled = false }: Props) => {
+  const router = useRouter();
+  const { isGuest, isLoading } = useUser();
   const [open, setOpen] = useState(false);
 
   const tileClasses =
@@ -25,11 +40,20 @@ const AddCharacterButton = ({ variant = 'tile', disabled = false }: Props) => {
   const pillClasses =
     'inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-5 py-3 text-base font-bold min-h-[44px] hover:bg-crayon-orange-dark disabled:opacity-40 disabled:cursor-not-allowed';
 
+  const handleClick = () => {
+    // Guest path: route to signin with callback so we land back here after auth.
+    if (isGuest || isLoading) {
+      router.push(`/signin?callbackUrl=${encodeURIComponent('/characters')}`);
+      return;
+    }
+    setOpen(true);
+  };
+
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={handleClick}
         disabled={disabled}
         className={variant === 'tile' ? tileClasses : pillClasses}
         aria-label="Make a new character"
@@ -39,7 +63,7 @@ const AddCharacterButton = ({ variant = 'tile', disabled = false }: Props) => {
           className={variant === 'tile' ? 'text-5xl' : 'text-lg'}
         />
         <span className={variant === 'tile' ? 'font-display text-xl' : ''}>
-          {variant === 'tile' ? 'Make a friend' : 'Make a friend'}
+          Make a friend
         </span>
       </button>
 

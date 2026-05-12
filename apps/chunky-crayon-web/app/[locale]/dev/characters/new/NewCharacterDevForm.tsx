@@ -4,11 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { createCharacter } from '@/app/actions/characters';
 
-type Props = {
-  parentGateToken: string;
-};
-
-const NewCharacterDevForm = ({ parentGateToken }: Props) => {
+const NewCharacterDevForm = () => {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [name, setName] = useState('Rex');
@@ -23,7 +19,6 @@ const NewCharacterDevForm = ({ parentGateToken }: Props) => {
       const result = await createCharacter({
         name,
         shortPrompt,
-        parentGateToken,
       });
       if (result.ok) {
         router.push(`/en/dev/characters/${result.characterId}`);
