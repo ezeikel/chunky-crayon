@@ -30,7 +30,13 @@
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShuffle, faPen } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faShuffle,
+  faPen,
+  faArrowRight,
+  faArrowLeft,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { DuotoneStyle } from '@/lib/characters/picker-catalog';
 import {
   Dialog,
   DialogContent,
@@ -71,6 +77,19 @@ const STEP_TITLES: Record<Step, string> = {
   name: 'Give them a name',
   voice: 'Pick a voice',
 };
+
+/**
+ * Map a DuotoneStyle to the inline CSS vars that FontAwesome's
+ * pro-duotone icons read. Same pattern as ParentalGateModal.
+ * Secondary opacity defaults to 0.4 (FA default); raising slightly
+ * to 0.8 makes both layers read on the kid-sized grid.
+ */
+const duotoneVars = (style: DuotoneStyle): React.CSSProperties =>
+  ({
+    '--fa-primary-color': style.primary,
+    '--fa-secondary-color': style.secondary,
+    '--fa-secondary-opacity': '0.8',
+  }) as React.CSSProperties;
 
 /**
  * Voice persona keys + emoji faces. Decoupled from voice-personas.ts so
@@ -243,21 +262,24 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
           </DialogDescription>
         </DialogHeader>
 
-        {/* Progress dots */}
-        <div className="flex justify-center gap-2 my-3" aria-hidden>
-          {STEPS.map((s, i) => (
-            <span
-              key={s}
-              className={cn(
-                'w-2.5 h-2.5 rounded-full transition-colors',
-                i === stepIndex
-                  ? 'bg-crayon-orange'
-                  : i < stepIndex
-                    ? 'bg-crayon-orange/50'
-                    : 'bg-paper-cream-dark',
-              )}
-            />
-          ))}
+        {/* Progress bar — fills left-to-right as the kid completes steps.
+            Reads as 'how far along you are' rather than 'tappable dots'.
+            stepIndex + 1 over STEPS.length means "you're on step N, so
+            N/total is filled". */}
+        <div
+          className="my-3 h-2 rounded-full bg-paper-cream-dark/60 overflow-hidden"
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={STEPS.length}
+          aria-valuenow={stepIndex + 1}
+          aria-label={`Step ${stepIndex + 1} of ${STEPS.length}`}
+        >
+          <div
+            className="h-full bg-crayon-orange transition-all duration-300 rounded-full"
+            style={{
+              width: `${((stepIndex + 1) / STEPS.length) * 100}%`,
+            }}
+          />
         </div>
 
         {/* ─── Species ─────────────────────────────────────────────── */}
@@ -281,10 +303,8 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                 >
                   <FontAwesomeIcon
                     icon={s.icon}
-                    className={cn(
-                      'text-3xl',
-                      selected ? 'text-crayon-orange' : 'text-neutral-700',
-                    )}
+                    className="text-3xl"
+                    style={duotoneVars(s.duotone)}
                   />
                   <span className="text-[10px] font-bold text-neutral-600">
                     {s.label}
@@ -357,10 +377,8 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                   >
                     <FontAwesomeIcon
                       icon={t.icon}
-                      className={cn(
-                        'text-2xl',
-                        selected ? 'text-crayon-orange' : 'text-neutral-700',
-                      )}
+                      className="text-2xl"
+                      style={duotoneVars(t.duotone)}
                     />
                     <span className="text-[10px] font-bold text-neutral-600">
                       {t.label}
@@ -446,24 +464,26 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
           </p>
         ) : null}
 
-        <div className="flex justify-between gap-3 pt-4">
+        {/* Footer: arrow nav. The Dialog's own × handles dismiss, so no
+            Cancel button. Back is only present from step 2 onward; on
+            step 1 we leave the slot empty so Next stays right-aligned.
+            The final step replaces Next-arrow with the "Make my friend"
+            CTA — a chunky pill, kid reads the words but the arrow icon
+            tells the rest. */}
+        <div className="flex justify-between items-center gap-3 pt-4 min-h-[56px]">
           {stepIndex > 0 ? (
             <button
               type="button"
               onClick={goBack}
               disabled={pending}
-              className="rounded-full px-5 py-3 text-sm border-2 border-paper-cream-dark min-h-[44px] disabled:opacity-50"
+              aria-label="Back"
+              className="rounded-full w-14 h-14 flex items-center justify-center border-2 border-paper-cream-dark text-neutral-700 hover:border-crayon-orange hover:text-crayon-orange disabled:opacity-50 transition-colors"
             >
-              Back
+              <FontAwesomeIcon icon={faArrowLeft} className="text-xl" />
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => handleOpenChange(false)}
-              className="rounded-full px-5 py-3 text-sm border-2 border-paper-cream-dark min-h-[44px]"
-            >
-              Cancel
-            </button>
+            // Empty spacer so Next stays right-aligned on step 1.
+            <span aria-hidden className="w-14 h-14" />
           )}
 
           {step === 'voice' ? (
@@ -471,18 +491,22 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
               type="button"
               onClick={handleSubmit}
               disabled={pending || !canAdvance}
-              className="rounded-full px-6 py-3 text-sm font-bold bg-black text-white min-h-[44px] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-6 py-3 text-base font-bold min-h-[56px] hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 transition-transform"
             >
               {pending ? 'Drawing…' : 'Make my friend'}
+              {!pending ? (
+                <FontAwesomeIcon icon={faArrowRight} className="text-lg" />
+              ) : null}
             </button>
           ) : (
             <button
               type="button"
               onClick={goNext}
               disabled={!canAdvance}
-              className="rounded-full px-6 py-3 text-sm font-bold bg-black text-white min-h-[44px] disabled:opacity-50"
+              aria-label="Next"
+              className="rounded-full w-14 h-14 flex items-center justify-center bg-crayon-orange text-white hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 transition-transform"
             >
-              Next
+              <FontAwesomeIcon icon={faArrowRight} className="text-xl" />
             </button>
           )}
         </div>

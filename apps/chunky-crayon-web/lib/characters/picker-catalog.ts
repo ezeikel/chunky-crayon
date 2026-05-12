@@ -51,6 +51,20 @@ export type SpeciesKey =
   | 'fairy'
   | 'monster';
 
+/**
+ * Each option gets a duotone palette so the FA icons actually shine. We
+ * read CSS vars from the crayon palette — same pattern as
+ * ParentalGateModal — and vary them per option so the grid pops as a
+ * playful rainbow rather than a row of identical grey shapes.
+ *
+ * Memory rule (`feedback_fontawesome_over_emojis.md`): vary colour
+ * per-item; don't mono-orange a whole row.
+ */
+export type DuotoneStyle = {
+  primary: string; // CSS color string for --fa-primary-color
+  secondary: string; // CSS color string for --fa-secondary-color
+};
+
 export type SpeciesOption = {
   key: SpeciesKey;
   /** Tiny label shown under the icon for parents. */
@@ -58,19 +72,93 @@ export type SpeciesOption = {
   icon: IconDefinition;
   /** Singular noun fragment used when building shortPrompt. */
   noun: string;
+  /** Duotone palette for the icon. */
+  duotone: DuotoneStyle;
 };
 
 export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
-  { key: 'dragon', label: 'Dragon', icon: faDragon, noun: 'dragon' },
-  { key: 'puppy', label: 'Puppy', icon: faDog, noun: 'puppy' },
-  { key: 'kitten', label: 'Kitten', icon: faCat, noun: 'kitten' },
+  {
+    key: 'dragon',
+    label: 'Dragon',
+    icon: faDragon,
+    noun: 'dragon',
+    duotone: {
+      primary: 'hsl(var(--crayon-purple))',
+      secondary: 'hsl(var(--crayon-pink))',
+    },
+  },
+  {
+    key: 'puppy',
+    label: 'Puppy',
+    icon: faDog,
+    noun: 'puppy',
+    duotone: {
+      primary: 'hsl(var(--crayon-orange))',
+      secondary: 'hsl(var(--crayon-yellow))',
+    },
+  },
+  {
+    key: 'kitten',
+    label: 'Kitten',
+    icon: faCat,
+    noun: 'kitten',
+    duotone: {
+      primary: 'hsl(var(--crayon-pink))',
+      secondary: 'hsl(var(--crayon-purple))',
+    },
+  },
   // No pro-duotone unicorn icon in the codebase's existing pool —
   // a star/sparkle reads "magical" and works as the unicorn anchor.
-  { key: 'unicorn', label: 'Unicorn', icon: faStarSparkle, noun: 'unicorn' },
-  { key: 'robot', label: 'Robot', icon: faRobot, noun: 'robot' },
-  { key: 'kid', label: 'Kid', icon: faChildReaching, noun: 'kid' },
-  { key: 'fairy', label: 'Fairy', icon: faHatWizard, noun: 'fairy' },
-  { key: 'monster', label: 'Monster', icon: faGhost, noun: 'monster' },
+  {
+    key: 'unicorn',
+    label: 'Unicorn',
+    icon: faStarSparkle,
+    noun: 'unicorn',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-pink))',
+    },
+  },
+  {
+    key: 'robot',
+    label: 'Robot',
+    icon: faRobot,
+    noun: 'robot',
+    duotone: {
+      primary: 'hsl(var(--crayon-teal))',
+      secondary: 'hsl(var(--crayon-purple))',
+    },
+  },
+  {
+    key: 'kid',
+    label: 'Kid',
+    icon: faChildReaching,
+    noun: 'kid',
+    duotone: {
+      primary: 'hsl(var(--crayon-orange))',
+      secondary: 'hsl(var(--crayon-teal))',
+    },
+  },
+  {
+    key: 'fairy',
+    label: 'Fairy',
+    icon: faHatWizard,
+    noun: 'fairy',
+    duotone: {
+      primary: 'hsl(var(--crayon-purple))',
+      secondary: 'hsl(var(--crayon-yellow))',
+    },
+  },
+  {
+    key: 'monster',
+    label: 'Monster',
+    icon: faGhost,
+    noun: 'monster',
+    duotone: {
+      primary: 'hsl(var(--crayon-green))',
+      secondary: 'hsl(var(--crayon-teal))',
+    },
+  },
 ] as const;
 
 // ─── Color ────────────────────────────────────────────────────────────────
@@ -161,6 +249,8 @@ export type TraitOption = {
     | 'brave-neutral'
     | 'silly-neutral'
     | 'gentle-neutral';
+  /** Duotone palette so the trait icons read as a playful rainbow. */
+  duotone: DuotoneStyle;
 };
 
 export const TRAIT_OPTIONS: readonly TraitOption[] = [
@@ -170,6 +260,10 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
     icon: faShieldHalved,
     promptPhrase: 'brave',
     suggestedPersona: 'brave-neutral',
+    duotone: {
+      primary: 'hsl(var(--crayon-orange))',
+      secondary: 'hsl(var(--crayon-yellow))',
+    },
   },
   {
     key: 'sleepy',
@@ -177,6 +271,10 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
     icon: faMoon,
     promptPhrase: 'sleepy',
     suggestedPersona: 'sleepy-neutral',
+    duotone: {
+      primary: 'hsl(var(--crayon-purple))',
+      secondary: 'hsl(var(--crayon-teal))',
+    },
   },
   {
     key: 'silly',
@@ -184,6 +282,10 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
     icon: faFaceLaughBeam,
     promptPhrase: 'silly',
     suggestedPersona: 'silly-neutral',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-orange))',
+    },
   },
   {
     key: 'shy',
@@ -191,6 +293,10 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
     icon: faHeart,
     promptPhrase: 'shy and gentle',
     suggestedPersona: 'gentle-neutral',
+    duotone: {
+      primary: 'hsl(var(--crayon-pink))',
+      secondary: 'hsl(var(--crayon-purple))',
+    },
   },
   {
     key: 'loves-snacks',
@@ -198,6 +304,10 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
     icon: faCookie,
     promptPhrase: 'always hungry',
     suggestedPersona: 'playful-girl-5yo',
+    duotone: {
+      primary: 'hsl(var(--crayon-orange))',
+      secondary: 'hsl(var(--crayon-pink))',
+    },
   },
   {
     key: 'bouncy',
@@ -205,6 +315,10 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
     icon: faBaseballBatBall,
     promptPhrase: 'bouncy and full of energy',
     suggestedPersona: 'playful-boy-5yo',
+    duotone: {
+      primary: 'hsl(var(--crayon-green))',
+      secondary: 'hsl(var(--crayon-teal))',
+    },
   },
   {
     key: 'curious',
@@ -212,6 +326,10 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
     icon: faMagnifyingGlass,
     promptPhrase: 'curious about everything',
     suggestedPersona: 'warm-girl-7yo',
+    duotone: {
+      primary: 'hsl(var(--crayon-teal))',
+      secondary: 'hsl(var(--crayon-green))',
+    },
   },
   {
     key: 'sparkly',
@@ -219,6 +337,10 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
     icon: faBolt,
     promptPhrase: 'sparkly and bright',
     suggestedPersona: 'warm-boy-7yo',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-pink))',
+    },
   },
 ] as const;
 
