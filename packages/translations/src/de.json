@@ -303,7 +303,8 @@
       "success": "Erfolgreich!",
       "successDescription": "Du hast dich erfolgreich für die E-Mail-Liste angemeldet!",
       "error": "Etwas ist schiefgelaufen",
-      "errorDescription": "Anmeldung für die E-Mail-Liste fehlgeschlagen. Bitte versuche es erneut."
+      "errorDescription": "Anmeldung für die E-Mail-Liste fehlgeschlagen. Bitte versuche es erneut.",
+      "trustLine": "Schließen Sie sich über 100 Eltern an"
     },
     "unsubscribe": {
       "success": "Abgemeldet",

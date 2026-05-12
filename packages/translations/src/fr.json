@@ -303,7 +303,8 @@
       "success": "Succès !",
       "successDescription": "Vous avez bien rejoint la liste e-mail !",
       "error": "Une erreur s'est produite",
-      "errorDescription": "Impossible de rejoindre la liste e-mail. Veuillez réessayer."
+      "errorDescription": "Impossible de rejoindre la liste e-mail. Veuillez réessayer.",
+      "trustLine": "Rejoignez plus de 100 parents"
     },
     "unsubscribe": {
       "success": "Désabonné",

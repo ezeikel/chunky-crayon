@@ -303,7 +303,8 @@
       "success": "¡Listo!",
       "successDescription": "¡Te has unido a la lista de correo correctamente!",
       "error": "Algo salió mal",
-      "errorDescription": "No se pudo unir a la lista de correo. Inténtalo de nuevo."
+      "errorDescription": "No se pudo unir a la lista de correo. Inténtalo de nuevo.",
+      "trustLine": "Únete a más de 100 padres"
     },
     "unsubscribe": {
       "success": "Suscripción cancelada",

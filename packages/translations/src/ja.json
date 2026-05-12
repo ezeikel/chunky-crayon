@@ -303,7 +303,8 @@
       "success": "完了！",
       "successDescription": "メール配信に登録しました！",
       "error": "問題が発生しました",
-      "errorDescription": "メール配信に登録できませんでした。もう一度お試しください。"
+      "errorDescription": "メール配信に登録できませんでした。もう一度お試しください。",
+      "trustLine": "100人以上の保護者が参加"
     },
     "unsubscribe": {
       "success": "配信停止しました",
