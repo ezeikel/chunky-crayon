@@ -27,6 +27,10 @@ export default async function Image({ params }: Props) {
   const { slug } = await params;
   const config = getLandingPageBySlug(slug);
 
+  // TODO(SEO follow-up): when slug is an image-detail slug (no landing config),
+  // look up the row via getColoringImageBySlugSuffix and render the per-image
+  // OG card from /coloring-image/[id]/opengraph-image. For now, image-detail
+  // pages get the generic collage card — acceptable but not optimal.
   const tagline = config?.tagline ?? 'Custom coloring pages, made in seconds.';
   const headline = config?.title ?? 'Free Printable Coloring Pages';
   const primaryTag = config?.tags[0];

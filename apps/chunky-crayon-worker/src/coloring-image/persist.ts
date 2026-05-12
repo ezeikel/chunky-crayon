@@ -35,6 +35,19 @@ import sharp from "sharp";
 import potrace from "oslllo-potrace";
 import QRCode from "qrcode";
 
+// Inline slugify here rather than importing from chunky-crayon-web: the
+// worker is a separate runtime with its own deps and we keep coupling tight.
+// Matches apps/chunky-crayon-web/lib/seo/slug.ts byte-for-byte.
+const slugify = (input: string): string =>
+  input
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60)
+    .replace(/-+$/, "");
+
 // ---------------------------------------------------------------------------
 // Inlined metadata schema + prompt (kept in sync with chunky-crayon-web)
 // ---------------------------------------------------------------------------
@@ -231,6 +244,12 @@ export const persistGeneratedColoringImage = async ({
   // transcript like "An elephant diving into a pool. He's wearing
   // goggles." Title gets the long SEO version, sourcePrompt stays kid-
   // pronounceable.
+  // Set slugBase from the AI-generated title. Used by /coloring-pages/[slug]
+  // for public images. User rows technically also get a slugBase set, but
+  // the URL helper's `userId === null` gate keeps the slugged URL hidden
+  // from them — simpler than reading the row first to decide.
+  const slugBase = slugify(imageMetadata.title);
+
   const updated = await db.coloringImage.update({
     where: { id: coloringImageId },
     data: {
@@ -243,6 +262,7 @@ export const persistGeneratedColoringImage = async ({
       qrCodeUrl: qrCodeSvgBlobUrl,
       status: "READY",
       streamingPartialUrl: null,
+      slugBase: slugBase || null,
     },
   });
 

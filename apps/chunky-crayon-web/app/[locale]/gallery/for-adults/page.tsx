@@ -19,6 +19,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { getFeaturedImages, getCategoryCounts } from '@/app/data/gallery';
 import cn from '@/lib/utils';
+import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
 
 export async function generateMetadata({
   params,
@@ -121,7 +122,7 @@ const FeaturedImages = async ({ locale }: { locale: string }) => {
         {validImages.slice(0, 8).map((image) => (
           <Link
             key={image.id}
-            href={`/coloring-image/${image.id}`}
+            href={getColoringImageUrl(image, locale)}
             className="relative aspect-square rounded-xl overflow-hidden bg-white border-2 border-paper-cream-dark hover:border-crayon-green/50 transition-all group shadow-sm hover:shadow-md"
           >
             <Image

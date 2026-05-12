@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
+import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCalendarStar,
@@ -18,8 +19,11 @@ import AnimatedGalleryGrid, {
 } from './AnimatedGalleryGrid';
 
 const DailyImagePreview = async () => {
-  const t = await getTranslations('homepage.galleryPreview');
-  const dailyImage = await getTodaysDailyImage();
+  const [t, dailyImage, locale] = await Promise.all([
+    getTranslations('homepage.galleryPreview'),
+    getTodaysDailyImage(),
+    getLocale(),
+  ]);
 
   if (!dailyImage || !dailyImage.svgUrl) return null;
 
@@ -50,7 +54,7 @@ const DailyImagePreview = async () => {
       </div>
       <div className="flex gap-4 items-center">
         <Link
-          href={`/coloring-image/${dailyImage.id}`}
+          href={getColoringImageUrl(dailyImage, locale)}
           className="relative w-32 h-32 rounded-xl overflow-hidden bg-white shadow-md hover:shadow-lg transition-shadow group flex-shrink-0"
         >
           <GalleryImageWithPreview
@@ -67,7 +71,7 @@ const DailyImagePreview = async () => {
             {dailyImage.title || t('latestDailyPage')}
           </h4>
           <Link
-            href={`/coloring-image/${dailyImage.id}`}
+            href={getColoringImageUrl(dailyImage, locale)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-crayon-orange text-white text-sm font-semibold rounded-full hover:bg-crayon-orange-dark transition-colors"
           >
             <FontAwesomeIcon icon={faSparkles} className="text-xs" />
@@ -80,8 +84,11 @@ const DailyImagePreview = async () => {
 };
 
 const CommunityPreview = async () => {
-  const t = await getTranslations('homepage.galleryPreview');
-  const allImages = await getFeaturedImages(4);
+  const [t, allImages, locale] = await Promise.all([
+    getTranslations('homepage.galleryPreview'),
+    getFeaturedImages(4),
+    getLocale(),
+  ]);
   const images = allImages.filter((img) => img.svgUrl);
 
   if (images.length === 0) return null;
@@ -117,7 +124,7 @@ const CommunityPreview = async () => {
         {images.map((image) => (
           <Link
             key={image.id}
-            href={`/coloring-image/${image.id}`}
+            href={getColoringImageUrl(image, locale)}
             className="relative aspect-square rounded-lg overflow-hidden bg-white border border-paper-cream-dark hover:border-crayon-purple/50 transition-colors group"
           >
             <GalleryImageWithPreview

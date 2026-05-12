@@ -3,6 +3,7 @@
 import { db, GenerationType, Prisma, Difficulty } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
 import type { PaginatedImagesResponse } from '@/app/data/coloring-image';
+import { GALLERY_IMAGE_SELECT } from '@/app/data/coloring-image';
 import { GALLERY_PAGE_SIZE, getDifficultyFromSlug } from '@/app/data/gallery';
 import { getCategoryBySlug } from '@/constants';
 
@@ -97,11 +98,7 @@ export async function loadGalleryImages(
   const images = await db.coloringImage.findMany({
     where: whereClause,
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
     },
     orderBy: {

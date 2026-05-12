@@ -26,6 +26,22 @@ const brandWhere = {
   status: 'READY' as const,
 };
 
+// Reusable select shape for every list query that produces GalleryImage[].
+// Keeping it as a Prisma.ColoringImageSelect-shaped object lets every list
+// query share the same field set without drift. The four URL-routing
+// fields (slugBase/userId/showInCommunity/status) feed getColoringImageUrl
+// — if a query produces gallery cards, it needs these.
+export const GALLERY_IMAGE_SELECT = {
+  id: true,
+  svgUrl: true,
+  title: true,
+  description: true,
+  userId: true,
+  slugBase: true,
+  showInCommunity: true,
+  status: true,
+} as const;
+
 // Cached data fetching for coloring images using Next.js 16 Cache Components
 // Uses 'use cache' directive with cacheLife and cacheTag for:
 // - Build-time caching during static generation (generateStaticParams)
@@ -71,6 +87,60 @@ export const getColoringImageBase = async (
       regionMapWidth: true,
       regionMapHeight: true,
       regionsJson: true,
+      // URL routing fields — used by getColoringImageUrl helper to pick
+      // between /coloring-image/[id] (private) and /coloring-pages/[slug]
+      // (public, SEO).
+      slugBase: true,
+      userId: true,
+      showInCommunity: true,
+      status: true,
+    },
+  });
+};
+
+/**
+ * Reverse lookup for /coloring-pages/[slug] route. The route hands us the
+ * 5-char suffix (last 5 chars of the cuid); we find the matching public
+ * READY row. Brand-scoped + visibility-gated so only daily/system public
+ * images resolve — user-generated rows are never publicly indexable.
+ */
+export const getColoringImageBySlugSuffix = async (
+  suffix: string,
+): Promise<Partial<ColoringImage> | null> => {
+  'use cache';
+  cacheLife('max');
+  cacheTag('coloring-image-by-slug-suffix', `coloring-image-suffix-${suffix}`);
+
+  return db.coloringImage.findFirst({
+    where: {
+      brand: BRAND,
+      userId: null,
+      status: 'READY',
+      showInCommunity: true,
+      slugBase: { not: null },
+      id: { endsWith: suffix },
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      alt: true,
+      tags: true,
+      url: true,
+      svgUrl: true,
+      qrCodeUrl: true,
+      backgroundMusicUrl: true,
+      colorMapJson: true,
+      fillPointsJson: true,
+      coloredReferenceUrl: true,
+      regionMapUrl: true,
+      regionMapWidth: true,
+      regionMapHeight: true,
+      regionsJson: true,
+      slugBase: true,
+      userId: true,
+      showInCommunity: true,
+      status: true,
     },
   });
 };
@@ -146,13 +216,7 @@ export const getColoringImagesByIds = async (
       ...brandWhere,
       id: { in: ids },
     },
-    select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
-    },
+    select: GALLERY_IMAGE_SELECT,
   });
 
   // Maintain the order of the input IDs
@@ -199,13 +263,7 @@ const getAllColoringImagesBase = async (
 
   return db.coloringImage.findMany({
     where: whereClause,
-    select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
-    },
+    select: GALLERY_IMAGE_SELECT,
     orderBy: {
       createdAt: 'desc',
     },
@@ -275,13 +333,18 @@ export const getAllColoringImagesStatic = async () => {
   });
 };
 
-// Image type for gallery display
+// Image type for gallery display.
+// `slugBase`, `showInCommunity`, `status` are required by getColoringImageUrl
+// so every list query that produces GalleryImage[] must select them too.
 export type GalleryImage = {
   id: string;
   title: string | null;
   description: string | null;
   svgUrl: string | null;
   userId: string | null;
+  slugBase: string | null;
+  showInCommunity: boolean;
+  status: 'GENERATING' | 'READY' | 'FAILED';
 };
 
 // Paginated response type
@@ -330,13 +393,7 @@ const getColoringImagesPaginatedBase = async (
   // Fetch one extra to determine if there are more pages
   const images = await db.coloringImage.findMany({
     where: whereClause,
-    select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
-    },
+    select: GALLERY_IMAGE_SELECT,
     orderBy: {
       createdAt: 'desc',
     },

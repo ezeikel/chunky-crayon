@@ -22,6 +22,7 @@ import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteSc
 import { getTagImages } from '@/app/data/gallery';
 import { generateAlternates } from '@/lib/seo';
 import cn from '@/lib/utils';
+import { getColoringImageCanonicalUrl } from '@/lib/seo/coloring-image-url';
 
 type HolidayEvent = {
   slug: string;
@@ -230,7 +231,7 @@ const HolidayGalleryContent = async ({
         position: index + 1,
         item: {
           '@type': 'ImageObject',
-          '@id': `https://chunkycrayon.com/coloring-image/${image.id}`,
+          '@id': getColoringImageCanonicalUrl(image, locale),
           name: image.title || `${event.name} Coloring Page`,
           contentUrl: image.svgUrl,
         },

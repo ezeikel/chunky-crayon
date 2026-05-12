@@ -8,16 +8,21 @@ import { LANDING_PAGES } from '@/lib/seo/landing-pages';
 
 const baseUrl = 'https://chunkycrayon.com';
 
-// Get all public coloring images for sitemap
+// Get all public coloring images for sitemap. slugBase must be populated
+// or the row can't be rendered at /coloring-pages/[slug] — defensive
+// filter in case a row slipped past the backfill or worker.
 async function getAllPublicImages() {
   return db.coloringImage.findMany({
     where: {
       brand: BRAND,
       userId: null, // Only public images
       status: 'READY', // Skip GENERATING / FAILED rows
+      showInCommunity: true,
+      slugBase: { not: null },
     },
     select: {
       id: true,
+      slugBase: true,
       updatedAt: true,
     },
     orderBy: {
@@ -297,21 +302,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Add coloring image pages for each locale
-  // These are the most important pages for SEO - individual coloring pages
+  // Add coloring image pages for each locale.
+  // Emit the slugged URL (/coloring-pages/{slugBase}-{idSuffix}) — the
+  // /coloring-image/[id] URL 301s to this for public rows, so we only
+  // ever surface the canonical SEO-friendly form to crawlers.
   for (const image of images) {
+    if (!image.slugBase) continue; // belt-and-braces, filter already excludes this
+    const sluggedPath = `/coloring-pages/${image.slugBase}-${image.id.slice(-5)}`;
     for (const locale of locales) {
       urls.push({
-        url: `${baseUrl}/${locale}/coloring-image/${image.id}`,
+        url: `${baseUrl}/${locale}${sluggedPath}`,
         lastModified: image.updatedAt,
         changeFrequency: 'monthly',
         priority: 0.6,
         alternates: {
           languages: Object.fromEntries(
-            locales.map((l) => [
-              l,
-              `${baseUrl}/${l}/coloring-image/${image.id}`,
-            ]),
+            locales.map((l) => [l, `${baseUrl}/${l}${sluggedPath}`]),
           ),
         },
       });

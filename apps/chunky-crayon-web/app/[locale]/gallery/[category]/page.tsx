@@ -26,6 +26,7 @@ import {
 import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
 import { Difficulty } from '@one-colored-pixel/db';
 import cn from '@/lib/utils';
+import { getColoringImageCanonicalUrl } from '@/lib/seo/coloring-image-url';
 
 type PageParams = {
   locale: string;
@@ -205,7 +206,7 @@ const CategoryGalleryContent = async ({
         position: index + 1,
         item: {
           '@type': 'ImageObject',
-          '@id': `https://chunkycrayon.com/coloring-image/${image.id}`,
+          '@id': getColoringImageCanonicalUrl(image, locale),
           name: image.title || `${category.name} Coloring Page`,
           contentUrl: image.svgUrl,
           thumbnailUrl: image.svgUrl,

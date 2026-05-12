@@ -11,6 +11,7 @@ import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteSc
 import { getTagImages, getTagCount } from '@/app/data/gallery';
 import { generateAlternates } from '@/lib/seo';
 import { GALLERY_CATEGORIES } from '@/constants';
+import { getColoringImageCanonicalUrl } from '@/lib/seo/coloring-image-url';
 
 type PageParams = {
   locale: string;
@@ -107,7 +108,7 @@ const TagGalleryContent = async ({
         position: index + 1,
         item: {
           '@type': 'ImageObject',
-          '@id': `https://chunkycrayon.com/coloring-image/${image.id}`,
+          '@id': getColoringImageCanonicalUrl(image, locale),
           name: image.title || `${displayTag} Coloring Page`,
           contentUrl: image.svgUrl,
           thumbnailUrl: image.svgUrl,

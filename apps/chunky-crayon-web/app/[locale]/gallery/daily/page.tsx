@@ -10,6 +10,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
 import TodaysDate from '@/components/TodaysDate';
 import { getDailyImages, getTodaysDailyImage } from '@/app/data/gallery';
+import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
 
 export async function generateMetadata({
   params,
@@ -41,7 +42,7 @@ export async function generateMetadata({
   };
 }
 
-const TodaysFeatured = async () => {
+const TodaysFeatured = async ({ locale }: { locale: string }) => {
   const todaysImage = await getTodaysDailyImage();
 
   if (!todaysImage || !todaysImage.svgUrl) return null;
@@ -67,7 +68,7 @@ const TodaysFeatured = async () => {
       </div>
       <div className="flex flex-col md:flex-row gap-6 items-center">
         <Link
-          href={`/coloring-image/${todaysImage.id}`}
+          href={getColoringImageUrl(todaysImage, locale)}
           className="relative w-full md:w-64 aspect-square rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-xl transition-shadow group"
         >
           <Image
@@ -87,7 +88,7 @@ const TodaysFeatured = async () => {
             </p>
           )}
           <Link
-            href={`/coloring-image/${todaysImage.id}`}
+            href={getColoringImageUrl(todaysImage, locale)}
             className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange text-white font-semibold rounded-full hover:bg-crayon-orange-dark transition-colors"
           >
             <FontAwesomeIcon icon={faSparkles} />
@@ -144,7 +145,7 @@ const DailyGalleryContent = async ({ locale }: { locale: string }) => {
       </div>
 
       {/* Today's Featured */}
-      <TodaysFeatured />
+      <TodaysFeatured locale={locale} />
 
       {/* Archive Section */}
       <div className="mb-6">

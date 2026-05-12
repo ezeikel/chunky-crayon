@@ -3,6 +3,7 @@ import { db, GenerationType, Difficulty } from '@one-colored-pixel/db';
 import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
 import { BRAND } from '@/lib/db';
 import type { GalleryImage, PaginatedImagesResponse } from './coloring-image';
+import { GALLERY_IMAGE_SELECT } from './coloring-image';
 
 // Brand-scoped + ready-status base where clause for all gallery queries.
 // Filtering on status=READY hides the in-flight rows the canvas-as-loader
@@ -60,11 +61,7 @@ const getCommunityImagesBase = async (
       userId: null, // Community images have no userId
     },
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
     },
     orderBy: {
@@ -114,11 +111,7 @@ const getDailyImagesBase = async (
       generationType: GenerationType.DAILY,
     },
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
       createdAt: true,
     },
@@ -165,10 +158,7 @@ export const getLatestDailyImage = async () => {
       generationType: GenerationType.DAILY,
     },
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
       createdAt: true,
     },
@@ -233,11 +223,7 @@ const getCategoryImagesBase = async (
       userId: null,
     },
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
     },
     orderBy: {
@@ -286,10 +272,7 @@ export const getFeaturedImages = async (limit: number = 6) => {
       userId: null, // Only community images
     },
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
     },
     orderBy: {
@@ -425,11 +408,7 @@ const getDifficultyImagesBase = async (
       userId: null, // Only community images
     },
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
       difficulty: true,
     },
@@ -555,11 +534,7 @@ const getCategoryImagesWithDifficultyBase = async (
   const images = await db.coloringImage.findMany({
     where: categoryWhere,
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
       difficulty: true,
     },
@@ -638,11 +613,7 @@ const getTagImagesBase = async (
       userId: null,
     },
     select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
+      ...GALLERY_IMAGE_SELECT,
       tags: true,
     },
     orderBy: {
@@ -732,13 +703,7 @@ export const getRelatedImages = async (
       tags: { hasSome: tags },
       userId: null,
     },
-    select: {
-      id: true,
-      svgUrl: true,
-      title: true,
-      description: true,
-      userId: true,
-    },
+    select: GALLERY_IMAGE_SELECT,
     orderBy: {
       createdAt: 'desc',
     },

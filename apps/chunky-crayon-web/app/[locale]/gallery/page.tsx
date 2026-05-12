@@ -34,6 +34,7 @@ import {
 import { GALLERY_CATEGORIES } from '@/constants';
 import { Difficulty } from '@one-colored-pixel/db';
 import cn from '@/lib/utils';
+import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
 
 export async function generateMetadata({
   params,
@@ -103,7 +104,7 @@ const DailyImageSection = async ({ locale }: { locale: string }) => {
       <div className="bg-gradient-to-br from-crayon-yellow/20 to-crayon-orange/20 rounded-3xl p-6 md:p-8">
         <div className="flex flex-col md:flex-row gap-6 items-center">
           <Link
-            href={`/coloring-image/${dailyImage.id}`}
+            href={getColoringImageUrl(dailyImage, locale)}
             className="relative w-full md:w-80 aspect-square rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-xl transition-shadow group"
           >
             <Image
@@ -123,7 +124,7 @@ const DailyImageSection = async ({ locale }: { locale: string }) => {
               </p>
             )}
             <Link
-              href={`/coloring-image/${dailyImage.id}`}
+              href={getColoringImageUrl(dailyImage, locale)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange text-white font-semibold rounded-full hover:bg-crayon-orange-dark transition-colors"
             >
               <FontAwesomeIcon icon={faSparkles} />
@@ -176,7 +177,7 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
         {images.map((image) => (
           <Link
             key={image.id}
-            href={`/coloring-image/${image.id}`}
+            href={getColoringImageUrl(image, locale)}
             className="relative aspect-square rounded-xl overflow-hidden bg-white border-2 border-paper-cream-dark hover:border-crayon-purple/50 transition-colors group"
           >
             <Image

@@ -1,22 +1,19 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { connection } from 'next/server';
 import { getTranslations } from 'next-intl/server';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMap } from '@fortawesome/pro-duotone-svg-icons';
 import {
   getColoringImageById,
-  getAllColoringImagesStatic,
   getColoringImageStatus,
 } from '@/app/data/coloring-image';
-import { getRelatedImages } from '@/app/data/gallery';
-import { auth } from '@/auth';
-import { ADMIN_EMAILS } from '@/constants';
-import ColoringPageContent from '@/components/ColoringPageContent/ColoringPageContent';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import StreamingCanvasView from '@/components/StreamingCanvasView/StreamingCanvasView';
+import ColoringImageDetailView from '@/components/ColoringImageDetailView/ColoringImageDetailView';
+import {
+  getColoringImageUrl,
+  isPubliclyIndexable,
+} from '@/lib/seo/coloring-image-url';
 
 type ColoringImagePageProps = {
   params: Promise<{
@@ -25,28 +22,15 @@ type ColoringImagePageProps = {
   }>;
 };
 
-// Static generation - all coloring image pages are pre-rendered at build time
-// Uses WebSocket connections to Neon (not HTTP fetch) which works with prerender.
+// generateStaticParams intentionally omitted — see below.
 //
-// We catch + log here rather than throwing because a transient DB failure during
-// build (e.g. a stale pooler connection right after a schema migration, the P2022
-// `column "(not available)" does not exist` we hit on 2026-04-30) will fail the
-// entire Vercel deploy. Pages can render on-demand via ISR if `generateStaticParams`
-// returns empty — the cost is "first hit pays the SSR latency", not a broken site.
-export const generateStaticParams = async () => {
-  try {
-    const images = await getAllColoringImagesStatic();
-    return images.map((image) => ({
-      id: image.id,
-    }));
-  } catch (err) {
-    console.error(
-      '[coloring-image] generateStaticParams failed — falling back to ISR-only:',
-      err,
-    );
-    return [];
-  }
-};
+// Public images now live at /coloring-pages/[slug] (their slugged URL); this
+// route 301-redirects to that canonical. Prerendering all public images at the
+// CUID URL would cache the rendered detail view instead of the redirect,
+// which is exactly what we want NOT to happen. Private user images are
+// per-user and can't be prerendered either. So this route is always served
+// dynamically — first hit pays a small SSR latency for the redirect lookup,
+// every subsequent hit hits the cached helper.
 
 export async function generateMetadata({
   params,
@@ -65,8 +49,20 @@ export async function generateMetadata({
     coloringImage.description ||
     'Free printable coloring page from Chunky Crayon. Color online or download and print!';
 
+  // Canonical URL — public images get the slugged URL, private user images
+  // stay on the CUID URL. Routing the canonical here matches the 301 we
+  // serve from the page handler.
   const baseUrl = 'https://chunkycrayon.com';
-  const pagePath = `/coloring-image/${id}`;
+  const pagePath = getColoringImageUrl(
+    {
+      id,
+      slugBase: coloringImage.slugBase ?? null,
+      userId: coloringImage.userId ?? null,
+      showInCommunity: coloringImage.showInCommunity ?? false,
+      status: coloringImage.status ?? 'READY',
+    },
+    locale,
+  );
 
   return {
     title,
@@ -76,7 +72,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${coloringImage.title || 'Coloring Page'} - Chunky Crayon`,
       description,
-      url: `${baseUrl}/${locale}${pagePath}`,
+      url: `${baseUrl}${pagePath}`,
       siteName: 'Chunky Crayon',
       type: 'website',
     },
@@ -86,22 +82,29 @@ export async function generateMetadata({
       description,
     },
     alternates: {
-      canonical: `${baseUrl}/${locale}${pagePath}`,
+      canonical: `${baseUrl}${pagePath}`,
       languages: {
-        en: `${baseUrl}/en${pagePath}`,
-        ja: `${baseUrl}/ja${pagePath}`,
-        ko: `${baseUrl}/ko${pagePath}`,
-        de: `${baseUrl}/de${pagePath}`,
-        fr: `${baseUrl}/fr${pagePath}`,
-        es: `${baseUrl}/es${pagePath}`,
-        'x-default': `${baseUrl}/en${pagePath}`,
+        en: `${baseUrl}${pagePath.replace(/^\/[a-z]{2}/, '/en')}`,
+        ja: `${baseUrl}${pagePath.replace(/^\/[a-z]{2}/, '/ja')}`,
+        ko: `${baseUrl}${pagePath.replace(/^\/[a-z]{2}/, '/ko')}`,
+        de: `${baseUrl}${pagePath.replace(/^\/[a-z]{2}/, '/de')}`,
+        fr: `${baseUrl}${pagePath.replace(/^\/[a-z]{2}/, '/fr')}`,
+        es: `${baseUrl}${pagePath.replace(/^\/[a-z]{2}/, '/es')}`,
+        'x-default': `${baseUrl}${pagePath.replace(/^\/[a-z]{2}/, '/en')}`,
       },
     },
   };
 }
 
 const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
-  const { id } = await params;
+  // connection() forces the route fully dynamic. Without it, Next 16's PPR
+  // would stream the layout shell as 200 OK before the redirect ran below,
+  // which silently turns a 301 into a 200-with-content. The canonical link
+  // in generateMetadata also covers the SEO consolidation regardless, so
+  // a user landing here from an external link still sees the page but
+  // Google reads it as a duplicate of /coloring-pages/[slug].
+  await connection();
+  const { id, locale } = await params;
 
   // Status check first (uncached) — branches the page between the
   // canvas-as-loader streaming view and the normal render. We can't fold
@@ -151,115 +154,41 @@ const ColoringImagePage = async ({ params }: ColoringImagePageProps) => {
     );
   }
 
-  // READY path — original render below. Cached.
-  const [coloringImage, session, tNav, tColoring] = await Promise.all([
-    getColoringImageById(id),
-    auth(),
-    getTranslations('navigation'),
-    getTranslations('coloringPage'),
-  ]);
-
+  // READY path — fetch the full image, then either redirect (public) or
+  // render the shared detail view (private).
+  const coloringImage = await getColoringImageById(id);
   if (!coloringImage) {
     notFound();
   }
 
-  const isAuthenticated = !!session?.user?.id;
-  const isAdmin =
-    !!session?.user?.email && ADMIN_EMAILS.includes(session.user.email);
-  const showRegionDebugLink = process.env.NODE_ENV === 'development' || isAdmin;
-  const relatedImages = await getRelatedImages(id, coloringImage.tags || [], 6);
-
-  // JSON-LD ImageObject schema for SEO
-  const imageSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'ImageObject',
-    '@id': `https://chunkycrayon.com/coloring-image/${id}`,
-    name: coloringImage.title || 'Coloring Page',
-    description:
-      coloringImage.description ||
-      'Free printable coloring page from Chunky Crayon',
-    contentUrl: coloringImage.svgUrl || coloringImage.url,
-    thumbnailUrl: coloringImage.svgUrl || coloringImage.url,
-    url: `https://chunkycrayon.com/coloring-image/${id}`,
-    isPartOf: {
-      '@id': 'https://chunkycrayon.com/#website',
-    },
-    creator: {
-      '@id': 'https://chunkycrayon.com/#organization',
-    },
-    copyrightHolder: {
-      '@id': 'https://chunkycrayon.com/#organization',
-    },
-    license: 'https://chunkycrayon.com/terms',
-    acquireLicensePage: 'https://chunkycrayon.com/pricing',
-    keywords:
-      coloringImage.tags?.join(', ') || 'coloring page, printable, kids',
-  };
+  // Public/indexable rows get a 301 to the slugged URL. The shared
+  // ColoringImageDetailView is rendered by /coloring-pages/[slug] in that
+  // case — single canonical URL per public image keeps Google from
+  // splitting authority across two URLs for the same content.
+  if (
+    isPubliclyIndexable({
+      id,
+      slugBase: coloringImage.slugBase ?? null,
+      userId: coloringImage.userId ?? null,
+      showInCommunity: coloringImage.showInCommunity ?? false,
+      status: 'READY',
+    })
+  ) {
+    const slugged = getColoringImageUrl(
+      {
+        id,
+        slugBase: coloringImage.slugBase ?? null,
+        userId: coloringImage.userId ?? null,
+        showInCommunity: coloringImage.showInCommunity ?? false,
+        status: 'READY',
+      },
+      locale,
+    );
+    redirect(slugged);
+  }
 
   return (
-    <PageWrap className="flex flex-col gap-y-6 lg:px-6">
-      {/* ImageObject Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(imageSchema) }}
-      />
-
-      {/* Breadcrumbs */}
-      <Breadcrumbs
-        items={[
-          { label: tNav('home'), href: '/' },
-          { label: tNav('gallery'), href: '/gallery' },
-          { label: coloringImage.title || tColoring('title') },
-        ]}
-      />
-
-      {/* Coloring Page Content - includes title with progress/mute on desktop */}
-      <ColoringPageContent
-        coloringImage={coloringImage}
-        isAuthenticated={isAuthenticated}
-        title={coloringImage.title || tColoring('title')}
-      />
-
-      {/* Admin/dev: inspect region store for this image */}
-      {showRegionDebugLink && (
-        <div className="flex justify-end">
-          <Link
-            href={`/dev/region-store/${id}`}
-            className="inline-flex items-center gap-x-2 rounded-full border-2 border-paper-cream-dark bg-white px-3 py-1.5 text-xs font-medium text-text-primary/70 hover:border-crayon-orange/50 hover:text-crayon-orange transition-colors"
-          >
-            <FontAwesomeIcon icon={faMap} className="text-text-tertiary" />
-            View region store
-          </Link>
-        </div>
-      )}
-
-      {/* Related Coloring Pages */}
-      {relatedImages.length > 0 && (
-        <section className="mt-8 pt-8 border-t border-paper-cream-dark">
-          <h2 className="font-tondo font-semibold text-xl text-text-primary mb-4">
-            {tColoring('relatedPages')}
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {relatedImages.map((related) => (
-              <Link
-                key={related.id}
-                href={`/coloring-image/${related.id}`}
-                className="relative aspect-square rounded-xl overflow-hidden bg-white border-2 border-paper-cream-dark hover:border-crayon-orange/50 transition-all group"
-              >
-                {related.svgUrl && (
-                  <Image
-                    src={related.svgUrl}
-                    alt={related.title || tColoring('title')}
-                    fill
-                    className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                  />
-                )}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-    </PageWrap>
+    <ColoringImageDetailView coloringImage={coloringImage} locale={locale} />
   );
 };
 
