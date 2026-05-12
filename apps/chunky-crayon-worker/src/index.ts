@@ -60,6 +60,8 @@ import {
 } from "./bundles/generate-page.js";
 import { generateAllBundlePages } from "./bundles/generate-all.js";
 import { getBundleProfile } from "@one-colored-pixel/coloring-core";
+import { generateCharacterPortrait } from "./characters/portrait.js";
+import { CharacterStatus } from "@one-colored-pixel/db";
 
 const WORKER_OUT_DIR = "/tmp/chunky-crayon-worker";
 
@@ -2587,6 +2589,91 @@ app.post("/jobs/content-reel/publish", async (c) => {
  * that browser tab close / refresh don't kill generation. Browsers watch
  * progress via /sse/coloring-image/:id (proxied through Vercel).
  */
+
+/**
+ * POST /jobs/character/generate
+ *
+ * Web app's createCharacter action POSTs here after INSERTing a Character
+ * row with status=GENERATING. We:
+ *   - generate the colored portrait via gpt-image-2 (no refs — the prompt
+ *     names every signature detail verbatim)
+ *   - trace a line-art SVG twin via potrace
+ *   - upload both to R2 under uploads/characters/${id}/
+ *   - flip the row to READY (or FAILED with reason on error)
+ *
+ * Fire-and-forget from Vercel's perspective — we return 202 immediately
+ * and run the work after-response. Failures are persisted to the row so
+ * the parent UI / dev viewer can show them.
+ */
+app.post("/jobs/character/generate", async (c) => {
+  const body = await c.req
+    .json<{
+      characterId?: string;
+      brand?: string;
+      prompt?: string;
+      signatureDetails?: unknown;
+    }>()
+    .catch(() => ({}) as Record<string, unknown>);
+
+  if (!body.characterId || typeof body.characterId !== "string") {
+    return c.json({ error: "characterId required" }, 400);
+  }
+  if (!body.prompt || typeof body.prompt !== "string") {
+    return c.json({ error: "prompt required" }, 400);
+  }
+  if (
+    !body.brand ||
+    (body.brand !== "CHUNKY_CRAYON" && body.brand !== "COLORING_HABITAT")
+  ) {
+    return c.json(
+      { error: "brand must be CHUNKY_CRAYON or COLORING_HABITAT" },
+      400,
+    );
+  }
+  const signatureDetails: string[] = Array.isArray(body.signatureDetails)
+    ? body.signatureDetails.filter(
+        (d): d is string => typeof d === "string" && d.length > 0,
+      )
+    : [];
+
+  const characterId = body.characterId;
+  const prompt = body.prompt;
+
+  console.log(
+    `[/jobs/character/generate] queued ${characterId} (signatureDetails=${signatureDetails.length})`,
+  );
+
+  // Fire-and-forget — return 202 immediately so the Vercel action doesn't
+  // block on the 20-30s portrait generation. Errors get persisted to the
+  // Character row so the UI can surface them.
+  void (async () => {
+    try {
+      await generateCharacterPortrait({
+        characterId,
+        prompt,
+        signatureDetails,
+      });
+    } catch (err) {
+      console.error(`[/jobs/character/generate] ${characterId} FAILED:`, err);
+      Sentry.captureException(err, {
+        extra: { characterId, route: "/jobs/character/generate" },
+      });
+      await db.character
+        .update({
+          where: { id: characterId },
+          data: {
+            status: CharacterStatus.FAILED,
+            failureReason:
+              err instanceof Error ? err.message.slice(0, 500) : "unknown",
+          },
+        })
+        .catch(() => {});
+    }
+  })();
+
+  return c.json({ ok: true, characterId }, 202);
+});
+
 app.post("/jobs/coloring-image/start", async (c) => {
   const body = await c.req
     .json<Partial<StartJobInput>>()
