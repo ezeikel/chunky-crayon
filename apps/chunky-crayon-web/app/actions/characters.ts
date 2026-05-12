@@ -314,6 +314,46 @@ export const listCharactersForActiveProfile = async () => {
 };
 
 /**
+ * Fetch a character + everything the profile page renders: unlocked
+ * outfits, equipped outfit, recently-played voice lines. Single round-trip
+ * so the page server-component doesn't fan out into N queries.
+ *
+ * Returns null on auth miss / non-ownership — leaks no information about
+ * whether the id exists.
+ */
+export const getCharacterForProfile = async (id: string) => {
+  const userId = await getUserId(ACTIONS.GET_CURRENT_USER);
+  if (!userId) return null;
+
+  return db.character.findFirst({
+    where: { id, userId, brand: BRAND },
+    select: {
+      id: true,
+      name: true,
+      species: true,
+      traits: true,
+      signatureDetails: true,
+      portraitUrl: true,
+      portraitLineArtUrl: true,
+      status: true,
+      failureReason: true,
+      voiceId: true,
+      voicePersona: true,
+      equippedOutfitId: true,
+      equippedOutfit: {
+        select: { id: true, key: true, imageUrl: true },
+      },
+      outfits: {
+        select: { id: true, key: true, imageUrl: true, unlockedAt: true },
+        orderBy: { unlockedAt: 'asc' },
+      },
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+};
+
+/**
  * Fetch a single character owned by the current user. Returns null for
  * unauthenticated requests or when the character doesn't exist / isn't
  * owned by the caller — callers should treat both cases as "not found"

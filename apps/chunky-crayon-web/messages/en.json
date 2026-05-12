@@ -1419,6 +1419,45 @@
       "lockedPrefix": "Take a breath and try again in",
       "lockedSuffix": "s.",
       "cancel": "Cancel"
+    },
+    "profile": {
+      "backLink": "← All friends",
+      "stillDrawingTitle": "{name} is on the way",
+      "stillDrawingBody": "Their portrait is being drawn. Come back in a moment.",
+      "seeAllCta": "See all friends",
+      "actions": {
+        "feed": "Feed",
+        "exercise": "Exercise",
+        "dress": "Dress"
+      },
+      "outfits": {
+        "heading": "Outfits",
+        "none": "No outfit",
+        "lockedPrice": "{cost} credits",
+        "errorEquip": "Could not save your change. Try again.",
+        "errorInsufficient": "You need {cost} credits to unlock this. You have {balance}.",
+        "errorUnlock": "We couldn't unlock that. Try again."
+      },
+      "voice": {
+        "heading": "Voice",
+        "presetHi": "Say hi",
+        "presetFeed": "Yum!",
+        "presetExercise": "Whoosh!",
+        "presetBye": "Bye!",
+        "customLabel": "Make {name} say something (grown-ups only)",
+        "customPlaceholder": "Hello, I'm {name}!",
+        "customSubmit": "Say it",
+        "customFooter": "{cost} credit per line",
+        "thinking": "{name} is thinking. Try again in a moment.",
+        "errors": {
+          "notFound": "We couldn't find this friend.",
+          "invalidInput": "Lines must be 1 to 80 characters.",
+          "parentGateRequired": "The grown-up check needs to pass again.",
+          "moderationBlocked": "We can't use that one. Try different words.",
+          "insufficientCredits": "Not enough credits to make this line.",
+          "synthesisFailed": "Something went wrong. Try again in a moment."
+        }
+      }
     }
   }
 }
