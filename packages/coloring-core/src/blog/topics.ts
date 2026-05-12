@@ -2516,6 +2516,422 @@ export const BLOG_TOPICS: BlogTopic[] = [
       "precision dot creation",
     ],
   },
+
+  // ===== WAVE 2 (2026-05-12): SEO content-cluster strategy =====
+  // 40 long-tail posts grouped into 5 clusters. Each cluster targets a
+  // distinct parent search context, so they compound rather than
+  // cannibalise each other. See docs/seo/blog-content-strategy.md for
+  // the full rationale, shape rules, and measurement plan.
+
+  // --- Cluster 1: Coloring for specific needs (high-intent, low comp) ---
+  {
+    topic: "Coloring pages for sensory regulation in kids",
+    category: "parenting",
+    keywords: [
+      "sensory regulation",
+      "sensory-sensitive kids",
+      "sensory activities",
+      "calming activities for kids",
+    ],
+  },
+  {
+    topic: "Coloring activities for anxiety in children",
+    category: "parenting",
+    keywords: [
+      "anxiety in children",
+      "calm-down activities",
+      "child anxiety relief",
+      "anxious kids",
+    ],
+  },
+  {
+    topic: "Coloring pages for autism spectrum kids",
+    category: "parenting",
+    keywords: [
+      "autism friendly",
+      "low-stimulation activities",
+      "autistic children",
+      "neurodivergent kids",
+    ],
+  },
+  {
+    topic: "Coloring pages for big feelings and emotion regulation",
+    category: "parenting",
+    keywords: [
+      "big feelings",
+      "emotion regulation",
+      "kid meltdowns",
+      "feelings activities",
+    ],
+  },
+  {
+    topic: "Coloring activities for sick days and illness recovery",
+    category: "parenting",
+    keywords: [
+      "sick day activities",
+      "fever recovery",
+      "quiet activities sick kids",
+      "illness recovery kids",
+    ],
+  },
+  {
+    topic: "Coloring to help kids process grief and loss",
+    category: "parenting",
+    keywords: [
+      "grief kids",
+      "loss processing children",
+      "pet death",
+      "family loss",
+    ],
+  },
+  {
+    topic: "Coloring activities for hospital stays and pediatric care",
+    category: "parenting",
+    keywords: [
+      "hospital activities",
+      "pediatric ward",
+      "child medical care",
+      "hospital kid activities",
+    ],
+  },
+  {
+    topic: "Coloring strategies for kids with ADHD and focus challenges",
+    category: "parenting",
+    keywords: [
+      "ADHD kids",
+      "focus strategies",
+      "attention activities",
+      "ADHD coloring",
+    ],
+  },
+
+  // --- Cluster 2: Context-specific quiet-time ---
+  {
+    topic: "Coloring pages for restaurant waits with kids",
+    category: "parenting",
+    keywords: [
+      "restaurant activities kids",
+      "dining out with kids",
+      "wait activities",
+      "kid restaurant",
+    ],
+  },
+  {
+    topic: "Coloring activities for plane trips with toddlers",
+    category: "parenting",
+    keywords: [
+      "plane activities toddler",
+      "flight activities",
+      "airplane kids",
+      "travel toddler",
+    ],
+  },
+  {
+    topic: "Coloring pages for doctor and dentist waiting rooms",
+    category: "parenting",
+    keywords: [
+      "waiting room activities",
+      "doctor visit kids",
+      "dentist activities",
+      "pediatric anxiety",
+    ],
+  },
+  {
+    topic: "Coloring activities for rainy day indoor fun",
+    category: "parenting",
+    keywords: [
+      "rainy day",
+      "indoor activities kids",
+      "wet day activities",
+      "indoor play",
+    ],
+  },
+  {
+    topic: "Coloring pages for naptime wind-down",
+    category: "parenting",
+    keywords: [
+      "naptime activities",
+      "wind-down toddler",
+      "quiet time before nap",
+      "calming pre-nap",
+    ],
+  },
+  {
+    topic: "Coloring for kids during screen-time breaks",
+    category: "parenting",
+    keywords: [
+      "screen-time breaks",
+      "digital detox kids",
+      "screen alternatives",
+      "screen-fatigue",
+    ],
+  },
+  {
+    topic: "Coloring activities for sibling quiet time together",
+    category: "parenting",
+    keywords: [
+      "sibling activities",
+      "multi-kid quiet time",
+      "siblings coloring",
+      "family quiet time",
+    ],
+  },
+  {
+    topic: "Coloring pages for after-school decompression",
+    category: "parenting",
+    keywords: [
+      "after school activities",
+      "school decompression",
+      "post-school routine",
+      "transition activities",
+    ],
+  },
+
+  // --- Cluster 3: How-to for parents using coloring ---
+  {
+    topic: "How to get toddlers to stay in the lines",
+    category: "techniques",
+    keywords: [
+      "toddler coloring skills",
+      "stay in the lines",
+      "fine motor toddler",
+      "coloring development",
+    ],
+  },
+  {
+    topic: "How to choose crayons for 3 year olds",
+    category: "techniques",
+    keywords: [
+      "best crayons toddler",
+      "crayons 3 year old",
+      "chunky crayons",
+      "toddler art supplies",
+    ],
+  },
+  {
+    topic: "How to store and organise kids coloring pages",
+    category: "techniques",
+    keywords: [
+      "organise kid art",
+      "store coloring pages",
+      "art storage kids",
+      "coloring page binder",
+    ],
+  },
+  {
+    topic: "How to display and celebrate kid art at home",
+    category: "techniques",
+    keywords: [
+      "display kid art",
+      "frame children art",
+      "celebrate kid creativity",
+      "art wall kids",
+    ],
+  },
+  {
+    topic: "How to make coloring pages from photos of kids",
+    category: "techniques",
+    keywords: [
+      "photo to coloring page",
+      "custom kid coloring",
+      "personalised coloring",
+      "photo coloring conversion",
+    ],
+  },
+  {
+    topic: "How to print coloring pages on a budget",
+    category: "techniques",
+    keywords: [
+      "print coloring pages cheap",
+      "printer ink savings",
+      "budget printing",
+      "free printables",
+    ],
+  },
+  {
+    topic: "How to color with toddlers who won't sit still",
+    category: "techniques",
+    keywords: [
+      "toddler attention",
+      "active toddler coloring",
+      "wiggly kids art",
+      "engage restless toddler",
+    ],
+  },
+  {
+    topic: "How to extend kids attention span with coloring activities",
+    category: "techniques",
+    keywords: [
+      "attention span kids",
+      "focus building",
+      "concentration activities",
+      "extend kid focus",
+    ],
+  },
+
+  // --- Cluster 4: Educational coloring (teacher-facing) ---
+  {
+    topic: "Coloring pages for letter recognition in preschool",
+    category: "educational",
+    keywords: [
+      "letter recognition",
+      "preschool literacy",
+      "alphabet coloring",
+      "pre-reading activities",
+    ],
+  },
+  {
+    topic: "Coloring activities for teaching emotions vocabulary",
+    category: "educational",
+    keywords: [
+      "emotions vocabulary",
+      "SEL activities",
+      "social emotional learning",
+      "feelings words kids",
+    ],
+  },
+  {
+    topic: "Coloring for teaching colours and colour mixing",
+    category: "educational",
+    keywords: [
+      "color mixing kids",
+      "primary colors",
+      "color theory children",
+      "rainbow activities",
+    ],
+  },
+  {
+    topic: "Coloring pages for counting and numbers in kindergarten",
+    category: "educational",
+    keywords: [
+      "counting activities",
+      "kindergarten math",
+      "numbers coloring",
+      "early math kids",
+    ],
+  },
+  {
+    topic: "Coloring activities for teaching shapes in preschool",
+    category: "educational",
+    keywords: [
+      "shapes preschool",
+      "geometry kids",
+      "shape recognition",
+      "early geometry",
+    ],
+  },
+  {
+    topic: "Coloring pages for fine motor skill development",
+    category: "educational",
+    keywords: [
+      "fine motor skills",
+      "occupational therapy",
+      "hand strength kids",
+      "OT activities",
+    ],
+  },
+  {
+    topic: "Coloring for classroom reward charts and routines",
+    category: "educational",
+    keywords: [
+      "reward chart",
+      "classroom management",
+      "behaviour chart",
+      "classroom routines",
+    ],
+  },
+  {
+    topic: "Coloring activities for the first week of school",
+    category: "educational",
+    keywords: [
+      "back to school activities",
+      "first week classroom",
+      "school welcome pack",
+      "kindergarten first day",
+    ],
+  },
+
+  // --- Cluster 5: Event/birthday/celebration-driven ---
+  {
+    topic: "Coloring pages for kids birthday party activity tables",
+    category: "parenting",
+    keywords: [
+      "birthday party activities",
+      "party activity table",
+      "kids party ideas",
+      "birthday entertainment",
+    ],
+  },
+  {
+    topic: "Coloring activities for wedding receptions with kids",
+    category: "parenting",
+    keywords: [
+      "wedding kids table",
+      "wedding activity bag",
+      "wedding child activities",
+      "wedding party kids",
+    ],
+  },
+  {
+    topic: "Coloring pages for baby shower games and activities",
+    category: "parenting",
+    keywords: [
+      "baby shower games",
+      "baby shower activities",
+      "shower kids activities",
+      "shower entertainment",
+    ],
+  },
+  {
+    topic: "Coloring activities for family road trips and printables",
+    category: "parenting",
+    keywords: [
+      "road trip activities",
+      "family travel kids",
+      "printable road trip",
+      "long drive kids",
+    ],
+  },
+  {
+    topic: "Coloring pages for camping trips with kids",
+    category: "parenting",
+    keywords: [
+      "camping activities kids",
+      "outdoor family activities",
+      "tent activities",
+      "camping with children",
+    ],
+  },
+  {
+    topic: "Coloring activities for grandparent visits and quiet time",
+    category: "parenting",
+    keywords: [
+      "grandparent activities",
+      "grandkid visits",
+      "multi-generational",
+      "grandparent quiet time",
+    ],
+  },
+  {
+    topic: "Coloring pages for kids sleepover parties",
+    category: "parenting",
+    keywords: [
+      "sleepover activities",
+      "slumber party games",
+      "sleepover ideas",
+      "kid sleepover host",
+    ],
+  },
+  {
+    topic: "Coloring activities for summer vacation boredom busters",
+    category: "parenting",
+    keywords: [
+      "summer activities kids",
+      "vacation boredom",
+      "summer break activities",
+      "summer printables",
+    ],
+  },
 ];
 
 export type BlogAuthor = {
