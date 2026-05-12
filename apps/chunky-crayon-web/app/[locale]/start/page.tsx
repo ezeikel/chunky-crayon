@@ -11,6 +11,8 @@ import StartProblem from './components/StartProblem';
 import StartHowItWorks from './components/StartHowItWorks';
 import LandingDemo from '@/components/LandingDemo/LandingDemo';
 import StartFeatures from './components/StartFeatures';
+import CharactersHookSection from './CharactersHookSection';
+import { charactersMarketingEnabled } from '@/flags';
 import StartFinalCta from './components/StartFinalCta';
 import PricingTeaser from '@/components/PricingTeaser';
 import Testimonials from '@/components/Testimonials';
@@ -147,9 +149,10 @@ function HeroFallback() {
 // reads headers() internally, so we can't cache this — it's fast enough
 // to re-render per request in practice.
 async function StartStaticBody() {
-  const [t, currency] = await Promise.all([
+  const [t, currency, showCharactersMarketing] = await Promise.all([
     getTranslations('start'),
     getCurrencyForRequest(),
+    charactersMarketingEnabled(),
   ]);
 
   // Splash monthly is the entry-point price the teaser advertises.
@@ -188,6 +191,10 @@ async function StartStaticBody() {
         pauseLabel={t('demo.pauseLabel')}
         page="start"
       />
+      {/* Characters marketing hook — flag-gated by `characters-marketing`.
+          When the flag is off this branch renders nothing, so the existing
+          /start funnel is undisturbed and revert is a one-line edit. */}
+      {showCharactersMarketing ? <CharactersHookSection /> : null}
       <StartFeatures
         title={t('features.title')}
         items={{

@@ -36,6 +36,12 @@ type HomePageContentProps = {
   latestComicStrip?: React.ReactNode;
   /** Featured product bundles — server component, optional, drives product sales on homepage. */
   featuredBundles?: React.ReactNode;
+  /** "Meet your characters" section — flag-gated marketing surface for
+   *  the Characters feature. Server-rendered (no DB), the parent page
+   *  passes null when the `characters-marketing` flag is off. Renders
+   *  between featuredBundles and recentCreations so it sits inside the
+   *  conversion-focused band of the page without disrupting it. */
+  meetYourCharacters?: React.ReactNode;
   /** Pre-rendered pricing teaser title with localized price interpolated.
    * Server resolves currency + the Splash monthly price so the title can
    * say "Plans from $7.99/month" for US visitors and "Plans from £7.99/month"
@@ -56,6 +62,7 @@ const HomePageContent = ({
   demo,
   latestComicStrip,
   featuredBundles,
+  meetYourCharacters,
   pricingTeaserTitle,
 }: HomePageContentProps) => {
   const { status } = useSession();
@@ -135,6 +142,12 @@ const HomePageContent = ({
       {/* Featured bundles - drives product sales, placed high for conversions */}
       {featuredBundles && (
         <div className="w-full relative z-10">{featuredBundles}</div>
+      )}
+
+      {/* Meet your characters — flag-gated by `characters-marketing`.
+          Parent passes null when off; one-line revert lives in [locale]/page.tsx. */}
+      {meetYourCharacters && (
+        <div className="w-full relative z-10">{meetYourCharacters}</div>
       )}
 
       {/* Recent creations - shows images guests have created */}

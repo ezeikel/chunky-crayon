@@ -8,6 +8,8 @@ import SocialProofStats from '@/components/SocialProofStats';
 import RecentCreations from '@/components/RecentCreations';
 import LatestComicStripCard from '@/components/LatestComicStripCard/LatestComicStripCard';
 import FeaturedBundles from '@/components/FeaturedBundles';
+import MeetYourCharactersSection from '@/components/Home/MeetYourCharactersSection/MeetYourCharactersSection';
+import { charactersMarketingEnabled } from '@/flags';
 import Loading from '@/components/Loading/Loading';
 import UnsubscribeToast from '@/components/UnsubscribeToast/UnsubscribeToast';
 import HomePageContent from '@/components/HomePageContent';
@@ -76,6 +78,7 @@ const HomePageWithColoState = async ({
   demo,
   latestComicStrip,
   featuredBundles,
+  meetYourCharacters,
 }: {
   searchParams: Promise<ColoringImageSearchParams>;
   form: React.ReactNode;
@@ -89,6 +92,7 @@ const HomePageWithColoState = async ({
   demo: React.ReactNode;
   latestComicStrip: React.ReactNode;
   featuredBundles: React.ReactNode;
+  meetYourCharacters: React.ReactNode;
 }) => {
   const search = (await searchParams) as ColoringImageSearchParams & {
     currency?: string;
@@ -120,6 +124,7 @@ const HomePageWithColoState = async ({
       demo={demo}
       latestComicStrip={latestComicStrip}
       featuredBundles={featuredBundles}
+      meetYourCharacters={meetYourCharacters}
       pricingTeaserTitle={pricingTeaserTitle}
     />
   );
@@ -127,6 +132,14 @@ const HomePageWithColoState = async ({
 
 // Main page - static shell with client-side auth-aware layout
 // Uses PPR: static page with dynamic pockets in Suspense boundaries
+// Wrapper that reads the `characters-marketing` PostHog flag inside a
+// Suspense boundary so the network call doesn't block the home page's
+// static shell. Renders the section when the flag is on, null otherwise.
+const CharactersMarketingSlot = async () => {
+  const show = await charactersMarketingEnabled();
+  return show ? <MeetYourCharactersSection /> : null;
+};
+
 const HomePage = async ({ params, searchParams }: HomePageProps) => {
   const { locale } = await params;
   return (
@@ -245,6 +258,11 @@ const HomePage = async ({ params, searchParams }: HomePageProps) => {
               }
             >
               <FeaturedBundles locale={locale} />
+            </Suspense>
+          }
+          meetYourCharacters={
+            <Suspense fallback={null}>
+              <CharactersMarketingSlot />
             </Suspense>
           }
         />
