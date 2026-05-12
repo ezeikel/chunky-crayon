@@ -164,6 +164,7 @@ const DailyGalleryContent = async ({ locale }: { locale: string }) => {
           initialCursor={nextCursor}
           initialHasMore={hasMore}
           galleryType="daily"
+          locale={locale}
         />
       ) : (
         <div className="text-center py-16">

@@ -188,6 +188,7 @@ const TagGalleryContent = async ({
           initialHasMore={hasMore}
           galleryType="tag"
           tagSlug={tag}
+          locale={locale}
         />
       ) : (
         <div className="text-center py-16">

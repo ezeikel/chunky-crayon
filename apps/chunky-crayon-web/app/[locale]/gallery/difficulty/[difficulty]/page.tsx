@@ -283,6 +283,7 @@ const DifficultyGalleryContent = async ({
           initialHasMore={hasMore}
           galleryType="difficulty"
           difficultySlug={difficultySlug}
+          locale={locale}
         />
       ) : (
         <div className="text-center py-16">

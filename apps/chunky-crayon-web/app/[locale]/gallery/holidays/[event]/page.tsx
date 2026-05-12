@@ -314,6 +314,7 @@ const HolidayGalleryContent = async ({
           initialHasMore={hasMore}
           galleryType="tag"
           tagSlug={event.tags[0]}
+          locale={locale}
         />
       ) : (
         <div className="text-center py-16">

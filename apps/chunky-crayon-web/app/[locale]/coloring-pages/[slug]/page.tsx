@@ -20,6 +20,11 @@ import {
   isPubliclyIndexable,
 } from '@/lib/seo/coloring-image-url';
 import SeoLandingViewTracker from '@/components/SeoLandingViewTracker';
+import PackDownloadButton from '@/components/PackDownloadButton/PackDownloadButton';
+
+// Mirror of generateLandingPackPDF's PACK_SIZE — kept in sync by hand
+// rather than imported to avoid pulling the PDF deps into the page bundle.
+const PACK_PAGE_COUNT = 12;
 
 type PageParams = { locale: string; slug: string };
 
@@ -118,7 +123,7 @@ const LandingPageContent = async ({
 }: {
   paramsPromise: Promise<PageParams>;
 }) => {
-  const { slug } = await paramsPromise;
+  const { slug, locale } = await paramsPromise;
   const config = getLandingPageBySlug(slug);
   if (!config) notFound();
 
@@ -155,12 +160,22 @@ const LandingPageContent = async ({
             {config.tagline}
           </p>
           <p className="text-muted-foreground">{config.intro}</p>
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col items-center gap-3">
+            {/* Primary CTA — instant pack download. The reason a parent
+                landed here from a "free X coloring pages" query is to
+                grab a printable now; everything else is secondary. */}
+            {images.length > 0 && (
+              <PackDownloadButton
+                slug={slug}
+                title={config.title}
+                pageCount={Math.min(PACK_PAGE_COUNT, images.length)}
+              />
+            )}
             <Link
               href="/"
-              className="inline-block bg-btn-orange text-white font-tondo font-bold px-6 py-3 rounded-coloring-card shadow-btn-primary hover:scale-105 transition"
+              className="font-tondo text-crayon-orange underline-offset-4 hover:underline"
             >
-              Make your own free page →
+              Or make your own custom page →
             </Link>
           </div>
         </header>
@@ -172,6 +187,7 @@ const LandingPageContent = async ({
             initialHasMore={hasMore}
             galleryType="tag"
             tagSlug={primaryTag}
+            locale={locale}
           />
         ) : (
           <div className="text-center text-muted-foreground py-16">

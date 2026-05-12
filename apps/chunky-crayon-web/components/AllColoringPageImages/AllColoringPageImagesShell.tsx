@@ -7,6 +7,7 @@ type AllColoringPageImagesShellProps = {
   nextCursor: string | null;
   hasMore: boolean;
   showCommunityImages: boolean;
+  locale: string;
 };
 
 export function AllColoringPageImagesShell({
@@ -14,6 +15,7 @@ export function AllColoringPageImagesShell({
   nextCursor,
   hasMore,
   showCommunityImages,
+  locale,
 }: AllColoringPageImagesShellProps) {
   return (
     <div className="flex flex-col gap-8 p-8 w-full">
@@ -25,6 +27,7 @@ export function AllColoringPageImagesShell({
         initialImages={images}
         initialCursor={nextCursor}
         initialHasMore={hasMore}
+        locale={locale}
       />
     </div>
   );

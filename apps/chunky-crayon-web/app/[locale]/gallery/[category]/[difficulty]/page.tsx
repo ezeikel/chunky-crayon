@@ -203,6 +203,7 @@ const ComboGalleryContent = async ({
           galleryType="category"
           categorySlug={categorySlug}
           difficultySlug={difficultySlug}
+          locale={locale}
         />
       ) : (
         <div className="text-center py-16">

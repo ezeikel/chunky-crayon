@@ -1,3 +1,4 @@
+import { getLocale } from 'next-intl/server';
 import { db } from '@one-colored-pixel/db';
 import { getColoringImagesPaginated } from '@/app/data/coloring-image';
 import { getUserId } from '@/app/actions/user';
@@ -15,7 +16,10 @@ const AllColoringPageImages = async ({
   searchParams,
 }: AllColoringPageImagesProps) => {
   // Get user's showCommunityImages setting and active profile
-  const userId = await getUserId(ACTIONS.GET_ALL_COLORING_IMAGES);
+  const [userId, locale] = await Promise.all([
+    getUserId(ACTIONS.GET_ALL_COLORING_IMAGES),
+    getLocale(),
+  ]);
   let showCommunityImages = false;
   let profileId: string | undefined;
 
@@ -50,6 +54,7 @@ const AllColoringPageImages = async ({
       nextCursor={nextCursor}
       hasMore={hasMore}
       showCommunityImages={showCommunityImages}
+      locale={locale}
     />
   );
 };

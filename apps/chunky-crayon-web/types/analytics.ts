@@ -237,6 +237,25 @@ export type EventProperties = {
     title?: string;
     hasColoring?: boolean;
   };
+  [TRACKING_EVENTS.LANDING_PACK_DOWNLOAD_CLICKED]: {
+    slug: string;
+    title?: string;
+  };
+  [TRACKING_EVENTS.LANDING_PACK_DOWNLOAD_COMPLETED]: {
+    slug: string;
+    pageCount: number;
+    bytes: number;
+    durationMs: number;
+  };
+  [TRACKING_EVENTS.GALLERY_CARD_DOWNLOAD_CLICKED]: {
+    coloringImageId: string;
+    fromPath?: string;
+  };
+  [TRACKING_EVENTS.COLORING_IMAGE_PDF_DOWNLOADED]: {
+    coloringImageId: string;
+    bytes: number;
+    durationMs: number;
+  };
 
   // ===== EMAIL SIGNUP =====
   [TRACKING_EVENTS.EMAIL_SIGNUP_STARTED]: {

@@ -289,6 +289,7 @@ const CategoryGalleryContent = async ({
             initialHasMore={hasMore}
             galleryType="category"
             categorySlug={categorySlug}
+            locale={locale}
           />
         ) : (
           <div className="text-center py-16">

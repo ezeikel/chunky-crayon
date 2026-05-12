@@ -1075,6 +1075,17 @@ export const TRACKING_EVENTS = {
   DOWNLOAD_PDF_CLICKED: 'download_pdf_clicked', // PDF download initiated
   DOWNLOAD_PDF_COMPLETED: 'download_pdf_completed', // PDF download successful
   PRINT_CLICKED: 'print_clicked', // Print button clicked
+  // SEO landing page primary CTA — 12-page printable pack served by
+  // /api/coloring-pages/[slug]/pack.pdf. The CLICKED event fires
+  // client-side at button press; COMPLETED fires server-side once the
+  // PDF is rendered, with { slug, pageCount, bytes, durationMs }.
+  LANDING_PACK_DOWNLOAD_CLICKED: 'landing_pack_download_clicked',
+  LANDING_PACK_DOWNLOAD_COMPLETED: 'landing_pack_download_completed',
+  // Per-card download icon on gallery thumbnails — single-page PDF for
+  // one image via /api/coloring-images/[id]/pdf. CLICKED fires client-
+  // side; COMPLETED fires server-side after render.
+  GALLERY_CARD_DOWNLOAD_CLICKED: 'gallery_card_download_clicked',
+  COLORING_IMAGE_PDF_DOWNLOADED: 'coloring_image_pdf_downloaded',
 
   // ===== EMAIL LIST (Lead Generation) =====
   EMAIL_SIGNUP_STARTED: 'email_signup_started', // Started entering email

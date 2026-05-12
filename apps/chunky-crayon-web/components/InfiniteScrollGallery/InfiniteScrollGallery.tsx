@@ -14,8 +14,10 @@ import {
 } from '@/app/actions/load-gallery-images';
 import type { GalleryImage } from '@/app/data/coloring-image';
 import ColoringImageSkeleton from '@/components/ColoringImage/ColoringImageSkeleton';
+import GalleryCardDownloadButton from '@/components/GalleryCardDownloadButton/GalleryCardDownloadButton';
 import { useProgressPreviews } from '@/hooks/useProgressPreviews';
 import { shouldRefresh, clearRefreshSignal } from '@/utils/galleryRefresh';
+import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
 import cn from '@/utils/cn';
 
 type InfiniteScrollGalleryProps = {
@@ -26,6 +28,14 @@ type InfiniteScrollGalleryProps = {
   categorySlug?: string;
   difficultySlug?: string;
   tagSlug?: string;
+  /**
+   * Locale string used to build the canonical card URL through
+   * `getColoringImageUrl`. Public images → /[locale]/coloring-pages/[slug],
+   * private images → /[locale]/coloring-image/[id]. Falls back to 'en'
+   * when not supplied; existing call sites that didn't pass it pre-
+   * slug-migration get correct English URLs by default.
+   */
+  locale?: string;
 };
 
 // TODO: Add emoji tag filtering in the future
@@ -41,6 +51,7 @@ const InfiniteScrollGallery = ({
   categorySlug,
   difficultySlug,
   tagSlug,
+  locale = 'en',
 }: InfiniteScrollGalleryProps) => {
   const t = useTranslations('gallery.infiniteScroll');
   const router = useRouter();
@@ -151,7 +162,7 @@ const InfiniteScrollGallery = ({
 
           return (
             <Link
-              href={`/coloring-image/${image.id}`}
+              href={getColoringImageUrl(image, locale)}
               key={image.id}
               className="block"
             >
@@ -170,6 +181,16 @@ const InfiniteScrollGallery = ({
                   className="w-full h-auto"
                   style={{ objectFit: 'cover' }}
                 />
+                {/* Always-visible PDF download for this single page. Stops
+                    propagation so tapping it triggers the download instead
+                    of navigating to the detail view. Public images only —
+                    private/in-flight rows wouldn't match the API filter so
+                    skip rendering the button on those. */}
+                {image.userId === null &&
+                  image.showInCommunity &&
+                  image.status === 'READY' && (
+                    <GalleryCardDownloadButton coloringImageId={image.id} />
+                  )}
                 {/* Show palette indicator when there's progress (kid-friendly, no text) */}
                 {previewUrl && (
                   <div className="absolute bottom-2 right-2 size-8 bg-crayon-orange rounded-full shadow-lg flex items-center justify-center">

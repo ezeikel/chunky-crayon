@@ -36,8 +36,15 @@ export async function generateMetadata({
   };
 }
 
-const CommunityGalleryContent = async () => {
-  const { images, nextCursor, hasMore } = await getCommunityImages();
+const CommunityGalleryContent = async ({
+  paramsPromise,
+}: {
+  paramsPromise: Promise<{ locale: string }>;
+}) => {
+  const [{ locale }, { images, nextCursor, hasMore }] = await Promise.all([
+    paramsPromise,
+    getCommunityImages(),
+  ]);
 
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-purple))',
@@ -80,6 +87,7 @@ const CommunityGalleryContent = async () => {
           initialCursor={nextCursor}
           initialHasMore={hasMore}
           galleryType="community"
+          locale={locale}
         />
       ) : (
         <div className="text-center py-16">
@@ -137,11 +145,15 @@ const LoadingSkeleton = () => (
   </div>
 );
 
-const CommunityGalleryPage = () => {
+const CommunityGalleryPage = ({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) => {
   return (
     <PageWrap>
       <Suspense fallback={<LoadingSkeleton />}>
-        <CommunityGalleryContent />
+        <CommunityGalleryContent paramsPromise={params} />
       </Suspense>
     </PageWrap>
   );
