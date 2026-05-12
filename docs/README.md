@@ -11,6 +11,7 @@ Permanent reference for how moving parts of this monorepo work. Each topic has i
 | **Voice mode**             | [voice-mode/](./voice-mode/README.md)                | 2-turn conversational create flow — Deepgram STT, Claude follow-up, ElevenLabs TTS, kid safety stack                              |
 | **Design system**          | [design-system/](./design-system/README.md)          | Tokens, fonts, motion, brand parity for CC + CH                                                                                   |
 | **Ads**                    | [ads/](./ads/README.md)                              | Config-driven ads, campaign templates, asset generation                                                                           |
+| **SEO**                    | [seo/](./seo/blog-content-strategy.md)               | Blog content-cluster strategy — what to write next, what compounds on existing winners, ship-cadence + measurement                |
 | **R2 storage migration**   | [R2_STORAGE_MIGRATION.md](./R2_STORAGE_MIGRATION.md) | Historical migration notes                                                                                                        |
 | **Plans (in-flight work)** | [plans/](./plans/)                                   | Multi-phase implementation plans, scratchpad-style                                                                                |
 
