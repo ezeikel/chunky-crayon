@@ -4,7 +4,8 @@ import { Readable } from 'stream';
 import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
-import { GenerationType, ColoringImage } from '@one-colored-pixel/db';
+import { db, GenerationType, ColoringImage } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import generatePDFNode from '@/utils/generatePDFNode';
 import streamToBuffer from '@/utils/streamToBuffer';
 import { fetchSvg } from '@one-colored-pixel/canvas';
@@ -148,54 +149,93 @@ type JoinColoringPageEmailListState = {
   email?: string;
 };
 
+/**
+ * Add an email to the daily-coloring list.
+ *
+ * Storage moved off Resend Audiences in May 2026 — the free-tier 3K
+ * contact cap was a silly thing to pay for given we only need a list
+ * to iterate at send time, and Resend's per-email `emails.send` (used
+ * by the daily cron) doesn't care where the list lives. Subscribers
+ * now live in our own `email_subscribers` Neon table; the daily cron
+ * reads from there.
+ *
+ * Behaviour preserved from the Resend-Audience era:
+ *   - Re-subscribing an active subscriber: no-op, return success.
+ *   - Re-subscribing a previously-unsubscribed contact: refuse with a
+ *     friendly error (we honour their previous opt-out).
+ *   - First-time signup: create row, send welcome email, fire Meta
+ *     Lead CAPI.
+ *
+ * The `source` form field is optional and free-form — landing pages,
+ * modals, footer, etc. all pass their own identifier so we can attribute
+ * which surface converts best (`email_subscribers.source` / `.sourceSlug`).
+ */
 export const joinColoringPageEmailList = async (
   previousState: JoinColoringPageEmailListState,
   formData: FormData,
 ): Promise<JoinColoringPageEmailListState> => {
-  const rawFormData = {
-    email: (formData.get('email') as string) || '',
-  };
+  const rawEmail = (formData.get('email') as string) || '';
+  const rawSource = (formData.get('source') as string) || '';
+  const rawSourceSlug = (formData.get('sourceSlug') as string) || '';
 
-  const email = normalizeEmail(rawFormData.email);
+  const email = normalizeEmail(rawEmail);
+  const source = rawSource.trim().slice(0, 80) || null;
+  const sourceSlug = rawSourceSlug.trim().slice(0, 120) || null;
+
+  if (!email || !email.includes('@')) {
+    return { error: 'Please enter a valid email.', success: false };
+  }
 
   try {
-    // Check if contact already exists in the audience
-    const { data: existing } = await resend.contacts.get({
-      audienceId,
-      email,
+    // Look up existing row (any status).
+    const existing = await db.emailSubscriber.findUnique({
+      where: { brand_email: { brand: BRAND, email } },
+      select: { id: true, unsubscribedAt: true },
     });
 
     if (existing) {
-      if (existing.unsubscribed) {
+      if (existing.unsubscribedAt) {
+        // Honour the previous opt-out. Asking us to opt them back in
+        // requires more than re-submitting the form — they have to
+        // explicitly re-subscribe via a separate flow we haven't built
+        // yet. For now, surface the same error the Resend-era code did.
         return {
           error: 'This email has previously unsubscribed.',
           success: false,
         };
       }
-      // Already subscribed
+      // Already active. Idempotent re-submit — return success without
+      // re-sending the welcome.
       return { success: true, email };
     }
 
-    // Create new contact
-    const { error: createError } = await resend.contacts.create({
-      audienceId,
-      email,
-    });
-
-    if (createError) {
-      console.error({ contactCreateError: createError });
-      return { error: 'Failed to join the email list', success: false };
+    // First-time signup.
+    let welcomeEmailId: string | null = null;
+    try {
+      const unsubscribeUrl = getUnsubscribeUrl(email);
+      const welcomeEmailHtml = await render(WelcomeEmail({ unsubscribeUrl }));
+      const sendResult = await resend.emails.send({
+        from: getResendFromAddress('no-reply', 'Chunky Crayon'),
+        to: email,
+        subject: 'Welcome to Chunky Crayon! 🎨',
+        html: welcomeEmailHtml,
+      });
+      welcomeEmailId = sendResult.data?.id ?? null;
+    } catch (err) {
+      // Welcome email failure shouldn't block the signup itself.
+      // Subscriber row gets created anyway; the daily cron is the
+      // primary value-delivery channel, not the welcome.
+      console.error('[joinColoringPageEmailList] welcome email failed:', err);
     }
 
-    // Send welcome email
-    const unsubscribeUrl = getUnsubscribeUrl(email);
-    const welcomeEmailHtml = await render(WelcomeEmail({ unsubscribeUrl }));
-
-    await resend.emails.send({
-      from: getResendFromAddress('no-reply', 'Chunky Crayon'),
-      to: email,
-      subject: 'Welcome to Chunky Crayon! 🎨',
-      html: welcomeEmailHtml,
+    await db.emailSubscriber.create({
+      data: {
+        brand: BRAND,
+        email,
+        source,
+        sourceSlug,
+        welcomeEmailId,
+      },
     });
 
     // Server-side Lead event. Mirrors the browser trackLead fire from
@@ -229,14 +269,20 @@ export const joinColoringPageEmailList = async (
   }
 };
 
+/**
+ * List active subscribers for the daily-image send loop.
+ *
+ * Reads from our `email_subscribers` Neon table (post-2026-05 migration
+ * off Resend Audiences). Filters out anyone who's unsubscribed; brand-
+ * scoped so a future CH list doesn't get CC's emails.
+ */
 export const getEmailListMembers = async (): Promise<string[]> => {
-  const { data } = await resend.contacts.list({ audienceId });
-
-  if (!data?.data) return [];
-
-  return data.data
-    .filter((contact) => !contact.unsubscribed)
-    .map((contact) => contact.email);
+  const rows = await db.emailSubscriber.findMany({
+    where: { brand: BRAND, unsubscribedAt: null },
+    select: { email: true },
+    orderBy: { subscribedAt: 'asc' },
+  });
+  return rows.map((row) => row.email);
 };
 
 // Resend's default rate limit is 2 requests per second

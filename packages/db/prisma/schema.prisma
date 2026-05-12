@@ -1124,3 +1124,50 @@ model UgcAd {
   @@index([utmCampaign])
   @@map("ugc_ads")
 }
+
+// Daily-coloring-page email list. Lived in Resend Audiences until
+// 2026-05; we moved off because the free tier's 3K-contact cap was a
+// silly limit to pay for given (a) we only need a list to iterate at
+// send time and (b) Resend's per-email `emails.send` still works fine
+// for the actual send loop.
+//
+// One row per subscriber. Unsubscribes flip `unsubscribedAt` rather
+// than deleting so we can honour "previously unsubscribed, don't
+// re-sub them" semantics. Brand-scoped so CC + CH can share the
+// same table once CH wires this up (mirroring the bundle/coloring-
+// image multi-brand pattern).
+model EmailSubscriber {
+  id    String @id @default(cuid())
+  email String
+
+  // Where the signup happened. Free-form so we can grow without
+  // schema churn: 'landing:free-easter-coloring-pages-for-kids',
+  // 'modal:gallery-card', 'footer', 'hero', 'migrate:resend-backfill'.
+  // Useful for attributing which landings convert best.
+  source String?
+
+  // Free-text — usually the slug of the landing page or surface that
+  // captured them. NULL for legacy entries backfilled from Resend.
+  sourceSlug String?
+
+  brand          Brand     @default(CHUNKY_CRAYON)
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime? // Null = currently subscribed
+
+  // Welcome email send result. Mostly diagnostic — actual unsubscribe
+  // attribution lives on the per-day broadcast events if/when we add
+  // them.
+  welcomeEmailId String? // Resend message id from the welcome send
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Within a brand, an email is unique. (Cross-brand lets the same
+  // person subscribe to both CC + CH independently if CH ever wires
+  // up its own daily list.)
+  @@unique([brand, email])
+  // Daily cron query: `where brand AND unsubscribedAt IS NULL`.
+  @@index([brand, unsubscribedAt])
+  @@index([brand, source])
+  @@map("email_subscribers")
+}

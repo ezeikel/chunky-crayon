@@ -46,7 +46,14 @@ const isEligible = (): boolean => {
   }
 };
 
-const EmailCaptureModal = () => {
+type EmailCaptureModalProps = {
+  /** Optional landing-page slug for attribution. Passed straight to the
+   * form's hidden sourceSlug input so email_subscribers.sourceSlug
+   * records which landing converted them. */
+  sourceSlug?: string;
+};
+
+const EmailCaptureModal = ({ sourceSlug }: EmailCaptureModalProps = {}) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -138,7 +145,11 @@ const EmailCaptureModal = () => {
         </DialogHeader>
 
         <div className="pt-2">
-          <JoinColoringPageEmailListForm location="modal" />
+          <JoinColoringPageEmailListForm
+            location="modal"
+            source="modal:download-pack"
+            sourceSlug={sourceSlug}
+          />
         </div>
 
         <button

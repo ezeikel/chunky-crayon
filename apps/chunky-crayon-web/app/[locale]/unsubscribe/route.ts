@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { db } from '@one-colored-pixel/db';
+import { BRAND } from '@/lib/db';
 import { verifyEmailSignature } from '@/lib/unsubscribe';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const audienceId = process.env.RESEND_DAILY_EMAIL_SEGMENT_ID!;
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 
+/**
+ * Daily-email unsubscribe link target. The signed `sig` query param is
+ * generated alongside the encoded email by lib/unsubscribe.ts; same
+ * shape as before the May 2026 Resend-Audience → DB migration. Auth
+ * model unchanged — only the destination moved.
+ *
+ * Soft-unsubscribe (set `unsubscribedAt` rather than delete) so the
+ * signup action can refuse to re-add them and honour their previous
+ * opt-out, matching the legacy Resend behaviour.
+ */
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const encodedEmail = url.searchParams.get('email');
@@ -26,15 +35,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${baseUrl}/?unsub=invalid`, 302);
   }
 
-  // Mark contact as unsubscribed in Resend
-  const { error } = await resend.contacts.update({
-    audienceId,
-    email,
-    unsubscribed: true,
-  });
-
-  if (error) {
-    console.error('Failed to unsubscribe contact:', error);
+  try {
+    // Idempotent — `updateMany` so a missing row doesn't 500, and a
+    // double-click on the same link is a no-op. We only update rows
+    // that haven't already been unsubscribed, so the timestamp marks
+    // the original opt-out moment.
+    await db.emailSubscriber.updateMany({
+      where: { brand: BRAND, email, unsubscribedAt: null },
+      data: { unsubscribedAt: new Date() },
+    });
+  } catch (err) {
+    console.error('Failed to unsubscribe contact:', err);
     return NextResponse.redirect(`${baseUrl}/?unsub=invalid`, 302);
   }
 

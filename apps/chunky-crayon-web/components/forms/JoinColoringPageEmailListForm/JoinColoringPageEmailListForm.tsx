@@ -17,11 +17,25 @@ import { TRACKING_EVENTS } from '@/constants';
 type JoinColoringPageEmailListFormProps = {
   className?: string;
   location?: 'hero' | 'footer' | 'modal' | 'other';
+  /**
+   * Free-form attribution string written to email_subscribers.source.
+   * Example: 'modal:download-pack', 'footer', 'landing:hero'. Defaults
+   * to `location` when not specified.
+   */
+  source?: string;
+  /**
+   * Optional landing-page slug or path that captured this signup.
+   * Written to email_subscribers.sourceSlug. Useful for breaking
+   * "modal" conversions down by which landing the user was on.
+   */
+  sourceSlug?: string;
 };
 
 const JoinColoringPageEmailListForm = ({
   className,
   location = 'hero',
+  source,
+  sourceSlug,
 }: JoinColoringPageEmailListFormProps) => {
   const t = useTranslations('email');
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -165,6 +179,12 @@ const JoinColoringPageEmailListForm = ({
           isFooter ? 'gap-2 sm:gap-0 items-stretch' : 'gap-3',
         )}
       >
+        {/* Attribution — hidden inputs are picked up by the server
+            action and written to email_subscribers.source / .sourceSlug. */}
+        <input type="hidden" name="source" value={source ?? location} />
+        {sourceSlug ? (
+          <input type="hidden" name="sourceSlug" value={sourceSlug} />
+        ) : null}
         <Input
           type="email"
           name="email"

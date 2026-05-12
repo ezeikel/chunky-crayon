@@ -152,7 +152,7 @@ const LandingPageContent = async ({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
       />
       <SeoLandingViewTracker slug={slug} />
-      <EmailCaptureModal />
+      <EmailCaptureModal sourceSlug={slug} />
       <PageWrap>
         <header className="text-center mb-10 max-w-3xl mx-auto">
           <h1 className="font-tondo text-3xl md:text-5xl font-extrabold mb-3 text-primary">
