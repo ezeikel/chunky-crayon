@@ -60,10 +60,15 @@ export async function getFeatureFlagVariant<T extends string>(
  * inside CreateColoringPageForm, and the action-layer guards in createCharacter
  * / createPendingColoringImage. Default off; admin + ezeikelpemberton see it via
  * the PostHog cohort.
+ *
+ * Local dev escape hatch: NODE_ENV === 'development' bypasses PostHog and
+ * returns true. Vercel locks NODE_ENV to 'production' on every deployed
+ * environment (prod, preview, branch) so this can't accidentally leak.
  */
 export async function charactersFeatureEnabled(
   distinctId?: string,
 ): Promise<boolean> {
+  if (process.env.NODE_ENV === 'development') return true;
   return checkFeatureFlag(
     'characters-feature',
     distinctId ?? 'server-side-check',
@@ -76,10 +81,13 @@ export async function charactersFeatureEnabled(
  * and the /start landing-page hook. Held separate from the core feature flag
  * so the surfaces can be ramped independently of the feature itself (e.g. ship
  * the feature dark, then turn marketing on once retention signal is good).
+ *
+ * Local dev escape hatch: same as `charactersFeatureEnabled`.
  */
 export async function charactersMarketingEnabled(
   distinctId?: string,
 ): Promise<boolean> {
+  if (process.env.NODE_ENV === 'development') return true;
   return checkFeatureFlag(
     'characters-marketing',
     distinctId ?? 'server-side-check',

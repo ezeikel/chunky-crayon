@@ -24,7 +24,7 @@ import {
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
 import { getProfiles, getActiveProfile } from '@/app/actions/profiles';
-import { checkFeatureFlag } from '@/flags';
+import { checkFeatureFlag, charactersFeatureEnabled } from '@/flags';
 import { getMyStickerStats } from '@/app/actions/stickers';
 import { getMyColoState } from '@/app/actions/colo';
 import { getMyCurrentChallenge } from '@/app/actions/challenges';
@@ -332,12 +332,9 @@ const Header = async () => {
     false,
   );
   // Characters feature flag — gates the /characters entry. Mirrors
-  // showProducts; default off in prod.
-  const showCharacters = await checkFeatureFlag(
-    'characters-feature',
-    user?.id ?? 'server-side-check',
-    false,
-  );
+  // showProducts; default off in prod, always on in local dev (the
+  // helper bypasses PostHog when NODE_ENV === 'development').
+  const showCharacters = await charactersFeatureEnabled(user?.id);
 
   const mobileItems = getMobileItems(
     user,

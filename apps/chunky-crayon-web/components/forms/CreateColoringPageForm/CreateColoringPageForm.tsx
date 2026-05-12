@@ -76,7 +76,14 @@ const MultiModeForm = ({
   // Characters feature flag — gates the picker. Hidden for guests (the
   // feature itself requires auth on submit; showing the picker to a guest
   // would just take them to the auth wall after they pick).
-  const charactersFeatureEnabled = useFeatureFlagEnabled('characters-feature');
+  //
+  // Local dev: NODE_ENV === 'development' bypasses PostHog. Next.js inlines
+  // process.env.NODE_ENV at build time, so this is a static check in prod
+  // bundles (no runtime cost, no leak). Mirrors the server-side helper in
+  // flags.ts.
+  const charactersFeatureFlag = useFeatureFlagEnabled('characters-feature');
+  const charactersFeatureEnabled =
+    charactersFeatureFlag || process.env.NODE_ENV === 'development';
   const showCharacterPicker = !isGuest && charactersFeatureEnabled;
   const [characterId, setCharacterId] = useState<string | null>(null);
 
