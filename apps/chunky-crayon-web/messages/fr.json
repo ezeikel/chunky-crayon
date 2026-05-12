@@ -1351,5 +1351,113 @@
       "advanced": "Avancé",
       "expert": "Expert"
     }
+  },
+  "characters": {
+    "pageTitle": "Rencontrez vos amis",
+    "pageSubtitle": "Créez un ami qui apparaît dans chaque page de coloriage.",
+    "comingSoonTitle": "Les personnages arrivent bientôt",
+    "comingSoonBody": "Encore un petit moment, on prépare tout ça pour vous.",
+    "emptyTitle": "Créons ton premier ami !",
+    "emptyBody": "Choisis un nom, décris à quoi il ressemble, et on le dessine pour toi. Il apparaîtra dans tes pages de coloriage.",
+    "addFriendCta": "Créer un ami",
+    "fullHouse": "Ta maison est pleine. Supprime-en un pour faire de la place à un nouveau.",
+    "tile": {
+      "drawing": "Dessin en cours",
+      "retry": "Réessayer",
+      "drawingPlaceholder": "On dessine ton nouvel ami",
+      "failedPlaceholder": "Oups, ça n’a pas marché",
+      "gettingReady": "Préparation…"
+    },
+    "modal": {
+      "title": "Créer un ami",
+      "subtitle": "Créez un personnage que votre enfant verra dans les pages de coloriage.",
+      "name": {
+        "label": "Comment s’appelle-t-il ?",
+        "placeholder": "Rex"
+      },
+      "species": {
+        "label": "Quel genre d’ami ? (facultatif)"
+      },
+      "prompt": {
+        "label": "Décris ton ami",
+        "placeholder": "À quoi ressemble-t-il ? Qu’est-ce qu’il adore ?",
+        "examplesLabel": "Besoin d’une idée ?"
+      },
+      "voice": {
+        "label": "Choisir une voix (facultatif)",
+        "hint": "Pas d’inquiétude, tu pourras changer plus tard."
+      },
+      "footer": "On dessine {name} pour vous. Ça prend environ 30 secondes. Jusqu’à {max} amis par profil.",
+      "next": "Suivant",
+      "back": "Retour",
+      "cancel": "Annuler",
+      "submit": "Créer mon ami",
+      "submitting": "Dessin…",
+      "errors": {
+        "nameRequired": "Donne un nom à ton ami.",
+        "promptRequired": "Dis-nous un peu à propos de ton ami.",
+        "unauthorized": "Veuillez d’abord vous connecter.",
+        "noActiveProfile": "Choisis un profil avant de créer un personnage.",
+        "parentGateRequired": "La vérification adulte doit être refaite.",
+        "invalidInput": "Vérifie le nom et la description.",
+        "moderationBlocked": "On ne peut pas utiliser ça. Essaie une autre idée.",
+        "limitReached": "Ta maison est pleine. Essaie d’en supprimer un d’abord.",
+        "extractionFailed": "Un souci est survenu en dessinant ton ami.",
+        "workerUnavailable": "Un souci est survenu en dessinant ton ami.",
+        "unknown": "Oups, un souci est survenu. Réessaie."
+      }
+    },
+    "parentGate": {
+      "header": "Vérification adulte",
+      "questionPrefix": "Combien font",
+      "questionInfix": "moins",
+      "placeholder": "Tape la réponse",
+      "submit": "Valider",
+      "checking": "Vérification…",
+      "tryAgain": "Ce n’est pas tout à fait ça. Réessaie.",
+      "needsNumber": "Veuillez saisir un nombre.",
+      "lockedPrefix": "Respire un coup et réessaie dans",
+      "lockedSuffix": "s.",
+      "cancel": "Annuler"
+    },
+    "profile": {
+      "backLink": "← Tous les amis",
+      "stillDrawingTitle": "{name} arrive bientôt",
+      "stillDrawingBody": "Son portrait est en cours de dessin. Reviens dans un instant.",
+      "seeAllCta": "Voir tous les amis",
+      "actions": {
+        "feed": "Nourrir",
+        "exercise": "Faire bouger",
+        "dress": "Habiller"
+      },
+      "outfits": {
+        "heading": "Tenues",
+        "none": "Aucune tenue",
+        "lockedPrice": "{cost} crédits",
+        "errorEquip": "Impossible d’enregistrer le changement. Réessaie.",
+        "errorInsufficient": "Il te faut {cost} crédits pour débloquer ceci. Tu as {balance}.",
+        "errorUnlock": "Impossible de débloquer. Réessaie."
+      },
+      "voice": {
+        "heading": "Voix",
+        "presetHi": "Coucou",
+        "presetFeed": "Miam !",
+        "presetExercise": "Vroum !",
+        "presetBye": "Salut !",
+        "customLabel": "Fais dire quelque chose à {name} (adultes uniquement)",
+        "customPlaceholder": "Bonjour, je suis {name} !",
+        "customSubmit": "Le dire",
+        "customFooter": "{cost} crédit par phrase",
+        "thinking": "{name} réfléchit. Réessaie dans un instant.",
+        "errors": {
+          "notFound": "On n’a pas trouvé cet ami.",
+          "invalidInput": "Les phrases doivent faire 1 à 80 caractères.",
+          "parentGateRequired": "La vérification adulte doit être refaite.",
+          "moderationBlocked": "On ne peut pas utiliser ça. Essaie d’autres mots.",
+          "insufficientCredits": "Pas assez de crédits pour créer cette phrase.",
+          "synthesisFailed": "Oups, un souci est survenu. Réessaie dans un instant."
+        }
+      }
+    }
   }
 }

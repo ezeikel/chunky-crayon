@@ -1351,5 +1351,113 @@
       "advanced": "Avanzado",
       "expert": "Experto"
     }
+  },
+  "characters": {
+    "pageTitle": "Conoce a tus amigos",
+    "pageSubtitle": "Crea un amigo que aparezca en cada página para colorear.",
+    "comingSoonTitle": "Los personajes ya vienen",
+    "comingSoonBody": "Un momentito, lo estamos preparando para ti.",
+    "emptyTitle": "¡Vamos a crear a tu primer amigo!",
+    "emptyBody": "Elige un nombre, describe cómo es y lo dibujaremos para ti. Aparecerá en tus páginas para colorear.",
+    "addFriendCta": "Crear un amigo",
+    "fullHouse": "La casa está llena. Elimina uno para hacer espacio a alguien nuevo.",
+    "tile": {
+      "drawing": "Dibujando",
+      "retry": "Reintentar",
+      "drawingPlaceholder": "Estamos dibujando a tu nuevo amigo",
+      "failedPlaceholder": "Algo salió mal",
+      "gettingReady": "Preparando"
+    },
+    "modal": {
+      "title": "Crear un amigo",
+      "subtitle": "Crea un personaje que tu peque verá en las páginas para colorear.",
+      "name": {
+        "label": "¿Cómo se llama?",
+        "placeholder": "Rex"
+      },
+      "species": {
+        "label": "¿Qué tipo de amigo? (opcional)"
+      },
+      "prompt": {
+        "label": "Describe a tu amigo",
+        "placeholder": "¿Cómo es? ¿Qué le encanta?",
+        "examplesLabel": "¿Necesitas una idea?"
+      },
+      "voice": {
+        "label": "Elige una voz (opcional)",
+        "hint": "No te preocupes, podrás cambiarlo más tarde."
+      },
+      "footer": "Lo dibujaremos para ti, {name}. Tarda unos 30 segundos. Hasta {max} amigos por perfil.",
+      "next": "Siguiente",
+      "back": "Atrás",
+      "cancel": "Cancelar",
+      "submit": "Crear mi amigo",
+      "submitting": "Dibujando…",
+      "errors": {
+        "nameRequired": "Ponle un nombre a tu amigo.",
+        "promptRequired": "Cuéntanos un poquito sobre tu amigo.",
+        "unauthorized": "Inicia sesión primero, por favor.",
+        "noActiveProfile": "Elige un perfil antes de crear un personaje.",
+        "parentGateRequired": "Hay que volver a pasar la comprobación de adulto.",
+        "invalidInput": "Revisa el nombre y la descripción.",
+        "moderationBlocked": "Esa no se puede usar. Prueba con otra idea.",
+        "limitReached": "La casa está llena. Primero intenta eliminar uno.",
+        "extractionFailed": "Algo salió mal al dibujar a tu amigo.",
+        "workerUnavailable": "Algo salió mal al dibujar a tu amigo.",
+        "unknown": "Algo salió mal. Inténtalo de nuevo."
+      }
+    },
+    "parentGate": {
+      "header": "Comprobación de adulto",
+      "questionPrefix": "¿Cuánto es",
+      "questionInfix": "menos",
+      "placeholder": "Escribe la respuesta",
+      "submit": "Enviar",
+      "checking": "Comprobando…",
+      "tryAgain": "No es del todo correcto. Inténtalo de nuevo.",
+      "needsNumber": "Introduce un número, por favor.",
+      "lockedPrefix": "Respira y vuelve a intentarlo en",
+      "lockedSuffix": "s.",
+      "cancel": "Cancelar"
+    },
+    "profile": {
+      "backLink": "← Todos los amigos",
+      "stillDrawingTitle": "{name} ya viene",
+      "stillDrawingBody": "Estamos dibujando su retrato. Vuelve en un momentito.",
+      "seeAllCta": "Ver todos los amigos",
+      "actions": {
+        "feed": "Dar de comer",
+        "exercise": "Ejercicio",
+        "dress": "Vestir"
+      },
+      "outfits": {
+        "heading": "Conjuntos",
+        "none": "Sin conjunto",
+        "lockedPrice": "{cost} créditos",
+        "errorEquip": "No se pudo guardar el cambio. Inténtalo de nuevo.",
+        "errorInsufficient": "Necesitas {cost} créditos para desbloquear esto. Tienes {balance}.",
+        "errorUnlock": "No pudimos desbloquearlo. Inténtalo de nuevo."
+      },
+      "voice": {
+        "heading": "Voz",
+        "presetHi": "Di hola",
+        "presetFeed": "¡Ñam!",
+        "presetExercise": "¡Fiuu!",
+        "presetBye": "¡Adiós!",
+        "customLabel": "Haz que {name} diga algo (solo adultos)",
+        "customPlaceholder": "¡Hola, soy {name}!",
+        "customSubmit": "Decirlo",
+        "customFooter": "{cost} crédito por línea",
+        "thinking": "{name} está pensando. Inténtalo de nuevo en un momento.",
+        "errors": {
+          "notFound": "No pudimos encontrar a este amigo.",
+          "invalidInput": "Cada línea debe tener de 1 a 80 caracteres.",
+          "parentGateRequired": "Hay que volver a pasar la comprobación de adulto.",
+          "moderationBlocked": "Esa no se puede usar. Prueba con otras palabras.",
+          "insufficientCredits": "No hay suficientes créditos para crear esta línea.",
+          "synthesisFailed": "Algo salió mal. Inténtalo de nuevo en un momento."
+        }
+      }
+    }
   }
 }

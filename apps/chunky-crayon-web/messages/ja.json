@@ -1351,5 +1351,113 @@
       "advanced": "むずかしい",
       "expert": "エキスパート"
     }
+  },
+  "characters": {
+    "pageTitle": "おともだちに会おう",
+    "pageSubtitle": "毎回のぬりえに登場するおともだちをつくろう。",
+    "comingSoonTitle": "キャラクターはもうすぐ",
+    "comingSoonBody": "ただいま準備中です。もう少し待ってね。",
+    "emptyTitle": "はじめてのおともだちをつくろう！",
+    "emptyBody": "名前をつけて、見た目を教えてね。こちらで描いて、ぬりえに登場するよ。",
+    "addFriendCta": "おともだちをつくる",
+    "fullHouse": "いっぱいです。新しく追加するには、1人消してね。",
+    "tile": {
+      "drawing": "描いてるよ",
+      "retry": "もう一度",
+      "drawingPlaceholder": "新しいおともだちを描いてるよ",
+      "failedPlaceholder": "うまくいかなかったよ",
+      "gettingReady": "準備中"
+    },
+    "modal": {
+      "title": "おともだちをつくる",
+      "subtitle": "ぬりえに登場するキャラクターをつくろう。",
+      "name": {
+        "label": "おなまえは？",
+        "placeholder": "レックス"
+      },
+      "species": {
+        "label": "どんなおともだち？（任意）"
+      },
+      "prompt": {
+        "label": "おともだちを教えてね",
+        "placeholder": "どんな見た目？何が大好き？",
+        "examplesLabel": "例がほしい？"
+      },
+      "voice": {
+        "label": "こえをえらぶ（任意）",
+        "hint": "あとで変更できるから安心してね。"
+      },
+      "footer": "{name}を描くよ。約30秒かかります。プロフィールごとに最大{max}人まで。",
+      "next": "次へ",
+      "back": "戻る",
+      "cancel": "キャンセル",
+      "submit": "このおともだちをつくる",
+      "submitting": "描いてるよ…",
+      "errors": {
+        "nameRequired": "おともだちに名前をつけてね。",
+        "promptRequired": "おともだちのことを少し教えてね。",
+        "unauthorized": "先にサインインしてね。",
+        "noActiveProfile": "キャラクターをつくる前にプロフィールを選んでね。",
+        "parentGateRequired": "もう一度、おとなチェックが必要です。",
+        "invalidInput": "名前と説明を確認してね。",
+        "moderationBlocked": "それは使えないよ。別のアイデアにしてね。",
+        "limitReached": "いっぱいです。先に1人消してね。",
+        "extractionFailed": "おともだちを描くときに問題が起きたよ。",
+        "workerUnavailable": "おともだちを描くときに問題が起きたよ。",
+        "unknown": "問題が起きたよ。もう一度試してね。"
+      }
+    },
+    "parentGate": {
+      "header": "おとなチェック",
+      "questionPrefix": "",
+      "questionInfix": "ひく",
+      "placeholder": "答えを入力",
+      "submit": "送信",
+      "checking": "確認中…",
+      "tryAgain": "ちょっとちがうみたい。もう一度！",
+      "needsNumber": "数字を入力してね。",
+      "lockedPrefix": "深呼吸して、",
+      "lockedSuffix": "秒後にもう一度。",
+      "cancel": "キャンセル"
+    },
+    "profile": {
+      "backLink": "← おともだち一覧",
+      "stillDrawingTitle": "{name}はもうすぐ",
+      "stillDrawingBody": "いまおえを描いているところ。少ししたら戻ってきてね。",
+      "seeAllCta": "おともだち一覧を見る",
+      "actions": {
+        "feed": "ごはん",
+        "exercise": "うんどう",
+        "dress": "おきがえ"
+      },
+      "outfits": {
+        "heading": "おようふく",
+        "none": "おようふくなし",
+        "lockedPrice": "{cost}クレジット",
+        "errorEquip": "変更を保存できませんでした。もう一度試してね。",
+        "errorInsufficient": "開放には{cost}クレジット必要です。所持：{balance}。",
+        "errorUnlock": "開放できませんでした。もう一度試してね。"
+      },
+      "voice": {
+        "heading": "こえ",
+        "presetHi": "やあ！",
+        "presetFeed": "おいしい！",
+        "presetExercise": "ビューン！",
+        "presetBye": "バイバイ！",
+        "customLabel": "{name}に言わせたいこと（おとなのみ）",
+        "customPlaceholder": "こんにちは、{name}だよ！",
+        "customSubmit": "言わせる",
+        "customFooter": "1行につき{cost}クレジット",
+        "thinking": "{name}は考え中。少ししてから試してね。",
+        "errors": {
+          "notFound": "このおともだちが見つかりませんでした。",
+          "invalidInput": "1〜80文字で入力してね。",
+          "parentGateRequired": "もう一度、おとなチェックが必要です。",
+          "moderationBlocked": "それは使えないよ。別の言葉にしてね。",
+          "insufficientCredits": "このセリフを作るにはクレジットが足りません。",
+          "synthesisFailed": "問題が起きたよ。少ししてからもう一度試してね。"
+        }
+      }
+    }
   }
 }

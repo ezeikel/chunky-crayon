@@ -1351,5 +1351,113 @@
       "advanced": "Sehr fortgeschritten",
       "expert": "Experte"
     }
+  },
+  "characters": {
+    "pageTitle": "Triff deine Freunde",
+    "pageSubtitle": "Mach einen Freund, der auf jeder Malvorlage auftaucht.",
+    "comingSoonTitle": "Charaktere sind bald da",
+    "comingSoonBody": "Hab einen Moment Geduld, wir machen das gerade für dich fertig.",
+    "emptyTitle": "Lass uns deinen ersten Freund machen!",
+    "emptyBody": "Wähle einen Namen, beschreibe, wie er aussieht, und wir zeichnen ihn für dich. Er taucht in deinen Malvorlagen auf.",
+    "addFriendCta": "Freund erstellen",
+    "fullHouse": "Bei dir ist schon alles voll. Entferne einen, um Platz für jemanden Neuen zu machen.",
+    "tile": {
+      "drawing": "Wird gezeichnet",
+      "retry": "Erneut versuchen",
+      "drawingPlaceholder": "Wir zeichnen deinen neuen Freund",
+      "failedPlaceholder": "Etwas ist schiefgelaufen",
+      "gettingReady": "Wird vorbereitet"
+    },
+    "modal": {
+      "title": "Freund erstellen",
+      "subtitle": "Erstelle einen Charakter, den dein Kind in Malvorlagen sieht.",
+      "name": {
+        "label": "Wie heißt er/sie?",
+        "placeholder": "Rex"
+      },
+      "species": {
+        "label": "Welche Art Freund? (optional)"
+      },
+      "prompt": {
+        "label": "Beschreibe deinen Freund",
+        "placeholder": "Wie sieht er aus? Was liebt er?",
+        "examplesLabel": "Brauchst du einen Start?"
+      },
+      "voice": {
+        "label": "Stimme auswählen (optional)",
+        "hint": "Keine Sorge, das kannst du später ändern."
+      },
+      "footer": "Wir zeichnen {name} für dich. Das dauert etwa 30 Sekunden. Bis zu {max} Freunde pro Profil.",
+      "next": "Weiter",
+      "back": "Zurück",
+      "cancel": "Abbrechen",
+      "submit": "Meinen Freund erstellen",
+      "submitting": "Wird gezeichnet…",
+      "errors": {
+        "nameRequired": "Gib deinem Freund einen Namen.",
+        "promptRequired": "Erzähl uns ein bisschen über deinen Freund.",
+        "unauthorized": "Bitte melde dich zuerst an.",
+        "noActiveProfile": "Wähle ein Profil, bevor du einen Charakter erstellst.",
+        "parentGateRequired": "Die Elternprüfung muss erneut bestanden werden.",
+        "invalidInput": "Prüfe Name und Beschreibung.",
+        "moderationBlocked": "Das geht leider nicht. Probier eine andere Idee.",
+        "limitReached": "Bei dir ist schon alles voll. Entferne zuerst einen.",
+        "extractionFailed": "Beim Zeichnen deines Freundes ist etwas schiefgelaufen.",
+        "workerUnavailable": "Beim Zeichnen deines Freundes ist etwas schiefgelaufen.",
+        "unknown": "Etwas ist schiefgelaufen. Bitte versuch es noch einmal."
+      }
+    },
+    "parentGate": {
+      "header": "Elternprüfung",
+      "questionPrefix": "Was ist",
+      "questionInfix": "minus",
+      "placeholder": "Antwort eingeben",
+      "submit": "Bestätigen",
+      "checking": "Wird geprüft…",
+      "tryAgain": "Nicht ganz. Versuch's nochmal.",
+      "needsNumber": "Bitte gib eine Zahl ein.",
+      "lockedPrefix": "Atme kurz durch und versuch es wieder in",
+      "lockedSuffix": "s.",
+      "cancel": "Abbrechen"
+    },
+    "profile": {
+      "backLink": "← Alle Freunde",
+      "stillDrawingTitle": "{name} ist unterwegs",
+      "stillDrawingBody": "Das Porträt wird gerade gezeichnet. Schau gleich noch mal vorbei.",
+      "seeAllCta": "Alle Freunde ansehen",
+      "actions": {
+        "feed": "Füttern",
+        "exercise": "Bewegen",
+        "dress": "Anziehen"
+      },
+      "outfits": {
+        "heading": "Outfits",
+        "none": "Kein Outfit",
+        "lockedPrice": "{cost} Credits",
+        "errorEquip": "Deine Änderung konnte nicht gespeichert werden. Versuch es erneut.",
+        "errorInsufficient": "Du brauchst {cost} Credits zum Freischalten. Du hast {balance}.",
+        "errorUnlock": "Das konnten wir nicht freischalten. Versuch es erneut."
+      },
+      "voice": {
+        "heading": "Stimme",
+        "presetHi": "Sag Hallo",
+        "presetFeed": "Mmmh!",
+        "presetExercise": "Wusch!",
+        "presetBye": "Tschüss!",
+        "customLabel": "Lass {name} etwas sagen (nur für Erwachsene)",
+        "customPlaceholder": "Hallo, ich bin {name}!",
+        "customSubmit": "Sagen",
+        "customFooter": "{cost} Credit pro Zeile",
+        "thinking": "{name} denkt nach. Versuch es gleich noch mal.",
+        "errors": {
+          "notFound": "Diesen Freund konnten wir nicht finden.",
+          "invalidInput": "Zeilen müssen 1 bis 80 Zeichen lang sein.",
+          "parentGateRequired": "Die Elternprüfung muss erneut bestanden werden.",
+          "moderationBlocked": "Das geht leider nicht. Probier andere Wörter.",
+          "insufficientCredits": "Nicht genug Credits für diese Zeile.",
+          "synthesisFailed": "Etwas ist schiefgelaufen. Versuch es gleich noch mal."
+        }
+      }
+    }
   }
 }

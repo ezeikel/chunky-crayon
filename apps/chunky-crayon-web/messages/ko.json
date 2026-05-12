@@ -1351,5 +1351,113 @@
       "advanced": "고급",
       "expert": "최고급"
     }
+  },
+  "characters": {
+    "pageTitle": "친구들을 만나봐요",
+    "pageSubtitle": "모든 색칠 페이지에 등장하는 친구를 만들어 보세요.",
+    "comingSoonTitle": "캐릭터 기능이 곧 찾아와요",
+    "comingSoonBody": "조금만 기다려 주세요. 열심히 준비 중이에요.",
+    "emptyTitle": "첫 번째 친구를 만들어 볼까요?",
+    "emptyBody": "이름을 정하고 생김새를 설명해 주세요. 우리가 그려 드릴게요. 색칠 페이지에 함께 등장해요.",
+    "addFriendCta": "친구 만들기",
+    "fullHouse": "친구가 가득 찼어요. 새 친구를 위해 한 명을 지워 주세요.",
+    "tile": {
+      "drawing": "그리는 중",
+      "retry": "다시 하기",
+      "drawingPlaceholder": "새 친구를 그리고 있어요",
+      "failedPlaceholder": "문제가 생겼어요",
+      "gettingReady": "준비 중"
+    },
+    "modal": {
+      "title": "친구 만들기",
+      "subtitle": "아이의 색칠 페이지에 나올 캐릭터를 만들어 보세요.",
+      "name": {
+        "label": "이름이 뭐예요?",
+        "placeholder": "렉스"
+      },
+      "species": {
+        "label": "어떤 친구인가요? (선택)"
+      },
+      "prompt": {
+        "label": "친구를 소개해 주세요",
+        "placeholder": "어떤 모습인가요? 뭘 좋아하나요?",
+        "examplesLabel": "예시가 필요하신가요?"
+      },
+      "voice": {
+        "label": "목소리 고르기 (선택)",
+        "hint": "걱정 마세요, 나중에 바꿀 수 있어요."
+      },
+      "footer": "{name}를 그려 드릴게요. 약 30초 걸려요. 프로필당 최대 {max}명까지 만들 수 있어요.",
+      "next": "다음",
+      "back": "뒤로",
+      "cancel": "취소",
+      "submit": "친구 만들기",
+      "submitting": "그리는 중…",
+      "errors": {
+        "nameRequired": "친구 이름을 지어 주세요.",
+        "promptRequired": "친구에 대해 조금만 알려 주세요.",
+        "unauthorized": "먼저 로그인해 주세요.",
+        "noActiveProfile": "캐릭터를 만들기 전에 프로필을 선택해 주세요.",
+        "parentGateRequired": "보호자 확인을 다시 통과해야 해요.",
+        "invalidInput": "이름과 설명을 확인해 주세요.",
+        "moderationBlocked": "그건 사용할 수 없어요. 다른 아이디어로 해볼까요?",
+        "limitReached": "친구가 가득 찼어요. 먼저 한 명을 지워 주세요.",
+        "extractionFailed": "친구를 그리는 중 문제가 생겼어요.",
+        "workerUnavailable": "친구를 그리는 중 문제가 생겼어요.",
+        "unknown": "문제가 생겼어요. 다시 시도해 주세요."
+      }
+    },
+    "parentGate": {
+      "header": "보호자 확인",
+      "questionPrefix": "",
+      "questionInfix": "빼기",
+      "placeholder": "정답을 입력하세요",
+      "submit": "확인",
+      "checking": "확인 중…",
+      "tryAgain": "거의 맞았어요. 다시 해볼까요?",
+      "needsNumber": "숫자를 입력해 주세요.",
+      "lockedPrefix": "잠깐 숨 고르고",
+      "lockedSuffix": "초 후에 다시 해보세요.",
+      "cancel": "취소"
+    },
+    "profile": {
+      "backLink": "← 모든 친구",
+      "stillDrawingTitle": "{name}가 곧 찾아와요",
+      "stillDrawingBody": "초상화를 그리고 있어요. 잠시 후 다시 와 주세요.",
+      "seeAllCta": "모든 친구 보기",
+      "actions": {
+        "feed": "먹이 주기",
+        "exercise": "운동하기",
+        "dress": "옷 입히기"
+      },
+      "outfits": {
+        "heading": "옷",
+        "none": "옷 없음",
+        "lockedPrice": "{cost} 크레딧",
+        "errorEquip": "변경 내용을 저장할 수 없어요. 다시 시도해 주세요.",
+        "errorInsufficient": "해제하려면 {cost} 크레딧이 필요해요. 보유: {balance}.",
+        "errorUnlock": "해제할 수 없었어요. 다시 시도해 주세요."
+      },
+      "voice": {
+        "heading": "목소리",
+        "presetHi": "안녕!",
+        "presetFeed": "냠냠!",
+        "presetExercise": "슝!",
+        "presetBye": "안녕~",
+        "customLabel": "{name}에게 말하게 하기 (보호자만)",
+        "customPlaceholder": "안녕, 나는 {name}야!",
+        "customSubmit": "말하기",
+        "customFooter": "한 줄당 {cost} 크레딧",
+        "thinking": "{name}가 생각 중이에요. 잠시 후 다시 해보세요.",
+        "errors": {
+          "notFound": "이 친구를 찾을 수 없어요.",
+          "invalidInput": "문장은 1~80자여야 해요.",
+          "parentGateRequired": "보호자 확인을 다시 통과해야 해요.",
+          "moderationBlocked": "그건 사용할 수 없어요. 다른 말로 해볼까요?",
+          "insufficientCredits": "이 문장을 만들 크레딧이 부족해요.",
+          "synthesisFailed": "문제가 생겼어요. 잠시 후 다시 시도해 주세요."
+        }
+      }
+    }
   }
 }
