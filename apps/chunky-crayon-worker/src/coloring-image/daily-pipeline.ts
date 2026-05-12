@@ -78,17 +78,40 @@ ${createColoringImagePrompt(cleanedDescription)}`;
   const styleFiles = await getReferenceFiles();
 
   const client = new OpenAI();
-  const result = await client.images.edit({
-    model: "gpt-image-2",
-    image: styleFiles,
-    prompt: styledPrompt,
-    size: "1024x1024",
-    quality: "high",
-  });
 
-  const b64 = result.data?.[0]?.b64_json;
+  // Retry once on timeout/transient OpenAI errors. Single retry is enough —
+  // 2026-05-12 cron lost a day to a one-off `images.edit` hang at ~15min.
+  const maxAttempts = 2;
+  let lastErr: unknown;
+  let b64: string | undefined;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const result = await client.images.edit({
+        model: "gpt-image-2",
+        image: styleFiles,
+        prompt: styledPrompt,
+        size: "1024x1024",
+        quality: "high",
+      });
+      b64 = result.data?.[0]?.b64_json;
+      if (!b64) {
+        throw new Error("[daily-pipeline] OpenAI returned no image");
+      }
+      break;
+    } catch (err) {
+      lastErr = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(
+        `[daily-cron] gpt-image-2 attempt ${attempt}/${maxAttempts} failed: ${msg}`,
+      );
+      if (attempt === maxAttempts) break;
+      await new Promise((r) => setTimeout(r, 2_000));
+    }
+  }
   if (!b64) {
-    throw new Error("[daily-pipeline] OpenAI returned no image");
+    throw lastErr instanceof Error
+      ? lastErr
+      : new Error("[daily-pipeline] gpt-image-2 failed after retries");
   }
   const buffer = Buffer.from(b64, "base64");
   const tempFileName = `temp/${Date.now()}-${Math.random()
