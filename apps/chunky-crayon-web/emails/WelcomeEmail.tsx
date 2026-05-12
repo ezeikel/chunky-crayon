@@ -17,10 +17,15 @@ type WelcomeEmailProps = {
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 
+const utm = (campaign: string) =>
+  `?utm_source=welcome-email&utm_medium=email&utm_campaign=${campaign}`;
+
 const WelcomeEmail = ({ unsubscribeUrl }: WelcomeEmailProps) => (
   <Html>
     <Head />
-    <Preview>Welcome to Chunky Crayon - Free daily coloring pages!</Preview>
+    <Preview>
+      Your first coloring page lands tomorrow — and 2 more you can grab now
+    </Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header */}
@@ -33,46 +38,68 @@ const WelcomeEmail = ({ unsubscribeUrl }: WelcomeEmailProps) => (
         {/* Hero */}
         <Section style={hero}>
           <Text style={welcomeEmoji}>🎨</Text>
-          <Heading style={heroTitle}>Welcome to the Coloring Club!</Heading>
-        </Section>
-
-        {/* Main Content */}
-        <Section style={content}>
-          <Text style={paragraph}>
-            You&apos;re all set to receive a <strong>free coloring page</strong>{' '}
-            in your inbox every day!
-          </Text>
-          <Text style={paragraph}>
-            Each page is uniquely generated just for you - no two are ever the
-            same.
+          <Heading style={heroTitle}>You&apos;re in.</Heading>
+          <Text style={heroSubtitle}>
+            One free coloring page in your inbox every morning, starting
+            tomorrow.
           </Text>
         </Section>
 
-        {/* What to Expect */}
+        {/* What happens next — concrete, not hype. */}
         <Section style={expectSection}>
           <Heading as="h2" style={expectTitle}>
-            What to Expect
+            What happens next
           </Heading>
           <Text style={expectItem}>
-            <span style={checkmark}>✓</span> Daily coloring page delivered to
-            your inbox
+            <span style={checkmark}>1.</span>{' '}
+            <strong>Tomorrow at 8:30am UK time</strong>, your first page lands
+            as a PDF. Print it, or color it on screen.
           </Text>
           <Text style={expectItem}>
-            <span style={checkmark}>✓</span> High-quality PDF ready to print
+            <span style={checkmark}>2.</span> A different page every day — we
+            draw something new based on what kids are loving right now.
           </Text>
           <Text style={expectItem}>
-            <span style={checkmark}>✓</span> Fun themes for kids of all ages
-          </Text>
-          <Text style={expectItem}>
-            <span style={checkmark}>✓</span> Completely free, forever
+            <span style={checkmark}>3.</span> One-click unsubscribe at the
+            bottom of every email. No spam, ever.
           </Text>
         </Section>
 
-        {/* CTA */}
-        <Section style={ctaSection}>
-          <Text style={ctaText}>Can&apos;t wait for tomorrow?</Text>
-          <Link href={baseUrl} style={ctaButton}>
-            Create Your Own Now
+        {/* Soft pitch — try the generator while you wait. This is the
+            highest-engagement moment we'll have with a new subscriber.
+            We've earned the right to one ask. */}
+        <Section style={pitchCard}>
+          <Text style={pitchEyebrow}>While you wait</Text>
+          <Heading as="h3" style={pitchTitle}>
+            Make a custom page now
+          </Heading>
+          <Text style={pitchBody}>
+            Type any subject — &quot;a fox in a spacesuit&quot;, &quot;our dog
+            but as a pirate&quot;, your kid&apos;s name as a giant balloon — and
+            we&apos;ll draw it. Print-ready in 30 seconds.{' '}
+            <strong>First 2 are free, no signup needed.</strong>
+          </Text>
+          <Link href={`${baseUrl}${utm('try-generator')}`} style={pitchButton}>
+            Try the generator
+          </Link>
+        </Section>
+
+        {/* Bundle pitch — secondary, gentle. "Here's what's also available
+            if you fall in love with daily coloring." */}
+        <Section style={bundleCard}>
+          <Text style={bundleEyebrow}>If your kid gets hooked</Text>
+          <Heading as="h3" style={bundleTitle}>
+            Themed bundles, £4.99 a pop
+          </Heading>
+          <Text style={bundleBody}>
+            10-page coloring books on themes like Dino Dance Party. One-time
+            buy, no subscription, yours to print forever.
+          </Text>
+          <Link
+            href={`${baseUrl}/products/digital${utm('welcome-bundles')}`}
+            style={bundleButton}
+          >
+            See the bundles
           </Link>
         </Section>
 
@@ -100,9 +127,9 @@ const WelcomeEmail = ({ unsubscribeUrl }: WelcomeEmailProps) => (
   </Html>
 );
 
-// Styles - using warm analogous palette (coral, peach, cream)
+// Styles
 const main = {
-  backgroundColor: '#FAF7F2', // paper-cream
+  backgroundColor: '#FAF7F2',
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 };
@@ -125,7 +152,7 @@ const logoLink = {
 const logo = {
   fontSize: '28px',
   fontWeight: '700',
-  color: '#DA7353', // crayon-orange (coral)
+  color: '#DA7353',
   margin: '0',
 };
 
@@ -135,31 +162,26 @@ const hero = {
   padding: '40px 32px',
   textAlign: 'center' as const,
   marginBottom: '24px',
-  border: '2px solid #F0E6D8', // warm border
+  border: '2px solid #F0E6D8',
 };
 
 const welcomeEmoji = {
   fontSize: '48px',
-  margin: '0 0 16px',
+  margin: '0 0 8px',
 };
 
 const heroTitle = {
-  fontSize: '28px',
+  fontSize: '32px',
   fontWeight: '700',
   color: '#333333',
-  margin: '0',
+  margin: '0 0 12px',
 };
 
-const content = {
-  padding: '0 24px',
-  textAlign: 'center' as const,
-};
-
-const paragraph = {
+const heroSubtitle = {
   fontSize: '16px',
-  lineHeight: '26px',
-  color: '#333333',
-  margin: '0 0 16px',
+  lineHeight: '24px',
+  color: '#666666',
+  margin: '0',
 };
 
 const expectSection = {
@@ -167,54 +189,120 @@ const expectSection = {
   borderRadius: '16px',
   padding: '24px',
   margin: '24px 0',
-  border: '2px solid #F0E6D8', // warm border
+  border: '2px solid #F0E6D8',
 };
 
 const expectTitle = {
   fontSize: '18px',
   fontWeight: '600',
-  color: '#DA7353', // crayon-orange (coral)
+  color: '#DA7353',
   margin: '0 0 16px',
   textAlign: 'center' as const,
 };
 
 const expectItem = {
   fontSize: '14px',
+  lineHeight: '22px',
   color: '#333333',
-  margin: '0 0 12px',
+  margin: '0 0 14px',
   paddingLeft: '8px',
 };
 
 const checkmark = {
   marginRight: '8px',
-  color: '#EDAF8B', // crayon-teal (peach)
+  color: '#EDAF8B',
   fontWeight: '600',
 };
 
-const ctaSection = {
+const pitchCard = {
+  backgroundColor: '#FFFFFF',
+  borderRadius: '16px',
+  padding: '28px 24px',
+  margin: '24px 0',
+  border: '2px solid #F0E6D8',
   textAlign: 'center' as const,
-  padding: '24px 0',
 };
 
-const ctaText = {
-  fontSize: '16px',
-  color: '#666666',
+const pitchEyebrow = {
+  fontSize: '13px',
+  fontWeight: '600',
+  color: '#DA7353',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '1px',
+  margin: '0 0 12px',
+};
+
+const pitchTitle = {
+  fontSize: '22px',
+  fontWeight: '700',
+  color: '#333333',
+  margin: '0 0 12px',
+};
+
+const pitchBody = {
+  fontSize: '15px',
+  lineHeight: '22px',
+  color: '#555555',
   margin: '0 0 16px',
 };
 
-const ctaButton = {
-  backgroundColor: '#DA7353', // crayon-orange (coral)
+const pitchButton = {
+  backgroundColor: '#DA7353',
   color: '#FFFFFF',
   padding: '14px 28px',
   borderRadius: '12px',
   textDecoration: 'none',
   fontWeight: '600',
-  fontSize: '16px',
+  fontSize: '15px',
+  display: 'inline-block',
+};
+
+const bundleCard = {
+  backgroundColor: '#FAF7F2',
+  borderRadius: '16px',
+  padding: '24px',
+  margin: '24px 0',
+  border: '1px dashed #D9C7B0',
+  textAlign: 'center' as const,
+};
+
+const bundleEyebrow = {
+  fontSize: '12px',
+  fontWeight: '600',
+  color: '#999999',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '1px',
+  margin: '0 0 8px',
+};
+
+const bundleTitle = {
+  fontSize: '18px',
+  fontWeight: '700',
+  color: '#333333',
+  margin: '0 0 8px',
+};
+
+const bundleBody = {
+  fontSize: '14px',
+  lineHeight: '20px',
+  color: '#666666',
+  margin: '0 0 16px',
+};
+
+const bundleButton = {
+  backgroundColor: '#FFFFFF',
+  color: '#DA7353',
+  border: '2px solid #DA7353',
+  padding: '12px 24px',
+  borderRadius: '10px',
+  textDecoration: 'none',
+  fontWeight: '600',
+  fontSize: '14px',
   display: 'inline-block',
 };
 
 const hr = {
-  borderColor: '#F0E6D8', // warm border
+  borderColor: '#F0E6D8',
   margin: '32px 0',
 };
 
@@ -225,7 +313,7 @@ const footer = {
 
 const footerText = {
   fontSize: '14px',
-  color: '#DA7353', // crayon-orange (coral)
+  color: '#DA7353',
   fontWeight: '600',
   margin: '0 0 12px',
 };

@@ -296,12 +296,13 @@
   },
   "email": {
     "signup": {
-      "title": "Free Daily Coloring!",
-      "subtitle": "Get a <free>free</free> coloring page in your inbox every day.",
+      "title": "One free coloring page in your inbox, every morning",
+      "subtitle": "Drawn fresh daily, based on what kids are loving. <free>Free</free>, no spam, unsubscribe in one click.",
+      "trustLine": "Join 100+ parents",
       "placeholder": "parent@example.com",
-      "join": "Join",
+      "join": "Get my daily page",
       "success": "Success!",
-      "successDescription": "You have successfully joined the email list!",
+      "successDescription": "Check your inbox — your first page lands tomorrow at 8:30 UK time.",
       "error": "Something went wrong",
       "errorDescription": "Failed to join the email list. Please try again."
     },

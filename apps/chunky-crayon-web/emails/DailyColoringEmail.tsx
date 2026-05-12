@@ -5,16 +5,23 @@ import {
   Heading,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
   Section,
   Text,
 } from '@react-email/components';
+import type { DailyUpsell } from '@/lib/email-upsell';
 
 type DailyColoringEmailProps = {
   previewText?: string;
   unsubscribeUrl: string;
+  /**
+   * Today's upsell variant (subscription, bundle, app download, share,
+   * comic-strip). Resolved by `getDailyUpsell()` at send time. Optional
+   * because preview tools may render without one — fall back to a
+   * generic "visit Chunky Crayon" CTA when absent.
+   */
+  upsell?: DailyUpsell;
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
@@ -22,6 +29,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 const DailyColoringEmail = ({
   previewText = 'Your daily coloring page is here!',
   unsubscribeUrl,
+  upsell,
 }: DailyColoringEmailProps) => {
   const date = new Date();
   const dayName = date.toLocaleDateString('en-GB', { weekday: 'long' });
@@ -52,38 +60,14 @@ const DailyColoringEmail = ({
           {/* Main Content */}
           <Section style={content}>
             <Text style={paragraph}>
-              Your daily coloring page is attached to this email as a PDF.
-            </Text>
-            <Text style={paragraph}>
-              Print it out and let your creativity shine!
+              Today&apos;s coloring page is attached to this email. Print and
+              go.
             </Text>
           </Section>
 
-          {/* Tips Section */}
-          <Section style={tipsSection}>
-            <Heading as="h2" style={tipsTitle}>
-              Coloring Tips
-            </Heading>
-            <Text style={tipItem}>
-              <span style={tipEmoji}>1.</span> Use crayons, colored pencils, or
-              markers
-            </Text>
-            <Text style={tipItem}>
-              <span style={tipEmoji}>2.</span> Try mixing different colors
-            </Text>
-            <Text style={tipItem}>
-              <span style={tipEmoji}>3.</span> Have fun - there are no wrong
-              colors!
-            </Text>
-          </Section>
-
-          {/* CTA */}
-          <Section style={ctaSection}>
-            <Text style={ctaText}>Want more coloring pages?</Text>
-            <Link href={baseUrl} style={ctaButton}>
-              Visit Chunky Crayon
-            </Link>
-          </Section>
+          {/* Upsell — one clearly-demarcated "you might also like" card.
+              Picks a different variant every day of the week. */}
+          {upsell ? <UpsellCard upsell={upsell} /> : <GenericCta />}
 
           <Hr style={hr} />
 
@@ -109,6 +93,61 @@ const DailyColoringEmail = ({
     </Html>
   );
 };
+
+const UpsellCard = ({ upsell }: { upsell: DailyUpsell }) => {
+  // Bundle upsell has runtime-fetched fields. When the send loop hasn't
+  // filled them in (e.g. no published bundle that day), gracefully
+  // skip to the generic CTA so the email still ships.
+  if (upsell.kind === 'bundle') {
+    if (!upsell.bundleName || !upsell.ctaUrl) {
+      return <GenericCta />;
+    }
+    return (
+      <Section style={upsellCard}>
+        <Text style={upsellEyebrow}>{upsell.headline}</Text>
+        <Heading as="h3" style={upsellTitle}>
+          {upsell.bundleName}
+        </Heading>
+        {upsell.bundleTagline ? (
+          <Text style={upsellBody}>{upsell.bundleTagline}</Text>
+        ) : null}
+        {upsell.bundlePriceDisplay ? (
+          <Text style={upsellPrice}>{upsell.bundlePriceDisplay}</Text>
+        ) : null}
+        <Link href={upsell.ctaUrl} style={upsellButton}>
+          {upsell.ctaLabel}
+        </Link>
+      </Section>
+    );
+  }
+
+  // All other variants are self-contained.
+  return (
+    <Section style={upsellCard}>
+      <Text style={upsellEyebrow}>{upsell.headline}</Text>
+      <Text style={upsellBody}>{upsell.body}</Text>
+      <Link href={upsell.ctaUrl} style={upsellButton}>
+        {upsell.ctaLabel}
+      </Link>
+    </Section>
+  );
+};
+
+const GenericCta = () => (
+  <Section style={upsellCard}>
+    <Text style={upsellEyebrow}>Want a custom page?</Text>
+    <Text style={upsellBody}>
+      Type any subject and we&apos;ll generate a print-ready coloring page in 30
+      seconds. First 2 free.
+    </Text>
+    <Link
+      href={`${baseUrl}/?utm_source=daily-email&utm_medium=email&utm_campaign=generic-cta`}
+      style={upsellButton}
+    >
+      Make your own
+    </Link>
+  </Section>
+);
 
 // Styles - using warm analogous palette (coral, peach, cream)
 const main = {
@@ -145,7 +184,7 @@ const hero = {
   padding: '32px',
   textAlign: 'center' as const,
   marginBottom: '24px',
-  border: '2px solid #F0E6D8', // warm border
+  border: '2px solid #F0E6D8',
 };
 
 const heroTitle = {
@@ -173,59 +212,58 @@ const paragraph = {
   margin: '0 0 16px',
 };
 
-const tipsSection = {
+const upsellCard = {
   backgroundColor: '#FFFFFF',
   borderRadius: '16px',
-  padding: '24px',
+  padding: '28px 24px',
   margin: '24px 0',
-  border: '2px solid #F0E6D8', // warm border
-};
-
-const tipsTitle = {
-  fontSize: '18px',
-  fontWeight: '600',
-  color: '#DA7353', // crayon-orange (coral)
-  margin: '0 0 16px',
+  border: '2px solid #F0E6D8',
   textAlign: 'center' as const,
 };
 
-const tipItem = {
-  fontSize: '14px',
+const upsellEyebrow = {
+  fontSize: '13px',
+  fontWeight: '600',
+  color: '#DA7353',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '1px',
+  margin: '0 0 12px',
+};
+
+const upsellTitle = {
+  fontSize: '22px',
+  fontWeight: '700',
   color: '#333333',
   margin: '0 0 8px',
-  paddingLeft: '8px',
 };
 
-const tipEmoji = {
-  marginRight: '8px',
-  fontWeight: '600',
-  color: '#EDAF8B', // crayon-teal (peach)
-};
-
-const ctaSection = {
-  textAlign: 'center' as const,
-  padding: '24px 0',
-};
-
-const ctaText = {
-  fontSize: '16px',
-  color: '#666666',
+const upsellBody = {
+  fontSize: '15px',
+  lineHeight: '22px',
+  color: '#555555',
   margin: '0 0 16px',
 };
 
-const ctaButton = {
-  backgroundColor: '#DA7353', // crayon-orange (coral)
+const upsellPrice = {
+  fontSize: '20px',
+  fontWeight: '700',
+  color: '#333333',
+  margin: '0 0 16px',
+};
+
+const upsellButton = {
+  backgroundColor: '#DA7353',
   color: '#FFFFFF',
   padding: '14px 28px',
   borderRadius: '12px',
   textDecoration: 'none',
   fontWeight: '600',
-  fontSize: '16px',
+  fontSize: '15px',
   display: 'inline-block',
 };
 
 const hr = {
-  borderColor: '#F0E6D8', // warm border
+  borderColor: '#F0E6D8',
   margin: '32px 0',
 };
 
@@ -236,7 +274,7 @@ const footer = {
 
 const footerText = {
   fontSize: '14px',
-  color: '#DA7353', // crayon-orange (coral)
+  color: '#DA7353',
   fontWeight: '600',
   margin: '0 0 12px',
 };

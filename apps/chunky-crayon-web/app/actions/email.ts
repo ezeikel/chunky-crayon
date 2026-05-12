@@ -6,11 +6,18 @@ import { Resend } from 'resend';
 import { render } from '@react-email/components';
 import { db, GenerationType, ColoringImage } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
+import {
+  EMAIL_LIST,
+  DEFAULT_LISTS,
+  VALID_LIST_SLUGS,
+  type EmailListSlug,
+} from '@/lib/email-lists';
 import generatePDFNode from '@/utils/generatePDFNode';
 import streamToBuffer from '@/utils/streamToBuffer';
 import { fetchSvg } from '@one-colored-pixel/canvas';
 import { getUnsubscribeUrl } from '@/lib/unsubscribe';
 import DailyColoringEmail from '@/emails/DailyColoringEmail';
+import { getDailyUpsell, type DailyUpsell } from '@/lib/email-upsell';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
 import TrialEndingEmail from '@/emails/TrialEndingEmail';
@@ -177,10 +184,32 @@ export const joinColoringPageEmailList = async (
   const rawEmail = (formData.get('email') as string) || '';
   const rawSource = (formData.get('source') as string) || '';
   const rawSourceSlug = (formData.get('sourceSlug') as string) || '';
+  // `lists` arrives as a comma-separated string from the hidden input
+  // so a single field can express multi-list signups ("subscribe me to
+  // daily + bundles announcements from this footer form"). Defaults to
+  // DEFAULT_LISTS when absent. Every slug is validated against
+  // VALID_LIST_SLUGS — never trust raw form input.
+  const rawLists = (formData.get('lists') as string) || '';
 
   const email = normalizeEmail(rawEmail);
   const source = rawSource.trim().slice(0, 80) || null;
   const sourceSlug = rawSourceSlug.trim().slice(0, 120) || null;
+
+  const requestedLists = rawLists
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  const validLists =
+    requestedLists.length > 0
+      ? (requestedLists.filter((s) =>
+          VALID_LIST_SLUGS.has(s),
+        ) as EmailListSlug[])
+      : (DEFAULT_LISTS as readonly EmailListSlug[]);
+  // Guarantee at least one list — caller may have passed garbage.
+  const finalLists =
+    validLists.length > 0
+      ? validLists
+      : (DEFAULT_LISTS as readonly EmailListSlug[]);
 
   if (!email || !email.includes('@')) {
     return { error: 'Please enter a valid email.', success: false };
@@ -190,7 +219,7 @@ export const joinColoringPageEmailList = async (
     // Look up existing row (any status).
     const existing = await db.emailSubscriber.findUnique({
       where: { brand_email: { brand: BRAND, email } },
-      select: { id: true, unsubscribedAt: true },
+      select: { id: true, unsubscribedAt: true, lists: true },
     });
 
     if (existing) {
@@ -204,28 +233,43 @@ export const joinColoringPageEmailList = async (
           success: false,
         };
       }
-      // Already active. Idempotent re-submit — return success without
-      // re-sending the welcome.
+      // Already active. Merge new list slugs into the existing array
+      // so a daily-coloring subscriber who later opts into bundles-
+      // announce via a different form actually gets both. Idempotent —
+      // duplicate slugs filtered out.
+      const merged = Array.from(new Set([...existing.lists, ...finalLists]));
+      if (merged.length !== existing.lists.length) {
+        await db.emailSubscriber.update({
+          where: { brand_email: { brand: BRAND, email } },
+          data: { lists: merged },
+        });
+      }
       return { success: true, email };
     }
 
     // First-time signup.
     let welcomeEmailId: string | null = null;
-    try {
-      const unsubscribeUrl = getUnsubscribeUrl(email);
-      const welcomeEmailHtml = await render(WelcomeEmail({ unsubscribeUrl }));
-      const sendResult = await resend.emails.send({
-        from: getResendFromAddress('no-reply', 'Chunky Crayon'),
-        to: email,
-        subject: 'Welcome to Chunky Crayon! 🎨',
-        html: welcomeEmailHtml,
-      });
-      welcomeEmailId = sendResult.data?.id ?? null;
-    } catch (err) {
-      // Welcome email failure shouldn't block the signup itself.
-      // Subscriber row gets created anyway; the daily cron is the
-      // primary value-delivery channel, not the welcome.
-      console.error('[joinColoringPageEmailList] welcome email failed:', err);
+    // Only send the welcome email if they signed up for the daily list.
+    // A pure bundles-announce signup (no daily-coloring) shouldn't get
+    // the "welcome to daily coloring!" welcome — that'd be misleading.
+    const shouldSendWelcome = finalLists.includes(EMAIL_LIST.DAILY_COLORING);
+    if (shouldSendWelcome) {
+      try {
+        const unsubscribeUrl = getUnsubscribeUrl(email);
+        const welcomeEmailHtml = await render(WelcomeEmail({ unsubscribeUrl }));
+        const sendResult = await resend.emails.send({
+          from: getResendFromAddress('no-reply', 'Chunky Crayon'),
+          to: email,
+          subject: 'Welcome to Chunky Crayon! 🎨',
+          html: welcomeEmailHtml,
+        });
+        welcomeEmailId = sendResult.data?.id ?? null;
+      } catch (err) {
+        // Welcome email failure shouldn't block the signup itself.
+        // Subscriber row gets created anyway; the daily cron is the
+        // primary value-delivery channel, not the welcome.
+        console.error('[joinColoringPageEmailList] welcome email failed:', err);
+      }
     }
 
     await db.emailSubscriber.create({
@@ -234,6 +278,7 @@ export const joinColoringPageEmailList = async (
         email,
         source,
         sourceSlug,
+        lists: [...finalLists],
         welcomeEmailId,
       },
     });
@@ -270,15 +315,26 @@ export const joinColoringPageEmailList = async (
 };
 
 /**
- * List active subscribers for the daily-image send loop.
+ * List active subscribers for a given list slug.
  *
  * Reads from our `email_subscribers` Neon table (post-2026-05 migration
- * off Resend Audiences). Filters out anyone who's unsubscribed; brand-
- * scoped so a future CH list doesn't get CC's emails.
+ * off Resend Audiences). Filters by:
+ *   - brand (so CC + CH don't bleed)
+ *   - nuclear unsubscribe (`unsubscribedAt IS NULL`)
+ *   - per-list membership (`listSlug = ANY(lists)`)
+ *
+ * Default `listSlug` is the daily-coloring list, preserving the
+ * pre-multi-list behaviour for the daily cron.
  */
-export const getEmailListMembers = async (): Promise<string[]> => {
+export const getEmailListMembers = async (
+  listSlug: EmailListSlug = EMAIL_LIST.DAILY_COLORING,
+): Promise<string[]> => {
   const rows = await db.emailSubscriber.findMany({
-    where: { brand: BRAND, unsubscribedAt: null },
+    where: {
+      brand: BRAND,
+      unsubscribedAt: null,
+      lists: { has: listSlug },
+    },
     select: { email: true },
     orderBy: { subscribedAt: 'asc' },
   });
@@ -331,9 +387,12 @@ const sendSingleColoringEmail = async (
   subject: string,
   filename: string,
   coloringImagePdf: Buffer,
+  upsell?: DailyUpsell,
 ) => {
   const unsubscribeUrl = getUnsubscribeUrl(to);
-  const emailHtml = await render(DailyColoringEmail({ unsubscribeUrl }));
+  const emailHtml = await render(
+    DailyColoringEmail({ unsubscribeUrl, upsell }),
+  );
 
   return resend.emails.send({
     from: getResendFromAddress('no-reply', 'Chunky Crayon'),
@@ -379,6 +438,13 @@ export const sendColoringImageEmail = async (
   const subject = getEmailSubject(generationType);
   const filename = getEmailFilename(generationType);
 
+  // Resolve today's upsell variant once and reuse for every recipient.
+  // The variant is day-of-week based (see lib/email-upsell.ts), so
+  // it's identical for every subscriber in this batch. Bundle variants
+  // additionally need a DB lookup to fill in the runtime fields
+  // (name, tagline, price, slug → URL).
+  const upsell = await resolveDailyUpsell();
+
   // Send emails with rate limiting
   for (let i = 0; i < emails.length; i++) {
     if (i > 0) {
@@ -386,11 +452,66 @@ export const sendColoringImageEmail = async (
     }
 
     try {
-      await sendSingleColoringEmail(emails[i], subject, filename, pdfBuffer);
+      await sendSingleColoringEmail(
+        emails[i],
+        subject,
+        filename,
+        pdfBuffer,
+        upsell,
+      );
       console.log(`📧 Sent coloring email to: ${emails[i]}`);
     } catch (error) {
       console.error(`Failed to send email to ${emails[i]}:`, error);
     }
+  }
+};
+
+/**
+ * Resolve today's daily-email upsell variant. Pure variants (subscription,
+ * app, share, comic-strip) are returned as-is from getDailyUpsell().
+ * Bundle variants need a DB lookup to fill in the runtime fields —
+ * picks the latest published CC bundle. If no bundle is published,
+ * returns the variant with empty bundle fields so the email template
+ * falls back to its generic CTA.
+ */
+const resolveDailyUpsell = async (): Promise<DailyUpsell> => {
+  const variant = getDailyUpsell();
+
+  if (variant.kind !== 'bundle') return variant;
+
+  try {
+    const bundle = await db.bundle.findFirst({
+      where: { brand: 'CHUNKY_CRAYON', published: true },
+      select: {
+        slug: true,
+        name: true,
+        tagline: true,
+        pricePence: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!bundle) return variant;
+
+    const ctaUrl = `${baseUrl}/products/digital/${bundle.slug}?utm_source=daily-email&utm_medium=email&utm_campaign=upsell-bundle-${bundle.slug}`;
+    // Default to GBP display since this list is UK-skewed. The product
+    // page itself geo-detects so the click-through shows correct
+    // currency at checkout. pricePence is in 1/100ths (GBP minor units).
+    const bundlePriceDisplay = bundle.pricePence
+      ? `£${(bundle.pricePence / 100).toFixed(2)}`
+      : undefined;
+
+    return {
+      ...variant,
+      bundleSlug: bundle.slug,
+      bundleName: bundle.name,
+      bundleTagline: bundle.tagline,
+      bundlePriceDisplay,
+      ctaUrl,
+    };
+  } catch (err) {
+    console.error('[daily-email] bundle lookup failed:', err);
+    return variant;
   }
 };
 

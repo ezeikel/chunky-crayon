@@ -76,6 +76,12 @@ async function main() {
           brand: 'CHUNKY_CRAYON',
           email,
           source: 'migrate:resend-backfill',
+          // Historical Resend contacts all signed up via the daily
+          // coloring CTAs (homepage hero, footer, modal). They never
+          // had per-list semantics, so default them all to the
+          // daily-coloring list. Future signups can multi-list as
+          // needed.
+          lists: ['daily-coloring'],
           // Preserve the historical opt-out state — if they were
           // already unsubscribed in Resend, mark them as such here
           // too so the signup action keeps refusing re-subs.

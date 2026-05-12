@@ -29,6 +29,14 @@ type JoinColoringPageEmailListFormProps = {
    * "modal" conversions down by which landing the user was on.
    */
   sourceSlug?: string;
+  /**
+   * Comma-separated list slugs the subscriber should be added to. See
+   * lib/email-lists.ts for valid values. Defaults to 'daily-coloring'.
+   * Multi-list example: 'daily-coloring,bundles-announce' for a
+   * footer form that asks "send me both daily pages and bundle
+   * announcements".
+   */
+  lists?: string;
 };
 
 const JoinColoringPageEmailListForm = ({
@@ -36,6 +44,7 @@ const JoinColoringPageEmailListForm = ({
   location = 'hero',
   source,
   sourceSlug,
+  lists,
 }: JoinColoringPageEmailListFormProps) => {
   const t = useTranslations('email');
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -168,6 +177,13 @@ const JoinColoringPageEmailListForm = ({
               ),
             })}
           </p>
+          {/* Social proof — only show on the hero variant, not the
+              footer compact form (no room there). Numbers stay
+              hardcoded in translations for now; small list, no value
+              in a runtime lookup. Revisit when we cross 1K. */}
+          <p className="font-tondo text-xs text-text-tertiary mt-1.5">
+            {t('signup.trustLine')}
+          </p>
         </div>
       )}
 
@@ -180,11 +196,14 @@ const JoinColoringPageEmailListForm = ({
         )}
       >
         {/* Attribution — hidden inputs are picked up by the server
-            action and written to email_subscribers.source / .sourceSlug. */}
+            action and written to email_subscribers.source / .sourceSlug
+            / .lists. `lists` is comma-separated; defaults server-side
+            to 'daily-coloring' when omitted. */}
         <input type="hidden" name="source" value={source ?? location} />
         {sourceSlug ? (
           <input type="hidden" name="sourceSlug" value={sourceSlug} />
         ) : null}
+        {lists ? <input type="hidden" name="lists" value={lists} /> : null}
         <Input
           type="email"
           name="email"
