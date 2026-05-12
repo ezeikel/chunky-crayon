@@ -947,3 +947,169 @@ enum ComicStripTheme {
   SCHOOL
   ADVENTURE
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// UGC Ads System — see docs/ugc-ads/README.md
+// ─────────────────────────────────────────────────────────────────────
+
+// Lifecycle of a synthetic creator persona on TikTok.
+// drafting → admin reviews assets → warming → active → (banned|retired)
+enum PersonaStatus {
+  DRAFTING
+  WARMING
+  ACTIVE
+  BANNED
+  RETIRED
+}
+
+// Posting posture for the persona. v1 = STEALTH only; OFFICIAL reserved
+// for a future "post via @chunkycrayon, AI-labeled" path.
+enum PersonaPosture {
+  STEALTH
+  OFFICIAL
+}
+
+// A synthetic TikTok creator. One row per (handle, device, voice, face).
+// Identity assets live on R2 at ugc-personas/{handle}/.
+model Persona {
+  id          String         @id @default(cuid())
+  handle      String         @unique // tiktok handle, no @
+  displayName String
+  bio         String
+  status      PersonaStatus  @default(DRAFTING)
+  posture     PersonaPosture @default(STEALTH)
+
+  // identity (Json columns are Zod-validated in lib/ugc-ads/types.ts —
+  // do not write raw JSON, always go through the parser)
+  faceBriefJson Json // FaceBriefSchema
+  faceStillUrl  String // canonical persona face, R2
+  pfpUrl        String // profile-picture variant (different shot), R2
+  voiceId       String // ElevenLabs voice_id
+
+  // research-output blocks (Zod-validated)
+  followListJson     Json // FollowListSchema (split by category)
+  likeTargetsJson    Json
+  commentTargetsJson Json
+
+  // infrastructure — operator-filled, system tracks for cross-link safety.
+  // Two personas sharing deviceFingerprint or proxyEndpoint = bulk-ban risk;
+  // admin UI warns on collision.
+  deviceLabel       String? // human label, e.g. "iPhone 12 Pro (UGC #1)"
+  deviceFingerprint String? // freeform fingerprint identifier
+  simLast4          String?
+  proxyEndpoint     String?
+  proxyProvider     String?
+  accountCreatedAt  DateTime?
+  firstWarmupAt     DateTime?
+  firstAdAt         DateTime?
+
+  // tracking — utmCampaign is locked to handle; same string appears on every
+  // /start link in this persona's bio so PostHog can roll up per persona.
+  utmCampaign String  @unique
+  notes       String?
+
+  warmupClips   UgcWarmUpClip[]
+  warmupActions UgcWarmUpAction[]
+  ads           UgcAd[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Cross-link safety lookups — admin UI hits these to flag collisions
+  // before the operator accidentally reuses a device or proxy.
+  @@index([deviceFingerprint])
+  @@index([proxyEndpoint])
+  @@index([status])
+  @@map("personas")
+}
+
+// Abstract b-roll clips (no face) generated during persona creation, posted
+// during warm-up days 8-14 to make the account look lived-in before the
+// first real ad drops.
+model UgcWarmUpClip {
+  id           String    @id @default(cuid())
+  personaId    String
+  persona      Persona   @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  sequence     Int // 1..n posting order
+  prompt       String
+  videoUrl     String // R2
+  caption      String
+  scheduledDay Int // day N of warm-up (8..14 typical)
+  posted       Boolean   @default(false)
+  postedAt     DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([personaId, sequence])
+  @@map("ugc_warmup_clips")
+}
+
+// What the operator should do on this account on day N of warm-up.
+// One row per discrete action; ticked off manually in the admin UI.
+enum UgcWarmUpActionType {
+  SCROLL_FYP
+  FOLLOW_ACCOUNT
+  LIKE_VIDEO
+  COMMENT_VIDEO
+  POST_WARMUP_CLIP
+  ADD_LINK_IN_BIO
+}
+
+model UgcWarmUpAction {
+  id          String              @id @default(cuid())
+  personaId   String
+  persona     Persona             @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  day         Int // 1..14
+  type        UgcWarmUpActionType
+  target      String? // handle/url/clip-id depending on type
+  description String
+  done        Boolean             @default(false)
+  doneAt      DateTime?
+  createdAt   DateTime            @default(now())
+
+  @@index([personaId, day])
+  @@map("ugc_warmup_actions")
+}
+
+enum UgcAdStatus {
+  DRAFTING
+  READY // QC + virality passed, awaiting manual post
+  POSTED
+  FAILED_QC // judge or virality rejected
+  KILLED // pulled by operator
+}
+
+// One talking-head ad. Links to a Persona (creator) + a ColoringImage
+// (the page she's holding + the funnel destination via /start?id=).
+model UgcAd {
+  id              String  @id @default(cuid())
+  personaId       String
+  persona         Persona @relation(fields: [personaId], references: [id], onDelete: Cascade)
+  coloringImageId String? // optional — null while scene is being generated
+
+  hookText      String
+  scriptText    String
+  stillUrl      String
+  voiceoverUrl  String
+  finalVideoUrl String
+  framesPrefix  String // R2 prefix where judge-extracted frames live
+
+  judgeReportJson   Json? // judge.ts output: page integrity, face drift, etc.
+  viralityScore     Int? // 0-100, from Higgsfield brain_activity
+  viralityReportUrl String?
+
+  status UgcAdStatus @default(DRAFTING)
+
+  // UTM dimensions — locked to {persona.handle, this ad's id} so PostHog
+  // rollups are unambiguous. utmCampaign duplicated from Persona for query
+  // convenience; utmContent = this row's id.
+  utmCampaign String
+  utmContent  String
+
+  postedAt  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([personaId, status])
+  @@index([utmCampaign])
+  @@map("ugc_ads")
+}
