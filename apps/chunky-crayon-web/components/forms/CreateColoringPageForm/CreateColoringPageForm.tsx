@@ -25,6 +25,7 @@ import {
 } from './inputs';
 import FormCTA from './FormCTA';
 import QualityPicker from './QualityPicker/QualityPicker';
+import CharacterPicker from './CharacterPicker/CharacterPicker';
 
 type CreateColoringPageFormProps = {
   className?: string;
@@ -71,6 +72,13 @@ const MultiModeForm = ({
   const isSubscriber = Boolean(hasActiveSubscription);
   const showQualityPicker = useFeatureFlagEnabled('quality-tier-picker');
   const [quality, setQuality] = useState<ImageQuality>('low');
+
+  // Characters feature flag — gates the picker. Hidden for guests (the
+  // feature itself requires auth on submit; showing the picker to a guest
+  // would just take them to the auth wall after they pick).
+  const charactersFeatureEnabled = useFeatureFlagEnabled('characters-feature');
+  const showCharacterPicker = !isGuest && charactersFeatureEnabled;
+  const [characterId, setCharacterId] = useState<string | null>(null);
 
   /**
    * Common post-success bookkeeping: tracking, recents, gallery
@@ -158,12 +166,16 @@ const MultiModeForm = ({
                 photoBase64: imageBase64,
                 locale,
                 quality,
+                // characterId intentionally NOT passed: photo mode already
+                // uses the user's photo as its reference image. Mixing in
+                // a character portrait would muddy the output.
               })
             : await createPendingColoringImage({
                 mode: 'text',
                 description: desc,
                 locale,
                 quality,
+                characterId: characterId ?? undefined,
               });
 
         if (!result.ok) {
@@ -186,6 +198,13 @@ const MultiModeForm = ({
 
       {/* Input mode selector */}
       <InputModeSelector />
+
+      {/* Character picker — gated by `characters-feature` PostHog flag.
+          Hidden on photo mode because the photo IS the reference image
+          there (see createPendingColoringImage comment for context). */}
+      {showCharacterPicker && mode !== 'image' && (
+        <CharacterPicker value={characterId} onChange={setCharacterId} />
+      )}
 
       {/* Render active input based on mode */}
       {mode === 'text' && <TextInput />}
@@ -213,6 +232,7 @@ const MultiModeForm = ({
               secondAnswer,
               locale,
               quality,
+              characterId: characterId ?? undefined,
             });
 
             if (!result.ok) {

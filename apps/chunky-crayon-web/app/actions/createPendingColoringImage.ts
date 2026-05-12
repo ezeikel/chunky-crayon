@@ -35,6 +35,7 @@ import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { ACTIONS } from '@/constants';
 import { REFERENCE_IMAGES, prompts } from '@/lib/ai';
+import { buildCharacterAwareColoringPrompt } from '@/lib/ai/character-aware-prompts';
 import { moderateVoiceText } from '@/lib/moderation';
 import {
   generateQuickTitleFromVoice,
@@ -76,6 +77,18 @@ export type CreatePendingArgs = (
    *  allowed tiers (free/guest get capped at 'medium'). When omitted,
    *  resolves to a tier-appropriate default. */
   quality?: ImageQuality;
+  /**
+   * Optional recurring character to feature in the generated page. When set,
+   * we swap the standard prompt for `buildCharacterAwareColoringPrompt`,
+   * prepend the character's line-art portrait to `referenceImageUrls`, and
+   * record a CharacterUsage row after worker dispatch. v1 cap is one
+   * character per scene (enforced here — the form picker also enforces it).
+   *
+   * Ignored on photo mode: the photo IS the reference there, and mixing
+   * a character portrait with a kid-photo reference produces unpredictable
+   * results. Photo mode also already debits 5 credits for its own pipeline.
+   */
+  characterId?: string;
 };
 
 export type CreatePendingResult =
@@ -88,6 +101,7 @@ export type CreatePendingResult =
         | 'moderation_blocked'
         | 'insufficient_credits'
         | 'worker_unavailable'
+        | 'character_not_ready'
         | 'unknown';
       message?: string;
       credits?: number;
@@ -316,6 +330,75 @@ export const createPendingColoringImage = async (
 
   // Build the OpenAI prompt + image inputs.
   const activeProfile = await getActiveProfile();
+
+  // Optional character pre-fetch. Ownership + READY status are verified
+  // before we touch the prompt or reference image list — a stale id from
+  // the client must NOT leak someone else's portrait into a stranger's
+  // page. Ignored on photo mode (see CreatePendingArgs comment).
+  type ResolvedCharacter = {
+    id: string;
+    name: string;
+    species: string;
+    traits: string[];
+    signatureDetails: string[];
+    portraitLineArtUrl: string;
+  };
+  let resolvedCharacter: ResolvedCharacter | null = null;
+  if (args.characterId && args.mode !== 'photo' && userId && activeProfile) {
+    const character = await db.character.findFirst({
+      where: {
+        id: args.characterId,
+        userId,
+        profileId: activeProfile.id,
+        brand: BRAND,
+      },
+      select: {
+        id: true,
+        name: true,
+        species: true,
+        traits: true,
+        signatureDetails: true,
+        portraitLineArtUrl: true,
+        status: true,
+      },
+    });
+    if (!character || character.status !== 'READY') {
+      // Refund what we just debited — character was selected client-side
+      // but isn't usable. Don't penalise the user for a stale UI state.
+      if (userId) {
+        await refundCredits(userId, cost).catch(() => {});
+      }
+      return {
+        ok: false,
+        error: 'character_not_ready',
+        message:
+          character?.status === 'GENERATING'
+            ? 'Character is still being drawn. Try again in a moment.'
+            : 'Character is not available.',
+      };
+    }
+    if (!character.portraitLineArtUrl) {
+      // READY without a line-art URL shouldn't happen, but the column is
+      // nullable in the schema. Soft-fail to refund + friendly error.
+      if (userId) {
+        await refundCredits(userId, cost).catch(() => {});
+      }
+      return {
+        ok: false,
+        error: 'character_not_ready',
+        message: 'Character portrait is missing. Try again later.',
+      };
+    }
+    resolvedCharacter = {
+      id: character.id,
+      name: character.name,
+      species: character.species,
+      traits: character.traits,
+      signatureDetails: character.signatureDetails,
+      portraitLineArtUrl: character.portraitLineArtUrl,
+    };
+  }
+
   let workerBody: WorkerBody | null = null;
   let pendingRowId: string | null = null;
 
@@ -374,13 +457,49 @@ export const createPendingColoringImage = async (
         partialImages: 3,
       };
     } else {
-      const corePrompt =
-        activeProfile?.difficulty && activeProfile.difficulty !== 'BEGINNER'
-          ? prompts.createDifficultyAwarePrompt(
-              description,
-              activeProfile.difficulty,
-            )
-          : prompts.createColoringImagePrompt(description);
+      // Three prompt branches:
+      //   1. Character picked → character-aware prompt + portrait at
+      //      slot 0 of referenceImageUrls (cap total at 4 to stay within
+      //      OpenAI's 16-ref limit with comfy headroom and to avoid
+      //      drowning the character ref in style refs).
+      //   2. No character + non-BEGINNER difficulty → difficulty-aware
+      //      prompt (existing behaviour).
+      //   3. Default → standard coloring prompt (existing behaviour).
+      let corePrompt: string;
+      let referenceImageUrls: string[];
+
+      if (resolvedCharacter) {
+        corePrompt = buildCharacterAwareColoringPrompt({
+          description,
+          locale: args.locale,
+          difficulty: activeProfile?.difficulty,
+          character: {
+            name: resolvedCharacter.name,
+            species: resolvedCharacter.species,
+            traits: resolvedCharacter.traits,
+            signatureDetails: resolvedCharacter.signatureDetails,
+          },
+        });
+        // Character portrait first; then top up with brand style refs so
+        // gpt-image-2 still knows the target line-art aesthetic.
+        referenceImageUrls = [
+          resolvedCharacter.portraitLineArtUrl,
+          ...REFERENCE_IMAGES.slice(0, 3),
+        ];
+      } else if (
+        activeProfile?.difficulty &&
+        activeProfile.difficulty !== 'BEGINNER'
+      ) {
+        corePrompt = prompts.createDifficultyAwarePrompt(
+          description,
+          activeProfile.difficulty,
+        );
+        referenceImageUrls = REFERENCE_IMAGES.slice(0, 4);
+      } else {
+        corePrompt = prompts.createColoringImagePrompt(description);
+        referenceImageUrls = REFERENCE_IMAGES.slice(0, 4);
+      }
+
       const styledPrompt = `The provided images show the target coloring book style. Match their line weight, simplicity, and outline-only aesthetic.\n\n${corePrompt}`;
       workerBody = {
         coloringImageId: pending.id,
@@ -389,7 +508,7 @@ export const createPendingColoringImage = async (
         locale: args.locale,
         brand: BRAND,
         creditCost: userId ? cost : 0,
-        referenceImageUrls: REFERENCE_IMAGES.slice(0, 4),
+        referenceImageUrls,
         size: '1024x1024',
         quality: resolvedQuality,
         partialImages: 3,
@@ -397,6 +516,28 @@ export const createPendingColoringImage = async (
     }
 
     await postToWorker(workerBody);
+
+    // Record character usage AFTER the worker has accepted the job — if the
+    // worker rejected (404 / 5xx), the row above flips to FAILED and there
+    // was never any value to log. Unique (characterId, coloringImageId)
+    // makes accidental double-writes a no-op.
+    if (resolvedCharacter) {
+      await db.characterUsage
+        .create({
+          data: {
+            characterId: resolvedCharacter.id,
+            coloringImageId: pending.id,
+          },
+        })
+        .catch((err) => {
+          // Non-fatal: feature engagement analytics shouldn't tank a
+          // successful generation. Log and move on.
+          console.warn(
+            '[createPendingColoringImage] CharacterUsage insert failed:',
+            err,
+          );
+        });
+    }
 
     // Server-side Lead event for Meta + Pinterest. Mirrors the browser
     // trackLead fire from CreateColoringPageForm — gives Meta the
