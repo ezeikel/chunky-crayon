@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
+import { EMAIL_CAPTURE_PROMPT_EVENT } from '@/components/EmailCaptureModal/EmailCaptureModal';
 
 // Always-visible download icon overlay on every gallery card. Tap →
 // single-page PDF for that image. Skips the detail-page detour.
@@ -44,6 +45,10 @@ const GalleryCardDownloadButton = ({
         coloringImageId,
         fromPath,
       });
+
+      // Ask the email-capture modal to consider opening (modal handles
+      // eligibility + delay internally).
+      document.dispatchEvent(new CustomEvent(EMAIL_CAPTURE_PROMPT_EVENT));
 
       // Programmatic nav to the PDF endpoint. The Content-Disposition
       // header serves it as a download instead of navigating away.

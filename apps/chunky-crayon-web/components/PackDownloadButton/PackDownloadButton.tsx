@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/pro-duotone-svg-icons';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
+import { EMAIL_CAPTURE_PROMPT_EVENT } from '@/components/EmailCaptureModal/EmailCaptureModal';
 
 // Primary CTA on /coloring-pages/[slug] landing pages. Click → server
 // renders a 12-page printable PDF for the landing's tag-matched images
@@ -32,6 +33,11 @@ const PackDownloadButton = ({
       slug,
       title,
     });
+    // Ask the email-capture modal to consider opening. The modal
+    // decides whether to actually show based on its own cooldown +
+    // captured-state logic. Delay is handled inside the modal so the
+    // PDF download starts uninterrupted.
+    document.dispatchEvent(new CustomEvent(EMAIL_CAPTURE_PROMPT_EVENT));
   }, [slug, title]);
 
   const iconStyle = {
