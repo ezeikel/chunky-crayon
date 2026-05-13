@@ -85,6 +85,11 @@ function verifySignature(rawBody: string, headerValue: string | null): boolean {
     return process.env.NODE_ENV !== 'production';
   }
   if (!headerValue || !headerValue.startsWith('sha256=')) {
+    log.warn('Webhook signature header missing or malformed', {
+      action: 'facebook-webhook',
+      hasHeader: !!headerValue,
+      headerPrefix: headerValue ? headerValue.slice(0, 8) : null,
+    });
     return false;
   }
   const expected = createHmac('sha256', APP_SECRET)
@@ -92,11 +97,29 @@ function verifySignature(rawBody: string, headerValue: string | null): boolean {
     .digest('hex');
   const provided = headerValue.slice('sha256='.length);
   if (expected.length !== provided.length) {
+    log.warn('Webhook signature length mismatch', {
+      action: 'facebook-webhook',
+      expectedLen: expected.length,
+      providedLen: provided.length,
+      secretLen: APP_SECRET.length,
+    });
     return false;
   }
   try {
-    return timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
+    const match = timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
+    if (!match) {
+      log.warn('Webhook signature value mismatch', {
+        action: 'facebook-webhook',
+        secretLen: APP_SECRET.length,
+        expectedPrefix: expected.slice(0, 8),
+        providedPrefix: provided.slice(0, 8),
+      });
+    }
+    return match;
   } catch {
+    log.warn('Webhook signature compare threw', {
+      action: 'facebook-webhook',
+    });
     return false;
   }
 }
