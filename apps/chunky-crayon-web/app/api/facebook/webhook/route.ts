@@ -36,7 +36,7 @@ import {
 import * as log from '@/lib/logger';
 
 const VERIFY_TOKEN = process.env.FACEBOOK_WEBHOOK_VERIFY_TOKEN;
-const APP_SECRET = process.env.FACEBOOK_APP_SECRET;
+const APP_SECRET = process.env.FACEBOOK_BUSINESS_APP_SECRET;
 
 // =============================================================================
 // GET — subscription handshake (Meta calls this once when we register the URL)
@@ -72,9 +72,12 @@ export const GET = async (req: NextRequest) => {
 
 function verifySignature(rawBody: string, headerValue: string | null): boolean {
   if (!APP_SECRET) {
-    log.warn('FACEBOOK_APP_SECRET not configured — skipping signature check', {
-      action: 'facebook-webhook',
-    });
+    log.warn(
+      'FACEBOOK_BUSINESS_APP_SECRET not configured — skipping signature check',
+      {
+        action: 'facebook-webhook',
+      },
+    );
     // Fail open in dev so curl-based testing works. In prod APP_SECRET
     // is required and missing-secret is a deploy-time misconfig — but we
     // still don't want to 500 here and have Meta hammer-retry; warn loudly
