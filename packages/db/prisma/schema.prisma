@@ -562,6 +562,7 @@ enum GenerationType {
   USER // Created by a real user clicking Create in the app.
   DAILY // Daily cron scene. Kept distinct because scheduler, dedup, and content safety care about this category specifically.
   SYSTEM // Everything else programmatic — ads, demo reel fixtures, onboarding splashes, test seeds. Use purposeKey to distinguish.
+  COMMENT_REQUEST // Generated in response to a "#drawthis ..." comment on IG/FB. Kept separate from USER so the moderation gate, DM flow, and analytics don't conflate with in-app creates.
 }
 
 // Lifecycle of a ColoringImage row in the streaming-generation pipeline.
@@ -1316,4 +1317,107 @@ model CharacterUsage {
   @@unique([characterId, coloringImageId])
   @@index([coloringImageId])
   @@map("character_usages")
+}
+
+// =============================================================================
+// Social comment automation
+// =============================================================================
+// Two flows share this table:
+//
+// 1. AI auto-reply — every comment on our IG/FB posts gets classified and
+//    (usually) replied to. Mirrors the pattern from the PTP project.
+//
+// 2. #drawthis image requests — a comment matching the trigger pattern
+//    spawns a moderated image gen. On success we DM the commenter the
+//    line art (within the 7-day comment-window grace period) and reply
+//    to the comment with "done! check DMs ✨".
+//
+// Borderline image requests post to Slack with Approve / Reject buttons;
+// slackChannelId + slackMessageTs let the cron `chat.update` the message
+// in place once a decision is made.
+
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+}
+
+enum CommentQueueStatus {
+  PENDING // Just queued, awaiting processing tick.
+  PROCESSING // Cron picked it up, generating reply / waiting on Slack.
+  AWAITING_GENERATION // #drawthis approved, ColoringImage gen kicked off.
+  DM_SENT // Image DM delivered, comment reply posted. Terminal success.
+  REPLIED // AI reply posted to comment. Terminal success for non-image flow.
+  LIKED // Thread-reply path — liked instead of replying. Terminal success.
+  SKIPPED // Classifier decided not to engage, or moderation rejected.
+  FAILED // Retries exhausted. Terminal failure.
+}
+
+enum CommentType {
+  AGREEMENT
+  QUESTION
+  CORRECTION
+  COMBATIVE
+  APPRECIATION
+  EMOJI_ONLY
+  SPAM
+  IMAGE_REQUEST // "#drawthis ..." trigger. Classifier never assigns this — detected upstream by the webhook.
+  OTHER
+}
+
+// One row per inbound comment we want to act on. Webhook + catch-up cron
+// both insert here; the process cron picks it up after `processAfter` and
+// drives it to a terminal state.
+model SocialCommentQueue {
+  id             String         @id @default(cuid())
+  platform       SocialPlatform
+  // Meta-provided comment id. Unique so duplicate webhook deliveries are
+  // safe no-ops.
+  commentId      String         @unique
+  postId         String
+  authorId       String
+  authorUsername String?
+  commentText    String
+  postCaption    String?
+
+  // Thread-reply context. Used to prevent infinite reply loops on FB —
+  // we cap thread exchanges at one per user per post per 24h.
+  isThreadReply     Boolean @default(false)
+  parentCommentId   String?
+  parentCommentText String?
+
+  status       CommentQueueStatus @default(PENDING)
+  commentType  CommentType?
+  // When the process cron is allowed to act on this row. Used to add
+  // natural-looking 2-5 min delays after webhook ingest.
+  processAfter DateTime
+  processedAt  DateTime?
+
+  // AI reply flow
+  replyText      String?
+  replyCommentId String?
+  liked          Boolean @default(false)
+
+  // #drawthis image-request flow
+  extractedPrompt String?
+  coloringImageId String? // FK to ColoringImage once gen kicks off. Not a Prisma relation (kept lightweight; ColoringImage stays untouched).
+  dmSent          Boolean @default(false) // First DM (sorry / "on it") delivered.
+  imageDmSent     Boolean @default(false) // Final line-art DM delivered.
+
+  // Slack moderation (borderline image requests)
+  slackChannelId String?
+  slackMessageTs String?
+
+  errorMessage String?
+  retryCount   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Process cron query: pending rows ready to act on, oldest first.
+  @@index([status, processAfter])
+  // Thread-reply loop check: "did we already exchange with this user on this post in the last 24h?"
+  @@index([postId, authorId, isThreadReply, status])
+  // Image-request flow: poll for gen-complete rows.
+  @@index([commentType, status])
+  @@map("social_comment_queue")
 }
