@@ -21,8 +21,11 @@
  */
 import type { SocialPlatform } from '@one-colored-pixel/db';
 import { db } from '@one-colored-pixel/db';
+import { generateObject } from 'ai';
+import { z } from 'zod';
 import { findBlockedContent } from '@/lib/scene-generation';
 import { moderateVoiceText } from '@/lib/moderation';
+import { models } from '@/lib/ai/models';
 import { createColoringImageForCommentRequest } from '@/app/actions/createColoringImageForCommentRequest';
 import {
   replyToComment,
@@ -84,40 +87,141 @@ const pickRandom = <T>(arr: T[]): T =>
   arr[Math.floor(Math.random() * arr.length)];
 
 // =============================================================================
-// Moderation
+// Delivery messages — used by the process cron when a gen completes
 // =============================================================================
 //
-// Two gates: deterministic blocklist (fast) + LLM safety check (slow but
-// catches paraphrasing). Result decides the row's status:
-//   safe       → green-light gen
-//   blocked    → reject with apology
-//   borderline → Slack approval queue
+// IG: image arrives as a DM. The "on it ✨" reply on the comment is left
+// as-is (no edit needed); the DM carries the result.
+//
+// FB: no DM channel for Page comments. The cron posts a nested reply on
+// the original comment that contains the canonical URL to the generated
+// page. CUID URL (not slugged) — comment-request images aren't publicly
+// indexable, but the commenter who asked for it gets a direct link.
+
+const DM_CAPTIONS_IG = [
+  "Here's your coloring page! 🎨 Tap to save and print at home ✨",
+  'Made just for you 💛 Save it to print + color whenever you like 🖌️',
+  'Done! ✨ Long-press to save the image — happy coloring 🌈',
+];
+
+const FB_LINK_REPLIES = [
+  "Done! ✨ Here's your coloring page: ${url}",
+  'Ready! Tap to color: ${url} 🎨',
+  'All done! Save + print from here: ${url} 💛',
+];
+
+export function pickImageDmCaption(): string {
+  return pickRandom(DM_CAPTIONS_IG);
+}
+
+export function buildFbLinkReply(canonicalUrl: string): string {
+  return pickRandom(FB_LINK_REPLIES).replace('${url}', canonicalUrl);
+}
+
+// =============================================================================
+// Moderation — three tiers
+// =============================================================================
+//
+// 1. Deterministic blocklist (fast). Same list the daily scene generator
+//    uses. Catches the obvious stuff; over-eager by design — "sword" hits
+//    even when the kid wants "a knight with a sword".
+// 2. OpenAI moderation API via moderateVoiceText. Catches paraphrased
+//    unsafe content the blocklist would miss.
+// 3. Gemini Flash kid-safety judgement (the gate that makes Slack useful).
+//    Returns clearly_safe / clearly_unsafe / borderline. Borderline lets
+//    blocklist-flagged-but-actually-fine prompts through to human review
+//    instead of auto-rejecting them.
+//
+// Decision map:
+//   blocklist hit            → borderline (was: blocked — too aggressive)
+//   moderateVoiceText !ok    → blocked
+//   Gemini clearly_safe      → safe
+//   Gemini clearly_unsafe    → blocked
+//   Gemini borderline        → borderline (Slack approval)
 
 type ModerationResult =
   | { decision: 'safe' }
   | { decision: 'blocked'; reason: string }
   | { decision: 'borderline'; reason: string };
 
-async function moderatePrompt(prompt: string): Promise<ModerationResult> {
-  // Gate 1: deterministic blocklist. If a clear kid-unsafe word is in the
-  // prompt, reject outright — no point burning an LLM call.
-  const blocked = findBlockedContent(prompt);
-  if (blocked) {
-    return { decision: 'blocked', reason: `blocklist:${blocked}` };
-  }
+const kidSafetyJudgementSchema = z.object({
+  decision: z.enum(['clearly_safe', 'clearly_unsafe', 'borderline']),
+  reason: z.string(),
+});
 
-  // Gate 2: LLM safety check (OpenAI moderation API behind moderateVoiceText).
-  // The user-facing voice/photo paths already trust this gate for kid-safety;
-  // re-using it keeps comment-request consistent with the rest of CC.
-  //
-  // moderateVoiceText returns { ok: true } for clearly-safe content and
-  // { ok: false, code } for clearly-unsafe. There's no "uncertain" return
-  // today — so for phase 1 we map ok=false to BLOCKED, no borderline path.
-  // If we want a true uncertainty signal later, add a confidence score in
-  // moderateVoiceText and route low-confidence-safe to borderline here.
+const KID_SAFETY_SYSTEM = `You judge whether a short image prompt is appropriate to render as a coloring page for kids aged 3-10.
+
+Output one of three decisions:
+- clearly_safe: the subject is wholesome and obviously kid-appropriate. Things kids would draw: animals, fairies, dinosaurs, vehicles, food, sports, family, holidays, fantasy characters. Even mild themes with positive framing (a knight with a sword, a friendly dragon, a brave firefighter) are clearly_safe.
+- clearly_unsafe: the subject is hateful, sexual, gory, drug-related, self-harm, or otherwise inappropriate for kids by any reasonable parent's judgement. No grey area.
+- borderline: anything where a reasonable parent might split. Realistic weapons in non-fantasy contexts. Real-world political/religious imagery. Anything ambiguous, edgy, or that needs a human eyeball before we draw it.
+
+Bias toward 'clearly_safe' — most prompts kids type are obviously fine. Reserve 'borderline' for cases where you'd genuinely want a human to call it.
+
+The 'reason' field: one short clause explaining your call.`;
+
+async function judgeKidSafety(
+  prompt: string,
+): Promise<{
+  decision: 'clearly_safe' | 'clearly_unsafe' | 'borderline';
+  reason: string;
+}> {
+  try {
+    const { object } = await generateObject({
+      model: models.analytics,
+      schema: kidSafetyJudgementSchema,
+      system: KID_SAFETY_SYSTEM,
+      prompt: `Prompt to judge: "${prompt}"`,
+    });
+    return object;
+  } catch (err) {
+    // Fail safe — if the judgement call errors, route to borderline so a
+    // human eyeballs it rather than auto-firing. Better to miss a magic
+    // moment than to auto-render something unsafe because the LLM was down.
+    log.warn(
+      'Kid-safety judgement call failed — routing to borderline',
+      { action: 'image-request', prompt: prompt.slice(0, 80) },
+      err instanceof Error ? err : undefined,
+    );
+    return {
+      decision: 'borderline',
+      reason: 'safety_judgement_unavailable',
+    };
+  }
+}
+
+async function moderatePrompt(prompt: string): Promise<ModerationResult> {
+  // Gate 1: deterministic blocklist. Hits route to borderline (not blocked)
+  // so legitimate uses of "sword", "fire", etc. in kid-appropriate contexts
+  // still have a path through human review instead of auto-rejecting.
+  const blocked = findBlockedContent(prompt);
+
+  // Gate 2: OpenAI moderation. ok=false here means hateful/sexual/violent
+  // content the policy explicitly rejects — never borderline, always
+  // blocked.
   const m = await moderateVoiceText(prompt);
   if (!m.ok) {
-    return { decision: 'blocked', reason: m.code };
+    return { decision: 'blocked', reason: `openai-moderation:${m.code}` };
+  }
+
+  // Gate 3: kid-safety judgement. The tie-breaker for blocklist-flagged
+  // prompts and the catcher for paraphrased grey areas.
+  const judgement = await judgeKidSafety(prompt);
+
+  if (judgement.decision === 'clearly_unsafe') {
+    return {
+      decision: 'blocked',
+      reason: `kid-safety:${judgement.reason}`,
+    };
+  }
+
+  if (judgement.decision === 'borderline' || blocked) {
+    return {
+      decision: 'borderline',
+      reason: blocked
+        ? `blocklist:${blocked};kid-safety:${judgement.reason}`
+        : `kid-safety:${judgement.reason}`,
+    };
   }
 
   return { decision: 'safe' };
