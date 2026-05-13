@@ -6,6 +6,7 @@ import PageWrap from '@/components/PageWrap/PageWrap';
 import { charactersFeatureEnabled } from '@/flags';
 import { getCharacterForProfile } from '@/app/actions/characters';
 import CharacterCockpit from '@/components/Characters/CharacterCockpit/CharacterCockpit';
+import CharacterRetry from '@/components/Characters/CharacterRetry/CharacterRetry';
 
 /**
  * /characters/[id] — per-character profile page.
@@ -45,10 +46,8 @@ const ProfileContent = async ({ params }: PageProps) => {
   const { id } = await params;
   const character = await getCharacterForProfile(id);
   if (!character) notFound();
-  if (character.status !== 'READY') {
-    // Render a soft "still being drawn" state rather than 404. Parents
-    // who came back to the page after submitting the create modal should
-    // see clear progress, not a broken page.
+  if (character.status === 'GENERATING') {
+    // Soft "still being drawn" state rather than 404 / a broken page.
     return (
       <div className="text-center py-16">
         <h1 className="font-display text-3xl mb-3">
@@ -65,6 +64,15 @@ const ProfileContent = async ({ params }: PageProps) => {
         </Link>
       </div>
     );
+  }
+
+  if (character.status === 'FAILED') {
+    // Kid-friendly retry surface. The Cockpit doesn't make sense for a
+    // FAILED character (no portrait, no outfits). Render a dedicated
+    // retry CTA that re-fires the worker via regenerateCharacterPortrait.
+    // We use the client-side dev viewer's regenerate button as a tiny
+    // self-contained client component below.
+    return <CharacterRetry id={character.id} name={character.name} />;
   }
 
   return (

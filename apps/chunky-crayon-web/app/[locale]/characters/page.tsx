@@ -45,11 +45,11 @@ const FlaggedShell = async () => {
 
   return (
     <>
-      <header className="text-center pb-6">
-        <h1 className="font-display text-3xl md:text-4xl mb-2">
+      <header className="text-center pb-8 md:pb-10">
+        <h1 className="font-display text-4xl md:text-6xl mb-3 text-neutral-900">
           Meet your friends
         </h1>
-        <p className="text-neutral-600 max-w-lg mx-auto text-sm md:text-base">
+        <p className="text-neutral-700 max-w-xl mx-auto text-lg md:text-xl font-medium">
           Make a friend who shows up in every coloring page.
         </p>
       </header>

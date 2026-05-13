@@ -1,4 +1,9 @@
 import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faWandMagicSparkles,
+  faRotateRight,
+} from '@fortawesome/pro-duotone-svg-icons';
 import type { CharacterStatus } from '@one-colored-pixel/db';
 
 type Props = {
@@ -13,16 +18,20 @@ type Props = {
 
 /**
  * One character in the Bluey-style grid. Linkable into the per-character
- * profile page at /characters/[id] (Phase 4 fleshes out the destination).
+ * profile page at /characters/[id].
  *
  * Three visual states:
  *   - READY: line-art portrait + chunky name pill. Tile is a Link.
- *   - GENERATING: shimmer + Colo holds-up-a-crayon placeholder. Not a link
- *     (clicking the tile mid-generation is the most common "is it stuck"
- *     trap; the parent has nothing to do here yet).
- *   - FAILED: faded portrait outline + "Try again" affordance pointing at
- *     the regenerate flow (Phase 4 will wire the actual button — for now
- *     the tile just links to the profile page where retry lives).
+ *   - GENERATING: animated wand-sparkles icon inside a cream surface, with
+ *     a chunky 'Drawing…' pill. Not a link (clicking through to a not-yet-
+ *     READY character is the most common 'is it stuck' trap).
+ *   - FAILED: soft cream surface with a refresh icon + 'Try again' chunky
+ *     pill. Raw failureReason is NEVER shown to kids — it can leak the
+ *     OpenAI error text. Admins see it in the /dev/characters viewer.
+ *
+ * Visual treatment matches the create modal: rounded-3xl, chunky border,
+ * shadow-card, warm cream fills. Status pills use the brand crayon
+ * palette so the grid reads as a single family with the modal.
  *
  * Audience: kid-fingers + parent reviewing the gallery. Card sized for
  * chunky taps (full 1:1 aspect with the portrait taking the top 2/3).
@@ -35,7 +44,9 @@ const CharacterTile = ({
   portraitLineArtUrl,
   portraitUrl,
   status,
-  failureReason,
+  // failureReason intentionally not surfaced — kids shouldn't see raw
+  // error strings. Admins inspect via /dev/characters/[id].
+  failureReason: _failureReason,
 }: Props) => {
   const portrait = portraitLineArtUrl ?? portraitUrl;
   const isReady = status === 'READY';
@@ -45,31 +56,58 @@ const CharacterTile = ({
   const cardClasses =
     'group relative flex flex-col rounded-3xl border-2 border-paper-cream-dark bg-white shadow-card overflow-hidden';
 
+  // Duotone palette for status icons — picks up the modal's warm crayon
+  // tones so the page reads as one family.
+  const drawingIconStyle = {
+    '--fa-primary-color': 'hsl(var(--crayon-orange))',
+    '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+    '--fa-secondary-opacity': '0.8',
+  } as React.CSSProperties;
+
+  const retryIconStyle = {
+    '--fa-primary-color': 'hsl(var(--crayon-orange))',
+    '--fa-secondary-color': 'hsl(var(--crayon-pink))',
+    '--fa-secondary-opacity': '0.8',
+  } as React.CSSProperties;
+
   const inner = (
     <>
       <div
-        className={`aspect-square w-full flex items-center justify-center bg-paper-cream ${
-          isGenerating ? 'animate-pulse' : ''
-        }`}
+        className={`aspect-square w-full flex flex-col items-center justify-center gap-3 bg-paper-cream`}
       >
-        {portrait ? (
+        {isReady && portrait ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={portrait}
             alt={`${name}, a ${species}`}
-            className={`w-full h-full object-contain p-4 ${
-              isFailed ? 'opacity-40 grayscale' : ''
-            }`}
+            className="w-full h-full object-contain p-4"
           />
+        ) : isGenerating ? (
+          <>
+            <FontAwesomeIcon
+              icon={faWandMagicSparkles}
+              className="text-5xl animate-pulse"
+              style={drawingIconStyle}
+            />
+            <span className="text-sm font-bold text-neutral-700">
+              Drawing {name}…
+            </span>
+          </>
+        ) : isFailed ? (
+          <>
+            <FontAwesomeIcon
+              icon={faRotateRight}
+              className="text-5xl"
+              style={retryIconStyle}
+            />
+            <span className="text-sm font-bold text-neutral-700">
+              Tap to try again
+            </span>
+          </>
         ) : (
-          // No portrait yet — render a soft "drawing your friend" placeholder.
-          <span className="text-xs text-neutral-500 px-3 text-center">
-            {isGenerating
-              ? "We're drawing your new friend"
-              : isFailed
-                ? 'Something went wrong'
-                : 'Getting ready'}
-          </span>
+          // READY but no portrait yet (shouldn't happen — the worker sets
+          // both URLs before flipping status — but defensive fallback).
+          <span className="text-sm text-neutral-500">Getting ready</span>
         )}
       </div>
 
@@ -77,33 +115,22 @@ const CharacterTile = ({
         <span className="font-display text-lg leading-none truncate">
           {name}
         </span>
-        {isReady ? null : (
-          <span
-            className={`shrink-0 rounded-full px-2 py-1 text-[10px] uppercase tracking-wide ${
-              isGenerating
-                ? 'bg-amber-100 text-amber-800'
-                : 'bg-red-100 text-red-800'
-            }`}
-          >
-            {isGenerating ? 'Drawing' : 'Retry'}
+        {isGenerating ? (
+          <span className="shrink-0 rounded-full bg-crayon-yellow text-neutral-800 px-3 py-1 text-xs font-bold uppercase tracking-wide animate-pulse">
+            Drawing
           </span>
-        )}
+        ) : isFailed ? (
+          <span className="shrink-0 rounded-full bg-crayon-orange text-white px-3 py-1 text-xs font-bold uppercase tracking-wide">
+            Retry
+          </span>
+        ) : null}
       </div>
-
-      {isFailed && failureReason ? (
-        // Keep failureReason hidden by default and surface as a small
-        // hover/tap-revealed footnote. Parents who care can read it; kids
-        // who don't shouldn't see a wall of error text.
-        <p className="px-4 pb-3 text-[10px] text-red-700 line-clamp-2">
-          {failureReason}
-        </p>
-      ) : null}
     </>
   );
 
   // Don't let kids click through to a GENERATING tile (no useful state
   // there yet; profile page assumes READY).
-  if (!isReady && !isFailed) {
+  if (isGenerating) {
     return <div className={cardClasses}>{inner}</div>;
   }
 

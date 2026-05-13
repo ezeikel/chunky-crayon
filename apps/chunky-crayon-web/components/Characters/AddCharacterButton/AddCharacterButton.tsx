@@ -34,11 +34,21 @@ const AddCharacterButton = ({ variant = 'tile', disabled = false }: Props) => {
   const { isGuest, isLoading } = useUser();
   const [open, setOpen] = useState(false);
 
+  // Tile variant uses the same warm palette as the modal: cream fill,
+  // chunky dashed orange border, orange duotone faPlus icon. Reads as
+  // "this is the same family as my friends" rather than "settings page
+  // add button".
   const tileClasses =
-    'group flex flex-col items-center justify-center gap-3 rounded-3xl border-4 border-dashed border-paper-cream-dark bg-paper-cream/50 aspect-square w-full text-neutral-600 hover:bg-paper-cream hover:text-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
+    'group flex flex-col items-center justify-center gap-3 rounded-3xl border-4 border-dashed border-crayon-orange/40 bg-paper-cream/60 aspect-square w-full text-crayon-orange hover:border-crayon-orange hover:bg-paper-cream hover:scale-105 active:scale-95 transition-all shadow-card disabled:opacity-40 disabled:cursor-not-allowed';
 
   const pillClasses =
-    'inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-5 py-3 text-base font-bold min-h-[44px] hover:bg-crayon-orange-dark disabled:opacity-40 disabled:cursor-not-allowed';
+    'inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-6 py-3 text-lg font-bold min-h-[56px] shadow-card hover:scale-105 active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed';
+
+  const plusDuotone = {
+    '--fa-primary-color': 'hsl(var(--crayon-orange))',
+    '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+    '--fa-secondary-opacity': '0.8',
+  } as React.CSSProperties;
 
   const handleClick = () => {
     // Guest path: route to signin with callback so we land back here after auth.
@@ -60,9 +70,14 @@ const AddCharacterButton = ({ variant = 'tile', disabled = false }: Props) => {
       >
         <FontAwesomeIcon
           icon={faPlus}
-          className={variant === 'tile' ? 'text-5xl' : 'text-lg'}
+          className={variant === 'tile' ? 'text-6xl' : 'text-lg'}
+          style={variant === 'tile' ? plusDuotone : undefined}
         />
-        <span className={variant === 'tile' ? 'font-display text-xl' : ''}>
+        <span
+          className={
+            variant === 'tile' ? 'font-display text-2xl text-neutral-800' : ''
+          }
+        >
           Make a friend
         </span>
       </button>
