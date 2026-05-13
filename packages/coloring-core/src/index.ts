@@ -156,6 +156,12 @@ export {
 } from "./blog/prompts";
 export { BLOG_CATEGORIES, BLOG_TOPICS, BLOG_AUTHORS } from "./blog/topics";
 export type { BlogCategory, BlogTopic, BlogAuthor } from "./blog/topics";
+export { BLOG_LANDING_PAGES } from "./blog/landings";
+export type { BlogLandingPage } from "./blog/landings";
+export {
+  getReferenceImages,
+  REFERENCE_IMAGES,
+} from "./coloring-image/references";
 
 // Daily scene generation (Perplexity Sonar) + image metadata prompts
 export {

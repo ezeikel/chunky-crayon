@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { put, del } from "@one-colored-pixel/storage";
 import {
-  REFERENCE_IMAGES,
+  getReferenceImages,
   createColoringImagePrompt,
 } from "./cc-image-prompts.js";
 
@@ -14,15 +14,21 @@ import {
  *
  * No retries / no Gemini fallback — the cron is fire-and-forget anyway,
  * and a worker re-trigger gives us a clean retry. Keep this dumb.
+ *
+ * Always uses BEGINNER references — blog featured images target the
+ * same broad parent audience the social feed does.
  */
 
-let cachedReferenceFiles: File[] | null = null;
+const referenceFilesCache = new Map<string, File[]>();
 
 async function getReferenceFiles(): Promise<File[]> {
-  if (cachedReferenceFiles) return cachedReferenceFiles;
+  const urls = getReferenceImages("BEGINNER").slice(0, 4);
+  const cacheKey = urls.join("|");
+  const cached = referenceFilesCache.get(cacheKey);
+  if (cached) return cached;
 
   const files = await Promise.all(
-    REFERENCE_IMAGES.slice(0, 4).map(async (url, i) => {
+    urls.map(async (url, i) => {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(
@@ -37,7 +43,7 @@ async function getReferenceFiles(): Promise<File[]> {
     }),
   );
 
-  cachedReferenceFiles = files;
+  referenceFilesCache.set(cacheKey, files);
   return files;
 }
 

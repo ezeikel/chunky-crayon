@@ -70,8 +70,12 @@ export type ProviderConfig = {
  * Each app provides its own prompts, reference images, and difficulty modifiers.
  */
 export type ImageGenerationConfig = {
-  /** Style reference image URLs for OpenAI images.edit and Gemini */
-  referenceImages: readonly string[];
+  /**
+   * Returns the style reference image URLs to feed gpt-image-2 /
+   * Gemini for the given difficulty tier. Apps that don't care about
+   * difficulty can return the same array regardless of the argument.
+   */
+  getReferenceImages: (difficulty?: Difficulty | null) => readonly string[];
   /** Difficulty modifiers per level (app-specific content complexity) */
   difficultyModifiers: Partial<Record<Difficulty, DifficultyConfig>>;
   /** Create the primary coloring page prompt */
@@ -100,21 +104,26 @@ export type ImageGenerationConfig = {
 // Style Reference Image Helpers
 // =============================================================================
 
-let cachedStyleReferenceFiles: File[] | null = null;
+// Per-URL-list cache so each difficulty tier's reference set is fetched
+// once and reused across generations. Keyed by the joined URL list so a
+// caller swapping between tiers gets two cache entries, not one
+// contaminating the other.
+const styleReferenceFilesCache = new Map<string, File[]>();
 
 /**
- * Fetch reference image URLs and convert to File objects for OpenAI images.edit.
- * Results are cached in memory for the lifetime of the process.
+ * Fetch reference image URLs and convert to File objects for OpenAI
+ * images.edit. Results are cached in memory per URL-list for the
+ * lifetime of the process.
  */
 async function getStyleReferenceFiles(
   referenceImages: readonly string[],
   maxImages = 4,
 ): Promise<File[]> {
-  if (cachedStyleReferenceFiles) {
-    return cachedStyleReferenceFiles.slice(0, maxImages);
-  }
-
   const urls = referenceImages.slice(0, maxImages);
+  const cacheKey = urls.join("|");
+  const cached = styleReferenceFilesCache.get(cacheKey);
+  if (cached) return cached;
+
   const files = await Promise.all(
     urls.map(async (url, i) => {
       const response = await fetch(url);
@@ -126,7 +135,7 @@ async function getStyleReferenceFiles(
     }),
   );
 
-  cachedStyleReferenceFiles = files;
+  styleReferenceFilesCache.set(cacheKey, files);
   return files;
 }
 
@@ -156,7 +165,7 @@ function createOpenAIProvider(config: ImageGenerationConfig): ProviderConfig {
       const styledPrompt = `The provided images show the target coloring book style. Match their line weight, simplicity, and outline-only aesthetic.\n\n${prompt}`;
 
       const styleFiles = await getStyleReferenceFiles(
-        config.referenceImages,
+        config.getReferenceImages(difficulty),
         4,
       );
 
@@ -225,7 +234,7 @@ ${diffConfig.additionalRules.map((rule: string, i: number) => `${i + 1}. ${rule}
         }
       }
 
-      const selectedRefs = config.referenceImages.slice(0, 4);
+      const selectedRefs = config.getReferenceImages(difficulty).slice(0, 4);
       const messageContent: Array<
         { type: "text"; text: string } | { type: "image"; image: URL }
       > = [
@@ -531,7 +540,10 @@ export function createImageGenerationPipeline(config: ImageGenerationConfig) {
       type: "image/png",
     });
 
-    const styleFiles = await getStyleReferenceFiles(config.referenceImages, 4);
+    const styleFiles = await getStyleReferenceFiles(
+      config.getReferenceImages(difficulty),
+      4,
+    );
     const allImages = [imageFile, ...styleFiles];
 
     const client = new OpenAI();

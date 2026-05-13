@@ -5,22 +5,28 @@
  * Organized by feature/domain for easy maintenance.
  */
 
-import { NO_EM_DASHES_RULE } from '@one-colored-pixel/coloring-core';
+import {
+  NO_EM_DASHES_RULE,
+  REFERENCE_IMAGES as CORE_REFERENCE_IMAGES,
+  getReferenceImages as coreGetReferenceImages,
+} from '@one-colored-pixel/coloring-core';
 
 // =============================================================================
 // Reference Assets
 // =============================================================================
+//
+// References are now hoisted into coloring-core (so the worker can share
+// the same source) and split per difficulty tier. The v1 single-set URLs
+// listed below stayed on R2 as a rollback safety belt and are
+// intentionally NOT served from these exports.
+//
+// New code should call getReferenceImages(difficulty). REFERENCE_IMAGES
+// is preserved as a back-compat alias that always returns the beginner
+// set — flag for removal once every direct consumer (worker daily-pipeline,
+// worker blog image-gen, etc.) migrates.
 
-export const REFERENCE_IMAGES = [
-  'https://assets.chunkycrayon.com/reference-images/birthdays-8uiLmIVecHAw1yjqNRQ2OCYHoaa8gW.webp',
-  'https://assets.chunkycrayon.com/reference-images/dinosaur-bfmBtp1o0kVeIZtuVVNhmKTMJXOgS7.webp',
-  'https://assets.chunkycrayon.com/reference-images/family-and-friends-g4vlGFNcWXrcHQ7sB4y8LLYiO3PIAG.webp',
-  'https://assets.chunkycrayon.com/reference-images/farm-animals-knAdbOJKhulPhb7xnaCkMXycTunbNi.webp',
-  'https://assets.chunkycrayon.com/reference-images/sea-creatures-njuJrigKzRhyl7GZXeigWSHtbPFgiG.webp',
-  'https://assets.chunkycrayon.com/reference-images/superheroes-zX4vpC6SMlXVEn1Wxombkyr2fU165K.webp',
-  'https://assets.chunkycrayon.com/reference-images/trains-TOkt3DJ3Oy56ZTV0uy7h2XmD8DsTGV.webp',
-  'https://assets.chunkycrayon.com/reference-images/unicorns-8XVTm2dwIgIAUpah12vBMnWz7A02yo.webp',
-] as const;
+export const REFERENCE_IMAGES = CORE_REFERENCE_IMAGES;
+export const getReferenceImages = coreGetReferenceImages;
 
 // =============================================================================
 // Difficulty-Based Prompt Modifiers

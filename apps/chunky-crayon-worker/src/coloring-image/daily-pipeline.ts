@@ -27,7 +27,7 @@ import {
 } from "@one-colored-pixel/coloring-core";
 import { db, GenerationType, Brand } from "@one-colored-pixel/db";
 import {
-  REFERENCE_IMAGES,
+  getReferenceImages,
   createColoringImagePrompt,
 } from "../blog/cc-image-prompts.js";
 import { generateDailyScene } from "./daily-scene.js";
@@ -45,12 +45,21 @@ const visionModel = openai("gpt-5.2");
 // Image generation (gpt-image-2 with reference images)
 // =============================================================================
 
-let cachedReferenceFiles: File[] | null = null;
+// Per-difficulty cache so different cron jobs / tiers don't share files.
+// Daily cron always uses BEGINNER (social feed targets parents of
+// toddlers), but the cache is keyed correctly in case a future caller
+// passes a different tier through.
+const referenceFilesCache = new Map<string, File[]>();
 
-async function getReferenceFiles(): Promise<File[]> {
-  if (cachedReferenceFiles) return cachedReferenceFiles;
+async function getReferenceFiles(
+  difficulty: "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "EXPERT" = "BEGINNER",
+): Promise<File[]> {
+  const urls = getReferenceImages(difficulty).slice(0, 4);
+  const cacheKey = urls.join("|");
+  const cached = referenceFilesCache.get(cacheKey);
+  if (cached) return cached;
   const files = await Promise.all(
-    REFERENCE_IMAGES.slice(0, 4).map(async (url, i) => {
+    urls.map(async (url, i) => {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(
@@ -64,7 +73,7 @@ async function getReferenceFiles(): Promise<File[]> {
       });
     }),
   );
-  cachedReferenceFiles = files;
+  referenceFilesCache.set(cacheKey, files);
   return files;
 }
 

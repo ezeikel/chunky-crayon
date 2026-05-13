@@ -7,13 +7,13 @@
 
 import {
   createImageGenerationPipeline,
+  getReferenceImages,
   type ImageGenerationConfig,
 } from '@one-colored-pixel/coloring-core';
 import {
   createColoringImagePrompt,
   createGeminiColoringImagePrompt,
   createDifficultyAwarePrompt,
-  REFERENCE_IMAGES,
   DIFFICULTY_MODIFIERS,
   PHOTO_TO_COLORING_SYSTEM,
   createPhotoToColoringPrompt,
@@ -22,7 +22,7 @@ import {
 } from './prompts';
 
 const config: ImageGenerationConfig = {
-  referenceImages: REFERENCE_IMAGES,
+  getReferenceImages,
   difficultyModifiers: DIFFICULTY_MODIFIERS,
   createColoringImagePrompt,
   createGeminiColoringImagePrompt,
