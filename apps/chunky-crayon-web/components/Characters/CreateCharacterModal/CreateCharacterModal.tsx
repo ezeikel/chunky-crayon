@@ -29,16 +29,27 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faShuffle,
   faPen,
   faArrowRight,
   faArrowLeft,
+  faXmark,
+  faFaceSmileBeam,
+  faFaceGrinStars,
+  faFaceSmile,
+  faFaceLaughBeam,
+  faFaceSleeping,
+  faFaceAwesome,
+  faFaceGrinTongue,
+  faFaceSmileRelaxed,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { DuotoneStyle } from '@/lib/characters/picker-catalog';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -92,19 +103,97 @@ const duotoneVars = (style: DuotoneStyle): React.CSSProperties =>
   }) as React.CSSProperties;
 
 /**
- * Voice persona keys + emoji faces. Decoupled from voice-personas.ts so
- * that file stays server-safe (env-var reads). The keys MUST stay
- * aligned with VoicePersonaKey.
+ * Voice persona tiles. FA duotone face icons (no emojis — memory rule
+ * `feedback_fontawesome_over_emojis.md`: emojis read as cheap, FA
+ * duotone matches the brand).
+ *
+ * Visual treatment: yellow primary for every face. The earlier picker
+ * steps (species, traits) carry the full rainbow; the voice step is
+ * sequenced last and the kid is already invested. Keeping the row
+ * tonally calm (yellow base + varied secondary tints) reads as a row
+ * of happy little voices and avoids competing with the rainbows above.
+ *
+ * Decoupled from voice-personas.ts so that file stays server-safe
+ * (env-var reads). The keys MUST stay aligned with VoicePersonaKey.
  */
-const VOICE_TILES: { key: VoicePersonaKey; face: string; label: string }[] = [
-  { key: 'warm-girl-7yo', face: '😊', label: 'Warm' },
-  { key: 'warm-boy-7yo', face: '🙂', label: 'Cosy' },
-  { key: 'playful-girl-5yo', face: '😄', label: 'Bouncy' },
-  { key: 'playful-boy-5yo', face: '🤪', label: 'Playful' },
-  { key: 'sleepy-neutral', face: '😴', label: 'Sleepy' },
-  { key: 'brave-neutral', face: '😤', label: 'Brave' },
-  { key: 'silly-neutral', face: '🤣', label: 'Silly' },
-  { key: 'gentle-neutral', face: '🤗', label: 'Gentle' },
+const VOICE_TILES: {
+  key: VoicePersonaKey;
+  icon: typeof faFaceSmileBeam;
+  label: string;
+  duotone: DuotoneStyle;
+}[] = [
+  {
+    key: 'warm-girl-7yo',
+    icon: faFaceSmileBeam,
+    label: 'Warm',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-orange))',
+    },
+  },
+  {
+    key: 'warm-boy-7yo',
+    icon: faFaceSmile,
+    label: 'Cosy',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-pink))',
+    },
+  },
+  {
+    key: 'playful-girl-5yo',
+    icon: faFaceGrinStars,
+    label: 'Bouncy',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-pink))',
+    },
+  },
+  {
+    key: 'playful-boy-5yo',
+    icon: faFaceGrinTongue,
+    label: 'Playful',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-green))',
+    },
+  },
+  {
+    key: 'sleepy-neutral',
+    icon: faFaceSleeping,
+    label: 'Sleepy',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-purple))',
+    },
+  },
+  {
+    key: 'brave-neutral',
+    icon: faFaceAwesome,
+    label: 'Brave',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-orange))',
+    },
+  },
+  {
+    key: 'silly-neutral',
+    icon: faFaceLaughBeam,
+    label: 'Silly',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-green))',
+    },
+  },
+  {
+    key: 'gentle-neutral',
+    icon: faFaceSmileRelaxed,
+    label: 'Gentle',
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-teal))',
+    },
+  },
 ];
 
 const CreateCharacterModal = ({ open, onClose }: Props) => {
@@ -118,7 +207,6 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
   const [voicePersona, setVoicePersona] = useState<VoicePersonaKey | null>(
     null,
   );
-  const [error, setError] = useState<string | null>(null);
   const [hasTrackedStart, setHasTrackedStart] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -150,7 +238,6 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     setName('');
     setShowNameEdit(false);
     setVoicePersona(null);
-    setError(null);
     setHasTrackedStart(false);
   };
 
@@ -164,13 +251,11 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
   const stepIndex = STEPS.indexOf(step);
 
   const goNext = () => {
-    setError(null);
     const next = STEPS[stepIndex + 1];
     if (next) setStep(next);
   };
 
   const goBack = () => {
-    setError(null);
     const prev = STEPS[stepIndex - 1];
     if (prev) setStep(prev);
   };
@@ -207,14 +292,13 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
 
   const handleSubmit = () => {
     if (!species || !color) {
-      setError('Please finish all the steps.');
+      toast.error('Please finish all the steps.');
       return;
     }
     if (!name.trim()) {
-      setError('Give your friend a name.');
+      toast.error('Give your friend a name.');
       return;
     }
-    setError(null);
     startTransition(async () => {
       const result = await createCharacter({
         name: name.trim(),
@@ -241,7 +325,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
           worker_unavailable: 'Something went wrong drawing your friend.',
           unknown: 'Something went wrong. Please try again.',
         };
-        setError(
+        toast.error(
           friendly[result.error] ?? 'Something went wrong. Please try again.',
         );
       }
@@ -250,9 +334,31 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent
+        // Hide the default × close button rendered by the shared Dialog
+        // primitive — we render our own chunky red-circle close below so
+        // it's much harder to miss on a kid touchscreen. The default is
+        // an `absolute right-4 top-4` button that lives as a direct child
+        // of DialogContent, so we target it by position via the arbitrary
+        // variant. Keeps the shared primitive untouched for other dialogs
+        // (parent gate / share artwork / create profile / etc.) where
+        // the small × is appropriate.
+        className="max-w-lg space-y-5 p-6 md:p-8 [&>[type='button'].absolute]:hidden"
+      >
+        {/* Chunky kid-friendly close. Sits in the same top-right slot as
+            the default × but with a red filled circle so it pops against
+            the white dialog. DialogClose passes through Radix's dismiss
+            behaviour. */}
+        <DialogClose
+          aria-label="Close"
+          className="absolute right-3 top-3 z-10 w-10 h-10 rounded-full bg-crayon-orange text-white shadow-card flex items-center justify-center hover:scale-110 active:scale-95 transition-transform border-2 border-white"
+        >
+          <FontAwesomeIcon icon={faXmark} className="text-lg" />
+          <span className="sr-only">Close</span>
+        </DialogClose>
+
         <DialogHeader>
-          <DialogTitle className="text-2xl text-center">
+          <DialogTitle className="text-2xl md:text-3xl text-center font-bold">
             {STEP_TITLES[step]}
           </DialogTitle>
           {/* Screen-reader description only — visually hidden via the
@@ -267,7 +373,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
             stepIndex + 1 over STEPS.length means "you're on step N, so
             N/total is filled". */}
         <div
-          className="my-3 h-2 rounded-full bg-paper-cream-dark/60 overflow-hidden"
+          className="h-2 rounded-full bg-paper-cream-dark/60 overflow-hidden"
           role="progressbar"
           aria-valuemin={1}
           aria-valuemax={STEPS.length}
@@ -297,7 +403,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                   className={cn(
                     'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all min-h-[88px]',
                     selected
-                      ? 'border-crayon-orange bg-crayon-orange/10 scale-105'
+                      ? 'border-crayon-orange border-4 bg-white scale-105 shadow-card'
                       : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
                   )}
                 >
@@ -306,7 +412,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                     className="text-3xl"
                     style={duotoneVars(s.duotone)}
                   />
-                  <span className="text-[10px] font-bold text-neutral-600">
+                  <span className="text-sm font-bold text-neutral-800">
                     {s.label}
                   </span>
                 </button>
@@ -330,7 +436,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                   className={cn(
                     'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all min-h-[88px]',
                     selected
-                      ? 'border-crayon-orange scale-105'
+                      ? 'border-crayon-orange border-4 scale-105 shadow-card'
                       : 'border-paper-cream-dark hover:border-crayon-orange',
                   )}
                 >
@@ -340,7 +446,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                       c.swatchClass,
                     )}
                   />
-                  <span className="text-[10px] font-bold text-neutral-600">
+                  <span className="text-sm font-bold text-neutral-800">
                     {c.label}
                   </span>
                 </button>
@@ -352,8 +458,8 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
         {/* ─── Traits ──────────────────────────────────────────────── */}
         {step === 'traits' ? (
           <div className="space-y-3">
-            <p className="text-center text-xs text-neutral-500">
-              Pick up to {MAX_TRAITS}. Or none — totally fine.
+            <p className="text-center text-lg font-bold text-neutral-700">
+              Pick up to {MAX_TRAITS}
             </p>
             <div className="grid grid-cols-4 gap-3">
               {TRAIT_OPTIONS.map((t) => {
@@ -380,7 +486,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                       className="text-2xl"
                       style={duotoneVars(t.duotone)}
                     />
-                    <span className="text-[10px] font-bold text-neutral-600">
+                    <span className="text-sm font-bold text-neutral-800">
                       {t.label}
                     </span>
                   </button>
@@ -392,24 +498,38 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
 
         {/* ─── Name ────────────────────────────────────────────────── */}
         {step === 'name' ? (
-          <div className="flex flex-col items-center gap-4 py-2">
-            <p className="text-center text-3xl font-display">{name}</p>
+          <div className="flex flex-col items-center gap-6 py-4">
+            {/* The generated name is the hero — chunky display type so a
+                kid can read it from across the table, with a soft pill
+                background so it reads as a finished "this is your name". */}
+            <div className="w-full rounded-3xl bg-paper-cream/60 border-2 border-paper-cream-dark px-6 py-8">
+              <p className="text-center text-4xl md:text-5xl font-display leading-none break-words">
+                {name}
+              </p>
+            </div>
+
             <button
               type="button"
               onClick={handleShuffleName}
-              className="inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-5 py-3 text-base font-bold min-h-[44px] hover:scale-105 active:scale-95 transition-transform"
+              className="inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-6 py-3 text-lg font-bold min-h-[56px] hover:scale-105 active:scale-95 transition-transform shadow-card"
             >
               <FontAwesomeIcon icon={faShuffle} />
               Try another
             </button>
+
+            {/* Custom-name escape hatch — visual only icon button. Kids
+                ignore it; parents who care recognise the pencil. No text
+                because "type a custom name" was reading as a settings
+                link and breaking the kid-driven flow. */}
             {!showNameEdit ? (
               <button
                 type="button"
                 onClick={() => setShowNameEdit(true)}
-                className="text-xs text-neutral-500 underline inline-flex items-center gap-1"
+                aria-label="Type a custom name"
+                title="Type a custom name"
+                className="w-10 h-10 rounded-full border-2 border-paper-cream-dark text-neutral-500 hover:text-crayon-orange hover:border-crayon-orange flex items-center justify-center transition-colors"
               >
-                <FontAwesomeIcon icon={faPen} />
-                Type a custom name
+                <FontAwesomeIcon icon={faPen} className="text-sm" />
               </button>
             ) : (
               <input
@@ -417,7 +537,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                 value={name}
                 onChange={(e) => setName(e.target.value.slice(0, 24))}
                 autoFocus
-                className="w-full rounded-2xl border-2 border-paper-cream-dark px-4 py-3 text-lg text-center"
+                className="w-full rounded-2xl border-2 border-paper-cream-dark px-4 py-3 text-2xl font-display text-center"
                 placeholder="Type a name"
                 aria-label="Custom character name"
               />
@@ -443,12 +563,16 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
                   className={cn(
                     'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all min-h-[88px]',
                     selected
-                      ? 'border-crayon-orange bg-crayon-orange/10 scale-105'
+                      ? 'border-crayon-orange border-4 bg-white scale-105 shadow-card'
                       : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
                   )}
                 >
-                  <span className="text-3xl">{v.face}</span>
-                  <span className="text-[10px] font-bold text-neutral-600">
+                  <FontAwesomeIcon
+                    icon={v.icon}
+                    className="text-3xl"
+                    style={duotoneVars(v.duotone)}
+                  />
+                  <span className="text-sm font-bold text-neutral-800">
                     {v.label}
                   </span>
                 </button>
@@ -458,11 +582,9 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
         ) : null}
 
         {/* ─── Footer (nav + submit) ─────────────────────────────── */}
-        {error ? (
-          <p className="text-xs text-red-700 text-center mt-2" role="alert">
-            {error}
-          </p>
-        ) : null}
+        {/* Errors are surfaced via sonner toasts (app-wide pattern), not
+            inline within the modal — toasts overlay above the dialog,
+            auto-dismiss, and don't disturb the picker rhythm. */}
 
         {/* Footer: arrow nav. The Dialog's own × handles dismiss, so no
             Cancel button. Back is only present from step 2 onward; on
