@@ -84,6 +84,22 @@ const getNavItems = (
     href: '/gallery',
     visibility: 'always',
   },
+  // Characters — promoted from slot 5 to slot 3 (right after Gallery,
+  // ahead of Freebies/Products/My Stuff). Reasoning: Characters is the
+  // differentiated retention feature we're trying to push, so it needs
+  // visibility next to the discovery cluster — but not above Gallery,
+  // which remains our SEO/organic acquisition workhorse. Signed-in
+  // only; routing logged-out kids to a sign-in wall would be a worse
+  // UX. Gated by `characters-feature` PostHog flag (always on in dev).
+  ...(showCharacters
+    ? ([
+        {
+          label: 'Characters',
+          href: '/characters',
+          visibility: 'authenticated',
+        },
+      ] as const)
+    : []),
   // Comics demoted from desktop nav (still present in mobile menu +
   // footer) — desktop nav was overflowing once Characters was added.
   // Comics is the least conversion-critical of the top-level entries.
@@ -102,18 +118,6 @@ const getNavItems = (
           label: 'Products',
           href: '/products',
           visibility: 'always',
-        },
-      ] as const)
-    : []),
-  // Characters — gated behind `characters-feature` flag. Shows for
-  // signed-in users only (the feature itself requires auth on submit;
-  // routing logged-out kids to a sign-in wall would be a worse UX).
-  ...(showCharacters
-    ? ([
-        {
-          label: 'Characters',
-          href: '/characters',
-          visibility: 'authenticated',
         },
       ] as const)
     : []),
@@ -158,23 +162,10 @@ const getMobileItems = (
       iconName: faImages,
       href: '/gallery',
     });
-    items.push({
-      label: 'Comics',
-      iconName: faComment,
-      href: '/comics',
-    });
-    items.push({
-      label: t('freebies'),
-      iconName: faToolbox,
-      href: '/tools',
-    });
-    if (showProducts) {
-      items.push({
-        label: 'Products',
-        iconName: faStore,
-        href: '/products',
-      });
-    }
+    // Characters in slot 3 — keep mobile in sync with desktop ordering
+    // (Home, Gallery, Characters, Freebies, Comics, Products, My Stuff,
+    // …). Mobile keeps Comics in the list because the drawer has no
+    // space constraint; desktop demotes Comics to footer-only.
     if (showCharacters) {
       items.push({
         label: 'Characters',
@@ -183,14 +174,31 @@ const getMobileItems = (
       });
     }
     items.push({
-      label: t('blog'),
-      iconName: faNewspaper,
-      href: '/blog',
+      label: t('freebies'),
+      iconName: faToolbox,
+      href: '/tools',
     });
+    items.push({
+      label: 'Comics',
+      iconName: faComment,
+      href: '/comics',
+    });
+    if (showProducts) {
+      items.push({
+        label: 'Products',
+        iconName: faStore,
+        href: '/products',
+      });
+    }
     items.push({
       label: t('myStuff'),
       iconName: faHeart,
       href: '/account/my-artwork',
+    });
+    items.push({
+      label: t('blog'),
+      iconName: faNewspaper,
+      href: '/blog',
     });
     items.push({
       label: t('stickerBook'),
@@ -243,15 +251,17 @@ const getMobileItems = (
       iconName: faImages,
       href: '/gallery',
     });
-    items.push({
-      label: 'Comics',
-      iconName: faComment,
-      href: '/comics',
-    });
+    // Logged-out branch — same ordering as the signed-in mobile menu
+    // minus the auth-gated entries (Characters / My Stuff / etc.).
     items.push({
       label: t('freebies'),
       iconName: faToolbox,
       href: '/tools',
+    });
+    items.push({
+      label: 'Comics',
+      iconName: faComment,
+      href: '/comics',
     });
     if (showProducts) {
       items.push({
