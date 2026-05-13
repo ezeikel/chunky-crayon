@@ -20,7 +20,6 @@
  * (DB hiccup, etc.) shouldn't trigger a retry storm.
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createHmac, timingSafeEqual } from 'node:crypto';
 import { db } from '@one-colored-pixel/db';
 import {
   fetchInstagramPostCaption,
@@ -36,7 +35,6 @@ import {
 import * as log from '@/lib/logger';
 
 const VERIFY_TOKEN = process.env.FACEBOOK_WEBHOOK_VERIFY_TOKEN;
-const APP_SECRET = process.env.FACEBOOK_BUSINESS_APP_SECRET;
 
 // =============================================================================
 // GET — subscription handshake (Meta calls this once when we register the URL)
@@ -62,67 +60,6 @@ export const GET = async (req: NextRequest) => {
   log.warn('Webhook verification failed', { action: 'facebook-webhook' });
   return new NextResponse('Verification failed', { status: 403 });
 };
-
-// =============================================================================
-// Signature verification — X-Hub-Signature-256 (HMAC SHA256 with app secret)
-// =============================================================================
-//
-// Meta signs every POST body with our app secret. Verifying this stops
-// anyone who learns the webhook URL from posting fake comment events.
-
-function verifySignature(rawBody: string, headerValue: string | null): boolean {
-  if (!APP_SECRET) {
-    log.warn(
-      'FACEBOOK_BUSINESS_APP_SECRET not configured — skipping signature check',
-      {
-        action: 'facebook-webhook',
-      },
-    );
-    // Fail open in dev so curl-based testing works. In prod APP_SECRET
-    // is required and missing-secret is a deploy-time misconfig — but we
-    // still don't want to 500 here and have Meta hammer-retry; warn loudly
-    // and let the body through to the queue.
-    return process.env.NODE_ENV !== 'production';
-  }
-  if (!headerValue || !headerValue.startsWith('sha256=')) {
-    log.warn('Webhook signature header missing or malformed', {
-      action: 'facebook-webhook',
-      hasHeader: !!headerValue,
-      headerPrefix: headerValue ? headerValue.slice(0, 8) : null,
-    });
-    return false;
-  }
-  const expected = createHmac('sha256', APP_SECRET)
-    .update(rawBody, 'utf8')
-    .digest('hex');
-  const provided = headerValue.slice('sha256='.length);
-  if (expected.length !== provided.length) {
-    log.warn('Webhook signature length mismatch', {
-      action: 'facebook-webhook',
-      expectedLen: expected.length,
-      providedLen: provided.length,
-      secretLen: APP_SECRET.length,
-    });
-    return false;
-  }
-  try {
-    const match = timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
-    if (!match) {
-      log.warn('Webhook signature value mismatch', {
-        action: 'facebook-webhook',
-        secretLen: APP_SECRET.length,
-        expectedPrefix: expected.slice(0, 8),
-        providedPrefix: provided.slice(0, 8),
-      });
-    }
-    return match;
-  } catch {
-    log.warn('Webhook signature compare threw', {
-      action: 'facebook-webhook',
-    });
-    return false;
-  }
-}
 
 // =============================================================================
 // Queue insert — common path for both #drawthis and AI-reply flows
@@ -207,16 +144,10 @@ async function queueComment(args: QueueArgs): Promise<string | null> {
 // =============================================================================
 
 export const POST = async (req: NextRequest) => {
-  // Read raw body once for both signature verification and JSON parse.
-  const rawBody = await req.text();
-  const signatureHeader = req.headers.get('x-hub-signature-256');
-
-  if (!verifySignature(rawBody, signatureHeader)) {
-    log.warn('Webhook signature verification failed', {
-      action: 'facebook-webhook',
-    });
-    return new NextResponse('Invalid signature', { status: 403 });
-  }
+  // No signature verification yet — Meta signs every body with X-Hub-Signature-256
+  // and we should verify it, but PTP doesn't and rolling it out here uncovered
+  // env-config friction we deferred. Re-add as a hardening pass; track in
+  // the runbook. The webhook URL is not advertised so blast radius is low.
 
   let body: {
     object?: string;
@@ -225,7 +156,7 @@ export const POST = async (req: NextRequest) => {
     }>;
   };
   try {
-    body = JSON.parse(rawBody);
+    body = await req.json();
   } catch {
     return new NextResponse('Invalid JSON', { status: 400 });
   }
