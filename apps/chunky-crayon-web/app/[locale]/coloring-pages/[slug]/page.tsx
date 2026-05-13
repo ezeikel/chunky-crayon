@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { getLandingIcon } from '@/lib/seo/landing-icons';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
 import ColoringImageDetailView from '@/components/ColoringImageDetailView/ColoringImageDetailView';
@@ -13,7 +15,11 @@ import {
   getColoringImageById,
 } from '@/app/data/coloring-image';
 import { generateAlternates } from '@/lib/seo';
-import { LANDING_PAGES, getLandingPageBySlug } from '@/lib/seo/landing-pages';
+import {
+  LANDING_PAGES,
+  getLandingPageBySlug,
+  getRelatedLandings,
+} from '@/lib/seo/landing-pages';
 import {
   getCanonicalSlugForImage,
   getIdSuffixFromSlug,
@@ -161,7 +167,51 @@ const LandingPageContent = async ({
           <p className="font-tondo text-lg text-crayon-orange mb-4">
             {config.tagline}
           </p>
-          <p className="text-muted-foreground">{config.intro}</p>
+          {/* Problem-solver landings get a different copy block: targeted
+              audience line + situation acknowledgement + optional citation.
+              The reframing matters because these searchers arrived with a
+              problem, not browsing curiosity. Theme landings render the
+              standard intro only. */}
+          {config.angle === 'problem' ? (
+            <div className="space-y-4 text-left">
+              {config.targetAudience ? (
+                <p className="text-sm font-tondo text-muted-foreground italic text-center">
+                  {config.targetAudience}
+                </p>
+              ) : null}
+              {config.problemFraming ? (
+                <div className="bg-paper-cream/60 rounded-2xl p-5 border border-crayon-orange/20">
+                  <p className="text-xs font-tondo font-semibold uppercase tracking-wider text-crayon-orange mb-2">
+                    The situation
+                  </p>
+                  <p className="text-foreground">{config.problemFraming}</p>
+                </div>
+              ) : null}
+              <p className="text-muted-foreground text-center">
+                {config.intro}
+              </p>
+              {config.researchCitation?.source &&
+              config.researchCitation?.claim ? (
+                <p className="text-xs text-muted-foreground italic text-center">
+                  &ldquo;{config.researchCitation.claim}&rdquo; —{' '}
+                  {config.researchCitation.url ? (
+                    <a
+                      href={config.researchCitation.url}
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      className="underline hover:text-foreground"
+                    >
+                      {config.researchCitation.source}
+                    </a>
+                  ) : (
+                    config.researchCitation.source
+                  )}
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">{config.intro}</p>
+          )}
           <div className="mt-6 flex flex-col items-center gap-3">
             {/* Primary CTA — instant pack download. The reason a parent
                 landed here from a "free X coloring pages" query is to
@@ -177,7 +227,9 @@ const LandingPageContent = async ({
               href="/"
               className="font-tondo text-crayon-orange underline-offset-4 hover:underline"
             >
-              Or make your own custom page →
+              {config.angle === 'problem'
+                ? 'Or make a custom calming page for your kid →'
+                : 'Or make your own custom page →'}
             </Link>
           </div>
         </header>
@@ -200,6 +252,60 @@ const LandingPageContent = async ({
             .
           </div>
         )}
+
+        {/* Related landings — internal cross-linking. Google rewards
+            topical clusters where related pages link to each other, and
+            it gives readers a natural next-step that keeps them on-site
+            instead of bouncing back to search. */}
+        {(() => {
+          const related = getRelatedLandings(slug, 4);
+          if (related.length === 0) return null;
+          return (
+            <section className="mt-16 max-w-4xl mx-auto">
+              <h2 className="font-tondo text-xl md:text-2xl font-extrabold mb-2 text-primary">
+                Related coloring page collections
+              </h2>
+              <p className="text-sm text-muted-foreground mb-5">
+                Other collections parents and teachers often pair with this one.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {related.map((r) => {
+                  const { icon, color } = getLandingIcon(r.slug);
+                  return (
+                    <Link
+                      key={r.slug}
+                      href={`/coloring-pages/${r.slug}`}
+                      className="group flex items-start gap-3 bg-paper-cream/40 hover:bg-paper-cream/70 border-2 border-crayon-orange/15 hover:border-crayon-orange/40 rounded-2xl p-4 transition-colors"
+                    >
+                      <div
+                        className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-white/60 group-hover:bg-white transition-colors"
+                        style={{ color }}
+                      >
+                        <FontAwesomeIcon icon={icon} className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-tondo font-bold text-sm text-foreground mb-0.5">
+                          {r.title}
+                        </h3>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {r.tagline}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="mt-6 text-center">
+                <Link
+                  href="/coloring-pages"
+                  className="font-tondo text-crayon-orange underline-offset-4 hover:underline text-sm"
+                >
+                  See all coloring page collections →
+                </Link>
+              </div>
+            </section>
+          );
+        })()}
       </PageWrap>
     </>
   );
@@ -275,8 +381,28 @@ const SlugRouter = async ({
   );
 };
 
+// Skeleton that mirrors the actual landing shape (header + gallery grid).
+// Replaces the inline "Loading…" string — the brand convention is
+// per-page LoadingSkeletons that match the surrounding layout, not a
+// generic spinner.
+const LoadingSkeleton = () => (
+  <div className="animate-pulse max-w-5xl mx-auto px-6 py-12">
+    <div className="text-center mb-10 max-w-3xl mx-auto">
+      <div className="h-10 bg-paper-cream rounded w-3/4 mx-auto mb-4" />
+      <div className="h-5 bg-paper-cream rounded w-1/2 mx-auto mb-3" />
+      <div className="h-4 bg-paper-cream rounded w-5/6 mx-auto mb-1.5" />
+      <div className="h-4 bg-paper-cream rounded w-2/3 mx-auto" />
+    </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="aspect-square bg-paper-cream rounded-xl" />
+      ))}
+    </div>
+  </div>
+);
+
 const LandingPage = ({ params }: { params: Promise<PageParams> }) => (
-  <Suspense fallback={<div className="text-center py-24">Loading…</div>}>
+  <Suspense fallback={<LoadingSkeleton />}>
     <SlugRouter paramsPromise={params} />
   </Suspense>
 );

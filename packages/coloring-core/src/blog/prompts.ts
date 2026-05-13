@@ -6,6 +6,7 @@
  */
 
 import { NO_EM_DASHES_RULE } from "../utils/copy";
+import { BLOG_LANDING_PAGES } from "./landings";
 
 export const BLOG_POST_SYSTEM = `You are an expert content writer for Chunky Crayon, a family-friendly AI coloring page generator. You write engaging, SEO-optimized blog posts that help parents and educators discover the benefits of creative coloring activities.
 
@@ -29,8 +30,14 @@ Content structure:
 - Clear subheadings (H2, H3) for scannability
 - Short paragraphs (2-3 sentences max)
 - Bullet points for lists
-- Include at least 2-3 internal link opportunities to "/", "/pricing", or "/blog/[related-topic]"
-- Conclude with a call-to-action relating to Chunky Crayon`;
+- Conclude with a call-to-action relating to Chunky Crayon
+
+Internal linking (important for SEO):
+- Include 2-3 internal links total.
+- At least ONE link MUST point to a relevant /coloring-pages/{slug} landing page from the list provided in the user message. Pick the slug whose topic best matches the blog content (e.g. if you mention dinosaurs, link "dinosaur coloring pages" to the dinosaur landing). Anchor text should be natural phrases that read like normal sentence text, not "click here".
+- Use relative URLs (e.g. /coloring-pages/cute-dinosaur-coloring-pages-for-kids), not absolute https URLs.
+- DO NOT invent landing-page slugs. If no slug in the provided list fits the topic, link to "/" or "/pricing" instead.
+- Format internal links as standard markdown: [anchor text](/coloring-pages/slug-here).`;
 
 export const createBlogPostPrompt = (
   topic: string,
@@ -42,13 +49,17 @@ Target keywords to naturally include: ${keywords.join(", ")}
 
 ${coveredTopics.length > 0 ? `Topics we've already covered (don't repeat these): ${coveredTopics.slice(0, 20).join(", ")}` : ""}
 
+Available landing pages for internal linking — pick 1-2 that best fit the topic and link to them naturally inside the body (relative URL, descriptive anchor text):
+${BLOG_LANDING_PAGES.map((l) => `- /coloring-pages/${l.slug} — ${l.title}`).join("\n")}
+
 Requirements:
 - 1200-1800 words
 - Include 4-6 H2 subheadings
 - Write in American English
 - Make it practical and actionable
 - Include a soft CTA for Chunky Crayon (don't be pushy)
-- Format as clean markdown with proper heading hierarchy`;
+- Format as clean markdown with proper heading hierarchy
+- Embed 1-2 internal links to the most thematically relevant /coloring-pages/{slug} landing(s) from the list above`;
 
 export const BLOG_META_SYSTEM = `You are an SEO expert who creates compelling blog post metadata. Generate title, slug, and description that are optimized for search engines while remaining engaging for readers.
 
