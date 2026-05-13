@@ -161,6 +161,13 @@ export const POST = async (req: NextRequest) => {
     return new NextResponse('Invalid JSON', { status: 400 });
   }
 
+  // Diagnostic — log the full payload so we can see what Meta is sending
+  // and why we may have filtered it out. PTP does the same. Trim later.
+  // eslint-disable-next-line no-console
+  console.log(
+    `[facebook-webhook] FULL BODY: ${JSON.stringify(body).slice(0, 2000)}`,
+  );
+
   // Collect work then await all in parallel so the response can return
   // quickly. Each promise catches its own errors — one failed insert
   // shouldn't poison the others.
