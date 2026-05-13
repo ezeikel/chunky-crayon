@@ -2,18 +2,19 @@
 
 Permanent reference for how moving parts of this monorepo work. Each topic has its own folder or file. CLAUDE.md is for hot rules; this is for "how does X actually work, end to end."
 
-| Topic                      | Path                                                 | What's in it                                                                                                                      |
-| -------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **Bundles**                | [bundles/](./bundles/README.md)                      | Themed coloring bundles — profile spec, launch orchestrator, listing images, Stripe products, end-to-end runbook                  |
-| **Daily content crons**    | [crons/](./crons/README.md)                          | Blog + daily-image crons — Vercel thin trigger, Hetzner worker pipeline, fire-and-forget, env requirements                        |
-| **Social posting**         | [social-posting/](./social-posting/README.md)        | Auto-posting to IG/FB/Pinterest/TikTok — schedule, paused features (handlers intact), Daily Posting Brief email, engagement audit |
-| **Demo reels**             | [demo-reels/](./demo-reels/README.md)                | Vertical video crons (text + image variants), Hetzner worker, photo library, common failure modes                                 |
-| **Voice mode**             | [voice-mode/](./voice-mode/README.md)                | 2-turn conversational create flow — Deepgram STT, Claude follow-up, ElevenLabs TTS, kid safety stack                              |
-| **Design system**          | [design-system/](./design-system/README.md)          | Tokens, fonts, motion, brand parity for CC + CH                                                                                   |
-| **Ads**                    | [ads/](./ads/README.md)                              | Config-driven ads, campaign templates, asset generation                                                                           |
-| **SEO**                    | [seo/](./seo/blog-content-strategy.md)               | Blog content-cluster strategy — what to write next, what compounds on existing winners, ship-cadence + measurement                |
-| **R2 storage migration**   | [R2_STORAGE_MIGRATION.md](./R2_STORAGE_MIGRATION.md) | Historical migration notes                                                                                                        |
-| **Plans (in-flight work)** | [plans/](./plans/)                                   | Multi-phase implementation plans, scratchpad-style                                                                                |
+| Topic                      | Path                                                          | What's in it                                                                                                                                          |
+| -------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Bundles**                | [bundles/](./bundles/README.md)                               | Themed coloring bundles — profile spec, launch orchestrator, listing images, Stripe products, end-to-end runbook                                      |
+| **Daily content crons**    | [crons/](./crons/README.md)                                   | Blog + daily-image crons — Vercel thin trigger, Hetzner worker pipeline, fire-and-forget, env requirements                                            |
+| **Social posting**         | [social-posting/](./social-posting/README.md)                 | Auto-posting to IG/FB/Pinterest/TikTok — schedule, paused features (handlers intact), Daily Posting Brief email, engagement audit                     |
+| **Comment image requests** | [comment-image-requests/](./comment-image-requests/README.md) | `#drawthis` IG/FB comments → moderated coloring page gen → image DM (IG) or link reply (FB). Doubles as the AI auto-reply system for normal comments. |
+| **Demo reels**             | [demo-reels/](./demo-reels/README.md)                         | Vertical video crons (text + image variants), Hetzner worker, photo library, common failure modes                                                     |
+| **Voice mode**             | [voice-mode/](./voice-mode/README.md)                         | 2-turn conversational create flow — Deepgram STT, Claude follow-up, ElevenLabs TTS, kid safety stack                                                  |
+| **Design system**          | [design-system/](./design-system/README.md)                   | Tokens, fonts, motion, brand parity for CC + CH                                                                                                       |
+| **Ads**                    | [ads/](./ads/README.md)                                       | Config-driven ads, campaign templates, asset generation                                                                                               |
+| **SEO**                    | [seo/](./seo/blog-content-strategy.md)                        | Blog content-cluster strategy — what to write next, what compounds on existing winners, ship-cadence + measurement                                    |
+| **R2 storage migration**   | [R2_STORAGE_MIGRATION.md](./R2_STORAGE_MIGRATION.md)          | Historical migration notes                                                                                                                            |
+| **Plans (in-flight work)** | [plans/](./plans/)                                            | Multi-phase implementation plans, scratchpad-style                                                                                                    |
 
 ## When to add a doc here
 
