@@ -36,7 +36,9 @@
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
     "navigationMenu": "Menu de navigation",
-    "backToGallery": "Retour à la galerie"
+    "backToGallery": "Retour à la galerie",
+    "freebies": "Cadeaux",
+    "myStuff": "Mes contenus"
   },
   "coloringPage": {
     "title": "Page à colorier",

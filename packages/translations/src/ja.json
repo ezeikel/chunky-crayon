@@ -36,7 +36,9 @@
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
     "navigationMenu": "ナビゲーションメニュー",
-    "backToGallery": "ギャラリーに戻る"
+    "backToGallery": "ギャラリーに戻る",
+    "freebies": "無料アイテム",
+    "myStuff": "マイアイテム"
   },
   "coloringPage": {
     "title": "ぬりえ",

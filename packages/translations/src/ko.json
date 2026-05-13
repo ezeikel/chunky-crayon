@@ -36,7 +36,9 @@
     "openMenu": "메뉴 열기",
     "closeMenu": "메뉴 닫기",
     "navigationMenu": "탐색 메뉴",
-    "backToGallery": "갤러리로 돌아가기"
+    "backToGallery": "갤러리로 돌아가기",
+    "freebies": "무료 항목",
+    "myStuff": "내 항목"
   },
   "coloringPage": {
     "title": "색칠 페이지",
