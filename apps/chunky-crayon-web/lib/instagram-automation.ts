@@ -13,7 +13,7 @@ import * as log from '@/lib/logger';
 const GRAPH = 'https://graph.facebook.com/v22.0';
 
 const { INSTAGRAM_ACCOUNT_ID } = process.env;
-const PAGE_ACCESS_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+const PAGE_ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
 const { FACEBOOK_PAGE_ID } = process.env;
 
 type GraphResult = { success: boolean; error?: string };

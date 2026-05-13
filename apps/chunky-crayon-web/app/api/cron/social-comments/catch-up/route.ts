@@ -24,7 +24,7 @@ import * as log from '@/lib/logger';
 export const maxDuration = 300;
 
 const LOOKBACK_DAYS = 7;
-const PAGE_ACCESS_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+const PAGE_ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
 const { FACEBOOK_PAGE_ID } = process.env;
 
 type FBComment = {
@@ -109,7 +109,7 @@ async function catchUp(request: NextRequest): Promise<NextResponse> {
 
   if (!PAGE_ACCESS_TOKEN || !FACEBOOK_PAGE_ID) {
     return NextResponse.json(
-      { error: 'FACEBOOK_PAGE_ACCESS_TOKEN or FACEBOOK_PAGE_ID missing' },
+      { error: 'FACEBOOK_ACCESS_TOKEN or FACEBOOK_PAGE_ID missing' },
       { status: 500 },
     );
   }
