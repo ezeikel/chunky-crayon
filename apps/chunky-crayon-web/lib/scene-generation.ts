@@ -110,8 +110,11 @@ const BLOCKED_WORDS = [
 /**
  * Check if a scene description contains any blocked words.
  * Returns the first blocked word found, or null if safe.
+ *
+ * Exported so other surfaces (e.g. the IG/FB `#drawthis` comment flow) can
+ * apply the same kid-safety gate without duplicating the blocklist.
  */
-function findBlockedContent(description: string): string | null {
+export function findBlockedContent(description: string): string | null {
   const lower = description.toLowerCase();
   for (const word of BLOCKED_WORDS) {
     // Match whole words only (avoid false positives like "sword" in "swordfish")

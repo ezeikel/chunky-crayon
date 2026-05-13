@@ -34,8 +34,12 @@ import {
 import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { ACTIONS } from '@/constants';
-import { REFERENCE_IMAGES, prompts } from '@/lib/ai';
-import { buildCharacterAwareColoringPrompt } from '@/lib/ai/character-aware-prompts';
+import { prompts } from '@/lib/ai';
+import {
+  type WorkerBody,
+  postToWorker,
+  buildTextModeWorkerBody,
+} from '@/lib/coloring-worker';
 import { moderateVoiceText } from '@/lib/moderation';
 import {
   generateQuickTitleFromVoice,
@@ -137,43 +141,6 @@ const refundCredits = async (userId: string, amount: number): Promise<void> => {
       type: CreditTransactionType.GENERATION,
     },
   });
-};
-
-type WorkerBody = {
-  coloringImageId: string;
-  prompt: string;
-  description: string;
-  locale: string;
-  brand: Brand;
-  /** Worker refunds this if the job ends FAILED. */
-  creditCost: number;
-  referenceImageUrls?: string[];
-  imagesInline?: { b64: string; ext: 'png' | 'jpeg' | 'webp' }[];
-  size: '1024x1024';
-  quality: ImageQuality;
-  partialImages: 3;
-};
-
-const postToWorker = async (body: WorkerBody): Promise<void> => {
-  const workerUrl = process.env.CHUNKY_CRAYON_WORKER_URL;
-  const workerSecret = process.env.WORKER_SECRET;
-  if (!workerUrl) {
-    throw new Error('CHUNKY_CRAYON_WORKER_URL not set');
-  }
-  const resp = await fetch(`${workerUrl}/jobs/coloring-image/start`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {}),
-    },
-    body: JSON.stringify(body),
-  });
-  if (!resp.ok) {
-    const text = await resp.text().catch(() => '');
-    throw new Error(
-      `worker /jobs/coloring-image/start failed: ${resp.status} ${text.slice(0, 300)}`,
-    );
-  }
 };
 
 // ----------------------------------------------------------------------------
@@ -457,62 +424,28 @@ export const createPendingColoringImage = async (
         partialImages: 3,
       };
     } else {
-      // Three prompt branches:
-      //   1. Character picked → character-aware prompt + portrait at
-      //      slot 0 of referenceImageUrls (cap total at 4 to stay within
-      //      OpenAI's 16-ref limit with comfy headroom and to avoid
-      //      drowning the character ref in style refs).
-      //   2. No character + non-BEGINNER difficulty → difficulty-aware
-      //      prompt (existing behaviour).
-      //   3. Default → standard coloring prompt (existing behaviour).
-      let corePrompt: string;
-      let referenceImageUrls: string[];
-
-      if (resolvedCharacter) {
-        corePrompt = buildCharacterAwareColoringPrompt({
-          description,
-          locale: args.locale,
-          difficulty: activeProfile?.difficulty,
-          character: {
-            name: resolvedCharacter.name,
-            species: resolvedCharacter.species,
-            traits: resolvedCharacter.traits,
-            signatureDetails: resolvedCharacter.signatureDetails,
-          },
-        });
-        // Character portrait first; then top up with brand style refs so
-        // gpt-image-2 still knows the target line-art aesthetic.
-        referenceImageUrls = [
-          resolvedCharacter.portraitLineArtUrl,
-          ...REFERENCE_IMAGES.slice(0, 3),
-        ];
-      } else if (
-        activeProfile?.difficulty &&
-        activeProfile.difficulty !== 'BEGINNER'
-      ) {
-        corePrompt = prompts.createDifficultyAwarePrompt(
-          description,
-          activeProfile.difficulty,
-        );
-        referenceImageUrls = REFERENCE_IMAGES.slice(0, 4);
-      } else {
-        corePrompt = prompts.createColoringImagePrompt(description);
-        referenceImageUrls = REFERENCE_IMAGES.slice(0, 4);
-      }
-
-      const styledPrompt = `The provided images show the target coloring book style. Match their line weight, simplicity, and outline-only aesthetic.\n\n${corePrompt}`;
-      workerBody = {
+      // Text + voice modes share the same prompt-build path: optional
+      // character ref, difficulty-aware fallback, then the standard
+      // prompt. Lives in lib/coloring-worker.ts so the comment-request
+      // flow can reuse it without dragging credits/auth into that path.
+      workerBody = buildTextModeWorkerBody({
         coloringImageId: pending.id,
-        prompt: styledPrompt,
         description,
         locale: args.locale,
         brand: BRAND,
-        creditCost: userId ? cost : 0,
-        referenceImageUrls,
-        size: '1024x1024',
         quality: resolvedQuality,
-        partialImages: 3,
-      };
+        creditCost: userId ? cost : 0,
+        difficulty: activeProfile?.difficulty ?? undefined,
+        character: resolvedCharacter
+          ? {
+              name: resolvedCharacter.name,
+              species: resolvedCharacter.species,
+              traits: resolvedCharacter.traits,
+              signatureDetails: resolvedCharacter.signatureDetails,
+              portraitLineArtUrl: resolvedCharacter.portraitLineArtUrl,
+            }
+          : undefined,
+      });
     }
 
     await postToWorker(workerBody);
