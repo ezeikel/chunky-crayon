@@ -23,6 +23,15 @@
     },
     "app/api/cron/recover-stuck-content/route.ts": {
       "maxDuration": 180
+    },
+    "app/api/cron/social-comments/process/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/cron/social-comments/catch-up/route.ts": {
+      "maxDuration": 300
+    },
+    "app/api/facebook/webhook/route.ts": {
+      "maxDuration": 30
     }
   },
   "crons": [
@@ -159,6 +168,15 @@
     {
       "path": "/api/social/comic-strip-post?platform=pinterest",
       "schedule": "0 23 * * 0"
+    },
+
+    {
+      "path": "/api/cron/social-comments/process",
+      "schedule": "*/2 * * * *"
+    },
+    {
+      "path": "/api/cron/social-comments/catch-up",
+      "schedule": "0 4 * * *"
     }
   ]
 }

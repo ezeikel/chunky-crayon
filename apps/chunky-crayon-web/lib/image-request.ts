@@ -32,6 +32,7 @@ import {
   replyToFacebookComment,
   sendTextDM,
 } from '@/lib/instagram-automation';
+import { postBlockKitMessage, buildModerationMessage } from '@/lib/slack';
 import * as log from '@/lib/logger';
 
 // =============================================================================
@@ -370,20 +371,85 @@ export async function handleImageRequest({
   }
 
   if (moderation.decision === 'borderline') {
-    log.info('Image request borderline — pending Slack approval', {
+    log.info('Image request borderline — posting to Slack', {
       action: 'image-request',
       queueRowId,
       reason: moderation.reason,
       commenterUsername,
     });
-    // TODO(slack): post Block Kit message with Approve/Reject buttons,
-    // store slackChannelId + slackMessageTs on the row. Wired in the
-    // /api/admin/slack/interact PR.
+
+    const channel = process.env.SLACK_CC_MODERATION_CHANNEL_ID;
+    if (!channel) {
+      // No channel configured — fail safe by blocking. Better to skip
+      // than auto-fire a prompt the moderation triad couldn't agree on.
+      log.warn(
+        'SLACK_CC_MODERATION_CHANNEL_ID not set — treating borderline as blocked',
+        { action: 'image-request', queueRowId },
+      );
+      await Promise.allSettled([
+        platform === 'INSTAGRAM'
+          ? replyToComment(commentId, pickRandom(SORRY_REPLIES))
+          : replyToFacebookComment(commentId, pickRandom(SORRY_REPLIES)),
+        platform === 'INSTAGRAM'
+          ? sendTextDM(commenterId, pickRandom(SORRY_DMS))
+          : Promise.resolve(),
+        db.socialCommentQueue.update({
+          where: { id: queueRowId },
+          data: {
+            status: 'SKIPPED',
+            errorMessage: `borderline-no-slack:${moderation.reason}`,
+            processedAt: new Date(),
+          },
+        }),
+      ]);
+      return;
+    }
+
+    const slackPost = await postBlockKitMessage({
+      channel,
+      ...buildModerationMessage({
+        queueRowId,
+        platform,
+        commenterUsername,
+        prompt,
+        triadReasoning: moderation.reason,
+      }),
+    });
+
+    if (!slackPost.ok) {
+      // Same fail-safe: block rather than auto-fire if Slack is down.
+      log.warn('Slack post failed for borderline — treating as blocked', {
+        action: 'image-request',
+        queueRowId,
+        error: slackPost.error,
+      });
+      await Promise.allSettled([
+        platform === 'INSTAGRAM'
+          ? replyToComment(commentId, pickRandom(SORRY_REPLIES))
+          : replyToFacebookComment(commentId, pickRandom(SORRY_REPLIES)),
+        platform === 'INSTAGRAM'
+          ? sendTextDM(commenterId, pickRandom(SORRY_DMS))
+          : Promise.resolve(),
+        db.socialCommentQueue.update({
+          where: { id: queueRowId },
+          data: {
+            status: 'SKIPPED',
+            errorMessage: `borderline-slack-failed:${slackPost.error}`,
+            processedAt: new Date(),
+          },
+        }),
+      ]);
+      return;
+    }
+
+    // Slack posted — park the row at PENDING until Approve/Reject fires.
     await db.socialCommentQueue.update({
       where: { id: queueRowId },
       data: {
         status: 'PENDING',
         errorMessage: `borderline:${moderation.reason}`,
+        slackChannelId: slackPost.channel,
+        slackMessageTs: slackPost.ts,
       },
     });
     return;
