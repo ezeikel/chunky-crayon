@@ -31,9 +31,12 @@ import {
   getCategoryCounts,
   getGalleryStats,
   getDifficultyCounts,
+  getAgeGroupCounts,
 } from '@/app/data/gallery';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { Difficulty } from '@one-colored-pixel/db';
+import { getLandingPageBySlug } from '@/lib/seo/landing-pages';
+import { getLandingIcon } from '@/lib/seo/landing-icons';
 import cn from '@/lib/utils';
 import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
 
@@ -232,7 +235,11 @@ const AGE_GROUP_CARDS: {
 ];
 
 const AgeGroupCards = async ({ locale }: { locale: string }) => {
-  const t = await getTranslations({ locale, namespace: 'gallery' });
+  const [t, statsT, counts] = await Promise.all([
+    getTranslations({ locale, namespace: 'gallery' }),
+    getTranslations({ locale, namespace: 'gallery.stats' }),
+    getAgeGroupCounts(),
+  ]);
 
   return (
     <section className="mb-12">
@@ -265,6 +272,9 @@ const AgeGroupCards = async ({ locale }: { locale: string }) => {
             </p>
             <p className="text-xs text-text-secondary mt-1">
               {t(`ageGroups.${group.key}.description`)}
+            </p>
+            <p className="text-xs text-text-tertiary mt-2">
+              {counts[group.key] || 0} {statsT('pagesSuffix')}
             </p>
           </Link>
         ))}
@@ -361,6 +371,82 @@ const DifficultyCards = async ({ locale }: { locale: string }) => {
             </p>
           </Link>
         ))}
+      </div>
+    </section>
+  );
+};
+
+// Curated set of /coloring-pages/ landings surfaced on the gallery. Mix
+// of theme bestsellers and problem-solver hooks so browsing visitors get
+// a narrowing tool without losing the gallery's main purpose. The full
+// 73-landing directory lives at /coloring-pages.
+const BROWSE_BY_TOPIC_SLUGS = [
+  // Theme bestsellers
+  'bold-and-easy-animal-coloring-pages',
+  'cute-dinosaur-coloring-pages-for-kids',
+  'unicorn-coloring-pages-for-kids',
+  'easy-space-coloring-pages-for-kids',
+  // Problem-solver hooks
+  'calming-coloring-pages-for-kids-with-adhd',
+  'rainy-day-coloring-activities-for-kids',
+  'coloring-pages-for-autistic-children',
+  'screen-free-activities-for-6-year-olds',
+] as const;
+
+const BrowseByTopicCards = ({ locale: _locale }: { locale: string }) => {
+  const landings = BROWSE_BY_TOPIC_SLUGS.map((slug) =>
+    getLandingPageBySlug(slug),
+  ).filter((p): p is NonNullable<typeof p> => Boolean(p));
+
+  if (landings.length === 0) return null;
+
+  return (
+    <section className="mb-12">
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3">
+          <FontAwesomeIcon
+            icon={faSparkles}
+            className="text-2xl"
+            style={
+              {
+                '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+                '--fa-secondary-opacity': '1',
+              } as React.CSSProperties
+            }
+          />
+          <h2 className="font-tondo font-bold text-2xl text-text-primary">
+            Browse by Topic
+          </h2>
+        </div>
+        <Link
+          href="/coloring-pages"
+          className="text-sm text-crayon-orange hover:underline underline-offset-4 font-tondo whitespace-nowrap"
+        >
+          See all collections →
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        {landings.map((landing) => {
+          const { icon, color } = getLandingIcon(landing.slug);
+          return (
+            <Link
+              key={landing.slug}
+              href={`/coloring-pages/${landing.slug}`}
+              className="group p-4 rounded-2xl bg-white border-2 border-paper-cream-dark hover:shadow-md transition-all text-center"
+            >
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 bg-paper-cream/60 group-hover:bg-paper-cream transition-colors"
+                style={{ color }}
+              >
+                <FontAwesomeIcon icon={icon} className="text-xl" />
+              </div>
+              <h3 className="font-tondo font-semibold text-sm text-text-primary line-clamp-2">
+                {landing.title}
+              </h3>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
@@ -516,6 +602,7 @@ const GalleryContent = async ({ locale }: { locale: string }) => {
         <AgeGroupCards locale={locale} />
         <DifficultyCards locale={locale} />
         <CategoryCards locale={locale} />
+        <BrowseByTopicCards locale={locale} />
       </Suspense>
 
       {/* SEO Content */}

@@ -45,7 +45,10 @@ export const ALL_DIFFICULTIES = Object.values(Difficulty) as Difficulty[];
 export const GALLERY_PAGE_SIZE = 24;
 
 // ===== COMMUNITY IMAGES =====
-// Public images created by users (shared with community)
+// Public images created by REAL USERS (UGC). System-generated images
+// belong in the daily / themed / category sections, not Community.
+// The old query had `userId: null` which inverted this — it showed
+// system images and hid every actual user creation.
 
 const getCommunityImagesBase = async (
   cursor?: string,
@@ -58,7 +61,9 @@ const getCommunityImagesBase = async (
   const images = await db.coloringImage.findMany({
     where: {
       ...brandWhere,
-      userId: null, // Community images have no userId
+      userId: { not: null }, // UGC only — user-created images
+      showInCommunity: true, // The user opted into community visibility
+      status: 'READY',
     },
     select: {
       ...GALLERY_IMAGE_SELECT,
@@ -259,7 +264,11 @@ export const getCategoryImages = async (
 };
 
 // ===== FEATURED/RECENT IMAGES =====
-// For the main gallery page hero section
+// For the main gallery page hero section. Returns CURATED (system-
+// generated) images, not user content — these slots are programmatic
+// showcase, not UGC. The `userId: null` filter is intentional: it
+// picks system-owned rows. The misleading "Only community images"
+// comment from the original implementation has been corrected here.
 
 export const getFeaturedImages = async (limit: number = 6) => {
   'use cache';
@@ -269,7 +278,8 @@ export const getFeaturedImages = async (limit: number = 6) => {
   return db.coloringImage.findMany({
     where: {
       ...brandWhere,
-      userId: null, // Only community images
+      userId: null, // System-generated curated images
+      svgUrl: { not: null },
     },
     select: {
       ...GALLERY_IMAGE_SELECT,
@@ -280,6 +290,38 @@ export const getFeaturedImages = async (limit: number = 6) => {
     },
     take: limit,
   });
+};
+
+// ===== AGE GROUP COUNTS =====
+// Per-age-group image counts for the AgeGroupCards on /gallery. Mirrors
+// the per-page category clusters in /gallery/for-{toddlers,kids,teens,adults}.
+// Counts are scoped to curated (system) images because age-group landing
+// pages showcase our content, not UGC.
+
+const AGE_GROUP_TAGS = {
+  toddlers: ['animals', 'food', 'vehicles', 'nature'],
+  kids: ['animals', 'fantasy', 'characters', 'vehicles', 'nature', 'space'],
+  teens: ['fantasy', 'characters', 'detailed', 'patterns', 'space'],
+  adults: ['mandala', 'patterns', 'detailed', 'nature', 'abstract'],
+} as const;
+
+export const getAgeGroupCounts = async () => {
+  'use cache';
+  cacheLife('gallery-category');
+  cacheTag('gallery-category', 'gallery-age-group-counts');
+
+  const counts: Record<string, number> = {};
+  for (const [key, tags] of Object.entries(AGE_GROUP_TAGS)) {
+    counts[key] = await db.coloringImage.count({
+      where: {
+        ...brandWhere,
+        userId: null,
+        svgUrl: { not: null },
+        tags: { hasSome: [...tags] },
+      },
+    });
+  }
+  return counts;
 };
 
 // ===== CATEGORY COUNTS =====
