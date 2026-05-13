@@ -19,7 +19,7 @@ export const GET = async (request: NextRequest) => {
   const storedState = request.cookies.get('tiktok_user_oauth_state')?.value;
   const userId = request.cookies.get('tiktok_user_id')?.value;
   const returnUrl =
-    request.cookies.get('tiktok_return_url')?.value || '/account/my-artwork';
+    request.cookies.get('tiktok_return_url')?.value || '/account/my-stuff';
 
   const errorRedirect = (msg: string) =>
     NextResponse.redirect(

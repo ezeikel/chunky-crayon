@@ -18,7 +18,7 @@ export const routing = defineRouting({
     "/account/settings": "/account/settings",
     "/account/billing": "/account/billing",
     "/account/billing/success": "/account/billing/success",
-    "/account/my-artwork": "/account/my-artwork",
+    "/account/my-stuff": "/account/my-stuff",
     "/signin": "/signin",
     "/shared/[code]": "/shared/[code]",
     "/privacy": "/privacy",

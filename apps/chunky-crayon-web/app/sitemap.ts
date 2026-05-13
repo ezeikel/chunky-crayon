@@ -103,29 +103,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/privacy', priority: 0.3, changeFrequency: 'yearly' as const },
     { path: '/terms', priority: 0.3, changeFrequency: 'yearly' as const },
     // Phase 2 growth pages — free tools + teacher hub
-    { path: '/tools', priority: 0.9, changeFrequency: 'weekly' as const },
+    { path: '/freebies', priority: 0.9, changeFrequency: 'weekly' as const },
     {
-      path: '/tools/reward-chart',
+      path: '/freebies/reward-chart',
       priority: 0.9,
       changeFrequency: 'monthly' as const,
     },
     {
-      path: '/tools/name',
+      path: '/freebies/name',
       priority: 0.9,
       changeFrequency: 'monthly' as const,
     },
     {
-      path: '/tools/birthday-invite',
+      path: '/freebies/birthday-invite',
       priority: 0.9,
       changeFrequency: 'monthly' as const,
     },
     {
-      path: '/tools/abc-tracing',
+      path: '/freebies/abc-tracing',
       priority: 0.9,
       changeFrequency: 'monthly' as const,
     },
     {
-      path: '/tools/seasonal-pack',
+      path: '/freebies/seasonal-pack',
       priority: 0.9,
       changeFrequency: 'monthly' as const,
     },
@@ -151,6 +151,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/gallery/difficulty/advanced',
     '/gallery/difficulty/expert',
   ];
+
+  // Add the /coloring-pages topic-hub index (priority 0.9 — slightly above
+  // individual landings because it's the entry point for the whole cluster).
+  for (const locale of locales) {
+    const path = '/coloring-pages';
+    urls.push({
+      url: `${baseUrl}/${locale}${path}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      alternates: {
+        languages: Object.fromEntries(
+          locales.map((l) => [l, `${baseUrl}/${l}${path}`]),
+        ),
+      },
+    });
+  }
 
   // Add SEO long-tail landing pages (priority 0.85 — higher than gallery
   // categories because they target specific parent/teacher queries with

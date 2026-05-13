@@ -14,6 +14,55 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Route renames (2026-05-13): /tools -> /freebies, /account/my-artwork
+  // -> /account/my-stuff. 308 (permanent) so Google passes link equity
+  // and existing bookmarks resolve. Locale-aware sources catch /en/tools/
+  // and /tools/ alike. Keep these in place indefinitely — pulling them
+  // breaks every external backlink to the old paths.
+  async redirects() {
+    return [
+      {
+        source: '/tools',
+        destination: '/freebies',
+        permanent: true,
+      },
+      {
+        source: '/tools/:path*',
+        destination: '/freebies/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:locale/tools',
+        destination: '/:locale/freebies',
+        permanent: true,
+      },
+      {
+        source: '/:locale/tools/:path*',
+        destination: '/:locale/freebies/:path*',
+        permanent: true,
+      },
+      {
+        source: '/account/my-artwork',
+        destination: '/account/my-stuff',
+        permanent: true,
+      },
+      {
+        source: '/account/my-artwork/:path*',
+        destination: '/account/my-stuff/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:locale/account/my-artwork',
+        destination: '/:locale/account/my-stuff',
+        permanent: true,
+      },
+      {
+        source: '/:locale/account/my-artwork/:path*',
+        destination: '/:locale/account/my-stuff/:path*',
+        permanent: true,
+      },
+    ];
+  },
   cacheComponents: true,
   cacheLife: {
     // Blog list - updates daily via cron, but use webhook for immediate invalidation

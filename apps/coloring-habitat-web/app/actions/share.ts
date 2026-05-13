@@ -39,7 +39,7 @@ export async function createShare(
       expiration,
     );
 
-    revalidatePath("/account/my-artwork");
+    revalidatePath("/account/my-stuff");
 
     return {
       success: true,
@@ -100,7 +100,7 @@ export async function revokeShare(shareCode: string): Promise<boolean> {
     const success = await deactivateShare(shareCode, session.user.id);
 
     if (success) {
-      revalidatePath("/account/my-artwork");
+      revalidatePath("/account/my-stuff");
     }
 
     return success;

@@ -41,7 +41,7 @@ export async function createShare(
     );
 
     // Revalidate the my-artwork page to show share status
-    revalidatePath('/account/my-artwork');
+    revalidatePath('/account/my-stuff');
 
     return {
       success: true,
@@ -102,7 +102,7 @@ export async function revokeShare(shareCode: string): Promise<boolean> {
     const success = await deactivateShare(shareCode, session.user.id);
 
     if (success) {
-      revalidatePath('/account/my-artwork');
+      revalidatePath('/account/my-stuff');
     }
 
     return success;

@@ -8,6 +8,8 @@ import { faCakeCandles } from '@fortawesome/pro-duotone-svg-icons/faCakeCandles'
 import { faBookOpen } from '@fortawesome/pro-duotone-svg-icons/faBookOpen';
 import { faCalendarStar } from '@fortawesome/pro-duotone-svg-icons/faCalendarStar';
 import { generateAlternates } from '@/lib/seo';
+import CrayonScribble from '@/components/Intro/CrayonScribble';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import ViewContentTracker from '@/components/ViewContentTracker/ViewContentTracker';
 
 type PageParams = { locale: string };
@@ -20,7 +22,7 @@ const DUOTONE_STYLE = {
   '--fa-secondary-opacity': '1',
 } as React.CSSProperties;
 
-const HUB_PATH = '/tools';
+const HUB_PATH = '/freebies';
 const HUB_DESCRIPTION =
   'Free printable tools for ages 3–8: personalized reward charts, coloring pages, birthday invites, ABC worksheets and more. No signup required.';
 
@@ -31,11 +33,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   return {
-    title: 'Free Printable Tools for Parents & Teachers | Chunky Crayon',
+    title: 'Freebies — Free Printables for Parents & Teachers | Chunky Crayon',
     description: HUB_DESCRIPTION,
     alternates: generateAlternates(locale, HUB_PATH),
     openGraph: {
-      title: 'Free Printable Tools for Parents & Teachers',
+      title: 'Freebies — Free Printables for Parents & Teachers',
       description: HUB_DESCRIPTION,
       type: 'website',
       url: `https://chunkycrayon.com/${locale}${HUB_PATH}`,
@@ -99,11 +101,11 @@ const ToolsHubPage = async ({ params }: { params: Promise<PageParams> }) => {
   const itemListSchema = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Chunky Crayon Free Printable Tools',
+    name: 'Chunky Crayon Freebies',
     itemListElement: TOOLS.filter((t) => t.available).map((tool, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      url: `https://chunkycrayon.com/${locale}/tools/${tool.slug}`,
+      url: `https://chunkycrayon.com/${locale}/freebies/${tool.slug}`,
       name: tool.title,
     })),
   };
@@ -116,11 +118,22 @@ const ToolsHubPage = async ({ params }: { params: Promise<PageParams> }) => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
       <div className="max-w-5xl mx-auto py-12 px-4">
+        <Breadcrumbs
+          items={[{ label: 'Home', href: '/' }, { label: 'Freebies' }]}
+          className="mb-6"
+        />
         <header className="text-center mb-12">
-          <h1 className="font-tondo text-4xl font-extrabold mb-3 text-primary">
-            Free Printable Tools
+          {/* H1 mirrors the /account/my-stuff treatment: chunky font-tondo
+              hero size with a hand-drawn CrayonScribble underline in
+              crayon-orange. Keeps the renamed hubs visually consistent. */}
+          <h1 className="font-tondo text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary relative inline-block">
+            Freebies
+            <CrayonScribble
+              seed={73}
+              className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
+            />
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
             Quick, no-signup printables for parents, grandparents, and teachers
             of young kids (ages 3–8). All COPPA-safe, nothing you type is saved
             on our servers.
@@ -157,7 +170,7 @@ const ToolsHubPage = async ({ params }: { params: Promise<PageParams> }) => {
             return tool.available ? (
               <Link
                 key={tool.slug}
-                href={`/tools/${tool.slug}`}
+                href={`/freebies/${tool.slug}`}
                 className="block"
               >
                 {card}

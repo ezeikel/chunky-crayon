@@ -105,7 +105,7 @@ const getNavItems = (
   // Comics is the least conversion-critical of the top-level entries.
   {
     label: t('freebies'),
-    href: '/tools',
+    href: '/freebies',
     visibility: 'always',
   },
   // Products entry — gated behind the `bundles-shop` PostHog flag while
@@ -123,7 +123,7 @@ const getNavItems = (
     : []),
   {
     label: t('myStuff'),
-    href: '/account/my-artwork',
+    href: '/account/my-stuff',
     visibility: 'authenticated',
   },
   {
@@ -176,7 +176,7 @@ const getMobileItems = (
     items.push({
       label: t('freebies'),
       iconName: faToolbox,
-      href: '/tools',
+      href: '/freebies',
     });
     items.push({
       label: 'Comics',
@@ -193,7 +193,7 @@ const getMobileItems = (
     items.push({
       label: t('myStuff'),
       iconName: faHeart,
-      href: '/account/my-artwork',
+      href: '/account/my-stuff',
     });
     items.push({
       label: t('blog'),
@@ -256,7 +256,7 @@ const getMobileItems = (
     items.push({
       label: t('freebies'),
       iconName: faToolbox,
-      href: '/tools',
+      href: '/freebies',
     });
     items.push({
       label: 'Comics',

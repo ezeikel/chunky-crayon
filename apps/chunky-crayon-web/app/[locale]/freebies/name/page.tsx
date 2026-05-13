@@ -8,7 +8,7 @@ type PageParams = { locale: string };
 const TOOL_NAME = 'Personalised Name Coloring Pages';
 const TOOL_DESCRIPTION =
   "Create a free coloring page with your child's name in big bubble letters. Pick a theme (animals, unicorns, dinosaurs, space…), generate, print. No signup.";
-const TOOL_PATH = '/tools/name';
+const TOOL_PATH = '/freebies/name';
 
 export async function generateMetadata({
   params,

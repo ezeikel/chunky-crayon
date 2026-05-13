@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import { charactersFeatureEnabled } from '@/flags';
 import CharacterGrid from '@/components/Characters/CharacterGrid/CharacterGrid';
+import CrayonScribble from '@/components/Intro/CrayonScribble';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 /**
  * /characters — the Bluey-style roster page.
@@ -45,11 +47,18 @@ const FlaggedShell = async () => {
 
   return (
     <>
+      {/* H1 mirrors the /account/my-stuff, /freebies, /gallery treatment:
+          chunky font-tondo with a hand-drawn CrayonScribble underline.
+          Swapped from font-display so the hubs read as one family. */}
       <header className="text-center pb-8 md:pb-10">
-        <h1 className="font-display text-4xl md:text-6xl mb-3 text-neutral-900">
+        <h1 className="font-tondo text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary relative inline-block">
           Meet your friends
+          <CrayonScribble
+            seed={73}
+            className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
+          />
         </h1>
-        <p className="text-neutral-700 max-w-xl mx-auto text-lg md:text-xl font-medium">
+        <p className="mt-6 text-neutral-700 max-w-xl mx-auto text-lg md:text-xl font-medium">
           Make a friend who shows up in every coloring page.
         </p>
       </header>
@@ -82,6 +91,10 @@ const CharactersPage = () => {
 
   return (
     <PageWrap>
+      <Breadcrumbs
+        items={[{ label: 'Home', href: '/' }, { label: 'Characters' }]}
+        className="mb-6"
+      />
       <Suspense fallback={<GridSkeleton />}>
         <FlaggedShell />
       </Suspense>

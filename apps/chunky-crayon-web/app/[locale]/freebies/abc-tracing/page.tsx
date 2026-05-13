@@ -8,7 +8,7 @@ type PageParams = { locale: string };
 const TOOL_NAME = 'ABC Tracing Worksheets';
 const TOOL_DESCRIPTION =
   'Free 27-page printable A–Z alphabet tracing bundle for preschool and kindergarten. Each page has the letter to trace, a matching word and picture. Print-ready PDF.';
-const TOOL_PATH = '/tools/abc-tracing';
+const TOOL_PATH = '/freebies/abc-tracing';
 
 export async function generateMetadata({
   params,

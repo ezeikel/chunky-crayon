@@ -85,6 +85,33 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Route rename (2026-05-13): /account/my-artwork -> /account/my-stuff.
+  // 308 permanent so Google passes link equity and bookmarks resolve.
+  // Mirrors the same redirect in CC's next.config.
+  async redirects() {
+    return [
+      {
+        source: "/account/my-artwork",
+        destination: "/account/my-stuff",
+        permanent: true,
+      },
+      {
+        source: "/account/my-artwork/:path*",
+        destination: "/account/my-stuff/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:locale/account/my-artwork",
+        destination: "/:locale/account/my-stuff",
+        permanent: true,
+      },
+      {
+        source: "/:locale/account/my-artwork/:path*",
+        destination: "/:locale/account/my-stuff/:path*",
+        permanent: true,
+      },
+    ];
+  },
   serverExternalPackages: ["@resvg/resvg-js"],
 };
 

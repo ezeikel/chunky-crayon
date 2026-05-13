@@ -8,7 +8,7 @@ export type ToolSchemaInput = {
   name: string;
   /** Short one-liner describing what the tool does (maps to `description`) */
   description: string;
-  /** URL segment after the locale, e.g. "/tools/reward-chart". */
+  /** URL segment after the locale, e.g. "/freebies/reward-chart". */
   path: string;
   /** Locale segment, e.g. "en". */
   locale: string;

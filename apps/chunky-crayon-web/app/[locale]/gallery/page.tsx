@@ -23,6 +23,7 @@ import {
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import CrayonScribble from '@/components/Intro/CrayonScribble';
 import ViewContentTracker from '@/components/ViewContentTracker/ViewContentTracker';
 import {
   getTodaysDailyImage,
@@ -492,12 +493,18 @@ const GalleryContent = async ({ locale }: { locale: string }) => {
         className="mb-6"
       />
 
-      {/* Hero Section */}
+      {/* Hero Section — H1 mirrors the /account/my-stuff and /freebies
+          treatment for visual consistency across the renamed hubs:
+          chunky font-tondo with a hand-drawn CrayonScribble underline. */}
       <div className="text-center mb-12">
-        <h1 className="font-tondo font-bold text-4xl md:text-5xl text-text-primary mb-4">
+        <h1 className="font-tondo text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary relative inline-block">
           {t('heroTitle')}
+          <CrayonScribble
+            seed={73}
+            className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
+          />
         </h1>
-        <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+        <p className="mt-6 text-lg text-text-secondary max-w-2xl mx-auto">
           {t('heroSubtitle')}
         </p>
       </div>

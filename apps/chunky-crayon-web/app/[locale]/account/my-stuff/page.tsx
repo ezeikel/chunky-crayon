@@ -28,7 +28,7 @@ import DeleteArtworkButton from './DeleteArtworkButton';
 import ShareArtworkButton from './ShareArtworkButton';
 
 export const metadata: Metadata = {
-  title: 'My Artwork - Chunky Crayon',
+  title: 'My Stuff - Chunky Crayon',
   description: 'View and manage your saved coloring artwork.',
 };
 
@@ -387,7 +387,7 @@ const MyArtworkPage = () => {
         items={[
           { label: 'Home', href: '/' },
           { label: 'Account', href: '/account/settings' },
-          { label: 'My Artwork' },
+          { label: 'My Stuff' },
         ]}
         className="mb-6"
       />
@@ -395,7 +395,7 @@ const MyArtworkPage = () => {
       {/* Hero header — matches /products/digital aesthetic */}
       <header className="text-center py-8 lg:py-12">
         <h1 className="font-tondo text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary relative inline-block">
-          My Artwork
+          My Stuff
           <CrayonScribble
             seed={73}
             className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"

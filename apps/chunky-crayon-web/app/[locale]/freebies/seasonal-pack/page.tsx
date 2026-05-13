@@ -8,7 +8,7 @@ type PageParams = { locale: string };
 const TOOL_NAME = 'Seasonal Coloring Packs';
 const TOOL_DESCRIPTION =
   'Free printable seasonal coloring page bundles for Halloween, Christmas, Valentine’s, Easter, Thanksgiving and Back-to-school. 6–10 themed pages per pack. No signup.';
-const TOOL_PATH = '/tools/seasonal-pack';
+const TOOL_PATH = '/freebies/seasonal-pack';
 
 export async function generateMetadata({
   params,

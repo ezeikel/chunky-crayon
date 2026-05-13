@@ -59,7 +59,7 @@ const TeacherHubPage = () => (
     {/* Tool cards */}
     <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
       <Link
-        href="/tools/reward-chart"
+        href="/freebies/reward-chart"
         className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
       >
         <div className="flex items-start gap-4">
@@ -103,7 +103,7 @@ const TeacherHubPage = () => (
       </Link>
 
       <Link
-        href="/tools/birthday-invite"
+        href="/freebies/birthday-invite"
         className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
       >
         <div className="flex items-start gap-4">
@@ -125,7 +125,7 @@ const TeacherHubPage = () => (
       </Link>
 
       <Link
-        href="/tools/abc-tracing"
+        href="/freebies/abc-tracing"
         className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
       >
         <div className="flex items-start gap-4">
@@ -147,7 +147,7 @@ const TeacherHubPage = () => (
       </Link>
 
       <Link
-        href="/tools/seasonal-pack"
+        href="/freebies/seasonal-pack"
         className="block p-6 bg-white rounded-2xl border-2 border-paper-cream-dark hover:border-crayon-orange transition"
       >
         <div className="flex items-start gap-4">

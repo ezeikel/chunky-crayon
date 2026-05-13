@@ -25,7 +25,7 @@ const Header = () => {
   const authenticatedLinks = [
     { label: t("home"), href: "/" as const },
     { label: t("gallery"), href: "/gallery" as const },
-    { label: t("myStuff"), href: "/account/my-artwork" as const },
+    { label: t("myStuff"), href: "/account/my-stuff" as const },
     { label: t("pricing"), href: "/pricing" as const },
   ];
 

@@ -37,7 +37,7 @@ export const routing = defineRouting({
     '/account/settings': '/account/settings',
     '/account/billing': '/account/billing',
     '/account/billing/success': '/account/billing/success',
-    '/account/my-artwork': '/account/my-artwork',
+    '/account/my-stuff': '/account/my-stuff',
     '/account/challenges': '/account/challenges',
     '/account/profiles': '/account/profiles',
     '/account/profiles/[id]': '/account/profiles/[id]',

@@ -26,7 +26,7 @@ export const GET = async (request: NextRequest) => {
 
   const state = crypto.randomUUID();
   const returnUrl =
-    request.nextUrl.searchParams.get("return_url") || "/account/my-artwork";
+    request.nextUrl.searchParams.get("return_url") || "/account/my-stuff";
 
   const baseUrl = process.env.NEXTAUTH_URL || "https://coloringhabitat.com";
   const redirectUri = `${baseUrl}/api/auth/tiktok/callback`;
