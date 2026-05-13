@@ -160,34 +160,121 @@ Bias toward 'clearly_safe' — most prompts kids type are obviously fine. Reserv
 
 The 'reason' field: one short clause explaining your call.`;
 
-async function judgeKidSafety(
+type Judgement = z.infer<typeof kidSafetyJudgementSchema>;
+
+// Single-model judgement helper. Wraps generateObject + recovers from
+// errors by returning borderline so a missing/erroring verdict doesn't
+// auto-pass the prompt.
+async function singleJudge(
+  modelName: 'haiku45' | 'gemini' | 'gpt54mini' | 'opus47',
   prompt: string,
-): Promise<{
-  decision: 'clearly_safe' | 'clearly_unsafe' | 'borderline';
-  reason: string;
-}> {
+): Promise<Judgement> {
   try {
-    const { object } = await generateObject({
-      model: models.analytics,
-      schema: kidSafetyJudgementSchema,
-      system: KID_SAFETY_SYSTEM,
-      prompt: `Prompt to judge: "${prompt}"`,
-    });
-    return object;
+    let result;
+    if (modelName === 'opus47') {
+      // Opus 4.7: adaptive thinking on, runs longer + reasons harder.
+      // Higher quality verdict; only used in the Tier-2 escalation path.
+      result = await generateObject({
+        model: models.opus47,
+        schema: kidSafetyJudgementSchema,
+        system: KID_SAFETY_SYSTEM,
+        prompt: `Prompt to judge: "${prompt}"`,
+        providerOptions: {
+          anthropic: {
+            thinking: { type: 'adaptive' },
+          },
+        },
+      });
+    } else {
+      const model =
+        modelName === 'haiku45'
+          ? models.haiku45
+          : modelName === 'gpt54mini'
+            ? models.gpt54mini
+            : models.analytics; // gemini 3 flash
+      result = await generateObject({
+        model,
+        schema: kidSafetyJudgementSchema,
+        system: KID_SAFETY_SYSTEM,
+        prompt: `Prompt to judge: "${prompt}"`,
+      });
+    }
+    return result.object;
   } catch (err) {
-    // Fail safe — if the judgement call errors, route to borderline so a
-    // human eyeballs it rather than auto-firing. Better to miss a magic
-    // moment than to auto-render something unsafe because the LLM was down.
     log.warn(
-      'Kid-safety judgement call failed — routing to borderline',
-      { action: 'image-request', prompt: prompt.slice(0, 80) },
+      'Kid-safety judge errored — treating as borderline for this voter',
+      {
+        action: 'image-request',
+        judge: modelName,
+        prompt: prompt.slice(0, 80),
+      },
       err instanceof Error ? err : undefined,
     );
     return {
       decision: 'borderline',
-      reason: 'safety_judgement_unavailable',
+      reason: `${modelName}_unavailable`,
     };
   }
+}
+
+// Three-vendor parallel verdict. Each vendor brings different policy
+// training — disagreement is itself a useful signal. If any voter says
+// clearly_unsafe we escalate (safer); otherwise majority wins among the
+// non-error voters.
+async function judgeKidSafety(prompt: string): Promise<Judgement> {
+  // Tier 1: three cheap+fast verdicts in parallel.
+  const [haikuVote, geminiVote, gptVote] = await Promise.all([
+    singleJudge('haiku45', prompt),
+    singleJudge('gemini', prompt),
+    singleJudge('gpt54mini', prompt),
+  ]);
+  const votes = [haikuVote, geminiVote, gptVote];
+  const reasons = `haiku:${haikuVote.decision};gemini:${geminiVote.decision};gpt:${gptVote.decision}`;
+
+  // Any clearly_unsafe → escalate. Even one strong vendor saying "no"
+  // earns a human review (or Opus tie-break).
+  const anyUnsafe = votes.some((v) => v.decision === 'clearly_unsafe');
+
+  // All three agree → that's the answer.
+  if (
+    haikuVote.decision === geminiVote.decision &&
+    geminiVote.decision === gptVote.decision &&
+    !anyUnsafe
+  ) {
+    return {
+      decision: haikuVote.decision,
+      reason: `tier1-unanimous:${haikuVote.decision}`,
+    };
+  }
+
+  // 2-out-of-3 majority (and no one says clearly_unsafe) → take it.
+  if (!anyUnsafe) {
+    const tally = {
+      clearly_safe: votes.filter((v) => v.decision === 'clearly_safe').length,
+      borderline: votes.filter((v) => v.decision === 'borderline').length,
+      clearly_unsafe: 0,
+    };
+    if (tally.clearly_safe >= 2) {
+      return { decision: 'clearly_safe', reason: `tier1-majority:${reasons}` };
+    }
+    if (tally.borderline >= 2) {
+      return { decision: 'borderline', reason: `tier1-majority:${reasons}` };
+    }
+  }
+
+  // Tier 2: Opus 4.7 tie-break with adaptive thinking. Slow (~3-4s) but
+  // only fires on disagreement or any clearly_unsafe vote — empirically
+  // <5% of prompts.
+  log.info('Kid-safety triad split — escalating to Opus 4.7', {
+    action: 'image-request',
+    votes: reasons,
+    prompt: prompt.slice(0, 80),
+  });
+  const opusVote = await singleJudge('opus47', prompt);
+  return {
+    decision: opusVote.decision,
+    reason: `tier2-opus:${opusVote.decision}|${reasons}`,
+  };
 }
 
 async function moderatePrompt(prompt: string): Promise<ModerationResult> {

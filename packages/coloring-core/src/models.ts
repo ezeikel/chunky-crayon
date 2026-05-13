@@ -21,9 +21,19 @@ import type { LanguageModel as LanguageModelV3, ImageModel } from "ai";
 export const MODEL_IDS = {
   // Anthropic Text models
   CLAUDE_SONNET_4_5: "claude-sonnet-4-5-20250929",
+  // Cheap + fast Anthropic. Used for high-volume judgement / classify
+  // calls where Sonnet is overkill. Tier-1 of the kid-safety triad.
+  CLAUDE_HAIKU_4_5: "claude-haiku-4-5",
+  // Top-tier reasoning Anthropic with adaptive-thinking support.
+  // Tier-2 tie-breaker of the kid-safety triad.
+  CLAUDE_OPUS_4_7: "claude-opus-4-7",
 
   // OpenAI multimodal models (vision + text)
   GPT_5_2: "gpt-5.2",
+  // Current cheap + fast OpenAI text model per OpenAI's own API docs
+  // (recommended for low-latency, low-cost workloads as of 2026-05).
+  // Tier-1 of the kid-safety triad.
+  GPT_5_4_MINI: "gpt-5.4-mini",
 
   // OpenAI Image models
   GPT_IMAGE_1_5: "gpt-image-1.5",
@@ -84,6 +94,12 @@ export const models = {
   analytics: google(MODEL_IDS.GEMINI_3_FLASH),
   analyticsQuality: google(MODEL_IDS.GEMINI_3_PRO_IMAGE),
   geminiImage: google(MODEL_IDS.GEMINI_3_PRO_IMAGE),
+  // Kid-safety moderation triad — three cheap+fast verdicts in parallel
+  // then escalate to Opus 4.7 with adaptive thinking on disagreement.
+  // See lib/image-request.ts for the orchestration.
+  haiku45: anthropic(MODEL_IDS.CLAUDE_HAIKU_4_5),
+  opus47: anthropic(MODEL_IDS.CLAUDE_OPUS_4_7),
+  gpt54mini: openai(MODEL_IDS.GPT_5_4_MINI),
 };
 
 export const IMAGE_DEFAULTS = {
