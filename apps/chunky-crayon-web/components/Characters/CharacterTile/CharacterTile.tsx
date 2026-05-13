@@ -72,9 +72,10 @@ const CharacterTile = ({
 
   const inner = (
     <>
-      <div
-        className={`aspect-square w-full flex flex-col items-center justify-center gap-3 bg-paper-cream`}
-      >
+      {/* Pure white background — line-art reads as a coloring-page
+          preview only when the outlines have real contrast. Cream
+          muddied the black ink. */}
+      <div className="aspect-square w-full flex flex-col items-center justify-center gap-3 bg-white">
         {isReady && portrait ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

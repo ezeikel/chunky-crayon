@@ -84,13 +84,11 @@ const getNavItems = (
     href: '/gallery',
     visibility: 'always',
   },
+  // Comics demoted from desktop nav (still present in mobile menu +
+  // footer) — desktop nav was overflowing once Characters was added.
+  // Comics is the least conversion-critical of the top-level entries.
   {
-    label: 'Comics',
-    href: '/comics',
-    visibility: 'always',
-  },
-  {
-    label: t('tools'),
+    label: t('freebies'),
     href: '/tools',
     visibility: 'always',
   },
@@ -120,7 +118,7 @@ const getNavItems = (
       ] as const)
     : []),
   {
-    label: t('myArtwork'),
+    label: t('myStuff'),
     href: '/account/my-artwork',
     visibility: 'authenticated',
   },
@@ -166,7 +164,7 @@ const getMobileItems = (
       href: '/comics',
     });
     items.push({
-      label: t('tools'),
+      label: t('freebies'),
       iconName: faToolbox,
       href: '/tools',
     });
@@ -190,7 +188,7 @@ const getMobileItems = (
       href: '/blog',
     });
     items.push({
-      label: t('myArtwork'),
+      label: t('myStuff'),
       iconName: faHeart,
       href: '/account/my-artwork',
     });
@@ -251,7 +249,7 @@ const getMobileItems = (
       href: '/comics',
     });
     items.push({
-      label: t('tools'),
+      label: t('freebies'),
       iconName: faToolbox,
       href: '/tools',
     });

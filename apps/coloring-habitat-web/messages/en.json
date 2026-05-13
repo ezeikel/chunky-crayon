@@ -116,6 +116,10 @@
       "turnOff": "Turn sounds off"
     }
   },
+  "navigation": {
+    "freebies": "Free Tools",
+    "myStuff": "My Artwork"
+  },
   "homepage": {
     "hero": {
       "title": "Color your way to calm",
