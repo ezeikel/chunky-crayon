@@ -32,7 +32,9 @@ export const CRAFT_CONTEXTS: CraftContext[] = [
     name: 'Classroom',
     icon: faChalkboard,
     color: 'text-crayon-green',
-    tags: ['classroom', 'school', 'group-activity'],
+    // 'group-activity' dropped here too — same overlap with
+    // birthday-parties that caused leak through the combo extraTagsAny.
+    tags: ['classroom', 'school'],
     description:
       'Group-friendly coloring pages teachers can print in bulk for the whole class.',
   },

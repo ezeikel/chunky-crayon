@@ -1526,7 +1526,10 @@ export const GALLERY_CATEGORIES: GalleryCategory[] = [
     slug: 'unicorns',
     description: 'Beautiful unicorn and rainbow coloring pages',
     keywords: ['unicorn coloring pages', 'rainbow unicorn', 'magical horse'],
-    tags: ['unicorn', 'unicorns', 'rainbow', 'magical horse', 'pegasus'],
+    // Dropped 'rainbow' here — too aggressive, matches every page with
+    // a rainbow even when there's no unicorn (leprechauns, sprinklers,
+    // elephants under rainbows all leaked into the unicorn gallery).
+    tags: ['unicorn', 'unicorns', 'magical horse', 'pegasus'],
     icon: faHorseHead,
     color: 'text-crayon-pink',
     bgColor: 'bg-crayon-pink/10',

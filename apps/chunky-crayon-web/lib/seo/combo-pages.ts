@@ -313,7 +313,10 @@ export const COMBO_PAGES: ComboPage[] = [
     slug: 'coloring-pages-for-classroom',
     group: 'context',
     contextSlug: 'classroom',
-    extraTagsAny: ['classroom', 'school', 'group-activity'],
+    // Dropped 'group-activity' — also matched birthday-party scenes
+    // (kids round a cake, balloons, party hats). 'classroom' + 'school'
+    // is narrower and matches what teachers actually want here.
+    extraTagsAny: ['classroom', 'school'],
     title: 'Coloring Pages for the Classroom - Free Printable | Chunky Crayon',
     description:
       'Free coloring pages for teachers. Print-friendly PDFs, bulk-friendly templates, kid-tested designs. Use them as morning work, transitions, or rainy-day backup.',
