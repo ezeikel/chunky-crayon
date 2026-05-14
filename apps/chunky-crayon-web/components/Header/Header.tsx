@@ -455,9 +455,13 @@ const Header = async () => {
           priority
           className="w-7 h-7 md:w-8 md:h-8 shrink-0"
         />
-        <h1 className="font-tondo text-2xl md:text-3xl font-bold text-gradient-orange tracking-tight">
+        {/* Brand wordmark — not a heading. Was an <h1> historically,
+            which made every page have two H1s (this one + the page's
+            real H1). Per SEO best practice the header lockup is
+            decorative branding; the page's own <h1> stays the only one. */}
+        <span className="font-tondo text-2xl md:text-3xl font-bold text-gradient-orange tracking-tight">
           Chunky Crayon
-        </h1>
+        </span>
       </Link>
       {renderItems()}
     </ScrollHeader>

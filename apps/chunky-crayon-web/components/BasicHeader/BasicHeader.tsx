@@ -15,9 +15,10 @@ const BasicHeader = () => (
         height={32}
         className="w-7 h-7 md:w-8 md:h-8 shrink-0"
       />
-      <h1 className="font-tondo text-2xl md:text-3xl font-bold text-gradient-orange tracking-tight">
+      {/* Brand wordmark, not a heading — page H1s live in the page body. */}
+      <span className="font-tondo text-2xl md:text-3xl font-bold text-gradient-orange tracking-tight">
         Chunky Crayon
-      </h1>
+      </span>
     </Link>
   </header>
 );
