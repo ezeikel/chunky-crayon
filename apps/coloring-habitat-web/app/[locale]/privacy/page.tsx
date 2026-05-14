@@ -46,6 +46,43 @@ const PrivacyPage = () => {
             any time by contacting us at privacy@coloringhabitat.com.
           </p>
 
+          <h2 id="data-deletion" className="scroll-mt-24">
+            Data deletion
+          </h2>
+          <p>
+            You can request deletion of your Coloring Habitat account and all
+            associated data at any time. We will remove your personal data
+            (account, email, saved artwork, and any data collected via Facebook
+            or Instagram login or interactions) within 30 days of receiving a
+            verified request.
+          </p>
+          <p>
+            <strong>How to request deletion:</strong>
+          </p>
+          <ol>
+            <li>
+              Email us at{" "}
+              <a href="mailto:privacy@coloringhabitat.com?subject=Data%20Deletion%20Request">
+                privacy@coloringhabitat.com
+              </a>{" "}
+              with the subject line &ldquo;Data Deletion Request&rdquo;.
+            </li>
+            <li>
+              Include the email address associated with your account, or — if
+              you interacted with us only via Facebook or Instagram — the
+              username or Page ID you used.
+            </li>
+            <li>
+              We&rsquo;ll confirm receipt within 2 business days and complete
+              the deletion within 30 days.
+            </li>
+          </ol>
+          <p>
+            If you arrived here from Facebook or Instagram, this page also
+            serves as our official data deletion instructions URL as required by
+            Meta.
+          </p>
+
           <h2>Contact</h2>
           <p>
             For privacy-related enquiries, email{" "}

@@ -159,8 +159,47 @@ const PrivacyPolicy = () => (
       </ul>
     </section>
 
+    <section id="data-deletion" className="mb-8 scroll-mt-24">
+      <h2 className="text-2xl font-semibold mb-4">8. Data Deletion</h2>
+      <p className="mb-4">
+        You can request deletion of your Chunky Crayon account and all
+        associated data at any time. We will remove your personal data (account,
+        email, saved artwork, comment history, and any data collected via
+        Facebook or Instagram login or interactions) within 30 days of receiving
+        a verified request.
+      </p>
+      <p className="mb-4">
+        <strong>How to request deletion:</strong>
+      </p>
+      <ol className="list-decimal pl-6 mb-4">
+        <li>
+          Email us at{' '}
+          <a
+            href="mailto:support@chunkycrayon.com?subject=Data%20Deletion%20Request"
+            className="text-blue-600 underline"
+          >
+            support@chunkycrayon.com
+          </a>{' '}
+          with the subject line &ldquo;Data Deletion Request&rdquo;.
+        </li>
+        <li>
+          Include the email address associated with your account, or — if you
+          interacted with us only via Facebook or Instagram — the username or
+          Page ID you used.
+        </li>
+        <li>
+          We&rsquo;ll confirm receipt within 2 business days and complete the
+          deletion within 30 days, then send you a confirmation email.
+        </li>
+      </ol>
+      <p className="mb-4">
+        If you arrived here from Facebook or Instagram, this page also serves as
+        our official data deletion instructions URL as required by Meta.
+      </p>
+    </section>
+
     <section className="mb-8">
-      <h2 className="text-2xl font-semibold mb-4">8. Contact Us</h2>
+      <h2 className="text-2xl font-semibold mb-4">9. Contact Us</h2>
       <p className="mb-4">
         If you have any questions about this privacy policy or our privacy
         practices, please contact us at:
