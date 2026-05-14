@@ -149,10 +149,40 @@ const DailyImageSection = async ({ locale }: { locale: string }) => {
 // visitor actually browse our content rather than just navigate via
 // category cards. Distinct from Community (UGC), Daily (single image),
 // and Featured (just the top-6 hero strip).
-const OurLatestImages = async ({ locale }: { locale: string }) => {
+//
+// Difficulty filter is server-rendered via ?difficulty=beginner|intermediate|advanced
+// search param. Each filtered view is shareable via URL (good for SEO
+// + parent-to-parent sharing) and the existing /gallery/difficulty/[X]
+// pages stay the canonical "deep dive" destination — the chips here
+// are a quick narrow-without-leaving-page convenience.
+type DifficultyFilter = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | null;
+
+const parseDifficultyParam = (raw: string | undefined): DifficultyFilter => {
+  if (!raw) return null;
+  const upper = raw.toUpperCase();
+  if (
+    upper === 'BEGINNER' ||
+    upper === 'INTERMEDIATE' ||
+    upper === 'ADVANCED'
+  ) {
+    return upper;
+  }
+  return null;
+};
+
+const OurLatestImages = async ({
+  locale,
+  difficulty,
+}: {
+  locale: string;
+  difficulty: DifficultyFilter;
+}) => {
   const t = await getTranslations({ locale, namespace: 'gallery' });
-  const { images, nextCursor, hasMore } = await getSystemImages(undefined, 24);
-  if (images.length === 0) return null;
+  const { images, nextCursor, hasMore } = await getSystemImages(
+    undefined,
+    24,
+    difficulty ?? undefined,
+  );
 
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
@@ -160,9 +190,43 @@ const OurLatestImages = async ({ locale }: { locale: string }) => {
     '--fa-secondary-opacity': '1',
   } as React.CSSProperties;
 
+  // Chip targets are the existing /gallery main route with a query
+  // param. Server re-renders; PPR keeps the rest of the page cached.
+  const chips: Array<{
+    key: string;
+    href: string;
+    label: string;
+    active: boolean;
+  }> = [
+    {
+      key: 'all',
+      href: '/gallery',
+      label: t('difficultyFilter.all'),
+      active: difficulty === null,
+    },
+    {
+      key: 'beginner',
+      href: '/gallery?difficulty=beginner',
+      label: t('difficultyFilter.beginner'),
+      active: difficulty === 'BEGINNER',
+    },
+    {
+      key: 'intermediate',
+      href: '/gallery?difficulty=intermediate',
+      label: t('difficultyFilter.intermediate'),
+      active: difficulty === 'INTERMEDIATE',
+    },
+    {
+      key: 'advanced',
+      href: '/gallery?difficulty=advanced',
+      label: t('difficultyFilter.advanced'),
+      active: difficulty === 'ADVANCED',
+    },
+  ];
+
   return (
     <section className="mb-12">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-4">
         <FontAwesomeIcon
           icon={faPalette}
           className="text-2xl"
@@ -172,16 +236,45 @@ const OurLatestImages = async ({ locale }: { locale: string }) => {
           {t('ourLatestTitle')}
         </h2>
       </div>
-      <p className="text-text-secondary mb-6 max-w-3xl">
+      <p className="text-text-secondary mb-5 max-w-3xl">
         {t('ourLatestSubtitle')}
       </p>
-      <InfiniteScrollGallery
-        initialImages={images}
-        initialCursor={nextCursor}
-        initialHasMore={hasMore}
-        galleryType="system"
-        locale={locale}
-      />
+
+      {/* Filter chips. Anchor tags so each filter has a real URL —
+          shareable + crawlable, plus Cmd-click for new tabs works. */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {chips.map((chip) => (
+          <Link
+            key={chip.key}
+            href={chip.href}
+            scroll={false}
+            className={cn(
+              'inline-flex items-center px-4 py-1.5 rounded-full text-sm font-tondo font-semibold transition-colors border-2',
+              chip.active
+                ? 'bg-crayon-orange text-white border-crayon-orange'
+                : 'bg-white text-text-secondary border-paper-cream-dark hover:border-crayon-orange/50 hover:text-crayon-orange',
+            )}
+            aria-current={chip.active ? 'page' : undefined}
+          >
+            {chip.label}
+          </Link>
+        ))}
+      </div>
+
+      {images.length === 0 ? (
+        <div className="text-center text-text-secondary py-12 bg-paper-cream/40 rounded-2xl">
+          <p>{t('difficultyFilter.empty')}</p>
+        </div>
+      ) : (
+        <InfiniteScrollGallery
+          initialImages={images}
+          initialCursor={nextCursor}
+          initialHasMore={hasMore}
+          galleryType="system"
+          difficultySlug={difficulty?.toLowerCase()}
+          locale={locale}
+        />
+      )}
     </section>
   );
 };
@@ -613,12 +706,24 @@ const LoadingSkeleton = () => (
   </div>
 );
 
-// Async component that handles data fetching and translations
-const GalleryContent = async ({ locale }: { locale: string }) => {
-  const [t, tBreadcrumbs] = await Promise.all([
+// Async component that handles data fetching and translations.
+//
+// searchParams arrives as a Promise so the static shell stays cached —
+// awaiting it inside this Suspense child opts the dynamic island in,
+// not the whole page. See memory feedback_async_page_handlers_block_static_shell.
+const GalleryContent = async ({
+  locale,
+  searchParamsPromise,
+}: {
+  locale: string;
+  searchParamsPromise: Promise<{ difficulty?: string }>;
+}) => {
+  const [t, tBreadcrumbs, searchParams] = await Promise.all([
     getTranslations({ locale, namespace: 'gallery' }),
     getTranslations({ locale, namespace: 'breadcrumbs' }),
+    searchParamsPromise,
   ]);
+  const difficulty = parseDifficultyParam(searchParams.difficulty);
 
   return (
     <>
@@ -657,7 +762,7 @@ const GalleryContent = async ({ locale }: { locale: string }) => {
         <AgeGroupCards locale={locale} />
         <DifficultyCards locale={locale} />
         <CategoryCards locale={locale} />
-        <OurLatestImages locale={locale} />
+        <OurLatestImages locale={locale} difficulty={difficulty} />
         <CommunityHighlights locale={locale} />
       </Suspense>
 
@@ -676,20 +781,35 @@ const GalleryContent = async ({ locale }: { locale: string }) => {
   );
 };
 
-const GalleryPage = async ({
+const GalleryPage = ({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ difficulty?: string }>;
+}) => (
+  <PageWrap>
+    <Suspense fallback={<LoadingSkeleton />}>
+      <GalleryShell params={params} searchParams={searchParams} />
+    </Suspense>
+  </PageWrap>
+);
+
+// SlugRouter-style wrapper so params + searchParams are awaited inside
+// the Suspense boundary — keeps the static shell prerendered.
+const GalleryShell = async ({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ difficulty?: string }>;
 }) => {
   const { locale } = await params;
-
   return (
-    <PageWrap>
+    <>
       <ViewContentTracker contentType="gallery" />
-      <Suspense fallback={<LoadingSkeleton />}>
-        <GalleryContent locale={locale} />
-      </Suspense>
-    </PageWrap>
+      <GalleryContent locale={locale} searchParamsPromise={searchParams} />
+    </>
   );
 };
 
