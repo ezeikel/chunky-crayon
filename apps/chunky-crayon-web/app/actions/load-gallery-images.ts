@@ -9,6 +9,7 @@ import { getCategoryBySlug } from '@/constants';
 
 export type GalleryType =
   | 'community'
+  | 'system'
   | 'daily'
   | 'category'
   | 'difficulty'
@@ -16,7 +17,19 @@ export type GalleryType =
 
 /**
  * Server action to load more gallery images for infinite scroll.
- * Supports different gallery types: community, daily, category, and difficulty.
+ *
+ * Two distinct surfaces:
+ *   - `community` = user-generated content (UGC). userId NOT NULL AND
+ *     showInCommunity=true. Powers /gallery/community + the
+ *     "Community Creations" section on /gallery.
+ *   - `system` = curated content we generated (daily image cron + the
+ *     936-row landing backfill + ads + etc). userId IS NULL. Powers
+ *     the main "Our Latest" feed + age/category/difficulty/tag pages.
+ *
+ * Historical bug: the pre-2026-05 code used a single `community` type
+ * filtered by `userId: null`, conflating the two surfaces. /gallery/community
+ * was actually showing SYSTEM content. Fixed here by splitting the cases
+ * and flipping `community` to the honest UGC filter.
  */
 export async function loadGalleryImages(
   galleryType: GalleryType,
@@ -38,6 +51,18 @@ export async function loadGalleryImages(
 
   switch (galleryType) {
     case 'community':
+      // UGC only. Matches getCommunityImagesBase in app/data/gallery.ts.
+      whereClause = {
+        ...baseWhere,
+        userId: { not: null },
+        showInCommunity: true,
+      };
+      break;
+
+    case 'system':
+      // Everything WE generated. The 936-row landing backfill + daily
+      // cron output + ad assets. Used by the main /gallery "Our Latest"
+      // feed and the various age/category landings underneath it.
       whereClause = { ...baseWhere, userId: null };
       break;
 

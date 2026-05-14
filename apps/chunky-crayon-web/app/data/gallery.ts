@@ -99,6 +99,64 @@ export const getCommunityImages = async (
   return getCommunityImagesBase(cursor, limit);
 };
 
+// ===== SYSTEM IMAGES =====
+// Everything WE generated — the 936-row landing backfill, daily cron
+// output, ad assets. Distinct from "Featured" (just the latest 6) and
+// "Community" (UGC). Paginated for the main /gallery infinite-scroll
+// feed. Optional difficulty filter routes the BEGINNER/INTERMEDIATE/
+// ADVANCED triad we judged the rows into.
+
+const getSystemImagesBase = async (
+  cursor?: string,
+  limit: number = GALLERY_PAGE_SIZE,
+  difficulty?: Difficulty,
+): Promise<PaginatedImagesResponse> => {
+  'use cache';
+  cacheLife('gallery-community');
+  cacheTag('gallery-community', 'gallery-system');
+
+  const images = await db.coloringImage.findMany({
+    where: {
+      ...brandWhere,
+      userId: null, // System-generated, distinguishes from UGC
+      svgUrl: { not: null }, // Skip rows that don't have a rendered SVG yet
+      ...(difficulty ? { difficulty } : {}),
+    },
+    select: {
+      ...GALLERY_IMAGE_SELECT,
+      tags: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: limit + 1,
+    ...(cursor
+      ? {
+          cursor: { id: cursor },
+          skip: 1,
+        }
+      : {}),
+  });
+
+  const hasMore = images.length > limit;
+  const resultImages = hasMore ? images.slice(0, limit) : images;
+  const nextCursor = hasMore ? resultImages[resultImages.length - 1]?.id : null;
+
+  return {
+    images: resultImages,
+    nextCursor,
+    hasMore,
+  };
+};
+
+export const getSystemImages = async (
+  cursor?: string,
+  limit?: number,
+  difficulty?: Difficulty,
+): Promise<PaginatedImagesResponse> => {
+  return getSystemImagesBase(cursor, limit, difficulty);
+};
+
 // ===== DAILY IMAGES =====
 // Images generated automatically by the daily cron job
 

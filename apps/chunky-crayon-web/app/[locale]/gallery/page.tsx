@@ -28,11 +28,14 @@ import ViewContentTracker from '@/components/ViewContentTracker/ViewContentTrack
 import {
   getTodaysDailyImage,
   getFeaturedImages,
+  getCommunityImages,
+  getSystemImages,
   getCategoryCounts,
   getGalleryStats,
   getDifficultyCounts,
   getAgeGroupCounts,
 } from '@/app/data/gallery';
+import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { Difficulty } from '@one-colored-pixel/db';
 import { getLandingPageBySlug } from '@/lib/seo/landing-pages';
@@ -141,13 +144,62 @@ const DailyImageSection = async ({ locale }: { locale: string }) => {
   );
 };
 
+// Main system-image feed: the 936-row landing backfill + daily image cron
+// output + any other system-generated row. The big surface that lets a
+// visitor actually browse our content rather than just navigate via
+// category cards. Distinct from Community (UGC), Daily (single image),
+// and Featured (just the top-6 hero strip).
+const OurLatestImages = async ({ locale }: { locale: string }) => {
+  const t = await getTranslations({ locale, namespace: 'gallery' });
+  const { images, nextCursor, hasMore } = await getSystemImages(undefined, 24);
+  if (images.length === 0) return null;
+
+  const iconStyle = {
+    '--fa-primary-color': 'hsl(var(--crayon-orange))',
+    '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+    '--fa-secondary-opacity': '1',
+  } as React.CSSProperties;
+
+  return (
+    <section className="mb-12">
+      <div className="flex items-center gap-3 mb-6">
+        <FontAwesomeIcon
+          icon={faPalette}
+          className="text-2xl"
+          style={iconStyle}
+        />
+        <h2 className="font-tondo font-bold text-2xl text-text-primary">
+          {t('ourLatestTitle')}
+        </h2>
+      </div>
+      <p className="text-text-secondary mb-6 max-w-3xl">
+        {t('ourLatestSubtitle')}
+      </p>
+      <InfiniteScrollGallery
+        initialImages={images}
+        initialCursor={nextCursor}
+        initialHasMore={hasMore}
+        galleryType="system"
+        locale={locale}
+      />
+    </section>
+  );
+};
+
 const CommunityHighlights = async ({ locale }: { locale: string }) => {
   const t = await getTranslations({ locale, namespace: 'gallery' });
   const tAlt = await getTranslations({ locale, namespace: 'altText' });
-  const allImages = await getFeaturedImages(6);
-  // Filter out images without svgUrl
+  // UGC only. getCommunityImages applies userId IS NOT NULL +
+  // showInCommunity + status=READY. The previous version used
+  // getFeaturedImages which (despite the name) returns SYSTEM content —
+  // a labelling bug that made this section a duplicate of the system
+  // feed. See app/data/gallery.ts.
+  const { images: allImages } = await getCommunityImages(undefined, 6);
   const images = allImages.filter((img) => img.svgUrl);
 
+  // No UGC yet on this brand? Hide the section rather than show an
+  // empty grid or fall back to system content (that's the new
+  // "Our Latest" feed below).
   if (images.length === 0) return null;
 
   const iconStyle = {
@@ -598,11 +650,15 @@ const GalleryContent = async ({ locale }: { locale: string }) => {
       <Suspense fallback={<LoadingSkeleton />}>
         <GalleryStats locale={locale} />
         <DailyImageSection locale={locale} />
-        <CommunityHighlights locale={locale} />
+        {/* Browse-by-X surfaces sit ABOVE the main feed so visitors who
+            know what they want can narrow without scrolling past 936
+            thumbnails first. The feed itself sits below them. */}
+        <BrowseByTopicCards locale={locale} />
         <AgeGroupCards locale={locale} />
         <DifficultyCards locale={locale} />
         <CategoryCards locale={locale} />
-        <BrowseByTopicCards locale={locale} />
+        <OurLatestImages locale={locale} />
+        <CommunityHighlights locale={locale} />
       </Suspense>
 
       {/* SEO Content */}
