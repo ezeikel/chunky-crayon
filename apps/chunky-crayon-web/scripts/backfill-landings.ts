@@ -127,6 +127,10 @@ Generate exactly ${count} distinct, specific coloring page scene descriptions fo
  *
  * Row metadata (tags, sourcePrompt) is landing-specific and stays here;
  * the AI + upload work lives in coloring-core/backfill.
+ *
+ * Row starts as GENERATING so a mid-run failure (OpenAI billing limit,
+ * R2 outage, etc.) leaves the row visibly broken instead of pretending
+ * to be a real image — gallery filters exclude non-READY rows.
  */
 async function backfillOneImage(
   openai: OpenAI,
@@ -149,25 +153,40 @@ async function backfillOneImage(
       sourcePrompt: `${PURPOSE_KEY_PREFIX}:${landing.slug}: ${description}`,
       brand: Brand.CHUNKY_CRAYON,
       showInCommunity: true,
+      status: 'GENERATING',
     },
   });
 
-  const { url, svgUrl, qrCodeUrl } = await generateAndStoreColoringImage(
-    openai,
-    {
-      description,
-      difficulty,
-      rowId: row.id,
-      options: { quality: QUALITY },
-    },
-  );
+  try {
+    const { url, svgUrl, qrCodeUrl } = await generateAndStoreColoringImage(
+      openai,
+      {
+        description,
+        difficulty,
+        rowId: row.id,
+        options: { quality: QUALITY },
+      },
+    );
 
-  await db.coloringImage.update({
-    where: { id: row.id },
-    data: { url, svgUrl, qrCodeUrl },
-  });
+    await db.coloringImage.update({
+      where: { id: row.id },
+      data: { url, svgUrl, qrCodeUrl, status: 'READY' },
+    });
 
-  return row.id;
+    return row.id;
+  } catch (err) {
+    await db.coloringImage
+      .update({
+        where: { id: row.id },
+        data: {
+          status: 'FAILED',
+          failureReason:
+            err instanceof Error ? err.message.slice(0, 500) : 'unknown',
+        },
+      })
+      .catch(() => {});
+    throw err;
+  }
 }
 
 async function countExistingForLanding(slug: string): Promise<number> {

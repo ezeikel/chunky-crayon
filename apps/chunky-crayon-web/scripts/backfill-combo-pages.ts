@@ -203,6 +203,9 @@ const backfillOneImage = async (
     combo.difficulty ?? PrismaDifficulty.BEGINNER;
 
   // Insert row first so we get a stable id for the R2 paths + QR URL.
+  // Start as GENERATING so a mid-run failure (OpenAI billing limit,
+  // R2 outage, etc.) leaves the row visibly broken instead of pretending
+  // to be a real image — gallery filters exclude non-READY rows.
   const row = await db.coloringImage.create({
     data: {
       title: description.replace(/^a /i, '').replace(/\.$/, ''),
@@ -214,25 +217,43 @@ const backfillOneImage = async (
       sourcePrompt: `${PURPOSE_KEY_PREFIX}:${combo.slug}: ${description}`,
       brand: Brand.CHUNKY_CRAYON,
       showInCommunity: true,
+      status: 'GENERATING',
     },
   });
 
-  const { url, svgUrl, qrCodeUrl } = await generateAndStoreColoringImage(
-    openai,
-    {
-      description,
-      difficulty,
-      rowId: row.id,
-      options: { quality: QUALITY },
-    },
-  );
+  try {
+    const { url, svgUrl, qrCodeUrl } = await generateAndStoreColoringImage(
+      openai,
+      {
+        description,
+        difficulty,
+        rowId: row.id,
+        options: { quality: QUALITY },
+      },
+    );
 
-  await db.coloringImage.update({
-    where: { id: row.id },
-    data: { url, svgUrl, qrCodeUrl },
-  });
+    await db.coloringImage.update({
+      where: { id: row.id },
+      data: { url, svgUrl, qrCodeUrl, status: 'READY' },
+    });
 
-  return row.id;
+    return row.id;
+  } catch (err) {
+    // Mark the row FAILED so subsequent coverage counts / gallery filters
+    // exclude it. We could delete instead, but keeping the row preserves
+    // the audit trail for prompt debugging.
+    await db.coloringImage
+      .update({
+        where: { id: row.id },
+        data: {
+          status: 'FAILED',
+          failureReason:
+            err instanceof Error ? err.message.slice(0, 500) : 'unknown',
+        },
+      })
+      .catch(() => {});
+    throw err;
+  }
 };
 
 const runCombo = async (
