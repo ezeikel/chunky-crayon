@@ -183,7 +183,7 @@ export const COMBO_PAGES: ComboPage[] = [
     group: 'occasion',
     categorySlug: 'unicorns',
     occasionSlug: 'christmas',
-    extraTagsAny: ['christmas', 'santa', 'holiday'],
+    extraTagsAny: ['christmas', 'santa'],
     title: 'Christmas Unicorn Coloring Pages - Free Printable | Chunky Crayon',
     description:
       'Free Christmas unicorn coloring pages. Santa hats, twinkly hooves, snowy meadows. Print or color online before the cookies run out.',
@@ -227,7 +227,7 @@ export const COMBO_PAGES: ComboPage[] = [
     group: 'occasion',
     categorySlug: 'dinosaurs',
     occasionSlug: 'christmas',
-    extraTagsAny: ['christmas', 'santa', 'holiday'],
+    extraTagsAny: ['christmas', 'santa'],
     title: 'Christmas Dinosaur Coloring Pages - Free Printable | Chunky Crayon',
     description:
       'Free Christmas dinosaur coloring pages. T-Rex in a Santa hat, triceratops with baubles, the whole prehistoric Christmas crew. Print or color online.',

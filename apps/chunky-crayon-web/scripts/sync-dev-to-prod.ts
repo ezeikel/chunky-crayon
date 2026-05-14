@@ -1,11 +1,12 @@
 /**
- * Mirror the landing-backfill output from dev (DB + R2) to prod, so we
- * don't pay twice to regenerate the same images.
+ * Mirror SEO-backfill output (landings + combos) from dev (DB + R2) to
+ * prod, so we don't pay twice to regenerate the same images.
  *
- * Scope: ONLY rows that look like landing-backfill output, identified by
- * `sourcePrompt LIKE 'landing-backfill:%'`. Every other dev row stays
- * dev-only — this script never touches user content, the daily image
- * cron output, or anything outside the backfill purpose key.
+ * Scope: ONLY rows whose `sourcePrompt` starts with one of the
+ * approved backfill prefixes ('landing-backfill:', 'combo-backfill:').
+ * Every other dev row stays dev-only — this script never touches user
+ * content, the daily image cron output, or anything outside the
+ * backfill purpose keys.
  *
  * Pattern matches scripts/clone-seasonal-packs-to-prod.ts:
  *   - Two PrismaNeon adapters, two clients — reads dev, writes prod
@@ -25,7 +26,9 @@
  *   vercel env pull .env.prod.local --environment=production --cwd apps/chunky-crayon-web
  *
  * Usage:
- *   pnpm tsx scripts/sync-dev-to-prod.ts --dry-run
+ *   pnpm tsx scripts/sync-dev-to-prod.ts --dry-run              # both prefixes
+ *   pnpm tsx scripts/sync-dev-to-prod.ts --kind=landing --dry-run
+ *   pnpm tsx scripts/sync-dev-to-prod.ts --kind=combo --dry-run
  *   pnpm tsx scripts/sync-dev-to-prod.ts --slug calming-coloring-pages-for-kids-with-adhd --dry-run
  *   pnpm tsx scripts/sync-dev-to-prod.ts --apply
  */
@@ -38,28 +41,49 @@ import ws from 'ws';
 
 neonConfig.webSocketConstructor = ws;
 
-const SOURCE_PROMPT_PREFIX = 'landing-backfill:';
+const PREFIX_LANDING = 'landing-backfill:';
+const PREFIX_COMBO = 'combo-backfill:';
+const ALL_PREFIXES = [PREFIX_LANDING, PREFIX_COMBO];
+
+type Kind = 'landing' | 'combo' | 'all';
 
 type Args = {
   slug?: string;
+  kind: Kind;
   dryRun: boolean;
   apply: boolean;
 };
 
 function parseArgs(): Args {
   const argv = process.argv.slice(2);
-  const args: Args = { dryRun: false, apply: false };
+  const args: Args = { kind: 'all', dryRun: false, apply: false };
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (a === '--apply') args.apply = true;
     else if (a === '--dry-run') args.dryRun = true;
     else if (a === '--slug') args.slug = argv[++i];
+    else if (a.startsWith('--kind=')) {
+      const v = a.slice('--kind='.length);
+      if (v === 'landing' || v === 'combo' || v === 'all') args.kind = v;
+      else {
+        console.error(
+          `[sync] invalid --kind: ${v} (expected landing|combo|all)`,
+        );
+        process.exit(1);
+      }
+    }
   }
   // Default to dry-run if neither flag passed — explicit --apply is the
   // only way to write to prod.
   if (!args.apply) args.dryRun = true;
   return args;
 }
+
+const prefixesFor = (kind: Kind): string[] => {
+  if (kind === 'landing') return [PREFIX_LANDING];
+  if (kind === 'combo') return [PREFIX_COMBO];
+  return ALL_PREFIXES;
+};
 
 const extractR2Key = (publicUrl: string): string => {
   // R2 public URLs look like:
@@ -137,9 +161,16 @@ async function main() {
     adapter: new PrismaNeon({ connectionString: prodUrl }),
   });
 
+  const prefixes = prefixesFor(args.kind);
   const whereClause = args.slug
-    ? { sourcePrompt: { startsWith: `${SOURCE_PROMPT_PREFIX}${args.slug}:` } }
-    : { sourcePrompt: { startsWith: SOURCE_PROMPT_PREFIX } };
+    ? {
+        OR: prefixes.map((p) => ({
+          sourcePrompt: { startsWith: `${p}${args.slug}:` },
+        })),
+      }
+    : {
+        OR: prefixes.map((p) => ({ sourcePrompt: { startsWith: p } })),
+      };
 
   const totals = { copied: 0, skipped: 0, failed: 0 };
 
@@ -164,11 +195,15 @@ async function main() {
           continue;
         }
 
-        const slug = row.sourcePrompt
-          ?.replace(SOURCE_PROMPT_PREFIX, '')
-          .split(':')[0];
+        const matchedPrefix = ALL_PREFIXES.find((p) =>
+          row.sourcePrompt?.startsWith(p),
+        );
+        const slug = matchedPrefix
+          ? row.sourcePrompt?.replace(matchedPrefix, '').split(':')[0]
+          : undefined;
+        const kindLabel = matchedPrefix === PREFIX_COMBO ? 'combo' : 'landing';
         console.log(
-          `  [copy] ${row.id} (${slug}) "${row.title.slice(0, 50)}…"`,
+          `  [copy] ${row.id} (${kindLabel}:${slug}) "${row.title.slice(0, 50)}…"`,
         );
 
         // Clone each populated R2 URL in parallel

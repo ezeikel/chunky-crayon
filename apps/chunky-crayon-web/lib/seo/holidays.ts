@@ -28,7 +28,11 @@ export const HOLIDAY_EVENTS: HolidayEvent[] = [
     name: 'Christmas',
     icon: faTreeChristmas,
     color: 'text-crayon-green',
-    tags: ['christmas', 'santa', 'holiday'],
+    // Note: dropped 'holiday' here — it's ambiguous (UK: Christmas;
+    // US: vacation/summer-holiday). Causes summer-holiday tagged
+    // images to leak into Christmas pages. christmas + santa is
+    // narrow enough.
+    tags: ['christmas', 'santa'],
     description:
       'Festive Christmas coloring pages featuring Santa, snowmen, ornaments, and holiday cheer.',
     seoTitle: 'Christmas Coloring Pages - Free Printable Holiday Pages',
