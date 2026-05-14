@@ -1,0 +1,35 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Free printable routine charts for kids.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-white text-slate-900">
+    <slot />
+    <footer class="border-t border-slate-200 mt-16 py-8 text-center text-sm text-slate-500">
+      <p>
+        From the makers of
+        <a
+          href="https://chunkycrayon.com/?utm_source=routinecharts&utm_medium=footer&utm_campaign=site_footer"
+          class="text-orange-600 hover:underline"
+        >
+          Chunky Crayon
+        </a>
+      </p>
+    </footer>
+  </body>
+</html>

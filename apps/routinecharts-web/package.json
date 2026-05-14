@@ -1,0 +1,40 @@
+{
+  "name": "@one-colored-pixel/routinecharts-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --port 4100",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check-types": "astro check",
+    "lint": "eslint .",
+    "preinstall": "pnpm dlx only-allow pnpm",
+    "env:pull": "vercel env pull"
+  },
+  "dependencies": {
+    "@astrojs/react": "^5.0.3",
+    "@astrojs/vercel": "^9.0.0",
+    "@react-pdf/renderer": "^4.1.6",
+    "@sanity/astro": "^3.2.6",
+    "@sanity/client": "^7.0.0",
+    "@sanity/image-url": "^1.1.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "astro": "^6.3.2",
+    "posthog-js": "^1.205.0",
+    "qrcode": "^1.5.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
