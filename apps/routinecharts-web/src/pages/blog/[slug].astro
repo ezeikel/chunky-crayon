@@ -1,0 +1,94 @@
+---
+export const prerender = true;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { sanityClient, urlForImage } from "../../lib/sanity/client";
+import {
+  allPostSlugsQuery,
+  postBySlugQuery,
+  type PostFull,
+} from "../../lib/sanity/queries";
+import { PortableText } from "../../components/PortableText";
+
+export async function getStaticPaths() {
+  const slugs = await sanityClient.fetch<string[]>(allPostSlugsQuery);
+  return (slugs ?? []).map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+
+const post = await sanityClient.fetch<PostFull | null>(postBySlugQuery, {
+  slug,
+});
+
+if (!post) {
+  return Astro.redirect("/blog");
+}
+
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+const heroSrc = post.heroImage?.asset
+  ? urlForImage(post.heroImage).width(1600).fit("max").auto("format").url()
+  : null;
+---
+
+<BaseLayout title={`${post.title} | Routine Charts`} description={post.excerpt}>
+  <article class="max-w-2xl mx-auto px-6 py-12 md:py-16">
+    <nav class="mb-8">
+      <a
+        href="/blog"
+        class="text-sm font-medium text-slate-500 hover:text-orange-600"
+      >
+        ← Back to blog
+      </a>
+    </nav>
+
+    <header class="mb-10">
+      <p class="text-xs uppercase tracking-wide font-medium text-slate-500 mb-3">
+        {formatDate(post.publishedAt)}
+      </p>
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 mb-5 leading-tight">
+        {post.title}
+      </h1>
+      <p class="text-lg md:text-xl text-slate-600 leading-relaxed">
+        {post.excerpt}
+      </p>
+    </header>
+
+    {heroSrc && (
+      <img
+        src={heroSrc}
+        alt={post.heroImage?.alt ?? post.title}
+        class="w-full rounded-2xl mb-12 bg-slate-100"
+        loading="eager"
+      />
+    )}
+
+    <div class="prose-content">
+      <PortableText value={post.body} client:load={false} />
+    </div>
+
+    <footer class="mt-16 pt-8 border-t border-slate-200">
+      <div class="bg-orange-50 border border-orange-100 rounded-2xl p-6 md:p-8">
+        <h2 class="text-xl font-bold text-slate-900 mb-2">
+          Build a routine chart for free
+        </h2>
+        <p class="text-slate-600 mb-4">
+          Drag, drop, print. Includes a coloring page reward from Chunky Crayon
+          when the routine is done.
+        </p>
+        <a
+          href="/"
+          class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold px-5 py-2.5 rounded-lg"
+        >
+          Build my chart →
+        </a>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>
