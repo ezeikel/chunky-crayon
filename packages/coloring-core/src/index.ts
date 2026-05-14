@@ -171,6 +171,19 @@ export {
   _clearSerpResearchCache,
 } from "./blog/serp-research";
 export type { SerpResearch, SerpResult } from "./blog/serp-research";
+
+// Satellite-site blog pipeline (routinecharts.com, etc.)
+export {
+  SATELLITE_SITES,
+  getSatelliteSite,
+  createSatelliteBlogPostSystem,
+  createSatelliteBlogPostPrompt,
+  createSatelliteBlogMetaSystem,
+  createSatelliteBlogMetaPrompt,
+  createSatelliteBlogImagePromptSystem,
+  createSatelliteBlogImagePromptPrompt,
+} from "./satellite-blog";
+export type { SatelliteSiteConfig, SatelliteBlogTopic } from "./satellite-blog";
 export {
   getReferenceImages,
   REFERENCE_IMAGES,

@@ -52,6 +52,7 @@ import {
 } from "./coloring-image/jobs.js";
 import { subscribe } from "./coloring-image/listener.js";
 import { runBlogCron } from "./blog/pipeline.js";
+import { runSatelliteBlogCron } from "./satellite-blog/pipeline.js";
 import { runDailyImageCron } from "./coloring-image/daily-pipeline.js";
 import { runComicStripCron } from "./comic-strip/pipeline.js";
 import {
@@ -659,6 +660,39 @@ app.post("/generate/blog-post", async (c) => {
   });
 
   return c.json({ ok: true, accepted: true }, 202);
+});
+
+/**
+ * POST /generate/satellite-blog-post
+ *
+ * Daily blog cron for satellite sites (routinecharts.com, etc.). One worker
+ * route fans out by `siteSlug` body param to the right SatelliteSiteConfig.
+ * Same fire-and-forget pattern as /generate/blog-post above. Each satellite's
+ * Vercel cron POSTs here with `{ siteSlug }`.
+ */
+app.post("/generate/satellite-blog-post", async (c) => {
+  let body: { siteSlug?: unknown } = {};
+  try {
+    body = (await c.req.json()) as { siteSlug?: unknown };
+  } catch {
+    return c.json({ ok: false, error: "invalid json body" }, 400);
+  }
+
+  const siteSlug = typeof body.siteSlug === "string" ? body.siteSlug : null;
+  if (!siteSlug) {
+    return c.json({ ok: false, error: "missing siteSlug" }, 400);
+  }
+
+  console.log(`[/generate/satellite-blog-post] kickoff site=${siteSlug}`);
+
+  runSatelliteBlogCron(siteSlug).catch((err) => {
+    console.error(
+      `[/generate/satellite-blog-post] uncaught (site=${siteSlug}):`,
+      err,
+    );
+  });
+
+  return c.json({ ok: true, accepted: true, siteSlug }, 202);
 });
 
 /**
