@@ -19,6 +19,7 @@ import { getUnsubscribeUrl } from '@/lib/unsubscribe';
 import DailyColoringEmail from '@/emails/DailyColoringEmail';
 import { getDailyUpsell, type DailyUpsell } from '@/lib/email-upsell';
 import WelcomeEmail from '@/emails/WelcomeEmail';
+import MagicLinkEmail from '@/emails/MagicLinkEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
 import TrialEndingEmail from '@/emails/TrialEndingEmail';
 import SocialDigestEmail from '@/emails/SocialDigestEmail';
@@ -878,6 +879,29 @@ export const sendBundlePurchaseEmail = async ({
   return sendEmail({
     to,
     subject: `Your ${bundleName} bundle is ready!`,
+    html,
+    text,
+  });
+};
+
+/**
+ * Send the branded magic-link sign-in email.
+ *
+ * Called from `auth.ts` via the Resend provider's `sendVerificationRequest`
+ * override. Replaces Auth.js's stock "Sign in to {host}" HTML, which was
+ * a brutal first impression for a kids' coloring brand.
+ */
+export const sendMagicLinkEmail = async (
+  to: string,
+  magicLink: string,
+): Promise<{ success: boolean; messageId?: string; error?: string }> => {
+  const html = await render(MagicLinkEmail({ magicLink }));
+  const text = await render(MagicLinkEmail({ magicLink }), { plainText: true });
+
+  return sendEmail({
+    to,
+    from: getResendFromAddress('no-reply', 'Chunky Crayon'),
+    subject: 'Sign in to Chunky Crayon',
     html,
     text,
   });

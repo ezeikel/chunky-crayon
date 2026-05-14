@@ -12,6 +12,7 @@ import {
   readClientMatchData,
   sendSignupConversionEvents,
 } from '@/lib/conversion-api';
+import { sendMagicLinkEmail } from '@/app/actions/email';
 import { ADMIN_EMAILS } from '@/constants';
 
 // Bootstrap source for `User.role`: anyone whose email is in the
@@ -62,6 +63,12 @@ const config = {
     Resend({
       apiKey: process.env.RESEND_API_KEY,
       from: getResendFromAddress('no-reply'),
+      async sendVerificationRequest({ identifier: email, url }) {
+        const result = await sendMagicLinkEmail(email, url);
+        if (!result.success) {
+          throw new Error(result.error ?? 'Failed to send magic link email');
+        }
+      },
     }),
   ],
   callbacks: {
