@@ -45,8 +45,26 @@ async function isTopicCovered(topic: string): Promise<boolean> {
   }
 }
 
+// BLOG_TOPICS in coloring-core is a cross-brand catalogue: it includes an
+// `adult-coloring` bucket meant for Coloring Habitat, not Chunky Crayon. The
+// catalogue's only typing is `category: string`, so nothing stops the worker
+// from picking an adult topic — and on 2026-05-13 it did exactly that
+// ("Burnout Recovery Path Coloring for Professional Rejuvenation"), with
+// several similar adult-leaning posts having already shipped to Sanity in
+// prior weeks. Restrict CC's worker to the kid-appropriate buckets here.
+const CC_BLOG_CATEGORIES: ReadonlySet<string> = new Set([
+  "parenting",
+  "educational",
+  "seasonal",
+  "themes",
+  "techniques",
+]);
+
 function pickRandomUncoveredTopic(coveredTopics: string[]): BlogTopic | null {
-  const uncovered = BLOG_TOPICS.filter((t) => !coveredTopics.includes(t.topic));
+  const covered = new Set(coveredTopics);
+  const uncovered = BLOG_TOPICS.filter(
+    (t) => CC_BLOG_CATEGORIES.has(t.category) && !covered.has(t.topic),
+  );
   if (uncovered.length === 0) return null;
   return uncovered[Math.floor(Math.random() * uncovered.length)];
 }

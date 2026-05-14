@@ -20,7 +20,7 @@ Easy to miss in greps: `apps/chunky-crayon-worker/` runs the gen pipeline asynch
 IG/FB user comments "#drawthis a unicorn cake"
         │
         ▼  webhook POST
-/api/facebook/webhook  ── verifies X-Hub-Signature-256
+/api/facebook/webhook  ── POST body logged; X-Hub-Signature-256 verification deferred (see route handler)
         │
         ▼  extractImageRequestPrompt() matches
 INSERT social_comment_queue { commentType: IMAGE_REQUEST, extractedPrompt: "a unicorn cake" }
@@ -151,13 +151,13 @@ Key indexes:
 
 ## Endpoints
 
-| Path                                          | Caller                        | Purpose                                                                      |
-| --------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------- |
-| `GET /api/facebook/webhook`                   | Meta subscription handshake   | Verify `hub.verify_token` against `FACEBOOK_WEBHOOK_VERIFY_TOKEN`            |
-| `POST /api/facebook/webhook`                  | Meta (per comment)            | Receive comment events, signature-verify, queue + maybe `handleImageRequest` |
-| `GET /POST /api/cron/social-comments/process` | Vercel cron (every 2min)      | Drive PENDING + AWAITING_GENERATION rows to terminal states                  |
-| `GET/POST /api/cron/social-comments/catch-up` | Vercel cron (daily 04:00 UTC) | FB-only: scan 7-day post window for webhook-missed comments                  |
-| `POST /api/admin/slack/interact`              | Slack interactivity           | Approve/Reject buttons → run gen or send sorry                               |
+| Path                                          | Caller                        | Purpose                                                                                                                                    |
+| --------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GET /api/facebook/webhook`                   | Meta subscription handshake   | Verify `hub.verify_token` against `FACEBOOK_WEBHOOK_VERIFY_TOKEN`                                                                          |
+| `POST /api/facebook/webhook`                  | Meta (per comment)            | Receive comment events (body logged); queue + maybe `handleImageRequest` — `X-Hub-Signature-256` verification deferred (see route handler) |
+| `GET /POST /api/cron/social-comments/process` | Vercel cron (every 2min)      | Drive PENDING + AWAITING_GENERATION rows to terminal states                                                                                |
+| `GET/POST /api/cron/social-comments/catch-up` | Vercel cron (daily 04:00 UTC) | FB-only: scan 7-day post window for webhook-missed comments                                                                                |
+| `POST /api/admin/slack/interact`              | Slack interactivity           | Approve/Reject buttons → run gen or send sorry                                                                                             |
 
 ## Required environment variables
 
@@ -166,7 +166,7 @@ All on Vercel (CC project) + local `.env.local` for dev.
 | Var                              | Purpose                                                                                                                | How to source                                                                                                                       |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `FACEBOOK_WEBHOOK_VERIFY_TOKEN`  | GET handshake check — Meta calls once on subscription. Replaces the hardcoded value that used to be in the stub route. | Generate a random string (e.g. `openssl rand -hex 16`). Paste into Meta App Dashboard → Webhooks → "Verify Token" when subscribing. |
-| `FACEBOOK_BUSINESS_APP_SECRET`   | POST signature verification — HMAC SHA256 over the raw body.                                                           | Meta App Dashboard → Settings → Basic → "App Secret"                                                                                |
+| `FACEBOOK_BUSINESS_APP_SECRET`   | Reserved for future POST body HMAC (`X-Hub-Signature-256`); **not read by the webhook route today.**                   | Meta App Dashboard → Settings → Basic → "App Secret"                                                                                |
 | `FACEBOOK_PAGE_ACCESS_TOKEN`     | Graph API calls (already in env for other CC features)                                                                 | Token refresh cron                                                                                                                  |
 | `INSTAGRAM_ACCOUNT_ID`           | Identify our own IG comments to skip them. Already in env.                                                             | Meta dashboard                                                                                                                      |
 | `FACEBOOK_PAGE_ID`               | Identify our own FB comments to skip them. Already in env.                                                             | Meta dashboard                                                                                                                      |
@@ -184,7 +184,7 @@ All on Vercel (CC project) + local `.env.local` for dev.
 2. **Subscribe webhook** — Meta App Dashboard → Webhooks → Add subscription:
    - **Object**: `Page`. **Callback URL**: `https://chunkycrayon.com/api/facebook/webhook`. **Verify Token**: the value above. **Fields**: `feed` (catches comment add/edit/remove on Page posts).
    - **Object**: `Instagram`. Same Callback URL + Verify Token. **Fields**: `comments`.
-3. **Copy `FACEBOOK_BUSINESS_APP_SECRET`** from Settings → Basic → App Secret. Add to Vercel env.
+3. **(Optional until HMAC is enabled in code)** Copy `FACEBOOK_BUSINESS_APP_SECRET` from Settings → Basic → App Secret if you want it in Vercel for a future verification pass — current POST handling does not use it.
 4. **Subscribe the Page to your IG account** (one-time per FB Page / IG Business account pairing) using the Graph API Explorer: `POST /{page-id}/subscribed_apps?subscribed_fields=feed`.
 
 ### Slack (Chewy Bytes workspace)
@@ -218,8 +218,8 @@ vercel env add SLACK_CC_MODERATION_CHANNEL_ID
 
 | Symptom                                      | Likely cause                                                                                             | Fix                                                                                                                                                                                |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Webhook returns 403 "Invalid signature"      | `FACEBOOK_BUSINESS_APP_SECRET` missing or wrong in Vercel                                                | Re-pull `Settings → Basic → App Secret`, update env var, redeploy                                                                                                                  |
 | Webhook returns 403 on subscription verify   | `FACEBOOK_WEBHOOK_VERIFY_TOKEN` doesn't match what was set in Meta Dashboard                             | Re-set both ends to the same value                                                                                                                                                 |
+| `POST` returns 400                           | Malformed JSON body                                                                                      | Meta should always send JSON; check proxy / manual curl mistakes                                                                                                                   |
 | Webhook returns 200 but no rows inserted     | Likely IG `comments` or FB `feed` subscription missing on the Page                                       | Re-subscribe via Graph API Explorer (see setup step 4)                                                                                                                             |
 | `#drawthis` reply posts but DM never arrives | Outside the 7-day IG comment window (shouldn't happen — comment IS the trigger), or `sendImageDM` failed | Check Vercel logs for `image-request` action. Often falls back to text-DM with the R2 URL.                                                                                         |
 | Borderline never gets to Slack               | `SLACK_CC_MODERATION_CHANNEL_ID` missing, or bot not invited to channel                                  | Re-invite bot to channel; re-set env var. Failed Slack posts log `Slack postMessage failed` and fall through to blocked-fail-safe.                                                 |
@@ -229,7 +229,7 @@ vercel env add SLACK_CC_MODERATION_CHANNEL_ID
 
 ## Testing locally
 
-The webhook signature check fails open in dev (no `FACEBOOK_BUSINESS_APP_SECRET` set), so curl probes work:
+The POST handler does not verify `X-Hub-Signature-256` yet, so local `curl` probes work without `FACEBOOK_BUSINESS_APP_SECRET`:
 
 ```bash
 curl -X POST http://localhost:3000/api/facebook/webhook \
