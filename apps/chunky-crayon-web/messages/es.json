@@ -382,7 +382,8 @@
       "totalPages": "Páginas totales",
       "communityPages": "Páginas de la comunidad",
       "dailyPages": "Páginas diarias",
-      "pagesSuffix": "páginas"
+      "pagesSuffix": "páginas",
+      "ourPages": "Our Pages"
     },
     "ageGroups": {
       "toddlers": {

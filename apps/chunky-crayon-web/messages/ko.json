@@ -382,7 +382,8 @@
       "totalPages": "전체 도안",
       "communityPages": "커뮤니티 도안",
       "dailyPages": "데일리 도안",
-      "pagesSuffix": "개"
+      "pagesSuffix": "개",
+      "ourPages": "Our Pages"
     },
     "ageGroups": {
       "toddlers": {

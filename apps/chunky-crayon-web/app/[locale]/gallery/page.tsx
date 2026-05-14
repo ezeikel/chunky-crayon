@@ -181,7 +181,13 @@ const parsePageParam = (raw: string | undefined): number => {
   return parsed;
 };
 
-/** Build `/gallery?page=N&difficulty=X` for the given filter combination. */
+/**
+ * Build `/gallery?page=N&difficulty=X#our-latest` for the given filter.
+ * The hash anchors page navigation to the top of the Our Latest section
+ * so paginating doesn't dump the user at the top of the page (past the
+ * hero + browse cards) or leave them stuck at the bottom looking at
+ * the previous page's last row.
+ */
 const buildOurLatestHref = (
   page: number,
   difficulty: DifficultyFilter,
@@ -190,7 +196,8 @@ const buildOurLatestHref = (
   if (page > 1) params.set('page', String(page));
   if (difficulty) params.set('difficulty', difficulty.toLowerCase());
   const qs = params.toString();
-  return qs ? `/gallery?${qs}` : '/gallery';
+  const base = qs ? `/gallery?${qs}` : '/gallery';
+  return `${base}#our-latest`;
 };
 
 const OurLatestImages = async ({
@@ -255,7 +262,10 @@ const OurLatestImages = async ({
   ];
 
   return (
-    <section className="mb-12">
+    // scroll-mt offsets the anchor target so it lands BELOW the sticky
+    // header on browsers that respect scroll-margin. Number is conservative
+    // (heading + a touch of breathing room).
+    <section id="our-latest" className="mb-12 scroll-mt-24">
       <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
         <div className="flex items-center gap-3">
           <FontAwesomeIcon
@@ -736,6 +746,12 @@ const GalleryStats = async ({ locale }: { locale: string }) => {
         <div className="text-sm text-text-secondary">
           {t('stats.totalPages')}
         </div>
+      </div>
+      <div>
+        <div className="font-tondo font-bold text-3xl text-crayon-green">
+          {stats.systemImages.toLocaleString()}
+        </div>
+        <div className="text-sm text-text-secondary">{t('stats.ourPages')}</div>
       </div>
       <div>
         <div className="font-tondo font-bold text-3xl text-crayon-purple">

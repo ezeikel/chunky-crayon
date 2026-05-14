@@ -382,7 +382,8 @@
       "totalPages": "合計",
       "communityPages": "コミュニティ",
       "dailyPages": "デイリー",
-      "pagesSuffix": "ページ"
+      "pagesSuffix": "ページ",
+      "ourPages": "Our Pages"
     },
     "ageGroups": {
       "toddlers": {

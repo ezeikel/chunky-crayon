@@ -523,16 +523,35 @@ export const getGalleryStats = async () => {
   cacheLife('gallery-stats');
   cacheTag('gallery-stats');
 
-  const [totalImages, communityImages, dailyImages] = await Promise.all([
-    db.coloringImage.count({ where: brandWhere }),
-    db.coloringImage.count({ where: { ...brandWhere, userId: null } }),
-    db.coloringImage.count({
-      where: { ...brandWhere, generationType: GenerationType.DAILY },
-    }),
-  ]);
+  // Honest split. Previous version had `communityImages` set to userId
+  // IS NULL — that's SYSTEM content, not community. The mislabel
+  // showed "Community Pages: 1,175" while the real UGC count was 36.
+  // Each stat now counts what its label says.
+  //
+  // All filters include svgUrl: not null so the numbers match what a
+  // visitor can actually see in the gallery (in-flight GENERATING rows
+  // get excluded).
+  const baseWhere = { ...brandWhere, svgUrl: { not: null } };
+
+  const [totalImages, systemImages, communityImages, dailyImages] =
+    await Promise.all([
+      db.coloringImage.count({ where: baseWhere }),
+      db.coloringImage.count({ where: { ...baseWhere, userId: null } }),
+      db.coloringImage.count({
+        where: {
+          ...baseWhere,
+          userId: { not: null },
+          showInCommunity: true,
+        },
+      }),
+      db.coloringImage.count({
+        where: { ...baseWhere, generationType: GenerationType.DAILY },
+      }),
+    ]);
 
   return {
     totalImages,
+    systemImages,
     communityImages,
     dailyImages,
   };

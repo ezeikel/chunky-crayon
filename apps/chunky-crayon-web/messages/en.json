@@ -404,6 +404,7 @@
     "startColoring": "Start Coloring",
     "stats": {
       "totalPages": "Total Pages",
+      "ourPages": "Our Pages",
       "communityPages": "Community Pages",
       "dailyPages": "Daily Pages",
       "pagesSuffix": "pages"
