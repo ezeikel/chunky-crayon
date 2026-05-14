@@ -29,13 +29,13 @@ import {
   getTodaysDailyImage,
   getFeaturedImages,
   getCommunityImages,
-  getSystemImages,
+  getSystemImagesPage,
   getCategoryCounts,
   getGalleryStats,
   getDifficultyCounts,
   getAgeGroupCounts,
 } from '@/app/data/gallery';
-import InfiniteScrollGallery from '@/components/InfiniteScrollGallery/InfiniteScrollGallery';
+import Pagination from '@/components/Pagination/Pagination';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { Difficulty } from '@one-colored-pixel/db';
 import { getLandingPageBySlug } from '@/lib/seo/landing-pages';
@@ -150,11 +150,15 @@ const DailyImageSection = async ({ locale }: { locale: string }) => {
 // category cards. Distinct from Community (UGC), Daily (single image),
 // and Featured (just the top-6 hero strip).
 //
-// Difficulty filter is server-rendered via ?difficulty=beginner|intermediate|advanced
-// search param. Each filtered view is shareable via URL (good for SEO
-// + parent-to-parent sharing) and the existing /gallery/difficulty/[X]
-// pages stay the canonical "deep dive" destination — the chips here
-// are a quick narrow-without-leaving-page convenience.
+// Why paginated (not infinite scroll):
+//   - Our system content is finite-ish (~1000 rows, grows ~1/day)
+//   - Numbered pages give Google one indexable URL per page
+//   - Parent-to-parent sharing works ("look at page 3, the Halloween ones")
+// Community section stays infinite-scroll on /gallery/community —
+// that's the explore-driven surface.
+//
+// Both filters compose into the URL:
+//   /gallery?page=2&difficulty=beginner
 type DifficultyFilter = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | null;
 
 const parseDifficultyParam = (raw: string | undefined): DifficultyFilter => {
@@ -170,19 +174,45 @@ const parseDifficultyParam = (raw: string | undefined): DifficultyFilter => {
   return null;
 };
 
+const parsePageParam = (raw: string | undefined): number => {
+  if (!raw) return 1;
+  const parsed = parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return 1;
+  return parsed;
+};
+
+/** Build `/gallery?page=N&difficulty=X` for the given filter combination. */
+const buildOurLatestHref = (
+  page: number,
+  difficulty: DifficultyFilter,
+): string => {
+  const params = new URLSearchParams();
+  if (page > 1) params.set('page', String(page));
+  if (difficulty) params.set('difficulty', difficulty.toLowerCase());
+  const qs = params.toString();
+  return qs ? `/gallery?${qs}` : '/gallery';
+};
+
 const OurLatestImages = async ({
   locale,
   difficulty,
+  page,
 }: {
   locale: string;
   difficulty: DifficultyFilter;
+  page: number;
 }) => {
-  const t = await getTranslations({ locale, namespace: 'gallery' });
-  const { images, nextCursor, hasMore } = await getSystemImages(
-    undefined,
-    24,
-    difficulty ?? undefined,
-  );
+  const [t, tAlt] = await Promise.all([
+    getTranslations({ locale, namespace: 'gallery' }),
+    getTranslations({ locale, namespace: 'altText' }),
+  ]);
+
+  const {
+    images,
+    page: safePage,
+    totalPages,
+    totalCount,
+  } = await getSystemImagesPage(page, 24, difficulty ?? undefined);
 
   const iconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
@@ -190,8 +220,8 @@ const OurLatestImages = async ({
     '--fa-secondary-opacity': '1',
   } as React.CSSProperties;
 
-  // Chip targets are the existing /gallery main route with a query
-  // param. Server re-renders; PPR keeps the rest of the page cached.
+  // Difficulty chip targets always reset to page 1 — selecting a new
+  // filter on page 3 of the previous filter is rarely what you want.
   const chips: Array<{
     key: string;
     href: string;
@@ -200,25 +230,25 @@ const OurLatestImages = async ({
   }> = [
     {
       key: 'all',
-      href: '/gallery',
+      href: buildOurLatestHref(1, null),
       label: t('difficultyFilter.all'),
       active: difficulty === null,
     },
     {
       key: 'beginner',
-      href: '/gallery?difficulty=beginner',
+      href: buildOurLatestHref(1, 'BEGINNER'),
       label: t('difficultyFilter.beginner'),
       active: difficulty === 'BEGINNER',
     },
     {
       key: 'intermediate',
-      href: '/gallery?difficulty=intermediate',
+      href: buildOurLatestHref(1, 'INTERMEDIATE'),
       label: t('difficultyFilter.intermediate'),
       active: difficulty === 'INTERMEDIATE',
     },
     {
       key: 'advanced',
-      href: '/gallery?difficulty=advanced',
+      href: buildOurLatestHref(1, 'ADVANCED'),
       label: t('difficultyFilter.advanced'),
       active: difficulty === 'ADVANCED',
     },
@@ -226,15 +256,22 @@ const OurLatestImages = async ({
 
   return (
     <section className="mb-12">
-      <div className="flex items-center gap-3 mb-4">
-        <FontAwesomeIcon
-          icon={faPalette}
-          className="text-2xl"
-          style={iconStyle}
-        />
-        <h2 className="font-tondo font-bold text-2xl text-text-primary">
-          {t('ourLatestTitle')}
-        </h2>
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+        <div className="flex items-center gap-3">
+          <FontAwesomeIcon
+            icon={faPalette}
+            className="text-2xl"
+            style={iconStyle}
+          />
+          <h2 className="font-tondo font-bold text-2xl text-text-primary">
+            {t('ourLatestTitle')}
+          </h2>
+        </div>
+        {totalCount > 0 ? (
+          <p className="text-sm text-text-tertiary font-tondo">
+            {t('ourLatestCount', { count: totalCount })}
+          </p>
+        ) : null}
       </div>
       <p className="text-text-secondary mb-5 max-w-3xl">
         {t('ourLatestSubtitle')}
@@ -266,14 +303,33 @@ const OurLatestImages = async ({
           <p>{t('difficultyFilter.empty')}</p>
         </div>
       ) : (
-        <InfiniteScrollGallery
-          initialImages={images}
-          initialCursor={nextCursor}
-          initialHasMore={hasMore}
-          galleryType="system"
-          difficultySlug={difficulty?.toLowerCase()}
-          locale={locale}
-        />
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {images.map((image) => (
+              <Link
+                key={image.id}
+                href={getColoringImageUrl(image, locale)}
+                className="relative aspect-square rounded-xl overflow-hidden bg-white border-2 border-paper-cream-dark hover:border-crayon-orange/50 transition-all group shadow-sm hover:shadow-md"
+              >
+                {image.svgUrl ? (
+                  <Image
+                    src={image.svgUrl}
+                    alt={image.title || tAlt('coloringPage')}
+                    fill
+                    className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : null}
+              </Link>
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={safePage}
+            totalPages={totalPages}
+            buildHref={(p) => buildOurLatestHref(p, difficulty)}
+            ariaLabel={t('ourLatestTitle')}
+          />
+        </>
       )}
     </section>
   );
@@ -303,7 +359,7 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
 
   return (
     <section className="mb-12">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <FontAwesomeIcon
             icon={faUsers}
@@ -322,6 +378,9 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
           <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
         </Link>
       </div>
+      <p className="text-text-secondary mb-5 max-w-3xl">
+        {t('communitySubtitle')}
+      </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
         {images.map((image) => (
           <Link
@@ -337,6 +396,20 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
             />
           </Link>
         ))}
+      </div>
+
+      {/* Prominent CTA at the bottom of the preview strip. The
+          /gallery/community page is the explore-driven infinite-scroll
+          destination; we want browsers to actually land there rather
+          than skip past the section. */}
+      <div className="mt-6 flex justify-center">
+        <Link
+          href="/gallery/community"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-purple text-white font-tondo font-semibold rounded-full hover:bg-crayon-purple-dark transition-colors"
+        >
+          {t('browseAllCommunity')}
+          <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
+        </Link>
       </div>
     </section>
   );
@@ -716,7 +789,7 @@ const GalleryContent = async ({
   searchParamsPromise,
 }: {
   locale: string;
-  searchParamsPromise: Promise<{ difficulty?: string }>;
+  searchParamsPromise: Promise<{ difficulty?: string; page?: string }>;
 }) => {
   const [t, tBreadcrumbs, searchParams] = await Promise.all([
     getTranslations({ locale, namespace: 'gallery' }),
@@ -724,6 +797,7 @@ const GalleryContent = async ({
     searchParamsPromise,
   ]);
   const difficulty = parseDifficultyParam(searchParams.difficulty);
+  const page = parsePageParam(searchParams.page);
 
   return (
     <>
@@ -762,7 +836,7 @@ const GalleryContent = async ({
         <AgeGroupCards locale={locale} />
         <DifficultyCards locale={locale} />
         <CategoryCards locale={locale} />
-        <OurLatestImages locale={locale} difficulty={difficulty} />
+        <OurLatestImages locale={locale} difficulty={difficulty} page={page} />
         <CommunityHighlights locale={locale} />
       </Suspense>
 
@@ -786,7 +860,7 @@ const GalleryPage = ({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ difficulty?: string }>;
+  searchParams: Promise<{ difficulty?: string; page?: string }>;
 }) => (
   <PageWrap>
     <Suspense fallback={<LoadingSkeleton />}>
@@ -802,7 +876,7 @@ const GalleryShell = async ({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ difficulty?: string }>;
+  searchParams: Promise<{ difficulty?: string; page?: string }>;
 }) => {
   const { locale } = await params;
   return (

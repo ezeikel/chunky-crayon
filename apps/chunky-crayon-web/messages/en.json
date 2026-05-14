@@ -377,8 +377,11 @@
     "viewAllDaily": "View all daily pages",
     "communityCreations": "Community Creations",
     "viewAllCommunity": "View all community pages",
+    "communitySubtitle": "Pages our community of parents and kids created. Browse hundreds more on the dedicated community gallery — it's where the imaginative stuff lives.",
+    "browseAllCommunity": "Browse community gallery",
     "ourLatestTitle": "Our Latest Coloring Pages",
     "ourLatestSubtitle": "Fresh pages from us, with new ones added daily. Pick a tile to color online, print at home, or save for later.",
+    "ourLatestCount": "{count, plural, =1 {1 page} other {# pages}}",
     "difficultyFilter": {
       "all": "All",
       "beginner": "Easy",

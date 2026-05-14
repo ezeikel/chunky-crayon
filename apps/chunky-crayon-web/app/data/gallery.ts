@@ -157,6 +157,65 @@ export const getSystemImages = async (
   return getSystemImagesBase(cursor, limit, difficulty);
 };
 
+/**
+ * Page-numbered access to system images for the main /gallery feed.
+ *
+ * Distinct from getSystemImages (cursor-based, infinite-scroll-shaped)
+ * because the gallery's "Our Latest" surface ships as numbered pages —
+ * shareable URLs, Google can crawl every page, parent-to-parent links
+ * work ("look at page 3, the Halloween ones"). page is 1-indexed.
+ */
+export type PagedImagesResponse = {
+  images: GalleryImage[];
+  page: number;
+  totalPages: number;
+  totalCount: number;
+};
+
+export const SYSTEM_GALLERY_PAGE_SIZE = 24;
+
+export const getSystemImagesPage = async (
+  page: number = 1,
+  pageSize: number = SYSTEM_GALLERY_PAGE_SIZE,
+  difficulty?: Difficulty,
+): Promise<PagedImagesResponse> => {
+  'use cache';
+  cacheLife('gallery-community');
+  cacheTag('gallery-community', 'gallery-system');
+
+  // Clamp page to ≥1; we don't trust the URL to be well-formed.
+  const safePage = Math.max(1, Math.floor(page));
+  const where = {
+    ...brandWhere,
+    userId: null,
+    svgUrl: { not: null },
+    ...(difficulty ? { difficulty } : {}),
+  };
+
+  const [totalCount, images] = await Promise.all([
+    db.coloringImage.count({ where }),
+    db.coloringImage.findMany({
+      where,
+      select: {
+        ...GALLERY_IMAGE_SELECT,
+        tags: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: pageSize,
+      skip: (safePage - 1) * pageSize,
+    }),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
+  return {
+    images,
+    page: safePage,
+    totalPages,
+    totalCount,
+  };
+};
+
 // ===== DAILY IMAGES =====
 // Images generated automatically by the daily cron job
 

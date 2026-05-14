@@ -597,7 +597,10 @@
         "adults": "Chunky Crayon is built for kids ages 3-8. Coloring Habitat is our sister site for adult coloring — mandalas, intricate patterns, mindful designs, and stress-relief printables for grown-ups."
       },
       "cta": "Visit Coloring Habitat"
-    }
+    },
+    "ourLatestCount": "{count, plural, =1 {1 page} other {# pages}}",
+    "communitySubtitle": "Pages our community of parents and kids created. Browse hundreds more on the dedicated community gallery — it's where the imaginative stuff lives.",
+    "browseAllCommunity": "Browse community gallery"
   },
   "pricing": {
     "pageTitle": "料金 - Chunky Crayon",
