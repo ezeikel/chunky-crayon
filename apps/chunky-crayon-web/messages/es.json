@@ -461,7 +461,12 @@
       "beginner": "Easy",
       "intermediate": "Medium",
       "advanced": "Tricky",
-      "empty": "No pages in this tier yet. Try a different difficulty."
+      "empty": "No pages in this tier yet. Try a different difficulty.",
+      "expert": "Experto",
+      "easy": "Fácil",
+      "medium": "Medio",
+      "hard": "Difícil",
+      "filterByDifficulty": "Filtrar por dificultad"
     },
     "categoryPage": {
       "coloringPages": "Páginas para colorear de {category}",

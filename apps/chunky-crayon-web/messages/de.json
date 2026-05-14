@@ -461,7 +461,12 @@
       "beginner": "Easy",
       "intermediate": "Medium",
       "advanced": "Tricky",
-      "empty": "No pages in this tier yet. Try a different difficulty."
+      "empty": "No pages in this tier yet. Try a different difficulty.",
+      "expert": "Profi",
+      "easy": "Leicht",
+      "medium": "Mittel",
+      "hard": "Schwer",
+      "filterByDifficulty": "Nach Schwierigkeitsgrad filtern"
     },
     "categoryPage": {
       "coloringPages": "{category} Ausmalbilder",

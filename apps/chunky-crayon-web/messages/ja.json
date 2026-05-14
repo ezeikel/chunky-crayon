@@ -461,7 +461,12 @@
       "beginner": "Easy",
       "intermediate": "Medium",
       "advanced": "Tricky",
-      "empty": "No pages in this tier yet. Try a different difficulty."
+      "empty": "No pages in this tier yet. Try a different difficulty.",
+      "expert": "上級",
+      "easy": "かんたん",
+      "medium": "ふつう",
+      "hard": "むずかしい",
+      "filterByDifficulty": "むずかしさで絞り込み"
     },
     "categoryPage": {
       "coloringPages": "{category}のぬりえ",

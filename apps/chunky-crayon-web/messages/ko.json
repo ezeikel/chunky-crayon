@@ -461,7 +461,12 @@
       "beginner": "Easy",
       "intermediate": "Medium",
       "advanced": "Tricky",
-      "empty": "No pages in this tier yet. Try a different difficulty."
+      "empty": "No pages in this tier yet. Try a different difficulty.",
+      "expert": "전문가",
+      "easy": "쉬움",
+      "medium": "보통",
+      "hard": "어려움",
+      "filterByDifficulty": "난이도별 필터"
     },
     "categoryPage": {
       "coloringPages": "{category} 색칠공부 도안",
