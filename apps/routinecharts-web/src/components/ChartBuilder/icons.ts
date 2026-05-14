@@ -1,0 +1,33 @@
+export const ROUTINE_ICONS = [
+  { emoji: "🪥", label: "Brush teeth" },
+  { emoji: "🥣", label: "Breakfast" },
+  { emoji: "🥪", label: "Lunch" },
+  { emoji: "🍽️", label: "Dinner" },
+  { emoji: "👕", label: "Get dressed" },
+  { emoji: "🛁", label: "Bath time" },
+  { emoji: "🚿", label: "Shower" },
+  { emoji: "🛏️", label: "Make bed" },
+  { emoji: "📚", label: "Read" },
+  { emoji: "✏️", label: "Homework" },
+  { emoji: "🎒", label: "Pack bag" },
+  { emoji: "🧸", label: "Tidy toys" },
+  { emoji: "🐕", label: "Walk dog" },
+  { emoji: "🌱", label: "Water plants" },
+  { emoji: "🧺", label: "Laundry" },
+  { emoji: "🍎", label: "Snack" },
+  { emoji: "💧", label: "Drink water" },
+  { emoji: "🏃", label: "Exercise" },
+  { emoji: "🎨", label: "Art time" },
+  { emoji: "🎵", label: "Music practice" },
+  { emoji: "🌙", label: "Bedtime" },
+  { emoji: "🦷", label: "Floss" },
+  { emoji: "🧼", label: "Wash hands" },
+  { emoji: "🪴", label: "Chores" },
+];
+
+export const DEFAULT_ROWS = [
+  { label: "Brush teeth", icon: "🪥", time: "7:00am" },
+  { label: "Get dressed", icon: "👕", time: "7:15am" },
+  { label: "Breakfast", icon: "🥣", time: "7:30am" },
+  { label: "Pack bag", icon: "🎒", time: "8:00am" },
+];

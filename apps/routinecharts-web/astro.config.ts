@@ -6,5 +6,5 @@ export default defineConfig({
   site: "https://routinecharts.com",
   integrations: [react()],
   adapter: vercel(),
-  output: "static",
+  output: "server",
 });
