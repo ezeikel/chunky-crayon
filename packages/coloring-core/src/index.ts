@@ -148,6 +148,7 @@ export {
 // Blog content generation (prompts + topic/author catalogue)
 export {
   BLOG_POST_SYSTEM,
+  buildBlogSystemPrompt,
   createBlogPostPrompt,
   BLOG_META_SYSTEM,
   createBlogMetaPrompt,
@@ -158,6 +159,18 @@ export { BLOG_CATEGORIES, BLOG_TOPICS, BLOG_AUTHORS } from "./blog/topics";
 export type { BlogCategory, BlogTopic, BlogAuthor } from "./blog/topics";
 export { BLOG_LANDING_PAGES } from "./blog/landings";
 export type { BlogLandingPage } from "./blog/landings";
+export { VOICE_REF, HUMOR_REF, STORIES_REF } from "./blog/voice-refs";
+export {
+  expandKeywordCluster,
+  expandedClusterSchema,
+} from "./blog/keyword-clustering";
+export type { ExpandedCluster } from "./blog/keyword-clustering";
+export {
+  researchTopSerps,
+  serpResearchSchema,
+  _clearSerpResearchCache,
+} from "./blog/serp-research";
+export type { SerpResearch, SerpResult } from "./blog/serp-research";
 export {
   getReferenceImages,
   REFERENCE_IMAGES,

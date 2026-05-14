@@ -4,7 +4,7 @@ import {
   blogMetaSchema,
   blogPostSchema,
   blogImagePromptSchema,
-  BLOG_POST_SYSTEM,
+  buildBlogSystemPrompt,
   createBlogPostPrompt,
   BLOG_META_SYSTEM,
   createBlogMetaPrompt,
@@ -13,7 +13,14 @@ import {
   BLOG_TOPICS,
   BLOG_AUTHORS,
   stripEmDashes,
+  expandKeywordCluster,
+  researchTopSerps,
+  VOICE_REF,
+  HUMOR_REF,
+  STORIES_REF,
   type BlogTopic,
+  type ExpandedCluster,
+  type SerpResearch,
 } from "@one-colored-pixel/coloring-core";
 import {
   client as sanityClient,
@@ -91,13 +98,19 @@ async function generateMeta(topic: string, keywords: string[]) {
 
 async function generateContent(
   topic: string,
-  keywords: string[],
+  cluster: ExpandedCluster,
   coveredTopics: string[],
+  research: SerpResearch | null,
 ) {
+  const system = buildBlogSystemPrompt({
+    voice: VOICE_REF,
+    humor: HUMOR_REF,
+    stories: STORIES_REF,
+  });
   const { output } = await generateText({
     model: claudeModel,
-    system: BLOG_POST_SYSTEM,
-    prompt: createBlogPostPrompt(topic, keywords, coveredTopics),
+    system,
+    prompt: createBlogPostPrompt(topic, cluster, coveredTopics, research),
     output: Output.object({ schema: blogPostSchema }),
   });
   if (!output)
@@ -212,15 +225,66 @@ async function createSanityPost({
 }
 
 /**
+ * Find a topic by best-effort fuzzy match against BLOG_TOPICS. Used by
+ * the --topic CLI override so a human doesn't have to type the exact
+ * BLOG_TOPICS entry — substring match against the topic string wins.
+ */
+function findTopicOverride(override: string): BlogTopic | null {
+  const needle = override.trim().toLowerCase();
+  if (!needle) return null;
+  const exact = BLOG_TOPICS.find((t) => t.topic.toLowerCase() === needle);
+  if (exact) return exact;
+  const substr = BLOG_TOPICS.find((t) =>
+    t.topic.toLowerCase().includes(needle),
+  );
+  return substr ?? null;
+}
+
+export type RunBlogCronOptions = {
+  /**
+   * If set, skip the random-uncovered pick and use this topic instead.
+   * Accepts an exact BLOG_TOPICS string or a substring (first match
+   * wins). If no BLOG_TOPICS row matches, the cron exits without
+   * publishing.
+   */
+  topicOverride?: string;
+  /**
+   * If true, run the pipeline up to and including content generation
+   * but skip image generation and Sanity write. Console-logs the
+   * assembled system prompt, user prompt, and generated content so we
+   * can eyeball voice/structure without burning Sanity/R2 slots.
+   */
+  dryRun?: boolean;
+};
+
+/**
  * Run the blog cron pipeline. Fire-and-forget from the worker route's
  * perspective — caller awaits the kickoff but not the work.
  *
  * On any failure, alerts admin via Resend. Never throws to the caller.
  */
-export async function runBlogCron(): Promise<void> {
+export async function runBlogCron(
+  options: RunBlogCronOptions = {},
+): Promise<void> {
+  const { topicOverride, dryRun = false } = options;
   try {
     const coveredTopics = await getCoveredTopics();
-    const topic = pickRandomUncoveredTopic(coveredTopics);
+
+    let topic: BlogTopic | null;
+    if (topicOverride) {
+      topic = findTopicOverride(topicOverride);
+      if (!topic) {
+        console.error(
+          `[blog-cron] --topic="${topicOverride}" did not match any BLOG_TOPICS entry. Aborting.`,
+        );
+        return;
+      }
+      console.log(
+        `[blog-cron] using topic override: "${topic.topic}" (category: ${topic.category})`,
+      );
+    } else {
+      topic = pickRandomUncoveredTopic(coveredTopics);
+    }
 
     if (!topic) {
       const totalTopics = BLOG_TOPICS.length;
@@ -239,8 +303,10 @@ Next step: run the deep-research script to add new topics, then merge into BLOG_
     }
 
     // Idempotency: re-check after picking — protects against a parallel cron
-    // run (manual trigger + scheduled) racing on the same topic.
-    if (await isTopicCovered(topic.topic)) {
+    // run (manual trigger + scheduled) racing on the same topic. Skip when
+    // running with an explicit override (developer is intentionally
+    // re-running) or in dry-run mode (no Sanity write happens anyway).
+    if (!topicOverride && !dryRun && (await isTopicCovered(topic.topic))) {
       console.log(
         `[blog-cron] topic already covered between fetch and pick: ${topic.topic}`,
       );
@@ -249,13 +315,80 @@ Next step: run the deep-research script to add new topics, then merge into BLOG_
 
     console.log(`[blog-cron] generating post for topic: ${topic.topic}`);
 
+    // ---- NEW: keyword cluster expansion (Claude Sonnet 4.5) ----
+    const cluster = await expandKeywordCluster(topic);
+    const clusterTotal =
+      1 +
+      cluster.secondary.length +
+      cluster.questions.length +
+      cluster.semantic.length;
+    console.log(
+      `[blog-cron] keyword cluster expanded: ${clusterTotal} keywords (primary=1, secondary=${cluster.secondary.length}, questions=${cluster.questions.length}, semantic=${cluster.semantic.length})`,
+    );
+
+    // ---- NEW: SERP research (Perplexity Sonar) ----
+    // Failures return null and the prompt falls back to default
+    // targets. Daily post availability must not regress on this step.
+    const research = await researchTopSerps(topic.topic, [
+      cluster.primary,
+      ...cluster.secondary,
+    ]);
+    if (research) {
+      console.log(
+        `[blog-cron] SERP research returned: ${research.topResults.length} results, avg word count ${research.averageWordCount}`,
+      );
+    } else {
+      console.log(
+        `[blog-cron] SERP research returned: null (drafting with default targets)`,
+      );
+    }
+
+    // ---- NEW: voice/humor/stories refs are loaded as static imports ----
+    console.log(
+      `[blog-cron] voice refs loaded (voice=${VOICE_REF.length} chars, humor=${HUMOR_REF.length} chars, stories=${STORIES_REF.length} chars)`,
+    );
+
+    if (dryRun) {
+      const system = buildBlogSystemPrompt({
+        voice: VOICE_REF,
+        humor: HUMOR_REF,
+        stories: STORIES_REF,
+      });
+      const userPrompt = createBlogPostPrompt(
+        topic.topic,
+        cluster,
+        coveredTopics,
+        research,
+      );
+      console.log(
+        `\n[blog-cron][dry-run] ===== ASSEMBLED SYSTEM PROMPT (${system.length} chars) =====\n${system}\n[blog-cron][dry-run] ===== END SYSTEM PROMPT =====\n`,
+      );
+      console.log(
+        `\n[blog-cron][dry-run] ===== ASSEMBLED USER PROMPT =====\n${userPrompt}\n[blog-cron][dry-run] ===== END USER PROMPT =====\n`,
+      );
+      const { content } = await generateContent(
+        topic.topic,
+        cluster,
+        coveredTopics,
+        research,
+      );
+      console.log(
+        `\n[blog-cron][dry-run] ===== GENERATED CONTENT (${content.length} chars) =====\n${content}\n[blog-cron][dry-run] ===== END CONTENT =====\n`,
+      );
+      console.log(
+        `[blog-cron][dry-run] skipping meta/image/Sanity write. Done.`,
+      );
+      return;
+    }
+
     const meta = await generateMeta(topic.topic, topic.keywords);
     console.log(`[blog-cron] meta done: ${meta.title}`);
 
     const { content } = await generateContent(
       topic.topic,
-      topic.keywords,
+      cluster,
       coveredTopics,
+      research,
     );
     console.log(`[blog-cron] content done (${content.length} chars)`);
 

@@ -7,7 +7,8 @@
     "dev": "npx tsx --env-file=.env src/index.ts",
     "start": "npx tsx --env-file=.env src/index.ts",
     "remotion:studio": "npx remotion studio src/video/index.ts --port 3011",
-    "spike:record": "npx tsx --env-file=.env src/scripts/spike-record.ts"
+    "spike:record": "npx tsx --env-file=.env src/scripts/spike-record.ts",
+    "blog:run": "npx tsx --env-file=.env src/scripts/run-blog-cron.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",
