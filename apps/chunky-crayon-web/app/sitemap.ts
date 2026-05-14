@@ -7,6 +7,7 @@ import { GALLERY_CATEGORIES } from '@/constants';
 import { getAllTags, ALL_DIFFICULTIES } from '@/app/data/gallery';
 import { BRAND } from '@/lib/db';
 import { LANDING_PAGES } from '@/lib/seo/landing-pages';
+import { COMBO_PAGES } from '@/lib/seo/combo-pages';
 
 const baseUrl = 'https://chunkycrayon.com';
 
@@ -180,6 +181,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changeFrequency: 'weekly',
         priority: 0.85,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${baseUrl}/${l}${path}`]),
+          ),
+        },
+      });
+    }
+  }
+
+  // Add combo pages (theme × age × occasion/context). Priority 0.75 —
+  // between landing pages (0.85) and category-difficulty (0.6). Each
+  // combo is curated in lib/seo/combo-pages.ts; never publish a combo
+  // with <6 matching images.
+  for (const combo of COMBO_PAGES) {
+    const path = `/coloring-pages-for/${combo.slug}`;
+    for (const locale of locales) {
+      urls.push({
+        url: `${baseUrl}/${locale}${path}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.75,
         alternates: {
           languages: Object.fromEntries(
             locales.map((l) => [l, `${baseUrl}/${l}${path}`]),

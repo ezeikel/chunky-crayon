@@ -6,6 +6,7 @@ import type { PaginatedImagesResponse } from '@/app/data/coloring-image';
 import { GALLERY_IMAGE_SELECT } from '@/app/data/coloring-image';
 import { GALLERY_PAGE_SIZE, getDifficultyFromSlug } from '@/app/data/gallery';
 import { getCategoryBySlug } from '@/constants';
+import { getComboPageBySlug } from '@/lib/seo/combo-pages';
 
 export type GalleryType =
   | 'community'
@@ -13,7 +14,8 @@ export type GalleryType =
   | 'daily'
   | 'category'
   | 'difficulty'
-  | 'tag';
+  | 'tag'
+  | 'combo';
 
 /**
  * Server action to load more gallery images for infinite scroll.
@@ -30,6 +32,10 @@ export type GalleryType =
  * filtered by `userId: null`, conflating the two surfaces. /gallery/community
  * was actually showing SYSTEM content. Fixed here by splitting the cases
  * and flipping `community` to the honest UGC filter.
+ *
+ * Other gallery types (all SYSTEM filtered): daily, category, difficulty,
+ * tag, and combo (composite theme × age × occasion/context pages, powers
+ * /coloring-pages-for/[slug]).
  */
 export async function loadGalleryImages(
   galleryType: GalleryType,
@@ -37,6 +43,7 @@ export async function loadGalleryImages(
   categorySlug?: string,
   difficultySlug?: string,
   tagSlug?: string,
+  comboSlug?: string,
 ): Promise<PaginatedImagesResponse> {
   const limit = GALLERY_PAGE_SIZE;
 
@@ -118,6 +125,46 @@ export async function loadGalleryImages(
         userId: null,
       };
       break;
+
+    case 'combo': {
+      if (!comboSlug) {
+        return { images: [], nextCursor: null, hasMore: false };
+      }
+      const combo = getComboPageBySlug(comboSlug);
+      if (!combo) {
+        return { images: [], nextCursor: null, hasMore: false };
+      }
+      const andClauses: Prisma.ColoringImageWhereInput[] = [];
+      if (combo.categorySlug) {
+        const category = getCategoryBySlug(combo.categorySlug);
+        if (!category) {
+          return { images: [], nextCursor: null, hasMore: false };
+        }
+        andClauses.push({
+          OR: [
+            { tags: { hasSome: category.tags } },
+            ...category.tags.map((tag) => ({
+              OR: [
+                { title: { contains: tag, mode: 'insensitive' as const } },
+                {
+                  description: { contains: tag, mode: 'insensitive' as const },
+                },
+              ],
+            })),
+          ],
+        });
+      }
+      if (combo.extraTagsAny && combo.extraTagsAny.length > 0) {
+        andClauses.push({ tags: { hasSome: combo.extraTagsAny } });
+      }
+      whereClause = {
+        ...baseWhere,
+        userId: null,
+        ...(combo.difficulty ? { difficulty: combo.difficulty } : {}),
+        ...(andClauses.length > 0 ? { AND: andClauses } : {}),
+      };
+      break;
+    }
   }
 
   const images = await db.coloringImage.findMany({

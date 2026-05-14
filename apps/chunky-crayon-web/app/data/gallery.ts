@@ -888,3 +888,110 @@ export const getRelatedImages = async (
     take: limit,
   });
 };
+
+// ===== COMBO PAGE IMAGES =====
+// Powers /coloring-pages-for/[slug]. Combines an optional theme (category),
+// optional difficulty (mapped from age bracket / specific age), and optional
+// extra tag set (occasion or craft-context tags). All three are conjunctive
+// when supplied; supplying none returns every public image (caller responsible).
+
+export type ComboFilter = {
+  categorySlug?: string;
+  difficulty?: Difficulty;
+  extraTagsAny?: string[];
+};
+
+const buildComboWhere = (filter: ComboFilter) => {
+  const { categorySlug, difficulty, extraTagsAny } = filter;
+  const andClauses: Record<string, unknown>[] = [];
+
+  if (categorySlug) {
+    const category = getCategoryBySlug(categorySlug);
+    if (!category) {
+      // Caller must validate; we still produce a query that matches nothing.
+      andClauses.push({ id: '__missing-category__' });
+    } else {
+      andClauses.push({
+        OR: [
+          { tags: { hasSome: category.tags } },
+          ...category.tags.map((tag) => ({
+            OR: [
+              { title: { contains: tag, mode: 'insensitive' as const } },
+              { description: { contains: tag, mode: 'insensitive' as const } },
+            ],
+          })),
+        ],
+      });
+    }
+  }
+
+  if (extraTagsAny && extraTagsAny.length > 0) {
+    andClauses.push({ tags: { hasSome: extraTagsAny } });
+  }
+
+  return {
+    ...brandWhere,
+    userId: null,
+    ...(difficulty ? { difficulty } : {}),
+    ...(andClauses.length > 0 ? { AND: andClauses } : {}),
+  };
+};
+
+const getComboImagesBase = async (
+  filter: ComboFilter,
+  cursor?: string,
+  limit: number = GALLERY_PAGE_SIZE,
+): Promise<PaginatedImagesResponse> => {
+  'use cache';
+  cacheLife('gallery-category');
+  cacheTag(
+    'gallery-combo',
+    filter.categorySlug
+      ? `gallery-category-${filter.categorySlug}`
+      : 'gallery-combo-cross-theme',
+    filter.difficulty
+      ? `gallery-difficulty-${filter.difficulty.toLowerCase()}`
+      : 'gallery-all-difficulties',
+    ...(filter.extraTagsAny ?? []).map((t) => `gallery-tag-${t}`),
+  );
+
+  const images = await db.coloringImage.findMany({
+    where: buildComboWhere(filter),
+    select: {
+      ...GALLERY_IMAGE_SELECT,
+      tags: true,
+      difficulty: true,
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit + 1,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+  });
+
+  const hasMore = images.length > limit;
+  const resultImages = hasMore ? images.slice(0, limit) : images;
+  const nextCursor = hasMore ? resultImages[resultImages.length - 1]?.id : null;
+
+  return { images: resultImages, nextCursor, hasMore };
+};
+
+export const getComboImages = async (
+  filter: ComboFilter,
+  cursor?: string,
+  limit?: number,
+): Promise<PaginatedImagesResponse> => {
+  return getComboImagesBase(filter, cursor, limit);
+};
+
+export const getComboCount = async (filter: ComboFilter): Promise<number> => {
+  'use cache';
+  cacheLife('gallery-category');
+  cacheTag(
+    'gallery-combo-count',
+    filter.categorySlug
+      ? `gallery-category-${filter.categorySlug}`
+      : 'gallery-combo-cross-theme',
+    ...(filter.extraTagsAny ?? []).map((t) => `gallery-tag-${t}`),
+  );
+
+  return db.coloringImage.count({ where: buildComboWhere(filter) });
+};

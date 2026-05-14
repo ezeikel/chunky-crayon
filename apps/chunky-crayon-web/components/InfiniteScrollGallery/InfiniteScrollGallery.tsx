@@ -28,6 +28,7 @@ type InfiniteScrollGalleryProps = {
   categorySlug?: string;
   difficultySlug?: string;
   tagSlug?: string;
+  comboSlug?: string;
   /**
    * Locale string used to build the canonical card URL through
    * `getColoringImageUrl`. Public images → /[locale]/coloring-pages/[slug],
@@ -51,6 +52,7 @@ const InfiniteScrollGallery = ({
   categorySlug,
   difficultySlug,
   tagSlug,
+  comboSlug,
   locale = 'en',
 }: InfiniteScrollGalleryProps) => {
   const t = useTranslations('gallery.infiniteScroll');
@@ -93,6 +95,7 @@ const InfiniteScrollGallery = ({
             categorySlug,
             difficultySlug,
             tagSlug,
+            comboSlug,
           )
         : await loadMoreImages(cursor);
       setImages((prev) => [...prev, ...result.images]);
@@ -111,6 +114,7 @@ const InfiniteScrollGallery = ({
     categorySlug,
     difficultySlug,
     tagSlug,
+    comboSlug,
   ]);
 
   // Set up Intersection Observer
