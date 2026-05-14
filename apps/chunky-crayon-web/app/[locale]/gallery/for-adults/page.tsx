@@ -16,6 +16,7 @@ import {
 import { getTranslations } from 'next-intl/server';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import ColoringHabitatCallout from '@/components/ColoringHabitatCallout/ColoringHabitatCallout';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { getFeaturedImages, getCategoryCounts } from '@/app/data/gallery';
 import cn from '@/lib/utils';
@@ -251,6 +252,12 @@ const ForAdultsContent = async ({ locale }: { locale: string }) => {
           {commonT('createYourDesign')}
         </Link>
       </div>
+
+      {/* Cross-brand signpost: CH is the right destination for adult
+          coloring. Surfaced ABOVE the CC sample so the audience hits
+          the right door first. We still offer some pages below, but
+          the primary action is "go to CH". */}
+      <ColoringHabitatCallout audience="adults" locale={locale} />
 
       <FeaturedImages locale={locale} />
       <CategoryCards locale={locale} />
