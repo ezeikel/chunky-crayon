@@ -1,6 +1,6 @@
 /**
- * AI-judge the difficulty of every backfilled coloring image and update
- * the row's `difficulty` column to match.
+ * AI-judge the difficulty of coloring image rows and update the
+ * `difficulty` column to match the consensus.
  *
  * Pipeline per row:
  *   1. Fetch the PNG (or convert SVG to PNG via sharp if no PNG URL)
@@ -11,73 +11,41 @@
  *   4. Pick the majority class (BEGINNER / INTERMEDIATE / ADVANCED)
  *   5. UPDATE coloring_images SET difficulty = <class> WHERE id = <id>
  *
- * Why bother judging when most images came from a BEGINNER reference set?
- *   The backfill generated images from the same beginner reference set
- *   but Claude wrote varied prompts per landing — some scenes ended up
- *   more complex than others (a "T-Rex eating leaves" vs "T-Rex hosting
- *   a tea party with five forest animals"). Per-image judging is more
- *   honest than per-landing static tagging.
+ * Modes:
+ *   - landing-backfill (default): rows whose sourcePrompt starts with
+ *     `landing-backfill:`. Originally added to retro-rate the 936
+ *     backfill images.
+ *   - daily: DAILY generationType rows. New dailies get auto-rated by
+ *     the worker now; this is the back-fill for older ones that
+ *     defaulted to BEGINNER before the inline judge was wired up.
+ *   - id: rate exactly one row by id. Useful for a quick sanity check.
  *
  * Usage:
  *   pnpm tsx scripts/judge-image-difficulty.ts --dry-run
  *   pnpm tsx scripts/judge-image-difficulty.ts --slug calming-coloring-pages-for-kids-with-adhd --dry-run
+ *   pnpm tsx scripts/judge-image-difficulty.ts --mode daily --apply
+ *   pnpm tsx scripts/judge-image-difficulty.ts --id cmp57r0jh0001lg5vtuoarm55 --apply
  *   pnpm tsx scripts/judge-image-difficulty.ts --apply --limit 50
- *   pnpm tsx scripts/judge-image-difficulty.ts --apply        # all rows
  *
  * Env: ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_GENERATIVE_AI_API_KEY,
  *      DATABASE_URL (which DB to read+write — set per env).
  */
-import { z } from 'zod';
 import sharp from 'sharp';
-import { runJury } from '@one-colored-pixel/coloring-core';
+import { judgeColoringImageDifficulty } from '@one-colored-pixel/coloring-core';
 import {
   db,
   Difficulty as PrismaDifficulty,
   Brand,
+  GenerationType,
+  Prisma,
 } from '@one-colored-pixel/db';
 
-// Schema each judge must return. Three categories matches the v2
-// reference tiers. EXPERT is reserved for adult mandala output (not
-// generated on CC) so we don't include it as an option.
-const difficultyJudgementSchema = z.object({
-  difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
-  reasoning: z.string().max(280),
-});
-
-type DifficultyJudgement = z.infer<typeof difficultyJudgementSchema>;
-
-const DIFFICULTY_SYSTEM = `You rate the visual complexity of a child's coloring page on a 3-tier scale. The page is line art, no fill. Look at the image and pick exactly one tier.
-
-Rate by what a child of each age range can comfortably color, NOT by aesthetic preference:
-
-BEGINNER (ages 3-6, toddler/preschool)
-- One main subject, large simple shapes
-- ~5-10 distinct colorable areas total
-- Thick uniform outlines, plenty of empty space
-- No fine detail, no patterns inside shapes, no scale texture
-- Example: a single chubby cartoon dinosaur smiling, with a sun and a small mountain. Body is a few large enclosed shapes.
-
-INTERMEDIATE (ages 6-10, primary school)
-- Multiple elements / a scene with 2-4 subjects
-- ~12-20 distinct colorable areas
-- Some patterned details on clothing/skin/objects (simple stripes, dots, spots)
-- Bold outlines but slightly varied line weight allowed
-- Example: a T-Rex with simple spot patterns standing among 3 palm trees, a small pterodactyl, and a small egg in the foreground.
-
-ADVANCED (ages 8-12, older children)
-- Dense composition with many elements
-- ~25-40 distinct colorable areas
-- Decorative patterns throughout (zigzag, swirls, geometric)
-- Background filled with detail (leaves, scales, decorative skies)
-- Still a kids' coloring page — friendly cartoon faces, NOT adult zentangle/mandala
-- Example: a stegosaurus with patterned plates and scales next to a T-Rex and three pterodactyls, set in a prehistoric landscape with ferns and a nest of patterned eggs.
-
-Output JSON: {"difficulty": "BEGINNER" | "INTERMEDIATE" | "ADVANCED", "reasoning": "one short sentence explaining your call"}.`;
-
-const DIFFICULTY_PROMPT = `Rate the difficulty tier of the attached coloring page using the rubric in the system prompt. Reply with JSON only.`;
+type Mode = 'landing-backfill' | 'daily' | 'id';
 
 type Args = {
+  mode: Mode;
   slug?: string;
+  id?: string;
   limit?: number;
   apply: boolean;
   dryRun: boolean;
@@ -87,6 +55,7 @@ type Args = {
 function parseArgs(): Args {
   const argv = process.argv.slice(2);
   const args: Args = {
+    mode: 'landing-backfill',
     apply: false,
     dryRun: false,
     brand: Brand.CHUNKY_CRAYON,
@@ -97,8 +66,21 @@ function parseArgs(): Args {
     else if (a === '--dry-run') args.dryRun = true;
     else if (a === '--slug') args.slug = argv[++i];
     else if (a === '--limit') args.limit = parseInt(argv[++i], 10);
+    else if (a === '--mode') {
+      const next = argv[++i];
+      if (next !== 'landing-backfill' && next !== 'daily' && next !== 'id') {
+        throw new Error(`unknown --mode: ${next}`);
+      }
+      args.mode = next;
+    } else if (a === '--id') {
+      args.mode = 'id';
+      args.id = argv[++i];
+    }
   }
   if (!args.apply) args.dryRun = true;
+  if (args.mode === 'id' && !args.id) {
+    throw new Error('--id <rowId> required for id mode');
+  }
   return args;
 }
 
@@ -136,98 +118,33 @@ async function fetchImageBytes(
   throw new Error('row has neither url nor svgUrl');
 }
 
-/**
- * Pick the majority difficulty from the panel verdicts. Used when the
- * jury didn't escalate (all 3 agree, or 2-of-3 majority).
- */
-function pickMajority(
-  ratings: ReadonlyArray<DifficultyJudgement | null>,
-): PrismaDifficulty | null {
-  const tally: Record<string, number> = {};
-  for (const r of ratings) {
-    if (!r) continue;
-    tally[r.difficulty] = (tally[r.difficulty] ?? 0) + 1;
-  }
-  // Sort by count desc, take the top class with ≥2 votes.
-  const sorted = Object.entries(tally).sort((a, b) => b[1] - a[1]);
-  if (sorted.length === 0) return null;
-  const [topClass, topCount] = sorted[0];
-  if (topCount >= 2) return topClass as PrismaDifficulty;
-  return null;
-}
-
-async function judgeOneImage(
-  imageBuffer: Buffer,
-): Promise<{
-  difficulty: PrismaDifficulty;
-  source: 'tier1' | 'tier2';
-  reasoning: string;
-}> {
-  const verdict = await runJury<DifficultyJudgement>({
-    system: DIFFICULTY_SYSTEM,
-    prompt: DIFFICULTY_PROMPT,
-    images: [{ buffer: imageBuffer }],
-    schema: difficultyJudgementSchema,
-    // For difficulty rating there's no binary pass — every verdict is
-    // valid. The native `passed` field doesn't apply. We use it only to
-    // drive the escalation trigger below.
-    getPassed: () => true,
-    tier1: ['haiku-4.5', 'gemini-3-flash', 'gpt-5.4-mini'],
-    tieBreak: 'opus-4.7',
-    escalationTrigger: (verdicts) => {
-      // Escalate when the panel doesn't have a clear majority for one
-      // difficulty class. Schema-failed or errored verdicts count as
-      // "no opinion" — they don't block escalation.
-      const successful = verdicts.filter(
-        (v): v is typeof v & { ok: true } => v.ok,
-      );
-      if (successful.length < 2) return true; // Most of the panel failed
-      const tally: Record<string, number> = {};
-      for (const v of successful) {
-        tally[v.result.difficulty] = (tally[v.result.difficulty] ?? 0) + 1;
-      }
-      const topCount = Math.max(...Object.values(tally));
-      return topCount < 2;
-    },
-  });
-
-  if (verdict.escalated && verdict.tieBreakVerdict?.ok) {
-    return {
-      difficulty: verdict.tieBreakVerdict.result.difficulty as PrismaDifficulty,
-      source: 'tier2',
-      reasoning: verdict.tieBreakVerdict.result.reasoning,
-    };
-  }
-  const ratings = verdict.verdicts.map((v) => (v.ok ? v.result : null));
-  const majority = pickMajority(ratings);
-  if (majority) {
-    const example = ratings.find((r) => r?.difficulty === majority);
-    return {
-      difficulty: majority,
-      source: 'tier1',
-      reasoning: example?.reasoning ?? '(tier-1 majority)',
-    };
-  }
-  // No majority and no tie-break verdict — shouldn't happen but bail
-  // safely to BEGINNER.
-  return {
-    difficulty: 'BEGINNER',
-    source: 'tier1',
-    reasoning: 'fallback: no majority + no tie-break verdict',
-  };
-}
-
 async function main() {
   const args = parseArgs();
-  const where = args.slug
-    ? {
-        brand: args.brand,
-        sourcePrompt: { startsWith: `landing-backfill:${args.slug}:` },
-      }
-    : {
-        brand: args.brand,
-        sourcePrompt: { startsWith: 'landing-backfill:' },
-      };
+
+  let where: Prisma.ColoringImageWhereInput;
+  if (args.mode === 'id') {
+    where = { id: args.id };
+  } else if (args.mode === 'daily') {
+    // Daily mode targets the post-migration default-BEGINNER backlog.
+    // Already-judged daily rows (INTERMEDIATE / ADVANCED) are skipped so
+    // we don't pay to re-flip a verdict that's already correct — the
+    // judges aren't deterministic across runs.
+    where = {
+      brand: args.brand,
+      generationType: GenerationType.DAILY,
+      difficulty: PrismaDifficulty.BEGINNER,
+    };
+  } else {
+    where = args.slug
+      ? {
+          brand: args.brand,
+          sourcePrompt: { startsWith: `landing-backfill:${args.slug}:` },
+        }
+      : {
+          brand: args.brand,
+          sourcePrompt: { startsWith: 'landing-backfill:' },
+        };
+  }
 
   const rows = await db.coloringImage.findMany({
     where,
@@ -264,17 +181,18 @@ async function main() {
     try {
       const start = Date.now();
       const imageBuffer = await fetchImageBytes(row.url, row.svgUrl);
-      const judgement = await judgeOneImage(imageBuffer);
+      const judgement = await judgeColoringImageDifficulty(imageBuffer);
       const elapsed = ((Date.now() - start) / 1000).toFixed(1);
 
       tallyByDiff[judgement.difficulty] =
         (tallyByDiff[judgement.difficulty] ?? 0) + 1;
 
-      const changed = judgement.difficulty !== row.difficulty;
+      const nextDifficulty = judgement.difficulty as PrismaDifficulty;
+      const changed = nextDifficulty !== row.difficulty;
       const action = args.dryRun
-        ? `would update ${row.difficulty} → ${judgement.difficulty}`
+        ? `would update ${row.difficulty} → ${nextDifficulty}`
         : changed
-          ? `updating ${row.difficulty} → ${judgement.difficulty}`
+          ? `updating ${row.difficulty} → ${nextDifficulty}`
           : `keeping ${row.difficulty}`;
       console.log(
         `[${judgement.source}] ${row.id} (${elapsed}s) ${action} — ${judgement.reasoning.slice(0, 80)}${judgement.reasoning.length > 80 ? '…' : ''}`,
@@ -283,7 +201,7 @@ async function main() {
       if (!args.dryRun && changed) {
         await db.coloringImage.update({
           where: { id: row.id },
-          data: { difficulty: judgement.difficulty },
+          data: { difficulty: nextDifficulty },
         });
       }
       if (!changed) totals.unchanged += 1;

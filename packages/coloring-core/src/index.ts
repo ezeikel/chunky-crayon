@@ -175,6 +175,11 @@ export {
   getReferenceImages,
   REFERENCE_IMAGES,
 } from "./coloring-image/references";
+export { judgeColoringImageDifficulty } from "./coloring-image/difficulty-judge";
+export type {
+  JudgedDifficulty,
+  DifficultyJudgeResult,
+} from "./coloring-image/difficulty-judge";
 
 // Shared multi-judge jury — used by kid-safety moderation, comic-strip QC,
 // and image-difficulty rating. New AI-as-judge use cases should compose

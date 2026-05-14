@@ -24,6 +24,7 @@ import {
   CLEAN_UP_DESCRIPTION_SYSTEM,
   createImageMetadataSystemPrompt,
   IMAGE_METADATA_PROMPT,
+  judgeColoringImageDifficulty,
 } from "@one-colored-pixel/coloring-core";
 import { db, GenerationType, Brand } from "@one-colored-pixel/db";
 import {
@@ -194,26 +195,46 @@ export async function runDailyImageCron(): Promise<void> {
     tempFileName = tempFile;
     console.log(`[daily-cron] image done in ${Date.now() - imageStart}ms`);
 
-    // 4. Run metadata + trace + WebP encode in parallel
-    console.log("[daily-cron] running metadata + trace + webp in parallel…");
-    const [metadataResult, svg, webpBuffer] = await Promise.all([
-      generateText({
-        model: visionModel,
-        output: Output.object({ schema: imageMetadataSchema }),
-        system: createImageMetadataSystemPrompt(),
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: IMAGE_METADATA_PROMPT },
-              { type: "image", image: new URL(tempUrl) },
-            ],
-          },
-        ],
-      }),
-      traceImage(imageBuffer),
-      sharp(imageBuffer).webp().toBuffer(),
-    ]);
+    // 4. Run metadata + trace + WebP encode + difficulty judge in parallel.
+    //
+    // Difficulty judge is wrapped in a catch — a flaky vendor must not
+    // sink the cron. We default to BEGINNER if every judge errors, which
+    // is what the DB column defaults to anyway. judgePromise resolves to
+    // null on failure; we treat that as "leave at column default".
+    console.log(
+      "[daily-cron] running metadata + trace + webp + difficulty judge in parallel…",
+    );
+    const judgePromise = (async () => {
+      try {
+        const pngBuffer = await sharp(imageBuffer).png().toBuffer();
+        return await judgeColoringImageDifficulty(pngBuffer);
+      } catch (judgeErr) {
+        const msg =
+          judgeErr instanceof Error ? judgeErr.message : String(judgeErr);
+        console.warn(`[daily-cron] difficulty judge failed: ${msg}`);
+        return null;
+      }
+    })();
+    const [metadataResult, svg, webpBuffer, difficultyResult] =
+      await Promise.all([
+        generateText({
+          model: visionModel,
+          output: Output.object({ schema: imageMetadataSchema }),
+          system: createImageMetadataSystemPrompt(),
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: IMAGE_METADATA_PROMPT },
+                { type: "image", image: new URL(tempUrl) },
+              ],
+            },
+          ],
+        }),
+        traceImage(imageBuffer),
+        sharp(imageBuffer).webp().toBuffer(),
+        judgePromise,
+      ]);
 
     const imageMetadata = metadataResult.output;
     if (!imageMetadata) {
@@ -222,14 +243,20 @@ export async function runDailyImageCron(): Promise<void> {
     console.log(
       `[daily-cron] metadata: title="${imageMetadata.title}" tags=${imageMetadata.tags.length}`,
     );
+    if (difficultyResult) {
+      console.log(
+        `[daily-cron] difficulty: ${difficultyResult.difficulty} (${difficultyResult.source}) — ${difficultyResult.reasoning.slice(0, 80)}`,
+      );
+    }
 
-    // 5. Insert DB row (needs metadata)
+    // 5. Insert DB row (needs metadata + difficulty)
     const coloringImage = await db.coloringImage.create({
       data: {
         title: imageMetadata.title,
         description: imageMetadata.description,
         alt: imageMetadata.alt,
         tags: imageMetadata.tags,
+        difficulty: difficultyResult?.difficulty ?? "BEGINNER",
         generationType: GenerationType.DAILY,
         sourcePrompt: description,
         brand: Brand.CHUNKY_CRAYON,
