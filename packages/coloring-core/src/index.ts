@@ -163,6 +163,12 @@ export {
   REFERENCE_IMAGES,
 } from "./coloring-image/references";
 
+// Shared multi-judge jury — used by kid-safety moderation, comic-strip QC,
+// and image-difficulty rating. New AI-as-judge use cases should compose
+// runJury rather than rolling their own triad logic.
+export { runJury } from "./jury";
+export type { JuryConfig, JudgeId, JudgeVerdict, VotedVerdict } from "./jury";
+
 // Daily scene generation (Perplexity Sonar) + image metadata prompts
 export {
   CLEAN_UP_DESCRIPTION_SYSTEM,

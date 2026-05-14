@@ -21,11 +21,10 @@
  */
 import type { SocialPlatform } from '@one-colored-pixel/db';
 import { db } from '@one-colored-pixel/db';
-import { generateObject } from 'ai';
 import { z } from 'zod';
+import { runJury, type JudgeVerdict } from '@one-colored-pixel/coloring-core';
 import { findBlockedContent } from '@/lib/scene-generation';
 import { moderateVoiceText } from '@/lib/moderation';
-import { models } from '@/lib/ai/models';
 import { createColoringImageForCommentRequest } from '@/app/actions/createColoringImageForCommentRequest';
 import {
   replyToComment,
@@ -163,118 +162,87 @@ The 'reason' field: one short clause explaining your call.`;
 
 type Judgement = z.infer<typeof kidSafetyJudgementSchema>;
 
-// Single-model judgement helper. Wraps generateObject + recovers from
-// errors by returning borderline so a missing/erroring verdict doesn't
-// auto-pass the prompt.
-async function singleJudge(
-  modelName: 'haiku45' | 'gemini' | 'gpt54mini' | 'opus47',
-  prompt: string,
-): Promise<Judgement> {
-  try {
-    let result;
-    if (modelName === 'opus47') {
-      // Opus 4.7: adaptive thinking on, runs longer + reasons harder.
-      // Higher quality verdict; only used in the Tier-2 escalation path.
-      result = await generateObject({
-        model: models.opus47,
-        schema: kidSafetyJudgementSchema,
-        system: KID_SAFETY_SYSTEM,
-        prompt: `Prompt to judge: "${prompt}"`,
-        providerOptions: {
-          anthropic: {
-            thinking: { type: 'adaptive' },
-          },
-        },
-      });
-    } else {
-      const model =
-        modelName === 'haiku45'
-          ? models.haiku45
-          : modelName === 'gpt54mini'
-            ? models.gpt54mini
-            : models.analytics; // gemini 3 flash
-      result = await generateObject({
-        model,
-        schema: kidSafetyJudgementSchema,
-        system: KID_SAFETY_SYSTEM,
-        prompt: `Prompt to judge: "${prompt}"`,
-      });
-    }
-    return result.object;
-  } catch (err) {
-    log.warn(
-      'Kid-safety judge errored — treating as borderline for this voter',
-      {
-        action: 'image-request',
-        judge: modelName,
-        prompt: prompt.slice(0, 80),
-      },
-      err instanceof Error ? err : undefined,
-    );
-    return {
-      decision: 'borderline',
-      reason: `${modelName}_unavailable`,
-    };
-  }
-}
+/**
+ * Fallback verdict when a single judge erroreed out — treat as borderline
+ * for that voter so a missing verdict doesn't auto-pass.
+ */
+const failedAsBorderline = (v: JudgeVerdict<Judgement>): Judgement =>
+  v.ok
+    ? v.result
+    : { decision: 'borderline', reason: `${v.judge}_unavailable` };
 
-// Three-vendor parallel verdict. Each vendor brings different policy
-// training — disagreement is itself a useful signal. If any voter says
-// clearly_unsafe we escalate (safer); otherwise majority wins among the
-// non-error voters.
+/**
+ * Three-vendor parallel verdict using the shared runJury module.
+ *
+ * Tier 1: haiku-4.5 + gemini-3-flash + gpt-5.4-mini in parallel. Cheap
+ * + fast. Different vendors bring different policy training so
+ * disagreement is itself signal.
+ *
+ * Escalation trigger: any `clearly_unsafe` vote OR no clear majority.
+ * This is stricter than the default ("escalate unless unanimous")
+ * because we want a second look even when 2 vote clearly_safe + 1
+ * votes clearly_unsafe.
+ *
+ * Tier 2: Opus 4.7 with adaptive thinking. Fires on ~5% of prompts.
+ * Its verdict is final.
+ */
 async function judgeKidSafety(prompt: string): Promise<Judgement> {
-  // Tier 1: three cheap+fast verdicts in parallel.
-  const [haikuVote, geminiVote, gptVote] = await Promise.all([
-    singleJudge('haiku45', prompt),
-    singleJudge('gemini', prompt),
-    singleJudge('gpt54mini', prompt),
-  ]);
-  const votes = [haikuVote, geminiVote, gptVote];
-  const reasons = `haiku:${haikuVote.decision};gemini:${geminiVote.decision};gpt:${gptVote.decision}`;
-
-  // Any clearly_unsafe → escalate. Even one strong vendor saying "no"
-  // earns a human review (or Opus tie-break).
-  const anyUnsafe = votes.some((v) => v.decision === 'clearly_unsafe');
-
-  // All three agree → that's the answer.
-  if (
-    haikuVote.decision === geminiVote.decision &&
-    geminiVote.decision === gptVote.decision &&
-    !anyUnsafe
-  ) {
-    return {
-      decision: haikuVote.decision,
-      reason: `tier1-unanimous:${haikuVote.decision}`,
-    };
-  }
-
-  // 2-out-of-3 majority (and no one says clearly_unsafe) → take it.
-  if (!anyUnsafe) {
-    const tally = {
-      clearly_safe: votes.filter((v) => v.decision === 'clearly_safe').length,
-      borderline: votes.filter((v) => v.decision === 'borderline').length,
-      clearly_unsafe: 0,
-    };
-    if (tally.clearly_safe >= 2) {
-      return { decision: 'clearly_safe', reason: `tier1-majority:${reasons}` };
-    }
-    if (tally.borderline >= 2) {
-      return { decision: 'borderline', reason: `tier1-majority:${reasons}` };
-    }
-  }
-
-  // Tier 2: Opus 4.7 tie-break with adaptive thinking. Slow (~3-4s) but
-  // only fires on disagreement or any clearly_unsafe vote — empirically
-  // <5% of prompts.
-  log.info('Kid-safety triad split — escalating to Opus 4.7', {
-    action: 'image-request',
-    votes: reasons,
-    prompt: prompt.slice(0, 80),
+  const result = await runJury<Judgement>({
+    system: KID_SAFETY_SYSTEM,
+    prompt: `Prompt to judge: "${prompt}"`,
+    schema: kidSafetyJudgementSchema,
+    // `getPassed` here flags "clearly_safe" as the pass condition. We
+    // don't actually consume `voted.passed` for the final return value —
+    // we map verdicts back to {decision, reason} below — but runJury
+    // needs the predicate to compute its own counts + escalation trigger.
+    getPassed: (v) => v.decision === 'clearly_safe',
+    tier1: ['haiku-4.5', 'gemini-3-flash', 'gpt-5.4-mini'],
+    tieBreak: 'opus-4.7',
+    escalationTrigger: (verdicts) => {
+      const decisions = verdicts.map((v) => failedAsBorderline(v).decision);
+      // Any clearly_unsafe → escalate, even with two clearly_safe votes.
+      if (decisions.includes('clearly_unsafe')) return true;
+      // No clear majority → escalate. Each decision needs ≥2 votes.
+      const safe = decisions.filter((d) => d === 'clearly_safe').length;
+      const borderline = decisions.filter((d) => d === 'borderline').length;
+      return safe < 2 && borderline < 2;
+    },
   });
-  const opusVote = await singleJudge('opus47', prompt);
+
+  // Map runJury's panel + tie-break verdicts back to a kid-safety Judgement.
+  const tier1Decisions = result.verdicts.map(failedAsBorderline);
+  const summary = tier1Decisions
+    .map((d, i) => `${result.verdicts[i].judge}:${d.decision}`)
+    .join(';');
+
+  if (result.escalated && result.tieBreakVerdict) {
+    const opus = failedAsBorderline(result.tieBreakVerdict);
+    log.info('Kid-safety triad split — escalated to Opus 4.7', {
+      action: 'image-request',
+      votes: summary,
+      prompt: prompt.slice(0, 80),
+    });
+    return {
+      decision: opus.decision,
+      reason: `tier2-opus:${opus.decision}|${summary}`,
+    };
+  }
+
+  // No escalation = unanimous or majority. Pick the majority decision.
+  const tally = {
+    clearly_safe: tier1Decisions.filter((d) => d.decision === 'clearly_safe')
+      .length,
+    borderline: tier1Decisions.filter((d) => d.decision === 'borderline')
+      .length,
+    clearly_unsafe: 0, // escalation trigger above rules this out
+  };
+  const winning = tally.clearly_safe >= 2 ? 'clearly_safe' : 'borderline';
+  const unanimous = tier1Decisions.every((d) => d.decision === winning);
   return {
-    decision: opusVote.decision,
-    reason: `tier2-opus:${opusVote.decision}|${reasons}`,
+    decision: winning,
+    reason: unanimous
+      ? `tier1-unanimous:${winning}`
+      : `tier1-majority:${summary}`,
   };
 }
 

@@ -34,6 +34,8 @@ export const MODEL_IDS = {
   // (recommended for low-latency, low-cost workloads as of 2026-05).
   // Tier-1 of the kid-safety triad.
   GPT_5_4_MINI: "gpt-5.4-mini",
+  // Top-tier OpenAI multimodal — used by the comic-strip jury.
+  GPT_5_5: "gpt-5.5",
 
   // OpenAI Image models
   GPT_IMAGE_1_5: "gpt-image-1.5",
@@ -49,6 +51,7 @@ export const MODEL_IDS = {
 
   // Google Gemini models
   GEMINI_3_FLASH: "gemini-3-flash-preview",
+  GEMINI_3_PRO: "gemini-3.1-pro-preview",
   GEMINI_3_PRO_IMAGE: "gemini-3-pro-image-preview",
   GEMINI_2_5_FLASH_IMAGE: "gemini-2.5-flash-image-preview",
 } as const;
@@ -94,12 +97,16 @@ export const models = {
   analytics: google(MODEL_IDS.GEMINI_3_FLASH),
   analyticsQuality: google(MODEL_IDS.GEMINI_3_PRO_IMAGE),
   geminiImage: google(MODEL_IDS.GEMINI_3_PRO_IMAGE),
-  // Kid-safety moderation triad — three cheap+fast verdicts in parallel
-  // then escalate to Opus 4.7 with adaptive thinking on disagreement.
-  // See lib/image-request.ts for the orchestration.
+  // Jury panel members — referenced by the shared jury module
+  // (packages/coloring-core/src/jury/). Same instances power the
+  // kid-safety triad (cheap tier + opus47 tie-break) and the comic-strip
+  // jury (top tier, no tie-break). Picking models is a per-use-case
+  // decision; this object just exposes the building blocks.
   haiku45: anthropic(MODEL_IDS.CLAUDE_HAIKU_4_5),
   opus47: anthropic(MODEL_IDS.CLAUDE_OPUS_4_7),
   gpt54mini: openai(MODEL_IDS.GPT_5_4_MINI),
+  gpt55: openai(MODEL_IDS.GPT_5_5),
+  gemini3Pro: google(MODEL_IDS.GEMINI_3_PRO),
 };
 
 export const IMAGE_DEFAULTS = {
