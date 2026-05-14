@@ -187,6 +187,13 @@ export type {
 export { runJury } from "./jury";
 export type { JuryConfig, JudgeId, JudgeVerdict, VotedVerdict } from "./jury";
 
+// Shared lean image-generation pipeline used by SEO backfill scripts
+// (backfill-landings.ts, backfill-combo-pages.ts). Does NOT replace the
+// worker's full daily-pipeline — this is the cheap path for filling
+// SEO galleries with thematically-matched static images.
+export { generateAndStoreColoringImage } from "./backfill";
+export type { BackfillImageInput, BackfillImageOutput } from "./backfill";
+
 // Daily scene generation (Perplexity Sonar) + image metadata prompts
 export {
   CLEAN_UP_DESCRIPTION_SYSTEM,

@@ -3,56 +3,45 @@
  * landing on dev, so the empty galleries fill up before SEO traffic
  * lands on them.
  *
- * Pipeline per image (intentionally lean — skips region store,
- * background music, colored reference, fill points to keep cost ~$0.006
- * per image at low quality):
+ * Per-image pipeline (the AI + R2 work) lives in
+ * `packages/coloring-core/src/backfill/` — shared with
+ * `backfill-combo-pages.ts`. This script owns:
+ *   - Scene description generation (landing-specific Claude prompt)
+ *   - DB row create + update (landing-specific tags + sourcePrompt)
+ *   - Coverage counting (by sourcePrompt prefix)
  *
- *   1. Synthesise a varied scene description from the landing's tags
- *   2. gpt-image-2 (low quality, with v2 difficulty-aware references)
- *   3. WebP encode (sharp)
- *   4. SVG trace (sharp + potrace)
- *   5. QR code (for the printed-page back-link)
- *   6. R2 uploads (png + svg + qr)
- *   7. DB row insert: generationType=SYSTEM, purposeKey='landing-backfill:{slug}'
+ * Stays "lean" — skips region store, background music, colored
+ * reference, fill points to keep cost ~$0.006 per image at low quality.
  *
- * The script runs on the dev Neon branch + dev R2 bucket. After it
- * finishes, scripts/sync-dev-to-prod.ts (separate) copies rows + R2
- * objects to production so we don't pay twice.
+ * Runs on the dev Neon branch + dev R2 bucket. After it finishes,
+ * scripts/sync-dev-to-prod.ts copies rows + R2 objects to production.
  *
  * Usage:
  *   pnpm tsx scripts/backfill-landings.ts --slug calming-coloring-pages-for-kids-with-adhd
  *   pnpm tsx scripts/backfill-landings.ts --slug cute-dinosaur-coloring-pages-for-kids --count 3
  *   pnpm tsx scripts/backfill-landings.ts --all              # all 73 landings × 12 each
- *   pnpm tsx scripts/backfill-landings.ts --all --dry-run    # print the plan + skip API calls
- *   pnpm tsx scripts/backfill-landings.ts --all --skip-existing  # only fill landings that don't have 12 yet
+ *   pnpm tsx scripts/backfill-landings.ts --all --dry-run
+ *   pnpm tsx scripts/backfill-landings.ts --all --skip-existing
  *
  * Env: OPENAI_API_KEY, ANTHROPIC_API_KEY, DATABASE_URL (dev), R2_*
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
 import OpenAI from 'openai';
-import sharp from 'sharp';
-import QRCode from 'qrcode';
-import potrace from 'oslllo-potrace';
 import { generateText } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
-import { put } from '@one-colored-pixel/storage';
 import {
   db,
   GenerationType,
   Brand,
   Difficulty as PrismaDifficulty,
 } from '@one-colored-pixel/db';
-import { getReferenceImages } from '@one-colored-pixel/coloring-core';
+import { generateAndStoreColoringImage } from '@one-colored-pixel/coloring-core';
 import {
   LANDING_PAGES,
   getLandingPageBySlug,
   type LandingPageConfig,
 } from '@/lib/seo/landing-pages';
 
-const MODEL = 'gpt-image-2';
-const SIZE: '1024x1024' = '1024x1024';
 const QUALITY: 'low' | 'medium' | 'high' = 'low';
 const IMAGES_PER_LANDING = 12;
 const PURPOSE_KEY_PREFIX = 'landing-backfill';
@@ -133,71 +122,11 @@ Generate exactly ${count} distinct, specific coloring page scene descriptions fo
     .slice(0, count);
 }
 
-async function generateImageBuffer(
-  openai: OpenAI,
-  description: string,
-  difficulty: PrismaDifficulty,
-): Promise<Buffer> {
-  const refUrls = getReferenceImages(difficulty).slice(0, 4);
-  const refFiles = await Promise.all(
-    refUrls.map(async (url, i) => {
-      const res = await fetch(url);
-      const arrayBuffer = await res.arrayBuffer();
-      const ext = url.endsWith('.webp') ? 'webp' : 'png';
-      return new File([arrayBuffer], `style-ref-${i}.${ext}`, {
-        type: `image/${ext}`,
-      });
-    }),
-  );
-
-  const styledPrompt = `The provided images show the target coloring book style. Match their line weight, simplicity, and outline-only aesthetic.
-
-Scene: ${description}.
-
-Style: children's coloring book page, clean line art, thick black outlines on a pure white background. Cartoon style, friendly faces, large simple shapes. Every enclosed shape left completely white and unfilled. Outlines must be closed contours with no gaps. No shading, no gradients, no fill.`;
-
-  const result = await openai.images.edit({
-    model: MODEL,
-    image: refFiles,
-    prompt: styledPrompt,
-    size: SIZE,
-    quality: QUALITY,
-  });
-
-  const b64 = result.data?.[0]?.b64_json;
-  if (!b64) throw new Error('OpenAI returned no image data');
-  return Buffer.from(b64, 'base64');
-}
-
-async function traceImage(imageBuffer: Buffer): Promise<string> {
-  return new Promise((resolve, reject) => {
-    sharp(imageBuffer)
-      .flatten({ background: '#ffffff' })
-      .resize({ width: 1024 })
-      .grayscale()
-      .normalize()
-      .linear(1.3, -40)
-      .threshold(210)
-      .toFormat('png')
-      .toBuffer(async (err, pngBuffer) => {
-        if (err) return reject(err);
-        try {
-          const traced = await potrace(Buffer.from(pngBuffer), {
-            threshold: 200,
-            optimizeImage: true,
-            turnPolicy: 'majority',
-          }).trace();
-          resolve(traced);
-        } catch (potraceErr) {
-          reject(potraceErr);
-        }
-      });
-  });
-}
-
 /**
- * Lean per-image pipeline: gpt-image-2 → webp + svg trace + qr → R2 ×3 →
- * DB insert. Returns the inserted row id.
+ * Per-image: insert row → call shared AI+R2 pipeline → update row with URLs.
+ *
+ * Row metadata (tags, sourcePrompt) is landing-specific and stays here;
+ * the AI + upload work lives in coloring-core/backfill.
  */
 async function backfillOneImage(
   openai: OpenAI,
@@ -205,18 +134,6 @@ async function backfillOneImage(
   description: string,
 ): Promise<string> {
   const difficulty = resolveDifficulty(landing);
-  const imageBuffer = await generateImageBuffer(
-    openai,
-    description,
-    difficulty,
-  );
-
-  // Run trace + webp + qr in parallel; the row id for the QR comes
-  // after the DB insert, so use a placeholder URL and update post-insert.
-  const [svg, webpBuffer] = await Promise.all([
-    traceImage(imageBuffer),
-    sharp(imageBuffer).webp().toBuffer(),
-  ]);
 
   // Insert row first so we get a stable id for the R2 paths + QR URL.
   // No metadata vision pass — we use the landing's tags and a tidied
@@ -229,35 +146,25 @@ async function backfillOneImage(
       tags: landing.tags,
       difficulty,
       generationType: GenerationType.SYSTEM,
-      sourcePrompt: `landing-backfill:${landing.slug}: ${description}`,
+      sourcePrompt: `${PURPOSE_KEY_PREFIX}:${landing.slug}: ${description}`,
       brand: Brand.CHUNKY_CRAYON,
       showInCommunity: true,
     },
   });
 
-  const qrSvg = await QRCode.toString(
-    `https://chunkycrayon.com?utm_source=${row.id}&utm_medium=pdf-qr-code&utm_campaign=coloring-image-pdf`,
-    { type: 'svg' },
+  const { url, svgUrl, qrCodeUrl } = await generateAndStoreColoringImage(
+    openai,
+    {
+      description,
+      difficulty,
+      rowId: row.id,
+      options: { quality: QUALITY },
+    },
   );
-
-  const baseDir = `uploads/coloring-images/${row.id}`;
-  const [
-    { url: imageBlobUrl },
-    { url: imageSvgBlobUrl },
-    { url: qrCodeSvgBlobUrl },
-  ] = await Promise.all([
-    put(`${baseDir}/image.webp`, webpBuffer, { access: 'public' }),
-    put(`${baseDir}/image.svg`, Buffer.from(svg), { access: 'public' }),
-    put(`${baseDir}/qr-code.svg`, Buffer.from(qrSvg), { access: 'public' }),
-  ]);
 
   await db.coloringImage.update({
     where: { id: row.id },
-    data: {
-      url: imageBlobUrl,
-      svgUrl: imageSvgBlobUrl,
-      qrCodeUrl: qrCodeSvgBlobUrl,
-    },
+    data: { url, svgUrl, qrCodeUrl },
   });
 
   return row.id;

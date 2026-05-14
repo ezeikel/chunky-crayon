@@ -3,48 +3,58 @@
 /**
  * Top up combo-page content before launching new combos.
  *
- * For each entry in COMBO_PAGES that has fewer than the threshold of
- * matching images, this script POSTs to the dev image-generation endpoint
- * with prompts built from the combo's dimensions (theme + age + occasion
- * or context). Caps at MAX_PER_RUN images per combo per run to keep cost
- * predictable.
+ * Mirrors `backfill-landings.ts` for combo pages
+ * (/coloring-pages-for/[slug]). For each entry in COMBO_PAGES that has
+ * fewer than the threshold of matching images, generates new ones with
+ * prompts built from the combo's dimensions (theme + age + occasion
+ * or context). Caps at MAX_PER_RUN images per combo per run.
  *
- * Requires `pnpm dev` to be running on localhost:3000 (or set DEV_BASE_URL).
+ * Per-image pipeline (the AI + R2 work) lives in
+ * `packages/coloring-core/src/backfill/` — shared with
+ * `backfill-landings.ts`. This script owns:
+ *   - Scene prompt building (combo-specific: theme + age + occasion/context)
+ *   - DB row create + update (tags = union(category.tags, extraTagsAny))
+ *   - Coverage counting (by the same where-clause as the page renders)
+ *
+ * Runs directly against the dev Neon branch + dev R2 bucket. No dev
+ * server required (earlier version POSTed to /api/dev/...; consolidated
+ * away in favor of the same lean pipeline landings uses).
  *
  * Usage:
- *   pnpm tsx scripts/backfill-combo-pages.ts                   # all combos
- *   pnpm tsx scripts/backfill-combo-pages.ts --combo <slug>    # one combo
- *   pnpm tsx scripts/backfill-combo-pages.ts --dry-run         # show prompts, no generation
- *   pnpm tsx scripts/backfill-combo-pages.ts --threshold 10    # custom threshold (default 6)
+ *   pnpm tsx --env-file=.env.local scripts/backfill-combo-pages.ts
+ *   pnpm tsx --env-file=.env.local scripts/backfill-combo-pages.ts --combo=<slug>
+ *   pnpm tsx --env-file=.env.local scripts/backfill-combo-pages.ts --dry-run
+ *   pnpm tsx --env-file=.env.local scripts/backfill-combo-pages.ts --threshold=10
  *
- * Run before adding a combo to COMBO_PAGES on main. The page handler
- * silently 404s for slugs not in COMBO_PAGES, so it is safe to commit
- * the config first and run the backfill afterwards on the dev branch.
+ * Env: OPENAI_API_KEY, DATABASE_URL (dev), R2_*
  */
 
-import { GenerationType } from '@one-colored-pixel/db';
-import { COMBO_PAGES, type ComboPage } from '@/lib/seo/combo-pages';
-import { getComboCount } from '@/app/data/gallery';
-import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
-import { getHolidayEventBySlug } from '@/lib/seo/holidays';
-import { getCraftContextBySlug } from '@/lib/seo/craft-contexts';
+import OpenAI from 'openai';
 import {
-  getSpecificAgeBySlug,
-  getAgeBracketBySlug,
-} from '@/lib/seo/age-brackets';
+  db,
+  GenerationType,
+  Brand,
+  Difficulty as PrismaDifficulty,
+  Prisma,
+} from '@one-colored-pixel/db';
+import { generateAndStoreColoringImage } from '@one-colored-pixel/coloring-core';
+import { COMBO_PAGES, type ComboPage } from '@/lib/seo/combo-pages';
+import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
+import { getAgeBracketBySlug } from '@/lib/seo/age-brackets';
+import { BRAND } from '@/lib/db';
 
-const DEV_BASE = process.env.DEV_BASE_URL ?? 'http://localhost:3000';
-const ENDPOINT = `${DEV_BASE}/api/dev/generate-coloring-from-description`;
+const QUALITY: 'low' | 'medium' | 'high' = 'low';
 const DEFAULT_THRESHOLD = 6;
 const MAX_PER_RUN = 10;
+const PURPOSE_KEY_PREFIX = 'combo-backfill';
 
-type CliArgs = {
+type Args = {
   comboSlug?: string;
   dryRun: boolean;
   threshold: number;
 };
 
-const parseArgs = (): CliArgs => {
+const parseArgs = (): Args => {
   const args = process.argv.slice(2);
   return {
     comboSlug: args
@@ -58,6 +68,42 @@ const parseArgs = (): CliArgs => {
     ),
   };
 };
+
+// ===== Where-clause that mirrors the live combo page filter =====
+// Must stay in sync with getComboCount/getComboImages in app/data/gallery.ts.
+// We re-derive here rather than import the cached helpers so we can run
+// outside the Next runtime (cacheLife() requires it).
+
+const buildWhere = (combo: ComboPage): Prisma.ColoringImageWhereInput => {
+  const andClauses: Prisma.ColoringImageWhereInput[] = [];
+  if (combo.categorySlug) {
+    const category = getCategoryBySlug(combo.categorySlug);
+    if (!category) return { id: '__missing-category__' };
+    andClauses.push({
+      OR: [
+        { tags: { hasSome: category.tags } },
+        ...category.tags.map((tag) => ({
+          OR: [
+            { title: { contains: tag, mode: 'insensitive' as const } },
+            { description: { contains: tag, mode: 'insensitive' as const } },
+          ],
+        })),
+      ],
+    });
+  }
+  if (combo.extraTagsAny && combo.extraTagsAny.length > 0) {
+    andClauses.push({ tags: { hasSome: combo.extraTagsAny } });
+  }
+  return {
+    brand: BRAND,
+    status: 'READY',
+    userId: null,
+    ...(combo.difficulty ? { difficulty: combo.difficulty } : {}),
+    ...(andClauses.length > 0 ? { AND: andClauses } : {}),
+  };
+};
+
+// ===== Scene prompts derived from combo dimensions =====
 
 const ageDescriptor = (combo: ComboPage): string => {
   if (combo.specificAge != null) {
@@ -88,22 +134,17 @@ const ageDescriptor = (combo: ComboPage): string => {
 const themeNoun = (combo: ComboPage): string => {
   if (!combo.categorySlug) return '';
   const cat = getCategoryBySlug(combo.categorySlug);
-  if (!cat) return combo.categorySlug;
-  return cat.tags[0] ?? cat.slug;
+  return cat?.tags[0] ?? combo.categorySlug;
 };
 
 const occasionPhrase = (combo: ComboPage): string => {
   if (!combo.occasionSlug) return '';
-  const event = getHolidayEventBySlug(combo.occasionSlug);
-  if (!event) return combo.occasionSlug;
-  return event.name.toLowerCase();
+  return combo.occasionSlug.replace(/-/g, ' ');
 };
 
 const contextPhrase = (combo: ComboPage): string => {
   if (!combo.contextSlug) return '';
-  const ctx = getCraftContextBySlug(combo.contextSlug);
-  if (!ctx) return combo.contextSlug;
-  return ctx.name.toLowerCase();
+  return combo.contextSlug.replace(/-/g, ' ');
 };
 
 const buildPrompts = (combo: ComboPage, count: number): string[] => {
@@ -112,9 +153,6 @@ const buildPrompts = (combo: ComboPage, count: number): string[] => {
   const context = contextPhrase(combo);
   const age = ageDescriptor(combo);
 
-  // Seed list of variations per group. The endpoint AI-derives tags from
-  // the description, so we make sure the dimension keywords appear in
-  // every prompt.
   const variations = [
     occasion ? `${theme || 'whimsical character'} celebrating ${occasion}` : '',
     occasion ? `${theme || 'cheerful scene'} with ${occasion} decorations` : '',
@@ -136,46 +174,75 @@ const buildPrompts = (combo: ComboPage, count: number): string[] => {
   return prompts;
 };
 
-const generateOne = async (description: string): Promise<boolean> => {
-  const res = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
+// ===== Tag union — theme tags + occasion/context tags =====
+// We tag the new row with both sets so it matches the combo's filter
+// (which AND-intersects them). Without this, prompts that talk about
+// "rainy days" but where the AI tagger doesn't notice would never match
+// the rainy-days combo.
+
+const tagsForCombo = (combo: ComboPage): string[] => {
+  const tags = new Set<string>();
+  if (combo.categorySlug) {
+    const cat = getCategoryBySlug(combo.categorySlug);
+    if (cat) cat.tags.forEach((t) => tags.add(t));
+  }
+  if (combo.extraTagsAny) {
+    combo.extraTagsAny.forEach((t) => tags.add(t));
+  }
+  return Array.from(tags);
+};
+
+// ===== Per-image orchestration =====
+
+const backfillOneImage = async (
+  openai: OpenAI,
+  combo: ComboPage,
+  description: string,
+): Promise<string> => {
+  const difficulty: PrismaDifficulty =
+    combo.difficulty ?? PrismaDifficulty.BEGINNER;
+
+  // Insert row first so we get a stable id for the R2 paths + QR URL.
+  const row = await db.coloringImage.create({
+    data: {
+      title: description.replace(/^a /i, '').replace(/\.$/, ''),
       description,
+      alt: description,
+      tags: tagsForCombo(combo),
+      difficulty,
       generationType: GenerationType.SYSTEM,
-      purposeKey: 'combo-backfill',
-    }),
+      sourcePrompt: `${PURPOSE_KEY_PREFIX}:${combo.slug}: ${description}`,
+      brand: Brand.CHUNKY_CRAYON,
+      showInCommunity: true,
+    },
   });
 
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    console.error(`   ❌ ${res.status} ${body.slice(0, 200)}`);
-    return false;
-  }
-  const data = (await res.json().catch(() => ({}))) as {
-    success?: boolean;
-    id?: string;
-    title?: string;
-  };
-  if (!data.success) {
-    console.error(`   ❌ ${JSON.stringify(data).slice(0, 200)}`);
-    return false;
-  }
-  console.log(`   ✅ ${data.id} — ${data.title ?? '(no title)'}`);
-  return true;
+  const { url, svgUrl, qrCodeUrl } = await generateAndStoreColoringImage(
+    openai,
+    {
+      description,
+      difficulty,
+      rowId: row.id,
+      options: { quality: QUALITY },
+    },
+  );
+
+  await db.coloringImage.update({
+    where: { id: row.id },
+    data: { url, svgUrl, qrCodeUrl },
+  });
+
+  return row.id;
 };
 
 const runCombo = async (
+  openai: OpenAI,
   combo: ComboPage,
   threshold: number,
   dryRun: boolean,
-): Promise<void> => {
-  const count = await getComboCount({
-    categorySlug: combo.categorySlug,
-    difficulty: combo.difficulty,
-    extraTagsAny: combo.extraTagsAny,
-  });
-
+): Promise<{ created: number; failed: number }> => {
+  const result = { created: 0, failed: 0 };
+  const count = await db.coloringImage.count({ where: buildWhere(combo) });
   const need = Math.max(0, threshold - count);
   const toGenerate = Math.min(need, MAX_PER_RUN);
 
@@ -185,26 +252,41 @@ const runCombo = async (
 
   if (toGenerate === 0) {
     console.log('   ✓ at or above threshold');
-    return;
+    return result;
   }
 
   const prompts = buildPrompts(combo, toGenerate);
 
   if (dryRun) {
     prompts.forEach((p, i) => console.log(`   [${i + 1}] ${p}`));
-    return;
+    return result;
   }
 
   for (let i = 0; i < prompts.length; i += 1) {
-    console.log(`   [${i + 1}/${prompts.length}] ${prompts[i]}`);
-    // eslint-disable-next-line no-await-in-loop
-    await generateOne(prompts[i]);
+    const scene = prompts[i];
+    const start = Date.now();
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const id = await backfillOneImage(openai, combo, scene);
+      const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+      console.log(
+        `   [${i + 1}/${prompts.length}] ${id} (${elapsed}s) — ${scene.slice(0, 60)}${scene.length > 60 ? '…' : ''}`,
+      );
+      result.created += 1;
+    } catch (err) {
+      console.error(
+        `   [${i + 1}/${prompts.length}] FAILED:`,
+        err instanceof Error ? err.message : err,
+      );
+      result.failed += 1;
+    }
   }
+
+  return result;
 };
 
 const main = async () => {
   const { comboSlug, dryRun, threshold } = parseArgs();
-
   const combos = comboSlug
     ? COMBO_PAGES.filter((c) => c.slug === comboSlug)
     : COMBO_PAGES;
@@ -219,22 +301,29 @@ const main = async () => {
       dryRun ? ' (DRY RUN)' : ''
     }`,
   );
-  console.log(`Endpoint: ${ENDPOINT}`);
-
-  // Sanity: make sure GALLERY_CATEGORIES is wired up (catches stale imports).
   console.log(`Categories loaded: ${GALLERY_CATEGORIES.length}`);
 
+  if (!dryRun && !process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY is required');
+  }
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+  const totals = { created: 0, failed: 0 };
   for (const combo of combos) {
     // eslint-disable-next-line no-await-in-loop
-    await runCombo(combo, threshold, dryRun);
+    const r = await runCombo(openai, combo, threshold, dryRun);
+    totals.created += r.created;
+    totals.failed += r.failed;
   }
+
+  console.log(
+    `\n[backfill] done. created=${totals.created} failed=${totals.failed}`,
+  );
 };
 
-main().catch((err) => {
-  console.error('❌ Error:', err);
-  process.exit(1);
-});
-
-// Suppress unused-var lints for re-exported lookups that may become handy
-// when extending the prompt builder.
-void getSpecificAgeBySlug;
+main()
+  .catch((err) => {
+    console.error('[backfill] fatal:', err);
+    process.exit(1);
+  })
+  .finally(() => db.$disconnect());
