@@ -23,17 +23,15 @@ import {
   type QAResult,
 } from "@one-colored-pixel/coloring-core";
 import { put } from "@one-colored-pixel/storage";
+import { getReferenceImages } from "@one-colored-pixel/coloring-core";
 import { persistBundlePage } from "./persist";
 
-// Brand style references — copied from apps/chunky-crayon-web/lib/ai/prompts.ts
-// REFERENCE_IMAGES. The worker can't import from the web app, so the URLs
-// are inlined. If they ever rotate, update both places.
-const BRAND_STYLE_REFS = [
-  "https://assets.chunkycrayon.com/reference-images/birthdays-8uiLmIVecHAw1yjqNRQ2OCYHoaa8gW.webp",
-  "https://assets.chunkycrayon.com/reference-images/dinosaur-bfmBtp1o0kVeIZtuVVNhmKTMJXOgS7.webp",
-  "https://assets.chunkycrayon.com/reference-images/family-and-friends-g4vlGFNcWXrcHQ7sB4y8LLYiO3PIAG.webp",
-  "https://assets.chunkycrayon.com/reference-images/farm-animals-knAdbOJKhulPhb7xnaCkMXycTunbNi.webp",
-] as const;
+// Brand style references for bundle page generation. Pulled from the
+// shared coloring-core helper so this stays in sync with the rest of
+// CC's generation pipeline (web + daily-pipeline + blog cron all use
+// the same v2 reference set). Bundle pages target the same kid-friendly
+// audience as everything else, so we use the BEGINNER tier explicitly.
+const BRAND_STYLE_REFS = getReferenceImages("BEGINNER").slice(0, 4);
 
 // GPT_IMAGE_STYLE_BLOCK — copied from web's lib/ai/prompts.ts. Same reason
 // as BRAND_STYLE_REFS: worker can't reach into the web app.
