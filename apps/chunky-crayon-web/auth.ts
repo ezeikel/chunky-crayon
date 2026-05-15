@@ -1,12 +1,12 @@
 import NextAuth from 'next-auth';
-import type { NextAuthConfig } from 'next-auth';
+import type { NextAuthConfig, Profile } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-// TODO: re-enable when Apple/Facebook sign-in is implemented
-// import AppleProvider from 'next-auth/providers/apple';
-// import FacebookProvider from 'next-auth/providers/facebook';
+import AppleProvider from 'next-auth/providers/apple';
+import FacebookProvider from 'next-auth/providers/facebook';
 import Resend from 'next-auth/providers/resend';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { db } from '@one-colored-pixel/db';
+import { generateAppleClientSecret } from '@/lib/apple';
 import { getResendFromAddress } from '@/lib/email-config';
 import {
   readClientMatchData,
@@ -23,13 +23,33 @@ import { ADMIN_EMAILS } from '@/constants';
 const isAdminEmail = (email: string | null | undefined): boolean =>
   !!email && ADMIN_EMAILS.includes(email);
 
-// TODO: re-enable when Apple sign-in is implemented
-// type AppleProfile = Profile & {
-//   user?: {
-//     firstName?: string;
-//     lastName?: string;
-//   };
-// };
+// Apple only sends the user object (with firstName/lastName) on the very
+// first authorization — every subsequent sign-in returns just the JWT.
+type AppleProfile = Profile & {
+  user?: {
+    firstName?: string;
+    lastName?: string;
+  };
+};
+
+// Generated at module init. The JWT is valid ~6 months; the next deploy
+// (or any cold start) re-generates it, so it self-rotates as long as the
+// app is redeployed at least every 6 months. Skip generation when any of
+// the Apple env vars are missing so the build/dev server still starts on
+// machines that haven't provisioned them yet — the provider will throw
+// at runtime if a user actually attempts an Apple sign-in.
+const appleClientSecret =
+  process.env.APPLE_TEAM_ID &&
+  process.env.APPLE_KEY_ID &&
+  process.env.APPLE_CLIENT_ID &&
+  process.env.APPLE_PRIVATE_KEY
+    ? await generateAppleClientSecret({
+        teamId: process.env.APPLE_TEAM_ID,
+        keyId: process.env.APPLE_KEY_ID,
+        clientId: process.env.APPLE_CLIENT_ID,
+        privateKey: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      })
+    : '';
 
 const config = {
   adapter: PrismaAdapter(db),
@@ -49,17 +69,21 @@ const config = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       allowDangerousEmailAccountLinking: true,
     }),
-    // TODO: re-enable when Apple/Facebook sign-in is implemented
-    // AppleProvider({
-    //   clientId: process.env.AUTH_APPLE_ID as string,
-    //   clientSecret: process.env.AUTH_APPLE_SECRET as string,
-    //   allowDangerousEmailAccountLinking: true,
-    // }),
-    // FacebookProvider({
-    //   clientId: process.env.FACEBOOK_APP_ID as string,
-    //   clientSecret: process.env.FACEBOOK_APP_SECRET as string,
-    //   allowDangerousEmailAccountLinking: true,
-    // }),
+    AppleProvider({
+      clientId: process.env.APPLE_CLIENT_ID as string,
+      clientSecret: appleClientSecret,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CONSUMER_APP_ID as string,
+      clientSecret: process.env.FACEBOOK_CONSUMER_APP_SECRET as string,
+      allowDangerousEmailAccountLinking: true,
+      authorization: {
+        params: {
+          scope: 'public_profile email',
+        },
+      },
+    }),
     Resend({
       apiKey: process.env.RESEND_API_KEY,
       from: getResendFromAddress('no-reply'),
@@ -133,32 +157,65 @@ const config = {
         return true;
       }
 
-      // TODO: re-enable when Apple/Facebook sign-in is implemented
-      // if (account?.provider === 'apple') {
-      //   const appleProfile = profile as AppleProfile;
-      //   const existingUser = profile?.email
-      //     ? await db.user.findUnique({ where: { email: profile.email } })
-      //     : null;
-      //   if (existingUser) return true;
-      //   const name = appleProfile?.user
-      //     ? `${appleProfile.user.firstName} ${appleProfile.user.lastName}`
-      //     : undefined;
-      //   await db.user.create({
-      //     data: { email: profile?.email as string, name: name as string },
-      //   });
-      //   return true;
-      // }
-      //
-      // if (account?.provider === 'facebook') {
-      //   const existingUser = profile?.email
-      //     ? await db.user.findUnique({ where: { email: profile.email } })
-      //     : null;
-      //   if (existingUser) return true;
-      //   await db.user.create({
-      //     data: { email: profile?.email as string, name: profile?.name as string },
-      //   });
-      //   return true;
-      // }
+      if (account?.provider === 'apple' || account?.provider === 'facebook') {
+        const existingUser = profile?.email
+          ? await db.user.findUnique({ where: { email: profile.email } })
+          : null;
+
+        if (existingUser) {
+          // Same ADMIN_EMAILS sync as the google branch.
+          const shouldBeAdmin = isAdminEmail(existingUser.email);
+          const isAdmin = existingUser.role === 'ADMIN';
+          if (shouldBeAdmin !== isAdmin) {
+            await db.user.update({
+              where: { id: existingUser.id },
+              data: { role: shouldBeAdmin ? 'ADMIN' : 'USER' },
+            });
+          }
+          return true;
+        }
+
+        let name: string | undefined;
+        if (account.provider === 'facebook') {
+          name = profile?.name ?? undefined;
+        } else {
+          // Apple: user object only present on first authorization. Fall
+          // back to the email prefix when Apple omits the name claim.
+          const appleProfile = profile as AppleProfile;
+          const firstName = appleProfile?.user?.firstName;
+          const lastName = appleProfile?.user?.lastName;
+          if (firstName || lastName) {
+            name = [firstName, lastName].filter(Boolean).join(' ');
+          } else {
+            name = profile?.email?.split('@')[0];
+          }
+        }
+
+        const created = await db.user.create({
+          data: {
+            email: profile?.email as string,
+            name: name as string,
+            role: isAdminEmail(profile?.email as string) ? 'ADMIN' : 'USER',
+          },
+        });
+
+        // Fire CompleteRegistration via Meta/Pinterest CAPI, same dedup
+        // pattern as the google/resend branches.
+        const hints = await readClientMatchData();
+        sendSignupConversionEvents({
+          email: created.email!,
+          userId: created.id,
+          signupMethod: account.provider,
+          ...hints,
+        }).catch((err) => {
+          console.error(
+            `[CAPI] signup conversion failed (${account.provider})`,
+            err,
+          );
+        });
+
+        return true;
+      }
 
       if (account?.provider === 'resend') {
         const userEmail = account.providerAccountId;

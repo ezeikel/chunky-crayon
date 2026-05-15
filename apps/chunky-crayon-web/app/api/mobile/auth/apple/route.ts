@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         appleJWKS,
         {
           issuer: 'https://appleid.apple.com',
-          audience: process.env.AUTH_APPLE_ID,
+          audience: process.env.APPLE_CLIENT_ID,
         },
       );
       payload = verifiedPayload;

@@ -7,7 +7,11 @@ import { signIn } from 'next-auth/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/pro-regular-svg-icons';
 import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
-import { faGoogle, faApple } from '@fortawesome/free-brands-svg-icons';
+import {
+  faGoogle,
+  faApple,
+  faFacebook,
+} from '@fortawesome/free-brands-svg-icons';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +29,7 @@ const SignInOptions = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const showAppleSignIn = useFeatureFlagEnabled('apple-sign-in');
+  const showFacebookSignIn = useFeatureFlagEnabled('facebook-sign-in');
 
   const handleGoogleSignIn = () => {
     posthog.capture('user_signed_in', {
@@ -38,6 +43,13 @@ const SignInOptions = () => {
       provider: 'apple',
     });
     signIn('apple', { callbackUrl: '/' });
+  };
+
+  const handleFacebookSignIn = () => {
+    posthog.capture('user_signed_in', {
+      provider: 'facebook',
+    });
+    signIn('facebook', { callbackUrl: '/' });
   };
 
   const handleMagicLinkSignIn = async (e: React.FormEvent) => {
@@ -82,6 +94,16 @@ const SignInOptions = () => {
           >
             <FontAwesomeIcon icon={faApple} className="mr-2 h-4 w-4" />
             {t('continueWithApple')}
+          </Button>
+        )}
+        {showFacebookSignIn && (
+          <Button
+            variant="outline"
+            onClick={handleFacebookSignIn}
+            className="w-full border-[#1877F2] bg-[#1877F2] text-white hover:bg-[#1877F2]/90 hover:text-white"
+          >
+            <FontAwesomeIcon icon={faFacebook} className="mr-2 h-4 w-4" />
+            {t('continueWithFacebook')}
           </Button>
         )}
         <div className="relative">

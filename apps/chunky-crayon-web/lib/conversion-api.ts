@@ -672,7 +672,7 @@ export const sendFacebookCompleteRegistrationEvent = async ({
   phone?: string;
   firstName?: string;
   lastName?: string;
-  signupMethod?: 'google' | 'email';
+  signupMethod?: 'google' | 'email' | 'apple' | 'facebook';
 } & ClientMatchData): Promise<{ success: boolean; error?: string }> => {
   return postFacebookEvent(
     {
@@ -927,7 +927,7 @@ export const sendSignupConversionEvents = async (
     phone?: string;
     firstName?: string;
     lastName?: string;
-    signupMethod?: 'google' | 'email';
+    signupMethod?: 'google' | 'email' | 'apple' | 'facebook';
   } & ClientMatchData,
 ): Promise<void> => {
   await Promise.allSettled([
