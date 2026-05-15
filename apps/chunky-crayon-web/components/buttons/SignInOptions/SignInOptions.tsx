@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import posthog from 'posthog-js';
-import { useFeatureFlagEnabled } from 'posthog-js/react';
 import { signIn } from 'next-auth/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/pro-regular-svg-icons';
@@ -28,8 +27,6 @@ const SignInOptions = () => {
   const t = useTranslations('auth');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const showAppleSignIn = useFeatureFlagEnabled('apple-sign-in');
-  const showFacebookSignIn = useFeatureFlagEnabled('facebook-sign-in');
 
   const handleGoogleSignIn = () => {
     posthog.capture('user_signed_in', {
@@ -86,26 +83,22 @@ const SignInOptions = () => {
           <FontAwesomeIcon icon={faGoogle} className="mr-2 h-4 w-4" />
           {t('continueWithGoogle')}
         </Button>
-        {showAppleSignIn && (
-          <Button
-            variant="outline"
-            onClick={handleAppleSignIn}
-            className="w-full"
-          >
-            <FontAwesomeIcon icon={faApple} className="mr-2 h-4 w-4" />
-            {t('continueWithApple')}
-          </Button>
-        )}
-        {showFacebookSignIn && (
-          <Button
-            variant="outline"
-            onClick={handleFacebookSignIn}
-            className="w-full border-[#1877F2] bg-[#1877F2] text-white hover:bg-[#1877F2]/90 hover:text-white"
-          >
-            <FontAwesomeIcon icon={faFacebook} className="mr-2 h-4 w-4" />
-            {t('continueWithFacebook')}
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          onClick={handleAppleSignIn}
+          className="w-full"
+        >
+          <FontAwesomeIcon icon={faApple} className="mr-2 h-4 w-4" />
+          {t('continueWithApple')}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={handleFacebookSignIn}
+          className="w-full border-[#1877F2] bg-[#1877F2] text-white hover:bg-[#1877F2]/90 hover:text-white"
+        >
+          <FontAwesomeIcon icon={faFacebook} className="mr-2 h-4 w-4" />
+          {t('continueWithFacebook')}
+        </Button>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
