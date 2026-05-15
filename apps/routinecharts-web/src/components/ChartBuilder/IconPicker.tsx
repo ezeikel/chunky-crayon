@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ROUTINE_ICONS } from "./icons";
+import { trackEvent } from "../../lib/analytics/events";
 
 const FullEmojiPicker = lazy(() => import("./FullEmojiPicker"));
 
@@ -77,7 +78,10 @@ export const IconPicker = ({ value, onChange }: Props) => {
               </div>
               <button
                 type="button"
-                onClick={() => setMode("full")}
+                onClick={() => {
+                  setMode("full");
+                  trackEvent("browse_all_emoji_opened");
+                }}
                 className="w-full mt-2 py-2 text-xs font-medium text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
               >
                 Browse all emoji

@@ -38,7 +38,11 @@ const heroSrc = post.heroImage?.asset
 ---
 
 <BaseLayout title={`${post.title} | Routine Charts`} description={post.excerpt}>
-  <article class="max-w-2xl mx-auto px-6 py-12 md:py-16">
+  <article
+    class="max-w-2xl mx-auto px-6 py-12 md:py-16"
+    data-blog-slug={post.slug}
+    data-blog-title={post.title}
+  >
     <nav class="mb-8">
       <a
         href="/blog"

@@ -1,7 +1,12 @@
 import posthog from "posthog-js";
+import { inject } from "@vercel/analytics";
 
 const KEY = import.meta.env.PUBLIC_POSTHOG_KEY;
 const HOST = import.meta.env.PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com";
+
+// Vercel Analytics — first-party pageview + custom-event dashboard.
+// Framework-agnostic inject() (Astro has no React root to mount <Analytics/>).
+inject();
 
 if (KEY) {
   posthog.init(KEY, {

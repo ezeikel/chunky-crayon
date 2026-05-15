@@ -17,8 +17,14 @@ export const prerender = false;
 const SITE_SLUG = "routinecharts";
 
 const fireWorker = async () => {
-  const workerUrl = import.meta.env.CHUNKY_CRAYON_WORKER_URL;
-  const workerSecret = import.meta.env.WORKER_SECRET;
+  // Server-only secrets: read process.env at runtime (Vercel injects env
+  // vars there). Astro's import.meta.env only exposes PUBLIC_-prefixed vars
+  // to the server bundle, so non-public secrets MUST come from process.env.
+  const workerUrl =
+    process.env.CHUNKY_CRAYON_WORKER_URL ??
+    import.meta.env.CHUNKY_CRAYON_WORKER_URL;
+  const workerSecret =
+    process.env.WORKER_SECRET ?? import.meta.env.WORKER_SECRET;
 
   if (!workerUrl) {
     throw new Error("CHUNKY_CRAYON_WORKER_URL not set");

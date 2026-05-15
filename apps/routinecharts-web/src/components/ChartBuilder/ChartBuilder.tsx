@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { trackEvent } from "../../lib/analytics/events";
 import {
   DndContext,
   closestCenter,
@@ -70,6 +71,7 @@ export const ChartBuilder = () => {
       ...prev,
       rows: [...prev.rows, makeRow({ label: "", icon: "🪥", time: "" })],
     }));
+    trackEvent("chart_row_added");
   };
 
   const generatePdf = async () => {
@@ -96,6 +98,7 @@ export const ChartBuilder = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      trackEvent("pdf_download", { rows: config.rows.length });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Something went wrong");
     } finally {
