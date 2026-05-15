@@ -29,7 +29,7 @@ import { createColoringImageForCommentRequest } from '@/app/actions/createColori
 import {
   replyToComment,
   replyToFacebookComment,
-  sendTextDM,
+  sendCommentPrivateReply,
 } from '@/lib/instagram-automation';
 import { postBlockKitMessage, buildModerationMessage } from '@/lib/slack';
 import * as log from '@/lib/logger';
@@ -90,18 +90,20 @@ const pickRandom = <T>(arr: T[]): T =>
 // Delivery messages — used by the process cron when a gen completes
 // =============================================================================
 //
-// IG: image arrives as a DM. The "on it ✨" reply on the comment is left
-// as-is (no edit needed); the DM carries the result.
+// IG: delivered as a Private Reply DM (recipient.comment_id, one message
+// only). IG DMs render links clickable, so the single message carries the
+// coloring-page link directly.
 //
 // FB: no DM channel for Page comments. The cron posts a nested reply on
 // the original comment that contains the canonical URL to the generated
-// page. CUID URL (not slugged) — comment-request images aren't publicly
-// indexable, but the commenter who asked for it gets a direct link.
+// page. FB comments render links clickable. CUID URL (not slugged) —
+// comment-request images aren't publicly indexable, but the commenter who
+// asked for it gets a direct link.
 
-const DM_CAPTIONS_IG = [
-  "Here's your coloring page! 🎨 Tap to save and print at home ✨",
-  'Made just for you 💛 Save it to print + color whenever you like 🖌️',
-  'Done! ✨ Long-press to save the image — happy coloring 🌈',
+const IG_DM_MESSAGES = [
+  "Here's your coloring page! 🎨 Tap the link to print + color at home: ${url}",
+  'Made just for you 💛 Print + color it here: ${url}',
+  'All done! ✨ Your coloring page is ready: ${url} 🌈',
 ];
 
 const FB_LINK_REPLIES = [
@@ -110,8 +112,8 @@ const FB_LINK_REPLIES = [
   'All done! Save + print from here: ${url} 💛',
 ];
 
-export function pickImageDmCaption(): string {
-  return pickRandom(DM_CAPTIONS_IG);
+export function buildImageDmMessage(canonicalUrl: string): string {
+  return pickRandom(IG_DM_MESSAGES).replace('${url}', canonicalUrl);
 }
 
 export function buildFbLinkReply(canonicalUrl: string): string {
@@ -295,7 +297,6 @@ type HandleImageRequestArgs = {
   queueRowId: string;
   platform: SocialPlatform;
   commentId: string;
-  commenterId: string;
   commenterUsername: string;
   prompt: string;
 };
@@ -304,7 +305,6 @@ export async function handleImageRequest({
   queueRowId,
   platform,
   commentId,
-  commenterId,
   commenterUsername,
   prompt,
 }: HandleImageRequestArgs): Promise<void> {
@@ -324,7 +324,7 @@ export async function handleImageRequest({
       // IG DM only — FB doesn't open a 7-day DM window from a Page comment
       // the same way IG does. FB users get the reply only.
       platform === 'INSTAGRAM'
-        ? sendTextDM(commenterId, pickRandom(SORRY_DMS))
+        ? sendCommentPrivateReply(commentId, pickRandom(SORRY_DMS))
         : Promise.resolve(),
       db.socialCommentQueue.update({
         where: { id: queueRowId },
@@ -359,7 +359,7 @@ export async function handleImageRequest({
           ? replyToComment(commentId, pickRandom(SORRY_REPLIES))
           : replyToFacebookComment(commentId, pickRandom(SORRY_REPLIES)),
         platform === 'INSTAGRAM'
-          ? sendTextDM(commenterId, pickRandom(SORRY_DMS))
+          ? sendCommentPrivateReply(commentId, pickRandom(SORRY_DMS))
           : Promise.resolve(),
         db.socialCommentQueue.update({
           where: { id: queueRowId },
@@ -396,7 +396,7 @@ export async function handleImageRequest({
           ? replyToComment(commentId, pickRandom(SORRY_REPLIES))
           : replyToFacebookComment(commentId, pickRandom(SORRY_REPLIES)),
         platform === 'INSTAGRAM'
-          ? sendTextDM(commenterId, pickRandom(SORRY_DMS))
+          ? sendCommentPrivateReply(commentId, pickRandom(SORRY_DMS))
           : Promise.resolve(),
         db.socialCommentQueue.update({
           where: { id: queueRowId },
@@ -453,7 +453,7 @@ export async function handleImageRequest({
     });
     await Promise.allSettled([
       platform === 'INSTAGRAM'
-        ? sendTextDM(commenterId, pickRandom(SORRY_DMS))
+        ? sendCommentPrivateReply(commentId, pickRandom(SORRY_DMS))
         : Promise.resolve(),
       db.socialCommentQueue.update({
         where: { id: queueRowId },

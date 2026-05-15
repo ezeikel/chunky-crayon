@@ -26,10 +26,9 @@ import {
   replyToComment,
   replyToFacebookComment,
   likeComment,
-  sendImageDM,
-  sendTextDM,
+  sendCommentPrivateReply,
 } from '@/lib/instagram-automation';
-import { pickImageDmCaption, buildFbLinkReply } from '@/lib/image-request';
+import { buildImageDmMessage, buildFbLinkReply } from '@/lib/image-request';
 import { getColoringImageCanonicalUrl } from '@/lib/seo/coloring-image-url';
 import * as log from '@/lib/logger';
 
@@ -126,7 +125,7 @@ async function processAiReply(comment: QueueRow): Promise<{
 // AWAITING_GENERATION rows: poll the linked ColoringImage.status.
 //   - GENERATING → not ready yet. Bump processAfter +60s and leave the
 //     row's status as AWAITING_GENERATION.
-//   - READY → IG: sendImageDM. FB: nested reply with canonical URL.
+//   - READY → IG: Private Reply DM with link. FB: nested reply with link.
 //   - FAILED → polite sorry message + terminal FAILED on the queue row.
 
 async function processImageRequestDelivery(comment: QueueRow): Promise<{
@@ -182,11 +181,12 @@ async function processImageRequestDelivery(comment: QueueRow): Promise<{
   }
 
   if (img.status === 'FAILED') {
-    // Sorry path. IG gets a DM; FB gets a reply (no DM channel).
+    // Sorry path. IG gets a Private Reply DM (recipient.comment_id); FB
+    // gets a public nested reply (no DM channel for FB Page comments).
     const sorryText =
       "Hey! Our drawing magic didn't quite work this time. Want to try another idea? 🌈";
     if (comment.platform === 'INSTAGRAM') {
-      await sendTextDM(comment.authorId, sorryText);
+      await sendCommentPrivateReply(comment.commentId, sorryText);
     } else {
       await replyToFacebookComment(comment.commentId, sorryText);
     }
@@ -213,11 +213,26 @@ async function processImageRequestDelivery(comment: QueueRow): Promise<{
     return { result: 'not_ready' };
   }
 
+  // Canonical coloring-page URL — shared by both IG (DM) and FB (reply).
+  const canonicalUrl = getColoringImageCanonicalUrl(
+    {
+      id: img.id,
+      slugBase: img.slugBase,
+      userId: img.userId,
+      showInCommunity: img.showInCommunity,
+      status: img.status,
+    },
+    'en',
+  );
+
   if (comment.platform === 'INSTAGRAM') {
-    const dmResult = await sendImageDM(
-      comment.authorId,
-      img.url,
-      pickImageDmCaption(),
+    // Private Reply: ONE message only, delivered to the commenter's DM
+    // via recipient.comment_id. IG DMs render links clickable (IG
+    // comments do not), so we send a single text message with the
+    // coloring-page link rather than an image bubble.
+    const dmResult = await sendCommentPrivateReply(
+      comment.commentId,
+      buildImageDmMessage(canonicalUrl),
     );
 
     if (!dmResult.success && isRateLimited(dmResult.error)) {
@@ -228,7 +243,7 @@ async function processImageRequestDelivery(comment: QueueRow): Promise<{
       return { result: 'rate_limited' };
     }
     if (!dmResult.success) {
-      throw new Error(dmResult.error || 'image DM failed');
+      throw new Error(dmResult.error || 'private reply failed');
     }
 
     await db.socialCommentQueue.update({
@@ -244,21 +259,11 @@ async function processImageRequestDelivery(comment: QueueRow): Promise<{
   }
 
   // FACEBOOK: post a nested reply on the original comment with the
-  // canonical URL. CUID URL (comment-request rows aren't community/public).
-  const canonical = getColoringImageCanonicalUrl(
-    {
-      id: img.id,
-      slugBase: img.slugBase,
-      userId: img.userId,
-      showInCommunity: img.showInCommunity,
-      status: img.status,
-    },
-    'en',
-  );
-
+  // canonical URL (FB comments render links clickable; no DM channel for
+  // Page comments). CUID URL — comment-request rows aren't community/public.
   const replyResult = await replyToFacebookComment(
     comment.commentId,
-    buildFbLinkReply(canonical),
+    buildFbLinkReply(canonicalUrl),
   );
 
   if (!replyResult.success && isRateLimited(replyResult.error)) {

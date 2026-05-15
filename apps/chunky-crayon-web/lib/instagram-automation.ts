@@ -2,8 +2,9 @@
  * Meta Graph API helpers — IG + FB comment replies, DMs, like, fetch.
  *
  * Mirrors the pattern from the PTP project (parking-ticket-pal) but adapted
- * for CC's logger + Graph API version. New here vs PTP: sendImageDM, which
- * delivers a generated coloring page back to the commenter via IG/FB DM.
+ * for CC's logger + Graph API version. Comment→DM delivery uses the
+ * Private Replies API (sendCommentPrivateReply, recipient.comment_id) —
+ * NOT the general messaging API, which requires the user to message first.
  *
  * All functions return { success, error? } rather than throwing — failures
  * are logged, retries are owned by the calling cron's queue logic.
@@ -123,14 +124,26 @@ export async function likeComment(commentId: string): Promise<GraphResult> {
 // ============================================================================
 
 /**
- * Send a text DM to an IG user. POST /{ig-account-id}/messages
+ * Send a Private Reply — a DM delivered in response to a comment.
  *
- * Subject to IG's messaging window: we can only DM users we've had inbound
- * contact from in the last 7 days (a comment counts). Comment-triggered DMs
- * are always inside the window.
+ * This is the ManyChat "comment to DM" mechanism, and the ONLY way to DM a
+ * commenter who hasn't messaged us first. Uses `recipient.comment_id`
+ * instead of `recipient.id`. Requires `instagram_manage_comments` (which
+ * our Page token already has — NOT instagram_business_manage_messages, and
+ * NO App Review needed).
+ *
+ * Hard constraints (Meta):
+ *   - Exactly ONE message per comment. No follow-ups unless the user
+ *     replies first (then a 24h window opens).
+ *   - Must be sent within 7 days of the comment.
+ *
+ * IG DMs render links as clickable (IG comments do NOT), so a text message
+ * containing the coloring-page URL is the right delivery shape.
+ *
+ * https://developers.facebook.com/docs/instagram-platform/private-replies/
  */
-async function sendTextDM(
-  recipientId: string,
+export async function sendCommentPrivateReply(
+  commentId: string,
   text: string,
 ): Promise<GraphResult> {
   try {
@@ -142,7 +155,7 @@ async function sendTextDM(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        recipient: { id: recipientId },
+        recipient: { comment_id: commentId },
         message: { text },
         access_token: PAGE_ACCESS_TOKEN,
       }),
@@ -150,152 +163,20 @@ async function sendTextDM(
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(`DM send failed: ${JSON.stringify(data)}`);
+      throw new Error(`Private reply failed: ${JSON.stringify(data)}`);
     }
 
     return { success: true };
   } catch (e) {
     const err = e instanceof Error ? e : new Error(String(e));
     log.error(
-      'Failed to send text DM',
-      { action: 'instagram-automation', recipientId },
+      'Failed to send private reply',
+      { action: 'instagram-automation', commentId },
       err,
     );
     return { success: false, error: err.message };
   }
 }
-
-/**
- * Send an IG DM with a URL button (generic template). Falls back to a plain
- * text DM with the URL inlined if the template path fails.
- */
-async function sendButtonDM(
-  recipientId: string,
-  text: string,
-  buttonTitle: string,
-  buttonUrl: string,
-): Promise<GraphResult> {
-  try {
-    if (!INSTAGRAM_ACCOUNT_ID) {
-      throw new Error('INSTAGRAM_ACCOUNT_ID not configured');
-    }
-
-    const response = await fetch(`${GRAPH}/${INSTAGRAM_ACCOUNT_ID}/messages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        recipient: { id: recipientId },
-        message: {
-          attachment: {
-            type: 'template',
-            payload: {
-              template_type: 'generic',
-              elements: [
-                {
-                  title: text,
-                  buttons: [
-                    { type: 'web_url', url: buttonUrl, title: buttonTitle },
-                  ],
-                },
-              ],
-            },
-          },
-        },
-        access_token: PAGE_ACCESS_TOKEN,
-      }),
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-      log.warn('Button DM failed, falling back to text', {
-        action: 'instagram-automation',
-        recipientId,
-        error: JSON.stringify(data),
-      });
-      return await sendTextDM(recipientId, `${text}\n\n${buttonUrl}`);
-    }
-
-    return { success: true };
-  } catch (e) {
-    const err = e instanceof Error ? e : new Error(String(e));
-    log.error(
-      'Failed to send button DM',
-      { action: 'instagram-automation', recipientId },
-      err,
-    );
-    return sendTextDM(recipientId, `${text}\n\n${buttonUrl}`);
-  }
-}
-
-/**
- * Send an IG DM with an image attachment. Used to deliver the generated
- * coloring page back to the commenter for the #drawthis flow. Followed by
- * a text DM with the caption / CTA so we get caption + image in two clean
- * bubbles instead of one squashed template.
- *
- * Graph API: `attachment.type = 'image'` with `payload.url` pointing at a
- * publicly-readable image. Our R2 imageUrl is public.
- */
-export async function sendImageDM(
-  recipientId: string,
-  imageUrl: string,
-  caption: string,
-): Promise<GraphResult> {
-  try {
-    if (!INSTAGRAM_ACCOUNT_ID) {
-      throw new Error('INSTAGRAM_ACCOUNT_ID not configured');
-    }
-
-    const response = await fetch(`${GRAPH}/${INSTAGRAM_ACCOUNT_ID}/messages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        recipient: { id: recipientId },
-        message: {
-          attachment: {
-            type: 'image',
-            payload: { url: imageUrl, is_reusable: false },
-          },
-        },
-        access_token: PAGE_ACCESS_TOKEN,
-      }),
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-      log.warn('Image DM failed, falling back to text + URL', {
-        action: 'instagram-automation',
-        recipientId,
-        error: JSON.stringify(data),
-      });
-      return sendTextDM(recipientId, `${caption}\n\n${imageUrl}`);
-    }
-
-    // Image bubble delivered; follow up with the caption so the message
-    // arrives as two stacked bubbles in the IG inbox.
-    const captionResult = await sendTextDM(recipientId, caption);
-    if (!captionResult.success) {
-      log.warn('Image DM delivered but caption DM failed', {
-        action: 'instagram-automation',
-        recipientId,
-        captionError: captionResult.error,
-      });
-    }
-
-    return { success: true };
-  } catch (e) {
-    const err = e instanceof Error ? e : new Error(String(e));
-    log.error(
-      'Failed to send image DM',
-      { action: 'instagram-automation', recipientId },
-      err,
-    );
-    return sendTextDM(recipientId, `${caption}\n\n${imageUrl}`);
-  }
-}
-
-// Public re-exports for the queue processor.
-export { sendTextDM, sendButtonDM };
 
 // ============================================================================
 // Fetch helpers — used by the webhook to enrich queue rows with post context

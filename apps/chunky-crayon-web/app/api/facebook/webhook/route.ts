@@ -221,7 +221,6 @@ export const POST = async (req: NextRequest) => {
                   queueRowId: rowId,
                   platform: 'INSTAGRAM',
                   commentId,
-                  commenterId: authorId,
                   commenterUsername: authorUsername ?? 'there',
                   prompt: imageRequestPrompt,
                 });
@@ -328,7 +327,6 @@ export const POST = async (req: NextRequest) => {
                   queueRowId: rowId,
                   platform: 'FACEBOOK',
                   commentId,
-                  commenterId: authorId,
                   commenterUsername: authorUsername ?? 'there',
                   prompt: imageRequestPrompt,
                 });

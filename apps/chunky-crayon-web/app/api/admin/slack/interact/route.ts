@@ -28,14 +28,11 @@ import { createColoringImageForCommentRequest } from '@/app/actions/createColori
 import {
   replyToComment,
   replyToFacebookComment,
-  sendTextDM,
 } from '@/lib/instagram-automation';
 import * as log from '@/lib/logger';
 
 const SORRY_REPLY =
   "We couldn't draw that one — try something simpler next time 💛";
-const SORRY_DM =
-  "Hey! That one wasn't quite right for us. Want to try a simpler idea? Something like 'a sleeping puppy' or 'a smiling sunflower' usually works great ✨";
 
 type SlackInteractionPayload = {
   type: string;
@@ -144,14 +141,14 @@ async function handleReject(
     return;
   }
 
-  // Polite apology on the original comment + DM (IG only).
+  // Polite public reply on the original comment. We deliberately do NOT
+  // also send a Private Reply DM here — Private Replies are capped at one
+  // per comment and we reserve that single shot for the success path.
+  // A public "couldn't make that" reply is enough for a rejection.
   await Promise.allSettled([
     row.platform === 'INSTAGRAM'
       ? replyToComment(row.commentId, SORRY_REPLY)
       : replyToFacebookComment(row.commentId, SORRY_REPLY),
-    row.platform === 'INSTAGRAM'
-      ? sendTextDM(row.authorId, SORRY_DM)
-      : Promise.resolve(),
     db.socialCommentQueue.update({
       where: { id: queueRowId },
       data: {
