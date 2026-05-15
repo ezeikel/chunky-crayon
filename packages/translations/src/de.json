@@ -377,7 +377,8 @@
       "credentials": "Ungültige Anmeldedaten. Bitte prüfe deine E-Mail und versuche es erneut.",
       "sessionRequired": "Bitte melde dich an, um auf diese Seite zuzugreifen.",
       "default": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
-    }
+    },
+    "continueWithFacebook": "Mit Facebook fortfahren"
   },
   "errors": {
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",

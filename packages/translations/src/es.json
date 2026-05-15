@@ -377,7 +377,8 @@
       "credentials": "Credenciales no válidas. Revisa tu correo e inténtalo de nuevo.",
       "sessionRequired": "Inicia sesión para acceder a esta página.",
       "default": "Ocurrió un error inesperado. Inténtalo de nuevo."
-    }
+    },
+    "continueWithFacebook": "Continuar con Facebook"
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",

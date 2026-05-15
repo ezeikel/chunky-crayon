@@ -377,7 +377,8 @@
       "credentials": "정보가 올바르지 않습니다. 이메일을 확인하고 다시 시도해 주세요.",
       "sessionRequired": "이 페이지에 접근하려면 로그인해 주세요.",
       "default": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요."
-    }
+    },
+    "continueWithFacebook": "Facebook으로 계속하기"
   },
   "errors": {
     "generic": "문제가 발생했습니다. 다시 시도해 주세요.",

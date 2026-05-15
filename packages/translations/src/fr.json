@@ -377,7 +377,8 @@
       "credentials": "Identifiants invalides. Vérifiez votre e-mail et réessayez.",
       "sessionRequired": "Veuillez vous connecter pour accéder à cette page.",
       "default": "Une erreur inattendue s'est produite. Veuillez réessayer."
-    }
+    },
+    "continueWithFacebook": "Continuer avec Facebook"
   },
   "errors": {
     "generic": "Une erreur s’est produite. Veuillez réessayer.",
