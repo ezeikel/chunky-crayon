@@ -49,3 +49,10 @@ export const coveredTopicsQuery = `
 export const topicExistsQuery = `
   count(*[_type == "post" && sourceTopic == $topic]) > 0
 `;
+
+// Recent published posts for internal linking (topic clusters). Newest
+// first, capped — Claude picks 2-3 contextually relevant ones to link.
+export const recentPostsForLinkingQuery = `
+  *[_type == "post" && publishedAt < now() && !(_id in path("drafts.**"))]
+    | order(publishedAt desc)[0...20]{ title, "slug": slug.current }
+`;

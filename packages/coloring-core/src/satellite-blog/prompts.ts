@@ -41,17 +41,41 @@ Cross-link to Chunky Crayon:
 - Use it as a relevant aside, e.g. "${site.ccCtaHint}". Do NOT make the whole post about coloring; the host site is ${site.displayName}, not Chunky Crayon.
 - Format as standard markdown: [anchor text](${site.ccCtaUrl}).`;
 
-export const createSatelliteBlogPostPrompt = (
-  topic: string,
-  keywords: string[],
-  coveredTopics: string[] = [],
-) => `Write a comprehensive blog post about: "${topic}"
+export const createSatelliteBlogPostPrompt = (opts: {
+  topic: string;
+  keywords: string[];
+  coveredTopics?: string[];
+  /** {title, slug} of this site's other posts, for internal links. */
+  internalLinks?: { title: string; slug: string }[];
+  /** Optional SERP gist from dynamic discovery, to differentiate. */
+  serpGist?: string;
+}) => {
+  const {
+    topic,
+    keywords,
+    coveredTopics = [],
+    internalLinks = [],
+    serpGist,
+  } = opts;
+  return `Write a comprehensive blog post about: "${topic}"
 
 Target keywords to naturally include: ${keywords.join(", ")}
-
+${
+  serpGist
+    ? `\nWhat currently ranks for this and where it's weak (write something that fills this gap, don't just rehash): ${serpGist}`
+    : ""
+}
 ${
   coveredTopics.length > 0
-    ? `Topics we have already covered (do not repeat these): ${coveredTopics.slice(0, 20).join(", ")}`
+    ? `\nTopics we have already covered (do not repeat these): ${coveredTopics.slice(0, 20).join(", ")}`
+    : ""
+}
+${
+  internalLinks.length > 0
+    ? `\nInternal linking (IMPORTANT for SEO — topic clusters): link 2-3 of these existing posts naturally inside the body where contextually relevant, using descriptive anchor text (not "click here"). Use relative URLs /blog/<slug>. Only link ones that genuinely relate; do not force all of them.\n${internalLinks
+        .slice(0, 20)
+        .map((l) => `- /blog/${l.slug} — ${l.title}`)
+        .join("\n")}`
     : ""
 }
 
@@ -60,8 +84,10 @@ Requirements:
 - Include 3-5 H2 subheadings
 - Write in American English
 - Make it practical and actionable
+- ${internalLinks.length > 0 ? "Include 2-3 internal links to the relevant existing posts above (relative /blog/<slug> URLs, descriptive anchors)" : "No internal links yet (first posts on the site)"}
 - Include exactly ONE soft cross-link to Chunky Crayon as instructed in the system prompt
 - Format as clean markdown with proper heading hierarchy`;
+};
 
 export const createSatelliteBlogMetaSystem = (site: SatelliteSiteConfig) =>
   `You are an SEO expert who creates compelling blog post metadata for ${site.displayName}. Generate title, slug, and description that are optimized for search engines while remaining engaging for parent readers.

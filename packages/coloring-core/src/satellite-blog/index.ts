@@ -8,3 +8,10 @@ export {
   createSatelliteBlogImagePromptSystem,
   createSatelliteBlogImagePromptPrompt,
 } from "./prompts";
+export {
+  discoverTopic,
+  vetTopic,
+  resolveTopic,
+  CC_PROTECTED_KEYWORDS,
+} from "./topic-engine";
+export type { DiscoveredTopic, ResolvedTopic } from "./topic-engine";

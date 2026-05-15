@@ -154,6 +154,8 @@ const ROUTINECHARTS_CONFIG: SatelliteSiteConfig = {
   domain: "routinecharts.com",
   sanityDataset: "routinecharts",
   systemPromptBrandSection: `Routine Charts is a free tool that lets parents build and print custom routine charts for their kids. The site exists for parents, not for selling anything. Treat it as a no-bullshit utility: no upsells, no signups, no "premium" tier.`,
+  niche:
+    "printable routine charts, chore charts, and visual schedules for parents of young kids (ages 2-10) — morning/bedtime/after-school routines, behavior consistency, daily logistics",
   topics: ROUTINECHARTS_TOPICS,
   imageStylePrompt:
     "Modern flat illustration, calm pastel palette, simple shapes, no text. Soft warm-orange accent matching the Routine Charts brand. Editorial, parent-magazine aesthetic. Not childish, not corporate.",

@@ -22,7 +22,16 @@ export type SatelliteSiteConfig = {
   sanityDataset: string;
   /** Brand voice / SEO / tone instructions for the BLOG_POST_SYSTEM prompt. */
   systemPromptBrandSection: string;
-  /** Topic catalogue. */
+  /**
+   * One-line description of the site's content niche, used to steer the
+   * dynamic topic-discovery Perplexity search (e.g. "printable routine and
+   * chore charts for parents of young kids").
+   */
+  niche: string;
+  /**
+   * Static seed topics. Used as the fallback when dynamic discovery +
+   * jury vetting fails 3x in a run, so a post still ships that day.
+   */
   topics: SatelliteBlogTopic[];
   /** Featured-image style direction passed to gpt-image-2. */
   imageStylePrompt: string;

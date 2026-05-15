@@ -11,15 +11,16 @@ import {
   createSatelliteBlogImagePromptSystem,
   createSatelliteBlogImagePromptPrompt,
   getSatelliteSite,
+  resolveTopic,
   stripEmDashes,
   type SatelliteSiteConfig,
-  type SatelliteBlogTopic,
 } from "@one-colored-pixel/coloring-core";
 import {
   makeSatelliteReadClient,
   makeSatelliteWriteClient,
   coveredTopicsQuery,
   topicExistsQuery,
+  recentPostsForLinkingQuery,
 } from "./sanity.js";
 import { sendAdminAlert } from "../lib/email.js";
 import { revalidateSatellitePost } from "./revalidate.js";
@@ -54,13 +55,23 @@ async function isTopicCovered(
   }
 }
 
-function pickRandomUncoveredTopic(
-  site: SatelliteSiteConfig,
-  coveredTopics: string[],
-): SatelliteBlogTopic | null {
-  const uncovered = site.topics.filter((t) => !coveredTopics.includes(t.topic));
-  if (uncovered.length === 0) return null;
-  return uncovered[Math.floor(Math.random() * uncovered.length)] ?? null;
+type LinkablePost = { title: string; slug: string };
+
+async function getRecentPostsForLinking(
+  readClient: ReturnType<typeof makeSatelliteReadClient>,
+): Promise<LinkablePost[]> {
+  try {
+    const posts = await readClient.fetch<LinkablePost[]>(
+      recentPostsForLinkingQuery,
+    );
+    return (posts ?? []).filter((p) => p.title && p.slug);
+  } catch (err) {
+    console.error(
+      "[satellite-blog-cron] failed to fetch posts for internal linking:",
+      err,
+    );
+    return [];
+  }
 }
 
 async function generateMeta(
@@ -88,11 +99,19 @@ async function generateContent(
   topic: string,
   keywords: string[],
   coveredTopics: string[],
+  internalLinks: LinkablePost[],
+  serpGist: string | undefined,
 ) {
   const { output } = await generateText({
     model: claudeModel,
     system: createSatelliteBlogPostSystem(site),
-    prompt: createSatelliteBlogPostPrompt(topic, keywords, coveredTopics),
+    prompt: createSatelliteBlogPostPrompt({
+      topic,
+      keywords,
+      coveredTopics,
+      internalLinks,
+      serpGist,
+    }),
     output: Output.object({ schema: blogPostSchema }),
   });
   if (!output)
@@ -211,34 +230,50 @@ export async function runSatelliteBlogCron(siteSlug: string): Promise<void> {
 
   try {
     const coveredTopics = await getCoveredTopics(readClient);
-    const topic = pickRandomUncoveredTopic(site, coveredTopics);
 
-    if (!topic) {
-      const totalTopics = site.topics.length;
+    // Dynamic discovery (Perplexity) → jury vet → retry 3x → seed fallback.
+    const { resolved, attempts } = await resolveTopic(site, coveredTopics);
+
+    if (!resolved) {
       console.log(
-        `[satellite-blog-cron][${site.slug}] all ${totalTopics} topics covered, nothing to publish`,
+        `[satellite-blog-cron][${site.slug}] no topic resolved (dynamic failed ${attempts.length}x, seed list exhausted)`,
       );
       await sendAdminAlert({
-        subject: `${site.displayName}: Blog topic list exhausted`,
-        body: `The daily blog cron for ${site.displayName} ran but all ${totalTopics} topics in SATELLITE_SITES["${site.slug}"].topics have been covered.
+        subject: `${site.displayName}: No blog topic could be resolved`,
+        body: `The daily cron for ${site.displayName} could not resolve a topic.
 
-No new post was published today.
+Dynamic discovery + jury attempts:
+${attempts.join("\n") || "(none recorded)"}
 
-Next step: add new topics to packages/coloring-core/src/satellite-blog/sites.ts and redeploy the worker.`,
+The static seed list in SATELLITE_SITES["${site.slug}"].topics is also exhausted. No post published today. Add seed topics or check Perplexity/jury health.`,
       });
       return;
     }
 
+    if (resolved.source === "seed" && attempts.length > 0) {
+      console.warn(
+        `[satellite-blog-cron][${site.slug}] dynamic discovery failed ${attempts.length}x, fell back to seed topic`,
+      );
+      await sendAdminAlert({
+        subject: `${site.displayName}: fell back to seed topic`,
+        body: `Dynamic topic discovery failed its jury 3x today, so a static seed topic was used instead. A post still shipped. Attempts:\n\n${attempts.join("\n")}`,
+      });
+    }
+
+    const topic = { topic: resolved.topic, keywords: resolved.keywords };
+
     if (await isTopicCovered(readClient, topic.topic)) {
       console.log(
-        `[satellite-blog-cron][${site.slug}] topic already covered between fetch and pick: ${topic.topic}`,
+        `[satellite-blog-cron][${site.slug}] resolved topic already covered (race): ${topic.topic}`,
       );
       return;
     }
 
     console.log(
-      `[satellite-blog-cron][${site.slug}] generating post for topic: ${topic.topic}`,
+      `[satellite-blog-cron][${site.slug}] topic (${resolved.source}): ${topic.topic}`,
     );
+
+    const internalLinks = await getRecentPostsForLinking(readClient);
 
     const meta = await generateMeta(site, topic.topic, topic.keywords);
     console.log(`[satellite-blog-cron][${site.slug}] meta done: ${meta.title}`);
@@ -248,6 +283,8 @@ Next step: add new topics to packages/coloring-core/src/satellite-blog/sites.ts 
       topic.topic,
       topic.keywords,
       coveredTopics,
+      internalLinks,
+      resolved.serpGist,
     );
     console.log(
       `[satellite-blog-cron][${site.slug}] content done (${content.length} chars)`,

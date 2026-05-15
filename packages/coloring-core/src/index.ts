@@ -182,8 +182,17 @@ export {
   createSatelliteBlogMetaPrompt,
   createSatelliteBlogImagePromptSystem,
   createSatelliteBlogImagePromptPrompt,
+  discoverTopic,
+  vetTopic,
+  resolveTopic,
+  CC_PROTECTED_KEYWORDS,
 } from "./satellite-blog";
-export type { SatelliteSiteConfig, SatelliteBlogTopic } from "./satellite-blog";
+export type {
+  SatelliteSiteConfig,
+  SatelliteBlogTopic,
+  DiscoveredTopic,
+  ResolvedTopic,
+} from "./satellite-blog";
 export {
   getReferenceImages,
   REFERENCE_IMAGES,
