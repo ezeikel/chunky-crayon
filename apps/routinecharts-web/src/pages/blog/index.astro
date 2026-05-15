@@ -1,6 +1,6 @@
 ---
-export const prerender = true;
-
+// Server-rendered + ISR (see astro.config isr). Not prerendered so the
+// daily cron's new Sanity posts appear without a redeploy.
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { sanityClient, urlForImage } from "../../lib/sanity/client";
 import {

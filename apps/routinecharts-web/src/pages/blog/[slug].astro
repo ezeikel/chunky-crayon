@@ -1,19 +1,15 @@
 ---
-export const prerender = true;
-
+// Server-rendered + ISR (Vercel adapter isr config). NOT prerendered:
+// the daily cron writes new posts to Sanity after deploy, so build-time
+// getStaticPaths would never include them. Server-render matches any slug,
+// queries Sanity per request, 404s on miss. Vercel ISR caches each
+// response (expiration in astro.config) so Googlebot gets static-quality
+// HTML; the worker pings x-prerender-revalidate on publish for instant
+// freshness.
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { sanityClient, urlForImage } from "../../lib/sanity/client";
-import {
-  allPostSlugsQuery,
-  postBySlugQuery,
-  type PostFull,
-} from "../../lib/sanity/queries";
+import { postBySlugQuery, type PostFull } from "../../lib/sanity/queries";
 import { PortableText } from "../../components/PortableText";
-
-export async function getStaticPaths() {
-  const slugs = await sanityClient.fetch<string[]>(allPostSlugsQuery);
-  return (slugs ?? []).map((slug) => ({ params: { slug } }));
-}
 
 const { slug } = Astro.params;
 

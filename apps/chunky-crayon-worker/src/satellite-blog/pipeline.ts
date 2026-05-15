@@ -22,6 +22,7 @@ import {
   topicExistsQuery,
 } from "./sanity.js";
 import { sendAdminAlert } from "../lib/email.js";
+import { revalidateSatellitePost } from "./revalidate.js";
 import {
   generateSatelliteFeaturedImage,
   cleanupSatelliteBlogImage,
@@ -300,6 +301,10 @@ Next step: add new topics to packages/coloring-core/src/satellite-blog/sites.ts 
     if (tempFileName) {
       await cleanupSatelliteBlogImage(tempFileName);
     }
+
+    // Bust the ISR edge cache so the new post is crawlable immediately
+    // rather than at the next expiration window.
+    await revalidateSatellitePost(site.domain, meta.slug);
 
     console.log(
       `[satellite-blog-cron][${site.slug}] success: post id=${post._id} slug=${meta.slug} topic="${topic.topic}"`,
