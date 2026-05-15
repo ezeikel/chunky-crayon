@@ -1,0 +1,10 @@
+---
+// PostHog analytics — included once via BaseLayout.
+// Init lives in src/lib/analytics/posthog-client.ts. Tags every event with
+// `app: "routinecharts"` so we can build cross-site funnels alongside CC's
+// events in the shared PostHog project (110135).
+---
+
+<script>
+  import "../lib/analytics/posthog-client";
+</script>
