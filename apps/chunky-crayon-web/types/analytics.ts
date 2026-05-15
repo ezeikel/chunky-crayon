@@ -4,7 +4,7 @@ import { TRACKING_EVENTS } from '@/constants';
 export type TrackingEvent =
   (typeof TRACKING_EVENTS)[keyof typeof TRACKING_EVENTS];
 
-export type SignInMethod = 'google' | 'apple' | 'magic_link';
+export type SignInMethod = 'google' | 'apple' | 'facebook' | 'magic_link';
 
 /**
  * Type-safe event properties for each tracking event.

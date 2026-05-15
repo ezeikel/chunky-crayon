@@ -13,7 +13,8 @@ import {
   sendSignupConversionEvents,
 } from '@/lib/conversion-api';
 import { sendMagicLinkEmail } from '@/app/actions/email';
-import { ADMIN_EMAILS } from '@/constants';
+import { trackWithUser } from '@/utils/analytics-server';
+import { ADMIN_EMAILS, TRACKING_EVENTS } from '@/constants';
 
 // Bootstrap source for `User.role`: anyone whose email is in the
 // hardcoded ADMIN_EMAILS constant gets ADMIN on signin (and is demoted
@@ -154,6 +155,12 @@ const config = {
           console.error('[CAPI] signup conversion failed (google)', err);
         });
 
+        trackWithUser(created.id, TRACKING_EVENTS.AUTH_SIGN_UP_COMPLETED, {
+          method: 'google',
+        }).catch((err) => {
+          console.error('[PostHog] signup capture failed (google)', err);
+        });
+
         return true;
       }
 
@@ -214,6 +221,15 @@ const config = {
           );
         });
 
+        trackWithUser(created.id, TRACKING_EVENTS.AUTH_SIGN_UP_COMPLETED, {
+          method: account.provider,
+        }).catch((err) => {
+          console.error(
+            `[PostHog] signup capture failed (${account.provider})`,
+            err,
+          );
+        });
+
         return true;
       }
 
@@ -256,6 +272,12 @@ const config = {
           ...hints,
         }).catch((err) => {
           console.error('[CAPI] signup conversion failed (resend)', err);
+        });
+
+        trackWithUser(created.id, TRACKING_EVENTS.AUTH_SIGN_UP_COMPLETED, {
+          method: 'magic_link',
+        }).catch((err) => {
+          console.error('[PostHog] signup capture failed (resend)', err);
         });
 
         return true;
