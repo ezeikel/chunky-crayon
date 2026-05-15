@@ -4,7 +4,8 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -34,7 +35,13 @@ export const ChartBuilder = () => {
   const [error, setError] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    // Desktop: small drag distance to start.
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    // Touch: press-and-hold to drag so vertical scroll still works.
+    // 200ms delay + small tolerance is the dnd-kit touch recommendation.
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
