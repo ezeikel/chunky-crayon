@@ -1,0 +1,66 @@
+{
+  "name": "@one-colored-pixel/satellite-shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./config": {
+      "import": "./dist/config.js",
+      "types": "./dist/config.d.ts"
+    },
+    "./sanity": {
+      "import": "./dist/sanity/index.js",
+      "types": "./dist/sanity/index.d.ts"
+    },
+    "./analytics": {
+      "import": "./dist/analytics/index.js",
+      "types": "./dist/analytics/index.d.ts"
+    },
+    "./analytics/cc-link-tracking": {
+      "import": "./dist/analytics/cc-link-tracking.js",
+      "types": "./dist/analytics/cc-link-tracking.d.ts"
+    },
+    "./analytics/blog-view-tracking": {
+      "import": "./dist/analytics/blog-view-tracking.js",
+      "types": "./dist/analytics/blog-view-tracking.d.ts"
+    },
+    "./blog": {
+      "import": "./dist/blog/index.js",
+      "types": "./dist/blog/index.d.ts"
+    },
+    "./components/PortableText": {
+      "import": "./dist/components/PortableText.js",
+      "types": "./dist/components/PortableText.d.ts"
+    },
+    "./pdf/twemoji": {
+      "import": "./dist/pdf/twemoji.js",
+      "types": "./dist/pdf/twemoji.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf .turbo node_modules dist",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@portabletext/react": "^6.0.0",
+    "@sanity/client": "^7.13.2",
+    "@sanity/image-url": "^2.0.2",
+    "@twemoji/parser": "^17.0.1",
+    "@vercel/analytics": "^2.0.1",
+    "groq": "^5.1.0",
+    "posthog-js": "^1.205.0"
+  },
+  "peerDependencies": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "astro": "^6.3.2",
+    "typescript": "^5.7.0"
+  }
+}

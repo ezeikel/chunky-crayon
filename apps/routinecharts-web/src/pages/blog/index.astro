@@ -1,21 +1,17 @@
 ---
 // Server-rendered + ISR (see astro.config isr). Not prerendered so the
-// daily cron's new Sanity posts appear without a redeploy.
+// daily cron's new Sanity posts appear without a redeploy. Data fetch +
+// shaping live in the shared package; this is a thin presentational shell.
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { sanityClient, urlForImage } from "../../lib/sanity/client";
 import {
-  publishedPostsQuery,
-  type PostSummary,
-} from "../../lib/sanity/queries";
+  createSanityClient,
+  createUrlForImage,
+} from "@one-colored-pixel/satellite-shared/sanity";
+import { getBlogIndexData, formatDate } from "@one-colored-pixel/satellite-shared/blog";
+import { siteConfig } from "@/site.config";
 
-const posts = await sanityClient.fetch<PostSummary[]>(publishedPostsQuery);
-
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+const { posts } = await getBlogIndexData(siteConfig);
+const urlForImage = createUrlForImage(createSanityClient(siteConfig));
 ---
 
 <BaseLayout

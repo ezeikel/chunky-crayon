@@ -1,11 +1,20 @@
 import {
   PortableText as PortableTextRoot,
   type PortableTextComponents,
+  type PortableTextBlock,
 } from "@portabletext/react";
-import { urlForImage } from "../lib/sanity/client";
-import type { SanityImage } from "../lib/sanity/queries";
+import type { ImageUrlBuilder, SanityImageSource } from "../sanity/client";
+import type { SanityImage } from "../sanity/queries";
 
-const components: PortableTextComponents = {
+/**
+ * Renders Sanity Portable Text with Tailwind-styled components.
+ *
+ * `urlForImage` is injected (built via `createUrlForImage(client)` in the
+ * consuming app) so the package doesn't bake in a site's Sanity client.
+ */
+type UrlForImage = (source: SanityImageSource) => ImageUrlBuilder;
+
+const buildComponents = (urlForImage: UrlForImage): PortableTextComponents => ({
   block: {
     h2: ({ children }) => (
       <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-4 tracking-tight text-slate-900">
@@ -90,8 +99,17 @@ const components: PortableTextComponents = {
       );
     },
   },
-};
+});
 
-export const PortableText = ({ value }: { value: unknown[] }) => (
-  <PortableTextRoot value={value} components={components} />
+export const PortableText = ({
+  value,
+  urlForImage,
+}: {
+  value: unknown[];
+  urlForImage: UrlForImage;
+}) => (
+  <PortableTextRoot
+    value={value as PortableTextBlock[]}
+    components={buildComponents(urlForImage)}
+  />
 );

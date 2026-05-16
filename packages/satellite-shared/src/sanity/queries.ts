@@ -1,18 +1,17 @@
 import groq from "groq";
 
 /**
- * GROQ queries for routinecharts.com blog pages.
+ * GROQ query builders for satellite blog pages.
  *
  * Only returns published posts (drafts have `_id` starting with `drafts.`).
  * Filters by `siteSlug` defensively even though the dataset is per-site;
- * keeps the queries copy-paste-safe when we replicate to other satellites.
+ * keeps the queries copy-paste-safe across satellites. The slug is passed
+ * in rather than hardcoded so the package stays site-agnostic.
  */
 
-const SITE_SLUG = "routinecharts";
-
-export const publishedPostsQuery = groq`
+export const buildPublishedPostsQuery = (siteSlug: string) => groq`
   *[_type == "post"
-    && siteSlug == "${SITE_SLUG}"
+    && siteSlug == "${siteSlug}"
     && publishedAt < now()
     && !(_id in path("drafts.**"))
   ] | order(publishedAt desc) {
@@ -28,9 +27,9 @@ export const publishedPostsQuery = groq`
   }
 `;
 
-export const postBySlugQuery = groq`
+export const buildPostBySlugQuery = (siteSlug: string) => groq`
   *[_type == "post"
-    && siteSlug == "${SITE_SLUG}"
+    && siteSlug == "${siteSlug}"
     && slug.current == $slug
     && !(_id in path("drafts.**"))
   ][0] {
@@ -47,9 +46,9 @@ export const postBySlugQuery = groq`
   }
 `;
 
-export const allPostSlugsQuery = groq`
+export const buildAllPostSlugsQuery = (siteSlug: string) => groq`
   *[_type == "post"
-    && siteSlug == "${SITE_SLUG}"
+    && siteSlug == "${siteSlug}"
     && !(_id in path("drafts.**"))
   ].slug.current
 `;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { trackEvent } from "../../lib/analytics/events";
+import { trackEvent } from "@one-colored-pixel/satellite-shared/analytics";
 import {
   DndContext,
   closestCenter,

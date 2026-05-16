@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { ROUTINE_ICONS } from "./icons";
-import { trackEvent } from "../../lib/analytics/events";
+import { trackEvent } from "@one-colored-pixel/satellite-shared/analytics";
 
 const FullEmojiPicker = lazy(() => import("./FullEmojiPicker"));
 

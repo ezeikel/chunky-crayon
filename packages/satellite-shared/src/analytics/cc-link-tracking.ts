@@ -4,7 +4,8 @@ import { trackEvent } from "./events";
  * Auto-track every outbound click to chunkycrayon.com as `cc_cta_click`.
  * This is the funnel-critical conversion event for the whole satellite
  * strategy. Delegated listener so footer, blog CTA, and any future CC
- * link are covered without per-component wiring.
+ * link are covered without per-component wiring. Generic — reads the
+ * `data-cc-cta-location` attribute, no per-site config needed.
  */
 if (typeof document !== "undefined") {
   document.addEventListener(

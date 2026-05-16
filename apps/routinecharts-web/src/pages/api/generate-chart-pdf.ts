@@ -3,7 +3,7 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { createElement } from "react";
 import QRCode from "qrcode";
 import { ChartDocument, type ResolvedRow } from "../../lib/pdf/chartDocument";
-import { resolveEmojiToDataUrl } from "../../lib/pdf/twemoji";
+import { resolveEmojiToDataUrl } from "@one-colored-pixel/satellite-shared/pdf/twemoji";
 import type {
   ChartConfig,
   ChartRow,

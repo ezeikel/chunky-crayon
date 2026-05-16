@@ -5,28 +5,25 @@
 // queries Sanity per request, 404s on miss. Vercel ISR caches each
 // response (expiration in astro.config) so Googlebot gets static-quality
 // HTML; the worker pings x-prerender-revalidate on publish for instant
-// freshness.
+// freshness. Data fetch + shaping live in the shared package.
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { sanityClient, urlForImage } from "../../lib/sanity/client";
-import { postBySlugQuery, type PostFull } from "../../lib/sanity/queries";
-import { PortableText } from "../../components/PortableText";
+import {
+  createSanityClient,
+  createUrlForImage,
+} from "@one-colored-pixel/satellite-shared/sanity";
+import { getBlogPostData, formatDate } from "@one-colored-pixel/satellite-shared/blog";
+import { PortableText } from "@one-colored-pixel/satellite-shared/components/PortableText";
+import { siteConfig } from "@/site.config";
 
 const { slug } = Astro.params;
 
-const post = await sanityClient.fetch<PostFull | null>(postBySlugQuery, {
-  slug,
-});
+const { post } = await getBlogPostData(siteConfig, slug);
 
 if (!post) {
   return Astro.redirect("/blog");
 }
 
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+const urlForImage = createUrlForImage(createSanityClient(siteConfig));
 
 const heroSrc = post.heroImage?.asset
   ? urlForImage(post.heroImage).width(1600).fit("max").auto("format").url()
@@ -70,7 +67,7 @@ const heroSrc = post.heroImage?.asset
     )}
 
     <div class="prose-content">
-      <PortableText value={post.body} client:load={false} />
+      <PortableText value={post.body} urlForImage={urlForImage} client:load={false} />
     </div>
 
     <footer class="mt-16 pt-8 border-t border-slate-200">
