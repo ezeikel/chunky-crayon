@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/*
+ * Brand color is driven per-site by siteConfig.themeColor, applied as
+ * inline CSS vars on <html> in BaseLayout. These @theme tokens map the
+ * Tailwind `brand` color scale onto those vars so utility classes like
+ * text-brand / bg-brand-strong / bg-brand-tint render the site's color.
+ * Fallbacks here are routinecharts orange in case the inline vars are
+ * ever missing.
+ */
+@theme {
+  --color-brand: var(--brand, #f97316);
+  --color-brand-strong: var(--brand-strong, #ea580c);
+  --color-brand-dark: var(--brand-dark, #c2410c);
+  --color-brand-tint: var(--brand-tint, #fff7ed);
+  --color-brand-tint-border: var(--brand-tint-border, #ffedd5);
+  --font-sans:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+}
+
+html {
+  font-family: var(--font-sans);
+}

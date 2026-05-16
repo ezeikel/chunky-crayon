@@ -1,0 +1,61 @@
+---
+import "../styles/global.css";
+import PostHog from "../components/PostHog.astro";
+import { siteConfig } from "@/site.config";
+import { brandStyleVars } from "@one-colored-pixel/satellite-shared/config";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = siteConfig.tagline } = Astro.props;
+
+const ccFooterHref = `https://chunkycrayon.com/?utm_source=${siteConfig.ccUtmSource}&utm_medium=footer&utm_campaign=site_footer`;
+const toolLabel = siteConfig.navToolLabel ?? "Builder";
+const brandVars = brandStyleVars(siteConfig.themeColor);
+---
+
+<!doctype html>
+<html lang="en" style={brandVars}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <PostHog />
+  </head>
+  <body class="min-h-screen bg-white text-slate-900">
+    <header class="border-b border-slate-100">
+      <div
+        class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between"
+      >
+        <a href="/" class="font-bold text-slate-900 tracking-tight">
+          {siteConfig.name}
+        </a>
+        <nav class="flex items-center gap-6 text-sm">
+          <a href="/" class="text-slate-600 hover:text-brand">
+            {toolLabel}
+          </a>
+          <a href="/blog" class="text-slate-600 hover:text-brand">Blog</a>
+        </nav>
+      </div>
+    </header>
+    <slot />
+    <footer
+      class="border-t border-slate-200 mt-16 py-8 text-center text-sm text-slate-500"
+    >
+      <p>
+        From the makers of
+        <a
+          href={ccFooterHref}
+          class="text-brand hover:underline"
+          data-cc-cta-location="footer"
+        >
+          Chunky Crayon
+        </a>
+      </p>
+    </footer>
+  </body>
+</html>

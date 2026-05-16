@@ -1,0 +1,46 @@
+---
+export const prerender = true;
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { RoadKit } from "../components/RoadKit/RoadKit";
+---
+
+<BaseLayout title="Kids Road Kit | Free Printable Road Trip Activity Packs for Kids">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
+    <div class="text-center mb-8 sm:mb-10 md:mb-14">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-3 sm:mb-4">
+        A printable activity pack for the long drive.
+      </h1>
+      <p class="text-base sm:text-lg text-slate-600 max-w-xl mx-auto">
+        Pick the ages and trip length, print. No signup. No email. Free forever.
+      </p>
+    </div>
+
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-8 shadow-sm">
+      <RoadKit client:load />
+    </div>
+
+    <section class="mt-16 grid md:grid-cols-3 gap-6 text-sm">
+      <div>
+        <div class="text-2xl mb-2">🚗</div>
+        <h3 class="font-semibold text-slate-900 mb-1">Set the trip</h3>
+        <p class="text-slate-600">
+          Pick the kid ages and how long the drive is. We pick the games.
+        </p>
+      </div>
+      <div>
+        <div class="text-2xl mb-2">🖨️</div>
+        <h3 class="font-semibold text-slate-900 mb-1">Print at home</h3>
+        <p class="text-slate-600">
+          A4 / Letter, fits any printer. Longer trips get more pages.
+        </p>
+      </div>
+      <div>
+        <div class="text-2xl mb-2">🎨</div>
+        <h3 class="font-semibold text-slate-900 mb-1">A built-in quiet page</h3>
+        <p class="text-slate-600">
+          Every pack includes a coloring and doodle page from Chunky Crayon.
+        </p>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

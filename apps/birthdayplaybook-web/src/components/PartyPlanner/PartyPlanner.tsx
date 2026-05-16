@@ -12,7 +12,7 @@ import {
 // Shared mobile-first input styling. text-base (16px) prevents iOS zoom on
 // focus; min-h-[44px] keeps every control above the 44px touch target.
 const FIELD_CLASS =
-  "w-full min-h-[44px] px-3 py-2.5 text-base bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-400";
+  "w-full min-h-[44px] px-3 py-2.5 text-base bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand";
 
 const LABEL_CLASS =
   "text-xs font-medium uppercase tracking-wide text-slate-500 mb-1.5 block";
@@ -86,8 +86,8 @@ export const PartyPlanner = () => {
                 }
                 className={`min-h-[44px] flex items-center justify-center gap-1.5 px-2 py-2.5 text-sm font-semibold rounded-xl border-2 transition-colors ${
                   selected
-                    ? "border-pink-400 bg-pink-50 text-pink-700"
-                    : "border-slate-200 bg-white text-slate-600 hover:border-pink-200"
+                    ? "border-brand bg-brand-tint text-brand-strong"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-brand-tint-border"
                 }`}
                 aria-pressed={selected}
               >
@@ -203,7 +203,7 @@ export const PartyPlanner = () => {
                   key={station}
                   className="flex items-start gap-2 text-sm text-slate-700"
                 >
-                  <span className="font-semibold text-pink-600 shrink-0">
+                  <span className="font-semibold text-brand shrink-0">
                     {index + 1}.
                   </span>
                   <span>{station}</span>
@@ -224,7 +224,7 @@ export const PartyPlanner = () => {
           type="button"
           onClick={generatePdf}
           disabled={isGenerating}
-          className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all"
+          className="w-full bg-brand hover:bg-brand-strong disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all"
         >
           {isGenerating ? "Generating PDF..." : "Download printable party plan"}
         </button>

@@ -159,7 +159,7 @@ export const StickerChart = () => {
           type="button"
           onClick={generatePdf}
           disabled={isGenerating}
-          className="w-full bg-brand-tint0 hover:bg-brand-strong disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all"
+          className="w-full bg-brand hover:bg-brand-strong disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all"
         >
           {isGenerating ? "Generating PDF..." : "Download printable chart"}
         </button>

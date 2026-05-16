@@ -1,0 +1,84 @@
+---
+// Server-rendered + ISR (see astro.config isr). Not prerendered so the
+// daily cron's new Sanity posts appear without a redeploy. Data fetch +
+// shaping live in the shared package; this is a thin presentational shell.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  createSanityClient,
+  createUrlForImage,
+} from "@one-colored-pixel/satellite-shared/sanity";
+import { getBlogIndexData, formatDate } from "@one-colored-pixel/satellite-shared/blog";
+import { siteConfig } from "@/site.config";
+
+const { posts } = await getBlogIndexData(siteConfig);
+const urlForImage = createUrlForImage(createSanityClient(siteConfig));
+---
+
+<BaseLayout
+  title="Kids Road Kit Blog | Road trips that stay calm"
+  description="Practical, no-fluff advice for parents facing the long drive. Screen-free games, car snacks, packing lists: honest writing for parents in the thick of it."
+>
+  <main class="max-w-3xl mx-auto px-6 py-12 md:py-16">
+    <header class="mb-12 md:mb-16">
+      <p class="text-xs uppercase tracking-wide font-semibold text-brand mb-2">
+        The Kids Road Kit blog
+      </p>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4">
+        Long drives that do not end in tears.
+      </h1>
+      <p class="text-lg text-slate-600">
+        Short reads on car games, screen-free travel, and the daily logistics
+        of taking small humans on the road.
+      </p>
+    </header>
+
+    {posts.length === 0 ? (
+      <div class="border border-dashed border-slate-300 rounded-2xl p-10 text-center">
+        <p class="text-slate-500">
+          New posts coming soon. Check back tomorrow.
+        </p>
+      </div>
+    ) : (
+      <ul class="space-y-12">
+        {posts.map((post) => {
+          const imageSrc = post.heroImage?.asset
+            ? urlForImage(post.heroImage)
+                .width(1200)
+                .fit("max")
+                .auto("format")
+                .url()
+            : null;
+          return (
+            <li>
+              <a
+                href={`/blog/${post.slug}`}
+                class="block group"
+              >
+                {imageSrc && (
+                  <img
+                    src={imageSrc}
+                    alt={post.heroImage?.alt ?? post.title}
+                    class="w-full rounded-2xl mb-5 aspect-[3/2] object-cover bg-slate-100"
+                    loading="lazy"
+                  />
+                )}
+                <p class="text-xs uppercase tracking-wide font-medium text-slate-500 mb-2">
+                  {formatDate(post.publishedAt)}
+                </p>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 group-hover:text-brand transition-colors mb-3 tracking-tight">
+                  {post.title}
+                </h2>
+                <p class="text-base text-slate-600 leading-relaxed">
+                  {post.excerpt}
+                </p>
+                <span class="inline-block mt-4 text-sm font-semibold text-brand group-hover:text-brand-strong">
+                  Read more →
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    )}
+  </main>
+</BaseLayout>
