@@ -1,0 +1,91 @@
+---
+// Server-rendered + ISR (Vercel adapter isr config). NOT prerendered:
+// the daily cron writes new posts to Sanity after deploy, so build-time
+// getStaticPaths would never include them. Server-render matches any slug,
+// queries Sanity per request, 404s on miss. Vercel ISR caches each
+// response (expiration in astro.config) so Googlebot gets static-quality
+// HTML; the worker pings x-prerender-revalidate on publish for instant
+// freshness. Data fetch + shaping live in the shared package.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  createSanityClient,
+  createUrlForImage,
+} from "@one-colored-pixel/satellite-shared/sanity";
+import { getBlogPostData, formatDate } from "@one-colored-pixel/satellite-shared/blog";
+import { PortableText } from "@one-colored-pixel/satellite-shared/components/PortableText";
+import { siteConfig } from "@/site.config";
+
+const { slug } = Astro.params;
+
+const { post } = await getBlogPostData(siteConfig, slug);
+
+if (!post) {
+  return Astro.redirect("/blog");
+}
+
+const urlForImage = createUrlForImage(createSanityClient(siteConfig));
+
+const heroSrc = post.heroImage?.asset
+  ? urlForImage(post.heroImage).width(1600).fit("max").auto("format").url()
+  : null;
+---
+
+<BaseLayout title={`${post.title} | Sticker Chart Maker`} description={post.excerpt}>
+  <article
+    class="max-w-2xl mx-auto px-6 py-12 md:py-16"
+    data-blog-slug={post.slug}
+    data-blog-title={post.title}
+  >
+    <nav class="mb-8">
+      <a
+        href="/blog"
+        class="text-sm font-medium text-slate-500 hover:text-orange-600"
+      >
+        ← Back to blog
+      </a>
+    </nav>
+
+    <header class="mb-10">
+      <p class="text-xs uppercase tracking-wide font-medium text-slate-500 mb-3">
+        {formatDate(post.publishedAt)}
+      </p>
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 mb-5 leading-tight">
+        {post.title}
+      </h1>
+      <p class="text-lg md:text-xl text-slate-600 leading-relaxed">
+        {post.excerpt}
+      </p>
+    </header>
+
+    {heroSrc && (
+      <img
+        src={heroSrc}
+        alt={post.heroImage?.alt ?? post.title}
+        class="w-full rounded-2xl mb-12 bg-slate-100"
+        loading="eager"
+      />
+    )}
+
+    <div class="prose-content">
+      <PortableText value={post.body} urlForImage={urlForImage} client:load={false} />
+    </div>
+
+    <footer class="mt-16 pt-8 border-t border-slate-200">
+      <div class="bg-orange-50 border border-orange-100 rounded-2xl p-6 md:p-8">
+        <h2 class="text-xl font-bold text-slate-900 mb-2">
+          Make a sticker chart for free
+        </h2>
+        <p class="text-slate-600 mb-4">
+          Set a goal, pick the slots, print. Includes a coloring page reward
+          from Chunky Crayon when the chart is full.
+        </p>
+        <a
+          href="/"
+          class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold px-5 py-2.5 rounded-lg"
+        >
+          Make my chart →
+        </a>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>

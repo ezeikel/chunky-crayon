@@ -165,8 +165,98 @@ const ROUTINECHARTS_CONFIG: SatelliteSiteConfig = {
     "When a routine is done, a free coloring page from Chunky Crayon is a nice reward",
 };
 
+const STICKERCHARTMAKER_SEED_TOPICS: SatelliteBlogTopic[] = [
+  {
+    topic: "Sticker charts vs reward charts: which actually changes behavior",
+    keywords: [
+      "sticker chart",
+      "reward chart",
+      "behavior chart for kids",
+      "do sticker charts work",
+    ],
+  },
+  {
+    topic: "How many days should a sticker chart run before the reward?",
+    keywords: [
+      "sticker chart length",
+      "reward chart days",
+      "how long sticker chart",
+    ],
+  },
+  {
+    topic: "What to do when the sticker chart stops working",
+    keywords: [
+      "sticker chart not working",
+      "reward chart failing",
+      "kid bored of sticker chart",
+    ],
+  },
+  {
+    topic: "Sticker chart ideas for potty training that don't backfire",
+    keywords: [
+      "potty training sticker chart",
+      "potty reward chart",
+      "potty training rewards",
+    ],
+  },
+  {
+    topic: "Age-appropriate rewards for a kids' sticker chart (no toys needed)",
+    keywords: [
+      "sticker chart reward ideas",
+      "non-toy rewards kids",
+      "reward chart prizes",
+    ],
+  },
+  {
+    topic: "One sticker chart for siblings: how to make it fair",
+    keywords: [
+      "sibling sticker chart",
+      "reward chart multiple kids",
+      "fair reward system siblings",
+    ],
+  },
+  {
+    topic: "Sticker charts for bedtime: getting kids to stay in their room",
+    keywords: [
+      "bedtime sticker chart",
+      "stay in bed reward chart",
+      "sleep reward chart kids",
+    ],
+  },
+  {
+    topic: "Why experts are split on reward charts, and when to use one anyway",
+    keywords: [
+      "are reward charts good",
+      "sticker chart psychology",
+      "reward chart pros cons",
+    ],
+  },
+];
+
+const STICKERCHARTMAKER_CONFIG: SatelliteSiteConfig = {
+  slug: "stickerchartmaker",
+  displayName: "Sticker Chart Maker",
+  domain: "stickerchartmaker.com",
+  // SHARED dataset across all satellites (Sanity free tier caps datasets).
+  // Partitioning is by the `siteSlug` field on every post, enforced in
+  // every GROQ query. Dataset name is "routinecharts" for historical
+  // reasons (first site) but holds ALL sites' posts — not site-specific.
+  sanityDataset: "routinecharts",
+  systemPromptBrandSection: `Sticker Chart Maker is a free tool that lets parents build and print custom sticker/reward charts for their kids. It exists for parents, no upsells, no signups, no premium tier. Tone leans encouraging and positive-reinforcement-aware, but honest about when reward charts don't work.`,
+  niche:
+    "printable sticker charts and reward charts for parents of young kids (ages 2-9) — potty training, bedtime, behavior goals, positive reinforcement, motivation",
+  topics: STICKERCHARTMAKER_SEED_TOPICS,
+  imageStylePrompt:
+    "Modern flat illustration, cheerful but not garish palette with a friendly gold/amber accent, simple shapes, no text. Encouraging, parent-magazine aesthetic. Not childish, not corporate.",
+  ccCtaUrl:
+    "https://chunkycrayon.com/?utm_source=stickerchartmaker&utm_medium=blog&utm_campaign=blog_post",
+  ccCtaHint:
+    "A free coloring page from Chunky Crayon makes a nice no-cost reward when the chart is full",
+};
+
 export const SATELLITE_SITES: Record<string, SatelliteSiteConfig> = {
   [ROUTINECHARTS_CONFIG.slug]: ROUTINECHARTS_CONFIG,
+  [STICKERCHARTMAKER_CONFIG.slug]: STICKERCHARTMAKER_CONFIG,
 };
 
 export const getSatelliteSite = (slug: string): SatelliteSiteConfig | null =>
