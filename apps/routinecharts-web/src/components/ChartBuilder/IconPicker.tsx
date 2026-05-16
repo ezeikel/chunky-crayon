@@ -48,7 +48,7 @@ export const IconPicker = ({ value, onChange }: Props) => {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="w-12 h-12 flex items-center justify-center text-3xl bg-white border border-slate-200 hover:border-orange-400 rounded-lg transition-colors"
+        className="w-12 h-12 flex items-center justify-center text-3xl bg-white border border-slate-200 hover:border-brand rounded-lg transition-colors"
         aria-label="Change icon"
         aria-expanded={isOpen}
       >
@@ -64,9 +64,9 @@ export const IconPicker = ({ value, onChange }: Props) => {
                     key={icon.emoji}
                     type="button"
                     onClick={() => handlePick(icon.emoji)}
-                    className={`w-10 h-10 flex items-center justify-center text-2xl rounded-lg hover:bg-orange-50 transition-colors ${
+                    className={`w-10 h-10 flex items-center justify-center text-2xl rounded-lg hover:bg-brand-tint transition-colors ${
                       icon.emoji === value
-                        ? "bg-orange-100 ring-2 ring-orange-400"
+                        ? "bg-brand-tint ring-2 ring-brand"
                         : ""
                     }`}
                     title={icon.label}
@@ -82,7 +82,7 @@ export const IconPicker = ({ value, onChange }: Props) => {
                   setMode("full");
                   trackEvent("browse_all_emoji_opened");
                 }}
-                className="w-full mt-2 py-2 text-xs font-medium text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                className="w-full mt-2 py-2 text-xs font-medium text-slate-500 hover:text-brand hover:bg-brand-tint rounded-lg transition-colors"
               >
                 Browse all emoji
               </button>

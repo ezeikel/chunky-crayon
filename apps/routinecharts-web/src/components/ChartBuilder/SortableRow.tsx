@@ -65,7 +65,7 @@ export const SortableRow = ({ row, onChange, onRemove }: Props) => {
             onChange={(event) =>
               onChange(row.id, { label: event.target.value })
             }
-            className="flex-1 min-w-0 px-3 py-2.5 text-base bg-transparent border-0 focus:outline-none focus:ring-2 focus:ring-orange-300 rounded-lg font-medium"
+            className="flex-1 min-w-0 px-3 py-2.5 text-base bg-transparent border-0 focus:outline-none focus:ring-2 focus:ring-brand rounded-lg font-medium"
             placeholder="What's the activity?"
           />
         </div>
@@ -77,7 +77,7 @@ export const SortableRow = ({ row, onChange, onRemove }: Props) => {
           }
           step={300}
           aria-label="Time"
-          className="w-full sm:w-32 min-h-[44px] px-3 py-2.5 text-base text-slate-700 bg-slate-50 border-0 focus:outline-none focus:ring-2 focus:ring-orange-300 rounded-lg"
+          className="w-full sm:w-32 min-h-[44px] px-3 py-2.5 text-base text-slate-700 bg-slate-50 border-0 focus:outline-none focus:ring-2 focus:ring-brand rounded-lg"
         />
       </div>
 

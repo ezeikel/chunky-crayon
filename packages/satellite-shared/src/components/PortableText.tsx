@@ -37,7 +37,7 @@ const buildComponents = (urlForImage: UrlForImage): PortableTextComponents => ({
       </p>
     ),
     blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-orange-400 pl-4 italic my-6 text-slate-700">
+      <blockquote className="border-l-4 border-brand pl-4 italic my-6 text-slate-700">
         {children}
       </blockquote>
     ),
@@ -69,7 +69,7 @@ const buildComponents = (urlForImage: UrlForImage): PortableTextComponents => ({
       return (
         <a
           href={href}
-          className="text-orange-600 underline hover:text-orange-700"
+          className="text-brand underline hover:text-brand-strong"
           {...(isExternal
             ? { rel: "noopener noreferrer", target: "_blank" }
             : {})}

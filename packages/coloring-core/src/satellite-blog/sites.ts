@@ -254,9 +254,260 @@ const STICKERCHARTMAKER_CONFIG: SatelliteSiteConfig = {
     "A free coloring page from Chunky Crayon makes a nice no-cost reward when the chart is full",
 };
 
+const BOREDOMWHEEL_SEED_TOPICS: SatelliteBlogTopic[] = [
+  {
+    topic: "Screen-free things to do with a bored 5-year-old in 5 minutes",
+    keywords: [
+      "bored kid activities",
+      "screen free activities",
+      "quick kids activities",
+    ],
+  },
+  {
+    topic: "Rainy day activities for kids that need zero prep",
+    keywords: [
+      "rainy day activities kids",
+      "indoor activities no supplies",
+      "boredom busters",
+    ],
+  },
+  {
+    topic: "What to do when your kid says 'I'm bored' for the tenth time",
+    keywords: [
+      "kid always bored",
+      "im bored kids",
+      "handling boredom children",
+    ],
+  },
+  {
+    topic: "Why boredom is actually good for kids (and how to lean into it)",
+    keywords: [
+      "boredom good for kids",
+      "benefits of boredom children",
+      "let kids be bored",
+    ],
+  },
+  {
+    topic: "Indoor activities for high-energy kids stuck inside",
+    keywords: [
+      "high energy kids indoors",
+      "active indoor games",
+      "burn energy indoors kids",
+    ],
+  },
+  {
+    topic: "Solo play ideas that actually keep a 4-year-old busy",
+    keywords: [
+      "independent play ideas",
+      "solo play toddler",
+      "keep kid busy alone",
+    ],
+  },
+  {
+    topic: "Activities for two kids who fight when they're bored",
+    keywords: [
+      "sibling boredom activities",
+      "stop kids fighting bored",
+      "activities for siblings",
+    ],
+  },
+  {
+    topic: "5-minute boredom busters for the witching hour before dinner",
+    keywords: [
+      "witching hour kids",
+      "before dinner activities",
+      "5pm meltdown activities",
+    ],
+  },
+];
+
+const BOREDOMWHEEL_CONFIG: SatelliteSiteConfig = {
+  slug: "boredomwheel",
+  displayName: "Boredom Wheel",
+  domain: "boredomwheel.com",
+  sanityDataset: "routinecharts",
+  systemPromptBrandSection: `Boredom Wheel is a free spin-the-wheel tool that gives parents an instant screen-free activity idea for a bored kid. It exists for parents, no upsells, no signups. Tone is quick, energetic, and rescue-mode empathetic — the parent is frazzled and needs an idea NOW.`,
+  niche:
+    "screen-free boredom-buster activities for parents of young kids (ages 2-10) — rainy days, indoor play, quick no-prep activities, independent play, sibling activities",
+  topics: BOREDOMWHEEL_SEED_TOPICS,
+  imageStylePrompt:
+    "Modern flat illustration, playful energetic palette with a bright teal/cyan accent, simple shapes, no text. Lively, parent-magazine aesthetic. Not childish, not corporate.",
+  ccCtaUrl:
+    "https://chunkycrayon.com/?utm_source=boredomwheel&utm_medium=blog&utm_campaign=blog_post",
+  ccCtaHint:
+    "Coloring is one reliable boredom-buster — a free Chunky Crayon page buys you ten quiet minutes",
+};
+
+const BIRTHDAYPLAYBOOK_SEED_TOPICS: SatelliteBlogTopic[] = [
+  {
+    topic: "A realistic timeline for planning a kid's birthday party",
+    keywords: [
+      "kids party planning timeline",
+      "how to plan birthday party",
+      "party planning checklist",
+    ],
+  },
+  {
+    topic: "Low-budget kids party ideas that don't look low-budget",
+    keywords: [
+      "cheap kids party ideas",
+      "budget birthday party",
+      "affordable party kids",
+    ],
+  },
+  {
+    topic: "How many kids should you invite to a birthday party by age",
+    keywords: [
+      "how many kids invite party",
+      "birthday party guest list",
+      "party size by age",
+    ],
+  },
+  {
+    topic: "Party games for 4-year-olds that actually work",
+    keywords: [
+      "party games 4 year olds",
+      "toddler party games",
+      "birthday games young kids",
+    ],
+  },
+  {
+    topic: "What to do when no one RSVPs to your kid's party",
+    keywords: [
+      "no rsvp kids party",
+      "party rsvp problems",
+      "low party turnout",
+    ],
+  },
+  {
+    topic: "A no-stress birthday party plan for an introverted kid",
+    keywords: [
+      "introverted kid party",
+      "small birthday party ideas",
+      "low key kids party",
+    ],
+  },
+  {
+    topic: "The 2-hour party schedule that prevents meltdowns",
+    keywords: [
+      "kids party schedule",
+      "party timeline kids",
+      "birthday party flow",
+    ],
+  },
+  {
+    topic: "DIY party activities that keep kids busy without a entertainer",
+    keywords: [
+      "diy party activities",
+      "party activities no entertainer",
+      "self run party games",
+    ],
+  },
+];
+
+const BIRTHDAYPLAYBOOK_CONFIG: SatelliteSiteConfig = {
+  slug: "birthdayplaybook",
+  displayName: "Birthday Playbook",
+  domain: "birthdayplaybook.com",
+  sanityDataset: "routinecharts",
+  systemPromptBrandSection: `Birthday Playbook is a free tool that gives parents a printable kid's-party plan (checklist, invite wording, activity ideas) from a chosen theme. It exists for parents, no upsells, no signups. Tone is calm and confidence-building — party planning is overwhelming and the parent needs a clear plan.`,
+  niche:
+    "kids' birthday party planning for parents (kids ages 1-12) — themes, checklists, invitations, party games, timelines, budgets, activities",
+  topics: BIRTHDAYPLAYBOOK_SEED_TOPICS,
+  imageStylePrompt:
+    "Modern flat illustration, festive but tasteful palette with a confetti-pink/magenta accent, simple shapes, no text. Celebratory, parent-magazine aesthetic. Not childish, not corporate.",
+  ccCtaUrl:
+    "https://chunkycrayon.com/?utm_source=birthdayplaybook&utm_medium=blog&utm_campaign=blog_post",
+  ccCtaHint:
+    "Themed coloring sheets from Chunky Crayon make an easy party activity station",
+};
+
+const KIDSROADKIT_SEED_TOPICS: SatelliteBlogTopic[] = [
+  {
+    topic: "Road trip activities for toddlers that survive a 6-hour drive",
+    keywords: [
+      "road trip activities toddlers",
+      "long car ride toddler",
+      "car activities young kids",
+    ],
+  },
+  {
+    topic: "Screen-free car activities for kids who get carsick reading",
+    keywords: [
+      "carsick kids activities",
+      "screen free car games",
+      "no reading car activities",
+    ],
+  },
+  {
+    topic: "How to pack a road trip activity bag that actually gets used",
+    keywords: ["road trip bag kids", "car activity kit", "travel activity bag"],
+  },
+  {
+    topic: "Car games for kids that don't need anything but talking",
+    keywords: [
+      "no equipment car games",
+      "verbal car games kids",
+      "talking road trip games",
+    ],
+  },
+  {
+    topic: "Road trip plan for kids by age: what works at 3, 6, and 9",
+    keywords: [
+      "road trip by age",
+      "age appropriate travel activities",
+      "car activities by age",
+    ],
+  },
+  {
+    topic: "Surviving a flight with a 2-year-old: a realistic kit list",
+    keywords: [
+      "flight with toddler",
+      "plane activities toddler",
+      "travel kit 2 year old",
+    ],
+  },
+  {
+    topic: "How often should you stop on a road trip with young kids",
+    keywords: [
+      "road trip stops kids",
+      "how often stop driving kids",
+      "road trip breaks children",
+    ],
+  },
+  {
+    topic: "Printable road trip games that need zero prep at a rest stop",
+    keywords: [
+      "printable road trip games",
+      "travel bingo printable",
+      "car scavenger hunt kids",
+    ],
+  },
+];
+
+const KIDSROADKIT_CONFIG: SatelliteSiteConfig = {
+  slug: "kidsroadkit",
+  displayName: "Kids Road Kit",
+  domain: "kidsroadkit.com",
+  sanityDataset: "routinecharts",
+  systemPromptBrandSection: `Kids Road Kit is a free tool that generates a printable road-trip activity pack (bingo, scavenger hunts, games) by kid age and trip length. It exists for parents, no upsells, no signups. Tone is survival-mode empathetic — the parent is facing hours in a car with restless kids.`,
+  niche:
+    "road trip and travel activities for parents of young kids (ages 2-10) — car games, printable travel packs, packing, screen-free travel, flights, trip logistics",
+  topics: KIDSROADKIT_SEED_TOPICS,
+  imageStylePrompt:
+    "Modern flat illustration, road-trip palette with a sky-blue/sunshine accent, simple shapes, no text. Adventurous but calm, parent-magazine aesthetic. Not childish, not corporate.",
+  ccCtaUrl:
+    "https://chunkycrayon.com/?utm_source=kidsroadkit&utm_medium=blog&utm_campaign=blog_post",
+  ccCtaHint:
+    "Printable coloring pages from Chunky Crayon are a quiet, mess-light car activity",
+};
+
 export const SATELLITE_SITES: Record<string, SatelliteSiteConfig> = {
   [ROUTINECHARTS_CONFIG.slug]: ROUTINECHARTS_CONFIG,
   [STICKERCHARTMAKER_CONFIG.slug]: STICKERCHARTMAKER_CONFIG,
+  [BOREDOMWHEEL_CONFIG.slug]: BOREDOMWHEEL_CONFIG,
+  [BIRTHDAYPLAYBOOK_CONFIG.slug]: BIRTHDAYPLAYBOOK_CONFIG,
+  [KIDSROADKIT_CONFIG.slug]: KIDSROADKIT_CONFIG,
 };
 
 export const getSatelliteSite = (slug: string): SatelliteSiteConfig | null =>

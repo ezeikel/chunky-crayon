@@ -1,0 +1,50 @@
+---
+export const prerender = true;
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { BoredomWheel } from "../components/BoredomWheel/BoredomWheel";
+---
+
+<BaseLayout title="Boredom Wheel | Free Spin-the-Wheel of Screen-Free Activities for Kids">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16">
+    <div class="text-center mb-8 sm:mb-10 md:mb-14">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-3 sm:mb-4">
+        Spin it. Do it. Beat the boredom.
+      </h1>
+      <p class="text-base sm:text-lg text-slate-600 max-w-xl mx-auto">
+        Your kid just said they're bored. Tap spin, get a screen-free idea. No
+        signup. No email. Free forever.
+      </p>
+    </div>
+
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-8 shadow-sm">
+      <BoredomWheel client:load />
+    </div>
+
+    <section class="mt-16 grid md:grid-cols-3 gap-6 text-sm">
+      <div>
+        <div class="text-2xl mb-2">🎡</div>
+        <h3 class="font-semibold text-slate-900 mb-1">Tap spin</h3>
+        <p class="text-slate-600">
+          One tap lands on a no-prep, screen-free activity. No thinking
+          required from you.
+        </p>
+      </div>
+      <div>
+        <div class="text-2xl mb-2">🎚️</div>
+        <h3 class="font-semibold text-slate-900 mb-1">Tune it to your kid</h3>
+        <p class="text-slate-600">
+          Filter by age, hide anything that needs supplies, or add your own
+          family favorites.
+        </p>
+      </div>
+      <div>
+        <div class="text-2xl mb-2">🙌</div>
+        <h3 class="font-semibold text-slate-900 mb-1">Send them off</h3>
+        <p class="text-slate-600">
+          They get busy, you get ten minutes. Spin again whenever boredom
+          strikes back.
+        </p>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

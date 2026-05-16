@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import PostHog from "../components/PostHog.astro";
 import { siteConfig } from "@/site.config";
+import { brandStyleVars } from "@one-colored-pixel/satellite-shared/config";
 
 interface Props {
   title: string;
@@ -12,10 +13,11 @@ const { title, description = siteConfig.tagline } = Astro.props;
 
 const ccFooterHref = `https://chunkycrayon.com/?utm_source=${siteConfig.ccUtmSource}&utm_medium=footer&utm_campaign=site_footer`;
 const toolLabel = siteConfig.navToolLabel ?? "Builder";
+const brandVars = brandStyleVars(siteConfig.themeColor);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" style={brandVars}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -33,10 +35,10 @@ const toolLabel = siteConfig.navToolLabel ?? "Builder";
           {siteConfig.name}
         </a>
         <nav class="flex items-center gap-6 text-sm">
-          <a href="/" class="text-slate-600 hover:text-orange-600">
+          <a href="/" class="text-slate-600 hover:text-brand">
             {toolLabel}
           </a>
-          <a href="/blog" class="text-slate-600 hover:text-orange-600">Blog</a>
+          <a href="/blog" class="text-slate-600 hover:text-brand">Blog</a>
         </nav>
       </div>
     </header>
@@ -48,7 +50,7 @@ const toolLabel = siteConfig.navToolLabel ?? "Builder";
         From the makers of
         <a
           href={ccFooterHref}
-          class="text-orange-600 hover:underline"
+          class="text-brand hover:underline"
           data-cc-cta-location="footer"
         >
           Chunky Crayon

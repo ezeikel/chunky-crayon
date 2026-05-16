@@ -11,7 +11,7 @@ const FullEmojiPicker = ({ onPick, onBack }: Props) => (
     <button
       type="button"
       onClick={onBack}
-      className="mb-2 px-2 py-1 text-xs font-medium text-slate-500 hover:text-orange-600"
+      className="mb-2 px-2 py-1 text-xs font-medium text-slate-500 hover:text-brand"
     >
       ← Back to quick picks
     </button>

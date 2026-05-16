@@ -126,7 +126,7 @@ export const ChartBuilder = () => {
             onChange={(event) =>
               setConfig((prev) => ({ ...prev, childName: event.target.value }))
             }
-            className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400"
+            className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand"
             placeholder="Optional"
           />
         </label>
@@ -140,7 +140,7 @@ export const ChartBuilder = () => {
             onChange={(event) =>
               setConfig((prev) => ({ ...prev, title: event.target.value }))
             }
-            className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400"
+            className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand"
           />
         </label>
       </div>
@@ -170,7 +170,7 @@ export const ChartBuilder = () => {
       <button
         type="button"
         onClick={addRow}
-        className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-slate-500 hover:text-orange-600 hover:bg-orange-50 rounded-xl transition-colors"
+        className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-slate-500 hover:text-brand hover:bg-brand-tint rounded-xl transition-colors"
       >
         <span className="text-lg leading-none">+</span> Add activity
       </button>
@@ -185,7 +185,7 @@ export const ChartBuilder = () => {
           type="button"
           onClick={generatePdf}
           disabled={isGenerating || config.rows.length === 0}
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all"
+          className="w-full bg-brand hover:bg-brand-strong disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all"
         >
           {isGenerating ? "Generating PDF..." : "Download printable chart"}
         </button>

@@ -5,7 +5,7 @@ import { SLOT_OPTIONS, type SlotCount, type StickerChartConfig } from "./types";
 // Shared mobile-first input styling. text-base (16px) prevents iOS zoom on
 // focus; min-h-[44px] keeps every control above the 44px touch target.
 const FIELD_CLASS =
-  "w-full min-h-[44px] px-3 py-2.5 text-base bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400";
+  "w-full min-h-[44px] px-3 py-2.5 text-base bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand";
 
 const LABEL_CLASS =
   "text-xs font-medium uppercase tracking-wide text-slate-500 mb-1.5 block";
@@ -159,7 +159,7 @@ export const StickerChart = () => {
           type="button"
           onClick={generatePdf}
           disabled={isGenerating}
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all"
+          className="w-full bg-brand-tint0 hover:bg-brand-strong disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all"
         >
           {isGenerating ? "Generating PDF..." : "Download printable chart"}
         </button>

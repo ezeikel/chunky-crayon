@@ -1,0 +1,17 @@
+---
+// PostHog + Vercel Analytics — included once via BaseLayout.
+// Init + tracking listeners live in @one-colored-pixel/satellite-shared.
+// initAnalytics tags every event with `app: <slug>` for cross-site funnels
+// in CC's shared PostHog project (110135). cc-link-tracking auto-fires
+// cc_cta_click on any outbound chunkycrayon.com click (the funnel
+// conversion event); blog-view-tracking fires blog_post_view on posts.
+import { siteConfig } from "@/site.config";
+---
+
+<script define:vars={{ slug: siteConfig.slug }}>
+  import { initAnalytics } from "@one-colored-pixel/satellite-shared/analytics";
+  import "@one-colored-pixel/satellite-shared/analytics/cc-link-tracking";
+  import "@one-colored-pixel/satellite-shared/analytics/blog-view-tracking";
+
+  initAnalytics(slug);
+</script>
