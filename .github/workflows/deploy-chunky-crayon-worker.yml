@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - 'apps/chunky-crayon-worker/**'
+      # The worker imports shared pipeline/registry code from coloring-core
+      # (satellite-blog SATELLITE_SITES, topic engine, blog prompts, scene
+      # gen). Changes there must redeploy the worker or it runs stale logic
+      # — e.g. a new satellite site's cron hits getSatelliteSite()=null.
+      - 'packages/coloring-core/**'
       - '.github/workflows/deploy-chunky-crayon-worker.yml'
   workflow_dispatch:
     inputs:
