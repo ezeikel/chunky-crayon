@@ -103,21 +103,36 @@ pnpm tsx -r dotenv/config scripts/review-region-colors.ts \
   --model=gemini --limit=6 [--id=<id> ...] [--no-regen] [--out=<dir>]
 ```
 
-For each image it runs the real pipeline, then generates an **independent
-held-out colourise** of the same line art and, per region, compares the
-pipeline's chosen palette colour to the held-out render's region colour
-(snapped the same chroma-boosted way). It reports mean/median/p90 ΔE, a
-**random-assignment baseline**, % coherent, **object-group consistency**, the
-worst offenders by label, and writes a 3-panel composite
-(line art | pipeline fill | held-out render) per image.
+For each image it runs the real pipeline (via `generateRegionStoreLogic`
+directly, with the `onVariantRender` + `onVariantPreGroup` debug hooks), then
+writes a **4-panel composite**: line art | pipeline-chosen fill | **the render
+the pipeline actually sampled** | an independent held-out render.
 
-Pass/fail gate is deliberately NOT absolute coherence — the held-out render is
-a second non-deterministic colourise and on ambiguous subjects (an FBI agent's
-jacket) Gemini colours it differently every run, so absolute ΔE is noisy.
-The gate is: **≥1.4× better than random** (the literal "not random" test) AND
-**≥70% object-group consistency** (deterministic, the user's #1 requirement).
-Natural-choice quality (green dino, not blue) is judged by eyeballing the
-always-written composites — no metric fully captures it.
+The PRIMARY metric is **self-fidelity ΔE**: the pre-group chosen palette
+colour vs snapping the colour the pipeline's OWN render put in that region.
+This has zero cross-render variance and is measured *before* the group pass,
+so it cleanly answers "does sample→boost→snap faithfully reproduce the
+colourise JPG?" — observed ≈0 when correct.
+
+Two non-obvious requirements, learned the hard way:
+
+- **Score against the pipeline's OWN stored region map** (gunzip
+  `regionMapUrl`), NEVER a freshly re-detected one. `detectAllRegionsFromPixels`
+  numbers regions by raster scan order; a re-detected map's "region 20" is a
+  different physical region than `regionsJson`'s, so every per-region compare
+  (and the chosen-fill composite) lines up the wrong regions. This masqueraded
+  as a pipeline bug for a long time.
+- **Measure self-fidelity PRE group-pass.** The group pass deliberately
+  unifies an object's shaded sub-regions; counting that as "drift" inflates
+  the number. The `onVariantPreGroup` hook exposes the pre-group map.
+
+Gates: **self-fidelity ΔE ≤ 8** (only palette-snap quantisation should remain)
+AND **object-group consistency ≥ 55%** (NOT higher — forcing a superhero's
+cape/emblem/mask to one colour would be *wrong*; the safe override keeps
+genuinely-distinct sub-parts apart, so mixed-palette subjects land 55–75%).
+The vs-held-out ΔE and random baseline are reported for context only (the
+held-out render is a noisy 2nd colourise) and are **not** gated on. Composites
+remain the visual arbiter for natural-choice quality (green dino, not blue).
 
 `pnpm --filter @one-colored-pixel/coloring-core exec tsx
 scripts/check-color-and-sampler.mts` is the fast offline guard (no AI/DB) for
