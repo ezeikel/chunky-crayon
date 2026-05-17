@@ -11,6 +11,19 @@ import {
 } from "../schemas";
 import { detectAllRegionsFromPixels } from "@one-colored-pixel/canvas";
 import type { ColorMapConfig, ColorPaletteEntry } from "./generate-color-map";
+import {
+  nearestPaletteColor,
+  rgbToLab,
+  deltaE2000,
+  boostChroma,
+} from "../utils/color";
+import { createColourisePrompt } from "./colorise-prompts";
+import {
+  colorizeLineArt,
+  DEFAULT_COLORIZE_MODEL,
+  type ColorizeModel,
+} from "./colorize-line-art";
+import { sampleRegionColoursFromRender } from "./sample-region-colours";
 
 // =============================================================================
 // Types
@@ -60,8 +73,18 @@ export type GenerateRegionStoreConfig = ColorMapConfig & {
    * Per-palette-variant modifier appended to the base regionFillPointsSystem
    * prompt. Lets each brand tune the aesthetic of each variant while sharing
    * the base colouring rules.
+   *
+   * Still used by the AI-repair pass for outlier regions; the primary colour
+   * source is now JPEG sampling (see generateRegionStoreLogic step 6).
    */
   paletteVariantModifiers: Record<PaletteVariant, string>;
+  /**
+   * Which model produces the styled colourised render that region colours
+   * are sampled from. Defaults to "gemini" (today's known-good
+   * coloredReferenceUrl model). The dev region-store viewer overrides this
+   * to compare "gemini" vs "gpt" on the same image.
+   */
+  colorizeModel?: ColorizeModel;
 };
 
 export type GenerateRegionStoreResult =
@@ -385,14 +408,46 @@ Return exactly one entry per region ID — no skips, no duplicates, no invented 
 // Colouring pass (Strategy C)
 // =============================================================================
 
+type ResolvedColour = { hex: string; colorName: string };
+
+// A region's sampled colour is trusted (no AI repair needed) when the render
+// actually coloured a meaningful chunk of it, that colour was concentrated
+// rather than noisy, and the constrained palette can represent it closely.
+const TRUST_MIN_COVERAGE = 0.15;
+const TRUST_MIN_CONFIDENCE = 0.5;
+const TRUST_MAX_DELTA_E = 25;
+
+// In the object-group consistency pass, "same object ⇒ same colour" is the
+// #1 rule (a bunny's ears match its body; a jacket's sleeve matches its
+// collar). We only let a region keep its OWN colour when it is BOTH very
+// confidently sampled AND dramatically different from the group colour —
+// a genuinely distinct sub-part like a red stripe on a white sail. The bar
+// is deliberately high: per-region shading on the render routinely shifts a
+// single object's fragments by ΔE 20-30, and letting that fragment the
+// object is exactly the "muddy patchy body" failure the review loop caught.
+const GROUP_OVERRIDE_MIN_CONFIDENCE = 0.8;
+const GROUP_OVERRIDE_MIN_DELTA_E = 38;
+
 /**
- * Call the AI once for a single palette variant. Now that regions are
- * pre-labelled, the prompt includes the label list so the AI only has to
- * pick colours, not identify objects.
+ * Resolve every region's colour for ONE palette variant.
+ *
+ * Pipeline (replaces the old blind-AI pass):
+ *   1. Colourise the line art with the configured model + the variant prompt.
+ *   2. Sample each region's dominant colour from that render.
+ *   3. Snap each sampled colour to the constrained palette (CIEDE2000).
+ *   4. Regions the render coloured cleanly are trusted as-is. The rest
+ *      ("outliers": tiny, unfilled, noisy, or unrepresentable) go to ONE AI
+ *      repair call that SEES the render and is told the trusted colours.
+ *   5. Object-group consistency: same logical object ⇒ same colour, unless a
+ *      region is confidently a different-coloured sub-part.
  */
-async function assignColoursForVariant(
+async function resolveVariantColours(
   variant: PaletteVariant,
   config: GenerateRegionStoreConfig,
+  lineArtPng: Buffer,
+  pixelToRegion: Uint16Array,
+  width: number,
+  height: number,
   labelledRegions: Array<{
     id: number;
     label: string;
@@ -403,29 +458,169 @@ async function assignColoursForVariant(
     pixelPercentage: number;
   }>,
   palette: ColorPaletteEntry[],
-  imageBase64: string,
   sceneContext?: { title: string; description: string; tags: string[] },
 ): Promise<{
   variant: PaletteVariant;
-  response: RegionFirstColorResponse | null;
+  colours: Map<number, ResolvedColour> | null;
   elapsedMs: number;
+  stats: { sampled: number; repaired: number; grouped: number };
 }> {
   const startTime = Date.now();
+  const colorizeModel = config.colorizeModel ?? DEFAULT_COLORIZE_MODEL;
+  const regionIds = labelledRegions.map((r) => r.id);
+  const labelById = new Map(labelledRegions.map((r) => [r.id, r]));
+  const stats = { sampled: 0, repaired: 0, grouped: 0 };
+
+  try {
+    // --- 1. styled render ---------------------------------------------------
+    const sceneHint = sceneContext?.title
+      ? `This is: "${sceneContext.title}". ${sceneContext.description ?? ""}`
+      : "";
+    const render = await colorizeLineArt(
+      lineArtPng,
+      createColourisePrompt(variant, sceneHint),
+      colorizeModel,
+    );
+    if (!render.success) {
+      console.error(
+        `[RegionStore] ${variant}: colourise failed (${colorizeModel}): ${render.error}`,
+      );
+      return { variant, colours: null, elapsedMs: Date.now() - startTime, stats };
+    }
+
+    // --- 2. sample dominant colour per region -------------------------------
+    const samples = await sampleRegionColoursFromRender(
+      render.pngBuffer,
+      pixelToRegion,
+      regionIds,
+      width,
+      height,
+    );
+
+    // --- 3. snap to palette + 4. classify trusted vs outlier ----------------
+    // Boost chroma before snapping: the render is often muddy/desaturated,
+    // but its HUE is the right signal. A washed-out green dino region should
+    // snap to Grass Green, not grey "Slate". Genuine neutrals (grey rock)
+    // are left alone by boostChroma's low-delta guard.
+    const resolved = new Map<number, ResolvedColour>();
+    const outliers: number[] = [];
+    for (const id of regionIds) {
+      const s = samples.get(id);
+      if (!s || !s.rgb) {
+        outliers.push(id);
+        continue;
+      }
+      const snapped = nearestPaletteColor(boostChroma(s.rgb), palette);
+      if (!snapped) {
+        outliers.push(id);
+        continue;
+      }
+      if (
+        s.coverage >= TRUST_MIN_COVERAGE &&
+        s.confidence >= TRUST_MIN_CONFIDENCE &&
+        snapped.deltaE <= TRUST_MAX_DELTA_E
+      ) {
+        resolved.set(id, { hex: snapped.hex, colorName: snapped.name });
+        stats.sampled++;
+      } else {
+        // Stash the best-effort snap as a fallback; AI repair may override.
+        resolved.set(id, { hex: snapped.hex, colorName: snapped.name });
+        outliers.push(id);
+      }
+    }
+
+    // --- 5. AI repair pass for outliers (only if any) -----------------------
+    if (outliers.length > 0) {
+      const repaired = await repairOutlierColours(
+        variant,
+        config,
+        render.pngBuffer,
+        outliers,
+        resolved,
+        labelById,
+        palette,
+        sceneContext,
+      );
+      for (const [id, colour] of repaired) {
+        resolved.set(id, colour);
+        stats.repaired++;
+      }
+    }
+
+    // --- 6. object-group consistency ---------------------------------------
+    stats.grouped = enforceObjectGroupConsistency(
+      resolved,
+      samples,
+      labelledRegions,
+      palette,
+    );
+
+    return {
+      variant,
+      colours: resolved,
+      elapsedMs: Date.now() - startTime,
+      stats,
+    };
+  } catch (error) {
+    console.error(`[RegionStore] ${variant}: resolve failed:`, error);
+    return { variant, colours: null, elapsedMs: Date.now() - startTime, stats };
+  }
+}
+
+/**
+ * One AI call to (re)colour only the outlier regions, shown the styled render
+ * so it can copy the colours it can already see, and told the trusted regions'
+ * colours so its picks stay coherent with the sampled majority.
+ *
+ * Reuses the existing region-fill-points prompt machinery + response schema so
+ * the brand prompts don't need to change.
+ */
+async function repairOutlierColours(
+  variant: PaletteVariant,
+  config: GenerateRegionStoreConfig,
+  renderPng: Buffer,
+  outlierIds: number[],
+  resolvedSoFar: Map<number, ResolvedColour>,
+  labelById: Map<
+    number,
+    {
+      id: number;
+      label: string;
+      objectGroup: string;
+      gridRow: number;
+      gridCol: number;
+      size: "small" | "medium" | "large";
+      pixelPercentage: number;
+    }
+  >,
+  palette: ColorPaletteEntry[],
+  sceneContext?: { title: string; description: string; tags: string[] },
+): Promise<Map<number, ResolvedColour>> {
   const variantModifier = config.paletteVariantModifiers[variant];
-  const systemPrompt = `${config.regionFillPointsSystem}\n\n${variantModifier}\n\nIMPORTANT: Each region already has a verified semantic label attached. Trust the labels — do not second-guess what a region is. Focus entirely on choosing the best palette colour for each labelled region under the variant described above.`;
+  const systemPrompt = `${config.regionFillPointsSystem}\n\n${variantModifier}\n\nYou are shown a fully COLOURED render of this page. Most regions have ALREADY been assigned a colour by sampling that render directly — those are LOCKED and listed below. Your ONLY job is to assign the best palette colour to the small set of UNRESOLVED regions, copying what you can see in the render and keeping them harmonious with the locked colours. Match the variant aesthetic above.`;
 
-  // Build a labelled version of the detected regions for the prompt. We pass
-  // through the existing createRegionFillPointsPrompt but prepend an explicit
-  // labels block so the brand prompts don't need to change.
-  const labelsBlock = `PRE-IDENTIFIED REGIONS (labels are verified — do NOT relabel, only colour):
-${labelledRegions
-  .map(
-    (r) =>
-      `  - Region #${r.id}: ${r.label} (group: ${r.objectGroup}, grid r${r.gridRow}c${r.gridCol}, ${r.size}, ${r.pixelPercentage}% of canvas)`,
-  )
-  .join("\n")}
+  const lockedBlock = [...resolvedSoFar.entries()]
+    .filter(([id]) => !outlierIds.includes(id))
+    .map(([id, c]) => {
+      const l = labelById.get(id);
+      return `  - Region #${id} (${l?.label ?? "?"}): LOCKED to ${c.colorName} ${c.hex}`;
+    })
+    .join("\n");
 
-Using the variant guidelines in the system prompt, assign a palette colour to every region. The element field in your response MUST match the provided label exactly.`;
+  const outlierBlock = outlierIds
+    .map((id) => {
+      const l = labelById.get(id);
+      return `  - Region #${id}: ${l?.label ?? "unknown"} (group: ${l?.objectGroup ?? "unknown"}, grid r${l?.gridRow ?? 0}c${l?.gridCol ?? 0}, ${l?.size ?? "small"}, ${l?.pixelPercentage ?? 0}% of canvas)`;
+    })
+    .join("\n");
+
+  const instruction = `LOCKED REGIONS (already coloured from the render — do NOT change, listed for harmony only):
+${lockedBlock || "  (none)"}
+
+UNRESOLVED REGIONS — assign a palette colour to EACH of these ${outlierIds.length} (and ONLY these):
+${outlierBlock}
+
+For EACH unresolved region return: regionId, element (its label), suggestedColor (hex from palette), colorName, reasoning (5-7 words). Use ONLY the provided palette. Look at the coloured render to see what colour each region should be; if a region looks unfilled in the render, pick the colour a skilled illustrator would expect for that labelled object, distinct from adjacent locked regions.`;
 
   try {
     const { output } = await generateText({
@@ -436,39 +631,174 @@ Using the variant guidelines in the system prompt, assign a palette colour to ev
         {
           role: "user",
           content: [
-            { type: "text", text: labelsBlock },
             {
               type: "text",
-              text: config.createRegionFillPointsPrompt(
-                palette,
-                labelledRegions.map((r) => ({
-                  id: r.id,
-                  gridRow: r.gridRow,
-                  gridCol: r.gridCol,
-                  size: r.size,
-                  pixelPercentage: r.pixelPercentage,
-                })),
-                sceneContext,
-              ),
+              text: `AVAILABLE PALETTE (use ONLY these):\n${palette
+                .map((c) => `- ${c.name}: ${c.hex}`)
+                .join("\n")}`,
             },
-            { type: "image", image: imageBase64 },
+            { type: "text", text: instruction },
+            { type: "image", image: renderPng },
           ],
         },
       ],
     });
 
-    return {
-      variant,
-      response: output ?? null,
-      elapsedMs: Date.now() - startTime,
-    };
+    const result = new Map<number, ResolvedColour>();
+    if (output) {
+      const outlierSet = new Set(outlierIds);
+      for (const a of output.assignments) {
+        if (!outlierSet.has(a.regionId)) continue;
+        // Defensive: keep the AI's pick only if it's an exact palette hex;
+        // otherwise it hallucinated — drop it so the sampled-snap fallback
+        // (already stored in resolvedSoFar) stands.
+        const known = palette.find(
+          (p) => p.hex.toLowerCase() === a.suggestedColor.toLowerCase(),
+        );
+        if (known) {
+          result.set(a.regionId, { hex: known.hex, colorName: known.name });
+        }
+      }
+    }
+    return result;
   } catch (error) {
-    console.error(
-      `[RegionStore] AI call failed for ${variant} variant:`,
-      error,
-    );
-    return { variant, response: null, elapsedMs: Date.now() - startTime };
+    console.error(`[RegionStore] ${variant}: repair pass failed:`, error);
+    return new Map();
   }
+}
+
+/**
+ * Enforce "same logical object ⇒ same colour".
+ *
+ * The single biggest visible failure (old pipeline AND the first cut of this
+ * one — see the review loop's "muddy patchy dinosaur body") is one object's
+ * fragments getting different colours because the render shaded them
+ * differently. Fix:
+ *
+ *   1. The group's colour is the SIZE-WEIGHTED MEAN of its members' *sampled*
+ *      colours (pooled across the whole object), snapped to the palette —
+ *      NOT one fragment's resolved colour. One mis-sampled sliver can't drag
+ *      the object any more; the big areas dominate.
+ *   2. Every member is forced to that group colour UNLESS it is BOTH very
+ *      confidently sampled AND dramatically far from the group colour (a
+ *      genuine distinct sub-part like a red stripe on a white sail). The bar
+ *      is high on purpose — defaulting to one colour per object is correct
+ *      far more often than not.
+ *
+ * Returns the number of regions whose colour was changed by this pass.
+ */
+function enforceObjectGroupConsistency(
+  resolved: Map<number, ResolvedColour>,
+  samples: Map<
+    number,
+    { rgb: { r: number; g: number; b: number } | null; confidence: number }
+  >,
+  labelledRegions: Array<{
+    id: number;
+    label: string;
+    objectGroup: string;
+    pixelPercentage: number;
+  }>,
+  palette: ColorPaletteEntry[],
+): number {
+  // Coalesce by objectGroup AND by label. The labeller frequently gives an
+  // object's repeated parts the same precise label ("lightning bolt", "tail",
+  // "emblem border") but DIFFERENT objectGroup strings, leaving them as
+  // singletons that never get unified — the main driver of the review loop's
+  // low group-consistency. Two regions belong together if they share a
+  // non-"unknown" objectGroup OR the same non-"unknown" label.
+  const norm = (s: string) => s.trim().toLowerCase();
+  const byGroup = new Map<string, typeof labelledRegions>();
+  for (const r of labelledRegions) {
+    const g = norm(r.objectGroup || "unknown");
+    const l = norm(r.label || "unknown");
+    // Prefer a real objectGroup; otherwise fall back to the label. Skip
+    // regions that are "unknown" on both — that's a dumping ground.
+    const key =
+      g !== "unknown" ? `g:${g}` : l !== "unknown" ? `l:${l}` : null;
+    if (!key) continue;
+    const arr = byGroup.get(key);
+    if (arr) arr.push(r);
+    else byGroup.set(key, [r]);
+  }
+
+  let changed = 0;
+  for (const [, members] of byGroup) {
+    if (members.length < 2) continue;
+
+    // Group colour = size-weighted mean of members' SAMPLED colours, snapped
+    // to the palette. Falls back to the largest member's resolved colour if
+    // nothing in the group was sampled (e.g. the render left it all blank).
+    let wr = 0;
+    let wg = 0;
+    let wb = 0;
+    let wsum = 0;
+    for (const m of members) {
+      const s = samples.get(m.id);
+      if (!s || !s.rgb) continue;
+      const w = Math.max(0.0001, m.pixelPercentage);
+      wr += s.rgb.r * w;
+      wg += s.rgb.g * w;
+      wb += s.rgb.b * w;
+      wsum += w;
+    }
+
+    let groupColour: ResolvedColour | undefined;
+    if (wsum > 0) {
+      const snapped = nearestPaletteColor(
+        boostChroma({ r: wr / wsum, g: wg / wsum, b: wb / wsum }),
+        palette,
+      );
+      if (snapped) {
+        groupColour = { hex: snapped.hex, colorName: snapped.name };
+      }
+    }
+    if (!groupColour) {
+      const anchor = [...members].sort(
+        (a, b) => b.pixelPercentage - a.pixelPercentage,
+      )[0];
+      groupColour = resolved.get(anchor.id);
+    }
+    if (!groupColour) continue;
+    const groupLab = (() => {
+      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
+        groupColour.hex,
+      );
+      return m
+        ? rgbToLab({
+            r: parseInt(m[1], 16),
+            g: parseInt(m[2], 16),
+            b: parseInt(m[3], 16),
+          })
+        : null;
+    })();
+
+    for (const m of members) {
+      const current = resolved.get(m.id);
+      if (!current) continue;
+      if (current.hex.toLowerCase() === groupColour.hex.toLowerCase()) continue;
+
+      const s = samples.get(m.id);
+      // Keep this region's own colour only if it was sampled VERY confidently
+      // AND its sampled colour is dramatically far (CIEDE2000) from the group
+      // colour — a genuine distinct sub-part, not shading variance.
+      if (
+        s &&
+        s.rgb &&
+        s.confidence >= GROUP_OVERRIDE_MIN_CONFIDENCE &&
+        groupLab
+      ) {
+        const dE = deltaE2000(rgbToLab(s.rgb), groupLab);
+        if (dE > GROUP_OVERRIDE_MIN_DELTA_E) {
+          continue; // genuine different-coloured sub-part — leave it
+        }
+      }
+
+      resolved.set(m.id, groupColour);
+      changed++;
+    }
+  }
+  return changed;
 }
 
 // =============================================================================
@@ -478,17 +808,19 @@ Using the variant guidelines in the system prompt, assign a palette colour to ev
 /**
  * Build the full region store for a coloring image.
  *
- * Strategy C pipeline:
+ * Pipeline:
  *   1. Rasterise the SVG (1024×auto) and detect regions via scanline flood fill.
  *   2. Render a numbered-overlay PNG with region IDs stamped at each centroid.
  *   3. ONE AI call: pass both the line art and the overlay to the labelling
- *      prompt. The AI reads numbers off the overlay and returns verified
- *      semantic labels + object groups for every region.
- *   4. FOUR parallel AI calls (one per palette variant): pass the labelled
- *      region list + the original image. The AI's job is now just colour
- *      selection, not identification.
- *   5. Merge the labels + per-variant colour assignments into the per-region
- *      palette structure.
+ *      prompt → verified semantic labels + object groups for every region.
+ *   4. FOUR parallel per-variant colour passes (resolveVariantColours):
+ *      colourise the line art with the configured model + the variant prompt,
+ *      sample each region's dominant colour from that render, snap to the
+ *      constrained palette, AI-repair the regions the render didn't colour
+ *      cleanly, then enforce same-object-same-colour. This replaces the old
+ *      blind constrained-palette AI guess.
+ *   5. Merge the labels + per-variant resolved colours into the per-region
+ *      palette structure (shape unchanged — fully backward compatible).
  *   6. Gzip the Uint16Array pixel→regionId lookup.
  *
  * Caller is responsible for persistence (R2 upload + DB update).
@@ -612,44 +944,44 @@ export async function generateRegionStoreLogic(
       .filter((c) => c.hex !== "#FFFFFF" && c.hex !== "#212121")
       .map((c) => ({ hex: c.hex, name: c.name }));
 
-    // --- Step 6: colouring pass (FOUR parallel calls) -----------------------
+    // --- Step 6: colouring pass — JPEG-sampled, AI-repaired -----------------
+    // For each of the 4 variants, in parallel: colourise the line art with
+    // the configured model + the variant prompt, sample each region's
+    // dominant colour from that render, snap to the constrained palette,
+    // AI-repair the regions the render didn't colour cleanly, then enforce
+    // same-object-same-colour. Replaces the old blind constrained-palette
+    // AI guess (which the user reported as consistently mediocre).
     const variantResults = await Promise.all(
       PALETTE_VARIANTS.map((variant) =>
-        assignColoursForVariant(
+        resolveVariantColours(
           variant,
           config,
+          pngBuffer,
+          regionMap.pixelToRegion,
+          width,
+          height,
           labelledRegions,
           palette,
-          linePngBase64,
           sceneContext,
         ),
       ),
     );
 
-    // Bail if every variant failed — nothing usable to persist
-    if (variantResults.every((r) => r.response === null)) {
+    // Bail only if every variant failed — nothing usable to persist
+    if (variantResults.every((r) => r.colours === null)) {
       return {
         success: false,
-        error: "All palette variant AI calls failed",
+        error: "All palette variant colour passes failed",
       };
     }
 
-    // --- Step 7: merge variant responses into per-region palette entries ----
+    // --- Step 7: merge variant colours into per-region palette entries ------
     const variantLookups = new Map<
       PaletteVariant,
       Map<number, { hex: string; colorName: string }>
     >();
-    for (const { variant, response } of variantResults) {
-      const lookup = new Map<number, { hex: string; colorName: string }>();
-      if (response) {
-        for (const assignment of response.assignments) {
-          lookup.set(assignment.regionId, {
-            hex: assignment.suggestedColor,
-            colorName: assignment.colorName,
-          });
-        }
-      }
-      variantLookups.set(variant, lookup);
+    for (const { variant, colours } of variantResults) {
+      variantLookups.set(variant, colours ?? new Map());
     }
 
     // Brand-agnostic fallback colour when a variant didn't assign one (rare)
@@ -697,12 +1029,10 @@ export async function generateRegionStoreLogic(
     const regionMapGzipped = gzipSync(pixelToRegionBytes);
 
     // --- Step 9: build the JSON metadata ------------------------------------
-    // Prefer the labelling pass's scene description; fall back to whichever
-    // colour variant succeeded first.
+    // The labelling pass is now the sole scene-description source (the colour
+    // pass no longer returns prose — it samples pixels).
     const sceneDescription =
-      labellingResponse?.sceneDescription ??
-      variantResults.find((v) => v.response)?.response?.sceneDescription ??
-      "A coloring page";
+      labellingResponse?.sceneDescription ?? "A coloring page";
 
     const regionsJson: RegionStoreJson = {
       sceneDescription,
@@ -716,8 +1046,14 @@ export async function generateRegionStoreLogic(
     console.log(
       `[RegionStore] Completed in ${overallElapsed}ms:`,
       `${regions.length} regions, ${regionMapGzipped.byteLength} gz bytes,`,
-      `variant timings:`,
-      variantResults.map((v) => `${v.variant}=${v.elapsedMs}ms`).join(" "),
+      `colourModel=${config.colorizeModel ?? DEFAULT_COLORIZE_MODEL},`,
+      `variants:`,
+      variantResults
+        .map(
+          (v) =>
+            `${v.variant}=${v.elapsedMs}ms(sampled:${v.stats.sampled} repaired:${v.stats.repaired} grouped:${v.stats.grouped}${v.colours ? "" : " FAILED"})`,
+        )
+        .join(" "),
     );
 
     return {

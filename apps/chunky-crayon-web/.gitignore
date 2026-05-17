@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Phase-2 ad video experiments — scratch, not committed
 /test-clips/
+
+# Region-palette review-loop composites — scratch, not committed
+/.region-review/

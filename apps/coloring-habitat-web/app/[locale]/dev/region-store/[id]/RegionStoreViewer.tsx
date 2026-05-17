@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type {
   RegionStoreJson,
   PaletteVariant,
+  ColorizeModel,
 } from "@one-colored-pixel/coloring-core";
 import { regenerateRegionStoreDev } from "./regenerate";
 
@@ -13,6 +14,11 @@ const PALETTE_VARIANTS: PaletteVariant[] = [
   "pastel",
   "cute",
   "surprise",
+];
+
+const COLORIZE_MODELS: { id: ColorizeModel; label: string }[] = [
+  { id: "gemini", label: "Gemini 3 Pro" },
+  { id: "gpt", label: "GPT Image 2" },
 ];
 
 type Props = {
@@ -62,6 +68,7 @@ const RegionStoreViewer = ({
   const [regenerateMessage, setRegenerateMessage] = useState<string | null>(
     null,
   );
+  const [colorizeModel, setColorizeModel] = useState<ColorizeModel>("gemini");
   const [loadState, setLoadState] = useState<LoadState>({
     status: "loading",
     message: "Fetching regionMapUrl...",
@@ -73,10 +80,12 @@ const RegionStoreViewer = ({
   );
 
   const handleRegenerate = () => {
-    setRegenerateMessage("Running pipeline — this takes ~60s...");
+    setRegenerateMessage(
+      `Running pipeline with ${colorizeModel} — 4 styled renders + repair, this takes a while...`,
+    );
     startRegenerate(async () => {
       try {
-        const result = await regenerateRegionStoreDev(id);
+        const result = await regenerateRegionStoreDev(id, colorizeModel);
         setRegenerateMessage(result.message);
         if (result.success) {
           // Reload the server component data so we re-read regionsJson
@@ -266,13 +275,35 @@ const RegionStoreViewer = ({
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] text-neutral-500 uppercase tracking-wide mr-1">
+                Colorize model
+              </span>
+              {COLORIZE_MODELS.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setColorizeModel(m.id)}
+                  disabled={isRegenerating}
+                  className={`px-2.5 py-1 text-[11px] rounded disabled:cursor-not-allowed ${
+                    colorizeModel === m.id
+                      ? "bg-sky-600 text-white"
+                      : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
             <button
               type="button"
               onClick={handleRegenerate}
               disabled={isRegenerating}
               className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-neutral-700 disabled:cursor-not-allowed text-white text-xs font-bold rounded"
             >
-              {isRegenerating ? "Regenerating…" : "Regenerate region store"}
+              {isRegenerating
+                ? "Regenerating…"
+                : `Regenerate (${colorizeModel})`}
             </button>
             {regenerateMessage && (
               <div className="text-xs text-neutral-400 max-w-xs text-right">

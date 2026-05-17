@@ -2,7 +2,17 @@
 
 ## Status
 
-TODO — discovery / spike. No work scheduled.
+**SHIPPED** — implemented and superseded. The live system is documented at
+[`docs/region-palette/README.md`](../../region-palette/README.md). It went
+further than this spike proposed: all four variants are render-sampled (not
+just `realistic`), with a render-quality gate, chroma-boost-before-snap, an
+AI repair pass for outliers, size-weighted object-group consistency, a
+configurable colourise model (Gemini default / GPT), and a headless review
+loop. This file is kept only as the original discovery rationale.
+
+---
+
+_(original spike notes below)_
 
 ## Why this matters
 

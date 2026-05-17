@@ -145,6 +145,18 @@ export {
   type GenerateRegionStoreResult,
 } from "./actions/generate-regions";
 
+export {
+  colorizeLineArt,
+  DEFAULT_COLORIZE_MODEL,
+  type ColorizeModel,
+  type ColorizeResult,
+} from "./actions/colorize-line-art";
+export { createColourisePrompt } from "./actions/colorise-prompts";
+export {
+  sampleRegionColoursFromRender,
+  type RegionColourSample,
+} from "./actions/sample-region-colours";
+
 // Blog content generation (prompts + topic/author catalogue)
 export {
   BLOG_POST_SYSTEM,
@@ -300,3 +312,17 @@ export {
   type RandomSeedConfig,
 } from "./utils/random";
 export { stripEmDashes, NO_EM_DASHES_RULE } from "./utils/copy";
+export {
+  hexToRgb,
+  rgbToHex,
+  rgbToLab,
+  deltaE2000,
+  nearestPaletteColor,
+  boostChroma,
+} from "./utils/color";
+export type {
+  Rgb,
+  Lab,
+  PaletteEntry,
+  NearestPaletteResult,
+} from "./utils/color";

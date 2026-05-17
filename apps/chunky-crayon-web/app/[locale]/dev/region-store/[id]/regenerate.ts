@@ -2,6 +2,7 @@
 
 import { notFound } from 'next/navigation';
 import { db } from '@one-colored-pixel/db';
+import type { ColorizeModel } from '@one-colored-pixel/coloring-core';
 import { BRAND } from '@/lib/db';
 import { generateRegionStore } from '@/app/actions/generate-regions';
 
@@ -14,6 +15,7 @@ import { generateRegionStore } from '@/app/actions/generate-regions';
  */
 export async function regenerateRegionStoreDev(
   coloringImageId: string,
+  colorizeModel?: ColorizeModel,
 ): Promise<{ success: boolean; message: string }> {
   if (process.env.NODE_ENV === 'production') {
     notFound();
@@ -39,11 +41,16 @@ export async function regenerateRegionStoreDev(
   }
 
   const start = Date.now();
-  const result = await generateRegionStore(image.id, image.svgUrl, {
-    title: image.title ?? '',
-    description: image.description ?? '',
-    tags: (image.tags as string[]) ?? [],
-  });
+  const result = await generateRegionStore(
+    image.id,
+    image.svgUrl,
+    {
+      title: image.title ?? '',
+      description: image.description ?? '',
+      tags: (image.tags as string[]) ?? [],
+    },
+    colorizeModel,
+  );
   const elapsedMs = Date.now() - start;
 
   if (!result.success) {

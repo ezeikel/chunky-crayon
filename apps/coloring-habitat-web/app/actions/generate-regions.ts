@@ -5,6 +5,7 @@ import {
   generateRegionStoreLogic,
   DEFAULT_PALETTE_VARIANT_MODIFIERS,
   type GenerateRegionStoreResult,
+  type ColorizeModel,
 } from "@one-colored-pixel/coloring-core";
 import {
   REGION_FILL_POINTS_SYSTEM,
@@ -47,6 +48,7 @@ export async function generateRegionStore(
   coloringImageId: string,
   svgUrl: string,
   sceneContext?: { title: string; description: string; tags: string[] },
+  colorizeModel?: ColorizeModel,
 ): Promise<GenerateRegionStoreResult> {
   // Fetch the traced SVG bytes
   const svgResponse = await fetch(svgUrl);
@@ -60,7 +62,9 @@ export async function generateRegionStore(
 
   const result = await generateRegionStoreLogic(
     svgBuffer,
-    regionStoreConfig,
+    // colorizeModel left undefined ⇒ coloring-core defaults to "gemini".
+    // Only the dev viewer's model toggle passes a value here.
+    { ...regionStoreConfig, ...(colorizeModel ? { colorizeModel } : {}) },
     sceneContext,
   );
 
