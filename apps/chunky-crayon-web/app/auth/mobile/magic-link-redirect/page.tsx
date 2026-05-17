@@ -24,6 +24,8 @@ function MagicLinkRedirectContent() {
       return;
     }
 
+    let successTimeout: ReturnType<typeof setTimeout> | undefined;
+
     // Verify the token and get session
     const verifyToken = async () => {
       try {
@@ -48,7 +50,7 @@ function MagicLinkRedirectContent() {
         window.location.href = deepLink;
 
         // If we're still here after a short delay, show success message
-        setTimeout(() => {
+        successTimeout = setTimeout(() => {
           setStatus('success');
         }, 1000);
       } catch (err) {
@@ -58,6 +60,10 @@ function MagicLinkRedirectContent() {
     };
 
     verifyToken();
+
+    return () => {
+      if (successTimeout) clearTimeout(successTimeout);
+    };
   }, [token]);
 
   return (
