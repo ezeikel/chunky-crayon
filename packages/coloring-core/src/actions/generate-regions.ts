@@ -85,6 +85,28 @@ export type GenerateRegionStoreConfig = ColorMapConfig & {
    * to compare "gemini" vs "gpt" on the same image.
    */
   colorizeModel?: ColorizeModel;
+  /**
+   * Debug hook. When set, called once per variant with the EXACT render the
+   * pipeline generated and sampled (not a fresh independent render). The
+   * review loop uses this so its composite shows what the pipeline actually
+   * saw — otherwise "doesn't match" is unfalsifiable (two unrelated renders).
+   */
+  onVariantRender?: (
+    variant: PaletteVariant,
+    renderPng: Buffer,
+  ) => void | Promise<void>;
+  /**
+   * Debug hook. The per-region resolved colours BEFORE the object-group
+   * consistency pass runs. Lets the review separate "is sample→boost→snap
+   * faithful to the render?" (should be near-perfect) from "did the group
+   * pass then deliberately unify an object's shaded sub-regions?" (an
+   * intended deviation, not a bug) — otherwise the group pass's correct
+   * work inflates the self-fidelity number.
+   */
+  onVariantPreGroup?: (
+    variant: PaletteVariant,
+    resolved: Map<number, { hex: string; colorName: string }>,
+  ) => void | Promise<void>;
 };
 
 export type GenerateRegionStoreResult =
@@ -488,6 +510,15 @@ async function resolveVariantColours(
       return { variant, colours: null, elapsedMs: Date.now() - startTime, stats };
     }
 
+    // Surface the EXACT render we sampled (debug/verification only).
+    if (config.onVariantRender) {
+      try {
+        await config.onVariantRender(variant, render.pngBuffer);
+      } catch {
+        /* debug hook must never break generation */
+      }
+    }
+
     // --- 2. sample dominant colour per region -------------------------------
     const samples = await sampleRegionColoursFromRender(
       render.pngBuffer,
@@ -544,6 +575,15 @@ async function resolveVariantColours(
       for (const [id, colour] of repaired) {
         resolved.set(id, colour);
         stats.repaired++;
+      }
+    }
+
+    // Surface the resolved colours BEFORE group consistency (debug only).
+    if (config.onVariantPreGroup) {
+      try {
+        await config.onVariantPreGroup(variant, new Map(resolved));
+      } catch {
+        /* debug hook must never break generation */
       }
     }
 
@@ -701,63 +741,64 @@ function enforceObjectGroupConsistency(
   }>,
   palette: ColorPaletteEntry[],
 ): number {
-  // Coalesce by objectGroup AND by label. The labeller frequently gives an
-  // object's repeated parts the same precise label ("lightning bolt", "tail",
-  // "emblem border") but DIFFERENT objectGroup strings, leaving them as
-  // singletons that never get unified — the main driver of the review loop's
-  // low group-consistency. Two regions belong together if they share a
-  // non-"unknown" objectGroup OR the same non-"unknown" label.
+  // Two grouping signals with DIFFERENT trust levels:
+  //   - objectGroup ("g:") — the labeller's explicit "these regions are the
+  //     same logical object". Trusted: force the group colour fairly hard.
+  //   - shared label ("l:") — weaker. Same label can mean truly-same parts
+  //     ("lightning bolt" ×2) OR coincidentally-same generic labels on
+  //     unrelated regions. So label-only groups only TIGHTEN: a region keeps
+  //     its own colour unless it already sampled close to the group colour.
+  // This gets the consistency lift from label grouping WITHOUT the
+  // fists-turn-turquoise regression, because the override below is much
+  // stricter for "l:" groups.
   const norm = (s: string) => s.trim().toLowerCase();
-  const byGroup = new Map<string, typeof labelledRegions>();
+  const byGroup = new Map<
+    string,
+    { trusted: boolean; members: typeof labelledRegions }
+  >();
+  const add = (key: string, trusted: boolean, r: (typeof labelledRegions)[number]) => {
+    const e = byGroup.get(key);
+    if (e) e.members.push(r);
+    else byGroup.set(key, { trusted, members: [r] });
+  };
   for (const r of labelledRegions) {
     const g = norm(r.objectGroup || "unknown");
     const l = norm(r.label || "unknown");
-    // Prefer a real objectGroup; otherwise fall back to the label. Skip
-    // regions that are "unknown" on both — that's a dumping ground.
-    const key =
-      g !== "unknown" ? `g:${g}` : l !== "unknown" ? `l:${l}` : null;
-    if (!key) continue;
-    const arr = byGroup.get(key);
-    if (arr) arr.push(r);
-    else byGroup.set(key, [r]);
+    if (g !== "unknown") add(`g:${g}`, true, r);
+    else if (l !== "unknown") add(`l:${l}`, false, r);
   }
 
   let changed = 0;
-  for (const [, members] of byGroup) {
+  for (const { trusted, members } of byGroup.values()) {
     if (members.length < 2) continue;
 
-    // Group colour = size-weighted mean of members' SAMPLED colours, snapped
-    // to the palette. Falls back to the largest member's resolved colour if
-    // nothing in the group was sampled (e.g. the render left it all blank).
-    let wr = 0;
-    let wg = 0;
-    let wb = 0;
-    let wsum = 0;
+    // Group colour = the palette colour with the largest size-weighted VOTE
+    // among the members' already-resolved (snapped) colours.
+    //
+    // NEVER average RGB across the group: averaging a yellow region and a
+    // blue region yields muddy green/grey — a colour that exists nowhere in
+    // the object (this was the "brown muddy dinosaur" bug; the render was a
+    // clean green but body+mouth+tongue RGB-averaged to mud). Voting picks
+    // the colour the object actually mostly IS, and a minority oddly-coloured
+    // sub-part can't drag it.
+    const vote = new Map<string, { px: number; c: ResolvedColour }>();
     for (const m of members) {
-      const s = samples.get(m.id);
-      if (!s || !s.rgb) continue;
+      const c = resolved.get(m.id);
+      if (!c) continue;
+      const key = c.hex.toLowerCase();
+      const cell = vote.get(key);
       const w = Math.max(0.0001, m.pixelPercentage);
-      wr += s.rgb.r * w;
-      wg += s.rgb.g * w;
-      wb += s.rgb.b * w;
-      wsum += w;
+      if (cell) cell.px += w;
+      else vote.set(key, { px: w, c });
     }
 
     let groupColour: ResolvedColour | undefined;
-    if (wsum > 0) {
-      const snapped = nearestPaletteColor(
-        boostChroma({ r: wr / wsum, g: wg / wsum, b: wb / wsum }),
-        palette,
-      );
-      if (snapped) {
-        groupColour = { hex: snapped.hex, colorName: snapped.name };
+    let bestPx = -1;
+    for (const { px, c } of vote.values()) {
+      if (px > bestPx) {
+        bestPx = px;
+        groupColour = c;
       }
-    }
-    if (!groupColour) {
-      const anchor = [...members].sort(
-        (a, b) => b.pixelPercentage - a.pixelPercentage,
-      )[0];
-      groupColour = resolved.get(anchor.id);
     }
     if (!groupColour) continue;
     const groupLab = (() => {
@@ -779,18 +820,19 @@ function enforceObjectGroupConsistency(
       if (current.hex.toLowerCase() === groupColour.hex.toLowerCase()) continue;
 
       const s = samples.get(m.id);
-      // Keep this region's own colour only if it was sampled VERY confidently
-      // AND its sampled colour is dramatically far (CIEDE2000) from the group
-      // colour — a genuine distinct sub-part, not shading variance.
-      if (
-        s &&
-        s.rgb &&
-        s.confidence >= GROUP_OVERRIDE_MIN_CONFIDENCE &&
-        groupLab
-      ) {
+      // Decide whether to force the group colour onto this region.
+      //   - trusted (objectGroup): only keep own colour if sampled VERY
+      //     confidently AND dramatically far — same-object-same-colour wins.
+      //   - untrusted (label-only): much stricter. Keep own colour at lower
+      //     confidence and a far smaller ΔE — label groups only tighten
+      //     near-identical regions, they don't repaint a region that
+      //     genuinely sampled a different colour.
+      const minConf = trusted ? GROUP_OVERRIDE_MIN_CONFIDENCE : 0.4;
+      const maxDE = trusted ? GROUP_OVERRIDE_MIN_DELTA_E : 12;
+      if (s && s.rgb && s.confidence >= minConf && groupLab) {
         const dE = deltaE2000(rgbToLab(s.rgb), groupLab);
-        if (dE > GROUP_OVERRIDE_MIN_DELTA_E) {
-          continue; // genuine different-coloured sub-part — leave it
+        if (dE > maxDE) {
+          continue; // genuine different-coloured (sub-)part — leave it
         }
       }
 

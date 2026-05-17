@@ -125,6 +125,31 @@ ok(
   `boostChroma true grey stays neutral -> ${greyBoosted?.name} [expect Gray/Slate]`,
 );
 
+// THE turquoise-bunny bug: a near-neutral cream/light region with a FAINT
+// cool cast (sky bounce) must NOT detonate into a saturated cyan/blue.
+// s here = (200-178)/200 = 0.11 — below the grey floor, must pass through.
+const faintCoolCream = { r: 188, g: 196, b: 200 };
+const fb = boostChroma(faintCoolCream);
+const faintDelta = Math.hypot(
+  fb.r - faintCoolCream.r,
+  fb.g - faintCoolCream.g,
+  fb.b - faintCoolCream.b,
+);
+ok(
+  faintDelta < 20,
+  `boostChroma faint-cool near-grey barely moves (Δrgb ${faintDelta.toFixed(1)} < 20) -> {${Math.round(fb.r)},${Math.round(fb.g)},${Math.round(fb.b)}} [must NOT explode to cyan]`,
+);
+// A clearly chromatic but slightly washed colour SHOULD still get vivid.
+const washedRed = { r: 175, g: 95, b: 88 }; // s = (175-88)/175 = 0.50
+const wrName = nearestPaletteColor(boostChroma(washedRed), PALETTE)?.name;
+ok(
+  wrName === "Cherry Red" ||
+    wrName === "Coral" ||
+    wrName === "Crimson" ||
+    wrName === "Salmon",
+  `boostChroma washed red still vivid -> ${wrName} [expect a red]`,
+);
+
 // --- 4. sampler: a synthetic 3-region image -------------------------------
 // Build a 60×20 RGB image: cols 0-19 pure red, 20-39 pure green,
 // 40-59 pure blue. Region map: same banding. Each region's modal colour

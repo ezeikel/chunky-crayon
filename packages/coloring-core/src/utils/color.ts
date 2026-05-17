@@ -54,19 +54,31 @@ export function boostChroma({ r, g, b }: Rgb, amount = 0.6): Rgb {
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
   const delta = max - min;
+  if (max <= 0) return { r, g, b };
 
-  // Genuinely neutral (grey/white/black) — no hue to preserve, leave it.
-  if (delta < 14) return { r, g, b };
+  const s = delta / max; // HSV saturation, 0..1
 
-  // HSV-ish: keep value (max) and hue, push saturation toward 1.
-  const s = delta / max;
-  const targetS = s + (1 - s) * amount;
+  // A near-grey has NO reliable hue — its tiny channel differences are JPEG
+  // noise / ambient bounce, not a colour choice. The old `delta < 14` guard
+  // let a barely-tinted grey through and then a 0.6 boost DETONATED it into a
+  // fully-saturated colour (the "cream fur → turquoise, whole bunny cyan"
+  // bug). Fix: gate on SATURATION not raw delta, and ramp the boost in
+  // gradually above the floor so a faint tint is nudged, not exploded.
+  //   - s ≤ GREY_FLOOR  → leave entirely alone (a real grey stays grey)
+  //   - GREY_FLOOR..FULL_AT → boost ramps 0→full
+  //   - s ≥ FULL_AT     → full boost (genuinely chromatic, just washed out)
+  const GREY_FLOOR = 0.12;
+  const FULL_AT = 0.35;
+  if (s <= GREY_FLOOR) return { r, g, b };
+  const ramp = Math.min(1, (s - GREY_FLOOR) / (FULL_AT - GREY_FLOOR));
+  const eff = amount * ramp;
+  if (eff <= 0) return { r, g, b };
+
+  // Keep value (max) + hue, raise saturation toward (never fully to) 1.
+  const targetS = Math.min(0.95, s + (1 - s) * eff);
   const v = max;
-
-  // Reconstruct from the original hue. Work out where each channel sits
-  // relative to [min,max] and re-stretch that ratio to the new saturation.
   const newMin = v * (1 - targetS);
-  const scale = (newMin - v) / (min - v || 1); // maps [min,max] -> [newMin,v]
+  const scale = (newMin - v) / (min - v || -1); // maps [min,max] -> [newMin,v]
   const remap = (c: number) => v + (c - v) * scale;
   return {
     r: Math.max(0, Math.min(255, remap(r))),
