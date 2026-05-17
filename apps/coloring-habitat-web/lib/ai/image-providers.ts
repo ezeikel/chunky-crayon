@@ -22,7 +22,11 @@ import {
 } from "./prompts";
 
 const config: ImageGenerationConfig = {
-  referenceImages: REFERENCE_IMAGES,
+  // CH uses its own adult-oriented reference set (not coloring-core's
+  // kid-oriented getReferenceImages). The config contract changed to a
+  // difficulty-aware getter; CH's set isn't tiered, so return it for any
+  // difficulty.
+  getReferenceImages: () => REFERENCE_IMAGES,
   difficultyModifiers: DIFFICULTY_MODIFIERS,
   createColoringImagePrompt,
   createGeminiColoringImagePrompt,
