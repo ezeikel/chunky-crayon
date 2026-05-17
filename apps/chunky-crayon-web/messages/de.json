@@ -1318,7 +1318,8 @@
     "subtextNoCredits": "Du hast keine Credits mehr. Lade auf oder upgrade!",
     "subtextNoCreditsSubscribed": "Mehr Magie? Lade auf oder upgrade und lass die Kreativität weiterlaufen!",
     "subtextNoCreditsNoSubscription": "Wähle ein Abo oder kauf ein paar Credits, um weiterzumachen.",
-    "subtextFallback": "Du bekommst 15 Gratis-Credits – genug für 3 Seiten!"
+    "subtextFallback": "Du bekommst 15 Gratis-Credits – genug für 3 Seiten!",
+    "linkSeePlansGuestLimit": "Oder starte eine 7-tägige Gratis-Testphase für unbegrenzte Seiten"
   },
   "feedback": {
     "title": "Was beschäftigt dich?",

@@ -1318,7 +1318,8 @@
     "subtextNoCredits": "크레딧이 없어요. 충전하거나 업그레이드해요!",
     "subtextNoCreditsSubscribed": "마법이 더 필요하신가요? 충전하거나 업그레이드해서 계속 만들어요!",
     "subtextNoCreditsNoSubscription": "구독을 고르거나, 크레딧을 조금 사서 계속해요.",
-    "subtextFallback": "무료 15크레딧으로 3장을 만들 수 있어요!"
+    "subtextFallback": "무료 15크레딧으로 3장을 만들 수 있어요!",
+    "linkSeePlansGuestLimit": "또는 7일 무료 체험으로 무제한 페이지를 시작해요"
   },
   "feedback": {
     "title": "어떤 생각이 드나요?",

@@ -1318,7 +1318,8 @@
     "subtextNoCredits": "Tu n’as plus de crédits. Recharge ou améliore !",
     "subtextNoCreditsSubscribed": "Besoin de plus de magie ? Recharge ou améliore pour continuer à créer !",
     "subtextNoCreditsNoSubscription": "Choisis un abonnement, ou achète quelques crédits pour continuer.",
-    "subtextFallback": "Tu auras 15 crédits gratuits, de quoi créer 3 pages !"
+    "subtextFallback": "Tu auras 15 crédits gratuits, de quoi créer 3 pages !",
+    "linkSeePlansGuestLimit": "Ou commencez un essai gratuit de 7 jours pour des pages illimitées"
   },
   "feedback": {
     "title": "Que se passe-t-il ?",

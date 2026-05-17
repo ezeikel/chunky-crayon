@@ -1318,7 +1318,8 @@
     "subtextNoCredits": "Te quedaste sin créditos. ¡Recarga o mejora!",
     "subtextNoCreditsSubscribed": "¿Necesitas más magia? ¡Recarga o mejora para que siga la creatividad!",
     "subtextNoCreditsNoSubscription": "Elige una suscripción o compra algunos créditos para seguir.",
-    "subtextFallback": "¡Recibirás 15 créditos gratis, suficientes para crear 3 páginas!"
+    "subtextFallback": "¡Recibirás 15 créditos gratis, suficientes para crear 3 páginas!",
+    "linkSeePlansGuestLimit": "O empieza una prueba gratis de 7 días para páginas ilimitadas"
   },
   "feedback": {
     "title": "¿Qué tienes en mente?",

@@ -1318,7 +1318,8 @@
     "subtextNoCredits": "クレジットがないよ。追加するかアップグレードしてね！",
     "subtextNoCreditsSubscribed": "もっとまほうを追加しよう！クレジット追加かアップグレードで続けられるよ！",
     "subtextNoCreditsNoSubscription": "サブスクをえらぶか、クレジットを少し買って続けよう。",
-    "subtextFallback": "無料クレジット15で、ぬりえが3枚つくれるよ！"
+    "subtextFallback": "無料クレジット15で、ぬりえが3枚つくれるよ！",
+    "linkSeePlansGuestLimit": "または7日間無料で、ページ作り放題をお試し"
   },
   "feedback": {
     "title": "どんなことでも聞かせてね",
