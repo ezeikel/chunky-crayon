@@ -207,11 +207,11 @@ const generatePhotoColoringImageWithMetadata = async (
   }
 };
 
-// Lighter follow-up tasks that don't strictly need to land before the
-// response. Tolerates Vercel after() drop rate (small impact: tracking +
-// retrace). The heavyweight worker pipeline kick is awaited inline in
-// the action below, BEFORE the response — see comment there.
-const runPhotoFollowUp = async (
+// CREATION_COMPLETED fired before the response (not in after()) — see
+// docs/analytics/funnel-investigation-2026-05-17.md. A single PostHog
+// capture is cheap; keeping it out of best-effort after() makes the
+// funnel step reliable.
+const trackPhotoCreationCompleted = async (
   result: Partial<ColoringImage> & { id: string },
   userId: string | undefined,
   durationMs: number,
@@ -234,6 +234,19 @@ const runPhotoFollowUp = async (
     );
   } else {
     await track(TRACKING_EVENTS.CREATION_COMPLETED, completedTrackingData);
+  }
+};
+
+// Heavier follow-up tasks (image fetch + analysis + retrace) — slow,
+// self-healing, non-urgent, so the after() drop rate is acceptable here.
+// The heavyweight worker pipeline kick is awaited inline in the action
+// below, BEFORE the response — see comment there.
+const runPhotoFollowUp = async (
+  result: Partial<ColoringImage> & { id: string },
+  userId: string | undefined,
+) => {
+  if (!result.url || !result.svgUrl) {
+    return;
   }
 
   await Promise.allSettled([
@@ -331,7 +344,8 @@ export async function createColoringImageFromPhoto(
     if (result.url && result.svgUrl) {
       await requestAllPipelineFromWorker(result.id);
     }
-    after(() => runPhotoFollowUp(result, userId, authedDurationMs));
+    await trackPhotoCreationCompleted(result, userId, authedDurationMs);
+    after(() => runPhotoFollowUp(result, userId));
 
     revalidateTag('all-coloring-images', { expire: 0 });
     revalidatePath('/');
@@ -348,7 +362,8 @@ export async function createColoringImageFromPhoto(
   if (result.url && result.svgUrl) {
     await requestAllPipelineFromWorker(result.id);
   }
-  after(() => runPhotoFollowUp(result, undefined, guestDurationMs));
+  await trackPhotoCreationCompleted(result, undefined, guestDurationMs);
+  after(() => runPhotoFollowUp(result, undefined));
 
   revalidateTag('all-coloring-images', { expire: 0 });
   revalidatePath('/');

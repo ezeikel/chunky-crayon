@@ -29,11 +29,24 @@ const UserIdentify = () => {
   if (status === 'authenticated' && session?.user && !hasIdentified.current) {
     const userId = session.user.email || session.user.id;
     if (userId) {
-      // Identify in PostHog with locale
+      // Identify in PostHog with locale.
+      //
+      // `has_account: true` is the positive counterpart to the
+      // `email_subscriber: true` property set in
+      // JoinColoringPageEmailListForm when someone joins the daily-image
+      // email list. Without it, funnels can't distinguish a real app
+      // account from an email-only subscriber, so the
+      // signup → pricing step looks like a 0% drop-off when it's really
+      // just email subscribers who never intended to open the app.
+      // Filter funnels on `has_account = true` to measure true product
+      // users, or `email_subscriber = true` (no account) for the
+      // email re-activation path.
       posthog.identify(userId, {
         email: session.user.email,
         name: session.user.name,
         locale,
+        has_account: true,
+        account_identified_at: new Date().toISOString(),
       });
 
       // Identify in Sentry

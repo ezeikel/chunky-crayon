@@ -389,21 +389,29 @@ export const createColoringImage = async (
       await requestAllPipelineFromWorker(result.id);
     }
 
-    after(async () => {
-      if (!result.url || !result.svgUrl) {
-        return;
-      }
-
+    // CREATION_COMPLETED is fired BEFORE the response, not inside after().
+    // after() is best-effort on serverless and was dropping this event at
+    // a high rate (got much worse once gpt-image-2 lengthened the request
+    // — see docs/analytics/funnel-investigation-2026-05-17.md). A single
+    // PostHog capture costs single-digit ms, so the latency cost of doing
+    // it sync is negligible and the funnel step becomes reliable.
+    if (result.url && result.svgUrl) {
       await trackWithUser(userId, TRACKING_EVENTS.CREATION_COMPLETED, {
         coloringImageId: result.id,
         description: rawFormData.description,
         durationMs,
         creditsUsed: 5,
       });
+    }
 
-      // Lightweight follow-up tasks — analytics + base-data tweaks
-      // that don't strictly need to land before response. Tolerate
-      // the after() drop rate (small impact: tracking + retrace).
+    after(async () => {
+      if (!result.url || !result.svgUrl) {
+        return;
+      }
+
+      // Heavier follow-ups stay in after() — they're slow (image fetch +
+      // analysis), self-healing, and non-urgent, so the after() drop rate
+      // is an acceptable trade-off here (unlike the funnel event above).
       await Promise.allSettled([
         (async () => {
           const { isValid } = await checkSvgImage(result.svgUrl!);
@@ -452,11 +460,10 @@ export const createColoringImage = async (
     await requestAllPipelineFromWorker(result.id);
   }
 
-  after(async () => {
-    if (!result.url || !result.svgUrl) {
-      return;
-    }
-
+  // Fire CREATION_COMPLETED before the response (not in after()) — see the
+  // authenticated path above and
+  // docs/analytics/funnel-investigation-2026-05-17.md for why.
+  if (result.url && result.svgUrl) {
     await track(
       TRACKING_EVENTS.CREATION_COMPLETED,
       {
@@ -467,6 +474,12 @@ export const createColoringImage = async (
       },
       rawFormData.clientDistinctId,
     );
+  }
+
+  after(async () => {
+    if (!result.url || !result.svgUrl) {
+      return;
+    }
 
     await Promise.allSettled([
       (async () => {
@@ -749,18 +762,19 @@ export const createColoringImageFromVoiceConversation = async (opts: {
     await requestAllPipelineFromWorker(result.id);
   }
 
-  after(async () => {
-    if (!result.url || !result.svgUrl) return;
-
-    // CREATION_COMPLETED uses a fixed schema across text/image/voice;
-    // voice-source is implicit from the `purposeKey: 'voice'` on the row.
+  // CREATION_COMPLETED fired before the response (not in after()) — see
+  // docs/analytics/funnel-investigation-2026-05-17.md. This path has no
+  // other after() work, so after() is dropped entirely here.
+  // CREATION_COMPLETED uses a fixed schema across text/image/voice;
+  // voice-source is implicit from the `purposeKey: 'voice'` on the row.
+  if (result.url && result.svgUrl) {
     await trackWithUser(userId, TRACKING_EVENTS.CREATION_COMPLETED, {
       coloringImageId: result.id,
       description,
       durationMs,
       creditsUsed: VOICE_CREDIT_COST,
     });
-  });
+  }
 
   // Match the cache invalidation shape of `createColoringImage` so the
   // gallery / homepage re-render with the new image.

@@ -15,6 +15,7 @@ Permanent reference for how moving parts of this monorepo work. Each topic has i
 | **Ads**                    | [ads/](./ads/README.md)                                       | Config-driven ads, campaign templates, asset generation                                                                                               |
 | **SEO**                    | [seo/](./seo/blog-content-strategy.md)                        | Blog content-cluster strategy — what to write next, what compounds on existing winners, ship-cadence + measurement                                    |
 | **R2 storage migration**   | [R2_STORAGE_MIGRATION.md](./R2_STORAGE_MIGRATION.md)          | Historical migration notes                                                                                                                            |
+| **Funnel investigation**   | [analytics/](./analytics/funnel-investigation-2026-05-17.md)  | 2026-05-17 funnel deep-dive — probable creation-completion timeout regression, pricing-exposure choke point, email/app segmentation, saved insights   |
 | **Plans (in-flight work)** | [plans/](./plans/)                                            | Multi-phase implementation plans, scratchpad-style                                                                                                    |
 
 ## When to add a doc here
