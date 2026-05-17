@@ -6,6 +6,30 @@ Brush**. Spans `packages/coloring-core`, the CC/CH web actions, the Hetzner
 worker, and a headless review-loop script. This is a make-or-break feature and
 is showcased in the auto demo reels.
 
+## ⚠️ Flat per-region fill is INTENDED — do not "fix" it
+
+Each region gets ONE flat colour. The colourise render the pipeline samples
+is a smoothly-*shaded* painting; our output is flat blocks. **This gap is by
+design, not a defect**, and was a deliberate product decision:
+
+- It's a kids' coloring app. The output must look like *a child coloured a
+  coloring book* (flat, bright, inside the lines), not a finished adult
+  illustration. Flat is the on-brand, honest aesthetic for ages 3–8.
+- Magic Brush only works flat: the child sweeps and *their chosen colour*
+  appears — that's their accomplishment. Revealing a pre-shaded painting
+  would mean uncovering an adult's artwork, not colouring.
+- The palette/variant system (realistic/pastel/cute/surprise) only has
+  meaning with flat, namable colours.
+
+The review composite deliberately shows flat output next to the shaded
+render. **The render is a reference for COLOUR SENSIBILITY ONLY** (is the
+fur brown? the sky blue?), **never a shading/fidelity target.** Do not
+re-chase "make it look like the render" — that path was explored, costed,
+and rejected; reproducing the painting would make the product worse for its
+audience. If output looks "not good enough" next to the render, check it's a
+*colour* problem (wrong/random colours) before doing anything — flatness
+itself is not the problem to solve.
+
 ## The contract (unchanged, backward compatible)
 
 Every coloring image stores a **region store**:
