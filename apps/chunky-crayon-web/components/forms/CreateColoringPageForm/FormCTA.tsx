@@ -56,6 +56,14 @@ const FormCTA = ({ className }: FormCTAProps) => {
     const isNoCreditsNonSubscriber =
       blockedReason === 'no_credits' && !hasActiveSubscription;
 
+    // A guest who just hit the free-tries wall is the single highest
+    // intent moment in the product (they want more, right now). The
+    // primary CTA keeps sending them to sign up (an account is a
+    // prerequisite for checkout), but previously the ONLY message was
+    // "15 more free credits" with no paid path — the structural funnel
+    // leak. Add a direct one-click route to the trial offer alongside.
+    const isGuestLimit = blockedReason === 'guest_limit_reached';
+
     const config =
       blockedReason === 'guest_limit_reached'
         ? {
@@ -107,6 +115,22 @@ const FormCTA = ({ className }: FormCTAProps) => {
           >
             {t('linkColorAsYouGo')}
           </a>
+        )}
+        {isGuestLimit && (
+          <button
+            type="button"
+            onClick={() => {
+              trackEvent(TRACKING_EVENTS.PRICING_TEASER_CLICKED, {
+                location: 'guest_limit_cta',
+                generationsUsed:
+                  maxGuestGenerations - guestGenerationsRemaining,
+              });
+              handleAuthAction('pricing');
+            }}
+            className="font-tondo text-sm text-center text-text-muted hover:text-crayon-orange underline-offset-4 hover:underline transition-colors"
+          >
+            {t('linkSeePlansGuestLimit')}
+          </button>
         )}
       </div>
     );

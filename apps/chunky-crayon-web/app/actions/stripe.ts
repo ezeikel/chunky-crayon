@@ -29,6 +29,7 @@ import {
   readClientMatchData,
   sendInitiateCheckoutConversionEvents,
 } from '@/lib/conversion-api';
+import { paymentError } from '@/lib/logger';
 import { getUserId } from './user';
 
 // Cacheable Stripe functions that don't require headers/cookies
@@ -107,7 +108,14 @@ export const createCheckoutSession = async (
 
   // Validate priceId
   if (!priceId) {
-    console.error('No priceId provided to createCheckoutSession');
+    // This is a config failure (a NEXT_PUBLIC_STRIPE_PRICE_* env var
+    // inlined as undefined at build time) that previously failed
+    // silently with only a toast. Surface it as a Sentry issue so the
+    // next occurrence is diagnosable instead of invisible.
+    paymentError('createCheckoutSession: no priceId provided', undefined, {
+      action: 'create_checkout_session',
+      mode,
+    });
     return {
       id: '',
       error: 'No price ID provided. Please check environment variables.',
@@ -192,6 +200,15 @@ export const createCheckoutSession = async (
     payment_method_types: ['card'],
     line_items: [{ price: priceId, quantity: 1 }],
     mode,
+    // Localised Stripe-hosted page — we have US/UK/EU traffic. 'auto'
+    // matches the buyer's browser locale.
+    locale: 'auto',
+    // Let buyers redeem a launch coupon and remove the "is there a
+    // discount I'm missing?" hesitation at the payment moment. We don't
+    // create a coupon here — this only surfaces the field.
+    allow_promotion_codes: true,
+    // Explicit so the address step doesn't surprise-expand mid-checkout.
+    billing_address_collection: 'auto',
     success_url: `${origin}/account/billing/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}${cancelPath || '/pricing'}`,
     metadata: {
@@ -235,6 +252,17 @@ export const createCheckoutSession = async (
       },
     };
     sessionOptions.payment_method_collection = 'always';
+    // The card-required-for-a-free-trial step is the single highest
+    // friction point in the funnel (0/5 plan-clickers ever completed
+    // it). Restate the deal right at the Stripe submit button: free
+    // now, easy out, no charge today. No price interpolation — Stripe
+    // already shows the trial + recurring amount in its own summary.
+    sessionOptions.custom_text = {
+      submit: {
+        message:
+          'You will not be charged today. Your 7-day trial is free and you can cancel any time in one click before it ends.',
+      },
+    };
   }
 
   if (userId && user) {
@@ -249,7 +277,29 @@ export const createCheckoutSession = async (
   // For subscriptions, Stripe automatically creates a customer and collects email
   // Webhook will find/create user from the Stripe customer email
 
-  const stripeSession = await stripe.checkout.sessions.create(sessionOptions);
+  let stripeSession: Stripe.Checkout.Session;
+  try {
+    stripeSession = await stripe.checkout.sessions.create(sessionOptions);
+  } catch (err) {
+    // Previously unguarded: a Stripe API throw here surfaced to the
+    // client as an opaque "unexpected error" toast with nothing in
+    // Sentry. Capture it so a misconfigured price / account / key is
+    // diagnosable on the first occurrence.
+    paymentError(
+      'createCheckoutSession: stripe.checkout.sessions.create failed',
+      err instanceof Error ? err : undefined,
+      {
+        action: 'create_checkout_session',
+        mode,
+        priceId,
+        userId: userId ?? undefined,
+      },
+    );
+    return {
+      id: '',
+      error: 'Could not start checkout. Please try again.',
+    };
+  }
 
   // Fire InitiateCheckout server-side. Survives ad-blockers / iOS 14+
   // tracking restrictions that suppress the browser pixel fire. Don't

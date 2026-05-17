@@ -73,28 +73,71 @@ export default function StartHero({
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            {/* Primary — sign in, carrying the campaign key so post-auth
-                flows know which ad hook brought them in (used later for
-                attribution + per-campaign onboarding variants). */}
-            <Link
-              href={`/signin?from=start&campaign=${campaign}`}
-              onClick={() =>
-                track(TRACKING_EVENTS.START_HERO_CTA_CLICKED, {
-                  campaign,
-                  cta: 'signin',
-                  msFromMount: Date.now() - mountTimeRef.current,
-                })
-              }
-              className={cn(
-                'inline-flex items-center gap-2 font-tondo font-bold text-base md:text-lg text-white',
-                'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover',
-                'hover:scale-105 active:scale-95 transition-all duration-200',
-                'rounded-full px-7 py-3.5',
-              )}
-            >
-              <FontAwesomeIcon icon={faWandMagicSparkles} className="text-lg" />
-              {ctaLabel}
-            </Link>
+            {/* Primary CTA. Destination is A/B'd: `control` keeps the
+                historical `/signin` (free-signup) target; `pricing_first`
+                sends paid traffic straight to the trial offer. Both
+                carry the campaign key for post-auth attribution +
+                per-campaign onboarding variants. Flag:
+                exp-start-cta-destination (PostHog 110135). Measurement
+                first — we don't reroute the whole paid funnel until the
+                experiment shows the trial-first path lifts revenue. */}
+            <Experiment
+              flag="exp-start-cta-destination"
+              defaultVariant="control"
+              exposureProperties={{ campaign, surface: 'start_hero_cta' }}
+              variants={{
+                control: (
+                  <Link
+                    href={`/signin?from=start&campaign=${campaign}`}
+                    onClick={() =>
+                      track(TRACKING_EVENTS.START_HERO_CTA_CLICKED, {
+                        campaign,
+                        cta: 'signin',
+                        ctaDestination: 'signin',
+                        msFromMount: Date.now() - mountTimeRef.current,
+                      })
+                    }
+                    className={cn(
+                      'inline-flex items-center gap-2 font-tondo font-bold text-base md:text-lg text-white',
+                      'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover',
+                      'hover:scale-105 active:scale-95 transition-all duration-200',
+                      'rounded-full px-7 py-3.5',
+                    )}
+                  >
+                    <FontAwesomeIcon
+                      icon={faWandMagicSparkles}
+                      className="text-lg"
+                    />
+                    {ctaLabel}
+                  </Link>
+                ),
+                pricing_first: (
+                  <Link
+                    href={`/pricing?from=start&campaign=${campaign}`}
+                    onClick={() =>
+                      track(TRACKING_EVENTS.START_HERO_CTA_CLICKED, {
+                        campaign,
+                        cta: 'pricing',
+                        ctaDestination: 'pricing',
+                        msFromMount: Date.now() - mountTimeRef.current,
+                      })
+                    }
+                    className={cn(
+                      'inline-flex items-center gap-2 font-tondo font-bold text-base md:text-lg text-white',
+                      'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover',
+                      'hover:scale-105 active:scale-95 transition-all duration-200',
+                      'rounded-full px-7 py-3.5',
+                    )}
+                  >
+                    <FontAwesomeIcon
+                      icon={faWandMagicSparkles}
+                      className="text-lg"
+                    />
+                    {ctaLabel}
+                  </Link>
+                ),
+              }}
+            />
             <p className="font-rooney-sans text-sm text-text-muted max-w-xs">
               {experimentCtaSubtext ? (
                 <Experiment

@@ -319,7 +319,11 @@ export type EventProperties = {
     faq_question?: string;
   };
   [TRACKING_EVENTS.PRICING_TEASER_CLICKED]: {
-    location: 'homepage' | 'start';
+    location: 'homepage' | 'start' | 'guest_limit_cta';
+    // Present when fired from the guest-limit upgrade link in the
+    // create form — how many free generations were used before they
+    // hit the wall and chose the trial path over free signup.
+    generationsUsed?: number;
   };
   [TRACKING_EVENTS.SOCIAL_PROOF_CLICKED]: {
     location: 'homepage' | 'pricing' | 'start';
@@ -335,15 +339,36 @@ export type EventProperties = {
   };
 
   // ===== CHECKOUT =====
-  [TRACKING_EVENTS.CHECKOUT_STARTED]: {
-    productType: 'subscription' | 'credits' | 'bundle';
-    planName?: PlanName;
-    creditAmount?: number;
-    bundleSlug?: string;
-    bundleId?: string;
-    value: number; // Price in pence
-    currency: string;
-  };
+  // Fired client-side from the pricing page the instant a Stripe
+  // session exists and we're about to redirect — the last event we
+  // control before the Stripe-hosted page. Shape mirrors
+  // PRICING_PLAN_CLICKED's subscription|pack discriminated union.
+  [TRACKING_EVENTS.CHECKOUT_STARTED]:
+    | {
+        productType: 'subscription';
+        planName: PlanName;
+        planInterval: BillingPeriod;
+      }
+    | {
+        productType: 'pack';
+        packKey: string;
+        credits: number;
+      };
+  // Session create / redirect failed before the user reached Stripe.
+  // `stage` says where it broke; `reason` is the error string.
+  [TRACKING_EVENTS.CHECKOUT_FAILED]:
+    | {
+        productType: 'subscription';
+        planName: PlanName;
+        stage: 'session_create' | 'redirect' | 'exception';
+        reason?: string;
+      }
+    | {
+        productType: 'pack';
+        packKey: string;
+        stage: 'session_create' | 'redirect' | 'exception';
+        reason?: string;
+      };
   [TRACKING_EVENTS.CHECKOUT_COMPLETED]: {
     productType: 'subscription' | 'credits' | 'bundle';
     planName?: PlanName;
@@ -572,7 +597,10 @@ export type EventProperties = {
   };
   [TRACKING_EVENTS.START_HERO_CTA_CLICKED]: {
     campaign: string;
-    cta: 'signin' | 'download-pdf';
+    cta: 'signin' | 'download-pdf' | 'pricing';
+    // Set by the exp-start-cta-destination experiment so we can
+    // attribute revenue to "paid traffic → /signin" vs "→ /pricing".
+    ctaDestination?: 'signin' | 'pricing';
     msFromMount: number;
   };
   [TRACKING_EVENTS.LANDING_DEMO_PLAYED]: {

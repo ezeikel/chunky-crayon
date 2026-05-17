@@ -14,6 +14,7 @@ import {
   faStar,
   faMobileScreen,
   faPeopleRoof,
+  faShieldCheck,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { faCheck } from '@fortawesome/pro-solid-svg-icons';
 import { PlanName, BillingPeriod } from '@one-colored-pixel/db/types';
@@ -198,19 +199,48 @@ const PricingPageClient = ({
         const errorMessage =
           session?.error || 'Failed to create checkout session';
         console.error('Checkout session error:', errorMessage);
+        trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
+          productType: 'subscription',
+          planName: plan.key,
+          stage: 'session_create',
+          reason: errorMessage,
+        });
         toast.error(errorMessage);
         return;
       }
+
+      // Stripe session exists and we're about to hand off. This is the
+      // last event we control before the Stripe-hosted page — it closes
+      // the previously-dark gap between pricing_plan_clicked and
+      // checkout_completed.
+      trackEvent(TRACKING_EVENTS.CHECKOUT_STARTED, {
+        productType: 'subscription',
+        planName: plan.key,
+        planInterval:
+          interval === 'monthly' ? BillingPeriod.MONTHLY : BillingPeriod.ANNUAL,
+      });
 
       const { error } = await stripe.redirectToCheckout({
         sessionId: session.id,
       });
       if (error) {
         console.error('Stripe redirect error:', error);
+        trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
+          productType: 'subscription',
+          planName: plan.key,
+          stage: 'redirect',
+          reason: error.message,
+        });
         toast.error(error.message || 'Failed to redirect to checkout');
       }
     } catch (error) {
       console.error('Error purchasing plan:', error);
+      trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
+        productType: 'subscription',
+        planName: plan.key,
+        stage: 'exception',
+        reason: error instanceof Error ? error.message : 'unknown',
+      });
       toast.error(tErrors('unexpectedError'));
     } finally {
       setLoadingPlan(null);
@@ -262,19 +292,43 @@ const PricingPageClient = ({
       if (!session || !session.id) {
         const errorMessage = session?.error || 'Failed to start checkout';
         console.error('Pack checkout session error:', errorMessage);
+        trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
+          productType: 'pack',
+          packKey: pack.key,
+          stage: 'session_create',
+          reason: errorMessage,
+        });
         toast.error(errorMessage);
         return;
       }
+
+      trackEvent(TRACKING_EVENTS.CHECKOUT_STARTED, {
+        productType: 'pack',
+        packKey: pack.key,
+        credits: pack.credits,
+      });
 
       const { error } = await stripe.redirectToCheckout({
         sessionId: session.id,
       });
       if (error) {
         console.error('Stripe redirect error:', error);
+        trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
+          productType: 'pack',
+          packKey: pack.key,
+          stage: 'redirect',
+          reason: error.message,
+        });
         toast.error(error.message || 'Checkout failed');
       }
     } catch (err) {
       console.error('[pack-checkout]', err);
+      trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
+        productType: 'pack',
+        packKey: pack.key,
+        stage: 'exception',
+        reason: err instanceof Error ? err.message : 'unknown',
+      });
       toast.error(tErrors('unexpectedError'));
     } finally {
       setLoadingPack(null);
@@ -459,6 +513,26 @@ const PricingPageClient = ({
                       </span>
                     </>
                   )}
+                  {/* Always-on, every card (primary AND secondary) — the
+                      money-back guarantee was previously only visible to
+                      the `guarantee` arm of exp-pricing-trust, so most
+                      visitors never saw it at the decision point. The
+                      experiment still runs in the header trust strip;
+                      this is the de-risking line at the actual CTA. */}
+                  <span className="flex items-center justify-center gap-1.5 text-xs text-text-secondary text-center mt-1">
+                    <FontAwesomeIcon
+                      icon={faShieldCheck}
+                      className="text-crayon-orange"
+                      style={
+                        {
+                          '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                          '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+                          '--fa-secondary-opacity': '1',
+                        } as React.CSSProperties
+                      }
+                    />
+                    {t('trustStrip.guarantee')}
+                  </span>
                 </CardFooter>
               </Card>
             </StaggerItem>
@@ -706,13 +780,39 @@ const PricingPageClient = ({
               ))}
             </div>
           )}
-          <button
-            type="button"
-            onClick={handleSecondaryCtaClick}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-crayon-orange hover:text-crayon-orange-dark underline-offset-4 hover:underline transition-colors"
-          >
-            {t(secondaryCtaKey)} <span aria-hidden>→</span>
-          </button>
+          {/* CTA-primacy experiment. The secondary path ("See credit
+              packs →") sat above the pricing cards as a bold orange
+              link — inviting visitors away from the trial before they
+              saw it. `control` keeps that exactly. `trial_first` drops
+              it here; the secondary section still exists below the fold
+              with its own header, so the path isn't removed, just
+              de-emphasised at the decision point. Flag:
+              exp-pricing-cta-primacy (PostHog 110135). */}
+          <Experiment
+            flag="exp-pricing-cta-primacy"
+            defaultVariant="control"
+            exposureProperties={{ surface: 'pricing_secondary_cta' }}
+            variants={{
+              control: (
+                <button
+                  type="button"
+                  onClick={handleSecondaryCtaClick}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-crayon-orange hover:text-crayon-orange-dark underline-offset-4 hover:underline transition-colors"
+                >
+                  {t(secondaryCtaKey)} <span aria-hidden>→</span>
+                </button>
+              ),
+              trial_first: (
+                <button
+                  type="button"
+                  onClick={handleSecondaryCtaClick}
+                  className="inline-flex items-center gap-1 text-xs text-text-secondary/70 hover:text-text-secondary underline-offset-4 hover:underline transition-colors"
+                >
+                  {t(secondaryCtaKey)}
+                </button>
+              ),
+            }}
+          />
         </div>
       </FadeIn>
 

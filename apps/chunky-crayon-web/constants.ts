@@ -1130,8 +1130,9 @@ export const TRACKING_EVENTS = {
   COLOR_AS_YOU_GO_PACK_CLICKED: 'color_as_you_go_pack_clicked', // Public pack CTA clicked
 
   // ===== CHECKOUT & PAYMENTS (Revenue) =====
-  CHECKOUT_STARTED: 'checkout_started', // Redirecting to Stripe
-  CHECKOUT_COMPLETED: 'checkout_completed', // Payment successful
+  CHECKOUT_STARTED: 'checkout_started', // Stripe session created, redirecting to Stripe
+  CHECKOUT_FAILED: 'checkout_failed', // Session create or redirect failed before reaching Stripe
+  CHECKOUT_COMPLETED: 'checkout_completed', // Payment successful (fires on /account/billing/success)
   CHECKOUT_ABANDONED: 'checkout_abandoned', // User returned without paying
 
   // ===== SUBSCRIPTION MANAGEMENT =====
