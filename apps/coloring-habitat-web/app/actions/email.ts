@@ -120,9 +120,11 @@ const getEmailSubject = (generationType: GenerationType) => {
   const typeMap: Record<GenerationType, string> = {
     [GenerationType.DAILY]: "Daily",
     [GenerationType.USER]: "Custom",
-    // SYSTEM images (ads, demos) shouldn't reach this email flow, but
-    // Record<enum, ...> requires full coverage. Fall back to 'Custom'.
+    // SYSTEM (ads, demos) and COMMENT_REQUEST (delivered via IG/FB DM)
+    // shouldn't reach this email flow, but Record<enum, ...> requires
+    // full coverage. Fall back to 'Custom'.
     [GenerationType.SYSTEM]: "Custom",
+    [GenerationType.COMMENT_REQUEST]: "Custom",
   };
 
   return `Your ${typeMap[generationType]} Coloring Page — ${dayName} ${day} ${month}`;
@@ -138,6 +140,7 @@ const getEmailFilename = (generationType: GenerationType) => {
     [GenerationType.DAILY]: "Daily",
     [GenerationType.USER]: "Custom",
     [GenerationType.SYSTEM]: "Custom",
+    [GenerationType.COMMENT_REQUEST]: "Custom",
   };
 
   return `${typeMap[generationType].toLowerCase()}-coloring-page-${dayName}-${day}-${month}.pdf`;
