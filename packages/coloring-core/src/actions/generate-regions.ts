@@ -16,6 +16,8 @@ import {
   rgbToLab,
   deltaE2000,
   boostChroma,
+  rgbToHex,
+  hexToRgb,
 } from "../utils/color";
 import { createColourisePrompt } from "./colorise-prompts";
 import {
@@ -432,12 +434,13 @@ Return exactly one entry per region ID — no skips, no duplicates, no invented 
 
 type ResolvedColour = { hex: string; colorName: string };
 
-// A region's sampled colour is trusted (no AI repair needed) when the render
-// actually coloured a meaningful chunk of it, that colour was concentrated
-// rather than noisy, and the constrained palette can represent it closely.
+// A region's sampled colour is trusted (kept EXACT, no AI repair) when the
+// render coloured a meaningful chunk of it and that colour was concentrated
+// rather than noisy. No max-ΔE gate any more — we no longer snap to the
+// palette for trusted regions, so "can the palette represent it closely?"
+// is irrelevant; we keep the exact colour.
 const TRUST_MIN_COVERAGE = 0.15;
 const TRUST_MIN_CONFIDENCE = 0.5;
-const TRUST_MAX_DELTA_E = 25;
 
 // In the object-group consistency pass, "same object ⇒ same colour" is the
 // #1 rule (a bunny's ears match its body; a jacket's sleeve matches its
@@ -528,11 +531,20 @@ async function resolveVariantColours(
       height,
     );
 
-    // --- 3. snap to palette + 4. classify trusted vs outlier ----------------
-    // Boost chroma before snapping: the render is often muddy/desaturated,
-    // but its HUE is the right signal. A washed-out green dino region should
-    // snap to Grass Green, not grey "Slate". Genuine neutrals (grey rock)
-    // are left alone by boostChroma's low-delta guard.
+    // --- 3. resolve colour + 4. classify trusted vs outlier -----------------
+    // Nothing downstream requires palette membership — the canvas paints
+    // whatever hex we store. So for a region the render coloured CLEANLY we
+    // keep the EXACT sampled colour (chroma-cleaned), giving ΔE 0 vs the
+    // JPG instead of throwing precision away by snapping to ~50 crayons.
+    // boostChroma is rescue-only (leaves already-good tones alone), and the
+    // colourise render is a deliberately kid-friendly bright render, so the
+    // raw colour is safe to ship per product decision ("trust the render").
+    //
+    // The palette snap is now a FALLBACK: only low-confidence / blank
+    // regions (which can't be sampled reliably) snap to a safe palette
+    // colour, and those go to the AI-repair pass anyway. `colorName` is the
+    // nearest palette name purely as a human-readable label — the `hex` is
+    // the exact sampled value, not that palette entry's hex.
     const resolved = new Map<number, ResolvedColour>();
     const outliers: number[] = [];
     for (const id of regionIds) {
@@ -541,21 +553,23 @@ async function resolveVariantColours(
         outliers.push(id);
         continue;
       }
-      const snapped = nearestPaletteColor(boostChroma(s.rgb), palette);
-      if (!snapped) {
+      const cleaned = boostChroma(s.rgb);
+      const nearest = nearestPaletteColor(cleaned, palette);
+      if (!nearest) {
         outliers.push(id);
         continue;
       }
-      if (
-        s.coverage >= TRUST_MIN_COVERAGE &&
-        s.confidence >= TRUST_MIN_CONFIDENCE &&
-        snapped.deltaE <= TRUST_MAX_DELTA_E
-      ) {
-        resolved.set(id, { hex: snapped.hex, colorName: snapped.name });
+      if (s.coverage >= TRUST_MIN_COVERAGE && s.confidence >= TRUST_MIN_CONFIDENCE) {
+        // High-confidence → ship the EXACT cleaned colour (ΔE 0 vs render).
+        resolved.set(id, {
+          hex: rgbToHex(cleaned),
+          colorName: nearest.name,
+        });
         stats.sampled++;
       } else {
-        // Stash the best-effort snap as a fallback; AI repair may override.
-        resolved.set(id, { hex: snapped.hex, colorName: snapped.name });
+        // Low-confidence → snap to the safe palette colour as a best-effort
+        // fallback; AI repair may still override it.
+        resolved.set(id, { hex: nearest.hex, colorName: nearest.name });
         outliers.push(id);
       }
     }
@@ -772,47 +786,44 @@ function enforceObjectGroupConsistency(
   for (const { trusted, members } of byGroup.values()) {
     if (members.length < 2) continue;
 
-    // Group colour = the palette colour with the largest size-weighted VOTE
-    // among the members' already-resolved (snapped) colours.
+    // Group colour = the dominant PERCEPTUAL CLUSTER's representative.
     //
-    // NEVER average RGB across the group: averaging a yellow region and a
-    // blue region yields muddy green/grey — a colour that exists nowhere in
-    // the object (this was the "brown muddy dinosaur" bug; the render was a
-    // clean green but body+mouth+tongue RGB-averaged to mud). Voting picks
-    // the colour the object actually mostly IS, and a minority oddly-coloured
-    // sub-part can't drag it.
-    const vote = new Map<string, { px: number; c: ResolvedColour }>();
+    // Colours are now exact (not snapped), so an exact-hex vote would never
+    // coalesce — every region has a unique hex. Instead cluster members by
+    // perceptual similarity (CIEDE2000 ≤ CLUSTER_DE): a body painted in 12
+    // slightly-different greens forms ONE green cluster. Sum pixel weight
+    // per cluster, take the dominant cluster, and use its largest-area
+    // member's EXACT colour as the group colour. NEVER average RGB across
+    // the group (yellow+blue → muddy non-existent colour — the old
+    // "brown dinosaur" bug). A minority oddly-coloured sub-part forms its
+    // own small cluster and can't drag the object.
+    const CLUSTER_DE = 10;
+    type Cluster = {
+      lab: { L: number; a: number; b: number };
+      px: number;
+      best: { px: number; c: ResolvedColour };
+    };
+    const clusters: Cluster[] = [];
     for (const m of members) {
       const c = resolved.get(m.id);
       if (!c) continue;
-      const key = c.hex.toLowerCase();
-      const cell = vote.get(key);
+      const rgb = hexToRgb(c.hex);
+      if (!rgb) continue;
+      const lab = rgbToLab(rgb);
       const w = Math.max(0.0001, m.pixelPercentage);
-      if (cell) cell.px += w;
-      else vote.set(key, { px: w, c });
-    }
-
-    let groupColour: ResolvedColour | undefined;
-    let bestPx = -1;
-    for (const { px, c } of vote.values()) {
-      if (px > bestPx) {
-        bestPx = px;
-        groupColour = c;
+      let cl = clusters.find((k) => deltaE2000(k.lab, lab) <= CLUSTER_DE);
+      if (!cl) {
+        cl = { lab, px: 0, best: { px: -1, c } };
+        clusters.push(cl);
       }
+      cl.px += w;
+      if (w > cl.best.px) cl.best = { px: w, c };
     }
-    if (!groupColour) continue;
-    const groupLab = (() => {
-      const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
-        groupColour.hex,
-      );
-      return m
-        ? rgbToLab({
-            r: parseInt(m[1], 16),
-            g: parseInt(m[2], 16),
-            b: parseInt(m[3], 16),
-          })
-        : null;
-    })();
+    if (clusters.length === 0) continue;
+    const dominant = clusters.reduce((a, b) => (b.px > a.px ? b : a));
+    const groupColour: ResolvedColour = dominant.best.c;
+    const groupRgb = hexToRgb(groupColour.hex);
+    const groupLab = groupRgb ? rgbToLab(groupRgb) : null;
 
     for (const m of members) {
       const current = resolved.get(m.id);

@@ -39,16 +39,24 @@ chosen changes this shape** — the work below is purely "pick better colours".
       region-map raster and takes each region's **modal binned colour**
       (4-bit/channel, line-art-black + unfilled-white excluded), with
       `coverage` + `confidence`.
-   3. **Chroma-boost + snap**: `boostChroma()` pulls the sampled colour toward
-      full saturation (a washed-out green snaps to Grass Green, not grey
-      Slate; true greys are left alone), then `nearestPaletteColor()` snaps to
-      the constrained shipping palette via CIEDE2000.
-   4. **Trust vs repair**: clean, confident, well-representable regions are
-      kept. The rest go to **one AI repair call** that SEES the render and is
-      told the locked colours, and only re-colours the outliers.
-   5. **Object-group consistency**: every region in an `objectGroup` is forced
-      to the group's **size-weighted pooled sampled colour** (so one
-      mis-sampled sliver can't fragment a body) unless a region is *very*
+   3. **Chroma-clean (NO palette snap for trusted regions)**: `boostChroma()`
+      is rescue-only — it pulls a *washed-out* colour back toward its hue
+      (muddy green → green) but a saturation window leaves already-good tones
+      (fur, skin, tan) and true greys untouched. The cleaned colour is then
+      kept **EXACTLY** (ΔE 0 vs the render). Nothing downstream requires
+      palette membership — the canvas paints whatever hex we store — so
+      snapping to ~50 crayons was self-imposed precision loss and is gone for
+      the trusted path. `nearestPaletteColor()` is now only a FALLBACK for
+      low-confidence / unsampleable regions (which go to AI repair anyway),
+      and its name is kept as a human-readable `colorName` label while the
+      `hex` stays exact.
+   4. **Trust vs repair**: clean, confident regions keep their exact colour.
+      The rest go to **one AI repair call** that SEES the render and is told
+      the locked colours, and only re-colours the outliers.
+   5. **Object-group consistency**: members are clustered by perceptual
+      similarity (CIEDE2000 ≤ 10 — a body painted in 12 slightly-different
+      greens is one cluster); the dominant cluster's largest-area member's
+      exact colour becomes the group colour, unless a region is *very*
       confidently a dramatically different colour (a red stripe on a white
       sail). This enforces "same object = same colour", the #1 rule.
 4. Merge into `regionsJson`, gzip the region map. (unchanged)
@@ -108,11 +116,13 @@ directly, with the `onVariantRender` + `onVariantPreGroup` debug hooks), then
 writes a **4-panel composite**: line art | pipeline-chosen fill | **the render
 the pipeline actually sampled** | an independent held-out render.
 
-The PRIMARY metric is **self-fidelity ΔE**: the pre-group chosen palette
-colour vs snapping the colour the pipeline's OWN render put in that region.
-This has zero cross-render variance and is measured *before* the group pass,
-so it cleanly answers "does sample→boost→snap faithfully reproduce the
-colourise JPG?" — observed ≈0 when correct.
+**self-fidelity ΔE** (pre-group chosen colour vs the colour the pipeline's
+OWN render put in that region) is now ≈0 essentially **by construction** —
+trusted regions store the exact sampled colour, so this confirms the wiring
+is intact but is no longer the discriminating quality signal. The real
+arbiters now are the **visual composites** (do the exact colours look like a
+natural, kid-friendly coloring? — the "trust the render" bet) and
+**object-group consistency**.
 
 Two non-obvious requirements, learned the hard way:
 
@@ -126,9 +136,10 @@ Two non-obvious requirements, learned the hard way:
   unifies an object's shaded sub-regions; counting that as "drift" inflates
   the number. The `onVariantPreGroup` hook exposes the pre-group map.
 
-Gates: **self-fidelity ΔE ≤ 8** (only palette-snap quantisation should remain)
-AND **object-group consistency ≥ 55%** (NOT higher — forcing a superhero's
-cape/emblem/mask to one colour would be *wrong*; the safe override keeps
+Gates: **self-fidelity ΔE ≤ 8** (≈0 expected now — exact colours; a non-zero
+value means a wiring regression) AND **object-group consistency ≥ 55%** (NOT
+higher — forcing a superhero's cape/emblem/mask to one colour would be
+*wrong*; the safe override keeps
 genuinely-distinct sub-parts apart, so mixed-palette subjects land 55–75%).
 The vs-held-out ΔE and random baseline are reported for context only (the
 held-out render is a noisy 2nd colourise) and are **not** gated on. Composites

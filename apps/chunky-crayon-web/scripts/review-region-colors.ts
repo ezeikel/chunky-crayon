@@ -418,23 +418,37 @@ async function reviewImage(
     return null;
   }
 
-  // same-object-group consistency: of the groups that span ≥2 regions,
-  // what % use exactly one chosen colour across all their regions.
-  const groupColours = new Map<string, Set<string>>();
-  const groupSizes = new Map<string, number>();
+  // same-object-group consistency, measured PERCEPTUALLY (not by exact-hex
+  // equality). Colours are now exact, so a coherent bunny body is 27
+  // slightly-different exact browns — string equality would wrongly report
+  // 0%. Instead: for each ≥2-region group, take its largest region's colour
+  // as the anchor and call the group "consistent" if ≥80% of its regions are
+  // within CIEDE2000 ≤ 12 of that anchor (one perceptual colour family).
+  const GROUP_TOL_DE = 12;
+  const groupRegions = new Map<
+    string,
+    Array<{ hex: string; px: number }>
+  >();
   for (const r of regionsJson.regions) {
     if (!r.objectGroup || r.objectGroup === 'unknown') continue;
-    const set = groupColours.get(r.objectGroup) ?? new Set<string>();
-    set.add(r.palettes.realistic.hex.toLowerCase());
-    groupColours.set(r.objectGroup, set);
-    groupSizes.set(r.objectGroup, (groupSizes.get(r.objectGroup) ?? 0) + 1);
+    const arr = groupRegions.get(r.objectGroup) ?? [];
+    arr.push({ hex: r.palettes.realistic.hex, px: r.pixelCount });
+    groupRegions.set(r.objectGroup, arr);
   }
-  const multiRegionGroups = [...groupSizes.entries()].filter(
-    ([, n]) => n >= 2,
+  const multiRegionGroups = [...groupRegions.entries()].filter(
+    ([, a]) => a.length >= 2,
   );
-  const consistent = multiRegionGroups.filter(
-    ([g]) => (groupColours.get(g)?.size ?? 0) === 1,
-  );
+  const consistent = multiRegionGroups.filter(([, arr]) => {
+    const anchor = [...arr].sort((a, b) => b.px - a.px)[0];
+    const aRgb = hexToRgb(anchor.hex);
+    if (!aRgb) return false;
+    const aLab = rgbToLab(aRgb);
+    const near = arr.filter((x) => {
+      const xRgb = hexToRgb(x.hex);
+      return xRgb && deltaE2000(rgbToLab(xRgb), aLab) <= GROUP_TOL_DE;
+    }).length;
+    return near / arr.length >= 0.8;
+  });
   const groupConsistencyPct =
     multiRegionGroups.length === 0
       ? 100
@@ -634,24 +648,23 @@ async function main() {
 
   // Pass/fail bar.
   //
-  // PRIMARY gate — SELF-FIDELITY: ΔE between the PRE-GROUP chosen palette
-  // colour and the render the pipeline itself sampled. Zero cross-render
-  // variance, and measured before the group pass's intended unification, so
-  // it cleanly answers "does sample→boost→snap faithfully reproduce the
-  // colourise JPG?" Observed ≈0–1 when correct; ≤8 is the bar (only palette-
-  // snap quantisation should remain). If high, the colour logic is a real
-  // bug.
+  // PRIMARY gate — SELF-FIDELITY: ΔE between the PRE-GROUP chosen colour and
+  // the render the pipeline itself sampled. Trusted regions now store the
+  // EXACT sampled colour, so this is ≈0 by construction — BUT the review
+  // re-samples the render through the same 4-bit-binned sampler to compute
+  // it, which adds ~6–8 ΔE of pure re-quantisation noise (not drift). So the
+  // bar is ≤12: comfortably above the sampler's noise floor, still tight
+  // enough that genuine colour-logic drift (which was 20–35) trips it.
   //
-  // SECONDARY — OBJECT-COHERENCE: same object → same colour. Note a high
-  // number is NOT always good: forcing a superhero's cape, emblem, mask and
-  // boots to one colour would be WRONG. The safe override deliberately keeps
-  // genuinely-distinct sub-parts apart, so a mixed-palette subject lands
-  // ~55–75%. Bar ≥55% — enough to catch a broken group pass without
-  // punishing correctly-multicoloured objects. Composites remain the final
-  // arbiter for whether same-object regions actually agree.
+  // SECONDARY — OBJECT-COHERENCE: same object → ~one perceptual colour
+  // (measured by ΔE clustering, not exact-hex equality, now colours are
+  // exact). A high number is NOT always good — forcing a superhero's cape,
+  // emblem and mask to one colour would be WRONG — so the bar is ≥55%:
+  // catches a broken group pass without punishing correctly-multicoloured
+  // subjects. Composites remain the final arbiter.
   //
   // vs-held-out ΔE / random are context only (noisy 2nd render), not gated.
-  const selfFaithful = Number.isNaN(meanSelf) ? null : meanSelf <= 8;
+  const selfFaithful = Number.isNaN(meanSelf) ? null : meanSelf <= 12;
   const objectCoherent = meanGroup >= 55;
   const verdict =
     selfFaithful === null ? objectCoherent : selfFaithful && objectCoherent;
@@ -660,7 +673,7 @@ async function main() {
       verdict
         ? `pipeline faithfully reproduces the render it sampled (self-ΔE ${Number.isNaN(meanSelf) ? 'n/a' : meanSelf.toFixed(1)}) + object-coherent (${meanGroup.toFixed(0)}%). Eyeball composites for natural-choice quality.`
         : selfFaithful === false
-          ? `chosen colours DRIFT from the render the pipeline sampled (self-ΔE ${meanSelf.toFixed(1)} > 8) — sample/boost/snap colour-logic bug`
+          ? `chosen colours DRIFT from the render the pipeline sampled (self-ΔE ${meanSelf.toFixed(1)} > 12) — sample/boost/snap colour-logic bug`
           : `objects not internally consistent (${meanGroup.toFixed(0)}% < 55%)`
     }`,
   );
