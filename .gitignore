@@ -27,6 +27,9 @@ out/
 build
 dist
 
+# TypeScript incremental build cache (per-app, regenerated every build)
+*.tsbuildinfo
+
 
 # Debug
 npm-debug.log*
