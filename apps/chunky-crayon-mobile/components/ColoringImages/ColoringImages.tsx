@@ -47,6 +47,43 @@ const Square = memo(
 
 Square.displayName = "Square";
 
+// Hoisted to module scope so FlashList's ListFooterComponent identity is stable
+// across renders — defining it inside ColoringImages remounted the footer (and
+// its spinner) on every render.
+const ListFooter = memo(
+  ({
+    isFetchingNextPage,
+    hasNextPage,
+    hasItems,
+  }: {
+    isFetchingNextPage: boolean;
+    hasNextPage: boolean;
+    hasItems: boolean;
+  }) => {
+    if (isFetchingNextPage) {
+      return (
+        <View style={styles.footerContainer}>
+          <Spinner color={COLORS.crayonOrange} size={24} />
+        </View>
+      );
+    }
+
+    if (!hasNextPage && hasItems) {
+      return (
+        <View style={styles.footerContainer}>
+          <Text style={styles.endMessage}>
+            You've seen all the coloring pages!
+          </Text>
+        </View>
+      );
+    }
+
+    return null;
+  },
+);
+
+ListFooter.displayName = "ListFooter";
+
 const squareStyles = StyleSheet.create({
   pressable: {
     flex: 1,
@@ -147,28 +184,6 @@ const ColoringImages = () => {
     return null;
   }
 
-  const ListFooter = () => {
-    if (isFetchingNextPage) {
-      return (
-        <View style={styles.footerContainer}>
-          <Spinner color={COLORS.crayonOrange} size={24} />
-        </View>
-      );
-    }
-
-    if (!hasNextPage && coloringImages.length > 0) {
-      return (
-        <View style={styles.footerContainer}>
-          <Text style={styles.endMessage}>
-            You've seen all the coloring pages!
-          </Text>
-        </View>
-      );
-    }
-
-    return null;
-  };
-
   return (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
@@ -207,7 +222,13 @@ const ColoringImages = () => {
           }}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={ListFooter}
+          ListFooterComponent={
+            <ListFooter
+              isFetchingNextPage={isFetchingNextPage}
+              hasNextPage={!!hasNextPage}
+              hasItems={coloringImages.length > 0}
+            />
+          }
         />
       </View>
     </View>
