@@ -242,27 +242,18 @@ export const ColoringContextProvider = ({
     setIsHydrated(true);
   }, []);
 
-  // Persist audio settings to localStorage (only after hydration)
+  // Persist audio settings to localStorage (only after hydration). One effect
+  // for all three keys — setItem is idempotent, so re-writing an unchanged key
+  // is a no-op and the end state is identical to three separate effects.
   useEffect(() => {
-    if (isHydrated) {
-      localStorage.setItem(`${storagePrefix}-muted`, String(isMuted));
-    }
-  }, [isMuted, isHydrated]);
-
-  useEffect(() => {
-    if (isHydrated) {
-      localStorage.setItem(`${storagePrefix}-sfx-muted`, String(isSfxMuted));
-    }
-  }, [isSfxMuted, isHydrated]);
-
-  useEffect(() => {
-    if (isHydrated) {
-      localStorage.setItem(
-        `${storagePrefix}-ambient-muted`,
-        String(isAmbientMuted),
-      );
-    }
-  }, [isAmbientMuted, isHydrated]);
+    if (!isHydrated) return;
+    localStorage.setItem(`${storagePrefix}-muted`, String(isMuted));
+    localStorage.setItem(`${storagePrefix}-sfx-muted`, String(isSfxMuted));
+    localStorage.setItem(
+      `${storagePrefix}-ambient-muted`,
+      String(isAmbientMuted),
+    );
+  }, [isMuted, isSfxMuted, isAmbientMuted, isHydrated]);
 
   // Progress state
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
