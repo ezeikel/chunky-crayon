@@ -39,16 +39,18 @@ export function rgbToHex({ r, g, b }: Rgb): string {
  * Pull a colour toward full saturation while keeping its hue and rough
  * lightness.
  *
- * The colourise render is often muddy/desaturated (the review loop's
- * grey-dinosaur failure: a green dino sampled as grey, which then snaps to
- * "Slate" instead of "Grass Green"). The render's *hue* is still the right
- * signal — "this region is greenish" — it's only the saturation that's been
- * washed out. Boosting chroma before snapping makes a muddy green snap to a
- * clean green rather than to grey, which is what a human would actually
- * colour it. Near-neutral colours (true greys: low chroma at ALL hues) are
- * left alone so a genuinely grey rock stays grey.
+ * RESCUE-ONLY. The colourise render is sometimes muddy/desaturated (the
+ * review loop's grey-dinosaur failure: a green dino sampled as grey, which
+ * snaps to "Slate" instead of "Grass Green"). When a colour is *washed out*
+ * its hue is still the right signal, so we pull it back toward that hue.
  *
- * @param amount 0 = unchanged, 1 = fully saturated. Default 0.6.
+ * But it must NOT touch colours that are already fine: a tabby's soft tan
+ * fur (#B4926F) or a skin tone is a deliberate, correct colour — boosting it
+ * just over-saturates it into something harsher that mis-snaps. So the boost
+ * is applied through a WINDOW centred on the washed-out band and tapers to
+ * zero both below it (true greys: no hue) and above it (already saturated).
+ *
+ * @param amount peak boost strength at the centre of the window. Default 0.6.
  */
 export function boostChroma({ r, g, b }: Rgb, amount = 0.6): Rgb {
   const max = Math.max(r, g, b);
@@ -58,20 +60,29 @@ export function boostChroma({ r, g, b }: Rgb, amount = 0.6): Rgb {
 
   const s = delta / max; // HSV saturation, 0..1
 
-  // A near-grey has NO reliable hue — its tiny channel differences are JPEG
-  // noise / ambient bounce, not a colour choice. The old `delta < 14` guard
-  // let a barely-tinted grey through and then a 0.6 boost DETONATED it into a
-  // fully-saturated colour (the "cream fur → turquoise, whole bunny cyan"
-  // bug). Fix: gate on SATURATION not raw delta, and ramp the boost in
-  // gradually above the floor so a faint tint is nudged, not exploded.
-  //   - s ≤ GREY_FLOOR  → leave entirely alone (a real grey stays grey)
-  //   - GREY_FLOOR..FULL_AT → boost ramps 0→full
-  //   - s ≥ FULL_AT     → full boost (genuinely chromatic, just washed out)
+  // boostChroma is RESCUE-ONLY: it exists to pull a *washed-out* colour back
+  // toward its true hue (a muddy green → green), NOT to crank up colours that
+  // are already fine. The old "ramp up and stay full above FULL_AT" curve did
+  // the opposite — it hit an already-reasonable mid-tone (tabby fur #B4926F,
+  // s≈0.38; soft tan boots; skin) with the FULL boost, over-saturating it
+  // into a harsher colour that then mis-snapped. The correct shape is a
+  // WINDOW that tapers off once a colour already has enough chroma:
+  //
+  //   s ≤ GREY_FLOOR        → leave alone (no reliable hue; a real grey)
+  //   GREY_FLOOR → PEAK     → ramp boost UP (these are the genuinely washed
+  //                           colours that need rescuing)
+  //   PEAK → ADEQUATE       → ramp boost back DOWN (chroma getting healthy)
+  //   s ≥ ADEQUATE          → leave alone (already saturated — don't harm
+  //                           natural tans / skins / soft tones)
   const GREY_FLOOR = 0.12;
-  const FULL_AT = 0.35;
-  if (s <= GREY_FLOOR) return { r, g, b };
-  const ramp = Math.min(1, (s - GREY_FLOOR) / (FULL_AT - GREY_FLOOR));
-  const eff = amount * ramp;
+  const PEAK = 0.22;
+  const ADEQUATE = 0.45;
+  if (s <= GREY_FLOOR || s >= ADEQUATE) return { r, g, b };
+  const window =
+    s <= PEAK
+      ? (s - GREY_FLOOR) / (PEAK - GREY_FLOOR) // 0 → 1 (rescue ramp up)
+      : (ADEQUATE - s) / (ADEQUATE - PEAK); // 1 → 0 (taper down)
+  const eff = amount * Math.max(0, Math.min(1, window));
   if (eff <= 0) return { r, g, b };
 
   // Keep value (max) + hue, raise saturation toward (never fully to) 1.

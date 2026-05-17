@@ -150,6 +150,32 @@ ok(
   `boostChroma washed red still vivid -> ${wrName} [expect a red]`,
 );
 
+// RESCUE-ONLY regression: a tabby-fur tan that is ALREADY adequately
+// saturated (#B4926F, s = (180-111)/180 ≈ 0.38) must barely move — the old
+// curve cranked it to a harsh #B4712C that mis-snapped. It should stay a
+// soft warm tan, close to its sampled value.
+const tabbyFur = { r: 0xb4, g: 0x92, b: 0x6f };
+const tf = boostChroma(tabbyFur);
+const tfDelta = Math.hypot(
+  tf.r - tabbyFur.r,
+  tf.g - tabbyFur.g,
+  tf.b - tabbyFur.b,
+);
+ok(
+  tfDelta < 25,
+  `boostChroma already-OK tan barely moves (Δrgb ${tfDelta.toFixed(1)} < 25) -> {${Math.round(tf.r)},${Math.round(tf.g)},${Math.round(tf.b)}} [must NOT over-saturate natural fur/skin]`,
+);
+// And the washed-out green that NEEDS rescuing must still get rescued.
+const washedGreen = { r: 118, g: 138, b: 108 }; // s ≈ 0.22, the rescue band
+const wgName = nearestPaletteColor(boostChroma(washedGreen), PALETTE)?.name;
+ok(
+  wgName === "Grass Green" ||
+    wgName === "Forest" ||
+    wgName === "Lime" ||
+    wgName === "Olive",
+  `boostChroma washed green still rescued -> ${wgName} [expect a green, not grey/slate]`,
+);
+
 // --- 4. sampler: a synthetic 3-region image -------------------------------
 // Build a 60×20 RGB image: cols 0-19 pure red, 20-39 pure green,
 // 40-59 pure blue. Region map: same banding. Each region's modal colour

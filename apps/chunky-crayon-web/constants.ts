@@ -99,6 +99,25 @@ export const COLORING_PALETTE = {
     { name: 'Salmon', hex: '#FF8A65' },
     { name: 'Slate', hex: '#546E7A' },
     { name: 'Cream', hex: '#FFF8E1' },
+    // Natural mid-tones — AI auto-color / Magic Brush ONLY (not shown as kid
+    // crayon buttons). Added to close measured snap-ΔE gaps where realistic
+    // renders crammed soft earth/neutral colours onto a few far-apart entries
+    // (49 regions were landing on "Medium Dark" alone, avg ΔE 11.7). These
+    // bridge the warm-neutral, sage-green, soft-blue and neutral-grey gaps.
+    { name: 'Taupe', hex: '#B59A7C' },
+    { name: 'Warm Beige', hex: '#E3C9A6' },
+    { name: 'Mushroom', hex: '#A68A6D' },
+    { name: 'Sienna', hex: '#B5784B' },
+    { name: 'Sage', hex: '#9CAF88' },
+    { name: 'Moss', hex: '#6B8E4E' },
+    { name: 'Steel Blue', hex: '#5B7B9A' },
+    { name: 'Dusty Blue', hex: '#8AA4B8' },
+    { name: 'Charcoal', hex: '#3F4448' },
+    { name: 'Stone Gray', hex: '#B0AEA6' },
+    // Pale cool tones — windows/glass/highlights/snow read as a soft icy
+    // off-white, not warm Cream. Closes the last measured gap.
+    { name: 'Pale Ice', hex: '#E4EEF2' },
+    { name: 'Pale Sky', hex: '#C5DCEA' },
   ],
 } as const;
 
