@@ -33,17 +33,17 @@ production DB.
    until users actually get there.
 
 3. **🟡 The signup → pricing "0% drop-off" was largely a funnel artifact.**
-   Real journey is *create-as-guest → then sign in* (confirmed: the 2026-05-17
+   Real journey is _create-as-guest → then sign in_ (confirmed: the 2026-05-17
    page was created with `userId: null`). Signin-first ordered funnels
    mis-sequence this and falsely read 0%. Unordered: 291 people
-   created-or-signed-in, 132 (45%) did both — the product *is* used; the
+   created-or-signed-in, 132 (45%) did both — the product _is_ used; the
    funnels just measured it wrong.
 
 4. **🟡 Email → app re-activation path is dead.** Only ~6 `utm_source=daily-email`
    click-throughs in 90 days vs ~100 email-list signups in the same window.
    Subscribers get the free image and never return. The lever is the email CTA
-   + a re-engagement sequence, not the in-app funnel. (Independent of event
-   reliability — based on pageviews + email_signup_completed, both reliable.)
+   - a re-engagement sequence, not the in-app funnel. (Independent of event
+     reliability — based on pageviews + email_signup_completed, both reliable.)
 
 ## Evidence
 
@@ -67,8 +67,8 @@ errors. The completion event simply isn't landing.
 
 - `apps/chunky-crayon-web/app/actions/coloring-image.ts:392` — `creation_completed`
   is captured inside an `after()` block (runs after the HTTP response).
-- `coloring-image.ts:405-406` — explicit comment: *"Tolerate the after() drop
-  rate (small impact: tracking + retrace)."* This is a known, accepted trade-off,
+- `coloring-image.ts:405-406` — explicit comment: _"Tolerate the after() drop
+  rate (small impact: tracking + retrace)."_ This is a known, accepted trade-off,
   not a new bug.
 - `after()` callbacks are best-effort on serverless; when the function freezes /
   recycles post-response the block is dropped. The gpt-image-2 switch
@@ -84,7 +84,7 @@ userId null | has_svg true | has_regionmap true
 createdAt 20:00:18 → updatedAt 20:01:28  (~70s, well under maxDuration=150)
 ```
 
-(The 215s latency figure in memory is the daily *scene* pipeline, a different
+(The 215s latency figure in memory is the daily _scene_ pipeline, a different
 heavier path — not the user create path, which completes in ~70s.)
 
 ### Segmentation (findings #3, #4)
@@ -132,3 +132,93 @@ is `MAX_GUEST_GENERATIONS = 2`
 `FREE_CREDITS = 15` (`constants.ts:572`) is the signed-up credit grant — a
 different gate. The guest cap → signup path is well-instrumented
 (`guest_limit_reached` → `guest_signup_clicked` → auth). Not a problem.
+
+---
+
+# Addendum — first real customer, 2026-05-18
+
+The first ever real production subscription happened on 2026-05-18, the day
+after this investigation. It both validates and sharpens the findings above.
+
+## What happened
+
+A real UK user (Kent) clicked a Meta paid ad (`utm_campaign=dragon`,
+`utm_content=v1`), went landing → pricing → Stripe checkout, and started a
+**Sparkle annual 7-day trial (£249.99/yr)**. Single PostHog person
+(`person_id de44e4ef-…`, distinct_id `019e3a59-795c-…`); journey:
+
+```
+10:10 lands /en/start (dragon ad)
+10:10 CTA → /en/pricing
+10:12 pricing_plan_clicked → checkout_started → leaves for Stripe
+10:13 returns /account/billing/success?session_id=cs_live_b137T… → checkout_completed
+10:14 creates a coloring page AS GUEST, colours it, prints it
+10:28 back on /start, opens FAQ, submits feedback asking how to cancel
+```
+
+Stripe + DB verified clean end to end: `sub_1TYNEcK6qKjkWA8MOYhWt5AS`
+(SPARKLE / ANNUAL / TRIALING), `User` row created with `1015` credits
+(`FREE_CREDITS 15` + SPARKLE `1000`), `CreditTransaction` PURCHASE row,
+idempotency row `evt_1TYNEeK6qKjkWA8Mcl6MOtkB` present, **zero** Stripe/
+webhook/Sentry errors. The pipeline is mechanically proven.
+
+## The incident: guest-checkout sign-in dead end (CONFIRMED, was a hypothesis)
+
+The customer's own words via the in-app feedback widget:
+
+> "I followed the link and signed up for 7 day trial and top package for my
+> workplace but have just been told my boss already has subscription **how do I
+> cancel as I wasn't asked to sign in?**"
+
+This is finding #3 above (create/buy-as-guest, sign-in is a separate
+disconnected step) escalating from "funnel measurement artifact" to a
+**production incident that cost a support contact and a near-certain
+cancellation**. Root cause, verified in code (not inferred):
+
+- `components/BillingSuccess/BillingSuccess.tsx` has zero auth logic. After
+  checkout it shows "You're all set" + a "Go to Billing" link that bounces a
+  guest because they have no session.
+- `auth.ts` uses `session.strategy: 'database'` (PrismaAdapter). A session is
+  only ever minted via the `signIn` callback (google/apple/facebook/resend). A
+  Stripe webhook is none of those, so a guest buyer is **never logged in**.
+- `app/api/payment/webhook/route.ts` creates the `User` row server-side but no
+  session.
+- `app/actions/settings.ts` exposes only `updateShowCommunityImages` +
+  `getUserSettings`. **There is no email-change action and no self-serve
+  cancel.** A guest who pays under the "wrong" email has no path to anything:
+  not login, not email correction, not cancellation.
+
+Identity note for support tooling: the customer typed
+`carisbaba@yahoo.co.uk` into feedback but paid under
+`communityhawkhurst@outlook.com` (workplace mailbox; Cranbrook vs Hawkhurst,
+~4mi apart — corroborated same person). Support/feedback email will routinely
+differ from billing email; matching on email alone fails.
+
+GDPR note: confirming "this person == that person" required joining Stripe +
+prod DB + PostHog + IP geo. That cross-system linkage is itself personal data /
+profiling (lawful as legitimate interest for duplicate-account/support
+handling) and is in scope of any future DSAR. Do not disclose one data
+subject's account email/name to an unverified requester — verify by asking the
+requester to produce their sign-up email, never by stating it to them.
+
+## What this validates / sharpens vs the original findings
+
+- Finding #2 ("nobody reaches /pricing") still stands as the volume problem —
+  this is **one** conversion, not product-market fit, and it's being
+  cancelled. Do not over-fit: not a pricing signal, not a winning-creative
+  signal yet. Watch the dragon cohort over the next 10–20 clicks.
+- Finding #3 is now an incident, not an artifact. The fix is the
+  post-checkout sign-in handoff + self-serve billing, planned in
+  `~/.claude/plans/cc-first-customer-guest-checkout-gap.md`.
+- Positive: the core product experience landed (paid → created → coloured →
+  printed within a minute). Value delivery is intact; the gap is purely
+  post-purchase account/identity/self-serve.
+
+## Remediation
+
+Tracked in `~/.claude/plans/cc-first-customer-guest-checkout-gap.md`:
+auto-create a verified NextAuth session on the success page + magic-link
+backup, Stripe Billing Portal self-serve cancel/manage, an email-change action
+with new-address verification, and feedback-widget identity capture. The
+session-from-`session_id` path carries an account-hijack risk (the redirect URL
+is the only trust bearer) and gets a mandatory security review before merge.
