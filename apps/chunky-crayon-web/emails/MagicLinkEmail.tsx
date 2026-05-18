@@ -5,6 +5,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -26,7 +27,13 @@ const MagicLinkEmail = ({ magicLink }: MagicLinkEmailProps) => (
         {/* Header */}
         <Section style={header}>
           <Link href={baseUrl} style={logoLink}>
-            <Text style={logo}>Chunky Crayon</Text>
+            <Img
+              src="https://www.chunkycrayon.com/logos/cc-logo.png"
+              width="44"
+              height="48"
+              alt="Chunky Crayon"
+              style={logo}
+            />
           </Link>
         </Section>
 
@@ -116,10 +123,11 @@ const logoLink = {
 };
 
 const logo = {
-  fontSize: '28px',
-  fontWeight: '700',
-  color: '#DA7353',
-  margin: '0',
+  display: 'block',
+  margin: '0 auto',
+  border: '0',
+  outline: 'none',
+  textDecoration: 'none',
 };
 
 const hero = {
@@ -128,7 +136,7 @@ const hero = {
   padding: '40px 32px 32px',
   textAlign: 'center' as const,
   marginBottom: '20px',
-  border: '2px solid #F0E6D8',
+  border: '2px solid #F5F0E8',
 };
 
 const crayonEmoji = {
@@ -139,7 +147,7 @@ const crayonEmoji = {
 const heroTitle = {
   fontSize: '28px',
   fontWeight: '700',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 12px',
   lineHeight: '34px',
 };
@@ -147,7 +155,7 @@ const heroTitle = {
 const heroSubtitle = {
   fontSize: '16px',
   lineHeight: '24px',
-  color: '#666666',
+  color: '#8C7A6B',
   margin: '0',
 };
 
@@ -156,7 +164,7 @@ const ctaCard = {
   borderRadius: '16px',
   padding: '32px 24px',
   margin: '0 0 20px',
-  border: '2px solid #F0E6D8',
+  border: '2px solid #F5F0E8',
   textAlign: 'center' as const,
 };
 
@@ -174,7 +182,7 @@ const ctaButton = {
 
 const expiryText = {
   fontSize: '13px',
-  color: '#999999',
+  color: '#8C7A6B',
   margin: '0',
 };
 
@@ -183,7 +191,7 @@ const fallbackCard = {
   borderRadius: '12px',
   padding: '20px',
   margin: '0 0 20px',
-  border: '1px dashed #D9C7B0',
+  border: '1px dashed #F5F0E8',
 };
 
 const fallbackLabel = {
@@ -197,7 +205,7 @@ const fallbackLabel = {
 
 const fallbackBody = {
   fontSize: '14px',
-  color: '#666666',
+  color: '#8C7A6B',
   margin: '0 0 12px',
   lineHeight: '20px',
 };
@@ -220,13 +228,13 @@ const reassureSection = {
 const reassureText = {
   fontSize: '13px',
   lineHeight: '20px',
-  color: '#999999',
+  color: '#8C7A6B',
   margin: '0',
   textAlign: 'center' as const,
 };
 
 const hr = {
-  borderColor: '#F0E6D8',
+  borderColor: '#F5F0E8',
   margin: '24px 0',
 };
 
@@ -244,18 +252,18 @@ const footerText = {
 
 const footerLinks = {
   fontSize: '12px',
-  color: '#999999',
+  color: '#8C7A6B',
   margin: '0 0 8px',
 };
 
 const footerLink = {
-  color: '#999999',
+  color: '#DA7353',
   textDecoration: 'underline',
 };
 
 const footerCopyright = {
   fontSize: '12px',
-  color: '#CCCCCC',
+  color: '#B5A89B',
   margin: '0',
 };
 

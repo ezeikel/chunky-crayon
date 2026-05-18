@@ -5,6 +5,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -44,7 +45,13 @@ const TrialEndingEmail = ({
         {/* Header */}
         <Section style={header}>
           <Link href={baseUrl} style={logoLink}>
-            <Text style={logo}>Chunky Crayon</Text>
+            <Img
+              src="https://www.chunkycrayon.com/logos/cc-logo.png"
+              width="44"
+              height="48"
+              alt="Chunky Crayon"
+              style={logo}
+            />
           </Link>
         </Section>
 
@@ -144,10 +151,11 @@ const header = {
 const logoLink = { textDecoration: 'none' };
 
 const logo = {
-  fontSize: '28px',
-  fontWeight: '700',
-  color: '#DA7353',
-  margin: '0',
+  display: 'block',
+  margin: '0 auto',
+  border: '0',
+  outline: 'none',
+  textDecoration: 'none',
 };
 
 const banner = {

@@ -128,7 +128,13 @@ const SocialDigestEmail = ({
         {/* Header */}
         <Section style={header}>
           <Link href={baseUrl} style={logoLink}>
-            <Text style={logo}>Chunky Crayon</Text>
+            <Img
+              src="https://www.chunkycrayon.com/logos/cc-logo.png"
+              width="44"
+              height="48"
+              alt="Chunky Crayon"
+              style={logo}
+            />
           </Link>
         </Section>
 
@@ -501,10 +507,11 @@ const logoLink = {
 };
 
 const logo = {
-  fontSize: '28px',
-  fontWeight: '700',
-  color: '#DA7353',
-  margin: '0',
+  display: 'block',
+  margin: '0 auto',
+  border: '0',
+  outline: 'none',
+  textDecoration: 'none',
 };
 
 const hero = {
@@ -513,25 +520,25 @@ const hero = {
   padding: '32px',
   textAlign: 'center' as const,
   marginBottom: '24px',
-  border: '2px solid #F0E6D8',
+  border: '2px solid #F5F0E8',
 };
 
 const heroTitle = {
   fontSize: '28px',
   fontWeight: '700',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 8px',
 };
 
 const heroSubtitle = {
   fontSize: '16px',
-  color: '#666666',
+  color: '#8C7A6B',
   margin: '0',
 };
 
 const heroNote = {
   fontSize: '13px',
-  color: '#888888',
+  color: '#8C7A6B',
   margin: '12px 0 0',
   fontStyle: 'italic' as const,
 };
@@ -550,7 +557,7 @@ const infoSection = {
   borderRadius: '16px',
   padding: '24px',
   margin: '0 0 16px',
-  border: '2px solid #F0E6D8',
+  border: '2px solid #F5F0E8',
 };
 
 const sectionTitle = {
@@ -563,7 +570,7 @@ const sectionTitle = {
 const paragraph = {
   fontSize: '14px',
   lineHeight: '22px',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 8px',
 };
 
@@ -573,8 +580,8 @@ const inlineLink = {
 };
 
 const assetSection = {
-  backgroundColor: '#FFF5EE',
-  border: '2px solid #EDAF8B',
+  backgroundColor: '#FFF3E0',
+  border: '2px solid #FFE0B2',
   borderRadius: '16px',
   padding: '24px',
   margin: '0 0 16px',
@@ -592,13 +599,13 @@ const platformCard = {
   borderRadius: '16px',
   padding: '20px',
   margin: '0 0 12px',
-  border: '2px solid #F0E6D8',
+  border: '2px solid #F5F0E8',
 };
 
 const platformHeader = {
   fontSize: '16px',
   fontWeight: '600',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 8px',
 };
 
@@ -619,21 +626,21 @@ const badgeManual = {
   fontSize: '11px',
   fontWeight: '600',
   color: '#FFFFFF',
-  backgroundColor: '#EDAF8B',
+  backgroundColor: '#FFE0B2',
   padding: '2px 8px',
   borderRadius: '10px',
 };
 
 const assetTypeText = {
   fontSize: '12px',
-  color: '#999999',
+  color: '#8C7A6B',
   margin: '0 0 12px',
 };
 
 const captionBlock = {
   fontSize: '13px',
   lineHeight: '20px',
-  color: '#333333',
+  color: '#3F3127',
   backgroundColor: '#FAF7F2',
   padding: '12px',
   borderRadius: '8px',
@@ -643,7 +650,7 @@ const captionBlock = {
 };
 
 const hr = {
-  borderColor: '#F0E6D8',
+  borderColor: '#F5F0E8',
   margin: '32px 0',
 };
 
@@ -661,7 +668,7 @@ const footerText = {
 
 const footerCopyright = {
   fontSize: '12px',
-  color: '#CCCCCC',
+  color: '#B5A89B',
   margin: '0',
 };
 

@@ -49,7 +49,13 @@ const BundlePurchaseEmail = ({
       <Container style={container}>
         <Section style={header}>
           <Link href={baseUrl} style={logoLink}>
-            <Text style={logo}>Chunky Crayon</Text>
+            <Img
+              src="https://www.chunkycrayon.com/logos/cc-logo.png"
+              width="44"
+              height="48"
+              alt="Chunky Crayon"
+              style={logo}
+            />
           </Link>
         </Section>
 
@@ -122,30 +128,33 @@ const BundlePurchaseEmail = ({
   </Html>
 );
 
+// Shared brand tokens: kept identical to TrialEndingEmail /
+// WelcomeEmail / PaymentFailedEmail so every email reads as one suite.
 const main = {
-  backgroundColor: '#FFFAF5',
+  backgroundColor: '#FAF7F2',
   fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 };
 
 const container = {
   margin: '0 auto',
-  padding: '24px 16px',
-  maxWidth: '600px',
+  padding: '20px 0 48px',
+  maxWidth: '560px',
 };
 
 const header = {
   textAlign: 'center' as const,
-  marginBottom: '16px',
+  padding: '20px 0',
 };
 
 const logoLink = { textDecoration: 'none' };
 
 const logo = {
-  fontSize: '20px',
-  fontWeight: 700,
-  color: '#7A4FBF',
-  margin: 0,
+  display: 'block',
+  margin: '0 auto',
+  border: '0',
+  outline: 'none',
+  textDecoration: 'none',
 };
 
 const hero = {
@@ -157,7 +166,7 @@ const coverImg = {
   width: '100%',
   maxWidth: '520px',
   borderRadius: '16px',
-  border: '2px solid rgba(92, 58, 33, 0.1)',
+  border: '2px solid #F5F0E8',
 };
 
 const content = {
@@ -167,7 +176,7 @@ const content = {
 const heroTitle = {
   fontSize: '28px',
   fontWeight: 700,
-  color: '#3A2616',
+  color: '#3F3127',
   textAlign: 'center' as const,
   margin: '8px 0',
 };
@@ -175,14 +184,14 @@ const heroTitle = {
 const paragraph = {
   fontSize: '16px',
   lineHeight: 1.6,
-  color: '#5C3A21',
+  color: '#5C4D43',
   textAlign: 'center' as const,
 };
 
 const tagline = {
   fontSize: '15px',
   fontStyle: 'italic',
-  color: '#9B7755',
+  color: '#8C7A6B',
   textAlign: 'center' as const,
   marginTop: '4px',
 };
@@ -193,7 +202,7 @@ const ctaSection = {
 };
 
 const ctaButton = {
-  backgroundColor: '#F86A2F',
+  backgroundColor: '#DA7353',
   color: '#FFFFFF',
   padding: '16px 32px',
   borderRadius: '999px',
@@ -205,31 +214,31 @@ const ctaButton = {
 
 const ctaSub = {
   fontSize: '13px',
-  color: '#9B7755',
+  color: '#8C7A6B',
   marginTop: '12px',
 };
 
 const hr = {
-  borderColor: 'rgba(92, 58, 33, 0.1)',
+  borderColor: '#F5F0E8',
   margin: '24px 0',
 };
 
 const whatNextTitle = {
   fontSize: '18px',
   fontWeight: 700,
-  color: '#3A2616',
+  color: '#3F3127',
   margin: '0 0 12px',
 };
 
 const listItem = {
   fontSize: '15px',
   lineHeight: 1.6,
-  color: '#5C3A21',
+  color: '#5C4D43',
   margin: '6px 0',
 };
 
 const checkmark = {
-  color: '#F86A2F',
+  color: '#DA7353',
   fontWeight: 700,
   marginRight: '8px',
 };
@@ -241,18 +250,18 @@ const footer = {
 
 const footerText = {
   fontSize: '14px',
-  color: '#5C3A21',
+  color: '#8C7A6B',
   margin: '4px 0',
 };
 
 const footerLink = {
-  color: '#7A4FBF',
+  color: '#DA7353',
   textDecoration: 'underline',
 };
 
 const footerSmall = {
   fontSize: '12px',
-  color: '#9B7755',
+  color: '#B5A89B',
   marginTop: '12px',
 };
 

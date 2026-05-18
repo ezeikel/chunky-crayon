@@ -5,6 +5,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -47,7 +48,13 @@ const DailyColoringEmail = ({
           {/* Header */}
           <Section style={header}>
             <Link href={baseUrl} style={logoLink}>
-              <Text style={logo}>Chunky Crayon</Text>
+              <Img
+                src="https://www.chunkycrayon.com/logos/cc-logo.png"
+                width="44"
+                height="48"
+                alt="Chunky Crayon"
+                style={logo}
+              />
             </Link>
           </Section>
 
@@ -172,10 +179,11 @@ const logoLink = {
 };
 
 const logo = {
-  fontSize: '28px',
-  fontWeight: '700',
-  color: '#DA7353', // crayon-orange (coral)
-  margin: '0',
+  display: 'block',
+  margin: '0 auto',
+  border: '0',
+  outline: 'none',
+  textDecoration: 'none',
 };
 
 const hero = {
@@ -184,19 +192,19 @@ const hero = {
   padding: '32px',
   textAlign: 'center' as const,
   marginBottom: '24px',
-  border: '2px solid #F0E6D8',
+  border: '2px solid #F5F0E8',
 };
 
 const heroTitle = {
   fontSize: '28px',
   fontWeight: '700',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 8px',
 };
 
 const heroSubtitle = {
   fontSize: '16px',
-  color: '#666666',
+  color: '#8C7A6B',
   margin: '0',
 };
 
@@ -208,7 +216,7 @@ const content = {
 const paragraph = {
   fontSize: '16px',
   lineHeight: '26px',
-  color: '#333333',
+  color: '#5C4D43',
   margin: '0 0 16px',
 };
 
@@ -217,7 +225,7 @@ const upsellCard = {
   borderRadius: '16px',
   padding: '28px 24px',
   margin: '24px 0',
-  border: '2px solid #F0E6D8',
+  border: '2px solid #F5F0E8',
   textAlign: 'center' as const,
 };
 
@@ -233,21 +241,21 @@ const upsellEyebrow = {
 const upsellTitle = {
   fontSize: '22px',
   fontWeight: '700',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 8px',
 };
 
 const upsellBody = {
   fontSize: '15px',
   lineHeight: '22px',
-  color: '#555555',
+  color: '#5C4D43',
   margin: '0 0 16px',
 };
 
 const upsellPrice = {
   fontSize: '20px',
   fontWeight: '700',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 16px',
 };
 
@@ -263,7 +271,7 @@ const upsellButton = {
 };
 
 const hr = {
-  borderColor: '#F0E6D8',
+  borderColor: '#F5F0E8',
   margin: '32px 0',
 };
 
@@ -281,18 +289,18 @@ const footerText = {
 
 const footerLinks = {
   fontSize: '12px',
-  color: '#999999',
+  color: '#8C7A6B',
   margin: '0 0 8px',
 };
 
 const footerLink = {
-  color: '#999999',
+  color: '#DA7353',
   textDecoration: 'underline',
 };
 
 const footerCopyright = {
   fontSize: '12px',
-  color: '#CCCCCC',
+  color: '#B5A89B',
   margin: '0',
 };
 

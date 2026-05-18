@@ -5,6 +5,7 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -36,7 +37,13 @@ const PaymentFailedEmail = ({
         {/* Header */}
         <Section style={header}>
           <Link href={baseUrl} style={logoLink}>
-            <Text style={logo}>Chunky Crayon</Text>
+            <Img
+              src="https://www.chunkycrayon.com/logos/cc-logo.png"
+              width="44"
+              height="48"
+              alt="Chunky Crayon"
+              style={logo}
+            />
           </Link>
         </Section>
 
@@ -140,10 +147,11 @@ const logoLink = {
 };
 
 const logo = {
-  fontSize: '28px',
-  fontWeight: '700',
-  color: '#DA7353',
-  margin: '0',
+  display: 'block',
+  margin: '0 auto',
+  border: '0',
+  outline: 'none',
+  textDecoration: 'none',
 };
 
 const alertSection = {
@@ -174,14 +182,14 @@ const content = {
 const greeting = {
   fontSize: '18px',
   fontWeight: '600',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 16px',
 };
 
 const paragraph = {
   fontSize: '16px',
   lineHeight: '26px',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 16px',
 };
 
@@ -190,7 +198,7 @@ const infoSection = {
   borderRadius: '16px',
   padding: '24px',
   margin: '24px 0',
-  border: '2px solid #F0E6D8',
+  border: '2px solid #F5F0E8',
 };
 
 const infoTitle = {
@@ -203,7 +211,7 @@ const infoTitle = {
 
 const infoItem = {
   fontSize: '14px',
-  color: '#333333',
+  color: '#3F3127',
   margin: '0 0 12px',
   paddingLeft: '8px',
 };
@@ -232,12 +240,12 @@ const ctaButton = {
 
 const ctaSubtext = {
   fontSize: '14px',
-  color: '#666666',
+  color: '#8C7A6B',
   margin: '16px 0 0',
 };
 
 const hr = {
-  borderColor: '#F0E6D8',
+  borderColor: '#F5F0E8',
   margin: '32px 0',
 };
 
@@ -248,24 +256,24 @@ const footer = {
 
 const footerText = {
   fontSize: '14px',
-  color: '#666666',
+  color: '#8C7A6B',
   margin: '0 0 12px',
 };
 
 const footerLinks = {
   fontSize: '12px',
-  color: '#999999',
+  color: '#8C7A6B',
   margin: '0 0 8px',
 };
 
 const footerLink = {
-  color: '#999999',
+  color: '#DA7353',
   textDecoration: 'underline',
 };
 
 const footerCopyright = {
   fontSize: '12px',
-  color: '#CCCCCC',
+  color: '#B5A89B',
   margin: '0',
 };
 
