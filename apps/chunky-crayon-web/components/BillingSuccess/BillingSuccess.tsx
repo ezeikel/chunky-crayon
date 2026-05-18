@@ -1,8 +1,14 @@
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPalette, faSparkles } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faPalette,
+  faSparkles,
+  faEnvelopeOpenText,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { PlanName } from '@one-colored-pixel/db/types';
+import type { PostCheckoutSigninStatus } from '@/app/actions/stripe';
 import PurchaseTracking from '@/app/[locale]/account/billing/PurchaseTracking';
+import ManageSubscriptionButton from '@/components/buttons/ManageSubscriptionButton/ManageSubscriptionButton';
 
 type BillingSuccessProps = {
   amount: number | null;
@@ -12,6 +18,7 @@ type BillingSuccessProps = {
   planName?: PlanName;
   creditAmount?: number;
   isTrial?: boolean;
+  signinStatus?: PostCheckoutSigninStatus;
 };
 
 const BillingSuccess = ({
@@ -22,6 +29,7 @@ const BillingSuccess = ({
   planName,
   creditAmount,
   isTrial = false,
+  signinStatus = 'not_applicable',
 }: BillingSuccessProps) => {
   const headlineText =
     productType === 'subscription'
@@ -36,6 +44,15 @@ const BillingSuccess = ({
     productType === 'subscription'
       ? 'Your plan is active and your crayons are ready. Time to make something colourful!'
       : `${creditAmount ?? ''} fresh credits are in your account, ready to colour with.`;
+
+  // A guest buyer is signed out and has just been emailed a sign-in link.
+  // ('pending' means the webhook that creates their account is still
+  // catching up; the link still works once it does, so the guidance is the
+  // same: check your email.) Show them what to do next instead of a
+  // "Go to Billing" button that would bounce a logged-out guest.
+  const needsEmailSignin =
+    signinStatus === 'magic_link_sent' || signinStatus === 'pending';
+  const isAuthenticated = signinStatus === 'already_authenticated';
 
   return (
     <div className="max-w-lg mx-auto py-16 px-4 text-center">
@@ -64,13 +81,49 @@ const BillingSuccess = ({
             );
           })()}
       </div>
+
+      {needsEmailSignin && (
+        <div className="mb-8 rounded-2xl bg-crayon-orange/10 px-6 py-5 text-left">
+          <p className="flex items-center gap-2 font-semibold text-crayon-orange">
+            <FontAwesomeIcon icon={faEnvelopeOpenText} />
+            <span>Check your email to finish</span>
+          </p>
+          <p className="mt-2 text-sm text-text-secondary">
+            We have sent a sign-in link to the email you used at checkout. Click
+            it and you will land straight on your account, where you can manage
+            or cancel your plan any time.
+          </p>
+          <p className="mt-2 text-sm text-text-secondary">
+            You can close this page once you have the email.
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-col gap-4">
-        <Link
-          href="/account/billing"
-          className="inline-block bg-crayon-orange hover:bg-crayon-orange-dark text-white px-6 py-3 rounded-full font-semibold transition-colors"
-        >
-          Go to Billing
-        </Link>
+        {isAuthenticated && (
+          <Link
+            href="/account/billing"
+            className="inline-block bg-crayon-orange hover:bg-crayon-orange-dark text-white px-6 py-3 rounded-full font-semibold transition-colors"
+          >
+            Go to Billing
+          </Link>
+        )}
+        {isAuthenticated && productType === 'subscription' && (
+          <ManageSubscriptionButton
+            source="billing_success"
+            className="text-crayon-orange hover:text-crayon-orange-dark font-medium"
+          >
+            Manage or cancel subscription
+          </ManageSubscriptionButton>
+        )}
+        {needsEmailSignin && (
+          <Link
+            href="/signin"
+            className="inline-block bg-crayon-orange hover:bg-crayon-orange-dark text-white px-6 py-3 rounded-full font-semibold transition-colors"
+          >
+            Sign in another way
+          </Link>
+        )}
         <Link
           href="/"
           className="text-crayon-orange hover:text-crayon-orange-dark font-medium"

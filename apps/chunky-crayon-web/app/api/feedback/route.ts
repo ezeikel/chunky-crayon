@@ -24,6 +24,7 @@ export const POST = async (req: Request) => {
       email: body.email?.trim() || undefined,
       userName: body.userName?.trim() || undefined,
       pageUrl: body.pageUrl?.trim() || undefined,
+      distinctId: body.distinctId?.trim() || undefined,
     });
 
     return NextResponse.json({ ok: true });

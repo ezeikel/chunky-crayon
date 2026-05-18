@@ -155,12 +155,22 @@ const FeedbackDialog = ({
       const pageUrl =
         typeof window !== 'undefined' ? window.location.href : undefined;
 
+      // Stable account identity. The typed `email` is whatever the user
+      // chose to enter and frequently differs from their billing/auth email
+      // (the first real customer typed a personal address but had paid
+      // under a workplace one — support couldn't match them). The PostHog
+      // distinct_id always resolves to the identified person, so capturing
+      // it here lets support pivot from a feedback message straight to the
+      // real account, Stripe customer, and auth email.
+      const distinctId = posthog?.get_distinct_id?.();
+
       posthog?.capture(TRACKING_EVENTS.FEEDBACK_SUBMITTED, {
         feedback_type: selectedType,
         feedback_message: message,
         user_email: email || undefined,
         user_name: userName || undefined,
         page_url: pageUrl,
+        posthog_distinct_id: distinctId || undefined,
         $set: email ? { email } : undefined,
       });
 
@@ -173,6 +183,7 @@ const FeedbackDialog = ({
           email: email || undefined,
           userName: userName || undefined,
           pageUrl,
+          distinctId: distinctId || undefined,
         }),
       }).catch(() => {});
 

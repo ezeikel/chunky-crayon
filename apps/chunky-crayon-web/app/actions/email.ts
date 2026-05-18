@@ -832,6 +832,10 @@ export type FeedbackPayload = {
   email?: string;
   userName?: string;
   pageUrl?: string;
+  // PostHog distinct_id of the submitter. The typed `email` often differs
+  // from the account/billing email; this is the stable handle support uses
+  // to pivot to the real person + Stripe customer in PostHog.
+  distinctId?: string;
 };
 
 const FEEDBACK_TYPE_LABELS: Record<FeedbackPayload['feedbackType'], string> = {
@@ -851,7 +855,8 @@ export const sendFeedbackEmail = async (
     return;
   }
 
-  const { feedbackType, message, email, userName, pageUrl } = payload;
+  const { feedbackType, message, email, userName, pageUrl, distinctId } =
+    payload;
   const label = FEEDBACK_TYPE_LABELS[feedbackType];
   const subject = `[CC Feedback] ${label}`;
 
@@ -862,8 +867,9 @@ export const sendFeedbackEmail = async (
     message,
     '',
     userName ? `From: ${userName}` : null,
-    email ? `Email: ${email}` : null,
+    email ? `Email (as typed, may differ from billing): ${email}` : null,
     pageUrl ? `Page: ${pageUrl}` : null,
+    distinctId ? `PostHog person: ${distinctId}` : null,
     '',
     `Sent at: ${new Date().toISOString()}`,
   ]

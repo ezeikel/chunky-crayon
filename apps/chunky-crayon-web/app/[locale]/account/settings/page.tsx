@@ -6,6 +6,7 @@ import Loading from '@/components/Loading/Loading';
 import SettingsForm from './SettingsForm';
 import LanguageSettings from './LanguageSettings';
 import AudioSettings from './AudioSettings';
+import EmailSettings from './EmailSettings';
 import { getUserSettings } from '@/app/actions/settings';
 
 // Async component that handles auth, data fetching, and translations
@@ -28,6 +29,7 @@ const SettingsContent = async () => {
       <div className="space-y-6">
         <LanguageSettings />
         <AudioSettings />
+        <EmailSettings currentEmail={session.user.email ?? null} />
         <SettingsForm initialSettings={settings} />
       </div>
     </>

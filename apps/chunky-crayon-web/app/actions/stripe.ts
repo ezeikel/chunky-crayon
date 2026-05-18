@@ -30,6 +30,7 @@ import {
   sendInitiateCheckoutConversionEvents,
 } from '@/lib/conversion-api';
 import { paymentError } from '@/lib/logger';
+import { signIn, auth } from '@/auth';
 import { getUserId } from './user';
 
 // Cacheable Stripe functions that don't require headers/cookies
@@ -87,6 +88,102 @@ export const getStripeSession = async (sessionId: string) => {
   } catch (error) {
     console.error('Error fetching Stripe session:', error);
     return null;
+  }
+};
+
+// Result of attempting to get a guest buyer signed in after Stripe checkout.
+// Deliberately a coarse enum: the customer email is NEVER returned to the
+// client (it's a different data subject's PII until they prove ownership by
+// clicking the link in their own inbox — see the funnel-investigation doc's
+// GDPR note).
+export type PostCheckoutSigninStatus =
+  | 'already_authenticated' // a session cookie is already present, nothing to do
+  | 'magic_link_sent' // verified the Stripe session, emailed a sign-in link
+  | 'pending' // user row not created yet (webhook race) — caller should let them retry / check email
+  | 'not_applicable' // no/invalid session id, or no email on the Stripe customer
+  | 'error';
+
+// Post-checkout sign-in for GUEST buyers.
+//
+// Why this exists: guest Stripe checkout creates the User row server-side in
+// the webhook, but never establishes a NextAuth session (database strategy;
+// sessions only mint via the signIn callback, which a Stripe webhook never
+// triggers). The buyer lands on /account/billing/success fully logged out
+// with no way to reach or manage what they just paid for. This is the exact
+// dead end the first real customer hit (2026-05-18).
+//
+// Security: we do NOT mint a session from the URL `session_id`. That value
+// leaks into the address bar, Referer headers, and analytics; trusting it
+// for auth would be an account-takeover vector. Instead we (1) verify the
+// session server-side directly against Stripe, (2) read the customer email
+// from Stripe (never from the URL), (3) trigger the EXISTING, already-tested
+// NextAuth Resend magic-link to that verified address. The buyer proves
+// ownership by clicking the link in their own inbox. No new schema, no new
+// trust surface.
+export const triggerPostCheckoutSignin = async (
+  sessionId: string,
+): Promise<PostCheckoutSigninStatus> => {
+  if (!sessionId) return 'not_applicable';
+
+  // Already signed in (logged-in checkout flow, or a revisit after the link
+  // was clicked). Don't email a redundant link.
+  const existingSession = await auth();
+  if (existingSession?.user) return 'already_authenticated';
+
+  try {
+    const stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
+
+    // Only a genuinely completed checkout earns a sign-in link. A guessed
+    // or stale session id won't be `complete`.
+    if (stripeSession.status !== 'complete') return 'not_applicable';
+
+    // Read the email from Stripe, not the URL. customer_details.email is
+    // populated by Stripe Checkout; fall back to the customer object.
+    let email = stripeSession.customer_details?.email ?? null;
+    if (!email && stripeSession.customer) {
+      const customer = await stripe.customers.retrieve(
+        stripeSession.customer as string,
+      );
+      if (!('deleted' in customer && customer.deleted)) {
+        email = customer.email ?? null;
+      }
+    }
+    if (!email) return 'not_applicable';
+
+    // The webhook (checkout.session.completed) creates the User row. Stripe
+    // redirects the browser to the success page almost immediately, so the
+    // webhook may not have landed yet. We do ONE quick recheck rather than a
+    // long blocking poll: the success page render shouldn't hang for
+    // seconds. The user/pending distinction only changes reassurance copy,
+    // not behaviour — the magic link works either way (NextAuth's Resend
+    // provider creates the user on verify if the webhook is still catching
+    // up), so it's not worth blocking paint to nail it down.
+    let user = await db.user.findUnique({ where: { email } });
+    if (!user) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 800);
+      });
+      user = await db.user.findUnique({ where: { email } });
+    }
+
+    // Trigger the existing NextAuth Resend magic link. redirect:false so the
+    // server action returns control to us rather than throwing a redirect;
+    // the provider's sendVerificationRequest fans out to sendMagicLinkEmail.
+    // callbackUrl lands them on billing so they arrive where they expected.
+    await signIn('resend', {
+      email,
+      redirect: false,
+      redirectTo: '/account/billing',
+    });
+
+    return user ? 'magic_link_sent' : 'pending';
+  } catch (error) {
+    paymentError(
+      'triggerPostCheckoutSignin failed',
+      error instanceof Error ? error : undefined,
+      { action: 'post_checkout_signin' },
+    );
+    return 'error';
   }
 };
 
