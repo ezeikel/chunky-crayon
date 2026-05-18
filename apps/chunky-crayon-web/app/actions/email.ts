@@ -624,7 +624,7 @@ export const sendTrialEndingEmail = async ({
 // Send the subscription-welcome / activation email once, immediately
 // after a Stripe subscription is created (checkout.session.completed).
 // Its job is activation: get the new subscriber to make their first
-// coloring page. Trial-aware — pass chargeDate/amount when on the
+// coloring page. Trial-aware: pass chargeDate/amount when on the
 // 7-day trial so the copy states the real first charge up front.
 // No billing-portal link here (this is an activation email, not a
 // billing one); the later TrialEndingEmail owns the cancel CTA.

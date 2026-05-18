@@ -318,8 +318,8 @@ export const POST = async (req: Request) => {
       // is delivered once per subscription create) so a brand-new
       // subscriber gets a "make your first page" nudge straight away,
       // not just the trial-ending billing reminder days later. Failure
-      // must not 500 the webhook — Stripe would retry and we'd risk
-      // double-granting credits, so swallow errors like the CAPI block.
+      // must not 500 the webhook, since Stripe would retry and we'd
+      // risk double-granting credits, so swallow errors like CAPI does.
       if (user.email) {
         const isTrialing = subscription.status === 'trialing';
         const item = subscription.items.data[0];

@@ -32,19 +32,19 @@ const utm = (campaign: string) =>
 // Sent once, immediately after a Stripe subscription is created via
 // checkout.session.completed. Its whole job is activation: get the new
 // subscriber to make their first coloring page before the trial ends.
-// Trial-aware — when on the 7-day trial it states the real charge date
+// Trial-aware: when on the 7-day trial it states the real charge date
 // and amount so the follow-up TrialEndingEmail can't feel like a
-// bait-and-switch.
-// Defaults exist only so the react-email preview server renders
-// realistic content (mirrors a Sparkle annual trial). The Stripe
-// webhook always passes real values, so these never reach a user.
+// bait-and-switch. No prop defaults on purpose. The webhook always
+// passes real values; defaulting would silently send placeholder
+// content to a real user if a field were ever missing. Preview-only
+// sample data lives in PreviewProps below instead.
 const TrialStartedEmail = ({
-  userName = 'Lisa',
-  planName = 'Sparkle Plan',
-  credits = 1000,
-  isTrialing = true,
-  chargeDate = '25 May 2026',
-  amount = '£249.99',
+  userName,
+  planName,
+  credits,
+  isTrialing,
+  chargeDate,
+  amount,
 }: TrialStartedEmailProps) => (
   <Html>
     <Head />
@@ -153,7 +153,7 @@ TrialStartedEmail.PreviewProps = {
   amount: '£249.99',
 } satisfies TrialStartedEmailProps;
 
-// Styles — match warm palette from TrialEndingEmail / PaymentFailedEmail
+// Styles: match warm palette from TrialEndingEmail / PaymentFailedEmail
 const main = {
   backgroundColor: '#FAF7F2',
   fontFamily:
