@@ -24,10 +24,10 @@ type TrialEndingEmailProps = {
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 
-// Sent ~24h before the 7-day trial ends. Stripe fires the
+// Sent when the 7-day trial is about to end. Stripe fires the
 // `customer.subscription.trial_will_end` webhook 3 days before by
-// default — we adjust to 1 day in the webhook handler so the reminder
-// arrives close enough to be useful but not so early it gets ignored.
+// default; we have not changed that lead time yet, so the copy says
+// "ends soon" rather than "tomorrow" to stay accurate (see below).
 const TrialEndingEmail = ({
   userName,
   planName,
@@ -37,9 +37,7 @@ const TrialEndingEmail = ({
 }: TrialEndingEmailProps) => (
   <Html>
     <Head />
-    <Preview>
-      Your Chunky Crayon trial ends tomorrow — {amount} on {chargeDate}.
-    </Preview>
+    <Preview>{`Your Chunky Crayon trial ends soon. ${amount} on ${chargeDate}.`}</Preview>
     <Body style={main}>
       <Container style={container}>
         {/* Header */}
@@ -58,15 +56,15 @@ const TrialEndingEmail = ({
         {/* Heads-up banner */}
         <Section style={banner}>
           <Text style={bannerEmoji}>🖍️</Text>
-          <Heading style={bannerTitle}>Your trial ends tomorrow</Heading>
+          <Heading style={bannerTitle}>Your trial ends soon</Heading>
         </Section>
 
         {/* Main content */}
         <Section style={content}>
           <Text style={greeting}>Hi{userName ? ` ${userName}` : ''},</Text>
           <Text style={paragraph}>
-            Quick heads-up — your free trial of <strong>{planName}</strong> ends
-            tomorrow. We&apos;ll charge <strong>{amount}</strong> on{' '}
+            Quick heads-up. Your free trial of <strong>{planName}</strong> is
+            ending soon. We&apos;ll charge <strong>{amount}</strong> on{' '}
             <strong>{chargeDate}</strong> to keep your subscription active.
           </Text>
           <Text style={paragraph}>
@@ -81,8 +79,8 @@ const TrialEndingEmail = ({
             What happens next
           </Heading>
           <Text style={infoItem}>
-            <span style={bullet}>•</span> Tomorrow: we charge {amount} and your
-            subscription continues
+            <span style={bullet}>•</span> On {chargeDate}: we charge {amount}{' '}
+            and your subscription continues
           </Text>
           <Text style={infoItem}>
             <span style={bullet}>•</span> Your credits roll over per the{' '}
@@ -130,7 +128,19 @@ const TrialEndingEmail = ({
   </Html>
 );
 
-// Styles — match warm palette from PaymentFailedEmail / WelcomeEmail
+// Preview-server data only (react-email reads Component.PreviewProps).
+// Without it the dev server renders planName/amount/chargeDate blank,
+// producing nonsense like "your free trial of  is ending soon". Real
+// sends always pass values from the trial_will_end webhook handler.
+TrialEndingEmail.PreviewProps = {
+  userName: 'Lisa',
+  planName: 'Sparkle Plan',
+  chargeDate: '25 May 2026',
+  amount: '£249.99',
+  billingPortalUrl: 'https://billing.stripe.com/p/session/preview',
+} satisfies TrialEndingEmailProps;
+
+// Styles: match warm palette from PaymentFailedEmail / WelcomeEmail
 const main = {
   backgroundColor: '#FAF7F2',
   fontFamily:
