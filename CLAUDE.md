@@ -264,6 +264,19 @@ Before declaring an apparently-unused table, R2 prefix, env var, migration, or p
 
 When in doubt, leave it alone and ask. Rule of thumb: a kept-but-empty table costs nothing; a wrongly-dropped table costs hours of "why did X stop working?" plus another round of cleanup.
 
+## Testing
+
+Vitest (not Jest) for unit tests; Playwright for e2e. Full reference: [`docs/testing/README.md`](./docs/testing/README.md).
+
+Non-negotiables:
+
+- **Test extracted pure logic, never RSCs / Next routing / Cache Components.** Anything where a silent bug costs money or breaks the core experience (credit/price math, quota clamps, signing/verification, colour snapping) gets a unit test. Integration concerns are Playwright's job.
+- **A change to revenue/correctness-critical pure logic ships with its test in the same commit.** `foo.ts` → `foo.test.ts` next to it. Don't defer "I'll add tests later."
+- **Node-only test files** (importing `node:crypto`, `jose`, etc.) need `// @vitest-environment node` at the top — jsdom's `Uint8Array` realm breaks `jose`.
+- **Pre-commit runs `vitest related` and is blocking.** Don't bypass with `--no-verify` to dodge a red test; fix the test or the code.
+- Run `pnpm test` before pushing logic changes, same as `pnpm build` for page changes.
+- New `vitest.config.mts` `coverage.include` is an allowlist of tested areas — widen it as you add tests; never set it to "everything."
+
 ## Documentation
 
 `docs/` holds permanent reference for systems whose moving parts span multiple services / files / runtimes. Add a doc when answering "how does X work?" requires holding state across more than one of: web app, worker, DB schema, R2, cron, CI. See [`docs/README.md`](./docs/README.md) for the index and the format.

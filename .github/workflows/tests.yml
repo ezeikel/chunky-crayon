@@ -1,0 +1,130 @@
+name: Tests
+
+# Unit tests run on every push to main and on PRs — fast, no infra.
+# Playwright e2e runs in a separate job (built app + seeded DB + browsers).
+#
+# Posture (2026-05): the repo pushes straight to main with no branch
+# protection, so neither job *blocks* a merge today. They exist to make a
+# red test loud and to be ready the day PRs/branch protection are turned
+# on. When that happens, mark the `unit` job required in branch settings.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: pnpm install --frozen-lockfile
+
+      # turbo's `test` task depends on `db:generate`; prisma generate needs
+      # only the schema (the datasource has no url=env(...)), so no DB
+      # secret is required here.
+      - name: Run unit tests
+        run: pnpm test
+
+  # Gate e2e on the seed DB secret existing. Without it the job is a
+  # no-op (green, skipped steps) rather than a confusing red — until you
+  # add a PLAYWRIGHT_DATABASE_URL secret pointing at a throwaway Neon
+  # branch, e2e simply doesn't run.
+  e2e-precheck:
+    name: e2e precheck
+    runs-on: ubuntu-latest
+    outputs:
+      has_db: ${{ steps.check.outputs.has_db }}
+    steps:
+      - id: check
+        env:
+          PLAYWRIGHT_DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
+        run: |
+          if [ -n "$PLAYWRIGHT_DATABASE_URL" ]; then
+            echo "has_db=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_db=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::PLAYWRIGHT_DATABASE_URL secret not set — e2e job will be skipped. Add it (a throwaway Neon branch) to enable Playwright in CI."
+          fi
+
+  e2e:
+    name: Playwright e2e
+    runs-on: ubuntu-latest
+    needs: e2e-precheck
+    if: ${{ needs.e2e-precheck.outputs.has_db == 'true' }}
+    # Don't gate merges on e2e while it depends on a seeded DB — surface
+    # failures without making the whole run red.
+    continue-on-error: true
+    env:
+      DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        working-directory: ./apps/chunky-crayon-web
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Seed Playwright test user
+        working-directory: ./apps/chunky-crayon-web
+        run: pnpm tsx scripts/seed-test-user.ts
+
+      - name: Build chunky-crayon-web
+        run: pnpm build:web
+
+      - name: Run Playwright tests
+        env:
+          CI: 'true'
+          PLAYWRIGHT_BASE_URL: 'http://localhost:3000'
+        working-directory: ./apps/chunky-crayon-web
+        run: |
+          pnpm start &
+          npx wait-on http://localhost:3000 --timeout 120000
+          pnpm test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/chunky-crayon-web/playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore

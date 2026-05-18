@@ -14,7 +14,10 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf .turbo node_modules dist",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:related": "vitest related --run"
   },
   "dependencies": {
     "xmldom": "^0.6.0"
@@ -22,6 +25,8 @@
   "devDependencies": {
     "@types/node": "^24.3.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "typescript": "^5.4.5"
+    "@vitest/coverage-v8": "^4.1.2",
+    "typescript": "^5.4.5",
+    "vitest": "^4.1.2"
   }
 }

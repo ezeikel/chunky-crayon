@@ -11,6 +11,9 @@
     "dev:habitat": "turbo run dev --filter=@one-colored-pixel/coloring-habitat-web",
     "build:habitat": "turbo run build --filter=@one-colored-pixel/coloring-habitat-web",
     "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:web": "turbo run test --filter=@one-colored-pixel/chunky-crayon-web",
+    "test:e2e": "turbo run test:e2e --filter=@one-colored-pixel/chunky-crayon-web",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "prepare": "husky",
@@ -25,7 +28,7 @@
       "prettier --ignore-path .gitignore --write"
     ],
     "**/!(e2e)/*.{js,jsx,ts,tsx}": [
-      "jest --findRelatedTests --passWithNoTests"
+      "vitest related --run --passWithNoTests --config vitest.config.mts"
     ],
     "**/prisma/schema.prisma": [
       "pnpm exec prisma format --schema"
@@ -36,7 +39,8 @@
     "lint-staged": "^16.0.0",
     "prettier": "^3.6.2",
     "turbo": "^2.5.6",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "vitest": "^4.1.2"
   },
   "packageManager": "pnpm@10.6.1",
   "engines": {

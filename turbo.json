@@ -97,6 +97,14 @@
       "cache": false,
       "persistent": true
     },
+    "test": {
+      "dependsOn": ["db:generate"],
+      "outputs": ["coverage/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["db:generate"],
+      "cache": false
+    },
     "db:generate": {
       "inputs": ["packages/db/prisma/schema.prisma"],
       "outputs": ["node_modules/.prisma/client/**"]
