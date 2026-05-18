@@ -267,11 +267,22 @@ export const POST = async (req: Request) => {
         // Purchase/Subscribe alone for subscription products.
         const isTrialing = subscription.status === 'trialing';
 
+        // No money is captured at trial start (Stripe issues a
+        // zero-amount invoice; the card is charged when the trial
+        // ends). Sending the full plan price as `value` on
+        // Purchase/Subscribe makes Meta report revenue that never
+        // happened — inflating ROAS and steering optimization toward
+        // £0 trial-starters instead of payers. Fire the events with
+        // value 0 when trialing so the Subscribe column / dedup still
+        // work, but no phantom revenue is attributed. The forward
+        // value signal lives on StartTrial's predicted_ltv instead.
+        const conversionValue = isTrialing ? 0 : priceAmount;
+
         await Promise.allSettled([
           sendPurchaseConversionEvents({
             email: user.email,
             userId: user.id,
-            value: priceAmount,
+            value: conversionValue,
             currency: 'GBP',
             eventId: session.id,
             orderId: session.id,
@@ -286,7 +297,7 @@ export const POST = async (req: Request) => {
           sendSubscribeConversionEvents({
             email: user.email,
             userId: user.id,
-            value: priceAmount,
+            value: conversionValue,
             currency: 'GBP',
             eventId: `sub_${session.id}`,
             orderId: session.id,
