@@ -43,14 +43,14 @@
   "coloringPage": {
     "title": "Page à colorier",
     "relatedPages": "Plus de pages à colorier",
-    "defaultDescription": "Page à colorier gratuite à imprimer de Chunky Crayon",
+    "defaultDescription": "Page à colorier gratuite de Chunky Crayon à imprimer",
     "progress": {
       "colored": "colorié",
       "percentage": "{percent}%",
       "allDone": "Terminé !",
       "milestones": {
         "25": "Bon début !",
-        "50": "À mi-chemin !",
+        "50": "À mi-parcours !",
         "75": "Presque fini !",
         "100": "Incroyable !"
       }
@@ -78,7 +78,7 @@
     "brushTypes": {
       "crayon": "Crayon",
       "marker": "Feutre",
-      "pencil": "Crayon à papier",
+      "pencil": "Crayon de papier",
       "paintbrush": "Pinceau",
       "eraser": "Gomme",
       "glitter": "Paillettes",
@@ -320,7 +320,7 @@
     "pageSubtitle": "Gérez votre abonnement et achetez des crédits supplémentaires pour continuer à créer de superbes pages à colorier.",
     "currentPlan": "Forfait actuel",
     "currentCredits": "Crédits actuels : {count}",
-    "renewsOn": "Votre abonnement se renouvelle le {date}",
+    "renewsOn": "Votre abonnement sera renouvelé le {date}",
     "manageSubscription": "Gérer l’abonnement",
     "noActiveSubscription": "Aucun abonnement actif",
     "noSubscriptionDescription": "Choisissez un forfait pour commencer à créer de superbes pages à colorier.",
@@ -334,7 +334,7 @@
     "subscribe": "S’abonner",
     "currentPlanBadge": "Forfait actuel",
     "manageInPortal": "Gérez votre abonnement dans le portail client",
-    "noCommitment": "Sans engagement. Annulez à tout moment.",
+    "noCommitment": "Sans engagement. Résiliez à tout moment.",
     "perMonth": "/mois",
     "noSubscriptionForCredits": "Abonnement actif requis pour acheter des crédits",
     "noSubscriptionFound": "Aucun abonnement actif trouvé",
@@ -350,7 +350,7 @@
     "continueWithGoogle": "Continuer avec Google",
     "continueWithApple": "Continuer avec Apple",
     "signInWithEmail": "Se connecter par e-mail",
-    "sendingLink": "Envoi du lien…",
+    "sendingLink": "Envoi en cours…",
     "chooseMethod": "Choisissez votre méthode de connexion",
     "orContinueWith": "Ou continuer avec",
     "emailPlaceholder": "nom@exemple.com",
