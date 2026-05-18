@@ -20,6 +20,7 @@ import { FREE_CREDITS, PLAN_ROLLOVER_CAPS, TRACKING_EVENTS } from '@/constants';
 import {
   sendPaymentFailedEmail,
   sendTrialEndingEmail,
+  sendTrialStartedEmail,
 } from '@/app/actions/email';
 import { trackWithUser } from '@/utils/analytics-server';
 import {
@@ -311,6 +312,41 @@ export const POST = async (req: Request) => {
               ]
             : []),
         ]);
+      }
+
+      // Activation email. Fires once here (checkout.session.completed
+      // is delivered once per subscription create) so a brand-new
+      // subscriber gets a "make your first page" nudge straight away,
+      // not just the trial-ending billing reminder days later. Failure
+      // must not 500 the webhook — Stripe would retry and we'd risk
+      // double-granting credits, so swallow errors like the CAPI block.
+      if (user.email) {
+        const isTrialing = subscription.status === 'trialing';
+        const item = subscription.items.data[0];
+        const unitAmount = item?.price?.unit_amount ?? 0;
+        const currency = (item?.price?.currency ?? 'gbp').toUpperCase();
+        const symbol = currency === 'GBP' ? '£' : currency === 'USD' ? '$' : '';
+        const amount = `${symbol}${(unitAmount / 100).toFixed(2)}`;
+        const chargeDate = subscription.trial_end
+          ? new Date(subscription.trial_end * 1000).toLocaleDateString(
+              'en-GB',
+              { day: 'numeric', month: 'long', year: 'numeric' },
+            )
+          : undefined;
+
+        try {
+          await sendTrialStartedEmail({
+            email: user.email,
+            userName: user.name,
+            planName,
+            credits: creditAmount,
+            isTrialing,
+            chargeDate: isTrialing ? chargeDate : undefined,
+            amount: isTrialing ? amount : undefined,
+          });
+        } catch (err) {
+          console.error('[webhook] trial started email failed:', err);
+        }
       }
     } else if (session.metadata?.bundleSlug && session.metadata?.bundleId) {
       // Bundle purchase. createBundleCheckoutSession sets these metadata

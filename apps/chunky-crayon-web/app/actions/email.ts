@@ -22,6 +22,7 @@ import WelcomeEmail from '@/emails/WelcomeEmail';
 import MagicLinkEmail from '@/emails/MagicLinkEmail';
 import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
 import TrialEndingEmail from '@/emails/TrialEndingEmail';
+import TrialStartedEmail from '@/emails/TrialStartedEmail';
 import SocialDigestEmail from '@/emails/SocialDigestEmail';
 import BundlePurchaseEmail from '@/emails/BundlePurchaseEmail';
 import { stripe } from '@/lib/stripe';
@@ -613,6 +614,62 @@ export const sendTrialEndingEmail = async ({
     return { success: true };
   } catch (error) {
     console.error(`Failed to send trial ending email to ${email}:`, error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+};
+
+// Send the subscription-welcome / activation email once, immediately
+// after a Stripe subscription is created (checkout.session.completed).
+// Its job is activation: get the new subscriber to make their first
+// coloring page. Trial-aware — pass chargeDate/amount when on the
+// 7-day trial so the copy states the real first charge up front.
+// No billing-portal link here (this is an activation email, not a
+// billing one); the later TrialEndingEmail owns the cancel CTA.
+export const sendTrialStartedEmail = async ({
+  email,
+  userName,
+  planName,
+  credits,
+  isTrialing,
+  chargeDate,
+  amount,
+}: {
+  email: string;
+  userName?: string | null;
+  planName: string;
+  credits: number;
+  isTrialing: boolean;
+  chargeDate?: string;
+  amount?: string;
+}): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const emailHtml = await render(
+      TrialStartedEmail({
+        userName: userName || undefined,
+        planName,
+        credits,
+        isTrialing,
+        chargeDate,
+        amount,
+      }),
+    );
+
+    await resend.emails.send({
+      from: getResendFromAddress('no-reply', 'Chunky Crayon'),
+      to: email,
+      subject: isTrialing
+        ? 'Your Chunky Crayon trial is live 🎨'
+        : 'Welcome to Chunky Crayon 🎨',
+      html: emailHtml,
+    });
+
+    console.log(`📧 Sent trial started email to: ${email}`);
+    return { success: true };
+  } catch (error) {
+    console.error(`Failed to send trial started email to ${email}:`, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
