@@ -49,10 +49,10 @@
       "percentage": "{percent}%",
       "allDone": "Fertig!",
       "milestones": {
-        "25": "Toller Start!",
-        "50": "Halbzeit!",
+        "25": "Guter Start!",
+        "50": "Hälfte geschafft!",
         "75": "Fast fertig!",
-        "100": "Fantastisch!"
+        "100": "Geschafft!"
       }
     },
     "sidebar": {
@@ -356,8 +356,8 @@
     "emailPlaceholder": "name@beispiel.de",
     "termsAgreement": "Wenn du fortfährst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
     "verifyRequest": {
-      "title": "E-Mail prüfen!",
-      "description": "Wir haben dir einen magischen Link zum Anmelden gesendet. Klicke auf den Link in deiner E-Mail, um fortzufahren.",
+      "title": "Deine E-Mail prüfen!",
+      "description": "Wir haben dir einen Anmeldelink gesendet. Klicke auf den Link in deiner E-Mail, um fortzufahren.",
       "checkSpam": "Nicht zu sehen? Prüfe deinen Spam-Ordner.",
       "linkExpiry": "Der Link läuft in 24 Stunden ab.",
       "tryDifferentEmail": "Andere E-Mail verwenden"
