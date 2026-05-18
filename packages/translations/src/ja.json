@@ -42,10 +42,10 @@
   },
   "coloringPage": {
     "title": "ぬりえ",
-    "relatedPages": "ほかのぬりえ",
+    "relatedPages": "他のぬりえページ",
     "defaultDescription": "Chunky Crayonの無料印刷ぬりえ",
     "progress": {
-      "colored": "ぬりえ済み",
+      "colored": "塗り済み",
       "percentage": "{percent}%",
       "allDone": "完成！",
       "milestones": {
@@ -84,7 +84,7 @@
       "glitter": "ラメ",
       "sparkle": "キラキラ",
       "rainbow": "虹色",
-      "glow": "光る",
+      "glow": "グロー",
       "neon": "ネオン"
     },
     "brushSizes": {
@@ -108,7 +108,7 @@
       "share": "共有",
       "print": "印刷",
       "preparing": "準備中...",
-      "doneSharing": "共有しました",
+      "doneSharing": "共有完了",
       "colorAgain": "もう一度ぬる",
       "startOver": "最初から"
     },
@@ -351,7 +351,7 @@
     "continueWithApple": "Appleで続行",
     "signInWithEmail": "メールでログイン",
     "sendingLink": "リンクを送信中...",
-    "chooseMethod": "ログイン方法を選択",
+    "chooseMethod": "ログイン方法を選択してください",
     "orContinueWith": "または次で続行",
     "emailPlaceholder": "name@example.com",
     "termsAgreement": "続行すると、利用規約とプライバシーポリシーに同意したことになります。",
@@ -378,7 +378,7 @@
       "sessionRequired": "このページにアクセスするにはログインしてください。",
       "default": "予期しないエラーが発生しました。もう一度お試しください。"
     },
-    "continueWithFacebook": "Facebookで続ける"
+    "continueWithFacebook": "Facebookで続行"
   },
   "errors": {
     "generic": "問題が発生しました。もう一度お試しください。",
