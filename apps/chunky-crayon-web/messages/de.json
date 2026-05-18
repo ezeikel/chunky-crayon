@@ -383,7 +383,7 @@
       "communityPages": "Community-Seiten",
       "dailyPages": "Tagesbilder",
       "pagesSuffix": "Seiten",
-      "ourPages": "Our Pages"
+      "ourPages": "Unsere Seiten"
     },
     "ageGroups": {
       "toddlers": {
@@ -458,10 +458,10 @@
       "about": "Über"
     },
     "difficultyFilter": {
-      "all": "All",
-      "beginner": "Easy",
+      "all": "Alle",
+      "beginner": "Anfänger",
       "intermediate": "Medium",
-      "advanced": "Tricky",
+      "advanced": "Fortgeschritten",
       "empty": "No pages in this tier yet. Try a different difficulty.",
       "expert": "Profi",
       "easy": "Leicht",
@@ -585,23 +585,23 @@
         "popularDescription": "Entdecke unsere beliebtesten Erwachsenen-Kategorien: Mandala-Ausmalbilder zum Meditieren, filigrane Natur- und Botanikmotive, geometrische Muster, Art-Déco- und Jugendstil-Designs, zentangle-inspirierte Seiten und ruhige Landschaftsszenen. Jede bietet ihren eigenen Weg zur Entspannung."
       }
     },
-    "ourLatestTitle": "Our Latest Coloring Pages",
-    "ourLatestSubtitle": "Fresh pages from us, with new ones added daily. Pick a tile to color online, print at home, or save for later.",
+    "ourLatestTitle": "Unsere neuesten Ausmalbilder",
+    "ourLatestSubtitle": "Frische Seiten von uns, täglich kommen neue dazu. Wähle eine Kachel zum Online-Ausmalen, zum Ausdrucken oder zum Speichern.",
     "coloringHabitatCallout": {
-      "eyebrow": "From our sister site",
+      "eyebrow": "Von unserer Schwesterseite",
       "title": {
-        "teens": "Looking for older-kid coloring? Try Coloring Habitat",
-        "adults": "Coloring for grown-ups? Coloring Habitat is built for you"
+        "teens": "Suchst du Ausmalbilder für ältere Kinder? Probier Coloring Habitat",
+        "adults": "Ausmalen für Erwachsene? Coloring Habitat ist für dich gemacht"
       },
       "body": {
-        "teens": "Chunky Crayon focuses on younger kids (ages 3-8). Coloring Habitat has detailed designs, mandalas, and intricate scenes for older kids, teens, and adults — same printable-free model, just tuned for older audiences.",
-        "adults": "Chunky Crayon is built for kids ages 3-8. Coloring Habitat is our sister site for adult coloring — mandalas, intricate patterns, mindful designs, and stress-relief printables for grown-ups."
+        "teens": "Chunky Crayon fokussiert sich auf jüngere Kinder (3–8 Jahre). Coloring Habitat hat detailreiche Designs, Mandalas und filigrane Szenen für ältere Kinder, Teens und Erwachsene – gleiches kostenloses Modell, nur für ältere Zielgruppen optimiert.",
+        "adults": "Chunky Crayon ist für Kinder von 3–8 Jahren gemacht. Coloring Habitat ist unsere Schwesterseite für Erwachsenen-Ausmalbilder – Mandalas, filigrane Muster, achtsame Designs und entspannende Druckvorlagen für Erwachsene."
       },
-      "cta": "Visit Coloring Habitat"
+      "cta": "Zu Coloring Habitat"
     },
-    "ourLatestCount": "{count, plural, =1 {1 page} other {# pages}}",
-    "communitySubtitle": "Pages our community of parents and kids created. Browse hundreds more on the dedicated community gallery — it's where the imaginative stuff lives.",
-    "browseAllCommunity": "Browse community gallery"
+    "ourLatestCount": "{count, plural, =1 {1 Seite} other {# Seiten}}",
+    "communitySubtitle": "Seiten, die unsere Community aus Eltern und Kindern erstellt hat. Entdecke hunderte weitere in der Community-Galerie – hier leben die fantasievollen Ideen.",
+    "browseAllCommunity": "Community-Galerie durchstöbern"
   },
   "pricing": {
     "pageTitle": "Preise – Chunky Crayon",
