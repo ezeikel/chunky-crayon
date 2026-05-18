@@ -354,7 +354,7 @@
     "chooseMethod": "Elige tu método de inicio de sesión",
     "orContinueWith": "O continuar con",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "Al continuar, aceptas nuestros Términos del servicio y la Política de privacidad.",
+    "termsAgreement": "Al continuar, aceptas nuestros <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
     "verifyRequest": {
       "title": "¡Revisa tu correo!",
       "description": "Te enviamos un enlace mágico para iniciar sesión. Haz clic en el enlace del correo para continuar.",

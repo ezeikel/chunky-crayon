@@ -11,6 +11,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { deleteSavedArtwork } from '@/app/actions/saved-artwork';
+import { Button } from '@/components/ui/button';
 
 type DeleteArtworkButtonProps = {
   artworkId: string;
@@ -58,18 +59,19 @@ const DeleteArtworkButton = ({ artworkId }: DeleteArtworkButtonProps) => {
           </DialogHeader>
 
           <div className="flex flex-col gap-3 mt-6">
-            <button
+            <Button
               type="button"
+              variant="destructive"
               onClick={handleDelete}
               disabled={isPending}
-              className="w-full font-tondo font-bold text-white px-6 py-3 rounded-full bg-crayon-pink shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="h-auto w-full rounded-full px-6 py-3 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isPending ? (
                 <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
               ) : (
                 'Yes, Delete'
               )}
-            </button>
+            </Button>
             <button
               type="button"
               onClick={() => setIsOpen(false)}

@@ -274,13 +274,14 @@ const ImageInput = ({ className }: ImageInputProps) => {
             </p>
           </div>
         </div>
-        <button
+        <Button
           type="button"
           onClick={handleRetry}
-          className="font-tondo text-sm text-text-muted hover:text-text-primary underline underline-offset-2 transition-colors"
+          variant="link"
+          className="text-sm text-text-muted hover:text-text-primary"
         >
           {t('imageInput.notQuiteRight')}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -317,17 +318,15 @@ const ImageInput = ({ className }: ImageInputProps) => {
       />
 
       <div className="flex gap-4">
-        <button
+        <Button
           type="button"
           onClick={openCamera}
           disabled={!canGenerate}
           className={cn(
-            'flex flex-col items-center justify-center gap-2 w-28 h-28 rounded-coloring-card',
-            'transition-all duration-200 ease-out',
+            'h-28 w-28 flex-col rounded-coloring-card p-0',
             'focus:outline-none focus-visible:ring-4 focus-visible:ring-crayon-orange focus-visible:ring-offset-2',
-            canGenerate
-              ? 'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 cursor-pointer text-white'
-              : 'bg-paper-cream-dark cursor-not-allowed text-text-muted',
+            !canGenerate &&
+              'bg-paper-cream-dark cursor-not-allowed text-text-muted',
           )}
           style={
             {
@@ -346,19 +345,19 @@ const ImageInput = ({ className }: ImageInputProps) => {
           <span className="text-sm font-tondo font-bold">
             {t('imageInput.camera')}
           </span>
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="outline-muted"
           onClick={openFilePicker}
           disabled={!canGenerate}
           className={cn(
-            'flex flex-col items-center justify-center gap-2 w-28 h-28 rounded-coloring-card',
-            'transition-all duration-200 ease-out',
+            'h-28 w-28 flex-col rounded-coloring-card p-0',
             'focus:outline-none focus-visible:ring-4 focus-visible:ring-crayon-teal focus-visible:ring-offset-2',
-            canGenerate
-              ? 'bg-btn-teal shadow-btn-secondary hover:shadow-btn-secondary-hover hover:scale-105 active:scale-95 cursor-pointer text-white'
-              : 'bg-paper-cream-dark cursor-not-allowed text-text-muted',
+            canGenerate && 'hover:border-crayon-teal hover:bg-crayon-teal/10',
+            !canGenerate &&
+              'bg-paper-cream-dark cursor-not-allowed text-text-muted',
           )}
           style={
             {
@@ -377,7 +376,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
           <span className="text-sm font-tondo font-bold">
             {t('imageInput.upload')}
           </span>
-        </button>
+        </Button>
       </div>
 
       {/* Drop zone for desktop */}

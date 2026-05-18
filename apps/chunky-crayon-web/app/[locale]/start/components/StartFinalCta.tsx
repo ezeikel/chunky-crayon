@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Balancer from 'react-wrap-balancer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWandMagicSparkles } from '@fortawesome/pro-duotone-svg-icons';
-import cn from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 
 type StartFinalCtaProps = {
   title: string;
@@ -31,18 +31,12 @@ export default function StartFinalCta({
         </p>
 
         <div className="flex flex-col items-center gap-3">
-          <Link
-            href="/signin?from=start"
-            className={cn(
-              'inline-flex items-center gap-2 font-tondo font-bold text-lg text-white',
-              'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover',
-              'hover:scale-105 active:scale-95 transition-all duration-200',
-              'rounded-full px-8 py-4',
-            )}
-          >
-            <FontAwesomeIcon icon={faWandMagicSparkles} className="text-lg" />
-            {ctaLabel}
-          </Link>
+          <Button asChild className="h-auto rounded-full px-8 py-4 text-lg">
+            <Link href="/signin?from=start">
+              <FontAwesomeIcon icon={faWandMagicSparkles} className="text-lg" />
+              {ctaLabel}
+            </Link>
+          </Button>
           <p className="font-rooney-sans text-sm text-text-muted">
             {ctaSubtext}
           </p>

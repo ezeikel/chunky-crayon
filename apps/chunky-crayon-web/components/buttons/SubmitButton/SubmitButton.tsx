@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Button } from '@/components/ui/button';
+import { Button, type ButtonProps } from '@/components/ui/button';
 import cn from '@/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
@@ -11,19 +11,25 @@ type SubmitButtonProps = {
   className?: string;
   /** Additional disabled state (combines with form pending state) */
   disabled?: boolean;
+  /** Shared Button visual variant. */
+  variant?: ButtonProps['variant'];
   /** Optional leading icon shown before the label (hidden while pending). */
   icon?: IconDefinition;
   'data-testid'?: string;
 };
 
 const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
-  ({ text, className, disabled, icon, 'data-testid': dataTestId }, ref) => {
+  (
+    { text, className, disabled, variant, icon, 'data-testid': dataTestId },
+    ref,
+  ) => {
     const { pending } = useFormStatus();
 
     return (
       <Button
         ref={ref}
         type="submit"
+        variant={variant}
         disabled={pending || disabled}
         data-testid={dataTestId}
         className={cn('flex gap-x-2', {

@@ -354,7 +354,7 @@
     "chooseMethod": "Wähle deine bevorzugte Anmeldemethode",
     "orContinueWith": "Oder fortfahren mit",
     "emailPlaceholder": "name@beispiel.de",
-    "termsAgreement": "Wenn du fortfährst, stimmst du unseren Nutzungsbedingungen und der Datenschutzerklärung zu.",
+    "termsAgreement": "Wenn du fortfährst, stimmst du unseren <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
     "verifyRequest": {
       "title": "Deine E-Mail prüfen!",
       "description": "Wir haben dir einen Anmeldelink gesendet. Klicke auf den Link in deiner E-Mail, um fortzufahren.",

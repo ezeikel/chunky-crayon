@@ -48,8 +48,9 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-[200] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]",
-        "bg-white rounded-coloring-card border-2 border-coloring-surface-dark shadow-xl p-8",
+        "fixed left-[50%] top-[50%] z-[200] grid w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%]",
+        "max-h-[calc(100vh-2rem)] overflow-y-auto",
+        "bg-white rounded-coloring-card border-2 border-coloring-surface-dark p-7 shadow-coloring-surface sm:p-8",
         "duration-200",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -63,10 +64,10 @@ const DialogContent = React.forwardRef<
       {children}
       <DialogPrimitive.Close
         className={cn(
-          "absolute right-4 top-4 rounded-full p-2",
-          "text-coloring-text-secondary hover:text-coloring-accent hover:bg-coloring-surface",
+          "absolute right-4 top-4 flex size-10 items-center justify-center rounded-full border-2 border-coloring-surface-dark bg-white",
+          "text-coloring-text-secondary shadow-sm hover:text-coloring-accent hover:bg-coloring-surface",
           "transition-all duration-coloring-base ease-coloring hover:scale-110 active:scale-95",
-          "focus:outline-none focus:ring-2 focus:ring-coloring-accent focus:ring-offset-2",
+          "focus:outline-none focus:ring-4 focus:ring-coloring-accent/25 focus:ring-offset-2",
         )}
       >
         <FontAwesomeIcon icon={faXmark} className="text-xl" />
@@ -109,7 +110,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "font-coloring-heading text-2xl font-bold text-coloring-text-primary",
+      "font-coloring-heading text-2xl font-bold text-coloring-text-primary sm:text-3xl",
       className,
     )}
     {...props}
@@ -124,7 +125,7 @@ const DialogDescription = React.forwardRef<
   <DialogPrimitive.Description
     ref={ref}
     className={cn(
-      "font-coloring-body text-base text-coloring-text-secondary",
+      "font-coloring-body text-base leading-relaxed text-coloring-text-secondary",
       className,
     )}
     {...props}

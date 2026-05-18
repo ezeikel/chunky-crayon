@@ -426,17 +426,14 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
         Tap to chat
       </p>
 
-      <button
+      <Button
         type="button"
         onClick={startWithGate}
         disabled={!canGenerate}
         className={cn(
-          'w-24 h-24 rounded-full flex items-center justify-center',
-          'transition-all duration-200 ease-out',
+          'size-24 rounded-full p-0',
           'focus:outline-none focus-visible:ring-4 focus-visible:ring-crayon-orange focus-visible:ring-offset-2',
-          canGenerate
-            ? 'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-110 active:scale-95 cursor-pointer'
-            : 'bg-paper-cream-dark cursor-not-allowed',
+          !canGenerate && 'bg-paper-cream-dark cursor-not-allowed',
         )}
         style={
           {
@@ -456,7 +453,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
           size="3x"
           className={cn(canGenerate && 'animate-pulse')}
         />
-      </button>
+      </Button>
     </div>
   );
 };

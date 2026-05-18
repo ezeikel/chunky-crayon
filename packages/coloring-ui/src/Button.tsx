@@ -15,15 +15,15 @@ import cn from "./cn";
  * same `asChild` slot pattern, same forwardRef. Existing call sites that pass
  * `variant="outline"` or `size="sm"` keep working.
  *
- * Variants map to the toast palette where it makes sense — `destructive` is
- * the error-pink, `success` is the success-green — so an action button next
- * to a toast reads as the same brand family.
+ * Buttons share the toast palette, but not the full toast treatment. Primary
+ * and status actions keep the tactile chunky depth; outline/social/quiet
+ * actions stay flatter so multiple buttons in one card do not all shout.
  */
 
 const baseClasses = [
   "inline-flex items-center justify-center gap-2",
   "whitespace-nowrap select-none",
-  "font-[var(--font-coloring-body)] font-[var(--coloring-weight-emphasis,700)]",
+  "font-[var(--font-coloring-heading)] font-[var(--coloring-weight-emphasis,700)]",
   "rounded-coloring-button",
   "transition-[transform,box-shadow,background-color,color]",
   "duration-[var(--duration-coloring-base,200ms)]",
@@ -48,10 +48,10 @@ const buttonVariants = cva(baseClasses, {
     variant: {
       // Default brand accent (CC: chunky orange, CH: green) — opts into lift.
       default:
-        "bg-coloring-accent text-white hover:bg-coloring-accent-dark [--bottom:var(--color-coloring-accent-dark)] [--lift:6px] [--lift-active:3px]",
+        "bg-coloring-accent text-white hover:bg-coloring-accent [--bottom:var(--color-coloring-accent-dark)] [--lift:6px] [--lift-active:3px]",
       // Secondary uses the highlight token — opts into lift.
       secondary:
-        "bg-coloring-highlight text-white hover:brightness-95 [--bottom:var(--color-coloring-accent-dark)] [--lift:6px] [--lift-active:3px]",
+        "bg-coloring-highlight text-white hover:brightness-95 [--bottom:var(--color-coloring-error-bg-dark)] [--lift:6px] [--lift-active:3px]",
       // Destructive — pulls the error palette so it visually matches an error toast.
       destructive:
         "bg-[var(--color-coloring-error-bg)] text-[var(--color-coloring-error-on)] hover:brightness-95 [--bottom:var(--color-coloring-error-bg-dark)] [--lift:6px] [--lift-active:3px]",
@@ -60,7 +60,7 @@ const buttonVariants = cva(baseClasses, {
         "bg-[var(--color-coloring-success-bg)] text-[var(--color-coloring-success-on)] hover:brightness-95 [--bottom:var(--color-coloring-success-bg-dark)] [--lift:6px] [--lift-active:3px]",
       // Outline — surface-coloured fill with brand-coloured border + text.
       outline:
-        "bg-coloring-surface text-coloring-accent border-2 border-coloring-accent hover:bg-coloring-surface-dark [--bottom:var(--color-coloring-accent-dark)] [--lift:6px] [--lift-active:3px]",
+        "bg-white text-coloring-accent border-2 border-coloring-accent hover:bg-coloring-accent/5 shadow-[0_4px_14px_-8px_rgb(0_0_0/0.18)] active:translate-y-0 active:shadow-[0_2px_8px_-8px_rgb(0_0_0/0.18)]",
       // Neutral — chunky lift in dark text-primary. Use for secondary CTAs
       // that shouldn't compete with the primary brand-orange button (e.g.
       // pricing's non-popular plans, "skip" actions).
@@ -70,7 +70,7 @@ const buttonVariants = cva(baseClasses, {
       // toggles and other secondary controls that should feel like soft
       // surfaces, not branded calls-to-action.
       "outline-muted":
-        "bg-coloring-surface text-coloring-text-primary border-2 border-coloring-surface-dark hover:bg-coloring-surface-dark",
+        "bg-white text-coloring-text-primary border-2 border-coloring-surface-dark hover:border-coloring-accent/40 hover:bg-coloring-surface shadow-[0_4px_14px_-10px_rgb(0_0_0/0.16)] active:translate-y-0",
       // Ghost — flat, no shadow at all.
       ghost:
         "bg-transparent text-coloring-text-primary hover:bg-coloring-surface-dark shadow-none active:shadow-none active:translate-y-0",
@@ -91,7 +91,8 @@ const buttonVariants = cva(baseClasses, {
 });
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }

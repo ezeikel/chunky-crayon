@@ -32,18 +32,18 @@ const HeaderChallengeIndicator = ({
   return (
     <Link
       href="/account/challenges"
-      className="relative flex items-center gap-1 sm:gap-2 font-tondo font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-crayon-yellow/10 to-crayon-orange/10 border-2 border-crayon-yellow/30 hover:border-crayon-orange/50 hover:scale-105 active:scale-95 transition-all duration-200"
+      className="relative flex min-h-12 min-w-32 items-center justify-center gap-3 rounded-full border-2 border-crayon-yellow/40 bg-gradient-to-r from-crayon-yellow/10 to-crayon-orange/10 px-5 py-2 font-tondo font-bold transition-all duration-200 hover:scale-105 hover:border-crayon-orange/50 active:scale-95"
     >
       <FontAwesomeIcon
         icon={faTrophy}
-        className="text-base sm:text-lg"
+        className="text-xl"
         style={trophyStyle}
       />
 
       {/* Progress ring or completion indicator */}
-      <div className="relative w-5 h-5 sm:w-6 sm:h-6">
+      <div className="relative h-7 w-7">
         {/* Background circle */}
-        <svg className="w-5 h-5 sm:w-6 sm:h-6 -rotate-90">
+        <svg className="h-7 w-7 -rotate-90">
           <circle
             cx="50%"
             cy="50%"
@@ -79,21 +79,21 @@ const HeaderChallengeIndicator = ({
           </defs>
         </svg>
         {/* Center text */}
-        <span className="absolute inset-0 flex items-center justify-center text-[8px] sm:text-[10px] font-bold text-text-primary">
+        <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-text-primary">
           {isCompleted ? '!' : `${percentComplete}%`}
         </span>
       </div>
 
       {/* Reward ready badge */}
       {showRewardReady && (
-        <span className="absolute -top-1.5 -right-1.5 flex items-center gap-0.5 px-1.5 py-0.5 bg-crayon-green text-white text-[10px] font-bold rounded-full animate-pulse shadow-sm">
-          <FontAwesomeIcon icon={faStar} className="text-[8px]" />
+        <span className="absolute -right-2 -top-2 flex min-h-7 min-w-7 items-center justify-center rounded-full bg-crayon-green px-2 py-1 text-xs font-bold text-white shadow-sm">
+          <FontAwesomeIcon icon={faStar} className="text-[10px]" />
         </span>
       )}
 
       {/* Urgency indicator - last day */}
       {!isCompleted && daysRemaining === 0 && (
-        <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 bg-crayon-red text-white text-[10px] font-bold rounded-full animate-pulse shadow-sm">
+        <span className="absolute -right-2 -top-2 flex min-h-7 min-w-7 items-center justify-center rounded-full bg-crayon-red px-2 py-1 text-xs font-bold text-white shadow-sm">
           !
         </span>
       )}

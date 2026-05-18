@@ -9,6 +9,7 @@ import {
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useTranslations } from 'next-intl';
 import { useInputMode, type InputMode } from './InputModeContext';
+import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
 
 // =============================================================================
@@ -73,9 +74,10 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
         const isDisabled = disabled || isProcessing;
 
         return (
-          <button
+          <Button
             key={option.mode}
             type="button"
+            variant={isActive ? 'default' : 'outline-muted'}
             role="tab"
             aria-selected={isActive}
             aria-controls={`${option.mode}-input-panel`}
@@ -86,15 +88,13 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
             title={t(option.labelKey)}
             className={cn(
               // Base — compact tile matching DesktopToolsSidebar tool buttons
-              'flex items-center justify-center size-14 md:size-16 rounded-coloring-card',
-              'border-2 transition-all duration-200 ease-out',
+              'size-14 rounded-coloring-card border-2 p-0 md:size-16',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-crayon-orange',
-              isActive
-                ? 'bg-btn-orange border-transparent text-white shadow-btn-primary'
-                : 'bg-white border-paper-cream-dark text-text-primary hover:border-crayon-orange hover:bg-crayon-orange-light/10',
+              isActive && 'border-transparent',
+              !isActive &&
+                'border-paper-cream-dark bg-white text-text-primary hover:border-crayon-orange hover:bg-crayon-orange-light/10',
               isDisabled &&
                 'opacity-50 cursor-not-allowed hover:border-paper-cream-dark hover:bg-white',
-              !isDisabled && !isActive && 'hover:scale-105 active:scale-95',
             )}
             style={
               isActive
@@ -118,7 +118,7 @@ const InputModeSelector = ({ className, disabled }: InputModeSelectorProps) => {
                 isActive && 'animate-bounce-in',
               )}
             />
-          </button>
+          </Button>
         );
       })}
     </div>

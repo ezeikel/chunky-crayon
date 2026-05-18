@@ -1,0 +1,16 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Bea the bear</title>
+  <desc id="desc">A cheerful bear character with a paint splodge.</desc>
+  <rect width="320" height="320" rx="48" fill="#FFF8EA"/>
+  <circle cx="100" cy="105" r="36" fill="#B98A5B"/>
+  <circle cx="220" cy="105" r="36" fill="#B98A5B"/>
+  <circle cx="160" cy="164" r="94" fill="#C99A67"/>
+  <circle cx="123" cy="148" r="10" fill="#44342B"/>
+  <circle cx="197" cy="148" r="10" fill="#44342B"/>
+  <ellipse cx="160" cy="178" rx="34" ry="26" fill="#F6D9B8"/>
+  <path d="M146 172c6 7 22 7 28 0" stroke="#44342B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M132 213c15 13 41 13 56 0" stroke="#44342B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M224 217c20-10 47 3 53 25 4 17-5 35-21 42-19 8-43-4-49-25-5-17 2-34 17-42Z" fill="#E88997"/>
+  <circle cx="244" cy="249" r="15" fill="#F4D35E"/>
+  <circle cx="263" cy="237" r="10" fill="#E96545"/>
+</svg>

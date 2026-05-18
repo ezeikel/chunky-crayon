@@ -27,21 +27,19 @@ const HeaderStickerIndicator = ({
   return (
     <Link
       href="/account/profiles/stickers"
-      className="relative flex items-center gap-1 sm:gap-2 font-tondo font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-crayon-orange/10 to-crayon-yellow/10 border-2 border-crayon-orange/30 hover:border-crayon-orange/50 hover:scale-105 active:scale-95 transition-all duration-200"
+      className="relative flex min-h-12 min-w-32 items-center justify-center gap-3 rounded-full border-2 border-crayon-orange/30 bg-gradient-to-r from-crayon-orange/10 to-crayon-yellow/10 px-5 py-2 font-tondo font-bold transition-all duration-200 hover:scale-105 hover:border-crayon-orange/50 active:scale-95"
     >
       <FontAwesomeIcon
         icon={faBookOpen}
-        className="text-base sm:text-lg"
+        className="text-xl"
         style={stickerStyle}
       />
-      <span className="text-text-primary text-xs sm:text-sm">
-        {totalUnlocked}
-      </span>
+      <span className="text-base text-text-primary">{totalUnlocked}</span>
 
       {/* NEW badge */}
       {newCount > 0 && (
-        <span className="absolute -top-1.5 -right-1.5 flex items-center gap-0.5 px-1.5 py-0.5 bg-crayon-orange text-white text-[10px] font-bold rounded-full animate-pulse shadow-sm">
-          <FontAwesomeIcon icon={faStar} className="text-[8px]" />
+        <span className="absolute -right-2 -top-2 flex min-h-7 min-w-7 items-center justify-center gap-1 rounded-full bg-crayon-orange px-2 py-1 text-xs font-bold text-white shadow-sm">
+          <FontAwesomeIcon icon={faStar} className="text-[10px]" />
           {newCount}
         </span>
       )}

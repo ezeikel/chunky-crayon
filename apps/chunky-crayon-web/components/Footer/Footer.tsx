@@ -20,13 +20,47 @@ type FooterProps = {
   className?: string;
 };
 
-const Footer = async ({ className }: FooterProps) => {
-  const [t, tAlt, year] = await Promise.all([
-    getTranslations('footer'),
-    getTranslations('altText'),
-    getCachedYear(),
-  ]);
+export type FooterContentCopy = {
+  brand: string;
+  tagline: string;
+  aboutText: string;
+  mascotAlt: string;
+  copyright: string;
+  madeByPrefix: string;
+  madeByHeart: string;
+  madeByLocationPrefix: string;
+  madeByLocation: string;
+  sections: {
+    about: string;
+    connect: string;
+    getTheApp: string;
+    support: string;
+    freeTools: string;
+  };
+  newsletter: {
+    title: string;
+    subtitle: string;
+  };
+  links: {
+    privacyPolicy: string;
+    termsOfService: string;
+    colorAsYouGo: string;
+  };
+  freeTools: {
+    allTools: string;
+    nameColoringPages: string;
+    rewardChartMaker: string;
+    birthdayInviteMaker: string;
+    abcTracingWorksheets: string;
+    seasonalColoringPacks: string;
+    forTeachers: string;
+  };
+};
 
+export const FooterContent = ({
+  className,
+  copy,
+}: FooterProps & { copy: FooterContentCopy }) => {
   return (
     <footer
       className={cn(
@@ -52,18 +86,18 @@ const Footer = async ({ className }: FooterProps) => {
                 height={44}
                 className="w-10 h-10 md:w-11 md:h-11 shrink-0"
               />
-              {t('brand')}
+              {copy.brand}
             </Link>
           </div>
           <div>
-            <h3 className="font-bold text-lg mb-2">{t('sections.about')}</h3>
+            <h3 className="font-bold text-lg mb-2">{copy.sections.about}</h3>
             <p className="text-gray-300 text-base max-w-xs">
-              {t('aboutText')}{' '}
-              <span className="font-bold text-white">{t('tagline')}</span>
+              {copy.aboutText}{' '}
+              <span className="font-bold text-white">{copy.tagline}</span>
             </p>
           </div>
           <div className="mt-6">
-            <h3 className="font-bold text-lg mb-2">{t('sections.connect')}</h3>
+            <h3 className="font-bold text-lg mb-2">{copy.sections.connect}</h3>
             <ul className="flex gap-6 mt-2">
               {SOCIAL_LINKS.map(({ id, label, href, icon }) => (
                 <li key={id}>
@@ -84,15 +118,15 @@ const Footer = async ({ className }: FooterProps) => {
               ))}
             </ul>
           </div>
-          <AppStoreSection label={t('sections.getTheApp')} />
+          <AppStoreSection label={copy.sections.getTheApp} />
         </div>
         <div className="flex-1 min-w-[220px] flex flex-col gap-8">
           <div>
             <h3 className="font-tondo font-bold text-lg mb-2">
-              {t('newsletter.title')}
+              {copy.newsletter.title}
             </h3>
             <p className="text-sm text-gray-300 mb-4 max-w-sm">
-              {t('newsletter.subtitle')}
+              {copy.newsletter.subtitle}
             </p>
             <Suspense fallback={null}>
               <JoinColoringPageEmailListForm location="footer" />
@@ -100,7 +134,7 @@ const Footer = async ({ className }: FooterProps) => {
           </div>
 
           <div>
-            <h3 className="font-bold text-lg mb-2">{t('sections.support')}</h3>
+            <h3 className="font-bold text-lg mb-2">{copy.sections.support}</h3>
             <ul className="flex flex-col gap-1.5">
               <li>
                 <a
@@ -115,7 +149,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/color-as-you-go"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  {t('links.colorAsYouGo')}
+                  {copy.links.colorAsYouGo}
                 </Link>
               </li>
             </ul>
@@ -142,7 +176,7 @@ const Footer = async ({ className }: FooterProps) => {
           {/* Free Tools — internal linking for SEO + discoverability */}
           <div>
             <h3 className="font-bold text-lg mb-2">
-              {t('sections.freeTools')}
+              {copy.sections.freeTools}
             </h3>
             <ul className="flex flex-col gap-1.5">
               <li>
@@ -150,7 +184,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/freebies"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  {t('freeTools.allTools')}
+                  {copy.freeTools.allTools}
                 </Link>
               </li>
               <li>
@@ -158,7 +192,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/freebies/name"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  {t('freeTools.nameColoringPages')}
+                  {copy.freeTools.nameColoringPages}
                 </Link>
               </li>
               <li>
@@ -166,7 +200,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/freebies/reward-chart"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  {t('freeTools.rewardChartMaker')}
+                  {copy.freeTools.rewardChartMaker}
                 </Link>
               </li>
               <li>
@@ -174,7 +208,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/freebies/birthday-invite"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  {t('freeTools.birthdayInviteMaker')}
+                  {copy.freeTools.birthdayInviteMaker}
                 </Link>
               </li>
               <li>
@@ -182,7 +216,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/freebies/abc-tracing"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  {t('freeTools.abcTracingWorksheets')}
+                  {copy.freeTools.abcTracingWorksheets}
                 </Link>
               </li>
               <li>
@@ -190,7 +224,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/freebies/seasonal-pack"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  {t('freeTools.seasonalColoringPacks')}
+                  {copy.freeTools.seasonalColoringPacks}
                 </Link>
               </li>
               <li>
@@ -198,7 +232,7 @@ const Footer = async ({ className }: FooterProps) => {
                   href="/for-teachers"
                   className="text-gray-300 text-base hover:text-white transition-colors"
                 >
-                  {t('freeTools.forTeachers')}
+                  {copy.freeTools.forTeachers}
                 </Link>
               </li>
             </ul>
@@ -207,16 +241,16 @@ const Footer = async ({ className }: FooterProps) => {
       </div>
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mt-12 pt-6 text-gray-400 text-sm gap-2">
         <div className="flex flex-col md:flex-row items-center gap-4">
-          <span>{t('copyright', { year })}</span>
+          <span>{copy.copyright}</span>
           <div className="flex gap-4">
             <Link
               href="/privacy"
               className="hover:text-white transition-colors"
             >
-              {t('links.privacyPolicy')}
+              {copy.links.privacyPolicy}
             </Link>
             <Link href="/terms" className="hover:text-white transition-colors">
-              {t('links.termsOfService')}
+              {copy.links.termsOfService}
             </Link>
           </div>
         </div>
@@ -224,26 +258,72 @@ const Footer = async ({ className }: FooterProps) => {
           {/* Colo waving goodbye */}
           <Image
             src="/images/colo.svg"
-            alt={tAlt('mascot')}
+            alt={copy.mascotAlt}
             width={40}
             height={40}
             className="opacity-80 hover:opacity-100 transition-opacity"
           />
           <span>
-            {t.rich('madeBy', {
-              heart: (chunks) => (
-                <span className="text-[#FF8A65] font-bold text-lg">
-                  {chunks}
-                </span>
-              ),
-              location: (chunks) => (
-                <span className="text-white font-bold">{chunks}</span>
-              ),
-            })}
+            {copy.madeByPrefix}{' '}
+            <span className="text-[#FF8A65] font-bold text-lg">
+              {copy.madeByHeart}
+            </span>{' '}
+            {copy.madeByLocationPrefix}{' '}
+            <span className="text-white font-bold">{copy.madeByLocation}</span>
           </span>
         </div>
       </div>
     </footer>
+  );
+};
+
+const Footer = async ({ className }: FooterProps) => {
+  const [t, tAlt, year] = await Promise.all([
+    getTranslations('footer'),
+    getTranslations('altText'),
+    getCachedYear(),
+  ]);
+
+  return (
+    <FooterContent
+      className={className}
+      copy={{
+        brand: t('brand'),
+        tagline: t('tagline'),
+        aboutText: t('aboutText'),
+        mascotAlt: tAlt('mascot'),
+        copyright: t('copyright', { year }),
+        madeByPrefix: 'Made with',
+        madeByHeart: '♡',
+        madeByLocationPrefix: 'in',
+        madeByLocation: 'South London',
+        sections: {
+          about: t('sections.about'),
+          connect: t('sections.connect'),
+          getTheApp: t('sections.getTheApp'),
+          support: t('sections.support'),
+          freeTools: t('sections.freeTools'),
+        },
+        newsletter: {
+          title: t('newsletter.title'),
+          subtitle: t('newsletter.subtitle'),
+        },
+        links: {
+          privacyPolicy: t('links.privacyPolicy'),
+          termsOfService: t('links.termsOfService'),
+          colorAsYouGo: t('links.colorAsYouGo'),
+        },
+        freeTools: {
+          allTools: t('freeTools.allTools'),
+          nameColoringPages: t('freeTools.nameColoringPages'),
+          rewardChartMaker: t('freeTools.rewardChartMaker'),
+          birthdayInviteMaker: t('freeTools.birthdayInviteMaker'),
+          abcTracingWorksheets: t('freeTools.abcTracingWorksheets'),
+          seasonalColoringPacks: t('freeTools.seasonalColoringPacks'),
+          forTeachers: t('freeTools.forTeachers'),
+        },
+      }}
+    />
   );
 };
 

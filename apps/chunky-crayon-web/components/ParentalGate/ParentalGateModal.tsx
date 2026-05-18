@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
 
 type MathProblem = {
@@ -185,18 +186,16 @@ const ParentalGateModal = ({
           </div>
 
           {/* Submit Button */}
-          <button
+          <Button
             type="submit"
             disabled={!userAnswer}
             className={cn(
-              'w-full py-4 px-6 rounded-full font-tondo font-bold text-lg text-white',
-              'transition-all duration-200 hover:scale-105 active:scale-95',
-              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
-              'bg-crayon-orange shadow-btn-primary hover:shadow-btn-primary-hover',
+              'h-auto w-full rounded-full px-6 py-4 text-lg',
+              'disabled:cursor-not-allowed disabled:hover:scale-100',
             )}
           >
             {t('submit')}
-          </button>
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

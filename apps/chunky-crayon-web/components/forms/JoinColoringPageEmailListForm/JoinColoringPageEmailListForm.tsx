@@ -208,10 +208,10 @@ const JoinColoringPageEmailListForm = ({
           type="email"
           name="email"
           className={cn(
-            'flex-1 font-tondo',
+            'h-12 flex-1 py-0 font-tondo leading-none',
             isFooter
-              ? 'px-4 shrink-0 sm:shrink rounded-lg sm:rounded-full text-white placeholder:text-white/50 bg-white/10 border border-white/20 sm:bg-transparent sm:border-0 focus:ring-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none'
-              : 'px-4 border-2 border-paper-cream-dark rounded-xl py-2.5 placeholder:text-text-muted focus:border-crayon-orange focus:ring-2 focus:ring-crayon-orange/20',
+              ? 'px-5 shrink-0 sm:shrink rounded-lg sm:rounded-full text-white placeholder:text-white/50 bg-white/10 border border-white/20 sm:bg-transparent sm:border-0 focus:ring-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none'
+              : 'px-4 border-2 border-paper-cream-dark rounded-xl placeholder:text-text-muted focus:border-crayon-orange focus:ring-2 focus:ring-crayon-orange/20',
           )}
           placeholder={t('signup.placeholder')}
           ref={emailInputRef}
@@ -221,10 +221,10 @@ const JoinColoringPageEmailListForm = ({
         <SubmitButton
           text={t('signup.join')}
           className={cn(
-            'font-tondo font-bold text-white bg-crayon-orange hover:bg-crayon-orange-dark transition-all duration-200',
+            'font-tondo font-bold text-white transition-all duration-200',
             isFooter
-              ? 'px-4 shrink-0 sm:shrink rounded-lg sm:rounded-full shadow-md hover:shadow-lg'
-              : 'py-2.5 rounded-xl shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95',
+              ? 'h-12 px-5 shrink-0 sm:shrink rounded-lg sm:rounded-full shadow-md hover:shadow-lg'
+              : 'h-12 rounded-xl',
           )}
         />
       </form>

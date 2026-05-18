@@ -10,6 +10,7 @@ import { signBundleDownloadToken } from '@/lib/bundle-download-token';
 import { checkFeatureFlag } from '@/flags';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { Button } from '@/components/ui/button';
 import ThankYouProcessingPoller from './ThankYouProcessingPoller';
 
 type ThankYouPageProps = {
@@ -192,13 +193,12 @@ const DownloadCta = ({
   priceDisplay: string;
 }) => (
   <div className="text-center">
-    <a
-      href={href}
-      className="inline-flex items-center gap-3 font-tondo font-bold text-lg px-8 py-4 rounded-full bg-crayon-orange text-white shadow-btn-primary hover:shadow-btn-primary-hover transition-all duration-200 hover:-translate-y-0.5"
-    >
-      <FontAwesomeIcon icon={faDownload} className="text-xl" />
-      Download your bundle
-    </a>
+    <Button asChild className="h-auto rounded-full px-8 py-4 text-lg">
+      <a href={href}>
+        <FontAwesomeIcon icon={faDownload} className="text-xl" />
+        Download your bundle
+      </a>
+    </Button>
     <p className="mt-4 text-sm text-text-secondary font-rooney-sans">
       Order total: <strong>{priceDisplay}</strong>
     </p>

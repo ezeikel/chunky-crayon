@@ -299,9 +299,9 @@ const ColoAvatar = ({
       <AvatarWrapper
         {...(onClick || enableTapReactions ? { type: 'button' } : {})}
         className={cn(
-          'relative rounded-full overflow-hidden transition-transform',
+          'relative rounded-full overflow-hidden transition-all duration-200',
           (onClick || enableTapReactions) &&
-            'focus:outline-none focus:ring-2 focus:ring-crayon-orange focus:ring-offset-2 cursor-pointer hover:scale-105',
+            'cursor-pointer hover:scale-105 hover:shadow-[0_0_0_6px_hsl(var(--crayon-yellow)/0.35),0_10px_24px_hsl(var(--crayon-orange)/0.22)] focus-visible:outline-none focus-visible:shadow-[0_0_0_5px_hsl(var(--crayon-orange)),0_0_0_10px_hsl(var(--crayon-yellow)/0.45)]',
           !(onClick || enableTapReactions) && 'cursor-default',
           sizeClasses[size],
           // Apply current animation
@@ -391,26 +391,28 @@ const ColoAvatar = ({
 
       {/* Tooltip */}
       {showTooltip && showTooltipState && (
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-10">
-          <div className="bg-gray-900 text-white text-xs font-tondo rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
-            <p className="font-bold">{t(`stages.${stage}.name`)}</p>
-            <p className="text-gray-300 text-[10px]">
+        <div className="absolute left-1/2 top-full z-10 mt-3 -translate-x-1/2 sm:left-full sm:top-1/2 sm:ml-4 sm:mt-0 sm:-translate-y-1/2 sm:translate-x-0">
+          <div className="min-w-52 rounded-3xl border-2 border-paper-cream-dark bg-white px-4 py-3 text-center font-tondo shadow-card">
+            <p className="text-lg font-bold text-text-primary">
+              {t(`stages.${stage}.name`)}
+            </p>
+            <p className="mt-1 text-sm text-text-secondary">
               {t(`stages.${stage}.description`)}
             </p>
             {coloState?.progressToNext && (
-              <p className="text-crayon-orange text-[10px] mt-1">
+              <p className="mt-2 text-sm font-bold text-crayon-orange">
                 {coloState.progressToNext.current}/
                 {coloState.progressToNext.required} {t('avatar.artworks')}
               </p>
             )}
             {enableTapReactions && (
-              <p className="text-crayon-yellow text-[10px] mt-1 inline-flex items-center gap-1">
+              <p className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full bg-crayon-yellow px-4 py-2 text-base font-bold text-text-primary shadow-sm">
                 {t('avatar.tapMe')}
                 <FontAwesomeIcon icon={faPalette} />
               </p>
             )}
             {/* Tooltip arrow */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+            <div className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 -translate-y-2 rotate-45 border-l-2 border-t-2 border-paper-cream-dark bg-white sm:left-0 sm:top-1/2 sm:-translate-x-2 sm:-translate-y-1/2 sm:border-b-2 sm:border-l-2 sm:border-r-0 sm:border-t-0" />
           </div>
         </div>
       )}

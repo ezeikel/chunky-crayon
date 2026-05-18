@@ -353,7 +353,7 @@
     "chooseMethod": "Choose your preferred sign in method",
     "orContinueWith": "Or continue with",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy.",
+    "termsAgreement": "By continuing, you agree to our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>.",
     "verifyRequest": {
       "title": "Check Your Email!",
       "description": "We sent you a magic link to sign in. Click the link in your email to continue.",

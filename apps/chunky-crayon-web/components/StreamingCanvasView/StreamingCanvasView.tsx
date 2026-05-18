@@ -52,6 +52,7 @@ import { generateLoadingAudio } from '@/app/actions/loading-audio';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import cn from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 
 type StreamingStatus = 'GENERATING' | 'READY' | 'FAILED';
 
@@ -374,14 +375,14 @@ const StreamingCanvasView = ({
         <p className="font-tondo text-base text-text-primary text-center max-w-md">
           Don&apos;t worry — your credits have been refunded. Want to try again?
         </p>
-        <button
+        <Button
           type="button"
           onClick={() => router.push('/')}
-          className="font-tondo font-bold text-base md:text-lg text-white bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 rounded-full px-8 py-4"
+          className="h-auto rounded-full px-8 py-4 text-base md:text-lg"
         >
           <FontAwesomeIcon icon={faRotateRight} className="mr-2" />
           Try again
-        </button>
+        </Button>
       </div>
     );
   }

@@ -17,6 +17,7 @@ import { fetchRecentCreationImages } from '@/app/actions/recent-creations';
 import { useProgressPreviews } from '@/hooks/useProgressPreviews';
 import type { GalleryImage } from '@/app/data/coloring-image';
 import cn from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 
 type RecentCreationsProps = {
   className?: string;
@@ -155,13 +156,12 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
               {t('ctaMessage')}
             </p>
           </div>
-          <Link
-            href="/sign-up"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange hover:bg-crayon-orange-dark text-white font-tondo font-bold rounded-xl shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200 whitespace-nowrap"
-          >
-            {t('ctaButton')}
-            <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
-          </Link>
+          <Button asChild className="rounded-xl whitespace-nowrap">
+            <Link href="/sign-up">
+              {t('ctaButton')}
+              <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

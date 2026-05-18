@@ -6,11 +6,11 @@ import Balancer from 'react-wrap-balancer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWandMagicSparkles } from '@fortawesome/pro-duotone-svg-icons';
 import type { ColoringImage } from '@one-colored-pixel/db/types';
-import cn from '@/utils/cn';
 import { useAnalytics } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { Experiment } from '@/components/experiment/Experiment';
 import EmbeddedColoringCanvas from '@/components/EmbeddedColoringCanvas';
+import { Button } from '@/components/ui/button';
 
 type StartHeroProps = {
   campaign: 'trex' | 'foxes' | 'dragon' | 'default';
@@ -87,54 +87,46 @@ export default function StartHero({
               exposureProperties={{ campaign, surface: 'start_hero_cta' }}
               variants={{
                 control: (
-                  <Link
-                    href={`/signin?from=start&campaign=${campaign}`}
-                    onClick={() =>
-                      track(TRACKING_EVENTS.START_HERO_CTA_CLICKED, {
-                        campaign,
-                        cta: 'signin',
-                        ctaDestination: 'signin',
-                        msFromMount: Date.now() - mountTimeRef.current,
-                      })
-                    }
-                    className={cn(
-                      'inline-flex items-center gap-2 font-tondo font-bold text-base md:text-lg text-white',
-                      'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover',
-                      'hover:scale-105 active:scale-95 transition-all duration-200',
-                      'rounded-full px-7 py-3.5',
-                    )}
-                  >
-                    <FontAwesomeIcon
-                      icon={faWandMagicSparkles}
-                      className="text-lg"
-                    />
-                    {ctaLabel}
-                  </Link>
+                  <Button asChild className="h-auto rounded-full px-7 py-3.5">
+                    <Link
+                      href={`/signin?from=start&campaign=${campaign}`}
+                      onClick={() =>
+                        track(TRACKING_EVENTS.START_HERO_CTA_CLICKED, {
+                          campaign,
+                          cta: 'signin',
+                          ctaDestination: 'signin',
+                          msFromMount: Date.now() - mountTimeRef.current,
+                        })
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faWandMagicSparkles}
+                        className="text-lg"
+                      />
+                      {ctaLabel}
+                    </Link>
+                  </Button>
                 ),
                 pricing_first: (
-                  <Link
-                    href={`/pricing?from=start&campaign=${campaign}`}
-                    onClick={() =>
-                      track(TRACKING_EVENTS.START_HERO_CTA_CLICKED, {
-                        campaign,
-                        cta: 'pricing',
-                        ctaDestination: 'pricing',
-                        msFromMount: Date.now() - mountTimeRef.current,
-                      })
-                    }
-                    className={cn(
-                      'inline-flex items-center gap-2 font-tondo font-bold text-base md:text-lg text-white',
-                      'bg-btn-orange shadow-btn-primary hover:shadow-btn-primary-hover',
-                      'hover:scale-105 active:scale-95 transition-all duration-200',
-                      'rounded-full px-7 py-3.5',
-                    )}
-                  >
-                    <FontAwesomeIcon
-                      icon={faWandMagicSparkles}
-                      className="text-lg"
-                    />
-                    {ctaLabel}
-                  </Link>
+                  <Button asChild className="h-auto rounded-full px-7 py-3.5">
+                    <Link
+                      href={`/pricing?from=start&campaign=${campaign}`}
+                      onClick={() =>
+                        track(TRACKING_EVENTS.START_HERO_CTA_CLICKED, {
+                          campaign,
+                          cta: 'pricing',
+                          ctaDestination: 'pricing',
+                          msFromMount: Date.now() - mountTimeRef.current,
+                        })
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faWandMagicSparkles}
+                        className="text-lg"
+                      />
+                      {ctaLabel}
+                    </Link>
+                  </Button>
                 ),
               }}
             />

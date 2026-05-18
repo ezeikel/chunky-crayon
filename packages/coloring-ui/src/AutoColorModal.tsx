@@ -37,10 +37,10 @@ const AutoColorModal = ({ className }: AutoColorModalProps) => {
     >
       <div
         className={cn(
-          "flex flex-col items-center gap-5 p-8 rounded-coloring-card shadow-xl max-w-sm mx-4",
+          "mx-4 flex max-w-sm flex-col items-center gap-5 rounded-coloring-card p-8 shadow-coloring-surface",
           isKids
-            ? "bg-white border-2 border-coloring-accent/20"
-            : "bg-white border border-coloring-surface-dark",
+            ? "border-2 border-coloring-surface-dark bg-white"
+            : "border border-coloring-surface-dark bg-white",
         )}
       >
         {/* Spinner */}

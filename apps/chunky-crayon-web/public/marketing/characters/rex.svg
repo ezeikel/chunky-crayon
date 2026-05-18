@@ -1,0 +1,14 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Rex the dinosaur</title>
+  <desc id="desc">A friendly green dinosaur character holding a crayon.</desc>
+  <rect width="320" height="320" rx="48" fill="#FFF8EA"/>
+  <circle cx="164" cy="158" r="92" fill="#8BB35E"/>
+  <path d="M91 120c-22 18-34 48-28 77 8 42 47 71 89 64l-8-35c-23 2-45-14-50-38-4-18 3-36 17-47l-20-21Z" fill="#668B3F"/>
+  <path d="M128 84c8-29 37-48 68-41 42 9 72 43 76 85 4 50-32 95-82 101-38 4-74-16-91-49" fill="#91BE63"/>
+  <path d="M177 45l-10-26 29 10 12-24 12 29 31-1-19 24 22 22-33 1-10 30-18-26-31 9 15-28Z" fill="#F4D35E"/>
+  <circle cx="203" cy="111" r="12" fill="#44342B"/>
+  <circle cx="207" cy="107" r="4" fill="white"/>
+  <path d="M223 147c-17 13-42 13-58 0" stroke="#44342B" stroke-width="9" stroke-linecap="round"/>
+  <path d="M76 245l106-39 16 43-106 39-31-6 15-37Z" fill="#E96545"/>
+  <path d="M182 206l30-11 16 43-30 11-16-43Z" fill="#F4D35E"/>
+</svg>

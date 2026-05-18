@@ -1,0 +1,14 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Mei the maker</title>
+  <desc id="desc">A smiling child character holding a rainbow drawing.</desc>
+  <rect width="320" height="320" rx="48" fill="#FFF8EA"/>
+  <circle cx="160" cy="135" r="72" fill="#F4C8A4"/>
+  <path d="M88 137c3-55 35-89 82-89 38 0 67 24 72 58-25-4-47-16-66-36-17 28-47 51-88 67Z" fill="#44342B"/>
+  <circle cx="134" cy="136" r="9" fill="#44342B"/>
+  <circle cx="190" cy="136" r="9" fill="#44342B"/>
+  <path d="M137 168c14 16 42 16 56 0" stroke="#44342B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M75 245c14-45 47-70 85-70s71 25 85 70v35H75v-35Z" fill="#E96545"/>
+  <rect x="96" y="206" width="128" height="76" rx="12" fill="white" stroke="#44342B" stroke-width="6"/>
+  <path d="M116 258c0-24 19-43 43-43s43 19 43 43" stroke="#F4D35E" stroke-width="11" stroke-linecap="round"/>
+  <path d="M133 258c0-15 12-27 27-27s27 12 27 27" stroke="#8BB35E" stroke-width="10" stroke-linecap="round"/>
+</svg>

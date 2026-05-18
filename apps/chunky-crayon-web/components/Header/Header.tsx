@@ -38,6 +38,7 @@ import MobileMenu from './MobileMenu';
 import ScrollHeader from './ScrollHeader';
 import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
 import HeaderFeedbackTrigger from './HeaderFeedbackTrigger';
+import { Button } from '@/components/ui/button';
 
 export type Visibility = 'always' | 'authenticated' | 'unauthenticated';
 
@@ -427,12 +428,9 @@ const Header = async () => {
           ))}
           <LanguageSwitcher variant="icon" />
         </nav>
-        <Link
-          href="/signin"
-          className="hidden lg:flex items-center font-tondo font-bold text-white px-6 py-2.5 rounded-full bg-crayon-orange shadow-btn-primary hover:shadow-btn-primary-hover hover:scale-105 active:scale-95 transition-all duration-200"
-        >
-          {t('signIn')}
-        </Link>
+        <Button asChild className="hidden lg:flex rounded-full">
+          <Link href="/signin">{t('signIn')}</Link>
+        </Button>
         <MobileMenu items={mobileItems} />
       </div>
     );

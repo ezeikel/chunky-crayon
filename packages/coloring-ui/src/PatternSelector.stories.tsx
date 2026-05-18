@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useEffect } from "react";
+import { useColoringContext } from "./context";
 import PatternSelector from "./PatternSelector";
 
 const meta: Meta<typeof PatternSelector> = {
@@ -9,7 +11,19 @@ const meta: Meta<typeof PatternSelector> = {
 export default meta;
 type Story = StoryObj<typeof PatternSelector>;
 
-export const Default: Story = {};
+const PatternSelectorPreview = () => {
+  const { setActiveTool } = useColoringContext();
+
+  useEffect(() => {
+    setActiveTool("fill");
+  }, [setActiveTool]);
+
+  return <PatternSelector />;
+};
+
+export const Default: Story = {
+  render: () => <PatternSelectorPreview />,
+};
 
 export const BothBrands: Story = {
   render: () => (
@@ -18,13 +32,13 @@ export const BothBrands: Story = {
         data-theme="chunky-crayon"
         className="p-6 rounded-coloring-card bg-coloring-surface"
       >
-        <PatternSelector />
+        <PatternSelectorPreview />
       </div>
       <div
         data-theme="coloring-habitat"
         className="p-6 rounded-coloring-card bg-coloring-surface"
       >
-        <PatternSelector />
+        <PatternSelectorPreview />
       </div>
     </div>
   ),
