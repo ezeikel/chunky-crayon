@@ -383,7 +383,7 @@
       "communityPages": "Páginas de la comunidad",
       "dailyPages": "Páginas diarias",
       "pagesSuffix": "páginas",
-      "ourPages": "Our Pages"
+      "ourPages": "Nuestras páginas"
     },
     "ageGroups": {
       "toddlers": {
@@ -458,7 +458,7 @@
       "about": "Acerca de"
     },
     "difficultyFilter": {
-      "all": "All",
+      "all": "Todo",
       "beginner": "Easy",
       "intermediate": "Medium",
       "advanced": "Tricky",
@@ -569,7 +569,7 @@
         "pageTitle": "Páginas para colorear para adultos",
         "featuredSection": "Páginas populares para adultos",
         "categoriesSection": "Categorías para adultos",
-        "heroDescription": "Descubre los beneficios terapéuticos de colorear para adultos. Nuestra colección incluye mandalas intrincados, escenas de naturaleza y patrones detallados diseñados para relajarte y estar en calma. Perfectas para soltar el estrés tras un día largo.",
+        "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas intrincados, escenas de naturaleza y patrones detallados diseñados para relajarte y encontrar calma. Perfectas para soltar el estrés tras un día largo.",
         "whyTitle": "Beneficios de colorear para adultos",
         "why1Title": "Alivio del estrés",
         "why1Description": "Colorear activa la respuesta de relajación, reduce la ansiedad y aporta calma.",
@@ -578,30 +578,30 @@
         "why3Title": "Creatividad",
         "why3Description": "Exprésate con tus colores y crea obras preciosas.",
         "seoTitle": "Páginas para colorear gratis para adultos",
-        "seoParagraph1": "Colorear para adultos se ha vuelto una actividad de bienestar muy popular, y con razón. Los estudios muestran que colorear puede reducir la ansiedad, mejorar el enfoque y dar un descanso calmante de una vida llena de pantallas. Nuestra colección ofrece diseños bonitos e intrincados, perfectos para adultos.",
+        "seoParagraph1": "Colorear para adultos se ha vuelto una actividad de bienestar muy popular, y con razón. Los estudios muestran que colorear puede reducir la ansiedad, mejorar la concentración y dar un descanso calmante de una vida llena de pantallas. Nuestra colección ofrece diseños bonitos e intrincados, perfectos para adultos.",
         "seoParagraph2": "Desde mandalas detallados que ayudan al mindfulness hasta escenas tranquilas de naturaleza y patrones elegantes, cada página está pensada para horas de creatividad relajante. Imprime en papel de buena calidad y usa tus herramientas favoritas: lápices de colores, rotuladores o bolígrafos de gel quedan genial.",
         "seoParagraph3": "¿Quieres algo único? Crea tus propias páginas personalizadas. Describe tu escena perfecta para relajarte (un jardín zen, un patrón Art Nouveau, una ilustración botánica detallada) y daremos vida a tu idea.",
-        "popularTitle": "Temas populares para colorear (adultos)",
+        "popularTitle": "Temas populares de colorear para adultos",
         "popularDescription": "Explora nuestras categorías más populares para adultos: mandalas para meditar, diseños botánicos y de naturaleza intrincados, patrones geométricos, estilos Art Déco y Art Nouveau, páginas inspiradas en zentangle y paisajes tranquilos. Cada una ofrece un camino distinto hacia la relajación."
       }
     },
-    "ourLatestTitle": "Our Latest Coloring Pages",
-    "ourLatestSubtitle": "Fresh pages from us, with new ones added daily. Pick a tile to color online, print at home, or save for later.",
+    "ourLatestTitle": "Nuestras últimas páginas para colorear",
+    "ourLatestSubtitle": "Páginas nuevas nuestras, con novedades cada día. Elige una para colorear online, imprimir en casa o guardar para después.",
     "coloringHabitatCallout": {
-      "eyebrow": "From our sister site",
+      "eyebrow": "De nuestro sitio hermano",
       "title": {
-        "teens": "Looking for older-kid coloring? Try Coloring Habitat",
-        "adults": "Coloring for grown-ups? Coloring Habitat is built for you"
+        "teens": "¿Buscas colorear para niños mayores? Prueba Coloring Habitat",
+        "adults": "¿Colorear para adultos? Coloring Habitat está hecho para ti"
       },
       "body": {
-        "teens": "Chunky Crayon focuses on younger kids (ages 3-8). Coloring Habitat has detailed designs, mandalas, and intricate scenes for older kids, teens, and adults — same printable-free model, just tuned for older audiences.",
-        "adults": "Chunky Crayon is built for kids ages 3-8. Coloring Habitat is our sister site for adult coloring — mandalas, intricate patterns, mindful designs, and stress-relief printables for grown-ups."
+        "teens": "Chunky Crayon se enfoca en niños pequeños (de 3 a 8 años). Coloring Habitat tiene diseños detallados, mandalas y escenas intrincadas para niños mayores, adolescentes y adultos: mismo modelo gratuito para imprimir, solo adaptado para audiencias mayores.",
+        "adults": "Chunky Crayon está diseñado para niños de 3 a 8 años. Coloring Habitat es nuestro sitio hermano para colorear adultos: mandalas, patrones intrincados, diseños mindful y páginas antiestrés para imprimir."
       },
-      "cta": "Visit Coloring Habitat"
+      "cta": "Visitar Coloring Habitat"
     },
-    "ourLatestCount": "{count, plural, =1 {1 page} other {# pages}}",
-    "communitySubtitle": "Pages our community of parents and kids created. Browse hundreds more on the dedicated community gallery — it's where the imaginative stuff lives.",
-    "browseAllCommunity": "Browse community gallery"
+    "ourLatestCount": "{count, plural, =1 {1 página} other {# páginas}}",
+    "communitySubtitle": "Páginas que crearon nuestra comunidad de padres y niños. Explora cientos más en la galería dedicada de la comunidad: ahí es donde vive la magia de la imaginación.",
+    "browseAllCommunity": "Explorar galería de la comunidad"
   },
   "pricing": {
     "pageTitle": "Precios - Chunky Crayon",
