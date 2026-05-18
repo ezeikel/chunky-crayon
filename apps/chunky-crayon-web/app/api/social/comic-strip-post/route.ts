@@ -323,12 +323,17 @@ const handle = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Pick the strip: explicit id, else latest READY for this brand that
-    // hasn't been posted to ALL platforms yet.
+    // Pick the strip: explicit id, else latest READY *or POSTED* for this
+    // brand. POSTED must be included: the platform crons are staggered
+    // (FB 19:30, IG 21:30, Pinterest 23:00 UTC Sunday) and the first one
+    // to succeed flips the row READY -> POSTED. If we filtered to READY
+    // only, IG and Pinterest would 404 on a row Facebook already posted.
+    // The per-platform idempotency check below (existingResults[platform]
+    // ?.success) is what actually prevents a double-post — not the status.
     const strip = idParam
       ? await db.comicStrip.findUnique({ where: { id: idParam } })
       : await db.comicStrip.findFirst({
-          where: { brand: BRAND, status: 'READY' },
+          where: { brand: BRAND, status: { in: ['READY', 'POSTED'] } },
           orderBy: { createdAt: 'desc' },
         });
 
