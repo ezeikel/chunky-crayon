@@ -141,12 +141,29 @@ export const HeaderIndicators: Story = {
       <HeaderStickerIndicator totalUnlocked={24} newCount={3} />
       <HeaderChallengeIndicator
         challengeData={{
-          id: 'challenge-1',
-          title: 'Dino week',
-          percentComplete: 40,
+          challenge: {
+            id: 'challenge-1',
+            title: 'Dino week',
+            description: 'Color 3 dinosaur pages this week.',
+            type: 'THEME',
+            requirement: 3,
+            category: 'dinosaurs',
+            rewardType: 'sticker',
+            rewardId: 'sticker-dino',
+            icon: '🦕',
+            backgroundColor: 'bg-crayon-green',
+            accentColor: 'text-crayon-green',
+          },
+          weeklyChallengeId: 'weekly-1',
+          progress: 1,
           isCompleted: false,
-          rewardClaimed: false,
+          completedAt: null,
+          percentComplete: 40,
           daysRemaining: 3,
+          isActive: true,
+          startDate: new Date('2026-05-18'),
+          endDate: new Date('2026-05-25'),
+          rewardClaimed: false,
         }}
       />
       <HeaderColoIndicator

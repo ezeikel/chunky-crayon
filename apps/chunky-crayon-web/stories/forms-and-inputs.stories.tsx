@@ -51,7 +51,11 @@ export const InputModePieces: Story = {
             <InputModeSelector />
             <TextInput />
             <ExamplePrompts location="homepage" />
-            <QualityPicker value="low" onChange={() => undefined} />
+            <QualityPicker
+              value="low"
+              onChange={() => undefined}
+              isSubscriber={false}
+            />
             <FormCTA />
           </div>
         </InputModeProvider>
@@ -82,10 +86,7 @@ export const VoiceAndPhotoInputs: Story = {
 export const EmailSignup: Story = {
   render: () => (
     <main className="p-8">
-      <JoinColoringPageEmailListForm
-        className="max-w-md"
-        location="storybook"
-      />
+      <JoinColoringPageEmailListForm className="max-w-md" location="other" />
     </main>
   ),
 };
