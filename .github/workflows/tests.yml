@@ -23,9 +23,15 @@ on:
 env:
   NODE_VERSION: '20'
 
+# Cancel superseded runs ONLY for PRs (a new push to a PR makes the old
+# run moot). For pushes to main, every commit gets its own run that is
+# allowed to finish — otherwise rapid back-to-back pushes (common here
+# with parallel work sessions) cancel each other and main is NEVER
+# actually verified. The group is per-SHA on push, per-ref on PR.
 concurrency:
-  group: tests-${{ github.ref }}
-  cancel-in-progress: true
+  group: >-
+    tests-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   unit:
