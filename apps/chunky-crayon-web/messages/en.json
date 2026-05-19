@@ -850,11 +850,15 @@
     }
   },
   "stickerBook": {
-    "title": "Sticker Book",
-    "subtitle": "Collect stickers by coloring!",
-    "pageTitle": "Sticker Book - Chunky Crayon",
+    "title": "My Sticker Book",
+    "subtitle": "Color pictures to collect fun stickers!",
+    "pageTitle": "My Sticker Book - Chunky Crayon",
     "pageDescription": "View your sticker collection and see what stickers you can unlock!",
     "loadError": "Unable to load stickers. Please try again.",
+    "card": {
+      "viewSticker": "Look at the {name} sticker",
+      "lockedSticker": "{name} sticker, still locked"
+    },
     "filters": {
       "all": "All",
       "milestones": "Milestones",

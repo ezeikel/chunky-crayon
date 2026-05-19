@@ -1,9 +1,15 @@
 'use client';
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBookOpen, faStar } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faMedal,
+  faPaw,
+  faCompass,
+  faSparkles,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 import { STICKER_CATALOG, TOTAL_STICKERS } from '@/lib/stickers/catalog';
@@ -24,58 +30,69 @@ type StickerBookProps = {
   className?: string;
 };
 
-// Filter tabs - using StickerCategory with 'all' option
-type FilterTab = 'all' | StickerCategory;
-
-// Translation keys for filter tabs
-const filterTabKeys: { id: FilterTab; translationKey: string }[] = [
-  { id: 'all', translationKey: 'all' },
-  { id: 'milestone', translationKey: 'milestones' },
-  { id: 'category', translationKey: 'categories' },
-  { id: 'exploration', translationKey: 'explore' },
-  { id: 'special', translationKey: 'special' },
+// Sections shown in catalog order — no filtering, just scroll. Each gets a
+// big kid header with its own coloured duotone icon (varied, not mono-orange).
+const SECTIONS: {
+  category: StickerCategory;
+  translationKey: string;
+  icon: IconDefinition;
+  primary: string;
+  secondary: string;
+}[] = [
+  {
+    category: 'milestone',
+    translationKey: 'milestones',
+    icon: faMedal,
+    primary: 'hsl(var(--crayon-orange))',
+    secondary: 'hsl(var(--crayon-yellow))',
+  },
+  {
+    category: 'category',
+    translationKey: 'categories',
+    icon: faPaw,
+    primary: 'hsl(var(--crayon-green))',
+    secondary: 'hsl(var(--crayon-yellow))',
+  },
+  {
+    category: 'exploration',
+    translationKey: 'explore',
+    icon: faCompass,
+    primary: 'hsl(var(--crayon-purple))',
+    secondary: 'hsl(var(--crayon-pink))',
+  },
+  {
+    category: 'special',
+    translationKey: 'special',
+    icon: faSparkles,
+    primary: 'hsl(var(--crayon-yellow))',
+    secondary: 'hsl(var(--crayon-orange))',
+  },
 ];
 
 const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
   const t = useTranslations('stickerBook');
-  const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [selectedSticker, setSelectedSticker] = useState<Sticker | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Create a map for quick lookup of unlocked stickers
   const unlockedMap = useMemo(() => {
     const map = new Map<string, UnlockedStickerData>();
     unlockedStickers.forEach((s) => map.set(s.stickerId, s));
     return map;
   }, [unlockedStickers]);
 
-  // Filter stickers based on active tab
-  const filteredStickers = useMemo(() => {
-    if (activeFilter === 'all') return STICKER_CATALOG;
-    return STICKER_CATALOG.filter((s) => s.category === activeFilter);
-  }, [activeFilter]);
-
-  // Sort: unlocked first, then by rarity (legendary first)
-  const sortedStickers = useMemo(() => {
-    const rarityOrder: Record<Sticker['rarity'], number> = {
-      legendary: 0,
-      rare: 1,
-      uncommon: 2,
-      common: 3,
-    };
-
-    return [...filteredStickers].sort((a, b) => {
-      const aUnlocked = unlockedMap.has(a.id);
-      const bUnlocked = unlockedMap.has(b.id);
-
-      // Unlocked stickers first
-      if (aUnlocked && !bUnlocked) return -1;
-      if (!aUnlocked && bUnlocked) return 1;
-
-      // If both unlocked or both locked, sort by rarity
-      return rarityOrder[a.rarity] - rarityOrder[b.rarity];
-    });
-  }, [filteredStickers, unlockedMap]);
+  // Group by section ONCE in stable catalog order. No unlocked-first
+  // re-sort, no layout animation — so clicking a sticker never reflows
+  // or reorders the grid (this was the "jumps around" bug).
+  const sections = useMemo(
+    () =>
+      SECTIONS.map((section) => ({
+        ...section,
+        stickers: STICKER_CATALOG.filter(
+          (s) => s.category === section.category,
+        ),
+      })).filter((s) => s.stickers.length > 0),
+    [],
+  );
 
   const handleStickerClick = useCallback((sticker: Sticker) => {
     setSelectedSticker(sticker);
@@ -84,151 +101,101 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
 
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
-    // Delay clearing selected sticker for exit animation
     setTimeout(() => setSelectedSticker(null), 200);
   }, []);
 
-  // Mark new stickers as viewed when the component mounts
+  // Mark new stickers viewed shortly after mount (lets the NEW badges show).
   useEffect(() => {
     const newStickerIds = unlockedStickers
       .filter((s) => s.isNew)
       .map((s) => s.stickerId);
-
     if (newStickerIds.length > 0) {
-      // Mark as viewed after a short delay to let the user see the NEW badges
-      const timer = setTimeout(() => {
-        markStickersViewed(newStickerIds);
-      }, 3000);
-
+      const timer = setTimeout(() => markStickersViewed(newStickerIds), 3000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [unlockedStickers]);
 
   const unlockedCount = unlockedStickers.length;
-  const newCount = unlockedStickers.filter((s) => s.isNew).length;
 
   return (
-    <div className={cn('w-full max-w-4xl mx-auto', className)}>
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <FontAwesomeIcon
-          icon={faBookOpen}
-          className="text-3xl text-crayon-orange"
-        />
-        <div>
-          <h2 className="text-2xl font-bold font-tondo text-text-primary">
-            {t('title')}
-          </h2>
-          <p className="text-sm text-text-secondary">{t('subtitle')}</p>
-        </div>
-        {newCount > 0 && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="ml-auto flex items-center gap-1.5 bg-crayon-orange text-white px-3 py-1 rounded-full"
-          >
-            <FontAwesomeIcon icon={faStar} className="text-sm" />
-            <span className="text-sm font-bold">
-              {t('newBadge', { count: newCount })}
-            </span>
-          </motion.div>
-        )}
-      </div>
+    <div className={cn('mx-auto w-full max-w-4xl', className)}>
+      {/* Title — kid-warm, matches the breadcrumb + tab title */}
+      <h1 className="font-tondo text-3xl font-bold text-crayon-orange sm:text-4xl">
+        {t('title')}
+      </h1>
+      <p className="mt-1 font-tondo text-base text-text-secondary">
+        {t('subtitle')}
+      </p>
 
-      {/* Progress Bar */}
+      {/* Progress — same visual language as the in-canvas progress bar */}
       <ProgressBar
         current={unlockedCount}
         total={TOTAL_STICKERS}
-        className="mb-6"
+        className="mt-6"
       />
 
-      {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {filterTabKeys.map((tab) => {
-          const isActive = activeFilter === tab.id;
-          const count =
-            tab.id === 'all'
-              ? unlockedCount
-              : unlockedStickers.filter((s) => {
-                  const sticker = STICKER_CATALOG.find(
-                    (cat) => cat.id === s.stickerId,
-                  );
-                  return sticker?.category === tab.id;
-                }).length;
-          const total =
-            tab.id === 'all'
-              ? TOTAL_STICKERS
-              : STICKER_CATALOG.filter((s) => s.category === tab.id).length;
+      {/* Sectioned scroll — no tabs. Kid just scrolls and sees everything. */}
+      <div className="mt-8 space-y-10">
+        {sections.map((section) => {
+          const earned = section.stickers.filter((s) =>
+            unlockedMap.has(s.id),
+          ).length;
 
           return (
-            <motion.button
-              key={tab.id}
-              onClick={() => setActiveFilter(tab.id)}
-              whileTap={{ scale: 0.95 }}
-              className={cn(
-                'px-4 py-2 rounded-full text-sm font-medium transition-all',
-                'focus:outline-none focus:ring-2 focus:ring-crayon-orange focus:ring-offset-2',
-                // Min touch target for kids
-                'min-h-[44px]',
-                isActive
-                  ? 'bg-crayon-orange text-white shadow-btn-primary'
-                  : 'bg-paper-cream text-text-secondary hover:bg-paper-cream-dark',
-              )}
-            >
-              {t(`filters.${tab.translationKey}`)}
-              <span
-                className={cn(
-                  'ml-1.5 text-xs',
-                  isActive ? 'text-white/80' : 'text-text-muted',
-                )}
-              >
-                {t('countFormat', { count, total })}
-              </span>
-            </motion.button>
+            <section key={section.category}>
+              {/* Big friendly header: coloured icon + name + earned count */}
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-paper-cream">
+                  <FontAwesomeIcon
+                    icon={section.icon}
+                    className="text-2xl"
+                    style={
+                      {
+                        '--fa-primary-color': section.primary,
+                        '--fa-secondary-color': section.secondary,
+                        '--fa-secondary-opacity': '1',
+                      } as React.CSSProperties
+                    }
+                  />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="font-tondo text-xl font-bold text-text-primary sm:text-2xl">
+                    {t(`filters.${section.translationKey}`)}
+                  </h2>
+                  <p className="font-tondo text-sm font-bold text-text-muted">
+                    {earned} / {section.stickers.length}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4 md:grid-cols-5">
+                {section.stickers.map((sticker) => {
+                  const unlockData = unlockedMap.get(sticker.id);
+                  return (
+                    <motion.div
+                      key={sticker.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-40px' }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <StickerCard
+                        sticker={sticker}
+                        isUnlocked={!!unlockData}
+                        isNew={unlockData?.isNew}
+                        unlockedAt={unlockData?.unlockedAt}
+                        onClick={() => handleStickerClick(sticker)}
+                      />
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </section>
           );
         })}
       </div>
 
-      {/* Sticker Grid */}
-      <motion.div
-        layout
-        className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3"
-      >
-        <AnimatePresence mode="popLayout">
-          {sortedStickers.map((sticker, index) => {
-            const unlockData = unlockedMap.get(sticker.id);
-            const isUnlocked = !!unlockData;
-
-            return (
-              <motion.div
-                key={sticker.id}
-                layout
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ delay: index * 0.03 }}
-              >
-                <StickerCard
-                  sticker={sticker}
-                  isUnlocked={isUnlocked}
-                  isNew={unlockData?.isNew}
-                  unlockedAt={unlockData?.unlockedAt}
-                  onClick={() => handleStickerClick(sticker)}
-                />
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* Empty state for filtered view */}
-      {filteredStickers.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-text-muted">{t('emptyState')}</p>
-        </div>
-      )}
-
-      {/* Sticker Detail Modal */}
       <StickerDetailModal
         sticker={selectedSticker}
         isUnlocked={

@@ -2,6 +2,9 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar, faLock, faPartyHorn } from '@fortawesome/pro-duotone-svg-icons';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -20,39 +23,19 @@ type StickerDetailModalProps = {
   onClose: () => void;
 };
 
-// Rarity display names and colors
-const rarityConfig: Record<
-  StickerRarity,
-  { label: string; bgClass: string; textClass: string }
-> = {
-  common: {
-    label: 'Common',
-    bgClass: 'bg-gray-100',
-    textClass: 'text-gray-600',
-  },
-  uncommon: {
-    label: 'Uncommon',
-    bgClass: 'bg-crayon-green/10',
-    textClass: 'text-crayon-green-dark',
-  },
-  rare: {
-    label: 'Rare',
-    bgClass: 'bg-crayon-purple/10',
-    textClass: 'text-crayon-purple-dark',
-  },
-  legendary: {
-    label: 'Legendary',
-    bgClass: 'bg-gradient-to-r from-crayon-yellow/20 to-crayon-orange/20',
-    textClass: 'text-crayon-orange-dark',
-  },
+// Rarity = number of filled stars (kids count stars, they don't read "rare").
+const rarityStars: Record<StickerRarity, number> = {
+  common: 1,
+  uncommon: 2,
+  rare: 3,
+  legendary: 4,
 };
 
-// Rarity-based glow for the sticker image
-const rarityGlowStyles: Record<StickerRarity, string> = {
+const rarityGlow: Record<StickerRarity, string> = {
   common: '',
-  uncommon: 'drop-shadow-[0_0_8px_rgba(76,175,80,0.4)]',
-  rare: 'drop-shadow-[0_0_12px_rgba(156,39,176,0.4)]',
-  legendary: 'drop-shadow-[0_0_20px_rgba(255,193,7,0.6)]',
+  uncommon: 'drop-shadow-[0_0_10px_rgba(76,175,80,0.45)]',
+  rare: 'drop-shadow-[0_0_14px_rgba(156,39,176,0.45)]',
+  legendary: 'drop-shadow-[0_0_22px_rgba(255,193,7,0.6)]',
 };
 
 const StickerDetailModal = ({
@@ -62,115 +45,145 @@ const StickerDetailModal = ({
   isOpen,
   onClose,
 }: StickerDetailModalProps) => {
+  const t = useTranslations('stickerBook');
+  const tCatalog = useTranslations('stickerCatalog');
+
   if (!sticker) return null;
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    }).format(date);
-  };
+  const name = tCatalog(`${sticker.id}.name`);
+  const stars = rarityStars[sticker.rarity];
+
+  const unlockHint = (() => {
+    const { type, value, category } = sticker.unlockCondition;
+    if (type === 'artwork_count')
+      return t('detail.unlockConditions.artworkCount', { count: value });
+    if (type === 'first_category')
+      return t('detail.unlockConditions.firstCategory', {
+        category: category ?? '',
+      });
+    if (type === 'category_count')
+      return t('detail.unlockConditions.categoryCount', {
+        count: value,
+        category: category ?? '',
+      });
+    return t('detail.unlockConditions.special', { count: value });
+  })();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm rounded-3xl">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl">
-            {isUnlocked ? sticker.name : '???'}
+          <DialogTitle className="text-center font-tondo text-2xl font-bold text-text-primary">
+            {isUnlocked ? name : t('detail.lockedName')}
           </DialogTitle>
-          <DialogDescription className="text-center">
-            {isUnlocked ? sticker.description : 'This sticker is still locked!'}
+          <DialogDescription className="sr-only">
+            {isUnlocked
+              ? tCatalog(`${sticker.id}.description`)
+              : t('detail.lockedDescription')}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col items-center gap-4 py-4">
-          {/* Sticker Image */}
+        <div className="flex flex-col items-center gap-4 pt-2 pb-1">
+          {/* Big sticker — full colour unlocked, dimmed grayscale locked */}
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', duration: 0.5 }}
+            initial={{ scale: 0.6, opacity: 0, rotate: -8 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 16 }}
             className={cn(
-              'relative w-32 h-32 rounded-2xl p-4',
+              'relative h-44 w-44 rounded-3xl p-3',
               isUnlocked ? 'bg-paper-cream' : 'bg-gray-100',
             )}
           >
-            {isUnlocked ? (
-              <Image
-                src={sticker.imageUrl}
-                alt={sticker.name}
-                fill
-                className={cn(
-                  'object-contain p-2',
-                  rarityGlowStyles[sticker.rarity],
-                )}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-6xl text-gray-300">?</span>
-              </div>
-            )}
-
-            {/* Legendary sparkle overlay */}
-            {isUnlocked && sticker.rarity === 'legendary' && (
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                animate={{ opacity: [0.4, 0.8, 0.4] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                <div className="absolute top-2 left-3 w-2 h-2 bg-crayon-yellow rounded-full" />
-                <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-white rounded-full" />
-                <div className="absolute bottom-3 left-5 w-2 h-2 bg-crayon-orange rounded-full opacity-70" />
-                <div className="absolute bottom-5 right-3 w-1.5 h-1.5 bg-white rounded-full" />
-              </motion.div>
+            <Image
+              src={sticker.imageUrl}
+              alt={name}
+              fill
+              sizes="176px"
+              className={cn(
+                'object-contain p-2',
+                isUnlocked
+                  ? rarityGlow[sticker.rarity]
+                  : 'grayscale opacity-30 blur-[1px]',
+              )}
+            />
+            {!isUnlocked && (
+              <span className="absolute -top-3 -right-3 flex h-12 w-12 items-center justify-center rounded-full border-3 border-paper-cream-dark bg-white shadow-md">
+                <FontAwesomeIcon
+                  icon={faLock}
+                  className="text-xl"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--text-muted))',
+                      '--fa-secondary-color': 'hsl(var(--paper-cream-dark))',
+                      '--fa-secondary-opacity': '1',
+                    } as React.CSSProperties
+                  }
+                />
+              </span>
             )}
           </motion.div>
 
-          {/* Rarity Badge */}
-          <span
-            className={cn(
-              'px-3 py-1 rounded-full text-sm font-medium',
-              rarityConfig[sticker.rarity].bgClass,
-              rarityConfig[sticker.rarity].textClass,
-            )}
-          >
-            {rarityConfig[sticker.rarity].label}
-          </span>
+          {/* Rarity = a row of stars, not a text label */}
+          <div className="flex gap-1.5" aria-hidden>
+            {[0, 1, 2, 3].map((i) => (
+              <FontAwesomeIcon
+                key={i}
+                icon={faStar}
+                className={cn(
+                  'text-xl',
+                  i < stars ? 'text-crayon-yellow' : 'text-paper-cream-dark',
+                )}
+              />
+            ))}
+          </div>
 
-          {/* Unlock info or hint */}
           {isUnlocked ? (
-            <div className="text-center space-y-2">
-              {/* Unlock message */}
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-lg font-medium text-crayon-orange"
-              >
-                {sticker.unlockMessage}
-              </motion.p>
-
-              {/* Unlock date */}
+            <div className="flex flex-col items-center gap-2 text-center">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-crayon-orange/10">
+                <FontAwesomeIcon
+                  icon={faPartyHorn}
+                  className="text-2xl"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                      '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+                      '--fa-secondary-opacity': '1',
+                    } as React.CSSProperties
+                  }
+                />
+              </span>
+              <p className="font-tondo text-lg font-bold text-crayon-orange">
+                {tCatalog(`${sticker.id}.unlockMessage`)}
+              </p>
               {unlockedAt && (
-                <p className="text-sm text-text-muted">
-                  Unlocked on {formatDate(unlockedAt)}
+                <p className="font-tondo text-sm text-text-muted">
+                  {t('detail.unlockedOn', {
+                    date: new Intl.DateTimeFormat('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    }).format(unlockedAt),
+                  })}
                 </p>
               )}
             </div>
           ) : (
-            <div className="text-center space-y-2 px-4">
-              <p className="text-sm text-text-secondary font-medium">
-                How to unlock:
-              </p>
-              <p className="text-base text-text-primary">
-                {sticker.unlockCondition.type === 'artwork_count' &&
-                  `Save ${sticker.unlockCondition.value} artworks to your gallery`}
-                {sticker.unlockCondition.type === 'first_category' &&
-                  `Color your first ${sticker.unlockCondition.category} page`}
-                {sticker.unlockCondition.type === 'category_count' &&
-                  `Color ${sticker.unlockCondition.value} ${sticker.unlockCondition.category} pages`}
-                {sticker.unlockCondition.type === 'special' &&
-                  `Explore ${sticker.unlockCondition.value} different categories`}
+            <div className="flex w-full flex-col items-center gap-2 rounded-2xl bg-paper-cream px-4 py-3 text-center">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-crayon-purple/10">
+                <FontAwesomeIcon
+                  icon={faLock}
+                  className="text-lg"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--crayon-purple))',
+                      '--fa-secondary-color': 'hsl(var(--crayon-pink))',
+                      '--fa-secondary-opacity': '1',
+                    } as React.CSSProperties
+                  }
+                />
+              </span>
+              <p className="font-tondo text-base font-bold text-text-primary">
+                {unlockHint}
               </p>
             </div>
           )}

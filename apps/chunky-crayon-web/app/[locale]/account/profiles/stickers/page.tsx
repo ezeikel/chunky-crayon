@@ -38,7 +38,7 @@ const StickerBookContent = async () => {
           items={[
             { label: tNav('home'), href: '/' },
             { label: tNav('account'), href: '/account/settings' },
-            { label: tNav('stickerBook') },
+            { label: tStickerBook('title') },
           ]}
           className="mb-6"
         />
@@ -62,7 +62,7 @@ const StickerBookContent = async () => {
         items={[
           { label: tNav('home'), href: '/' },
           { label: tNav('account'), href: '/account/settings' },
-          { label: tNav('stickerBook') },
+          { label: tStickerBook('title') },
         ]}
         className="mb-6"
       />

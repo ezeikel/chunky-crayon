@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLock, faStar } from '@fortawesome/pro-duotone-svg-icons';
 import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
 import type { Sticker, StickerRarity } from '@/lib/stickers';
@@ -14,27 +16,17 @@ type StickerCardProps = {
   onClick: () => void;
 };
 
-// Rarity-based glow colors
-const rarityGlowClasses: Record<StickerRarity, string> = {
-  common: 'shadow-md hover:shadow-lg',
-  uncommon:
-    'shadow-[0_0_15px_rgba(76,175,80,0.3)] hover:shadow-[0_0_20px_rgba(76,175,80,0.5)]',
-  rare: 'shadow-[0_0_20px_rgba(156,39,176,0.3)] hover:shadow-[0_0_25px_rgba(156,39,176,0.5)]',
-  legendary:
-    'shadow-[0_0_25px_rgba(255,193,7,0.4)] hover:shadow-[0_0_35px_rgba(255,193,7,0.6)]',
+// Rarity-based ring + soft background. Kids read color, not labels.
+const rarityRing: Record<StickerRarity, string> = {
+  common: 'border-paper-cream-dark bg-white',
+  uncommon: 'border-crayon-green bg-crayon-green/5',
+  rare: 'border-crayon-purple bg-crayon-purple/5',
+  legendary: 'border-crayon-yellow bg-crayon-yellow/10',
 };
 
-// Rarity-based border colors
-const rarityBorderClasses: Record<StickerRarity, string> = {
-  common: 'border-paper-cream-dark',
-  uncommon: 'border-crayon-green',
-  rare: 'border-crayon-purple',
-  legendary: 'border-crayon-yellow',
-};
-
-// Rarity-based background for locked state hint
-const rarityBgHintClasses: Record<StickerRarity, string> = {
-  common: 'bg-gray-100',
+// Soft tint behind the dimmed art on locked cards.
+const lockedTint: Record<StickerRarity, string> = {
+  common: 'bg-paper-cream',
   uncommon: 'bg-crayon-green/5',
   rare: 'bg-crayon-purple/5',
   legendary: 'bg-crayon-yellow/5',
@@ -48,121 +40,99 @@ const StickerCard = ({
 }: StickerCardProps) => {
   const t = useTranslations('stickerBook');
   const tCatalog = useTranslations('stickerCatalog');
-
-  // Get translated sticker name
   const stickerName = tCatalog(`${sticker.id}.name`);
-
-  // Get unlock hint text based on condition type
-  const getUnlockHint = () => {
-    const { type, value, category } = sticker.unlockCondition;
-
-    switch (type) {
-      case 'artwork_count':
-        return t('detail.unlockConditions.artworkCount', { count: value });
-      case 'first_category':
-        return t('detail.unlockConditions.firstCategory', {
-          category: category ?? '',
-        });
-      case 'category_count':
-        return t('detail.unlockConditions.categoryCount', {
-          count: value,
-          category: category ?? '',
-        });
-      case 'special':
-        return t('detail.unlockConditions.special', { count: 3 });
-      default:
-        return '';
-    }
-  };
 
   return (
     <motion.button
+      type="button"
       onClick={onClick}
-      whileHover={{ scale: isUnlocked ? 1.05 : 1.02 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.04 }}
+      whileTap={{ scale: 0.94 }}
       className={cn(
-        'relative aspect-square rounded-2xl p-2 transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-crayon-orange focus:ring-offset-2',
-        // Large tap targets for kids (min 44px, we're using much larger)
-        'min-h-[80px] min-w-[80px]',
+        'group relative aspect-square w-full rounded-3xl border-4 p-3',
+        'flex flex-col items-center justify-center gap-1.5',
+        'cursor-pointer transition-shadow duration-200',
+        'focus:outline-none focus-visible:ring-4 focus-visible:ring-crayon-orange/50',
+        // Big, chunky tap target for little hands
+        'min-h-[112px] shadow-[0_4px_0_0_hsl(var(--paper-cream-dark))]',
+        'active:shadow-[0_1px_0_0_hsl(var(--paper-cream-dark))] active:translate-y-[3px]',
         isUnlocked
-          ? cn(
-              'bg-white border-3 cursor-pointer',
-              rarityBorderClasses[sticker.rarity],
-              rarityGlowClasses[sticker.rarity],
-            )
-          : cn(
-              'border-2 border-dashed border-gray-300 cursor-pointer',
-              rarityBgHintClasses[sticker.rarity],
-            ),
+          ? rarityRing[sticker.rarity]
+          : 'border-dashed border-3 border-paper-cream-dark',
+        !isUnlocked && lockedTint[sticker.rarity],
       )}
       aria-label={
         isUnlocked
-          ? `View ${stickerName} sticker`
-          : `Locked sticker: ${stickerName}`
+          ? t('card.viewSticker', { name: stickerName })
+          : t('card.lockedSticker', { name: stickerName })
       }
     >
-      {/* Sticker Image or Locked Placeholder */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        {isUnlocked ? (
-          <Image
-            src={sticker.imageUrl}
-            alt={stickerName}
-            fill
-            className="object-contain p-1"
-          />
-        ) : (
-          // Locked state - silhouette with question mark
-          <div className="flex flex-col items-center justify-center gap-1">
-            <div className="text-3xl text-gray-300">?</div>
-            <span className="text-[10px] text-gray-400 text-center px-1 line-clamp-2">
-              {getUnlockHint()}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* NEW Badge */}
-      {isUnlocked && isNew && (
-        <motion.div
-          initial={{ scale: 0, rotate: -12 }}
-          animate={{ scale: 1, rotate: -12 }}
+      {/* Sticker art — full color when unlocked, dimmed grayscale when locked */}
+      <div className="relative w-full flex-1 min-h-0">
+        <Image
+          src={sticker.imageUrl}
+          alt={stickerName}
+          fill
+          sizes="160px"
           className={cn(
-            'absolute -top-2 -right-2 z-10',
-            'bg-crayon-orange text-white',
-            'text-[10px] font-bold px-2 py-0.5 rounded-full',
-            'shadow-md animate-pulse',
-          )}
-        >
-          {t('newBadge', { count: 1 }).replace('1 ', '')}
-        </motion.div>
-      )}
-
-      {/* Rarity indicator for unlocked stickers */}
-      {isUnlocked && sticker.rarity !== 'common' && (
-        <div
-          className={cn(
-            'absolute bottom-1 right-1 w-3 h-3 rounded-full',
-            sticker.rarity === 'uncommon' && 'bg-crayon-green',
-            sticker.rarity === 'rare' && 'bg-crayon-purple',
-            sticker.rarity === 'legendary' &&
-              'bg-gradient-to-r from-crayon-yellow to-crayon-orange animate-pulse',
+            'object-contain transition-all duration-200',
+            isUnlocked
+              ? 'p-1 drop-shadow-sm'
+              : 'p-2 grayscale opacity-30 blur-[0.5px]',
           )}
         />
+      </div>
+
+      {/* Name — always shown, short, big enough for early readers */}
+      <span
+        className={cn(
+          'w-full text-center font-tondo font-bold leading-tight line-clamp-2',
+          'text-[13px] sm:text-sm',
+          isUnlocked ? 'text-text-primary' : 'text-text-muted',
+        )}
+      >
+        {stickerName}
+      </span>
+
+      {/* Lock badge — locked only, big and obvious, no text */}
+      {!isUnlocked && (
+        <span
+          className={cn(
+            'absolute -top-3 -right-3 flex h-10 w-10 items-center justify-center',
+            'rounded-full bg-white border-3 border-paper-cream-dark shadow-md',
+          )}
+        >
+          <FontAwesomeIcon
+            icon={faLock}
+            className="text-lg"
+            style={
+              {
+                '--fa-primary-color': 'hsl(var(--text-muted))',
+                '--fa-secondary-color': 'hsl(var(--paper-cream-dark))',
+                '--fa-secondary-opacity': '1',
+              } as React.CSSProperties
+            }
+          />
+        </span>
       )}
 
-      {/* Legendary sparkle effect */}
-      {isUnlocked && sticker.rarity === 'legendary' && (
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 2, repeat: Infinity }}
+      {/* NEW star badge — freshly unlocked */}
+      {isUnlocked && isNew && (
+        <motion.span
+          initial={{ scale: 0, rotate: -15 }}
+          animate={{ scale: 1, rotate: -12 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 14 }}
+          className={cn(
+            'absolute -top-3 -right-3 flex h-11 w-11 items-center justify-center',
+            'rounded-full bg-crayon-orange border-3 border-white shadow-md',
+          )}
+          aria-hidden
         >
-          <div className="absolute top-1 left-1 w-1.5 h-1.5 bg-white rounded-full" />
-          <div className="absolute top-3 right-2 w-1 h-1 bg-white rounded-full" />
-          <div className="absolute bottom-2 left-3 w-1.5 h-1.5 bg-white rounded-full" />
-        </motion.div>
+          <FontAwesomeIcon
+            icon={faStar}
+            className="text-lg text-white animate-pulse"
+          />
+        </motion.span>
       )}
     </motion.button>
   );
