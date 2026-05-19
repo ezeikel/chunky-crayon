@@ -38,7 +38,7 @@ import { COLO_STAGES } from '@/lib/colo';
  * - evolved: Celebration animation with sparkles
  */
 
-type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type AvatarSize = 'xs' | 'sm' | 'header' | 'md' | 'lg' | 'xl';
 
 // Reaction types for tap interactions
 type ReactionType = 'wiggle' | 'bounce' | 'squish' | 'happy-jump' | 'shake';
@@ -65,6 +65,8 @@ type ColoAvatarProps = {
   showTooltip?: boolean;
   /** Show progress to next stage */
   showProgress?: boolean;
+  /** Stroke width for the optional progress ring */
+  progressStrokeWidth?: number;
   /** Enable tap reactions (animations, sounds, particles) */
   enableTapReactions?: boolean;
   /** Additional className */
@@ -76,6 +78,7 @@ type ColoAvatarProps = {
 const sizeClasses: Record<AvatarSize, string> = {
   xs: 'w-8 h-8',
   sm: 'w-12 h-12',
+  header: 'w-10 h-10',
   md: 'w-16 h-16',
   lg: 'w-24 h-24',
   xl: 'w-32 h-32',
@@ -85,6 +88,7 @@ const sizeClasses: Record<AvatarSize, string> = {
 const wrapperWithProgressClasses: Record<AvatarSize, string> = {
   xs: 'w-10 h-10',
   sm: 'w-14 h-14',
+  header: 'w-12 h-12',
   md: 'w-20 h-20',
   lg: 'w-28 h-28',
   xl: 'w-36 h-36',
@@ -93,6 +97,7 @@ const wrapperWithProgressClasses: Record<AvatarSize, string> = {
 const textSizeClasses: Record<AvatarSize, string> = {
   xs: 'text-[8px]',
   sm: 'text-[10px]',
+  header: 'text-[9px]',
   md: 'text-xs',
   lg: 'text-sm',
   xl: 'text-base',
@@ -165,6 +170,7 @@ const ColoAvatar = ({
   size = 'md',
   showTooltip = false,
   showProgress = false,
+  progressStrokeWidth = 4,
   enableTapReactions = true,
   className,
   onClick,
@@ -371,7 +377,7 @@ const ColoAvatar = ({
             r="46"
             fill="none"
             stroke="rgba(0,0,0,0.1)"
-            strokeWidth="4"
+            strokeWidth={progressStrokeWidth}
           />
           {/* Progress arc */}
           <circle
@@ -380,7 +386,7 @@ const ColoAvatar = ({
             r="46"
             fill="none"
             stroke="currentColor"
-            strokeWidth="4"
+            strokeWidth={progressStrokeWidth}
             strokeLinecap="round"
             strokeDasharray={`${289 * (coloState!.progressToNext!.percentage / 100)} 289`}
             className="text-crayon-orange transition-all duration-500"

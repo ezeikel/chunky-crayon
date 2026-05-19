@@ -32,24 +32,24 @@ const HeaderChallengeIndicator = ({
   return (
     <Link
       href="/account/challenges"
-      className="relative flex min-h-12 min-w-32 items-center justify-center gap-3 rounded-full border-2 border-crayon-yellow/40 bg-gradient-to-r from-crayon-yellow/10 to-crayon-orange/10 px-5 py-2 font-tondo font-bold transition-all duration-200 hover:scale-105 hover:border-crayon-orange/50 active:scale-95"
+      className="relative flex h-16 min-w-48 items-center justify-between gap-5 rounded-full border-2 border-crayon-yellow/40 bg-gradient-to-r from-crayon-yellow/10 to-crayon-orange/10 px-6 font-tondo font-bold transition-all duration-200 hover:scale-105 hover:border-crayon-orange/50 active:scale-95"
     >
       <FontAwesomeIcon
         icon={faTrophy}
-        className="text-xl"
+        className="shrink-0 text-xl"
         style={trophyStyle}
       />
 
       {/* Progress ring or completion indicator */}
-      <div className="relative h-7 w-7">
+      <div className="relative h-12 w-12 shrink-0 rounded-full bg-white/80">
         {/* Background circle */}
-        <svg className="h-7 w-7 -rotate-90">
+        <svg className="h-12 w-12 -rotate-90">
           <circle
             cx="50%"
             cy="50%"
-            r="40%"
+            r="38%"
             stroke="currentColor"
-            strokeWidth="3"
+            strokeWidth="3.5"
             fill="none"
             className="text-paper-cream"
           />
@@ -57,9 +57,9 @@ const HeaderChallengeIndicator = ({
           <circle
             cx="50%"
             cy="50%"
-            r="40%"
+            r="38%"
             stroke="url(#challengeGradient)"
-            strokeWidth="3"
+            strokeWidth="3.5"
             fill="none"
             strokeLinecap="round"
             strokeDasharray={`${percentComplete * 0.5} 50`}
@@ -79,7 +79,7 @@ const HeaderChallengeIndicator = ({
           </defs>
         </svg>
         {/* Center text */}
-        <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-text-primary">
+        <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold leading-none text-text-primary">
           {isCompleted ? '!' : `${percentComplete}%`}
         </span>
       </div>

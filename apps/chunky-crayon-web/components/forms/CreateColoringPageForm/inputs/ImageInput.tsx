@@ -362,10 +362,10 @@ const ImageInput = ({ className }: ImageInputProps) => {
           style={
             {
               '--fa-primary-color': canGenerate
-                ? 'white'
+                ? 'hsl(var(--crayon-orange))'
                 : 'hsl(var(--text-muted))',
               '--fa-secondary-color': canGenerate
-                ? 'rgba(255, 255, 255, 0.8)'
+                ? 'hsl(var(--crayon-yellow))'
                 : 'hsl(var(--text-muted))',
               '--fa-secondary-opacity': '1',
             } as React.CSSProperties

@@ -66,12 +66,12 @@ const SquiggleSeparator = ({ label }: { label: string }) => {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 py-1">
+    <div className="flex min-w-0 items-center gap-2 py-1 sm:gap-3">
       <svg
         aria-hidden
         viewBox="0 0 156 24"
         preserveAspectRatio="none"
-        className="h-6 flex-1"
+        className="h-6 min-w-0 flex-1"
         style={{
           opacity: ready ? 0.7 : 0,
           transition: 'opacity 180ms ease-out',
@@ -79,14 +79,14 @@ const SquiggleSeparator = ({ label }: { label: string }) => {
       >
         <g ref={leftRef} />
       </svg>
-      <span className="rounded-full bg-paper-cream px-3 py-1 font-tondo text-xs font-bold uppercase text-text-muted">
+      <span className="shrink-0 rounded-full bg-paper-cream px-2.5 py-1 font-tondo text-[11px] font-bold uppercase text-text-muted sm:px-3 sm:text-xs">
         {label}
       </span>
       <svg
         aria-hidden
         viewBox="0 0 156 24"
         preserveAspectRatio="none"
-        className="h-6 flex-1"
+        className="h-6 min-w-0 flex-1"
         style={{
           opacity: ready ? 0.7 : 0,
           transition: 'opacity 180ms ease-out',
@@ -144,37 +144,37 @@ const SignInOptions = () => {
   };
 
   return (
-    <Card className="w-full max-w-lg rounded-3xl border-2 border-paper-cream-dark bg-white shadow-card">
-      <CardHeader className="space-y-2 px-8 pb-5 pt-8 md:px-10">
+    <Card className="w-full max-w-lg overflow-hidden rounded-3xl border-2 border-paper-cream-dark bg-white shadow-card">
+      <CardHeader className="space-y-2 px-5 pb-5 pt-8 sm:px-8 md:px-10">
         <CardTitle className="font-tondo text-3xl font-bold text-text-primary">
           {t('signIn')}
         </CardTitle>
         <CardDescription>{t('chooseMethod')}</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4 px-8 md:px-10">
+      <CardContent className="grid min-w-0 gap-4 px-5 sm:px-8 md:px-10">
         <Button
           variant="outline-muted"
           onClick={handleGoogleSignIn}
-          className="h-12 w-full shadow-none [--bottom:transparent] [--lift:0px] [--lift-active:0px]"
+          className="h-12 w-full min-w-0 px-3 text-sm shadow-none sm:px-6 sm:text-base [--bottom:transparent] [--lift:0px] [--lift-active:0px]"
         >
           <FontAwesomeIcon icon={faGoogle} className="mr-2 h-4 w-4" />
-          {t('continueWithGoogle')}
+          <span className="min-w-0 truncate">{t('continueWithGoogle')}</span>
         </Button>
         <Button
           variant="outline-muted"
           onClick={handleAppleSignIn}
-          className="h-12 w-full shadow-none [--bottom:transparent] [--lift:0px] [--lift-active:0px]"
+          className="h-12 w-full min-w-0 px-3 text-sm shadow-none sm:px-6 sm:text-base [--bottom:transparent] [--lift:0px] [--lift-active:0px]"
         >
           <FontAwesomeIcon icon={faApple} className="mr-2 h-4 w-4" />
-          {t('continueWithApple')}
+          <span className="min-w-0 truncate">{t('continueWithApple')}</span>
         </Button>
         <Button
           variant="outline-muted"
           onClick={handleFacebookSignIn}
-          className="h-12 w-full border-[#1877F2] bg-[#1877F2] text-white shadow-none hover:bg-[#1877F2]/90 hover:text-white [--bottom:transparent] [--lift:0px] [--lift-active:0px]"
+          className="h-12 w-full min-w-0 border-[#1877F2] bg-[#1877F2] px-3 text-sm text-white shadow-none hover:bg-[#1877F2]/90 hover:text-white sm:px-6 sm:text-base [--bottom:transparent] [--lift:0px] [--lift-active:0px]"
         >
           <FontAwesomeIcon icon={faFacebook} className="mr-2 h-4 w-4" />
-          {t('continueWithFacebook')}
+          <span className="min-w-0 truncate">{t('continueWithFacebook')}</span>
         </Button>
         <SquiggleSeparator label={t('orContinueWith')} />
         <form onSubmit={handleMagicLinkSignIn} className="grid gap-2">
@@ -186,7 +186,11 @@ const SignInOptions = () => {
             className="h-12 py-0"
             required
           />
-          <Button type="submit" disabled={isLoading} className="h-12 w-full">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="h-12 w-full min-w-0 px-3 text-sm sm:px-6 sm:text-base"
+          >
             {isLoading ? (
               <>
                 <FontAwesomeIcon
@@ -200,19 +204,19 @@ const SignInOptions = () => {
                     } as React.CSSProperties
                   }
                 />
-                {t('sendingLink')}
+                <span className="min-w-0 truncate">{t('sendingLink')}</span>
               </>
             ) : (
               <>
                 <FontAwesomeIcon icon={faEnvelope} className="mr-2 h-4 w-4" />
-                {t('signInWithEmail')}
+                <span className="min-w-0 truncate">{t('signInWithEmail')}</span>
               </>
             )}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col items-center px-8 pb-8 text-sm leading-relaxed text-muted-foreground md:px-10">
-        <p>
+      <CardFooter className="flex flex-col items-center px-5 pb-8 text-sm leading-relaxed text-muted-foreground sm:px-8 md:px-10">
+        <p className="text-center">
           {t.rich('termsAgreement', {
             terms: (chunks) => (
               <Link

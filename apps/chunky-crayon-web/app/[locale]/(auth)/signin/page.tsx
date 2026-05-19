@@ -15,7 +15,7 @@ const SignInPage = async ({ params }: Props) => {
   setRequestLocale(locale);
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex w-full items-center justify-center px-4 py-6">
       <SignInOptions />
     </div>
   );
