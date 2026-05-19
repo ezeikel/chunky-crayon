@@ -85,11 +85,16 @@ pnpm test:e2e        # Playwright (needs seeded DB + running app)
 cd packages/stripe-shared && pnpm test:watch
 ```
 
-`turbo run test` depends on `db:generate` (some packages import
-`@one-colored-pixel/db`); Prisma generate needs only the schema, no live
-DB. Unlike the app _build_, unit tests do NOT need the workspace packages
-compiled to `dist/` — Vitest imports their `src/` directly, so tests run
-green in a fresh worktree even before `pnpm build`.
+`turbo run test` depends on `db:generate` AND `^build` (build the
+workspace packages first). The `^build` is load-bearing: a test that
+imports a package _subpath export_ (e.g. `@one-colored-pixel/db/types`,
+resolved via the package `exports` map to `dist/types.js`, NOT `src/`)
+cannot resolve until that package is built. Vitest resolves the package
+root (`.`) from `src/` via tsconfig paths, but subpath exports go through
+the `exports` map and need `dist/`. So in a clean checkout (CI, fresh
+worktree) tests fail with `Failed to resolve import
+"@one-colored-pixel/db/types"` until `^build` runs. Prisma generate still
+needs only the schema, no live DB.
 
 ## E2E (Playwright)
 
