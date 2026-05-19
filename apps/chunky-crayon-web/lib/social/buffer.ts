@@ -105,17 +105,23 @@ type BufferChannel = {
   name?: string;
 };
 
-const GET_ORGANIZATIONS = /* GraphQL */ `
-  query GetOrganizations {
-    organizations {
-      id
-      name
+// Real Buffer schema: there is NO top-level `organizations` query — orgs
+// hang off `account`. (The public docs example showing `organizations { id }`
+// is wrong; the API rejects it.) channels(input:) takes an OrganizationId
+// scalar, passed here as a String variable which the scalar coerces.
+const GET_ACCOUNT_ORGS = /* GraphQL */ `
+  query GetAccountOrgs {
+    account {
+      organizations {
+        id
+        name
+      }
     }
   }
 `;
 
 const GET_CHANNELS = /* GraphQL */ `
-  query GetChannels($organizationId: String!) {
+  query GetChannels($organizationId: OrganizationId!) {
     channels(input: { organizationId: $organizationId }) {
       id
       service
@@ -143,9 +149,10 @@ export const resolveChannelId = async (
       : process.env.BUFFER_CHANNEL_ID_LINKEDIN;
   if (pinned) return pinned;
 
-  const { organizations } = await bufferGraphQL<{
-    organizations: BufferOrganization[];
-  }>(GET_ORGANIZATIONS, {});
+  const { account } = await bufferGraphQL<{
+    account: { organizations: BufferOrganization[] };
+  }>(GET_ACCOUNT_ORGS, {});
+  const organizations = account?.organizations ?? [];
 
   const wanted = SERVICE_FOR_PLATFORM[platform];
 
@@ -186,9 +193,10 @@ export const listBufferChannels = async (): Promise<
     name?: string;
   }[]
 > => {
-  const { organizations } = await bufferGraphQL<{
-    organizations: BufferOrganization[];
-  }>(GET_ORGANIZATIONS, {});
+  const { account } = await bufferGraphQL<{
+    account: { organizations: BufferOrganization[] };
+  }>(GET_ACCOUNT_ORGS, {});
+  const organizations = account?.organizations ?? [];
 
   const perOrg = await Promise.all(
     organizations.map((org) =>
