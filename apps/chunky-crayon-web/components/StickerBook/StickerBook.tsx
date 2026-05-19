@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMedal,
@@ -173,13 +172,7 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
                 {section.stickers.map((sticker) => {
                   const unlockData = unlockedMap.get(sticker.id);
                   return (
-                    <motion.div
-                      key={sticker.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-40px' }}
-                      transition={{ duration: 0.25 }}
-                    >
+                    <div key={sticker.id}>
                       <StickerCard
                         sticker={sticker}
                         isUnlocked={!!unlockData}
@@ -187,7 +180,7 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
                         unlockedAt={unlockData?.unlockedAt}
                         onClick={() => handleStickerClick(sticker)}
                       />
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
