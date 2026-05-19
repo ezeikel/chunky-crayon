@@ -17,15 +17,20 @@ Place generated files in: `/public/audio/brush/`
 
 | Brush Type   | Filename           | Volume | Status |
 | ------------ | ------------------ | ------ | ------ |
-| crayon       | `crayon.mp3`       | 0.25   | TODO   |
-| marker       | `marker.mp3`       | 0.25   | TODO   |
-| eraser       | `eraser.mp3`       | 0.20   | TODO   |
-| glitter      | `glitter.mp3`      | 0.30   | TODO   |
-| sparkle      | `sparkle.mp3`      | 0.30   | TODO   |
-| rainbow      | `rainbow.mp3`      | 0.25   | TODO   |
-| glow         | `glow.mp3`         | 0.25   | TODO   |
-| neon         | `neon.mp3`         | 0.30   | TODO   |
-| magic-reveal | `magic-reveal.mp3` | 0.35   | TODO   |
+| crayon       | `crayon.mp3`       | 0.25   | DONE   |
+| marker       | `marker.mp3`       | 0.25   | DONE   |
+| eraser       | `eraser.mp3`       | 0.20   | DONE   |
+| glitter      | `glitter.mp3`      | 0.30   | DONE   |
+| sparkle      | `sparkle.mp3`      | 0.30   | DONE   |
+| rainbow      | `rainbow.mp3`      | 0.25   | DONE   |
+| glow         | `glow.mp3`         | 0.25   | DONE   |
+| neon         | `neon.mp3`         | 0.30   | DONE   |
+| magic-reveal | `magic-reveal.mp3` | 0.35   | DONE   |
+
+All nine generated via `scripts/generate-sfx.ts` (ElevenLabs
+`eleven_text_to_sound_v2`, `loop: true`, ~5-6s seamless loops). Rerun a single
+one with `npx tsx scripts/generate-sfx.ts <name>` and audition in Storybook
+(Coloring / SoundEffects).
 
 **Fallback**: If a brush sound file is missing, the app uses
 `/public/audio/draw.mp3`.

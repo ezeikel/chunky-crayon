@@ -4,35 +4,41 @@ This directory contains sound effects for the coloring experience.
 
 ## Current Sound Files
 
-All sounds were generated via ElevenLabs text-to-sound-effects API. These are
-placeholder sounds that work but may need refinement for a more polished
-kid-friendly experience.
+All sounds are generated via the ElevenLabs Text to Sound Effects API
+(`eleven_text_to_sound_v2`). The "Regenerated" rows were re-prompted with
+concrete physical cues + explicit kid-friendly tone and tuned
+`prompt_influence`; `tap/pop/draw/fill` are the original placeholders, kept
+as-is by product decision.
 
-| File          | Description                         | Status       | Notes                               |
-| ------------- | ----------------------------------- | ------------ | ----------------------------------- |
-| `tap.mp3`     | Light tap sound for UI interactions | Needs review | Used for color/brush size selection |
-| `pop.mp3`     | Pop sound for tool selection        | Needs review | Used when switching tools           |
-| `draw.mp3`    | Subtle drawing/crayon sound         | Needs review | Plays when starting to draw         |
-| `fill.mp3`    | Fill bucket pour sound              | Needs review | Plays on successful fill            |
-| `undo.mp3`    | Swoosh/rewind sound                 | Needs review | Plays on undo action                |
-| `redo.mp3`    | Forward swoosh sound                | Needs review | Plays on redo action                |
-| `save.mp3`    | Success/chime sound                 | Needs review | Plays when artwork is saved         |
-| `sparkle.mp3` | Magical sparkle sound               | Needs review | Plays on start over/clear           |
-| `error.mp3`   | Soft error tone                     | Needs review | Plays on save failure               |
+| File          | Description                         | Status      | Notes                               |
+| ------------- | ----------------------------------- | ----------- | ----------------------------------- |
+| `tap.mp3`     | Light tap sound for UI interactions | Kept        | Used for color/brush size selection |
+| `pop.mp3`     | Pop sound for tool selection        | Kept        | Used when switching tools / palette |
+| `draw.mp3`    | Subtle drawing/crayon sound         | Kept        | Brush-loop fallback                 |
+| `fill.mp3`    | Fill bucket pour sound              | Kept        | Plays on successful fill            |
+| `undo.mp3`    | Soft undo whoosh                    | Regenerated | Plays on undo action                |
+| `redo.mp3`    | Soft redo whoosh                    | Regenerated | Plays on redo action                |
+| `save.mp3`    | Cheerful success chime              | Regenerated | Plays when artwork is saved         |
+| `sparkle.mp3` | Magical sparkle shimmer             | Regenerated | Celebration / magic actions         |
+| `error.mp3`   | Gentle non-scary error tone         | Regenerated | Plays on save failure               |
 
-## TODO: Sound Improvements
+Brush loop sounds (9 files in `brush/`) are documented in
+`apps/chunky-crayon-web/BRUSH_SOUNDS.md`.
 
-Replace these AI-generated sounds with higher quality alternatives:
+## Regenerating
 
-- [ ] `tap.mp3` - Should be a satisfying, soft tap
-- [ ] `pop.mp3` - Should be a fun, bubbly pop
-- [ ] `draw.mp3` - Should sound like crayon on paper
-- [ ] `fill.mp3` - Should be a smooth pour/splash
-- [ ] `undo.mp3` - Should be a quick rewind whoosh
-- [ ] `redo.mp3` - Should be a quick forward whoosh
-- [ ] `save.mp3` - Should be a cheerful success chime
-- [ ] `sparkle.mp3` - Should be magical and delightful
-- [ ] `error.mp3` - Should be gentle, not scary for kids
+All sounds are produced by `scripts/generate-sfx.ts`:
+
+```bash
+ELEVENLABS_API_KEY=... npx tsx scripts/generate-sfx.ts            # all
+ELEVENLABS_API_KEY=... npx tsx scripts/generate-sfx.ts undo redo  # subset
+ELEVENLABS_API_KEY=... npx tsx scripts/generate-sfx.ts --brush    # brushes
+```
+
+Prompts and per-sound `duration_seconds` / `prompt_influence` / `loop` live in
+that script. Audition in Storybook (`packages/coloring-ui`, story **Coloring /
+SoundEffects**) — that page mirrors `public/audio/` into its static dir, so
+re-copy after regenerating if you want Storybook fresh.
 
 ## Recommended Sources
 
