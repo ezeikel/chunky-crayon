@@ -169,7 +169,7 @@ export default function IntroClient({
 
       <h1
         style={{ animationDelay: ENTRANCE.headline }}
-        className="font-tondo font-bold text-text-primary text-[clamp(2.25rem,6vw,4rem)] leading-[0.95] tracking-tight mb-7 [word-break:break-word] animate-[fadeUp_500ms_ease-out_both] opacity-0"
+        className="font-tondo font-bold text-text-primary text-[clamp(2.25rem,6vw,4rem)] leading-[0.95] tracking-tight mb-7 [word-break:break-word] animate-[riseUp_500ms_ease-out_both]"
       >
         {experimentHeadlines ? (
           <Experiment

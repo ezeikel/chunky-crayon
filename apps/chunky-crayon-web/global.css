@@ -239,9 +239,23 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
+/* LCP-safe entrance: same slide-up motion as fadeUp but never gates
+ * opacity. Used on the hero <h1> (the LCP element) so the headline
+ * paints immediately at full opacity instead of waiting for hydration +
+ * the 0.32s delay + 0.5s fade — which was costing ~4s of render delay
+ * (11.6s p75 LCP in the field). Visually near-identical: the headline
+ * still slides up, it just slides up visible. */
+@keyframes riseUp {
+  0% { transform: translateY(8px); }
+  100% { transform: translateY(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   @keyframes fadeUp {
     0%, 100% { opacity: 1; transform: none; }
+  }
+  @keyframes riseUp {
+    0%, 100% { transform: none; }
   }
 }
 
