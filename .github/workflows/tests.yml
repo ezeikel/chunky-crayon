@@ -157,9 +157,31 @@ jobs:
           CI: 'true'
           PLAYWRIGHT_BASE_URL: 'http://localhost:3000'
         working-directory: ./apps/chunky-crayon-web
+        # `next dev` on this large app is slow to first-serve on CI
+        # runners (Turbopack cold compile). A plain `wait-on http://...`
+        # times out because the port isn't bound + first route isn't
+        # compiled within the window. So: (1) wait for Next's own "Ready"
+        # log line (binds fast — the real "process up" signal), then
+        # (2) warm the homepage with a long-timeout curl to force the
+        # first on-demand compile before Playwright starts. The specs'
+        # gotoStable() helper absorbs per-route compiles after that.
         run: |
           pnpm dev > /tmp/dev.log 2>&1 &
-          npx wait-on http://localhost:3000 --timeout 180000
+          DEV_PID=$!
+          echo "Waiting for next dev to report Ready..."
+          for i in $(seq 1 60); do
+            if grep -qE "Ready in|started server|Local:.*3000" /tmp/dev.log; then
+              echo "next dev is up"; break
+            fi
+            if ! kill -0 "$DEV_PID" 2>/dev/null; then
+              echo "::error::next dev exited early"; cat /tmp/dev.log; exit 1
+            fi
+            sleep 3
+          done
+          echo "Warming homepage (forces first Turbopack compile)..."
+          curl -s -o /dev/null --max-time 240 --retry 5 --retry-delay 5 \
+            --retry-all-errors http://localhost:3000/en || true
+          npx wait-on http://localhost:3000/en --timeout 120000
           pnpm test:e2e
 
       - name: Upload Playwright report
