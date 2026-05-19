@@ -603,6 +603,21 @@ export type EventProperties = {
     ctaDestination?: 'signin' | 'pricing';
     msFromMount: number;
   };
+  // Post-engagement conversion bridge (exp-start-post-engagement-bridge
+  // =bridge). Fired from StartPostEngagementBridge on the /start hero.
+  [TRACKING_EVENTS.START_BRIDGE_SHOWN]: {
+    campaign: string;
+  };
+  [TRACKING_EVENTS.START_BRIDGE_CLICKED]: {
+    campaign: string;
+    // True if the visitor had already printed/downloaded their page
+    // (peak intent) before clicking through to the guest create flow.
+    hasExported: boolean;
+  };
+  [TRACKING_EVENTS.START_BRIDGE_DISMISSED]: {
+    campaign: string;
+    hasExported: boolean;
+  };
   [TRACKING_EVENTS.LANDING_DEMO_PLAYED]: {
     page: 'homepage' | 'start';
     startingScenario: string; // campaign key the demo opens with

@@ -1194,6 +1194,9 @@ export const TRACKING_EVENTS = {
   START_HERO_PDF_DOWNLOADED: 'start_hero_pdf_downloaded', // Visitor downloaded their /start canvas as a PDF
   START_HERO_PDF_PRINTED: 'start_hero_pdf_printed', // Visitor opened the print dialog for their /start canvas
   START_HERO_CTA_CLICKED: 'start_hero_cta_clicked', // Primary signin CTA clicked from the /start hero
+  START_BRIDGE_SHOWN: 'start_bridge_shown', // Post-engagement bridge prompt rendered (after first canvas interaction) — exp-start-post-engagement-bridge=bridge only
+  START_BRIDGE_CLICKED: 'start_bridge_clicked', // Visitor clicked the bridge CTA through to the guest create flow
+  START_BRIDGE_DISMISSED: 'start_bridge_dismissed', // Visitor dismissed the bridge prompt without clicking through
   LANDING_DEMO_PLAYED: 'landing_demo_played', // User pressed play on the phone-frame demo
   LANDING_DEMO_COMPLETED: 'landing_demo_completed', // Demo cycled through every scenario at least once
   LANDING_DEMO_CTA_CLICKED: 'landing_demo_cta_clicked', // "Color this one" CTA inside demo result frame

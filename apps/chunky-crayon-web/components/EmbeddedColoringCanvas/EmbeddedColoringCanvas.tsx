@@ -15,6 +15,7 @@ import SaveButton from '@/components/buttons/SaveButton';
 import PrintButton from '@/components/buttons/PrintButton';
 import { Experiment } from '@/components/experiment/Experiment';
 import TapPromptOverlay from '@/components/TapPromptOverlay';
+import StartPostEngagementBridge from '@/components/StartPostEngagementBridge';
 import SlimColorPalette from './SlimColorPalette';
 
 type EmbeddedColoringCanvasProps = {
@@ -86,6 +87,10 @@ const EmbeddedColoringCanvas = ({
   // method) so the overlay fades out, revealing the artwork they're
   // about to color.
   const [hasInteracted, setHasInteracted] = useState(false);
+  // Flips true once the visitor prints or downloads their coloured
+  // page — peak intent. Drives the escalated copy in the
+  // post-engagement bridge (exp-start-post-engagement-bridge=bridge).
+  const [hasExported, setHasExported] = useState(false);
 
   // Snapshot of the painted canvas at click time, used by the
   // SaveButton to embed the visitor's coloured version into the
@@ -130,6 +135,29 @@ const EmbeddedColoringCanvas = ({
       msFromMount: Date.now() - mountTimeRef.current,
     });
   }, [campaign, image.id, track, handleFirstInteraction]);
+
+  // Print / download capture handlers. Each fires the hero-specific
+  // event (before the button's own global event, via onClickCapture)
+  // AND flips hasExported so the post-engagement bridge can escalate
+  // its copy to peak-intent. Extracted so desktop + mobile share one
+  // implementation instead of four duplicated inline arrows.
+  const handlePrintCapture = useCallback(() => {
+    setHasExported(true);
+    track(TRACKING_EVENTS.START_HERO_PDF_PRINTED, {
+      campaign,
+      coloringImageId: image.id ?? '',
+      msFromMount: Date.now() - mountTimeRef.current,
+    });
+  }, [campaign, image.id, track]);
+
+  const handleDownloadCapture = useCallback(() => {
+    setHasExported(true);
+    track(TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED, {
+      campaign,
+      coloringImageId: image.id ?? '',
+      msFromMount: Date.now() - mountTimeRef.current,
+    });
+  }, [campaign, image.id, track]);
 
   // Parse regionsJson from the DB string. Mirrors the parsing block in
   // ColoringArea.tsx — keep in sync if shape changes.
@@ -240,6 +268,28 @@ const EmbeddedColoringCanvas = ({
         </div>
       </div>
 
+      {/* Post-engagement conversion bridge. Gated by
+          exp-start-post-engagement-bridge: `control` renders nothing
+          (holdout = current /start funnel), `bridge` shows the
+          dismissible "make your own → guest create" prompt once the
+          visitor has interacted. Placed directly under the canvas so it
+          reads as the natural next step right after they colour. */}
+      <Experiment
+        flag="exp-start-post-engagement-bridge"
+        defaultVariant="control"
+        exposureProperties={{ campaign, surface: 'start_canvas' }}
+        variants={{
+          control: null,
+          bridge: (
+            <StartPostEngagementBridge
+              campaign={campaign}
+              hasInteracted={hasInteracted}
+              hasExported={hasExported}
+            />
+          ),
+        }}
+      />
+
       {/* Desktop: inline palette below the canvas. Save button is
           rendered inline with the tools row (via SlimColorPalette's
           trailingAction slot) so the whole controls block reads as one
@@ -267,13 +317,7 @@ const EmbeddedColoringCanvas = ({
             <>
               <div
                 className="w-full aspect-square max-w-16"
-                onClickCapture={() =>
-                  track(TRACKING_EVENTS.START_HERO_PDF_PRINTED, {
-                    campaign,
-                    coloringImageId: image.id ?? '',
-                    msFromMount: Date.now() - mountTimeRef.current,
-                  })
-                }
+                onClickCapture={handlePrintCapture}
               >
                 <PrintButton
                   coloringImage={image}
@@ -283,13 +327,7 @@ const EmbeddedColoringCanvas = ({
               </div>
               <div
                 className="w-full aspect-square max-w-16"
-                onClickCapture={() =>
-                  track(TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED, {
-                    campaign,
-                    coloringImageId: image.id ?? '',
-                    msFromMount: Date.now() - mountTimeRef.current,
-                  })
-                }
+                onClickCapture={handleDownloadCapture}
               >
                 <SaveButton
                   coloringImage={image}
