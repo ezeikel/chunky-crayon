@@ -26,7 +26,8 @@ export type ContentReelCaptionPlatform =
   | 'instagram'
   | 'facebook'
   | 'pinterest'
-  | 'tiktok';
+  | 'tiktok'
+  | 'linkedin';
 
 export type ContentReelCaptionInput = {
   kind: 'STAT' | 'FACT' | 'TIP' | 'MYTH';
@@ -86,6 +87,16 @@ const CAPTION_PROMPTS: Record<
       `Payoff: ${reel.payoff}`,
       '',
       "Format: 2-3 short lines, casual + scroll-stopping tone, then 3-5 hashtags on the same or next line. Total under 150 characters (TikTok's caption sweet spot — long captions get truncated). Lead with a hook that makes the user want to watch the full reel.",
+    ].join('\n'),
+  linkedin: (reel) =>
+    [
+      `Write a LinkedIn caption for this ${reel.kind} content reel.`,
+      `Hook: ${reel.hook}`,
+      `Payoff: ${reel.payoff}`,
+      `Source: ${reel.sourceTitle ?? 'parenting research'}`,
+      `Source URL: ${reel.sourceUrl ?? 'omit'}`,
+      '',
+      'Format: a thoughtful, grounded 120-200 word post for working parents, educators, and early-years professionals. A point of view plus the practical takeaway. Source URL on its own line at the end if present. 0-3 hashtags. No marketing cliches, no buzzword soup.',
     ].join('\n'),
 };
 

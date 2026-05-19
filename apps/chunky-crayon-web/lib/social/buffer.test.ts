@@ -56,6 +56,39 @@ describe('buildCreatePostVariables', () => {
     expect(input.channelId).toBe('ch_abc');
     expect(input.text).toBe(base.text);
   });
+
+  it('builds an image asset when imageUrl is given (carousel → LinkedIn)', () => {
+    const { input } = buildCreatePostVariables('ch_li', {
+      text: 'Today’s free coloring page',
+      imageUrl: 'https://pub-x.r2.dev/daily/page.jpg',
+      dueAt: new Date('2026-05-21T19:30:00.000Z'),
+    });
+    expect(input.assets).toHaveLength(1);
+    expect(input.assets[0]).toEqual({
+      image: { url: 'https://pub-x.r2.dev/daily/page.jpg' },
+    });
+    // @oneOf: exactly one key, and it's image not video.
+    expect(Object.keys(input.assets[0])).toEqual(['image']);
+  });
+
+  it('video wins if both are set (video is the richer surface)', () => {
+    const { input } = buildCreatePostVariables('ch_x', {
+      text: 't',
+      videoUrl: 'https://pub-x.r2.dev/v.mp4',
+      imageUrl: 'https://pub-x.r2.dev/i.jpg',
+      dueAt: new Date('2026-05-21T19:30:00.000Z'),
+    });
+    expect(Object.keys(input.assets[0])).toEqual(['video']);
+  });
+
+  it('throws if neither videoUrl nor imageUrl is provided', () => {
+    expect(() =>
+      buildCreatePostVariables('ch_x', {
+        text: 't',
+        dueAt: new Date('2026-05-21T19:30:00.000Z'),
+      }),
+    ).toThrow(/videoUrl or imageUrl/);
+  });
 });
 
 describe('isBufferBridgeEnabled', () => {

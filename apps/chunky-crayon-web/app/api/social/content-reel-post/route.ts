@@ -26,6 +26,10 @@ import {
   generateContentReelCaption,
   type ContentReelCaptionInput,
 } from '@/lib/content-reel/captions';
+import {
+  schedulePostViaBuffer,
+  isBufferBridgeEnabled,
+} from '@/lib/social/buffer';
 import { BRAND } from '@/lib/db';
 
 export const maxDuration = 300;
@@ -511,6 +515,49 @@ const handleInner = async (request: Request): Promise<Response> => {
         error: message,
         caption: captionByPlatform.pinterest,
       };
+    }
+  }
+
+  // TikTok + LinkedIn via the Buffer bridge (temporary, until direct
+  // TikTok App Review / LinkedIn approval lands). Content reels are
+  // video, so both platforms are a good fit (unlike static carousels,
+  // which go LinkedIn-only). Gated per-platform by BUFFER_ENABLE_*;
+  // no-ops cleanly when the bridge is off. The reel asset must stay live
+  // until publish — it's a durable R2 URL, so fine. dueAt is a few
+  // minutes out (this route runs at the platform's cron slot).
+  const bufferDueAt = () => new Date(Date.now() + 5 * 60 * 1000);
+  const bufferTargets: ('tiktok' | 'linkedin')[] = (
+    ['tiktok', 'linkedin'] as const
+  ).filter((p) => !platformFilter || platformFilter === p);
+
+  for (const platform of bufferTargets) {
+    if (!isBufferBridgeEnabled(platform)) continue;
+    // eslint-disable-next-line no-await-in-loop
+    const caption = await generateContentReelCaption(platform, reelInput);
+    // eslint-disable-next-line no-await-in-loop
+    const buffered = await schedulePostViaBuffer({
+      platform,
+      text: caption,
+      videoUrl: reel.reelUrl,
+      thumbnailUrl: reel.coverUrl ?? undefined,
+      dueAt: bufferDueAt(),
+    });
+    if (buffered.scheduled) {
+      results[platform] = {
+        success: true,
+        via: 'buffer',
+        mediaId: buffered.postId,
+        caption,
+        postedAt: new Date().toISOString(),
+      };
+      console.log(
+        `[ContentReel] ${platform} scheduled via Buffer: ${buffered.postId}`,
+      );
+    } else if (!buffered.disabled) {
+      const message = buffered.error ?? 'unknown';
+      console.error(`[ContentReel] Buffer ${platform} failed: ${message}`);
+      errors.push(`${platform} (Buffer): ${message}`);
+      results[platform] = { success: false, caption, error: message };
     }
   }
 

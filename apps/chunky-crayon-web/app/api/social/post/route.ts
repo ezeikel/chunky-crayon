@@ -243,6 +243,9 @@ type SocialPostResults = {
   // we wire postToLinkedInPage into handleRequest.
   linkedin?: PlatformResult;
   linkedinDemoReel?: PlatformResult;
+  /** Daily coloring page image, posted to LinkedIn via the Buffer bridge.
+   * Static, so LinkedIn only (TikTok is video-only). */
+  linkedinCarousel?: PlatformResult;
   tiktok?: PlatformResult;
   tiktokDemoReel?: PlatformResult;
 };
@@ -2061,6 +2064,56 @@ const handleRequest = async (request: Request) => {
             caption: instagramCaptionForResults,
             error: errorMsg,
           };
+        }
+
+        // LinkedIn via the Buffer bridge — the daily coloring page as a
+        // single image post. Static, so LinkedIn ONLY (TikTok is
+        // video-only by design; see the demo-reel/content-reel paths for
+        // video). Gated by BUFFER_ENABLE_LINKEDIN; no-ops when off. Reuses
+        // the JPEG already uploaded for the IG feed post.
+        if (
+          isBufferBridgeEnabled('linkedin') &&
+          instagramImageUrl &&
+          !staticAlreadyPosted('linkedinCarousel')
+        ) {
+          try {
+            const liCaption = await generateLinkedInCaption(
+              coloringImage,
+              'image',
+            );
+            const buffered = await schedulePostViaBuffer({
+              platform: 'linkedin',
+              text: liCaption,
+              imageUrl: instagramImageUrl,
+              dueAt: new Date(Date.now() + 5 * 60 * 1000),
+            });
+            if (buffered.scheduled) {
+              staticPlatformResults.linkedinCarousel = {
+                success: true,
+                via: 'buffer',
+                mediaId: buffered.postId,
+                caption: liCaption,
+                postedAt: new Date().toISOString(),
+              };
+              console.log(
+                `[Carousel] LinkedIn scheduled via Buffer: ${buffered.postId}`,
+              );
+            } else if (!buffered.disabled) {
+              console.error(
+                `[Carousel] Buffer LinkedIn failed: ${buffered.error}`,
+              );
+              results.errors.push(`LinkedIn (Buffer): ${buffered.error}`);
+              staticPlatformResults.linkedinCarousel = {
+                success: false,
+                caption: liCaption,
+                error: buffered.error,
+              };
+            }
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Unknown error';
+            console.error('[Carousel] LinkedIn Buffer push errored:', msg);
+            results.errors.push(`LinkedIn (Buffer): ${msg}`);
+          }
         }
 
         // Also post the line-art image to IG Story — non-blocking. Uses

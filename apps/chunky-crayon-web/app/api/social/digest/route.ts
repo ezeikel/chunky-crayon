@@ -76,6 +76,8 @@ const POST_SCHEDULE: Record<string, ScheduledSlot> = {
   // Content-reel slots (daily 7d/wk) — different rhythm, US lunch saves.
   facebookContentReel: { utc: '17:00', days: 'weekday' }, // US 12pm ET lunch
   instagramContentReel: { utc: '18:30', days: 'weekday' }, // US 1:30pm ET
+  tiktokContentReel: { utc: '19:00', days: 'weekday' }, // via Buffer bridge
+  linkedinContentReel: { utc: '19:30', days: 'weekday' }, // via Buffer bridge
   pinterestContentReel: { utc: '22:00', days: 'weekday' }, // late-eve discovery
   // TikTok + LinkedIn demo-reel post via the Buffer bridge (until direct
   // TikTok/LinkedIn approval lands). The cron fires at these slots; the
@@ -98,6 +100,8 @@ const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
   // Content-reel slots — keep 7d/wk timing aligned with weekday lunch logic.
   facebookContentReel: { utc: '17:00', days: 'weekend' },
   instagramContentReel: { utc: '18:30', days: 'weekend' },
+  tiktokContentReel: { utc: '19:00', days: 'weekend' },
+  linkedinContentReel: { utc: '19:30', days: 'weekend' },
   pinterestContentReel: { utc: '22:00', days: 'weekend' },
   // Comic strip — Sunday only. Generation 06:00 UTC, posts that evening.
   // Separated from content-reel times (17:00/18:30/22:00) so two
@@ -297,9 +301,26 @@ export const GET = async (request: Request) => {
     //    new cron entry would make slotFor() report willAutoPost:true even
     //    on days the bridge was off or the push failed — a false "auto".)
     const bufferOverride = (
-      key: 'tiktokDemoReel' | 'linkedinDemoReel',
+      key: 'tiktokDemoReel' | 'linkedinDemoReel' | 'linkedinCarousel',
     ): { postedVia: 'buffer' } | { willAutoPost: false } => {
       const r = bufferResults[key];
+      return r?.success && r.via === 'buffer'
+        ? { postedVia: 'buffer' as const }
+        : { willAutoPost: false };
+    };
+
+    // Content-reel Buffer status lives on the contentReel row (keyed by
+    // plain 'tiktok'/'linkedin'), NOT on the coloring image. Same flip
+    // logic as bufferOverride but reading the right row.
+    const contentReelBufferResults =
+      (contentReel?.socialPostResults as Record<
+        string,
+        { success?: boolean; via?: string } | undefined
+      > | null) ?? {};
+    const contentReelBufferOverride = (
+      key: 'tiktok' | 'linkedin',
+    ): { postedVia: 'buffer' } | { willAutoPost: false } => {
+      const r = contentReelBufferResults[key];
       return r?.success && r.via === 'buffer'
         ? { postedVia: 'buffer' as const }
         : { willAutoPost: false };
@@ -359,7 +380,7 @@ export const GET = async (request: Request) => {
     // Claude cost — keeps each surface independent and means a brief-
     // failure doesn't block the post route or vice versa.
     let contentReelCaptions: Record<
-      'instagram' | 'facebook' | 'pinterest' | 'tiktok',
+      'instagram' | 'facebook' | 'pinterest' | 'tiktok' | 'linkedin',
       string
     > | null = null;
     if (contentReel) {
@@ -370,17 +391,19 @@ export const GET = async (request: Request) => {
         sourceTitle: contentReel.sourceTitle ?? undefined,
         sourceUrl: contentReel.sourceUrl ?? undefined,
       };
-      const [ig, fb, pin, tt] = await Promise.all([
+      const [ig, fb, pin, tt, li] = await Promise.all([
         generateContentReelCaption('instagram', reelCaptionInput),
         generateContentReelCaption('facebook', reelCaptionInput),
         generateContentReelCaption('pinterest', reelCaptionInput),
         generateContentReelCaption('tiktok', reelCaptionInput),
+        generateContentReelCaption('linkedin', reelCaptionInput),
       ]);
       contentReelCaptions = {
         instagram: ig,
         facebook: fb,
         pinterest: pin,
         tiktok: tt,
+        linkedin: li,
       };
     }
 
@@ -440,7 +463,12 @@ export const GET = async (request: Request) => {
           {
             platform: 'LinkedIn',
             caption: linkedinCaption,
-            willAutoPost: false, // LinkedIn is manual-only
+            // Rides the carousel cron (same trigger as the IG carousel);
+            // slotFor provides willAutoPost/scheduledTimeUtc, then the
+            // Buffer override flips to "via Buffer" on success or forces
+            // manual if the bridge was off / the push failed.
+            ...slotFor('instagramCarousel'),
+            ...bufferOverride('linkedinCarousel'),
             assetType: 'image',
           },
         ];
@@ -573,7 +601,16 @@ export const GET = async (request: Request) => {
           {
             platform: 'TikTok',
             caption: contentReelCaptions.tiktok,
-            willAutoPost: false, // TikTok is manual-only — upload via app
+            ...slotFor('tiktokContentReel'),
+            // Buffer bridge (when enabled) flips this to "via Buffer".
+            ...contentReelBufferOverride('tiktok'),
+            assetType: 'video',
+          },
+          {
+            platform: 'LinkedIn',
+            caption: contentReelCaptions.linkedin,
+            ...slotFor('linkedinContentReel'),
+            ...contentReelBufferOverride('linkedin'),
             assetType: 'video',
           },
         ]
