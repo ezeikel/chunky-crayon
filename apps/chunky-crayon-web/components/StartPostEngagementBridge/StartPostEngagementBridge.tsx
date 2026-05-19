@@ -99,7 +99,7 @@ const StartPostEngagementBridge = ({
       <div className="flex items-start justify-between gap-3">
         <p className="font-tondo font-bold text-text-primary text-base leading-snug">
           {hasExported
-            ? 'Love it? Your kid can make their very own — a dinosaur chef, a space cat, anything they can dream up.'
+            ? 'Love it? Your kid can make their very own. A dinosaur chef, a space cat, anything they can dream up.'
             : 'Want your kid to make their own? Describe any scene and get a fresh page in about 2 minutes.'}
         </p>
         <button
