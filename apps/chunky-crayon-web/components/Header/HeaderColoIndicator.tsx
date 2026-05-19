@@ -62,7 +62,7 @@ const HeaderColoIndicator = ({
         <button
           type="button"
           className={cn(
-            'relative rounded-full border-2 border-paper-cream-dark bg-white p-1.5 shadow-sm transition-all duration-200',
+            'relative inline-flex aspect-square items-center justify-center rounded-full border-2 border-paper-cream-dark bg-white p-1.5 shadow-sm transition-all duration-200',
             'hover:scale-105 hover:border-crayon-orange hover:shadow-[0_0_0_5px_hsl(var(--crayon-yellow)/0.3)] active:scale-95',
             'focus:outline-none focus-visible:shadow-[0_0_0_4px_hsl(var(--crayon-orange)),0_0_0_9px_hsl(var(--crayon-yellow)/0.4)]',
             className,
