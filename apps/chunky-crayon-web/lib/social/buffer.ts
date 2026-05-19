@@ -149,15 +149,20 @@ export const resolveChannelId = async (
 
   const wanted = SERVICE_FOR_PLATFORM[platform];
 
-  for (const org of organizations) {
-    // eslint-disable-next-line no-await-in-loop
-    const { channels } = await bufferGraphQL<{ channels: BufferChannel[] }>(
-      GET_CHANNELS,
-      { organizationId: org.id },
-    );
-    const match = channels.find((c) => c.service?.toLowerCase() === wanted);
-    if (match) return match.id;
-  }
+  // Fetch every org's channels in parallel (faster than serial, and keeps
+  // this loop-free for repos whose lint forbids for-of). Flatten, then
+  // pick the first channel whose service matches the platform.
+  const channelLists = await Promise.all(
+    organizations.map((org) =>
+      bufferGraphQL<{ channels: BufferChannel[] }>(GET_CHANNELS, {
+        organizationId: org.id,
+      }).then((d) => d.channels),
+    ),
+  );
+  const match = channelLists
+    .flat()
+    .find((c) => c.service?.toLowerCase() === wanted);
+  if (match) return match.id;
 
   throw new Error(
     `No Buffer channel found for service "${wanted}". Connect the channel in Buffer or set the pin env var.`,
