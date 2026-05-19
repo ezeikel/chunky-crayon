@@ -183,13 +183,12 @@ const ColoAvatar = ({
   const stageInfo = COLO_STAGES[stage];
   const colors = stageColors[stage];
 
-  // Check if SVG exists - for now, only stage 1 uses the base colo.svg
-  // Later we'll have stage-specific SVGs at /images/colo/stage-{n}.svg
-  const imagePath = stage === 1 ? '/images/colo.svg' : stageInfo.imagePath;
+  // Every stage now has a generated PNG at /images/colo/stage-{n}.png
+  const imagePath = stageInfo.imagePath;
   const [imageError, setImageError] = useState(false);
 
-  // Use placeholder if image doesn't exist
-  const showPlaceholder = imageError || stage !== 1;
+  // Only fall back to the placeholder if the image genuinely fails to load
+  const showPlaceholder = imageError;
 
   // Determine if we need the larger wrapper for progress ring
   const hasProgress = showProgress && coloState?.progressToNext;

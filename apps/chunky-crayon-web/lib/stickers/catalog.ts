@@ -1,11 +1,5 @@
 import type { Sticker } from './types';
 
-// TODO: Replace placeholder URLs with actual Colo sticker SVG illustrations
-// Each sticker should feature Colo in a themed pose/costume
-// Example: "First Steps" = Colo holding a crayon proudly
-// Example: "Animal Friend" = Colo wearing animal ears
-const PLACEHOLDER_STICKER_URL = '/images/stickers/placeholder.svg';
-
 /**
  * Complete sticker catalog
  *
@@ -13,8 +7,6 @@ const PLACEHOLDER_STICKER_URL = '/images/stickers/placeholder.svg';
  * - Milestone stickers: Unlock by reaching artwork counts
  * - Category stickers: Unlock by coloring specific themes
  * - Special stickers: Seasonal/event stickers
- *
- * TODO: Create SVG illustrations for each sticker featuring Colo mascot
  */
 export const STICKER_CATALOG: Sticker[] = [
   // ============================================
@@ -24,7 +16,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'first-steps',
     name: 'First Steps',
     description: 'Save your very first colored artwork!',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo holding a crayon proudly
+    imageUrl: '/images/stickers/first-steps.png',
     category: 'milestone',
     rarity: 'common',
     unlockCondition: { type: 'artwork_count', value: 1 },
@@ -34,7 +26,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'getting-started',
     name: 'Getting Started',
     description: 'Save 3 colored artworks',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with 3 crayons
+    imageUrl: '/images/stickers/getting-started.png',
     category: 'milestone',
     rarity: 'common',
     unlockCondition: { type: 'artwork_count', value: 3 },
@@ -44,7 +36,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'high-five',
     name: 'High Five',
     description: 'Save 5 colored artworks',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo giving high five
+    imageUrl: '/images/stickers/high-five.png',
     category: 'milestone',
     rarity: 'common',
     unlockCondition: { type: 'artwork_count', value: 5 },
@@ -54,7 +46,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'perfect-ten',
     name: 'Perfect Ten',
     description: 'Save 10 colored artworks',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo wearing medal
+    imageUrl: '/images/stickers/perfect-ten.png',
     category: 'milestone',
     rarity: 'uncommon',
     unlockCondition: { type: 'artwork_count', value: 10 },
@@ -64,7 +56,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'super-artist',
     name: 'Super Artist',
     description: 'Save 25 colored artworks',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with cape
+    imageUrl: '/images/stickers/super-artist.png',
     category: 'milestone',
     rarity: 'rare',
     unlockCondition: { type: 'artwork_count', value: 25 },
@@ -74,7 +66,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'master-creator',
     name: 'Master Creator',
     description: 'Save 50 colored artworks',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with crown
+    imageUrl: '/images/stickers/master-creator.png',
     category: 'milestone',
     rarity: 'legendary',
     unlockCondition: { type: 'artwork_count', value: 50 },
@@ -84,7 +76,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'century-club',
     name: 'Century Club',
     description: 'Save 100 colored artworks',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with golden brush
+    imageUrl: '/images/stickers/century-club.png',
     category: 'milestone',
     rarity: 'legendary',
     unlockCondition: { type: 'artwork_count', value: 100 },
@@ -98,7 +90,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'animal-friend',
     name: 'Animal Friend',
     description: 'Color your first animal page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with animal ears
+    imageUrl: '/images/stickers/animal-friend.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'animals' },
@@ -108,7 +100,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'fantasy-dreamer',
     name: 'Fantasy Dreamer',
     description: 'Color your first fantasy page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo as wizard
+    imageUrl: '/images/stickers/fantasy-dreamer.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'fantasy' },
@@ -118,7 +110,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'space-explorer',
     name: 'Space Explorer',
     description: 'Color your first space page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo as astronaut
+    imageUrl: '/images/stickers/space-explorer.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'space' },
@@ -128,7 +120,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'nature-lover',
     name: 'Nature Lover',
     description: 'Color your first nature page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with flower crown
+    imageUrl: '/images/stickers/nature-lover.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'nature' },
@@ -138,7 +130,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'vehicle-driver',
     name: 'Vehicle Driver',
     description: 'Color your first vehicles page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo driving car
+    imageUrl: '/images/stickers/vehicle-driver.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'vehicles' },
@@ -148,7 +140,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'dino-hunter',
     name: 'Dino Hunter',
     description: 'Color your first dinosaur page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with dinosaur
+    imageUrl: '/images/stickers/dino-hunter.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: {
@@ -162,7 +154,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'ocean-diver',
     name: 'Ocean Diver',
     description: 'Color your first ocean page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with snorkel
+    imageUrl: '/images/stickers/ocean-diver.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'ocean' },
@@ -172,7 +164,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'food-lover',
     name: 'Food Lover',
     description: 'Color your first food page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo as chef
+    imageUrl: '/images/stickers/food-lover.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'food' },
@@ -182,7 +174,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'sports-star',
     name: 'Sports Star',
     description: 'Color your first sports page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with trophy
+    imageUrl: '/images/stickers/sports-star.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'sports' },
@@ -192,7 +184,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'holiday-spirit',
     name: 'Holiday Spirit',
     description: 'Color your first holiday page',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with party hat
+    imageUrl: '/images/stickers/holiday-spirit.png',
     category: 'category',
     rarity: 'common',
     unlockCondition: { type: 'first_category', value: 1, category: 'holidays' },
@@ -206,7 +198,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'animal-master',
     name: 'Animal Master',
     description: 'Color 5 animal pages',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo surrounded by animals
+    imageUrl: '/images/stickers/animal-master.png',
     category: 'category',
     rarity: 'uncommon',
     unlockCondition: { type: 'category_count', value: 5, category: 'animals' },
@@ -216,7 +208,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'fantasy-master',
     name: 'Fantasy Master',
     description: 'Color 5 fantasy pages',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo as powerful wizard
+    imageUrl: '/images/stickers/fantasy-master.png',
     category: 'category',
     rarity: 'uncommon',
     unlockCondition: { type: 'category_count', value: 5, category: 'fantasy' },
@@ -226,7 +218,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'space-master',
     name: 'Space Master',
     description: 'Color 5 space pages',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo on the moon
+    imageUrl: '/images/stickers/space-master.png',
     category: 'category',
     rarity: 'uncommon',
     unlockCondition: { type: 'category_count', value: 5, category: 'space' },
@@ -240,7 +232,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'category-explorer',
     name: 'Category Explorer',
     description: 'Color pages from 3 different categories',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with map
+    imageUrl: '/images/stickers/category-explorer.png',
     category: 'exploration',
     rarity: 'uncommon',
     unlockCondition: { type: 'special', value: 3 }, // Will need custom logic
@@ -250,7 +242,7 @@ export const STICKER_CATALOG: Sticker[] = [
     id: 'world-traveler',
     name: 'World Traveler',
     description: 'Color pages from 5 different categories',
-    imageUrl: PLACEHOLDER_STICKER_URL, // TODO: Colo with suitcase
+    imageUrl: '/images/stickers/world-traveler.png',
     category: 'exploration',
     rarity: 'rare',
     unlockCondition: { type: 'special', value: 5 }, // Will need custom logic
