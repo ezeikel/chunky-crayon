@@ -395,6 +395,12 @@ model Profile {
   isDefault       Boolean    @default(false) // First profile is default
   coloStage       Int        @default(1) // Colo evolution stage (1-6)
   coloAccessories String[]   @default([]) // Unlocked Colo accessories ["astronaut-helmet", "crown"]
+  // Privacy-first input-mode gating. Scene Builder is always available;
+  // the free-text / mic / camera modes ("text" | "voice" | "image") are
+  // locked by default and a parent unlocks them per child via the parent
+  // gate. Empty array = only Scene Builder. Per-profile so a parent can
+  // unlock voice for an older sibling but not a 4yo.
+  unlockedModes   String[]   @default([]) // ["text","voice","image"] subset
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
