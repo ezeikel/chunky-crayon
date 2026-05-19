@@ -1,5 +1,4 @@
 import { put } from '@one-colored-pixel/storage';
-import { chromium } from 'playwright';
 import sharp from 'sharp';
 import potrace from 'oslllo-potrace';
 import * as Sentry from '@sentry/nextjs';
@@ -72,6 +71,14 @@ export const traceImage = async (
 export const checkSvgImage = async (
   svgUrl: string,
 ): Promise<CheckSvgImageResult> => {
+  // Lazy-load Playwright so importing this module (e.g. for `traceImage`,
+  // which only needs sharp + potrace) does not pull `playwright-core` into
+  // every consumer's serverless bundle. `playwright` is listed in
+  // next.config `serverExternalPackages`, so a top-level static import made
+  // the demo-reel cron crash at module-load with "Cannot find module
+  // playwright-core/browsers.json" on routes that never launch a browser.
+  const { chromium } = await import('playwright');
+
   // launch browser and take screenshot
   const launchOptions = await getBrowserLaunchOptions();
   const browser = await chromium.launch(launchOptions);

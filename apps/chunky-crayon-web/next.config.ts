@@ -158,6 +158,23 @@ const nextConfig: NextConfig = {
     '@resvg/resvg-js',
     'playwright',
   ],
+  // `playwright-core` loads `browsers.json` via a path computed at runtime,
+  // not a static `require`, so Next's file tracer copies the JS but misses
+  // the data file. Any route whose import graph reaches `utils/traceImage`
+  // (the coloring-image pipelines: daily image, demo-reel produce-v2,
+  // photo/image-to-coloring, retrace — a broad surface) then crashes at
+  // module-load on Vercel with "Cannot find module
+  // playwright-core/browsers.json" — a raw 500 before the handler runs, so
+  // the route's own error handling never fires and nothing reaches Sentry.
+  // The lazy `import('playwright')` in traceImage isn't enough on its own:
+  // the tracer still follows the dynamic import and `serverExternalPackages`
+  // still pulls in playwright-core, just without the data file. Explicitly
+  // tracing browsers.json for every route is the actual fix; the file is
+  // ~2KB so the bundle cost is negligible. Path is relative to this config
+  // (the app dir); playwright-core is hoisted to the repo-root node_modules.
+  outputFileTracingIncludes: {
+    '/**': ['../../node_modules/playwright-core/browsers.json'],
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',

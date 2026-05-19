@@ -1,5 +1,4 @@
 import { put } from "@one-colored-pixel/storage";
-import { chromium } from "playwright";
 import sharp from "sharp";
 import potrace from "oslllo-potrace";
 import * as Sentry from "@sentry/nextjs";
@@ -72,6 +71,13 @@ export const traceImage = async (
 export const checkSvgImage = async (
   svgUrl: string,
 ): Promise<CheckSvgImageResult> => {
+  // Lazy-load Playwright so importing this module (e.g. for `traceImage`,
+  // which only needs sharp + potrace) does not pull `playwright-core` into
+  // every consumer's serverless bundle. Mirrors the CC fix for the
+  // demo-reel cron module-load crash; CH keeps parity even though it has
+  // no demo-reel route today.
+  const { chromium } = await import("playwright");
+
   // launch browser and take screenshot
   const launchOptions = await getBrowserLaunchOptions();
   const browser = await chromium.launch(launchOptions);
