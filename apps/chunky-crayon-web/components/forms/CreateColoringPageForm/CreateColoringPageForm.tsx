@@ -24,7 +24,8 @@ import {
   useInputMode,
   type InputMode,
 } from './inputs';
-import { getUnlockedModes, type GateableMode } from '@/app/actions/scene';
+import { getUnlockedModes } from '@/app/actions/scene';
+import { type GateableMode } from '@/lib/scene/modes';
 import FormCTA from './FormCTA';
 import QualityPicker from './QualityPicker/QualityPicker';
 import CharacterPicker from './CharacterPicker/CharacterPicker';

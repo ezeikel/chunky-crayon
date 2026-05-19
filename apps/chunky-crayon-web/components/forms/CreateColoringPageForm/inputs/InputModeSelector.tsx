@@ -15,7 +15,8 @@ import { useInputMode, type InputMode } from './InputModeContext';
 import { Button } from '@/components/ui/button';
 import { useParentalGate } from '@/components/ParentalGate';
 import { issueParentGateToken } from '@/app/actions/parent-gate';
-import { setModeUnlocked, type GateableMode } from '@/app/actions/scene';
+import { setModeUnlocked } from '@/app/actions/scene';
+import { type GateableMode } from '@/lib/scene/modes';
 import cn from '@/utils/cn';
 
 // =============================================================================

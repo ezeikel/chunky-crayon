@@ -29,11 +29,8 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { useParentalGate } from '@/components/ParentalGate';
 import { issueParentGateToken } from '@/app/actions/parent-gate';
-import {
-  setModeUnlocked,
-  GATEABLE_MODES,
-  type GateableMode,
-} from '@/app/actions/scene';
+import { setModeUnlocked } from '@/app/actions/scene';
+import { GATEABLE_MODES, type GateableMode } from '@/lib/scene/modes';
 
 type ModeAccessSettingsProps = {
   /** Modes the active profile has already unlocked (server-resolved). */

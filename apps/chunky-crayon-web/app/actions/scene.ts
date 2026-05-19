@@ -28,16 +28,11 @@ import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { verifyParentGateToken } from '@/app/actions/parent-gate';
 import { ACTIONS } from '@/constants';
-
-/**
- * The gateable input modes. Scene Builder ('scene') is intentionally NOT
- * in this set — it is always on and can never be locked.
- */
-export const GATEABLE_MODES = ['text', 'voice', 'image'] as const;
-export type GateableMode = (typeof GATEABLE_MODES)[number];
-
-const isGateableMode = (v: unknown): v is GateableMode =>
-  typeof v === 'string' && (GATEABLE_MODES as readonly string[]).includes(v);
+import {
+  GATEABLE_MODES,
+  isGateableMode,
+  type GateableMode,
+} from '@/lib/scene/modes';
 
 /**
  * Unlocked modes for the current user's active profile.
