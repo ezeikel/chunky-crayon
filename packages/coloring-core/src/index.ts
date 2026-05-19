@@ -173,6 +173,13 @@ export { BLOG_LANDING_PAGES } from "./blog/landings";
 export type { BlogLandingPage } from "./blog/landings";
 export { VOICE_REF, HUMOR_REF, STORIES_REF } from "./blog/voice-refs";
 export {
+  CC_BRAND_VOICE_CORE,
+  ccPlatformAdapter,
+  ccContentTypeAdapter,
+  ccVoice,
+} from "./voice/brand-voice";
+export type { CCPlatform, CCContentType } from "./voice/brand-voice";
+export {
   expandKeywordCluster,
   expandedClusterSchema,
 } from "./blog/keyword-clustering";

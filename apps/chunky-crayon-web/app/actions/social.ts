@@ -14,7 +14,7 @@ import {
   createTikTokCaptionPrompt,
   createLinkedInCaptionPrompt,
 } from '@/lib/ai';
-import { sanitizeCaption } from '@one-colored-pixel/coloring-core';
+import { sanitizeCaption, ccVoice } from '@one-colored-pixel/coloring-core';
 import { ColoringImage } from '@one-colored-pixel/db';
 
 /**
@@ -127,26 +127,32 @@ Remember: Write as Chunky Crayon the brand. Output ONLY the final post text with
 const buildDemoReelFraming = (
   variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
 ): string => {
+  // What input the demo shows on screen. Stated as the feature we're
+  // demonstrating ("type an idea"), NOT as something the viewer's kid did
+  // ("your kid types"). That second-person framing is the fake-testimonial
+  // failure Phase 0 research flagged; the brand-voice core forbids it.
   const inputLine =
     variant === 'IMAGE'
-      ? 'A kid uploads a photo (something around them, a pet, a memory)'
+      ? 'upload a photo (a pet, a toy, something around them)'
       : variant === 'VOICE'
-        ? 'A kid says out loud what they want to colour'
-        : 'A kid types a short idea';
+        ? 'say out loud what they want to colour'
+        : 'type a short idea';
 
+  // ccVoice('tiktok', 'demo_reel') carries the brand core + the demo-reel
+  // anti-ventriloquism rule. Platform-specific length is layered on by the
+  // per-platform addendum that wraps this; tiktok is just the seed here.
   return `
-This video is a real product demo recorded from chunkycrayon.com:
-1. ${inputLine}
-2. A printable coloring page appears in seconds
-3. The colors sweep across and fill it in automatically
+${ccVoice('tiktok', 'demo_reel')}
 
-The caption must frame this as the kid's idea coming to life — NOT as
-"animated line-art", NOT as "a video of a coloring page", and NOT as
-anything tech-y. Do NOT use the words "AI", "artificial intelligence",
-"automatic", "tech", or "magic brush". Parents are wary of AI marketing;
-talk about the OUTCOME (a free printable, a screen-free activity, kids
-seeing their idea come to life) and let the video carry the wow factor.
-The hero is the kid's idea, not the workflow.`;
+WHAT THIS SPECIFIC REEL SHOWS (a demo we recorded from chunkycrayon.com):
+1. A kid can ${inputLine}
+2. A printable coloring page appears in seconds
+3. The colors sweep across and fill it in
+
+Caption it as us showing the feature in action ("watch our app turn a
+${variant === 'IMAGE' ? 'photo' : variant === 'VOICE' ? 'spoken idea' : 'typed idea'} into a coloring page"). Sell the OUTCOME, a free
+printable and a screen-free win, never the workflow and never the
+technology. The video carries the wow; the caption stays plain.`;
 };
 
 /**
@@ -170,43 +176,45 @@ const variantHookRequirement = (
 } => {
   if (variant === 'IMAGE') {
     return {
-      inputAction: 'uploaded a photo',
+      inputAction: 'a photo gets uploaded',
       examples: [
-        '"snap a pic, get a coloring page"',
-        '"upload a photo and watch it become a coloring page"',
-        '"your kid uploads a photo of their dog → coloring page"',
+        '"watch a photo turn into a coloring page"',
+        '"upload a pic, get a printable coloring page back"',
+        '"snap → coloring page, here\'s how it works"',
       ],
       forbidden: [
-        '"we made…", "we released…", "we added…" — these IGNORE the photo upload, which is THE story',
-        '"check out this coloring page" — same problem',
+        '"my kid uploaded…", "your kid uploads…", "watch her face" — fake-testimonial / ventriloquism, banned',
+        '"we made…", "we released…" — ignores the photo input, which is what the video shows',
         '"AI", "tech", "automatic" — banned everywhere',
       ],
     };
   }
   if (variant === 'VOICE') {
     return {
-      inputAction: 'said aloud',
+      inputAction: 'an idea gets said aloud',
       examples: [
-        '"she SAID it and got a coloring page"',
-        '"talk to it, get a coloring page back"',
-        '"your kid says \'space dragon\' → coloring page"',
+        '"say it out loud, get a coloring page"',
+        '"watch a spoken idea become a printable page"',
+        '"\'space dragon\' said out loud → coloring page"',
       ],
       forbidden: [
-        '"we made…", "we released…", "we added…" — these IGNORE the voice input, which is THE story',
+        '"my kid said…", "your kid says…", "watch her say it" — fake-testimonial / ventriloquism, banned',
+        '"we made…", "we released…" — ignores the spoken input, which is what the video shows',
         '"typed", "uploaded" — wrong variant',
         '"AI", "voice AI", "tech" — banned everywhere',
       ],
     };
   }
   return {
-    inputAction: 'typed a short idea',
+    inputAction: 'a short idea gets typed',
     examples: [
       '"type 3 words, get a coloring page"',
-      '"your kid types it → coloring page appears"',
-      "\"typed 'bumblebee garden' → here's the page\"",
+      '"watch a typed idea become a printable page"',
+      "\"'bumblebee garden' typed in → here's the page\"",
     ],
     forbidden: [
-      '"we made…", "we released…", "we added…" — these read as marketing, not a demo',
+      '"my kid typed…", "your kid types…" — fake-testimonial / ventriloquism, banned',
+      '"we made…", "we released…", "we added…" — reads as marketing, not a demo',
       '"snapped", "uploaded", "said" — wrong variant',
       '"AI", "tech", "automatic" — banned everywhere',
     ],
@@ -219,12 +227,13 @@ const renderVariantRequirement = (
 ): string => {
   const req = variantHookRequirement(variant);
   return `
-HARD REQUIREMENT — LINE 1 MUST reference that the kid ${req.inputAction}.
+HARD REQUIREMENT: line 1 MUST show the feature where ${req.inputAction}.
+Frame it as us demonstrating the app, not as a kid or parent narrating.
 
 Good line-1 patterns to mimic:
 ${req.examples.map((e) => `  - ${e}`).join('\n')}
 
-DO NOT use these openers (they ignore the input and read like generic marketing):
+DO NOT use these openers:
 ${req.forbidden.map((f) => `  - ${f}`).join('\n')}`;
 };
 
@@ -257,10 +266,10 @@ const buildFacebookDemoReelAddendum = (
 ): string => {
   const opener =
     variant === 'IMAGE'
-      ? `"We had to show you this — your kid uploads a photo, and a free coloring page of it appears."`
+      ? `"We had to show you this. Upload a photo, and a free coloring page of it appears."`
       : variant === 'VOICE'
-        ? `"We had to show you this — your kid says what they want to draw, and a free coloring page appears."`
-        : `"We had to show you this — your kid types an idea and a free coloring page appears."`;
+        ? `"We had to show you this. Say what you want to draw, and a free coloring page appears."`
+        : `"We had to show you this. Type an idea, and a free coloring page appears."`;
 
   return `
 ${buildDemoReelFraming(variant)}
@@ -276,8 +285,8 @@ REQUIREMENTS:
 3. CTA: "Free at chunkycrayon.com — no signup needed to try it".
 4. 2-3 hashtags max, family-friendly (#Parenting #KidsActivities).
 5. Do NOT mention "AI", "artificial intelligence", "tech", "automatic",
-   or "magic brush". Parents are AI-skeptical; describe the kid's idea
-   coming to life, not the underlying tech.
+   or "magic brush". Parents are AI-skeptical; show the feature and the
+   free printable outcome, not the underlying tech.
 
 Remember: Write as Chunky Crayon the brand. Output ONLY the final post text without any labels or section markers.`;
 };
@@ -308,7 +317,7 @@ REQUIREMENTS:
    #screenfreeplay #kidstok. Do NOT use #aiforkids or any AI/tech tag.
 5. End with "free at chunkycrayon.com".
 6. Do NOT mention "AI", "artificial intelligence", "automatic", "tech",
-   or "magic brush". Talk about the kid's idea coming to life.
+   or "magic brush". Show the feature and the free printable outcome.
 
 Remember: Output ONLY the final caption text without any labels.`;
 };
