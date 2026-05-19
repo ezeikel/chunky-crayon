@@ -41,6 +41,7 @@ export default defineConfig({
         'lib/coloring-image-purpose.ts',
         'lib/bundle-download-token.ts',
         'lib/unsubscribe.ts',
+        'lib/social/buffer.ts',
       ],
     },
   },

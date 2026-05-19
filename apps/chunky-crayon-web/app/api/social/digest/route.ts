@@ -77,9 +77,12 @@ const POST_SCHEDULE: Record<string, ScheduledSlot> = {
   facebookContentReel: { utc: '17:00', days: 'weekday' }, // US 12pm ET lunch
   instagramContentReel: { utc: '18:30', days: 'weekday' }, // US 1:30pm ET
   pinterestContentReel: { utc: '22:00', days: 'weekday' }, // late-eve discovery
-  // tiktokDemoReel + tiktokContentReel intentionally omitted — TikTok auto-
-  // posting is paused; brief surfaces caption + asset for manual upload via
-  // the TikTok app (sandbox API only writes drafts anyway, half-manual).
+  // TikTok + LinkedIn demo-reel post via the Buffer bridge (until direct
+  // TikTok/LinkedIn approval lands). The cron fires at these slots; the
+  // post route schedules into Buffer's queue a few minutes out. When the
+  // bridge is OFF these crons no-op and the brief shows them as manual.
+  tiktokDemoReel: { utc: '22:00', days: 'weekday' },
+  linkedinDemoReel: { utc: '22:30', days: 'weekday' },
 };
 
 const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
@@ -89,6 +92,8 @@ const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
   facebookDemoReel: { utc: '17:30', days: 'weekend' }, // US 12:30pm ET
   instagramDemoReel: { utc: '19:00', days: 'weekend' }, // US 2pm ET
   pinterestDemoReel: { utc: '20:30', days: 'weekend' },
+  tiktokDemoReel: { utc: '21:00', days: 'weekend' },
+  linkedinDemoReel: { utc: '21:30', days: 'weekend' },
   pinterest: { utc: '22:30', days: 'weekend' }, // weekend Pinterest static
   // Content-reel slots — keep 7d/wk timing aligned with weekday lunch logic.
   facebookContentReel: { utc: '17:00', days: 'weekend' },
@@ -271,6 +276,35 @@ export const GET = async (request: Request) => {
     // separate concerns and meant a missing daily image incorrectly
     // killed the demo-reel section too.
     const captionImage = demoReelImage ?? coloringImage;
+
+    // Buffer-bridge status: the /api/social/post demo-reel run records
+    // `{ success: true, via: 'buffer' }` under the platform key when it
+    // schedules TikTok/LinkedIn into Buffer's queue. If that's present we
+    // flip the brief badge to "auto-posted via Buffer" so you know it's
+    // handled and don't post it again by hand. Reads the same row the
+    // demo-reel post route writes to (the demo-reel image, falling back
+    // to the daily one). Failure / absence → stays manual, caption shown.
+    const bufferResults =
+      ((captionImage?.socialPostResults ??
+        coloringImage?.socialPostResults) as Record<
+        string,
+        { success?: boolean; via?: string } | undefined
+      > | null) ?? {};
+    // For TikTok/LinkedIn the only "auto" path is the Buffer bridge. So:
+    //  - Buffer succeeded → postedVia:'buffer' (blue "via Buffer" badge)
+    //  - otherwise → force willAutoPost:false so it reads "manual" and the
+    //    caption/asset are surfaced for hand-posting. (Without this, the
+    //    new cron entry would make slotFor() report willAutoPost:true even
+    //    on days the bridge was off or the push failed — a false "auto".)
+    const bufferOverride = (
+      key: 'tiktokDemoReel' | 'linkedinDemoReel',
+    ): { postedVia: 'buffer' } | { willAutoPost: false } => {
+      const r = bufferResults[key];
+      return r?.success && r.via === 'buffer'
+        ? { postedVia: 'buffer' as const }
+        : { willAutoPost: false };
+    };
+
     const dailyImageCaptionPromises = coloringImage
       ? ([
           generateInstagramCaption(coloringImage, 'carousel'),
@@ -435,12 +469,16 @@ export const GET = async (request: Request) => {
             platform: 'TikTok',
             caption: tiktokDemoReelCaption,
             ...slotFor('tiktokDemoReel'),
+            // Buffer bridge (when enabled) flips this to "via Buffer".
+            ...bufferOverride('tiktokDemoReel'),
             assetType: 'video',
           },
           {
             platform: 'LinkedIn Reel',
             caption: linkedinDemoReelCaption,
-            willAutoPost: false, // LinkedIn is manual-only
+            willAutoPost: false, // LinkedIn direct is manual until approval
+            // Buffer bridge (when enabled) flips this to "via Buffer".
+            ...bufferOverride('linkedinDemoReel'),
             assetType: 'video',
           },
           {

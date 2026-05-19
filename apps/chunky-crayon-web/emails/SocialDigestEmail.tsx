@@ -22,6 +22,8 @@ type SocialDigestEntry = {
   /** When the cron is scheduled to fire today, in UTC HH:MM. Undefined for
    *  manual-only entries. */
   scheduledTimeUtc?: string;
+  /** 'buffer' when scheduled into Buffer's queue (TikTok/LinkedIn bridge). */
+  postedVia?: 'buffer';
 };
 
 type SocialDigestEmailProps = {
@@ -96,6 +98,24 @@ export type PipelineStatusEntry = {
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
+
+/**
+ * One badge for an entry's posting status. Three states:
+ *  - postedVia 'buffer' → blue "auto-posted via Buffer" (TikTok/LinkedIn
+ *    bridge; it's handled, don't post by hand)
+ *  - willAutoPost → green "auto-posting" (our own direct cron)
+ *  - otherwise → amber "manual" (you post it yourself)
+ */
+const StatusBadge = ({ entry }: { entry: SocialDigestEntry }) => {
+  if (entry.postedVia === 'buffer') {
+    return <span style={badgeBuffer}>auto-posted via Buffer</span>;
+  }
+  return (
+    <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
+      {entry.willAutoPost ? 'auto-posting' : 'manual'}
+    </span>
+  );
+};
 
 const SocialDigestEmail = ({
   blogTitle,
@@ -246,9 +266,7 @@ const SocialDigestEmail = ({
           <Section key={`daily-${index}`} style={platformCard}>
             <Text style={platformHeader}>
               <span style={platformName}>{entry.platform}</span>
-              <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
-                {entry.willAutoPost ? 'auto-posting' : 'manual'}
-              </span>
+              <StatusBadge entry={entry} />
             </Text>
             <Text style={assetTypeText}>
               Asset: {entry.assetType}
@@ -298,9 +316,7 @@ const SocialDigestEmail = ({
               <Section key={`reel-${index}`} style={platformCard}>
                 <Text style={platformHeader}>
                   <span style={platformName}>{entry.platform}</span>
-                  <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
-                    {entry.willAutoPost ? 'auto-posting' : 'manual'}
-                  </span>
+                  <StatusBadge entry={entry} />
                 </Text>
                 <Text style={assetTypeText}>
                   Asset: {entry.assetType}
@@ -372,9 +388,7 @@ const SocialDigestEmail = ({
               <Section key={`content-reel-${index}`} style={platformCard}>
                 <Text style={platformHeader}>
                   <span style={platformName}>{entry.platform}</span>
-                  <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
-                    {entry.willAutoPost ? 'auto-posting' : 'manual'}
-                  </span>
+                  <StatusBadge entry={entry} />
                 </Text>
                 <Text style={assetTypeText}>
                   Asset: {entry.assetType}
@@ -454,9 +468,7 @@ const SocialDigestEmail = ({
               <Section key={`comic-strip-${index}`} style={platformCard}>
                 <Text style={platformHeader}>
                   <span style={platformName}>{entry.platform}</span>
-                  <span style={entry.willAutoPost ? badgeAuto : badgeManual}>
-                    {entry.willAutoPost ? 'auto-posting' : 'manual'}
-                  </span>
+                  <StatusBadge entry={entry} />
                 </Text>
                 <Text style={assetTypeText}>
                   Asset: {entry.assetType}
@@ -627,6 +639,17 @@ const badgeManual = {
   fontWeight: '600',
   color: '#FFFFFF',
   backgroundColor: '#FFE0B2',
+  padding: '2px 8px',
+  borderRadius: '10px',
+};
+
+// Buffer-scheduled (TikTok/LinkedIn bridge). Blue to read as "handled, but
+// not via our own direct API" — distinct from the green direct auto-post.
+const badgeBuffer = {
+  fontSize: '11px',
+  fontWeight: '600',
+  color: '#FFFFFF',
+  backgroundColor: '#2D7DD2',
   padding: '2px 8px',
   borderRadius: '10px',
 };

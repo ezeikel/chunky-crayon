@@ -42,6 +42,13 @@ export type SocialDigestEntry = {
   /** When the cron is scheduled to fire today, in UTC HH:MM. Undefined for
    *  manual-only entries. */
   scheduledTimeUtc?: string;
+  /**
+   * Set to 'buffer' when this entry was scheduled into Buffer's queue
+   * (the TikTok/LinkedIn bridge until direct approval lands). The email
+   * shows "auto-posted via Buffer" instead of "manual" so you know it's
+   * handled and don't post it again by hand.
+   */
+  postedVia?: 'buffer';
 };
 
 const resend = new Resend(process.env.RESEND_API_KEY);

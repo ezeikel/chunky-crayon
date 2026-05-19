@@ -8,13 +8,18 @@ import {
   generateInstagramCaption,
   generateFacebookCaption,
   generatePinterestCaption,
-  // generateLinkedInCaption — import kept nearby as a reminder; currently
-  // the digest email generates LinkedIn captions (manual-post workflow).
-  // Re-add when postToLinkedInPage gets wired back in.
+  // generateLinkedInCaption is used by the Buffer bridge below (LinkedIn
+  // demo-reel posting via Buffer until direct LinkedIn approval lands).
+  // postToLinkedInPage (the direct path) stays dormant until then.
+  generateLinkedInCaption,
   generateTikTokCaption,
   type InstagramPostType,
   type FacebookPostType,
 } from '@/app/actions/social';
+import {
+  schedulePostViaBuffer,
+  isBufferBridgeEnabled,
+} from '@/lib/social/buffer';
 
 export const maxDuration = 180; // Increased for carousel creation
 
@@ -206,6 +211,13 @@ type PlatformResult = {
   caption?: string;
   postedAt?: string; // ISO
   error?: string;
+  /**
+   * Posting route, when not our own direct API. 'buffer' = scheduled into
+   * Buffer's queue (TikTok/LinkedIn bridge until direct approval lands).
+   * The digest uses this to render "Auto-posted via Buffer" instead of a
+   * plain "Auto-posted" badge. Absent for direct IG/FB/Pinterest posts.
+   */
+  via?: 'buffer';
 };
 
 type SocialPostResults = {
@@ -1294,9 +1306,18 @@ const handleRequest = async (request: Request) => {
         instagramReel: null as string | null,
         facebook: null as string | null,
         tiktok: null as string | null,
+        linkedin: null as string | null,
         pinterestVideo: null as string | null,
         errors: [] as string[],
       };
+
+      // Buffer needs a future dueAt. This route runs AT the platform's
+      // cron slot, so "the slot" is effectively now — schedule a few
+      // minutes out to give Buffer's pipeline headroom and stay safely
+      // in the future. The exact slot is owned by vercel.json's cron
+      // time; we don't recompute a clock time here.
+      const bufferDueAt = (_key: keyof SocialPostResults): Date =>
+        new Date(Date.now() + 5 * 60 * 1000);
 
       // If today's image doesn't have a rendered reel yet, pick the most
       // recent image that does. The separate /api/social/demo-reel/produce
@@ -1491,57 +1512,146 @@ const handleRequest = async (request: Request) => {
         }
       }
 
-      // TikTok — note that the underlying tiktok/post handler uploads to
-      // the user's TikTok Inbox/Drafts (sandbox API). It's a successful
-      // upload but NOT a published post — the user has to hit publish in
-      // the TikTok app. Reflect that in autoPosted=false on the digest.
+      // The cover image we hand Buffer as the video thumbnail — same
+      // stop-scroll hook cover IG/FB use, falling back to the colored
+      // outcome cover for older rows.
+      const bufferThumbnailUrl =
+        coloringImage.demoReelHookCoverUrl ??
+        coloringImage.demoReelCoverUrl ??
+        undefined;
+
+      // TikTok. While direct TikTok publishing is pending App Review the
+      // sandbox API only writes drafts (success:false, you publish in-app).
+      // When the Buffer bridge is enabled for TikTok we push the reel into
+      // Buffer's queue instead — a real scheduled publish — and skip the
+      // sandbox draft entirely. Falls back to the draft path if Buffer is
+      // off or the push fails, so a Buffer outage degrades to manual.
       if (shouldPost('tiktok') && !alreadyPosted('tiktokDemoReel')) {
         const caption = await generateTikTokCaption(coloringImage, 'demo_reel');
-        try {
-          const tiktokRes = await fetch(
-            new URL('/api/social/tiktok/post', request.url).toString(),
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                authorization: request.headers.get('authorization') ?? '',
+
+        let bufferHandled = false;
+        if (isBufferBridgeEnabled('tiktok')) {
+          const buffered = await schedulePostViaBuffer({
+            platform: 'tiktok',
+            text: caption,
+            videoUrl: reelUrl,
+            thumbnailUrl: bufferThumbnailUrl,
+            dueAt: bufferDueAt('tiktokDemoReel'),
+          });
+          if (buffered.scheduled) {
+            bufferHandled = true;
+            demoResults.tiktok = buffered.postId ?? 'buffer-scheduled';
+            platformResults.tiktokDemoReel = {
+              success: true,
+              via: 'buffer',
+              mediaId: buffered.postId,
+              caption,
+              postedAt: new Date().toISOString(),
+            };
+            console.log(
+              `[DemoReel] TikTok scheduled via Buffer: ${buffered.postId}`,
+            );
+          } else if (!buffered.disabled) {
+            // Buffer was on but the push failed — log and fall through to
+            // the sandbox draft so the caption/asset still reach you.
+            console.error(
+              `[DemoReel] Buffer TikTok push failed, falling back to draft: ${buffered.error}`,
+            );
+            demoResults.errors.push(`Buffer TikTok: ${buffered.error}`);
+          }
+        }
+
+        if (!bufferHandled) {
+          try {
+            const tiktokRes = await fetch(
+              new URL('/api/social/tiktok/post', request.url).toString(),
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  authorization: request.headers.get('authorization') ?? '',
+                },
+                body: JSON.stringify({
+                  videoUrl: reelUrl,
+                  caption,
+                  coloringImageId: coloringImage.id,
+                }),
               },
-              body: JSON.stringify({
-                videoUrl: reelUrl,
-                caption,
-                coloringImageId: coloringImage.id,
-              }),
-            },
-          );
-          const tiktokJson = (await tiktokRes.json().catch(() => ({}))) as {
-            publishId?: string;
-            id?: string;
-          };
-          const draftId = tiktokJson.publishId ?? tiktokJson.id ?? 'queued';
-          demoResults.tiktok = draftId;
-          platformResults.tiktokDemoReel = {
-            success: false, // sandbox API → drafts only, not auto-published
-            mediaId: draftId,
-            caption,
-            postedAt: new Date().toISOString(),
-          };
-        } catch (err) {
-          console.error('[DemoReel] TikTok failed:', err);
-          const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-          demoResults.errors.push(`TikTok: ${errorMsg}`);
-          platformResults.tiktokDemoReel = {
-            success: false,
-            caption,
-            error: errorMsg,
-          };
+            );
+            const tiktokJson = (await tiktokRes.json().catch(() => ({}))) as {
+              publishId?: string;
+              id?: string;
+            };
+            const draftId = tiktokJson.publishId ?? tiktokJson.id ?? 'queued';
+            demoResults.tiktok = draftId;
+            platformResults.tiktokDemoReel = {
+              success: false, // sandbox API → drafts only, not auto-published
+              mediaId: draftId,
+              caption,
+              postedAt: new Date().toISOString(),
+            };
+          } catch (err) {
+            console.error('[DemoReel] TikTok failed:', err);
+            const errorMsg =
+              err instanceof Error ? err.message : 'Unknown error';
+            demoResults.errors.push(`TikTok: ${errorMsg}`);
+            platformResults.tiktokDemoReel = {
+              success: false,
+              caption,
+              error: errorMsg,
+            };
+          }
         }
       }
 
-      // TODO(LinkedIn auto-post): dormant — LinkedIn is manual-only.
-      // Caption is generated in the digest email for copy-paste. To
-      // re-enable: add an `if (shouldPost('linkedin') && …)` branch
-      // calling postToLinkedInPage(reelUrl, caption) (helper kept
-      // dormant above handleRequest).
+      // LinkedIn. Direct posting (postToLinkedInPage, kept dormant above
+      // handleRequest) is blocked until LinkedIn approves the app. Until
+      // then the Buffer bridge schedules the reel into Buffer's queue when
+      // enabled. When direct approval lands: flip BUFFER_ENABLE_LINKEDIN
+      // off and re-wire postToLinkedInPage here. If the bridge is off this
+      // stays a no-op and the caption still appears in the digest email.
+      if (
+        shouldPost('linkedin') &&
+        !alreadyPosted('linkedinDemoReel') &&
+        isBufferBridgeEnabled('linkedin')
+      ) {
+        const caption = await generateLinkedInCaption(
+          coloringImage,
+          'demo_reel',
+        );
+        const buffered = await schedulePostViaBuffer({
+          platform: 'linkedin',
+          text: caption,
+          videoUrl: reelUrl,
+          thumbnailUrl: bufferThumbnailUrl,
+          dueAt: bufferDueAt('linkedinDemoReel'),
+        });
+        if (buffered.scheduled) {
+          demoResults.linkedin = buffered.postId ?? 'buffer-scheduled';
+          platformResults.linkedinDemoReel = {
+            success: true,
+            via: 'buffer',
+            mediaId: buffered.postId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
+          console.log(
+            `[DemoReel] LinkedIn scheduled via Buffer: ${buffered.postId}`,
+          );
+        } else {
+          // Push failed (Buffer was on but errored). Record it so the
+          // digest still surfaces the caption for manual posting.
+          console.error(
+            `[DemoReel] Buffer LinkedIn push failed: ${buffered.error}`,
+          );
+          demoResults.errors.push(`Buffer LinkedIn: ${buffered.error}`);
+          platformResults.linkedinDemoReel = {
+            success: false,
+            caption,
+            error: buffered.error,
+          };
+        }
+      }
 
       // Pinterest video pin — prefer the worker-captured colored cover
       // (finished artwork). Fall back to a square line-art render if
@@ -1598,6 +1708,7 @@ const handleRequest = async (request: Request) => {
         demoResults.instagramReel ||
         demoResults.facebook ||
         demoResults.tiktok ||
+        demoResults.linkedin ||
         demoResults.pinterestVideo;
 
       return NextResponse.json(

@@ -105,6 +105,14 @@
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
       "schedule": "30 21 * * 1-5"
     },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=tiktok",
+      "schedule": "0 22 * * 1-5"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=linkedin",
+      "schedule": "30 22 * * 1-5"
+    },
 
     {
       "path": "/api/social/post?platform=pinterest",
@@ -131,6 +139,14 @@
     {
       "path": "/api/social/post?type=demo-reel&platform=pinterest",
       "schedule": "30 20 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=tiktok",
+      "schedule": "0 21 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=linkedin",
+      "schedule": "30 21 * * 0,6"
     },
     {
       "path": "/api/social/post?platform=pinterest",
