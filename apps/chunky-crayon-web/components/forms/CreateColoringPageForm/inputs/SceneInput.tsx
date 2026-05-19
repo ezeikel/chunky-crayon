@@ -50,15 +50,20 @@ import useCharacters from '@/hooks/useCharacters';
 type SceneInputProps = {
   /**
    * Reports the current build up to the form on every change. `description`
-   * is empty until the required layers (subject + location) are picked —
-   * the form's Create button keys its disabled state off that.
+   * is empty until the required layers (subject + location) are picked.
    */
   onChange: (next: { description: string; characterId: string | null }) => void;
+  /**
+   * The wizard owns its own "Create!" button (final step), so scene mode
+   * does NOT use the shared FormCTA. This fires when the kid taps Create
+   * with the required steps satisfied — the form submits from here.
+   */
+  onCreate: () => void;
 };
 
 // One label namespace for the whole scene picker. The app owns i18n;
 // coloring-ui only renders the strings we pass.
-const SceneInput = ({ onChange }: SceneInputProps) => {
+const SceneInput = ({ onChange, onCreate }: SceneInputProps) => {
   const t = useTranslations('createForm.scene');
   const router = useRouter();
   const { characters } = useCharacters();
@@ -217,12 +222,19 @@ const SceneInput = ({ onChange }: SceneInputProps) => {
         selection={selection}
         onSelectionChange={setSelection}
         onSurpriseMe={handleSurpriseMe}
+        onCreate={onCreate}
         lockedKeys={lockedKeys}
         onLockedTap={handleLockedTap}
         labels={{
           ariaLabel: t('ariaLabel'),
           surpriseMe: t('surpriseMe'),
           lockedSuffix: t('lockedMakeCharacter'),
+          back: t('back'),
+          next: t('next'),
+          create: t('create'),
+          extrasTitle: t('extrasTitle'),
+          skip: t('skip'),
+          stepLabel: (c, n) => t('stepLabel', { current: c, total: n }),
         }}
       />
     </div>

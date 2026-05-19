@@ -257,6 +257,7 @@ const MultiModeForm = ({
       {mode === 'scene' && (
         <SceneInput
           onChange={({ characterId: cId }) => setSceneCharacterId(cId)}
+          onCreate={() => formRef.current?.requestSubmit()}
         />
       )}
       {mode === 'text' && <TextInput />}
@@ -332,8 +333,11 @@ const MultiModeForm = ({
         />
       )}
 
-      {/* Shared bottom CTA — free-try chip + Create/auth fallback */}
-      <FormCTA />
+      {/* Shared bottom CTA — free-try chip + Create/auth fallback. Hidden
+          in scene mode: the wizard owns its own final "Create!" button
+          (last step), so a second always-visible CTA would duplicate it
+          and let a kid submit mid-wizard before the scene is built. */}
+      {mode !== 'scene' && <FormCTA />}
     </form>
   );
 };

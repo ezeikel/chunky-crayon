@@ -1,28 +1,41 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDice, faCheck, faLock } from "@fortawesome/pro-duotone-svg-icons";
+import {
+  faDice,
+  faCheck,
+  faLock,
+  faArrowLeft,
+  faArrowRight,
+  faWandMagicSparkles,
+} from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import cn from "./cn";
 
 /**
  * SceneBuilder — the privacy-first default create surface.
  *
- * A kid layers a coloring scene by tapping colourful tiles across five
- * rows (subjects, location, weather, activity, accent). Zero typing, no
- * mic, no camera — the whole reason this is the default mode.
+ * A 3-8yo builds a coloring scene by tapping colourful tiles. Zero
+ * typing, no mic, no camera — the whole reason this is the default mode.
  *
- * This component is **presentational + controlled + app-agnostic**, the
- * same contract as InputModeSelector: the app owns the catalogue data and
- * selection state and passes them in. coloring-ui never imports the
- * app-side `lib/scene` catalogue, so CC and CH can share this component
- * while keeping brand-specific option sets and i18n in the app.
+ * Wizard, not a wall of options. One question per screen:
  *
- * Tokenised throughout (`coloring-accent`, `coloring-surface`, etc.) so it
- * renders in the active brand's theme. Animations are CSS transitions —
- * coloring-ui has no framer-motion dependency and the existing components
- * (InputModeSelector) animate the same way.
+ *   Step 1  Who? (required, pick up to `maxSelections`)
+ *   Step 2  Where? (required, pick 1)
+ *   Step 3  Make it special (OPTIONAL, skippable) — weather + activity +
+ *           accent collapsed into one light screen, since none are
+ *           required and a kid shouldn't sit through three more screens.
+ *
+ * The first layer the app passes is Step 1, the second is Step 2, and any
+ * remaining layers fold into the optional Step 3. This keeps the data
+ * contract identical to before (the app still passes `layers` /
+ * `selection` / `onSelectionChange`) — only the interaction model changed.
+ *
+ * Presentational + controlled + app-agnostic, same contract as
+ * InputModeSelector: the app owns the catalogue + i18n, coloring-ui never
+ * imports app data, so CC/CH share this. Tokenised; CSS-transition
+ * animations only (no framer-motion dep in this package).
  */
 
 // ─── Public data contract (app supplies these) ──────────────────────────────
@@ -48,7 +61,7 @@ export type SceneTileOption = {
 export type SceneLayer = {
   /** Stable layer id (subject, location, weather, activity, accent). */
   id: string;
-  /** Row heading. App passes the translated string. */
+  /** Step / section heading. App passes the translated string. */
   title: string;
   /** "single" → one selection; "multi" → up to `maxSelections`. */
   kind: "single" | "multi";
@@ -59,8 +72,8 @@ export type SceneLayer = {
 
 /**
  * Selection state: layer id → array of selected option keys. Single-select
- * rows hold 0 or 1 entries; multi-select up to the layer's cap. Controlled
- * by the parent so the app can derive the description + drive submit.
+ * layers hold 0 or 1 entries; multi up to the layer's cap. Controlled by
+ * the parent so the app can derive the description + drive submit.
  */
 export type SceneSelection = Record<string, readonly string[]>;
 
@@ -71,6 +84,18 @@ export type SceneBuilderLabels = {
   surpriseMe?: string;
   /** Suffix appended to a locked tile's aria-label, e.g. "(locked)". */
   lockedSuffix?: string;
+  /** "Back" button. */
+  back?: string;
+  /** "Next" button. */
+  next?: string;
+  /** Final action, e.g. "Create!". */
+  create?: string;
+  /** Optional-step title, e.g. "Make it special". */
+  extrasTitle?: string;
+  /** Skip-the-optional-step affordance, e.g. "Skip". */
+  skip?: string;
+  /** Step counter, given (current,total) → string e.g. "Step 1 of 2". */
+  stepLabel?: (current: number, total: number) => string;
 };
 
 export type SceneBuilderProps = {
@@ -79,11 +104,12 @@ export type SceneBuilderProps = {
   onSelectionChange: (next: SceneSelection) => void;
   /** Dice tap → app rolls a scene and applies it via onSelectionChange. */
   onSurpriseMe?: () => void;
+  /** Final "Create!" tap. Enabled only when required steps are satisfied. */
+  onCreate?: () => void;
   /**
-   * Option keys to render with a lock badge and block from selection
-   * (used for the `your-character` tile when the kid has no saved
-   * character yet — tap routes to character creation in the app).
-   * Keyed by layer id → set of locked option keys.
+   * Option keys to render locked (blocked from selection) — used for the
+   * `your-character` tile when the kid has no saved character yet.
+   * Keyed by layer id → locked option keys.
    */
   lockedKeys?: Record<string, readonly string[]>;
   /** Tap on a locked tile (app decides what to do — e.g. open a flow). */
@@ -101,6 +127,8 @@ type SceneTileProps = {
   locked: boolean;
   disabled: boolean;
   lockedSuffix?: string;
+  /** "lg" for the focused step grid, "sm" for the optional-step rows. */
+  size?: "lg" | "sm";
   onToggle: () => void;
 };
 
@@ -110,9 +138,9 @@ const SceneTile = ({
   locked,
   disabled,
   lockedSuffix,
+  size = "lg",
   onToggle,
 }: SceneTileProps) => {
-  const isInert = disabled || (locked && !onToggle);
   const ariaLabel = locked
     ? `${option.label} ${lockedSuffix ?? "(locked)"}`
     : option.label;
@@ -126,26 +154,22 @@ const SceneTile = ({
       title={option.label}
       disabled={disabled}
       onClick={onToggle}
-      className={cn(
-        "relative flex shrink-0 flex-col items-center gap-1.5",
-        "focus:outline-none",
-      )}
+      className="group flex shrink-0 flex-col items-center gap-2 focus:outline-none"
     >
       <span
         className={cn(
-          // Chunky kid tap target. --coloring-touch-target is the brand's
-          // min tap size; the tile is comfortably above 44pt either way.
-          "relative grid size-20 place-items-center overflow-hidden md:size-24",
+          "relative grid place-items-center overflow-hidden",
           "rounded-coloring-card border-2",
           "transition-all duration-coloring-base ease-coloring",
           "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+          size === "lg" ? "size-28 md:size-32" : "size-20 md:size-24",
           selected
             ? "border-coloring-accent shadow-coloring-button scale-105"
             : "border-coloring-surface-dark bg-white",
-          !isInert &&
+          !disabled &&
             !selected &&
-            "hover:border-coloring-accent hover:bg-coloring-surface active:scale-95",
-          isInert && "opacity-60",
+            "group-hover:border-coloring-accent group-hover:bg-coloring-surface group-active:scale-95",
+          disabled && "opacity-60",
         )}
         style={
           {
@@ -166,29 +190,26 @@ const SceneTile = ({
         ) : (
           <FontAwesomeIcon
             icon={option.icon}
-            className="text-4xl md:text-5xl"
+            className={size === "lg" ? "text-6xl" : "text-4xl"}
           />
         )}
 
         {selected && (
           <span
             className={cn(
-              "absolute right-1 top-1 grid size-6 place-items-center",
+              "absolute right-1.5 top-1.5 grid size-7 place-items-center",
               "rounded-full bg-coloring-accent text-white",
               "animate-in zoom-in duration-coloring-fast",
             )}
             aria-hidden="true"
           >
-            <FontAwesomeIcon icon={faCheck} className="text-xs" />
+            <FontAwesomeIcon icon={faCheck} className="text-sm" />
           </span>
         )}
 
         {locked && (
           <span
-            className={cn(
-              "absolute inset-0 grid place-items-center",
-              "bg-coloring-text-primary/40 backdrop-blur-[1px]",
-            )}
+            className="absolute inset-0 grid place-items-center bg-coloring-text-primary/40 backdrop-blur-[1px]"
             aria-hidden="true"
           >
             <FontAwesomeIcon
@@ -201,7 +222,7 @@ const SceneTile = ({
 
       <span
         className={cn(
-          "max-w-20 truncate text-xs font-medium md:max-w-24",
+          "max-w-28 truncate text-center text-sm font-semibold",
           selected ? "text-coloring-accent" : "text-coloring-text-secondary",
         )}
       >
@@ -211,116 +232,114 @@ const SceneTile = ({
   );
 };
 
-// ─── Layer row ───────────────────────────────────────────────────────────────
+// ─── Tile grid (one layer's options) ─────────────────────────────────────────
 
-type SceneLayerRowProps = {
+type TileGridProps = {
   layer: SceneLayer;
   selected: readonly string[];
   locked: readonly string[];
   disabled: boolean;
   lockedSuffix?: string;
+  size?: "lg" | "sm";
   onToggle: (optionKey: string) => void;
   onLockedTap?: (optionKey: string) => void;
 };
 
-const SceneLayerRow = ({
+const TileGrid = ({
   layer,
   selected,
   locked,
   disabled,
   lockedSuffix,
+  size = "lg",
   onToggle,
   onLockedTap,
-}: SceneLayerRowProps) => {
+}: TileGridProps) => {
   const lockedSet = useMemo(() => new Set(locked), [locked]);
   const selectedSet = useMemo(() => new Set(selected), [selected]);
 
   return (
-    <section aria-label={layer.title} className="flex flex-col gap-2">
-      <h3 className="px-1 text-sm font-semibold text-coloring-text-primary">
-        {layer.title}
-      </h3>
-      {/* Horizontal scroll keeps each row to one swipeable strip — far
-          easier for a small child than a reflowing grid. */}
-      <div
-        role="listbox"
-        aria-label={layer.title}
-        aria-multiselectable={layer.kind === "multi"}
-        className={cn(
-          "flex gap-3 overflow-x-auto pb-2",
-          "[-ms-overflow-style:none] [scrollbar-width:thin]",
-        )}
-      >
-        {layer.options.map((option) => {
-          const isLocked = lockedSet.has(option.key);
-          return (
-            <SceneTile
-              key={option.key}
-              option={option}
-              selected={selectedSet.has(option.key)}
-              locked={isLocked}
-              disabled={disabled}
-              lockedSuffix={lockedSuffix}
-              onToggle={() =>
-                isLocked ? onLockedTap?.(option.key) : onToggle(option.key)
-              }
-            />
-          );
-        })}
-      </div>
-    </section>
+    <div
+      role="listbox"
+      aria-label={layer.title}
+      aria-multiselectable={layer.kind === "multi"}
+      className="flex flex-wrap justify-center gap-3 md:gap-4"
+    >
+      {layer.options.map((option) => {
+        const isLocked = lockedSet.has(option.key);
+        return (
+          <SceneTile
+            key={option.key}
+            option={option}
+            selected={selectedSet.has(option.key)}
+            locked={isLocked}
+            disabled={disabled}
+            lockedSuffix={lockedSuffix}
+            size={size}
+            onToggle={() =>
+              isLocked ? onLockedTap?.(option.key) : onToggle(option.key)
+            }
+          />
+        );
+      })}
+    </div>
   );
 };
 
-// ─── Dice button ─────────────────────────────────────────────────────────────
+// ─── Step dots ───────────────────────────────────────────────────────────────
 
-type DiceButtonProps = {
-  label: string;
-  disabled: boolean;
-  onClick: () => void;
-};
-
-const DiceButton = ({ label, disabled, onClick }: DiceButtonProps) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={disabled}
-    aria-label={label}
-    title={label}
-    className={cn(
-      "group flex items-center gap-2 self-center",
-      "rounded-coloring-button border-2 border-coloring-accent",
-      "bg-white px-4 py-2 text-sm font-bold text-coloring-accent",
-      "transition-all duration-coloring-base ease-coloring",
-      "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-      !disabled && "hover:bg-coloring-accent hover:text-white active:scale-95",
-      disabled && "opacity-50",
-    )}
-  >
-    <FontAwesomeIcon
-      icon={faDice}
-      className={cn(
-        "text-lg transition-transform duration-coloring-base",
-        !disabled && "group-hover:rotate-[20deg] group-active:rotate-[360deg]",
-      )}
-    />
-    {label}
-  </button>
+const StepDots = ({ total, current }: { total: number; current: number }) => (
+  <div className="flex items-center gap-2" aria-hidden="true">
+    {Array.from({ length: total }).map((_, i) => (
+      <span
+        // eslint-disable-next-line react/no-array-index-key
+        key={i}
+        className={cn(
+          "size-2.5 rounded-full transition-colors duration-coloring-base",
+          i === current
+            ? "bg-coloring-accent"
+            : i < current
+              ? "bg-coloring-accent/50"
+              : "bg-coloring-surface-dark",
+        )}
+      />
+    ))}
+  </div>
 );
 
-// ─── SceneBuilder ────────────────────────────────────────────────────────────
+// ─── SceneBuilder (wizard) ───────────────────────────────────────────────────
 
 const SceneBuilder = ({
   layers,
   selection,
   onSelectionChange,
   onSurpriseMe,
+  onCreate,
   lockedKeys,
   onLockedTap,
   disabled = false,
   className,
   labels = {},
 }: SceneBuilderProps) => {
+  // Layer 0 → step 1 (required), layer 1 → step 2 (required), the rest →
+  // one optional "make it special" step. Defensive against odd layer
+  // counts so the app can't crash this by passing < 2 layers.
+  const subjectLayer = layers[0];
+  const locationLayer = layers[1];
+  const extraLayers = useMemo(() => layers.slice(2), [layers]);
+
+  // Steps: 0 = subject, 1 = location, 2 = (optional) extras. Extras only
+  // counts as a step if there are extra layers to show.
+  const hasExtras = extraLayers.length > 0;
+  const totalSteps = hasExtras ? 3 : 2;
+  // Step counter shown to the user only counts the REQUIRED steps (2) —
+  // "Step 1 of 2", then an optional bonus screen. Less intimidating than
+  // "Step 1 of 3" when the 3rd is skippable.
+  const requiredSteps = 2;
+  const [step, setStep] = useState(0);
+
+  const stepLabel = labels.stepLabel ?? ((c, t) => `Step ${c} of ${t}`);
+
   const toggleOption = (layer: SceneLayer, optionKey: string) => {
     if (disabled) return;
     const current = selection[layer.id] ?? [];
@@ -328,53 +347,226 @@ const SceneBuilder = ({
 
     let nextForLayer: string[];
     if (layer.kind === "single") {
-      // Tap-again deselects so a kid can clear an optional row.
       nextForLayer = isSelected ? [] : [optionKey];
     } else if (isSelected) {
       nextForLayer = current.filter((k) => k !== optionKey);
     } else {
       const cap = layer.maxSelections ?? Infinity;
-      if (current.length >= cap) {
-        // At the cap: drop the oldest pick so the newest tap still
-        // registers (kids don't read "you can pick 3" — they just tap).
-        nextForLayer = [...current.slice(1), optionKey];
-      } else {
-        nextForLayer = [...current, optionKey];
-      }
+      nextForLayer =
+        current.length >= cap
+          ? [...current.slice(1), optionKey]
+          : [...current, optionKey];
     }
-
     onSelectionChange({ ...selection, [layer.id]: nextForLayer });
   };
 
+  const subjectChosen = (selection[subjectLayer?.id ?? ""] ?? []).length > 0;
+  const locationChosen = (selection[locationLayer?.id ?? ""] ?? []).length > 0;
+
+  const canAdvanceFromSubject = subjectChosen;
+  const canAdvanceFromLocation = locationChosen;
+  const canCreate = subjectChosen && locationChosen;
+
+  const renderTitle = (text: string) => (
+    <h2 className="text-center text-xl font-bold text-coloring-text-primary md:text-2xl">
+      {text}
+    </h2>
+  );
+
   return (
     <div
-      className={cn("flex flex-col gap-5", className)}
+      className={cn("flex flex-col gap-6", className)}
       role="group"
-      aria-label={labels.ariaLabel ?? "Build your scene"}
+      aria-label={labels.ariaLabel ?? "Build your picture"}
     >
-      {layers.map((layer) => (
-        <SceneLayerRow
-          key={layer.id}
-          layer={layer}
-          selected={selection[layer.id] ?? []}
-          locked={lockedKeys?.[layer.id] ?? []}
-          disabled={disabled}
-          lockedSuffix={labels.lockedSuffix}
-          onToggle={(optionKey) => toggleOption(layer, optionKey)}
-          onLockedTap={
-            onLockedTap
-              ? (optionKey) => onLockedTap(layer.id, optionKey)
-              : undefined
-          }
-        />
-      ))}
+      {/* Header: step counter + dots + dice */}
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-semibold uppercase tracking-wide text-coloring-text-secondary">
+          {step < requiredSteps
+            ? stepLabel(step + 1, requiredSteps)
+            : (labels.extrasTitle ?? "Make it special")}
+        </span>
+        <StepDots total={totalSteps} current={step} />
+        {onSurpriseMe && (
+          <button
+            type="button"
+            onClick={onSurpriseMe}
+            disabled={disabled}
+            aria-label={labels.surpriseMe ?? "Surprise me!"}
+            title={labels.surpriseMe ?? "Surprise me!"}
+            className={cn(
+              "flex items-center gap-1.5 rounded-coloring-button border-2",
+              "border-coloring-accent bg-white px-3 py-1.5 text-xs font-bold",
+              "text-coloring-accent transition-all duration-coloring-base",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+              !disabled &&
+                "hover:bg-coloring-accent hover:text-white active:scale-95",
+              disabled && "opacity-50",
+            )}
+          >
+            <FontAwesomeIcon icon={faDice} />
+            {labels.surpriseMe ?? "Surprise me!"}
+          </button>
+        )}
+      </div>
 
-      {onSurpriseMe && (
-        <DiceButton
-          label={labels.surpriseMe ?? "Surprise me!"}
-          disabled={disabled}
-          onClick={onSurpriseMe}
-        />
+      {/* Step 1 — Who? (required) */}
+      {step === 0 && subjectLayer && (
+        <div className="flex flex-col gap-5">
+          {renderTitle(subjectLayer.title)}
+          <TileGrid
+            layer={subjectLayer}
+            selected={selection[subjectLayer.id] ?? []}
+            locked={lockedKeys?.[subjectLayer.id] ?? []}
+            disabled={disabled}
+            lockedSuffix={labels.lockedSuffix}
+            onToggle={(k) => toggleOption(subjectLayer, k)}
+            onLockedTap={
+              onLockedTap ? (k) => onLockedTap(subjectLayer.id, k) : undefined
+            }
+          />
+          <div className="flex justify-end">
+            <button
+              type="button"
+              disabled={disabled || !canAdvanceFromSubject}
+              onClick={() => setStep(1)}
+              className={cn(
+                "flex items-center gap-2 rounded-coloring-button px-6 py-3",
+                "text-base font-bold transition-all duration-coloring-base",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+                canAdvanceFromSubject && !disabled
+                  ? "bg-coloring-accent text-white shadow-coloring-button hover:brightness-105 active:scale-95"
+                  : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
+              )}
+            >
+              {labels.next ?? "Next"}
+              <FontAwesomeIcon icon={faArrowRight} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 2 — Where? (required) */}
+      {step === 1 && locationLayer && (
+        <div className="flex flex-col gap-5">
+          {renderTitle(locationLayer.title)}
+          <TileGrid
+            layer={locationLayer}
+            selected={selection[locationLayer.id] ?? []}
+            locked={lockedKeys?.[locationLayer.id] ?? []}
+            disabled={disabled}
+            lockedSuffix={labels.lockedSuffix}
+            onToggle={(k) => toggleOption(locationLayer, k)}
+          />
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => setStep(0)}
+              className={cn(
+                "flex items-center gap-2 rounded-coloring-button px-5 py-3",
+                "text-base font-semibold text-coloring-text-secondary",
+                "transition-all duration-coloring-base",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+                "hover:bg-coloring-surface active:scale-95",
+              )}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+              {labels.back ?? "Back"}
+            </button>
+            {hasExtras ? (
+              <button
+                type="button"
+                disabled={disabled || !canAdvanceFromLocation}
+                onClick={() => setStep(2)}
+                className={cn(
+                  "flex items-center gap-2 rounded-coloring-button px-6 py-3",
+                  "text-base font-bold transition-all duration-coloring-base",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+                  canAdvanceFromLocation && !disabled
+                    ? "bg-coloring-accent text-white shadow-coloring-button hover:brightness-105 active:scale-95"
+                    : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
+                )}
+              >
+                {labels.next ?? "Next"}
+                <FontAwesomeIcon icon={faArrowRight} />
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={disabled || !canCreate}
+                onClick={() => onCreate?.()}
+                className={cn(
+                  "flex items-center gap-2 rounded-coloring-button px-6 py-3",
+                  "text-base font-bold transition-all duration-coloring-base",
+                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+                  canCreate && !disabled
+                    ? "bg-coloring-accent text-white shadow-coloring-button hover:brightness-105 active:scale-95"
+                    : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
+                )}
+              >
+                <FontAwesomeIcon icon={faWandMagicSparkles} />
+                {labels.create ?? "Create!"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Step 3 — Make it special (OPTIONAL, skippable) */}
+      {step === 2 && hasExtras && (
+        <div className="flex flex-col gap-6">
+          {renderTitle(labels.extrasTitle ?? "Make it special")}
+          {extraLayers.map((layer) => (
+            <section key={layer.id} className="flex flex-col gap-3">
+              <h3 className="text-center text-sm font-semibold text-coloring-text-secondary">
+                {layer.title}
+              </h3>
+              <TileGrid
+                layer={layer}
+                selected={selection[layer.id] ?? []}
+                locked={lockedKeys?.[layer.id] ?? []}
+                disabled={disabled}
+                lockedSuffix={labels.lockedSuffix}
+                size="sm"
+                onToggle={(k) => toggleOption(layer, k)}
+              />
+            </section>
+          ))}
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => setStep(1)}
+              className={cn(
+                "flex items-center gap-2 rounded-coloring-button px-5 py-3",
+                "text-base font-semibold text-coloring-text-secondary",
+                "transition-all duration-coloring-base",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+                "hover:bg-coloring-surface active:scale-95",
+              )}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+              {labels.back ?? "Back"}
+            </button>
+            <button
+              type="button"
+              disabled={disabled || !canCreate}
+              onClick={() => onCreate?.()}
+              className={cn(
+                "flex items-center gap-2 rounded-coloring-button px-6 py-3",
+                "text-base font-bold transition-all duration-coloring-base",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+                canCreate && !disabled
+                  ? "bg-coloring-accent text-white shadow-coloring-button hover:brightness-105 active:scale-95"
+                  : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
+              )}
+            >
+              <FontAwesomeIcon icon={faWandMagicSparkles} />
+              {labels.create ?? "Create!"}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

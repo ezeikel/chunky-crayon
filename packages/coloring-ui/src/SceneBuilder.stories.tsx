@@ -250,9 +250,10 @@ const SceneBuilderHost = ({
 }: HostProps) => {
   const [selection, setSelection] = useState<SceneSelection>(initial);
   const [lockedTap, setLockedTap] = useState<string | null>(null);
+  const [created, setCreated] = useState(false);
 
   return (
-    <div style={{ maxWidth: 560 }}>
+    <div style={{ maxWidth: 600 }}>
       <SceneBuilder
         layers={LAYERS}
         selection={selection}
@@ -260,17 +261,36 @@ const SceneBuilderHost = ({
         onSurpriseMe={
           withDice ? () => setSelection(rollDemoScene()) : undefined
         }
+        onCreate={() => setCreated(true)}
         lockedKeys={lockCharacter ? { subject: ["your-character"] } : undefined}
         onLockedTap={(layerId, optionKey) =>
           setLockedTap(`${layerId} / ${optionKey}`)
         }
         disabled={disabled}
         labels={{
-          ariaLabel: "Build your scene",
+          ariaLabel: "Build your picture",
           surpriseMe: "Surprise me!",
           lockedSuffix: "(make a character first)",
+          back: "Back",
+          next: "Next",
+          create: "Create!",
+          extrasTitle: "Make it special",
+          skip: "Skip",
+          stepLabel: (c, t) => `Step ${c} of ${t}`,
         }}
       />
+      {created && (
+        <p
+          style={{
+            marginTop: 12,
+            color: "#3fa34d",
+            fontSize: 13,
+            fontWeight: 700,
+          }}
+        >
+          onCreate fired ✓
+        </p>
+      )}
       {lockedTap && (
         <p
           style={{
