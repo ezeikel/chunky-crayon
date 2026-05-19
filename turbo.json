@@ -98,11 +98,11 @@
       "persistent": true
     },
     "test": {
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["db:generate", "^build"],
       "outputs": ["coverage/**"]
     },
     "test:e2e": {
-      "dependsOn": ["db:generate"],
+      "dependsOn": ["db:generate", "^build"],
       "cache": false
     },
     "db:generate": {
