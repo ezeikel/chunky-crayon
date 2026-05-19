@@ -9,6 +9,7 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import { useAnalytics } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
+import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
 
 type StartPostEngagementBridgeProps = {
@@ -45,6 +46,13 @@ type StartPostEngagementBridgeProps = {
  * "make your OWN — describe anything", routing into the existing guest
  * create flow on the homepage (createPendingColoringImage, designed for
  * guests on homepage/start). No auth wall.
+ *
+ * Styling deliberately mirrors the chunky kid-brand language: the CTA is
+ * the SAME shared <Button> primitive (default variant) the /start hero
+ * "Try it free" button uses — chunky bottom-drop lift, bouncy easing,
+ * brand accent — so the two CTAs read as one family. The card itself
+ * gets a confident fill + thick border + matching bottom-drop shadow so
+ * it pops on the page instead of reading like an adult SaaS toast.
  *
  * Gated by exp-start-post-engagement-bridge=bridge — the `control`
  * variant never mounts this, so the existing /start funnel is the
@@ -86,43 +94,71 @@ const StartPostEngagementBridge = ({
     track(TRACKING_EVENTS.START_BRIDGE_CLICKED, { campaign, hasExported });
   };
 
+  const headline = hasExported
+    ? 'Love it? Make your very own'
+    : 'Want your kid to make their own?';
+  const sub = hasExported
+    ? 'A dinosaur chef, a space cat, anything they can dream up. Describe it, get a fresh page in about 2 minutes.'
+    : 'Describe any scene and get a fresh printable page in about 2 minutes.';
+
   return (
     <div
       className={cn(
-        'w-full max-w-[400px] rounded-2xl border-2 border-crayon-orange/30',
-        'bg-crayon-yellow-light/40 px-5 py-4 shadow-sm',
-        'animate-in fade-in slide-in-from-bottom-2 duration-300',
+        'relative w-full max-w-[400px] rounded-3xl',
+        // Clean white card, no border — the orange button is the only
+        // loud element; the card is just a soft-elevated white surface
+        // that frames it. (Earlier yellow-fill + thick orange ring +
+        // icon chip stacked into an orange-on-orange pile-up that read
+        // garish; the soft shadow alone lifts it off the page.)
+        'bg-white px-6 pt-6 pb-7',
+        'shadow-[0_10px_28px_-10px_rgb(0_0_0/0.18)]',
       )}
+      // Sly entrance: slide-up + overshoot settle, then a single
+      // delayed attention bob ~0.9s after it lands (visitor is
+      // mid-colour, so the late nudge catches the eye). Pure CSS
+      // keyframes (global.css), reduced-motion-safe.
+      style={{
+        animation:
+          'bridge-in 420ms cubic-bezier(0.34,1.56,0.64,1) both, ' +
+          'bridge-nudge 600ms ease-in-out 900ms 1',
+      }}
       role="region"
       aria-label="Make your own coloring page"
     >
-      <div className="flex items-start justify-between gap-3">
-        <p className="font-tondo font-bold text-text-primary text-base leading-snug">
-          {hasExported
-            ? 'Love it? Your kid can make their very own. A dinosaur chef, a space cat, anything they can dream up.'
-            : 'Want your kid to make their own? Describe any scene and get a fresh page in about 2 minutes.'}
-        </p>
-        <button
-          type="button"
-          onClick={handleDismiss}
-          aria-label="Dismiss"
-          className="shrink-0 -mt-1 -mr-1 p-1.5 text-text-muted hover:text-text-primary transition-colors"
-        >
-          <FontAwesomeIcon icon={faXmark} className="text-base" />
-        </button>
-      </div>
-      <Link
-        href={href}
-        onClick={handleClick}
+      <button
+        type="button"
+        onClick={handleDismiss}
+        aria-label="Dismiss"
         className={cn(
-          'mt-3 inline-flex items-center gap-2 rounded-full',
-          'bg-crayon-orange px-6 py-3 font-rooney-sans font-bold text-white',
-          'shadow-sm transition-transform hover:scale-[1.02] active:scale-95',
+          'absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full',
+          'text-text-muted hover:text-text-primary hover:bg-black/5',
+          'transition-colors',
         )}
       >
-        <FontAwesomeIcon icon={faWandMagicSparkles} className="text-lg" />
-        Make your own
-      </Link>
+        <FontAwesomeIcon icon={faXmark} className="text-base" />
+      </button>
+
+      <div className="pr-6">
+        <h3 className="font-tondo font-bold text-text-primary text-xl leading-tight">
+          {headline}
+        </h3>
+        <p className="mt-1.5 font-rooney-sans text-base text-text-secondary leading-snug">
+          {sub}
+        </p>
+      </div>
+
+      {/* SAME button as the /start hero "Try it free": shared <Button>
+          primitive, default variant, asChild + <Link>, wand icon. This
+          is intentionally the only saturated element in the card. */}
+      <Button
+        asChild
+        className="mt-5 h-auto w-full rounded-full px-7 py-3.5 text-base"
+      >
+        <Link href={href} onClick={handleClick}>
+          <FontAwesomeIcon icon={faWandMagicSparkles} className="text-lg" />
+          Make your own
+        </Link>
+      </Button>
     </div>
   );
 };

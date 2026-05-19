@@ -245,6 +245,35 @@
   }
 }
 
+/* /start post-engagement bridge entrance. Slides up from below with a
+ * slight overshoot then settles — same spring feel as the brand
+ * <Button> easing — so it reads as a confident "here's the fun next
+ * thing" rather than a quiet toast. */
+@keyframes bridge-in {
+  0%   { opacity: 0; transform: translateY(28px) scale(0.96); }
+  60%  { opacity: 1; transform: translateY(-6px) scale(1.01); }
+  80%  { transform: translateY(2px) scale(1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* One-time attention nudge a beat AFTER the card settles — the visitor
+ * is mid-colour when it appears, so a delayed gentle bob catches the
+ * eye without hijacking. Single iteration, not a loop. */
+@keyframes bridge-nudge {
+  0%, 100% { transform: translateY(0); }
+  40%      { transform: translateY(-5px); }
+  70%      { transform: translateY(-1px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes bridge-in {
+    0%, 100% { opacity: 1; transform: none; }
+  }
+  @keyframes bridge-nudge {
+    0%, 100% { transform: none; }
+  }
+}
+
 @keyframes slide-up-full {
   0% { transform: translateY(100%); }
   100% { transform: translateY(0); }
