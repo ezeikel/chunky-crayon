@@ -93,12 +93,19 @@ jobs:
     timeout-minutes: 25
     env:
       DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
-      # `next build` instantiates `new Stripe(process.env.STRIPE_SECRET!)`
-      # at module load during page-data collection; without it the build
-      # throws "Neither apiKey nor config.authenticator provided". This is
-      # the ONLY module-load env that hard-fails the build (audited:
-      # single `new X(process.env.Y!)` in lib/). It's a test-mode key.
+      # `next build` page-data collection imports modules that construct
+      # API clients at top level; the constructor throws if the key is
+      # missing. Audited across lib/ + app/ + utils/ — these are the ONLY
+      # module-load constructors that hard-fail the build:
+      #   lib/stripe.ts                       -> new Stripe(STRIPE_SECRET!)
+      #   app/actions/email.ts                -> new Resend(RESEND_API_KEY)
+      #   app/api/mobile/auth/magic-link/...  -> new Resend(RESEND_API_KEY)
+      # i.e. exactly two secrets (STRIPE_SECRET test-mode + RESEND). The
+      # other ~60 turbo.json env vars are runtime-only and don't break the
+      # build. If a new module adds another top-level `new X(env)`, the
+      # build will fail on that one next — add that single secret then.
       STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
