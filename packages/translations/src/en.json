@@ -274,6 +274,27 @@
       "enabled": "Community images enabled",
       "disabled": "Community images disabled"
     },
+    "modeAccess": {
+      "title": "Ways to create",
+      "description": "Your child always has the picture builder, which uses no typing, microphone or camera. You can unlock the other ways one at a time. This is set for the profile that is currently active.",
+      "text": {
+        "label": "Typing",
+        "description": "Your child types a description of what to draw."
+      },
+      "voice": {
+        "label": "Talking",
+        "description": "Your child records their voice to describe a scene. Uses the microphone."
+      },
+      "image": {
+        "label": "Photo",
+        "description": "Your child takes or chooses a photo to turn into a coloring page. Uses the camera."
+      },
+      "unlocked": "Unlocked",
+      "locked": "Locked",
+      "enableFailed": "Could not turn that on. Please try again.",
+      "enabledToast": "Unlocked",
+      "disabledToast": "Locked again"
+    },
     "languagePreference": {
       "title": "Language",
       "description": "Choose your preferred language for the app"

@@ -7,7 +7,9 @@ import SettingsForm from './SettingsForm';
 import LanguageSettings from './LanguageSettings';
 import AudioSettings from './AudioSettings';
 import EmailSettings from './EmailSettings';
+import ModeAccessSettings from './ModeAccessSettings';
 import { getUserSettings } from '@/app/actions/settings';
+import { getUnlockedModes } from '@/app/actions/scene';
 
 // Async component that handles auth, data fetching, and translations
 const SettingsContent = async () => {
@@ -17,9 +19,10 @@ const SettingsContent = async () => {
     redirect('/');
   }
 
-  const [t, settings] = await Promise.all([
+  const [t, settings, unlockedModes] = await Promise.all([
     getTranslations('settings'),
     getUserSettings(),
+    getUnlockedModes(),
   ]);
 
   return (
@@ -30,6 +33,7 @@ const SettingsContent = async () => {
         <LanguageSettings />
         <AudioSettings />
         <EmailSettings currentEmail={session.user.email ?? null} />
+        <ModeAccessSettings initialUnlockedModes={unlockedModes} />
         <SettingsForm initialSettings={settings} />
       </div>
     </>
