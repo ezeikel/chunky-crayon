@@ -132,6 +132,17 @@ export {
   type InputModeSelectorLabels,
 } from "./InputModeSelector";
 
+// Scene Builder — privacy-first default create surface
+export {
+  default as SceneBuilder,
+  type SceneBuilderProps,
+  type SceneBuilderLabels,
+  type SceneLayer,
+  type SceneTileOption,
+  type SceneTileDuotone,
+  type SceneSelection,
+} from "./SceneBuilder";
+
 // Async fill (Web Worker)
 export { asyncFloodFill, terminateFillWorker } from "./asyncFill";
 
