@@ -2,40 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSparkles,
   faStar,
-  faHelmetSafety,
-  faCrown,
-  faScarf,
-  faHatCowboy,
-  faPalette,
-  faMask,
-  faGlasses,
-  faDinosaur,
-  faFlower,
   faPartyHorn,
 } from '@fortawesome/pro-duotone-svg-icons';
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { ColoAvatar } from '@/components/ColoAvatar';
 import Confetti from '@/components/Confetti/Confetti';
 import Portal from '@/components/Portal';
 import type { ColoStage, EvolutionResult } from '@/lib/colo';
 import { COLO_STAGES, getAccessory } from '@/lib/colo';
-
-const getAccessoryIcon = (accessoryId: string): IconDefinition | null => {
-  if (accessoryId.includes('helmet')) return faHelmetSafety;
-  if (accessoryId.includes('crown')) return faCrown;
-  if (accessoryId.includes('scarf')) return faScarf;
-  if (accessoryId.includes('hat')) return faHatCowboy;
-  if (accessoryId.includes('beret')) return faPalette;
-  if (accessoryId.includes('cape')) return faMask;
-  if (accessoryId.includes('glasses')) return faGlasses;
-  if (accessoryId.includes('spikes')) return faDinosaur;
-  if (accessoryId.includes('flower')) return faFlower;
-  return null;
-};
 
 type ColoEvolutionCelebrationProps = {
   /** Evolution result from server action */
@@ -240,18 +218,15 @@ const ColoEvolutionCelebration = ({
                             exit={{ opacity: 0, scale: 0.8 }}
                             className="flex flex-col items-center gap-2"
                           >
-                            {/* Accessory icon placeholder */}
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-crayon-orange-light to-crayon-orange flex items-center justify-center text-2xl">
-                              {(() => {
-                                const accessoryIcon =
-                                  getAccessoryIcon(accessoryId);
-                                return accessoryIcon ? (
-                                  <FontAwesomeIcon
-                                    icon={accessoryIcon}
-                                    className="text-white"
-                                  />
-                                ) : null;
-                              })()}
+                            {/* Accessory item icon */}
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-crayon-orange-light to-crayon-orange flex items-center justify-center overflow-hidden">
+                              <Image
+                                src={accessory.imagePath}
+                                alt={accessory.name}
+                                width={64}
+                                height={64}
+                                className="w-full h-full object-contain p-1.5"
+                              />
                             </div>
                             <p className="font-tondo font-medium text-text-primary">
                               {accessory.name}

@@ -2,22 +2,11 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSparkles,
-  faTrophy,
-  faHelmetSafety,
-  faCrown,
-  faScarf,
-  faHatCowboy,
-  faPalette,
-  faMask,
-  faGlasses,
-  faDinosaur,
-  faFlower,
-} from '@fortawesome/pro-duotone-svg-icons';
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faSparkles, faTrophy } from '@fortawesome/pro-duotone-svg-icons';
 import { ColoAvatar } from '@/components/ColoAvatar';
+import { getAccessory } from '@/lib/colo';
 import type { ColoState } from '@/lib/colo';
 import {
   DropdownMenu,
@@ -25,19 +14,6 @@ import {
   DropdownMenuContent,
 } from '@/components/ui/dropdown-menu';
 import cn from '@/utils/cn';
-
-const getAccessoryIcon = (accessoryId: string): IconDefinition | null => {
-  if (accessoryId.includes('helmet')) return faHelmetSafety;
-  if (accessoryId.includes('crown')) return faCrown;
-  if (accessoryId.includes('scarf')) return faScarf;
-  if (accessoryId.includes('hat')) return faHatCowboy;
-  if (accessoryId.includes('beret')) return faPalette;
-  if (accessoryId.includes('cape')) return faMask;
-  if (accessoryId.includes('glasses')) return faGlasses;
-  if (accessoryId.includes('spikes')) return faDinosaur;
-  if (accessoryId.includes('flower')) return faFlower;
-  return null;
-};
 
 type HeaderColoIndicatorProps = {
   coloState: ColoState | null;
@@ -156,19 +132,21 @@ const HeaderColoIndicator = ({
             </p>
             <div className="flex flex-wrap gap-1">
               {coloState.accessories.slice(0, 6).map((accessoryId) => {
-                const accessoryIcon = getAccessoryIcon(accessoryId);
+                const accessory = getAccessory(accessoryId);
+                if (!accessory) return null;
                 return (
                   <span
                     key={accessoryId}
-                    className="w-6 h-6 rounded-full bg-crayon-orange-light/20 flex items-center justify-center text-xs"
-                    title={accessoryId}
+                    className="w-6 h-6 rounded-full bg-crayon-orange-light/20 flex items-center justify-center overflow-hidden"
+                    title={accessory.name}
                   >
-                    {accessoryIcon && (
-                      <FontAwesomeIcon
-                        icon={accessoryIcon}
-                        className="text-crayon-orange"
-                      />
-                    )}
+                    <Image
+                      src={accessory.imagePath}
+                      alt={accessory.name}
+                      width={24}
+                      height={24}
+                      className="w-full h-full object-contain p-0.5"
+                    />
                   </span>
                 );
               })}
