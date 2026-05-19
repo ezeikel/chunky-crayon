@@ -84,28 +84,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: e2e-precheck
     if: ${{ needs.e2e-precheck.outputs.has_db == 'true' }}
-    # Non-blocking: surface failures without making the whole run red
-    # while e2e depends on a seeded DB + heavy build.
+    # Non-blocking: surface failures without making the whole run red.
     continue-on-error: true
-    # Hard ceiling — install + Playwright download + Next build + the
-    # specs themselves. If this is exceeded something is wedged; kill it
-    # rather than let it run for hours.
-    timeout-minutes: 25
+    # Hard ceiling — install + Playwright download + dev-server compile +
+    # the specs. If exceeded something is wedged; kill it rather than let
+    # it run for hours.
+    timeout-minutes: 20
     env:
       DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
-      # `next build` page-data collection imports modules that construct
-      # API clients at top level; the constructor throws if the key is
-      # missing. Audited across lib/ + app/ + utils/ — these are the ONLY
-      # module-load constructors that hard-fail the build:
-      #   lib/stripe.ts                       -> new Stripe(STRIPE_SECRET!)
-      #   app/actions/email.ts                -> new Resend(RESEND_API_KEY)
-      #   app/api/mobile/auth/magic-link/...  -> new Resend(RESEND_API_KEY)
-      # i.e. exactly two secrets (STRIPE_SECRET test-mode + RESEND). The
-      # other ~60 turbo.json env vars are runtime-only and don't break the
-      # build. If a new module adds another top-level `new X(env)`, the
-      # build will fail on that one next — add that single secret then.
-      STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -144,27 +130,36 @@ jobs:
         working-directory: ./apps/chunky-crayon-web
         run: pnpm exec playwright install-deps chromium
 
-      # MUST run before the seed step: @one-colored-pixel/db (and the
-      # other workspace packages) export from dist/, which only exists
-      # after a tsc build. `pnpm build:web` builds the package dependency
-      # graph via turbo AND the Next app, so it covers both the seed
-      # script's `import('@one-colored-pixel/db')` and `pnpm start`.
-      # Without this the seed fails with ERR_MODULE_NOT_FOUND on db/dist.
-      - name: Build chunky-crayon-web (+ workspace packages)
-        run: pnpm build:web
+      # We run the specs against `next dev`, NOT a production build.
+      # Rationale: a full `next build` of this 3437-page app does
+      # page-data collection that imports modules constructing API
+      # clients (Stripe, Resend, PostHog, …) at top level — each throws
+      # on a missing key, so a CI build needs ~most of the 60-var prod
+      # env. `next dev` compiles routes on demand and tolerates missing
+      # env, which is exactly how these specs are verified locally. For a
+      # non-blocking smoke job this is the right trade.
+      #
+      # Both `next dev` AND the seed script need the workspace packages
+      # built — they export from dist/ (tsc output), and `pnpm install`
+      # only runs `prisma generate`, not the package tsc builds. Build
+      # exactly the 7 packages the web app depends on, NOT the Next app
+      # itself (`^...` = dependencies-of, excluding the package). This is
+      # ~30s of tsc, vs the ~2min full prod build we're avoiding.
+      - name: Build workspace packages (deps of the web app)
+        run: pnpm exec turbo run build --filter=@one-colored-pixel/chunky-crayon-web^...
 
       - name: Seed Playwright test user
         working-directory: ./apps/chunky-crayon-web
         run: pnpm tsx scripts/seed-test-user.ts
 
-      - name: Run Playwright tests
+      - name: Run Playwright tests (against next dev)
         env:
           CI: 'true'
           PLAYWRIGHT_BASE_URL: 'http://localhost:3000'
         working-directory: ./apps/chunky-crayon-web
         run: |
-          pnpm start &
-          npx wait-on http://localhost:3000 --timeout 120000
+          pnpm dev > /tmp/dev.log 2>&1 &
+          npx wait-on http://localhost:3000 --timeout 180000
           pnpm test:e2e
 
       - name: Upload Playwright report
