@@ -42,6 +42,8 @@ export default defineConfig({
         'lib/bundle-download-token.ts',
         'lib/unsubscribe.ts',
         'lib/social/buffer.ts',
+        'lib/scene/build-scene-description.ts',
+        'lib/scene/random-scene.ts',
       ],
     },
   },
