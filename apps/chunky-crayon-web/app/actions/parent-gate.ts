@@ -8,6 +8,7 @@
  *   - createCharacter (Phase 2)
  *   - generateCustomVoiceLine (Phase 4)
  *   - deleteCharacter (any phase)
+ *   - setModeUnlocked (Scene Builder: unlocking text/voice/image input)
  *
  * Why HMAC and not just a DB row: the gate is asked many times, fast, and
  * across surfaces that don't all share a session storage layer. Stateless
@@ -35,7 +36,8 @@ const TTL_SECONDS = 5 * 60; // 5 minutes
 export type ParentGateScope =
   | 'character:create'
   | 'character:delete'
-  | 'character:voice-custom';
+  | 'character:voice-custom'
+  | 'modes:unlock';
 
 type Payload = {
   uid: string;
