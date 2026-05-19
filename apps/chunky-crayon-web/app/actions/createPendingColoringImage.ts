@@ -42,6 +42,11 @@ import {
 } from '@/lib/coloring-worker';
 import { moderateVoiceText } from '@/lib/moderation';
 import {
+  assertTrialSpendAllowed,
+  TrialSpendCapError,
+} from '@/lib/trial-spend-guard';
+import { TRIAL_GENERATION_CAP } from '@/lib/trial-policy';
+import {
   generateQuickTitleFromVoice,
   generateQuickTitleFromPhoto,
 } from '@/app/actions/quickTitle';
@@ -104,6 +109,7 @@ export type CreatePendingResult =
         | 'invalid_input'
         | 'moderation_blocked'
         | 'insufficient_credits'
+        | 'trial_cap_reached'
         | 'worker_unavailable'
         | 'character_not_ready'
         | 'unknown';
@@ -115,18 +121,35 @@ export type CreatePendingResult =
 // Helpers
 // ----------------------------------------------------------------------------
 
-const debitCredits = async (userId: string, amount: number): Promise<void> => {
-  await db.user.update({
-    where: { id: userId },
-    data: { credits: { decrement: amount } },
-  });
-  await db.creditTransaction.create({
-    data: {
-      userId,
-      amount: -amount,
-      type: CreditTransactionType.GENERATION,
-    },
-  });
+// Returns false when blocked by the unpaid-trial spend cap. Debit +
+// audit-row now run in one tx (previously two separate writes) with the
+// cap checked inside it before the decrement, so count+debit are atomic.
+const debitCredits = async (
+  userId: string,
+  amount: number,
+): Promise<{ ok: true } | { ok: false; capped: true }> => {
+  try {
+    await db.$transaction(async (tx) => {
+      await assertTrialSpendAllowed(tx, userId);
+      await tx.user.update({
+        where: { id: userId },
+        data: { credits: { decrement: amount } },
+      });
+      await tx.creditTransaction.create({
+        data: {
+          userId,
+          amount: -amount,
+          type: CreditTransactionType.GENERATION,
+        },
+      });
+    });
+  } catch (error) {
+    if (error instanceof TrialSpendCapError) {
+      return { ok: false, capped: true };
+    }
+    throw error;
+  }
+  return { ok: true };
 };
 
 const refundCredits = async (userId: string, amount: number): Promise<void> => {
@@ -238,7 +261,15 @@ export const createPendingColoringImage = async (
       };
     }
     isSubscriber = user.subscriptions.length > 0;
-    await debitCredits(userId, cost);
+    const debit = await debitCredits(userId, cost);
+    if (!debit.ok) {
+      return {
+        ok: false,
+        error: 'trial_cap_reached',
+        message: `Your free trial includes ${TRIAL_GENERATION_CAP} creations. Add a payment method to keep creating.`,
+        credits: user.credits,
+      };
+    }
   }
 
   // Resolve final quality. If the user passed one, clamp it to what their

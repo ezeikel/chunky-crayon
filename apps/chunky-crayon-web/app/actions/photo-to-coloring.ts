@@ -26,6 +26,11 @@ import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 import { requestAllPipelineFromWorker } from '@/lib/worker';
+import {
+  assertTrialSpendAllowed,
+  TrialSpendCapError,
+} from '@/lib/trial-spend-guard';
+import { TRIAL_GENERATION_CAP } from '@/lib/trial-policy';
 
 const LOCALE_LANGUAGE_MAP: Record<
   string,
@@ -313,31 +318,46 @@ export async function createColoringImageFromPhoto(
       };
     }
 
-    const result = await db.$transaction(
-      async (tx) => {
-        await tx.user.update({
-          where: { id: userId },
-          data: { credits: { decrement: 5 } },
-        });
+    let result;
+    try {
+      result = await db.$transaction(
+        async (tx) => {
+          // Unpaid-trial spend cap (inside tx, before debit/generation —
+          // see createColoringImage for the race rationale).
+          await assertTrialSpendAllowed(tx, userId);
 
-        await tx.creditTransaction.create({
-          data: {
+          await tx.user.update({
+            where: { id: userId },
+            data: { credits: { decrement: 5 } },
+          });
+
+          await tx.creditTransaction.create({
+            data: {
+              userId,
+              amount: -5,
+              type: CreditTransactionType.GENERATION,
+            },
+          });
+
+          return generatePhotoColoringImageWithMetadata(
+            photoBase64,
             userId,
-            amount: -5,
-            type: CreditTransactionType.GENERATION,
-          },
-        });
-
-        return generatePhotoColoringImageWithMetadata(
-          photoBase64,
-          userId,
-          locale,
-        );
-      },
-      {
-        timeout: 180000,
-      },
-    );
+            locale,
+          );
+        },
+        {
+          timeout: 180000,
+        },
+      );
+    } catch (error) {
+      if (error instanceof TrialSpendCapError) {
+        return {
+          error: `Your free trial includes ${TRIAL_GENERATION_CAP} creations. Add a payment method to keep creating.`,
+          credits: user?.credits ?? 0,
+        };
+      }
+      throw error;
+    }
 
     const authedDurationMs = Date.now() - startedAt;
     // Fire pipeline before returning — see lib/worker.ts comment.

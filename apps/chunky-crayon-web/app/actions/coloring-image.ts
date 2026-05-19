@@ -38,6 +38,11 @@ import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { checkSvgImage, retraceImage, traceImage } from '@/utils/traceImage';
 import { requestAllPipelineFromWorker } from '@/lib/worker';
+import {
+  assertTrialSpendAllowed,
+  TrialSpendCapError,
+} from '@/lib/trial-spend-guard';
+import { TRIAL_GENERATION_CAP } from '@/lib/trial-policy';
 
 // Worker fire-and-forget helpers live in @/lib/worker so this action
 // and the photo-to-coloring action both share the same implementation.
@@ -343,37 +348,54 @@ export const createColoringImage = async (
     }
 
     // use a transaction to deduct credits and create the coloring image
-    const result = await db.$transaction(
-      async (tx) => {
-        // deduct credits
-        await tx.user.update({
-          where: { id: userId },
-          data: { credits: { decrement: 5 } },
-        });
+    let result;
+    try {
+      result = await db.$transaction(
+        async (tx) => {
+          // Unpaid-trial spend cap. Runs inside the tx and BEFORE the
+          // decrement/generation so a capped user fails fast without
+          // burning a gpt-image-2 call, and so the count+debit are atomic
+          // (closes the concurrent-generation race).
+          await assertTrialSpendAllowed(tx, userId);
 
-        // create credit transaction record
-        await tx.creditTransaction.create({
-          data: {
+          // deduct credits
+          await tx.user.update({
+            where: { id: userId },
+            data: { credits: { decrement: 5 } },
+          });
+
+          // create credit transaction record
+          await tx.creditTransaction.create({
+            data: {
+              userId,
+              amount: -5,
+              type: CreditTransactionType.GENERATION,
+            },
+          });
+
+          return generateColoringImageWithMetadata(
+            rawFormData.description,
             userId,
-            amount: -5,
-            type: CreditTransactionType.GENERATION,
-          },
-        });
-
-        return generateColoringImageWithMetadata(
-          rawFormData.description,
-          userId,
-          rawFormData.generationType,
-          rawFormData.locale,
-          rawFormData.description,
-          rawFormData.clientDistinctId,
-          rawFormData.purposeKey,
-        );
-      },
-      {
-        timeout: 120000, // 2 minutes for DALL-E image generation
-      },
-    );
+            rawFormData.generationType,
+            rawFormData.locale,
+            rawFormData.description,
+            rawFormData.clientDistinctId,
+            rawFormData.purposeKey,
+          );
+        },
+        {
+          timeout: 120000, // 2 minutes for DALL-E image generation
+        },
+      );
+    } catch (error) {
+      if (error instanceof TrialSpendCapError) {
+        return {
+          error: `Your free trial includes ${TRIAL_GENERATION_CAP} creations. Add a payment method to keep creating.`,
+          credits: user?.credits ?? 0,
+        };
+      }
+      throw error;
+    }
 
     const durationMs = Date.now() - startedAt;
 
@@ -724,35 +746,50 @@ export const createColoringImageFromVoiceConversation = async (opts: {
 
   // Same transactional credit-debit + generation pattern as `createColoringImage`.
   // `purposeKey: 'voice'` flags voice-sourced rows for analytics/admin.
-  const result = await db.$transaction(
-    async (tx) => {
-      await tx.user.update({
-        where: { id: userId },
-        data: { credits: { decrement: VOICE_CREDIT_COST } },
-      });
+  let result;
+  try {
+    result = await db.$transaction(
+      async (tx) => {
+        // Unpaid-trial spend cap (inside tx, before debit — see
+        // createColoringImage for the race/why).
+        await assertTrialSpendAllowed(tx, userId);
 
-      await tx.creditTransaction.create({
-        data: {
+        await tx.user.update({
+          where: { id: userId },
+          data: { credits: { decrement: VOICE_CREDIT_COST } },
+        });
+
+        await tx.creditTransaction.create({
+          data: {
+            userId,
+            amount: -VOICE_CREDIT_COST,
+            type: CreditTransactionType.GENERATION,
+          },
+        });
+
+        return generateColoringImageWithMetadata(
+          description,
           userId,
-          amount: -VOICE_CREDIT_COST,
-          type: CreditTransactionType.GENERATION,
-        },
-      });
-
-      return generateColoringImageWithMetadata(
-        description,
-        userId,
-        GenerationType.USER,
-        opts.locale ?? 'en',
-        description, // sourcePrompt — also the description for voice
-        opts.clientDistinctId,
-        'voice', // purposeKey — splits voice gens from text/image
-      );
-    },
-    {
-      timeout: 120000,
-    },
-  );
+          GenerationType.USER,
+          opts.locale ?? 'en',
+          description, // sourcePrompt — also the description for voice
+          opts.clientDistinctId,
+          'voice', // purposeKey — splits voice gens from text/image
+        );
+      },
+      {
+        timeout: 120000,
+      },
+    );
+  } catch (error) {
+    if (error instanceof TrialSpendCapError) {
+      return {
+        error: `Your free trial includes ${TRIAL_GENERATION_CAP} creations. Add a payment method to keep creating.`,
+        credits: user?.credits ?? 0,
+      };
+    }
+    throw error;
+  }
 
   const durationMs = Date.now() - startedAt;
 

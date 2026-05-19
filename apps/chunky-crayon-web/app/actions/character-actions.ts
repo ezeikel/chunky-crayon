@@ -36,6 +36,10 @@ import {
   type PresetSlot,
 } from '@/lib/characters/voice-lines';
 import {
+  assertTrialSpendAllowed,
+  TrialSpendCapError,
+} from '@/lib/trial-spend-guard';
+import {
   ALL_OUTFIT_KEYS,
   getOutfit,
   type OutfitKey,
@@ -83,7 +87,9 @@ const fetchOwnedCharacter = async (id: string) => {
 const debitCredits = async (
   userId: string,
   amount: number,
-): Promise<{ ok: true } | { ok: false; balance: number }> => {
+): Promise<
+  { ok: true } | { ok: false; balance: number } | { ok: false; capped: true }
+> => {
   const user = await db.user.findUnique({
     where: { id: userId },
     select: { credits: true },
@@ -91,17 +97,31 @@ const debitCredits = async (
   if (!user || user.credits < amount) {
     return { ok: false, balance: user?.credits ?? 0 };
   }
-  await db.user.update({
-    where: { id: userId },
-    data: { credits: { decrement: amount } },
-  });
-  await db.creditTransaction.create({
-    data: {
-      userId,
-      amount: -amount,
-      type: CreditTransactionType.GENERATION,
-    },
-  });
+  // Debit + transaction-row in one tx (previously two separate writes that
+  // could leave credits decremented with no audit row). The unpaid-trial
+  // cap is checked inside the same tx before the decrement so the
+  // count+debit are atomic.
+  try {
+    await db.$transaction(async (tx) => {
+      await assertTrialSpendAllowed(tx, userId);
+      await tx.user.update({
+        where: { id: userId },
+        data: { credits: { decrement: amount } },
+      });
+      await tx.creditTransaction.create({
+        data: {
+          userId,
+          amount: -amount,
+          type: CreditTransactionType.GENERATION,
+        },
+      });
+    });
+  } catch (error) {
+    if (error instanceof TrialSpendCapError) {
+      return { ok: false, capped: true };
+    }
+    throw error;
+  }
   return { ok: true };
 };
 
@@ -161,6 +181,7 @@ export type GenerateCustomVoiceLineResult =
         | 'parent_gate_required'
         | 'moderation_blocked'
         | 'insufficient_credits'
+        | 'trial_cap_reached'
         | 'synthesis_failed';
       balance?: number;
     };
@@ -190,6 +211,9 @@ export const generateCustomVoiceLine = async (
   const cost = CHARACTER_LIMITS.CUSTOM_VOICE_CREDIT_COST;
   const debit = await debitCredits(found.userId, cost);
   if (!debit.ok) {
+    if ('capped' in debit) {
+      return { ok: false, error: 'trial_cap_reached' };
+    }
     return {
       ok: false,
       error: 'insufficient_credits',
@@ -223,7 +247,8 @@ export type UnlockOutfitResult =
         | 'not_found'
         | 'invalid_input'
         | 'already_unlocked'
-        | 'insufficient_credits';
+        | 'insufficient_credits'
+        | 'trial_cap_reached';
       balance?: number;
     };
 
@@ -259,6 +284,9 @@ export const unlockOutfit = async (
 
   const debit = await debitCredits(found.userId, outfit.unlockCost);
   if (!debit.ok) {
+    if ('capped' in debit) {
+      return { ok: false, error: 'trial_cap_reached' };
+    }
     return {
       ok: false,
       error: 'insufficient_credits',

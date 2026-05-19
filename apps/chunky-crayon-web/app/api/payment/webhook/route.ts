@@ -30,6 +30,7 @@ import {
   sendSubscribeConversionEvents,
 } from '@/lib/conversion-api';
 import { fulfilBundlePurchase } from '@/app/actions/bundle-fulfilment';
+import { reclaimTarget, shouldReclaim } from '@/lib/trial-policy';
 
 // Check if webhook event has already been processed (idempotency)
 const isEventProcessed = async (eventId: string): Promise<boolean> => {
@@ -576,6 +577,39 @@ export const POST = async (req: Request) => {
         status: SubscriptionStatus.CANCELLED,
       },
     });
+
+    // Reclaim unspent plan credits when a trial cancels/lapses WITHOUT ever
+    // paying. Closes the second half of the trial loophole: an account that
+    // started a trial (full plan credits granted up front), used some, then
+    // cancelled before any payment should not keep a year's worth of
+    // credits. Only fires when the subscription was still TRIALING at
+    // deletion — a converted/paying customer's row is ACTIVE and is left
+    // untouched. Idempotent: shouldReclaim() is false once the balance is
+    // already at/under the free baseline, so a re-delivered webhook is a
+    // no-op. Reclaim is also bounded by reclaimTarget so we never zero a
+    // legitimate free balance.
+    if (
+      existingSubscription &&
+      existingSubscription.status === SubscriptionStatus.TRIALING &&
+      shouldReclaim(existingSubscription.user.credits)
+    ) {
+      const target = reclaimTarget(existingSubscription.user.credits);
+      const delta = target - existingSubscription.user.credits; // negative
+      await db.$transaction([
+        db.user.update({
+          where: { id: existingSubscription.userId },
+          data: { credits: target },
+        }),
+        db.creditTransaction.create({
+          data: {
+            userId: existingSubscription.userId,
+            amount: delta,
+            type: CreditTransactionType.ADJUSTMENT,
+            reference: `trial-reclaim:${subscription.id}`,
+          },
+        }),
+      ]);
+    }
 
     // Track subscription cancelled event
     if (existingSubscription) {

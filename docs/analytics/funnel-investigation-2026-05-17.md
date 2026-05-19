@@ -222,3 +222,49 @@ backup, Stripe Billing Portal self-serve cancel/manage, an email-change action
 with new-address verification, and feedback-widget identity capture. The
 session-from-`session_id` path carries an account-hijack risk (the redirect URL
 is the only trust bearer) and gets a mandatory security review before merge.
+
+(Shipped 2026-05-18. Magic-link-only option chosen, no session minted from
+the URL. Also discovered the live Stripe account had NO Billing Portal config
+at all, so self-serve cancel had never worked in prod; created
+`bpc_1TYYY8K6qKjkWA8MqNwTzy9D`.)
+
+---
+
+# Addendum 2 — trial-abuse loophole (2026-05-19)
+
+The first customer also exposed a money leak: a 7-day trial grants the FULL
+plan credit allotment up front (SPARKLE = 1000). Nothing reclaimed on cancel,
+no cap on spend during the trial. So anyone can start a trial, burn ~1000 real
+gpt-image-2 generations (each a real API bill) in 7 days, cancel, pay £0, and
+repeat with a fresh email. Lisa herself was low-risk (gone, won't sign in) but
+the class is live now that paid ads drive real cold signups.
+
+Fix shipped (plan: `~/.claude/plans/cc-trial-abuse-cap-and-reclaim.md`):
+
+1. Unpaid-trial spend cap = 10 credit-debiting actions until first successful
+   payment. Full credits still granted at trial start (keeps trial UX simple);
+   the cap is an independent gate on spend. The cap, not the reclaim, is what
+   actually closes the loophole, an abuser cannot spend past 10 even though
+   the balance reads 1000.
+2. Reclaim on cancel/lapse-without-payment: a still-TRIALING (never converted)
+   subscription being deleted resets `user.credits` to `FREE_CREDITS` (15),
+   never below, with an `ADJUSTMENT` audit row. Paying (ACTIVE) customers who
+   cancel are untouched.
+
+Where it lives: pure policy in `lib/trial-policy.ts` (unit-tested); DB
+enforcement in `lib/trial-spend-guard.ts` (`assertTrialSpendAllowed`) called
+inside the `$transaction` at all 5 credit-debit sites (`coloring-image.ts` x2,
+`photo-to-coloring.ts`, `character-actions.ts`, `createPendingColoringImage.ts`
+, the last two were made transactional in the process, fixing a latent
+decrement-without-audit-row bug); reclaim in the `customer.subscription.deleted`
+handler in `app/api/payment/webhook/route.ts`.
+
+Concurrency: the guard takes `SELECT ... FOR UPDATE` on the user row at the top
+of the transaction, serializing all credit-affecting txns per user. This closes
+the cap race AND the pre-existing credit-balance overspend race for the trial
+path (the `user.credits < N` precheck is outside the tx).
+
+Known NOT closed (logged, out of scope): re-registering with a fresh email
+gets another 10-action trial. True one-trial-per-person (card fingerprint /
+Stripe trial eligibility) is a separate, larger piece. The loophole is now
+~10 API calls per throwaway email, not ~1000.
