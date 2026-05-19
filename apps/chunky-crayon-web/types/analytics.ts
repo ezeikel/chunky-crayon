@@ -50,7 +50,7 @@ export type EventProperties = {
   };
   [TRACKING_EVENTS.CREATION_SUBMITTED]: {
     description: string;
-    inputType: 'text' | 'voice' | 'image';
+    inputType: 'scene' | 'text' | 'voice' | 'image';
     characterCount: number;
   };
   [TRACKING_EVENTS.EXAMPLE_PROMPT_CLICKED]: {

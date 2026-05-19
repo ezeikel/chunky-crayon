@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useFeatureFlagEnabled } from 'posthog-js/react';
@@ -16,6 +16,7 @@ import { createPendingColoringImage } from '@/app/actions/createPendingColoringI
 import {
   InputModeProvider,
   InputModeSelector,
+  SceneInput,
   TextInput,
   VoiceInput,
   ImageInput,
@@ -23,6 +24,7 @@ import {
   useInputMode,
   type InputMode,
 } from './inputs';
+import { getUnlockedModes, type GateableMode } from '@/app/actions/scene';
 import FormCTA from './FormCTA';
 import QualityPicker from './QualityPicker/QualityPicker';
 import CharacterPicker from './CharacterPicker/CharacterPicker';
@@ -86,6 +88,30 @@ const MultiModeForm = ({
     charactersFeatureFlag || process.env.NODE_ENV === 'development';
   const showCharacterPicker = !isGuest && charactersFeatureEnabled;
   const [characterId, setCharacterId] = useState<string | null>(null);
+
+  // Scene mode mirrors its built description into InputModeContext (see
+  // SceneInput) so it rides the same `description` + `isReady` path as
+  // text mode — that's what enables FormCTA. Only the character mix-in
+  // is scene-specific; the shared context has no slot for it.
+  const [sceneCharacterId, setSceneCharacterId] = useState<string | null>(null);
+
+  // Per-profile unlocked modes (Scene is always available, not listed).
+  // Guests never have a profile to gate against, so the gateable modes
+  // stay locked and the lock badge nudges them to sign in.
+  const [unlockedModes, setUnlockedModes] = useState<GateableMode[]>([]);
+  useEffect(() => {
+    if (isGuest) {
+      setUnlockedModes([]);
+      return;
+    }
+    let cancelled = false;
+    void getUnlockedModes().then((modes) => {
+      if (!cancelled) setUnlockedModes(modes);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isGuest]);
 
   /**
    * Common post-success bookkeeping: tracking, recents, gallery
@@ -182,7 +208,11 @@ const MultiModeForm = ({
                 description: desc,
                 locale,
                 quality,
-                characterId: characterId ?? undefined,
+                // Scene mode mixes in its own (sentinel-driven) character;
+                // text mode uses the CharacterPicker selection.
+                characterId:
+                  (inputType === 'scene' ? sceneCharacterId : characterId) ??
+                  undefined,
               });
 
         if (!result.ok) {
@@ -198,22 +228,36 @@ const MultiModeForm = ({
       ref={formRef}
       className={cn('flex flex-col gap-y-4', className)}
     >
-      {/* Hidden inputs for form submission */}
+      {/* Hidden inputs for form submission. Scene mirrors its built
+          description into InputModeContext (see SceneInput), so all modes
+          submit the same `description`; scene rides the text pipeline. */}
       <input type="hidden" name="inputType" value={mode} />
       <input type="hidden" name="description" value={description} />
       <input type="hidden" name="locale" value={locale} />
 
       {/* Input mode selector */}
-      <InputModeSelector />
+      <InputModeSelector
+        unlockedModes={unlockedModes}
+        onModeUnlocked={(m) =>
+          setUnlockedModes((prev) => (prev.includes(m) ? prev : [...prev, m]))
+        }
+        isGuest={isGuest}
+      />
 
       {/* Character picker — gated by `characters-feature` PostHog flag.
-          Hidden on photo mode because the photo IS the reference image
-          there (see createPendingColoringImage comment for context). */}
-      {showCharacterPicker && mode !== 'image' && (
+          Hidden on photo mode (the photo IS the reference image) and on
+          scene mode (scene mixes a character in via its own sentinel
+          tile, so a second picker would be redundant + conflicting). */}
+      {showCharacterPicker && mode !== 'image' && mode !== 'scene' && (
         <CharacterPicker value={characterId} onChange={setCharacterId} />
       )}
 
       {/* Render active input based on mode */}
+      {mode === 'scene' && (
+        <SceneInput
+          onChange={({ characterId: cId }) => setSceneCharacterId(cId)}
+        />
+      )}
       {mode === 'text' && <TextInput />}
       {mode === 'voice' && (
         <VoiceInput
@@ -300,6 +344,15 @@ const CreateColoringPageForm = ({
 }: CreateColoringPageFormProps) => {
   const isLarge = size === 'large';
 
+  // Default-mode flip is a flag-gated ramp (PostHog 'scene-builder-default',
+  // dev-on). When on, the form opens on the privacy-first Scene Builder
+  // with text/voice/image locked behind the parent gate. When off, it
+  // keeps the legacy 'text' default so the rollout is measurable, not a
+  // hard cutover for every existing user.
+  const sceneFlag = useFeatureFlagEnabled('scene-builder-default');
+  const sceneBuilderDefault =
+    sceneFlag || process.env.NODE_ENV === 'development';
+
   return (
     <div
       className={cn(
@@ -307,7 +360,7 @@ const CreateColoringPageForm = ({
         isLarge ? 'max-w-2xl' : 'max-w-lg',
       )}
     >
-      <InputModeProvider>
+      <InputModeProvider initialMode={sceneBuilderDefault ? 'scene' : 'text'}>
         <MultiModeForm className={className} location={location} />
       </InputModeProvider>
     </div>

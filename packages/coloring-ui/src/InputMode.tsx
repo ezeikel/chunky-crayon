@@ -15,7 +15,12 @@ import {
  * its own brand-specific input shells and server actions.
  */
 
-export type InputMode = "text" | "voice" | "image";
+/**
+ * "scene" is the privacy-first Scene Builder — the default create mode
+ * (no free-text / mic / camera). text / voice / image are gateable and
+ * locked per child profile until a parent unlocks them.
+ */
+export type InputMode = "scene" | "text" | "voice" | "image";
 
 export type InputModeState = {
   mode: InputMode;

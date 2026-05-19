@@ -10,6 +10,7 @@ export {
 
 // Input Components
 export { default as InputModeSelector } from './InputModeSelector';
+export { default as SceneInput } from './SceneInput';
 export { default as TextInput } from './TextInput';
 export { default as VoiceInput } from './VoiceInput';
 export { default as ImageInput } from './ImageInput';

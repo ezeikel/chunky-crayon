@@ -1252,10 +1252,74 @@
     "exampleDragon": "A dragon and bunny having a tea party",
     "exampleFoxes": "A family of foxes having a picnic",
     "inputModes": {
+      "scene": "Build",
       "type": "Type",
       "talk": "Talk",
       "photo": "Photo",
-      "ariaLabel": "Input mode selection"
+      "ariaLabel": "Input mode selection",
+      "lockedSuffix": "(ask a grown-up)"
+    },
+    "scene": {
+      "ariaLabel": "Build your picture",
+      "surpriseMe": "Surprise me!",
+      "lockedMakeCharacter": "(make a character first)",
+      "subjectMyCharacter": "My Character",
+      "subjectTitle": "Who's in your picture?",
+      "locationTitle": "Where are they?",
+      "weatherTitle": "What's the weather?",
+      "activityTitle": "What are they doing?",
+      "accentTitle": "Add a little extra",
+      "subject": {
+        "horse": "Horse",
+        "cow": "Cow",
+        "sheep": "Sheep",
+        "dog": "Dog",
+        "cat": "Cat",
+        "fox": "Fox",
+        "lion": "Lion",
+        "fish": "Fish",
+        "dragon": "Dragon",
+        "bird": "Bird",
+        "kid": "Kid",
+        "astronaut": "Astronaut"
+      },
+      "location": {
+        "beach": "Beach",
+        "sea": "At Sea",
+        "football-game": "Football",
+        "busy-street": "Busy Street",
+        "shopping-mall": "Mall",
+        "desert-island": "Island",
+        "forest": "Forest",
+        "mountains": "Mountains",
+        "train-station": "Station"
+      },
+      "weather": {
+        "sunny": "Sunny",
+        "snowy": "Snowy",
+        "rainy": "Rainy",
+        "night": "Night",
+        "rainbow": "Rainbow",
+        "cloudy": "Cloudy"
+      },
+      "activity": {
+        "playing": "Playing",
+        "sleeping": "Sleeping",
+        "running": "Running",
+        "swimming": "Swimming",
+        "flying-a-kite": "Kite",
+        "riding-a-bike": "Biking",
+        "having-a-picnic": "Picnic",
+        "dancing": "Dancing"
+      },
+      "accent": {
+        "birthday": "Birthday",
+        "sparkles": "Sparkles",
+        "underwater-bubbles": "Bubbles",
+        "flowers": "Flowers",
+        "space-stars": "Stars",
+        "balloons": "Balloons"
+      }
     },
     "voiceInput": {
       "startRecording": "Start recording",
