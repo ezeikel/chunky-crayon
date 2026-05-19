@@ -1,12 +1,17 @@
 name: Tests
 
 # Unit tests run on every push to main and on PRs — fast, no infra.
-# Playwright e2e runs in a separate job (built app + seeded DB + browsers).
+# Playwright e2e runs in a separate, gated, non-blocking job (it needs a
+# built app + seeded DB + browsers, so it's inherently slower).
 #
 # Posture (2026-05): the repo pushes straight to main with no branch
 # protection, so neither job *blocks* a merge today. They exist to make a
 # red test loud and to be ready the day PRs/branch protection are turned
 # on. When that happens, mark the `unit` job required in branch settings.
+#
+# Every job has an explicit timeout — a hung step must die fast, not run
+# until GitHub's 6h default (that's what forced a manual cancel the first
+# time this shipped).
 
 on:
   push:
@@ -26,6 +31,7 @@ jobs:
   unit:
     name: Unit tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -46,17 +52,19 @@ jobs:
 
       # turbo's `test` task depends on `db:generate`; prisma generate needs
       # only the schema (the datasource has no url=env(...)), so no DB
-      # secret is required here.
+      # secret is required here. Vitest imports package src/ directly, so
+      # the workspace packages do NOT need to be tsc-built for unit tests.
       - name: Run unit tests
         run: pnpm test
 
-  # Gate e2e on the seed DB secret existing. Without it the job is a
-  # no-op (green, skipped steps) rather than a confusing red — until you
-  # add a PLAYWRIGHT_DATABASE_URL secret pointing at a throwaway Neon
-  # branch, e2e simply doesn't run.
+  # Gate e2e on the seed DB secret existing. Without it the job is skipped
+  # (the run stays green) rather than a confusing red — until a
+  # PLAYWRIGHT_DATABASE_URL secret (a throwaway Neon branch forked from
+  # dev) exists, e2e simply doesn't run.
   e2e-precheck:
     name: e2e precheck
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     outputs:
       has_db: ${{ steps.check.outputs.has_db }}
     steps:
@@ -76,9 +84,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: e2e-precheck
     if: ${{ needs.e2e-precheck.outputs.has_db == 'true' }}
-    # Don't gate merges on e2e while it depends on a seeded DB — surface
-    # failures without making the whole run red.
+    # Non-blocking: surface failures without making the whole run red
+    # while e2e depends on a seeded DB + heavy build.
     continue-on-error: true
+    # Hard ceiling — install + Playwright download + Next build + the
+    # specs themselves. If this is exceeded something is wedged; kill it
+    # rather than let it run for hours.
+    timeout-minutes: 25
     env:
       DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
     steps:
@@ -99,16 +111,38 @@ jobs:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: pnpm install --frozen-lockfile
 
+      # Cache the Playwright browser download (~290 MB of chromium +
+      # headless shell + ffmpeg) keyed on the playwright version in the
+      # lockfile. First run is slow; every run after is a cache hit.
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Install Playwright browsers
+        if: steps.pw-cache.outputs.cache-hit != 'true'
         working-directory: ./apps/chunky-crayon-web
         run: pnpm exec playwright install --with-deps chromium
+
+      - name: Install Playwright system deps (cache hit path)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        working-directory: ./apps/chunky-crayon-web
+        run: pnpm exec playwright install-deps chromium
+
+      # MUST run before the seed step: @one-colored-pixel/db (and the
+      # other workspace packages) export from dist/, which only exists
+      # after a tsc build. `pnpm build:web` builds the package dependency
+      # graph via turbo AND the Next app, so it covers both the seed
+      # script's `import('@one-colored-pixel/db')` and `pnpm start`.
+      # Without this the seed fails with ERR_MODULE_NOT_FOUND on db/dist.
+      - name: Build chunky-crayon-web (+ workspace packages)
+        run: pnpm build:web
 
       - name: Seed Playwright test user
         working-directory: ./apps/chunky-crayon-web
         run: pnpm tsx scripts/seed-test-user.ts
-
-      - name: Build chunky-crayon-web
-        run: pnpm build:web
 
       - name: Run Playwright tests
         env:
