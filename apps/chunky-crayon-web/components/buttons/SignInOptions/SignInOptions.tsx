@@ -144,8 +144,8 @@ const SignInOptions = () => {
   };
 
   return (
-    <Card className="w-full max-w-lg overflow-hidden rounded-3xl border-2 border-paper-cream-dark bg-white shadow-card">
-      <CardHeader className="space-y-2 px-5 pb-5 pt-8 sm:px-8 md:px-10">
+    <Card className="w-full max-w-lg min-w-0 overflow-hidden rounded-3xl border-2 border-paper-cream-dark bg-white shadow-card">
+      <CardHeader className="min-w-0 space-y-2 px-5 pb-5 pt-8 sm:px-8 md:px-10">
         <CardTitle className="font-tondo text-3xl font-bold text-text-primary">
           {t('signIn')}
         </CardTitle>
@@ -177,7 +177,7 @@ const SignInOptions = () => {
           <span className="min-w-0 truncate">{t('continueWithFacebook')}</span>
         </Button>
         <SquiggleSeparator label={t('orContinueWith')} />
-        <form onSubmit={handleMagicLinkSignIn} className="grid gap-2">
+        <form onSubmit={handleMagicLinkSignIn} className="grid min-w-0 gap-2">
           <Input
             type="email"
             placeholder={t('emailPlaceholder')}
@@ -215,8 +215,8 @@ const SignInOptions = () => {
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col items-center px-5 pb-8 text-sm leading-relaxed text-muted-foreground sm:px-8 md:px-10">
-        <p className="text-center">
+      <CardFooter className="flex min-w-0 flex-col items-center px-5 pb-8 text-sm leading-relaxed text-muted-foreground sm:px-8 md:px-10">
+        <p className="max-w-full text-center">
           {t.rich('termsAgreement', {
             terms: (chunks) => (
               <Link

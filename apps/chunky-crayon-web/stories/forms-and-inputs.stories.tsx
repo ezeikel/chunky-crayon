@@ -108,3 +108,11 @@ export const SignInOptionsCard: Story = {
     </main>
   ),
 };
+
+export const SignInOptionsNarrowAppShell: Story = {
+  render: () => (
+    <main className="flex min-h-screen w-[295px] min-w-0 items-center justify-center overflow-x-hidden px-0 py-4">
+      <SignInOptions />
+    </main>
+  ),
+};

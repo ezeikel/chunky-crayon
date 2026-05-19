@@ -7,6 +7,7 @@ import {
   faLock,
   faSparkles,
 } from '@fortawesome/pro-duotone-svg-icons';
+import { MagicColorOverlay } from '@one-colored-pixel/coloring-ui';
 import {
   Dialog,
   DialogContent,
@@ -91,6 +92,13 @@ const OpenFeedbackDialog = () => {
   );
 };
 
+const ColoringCanvasShell = ({ children }: { children: React.ReactNode }) => (
+  <div className="relative mx-auto h-[420px] w-full max-w-2xl overflow-hidden rounded-coloring-card border-2 border-paper-cream-dark bg-paper shadow-card">
+    <div className="absolute inset-8 rounded-3xl border-2 border-paper-cream-dark bg-white" />
+    {children}
+  </div>
+);
+
 export const DialogShellOpen: Story = {
   render: () => (
     <main className="min-h-screen bg-paper p-8">
@@ -111,6 +119,41 @@ export const FeedbackOpen: Story = {
   render: () => (
     <main className="min-h-screen bg-paper p-8">
       <OpenFeedbackDialog />
+    </main>
+  ),
+};
+
+export const GettingColoursReady: Story = {
+  render: () => (
+    <main className="min-h-screen bg-paper p-8">
+      <ColoringCanvasShell>
+        <MagicColorOverlay
+          state="loading"
+          phase="colorMap"
+          messages={{
+            loadingTitleColorMap: 'Getting the colours ready!',
+            loadingBodyColorMapFallback:
+              'Almost there - Colo is mixing a palette for this picture.',
+          }}
+        />
+      </ColoringCanvasShell>
+    </main>
+  ),
+};
+
+export const MagicColoursError: Story = {
+  render: () => (
+    <main className="min-h-screen bg-paper p-8">
+      <ColoringCanvasShell>
+        <MagicColorOverlay
+          state="error"
+          errorMessage="Colo could not build the colour map this time."
+          onRetry={() => undefined}
+          messages={{
+            errorTitle: 'Oops, the magic got tangled!',
+          }}
+        />
+      </ColoringCanvasShell>
     </main>
   ),
 };
