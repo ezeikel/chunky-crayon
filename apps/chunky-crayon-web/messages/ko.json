@@ -883,6 +883,10 @@
         "categoryCount": "{category} 페이지 {count}개 색칠하기",
         "special": "서로 다른 카테고리 {count}개 탐험하기"
       }
+    },
+    "card": {
+      "viewSticker": "{name} 스티커 보기",
+      "lockedSticker": "{name} 스티커, 아직 잠겨 있어요"
     }
   },
   "stickerCatalog": {

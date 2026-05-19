@@ -883,6 +883,10 @@
         "categoryCount": "{category}を{count}ページぬる",
         "special": "ちがうカテゴリを{count}こたんけんする"
       }
+    },
+    "card": {
+      "viewSticker": "{name}のステッカーを見る",
+      "lockedSticker": "{name}のステッカー（まだロック中）"
     }
   },
   "stickerCatalog": {

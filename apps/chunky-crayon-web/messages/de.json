@@ -883,6 +883,10 @@
         "categoryCount": "Male {count} {category}-Seiten aus",
         "special": "Entdecke {count} verschiedene Kategorien"
       }
+    },
+    "card": {
+      "viewSticker": "{name}-Sticker ansehen",
+      "lockedSticker": "{name}-Sticker, noch gesperrt"
     }
   },
   "stickerCatalog": {

@@ -883,6 +883,10 @@
         "categoryCount": "Colorea {count} páginas de {category}",
         "special": "Explora {count} categorías diferentes"
       }
+    },
+    "card": {
+      "viewSticker": "Ver la pegatina de {name}",
+      "lockedSticker": "Pegatina de {name}, aún bloqueada"
     }
   },
   "stickerCatalog": {

@@ -883,6 +883,10 @@
         "categoryCount": "Colorie {count} pages {category}",
         "special": "Explore {count} catégories différentes"
       }
+    },
+    "card": {
+      "viewSticker": "Voir l’autocollant {name}",
+      "lockedSticker": "Autocollant {name}, encore verrouillé"
     }
   },
   "stickerCatalog": {
