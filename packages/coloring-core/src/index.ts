@@ -311,7 +311,13 @@ export {
   createRandomDescriptionGenerator,
   type RandomSeedConfig,
 } from "./utils/random";
-export { stripEmDashes, NO_EM_DASHES_RULE } from "./utils/copy";
+export {
+  stripEmDashes,
+  stripMarkdown,
+  sanitizeCaption,
+  NO_EM_DASHES_RULE,
+  NO_MARKDOWN_RULE,
+} from "./utils/copy";
 export {
   hexToRgb,
   rgbToHex,

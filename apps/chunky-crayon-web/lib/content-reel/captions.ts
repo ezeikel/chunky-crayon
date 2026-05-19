@@ -20,6 +20,7 @@
  */
 import { generateText } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
+import { sanitizeCaption } from '@one-colored-pixel/coloring-core';
 
 export type ContentReelCaptionPlatform =
   | 'instagram'
@@ -98,5 +99,5 @@ export async function generateContentReelCaption(
     prompt: CAPTION_PROMPTS[platform](reel),
     temperature: 0.6,
   });
-  return result.text.trim();
+  return sanitizeCaption(result.text);
 }

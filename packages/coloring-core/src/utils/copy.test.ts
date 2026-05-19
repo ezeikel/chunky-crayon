@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { NO_EM_DASHES_RULE, stripEmDashes } from "./copy";
+import {
+  NO_EM_DASHES_RULE,
+  NO_MARKDOWN_RULE,
+  sanitizeCaption,
+  stripEmDashes,
+  stripMarkdown,
+} from "./copy";
 
 /**
  * "No em dashes in user-facing copy" is a hard brand-voice rule (em dashes
@@ -44,5 +50,104 @@ describe("NO_EM_DASHES_RULE", () => {
     // example, so we only assert it is present and substantive.
     expect(NO_EM_DASHES_RULE.length).toBeGreaterThan(50);
     expect(NO_EM_DASHES_RULE.toLowerCase()).toContain("em dash");
+  });
+});
+
+/**
+ * Social platforms render no markdown — a LinkedIn post once shipped with
+ * literal "# LinkedIn Post:" and "**" because the model formatted its
+ * output and nothing stripped it. stripMarkdown is the deterministic fix;
+ * the critical invariant is that #hashtags survive while # headings don't.
+ */
+describe("stripMarkdown", () => {
+  it("removes an ATX heading marker but keeps the heading text", () => {
+    expect(stripMarkdown("# LinkedIn Post: Wedding Parking")).toBe(
+      "LinkedIn Post: Wedding Parking",
+    );
+    expect(stripMarkdown("### Tips")).toBe("Tips");
+  });
+
+  it("keeps #hashtags (no space after #) untouched", () => {
+    expect(stripMarkdown("#WeddingPlanning #UKWedding #PCN")).toBe(
+      "#WeddingPlanning #UKWedding #PCN",
+    );
+  });
+
+  it("strips bold and italic but keeps the words", () => {
+    expect(stripMarkdown("**Attention planners** and *event* teams")).toBe(
+      "Attention planners and event teams",
+    );
+    expect(stripMarkdown("***very*** ___strong___ __bold__ _it_")).toBe(
+      "very strong bold it",
+    );
+  });
+
+  it("does not leave a stray asterisk from nested bold", () => {
+    expect(stripMarkdown("**bold**")).not.toContain("*");
+  });
+
+  it("strips inline code and fences, keeping contents", () => {
+    expect(stripMarkdown("use `npm run build` now")).toBe(
+      "use npm run build now",
+    );
+  });
+
+  it("flattens markdown links to text + url", () => {
+    expect(
+      stripMarkdown("[the full guide](https://parkingticketpal.com/blog/x)"),
+    ).toBe("the full guide https://parkingticketpal.com/blog/x");
+  });
+
+  it("strips list markers but keeps list text", () => {
+    expect(stripMarkdown("- first\n- second\n1. third")).toBe(
+      "first\nsecond\nthird",
+    );
+  });
+
+  it("leaves a plain bare URL untouched", () => {
+    expect(stripMarkdown("Read it: https://parkingticketpal.com/blog/x")).toBe(
+      "Read it: https://parkingticketpal.com/blog/x",
+    );
+  });
+
+  it("preserves emojis and line breaks", () => {
+    expect(stripMarkdown("🎩 hook\n\nbody 🚗")).toBe("🎩 hook\n\nbody 🚗");
+  });
+});
+
+describe("sanitizeCaption (markdown + em dashes, the real LinkedIn failure)", () => {
+  it("fixes the exact post that shipped broken", () => {
+    const broken = [
+      "# LinkedIn Post: Wedding Venue Parking Rules UK",
+      "",
+      "🎩 **Attention event planners** — parking compliance is the hidden risk.",
+      "",
+      "📋 **Venue restrictions vary** — private land rules apply differently",
+      "",
+      "#EventManagement #WeddingIndustry",
+    ].join("\n");
+    const clean = sanitizeCaption(broken);
+
+    expect(clean).not.toContain("#  "); // no heading-with-space artefact
+    expect(clean).not.toMatch(/(^|\n)#\s/); // no leading "# " heading line
+    expect(clean).not.toContain("**");
+    expect(clean).not.toContain("—");
+    // Hashtags and emojis survive.
+    expect(clean).toContain("#EventManagement");
+    expect(clean).toContain("🎩");
+    // Heading text is kept, just unmarked.
+    expect(clean).toContain("LinkedIn Post: Wedding Venue Parking Rules UK");
+  });
+
+  it("is idempotent on already-clean copy", () => {
+    const clean = "Great free coloring page today! 🎨 #coloring #kids";
+    expect(sanitizeCaption(clean)).toBe(clean);
+  });
+});
+
+describe("NO_MARKDOWN_RULE", () => {
+  it("is a substantive plain-text instruction", () => {
+    expect(NO_MARKDOWN_RULE.length).toBeGreaterThan(50);
+    expect(NO_MARKDOWN_RULE.toLowerCase()).toContain("plain text");
   });
 });

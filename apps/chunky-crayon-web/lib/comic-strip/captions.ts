@@ -24,6 +24,8 @@
  * no "AI" framing.
  */
 
+import { sanitizeCaption } from '@one-colored-pixel/coloring-core';
+
 export type ComicStripCaptionPlatform =
   | 'instagram'
   | 'facebook'
@@ -46,9 +48,6 @@ const STANDARD_HASHTAGS = [
   '#ColoringPagesForKids',
 ];
 
-const stripEmDashes = (s: string): string =>
-  s.replace(/—/g, ',').replace(/–/g, ',');
-
 const ensurePeriod = (s: string): string => {
   const trimmed = s.trim();
   if (!trimmed) return trimmed;
@@ -61,14 +60,14 @@ const ensurePeriod = (s: string): string => {
 };
 
 const buildInstagramCaption = (input: ComicStripCaptionInput): string => {
-  const base = ensurePeriod(stripEmDashes(input.baseCaption));
+  const base = ensurePeriod(sanitizeCaption(input.baseCaption));
   const cta = 'Swipe through to read it ➡️';
   const tags = STANDARD_HASHTAGS.join(' ');
   return `${base}\n\n${cta}\n\n${tags}`;
 };
 
 const buildFacebookCaption = (input: ComicStripCaptionInput): string => {
-  const base = ensurePeriod(stripEmDashes(input.baseCaption));
+  const base = ensurePeriod(sanitizeCaption(input.baseCaption));
   const cta =
     'More free coloring pages and weekly comics at chunkycrayon.com 🎨';
   return `${base}\n\n${cta}`;
@@ -78,12 +77,12 @@ const buildPinterestCaption = (input: ComicStripCaptionInput): string => {
   // Pinterest descriptions max 500 chars; we target ≤400 to leave headroom.
   // Strip our brand hashtags from base and tighten to title + 1 line.
   const base = ensurePeriod(
-    stripEmDashes(input.baseCaption)
+    sanitizeCaption(input.baseCaption)
       .replace(/#\w+\s*/g, '')
       .trim(),
   );
   const themeWord = input.theme.toLowerCase().replace(/_/g, ' ');
-  const description = `${input.title} — a 4-panel kids comic strip for ages 3-8. ${base} A free weekly comic from Chunky Crayon. Theme: ${themeWord}.`;
+  const description = `${input.title}, a 4-panel kids comic strip for ages 3-8. ${base} A free weekly comic from Chunky Crayon. Theme: ${themeWord}.`;
   // Truncate at 395 char to keep clean room.
   return description.length > 395
     ? `${description.slice(0, 395).trim()}…`
@@ -92,7 +91,7 @@ const buildPinterestCaption = (input: ComicStripCaptionInput): string => {
 
 const buildTikTokCaption = (input: ComicStripCaptionInput): string => {
   const base = ensurePeriod(
-    stripEmDashes(input.baseCaption)
+    sanitizeCaption(input.baseCaption)
       .replace(/#\w+\s*/g, '')
       .trim(),
   );
