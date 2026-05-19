@@ -23,6 +23,7 @@
     "db:studio": "cd ../../packages/db && pnpm db:studio",
     "check:tokens": "tsx scripts/check-social-tokens.ts",
     "setup:tokens": "tsx scripts/setup-social-tokens.ts",
+    "buffer:channels": "tsx scripts/list-buffer-channels.ts",
     "test:social": "tsx scripts/test-social-posting.ts",
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build -o storybook-static"

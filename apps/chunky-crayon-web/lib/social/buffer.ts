@@ -169,6 +169,46 @@ export const resolveChannelId = async (
   );
 };
 
+/**
+ * List every connected Buffer channel across all organizations on the
+ * account, with the org it belongs to. Used by the channel-ID lookup
+ * script so you can copy the exact ids into BUFFER_CHANNEL_ID_TIKTOK /
+ * BUFFER_CHANNEL_ID_LINKEDIN per app (CC and PTP share one Buffer
+ * account, so the ids must be pinned to avoid cross-posting).
+ */
+export const listBufferChannels = async (): Promise<
+  {
+    organizationId: string;
+    organizationName?: string;
+    id: string;
+    service: string;
+    displayName?: string;
+    name?: string;
+  }[]
+> => {
+  const { organizations } = await bufferGraphQL<{
+    organizations: BufferOrganization[];
+  }>(GET_ORGANIZATIONS, {});
+
+  const perOrg = await Promise.all(
+    organizations.map((org) =>
+      bufferGraphQL<{ channels: BufferChannel[] }>(GET_CHANNELS, {
+        organizationId: org.id,
+      }).then((d) =>
+        d.channels.map((c) => ({
+          organizationId: org.id,
+          organizationName: org.name,
+          id: c.id,
+          service: c.service,
+          displayName: c.displayName,
+          name: c.name,
+        })),
+      ),
+    ),
+  );
+  return perOrg.flat();
+};
+
 const CREATE_POST = /* GraphQL */ `
   mutation CreatePost($input: CreatePostInput!) {
     createPost(input: $input) {
