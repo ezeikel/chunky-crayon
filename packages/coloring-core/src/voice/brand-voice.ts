@@ -117,6 +117,7 @@ export function ccContentTypeAdapter(content: CCContentType): string {
       return `This is a DEMO of our own product, recorded by us. There is no real child in it. We are the brand showing a feature: a kid-style prompt becomes a printable page and the colors fill in.
 - Caption it as "watch what happens when..." / "here's our app turning..." / "we built this so...". Brand showing a capability.
 - NEVER write it as a parent or child reacting ("my kid loved this", "watch her face when"). That is fake-testimonial framing and it reads as untrustworthy. We own that it's our demo.
+- Engagement lines stay brand-first too: "what should we make next?" not "drop a heart if YOUR KID would color this". Don't put words in the reader's kid's mouth even in a CTA.
 - Sell the OUTCOME (a free printable, a screen-free 15 minutes, an idea becoming a page), never the workflow, never the technology.`;
     case "comic_strip":
       return `This is our weekly 4-panel kids' comic strip. Light, fun, swipe-to-read energy. The base caption is already brand-voiced; the platform tail adds the CTA and tags.`;
