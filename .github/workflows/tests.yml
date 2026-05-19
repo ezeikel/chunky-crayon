@@ -93,6 +93,12 @@ jobs:
     timeout-minutes: 25
     env:
       DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
+      # `next build` instantiates `new Stripe(process.env.STRIPE_SECRET!)`
+      # at module load during page-data collection; without it the build
+      # throws "Neither apiKey nor config.authenticator provided". This is
+      # the ONLY module-load env that hard-fails the build (audited:
+      # single `new X(process.env.Y!)` in lib/). It's a test-mode key.
+      STRIPE_SECRET: ${{ secrets.STRIPE_SECRET }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
