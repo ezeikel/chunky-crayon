@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDice,
@@ -8,6 +8,8 @@ import {
   faLock,
   faArrowLeft,
   faArrowRight,
+  faChevronLeft,
+  faChevronRight,
   faWandMagicSparkles,
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -162,7 +164,7 @@ const SceneTile = ({
           "rounded-coloring-card border-2",
           "transition-all duration-coloring-base ease-coloring",
           "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-          size === "lg" ? "size-28 md:size-32" : "size-20 md:size-24",
+          size === "lg" ? "size-24 md:size-28" : "size-16 md:size-20",
           selected
             ? "border-coloring-accent shadow-coloring-button scale-105"
             : "border-coloring-surface-dark bg-white",
@@ -232,56 +234,190 @@ const SceneTile = ({
   );
 };
 
-// ─── Tile grid (one layer's options) ─────────────────────────────────────────
+// ─── Tile carousel (one layer's options, scroll-snap, swipeable) ────────────
+//
+// Why a carousel and not a wrap grid: at 13+ subjects the wrap grid grows
+// the card vertically, breaking the original-form-footprint promise. A
+// horizontal scroll-snap track keeps the step at a constant height
+// regardless of catalogue size and matches how kids actually flick through
+// content on tablets.
+//
+// Implementation notes:
+//   - `scroll-snap-x mandatory` + `snap-center` per tile gives native
+//     touch swipe + clean arrow-button paging with zero JS animation.
+//   - Page dots derive from `scrollLeft` / containerWidth, recomputed on
+//     scroll + resize. No external observer needed.
+//   - Arrows live OUTSIDE the scroll region so they don't fight pointer
+//     events with a swipe.
 
-type TileGridProps = {
+type TileCarouselProps = {
   layer: SceneLayer;
   selected: readonly string[];
   locked: readonly string[];
   disabled: boolean;
   lockedSuffix?: string;
   size?: "lg" | "sm";
+  /** Optional translated labels for the arrow buttons. */
+  prevLabel?: string;
+  nextLabel?: string;
   onToggle: (optionKey: string) => void;
   onLockedTap?: (optionKey: string) => void;
 };
 
-const TileGrid = ({
+const TileCarousel = ({
   layer,
   selected,
   locked,
   disabled,
   lockedSuffix,
   size = "lg",
+  prevLabel,
+  nextLabel,
   onToggle,
   onLockedTap,
-}: TileGridProps) => {
+}: TileCarouselProps) => {
   const lockedSet = useMemo(() => new Set(locked), [locked]);
   const selectedSet = useMemo(() => new Set(selected), [selected]);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [page, setPage] = useState(0);
+  const [pageCount, setPageCount] = useState(1);
+
+  // Recompute page count + active page on scroll / resize. The carousel
+  // is responsive so the per-page tile count varies with card width;
+  // doing the math from real scrollLeft + clientWidth means we never
+  // hard-code "3 per page" anywhere.
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      if (clientWidth === 0) return;
+      const pages = Math.max(1, Math.ceil(scrollWidth / clientWidth));
+      setPageCount(pages);
+      // Round to nearest page so a partial-overscroll bounce doesn't
+      // flicker the dot to the next index.
+      setPage(Math.round(scrollLeft / clientWidth));
+    };
+
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, [layer.options.length]);
+
+  const scrollByPage = (dir: 1 | -1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth, behavior: "smooth" });
+  };
+
+  const atStart = page <= 0;
+  const atEnd = page >= pageCount - 1;
 
   return (
-    <div
-      role="listbox"
-      aria-label={layer.title}
-      aria-multiselectable={layer.kind === "multi"}
-      className="flex flex-wrap justify-center gap-3 md:gap-4"
-    >
-      {layer.options.map((option) => {
-        const isLocked = lockedSet.has(option.key);
-        return (
-          <SceneTile
-            key={option.key}
-            option={option}
-            selected={selectedSet.has(option.key)}
-            locked={isLocked}
-            disabled={disabled}
-            lockedSuffix={lockedSuffix}
-            size={size}
-            onToggle={() =>
-              isLocked ? onLockedTap?.(option.key) : onToggle(option.key)
-            }
-          />
-        );
-      })}
+    <div className="flex flex-col gap-2">
+      <div className="relative">
+        {/* Left arrow — fades when there's nowhere left to go. Hidden from
+            screen readers when inert; touch users can just swipe. */}
+        <button
+          type="button"
+          onClick={() => scrollByPage(-1)}
+          disabled={disabled || atStart}
+          aria-label={prevLabel ?? "Previous"}
+          className={cn(
+            "absolute left-0 top-1/2 z-10 -translate-y-1/2",
+            "grid size-9 place-items-center rounded-full",
+            "bg-white text-coloring-text-primary shadow-coloring-button",
+            "border border-coloring-surface-dark",
+            "transition-opacity duration-coloring-base",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+            atStart || disabled
+              ? "pointer-events-none opacity-0"
+              : "hover:scale-105 active:scale-95",
+          )}
+        >
+          <FontAwesomeIcon icon={faChevronLeft} className="text-sm" />
+        </button>
+
+        <div
+          ref={trackRef}
+          role="listbox"
+          aria-label={layer.title}
+          aria-multiselectable={layer.kind === "multi"}
+          className={cn(
+            "flex gap-3 overflow-x-auto px-2 md:gap-4",
+            "snap-x snap-mandatory scroll-px-2",
+            // Hide native scrollbar — page dots are the visual cue.
+            "[-ms-overflow-style:none] [scrollbar-width:none]",
+            "[&::-webkit-scrollbar]:hidden",
+            "py-1",
+          )}
+        >
+          {layer.options.map((option) => {
+            const isLocked = lockedSet.has(option.key);
+            return (
+              <div key={option.key} className="snap-center shrink-0">
+                <SceneTile
+                  option={option}
+                  selected={selectedSet.has(option.key)}
+                  locked={isLocked}
+                  disabled={disabled}
+                  lockedSuffix={lockedSuffix}
+                  size={size}
+                  onToggle={() =>
+                    isLocked ? onLockedTap?.(option.key) : onToggle(option.key)
+                  }
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right arrow — mirror of left. */}
+        <button
+          type="button"
+          onClick={() => scrollByPage(1)}
+          disabled={disabled || atEnd}
+          aria-label={nextLabel ?? "Next"}
+          className={cn(
+            "absolute right-0 top-1/2 z-10 -translate-y-1/2",
+            "grid size-9 place-items-center rounded-full",
+            "bg-white text-coloring-text-primary shadow-coloring-button",
+            "border border-coloring-surface-dark",
+            "transition-opacity duration-coloring-base",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+            atEnd || disabled
+              ? "pointer-events-none opacity-0"
+              : "hover:scale-105 active:scale-95",
+          )}
+        >
+          <FontAwesomeIcon icon={faChevronRight} className="text-sm" />
+        </button>
+      </div>
+
+      {/* Page dots — only render when there's more than one page. */}
+      {pageCount > 1 && (
+        <div
+          className="flex items-center justify-center gap-1.5"
+          aria-hidden="true"
+        >
+          {Array.from({ length: pageCount }).map((_, i) => (
+            <span
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              className={cn(
+                "size-1.5 rounded-full transition-colors duration-coloring-base",
+                i === page ? "bg-coloring-accent" : "bg-coloring-surface-dark",
+              )}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -367,21 +503,25 @@ const SceneBuilder = ({
   const canAdvanceFromLocation = locationChosen;
   const canCreate = subjectChosen && locationChosen;
 
+  // Tighter than the previous title — the card has to stay close to the
+  // original form footprint, so step heading + tile row + CTA need to fit
+  // without the card outgrowing its old size.
   const renderTitle = (text: string) => (
-    <h2 className="text-center text-xl font-bold text-coloring-text-primary md:text-2xl">
+    <h2 className="text-center text-base font-bold text-coloring-text-primary md:text-lg">
       {text}
     </h2>
   );
 
   return (
     <div
-      className={cn("flex flex-col gap-6", className)}
+      className={cn("flex flex-col gap-3", className)}
       role="group"
       aria-label={labels.ariaLabel ?? "Build your picture"}
     >
-      {/* Header: step counter + dots + dice */}
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-semibold uppercase tracking-wide text-coloring-text-secondary">
+      {/* Header: step counter + dots + dice. Compact; the dice label is
+          icon-only on narrow widths so it doesn't push the dots off-row. */}
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-coloring-text-secondary md:text-xs">
           {step < requiredSteps
             ? stepLabel(step + 1, requiredSteps)
             : (labels.extrasTitle ?? "Make it special")}
@@ -395,8 +535,8 @@ const SceneBuilder = ({
             aria-label={labels.surpriseMe ?? "Surprise me!"}
             title={labels.surpriseMe ?? "Surprise me!"}
             className={cn(
-              "flex items-center gap-1.5 rounded-coloring-button border-2",
-              "border-coloring-accent bg-white px-3 py-1.5 text-xs font-bold",
+              "flex items-center gap-1.5 rounded-full border-2",
+              "border-coloring-accent bg-white px-2 py-1 text-xs font-bold",
               "text-coloring-accent transition-all duration-coloring-base",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
               !disabled &&
@@ -405,21 +545,25 @@ const SceneBuilder = ({
             )}
           >
             <FontAwesomeIcon icon={faDice} />
-            {labels.surpriseMe ?? "Surprise me!"}
+            <span className="hidden md:inline">
+              {labels.surpriseMe ?? "Surprise me!"}
+            </span>
           </button>
         )}
       </div>
 
       {/* Step 1 — Who? (required) */}
       {step === 0 && subjectLayer && (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-3">
           {renderTitle(subjectLayer.title)}
-          <TileGrid
+          <TileCarousel
             layer={subjectLayer}
             selected={selection[subjectLayer.id] ?? []}
             locked={lockedKeys?.[subjectLayer.id] ?? []}
             disabled={disabled}
             lockedSuffix={labels.lockedSuffix}
+            prevLabel={labels.back}
+            nextLabel={labels.next}
             onToggle={(k) => toggleOption(subjectLayer, k)}
             onLockedTap={
               onLockedTap ? (k) => onLockedTap(subjectLayer.id, k) : undefined
@@ -448,14 +592,16 @@ const SceneBuilder = ({
 
       {/* Step 2 — Where? (required) */}
       {step === 1 && locationLayer && (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-3">
           {renderTitle(locationLayer.title)}
-          <TileGrid
+          <TileCarousel
             layer={locationLayer}
             selected={selection[locationLayer.id] ?? []}
             locked={lockedKeys?.[locationLayer.id] ?? []}
             disabled={disabled}
             lockedSuffix={labels.lockedSuffix}
+            prevLabel={labels.back}
+            nextLabel={labels.next}
             onToggle={(k) => toggleOption(locationLayer, k)}
           />
           <div className="flex items-center justify-between gap-3">
@@ -515,19 +661,21 @@ const SceneBuilder = ({
 
       {/* Step 3 — Make it special (OPTIONAL, skippable) */}
       {step === 2 && hasExtras && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3">
           {renderTitle(labels.extrasTitle ?? "Make it special")}
           {extraLayers.map((layer) => (
-            <section key={layer.id} className="flex flex-col gap-3">
-              <h3 className="text-center text-sm font-semibold text-coloring-text-secondary">
+            <section key={layer.id} className="flex flex-col gap-1.5">
+              <h3 className="text-center text-xs font-semibold uppercase tracking-wide text-coloring-text-secondary">
                 {layer.title}
               </h3>
-              <TileGrid
+              <TileCarousel
                 layer={layer}
                 selected={selection[layer.id] ?? []}
                 locked={lockedKeys?.[layer.id] ?? []}
                 disabled={disabled}
                 lockedSuffix={labels.lockedSuffix}
+                prevLabel={labels.back}
+                nextLabel={labels.next}
                 size="sm"
                 onToggle={(k) => toggleOption(layer, k)}
               />
