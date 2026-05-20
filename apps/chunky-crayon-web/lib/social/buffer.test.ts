@@ -132,6 +132,61 @@ describe('buildCreatePostVariables', () => {
     });
     expect('metadata' in (input as object)).toBe(false);
   });
+
+  // Threads — text-first platform. Posts may be text-only (empty assets
+  // array). Link + reply-with-link is the same algo-friendly pattern as
+  // LinkedIn (link in a reply post, not the body).
+  it('allows a text-only Threads post (empty assets array)', () => {
+    const { input } = buildCreatePostVariables('ch_th', {
+      platform: 'threads',
+      text: 'A sharp take on UK parking rules.',
+      dueAt: new Date('2026-05-22T09:00:00.000Z'),
+    });
+    expect(input.assets).toEqual([]);
+  });
+
+  it('does NOT throw when platform=threads and no video/image (text-only is valid)', () => {
+    expect(() =>
+      buildCreatePostVariables('ch_th', {
+        platform: 'threads',
+        text: 't',
+        dueAt: new Date('2026-05-22T09:00:00.000Z'),
+      }),
+    ).not.toThrow();
+  });
+
+  it('emits metadata.threads with linkAttachment + thread reply', () => {
+    const { input } = buildCreatePostVariables('ch_th', {
+      platform: 'threads',
+      text: 'Paid the ticket? You may have just waived your appeal rights.',
+      dueAt: new Date('2026-05-22T09:00:00.000Z'),
+      metadata: {
+        linkAttachmentUrl: 'https://parkingticketpal.com/blog/x',
+        replyThread: 'Read the full guide: https://parkingticketpal.com/blog/x',
+      },
+    });
+    const md = (input as { metadata?: { threads?: unknown } }).metadata;
+    expect(md).toEqual({
+      threads: {
+        linkAttachment: { url: 'https://parkingticketpal.com/blog/x' },
+        thread: [
+          {
+            text: 'Read the full guide: https://parkingticketpal.com/blog/x',
+            assets: [],
+          },
+        ],
+      },
+    });
+  });
+
+  it('emits no metadata.threads when no threads-specific extras are set', () => {
+    const { input } = buildCreatePostVariables('ch_th', {
+      platform: 'threads',
+      text: 't',
+      dueAt: new Date('2026-05-22T09:00:00.000Z'),
+    });
+    expect('metadata' in (input as object)).toBe(false);
+  });
 });
 
 describe('isBufferBridgeEnabled', () => {
@@ -141,6 +196,7 @@ describe('isBufferBridgeEnabled', () => {
     delete process.env.BUFFER_API_KEY;
     delete process.env.BUFFER_ENABLE_TIKTOK;
     delete process.env.BUFFER_ENABLE_LINKEDIN;
+    delete process.env.BUFFER_ENABLE_THREADS;
   });
 
   afterEach(() => {
@@ -164,6 +220,10 @@ describe('isBufferBridgeEnabled', () => {
     expect(isBufferBridgeEnabled('tiktok')).toBe(true);
     // LinkedIn flag still unset — its direct approval landed, say — so off.
     expect(isBufferBridgeEnabled('linkedin')).toBe(false);
+    // Threads gated by its own BUFFER_ENABLE_THREADS flag.
+    expect(isBufferBridgeEnabled('threads')).toBe(false);
+    process.env.BUFFER_ENABLE_THREADS = 'true';
+    expect(isBufferBridgeEnabled('threads')).toBe(true);
   });
 
   it('accepts "1" as well as "true"', () => {

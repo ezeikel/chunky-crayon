@@ -27,7 +27,8 @@ export type ContentReelCaptionPlatform =
   | 'facebook'
   | 'pinterest'
   | 'tiktok'
-  | 'linkedin';
+  | 'linkedin'
+  | 'threads';
 
 export type ContentReelCaptionInput = {
   kind: 'STAT' | 'FACT' | 'TIP' | 'MYTH';
@@ -97,6 +98,15 @@ const CAPTION_PROMPTS: Record<
       `Source URL: ${reel.sourceUrl ?? 'omit'}`,
       '',
       'Format: a thoughtful, grounded 120-200 word post for working parents, educators, and early-years professionals. A point of view plus the practical takeaway. Source URL on its own line at the end if present. 0-3 hashtags. No marketing cliches, no buzzword soup.',
+    ].join('\n'),
+  threads: (reel) =>
+    [
+      `Write a Threads post for this ${reel.kind} content reel.`,
+      `Hook: ${reel.hook}`,
+      `Payoff: ${reel.payoff}`,
+      `Source: ${reel.sourceTitle ?? 'parenting research'}`,
+      '',
+      'Format: 1 to 3 short sentences, ideally under 200 characters total. Text-first, dry-warm parent voice. Lead with the take or a specific observation, NOT a hook-for-asset opener. No hashtags. No URL in the body (a reply post will carry the source link).',
     ].join('\n'),
 };
 

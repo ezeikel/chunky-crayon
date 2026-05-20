@@ -71,6 +71,14 @@ describe("ccPlatformAdapter 2026 length norms", () => {
     expect(p).toContain("search engine");
     expect(p).toContain("no emojis. no hashtags");
   });
+
+  it("threads is text-first, short, no hashtags, link goes in a reply", () => {
+    const t = ccPlatformAdapter("threads").toLowerCase();
+    expect(t).toContain("text-first");
+    expect(t).toContain("no hashtags");
+    // The link-in-reply rule is the algo-aware play we want preserved.
+    expect(t).toContain("metadata.threads.thread");
+  });
 });
 
 describe("ccVoice composition", () => {

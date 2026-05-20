@@ -13,6 +13,7 @@ import {
   // postToLinkedInPage (the direct path) stays dormant until then.
   generateLinkedInCaption,
   generateTikTokCaption,
+  generateThreadsCaption,
   type InstagramPostType,
   type FacebookPostType,
 } from '@/app/actions/social';
@@ -248,6 +249,11 @@ type SocialPostResults = {
   linkedinCarousel?: PlatformResult;
   tiktok?: PlatformResult;
   tiktokDemoReel?: PlatformResult;
+  /** Threads via the Buffer bridge — text-first platform; demo-reels post
+   * as native video, daily carousel posts as a text take with the
+   * coloring-page URL in a reply-thread. */
+  threadsDemoReel?: PlatformResult;
+  threadsCarousel?: PlatformResult;
 };
 
 /**
@@ -1310,6 +1316,7 @@ const handleRequest = async (request: Request) => {
         facebook: null as string | null,
         tiktok: null as string | null,
         linkedin: null as string | null,
+        threads: null as string | null,
         pinterestVideo: null as string | null,
         errors: [] as string[],
       };
@@ -1656,6 +1663,48 @@ const handleRequest = async (request: Request) => {
         }
       }
 
+      // Threads. Text-first platform but accepts native video; we post the
+      // demo reel as a video Threads post with the demo-reel caption.
+      // Threads doesn't have a per-post URL concept like blog promo (the
+      // reel IS the content), so no replyThread/linkAttachment here.
+      if (
+        shouldPost('threads') &&
+        !alreadyPosted('threadsDemoReel') &&
+        isBufferBridgeEnabled('threads')
+      ) {
+        const caption = await generateThreadsCaption(coloringImage);
+        const buffered = await schedulePostViaBuffer({
+          platform: 'threads',
+          text: caption,
+          videoUrl: reelUrl,
+          thumbnailUrl: bufferThumbnailUrl,
+          dueAt: bufferDueAt('threadsDemoReel'),
+        });
+        if (buffered.scheduled) {
+          demoResults.threads = buffered.postId ?? 'buffer-scheduled';
+          platformResults.threadsDemoReel = {
+            success: true,
+            via: 'buffer',
+            mediaId: buffered.postId,
+            caption,
+            postedAt: new Date().toISOString(),
+          };
+          console.log(
+            `[DemoReel] Threads scheduled via Buffer: ${buffered.postId}`,
+          );
+        } else {
+          console.error(
+            `[DemoReel] Buffer Threads push failed: ${buffered.error}`,
+          );
+          demoResults.errors.push(`Buffer Threads: ${buffered.error}`);
+          platformResults.threadsDemoReel = {
+            success: false,
+            caption,
+            error: buffered.error,
+          };
+        }
+      }
+
       // Pinterest video pin — prefer the worker-captured colored cover
       // (finished artwork). Fall back to a square line-art render if
       // that's missing (e.g. older images without demoReelCoverUrl).
@@ -1712,6 +1761,7 @@ const handleRequest = async (request: Request) => {
         demoResults.facebook ||
         demoResults.tiktok ||
         demoResults.linkedin ||
+        demoResults.threads ||
         demoResults.pinterestVideo;
 
       return NextResponse.json(
@@ -2120,6 +2170,58 @@ const handleRequest = async (request: Request) => {
             const msg = err instanceof Error ? err.message : 'Unknown error';
             console.error('[Carousel] LinkedIn Buffer push errored:', msg);
             results.errors.push(`LinkedIn (Buffer): ${msg}`);
+          }
+        }
+
+        // Threads via the Buffer bridge — daily coloring page as a text
+        // take (Threads is text-first; the visual carries via the
+        // linkAttachment card and the URL in a reply post). Same algo
+        // play as LinkedIn: keep the body link-free, link goes in a
+        // follow-up reply via metadata.threads.thread.
+        if (
+          isBufferBridgeEnabled('threads') &&
+          !staticAlreadyPosted('threadsCarousel')
+        ) {
+          try {
+            const thCaption = await generateThreadsCaption(coloringImage);
+            const thPageUrl = `https://chunkycrayon.com/coloring/${coloringImage.id}`;
+            const buffered = await schedulePostViaBuffer({
+              platform: 'threads',
+              text: thCaption,
+              // No videoUrl/imageUrl — text-only main post. The image
+              // shows up via the linkAttachment preview card.
+              metadata: {
+                linkAttachmentUrl: thPageUrl,
+                replyThread: `Print it free: ${thPageUrl}`,
+              },
+              dueAt: new Date(Date.now() + 5 * 60 * 1000),
+            });
+            if (buffered.scheduled) {
+              staticPlatformResults.threadsCarousel = {
+                success: true,
+                via: 'buffer',
+                mediaId: buffered.postId,
+                caption: thCaption,
+                postedAt: new Date().toISOString(),
+              };
+              console.log(
+                `[Carousel] Threads scheduled via Buffer: ${buffered.postId}`,
+              );
+            } else if (!buffered.disabled) {
+              console.error(
+                `[Carousel] Buffer Threads failed: ${buffered.error}`,
+              );
+              results.errors.push(`Threads (Buffer): ${buffered.error}`);
+              staticPlatformResults.threadsCarousel = {
+                success: false,
+                caption: thCaption,
+                error: buffered.error,
+              };
+            }
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Unknown error';
+            console.error('[Carousel] Threads Buffer push errored:', msg);
+            results.errors.push(`Threads (Buffer): ${msg}`);
           }
         }
 

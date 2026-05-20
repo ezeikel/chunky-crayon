@@ -526,26 +526,37 @@ const handleInner = async (request: Request): Promise<Response> => {
   // until publish — it's a durable R2 URL, so fine. dueAt is a few
   // minutes out (this route runs at the platform's cron slot).
   const bufferDueAt = () => new Date(Date.now() + 5 * 60 * 1000);
-  const bufferTargets: ('tiktok' | 'linkedin')[] = (
-    ['tiktok', 'linkedin'] as const
+  const bufferTargets: ('tiktok' | 'linkedin' | 'threads')[] = (
+    ['tiktok', 'linkedin', 'threads'] as const
   ).filter((p) => !platformFilter || platformFilter === p);
 
   for (const platform of bufferTargets) {
     if (!isBufferBridgeEnabled(platform)) continue;
     // eslint-disable-next-line no-await-in-loop
     const caption = await generateContentReelCaption(platform, reelInput);
-    // LinkedIn: drop the source URL into a brand-posted first comment +
-    // a rich linkAttachment card. LinkedIn downranks posts with a URL in
-    // the body; this keeps the body clean and still gives the reader a
-    // tap-away link. No-op when the reel has no sourceUrl. Skip for
-    // TikTok — TikTok's API doesn't expose first-comment.
-    const metadata =
-      platform === 'linkedin' && reel.sourceUrl
-        ? {
-            firstComment: `Source: ${reel.sourceUrl}`,
-            linkAttachmentUrl: reel.sourceUrl,
-          }
-        : undefined;
+    // LinkedIn: source URL goes in a brand-posted first comment + a rich
+    // linkAttachment card (LinkedIn downranks links in the body).
+    // Threads: same play, but the URL goes in a reply-thread post (Buffer
+    //   metadata.threads.thread) + linkAttachment for the card.
+    // TikTok: no first-comment / metadata support — caption only.
+    let metadata:
+      | {
+          firstComment?: string;
+          linkAttachmentUrl?: string;
+          replyThread?: string;
+        }
+      | undefined;
+    if (platform === 'linkedin' && reel.sourceUrl) {
+      metadata = {
+        firstComment: `Source: ${reel.sourceUrl}`,
+        linkAttachmentUrl: reel.sourceUrl,
+      };
+    } else if (platform === 'threads' && reel.sourceUrl) {
+      metadata = {
+        linkAttachmentUrl: reel.sourceUrl,
+        replyThread: `Source: ${reel.sourceUrl}`,
+      };
+    }
     // eslint-disable-next-line no-await-in-loop
     const buffered = await schedulePostViaBuffer({
       platform,

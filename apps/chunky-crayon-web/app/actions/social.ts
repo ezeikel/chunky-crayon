@@ -8,11 +8,13 @@ import {
   PINTEREST_CAPTION_SYSTEM,
   TIKTOK_CAPTION_SYSTEM,
   LINKEDIN_CAPTION_SYSTEM,
+  THREADS_CAPTION_SYSTEM,
   createInstagramCaptionPrompt,
   createFacebookCaptionPrompt,
   createPinterestCaptionPrompt,
   createTikTokCaptionPrompt,
   createLinkedInCaptionPrompt,
+  createThreadsCaptionPrompt,
 } from '@/lib/ai';
 import { sanitizeCaption, ccVoice } from '@one-colored-pixel/coloring-core';
 import { ColoringImage } from '@one-colored-pixel/db';
@@ -559,6 +561,30 @@ export const generateLinkedInCaption = async (
     return sanitizeCaption(text);
   } catch (error) {
     console.error('[LinkedIn] Caption generation failed:', error);
+    throw error;
+  }
+};
+
+// Threads is text-first; one caption shape works across daily / demo-reel /
+// content-reel since the post is the thought, not a hook-for-an-asset. We
+// keep the API signature compatible with the others (takes a ColoringImage)
+// so the Buffer-bridge call sites stay symmetrical.
+export const generateThreadsCaption = async (
+  coloringImage: ColoringImage,
+): Promise<string> => {
+  try {
+    const { text } = await generateText({
+      model: models.creative,
+      system: THREADS_CAPTION_SYSTEM,
+      prompt: createThreadsCaptionPrompt(
+        coloringImage.title ?? '',
+        coloringImage.description ?? '',
+        coloringImage.tags ?? [],
+      ),
+    });
+    return sanitizeCaption(text);
+  } catch (error) {
+    console.error('[Threads] Caption generation failed:', error);
     throw error;
   }
 };

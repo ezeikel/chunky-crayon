@@ -66,11 +66,13 @@ export {
   PINTEREST_CAPTION_SYSTEM,
   TIKTOK_CAPTION_SYSTEM,
   LINKEDIN_CAPTION_SYSTEM,
+  THREADS_CAPTION_SYSTEM,
   createInstagramCaptionPrompt,
   createFacebookCaptionPrompt,
   createPinterestCaptionPrompt,
   createTikTokCaptionPrompt,
   createLinkedInCaptionPrompt,
+  createThreadsCaptionPrompt,
   // Analytics prompts
   IMAGE_ANALYTICS_SYSTEM,
   IMAGE_ANALYTICS_PROMPT,

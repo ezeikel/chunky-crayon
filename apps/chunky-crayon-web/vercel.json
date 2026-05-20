@@ -68,6 +68,10 @@
       "schedule": "30 19 * * *"
     },
     {
+      "path": "/api/social/content-reel-post?platform=threads",
+      "schedule": "0 20 * * *"
+    },
+    {
       "path": "/api/social/content-reel-post?platform=pinterest",
       "schedule": "0 22 * * *"
     },
@@ -121,6 +125,10 @@
       "path": "/api/social/post?type=demo-reel&platform=linkedin",
       "schedule": "30 22 * * 1-5"
     },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=threads",
+      "schedule": "45 22 * * 1-5"
+    },
 
     {
       "path": "/api/social/post?platform=pinterest",
@@ -155,6 +163,10 @@
     {
       "path": "/api/social/post?type=demo-reel&platform=linkedin",
       "schedule": "30 21 * * 0,6"
+    },
+    {
+      "path": "/api/social/post?type=demo-reel&platform=threads",
+      "schedule": "45 21 * * 0,6"
     },
     {
       "path": "/api/social/post?platform=pinterest",

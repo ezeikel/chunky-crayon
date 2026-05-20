@@ -9,6 +9,7 @@ import {
   generatePinterestCaption,
   generateLinkedInCaption,
   generateTikTokCaption,
+  generateThreadsCaption,
 } from '@/app/actions/social';
 import {
   generateContentReelCaption,
@@ -78,13 +79,16 @@ const POST_SCHEDULE: Record<string, ScheduledSlot> = {
   instagramContentReel: { utc: '18:30', days: 'weekday' }, // US 1:30pm ET
   tiktokContentReel: { utc: '19:00', days: 'weekday' }, // via Buffer bridge
   linkedinContentReel: { utc: '19:30', days: 'weekday' }, // via Buffer bridge
+  threadsContentReel: { utc: '20:00', days: 'weekday' }, // via Buffer bridge
   pinterestContentReel: { utc: '22:00', days: 'weekday' }, // late-eve discovery
-  // TikTok + LinkedIn demo-reel post via the Buffer bridge (until direct
-  // TikTok/LinkedIn approval lands). The cron fires at these slots; the
-  // post route schedules into Buffer's queue a few minutes out. When the
-  // bridge is OFF these crons no-op and the brief shows them as manual.
+  // TikTok + LinkedIn + Threads demo-reel post via the Buffer bridge
+  // (until direct TikTok/LinkedIn approval lands). The cron fires at
+  // these slots; the post route schedules into Buffer's queue a few
+  // minutes out. When the bridge is OFF these crons no-op and the brief
+  // shows them as manual.
   tiktokDemoReel: { utc: '22:00', days: 'weekday' },
   linkedinDemoReel: { utc: '22:30', days: 'weekday' },
+  threadsDemoReel: { utc: '22:45', days: 'weekday' },
 };
 
 const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
@@ -96,12 +100,14 @@ const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
   pinterestDemoReel: { utc: '20:30', days: 'weekend' },
   tiktokDemoReel: { utc: '21:00', days: 'weekend' },
   linkedinDemoReel: { utc: '21:30', days: 'weekend' },
+  threadsDemoReel: { utc: '21:45', days: 'weekend' },
   pinterest: { utc: '22:30', days: 'weekend' }, // weekend Pinterest static
   // Content-reel slots — keep 7d/wk timing aligned with weekday lunch logic.
   facebookContentReel: { utc: '17:00', days: 'weekend' },
   instagramContentReel: { utc: '18:30', days: 'weekend' },
   tiktokContentReel: { utc: '19:00', days: 'weekend' },
   linkedinContentReel: { utc: '19:30', days: 'weekend' },
+  threadsContentReel: { utc: '20:00', days: 'weekend' },
   pinterestContentReel: { utc: '22:00', days: 'weekend' },
   // Comic strip — Sunday only. Generation 06:00 UTC, posts that evening.
   // Separated from content-reel times (17:00/18:30/22:00) so two
@@ -301,7 +307,12 @@ export const GET = async (request: Request) => {
     //    new cron entry would make slotFor() report willAutoPost:true even
     //    on days the bridge was off or the push failed — a false "auto".)
     const bufferOverride = (
-      key: 'tiktokDemoReel' | 'linkedinDemoReel' | 'linkedinCarousel',
+      key:
+        | 'tiktokDemoReel'
+        | 'linkedinDemoReel'
+        | 'linkedinCarousel'
+        | 'threadsDemoReel'
+        | 'threadsCarousel',
     ): { postedVia: 'buffer' } | { willAutoPost: false } => {
       const r = bufferResults[key];
       return r?.success && r.via === 'buffer'
@@ -318,7 +329,7 @@ export const GET = async (request: Request) => {
         { success?: boolean; via?: string } | undefined
       > | null) ?? {};
     const contentReelBufferOverride = (
-      key: 'tiktok' | 'linkedin',
+      key: 'tiktok' | 'linkedin' | 'threads',
     ): { postedVia: 'buffer' } | { willAutoPost: false } => {
       const r = contentReelBufferResults[key];
       return r?.success && r.via === 'buffer'
@@ -334,6 +345,7 @@ export const GET = async (request: Request) => {
           generateFacebookCaption(coloringImage, 'colored_static'),
           generatePinterestCaption(coloringImage),
           generateLinkedInCaption(coloringImage),
+          generateThreadsCaption(coloringImage),
         ] as const)
       : null;
     const demoReelCaptionPromises = captionImage
@@ -346,6 +358,9 @@ export const GET = async (request: Request) => {
           // when daily image exists; otherwise generate against the
           // demo-reel image.
           generatePinterestCaption(captionImage),
+          // Threads caption is content-type-agnostic (one shape works
+          // across daily / demo-reel / content-reel) — same generator.
+          generateThreadsCaption(captionImage),
         ] as const)
       : null;
 
@@ -365,14 +380,16 @@ export const GET = async (request: Request) => {
       facebookColoredStaticCaption,
       pinterestCaption,
       linkedinCaption,
-    ] = dailyImageResults ?? (Array.from({ length: 6 }, () => '') as string[]);
+      threadsCarouselCaption,
+    ] = dailyImageResults ?? (Array.from({ length: 7 }, () => '') as string[]);
     const [
       instagramDemoReelCaption,
       facebookDemoReelCaption,
       tiktokDemoReelCaption,
       linkedinDemoReelCaption,
       pinterestDemoReelCaption,
-    ] = demoReelResults ?? (Array.from({ length: 5 }, () => '') as string[]);
+      threadsDemoReelCaption,
+    ] = demoReelResults ?? (Array.from({ length: 6 }, () => '') as string[]);
 
     // Pre-generate content-reel captions for the brief so the recipient
     // can copy-paste for manual platforms (TikTok). The auto-post route
@@ -380,7 +397,12 @@ export const GET = async (request: Request) => {
     // Claude cost — keeps each surface independent and means a brief-
     // failure doesn't block the post route or vice versa.
     let contentReelCaptions: Record<
-      'instagram' | 'facebook' | 'pinterest' | 'tiktok' | 'linkedin',
+      | 'instagram'
+      | 'facebook'
+      | 'pinterest'
+      | 'tiktok'
+      | 'linkedin'
+      | 'threads',
       string
     > | null = null;
     if (contentReel) {
@@ -391,12 +413,13 @@ export const GET = async (request: Request) => {
         sourceTitle: contentReel.sourceTitle ?? undefined,
         sourceUrl: contentReel.sourceUrl ?? undefined,
       };
-      const [ig, fb, pin, tt, li] = await Promise.all([
+      const [ig, fb, pin, tt, li, th] = await Promise.all([
         generateContentReelCaption('instagram', reelCaptionInput),
         generateContentReelCaption('facebook', reelCaptionInput),
         generateContentReelCaption('pinterest', reelCaptionInput),
         generateContentReelCaption('tiktok', reelCaptionInput),
         generateContentReelCaption('linkedin', reelCaptionInput),
+        generateContentReelCaption('threads', reelCaptionInput),
       ]);
       contentReelCaptions = {
         instagram: ig,
@@ -404,6 +427,7 @@ export const GET = async (request: Request) => {
         pinterest: pin,
         tiktok: tt,
         linkedin: li,
+        threads: th,
       };
     }
 
@@ -471,6 +495,18 @@ export const GET = async (request: Request) => {
             ...bufferOverride('linkedinCarousel'),
             assetType: 'image',
           },
+          {
+            platform: 'Threads',
+            caption: threadsCarouselCaption,
+            // Same trigger as LinkedIn; Threads posts as text + reply
+            // with the page URL via the Buffer bridge.
+            ...slotFor('instagramCarousel'),
+            ...bufferOverride('threadsCarousel'),
+            // Marked 'image' here because the Buffer linkAttachment
+            // surfaces the page image as the post card — the digest
+            // categorisation matches what the reader sees on Threads.
+            assetType: 'image',
+          },
         ];
 
     // Demo-reel entries gate on whether we have a coloringImage source
@@ -507,6 +543,13 @@ export const GET = async (request: Request) => {
             willAutoPost: false, // LinkedIn direct is manual until approval
             // Buffer bridge (when enabled) flips this to "via Buffer".
             ...bufferOverride('linkedinDemoReel'),
+            assetType: 'video',
+          },
+          {
+            platform: 'Threads',
+            caption: threadsDemoReelCaption,
+            ...slotFor('threadsDemoReel'),
+            ...bufferOverride('threadsDemoReel'),
             assetType: 'video',
           },
           {
@@ -611,6 +654,13 @@ export const GET = async (request: Request) => {
             caption: contentReelCaptions.linkedin,
             ...slotFor('linkedinContentReel'),
             ...contentReelBufferOverride('linkedin'),
+            assetType: 'video',
+          },
+          {
+            platform: 'Threads',
+            caption: contentReelCaptions.threads,
+            ...slotFor('threadsContentReel'),
+            ...contentReelBufferOverride('threads'),
             assetType: 'video',
           },
         ]
