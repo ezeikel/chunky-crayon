@@ -125,13 +125,20 @@ const ProgressIndicator = ({
           />
         </motion.div>
 
+        {/* Milestone + done badges sit BELOW the bar (top-full + mt-2)
+            rather than floating above. The progress bar lives at the
+            very top of the mobile viewport on /coloring-image/[id],
+            and in in-app browsers (Instagram, Facebook) that edge is
+            occluded by the browser chrome — anything anchored -top-12
+            above the bar gets clipped. Anchoring below puts the badge
+            inside the canvas region where there's always room. */}
         <AnimatePresence>
           {showMilestone && lastMilestone && !isDone && (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              initial={{ opacity: 0, y: -10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.9 }}
-              className="absolute -top-12 left-1/2 -translate-x-1/2 px-4 py-2 bg-crayon-yellow rounded-full shadow-lg z-10"
+              exit={{ opacity: 0, y: 10, scale: 0.9 }}
+              className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-4 py-2 bg-crayon-yellow rounded-full shadow-lg z-10"
             >
               <span className="font-tondo font-bold text-base text-text-primary whitespace-nowrap">
                 {t(`milestones.${lastMilestone}`)}
@@ -143,10 +150,10 @@ const ProgressIndicator = ({
         <AnimatePresence>
           {isDone && (
             <motion.div
-              initial={{ opacity: 0, y: 12, scale: 0.85 }}
+              initial={{ opacity: 0, y: -12, scale: 0.85 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ type: 'spring', stiffness: 280, damping: 18 }}
-              className="absolute -top-14 left-1/2 -translate-x-1/2 px-5 py-2 bg-crayon-green rounded-full shadow-lg z-10 flex items-center gap-2 whitespace-nowrap"
+              className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-5 py-2 bg-crayon-green rounded-full shadow-lg z-10 flex items-center gap-2 whitespace-nowrap"
             >
               <FontAwesomeIcon icon={faStar} className="text-white text-lg" />
               <span className="font-tondo font-bold text-lg text-white">

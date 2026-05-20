@@ -301,6 +301,35 @@ const MobileColoringDrawer = ({
     snapPoints[DEFAULT_SNAP],
   );
 
+  // In-app browsers (Instagram, Facebook, TikTok) overlay their own
+  // bottom chrome on top of the page without pushing
+  // env(safe-area-inset-bottom) down — so `pb-safe` alone won't keep
+  // the drawer above their gesture bar / close button row. The visual
+  // viewport API is the only reliable signal: the difference between
+  // window.innerHeight (layout viewport bottom) and
+  // visualViewport.offsetTop + visualViewport.height (visible bottom)
+  // is the chrome's height. Pad the drawer's bottom by that amount so
+  // tools never hide under the in-app browser footer.
+  const [visualBottomInset, setVisualBottomInset] = useState(0);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.visualViewport) return;
+    const vv = window.visualViewport;
+    const update = () => {
+      const inset = Math.max(
+        0,
+        window.innerHeight - (vv.offsetTop + vv.height),
+      );
+      setVisualBottomInset(inset);
+    };
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, []);
+
   // Spring config — feels good already, keep as-is.
   const springConfig = {
     type: "spring" as const,
@@ -558,16 +587,18 @@ const MobileColoringDrawer = ({
           <Drawer.Content aria-describedby={undefined} asChild>
             <motion.div
               className={cn(
-                "fixed bottom-0 left-0 right-0 z-50 mx-2",
+                "fixed left-0 right-0 z-50 mx-2",
                 "flex flex-col overflow-hidden",
                 "bg-white rounded-t-3xl",
                 "border-2 border-b-0 border-coloring-surface-dark",
                 "shadow-[0_-4px_16px_rgba(0,0,0,0.15)]",
-                // Safe area padding for notched devices
+                // Safe area padding for notched devices. visualBottomInset
+                // (applied via inline `bottom`) handles in-app browser
+                // chrome that env(safe-area-inset-bottom) doesn't reach.
                 "pb-safe",
                 className,
               )}
-              style={{ height }}
+              style={{ height, bottom: visualBottomInset }}
             >
               {/* Accessible title - visually hidden */}
               <Drawer.Title className="sr-only">Coloring Tools</Drawer.Title>
@@ -601,8 +632,12 @@ const MobileColoringDrawer = ({
                 <div className="w-14 h-[5px] rounded-full bg-coloring-surface-dark/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)]" />
               </motion.div>
 
-              {/* Scrollable content area */}
-              <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pb-4">
+              {/* Scrollable content area. `pt-2` gives the magic
+                  tool's sparkle decoration (`-top-2 -right-2` on the
+                  button) room to peek out without being clipped by
+                  this container's `overflow-x-hidden` / the outer
+                  `overflow-hidden`. */}
+              <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pt-2 pb-4">
                 {/* Tools — icon-only chunky-card grid, matching desktop sidebar.
                     Slim variant renders 3 tools + the consumer's trailing
                     action cells (e.g. Print + Save) in the same 5-col
@@ -958,7 +993,7 @@ const MobileColoringDrawer = ({
             aria-hidden
             className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center"
             style={{
-              bottom: drawerHeightLive + 12,
+              bottom: drawerHeightLive + visualBottomInset + 12,
             }}
           >
             <div className="relative flex flex-col items-center gap-2">
