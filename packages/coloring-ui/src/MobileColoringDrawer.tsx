@@ -632,12 +632,15 @@ const MobileColoringDrawer = ({
                 <div className="w-14 h-[5px] rounded-full bg-coloring-surface-dark/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)]" />
               </motion.div>
 
-              {/* Scrollable content area. `pt-2` gives the magic
+              {/* Scrollable content area. `pt-4` gives the magic
                   tool's sparkle decoration (`-top-2 -right-2` on the
-                  button) room to peek out without being clipped by
-                  this container's `overflow-x-hidden` / the outer
-                  `overflow-hidden`. */}
-              <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pt-2 pb-4">
+                  button) room to peek out — the sparkle icon itself
+                  is ~14px tall and offset 8px above the button, so
+                  it needs ~16px of headroom or it gets clipped by
+                  the scroll area's top edge. Bumped `px-4 → px-5`
+                  for the same reason on the right side, where the
+                  full variant's magic-auto sits as the last cell. */}
+              <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-5 pt-4 pb-4">
                 {/* Tools — icon-only chunky-card grid, matching desktop sidebar.
                     Slim variant renders 3 tools + the consumer's trailing
                     action cells (e.g. Print + Save) in the same 5-col
