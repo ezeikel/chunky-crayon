@@ -534,12 +534,25 @@ const handleInner = async (request: Request): Promise<Response> => {
     if (!isBufferBridgeEnabled(platform)) continue;
     // eslint-disable-next-line no-await-in-loop
     const caption = await generateContentReelCaption(platform, reelInput);
+    // LinkedIn: drop the source URL into a brand-posted first comment +
+    // a rich linkAttachment card. LinkedIn downranks posts with a URL in
+    // the body; this keeps the body clean and still gives the reader a
+    // tap-away link. No-op when the reel has no sourceUrl. Skip for
+    // TikTok — TikTok's API doesn't expose first-comment.
+    const metadata =
+      platform === 'linkedin' && reel.sourceUrl
+        ? {
+            firstComment: `Source: ${reel.sourceUrl}`,
+            linkAttachmentUrl: reel.sourceUrl,
+          }
+        : undefined;
     // eslint-disable-next-line no-await-in-loop
     const buffered = await schedulePostViaBuffer({
       platform,
       text: caption,
       videoUrl: reel.reelUrl,
       thumbnailUrl: reel.coverUrl ?? undefined,
+      metadata,
       dueAt: bufferDueAt(),
     });
     if (buffered.scheduled) {

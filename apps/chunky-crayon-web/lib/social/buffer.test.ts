@@ -89,6 +89,49 @@ describe('buildCreatePostVariables', () => {
       }),
     ).toThrow(/videoUrl or imageUrl/);
   });
+
+  // LinkedIn-specific metadata (firstComment + linkAttachment) — the
+  // standard LinkedIn play is body text without a URL (algorithm
+  // downranks link posts) + the URL in a brand-posted first comment +
+  // a linkAttachment for the rich blog-card preview.
+  it('emits metadata.linkedin when platform is linkedin and metadata is set', () => {
+    const { input } = buildCreatePostVariables('ch_li', {
+      platform: 'linkedin',
+      ...base,
+      metadata: {
+        firstComment:
+          'Read the full guide: https://parkingticketpal.com/blog/x',
+        linkAttachmentUrl: 'https://parkingticketpal.com/blog/x',
+      },
+    });
+    expect((input as { metadata?: { linkedin?: unknown } }).metadata).toEqual({
+      linkedin: {
+        firstComment:
+          'Read the full guide: https://parkingticketpal.com/blog/x',
+        linkAttachment: { url: 'https://parkingticketpal.com/blog/x' },
+      },
+    });
+  });
+
+  it('omits metadata key entirely when no LinkedIn extras are set', () => {
+    const { input } = buildCreatePostVariables('ch_li', {
+      platform: 'linkedin',
+      ...base,
+    });
+    expect('metadata' in (input as object)).toBe(false);
+  });
+
+  it('does not emit LinkedIn metadata for a TikTok post (even if metadata is passed)', () => {
+    // Buffer's TikTok schema only exposes `title`; firstComment is
+    // LinkedIn/FB/IG. We deliberately ignore the input rather than emit
+    // metadata.tiktok with the wrong shape.
+    const { input } = buildCreatePostVariables('ch_tt', {
+      platform: 'tiktok',
+      ...base,
+      metadata: { firstComment: 'wrong place', linkAttachmentUrl: 'x' },
+    });
+    expect('metadata' in (input as object)).toBe(false);
+  });
 });
 
 describe('isBufferBridgeEnabled', () => {

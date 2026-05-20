@@ -2081,10 +2081,17 @@ const handleRequest = async (request: Request) => {
               coloringImage,
               'image',
             );
+            const liPageUrl = `https://chunkycrayon.com/coloring/${coloringImage.id}`;
             const buffered = await schedulePostViaBuffer({
               platform: 'linkedin',
               text: liCaption,
               imageUrl: instagramImageUrl,
+              metadata: {
+                // First comment with the link (LinkedIn downranks
+                // link-in-body); body stays clean.
+                firstComment: `Grab the printable: ${liPageUrl}`,
+                linkAttachmentUrl: liPageUrl,
+              },
               dueAt: new Date(Date.now() + 5 * 60 * 1000),
             });
             if (buffered.scheduled) {
