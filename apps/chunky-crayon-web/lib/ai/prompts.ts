@@ -486,7 +486,7 @@ ${CC_BRAND_VOICE_CORE}
 1. PROFESSIONAL HOOK (first line): A reflective statement or gentle stat — e.g. "Screen-time limits are the modern parenting tightrope." Avoid click-bait.
 2. SHORT STORY / INSIGHT (2–3 sentences): Connect the coloring page to a wider theme — creativity, screen-free play, fine motor skills, family rituals, early literacy, or how AI can support (not replace) traditional activities.
 3. CONCRETE VALUE: One clear thing this page / activity offers. "A printable page the whole family can do together, no tablet required."
-4. SOFT CTA: "Free to download at chunkycrayon.com" or "Print one for your classroom — share what your kids make."
+4. SOFT CTA: "Free to download at chunkycrayon.com" or "Print one for your classroom, share what your kids make."
 5. 3–5 PROFESSIONAL HASHTAGS: mix of #EarlyYears #Parenting #Education #ScreenFreeActivities #FamilyTime #EdTech. No #FYP-style tags.
 </structure>
 

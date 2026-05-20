@@ -282,7 +282,7 @@ REQUIREMENTS:
    kid's input action (per HARD REQUIREMENT above). Mimic the example:
    ${opener}
 2. SHARE TRIGGER: "Tag a parent who'd love this" / "Share with the grandparents".
-3. CTA: "Free at chunkycrayon.com — no signup needed to try it".
+3. CTA: "Free at chunkycrayon.com, no signup needed to try it".
 4. 2-3 hashtags max, family-friendly (#Parenting #KidsActivities).
 5. Do NOT mention "AI", "artificial intelligence", "tech", "automatic",
    or "magic brush". Parents are AI-skeptical; show the feature and the
@@ -345,7 +345,7 @@ REQUIREMENTS:
    fill it in so they can see what's possible before they pick up a crayon.
 3. Tie it to a professional theme — screen-free follow-through, agency,
    creativity, reducing prep time for educators.
-4. CTA: "Free to try at chunkycrayon.com — we'd love your feedback".
+4. CTA: "Free to try at chunkycrayon.com. We'd love your feedback".
 5. 3-5 professional hashtags (#EarlyYears #EdTech #ScreenFreePlay #Parenting).
 6. 150-220 words.
 7. Do NOT use the words "AI", "artificial intelligence", "GenAI", "machine
@@ -384,9 +384,9 @@ REQUIREMENTS:
 1. HOOK (first line): something that ties to the demo reel they just
    saw OR teases the printable. Avoid "ASMR", "satisfying" framing.
    Good: "Saw the AI color this one earlier? Now it's your kid's turn."
-         "We made this in seconds. Your kid can too — link in bio."
+         "We made this in seconds. Your kid can too. Link in bio."
 2. SAVE TRIGGER: "Save this idea for your next bored-rainy-day moment".
-3. CTA: "Try it free at chunkycrayon.com — link in bio".
+3. CTA: "Try it free at chunkycrayon.com, link in bio".
 4. 6-10 hashtags mixing #kidsactivities #coloringpage #freeprintable
    #aiforkids #screenfreeplay.
 
@@ -403,7 +403,7 @@ REQUIREMENTS:
    chunkycrayon.com so your kid can have a go."
 2. SHARE TRIGGER: "Tag a parent or grandparent who'd love this for
    the next car ride / rainy day".
-3. CTA: "Free at chunkycrayon.com — no signup needed to try".
+3. CTA: "Free at chunkycrayon.com, no signup needed to try".
 4. 2-3 family-friendly hashtags (#KidsActivities #FreePrintable).
 
 Remember: Output ONLY the post text without labels.`;
