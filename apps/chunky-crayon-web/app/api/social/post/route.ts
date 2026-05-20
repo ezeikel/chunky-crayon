@@ -551,38 +551,6 @@ const createInstagramReelContainer = async (
 };
 
 /**
- * Create an Instagram Story container (image).
- *
- * Stories support IMAGE or VIDEO. For vertical-friendly images (our SVG
- * converter outputs 1080×1920), Meta accepts them directly. Follow with
- * publishInstagramMedia to actually post.
- *
- * Stories last 24h and don't carry a caption (text overlays are a
- * separate manual step in the app).
- */
-const createInstagramStoryImageContainer = async (imageUrl: string) => {
-  const response = await fetch(
-    `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        media_type: 'STORIES',
-        image_url: imageUrl,
-        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
-      }),
-    },
-  );
-  const data = await response.json();
-  if (!data.id) {
-    throw new Error(
-      `failed to create IG Story image container: ${JSON.stringify(data)}`,
-    );
-  }
-  return data.id;
-};
-
-/**
  * Create an Instagram Story container (video).
  *
  * Accepts vertical 9:16 mp4 (our reel output is 1080×1920). Stories
@@ -610,32 +578,6 @@ const createInstagramStoryVideoContainer = async (videoUrl: string) => {
     );
   }
   return data.id;
-};
-
-/**
- * Post an image to the Facebook Page's story.
- *
- * Uses the Page's /photo_stories edge. Requires pages_manage_posts +
- * pages_read_engagement on the access token (same token scope used for
- * feed posts).
- */
-const postImageToFacebookStory = async (imageUrl: string) => {
-  const response = await fetch(
-    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/photo_stories`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: imageUrl,
-        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
-      }),
-    },
-  );
-  const data = await response.json();
-  if (!data.id && !data.success) {
-    throw new Error(`failed to post FB Story image: ${JSON.stringify(data)}`);
-  }
-  return data.id ?? data.post_id ?? 'ok';
 };
 
 /**
@@ -1883,30 +1825,10 @@ const handleRequest = async (request: Request) => {
           };
         }
 
-        // Also post to IG Story — non-blocking.
-        if (
-          platformResults.instagramColoredStatic?.success &&
-          !csAlreadyPosted('instagramStoryColoredStatic')
-        ) {
-          try {
-            const storyContainerId =
-              await createInstagramStoryImageContainer(blankImageUrl);
-            await waitForMediaReady(storyContainerId, 20, 3000);
-            const storyId = await publishInstagramMedia(storyContainerId);
-            platformResults.instagramStoryColoredStatic = {
-              success: true,
-              mediaId: storyId,
-              postedAt: new Date().toISOString(),
-            };
-            console.log('[ColoredStatic] IG Story posted:', storyId);
-          } catch (err) {
-            console.error('[ColoredStatic] IG Story failed (non-fatal):', err);
-            platformResults.instagramStoryColoredStatic = {
-              success: false,
-              error: err instanceof Error ? err.message : 'Unknown error',
-            };
-          }
-        }
+        // No Story for colored_static. Stories are reserved for reel
+        // video content (demo reel + content reel) where the asset is
+        // already vertical 9:16 and the format earns the 24h placement.
+        // Static + carousel images stay feed-only.
       }
 
       // Facebook single-image post
@@ -1935,27 +1857,7 @@ const handleRequest = async (request: Request) => {
           };
         }
 
-        // Also post to FB Story — non-blocking.
-        if (
-          platformResults.facebookColoredStatic?.success &&
-          !csAlreadyPosted('facebookStoryColoredStatic')
-        ) {
-          try {
-            const storyId = await postImageToFacebookStory(blankImageUrl);
-            platformResults.facebookStoryColoredStatic = {
-              success: true,
-              mediaId: storyId,
-              postedAt: new Date().toISOString(),
-            };
-            console.log('[ColoredStatic] FB Story posted:', storyId);
-          } catch (err) {
-            console.error('[ColoredStatic] FB Story failed (non-fatal):', err);
-            platformResults.facebookStoryColoredStatic = {
-              success: false,
-              error: err instanceof Error ? err.message : 'Unknown error',
-            };
-          }
-        }
+        // No FB Story for colored_static (see IG Story comment above).
       }
 
       try {
@@ -2225,32 +2127,10 @@ const handleRequest = async (request: Request) => {
           }
         }
 
-        // Also post the line-art image to IG Story — non-blocking. Uses
-        // the JPEG we already uploaded for the feed post.
-        if (
-          staticPlatformResults.instagramCarousel?.success &&
-          instagramImageUrl &&
-          !existingStaticResults.instagramStory?.success
-        ) {
-          try {
-            const storyContainerId =
-              await createInstagramStoryImageContainer(instagramImageUrl);
-            await waitForMediaReady(storyContainerId, 20, 3000);
-            const storyId = await publishInstagramMedia(storyContainerId);
-            staticPlatformResults.instagramStory = {
-              success: true,
-              mediaId: storyId,
-              postedAt: new Date().toISOString(),
-            };
-            console.log('[Instagram] Story posted:', storyId);
-          } catch (err) {
-            console.error('[Instagram] Story failed (non-fatal):', err);
-            staticPlatformResults.instagramStory = {
-              success: false,
-              error: err instanceof Error ? err.message : 'Unknown error',
-            };
-          }
-        }
+        // No Story for the carousel / line-art feed image. Stories are
+        // reserved for reel video content (demo reel + content reel)
+        // where the asset is already vertical 9:16. Static + carousel
+        // images stay feed-only.
       }
 
       // Post 2: Reel (if we have animation) - for algorithm reach/discovery
@@ -2377,24 +2257,7 @@ const handleRequest = async (request: Request) => {
         };
         console.log('Successfully posted image to Facebook:', facebookImageId);
 
-        // Also post to FB Story — non-blocking.
-        if (!existingStaticResults.facebookStory?.success) {
-          try {
-            const storyId = await postImageToFacebookStory(facebookImageUrl);
-            staticPlatformResults.facebookStory = {
-              success: true,
-              mediaId: storyId,
-              postedAt: new Date().toISOString(),
-            };
-            console.log('[Facebook] Story posted:', storyId);
-          } catch (err) {
-            console.error('[Facebook] Story failed (non-fatal):', err);
-            staticPlatformResults.facebookStory = {
-              success: false,
-              error: err instanceof Error ? err.message : 'Unknown error',
-            };
-          }
-        }
+        // No FB Story for the static feed image (see carousel comment above).
       } catch (error) {
         console.error('Error posting image to Facebook:', error);
         const errorMsg =

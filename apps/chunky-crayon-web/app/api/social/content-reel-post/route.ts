@@ -138,6 +138,91 @@ const publishInstagramMedia = async (creationId: string): Promise<string> => {
   return data.id;
 };
 
+/**
+ * Create an Instagram Story container (video). Mirrors the helper in
+ * /api/social/post for demo reels. Content reels are vertical 9:16
+ * already so they fit Story format. Story auto-trims to 60s; our reels
+ * are ~50-69s so we may lose the tail. Non-blocking — feed post stays
+ * canonical.
+ */
+const createInstagramStoryVideoContainer = async (
+  videoUrl: string,
+): Promise<string> => {
+  const response = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.INSTAGRAM_ACCOUNT_ID}/media`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        media_type: 'STORIES',
+        video_url: videoUrl,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+  const data = await response.json();
+  if (!data.id) {
+    throw new Error(
+      `failed to create IG Story video container: ${JSON.stringify(data)}`,
+    );
+  }
+  return data.id;
+};
+
+/**
+ * Post a video to the Facebook Page's story. Two-step upload+finish
+ * flow per FB Graph API. Mirrors the helper in /api/social/post.
+ */
+const postVideoToFacebookStory = async (videoUrl: string): Promise<string> => {
+  const startRes = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/video_stories`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upload_phase: 'start',
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+  const startData = await startRes.json();
+  if (!startData.video_id || !startData.upload_url) {
+    throw new Error(
+      `FB Story: failed to start upload session: ${JSON.stringify(startData)}`,
+    );
+  }
+
+  const uploadRes = await fetch(startData.upload_url, {
+    method: 'POST',
+    headers: {
+      Authorization: `OAuth ${process.env.FACEBOOK_ACCESS_TOKEN}`,
+      file_url: videoUrl,
+    },
+  });
+  const uploadData = await uploadRes.json();
+  if (!uploadData.success) {
+    throw new Error(`FB Story: upload failed: ${JSON.stringify(uploadData)}`);
+  }
+
+  const finishRes = await fetch(
+    `https://graph.facebook.com/v22.0/${process.env.FACEBOOK_PAGE_ID}/video_stories`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        upload_phase: 'finish',
+        video_id: startData.video_id,
+        access_token: process.env.FACEBOOK_ACCESS_TOKEN,
+      }),
+    },
+  );
+  const finishData = await finishRes.json();
+  if (!finishData.success && !finishData.post_id) {
+    throw new Error(`FB Story: finish failed: ${JSON.stringify(finishData)}`);
+  }
+  return finishData.post_id ?? startData.video_id;
+};
+
 const postVideoToFacebookPage = async (
   videoUrl: string,
   description: string,
@@ -443,6 +528,27 @@ const handleInner = async (request: Request): Promise<Response> => {
         postedAt: new Date().toISOString(),
       };
       console.log(`[ContentReel] IG posted: ${mediaId}`);
+
+      // Also post the reel to IG Story — non-blocking. A failed Story
+      // never fails the feed post (which is canonical). Mirrors the
+      // demo-reel Story flow in /api/social/post.
+      try {
+        const storyContainerId = await createInstagramStoryVideoContainer(
+          reel.reelUrl,
+        );
+        await waitForInstagramContainer(storyContainerId);
+        const storyId = await publishInstagramMedia(storyContainerId);
+        results.instagramStory = {
+          success: true,
+          mediaId: storyId,
+          postedAt: new Date().toISOString(),
+        };
+        console.log(`[ContentReel] IG Story posted: ${storyId}`);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error('[ContentReel] IG Story failed (non-fatal):', message);
+        results.instagramStory = { success: false, error: message };
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       console.error('[ContentReel] IG failed:', message);
@@ -474,6 +580,22 @@ const handleInner = async (request: Request): Promise<Response> => {
         postedAt: new Date().toISOString(),
       };
       console.log(`[ContentReel] FB posted: ${fbId}`);
+
+      // Also post to FB Story — non-blocking. Mirrors the demo-reel
+      // FB Story flow in /api/social/post.
+      try {
+        const storyId = await postVideoToFacebookStory(reel.reelUrl);
+        results.facebookStory = {
+          success: true,
+          mediaId: storyId,
+          postedAt: new Date().toISOString(),
+        };
+        console.log(`[ContentReel] FB Story posted: ${storyId}`);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error('[ContentReel] FB Story failed (non-fatal):', message);
+        results.facebookStory = { success: false, error: message };
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       console.error('[ContentReel] FB failed:', message);
