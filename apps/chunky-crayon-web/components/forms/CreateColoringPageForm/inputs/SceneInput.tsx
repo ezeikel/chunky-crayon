@@ -234,7 +234,6 @@ const SceneInput = ({ onChange, onCreate }: SceneInputProps) => {
           create: t('create'),
           extrasTitle: t('extrasTitle'),
           skip: t('skip'),
-          stepLabel: (c, n) => t('stepLabel', { current: c, total: n }),
         }}
       />
     </div>

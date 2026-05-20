@@ -276,7 +276,6 @@ const SceneBuilderHost = ({
           create: "Create!",
           extrasTitle: "Make it special",
           skip: "Skip",
-          stepLabel: (c, t) => `Step ${c} of ${t}`,
         }}
       />
       {created && (

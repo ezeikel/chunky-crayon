@@ -96,8 +96,6 @@ export type SceneBuilderLabels = {
   extrasTitle?: string;
   /** Skip-the-optional-step affordance, e.g. "Skip". */
   skip?: string;
-  /** Step counter, given (current,total) → string e.g. "Step 1 of 2". */
-  stepLabel?: (current: number, total: number) => string;
 };
 
 export type SceneBuilderProps = {
@@ -161,16 +159,19 @@ const SceneTile = ({
       <span
         className={cn(
           "relative grid place-items-center overflow-hidden",
-          "rounded-coloring-card border-2",
+          "rounded-coloring-card border bg-white",
           "transition-all duration-coloring-base ease-coloring",
           "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
           size === "lg" ? "size-24 md:size-28" : "size-16 md:size-20",
+          // Calm selected state: gentle scale + soft drop-shadow halo + the
+          // check badge top-right. No heavy orange border, no orange label —
+          // those together read as alarming rather than "you picked this".
           selected
-            ? "border-coloring-accent shadow-coloring-button scale-105"
-            : "border-coloring-surface-dark bg-white",
+            ? "border-transparent scale-105 shadow-[0_6px_18px_rgba(255,138,61,0.35)]"
+            : "border-coloring-surface-dark",
           !disabled &&
             !selected &&
-            "group-hover:border-coloring-accent group-hover:bg-coloring-surface group-active:scale-95",
+            "group-hover:border-coloring-accent/40 group-hover:bg-coloring-surface group-active:scale-95",
           disabled && "opacity-60",
         )}
         style={
@@ -222,10 +223,12 @@ const SceneTile = ({
         )}
       </span>
 
+      {/* Label stays default colour even when selected — turning it
+          orange together with the tile glow read as alarming, not chosen. */}
       <span
         className={cn(
           "max-w-28 truncate text-center text-sm font-semibold",
-          selected ? "text-coloring-accent" : "text-coloring-text-secondary",
+          "text-coloring-text-primary",
         )}
       >
         {option.label}
@@ -422,27 +425,6 @@ const TileCarousel = ({
   );
 };
 
-// ─── Step dots ───────────────────────────────────────────────────────────────
-
-const StepDots = ({ total, current }: { total: number; current: number }) => (
-  <div className="flex items-center gap-2" aria-hidden="true">
-    {Array.from({ length: total }).map((_, i) => (
-      <span
-        // eslint-disable-next-line react/no-array-index-key
-        key={i}
-        className={cn(
-          "size-2.5 rounded-full transition-colors duration-coloring-base",
-          i === current
-            ? "bg-coloring-accent"
-            : i < current
-              ? "bg-coloring-accent/50"
-              : "bg-coloring-surface-dark",
-        )}
-      />
-    ))}
-  </div>
-);
-
 // ─── SceneBuilder (wizard) ───────────────────────────────────────────────────
 
 const SceneBuilder = ({
@@ -465,16 +447,11 @@ const SceneBuilder = ({
   const extraLayers = useMemo(() => layers.slice(2), [layers]);
 
   // Steps: 0 = subject, 1 = location, 2 = (optional) extras. Extras only
-  // counts as a step if there are extra layers to show.
+  // exists as a step if there are extra layers to show. We don't surface
+  // step numbers in the UI any more (kids don't read them); progress is
+  // implicit in the question changing + the carousel page dots.
   const hasExtras = extraLayers.length > 0;
-  const totalSteps = hasExtras ? 3 : 2;
-  // Step counter shown to the user only counts the REQUIRED steps (2) —
-  // "Step 1 of 2", then an optional bonus screen. Less intimidating than
-  // "Step 1 of 3" when the 3rd is skippable.
-  const requiredSteps = 2;
   const [step, setStep] = useState(0);
-
-  const stepLabel = labels.stepLabel ?? ((c, t) => `Step ${c} of ${t}`);
 
   const toggleOption = (layer: SceneLayer, optionKey: string) => {
     if (disabled) return;
@@ -518,16 +495,15 @@ const SceneBuilder = ({
       role="group"
       aria-label={labels.ariaLabel ?? "Build your picture"}
     >
-      {/* Header: step counter + dots + dice. Compact; the dice label is
-          icon-only on narrow widths so it doesn't push the dots off-row. */}
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-coloring-text-secondary md:text-xs">
-          {step < requiredSteps
-            ? stepLabel(step + 1, requiredSteps)
-            : (labels.extrasTitle ?? "Make it special")}
-        </span>
-        <StepDots total={totalSteps} current={step} />
-        {onSurpriseMe && (
+      {/* Surprise me — kid-prominent. The most playful affordance shouldn't
+          read as the most timid; it's a chunky filled brand pill, not a
+          ghost button. We deliberately dropped the "STEP X OF Y" text and
+          step dots — a 3-8yo doesn't read either, and the carousel page
+          dots beneath the tiles already carry "your place in this set"
+          unambiguously. Two competing dot rows confuse adults, never mind
+          kids. */}
+      {onSurpriseMe && (
+        <div className="flex justify-end">
           <button
             type="button"
             onClick={onSurpriseMe}
@@ -535,22 +511,19 @@ const SceneBuilder = ({
             aria-label={labels.surpriseMe ?? "Surprise me!"}
             title={labels.surpriseMe ?? "Surprise me!"}
             className={cn(
-              "flex items-center gap-1.5 rounded-full border-2",
-              "border-coloring-accent bg-white px-2 py-1 text-xs font-bold",
-              "text-coloring-accent transition-all duration-coloring-base",
+              "flex items-center gap-2 rounded-full",
+              "bg-coloring-accent px-4 py-2 text-sm font-bold text-white",
+              "shadow-coloring-button transition-all duration-coloring-base",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-              !disabled &&
-                "hover:bg-coloring-accent hover:text-white active:scale-95",
+              !disabled && "hover:brightness-105 active:scale-95",
               disabled && "opacity-50",
             )}
           >
-            <FontAwesomeIcon icon={faDice} />
-            <span className="hidden md:inline">
-              {labels.surpriseMe ?? "Surprise me!"}
-            </span>
+            <FontAwesomeIcon icon={faDice} className="text-base" />
+            {labels.surpriseMe ?? "Surprise me!"}
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Step 1 — Who? (required) */}
       {step === 0 && subjectLayer && (
