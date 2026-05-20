@@ -18,7 +18,7 @@
  */
 import { generateObject, generateText } from 'ai';
 import { z } from 'zod';
-import { ccVoice } from '@one-colored-pixel/coloring-core';
+import { ccVoice, sanitizeCaption } from '@one-colored-pixel/coloring-core';
 import { models } from '@/lib/ai/models';
 import type { CommentType } from '@one-colored-pixel/db';
 
@@ -41,7 +41,7 @@ If you genuinely can't add value, reply with exactly "SKIP" and nothing else.`;
 
 const COMMENT_TYPE_GUIDANCE: Record<CommentType, string> = {
   AGREEMENT:
-    "Acknowledge warmly and add one tiny extra observation about the page — what's fun about it, what kids tend to enjoy coloring. Don't gush.",
+    "Acknowledge warmly and add one tiny extra observation about the page: what's fun about it, what kids tend to enjoy coloring. Don't gush.",
   QUESTION:
     'Answer directly and briefly. If we genuinely don\'t know, say so cheerfully ("good question, we\'re not sure!"). Never make up an answer.',
   CORRECTION:
@@ -54,7 +54,7 @@ const COMMENT_TYPE_GUIDANCE: Record<CommentType, string> = {
     'Reply with a short warm phrase + matching emoji. Don\'t overthink it. "🌈 thank you!" energy.',
   SPAM: 'Always SKIP.',
   IMAGE_REQUEST:
-    'This should not be hitting this path — image requests are handled upstream by the #drawthis flow. SKIP.',
+    'This should not be hitting this path. Image requests are handled upstream by the #drawthis flow. SKIP.',
   OTHER:
     "Treat as appreciation or a light comment. One short warm reply if there's anything to say, otherwise SKIP.",
 };
@@ -103,9 +103,9 @@ shouldReply rules:
 - Default TRUE. Only set FALSE for: clear spam, non-English with no context, just a stranger's @-tag with no real message, or genuinely abusive/inappropriate content.
 - Questions ALWAYS get a reply (even if we can only partially answer).
 - Emoji-only comments ALSO get a reply.
-- Combative comments USUALLY get a short friendly deflect, sometimes SKIP — depends on tone.
+- Combative comments USUALLY get a short friendly deflect, sometimes SKIP. Depends on tone.
 
-Be honest in 'reason' — one short sentence on why you classified it this way.`,
+Be honest in 'reason': one short sentence on why you classified it this way.`,
   });
 
   return object as ClassifyResult;
@@ -161,7 +161,11 @@ Their comment: "${commentText}"
 Reply with ONLY the reply text. No quotes, no labels, no preamble. If you genuinely can't add value, reply with exactly "SKIP".`,
   });
 
-  const trimmed = text.trim();
+  // Sanitise like every other CC caption: strip markdown the platform
+  // won't render and convert em/en dashes to commas. Was missing here,
+  // which is why em dashes occasionally shipped in posted replies even
+  // though the brand-voice rule forbids them.
+  const trimmed = sanitizeCaption(text);
   if (trimmed === 'SKIP' || trimmed === '') {
     return {
       reply: null,
