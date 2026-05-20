@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPalette, faArrowRight } from '@fortawesome/pro-duotone-svg-icons';
-import { faStar, faHeart, faSpinner } from '@fortawesome/pro-solid-svg-icons';
+import { faStar, faHeart } from '@fortawesome/pro-solid-svg-icons';
 import { getSharedArtworkByCode } from '@/app/actions/share';
+import Loading from '@/components/Loading/Loading';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import ProfileAvatar from '@/components/ProfileAvatar/ProfileAvatar';
 import FormattedDate from './FormattedDate';
@@ -62,12 +63,7 @@ const SharedArtworkLoading = () => (
       </h1>
       <FontAwesomeIcon icon={faStar} className="text-2xl text-crayon-yellow" />
     </div>
-    <div className="flex items-center justify-center py-20">
-      <FontAwesomeIcon
-        icon={faSpinner}
-        className="text-4xl text-crayon-purple animate-spin"
-      />
-    </div>
+    <Loading size="lg" className="py-20" />
   </PageWrap>
 );
 

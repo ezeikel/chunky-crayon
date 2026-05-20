@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faSpinner } from '@fortawesome/pro-solid-svg-icons';
+import { faTrash } from '@fortawesome/pro-solid-svg-icons';
+import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import {
   Dialog,
   DialogContent,
@@ -67,7 +68,10 @@ const DeleteArtworkButton = ({ artworkId }: DeleteArtworkButtonProps) => {
               className="h-auto w-full rounded-full px-6 py-3 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isPending ? (
-                <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+                <FontAwesomeIcon
+                  icon={faSpinnerThird}
+                  className="animate-spin"
+                />
               ) : (
                 'Yes, Delete'
               )}

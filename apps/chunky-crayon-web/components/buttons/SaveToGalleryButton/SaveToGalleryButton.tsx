@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { faHeart, faSpinner, faCheck } from '@fortawesome/pro-solid-svg-icons';
+import { faHeart, faCheck } from '@fortawesome/pro-solid-svg-icons';
+import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { saveArtworkToGallery } from '@/app/actions/saved-artwork';
 import Confetti from '@/components/Confetti';
 import { StickerReward } from '@/components/StickerReward';
@@ -146,7 +147,7 @@ const SaveToGalleryButton = ({
         <ActionButton
           size="tile"
           tone="secondary"
-          icon={faSpinner}
+          icon={faSpinnerThird}
           label={t('saving')}
           disabled
           className={className}

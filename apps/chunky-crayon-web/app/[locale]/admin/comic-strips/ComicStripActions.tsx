@@ -7,7 +7,7 @@ import {
   faShareNodes,
   faCheck,
   faXmark,
-  faSpinner,
+  faSpinnerThird,
 } from '@fortawesome/pro-duotone-svg-icons';
 import {
   triggerComicStripGeneration,
@@ -73,7 +73,7 @@ const ComicStripActions = ({ latestStripId }: Props) => {
           className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-crayon-orange text-white font-rooney-sans font-bold disabled:opacity-60"
         >
           {genStatus.kind === 'pending' ? (
-            <FontAwesomeIcon icon={faSpinner} spin />
+            <FontAwesomeIcon icon={faSpinnerThird} spin />
           ) : (
             <FontAwesomeIcon icon={faWandMagicSparkles} />
           )}
@@ -112,7 +112,7 @@ const ComicStripActions = ({ latestStripId }: Props) => {
                 className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border-2 border-crayon-orange text-crayon-orange-dark font-rooney-sans font-bold capitalize disabled:opacity-60"
               >
                 {s.kind === 'pending' ? (
-                  <FontAwesomeIcon icon={faSpinner} spin />
+                  <FontAwesomeIcon icon={faSpinnerThird} spin />
                 ) : s.kind === 'success' ? (
                   <FontAwesomeIcon icon={faCheck} />
                 ) : s.kind === 'error' ? (

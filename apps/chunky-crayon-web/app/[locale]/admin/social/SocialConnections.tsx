@@ -14,10 +14,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCircleCheck,
   faCircleXmark,
-  faSpinner,
   faPlugCircleXmark,
   faArrowUpRightFromSquare,
 } from '@fortawesome/pro-solid-svg-icons';
+import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 
 const CheckCircle = ({ className }: { className?: string }) => (
   <FontAwesomeIcon icon={faCircleCheck} className={className} />
@@ -26,7 +26,7 @@ const XCircle = ({ className }: { className?: string }) => (
   <FontAwesomeIcon icon={faCircleXmark} className={className} />
 );
 const Loader2 = ({ className }: { className?: string }) => (
-  <FontAwesomeIcon icon={faSpinner} className={className} />
+  <FontAwesomeIcon icon={faSpinnerThird} className={className} />
 );
 const Unplug = ({ className }: { className?: string }) => (
   <FontAwesomeIcon icon={faPlugCircleXmark} className={className} />

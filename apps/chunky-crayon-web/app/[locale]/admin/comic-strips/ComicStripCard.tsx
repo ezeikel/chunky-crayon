@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTrashCan,
-  faSpinner,
+  faSpinnerThird,
   faArrowsRotate,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { deleteComicStrip, rerollComicStrip } from '@/app/actions/comic-strip';
@@ -189,7 +189,7 @@ const ComicStripCard = ({ strip: s }: Props) => {
                 }`}
               >
                 {rerollState === 'pending' ? (
-                  <FontAwesomeIcon icon={faSpinner} spin />
+                  <FontAwesomeIcon icon={faSpinnerThird} spin />
                 ) : (
                   <FontAwesomeIcon icon={faArrowsRotate} />
                 )}
@@ -213,7 +213,7 @@ const ComicStripCard = ({ strip: s }: Props) => {
               }`}
             >
               {deleteState === 'pending' ? (
-                <FontAwesomeIcon icon={faSpinner} spin />
+                <FontAwesomeIcon icon={faSpinnerThird} spin />
               ) : (
                 <FontAwesomeIcon icon={faTrashCan} />
               )}

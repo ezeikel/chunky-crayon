@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { faShare, faSpinner } from '@fortawesome/pro-duotone-svg-icons';
+import { faShare, faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import AdultGate from '@/components/AdultGate';
 import Portal from '@/components/Portal';
@@ -76,7 +76,7 @@ const ShareButton = ({
       <ActionButton
         size="tile"
         tone="tool"
-        icon={state === 'uploading' ? faSpinner : faShare}
+        icon={state === 'uploading' ? faSpinnerThird : faShare}
         label={state === 'uploading' ? t('preparing') : t('idle')}
         onClick={handleShareClick}
         disabled={

@@ -3,13 +3,10 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSpinner,
-  faCheck,
-  faTimes,
-  faUnlink,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes, faUnlink } from '@fortawesome/free-solid-svg-icons';
+import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { faTiktok } from '@fortawesome/free-brands-svg-icons';
+import Loading from '@/components/Loading/Loading';
 import type { CreatorInfo } from '@/lib/tiktok';
 
 type TikTokPostComposerProps = {
@@ -113,14 +110,8 @@ const TikTokPostComposer = ({
 
   if (state === 'loading') {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-3">
-        <FontAwesomeIcon
-          icon={faSpinner}
-          className="text-2xl text-primary animate-spin"
-        />
-        <p className="text-sm text-muted-foreground">
-          Loading TikTok account...
-        </p>
+      <div className="py-12">
+        <Loading text="Loading TikTok account..." />
       </div>
     );
   }
@@ -302,7 +293,7 @@ const TikTokPostComposer = ({
         >
           {state === 'posting' ? (
             <>
-              <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+              <FontAwesomeIcon icon={faSpinnerThird} className="animate-spin" />
               Publishing...
             </>
           ) : (
