@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ColoringImage } from '@one-colored-pixel/db/types';
 import {
   ImageCanvas,
+  MobileColoringDrawer,
   useRegionStore,
   type ImageCanvasHandle,
   type RegionStoreJson,
@@ -17,6 +18,7 @@ import { Experiment } from '@/components/experiment/Experiment';
 import TapPromptOverlay from '@/components/TapPromptOverlay';
 import StartPostEngagementBridge from '@/components/StartPostEngagementBridge';
 import SlimColorPalette from './SlimColorPalette';
+import EmbeddedDrawerTracker from './EmbeddedDrawerTracker';
 
 type EmbeddedColoringCanvasProps = {
   /**
@@ -35,6 +37,14 @@ type EmbeddedColoringCanvasProps = {
    * variant; hidden after the visitor's first interaction.
    */
   tapPromptLabel?: string;
+  /**
+   * Translated label shown under the pulsing hand affordance on the
+   * mobile drawer handle for first-time visitors (e.g. "Drag for
+   * tools"). Same prop, same hint, as /coloring-image/[id] — so a
+   * first-time paid-ad visitor learns the gesture before they hit
+   * the real coloring page.
+   */
+  handleHintLabel?: string;
   className?: string;
 };
 
@@ -68,6 +78,7 @@ const EmbeddedColoringCanvas = ({
   image,
   campaign,
   tapPromptLabel,
+  handleHintLabel,
   className,
 }: EmbeddedColoringCanvasProps) => {
   const { track } = useAnalytics();
@@ -340,83 +351,52 @@ const EmbeddedColoringCanvas = ({
         />
       </div>
 
-      {/* Mobile: bottom-sheet drawer with the same look + feel as
-          coloring-ui's MobileColoringDrawer (rounded top, drag handle,
-          paper-cream surface, shadow above) so it visually matches the
-          /coloring-image/[id] mobile experience visitors will see if
-          they sign up. Gated by IntersectionObserver — visible only
-          while the canvas is in viewport so it doesn't follow visitors
-          into the marketing copy below.
-          The drag handle is decorative here — we deliberately don't
-          use Vaul because the canvas is the page's main feature, not
-          dismissible by mistake. */}
+      {/* Mobile: the SAME MobileColoringDrawer used on /coloring-image/[id],
+          with variant="slim" to render only crayon / magic / eraser plus
+          our Print + Save trailing actions. Sharing the shell means
+          drag/snap/spring physics, the pulsing-hand hint, safe-area
+          handling, and any future improvements land on both surfaces.
+          Gated by IntersectionObserver — visible only while the canvas
+          is in viewport so it doesn't follow visitors down the page.
+          EmbeddedDrawerTracker is a renderless sibling that bridges
+          context-driven tool changes to analytics events + the
+          one-shot magic-auto reset that /start needs (the drawer's
+          magic-auto is sticky by default in the full variant). */}
       {isInViewport && (
-        <div
-          className={cn(
-            'md:hidden fixed bottom-0 left-0 right-0 z-40 mx-2',
-            'flex flex-col bg-white rounded-t-3xl overflow-hidden',
-            'border-2 border-b-0 border-coloring-surface-dark',
-            'shadow-[0_-4px_16px_rgba(0,0,0,0.15)]',
-            'pb-[max(0.75rem,env(safe-area-inset-bottom))]',
-          )}
-        >
-          {/* Decorative drag-handle pill — matches MobileColoringDrawer */}
-          <div
-            aria-hidden
-            className="flex items-center justify-center pt-3 pb-2 w-full"
-          >
-            <div className="w-12 h-1.5 rounded-full bg-coloring-surface-dark" />
-          </div>
-          <div className="px-4 pb-2">
-            <SlimColorPalette
-              magicAvailable={regionStore.state.isReady}
-              onMagicAutoColor={handleMagicAutoColor}
-              campaign={campaign}
-              trailingAction={
-                // Print + Save rendered as direct grid cells (parent
-                // SlimColorPalette uses grid grid-cols-5). Wrapper
-                // divs get the cell sizing (w-full aspect-square
-                // max-w-16); the !w-full !h-full overrides force the
-                // buttons to fill their cells. All 5 buttons (3 tools
-                // + 2 actions) shrink uniformly when the row would
-                // overflow, cap at 64px when there's room.
-                <>
-                  <div
-                    className="w-full aspect-square max-w-16"
-                    onClickCapture={() =>
-                      track(TRACKING_EVENTS.START_HERO_PDF_PRINTED, {
-                        campaign,
-                        coloringImageId: image.id ?? '',
-                        msFromMount: Date.now() - mountTimeRef.current,
-                      })
-                    }
-                  >
-                    <PrintButton
-                      coloringImage={image}
-                      getCanvasDataUrl={getCanvasDataUrl}
-                      className="!w-full !h-full"
-                    />
-                  </div>
-                  <div
-                    className="w-full aspect-square max-w-16"
-                    onClickCapture={() =>
-                      track(TRACKING_EVENTS.START_HERO_PDF_DOWNLOADED, {
-                        campaign,
-                        coloringImageId: image.id ?? '',
-                        msFromMount: Date.now() - mountTimeRef.current,
-                      })
-                    }
-                  >
-                    <SaveButton
-                      coloringImage={image}
-                      getCanvasDataUrl={getCanvasDataUrl}
-                      className="!w-full !h-full"
-                    />
-                  </div>
-                </>
-              }
-            />
-          </div>
+        <div className="md:hidden">
+          <MobileColoringDrawer
+            variant="slim"
+            handleHintLabel={handleHintLabel}
+            trailingAction={
+              <>
+                <div
+                  className="w-full aspect-square max-w-16"
+                  onClickCapture={handlePrintCapture}
+                >
+                  <PrintButton
+                    coloringImage={image}
+                    getCanvasDataUrl={getCanvasDataUrl}
+                    className="!w-full !h-full"
+                  />
+                </div>
+                <div
+                  className="w-full aspect-square max-w-16"
+                  onClickCapture={handleDownloadCapture}
+                >
+                  <SaveButton
+                    coloringImage={image}
+                    getCanvasDataUrl={getCanvasDataUrl}
+                    className="!w-full !h-full"
+                  />
+                </div>
+              </>
+            }
+          />
+          <EmbeddedDrawerTracker
+            campaign={campaign}
+            onMagicAutoColor={handleMagicAutoColor}
+            magicReady={regionStore.state.isReady}
+          />
         </div>
       )}
     </div>

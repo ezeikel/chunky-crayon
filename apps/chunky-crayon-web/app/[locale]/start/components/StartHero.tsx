@@ -18,6 +18,12 @@ type StartHeroProps = {
   subtitle: string;
   eyebrow: string;
   tryColoringLabel: string;
+  /**
+   * Translated "Drag for tools" affordance, surfaced as the pulsing
+   * hand hint on the mobile coloring drawer. Same copy as
+   * /coloring-image/[id] (coloringPage.dragForTools).
+   */
+  dragForToolsLabel: string;
   ctaLabel: string;
   ctaSubtext: string;
   experimentCtaSubtext?: { urgency: string; proof: string };
@@ -43,6 +49,7 @@ export default function StartHero({
   subtitle,
   eyebrow,
   tryColoringLabel,
+  dragForToolsLabel,
   ctaLabel,
   ctaSubtext,
   experimentCtaSubtext,
@@ -160,6 +167,7 @@ export default function StartHero({
               image={image}
               campaign={campaign}
               tapPromptLabel={tryColoringLabel}
+              handleHintLabel={dragForToolsLabel}
             />
           ) : null}
         </div>

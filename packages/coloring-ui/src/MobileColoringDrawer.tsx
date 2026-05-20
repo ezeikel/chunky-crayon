@@ -60,6 +60,30 @@ type MobileColoringDrawerProps = {
    * localStorage('coloring-drawer-handle-hinted').
    */
   handleHintLabel?: string;
+  /**
+   * Which feature set to render.
+   *
+   * - `'full'` (default): the real coloring experience used on
+   *   /coloring-image/[id] — all 10 tools, palette variant switcher,
+   *   fill types, patterns, brush sizes, undo/redo.
+   * - `'slim'`: a stripped-down variant for marketing surfaces like
+   *   /start where there's no save/undo/sticker state to drive. Renders
+   *   only crayon / magic-auto (one-shot) / eraser in the tools row,
+   *   skips the palette variant switcher / fill / patterns / sticker /
+   *   magic-reveal / undo / redo. The shell (vaul, snap points, drag
+   *   physics, pulsing-hand hint, safe-area handling) is identical, so
+   *   improvements to either surface land in both.
+   */
+  variant?: "full" | "slim";
+  /**
+   * Optional content rendered as extra cells at the end of the tools
+   * row. Only used by the `slim` variant — lets marketing surfaces
+   * inline Print / Save (or any action buttons) alongside crayon /
+   * magic / eraser so the whole controls block reads as one row. The
+   * tools row is a 5-col grid; pass a fragment of grid-cell children
+   * (e.g. two wrappers around PrintButton + SaveButton).
+   */
+  trailingAction?: React.ReactNode;
 };
 
 type ToolConfig = {
@@ -179,13 +203,32 @@ const RedoIcon = ({ className }: { className?: string }) => (
  * - Section rows: Direct flex with gap, no container wrappers
  * - Large touch targets for young children (ages 3-8)
  */
+// Slim variant only renders crayon / magic-auto / eraser. Marketing
+// surfaces (e.g. /start) don't have save/undo/sticker state, so the
+// rest of the full tool set is meaningless there.
+const slimTools: ToolConfig[] = [
+  { id: "crayon", label: "Crayon", icon: faPencil },
+  {
+    id: "magic-auto",
+    label: "Auto Color",
+    shortLabel: "Magic",
+    icon: faBrush,
+    isMagic: true,
+  },
+  { id: "eraser", label: "Eraser", icon: faEraser },
+];
+
 const MobileColoringDrawer = ({
   className,
   onUndo,
   onRedo,
   onStickerToolSelect,
   handleHintLabel,
+  variant = "full",
+  trailingAction,
 }: MobileColoringDrawerProps) => {
+  const isSlim = variant === "slim";
+  const visibleTools = isSlim ? slimTools : tools;
   const {
     activeTool,
     brushType,
@@ -208,14 +251,16 @@ const MobileColoringDrawer = ({
   const { playSound } = useSound();
 
   // Four snap points. Heights in px so behaviour is predictable across
-  // devices.
-  // - MIN  40px:   drag handle only — minimum footprint for users who
+  // devices. Bumped by ~16-20px after the drag handle's vertical hit
+  // area grew (py-5 instead of pt-3 pb-2) so a 5-year-old can actually
+  // grab it; minimums and tools-row peek scale up to match.
+  // - MIN  64px:   drag handle only — minimum footprint for users who
   //                want full canvas visibility while coloring.
   //                Drag-down only (not part of the click cycle).
-  // - PEEK 120px:  drag handle + tools row. Default mount state.
-  // - HALF 340px:  adds palette-variant switcher + color swatches.
-  // - FULL 560px:  adds brush sizes / fill / patterns / undo-redo.
-  const snapPoints = [40, 120, 340, 560] as const;
+  // - PEEK 140px:  drag handle + tools row. Default mount state.
+  // - HALF 360px:  adds palette-variant switcher + color swatches.
+  // - FULL 580px:  adds brush sizes / fill / patterns / undo-redo.
+  const snapPoints = [64, 140, 360, 580] as const;
   type SnapIndex = 0 | 1 | 2 | 3;
   // Default mount state is PEEK (index 1), not MIN. MIN is a power-user
   // drag-down destination, not the first thing a new user should see.
@@ -527,11 +572,14 @@ const MobileColoringDrawer = ({
               {/* Accessible title - visually hidden */}
               <Drawer.Title className="sr-only">Coloring Tools</Drawer.Title>
 
-              {/* Drag handle - drag or click to toggle expanded/collapsed */}
+              {/* Drag handle - drag or click to toggle expanded/collapsed.
+                  Tall (~56px) padding around a small visible pill: a 5yo
+                  needs a chunky hit area, but a chunky pill looks wrong.
+                  The padding is on the touch target, not the pill. */}
               <motion.div
                 role="button"
                 tabIndex={0}
-                className="flex items-center justify-center pt-3 pb-2 w-full cursor-grab active:cursor-grabbing touch-none select-none"
+                className="flex items-center justify-center py-5 w-full cursor-grab active:cursor-grabbing touch-none select-none"
                 onPan={handlePan}
                 onPanEnd={handlePanEnd}
                 onTap={handleToggle}
@@ -555,10 +603,13 @@ const MobileColoringDrawer = ({
 
               {/* Scrollable content area */}
               <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pb-4">
-                {/* Tools — icon-only chunky-card grid, matching desktop sidebar */}
+                {/* Tools — icon-only chunky-card grid, matching desktop sidebar.
+                    Slim variant renders 3 tools + the consumer's trailing
+                    action cells (e.g. Print + Save) in the same 5-col
+                    grid so everything reads as one row. */}
                 <div className="mb-4">
                   <div className="grid grid-cols-5 gap-2">
-                    {tools.map((tool) => {
+                    {visibleTools.map((tool) => {
                       const isActive = isToolActive(tool.id);
                       if (tool.isMagic) {
                         // Magic tools — purple→pink gradient background + sparkle
@@ -614,45 +665,50 @@ const MobileColoringDrawer = ({
                         </button>
                       );
                     })}
+                    {isSlim && trailingAction}
                   </div>
                 </div>
 
                 {/* Palette variant switcher — swaps the swatch grid and drives
                  * the magic-tool palette too, matching desktop's single-knob UX.
                  * Always rendered so the inner overflow-y-auto can scroll to it
-                 * even at peek; the snap height controls how much is visible. */}
-                <div className="mb-3">
-                  <div className="grid grid-cols-4 gap-2">
-                    {PALETTE_VARIANTS.map((variant) => {
-                      const isActive = paletteVariant === variant;
-                      return (
-                        <button
-                          key={variant}
-                          type="button"
-                          onClick={() => {
-                            setPaletteVariant(variant);
-                            playSound("tap");
-                          }}
-                          aria-label={variant}
-                          title={variant}
-                          aria-pressed={isActive}
-                          className={cn(
-                            "flex items-center justify-center h-12 rounded-coloring-card border-2",
-                            "transition-all duration-coloring-base ease-coloring active:scale-95",
-                            isActive
-                              ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
-                              : "bg-white border-coloring-surface-dark text-coloring-text-primary",
-                          )}
-                        >
-                          <FontAwesomeIcon
-                            icon={variantIcons[variant]}
-                            size="lg"
-                          />
-                        </button>
-                      );
-                    })}
+                 * even at peek; the snap height controls how much is visible.
+                 * Slim variant hides this — marketing surfaces use the
+                 * default 'realistic' palette and don't expose mood. */}
+                {!isSlim && (
+                  <div className="mb-3">
+                    <div className="grid grid-cols-4 gap-2">
+                      {PALETTE_VARIANTS.map((variant) => {
+                        const isActive = paletteVariant === variant;
+                        return (
+                          <button
+                            key={variant}
+                            type="button"
+                            onClick={() => {
+                              setPaletteVariant(variant);
+                              playSound("tap");
+                            }}
+                            aria-label={variant}
+                            title={variant}
+                            aria-pressed={isActive}
+                            className={cn(
+                              "flex items-center justify-center h-12 rounded-coloring-card border-2",
+                              "transition-all duration-coloring-base ease-coloring active:scale-95",
+                              isActive
+                                ? "bg-coloring-accent border-transparent text-white shadow-btn-primary"
+                                : "bg-white border-coloring-surface-dark text-coloring-text-primary",
+                            )}
+                          >
+                            <FontAwesomeIcon
+                              icon={variantIcons[variant]}
+                              size="lg"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Colors — grid driven by the current palette variant.
                   Always rendered; scrollable at peek via the parent
@@ -742,8 +798,9 @@ const MobileColoringDrawer = ({
                   </div>
                 )}
 
-                {/* Fill Type — icon-only tiles matching tools */}
-                {showFillTypeSelector && (
+                {/* Fill Type — icon-only tiles matching tools. Slim
+                    variant has no fill tool, so this is never shown. */}
+                {!isSlim && showFillTypeSelector && (
                   <div className="mb-4">
                     <div className="flex gap-2">
                       {fillTypes.map((fill) => {
@@ -787,8 +844,8 @@ const MobileColoringDrawer = ({
                   </div>
                 )}
 
-                {/* Pattern — icon-only tile grid */}
-                {showPatternSelector && (
+                {/* Pattern — icon-only tile grid. Slim has no fill, no patterns. */}
+                {!isSlim && showPatternSelector && (
                   <div className="mb-4">
                     <div className="grid grid-cols-5 gap-2">
                       {patternTypes.map((pattern) => {
@@ -828,41 +885,44 @@ const MobileColoringDrawer = ({
                   </div>
                 )}
 
-                {/* History Section — Undo/Redo. Always rendered;
-                    reachable by scroll at peek/half. */}
-                <div className="mb-4">
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={handleUndo}
-                      disabled={!canUndo}
-                      className={cn(
-                        "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
-                        "flex items-center justify-center",
-                        "transition-all duration-coloring-base ease-coloring active:scale-95",
-                        !canUndo && "opacity-50 cursor-not-allowed",
-                      )}
-                      aria-label="Undo"
-                    >
-                      <UndoIcon className="size-6 text-coloring-text-primary" />
-                    </button>
+                {/* History Section — Undo/Redo. Slim variant has no
+                    history (marketing canvas, no save/restore state)
+                    so the row is hidden entirely. */}
+                {!isSlim && (
+                  <div className="mb-4">
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={handleUndo}
+                        disabled={!canUndo}
+                        className={cn(
+                          "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
+                          "flex items-center justify-center",
+                          "transition-all duration-coloring-base ease-coloring active:scale-95",
+                          !canUndo && "opacity-50 cursor-not-allowed",
+                        )}
+                        aria-label="Undo"
+                      >
+                        <UndoIcon className="size-6 text-coloring-text-primary" />
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={handleRedo}
-                      disabled={!canRedo}
-                      className={cn(
-                        "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
-                        "flex items-center justify-center",
-                        "transition-all duration-coloring-base ease-coloring active:scale-95",
-                        !canRedo && "opacity-50 cursor-not-allowed",
-                      )}
-                      aria-label="Redo"
-                    >
-                      <RedoIcon className="size-6 text-coloring-text-primary" />
-                    </button>
+                      <button
+                        type="button"
+                        onClick={handleRedo}
+                        disabled={!canRedo}
+                        className={cn(
+                          "size-14 rounded-coloring-card border-2 border-coloring-surface-dark bg-white",
+                          "flex items-center justify-center",
+                          "transition-all duration-coloring-base ease-coloring active:scale-95",
+                          !canRedo && "opacity-50 cursor-not-allowed",
+                        )}
+                        aria-label="Redo"
+                      >
+                        <RedoIcon className="size-6 text-coloring-text-primary" />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           </Drawer.Content>

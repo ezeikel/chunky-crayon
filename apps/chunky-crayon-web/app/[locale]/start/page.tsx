@@ -119,6 +119,7 @@ async function StartHeroAsync({
         subtitle={t(`hero.${campaign}.subtitle`)}
         eyebrow={t('eyebrow')}
         tryColoringLabel={t('tryColoring')}
+        dragForToolsLabel={t('dragForTools')}
         ctaLabel={t('cta')}
         ctaSubtext={t('ctaSubtext')}
         experimentCtaSubtext={{
