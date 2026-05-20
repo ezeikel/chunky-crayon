@@ -27,7 +27,7 @@ import { ColoringImage } from '@one-colored-pixel/db';
  * Instagram carousel-specific system prompt addition.
  * Static image first (conversion), video second (engagement).
  */
-const INSTAGRAM_CAROUSEL_ADDENDUM = `
+export const INSTAGRAM_CAROUSEL_ADDENDUM = `
 
 CAROUSEL POST - Create ANTICIPATION for swiping:
 
@@ -45,7 +45,7 @@ Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text w
  * Instagram carousel with colored example (2 slides).
  * Colored example first (scroll-stopper) → B&W printable second
  */
-const INSTAGRAM_CAROUSEL_WITH_COLORED_ADDENDUM = `
+export const INSTAGRAM_CAROUSEL_WITH_COLORED_ADDENDUM = `
 
 2-SLIDE CAROUSEL - Color first to stop the scroll:
 
@@ -63,7 +63,7 @@ Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text w
  * Instagram Reel-specific system prompt addition.
  * Cross-promotes the carousel post for downloads.
  */
-const INSTAGRAM_REEL_ADDENDUM = `
+export const INSTAGRAM_REEL_ADDENDUM = `
 
 REEL - Optimized for DISCOVERY and REACH:
 
@@ -86,7 +86,7 @@ Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text w
 /**
  * Facebook video-specific system prompt addition.
  */
-const FACEBOOK_VIDEO_ADDENDUM = `
+export const FACEBOOK_VIDEO_ADDENDUM = `
 
 VIDEO POST - Optimize for watch time and shares:
 
@@ -102,7 +102,7 @@ Remember: Write as Chunky Crayon the brand. Output ONLY the final post text with
  * Facebook image post when video is also posted.
  * Cross-references the video post.
  */
-const FACEBOOK_IMAGE_WITH_VIDEO_ADDENDUM = `
+export const FACEBOOK_IMAGE_WITH_VIDEO_ADDENDUM = `
 
 IMAGE POST (video also posted) - Cross-reference naturally:
 
@@ -130,7 +130,7 @@ Remember: Write as Chunky Crayon the brand. Output ONLY the final post text with
  * AI-skeptical right now — frame the magic in human terms (the kid asks,
  * a coloring page appears, watch the colors fill in).
  */
-const buildDemoReelFraming = (
+export const buildDemoReelFraming = (
   variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
 ): string => {
   // What input the demo shows on screen. Stated as the feature we're
@@ -189,9 +189,9 @@ const variantHookRequirement = (
         '"snap → coloring page, here\'s how it works"',
       ],
       forbidden: [
-        '"my kid uploaded…", "your kid uploads…", "watch her face" — fake-testimonial / ventriloquism, banned',
-        '"we made…", "we released…" — ignores the photo input, which is what the video shows',
-        '"AI", "tech", "automatic" — banned everywhere',
+        '"my kid uploaded…", "your kid uploads…", "watch her face": fake-testimonial / ventriloquism, banned',
+        '"we made…", "we released…": ignores the photo input, which is what the video shows',
+        '"AI", "tech", "automatic": banned everywhere',
       ],
     };
   }
@@ -204,10 +204,10 @@ const variantHookRequirement = (
         '"\'space dragon\' said out loud → coloring page"',
       ],
       forbidden: [
-        '"my kid said…", "your kid says…", "watch her say it" — fake-testimonial / ventriloquism, banned',
-        '"we made…", "we released…" — ignores the spoken input, which is what the video shows',
-        '"typed", "uploaded" — wrong variant',
-        '"AI", "voice AI", "tech" — banned everywhere',
+        '"my kid said…", "your kid says…", "watch her say it": fake-testimonial / ventriloquism, banned',
+        '"we made…", "we released…": ignores the spoken input, which is what the video shows',
+        '"typed", "uploaded": wrong variant',
+        '"AI", "voice AI", "tech": banned everywhere',
       ],
     };
   }
@@ -219,10 +219,10 @@ const variantHookRequirement = (
       "\"'bumblebee garden' typed in → here's the page\"",
     ],
     forbidden: [
-      '"my kid typed…", "your kid types…" — fake-testimonial / ventriloquism, banned',
-      '"we made…", "we released…", "we added…" — reads as marketing, not a demo',
-      '"snapped", "uploaded", "said" — wrong variant',
-      '"AI", "tech", "automatic" — banned everywhere',
+      '"my kid typed…", "your kid types…": fake-testimonial / ventriloquism, banned',
+      '"we made…", "we released…", "we added…": reads as marketing, not a demo',
+      '"snapped", "uploaded", "said": wrong variant',
+      '"AI", "tech", "automatic": banned everywhere',
     ],
   };
 };
@@ -243,12 +243,12 @@ DO NOT use these openers:
 ${req.forbidden.map((f) => `  - ${f}`).join('\n')}`;
 };
 
-const buildInstagramDemoReelAddendum = (
+export const buildInstagramDemoReelAddendum = (
   variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
 ): string => `
 ${buildDemoReelFraming(variant)}
 
-REEL — product-demo hook, optimized for saves + shares:
+REEL: product-demo hook, optimized for saves + shares:
 ${renderVariantRequirement(variant)}
 
 REQUIREMENTS:
@@ -256,18 +256,18 @@ REQUIREMENTS:
    line MUST reference the kid's input action verbatim. Failure mode:
    generic "we made / we released" openers that ignore the variant.
    Avoid: "So satisfying", "ASMR", "animation" framing, anything tech-y.
-2. BENEFIT (1 line): why a parent cares — free, instant, any idea their kid has.
+2. BENEFIT (1 line): why a parent cares: free, instant, any idea their kid has.
 3. SAVE TRIGGER: "Save this for the next 'I'm bored' moment".
 4. CTA: "Try it free at chunkycrayon.com".
-5. 8-12 discovery hashtags. Use parent + creativity tags, no tech ones —
+5. 8-12 discovery hashtags. Use parent + creativity tags, no tech ones,
    e.g. #kidsactivities #screenfreeplay #coloringpage #freeprintable
    #toddleractivities #preschool #kidscrafts #parentingwin.
-   Do NOT use #aiforkids or any AI/tech-related hashtag.
-6. Short — under 220 chars before hashtags. Reel captions get clipped.
+   Do NOT use any tech-related hashtag.
+6. Short, under 220 chars before hashtags. Reel captions get clipped.
 
 Remember: Write as Chunky Crayon the brand. Output ONLY the final caption text without any labels or section markers.`;
 
-const buildFacebookDemoReelAddendum = (
+export const buildFacebookDemoReelAddendum = (
   variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
 ): string => {
   const opener =
@@ -280,11 +280,11 @@ const buildFacebookDemoReelAddendum = (
   return `
 ${buildDemoReelFraming(variant)}
 
-FACEBOOK VIDEO — product demo framed for parents/grandparents:
+FACEBOOK VIDEO: product demo framed for parents/grandparents:
 ${renderVariantRequirement(variant)}
 
 REQUIREMENTS:
-1. Warm opener acknowledging the workflow — line 1 MUST reference the
+1. Warm opener acknowledging the workflow. Line 1 MUST reference the
    kid's input action (per HARD REQUIREMENT above). Mimic the example:
    ${opener}
 2. SHARE TRIGGER: "Tag a parent who'd love this" / "Share with the grandparents".
@@ -297,7 +297,7 @@ REQUIREMENTS:
 Remember: Write as Chunky Crayon the brand. Output ONLY the final post text without any labels or section markers.`;
 };
 
-const buildTikTokDemoReelAddendum = (
+export const buildTikTokDemoReelAddendum = (
   variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
 ): string => {
   const lead =
@@ -310,17 +310,17 @@ const buildTikTokDemoReelAddendum = (
   return `
 ${buildDemoReelFraming(variant)}
 
-TIKTOK — authentic product-demo energy:
+TIKTOK: authentic product-demo energy:
 ${renderVariantRequirement(variant)}
 
 REQUIREMENTS:
 1. Line 1 MUST follow the HARD REQUIREMENT above (lowercase, references
    the kid's input action). Use this template as the structural model:
    ${lead}
-2. Keep it short, lowercase, conversational — no corporate voice.
+2. Keep it short, lowercase, conversational, no corporate voice.
 3. One cheeky aside is fine ("this is unfair to crayons").
 4. 5-8 hashtags: #fyp #parentsoftiktok #kidsactivities #coloringpage
-   #screenfreeplay #kidstok. Do NOT use #aiforkids or any AI/tech tag.
+   #screenfreeplay #kidstok. No tech-related hashtags.
 5. End with "free at chunkycrayon.com".
 6. Do NOT mention "AI", "artificial intelligence", "automatic", "tech",
    or "magic brush". Show the feature and the free printable outcome.
@@ -328,7 +328,7 @@ REQUIREMENTS:
 Remember: Output ONLY the final caption text without any labels.`;
 };
 
-const buildLinkedinDemoReelAddendum = (
+export const buildLinkedinDemoReelAddendum = (
   variant: 'TEXT' | 'IMAGE' | 'VOICE' | null | undefined,
 ): string => {
   const inputDesc =
@@ -341,7 +341,7 @@ const buildLinkedinDemoReelAddendum = (
   return `
 ${buildDemoReelFraming(variant)}
 
-LINKEDIN — professional framing for educators, early-years pros, working parents:
+LINKEDIN: professional framing for educators, early-years pros, working parents:
 
 REQUIREMENTS:
 1. Open with the observation, not the pitch: lead with what we've noticed
@@ -349,7 +349,7 @@ REQUIREMENTS:
    response.
 2. Explain the workflow in one sentence: ${inputDesc}, then sweeps of color
    fill it in so they can see what's possible before they pick up a crayon.
-3. Tie it to a professional theme — screen-free follow-through, agency,
+3. Tie it to a professional theme: screen-free follow-through, agency,
    creativity, reducing prep time for educators.
 4. CTA: "Free to try at chunkycrayon.com. We'd love your feedback".
 5. 3-5 professional hashtags (#EarlyYears #EdTech #ScreenFreePlay #Parenting).
@@ -367,45 +367,46 @@ Remember: Output ONLY the final post text without any labels.`;
  * my own", click through, and get the printable line art.
  */
 const COLORED_STATIC_FRAMING = `
-This is the BLANK line-art coloring page — the one viewers just saw
+This is the BLANK line-art coloring page, the one viewers just saw
 being colored in our demo reel. It's posted immediately after the reel
-so people who watched it think "I want my kid to try that". The image
+so people who watched it think "I want to print that". The image
 they're seeing is the blank canvas, ready to print and color.
 
 The caption must:
-- Tie back to the reel they just watched ("saw the AI color this one?
-  here's the blank version for your kid")
+- Tie back to the reel they just watched (e.g. "saw the colors fill in
+  earlier? here's the blank version, ready to print")
 - Drive the click: this page is free to print + color at
-  chunkycrayon.com — no signup needed.
-- Make it about the kid's creativity, not the AI.
-- Emphasize that THEIR version will look completely different — every
+  chunkycrayon.com, no signup needed.
+- Make it about the kid's creativity and the screen-free moment, not
+  about the underlying tech.
+- Emphasize that THEIR version will look completely different. Every
   kid colors it their own way.`;
 
-const INSTAGRAM_COLORED_STATIC_ADDENDUM = `
+export const INSTAGRAM_COLORED_STATIC_ADDENDUM = `
 ${COLORED_STATIC_FRAMING}
 
-INSTAGRAM SINGLE IMAGE — drive a click to chunkycrayon.com:
+INSTAGRAM SINGLE IMAGE: drive a click to chunkycrayon.com:
 
 REQUIREMENTS:
 1. HOOK (first line): something that ties to the demo reel they just
    saw OR teases the printable. Avoid "ASMR", "satisfying" framing.
-   Good: "Saw the AI color this one earlier? Now it's your kid's turn."
-         "We made this in seconds. Your kid can too. Link in bio."
+   Good: "Saw the colors fill in earlier? Here's the blank version, ready to print."
+         "We made this in seconds. Print it free and let your kid have a go."
 2. SAVE TRIGGER: "Save this idea for your next bored-rainy-day moment".
 3. CTA: "Try it free at chunkycrayon.com, link in bio".
 4. 6-10 hashtags mixing #kidsactivities #coloringpage #freeprintable
-   #aiforkids #screenfreeplay.
+   #screenfreeplay #parentingwin. No tech-related hashtags.
 
 Remember: Output ONLY the caption text without labels.`;
 
-const FACEBOOK_COLORED_STATIC_ADDENDUM = `
+export const FACEBOOK_COLORED_STATIC_ADDENDUM = `
 ${COLORED_STATIC_FRAMING}
 
-FACEBOOK SINGLE IMAGE — warm, parent/grandparent voice:
+FACEBOOK SINGLE IMAGE: warm, parent/grandparent voice:
 
 REQUIREMENTS:
 1. Open warmly: "Saw our short video earlier? This is how today's
-   coloring page came out — and the blank version is free at
+   coloring page came out, and the blank version is free at
    chunkycrayon.com so your kid can have a go."
 2. SHARE TRIGGER: "Tag a parent or grandparent who'd love this for
    the next car ride / rainy day".

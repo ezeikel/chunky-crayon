@@ -42,6 +42,24 @@ describe("stripEmDashes", () => {
   it("contains no em dash itself after sanitising", () => {
     expect(stripEmDashes("x — y—z")).not.toContain("—");
   });
+
+  // En dashes (U+2013, narrower than em dashes) drift in via copy-paste
+  // and from AI output describing numeric ranges. The brand-voice rule
+  // covers them too.
+  it("replaces an en dash between digits with ' to ' (natural English)", () => {
+    expect(stripEmDashes("150–220 words")).toBe("150 to 220 words");
+    expect(stripEmDashes("3–5 hashtags")).toBe("3 to 5 hashtags");
+  });
+
+  it("replaces a non-numeric en dash with a comma", () => {
+    expect(stripEmDashes("clean copy – no clutter")).toBe(
+      "clean copy, no clutter",
+    );
+  });
+
+  it("contains no en dash after sanitising", () => {
+    expect(stripEmDashes("a – b, 2–3 sentences")).not.toContain("–");
+  });
 });
 
 describe("NO_EM_DASHES_RULE", () => {

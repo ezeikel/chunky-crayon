@@ -17,9 +17,10 @@
  * renders no markdown). The sanitiser is the deterministic guarantee.
  */
 
-const EM_DASH = "—";
+const EM_DASH = "—"; // U+2014
+const EN_DASH = "–"; // U+2013 — narrower, often used in ranges (e.g. "150–220 words")
 
-export const NO_EM_DASHES_RULE = `Never use em dashes (—) in user-facing copy. Em dashes read as AI-generated. Use commas, parentheses, or split into separate sentences instead. This applies to every word the reader sees, including hooks, body copy, captions, hashtags, and CTAs.`;
+export const NO_EM_DASHES_RULE = `Never use em dashes (—) or en dashes (–) in user-facing copy. They both read as AI-generated to skeptical parents. Use commas, parentheses, or split into separate sentences instead. For numeric ranges, use "to" (e.g. "150 to 220 words" not "150–220 words"). This applies to every word the reader sees, including hooks, body copy, captions, hashtags, and CTAs.`;
 
 export const NO_MARKDOWN_RULE = `Output plain text only. No markdown whatsoever: no # headings, no **bold** or *italic* or __underline__, no \`code\`, no markdown links, no bullet/numbered list markers. Social platforms render none of it, so it shows up literally as "#" and "**" in the post. Use line breaks, emojis, and plain sentences for structure instead.`;
 
@@ -32,7 +33,13 @@ export const NO_MARKDOWN_RULE = `Output plain text only. No markdown whatsoever:
  * double spaces left by spaced em dashes.
  */
 export function stripEmDashes(text: string): string {
+  // En dashes ("150–220 words") become " to " when between digits — the
+  // natural English reading — and a comma otherwise. Em dashes always
+  // become a comma. Doing en first avoids the em-replacement turning a
+  // digit-range "150,220" into ambiguous numbers.
   return text
+    .replace(new RegExp(`(\\d)\\s*${EN_DASH}\\s*(\\d)`, "g"), "$1 to $2")
+    .replace(new RegExp(`\\s*${EN_DASH}\\s*`, "g"), ", ")
     .replace(new RegExp(`\\s*${EM_DASH}\\s*`, "g"), ", ")
     .replace(/, ,/g, ",")
     .replace(/  +/g, " ")
