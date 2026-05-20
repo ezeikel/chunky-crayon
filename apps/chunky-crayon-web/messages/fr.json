@@ -363,7 +363,8 @@
     "finalCta": {
       "title": "Une page à colorier et 20 minutes de calme.",
       "body": "Décrivez une scène. On la dessine. Aucun compte nécessaire pour essayer."
-    }
+    },
+    "dragForTools": "Fais glisser pour les outils"
   },
   "gallery": {
     "pageTitle": "Galerie de coloriages gratuits - Chunky Crayon",

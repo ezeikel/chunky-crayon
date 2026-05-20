@@ -363,7 +363,8 @@
     "finalCta": {
       "title": "색칠놀이 한 장이면, 고요한 20분.",
       "body": "장면을 입력해 보세요. 우리가 그려드려요. 체험은 가입 없이 가능!"
-    }
+    },
+    "dragForTools": "끌어서 도구 보기"
   },
   "gallery": {
     "pageTitle": "무료 색칠공부 도안 갤러리 - Chunky Crayon",
