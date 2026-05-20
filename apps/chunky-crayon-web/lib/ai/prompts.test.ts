@@ -46,7 +46,7 @@ import {
   buildFacebookDemoReelAddendum,
   buildTikTokDemoReelAddendum,
   buildLinkedinDemoReelAddendum,
-} from '@/app/actions/social';
+} from '@/app/actions/social-prompts';
 
 /**
  * The cores intentionally name the banned things ("never use em dashes",
