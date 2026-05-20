@@ -64,22 +64,42 @@ const main = async () => {
   // Surface the two we actually pin so they're easy to copy.
   console.log('\n──────────────────────────────────────────────');
   console.log('Pin these per app (CC and PTP each get their OWN ids):');
-  const tiktoks = channels.filter((c) => c.service?.toLowerCase() === 'tiktok');
-  const linkedins = channels.filter(
-    (c) => c.service?.toLowerCase() === 'linkedin',
-  );
-  console.log('\nTikTok channels:');
-  tiktoks.forEach((c) =>
-    console.log(
-      `  BUFFER_CHANNEL_ID_TIKTOK=${c.id}  # ${c.displayName ?? c.name ?? c.organizationName}`,
-    ),
-  );
-  console.log('\nLinkedIn channels:');
-  linkedins.forEach((c) =>
-    console.log(
-      `  BUFFER_CHANNEL_ID_LINKEDIN=${c.id}  # ${c.displayName ?? c.name ?? c.organizationName}`,
-    ),
-  );
+
+  // Iterate the platforms we actually bridge via Buffer. Adding a new
+  // platform = one entry here, instead of a new branch per platform.
+  // Keeps env-var-name conventions in sync with lib/social/buffer.ts's
+  // ENV_SUFFIX map.
+  const BRIDGED_SERVICES: { service: string; envVar: string; label: string }[] =
+    [
+      {
+        service: 'tiktok',
+        envVar: 'BUFFER_CHANNEL_ID_TIKTOK',
+        label: 'TikTok',
+      },
+      {
+        service: 'linkedin',
+        envVar: 'BUFFER_CHANNEL_ID_LINKEDIN',
+        label: 'LinkedIn',
+      },
+      {
+        service: 'threads',
+        envVar: 'BUFFER_CHANNEL_ID_THREADS',
+        label: 'Threads',
+      },
+    ];
+
+  for (const { service, envVar, label } of BRIDGED_SERVICES) {
+    const matches = channels.filter(
+      (c) => c.service?.toLowerCase() === service,
+    );
+    if (matches.length === 0) continue;
+    console.log(`\n${label} channels:`);
+    matches.forEach((c) =>
+      console.log(
+        `  ${envVar}=${c.id}  # ${c.displayName ?? c.name ?? c.organizationName}`,
+      ),
+    );
+  }
   console.log('');
 };
 
