@@ -186,3 +186,65 @@ WHERE "createdAt" > NOW() - INTERVAL '1 day' AND brand = 'CHUNKY_CRAYON';
 ```
 
 Run against prod Neon branch `br-morning-leaf-a4gj86x5`.
+
+## TODO: Replace Buffer with direct Threads API (future)
+
+TikTok, LinkedIn, and Threads currently post via the Buffer GraphQL API
+(`lib/social/buffer.ts`). It's a TEMPORARY bridge. Each platform's
+direct-API path either is blocked on Meta/TikTok/LinkedIn App Review
+(TT + LI) or has not been built yet (Threads). When approvals land we
+remove Buffer per platform and post direct, same way we do IG and FB.
+
+**Threads is the easiest one to migrate**, because it lives on the same
+Meta developer platform as IG/FB — your existing Meta business app
+already has Tech Provider Verification (from the IG/FB approval). What's
+needed:
+
+1. **App Review submission** in the Meta App Dashboard for the existing
+   Meta app, requesting `threads_basic` + `threads_content_publish`
+   (+ `threads_manage_replies` for the reply-thread / link-in-reply
+   pattern we use, see `metadata.threads.thread` in
+   `lib/social/buffer.ts`). Manual review, ~2-4 weeks per permission per
+   Meta's published timelines. Screencast demonstrating the full
+   publish flow is required.
+2. **OAuth grant flow** to mint a long-lived Threads token for each
+   brand's Threads account (CC and PTP separately). Threads tokens are
+   long-lived but expire after ~60 days; need refresh handling — mirror
+   `lib/social-tokens.ts` patterns.
+3. **Token storage**: `CHUNKY_CRAYON_THREADS_ACCESS_TOKEN` env var
+   (and the PTP equivalent in its repo), plus refresh persistence in
+   the `apiTokens` table the way Pinterest does it.
+4. **Direct posters** in `lib/threads-direct.ts` (new):
+   - `createThreadsContainer(text, opts: { videoUrl?, imageUrl?, linkAttachmentUrl? })`
+   - `waitForThreadsContainer(containerId)` (mirror Instagram media polling)
+   - `publishThreads(containerId)`
+   - `replyToThread(parentId, text)` for the link-in-reply pattern
+   - All against `https://graph.threads.net/v1.0/` (NOT `graph.facebook.com`).
+5. **Call-site swap**: in `app/api/social/post/route.ts`,
+   `app/api/social/content-reel-post/route.ts`, drop the
+   `schedulePostViaBuffer({ platform: 'threads', ... })` calls and
+   replace with the direct posters. Keep the `metadata.linkAttachmentUrl`
+   - `replyThread` mapping logic — those translate to native Threads
+     API calls (the linkAttachment becomes a regular post with a URL,
+     the reply becomes a separate `replyToThread` after publish).
+6. **Decommission**: flip `BUFFER_ENABLE_THREADS=false` in Vercel (CC
+   and PTP). The Buffer module's `threads` platform stays in place
+   (no behaviour change — it just no-ops without the flag) but the
+   `lib/social/buffer.ts` Threads metadata path can be removed in a
+   follow-up cleanup.
+
+**Cost saving**: -$6/mo per Buffer channel removed (~$12/mo total
+across CC + PTP).
+
+**Reference**: [Threads API docs](https://developers.facebook.com/docs/threads/).
+Two-step container model (POST `/threads`, then POST `/threads_publish`)
+is identical to Instagram's reel-publish flow, so the implementation
+should be a fairly mechanical port of the existing IG reel posters.
+
+**Same-pattern future for TikTok and LinkedIn**: when their direct
+approvals land (TikTok App Review still pending, LinkedIn was
+rejected on first pass), the LinkedIn `postToLinkedInPage` stub is
+already kept dormant in `app/api/social/post/route.ts` waiting to be
+re-enabled, and TikTok's `app/api/social/tiktok/post/route.ts` route
+will switch from sandbox-drafts to the published-posts endpoint. Same
+flip-the-env-var-off, swap-the-call-site, retire-Buffer pattern.
