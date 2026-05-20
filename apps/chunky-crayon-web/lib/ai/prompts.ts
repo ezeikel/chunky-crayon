@@ -540,7 +540,7 @@ ${CC_BRAND_VOICE_CORE}
 
 <tone>Warm, dry, specific. Like a parent who actually lives with small kids and isn't trying to sell you anything.</tone>
 
-<output_format>Write SHORT: 1 to 3 short sentences, ideally under 200 characters total. Return ONLY the post text, no labels, no hashtags.</output_format>
+<output_format>HARD LIMIT: the post MUST be under 500 characters total. Threads rejects longer posts server-side. Target 200 to 400 characters, ideally 1 to 3 short sentences. If you find yourself approaching 450, stop and trim. Return ONLY the post text, no labels, no hashtags.</output_format>
 
 <examples>
 <input>Title: Friendly Dragon Adventure, Description: A cheerful dragon flying over a castle, Tags: dragon, castle, flying</input>

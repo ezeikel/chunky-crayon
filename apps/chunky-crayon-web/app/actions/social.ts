@@ -16,7 +16,11 @@ import {
   createLinkedInCaptionPrompt,
   createThreadsCaptionPrompt,
 } from '@/lib/ai';
-import { sanitizeCaption, ccVoice } from '@one-colored-pixel/coloring-core';
+import {
+  sanitizeCaption,
+  ccVoice,
+  CC_BRAND_VOICE_CORE,
+} from '@one-colored-pixel/coloring-core';
 import { ColoringImage } from '@one-colored-pixel/db';
 
 /**
@@ -565,6 +569,50 @@ export const generateLinkedInCaption = async (
   }
 };
 
+// Threads has a HARD 500-char server limit; Buffer rejects over-limit
+// posts at publish time. The prompt itself (THREADS_CAPTION_SYSTEM +
+// ccPlatformAdapter('threads')) is the primary defence. This is the
+// safety net for marginal overruns: if Sonnet produced 520 chars, ask
+// Haiku to rewrite under 480 preserving voice + structure. ONE retry
+// only; if still over, return as-is and let buildCreatePostVariables
+// throw a clean publish-time failure rather than ship truncated copy.
+const shrinkThreadsCaptionIfOver = async (
+  caption: string,
+  ctx: { imageId: string },
+): Promise<string> => {
+  if (caption.length <= 500) return caption;
+
+  console.warn(
+    `[Threads] caption ${caption.length} chars > 500, Haiku shrink retry (image ${ctx.imageId})`,
+  );
+
+  try {
+    const { text } = await generateText({
+      model: models.haiku45,
+      system: `${CC_BRAND_VOICE_CORE}
+
+You are tightening a Threads post that is over the 500-character platform limit. Rewrite it UNDER 480 characters while preserving:
+- the voice (warm, dry, specific; brand "we" not parent "I")
+- the opening hook (first 1-2 sentences carry the post)
+- one specific observation
+
+Drop secondary phrasing, qualifiers, and anything the post can survive without. No hashtags, no URL. Return ONLY the rewritten caption, no labels, no quotes.`,
+      prompt: `Original (${caption.length} chars):\n\n${caption}\n\nRewrite under 480 characters.`,
+    });
+
+    const shrunk = sanitizeCaption(text);
+    if (shrunk.length > 500) {
+      console.warn(
+        `[Threads] Haiku shrink retry still ${shrunk.length} chars > 500 (image ${ctx.imageId}); buffer.ts will fail loud`,
+      );
+    }
+    return shrunk;
+  } catch (error) {
+    console.error('[Threads] shrink retry failed; returning original:', error);
+    return caption;
+  }
+};
+
 // Threads is text-first; one caption shape works across daily / demo-reel /
 // content-reel since the post is the thought, not a hook-for-an-asset. We
 // keep the API signature compatible with the others (takes a ColoringImage)
@@ -582,7 +630,10 @@ export const generateThreadsCaption = async (
         coloringImage.tags ?? [],
       ),
     });
-    return sanitizeCaption(text);
+    const sanitized = sanitizeCaption(text);
+    return shrinkThreadsCaptionIfOver(sanitized, {
+      imageId: coloringImage.id,
+    });
   } catch (error) {
     console.error('[Threads] Caption generation failed:', error);
     throw error;

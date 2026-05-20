@@ -92,9 +92,10 @@ export function ccPlatformAdapter(platform: CCPlatform): string {
 - No marketing clichés ("unlock creativity", "game-changing"). 0 to 2 emojis only if the moment calls for it. 0 to 3 hashtags.`;
     case "threads":
       return `THREADS is text-first, conversational, opinion-driven. Reads like an overheard parent text. The voice has more room to be dry and specific here than anywhere else.
-- Length: short. Ideal is 1 to 3 short sentences (under 200 chars total), occasionally a slightly longer take when there's a real observation to share.
+- HARD LIMIT: under 500 characters total. Threads rejects posts over 500 server-side; if you go over the post fails to publish.
+- Ideal is 1 to 3 short sentences (target 200 to 400 chars), occasionally a slightly longer take when there's a real observation. If you find yourself approaching 450, stop and trim.
 - Open with a scene, a small joke, or a flat-out useful observation. The hook IS the post; there is no "swipe for more". No clickbait.
-- Links downrank in the body (same as LinkedIn) — when there's a URL, drop it into a reply post via metadata.threads.thread, not the main post.
+- Links downrank in the body (same as LinkedIn): when there's a URL, drop it into a reply post via metadata.threads.thread, not the main post.
 - 0 to 1 emoji, only if it adds. No hashtags (Threads doesn't use them).`;
     default:
       return "";
