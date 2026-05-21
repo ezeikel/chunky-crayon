@@ -3,22 +3,27 @@
  * the Scene Builder picker.
  *
  * Every catalogue option (subject / location / weather / activity /
- * accent) gets a small bright kid-style illustration. The SceneBuilder
- * tile prefers `thumbnailUrl` and falls back to the FA duotone icon when
- * it's null — so this script's only job is: generate the image, upload to
- * R2, and write the URL back into `lib/scene/scene-catalog.ts`.
+ * accent) gets a small bright kid-style illustration. The catalogue
+ * stores an R2 key (e.g. `scene-thumbnails/subject/dog.png`); the
+ * SceneInput adapter resolves the full URL at render time via
+ * `lib/scene/thumbnail-url.ts`. So this script's only job is: generate
+ * the image, upload to R2, and write the KEY (not the URL) back into
+ * `lib/scene/scene-catalog.ts`. Env-agnostic — same catalogue file
+ * works in dev + prod against different R2 buckets.
  *
  * gpt-image-2 (no reference image — these are fresh illustrations, not
  * character edits, so transparency isn't needed and gpt-image-2's lack of
  * alpha doesn't bite here, per feedback_gpt_image_2_no_transparent_bg).
  *
- * Idempotent + resumable: skips any option whose R2 object already exists
- * (and, with --commit, whose catalogue entry already has a URL). Safe to
- * re-run after a partial failure. Six-check rule respected — the catalogue
- * file is the spec, `scene-thumbnails/` is a new R2 prefix only this
- * script + the SceneBuilder tile consume.
+ * Idempotent + resumable: skips any option whose R2 object already exists.
+ * Safe to re-run after a partial failure. Six-check rule respected — the
+ * catalogue file is the spec, `scene-thumbnails/` is a new R2 prefix only
+ * this script + the SceneBuilder tile consume.
  *
- * Cost: ~$0.02 per gpt-image-2 "medium" 1024². Full set (~50) ≈ $1.
+ * Cost (per OpenAI Images API, May 2026): roughly $0.053/image at
+ * `medium` quality and $0.211/image at `high` quality, both 1024×1024.
+ * Full catalog (~41 tiles) at high ≈ $8.65, ~75 min. Numbers are
+ * estimates from OpenAI's calculator — token-metered, not flat-fee.
  *
  * Usage (from apps/chunky-crayon-web):
  *   # dry run — previews to scripts/out/scene-thumbnails/ only, no R2,
@@ -132,7 +137,7 @@ const main = async () => {
   }
 
   // (layer:key) -> public R2 url, accumulated for the catalogue patch.
-  const urls: Record<string, string> = {};
+  const keys: Record<string, string> = {};
 
   for (const job of selected) {
     const id = `${job.layer}:${job.key}`;
@@ -140,11 +145,8 @@ const main = async () => {
 
     if (!FORCE && COMMIT && (await exists(key))) {
       console.log(`[scene-thumb] skip ${id} (R2 object exists)`);
-      // Still record the URL so a resumed run patches the catalogue.
-      // Matches the storage client's convention: `${R2_PUBLIC_URL}/${key}`
-      // with any trailing slash on the base trimmed.
-      const base = (process.env.R2_PUBLIC_URL ?? '').replace(/\/+$/, '');
-      urls[id] = `${base}/${key}`;
+      // Still record the key so a resumed run patches the catalogue.
+      keys[id] = key;
       continue;
     }
 
@@ -165,9 +167,12 @@ const main = async () => {
     writeFileSync(preview, buf);
 
     if (COMMIT) {
-      const res = await put(key, buf, { contentType: 'image/png' });
-      urls[id] = res.url;
-      console.log(`[scene-thumb] ${id} ${elapsed}s -> ${res.url}`);
+      await put(key, buf, { contentType: 'image/png' });
+      // Record the R2 KEY (not the URL) — catalog stores env-agnostic
+      // keys; full URL is resolved at render time via
+      // `lib/scene/thumbnail-url.ts` from NEXT_PUBLIC_R2_PUBLIC_URL.
+      keys[id] = key;
+      console.log(`[scene-thumb] ${id} ${elapsed}s -> ${key}`);
     } else {
       console.log(`[scene-thumb] ${id} ${elapsed}s -> ${preview} (dry run)`);
     }
@@ -180,22 +185,22 @@ const main = async () => {
     return;
   }
 
-  // Patch scene-catalog.ts: replace `thumbnailUrl: null` with the R2 url
+  // Patch scene-catalog.ts: replace `thumbnailKey: null` with the R2 key
   // for each generated option. We match per-option by the unique `key:
-  // '<key>'` line and rewrite the nearest following `thumbnailUrl: null`.
-  // Conservative: only touches entries we have a URL for, leaves the rest.
+  // '<key>'` line and rewrite the nearest following `thumbnailKey: null`.
+  // Conservative: only touches entries we have a key for, leaves the rest.
   let src = readFileSync(CATALOG_PATH, 'utf8');
   let patched = 0;
   for (const job of selected) {
-    const url = urls[`${job.layer}:${job.key}`];
-    if (!url) continue;
-    // Anchor on the option's key line, then the FIRST thumbnailUrl after
+    const k = keys[`${job.layer}:${job.key}`];
+    if (!k) continue;
+    // Anchor on the option's key line, then the FIRST thumbnailKey after
     // it. Catalogue entries are small literal objects so this is stable.
     const anchor = new RegExp(
-      `(key:\\s*'${job.key}'[\\s\\S]*?thumbnailUrl:\\s*)null`,
+      `(key:\\s*'${job.key}'[\\s\\S]*?thumbnailKey:\\s*)null`,
     );
     if (anchor.test(src)) {
-      src = src.replace(anchor, `$1'${url}'`);
+      src = src.replace(anchor, `$1'${k}'`);
       patched += 1;
     } else {
       console.warn(
@@ -206,7 +211,7 @@ const main = async () => {
   if (patched > 0) {
     writeFileSync(CATALOG_PATH, src);
     console.log(
-      `\n[scene-thumb] patched ${patched} thumbnailUrl entries in scene-catalog.ts`,
+      `\n[scene-thumb] patched ${patched} thumbnailKey entries in scene-catalog.ts`,
     );
   } else {
     console.log('\n[scene-thumb] no catalogue entries needed patching');

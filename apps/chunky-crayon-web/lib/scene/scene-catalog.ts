@@ -17,7 +17,7 @@
  * Same idiom as `lib/characters/picker-catalog.ts`: typed keys, readonly
  * option arrays, per-item duotone palettes so the FA placeholder tiles read
  * as a playful rainbow rather than a mono-orange row
- * (`feedback_fontawesome_over_emojis`). `thumbnailUrl` is null until the
+ * (`feedback_fontawesome_over_emojis`). `thumbnailKey` is null until the
  * Phase 7 asset pipeline fills it with a generated colourful illustration;
  * the FA `icon` is the permanent graceful fallback.
  *
@@ -92,7 +92,7 @@ type SceneOptionBase = {
    * `generate-scene-thumbnails` script populates it from R2. The tile
    * component falls back to `icon` when this is null or 404s.
    */
-  thumbnailUrl: string | null;
+  thumbnailKey: string | null;
 };
 
 // ─── Subject (multi-select, capped) ─────────────────────────────────────────
@@ -130,7 +130,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'My Character',
     icon: faStar,
     promptNoun: null,
-    thumbnailUrl: null,
+    thumbnailKey: null,
     duotone: {
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-pink))',
@@ -141,8 +141,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Horse',
     icon: faHorse,
     promptNoun: 'a horse',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/horse.png',
+    thumbnailKey: 'scene-thumbnails/subject/horse.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -153,8 +152,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Cow',
     icon: faCow,
     promptNoun: 'a cow',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/cow.png',
+    thumbnailKey: 'scene-thumbnails/subject/cow.png',
     duotone: {
       primary: 'hsl(var(--crayon-pink))',
       secondary: 'hsl(var(--crayon-purple))',
@@ -165,8 +163,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Sheep',
     icon: faSheep,
     promptNoun: 'a sheep',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/sheep.png',
+    thumbnailKey: 'scene-thumbnails/subject/sheep.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-green))',
@@ -177,8 +174,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Dog',
     icon: faDog,
     promptNoun: 'a dog',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/dog.png',
+    thumbnailKey: 'scene-thumbnails/subject/dog.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -189,8 +185,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Cat',
     icon: faCat,
     promptNoun: 'a cat',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/cat.png',
+    thumbnailKey: 'scene-thumbnails/subject/cat.png',
     duotone: {
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-pink))',
@@ -204,8 +199,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Fox',
     icon: faPaw,
     promptNoun: 'a fox',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/fox.png',
+    thumbnailKey: 'scene-thumbnails/subject/fox.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -216,8 +210,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Lion',
     icon: faPaw,
     promptNoun: 'a lion',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/lion.png',
+    thumbnailKey: 'scene-thumbnails/subject/lion.png',
     duotone: {
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-orange))',
@@ -228,8 +221,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Fish',
     icon: faFish,
     promptNoun: 'a fish',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/fish.png',
+    thumbnailKey: 'scene-thumbnails/subject/fish.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-purple))',
@@ -240,8 +232,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Dragon',
     icon: faDragon,
     promptNoun: 'a friendly dragon',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/dragon.png',
+    thumbnailKey: 'scene-thumbnails/subject/dragon.png',
     duotone: {
       primary: 'hsl(var(--crayon-green))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -252,8 +243,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Bird',
     icon: faBird,
     promptNoun: 'a bird',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/bird.png',
+    thumbnailKey: 'scene-thumbnails/subject/bird.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -264,8 +254,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Kid',
     icon: faChild,
     promptNoun: 'a happy child',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/kid.png',
+    thumbnailKey: 'scene-thumbnails/subject/kid.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-pink))',
@@ -276,8 +265,7 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
     label: 'Astronaut',
     icon: faUserAstronaut,
     promptNoun: 'an astronaut',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/subject/astronaut.png',
+    thumbnailKey: 'scene-thumbnails/subject/astronaut.png',
     duotone: {
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -320,8 +308,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'Beach',
     icon: faUmbrellaBeach,
     promptPhrase: 'at the beach',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/beach.png',
+    thumbnailKey: 'scene-thumbnails/location/beach.png',
     duotone: {
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -332,8 +319,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'At Sea',
     icon: faSailboat,
     promptPhrase: 'out at sea',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/sea.png',
+    thumbnailKey: 'scene-thumbnails/location/sea.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-purple))',
@@ -344,8 +330,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'Football',
     icon: faFutbol,
     promptPhrase: 'at a football game',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/football-game.png',
+    thumbnailKey: 'scene-thumbnails/location/football-game.png',
     duotone: {
       primary: 'hsl(var(--crayon-green))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -356,8 +341,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'Busy Street',
     icon: faCity,
     promptPhrase: 'on a busy street',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/busy-street.png',
+    thumbnailKey: 'scene-thumbnails/location/busy-street.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-purple))',
@@ -368,8 +352,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'Mall',
     icon: faStore,
     promptPhrase: 'in a shopping mall',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/shopping-mall.png',
+    thumbnailKey: 'scene-thumbnails/location/shopping-mall.png',
     duotone: {
       primary: 'hsl(var(--crayon-pink))',
       secondary: 'hsl(var(--crayon-orange))',
@@ -380,8 +363,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'Island',
     icon: faTreePalm,
     promptPhrase: 'on a desert island',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/desert-island.png',
+    thumbnailKey: 'scene-thumbnails/location/desert-island.png',
     duotone: {
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-green))',
@@ -392,8 +374,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'Forest',
     icon: faTree,
     promptPhrase: 'in a forest',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/forest.png',
+    thumbnailKey: 'scene-thumbnails/location/forest.png',
     duotone: {
       primary: 'hsl(var(--crayon-green))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -404,8 +385,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'Mountains',
     icon: faMountain,
     promptPhrase: 'in the mountains',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/mountains.png',
+    thumbnailKey: 'scene-thumbnails/location/mountains.png',
     duotone: {
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -416,8 +396,7 @@ export const LOCATION_OPTIONS: readonly LocationOption[] = [
     label: 'Station',
     icon: faTrain,
     promptPhrase: 'at a train station',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/location/train-station.png',
+    thumbnailKey: 'scene-thumbnails/location/train-station.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -447,8 +426,7 @@ export const WEATHER_OPTIONS: readonly WeatherOption[] = [
     label: 'Sunny',
     icon: faSun,
     promptPhrase: 'on a sunny day',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/weather/sunny.png',
+    thumbnailKey: 'scene-thumbnails/weather/sunny.png',
     duotone: {
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-orange))',
@@ -459,8 +437,7 @@ export const WEATHER_OPTIONS: readonly WeatherOption[] = [
     label: 'Snowy',
     icon: faSnowflake,
     promptPhrase: 'on a snowy day',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/weather/snowy.png',
+    thumbnailKey: 'scene-thumbnails/weather/snowy.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-purple))',
@@ -471,8 +448,7 @@ export const WEATHER_OPTIONS: readonly WeatherOption[] = [
     label: 'Rainy',
     icon: faCloudRain,
     promptPhrase: 'on a rainy day',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/weather/rainy.png',
+    thumbnailKey: 'scene-thumbnails/weather/rainy.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-green))',
@@ -483,8 +459,7 @@ export const WEATHER_OPTIONS: readonly WeatherOption[] = [
     label: 'Night',
     icon: faMoon,
     promptPhrase: 'at night under the stars',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/weather/night.png',
+    thumbnailKey: 'scene-thumbnails/weather/night.png',
     duotone: {
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -495,8 +470,7 @@ export const WEATHER_OPTIONS: readonly WeatherOption[] = [
     label: 'Rainbow',
     icon: faRainbow,
     promptPhrase: 'with a big rainbow in the sky',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/weather/rainbow.png',
+    thumbnailKey: 'scene-thumbnails/weather/rainbow.png',
     duotone: {
       primary: 'hsl(var(--crayon-pink))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -507,8 +481,7 @@ export const WEATHER_OPTIONS: readonly WeatherOption[] = [
     label: 'Cloudy',
     icon: faCloud,
     promptPhrase: 'on a cloudy day',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/weather/cloudy.png',
+    thumbnailKey: 'scene-thumbnails/weather/cloudy.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-orange))',
@@ -540,8 +513,7 @@ export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
     label: 'Playing',
     icon: faFutbol,
     promptPhrase: 'playing together',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/activity/playing.png',
+    thumbnailKey: 'scene-thumbnails/activity/playing.png',
     duotone: {
       primary: 'hsl(var(--crayon-green))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -552,8 +524,7 @@ export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
     label: 'Sleeping',
     icon: faMoon,
     promptPhrase: 'curled up sleeping',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/activity/sleeping.png',
+    thumbnailKey: 'scene-thumbnails/activity/sleeping.png',
     duotone: {
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -564,8 +535,7 @@ export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
     label: 'Running',
     icon: faPersonRunning,
     promptPhrase: 'running and playing',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/activity/running.png',
+    thumbnailKey: 'scene-thumbnails/activity/running.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-pink))',
@@ -576,8 +546,7 @@ export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
     label: 'Swimming',
     icon: faPersonSwimming,
     promptPhrase: 'swimming',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/activity/swimming.png',
+    thumbnailKey: 'scene-thumbnails/activity/swimming.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-purple))',
@@ -588,8 +557,7 @@ export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
     label: 'Kite',
     icon: faKite,
     promptPhrase: 'flying a kite',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/activity/flying-a-kite.png',
+    thumbnailKey: 'scene-thumbnails/activity/flying-a-kite.png',
     duotone: {
       primary: 'hsl(var(--crayon-pink))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -600,8 +568,7 @@ export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
     label: 'Biking',
     icon: faBicycle,
     promptPhrase: 'riding a bike',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/activity/riding-a-bike.png',
+    thumbnailKey: 'scene-thumbnails/activity/riding-a-bike.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -612,8 +579,7 @@ export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
     label: 'Picnic',
     icon: faIceCream,
     promptPhrase: 'having a picnic',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/activity/having-a-picnic.png',
+    thumbnailKey: 'scene-thumbnails/activity/having-a-picnic.png',
     duotone: {
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-green))',
@@ -624,8 +590,7 @@ export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
     label: 'Dancing',
     icon: faMusic,
     promptPhrase: 'dancing',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/activity/dancing.png',
+    thumbnailKey: 'scene-thumbnails/activity/dancing.png',
     duotone: {
       primary: 'hsl(var(--crayon-pink))',
       secondary: 'hsl(var(--crayon-purple))',
@@ -655,8 +620,7 @@ export const ACCENT_OPTIONS: readonly AccentOption[] = [
     label: 'Birthday',
     icon: faCakeCandles,
     promptPhrase: 'with birthday party decorations',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/accent/birthday.png',
+    thumbnailKey: 'scene-thumbnails/accent/birthday.png',
     duotone: {
       primary: 'hsl(var(--crayon-pink))',
       secondary: 'hsl(var(--crayon-yellow))',
@@ -667,8 +631,7 @@ export const ACCENT_OPTIONS: readonly AccentOption[] = [
     label: 'Sparkles',
     icon: faStar,
     promptPhrase: 'with magical sparkles',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/accent/sparkles.png',
+    thumbnailKey: 'scene-thumbnails/accent/sparkles.png',
     duotone: {
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-pink))',
@@ -679,8 +642,7 @@ export const ACCENT_OPTIONS: readonly AccentOption[] = [
     label: 'Bubbles',
     icon: faFish,
     promptPhrase: 'with underwater bubbles',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/accent/underwater-bubbles.png',
+    thumbnailKey: 'scene-thumbnails/accent/underwater-bubbles.png',
     duotone: {
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-purple))',
@@ -691,8 +653,7 @@ export const ACCENT_OPTIONS: readonly AccentOption[] = [
     label: 'Flowers',
     icon: faTree,
     promptPhrase: 'with lots of flowers',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/accent/flowers.png',
+    thumbnailKey: 'scene-thumbnails/accent/flowers.png',
     duotone: {
       primary: 'hsl(var(--crayon-green))',
       secondary: 'hsl(var(--crayon-pink))',
@@ -703,8 +664,7 @@ export const ACCENT_OPTIONS: readonly AccentOption[] = [
     label: 'Stars',
     icon: faRocket,
     promptPhrase: 'with stars and planets in the sky',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/accent/space-stars.png',
+    thumbnailKey: 'scene-thumbnails/accent/space-stars.png',
     duotone: {
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-teal))',
@@ -715,8 +675,7 @@ export const ACCENT_OPTIONS: readonly AccentOption[] = [
     label: 'Balloons',
     icon: faGift,
     promptPhrase: 'with party balloons everywhere',
-    thumbnailUrl:
-      'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev/scene-thumbnails/accent/balloons.png',
+    thumbnailKey: 'scene-thumbnails/accent/balloons.png',
     duotone: {
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-pink))',

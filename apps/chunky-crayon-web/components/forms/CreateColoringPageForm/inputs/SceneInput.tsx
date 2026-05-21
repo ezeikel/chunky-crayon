@@ -45,6 +45,7 @@ import {
   type ScenePicks,
 } from '@/lib/scene/build-scene-description';
 import { rollRandomScene } from '@/lib/scene/random-scene';
+import { resolveThumbnailUrl } from '@/lib/scene/thumbnail-url';
 import useCharacters from '@/hooks/useCharacters';
 
 type SceneInputProps = {
@@ -79,18 +80,21 @@ const SceneInput = ({ onChange, onCreate }: SceneInputProps) => {
   const hasCharacter = Boolean(readyCharacter);
 
   const layers = useMemo<SceneLayer[]>(() => {
+    // Catalogue stores R2 keys (env-agnostic); resolve to a full public
+    // URL at render time so the same catalogue works in dev + prod
+    // without committing env-specific URLs.
     const toTile = (o: {
       key: string;
       label: string;
       icon: SceneLayer['options'][number]['icon'];
       duotone: SceneLayer['options'][number]['duotone'];
-      thumbnailUrl: string | null;
+      thumbnailKey: string | null;
     }) => ({
       key: o.key,
       label: o.label,
       icon: o.icon,
       duotone: o.duotone,
-      thumbnailUrl: o.thumbnailUrl,
+      thumbnailUrl: resolveThumbnailUrl(o.thumbnailKey),
     });
 
     return [
