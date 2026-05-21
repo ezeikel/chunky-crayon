@@ -294,7 +294,28 @@
     },
     "communityGalleryEnabled": "Community-Galeriebilder aktiviert",
     "communityGalleryDisabled": "Community-Galeriebilder deaktiviert",
-    "noEmail": "Keine E-Mail hinterlegt"
+    "noEmail": "Keine E-Mail hinterlegt",
+    "modeAccess": {
+      "title": "Möglichkeiten zum Erstellen",
+      "description": "Ihr Kind kann immer den Bilder-Ersteller nutzen, ganz ohne Tippen, Mikrofon oder Kamera. Sie können die anderen Möglichkeiten einzeln freischalten. Dies gilt für das aktuell aktive Profil.",
+      "text": {
+        "label": "Tippen",
+        "description": "Ihr Kind tippt eine Beschreibung ein, was gezeichnet werden soll."
+      },
+      "voice": {
+        "label": "Sprechen",
+        "description": "Ihr Kind nimmt seine Stimme auf, um eine Szene zu beschreiben. Verwendet das Mikrofon."
+      },
+      "image": {
+        "label": "Foto",
+        "description": "Ihr Kind macht oder wählt ein Foto, um daraus eine Ausmalseite zu machen. Verwendet die Kamera."
+      },
+      "unlocked": "Freigeschaltet",
+      "locked": "Gesperrt",
+      "enableFailed": "Konnte nicht aktiviert werden. Bitte versuche es erneut.",
+      "enabledToast": "Freigeschaltet",
+      "disabledToast": "Wieder gesperrt"
+    }
   },
   "email": {
     "signup": {

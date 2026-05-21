@@ -294,7 +294,28 @@
     },
     "communityGalleryEnabled": "コミュニティギャラリー画像：オン",
     "communityGalleryDisabled": "コミュニティギャラリー画像：オフ",
-    "noEmail": "メールアドレス未設定"
+    "noEmail": "メールアドレス未設定",
+    "modeAccess": {
+      "title": "作り方",
+      "description": "お子さまはいつでも、文字入力・マイク・カメラを使わない「絵づくり」を利用できます。ほかの作り方は、1つずつ解除できます。設定は現在使用中のプロフィールに適用されます。",
+      "text": {
+        "label": "入力",
+        "description": "描きたいものを文章で入力します。"
+      },
+      "voice": {
+        "label": "音声",
+        "description": "音声を録音して、場面を説明します。マイクを使用します。"
+      },
+      "image": {
+        "label": "写真",
+        "description": "写真を撮るか選んで、ぬりえにします。カメラを使用します。"
+      },
+      "unlocked": "解除済み",
+      "locked": "ロック中",
+      "enableFailed": "有効にできませんでした。もう一度お試しください。",
+      "enabledToast": "解除しました",
+      "disabledToast": "再びロックしました"
+    }
   },
   "email": {
     "signup": {

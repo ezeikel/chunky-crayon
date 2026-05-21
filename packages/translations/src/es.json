@@ -294,7 +294,28 @@
     },
     "communityGalleryEnabled": "Imágenes de la galería de la comunidad activadas",
     "communityGalleryDisabled": "Imágenes de la galería de la comunidad desactivadas",
-    "noEmail": "No hay correo configurado"
+    "noEmail": "No hay correo configurado",
+    "modeAccess": {
+      "title": "Formas de crear",
+      "description": "Tu hijo siempre tiene el creador de dibujos, que no usa teclado, micrófono ni cámara. Puedes desbloquear las otras formas una por una. Esto se aplica al perfil que está activo.",
+      "text": {
+        "label": "Escribir",
+        "description": "Tu hijo escribe una descripción de lo que quiere dibujar."
+      },
+      "voice": {
+        "label": "Hablar",
+        "description": "Tu hijo graba su voz para describir una escena. Usa el micrófono."
+      },
+      "image": {
+        "label": "Foto",
+        "description": "Tu hijo toma o elige una foto para convertirla en una página para colorear. Usa la cámara."
+      },
+      "unlocked": "Desbloqueado",
+      "locked": "Bloqueado",
+      "enableFailed": "No se pudo activar. Inténtalo de nuevo.",
+      "enabledToast": "Desbloqueado",
+      "disabledToast": "Bloqueado de nuevo"
+    }
   },
   "email": {
     "signup": {

@@ -294,7 +294,28 @@
     },
     "communityGalleryEnabled": "Images de la galerie communautaire activées",
     "communityGalleryDisabled": "Images de la galerie communautaire désactivées",
-    "noEmail": "Aucune adresse e-mail"
+    "noEmail": "Aucune adresse e-mail",
+    "modeAccess": {
+      "title": "Modes de création",
+      "description": "Votre enfant a toujours le créateur d’images, qui n’utilise ni saisie, ni micro, ni caméra. Vous pouvez débloquer les autres modes un par un. Ce réglage s’applique au profil actuellement actif.",
+      "text": {
+        "label": "Saisie",
+        "description": "Votre enfant saisit une description de ce qu’il veut dessiner."
+      },
+      "voice": {
+        "label": "Voix",
+        "description": "Votre enfant enregistre sa voix pour décrire une scène. Utilise le micro."
+      },
+      "image": {
+        "label": "Photo",
+        "description": "Votre enfant prend ou choisit une photo à transformer en page de coloriage. Utilise la caméra."
+      },
+      "unlocked": "Débloqué",
+      "locked": "Verrouillé",
+      "enableFailed": "Impossible d’activer. Veuillez réessayer.",
+      "enabledToast": "Débloqué",
+      "disabledToast": "À nouveau verrouillé"
+    }
   },
   "email": {
     "signup": {
