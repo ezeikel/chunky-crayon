@@ -349,15 +349,11 @@ const CreateColoringPageForm = ({
 }: CreateColoringPageFormProps) => {
   const isLarge = size === 'large';
 
-  // Default-mode flip is a flag-gated ramp (PostHog 'scene-builder-default',
-  // dev-on). When on, the form opens on the privacy-first Scene Builder
-  // with text/voice/image locked behind the parent gate. When off, it
-  // keeps the legacy 'text' default so the rollout is measurable, not a
-  // hard cutover for every existing user.
-  const sceneFlag = useFeatureFlagEnabled('scene-builder-default');
-  const sceneBuilderDefault =
-    sceneFlag || process.env.NODE_ENV === 'development';
-
+  // Scene Builder is the default mode for everyone — privacy-first,
+  // tap-only, no typing/voice/photo until the parent gate is passed.
+  // Was previously flag-ramped behind PostHog 'scene-builder-default';
+  // the flag was never created in PostHog so prod ran on the legacy 'text'
+  // default the whole time. Cutover is this commit: rollout = deploy.
   return (
     <div
       className={cn(
@@ -365,7 +361,7 @@ const CreateColoringPageForm = ({
         isLarge ? 'max-w-2xl' : 'max-w-lg',
       )}
     >
-      <InputModeProvider initialMode={sceneBuilderDefault ? 'scene' : 'text'}>
+      <InputModeProvider initialMode="scene">
         <MultiModeForm className={className} location={location} />
       </InputModeProvider>
     </div>
