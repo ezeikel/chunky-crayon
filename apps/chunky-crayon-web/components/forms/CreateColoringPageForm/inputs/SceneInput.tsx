@@ -60,11 +60,18 @@ type SceneInputProps = {
    * with the required steps satisfied — the form submits from here.
    */
   onCreate: () => void;
+  /**
+   * Mirror of the parent form's `showCharacterPicker` gate: characters
+   * flag is on AND user is signed in. When false, the `your-character`
+   * sentinel is dropped from the subject layer entirely — kid never sees
+   * an "Add character" tile that would dead-end at the auth wall.
+   */
+  charactersEnabled: boolean;
 };
 
 // One label namespace for the whole scene picker. The app owns i18n;
 // coloring-ui only renders the strings we pass.
-const SceneInput = ({ onChange, onCreate }: SceneInputProps) => {
+const SceneInput = ({ onChange, onCreate, charactersEnabled }: SceneInputProps) => {
   const t = useTranslations('createForm.scene');
   const router = useRouter();
   const { characters } = useCharacters();
@@ -103,22 +110,27 @@ const SceneInput = ({ onChange, onCreate }: SceneInputProps) => {
         title: t('subjectTitle'),
         kind: 'multi',
         maxSelections: MAX_SUBJECTS,
-        options: SUBJECT_OPTIONS.map((o) => {
-          if (o.key === 'your-character') {
-            // Two distinct states for the sentinel:
-            //   - has READY character → normal tile, label = character's name
-            //   - no character yet → "add" affordance, label "Add character",
-            //     tap routes to /characters (see handleLockedTap)
-            if (readyCharacter) {
-              return toTile({ ...o, label: readyCharacter.name });
+        options: SUBJECT_OPTIONS
+          // When the characters feature is gated off (flag or guest), the
+          // `your-character` sentinel is dropped wholesale — no add-tile,
+          // no locked tile, no dead-end at the auth wall.
+          .filter((o) => o.key !== 'your-character' || charactersEnabled)
+          .map((o) => {
+            if (o.key === 'your-character') {
+              // Two distinct states for the sentinel:
+              //   - has READY character → normal tile, label = character's name
+              //   - no character yet → "add" affordance, label "Add character",
+              //     tap routes to /characters (see handleLockedTap)
+              if (readyCharacter) {
+                return toTile({ ...o, label: readyCharacter.name });
+              }
+              return {
+                ...toTile({ ...o, label: t('subjectAddCharacter') }),
+                state: 'add' as const,
+              };
             }
-            return {
-              ...toTile({ ...o, label: t('subjectAddCharacter') }),
-              state: 'add' as const,
-            };
-          }
-          return toTile({ ...o, label: t(`subject.${o.key}`) });
-        }),
+            return toTile({ ...o, label: t(`subject.${o.key}`) });
+          }),
       },
       {
         id: 'location',
@@ -153,12 +165,17 @@ const SceneInput = ({ onChange, onCreate }: SceneInputProps) => {
         ),
       },
     ];
-  }, [t, readyCharacter]);
+  }, [t, readyCharacter, charactersEnabled]);
 
   // Lock the My Character tile until there's a READY character to mix in.
+  // When the feature is gated off, the sentinel isn't rendered at all, so
+  // there's nothing to lock.
   const lockedKeys = useMemo(
-    () => (hasCharacter ? undefined : { subject: ['your-character'] }),
-    [hasCharacter],
+    () =>
+      charactersEnabled && !hasCharacter
+        ? { subject: ['your-character'] }
+        : undefined,
+    [charactersEnabled, hasCharacter],
   );
 
   // Derive description + characterId from picks. The description is

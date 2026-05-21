@@ -258,6 +258,7 @@ const MultiModeForm = ({
         <SceneInput
           onChange={({ characterId: cId }) => setSceneCharacterId(cId)}
           onCreate={() => formRef.current?.requestSubmit()}
+          charactersEnabled={showCharacterPicker}
         />
       )}
       {mode === 'text' && <TextInput />}
