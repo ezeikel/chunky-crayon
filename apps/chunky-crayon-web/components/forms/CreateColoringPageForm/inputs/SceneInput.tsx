@@ -99,19 +99,22 @@ const SceneInput = ({ onChange, onCreate }: SceneInputProps) => {
         title: t('subjectTitle'),
         kind: 'multi',
         maxSelections: MAX_SUBJECTS,
-        options: SUBJECT_OPTIONS.map((o) =>
-          toTile({
-            ...o,
-            // Sentinel label flips once a character exists so the tile
-            // reads as "your character" rather than a generic prompt.
-            label:
-              o.key === 'your-character'
-                ? readyCharacter
-                  ? readyCharacter.name
-                  : t('subjectMyCharacter')
-                : t(`subject.${o.key}`),
-          }),
-        ),
+        options: SUBJECT_OPTIONS.map((o) => {
+          if (o.key === 'your-character') {
+            // Two distinct states for the sentinel:
+            //   - has READY character → normal tile, label = character's name
+            //   - no character yet → "add" affordance, label "Add character",
+            //     tap routes to /characters (see handleLockedTap)
+            if (readyCharacter) {
+              return toTile({ ...o, label: readyCharacter.name });
+            }
+            return {
+              ...toTile({ ...o, label: t('subjectAddCharacter') }),
+              state: 'add' as const,
+            };
+          }
+          return toTile({ ...o, label: t(`subject.${o.key}`) });
+        }),
       },
       {
         id: 'location',

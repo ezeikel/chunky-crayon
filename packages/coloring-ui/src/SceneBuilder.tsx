@@ -7,6 +7,7 @@ import {
   faArrowLeft,
   faArrowRight,
   faWandMagicSparkles,
+  faPlus,
 } from "@fortawesome/pro-duotone-svg-icons";
 // Solid (flat single-colour) icons for the check badge and lock overlay:
 // the parent tile sets --fa-primary-color to the option's brand colour
@@ -61,6 +62,15 @@ export type SceneTileOption = {
   duotone: SceneTileDuotone;
   /** Generated colourful illustration; null until the asset pipeline runs. */
   thumbnailUrl: string | null;
+  /**
+   * "add" replaces the tile content with a plus-icon affordance —
+   * intended for sentinels like `your-character` when the underlying
+   * entity doesn't exist yet. Distinct from `locked` (which means "you
+   * can't tap this"): an `add` tile IS tappable and routes (via
+   * onLockedTap) to a place where the missing entity can be created.
+   * Reads as "add one" not "denied".
+   */
+  state?: "add";
 };
 
 export type SceneLayer = {
@@ -157,7 +167,17 @@ const SceneTile = ({
       title={option.label}
       disabled={disabled}
       onClick={onToggle}
-      className="group flex shrink-0 flex-col items-center gap-2 focus:outline-none"
+      // Focus ring belongs on the BUTTON (the focused element), not the
+      // inner span — `focus-visible:*` only triggers on the focused
+      // element. `rounded-coloring-card` so the ring follows the tile's
+      // corners. `tap-highlight-transparent` kills the dark square that
+      // mobile Safari draws on tap by default and that ignores the
+      // inner span's border-radius.
+      className={cn(
+        "group flex shrink-0 flex-col items-center gap-2 rounded-coloring-card",
+        "[-webkit-tap-highlight-color:transparent]",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+      )}
     >
       {/* Outer wrapper: positions the check badge so it can poke OUT of
           the tile (no overflow-hidden here). The tile itself sits inside
@@ -173,7 +193,6 @@ const SceneTile = ({
             "block size-full overflow-hidden",
             "rounded-coloring-card border bg-white",
             "transition-all duration-coloring-base ease-coloring",
-            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
             "grid place-items-center",
             // Calm selected state: gentle scale + soft drop-shadow halo +
             // the check badge corner-popped on the outer wrapper. No heavy
@@ -181,21 +200,45 @@ const SceneTile = ({
             // alarming rather than "you picked this".
             selected
               ? "border-transparent scale-105 shadow-[0_6px_18px_rgba(255,138,61,0.35)]"
-              : "border-coloring-surface-dark",
+              : option.state === "add"
+                ? // "Add" affordance — dashed orange-tinted border + softer
+                  // cream wash so it reads as "tap to add", clearly
+                  // different from the normal solid-bordered tiles around
+                  // it. Not the same vocabulary as a locked tile (no grey
+                  // wash, no lock); not the same as a normal tile (border
+                  // is dashed + tinted).
+                  "border-dashed border-coloring-accent/50 bg-coloring-surface"
+                : "border-coloring-surface-dark",
             !disabled &&
               !selected &&
               "group-hover:border-coloring-accent/40 group-hover:bg-coloring-surface group-active:scale-95",
             disabled && "opacity-60",
           )}
           style={
-            {
-              "--fa-primary-color": option.duotone.primary,
-              "--fa-secondary-color": option.duotone.secondary,
-              "--fa-secondary-opacity": "1",
-            } as React.CSSProperties
+            // The "add" variant ignores per-option brand colours — it's
+            // always rendered in the brand accent so it reads as a
+            // consistent system affordance, not an option in its own right.
+            option.state === "add"
+              ? undefined
+              : ({
+                  "--fa-primary-color": option.duotone.primary,
+                  "--fa-secondary-color": option.duotone.secondary,
+                  "--fa-secondary-opacity": "1",
+                } as React.CSSProperties)
           }
         >
-          {option.thumbnailUrl ? (
+          {option.state === "add" ? (
+            // Big plus icon — clear "tap to add" affordance for sentinels
+            // like `your-character` when no character exists yet. Sits
+            // where the thumbnail/icon would otherwise be.
+            <FontAwesomeIcon
+              icon={faPlus}
+              className={cn(
+                "text-coloring-accent",
+                size === "lg" ? "text-5xl" : "text-3xl",
+              )}
+            />
+          ) : option.thumbnailUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={option.thumbnailUrl}
@@ -210,11 +253,11 @@ const SceneTile = ({
             />
           )}
 
-          {locked && (
+          {locked && option.state !== "add" && (
+            // Grey-wash + lock — for tiles that are truly unavailable
+            // (not the "add" affordance, which IS available and tappable).
             // Solid (non-duotone) icons render via `color` (text-*), not
-            // the duotone CSS vars. We use `text-neutral-500` directly
-            // on the icon — setting `--fa-primary-color` here is a no-op
-            // and was leaving the lock the wrong colour.
+            // the duotone CSS vars; `text-neutral-600` directly on the icon.
             <span
               className={cn(
                 "absolute inset-0 grid place-items-center",
@@ -223,10 +266,6 @@ const SceneTile = ({
               )}
               aria-hidden="true"
             >
-              {/* Sized to feel like the tile itself is locked — small
-                  icons get lost on a 96px tile. Bumped up for big tiles
-                  (Step 1/2 carousels); kept proportional on small ones
-                  (the extras step). */}
               <FontAwesomeIcon
                 icon={faLock}
                 className={cn(
