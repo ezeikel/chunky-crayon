@@ -44,6 +44,7 @@ export default defineConfig({
         'lib/social/buffer.ts',
         'lib/scene/build-scene-description.ts',
         'lib/scene/random-scene.ts',
+        'lib/scene/thumbnail-url.ts',
       ],
     },
   },
