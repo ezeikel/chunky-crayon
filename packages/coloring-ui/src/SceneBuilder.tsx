@@ -313,34 +313,49 @@ const TileCarousel = ({
     let startScroll = 0;
     let moved = 0;
 
+    // Track the down without capturing the pointer yet — `setPointerCapture`
+    // on the strip steals subsequent events (including the tile button's
+    // click), so a clean tap never reaches the SceneTile. We only capture
+    // ONCE movement crosses the threshold and we're sure this is a drag,
+    // not a tap. Same trick lets tile clicks work normally.
+    let captured = false;
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       dragging = true;
+      captured = false;
       moved = 0;
       startX = e.clientX;
       startScroll = el.scrollLeft;
-      el.setPointerCapture(e.pointerId);
-      el.style.cursor = "grabbing";
-      // Pause snap during the drag so the strip follows the cursor 1:1
-      // instead of jerking to nearest snap point on every pixel.
-      el.style.scrollSnapType = "none";
+      // Don't change cursor / disable snap until we know this is a drag.
     };
     const onPointerMove = (e: PointerEvent) => {
       if (!dragging) return;
       const dx = e.clientX - startX;
       moved = Math.max(moved, Math.abs(dx));
-      el.scrollLeft = startScroll - dx;
+      // First time we cross the threshold, claim the pointer for drag.
+      // Below threshold: leave events untouched so the SceneTile click
+      // fires normally.
+      if (!captured && moved > 5) {
+        captured = true;
+        el.setPointerCapture(e.pointerId);
+        el.style.cursor = "grabbing";
+        el.style.scrollSnapType = "none";
+      }
+      if (captured) el.scrollLeft = startScroll - dx;
     };
     const endDrag = (e: PointerEvent) => {
       if (!dragging) return;
       dragging = false;
-      el.style.cursor = "";
-      // Re-enable snap; the strip animates to the nearest snap point.
-      el.style.scrollSnapType = "";
-      try {
-        el.releasePointerCapture(e.pointerId);
-      } catch {
-        /* already released */
+      if (captured) {
+        el.style.cursor = "";
+        // Re-enable snap; the strip animates to the nearest snap point.
+        el.style.scrollSnapType = "";
+        try {
+          el.releasePointerCapture(e.pointerId);
+        } catch {
+          /* already released */
+        }
+        captured = false;
       }
     };
     // If movement exceeded the threshold, swallow the click so the tile
@@ -476,19 +491,92 @@ const SceneBuilder = ({
     </h2>
   );
 
+  // ─── Action buttons ──────────────────────────────────────────────────
+  //
+  // Icon-only circular buttons. Kids 3-8 don't read "Next"/"Back"/"Create";
+  // a right-arrow is universally "go forward", left-arrow is "go back",
+  // a wand is "make magic". Labels go through to assistive tech via
+  // aria-label + title — accessibility is preserved, the kid just doesn't
+  // see a text label fighting the icon for attention.
+  //
+  // No border, no shadow — those combined with the rounded-coloring-button
+  // token were rendering a visible halo around the orange fill. Pure
+  // brand-fill circle, scale-on-active, that's it.
+
+  // Primary (go forward / create) — solid brand fill.
+  const PrimaryAction = ({
+    icon,
+    label,
+    onClick,
+    enabled,
+    large = false,
+  }: {
+    icon: IconDefinition;
+    label: string;
+    onClick: () => void;
+    enabled: boolean;
+    large?: boolean;
+  }) => (
+    <button
+      type="button"
+      disabled={!enabled || disabled}
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={cn(
+        "grid place-items-center rounded-full",
+        "transition-transform duration-coloring-base",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+        large ? "size-14" : "size-12",
+        enabled && !disabled
+          ? "bg-coloring-accent text-white hover:brightness-105 active:scale-95"
+          : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
+      )}
+    >
+      <FontAwesomeIcon icon={icon} className={large ? "text-xl" : "text-lg"} />
+    </button>
+  );
+
+  // Secondary (go back) — soft ghost circle, no fill, sits quietly so
+  // forward momentum is the visually dominant action.
+  const SecondaryAction = ({
+    icon,
+    label,
+    onClick,
+  }: {
+    icon: IconDefinition;
+    label: string;
+    onClick: () => void;
+  }) => (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={cn(
+        "grid size-12 place-items-center rounded-full",
+        "text-coloring-text-secondary",
+        "transition-all duration-coloring-base",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+        !disabled && "hover:bg-coloring-surface active:scale-95",
+        disabled && "opacity-50",
+      )}
+    >
+      <FontAwesomeIcon icon={icon} className="text-lg" />
+    </button>
+  );
+
   return (
     <div
-      className={cn("flex flex-col gap-3", className)}
+      className={cn("flex flex-col gap-5", className)}
       role="group"
       aria-label={labels.ariaLabel ?? "Build your picture"}
     >
-      {/* Surprise me — kid-prominent. The most playful affordance shouldn't
-          read as the most timid; it's a chunky filled brand pill, not a
-          ghost button. We deliberately dropped the "STEP X OF Y" text and
-          step dots — a 3-8yo doesn't read either, and the carousel page
-          dots beneath the tiles already carry "your place in this set"
-          unambiguously. Two competing dot rows confuse adults, never mind
-          kids. */}
+      {/* Surprise me — kid-prominent dice. Icon-only on purpose: 3-8yos
+          don't read "Surprise me!" but a chunky dice icon is universally
+          legible as shuffle/random. The label still goes through to
+          assistive tech via aria-label + title. */}
       {onSurpriseMe && (
         <div className="flex justify-end">
           <button
@@ -498,23 +586,22 @@ const SceneBuilder = ({
             aria-label={labels.surpriseMe ?? "Surprise me!"}
             title={labels.surpriseMe ?? "Surprise me!"}
             className={cn(
-              "flex items-center gap-2 rounded-full",
-              "bg-coloring-accent px-4 py-2 text-sm font-bold text-white",
-              "shadow-coloring-button transition-all duration-coloring-base",
+              "grid size-11 place-items-center rounded-full",
+              "bg-coloring-accent text-white",
+              "transition-transform duration-coloring-base",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
               !disabled && "hover:brightness-105 active:scale-95",
               disabled && "opacity-50",
             )}
           >
-            <FontAwesomeIcon icon={faDice} className="text-base" />
-            {labels.surpriseMe ?? "Surprise me!"}
+            <FontAwesomeIcon icon={faDice} className="text-xl" />
           </button>
         </div>
       )}
 
       {/* Step 1 — Who? (required) */}
       {step === 0 && subjectLayer && (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {renderTitle(subjectLayer.title)}
           <TileCarousel
             layer={subjectLayer}
@@ -527,30 +614,20 @@ const SceneBuilder = ({
               onLockedTap ? (k) => onLockedTap(subjectLayer.id, k) : undefined
             }
           />
-          <div className="flex justify-end">
-            <button
-              type="button"
-              disabled={disabled || !canAdvanceFromSubject}
+          <div className="flex justify-end pt-1">
+            <PrimaryAction
+              icon={faArrowRight}
+              label={labels.next ?? "Next"}
               onClick={() => setStep(1)}
-              className={cn(
-                "flex items-center gap-2 rounded-coloring-button px-6 py-3",
-                "text-base font-bold transition-all duration-coloring-base",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-                canAdvanceFromSubject && !disabled
-                  ? "bg-coloring-accent text-white shadow-coloring-button hover:brightness-105 active:scale-95"
-                  : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
-              )}
-            >
-              {labels.next ?? "Next"}
-              <FontAwesomeIcon icon={faArrowRight} />
-            </button>
+              enabled={canAdvanceFromSubject}
+            />
           </div>
         </div>
       )}
 
       {/* Step 2 — Where? (required) */}
       {step === 1 && locationLayer && (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {renderTitle(locationLayer.title)}
           <TileCarousel
             layer={locationLayer}
@@ -560,56 +637,27 @@ const SceneBuilder = ({
             lockedSuffix={labels.lockedSuffix}
             onToggle={(k) => toggleOption(locationLayer, k)}
           />
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              disabled={disabled}
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <SecondaryAction
+              icon={faArrowLeft}
+              label={labels.back ?? "Back"}
               onClick={() => setStep(0)}
-              className={cn(
-                "flex items-center gap-2 rounded-coloring-button px-5 py-3",
-                "text-base font-semibold text-coloring-text-secondary",
-                "transition-all duration-coloring-base",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-                "hover:bg-coloring-surface active:scale-95",
-              )}
-            >
-              <FontAwesomeIcon icon={faArrowLeft} />
-              {labels.back ?? "Back"}
-            </button>
+            />
             {hasExtras ? (
-              <button
-                type="button"
-                disabled={disabled || !canAdvanceFromLocation}
+              <PrimaryAction
+                icon={faArrowRight}
+                label={labels.next ?? "Next"}
                 onClick={() => setStep(2)}
-                className={cn(
-                  "flex items-center gap-2 rounded-coloring-button px-6 py-3",
-                  "text-base font-bold transition-all duration-coloring-base",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-                  canAdvanceFromLocation && !disabled
-                    ? "bg-coloring-accent text-white shadow-coloring-button hover:brightness-105 active:scale-95"
-                    : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
-                )}
-              >
-                {labels.next ?? "Next"}
-                <FontAwesomeIcon icon={faArrowRight} />
-              </button>
+                enabled={canAdvanceFromLocation}
+              />
             ) : (
-              <button
-                type="button"
-                disabled={disabled || !canCreate}
+              <PrimaryAction
+                icon={faWandMagicSparkles}
+                label={labels.create ?? "Create!"}
                 onClick={() => onCreate?.()}
-                className={cn(
-                  "flex items-center gap-2 rounded-coloring-button px-6 py-3",
-                  "text-base font-bold transition-all duration-coloring-base",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-                  canCreate && !disabled
-                    ? "bg-coloring-accent text-white shadow-coloring-button hover:brightness-105 active:scale-95"
-                    : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
-                )}
-              >
-                <FontAwesomeIcon icon={faWandMagicSparkles} />
-                {labels.create ?? "Create!"}
-              </button>
+                enabled={canCreate}
+                large
+              />
             )}
           </div>
         </div>
@@ -617,7 +665,7 @@ const SceneBuilder = ({
 
       {/* Step 3 — Make it special (OPTIONAL, skippable) */}
       {step === 2 && hasExtras && (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {renderTitle(labels.extrasTitle ?? "Make it special")}
           {extraLayers.map((layer) => (
             <section key={layer.id} className="flex flex-col gap-1.5">
@@ -635,38 +683,19 @@ const SceneBuilder = ({
               />
             </section>
           ))}
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              disabled={disabled}
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <SecondaryAction
+              icon={faArrowLeft}
+              label={labels.back ?? "Back"}
               onClick={() => setStep(1)}
-              className={cn(
-                "flex items-center gap-2 rounded-coloring-button px-5 py-3",
-                "text-base font-semibold text-coloring-text-secondary",
-                "transition-all duration-coloring-base",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-                "hover:bg-coloring-surface active:scale-95",
-              )}
-            >
-              <FontAwesomeIcon icon={faArrowLeft} />
-              {labels.back ?? "Back"}
-            </button>
-            <button
-              type="button"
-              disabled={disabled || !canCreate}
+            />
+            <PrimaryAction
+              icon={faWandMagicSparkles}
+              label={labels.create ?? "Create!"}
               onClick={() => onCreate?.()}
-              className={cn(
-                "flex items-center gap-2 rounded-coloring-button px-6 py-3",
-                "text-base font-bold transition-all duration-coloring-base",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-                canCreate && !disabled
-                  ? "bg-coloring-accent text-white shadow-coloring-button hover:brightness-105 active:scale-95"
-                  : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
-              )}
-            >
-              <FontAwesomeIcon icon={faWandMagicSparkles} />
-              {labels.create ?? "Create!"}
-            </button>
+              enabled={canCreate}
+              large
+            />
           </div>
         </div>
       )}
