@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDice,
@@ -190,7 +191,9 @@ const SceneTile = ({
       >
         <span
           className={cn(
-            "block size-full overflow-hidden",
+            // `relative` so next/image's `fill` mode positions correctly
+            // against this box (next/image absolutely-positions itself).
+            "relative block size-full overflow-hidden",
             "rounded-coloring-card border bg-white",
             "transition-all duration-coloring-base ease-coloring",
             "grid place-items-center",
@@ -239,11 +242,18 @@ const SceneTile = ({
               )}
             />
           ) : option.thumbnailUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            // Use next/image — the source 1024×1024 thumbnails are 3–10×
+            // bigger than the tile renders at (96–112px). next/image asks
+            // R2 for an appropriately-sized variant, lazy-loads off-screen
+            // tiles, and caches aggressively. The plain `<img>` was the
+            // direct cause of the "tiles take a moment to populate" lag
+            // we saw on slower connections.
+            <Image
               src={option.thumbnailUrl}
               alt=""
-              className="size-full object-cover"
+              fill
+              sizes={size === "lg" ? "112px" : "80px"}
+              className="object-cover"
               draggable={false}
             />
           ) : (

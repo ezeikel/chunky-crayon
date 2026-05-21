@@ -30,6 +30,7 @@
  */
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { OUTFIT_LIBRARY, type OutfitKey } from '@/lib/characters/outfits';
@@ -98,11 +99,16 @@ const CharacterCockpit = (props: Props) => {
           )}
         >
           {portrait ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            // R2-hosted portrait, rendered at 256–320px. next/image
+            // serves a size-appropriate variant and lazy-loads if the
+            // cockpit isn't immediately on-screen.
+            <Image
               src={portrait}
               alt={`${props.name}, a ${props.species}`}
-              className="w-full h-full object-contain p-4"
+              fill
+              sizes="(max-width: 768px) 256px, 320px"
+              className="object-contain p-4"
+              priority
             />
           ) : null}
           {/* Equipped outfit overlay — sits on top of the portrait. */}

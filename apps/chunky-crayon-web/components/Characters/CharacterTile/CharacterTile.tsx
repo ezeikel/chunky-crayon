@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faWandMagicSparkles,
@@ -75,13 +76,18 @@ const CharacterTile = ({
       {/* Pure white background — line-art reads as a coloring-page
           preview only when the outlines have real contrast. Cream
           muddied the black ink. */}
-      <div className="aspect-square w-full flex flex-col items-center justify-center gap-3 bg-white">
+      <div className="relative aspect-square w-full flex flex-col items-center justify-center gap-3 bg-white">
         {isReady && portrait ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          // R2-hosted portrait; next/image lazy-loads off-screen tiles +
+          // serves a size-appropriate variant. `relative` parent above so
+          // `fill` positions correctly. p-4 padding becomes the parent's
+          // box, not the image's.
+          <Image
             src={portrait}
             alt={`${name}, a ${species}`}
-            className="w-full h-full object-contain p-4"
+            fill
+            sizes="(max-width: 768px) 50vw, 280px"
+            className="object-contain p-4"
           />
         ) : isGenerating ? (
           <>

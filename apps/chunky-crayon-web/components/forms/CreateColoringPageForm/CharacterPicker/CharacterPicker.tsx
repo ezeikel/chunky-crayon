@@ -21,6 +21,7 @@
  */
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { faPlus } from '@fortawesome/pro-duotone-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -147,13 +148,17 @@ const CharacterPicker = ({ value, onChange }: Props) => {
                   : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
               )}
             >
-              <div className="flex-1 w-full flex items-center justify-center overflow-hidden">
+              <div className="relative flex-1 w-full flex items-center justify-center overflow-hidden">
                 {portrait ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  // Portraits are R2-hosted webp/svg, ~96px rendered.
+                  // next/image lazy-loads off-screen pills and serves a
+                  // size-appropriate variant rather than the full upload.
+                  <Image
                     src={portrait}
                     alt=""
-                    className="w-full h-full object-contain"
+                    fill
+                    sizes="96px"
+                    className="object-contain"
                   />
                 ) : (
                   <span className="text-xs text-neutral-400">…</span>
