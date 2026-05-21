@@ -1105,7 +1105,8 @@
     "cancel": "Cancelar",
     "error": "¡Casi! Prueba con otro...",
     "incorrect": "No es correcto. Inténtalo de nuevo.",
-    "hint": "¡Pídele ayuda a un padre, madre o tutor!"
+    "hint": "¡Pídele ayuda a un padre, madre o tutor!",
+    "settingsHint": "You can turn this off anytime in Settings."
   },
   "stickerReward": {
     "congratulations": "¡Felicidades!",
@@ -1249,7 +1250,9 @@
       "type": "Escribir",
       "talk": "Hablar",
       "photo": "Foto",
-      "ariaLabel": "Selección del modo de entrada"
+      "ariaLabel": "Selección del modo de entrada",
+      "scene": "Build",
+      "unlockFailed": "Something went wrong. Try again?"
     },
     "voiceInput": {
       "startRecording": "Empezar a grabar",
@@ -1324,7 +1327,74 @@
     "subtextNoCreditsSubscribed": "¿Necesitas más magia? ¡Recarga o mejora para que siga la creatividad!",
     "subtextNoCreditsNoSubscription": "Elige una suscripción o compra algunos créditos para seguir.",
     "subtextFallback": "¡Recibirás 15 créditos gratis, suficientes para crear 3 páginas!",
-    "linkSeePlansGuestLimit": "O empieza una prueba gratis de 7 días para páginas ilimitadas"
+    "linkSeePlansGuestLimit": "O empieza una prueba gratis de 7 días para páginas ilimitadas",
+    "scene": {
+      "ariaLabel": "Build your picture",
+      "surpriseMe": "Surprise me!",
+      "lockedMakeCharacter": "(make a character first)",
+      "back": "Back",
+      "next": "Next",
+      "create": "Create!",
+      "extrasTitle": "Extras",
+      "skip": "Skip",
+      "subjectAddCharacter": "Add character",
+      "subjectTitle": "Who?",
+      "locationTitle": "Where?",
+      "weatherTitle": "Weather",
+      "activityTitle": "Doing what?",
+      "accentTitle": "Extras",
+      "subject": {
+        "horse": "Horse",
+        "cow": "Cow",
+        "sheep": "Sheep",
+        "dog": "Dog",
+        "cat": "Cat",
+        "fox": "Fox",
+        "lion": "Lion",
+        "fish": "Fish",
+        "dragon": "Dragon",
+        "bird": "Bird",
+        "kid": "Kid",
+        "astronaut": "Astronaut"
+      },
+      "location": {
+        "beach": "Beach",
+        "sea": "At Sea",
+        "football-game": "Football",
+        "busy-street": "Busy Street",
+        "shopping-mall": "Mall",
+        "desert-island": "Island",
+        "forest": "Forest",
+        "mountains": "Mountains",
+        "train-station": "Station"
+      },
+      "weather": {
+        "sunny": "Sunny",
+        "snowy": "Snowy",
+        "rainy": "Rainy",
+        "night": "Night",
+        "rainbow": "Rainbow",
+        "cloudy": "Cloudy"
+      },
+      "activity": {
+        "playing": "Playing",
+        "sleeping": "Sleeping",
+        "running": "Running",
+        "swimming": "Swimming",
+        "flying-a-kite": "Kite",
+        "riding-a-bike": "Biking",
+        "having-a-picnic": "Picnic",
+        "dancing": "Dancing"
+      },
+      "accent": {
+        "birthday": "Birthday",
+        "sparkles": "Sparkles",
+        "underwater-bubbles": "Bubbles",
+        "flowers": "Flowers",
+        "space-stars": "Stars",
+        "balloons": "Balloons"
+      }
+    }
   },
   "feedback": {
     "title": "¿Qué tienes en mente?",

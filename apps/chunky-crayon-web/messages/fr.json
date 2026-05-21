@@ -1105,7 +1105,8 @@
     "cancel": "Annuler",
     "error": "Pas tout à fait ! Essaie encore...",
     "incorrect": "Ce n’est pas la bonne réponse. Réessaie.",
-    "hint": "Demande de l’aide à un parent ou à un tuteur !"
+    "hint": "Demande de l’aide à un parent ou à un tuteur !",
+    "settingsHint": "You can turn this off anytime in Settings."
   },
   "stickerReward": {
     "congratulations": "Bravo !",
@@ -1249,7 +1250,9 @@
       "type": "Écrire",
       "talk": "Parler",
       "photo": "Photo",
-      "ariaLabel": "Sélection du mode de saisie"
+      "ariaLabel": "Sélection du mode de saisie",
+      "scene": "Build",
+      "unlockFailed": "Something went wrong. Try again?"
     },
     "voiceInput": {
       "startRecording": "Démarrer l’enregistrement",
@@ -1324,7 +1327,74 @@
     "subtextNoCreditsSubscribed": "Besoin de plus de magie ? Recharge ou améliore pour continuer à créer !",
     "subtextNoCreditsNoSubscription": "Choisis un abonnement, ou achète quelques crédits pour continuer.",
     "subtextFallback": "Tu auras 15 crédits gratuits, de quoi créer 3 pages !",
-    "linkSeePlansGuestLimit": "Ou commencez un essai gratuit de 7 jours pour des pages illimitées"
+    "linkSeePlansGuestLimit": "Ou commencez un essai gratuit de 7 jours pour des pages illimitées",
+    "scene": {
+      "ariaLabel": "Build your picture",
+      "surpriseMe": "Surprise me!",
+      "lockedMakeCharacter": "(make a character first)",
+      "back": "Back",
+      "next": "Next",
+      "create": "Create!",
+      "extrasTitle": "Extras",
+      "skip": "Skip",
+      "subjectAddCharacter": "Add character",
+      "subjectTitle": "Who?",
+      "locationTitle": "Where?",
+      "weatherTitle": "Weather",
+      "activityTitle": "Doing what?",
+      "accentTitle": "Extras",
+      "subject": {
+        "horse": "Horse",
+        "cow": "Cow",
+        "sheep": "Sheep",
+        "dog": "Dog",
+        "cat": "Cat",
+        "fox": "Fox",
+        "lion": "Lion",
+        "fish": "Fish",
+        "dragon": "Dragon",
+        "bird": "Bird",
+        "kid": "Kid",
+        "astronaut": "Astronaut"
+      },
+      "location": {
+        "beach": "Beach",
+        "sea": "At Sea",
+        "football-game": "Football",
+        "busy-street": "Busy Street",
+        "shopping-mall": "Mall",
+        "desert-island": "Island",
+        "forest": "Forest",
+        "mountains": "Mountains",
+        "train-station": "Station"
+      },
+      "weather": {
+        "sunny": "Sunny",
+        "snowy": "Snowy",
+        "rainy": "Rainy",
+        "night": "Night",
+        "rainbow": "Rainbow",
+        "cloudy": "Cloudy"
+      },
+      "activity": {
+        "playing": "Playing",
+        "sleeping": "Sleeping",
+        "running": "Running",
+        "swimming": "Swimming",
+        "flying-a-kite": "Kite",
+        "riding-a-bike": "Biking",
+        "having-a-picnic": "Picnic",
+        "dancing": "Dancing"
+      },
+      "accent": {
+        "birthday": "Birthday",
+        "sparkles": "Sparkles",
+        "underwater-bubbles": "Bubbles",
+        "flowers": "Flowers",
+        "space-stars": "Stars",
+        "balloons": "Balloons"
+      }
+    }
   },
   "feedback": {
     "title": "Que se passe-t-il ?",

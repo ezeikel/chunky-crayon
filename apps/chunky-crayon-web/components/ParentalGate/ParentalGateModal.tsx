@@ -65,9 +65,18 @@ const pickRandomProblem = (): Problem =>
 /**
  * Build a 3-button answer set: the correct answer plus two distractors
  * that are close enough to feel plausible (correct ± 1, never negative,
- * never the same as correct). Then shuffle.
+ * never the same as correct).
+ *
+ * Caller decides whether to shuffle. Initial-state callers (useState
+ * defaults that may run during SSR / prerender) MUST pass `false` —
+ * Math.random in a client component during prerender is a hard error
+ * in Next 16's Cache Components. Client effects can safely shuffle
+ * after mount.
  */
-const buildAnswerChoices = (correct: number): number[] => {
+const buildAnswerChoices = (
+  correct: number,
+  shouldShuffle: boolean,
+): number[] => {
   const candidates = new Set<number>([correct]);
   let bump = 1;
   while (candidates.size < 3) {
@@ -75,7 +84,8 @@ const buildAnswerChoices = (correct: number): number[] => {
     if (candidates.size < 3) candidates.add(correct + bump);
     bump += 1;
   }
-  return shuffle([...candidates]);
+  const arr = [...candidates];
+  return shouldShuffle ? shuffle(arr) : arr;
 };
 
 const shuffle = <T,>(arr: T[]): T[] => {
@@ -115,8 +125,11 @@ const ParentalGateModal = ({
   const t = useTranslations('parentalGate');
   const router = useRouter();
   const [problem, setProblem] = useState<Problem>(DEFAULT_PROBLEM);
+  // Initial choices MUST be deterministic — Math.random during SSR/
+  // prerender is a hard error in Next 16 Cache Components. We shuffle
+  // (and roll a fresh problem) in the open-effect below, post-mount.
   const [choices, setChoices] = useState<number[]>(() =>
-    buildAnswerChoices(DEFAULT_PROBLEM.answer),
+    buildAnswerChoices(DEFAULT_PROBLEM.answer, false),
   );
   const [wrongCount, setWrongCount] = useState(0);
   const [shake, setShake] = useState(false);
@@ -127,7 +140,7 @@ const ParentalGateModal = ({
     if (!open) return;
     const next = pickRandomProblem();
     setProblem(next);
-    setChoices(buildAnswerChoices(next.answer));
+    setChoices(buildAnswerChoices(next.answer, true));
     setWrongCount(0);
     setShake(false);
   }, [open]);

@@ -1105,7 +1105,8 @@
     "cancel": "キャンセル",
     "error": "おしい！ べつの問題でもう一回…",
     "incorrect": "ちがうよ。もう一度ためしてね。",
-    "hint": "保護者の方に手伝ってもらってね！"
+    "hint": "保護者の方に手伝ってもらってね！",
+    "settingsHint": "You can turn this off anytime in Settings."
   },
   "stickerReward": {
     "congratulations": "おめでとう！",
@@ -1249,7 +1250,9 @@
       "type": "入力",
       "talk": "おしゃべり",
       "photo": "写真",
-      "ariaLabel": "入力方法の選択"
+      "ariaLabel": "入力方法の選択",
+      "scene": "Build",
+      "unlockFailed": "Something went wrong. Try again?"
     },
     "voiceInput": {
       "startRecording": "録音を開始",
@@ -1324,7 +1327,74 @@
     "subtextNoCreditsSubscribed": "もっとまほうを追加しよう！クレジット追加かアップグレードで続けられるよ！",
     "subtextNoCreditsNoSubscription": "サブスクをえらぶか、クレジットを少し買って続けよう。",
     "subtextFallback": "無料クレジット15で、ぬりえが3枚つくれるよ！",
-    "linkSeePlansGuestLimit": "または7日間無料で、ページ作り放題をお試し"
+    "linkSeePlansGuestLimit": "または7日間無料で、ページ作り放題をお試し",
+    "scene": {
+      "ariaLabel": "Build your picture",
+      "surpriseMe": "Surprise me!",
+      "lockedMakeCharacter": "(make a character first)",
+      "back": "Back",
+      "next": "Next",
+      "create": "Create!",
+      "extrasTitle": "Extras",
+      "skip": "Skip",
+      "subjectAddCharacter": "Add character",
+      "subjectTitle": "Who?",
+      "locationTitle": "Where?",
+      "weatherTitle": "Weather",
+      "activityTitle": "Doing what?",
+      "accentTitle": "Extras",
+      "subject": {
+        "horse": "Horse",
+        "cow": "Cow",
+        "sheep": "Sheep",
+        "dog": "Dog",
+        "cat": "Cat",
+        "fox": "Fox",
+        "lion": "Lion",
+        "fish": "Fish",
+        "dragon": "Dragon",
+        "bird": "Bird",
+        "kid": "Kid",
+        "astronaut": "Astronaut"
+      },
+      "location": {
+        "beach": "Beach",
+        "sea": "At Sea",
+        "football-game": "Football",
+        "busy-street": "Busy Street",
+        "shopping-mall": "Mall",
+        "desert-island": "Island",
+        "forest": "Forest",
+        "mountains": "Mountains",
+        "train-station": "Station"
+      },
+      "weather": {
+        "sunny": "Sunny",
+        "snowy": "Snowy",
+        "rainy": "Rainy",
+        "night": "Night",
+        "rainbow": "Rainbow",
+        "cloudy": "Cloudy"
+      },
+      "activity": {
+        "playing": "Playing",
+        "sleeping": "Sleeping",
+        "running": "Running",
+        "swimming": "Swimming",
+        "flying-a-kite": "Kite",
+        "riding-a-bike": "Biking",
+        "having-a-picnic": "Picnic",
+        "dancing": "Dancing"
+      },
+      "accent": {
+        "birthday": "Birthday",
+        "sparkles": "Sparkles",
+        "underwater-bubbles": "Bubbles",
+        "flowers": "Flowers",
+        "space-stars": "Stars",
+        "balloons": "Balloons"
+      }
+    }
   },
   "feedback": {
     "title": "どんなことでも聞かせてね",

@@ -1105,7 +1105,8 @@
     "cancel": "Abbrechen",
     "error": "Fast richtig! Probier noch eine...",
     "incorrect": "Das stimmt nicht. Bitte versuch es noch einmal.",
-    "hint": "Frag Mama, Papa oder eine Aufsichtsperson um Hilfe!"
+    "hint": "Frag Mama, Papa oder eine Aufsichtsperson um Hilfe!",
+    "settingsHint": "You can turn this off anytime in Settings."
   },
   "stickerReward": {
     "congratulations": "Glückwunsch!",
@@ -1249,7 +1250,9 @@
       "type": "Tippen",
       "talk": "Sprechen",
       "photo": "Foto",
-      "ariaLabel": "Auswahl des Eingabemodus"
+      "ariaLabel": "Auswahl des Eingabemodus",
+      "scene": "Build",
+      "unlockFailed": "Something went wrong. Try again?"
     },
     "voiceInput": {
       "startRecording": "Aufnahme starten",
@@ -1324,7 +1327,74 @@
     "subtextNoCreditsSubscribed": "Mehr Magie? Lade auf oder upgrade und lass die Kreativität weiterlaufen!",
     "subtextNoCreditsNoSubscription": "Wähle ein Abo oder kauf ein paar Credits, um weiterzumachen.",
     "subtextFallback": "Du bekommst 15 Gratis-Credits – genug für 3 Seiten!",
-    "linkSeePlansGuestLimit": "Oder starte eine 7-tägige Gratis-Testphase für unbegrenzte Seiten"
+    "linkSeePlansGuestLimit": "Oder starte eine 7-tägige Gratis-Testphase für unbegrenzte Seiten",
+    "scene": {
+      "ariaLabel": "Build your picture",
+      "surpriseMe": "Surprise me!",
+      "lockedMakeCharacter": "(make a character first)",
+      "back": "Back",
+      "next": "Next",
+      "create": "Create!",
+      "extrasTitle": "Extras",
+      "skip": "Skip",
+      "subjectAddCharacter": "Add character",
+      "subjectTitle": "Who?",
+      "locationTitle": "Where?",
+      "weatherTitle": "Weather",
+      "activityTitle": "Doing what?",
+      "accentTitle": "Extras",
+      "subject": {
+        "horse": "Horse",
+        "cow": "Cow",
+        "sheep": "Sheep",
+        "dog": "Dog",
+        "cat": "Cat",
+        "fox": "Fox",
+        "lion": "Lion",
+        "fish": "Fish",
+        "dragon": "Dragon",
+        "bird": "Bird",
+        "kid": "Kid",
+        "astronaut": "Astronaut"
+      },
+      "location": {
+        "beach": "Beach",
+        "sea": "At Sea",
+        "football-game": "Football",
+        "busy-street": "Busy Street",
+        "shopping-mall": "Mall",
+        "desert-island": "Island",
+        "forest": "Forest",
+        "mountains": "Mountains",
+        "train-station": "Station"
+      },
+      "weather": {
+        "sunny": "Sunny",
+        "snowy": "Snowy",
+        "rainy": "Rainy",
+        "night": "Night",
+        "rainbow": "Rainbow",
+        "cloudy": "Cloudy"
+      },
+      "activity": {
+        "playing": "Playing",
+        "sleeping": "Sleeping",
+        "running": "Running",
+        "swimming": "Swimming",
+        "flying-a-kite": "Kite",
+        "riding-a-bike": "Biking",
+        "having-a-picnic": "Picnic",
+        "dancing": "Dancing"
+      },
+      "accent": {
+        "birthday": "Birthday",
+        "sparkles": "Sparkles",
+        "underwater-bubbles": "Bubbles",
+        "flowers": "Flowers",
+        "space-stars": "Stars",
+        "balloons": "Balloons"
+      }
+    }
   },
   "feedback": {
     "title": "Was beschäftigt dich?",
