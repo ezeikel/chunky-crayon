@@ -5,13 +5,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDice,
   faCheck,
-  faLock,
   faArrowLeft,
   faArrowRight,
-  faChevronLeft,
-  faChevronRight,
   faWandMagicSparkles,
 } from "@fortawesome/pro-duotone-svg-icons";
+// Lock icon is intentionally a flat solid (grey), not duotone — the
+// locked-tile overlay should read as a calm "later" cue, not a coloured
+// design element fighting the rest of the row.
+import { faLock } from "@fortawesome/pro-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import cn from "./cn";
 
@@ -212,13 +213,23 @@ const SceneTile = ({
 
         {locked && (
           <span
-            className="absolute inset-0 grid place-items-center bg-coloring-text-primary/40 backdrop-blur-[1px]"
+            className={cn(
+              "absolute inset-0 grid place-items-center",
+              // Soft grey wash, no blur. The lock reads as "later" not
+              // "denied"; duotone tinting on the lock fights the rest of
+              // the row, so we force flat neutral grey here.
+              "bg-neutral-200/80",
+            )}
             aria-hidden="true"
+            // Override the parent's duotone vars — the lock is intentionally
+            // flat grey, not in the tile's brand colour.
+            style={
+              {
+                "--fa-primary-color": "rgb(115, 115, 115)",
+              } as React.CSSProperties
+            }
           >
-            <FontAwesomeIcon
-              icon={faLock}
-              className="text-2xl text-white drop-shadow"
-            />
+            <FontAwesomeIcon icon={faLock} className="text-2xl" />
           </span>
         )}
       </span>
@@ -260,9 +271,6 @@ type TileCarouselProps = {
   disabled: boolean;
   lockedSuffix?: string;
   size?: "lg" | "sm";
-  /** Optional translated labels for the arrow buttons. */
-  prevLabel?: string;
-  nextLabel?: string;
   onToggle: (optionKey: string) => void;
   onLockedTap?: (optionKey: string) => void;
 };
@@ -274,153 +282,132 @@ const TileCarousel = ({
   disabled,
   lockedSuffix,
   size = "lg",
-  prevLabel,
-  nextLabel,
   onToggle,
   onLockedTap,
 }: TileCarouselProps) => {
   const lockedSet = useMemo(() => new Set(locked), [locked]);
   const selectedSet = useMemo(() => new Set(selected), [selected]);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const [page, setPage] = useState(0);
-  const [pageCount, setPageCount] = useState(1);
 
-  // Recompute page count + active page on scroll / resize. The carousel
-  // is responsive so the per-page tile count varies with card width;
-  // doing the math from real scrollLeft + clientWidth means we never
-  // hard-code "3 per page" anywhere.
+  // Swipe + click-and-drag. There are two gestures we have to cover:
+  //
+  //   1. Touch swipe on tablets/phones. `overflow-x-auto` alone isn't
+  //      enough — when the page itself is vertically scrollable, the
+  //      browser can interpret an ambiguous diagonal swipe as vertical
+  //      and skip our horizontal scroll entirely. `touch-action: pan-x`
+  //      (Tailwind `touch-pan-x`) explicitly claims the horizontal pan
+  //      gesture for this element so swipe lands reliably.
+  //
+  //   2. Mouse click-and-drag on desktop. Browsers do NOT enable this
+  //      natively on `overflow-x-auto`. We wire pointer events ourselves
+  //      and guard tile clicks with a 5px movement threshold so a real
+  //      tap still selects the tile underneath the cursor.
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
 
-    const update = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = el;
-      if (clientWidth === 0) return;
-      const pages = Math.max(1, Math.ceil(scrollWidth / clientWidth));
-      setPageCount(pages);
-      // Round to nearest page so a partial-overscroll bounce doesn't
-      // flicker the dot to the next index.
-      setPage(Math.round(scrollLeft / clientWidth));
+    // Skip on touch devices — the native swipe gesture already drives
+    // the scroll there; we don't want our pointer handler racing with it.
+    let dragging = false;
+    let startX = 0;
+    let startScroll = 0;
+    let moved = 0;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      dragging = true;
+      moved = 0;
+      startX = e.clientX;
+      startScroll = el.scrollLeft;
+      el.setPointerCapture(e.pointerId);
+      el.style.cursor = "grabbing";
+      // Pause snap during the drag so the strip follows the cursor 1:1
+      // instead of jerking to nearest snap point on every pixel.
+      el.style.scrollSnapType = "none";
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(dx));
+      el.scrollLeft = startScroll - dx;
+    };
+    const endDrag = (e: PointerEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      el.style.cursor = "";
+      // Re-enable snap; the strip animates to the nearest snap point.
+      el.style.scrollSnapType = "";
+      try {
+        el.releasePointerCapture(e.pointerId);
+      } catch {
+        /* already released */
+      }
+    };
+    // If movement exceeded the threshold, swallow the click so the tile
+    // underneath doesn't fire. Capture phase so we beat the tile's own
+    // onClick.
+    const onClickCapture = (e: MouseEvent) => {
+      if (moved > 5) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      moved = 0;
     };
 
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
+    el.addEventListener("pointerdown", onPointerDown);
+    el.addEventListener("pointermove", onPointerMove);
+    el.addEventListener("pointerup", endDrag);
+    el.addEventListener("pointercancel", endDrag);
+    el.addEventListener("click", onClickCapture, true);
     return () => {
-      el.removeEventListener("scroll", update);
-      ro.disconnect();
+      el.removeEventListener("pointerdown", onPointerDown);
+      el.removeEventListener("pointermove", onPointerMove);
+      el.removeEventListener("pointerup", endDrag);
+      el.removeEventListener("pointercancel", endDrag);
+      el.removeEventListener("click", onClickCapture, true);
     };
-  }, [layer.options.length]);
-
-  const scrollByPage = (dir: 1 | -1) => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir * el.clientWidth, behavior: "smooth" });
-  };
-
-  const atStart = page <= 0;
-  const atEnd = page >= pageCount - 1;
+  }, []);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="relative">
-        {/* Left arrow — fades when there's nowhere left to go. Hidden from
-            screen readers when inert; touch users can just swipe. */}
-        <button
-          type="button"
-          onClick={() => scrollByPage(-1)}
-          disabled={disabled || atStart}
-          aria-label={prevLabel ?? "Previous"}
-          className={cn(
-            "absolute left-0 top-1/2 z-10 -translate-y-1/2",
-            "grid size-9 place-items-center rounded-full",
-            "bg-white text-coloring-text-primary shadow-coloring-button",
-            "border border-coloring-surface-dark",
-            "transition-opacity duration-coloring-base",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-            atStart || disabled
-              ? "pointer-events-none opacity-0"
-              : "hover:scale-105 active:scale-95",
-          )}
-        >
-          <FontAwesomeIcon icon={faChevronLeft} className="text-sm" />
-        </button>
-
-        <div
-          ref={trackRef}
-          role="listbox"
-          aria-label={layer.title}
-          aria-multiselectable={layer.kind === "multi"}
-          className={cn(
-            "flex gap-3 overflow-x-auto px-2 md:gap-4",
-            "snap-x snap-mandatory scroll-px-2",
-            // Hide native scrollbar — page dots are the visual cue.
-            "[-ms-overflow-style:none] [scrollbar-width:none]",
-            "[&::-webkit-scrollbar]:hidden",
-            "py-1",
-          )}
-        >
-          {layer.options.map((option) => {
-            const isLocked = lockedSet.has(option.key);
-            return (
-              <div key={option.key} className="snap-center shrink-0">
-                <SceneTile
-                  option={option}
-                  selected={selectedSet.has(option.key)}
-                  locked={isLocked}
-                  disabled={disabled}
-                  lockedSuffix={lockedSuffix}
-                  size={size}
-                  onToggle={() =>
-                    isLocked ? onLockedTap?.(option.key) : onToggle(option.key)
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Right arrow — mirror of left. */}
-        <button
-          type="button"
-          onClick={() => scrollByPage(1)}
-          disabled={disabled || atEnd}
-          aria-label={nextLabel ?? "Next"}
-          className={cn(
-            "absolute right-0 top-1/2 z-10 -translate-y-1/2",
-            "grid size-9 place-items-center rounded-full",
-            "bg-white text-coloring-text-primary shadow-coloring-button",
-            "border border-coloring-surface-dark",
-            "transition-opacity duration-coloring-base",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
-            atEnd || disabled
-              ? "pointer-events-none opacity-0"
-              : "hover:scale-105 active:scale-95",
-          )}
-        >
-          <FontAwesomeIcon icon={faChevronRight} className="text-sm" />
-        </button>
-      </div>
-
-      {/* Page dots — only render when there's more than one page. */}
-      {pageCount > 1 && (
-        <div
-          className="flex items-center justify-center gap-1.5"
-          aria-hidden="true"
-        >
-          {Array.from({ length: pageCount }).map((_, i) => (
-            <span
-              // eslint-disable-next-line react/no-array-index-key
-              key={i}
-              className={cn(
-                "size-1.5 rounded-full transition-colors duration-coloring-base",
-                i === page ? "bg-coloring-accent" : "bg-coloring-surface-dark",
-              )}
-            />
-          ))}
-        </div>
+    <div
+      ref={trackRef}
+      role="listbox"
+      aria-label={layer.title}
+      aria-multiselectable={layer.kind === "multi"}
+      className={cn(
+        "flex gap-3 overflow-x-auto px-2 md:gap-4",
+        "snap-x snap-mandatory scroll-px-2",
+        // Claim horizontal pan for touch so an ambiguous diagonal swipe
+        // doesn't get hijacked by the page's vertical scroll. Without
+        // this, touch-swipe is unreliable when the form sits in a
+        // vertically scrollable page (which is always).
+        "touch-pan-x",
+        // Tell desktop users they can drag; the JS handler does the work.
+        "cursor-grab select-none",
+        // Native scrollbar hidden — edge-peek is the visual cue, not a bar.
+        "[-ms-overflow-style:none] [scrollbar-width:none]",
+        "[&::-webkit-scrollbar]:hidden",
+        "py-2",
       )}
+    >
+      {layer.options.map((option) => {
+        const isLocked = lockedSet.has(option.key);
+        return (
+          <div key={option.key} className="snap-center shrink-0">
+            <SceneTile
+              option={option}
+              selected={selectedSet.has(option.key)}
+              locked={isLocked}
+              disabled={disabled}
+              lockedSuffix={lockedSuffix}
+              size={size}
+              onToggle={() =>
+                isLocked ? onLockedTap?.(option.key) : onToggle(option.key)
+              }
+            />
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -535,8 +522,6 @@ const SceneBuilder = ({
             locked={lockedKeys?.[subjectLayer.id] ?? []}
             disabled={disabled}
             lockedSuffix={labels.lockedSuffix}
-            prevLabel={labels.back}
-            nextLabel={labels.next}
             onToggle={(k) => toggleOption(subjectLayer, k)}
             onLockedTap={
               onLockedTap ? (k) => onLockedTap(subjectLayer.id, k) : undefined
@@ -573,8 +558,6 @@ const SceneBuilder = ({
             locked={lockedKeys?.[locationLayer.id] ?? []}
             disabled={disabled}
             lockedSuffix={labels.lockedSuffix}
-            prevLabel={labels.back}
-            nextLabel={labels.next}
             onToggle={(k) => toggleOption(locationLayer, k)}
           />
           <div className="flex items-center justify-between gap-3">
@@ -647,8 +630,6 @@ const SceneBuilder = ({
                 locked={lockedKeys?.[layer.id] ?? []}
                 disabled={disabled}
                 lockedSuffix={labels.lockedSuffix}
-                prevLabel={labels.back}
-                nextLabel={labels.next}
                 size="sm"
                 onToggle={(k) => toggleOption(layer, k)}
               />
