@@ -994,7 +994,12 @@ const MobileColoringDrawer = ({
           // smoothly tracks the snap animations (peek -> half -> full).
           <div
             aria-hidden
-            className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center"
+            // md:hidden — the parent MobileColoringDrawer is gated to
+            // mobile widths but `createPortal` mounts this hint into
+            // document.body, escaping that gate. Without the explicit
+            // hidden class here the hint label and pulsing ring leak
+            // onto desktop where there's no drawer to drag.
+            className="pointer-events-none fixed left-0 right-0 z-[60] flex justify-center md:hidden"
             style={{
               bottom: drawerHeightLive + visualBottomInset + 12,
             }}
