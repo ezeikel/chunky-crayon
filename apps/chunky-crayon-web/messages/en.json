@@ -1102,16 +1102,9 @@
     "whatsappAria": "Share on WhatsApp"
   },
   "parentalGate": {
-    "title": "Grown-ups only!",
-    "subtitle": "Solve this math problem to continue",
-    "description": "To make sure a grown-up is helping, please answer this question:",
-    "question": "What is {num1} + {num2}?",
-    "placeholder": "Your answer",
-    "submit": "Check Answer",
-    "cancel": "Cancel",
-    "error": "Not quite right! Try another one...",
-    "incorrect": "That's not right. Please try again.",
-    "hint": "Ask a parent or guardian for help!"
+    "title": "Quick check",
+    "subtitle": "Tap the right answer",
+    "settingsHint": "You can turn this off anytime in Settings."
   },
   "stickerReward": {
     "congratulations": "Congratulations!",
@@ -1257,7 +1250,7 @@
       "talk": "Talk",
       "photo": "Photo",
       "ariaLabel": "Input mode selection",
-      "lockedSuffix": "(ask a grown-up)"
+      "unlockFailed": "Something went wrong. Try again?"
     },
     "scene": {
       "ariaLabel": "Build your picture",

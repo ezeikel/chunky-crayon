@@ -1,12 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faShapes,
   faPencil,
   faMicrophoneLines,
   faCameraRetro,
-  faLock,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useTranslations } from 'next-intl';
@@ -17,6 +17,10 @@ import { useParentalGate } from '@/components/ParentalGate';
 import { issueParentGateToken } from '@/app/actions/parent-gate';
 import { setModeUnlocked } from '@/app/actions/scene';
 import { type GateableMode } from '@/lib/scene/modes';
+import {
+  addUnlockedModeToCookie,
+  getUnlockedModesFromCookie,
+} from '@/lib/scene/unlock-cookie';
 import cn from '@/utils/cn';
 
 // =============================================================================
@@ -36,7 +40,8 @@ type InputOption = {
 // =============================================================================
 
 // Scene first — it's the privacy-first default. The other three are
-// locked per profile until a parent unlocks them.
+// gated behind a one-time parent check. Once passed, the unlock persists
+// (cookie for guests, DB for signed-in) and we never re-ask for that mode.
 const INPUT_OPTIONS: InputOption[] = [
   { mode: 'scene', labelKey: 'scene', icon: faShapes, gateable: false },
   { mode: 'text', labelKey: 'type', icon: faPencil, gateable: true },
@@ -53,14 +58,14 @@ type InputModeSelectorProps = {
   /** Disable all mode buttons */
   disabled?: boolean;
   /**
-   * Modes the active profile has unlocked. Scene is always available and
-   * not included here. Undefined while loading / for guests (treated as
-   * "all gateable modes locked" — the safe default).
+   * Modes unlocked on the SERVER side for this user's active profile.
+   * Undefined for guests / while loading. The local cookie state is
+   * merged on top so we have a unified view of "what's unlocked".
    */
   unlockedModes?: GateableMode[];
-  /** Optimistically reflect an unlock without a refetch. */
+  /** Optimistically reflect a server-side unlock without a refetch. */
   onModeUnlocked?: (mode: GateableMode) => void;
-  /** True for signed-out users — they can't unlock (no profile to write). */
+  /** True for signed-out users — drives cookie vs server persistence. */
   isGuest?: boolean;
 };
 
@@ -75,54 +80,72 @@ const InputModeSelector = ({
   const t = useTranslations('createForm.inputModes');
   const { openGate } = useParentalGate();
 
-  const isModeLocked = (option: InputOption): boolean => {
-    if (!option.gateable) return false;
-    return !(unlockedModes ?? []).includes(option.mode as GateableMode);
+  // Cookie-backed unlocks (used for guests + as a belt-and-braces local
+  // cache for signed-in users). Read on mount; updated when the parent
+  // gate passes. SSR-safe — the helper returns [] when document is
+  // unavailable, then the client effect refreshes.
+  const [cookieUnlocks, setCookieUnlocks] = useState<GateableMode[]>([]);
+  useEffect(() => {
+    setCookieUnlocks(getUnlockedModesFromCookie());
+  }, []);
+
+  // Effective unlock set: server (DB) ∪ cookie. Signed-in users have
+  // either path lighting up the same mode; guests only ever get the
+  // cookie path. Both produce the same UI.
+  const isUnlocked = (option: InputOption): boolean => {
+    if (!option.gateable) return true;
+    const m = option.mode as GateableMode;
+    return (unlockedModes ?? []).includes(m) || cookieUnlocks.includes(m);
   };
 
-  const unlockMode = (mode: GateableMode) => {
-    // Parent gate first (client subtraction friction), then mint the
-    // scoped token and persist the unlock server-side. The HMAC token is
-    // what actually authorises setModeUnlocked — the modal is just UX.
-    openGate({
-      reason: 'unlock-input-mode',
-      onSuccess: async () => {
-        const issued = await issueParentGateToken('modes:unlock');
-        if (!issued.ok) {
-          toast.error(t('unlockFailed'));
-          return;
-        }
-        const res = await setModeUnlocked({
-          mode,
-          unlocked: true,
-          parentGateToken: issued.token,
-        });
-        if (!res.ok) {
-          toast.error(t('unlockFailed'));
-          return;
-        }
-        onModeUnlocked?.(mode);
-        setMode(mode);
-        toast.success(t('unlockSuccess'));
-      },
+  // Server-side persistent unlock for signed-in users. Skips the DB
+  // call for guests — there's no profile row to write against.
+  const persistUnlock = async (mode: GateableMode): Promise<boolean> => {
+    if (isGuest) {
+      addUnlockedModeToCookie(mode);
+      setCookieUnlocks((prev) =>
+        prev.includes(mode) ? prev : [...prev, mode],
+      );
+      return true;
+    }
+    const issued = await issueParentGateToken('modes:unlock');
+    if (!issued.ok) return false;
+    const res = await setModeUnlocked({
+      mode,
+      unlocked: true,
+      parentGateToken: issued.token,
     });
+    if (!res.ok) return false;
+    // Also write the cookie for signed-in users so a logged-out reload
+    // (e.g. session expiry) doesn't re-prompt the same parent.
+    addUnlockedModeToCookie(mode);
+    setCookieUnlocks((prev) => (prev.includes(mode) ? prev : [...prev, mode]));
+    onModeUnlocked?.(mode);
+    return true;
   };
 
   const handleModeChange = (option: InputOption) => {
     if (disabled || isProcessing) return;
 
-    if (isModeLocked(option)) {
-      if (isGuest) {
-        // No profile to write an unlock against — nudge to sign in
-        // rather than opening a gate that can't persist.
-        toast.info(t('lockedSignInPrompt'));
-        return;
-      }
-      unlockMode(option.mode as GateableMode);
+    // Already unlocked (or never gated) — just switch.
+    if (isUnlocked(option)) {
+      setMode(option.mode);
       return;
     }
 
-    setMode(option.mode);
+    // Gate it. The modal handles its own UI; we pass the success
+    // callback that persists + flips the mode.
+    openGate({
+      reason: 'unlock-input-mode',
+      onSuccess: async () => {
+        const ok = await persistUnlock(option.mode as GateableMode);
+        if (!ok) {
+          toast.error(t('unlockFailed'));
+          return;
+        }
+        setMode(option.mode);
+      },
+    });
   };
 
   return (
@@ -134,9 +157,7 @@ const InputModeSelector = ({
       {INPUT_OPTIONS.map((option) => {
         const isActive = option.mode === currentMode;
         const isDisabled = disabled || isProcessing;
-        const locked = isModeLocked(option);
-        const baseLabel = t(option.labelKey);
-        const label = locked ? `${baseLabel} ${t('lockedSuffix')}` : baseLabel;
+        const label = t(option.labelKey);
 
         return (
           <Button
@@ -152,8 +173,14 @@ const InputModeSelector = ({
             aria-label={label}
             title={label}
             className={cn(
-              // Base — compact tile matching DesktopToolsSidebar tool buttons
-              'relative size-14 rounded-coloring-card border-2 p-0 md:size-16',
+              // Same compact tile shape across all four. No lock badge,
+              // no premium-y styling on gated modes — every mode tile
+              // looks identical and ready to use. The parent gate fires
+              // on tap; the user finds out about it AT the modal, not
+              // by reading a lock icon on the tile. (Research finding:
+              // a visible lock implies paywall, which kills the adult
+              // trial click-through.)
+              'size-14 rounded-coloring-card border-2 p-0 md:size-16',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-crayon-orange',
               isActive && 'border-transparent',
               !isActive &&
@@ -181,20 +208,8 @@ const InputModeSelector = ({
               className={cn(
                 'transition-transform duration-200',
                 isActive && 'animate-bounce-in',
-                locked && 'opacity-40',
               )}
             />
-            {locked && (
-              <span
-                className={cn(
-                  'absolute -right-1 -top-1 grid size-5 place-items-center',
-                  'rounded-full bg-crayon-purple text-white shadow',
-                )}
-                aria-hidden="true"
-              >
-                <FontAwesomeIcon icon={faLock} className="text-[10px]" />
-              </span>
-            )}
           </Button>
         );
       })}

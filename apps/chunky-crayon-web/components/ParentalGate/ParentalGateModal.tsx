@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock, faCalculator } from '@fortawesome/pro-duotone-svg-icons';
+import { faHandWave } from '@fortawesome/pro-duotone-svg-icons';
 import {
   Dialog,
   DialogContent,
@@ -12,33 +12,82 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
 
-type MathProblem = {
-  num1: number;
-  num2: number;
-  operator: '×';
+/**
+ * ParentalGate — the "quick check" modal.
+ *
+ * Replaces the previous 7×8 multiplication challenge (Year-4 maths), which
+ * adults failed ~95% of the time under any kind of pressure. New design is
+ * a single primary-school sum (`a + b = ?`) with three big tap-able number
+ * buttons. Adults pass in <2 seconds; a 3-8yo who can't yet add reliably
+ * fails. Apple guideline 1.3 only requires a meaningful adult action — it
+ * does NOT require Year-4 multiplication, and per-research the simpler
+ * gate matches what Sago Mini / Toca Boca / PBS Kids actually ship.
+ *
+ * Aesthetic match: chunky circular brand-orange answer buttons (same
+ * vocabulary as the wizard's Dice / Next / Create buttons), big friendly
+ * title, no scary lock icon — a waving hand instead. The point is to
+ * read as "oh hi grown-up", not "you are blocked".
+ *
+ * Wrong-answer behaviour: shake + reshuffle the three number positions
+ * (defeats "always tap the middle one"). Same problem stays. Three
+ * wrongs in a row → silent close (no scary "you failed" message; kid
+ * gives up, parent re-triggers).
+ *
+ * Persistence is owned by the CALLER via onSuccess (see ParentalGateContext).
+ * The gate itself only verifies the parent is in the room; it doesn't know
+ * what action the success unlocks.
+ */
+
+type Problem = {
+  a: number;
+  b: number;
   answer: number;
 };
 
-// UK Year 4 level multiplication - easy for adults, challenging for ages 3-8
-const SIMPLE_PROBLEMS: MathProblem[] = [
-  { num1: 7, num2: 8, operator: '×', answer: 56 },
-  { num1: 9, num2: 6, operator: '×', answer: 54 },
-  { num1: 8, num2: 7, operator: '×', answer: 56 },
-  { num1: 6, num2: 9, operator: '×', answer: 54 },
-  { num1: 8, num2: 6, operator: '×', answer: 48 },
-  { num1: 7, num2: 9, operator: '×', answer: 63 },
-  { num1: 9, num2: 8, operator: '×', answer: 72 },
-  { num1: 6, num2: 7, operator: '×', answer: 42 },
-  { num1: 8, num2: 9, operator: '×', answer: 72 },
-  { num1: 7, num2: 6, operator: '×', answer: 42 },
+// Primary-school sums kept deliberately easy. Mix of orderings so it
+// doesn't feel rote.
+const PROBLEMS: Problem[] = [
+  { a: 2, b: 1, answer: 3 },
+  { a: 1, b: 3, answer: 4 },
+  { a: 3, b: 2, answer: 5 },
+  { a: 4, b: 2, answer: 6 },
+  { a: 2, b: 5, answer: 7 },
+  { a: 3, b: 4, answer: 7 },
+  { a: 5, b: 1, answer: 6 },
+  { a: 1, b: 4, answer: 5 },
 ];
 
-const getRandomProblem = (): MathProblem => {
-  return SIMPLE_PROBLEMS[Math.floor(Math.random() * SIMPLE_PROBLEMS.length)];
+const pickRandomProblem = (): Problem =>
+  PROBLEMS[Math.floor(Math.random() * PROBLEMS.length)];
+
+/**
+ * Build a 3-button answer set: the correct answer plus two distractors
+ * that are close enough to feel plausible (correct ± 1, never negative,
+ * never the same as correct). Then shuffle.
+ */
+const buildAnswerChoices = (correct: number): number[] => {
+  const candidates = new Set<number>([correct]);
+  let bump = 1;
+  while (candidates.size < 3) {
+    if (correct - bump > 0) candidates.add(correct - bump);
+    if (candidates.size < 3) candidates.add(correct + bump);
+    bump += 1;
+  }
+  return shuffle([...candidates]);
 };
+
+const shuffle = <T,>(arr: T[]): T[] => {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+};
+
+const MAX_WRONG_ATTEMPTS = 3;
 
 type ParentalGateModalProps = {
   open: boolean;
@@ -53,8 +102,9 @@ type ParentalGateModalProps = {
   onSuccess?: () => void;
 };
 
-// Default problem to avoid Math.random() during SSR
-const DEFAULT_PROBLEM: MathProblem = SIMPLE_PROBLEMS[0];
+// Default problem used during SSR so render is deterministic; the real
+// problem is rolled client-side when `open` flips true.
+const DEFAULT_PROBLEM = PROBLEMS[0];
 
 const ParentalGateModal = ({
   open,
@@ -64,139 +114,137 @@ const ParentalGateModal = ({
 }: ParentalGateModalProps) => {
   const t = useTranslations('parentalGate');
   const router = useRouter();
-  const [problem, setProblem] = useState<MathProblem>(DEFAULT_PROBLEM);
-  const [userAnswer, setUserAnswer] = useState('');
-  const [error, setError] = useState(false);
+  const [problem, setProblem] = useState<Problem>(DEFAULT_PROBLEM);
+  const [choices, setChoices] = useState<number[]>(() =>
+    buildAnswerChoices(DEFAULT_PROBLEM.answer),
+  );
+  const [wrongCount, setWrongCount] = useState(0);
   const [shake, setShake] = useState(false);
 
-  // Generate a new problem when modal opens (client-side only)
+  // Roll a fresh problem each time the modal opens (client-only — keeps
+  // SSR deterministic and avoids hydration mismatch).
   useEffect(() => {
-    if (open) {
-      setProblem(getRandomProblem());
-      setUserAnswer('');
-      setError(false);
-    }
+    if (!open) return;
+    const next = pickRandomProblem();
+    setProblem(next);
+    setChoices(buildAnswerChoices(next.answer));
+    setWrongCount(0);
+    setShake(false);
   }, [open]);
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
+  const handleCorrect = useCallback(() => {
+    onOpenChange(false);
+    if (onSuccess) {
+      onSuccess();
+    } else if (
+      targetPath.startsWith('mailto:') ||
+      targetPath.startsWith('http://') ||
+      targetPath.startsWith('https://')
+    ) {
+      window.open(targetPath, '_blank', 'noopener,noreferrer');
+    } else if (targetPath) {
+      router.push(targetPath);
+    }
+  }, [onOpenChange, onSuccess, router, targetPath]);
 
-      const numericAnswer = parseInt(userAnswer, 10);
+  const handleWrong = useCallback(() => {
+    const next = wrongCount + 1;
+    setWrongCount(next);
+    setShake(true);
+    // Reshuffle positions so "always tap the middle one" doesn't work.
+    setChoices((prev) => shuffle(prev));
+    window.setTimeout(() => setShake(false), 400);
 
-      if (numericAnswer === problem.answer) {
-        // Correct! Either fire the callback (in-page action) or navigate.
-        onOpenChange(false);
-
-        if (onSuccess) {
-          onSuccess();
-        } else if (
-          targetPath.startsWith('mailto:') ||
-          targetPath.startsWith('http://') ||
-          targetPath.startsWith('https://')
-        ) {
-          window.open(targetPath, '_blank', 'noopener,noreferrer');
-        } else if (targetPath) {
-          router.push(targetPath);
-        }
-      } else {
-        // Wrong answer - shake and show error
-        setError(true);
-        setShake(true);
-        setUserAnswer('');
-
-        // Remove shake after animation
-        setTimeout(() => setShake(false), 500);
-
-        // Generate a new problem after a short delay
-        setTimeout(() => {
-          setProblem(getRandomProblem());
-          setError(false);
-        }, 1500);
-      }
-    },
-    [userAnswer, problem.answer, targetPath, onSuccess, router, onOpenChange],
-  );
-
-  const iconStyle = {
-    '--fa-primary-color': 'hsl(var(--crayon-orange))',
-    '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-    '--fa-secondary-opacity': '0.8',
-  } as React.CSSProperties;
+    if (next >= MAX_WRONG_ATTEMPTS) {
+      // Silent close. No "you failed" copy — a kid just gives up and the
+      // parent re-triggers if they actually meant to pass.
+      window.setTimeout(() => onOpenChange(false), 500);
+    }
+  }, [onOpenChange, wrongCount]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={cn(shake && 'animate-shake')}
+        className={cn('gap-6 rounded-3xl p-6 sm:p-8', shake && 'animate-shake')}
         onPointerDownOutside={(e) => e.preventDefault()}
       >
-        <DialogHeader>
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-full bg-crayon-orange/10 flex items-center justify-center">
-              <FontAwesomeIcon
-                icon={faLock}
-                className="text-3xl"
-                style={iconStyle}
-              />
-            </div>
-          </div>
-          <DialogTitle className="text-2xl">{t('title')}</DialogTitle>
-          <DialogDescription className="text-base">
+        <DialogHeader className="items-center gap-3 text-center">
+          {/* Friendly waving hand — replaces the lock-in-a-circle. The
+              previous header read as "you are blocked"; this reads as
+              "oh hi grown-up". FA duotone (not emoji — per the
+              codebase's no-emojis-in-UI rule) animated via the global
+              `wave` keyframe with origin-bottom-right so it pivots from
+              the wrist like a real wave. */}
+          <FontAwesomeIcon
+            icon={faHandWave}
+            aria-hidden="true"
+            className="text-5xl animate-wave [transform-origin:bottom_right]"
+            style={
+              {
+                '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+                '--fa-secondary-opacity': '1',
+              } as React.CSSProperties
+            }
+          />
+          <DialogTitle className="font-tondo text-2xl font-bold md:text-3xl">
+            {t('title')}
+          </DialogTitle>
+          <DialogDescription className="text-base text-text-secondary">
             {t('subtitle')}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          {/* Math Problem Display */}
-          <div className="flex items-center justify-center gap-4 py-6 px-4 bg-paper-cream rounded-2xl">
-            <FontAwesomeIcon
-              icon={faCalculator}
-              className="text-2xl text-crayon-teal"
-              style={iconStyle}
-            />
-            <span className="font-tondo text-4xl font-bold text-text-primary">
-              {problem.num1} {problem.operator} {problem.num2} = ?
-            </span>
-          </div>
+        {/* The sum. Soft cream pill matches the wizard's tile styling. */}
+        <div
+          className="flex items-center justify-center rounded-2xl bg-paper-cream px-6 py-5"
+          aria-live="polite"
+        >
+          <span className="font-tondo text-4xl font-bold text-text-primary sm:text-5xl">
+            {problem.a} + {problem.b} = ?
+          </span>
+        </div>
 
-          {/* Answer Input */}
-          <div className="space-y-2">
-            <input
-              type="number"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              placeholder={t('placeholder')}
+        {/* Three chunky circular answer buttons. Same vocabulary as the
+            wizard's Dice / Next / Create — brand-orange fill, no border,
+            no halo, soft shadow on press. */}
+        <div
+          className="flex items-center justify-center gap-4 sm:gap-6"
+          role="group"
+          aria-label={t('subtitle')}
+        >
+          {choices.map((n) => (
+            <button
+              // Position is part of the key so reshuffling triggers a
+              // remount + the zoom-in animation reads as fresh options.
+              key={`${n}-${choices.indexOf(n)}`}
+              type="button"
+              onClick={() =>
+                n === problem.answer ? handleCorrect() : handleWrong()
+              }
               className={cn(
-                'w-full px-6 py-4 text-center text-2xl font-tondo font-bold',
-                'rounded-2xl border-3 transition-all duration-200',
-                'focus:outline-none focus:ring-4',
-                error
-                  ? 'border-red-400 bg-red-50 focus:ring-red-200'
-                  : 'border-paper-cream-dark bg-white focus:border-crayon-teal focus:ring-crayon-teal/20',
+                'grid size-16 place-items-center rounded-full sm:size-20',
+                'bg-coloring-accent text-white',
+                'font-tondo text-2xl font-bold sm:text-3xl',
+                'transition-transform duration-coloring-base',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent',
+                'hover:brightness-105 active:scale-95',
               )}
-              autoFocus
-            />
-            {error && (
-              <p className="text-center text-red-500 font-tondo font-medium animate-in fade-in">
-                {t('error')}
-              </p>
-            )}
-          </div>
+            >
+              {n}
+            </button>
+          ))}
+        </div>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            disabled={!userAnswer}
-            className={cn(
-              'h-auto w-full rounded-full px-6 py-4 text-lg',
-              'disabled:cursor-not-allowed disabled:hover:scale-100',
-            )}
-          >
-            {t('submit')}
-          </Button>
-        </form>
+        {/* Helper text — sets the expectation that this unlock is a
+            one-way switch with an obvious override. Big enough to read
+            (was text-xs, looked like a legal disclaimer); warm enough
+            to feel like reassurance, not a footnote.
+            No bottom Cancel button — Dialog renders an X top-right
+            already; two dismiss affordances was clutter. */}
+        <p className="text-center text-sm font-medium text-text-secondary">
+          {t('settingsHint')}
+        </p>
       </DialogContent>
     </Dialog>
   );
