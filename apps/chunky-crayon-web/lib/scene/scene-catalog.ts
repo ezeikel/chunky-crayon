@@ -274,11 +274,14 @@ export const SUBJECT_OPTIONS: readonly SubjectOption[] = [
 ] as const;
 
 /**
- * Hard cap on subjects. More than 3 in one scene makes gpt-image-2 crowd
- * the page and lose line clarity — same reasoning as MAX_TRAITS. The
- * `your-character` sentinel counts toward this cap.
+ * Hard cap on subjects. 2 keeps the mental model tiny for a 3-8yo (their
+ * character + one friend) and stops gpt-image-2 from crowding the page,
+ * which it does past ~2-3 subjects. The wizard's multi-select toggle
+ * "slip-oldest" so a 3rd tap drops the oldest pick rather than rejecting
+ * — kids never hit a "you can't pick another" wall. The `your-character`
+ * sentinel counts toward this cap.
  */
-export const MAX_SUBJECTS = 3;
+export const MAX_SUBJECTS = 2;
 
 // ─── Location (single-select, required) ─────────────────────────────────────
 

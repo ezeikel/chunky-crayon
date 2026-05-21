@@ -4,15 +4,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDice,
-  faCheck,
   faArrowLeft,
   faArrowRight,
   faWandMagicSparkles,
 } from "@fortawesome/pro-duotone-svg-icons";
-// Lock icon is intentionally a flat solid (grey), not duotone — the
-// locked-tile overlay should read as a calm "later" cue, not a coloured
-// design element fighting the rest of the row.
-import { faLock } from "@fortawesome/pro-solid-svg-icons";
+// Solid (flat single-colour) icons for the check badge and lock overlay:
+// the parent tile sets --fa-primary-color to the option's brand colour
+// (e.g. orange for Horse). A duotone faCheck inherits that and renders
+// orange-on-orange — invisible. Solid faCheck respects text-white instead.
+// Same reasoning for the lock — it must read as a calm "later" cue, not a
+// coloured design element fighting the rest of the row.
+import { faCheck, faLock } from "@fortawesome/pro-solid-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import cn from "./cn";
 
@@ -157,79 +159,102 @@ const SceneTile = ({
       onClick={onToggle}
       className="group flex shrink-0 flex-col items-center gap-2 focus:outline-none"
     >
+      {/* Outer wrapper: positions the check badge so it can poke OUT of
+          the tile (no overflow-hidden here). The tile itself sits inside
+          and keeps its own overflow-hidden for the illustration crop. */}
       <span
         className={cn(
-          "relative grid place-items-center overflow-hidden",
-          "rounded-coloring-card border bg-white",
-          "transition-all duration-coloring-base ease-coloring",
-          "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+          "relative inline-block",
           size === "lg" ? "size-24 md:size-28" : "size-16 md:size-20",
-          // Calm selected state: gentle scale + soft drop-shadow halo + the
-          // check badge top-right. No heavy orange border, no orange label —
-          // those together read as alarming rather than "you picked this".
-          selected
-            ? "border-transparent scale-105 shadow-[0_6px_18px_rgba(255,138,61,0.35)]"
-            : "border-coloring-surface-dark",
-          !disabled &&
-            !selected &&
-            "group-hover:border-coloring-accent/40 group-hover:bg-coloring-surface group-active:scale-95",
-          disabled && "opacity-60",
         )}
-        style={
-          {
-            "--fa-primary-color": option.duotone.primary,
-            "--fa-secondary-color": option.duotone.secondary,
-            "--fa-secondary-opacity": "1",
-          } as React.CSSProperties
-        }
       >
-        {option.thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={option.thumbnailUrl}
-            alt=""
-            className="size-full object-cover"
-            draggable={false}
-          />
-        ) : (
-          <FontAwesomeIcon
-            icon={option.icon}
-            className={size === "lg" ? "text-6xl" : "text-4xl"}
-          />
-        )}
+        <span
+          className={cn(
+            "block size-full overflow-hidden",
+            "rounded-coloring-card border bg-white",
+            "transition-all duration-coloring-base ease-coloring",
+            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
+            "grid place-items-center",
+            // Calm selected state: gentle scale + soft drop-shadow halo +
+            // the check badge corner-popped on the outer wrapper. No heavy
+            // orange border, no orange label — those together read as
+            // alarming rather than "you picked this".
+            selected
+              ? "border-transparent scale-105 shadow-[0_6px_18px_rgba(255,138,61,0.35)]"
+              : "border-coloring-surface-dark",
+            !disabled &&
+              !selected &&
+              "group-hover:border-coloring-accent/40 group-hover:bg-coloring-surface group-active:scale-95",
+            disabled && "opacity-60",
+          )}
+          style={
+            {
+              "--fa-primary-color": option.duotone.primary,
+              "--fa-secondary-color": option.duotone.secondary,
+              "--fa-secondary-opacity": "1",
+            } as React.CSSProperties
+          }
+        >
+          {option.thumbnailUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={option.thumbnailUrl}
+              alt=""
+              className="size-full object-cover"
+              draggable={false}
+            />
+          ) : (
+            <FontAwesomeIcon
+              icon={option.icon}
+              className={size === "lg" ? "text-6xl" : "text-4xl"}
+            />
+          )}
 
+          {locked && (
+            // Solid (non-duotone) icons render via `color` (text-*), not
+            // the duotone CSS vars. We use `text-neutral-500` directly
+            // on the icon — setting `--fa-primary-color` here is a no-op
+            // and was leaving the lock the wrong colour.
+            <span
+              className={cn(
+                "absolute inset-0 grid place-items-center",
+                // Soft grey wash. The lock reads as "later" not "denied".
+                "bg-neutral-200/80",
+              )}
+              aria-hidden="true"
+            >
+              {/* Sized to feel like the tile itself is locked — small
+                  icons get lost on a 96px tile. Bumped up for big tiles
+                  (Step 1/2 carousels); kept proportional on small ones
+                  (the extras step). */}
+              <FontAwesomeIcon
+                icon={faLock}
+                className={cn(
+                  "text-neutral-600",
+                  size === "lg" ? "text-4xl" : "text-2xl",
+                )}
+              />
+            </span>
+          )}
+        </span>
+
+        {/* Check badge — sits ON the outer wrapper, OUTSIDE the
+            overflow-hidden clipping span, so it pokes out of the tile
+            corner like a sticker instead of getting half-clipped by the
+            tile's rounded border. */}
         {selected && (
           <span
             className={cn(
-              "absolute right-1.5 top-1.5 grid size-7 place-items-center",
-              "rounded-full bg-coloring-accent text-white",
+              "pointer-events-none absolute -right-2 -top-2 grid size-9 place-items-center",
+              "rounded-full bg-coloring-accent",
+              "ring-2 ring-white shadow-md",
               "animate-in zoom-in duration-coloring-fast",
             )}
             aria-hidden="true"
           >
-            <FontAwesomeIcon icon={faCheck} className="text-sm" />
-          </span>
-        )}
-
-        {locked && (
-          <span
-            className={cn(
-              "absolute inset-0 grid place-items-center",
-              // Soft grey wash, no blur. The lock reads as "later" not
-              // "denied"; duotone tinting on the lock fights the rest of
-              // the row, so we force flat neutral grey here.
-              "bg-neutral-200/80",
-            )}
-            aria-hidden="true"
-            // Override the parent's duotone vars — the lock is intentionally
-            // flat grey, not in the tile's brand colour.
-            style={
-              {
-                "--fa-primary-color": "rgb(115, 115, 115)",
-              } as React.CSSProperties
-            }
-          >
-            <FontAwesomeIcon icon={faLock} className="text-2xl" />
+            {/* `text-white` on the icon itself — solid FA icons use
+                `color`, not the duotone `--fa-primary-color` var. */}
+            <FontAwesomeIcon icon={faCheck} className="text-base text-white" />
           </span>
         )}
       </span>
@@ -482,11 +507,12 @@ const SceneBuilder = ({
   const canAdvanceFromLocation = locationChosen;
   const canCreate = subjectChosen && locationChosen;
 
-  // Tighter than the previous title — the card has to stay close to the
-  // original form footprint, so step heading + tile row + CTA need to fit
-  // without the card outgrowing its old size.
+  // Big, friendly title — this is the most important text on screen for
+  // a 3-8yo and should dominate. The questions themselves are now
+  // one-word ("Who?", "Where?") so the big size + short text reads at a
+  // glance with zero decoding.
   const renderTitle = (text: string) => (
-    <h2 className="text-center text-base font-bold text-coloring-text-primary md:text-lg">
+    <h2 className="text-center text-2xl font-bold text-coloring-text-primary md:text-3xl">
       {text}
     </h2>
   );
@@ -668,8 +694,8 @@ const SceneBuilder = ({
         <div className="flex flex-col gap-4">
           {renderTitle(labels.extrasTitle ?? "Make it special")}
           {extraLayers.map((layer) => (
-            <section key={layer.id} className="flex flex-col gap-1.5">
-              <h3 className="text-center text-xs font-semibold uppercase tracking-wide text-coloring-text-secondary">
+            <section key={layer.id} className="flex flex-col gap-2">
+              <h3 className="text-center text-base font-bold text-coloring-text-primary md:text-lg">
                 {layer.title}
               </h3>
               <TileCarousel
