@@ -57,7 +57,7 @@ const ONLY = args
 
 const MODEL = 'gpt-image-2';
 const SIZE = '1024x1024' as const;
-const QUALITY = 'medium' as const;
+const QUALITY = 'high' as const;
 const R2_PREFIX = 'scene-thumbnails';
 const OUT_DIR = join(process.cwd(), 'scripts', 'out', 'scene-thumbnails');
 const CATALOG_PATH = join(process.cwd(), 'lib', 'scene', 'scene-catalog.ts');
@@ -97,12 +97,24 @@ const jobs: Job[] = [
 ];
 
 const buildPrompt = (subject: string): string =>
-  // Positive framing, ~1 sentence, bright flat kid-app style. No text,
-  // single centred subject, soft solid background so it reads on a tile.
-  `A cheerful, brightly coloured, simple flat illustration of ${subject} ` +
-  `for a young children's app icon. Bold rounded shapes, friendly and ` +
-  `playful, thick clean outlines, a soft single-colour pastel background, ` +
-  `centred composition, no text, no words, no letters.`;
+  // Chunky Crayon brand recipe — matches the existing Colo mascot and
+  // sticker set (see public/images/colo*.png + public/images/stickers/*).
+  // The earlier version produced generic kid-app illustrations that
+  // could pass for any app from Toca Boca to PBS Kids. This tightens
+  // to the actual brand: warm-brown outlines (#5a3a1f, not pure black),
+  // pink cheek-blush on faces (a Chunky Crayon signature), minimal flat
+  // eyes (no kawaii highlights), chunky proportions, white background
+  // for tile-cutout flexibility.
+  `A simple flat 2D illustration of ${subject} in the style of a ` +
+  `friendly children's mascot. ` +
+  `Thick warm dark-brown outlines (around #5a3a1f), not pure black. ` +
+  `Bright flat colour fills, no gradients, no shading. ` +
+  `If the subject has a face: two simple oval eyes (no highlights, no ` +
+  `sparkles inside the eyes), a tiny smiling mouth, and small soft ` +
+  `pink circular cheek blushes on either side of the face. ` +
+  `Chunky stocky proportions, short limbs, big head if it has one. ` +
+  `Centred composition, single subject, on a pure white background. ` +
+  `No text, no words, no letters, no logos.`;
 
 const r2Key = (job: Job) => `${R2_PREFIX}/${job.layer}/${job.key}.png`;
 
