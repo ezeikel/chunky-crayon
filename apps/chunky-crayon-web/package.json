@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:worktree": "node scripts/dev-worktree.mjs",
     "dev:characters": "PORT=4000 next dev --turbopack",
     "build": "next build",
     "start": "next start",
