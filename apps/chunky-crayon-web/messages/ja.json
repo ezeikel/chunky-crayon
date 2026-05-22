@@ -1426,7 +1426,8 @@
     "sendButton": "送る",
     "sending": "送信中...",
     "successTitle": "受け取りました、ありがとう",
-    "successMessage": "内容を確認して、必要があれば返信します。"
+    "successMessage": "内容を確認して、必要があれば返信します。",
+    "back": "戻る"
   },
   "og": {
     "homepage": {

@@ -1426,7 +1426,8 @@
     "sendButton": "Envoyer",
     "sending": "Envoi en cours...",
     "successTitle": "Bien reçu, merci",
-    "successMessage": "On y jette un œil et on répond si besoin."
+    "successMessage": "On y jette un œil et on répond si besoin.",
+    "back": "Retour"
   },
   "og": {
     "homepage": {

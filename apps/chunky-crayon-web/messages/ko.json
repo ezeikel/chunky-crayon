@@ -1426,7 +1426,8 @@
     "sendButton": "보내기",
     "sending": "보내는 중...",
     "successTitle": "받았어요, 고마워요",
-    "successMessage": "확인해보고 필요하면 답장드릴게요."
+    "successMessage": "확인해보고 필요하면 답장드릴게요.",
+    "back": "뒤로"
   },
   "og": {
     "homepage": {

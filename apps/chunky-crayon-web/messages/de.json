@@ -1426,7 +1426,8 @@
     "sendButton": "Abschicken",
     "sending": "Wird gesendet …",
     "successTitle": "Alles klar, danke!",
-    "successMessage": "Wir schauen es uns an und melden uns, wenn es sinnvoll ist."
+    "successMessage": "Wir schauen es uns an und melden uns, wenn es sinnvoll ist.",
+    "back": "Zurück"
   },
   "og": {
     "homepage": {

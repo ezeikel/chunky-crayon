@@ -1426,7 +1426,8 @@
     "sendButton": "Enviar",
     "sending": "Enviando...",
     "successTitle": "¡Listo, gracias!",
-    "successMessage": "Lo revisaremos y te responderemos si hace falta."
+    "successMessage": "Lo revisaremos y te responderemos si hace falta.",
+    "back": "Atrás"
   },
   "og": {
     "homepage": {
