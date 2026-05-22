@@ -1394,6 +1394,11 @@
         "space-stars": "Stars",
         "balloons": "Balloons"
       }
+    },
+    "blockReason": {
+      "guestLimit": "Plus d’essais gratuits",
+      "noSubscription": "Abonnez-vous pour continuer",
+      "subscriberNoCredits": "Rechargez pour continuer"
     }
   },
   "feedback": {
@@ -1553,6 +1558,30 @@
           "synthesisFailed": "Oups, un souci est survenu. Réessaie dans un instant."
         }
       }
+    }
+  },
+  "paywall": {
+    "guestLimit": {
+      "title": "Vous avez utilisé vos essais gratuits",
+      "subtitle": "Abonnez-vous pour continuer à créer, ou obtenez 15 gratuits avec un compte."
+    },
+    "noSubscription": {
+      "title": "Plus de crédits",
+      "subtitle": "Choisissez une formule pour continuer à créer."
+    },
+    "subscriberNoCredits": {
+      "title": "Plus de crédits",
+      "subtitle": "Vous avez utilisé les crédits de ce mois-ci. Prenez un pack recharge pour continuer.",
+      "primary": "Voir les packs"
+    },
+    "common": {
+      "subscribe": "S’abonner",
+      "creditsPerMonth": "{count} crédits par mois",
+      "perMonth": "par mois",
+      "popular": "Populaire",
+      "seeAllPlans": "Voir les packs et tous les détails",
+      "signUpFree": "Créer un compte : 15 crédits offerts",
+      "dismiss": "Peut-être plus tard"
     }
   }
 }

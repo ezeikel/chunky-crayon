@@ -1394,6 +1394,11 @@
         "space-stars": "Stars",
         "balloons": "Balloons"
       }
+    },
+    "blockReason": {
+      "guestLimit": "無料回数が終わりました",
+      "noSubscription": "続けるには登録してね",
+      "subscriberNoCredits": "続けるには追加してね"
     }
   },
   "feedback": {
@@ -1553,6 +1558,30 @@
           "synthesisFailed": "問題が起きたよ。少ししてからもう一度試してね。"
         }
       }
+    }
+  },
+  "paywall": {
+    "guestLimit": {
+      "title": "無料おためし回数を使い切りました",
+      "subtitle": "続けて作るには登録するか、アカウントで無料15回分を受け取れます。"
+    },
+    "noSubscription": {
+      "title": "クレジットがなくなりました",
+      "subtitle": "プランを選んで、作り続けましょう。"
+    },
+    "subscriberNoCredits": {
+      "title": "クレジットがなくなりました",
+      "subtitle": "今月分のクレジットを使い切りました。追加パックで続けられます。",
+      "primary": "パックを見る"
+    },
+    "common": {
+      "subscribe": "登録する",
+      "creditsPerMonth": "月{count}クレジット",
+      "perMonth": "毎月",
+      "popular": "人気",
+      "seeAllPlans": "パックとプラン詳細を見る",
+      "signUpFree": "登録して無料15クレジット",
+      "dismiss": "あとで"
     }
   }
 }

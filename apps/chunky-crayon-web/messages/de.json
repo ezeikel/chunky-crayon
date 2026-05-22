@@ -1394,6 +1394,11 @@
         "space-stars": "Stars",
         "balloons": "Balloons"
       }
+    },
+    "blockReason": {
+      "guestLimit": "Keine Gratisversuche mehr",
+      "noSubscription": "Abonnieren, um weiterzumachen",
+      "subscriberNoCredits": "Guthaben aufladen, um weiterzumachen"
     }
   },
   "feedback": {
@@ -1553,6 +1558,30 @@
           "synthesisFailed": "Etwas ist schiefgelaufen. Versuch es gleich noch mal."
         }
       }
+    }
+  },
+  "paywall": {
+    "guestLimit": {
+      "title": "Du hast deine Gratis-Versuche aufgebraucht",
+      "subtitle": "Abonniere, um weiter zu malen, oder hol dir mit einem Konto 15 weitere gratis."
+    },
+    "noSubscription": {
+      "title": "Keine Credits mehr",
+      "subtitle": "Wähle einen Plan, um weiter zu malen."
+    },
+    "subscriberNoCredits": {
+      "title": "Keine Credits mehr",
+      "subtitle": "Du hast die Credits dieses Monats verbraucht. Hol dir ein Nachfüllpaket, um weiterzumachen.",
+      "primary": "Paketoptionen ansehen"
+    },
+    "common": {
+      "subscribe": "Abonnieren",
+      "creditsPerMonth": "{count} Credits pro Monat",
+      "perMonth": "pro Monat",
+      "popular": "Beliebt",
+      "seeAllPlans": "Pakete und alle Plandetails ansehen",
+      "signUpFree": "Registrieren & 15 Gratis-Credits sichern",
+      "dismiss": "Vielleicht später"
     }
   }
 }
