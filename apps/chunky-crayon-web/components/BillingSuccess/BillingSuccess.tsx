@@ -9,6 +9,7 @@ import { PlanName } from '@one-colored-pixel/db/types';
 import type { PostCheckoutSigninStatus } from '@/app/actions/stripe';
 import PurchaseTracking from '@/app/[locale]/account/billing/PurchaseTracking';
 import ManageSubscriptionButton from '@/components/buttons/ManageSubscriptionButton/ManageSubscriptionButton';
+import FinishCreationButton from './FinishCreationButton';
 
 type BillingSuccessProps = {
   amount: number | null;
@@ -100,6 +101,12 @@ const BillingSuccess = ({
       )}
 
       <div className="flex flex-col gap-4">
+        {/* If they subscribed mid-creation, the create form stashed
+            their scene in localStorage before the Stripe redirect.
+            This button (renders only when such a snapshot exists)
+            takes them back to finish it — the primary action for a
+            fresh subscriber, so it sits at the top of the stack. */}
+        <FinishCreationButton />
         {isAuthenticated && (
           <Link
             href="/account/billing"

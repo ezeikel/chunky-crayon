@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useFeatureFlagEnabled } from 'posthog-js/react';
 import { type ImageQuality } from '@one-colored-pixel/coloring-core/image-quality';
+import { type SceneSelection } from '@one-colored-pixel/coloring-ui';
 import { DEFAULT_CURRENCY, type Currency } from '@/lib/currency';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
@@ -27,6 +28,11 @@ import {
 } from './inputs';
 import { getUnlockedModes } from '@/app/actions/scene';
 import { type GateableMode } from '@/lib/scene/modes';
+import {
+  savePendingCreation,
+  loadPendingCreation,
+  clearPendingCreation,
+} from '@/lib/create/pending-creation';
 import FormCTA from './FormCTA';
 import {
   PaywallModal,
@@ -82,7 +88,14 @@ const MultiModeForm = ({
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const locale = useLocale();
-  const { mode, description, imageBase64 } = useInputMode();
+  const {
+    mode,
+    description,
+    imageBase64,
+    setMode,
+    setDescription,
+    setImageBase64,
+  } = useInputMode();
   const {
     isGuest,
     guestGenerationsUsed,
@@ -127,6 +140,12 @@ const MultiModeForm = ({
   // text mode — that's what enables FormCTA. Only the character mix-in
   // is scene-specific; the shared context has no slot for it.
   const [sceneCharacterId, setSceneCharacterId] = useState<string | null>(null);
+  // Raw scene picker state + built description, lifted from SceneInput so
+  // we can snapshot the in-progress scene into localStorage when the
+  // paywall interrupts it (resume-after-checkout — see
+  // lib/create/pending-creation).
+  const [sceneSelection, setSceneSelection] = useState<SceneSelection>({});
+  const [sceneDescription, setSceneDescription] = useState('');
 
   // Per-profile unlocked modes (Scene is always available, not listed).
   // Guests never have a profile to gate against, so the gateable modes
@@ -187,6 +206,70 @@ const MultiModeForm = ({
     router.push(`/coloring-image/${id}`);
   };
 
+  // ─── Resume creation after checkout ──────────────────────────────────
+  //
+  // When the paywall interrupts a creation, we snapshot the current
+  // intent to localStorage right before opening the modal (the modal
+  // leads to Stripe Checkout, a full-page redirect that would otherwise
+  // wipe the in-progress scene). On return — once the user can actually
+  // generate — we restore it. See lib/create/pending-creation.
+
+  // Snapshot the current creation intent, then open the paywall. This
+  // wraps the raw `openPaywall` so every paywall-from-the-create-form
+  // path persists the scene first. `/pricing` and other surfaces use
+  // the bare hook, so the snapshot logic correctly lives here only.
+  const openPaywallWithSnapshot = (triggerLocation: string) => {
+    if (mode === 'scene' && sceneDescription) {
+      savePendingCreation({
+        mode: 'scene',
+        selection: sceneSelection,
+        characterId: sceneCharacterId,
+        description: sceneDescription,
+      });
+    } else if (mode === 'text' && description.trim()) {
+      savePendingCreation({ mode: 'text', description });
+    } else if (mode === 'image' && imageBase64) {
+      savePendingCreation({ mode: 'photo', photoBase64: imageBase64 });
+    }
+    // Voice is intentionally not snapshotted — its two-answer flow has
+    // its own internal state machine and restoring it cleanly isn't
+    // worth the complexity for v1.
+    openPaywall(triggerLocation);
+  };
+
+  // Seeds SceneInput's picker when a scene is restored post-checkout.
+  // null = nothing to restore (the normal first-load case).
+  const [restoredSelection, setRestoredSelection] =
+    useState<SceneSelection | null>(null);
+
+  // Restore on mount — but only once the user can actually generate
+  // (the subscription / credits landed). If they abandoned checkout and
+  // came back still blocked, the saved intent is left untouched for
+  // their next attempt and the form opens normally.
+  const restoreAttempted = useRef(false);
+  useEffect(() => {
+    if (restoreAttempted.current || !canGenerate) return;
+    restoreAttempted.current = true;
+    const saved = loadPendingCreation();
+    if (!saved) return;
+    // Apply, then clear immediately so a refresh doesn't re-restore.
+    if (saved.mode === 'scene') {
+      setRestoredSelection(saved.selection);
+      setSceneSelection(saved.selection);
+      setSceneCharacterId(saved.characterId);
+      setSceneDescription(saved.description);
+      setDescription(saved.description);
+      setMode('scene');
+    } else if (saved.mode === 'text') {
+      setDescription(saved.description);
+      setMode('text');
+    } else if (saved.mode === 'photo') {
+      setImageBase64(saved.photoBase64);
+      setMode('image');
+    }
+    clearPendingCreation();
+  }, [canGenerate, setDescription, setImageBase64, setMode]);
+
   return (
     <form
       action={async (formData) => {
@@ -199,7 +282,7 @@ const MultiModeForm = ({
         // disabled-button bypass would otherwise submit. Open the
         // paywall instead of firing the action.
         if (!canGenerate) {
-          openPaywall('form_action_blocked');
+          openPaywallWithSnapshot('form_action_blocked');
           return;
         }
 
@@ -298,11 +381,25 @@ const MultiModeForm = ({
       {/* Render active input based on mode */}
       {mode === 'scene' && (
         <SceneInput
-          onChange={({ characterId: cId }) => setSceneCharacterId(cId)}
+          // Remount when a restore lands so SceneInput re-seeds its
+          // selection useState from `initialSelection`. The default
+          // mode is 'scene', so SceneInput is already mounted (with an
+          // empty selection) by the time the post-checkout restore
+          // effect runs — without the key change, the new
+          // initialSelection would be ignored.
+          key={restoredSelection ? 'restored' : 'fresh'}
+          onChange={({ characterId: cId, selection, description: desc }) => {
+            setSceneCharacterId(cId);
+            setSceneSelection(selection);
+            setSceneDescription(desc);
+          }}
           onCreate={() => formRef.current?.requestSubmit()}
           charactersEnabled={showCharacterPicker}
           createBlocked={!canGenerate}
-          onCreateBlockedTap={() => openPaywall('scene_wizard_create')}
+          onCreateBlockedTap={() =>
+            openPaywallWithSnapshot('scene_wizard_create')
+          }
+          initialSelection={restoredSelection ?? undefined}
         />
       )}
       {mode === 'text' && <TextInput />}
@@ -384,7 +481,7 @@ const MultiModeForm = ({
           duplicative + let a kid submit mid-wizard before the scene is
           built. */}
       <FormCTA
-        openPaywall={openPaywall}
+        openPaywall={openPaywallWithSnapshot}
         compact={mode === 'scene'}
         user={user}
       />

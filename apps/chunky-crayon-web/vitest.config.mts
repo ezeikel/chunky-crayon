@@ -45,6 +45,7 @@ export default defineConfig({
         'lib/scene/build-scene-description.ts',
         'lib/scene/random-scene.ts',
         'lib/scene/thumbnail-url.ts',
+        'lib/create/pending-creation.ts',
       ],
     },
   },

@@ -50,10 +50,17 @@ import useCharacters from '@/hooks/useCharacters';
 
 type SceneInputProps = {
   /**
-   * Reports the current build up to the form on every change. `description`
-   * is empty until the required layers (subject + location) are picked.
+   * Reports the current build up to the form on every change.
+   * `description` is empty until the required layers (subject +
+   * location) are picked. `selection` is the raw picker state — the
+   * parent persists it so a paywall-interrupted scene can be restored
+   * after checkout (see lib/create/pending-creation).
    */
-  onChange: (next: { description: string; characterId: string | null }) => void;
+  onChange: (next: {
+    description: string;
+    characterId: string | null;
+    selection: SceneSelection;
+  }) => void;
   /**
    * The wizard owns its own "Create!" button (final step), so scene mode
    * does NOT use the shared FormCTA. This fires when the kid taps Create
@@ -68,14 +75,20 @@ type SceneInputProps = {
    */
   charactersEnabled: boolean;
   /**
-   * When true, the wizard's Create button renders in a blocked visual
-   * state (lock icon, muted) and tap fires `onCreateBlockedTap` instead
-   * of `onCreate`. Used to surface the in-form PaywallModal at the
-   * START of the wizard, not after the kid has built the scene.
+   * When true, the wizard's Create button stays a normal-looking Create
+   * button but tap fires `onCreateBlockedTap` (opens the paywall)
+   * instead of `onCreate`. Surfaces the paywall at the START of the
+   * wizard, not after the kid has built the scene.
    */
   createBlocked?: boolean;
   /** Fired when the kid taps the blocked Create button. */
   onCreateBlockedTap?: () => void;
+  /**
+   * Seeds the picker's initial selection — used to restore a scene
+   * that was interrupted by the paywall and resumed after checkout.
+   * Defaults to an empty selection.
+   */
+  initialSelection?: SceneSelection;
 };
 
 // One label namespace for the whole scene picker. The app owns i18n;
@@ -86,12 +99,15 @@ const SceneInput = ({
   charactersEnabled,
   createBlocked = false,
   onCreateBlockedTap,
+  initialSelection,
 }: SceneInputProps) => {
   const t = useTranslations('createForm.scene');
   const router = useRouter();
   const { characters } = useCharacters();
   const { setDescription } = useInputMode();
-  const [selection, setSelection] = useState<SceneSelection>({});
+  const [selection, setSelection] = useState<SceneSelection>(
+    initialSelection ?? {},
+  );
 
   // First READY character is the one we mix in. v1 is one-character-per
   // scene (same cap the CharacterPicker + server enforce).
@@ -228,6 +244,9 @@ const SceneInput = ({
         subjects.includes('your-character') && readyCharacter
           ? readyCharacter.id
           : null,
+      // Raw picker state — the parent persists this so a paywall-
+      // interrupted scene can be restored after checkout.
+      selection,
     });
   }, [selection, readyCharacter, hasCharacter, setDescription]);
 
