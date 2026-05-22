@@ -1,12 +1,11 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import {
-  faWandMagicSparkles,
-  faLock,
-} from '@fortawesome/pro-duotone-svg-icons';
+import { faWandMagicSparkles } from '@fortawesome/pro-duotone-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type useUser from '@/hooks/useUser';
 import SubmitButton from '@/components/buttons/SubmitButton/SubmitButton';
+import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
 import { useInputMode } from './inputs/InputModeContext';
 import BlockReasonPill from './BlockReasonPill';
@@ -106,22 +105,36 @@ const FormCTA = ({
           pill only, no SubmitButton. */}
       {!compact &&
         (blockState ? (
-          // Blocked: button looks like a Submit but tap opens paywall.
-          // Stays in the DOM so the form layout is stable across states.
-          <button
+          // Blocked: the button looks IDENTICAL to the normal Create
+          // button — full brand fill, wand icon — it just opens the
+          // paywall instead of submitting. No lock, no dimming: the
+          // parent has come this far, a lock at the payoff moment
+          // suppresses the tap. Honesty about the limit is carried by
+          // the BlockReasonPill above, so this is informed-not-tricked,
+          // and the button stays inviting. (Same reasoning as
+          // SceneBuilder's PrimaryAction blocked variant.)
+          //
+          // Plain Button (not SubmitButton) — SubmitButton is hardwired
+          // type="submit" + useFormStatus; this must NOT submit the form.
+          <Button
             type="button"
             onClick={() => openPaywall('formcta_create_button')}
-            className={cn(
-              'inline-flex h-auto items-center justify-center gap-2 rounded-full',
-              'bg-crayon-orange/60 px-6 py-4 text-base font-bold text-white',
-              'transition hover:bg-crayon-orange/70 active:scale-[0.98]',
-              'md:text-lg',
-            )}
+            className="flex h-auto gap-x-2 rounded-full py-4 text-base md:text-lg"
             data-testid="create-submit-blocked"
           >
-            <FormCTAIcon blocked />
+            <FontAwesomeIcon
+              icon={faWandMagicSparkles}
+              className="text-lg"
+              style={
+                {
+                  '--fa-primary-color': 'white',
+                  '--fa-secondary-color': 'rgba(255, 255, 255, 0.85)',
+                  '--fa-secondary-opacity': '1',
+                } as React.CSSProperties
+              }
+            />
             {t('buttonCreate')}
-          </button>
+          </Button>
         ) : (
           <SubmitButton
             text={t('buttonCreate')}
@@ -132,30 +145,6 @@ const FormCTA = ({
           />
         ))}
     </div>
-  );
-};
-
-// Tiny local icon helper so the blocked button's lock icon styling
-// stays co-located with the button it lives on.
-const FormCTAIcon = ({ blocked }: { blocked: boolean }) => {
-  if (!blocked) return null;
-  // Inline svg via FontAwesome to avoid pulling FontAwesomeIcon into
-  // the SubmitButton (which would shift its bundle). Tiny inline.
-  // We re-use the duotone faLock by component for the blocked-button
-  // affordance — keeps the lock visual language consistent with the
-  // pill above.
-  return (
-    <span
-      className="inline-flex h-5 w-5 items-center justify-center"
-      aria-hidden="true"
-    >
-      <svg
-        viewBox={`0 0 ${faLock.icon[0]} ${faLock.icon[1]}`}
-        className="h-4 w-4 fill-current"
-      >
-        <path d={faLock.icon[4] as string} />
-      </svg>
-    </span>
   );
 };
 

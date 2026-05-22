@@ -594,10 +594,14 @@ const SceneBuilder = ({
   // Three render states:
   //   - enabled       → solid brand fill, normal icon, tap fires onClick
   //   - disabled      → muted fill, not tappable (e.g. required step empty)
-  //   - blocked       → dimmed brand fill + lock icon, STILL tappable
-  //                     (caller opens a paywall on tap). Distinguishes
-  //                     "you can't do this yet" from "you can't do this
-  //                     unless you pay" — the latter is a CTA, not a wall.
+  //   - blocked       → looks IDENTICAL to enabled (full brand fill, the
+  //                     real Create icon), STILL tappable — tap opens a
+  //                     paywall. We deliberately do NOT show a lock here:
+  //                     the parent has just built a whole scene, and a
+  //                     lock at the payoff moment deflates the click.
+  //                     Honesty about the limit is carried by the
+  //                     "Out of free tries" pill rendered separately;
+  //                     the button's job is to stay inviting.
   const PrimaryAction = ({
     icon,
     label,
@@ -625,17 +629,14 @@ const SceneBuilder = ({
         "transition-transform duration-coloring-base",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
         large ? "size-14" : "size-12",
-        blocked
-          ? "bg-coloring-accent/60 text-white hover:brightness-105 active:scale-95"
-          : enabled && !disabled
-            ? "bg-coloring-accent text-white hover:brightness-105 active:scale-95"
-            : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
+        // Blocked renders the same as enabled — inviting, not a wall.
+        enabled || blocked
+          ? "bg-coloring-accent text-white hover:brightness-105 active:scale-95"
+          : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
+        !blocked && disabled && "cursor-not-allowed",
       )}
     >
-      <FontAwesomeIcon
-        icon={blocked ? faLock : icon}
-        className={large ? "text-xl" : "text-lg"}
-      />
+      <FontAwesomeIcon icon={icon} className={large ? "text-xl" : "text-lg"} />
     </button>
   );
 
