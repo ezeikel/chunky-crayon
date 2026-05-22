@@ -261,17 +261,19 @@ const FeedbackDialog = ({
               transition={{ duration: 0.2 }}
               className="relative"
             >
-              {/* Back arrow — top-left, mirroring the Dialog's built-in
-                  X close button at top-right (same size + inset). */}
+              {/* Back arrow — top-left, a mirror of the Dialog's built-in
+                  X close button at top-right: same circular bordered
+                  button, same `size-10`, same `top-4` inset, so the two
+                  read as a matched pair on one row. */}
               <button
                 type="button"
                 onClick={handleBack}
                 aria-label={t('back')}
-                className="absolute left-4 top-4 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-paper-cream focus:outline-none focus:ring-2 focus:ring-crayon-orange/20"
+                className="absolute left-4 top-4 z-10 flex size-10 items-center justify-center rounded-full border-2 border-coloring-surface-dark bg-white transition-colors hover:bg-paper-cream focus:outline-none focus:ring-2 focus:ring-crayon-orange/20"
               >
                 <FontAwesomeIcon
                   icon={faArrowLeft}
-                  className="text-text-secondary"
+                  className="text-xl text-text-secondary"
                   style={
                     {
                       '--fa-primary-color': 'hsl(var(--text-secondary))',
