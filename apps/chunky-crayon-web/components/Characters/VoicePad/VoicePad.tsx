@@ -23,7 +23,8 @@ import {
   generateCustomVoiceLine,
   playPresetVoiceLine,
 } from '@/app/actions/character-actions';
-import ParentGate from '@/components/ParentGate/ParentGate';
+import { useParentalGate } from '@/components/ParentalGate';
+import { issueParentGateToken } from '@/app/actions/parent-gate';
 import cn from '@/utils/cn';
 
 type PresetSlot = 'hi' | 'feed' | 'exercise' | 'bye';
@@ -46,9 +47,9 @@ const VoicePad = ({ characterId, name }: Props) => {
   const [activeSlot, setActiveSlot] = useState<PresetSlot | 'custom' | null>(
     null,
   );
-  const [showGate, setShowGate] = useState(false);
   const [customText, setCustomText] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { openGate } = useParentalGate();
   const [pending, startTransition] = useTransition();
 
   const playUrl = (url: string) => {
@@ -85,8 +86,25 @@ const VoicePad = ({ characterId, name }: Props) => {
     });
   };
 
+  // "Say it" → shared tap-math parent-gate modal. On pass we mint a
+  // scope-bound token and run the gated server action. Mirrors the
+  // create-form's InputModeSelector — one gate UX across the app.
+  const handleSayItTapped = () => {
+    if (!customText.trim()) return;
+    openGate({
+      reason: 'character_custom_voice',
+      onSuccess: async () => {
+        const issued = await issueParentGateToken('character:voice-custom');
+        if (!issued.ok) {
+          setError('The grown-up check needs to pass again.');
+          return;
+        }
+        handleCustomSubmit(issued.token);
+      },
+    });
+  };
+
   const handleCustomSubmit = (token: string) => {
-    setShowGate(false);
     setError(null);
     const text = customText.trim();
     if (!text) return;
@@ -163,7 +181,7 @@ const VoicePad = ({ characterId, name }: Props) => {
             />
             <button
               type="button"
-              onClick={() => setShowGate(true)}
+              onClick={handleSayItTapped}
               disabled={pending || customText.trim().length === 0}
               className="rounded-2xl bg-black text-white px-4 py-2 text-sm font-bold disabled:opacity-50"
             >
@@ -177,17 +195,6 @@ const VoicePad = ({ characterId, name }: Props) => {
           </span>
         </label>
       </div>
-
-      {/* Inline parent gate — minted token is dispatched into handleCustomSubmit. */}
-      {showGate ? (
-        <div className="mt-3">
-          <ParentGate
-            scope="character:voice-custom"
-            onPass={handleCustomSubmit}
-            onCancel={() => setShowGate(false)}
-          />
-        </div>
-      ) : null}
 
       {error ? (
         <p className="mt-2 text-xs text-red-700" role="alert">
