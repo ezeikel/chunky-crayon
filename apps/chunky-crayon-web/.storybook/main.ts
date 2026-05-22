@@ -26,14 +26,22 @@ const config: StorybookConfig = {
   staticDirs: ['../public'],
   viteFinal: async (viteConfig) => {
     viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()];
-    // `next-auth/react` reads `process.env.*` at module scope; the
-    // browser has no `process`, so without this any story wrapped by
-    // SessionProvider (every story — it's in preview.tsx's global
-    // decorator) throws "process is not defined". Stub a minimal
-    // process.env so the module loads cleanly in Storybook.
+    // Browser has no `process`, so `process.env.*` reads at module
+    // scope crash. Two cases this stub covers:
+    //   - `next-auth/react` reads `process.env.*` on load (every story
+    //     is wrapped by SessionProvider in preview.tsx).
+    //   - `useStripeCheckout` calls `loadStripe(process.env
+    //     .NEXT_PUBLIC_STRIPE_KEY)` at module scope; Stripe's initStripe
+    //     does `key.match(...)` and throws on `undefined` — which takes
+    //     down the whole story file (CreateColoringPageForm imports the
+    //     paywall → useStripeCheckout). A dummy publishable key makes
+    //     loadStripe load cleanly; Storybook does no real checkout.
     viteConfig.define = {
       ...viteConfig.define,
-      'process.env': JSON.stringify({ NODE_ENV: 'development' }),
+      'process.env': JSON.stringify({
+        NODE_ENV: 'development',
+        NEXT_PUBLIC_STRIPE_KEY: 'pk_test_storybook_dummy',
+      }),
     };
     viteConfig.resolve = {
       ...viteConfig.resolve,
