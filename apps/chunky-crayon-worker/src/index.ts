@@ -2629,9 +2629,9 @@ app.post("/jobs/content-reel/publish", async (c) => {
  *
  * Web app's createCharacter action POSTs here after INSERTing a Character
  * row with status=GENERATING. We:
- *   - generate the colored portrait via gpt-image-2 (no refs — the prompt
- *     names every signature detail verbatim)
- *   - trace a line-art SVG twin via potrace
+ *   - generate the line-art portrait via gpt-image-2 (call 1)
+ *   - generate the colored illustration via images.edit, conditioned on
+ *     the line-art (call 2) — guarantees the two assets match
  *   - upload both to R2 under uploads/characters/${id}/
  *   - flip the row to READY (or FAILED with reason on error)
  *
@@ -2644,7 +2644,8 @@ app.post("/jobs/character/generate", async (c) => {
     .json<{
       characterId?: string;
       brand?: string;
-      prompt?: string;
+      lineArtPrompt?: string;
+      coloringPrompt?: string;
       signatureDetails?: unknown;
     }>()
     .catch(() => ({}) as Record<string, unknown>);
@@ -2652,8 +2653,11 @@ app.post("/jobs/character/generate", async (c) => {
   if (!body.characterId || typeof body.characterId !== "string") {
     return c.json({ error: "characterId required" }, 400);
   }
-  if (!body.prompt || typeof body.prompt !== "string") {
-    return c.json({ error: "prompt required" }, 400);
+  if (!body.lineArtPrompt || typeof body.lineArtPrompt !== "string") {
+    return c.json({ error: "lineArtPrompt required" }, 400);
+  }
+  if (!body.coloringPrompt || typeof body.coloringPrompt !== "string") {
+    return c.json({ error: "coloringPrompt required" }, 400);
   }
   if (
     !body.brand ||
@@ -2671,20 +2675,22 @@ app.post("/jobs/character/generate", async (c) => {
     : [];
 
   const characterId = body.characterId;
-  const prompt = body.prompt;
+  const lineArtPrompt = body.lineArtPrompt;
+  const coloringPrompt = body.coloringPrompt;
 
   console.log(
     `[/jobs/character/generate] queued ${characterId} (signatureDetails=${signatureDetails.length})`,
   );
 
   // Fire-and-forget — return 202 immediately so the Vercel action doesn't
-  // block on the 20-30s portrait generation. Errors get persisted to the
-  // Character row so the UI can surface them.
+  // block on the ~2-3min two-call portrait generation. Errors get
+  // persisted to the Character row so the UI can surface them.
   void (async () => {
     try {
       await generateCharacterPortrait({
         characterId,
-        prompt,
+        lineArtPrompt,
+        coloringPrompt,
         signatureDetails,
       });
     } catch (err) {

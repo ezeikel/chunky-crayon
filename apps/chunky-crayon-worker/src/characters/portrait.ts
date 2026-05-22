@@ -1,92 +1,62 @@
 /**
- * Character portrait generation.
+ * Character portrait generation — two assets, two gpt-image-2 calls.
  *
  * The web app's createCharacter action INSERTs a Character row with
- * status=GENERATING and then fires this endpoint. We:
+ * status=GENERATING and fires this endpoint. We:
  *
- *   1. Call gpt-image-2 with the stored referenceSheetPrompt to produce a
- *      flat-coloured cartoon portrait on a plain white background. No QA
- *      retry loop: unlike bundles (where the same hero appears across 10
- *      pages and the QA gate guards visual continuity), a single-page
- *      character portrait either works on the first pass or the parent
- *      can retry via regenerateCharacterPortrait.
+ *   1. Line-art call — `images.generate` with the line-art prompt
+ *      produces a clean black-and-white coloring-book outline. This is
+ *      the canonical asset: the coloring-page pipeline conditions on it
+ *      when the character appears in a scene.
  *
- *   2. Run potrace on a thresholded grayscale version of the raster to
- *      produce the line-art twin. Same pipeline as the bundle persist
- *      traceImage helper, copied here so the worker module stays
- *      self-contained.
+ *   2. Colored call — `images.edit` with the line-art raster from step
+ *      1 fed back as the reference `image`, plus the coloring prompt
+ *      ("color this in, warm Chunky Crayon recipe"). Because the
+ *      colored portrait is drawn ON the exact line-art, the two assets
+ *      are guaranteed to match — same pose, proportions, details.
  *
- *   3. Upload both artefacts to R2 under
+ *   3. Upload both to R2 under
+ *        uploads/characters/${characterId}/portrait-line-art.webp
  *        uploads/characters/${characterId}/portrait.webp
- *        uploads/characters/${characterId}/portrait-line-art.svg
  *      …and flip the Character row to status=READY.
  *
  *   4. On any error: flip status=FAILED + failureReason so the parent UI
  *      (and the /dev/characters debug viewer) can offer a retry.
  *
- * Why two assets, not one:
- *   - The line-art SVG is what users see in the /characters grid + on a
- *     character's profile page. It composites cleanly with outfit overlays.
- *   - The colored webp is the canonical reference image piped into
- *     gpt-image-2 for scene generation (Phase 5). Line-art conditioning
- *     experiments may eventually let us drop one of these — for now we
- *     ship both so the choice stays open.
+ * No QA retry loop: a single-page character portrait either works on the
+ * first pass or the parent retries via regenerateCharacterPortrait.
+ *
+ * Why two assets:
+ *   - portraitLineArtUrl — the coloring-page reference (line-art
+ *     conditioning yields cleaner pages than colored conditioning).
+ *   - portraitUrl — the colored illustration shown in the /characters
+ *     grid + cockpit. The kid's actual orange dragon.
+ *
+ * (Previously this generated one raster and `potrace`-traced a line-art
+ * twin from it. That made both assets line-art and never produced a
+ * real colored version — see the portrait-prompt.ts history.)
  */
 
 import OpenAI from "openai";
 import sharp from "sharp";
-import potrace from "oslllo-potrace";
 import { db, CharacterStatus } from "@one-colored-pixel/db";
 import { put } from "@one-colored-pixel/storage";
 
 const MODEL_ID = "gpt-image-2";
 const SIZE = "1024x1024" as const;
 
-/**
- * Trace the line-art twin from the colored raster. Mirrors
- * apps/chunky-crayon-worker/src/bundles/persist.ts::traceImage so the
- * line-art style matches what bundle pages produce.
- */
-const traceLineArt = async (imageBuffer: Buffer): Promise<string> =>
-  new Promise((resolve, reject) => {
-    sharp(imageBuffer)
-      .flatten({ background: "#ffffff" })
-      .resize({ width: 1024 })
-      .grayscale()
-      .normalize()
-      .linear(1.3, -40)
-      .threshold(210)
-      .toFormat("png")
-      .toBuffer(async (err, pngBuffer) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        try {
-          const traced = await potrace(Buffer.from(pngBuffer), {
-            threshold: 200,
-            optimizeImage: true,
-            turnPolicy: "majority",
-          }).trace();
-          resolve(traced);
-        } catch (traceErr) {
-          reject(
-            traceErr instanceof Error ? traceErr : new Error(String(traceErr)),
-          );
-        }
-      });
-  });
-
 export type GenerateCharacterPortraitOptions = {
   /** Character.id — used to scope R2 paths and update the row. */
   characterId: string;
-  /** Full portrait prompt built by buildCharacterPortraitPrompt. */
-  prompt: string;
+  /** Prompt for call 1 — the clean line-art portrait. */
+  lineArtPrompt: string;
+  /** Prompt for call 2 — colour in the line-art (warm brand recipe). */
+  coloringPrompt: string;
   /**
    * QA-checkable signature features. Currently passed through to logs
-   * only; if v1 character generation drifts, we'll add a per-character
-   * QA gate that re-uses the bundle jury. Kept in the API so adding it
-   * later doesn't require a worker-route shape change.
+   * only; if character generation drifts we'll add a per-character QA
+   * gate reusing the bundle jury. Kept in the API so adding it later
+   * needs no worker-route shape change.
    */
   signatureDetails: readonly string[];
 };
@@ -96,10 +66,22 @@ export type GenerateCharacterPortraitResult = {
   portraitLineArtUrl: string;
 };
 
+/** Decode a gpt-image-2 b64 result to a raw PNG buffer. */
+const decodeImage = (
+  result: OpenAI.Images.ImagesResponse,
+  label: string,
+): Buffer => {
+  const b64 = result.data?.[0]?.b64_json;
+  if (!b64) {
+    throw new Error(`[character-portrait] ${label} returned no image`);
+  }
+  return Buffer.from(b64, "base64");
+};
+
 /**
  * Generate the two portrait artefacts for one character and persist them.
- * Throws on OpenAI / R2 / potrace errors — the caller (Hono route handler)
- * catches and flips the Character row to FAILED with the error message.
+ * Throws on OpenAI / R2 errors — the caller (Hono route handler) catches
+ * and flips the Character row to FAILED with the error message.
  */
 export const generateCharacterPortrait = async (
   options: GenerateCharacterPortraitOptions,
@@ -109,51 +91,65 @@ export const generateCharacterPortrait = async (
   }
 
   const client = new OpenAI();
-
   console.log(
     `[character-portrait] ${options.characterId} — generating (signatureDetails=${options.signatureDetails.length})`,
   );
   const start = Date.now();
 
-  // Single-shot generation. We do NOT pass `image` references here: the
-  // portrait IS the reference. The prompt itself names every signature
-  // detail verbatim (see lib/characters/portrait-prompt.ts).
-  const result = await client.images.generate({
+  // ── Call 1: line-art ──────────────────────────────────────────────
+  const lineArtResult = await client.images.generate({
     model: MODEL_ID,
-    prompt: options.prompt,
+    prompt: options.lineArtPrompt,
     size: SIZE,
     quality: "high",
   });
-  const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-  console.log(`[character-portrait] gpt-image-2 done in ${elapsed}s`);
+  const lineArtRaw = decodeImage(lineArtResult, "line-art");
+  const lineArtElapsed = ((Date.now() - start) / 1000).toFixed(1);
+  console.log(
+    `[character-portrait] ${options.characterId} line-art done in ${lineArtElapsed}s`,
+  );
 
-  const b64 = result.data?.[0]?.b64_json;
-  if (!b64) {
-    throw new Error("[character-portrait] gpt-image-2 returned no image");
-  }
-  const rawBuffer = Buffer.from(b64, "base64");
+  // ── Call 2: colour in the line-art ────────────────────────────────
+  // The line-art raster is the reference image. gpt-image-2's
+  // `images.edit` colours inside the existing outline (same pattern as
+  // coloring-image/jobs.ts). PNG so the model gets the cleanest input.
+  const lineArtFile = new File([new Uint8Array(lineArtRaw)], "line-art.png", {
+    type: "image/png",
+  });
+  const coloredResult = await client.images.edit({
+    model: MODEL_ID,
+    image: [lineArtFile],
+    prompt: options.coloringPrompt,
+    size: SIZE,
+    quality: "high",
+  });
+  const coloredRaw = decodeImage(coloredResult, "colored");
+  const totalElapsed = ((Date.now() - start) / 1000).toFixed(1);
+  console.log(
+    `[character-portrait] ${options.characterId} colored done (${totalElapsed}s total)`,
+  );
 
-  // Convert to webp for storage (smaller, identical visual quality at
-  // this size). Trace the line-art twin in parallel.
-  const [webpBuffer, lineArtSvg] = await Promise.all([
-    sharp(rawBuffer).webp({ quality: 90 }).toBuffer(),
-    traceLineArt(rawBuffer),
+  // Convert both to webp for storage (smaller, identical visual quality
+  // at this size).
+  const [lineArtWebp, coloredWebp] = await Promise.all([
+    sharp(lineArtRaw).webp({ quality: 90 }).toBuffer(),
+    sharp(coloredRaw).webp({ quality: 90 }).toBuffer(),
   ]);
 
   // R2 paths — convention: uploads/characters/${id}/...
+  const lineArtPath = `uploads/characters/${options.characterId}/portrait-line-art.webp`;
   const portraitPath = `uploads/characters/${options.characterId}/portrait.webp`;
-  const lineArtPath = `uploads/characters/${options.characterId}/portrait-line-art.svg`;
 
-  const [{ url: portraitUrl }, { url: portraitLineArtUrl }] = await Promise.all(
+  const [{ url: portraitLineArtUrl }, { url: portraitUrl }] = await Promise.all(
     [
-      put(portraitPath, webpBuffer, {
+      put(lineArtPath, lineArtWebp, {
         access: "public",
         contentType: "image/webp",
         allowOverwrite: true,
       }),
-      put(lineArtPath, Buffer.from(lineArtSvg), {
+      put(portraitPath, coloredWebp, {
         access: "public",
-        contentType: "image/svg+xml",
+        contentType: "image/webp",
         allowOverwrite: true,
       }),
     ],
@@ -170,7 +166,7 @@ export const generateCharacterPortrait = async (
   });
 
   console.log(
-    `[character-portrait] ${options.characterId} READY (${elapsed}s total)`,
+    `[character-portrait] ${options.characterId} READY (${totalElapsed}s total)`,
   );
 
   return { portraitUrl, portraitLineArtUrl };

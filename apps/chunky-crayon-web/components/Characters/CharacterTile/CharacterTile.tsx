@@ -22,7 +22,7 @@ type Props = {
  * profile page at /characters/[id].
  *
  * Three visual states:
- *   - READY: line-art portrait + chunky name pill. Tile is a Link.
+ *   - READY: colored portrait + chunky name pill. Tile is a Link.
  *   - GENERATING: animated wand-sparkles icon inside a cream surface, with
  *     a chunky 'Drawing…' pill. Not a link (clicking through to a not-yet-
  *     READY character is the most common 'is it stuck' trap).
@@ -49,7 +49,10 @@ const CharacterTile = ({
   // error strings. Admins inspect via /dev/characters/[id].
   failureReason: _failureReason,
 }: Props) => {
-  const portrait = portraitLineArtUrl ?? portraitUrl;
+  // Show the colored illustration — the kid's actual character. Line-art
+  // is a fallback only (a pre-two-asset character not yet backfilled);
+  // line-art is the coloring-page reference, not a display asset.
+  const portrait = portraitUrl ?? portraitLineArtUrl;
   const isReady = status === 'READY';
   const isGenerating = status === 'GENERATING';
   const isFailed = status === 'FAILED';

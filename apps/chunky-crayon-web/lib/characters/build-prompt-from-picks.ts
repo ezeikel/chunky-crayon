@@ -86,11 +86,15 @@ export const buildExtractedFromPicks = ({
     ...traitsText.map((phrase) => `expression conveys ${phrase}`),
   ];
 
+  // Style-neutral character description. The line-art vs coloring style
+  // is added downstream by buildCharacterLineArtPrompt /
+  // buildCharacterColoringPrompt — keeping this neutral means the same
+  // referenceSheetPrompt feeds both calls without contradicting either.
   const referenceSheetPrompt = `A friendly cartoon ${colorWord(color)} ${speciesNoun(
     species,
   )}${
     traitsText.length > 0 ? `, who is ${traitsText.join(' and ')}` : ''
-  }. Drawn as a children's coloring book line-art portrait, single character, plain white background, no scenery.`;
+  }. Single character, plain white background, no scenery.`;
 
   // The first trait drives the suggested voice persona. Falls back to
   // a sensible gender-neutral default if no traits picked.

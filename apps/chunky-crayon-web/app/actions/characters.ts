@@ -30,7 +30,10 @@ import { getUserId } from '@/app/actions/user';
 import { getActiveProfile } from '@/app/actions/profiles';
 import { moderateVoiceText } from '@/lib/moderation';
 import { verifyParentGateToken } from '@/app/actions/parent-gate';
-import { buildCharacterPortraitPrompt } from '@/lib/characters/portrait-prompt';
+import {
+  buildCharacterLineArtPrompt,
+  buildCharacterColoringPrompt,
+} from '@/lib/characters/portrait-prompt';
 import {
   buildShortPromptFromPicks,
   buildExtractedFromPicks,
@@ -90,7 +93,10 @@ export type CreateCharacterResult =
 type CharacterWorkerBody = {
   characterId: string;
   brand: Brand;
-  prompt: string;
+  /** Prompt for call 1 — the clean line-art portrait. */
+  lineArtPrompt: string;
+  /** Prompt for call 2 — colour in the line-art (warm brand recipe). */
+  coloringPrompt: string;
   /** QA-checkable visual features. Worker reruns gpt-image-2 with these
    *  appended on retry if the first pass misses any of them. */
   signatureDetails: readonly string[];
@@ -225,7 +231,13 @@ export const createCharacter = async (
     traits: input.traits,
   });
 
-  const portraitPrompt = buildCharacterPortraitPrompt({ name, extracted });
+  // Two single-purpose prompts: line-art (call 1) and the colour-in
+  // instruction (call 2). We persist the line-art prompt as
+  // `referenceSheetPrompt` (the canonical "what the character is"
+  // prompt); the coloring prompt is deterministically rebuilt from the
+  // stored signatureDetails on regenerate, so no extra column.
+  const lineArtPrompt = buildCharacterLineArtPrompt({ name, extracted });
+  const coloringPrompt = buildCharacterColoringPrompt({ name, extracted });
 
   // 5. INSERT GENERATING row
   let characterId: string | null = null;
@@ -240,7 +252,7 @@ export const createCharacter = async (
         shortPrompt,
         traits: extracted.traits,
         signatureDetails: extracted.signatureDetails,
-        referenceSheetPrompt: portraitPrompt,
+        referenceSheetPrompt: lineArtPrompt,
         voicePersona: input.voicePersona ?? extracted.suggestedVoicePersona,
         status: CharacterStatus.GENERATING,
       },
@@ -252,7 +264,8 @@ export const createCharacter = async (
     await postToWorker({
       characterId,
       brand: BRAND,
-      prompt: portraitPrompt,
+      lineArtPrompt,
+      coloringPrompt,
       signatureDetails: extracted.signatureDetails,
     });
   } catch (err) {
@@ -416,11 +429,14 @@ export const deleteCharacter = async (
 };
 
 /**
- * Regenerate the portrait for an existing character (admin / dev tool).
- * Flips status back to GENERATING and re-POSTs the worker with the same
- * stored `referenceSheetPrompt` + `signatureDetails`. Useful when a prompt
- * change is rolled out and we want to refresh an existing character without
- * the parent having to recreate it.
+ * Regenerate the portrait for an existing character (admin / dev tool,
+ * also used by the backfill script). Flips status back to GENERATING
+ * and re-POSTs the worker.
+ *
+ * The line-art prompt is the stored `referenceSheetPrompt`. The coloring
+ * prompt is rebuilt deterministically from the stored `species` +
+ * `signatureDetails` (the picked colour lives in signatureDetails as a
+ * "<colour> body colour" entry) — no separate column needed.
  */
 export const regenerateCharacterPortrait = async (
   id: string,
@@ -432,11 +448,29 @@ export const regenerateCharacterPortrait = async (
     where: { id, userId, brand: BRAND },
     select: {
       id: true,
+      name: true,
+      species: true,
+      traits: true,
       referenceSheetPrompt: true,
       signatureDetails: true,
     },
   });
   if (!existing) return { ok: false, error: 'not_found' };
+
+  // Rebuild the coloring prompt from the stored structure. The line-art
+  // prompt is the stored referenceSheetPrompt verbatim.
+  const coloringPrompt = buildCharacterColoringPrompt({
+    name: existing.name,
+    extracted: {
+      species: existing.species,
+      traits: existing.traits,
+      signatureDetails: existing.signatureDetails,
+      referenceSheetPrompt: existing.referenceSheetPrompt,
+      // suggestedVoicePersona is unused by the coloring prompt — a
+      // valid placeholder keeps the ExtractedCharacter shape satisfied.
+      suggestedVoicePersona: 'warm-girl-7yo',
+    },
+  });
 
   await db.character.update({
     where: { id },
@@ -447,7 +481,8 @@ export const regenerateCharacterPortrait = async (
     await postToWorker({
       characterId: existing.id,
       brand: BRAND,
-      prompt: existing.referenceSheetPrompt,
+      lineArtPrompt: existing.referenceSheetPrompt,
+      coloringPrompt,
       signatureDetails: existing.signatureDetails,
     });
   } catch (err) {

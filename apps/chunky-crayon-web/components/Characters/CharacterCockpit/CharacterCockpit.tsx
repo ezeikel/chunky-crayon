@@ -62,7 +62,9 @@ const CharacterCockpit = (props: Props) => {
   >(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
-  const portrait = props.portraitLineArtUrl ?? props.portraitUrl;
+  // Show the colored illustration — the kid's actual character. Line-art
+  // is a fallback only (a pre-two-asset character not yet backfilled).
+  const portrait = props.portraitUrl ?? props.portraitLineArtUrl;
 
   // Each cosmetic action plays its preset voice line + triggers the bounce
   // animation. We don't track meter state — purely cosmetic by design.
