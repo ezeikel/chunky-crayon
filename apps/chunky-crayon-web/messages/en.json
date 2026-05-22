@@ -1448,7 +1448,8 @@
     "sendButton": "Send it over",
     "sending": "Sending...",
     "successTitle": "Got it, thank you",
-    "successMessage": "We'll take a look and write back if it makes sense."
+    "successMessage": "We'll take a look and write back if it makes sense.",
+    "back": "Back"
   },
   "og": {
     "homepage": {

@@ -259,41 +259,45 @@ const FeedbackDialog = ({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
+              className="relative"
             >
+              {/* Back arrow — top-left, mirroring the Dialog's built-in
+                  X close button at top-right (same size + inset). */}
+              <button
+                type="button"
+                onClick={handleBack}
+                aria-label={t('back')}
+                className="absolute left-4 top-4 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-paper-cream focus:outline-none focus:ring-2 focus:ring-crayon-orange/20"
+              >
+                <FontAwesomeIcon
+                  icon={faArrowLeft}
+                  className="text-text-secondary"
+                  style={
+                    {
+                      '--fa-primary-color': 'hsl(var(--text-secondary))',
+                      '--fa-secondary-color': 'hsl(var(--text-secondary))',
+                      '--fa-secondary-opacity': '0.5',
+                    } as React.CSSProperties
+                  }
+                />
+              </button>
+
               <div className="p-6 pb-0">
                 <DialogHeader className="pb-4">
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={handleBack}
-                      className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-paper-cream"
-                    >
-                      <FontAwesomeIcon
-                        icon={faArrowLeft}
-                        className="text-text-secondary"
-                        style={
-                          {
-                            '--fa-primary-color': 'hsl(var(--text-secondary))',
-                            '--fa-secondary-color':
-                              'hsl(var(--text-secondary))',
-                            '--fa-secondary-opacity': '0.5',
-                          } as React.CSSProperties
-                        }
-                      />
-                    </button>
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-full ${currentType.bgColor}`}
-                    >
-                      <FontAwesomeIcon
-                        icon={currentType.icon}
-                        className={currentType.color}
-                        style={currentType.iconStyle}
-                      />
-                    </div>
-                    <DialogTitle className="font-tondo text-lg font-bold text-text-primary">
-                      {t(`types.${selectedType}.label`)}
-                    </DialogTitle>
+                  {/* Icon stacked above a centered title — same pattern
+                      as the type-picker view and the other CC modals. */}
+                  <div
+                    className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${currentType.bgColor}`}
+                  >
+                    <FontAwesomeIcon
+                      icon={currentType.icon}
+                      className={`text-lg ${currentType.color}`}
+                      style={currentType.iconStyle}
+                    />
                   </div>
+                  <DialogTitle className="mt-3 text-center font-tondo text-xl font-bold text-text-primary">
+                    {t(`types.${selectedType}.label`)}
+                  </DialogTitle>
                 </DialogHeader>
               </div>
 
