@@ -36,11 +36,20 @@ const config: StorybookConfig = {
     //     down the whole story file (CreateColoringPageForm imports the
     //     paywall → useStripeCheckout). A dummy publishable key makes
     //     loadStripe load cleanly; Storybook does no real checkout.
+    //   - `resolveThumbnailUrl` reads `NEXT_PUBLIC_R2_PUBLIC_URL` to
+    //     build Scene Builder / Character Builder thumbnail URLs.
+    //     Without it the resolver returns null and SceneTile silently
+    //     falls back to the FA icon — so the Character Builder story
+    //     showed grey icons instead of the real illustrations. The R2
+    //     bucket URL is a public `NEXT_PUBLIC_*` value (it ships to the
+    //     browser in prod), so it's safe to hardcode here.
     viteConfig.define = {
       ...viteConfig.define,
       'process.env': JSON.stringify({
         NODE_ENV: 'development',
         NEXT_PUBLIC_STRIPE_KEY: 'pk_test_storybook_dummy',
+        NEXT_PUBLIC_R2_PUBLIC_URL:
+          'https://pub-3113b77fbb06419f9c8070eb1f8471cc.r2.dev',
       }),
     };
     viteConfig.resolve = {
