@@ -11,11 +11,15 @@ function getAbsolutePath(value: string) {
 }
 
 const config: StorybookConfig = {
+  // All stories live in one tree — `apps/chunky-crayon-web/stories/`,
+  // organised by section. Stories for `coloring-ui` library components
+  // live here too (imported via `@one-colored-pixel/coloring-ui`), so
+  // this single CC Storybook shows library + app components in one UI.
+  // Decoupling story location from component source keeps everything
+  // findable in one place.
   stories: [
     '../stories/**/*.mdx',
     '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    '../components/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    '../../../packages/coloring-ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
   addons: [getAbsolutePath('@storybook/addon-a11y')],
   framework: getAbsolutePath('@storybook/react-vite'),
