@@ -26,6 +26,15 @@ const config: StorybookConfig = {
   staticDirs: ['../public'],
   viteFinal: async (viteConfig) => {
     viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()];
+    // `next-auth/react` reads `process.env.*` at module scope; the
+    // browser has no `process`, so without this any story wrapped by
+    // SessionProvider (every story — it's in preview.tsx's global
+    // decorator) throws "process is not defined". Stub a minimal
+    // process.env so the module loads cleanly in Storybook.
+    viteConfig.define = {
+      ...viteConfig.define,
+      'process.env': JSON.stringify({ NODE_ENV: 'development' }),
+    };
     viteConfig.resolve = {
       ...viteConfig.resolve,
       alias: [
