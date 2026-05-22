@@ -202,6 +202,33 @@ const FeedbackDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[440px] p-0 gap-0 overflow-hidden rounded-3xl border-2 border-paper-cream-dark">
+        {/* Back arrow — a direct child of DialogContent so it anchors to
+            the SAME box as the Dialog's built-in X close button. Keeping
+            it inside the animated step would anchor it to that div's
+            transform instead, dropping it below the X. Same circular
+            bordered button, same `size-10`, same `top-4` inset → the two
+            read as a matched pair on one row. Only the form step has a
+            back affordance. */}
+        {view === 'form' && (
+          <button
+            type="button"
+            onClick={handleBack}
+            aria-label={t('back')}
+            className="absolute left-4 top-4 z-10 flex size-10 items-center justify-center rounded-full border-2 border-coloring-surface-dark bg-white transition-colors hover:bg-paper-cream focus:outline-none focus:ring-2 focus:ring-crayon-orange/20"
+          >
+            <FontAwesomeIcon
+              icon={faArrowLeft}
+              className="text-xl text-text-secondary"
+              style={
+                {
+                  '--fa-primary-color': 'hsl(var(--text-secondary))',
+                  '--fa-secondary-color': 'hsl(var(--text-secondary))',
+                  '--fa-secondary-opacity': '0.5',
+                } as React.CSSProperties
+              }
+            />
+          </button>
+        )}
         <AnimatePresence mode="wait">
           {view === 'type' && (
             <motion.div
@@ -259,31 +286,7 @@ const FeedbackDialog = ({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
-              className="relative"
             >
-              {/* Back arrow — top-left, a mirror of the Dialog's built-in
-                  X close button at top-right: same circular bordered
-                  button, same `size-10`, same `top-4` inset, so the two
-                  read as a matched pair on one row. */}
-              <button
-                type="button"
-                onClick={handleBack}
-                aria-label={t('back')}
-                className="absolute left-4 top-4 z-10 flex size-10 items-center justify-center rounded-full border-2 border-coloring-surface-dark bg-white transition-colors hover:bg-paper-cream focus:outline-none focus:ring-2 focus:ring-crayon-orange/20"
-              >
-                <FontAwesomeIcon
-                  icon={faArrowLeft}
-                  className="text-xl text-text-secondary"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--text-secondary))',
-                      '--fa-secondary-color': 'hsl(var(--text-secondary))',
-                      '--fa-secondary-opacity': '0.5',
-                    } as React.CSSProperties
-                  }
-                />
-              </button>
-
               <div className="p-6 pb-0">
                 <DialogHeader className="pb-4">
                   {/* Icon stacked above a centered title — same pattern
