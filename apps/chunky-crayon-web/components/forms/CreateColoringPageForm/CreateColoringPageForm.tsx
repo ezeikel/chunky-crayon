@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useFeatureFlagEnabled } from 'posthog-js/react';
 import { type ImageQuality } from '@one-colored-pixel/coloring-core/image-quality';
+import { DEFAULT_CURRENCY, type Currency } from '@/lib/currency';
 import cn from '@/utils/cn';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
@@ -27,6 +28,11 @@ import {
 import { getUnlockedModes } from '@/app/actions/scene';
 import { type GateableMode } from '@/lib/scene/modes';
 import FormCTA from './FormCTA';
+import {
+  PaywallModal,
+  usePaywall,
+  type PaywallState,
+} from '@/components/PaywallModal';
 import QualityPicker from './QualityPicker/QualityPicker';
 import CharacterPicker from './CharacterPicker/CharacterPicker';
 
@@ -38,15 +44,40 @@ type CreateColoringPageFormProps = {
    *  render (guests on homepage/start only) and the location field sent
    *  to PostHog on pill clicks. */
   location?: 'homepage' | 'start';
+  /** Geo-resolved currency. Threaded through to the in-form PaywallModal
+   *  so plan prices match the visitor's currency. Defaults to GBP. */
+  currency?: Currency;
 };
 
-// Inner form component that uses the input mode context
+// Inner form component that uses the input mode context.
+//
+// `user` is hoisted from the outer CreateColoringPageForm so the two
+// components share a single useUser() instance — without this MultiModeForm
+// would fire its own getCurrentUser() request alongside the outer one,
+// doubling the network on mount.
+type MultiModeFormUserSlice = Pick<
+  ReturnType<typeof useUser>,
+  | 'isGuest'
+  | 'guestGenerationsUsed'
+  | 'guestGenerationsRemaining'
+  | 'incrementGuestGeneration'
+  | 'hasActiveSubscription'
+  | 'canGenerate'
+  // Threaded through to FormCTA — needed for the (blockedReason, sub)
+  // → PaywallState lookup.
+  | 'blockedReason'
+>;
+
 const MultiModeForm = ({
   className,
   location,
+  openPaywall,
+  user,
 }: {
   className?: string;
   location?: 'homepage' | 'start';
+  openPaywall: (triggerLocation: string) => void;
+  user: MultiModeFormUserSlice;
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
@@ -58,7 +89,8 @@ const MultiModeForm = ({
     guestGenerationsRemaining,
     incrementGuestGeneration,
     hasActiveSubscription,
-  } = useUser();
+    canGenerate,
+  } = user;
   const { addCreation } = useRecentCreations();
 
   // Quality tier. UI generations always default to 'low' so cold paid traffic
@@ -161,6 +193,16 @@ const MultiModeForm = ({
         const inputType = formData.get('inputType') as InputMode;
         const desc = formData.get('description') as string;
 
+        // Belt-and-braces gate. Visual states (disabled button / pill /
+        // wizard's blocked Create) already prevent this in the happy
+        // path, but pressing Enter inside a text input or any stale
+        // disabled-button bypass would otherwise submit. Open the
+        // paywall instead of firing the action.
+        if (!canGenerate) {
+          openPaywall('form_action_blocked');
+          return;
+        }
+
         trackEvent(TRACKING_EVENTS.CREATION_SUBMITTED, {
           description: desc,
           inputType: inputType || 'text',
@@ -259,6 +301,8 @@ const MultiModeForm = ({
           onChange={({ characterId: cId }) => setSceneCharacterId(cId)}
           onCreate={() => formRef.current?.requestSubmit()}
           charactersEnabled={showCharacterPicker}
+          createBlocked={!canGenerate}
+          onCreateBlockedTap={() => openPaywall('scene_wizard_create')}
         />
       )}
       {mode === 'text' && <TextInput />}
@@ -334,11 +378,16 @@ const MultiModeForm = ({
         />
       )}
 
-      {/* Shared bottom CTA — free-try chip + Create/auth fallback. Hidden
-          in scene mode: the wizard owns its own final "Create!" button
-          (last step), so a second always-visible CTA would duplicate it
-          and let a kid submit mid-wizard before the scene is built. */}
-      {mode !== 'scene' && <FormCTA />}
+      {/* Shared bottom CTA. In Scene mode it renders in `compact` so it
+          shows ONLY the free-tries chip / blocked-reason pill — the
+          wizard owns the actual Create button so a second one would be
+          duplicative + let a kid submit mid-wizard before the scene is
+          built. */}
+      <FormCTA
+        openPaywall={openPaywall}
+        compact={mode === 'scene'}
+        user={user}
+      />
     </form>
   );
 };
@@ -347,8 +396,24 @@ const CreateColoringPageForm = ({
   className,
   size = 'default',
   location,
+  currency = DEFAULT_CURRENCY,
 }: CreateColoringPageFormProps) => {
   const isLarge = size === 'large';
+  // Single useUser() per form mount. MultiModeForm receives the slice
+  // it needs as `user`; the outer component also reads `blockedReason`
+  // here to compute the PaywallModal's state.
+  const user = useUser();
+  const { isGuest, hasActiveSubscription, blockedReason } = user;
+  const paywall = usePaywall();
+
+  // Map (blockedReason, sub status) → PaywallState. Single source of
+  // truth for which ladder the modal shows.
+  const paywallState: PaywallState = (() => {
+    if (blockedReason === 'guest_limit_reached' || isGuest)
+      return 'guest_limit';
+    if (hasActiveSubscription) return 'subscriber_no_credits';
+    return 'no_subscription';
+  })();
 
   // Scene Builder is the default mode for everyone — privacy-first,
   // tap-only, no typing/voice/photo until the parent gate is passed.
@@ -363,8 +428,20 @@ const CreateColoringPageForm = ({
       )}
     >
       <InputModeProvider initialMode="scene">
-        <MultiModeForm className={className} location={location} />
+        <MultiModeForm
+          className={className}
+          location={location}
+          openPaywall={paywall.openPaywall}
+          user={user}
+        />
       </InputModeProvider>
+      <PaywallModal
+        open={paywall.open}
+        onOpenChange={paywall.setOpen}
+        state={paywallState}
+        triggerLocation={paywall.triggerLocation}
+        currency={currency}
+      />
     </div>
   );
 };

@@ -44,6 +44,25 @@ export type EventProperties = {
     generationsUsed: number;
   };
 
+  // ===== IN-FORM PAYWALL MODAL =====
+  // PaywallState mirrors the discriminator the modal uses to pick its
+  // ladder. Kept here (rather than imported from the component) so the
+  // tracking layer doesn't pull in client-only modules.
+  [TRACKING_EVENTS.PAYWALL_VIEWED]: {
+    state: 'guest_limit' | 'no_subscription' | 'subscriber_no_credits';
+    triggerLocation: string;
+  };
+  [TRACKING_EVENTS.PAYWALL_DISMISSED]: {
+    state: 'guest_limit' | 'no_subscription' | 'subscriber_no_credits';
+    triggerLocation: string;
+    via: 'x' | 'maybe_later' | 'outside_click' | 'escape_key';
+  };
+  [TRACKING_EVENTS.PAYWALL_SECONDARY_CLICKED]: {
+    state: 'guest_limit' | 'no_subscription' | 'subscriber_no_credits';
+    triggerLocation: string;
+    link: 'pricing' | 'pricing_packs' | 'signin';
+  };
+
   // ===== COLORING PAGE CREATION =====
   [TRACKING_EVENTS.CREATION_STARTED]: {
     inputLength: number;
@@ -285,6 +304,12 @@ export type EventProperties = {
         price: string;
         variant?: 'subscriptions_primary' | 'packs_primary';
         section?: 'primary' | 'secondary';
+        /**
+         * Where the click came from. 'pricing_page' (default) is the
+         * /pricing route; 'paywall_modal' is the in-form blocked-state
+         * modal. Lets the funnel split conversion by surface.
+         */
+        source?: 'pricing_page' | 'paywall_modal';
       }
     | {
         productType: 'pack';
@@ -296,6 +321,7 @@ export type EventProperties = {
         price: string;
         variant?: 'subscriptions_primary' | 'packs_primary';
         section?: 'primary' | 'secondary';
+        source?: 'pricing_page' | 'paywall_modal';
       };
   [TRACKING_EVENTS.PRICING_CREDITS_CLICKED]: {
     creditAmount: number;

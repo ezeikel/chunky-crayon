@@ -67,11 +67,26 @@ type SceneInputProps = {
    * an "Add character" tile that would dead-end at the auth wall.
    */
   charactersEnabled: boolean;
+  /**
+   * When true, the wizard's Create button renders in a blocked visual
+   * state (lock icon, muted) and tap fires `onCreateBlockedTap` instead
+   * of `onCreate`. Used to surface the in-form PaywallModal at the
+   * START of the wizard, not after the kid has built the scene.
+   */
+  createBlocked?: boolean;
+  /** Fired when the kid taps the blocked Create button. */
+  onCreateBlockedTap?: () => void;
 };
 
 // One label namespace for the whole scene picker. The app owns i18n;
 // coloring-ui only renders the strings we pass.
-const SceneInput = ({ onChange, onCreate, charactersEnabled }: SceneInputProps) => {
+const SceneInput = ({
+  onChange,
+  onCreate,
+  charactersEnabled,
+  createBlocked = false,
+  onCreateBlockedTap,
+}: SceneInputProps) => {
   const t = useTranslations('createForm.scene');
   const router = useRouter();
   const { characters } = useCharacters();
@@ -247,6 +262,8 @@ const SceneInput = ({ onChange, onCreate, charactersEnabled }: SceneInputProps) 
         onSelectionChange={setSelection}
         onSurpriseMe={handleSurpriseMe}
         onCreate={onCreate}
+        createBlocked={createBlocked}
+        onCreateBlockedTap={onCreateBlockedTap}
         lockedKeys={lockedKeys}
         onLockedTap={handleLockedTap}
         labels={{

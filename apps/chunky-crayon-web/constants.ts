@@ -1053,6 +1053,14 @@ export const TRACKING_EVENTS = {
   GUEST_LIMIT_REACHED: 'guest_limit_reached', // Guest exhausted free tries
   GUEST_SIGNUP_CLICKED: 'guest_signup_clicked', // Guest clicked signup CTA
 
+  // ===== IN-FORM PAYWALL MODAL =====
+  // Modal that opens above the create form when the user can't generate
+  // (guest out of tries, signed-in user out of credits). Plan-card taps
+  // inside the modal reuse PRICING_PLAN_CLICKED with source:'paywall_modal'.
+  PAYWALL_VIEWED: 'paywall_viewed', // Paywall modal opened
+  PAYWALL_DISMISSED: 'paywall_dismissed', // Modal closed without converting
+  PAYWALL_SECONDARY_CLICKED: 'paywall_secondary_clicked', // 'See packs' / 'Sign up' / etc.
+
   // ===== COLORING PAGE CREATION (Core Funnel) =====
   CREATION_STARTED: 'creation_started', // User starts typing description
   CREATION_SUBMITTED: 'creation_submitted', // Description submitted

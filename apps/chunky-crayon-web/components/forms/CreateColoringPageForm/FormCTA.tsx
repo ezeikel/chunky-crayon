@@ -1,45 +1,69 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { faWandMagicSparkles } from '@fortawesome/pro-duotone-svg-icons';
-import useUser from '@/hooks/useUser';
-import { trackEvent } from '@/utils/analytics-client';
-import { TRACKING_EVENTS } from '@/constants';
+import {
+  faWandMagicSparkles,
+  faLock,
+} from '@fortawesome/pro-duotone-svg-icons';
+import type useUser from '@/hooks/useUser';
 import SubmitButton from '@/components/buttons/SubmitButton/SubmitButton';
-import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
 import { useInputMode } from './inputs/InputModeContext';
+import BlockReasonPill from './BlockReasonPill';
+import { type PaywallState } from '@/components/PaywallModal';
+
+// Subset of useUser() this component needs. Hoisted from the parent so
+// CreateColoringPageForm fires useUser() once across the whole form.
+type FormCTAUserSlice = Pick<
+  ReturnType<typeof useUser>,
+  | 'canGenerate'
+  | 'blockedReason'
+  | 'hasActiveSubscription'
+  | 'isGuest'
+  | 'guestGenerationsRemaining'
+>;
 
 type FormCTAProps = {
   className?: string;
+  /** Opens the paywall modal with the given trigger location for funnel
+   *  attribution. Required — every blocked-state path through this
+   *  component now leads to the modal. */
+  openPaywall: (triggerLocation: string) => void;
+  /** When true, render ONLY the chip / pill — no Create-shaped button.
+   *  Scene mode uses this because the wizard owns its own Create
+   *  button, but we still want the chip + pill underneath the wizard. */
+  compact?: boolean;
+  user: FormCTAUserSlice;
 };
 
 /**
  * Bottom-of-form CTA shared across all input modes.
  *
- * Renders:
- * - Orange "X free tries left" chip for signed-out guests who can still generate.
- * - Big pill submit button ("Create") when the user can generate AND the active
- *   input is ready (text has content, voice has a transcription, image is
- *   uploaded).
- * - Auth fallback button (Sign up / View plans / Buy credits / Get started)
- *   when the user is blocked.
+ * Three render states (down from six pre-rewrite):
  *
- * The submit button is always present in the DOM so the form's action wires
- * up; it's just disabled until `isReady` flips true. This keeps the layout
- * stable across modes and avoids the previous per-input duplication.
+ *   - guest with tries left   → free-tries chip + Submit
+ *   - blocked (any reason)    → BlockReasonPill + button that opens paywall
+ *   - happy path              → just Submit, disabled until isReady
+ *
+ * The legacy soft-wall buttons (Sign up / View plans / Buy credits /
+ * Get started) all moved into PaywallModal. The single source of truth
+ * for "what do we sell this user" is now `PaywallModal`'s state
+ * lookup, not a per-component config object.
  */
-const FormCTA = ({ className }: FormCTAProps) => {
+const FormCTA = ({
+  className,
+  openPaywall,
+  compact = false,
+  user,
+}: FormCTAProps) => {
   const t = useTranslations('createForm');
   const {
     canGenerate,
     blockedReason,
     hasActiveSubscription,
-    handleAuthAction,
     isGuest,
     guestGenerationsRemaining,
-    maxGuestGenerations,
-  } = useUser();
+  } = user;
   const { isReady, isBusy } = useInputMode();
 
   // Hide the global CTA when the active input is in a transient inner
@@ -47,112 +71,91 @@ const FormCTA = ({ className }: FormCTAProps) => {
   // controls own the interaction there.
   if (isBusy) return null;
 
-  // Signed-in user without credits / signed-out guest past limit etc.
-  if (!canGenerate) {
-    // Non-subscribers without credits get sent to /pricing (subscription
-    // pitch) — that page has its own inline escape-hatch to
-    // /color-as-you-go. We additionally show a secondary inline link
-    // below the primary CTA so the lighter-touch path isn't buried.
-    const isNoCreditsNonSubscriber =
-      blockedReason === 'no_credits' && !hasActiveSubscription;
-
-    // A guest who just hit the free-tries wall is the single highest
-    // intent moment in the product (they want more, right now). The
-    // primary CTA keeps sending them to sign up (an account is a
-    // prerequisite for checkout), but previously the ONLY message was
-    // "15 more free credits" with no paid path — the structural funnel
-    // leak. Add a direct one-click route to the trial offer alongside.
-    const isGuestLimit = blockedReason === 'guest_limit_reached';
-
-    const config =
-      blockedReason === 'guest_limit_reached'
-        ? {
-            text: t('buttonSignUp'),
-            subtext: t('subtextGuestLimit'),
-            action: () => {
-              trackEvent(TRACKING_EVENTS.GUEST_SIGNUP_CLICKED, {
-                location: 'text_input',
-                generationsUsed:
-                  maxGuestGenerations - guestGenerationsRemaining,
-              });
-              handleAuthAction('signin');
-            },
-          }
-        : blockedReason === 'no_credits'
-          ? {
-              text: hasActiveSubscription
-                ? t('buttonBuyCredits')
-                : t('buttonViewPlans'),
-              subtext: hasActiveSubscription
-                ? t('subtextNoCreditsSubscribed')
-                : t('subtextNoCreditsNoSubscription'),
-              action: () =>
-                handleAuthAction(hasActiveSubscription ? 'billing' : 'pricing'),
-            }
-          : {
-              text: t('buttonGetStarted'),
-              subtext: t('subtextFallback'),
-              action: () => handleAuthAction('signin'),
-            };
-
-    return (
-      <div className={cn('flex flex-col gap-3', className)}>
-        <Button
-          onClick={config.action}
-          size="lg"
-          className="rounded-full hover:scale-105 active:scale-95"
-          type="button"
-        >
-          {config.text}
-        </Button>
-        <p className="font-tondo text-sm text-center text-text-muted">
-          {config.subtext}
-        </p>
-        {isNoCreditsNonSubscriber && (
-          <a
-            href="/color-as-you-go"
-            className="font-tondo text-sm text-center text-text-muted hover:text-crayon-orange underline-offset-4 hover:underline transition-colors"
-          >
-            {t('linkColorAsYouGo')}
-          </a>
-        )}
-        {isGuestLimit && (
-          <button
-            type="button"
-            onClick={() => {
-              trackEvent(TRACKING_EVENTS.PRICING_TEASER_CLICKED, {
-                location: 'guest_limit_cta',
-                generationsUsed:
-                  maxGuestGenerations - guestGenerationsRemaining,
-              });
-              handleAuthAction('pricing');
-            }}
-            className="font-tondo text-sm text-center text-text-muted hover:text-crayon-orange underline-offset-4 hover:underline transition-colors"
-          >
-            {t('linkSeePlansGuestLimit')}
-          </button>
-        )}
-      </div>
-    );
-  }
+  // Map (blockedReason, subStatus) → PaywallState. Source of truth for
+  // both the pill copy and the modal's ladder.
+  const blockState: PaywallState | null = (() => {
+    if (!blockedReason) return null;
+    if (blockedReason === 'guest_limit_reached') return 'guest_limit';
+    if (blockedReason === 'no_credits') {
+      return hasActiveSubscription
+        ? 'subscriber_no_credits'
+        : 'no_subscription';
+    }
+    return null;
+  })();
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      {isGuest && (
-        <div className="flex justify-center">
-          <span className="font-tondo text-sm font-bold text-crayon-orange bg-crayon-orange-light/25 px-3 py-1 rounded-full">
-            {t('freeTriesChip', { remaining: guestGenerationsRemaining })}
-          </span>
-        </div>
+      {/* Top-row chip:
+          - Guest with tries left      → encouraging "X free tries left"
+          - Blocked (any reason)       → BlockReasonPill (lock + reason)
+          - Happy signed-in path       → nothing */}
+      {blockState ? (
+        <BlockReasonPill blockState={blockState} />
+      ) : (
+        isGuest && (
+          <div className="flex justify-center">
+            <span className="font-tondo text-sm font-bold text-crayon-orange bg-crayon-orange-light/25 px-3 py-1 rounded-full">
+              {t('freeTriesChip', { remaining: guestGenerationsRemaining })}
+            </span>
+          </div>
+        )
       )}
-      <SubmitButton
-        text={t('buttonCreate')}
-        icon={faWandMagicSparkles}
-        disabled={!isReady}
-        className="h-auto rounded-full py-4 text-base disabled:hover:scale-100 md:text-lg"
-        data-testid="create-submit"
-      />
+
+      {/* Compact mode (Scene wizard owns its own Create button): chip /
+          pill only, no SubmitButton. */}
+      {!compact &&
+        (blockState ? (
+          // Blocked: button looks like a Submit but tap opens paywall.
+          // Stays in the DOM so the form layout is stable across states.
+          <button
+            type="button"
+            onClick={() => openPaywall('formcta_create_button')}
+            className={cn(
+              'inline-flex h-auto items-center justify-center gap-2 rounded-full',
+              'bg-crayon-orange/60 px-6 py-4 text-base font-bold text-white',
+              'transition hover:bg-crayon-orange/70 active:scale-[0.98]',
+              'md:text-lg',
+            )}
+            data-testid="create-submit-blocked"
+          >
+            <FormCTAIcon blocked />
+            {t('buttonCreate')}
+          </button>
+        ) : (
+          <SubmitButton
+            text={t('buttonCreate')}
+            icon={faWandMagicSparkles}
+            disabled={!canGenerate || !isReady}
+            className="h-auto rounded-full py-4 text-base disabled:hover:scale-100 md:text-lg"
+            data-testid="create-submit"
+          />
+        ))}
     </div>
+  );
+};
+
+// Tiny local icon helper so the blocked button's lock icon styling
+// stays co-located with the button it lives on.
+const FormCTAIcon = ({ blocked }: { blocked: boolean }) => {
+  if (!blocked) return null;
+  // Inline svg via FontAwesome to avoid pulling FontAwesomeIcon into
+  // the SubmitButton (which would shift its bundle). Tiny inline.
+  // We re-use the duotone faLock by component for the blocked-button
+  // affordance — keeps the lock visual language consistent with the
+  // pill above.
+  return (
+    <span
+      className="inline-flex h-5 w-5 items-center justify-center"
+      aria-hidden="true"
+    >
+      <svg
+        viewBox={`0 0 ${faLock.icon[0]} ${faLock.icon[1]}`}
+        className="h-4 w-4 fill-current"
+      >
+        <path d={faLock.icon[4] as string} />
+      </svg>
+    </span>
   );
 };
 

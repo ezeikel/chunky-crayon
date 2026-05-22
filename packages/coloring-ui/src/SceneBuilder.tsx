@@ -121,6 +121,15 @@ export type SceneBuilderProps = {
   /** Final "Create!" tap. Enabled only when required steps are satisfied. */
   onCreate?: () => void;
   /**
+   * When true, the Create button renders in a blocked-visual state
+   * (lock icon, muted) and tap fires `onCreateBlockedTap` instead of
+   * `onCreate`. Used to surface the in-form paywall at the START of
+   * the wizard rather than after the kid has finished it.
+   */
+  createBlocked?: boolean;
+  /** Tap on the blocked Create button. */
+  onCreateBlockedTap?: () => void;
+  /**
    * Option keys to render locked (blocked from selection) — used for the
    * `your-character` tile when the kid has no saved character yet.
    * Keyed by layer id → locked option keys.
@@ -509,6 +518,8 @@ const SceneBuilder = ({
   onSelectionChange,
   onSurpriseMe,
   onCreate,
+  createBlocked = false,
+  onCreateBlockedTap,
   lockedKeys,
   onLockedTap,
   disabled = false,
@@ -579,22 +590,33 @@ const SceneBuilder = ({
   // brand-fill circle, scale-on-active, that's it.
 
   // Primary (go forward / create) — solid brand fill.
+  //
+  // Three render states:
+  //   - enabled       → solid brand fill, normal icon, tap fires onClick
+  //   - disabled      → muted fill, not tappable (e.g. required step empty)
+  //   - blocked       → dimmed brand fill + lock icon, STILL tappable
+  //                     (caller opens a paywall on tap). Distinguishes
+  //                     "you can't do this yet" from "you can't do this
+  //                     unless you pay" — the latter is a CTA, not a wall.
   const PrimaryAction = ({
     icon,
     label,
     onClick,
     enabled,
+    blocked = false,
     large = false,
   }: {
     icon: IconDefinition;
     label: string;
     onClick: () => void;
     enabled: boolean;
+    blocked?: boolean;
     large?: boolean;
   }) => (
     <button
       type="button"
-      disabled={!enabled || disabled}
+      // Blocked stays tappable — caller opens a paywall on tap.
+      disabled={blocked ? false : !enabled || disabled}
       onClick={onClick}
       aria-label={label}
       title={label}
@@ -603,12 +625,17 @@ const SceneBuilder = ({
         "transition-transform duration-coloring-base",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-coloring-accent",
         large ? "size-14" : "size-12",
-        enabled && !disabled
-          ? "bg-coloring-accent text-white hover:brightness-105 active:scale-95"
-          : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
+        blocked
+          ? "bg-coloring-accent/60 text-white hover:brightness-105 active:scale-95"
+          : enabled && !disabled
+            ? "bg-coloring-accent text-white hover:brightness-105 active:scale-95"
+            : "cursor-not-allowed bg-coloring-surface-dark text-coloring-muted",
       )}
     >
-      <FontAwesomeIcon icon={icon} className={large ? "text-xl" : "text-lg"} />
+      <FontAwesomeIcon
+        icon={blocked ? faLock : icon}
+        className={large ? "text-xl" : "text-lg"}
+      />
     </button>
   );
 
@@ -729,8 +756,11 @@ const SceneBuilder = ({
               <PrimaryAction
                 icon={faWandMagicSparkles}
                 label={labels.create ?? "Create!"}
-                onClick={() => onCreate?.()}
+                onClick={() =>
+                  createBlocked ? onCreateBlockedTap?.() : onCreate?.()
+                }
                 enabled={canCreate}
+                blocked={createBlocked}
                 large
               />
             )}
@@ -767,8 +797,11 @@ const SceneBuilder = ({
             <PrimaryAction
               icon={faWandMagicSparkles}
               label={labels.create ?? "Create!"}
-              onClick={() => onCreate?.()}
+              onClick={() =>
+                createBlocked ? onCreateBlockedTap?.() : onCreate?.()
+              }
               enabled={canCreate}
+              blocked={createBlocked}
               large
             />
           </div>

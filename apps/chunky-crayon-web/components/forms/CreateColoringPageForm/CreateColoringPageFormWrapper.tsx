@@ -1,3 +1,4 @@
+import { getCurrencyForRequest } from '@/lib/currency.server';
 import CreateColoringPageForm from './CreateColoringPageForm';
 
 type CreateColoringPageFormWrapperProps = {
@@ -10,16 +11,26 @@ type CreateColoringPageFormWrapperProps = {
   location?: 'homepage' | 'start';
 };
 
-function CreateColoringPageFormWrapper({
+/**
+ * Async server wrapper. Resolves the geo currency here (not in the page
+ * component) so reading the `x-vercel-ip-country` header doesn't push
+ * the whole page out of the static shell — the wrapper is always
+ * rendered inside a Suspense boundary, so only this subtree is dynamic.
+ * Currency is forwarded to the form for the in-form PaywallModal's
+ * plan prices.
+ */
+async function CreateColoringPageFormWrapper({
   className,
   size = 'default',
   location,
 }: CreateColoringPageFormWrapperProps) {
+  const currency = await getCurrencyForRequest();
   return (
     <CreateColoringPageForm
       className={className}
       size={size}
       location={location}
+      currency={currency}
     />
   );
 }

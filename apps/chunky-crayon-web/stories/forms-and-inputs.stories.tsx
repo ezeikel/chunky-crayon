@@ -56,7 +56,16 @@ export const InputModePieces: Story = {
               onChange={() => undefined}
               isSubscriber={false}
             />
-            <FormCTA />
+            <FormCTA
+              openPaywall={() => undefined}
+              user={{
+                canGenerate: true,
+                blockedReason: null,
+                hasActiveSubscription: false,
+                isGuest: false,
+                guestGenerationsRemaining: 2,
+              }}
+            />
           </div>
         </InputModeProvider>
       </div>

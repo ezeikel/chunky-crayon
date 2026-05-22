@@ -1392,7 +1392,36 @@
     "subtextNoCredits": "You're out of credits. Top up or upgrade!",
     "subtextNoCreditsSubscribed": "Need more magic? Top up or upgrade to keep the creativity going!",
     "subtextNoCreditsNoSubscription": "Pick a subscription, or buy a few credits to keep going.",
-    "subtextFallback": "You'll get 15 free credits, enough to create 3 pages!"
+    "subtextFallback": "You'll get 15 free credits, enough to create 3 pages!",
+    "blockReason": {
+      "guestLimit": "Out of free tries",
+      "noSubscription": "Subscribe to keep going",
+      "subscriberNoCredits": "Top up to keep going"
+    }
+  },
+  "paywall": {
+    "guestLimit": {
+      "title": "You've used your free tries",
+      "subtitle": "Subscribe to keep creating, or grab 15 more free with an account."
+    },
+    "noSubscription": {
+      "title": "All out of credits",
+      "subtitle": "Pick a plan to keep creating."
+    },
+    "subscriberNoCredits": {
+      "title": "All out of credits",
+      "subtitle": "You've used this month's credits. Grab a top-up pack to keep going.",
+      "primary": "See pack options"
+    },
+    "common": {
+      "subscribe": "Subscribe",
+      "creditsPerMonth": "{count} credits a month",
+      "perMonth": "per month",
+      "popular": "Popular",
+      "seeAllPlans": "See packs and full plan details",
+      "signUpFree": "Sign up for 15 free credits",
+      "dismiss": "Maybe later"
+    }
   },
   "feedback": {
     "title": "What's on your mind?",

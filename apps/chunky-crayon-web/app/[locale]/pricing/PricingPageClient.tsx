@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { loadStripe } from '@stripe/stripe-js';
-import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -17,7 +15,7 @@ import {
   faShieldCheck,
 } from '@fortawesome/pro-duotone-svg-icons';
 import { faCheck } from '@fortawesome/pro-solid-svg-icons';
-import { PlanName, BillingPeriod } from '@one-colored-pixel/db/types';
+import { PlanName } from '@one-colored-pixel/db/types';
 import {
   PlanInterval,
   SOCIAL_PROOF_STATS,
@@ -37,12 +35,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import cn from '@/utils/cn';
-import { createCheckoutSession } from '@/app/actions/stripe';
+import { useStripeCheckout } from '@/hooks/useStripeCheckout';
 import FadeIn from '@/components/motion/FadeIn';
 import StaggerChildren from '@/components/motion/StaggerChildren';
 import StaggerItem from '@/components/motion/StaggerItem';
 import CrayonScribble from '@/components/Intro/CrayonScribble';
-import { trackViewContent, trackInitiateCheckout } from '@/utils/pixels';
+import { trackViewContent } from '@/utils/pixels';
 import FAQ from '@/components/FAQ/FAQ';
 import Testimonials, { StarRating } from '@/components/Testimonials';
 import { Experiment } from '@/components/experiment/Experiment';
@@ -55,10 +53,6 @@ const planSeeds: Record<PlanName, number> = {
   [PlanName.RAINBOW]: 287,
   [PlanName.SPARKLE]: 419,
 };
-
-// make sure to call `loadStripe` outside of a component's render to avoid
-// recreating the `Stripe` object on every render
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
 
 // Map PlanName enum to translation keys
 const planKeyMap: Record<PlanName, string> = {
@@ -94,10 +88,9 @@ const PricingPageClient = ({
   variant = 'subscriptions_primary',
 }: PricingPageClientProps) => {
   const t = useTranslations('pricing');
-  const tErrors = useTranslations('errors');
   const [interval, setInterval] = useState<PlanInterval>('monthly');
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [loadingPack, setLoadingPack] = useState<string | null>(null);
+  const { loadingPlan, loadingPack, purchasePlan, purchasePack } =
+    useStripeCheckout({ currency, source: 'pricing_page' });
   const plans = SUBSCRIPTION_PLANS[interval];
 
   const intervalLabels: Record<PlanInterval, string> = {
@@ -151,189 +144,17 @@ const PricingPageClient = ({
     return () => observer.disconnect();
   }, [variant, secondaryType]);
 
-  const handlePlanPurchase = async (
+  // Thin wrappers — the real work (tracking, Stripe, redirect, error
+  // handling) lives in useStripeCheckout so the PaywallModal can reuse it.
+  const handlePlanPurchase = (
     plan: (typeof plans)[0],
     section: SectionPosition,
-  ) => {
-    const planTranslationKey = planKeyMap[plan.key];
-    const planName = t(`plans.${planTranslationKey}.name`);
-    const priceEntry = plan.prices[currency];
-    setLoadingPlan(planName);
+  ) => purchasePlan({ plan, interval, variant, section });
 
-    trackEvent(TRACKING_EVENTS.PRICING_PLAN_CLICKED, {
-      productType: 'subscription',
-      planName: plan.key,
-      planInterval:
-        interval === 'monthly' ? BillingPeriod.MONTHLY : BillingPeriod.ANNUAL,
-      price: priceEntry.display,
-      variant,
-      section,
-    });
-
-    // Meta Pixel InitiateCheckout — dedupe with server CAPI via shared
-    // eventId. Pinterest piggybacks on Purchase, no InitiateCheckout
-    // there.
-    const priceInMinorUnits =
-      parseInt(priceEntry.display.replace(/[^0-9]/g, ''), 10) * 100;
-    const initiateCheckoutEventId = crypto.randomUUID();
-    trackInitiateCheckout({
-      value: priceInMinorUnits,
-      currency,
-      productType: 'subscription',
-      planName: plan.key,
-      eventId: initiateCheckoutEventId,
-    });
-
-    try {
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error('Stripe failed to load');
-
-      const session = await createCheckoutSession(
-        priceEntry.stripePriceEnv,
-        'subscription',
-        undefined,
-        initiateCheckoutEventId,
-      );
-
-      if (!session || !session.id) {
-        const errorMessage =
-          session?.error || 'Failed to create checkout session';
-        console.error('Checkout session error:', errorMessage);
-        trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
-          productType: 'subscription',
-          planName: plan.key,
-          stage: 'session_create',
-          reason: errorMessage,
-        });
-        toast.error(errorMessage);
-        return;
-      }
-
-      // Stripe session exists and we're about to hand off. This is the
-      // last event we control before the Stripe-hosted page — it closes
-      // the previously-dark gap between pricing_plan_clicked and
-      // checkout_completed.
-      trackEvent(TRACKING_EVENTS.CHECKOUT_STARTED, {
-        productType: 'subscription',
-        planName: plan.key,
-        planInterval:
-          interval === 'monthly' ? BillingPeriod.MONTHLY : BillingPeriod.ANNUAL,
-      });
-
-      const { error } = await stripe.redirectToCheckout({
-        sessionId: session.id,
-      });
-      if (error) {
-        console.error('Stripe redirect error:', error);
-        trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
-          productType: 'subscription',
-          planName: plan.key,
-          stage: 'redirect',
-          reason: error.message,
-        });
-        toast.error(error.message || 'Failed to redirect to checkout');
-      }
-    } catch (error) {
-      console.error('Error purchasing plan:', error);
-      trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
-        productType: 'subscription',
-        planName: plan.key,
-        stage: 'exception',
-        reason: error instanceof Error ? error.message : 'unknown',
-      });
-      toast.error(tErrors('unexpectedError'));
-    } finally {
-      setLoadingPlan(null);
-    }
-  };
-
-  const handlePackPurchase = async (
+  const handlePackPurchase = (
     pack: (typeof CREDIT_PACKS_PUBLIC)[0],
     section: SectionPosition,
-  ) => {
-    const priceEntry = pack.prices[currency];
-    setLoadingPack(pack.key);
-
-    trackEvent(TRACKING_EVENTS.PRICING_PLAN_CLICKED, {
-      productType: 'pack',
-      packKey: pack.key as
-        | 'PUBLIC_CREDITS_50'
-        | 'PUBLIC_CREDITS_200'
-        | 'PUBLIC_CREDITS_500',
-      credits: pack.credits,
-      price: priceEntry.display,
-      variant,
-      section,
-    });
-
-    const priceInMinorUnits = Math.round(
-      parseFloat(priceEntry.display.replace(/[^0-9.]/g, '')) * 100,
-    );
-    const initiateCheckoutEventId = crypto.randomUUID();
-    trackInitiateCheckout({
-      value: priceInMinorUnits,
-      currency,
-      productType: 'credits',
-      creditAmount: pack.credits,
-      eventId: initiateCheckoutEventId,
-    });
-
-    try {
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error('Stripe failed to load');
-
-      const session = await createCheckoutSession(
-        priceEntry.stripePriceEnv,
-        'payment',
-        '/pricing',
-        initiateCheckoutEventId,
-      );
-
-      if (!session || !session.id) {
-        const errorMessage = session?.error || 'Failed to start checkout';
-        console.error('Pack checkout session error:', errorMessage);
-        trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
-          productType: 'pack',
-          packKey: pack.key,
-          stage: 'session_create',
-          reason: errorMessage,
-        });
-        toast.error(errorMessage);
-        return;
-      }
-
-      trackEvent(TRACKING_EVENTS.CHECKOUT_STARTED, {
-        productType: 'pack',
-        packKey: pack.key,
-        credits: pack.credits,
-      });
-
-      const { error } = await stripe.redirectToCheckout({
-        sessionId: session.id,
-      });
-      if (error) {
-        console.error('Stripe redirect error:', error);
-        trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
-          productType: 'pack',
-          packKey: pack.key,
-          stage: 'redirect',
-          reason: error.message,
-        });
-        toast.error(error.message || 'Checkout failed');
-      }
-    } catch (err) {
-      console.error('[pack-checkout]', err);
-      trackEvent(TRACKING_EVENTS.CHECKOUT_FAILED, {
-        productType: 'pack',
-        packKey: pack.key,
-        stage: 'exception',
-        reason: err instanceof Error ? err.message : 'unknown',
-      });
-      toast.error(tErrors('unexpectedError'));
-    } finally {
-      setLoadingPack(null);
-    }
-  };
+  ) => purchasePack({ pack, variant, section });
 
   const handleSecondaryCtaClick = () => {
     trackEvent(TRACKING_EVENTS.PRICING_SECONDARY_CTA_CLICKED, {
@@ -497,7 +318,7 @@ const PricingPageClient = ({
                       isPrimary ? 'text-base py-6' : 'text-sm py-4',
                     )}
                     onClick={() => handlePlanPurchase(plan, section)}
-                    disabled={loadingPlan === planName}
+                    disabled={loadingPlan === plan.key}
                   >
                     {t('buyNow')}
                   </Button>
