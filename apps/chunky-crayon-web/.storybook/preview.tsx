@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { SessionProvider } from 'next-auth/react';
 import { Toaster } from '@/components/ui/sonner';
 import { ColoringContextProvider } from '@one-colored-pixel/coloring-ui';
+import { ParentalGateProvider } from '@/components/ParentalGate';
 import appMessages from '../messages/en.json';
 import sharedMessages from '../../../packages/translations/src/en.json';
 import '../global.css';
@@ -126,10 +127,15 @@ const preview: Preview = {
         <NextIntlClientProvider locale="en" messages={messages}>
           <SessionProvider session={session}>
             <ColoringContextProvider variant="kids" storagePrefix="storybook">
-              <div className="min-h-screen bg-paper font-rooney-sans text-text-primary">
-                <Story />
-                <Toaster />
-              </div>
+              {/* InputModeSelector (and anything under CreateColoringPageForm)
+                  calls useParentalGate, which throws without this provider.
+                  Global so every story has the gate context available. */}
+              <ParentalGateProvider>
+                <div className="min-h-screen bg-paper font-rooney-sans text-text-primary">
+                  <Story />
+                  <Toaster />
+                </div>
+              </ParentalGateProvider>
             </ColoringContextProvider>
           </SessionProvider>
         </NextIntlClientProvider>
