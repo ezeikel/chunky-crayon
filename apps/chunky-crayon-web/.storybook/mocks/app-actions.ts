@@ -35,3 +35,7 @@ export const describeImage = async () => ({ description: 'A family photo' });
 export const listCharactersForPicker = async () => [];
 export const listCharactersForActiveProfile = async () => [];
 export const getCharacters = async () => [];
+export const createCharacter = async () => ({
+  ok: true as const,
+  characterId: 'storybook-character',
+});

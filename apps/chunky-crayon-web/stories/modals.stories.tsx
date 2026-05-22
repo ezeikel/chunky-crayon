@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -7,7 +7,11 @@ import {
   faLock,
   faSparkles,
 } from '@fortawesome/pro-duotone-svg-icons';
-import { MagicColorOverlay } from '@one-colored-pixel/coloring-ui';
+import {
+  AutoColorModal,
+  MagicColorOverlay,
+  useColoringContext,
+} from '@one-colored-pixel/coloring-ui';
 import {
   Dialog,
   DialogContent,
@@ -17,16 +21,37 @@ import {
 } from '@/components/ui/dialog';
 import ParentalGateModal from '@/components/ParentalGate/ParentalGateModal';
 import FeedbackDialog from '@/components/FeedbackDialog/FeedbackDialog';
+import PaywallModal, {
+  type PaywallState,
+} from '@/components/PaywallModal/PaywallModal';
+import CreateProfileModal from '@/components/CreateProfileModal/CreateProfileModal';
+import EmailCaptureModal, {
+  EMAIL_CAPTURE_PROMPT_EVENT,
+} from '@/components/EmailCaptureModal/EmailCaptureModal';
+import CreateCharacterModal from '@/components/Characters/CreateCharacterModal/CreateCharacterModal';
+import ShareArtworkModal from '@/components/ShareArtworkModal/ShareArtworkModal';
+import StickerDetailModal from '@/components/StickerBook/StickerDetailModal';
+import AdultGate from '@/components/AdultGate';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
 import { Button } from '@/components/ui/button';
+import { STICKER_CATALOG } from '@/lib/stickers/catalog';
 
+/**
+ * The Modals section. Every modal that exists in the Chunky Crayon web
+ * app gets a story here, in its meaningful states — a Modals section
+ * must not be missing a modal that exists in the app.
+ *
+ * Modals are rendered with `open` forced true so the dialog content is
+ * visible in the Storybook canvas. State-bearing modals (Paywall,
+ * ShareArtwork) get one story per state.
+ */
 const meta = {
   title: 'Chunky Crayon/05 Modals',
   parameters: {
     docs: {
       description: {
         component:
-          'Modal shells and high-friction flows used across Chunky Crayon. These stories keep modal typography, icon badges, borders, and action rows easy to compare.',
+          'Modal shells and high-friction flows used across Chunky Crayon. These stories keep modal typography, icon badges, borders, and action rows easy to compare. Every modal in the app appears here, in its meaningful states.',
       },
     },
   },
@@ -40,6 +65,12 @@ const modalIconStyle = {
   '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
   '--fa-secondary-opacity': '1',
 } as React.CSSProperties;
+
+const Stage = ({ children }: { children: React.ReactNode }) => (
+  <main className="min-h-screen bg-paper p-8">{children}</main>
+);
+
+// ─── Generic dialog shell ─────────────────────────────────────────────
 
 const OpenDialogShell = () => (
   <Dialog open>
@@ -68,6 +99,17 @@ const OpenDialogShell = () => (
   </Dialog>
 );
 
+export const DialogShellOpen: Story = {
+  name: 'Dialog shell',
+  render: () => (
+    <Stage>
+      <OpenDialogShell />
+    </Stage>
+  ),
+};
+
+// ─── ParentalGateModal ────────────────────────────────────────────────
+
 const OpenParentalGate = () => {
   const [open, setOpen] = useState(true);
   return (
@@ -78,6 +120,17 @@ const OpenParentalGate = () => {
     />
   );
 };
+
+export const ParentalGateOpen: Story = {
+  name: 'Parental gate',
+  render: () => (
+    <Stage>
+      <OpenParentalGate />
+    </Stage>
+  ),
+};
+
+// ─── FeedbackDialog ───────────────────────────────────────────────────
 
 const OpenFeedbackDialog = () => {
   const [open, setOpen] = useState(true);
@@ -92,6 +145,189 @@ const OpenFeedbackDialog = () => {
   );
 };
 
+export const FeedbackOpen: Story = {
+  name: 'Feedback dialog',
+  render: () => (
+    <Stage>
+      <OpenFeedbackDialog />
+    </Stage>
+  ),
+};
+
+// ─── PaywallModal — three states ──────────────────────────────────────
+
+const OpenPaywall = ({ state }: { state: PaywallState }) => {
+  const [open, setOpen] = useState(true);
+  return (
+    <PaywallModal
+      open={open}
+      onOpenChange={setOpen}
+      state={state}
+      triggerLocation="storybook"
+      currency="GBP"
+    />
+  );
+};
+
+export const PaywallGuestLimit: Story = {
+  name: 'Paywall — guest limit',
+  render: () => (
+    <Stage>
+      <OpenPaywall state="guest_limit" />
+    </Stage>
+  ),
+};
+
+export const PaywallNoSubscription: Story = {
+  name: 'Paywall — no subscription',
+  render: () => (
+    <Stage>
+      <OpenPaywall state="no_subscription" />
+    </Stage>
+  ),
+};
+
+export const PaywallSubscriberNoCredits: Story = {
+  name: 'Paywall — subscriber out of credits',
+  render: () => (
+    <Stage>
+      <OpenPaywall state="subscriber_no_credits" />
+    </Stage>
+  ),
+};
+
+// ─── CreateProfileModal ───────────────────────────────────────────────
+
+const OpenCreateProfile = () => {
+  const [open, setOpen] = useState(true);
+  return <CreateProfileModal open={open} onOpenChange={setOpen} />;
+};
+
+export const CreateProfileOpen: Story = {
+  name: 'Create profile',
+  render: () => (
+    <Stage>
+      <OpenCreateProfile />
+    </Stage>
+  ),
+};
+
+// ─── EmailCaptureModal ────────────────────────────────────────────────
+// Self-managed: it opens in response to a DOM event after a short delay.
+// The story fires that event on mount so the modal appears in the canvas.
+
+const OpenEmailCapture = () => {
+  useEffect(() => {
+    // Clear any prior dismiss/capture state so the modal is eligible.
+    try {
+      window.localStorage.removeItem('cc_email_captured');
+      window.localStorage.removeItem('cc_email_modal_dismissed_at');
+    } catch {
+      // ignore — Safari private mode
+    }
+    document.dispatchEvent(new Event(EMAIL_CAPTURE_PROMPT_EVENT));
+  }, []);
+  return <EmailCaptureModal sourceSlug="storybook" />;
+};
+
+export const EmailCaptureOpen: Story = {
+  name: 'Email capture',
+  render: () => (
+    <Stage>
+      <OpenEmailCapture />
+    </Stage>
+  ),
+};
+
+// ─── CreateCharacterModal (Character Builder — 5-step wizard) ──────────
+
+const OpenCreateCharacter = () => {
+  const [open, setOpen] = useState(true);
+  return <CreateCharacterModal open={open} onClose={() => setOpen(false)} />;
+};
+
+export const CreateCharacterOpen: Story = {
+  name: 'Create character (Character Builder)',
+  render: () => (
+    <Stage>
+      <OpenCreateCharacter />
+    </Stage>
+  ),
+};
+
+// ─── ShareArtworkModal — gate + options states ────────────────────────
+// The modal opens at the AdultGate step; pass the gate to reach options.
+
+const OpenShareArtwork = () => {
+  const [open, setOpen] = useState(true);
+  return (
+    <ShareArtworkModal
+      artworkId="storybook-artwork"
+      artworkTitle="Maya's Friendly Dragon"
+      artworkImageUrl="/images/colo.svg"
+      isOpen={open}
+      onClose={() => setOpen(false)}
+    />
+  );
+};
+
+export const ShareArtworkGate: Story = {
+  name: 'Share artwork — adult gate',
+  render: () => (
+    <Stage>
+      <OpenShareArtwork />
+    </Stage>
+  ),
+};
+
+// ─── AdultGate (standalone — also embedded in ShareArtworkModal) ───────
+
+export const AdultGateOpen: Story = {
+  name: 'Adult gate',
+  render: () => (
+    <Stage>
+      <div className="flex justify-center pt-12">
+        <AdultGate onSuccess={() => undefined} onCancel={() => undefined} />
+      </div>
+    </Stage>
+  ),
+};
+
+// ─── StickerDetailModal — unlocked + locked ───────────────────────────
+
+const sampleSticker = STICKER_CATALOG[0];
+
+export const StickerDetailUnlocked: Story = {
+  name: 'Sticker detail — unlocked',
+  render: () => (
+    <Stage>
+      <StickerDetailModal
+        sticker={sampleSticker}
+        isUnlocked
+        unlockedAt={new Date('2026-05-01')}
+        isOpen
+        onClose={() => undefined}
+      />
+    </Stage>
+  ),
+};
+
+export const StickerDetailLocked: Story = {
+  name: 'Sticker detail — locked',
+  render: () => (
+    <Stage>
+      <StickerDetailModal
+        sticker={sampleSticker}
+        isUnlocked={false}
+        isOpen
+        onClose={() => undefined}
+      />
+    </Stage>
+  ),
+};
+
+// ─── MagicColorOverlay (coloring-ui — modal-shaped canvas overlay) ─────
+
 const ColoringCanvasShell = ({ children }: { children: React.ReactNode }) => (
   <div className="relative mx-auto h-[420px] w-full max-w-2xl overflow-hidden rounded-coloring-card border-2 border-paper-cream-dark bg-paper shadow-card">
     <div className="absolute inset-8 rounded-3xl border-2 border-paper-cream-dark bg-white" />
@@ -99,33 +335,10 @@ const ColoringCanvasShell = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-export const DialogShellOpen: Story = {
-  render: () => (
-    <main className="min-h-screen bg-paper p-8">
-      <OpenDialogShell />
-    </main>
-  ),
-};
-
-export const ParentalGateOpen: Story = {
-  render: () => (
-    <main className="min-h-screen bg-paper p-8">
-      <OpenParentalGate />
-    </main>
-  ),
-};
-
-export const FeedbackOpen: Story = {
-  render: () => (
-    <main className="min-h-screen bg-paper p-8">
-      <OpenFeedbackDialog />
-    </main>
-  ),
-};
-
 export const GettingColoursReady: Story = {
+  name: 'Magic colours — loading',
   render: () => (
-    <main className="min-h-screen bg-paper p-8">
+    <Stage>
       <ColoringCanvasShell>
         <MagicColorOverlay
           state="loading"
@@ -137,13 +350,14 @@ export const GettingColoursReady: Story = {
           }}
         />
       </ColoringCanvasShell>
-    </main>
+    </Stage>
   ),
 };
 
 export const MagicColoursError: Story = {
+  name: 'Magic colours — error',
   render: () => (
-    <main className="min-h-screen bg-paper p-8">
+    <Stage>
       <ColoringCanvasShell>
         <MagicColorOverlay
           state="error"
@@ -154,11 +368,36 @@ export const MagicColoursError: Story = {
           }}
         />
       </ColoringCanvasShell>
-    </main>
+    </Stage>
   ),
 };
 
+// ─── AutoColorModal (coloring-ui — full-page auto-color overlay) ──────
+// Driven by the coloring context's `isAutoColoring` flag; the story
+// flips it true on mount so the overlay shows.
+
+const OpenAutoColorModal = () => {
+  const { setIsAutoColoring } = useColoringContext();
+  useEffect(() => {
+    setIsAutoColoring(true);
+    return () => setIsAutoColoring(false);
+  }, [setIsAutoColoring]);
+  return <AutoColorModal />;
+};
+
+export const AutoColorOpen: Story = {
+  name: 'Auto-color overlay',
+  render: () => (
+    <Stage>
+      <OpenAutoColorModal />
+    </Stage>
+  ),
+};
+
+// ─── Launcher overview ────────────────────────────────────────────────
+
 export const ModalLauncherGrid: Story = {
+  name: 'Launcher grid',
   render: () => (
     <main className="p-8">
       <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-3">

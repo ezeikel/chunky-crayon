@@ -67,6 +67,7 @@ apps/chunky-crayon-web/.env.local.bak-*
 apps/chunky-crayon-worker/tmp/
 
 # Storybook build artifacts + logs
+apps/chunky-crayon-web/storybook-static/
 packages/coloring-ui/storybook-static/
 packages/coloring-ui/debug-storybook.log
 
