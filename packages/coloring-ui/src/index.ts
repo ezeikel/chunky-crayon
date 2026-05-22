@@ -132,9 +132,13 @@ export {
   type InputModeSelectorLabels,
 } from "./InputModeSelector";
 
-// Scene Builder — privacy-first default create surface
+// Scene Builder — privacy-first default create surface.
+// SceneTile + TileCarousel are also exported standalone so the Character
+// Builder can reuse the exact same illustration-tile UI.
 export {
   default as SceneBuilder,
+  SceneTile,
+  TileCarousel,
   type SceneBuilderProps,
   type SceneBuilderLabels,
   type SceneLayer,

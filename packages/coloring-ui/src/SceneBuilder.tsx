@@ -155,7 +155,7 @@ type SceneTileProps = {
   onToggle: () => void;
 };
 
-const SceneTile = ({
+export const SceneTile = ({
   option,
   selected,
   locked,
@@ -358,7 +358,7 @@ type TileCarouselProps = {
   onLockedTap?: (optionKey: string) => void;
 };
 
-const TileCarousel = ({
+export const TileCarousel = ({
   layer,
   selected,
   locked,

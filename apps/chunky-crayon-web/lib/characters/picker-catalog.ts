@@ -36,8 +36,16 @@ import {
   faHeart,
   faBaseballBatBall,
   faMagnifyingGlass,
+  faFaceSmileBeam,
+  faFaceGrinStars,
+  faFaceSmile,
+  faFaceSleeping,
+  faFaceAwesome,
+  faFaceGrinTongue,
+  faFaceSmileRelaxed,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import type { VoicePersonaKey } from './voice-persona-types';
 
 // ─── Species ──────────────────────────────────────────────────────────────
 
@@ -72,8 +80,16 @@ export type SpeciesOption = {
   icon: IconDefinition;
   /** Singular noun fragment used when building shortPrompt. */
   noun: string;
-  /** Duotone palette for the icon. */
+  /** Duotone palette for the icon (FA fallback when no illustration). */
   duotone: DuotoneStyle;
+  /**
+   * R2 key for the tile illustration, e.g.
+   * `character-thumbnails/species/dragon.png`. Resolved to a public URL
+   * at render time via `resolveThumbnailUrl`. `null` until the
+   * generation script (`generate-character-thumbnails.ts`) fills it;
+   * the SceneTile falls back to the FA `icon` while null.
+   */
+  thumbnailKey: string | null;
 };
 
 export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
@@ -86,6 +102,7 @@ export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-pink))',
     },
+    thumbnailKey: 'character-thumbnails/species/dragon.png',
   },
   {
     key: 'puppy',
@@ -96,6 +113,7 @@ export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-yellow))',
     },
+    thumbnailKey: 'character-thumbnails/species/puppy.png',
   },
   {
     key: 'kitten',
@@ -106,6 +124,7 @@ export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
       primary: 'hsl(var(--crayon-pink))',
       secondary: 'hsl(var(--crayon-purple))',
     },
+    thumbnailKey: 'character-thumbnails/species/kitten.png',
   },
   // No pro-duotone unicorn icon in the codebase's existing pool —
   // a star/sparkle reads "magical" and works as the unicorn anchor.
@@ -118,6 +137,7 @@ export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-pink))',
     },
+    thumbnailKey: 'character-thumbnails/species/unicorn.png',
   },
   {
     key: 'robot',
@@ -128,6 +148,7 @@ export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-purple))',
     },
+    thumbnailKey: 'character-thumbnails/species/robot.png',
   },
   {
     key: 'kid',
@@ -138,6 +159,7 @@ export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-teal))',
     },
+    thumbnailKey: 'character-thumbnails/species/kid.png',
   },
   {
     key: 'fairy',
@@ -148,6 +170,7 @@ export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-yellow))',
     },
+    thumbnailKey: 'character-thumbnails/species/fairy.png',
   },
   {
     key: 'monster',
@@ -158,6 +181,7 @@ export const SPECIES_OPTIONS: readonly SpeciesOption[] = [
       primary: 'hsl(var(--crayon-green))',
       secondary: 'hsl(var(--crayon-teal))',
     },
+    thumbnailKey: 'character-thumbnails/species/monster.png',
   },
 ] as const;
 
@@ -251,6 +275,11 @@ export type TraitOption = {
     | 'gentle-neutral';
   /** Duotone palette so the trait icons read as a playful rainbow. */
   duotone: DuotoneStyle;
+  /**
+   * R2 key for the tile illustration (FA `icon` is the fallback).
+   * `null` until `generate-character-thumbnails.ts` fills it.
+   */
+  thumbnailKey: string | null;
 };
 
 export const TRAIT_OPTIONS: readonly TraitOption[] = [
@@ -264,6 +293,7 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-yellow))',
     },
+    thumbnailKey: 'character-thumbnails/trait/brave.png',
   },
   {
     key: 'sleepy',
@@ -275,6 +305,7 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
       primary: 'hsl(var(--crayon-purple))',
       secondary: 'hsl(var(--crayon-teal))',
     },
+    thumbnailKey: 'character-thumbnails/trait/sleepy.png',
   },
   {
     key: 'silly',
@@ -286,6 +317,7 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-orange))',
     },
+    thumbnailKey: 'character-thumbnails/trait/silly.png',
   },
   {
     key: 'shy',
@@ -297,6 +329,7 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
       primary: 'hsl(var(--crayon-pink))',
       secondary: 'hsl(var(--crayon-purple))',
     },
+    thumbnailKey: 'character-thumbnails/trait/shy.png',
   },
   {
     key: 'loves-snacks',
@@ -308,6 +341,7 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
       primary: 'hsl(var(--crayon-orange))',
       secondary: 'hsl(var(--crayon-pink))',
     },
+    thumbnailKey: 'character-thumbnails/trait/loves-snacks.png',
   },
   {
     key: 'bouncy',
@@ -319,6 +353,7 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
       primary: 'hsl(var(--crayon-green))',
       secondary: 'hsl(var(--crayon-teal))',
     },
+    thumbnailKey: 'character-thumbnails/trait/bouncy.png',
   },
   {
     key: 'curious',
@@ -330,6 +365,7 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
       primary: 'hsl(var(--crayon-teal))',
       secondary: 'hsl(var(--crayon-green))',
     },
+    thumbnailKey: 'character-thumbnails/trait/curious.png',
   },
   {
     key: 'sparkly',
@@ -341,8 +377,112 @@ export const TRAIT_OPTIONS: readonly TraitOption[] = [
       primary: 'hsl(var(--crayon-yellow))',
       secondary: 'hsl(var(--crayon-pink))',
     },
+    thumbnailKey: 'character-thumbnails/trait/sparkly.png',
   },
 ] as const;
 
 /** Hard cap on how many traits a kid can pick. More than 3 confuses gpt-image-2. */
 export const MAX_TRAITS = 3;
+
+// ─── Voice personas ────────────────────────────────────────────────────────
+
+/**
+ * Voice persona picker tiles. Moved here from CreateCharacterModal so the
+ * thumbnail-generation script has one catalog to read. Decoupled from
+ * voice-personas.ts (which reads env vars and must stay server-only) —
+ * keys MUST stay aligned with VoicePersonaKey.
+ *
+ * Like species + traits, each tile carries an FA `icon` fallback and a
+ * `thumbnailKey` the generation script fills with an illustration.
+ */
+export type VoiceTileOption = {
+  key: VoicePersonaKey;
+  /** Tiny label shown under the tile. */
+  label: string;
+  icon: IconDefinition;
+  duotone: DuotoneStyle;
+  thumbnailKey: string | null;
+};
+
+export const VOICE_TILES: readonly VoiceTileOption[] = [
+  {
+    key: 'warm-girl-7yo',
+    label: 'Warm',
+    icon: faFaceSmileBeam,
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-orange))',
+    },
+    thumbnailKey: 'character-thumbnails/voice/warm-girl-7yo.png',
+  },
+  {
+    key: 'warm-boy-7yo',
+    label: 'Cosy',
+    icon: faFaceSmile,
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-pink))',
+    },
+    thumbnailKey: 'character-thumbnails/voice/warm-boy-7yo.png',
+  },
+  {
+    key: 'playful-girl-5yo',
+    label: 'Bouncy',
+    icon: faFaceGrinStars,
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-pink))',
+    },
+    thumbnailKey: 'character-thumbnails/voice/playful-girl-5yo.png',
+  },
+  {
+    key: 'playful-boy-5yo',
+    label: 'Playful',
+    icon: faFaceGrinTongue,
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-green))',
+    },
+    thumbnailKey: 'character-thumbnails/voice/playful-boy-5yo.png',
+  },
+  {
+    key: 'sleepy-neutral',
+    label: 'Sleepy',
+    icon: faFaceSleeping,
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-purple))',
+    },
+    thumbnailKey: 'character-thumbnails/voice/sleepy-neutral.png',
+  },
+  {
+    key: 'brave-neutral',
+    label: 'Brave',
+    icon: faFaceAwesome,
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-orange))',
+    },
+    thumbnailKey: 'character-thumbnails/voice/brave-neutral.png',
+  },
+  {
+    key: 'silly-neutral',
+    label: 'Silly',
+    icon: faFaceLaughBeam,
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-green))',
+    },
+    thumbnailKey: 'character-thumbnails/voice/silly-neutral.png',
+  },
+  {
+    key: 'gentle-neutral',
+    label: 'Gentle',
+    icon: faFaceSmileRelaxed,
+    duotone: {
+      primary: 'hsl(var(--crayon-yellow))',
+      secondary: 'hsl(var(--crayon-teal))',
+    },
+    thumbnailKey: 'character-thumbnails/voice/gentle-neutral.png',
+  },
+] as const;

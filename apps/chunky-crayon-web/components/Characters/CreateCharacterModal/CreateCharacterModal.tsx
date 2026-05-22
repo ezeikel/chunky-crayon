@@ -1,35 +1,42 @@
 'use client';
 
 /**
- * Icon-first character create flow. Five tap-driven steps:
+ * Kid-driven Create Character flow — five tap-driven steps, brought up
+ * to Scene Builder quality:
  *
- *   1. Species   — 4x2 icon grid (dragon, puppy, kitten, unicorn, robot,
- *                  kid, fairy, monster).
- *   2. Colour    — 6 chunky brand-palette swatches.
- *   3. Traits    — 8 icon chips, multi-select up to 3.
- *   4. Name      — auto-generated from species+traits; chunky shuffle button;
- *                  parent-only "change" link reveals a text input.
- *   5. Voice     — persona picker (icon tiles, optional).
+ *   1. Species  — illustration tiles in a carousel (TileCarousel).
+ *   2. Colour   — 6 chunky brand-palette swatches.
+ *   3. Traits   — illustration tiles, multi-select up to 3.
+ *   4. Name     — a "HELLO my name is" sticker name-tag; shuffle to
+ *                 re-roll, parent-only pencil for a custom name.
+ *   5. Voice    — illustration tiles (optional).
  *
- * No textarea anywhere. No free-text required to finish — every step is
- * tappable, including the name step (shuffle to keep, type only if you
- * want a custom name).
+ * The picker steps reuse `SceneTile` / `TileCarousel` from coloring-ui
+ * so the Character Builder reads as the same family as the Scene
+ * Builder — illustration tiles, calm select state, carousel. The
+ * catalogue (`lib/characters/picker-catalog.ts`) carries a
+ * `thumbnailKey` per option; SceneTile resolves it to a URL and falls
+ * back to the FA `icon` while a key is null.
  *
- * On submit we send structured picks to `createCharacter`; the server
- * constructs the shortPrompt deterministically. See
- * lib/characters/build-prompt-from-picks.ts for the prompt assembly.
+ * Framer Motion: steps slide/fade between, the name-tag springs in on
+ * generate, a confetti beat fires on a successful create. All gated by
+ * `useReducedMotion`.
  *
- * Why no parent gate:
- *   Creation is functionally the same as making a coloring page (kid
- *   describes thing → we draw it). The signed-in cookie IS the trust
- *   line. Parent gates stay on custom voice (1 credit) + delete.
+ * No textarea anywhere. No free-text required to finish. On submit we
+ * send structured picks to `createCharacter`; the server builds the
+ * shortPrompt deterministically.
  *
- * No em dashes. No "AI" word. US/UK-neutral. Tap targets ≥ 44pt.
+ * Why no parent gate: creation is functionally the same as making a
+ * coloring page — the signed-in cookie IS the trust line. Parent gates
+ * stay on custom voice (1 credit) + delete.
+ *
+ * No em dashes. No "AI" word. US/UK-neutral. Tap targets >= 44pt.
  */
 
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faShuffle,
@@ -37,16 +44,8 @@ import {
   faArrowRight,
   faArrowLeft,
   faXmark,
-  faFaceSmileBeam,
-  faFaceGrinStars,
-  faFaceSmile,
-  faFaceLaughBeam,
-  faFaceSleeping,
-  faFaceAwesome,
-  faFaceGrinTongue,
-  faFaceSmileRelaxed,
 } from '@fortawesome/pro-duotone-svg-icons';
-import type { DuotoneStyle } from '@/lib/characters/picker-catalog';
+import { TileCarousel, type SceneLayer } from '@one-colored-pixel/coloring-ui';
 import {
   Dialog,
   DialogClose,
@@ -63,6 +62,7 @@ import {
   MAX_TRAITS,
   SPECIES_OPTIONS,
   TRAIT_OPTIONS,
+  VOICE_TILES,
   type ColorKey,
   type SpeciesKey,
   type TraitKey,
@@ -70,6 +70,8 @@ import {
 import { generateCharacterName } from '@/lib/characters/name-generator';
 import { VOICE_PERSONAS } from '@/lib/characters/voice-personas';
 import type { VoicePersonaKey } from '@/lib/characters/voice-persona-types';
+import { resolveThumbnailUrl } from '@/lib/scene/thumbnail-url';
+import Confetti from '@/components/Confetti/Confetti';
 import cn from '@/utils/cn';
 
 type Props = {
@@ -90,114 +92,29 @@ const STEP_TITLES: Record<Step, string> = {
 };
 
 /**
- * Map a DuotoneStyle to the inline CSS vars that FontAwesome's
- * pro-duotone icons read. Same pattern as ParentalGateModal.
- * Secondary opacity defaults to 0.4 (FA default); raising slightly
- * to 0.8 makes both layers read on the kid-sized grid.
+ * Map a catalogue option ({ key, label, icon, duotone, thumbnailKey })
+ * to the SceneTile contract ({ ..., thumbnailUrl }). The catalogue
+ * stores env-agnostic R2 keys; resolveThumbnailUrl builds the public
+ * URL at render time. SceneTile falls back to the FA icon when the
+ * resolved URL is null.
  */
-const duotoneVars = (style: DuotoneStyle): React.CSSProperties =>
-  ({
-    '--fa-primary-color': style.primary,
-    '--fa-secondary-color': style.secondary,
-    '--fa-secondary-opacity': '0.8',
-  }) as React.CSSProperties;
-
-/**
- * Voice persona tiles. FA duotone face icons (no emojis — memory rule
- * `feedback_fontawesome_over_emojis.md`: emojis read as cheap, FA
- * duotone matches the brand).
- *
- * Visual treatment: yellow primary for every face. The earlier picker
- * steps (species, traits) carry the full rainbow; the voice step is
- * sequenced last and the kid is already invested. Keeping the row
- * tonally calm (yellow base + varied secondary tints) reads as a row
- * of happy little voices and avoids competing with the rainbows above.
- *
- * Decoupled from voice-personas.ts so that file stays server-safe
- * (env-var reads). The keys MUST stay aligned with VoicePersonaKey.
- */
-const VOICE_TILES: {
-  key: VoicePersonaKey;
-  icon: typeof faFaceSmileBeam;
+const toTile = (o: {
+  key: string;
   label: string;
-  duotone: DuotoneStyle;
-}[] = [
-  {
-    key: 'warm-girl-7yo',
-    icon: faFaceSmileBeam,
-    label: 'Warm',
-    duotone: {
-      primary: 'hsl(var(--crayon-yellow))',
-      secondary: 'hsl(var(--crayon-orange))',
-    },
-  },
-  {
-    key: 'warm-boy-7yo',
-    icon: faFaceSmile,
-    label: 'Cosy',
-    duotone: {
-      primary: 'hsl(var(--crayon-yellow))',
-      secondary: 'hsl(var(--crayon-pink))',
-    },
-  },
-  {
-    key: 'playful-girl-5yo',
-    icon: faFaceGrinStars,
-    label: 'Bouncy',
-    duotone: {
-      primary: 'hsl(var(--crayon-yellow))',
-      secondary: 'hsl(var(--crayon-pink))',
-    },
-  },
-  {
-    key: 'playful-boy-5yo',
-    icon: faFaceGrinTongue,
-    label: 'Playful',
-    duotone: {
-      primary: 'hsl(var(--crayon-yellow))',
-      secondary: 'hsl(var(--crayon-green))',
-    },
-  },
-  {
-    key: 'sleepy-neutral',
-    icon: faFaceSleeping,
-    label: 'Sleepy',
-    duotone: {
-      primary: 'hsl(var(--crayon-yellow))',
-      secondary: 'hsl(var(--crayon-purple))',
-    },
-  },
-  {
-    key: 'brave-neutral',
-    icon: faFaceAwesome,
-    label: 'Brave',
-    duotone: {
-      primary: 'hsl(var(--crayon-yellow))',
-      secondary: 'hsl(var(--crayon-orange))',
-    },
-  },
-  {
-    key: 'silly-neutral',
-    icon: faFaceLaughBeam,
-    label: 'Silly',
-    duotone: {
-      primary: 'hsl(var(--crayon-yellow))',
-      secondary: 'hsl(var(--crayon-green))',
-    },
-  },
-  {
-    key: 'gentle-neutral',
-    icon: faFaceSmileRelaxed,
-    label: 'Gentle',
-    duotone: {
-      primary: 'hsl(var(--crayon-yellow))',
-      secondary: 'hsl(var(--crayon-teal))',
-    },
-  },
-];
+  icon: SceneLayer['options'][number]['icon'];
+  duotone: SceneLayer['options'][number]['duotone'];
+  thumbnailKey: string | null;
+}) => ({
+  key: o.key,
+  label: o.label,
+  icon: o.icon,
+  duotone: o.duotone,
+  thumbnailUrl: resolveThumbnailUrl(o.thumbnailKey),
+});
 
 const CreateCharacterModal = ({ open, onClose }: Props) => {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const [step, setStep] = useState<Step>('species');
   const [species, setSpecies] = useState<SpeciesKey | null>(null);
   const [color, setColor] = useState<ColorKey | null>(null);
@@ -208,6 +125,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     null,
   );
   const [hasTrackedStart, setHasTrackedStart] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
   const [pending, startTransition] = useTransition();
 
   // Track CREATE_STARTED once per modal open.
@@ -239,6 +157,7 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     setShowNameEdit(false);
     setVoicePersona(null);
     setHasTrackedStart(false);
+    setCelebrating(false);
   };
 
   const handleOpenChange = (next: boolean) => {
@@ -290,6 +209,36 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     });
   };
 
+  // ── Step layers (SceneLayer-shaped, for TileCarousel) ───────────────
+  const speciesLayer: SceneLayer = useMemo(
+    () => ({
+      id: 'species',
+      title: STEP_TITLES.species,
+      kind: 'single',
+      options: SPECIES_OPTIONS.map(toTile),
+    }),
+    [],
+  );
+  const traitsLayer: SceneLayer = useMemo(
+    () => ({
+      id: 'traits',
+      title: STEP_TITLES.traits,
+      kind: 'multi',
+      maxSelections: MAX_TRAITS,
+      options: TRAIT_OPTIONS.map(toTile),
+    }),
+    [],
+  );
+  const voiceLayer: SceneLayer = useMemo(
+    () => ({
+      id: 'voice',
+      title: STEP_TITLES.voice,
+      kind: 'single',
+      options: VOICE_TILES.map(toTile),
+    }),
+    [],
+  );
+
   const handleSubmit = () => {
     if (!species || !color) {
       toast.error('Please finish all the steps.');
@@ -313,8 +262,15 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
           species,
           voicePersona: voicePersona ?? undefined,
         });
-        handleOpenChange(false);
-        router.refresh();
+        // A short celebratory beat before we close + refresh — the
+        // payoff moment of the whole flow. Confetti self-completes;
+        // its onComplete closes the modal. Skipped under reduce-motion.
+        if (reduceMotion) {
+          handleOpenChange(false);
+          router.refresh();
+        } else {
+          setCelebrating(true);
+        }
       } else {
         const friendly: Record<string, string> = {
           unauthorized: 'Please sign in first.',
@@ -332,23 +288,23 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     });
   };
 
+  // Step-transition motion. A gentle horizontal slide + fade so the
+  // wizard has momentum; suppressed under reduce-motion.
+  const stepMotion = reduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0, x: 24 },
+        animate: { opacity: 1, x: 0 },
+        exit: { opacity: 0, x: -24 },
+        transition: { duration: 0.22, ease: 'easeOut' as const },
+      };
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        // Hide the default × close button rendered by the shared Dialog
-        // primitive — we render our own chunky red-circle close below so
-        // it's much harder to miss on a kid touchscreen. The default is
-        // an `absolute right-4 top-4` button that lives as a direct child
-        // of DialogContent, so we target it by position via the arbitrary
-        // variant. Keeps the shared primitive untouched for other dialogs
-        // (parent gate / share artwork / create profile / etc.) where
-        // the small × is appropriate.
+        // Hide the default × — we render our own chunky red-circle close.
         className="max-w-lg space-y-5 p-6 md:p-8 [&>[type='button'].absolute]:hidden"
       >
-        {/* Chunky kid-friendly close. Sits in the same top-right slot as
-            the default × but with a red filled circle so it pops against
-            the white dialog. DialogClose passes through Radix's dismiss
-            behaviour. */}
         <DialogClose
           aria-label="Close"
           className="absolute right-3 top-3 z-10 w-10 h-10 rounded-full bg-crayon-orange text-white shadow-card flex items-center justify-center hover:scale-110 active:scale-95 transition-transform border-2 border-white"
@@ -361,17 +317,12 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
           <DialogTitle className="text-2xl md:text-3xl text-center font-bold">
             {STEP_TITLES[step]}
           </DialogTitle>
-          {/* Screen-reader description only — visually hidden via the
-              Dialog primitive's default styling for DialogDescription. */}
           <DialogDescription className="sr-only">
             Step {stepIndex + 1} of {STEPS.length} in making your character.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Progress bar — fills left-to-right as the kid completes steps.
-            Reads as 'how far along you are' rather than 'tappable dots'.
-            stepIndex + 1 over STEPS.length means "you're on step N, so
-            N/total is filled". */}
+        {/* Progress bar — fills left-to-right as steps complete. */}
         <div
           className="h-2 rounded-full bg-paper-cream-dark/60 overflow-hidden"
           role="progressbar"
@@ -382,216 +333,147 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
         >
           <div
             className="h-full bg-crayon-orange transition-all duration-300 rounded-full"
-            style={{
-              width: `${((stepIndex + 1) / STEPS.length) * 100}%`,
-            }}
+            style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }}
           />
         </div>
 
-        {/* ─── Species ─────────────────────────────────────────────── */}
-        {step === 'species' ? (
-          <div className="grid grid-cols-4 gap-3">
-            {SPECIES_OPTIONS.map((s) => {
-              const selected = species === s.key;
-              return (
+        {/* Animated step body. AnimatePresence swaps the active step
+            with a slide+fade; `mode="wait"` so the outgoing step
+            finishes before the incoming one starts. */}
+        <AnimatePresence mode="wait">
+          <motion.div key={step} {...stepMotion}>
+            {/* ─── Species ───────────────────────────────────────── */}
+            {step === 'species' ? (
+              <TileCarousel
+                layer={speciesLayer}
+                selected={species ? [species] : []}
+                locked={[]}
+                disabled={pending}
+                onToggle={(k) => setSpecies(k as SpeciesKey)}
+              />
+            ) : null}
+
+            {/* ─── Colour ────────────────────────────────────────── */}
+            {step === 'color' ? (
+              <div className="grid grid-cols-3 gap-3">
+                {COLOR_OPTIONS.map((c) => {
+                  const selected = color === c.key;
+                  return (
+                    <button
+                      type="button"
+                      key={c.key}
+                      onClick={() => setColor(c.key)}
+                      aria-pressed={selected}
+                      aria-label={c.label}
+                      className={cn(
+                        'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all min-h-[88px]',
+                        selected
+                          ? 'border-crayon-orange border-4 scale-105 shadow-card'
+                          : 'border-paper-cream-dark hover:border-crayon-orange',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'w-12 h-12 rounded-full shadow-inner',
+                          c.swatchClass,
+                        )}
+                      />
+                      <span className="text-sm font-bold text-neutral-800">
+                        {c.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {/* ─── Traits ────────────────────────────────────────── */}
+            {step === 'traits' ? (
+              <div className="space-y-3">
+                <p className="text-center text-lg font-bold text-neutral-700">
+                  Pick up to {MAX_TRAITS}
+                </p>
+                <TileCarousel
+                  layer={traitsLayer}
+                  selected={traits}
+                  locked={[]}
+                  disabled={pending}
+                  onToggle={(k) => toggleTrait(k as TraitKey)}
+                />
+              </div>
+            ) : null}
+
+            {/* ─── Name ──────────────────────────────────────────── */}
+            {step === 'name' ? (
+              <div className="flex flex-col items-center gap-6 py-2">
+                <NameTag name={name} reduceMotion={Boolean(reduceMotion)} />
+
                 <button
                   type="button"
-                  key={s.key}
-                  onClick={() => setSpecies(s.key)}
-                  aria-pressed={selected}
-                  aria-label={s.label}
-                  className={cn(
-                    'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all min-h-[88px]',
-                    selected
-                      ? 'border-crayon-orange border-4 bg-white scale-105 shadow-card'
-                      : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
-                  )}
+                  onClick={handleShuffleName}
+                  className="inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-6 py-3 text-lg font-bold min-h-[56px] hover:scale-105 active:scale-95 transition-transform shadow-card"
                 >
-                  <FontAwesomeIcon
-                    icon={s.icon}
-                    className="text-3xl"
-                    style={duotoneVars(s.duotone)}
-                  />
-                  <span className="text-sm font-bold text-neutral-800">
-                    {s.label}
-                  </span>
+                  <FontAwesomeIcon icon={faShuffle} />
+                  Try another
                 </button>
-              );
-            })}
-          </div>
-        ) : null}
 
-        {/* ─── Colour ──────────────────────────────────────────────── */}
-        {step === 'color' ? (
-          <div className="grid grid-cols-3 gap-3">
-            {COLOR_OPTIONS.map((c) => {
-              const selected = color === c.key;
-              return (
-                <button
-                  type="button"
-                  key={c.key}
-                  onClick={() => setColor(c.key)}
-                  aria-pressed={selected}
-                  aria-label={c.label}
-                  className={cn(
-                    'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-2 transition-all min-h-[88px]',
-                    selected
-                      ? 'border-crayon-orange border-4 scale-105 shadow-card'
-                      : 'border-paper-cream-dark hover:border-crayon-orange',
-                  )}
-                >
-                  <span
-                    className={cn(
-                      'w-12 h-12 rounded-full shadow-inner',
-                      c.swatchClass,
-                    )}
-                  />
-                  <span className="text-sm font-bold text-neutral-800">
-                    {c.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
-
-        {/* ─── Traits ──────────────────────────────────────────────── */}
-        {step === 'traits' ? (
-          <div className="space-y-3">
-            <p className="text-center text-lg font-bold text-neutral-700">
-              Pick up to {MAX_TRAITS}
-            </p>
-            <div className="grid grid-cols-4 gap-3">
-              {TRAIT_OPTIONS.map((t) => {
-                const selected = traits.includes(t.key);
-                const atCap = !selected && traits.length >= MAX_TRAITS;
-                return (
+                {/* Custom-name escape hatch — parents recognise the
+                    pencil; kids ignore it. */}
+                {!showNameEdit ? (
                   <button
                     type="button"
-                    key={t.key}
-                    onClick={() => toggleTrait(t.key)}
-                    aria-pressed={selected}
-                    aria-label={t.label}
-                    disabled={atCap}
-                    className={cn(
-                      'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all min-h-[88px]',
-                      selected
-                        ? 'border-crayon-orange bg-crayon-orange/10 scale-105'
-                        : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
-                      atCap && 'opacity-40 cursor-not-allowed',
-                    )}
+                    onClick={() => setShowNameEdit(true)}
+                    aria-label="Type a custom name"
+                    title="Type a custom name"
+                    className="w-10 h-10 rounded-full border-2 border-paper-cream-dark text-neutral-500 hover:text-crayon-orange hover:border-crayon-orange flex items-center justify-center transition-colors"
                   >
-                    <FontAwesomeIcon
-                      icon={t.icon}
-                      className="text-2xl"
-                      style={duotoneVars(t.duotone)}
-                    />
-                    <span className="text-sm font-bold text-neutral-800">
-                      {t.label}
-                    </span>
+                    <FontAwesomeIcon icon={faPen} className="text-sm" />
                   </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
-
-        {/* ─── Name ────────────────────────────────────────────────── */}
-        {step === 'name' ? (
-          <div className="flex flex-col items-center gap-6 py-4">
-            {/* The generated name is the hero — chunky display type so a
-                kid can read it from across the table, with a soft pill
-                background so it reads as a finished "this is your name". */}
-            <div className="w-full rounded-3xl bg-paper-cream/60 border-2 border-paper-cream-dark px-6 py-8">
-              <p className="text-center text-4xl md:text-5xl font-display leading-none break-words">
-                {name}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleShuffleName}
-              className="inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-6 py-3 text-lg font-bold min-h-[56px] hover:scale-105 active:scale-95 transition-transform shadow-card"
-            >
-              <FontAwesomeIcon icon={faShuffle} />
-              Try another
-            </button>
-
-            {/* Custom-name escape hatch — visual only icon button. Kids
-                ignore it; parents who care recognise the pencil. No text
-                because "type a custom name" was reading as a settings
-                link and breaking the kid-driven flow. */}
-            {!showNameEdit ? (
-              <button
-                type="button"
-                onClick={() => setShowNameEdit(true)}
-                aria-label="Type a custom name"
-                title="Type a custom name"
-                className="w-10 h-10 rounded-full border-2 border-paper-cream-dark text-neutral-500 hover:text-crayon-orange hover:border-crayon-orange flex items-center justify-center transition-colors"
-              >
-                <FontAwesomeIcon icon={faPen} className="text-sm" />
-              </button>
-            ) : (
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value.slice(0, 24))}
-                autoFocus
-                className="w-full rounded-2xl border-2 border-paper-cream-dark px-4 py-3 text-2xl font-display text-center"
-                placeholder="Type a name"
-                aria-label="Custom character name"
-              />
-            )}
-          </div>
-        ) : null}
-
-        {/* ─── Voice ───────────────────────────────────────────────── */}
-        {step === 'voice' ? (
-          <div className="grid grid-cols-4 gap-3">
-            {VOICE_TILES.map((v) => {
-              const selected = voicePersona === v.key;
-              return (
-                <button
-                  type="button"
-                  key={v.key}
-                  onClick={() =>
-                    setVoicePersona((prev) => (prev === v.key ? null : v.key))
-                  }
-                  aria-pressed={selected}
-                  aria-label={`${v.label} voice`}
-                  title={VOICE_PERSONAS[v.key]?.description}
-                  className={cn(
-                    'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all min-h-[88px]',
-                    selected
-                      ? 'border-crayon-orange border-4 bg-white scale-105 shadow-card'
-                      : 'border-paper-cream-dark bg-white hover:border-crayon-orange',
-                  )}
-                >
-                  <FontAwesomeIcon
-                    icon={v.icon}
-                    className="text-3xl"
-                    style={duotoneVars(v.duotone)}
+                ) : (
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value.slice(0, 24))}
+                    autoFocus
+                    className="w-full rounded-2xl border-2 border-paper-cream-dark px-4 py-3 text-2xl font-display text-center"
+                    placeholder="Type a name"
+                    aria-label="Custom character name"
                   />
-                  <span className="text-sm font-bold text-neutral-800">
-                    {v.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
+                )}
+              </div>
+            ) : null}
 
-        {/* ─── Footer (nav + submit) ─────────────────────────────── */}
-        {/* Errors are surfaced via sonner toasts (app-wide pattern), not
-            inline within the modal — toasts overlay above the dialog,
-            auto-dismiss, and don't disturb the picker rhythm. */}
+            {/* ─── Voice ─────────────────────────────────────────── */}
+            {step === 'voice' ? (
+              <div className="space-y-3">
+                <TileCarousel
+                  layer={voiceLayer}
+                  selected={voicePersona ? [voicePersona] : []}
+                  locked={[]}
+                  disabled={pending}
+                  onToggle={(k) =>
+                    setVoicePersona((prev) =>
+                      prev === k ? null : (k as VoicePersonaKey),
+                    )
+                  }
+                />
+                {/* Persona blurb for the selected voice — a small
+                    parent-facing nicety now that per-tile tooltips
+                    don't survive the shared TileCarousel. */}
+                {voicePersona ? (
+                  <p className="text-center text-sm text-text-secondary">
+                    {VOICE_PERSONAS[voicePersona]?.description}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+          </motion.div>
+        </AnimatePresence>
 
-        {/* Footer: arrow nav. The Dialog's own × handles dismiss, so no
-            Cancel button. Back is only present from step 2 onward; on
-            step 1 we leave the slot empty so Next stays right-aligned.
-            The final step replaces Next-arrow with the "Make my friend"
-            CTA — a chunky pill, kid reads the words but the arrow icon
-            tells the rest. */}
+        {/* ─── Footer (nav + submit) ───────────────────────────────
+            Errors surface via sonner toasts, not inline. Back appears
+            from step 2 on; the final step swaps Next for the
+            "Make my friend" CTA. */}
         <div className="flex justify-between items-center gap-3 pt-4 min-h-[56px]">
           {stepIndex > 0 ? (
             <button
@@ -604,7 +486,6 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
               <FontAwesomeIcon icon={faArrowLeft} className="text-xl" />
             </button>
           ) : (
-            // Empty spacer so Next stays right-aligned on step 1.
             <span aria-hidden className="w-14 h-14" />
           )}
 
@@ -632,8 +513,64 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
             </button>
           )}
         </div>
+
+        {/* Final celebration — confetti beat on a successful create,
+            then close + refresh. */}
+        <Confetti
+          isActive={celebrating}
+          onComplete={() => {
+            handleOpenChange(false);
+            router.refresh();
+          }}
+          duration={1600}
+        />
       </DialogContent>
     </Dialog>
+  );
+};
+
+/**
+ * The "HELLO my name is" sticker name-tag. The classic red-banner
+ * badge: white body, red top strip, the name in big display type.
+ * Springs in (scale + slight rotate settle) whenever `name` changes —
+ * the re-key on `name` replays the animation on every shuffle.
+ */
+const NameTag = ({
+  name,
+  reduceMotion,
+}: {
+  name: string;
+  reduceMotion: boolean;
+}) => {
+  const spring = reduceMotion
+    ? {}
+    : {
+        initial: { scale: 0.7, rotate: -8, opacity: 0 },
+        animate: { scale: 1, rotate: -2, opacity: 1 },
+        transition: { type: 'spring' as const, stiffness: 320, damping: 16 },
+      };
+  return (
+    <motion.div
+      key={name}
+      {...spring}
+      className="w-full max-w-xs overflow-hidden rounded-2xl border-2 border-neutral-300 bg-white shadow-card"
+    >
+      {/* "Hello my name is" banner. The classic name-tag is red; the CC
+          palette has no red token, so we use crayon-pink — the warmest
+          brand colour, reads as the classic badge without a magic
+          literal and stays distinct from the orange shuffle button. */}
+      <div className="bg-crayon-pink py-2 text-center">
+        <p className="font-display text-sm uppercase tracking-[0.2em] text-white">
+          Hello my name is
+        </p>
+      </div>
+      {/* Name body */}
+      <div className="px-6 py-8">
+        <p className="break-words text-center font-display text-4xl leading-none text-neutral-800 md:text-5xl">
+          {name}
+        </p>
+      </div>
+    </motion.div>
   );
 };
 
