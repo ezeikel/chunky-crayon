@@ -28,30 +28,33 @@ primitives (thin framer-motion wrappers).
   ShareButton, StartOverButton, SignInOptions, ParentalGate.
 - `gallery-and-content.stories.tsx` — AllColoringPageImagesShell,
   GalleryImageWithPreview, InfiniteScrollGallery, ImageFilterToggle,
-  Pagination, DifficultyFilter, DifficultySlider, TodaysDate, blog/*,
+  Pagination, DifficultyFilter, DifficultySlider, TodaysDate, blog/\*,
   Breadcrumbs.
 - `homepage-sections.stories.tsx` — HomePageContent, DashboardHeader,
   IntroClient, LandingDemoClient, PricingTeaser, Testimonials, FAQ,
   MeetYourCharactersSection.
 - `modals.stories.tsx` — ParentalGateModal, FeedbackDialog.
-- `navigation.stories.tsx` — ScrollHeader, MobileMenu, Header*Indicator,
+- `navigation.stories.tsx` — ScrollHeader, MobileMenu, Header\*Indicator,
   LanguageSwitcher, MobileLanguageSelector.
 - `coloring-tools.stories.tsx` — palette/drawer compositions.
 
 ## Gap list — by section
 
 ### Section: Design System
+
 Largely covered. Verify complete: spacing scale, shadows, radii,
 the full crayon colour palette, typography (all heading levels +
 body). Add what's missing.
 
 ### Section: Atoms — GAPS
+
 `ui/` primitives not yet storied: `avatar`, `select`, `switch`,
 `dropdown-menu`, `skeleton`. No dedicated Heading component exists —
 headings are raw Tailwind; the Design System typography story is the
 canonical "headings" reference (note this, don't invent a component).
 
 ### Section: Buttons — PARTIAL
+
 Covered: SubmitButton, ShareButton, StartOverButton, SignInOptions.
 GAPS: `ManageSubscriptionButton`, `PrintButton`, `SaveButton`,
 `SaveToGalleryButton`, `GalleryCardDownloadButton`, `PackDownloadButton`,
@@ -59,8 +62,10 @@ GAPS: `ManageSubscriptionButton`, `PrintButton`, `SaveButton`,
 download buttons elsewhere.
 
 ### Section: Modals — BIGGEST GAP
+
 Covered: ParentalGateModal, FeedbackDialog.
 GAPS (every modal must be here):
+
 - `PaywallModal` ⚠️ — all three states: guest_limit, no_subscription,
   subscriber_no_credits
 - `CreateProfileModal`
@@ -71,32 +76,40 @@ GAPS (every modal must be here):
 - `AutoColorModal` (coloring-ui)
 - `StickerDetailModal`
 - `TikTokPostComposer` (admin modal — confirm if modal-shaped)
-"A Modals section must not be missing a modal that exists in the app."
+  "A Modals section must not be missing a modal that exists in the app."
 
 ### Section: Tiles & Cards — NO COVERAGE
+
 GAPS: `CharacterTile` (states: READY / GENERATING / FAILED),
 `ProfileCard`, `AddProfileCard`, `ChallengeCard`, `ChallengeWidget`,
 `LatestComicStripCard`, `StickerCard`, `FactCard`, `FeaturedBundles`,
 `RecentCreations`, `ColoringImage` card, `GalleryPreview` cards,
 `SceneTile` (coloring-ui — exported standalone).
 
-### Section: Characters — NO COVERAGE
+### Section: Characters — PARTIAL
+
+Covered: the Character Builder illustration tiles —
+`characters.stories.tsx` renders every species, trait, and voice from
+`lib/characters/picker-catalog.ts` with the real `SceneTile`.
 GAPS: `CharacterCockpit`, `CharacterGrid`, `CharacterRetry`,
 `AddCharacterButton`, `OutfitPicker`, `VoicePad`, `ColoAvatar`,
 `ColoEvolutionCelebration`.
 
 ### Section: Forms — PARTIAL
+
 Covered: CreateColoringPageForm, FormCTA, QualityPicker, email form.
 GAPS: `BlockReasonPill`, `CharacterPicker`, `InputModeSelector` +
 the inputs (`TextInput`, `VoiceInput`, `ImageInput`, `SceneInput`,
 `ExamplePrompts`), `InputOptions`.
 
 ### Section: Navigation — PARTIAL
+
 Covered: ScrollHeader, MobileMenu, Header indicators, LanguageSwitcher.
 GAPS: `Header` (full), `Footer`, `BasicHeader`, `HeaderDropdown`,
 `HeaderFeedbackTrigger`, `JumpToNav`, `PageWrap`.
 
 ### Section: Canvas / Coloring — REBUILD (stories were deleted)
+
 All `coloring-ui` components lost their stories. Rebuild fresh:
 `ImageCanvas`, `ColoringToolbar`, `ColorPalette`, `ColorStrip`,
 `DesktopColorPalette`, `DesktopToolsSidebar`, `MobileColoringDrawer`,
@@ -109,24 +122,29 @@ App-side canvas: `ColoringArea`, `ColoringPageContent`,
 `FocusMode*`, `TapPromptOverlay`.
 
 ### Section: Gallery / Blog / Home — PARTIAL
+
 Covered by `gallery-and-content` + `homepage-sections`. GAPS:
 `AnimatedGalleryGrid/Header`, `DailyImageHeading`, `SocialProofStats` +
 `AnimatedStatCard`, `StartPostEngagementBridge`, `ColoringHabitatCallout`,
 `AppStoreSection` / `AppStoreButtons`, `SocialShare`.
 
 ### Section: Stickers — NO COVERAGE
+
 GAPS: `StickerBook`, `StickerCard`, `StickerSelector`, `StickerReward`,
 `StickerBook/ProgressBar`.
 
 ### Section: Profiles — NO COVERAGE
+
 GAPS: `ProfileUI`, `ProfileAvatar`, `ProfileIndicator`,
 `ProfileSwitcher`, `ProfileCard`, `AddProfileCard`.
 
 ### Section: Feedback / Loading / Misc
+
 GAPS: `Loading/ColoLoading`, `PixelLoaders`, `Confetti`,
 `UnsubscribeToast`, `TypedText`, `CrayonScribble`, `CachedLastUpdateDate`.
 
 ## Excluded (not storied — justified)
+
 `PixelTracker`, `UserIdentify`, `*ViewTracker` (SeoLanding, TeacherHub,
 LandingPageViewTracker), `experiment/Experiment`, all `*Provider` /
 `*Context`, all `*Wrapper` server shells, `components/pdfs/**`,
