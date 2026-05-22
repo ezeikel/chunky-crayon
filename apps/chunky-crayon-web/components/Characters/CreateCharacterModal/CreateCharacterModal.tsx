@@ -303,7 +303,13 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         // Hide the default × — we render our own chunky red-circle close.
-        className="max-w-lg space-y-5 p-6 md:p-8 [&>[type='button'].absolute]:hidden"
+        // The Dialog primitive is a CSS grid (`grid w-[calc(100%-2rem)]
+        // max-w-lg`). A grid item defaults to `min-width:auto`, so the
+        // wide TileCarousel track would refuse to shrink and blow the
+        // dialog past max-w-lg. The fix is `min-w-0` on the carousel's
+        // wrapper (below); `overflow-hidden` here is a belt-and-braces
+        // clip so nothing can still spill horizontally.
+        className="space-y-5 overflow-hidden p-6 md:p-8 [&>[type='button'].absolute]:hidden"
       >
         <DialogClose
           aria-label="Close"
@@ -341,7 +347,15 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
             with a slide+fade; `mode="wait"` so the outgoing step
             finishes before the incoming one starts. */}
         <AnimatePresence mode="wait">
-          <motion.div key={step} {...stepMotion}>
+          {/* `min-w-0` lets this shrink below the carousel's intrinsic
+              content width (a flex/grid child defaults to min-content);
+              `overflow-hidden` keeps the carousel's horizontal scroll
+              INSIDE the dialog instead of widening it. */}
+          <motion.div
+            key={step}
+            {...stepMotion}
+            className="w-full min-w-0 overflow-hidden"
+          >
             {/* ─── Species ───────────────────────────────────────── */}
             {step === 'species' ? (
               <TileCarousel
