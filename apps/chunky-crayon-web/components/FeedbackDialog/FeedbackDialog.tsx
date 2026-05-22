@@ -313,7 +313,7 @@ const FeedbackDialog = ({
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder={t(`types.${selectedType}.placeholder`)}
-                      className="min-h-[140px] resize-none rounded-xl border-paper-cream-dark focus:border-crayon-orange focus:ring-crayon-orange/20 font-tondo"
+                      className="min-h-[140px] resize-none rounded-xl border-paper-cream-dark px-4 py-3 focus:border-crayon-orange focus:ring-crayon-orange/20 font-tondo"
                       required
                       autoFocus
                     />
