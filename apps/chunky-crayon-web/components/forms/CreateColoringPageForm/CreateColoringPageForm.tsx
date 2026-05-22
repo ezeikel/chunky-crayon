@@ -146,6 +146,12 @@ const MultiModeForm = ({
   // lib/create/pending-creation).
   const [sceneSelection, setSceneSelection] = useState<SceneSelection>({});
   const [sceneDescription, setSceneDescription] = useState('');
+  // Voice answers, surfaced from VoiceInput once both turns finish, so
+  // a paywall-interrupted voice creation can be snapshotted + resumed.
+  const [voiceAnswers, setVoiceAnswers] = useState<{
+    firstAnswer: string;
+    secondAnswer: string;
+  } | null>(null);
 
   // Per-profile unlocked modes (Scene is always available, not listed).
   // Guests never have a profile to gate against, so the gateable modes
@@ -230,17 +236,24 @@ const MultiModeForm = ({
       savePendingCreation({ mode: 'text', description });
     } else if (mode === 'image' && imageBase64) {
       savePendingCreation({ mode: 'photo', photoBase64: imageBase64 });
+    } else if (mode === 'voice' && voiceAnswers) {
+      savePendingCreation({
+        mode: 'voice',
+        firstAnswer: voiceAnswers.firstAnswer,
+        secondAnswer: voiceAnswers.secondAnswer,
+      });
     }
-    // Voice is intentionally not snapshotted — its two-answer flow has
-    // its own internal state machine and restoring it cleanly isn't
-    // worth the complexity for v1.
     openPaywall(triggerLocation);
   };
 
-  // Seeds SceneInput's picker when a scene is restored post-checkout.
-  // null = nothing to restore (the normal first-load case).
+  // Seeds SceneInput's picker / VoiceInput's answers when a creation is
+  // restored post-checkout. null = nothing to restore (normal load).
   const [restoredSelection, setRestoredSelection] =
     useState<SceneSelection | null>(null);
+  const [restoredVoiceAnswers, setRestoredVoiceAnswers] = useState<{
+    firstAnswer: string;
+    secondAnswer: string;
+  } | null>(null);
 
   // Restore on mount — but only once the user can actually generate
   // (the subscription / credits landed). If they abandoned checkout and
@@ -266,6 +279,15 @@ const MultiModeForm = ({
     } else if (saved.mode === 'photo') {
       setImageBase64(saved.photoBase64);
       setMode('image');
+    } else if (saved.mode === 'voice') {
+      // VoiceInput re-seeds its conversation hook into `ready_to_submit`
+      // from this prop — no mic, no question playback.
+      setRestoredVoiceAnswers({
+        firstAnswer: saved.firstAnswer,
+        secondAnswer: saved.secondAnswer,
+      });
+      setDescription(`${saved.firstAnswer} ${saved.secondAnswer}`.trim());
+      setMode('voice');
     }
     clearPendingCreation();
   }, [canGenerate, setDescription, setImageBase64, setMode]);
@@ -405,6 +427,15 @@ const MultiModeForm = ({
       {mode === 'text' && <TextInput />}
       {mode === 'voice' && (
         <VoiceInput
+          // Surface the two answers up so a paywall-interrupted voice
+          // creation can be snapshotted (resume-after-checkout).
+          onAnswersChange={(firstAnswer, secondAnswer) =>
+            setVoiceAnswers({ firstAnswer, secondAnswer })
+          }
+          // When present, VoiceInput seeds its conversation hook
+          // straight into `ready_to_submit` from these (post-checkout
+          // restore). undefined on the normal first-load path.
+          restoreAnswers={restoredVoiceAnswers ?? undefined}
           onComplete={async (firstAnswer, secondAnswer) => {
             const desc = `${firstAnswer} ${secondAnswer}`.trim();
 

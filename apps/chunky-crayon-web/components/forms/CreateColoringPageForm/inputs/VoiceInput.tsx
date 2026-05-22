@@ -43,6 +43,20 @@ type VoiceInputProps = {
     firstAnswer: string,
     secondAnswer: string,
   ) => Promise<VoiceConversationError | void> | VoiceConversationError | void;
+  /**
+   * Fires when both transcripts have been captured (state hits
+   * `ready_to_submit`). The parent uses this to snapshot the voice
+   * answers so a paywall-interrupted voice creation can be resumed
+   * after checkout — separate from `onComplete`, which only fires on
+   * an actual submit.
+   */
+  onAnswersChange?: (firstAnswer: string, secondAnswer: string) => void;
+  /**
+   * When provided, seeds the conversation straight into
+   * `ready_to_submit` with these answers — no mic, no question
+   * playback. Used to restore a voice creation after checkout.
+   */
+  restoreAnswers?: { firstAnswer: string; secondAnswer: string };
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -84,7 +98,12 @@ const ERROR_COPY: Record<VoiceConversationError, string> = {
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
-const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
+const VoiceInput = ({
+  className,
+  onComplete,
+  onAnswersChange,
+  restoreAnswers,
+}: VoiceInputProps) => {
   const { canGenerate } = useUser();
   const { setDescription, setIsProcessing, setIsBusy } = useInputMode();
   const { openGate } = useParentalGate();
@@ -103,7 +122,26 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
     stopRecording,
     reset,
     fail,
+    restore,
   } = useVoiceConversation();
+
+  // Post-checkout restore: seed the conversation into `ready_to_submit`
+  // from the snapshotted answers. Runs once on mount when the parent
+  // passes `restoreAnswers`.
+  const restoreAppliedRef = useRef(false);
+  useEffect(() => {
+    if (restoreAppliedRef.current || !restoreAnswers) return;
+    restoreAppliedRef.current = true;
+    restore(restoreAnswers.firstAnswer, restoreAnswers.secondAnswer);
+  }, [restoreAnswers, restore]);
+
+  // Surface both answers up the moment they're both captured, so the
+  // parent can snapshot them if the paywall interrupts the creation.
+  useEffect(() => {
+    if (firstAnswer && secondAnswer) {
+      onAnswersChange?.(firstAnswer, secondAnswer);
+    }
+  }, [firstAnswer, secondAnswer, onAnswersChange]);
 
   // Wraps `start()` with a one-time-per-session parental gate. Once the
   // gate is passed, the flag persists in sessionStorage so subsequent

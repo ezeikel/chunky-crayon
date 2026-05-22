@@ -132,6 +132,13 @@ export type VoiceConversationResult = {
    * stranding the user on "Painting your page…" forever.
    */
   fail: (code: VoiceConversationError) => void;
+
+  /**
+   * Seed the machine into `ready_to_submit` with two pre-captured
+   * answers. Used to resume a voice creation interrupted by the paywall
+   * (see lib/create/pending-creation) — no mic, no question playback.
+   */
+  restore: (firstAnswer: string, secondAnswer: string) => void;
 };
 
 // ============================================================================
@@ -300,6 +307,23 @@ export function useVoiceConversation(): VoiceConversationResult {
       stopAudioPlayback();
       setError(code);
       setState('error');
+    },
+    [cleanupRecording, stopAudioPlayback],
+  );
+
+  // Seed the machine straight into `ready_to_submit` with two answers
+  // that were captured earlier — used to restore a voice creation that
+  // was interrupted by the paywall and resumed after checkout. No mic,
+  // no playback: the transcripts already exist, we just re-arrive at
+  // the submit-ready state. (See lib/create/pending-creation.)
+  const restore = useCallback(
+    (a1: string, a2: string) => {
+      cleanupRecording();
+      stopAudioPlayback();
+      setError(null);
+      setFirstAnswer(a1);
+      setSecondAnswer(a2);
+      setState('ready_to_submit');
     },
     [cleanupRecording, stopAudioPlayback],
   );
@@ -841,5 +865,6 @@ export function useVoiceConversation(): VoiceConversationResult {
     stopRecording,
     reset,
     fail,
+    restore,
   };
 }
