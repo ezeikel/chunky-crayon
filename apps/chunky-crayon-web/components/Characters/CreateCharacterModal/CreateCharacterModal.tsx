@@ -347,15 +347,16 @@ const CreateCharacterModal = ({ open, onClose }: Props) => {
             with a slide+fade; `mode="wait"` so the outgoing step
             finishes before the incoming one starts. */}
         <AnimatePresence mode="wait">
-          {/* `min-w-0` lets this shrink below the carousel's intrinsic
-              content width (a flex/grid child defaults to min-content);
-              `overflow-hidden` keeps the carousel's horizontal scroll
-              INSIDE the dialog instead of widening it. */}
-          <motion.div
-            key={step}
-            {...stepMotion}
-            className="w-full min-w-0 overflow-hidden"
-          >
+          {/* `min-w-0` is the actual overflow fix: the dialog is a CSS
+              grid and a grid child defaults to `min-width:auto`, so the
+              wide TileCarousel track would refuse to shrink and blow
+              the dialog past max-w-lg. `min-w-0` overrides that, and
+              TileCarousel's own `overflow-x-auto` then scrolls the
+              track internally. NO `overflow-hidden` here — the colour
+              and name steps have selected tiles that scale + grow a
+              border slightly past their cell, and clipping the wrapper
+              would shave those edges off. */}
+          <motion.div key={step} {...stepMotion} className="w-full min-w-0">
             {/* ─── Species ───────────────────────────────────────── */}
             {step === 'species' ? (
               <TileCarousel
