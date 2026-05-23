@@ -22,7 +22,7 @@ type CreateShareResponse = {
 
 /**
  * Create a shareable link for an artwork
- * Requires parent confirmation via AdultGate before calling
+ * Requires parent confirmation via the parental gate before calling
  */
 export async function createShare(
   artworkId: string,

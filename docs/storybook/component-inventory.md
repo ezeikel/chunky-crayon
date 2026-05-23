@@ -61,22 +61,20 @@ GAPS: `ManageSubscriptionButton`, `PrintButton`, `SaveButton`,
 `buttons/...` — every component in `components/buttons/` + the
 download buttons elsewhere.
 
-### Section: Modals — BIGGEST GAP
+### Section: Modals — COVERED
 
-Covered: ParentalGateModal, FeedbackDialog.
-GAPS (every modal must be here):
+`modals.stories.tsx` has every modal in the app: ParentalGateModal,
+FeedbackDialog, `PaywallModal` (all three states — guest_limit,
+no_subscription, subscriber_no_credits), `CreateProfileModal`,
+`EmailCaptureModal`, `CreateCharacterModal` (the Character Builder
+5-step wizard), `ShareArtworkModal`, `StickerDetailModal`,
+`AutoColorModal` (coloring-ui), plus the generic dialog shell and the
+MagicColorOverlay states.
 
-- `PaywallModal` ⚠️ — all three states: guest_limit, no_subscription,
-  subscriber_no_credits
-- `CreateProfileModal`
-- `EmailCaptureModal`
-- `CreateCharacterModal` (the Character Builder — 5-step wizard)
-- `ShareArtworkModal`
-- `AdultGate`
-- `AutoColorModal` (coloring-ui)
-- `StickerDetailModal`
-- `TikTokPostComposer` (admin modal — confirm if modal-shaped)
-  "A Modals section must not be missing a modal that exists in the app."
+Note: there is **one** adult/parent gate — `ParentalGateModal`. The old
+`AdultGate` component was deleted; the share-artwork flow now gates
+through `useParentalGate` like everything else. `TikTokPostComposer`
+is a panel inside ShareArtworkModal, not a standalone modal.
 
 ### Section: Tiles & Cards — NO COVERAGE
 

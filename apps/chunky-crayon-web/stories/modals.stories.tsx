@@ -31,7 +31,6 @@ import EmailCaptureModal, {
 import CreateCharacterModal from '@/components/Characters/CreateCharacterModal/CreateCharacterModal';
 import ShareArtworkModal from '@/components/ShareArtworkModal/ShareArtworkModal';
 import StickerDetailModal from '@/components/StickerBook/StickerDetailModal';
-import AdultGate from '@/components/AdultGate';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
 import { Button } from '@/components/ui/button';
 import { STICKER_CATALOG } from '@/lib/stickers/catalog';
@@ -255,8 +254,9 @@ export const CreateCharacterOpen: Story = {
   ),
 };
 
-// ─── ShareArtworkModal — gate + options states ────────────────────────
-// The modal opens at the AdultGate step; pass the gate to reach options.
+// ─── ShareArtworkModal ────────────────────────────────────────────────
+// The parental gate runs at the caller before the modal opens, so the
+// modal itself starts at the share-options step.
 
 const OpenShareArtwork = () => {
   const [open, setOpen] = useState(true);
@@ -271,24 +271,11 @@ const OpenShareArtwork = () => {
   );
 };
 
-export const ShareArtworkGate: Story = {
-  name: 'Share artwork — adult gate',
+export const ShareArtworkOptions: Story = {
+  name: 'Share artwork',
   render: () => (
     <Stage>
       <OpenShareArtwork />
-    </Stage>
-  ),
-};
-
-// ─── AdultGate (standalone — also embedded in ShareArtworkModal) ───────
-
-export const AdultGateOpen: Story = {
-  name: 'Adult gate',
-  render: () => (
-    <Stage>
-      <div className="flex justify-center pt-12">
-        <AdultGate onSuccess={() => undefined} onCancel={() => undefined} />
-      </div>
     </Stage>
   ),
 };

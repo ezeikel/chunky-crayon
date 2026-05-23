@@ -14,7 +14,6 @@ import {
 } from '@fortawesome/pro-solid-svg-icons';
 import { faLockOpen, faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { faTiktok } from '@fortawesome/free-brands-svg-icons';
-import AdultGate from '@/components/AdultGate';
 import Portal from '@/components/Portal';
 import TikTokPostComposer from '@/components/TikTokPostComposer';
 import { createShare } from '@/app/actions/share';
@@ -29,7 +28,7 @@ type ShareArtworkModalProps = {
   onClose: () => void;
 };
 
-type ModalState = 'gate' | 'options' | 'generating' | 'success' | 'tiktok';
+type ModalState = 'options' | 'generating' | 'success' | 'tiktok';
 
 type ExpirationOption = {
   value: ShareExpiration;
@@ -52,7 +51,9 @@ const ShareArtworkModal = ({
 }: ShareArtworkModalProps) => {
   const t = useTranslations('shareModal');
   const tCommon = useTranslations('common');
-  const [state, setState] = useState<ModalState>('gate');
+  // The parental gate runs at the caller (ShareArtworkButton) before
+  // this modal ever opens, so the modal starts straight at 'options'.
+  const [state, setState] = useState<ModalState>('options');
   const [selectedExpiration, setSelectedExpiration] =
     useState<ShareExpiration>('30days');
   const [shareUrl, setShareUrl] = useState<string | null>(null);
@@ -94,12 +95,8 @@ const ShareArtworkModal = ({
     setState('success');
   };
 
-  const handleGateSuccess = useCallback(() => {
-    setState('options');
-  }, []);
-
   const handleCancel = useCallback(() => {
-    setState('gate');
+    setState('options');
     setShareUrl(null);
     setError(null);
     setCopied(false);
@@ -142,7 +139,7 @@ const ShareArtworkModal = ({
   }, [shareUrl]);
 
   const handleDone = useCallback(() => {
-    setState('gate');
+    setState('options');
     setShareUrl(null);
     setError(null);
     setCopied(false);
@@ -163,10 +160,6 @@ const ShareArtworkModal = ({
 
         {/* Modal Content */}
         <div className="relative z-10 w-full max-w-md">
-          {state === 'gate' && (
-            <AdultGate onSuccess={handleGateSuccess} onCancel={handleCancel} />
-          )}
-
           {state === 'options' && (
             <div className="bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
               {/* Header */}

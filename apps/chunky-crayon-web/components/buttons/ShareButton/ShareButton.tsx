@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { faShare, faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { ActionButton } from '@one-colored-pixel/coloring-ui';
-import AdultGate from '@/components/AdultGate';
+import { useParentalGate } from '@/components/ParentalGate';
 import Portal from '@/components/Portal';
 import SocialShare from '@/components/SocialShare/SocialShare';
 import { uploadArtworkForSharing } from '@/app/actions/share-artwork';
@@ -18,7 +18,7 @@ type ShareButtonProps = {
   className?: string;
 };
 
-type ShareState = 'idle' | 'gate' | 'uploading' | 'sharing';
+type ShareState = 'idle' | 'uploading' | 'sharing';
 
 const ShareButton = ({
   url,
@@ -29,14 +29,11 @@ const ShareButton = ({
   className,
 }: ShareButtonProps) => {
   const t = useTranslations('shareButton');
+  const { openGate } = useParentalGate();
   const [state, setState] = useState<ShareState>('idle');
   const [shareImageUrl, setShareImageUrl] = useState<string | undefined>(
     imageUrl,
   );
-
-  const handleShareClick = useCallback(() => {
-    setState('gate');
-  }, []);
 
   const handleGateSuccess = useCallback(async () => {
     // If we have canvas access, upload the colored artwork
@@ -56,9 +53,12 @@ const ShareButton = ({
     setState('sharing');
   }, [getCanvasDataUrl]);
 
-  const handleCancel = useCallback(() => {
-    setState('idle');
-  }, []);
+  // Sharing is a parent-facing action — gate it. The parental gate is
+  // rendered globally by ParentalGateProvider; openGate's callback form
+  // runs handleGateSuccess only once a grown-up has passed.
+  const handleShareClick = useCallback(() => {
+    openGate({ onSuccess: handleGateSuccess });
+  }, [openGate, handleGateSuccess]);
 
   const handleClose = useCallback(() => {
     setState('idle');
@@ -79,30 +79,9 @@ const ShareButton = ({
         icon={state === 'uploading' ? faSpinnerThird : faShare}
         label={state === 'uploading' ? t('preparing') : t('idle')}
         onClick={handleShareClick}
-        disabled={
-          state === 'uploading' || state === 'gate' || state === 'sharing'
-        }
+        disabled={state === 'uploading' || state === 'sharing'}
         className={className}
       />
-
-      {state === 'gate' && (
-        <Portal>
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-              onClick={handleCancel}
-              aria-hidden="true"
-            />
-            {/* Gate */}
-            <AdultGate
-              onSuccess={handleGateSuccess}
-              onCancel={handleCancel}
-              className="relative z-10"
-            />
-          </div>
-        </Portal>
-      )}
 
       {state === 'sharing' && (
         <Portal>

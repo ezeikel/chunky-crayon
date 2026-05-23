@@ -769,16 +769,6 @@
       "cta": "See plans"
     }
   },
-  "adultGate": {
-    "title": "Quick check, are you a grown-up?",
-    "explanation": "We use a small math problem so this only opens for parents.",
-    "whatIs": "What's",
-    "placeholder": "Type the answer",
-    "check": "Yep, I've got it",
-    "cancel": "Maybe later",
-    "error": "Hmm, not quite. Have another go.",
-    "errorWithAttempts": "Still not right ({attempts} tries). Take your time."
-  },
   "startOverButton": {
     "idle": "Start Over",
     "modalTitle": "Wipe the page?",
