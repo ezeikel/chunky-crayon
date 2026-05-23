@@ -1087,7 +1087,6 @@ export const TRACKING_EVENTS = {
   PAGE_COLOR_SELECTED: 'page_color_selected', // Color picked
   PAGE_STROKE_MADE: 'page_stroke_made', // Drawing stroke completed
   PAGE_SAVED: 'page_saved', // Saved to gallery
-  PAGE_SHARED: 'page_shared', // Shared via link
   PAGE_FIRST_STROKE: 'page_first_stroke', // First stroke after page mount — measures time-to-engage
   TOOL_SELECTED: 'tool_selected', // Tile click in toolbar (crayon, marker, fill, magic-reveal, etc.)
   BRUSH_SIZE_CHANGED: 'brush_size_changed', // Switched between small/medium/large

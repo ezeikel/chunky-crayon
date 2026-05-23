@@ -29,7 +29,6 @@ import EmailCaptureModal, {
   EMAIL_CAPTURE_PROMPT_EVENT,
 } from '@/components/EmailCaptureModal/EmailCaptureModal';
 import CreateCharacterModal from '@/components/Characters/CreateCharacterModal/CreateCharacterModal';
-import ShareArtworkModal from '@/components/ShareArtworkModal/ShareArtworkModal';
 import StickerDetailModal from '@/components/StickerBook/StickerDetailModal';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
 import { Button } from '@/components/ui/button';
@@ -250,32 +249,6 @@ export const CreateCharacterOpen: Story = {
   render: () => (
     <Stage>
       <OpenCreateCharacter />
-    </Stage>
-  ),
-};
-
-// ─── ShareArtworkModal ────────────────────────────────────────────────
-// The parental gate runs at the caller before the modal opens, so the
-// modal itself starts at the share-options step.
-
-const OpenShareArtwork = () => {
-  const [open, setOpen] = useState(true);
-  return (
-    <ShareArtworkModal
-      artworkId="storybook-artwork"
-      artworkTitle="Maya's Friendly Dragon"
-      artworkImageUrl="/images/colo.svg"
-      isOpen={open}
-      onClose={() => setOpen(false)}
-    />
-  );
-};
-
-export const ShareArtworkOptions: Story = {
-  name: 'Share artwork',
-  render: () => (
-    <Stage>
-      <OpenShareArtwork />
     </Stage>
   ),
 };

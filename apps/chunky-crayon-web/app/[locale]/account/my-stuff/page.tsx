@@ -25,7 +25,6 @@ import { getMyStickerStats } from '@/app/actions/stickers';
 import { getMyCurrentChallenge } from '@/app/actions/challenges';
 import { listMyBundlePurchases } from '@/app/data/bundle';
 import DeleteArtworkButton from './DeleteArtworkButton';
-import ShareArtworkButton from './ShareArtworkButton';
 
 export const metadata: Metadata = {
   title: 'My Stuff - Chunky Crayon',
@@ -293,7 +292,7 @@ const ArtworkGrid = async () => {
           </h3>
           <p className="text-text-secondary font-rooney-sans mb-6 max-w-md mx-auto">
             Color a page and tap save to see it here. Your artwork stays
-            forever, ready to share or print.
+            forever, ready to print whenever you want.
           </p>
           <Link
             href="/gallery"
@@ -357,11 +356,6 @@ const ArtworkGrid = async () => {
                     className="text-sm md:text-lg"
                   />
                 </Link>
-                <ShareArtworkButton
-                  artworkId={artwork.id}
-                  artworkTitle={artwork.title || 'My Artwork'}
-                  artworkImageUrl={artwork.imageUrl}
-                />
                 <DeleteArtworkButton artworkId={artwork.id} />
               </div>
             </div>

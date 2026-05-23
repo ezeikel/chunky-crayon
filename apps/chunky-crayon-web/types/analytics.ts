@@ -197,10 +197,6 @@ export type EventProperties = {
   [TRACKING_EVENTS.PAGE_SAVED]: {
     coloringImageId: string;
   };
-  [TRACKING_EVENTS.PAGE_SHARED]: {
-    coloringImageId: string;
-    shareMethod: 'link' | 'social';
-  };
   [TRACKING_EVENTS.PAGE_FIRST_STROKE]: {
     coloringImageId?: string;
     msFromMount: number; // Time from page open to first stroke. Engagement signal.

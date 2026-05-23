@@ -776,30 +776,6 @@
     "confirm": "Yep, fresh page",
     "cancel": "Keep coloring"
   },
-  "shareButton": {
-    "idle": "Share",
-    "preparing": "Wrapping it up...",
-    "doneSharing": "All done"
-  },
-  "shareModal": {
-    "title": "Share this artwork",
-    "privacyNote": "Anyone with the link can see this page. We don't share names, emails, or anything else.",
-    "expiresIn": "Link works for:",
-    "expiration": {
-      "7days": "1 week",
-      "30days": "1 month",
-      "never": "Forever"
-    },
-    "createLink": "Make the link",
-    "creating": "Making your link...",
-    "success": {
-      "title": "Link's ready",
-      "subtitle": "Send it to anyone you want to show."
-    },
-    "done": "All done",
-    "error": "That didn't work. Try again in a moment.",
-    "socialShare": "Or post it"
-  },
   "stickers": {
     "categories": {
       "stars": "Stars",
@@ -1081,15 +1057,6 @@
     "pinterest": "Pinterest",
     "x": "X",
     "threads": "Threads"
-  },
-  "socialShare": {
-    "shareOn": "Share on {platform}",
-    "download": "Download artwork",
-    "downloadAria": "Download your colored artwork",
-    "facebookAria": "Share on Facebook",
-    "xAria": "Share on X (Twitter)",
-    "pinterestAria": "Pin on Pinterest",
-    "whatsappAria": "Share on WhatsApp"
   },
   "parentalGate": {
     "title": "Quick check",

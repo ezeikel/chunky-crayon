@@ -32,7 +32,6 @@ import {
 import SaveButton from '@/components/buttons/SaveButton';
 import PrintButton from '@/components/buttons/PrintButton';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
-import ShareButton from '@/components/buttons/ShareButton';
 import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton';
 import {
   CanvasAction,
@@ -1482,13 +1481,6 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             coloringImage={coloringImage}
             getCanvasDataUrl={getCanvasDataUrl}
           />
-          <ShareButton
-            url={typeof window !== 'undefined' ? window.location.href : ''}
-            title={coloringImage.title || 'Coloring Page'}
-            description={`Color this ${coloringImage.title || 'fun coloring page'} on Chunky Crayon!`}
-            imageUrl={coloringImage.url || undefined}
-            getCanvasDataUrl={getCanvasDataUrl}
-          />
           {isAuthenticated && coloringImage.id && (
             <SaveToGalleryButton
               coloringImageId={coloringImage.id}
@@ -1506,13 +1498,6 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           />
           <SaveButton
             coloringImage={coloringImage}
-            getCanvasDataUrl={getCanvasDataUrl}
-          />
-          <ShareButton
-            url={typeof window !== 'undefined' ? window.location.href : ''}
-            title={coloringImage.title || 'Coloring Page'}
-            description={`Color this ${coloringImage.title || 'fun coloring page'} on Chunky Crayon!`}
-            imageUrl={coloringImage.url || undefined}
             getCanvasDataUrl={getCanvasDataUrl}
           />
           {isAuthenticated && coloringImage.id && (

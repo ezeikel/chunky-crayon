@@ -112,10 +112,6 @@ const config: StorybookConfig = {
           replacement: resolve(root, '.storybook/mocks/stripe-actions.ts'),
         },
         {
-          find: '@/app/actions/share-artwork',
-          replacement: resolve(root, '.storybook/mocks/app-actions.ts'),
-        },
-        {
           find: '@/app/actions/createPendingColoringImage',
           replacement: resolve(root, '.storybook/mocks/app-actions.ts'),
         },
@@ -133,10 +129,6 @@ const config: StorybookConfig = {
         },
         {
           find: '@/app/actions/load-gallery-images',
-          replacement: resolve(root, '.storybook/mocks/app-actions.ts'),
-        },
-        {
-          find: '@/app/actions/share',
           replacement: resolve(root, '.storybook/mocks/app-actions.ts'),
         },
         {

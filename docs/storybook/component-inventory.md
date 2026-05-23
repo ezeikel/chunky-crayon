@@ -25,7 +25,7 @@ primitives (thin framer-motion wrappers).
   ui/textarea, ui/card, Loading, ui/sonner. Colors/typography.
 - `forms-and-inputs.stories.tsx` — CreateColoringPageForm, FormCTA,
   QualityPicker, JoinColoringPageEmailListForm, SubmitButton,
-  ShareButton, StartOverButton, SignInOptions, ParentalGate.
+  StartOverButton, SignInOptions, ParentalGate.
 - `gallery-and-content.stories.tsx` — AllColoringPageImagesShell,
   GalleryImageWithPreview, InfiniteScrollGallery, ImageFilterToggle,
   Pagination, DifficultyFilter, DifficultySlider, TodaysDate, blog/\*,
@@ -55,7 +55,7 @@ canonical "headings" reference (note this, don't invent a component).
 
 ### Section: Buttons — PARTIAL
 
-Covered: SubmitButton, ShareButton, StartOverButton, SignInOptions.
+Covered: SubmitButton, StartOverButton, SignInOptions.
 GAPS: `ManageSubscriptionButton`, `PrintButton`, `SaveButton`,
 `SaveToGalleryButton`, `GalleryCardDownloadButton`, `PackDownloadButton`,
 `buttons/...` — every component in `components/buttons/` + the
@@ -67,14 +67,15 @@ download buttons elsewhere.
 FeedbackDialog, `PaywallModal` (all three states — guest_limit,
 no_subscription, subscriber_no_credits), `CreateProfileModal`,
 `EmailCaptureModal`, `CreateCharacterModal` (the Character Builder
-5-step wizard), `ShareArtworkModal`, `StickerDetailModal`,
-`AutoColorModal` (coloring-ui), plus the generic dialog shell and the
-MagicColorOverlay states.
+5-step wizard), `StickerDetailModal`, `AutoColorModal` (coloring-ui),
+plus the generic dialog shell and the MagicColorOverlay states.
 
 Note: there is **one** adult/parent gate — `ParentalGateModal`. The old
-`AdultGate` component was deleted; the share-artwork flow now gates
-through `useParentalGate` like everything else. `TikTokPostComposer`
-is a panel inside ShareArtworkModal, not a standalone modal.
+`AdultGate` is gone. CC has no user-share / public-share-link feature
+at all (it's a kids app — see `feedback_no_user_share_features_in_cc`);
+`ShareArtworkModal`, `ShareButton`, `SocialShare`, `TikTokPostComposer`,
+the `/shared/[code]` route, and the related server actions / lib were
+deleted. CH still ships share and has its own copies.
 
 ### Section: Tiles & Cards — NO COVERAGE
 
@@ -124,7 +125,7 @@ App-side canvas: `ColoringArea`, `ColoringPageContent`,
 Covered by `gallery-and-content` + `homepage-sections`. GAPS:
 `AnimatedGalleryGrid/Header`, `DailyImageHeading`, `SocialProofStats` +
 `AnimatedStatCard`, `StartPostEngagementBridge`, `ColoringHabitatCallout`,
-`AppStoreSection` / `AppStoreButtons`, `SocialShare`.
+`AppStoreSection` / `AppStoreButtons`.
 
 ### Section: Stickers — NO COVERAGE
 

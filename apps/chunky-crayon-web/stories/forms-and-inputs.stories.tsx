@@ -12,7 +12,6 @@ import {
 } from '@/components/forms/CreateColoringPageForm/inputs';
 import JoinColoringPageEmailListForm from '@/components/forms/JoinColoringPageEmailListForm/JoinColoringPageEmailListForm';
 import SubmitButton from '@/components/buttons/SubmitButton/SubmitButton';
-import ShareButton from '@/components/buttons/ShareButton';
 import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
 import SignInOptions from '@/components/buttons/SignInOptions/SignInOptions';
 import { ParentalGateProvider } from '@/components/ParentalGate';
@@ -104,7 +103,6 @@ export const ActionButtons: Story = {
   render: () => (
     <main className="flex flex-wrap items-center gap-4 p-8">
       <SubmitButton text="Create" icon={faWandMagicSparkles} />
-      <ShareButton url="https://chunkycrayon.com/gallery" title="Share page" />
       <StartOverButton onStartOver={() => undefined} />
     </main>
   ),

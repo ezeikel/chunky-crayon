@@ -1,8 +1,3 @@
-export const uploadArtworkForSharing = async () => ({
-  success: true,
-  imageUrl: '/images/colo.svg',
-});
-
 export const createPendingColoringImage = async () => ({
   ok: true,
   id: 'storybook-coloring-image',
@@ -23,11 +18,6 @@ export const loadGalleryImages = async () => ({
   images: [],
   nextCursor: null,
   hasMore: false,
-});
-
-export const createShare = async () => ({
-  success: true,
-  shareUrl: 'https://chunkycrayon.com/shared/storybook',
 });
 
 export const transcribeAudio = async () => ({ text: 'A friendly dragon' });
