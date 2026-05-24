@@ -26,6 +26,14 @@ type PaginationProps = {
   buildHref: (page: number) => string;
   /** Accessible label for the nav wrapper. */
   ariaLabel?: string;
+  /**
+   * Whether navigating to a new page should scroll to top. Default
+   * true (matches the existing /gallery behaviour). Pass false for
+   * in-page pagination where the kid is reading the grid right above
+   * and a jump-to-top is disorienting — e.g. /account/my-stuff's
+   * "Your pictures" section.
+   */
+  scroll?: boolean;
 };
 
 const Pagination = ({
@@ -33,6 +41,7 @@ const Pagination = ({
   totalPages,
   buildHref,
   ariaLabel = 'Pagination',
+  scroll = true,
 }: PaginationProps) => {
   if (totalPages <= 1) return null;
 
@@ -69,6 +78,7 @@ const Pagination = ({
       {hasPrev ? (
         <Link
           href={buildHref(safeCurrent - 1)}
+          scroll={scroll}
           rel="prev"
           aria-label="Previous page"
           className="inline-flex items-center justify-center w-10 h-10 rounded-full font-tondo font-semibold text-text-secondary border-2 border-paper-cream-dark hover:border-crayon-orange/50 hover:text-crayon-orange transition-colors"
@@ -102,6 +112,7 @@ const Pagination = ({
           <Link
             key={item.page}
             href={buildHref(item.page)}
+            scroll={scroll}
             aria-current={isActive ? 'page' : undefined}
             aria-label={
               isActive ? `Page ${item.page}, current` : `Page ${item.page}`
@@ -122,6 +133,7 @@ const Pagination = ({
       {hasNext ? (
         <Link
           href={buildHref(safeCurrent + 1)}
+          scroll={scroll}
           rel="next"
           aria-label="Next page"
           className="inline-flex items-center justify-center w-10 h-10 rounded-full font-tondo font-semibold text-text-secondary border-2 border-paper-cream-dark hover:border-crayon-orange/50 hover:text-crayon-orange transition-colors"

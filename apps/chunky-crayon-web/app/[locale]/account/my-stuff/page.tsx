@@ -18,7 +18,6 @@ import { auth } from '@/auth';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import CrayonScribble from '@/components/Intro/CrayonScribble';
-import Loading from '@/components/Loading/Loading';
 import ChallengeWidget from '@/components/ChallengeCard/ChallengeWidget';
 import { getUserSavedArtwork } from '@/app/actions/saved-artwork';
 import {
@@ -271,6 +270,36 @@ const BundlePurchaseCard = ({
   );
 };
 
+// Skeleton placeholders for the two grid sections — matches the
+// final card layout so the page doesn't flash a spinner. Static
+// shell renders these instantly while the per-user data resolves
+// inside Suspense.
+const GridSectionSkeleton = ({
+  title,
+  cards = 8,
+}: {
+  title: string;
+  cards?: number;
+}) => (
+  <section className="mt-12 lg:mt-16">
+    <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary mb-6 relative inline-block">
+      {title}
+      <CrayonScribble
+        seed={29}
+        className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
+      />
+    </h2>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+      {Array.from({ length: cards }).map((_, i) => (
+        <div
+          key={i}
+          className="aspect-square rounded-2xl bg-paper-cream-dark/30 animate-pulse"
+        />
+      ))}
+    </div>
+  </section>
+);
+
 // ─── My creations grid (every page they generated, paginated) ───────
 // Distinct from "Your saved pictures" below: this is the kid's full
 // pile of generated coloring pages (colored or not), the workbench
@@ -371,6 +400,10 @@ const MyCreationsSection = async ({
               p === 1 ? '/account/my-stuff' : `/account/my-stuff?page=${p}`
             }
             ariaLabel="Your pictures"
+            // Stay put on click — the grid above is what changed, the
+            // pagination is right under the kid's eye. Scroll-to-top
+            // would jump the page back to the breadcrumb header.
+            scroll={false}
           />
         </div>
       )}
@@ -520,11 +553,13 @@ const MyArtworkPage = ({
             2. Your saved pictures — colored & saved.
             3. Bundles — bought content.
             4. Stickers + challenge — progress / engagement. */}
-      <Suspense fallback={<Loading size="lg" />}>
+      <Suspense fallback={<GridSectionSkeleton title="Your pictures" />}>
         <MyCreationsSection searchParamsPromise={searchParams} />
       </Suspense>
 
-      <Suspense fallback={<Loading size="lg" />}>
+      <Suspense
+        fallback={<GridSectionSkeleton title="Your saved pictures" cards={4} />}
+      >
         <ArtworkGrid />
       </Suspense>
 
