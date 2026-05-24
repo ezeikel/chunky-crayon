@@ -1037,10 +1037,10 @@
       "delete": "Delete {name}"
     },
     "create": {
-      "title": "Create Profile",
-      "subtitle": "Add a new artist to your family",
-      "button": "Create Profile",
-      "creating": "Creating...",
+      "title": "Make a profile",
+      "subtitle": "Pick a name and a picture",
+      "button": "Make Profile",
+      "creating": "Making...",
       "success": "Profile created!",
       "addProfile": "Add Profile",
       "maxReached": "Maximum profiles reached",
@@ -1048,8 +1048,8 @@
       "nameLabel": "Name",
       "namePlaceholder": "e.g., Emma",
       "nameError": "Please enter a name",
-      "ageGroupLabel": "Age Group",
-      "avatarLabel": "Avatar"
+      "ageGroupLabel": "How old?",
+      "avatarLabel": "Pick a picture"
     }
   },
   "social": {

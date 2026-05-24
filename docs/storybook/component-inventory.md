@@ -138,10 +138,15 @@ GAPS: `ColoEvolutionCelebration` (modal-like full-screen overlay),
 `StickerBook` (the page-level wrapper), `StickerSelector`,
 `StickerReward`, `StickerBook/ProgressBar`.
 
-### Section: Profiles — NO COVERAGE
+### Section: Profiles — PARTIAL
 
-GAPS: `ProfileUI`, `ProfileAvatar`, `ProfileIndicator`,
-`ProfileSwitcher`, `ProfileCard`, `AddProfileCard`.
+Covered: `profiles.stories.tsx` renders the full 12-avatar catalog
+(via the real `ProfileAvatar` reading from `lib/avatars.ts`) +
+every `ProfileAvatar` size variant + the initials fallback path.
+The `CreateProfileModal` itself is storied under
+`05 Modals / Create profile`.
+GAPS: `ProfileUI`, `ProfileIndicator`, `ProfileSwitcher`,
+`ProfileCard`, `AddProfileCard`.
 
 ### Section: Feedback / Loading / Misc
 

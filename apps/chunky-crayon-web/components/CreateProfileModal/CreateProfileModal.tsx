@@ -10,6 +10,9 @@ import {
   faChildReaching,
   faGamepad,
   faPalette,
+  faUserPlus,
+  faSpinnerThird,
+  faCheck,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { AgeGroup } from '@one-colored-pixel/db/types';
@@ -143,16 +146,46 @@ const CreateProfileModal = ({
     }
   };
 
+  // Description for the selected age group — same content as the old
+  // standalone <p>, hoisted so the JSX reads cleanly.
+  const ageGroupDescription = tAgeGroups(
+    AGE_GROUP_OPTIONS.find((o) => o.value === ageGroup)?.descriptionKey ??
+      'childDescription',
+  );
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{t('create.title')}</DialogTitle>
-          <DialogDescription>{t('create.subtitle')}</DialogDescription>
+      {/* max-w-lg + tighter overflow scroll. Matches PaywallModal /
+          ParentalGate / FeedbackDialog kid-modal chrome: icon-in-circle
+          header badge, friendly title, chunky tap targets. */}
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="items-center gap-3 text-center">
+          {/* Header badge — same recipe as the other CC modals. */}
+          <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-crayon-orange/10">
+            <FontAwesomeIcon
+              icon={faUserPlus}
+              className="text-3xl"
+              style={
+                {
+                  '--fa-primary-color': 'hsl(var(--crayon-orange))',
+                  '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
+                  '--fa-secondary-opacity': '1',
+                } as React.CSSProperties
+              }
+            />
+          </div>
+          <DialogTitle className="font-tondo text-2xl font-bold text-text-primary md:text-3xl">
+            {t('create.title')}
+          </DialogTitle>
+          <DialogDescription className="text-base text-text-secondary">
+            {t('create.subtitle')}
+          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-          {/* Name input */}
+        <form onSubmit={handleSubmit} className="mt-2 space-y-6">
+          {/* Name input — chunkier rounded-2xl, larger padding, tondo
+              as the value typography so the kid's name reads as the
+              friendly tile inscription it is. */}
           <div>
             <label
               htmlFor="profile-name"
@@ -168,9 +201,7 @@ const CreateProfileModal = ({
               placeholder={t('create.namePlaceholder')}
               maxLength={20}
               className={cn(
-                'w-full px-4 py-3 rounded-xl',
-                'border-2 border-paper-cream-dark',
-                'font-tondo text-lg text-text-primary',
+                'w-full rounded-2xl border-2 border-paper-cream-dark px-4 py-3 font-tondo text-lg text-text-primary',
                 'placeholder:text-gray-400',
                 'focus:outline-none focus:border-crayon-orange focus:ring-2 focus:ring-crayon-orange/20',
                 'transition-all duration-200',
@@ -179,127 +210,128 @@ const CreateProfileModal = ({
             />
           </div>
 
-          {/* Age group selector */}
+          {/* Age group selector — kept shape, tightened spacing. */}
           <div>
             <label className="block font-tondo font-bold text-sm text-text-secondary mb-2">
               {t('create.ageGroupLabel')}
             </label>
             <div className="grid grid-cols-5 gap-2">
-              {AGE_GROUP_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setAgeGroup(option.value)}
-                  disabled={isPending}
-                  className={cn(
-                    'flex flex-col items-center gap-1 p-2 rounded-xl',
-                    'border-2 transition-all duration-200',
-                    'hover:scale-105 active:scale-95',
-                    ageGroup === option.value
-                      ? 'border-crayon-orange bg-crayon-orange/10'
-                      : 'border-paper-cream-dark hover:border-gray-300',
-                  )}
-                >
-                  <FontAwesomeIcon
-                    icon={option.icon}
+              {AGE_GROUP_OPTIONS.map((option) => {
+                const isActive = ageGroup === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setAgeGroup(option.value)}
+                    disabled={isPending}
                     className={cn(
-                      'text-2xl',
-                      ageGroup === option.value
-                        ? 'text-crayon-orange'
-                        : option.color,
+                      'flex flex-col items-center gap-1 rounded-2xl border-2 p-2 transition-all duration-200',
+                      'hover:scale-105 active:scale-95',
+                      isActive
+                        ? 'border-crayon-orange bg-crayon-orange/10'
+                        : 'border-paper-cream-dark hover:border-gray-300',
                     )}
-                  />
-                  <span
-                    className={cn(
-                      'font-tondo text-xs font-bold',
-                      ageGroup === option.value
-                        ? 'text-crayon-orange'
-                        : 'text-text-secondary',
-                    )}
+                    aria-pressed={isActive}
                   >
-                    {tAgeGroups(option.labelKey)}
-                  </span>
-                </button>
-              ))}
+                    <FontAwesomeIcon
+                      icon={option.icon}
+                      className={cn(
+                        'text-2xl',
+                        isActive ? 'text-crayon-orange' : option.color,
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        'font-tondo text-xs font-bold',
+                        isActive ? 'text-crayon-orange' : 'text-text-secondary',
+                      )}
+                    >
+                      {tAgeGroups(option.labelKey)}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-            <p className="mt-2 text-xs text-gray-500 text-center">
-              {tAgeGroups(
-                AGE_GROUP_OPTIONS.find((o) => o.value === ageGroup)
-                  ?.descriptionKey ?? 'childDescription',
-              )}
+            <p className="mt-2 text-center text-xs text-gray-500">
+              {ageGroupDescription}
             </p>
           </div>
 
-          {/* Avatar picker */}
+          {/* Avatar picker — 4 cols × 3 rows of illustrated tiles.
+              Each tile uses ProfileAvatar size='md' (64px) so the
+              illustrations read at a glance. Selected state is a
+              chunky orange ring + a check chip in the corner — same
+              affordance the Character Builder species tiles use. */}
           <div>
-            <label className="block font-tondo font-bold text-sm text-text-secondary mb-2">
+            <label className="block font-tondo font-bold text-sm text-text-secondary mb-3">
               {t('create.avatarLabel')}
             </label>
-            <div className="grid grid-cols-5 gap-3">
-              {selectableAvatars.map((avatar) => (
-                <button
-                  key={avatar.id}
-                  type="button"
-                  onClick={() => setAvatarId(avatar.id)}
-                  disabled={isPending}
-                  className={cn(
-                    'relative rounded-full p-1',
-                    'transition-all duration-200',
-                    'hover:scale-110 active:scale-95',
-                    avatarId === avatar.id && 'ring-4 ring-crayon-orange',
-                  )}
-                >
-                  <ProfileAvatar
-                    avatarId={avatar.id}
-                    name={name || '?'}
-                    size="sm"
-                  />
-                  {avatarId === avatar.id && (
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-crayon-orange rounded-full flex items-center justify-center">
-                      <svg
-                        className="w-3 h-3 text-white"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={3}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
+            <div className="grid grid-cols-4 gap-3">
+              {selectableAvatars.map((avatar) => {
+                const isActive = avatarId === avatar.id;
+                return (
+                  <button
+                    key={avatar.id}
+                    type="button"
+                    onClick={() => setAvatarId(avatar.id)}
+                    disabled={isPending}
+                    aria-label={avatar.name}
+                    aria-pressed={isActive}
+                    className={cn(
+                      'relative flex items-center justify-center rounded-full p-1 transition-all duration-200',
+                      'hover:scale-110 active:scale-95',
+                      isActive && 'ring-4 ring-crayon-orange',
+                    )}
+                  >
+                    <ProfileAvatar
+                      avatarId={avatar.id}
+                      name={avatar.name}
+                      size="md"
+                    />
+                    {isActive && (
+                      <div className="absolute -bottom-1 -right-1 flex size-6 items-center justify-center rounded-full bg-crayon-orange shadow-sm">
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="text-xs text-white"
                         />
-                      </svg>
-                    </div>
-                  )}
-                </button>
-              ))}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Error message */}
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {/* Error message — kept inline + simple. */}
+          {error && (
+            <p className="text-center text-sm text-crayon-pink">{error}</p>
+          )}
 
-          {/* Submit button */}
+          {/* Submit pill — same brand-orange chunky pill the rest of
+              the CC modal kit uses. */}
           <button
             type="submit"
             disabled={isPending || !name.trim()}
             className={cn(
-              'w-full py-3 px-6 rounded-full',
-              'font-tondo font-bold text-lg text-white',
-              'bg-crayon-orange shadow-btn-primary',
-              'hover:shadow-btn-primary-hover hover:scale-105',
-              'active:scale-95 transition-all duration-200',
+              'inline-flex w-full items-center justify-center gap-2 rounded-full bg-crayon-orange px-6 py-3.5 font-tondo text-lg font-bold text-white shadow-btn-primary',
+              'transition-all duration-200 hover:scale-105 hover:shadow-btn-primary-hover active:scale-95',
               'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
               'focus:outline-none focus-visible:ring-4 focus-visible:ring-crayon-orange/50',
             )}
           >
             {isPending ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <>
+                <FontAwesomeIcon
+                  icon={faSpinnerThird}
+                  className="animate-spin"
+                />
                 {t('create.creating')}
-              </span>
+              </>
             ) : (
-              t('create.button')
+              <>
+                <FontAwesomeIcon icon={faUserPlus} />
+                {t('create.button')}
+              </>
             )}
           </button>
         </form>

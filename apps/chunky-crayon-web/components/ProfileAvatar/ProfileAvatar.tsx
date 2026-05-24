@@ -1,7 +1,25 @@
 'use client';
 
-import { getAvatar, getAvatarColor, getInitials } from '@/lib/avatars';
+import { useState } from 'react';
+import Image from 'next/image';
+import { getAvatar, getInitials } from '@/lib/avatars';
+import { resolveThumbnailUrl } from '@/lib/scene/thumbnail-url';
 import cn from '@/lib/utils';
+
+/**
+ * Profile avatar render.
+ *
+ * Was a coloured-crayon circle (named hex per avatar + crayon-shine
+ * pseudo-art). New shape: an illustrated tile from R2 sitting on a
+ * soft tinted background (the catalog entry's `bg` Tailwind class).
+ * `resolveThumbnailUrl` handles the env-aware URL build (same helper
+ * the Character Builder species tiles use) so dev + prod work from
+ * one catalog. Initials are the visual fallback when the image fails
+ * to load AND when we have no avatar match in the catalog.
+ *
+ * Sizes / borders kept verbatim so every existing call site renders
+ * at the same physical dimensions.
+ */
 
 type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -21,6 +39,17 @@ const sizeClasses: Record<AvatarSize, string> = {
   xl: 'w-32 h-32 text-3xl',
 };
 
+// Pixel dimensions for `<Image>` (matches sizeClasses). Gives Next/Image
+// a concrete size so it doesn't ship full-resolution 1024² PNGs for an
+// 8px chip in the header.
+const sizePx: Record<AvatarSize, number> = {
+  xs: 32,
+  sm: 40,
+  md: 64,
+  lg: 96,
+  xl: 128,
+};
+
 const borderSizeClasses: Record<AvatarSize, string> = {
   xs: 'ring-2',
   sm: 'ring-2',
@@ -37,49 +66,56 @@ const ProfileAvatar = ({
   showBorder = false,
 }: ProfileAvatarProps) => {
   const avatar = getAvatar(avatarId);
-  const color = getAvatarColor(avatarId);
   const initials = name ? getInitials(name) : '?';
+  const [imageError, setImageError] = useState(false);
 
-  // For placeholder avatars, show a gray circle with initials
-  if (avatar?.placeholder || !avatar) {
-    return (
-      <div
-        className={cn(
-          'rounded-full flex items-center justify-center font-tondo font-bold text-gray-500 bg-gray-200',
-          sizeClasses[size],
-          showBorder && `${borderSizeClasses[size]} ring-white ring-offset-2`,
-          className,
-        )}
-      >
-        {initials}
-      </div>
-    );
-  }
-
-  // For crayon avatars, render a colored circle with crayon-style design
-  return (
+  // Fallback path — no catalog match (unknown id) OR the image
+  // failed to load. Same grey-initials chip the previous component
+  // shipped, kept as the last-resort visual.
+  const renderInitialsFallback = () => (
     <div
       className={cn(
-        'rounded-full flex items-center justify-center relative overflow-hidden',
+        'rounded-full flex items-center justify-center font-tondo font-bold text-gray-500 bg-gray-200',
         sizeClasses[size],
         showBorder && `${borderSizeClasses[size]} ring-white ring-offset-2`,
         className,
       )}
-      style={{ backgroundColor: color }}
     >
-      {/* Crayon texture effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+      {initials}
+    </div>
+  );
 
-      {/* Crayon shine effect */}
-      <div
-        className="absolute top-1 left-1/4 w-1/3 h-1/4 rounded-full opacity-40"
-        style={{ backgroundColor: 'white' }}
-      />
+  if (!avatar) return renderInitialsFallback();
 
-      {/* Crayon tip indicator (small circle at bottom) */}
-      <div
-        className="absolute bottom-[10%] w-[30%] h-[30%] rounded-full opacity-30"
-        style={{ backgroundColor: 'black' }}
+  const imageUrl = resolveThumbnailUrl(avatar.imageKey);
+
+  // Env-resolver returned null — dev surface without R2 wired up, or
+  // a brand-new install before generate-profile-avatars has run.
+  // Show the initials chip rather than a broken image.
+  if (!imageUrl || imageError) return renderInitialsFallback();
+
+  const px = sizePx[size];
+
+  return (
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-full',
+        avatar.bg,
+        sizeClasses[size],
+        showBorder && `${borderSizeClasses[size]} ring-white ring-offset-2`,
+        className,
+      )}
+    >
+      <Image
+        src={imageUrl}
+        alt={name ? `${name}'s avatar` : avatar.name}
+        width={px}
+        height={px}
+        // p-1 trims the illustration slightly inside the tinted ring
+        // so the art has a small "breathing" gap from the edge — same
+        // composition the Character Builder species tiles use.
+        className="size-full object-contain p-1"
+        onError={() => setImageError(true)}
       />
     </div>
   );
