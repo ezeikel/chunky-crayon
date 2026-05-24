@@ -91,8 +91,9 @@ Covered: the Character Builder illustration tiles —
 `characters.stories.tsx` renders every species, trait, and voice from
 `lib/characters/picker-catalog.ts` with the real `SceneTile`.
 GAPS: `CharacterCockpit`, `CharacterGrid`, `CharacterRetry`,
-`AddCharacterButton`, `OutfitPicker`, `VoicePad`, `ColoAvatar`,
-`ColoEvolutionCelebration`.
+`AddCharacterButton`, `OutfitPicker`, `VoicePad`. (`ColoAvatar` +
+`ColoEvolutionCelebration` moved to the Mascot & Stickers section
+below — they're the mascot, not Character Builder pieces.)
 
 ### Section: Forms — PARTIAL
 
@@ -127,10 +128,15 @@ Covered by `gallery-and-content` + `homepage-sections`. GAPS:
 `AnimatedStatCard`, `StartPostEngagementBridge`, `ColoringHabitatCallout`,
 `AppStoreSection` / `AppStoreButtons`.
 
-### Section: Stickers — NO COVERAGE
+### Section: Mascot & Stickers — PARTIAL
 
-GAPS: `StickerBook`, `StickerCard`, `StickerSelector`, `StickerReward`,
-`StickerBook/ProgressBar`.
+Covered: `mascot-and-stickers.stories.tsx` renders all 6 Colo stages
+(Baby → Master) via the real `ColoAvatar`, every avatar size, the
+full 22-sticker catalog via the real `StickerCard` in both
+unlocked + locked states, and a mid-game mixed view.
+GAPS: `ColoEvolutionCelebration` (modal-like full-screen overlay),
+`StickerBook` (the page-level wrapper), `StickerSelector`,
+`StickerReward`, `StickerBook/ProgressBar`.
 
 ### Section: Profiles — NO COVERAGE
 
