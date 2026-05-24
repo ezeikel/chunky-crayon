@@ -18,11 +18,21 @@ import cn from '@/utils/cn';
 type HeaderColoIndicatorProps = {
   coloState: ColoState | null;
   className?: string;
+  /**
+   * 'pill' (default) — standalone, renders its own pill chrome
+   * (border, bg, padding). The original shape, still useful when
+   * the indicator stands alone.
+   * 'bare' — drops the pill chrome so this trigger can be composed
+   * inside a shared parent pill alongside another indicator. Used
+   * by the combined Colo+Sticker pill in Header.tsx.
+   */
+  variant?: 'pill' | 'bare';
 };
 
 const HeaderColoIndicator = ({
   coloState,
   className,
+  variant = 'pill',
 }: HeaderColoIndicatorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations('colo');
@@ -32,15 +42,20 @@ const HeaderColoIndicator = ({
     return null;
   }
 
+  const isBare = variant === 'bare';
+
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <button
           type="button"
           className={cn(
-            'relative flex h-16 min-w-48 items-center justify-center rounded-full border-2 border-paper-cream-dark bg-white/80 px-6 shadow-sm transition-all duration-200',
-            'hover:scale-105 hover:border-crayon-orange hover:shadow-[0_0_0_4px_hsl(var(--crayon-yellow)/0.28)] active:scale-95',
-            'focus:outline-none focus-visible:shadow-[0_0_0_4px_hsl(var(--crayon-orange)),0_0_0_9px_hsl(var(--crayon-yellow)/0.4)]',
+            isBare
+              ? // Bare trigger — no border, no bg. Shared parent pill
+                // in Header.tsx owns the chrome. Sized snug around
+                // the avatar so it matches the sticker icon's height.
+                'relative flex items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-crayon-orange focus-visible:ring-offset-1'
+              : 'relative flex h-16 min-w-48 items-center justify-center rounded-full border-2 border-paper-cream-dark bg-white/80 px-6 shadow-sm transition-all duration-200 hover:scale-105 hover:border-crayon-orange hover:shadow-[0_0_0_4px_hsl(var(--crayon-yellow)/0.28)] active:scale-95 focus:outline-none focus-visible:shadow-[0_0_0_4px_hsl(var(--crayon-orange)),0_0_0_9px_hsl(var(--crayon-yellow)/0.4)]',
             className,
           )}
           aria-label={`Colo: ${t(`stages.${coloState.stage}.name`)}`}

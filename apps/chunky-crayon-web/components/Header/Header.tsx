@@ -80,18 +80,25 @@ const getNavItems = (
     href: '/',
     visibility: 'always',
   },
+  // My Stuff — second slot for signed-in users. It's the workbench
+  // door (the kid's pile of pictures + saved + bundles + progress),
+  // so it should sit right next to Home for a logged-in kid finding
+  // their stuff. Previously buried after Freebies + Products which
+  // was wrong priority — those are marketing/commerce surfaces, this
+  // is "their stuff". Signed-in only by definition.
+  {
+    label: t('myStuff'),
+    href: '/account/my-stuff',
+    visibility: 'authenticated',
+  },
   {
     label: t('gallery'),
     href: '/gallery',
     visibility: 'always',
   },
-  // Characters — promoted from slot 5 to slot 3 (right after Gallery,
-  // ahead of Freebies/Products/My Stuff). Reasoning: Characters is the
-  // differentiated retention feature we're trying to push, so it needs
-  // visibility next to the discovery cluster — but not above Gallery,
-  // which remains our SEO/organic acquisition workhorse. Signed-in
-  // only; routing logged-out kids to a sign-in wall would be a worse
-  // UX. Gated by `characters-feature` PostHog flag (always on in dev).
+  // Characters — slot 4 (after Home / My Stuff / Gallery). The
+  // differentiated retention feature; signed-in only. Gated by
+  // `characters-feature` PostHog flag (always on in dev).
   ...(showCharacters
     ? ([
         {
@@ -123,11 +130,6 @@ const getNavItems = (
       ] as const)
     : []),
   {
-    label: t('myStuff'),
-    href: '/account/my-stuff',
-    visibility: 'authenticated',
-  },
-  {
     label: t('blog'),
     href: '/blog',
     visibility: 'unauthenticated',
@@ -158,13 +160,20 @@ const getMobileItems = (
       iconName: faHouse,
       href: '/',
     });
+    // My Stuff second — the kid's workbench door. Same priority as
+    // the desktop nav so the two orderings stay in sync.
+    items.push({
+      label: t('myStuff'),
+      iconName: faHeart,
+      href: '/account/my-stuff',
+    });
     items.push({
       label: t('gallery'),
       iconName: faImages,
       href: '/gallery',
     });
-    // Characters in slot 3 — keep mobile in sync with desktop ordering
-    // (Home, Gallery, Characters, Freebies, Comics, Products, My Stuff,
+    // Characters in slot 4 — keep mobile in sync with desktop ordering
+    // (Home, My Stuff, Gallery, Characters, Freebies, Comics, Products,
     // …). Mobile keeps Comics in the list because the drawer has no
     // space constraint; desktop demotes Comics to footer-only.
     if (showCharacters) {
@@ -191,11 +200,6 @@ const getMobileItems = (
         href: '/products',
       });
     }
-    items.push({
-      label: t('myStuff'),
-      iconName: faHeart,
-      href: '/account/my-stuff',
-    });
     items.push({
       label: t('blog'),
       iconName: faNewspaper,
@@ -386,18 +390,48 @@ const Header = async () => {
             />
           </nav>
 
-          {/* Kid-facing items - challenge stays visible everywhere; Colo + sticker hide below xl to prevent header wrap */}
+          {/* Kid-facing progress items.
+              - Challenge keeps its own small pill (always visible).
+              - Colo + Sticker are now ONE shared pill so they read as
+                a single "your progress" widget instead of two competing
+                chunky pills (each was min-w-32–48). The pill is sized
+                snug around the sticker icon's height; the Colo avatar
+                drops its own pill chrome (variant='bare') and sits on
+                the left, sticker icon+count on the right.
+              - Two distinct tap targets inside one visual pill: Colo
+                opens its dropdown, sticker links to the stickers page.
+              - Hides below xl (same as before) to prevent header wrap
+                on the cluttered logged-in nav. */}
           <div className="flex items-center gap-2">
             {/* Challenge indicator */}
             <HeaderChallengeIndicator challengeData={currentChallenge} />
-            {/* Colo mascot indicator */}
-            {coloState && (
+
+            {/* Combined Colo + Sticker progress pill — only render when
+                both data sources are present (the bare variants assume
+                they're composed inside this shared chrome). */}
+            {coloState && stickerStats && (
+              <div className="hidden xl:flex h-12 items-center gap-2 rounded-full border-2 border-paper-cream-dark bg-white/80 px-3 shadow-sm">
+                <HeaderColoIndicator coloState={coloState} variant="bare" />
+                {/* Subtle vertical divider so the two tap targets read
+                    as distinct without an extra border. */}
+                <span aria-hidden className="h-6 w-px bg-paper-cream-dark/60" />
+                <HeaderStickerIndicator
+                  totalUnlocked={stickerStats.totalUnlocked}
+                  newCount={stickerStats.newCount}
+                  variant="bare"
+                />
+              </div>
+            )}
+
+            {/* Fallback: if only one of the two is present, render it
+                standalone in its original pill shape (avoids a
+                lopsided shared pill with one empty side). */}
+            {coloState && !stickerStats && (
               <div className="hidden xl:flex">
                 <HeaderColoIndicator coloState={coloState} />
               </div>
             )}
-            {/* Sticker indicator */}
-            {stickerStats && (
+            {!coloState && stickerStats && (
               <div className="hidden xl:flex">
                 <HeaderStickerIndicator
                   totalUnlocked={stickerStats.totalUnlocked}
