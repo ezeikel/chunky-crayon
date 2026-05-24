@@ -45,6 +45,9 @@ const HeaderColoIndicator = ({
   const isBare = variant === 'bare';
 
   return (
+    // Wrapper DropdownMenu in @/components/ui/dropdown-menu defaults
+    // `modal={false}` — non-blocking peek behaviour for every dropdown
+    // in the app. No body scroll-lock, no right-edge gap on open.
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <button
@@ -78,100 +81,90 @@ const HeaderColoIndicator = ({
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-72 p-4">
-        <div className="flex items-start gap-4">
-          {/* Larger Colo avatar */}
-          <ColoAvatar coloState={coloState} size="lg" showProgress />
-
-          {/* Stage info */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-tondo font-bold text-lg text-crayon-orange">
-              {t(`stages.${coloState.stage}.name`)}
-            </h3>
-            <p className="font-tondo text-sm text-text-muted mt-1">
-              {t(`stages.${coloState.stage}.description`)}
-            </p>
-          </div>
+      {/* Dropdown body — redesigned for 3-8yo readers.
+          Old version had six text blocks (name, description, "Next:
+          X", fraction, progress bar, "Save N more artworks" sentence,
+          "Accessories (N)" header + icons). For a kid that's a wall.
+          New version: avatar + stage name + visual progress bar +
+          a single smart status line ("Ready to grow!" when capped at
+          threshold, max-stage trophy otherwise), then the accessory
+          icons with no count header. */}
+      <DropdownMenuContent align="end" className="w-64 p-4">
+        {/* Avatar + stage name in one row. Avatar carries identity,
+            name is the only line of text. */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <ColoAvatar
+            coloState={coloState}
+            size="lg"
+            enableTapReactions={false}
+          />
+          <h3 className="font-tondo text-xl font-bold text-crayon-orange">
+            {t(`stages.${coloState.stage}.name`)}
+          </h3>
         </div>
 
-        {/* Progress to next stage */}
-        {coloState.progressToNext && coloState.nextStage && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-tondo text-sm text-text-muted">
-                {t('indicator.next', {
-                  stageName: t(`stages.${coloState.nextStage.stage}.name`),
-                })}
-              </span>
-              <span className="font-tondo text-sm font-bold text-crayon-orange">
-                {coloState.progressToNext.current}/
-                {coloState.progressToNext.required}
-              </span>
-            </div>
-            {/* Progress bar */}
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+        {/* Progress bar — visual only, no fraction text. The cap in
+            getColoState already clamps `current` at `required`, so the
+            bar can hit 100% but never overshoot. */}
+        {coloState.progressToNext && (
+          <div className="mt-4">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-paper-cream">
               <div
-                className="h-full bg-gradient-to-r from-crayon-orange to-crayon-orange-light rounded-full transition-all duration-500"
-                style={{ width: `${coloState.progressToNext.percentage}%` }}
+                className="h-full rounded-full bg-crayon-orange transition-all duration-500"
+                style={{
+                  width: `${Math.min(100, Math.max(0, coloState.progressToNext.percentage))}%`,
+                }}
               />
             </div>
-            <p className="font-tondo text-xs text-text-muted mt-2 text-center">
-              {t('indicator.saveToEvolve', {
-                count:
-                  coloState.progressToNext.required -
-                  coloState.progressToNext.current,
-              })}
-            </p>
+            {/* Ready-to-grow celebration only when the bar's at 100%
+                (evolution is queued). Skips the awkward "Save 0 more
+                artworks to evolve!" copy. */}
+            {coloState.progressToNext.percentage >= 100 && (
+              <p className="mt-2 text-center font-tondo text-sm font-bold text-crayon-orange">
+                <FontAwesomeIcon icon={faSparkles} className="mr-1" />
+                {t('indicator.readyToGrow')}
+              </p>
+            )}
           </div>
         )}
 
-        {/* Max stage message */}
+        {/* Max stage — replace bar + status with a trophy badge. */}
         {!coloState.nextStage && (
-          <div className="mt-4 pt-4 border-t border-gray-100 text-center">
+          <div className="mt-4 flex flex-col items-center gap-1">
             <FontAwesomeIcon
               icon={faTrophy}
-              className="text-2xl text-crayon-yellow"
+              className="text-3xl text-crayon-yellow"
             />
-            <p className="font-tondo text-sm text-text-muted mt-1">
-              {t('indicator.maxStage')}
-            </p>
           </div>
         )}
 
-        {/* Accessories section (if any unlocked) */}
+        {/* Accessories — icons only, no count header. */}
         {coloState.accessories.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="font-tondo text-xs text-text-muted mb-2">
-              {t('indicator.accessories', {
-                count: coloState.accessories.length,
-              })}
-            </p>
-            <div className="flex flex-wrap gap-1">
-              {coloState.accessories.slice(0, 6).map((accessoryId) => {
-                const accessory = getAccessory(accessoryId);
-                if (!accessory) return null;
-                return (
-                  <span
-                    key={accessoryId}
-                    className="w-6 h-6 rounded-full bg-crayon-orange-light/20 flex items-center justify-center overflow-hidden"
-                    title={accessory.name}
-                  >
-                    <Image
-                      src={accessory.imagePath}
-                      alt={accessory.name}
-                      width={24}
-                      height={24}
-                      className="w-full h-full object-contain p-0.5"
-                    />
-                  </span>
-                );
-              })}
-              {coloState.accessories.length > 6 && (
-                <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-500">
-                  +{coloState.accessories.length - 6}
+          <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+            {coloState.accessories.slice(0, 6).map((accessoryId) => {
+              const accessory = getAccessory(accessoryId);
+              if (!accessory) return null;
+              return (
+                <span
+                  key={accessoryId}
+                  className="flex size-7 items-center justify-center overflow-hidden rounded-full bg-crayon-orange-light/20"
+                  title={accessory.name}
+                >
+                  <Image
+                    src={accessory.imagePath}
+                    alt={accessory.name}
+                    width={24}
+                    height={24}
+                    className="size-full object-contain p-0.5"
+                  />
                 </span>
-              )}
-            </div>
+              );
+            })}
+            {coloState.accessories.length > 6 && (
+              <span className="flex size-7 items-center justify-center rounded-full bg-gray-100 text-xs text-gray-500">
+                +{coloState.accessories.length - 6}
+              </span>
+            )}
           </div>
         )}
       </DropdownMenuContent>

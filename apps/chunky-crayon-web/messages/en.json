@@ -30,6 +30,7 @@
     "indicator": {
       "next": "Next: {stageName}",
       "saveToEvolve": "Save {count} more artworks to evolve!",
+      "readyToGrow": "Ready to grow!",
       "maxStage": "You've reached the highest stage!",
       "accessories": "Accessories ({count})"
     },

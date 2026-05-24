@@ -6,7 +6,31 @@ import { Check, ChevronRight, Circle } from 'lucide-react';
 
 import cn from '@/lib/utils';
 
-const DropdownMenu = DropdownMenuPrimitive.Root;
+/**
+ * Wrapped Root that flips Radix's `modal` default from true → false.
+ *
+ * Why: Radix Dropdown defaults `modal=true`, which calls `RemoveScroll`
+ * on the body and pads it for the scrollbar width while open. That
+ * behaviour is right for a Dialog (background non-interactive), wrong
+ * for an indicator-peek menu (page still scrollable + interactive,
+ * kid just wants to glance at progress / pick a profile). With the
+ * Radix default, every dropdown in this app jolts the page right by
+ * ~15px on open — most visible as a gap on the right side of the
+ * header.
+ *
+ * Every consumer in CC today (Colo, profile/account, language
+ * switcher, profile indicator) is a peek-style menu — none want the
+ * background lock. So the wrapper default is `modal=false`; if a
+ * future consumer genuinely needs scroll-lock + non-interactive
+ * background, pass `modal` explicitly on that call site.
+ */
+const DropdownMenu = ({
+  modal = false,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>) => (
+  <DropdownMenuPrimitive.Root modal={modal} {...props} />
+);
+DropdownMenu.displayName = 'DropdownMenu';
 
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
