@@ -1585,5 +1585,11 @@
       "signUpFree": "Créer un compte : 15 crédits offerts",
       "dismiss": "Peut-être plus tard"
     }
+  },
+  "myRecentArtwork": {
+    "title": "Tes images récentes",
+    "seeAll": "Voir toutes mes images",
+    "empty": "Colorie une page et appuie sur Enregistrer pour commencer ta collection !",
+    "untitled": "Mon image"
   }
 }

@@ -1585,5 +1585,11 @@
       "signUpFree": "Crear cuenta y conseguir 15 créditos gratis",
       "dismiss": "Quizá más tarde"
     }
+  },
+  "myRecentArtwork": {
+    "title": "Tus dibujos recientes",
+    "seeAll": "Ver todos mis dibujos",
+    "empty": "¡Colorea una página y toca Guardar para empezar tu colección!",
+    "untitled": "Mi dibujo"
   }
 }

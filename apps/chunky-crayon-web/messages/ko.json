@@ -1585,5 +1585,11 @@
       "signUpFree": "가입하고 무료 크레딧 15개 받기",
       "dismiss": "나중에 할게요"
     }
+  },
+  "myRecentArtwork": {
+    "title": "최근 내 그림",
+    "seeAll": "내 그림 모두 보기",
+    "empty": "색칠하고 저장을 누르면 내 컬렉션이 시작돼요!",
+    "untitled": "내 그림"
   }
 }

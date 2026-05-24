@@ -1585,5 +1585,11 @@
       "signUpFree": "Registrieren & 15 Gratis-Credits sichern",
       "dismiss": "Vielleicht später"
     }
+  },
+  "myRecentArtwork": {
+    "title": "Deine neuesten Bilder",
+    "seeAll": "Alle meine Bilder ansehen",
+    "empty": "Male eine Seite aus und tippe auf „Speichern“, um deine Sammlung zu starten!",
+    "untitled": "Mein Bild"
   }
 }
