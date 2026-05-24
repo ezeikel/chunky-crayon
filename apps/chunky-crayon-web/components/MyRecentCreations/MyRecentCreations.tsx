@@ -35,7 +35,7 @@ import MyRecentCreationsView from './MyRecentCreationsView';
 
 const MyRecentCreations = async () => {
   const session = await auth();
-  if (!session?.user) return null;
+  if (!session?.user?.id) return null;
   const userId = session.user.id;
 
   const [activeProfile, locale, t] = await Promise.all([

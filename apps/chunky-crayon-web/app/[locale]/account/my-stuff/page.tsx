@@ -282,7 +282,7 @@ const MyCreationsSection = async ({
   searchParamsPromise: Promise<{ page?: string }>;
 }) => {
   const session = await auth();
-  if (!session?.user) return null;
+  if (!session?.user?.id) return null;
   const userId = session.user.id;
 
   const [activeProfile, locale, sp] = await Promise.all([
