@@ -1591,5 +1591,11 @@
     "seeAll": "Voir toutes mes images",
     "empty": "Colorie une page et appuie sur Enregistrer pour commencer ta collection !",
     "untitled": "Mon image"
+  },
+  "myRecentCreations": {
+    "title": "Vos images récentes",
+    "seeAll": "Voir toutes mes images",
+    "empty": "Créez votre première image avec le formulaire ci-dessus !",
+    "untitled": "Mon image"
   }
 }

@@ -1591,5 +1591,11 @@
     "seeAll": "내 그림 모두 보기",
     "empty": "색칠하고 저장을 누르면 내 컬렉션이 시작돼요!",
     "untitled": "내 그림"
+  },
+  "myRecentCreations": {
+    "title": "최근에 만든 그림",
+    "seeAll": "내 그림 모두 보기",
+    "empty": "위 만들기에서 첫 그림을 만들어 보세요!",
+    "untitled": "내 그림"
   }
 }

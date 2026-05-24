@@ -1591,5 +1591,11 @@
     "seeAll": "Alle meine Bilder ansehen",
     "empty": "Male eine Seite aus und tippe auf „Speichern“, um deine Sammlung zu starten!",
     "untitled": "Mein Bild"
+  },
+  "myRecentCreations": {
+    "title": "Deine neuesten Bilder",
+    "seeAll": "Alle мои Bilder ansehen",
+    "empty": "Mach dein erstes Bild mit dem Formular oben!",
+    "untitled": "Mein Bild"
   }
 }

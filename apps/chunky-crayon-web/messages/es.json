@@ -1591,5 +1591,11 @@
     "seeAll": "Ver todos mis dibujos",
     "empty": "¡Colorea una página y toca Guardar para empezar tu colección!",
     "untitled": "Mi dibujo"
+  },
+  "myRecentCreations": {
+    "title": "Tus dibujos recientes",
+    "seeAll": "Ver todos mis dibujos",
+    "empty": "¡Crea tu primer dibujo con el formulario de arriba!",
+    "untitled": "Mi dibujo"
   }
 }
