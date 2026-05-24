@@ -140,6 +140,11 @@ const LEGACY_AVATAR_MAP: Record<string, string> = {
   'avatar-03': 'unicorn',
   'avatar-04': 'dragon',
   'avatar-05': 'robot',
+  // Schema default — `avatarId String @default("default")` lives on
+  // every profile that was created before the picker was wired up
+  // (most "Artist" / "Artist (imported)" rows are in this bucket).
+  // Without this mapping they render as grey initials chips.
+  default: DEFAULT_AVATAR_ID,
 };
 
 const resolveLegacy = (avatarId: string): string =>

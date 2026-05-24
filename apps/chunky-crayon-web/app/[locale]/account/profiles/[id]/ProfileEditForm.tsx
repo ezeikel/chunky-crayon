@@ -272,7 +272,7 @@ const ProfileEditForm = ({ profile, canDelete }: ProfileEditFormProps) => {
           <label className="block font-tondo font-bold text-sm text-text-secondary mb-2">
             {t('form.avatar')}
           </label>
-          <div className="grid grid-cols-5 gap-3">
+          <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
             {selectableAvatars.map((avatar) => (
               <button
                 key={avatar.id}
@@ -280,16 +280,17 @@ const ProfileEditForm = ({ profile, canDelete }: ProfileEditFormProps) => {
                 onClick={() => setAvatarId(avatar.id)}
                 disabled={isPending}
                 className={cn(
-                  'relative rounded-full p-1',
+                  'relative rounded-full',
                   'transition-all duration-200',
                   'hover:scale-110 active:scale-95',
-                  avatarId === avatar.id && 'ring-4 ring-crayon-orange',
+                  avatarId === avatar.id &&
+                    'ring-4 ring-crayon-orange ring-offset-2 ring-offset-paper',
                 )}
               >
                 <ProfileAvatar
                   avatarId={avatar.id}
                   name={name || '?'}
-                  size="sm"
+                  size="md"
                 />
                 {avatarId === avatar.id && (
                   <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-crayon-orange rounded-full flex items-center justify-center">
