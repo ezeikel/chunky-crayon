@@ -26,7 +26,7 @@
     "setup:tokens": "tsx scripts/setup-social-tokens.ts",
     "buffer:channels": "tsx scripts/list-buffer-channels.ts",
     "test:social": "tsx scripts/test-social-posting.ts",
-    "storybook": "storybook dev -p 6007",
+    "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static"
   },
   "dependencies": {

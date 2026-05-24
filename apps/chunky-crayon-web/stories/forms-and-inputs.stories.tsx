@@ -7,6 +7,7 @@ import {
   ImageInput,
   InputModeProvider,
   InputModeSelector,
+  SceneInput,
   TextInput,
   VoiceInput,
 } from '@/components/forms/CreateColoringPageForm/inputs';
@@ -72,22 +73,75 @@ export const InputModePieces: Story = {
   ),
 };
 
-export const VoiceAndPhotoInputs: Story = {
+// ─── Per-input stories ────────────────────────────────────────────────
+// Each input mode is its own surface — text textarea, voice mic, image
+// upload, scene tile-picker. A focused story per mode lets you tweak
+// that surface in isolation rather than digging through the composed
+// `InputModePieces` example above.
+
+const InputCard = ({ children }: { children: React.ReactNode }) => (
+  <main className="p-8">
+    <div className="mx-auto max-w-xl rounded-2xl border-2 border-paper-cream-dark bg-white p-6 shadow-card">
+      {children}
+    </div>
+  </main>
+);
+
+export const TextInputStory: Story = {
+  name: 'Input — Text',
   render: () => (
+    <InputCard>
+      <InputModeProvider>
+        <TextInput />
+      </InputModeProvider>
+    </InputCard>
+  ),
+};
+
+export const VoiceInputStory: Story = {
+  name: 'Input — Voice',
+  render: () => (
+    // VoiceInput is gated behind the parental gate (voice mode is a
+    // parent-facing capability), so it needs the gate provider.
     <ParentalGateProvider>
-      <main className="grid gap-6 p-8 md:grid-cols-2">
-        <div className="rounded-2xl border-2 border-paper-cream-dark bg-white p-6 shadow-card">
-          <InputModeProvider>
-            <VoiceInput onComplete={async () => undefined} />
-          </InputModeProvider>
-        </div>
-        <div className="rounded-2xl border-2 border-paper-cream-dark bg-white p-6 shadow-card">
-          <InputModeProvider>
-            <ImageInput />
-          </InputModeProvider>
-        </div>
-      </main>
+      <InputCard>
+        <InputModeProvider>
+          <VoiceInput onComplete={async () => undefined} />
+        </InputModeProvider>
+      </InputCard>
     </ParentalGateProvider>
+  ),
+};
+
+export const ImageInputStory: Story = {
+  name: 'Input — Image',
+  render: () => (
+    <InputCard>
+      <InputModeProvider>
+        <ImageInput />
+      </InputModeProvider>
+    </InputCard>
+  ),
+};
+
+export const SceneInputStory: Story = {
+  name: 'Input — Scene Builder',
+  render: () => (
+    // Scene Builder owns its own Create button + paywall affordance, so
+    // it gets the callbacks but they no-op here. `charactersEnabled` is
+    // false so the `your-character` tile is dropped (no auth dead-end
+    // from a Storybook canvas).
+    <main className="p-8">
+      <div className="mx-auto max-w-3xl rounded-2xl border-2 border-paper-cream-dark bg-white p-6 shadow-card">
+        <InputModeProvider>
+          <SceneInput
+            onChange={() => undefined}
+            onCreate={() => undefined}
+            charactersEnabled={false}
+          />
+        </InputModeProvider>
+      </div>
+    </main>
   ),
 };
 
