@@ -45,20 +45,24 @@ export const ALL_DIFFICULTIES = Object.values(Difficulty) as Difficulty[];
 export const GALLERY_PAGE_SIZE = 24;
 
 // ===== COMMUNITY IMAGES =====
-// "Community" on CC = pages made by anonymous GUEST visitors using
-// their two free tries. NOT signed-in users' kid art. Two reasons:
-//   1. CC is a 3-8yo kids app — signed-in accounts are families,
-//      and there's no opt-in / parental-gate flow for sharing a
-//      kid's work publicly. Defaulting their saved art into a
-//      public "Community" pool was a silent privacy leak.
-//   2. Guests are anonymous marketing visitors trying the free
-//      create flow. Surfacing their creations as "look what people
-//      are making in 2 minutes" is fair social proof for cold
-//      visitors.
-// `generationType: USER` excludes SYSTEM (seeded backfill / ads /
-// demo reels / content reels), DAILY (cron output), and
-// COMMENT_REQUEST (#drawthis IG/FB replies). `userId: null`
-// excludes anything attached to a signed-in account.
+// "Community" on CC = pages made by REAL PEOPLE interacting with the
+// brand from the outside — i.e. not signed-in users' kid art. Two
+// sources today:
+//   - GUEST free-creates: anonymous visitors using their two free
+//     tries before signup. The classic "look what people are making
+//     in 2 minutes" social proof.
+//   - COMMENT_REQUEST: #drawthis replies to brand Instagram / Facebook
+//     posts. Same shape — public-facing, anonymous-to-other-visitors,
+//     organic engagement from real followers. Belongs here.
+// Excluded from community:
+//   - Signed-in users' kid art (userId IS NOT NULL): CC is a 3-8yo
+//     kids app, signed-in accounts are families, and there's no
+//     opt-in / parental-gate flow for sharing a kid's work publicly.
+//     Defaulting their saved art into a public pool was a silent
+//     privacy leak.
+//   - SYSTEM (seeded backfill, ads, demo reels, content reels): brand
+//     content, has its own gallery sections.
+//   - DAILY (cron-generated daily image): has its own surface.
 // Surface rules: logged-out visitors only. Logged-in users never
 // see this surface (see `feedback_cc_no_community_for_logged_in`).
 // `brandWhere` already enforces `status: 'READY'` so unfinished or
@@ -76,7 +80,9 @@ const getCommunityImagesBase = async (
     where: {
       ...brandWhere,
       userId: null,
-      generationType: GenerationType.USER,
+      generationType: {
+        in: [GenerationType.USER, GenerationType.COMMENT_REQUEST],
+      },
     },
     select: {
       ...GALLERY_IMAGE_SELECT,

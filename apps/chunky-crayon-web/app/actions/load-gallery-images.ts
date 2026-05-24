@@ -58,15 +58,18 @@ export async function loadGalleryImages(
 
   switch (galleryType) {
     case 'community':
-      // Guest-only creations (userId NULL + generationType USER).
-      // Mirrors getCommunityImagesBase in app/data/gallery.ts —
-      // signed-in users' saved kid art is never community-eligible
-      // on CC (3-8yo; no public-share opt-in). See
+      // Anonymous external creations: guest free-creates (USER) AND
+      // #drawthis IG/FB comment replies (COMMENT_REQUEST). Mirrors
+      // getCommunityImagesBase in app/data/gallery.ts — signed-in
+      // users' saved kid art is never community-eligible on CC (3-8yo;
+      // no public-share opt-in). See
       // `feedback_cc_no_community_for_logged_in`.
       whereClause = {
         ...baseWhere,
         userId: null,
-        generationType: GenerationType.USER,
+        generationType: {
+          in: [GenerationType.USER, GenerationType.COMMENT_REQUEST],
+        },
       };
       break;
 

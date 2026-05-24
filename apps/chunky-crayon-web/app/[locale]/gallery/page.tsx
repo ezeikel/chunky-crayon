@@ -359,9 +359,10 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
 
   const t = await getTranslations({ locale, namespace: 'gallery' });
   const tAlt = await getTranslations({ locale, namespace: 'altText' });
-  // Guest-only creations (userId NULL + generationType USER), as
-  // re-scoped in app/data/gallery.ts. Signed-in users' saved art is
-  // never community-eligible on CC (3-8yo; no public-share opt-in).
+  // Anonymous external creations: guest free-creates (USER) AND
+  // #drawthis IG/FB comment replies (COMMENT_REQUEST), as re-scoped
+  // in app/data/gallery.ts. Signed-in users' saved art is never
+  // community-eligible on CC (3-8yo; no public-share opt-in).
   // Pull 7 so we can detect overflow: if we get 7+, /gallery/community
   // has more than the section shows → the "view all" link is honest.
   // 6 or fewer → the section IS the whole community pool right now,

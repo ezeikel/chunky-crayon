@@ -20,7 +20,7 @@ export async function generateMetadata({
   return {
     title: 'Community Coloring Pages - Free Printable Pages | Chunky Crayon',
     description:
-      'A live feed of coloring pages people made while trying Chunky Crayon. Fresh ideas every day. Color online or print for free.',
+      'Coloring pages from our community. Fresh ideas every day. Color online or print for free. Color online or print for free.',
     keywords: [
       'community coloring pages',
       'free coloring pages',
@@ -30,7 +30,7 @@ export async function generateMetadata({
     openGraph: {
       title: 'Community Coloring Pages - Chunky Crayon',
       description:
-        'A live feed of coloring pages people made while trying Chunky Crayon. Fresh ideas every day.',
+        'Coloring pages from our community. Fresh ideas every day. Color online or print for free.',
       type: 'website',
       url: `https://chunkycrayon.com/${locale}/gallery/community`,
     },
@@ -87,8 +87,8 @@ const CommunityGalleryContent = async ({
           </h1>
         </div>
         <p className="text-text-secondary max-w-2xl">
-          A live feed of pages people drew while trying Chunky Crayon. Fresh
-          ideas every day — color them online or print them for free.
+          Coloring pages from our community. Fresh ideas every day. Color them
+          online or print them for free.
         </p>
       </div>
 
@@ -125,17 +125,16 @@ const CommunityGalleryContent = async ({
       {/* SEO Content */}
       <section className="mt-16 pt-12 border-t border-paper-cream-dark">
         <h2 className="font-tondo font-bold text-2xl md:text-3xl text-text-primary mb-6">
-          Where these pages come from
+          Community Coloring Pages
         </h2>
         <div className="space-y-4 text-text-secondary leading-relaxed max-w-4xl">
           <p>
-            Every page on this feed was drawn from an idea someone typed into
-            Chunky Crayon while trying the free create flow. No accounts, no
-            usernames — just fresh coloring ideas as they happen.
+            Fresh coloring pages from our community. Color them online or print
+            them at home for free.
           </p>
           <p>
-            Try it yourself: describe anything you&apos;d like to color, and
-            Chunky Crayon turns it into a printable line drawing in seconds.
+            Want to make your own? Describe anything you&apos;d like to color,
+            and Chunky Crayon turns it into a printable line drawing in seconds.
           </p>
         </div>
       </section>
