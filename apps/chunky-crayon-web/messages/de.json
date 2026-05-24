@@ -35,7 +35,8 @@
     },
     "avatar": {
       "tapMe": "Tippe mich an!",
-      "artworks": "Kunstwerke"
+      "artworks": "Kunstwerke",
+      "maxStage": "Fertig!"
     },
     "stages": {
       "1": {

@@ -35,7 +35,8 @@
     },
     "avatar": {
       "tapMe": "タップしてね！",
-      "artworks": "作品"
+      "artworks": "作品",
+      "maxStage": "できたよ！"
     },
     "stages": {
       "1": {

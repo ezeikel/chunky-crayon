@@ -35,7 +35,8 @@
     },
     "avatar": {
       "tapMe": "나를 눌러줘!",
-      "artworks": "작품"
+      "artworks": "작품",
+      "maxStage": "완료했어요!"
     },
     "stages": {
       "1": {
