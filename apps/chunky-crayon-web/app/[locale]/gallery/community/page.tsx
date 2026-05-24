@@ -20,7 +20,7 @@ export async function generateMetadata({
   return {
     title: 'Community Coloring Pages - Free Printable Pages | Chunky Crayon',
     description:
-      'Coloring pages from our community. Fresh ideas every day. Color online or print for free. Color online or print for free.',
+      'Coloring pages from our community. Fresh ideas every day. Color online or print for free.',
     keywords: [
       'community coloring pages',
       'free coloring pages',
