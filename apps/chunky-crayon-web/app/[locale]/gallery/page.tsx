@@ -36,6 +36,7 @@ import {
   getAgeGroupCounts,
 } from '@/app/data/gallery';
 import Pagination from '@/components/Pagination/Pagination';
+import GalleryStatsComponent from '@/components/GalleryStats';
 import { GALLERY_CATEGORIES } from '@/constants';
 import { Difficulty } from '@one-colored-pixel/db';
 import { getLandingPageBySlug } from '@/lib/seo/landing-pages';
@@ -733,43 +734,23 @@ const CategoryCards = async ({ locale }: { locale: string }) => {
   );
 };
 
+// Thin data-loading wrapper around the GalleryStats presentation
+// component (components/GalleryStats). Keeps the data fetch + i18n
+// here so the visual surface stays a pure, storyable component that
+// takes its strings as props.
 const GalleryStats = async ({ locale }: { locale: string }) => {
   const t = await getTranslations({ locale, namespace: 'gallery' });
   const stats = await getGalleryStats();
-
   return (
-    <div className="flex flex-wrap justify-center gap-8 mb-12 text-center">
-      <div>
-        <div className="font-tondo font-bold text-3xl text-crayon-orange">
-          {stats.totalImages.toLocaleString()}
-        </div>
-        <div className="text-sm text-text-secondary">
-          {t('stats.totalPages')}
-        </div>
-      </div>
-      <div>
-        <div className="font-tondo font-bold text-3xl text-crayon-green">
-          {stats.systemImages.toLocaleString()}
-        </div>
-        <div className="text-sm text-text-secondary">{t('stats.ourPages')}</div>
-      </div>
-      <div>
-        <div className="font-tondo font-bold text-3xl text-crayon-purple">
-          {stats.communityImages.toLocaleString()}
-        </div>
-        <div className="text-sm text-text-secondary">
-          {t('stats.communityPages')}
-        </div>
-      </div>
-      <div>
-        <div className="font-tondo font-bold text-3xl text-crayon-blue">
-          {stats.dailyImages.toLocaleString()}
-        </div>
-        <div className="text-sm text-text-secondary">
-          {t('stats.dailyPages')}
-        </div>
-      </div>
-    </div>
+    <GalleryStatsComponent
+      stats={stats}
+      labels={{
+        totalPages: t('stats.totalPages'),
+        ourPages: t('stats.ourPages'),
+        communityPages: t('stats.communityPages'),
+        dailyPages: t('stats.dailyPages'),
+      }}
+    />
   );
 };
 

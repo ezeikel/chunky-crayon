@@ -12,6 +12,7 @@ import BlogGrid from '@/components/blog/BlogGrid';
 import BlogHeader from '@/components/blog/BlogHeader';
 import CategoryList from '@/components/blog/CategoryList';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import GalleryStats from '@/components/GalleryStats';
 import { AgeGroup, Difficulty } from '@one-colored-pixel/db/types';
 import { sampleImages } from './fixtures';
 
@@ -191,6 +192,38 @@ export const SupportingContent: Story = {
           </p>
         </div>
       </section>
+    </main>
+  ),
+};
+
+// ─── Gallery stats row ────────────────────────────────────────────────
+// Was naked tondo numbers in dead space — read off-brand. Now a row
+// of chunky bordered cards with FA duotone icons in tinted brand-
+// colour circles, matching the modal vocabulary (PaywallModal,
+// FeedbackDialog, character tiles). Four crayon colours, one per
+// stat, keeps the playful per-item differentiation that Colo +
+// character tiles already use.
+
+export const GalleryStatsRow: Story = {
+  name: 'Gallery stats row',
+  render: () => (
+    <main className="bg-paper p-8">
+      <div className="mx-auto max-w-5xl">
+        <GalleryStats
+          stats={{
+            totalImages: 1280,
+            systemImages: 1235,
+            communityImages: 45,
+            dailyImages: 50,
+          }}
+          labels={{
+            totalPages: 'Total Pages',
+            ourPages: 'Our Pages',
+            communityPages: 'Community Pages',
+            dailyPages: 'Daily Pages',
+          }}
+        />
+      </div>
     </main>
   ),
 };
