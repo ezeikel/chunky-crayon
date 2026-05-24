@@ -1062,7 +1062,8 @@
       "profilesUsed": "{max}개 중 {count}개 사용 중",
       "colorings": "{count, plural, =1 {색칠 1개} other {색칠 #개}}",
       "edit": "{name} 수정",
-      "delete": "{name} 삭제"
+      "delete": "{name} 삭제",
+      "addProfile": "새 프로필"
     },
     "create": {
       "title": "프로필 만들기",

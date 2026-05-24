@@ -1062,7 +1062,8 @@
       "profilesUsed": "{max}件中{count}件使用中",
       "colorings": "{count, plural, =1 {ぬりえ1件} other {ぬりえ#件}}",
       "edit": "{name}を編集",
-      "delete": "{name}を削除"
+      "delete": "{name}を削除",
+      "addProfile": "新しいプロフィール"
     },
     "create": {
       "title": "プロフィールを作成",

@@ -1062,7 +1062,8 @@
       "profilesUsed": "{count} von {max} Profilen genutzt",
       "colorings": "{count, plural, =1 {1 Ausmalbild} other {# Ausmalbilder}}",
       "edit": "{name} bearbeiten",
-      "delete": "{name} löschen"
+      "delete": "{name} löschen",
+      "addProfile": "Neues Profil"
     },
     "create": {
       "title": "Profil erstellen",

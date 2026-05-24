@@ -1062,7 +1062,8 @@
       "profilesUsed": "{count} sur {max} profils utilisés",
       "colorings": "{count, plural, =1 {1 coloriage} other {# coloriages}}",
       "edit": "Modifier {name}",
-      "delete": "Supprimer {name}"
+      "delete": "Supprimer {name}",
+      "addProfile": "Nouveau profil"
     },
     "create": {
       "title": "Créer un profil",
