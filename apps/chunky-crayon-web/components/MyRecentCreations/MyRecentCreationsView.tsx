@@ -5,44 +5,48 @@ import { faArrowRight, faPalette } from '@fortawesome/pro-duotone-svg-icons';
 import cn from '@/utils/cn';
 
 /**
- * Presentation-only piece of MyRecentArtwork.
+ * Presentation-only piece of MyRecentCreations.
  *
  * Lives in its own file so Storybook can import it without pulling in
  * the server component's `@/auth` dependency chain (NextAuth's CJS
  * exports break Vite/Rollup when transitively included). Same pattern
  * as GalleryStats (route owns i18n + data, view stays pure).
  *
- * `items` is empty → friendly start-coloring prompt.
+ * `items` is empty → friendly start-creating prompt.
  * `items` is populated → horizontal-scroll strip on mobile, 5-col grid
- * on desktop, "See all my pictures" door to /account/my-stuff.
+ * on desktop, "See all my pictures" door to /account/my-stuff (the
+ * saved-artwork archive — different surface).
+ *
+ * Items carry `href` directly (computed server-side from
+ * `getColoringImageUrl`) so this view stays URL-agnostic.
  */
 
-export type MyRecentArtworkItem = {
+export type MyRecentCreationsItem = {
   id: string;
   imageUrl: string;
-  artworkId: string;
+  href: string;
   title: string;
 };
 
-export type MyRecentArtworkLabels = {
+export type MyRecentCreationsLabels = {
   title: string;
   empty: string;
   seeAll: string;
 };
 
-export type MyRecentArtworkViewProps = {
-  items: MyRecentArtworkItem[];
-  labels: MyRecentArtworkLabels;
+export type MyRecentCreationsViewProps = {
+  items: MyRecentCreationsItem[];
+  labels: MyRecentCreationsLabels;
   className?: string;
 };
 
-const MyRecentArtworkView = ({
+const MyRecentCreationsView = ({
   items,
   labels,
   className,
-}: MyRecentArtworkViewProps) => {
-  // Empty state — first-time signed-in user with no saved artwork yet.
-  // Friendly "start coloring" prompt rather than a stark "no items".
+}: MyRecentCreationsViewProps) => {
+  // Empty state — signed-in user with nothing generated yet. The hint
+  // points at the create form above this slot on the homepage.
   if (items.length === 0) {
     return (
       <section
@@ -103,7 +107,7 @@ const MyRecentArtworkView = ({
               className="shrink-0 basis-40 snap-start md:basis-auto"
             >
               <Link
-                href={`/coloring-pages/${item.artworkId}`}
+                href={item.href}
                 aria-label={item.title}
                 className="group block aspect-square overflow-hidden rounded-3xl border-2 border-paper-cream-dark bg-white shadow-card transition-all hover:scale-105 hover:border-crayon-orange active:scale-95"
               >
@@ -123,4 +127,4 @@ const MyRecentArtworkView = ({
   );
 };
 
-export default MyRecentArtworkView;
+export default MyRecentCreationsView;

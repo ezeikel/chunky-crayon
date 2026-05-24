@@ -1181,10 +1181,10 @@
     "ctaMessage": "to keep your creations forever and unlock more!",
     "ctaButton": "Start Free"
   },
-  "myRecentArtwork": {
+  "myRecentCreations": {
     "title": "Your recent pictures",
     "seeAll": "See all my pictures",
-    "empty": "Color a page and tap save to start your collection!",
+    "empty": "Make your first picture with the create form above!",
     "untitled": "My picture"
   },
   "coloringPage": {

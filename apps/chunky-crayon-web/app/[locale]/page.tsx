@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
 import CreateColoringPageFormWrapper from '@/components/forms/CreateColoringPageForm/CreateColoringPageFormWrapper';
 import AllColoringPageImages from '@/components/AllColoringPageImages/AllColoringPageImages';
-import MyRecentArtwork from '@/components/MyRecentArtwork';
+import MyRecentCreations from '@/components/MyRecentCreations';
 import GalleryPreview from '@/components/GalleryPreview';
 import SocialProofStats from '@/components/SocialProofStats';
 import RecentCreations from '@/components/RecentCreations';
@@ -71,7 +71,7 @@ const HomePageWithColoState = async ({
   form,
   formLarge,
   gallery,
-  myRecentArtwork,
+  myRecentCreations,
   galleryPreview,
   socialProofStats,
   recentCreations,
@@ -86,7 +86,7 @@ const HomePageWithColoState = async ({
   form: React.ReactNode;
   formLarge: React.ReactNode;
   gallery: React.ReactNode;
-  myRecentArtwork: React.ReactNode;
+  myRecentCreations: React.ReactNode;
   galleryPreview: React.ReactNode;
   socialProofStats: React.ReactNode;
   recentCreations: React.ReactNode;
@@ -119,7 +119,7 @@ const HomePageWithColoState = async ({
       form={form}
       formLarge={formLarge}
       gallery={gallery}
-      myRecentArtwork={myRecentArtwork}
+      myRecentCreations={myRecentCreations}
       galleryPreview={galleryPreview}
       socialProofStats={socialProofStats}
       recentCreations={recentCreations}
@@ -198,7 +198,7 @@ const HomePage = async ({ params, searchParams }: HomePageProps) => {
               <AllColoringPageImages searchParams={searchParams} />
             </Suspense>
           }
-          myRecentArtwork={
+          myRecentCreations={
             <Suspense
               fallback={
                 <div className="flex flex-col gap-8 p-8 min-h-[200px] items-center justify-center w-full">
@@ -206,7 +206,7 @@ const HomePage = async ({ params, searchParams }: HomePageProps) => {
                 </div>
               }
             >
-              <MyRecentArtwork />
+              <MyRecentCreations />
             </Suspense>
           }
           galleryPreview={

@@ -434,6 +434,60 @@ export const getColoringImagesPaginated = async (
   );
 };
 
+/**
+ * Page-numbered access to the active profile's own generated coloring
+ * pages. Powers the "My Creations" section on /account/my-stuff — the
+ * kid's full pile of pages they made (colored or not), paginated.
+ *
+ * Distinct from `getColoringImagesPaginated` (which is cursor-based
+ * for infinite scroll) and from `getUserSavedArtwork` (which queries
+ * the `SavedArtwork` table for finished saved work). Same shape as
+ * `getSystemImagesPage` for consistency with the public gallery's
+ * paginated section.
+ *
+ * page is 1-indexed and clamped to ≥1. Returns `totalPages: 1` and
+ * empty images when the user has no creations yet.
+ */
+export type MyCreationsPagedResponse = {
+  images: GalleryImage[];
+  page: number;
+  totalPages: number;
+  totalCount: number;
+};
+
+export const MY_CREATIONS_PAGE_SIZE = 24;
+
+export const getMyCreationsPage = async (
+  userId: string,
+  profileId: string | undefined,
+  page: number = 1,
+  pageSize: number = MY_CREATIONS_PAGE_SIZE,
+): Promise<MyCreationsPagedResponse> => {
+  // Clamp page to ≥1; URL params aren't trustworthy.
+  const safePage = Math.max(1, Math.floor(page));
+
+  const where = {
+    ...brandWhere,
+    userId,
+    ...(profileId ? { profileId } : {}),
+  };
+
+  const [totalCount, images] = await Promise.all([
+    db.coloringImage.count({ where }),
+    db.coloringImage.findMany({
+      where,
+      select: GALLERY_IMAGE_SELECT,
+      orderBy: { createdAt: 'desc' },
+      take: pageSize,
+      skip: (safePage - 1) * pageSize,
+    }),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
+  return { images, page: safePage, totalPages, totalCount };
+};
+
 // Ad-campaign hero image lookup — lives outside the community feed
 // (showInCommunity=false). /start?utm_campaign=trex calls this with the
 // campaign key to load the exact image the visitor saw in the ad.

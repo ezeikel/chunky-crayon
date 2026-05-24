@@ -21,13 +21,16 @@ type HomePageContentProps = {
   /** Gallery component — logged-OUT only (community + system mix). */
   gallery: React.ReactNode;
   /**
-   * Logged-IN homepage recent-artwork strip. Replaces `gallery` on the
-   * signed-in branch — CC kids never see UGC, so the logged-in home
-   * shows the current profile's own recent saved artwork + a "see all"
-   * door to /account/my-stuff. Server-rendered, passed as a slot.
-   * See `feedback_cc_no_community_for_logged_in`.
+   * Logged-IN homepage recent-CREATIONS strip. Replaces `gallery` on
+   * the signed-in branch. Shows the active profile's last 10
+   * generated coloring pages (every page they made, colored or not)
+   * so the homepage reads as an "active workbench" — tap a card to
+   * keep coloring. The "See all my pictures" door points at
+   * /account/my-stuff (the *archive* of saved finished work, a
+   * deliberately distinct surface). Server-rendered, passed as a
+   * slot. See `feedback_cc_no_community_for_logged_in`.
    */
-  myRecentArtwork?: React.ReactNode;
+  myRecentCreations?: React.ReactNode;
   /** Gallery preview for logged-out users - shows free library snippets with CTAs */
   galleryPreview?: React.ReactNode;
   /** Social proof stats for logged-out users - shows total pages, daily pages, etc. */
@@ -62,7 +65,7 @@ const HomePageContent = ({
   form,
   formLarge,
   gallery,
-  myRecentArtwork,
+  myRecentCreations,
   galleryPreview,
   socialProofStats,
   recentCreations,
@@ -108,9 +111,10 @@ const HomePageContent = ({
           <div className="w-full">{formLarge || form}</div>
         </div>
 
-        {/* Recent artwork — current profile only, with "See all" door
-            to /account/my-stuff. The kid's pile, not the global feed. */}
-        {myRecentArtwork}
+        {/* Recent creations — active profile's last 10 generated
+            coloring pages (workbench). "See all my pictures" door
+            points at /account/my-stuff (the saved archive). */}
+        {myRecentCreations}
       </PageWrap>
     );
   }

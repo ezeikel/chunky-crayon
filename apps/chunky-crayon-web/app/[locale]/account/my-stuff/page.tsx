@@ -21,9 +21,17 @@ import CrayonScribble from '@/components/Intro/CrayonScribble';
 import Loading from '@/components/Loading/Loading';
 import ChallengeWidget from '@/components/ChallengeCard/ChallengeWidget';
 import { getUserSavedArtwork } from '@/app/actions/saved-artwork';
+import {
+  getMyCreationsPage,
+  MY_CREATIONS_PAGE_SIZE,
+} from '@/app/data/coloring-image';
+import { getActiveProfile } from '@/app/actions/profiles';
+import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
+import { getLocale } from 'next-intl/server';
 import { getMyStickerStats } from '@/app/actions/stickers';
 import { getMyCurrentChallenge } from '@/app/actions/challenges';
 import { listMyBundlePurchases } from '@/app/data/bundle';
+import Pagination from '@/components/Pagination/Pagination';
 import DeleteArtworkButton from './DeleteArtworkButton';
 
 export const metadata: Metadata = {
@@ -263,7 +271,114 @@ const BundlePurchaseCard = ({
   );
 };
 
-// ─── Artwork grid ────────────────────────────────────────────────────
+// ─── My creations grid (every page they generated, paginated) ───────
+// Distinct from "Your saved pictures" below: this is the kid's full
+// pile of generated coloring pages (colored or not), the workbench
+// archive. Tap a card to keep coloring. Page-numbered URLs so a
+// parent can deep-link or refresh without losing their place.
+const MyCreationsSection = async ({
+  searchParamsPromise,
+}: {
+  searchParamsPromise: Promise<{ page?: string }>;
+}) => {
+  const session = await auth();
+  if (!session?.user) return null;
+  const userId = session.user.id;
+
+  const [activeProfile, locale, sp] = await Promise.all([
+    getActiveProfile(),
+    getLocale(),
+    searchParamsPromise,
+  ]);
+
+  const pageNum = Number(sp.page ?? '1');
+  const { images, page, totalPages, totalCount } = await getMyCreationsPage(
+    userId,
+    activeProfile?.id,
+    Number.isFinite(pageNum) ? pageNum : 1,
+  );
+
+  if (totalCount === 0) {
+    return (
+      <section className="mt-12 lg:mt-16">
+        <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary mb-6 relative inline-block">
+          Your pictures
+          <CrayonScribble
+            seed={29}
+            className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
+          />
+        </h2>
+        <div className="text-center py-12 lg:py-16 rounded-3xl border-2 border-dashed border-border-light bg-paper-cream">
+          <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-crayon-orange/10 border-2 border-crayon-orange/20 flex items-center justify-center">
+            <FontAwesomeIcon
+              icon={faPalette}
+              className="text-3xl text-crayon-orange"
+            />
+          </div>
+          <h3 className="font-tondo font-bold text-xl lg:text-2xl text-text-primary mb-2">
+            No pictures yet
+          </h3>
+          <p className="text-text-secondary font-rooney-sans mb-6 max-w-md mx-auto">
+            Head back home and tap Create to make your first picture.
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange hover:bg-crayon-orange-dark text-white font-tondo font-bold rounded-full shadow-btn-primary transition-colors"
+          >
+            Make a picture
+            <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mt-12 lg:mt-16">
+      <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary mb-6 relative inline-block">
+        Your pictures
+        <CrayonScribble
+          seed={29}
+          className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
+        />
+      </h2>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+        {images.map((img) => (
+          <Link
+            key={img.id}
+            href={getColoringImageUrl(img, locale)}
+            className="group block aspect-square relative rounded-2xl border-3 border-text-primary/10 overflow-hidden bg-bg-white hover:border-crayon-orange hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
+          >
+            {img.svgUrl ? (
+              <Image
+                src={img.svgUrl}
+                alt={img.title ?? 'My picture'}
+                fill
+                className="object-contain p-2"
+              />
+            ) : null}
+          </Link>
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="mt-8">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            buildHref={(p) =>
+              p === 1 ? '/account/my-stuff' : `/account/my-stuff?page=${p}`
+            }
+            ariaLabel="Your pictures"
+          />
+        </div>
+      )}
+    </section>
+  );
+};
+
+// ─── Saved-pictures grid ─────────────────────────────────────────────
 const ArtworkGrid = async () => {
   const session = await auth();
   if (!session?.user) redirect('/signin');
@@ -274,7 +389,7 @@ const ArtworkGrid = async () => {
     return (
       <section className="mt-12 lg:mt-16">
         <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary mb-6 relative inline-block">
-          Your Artwork
+          Your saved pictures
           <CrayonScribble
             seed={17}
             className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
@@ -288,19 +403,12 @@ const ArtworkGrid = async () => {
             />
           </div>
           <h3 className="font-tondo font-bold text-xl lg:text-2xl text-text-primary mb-2">
-            No saved artwork yet
+            Nothing saved yet
           </h3>
           <p className="text-text-secondary font-rooney-sans mb-6 max-w-md mx-auto">
-            Color a page and tap save to see it here. Your artwork stays
+            Color one of your pictures and tap save. Saved pictures stay
             forever, ready to print whenever you want.
           </p>
-          <Link
-            href="/gallery"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-orange hover:bg-crayon-orange-dark text-white font-tondo font-bold rounded-full shadow-btn-primary transition-colors"
-          >
-            Browse coloring pages
-            <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
-          </Link>
         </div>
       </section>
     );
@@ -309,7 +417,7 @@ const ArtworkGrid = async () => {
   return (
     <section className="mt-12 lg:mt-16">
       <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary mb-6 relative inline-block">
-        Your Artwork
+        Your saved pictures
         <CrayonScribble
           seed={17}
           className="absolute -bottom-2 left-0 w-full h-3 text-crayon-orange/60"
@@ -374,7 +482,13 @@ const MyBundlesWrapper = async () => {
 };
 
 // ─── Page ────────────────────────────────────────────────────────────
-const MyArtworkPage = () => {
+const MyArtworkPage = ({
+  searchParams,
+}: {
+  // Sync page handler (per `feedback_async_page_handlers_block_static_shell`),
+  // params arrive as a Promise that the Suspense child awaits.
+  searchParams: Promise<{ page?: string }>;
+}) => {
   return (
     <PageWrap>
       <Breadcrumbs
@@ -400,10 +514,25 @@ const MyArtworkPage = () => {
         </p>
       </header>
 
-      {/* Stats + challenge + bundles + artwork — section order matches
-          the user's mental model: progress (stickers / challenge), then
-          owned content (bundles), then made content (artwork). */}
-      <div className="space-y-4 lg:space-y-5">
+      {/* Section order: made > saved > bought > earned.
+            1. Your pictures — every page the kid generated (the active
+               workbench, the most-asked thing on this page).
+            2. Your saved pictures — colored & saved.
+            3. Bundles — bought content.
+            4. Stickers + challenge — progress / engagement. */}
+      <Suspense fallback={<Loading size="lg" />}>
+        <MyCreationsSection searchParamsPromise={searchParams} />
+      </Suspense>
+
+      <Suspense fallback={<Loading size="lg" />}>
+        <ArtworkGrid />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        <MyBundlesWrapper />
+      </Suspense>
+
+      <div className="mt-12 lg:mt-16 space-y-4 lg:space-y-5">
         <Suspense fallback={null}>
           <StickerStatsCard />
         </Suspense>
@@ -411,14 +540,6 @@ const MyArtworkPage = () => {
           <ChallengeSection />
         </Suspense>
       </div>
-
-      <Suspense fallback={null}>
-        <MyBundlesWrapper />
-      </Suspense>
-
-      <Suspense fallback={<Loading size="lg" />}>
-        <ArtworkGrid />
-      </Suspense>
     </PageWrap>
   );
 };
