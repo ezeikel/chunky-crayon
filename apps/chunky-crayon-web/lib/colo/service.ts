@@ -33,8 +33,15 @@ export const getColoState = (
 
   let progressToNext: ColoState['progressToNext'] = null;
   if (nextStageInfo) {
-    const currentProgress = artworkCount;
     const requiredForNext = nextStageInfo.requiredArtworks;
+    // Cap `current` at `required` for display. Without this cap, a kid
+    // who saves more than the next-stage threshold before the evolution
+    // event fires sees broken UI: a "50/30 artworks" fraction in the
+    // ColoAvatar tooltip and a literally-negative "Save -20 more
+    // artworks to evolve!" in the DashboardHeader (which subtracts
+    // current from required). Clamping the source is the right place
+    // to fix this — consumers shouldn't each have to remember.
+    const currentProgress = Math.min(artworkCount, requiredForNext);
     const percentage = Math.min(
       100,
       Math.round((currentProgress / requiredForNext) * 100),

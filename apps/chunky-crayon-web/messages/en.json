@@ -35,7 +35,8 @@
     },
     "avatar": {
       "tapMe": "Tap me!",
-      "artworks": "artworks"
+      "artworks": "artworks",
+      "maxStage": "All done!"
     },
     "stages": {
       "1": {

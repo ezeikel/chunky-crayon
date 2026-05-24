@@ -85,6 +85,109 @@ export const ColoStages: Story = {
   ),
 };
 
+// ─── Colo — tooltip (hover/tap state) ────────────────────────────────
+// The tooltip used to be four stacked text blocks (title +
+// description + a "50/30 artworks" fraction + a Tap-me pill); the
+// fraction could read "50/30" and the matching dashboard subtitle
+// went "Save -20 more artworks to evolve!" when the kid overshot a
+// stage threshold. Redesigned for 3-8yo: just the stage name as a big
+// headline, a visual progress bar (no fraction), and a chunky brand-
+// orange "Tap me!" pill. At max stage the bar becomes a four-star
+// "all done" badge instead of math. Service-level cap on
+// `progressToNext.current` keeps the bar inside [0,100%].
+
+const sampleColoState = (stage: ColoStage, artworkCount: number) => {
+  const info = COLO_STAGES[stage];
+  const next = stage < 6 ? COLO_STAGES[(stage + 1) as ColoStage] : null;
+  const required = next?.requiredArtworks ?? 0;
+  const capped = Math.min(artworkCount, required);
+  return {
+    stage,
+    stageName: info.name,
+    stageDescription: info.description,
+    imagePath: info.imagePath,
+    accessories: [],
+    nextStage: next,
+    progressToNext: next
+      ? {
+          current: capped,
+          required,
+          percentage: Math.round((capped / required) * 100),
+        }
+      : null,
+  };
+};
+
+const TooltipDemo = ({
+  stage,
+  artworkCount,
+  label,
+}: {
+  stage: ColoStage;
+  artworkCount: number;
+  label: string;
+}) => (
+  // `forceTooltipOpen` keeps the bubble pinned so the story IS the
+  // tooltip — no hover dance needed. Heavy bottom padding gives the
+  // bubble room to land below the avatar without clipping the next
+  // card in the grid.
+  <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-paper-cream-dark/60 bg-paper p-4 pb-48">
+    <ColoAvatar
+      stage={stage}
+      coloState={sampleColoState(stage, artworkCount)}
+      size="lg"
+      forceTooltipOpen
+      enableTapReactions
+    />
+    <p className="font-tondo text-sm font-bold text-text-secondary">{label}</p>
+  </div>
+);
+
+export const ColoTooltip: Story = {
+  name: 'Colo — tooltip (every progress state)',
+  render: () => (
+    <Stage>
+      <section className="space-y-3">
+        <div>
+          <h2 className="font-tondo text-xl font-bold text-text-primary">
+            Tooltip — 3-8yo redesign
+          </h2>
+          <p className="text-sm text-text-secondary">
+            Headline = stage name. Progress is a visual bar, no fraction. Max
+            stage swaps the bar for four stars. Tap-me pill is the only piece of
+            meaningful copy. Tooltips are pinned open (forceTooltipOpen) so the
+            story IS the tooltip.
+          </p>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <TooltipDemo
+            stage={2}
+            artworkCount={2}
+            label="Early progress (2 / 15 to next)"
+          />
+          <TooltipDemo
+            stage={3}
+            artworkCount={28}
+            label="Nearly there (28 / 30 to next)"
+          />
+          <TooltipDemo
+            stage={3}
+            artworkCount={100}
+            label="Overshoot capped at 30 (was the bug)"
+          />
+          <TooltipDemo stage={4} artworkCount={40} label="Mid-stage" />
+          <TooltipDemo stage={5} artworkCount={80} label="One stage to go" />
+          <TooltipDemo
+            stage={6}
+            artworkCount={200}
+            label="Max stage — four-star badge, no bar"
+          />
+        </div>
+      </section>
+    </Stage>
+  ),
+};
+
 // ─── Colo — every avatar size ─────────────────────────────────────────
 
 const SIZES = ['xs', 'sm', 'header', 'md', 'lg', 'xl'] as const;

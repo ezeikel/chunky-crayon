@@ -63,6 +63,12 @@ type ColoAvatarProps = {
   size?: AvatarSize;
   /** Show stage name on hover/click */
   showTooltip?: boolean;
+  /**
+   * Force the tooltip open regardless of hover state. Used by stories
+   * and visual reference docs where the tooltip IS the subject of the
+   * shot. Implies `showTooltip`. Not for in-app use.
+   */
+  forceTooltipOpen?: boolean;
   /** Show progress to next stage */
   showProgress?: boolean;
   /** Stroke width for the optional progress ring */
@@ -169,6 +175,7 @@ const ColoAvatar = ({
   stage: stageProp,
   size = 'md',
   showTooltip = false,
+  forceTooltipOpen = false,
   showProgress = false,
   progressStrokeWidth = 4,
   enableTapReactions = true,
@@ -394,33 +401,82 @@ const ColoAvatar = ({
         </svg>
       )}
 
-      {/* Tooltip */}
-      {showTooltip && showTooltipState && (
-        <div className="absolute left-1/2 top-full z-10 mt-3 -translate-x-1/2 sm:left-full sm:top-1/2 sm:ml-4 sm:mt-0 sm:-translate-y-1/2 sm:translate-x-0">
-          <div className="min-w-52 rounded-3xl border-2 border-paper-cream-dark bg-white px-4 py-3 text-center font-tondo shadow-card">
-            <p className="text-lg font-bold text-text-primary">
-              {t(`stages.${stage}.name`)}
-            </p>
-            <p className="mt-1 text-sm text-text-secondary">
-              {t(`stages.${stage}.description`)}
-            </p>
-            {coloState?.progressToNext && (
-              <p className="mt-2 text-sm font-bold text-crayon-orange">
-                {coloState.progressToNext.current}/
-                {coloState.progressToNext.required} {t('avatar.artworks')}
+      {/* Tooltip — redesigned for 3-8yo readers.
+          Old version stacked title + description + "x/y artworks" fraction
+          + a Tap-me pill: four text blocks, mostly grey, with a math
+          fraction that could go negative past the max stage threshold.
+          New version is shape-first: big stage name as the headline, a
+          visual progress bar (no fractions), and a chunky brand-orange
+          Tap-me pill if reactions are on. At max stage the bar becomes
+          a four-star "all done" badge instead of math. */}
+      {(showTooltip || forceTooltipOpen) &&
+        (showTooltipState || forceTooltipOpen) && (
+          <div className="absolute left-1/2 top-full z-10 mt-3 -translate-x-1/2 sm:left-full sm:top-1/2 sm:ml-4 sm:mt-0 sm:-translate-y-1/2 sm:translate-x-0">
+            <div className="w-56 rounded-3xl border-2 border-paper-cream-dark bg-white px-5 py-4 text-center font-tondo shadow-card">
+              <p className="text-xl font-bold text-text-primary">
+                {t(`stages.${stage}.name`)}
               </p>
-            )}
-            {enableTapReactions && (
-              <p className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full bg-crayon-yellow px-4 py-2 text-base font-bold text-text-primary shadow-sm">
-                {t('avatar.tapMe')}
-                <FontAwesomeIcon icon={faPalette} />
-              </p>
-            )}
-            {/* Tooltip arrow */}
-            <div className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 -translate-y-2 rotate-45 border-l-2 border-t-2 border-paper-cream-dark bg-white sm:left-0 sm:top-1/2 sm:-translate-x-2 sm:-translate-y-1/2 sm:border-b-2 sm:border-l-2 sm:border-r-0 sm:border-t-0" />
+
+              {coloState?.progressToNext ? (
+                // Visual progress — a chunky filled bar, no fraction text.
+                // Clamp to [0,1] so the bar never visually overshoots past
+                // the threshold (old version showed "50/30" which both
+                // read as broken AND made the subtitle "Save -20 more
+                // artworks" elsewhere — a negative number for a kid).
+                <div className="mt-3">
+                  <div
+                    className="relative h-3 w-full overflow-hidden rounded-full bg-paper-cream"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={coloState.progressToNext.required}
+                    aria-valuenow={Math.min(
+                      coloState.progressToNext.current,
+                      coloState.progressToNext.required,
+                    )}
+                  >
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full bg-crayon-orange transition-[width] duration-500"
+                      style={{
+                        width: `${Math.min(100, Math.max(0, coloState.progressToNext.percentage))}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                // Max stage — replace the bar with a four-star badge so the
+                // kid sees "complete!" as a shape, not a number.
+                <div
+                  className="mt-3 flex justify-center gap-1"
+                  aria-label={t('avatar.maxStage')}
+                >
+                  {[0, 1, 2, 3].map((i) => (
+                    <FontAwesomeIcon
+                      key={i}
+                      icon={faStar}
+                      className="text-lg"
+                      style={
+                        {
+                          '--fa-primary-color': 'hsl(var(--crayon-yellow))',
+                          '--fa-secondary-color': 'hsl(var(--crayon-orange))',
+                          '--fa-secondary-opacity': '1',
+                        } as React.CSSProperties
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+
+              {enableTapReactions && (
+                <p className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full bg-crayon-orange px-5 py-2.5 text-base font-bold text-white shadow-btn-primary">
+                  <FontAwesomeIcon icon={faPalette} />
+                  {t('avatar.tapMe')}
+                </p>
+              )}
+              {/* Tooltip arrow */}
+              <div className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 -translate-y-2 rotate-45 border-l-2 border-t-2 border-paper-cream-dark bg-white sm:left-0 sm:top-1/2 sm:-translate-x-2 sm:-translate-y-1/2 sm:border-b-2 sm:border-l-2 sm:border-r-0 sm:border-t-0" />
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };
