@@ -18,8 +18,16 @@ type HomePageContentProps = {
   form: React.ReactNode;
   /** Form for logged-in users (large size) - optional, falls back to form */
   formLarge?: React.ReactNode;
-  /** Gallery component */
+  /** Gallery component — logged-OUT only (community + system mix). */
   gallery: React.ReactNode;
+  /**
+   * Logged-IN homepage recent-artwork strip. Replaces `gallery` on the
+   * signed-in branch — CC kids never see UGC, so the logged-in home
+   * shows the current profile's own recent saved artwork + a "see all"
+   * door to /account/my-stuff. Server-rendered, passed as a slot.
+   * See `feedback_cc_no_community_for_logged_in`.
+   */
+  myRecentArtwork?: React.ReactNode;
   /** Gallery preview for logged-out users - shows free library snippets with CTAs */
   galleryPreview?: React.ReactNode;
   /** Social proof stats for logged-out users - shows total pages, daily pages, etc. */
@@ -54,6 +62,7 @@ const HomePageContent = ({
   form,
   formLarge,
   gallery,
+  myRecentArtwork,
   galleryPreview,
   socialProofStats,
   recentCreations,
@@ -99,8 +108,9 @@ const HomePageContent = ({
           <div className="w-full">{formLarge || form}</div>
         </div>
 
-        {/* Gallery section */}
-        {gallery}
+        {/* Recent artwork — current profile only, with "See all" door
+            to /account/my-stuff. The kid's pile, not the global feed. */}
+        {myRecentArtwork}
       </PageWrap>
     );
   }

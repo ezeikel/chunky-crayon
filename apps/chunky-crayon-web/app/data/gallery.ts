@@ -45,10 +45,24 @@ export const ALL_DIFFICULTIES = Object.values(Difficulty) as Difficulty[];
 export const GALLERY_PAGE_SIZE = 24;
 
 // ===== COMMUNITY IMAGES =====
-// Public images created by REAL USERS (UGC). System-generated images
-// belong in the daily / themed / category sections, not Community.
-// The old query had `userId: null` which inverted this — it showed
-// system images and hid every actual user creation.
+// "Community" on CC = pages made by anonymous GUEST visitors using
+// their two free tries. NOT signed-in users' kid art. Two reasons:
+//   1. CC is a 3-8yo kids app — signed-in accounts are families,
+//      and there's no opt-in / parental-gate flow for sharing a
+//      kid's work publicly. Defaulting their saved art into a
+//      public "Community" pool was a silent privacy leak.
+//   2. Guests are anonymous marketing visitors trying the free
+//      create flow. Surfacing their creations as "look what people
+//      are making in 2 minutes" is fair social proof for cold
+//      visitors.
+// `generationType: USER` excludes SYSTEM (seeded backfill / ads /
+// demo reels / content reels), DAILY (cron output), and
+// COMMENT_REQUEST (#drawthis IG/FB replies). `userId: null`
+// excludes anything attached to a signed-in account.
+// Surface rules: logged-out visitors only. Logged-in users never
+// see this surface (see `feedback_cc_no_community_for_logged_in`).
+// `brandWhere` already enforces `status: 'READY'` so unfinished or
+// failed rows can't leak in.
 
 const getCommunityImagesBase = async (
   cursor?: string,
@@ -61,9 +75,8 @@ const getCommunityImagesBase = async (
   const images = await db.coloringImage.findMany({
     where: {
       ...brandWhere,
-      userId: { not: null }, // UGC only — user-created images
-      showInCommunity: true, // The user opted into community visibility
-      status: 'READY',
+      userId: null,
+      generationType: GenerationType.USER,
     },
     select: {
       ...GALLERY_IMAGE_SELECT,

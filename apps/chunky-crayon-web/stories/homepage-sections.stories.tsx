@@ -7,6 +7,9 @@ import PricingTeaser from '@/components/PricingTeaser';
 import Testimonials, { StarRating } from '@/components/Testimonials';
 import FAQ from '@/components/FAQ';
 import MeetYourCharactersSection from '@/components/Home/MeetYourCharactersSection/MeetYourCharactersSection';
+import MyRecentArtworkView, {
+  type MyRecentArtworkItem,
+} from '@/components/MyRecentArtwork/MyRecentArtworkView';
 import {
   MockCreateForm,
   MockGalleryStrip,
@@ -183,5 +186,78 @@ export const PricingTeaserSection: Story = {
       ctaLabel="See plans"
       location="homepage"
     />
+  ),
+};
+
+// ─── My recent artwork strip ───────────────────────────────────────────
+// Logged-in homepage's recent-pictures strip. Replaced the previous
+// wall of mixed user+community images on the logged-in home (a 3-8yo
+// kids app can't police what other users created). Shows up to ~10 of
+// the current profile's saved artwork + a "See all my pictures" door
+// to /account/my-stuff. The empty state ships its own friendly card.
+
+const sampleArtworkItems: MyRecentArtworkItem[] = [
+  {
+    id: 'a1',
+    imageUrl: '/images/colo.svg',
+    artworkId: 'img-1',
+    title: 'Friendly dragon',
+  },
+  {
+    id: 'a2',
+    imageUrl: '/images/colo.svg',
+    artworkId: 'img-2',
+    title: 'Robot in space',
+  },
+  {
+    id: 'a3',
+    imageUrl: '/images/colo.svg',
+    artworkId: 'img-3',
+    title: 'Princess and a cat',
+  },
+  {
+    id: 'a4',
+    imageUrl: '/images/colo.svg',
+    artworkId: 'img-4',
+    title: 'Birthday cake',
+  },
+  {
+    id: 'a5',
+    imageUrl: '/images/colo.svg',
+    artworkId: 'img-5',
+    title: 'Rainbow unicorn',
+  },
+  {
+    id: 'a6',
+    imageUrl: '/images/colo.svg',
+    artworkId: 'img-6',
+    title: 'Tiny dinosaur',
+  },
+];
+
+const myRecentArtworkLabels = {
+  title: 'Your recent pictures',
+  seeAll: 'See all my pictures',
+  empty: 'Color a page and tap save to start your collection!',
+};
+
+export const MyRecentArtworkStrip: Story = {
+  name: 'My recent artwork — populated',
+  render: () => (
+    <main className="bg-paper p-8">
+      <MyRecentArtworkView
+        items={sampleArtworkItems}
+        labels={myRecentArtworkLabels}
+      />
+    </main>
+  ),
+};
+
+export const MyRecentArtworkEmpty: Story = {
+  name: 'My recent artwork — empty state',
+  render: () => (
+    <main className="bg-paper p-8">
+      <MyRecentArtworkView items={[]} labels={myRecentArtworkLabels} />
+    </main>
   ),
 };

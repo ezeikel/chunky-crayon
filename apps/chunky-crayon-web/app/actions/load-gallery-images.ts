@@ -58,11 +58,15 @@ export async function loadGalleryImages(
 
   switch (galleryType) {
     case 'community':
-      // UGC only. Matches getCommunityImagesBase in app/data/gallery.ts.
+      // Guest-only creations (userId NULL + generationType USER).
+      // Mirrors getCommunityImagesBase in app/data/gallery.ts —
+      // signed-in users' saved kid art is never community-eligible
+      // on CC (3-8yo; no public-share opt-in). See
+      // `feedback_cc_no_community_for_logged_in`.
       whereClause = {
         ...baseWhere,
-        userId: { not: null },
-        showInCommunity: true,
+        userId: null,
+        generationType: GenerationType.USER,
       };
       break;
 

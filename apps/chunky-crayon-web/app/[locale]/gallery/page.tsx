@@ -21,6 +21,7 @@ import {
   faPalette,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { auth } from '@/auth';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import CrayonScribble from '@/components/Intro/CrayonScribble';
@@ -347,15 +348,28 @@ const OurLatestImages = async ({
 };
 
 const CommunityHighlights = async ({ locale }: { locale: string }) => {
+  // CC content policy: the community-creations surface is shown to
+  // LOGGED-OUT visitors only. Logged-in kids (3-8yo) never see UGC on
+  // CC — we can't policy what other users created, so the safety
+  // posture is "community is for logged-out marketing context only".
+  // See feedback_cc_no_community_for_logged_in. Logged-out: still
+  // shown (it's the social-proof surface for the public gallery).
+  const session = await auth();
+  if (session?.user) return null;
+
   const t = await getTranslations({ locale, namespace: 'gallery' });
   const tAlt = await getTranslations({ locale, namespace: 'altText' });
-  // UGC only. getCommunityImages applies userId IS NOT NULL +
-  // showInCommunity + status=READY. The previous version used
-  // getFeaturedImages which (despite the name) returns SYSTEM content —
-  // a labelling bug that made this section a duplicate of the system
-  // feed. See app/data/gallery.ts.
-  const { images: allImages } = await getCommunityImages(undefined, 6);
-  const images = allImages.filter((img) => img.svgUrl);
+  // Guest-only creations (userId NULL + generationType USER), as
+  // re-scoped in app/data/gallery.ts. Signed-in users' saved art is
+  // never community-eligible on CC (3-8yo; no public-share opt-in).
+  // Pull 7 so we can detect overflow: if we get 7+, /gallery/community
+  // has more than the section shows → the "view all" link is honest.
+  // 6 or fewer → the section IS the whole community pool right now,
+  // so don't tease a deeper page that doesn't exist. The display still
+  // caps at 6.
+  const { images: allImages } = await getCommunityImages(undefined, 7);
+  const hasMoreThanPreview = allImages.length > 6;
+  const images = allImages.filter((img) => img.svgUrl).slice(0, 6);
 
   // No UGC yet on this brand? Hide the section rather than show an
   // empty grid or fall back to system content (that's the new
@@ -381,13 +395,15 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
             {t('communityCreations')}
           </h2>
         </div>
-        <Link
-          href="/gallery/community"
-          className="text-sm text-crayon-purple hover:text-crayon-purple-dark transition-colors flex items-center gap-1"
-        >
-          {t('viewAllCommunity')}
-          <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
-        </Link>
+        {hasMoreThanPreview && (
+          <Link
+            href="/gallery/community"
+            className="text-sm text-crayon-purple hover:text-crayon-purple-dark transition-colors flex items-center gap-1"
+          >
+            {t('viewAllCommunity')}
+            <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
+          </Link>
+        )}
       </div>
       <p className="text-text-secondary mb-5 max-w-3xl">
         {t('communitySubtitle')}
@@ -412,16 +428,20 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
       {/* Prominent CTA at the bottom of the preview strip. The
           /gallery/community page is the explore-driven infinite-scroll
           destination; we want browsers to actually land there rather
-          than skip past the section. */}
-      <div className="mt-6 flex justify-center">
-        <Link
-          href="/gallery/community"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-purple text-white font-tondo font-semibold rounded-full hover:bg-crayon-purple-dark transition-colors"
-        >
-          {t('browseAllCommunity')}
-          <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
-        </Link>
-      </div>
+          than skip past the section. Hidden when the preview already
+          shows everything we have — no point sending visitors to a
+          deeper page that's the same content. */}
+      {hasMoreThanPreview && (
+        <div className="mt-6 flex justify-center">
+          <Link
+            href="/gallery/community"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-crayon-purple text-white font-tondo font-semibold rounded-full hover:bg-crayon-purple-dark transition-colors"
+          >
+            {t('browseAllCommunity')}
+            <FontAwesomeIcon icon={faArrowRight} className="text-sm" />
+          </Link>
+        </div>
+      )}
     </section>
   );
 };
