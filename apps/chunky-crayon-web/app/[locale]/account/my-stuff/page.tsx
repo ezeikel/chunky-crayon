@@ -9,7 +9,6 @@ import {
   faArrowRight,
   faBookOpen,
   faStar,
-  faPaintbrush,
   faDownload,
   faGift,
 } from '@fortawesome/pro-duotone-svg-icons';
@@ -19,7 +18,8 @@ import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import CrayonScribble from '@/components/Intro/CrayonScribble';
 import ChallengeWidget from '@/components/ChallengeCard/ChallengeWidget';
-import { getUserSavedArtwork } from '@/app/actions/saved-artwork';
+import { getUserSavedArtworkPage } from '@/app/actions/saved-artwork';
+import DeleteCreationButton from './DeleteCreationButton';
 import {
   getMyCreationsPage,
   MY_CREATIONS_PAGE_SIZE,
@@ -308,7 +308,7 @@ const GridSectionSkeleton = ({
 const MyCreationsSection = async ({
   searchParamsPromise,
 }: {
-  searchParamsPromise: Promise<{ page?: string }>;
+  searchParamsPromise: Promise<{ page?: string; savedPage?: string }>;
 }) => {
   const session = await auth();
   if (!session?.user?.id) return null;
@@ -372,22 +372,36 @@ const MyCreationsSection = async ({
         />
       </h2>
 
+      {/* Cards match the "Your saved pictures" grid below: a single
+          full-bleed image-only tile, no title row, with a small
+          delete-overlay chip in the top-right. Tap the tile to keep
+          coloring; tap the chip to remove. */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
         {images.map((img) => (
-          <Link
-            key={img.id}
-            href={getColoringImageUrl(img, locale)}
-            className="group block aspect-square relative rounded-2xl border-3 border-text-primary/10 overflow-hidden bg-bg-white hover:border-crayon-orange hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
-          >
-            {img.svgUrl ? (
-              <Image
-                src={img.svgUrl}
-                alt={img.title ?? 'My picture'}
-                fill
-                className="object-contain p-2"
-              />
-            ) : null}
-          </Link>
+          <div key={img.id} className="group relative aspect-square">
+            <Link
+              href={getColoringImageUrl(img, locale)}
+              aria-label={img.title ?? 'My picture'}
+              className="block size-full relative rounded-2xl border-3 border-text-primary/10 overflow-hidden bg-bg-white hover:border-crayon-orange hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
+            >
+              {img.svgUrl ? (
+                <Image
+                  src={img.svgUrl}
+                  alt={img.title ?? 'My picture'}
+                  fill
+                  className="object-cover"
+                />
+              ) : null}
+            </Link>
+
+            {/* Delete chip — outside the <Link> so the tap doesn't
+                bubble into "open the picture". Refuses with a friendly
+                toast if this picture has a saved colored version
+                (handled by the server action). */}
+            <div className="absolute top-2 right-2 z-10">
+              <DeleteCreationButton coloringImageId={img.id} />
+            </div>
+          </div>
         ))}
       </div>
 
@@ -396,9 +410,15 @@ const MyCreationsSection = async ({
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            buildHref={(p) =>
-              p === 1 ? '/account/my-stuff' : `/account/my-stuff?page=${p}`
-            }
+            buildHref={(p) => {
+              // Preserve `?savedPage=` if the kid is mid-browse on the
+              // saved grid below, so this pagination doesn't reset it.
+              const params = new URLSearchParams();
+              if (p !== 1) params.set('page', String(p));
+              if (sp.savedPage) params.set('savedPage', sp.savedPage);
+              const qs = params.toString();
+              return qs ? `/account/my-stuff?${qs}` : '/account/my-stuff';
+            }}
             ariaLabel="Your pictures"
             // Stay put on click — the grid above is what changed, the
             // pagination is right under the kid's eye. Scroll-to-top
@@ -412,13 +432,28 @@ const MyCreationsSection = async ({
 };
 
 // ─── Saved-pictures grid ─────────────────────────────────────────────
-const ArtworkGrid = async () => {
+// Page-numbered same as MyCreationsSection. Uses `?savedPage=N` so
+// the two paginated grids on this page don't collide on `?page=` —
+// the kid can be on creations page 3 AND saved page 2 at the same
+// time without one resetting the other.
+const ArtworkGrid = async ({
+  searchParamsPromise,
+}: {
+  searchParamsPromise: Promise<{ page?: string; savedPage?: string }>;
+}) => {
   const session = await auth();
   if (!session?.user) redirect('/signin');
 
-  const savedArtwork = await getUserSavedArtwork();
+  const sp = await searchParamsPromise;
+  const pageNum = Number(sp.savedPage ?? '1');
+  const {
+    items: savedArtwork,
+    page,
+    totalPages,
+    totalCount,
+  } = await getUserSavedArtworkPage(Number.isFinite(pageNum) ? pageNum : 1);
 
-  if (savedArtwork.length === 0) {
+  if (totalCount === 0) {
     return (
       <section className="mt-12 lg:mt-16">
         <h2 className="font-tondo text-2xl lg:text-3xl font-bold text-text-primary mb-6 relative inline-block">
@@ -457,52 +492,60 @@ const ArtworkGrid = async () => {
         />
       </h2>
 
+      {/* Cards match the "Your pictures" grid shape above: a single
+          full-bleed image-only tile, no title / date row (kids don't
+          care, parents have the date metadata on the detail page).
+          The tile IS the link to keep coloring. Delete sits as a
+          small overlay so it's reachable but doesn't compete for
+          attention with the picture. */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
         {savedArtwork.map((artwork) => (
-          <div
-            key={artwork.id}
-            className="group relative bg-bg-white rounded-2xl border-3 border-text-primary/10 overflow-hidden hover:border-crayon-pink hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
-          >
+          <div key={artwork.id} className="group relative aspect-square">
             <Link
               href={`/coloring-image/${artwork.coloringImageId}`}
-              className="block aspect-square relative"
+              aria-label={artwork.title || 'Saved picture'}
+              className="block size-full relative rounded-2xl border-3 border-text-primary/10 overflow-hidden bg-bg-white hover:border-crayon-pink hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
             >
               <Image
                 src={artwork.imageUrl}
-                alt={artwork.title || 'Saved artwork'}
+                alt={artwork.title || 'Saved picture'}
                 fill
-                className="object-contain p-2"
+                className="object-cover"
               />
             </Link>
 
-            <div className="p-3 border-t-2 border-text-primary/5 bg-paper-cream/40">
-              <h3 className="font-tondo font-bold text-sm text-text-primary truncate">
-                {artwork.title}
-              </h3>
-              <span className="font-rooney-sans text-xs text-text-muted">
-                {getFriendlyTime(new Date(artwork.createdAt))}
-              </span>
-            </div>
-
-            {/* Hover-reveal action buttons (always visible on mobile) */}
-            <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/0 md:bg-black/0 md:opacity-0 md:group-hover:opacity-100 md:group-hover:bg-black/20 transition-all duration-200 pointer-events-none">
-              <div className="flex items-center gap-2 md:gap-3 pointer-events-auto">
-                <Link
-                  href={`/coloring-image/${artwork.coloringImageId}`}
-                  className="flex items-center justify-center size-10 md:size-14 rounded-full bg-crayon-teal text-white shadow-lg hover:bg-crayon-teal-dark hover:scale-110 active:scale-95 transition-all duration-200"
-                  title="Color again"
-                >
-                  <FontAwesomeIcon
-                    icon={faPaintbrush}
-                    className="text-sm md:text-lg"
-                  />
-                </Link>
-                <DeleteArtworkButton artworkId={artwork.id} />
-              </div>
+            {/* Delete control — small chip overlaid in the top-right,
+                outside the <Link> so taps don't bubble into "open the
+                picture". Always visible (kids/parents need it
+                reachable on touch; no hover state on mobile).
+                size='sm' is the 32px overlay variant. */}
+            <div className="absolute top-2 right-2 z-10">
+              <DeleteArtworkButton artworkId={artwork.id} size="sm" />
             </div>
           </div>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-8">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            buildHref={(p) => {
+              // Use `?savedPage=` so creations + saved can paginate
+              // independently. Keep the current `?page=` (the
+              // pictures grid) intact when present.
+              const params = new URLSearchParams();
+              if (sp.page) params.set('page', sp.page);
+              if (p !== 1) params.set('savedPage', String(p));
+              const qs = params.toString();
+              return qs ? `/account/my-stuff?${qs}` : '/account/my-stuff';
+            }}
+            ariaLabel="Your saved pictures"
+            scroll={false}
+          />
+        </div>
+      )}
     </section>
   );
 };
@@ -520,7 +563,7 @@ const MyArtworkPage = ({
 }: {
   // Sync page handler (per `feedback_async_page_handlers_block_static_shell`),
   // params arrive as a Promise that the Suspense child awaits.
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; savedPage?: string }>;
 }) => {
   return (
     <PageWrap>
@@ -560,7 +603,7 @@ const MyArtworkPage = ({
       <Suspense
         fallback={<GridSectionSkeleton title="Your saved pictures" cards={4} />}
       >
-        <ArtworkGrid />
+        <ArtworkGrid searchParamsPromise={searchParams} />
       </Suspense>
 
       <Suspense fallback={null}>

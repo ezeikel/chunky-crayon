@@ -820,3 +820,65 @@ export const createColoringImageFromVoiceConversation = async (opts: {
 
   return result;
 };
+
+/**
+ * Delete one of the current user's own coloring images (a generation
+ * they made). Powers the small trash overlay on each card in the
+ * "Your pictures" grid on /account/my-stuff.
+ *
+ * Guardrails:
+ *   - Ownership: only the image's owner can delete it (userId match).
+ *     Implicit profile scope: if the row has profileId set, the call
+ *     still succeeds for any of the user's profiles — a parent can
+ *     clean up a kid's pile, and a kid switching profiles can still
+ *     delete what they made under another profile. Adjust if we want
+ *     per-profile delete-only-yours behaviour later.
+ *   - Saved-artwork dependency: SavedArtwork.coloringImage is a hard
+ *     FK with no onDelete cascade — deleting a ColoringImage that has
+ *     SavedArtwork rows pointing at it throws a Prisma FK error.
+ *     Instead of attempting and failing, we count first and refuse
+ *     with a friendly `hasSavedReferences` flag so the caller can
+ *     surface the right message ("delete the saved picture instead").
+ */
+export const deleteMyCreation = async (
+  coloringImageId: string,
+): Promise<
+  | { success: true }
+  | {
+      success: false;
+      reason: 'unauthorized' | 'not_found' | 'has_saved_references' | 'unknown';
+    }
+> => {
+  try {
+    const userId = await getUserId(ACTIONS.DELETE_MY_CREATION);
+    if (!userId) return { success: false, reason: 'unauthorized' };
+
+    const image = await db.coloringImage.findFirst({
+      where: { id: coloringImageId, userId },
+      select: { id: true },
+    });
+    if (!image) return { success: false, reason: 'not_found' };
+
+    // If this template has a saved colored copy, the kid's keepsake
+    // depends on it — refuse rather than orphan or cascade-delete.
+    const savedCount = await db.savedArtwork.count({
+      where: { coloringImageId },
+    });
+    if (savedCount > 0) {
+      return { success: false, reason: 'has_saved_references' };
+    }
+
+    await db.coloringImage.delete({ where: { id: coloringImageId } });
+
+    // Bust the gallery cache that hides/shows this row in the user's
+    // own paginated grid + the public listings (the row was almost
+    // certainly showInCommunity:true since that's the schema default).
+    revalidatePath('/account/my-stuff');
+    revalidateTag('coloring-images-paginated', { expire: 0 });
+
+    return { success: true };
+  } catch (err) {
+    console.error('[deleteMyCreation] failed', err);
+    return { success: false, reason: 'unknown' };
+  }
+};

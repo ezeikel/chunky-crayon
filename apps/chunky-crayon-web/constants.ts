@@ -630,6 +630,7 @@ export const ACTIONS = {
   // Saved artwork actions
   SAVE_ARTWORK: 'save artwork',
   GET_SAVED_ARTWORKS: 'get saved artworks',
+  DELETE_MY_CREATION: 'delete my coloring image',
   // Conversion tracking actions
   RECORD_RESOURCE_SAVED: 'record resource saved',
 };

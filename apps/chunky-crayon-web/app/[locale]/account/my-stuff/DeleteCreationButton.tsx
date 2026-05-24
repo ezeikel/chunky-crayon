@@ -3,7 +3,8 @@
 import { useState, useTransition } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faCheck } from '@fortawesome/pro-solid-svg-icons';
-import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
+import { faSpinnerThird, faHeart } from '@fortawesome/pro-duotone-svg-icons';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -11,49 +12,63 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { deleteSavedArtwork } from '@/app/actions/saved-artwork';
+import { deleteMyCreation } from '@/app/actions/coloring-image';
 
-type DeleteArtworkButtonProps = {
-  artworkId: string;
-  /**
-   * 'lg' (default) = chunky 44–56px pink ball, the original action-row
-   * style. 'sm' = compact 32px chip designed to sit as a top-right
-   * overlay on a thumbnail without dominating the picture.
-   */
-  size?: 'lg' | 'sm';
+/**
+ * Delete one of the kid's own ColoringImage rows from the "Your
+ * pictures" grid on /account/my-stuff. Mirrors DeleteArtworkButton's
+ * shape (32px pink chip overlay, chunky kid-friendly two-button
+ * confirm dialog) so the two grids feel identical.
+ *
+ * Distinct from DeleteArtworkButton because it deletes a different
+ * model (ColoringImage vs SavedArtwork) AND has to handle the
+ * "this picture has a saved colored copy" guardrail — see the
+ * has_saved_references branch on the server action. In that case we
+ * surface a friendly toast pointing the parent at the saved grid.
+ */
+
+type DeleteCreationButtonProps = {
+  coloringImageId: string;
 };
 
-const DeleteArtworkButton = ({
-  artworkId,
-  size = 'lg',
-}: DeleteArtworkButtonProps) => {
+const DeleteCreationButton = ({
+  coloringImageId,
+}: DeleteCreationButtonProps) => {
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDelete = () => {
     startTransition(async () => {
-      await deleteSavedArtwork(artworkId);
+      const result = await deleteMyCreation(coloringImageId);
       setIsOpen(false);
+      if (!result.success) {
+        // has_saved_references is the common explanatory case — the
+        // kid colored + saved this picture, and the saved version
+        // depends on this row. Direct them to the saved grid.
+        if (result.reason === 'has_saved_references') {
+          toast.info(
+            'This picture has a saved colored version. Delete that one first.',
+            { icon: <FontAwesomeIcon icon={faHeart} /> },
+          );
+          return;
+        }
+        toast.error("Couldn't delete that picture. Try again?");
+      }
     });
   };
 
   return (
     <>
+      {/* Small chip — same shape as DeleteArtworkButton size='sm' so
+          both grids' overlays feel identical. */}
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className={
-          size === 'sm'
-            ? 'flex items-center justify-center size-8 rounded-full bg-crayon-pink/90 backdrop-blur-sm text-white shadow-md hover:bg-crayon-pink hover:scale-110 active:scale-95 transition-all duration-200'
-            : 'flex items-center justify-center size-11 md:size-14 rounded-full bg-crayon-pink text-white shadow-lg hover:bg-crayon-pink-dark hover:scale-110 active:scale-95 transition-all duration-200'
-        }
-        aria-label="Delete artwork"
-        title="Delete artwork"
+        className="flex items-center justify-center size-8 rounded-full bg-crayon-pink/90 backdrop-blur-sm text-white shadow-md hover:bg-crayon-pink hover:scale-110 active:scale-95 transition-all duration-200"
+        aria-label="Delete picture"
+        title="Delete picture"
       >
-        <FontAwesomeIcon
-          icon={faTrash}
-          className={size === 'sm' ? 'text-xs' : 'text-sm md:text-base'}
-        />
+        <FontAwesomeIcon icon={faTrash} className="text-xs" />
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -68,17 +83,13 @@ const DeleteArtworkButton = ({
             <DialogTitle className="text-center font-tondo text-xl">
               Are you sure?
             </DialogTitle>
-            {/* Screen-reader description; visually hidden so the kid
-                sees just the title + the two pill buttons. */}
             <DialogDescription className="sr-only">
-              Permanently delete this saved picture.
+              Permanently delete this picture.
             </DialogDescription>
           </DialogHeader>
 
           {/* Rounded-full pills, icon + text inline. Same vocabulary
-              as PaywallModal / ParentalGate's action row. Side-by-side
-              at this card width so neither button feels like a
-              landing pad. */}
+              as DeleteArtworkButton + PaywallModal / ParentalGate. */}
           <div className="mt-2 flex justify-center gap-3">
             <button
               type="button"
@@ -112,4 +123,4 @@ const DeleteArtworkButton = ({
   );
 };
 
-export default DeleteArtworkButton;
+export default DeleteCreationButton;

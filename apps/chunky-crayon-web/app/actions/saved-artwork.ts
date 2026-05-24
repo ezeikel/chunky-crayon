@@ -154,6 +154,58 @@ export async function getUserSavedArtwork() {
 }
 
 /**
+ * Page-numbered access to the current user's saved artwork. Powers
+ * the "Your saved pictures" section on /account/my-stuff. Mirrors
+ * getMyCreationsPage's shape so the page can paginate both grids
+ * consistently (24 per page, page-numbered, totalPages + totalCount).
+ *
+ * `page` is 1-indexed and clamped to >=1. The page-size constant is
+ * intentionally inlined: every export from a 'use server' module
+ * must be async (see `feedback_use_server_exports_must_be_async`).
+ */
+export async function getUserSavedArtworkPage(page: number = 1) {
+  const PAGE_SIZE = 24;
+
+  const userId = await getUserId();
+  if (!userId) {
+    return {
+      items: [],
+      page: 1,
+      totalPages: 1,
+      totalCount: 0,
+      pageSize: PAGE_SIZE,
+    } as const;
+  }
+
+  const activeProfile = await getActiveProfile();
+  const where = activeProfile
+    ? { userId, profileId: activeProfile.id }
+    : { userId };
+
+  // Clamp page to >=1; URL params aren't trustworthy.
+  const safePage = Math.max(1, Math.floor(page));
+
+  const [totalCount, items] = await Promise.all([
+    db.savedArtwork.count({ where }),
+    db.savedArtwork.findMany({
+      where,
+      include: {
+        coloringImage: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: PAGE_SIZE,
+      skip: (safePage - 1) * PAGE_SIZE,
+    }),
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  return { items, page: safePage, totalPages, totalCount, pageSize: PAGE_SIZE };
+}
+
+/**
  * Delete a saved artwork
  */
 export async function deleteSavedArtwork(
