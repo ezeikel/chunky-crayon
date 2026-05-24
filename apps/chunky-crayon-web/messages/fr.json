@@ -31,7 +31,8 @@
       "next": "Prochain : {stageName}",
       "saveToEvolve": "Enregistre encore {count} dessins pour évoluer !",
       "maxStage": "Tu as atteint le niveau maximum !",
-      "accessories": "Accessoires ({count})"
+      "accessories": "Accessoires ({count})",
+      "readyToGrow": "Prêt à grandir !"
     },
     "avatar": {
       "tapMe": "Tape sur moi !",

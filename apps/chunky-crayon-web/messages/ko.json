@@ -31,7 +31,8 @@
       "next": "다음: {stageName}",
       "saveToEvolve": "그림을 {count}개 더 저장하면 진화해요!",
       "maxStage": "최고 단계에 도달했어요!",
-      "accessories": "액세서리 ({count})"
+      "accessories": "액세서리 ({count})",
+      "readyToGrow": "자랄 준비 완료!"
     },
     "avatar": {
       "tapMe": "나를 눌러줘!",

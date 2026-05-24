@@ -31,7 +31,8 @@
       "next": "次：{stageName}",
       "saveToEvolve": "あと{count}枚保存して進化！",
       "maxStage": "いちばん上のステージに到達したよ！",
-      "accessories": "アクセサリー（{count}）"
+      "accessories": "アクセサリー（{count}）",
+      "readyToGrow": "大きくなる準備OK！"
     },
     "avatar": {
       "tapMe": "タップしてね！",

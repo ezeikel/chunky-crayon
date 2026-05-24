@@ -31,7 +31,8 @@
       "next": "Siguiente: {stageName}",
       "saveToEvolve": "¡Guarda {count} dibujos más para evolucionar!",
       "maxStage": "¡Has llegado al nivel más alto!",
-      "accessories": "Accesorios ({count})"
+      "accessories": "Accesorios ({count})",
+      "readyToGrow": "¡Listo para crecer!"
     },
     "avatar": {
       "tapMe": "¡Tócame!",
