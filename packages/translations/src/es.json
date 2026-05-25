@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "Página para colorear",
     "relatedPages": "Más páginas para colorear",
-    "defaultDescription": "Página para colorear gratuita e imprimible de Chunky Crayon",
+    "defaultDescription": "Página para colorear gratuita para imprimir de Chunky Crayon",
     "progress": {
       "colored": "coloreado",
       "percentage": "{percent}%",
@@ -108,7 +108,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Hecho",
+      "doneSharing": "Compartido",
       "colorAgain": "Colorear de nuevo",
       "startOver": "Empezar de nuevo"
     },
@@ -126,7 +126,7 @@
     },
     "colorPalette": {
       "selectColor": "Seleccionar color {color}",
-      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas de magia"
+      "magicToolsMessage": "Los colores se eligen automáticamente con las herramientas mágicas"
     },
     "patternSelector": {
       "label": "Patrón:"
@@ -374,7 +374,7 @@
     "sendingLink": "Enviando enlace...",
     "chooseMethod": "Elige tu método de inicio de sesión",
     "orContinueWith": "O continuar con",
-    "emailPlaceholder": "name@example.com",
+    "emailPlaceholder": "nombre@ejemplo.com",
     "termsAgreement": "Al continuar, aceptas nuestros <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
     "verifyRequest": {
       "title": "¡Revisa tu correo!",
@@ -420,7 +420,7 @@
     "gallery": "Galería",
     "daily": "Páginas para colorear diarias",
     "community": "Páginas para colorear de la comunidad",
-    "forToddlers": "Para pequeños",
+    "forToddlers": "Para bebés",
     "forKids": "Para niños",
     "forTeens": "Para adolescentes",
     "forAdults": "Para adultos",
