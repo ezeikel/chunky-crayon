@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "Page à colorier",
     "relatedPages": "Plus de pages à colorier",
-    "defaultDescription": "Page à colorier gratuite de Chunky Crayon à imprimer",
+    "defaultDescription": "Page à colorier à imprimer gratuite de Chunky Crayon",
     "progress": {
       "colored": "colorié",
       "percentage": "{percent}%",
@@ -78,7 +78,7 @@
     "brushTypes": {
       "crayon": "Crayon",
       "marker": "Feutre",
-      "pencil": "Crayon de papier",
+      "pencil": "Crayon à papier",
       "paintbrush": "Pinceau",
       "eraser": "Gomme",
       "glitter": "Paillettes",
@@ -355,7 +355,7 @@
     "subscribe": "S’abonner",
     "currentPlanBadge": "Forfait actuel",
     "manageInPortal": "Gérez votre abonnement dans le portail client",
-    "noCommitment": "Sans engagement. Résiliez à tout moment.",
+    "noCommitment": "Sans engagement. Annulez à tout moment.",
     "perMonth": "/mois",
     "noSubscriptionForCredits": "Abonnement actif requis pour acheter des crédits",
     "noSubscriptionFound": "Aucun abonnement actif trouvé",
@@ -371,7 +371,7 @@
     "continueWithGoogle": "Continuer avec Google",
     "continueWithApple": "Continuer avec Apple",
     "signInWithEmail": "Se connecter par e-mail",
-    "sendingLink": "Envoi en cours…",
+    "sendingLink": "Envoi du lien...",
     "chooseMethod": "Choisissez votre méthode de connexion",
     "orContinueWith": "Ou continuer avec",
     "emailPlaceholder": "nom@exemple.com",
