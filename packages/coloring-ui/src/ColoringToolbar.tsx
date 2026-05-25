@@ -39,6 +39,10 @@ type ColoringToolbarProps = {
   onUndo?: (action: CanvasAction) => void;
   onRedo?: (action: CanvasAction) => void;
   onStickerToolSelect?: () => void;
+  // Optional slot rendered inside ZoomControls (right of the +/- pill).
+  // Used by the host app to place a FocusModeToggleButton next to zoom
+  // at every breakpoint — same affordance as the mobile zoom pill.
+  zoomTrailing?: React.ReactNode;
 };
 
 type ToolConfig = {
@@ -89,6 +93,7 @@ const ColoringToolbar = ({
   onUndo,
   onRedo,
   onStickerToolSelect,
+  zoomTrailing,
 }: ColoringToolbarProps) => {
   const {
     activeTool,
@@ -329,7 +334,7 @@ const ColoringToolbar = ({
       {/* Undo/Redo + Zoom — reuse shared chunky-card components */}
       <div className="flex items-center gap-3">
         <UndoRedoButtons onUndo={onUndo} onRedo={onRedo} />
-        <ZoomControls />
+        <ZoomControls trailing={zoomTrailing} />
       </div>
     </div>
   );

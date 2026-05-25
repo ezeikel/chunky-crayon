@@ -76,6 +76,12 @@ type DesktopToolsSidebarProps = {
    * tool grid. Radix-style slot: each app supplies its own composed
    * button components. */
   actions?: ReactNode;
+  /** Optional slot rendered alongside the zoom buttons (right of the
+   * +/- pair). Used by the host app to place a FocusModeToggleButton
+   * next to zoom — same affordance as the mobile zoom pill and the
+   * tablet ColoringToolbar zoom row, so the focus toggle always lives
+   * beside zoom regardless of breakpoint. */
+  zoomTrailing?: ReactNode;
   /** Whether the sticker tool tile is shown. CC = true, CH = false. */
   showStickers?: boolean;
   /** Optional translated labels; English fallbacks used when omitted. */
@@ -200,6 +206,7 @@ const DesktopToolsSidebar = ({
   onRedo,
   onStickerToolSelect,
   actions,
+  zoomTrailing,
   showStickers = true,
   labels = {},
   size = "default",
@@ -603,6 +610,7 @@ const DesktopToolsSidebar = ({
               </button>
             </>
           )}
+          {zoomTrailing}
         </div>
 
         <div className="text-center font-coloring-heading font-bold text-xl text-coloring-text-primary tabular-nums">

@@ -1281,6 +1281,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             onUndo={handleUndo}
             onRedo={handleRedo}
             onStickerToolSelect={openStickerSelector}
+            // Mirror the mobile zoom pill: focus toggle sits beside the
+            // zoom buttons at every breakpoint so the kid finds it in
+            // the same visual relationship to the canvas.
+            zoomTrailing={<FocusModeToggleButton hideInFocusMode />}
           />
         </div>
 

@@ -152,7 +152,10 @@ const ColoringPageContent = ({
             {title}
           </h1>
           {/* Desktop only: Progress bar stretches, mute on right */}
-          {/* Hidden on xl+ where sidebars are visible */}
+          {/* Hidden on xl+ where sidebars are visible. Focus toggle is
+              NOT here — it lives next to zoom inside ColoringToolbar
+              at this tier, so the toggle's visual relationship to
+              the canvas matches mobile. */}
           <div className="hidden md:flex xl:hidden items-center gap-4 w-full">
             <ProgressIndicator
               getCanvas={getCanvas}
@@ -160,7 +163,6 @@ const ColoringPageContent = ({
               className="flex-1"
             />
             <MuteToggle />
-            <FocusModeToggleButton hideInFocusMode />
           </div>
         </div>
 
@@ -177,10 +179,10 @@ const ColoringPageContent = ({
           {/* Center - Canvas Area */}
           {/* Grows to fill available space with max-width cap */}
           <div className="max-w-3xl w-full flex-1 xl:max-w-none xl:min-w-[600px]">
-            {/* Progress bar for xl+ - above canvas. FocusModeToggleButton
-                sits alongside MuteToggle as the desktop entry point into
-                focus mode (mobile has the same button inside the zoom
-                pill — see ColoringArea). */}
+            {/* Progress bar for xl+ - above canvas. Focus toggle lives
+                next to zoom inside DesktopToolsSidebar at this tier
+                (consistent placement with mobile zoom pill + tablet
+                ColoringToolbar). */}
             <div className="hidden xl:flex items-center gap-4 mb-3">
               <ProgressIndicator
                 getCanvas={getCanvas}
@@ -188,7 +190,6 @@ const ColoringPageContent = ({
                 className="flex-1"
               />
               <MuteToggle />
-              <FocusModeToggleButton hideInFocusMode />
             </div>
 
             {/* Coloring Area - clean white card matching gallery aesthetic.
@@ -215,6 +216,9 @@ const ColoringPageContent = ({
               onRedo={handleRedo}
               onStickerToolSelect={handleStickerToolSelect}
               labels={sidebarLabels}
+              // Focus toggle beside zoom — same affordance as the
+              // mobile zoom pill and the tablet ColoringToolbar.
+              zoomTrailing={<FocusModeToggleButton hideInFocusMode />}
               actions={
                 <>
                   <StartOverButton onStartOver={handleStartOver} />
