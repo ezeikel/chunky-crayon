@@ -386,7 +386,7 @@
       "communityPages": "커뮤니티 도안",
       "dailyPages": "데일리 도안",
       "pagesSuffix": "개",
-      "ourPages": "Our Pages"
+      "ourPages": "우리 도안"
     },
     "ageGroups": {
       "toddlers": {
@@ -461,10 +461,10 @@
       "about": "소개"
     },
     "difficultyFilter": {
-      "all": "All",
-      "beginner": "Easy",
-      "intermediate": "Medium",
-      "advanced": "Tricky",
+      "all": "전체",
+      "beginner": "초급",
+      "intermediate": "중급",
+      "advanced": "고급",
       "empty": "No pages in this tier yet. Try a different difficulty.",
       "expert": "전문가",
       "easy": "쉬움",
@@ -588,23 +588,23 @@
         "popularDescription": "성인 인기 카테고리를 만나보세요: 명상용 만다라 색칠 도안, 섬세한 자연·보태니컬 디자인, 기하학 패턴, 아르데코·아르누보 스타일, 젠탱글 감성 도안, 평화로운 풍경 도안. 각 테마가 다른 방식으로 휴식을 선물해요."
       }
     },
-    "ourLatestTitle": "Our Latest Coloring Pages",
-    "ourLatestSubtitle": "Fresh pages from us, with new ones added daily. Pick a tile to color online, print at home, or save for later.",
+    "ourLatestTitle": "최신 색칠공부 도안",
+    "ourLatestSubtitle": "매일 새로 추가되는 따끈따끈한 도안들이에요. 타일을 골라 온라인으로 색칠하거나, 집에서 출력하거나, 나중을 위해 저장하세요.",
     "coloringHabitatCallout": {
-      "eyebrow": "From our sister site",
+      "eyebrow": "자매 사이트에서",
       "title": {
-        "teens": "Looking for older-kid coloring? Try Coloring Habitat",
-        "adults": "Coloring for grown-ups? Coloring Habitat is built for you"
+        "teens": "큰 아이용 색칠을 찾고 계신가요? Coloring Habitat을 써보세요",
+        "adults": "어른용 색칠이 필요한가요? Coloring Habitat이 딱이에요"
       },
       "body": {
-        "teens": "Chunky Crayon focuses on younger kids (ages 3-8). Coloring Habitat has detailed designs, mandalas, and intricate scenes for older kids, teens, and adults — same printable-free model, just tuned for older audiences.",
-        "adults": "Chunky Crayon is built for kids ages 3-8. Coloring Habitat is our sister site for adult coloring — mandalas, intricate patterns, mindful designs, and stress-relief printables for grown-ups."
+        "teens": "Chunky Crayon은 어린아이(3-8세)에 집중해요. Coloring Habitat은 좀 더 큰 아이, 청소년, 성인을 위한 디테일한 디자인, 만다라, 섬세한 장면이 있어요. 같은 무료 출력 모델이지만 더 큰 연령대에 맞춰져 있어요.",
+        "adults": "Chunky Crayon은 3-8세 아이를 위해 만들었어요. Coloring Habitat은 성인용 색칠을 위한 자매 사이트예요. 만다라, 섬세한 패턴, 마음챙김 디자인, 어른을 위한 스트레스 해소 출력용 도안이 있어요."
       },
-      "cta": "Visit Coloring Habitat"
+      "cta": "Coloring Habitat 방문하기"
     },
-    "ourLatestCount": "{count, plural, =1 {1 page} other {# pages}}",
+    "ourLatestCount": "{count, plural, =1 {도안 1개} other {도안 #개}}",
     "communitySubtitle": "Pages our community of parents and kids created. Browse hundreds more on the dedicated community gallery — it's where the imaginative stuff lives.",
-    "browseAllCommunity": "Browse community gallery"
+    "browseAllCommunity": "커뮤니티 갤러리 둘러보기"
   },
   "pricing": {
     "pageTitle": "요금제 - Chunky Crayon",
