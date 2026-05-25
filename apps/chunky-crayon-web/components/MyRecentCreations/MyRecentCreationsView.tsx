@@ -78,13 +78,17 @@ const MyRecentCreationsView = ({
   return (
     <section className={cn('w-full', className)}>
       <div className="mx-auto max-w-5xl">
-        <div className="mb-4 flex items-end justify-between gap-3">
+        {/* Header stacks on mobile so the full kid-friendly "See all
+            my pictures" CTA never wraps next to the title (iPhone Plus
+            / Pro Max width — ~430px — can't fit both at sm-text+pill).
+            Side-by-side at sm+ when there's room. */}
+        <div className="mb-4 flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
           <h2 className="font-tondo text-2xl font-bold text-text-primary md:text-3xl">
             {labels.title}
           </h2>
           <Link
             href="/account/my-stuff"
-            className="inline-flex items-center gap-2 rounded-full bg-crayon-orange px-4 py-2 font-tondo text-sm font-bold text-white shadow-btn-primary transition-transform hover:scale-105 active:scale-95 md:text-base"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-crayon-orange px-4 py-2 font-tondo text-sm font-bold text-white shadow-btn-primary transition-transform hover:scale-105 active:scale-95 md:text-base"
           >
             {labels.seeAll}
             <FontAwesomeIcon icon={faArrowRight} className="text-sm" />

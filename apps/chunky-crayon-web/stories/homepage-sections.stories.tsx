@@ -27,6 +27,38 @@ const meta = {
           'The Lego bricks that build the Chunky Crayon homepage: hero slots, demo, bundles/characters slots, proof sections, pricing teaser, FAQ, and logged-in dashboard shell.',
       },
     },
+    // Same CC viewport menu as section 07 so per-breakpoint stories
+    // (e.g. the MyRecentCreations header that wraps on iPhone widths)
+    // can pin a specific width via `globals: { viewport: { value } }`.
+    viewport: {
+      options: {
+        cc320: {
+          name: '📱 320 — iPhone SE',
+          styles: { width: '320px', height: '720px' },
+          type: 'mobile' as const,
+        },
+        cc390: {
+          name: '📱 390 — iPhone 14',
+          styles: { width: '390px', height: '844px' },
+          type: 'mobile' as const,
+        },
+        cc430: {
+          name: '📱 430 — iPhone 17 Pro Max',
+          styles: { width: '430px', height: '932px' },
+          type: 'mobile' as const,
+        },
+        cc640: {
+          name: '📱 640 — sm breakpoint',
+          styles: { width: '640px', height: '900px' },
+          type: 'tablet' as const,
+        },
+        cc1280: {
+          name: '💻 1280 — laptop',
+          styles: { width: '1280px', height: '800px' },
+          type: 'desktop' as const,
+        },
+      },
+    },
   },
 } satisfies Meta;
 
@@ -245,6 +277,63 @@ export const MyRecentCreationsStrip: Story = {
   name: 'My recent creations — populated',
   render: () => (
     <main className="bg-paper p-8">
+      <MyRecentCreationsView
+        items={sampleCreationItems}
+        labels={myRecentCreationsLabels}
+      />
+    </main>
+  ),
+};
+
+// Per-breakpoint stories — header was wrapping on iPhone widths
+// (long title + long CTA pill competing for the same row). Audited
+// at the breakpoints where the layout transitions: 320 / 390 / 430
+// (Pro Max), then 640 where the header un-stacks to side-by-side.
+
+export const MyRecentCreations320: Story = {
+  name: 'My recent creations — 📱 320',
+  globals: { viewport: { value: 'cc320' } },
+  render: () => (
+    <main className="min-h-screen bg-paper p-4">
+      <MyRecentCreationsView
+        items={sampleCreationItems}
+        labels={myRecentCreationsLabels}
+      />
+    </main>
+  ),
+};
+
+export const MyRecentCreations390: Story = {
+  name: 'My recent creations — 📱 390',
+  globals: { viewport: { value: 'cc390' } },
+  render: () => (
+    <main className="min-h-screen bg-paper p-4">
+      <MyRecentCreationsView
+        items={sampleCreationItems}
+        labels={myRecentCreationsLabels}
+      />
+    </main>
+  ),
+};
+
+export const MyRecentCreations430: Story = {
+  name: 'My recent creations — 📱 430 (iPhone Pro Max)',
+  globals: { viewport: { value: 'cc430' } },
+  render: () => (
+    <main className="min-h-screen bg-paper p-4">
+      <MyRecentCreationsView
+        items={sampleCreationItems}
+        labels={myRecentCreationsLabels}
+      />
+    </main>
+  ),
+};
+
+export const MyRecentCreations640: Story = {
+  name: 'My recent creations — 📱 640 (sm breakpoint, header un-stacks)',
+  globals: { viewport: { value: 'cc640' } },
+  render: () => (
+    <main className="min-h-screen bg-paper p-6">
       <MyRecentCreationsView
         items={sampleCreationItems}
         labels={myRecentCreationsLabels}
