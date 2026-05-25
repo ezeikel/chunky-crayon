@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "ぬりえ",
     "relatedPages": "他のぬりえページ",
-    "defaultDescription": "Chunky Crayonの無料印刷ぬりえ",
+    "defaultDescription": "Chunky Crayonの無料印刷可能ぬりえ",
     "progress": {
       "colored": "塗り済み",
       "percentage": "{percent}%",
@@ -88,9 +88,9 @@
       "neon": "ネオン"
     },
     "brushSizes": {
-      "small": "細い",
+      "small": "小",
       "medium": "普通",
-      "large": "太い"
+      "large": "大"
     },
     "fillPatterns": {
       "solid": "単色",
@@ -125,7 +125,7 @@
       "redoShortcut": "やり直す (Ctrl+Y)"
     },
     "colorPalette": {
-      "selectColor": "{color}を選択",
+      "selectColor": "{color}色を選択",
       "magicToolsMessage": "マジックツールでは色が自動で選ばれます"
     },
     "patternSelector": {
@@ -375,7 +375,7 @@
     "chooseMethod": "ログイン方法を選択してください",
     "orContinueWith": "または次で続行",
     "emailPlaceholder": "name@example.com",
-    "termsAgreement": "続行すると、<terms>利用規約</terms>と<privacy>プライバシーポリシー</privacy>に同意したことになります。",
+    "termsAgreement": "続行することで、<terms>利用規約</terms>と<privacy>プライバシーポリシー</privacy>に同意することになります。",
     "verifyRequest": {
       "title": "メールを確認してください！",
       "description": "ログイン用のマジックリンクを送りました。メール内のリンクをクリックして続行してください。",
