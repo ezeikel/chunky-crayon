@@ -1,152 +1,114 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
 
-type ConfettiPiece = {
-  id: number;
-  x: number;
-  color: string;
-  size: number;
-  rotation: number;
-  delay: number;
-};
+/**
+ * Confetti burst on save / sticker unlock / colo evolution.
+ *
+ * Switched from the hand-rolled framer-motion gravity drop to
+ * `canvas-confetti` on 2026-05 — the previous implementation
+ * rendered 50 pastel SVG/divs in `position: fixed` and felt slow +
+ * washed-out against the cream paper background. canvas-confetti is
+ * GPU-accelerated, hits ~60fps on phones, and the saturated CC
+ * crayon palette below pops on cream.
+ *
+ * Pattern: two side-firing bursts in quick succession (`school-pride`
+ * style) → a tall centre burst for the "money shot". Plays out in
+ * ~1.5s, then auto-cleans the canvas. `isActive` toggling re-fires
+ * the burst; the host component still owns when to trigger.
+ *
+ * The library mounts its own full-viewport canvas behind everything;
+ * we don't render any DOM ourselves.
+ */
 
 type ConfettiProps = {
   isActive: boolean;
   onComplete?: () => void;
+  /** Duration before `onComplete` fires. Default 1500ms; the library
+   *  itself animates particles to settle over ~3s — the host can
+   *  re-trigger the next celebration any time after `onComplete`. */
   duration?: number;
+  /**
+   * Kept for API compatibility with the previous hand-rolled Confetti
+   * component. Ignored — canvas-confetti uses fixed particle counts
+   * tuned for chunky kid-feel. Remove from callers once everyone is
+   * migrated.
+   */
   pieceCount?: number;
 };
 
-// Kid-friendly crayon colors for confetti
-const CONFETTI_COLORS = [
-  'hsl(12, 75%, 58%)', // Coral orange
-  'hsl(355, 65%, 72%)', // Blush pink
-  'hsl(42, 95%, 62%)', // Sunshine yellow
-  'hsl(85, 35%, 52%)', // Sage green
-  'hsl(340, 30%, 65%)', // Dusty rose/purple
-  'hsl(25, 80%, 72%)', // Peach
+// CC crayon palette — saturated tokens, not the muted-pastel
+// versions used elsewhere. These read as confetti on cream.
+const CC_CRAYON_COLORS = [
+  '#FF6B35', // crayon orange
+  '#FFC638', // crayon yellow
+  '#F95880', // crayon pink
+  '#7CC576', // crayon green
+  '#5DADE2', // crayon sky
+  '#9B59B6', // crayon purple
+  '#FF8C7C', // coral
+  '#F5A623', // tangerine
 ];
 
-// Confetti shapes: circles, squares, and stars
-const shapes = ['circle', 'square', 'star'] as const;
-
-const StarShape = ({ color, size }: { color: string; size: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-  </svg>
-);
-
-const ConfettiPieceComponent = ({
-  piece,
-  duration,
-}: {
-  piece: ConfettiPiece;
-  duration: number;
-}) => {
-  const shape = shapes[piece.id % shapes.length];
-  const endY = typeof window !== 'undefined' ? window.innerHeight + 100 : 800;
-
-  return (
-    <motion.div
-      initial={{
-        x: piece.x,
-        y: -20,
-        rotate: 0,
-        opacity: 1,
-        scale: 0,
-      }}
-      animate={{
-        y: endY,
-        rotate: piece.rotation + 720,
-        opacity: [1, 1, 1, 0],
-        scale: [0, 1, 1, 0.5],
-        x: piece.x + (Math.random() - 0.5) * 200,
-      }}
-      transition={{
-        duration: duration / 1000,
-        delay: piece.delay,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
-      className="fixed pointer-events-none z-50"
-      style={{ top: 0, left: 0 }}
-    >
-      {shape === 'circle' && (
-        <div
-          className="rounded-full"
-          style={{
-            width: piece.size,
-            height: piece.size,
-            backgroundColor: piece.color,
-          }}
-        />
-      )}
-      {shape === 'square' && (
-        <div
-          className="rounded-sm"
-          style={{
-            width: piece.size,
-            height: piece.size,
-            backgroundColor: piece.color,
-          }}
-        />
-      )}
-      {shape === 'star' && <StarShape color={piece.color} size={piece.size} />}
-    </motion.div>
-  );
+const sideBurst = (originX: number, angle: number) => {
+  confetti({
+    particleCount: 45,
+    angle,
+    spread: 70,
+    startVelocity: 55,
+    origin: { x: originX, y: 0.7 },
+    colors: CC_CRAYON_COLORS,
+    scalar: 1.2, // bigger particles so they read as chunky
+    ticks: 220,
+    shapes: ['circle', 'square'],
+    zIndex: 60,
+  });
 };
 
-const Confetti = ({
-  isActive,
-  onComplete,
-  duration = 3000,
-  pieceCount = 50,
-}: ConfettiProps) => {
-  const [pieces, setPieces] = useState<ConfettiPiece[]>([]);
+const centerBurst = () => {
+  confetti({
+    particleCount: 80,
+    angle: 90,
+    spread: 110,
+    startVelocity: 45,
+    origin: { x: 0.5, y: 0.8 },
+    colors: CC_CRAYON_COLORS,
+    scalar: 1.4,
+    ticks: 260,
+    shapes: ['circle', 'square'],
+    zIndex: 60,
+  });
+};
 
-  const generatePieces = useCallback(() => {
-    const windowWidth =
-      typeof window !== 'undefined' ? window.innerWidth : 1000;
-
-    return Array.from({ length: pieceCount }, (_, i) => ({
-      id: i,
-      x: Math.random() * windowWidth,
-      color:
-        CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-      size: Math.random() * 12 + 8, // 8-20px
-      rotation: Math.random() * 360,
-      delay: Math.random() * 0.5, // Stagger the start
-    }));
-  }, [pieceCount]);
+const Confetti = ({ isActive, onComplete, duration = 1500 }: ConfettiProps) => {
+  const hasFiredRef = useRef(false);
 
   useEffect(() => {
-    if (isActive) {
-      setPieces(generatePieces());
-
-      // Call onComplete after animation finishes
-      const timer = setTimeout(() => {
-        onComplete?.();
-        setPieces([]);
-      }, duration + 500); // Extra buffer for last pieces
-
-      return () => clearTimeout(timer);
-    } else {
-      setPieces([]);
+    if (!isActive) {
+      hasFiredRef.current = false;
+      return undefined;
     }
-  }, [isActive, duration, onComplete, generatePieces]);
+    if (hasFiredRef.current) return undefined;
+    hasFiredRef.current = true;
 
-  return (
-    <AnimatePresence>
-      {pieces.map((piece) => (
-        <ConfettiPieceComponent
-          key={piece.id}
-          piece={piece}
-          duration={duration}
-        />
-      ))}
-    </AnimatePresence>
-  );
+    // Side fires first (school-pride pattern), then a centre money
+    // shot a quarter-second later for a layered, less monotone feel.
+    sideBurst(0.05, 60);
+    sideBurst(0.95, 120);
+    const centerTimer = setTimeout(centerBurst, 250);
+
+    const completeTimer = setTimeout(() => {
+      onComplete?.();
+    }, duration);
+
+    return () => {
+      clearTimeout(centerTimer);
+      clearTimeout(completeTimer);
+    };
+  }, [isActive, duration, onComplete]);
+
+  return null;
 };
 
 export default Confetti;

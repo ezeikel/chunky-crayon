@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faCheck } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
@@ -29,11 +31,24 @@ const DeleteArtworkButton = ({
 }: DeleteArtworkButtonProps) => {
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
+  // Close the modal and tell the user it's gone the moment they tap
+  // Delete — the server roundtrip (DB delete + R2 cleanup + revalidate)
+  // takes seconds, and forcing the kid to stare at a spinner is the UX
+  // the user pushed back on. Refresh the page once the action resolves
+  // so the grid actually re-renders without the card. Toast on error
+  // and the modal re-opens via router refresh state.
   const handleDelete = () => {
+    setIsOpen(false);
+    toast.success('Picture removed');
     startTransition(async () => {
-      await deleteSavedArtwork(artworkId);
-      setIsOpen(false);
+      const result = await deleteSavedArtwork(artworkId);
+      if (!result.success) {
+        toast.error(result.error ?? 'Could not remove picture');
+        return;
+      }
+      router.refresh();
     });
   };
 

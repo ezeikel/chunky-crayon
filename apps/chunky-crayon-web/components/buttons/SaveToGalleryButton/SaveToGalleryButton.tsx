@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { faHeart, faCheck } from '@fortawesome/pro-solid-svg-icons';
+import { toast } from 'sonner';
+import { faHeart } from '@fortawesome/pro-solid-svg-icons';
 import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { saveArtworkToGallery } from '@/app/actions/saved-artwork';
 import Confetti from '@/components/Confetti';
@@ -43,28 +44,34 @@ const SaveToGalleryButton = ({
   const { playSound } = useSound();
 
   const handleSave = useCallback(async () => {
-    setState('saving');
     setErrorMessage(null);
 
     trackEvent(TRACKING_EVENTS.SAVE_TO_GALLERY_CLICKED, {
       coloringImageId,
     });
 
-    try {
-      const dataUrl = getCanvasDataUrl();
-      if (!dataUrl) {
-        setState('error');
-        setErrorMessage(t('errors.captureArtwork'));
-        playSound('error');
-        return;
-      }
+    const dataUrl = getCanvasDataUrl();
+    if (!dataUrl) {
+      setState('error');
+      setErrorMessage(t('errors.captureArtwork'));
+      playSound('error');
+      return;
+    }
 
+    // Optimistic flip: the button shows "saved" (filled heart) the
+    // instant the kid taps — the server roundtrip is several seconds
+    // (sharp resize → R2 upload → DB insert → sticker check → colo
+    // evolution → revalidate) and waiting feels unresponsive. We
+    // revert + toast on actual failure below. Confetti / sticker /
+    // colo celebrations still fire only on real success — we don't
+    // want to celebrate a phantom save.
+    setState('success');
+    playSound('save');
+
+    try {
       const result = await saveArtworkToGallery(coloringImageId, dataUrl);
 
       if (result.success) {
-        setState('success');
-        playSound('save');
-
         // Canonical paid-ad lead signal — only fire on confirmed save
         // (the click event already went to PostHog above for product
         // analytics; ads care about completed value, not clicks).
@@ -105,16 +112,21 @@ const SaveToGalleryButton = ({
           setTimeout(() => setState('idle'), 3000);
         }
       } else {
+        // Server returned an error — revert the optimistic flip and
+        // surface the reason. Toast so the parent sees what failed
+        // even after the inline error chrome fades.
         setState('error');
         setErrorMessage(result.error);
         playSound('error');
+        toast.error(result.error ?? t('errors.generic'));
       }
     } catch {
       setState('error');
       setErrorMessage(t('errors.generic'));
       playSound('error');
+      toast.error(t('errors.generic'));
     }
-  }, [coloringImageId, getCanvasDataUrl, playSound]);
+  }, [coloringImageId, getCanvasDataUrl, playSound, t]);
 
   const handleConfettiComplete = useCallback(() => {
     setShowConfetti(false);
@@ -141,16 +153,24 @@ const SaveToGalleryButton = ({
     setState('idle');
   }, []);
 
+  // Visual rule: chrome stays uniform with sibling action buttons
+  // (StartOver / Print / Save) — same white-with-thin-border tile,
+  // same size. Only the icon + colour signals the state change. No
+  // tone morphs (no pink outline at rest, no green pill on success)
+  // — those make the heart button look out of family.
   const renderButton = () => {
     if (state === 'saving') {
       return (
         <ActionButton
           size="tile"
-          tone="secondary"
+          tone="tool"
           icon={faSpinnerThird}
           label={t('saving')}
           disabled
-          className={className}
+          // FA's pro-duotone faSpinnerThird is static SVG — the icon
+          // alone won't rotate. `[&_svg]:animate-spin` applies the
+          // Tailwind spin keyframes to the rendered svg child.
+          className={cn('[&_svg]:animate-spin text-crayon-pink', className)}
         />
       );
     }
@@ -159,11 +179,16 @@ const SaveToGalleryButton = ({
       return (
         <ActionButton
           size="tile"
-          tone="success"
-          icon={faCheck}
+          tone="tool"
+          icon={faHeart}
           label={t('saved')}
           disabled
-          className={cn('animate-bounce-in', className)}
+          // Saved-state signal = filled pink heart inside the same
+          // white tile chrome. Bounce-in is fine but no colour wash.
+          className={cn(
+            'animate-bounce-in [&_svg]:text-crayon-pink',
+            className,
+          )}
         />
       );
     }
@@ -173,7 +198,7 @@ const SaveToGalleryButton = ({
         <div className={cn('flex flex-col items-center gap-2', className)}>
           <ActionButton
             size="tile"
-            tone="secondary"
+            tone="tool"
             icon={faHeart}
             label={t('tryAgain')}
             onClick={handleSave}
@@ -188,7 +213,7 @@ const SaveToGalleryButton = ({
     return (
       <ActionButton
         size="tile"
-        tone="secondary"
+        tone="tool"
         icon={faHeart}
         label={t('idle')}
         onClick={handleSave}
