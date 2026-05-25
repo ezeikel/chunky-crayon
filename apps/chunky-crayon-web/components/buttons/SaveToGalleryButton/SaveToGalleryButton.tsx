@@ -107,9 +107,13 @@ const SaveToGalleryButton = ({
           // No stickers but have evolution - show evolution celebration
           setShowEvolutionCelebration(true);
         } else {
-          // No stickers or evolution - show confetti and reset after 3 seconds
+          // No stickers or evolution — fire confetti and stay in
+          // the success state. Reverting to 'idle' (the old behaviour)
+          // makes the filled-pink heart go back to a black outline a
+          // few seconds after save, which reads as "save failed". The
+          // button is the persistent saved-state signal now; the kid
+          // sees pink heart = saved until they navigate away.
           setShowConfetti(true);
-          setTimeout(() => setState('idle'), 3000);
         }
       } else {
         // Server returned an error — revert the optimistic flip and
@@ -136,21 +140,22 @@ const SaveToGalleryButton = ({
     setShowStickerReward(false);
     setUnlockedStickers([]);
 
-    // Check if there's a pending evolution celebration to show
+    // Check if there's a pending evolution celebration to show.
+    // The button stays in 'success' (filled pink heart) either way —
+    // we don't revert to 'idle' or the kid thinks the save failed.
     if (
       evolutionResult &&
       (evolutionResult.evolved || evolutionResult.newAccessories.length > 0)
     ) {
       setShowEvolutionCelebration(true);
-    } else {
-      setState('idle');
     }
   }, [evolutionResult]);
 
   const handleEvolutionCelebrationComplete = useCallback(() => {
     setShowEvolutionCelebration(false);
     setEvolutionResult(null);
-    setState('idle');
+    // Stay in 'success' — the pink heart is the persistent saved-state
+    // signal; reverting reads as save-undone.
   }, []);
 
   // Visual rule: chrome stays uniform with sibling action buttons
