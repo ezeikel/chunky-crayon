@@ -111,10 +111,19 @@ const ProfileAvatar = ({
         alt={name ? `${name}'s avatar` : avatar.name}
         width={px}
         height={px}
-        // p-1 trims the illustration slightly inside the tinted ring
-        // so the art has a small "breathing" gap from the edge — same
-        // composition the Character Builder species tiles use.
-        className="size-full object-contain p-1"
+        // Pull the illustration in from the circular edge by ~12% on
+        // each side so tall features (bunny ears, unicorn horn, lion
+        // mane, owl tufts, panda ears, dragon spikes) stay inside the
+        // inscribed circle when the rounded-full mask clips. The
+        // generated PNGs use the full square (the recipe is "subject
+        // filling the frame edge to edge"), so anything in the four
+        // corners of the source gets cut by the circle. Scale the art
+        // to ~76% inside its parent square — math: a circle inscribed
+        // in a square reaches the edges only at the midpoints, so
+        // anything outside √2/2 ≈ 71% of the half-width on the
+        // diagonal is clipped. p-[12%] gives a comfortable safety
+        // margin without making the avatar feel small.
+        className="size-full object-contain p-[12%]"
         onError={() => setImageError(true)}
       />
     </div>
