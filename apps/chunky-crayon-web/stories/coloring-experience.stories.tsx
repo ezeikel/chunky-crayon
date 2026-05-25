@@ -52,8 +52,12 @@ const FIXTURE_COLORING_IMAGE: Partial<ColoringImage> = {
     '/_assets-cc/uploads/coloring-images/cmpjbaxro000004jlf15ah3mr/regions.bin.gz',
   regionMapWidth: 1024,
   regionMapHeight: 1024,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  regionsJson: regionsJson as any,
+  // ColoringArea expects regionsJson as a string (Prisma Text
+  // column) and JSON.parses it. Importing the JSON file gives us a
+  // pre-parsed object; restringify so the component's parse step
+  // doesn't throw → regionStore.isReady → auto-color + magic brush
+  // fill the entire canvas like prod.
+  regionsJson: JSON.stringify(regionsJson),
   backgroundMusicUrl: null,
   status: 'READY',
   generationType: 'SYSTEM',

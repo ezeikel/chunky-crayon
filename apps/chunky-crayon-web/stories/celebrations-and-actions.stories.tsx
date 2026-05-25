@@ -123,8 +123,9 @@ const FIXTURE_COLORING_IMAGE: Partial<ColoringImage> = {
     '/_assets-cc/uploads/coloring-images/cmpjbaxro000004jlf15ah3mr/regions.bin.gz',
   regionMapWidth: 1024,
   regionMapHeight: 1024,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  regionsJson: regionsJson as any,
+  // ColoringArea JSON.parses this — stringify so the parse step
+  // doesn't throw → auto-color works in the story like prod.
+  regionsJson: JSON.stringify(regionsJson),
   status: 'READY',
   generationType: 'SYSTEM',
   brand: 'CHUNKY_CRAYON',
