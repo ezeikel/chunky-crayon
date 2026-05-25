@@ -6,13 +6,14 @@ import {
   DesktopToolsSidebar,
   type DesktopToolsSidebarLabels,
 } from '@one-colored-pixel/coloring-ui';
-import {
-  faSpinnerThird,
-  faFloppyDisk,
-  faPrint,
-  faArrowsRotate,
-} from '@fortawesome/pro-duotone-svg-icons';
+import { faSpinnerThird } from '@fortawesome/pro-duotone-svg-icons';
 import { faHeart } from '@fortawesome/pro-solid-svg-icons';
+import StartOverButton from '@/components/buttons/StartOverButton/StartOverButton';
+import PrintButton from '@/components/buttons/PrintButton/PrintButton';
+import SaveButton from '@/components/buttons/SaveButton/SaveButton';
+import SaveToGalleryButton from '@/components/buttons/SaveToGalleryButton/SaveToGalleryButton';
+import type { ColoringImage } from '@one-colored-pixel/db/types';
+import regionsJson from './fixtures/region-store-monkey-seashell.json';
 
 /**
  * Section 11 — Celebrations & Action Row.
@@ -109,27 +110,61 @@ export const ConfettiBurst: Story = {
 
 // ─── Action row across breakpoints ───────────────────────────────────
 
-// Mobile / tablet pattern: icon-only chunky tiles in the canvas card.
-// Mirrors the row rendered inside ColoringArea at md+ tile size.
+// Fixture coloring-image for the real button compositions (Print +
+// Save read coloringImage.title/svgUrl/qrCodeUrl when generating the
+// PDF). Re-uses the same fixture as the coloring-experience story.
+const FIXTURE_COLORING_IMAGE: Partial<ColoringImage> = {
+  id: 'cmpjbaxro000004jlf15ah3mr',
+  title: 'Happy Monkey Painting a Seashell',
+  alt: 'Happy Monkey Painting a Seashell, Beach Coloring Page',
+  svgUrl:
+    '/_assets-cc/uploads/coloring-images/cmpjbaxro000004jlf15ah3mr/image.svg',
+  regionMapUrl:
+    '/_assets-cc/uploads/coloring-images/cmpjbaxro000004jlf15ah3mr/regions.bin.gz',
+  regionMapWidth: 1024,
+  regionMapHeight: 1024,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  regionsJson: regionsJson as any,
+  status: 'READY',
+  generationType: 'SYSTEM',
+  brand: 'CHUNKY_CRAYON',
+  difficulty: 'BEGINNER',
+};
+
+// Stub canvas getter for the print/save PDF generation. Returns a
+// transparent 1x1 PNG so the PDF builds without complaining about a
+// missing canvas image. The button doesn't crash either way — it
+// gracefully falls back to "just the line art" when getCanvasDataUrl
+// returns null, but a non-null URL exercises the with-canvas code
+// path so the story matches the live look.
+const getStubCanvasDataUrl = () =>
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkAAIAAAoAAv/lxKUAAAAASUVORK5CYII=';
+
+// Mobile / tablet pattern: real app buttons inside the canvas card.
+// Same composition as ColoringArea renders at md- so the story is a
+// faithful preview of the real layout (StartOverButton's confirm
+// modal works, PrintButton + SaveButton kick off real PDF flows,
+// SaveToGalleryButton's optimistic flip + canvas-confetti fires).
 const MobileActionRow = () => (
   <div className="rounded-2xl border-2 border-paper-cream-dark bg-white p-4 shadow-sm">
     {/* Canvas placeholder — just enough framing so the row's gutter
         from the card edge is visible. */}
     <div className="mb-4 aspect-square rounded-lg bg-paper-cream-dark/30" />
-    <div className="flex items-center justify-center gap-3 py-2 px-4">
-      <ActionButton
-        size="tile"
-        tone="tool"
-        icon={faArrowsRotate}
-        label="Start Over"
+    {/* Mirror ColoringArea's mobile row exactly: gap-2 at base for 320
+        fit, gap-3 at sm+ for more breathing room. */}
+    <div className="flex items-center justify-center gap-2 sm:gap-3 py-2 px-4">
+      <StartOverButton onStartOver={() => {}} />
+      <PrintButton
+        coloringImage={FIXTURE_COLORING_IMAGE}
+        getCanvasDataUrl={getStubCanvasDataUrl}
       />
-      <ActionButton size="tile" tone="tool" icon={faPrint} label="Print" />
-      <ActionButton size="tile" tone="tool" icon={faFloppyDisk} label="Save" />
-      <ActionButton
-        size="tile"
-        tone="tool"
-        icon={faHeart}
-        label="Save to gallery"
+      <SaveButton
+        coloringImage={FIXTURE_COLORING_IMAGE}
+        getCanvasDataUrl={getStubCanvasDataUrl}
+      />
+      <SaveToGalleryButton
+        coloringImageId={FIXTURE_COLORING_IMAGE.id ?? 'sb-fixture'}
+        getCanvasDataUrl={getStubCanvasDataUrl}
       />
     </div>
   </div>
@@ -165,10 +200,19 @@ const DesktopActionStack = () => (
     labels={sidebarLabels}
     actions={
       <>
-        <ActionButton tone="tool" icon={faArrowsRotate} label="Start Over" />
-        <ActionButton tone="tool" icon={faPrint} label="Print" />
-        <ActionButton tone="tool" icon={faFloppyDisk} label="Save" />
-        <ActionButton tone="tool" icon={faHeart} label="Save to gallery" />
+        <StartOverButton onStartOver={() => {}} />
+        <PrintButton
+          coloringImage={FIXTURE_COLORING_IMAGE}
+          getCanvasDataUrl={getStubCanvasDataUrl}
+        />
+        <SaveButton
+          coloringImage={FIXTURE_COLORING_IMAGE}
+          getCanvasDataUrl={getStubCanvasDataUrl}
+        />
+        <SaveToGalleryButton
+          coloringImageId={FIXTURE_COLORING_IMAGE.id ?? 'sb-fixture'}
+          getCanvasDataUrl={getStubCanvasDataUrl}
+        />
       </>
     }
   />

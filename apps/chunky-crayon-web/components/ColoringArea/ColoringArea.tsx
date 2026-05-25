@@ -1494,10 +1494,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         </div>
 
         {/* Mobile Action buttons - Compact row with icon-only buttons.
-            `px-4` inside the canvas card's `p-4` gives the row a
-            clear 32px gutter from the card edge so the chunky buttons
-            don't kiss the border. */}
-        <div className="md:hidden flex items-center justify-center gap-3 py-2 px-4">
+            At 320 four 64px tiles + gap-3 + px-4 overflows the card
+            (288px content area, 292px needed). gap-2 at base + gap-3
+            at sm+ keeps tiles square AND clear of the card edge. */}
+        <div className="md:hidden flex items-center justify-center gap-2 sm:gap-3 py-2 px-4">
           <StartOverButton onStartOver={handleStartOver} />
           <PrintButton
             coloringImage={coloringImage}

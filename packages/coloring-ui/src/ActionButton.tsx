@@ -119,11 +119,14 @@ const sizeClasses: Record<ActionButtonSize, string> = {
   tile:
     // Kid-first icon-only square. 64px hits Sesame Workshop's 60-75px target
     // for ages 3-6. Label hidden visually; surfaced via aria-label + tooltip.
-    "size-16",
+    // shrink-0 is critical — without it the mobile action row at 320 squeezes
+    // 4 tiles into ~256px and they go oval. Audited via the storybook
+    // celebrations-and-actions story.
+    "size-16 shrink-0",
   "tile-compact":
     // Adult / dense sidebars. Matches compact tool-grid tile size (48px)
     // so action row aligns column-for-column with the tool grid above.
-    "size-12",
+    "size-12 shrink-0",
 };
 
 const heroIconClass =
