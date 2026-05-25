@@ -122,7 +122,14 @@ const sizeClasses: Record<ActionButtonSize, string> = {
     // shrink-0 is critical — without it the mobile action row at 320 squeezes
     // 4 tiles into ~256px and they go oval. Audited via the storybook
     // celebrations-and-actions story.
-    "size-16 shrink-0",
+    //
+    // 56px at base / 64px at sm+: at 320 a 4-tile row of 64px tiles
+    // overflows the canvas card (4×64 + 3×8 gap + 2×16 row-px = 288
+    // → 288 card-content area, no breathing room → wrap). Dropping
+    // to 56px gives 4×56 + 3×8 = 248 in 288 = 40px to spare, still
+    // well above the 44pt iOS touch target. At sm+ (≥640px) we get
+    // the full 64px for the kid-friendly chunky look.
+    "size-14 sm:size-16 shrink-0",
   "tile-compact":
     // Adult / dense sidebars. Matches compact tool-grid tile size (48px)
     // so action row aligns column-for-column with the tool grid above.
