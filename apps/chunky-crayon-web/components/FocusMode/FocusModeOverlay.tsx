@@ -6,16 +6,19 @@ import { useFocusMode } from './FocusModeProvider';
 
 /**
  * Backdrop scrim rendered when focus mode is active on mobile. Covers
- * the entire viewport at z-[55], hiding the page chrome (header,
- * breadcrumbs, footer, related-pages section) behind a solid surface.
- * The canvas card + drawer sit at z-[56]+ so they punch through.
+ * the entire viewport at z-[55], hiding the page chrome behind a
+ * solid surface. The canvas card + drawer sit at z-[56]+ so they
+ * punch through.
+ *
+ * Mobile-only by design — on desktop / tablet, focus mode hides
+ * chrome via `.focus-mode-hide` CSS rules + the Fullscreen API
+ * (managed by FocusModeProvider). No scrim needed because there's
+ * no canvas-promotion to cover under, and the sidebars stay visible
+ * as tools the kid uses.
  *
  * Lives in a body portal so it's not constrained by parent stacking
  * contexts. Solid bg-paper-cream matches the page background so the
  * canvas feels like it's on its own clean surface.
- *
- * The actual scroll lock and focus-mode-data attribute are managed by
- * FocusModeProvider — this component is purely visual.
  */
 const FocusModeOverlay = () => {
   const { isFocusMode } = useFocusMode();

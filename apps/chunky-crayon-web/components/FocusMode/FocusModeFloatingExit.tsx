@@ -6,15 +6,17 @@ import { useFocusMode } from './FocusModeProvider';
 import cn from '@/utils/cn';
 
 /**
- * Floating exit button shown only while focus mode is active on
- * mobile. Pins to the top-right of the visual viewport with safe-area
- * padding so it doesn't sit under the iOS notch.
+ * Floating exit button shown while focus mode is active at every
+ * breakpoint. Pins to the top-right of the visual viewport with
+ * safe-area padding so it doesn't sit under the iOS notch.
  *
  * Counterpart to FocusModeToggleButton (which lives inside the zoom
- * pill in normal view and is hidden in focus mode). In focus mode the
- * canvas card is promoted to position:fixed; this button sits above
- * it via a higher z-index, and CSS in global.css pushes the canvas
- * down by the X's height plus a gap so they never overlap.
+ * pill on mobile and in the progress/mute row on desktop, hidden in
+ * focus mode). On mobile the canvas card is promoted to
+ * position:fixed; on desktop the canvas stays in its normal spot.
+ * Either way this X sits above everything via z-[70] — above the
+ * mobile scrim (z-[55]), the bumped drawer (z-[56]), and the
+ * desktop tool sidebars.
  */
 const FocusModeFloatingExit = () => {
   const { isFocusMode, exitFocus } = useFocusMode();
@@ -27,7 +29,7 @@ const FocusModeFloatingExit = () => {
       onClick={exitFocus}
       aria-label="Exit focus mode"
       className={cn(
-        'md:hidden fixed z-[70] flex items-center justify-center',
+        'fixed z-[70] flex items-center justify-center',
         'w-10 h-10 rounded-full bg-white text-coloring-text-primary',
         'shadow-lg border-2 border-coloring-surface-dark',
         'active:scale-95 transition-transform duration-150',

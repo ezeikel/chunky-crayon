@@ -987,21 +987,29 @@
   animation: magic-progress 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
-/* Focus mode — a real full-screen modal on mobile that takes over
-   the viewport so coloring isn't competing with header / breadcrumbs
-   / page scroll. Implementation:
-   - <html data-focus-mode> locks body scroll (the page chrome stays in
-     the DOM but is unreachable).
-   - FocusModeOverlay renders a fixed inset-0 backdrop at z-[55].
-   - The canvas-card wrapper in ColoringArea is promoted to
-     position:fixed inset-x-0 top-0 via `.focus-mode-canvas-wrap`,
-     pinning the canvas to the top of the viewport above the backdrop.
-   - The existing MobileColoringDrawer is already fixed:bottom-0;
-     focus mode just bumps its z-index above the backdrop.
-   - The X button (FocusModeExitButton) is the only escape and sits at
-     z-[70].
-   Mobile only — gated by max-width:767px and the provider's matchMedia.
+/* Focus mode — "remove the chrome" state for the coloring canvas.
+   Cross-breakpoint (lifted from mobile-only on 2026-05).
+   Implementation:
+   - <html data-focus-mode> is the single switch (set by FocusModeProvider).
+   - Mobile: FocusModeOverlay renders a fixed inset-0 backdrop at z-[55];
+     the canvas card is promoted to position:fixed inset-x-0 top-0 so
+     it punches through above the scrim, and the bottom drawer's
+     z-index is bumped above it. Same as before the lift.
+   - Tablet + desktop: NO scrim. Instead, `.focus-mode-hide` elements
+     (Header, Footer, Breadcrumbs, page H1, related-pages) just
+     display:none, leaving the canvas + sidebars in place — and the
+     browser Fullscreen API (FocusModeProvider) hides OS chrome.
+   - The X button (FocusModeFloatingExit) is the only escape and sits at
+     z-[70] across every breakpoint.
 */
+
+/* Cross-breakpoint: opt-in chrome hide. Any element that should
+   vanish when focus mode activates carries `focus-mode-hide`. */
+html[data-focus-mode] .focus-mode-hide {
+  display: none !important;
+}
+
+/* Mobile-only: full-takeover behaviour. */
 @media (max-width: 767px) {
   html[data-focus-mode],
   html[data-focus-mode] body {

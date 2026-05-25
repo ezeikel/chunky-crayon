@@ -1,0 +1,2108 @@
+{
+  "sceneDescription": "A monkey with a flower crown is sitting on a small island, painting a seashell. There are other seashells, coral, pebbles, and a paint palette on the sand. In the background, there is a large palm tree, the ocean, two fish, a sun, and clouds.",
+  "sourceWidth": 1024,
+  "sourceHeight": 1024,
+  "regionPixelCount": 899835,
+  "regions": [
+    {
+      "id": 1,
+      "bounds": { "x": 0, "y": 0, "width": 1024, "height": 1024 },
+      "centroid": { "x": 616, "y": 453 },
+      "pixelCount": 429243,
+      "label": "sky and ocean",
+      "objectGroup": "background",
+      "palettes": {
+        "realistic": { "hex": "#C5DCEA", "colorName": "Pale Sky" },
+        "pastel": { "hex": "#ADE2F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#57D0F8", "colorName": "Turquoise" },
+        "surprise": { "hex": "#8E24AA", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 2,
+      "bounds": { "x": 212, "y": 27, "width": 122, "height": 95 },
+      "centroid": { "x": 259, "y": 59 },
+      "pixelCount": 3970,
+      "label": "palm frond",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#46DD83", "colorName": "Lime" },
+        "cute": { "hex": "#60CF99", "colorName": "Sage" },
+        "surprise": { "hex": "#387BBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 3,
+      "bounds": { "x": 820, "y": 34, "width": 8, "height": 18 },
+      "centroid": { "x": 823, "y": 43 },
+      "pixelCount": 120,
+      "label": "sun ray",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#FB8C00", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 4,
+      "bounds": { "x": 122, "y": 45, "width": 85, "height": 67 },
+      "centroid": { "x": 174, "y": 70 },
+      "pixelCount": 2489,
+      "label": "palm frond",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#46DD83", "colorName": "Lime" },
+        "cute": { "hex": "#60CF99", "colorName": "Sage" },
+        "surprise": { "hex": "#387BBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 5,
+      "bounds": { "x": 759, "y": 60, "width": 16, "height": 15 },
+      "centroid": { "x": 766, "y": 67 },
+      "pixelCount": 136,
+      "label": "sun ray",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#D6578B", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 6,
+      "bounds": { "x": 871, "y": 57, "width": 17, "height": 15 },
+      "centroid": { "x": 879, "y": 64 },
+      "pixelCount": 159,
+      "label": "sun ray",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#D9558D", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 7,
+      "bounds": { "x": 777, "y": 75, "width": 95, "height": 93 },
+      "centroid": { "x": 824, "y": 121 },
+      "pixelCount": 7097,
+      "label": "sun",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#FB8C00", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 8,
+      "bounds": { "x": 40, "y": 87, "width": 163, "height": 72 },
+      "centroid": { "x": 117, "y": 114 },
+      "pixelCount": 5222,
+      "label": "palm frond",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#46DD83", "colorName": "Lime" },
+        "cute": { "hex": "#60CF99", "colorName": "Sage" },
+        "surprise": { "hex": "#387BBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 9,
+      "bounds": { "x": 222, "y": 88, "width": 153, "height": 79 },
+      "centroid": { "x": 307, "y": 117 },
+      "pixelCount": 5188,
+      "label": "palm frond",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#46DD83", "colorName": "Lime" },
+        "cute": { "hex": "#60CF99", "colorName": "Sage" },
+        "surprise": { "hex": "#387BBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 10,
+      "bounds": { "x": 422, "y": 102, "width": 183, "height": 70 },
+      "centroid": { "x": 519, "y": 142 },
+      "pixelCount": 3948,
+      "label": "monkey hair",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 11,
+      "bounds": { "x": 732, "y": 114, "width": 22, "height": 10 },
+      "centroid": { "x": 742, "y": 118 },
+      "pixelCount": 183,
+      "label": "sun ray",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#FB8C00", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 12,
+      "bounds": { "x": 893, "y": 116, "width": 22, "height": 9 },
+      "centroid": { "x": 904, "y": 120 },
+      "pixelCount": 171,
+      "label": "sun ray",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#FB8C00", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 13,
+      "bounds": { "x": 223, "y": 129, "width": 95, "height": 110 },
+      "centroid": { "x": 281, "y": 171 },
+      "pixelCount": 4699,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#46DD83", "colorName": "Lime" },
+        "cute": { "hex": "#60CF99", "colorName": "Sage" },
+        "surprise": { "hex": "#387BBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 14,
+      "bounds": { "x": 102, "y": 135, "width": 100, "height": 101 },
+      "centroid": { "x": 140, "y": 173 },
+      "pixelCount": 3677,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#46DD83", "colorName": "Lime" },
+        "cute": { "hex": "#60CF99", "colorName": "Sage" },
+        "surprise": { "hex": "#387BBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 15,
+      "bounds": { "x": 201, "y": 141, "width": 26, "height": 27 },
+      "centroid": { "x": 214, "y": 155 },
+      "pixelCount": 578,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#E08B5A", "colorName": "Salmon" },
+        "cute": { "hex": "#B8845F", "colorName": "Sienna" },
+        "surprise": { "hex": "#E54682", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 16,
+      "bounds": { "x": 309, "y": 143, "width": 55, "height": 82 },
+      "centroid": { "x": 334, "y": 177 },
+      "pixelCount": 1811,
+      "label": "palm frond",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#46DD83", "colorName": "Lime" },
+        "cute": { "hex": "#60CF99", "colorName": "Sage" },
+        "surprise": { "hex": "#387BBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 17,
+      "bounds": { "x": 449, "y": 148, "width": 83, "height": 76 },
+      "centroid": { "x": 501, "y": 192 },
+      "pixelCount": 3409,
+      "label": "flower center",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#F8DF50", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#F65978", "colorName": "Bubblegum Pink" },
+        "cute": { "hex": "#EF7EAA", "colorName": "Rose" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 18,
+      "bounds": { "x": 363, "y": 151, "width": 80, "height": 82 },
+      "centroid": { "x": 408, "y": 203 },
+      "pixelCount": 3478,
+      "label": "flower petal",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#F65978", "colorName": "Bubblegum Pink" },
+        "cute": { "hex": "#EF7EAA", "colorName": "Rose" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 19,
+      "bounds": { "x": 533, "y": 152, "width": 57, "height": 66 },
+      "centroid": { "x": 568, "y": 194 },
+      "pixelCount": 2097,
+      "label": "flower petal",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#4ADD8B", "colorName": "Lime" },
+        "cute": { "hex": "#5DCE95", "colorName": "Sage" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 20,
+      "bounds": { "x": 136, "y": 158, "width": 56, "height": 69 },
+      "centroid": { "x": 162, "y": 194 },
+      "pixelCount": 1433,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#46DD83", "colorName": "Lime" },
+        "cute": { "hex": "#60CF99", "colorName": "Sage" },
+        "surprise": { "hex": "#387BBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 21,
+      "bounds": { "x": 185, "y": 162, "width": 201, "height": 305 },
+      "centroid": { "x": 258, "y": 309 },
+      "pixelCount": 27286,
+      "label": "monkey tail",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#8951BF", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 22,
+      "bounds": { "x": 591, "y": 161, "width": 65, "height": 71 },
+      "centroid": { "x": 630, "y": 195 },
+      "pixelCount": 2468,
+      "label": "flower petal",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#F65978", "colorName": "Bubblegum Pink" },
+        "cute": { "hex": "#EF7EAA", "colorName": "Rose" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 23,
+      "bounds": { "x": 756, "y": 165, "width": 18, "height": 15 },
+      "centroid": { "x": 764, "y": 172 },
+      "pixelCount": 177,
+      "label": "sun ray",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#FB8C00", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 24,
+      "bounds": { "x": 188, "y": 168, "width": 19, "height": 22 },
+      "centroid": { "x": 197, "y": 179 },
+      "pixelCount": 312,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#E08856", "colorName": "Salmon" },
+        "cute": { "hex": "#B88661", "colorName": "Sienna" },
+        "surprise": { "hex": "#EA80A4", "colorName": "Rose" }
+      }
+    },
+    {
+      "id": 25,
+      "bounds": { "x": 872, "y": 167, "width": 17, "height": 17 },
+      "centroid": { "x": 880, "y": 175 },
+      "pixelCount": 180,
+      "label": "sun ray",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#FB8C00", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 26,
+      "bounds": { "x": 483, "y": 180, "width": 15, "height": 13 },
+      "centroid": { "x": 490, "y": 186 },
+      "pixelCount": 170,
+      "label": "flower petal",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#FCDA5B", "colorName": "Gold" },
+        "cute": { "hex": "#EF7EAA", "colorName": "Rose" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 27,
+      "bounds": { "x": 397, "y": 185, "width": 15, "height": 14 },
+      "centroid": { "x": 404, "y": 192 },
+      "pixelCount": 174,
+      "label": "flower center",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#FAE05C", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#EF7EAA", "colorName": "Rose" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 28,
+      "bounds": { "x": 172, "y": 190, "width": 28, "height": 37 },
+      "centroid": { "x": 185, "y": 208 },
+      "pixelCount": 700,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#E28757", "colorName": "Salmon" },
+        "cute": { "hex": "#BA8863", "colorName": "Sienna" },
+        "surprise": { "hex": "#EC80A3", "colorName": "Rose" }
+      }
+    },
+    {
+      "id": 29,
+      "bounds": { "x": 816, "y": 188, "width": 8, "height": 19 },
+      "centroid": { "x": 820, "y": 197 },
+      "pixelCount": 136,
+      "label": "sun ray",
+      "objectGroup": "sun",
+      "palettes": {
+        "realistic": { "hex": "#F7DD52", "colorName": "Sunshine Yellow" },
+        "pastel": { "hex": "#FAE76D", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE348", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#DB5689", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 30,
+      "bounds": { "x": 437, "y": 195, "width": 22, "height": 15 },
+      "centroid": { "x": 447, "y": 202 },
+      "pixelCount": 232,
+      "label": "flower petal",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#4CD476", "colorName": "Lime" },
+        "cute": { "hex": "#5DCB90", "colorName": "Grass Green" },
+        "surprise": { "hex": "#2AA088", "colorName": "Mint" }
+      }
+    },
+    {
+      "id": 31,
+      "bounds": { "x": 615, "y": 193, "width": 11, "height": 12 },
+      "centroid": { "x": 620, "y": 199 },
+      "pixelCount": 119,
+      "label": "flower center",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#FBE560", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#EF7EAA", "colorName": "Rose" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 32,
+      "bounds": { "x": 329, "y": 198, "width": 43, "height": 58 },
+      "centroid": { "x": 345, "y": 218 },
+      "pixelCount": 1236,
+      "label": "flower petal",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#46DE84", "colorName": "Lime" },
+        "cute": { "hex": "#5DD099", "colorName": "Sage" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 33,
+      "bounds": { "x": 848, "y": 200, "width": 143, "height": 80 },
+      "centroid": { "x": 922, "y": 245 },
+      "pixelCount": 6988,
+      "label": "cloud",
+      "objectGroup": "cloud",
+      "palettes": {
+        "realistic": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "pastel": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "cute": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "surprise": { "hex": "#16B0A1", "colorName": "Mint" }
+      }
+    },
+    {
+      "id": 34,
+      "bounds": { "x": 35, "y": 209, "width": 55, "height": 40 },
+      "centroid": { "x": 67, "y": 225 },
+      "pixelCount": 1151,
+      "label": "palm frond",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#80AF4C", "colorName": "Lime" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#55D0F7", "colorName": "Turquoise" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 35,
+      "bounds": { "x": 354, "y": 213, "width": 288, "height": 200 },
+      "centroid": { "x": 475, "y": 243 },
+      "pixelCount": 12141,
+      "label": "monkey face",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 36,
+      "bounds": { "x": 121, "y": 217, "width": 26, "height": 17 },
+      "centroid": { "x": 132, "y": 224 },
+      "pixelCount": 266,
+      "label": "palm trunk section",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#59C5F2", "colorName": "Turquoise" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#55D0F7", "colorName": "Turquoise" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 37,
+      "bounds": { "x": 674, "y": 216, "width": 138, "height": 64 },
+      "centroid": { "x": 740, "y": 253 },
+      "pixelCount": 5577,
+      "label": "cloud",
+      "objectGroup": "cloud",
+      "palettes": {
+        "realistic": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "pastel": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "cute": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "surprise": { "hex": "#16B0A1", "colorName": "Mint" }
+      }
+    },
+    {
+      "id": 38,
+      "bounds": { "x": 157, "y": 225, "width": 32, "height": 45 },
+      "centroid": { "x": 173, "y": 249 },
+      "pixelCount": 1024,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#E28B5A", "colorName": "Salmon" },
+        "cute": { "hex": "#BC8760", "colorName": "Sienna" },
+        "surprise": { "hex": "#EE7EA4", "colorName": "Rose" }
+      }
+    },
+    {
+      "id": 39,
+      "bounds": { "x": 93, "y": 233, "width": 12, "height": 23 },
+      "centroid": { "x": 98, "y": 245 },
+      "pixelCount": 198,
+      "label": "palm frond",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#59C5F2", "colorName": "Turquoise" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#55D0F7", "colorName": "Turquoise" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 40,
+      "bounds": { "x": 121, "y": 232, "width": 37, "height": 29 },
+      "centroid": { "x": 142, "y": 243 },
+      "pixelCount": 629,
+      "label": "palm trunk section",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#59C5F2", "colorName": "Turquoise" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#55D0F7", "colorName": "Turquoise" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 41,
+      "bounds": { "x": 19, "y": 247, "width": 67, "height": 57 },
+      "centroid": { "x": 46, "y": 268 },
+      "pixelCount": 1654,
+      "label": "palm frond",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#87B34F", "colorName": "Lime" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#55D0F7", "colorName": "Turquoise" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 42,
+      "bounds": { "x": 388, "y": 249, "width": 245, "height": 204 },
+      "centroid": { "x": 513, "y": 348 },
+      "pixelCount": 31215,
+      "label": "monkey nose",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 43,
+      "bounds": { "x": 101, "y": 251, "width": 46, "height": 37 },
+      "centroid": { "x": 127, "y": 265 },
+      "pixelCount": 825,
+      "label": "palm frond",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#82AD4E", "colorName": "Lime" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#55D0F7", "colorName": "Turquoise" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 44,
+      "bounds": { "x": 82, "y": 266, "width": 16, "height": 15 },
+      "centroid": { "x": 90, "y": 273 },
+      "pixelCount": 200,
+      "label": "palm trunk section",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#A67950", "colorName": "Sienna" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#BE8E67", "colorName": "Mushroom" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 45,
+      "bounds": { "x": 88, "y": 271, "width": 55, "height": 148 },
+      "centroid": { "x": 115, "y": 343 },
+      "pixelCount": 6310,
+      "label": "palm trunk",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#59C5F2", "colorName": "Turquoise" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#55D0F7", "colorName": "Turquoise" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 46,
+      "bounds": { "x": 148, "y": 271, "width": 33, "height": 45 },
+      "centroid": { "x": 164, "y": 294 },
+      "pixelCount": 1252,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#E28D5A", "colorName": "Salmon" },
+        "cute": { "hex": "#BC8860", "colorName": "Sienna" },
+        "surprise": { "hex": "#ED7EA5", "colorName": "Rose" }
+      }
+    },
+    {
+      "id": 47,
+      "bounds": { "x": 301, "y": 277, "width": 71, "height": 90 },
+      "centroid": { "x": 335, "y": 320 },
+      "pixelCount": 4452,
+      "label": "monkey ear",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 48,
+      "bounds": { "x": 76, "y": 285, "width": 12, "height": 19 },
+      "centroid": { "x": 82, "y": 294 },
+      "pixelCount": 170,
+      "label": "palm trunk section",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#AB7E55", "colorName": "Sienna" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#B78863", "colorName": "Sienna" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 49,
+      "bounds": { "x": 635, "y": 282, "width": 45, "height": 83 },
+      "centroid": { "x": 657, "y": 324 },
+      "pixelCount": 2366,
+      "label": "flower petal",
+      "objectGroup": "flower crown",
+      "palettes": {
+        "realistic": { "hex": "#E67DA2", "colorName": "Rose" },
+        "pastel": { "hex": "#F65978", "colorName": "Bubblegum Pink" },
+        "cute": { "hex": "#EF7EAA", "colorName": "Rose" },
+        "surprise": { "hex": "#F18626", "colorName": "Sunset Orange" }
+      }
+    },
+    {
+      "id": 50,
+      "bounds": { "x": 69, "y": 308, "width": 15, "height": 22 },
+      "centroid": { "x": 76, "y": 319 },
+      "pixelCount": 299,
+      "label": "palm trunk section",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#B58458", "colorName": "Sienna" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#BF8F69", "colorName": "Taupe" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 51,
+      "bounds": { "x": 443, "y": 308, "width": 41, "height": 41 },
+      "centroid": { "x": 460, "y": 322 },
+      "pixelCount": 729,
+      "label": "monkey eye",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 52,
+      "bounds": { "x": 558, "y": 309, "width": 37, "height": 25 },
+      "centroid": { "x": 577, "y": 320 },
+      "pixelCount": 554,
+      "label": "monkey eye",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 53,
+      "bounds": { "x": 144, "y": 318, "width": 37, "height": 51 },
+      "centroid": { "x": 161, "y": 344 },
+      "pixelCount": 1671,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#E28C5B", "colorName": "Salmon" },
+        "cute": { "hex": "#BD8860", "colorName": "Sienna" },
+        "surprise": { "hex": "#EE7EA6", "colorName": "Rose" }
+      }
+    },
+    {
+      "id": 54,
+      "bounds": { "x": 67, "y": 334, "width": 17, "height": 24 },
+      "centroid": { "x": 75, "y": 346 },
+      "pixelCount": 392,
+      "label": "palm trunk section",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#B28054", "colorName": "Sienna" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#BD8761", "colorName": "Sienna" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 55,
+      "bounds": { "x": 623, "y": 335, "width": 12, "height": 18 },
+      "centroid": { "x": 629, "y": 344 },
+      "pixelCount": 167,
+      "label": "monkey ear",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 56,
+      "bounds": { "x": 67, "y": 362, "width": 21, "height": 27 },
+      "centroid": { "x": 76, "y": 375 },
+      "pixelCount": 511,
+      "label": "palm trunk section",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#B07D50", "colorName": "Sienna" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#BC8861", "colorName": "Sienna" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 57,
+      "bounds": { "x": 144, "y": 369, "width": 57, "height": 82 },
+      "centroid": { "x": 171, "y": 405 },
+      "pixelCount": 2513,
+      "label": "palm trunk section",
+      "objectGroup": "large palm tree",
+      "palettes": {
+        "realistic": { "hex": "#89B64E", "colorName": "Lime" },
+        "pastel": { "hex": "#E28C5A", "colorName": "Salmon" },
+        "cute": { "hex": "#BE8961", "colorName": "Sienna" },
+        "surprise": { "hex": "#EB7EA5", "colorName": "Rose" }
+      }
+    },
+    {
+      "id": 58,
+      "bounds": { "x": 228, "y": 372, "width": 95, "height": 133 },
+      "centroid": { "x": 272, "y": 431 },
+      "pixelCount": 5163,
+      "label": "sand dune",
+      "objectGroup": "island",
+      "palettes": {
+        "realistic": { "hex": "#F6C76E", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#FCA253", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#F8C15B", "colorName": "Skin Tone" },
+        "surprise": { "hex": "#BCD635", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 59,
+      "bounds": { "x": 70, "y": 390, "width": 28, "height": 35 },
+      "centroid": { "x": 83, "y": 406 },
+      "pixelCount": 694,
+      "label": "palm trunk section",
+      "objectGroup": "small palm tree",
+      "palettes": {
+        "realistic": { "hex": "#B17E51", "colorName": "Sienna" },
+        "pastel": { "hex": "#B2E4F9", "colorName": "Pale Sky" },
+        "cute": { "hex": "#BC8963", "colorName": "Sienna" },
+        "surprise": { "hex": "#8951BE", "colorName": "Lavender" }
+      }
+    },
+    {
+      "id": 60,
+      "bounds": { "x": 465, "y": 390, "width": 81, "height": 41 },
+      "centroid": { "x": 508, "y": 410 },
+      "pixelCount": 1082,
+      "label": "monkey mouth",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#AA3E4E", "colorName": "Magenta" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#9E2576", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 61,
+      "bounds": { "x": 255, "y": 402, "width": 41, "height": 86 },
+      "centroid": { "x": 278, "y": 443 },
+      "pixelCount": 2209,
+      "label": "sand dune",
+      "objectGroup": "island",
+      "palettes": {
+        "realistic": { "hex": "#F6C76E", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#FCA253", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#F8C15B", "colorName": "Skin Tone" },
+        "surprise": { "hex": "#BCD635", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 62,
+      "bounds": { "x": 27, "y": 414, "width": 243, "height": 91 },
+      "centroid": { "x": 134, "y": 459 },
+      "pixelCount": 8369,
+      "label": "sand dune",
+      "objectGroup": "island",
+      "palettes": {
+        "realistic": { "hex": "#F6C76E", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#48DE88", "colorName": "Lime" },
+        "cute": { "hex": "#F8C15B", "colorName": "Skin Tone" },
+        "surprise": { "hex": "#BCD635", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 63,
+      "bounds": { "x": 473, "y": 414, "width": 47, "height": 23 },
+      "centroid": { "x": 496, "y": 426 },
+      "pixelCount": 646,
+      "label": "monkey tongue",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#EE7EA7", "colorName": "Rose" }
+      }
+    },
+    {
+      "id": 64,
+      "bounds": { "x": 289, "y": 425, "width": 358, "height": 154 },
+      "centroid": { "x": 446, "y": 480 },
+      "pixelCount": 22890,
+      "label": "monkey body",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 65,
+      "bounds": { "x": 388, "y": 457, "width": 42, "height": 36 },
+      "centroid": { "x": 408, "y": 475 },
+      "pixelCount": 544,
+      "label": "paintbrush handle",
+      "objectGroup": "paintbrush",
+      "palettes": {
+        "realistic": { "hex": "#BC925A", "colorName": "Taupe" },
+        "pastel": { "hex": "#8AC6EF", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#B67F47", "colorName": "Sienna" },
+        "surprise": { "hex": "#E14891", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 66,
+      "bounds": { "x": 744, "y": 479, "width": 17, "height": 17 },
+      "centroid": { "x": 752, "y": 487 },
+      "pixelCount": 201,
+      "label": "sparkle",
+      "objectGroup": "water effects",
+      "palettes": {
+        "realistic": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "pastel": { "hex": "#DECEE4", "colorName": "Pale Ice" },
+        "cute": { "hex": "#7DCDEC", "colorName": "Pale Sky" },
+        "surprise": { "hex": "#FAE42F", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 67,
+      "bounds": { "x": 443, "y": 487, "width": 19, "height": 9 },
+      "centroid": { "x": 452, "y": 491 },
+      "pixelCount": 104,
+      "label": "paintbrush bristles",
+      "objectGroup": "paintbrush",
+      "palettes": {
+        "realistic": { "hex": "#BC925A", "colorName": "Taupe" },
+        "pastel": { "hex": "#8AC6EF", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#B67F47", "colorName": "Sienna" },
+        "surprise": { "hex": "#E14891", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 68,
+      "bounds": { "x": 382, "y": 497, "width": 101, "height": 76 },
+      "centroid": { "x": 427, "y": 534 },
+      "pixelCount": 5061,
+      "label": "monkey arm",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 69,
+      "bounds": { "x": 556, "y": 504, "width": 17, "height": 17 },
+      "centroid": { "x": 564, "y": 512 },
+      "pixelCount": 204,
+      "label": "monkey arm",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#7CC6E7", "colorName": "Dusty Blue" },
+        "surprise": { "hex": "#B55F56", "colorName": "Cherry Red" }
+      }
+    },
+    {
+      "id": 70,
+      "bounds": { "x": 600, "y": 507, "width": 85, "height": 92 },
+      "centroid": { "x": 654, "y": 544 },
+      "pixelCount": 3094,
+      "label": "monkey hand",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 71,
+      "bounds": { "x": 909, "y": 509, "width": 12, "height": 13 },
+      "centroid": { "x": 914, "y": 515 },
+      "pixelCount": 125,
+      "label": "sparkle",
+      "objectGroup": "water effects",
+      "palettes": {
+        "realistic": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "pastel": { "hex": "#DECEE4", "colorName": "Pale Ice" },
+        "cute": { "hex": "#7DCDEC", "colorName": "Pale Sky" },
+        "surprise": { "hex": "#FAE42F", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 72,
+      "bounds": { "x": 31, "y": 514, "width": 956, "height": 428 },
+      "centroid": { "x": 513, "y": 750 },
+      "pixelCount": 173270,
+      "label": "sand",
+      "objectGroup": "island",
+      "palettes": {
+        "realistic": { "hex": "#F6C76E", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#FCA253", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#F8C15B", "colorName": "Skin Tone" },
+        "surprise": { "hex": "#BCD635", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 73,
+      "bounds": { "x": 537, "y": 518, "width": 118, "height": 132 },
+      "centroid": { "x": 592, "y": 580 },
+      "pixelCount": 8768,
+      "label": "seashell",
+      "objectGroup": "seashell",
+      "palettes": {
+        "realistic": { "hex": "#FAC080", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#E4C7E7", "colorName": "Rose" },
+        "cute": { "hex": "#FCE33E", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#2AAAE0", "colorName": "Turquoise" }
+      }
+    },
+    {
+      "id": 74,
+      "bounds": { "x": 471, "y": 539, "width": 17, "height": 13 },
+      "centroid": { "x": 478, "y": 544 },
+      "pixelCount": 168,
+      "label": "paintbrush ferrule",
+      "objectGroup": "paintbrush",
+      "palettes": {
+        "realistic": { "hex": "#BC925A", "colorName": "Taupe" },
+        "pastel": { "hex": "#8AC6EF", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#B67F47", "colorName": "Sienna" },
+        "surprise": { "hex": "#E14891", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 75,
+      "bounds": { "x": 482, "y": 546, "width": 18, "height": 18 },
+      "centroid": { "x": 490, "y": 554 },
+      "pixelCount": 211,
+      "label": "monkey hand",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 76,
+      "bounds": { "x": 524, "y": 552, "width": 18, "height": 22 },
+      "centroid": { "x": 533, "y": 562 },
+      "pixelCount": 236,
+      "label": "paint",
+      "objectGroup": "paintbrush",
+      "palettes": {
+        "realistic": { "hex": "#BC925A", "colorName": "Taupe" },
+        "pastel": { "hex": "#8AC6EF", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#B67F47", "colorName": "Sienna" },
+        "surprise": { "hex": "#E14891", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 77,
+      "bounds": { "x": 377, "y": 557, "width": 117, "height": 41 },
+      "centroid": { "x": 443, "y": 582 },
+      "pixelCount": 2585,
+      "label": "monkey hand",
+      "objectGroup": "monkey",
+      "palettes": {
+        "realistic": { "hex": "#F4AF77", "colorName": "Medium" },
+        "pastel": { "hex": "#E9934D", "colorName": "Sunset Orange" },
+        "cute": { "hex": "#FCAE76", "colorName": "Medium" },
+        "surprise": { "hex": "#CEDC32", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 78,
+      "bounds": { "x": 500, "y": 566, "width": 39, "height": 37 },
+      "centroid": { "x": 516, "y": 583 },
+      "pixelCount": 979,
+      "label": "seashell ridge",
+      "objectGroup": "seashell",
+      "palettes": {
+        "realistic": { "hex": "#FAC080", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#E4C7E7", "colorName": "Rose" },
+        "cute": { "hex": "#FCE33E", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#E23C8F", "colorName": "Bubblegum Pink" }
+      }
+    },
+    {
+      "id": 79,
+      "bounds": { "x": 708, "y": 590, "width": 94, "height": 80 },
+      "centroid": { "x": 748, "y": 634 },
+      "pixelCount": 2638,
+      "label": "coral",
+      "objectGroup": "coral",
+      "palettes": {
+        "realistic": { "hex": "#EB8881", "colorName": "Salmon" },
+        "pastel": { "hex": "#FAA978", "colorName": "Peach" },
+        "cute": { "hex": "#F48776", "colorName": "Salmon" },
+        "surprise": { "hex": "#8747A7", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 80,
+      "bounds": { "x": 517, "y": 593, "width": 33, "height": 24 },
+      "centroid": { "x": 533, "y": 607 },
+      "pixelCount": 517,
+      "label": "seashell ridge",
+      "objectGroup": "seashell",
+      "palettes": {
+        "realistic": { "hex": "#FAC080", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#FDEA6E", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE33E", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#2AAAE0", "colorName": "Turquoise" }
+      }
+    },
+    {
+      "id": 81,
+      "bounds": { "x": 128, "y": 607, "width": 214, "height": 93 },
+      "centroid": { "x": 235, "y": 656 },
+      "pixelCount": 10679,
+      "label": "paint palette",
+      "objectGroup": "paint palette",
+      "palettes": {
+        "realistic": { "hex": "#C8935B", "colorName": "Taupe" },
+        "pastel": { "hex": "#F9AC72", "colorName": "Medium" },
+        "cute": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "surprise": { "hex": "#EDB279", "colorName": "Medium" }
+      }
+    },
+    {
+      "id": 82,
+      "bounds": { "x": 615, "y": 614, "width": 34, "height": 18 },
+      "centroid": { "x": 632, "y": 623 },
+      "pixelCount": 269,
+      "label": "coral",
+      "objectGroup": "coral",
+      "palettes": {
+        "realistic": { "hex": "#EB8881", "colorName": "Salmon" },
+        "pastel": { "hex": "#E4CCE6", "colorName": "Rose" },
+        "cute": { "hex": "#F48776", "colorName": "Salmon" },
+        "surprise": { "hex": "#8747A7", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 83,
+      "bounds": { "x": 206, "y": 619, "width": 33, "height": 16 },
+      "centroid": { "x": 222, "y": 626 },
+      "pixelCount": 453,
+      "label": "paint blob",
+      "objectGroup": "paint palette",
+      "palettes": {
+        "realistic": { "hex": "#3E88C6", "colorName": "Sky Blue" },
+        "pastel": { "hex": "#F9AC72", "colorName": "Medium" },
+        "cute": { "hex": "#F183B0", "colorName": "Rose" },
+        "surprise": { "hex": "#2FA181", "colorName": "Mint" }
+      }
+    },
+    {
+      "id": 84,
+      "bounds": { "x": 260, "y": 624, "width": 34, "height": 17 },
+      "centroid": { "x": 277, "y": 632 },
+      "pixelCount": 481,
+      "label": "paint blob",
+      "objectGroup": "paint palette",
+      "palettes": {
+        "realistic": { "hex": "#C8935B", "colorName": "Taupe" },
+        "pastel": { "hex": "#F9AC72", "colorName": "Medium" },
+        "cute": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "surprise": { "hex": "#EDB279", "colorName": "Medium" }
+      }
+    },
+    {
+      "id": 85,
+      "bounds": { "x": 534, "y": 625, "width": 21, "height": 16 },
+      "centroid": { "x": 544, "y": 633 },
+      "pixelCount": 226,
+      "label": "seashell ridge",
+      "objectGroup": "seashell",
+      "palettes": {
+        "realistic": { "hex": "#FAC080", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#E4C7E7", "colorName": "Rose" },
+        "cute": { "hex": "#FCE33E", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#2AAAE0", "colorName": "Turquoise" }
+      }
+    },
+    {
+      "id": 86,
+      "bounds": { "x": 154, "y": 629, "width": 35, "height": 17 },
+      "centroid": { "x": 171, "y": 637 },
+      "pixelCount": 511,
+      "label": "paint blob",
+      "objectGroup": "paint palette",
+      "palettes": {
+        "realistic": { "hex": "#C8935B", "colorName": "Taupe" },
+        "pastel": { "hex": "#F9AC72", "colorName": "Medium" },
+        "cute": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "surprise": { "hex": "#EDB279", "colorName": "Medium" }
+      }
+    },
+    {
+      "id": 87,
+      "bounds": { "x": 286, "y": 650, "width": 40, "height": 22 },
+      "centroid": { "x": 306, "y": 660 },
+      "pixelCount": 705,
+      "label": "paint blob",
+      "objectGroup": "paint palette",
+      "palettes": {
+        "realistic": { "hex": "#C8935B", "colorName": "Taupe" },
+        "pastel": { "hex": "#F9AC72", "colorName": "Medium" },
+        "cute": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "surprise": { "hex": "#EDB279", "colorName": "Medium" }
+      }
+    },
+    {
+      "id": 88,
+      "bounds": { "x": 649, "y": 652, "width": 66, "height": 89 },
+      "centroid": { "x": 677, "y": 700 },
+      "pixelCount": 2136,
+      "label": "coral",
+      "objectGroup": "coral",
+      "palettes": {
+        "realistic": { "hex": "#EB8881", "colorName": "Salmon" },
+        "pastel": { "hex": "#58DE90", "colorName": "Lime" },
+        "cute": { "hex": "#F48776", "colorName": "Salmon" },
+        "surprise": { "hex": "#8747A7", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 89,
+      "bounds": { "x": 166, "y": 662, "width": 36, "height": 19 },
+      "centroid": { "x": 183, "y": 671 },
+      "pixelCount": 562,
+      "label": "paint blob",
+      "objectGroup": "paint palette",
+      "palettes": {
+        "realistic": { "hex": "#8954AE", "colorName": "Lavender" },
+        "pastel": { "hex": "#F9AC72", "colorName": "Medium" },
+        "cute": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "surprise": { "hex": "#8547A4", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 90,
+      "bounds": { "x": 455, "y": 664, "width": 47, "height": 88 },
+      "centroid": { "x": 479, "y": 708 },
+      "pixelCount": 1804,
+      "label": "coral",
+      "objectGroup": "coral",
+      "palettes": {
+        "realistic": { "hex": "#EB8881", "colorName": "Salmon" },
+        "pastel": { "hex": "#FAA976", "colorName": "Peach" },
+        "cute": { "hex": "#F48776", "colorName": "Salmon" },
+        "surprise": { "hex": "#8747A7", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 91,
+      "bounds": { "x": 386, "y": 668, "width": 55, "height": 69 },
+      "centroid": { "x": 414, "y": 702 },
+      "pixelCount": 1486,
+      "label": "coral",
+      "objectGroup": "coral",
+      "palettes": {
+        "realistic": { "hex": "#EB8881", "colorName": "Salmon" },
+        "pastel": { "hex": "#F9A978", "colorName": "Peach" },
+        "cute": { "hex": "#F48776", "colorName": "Salmon" },
+        "surprise": { "hex": "#8747A7", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 92,
+      "bounds": { "x": 509, "y": 667, "width": 58, "height": 96 },
+      "centroid": { "x": 538, "y": 717 },
+      "pixelCount": 2213,
+      "label": "coral",
+      "objectGroup": "coral",
+      "palettes": {
+        "realistic": { "hex": "#EB8881", "colorName": "Salmon" },
+        "pastel": { "hex": "#58DE90", "colorName": "Lime" },
+        "cute": { "hex": "#F48776", "colorName": "Salmon" },
+        "surprise": { "hex": "#8747A7", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 93,
+      "bounds": { "x": 724, "y": 667, "width": 34, "height": 14 },
+      "centroid": { "x": 741, "y": 673 },
+      "pixelCount": 399,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 94,
+      "bounds": { "x": 129, "y": 672, "width": 210, "height": 43 },
+      "centroid": { "x": 232, "y": 705 },
+      "pixelCount": 2219,
+      "label": "paint blob",
+      "objectGroup": "paint palette",
+      "palettes": {
+        "realistic": { "hex": "#C8935B", "colorName": "Taupe" },
+        "pastel": { "hex": "#F9AC72", "colorName": "Medium" },
+        "cute": { "hex": "#FFF8E1", "colorName": "Cream" },
+        "surprise": { "hex": "#EDB279", "colorName": "Medium" }
+      }
+    },
+    {
+      "id": 95,
+      "bounds": { "x": 582, "y": 679, "width": 48, "height": 73 },
+      "centroid": { "x": 603, "y": 716 },
+      "pixelCount": 1385,
+      "label": "coral",
+      "objectGroup": "coral",
+      "palettes": {
+        "realistic": { "hex": "#EB8881", "colorName": "Salmon" },
+        "pastel": { "hex": "#58DE90", "colorName": "Lime" },
+        "cute": { "hex": "#F48776", "colorName": "Salmon" },
+        "surprise": { "hex": "#8747A7", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 96,
+      "bounds": { "x": 783, "y": 678, "width": 31, "height": 18 },
+      "centroid": { "x": 797, "y": 686 },
+      "pixelCount": 393,
+      "label": "conch shell section",
+      "objectGroup": "conch shell",
+      "palettes": {
+        "realistic": { "hex": "#F6BD7C", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#DFCCE6", "colorName": "Pale Ice" },
+        "cute": { "hex": "#59D399", "colorName": "Sage" },
+        "surprise": { "hex": "#3E76BF", "colorName": "Steel Blue" }
+      }
+    },
+    {
+      "id": 97,
+      "bounds": { "x": 796, "y": 686, "width": 40, "height": 35 },
+      "centroid": { "x": 812, "y": 700 },
+      "pixelCount": 616,
+      "label": "conch shell section",
+      "objectGroup": "conch shell",
+      "palettes": {
+        "realistic": { "hex": "#F6BD7C", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#DFCCE6", "colorName": "Pale Ice" },
+        "cute": { "hex": "#59D399", "colorName": "Sage" },
+        "surprise": { "hex": "#3E76BF", "colorName": "Steel Blue" }
+      }
+    },
+    {
+      "id": 98,
+      "bounds": { "x": 807, "y": 692, "width": 51, "height": 41 },
+      "centroid": { "x": 828, "y": 711 },
+      "pixelCount": 786,
+      "label": "conch shell section",
+      "objectGroup": "conch shell",
+      "palettes": {
+        "realistic": { "hex": "#F6BD7C", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#DFCCE6", "colorName": "Pale Ice" },
+        "cute": { "hex": "#59D399", "colorName": "Sage" },
+        "surprise": { "hex": "#3E76BF", "colorName": "Steel Blue" }
+      }
+    },
+    {
+      "id": 99,
+      "bounds": { "x": 824, "y": 702, "width": 57, "height": 39 },
+      "centroid": { "x": 851, "y": 718 },
+      "pixelCount": 1075,
+      "label": "conch shell section",
+      "objectGroup": "conch shell",
+      "palettes": {
+        "realistic": { "hex": "#F6BD7C", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#DFCCE6", "colorName": "Pale Ice" },
+        "cute": { "hex": "#59D399", "colorName": "Sage" },
+        "surprise": { "hex": "#3E76BF", "colorName": "Steel Blue" }
+      }
+    },
+    {
+      "id": 100,
+      "bounds": { "x": 761, "y": 707, "width": 30, "height": 13 },
+      "centroid": { "x": 776, "y": 713 },
+      "pixelCount": 351,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 101,
+      "bounds": { "x": 375, "y": 713, "width": 29, "height": 16 },
+      "centroid": { "x": 390, "y": 720 },
+      "pixelCount": 347,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 102,
+      "bounds": { "x": 439, "y": 711, "width": 31, "height": 26 },
+      "centroid": { "x": 454, "y": 725 },
+      "pixelCount": 438,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 103,
+      "bounds": { "x": 840, "y": 723, "width": 51, "height": 22 },
+      "centroid": { "x": 867, "y": 734 },
+      "pixelCount": 809,
+      "label": "conch shell section",
+      "objectGroup": "conch shell",
+      "palettes": {
+        "realistic": { "hex": "#F6BD7C", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#DFCCE6", "colorName": "Pale Ice" },
+        "cute": { "hex": "#59D399", "colorName": "Sage" },
+        "surprise": { "hex": "#3E76BF", "colorName": "Steel Blue" }
+      }
+    },
+    {
+      "id": 104,
+      "bounds": { "x": 423, "y": 730, "width": 22, "height": 14 },
+      "centroid": { "x": 433, "y": 736 },
+      "pixelCount": 263,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 105,
+      "bounds": { "x": 553, "y": 729, "width": 12, "height": 13 },
+      "centroid": { "x": 558, "y": 735 },
+      "pixelCount": 104,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 106,
+      "bounds": { "x": 558, "y": 730, "width": 22, "height": 34 },
+      "centroid": { "x": 570, "y": 746 },
+      "pixelCount": 469,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 107,
+      "bounds": { "x": 638, "y": 735, "width": 27, "height": 15 },
+      "centroid": { "x": 651, "y": 742 },
+      "pixelCount": 319,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 108,
+      "bounds": { "x": 715, "y": 733, "width": 31, "height": 19 },
+      "centroid": { "x": 730, "y": 742 },
+      "pixelCount": 492,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#619ED8", "colorName": "Sky Blue" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 109,
+      "bounds": { "x": 369, "y": 738, "width": 29, "height": 14 },
+      "centroid": { "x": 383, "y": 745 },
+      "pixelCount": 340,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 110,
+      "bounds": { "x": 443, "y": 740, "width": 26, "height": 18 },
+      "centroid": { "x": 455, "y": 748 },
+      "pixelCount": 378,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 111,
+      "bounds": { "x": 282, "y": 743, "width": 21, "height": 26 },
+      "centroid": { "x": 294, "y": 754 },
+      "pixelCount": 308,
+      "label": "seashell",
+      "objectGroup": "seashells",
+      "palettes": {
+        "realistic": { "hex": "#F4967A", "colorName": "Salmon" },
+        "pastel": { "hex": "#F8537D", "colorName": "Bubblegum Pink" },
+        "cute": { "hex": "#F07FAF", "colorName": "Rose" },
+        "surprise": { "hex": "#EA292D", "colorName": "Cherry Red" }
+      }
+    },
+    {
+      "id": 112,
+      "bounds": { "x": 715, "y": 744, "width": 102, "height": 101 },
+      "centroid": { "x": 763, "y": 801 },
+      "pixelCount": 3789,
+      "label": "coral",
+      "objectGroup": "coral",
+      "palettes": {
+        "realistic": { "hex": "#EB8881", "colorName": "Salmon" },
+        "pastel": { "hex": "#58DE90", "colorName": "Lime" },
+        "cute": { "hex": "#F48776", "colorName": "Salmon" },
+        "surprise": { "hex": "#8747A7", "colorName": "Grape Purple" }
+      }
+    },
+    {
+      "id": 113,
+      "bounds": { "x": 264, "y": 748, "width": 27, "height": 39 },
+      "centroid": { "x": 280, "y": 764 },
+      "pixelCount": 514,
+      "label": "seashell section",
+      "objectGroup": "seashells",
+      "palettes": {
+        "realistic": { "hex": "#F4967A", "colorName": "Salmon" },
+        "pastel": { "hex": "#F8537D", "colorName": "Bubblegum Pink" },
+        "cute": { "hex": "#F07FAF", "colorName": "Rose" },
+        "surprise": { "hex": "#EA292D", "colorName": "Cherry Red" }
+      }
+    },
+    {
+      "id": 114,
+      "bounds": { "x": 608, "y": 746, "width": 33, "height": 16 },
+      "centroid": { "x": 624, "y": 754 },
+      "pixelCount": 448,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#69A1D9", "colorName": "Sky Blue" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 115,
+      "bounds": { "x": 744, "y": 749, "width": 12, "height": 13 },
+      "centroid": { "x": 750, "y": 755 },
+      "pixelCount": 112,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 116,
+      "bounds": { "x": 857, "y": 746, "width": 27, "height": 13 },
+      "centroid": { "x": 871, "y": 752 },
+      "pixelCount": 298,
+      "label": "conch shell tip",
+      "objectGroup": "conch shell",
+      "palettes": {
+        "realistic": { "hex": "#F6BD7C", "colorName": "Skin Tone" },
+        "pastel": { "hex": "#DFCCE6", "colorName": "Pale Ice" },
+        "cute": { "hex": "#59D399", "colorName": "Sage" },
+        "surprise": { "hex": "#3E76BF", "colorName": "Steel Blue" }
+      }
+    },
+    {
+      "id": 117,
+      "bounds": { "x": 239, "y": 755, "width": 39, "height": 51 },
+      "centroid": { "x": 263, "y": 775 },
+      "pixelCount": 868,
+      "label": "seashell section",
+      "objectGroup": "seashells",
+      "palettes": {
+        "realistic": { "hex": "#F4967A", "colorName": "Salmon" },
+        "pastel": { "hex": "#62A6EB", "colorName": "Sky Blue" },
+        "cute": { "hex": "#F07FAF", "colorName": "Rose" },
+        "surprise": { "hex": "#EA292D", "colorName": "Cherry Red" }
+      }
+    },
+    {
+      "id": 118,
+      "bounds": { "x": 469, "y": 754, "width": 27, "height": 13 },
+      "centroid": { "x": 482, "y": 760 },
+      "pixelCount": 306,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#659DD4", "colorName": "Sky Blue" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 119,
+      "bounds": { "x": 503, "y": 754, "width": 84, "height": 66 },
+      "centroid": { "x": 542, "y": 787 },
+      "pixelCount": 2784,
+      "label": "starfish",
+      "objectGroup": "starfish",
+      "palettes": {
+        "realistic": { "hex": "#F28F47", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#FCE868", "colorName": "Sunshine Yellow" },
+        "cute": { "hex": "#FCE347", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#FCE729", "colorName": "Sunshine Yellow" }
+      }
+    },
+    {
+      "id": 120,
+      "bounds": { "x": 501, "y": 757, "width": 19, "height": 8 },
+      "centroid": { "x": 510, "y": 760 },
+      "pixelCount": 132,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 121,
+      "bounds": { "x": 573, "y": 757, "width": 33, "height": 13 },
+      "centroid": { "x": 589, "y": 763 },
+      "pixelCount": 340,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 122,
+      "bounds": { "x": 690, "y": 758, "width": 28, "height": 17 },
+      "centroid": { "x": 704, "y": 766 },
+      "pixelCount": 407,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 123,
+      "bounds": { "x": 388, "y": 761, "width": 28, "height": 15 },
+      "centroid": { "x": 402, "y": 768 },
+      "pixelCount": 354,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#F07FAA", "colorName": "Rose" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 124,
+      "bounds": { "x": 193, "y": 766, "width": 67, "height": 53 },
+      "centroid": { "x": 229, "y": 793 },
+      "pixelCount": 2477,
+      "label": "seashell body",
+      "objectGroup": "seashells",
+      "palettes": {
+        "realistic": { "hex": "#F4967A", "colorName": "Salmon" },
+        "pastel": { "hex": "#F8537D", "colorName": "Bubblegum Pink" },
+        "cute": { "hex": "#F07FAF", "colorName": "Rose" },
+        "surprise": { "hex": "#EA292D", "colorName": "Cherry Red" }
+      }
+    },
+    {
+      "id": 125,
+      "bounds": { "x": 416, "y": 780, "width": 29, "height": 16 },
+      "centroid": { "x": 430, "y": 788 },
+      "pixelCount": 391,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 126,
+      "bounds": { "x": 322, "y": 784, "width": 49, "height": 90 },
+      "centroid": { "x": 343, "y": 824 },
+      "pixelCount": 2136,
+      "label": "scallop shell",
+      "objectGroup": "scallop shell",
+      "palettes": {
+        "realistic": { "hex": "#F06F7E", "colorName": "Bubblegum Pink" },
+        "pastel": { "hex": "#6CA6EB", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#FCE55B", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#277CBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 127,
+      "bounds": { "x": 661, "y": 783, "width": 31, "height": 18 },
+      "centroid": { "x": 676, "y": 792 },
+      "pixelCount": 458,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#629ED9", "colorName": "Sky Blue" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 128,
+      "bounds": { "x": 314, "y": 792, "width": 13, "height": 52 },
+      "centroid": { "x": 320, "y": 815 },
+      "pixelCount": 457,
+      "label": "scallop shell ridge",
+      "objectGroup": "scallop shell",
+      "palettes": {
+        "realistic": { "hex": "#F06F7E", "colorName": "Bubblegum Pink" },
+        "pastel": { "hex": "#6CA6EB", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#FCE55B", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#277CBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 129,
+      "bounds": { "x": 347, "y": 794, "width": 43, "height": 59 },
+      "centroid": { "x": 368, "y": 818 },
+      "pixelCount": 846,
+      "label": "scallop shell ridge",
+      "objectGroup": "scallop shell",
+      "palettes": {
+        "realistic": { "hex": "#F06F7E", "colorName": "Bubblegum Pink" },
+        "pastel": { "hex": "#6CA6EB", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#FCE55B", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#277CBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 130,
+      "bounds": { "x": 441, "y": 800, "width": 30, "height": 17 },
+      "centroid": { "x": 456, "y": 808 },
+      "pixelCount": 416,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#5F9CD6", "colorName": "Sky Blue" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 131,
+      "bounds": { "x": 304, "y": 805, "width": 16, "height": 43 },
+      "centroid": { "x": 310, "y": 825 },
+      "pixelCount": 293,
+      "label": "scallop shell ridge",
+      "objectGroup": "scallop shell",
+      "palettes": {
+        "realistic": { "hex": "#F06F7E", "colorName": "Bubblegum Pink" },
+        "pastel": { "hex": "#6CA6EB", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#FCE55B", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#277CBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 132,
+      "bounds": { "x": 625, "y": 801, "width": 31, "height": 17 },
+      "centroid": { "x": 640, "y": 809 },
+      "pixelCount": 438,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#EF7FAE", "colorName": "Rose" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 133,
+      "bounds": { "x": 358, "y": 810, "width": 42, "height": 41 },
+      "centroid": { "x": 381, "y": 828 },
+      "pixelCount": 592,
+      "label": "scallop shell ridge",
+      "objectGroup": "scallop shell",
+      "palettes": {
+        "realistic": { "hex": "#F06F7E", "colorName": "Bubblegum Pink" },
+        "pastel": { "hex": "#6CA6EB", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#FCE55B", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#277CBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 134,
+      "bounds": { "x": 469, "y": 822, "width": 28, "height": 16 },
+      "centroid": { "x": 483, "y": 830 },
+      "pixelCount": 372,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#EE80AA", "colorName": "Rose" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 135,
+      "bounds": { "x": 583, "y": 824, "width": 31, "height": 17 },
+      "centroid": { "x": 598, "y": 832 },
+      "pixelCount": 436,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#68A2DA", "colorName": "Dusty Blue" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 136,
+      "bounds": { "x": 297, "y": 826, "width": 12, "height": 17 },
+      "centroid": { "x": 302, "y": 834 },
+      "pixelCount": 131,
+      "label": "scallop shell ridge",
+      "objectGroup": "scallop shell",
+      "palettes": {
+        "realistic": { "hex": "#F06F7E", "colorName": "Bubblegum Pink" },
+        "pastel": { "hex": "#6CA6EB", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#FCE55B", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#277CBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 137,
+      "bounds": { "x": 362, "y": 829, "width": 40, "height": 30 },
+      "centroid": { "x": 384, "y": 844 },
+      "pixelCount": 479,
+      "label": "scallop shell ridge",
+      "objectGroup": "scallop shell",
+      "palettes": {
+        "realistic": { "hex": "#F06F7E", "colorName": "Bubblegum Pink" },
+        "pastel": { "hex": "#6CA6EB", "colorName": "Dusty Blue" },
+        "cute": { "hex": "#FCE55B", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#277CBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 138,
+      "bounds": { "x": 501, "y": 842, "width": 29, "height": 17 },
+      "centroid": { "x": 515, "y": 850 },
+      "pixelCount": 397,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#689FD7", "colorName": "Sky Blue" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 139,
+      "bounds": { "x": 545, "y": 846, "width": 32, "height": 18 },
+      "centroid": { "x": 560, "y": 855 },
+      "pixelCount": 466,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#EF80AC", "colorName": "Rose" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 140,
+      "bounds": { "x": 733, "y": 847, "width": 32, "height": 12 },
+      "centroid": { "x": 748, "y": 853 },
+      "pixelCount": 326,
+      "label": "pebble",
+      "objectGroup": "pebbles",
+      "palettes": {
+        "realistic": { "hex": "#AAA79E", "colorName": "Stone Gray" },
+        "pastel": { "hex": "#F9B563", "colorName": "Skin Tone" },
+        "cute": { "hex": "#E1AB5D", "colorName": "Medium" },
+        "surprise": { "hex": "#A59DA0", "colorName": "Gray" }
+      }
+    },
+    {
+      "id": 141,
+      "bounds": { "x": 105, "y": 871, "width": 29, "height": 10 },
+      "centroid": { "x": 118, "y": 875 },
+      "pixelCount": 187,
+      "label": "fish fin",
+      "objectGroup": "fish",
+      "palettes": {
+        "realistic": { "hex": "#F29542", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#F28FBD", "colorName": "Rose" },
+        "cute": { "hex": "#FCE556", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#5FB855", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 142,
+      "bounds": { "x": 61, "y": 878, "width": 23, "height": 42 },
+      "centroid": { "x": 72, "y": 899 },
+      "pixelCount": 657,
+      "label": "fish tail",
+      "objectGroup": "fish",
+      "palettes": {
+        "realistic": { "hex": "#F29542", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#F28FBD", "colorName": "Rose" },
+        "cute": { "hex": "#F68257", "colorName": "Salmon" },
+        "surprise": { "hex": "#5FB855", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 143,
+      "bounds": { "x": 85, "y": 879, "width": 57, "height": 58 },
+      "centroid": { "x": 116, "y": 904 },
+      "pixelCount": 1672,
+      "label": "fish body",
+      "objectGroup": "fish",
+      "palettes": {
+        "realistic": { "hex": "#F29542", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#F28FBD", "colorName": "Rose" },
+        "cute": { "hex": "#FCE556", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#5FB855", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 144,
+      "bounds": { "x": 138, "y": 882, "width": 43, "height": 55 },
+      "centroid": { "x": 153, "y": 914 },
+      "pixelCount": 1454,
+      "label": "fish head",
+      "objectGroup": "fish",
+      "palettes": {
+        "realistic": { "hex": "#F29542", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#F28FBD", "colorName": "Rose" },
+        "cute": { "hex": "#FCE556", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#5FB855", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 145,
+      "bounds": { "x": 851, "y": 895, "width": 38, "height": 21 },
+      "centroid": { "x": 871, "y": 904 },
+      "pixelCount": 522,
+      "label": "fish fin",
+      "objectGroup": "fish",
+      "palettes": {
+        "realistic": { "hex": "#F29542", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#F28FBD", "colorName": "Rose" },
+        "cute": { "hex": "#FCE556", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#5FB855", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 146,
+      "bounds": { "x": 207, "y": 905, "width": 12, "height": 11 },
+      "centroid": { "x": 213, "y": 910 },
+      "pixelCount": 110,
+      "label": "bubble",
+      "objectGroup": "bubbles",
+      "palettes": {
+        "realistic": { "hex": "#C5DCEA", "colorName": "Pale Sky" },
+        "pastel": { "hex": "#DAF3F5", "colorName": "Pale Ice" },
+        "cute": { "hex": "#C6EAF6", "colorName": "Pale Sky" },
+        "surprise": { "hex": "#68CAE8", "colorName": "Turquoise" }
+      }
+    },
+    {
+      "id": 147,
+      "bounds": { "x": 111, "y": 914, "width": 15, "height": 9 },
+      "centroid": { "x": 117, "y": 918 },
+      "pixelCount": 119,
+      "label": "fish eye",
+      "objectGroup": "fish",
+      "palettes": {
+        "realistic": { "hex": "#F29542", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#F28FBD", "colorName": "Rose" },
+        "cute": { "hex": "#FCE556", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#5FB855", "colorName": "Lime" }
+      }
+    },
+    {
+      "id": 148,
+      "bounds": { "x": 809, "y": 912, "width": 119, "height": 59 },
+      "centroid": { "x": 867, "y": 940 },
+      "pixelCount": 4069,
+      "label": "fish body",
+      "objectGroup": "fish",
+      "palettes": {
+        "realistic": { "hex": "#F29542", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#F28FBD", "colorName": "Rose" },
+        "cute": { "hex": "#FCE556", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#267CBA", "colorName": "Sky Blue" }
+      }
+    },
+    {
+      "id": 149,
+      "bounds": { "x": 777, "y": 928, "width": 13, "height": 13 },
+      "centroid": { "x": 783, "y": 934 },
+      "pixelCount": 151,
+      "label": "bubble",
+      "objectGroup": "bubbles",
+      "palettes": {
+        "realistic": { "hex": "#C5DCEA", "colorName": "Pale Sky" },
+        "pastel": { "hex": "#DAF3F5", "colorName": "Pale Ice" },
+        "cute": { "hex": "#C6EAF6", "colorName": "Pale Sky" },
+        "surprise": { "hex": "#68CAE8", "colorName": "Turquoise" }
+      }
+    },
+    {
+      "id": 150,
+      "bounds": { "x": 871, "y": 967, "width": 16, "height": 10 },
+      "centroid": { "x": 879, "y": 972 },
+      "pixelCount": 118,
+      "label": "fish tail",
+      "objectGroup": "fish",
+      "palettes": {
+        "realistic": { "hex": "#F29542", "colorName": "Sunset Orange" },
+        "pastel": { "hex": "#F28FBD", "colorName": "Rose" },
+        "cute": { "hex": "#FCE556", "colorName": "Sunshine Yellow" },
+        "surprise": { "hex": "#5FB855", "colorName": "Lime" }
+      }
+    }
+  ]
+}

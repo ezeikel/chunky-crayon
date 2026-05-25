@@ -24,6 +24,7 @@ import {
   FocusModeProvider,
   FocusModeOverlay,
   FocusModeFloatingExit,
+  FocusModeToggleButton,
 } from '@/components/FocusMode';
 
 type ColoringPageContentProps = {
@@ -144,8 +145,10 @@ const ColoringPageContent = ({
         {/* Title with progress/mute underneath on desktop */}
         <div className="flex flex-col items-center gap-2 max-w-3xl xl:max-w-none w-full mx-auto xl:px-4">
           {/* Hidden on mobile to maximise canvas real estate — the title is
-           * already present via the breadcrumb and browser tab. */}
-          <h1 className="hidden md:block font-tondo font-bold text-2xl md:text-3xl text-text-primary text-center">
+           * already present via the breadcrumb and browser tab. Also
+           * carries `focus-mode-hide` so it disappears at every breakpoint
+           * when focus mode activates. */}
+          <h1 className="hidden md:block font-tondo font-bold text-2xl md:text-3xl text-text-primary text-center focus-mode-hide">
             {title}
           </h1>
           {/* Desktop only: Progress bar stretches, mute on right */}
@@ -157,6 +160,7 @@ const ColoringPageContent = ({
               className="flex-1"
             />
             <MuteToggle />
+            <FocusModeToggleButton hideInFocusMode />
           </div>
         </div>
 
@@ -173,7 +177,10 @@ const ColoringPageContent = ({
           {/* Center - Canvas Area */}
           {/* Grows to fill available space with max-width cap */}
           <div className="max-w-3xl w-full flex-1 xl:max-w-none xl:min-w-[600px]">
-            {/* Progress bar for xl+ - above canvas */}
+            {/* Progress bar for xl+ - above canvas. FocusModeToggleButton
+                sits alongside MuteToggle as the desktop entry point into
+                focus mode (mobile has the same button inside the zoom
+                pill — see ColoringArea). */}
             <div className="hidden xl:flex items-center gap-4 mb-3">
               <ProgressIndicator
                 getCanvas={getCanvas}
@@ -181,6 +188,7 @@ const ColoringPageContent = ({
                 className="flex-1"
               />
               <MuteToggle />
+              <FocusModeToggleButton hideInFocusMode />
             </div>
 
             {/* Coloring Area - clean white card matching gallery aesthetic.

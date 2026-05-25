@@ -204,14 +204,22 @@ export default async function LocaleLayout({ children, params }: Props) {
       >
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers>
-            <Suspense fallback={<BasicHeader />}>
-              <Header />
-            </Suspense>
+            {/* `focus-mode-hide` is the cross-breakpoint hide hook the
+                coloring canvas's focus mode uses — when active, the
+                Header / Footer vanish at every breakpoint. CSS rule
+                lives in global.css. */}
+            <div className="focus-mode-hide">
+              <Suspense fallback={<BasicHeader />}>
+                <Header />
+              </Suspense>
+            </div>
             <main className="flex flex-col min-h-[calc(100vh-72px)] [&>div]:flex-1">
               {children}
               {shouldInjectToolbar && <VercelToolbar />}
             </main>
-            <Footer />
+            <div className="focus-mode-hide">
+              <Footer />
+            </div>
           </Providers>
         </NextIntlClientProvider>
         <Toaster />

@@ -108,18 +108,43 @@ Covered: ScrollHeader, MobileMenu, Header indicators, LanguageSwitcher.
 GAPS: `Header` (full), `Footer`, `BasicHeader`, `HeaderDropdown`,
 `HeaderFeedbackTrigger`, `JumpToNav`, `PageWrap`.
 
-### Section: Canvas / Coloring — REBUILD (stories were deleted)
+### Section: Coloring Experience — COVERED
 
-All `coloring-ui` components lost their stories. Rebuild fresh:
-`ImageCanvas`, `ColoringToolbar`, `ColorPalette`, `ColorStrip`,
-`DesktopColorPalette`, `DesktopToolsSidebar`, `MobileColoringDrawer`,
-`BrushSizeSelector`, `PatternSelector`, `ToolSelector`,
-`UndoRedoButtons`, `ZoomControls`, `ActionButton`, `MuteToggle`,
+`07 Coloring Experience` (`coloring-experience.stories.tsx`) renders
+the **real `ColoringPageContent`** with the full canvas + tools at
+every breakpoint, via a fixed-width frame decorator (no viewport
+addon). 16 stories total — Standard mode + Focus mode at 320 / 390 /
+414 / 768 / 1024 / 1280 / 1536 / 1920. Fixture is one prod system
+image (region-store backfilled, so magic-brush + auto-color are
+functional in the story). The story file also renders stand-in
+Header / Breadcrumbs / Footer carrying `focus-mode-hide` so the
+focus-mode stories actually demonstrate the chrome disappearing.
+This is the single canvas-section story file — use it to audit
+responsive layout across the whole coloring screen rather than
+storying every inner palette/toolbar separately.
+
+Focus mode `FocusMode*` components (`FocusModeProvider`,
+`FocusModeOverlay`, `FocusModeFloatingExit`, `FocusModeToggleButton`)
+are exercised in-place by the Focus mode set above — no separate
+section. Note: cross-breakpoint as of the 2026-05 lift; on desktop
+the chrome hides via `.focus-mode-hide` CSS + the browser Fullscreen
+API (which Storybook can't trigger inside its iframe — that part is
+verified on the real app).
+
+### Section: Canvas / Coloring (inner pieces) — PARTIAL
+
+The full coloring experience lives in section 07 (above). Some inner
+`coloring-ui` components also worth a dedicated story so they're
+reviewable standalone — these are GAPS:
+`ImageCanvas`, `ColorStrip`, `BrushSizeSelector`, `PatternSelector`,
+`ToolSelector`, `UndoRedoButtons`, `ZoomControls`, `MuteToggle`,
 `ProgressIndicator`, `AutoColorPreview`, `MagicColorOverlay`,
 `CompletionCelebration`, `Toaster`, `SceneBuilder`, `InputModeSelector`.
-App-side canvas: `ColoringArea`, `ColoringPageContent`,
-`EmbeddedColoringCanvas`, `SlimColorPalette`, `StreamingCanvasView`,
-`FocusMode*`, `TapPromptOverlay`.
+App-side canvas: `EmbeddedColoringCanvas`, `SlimColorPalette`,
+`StreamingCanvasView`, `TapPromptOverlay`. Stories already exist for
+`ColoringToolbar`, `ColorPalette`, `DesktopColorPalette`,
+`DesktopToolsSidebar`, `MobileColoringDrawer`, `ActionButton` in
+section 06.
 
 ### Section: Gallery / Blog / Home — PARTIAL
 

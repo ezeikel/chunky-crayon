@@ -116,6 +116,48 @@ const config: StorybookConfig = {
           replacement: resolve(root, '.storybook/mocks/app-actions.ts'),
         },
         {
+          // SaveToGalleryButton (used by ColoringPageContent) imports
+          // this action, which transitively pulls `@/auth` →
+          // next-auth → server-only modules that fail to bundle for
+          // the browser. Storybook never executes the action, so a
+          // stub is enough to break the chain.
+          find: '@/app/actions/saved-artwork',
+          replacement: resolve(
+            root,
+            '.storybook/mocks/saved-artwork-actions.ts',
+          ),
+        },
+        {
+          // ColoringArea imports `type { GridColorMap, FillPointsData }`
+          // from `@/lib/ai`, which re-exports lib/ai/prompts.ts — that
+          // imports `CC_BRAND_VOICE_CORE` from the storybook-stubbed
+          // coloring-core mock + various AI SDK clients that don't
+          // bundle for the browser. Stub the whole namespace.
+          find: '@/lib/ai',
+          replacement: resolve(root, '.storybook/mocks/lib-ai.ts'),
+        },
+        {
+          // ColoringArea calls generateRegionFillPoints lazily for
+          // images without a region store. Real module imports prompt
+          // constants + AI SDK clients — browser-bundle hostile. The
+          // fixture images are backfilled, so the action never fires.
+          find: '@/app/actions/generate-color-map',
+          replacement: resolve(
+            root,
+            '.storybook/mocks/generate-color-map-actions.ts',
+          ),
+        },
+        {
+          // Same shape as generate-color-map: ColoringArea's
+          // region-store retry path imports these. Fixture images
+          // are pre-backfilled so these never fire.
+          find: '@/app/actions/generate-regions',
+          replacement: resolve(
+            root,
+            '.storybook/mocks/generate-regions-actions.ts',
+          ),
+        },
+        {
           find: '@/app/actions/conversions',
           replacement: resolve(root, '.storybook/mocks/app-actions.ts'),
         },

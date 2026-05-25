@@ -89,13 +89,15 @@ const ColoringImageDetailView = async ({ coloringImage, locale }: Props) => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(imageSchema) }}
       />
 
-      <Breadcrumbs
-        items={[
-          { label: tNav('home'), href: '/' },
-          { label: tNav('gallery'), href: '/gallery' },
-          { label: coloringImage.title || tColoring('title') },
-        ]}
-      />
+      <div className="focus-mode-hide">
+        <Breadcrumbs
+          items={[
+            { label: tNav('home'), href: '/' },
+            { label: tNav('gallery'), href: '/gallery' },
+            { label: coloringImage.title || tColoring('title') },
+          ]}
+        />
+      </div>
 
       <ColoringPageContent
         coloringImage={coloringImage}
@@ -104,7 +106,7 @@ const ColoringImageDetailView = async ({ coloringImage, locale }: Props) => {
       />
 
       {showRegionDebugLink && (
-        <div className="flex justify-end">
+        <div className="flex justify-end focus-mode-hide">
           <Link
             href={`/dev/region-store/${id}`}
             className="inline-flex items-center gap-x-2 rounded-full border-2 border-paper-cream-dark bg-white px-3 py-1.5 text-xs font-medium text-text-primary/70 hover:border-crayon-orange/50 hover:text-crayon-orange transition-colors"
@@ -116,7 +118,7 @@ const ColoringImageDetailView = async ({ coloringImage, locale }: Props) => {
       )}
 
       {relatedImages.length > 0 && (
-        <section className="mt-8 pt-8 border-t border-paper-cream-dark">
+        <section className="mt-8 pt-8 border-t border-paper-cream-dark focus-mode-hide">
           <h2 className="font-tondo font-semibold text-xl text-text-primary mb-4">
             {tColoring('relatedPages')}
           </h2>
