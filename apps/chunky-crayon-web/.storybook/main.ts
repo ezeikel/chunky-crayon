@@ -26,6 +26,24 @@ const config: StorybookConfig = {
   staticDirs: ['../public'],
   viteFinal: async (viteConfig) => {
     viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()];
+
+    // Proxy assets.chunkycrayon.com through the Storybook dev server
+    // so the coloring-experience story can fetch SVGs / region maps
+    // for the canvas without hitting CORS. Production sets these
+    // CORS headers via Cloudflare; localhost obviously doesn't.
+    // Only affects Storybook dev — the real app's next.config has
+    // its own rewrite rules.
+    viteConfig.server = {
+      ...(viteConfig.server ?? {}),
+      proxy: {
+        ...(viteConfig.server?.proxy ?? {}),
+        '/_assets-cc': {
+          target: 'https://assets.chunkycrayon.com',
+          changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/_assets-cc/, ''),
+        },
+      },
+    };
     // Browser has no `process`, so `process.env.*` reads at module
     // scope crash. Two cases this stub covers:
     //   - `next-auth/react` reads `process.env.*` on load (every story
