@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "Malvorlage",
     "relatedPages": "Weitere Malvorlagen",
-    "defaultDescription": "Kostenlose druckbare Malvorlage von Chunky Crayon",
+    "defaultDescription": "Kostenlose druckbare Malvorlage",
     "progress": {
       "colored": "ausgemalt",
       "percentage": "{percent}%",
@@ -235,7 +235,7 @@
       "medium": "Mittel",
       "mediumDark": "Mitteldunkel",
       "dark": "Dunkel",
-      "deep": "Sehr dunkel"
+      "deep": "Tief"
     }
   },
   "shareArtwork": {
@@ -377,7 +377,7 @@
     "emailPlaceholder": "name@beispiel.de",
     "termsAgreement": "Wenn du fortfährst, stimmst du unseren <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
     "verifyRequest": {
-      "title": "Deine E-Mail prüfen!",
+      "title": "E-Mails prüfen!",
       "description": "Wir haben dir einen Anmeldelink gesendet. Klicke auf den Link in deiner E-Mail, um fortzufahren.",
       "checkSpam": "Nicht zu sehen? Prüfe deinen Spam-Ordner.",
       "linkExpiry": "Der Link läuft in 24 Stunden ab.",
@@ -425,7 +425,7 @@
     "forTeens": "Für Teenager",
     "forAdults": "Für Erwachsene",
     "holidays": "Feiertage & Jahreszeiten",
-    "ariaLabel": "Breadcrumb-Navigation"
+    "ariaLabel": "Brotkrumen-Navigation"
   },
   "jumpToNav": {
     "jumpToSection": "Zum Abschnitt springen",
