@@ -98,10 +98,12 @@ const MyRecentCreationsView = ({
         {/* Horizontal-scroll strip on mobile (kid can swipe), grid on
             larger screens. -mx-4 px-4 lets the scroll edge bleed past
             the page padding so the first card hugs the left edge and
-            the last card has breathing room before the page edge. */}
+            the last card has breathing room before the page edge.
+            py-1.5 gives hover/active scale room without the strip's
+            implicit overflow-y:hidden clipping the card corners. */}
         <ul
           className={cn(
-            'flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible md:pb-0',
+            'flex snap-x snap-mandatory gap-3 overflow-x-auto py-1.5 pb-2 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible md:py-0 md:pb-0',
             '-mx-4 px-4 md:mx-0 md:px-0',
           )}
         >
@@ -113,7 +115,13 @@ const MyRecentCreationsView = ({
               <Link
                 href={item.href}
                 aria-label={item.title}
-                className="group block aspect-square overflow-hidden rounded-3xl border-2 border-paper-cream-dark bg-white shadow-card transition-all hover:scale-105 hover:border-crayon-orange active:scale-95"
+                // Border-colour swap on hover/active is the affordance;
+                // dropped hover:scale-105 because the strip's
+                // overflow-x-auto implicitly clips the y-axis, hard-
+                // squaring the top corners on the first hovered card.
+                // active:scale-95 stays because the tap-back feedback
+                // fits inside the new py-1.5 strip padding.
+                className="group block aspect-square overflow-hidden rounded-3xl border-2 border-paper-cream-dark bg-white shadow-card transition-colors hover:border-crayon-orange active:scale-95"
               >
                 <Image
                   src={item.imageUrl}
