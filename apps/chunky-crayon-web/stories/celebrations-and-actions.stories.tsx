@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import Confetti from '@/components/Confetti';
-import { ActionButton } from '@one-colored-pixel/coloring-ui';
+import {
+  ActionButton,
+  DesktopToolsSidebar,
+  type DesktopToolsSidebarLabels,
+} from '@one-colored-pixel/coloring-ui';
 import {
   faSpinnerThird,
   faFloppyDisk,
@@ -131,28 +135,43 @@ const MobileActionRow = () => (
   </div>
 );
 
-// Desktop pattern: icon+label hero buttons stacked in the sidebar's
-// action slot. Reuses the same shared ActionButton with `size="hero"`.
+// Desktop pattern: the REAL DesktopToolsSidebar from coloring-ui,
+// with action tiles in its `actions` slot. The sidebar wraps the
+// slot in ActionButtonSizeProvider so every ActionButton inside
+// renders at `size="tile"` (64px square) — same chrome the live
+// app produces. Earlier draft of this story used `size="hero"`
+// (the chunky Duolingo-style depth CTA) and the user pushed back
+// on the orange underline — that's full-page-CTA chrome, not
+// sidebar chrome.
+const sidebarLabels: DesktopToolsSidebarLabels = {
+  crayon: 'Crayon',
+  marker: 'Marker',
+  glitter: 'Glitter',
+  eraser: 'Eraser',
+  fill: 'Fill',
+  sticker: 'Sticker',
+  'magic-reveal': 'Magic Brush',
+  'magic-auto': 'Auto Color',
+  undo: 'Undo',
+  redo: 'Redo',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  pan: 'Pan',
+  resetView: 'Reset view',
+};
+
 const DesktopActionStack = () => (
-  <div className="flex w-72 flex-col gap-3 rounded-coloring-card border-2 border-paper-cream-dark bg-white p-4 shadow-sm">
-    <h3 className="font-tondo text-sm font-bold uppercase tracking-wide text-text-secondary">
-      Actions
-    </h3>
-    <ActionButton
-      size="hero"
-      tone="tool"
-      icon={faArrowsRotate}
-      label="Start Over"
-    />
-    <ActionButton size="hero" tone="tool" icon={faPrint} label="Print" />
-    <ActionButton size="hero" tone="tool" icon={faFloppyDisk} label="Save" />
-    <ActionButton
-      size="hero"
-      tone="tool"
-      icon={faHeart}
-      label="Save to gallery"
-    />
-  </div>
+  <DesktopToolsSidebar
+    labels={sidebarLabels}
+    actions={
+      <>
+        <ActionButton tone="tool" icon={faArrowsRotate} label="Start Over" />
+        <ActionButton tone="tool" icon={faPrint} label="Print" />
+        <ActionButton tone="tool" icon={faFloppyDisk} label="Save" />
+        <ActionButton tone="tool" icon={faHeart} label="Save to gallery" />
+      </>
+    }
+  />
 );
 
 // Each state of the SaveToGallery button, side-by-side, on one row.
