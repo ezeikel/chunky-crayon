@@ -41,6 +41,7 @@ import { join } from 'node:path';
 import OpenAI from 'openai';
 import { put, exists } from '@one-colored-pixel/storage';
 import { AVATARS } from '../lib/avatars';
+import { removeBackground } from '../lib/replicate-bg-remove';
 
 const args = process.argv.slice(2);
 const COMMIT = args.includes('--commit');
@@ -61,29 +62,40 @@ const OUT_DIR = join(process.cwd(), 'scripts', 'out', 'profile-avatars');
 const PUBLIC_DIR = join(process.cwd(), 'public', 'profile-avatars');
 
 // Per-avatar subject prompts. Each avatar is a HEAD-only portrait
-// rather than a full body — round profile-picture composition reads
-// best at the chip sizes. For mythical species we lean into the
-// instantly-recognisable signature (unicorn horn, dragon eye-ridge,
-// robot antenna) so even a kid who can't read the name knows which
-// is which.
+// (mostly) — round profile-picture composition reads best at the
+// chip sizes. Fresh mix of magical / sci-fi / friendly-objects-
+// with-faces so the avatar picker feels distinct from the Character
+// Builder species picker (no overlap with the everyday-animals set
+// the kid uses to fill story scenes).
 const SUBJECTS: Record<string, string> = {
-  cat: 'a cute round cartoon kitten head looking forward, big triangular ears, whiskers',
-  dog: 'a cute round cartoon puppy head looking forward, floppy ears, little black nose',
-  bunny: 'a cute round cartoon bunny head looking forward, tall floppy ears',
-  fox: 'a cute round cartoon fox head looking forward, pointed ears, small white snout',
-  lion: 'a cute round cartoon lion head looking forward, fluffy mane framing the face',
-  panda:
-    'a cute round cartoon panda head looking forward, black eye patches, round black ears',
-  frog: 'a cute round cartoon frog head looking forward, big round eyes on top, wide smile',
-  turtle:
-    'a cute round cartoon turtle head looking forward, peeking out of a green shell',
-  owl: 'a cute round cartoon owl head looking forward, large eyes, tiny beak',
-  unicorn:
-    'a cute round cartoon unicorn head looking forward, small rainbow horn on the forehead, pastel mane wisps',
+  // Magical creatures (4) — distinct from Character Builder species
+  // except for dragon + unicorn (intentionally kept; top kid picks).
   dragon:
-    'a cute round cartoon baby dragon head looking forward, small eye ridges, tiny rounded horns',
-  robot:
-    'a cute round cartoon robot head looking forward, small antenna on top, two round friendly eyes',
+    'a cute round cartoon baby dragon head, small eye ridges, tiny rounded horns, scaly cheeks',
+  unicorn:
+    'a cute round cartoon unicorn head, small rainbow horn on the forehead, pastel rainbow mane wisps',
+  mermaid:
+    'a cute round cartoon mermaid head, sea-green long flowing hair with a tiny seashell hair clip',
+  ghost:
+    'a cute round cartoon friendly ghost head, soft white blob shape with rounded top, two big oval eyes',
+  // Roleplay / costume identities (3) — kid-face-with-iconic-prop.
+  superhero:
+    'a cute round cartoon superhero kid head, small red domino eye-mask, hair sticking out underneath, top edge of a cape collar visible at the bottom of the face',
+  astronaut:
+    'a cute round cartoon astronaut kid head inside a clear round space helmet, smiling face visible through the visor, small antenna on top of the helmet',
+  wizard:
+    'a cute round cartoon wizard kid head, tall pointy purple hat with a small yellow star on the front, hair peeking out underneath',
+  // Sci-fi (2)
+  alien:
+    'a cute round cartoon green alien head, two tall antennae with little orbs on top, three friendly eyes',
+  rocket:
+    'a cute round cartoon rocket with a friendly face on its nose, small fins, tiny flame puff at the bottom, white-and-red body',
+  // Friendly objects + treats (3)
+  'ice-cream':
+    'a cute round cartoon double-scoop ice cream cone with a friendly face on the top scoop, pink strawberry scoop on top and vanilla scoop below, waffle cone visible at the bottom',
+  sun: 'a cute round cartoon yellow sun with a friendly face in the middle, soft rounded sun rays around the edges',
+  rainbow:
+    'a cute round cartoon rainbow arch with a friendly face on the front, two soft white cloud puffs at the bottom corners',
 };
 
 type Job = { id: string; subject: string };
@@ -96,8 +108,15 @@ const jobs: Job[] = AVATARS.map((a) => ({
 }));
 
 const buildPrompt = (subject: string): string =>
-  // Identical brand recipe to generate-character-thumbnails.ts so the
-  // avatar picker reads as the same family as the rest of CC.
+  // Brand recipe consistent with the rest of CC (warm-brown outlines,
+  // flat colours, pink cheek blush). Background is solid bright
+  // magenta (#ff00ff) — gpt-image-2 rejects `background:'transparent'`
+  // and a plain WHITE bg breaks the post-strip step for subjects with
+  // white in them (ghost is a white blob → got bg-stripped through
+  // its body; rocket has a white-and-red body → white parts went
+  // transparent). Magenta is colour-distinct from any subject in the
+  // catalog so the Replicate bg-remover keys it cleanly without
+  // eating into the character. See feedback_always_transparent_pngs.md.
   `A simple flat 2D illustration of ${subject} in the style of a ` +
   `friendly children's mascot. ` +
   `Thick warm dark-brown outlines (around #5a3a1f), not pure black. ` +
@@ -106,13 +125,23 @@ const buildPrompt = (subject: string): string =>
   `eyes), a tiny smiling mouth, and small soft pink circular cheek ` +
   `blushes on either side of the face. ` +
   `Chunky stocky proportions, big head, centered composition, ` +
-  `single subject filling the frame from edge to edge, on a pure ` +
-  `white background. No text, no words, no letters, no logos.`;
+  `single subject filling about 70% of the frame with comfortable ` +
+  `padding around the edges so nothing gets clipped by a round mask. ` +
+  `Plain solid bright magenta (#ff00ff) background, no gradient, ` +
+  `no texture. No text, no words, no letters, no logos.`;
 
 const r2Key = (job: Job) => `${R2_PREFIX}/${job.id}.png`;
 
 const main = async () => {
   if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not set');
+  if (COMMIT && !process.env.REPLICATE_API_TOKEN) {
+    throw new Error('REPLICATE_API_TOKEN not set — needed for bg-strip step');
+  }
+  // R2 public host — Replicate needs a publicly fetchable URL to
+  // read the just-uploaded opaque PNG. Use the dev bucket's public
+  // URL since this script runs with .env.local creds.
+  const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL;
+  if (COMMIT && !R2_PUBLIC_URL) throw new Error('R2_PUBLIC_URL not set');
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   mkdirSync(OUT_DIR, { recursive: true });
@@ -152,15 +181,36 @@ const main = async () => {
     writeFileSync(preview, buf);
 
     if (COMMIT) {
-      await put(key, buf, { contentType: 'image/png' });
+      // Two-step upload because gpt-image-2 returns opaque RGB and
+      // Replicate's bg-remover needs a public URL to fetch. Upload
+      // the opaque version first (overwrite OK — the bg-strip step
+      // immediately re-uploads the RGBA on top), then strip + final
+      // upload. See lib/replicate-bg-remove.ts + the
+      // feedback_always_transparent_pngs.md memory rule.
+      await put(key, buf, {
+        contentType: 'image/png',
+        allowOverwrite: true,
+      });
+
+      const stripStart = Date.now();
+      const publicUrl = `${R2_PUBLIC_URL}/${key}?t=${Date.now()}`;
+      const rgbaBuf = await removeBackground(publicUrl);
+      const stripElapsed = ((Date.now() - stripStart) / 1000).toFixed(1);
+
+      await put(key, rgbaBuf, {
+        contentType: 'image/png',
+        allowOverwrite: true,
+      });
       // Public dir mirror so dev / Storybook can render before the
       // R2 CDN has propagated. Tracked in git for the dev experience.
-      writeFileSync(join(PUBLIC_DIR, `${job.id}.png`), buf);
+      writeFileSync(join(PUBLIC_DIR, `${job.id}.png`), rgbaBuf);
       keys[job.id] = key;
-      console.log(`[profile-avatar] ${job.id} ${elapsed}s -> ${key}`);
+      console.log(
+        `[profile-avatar] ${job.id} gen ${elapsed}s + bg-strip ${stripElapsed}s -> ${key} (${(rgbaBuf.length / 1024).toFixed(0)}KB RGBA)`,
+      );
     } else {
       console.log(
-        `[profile-avatar] ${job.id} ${elapsed}s -> ${preview} (dry run)`,
+        `[profile-avatar] ${job.id} ${elapsed}s -> ${preview} (dry run, no bg-strip)`,
       );
     }
   }
