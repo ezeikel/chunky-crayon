@@ -1,7 +1,7 @@
 {
   "common": {
     "loading": "불러오는 중...",
-    "error": "문제가 발생했어요",
+    "error": "문제가 발생했습니다",
     "retry": "다시 시도",
     "save": "저장",
     "cancel": "취소",
@@ -49,10 +49,10 @@
       "percentage": "{percent}%",
       "allDone": "완료!",
       "milestones": {
-        "25": "좋은 시작이에요!",
-        "50": "반쯤 왔어요!",
-        "75": "거의 다 됐어요!",
-        "100": "최고예요!"
+        "25": "좋은 시작!",
+        "50": "반 완료!",
+        "75": "거의 완료!",
+        "100": "완성!"
       }
     },
     "sidebar": {
@@ -126,7 +126,7 @@
     },
     "colorPalette": {
       "selectColor": "{color} 색상 선택",
-      "magicToolsMessage": "매직 도구에서는 색상이 자동으로 선택돼요"
+      "magicToolsMessage": "매직 도구에서는 색상이 자동으로 선택됩니다"
     },
     "patternSelector": {
       "label": "패턴:"
@@ -338,13 +338,13 @@
   },
   "billing": {
     "pageTitle": "결제 및 구독",
-    "pageSubtitle": "구독을 관리하고 추가 크레딧을 구매하여 멋진 컬러링 페이지를 계속 만들어 보세요.",
+    "pageSubtitle": "구독을 관리하고 추가 크레딧을 구매하여 멋진 컬러링 페이지를 계속 만들어 주세요.",
     "currentPlan": "현재 플랜",
     "currentCredits": "현재 크레딧: {count}",
     "renewsOn": "구독은 {date}에 갱신됩니다",
     "manageSubscription": "구독 관리",
     "noActiveSubscription": "활성 구독 없음",
-    "noSubscriptionDescription": "플랜을 선택하고 멋진 컬러링 페이지 만들기를 시작하세요.",
+    "noSubscriptionDescription": "플랜을 선택하고 멋진 컬러링 페이지 만들기를 시작해 주세요.",
     "viewPlans": "플랜 보기",
     "buyMoreCredits": "크레딧 더 구매",
     "credits": "크레딧 {count}개",
@@ -354,8 +354,8 @@
     "changePlan": "플랜 변경",
     "subscribe": "구독하기",
     "currentPlanBadge": "현재 플랜",
-    "manageInPortal": "고객 포털에서 구독을 관리하세요",
-    "noCommitment": "약정 없음. 언제든지 취소할 수 있어요.",
+    "manageInPortal": "고객 포털에서 구독을 관리해 주세요",
+    "noCommitment": "약정 없음. 언제든지 취소 가능합니다.",
     "perMonth": "/월",
     "noSubscriptionForCredits": "크레딧 구매를 위해 활성 구독이 필요합니다",
     "noSubscriptionFound": "활성 구독을 찾을 수 없습니다",
@@ -378,8 +378,8 @@
     "termsAgreement": "계속하면 <terms>서비스 이용약관</terms> 및 <privacy>개인정보처리방침</privacy>에 동의하게 됩니다.",
     "verifyRequest": {
       "title": "이메일을 확인하세요!",
-      "description": "로그인용 매직 링크를 보냈어요. 이메일의 링크를 눌러 계속하세요.",
-      "checkSpam": "보이지 않나요? 스팸함을 확인해 보세요.",
+      "description": "로그인용 매직 링크를 보냈습니다. 이메일의 링크를 클릭하여 계속하세요.",
+      "checkSpam": "보이지 않나요? 스팸함을 확인해 주세요.",
       "linkExpiry": "링크는 24시간 후 만료됩니다.",
       "tryDifferentEmail": "다른 이메일 사용"
     },
