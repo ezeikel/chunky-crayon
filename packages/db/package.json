@@ -39,6 +39,6 @@
     "dotenv": "^17.2.1",
     "prisma": "7.2.0",
     "tsx": "^4.20.4",
-    "typescript": "^5.4.5"
+    "typescript": "~6.0.3"
   }
 }
