@@ -146,7 +146,7 @@ export const claimMyChallengeReward = async (
       }
 
       revalidatePath('/');
-      revalidatePath('/account/stickers');
+      revalidatePath('/account/profiles/stickers');
       revalidatePath('/account/profiles');
 
       return {

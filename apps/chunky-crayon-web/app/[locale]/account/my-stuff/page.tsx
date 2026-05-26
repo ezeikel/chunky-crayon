@@ -104,7 +104,7 @@ const StickerStatsCard = async () => {
 
   return (
     <Link
-      href="/account/stickers"
+      href="/account/profiles/stickers"
       className="group block rounded-3xl border-3 border-text-primary/10 bg-bg-white hover:border-crayon-orange hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
     >
       <div className="flex items-center gap-4 p-5 lg:p-6">
