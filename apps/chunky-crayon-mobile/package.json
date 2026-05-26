@@ -9,6 +9,10 @@
     "dev:android": "expo start --android",
     "dev:ios": "expo start --ios",
     "web": "expo start --web",
+    "storybook": "EXPO_PUBLIC_STORYBOOK_ENABLED=true expo start",
+    "storybook:ios": "EXPO_PUBLIC_STORYBOOK_ENABLED=true expo start --ios",
+    "storybook:ipad": "EXPO_PUBLIC_STORYBOOK_ENABLED=true expo start --ios --device \"iPad Pro 13-inch (M5)\"",
+    "storybook:android": "EXPO_PUBLIC_STORYBOOK_ENABLED=true expo start --android",
     "prebuild": "expo prebuild",
     "prebuild:ios": "expo prebuild --platform ios --clean",
     "prebuild:android": "expo prebuild --platform android --clean",
@@ -108,6 +112,9 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@storybook/addon-ondevice-actions": "^10",
+    "@storybook/addon-ondevice-controls": "^10",
+    "@storybook/react-native": "^10",
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.61.6",
     "@types/jest": "^29.5.14",
@@ -119,6 +126,7 @@
     "jest-expo": "~55.0.9",
     "postcss": "^8",
     "react-test-renderer": "18.3.1",
+    "storybook": "^10",
     "tailwindcss": "^4",
     "typescript": "~5.9.3"
   },
