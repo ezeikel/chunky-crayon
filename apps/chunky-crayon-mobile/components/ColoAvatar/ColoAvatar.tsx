@@ -353,13 +353,13 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   shineOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: RADIUS.full,
     opacity: 0.3,
   },
   progressRingContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
   },

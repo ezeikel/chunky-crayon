@@ -43,7 +43,7 @@ export default function TabLayout() {
             <FontAwesomeIcon
               icon={focused ? faHouseChimney : faHouseChimneyLight}
               size={24}
-              color={color}
+              color={color as string}
             />
           ),
         }}
@@ -56,7 +56,7 @@ export default function TabLayout() {
             <FontAwesomeIcon
               icon={focused ? faHeart : faHeartLight}
               size={24}
-              color={color}
+              color={color as string}
             />
           ),
         }}
@@ -69,7 +69,7 @@ export default function TabLayout() {
             <FontAwesomeIcon
               icon={focused ? faTrophy : faTrophyLight}
               size={24}
-              color={color}
+              color={color as string}
             />
           ),
         }}
@@ -82,7 +82,7 @@ export default function TabLayout() {
             <FontAwesomeIcon
               icon={focused ? faNoteSticky : faNoteStickyLight}
               size={24}
-              color={color}
+              color={color as string}
             />
           ),
         }}
@@ -95,7 +95,7 @@ export default function TabLayout() {
             <FontAwesomeIcon
               icon={focused ? faGear : faGearLight}
               size={24}
-              color={color}
+              color={color as string}
             />
           ),
         }}

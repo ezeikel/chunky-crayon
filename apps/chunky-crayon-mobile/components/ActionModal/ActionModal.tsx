@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   backdropPressable: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   modalContainer: {
     width: SCREEN_WIDTH - 48,

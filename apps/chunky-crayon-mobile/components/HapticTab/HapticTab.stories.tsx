@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHouse, faPalette, faStar } from "@fortawesome/pro-solid-svg-icons";
 import { action } from "storybook/actions";
 import type { Meta, StoryObj } from "@storybook/react-native";
-import type { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
+import type { BottomTabBarButtonProps } from "expo-router/js-tabs";
 import HapticTab from "./HapticTab";
 
 // HapticTab is normally rendered inside a React Navigation bottom

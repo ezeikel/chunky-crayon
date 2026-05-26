@@ -19,7 +19,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: "./assets/images/icon.png",
     scheme: "chunkycrayon",
     userInterfaceStyle: "light",
-    newArchEnabled: true,
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.chewybytes.chunkycrayon.app",
@@ -63,6 +62,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       "expo-web-browser",
       "expo-audio",
       "expo-apple-authentication",
+      "expo-secure-store",
+      "expo-sharing",
+      "expo-status-bar",
       "@react-native-google-signin/google-signin",
       [
         "react-native-fbsdk-next",
@@ -83,7 +85,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       [
-        "@sentry/react-native/expo",
+        "@sentry/react-native",
         {
           url: "https://sentry.io/",
           project: "chunky-crayon-app",

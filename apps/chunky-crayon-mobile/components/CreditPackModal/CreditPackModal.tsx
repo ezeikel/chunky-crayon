@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     alignItems: "center",
     justifyContent: "center",

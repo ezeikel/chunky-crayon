@@ -1,4 +1,4 @@
-import { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
+import { BottomTabBarButtonProps } from "expo-router/js-tabs";
 import { Pressable, GestureResponderEvent, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
 

@@ -80,9 +80,12 @@ export function useFillLayer(
         canvas.drawSvg(svg, w, h);
         surface.flush();
 
-        // Snapshot as GPU texture, then convert to CPU image for pixel access
+        // Snapshot as GPU texture, then convert to CPU image for pixel access.
+        // Skia 3.x can return null from makeNonTextureImage when the texture
+        // can't be read back (driver edge case); fall back to the texture
+        // image so floodFill always has something to work with.
         const textureImage = surface.makeImageSnapshot();
-        let currentImage = textureImage.makeNonTextureImage();
+        let currentImage = textureImage.makeNonTextureImage() ?? textureImage;
 
         // Step 2: Apply each fill action sequentially
         for (const action of fillActions) {
