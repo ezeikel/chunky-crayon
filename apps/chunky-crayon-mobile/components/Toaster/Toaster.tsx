@@ -151,6 +151,13 @@ const Toaster = (props: ToasterProps) => (
     position="top-center"
     duration={4000}
     closeButton
+    // richColors ON because sonner-native reads `closeButtonColor` from
+    // `colors.rich[variant].foreground` (= white) when it's true. With
+    // richColors OFF, the close X is rendered in `text-secondary` (dark
+    // grey) which clashes against our coloured toast cards. Our own
+    // per-variant style in `toastOptions.{variant}` still wins for bg/
+    // shadow, so this only changes the close icon's color.
+    richColors
     visibleToasts={3}
     // Web sets `gap={28}` on the Toaster — vertical space between stacked toasts.
     gap={28}
