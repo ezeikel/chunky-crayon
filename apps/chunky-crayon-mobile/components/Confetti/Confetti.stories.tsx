@@ -3,25 +3,31 @@ import { View, Pressable, Text } from "react-native";
 import type { Meta, StoryObj } from "@storybook/react-native";
 import Confetti from "./Confetti";
 
-// Confetti is keyed by `visible` and clears itself after ~2.5s.
-// Story wraps a tappable "Trigger" button so kids — sorry, reviewers
-// — can fire bursts on demand instead of staring at a never-loops
-// piece of UI.
+// Confetti fires on `isActive` toggle and clears itself after
+// duration. Story wraps a "Replay" button so reviewers can fire
+// bursts on demand instead of staring at a never-loops piece of UI.
+//
+// Mirrors web's storybook entry — same pattern (button → toggle
+// active → onComplete resets) so what reviewers see on mobile
+// matches what they see on web at /story/chunky-crayon-11-celebrations-actions--confetti.
 const Trigger = () => {
-  const [visible, setVisible] = useState(true);
+  const [active, setActive] = useState(true);
 
-  // Restart automatically on mount so the story shows the celebration
-  // immediately when navigating in.
+  // Fire immediately on mount so the burst is visible on first
+  // navigate.
   useEffect(() => {
-    setVisible(true);
+    setActive(true);
   }, []);
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Pressable
         onPress={() => {
-          setVisible(false);
-          setTimeout(() => setVisible(true), 50);
+          setActive(false);
+          // Tiny gap before flipping back so the false→true edge is
+          // distinct (the component re-fires on the edge, not on
+          // every render).
+          setTimeout(() => setActive(true), 50);
         }}
         style={{
           backgroundColor: "#E46444",
@@ -34,7 +40,7 @@ const Trigger = () => {
           🎉 Replay burst
         </Text>
       </Pressable>
-      <Confetti visible={visible} onComplete={() => setVisible(false)} />
+      <Confetti isActive={active} onComplete={() => setActive(false)} />
     </View>
   );
 };
@@ -51,6 +57,6 @@ export const Burst: Story = {
   render: () => <Trigger />,
 };
 
-export const ManualVisible: Story = {
-  args: { visible: true },
+export const ManualActive: Story = {
+  args: { isActive: true },
 };

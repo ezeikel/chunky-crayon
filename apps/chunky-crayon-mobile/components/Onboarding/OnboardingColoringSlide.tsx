@@ -293,7 +293,7 @@ const OnboardingColoringSlide = ({
       {showToolbar && <MobileColoringToolbar />}
 
       {/* Confetti overlay */}
-      <Confetti visible={phase === "CELEBRATION"} />
+      <Confetti isActive={phase === "CELEBRATION"} />
     </View>
   );
 };
