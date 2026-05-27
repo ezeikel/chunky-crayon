@@ -1,46 +1,38 @@
-import { useState, useCallback, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  Modal,
-  StyleSheet,
-  Pressable,
-  Animated,
-  Easing,
-} from "react-native";
+import { useState, useCallback, useEffect } from "react";
+import { View, Text, Modal, StyleSheet, Pressable } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHandWave } from "@fortawesome/pro-duotone-svg-icons";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 import { FONTS, COLORS } from "@/lib/design";
 
 /**
  * Mobile port of apps/chunky-crayon-web/components/ParentalGate/ParentalGateModal.tsx.
  *
- * The previous mobile gate shipped the old web design (Year-4
- * multiplication via text input + lock icon + COPPA notice). Web
- * replaced that months ago — Year-4 maths failed 95% of adults under
- * pressure and the lock icon read as "you are blocked" rather than
- * "oh hi grown-up". This file mirrors the new design value-for-value
- * so CC mobile + CC web parental gates look and behave identically.
+ * Animations are Reanimated (worklets / UI thread) — never RN's
+ * built-in Animated API. See feedback_use_reanimated_not_animated.
  *
- * Behaviour parity:
+ * Behaviour parity with web:
  *   - One primary-school sum (a + b = ?), problem set matches web's
- *     PROBLEMS array.
+ *     PROBLEMS array verbatim.
  *   - Three chunky circular brand-orange answer buttons (correct +
  *     two close distractors via buildAnswerChoices).
- *   - Wrong answer ⇒ shake (Animated horizontal -10/+10 sequence) +
+ *   - Wrong answer ⇒ shake (horizontal Reanimated sequence) +
  *     reshuffle button positions so "always tap the middle one" fails.
- *   - 3 wrongs in a row ⇒ silent close (no scary "you failed"; kid
- *     gives up, parent re-triggers).
- *   - Friendly waving-hand icon (faHandWave duotone, orange/yellow,
- *     subtle wiggle on mount) — replaces the old lock.
+ *   - 3 wrongs in a row ⇒ silent close (no scary "you failed").
+ *   - Friendly waving-hand icon (faHandWave duotone, orange/yellow)
+ *     with a Reanimated wiggle on open. Replaces the old lock.
  *
- * API parity with the previous mobile file is preserved so call sites
- * (settings.tsx, ActionModal, CreditPackModal) don't change:
- *   visible, onClose, onSuccess, title?, subtitle?
+ * API parity (so settings.tsx / ActionModal / CreditPackModal don't
+ * change): visible, onClose, onSuccess, title?, subtitle?
  *
- * Apple guideline 1.3 only requires a meaningful adult action — it
- * does NOT require Year-4 multiplication. Sago Mini / Toca Boca /
- * PBS Kids all ship simpler gates; we now match.
+ * Apple guideline 1.3 only requires a meaningful adult action; this
+ * matches Sago Mini / Toca Boca / PBS Kids gate complexity.
  */
 
 type ParentalGateProps = {
@@ -57,8 +49,7 @@ type Problem = {
   answer: number;
 };
 
-// Verbatim from web's ParentalGateModal.tsx — same problem set so
-// parity holds.
+// Verbatim from web's ParentalGateModal.tsx.
 const PROBLEMS: Problem[] = [
   { a: 2, b: 1, answer: 3 },
   { a: 1, b: 3, answer: 4 },
@@ -83,8 +74,8 @@ const shuffle = <T,>(arr: T[]): T[] => {
 };
 
 /**
- * Build a 3-button answer set: correct answer plus two close
- * distractors (±1). Same shape as web's buildAnswerChoices.
+ * 3-button answer set: correct + two close distractors (±1).
+ * Matches web's buildAnswerChoices.
  */
 const buildAnswerChoices = (correct: number, shouldShuffle: boolean) => {
   const candidates = new Set<number>([correct]);
@@ -114,76 +105,47 @@ const ParentalGate = ({
   );
   const [wrongCount, setWrongCount] = useState(0);
 
-  // Container shake on wrong answer — Animated translation sequence.
-  // Native driver so it doesn't fight the React thread when the kid is
-  // mashing buttons.
-  const shakeAnim = useRef(new Animated.Value(0)).current;
-  // Wave hand wiggle when modal opens — single rotation pulse so the
-  // header reads as "oh hi grown-up". Web does this via a CSS keyframe
-  // (`animate-wave` + origin-bottom-right); RN gets it via Animated.
-  const waveAnim = useRef(new Animated.Value(0)).current;
+  // Reanimated shared values run on the UI thread via worklets —
+  // animations don't block JS even when the kid is mashing buttons.
+  const shakeX = useSharedValue(0);
+  const waveRotation = useSharedValue(0); // -1..1 → -20deg..20deg
+
+  const containerStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shakeX.value }],
+  }));
+
+  const waveStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${waveRotation.value * 20}deg` }],
+  }));
 
   const triggerShake = useCallback(() => {
-    Animated.sequence([
-      Animated.timing(shakeAnim, {
-        toValue: 10,
-        duration: 60,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: -10,
-        duration: 60,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: 10,
-        duration: 60,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: 0,
-        duration: 60,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [shakeAnim]);
+    shakeX.value = withSequence(
+      withTiming(10, { duration: 60 }),
+      withTiming(-10, { duration: 60 }),
+      withTiming(10, { duration: 60 }),
+      withTiming(0, { duration: 60 }),
+    );
+  }, [shakeX]);
 
-  // Roll a fresh problem each time the modal opens; reset wrong count
-  // and play the wave wiggle. Mirrors web's `useEffect([open])` reset.
+  // Roll a fresh problem each open, play the wave wiggle, reset state.
   useEffect(() => {
     if (!visible) return;
     const next = pickRandomProblem();
     setProblem(next);
     setChoices(buildAnswerChoices(next.answer, true));
     setWrongCount(0);
-    // 0 → 1 → 0 → 1 → 0 mini-wiggle. Same energy as the web wave but
-    // simpler — Animated.sequence is enough; no need for Reanimated.
-    waveAnim.setValue(0);
-    Animated.sequence([
-      Animated.timing(waveAnim, {
-        toValue: 1,
-        duration: 220,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(waveAnim, {
-        toValue: -0.7,
-        duration: 220,
-        useNativeDriver: true,
-      }),
-      Animated.timing(waveAnim, {
-        toValue: 0.8,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(waveAnim, {
-        toValue: 0,
-        duration: 220,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [visible, waveAnim]);
+
+    // Wiggle: 0 → 1 → -0.7 → 0.8 → 0, mirrors the web `animate-wave`
+    // keyframe. Using withSequence + ease-out cubic for a wave-like
+    // settle (rotates around the wrist, peaks then dampens).
+    waveRotation.value = 0;
+    waveRotation.value = withSequence(
+      withTiming(1, { duration: 220, easing: Easing.out(Easing.cubic) }),
+      withTiming(-0.7, { duration: 220 }),
+      withTiming(0.8, { duration: 200 }),
+      withTiming(0, { duration: 220, easing: Easing.out(Easing.cubic) }),
+    );
+  }, [visible, waveRotation]);
 
   const handleCorrect = useCallback(() => {
     onSuccess();
@@ -196,7 +158,7 @@ const ParentalGate = ({
     setChoices((prev) => shuffle(prev));
 
     if (next >= MAX_WRONG_ATTEMPTS) {
-      // Silent close — no "you failed" copy. Web does the same.
+      // Silent close — no "you failed" copy.
       setTimeout(() => onClose(), 450);
     }
   }, [wrongCount, triggerShake, onClose]);
@@ -207,27 +169,12 @@ const ParentalGate = ({
       transparent
       animationType="fade"
       onRequestClose={onClose}
-      // Prevent dismissing by tapping outside — kids will try.
     >
       <View style={styles.overlay}>
-        <Animated.View
-          style={[styles.container, { transform: [{ translateX: shakeAnim }] }]}
-        >
-          {/* Waving hand. faHandWave duotone — primary orange,
-              secondary yellow at full opacity. Wiggles on mount via
-              waveAnim. Replaces the lock icon. */}
-          <Animated.View
-            style={{
-              transform: [
-                {
-                  rotate: waveAnim.interpolate({
-                    inputRange: [-1, 1],
-                    outputRange: ["-20deg", "20deg"],
-                  }),
-                },
-              ],
-            }}
-          >
+        <Animated.View style={[styles.container, containerStyle]}>
+          {/* faHandWave duotone — primary orange, secondary yellow.
+              Wiggles on mount via waveRotation. Replaces the lock. */}
+          <Animated.View style={waveStyle}>
             <FontAwesomeIcon
               icon={faHandWave}
               size={56}
@@ -240,17 +187,14 @@ const ParentalGate = ({
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>
 
-          {/* The sum. Soft cream pill matches the wizard's tile
-              styling on web (bg-paper-cream / rounded-2xl). */}
+          {/* The sum. Soft cream pill matches web's bg-paper-cream. */}
           <View style={styles.sumPill} accessibilityLiveRegion="polite">
             <Text style={styles.sumText}>
               {problem.a} + {problem.b} = ?
             </Text>
           </View>
 
-          {/* Three chunky circular answer buttons. Same vocabulary as
-              the wizard's Dice / Next / Create — brand-orange fill,
-              white text, active:scale-95. */}
+          {/* Three chunky circular answer buttons. */}
           <View style={styles.answersRow} accessibilityRole="radiogroup">
             {choices.map((n, idx) => (
               <Pressable
@@ -270,10 +214,6 @@ const ParentalGate = ({
             ))}
           </View>
 
-          {/* Helper hint at the bottom — web shows a single small line
-              of warm reassurance text. No bottom cancel button (web
-              omits it too); modal swipes / back gesture / `onRequestClose`
-              are the dismiss affordance. */}
           <Text style={styles.hint}>
             Adults: tap the right answer to continue.
           </Text>
@@ -348,8 +288,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.crayonOrange,
     alignItems: "center",
     justifyContent: "center",
-    // Chunky bottom-drop shadow in the dark-orange shade — mirrors
-    // web's [--bottom:] chunky shadow on primary buttons.
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.18,
