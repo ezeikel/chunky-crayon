@@ -15,6 +15,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import Feed from "@/components/Feed/Feed";
+import MyRecentCreations from "@/components/MyRecentCreations";
 import CreateColoringImageForm from "@/components/forms/CreateColoringImageForm/CreateColoringImageForm";
 import ColoAvatar from "@/components/ColoAvatar";
 import AppHeader from "@/components/AppHeader";
@@ -166,6 +167,9 @@ const HomeScreen = () => {
               <CreateColoringImageForm />
             </View>
           </View>
+
+          {/* Recent creations strip — kid's active workbench. */}
+          <MyRecentCreations />
 
           <View style={{ marginTop: 16 }}>
             <Feed />
