@@ -19,6 +19,7 @@ import CreateColoringImageForm from "@/components/forms/CreateColoringImageForm/
 import ColoAvatar from "@/components/ColoAvatar";
 import AppHeader from "@/components/AppHeader";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
+import ColoBottomSheet from "@/components/ColoBottomSheet";
 import { useColoContext } from "@/contexts";
 import useHeaderData from "@/hooks/useHeaderData";
 
@@ -27,6 +28,7 @@ const padding = 20;
 const HomeScreen = () => {
   const [screenWidth] = useState(Dimensions.get("window").width);
   const [isProfileSwitcherOpen, setIsProfileSwitcherOpen] = useState(false);
+  const [isColoSheetOpen, setIsColoSheetOpen] = useState(false);
   const { coloState, isLoading: coloLoading } = useColoContext();
   const headerData = useHeaderData();
 
@@ -54,6 +56,7 @@ const HomeScreen = () => {
           stickerCount={headerData.stickerCount}
           profileName={headerData.profileName}
           coloStage={headerData.coloStage}
+          onColoPress={() => setIsColoSheetOpen(true)}
           onProfilePress={() => setIsProfileSwitcherOpen(true)}
         />
         <ScrollView
@@ -173,6 +176,12 @@ const HomeScreen = () => {
       <ProfileSwitcher
         isOpen={isProfileSwitcherOpen}
         onClose={() => setIsProfileSwitcherOpen(false)}
+      />
+
+      <ColoBottomSheet
+        isOpen={isColoSheetOpen}
+        onClose={() => setIsColoSheetOpen(false)}
+        coloState={coloState}
       />
     </View>
   );

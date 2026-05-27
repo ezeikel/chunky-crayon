@@ -39,30 +39,77 @@ const HeaderIndicator = ({
 type ProfileSwitcherProps = {
   name: string;
   coloStage: ColoStage;
+  /**
+   * Backwards-compat — when only `onPress` is given, the whole pill
+   * triggers it. Newer call sites pass `onColoPress` + `onProfilePress`
+   * separately so the Colo avatar opens the Colo detail sheet while
+   * the name+chevron half opens the profile switcher.
+   */
   onPress?: () => void;
+  onColoPress?: () => void;
+  onProfilePress?: () => void;
 };
 
 const ProfileSwitcher = ({
   name,
   coloStage,
   onPress,
-}: ProfileSwitcherProps) => (
-  <Pressable
-    style={({ pressed }) => [
-      styles.profileSwitcher,
-      pressed && styles.profileSwitcherPressed,
-    ]}
-    onPress={onPress}
-  >
-    <View style={styles.avatarContainer}>
-      <ColoAvatar stage={coloStage} size="xs" enableTapReactions={false} />
+  onColoPress,
+  onProfilePress,
+}: ProfileSwitcherProps) => {
+  // If callers pass split handlers, render two distinct tap zones
+  // inside the shared pill chrome. Otherwise fall back to the old
+  // single-Pressable shape.
+  const hasSplit = onColoPress != null || onProfilePress != null;
+
+  if (!hasSplit) {
+    return (
+      <Pressable
+        style={({ pressed }) => [
+          styles.profileSwitcher,
+          pressed && styles.profileSwitcherPressed,
+        ]}
+        onPress={onPress}
+      >
+        <View style={styles.avatarContainer}>
+          <ColoAvatar stage={coloStage} size="xs" enableTapReactions={false} />
+        </View>
+        <Text style={styles.profileName} numberOfLines={1}>
+          {name}
+        </Text>
+        <FontAwesomeIcon icon={faChevronDown} size={10} color="#9CA3AF" />
+      </Pressable>
+    );
+  }
+
+  return (
+    <View style={styles.profileSwitcher}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.coloTap,
+          pressed && styles.profileSwitcherPressed,
+        ]}
+        onPress={onColoPress}
+        accessibilityLabel="Open Colo details"
+      >
+        <ColoAvatar stage={coloStage} size="xs" enableTapReactions={false} />
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => [
+          styles.profileTap,
+          pressed && styles.profileSwitcherPressed,
+        ]}
+        onPress={onProfilePress}
+        accessibilityLabel={`Switch profile, current: ${name}`}
+      >
+        <Text style={styles.profileName} numberOfLines={1}>
+          {name}
+        </Text>
+        <FontAwesomeIcon icon={faChevronDown} size={10} color="#9CA3AF" />
+      </Pressable>
     </View>
-    <Text style={styles.profileName} numberOfLines={1}>
-      {name}
-    </Text>
-    <FontAwesomeIcon icon={faChevronDown} size={10} color="#9CA3AF" />
-  </Pressable>
-);
+  );
+};
 
 type AppHeaderProps = {
   credits?: number;
@@ -74,6 +121,13 @@ type AppHeaderProps = {
   onChallengePress?: () => void;
   onStickersPress?: () => void;
   onProfilePress?: () => void;
+  /**
+   * Optional. When given, tapping the Colo avatar inside the profile
+   * pill opens the Colo detail sheet (instead of falling through to
+   * onProfilePress). Web's kid-friendly Colo dropdown maps to this
+   * on mobile — see ColoBottomSheet.
+   */
+  onColoPress?: () => void;
 };
 
 const AppHeader = ({
@@ -86,6 +140,7 @@ const AppHeader = ({
   onChallengePress,
   onStickersPress,
   onProfilePress,
+  onColoPress,
 }: AppHeaderProps) => {
   const insets = useSafeAreaInsets();
 
@@ -133,11 +188,16 @@ const AppHeader = ({
         />
       </View>
 
-      {/* Right side - Profile Switcher */}
+      {/* Right side - Profile Switcher. Split tap zones when callers
+          give onColoPress (Colo avatar opens Colo detail sheet, rest
+          opens profile switcher). Falls back to single onPress
+          otherwise — keeps existing tab-screen callsites working. */}
       <ProfileSwitcher
         name={profileName}
         coloStage={coloStage}
-        onPress={onProfilePress}
+        onPress={onColoPress == null ? onProfilePress : undefined}
+        onColoPress={onColoPress}
+        onProfilePress={onColoPress == null ? undefined : onProfilePress}
       />
     </View>
   );
@@ -240,6 +300,23 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
+  },
+  // Split-mode tap zones — sit inside the profile pill chrome so the
+  // pill still looks like one element while reading as two tap targets.
+  coloTap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profileTap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
   },
   profileName: {
     fontFamily: "TondoTrial-Bold",
