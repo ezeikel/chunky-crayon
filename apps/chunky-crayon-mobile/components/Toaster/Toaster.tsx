@@ -165,6 +165,12 @@ const Toaster = (props: ToasterProps) => (
     toastOptions={{
       // Default (no variant) — purple loading card.
       style: variantTint("loading"),
+      // Force the icon + text + close-X row to vertically center even
+      // when there's a description. Sonner-native's default flips
+      // `alignItems` to `stretch` when a description exists, which
+      // pins the close X to the top of the card. Web keeps the close
+      // centered, so we do the same.
+      toastContentStyle: { alignItems: "center" },
       // Title: 1rem, 700 weight, tight line-height.
       titleStyle: {
         fontWeight: "700",
