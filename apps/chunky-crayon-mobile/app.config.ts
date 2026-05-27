@@ -93,7 +93,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       [
-        "@jamsch/expo-speech-recognition",
+        "expo-speech-recognition",
         {
           microphonePermission:
             "Allow Chunky Crayon to use the microphone to hear your coloring ideas",

@@ -14,7 +14,7 @@ import * as Haptics from "expo-haptics";
 import {
   ExpoSpeechRecognitionModule,
   useSpeechRecognitionEvent,
-} from "@jamsch/expo-speech-recognition";
+} from "expo-speech-recognition";
 import { useInputMode } from "./InputModeContext";
 import Spinner from "@/components/Spinner/Spinner";
 
