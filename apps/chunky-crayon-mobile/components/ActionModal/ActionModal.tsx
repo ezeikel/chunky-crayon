@@ -24,9 +24,16 @@ import {
   writeAsStringAsync,
   EncodingType,
 } from "expo-file-system/legacy";
+import { toast } from "sonner-native";
 import { useCanvasStore } from "@/stores/canvasStore";
 import ParentalGate from "@/components/ParentalGate";
 import { tapLight, tapMedium, tapHeavy, notifySuccess } from "@/utils/haptics";
+
+// Transient error message kept consistent across the modal so the kid
+// (and their parent) sees the same wording whatever failed.
+const SAVE_FAIL_MSG = "Couldn't save your artwork. Please try again.";
+const SHARE_FAIL_MSG = "Couldn't share your artwork. Please try again.";
+const CAPTURE_FAIL_MSG = "Couldn't capture your artwork.";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -56,7 +63,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
   // Save to Photos handler
   const handleSaveToPhotos = useCallback(async () => {
     if (!captureCanvas) {
-      Alert.alert("Oops!", "Unable to save your artwork. Please try again.");
+      toast.error(SAVE_FAIL_MSG);
       return;
     }
 
@@ -75,7 +82,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
 
       const dataUrl = captureCanvas();
       if (!dataUrl) {
-        Alert.alert("Oops!", "Failed to capture artwork.");
+        toast.error(CAPTURE_FAIL_MSG);
         return;
       }
 
@@ -93,11 +100,11 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
 
       tapHeavy();
       notifySuccess();
-      Alert.alert("Saved!", "Your artwork is in your photo library!");
+      toast.success("Saved to your photo library!");
       onClose();
     } catch (error) {
       console.error("Save error:", error);
-      Alert.alert("Oops!", "Failed to save artwork. Please try again.");
+      toast.error(SAVE_FAIL_MSG);
     } finally {
       setIsSaving(false);
     }
@@ -106,7 +113,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
   // Share button handler - opens parental gate first
   const handleSharePress = useCallback(() => {
     if (!captureCanvas) {
-      Alert.alert("Oops!", "Unable to share your artwork. Please try again.");
+      toast.error(SHARE_FAIL_MSG);
       return;
     }
     tapLight();
@@ -118,7 +125,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
     setShowShareGate(false);
 
     if (!captureCanvas) {
-      Alert.alert("Oops!", "Unable to share your artwork. Please try again.");
+      toast.error(SHARE_FAIL_MSG);
       return;
     }
 
@@ -126,7 +133,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
     try {
       const dataUrl = captureCanvas();
       if (!dataUrl) {
-        Alert.alert("Oops!", "Failed to capture artwork.");
+        toast.error(CAPTURE_FAIL_MSG);
         return;
       }
 
@@ -148,11 +155,11 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
         });
         onClose();
       } else {
-        Alert.alert("Oops!", "Sharing is not available on this device.");
+        toast.error("Sharing isn't available on this device.");
       }
     } catch (error) {
       console.error("Share error:", error);
-      Alert.alert("Oops!", "Failed to share artwork. Please try again.");
+      toast.error(SHARE_FAIL_MSG);
     } finally {
       setIsSharing(false);
     }
@@ -161,7 +168,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
   // My Artwork handler - saves to local gallery
   const handleMyArtwork = useCallback(async () => {
     if (!captureCanvas) {
-      Alert.alert("Oops!", "Unable to save your artwork. Please try again.");
+      toast.error(SAVE_FAIL_MSG);
       return;
     }
 
@@ -180,7 +187,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
 
       const dataUrl = captureCanvas();
       if (!dataUrl) {
-        Alert.alert("Oops!", "Failed to capture artwork.");
+        toast.error(CAPTURE_FAIL_MSG);
         return;
       }
 
@@ -198,14 +205,11 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
 
       tapHeavy();
       notifySuccess();
-      Alert.alert(
-        "Added to My Artwork!",
-        "Your masterpiece is saved to your collection!",
-      );
+      toast.success("Added to your collection!");
       onClose();
     } catch (error) {
       console.error("Save error:", error);
-      Alert.alert("Oops!", "Failed to save artwork. Please try again.");
+      toast.error(SAVE_FAIL_MSG);
     } finally {
       setIsSaving(false);
     }
