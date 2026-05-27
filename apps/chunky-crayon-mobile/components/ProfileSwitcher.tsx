@@ -14,13 +14,13 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faUser,
   faPlus,
   faCheck,
   faPencil,
   faTrash,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
+import ProfileAvatar from "@/components/ProfileAvatar";
 import {
   useProfiles,
   useActiveProfile,
@@ -259,23 +259,12 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
                     onPress={() => !isEditing && handleSelectProfile(profile)}
                     disabled={isEditing}
                   >
-                    <View
-                      style={[
-                        styles.avatarContainer,
-                        profile.id === activeProfile?.id &&
-                          styles.avatarContainerActive,
-                      ]}
-                    >
-                      <FontAwesomeIcon
-                        icon={faUser}
-                        size={20}
-                        color={
-                          profile.id === activeProfile?.id
-                            ? "#FFFFFF"
-                            : "#E46444"
-                        }
-                      />
-                    </View>
+                    <ProfileAvatar
+                      avatarId={profile.avatarId}
+                      name={profile.name}
+                      size="md"
+                      showBorder={profile.id === activeProfile?.id}
+                    />
                     <View style={styles.profileInfo}>
                       <Text style={styles.profileName}>{profile.name}</Text>
                       <Text style={styles.profileMeta}>
