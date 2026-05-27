@@ -1,27 +1,32 @@
 import { useState } from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { getAvatar, getInitials } from "@/lib/avatars";
-import { resolveR2Url } from "@/lib/r2-url";
 import { COLORS, FONTS } from "@/lib/design";
 
 /**
- * Profile avatar render. Mobile port of web's
+ * Profile avatar render. Mobile port of
  * apps/chunky-crayon-web/components/ProfileAvatar/ProfileAvatar.tsx.
  *
- * An illustrated tile from R2 sitting on a soft tinted circular
- * background. `resolveR2Url` builds the URL from the catalog entry's
- * imageKey + `EXPO_PUBLIC_R2_PUBLIC_URL`. Falls back to a grey
- * initials chip when:
- *   - the avatarId has no catalog match (unknown id)
- *   - the env var isn't set (dev surfaces without R2)
- *   - the image fails to load
+ * An illustrated tile sitting on a soft tinted circular background.
+ * The PNG comes from the bundled `assets/profile-avatars/` dir (not
+ * R2 like the web app) — fast first-paint, works offline, no network
+ * dependency for a static asset that's never user-uploaded.
+ *
+ * `expo-image` over RN's default Image because it ships proper
+ * SDWebImage / Coil caching, decode-on-background-thread, and a
+ * smoother fade-in than the RN default.
+ *
+ * Falls back to a grey initials chip when the avatarId has no
+ * catalog match (unknown id) or — extremely rarely — the bundled
+ * asset fails to decode.
  *
  * The illustration is pulled in from the circular edge by ~12% on
  * each side so tall features (unicorn horn, dragon spikes, ghost
  * tendrils) stay inside the inscribed circle when the round mask
- * clips. The generated PNGs use the full square — so anything in the
- * corners gets cut by the rounded mask without this safety margin.
- * Same value web uses (`p-[12%]` Tailwind).
+ * clips. The 256² source PNGs use the full square (subject filling
+ * edge to edge) so without the safety margin the four corners get
+ * clipped by the rounded mask.
  */
 
 type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
@@ -92,10 +97,7 @@ const ProfileAvatar = ({
     </View>
   );
 
-  if (!avatar) return renderInitialsFallback();
-
-  const imageUrl = resolveR2Url(avatar.imageKey);
-  if (!imageUrl || imageError) return renderInitialsFallback();
+  if (!avatar || imageError) return renderInitialsFallback();
 
   return (
     <View
@@ -107,9 +109,10 @@ const ProfileAvatar = ({
       accessibilityLabel={name ? `${name}'s avatar` : avatar.name}
     >
       <Image
-        source={{ uri: imageUrl }}
+        source={avatar.image}
         style={styles.image}
-        resizeMode="contain"
+        contentFit="contain"
+        transition={150}
         onError={() => setImageError(true)}
       />
     </View>

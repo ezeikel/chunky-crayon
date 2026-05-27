@@ -2,27 +2,38 @@
  * Avatar catalog for profile selection. Mobile-side duplicate of
  * apps/chunky-crayon-web/lib/avatars.ts.
  *
- * The catalog ids + R2 imageKeys are the shared contract; the `bg`
- * value differs from web because web ships Tailwind class names
- * (`bg-crayon-green/15`) that don't apply on React Native. Here we
- * resolve to explicit RGBA strings using mobile's CRAYON_PALETTE,
- * with ~15% alpha to match web's `/15` Tailwind opacity modifier.
+ * On web the catalog stores R2 keys (`profile-avatars/dragon.png`)
+ * resolved at render time via `NEXT_PUBLIC_R2_PUBLIC_URL`. On mobile
+ * we bundle the PNGs directly into the app under
+ * `assets/profile-avatars/` and `require()` them so:
+ *   - first profile-switcher render is instant (no R2 fetch)
+ *   - the app works offline
+ *   - kids on slow connections don't see a 2s grey-initials chip
+ *     before the PNG appears
  *
- * Adding / removing an avatar: also update the web catalog, run
- * `scripts/generate-profile-avatars.ts` on the web side to produce
- * the PNG (uploaded to R2 under `profile-avatars/<id>.png`), and
- * include the new id in LEGACY_AVATAR_MAP only if it replaces an
- * older id that's already saved in profile rows.
+ * The bundled PNGs are 256×256 (2× retina headroom for xl=128px)
+ * vs the 1024² web originals. To add a new avatar:
+ *   1. Update web's catalog + run scripts/generate-profile-avatars.ts
+ *      to produce + upload to R2.
+ *   2. Copy the new R2 PNG into this dir, resize to 256² with sips
+ *      (sips --resampleHeightWidth 256 256 file.png --out file.png).
+ *   3. Add the entry below + require() the new path.
+ *
+ * `bg` differs from web because web ships Tailwind class names
+ * (`bg-crayon-green/15`) that don't apply on RN. Here we resolve to
+ * explicit RGBA strings using mobile's CRAYON_PALETTE, with ~15%
+ * alpha to match web's `/15` Tailwind opacity modifier.
  */
 
+import type { ImageSourcePropType } from "react-native";
 import { CRAYON_PALETTE } from "@/lib/design";
 
 export type Avatar = {
   id: string;
-  /** Display label (used as accessibility label + initials fallback). */
+  /** Display label (a11y label + initials fallback). */
   name: string;
-  /** R2 key, resolved at render time by `resolveR2Url`. */
-  imageKey: string;
+  /** Bundled PNG asset — `require()` of the 256² file. */
+  image: ImageSourcePropType;
   /** Soft tinted background colour behind the illustration. */
   bg: string;
 };
@@ -41,75 +52,75 @@ export const AVATARS: Avatar[] = [
   {
     id: "dragon",
     name: "Dragon",
-    imageKey: "profile-avatars/dragon.png",
+    image: require("@/assets/profile-avatars/dragon.png"),
     bg: tint(CRAYON_PALETTE.green),
   },
   {
     id: "unicorn",
     name: "Unicorn",
-    imageKey: "profile-avatars/unicorn.png",
+    image: require("@/assets/profile-avatars/unicorn.png"),
     bg: tint(CRAYON_PALETTE.purple),
   },
   {
     id: "mermaid",
     name: "Mermaid",
-    imageKey: "profile-avatars/mermaid.png",
+    image: require("@/assets/profile-avatars/mermaid.png"),
     bg: tint(CRAYON_PALETTE.blue),
   },
   {
     id: "ghost",
     name: "Ghost",
-    imageKey: "profile-avatars/ghost.png",
+    image: require("@/assets/profile-avatars/ghost.png"),
     bg: PAPER_CREAM_DARK_TINT,
   },
   // Roleplay / costume identities (3) — face-with-iconic-prop tier.
   {
     id: "superhero",
     name: "Superhero",
-    imageKey: "profile-avatars/superhero.png",
+    image: require("@/assets/profile-avatars/superhero.png"),
     bg: tint(CRAYON_PALETTE.pink),
   },
   {
     id: "astronaut",
     name: "Astronaut",
-    imageKey: "profile-avatars/astronaut.png",
+    image: require("@/assets/profile-avatars/astronaut.png"),
     bg: tint(CRAYON_PALETTE.blue),
   },
   {
     id: "wizard",
     name: "Wizard",
-    imageKey: "profile-avatars/wizard.png",
+    image: require("@/assets/profile-avatars/wizard.png"),
     bg: tint(CRAYON_PALETTE.purple),
   },
   {
     id: "alien",
     name: "Alien",
-    imageKey: "profile-avatars/alien.png",
+    image: require("@/assets/profile-avatars/alien.png"),
     bg: tint(CRAYON_PALETTE.green),
   },
   {
     id: "rocket",
     name: "Rocket",
-    imageKey: "profile-avatars/rocket.png",
+    image: require("@/assets/profile-avatars/rocket.png"),
     bg: tint(CRAYON_PALETTE.blue),
   },
   // Friendly objects / shapes (3) — abstract no-bias picks.
   {
     id: "ice-cream",
     name: "Ice Cream",
-    imageKey: "profile-avatars/ice-cream.png",
+    image: require("@/assets/profile-avatars/ice-cream.png"),
     bg: tint(CRAYON_PALETTE.pink),
   },
   {
     id: "sun",
     name: "Sun",
-    imageKey: "profile-avatars/sun.png",
+    image: require("@/assets/profile-avatars/sun.png"),
     bg: tint(CRAYON_PALETTE.yellow, "33"),
   },
   {
     id: "rainbow",
     name: "Rainbow",
-    imageKey: "profile-avatars/rainbow.png",
+    image: require("@/assets/profile-avatars/rainbow.png"),
     bg: tint(CRAYON_PALETTE.blue),
   },
 ];

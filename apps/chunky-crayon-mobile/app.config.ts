@@ -65,6 +65,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       "expo-secure-store",
       "expo-sharing",
       "expo-status-bar",
+      "expo-image",
       "@react-native-google-signin/google-signin",
       [
         "react-native-fbsdk-next",
