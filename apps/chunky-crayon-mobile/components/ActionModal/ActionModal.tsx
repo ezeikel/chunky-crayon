@@ -4,7 +4,6 @@ import {
   Text,
   Pressable,
   StyleSheet,
-  Alert,
   Modal,
   Dimensions,
 } from "react-native";
@@ -24,9 +23,10 @@ import {
   writeAsStringAsync,
   EncodingType,
 } from "expo-file-system/legacy";
-import { toast } from "sonner-native";
+import { toast } from "@/components/Toaster";
 import { useCanvasStore } from "@/stores/canvasStore";
 import ParentalGate from "@/components/ParentalGate";
+import ConfirmSheet from "@/components/ConfirmSheet";
 import { tapLight, tapMedium, tapHeavy, notifySuccess } from "@/utils/haptics";
 
 // Transient error message kept consistent across the modal so the kid
@@ -57,6 +57,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [showShareGate, setShowShareGate] = useState(false);
+  const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
 
   const { captureCanvas, reset, setTool, setBrushType } = useCanvasStore();
 
@@ -73,8 +74,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
       // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(
-          "Permission Needed",
+        toast.error(
           "Please allow access to your photo library to save your artwork.",
         );
         return;
@@ -178,8 +178,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
       // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(
-          "Permission Needed",
+        toast.error(
           "Please allow access to your photo library to save your artwork.",
         );
         return;
@@ -218,25 +217,16 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
   // Start Over handler
   const handleStartOver = useCallback(() => {
     tapLight();
-    Alert.alert(
-      "Start Over?",
-      "Are you sure? This will erase all your coloring!",
-      [
-        { text: "No, Keep It", style: "cancel" },
-        {
-          text: "Yes, Start Over",
-          style: "destructive",
-          onPress: () => {
-            tapHeavy();
-            reset();
-            setTool("brush");
-            setBrushType("crayon");
-            notifySuccess();
-            onClose();
-          },
-        },
-      ],
-    );
+    setShowStartOverConfirm(true);
+  }, []);
+
+  const confirmStartOver = useCallback(() => {
+    tapHeavy();
+    reset();
+    setTool("brush");
+    setBrushType("crayon");
+    notifySuccess();
+    onClose();
   }, [reset, setTool, setBrushType, onClose]);
 
   return (
@@ -333,6 +323,18 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
         onSuccess={handleShareConfirmed}
         title="Share Artwork"
         subtitle="A parent or guardian needs to verify before sharing"
+      />
+
+      {/* Start Over confirmation */}
+      <ConfirmSheet
+        isOpen={showStartOverConfirm}
+        onClose={() => setShowStartOverConfirm(false)}
+        title="Start over?"
+        description="Are you sure? This will erase all your coloring!"
+        confirmLabel="Yes, Start Over"
+        cancelLabel="No, Keep It"
+        onConfirm={confirmStartOver}
+        tone="destructive"
       />
     </Modal>
   );

@@ -1,12 +1,6 @@
 import { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  Alert,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { toast } from "@/components/Toaster";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCameraRetro, faImages } from "@fortawesome/pro-duotone-svg-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -66,10 +60,7 @@ const ImageInputPanel = ({
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(
-          "Camera Permission",
-          "We need camera access to take photos!",
-        );
+        toast.error("Camera access is needed to take photos.");
         return;
       }
 
@@ -89,7 +80,7 @@ const ImageInputPanel = ({
       }
     } catch (error) {
       console.error("Failed to take photo:", error);
-      Alert.alert("Error", "Failed to take photo. Please try again.");
+      toast.error("Couldn't take photo. Please try again.");
     }
   }, []);
 
@@ -98,10 +89,7 @@ const ImageInputPanel = ({
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(
-          "Photo Library Permission",
-          "We need access to your photos!",
-        );
+        toast.error("Photo library access is needed to pick a picture.");
         return;
       }
 
@@ -121,7 +109,7 @@ const ImageInputPanel = ({
       }
     } catch (error) {
       console.error("Failed to pick image:", error);
-      Alert.alert("Error", "Failed to select image. Please try again.");
+      toast.error("Couldn't pick that image. Please try again.");
     }
   }, []);
 
@@ -146,21 +134,17 @@ const ImageInputPanel = ({
         onColoringImageCreated(response.coloringImage);
       } else if (response.error) {
         setError(response.error);
-        Alert.alert("Generation Failed", response.error);
+        toast.error(response.error);
       } else {
         setError("Failed to create coloring page from photo.");
-        Alert.alert(
-          "Generation Failed",
-          "We couldn't create a coloring page from your photo. Please try again!",
+        toast.error(
+          "Couldn't make a coloring page from your photo. Try again!",
         );
       }
     } catch (error) {
       console.error("Failed to generate coloring page:", error);
       setError("Something went wrong. Please try again.");
-      Alert.alert(
-        "Processing Error",
-        "Something went wrong while creating your coloring page. Please try again!",
-      );
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsProcessing(false);
     }

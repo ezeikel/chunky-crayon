@@ -5,9 +5,10 @@ import {
   StyleSheet,
   Pressable,
   TextInput,
-  Alert,
   ActivityIndicator,
 } from "react-native";
+import { toast } from "@/components/Toaster";
+import ConfirmSheet from "@/components/ConfirmSheet";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
@@ -63,6 +64,10 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
     useState<string>(DEFAULT_AVATAR_ID);
   const [editProfileName, setEditProfileName] = useState("");
 
+  // Delete-profile confirm sheet
+  const [deleteTargetProfile, setDeleteTargetProfile] =
+    useState<Profile | null>(null);
+
   const handleSheetChanges = useCallback(
     (index: number) => {
       if (index === -1) {
@@ -98,13 +103,13 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
       await setActiveProfile.mutateAsync(profile.id);
       onClose();
     } catch {
-      Alert.alert("Error", "Failed to switch profile. Please try again.");
+      toast.error("Couldn't switch profile. Please try again.");
     }
   };
 
   const handleCreateProfile = async () => {
     if (!newProfileName.trim()) {
-      Alert.alert("Error", "Please enter a profile name.");
+      toast.error("Please enter a profile name.");
       return;
     }
 
@@ -117,7 +122,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
       setNewProfileAvatarId(DEFAULT_AVATAR_ID);
       setIsCreating(false);
     } catch {
-      Alert.alert("Error", "Failed to create profile. Please try again.");
+      toast.error("Couldn't create profile. Please try again.");
     }
   };
 
@@ -137,7 +142,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
       setEditingProfileId(null);
       setEditProfileName("");
     } catch {
-      Alert.alert("Error", "Failed to update profile. Please try again.");
+      toast.error("Couldn't update profile. Please try again.");
     }
   };
 
@@ -148,31 +153,21 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
 
   const handleDeleteProfile = (profile: Profile) => {
     if (profiles.length <= 1) {
-      Alert.alert("Cannot Delete", "You must have at least one profile.");
+      toast.error("You must have at least one profile.");
       return;
     }
+    setDeleteTargetProfile(profile);
+  };
 
-    Alert.alert(
-      "Delete Profile",
-      `Are you sure you want to delete "${profile.name}"? This will also delete all their saved artwork.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteProfileMutation.mutateAsync(profile.id);
-            } catch {
-              Alert.alert(
-                "Error",
-                "Failed to delete profile. Please try again.",
-              );
-            }
-          },
-        },
-      ],
-    );
+  const confirmDeleteProfile = async () => {
+    if (!deleteTargetProfile) return;
+    try {
+      await deleteProfileMutation.mutateAsync(deleteTargetProfile.id);
+    } catch {
+      toast.error("Couldn't delete profile. Please try again.");
+    } finally {
+      setDeleteTargetProfile(null);
+    }
   };
 
   // Control bottom sheet visibility
@@ -187,228 +182,249 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
   const canAddProfile = profiles.length < MAX_PROFILES;
 
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={-1}
-      snapPoints={snapPoints}
-      onChange={handleSheetChanges}
-      backdropComponent={renderBackdrop}
-      enablePanDownToClose
-      backgroundStyle={styles.sheetBackground}
-      handleIndicatorStyle={styles.handleIndicator}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profiles</Text>
-        <Pressable
-          style={styles.editButton}
-          onPress={() => setIsEditing(!isEditing)}
-        >
-          <Text style={styles.editButtonText}>
-            {isEditing ? "Done" : "Edit"}
-          </Text>
-        </Pressable>
-      </View>
+    <>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        backdropComponent={renderBackdrop}
+        enablePanDownToClose
+        backgroundStyle={styles.sheetBackground}
+        handleIndicatorStyle={styles.handleIndicator}
+      >
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Profiles</Text>
+          <Pressable
+            style={styles.editButton}
+            onPress={() => setIsEditing(!isEditing)}
+          >
+            <Text style={styles.editButtonText}>
+              {isEditing ? "Done" : "Edit"}
+            </Text>
+          </Pressable>
+        </View>
 
-      <BottomSheetScrollView contentContainerStyle={styles.content}>
-        {profilesLoading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#E46444" />
-          </View>
-        ) : (
-          <>
-            {/* Profile List */}
-            {profiles.map((profile) => (
-              <View key={profile.id} style={styles.profileRow}>
-                {editingProfileId === profile.id ? (
-                  // Edit mode for this profile
-                  <View style={styles.editRow}>
-                    <TextInput
-                      style={styles.editInput}
-                      value={editProfileName}
-                      onChangeText={setEditProfileName}
-                      placeholder="Profile name"
-                      placeholderTextColor="#9CA3AF"
-                      autoFocus
-                      maxLength={20}
-                    />
-                    <Pressable
-                      style={styles.editActionButton}
-                      onPress={handleSaveEdit}
-                      disabled={updateProfileMutation.isPending}
-                    >
-                      {updateProfileMutation.isPending ? (
-                        <ActivityIndicator size="small" color="#22C55E" />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          size={18}
-                          color="#22C55E"
-                        />
-                      )}
-                    </Pressable>
-                    <Pressable
-                      style={styles.editActionButton}
-                      onPress={handleCancelEdit}
-                    >
-                      <FontAwesomeIcon
-                        icon={faXmark}
-                        size={18}
-                        color="#9CA3AF"
+        <BottomSheetScrollView contentContainerStyle={styles.content}>
+          {profilesLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#E46444" />
+            </View>
+          ) : (
+            <>
+              {/* Profile List */}
+              {profiles.map((profile) => (
+                <View key={profile.id} style={styles.profileRow}>
+                  {editingProfileId === profile.id ? (
+                    // Edit mode for this profile
+                    <View style={styles.editRow}>
+                      <TextInput
+                        style={styles.editInput}
+                        value={editProfileName}
+                        onChangeText={setEditProfileName}
+                        placeholder="Profile name"
+                        placeholderTextColor="#9CA3AF"
+                        autoFocus
+                        maxLength={20}
                       />
-                    </Pressable>
-                  </View>
-                ) : (
-                  // Normal profile row
-                  <Pressable
-                    style={[
-                      styles.profileItem,
-                      profile.id === activeProfile?.id &&
-                        styles.profileItemActive,
-                    ]}
-                    onPress={() => !isEditing && handleSelectProfile(profile)}
-                    disabled={isEditing}
-                  >
-                    <ProfileAvatar
-                      avatarId={profile.avatarId}
-                      name={profile.name}
-                      size="md"
-                      showBorder={profile.id === activeProfile?.id}
-                    />
-                    <View style={styles.profileInfo}>
-                      <Text style={styles.profileName}>{profile.name}</Text>
-                      <Text style={styles.profileMeta}>
-                        {profile.artworkCount} artwork
-                        {profile.artworkCount !== 1 ? "s" : ""}
-                      </Text>
-                    </View>
-                    {profile.id === activeProfile?.id && !isEditing && (
-                      <View style={styles.activeIndicator}>
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          size={16}
-                          color="#22C55E"
-                        />
-                      </View>
-                    )}
-                    {isEditing && (
-                      <View style={styles.editActions}>
-                        <Pressable
-                          style={styles.editActionButton}
-                          onPress={() => handleStartEdit(profile)}
-                        >
+                      <Pressable
+                        style={styles.editActionButton}
+                        onPress={handleSaveEdit}
+                        disabled={updateProfileMutation.isPending}
+                      >
+                        {updateProfileMutation.isPending ? (
+                          <ActivityIndicator size="small" color="#22C55E" />
+                        ) : (
                           <FontAwesomeIcon
-                            icon={faPencil}
-                            size={16}
-                            color="#6B7280"
+                            icon={faCheck}
+                            size={18}
+                            color="#22C55E"
                           />
-                        </Pressable>
-                        {!profile.isDefault && (
+                        )}
+                      </Pressable>
+                      <Pressable
+                        style={styles.editActionButton}
+                        onPress={handleCancelEdit}
+                      >
+                        <FontAwesomeIcon
+                          icon={faXmark}
+                          size={18}
+                          color="#9CA3AF"
+                        />
+                      </Pressable>
+                    </View>
+                  ) : (
+                    // Normal profile row
+                    <Pressable
+                      style={[
+                        styles.profileItem,
+                        profile.id === activeProfile?.id &&
+                          styles.profileItemActive,
+                      ]}
+                      onPress={() => !isEditing && handleSelectProfile(profile)}
+                      disabled={isEditing}
+                    >
+                      <ProfileAvatar
+                        avatarId={profile.avatarId}
+                        name={profile.name}
+                        size="md"
+                        showBorder={profile.id === activeProfile?.id}
+                      />
+                      <View style={styles.profileInfo}>
+                        <Text style={styles.profileName}>{profile.name}</Text>
+                        <Text style={styles.profileMeta}>
+                          {profile.artworkCount} artwork
+                          {profile.artworkCount !== 1 ? "s" : ""}
+                        </Text>
+                      </View>
+                      {profile.id === activeProfile?.id && !isEditing && (
+                        <View style={styles.activeIndicator}>
+                          <FontAwesomeIcon
+                            icon={faCheck}
+                            size={16}
+                            color="#22C55E"
+                          />
+                        </View>
+                      )}
+                      {isEditing && (
+                        <View style={styles.editActions}>
                           <Pressable
                             style={styles.editActionButton}
-                            onPress={() => handleDeleteProfile(profile)}
-                            disabled={deleteProfileMutation.isPending}
+                            onPress={() => handleStartEdit(profile)}
                           >
-                            {deleteProfileMutation.isPending ? (
-                              <ActivityIndicator size="small" color="#EF4444" />
-                            ) : (
-                              <FontAwesomeIcon
-                                icon={faTrash}
-                                size={16}
-                                color="#EF4444"
-                              />
-                            )}
+                            <FontAwesomeIcon
+                              icon={faPencil}
+                              size={16}
+                              color="#6B7280"
+                            />
                           </Pressable>
-                        )}
-                      </View>
-                    )}
-                  </Pressable>
-                )}
-              </View>
-            ))}
+                          {!profile.isDefault && (
+                            <Pressable
+                              style={styles.editActionButton}
+                              onPress={() => handleDeleteProfile(profile)}
+                              disabled={deleteProfileMutation.isPending}
+                            >
+                              {deleteProfileMutation.isPending ? (
+                                <ActivityIndicator
+                                  size="small"
+                                  color="#EF4444"
+                                />
+                              ) : (
+                                <FontAwesomeIcon
+                                  icon={faTrash}
+                                  size={16}
+                                  color="#EF4444"
+                                />
+                              )}
+                            </Pressable>
+                          )}
+                        </View>
+                      )}
+                    </Pressable>
+                  )}
+                </View>
+              ))}
 
-            {/* Add Profile Section */}
-            {isCreating ? (
-              <View style={styles.createCard}>
-                {/* Live avatar preview */}
-                <View style={styles.createPreview}>
-                  <ProfileAvatar
-                    avatarId={newProfileAvatarId}
-                    name={newProfileName || "?"}
-                    size="xl"
-                    showBorder
+              {/* Add Profile Section */}
+              {isCreating ? (
+                <View style={styles.createCard}>
+                  {/* Live avatar preview */}
+                  <View style={styles.createPreview}>
+                    <ProfileAvatar
+                      avatarId={newProfileAvatarId}
+                      name={newProfileName || "?"}
+                      size="xl"
+                      showBorder
+                    />
+                    <Text style={styles.createPreviewLabel}>
+                      Pick your character
+                    </Text>
+                  </View>
+
+                  {/* Avatar picker grid */}
+                  <AvatarPicker
+                    selectedAvatarId={newProfileAvatarId}
+                    onSelect={setNewProfileAvatarId}
                   />
-                  <Text style={styles.createPreviewLabel}>
-                    Pick your character
+
+                  {/* Name input */}
+                  <TextInput
+                    style={styles.createInputLarge}
+                    value={newProfileName}
+                    onChangeText={setNewProfileName}
+                    placeholder="What's your name?"
+                    placeholderTextColor="#9CA3AF"
+                    autoFocus
+                    maxLength={20}
+                  />
+
+                  {/* Actions row */}
+                  <View style={styles.createActions}>
+                    <Pressable
+                      style={styles.createCancelButton}
+                      onPress={() => {
+                        setIsCreating(false);
+                        setNewProfileName("");
+                        setNewProfileAvatarId(DEFAULT_AVATAR_ID);
+                      }}
+                    >
+                      <Text style={styles.createCancelText}>Cancel</Text>
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.createButtonLarge,
+                        (!newProfileName.trim() || createProfile.isPending) &&
+                          styles.createButtonDisabled,
+                      ]}
+                      onPress={handleCreateProfile}
+                      disabled={
+                        !newProfileName.trim() || createProfile.isPending
+                      }
+                    >
+                      {createProfile.isPending ? (
+                        <ActivityIndicator size="small" color="#FFFFFF" />
+                      ) : (
+                        <Text style={styles.createButtonText}>Create</Text>
+                      )}
+                    </Pressable>
+                  </View>
+                </View>
+              ) : canAddProfile ? (
+                <Pressable
+                  style={styles.addProfileButton}
+                  onPress={() => setIsCreating(true)}
+                >
+                  <View style={styles.avatarContainerNew}>
+                    <FontAwesomeIcon icon={faPlus} size={20} color="#9CA3AF" />
+                  </View>
+                  <Text style={styles.addProfileText}>Add Profile</Text>
+                </Pressable>
+              ) : (
+                <View style={styles.maxProfilesNote}>
+                  <Text style={styles.maxProfilesText}>
+                    Maximum of {MAX_PROFILES} profiles reached
                   </Text>
                 </View>
+              )}
+            </>
+          )}
+        </BottomSheetScrollView>
+      </BottomSheet>
 
-                {/* Avatar picker grid */}
-                <AvatarPicker
-                  selectedAvatarId={newProfileAvatarId}
-                  onSelect={setNewProfileAvatarId}
-                />
-
-                {/* Name input */}
-                <TextInput
-                  style={styles.createInputLarge}
-                  value={newProfileName}
-                  onChangeText={setNewProfileName}
-                  placeholder="What's your name?"
-                  placeholderTextColor="#9CA3AF"
-                  autoFocus
-                  maxLength={20}
-                />
-
-                {/* Actions row */}
-                <View style={styles.createActions}>
-                  <Pressable
-                    style={styles.createCancelButton}
-                    onPress={() => {
-                      setIsCreating(false);
-                      setNewProfileName("");
-                      setNewProfileAvatarId(DEFAULT_AVATAR_ID);
-                    }}
-                  >
-                    <Text style={styles.createCancelText}>Cancel</Text>
-                  </Pressable>
-                  <Pressable
-                    style={[
-                      styles.createButtonLarge,
-                      (!newProfileName.trim() || createProfile.isPending) &&
-                        styles.createButtonDisabled,
-                    ]}
-                    onPress={handleCreateProfile}
-                    disabled={!newProfileName.trim() || createProfile.isPending}
-                  >
-                    {createProfile.isPending ? (
-                      <ActivityIndicator size="small" color="#FFFFFF" />
-                    ) : (
-                      <Text style={styles.createButtonText}>Create</Text>
-                    )}
-                  </Pressable>
-                </View>
-              </View>
-            ) : canAddProfile ? (
-              <Pressable
-                style={styles.addProfileButton}
-                onPress={() => setIsCreating(true)}
-              >
-                <View style={styles.avatarContainerNew}>
-                  <FontAwesomeIcon icon={faPlus} size={20} color="#9CA3AF" />
-                </View>
-                <Text style={styles.addProfileText}>Add Profile</Text>
-              </Pressable>
-            ) : (
-              <View style={styles.maxProfilesNote}>
-                <Text style={styles.maxProfilesText}>
-                  Maximum of {MAX_PROFILES} profiles reached
-                </Text>
-              </View>
-            )}
-          </>
-        )}
-      </BottomSheetScrollView>
-    </BottomSheet>
+      <ConfirmSheet
+        isOpen={deleteTargetProfile !== null}
+        onClose={() => setDeleteTargetProfile(null)}
+        title="Delete profile?"
+        description={
+          deleteTargetProfile
+            ? `This will erase "${deleteTargetProfile.name}" and all their saved pictures.`
+            : undefined
+        }
+        confirmLabel="Delete"
+        onConfirm={confirmDeleteProfile}
+        tone="destructive"
+      />
+    </>
   );
 };
 

@@ -8,12 +8,13 @@ import {
   Pressable,
   Linking,
   Platform,
-  Alert,
   Switch,
   TextInput,
   ActivityIndicator,
   Modal,
 } from "react-native";
+import { toast } from "@/components/Toaster";
+import ConfirmSheet from "@/components/ConfirmSheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -177,6 +178,9 @@ const SettingsScreen = () => {
   const [subscriptionModalVisible, setSubscriptionModalVisible] =
     useState(false);
 
+  // Sign-out confirm sheet
+  const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
+
   const handleManageProfiles = () => {
     setProfileSwitcherOpen(true);
   };
@@ -196,7 +200,7 @@ const SettingsScreen = () => {
   }, []);
 
   const handleLanguage = () => {
-    Alert.alert("Language", "Language settings coming soon!", [{ text: "OK" }]);
+    toast.info("Language settings coming soon!");
   };
 
   const handleSupport = () => {
@@ -231,22 +235,13 @@ const SettingsScreen = () => {
     setMagicLinkEmail("");
   };
 
-  const handleSignOut = async () => {
-    Alert.alert(
-      "Sign Out",
-      "Are you sure you want to sign out? Your artwork will remain on this device.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Sign Out",
-          style: "destructive",
-          onPress: async () => {
-            await signOut();
-            Alert.alert("Signed Out", "You have been signed out successfully.");
-          },
-        },
-      ],
-    );
+  const handleSignOut = () => {
+    setSignOutConfirmOpen(true);
+  };
+
+  const confirmSignOut = async () => {
+    await signOut();
+    toast.success("You're signed out. Your artwork stays on this device.");
   };
 
   const handleGoogleSignIn = async () => {
@@ -255,15 +250,14 @@ const SettingsScreen = () => {
       const result = await signInWithGoogleHandler();
       if (result) {
         setSignInModalVisible(false);
-        Alert.alert(
-          "Success",
+        toast.success(
           result.wasMerged
-            ? "Your account has been linked and artwork synced!"
-            : "You are now signed in!",
+            ? "Account linked and artwork synced!"
+            : "You're signed in!",
         );
       }
     } catch {
-      Alert.alert("Error", "Failed to sign in with Google. Please try again.");
+      toast.error("Couldn't sign in with Google. Please try again.");
     } finally {
       setSignInLoading(false);
     }
@@ -275,15 +269,14 @@ const SettingsScreen = () => {
       const result = await signInWithAppleHandler();
       if (result) {
         setSignInModalVisible(false);
-        Alert.alert(
-          "Success",
+        toast.success(
           result.wasMerged
-            ? "Your account has been linked and artwork synced!"
-            : "You are now signed in!",
+            ? "Account linked and artwork synced!"
+            : "You're signed in!",
         );
       }
     } catch {
-      Alert.alert("Error", "Failed to sign in with Apple. Please try again.");
+      toast.error("Couldn't sign in with Apple. Please try again.");
     } finally {
       setSignInLoading(false);
     }
@@ -295,18 +288,14 @@ const SettingsScreen = () => {
       const result = await signInWithFacebookHandler();
       if (result) {
         setSignInModalVisible(false);
-        Alert.alert(
-          "Success",
+        toast.success(
           result.wasMerged
-            ? "Your account has been linked and artwork synced!"
-            : "You are now signed in!",
+            ? "Account linked and artwork synced!"
+            : "You're signed in!",
         );
       }
     } catch {
-      Alert.alert(
-        "Error",
-        "Failed to sign in with Facebook. Please try again.",
-      );
+      toast.error("Couldn't sign in with Facebook. Please try again.");
     } finally {
       setSignInLoading(false);
     }
@@ -314,7 +303,7 @@ const SettingsScreen = () => {
 
   const handleSendMagicLink = async () => {
     if (!magicLinkEmail || !magicLinkEmail.includes("@")) {
-      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      toast.error("Please enter a valid email address.");
       return;
     }
 
@@ -324,10 +313,10 @@ const SettingsScreen = () => {
       if (success) {
         setMagicLinkSent(true);
       } else {
-        Alert.alert("Error", "Failed to send magic link. Please try again.");
+        toast.error("Couldn't send magic link. Please try again.");
       }
     } catch {
-      Alert.alert("Error", "Failed to send magic link. Please try again.");
+      toast.error("Couldn't send magic link. Please try again.");
     } finally {
       setSignInLoading(false);
     }
@@ -727,6 +716,17 @@ const SettingsScreen = () => {
       <SubscriptionManager
         visible={subscriptionModalVisible}
         onClose={() => setSubscriptionModalVisible(false)}
+      />
+
+      {/* Sign-out confirmation */}
+      <ConfirmSheet
+        isOpen={signOutConfirmOpen}
+        onClose={() => setSignOutConfirmOpen(false)}
+        title="Sign out?"
+        description="Your artwork will stay on this device."
+        confirmLabel="Sign Out"
+        onConfirm={confirmSignOut}
+        tone="destructive"
       />
     </View>
   );

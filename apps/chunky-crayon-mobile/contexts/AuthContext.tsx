@@ -7,7 +7,7 @@ import React, {
   useMemo,
   ReactNode,
 } from "react";
-import { Alert } from "react-native";
+import { toast } from "@/components/Toaster";
 import { useQueryClient } from "@tanstack/react-query";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
@@ -146,7 +146,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           error instanceof Error
             ? error.message
             : "Failed to sign in with Google";
-        Alert.alert("Sign In Failed", message);
+        toast.error(message);
         return null;
       } finally {
         setIsLoading(false);
@@ -200,7 +200,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           error instanceof Error
             ? error.message
             : "Failed to sign in with Apple";
-        Alert.alert("Sign In Failed", message);
+        toast.error(message);
         return null;
       } finally {
         setIsLoading(false);
@@ -252,7 +252,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           error instanceof Error
             ? error.message
             : "Failed to sign in with Facebook";
-        Alert.alert("Sign In Failed", message);
+        toast.error(message);
         return null;
       } finally {
         setIsLoading(false);
@@ -267,20 +267,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const response = await sendMagicLink(email);
 
         if (response.success) {
-          Alert.alert(
-            "Check Your Email",
-            "We sent a sign-in link to your email. Tap it to sign in!",
-          );
+          toast.success("Check your email — we sent a sign-in link!");
           return true;
         }
 
-        Alert.alert("Error", response.error || "Failed to send magic link");
+        toast.error(response.error || "Failed to send magic link");
         return false;
       } catch (error: unknown) {
         console.error("Magic link error:", error);
         const message =
           error instanceof Error ? error.message : "Failed to send magic link";
-        Alert.alert("Error", message);
+        toast.error(message);
         return false;
       } finally {
         setIsLoading(false);
@@ -311,10 +308,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return response;
       } catch (error: unknown) {
         console.error("Magic link verification error:", error);
-        Alert.alert(
-          "Sign In Failed",
-          "The magic link is invalid or expired. Please try again.",
-        );
+        toast.error("The magic link is invalid or expired. Please try again.");
         return null;
       } finally {
         setIsLoading(false);

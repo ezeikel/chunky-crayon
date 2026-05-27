@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Alert } from "react-native";
+import { toast } from "@/components/Toaster";
 import { PurchasesPackage, PurchasesOffering } from "react-native-purchases";
 import {
   getOfferings,
@@ -50,10 +50,7 @@ export function usePurchase() {
         return;
       }
 
-      Alert.alert(
-        "Purchase Failed",
-        "There was an error processing your purchase. Please try again.",
-      );
+      toast.error("Couldn't process your purchase. Please try again.");
     },
   });
 }
@@ -81,22 +78,13 @@ export function useRestorePurchases() {
         customerInfo.entitlements.active["premium"] !== undefined;
 
       if (hasSubscription) {
-        Alert.alert(
-          "Purchases Restored",
-          "Your subscription has been restored successfully!",
-        );
+        toast.success("Your subscription has been restored!");
       } else {
-        Alert.alert(
-          "No Purchases Found",
-          "No previous purchases were found to restore.",
-        );
+        toast.info("No previous purchases found to restore.");
       }
     },
     onError: () => {
-      Alert.alert(
-        "Restore Failed",
-        "There was an error restoring your purchases. Please try again.",
-      );
+      toast.error("Couldn't restore your purchases. Please try again.");
     },
   });
 }

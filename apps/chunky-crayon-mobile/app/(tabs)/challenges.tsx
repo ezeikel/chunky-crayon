@@ -5,8 +5,8 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
-  Alert,
 } from "react-native";
+import { toast } from "@/components/Toaster";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -256,14 +256,12 @@ const ChallengesScreen = () => {
         currentChallenge.weeklyChallengeId,
       );
       if (result.success) {
-        Alert.alert(
-          "Reward Claimed!",
+        toast.success(
           `You earned a new ${result.reward?.type === "sticker" ? "sticker" : "Colo accessory"}!`,
-          [{ text: "Awesome!" }],
         );
       }
     } catch {
-      Alert.alert("Error", "Failed to claim reward. Please try again.");
+      toast.error("Couldn't claim that reward. Please try again.");
     }
   };
 

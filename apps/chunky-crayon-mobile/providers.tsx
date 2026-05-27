@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { Toaster } from "sonner-native";
+import { Toaster } from "@/components/Toaster";
 import {
   AuthProvider,
   ColoProvider,
@@ -27,12 +27,11 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
             </SubscriptionProvider>
           </AuthProvider>
         </QueryClientProvider>
-        {/* sonner-native toast host. Sits under BottomSheetModalProvider
-            so toasts render above any open sheet. See memory
-            feedback_sonner_toasts_for_errors — transient feedback
-            (save / delete / network errors) lives here, not in
-            Alert.alert. Blocking confirms (sign out, parental gate,
-            delete profile) stay as Alert. */}
+        {/* Brand-styled toast host. Sits under BottomSheetModalProvider
+            so toasts render above any open sheet. ALL transient
+            feedback lives here (no Alert.alert). Destructive confirms
+            use ConfirmSheet (also a bottom sheet) so the experience
+            stays in-app and brand-styled. */}
         <Toaster />
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
