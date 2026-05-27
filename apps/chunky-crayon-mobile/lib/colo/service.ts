@@ -32,8 +32,15 @@ export const getColoState = (
 
   let progressToNext: ColoState["progressToNext"] = null;
   if (nextStageInfo) {
-    const currentProgress = artworkCount;
     const requiredForNext = nextStageInfo.requiredArtworks;
+    // Cap `current` at `required` so consumers don't have to remember
+    // to Math.max(0, ...). Without this clamp, a kid who saved past
+    // a stage threshold *before* the evolution event fires sees a
+    // broken UI: "50/30 artworks" in the tooltip AND a literally-
+    // negative "Save -20 more artworks to evolve!" in the
+    // DashboardHeader (which does required - current). Same fix
+    // web shipped in apps/chunky-crayon-web/lib/colo/service.ts.
+    const currentProgress = Math.min(artworkCount, requiredForNext);
     const percentage = Math.min(
       100,
       Math.round((currentProgress / requiredForNext) * 100),
