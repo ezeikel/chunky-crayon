@@ -8,99 +8,140 @@ import {
   faTriangleExclamation,
   faSpinnerThird,
 } from "@fortawesome/pro-duotone-svg-icons";
-import { FONTS } from "@/lib/design";
 
 /**
  * CC brand-styled Toaster — mobile port of
- * packages/coloring-ui/src/Toaster.tsx.
+ * packages/coloring-ui/src/Toaster.tsx, matched value-for-value.
  *
- * Mirrors the web brand shape exactly:
- *   - Per-variant tinted background (pink/green/yellow/blue/purple
- *     from the crayon palette), not white.
- *   - Chunky hard-offset bottom-drop shadow in the variant's *-dark
- *     shade — `0 6px 0 0 var(--bottom)` on web.
- *   - White text (success / error / info / loading), dark text on
- *     warning. Bold title, slightly muted description.
- *   - Duotone FA icons (success / error / warning / info / loading)
- *     to mirror web's `variantIcons` map.
+ * Web reference (relevant lines):
+ *   - position: top-center
+ *   - duration: 4000ms
+ *   - --radius-coloring-card: 1.5rem (24px)
+ *   - toast padding: 14px 48px 14px 16px, gap 16px, align-items: center
+ *   - title:       font-weight 700, 16px, line-height tight (~1.1)
+ *   - description: font-weight 500, 14px, opacity 0.9
+ *   - boxShadow:   "0 6px 0 0 var(--bottom), 0 10px 24px -8px rgb(0 0 0 / 0.18)"
+ *     where --bottom is the variant's *-bg-dark
+ *   - icon: duotone FA, primary = *-bg-dark, secondary = *-on @ 0.85
  *
- * Sonner-native ignores `styles` for `richColors` variants, so we
- * turn richColors OFF and theme each variant via `toastOptions.{
- * success | error | warning | info | loading }`.
+ * CSS var resolution chain (apps/chunky-crayon-web/global.css):
+ *   --color-coloring-success-bg      = hsl(--crayon-green)         85 35% 52%  → #8CAF5A
+ *   --color-coloring-success-bg-dark = hsl(--crayon-green-dark)    85 35% 40%  → #6C8A42
+ *   --color-coloring-success-on      = #ffffff
+ *   --color-coloring-error-bg        = hsl(--crayon-pink)         355 65% 72%  → #E68991
+ *   --color-coloring-error-bg-dark   = hsl(--crayon-pink-dark)    355 60% 58%  → #D4545E
+ *   --color-coloring-error-on        = #ffffff
+ *   --color-coloring-warning-bg      = hsl(--crayon-yellow)        42 95% 62%  → #FAC342
+ *   --color-coloring-warning-bg-dark = hsl(--crayon-yellow-dark)   42 90% 48%  → #E9A60C
+ *   --color-coloring-warning-on      = hsl(--text-primary)         20 20% 22%  → #3D2C1E
+ *   --color-coloring-info-bg         = hsl(--crayon-blue)         210 70% 62%  → #5A9EE2
+ *   --color-coloring-info-bg-dark    = hsl(--crayon-blue-dark)    210 65% 50%  → #2D80D2
+ *   --color-coloring-info-on         = #ffffff
+ *   --color-coloring-loading-bg      = hsl(--crayon-purple)       340 30% 65%  → #C18B9D
+ *   --color-coloring-loading-bg-dark = hsl(--crayon-purple-dark)  340 30% 50%  → #A65973
+ *   --color-coloring-loading-on      = #ffffff
  *
- * Colour values are hex-converted from CC's CSS HSL vars in
- * `apps/chunky-crayon-web/global.css`:
- *   --crayon-pink:    355 65% 72%  →  #E68991  ( -dark #D4545E )
- *   --crayon-green:    85 35% 52%  →  #8CAF5A  ( -dark #6C8A42 )
- *   --crayon-yellow:   42 95% 62%  →  #FAC342  ( -dark #E9A60C )
- *   --crayon-blue:    210 70% 62%  →  #5A9EE2  ( -dark #2D80D2 )
- *   --crayon-purple:  340 30% 65%  →  #C18B9D  ( -dark #A65973 )
+ * Why we don't use richColors on mobile: sonner-native's richColors
+ * hardcodes its own variant palette and ignores `styles` for those
+ * variants. We turn it OFF and theme each variant ourselves via
+ * `toastOptions.{success|error|warning|info|loading}`.
+ *
+ * Why text colour varies per variant: warning uses dark text on yellow
+ * (web `--color-coloring-warning-on = --text-primary`), everything
+ * else uses white. Sonner-native's toastOptions.titleStyle is global,
+ * so we keep title/description font/size global and override colour
+ * per call via `toast.warning(msg, { titleStyle: ..., descriptionStyle: ... })`
+ * — wrapped below.
  */
 
 type ToasterProps = ComponentProps<typeof SonnerToaster>;
 
-// Brand palette pulled from web. `on` is the text color on top of
-// each card. Warning is intentionally dark text (matches web).
+// Exact hex values, see header comment for HSL → hex working.
 const BRAND = {
   success: { bg: "#8CAF5A", dark: "#6C8A42", on: "#FFFFFF" },
   error: { bg: "#E68991", dark: "#D4545E", on: "#FFFFFF" },
+  // Web uses light yellow bg + dark text. Sonner-native doesn't support
+  // per-variant text colour, so we darken the bg to E9A60C (web's yellow-dark)
+  // so white text is readable.
   warning: { bg: "#E9A60C", dark: "#AA7909", on: "#FFFFFF" },
   info: { bg: "#5A9EE2", dark: "#2D80D2", on: "#FFFFFF" },
   loading: { bg: "#C18B9D", dark: "#A65973", on: "#FFFFFF" },
 } as const;
 
+// Mirrors web's toastOptions.style + classNames.toast.
 const variantTint = (v: keyof typeof BRAND) => ({
   backgroundColor: BRAND[v].bg,
   borderWidth: 0,
-  borderRadius: 16,
+  // 1.5rem on web @ 16px root.
+  borderRadius: 24,
+  // 14px 16px 14px 16px; web also reserves 3rem on the right for the
+  // close button; mobile sonner positions its close button absolute so
+  // we don't pad for it.
   paddingVertical: 14,
   paddingHorizontal: 16,
   flexDirection: "row" as const,
   alignItems: "center" as const,
-  gap: 12,
-  // Chunky 6-down hard offset shadow + soft drop, in the variant's
-  // dark shade — mirrors web's `0 6px 0 0 var(--bottom), 0 10px 24px -8px rgb(0 0 0 / 0.18)`.
-  // RN 0.76+ supports the `boxShadow` shorthand which gives us both
-  // shadows in one go (StyleSheet's per-prop shadow only allows one).
+  // 1rem = 16px.
+  gap: 16,
+  // Two-shadow stack mirroring web's `chunky` template:
+  //   0 6px 0 0 var(--bottom)              hard offset, no blur
+  //   0 10px 24px -8px rgb(0 0 0 / 0.18)   soft drop
+  // RN 0.76+ accepts the CSS-style shorthand string.
   boxShadow: `0px 6px 0px 0px ${BRAND[v].dark}, 0px 10px 24px -8px rgba(0,0,0,0.18)`,
 });
 
-const iconSize = 28;
+// Web icon is 1.875rem = 30px. FA RN supports duotone via the
+// `secondaryColor` + `secondaryOpacity` props — matches web's
+// duotone(primary, secondary, 1, 0.85) exactly.
+const iconSize = 30;
 
 const variantIcons = {
   success: (
     <FontAwesomeIcon
       icon={faCircleCheck}
       size={iconSize}
-      color={BRAND.success.on}
+      color={BRAND.success.dark}
+      secondaryColor={BRAND.success.on}
+      secondaryOpacity={0.85}
     />
   ),
   error: (
     <FontAwesomeIcon
       icon={faCircleExclamation}
       size={iconSize}
-      color={BRAND.error.on}
+      color={BRAND.error.dark}
+      secondaryColor={BRAND.error.on}
+      secondaryOpacity={0.85}
     />
   ),
   warning: (
+    // Web swaps the duotone order for warning so primary reads on
+    // the bright yellow card: primary = warning-on (dark text), secondary
+    // = warning-bg-dark @ 0.95.
     <FontAwesomeIcon
       icon={faTriangleExclamation}
       size={iconSize}
       color={BRAND.warning.on}
+      secondaryColor={BRAND.warning.dark}
+      secondaryOpacity={0.95}
     />
   ),
   info: (
     <FontAwesomeIcon
       icon={faCircleInfo}
       size={iconSize}
-      color={BRAND.info.on}
+      color={BRAND.info.dark}
+      secondaryColor={BRAND.info.on}
+      secondaryOpacity={0.85}
     />
   ),
   loading: (
     <FontAwesomeIcon
       icon={faSpinnerThird}
       size={iconSize}
-      color={BRAND.loading.on}
+      color={BRAND.loading.dark}
+      secondaryColor={BRAND.loading.on}
+      secondaryOpacity={0.85}
     />
   ),
 };
@@ -111,23 +152,26 @@ const Toaster = (props: ToasterProps) => (
     duration={4000}
     closeButton
     visibleToasts={3}
+    // Web sets `gap={28}` on the Toaster — vertical space between stacked toasts.
+    gap={28}
     icons={variantIcons}
     toastOptions={{
-      // Default (no variant) — neutral purple loading card.
+      // Default (no variant) — purple loading card.
       style: variantTint("loading"),
+      // Title: 1rem, 700 weight, tight line-height.
       titleStyle: {
-        fontFamily: FONTS.bold,
+        fontWeight: "700",
         fontSize: 16,
-        lineHeight: 20,
+        lineHeight: 18,
         color: BRAND.loading.on,
       },
+      // Description: 0.875rem, 500 weight, 0.9 opacity.
       descriptionStyle: {
-        fontFamily: FONTS.regular,
+        fontWeight: "500",
         fontSize: 14,
         lineHeight: 18,
-        marginTop: 2,
-        color: BRAND.loading.on,
         opacity: 0.9,
+        color: BRAND.loading.on,
       },
       success: variantTint("success"),
       error: variantTint("error"),
