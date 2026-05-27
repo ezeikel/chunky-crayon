@@ -21,6 +21,7 @@ import {
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import AvatarPicker from "@/components/AvatarPicker";
 import {
   useProfiles,
   useActiveProfile,
@@ -30,6 +31,7 @@ import {
   useDeleteProfile,
 } from "@/hooks/api/useProfiles";
 import type { Profile } from "@/api";
+import { DEFAULT_AVATAR_ID } from "@/lib/avatars";
 
 type ProfileSwitcherProps = {
   isOpen: boolean;
@@ -57,6 +59,8 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [newProfileName, setNewProfileName] = useState("");
+  const [newProfileAvatarId, setNewProfileAvatarId] =
+    useState<string>(DEFAULT_AVATAR_ID);
   const [editProfileName, setEditProfileName] = useState("");
 
   const handleSheetChanges = useCallback(
@@ -68,6 +72,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
         setIsCreating(false);
         setEditingProfileId(null);
         setNewProfileName("");
+        setNewProfileAvatarId(DEFAULT_AVATAR_ID);
         setEditProfileName("");
       }
     },
@@ -104,8 +109,12 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
     }
 
     try {
-      await createProfile.mutateAsync({ name: newProfileName.trim() });
+      await createProfile.mutateAsync({
+        name: newProfileName.trim(),
+        avatarId: newProfileAvatarId,
+      });
       setNewProfileName("");
+      setNewProfileAvatarId(DEFAULT_AVATAR_ID);
       setIsCreating(false);
     } catch {
       Alert.alert("Error", "Failed to create profile. Please try again.");
@@ -319,43 +328,65 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
 
             {/* Add Profile Section */}
             {isCreating ? (
-              <View style={styles.createRow}>
-                <View style={styles.avatarContainerNew}>
-                  <FontAwesomeIcon icon={faPlus} size={20} color="#9CA3AF" />
+              <View style={styles.createCard}>
+                {/* Live avatar preview */}
+                <View style={styles.createPreview}>
+                  <ProfileAvatar
+                    avatarId={newProfileAvatarId}
+                    name={newProfileName || "?"}
+                    size="xl"
+                    showBorder
+                  />
+                  <Text style={styles.createPreviewLabel}>
+                    Pick your character
+                  </Text>
                 </View>
+
+                {/* Avatar picker grid */}
+                <AvatarPicker
+                  selectedAvatarId={newProfileAvatarId}
+                  onSelect={setNewProfileAvatarId}
+                />
+
+                {/* Name input */}
                 <TextInput
-                  style={styles.createInput}
+                  style={styles.createInputLarge}
                   value={newProfileName}
                   onChangeText={setNewProfileName}
-                  placeholder="Enter name"
+                  placeholder="What's your name?"
                   placeholderTextColor="#9CA3AF"
                   autoFocus
                   maxLength={20}
                 />
-                <Pressable
-                  style={[
-                    styles.createButton,
-                    (!newProfileName.trim() || createProfile.isPending) &&
-                      styles.createButtonDisabled,
-                  ]}
-                  onPress={handleCreateProfile}
-                  disabled={!newProfileName.trim() || createProfile.isPending}
-                >
-                  {createProfile.isPending ? (
-                    <ActivityIndicator size="small" color="#FFFFFF" />
-                  ) : (
-                    <Text style={styles.createButtonText}>Add</Text>
-                  )}
-                </Pressable>
-                <Pressable
-                  style={styles.cancelButton}
-                  onPress={() => {
-                    setIsCreating(false);
-                    setNewProfileName("");
-                  }}
-                >
-                  <FontAwesomeIcon icon={faXmark} size={18} color="#9CA3AF" />
-                </Pressable>
+
+                {/* Actions row */}
+                <View style={styles.createActions}>
+                  <Pressable
+                    style={styles.createCancelButton}
+                    onPress={() => {
+                      setIsCreating(false);
+                      setNewProfileName("");
+                      setNewProfileAvatarId(DEFAULT_AVATAR_ID);
+                    }}
+                  >
+                    <Text style={styles.createCancelText}>Cancel</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.createButtonLarge,
+                      (!newProfileName.trim() || createProfile.isPending) &&
+                        styles.createButtonDisabled,
+                    ]}
+                    onPress={handleCreateProfile}
+                    disabled={!newProfileName.trim() || createProfile.isPending}
+                  >
+                    {createProfile.isPending ? (
+                      <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                      <Text style={styles.createButtonText}>Create</Text>
+                    )}
+                  </Pressable>
+                </View>
               </View>
             ) : canAddProfile ? (
               <Pressable
@@ -528,42 +559,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#9CA3AF",
   },
-  createRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 10,
-    marginTop: 4,
-    borderWidth: 2,
-    borderColor: "#E46444",
-  },
-  createInput: {
-    flex: 1,
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 16,
-    color: "#374151",
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-  },
-  createButton: {
-    backgroundColor: "#E46444",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginLeft: 8,
-  },
   createButtonDisabled: {
     opacity: 0.5,
   },
   createButtonText: {
     fontFamily: "TondoTrial-Bold",
-    fontSize: 14,
+    fontSize: 16,
     color: "#FFFFFF",
-  },
-  cancelButton: {
-    padding: 8,
-    marginLeft: 4,
   },
   maxProfilesNote: {
     padding: 16,
@@ -573,6 +575,62 @@ const styles = StyleSheet.create({
     fontFamily: "TondoTrial-Regular",
     fontSize: 14,
     color: "#9CA3AF",
+  },
+
+  // ─── Create-profile card (avatar picker + name + actions) ───
+  createCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 16,
+    marginTop: 8,
+    borderWidth: 2,
+    borderColor: "#E46444",
+    gap: 16,
+  },
+  createPreview: {
+    alignItems: "center",
+    gap: 8,
+  },
+  createPreviewLabel: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 16,
+    color: "#3D2C1E",
+  },
+  createInputLarge: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 18,
+    color: "#374151",
+    backgroundColor: "#FAF7F1",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#E8DFD6",
+  },
+  createActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  createCancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F3EBE0",
+  },
+  createCancelText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 16,
+    color: "#7A6F66",
+  },
+  createButtonLarge: {
+    flex: 2,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E46444",
   },
 });
 

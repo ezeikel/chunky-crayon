@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { View, Text, Pressable, Image, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -268,7 +269,8 @@ const ColoAvatar = ({
             <Image
               source={{ uri: stageInfo.imagePath }}
               style={styles.coloImage}
-              resizeMode="cover"
+              contentFit="cover"
+              transition={200}
             />
           )}
 
