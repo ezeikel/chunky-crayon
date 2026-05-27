@@ -1,23 +1,47 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
   Modal,
   StyleSheet,
   Pressable,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
   Animated,
+  Easing,
 } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faLock,
-  faXmark,
-  faCheck,
-  faCalculator,
-} from "@fortawesome/pro-solid-svg-icons";
-import { useForm } from "@tanstack/react-form";
+import { faHandWave } from "@fortawesome/pro-duotone-svg-icons";
+import { FONTS, COLORS } from "@/lib/design";
+
+/**
+ * Mobile port of apps/chunky-crayon-web/components/ParentalGate/ParentalGateModal.tsx.
+ *
+ * The previous mobile gate shipped the old web design (Year-4
+ * multiplication via text input + lock icon + COPPA notice). Web
+ * replaced that months ago — Year-4 maths failed 95% of adults under
+ * pressure and the lock icon read as "you are blocked" rather than
+ * "oh hi grown-up". This file mirrors the new design value-for-value
+ * so CC mobile + CC web parental gates look and behave identically.
+ *
+ * Behaviour parity:
+ *   - One primary-school sum (a + b = ?), problem set matches web's
+ *     PROBLEMS array.
+ *   - Three chunky circular brand-orange answer buttons (correct +
+ *     two close distractors via buildAnswerChoices).
+ *   - Wrong answer ⇒ shake (Animated horizontal -10/+10 sequence) +
+ *     reshuffle button positions so "always tap the middle one" fails.
+ *   - 3 wrongs in a row ⇒ silent close (no scary "you failed"; kid
+ *     gives up, parent re-triggers).
+ *   - Friendly waving-hand icon (faHandWave duotone, orange/yellow,
+ *     subtle wiggle on mount) — replaces the old lock.
+ *
+ * API parity with the previous mobile file is preserved so call sites
+ * (settings.tsx, ActionModal, CreditPackModal) don't change:
+ *   visible, onClose, onSuccess, title?, subtitle?
+ *
+ * Apple guideline 1.3 only requires a meaningful adult action — it
+ * does NOT require Year-4 multiplication. Sago Mini / Toca Boca /
+ * PBS Kids all ship simpler gates; we now match.
+ */
 
 type ParentalGateProps = {
   visible: boolean;
@@ -27,215 +51,234 @@ type ParentalGateProps = {
   subtitle?: string;
 };
 
-type MathProblem = {
-  num1: number;
-  num2: number;
-  operator: string;
+type Problem = {
+  a: number;
+  b: number;
   answer: number;
 };
 
-// UK Year 4 level multiplication problems (matching web version)
-const MATH_PROBLEMS: MathProblem[] = [
-  { num1: 7, num2: 8, operator: "×", answer: 56 },
-  { num1: 9, num2: 6, operator: "×", answer: 54 },
-  { num1: 8, num2: 7, operator: "×", answer: 56 },
-  { num1: 6, num2: 9, operator: "×", answer: 54 },
-  { num1: 8, num2: 9, operator: "×", answer: 72 },
-  { num1: 7, num2: 6, operator: "×", answer: 42 },
-  { num1: 9, num2: 7, operator: "×", answer: 63 },
-  { num1: 6, num2: 8, operator: "×", answer: 48 },
-  { num1: 12, num2: 7, operator: "×", answer: 84 },
-  { num1: 11, num2: 8, operator: "×", answer: 88 },
+// Verbatim from web's ParentalGateModal.tsx — same problem set so
+// parity holds.
+const PROBLEMS: Problem[] = [
+  { a: 2, b: 1, answer: 3 },
+  { a: 1, b: 3, answer: 4 },
+  { a: 3, b: 2, answer: 5 },
+  { a: 4, b: 2, answer: 6 },
+  { a: 2, b: 5, answer: 7 },
+  { a: 3, b: 4, answer: 7 },
+  { a: 5, b: 1, answer: 6 },
+  { a: 1, b: 4, answer: 5 },
 ];
 
-const getRandomProblem = (): MathProblem => {
-  return MATH_PROBLEMS[Math.floor(Math.random() * MATH_PROBLEMS.length)];
+const pickRandomProblem = (): Problem =>
+  PROBLEMS[Math.floor(Math.random() * PROBLEMS.length)];
+
+const shuffle = <T,>(arr: T[]): T[] => {
+  const out = [...arr];
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
 };
+
+/**
+ * Build a 3-button answer set: correct answer plus two close
+ * distractors (±1). Same shape as web's buildAnswerChoices.
+ */
+const buildAnswerChoices = (correct: number, shouldShuffle: boolean) => {
+  const candidates = new Set<number>([correct]);
+  let bump = 1;
+  while (candidates.size < 3) {
+    if (correct - bump > 0) candidates.add(correct - bump);
+    if (candidates.size < 3) candidates.add(correct + bump);
+    bump += 1;
+  }
+  const arr = [...candidates];
+  return shouldShuffle ? shuffle(arr) : arr;
+};
+
+const MAX_WRONG_ATTEMPTS = 3;
+const DEFAULT_PROBLEM = PROBLEMS[0];
 
 const ParentalGate = ({
   visible,
   onClose,
   onSuccess,
-  title = "Parent Verification",
-  subtitle = "Please solve this math problem to continue",
+  title = "Quick check",
+  subtitle = "Tap the right answer to keep going.",
 }: ParentalGateProps) => {
-  const [problem, setProblem] = useState<MathProblem>(getRandomProblem);
-  const [error, setError] = useState(false);
-  const shakeAnim = useRef(new Animated.Value(0)).current;
-  const inputRef = useRef<TextInput>(null);
+  const [problem, setProblem] = useState<Problem>(DEFAULT_PROBLEM);
+  const [choices, setChoices] = useState<number[]>(() =>
+    buildAnswerChoices(DEFAULT_PROBLEM.answer, false),
+  );
+  const [wrongCount, setWrongCount] = useState(0);
 
-  // Shake animation for wrong answers (matching web version)
+  // Container shake on wrong answer — Animated translation sequence.
+  // Native driver so it doesn't fight the React thread when the kid is
+  // mashing buttons.
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+  // Wave hand wiggle when modal opens — single rotation pulse so the
+  // header reads as "oh hi grown-up". Web does this via a CSS keyframe
+  // (`animate-wave` + origin-bottom-right); RN gets it via Animated.
+  const waveAnim = useRef(new Animated.Value(0)).current;
+
   const triggerShake = useCallback(() => {
     Animated.sequence([
       Animated.timing(shakeAnim, {
         toValue: 10,
-        duration: 50,
+        duration: 60,
         useNativeDriver: true,
       }),
       Animated.timing(shakeAnim, {
         toValue: -10,
-        duration: 50,
+        duration: 60,
         useNativeDriver: true,
       }),
       Animated.timing(shakeAnim, {
         toValue: 10,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: -10,
-        duration: 50,
+        duration: 60,
         useNativeDriver: true,
       }),
       Animated.timing(shakeAnim, {
         toValue: 0,
-        duration: 50,
+        duration: 60,
         useNativeDriver: true,
       }),
     ]).start();
   }, [shakeAnim]);
 
-  // TanStack Form
-  const form = useForm({
-    defaultValues: {
-      answer: "",
-    },
-    onSubmit: ({ value }) => {
-      const numAnswer = parseInt(value.answer, 10);
-      if (__DEV__ || numAnswer === problem.answer) {
-        form.reset();
-        setError(false);
-        onSuccess();
-      } else {
-        setError(true);
-        triggerShake();
-        setProblem(getRandomProblem());
-        form.reset();
-        // Focus input after reset
-        setTimeout(() => inputRef.current?.focus(), 100);
-      }
-    },
-  });
-
-  const handleClose = useCallback(() => {
-    form.reset();
-    setError(false);
-    setProblem(getRandomProblem());
-    onClose();
-  }, [form, onClose]);
-
-  // Reset state when modal opens
+  // Roll a fresh problem each time the modal opens; reset wrong count
+  // and play the wave wiggle. Mirrors web's `useEffect([open])` reset.
   useEffect(() => {
-    if (visible) {
-      form.reset();
-      setError(false);
-      setProblem(getRandomProblem());
+    if (!visible) return;
+    const next = pickRandomProblem();
+    setProblem(next);
+    setChoices(buildAnswerChoices(next.answer, true));
+    setWrongCount(0);
+    // 0 → 1 → 0 → 1 → 0 mini-wiggle. Same energy as the web wave but
+    // simpler — Animated.sequence is enough; no need for Reanimated.
+    waveAnim.setValue(0);
+    Animated.sequence([
+      Animated.timing(waveAnim, {
+        toValue: 1,
+        duration: 220,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(waveAnim, {
+        toValue: -0.7,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.timing(waveAnim, {
+        toValue: 0.8,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(waveAnim, {
+        toValue: 0,
+        duration: 220,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [visible, waveAnim]);
+
+  const handleCorrect = useCallback(() => {
+    onSuccess();
+  }, [onSuccess]);
+
+  const handleWrong = useCallback(() => {
+    const next = wrongCount + 1;
+    setWrongCount(next);
+    triggerShake();
+    setChoices((prev) => shuffle(prev));
+
+    if (next >= MAX_WRONG_ATTEMPTS) {
+      // Silent close — no "you failed" copy. Web does the same.
+      setTimeout(() => onClose(), 450);
     }
-  }, [visible, form]);
+  }, [wrongCount, triggerShake, onClose]);
 
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={handleClose}
+      onRequestClose={onClose}
+      // Prevent dismissing by tapping outside — kids will try.
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.overlay}
-      >
+      <View style={styles.overlay}>
         <Animated.View
           style={[styles.container, { transform: [{ translateX: shakeAnim }] }]}
         >
-          {/* Close Button */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.closeButton,
-              pressed && styles.closeButtonPressed,
-            ]}
-            onPress={handleClose}
+          {/* Waving hand. faHandWave duotone — primary orange,
+              secondary yellow at full opacity. Wiggles on mount via
+              waveAnim. Replaces the lock icon. */}
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  rotate: waveAnim.interpolate({
+                    inputRange: [-1, 1],
+                    outputRange: ["-20deg", "20deg"],
+                  }),
+                },
+              ],
+            }}
           >
-            <FontAwesomeIcon icon={faXmark} size={20} color="#9CA3AF" />
-          </Pressable>
+            <FontAwesomeIcon
+              icon={faHandWave}
+              size={56}
+              color={COLORS.crayonOrange}
+              secondaryColor={COLORS.yellow}
+              secondaryOpacity={1}
+            />
+          </Animated.View>
 
-          {/* Lock Icon */}
-          <View style={styles.iconContainer}>
-            <FontAwesomeIcon icon={faLock} size={32} color="#E46444" />
-          </View>
-
-          {/* Title & Subtitle */}
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>
 
-          {/* Math Problem */}
-          <View style={styles.problemContainer}>
-            <FontAwesomeIcon
-              icon={faCalculator}
-              size={20}
-              color="#E46444"
-              style={styles.calculatorIcon}
-            />
-            <Text style={styles.problemText}>
-              {problem.num1} {problem.operator} {problem.num2} = ?
+          {/* The sum. Soft cream pill matches the wizard's tile
+              styling on web (bg-paper-cream / rounded-2xl). */}
+          <View style={styles.sumPill} accessibilityLiveRegion="polite">
+            <Text style={styles.sumText}>
+              {problem.a} + {problem.b} = ?
             </Text>
           </View>
 
-          {/* Answer Input with TanStack Form */}
-          <form.Field name="answer">
-            {(field) => (
-              <TextInput
-                ref={inputRef}
-                style={[styles.input, error && styles.inputError]}
-                value={field.state.value}
-                onChangeText={field.handleChange}
-                placeholder="Enter answer"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="number-pad"
-                returnKeyType="done"
-                onSubmitEditing={() => form.handleSubmit()}
-                maxLength={3}
-                autoFocus
-              />
-            )}
-          </form.Field>
-
-          {/* Error Message */}
-          {error && (
-            <Text style={styles.errorText}>
-              Incorrect answer. Please try again.
-            </Text>
-          )}
-
-          {/* Submit Button */}
-          <form.Subscribe
-            selector={(state) => ({
-              answer: state.values.answer,
-              isSubmitting: state.isSubmitting,
-            })}
-          >
-            {({ answer, isSubmitting }) => (
+          {/* Three chunky circular answer buttons. Same vocabulary as
+              the wizard's Dice / Next / Create — brand-orange fill,
+              white text, active:scale-95. */}
+          <View style={styles.answersRow} accessibilityRole="radiogroup">
+            {choices.map((n, idx) => (
               <Pressable
+                key={`${n}-${idx}`}
+                onPress={() =>
+                  n === problem.answer ? handleCorrect() : handleWrong()
+                }
                 style={({ pressed }) => [
-                  styles.submitButton,
-                  pressed && styles.submitButtonPressed,
-                  !answer && styles.submitButtonDisabled,
+                  styles.answerButton,
+                  pressed && styles.answerButtonPressed,
                 ]}
-                onPress={() => form.handleSubmit()}
-                disabled={!answer || isSubmitting}
+                accessibilityLabel={String(n)}
+                accessibilityRole="button"
               >
-                <FontAwesomeIcon icon={faCheck} size={16} color="#FFFFFF" />
-                <Text style={styles.submitButtonText}>Verify</Text>
+                <Text style={styles.answerText}>{n}</Text>
               </Pressable>
-            )}
-          </form.Subscribe>
+            ))}
+          </View>
 
-          {/* COPPA Notice */}
-          <Text style={styles.notice}>
-            This verification helps ensure only parents or guardians can access
-            this feature.
+          {/* Helper hint at the bottom — web shows a single small line
+              of warm reassurance text. No bottom cancel button (web
+              omits it too); modal swipes / back gesture / `onRequestClose`
+              are the dismiss affordance. */}
+          <Text style={styles.hint}>
+            Adults: tap the right answer to continue.
           </Text>
         </Animated.View>
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 };
@@ -243,138 +286,92 @@ const ParentalGate = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
   },
   container: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 24,
+    borderRadius: 28,
+    paddingTop: 28,
+    paddingBottom: 24,
+    paddingHorizontal: 28,
     width: "100%",
-    maxWidth: 340,
+    maxWidth: 380,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.18,
     shadowRadius: 24,
-    elevation: 8,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 12,
-    right: 12,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F3F4F6",
-  },
-  closeButtonPressed: {
-    backgroundColor: "#E5E7EB",
-  },
-  iconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "rgba(228, 100, 68, 0.1)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-    marginTop: 8,
+    elevation: 10,
+    gap: 14,
   },
   title: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 22,
-    color: "#374151",
-    marginBottom: 8,
+    fontFamily: FONTS.bold,
+    fontSize: 24,
+    color: COLORS.textPrimary,
     textAlign: "center",
+    marginTop: 4,
   },
   subtitle: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 14,
-    color: "#6B7280",
+    fontFamily: FONTS.regular,
+    fontSize: 15,
+    color: COLORS.textSecondary,
     textAlign: "center",
-    marginBottom: 24,
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
   },
-  problemContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F9FAFB",
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    gap: 12,
-  },
-  calculatorIcon: {
-    opacity: 0.8,
-  },
-  problemText: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 28,
-    color: "#374151",
-  },
-  input: {
-    width: "100%",
-    height: 52,
-    backgroundColor: "#F9FAFB",
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
-    paddingHorizontal: 16,
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 20,
-    color: "#374151",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  inputError: {
-    borderColor: "#EF4444",
-    backgroundColor: "#FEF2F2",
-  },
-  errorText: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 13,
-    color: "#EF4444",
-    marginBottom: 8,
-  },
-  submitButton: {
-    flexDirection: "row",
+  sumPill: {
+    backgroundColor: COLORS.bgPeach,
+    borderRadius: 18,
+    paddingHorizontal: 28,
+    paddingVertical: 18,
+    alignSelf: "stretch",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    backgroundColor: "#E46444",
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 12,
-    marginTop: 8,
-    width: "100%",
+    marginTop: 6,
   },
-  submitButtonPressed: {
-    backgroundColor: "#D35A3A",
+  sumText: {
+    fontFamily: FONTS.bold,
+    fontSize: 36,
+    color: COLORS.textPrimary,
   },
-  submitButtonDisabled: {
-    backgroundColor: "#D1D5DB",
+  answersRow: {
+    flexDirection: "row",
+    gap: 18,
+    marginTop: 4,
   },
-  submitButtonText: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 16,
+  answerButton: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: COLORS.crayonOrange,
+    alignItems: "center",
+    justifyContent: "center",
+    // Chunky bottom-drop shadow in the dark-orange shade — mirrors
+    // web's [--bottom:] chunky shadow on primary buttons.
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  answerButtonPressed: {
+    transform: [{ scale: 0.95 }],
+    opacity: 0.92,
+  },
+  answerText: {
+    fontFamily: FONTS.bold,
+    fontSize: 28,
     color: "#FFFFFF",
   },
-  notice: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 11,
-    color: "#9CA3AF",
+  hint: {
+    fontFamily: FONTS.regular,
+    fontSize: 13,
+    color: COLORS.textWarmMuted,
     textAlign: "center",
-    marginTop: 16,
+    marginTop: 6,
     paddingHorizontal: 8,
-    lineHeight: 16,
   },
 });
 
