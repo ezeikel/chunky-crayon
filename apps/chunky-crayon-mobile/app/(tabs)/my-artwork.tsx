@@ -3,11 +3,11 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   Pressable,
   ActivityIndicator,
   Dimensions,
 } from "react-native";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHeart, faPalette } from "@fortawesome/pro-solid-svg-icons";
@@ -80,7 +80,8 @@ const MyArtworkScreen = () => {
             <Image
               source={{ uri: artwork.imageUrl }}
               style={styles.artworkImage}
-              resizeMode="cover"
+              contentFit="cover"
+              transition={200}
             />
             <View style={styles.artworkInfo}>
               <Text style={styles.artworkTitle} numberOfLines={1}>

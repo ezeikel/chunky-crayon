@@ -5,10 +5,10 @@ import {
   Dimensions,
   Pressable,
   StyleSheet,
-  Image,
   FlatList,
   ListRenderItem,
 } from "react-native";
+import { Image } from "expo-image";
 import { SvgUri } from "react-native-svg";
 import { useRouter } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -62,7 +62,8 @@ const ColoringCard = memo(
           <Image
             source={{ uri: item.previewUrl }}
             style={styles.artworkImage}
-            resizeMode="cover"
+            contentFit="cover"
+            transition={200}
           />
         ) : item.svgUrl ? (
           // Fall back to SVG outline
@@ -108,7 +109,8 @@ const ArtworkCard = memo(
           <Image
             source={{ uri: item.thumbnailUrl || item.imageUrl }}
             style={styles.artworkImage}
-            resizeMode="cover"
+            contentFit="cover"
+            transition={200}
           />
         ) : (
           <Text style={styles.placeholderText}>🖼️</Text>
@@ -140,7 +142,8 @@ const InProgressCard = memo(
           <Image
             source={{ uri: item.previewUrl }}
             style={styles.artworkImage}
-            resizeMode="cover"
+            contentFit="cover"
+            transition={200}
           />
         ) : item.coloringImage.svgUrl ? (
           <SvgUri
