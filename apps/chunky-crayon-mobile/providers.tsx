@@ -7,6 +7,7 @@ import {
   UserProvider,
   SubscriptionProvider,
 } from "@/contexts";
+import { FocusModeProvider } from "@/components/FocusMode";
 
 export const queryClient = new QueryClient();
 
@@ -18,7 +19,9 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
           <AuthProvider>
             <SubscriptionProvider>
               <UserProvider>
-                <ColoProvider>{children}</ColoProvider>
+                <ColoProvider>
+                  <FocusModeProvider>{children}</FocusModeProvider>
+                </ColoProvider>
               </UserProvider>
             </SubscriptionProvider>
           </AuthProvider>

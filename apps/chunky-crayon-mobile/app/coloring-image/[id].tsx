@@ -19,6 +19,12 @@ import { tapLight } from "@/utils/haptics";
 import { debugCanvasStorage } from "@/utils/canvasPersistence";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useCanvasStore } from "@/stores/canvasStore";
+import {
+  useFocusMode,
+  FocusModeStatusBar,
+  FocusModeToggleButton,
+  FocusModeFloatingExit,
+} from "@/components/FocusMode";
 
 const ColoringImage = () => {
   const { id } = useLocalSearchParams();
@@ -27,6 +33,7 @@ const ColoringImage = () => {
   const [scroll, setScroll] = useState(true);
   const [showActionModal, setShowActionModal] = useState(false);
   const insets = useSafeAreaInsets();
+  const { isFocusMode } = useFocusMode();
 
   // Responsive layout hook
   const {
@@ -91,90 +98,100 @@ const ColoringImage = () => {
         }}
       />
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={styles.gradient}>
-        {/* Header Area - Compact in phone landscape */}
-        <View
-          style={[
-            styles.header,
-            useCompactHeader && styles.headerCompact,
-            {
-              paddingTop: insets.top + (useCompactHeader ? 4 : 8),
-              paddingLeft: insets.left + 8,
-              paddingRight: insets.right + 8,
-            },
-          ]}
-        >
-          {/* Back button */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.headerButton,
-              useCompactHeader && styles.headerButtonCompact,
-              pressed && styles.headerButtonPressed,
+        {/* Focus-mode status bar binding — declarative hide. */}
+        <FocusModeStatusBar />
+
+        {/* Header Area - Compact in phone landscape. Hidden in focus mode. */}
+        {!isFocusMode && (
+          <View
+            style={[
+              styles.header,
+              useCompactHeader && styles.headerCompact,
+              {
+                paddingTop: insets.top + (useCompactHeader ? 4 : 8),
+                paddingLeft: insets.left + 8,
+                paddingRight: insets.right + 8,
+              },
             ]}
-            onPress={handleBack}
           >
-            <FontAwesomeIcon
-              icon={faChevronLeft}
-              size={useCompactHeader ? 16 : 18}
-              color="#374151"
-            />
-          </Pressable>
+            {/* Back button */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.headerButton,
+                useCompactHeader && styles.headerButtonCompact,
+                pressed && styles.headerButtonPressed,
+              ]}
+              onPress={handleBack}
+            >
+              <FontAwesomeIcon
+                icon={faChevronLeft}
+                size={useCompactHeader ? 16 : 18}
+                color="#374151"
+              />
+            </Pressable>
 
-          {/* Title - Hidden in compact mode */}
-          {!useCompactHeader && (
-            <View style={styles.titleContainer}>
-              <Text style={styles.title} numberOfLines={2}>
-                {coloringImage.title}
-              </Text>
-            </View>
-          )}
-
-          {/* Spacer for landscape - controls go in middle, done button at end */}
-          {isLandscapeLayout && (
-            <>
-              <View style={{ flex: 1 }} />
-              {/* Controls in header for landscape */}
-              <View style={styles.landscapeHeaderControls}>
-                <ProgressIndicator />
-                <MuteToggle />
+            {/* Title - Hidden in compact mode */}
+            {!useCompactHeader && (
+              <View style={styles.titleContainer}>
+                <Text style={styles.title} numberOfLines={2}>
+                  {coloringImage.title}
+                </Text>
               </View>
-              <View style={{ flex: 1 }} />
-            </>
-          )}
+            )}
 
-          {/* Done button */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.headerButton,
-              styles.doneButton,
-              useCompactHeader && styles.headerButtonCompact,
-              pressed && styles.headerButtonPressed,
-            ]}
-            onPress={handleDone}
-          >
-            <FontAwesomeIcon
-              icon={faStar}
-              size={useCompactHeader ? 16 : 18}
-              color="#FFFFFF"
-            />
-          </Pressable>
-        </View>
+            {/* Spacer for landscape - controls go in middle, done button at end */}
+            {isLandscapeLayout && (
+              <>
+                <View style={{ flex: 1 }} />
+                {/* Controls in header for landscape */}
+                <View style={styles.landscapeHeaderControls}>
+                  <ProgressIndicator />
+                  <MuteToggle />
+                </View>
+                <View style={{ flex: 1 }} />
+              </>
+            )}
 
-        {/* Canvas Controls - separate row in portrait mode */}
-        {!isLandscapeLayout && (
+            {/* Done button */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.headerButton,
+                styles.doneButton,
+                useCompactHeader && styles.headerButtonCompact,
+                pressed && styles.headerButtonPressed,
+              ]}
+              onPress={handleDone}
+            >
+              <FontAwesomeIcon
+                icon={faStar}
+                size={useCompactHeader ? 16 : 18}
+                color="#FFFFFF"
+              />
+            </Pressable>
+          </View>
+        )}
+
+        {/* Canvas Controls - separate row in portrait mode. Hidden in
+            focus mode; the focus toggle moves into the row when shown. */}
+        {!isLandscapeLayout && !isFocusMode && (
           <View style={styles.canvasControls}>
             <ProgressIndicator />
             <MuteToggle />
             <ZoomControls />
+            <FocusModeToggleButton />
           </View>
         )}
 
         {/* Main Content Area */}
         <View style={styles.mainContent}>
-          {/* Three-panel landscape layout: Colors | Canvas | Tools */}
+          {/* Three-panel landscape layout: Colors | Canvas | Tools.
+              Sidebars hidden in focus mode. */}
           {isLandscapeLayout && landscapeLayout ? (
             <>
               {/* Left Sidebar - Color Palette */}
-              <ColorPaletteSidebar width={landscapeLayout.leftSidebarWidth} />
+              {!isFocusMode && (
+                <ColorPaletteSidebar width={landscapeLayout.leftSidebarWidth} />
+              )}
 
               {/* Center - Canvas */}
               <View style={styles.canvasCenter}>
@@ -189,13 +206,15 @@ const ColoringImage = () => {
               </View>
 
               {/* Right Sidebar - Tools */}
-              <ToolsSidebar
-                width={landscapeLayout.rightSidebarWidth}
-                onZoomIn={handleZoomIn}
-                onZoomOut={handleZoomOut}
-                onResetZoom={handleResetZoom}
-                zoom={scale}
-              />
+              {!isFocusMode && (
+                <ToolsSidebar
+                  width={landscapeLayout.rightSidebarWidth}
+                  onZoomIn={handleZoomIn}
+                  onZoomOut={handleZoomOut}
+                  onResetZoom={handleResetZoom}
+                  zoom={scale}
+                />
+              )}
             </>
           ) : (
             /* Portrait layout - Canvas with bottom toolbar */
@@ -227,8 +246,11 @@ const ColoringImage = () => {
           onClose={() => setShowActionModal(false)}
         />
 
-        {/* Bottom Toolbar for portrait modes only */}
-        {!useSideToolbar && <MobileColoringToolbar />}
+        {/* Bottom Toolbar for portrait modes only. Hidden in focus mode. */}
+        {!useSideToolbar && !isFocusMode && <MobileColoringToolbar />}
+
+        {/* Floating exit X — only renders while focus mode is active. */}
+        <FocusModeFloatingExit />
       </LinearGradient>
     </View>
   );
