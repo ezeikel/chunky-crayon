@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faHouseChimney,
+  faImages,
   faHeart,
   faTrophy,
   faNoteSticky,
@@ -9,6 +10,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faHouseChimney as faHouseChimneyLight,
+  faImages as faImagesLight,
   faHeart as faHeartLight,
   faTrophy as faTrophyLight,
   faNoteSticky as faNoteStickyLight,
@@ -42,6 +44,19 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <FontAwesomeIcon
               icon={focused ? faHouseChimney : faHouseChimneyLight}
+              size={24}
+              color={color as string}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="gallery"
+        options={{
+          title: "Gallery",
+          tabBarIcon: ({ focused, color }) => (
+            <FontAwesomeIcon
+              icon={focused ? faImages : faImagesLight}
               size={24}
               color={color as string}
             />

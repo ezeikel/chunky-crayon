@@ -14,7 +14,6 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
-import Feed from "@/components/Feed/Feed";
 import MyRecentCreations from "@/components/MyRecentCreations";
 import CreateColoringImageForm from "@/components/forms/CreateColoringImageForm/CreateColoringImageForm";
 import ColoAvatar from "@/components/ColoAvatar";
@@ -168,12 +167,13 @@ const HomeScreen = () => {
             </View>
           </View>
 
-          {/* Recent creations strip — kid's active workbench. */}
+          {/* Recent creations strip — kid's active workbench.
+              Matches web's logged-in dashboard composition: greeting +
+              create + recent creations, deliberately minimal/kid-focused.
+              Browse content (today's pick / challenge / collections) lives
+              on the Gallery tab, not here — same split as web, where the
+              feed-like content sits on browse routes, not the dashboard. */}
           <MyRecentCreations />
-
-          <View style={{ marginTop: 16 }}>
-            <Feed />
-          </View>
         </ScrollView>
       </LinearGradient>
 
