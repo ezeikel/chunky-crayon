@@ -10,7 +10,6 @@ import SceneBuilder, {
   type SceneSelection,
 } from "@/components/SceneBuilder";
 import { useT } from "@/lib/i18n/useT";
-import { resolveR2Url } from "@/lib/r2-url";
 import {
   SUBJECT_OPTIONS,
   LOCATION_OPTIONS,
@@ -61,13 +60,15 @@ const SceneInput = ({ onCreate, initialSelection }: SceneInputProps) => {
       label: string;
       icon: SceneLayer["options"][number]["icon"];
       duotone: SceneLayer["options"][number]["duotone"];
-      thumbnailKey: string | null;
+      thumbnail: SceneLayer["options"][number]["thumbnail"];
     }) => ({
       key: o.key,
       label: o.label,
       icon: o.icon,
       duotone: o.duotone,
-      thumbnailUrl: resolveR2Url(o.thumbnailKey),
+      // Bundled illustration PNG (require()'d in the catalogue), not a
+      // runtime R2 URL — same pattern as profile avatars.
+      thumbnail: o.thumbnail,
     });
 
     return [

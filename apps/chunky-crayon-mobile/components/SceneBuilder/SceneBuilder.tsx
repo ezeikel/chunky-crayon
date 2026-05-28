@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  type ImageSourcePropType as ImageSource,
+} from "react-native";
 import { Image } from "expo-image";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -52,12 +59,18 @@ export type SceneTileOption = {
   key: string;
   /** Short label under the tile (app passes the translated string). */
   label: string;
-  /** FA fallback icon, shown when `thumbnailUrl` is null. */
+  /** FA fallback icon, shown when `thumbnail` is null. */
   icon: IconDefinition;
   /** Duotone palette for the FA fallback. */
   duotone: SceneTileDuotone;
-  /** Generated illustration; null until the asset pipeline runs. */
-  thumbnailUrl: string | null;
+  /**
+   * Bundled illustration source (the primary visual). The app passes a
+   * `require()`'d PNG (ImageSourcePropType); null falls back to the FA
+   * icon. Web passes a remote URL string instead — both are valid
+   * expo-image sources, but mobile bundles the assets (see lib/scene/
+   * scene-catalog.ts) so this is typically a require() module.
+   */
+  thumbnail: ImageSource | null;
   /**
    * "add" replaces the tile content with a plus-icon affordance — for
    * sentinels like `your-character` when the entity doesn't exist yet.
@@ -173,9 +186,9 @@ const SceneTile = ({
               size={iconSize}
               color={COLORS.crayonOrange}
             />
-          ) : option.thumbnailUrl ? (
+          ) : option.thumbnail ? (
             <Image
-              source={{ uri: option.thumbnailUrl }}
+              source={option.thumbnail}
               style={styles.thumbnail}
               contentFit="cover"
               transition={150}
