@@ -1,0 +1,22 @@
+# Maestro config for the Chunky Crayon mobile app.
+#
+# Maestro is our end-to-end UI test runner — it drives the compiled app on
+# a simulator/emulator and asserts real user journeys across navigation +
+# native modals (the parent gate, paywalls) that Storybook can't reach.
+#
+# Run a single flow:    maestro test .maestro/flows/<flow>.yaml
+# Run the whole suite:  maestro test .maestro/flows/
+# AI-driven (MCP):       the Maestro MCP server ships with the CLI — point
+#                        Claude Code at it to author/debug flows live.
+#
+# The app must be installed + a simulator booted first (we use Argent /
+# `pnpm ios`). Flows that hit the backend need EXPO_PUBLIC_API_URL pointing
+# at a reachable web app (local :3000 or a deployed env) — those are tagged
+# `backend` so they can be excluded from a pure-UI run with:
+#   maestro test .maestro/flows/ --exclude-tags=backend
+
+appId: com.chewybytes.chunkycrayon.app
+
+# Default flow include order when running the directory.
+flows:
+  - flows/*.yaml

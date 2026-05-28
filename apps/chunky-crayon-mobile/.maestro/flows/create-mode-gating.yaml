@@ -1,0 +1,69 @@
+# Create-form mode gating: Scene is the default + the other three modes
+# are parent-gated. Exercises the gate I built end to end: tap a gated mode
+# → parental gate → solve the sum → mode unlocks → its input panel shows.
+# Client-side, backend-independent.
+#
+# Scene Builder is the privacy-first default; Text / Voice / Image let a kid
+# feed arbitrary input into the AI, so they sit behind a one-time parent
+# gate (see feedback_cc_create_mode_parent_gating).
+#
+# Solving the sum: the gate has NO backdrop dismiss — the only exits are a
+# correct answer or 3 wrong answers. Maestro can't do arithmetic inline, so
+# we cover the gate's fixed 8-problem set with a conditional per problem,
+# tapping the correct answer button (matched by its accessibility label =
+# the number). Exactly one block fires per run.
+appId: com.chewybytes.chunkycrayon.app
+---
+- launchApp:
+    clearState: true
+    permissions:
+      all: allow
+
+# Dismiss a dev-build LogBox if one overlays on launch (keeps it un-flaky).
+- runFlow:
+    when:
+      visible: "Dismiss (ESC)"
+    commands:
+      - tapOn: "Dismiss (ESC)"
+
+# Scene is the default create mode — the "Who?" wizard step is showing.
+- assertVisible: "Who?"
+- assertVisible: "Horse"
+
+# Tapping a gated mode (Type) fires the parental gate, not the panel.
+- tapOn:
+    id: "Type input mode"
+- assertVisible: "Quick check"
+
+# Solve whichever problem is shown. PROBLEMS (ParentalGate.tsx):
+#   2+1=3, 1+3=4, 3+2=5, 4+2=6, 2+5=7, 3+4=7, 5+1=6, 1+4=5
+# The correct-answer button carries accessibilityLabel = the number.
+# Each block: when the operand text is visible, tap the answer.
+- runFlow:
+    when: { visible: "2 + 1 = ?" }
+    commands: [{ tapOn: { id: "3" } }]
+- runFlow:
+    when: { visible: "1 + 3 = ?" }
+    commands: [{ tapOn: { id: "4" } }]
+- runFlow:
+    when: { visible: "3 + 2 = ?" }
+    commands: [{ tapOn: { id: "5" } }]
+- runFlow:
+    when: { visible: "4 + 2 = ?" }
+    commands: [{ tapOn: { id: "6" } }]
+- runFlow:
+    when: { visible: "2 + 5 = ?" }
+    commands: [{ tapOn: { id: "7" } }]
+- runFlow:
+    when: { visible: "3 + 4 = ?" }
+    commands: [{ tapOn: { id: "7" } }]
+- runFlow:
+    when: { visible: "5 + 1 = ?" }
+    commands: [{ tapOn: { id: "6" } }]
+- runFlow:
+    when: { visible: "1 + 4 = ?" }
+    commands: [{ tapOn: { id: "5" } }]
+
+# Gate solved → it closes and Type mode unlocks, showing the text input.
+- assertNotVisible: "Quick check"
+- assertVisible: "Create coloring page"

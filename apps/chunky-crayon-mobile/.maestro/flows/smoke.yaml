@@ -1,0 +1,44 @@
+# Smoke test: the app launches and the home / create screen renders.
+#
+# Backend-independent — the create form + its header render even when the
+# feed fetch fails (no EXPO_PUBLIC_API_URL), so this is the baseline that
+# proves the app boots and the create surface mounts.
+appId: com.chewybytes.chunkycrayon.app
+---
+# NOTE: launch WITHOUT clearState. On a dev build, clearState wipes the
+# expo-dev-launcher's remembered Metro server, dropping you on the server
+# picker + dev-menu onboarding — non-deterministic relative to JS bundle
+# load. Without it the dev-client boots straight into the app. (For a
+# clean per-flow reset, run Maestro against a preview/release build, where
+# the launcher doesn't exist and env is baked in — see .maestro/config.yaml.)
+- launchApp:
+    permissions:
+      all: allow
+
+# If the dev-launcher server picker shows anyway, connect to the current
+# Metro (matched by its :8081 URL). Optional / dev-build only.
+- runFlow:
+    when:
+      visible: "Development Servers"
+    commands:
+      - tapOn:
+          text: ".*:8081"
+
+# Wait for the JS bundle to mount, then assert the create card's heading
+# (always present on the home tab).
+- extendedWaitUntil:
+    visible: "What do you want to color today?"
+    timeout: 60000
+
+# Scene is the default create mode → its first wizard step ("Who?") shows.
+- assertVisible: "Who?"
+
+# The four mode tiles are present (scene-first, then the gated three).
+- assertVisible:
+    id: "Build input mode"
+- assertVisible:
+    id: "Type input mode"
+- assertVisible:
+    id: "Talk input mode"
+- assertVisible:
+    id: "Photo input mode"
