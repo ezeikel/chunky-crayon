@@ -3,11 +3,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { PALETTE_COLORS } from "@/constants/Colors";
 import { TOOLBAR } from "@/constants/Sizes";
+import { COLORS } from "@/lib/design";
 import { selectionChanged } from "@/utils/haptics";
 
 /**
- * Horizontal color palette bar for landscape layouts.
- * Sits at the bottom of the canvas area, providing quick color access.
+ * Horizontal color palette bar for landscape layouts. Sits at the
+ * bottom of the canvas area for quick color access.
+ *
+ * Swatch styling matches ColorPalette + web: round swatches with a
+ * cream-dark border; the selected swatch gets the crayon-orange halo
+ * (orange ring + offset + white inner border), not a flat grey border.
  */
 const ColorPaletteBar = () => {
   const insets = useSafeAreaInsets();
@@ -26,29 +31,39 @@ const ColorPaletteBar = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {PALETTE_COLORS.map((color) => (
-          <Pressable key={color} onPress={() => handleColorSelect(color)}>
-            <View
+        {PALETTE_COLORS.map((color) => {
+          const isSelected = selectedColor === color;
+          return (
+            <Pressable
+              key={color}
+              onPress={() => handleColorSelect(color)}
               style={[
-                styles.colorSwatch,
-                { backgroundColor: color },
-                selectedColor === color && styles.colorSwatchActive,
-                color === "#FFFFFF" && styles.colorSwatchWhite,
+                styles.swatchWrap,
+                isSelected && styles.swatchWrapSelected,
               ]}
-            />
-          </Pressable>
-        ))}
+            >
+              <View
+                style={[
+                  { backgroundColor: color },
+                  isSelected ? styles.swatchSelected : styles.swatch,
+                ]}
+              />
+            </Pressable>
+          );
+        })}
       </ScrollView>
     </View>
   );
 };
 
+const SWATCH = 44;
+
 const styles = StyleSheet.create({
   container: {
     height: TOOLBAR.paletteHeight,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
+    backgroundColor: COLORS.white,
+    borderTopWidth: 2,
+    borderTopColor: COLORS.bgCreamDark,
     justifyContent: "center",
     paddingTop: 8,
   },
@@ -58,20 +73,31 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 16,
   },
-  colorSwatch: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  swatchWrap: {
+    width: SWATCH,
+    height: SWATCH,
+    borderRadius: SWATCH / 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  swatchWrapSelected: {
     borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderColor: COLORS.crayonOrange,
+    padding: 2,
   },
-  colorSwatchActive: {
-    borderWidth: 3,
-    borderColor: "#374151",
-    transform: [{ scale: 1.1 }],
+  swatch: {
+    width: SWATCH - 2,
+    height: SWATCH - 2,
+    borderRadius: (SWATCH - 2) / 2,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
   },
-  colorSwatchWhite: {
-    borderColor: "#D1D5DB",
+  swatchSelected: {
+    width: SWATCH - 10,
+    height: SWATCH - 10,
+    borderRadius: (SWATCH - 10) / 2,
+    borderWidth: 2,
+    borderColor: COLORS.white,
   },
 });
 

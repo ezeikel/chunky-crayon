@@ -9,8 +9,6 @@ import {
   faWandSparkles,
   faStar,
   faRainbow,
-  faSun,
-  faBoltLightning,
   faBrush,
   faArrowRotateLeft,
   faArrowRotateRight,
@@ -24,7 +22,8 @@ import {
   faTableCellsLarge,
   faBorderAll,
   faGripVertical,
-} from "@fortawesome/pro-solid-svg-icons";
+} from "@fortawesome/pro-duotone-svg-icons";
+import { COLORS } from "@/lib/design";
 import {
   useCanvasStore,
   Tool,
@@ -59,18 +58,20 @@ const ToolButton = ({
   <Pressable
     onPress={onPress}
     disabled={disabled}
-    className={`items-center justify-center px-3 py-2 rounded-lg min-w-14 ${
-      isActive
-        ? "bg-[#E46444]"
-        : disabled
-          ? "bg-gray-200 opacity-50"
-          : "bg-gray-100"
-    }`}
+    style={[
+      styles.button,
+      isActive ? styles.buttonActive : styles.buttonIdle,
+      disabled && styles.buttonDisabled,
+    ]}
   >
     <FontAwesomeIcon
       icon={icon}
       size={20}
-      color={isActive ? "#FFFFFF" : disabled ? "#9CA3AF" : "#4B5563"}
+      color={
+        isActive ? "#FFFFFF" : disabled ? COLORS.textMuted : COLORS.textPrimary
+      }
+      secondaryColor={isActive ? "rgba(255,255,255,0.85)" : COLORS.crayonPeach}
+      secondaryOpacity={1}
     />
     <Text
       style={[
@@ -132,15 +133,12 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
     { category: "weather", label: "Weather", icon: faCloudSun },
   ];
 
+  // Kids brush set — web removed glow/neon/glitter/pencil (confusing UX).
   const brushTypes: { type: BrushType; label: string; icon: IconDefinition }[] =
     [
       { type: "crayon", label: "Crayon", icon: faPencil },
       { type: "marker", label: "Marker", icon: faPaintbrush },
-      { type: "pencil", label: "Pencil", icon: faPencil },
       { type: "rainbow", label: "Rainbow", icon: faRainbow },
-      { type: "glow", label: "Glow", icon: faSun },
-      { type: "neon", label: "Neon", icon: faBoltLightning },
-      { type: "glitter", label: "Glitter", icon: faSparkles },
     ];
 
   const fillTypes: { type: FillType; label: string; icon: IconDefinition }[] = [
@@ -220,7 +218,7 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
 
       {/* Brush Type Selection (only show when brush tool is selected) */}
       {selectedTool === "brush" && (
-        <View className="flex-row gap-2 pt-2 border-t border-gray-200">
+        <View className="flex-row gap-2 pt-2 border-t border-[#F4EEE6]">
           {brushTypes.map(({ type, label, icon }) => (
             <ToolButton
               key={type}
@@ -239,7 +237,7 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
       {/* Fill Type Selection (only show when fill tool is selected) */}
       {selectedTool === "fill" && (
         <>
-          <View className="flex-row gap-2 pt-2 border-t border-gray-200">
+          <View className="flex-row gap-2 pt-2 border-t border-[#F4EEE6]">
             {fillTypes.map(({ type, label, icon }) => (
               <ToolButton
                 key={type}
@@ -256,7 +254,7 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
 
           {/* Pattern Selection (only show when pattern fill is selected) */}
           {fillType === "pattern" && (
-            <View className="flex-row flex-wrap gap-2 pt-2 border-t border-gray-200 mt-2">
+            <View className="flex-row flex-wrap gap-2 pt-2 border-t border-[#F4EEE6] mt-2">
               {patternTypes.map(({ type, label, icon }) => (
                 <ToolButton
                   key={type}
@@ -278,7 +276,7 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
       {selectedTool === "sticker" && (
         <>
           {/* Category Selection */}
-          <View className="flex-row gap-2 pt-2 border-t border-gray-200">
+          <View className="flex-row gap-2 pt-2 border-t border-[#F4EEE6]">
             {stickerCategoryInfo.map(({ category, label, icon }) => (
               <ToolButton
                 key={category}
@@ -299,7 +297,7 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            className="pt-2 border-t border-gray-200 mt-2"
+            className="pt-2 border-t border-[#F4EEE6] mt-2"
           >
             <View className="flex-row gap-2">
               {STICKER_CATEGORIES[stickerCategory].map((sticker, index) => (
@@ -309,11 +307,14 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
                     tapLight();
                     setSticker(sticker);
                   }}
-                  className={`items-center justify-center w-12 h-12 rounded-lg ${
-                    selectedSticker === sticker ? "bg-[#E46444]" : "bg-gray-100"
-                  }`}
+                  style={[
+                    styles.stickerTile,
+                    selectedSticker === sticker
+                      ? styles.buttonActive
+                      : styles.buttonIdle,
+                  ]}
                 >
-                  <Text className="text-2xl">{sticker}</Text>
+                  <Text style={styles.stickerEmoji}>{sticker}</Text>
                 </Pressable>
               ))}
             </View>
@@ -323,7 +324,7 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
 
       {/* Magic Mode Selection (only show when magic tool is selected) */}
       {selectedTool === "magic" && (
-        <View className="flex-row gap-2 pt-2 border-t border-gray-200">
+        <View className="flex-row gap-2 pt-2 border-t border-[#F4EEE6]">
           {magicModes.map(({ mode, label, icon }) => (
             <ToolButton
               key={mode}
@@ -350,6 +351,28 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
 };
 
 const styles = StyleSheet.create({
+  // White cream-bordered tool tile, orange-fill when active — matches
+  // web's ToolSelector + the rest of the mobile canvas chrome.
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    borderWidth: 2,
+    minWidth: 56,
+  },
+  buttonIdle: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.bgCreamDark,
+  },
+  buttonActive: {
+    backgroundColor: COLORS.crayonOrange,
+    borderColor: COLORS.crayonOrange,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
   buttonLabel: {
     fontSize: 12,
     marginTop: 2,
@@ -357,14 +380,25 @@ const styles = StyleSheet.create({
   },
   buttonLabelActive: {
     color: "#FFF",
-    fontWeight: "bold",
+    fontFamily: "RooneySans-Bold",
   },
   buttonLabelInactive: {
-    color: "#4B5563",
+    color: COLORS.textPrimary,
+  },
+  stickerTile: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    borderWidth: 2,
+  },
+  stickerEmoji: {
+    fontSize: 24,
   },
   hintText: {
     fontSize: 12,
-    color: "#6B7280",
+    color: COLORS.textMuted,
     fontFamily: "RooneySans-Regular",
   },
 });

@@ -1,9 +1,10 @@
 import { View, ScrollView, Pressable, Text, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faPalette } from "@fortawesome/pro-solid-svg-icons";
+import { faPalette } from "@fortawesome/pro-duotone-svg-icons";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { ALL_COLORING_COLORS } from "@/constants/Colors";
+import { COLORS } from "@/lib/design";
 import { selectionChanged } from "@/utils/haptics";
 
 type ColorPaletteSidebarProps = {
@@ -12,14 +13,16 @@ type ColorPaletteSidebarProps = {
 };
 
 /**
- * Left sidebar color palette for landscape layouts.
- * Matches web's DesktopColorPalette component with 4-column grid.
+ * Left sidebar color palette for landscape layouts. Mirrors web's
+ * DesktopColorPalette 4-column grid. Swatches match ColorPalette + web:
+ * cream-dark border, crayon-orange halo on the selected swatch (ring +
+ * offset + white inner border). Dims when magic tools are active
+ * (web's opacity-40 + pointer-events-none).
  */
 const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
   const insets = useSafeAreaInsets();
   const { selectedColor, setColor, selectedTool, magicMode } = useCanvasStore();
 
-  // Disable palette when magic tools are active
   const isMagicToolActive =
     selectedTool === "magic" &&
     (magicMode === "suggest" || magicMode === "auto");
@@ -30,13 +33,14 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
     setColor(color);
   };
 
-  // Calculate swatch size based on available width
   // 4 columns with gaps: width = 4*swatch + 3*gap + padding*2
   const paddingHorizontal = 12;
   const gap = 6;
   const availableWidth = width - paddingHorizontal * 2 - insets.left;
   const swatchSize = Math.floor((availableWidth - gap * 3) / 4);
   const clampedSwatchSize = Math.max(28, Math.min(swatchSize, 44));
+  const innerSize = clampedSwatchSize - 2;
+  const selectedInner = clampedSwatchSize - 10;
 
   return (
     <View
@@ -53,7 +57,13 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
     >
       {/* Header */}
       <View style={styles.header}>
-        <FontAwesomeIcon icon={faPalette} size={18} color="#E46444" />
+        <FontAwesomeIcon
+          icon={faPalette}
+          size={18}
+          color={COLORS.crayonOrange}
+          secondaryColor={COLORS.crayonPeach}
+          secondaryOpacity={1}
+        />
         <Text style={styles.headerText}>Colors</Text>
       </View>
 
@@ -62,38 +72,52 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.gridContainer,
-          { gap, opacity: isMagicToolActive ? 0.4 : 1 },
+          { opacity: isMagicToolActive ? 0.4 : 1 },
         ]}
+        pointerEvents={isMagicToolActive ? "none" : "auto"}
       >
         <View style={[styles.grid, { gap }]}>
           {ALL_COLORING_COLORS.map((color) => {
-            const isSelected = selectedColor === color.hex;
-            const isWhite = color.hex === "#FFFFFF";
+            const isSelected =
+              selectedColor === color.hex && !isMagicToolActive;
 
             return (
               <Pressable
                 key={color.hex}
                 onPress={() => handleColorSelect(color.hex)}
                 disabled={isMagicToolActive}
-                style={({ pressed }) => [
-                  styles.colorSwatch,
+                style={[
+                  styles.swatchWrap,
                   {
                     width: clampedSwatchSize,
                     height: clampedSwatchSize,
-                    backgroundColor: color.hex,
                     borderRadius: clampedSwatchSize / 2,
                   },
-                  isWhite && styles.colorSwatchWhite,
-                  isSelected && !isMagicToolActive && styles.colorSwatchActive,
-                  pressed && styles.colorSwatchPressed,
+                  isSelected && styles.swatchWrapSelected,
                 ]}
                 accessibilityLabel={`Select ${color.name} color`}
-                accessibilityHint={
-                  isMagicToolActive
-                    ? "Colors are chosen automatically with Magic tools"
-                    : undefined
-                }
-              />
+              >
+                <View
+                  style={[
+                    { backgroundColor: color.hex },
+                    isSelected
+                      ? {
+                          width: selectedInner,
+                          height: selectedInner,
+                          borderRadius: selectedInner / 2,
+                          borderWidth: 2,
+                          borderColor: COLORS.white,
+                        }
+                      : {
+                          width: innerSize,
+                          height: innerSize,
+                          borderRadius: innerSize / 2,
+                          borderWidth: 2,
+                          borderColor: COLORS.bgCreamDark,
+                        },
+                  ]}
+                />
+              </Pressable>
             );
           })}
         </View>
@@ -104,9 +128,9 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
-    borderRightWidth: 1,
-    borderRightColor: "#E5E7EB",
+    backgroundColor: COLORS.white,
+    borderRightWidth: 2,
+    borderRightColor: COLORS.bgCreamDark,
     shadowColor: "#000",
     shadowOffset: { width: 2, height: 0 },
     shadowOpacity: 0.1,
@@ -121,9 +145,8 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 14,
-    fontWeight: "bold",
     fontFamily: "TondoTrial-Bold",
-    color: "#374151",
+    color: COLORS.textPrimary,
   },
   gridContainer: {
     flexGrow: 1,
@@ -132,24 +155,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
-  colorSwatch: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+  swatchWrap: {
+    alignItems: "center",
+    justifyContent: "center",
   },
-  colorSwatchWhite: {
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-  },
-  colorSwatchActive: {
-    borderWidth: 3,
-    borderColor: "#374151",
-    transform: [{ scale: 1.1 }],
-  },
-  colorSwatchPressed: {
-    transform: [{ scale: 0.95 }],
+  swatchWrapSelected: {
+    borderWidth: 2,
+    borderColor: COLORS.crayonOrange,
+    padding: 2,
   },
 });
 

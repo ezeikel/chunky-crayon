@@ -10,8 +10,6 @@ import {
   faSparkles,
   faStar,
   faRainbow,
-  faSun,
-  faBoltLightning,
   faBrush,
   faArrowRotateLeft,
   faArrowRotateRight,
@@ -22,7 +20,8 @@ import {
   faMagnifyingGlassPlus,
   faMagnifyingGlassMinus,
   faExpand,
-} from "@fortawesome/pro-solid-svg-icons";
+} from "@fortawesome/pro-duotone-svg-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   useCanvasStore,
   Tool,
@@ -31,6 +30,7 @@ import {
 } from "@/stores/canvasStore";
 import { tapLight, tapMedium, notifyWarning } from "@/utils/haptics";
 import { BRUSH_SIZES } from "@/constants/Colors";
+import { COLORS, CRAYON } from "@/lib/design";
 
 type ToolConfig = {
   id: string;
@@ -42,7 +42,9 @@ type ToolConfig = {
   isMagic?: boolean;
 };
 
-// Regular tools shown as 4-column grid (matching web's DesktopToolsSidebar)
+// Kids regular tools (matching web's ToolSelector KIDS_TOOL_IDS — minus
+// the magic-auto which lives in the featured magic row below). Web removed
+// glow/neon/glitter (confusing UX), so they're dropped here too.
 const regularTools: ToolConfig[] = [
   {
     id: "crayon",
@@ -59,48 +61,25 @@ const regularTools: ToolConfig[] = [
     icon: faPaintbrush,
   },
   {
-    id: "glitter",
-    tool: "brush",
-    brushType: "glitter",
-    label: "Glitter",
-    icon: faSparkles,
-  },
-  {
     id: "rainbow",
     tool: "brush",
     brushType: "rainbow",
     label: "Rainbow",
     icon: faRainbow,
   },
-  { id: "glow", tool: "brush", brushType: "glow", label: "Glow", icon: faSun },
-  {
-    id: "neon",
-    tool: "brush",
-    brushType: "neon",
-    label: "Neon",
-    icon: faBoltLightning,
-  },
   { id: "fill", tool: "fill", label: "Fill", icon: faFillDrip },
   { id: "eraser", tool: "eraser", label: "Eraser", icon: faEraser },
   { id: "sticker", tool: "sticker", label: "Sticker", icon: faStar },
 ];
 
-// Magic tools shown with labels (matching web's featured magic tools)
+// Featured magic tools (web shows these with labels + the magic gradient).
 const magicTools: ToolConfig[] = [
-  {
-    id: "magic-suggest",
-    tool: "magic",
-    magicMode: "suggest",
-    label: "Magic Brush",
-    icon: faBrush,
-    isMagic: true,
-  },
   {
     id: "magic-auto",
     tool: "magic",
     magicMode: "auto",
     label: "Auto Color",
-    icon: faFillDrip,
+    icon: faBrush,
     isMagic: true,
   },
 ];
@@ -238,7 +217,13 @@ const ToolsSidebar = ({
         {/* Tools Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <FontAwesomeIcon icon={faToolbox} size={16} color="#E46444" />
+            <FontAwesomeIcon
+              icon={faToolbox}
+              size={16}
+              color={COLORS.crayonOrange}
+              secondaryColor={COLORS.crayonPeach}
+              secondaryOpacity={1}
+            />
             <Text style={styles.sectionTitle}>Tools</Text>
           </View>
 
@@ -256,14 +241,18 @@ const ToolsSidebar = ({
                       width: clampedButtonSize,
                       height: clampedButtonSize,
                     },
-                    isActive && styles.toolButtonActive,
+                    isActive ? styles.toolButtonActive : styles.toolButtonIdle,
                   ]}
                   accessibilityLabel={config.label}
                 >
                   <FontAwesomeIcon
                     icon={config.icon}
                     size={clampedButtonSize * 0.45}
-                    color={isActive ? "#FFFFFF" : "#4B5563"}
+                    color={isActive ? "#FFFFFF" : COLORS.textPrimary}
+                    secondaryColor={
+                      isActive ? "rgba(255,255,255,0.85)" : COLORS.crayonPeach
+                    }
+                    secondaryOpacity={1}
                   />
                 </Pressable>
               );
@@ -278,28 +267,43 @@ const ToolsSidebar = ({
                 <Pressable
                   key={config.id}
                   onPress={() => handleToolSelect(config)}
-                  style={[
-                    styles.magicToolButton,
-                    isActive && styles.magicToolButtonActive,
-                  ]}
                   accessibilityLabel={config.label}
                 >
-                  <FontAwesomeIcon
-                    icon={config.icon}
-                    size={16}
-                    color={isActive ? "#FFFFFF" : "#8E24AA"}
-                  />
-                  <Text
-                    style={[
-                      styles.magicToolLabel,
-                      isActive && styles.magicToolLabelActive,
-                    ]}
+                  <LinearGradient
+                    colors={
+                      isActive
+                        ? [CRAYON.purple.base, CRAYON.pink.base]
+                        : [`${CRAYON.purple.base}1F`, `${CRAYON.pink.base}1F`]
+                    }
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.magicToolButton}
                   >
-                    {config.label}
-                  </Text>
-                  <Text style={[styles.magicEmoji, isActive && { opacity: 1 }]}>
-                    ✨
-                  </Text>
+                    <FontAwesomeIcon
+                      icon={config.icon}
+                      size={16}
+                      color={isActive ? "#FFFFFF" : CRAYON.purple.base}
+                      secondaryColor={
+                        isActive ? "rgba(255,255,255,0.85)" : CRAYON.pink.base
+                      }
+                      secondaryOpacity={1}
+                    />
+                    <Text
+                      style={[
+                        styles.magicToolLabel,
+                        isActive && styles.magicToolLabelActive,
+                      ]}
+                    >
+                      {config.label}
+                    </Text>
+                    <FontAwesomeIcon
+                      icon={faSparkles}
+                      size={13}
+                      color={isActive ? "#FFFFFF" : CRAYON.purple.base}
+                      secondaryColor={CRAYON.pink.base}
+                      secondaryOpacity={1}
+                    />
+                  </LinearGradient>
                 </Pressable>
               );
             })}
@@ -312,7 +316,13 @@ const ToolsSidebar = ({
         {/* Brush Size Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <FontAwesomeIcon icon={faRuler} size={14} color="#E46444" />
+            <FontAwesomeIcon
+              icon={faRuler}
+              size={14}
+              color={COLORS.crayonOrange}
+              secondaryColor={COLORS.crayonPeach}
+              secondaryOpacity={1}
+            />
             <Text style={styles.sectionTitle}>Size</Text>
           </View>
 
@@ -366,7 +376,9 @@ const ToolsSidebar = ({
             <FontAwesomeIcon
               icon={faClockRotateLeft}
               size={14}
-              color="#E46444"
+              color={COLORS.crayonOrange}
+              secondaryColor={COLORS.crayonPeach}
+              secondaryOpacity={1}
             />
             <Text style={styles.sectionTitle}>History</Text>
           </View>
@@ -385,7 +397,7 @@ const ToolsSidebar = ({
               <FontAwesomeIcon
                 icon={faArrowRotateLeft}
                 size={16}
-                color={canUndo() ? "#4B5563" : "#9CA3AF"}
+                color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
               />
             </Pressable>
             <Pressable
@@ -401,7 +413,7 @@ const ToolsSidebar = ({
               <FontAwesomeIcon
                 icon={faArrowRotateRight}
                 size={16}
-                color={canRedo() ? "#4B5563" : "#9CA3AF"}
+                color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
               />
             </Pressable>
           </View>
@@ -416,7 +428,9 @@ const ToolsSidebar = ({
             <FontAwesomeIcon
               icon={faMagnifyingGlassPlus}
               size={14}
-              color="#E46444"
+              color={COLORS.crayonOrange}
+              secondaryColor={COLORS.crayonPeach}
+              secondaryOpacity={1}
             />
             <Text style={styles.sectionTitle}>Zoom</Text>
           </View>
@@ -438,7 +452,7 @@ const ToolsSidebar = ({
               <FontAwesomeIcon
                 icon={faMagnifyingGlassMinus}
                 size={14}
-                color={zoom <= minZoom ? "#9CA3AF" : "#4B5563"}
+                color={zoom <= minZoom ? COLORS.textMuted : COLORS.textPrimary}
               />
             </Pressable>
             <Pressable
@@ -457,7 +471,7 @@ const ToolsSidebar = ({
               <FontAwesomeIcon
                 icon={faMagnifyingGlassPlus}
                 size={14}
-                color={zoom >= maxZoom ? "#9CA3AF" : "#4B5563"}
+                color={zoom >= maxZoom ? COLORS.textMuted : COLORS.textPrimary}
               />
             </Pressable>
             <Pressable
@@ -471,7 +485,11 @@ const ToolsSidebar = ({
               ]}
               accessibilityLabel="Reset Zoom"
             >
-              <FontAwesomeIcon icon={faExpand} size={14} color="#4B5563" />
+              <FontAwesomeIcon
+                icon={faExpand}
+                size={14}
+                color={COLORS.textPrimary}
+              />
             </Pressable>
           </View>
 
@@ -485,9 +503,9 @@ const ToolsSidebar = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
-    borderLeftWidth: 1,
-    borderLeftColor: "#E5E7EB",
+    backgroundColor: COLORS.white,
+    borderLeftWidth: 2,
+    borderLeftColor: COLORS.bgCreamDark,
     shadowColor: "#000",
     shadowOffset: { width: -2, height: 0 },
     shadowOpacity: 0.1,
@@ -507,13 +525,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 12,
-    fontWeight: "bold",
     fontFamily: "TondoTrial-Bold",
-    color: "#374151",
+    color: COLORS.textPrimary,
   },
   divider: {
     height: 1,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: COLORS.bgCreamDark,
     marginVertical: 4,
   },
   toolGrid: {
@@ -523,11 +540,16 @@ const styles = StyleSheet.create({
   toolButton: {
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
-    backgroundColor: "#F3F4F6",
+    borderRadius: 16,
+    borderWidth: 2,
+  },
+  toolButtonIdle: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.bgCreamDark,
   },
   toolButtonActive: {
-    backgroundColor: "#E46444",
+    backgroundColor: COLORS.crayonOrange,
+    borderColor: COLORS.crayonOrange,
   },
   magicToolsContainer: {
     marginTop: 6,
@@ -538,25 +560,16 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: "rgba(142, 36, 170, 0.1)",
-  },
-  magicToolButtonActive: {
-    // React Native doesn't support linear-gradient, use solid color
-    backgroundColor: "#8E24AA",
+    borderRadius: 16,
   },
   magicToolLabel: {
     flex: 1,
     fontSize: 12,
-    fontWeight: "bold",
-    color: "#8E24AA",
+    fontFamily: "TondoTrial-Bold",
+    color: CRAYON.purple.dark,
   },
   magicToolLabelActive: {
     color: "#FFFFFF",
-  },
-  magicEmoji: {
-    fontSize: 12,
-    opacity: 0.7,
   },
   sizeRow: {
     flexDirection: "row",
@@ -565,13 +578,14 @@ const styles = StyleSheet.create({
   sizeButton: {
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
-    backgroundColor: "#F3F4F6",
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
   },
   sizeButtonActive: {
-    backgroundColor: "#E5E7EB",
-    borderWidth: 2,
-    borderColor: "#9CA3AF",
+    backgroundColor: COLORS.crayonOrange,
+    borderColor: COLORS.crayonOrange,
   },
   sizeDot: {
     // Dynamic size set inline
@@ -583,8 +597,10 @@ const styles = StyleSheet.create({
   historyButton: {
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
-    backgroundColor: "#F3F4F6",
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
   },
   historyButtonDisabled: {
     opacity: 0.5,
@@ -593,12 +609,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     flexWrap: "wrap",
+    gap: 6,
   },
   zoomButton: {
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 8,
-    backgroundColor: "#F3F4F6",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
   },
   zoomButtonDisabled: {
     opacity: 0.5,
@@ -606,7 +625,7 @@ const styles = StyleSheet.create({
   zoomPercentage: {
     textAlign: "center",
     fontSize: 11,
-    color: "#6B7280",
+    color: COLORS.textMuted,
     marginTop: 4,
   },
 });
