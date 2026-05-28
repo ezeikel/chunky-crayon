@@ -154,8 +154,16 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       setHasAutoColored,
       paletteVariant,
       pushToHistory,
+      setMagicReady,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
+
+    // Surface region-store readiness to the toolbars so the magic-brush /
+    // auto-color buttons disable + spin until the pre-computed region store
+    // is available. 'ready' = usable; 'waiting'/'retrying'/'timeout' = not.
+    useEffect(() => {
+      setMagicReady(regionStoreStatus === 'ready');
+    }, [regionStoreStatus, setMagicReady]);
 
     // Parse region-aware fill points (preferred) and grid color map (fallback)
     const parsedFillPoints = useMemo<FillPointsData | null>(() => {

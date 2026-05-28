@@ -145,8 +145,14 @@ const ToolSelector = ({
   className,
   onStickerToolSelect,
 }: ToolSelectorProps) => {
-  const { activeTool, setActiveTool, brushType, setBrushType, variant } =
-    useColoringContext();
+  const {
+    activeTool,
+    setActiveTool,
+    brushType,
+    setBrushType,
+    variant,
+    magicReady,
+  } = useColoringContext();
   const { playSound } = useSound();
 
   // Filter tools based on variant
@@ -201,9 +207,13 @@ const ToolSelector = ({
         setActiveTool("eyedropper");
         break;
       case "magic-reveal":
+        // The magic tools need the pre-computed region store; ignore taps
+        // until it's ready (the button is also visually disabled).
+        if (!magicReady) return;
         setActiveTool("magic-reveal");
         break;
       case "magic-auto":
+        if (!magicReady) return;
         setActiveTool("magic-auto");
         break;
     }
@@ -241,32 +251,52 @@ const ToolSelector = ({
         const isActive = isToolActive(id);
 
         if (isMagic) {
+          // Magic tools depend on the pre-computed region store. While
+          // it's still being written (`!magicReady`) the button is
+          // disabled and shows a spinner in place of the icon — it reads
+          // as "getting ready" rather than broken.
           return (
             <button
               type="button"
               key={id}
               onClick={() => handleToolSelect(id)}
+              disabled={!magicReady}
               className={cn(
                 "relative flex items-center justify-center rounded-coloring-card size-10 sm:size-12 transition-all duration-coloring-base ease-coloring",
-                "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-magic-from",
+                "focus:outline-none focus:ring-2 focus:ring-coloring-magic-from",
+                magicReady && "active:scale-95",
                 isActive
                   ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
                   : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
+                !magicReady && "cursor-not-allowed opacity-60",
               )}
-              aria-label={label}
-              title={label}
+              aria-label={magicReady ? label : `${label} (getting ready)`}
+              title={magicReady ? label : `${label} — getting ready…`}
               aria-pressed={isActive}
+              aria-busy={!magicReady}
               data-testid={`tool-${id}`}
             >
-              <Icon className="size-5 sm:size-6" />
-              <FontAwesomeIcon
-                icon={faSparkles}
-                className={cn(
-                  "absolute -top-2 -right-2 size-4 drop-shadow-sm",
-                  isActive ? "text-white" : "text-coloring-magic-from",
-                )}
-                aria-hidden
-              />
+              {magicReady ? (
+                <>
+                  <Icon className="size-5 sm:size-6" />
+                  <FontAwesomeIcon
+                    icon={faSparkles}
+                    className={cn(
+                      "absolute -top-2 -right-2 size-4 drop-shadow-sm",
+                      isActive ? "text-white" : "text-coloring-magic-from",
+                    )}
+                    aria-hidden
+                  />
+                </>
+              ) : (
+                <span
+                  className={cn(
+                    "size-5 sm:size-6 rounded-full border-2 animate-spin",
+                    "border-coloring-magic-from/30 border-t-coloring-magic-from",
+                  )}
+                  aria-hidden
+                />
+              )}
             </button>
           );
         }

@@ -236,6 +236,7 @@ const MobileColoringDrawer = ({
     brushSize,
     selectedPattern,
     paletteVariant,
+    magicReady,
     setActiveTool,
     setBrushType,
     setSelectedColor,
@@ -531,9 +532,12 @@ const MobileColoringDrawer = ({
         onStickerToolSelect?.();
         break;
       case "magic-reveal":
+        // Magic tools need the region store; ignore taps until ready.
+        if (!magicReady) return;
         setActiveTool("magic-reveal");
         break;
       case "magic-auto":
+        if (!magicReady) return;
         setActiveTool("magic-auto");
         break;
     }
@@ -650,36 +654,57 @@ const MobileColoringDrawer = ({
                     {visibleTools.map((tool) => {
                       const isActive = isToolActive(tool.id);
                       if (tool.isMagic) {
-                        // Magic tools — purple→pink gradient background + sparkle
-                        // decoration, mirroring desktop.
+                        // Magic tools — purple→pink gradient background +
+                        // sparkle decoration, mirroring desktop. Disabled
+                        // with a spinner until the region store is ready.
                         return (
                           <button
                             key={tool.id}
                             type="button"
                             onClick={() => handleToolSelect(tool.id)}
+                            disabled={!magicReady}
                             className={cn(
                               "relative aspect-square w-full rounded-coloring-card",
                               "flex items-center justify-center",
-                              "transition-all duration-coloring-base ease-coloring active:scale-95",
+                              "transition-all duration-coloring-base ease-coloring",
+                              magicReady && "active:scale-95",
                               isActive
                                 ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
                                 : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
+                              !magicReady && "cursor-not-allowed opacity-60",
                             )}
-                            aria-label={tool.label}
+                            aria-label={
+                              magicReady
+                                ? tool.label
+                                : `${tool.label} (getting ready)`
+                            }
                             aria-pressed={isActive}
+                            aria-busy={!magicReady}
                           >
-                            <FontAwesomeIcon icon={tool.icon} size="xl" />
-                            <FontAwesomeIcon
-                              icon={faSparkles}
-                              size="lg"
-                              aria-hidden
-                              className={cn(
-                                "absolute -top-2 -right-2 drop-shadow-sm",
-                                isActive
-                                  ? "text-white"
-                                  : "text-coloring-magic-from",
-                              )}
-                            />
+                            {magicReady ? (
+                              <>
+                                <FontAwesomeIcon icon={tool.icon} size="xl" />
+                                <FontAwesomeIcon
+                                  icon={faSparkles}
+                                  size="lg"
+                                  aria-hidden
+                                  className={cn(
+                                    "absolute -top-2 -right-2 drop-shadow-sm",
+                                    isActive
+                                      ? "text-white"
+                                      : "text-coloring-magic-from",
+                                  )}
+                                />
+                              </>
+                            ) : (
+                              <span
+                                className={cn(
+                                  "size-6 rounded-full border-2 animate-spin",
+                                  "border-coloring-magic-from/30 border-t-coloring-magic-from",
+                                )}
+                                aria-hidden
+                              />
+                            )}
                           </button>
                         );
                       }

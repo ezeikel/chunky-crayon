@@ -116,6 +116,16 @@ type ColoringContextArgs = {
   paletteVariant: PaletteVariant;
   setPaletteVariant: Dispatch<SetStateAction<PaletteVariant>>;
 
+  // Magic-tool readiness — the magic brush + auto-color depend on the
+  // pre-computed region store (regionMapUrl + regionsJson), which the
+  // backend writes asynchronously after image creation. While it's not
+  // yet available the magic tools can't work, so the host sets this false
+  // and the toolbars disable + show a spinner on those buttons. Defaults
+  // true so images without a region store (or already-ready ones) aren't
+  // blocked.
+  magicReady: boolean;
+  setMagicReady: Dispatch<SetStateAction<boolean>>;
+
   // Variant — controls which feature set is exposed
   variant: ColoringVariant;
 };
@@ -182,6 +192,8 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setHasAutoColored: () => {},
   paletteVariant: "realistic",
   setPaletteVariant: () => {},
+  magicReady: true,
+  setMagicReady: () => {},
   variant: "adult",
 });
 
@@ -263,6 +275,10 @@ export const ColoringContextProvider = ({
   const [hasAutoColored, setHasAutoColored] = useState(false);
   const [paletteVariant, setPaletteVariant] =
     useState<PaletteVariant>("realistic");
+  // Default true: images without a region store, or already-ready ones,
+  // shouldn't have their magic tools blocked. The host flips this false
+  // while the region store is still being written.
+  const [magicReady, setMagicReady] = useState(true);
 
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
@@ -387,6 +403,8 @@ export const ColoringContextProvider = ({
       setHasAutoColored,
       paletteVariant,
       setPaletteVariant,
+      magicReady,
+      setMagicReady,
       variant,
     }),
     [
@@ -422,6 +440,7 @@ export const ColoringContextProvider = ({
       isAutoColoring,
       hasAutoColored,
       paletteVariant,
+      magicReady,
       variant,
     ],
   );
