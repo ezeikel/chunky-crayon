@@ -8,13 +8,16 @@ import {
   Dimensions,
 } from "react-native";
 import { Image } from "expo-image";
+import { SvgUri } from "react-native-svg";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHeart, faPalette } from "@fortawesome/pro-solid-svg-icons";
+import { faPaintbrush } from "@fortawesome/pro-duotone-svg-icons";
 import { useRouter } from "expo-router";
 import AppHeader from "@/components/AppHeader";
 import useHeaderData from "@/hooks/useHeaderData";
-import { useSavedArtworks } from "@/hooks/api";
+import { useSavedArtworks, useFeed } from "@/hooks/api";
+import { COLORS, FONTS } from "@/lib/design";
 
 const { width: screenWidth } = Dimensions.get("window");
 const GRID_PADDING = 16;
@@ -25,10 +28,15 @@ const ITEM_WIDTH =
 
 const MyArtworkScreen = () => {
   const headerData = useHeaderData();
-  const { data, isLoading, error } = useSavedArtworks();
+  const { data, isLoading } = useSavedArtworks();
+  const { data: feed } = useFeed();
   const router = useRouter();
 
   const artworks = data?.artworks ?? [];
+  // In-progress "workbench" — coloring pages the kid has started but not
+  // saved. Web splits my-stuff into this workbench + the saved archive;
+  // mobile mirrors that with an "In Progress" section above "Saved".
+  const inProgress = feed?.inProgressWork ?? [];
 
   const handleArtworkPress = (coloringImageId: string) => {
     router.push(`/coloring-image/${coloringImageId}`);
@@ -62,11 +70,70 @@ const MyArtworkScreen = () => {
     </View>
   );
 
+  // Workbench: pages started but not yet saved. Tap to keep coloring.
+  const renderInProgress = () => {
+    if (inProgress.length === 0) return null;
+    return (
+      <View style={styles.gridContainer}>
+        <View style={styles.sectionHeaderRow}>
+          <FontAwesomeIcon
+            icon={faPaintbrush}
+            size={18}
+            color={COLORS.crayonOrange}
+            secondaryColor={COLORS.crayonPeach}
+            secondaryOpacity={1}
+          />
+          <Text style={styles.sectionTitle}>Keep Coloring</Text>
+        </View>
+        <View style={styles.grid}>
+          {inProgress.map((item) => (
+            <Pressable
+              key={item.id}
+              style={({ pressed }) => [
+                styles.artworkCard,
+                pressed && styles.artworkCardPressed,
+              ]}
+              onPress={() => handleArtworkPress(item.coloringImageId)}
+            >
+              {item.previewUrl ? (
+                <Image
+                  source={{ uri: item.previewUrl }}
+                  style={styles.artworkImage}
+                  contentFit="cover"
+                  transition={200}
+                />
+              ) : item.coloringImage.svgUrl ? (
+                <View style={styles.artworkImage}>
+                  <SvgUri
+                    uri={item.coloringImage.svgUrl}
+                    width="100%"
+                    height="100%"
+                  />
+                </View>
+              ) : (
+                <View style={styles.artworkImage} />
+              )}
+              <View style={styles.artworkInfo}>
+                <Text style={styles.artworkTitle} numberOfLines={1}>
+                  {item.coloringImage.title}
+                </Text>
+                <Text style={styles.artworkDate}>In progress</Text>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
   const renderArtworkGrid = () => (
     <View style={styles.gridContainer}>
-      <Text style={styles.sectionTitle}>
-        {artworks.length} Saved Artwork{artworks.length !== 1 ? "s" : ""}
-      </Text>
+      <View style={styles.sectionHeaderRow}>
+        <FontAwesomeIcon icon={faHeart} size={16} color={COLORS.crayonOrange} />
+        <Text style={styles.sectionTitle}>
+          {artworks.length} Saved Artwork{artworks.length !== 1 ? "s" : ""}
+        </Text>
+      </View>
       <View style={styles.grid}>
         {artworks.map((artwork) => (
           <Pressable
@@ -110,17 +177,24 @@ const MyArtworkScreen = () => {
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={
-            artworks.length === 0
+            // Centered empty state only when there's nothing at all —
+            // neither in-progress nor saved.
+            !isLoading && artworks.length === 0 && inProgress.length === 0
               ? styles.emptyScrollContent
               : styles.scrollContent
           }
           showsVerticalScrollIndicator={false}
         >
-          {isLoading
-            ? renderLoading()
-            : artworks.length === 0
-              ? renderEmptyState()
-              : renderArtworkGrid()}
+          {isLoading ? (
+            renderLoading()
+          ) : artworks.length === 0 && inProgress.length === 0 ? (
+            renderEmptyState()
+          ) : (
+            <>
+              {renderInProgress()}
+              {artworks.length > 0 && renderArtworkGrid()}
+            </>
+          )}
         </ScrollView>
       </LinearGradient>
     </View>
@@ -207,11 +281,16 @@ const styles = StyleSheet.create({
   gridContainer: {
     padding: GRID_PADDING,
   },
-  sectionTitle: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 20,
-    color: "#374151",
+  sectionHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
     marginBottom: 16,
+  },
+  sectionTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 20,
+    color: COLORS.textPrimary,
   },
   grid: {
     flexDirection: "row",
