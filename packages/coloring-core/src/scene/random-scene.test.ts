@@ -1,12 +1,12 @@
-import { describe, expect, it } from 'vitest';
-import { rollRandomScene } from './random-scene';
-import { buildSceneDescription } from './build-scene-description';
+import { describe, expect, it } from "vitest";
+import { rollRandomScene } from "./random-scene";
+import { buildSceneDescription } from "./build-scene-description";
 import {
   LOCATION_OPTIONS,
   WEATHER_OPTIONS,
   ACTIVITY_OPTIONS,
   ACCENT_OPTIONS,
-} from './scene-catalog';
+} from "./scene-catalog";
 
 /**
  * The dice button must always produce a valid, colourable scene. A roll
@@ -21,25 +21,25 @@ const weatherKeys = new Set(WEATHER_OPTIONS.map((o) => o.key));
 const activityKeys = new Set(ACTIVITY_OPTIONS.map((o) => o.key));
 const accentKeys = new Set(ACCENT_OPTIONS.map((o) => o.key));
 
-describe('rollRandomScene', () => {
-  it('is deterministic for a given seed', () => {
+describe("rollRandomScene", () => {
+  it("is deterministic for a given seed", () => {
     expect(rollRandomScene(12345)).toEqual(rollRandomScene(12345));
   });
 
-  it('different seeds generally differ', () => {
+  it("different seeds generally differ", () => {
     const a = JSON.stringify(rollRandomScene(1));
     const b = JSON.stringify(rollRandomScene(999999));
     expect(a).not.toBe(b);
   });
 
-  it('always sets a valid location', () => {
+  it("always sets a valid location", () => {
     for (let seed = 0; seed < 200; seed += 1) {
       const r = rollRandomScene(seed);
       expect(locationKeys.has(r.location)).toBe(true);
     }
   });
 
-  it('always picks 1 or 2 subjects, never zero, never over the cap', () => {
+  it("always picks 1 or 2 subjects, never zero, never over the cap", () => {
     for (let seed = 0; seed < 200; seed += 1) {
       const r = rollRandomScene(seed);
       expect(r.subjects.length).toBeGreaterThanOrEqual(1);
@@ -47,21 +47,21 @@ describe('rollRandomScene', () => {
     }
   });
 
-  it('never auto-picks the your-character sentinel', () => {
+  it("never auto-picks the your-character sentinel", () => {
     for (let seed = 0; seed < 500; seed += 1) {
       const r = rollRandomScene(seed);
-      expect(r.subjects).not.toContain('your-character');
+      expect(r.subjects).not.toContain("your-character");
     }
   });
 
-  it('never repeats a subject within a roll', () => {
+  it("never repeats a subject within a roll", () => {
     for (let seed = 0; seed < 200; seed += 1) {
       const r = rollRandomScene(seed);
       expect(new Set(r.subjects).size).toBe(r.subjects.length);
     }
   });
 
-  it('optional layers are either null or a valid key', () => {
+  it("optional layers are either null or a valid key", () => {
     for (let seed = 0; seed < 200; seed += 1) {
       const r = rollRandomScene(seed);
       if (r.weather != null) expect(weatherKeys.has(r.weather)).toBe(true);
@@ -70,12 +70,12 @@ describe('rollRandomScene', () => {
     }
   });
 
-  it('produces a non-empty description for every seeded roll', () => {
+  it("produces a non-empty description for every seeded roll", () => {
     for (let seed = 0; seed < 200; seed += 1) {
       const r = rollRandomScene(seed);
       const desc = buildSceneDescription(r);
       expect(desc.length).toBeGreaterThan(0);
-      expect(desc).not.toBe('a friendly animal in a happy scene');
+      expect(desc).not.toBe("a friendly animal in a happy scene");
     }
   });
 });

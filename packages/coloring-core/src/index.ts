@@ -251,6 +251,37 @@ export {
 } from "./scene/seasonal-calendar";
 export type { SeasonalEvent } from "./scene/seasonal-calendar";
 
+// Scene Builder catalogue (data-only — no FA icons; presentation lives
+// per-app) + the deterministic description builder, dice roller, and
+// gateable-mode constants. Shared by web + mobile create forms.
+export {
+  SUBJECT_OPTIONS,
+  LOCATION_OPTIONS,
+  WEATHER_OPTIONS,
+  ACTIVITY_OPTIONS,
+  ACCENT_OPTIONS,
+  MAX_SUBJECTS,
+  SCENE_LAYERS,
+} from "./scene/scene-catalog";
+export type {
+  SubjectKey,
+  LocationKey,
+  WeatherKey,
+  ActivityKey,
+  AccentKey,
+  SubjectOption,
+  LocationOption,
+  WeatherOption,
+  ActivityOption,
+  AccentOption,
+} from "./scene/scene-catalog";
+export { buildSceneDescription } from "./scene/build-scene-description";
+export type { ScenePicks } from "./scene/build-scene-description";
+export { rollRandomScene } from "./scene/random-scene";
+export type { RandomSceneResult } from "./scene/random-scene";
+export { GATEABLE_MODES, isGateableMode } from "./scene/modes";
+export type { GateableMode } from "./scene/modes";
+
 // Bundles — hero character profiles + page QA gate. Shared between web
 // (admin UI, retry endpoint) and worker (page generation pipeline).
 export {
