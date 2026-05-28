@@ -93,6 +93,7 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
     selectedSticker,
     stickerCategory,
     magicMode,
+    magicReady,
     setTool,
     setBrushType,
     setFillType,
@@ -171,18 +172,24 @@ const CanvasToolbar = ({ style }: CanvasToolbarProps) => {
       {/* Tool Selection Row */}
       <View className="flex-row justify-between mb-3">
         <View className="flex-row gap-2">
-          {tools.map(({ tool, label, icon }) => (
-            <ToolButton
-              key={tool}
-              label={label}
-              icon={icon}
-              isActive={selectedTool === tool}
-              onPress={() => {
-                tapLight();
-                setTool(tool);
-              }}
-            />
-          ))}
+          {tools.map(({ tool, label, icon }) => {
+            // The magic tool needs the region store; disable until ready.
+            const magicLocked = tool === "magic" && !magicReady;
+            return (
+              <ToolButton
+                key={tool}
+                label={label}
+                icon={icon}
+                isActive={selectedTool === tool}
+                disabled={magicLocked}
+                onPress={() => {
+                  if (magicLocked) return;
+                  tapLight();
+                  setTool(tool);
+                }}
+              />
+            );
+          })}
         </View>
 
         {/* Undo/Redo */}

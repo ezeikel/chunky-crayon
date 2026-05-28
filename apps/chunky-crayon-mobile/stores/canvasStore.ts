@@ -181,6 +181,14 @@ export type CanvasState = {
 
   // Magic tool settings
   magicMode: MagicMode;
+  /**
+   * Whether the magic tools (auto-color / magic brush) are usable. They
+   * depend on the pre-computed region store, which the backend writes
+   * async after image creation. While it's not ready the toolbars disable
+   * + spin those buttons. Mirrors web's coloring-context `magicReady`.
+   * Defaults true so images without a region store aren't blocked.
+   */
+  magicReady: boolean;
 
   // Rainbow brush hue tracking (0-360)
   rainbowHue: number;
@@ -220,6 +228,7 @@ type CanvasActions = {
   setStickerCategory: (category: StickerCategory) => void;
   setStickerSize: (size: number) => void;
   setMagicMode: (mode: MagicMode) => void;
+  setMagicReady: (ready: boolean) => void;
   advanceRainbowHue: (amount?: number) => void;
 
   // History actions
@@ -262,6 +271,7 @@ const initialState: CanvasState = {
   stickerCategory: "animals",
   stickerSize: 40,
   magicMode: "suggest",
+  magicReady: true,
   rainbowHue: 0,
 
   history: [],
@@ -296,6 +306,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     setStickerSize: (size) =>
       set({ stickerSize: Math.max(20, Math.min(100, size)) }),
     setMagicMode: (mode) => set({ magicMode: mode }),
+    setMagicReady: (ready) => set({ magicReady: ready }),
     advanceRainbowHue: (amount = 30) =>
       set((state) => ({ rainbowHue: (state.rainbowHue + amount) % 360 })),
 

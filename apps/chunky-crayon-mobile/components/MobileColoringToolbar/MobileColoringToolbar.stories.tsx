@@ -45,6 +45,7 @@ export const Default: Story = {
         selectedTool: "brush",
         brushType: "crayon",
         selectedColor: "#E46444",
+        magicReady: true,
       });
     }, []);
     return (
@@ -62,6 +63,7 @@ export const FillSelected: Story = {
         selectedTool: "fill",
         fillType: "solid",
         selectedColor: "#5A9EE2",
+        magicReady: true,
       });
     }, []);
     return (
@@ -79,7 +81,29 @@ export const MagicSelected: Story = {
         selectedTool: "magic",
         magicMode: "auto",
         selectedColor: "#8CAF5A",
+        magicReady: true,
       });
+    }, []);
+    return (
+      <Stage>
+        <ToolbarContent />
+      </Stage>
+    );
+  },
+};
+
+// Region store not yet ready → the Auto-Color (magic) tile is disabled
+// and shows a spinner in place of its icon, ignoring taps.
+export const MagicNotReady: Story = {
+  render: () => {
+    useEffect(() => {
+      useCanvasStore.setState({
+        selectedTool: "brush",
+        brushType: "crayon",
+        selectedColor: "#E46444",
+        magicReady: false,
+      });
+      return () => useCanvasStore.setState({ magicReady: true });
     }, []);
     return (
       <Stage>

@@ -1,4 +1,11 @@
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -184,6 +191,7 @@ const ToolbarContent = () => {
     fillType,
     selectedPattern,
     magicMode,
+    magicReady,
     setTool,
     setColor,
     setBrushType,
@@ -197,6 +205,8 @@ const ToolbarContent = () => {
   } = useCanvasStore();
 
   const handleToolSelect = (config: ToolConfig) => {
+    // Magic tools need the region store; ignore taps until ready.
+    if (config.isMagic && !magicReady) return;
     tapLight();
     setTool(config.tool);
     if (config.brushType) setBrushType(config.brushType);
@@ -230,11 +240,17 @@ const ToolbarContent = () => {
             // badge (web ToolSelector). Active = full gradient + white;
             // inactive = soft 12%-tint gradient + magic-from icon.
             if (config.isMagic) {
+              // Disabled + spinner until the region store is ready.
               return (
                 <Pressable
                   key={config.id}
                   onPress={() => handleToolSelect(config)}
-                  style={styles.magicWrap}
+                  disabled={!magicReady}
+                  style={[
+                    styles.magicWrap,
+                    !magicReady && styles.magicDisabled,
+                  ]}
+                  accessibilityState={{ disabled: !magicReady }}
                 >
                   <LinearGradient
                     colors={
@@ -246,25 +262,34 @@ const ToolbarContent = () => {
                     end={{ x: 1, y: 1 }}
                     style={styles.magicButton}
                   >
-                    <FontAwesomeIcon
-                      icon={config.icon}
-                      size={20}
-                      color={active ? "#FFFFFF" : CRAYON.purple.base}
-                      secondaryColor={
-                        active ? "rgba(255,255,255,0.85)" : CRAYON.pink.base
-                      }
-                      secondaryOpacity={1}
-                    />
+                    {magicReady ? (
+                      <FontAwesomeIcon
+                        icon={config.icon}
+                        size={20}
+                        color={active ? "#FFFFFF" : CRAYON.purple.base}
+                        secondaryColor={
+                          active ? "rgba(255,255,255,0.85)" : CRAYON.pink.base
+                        }
+                        secondaryOpacity={1}
+                      />
+                    ) : (
+                      <ActivityIndicator
+                        size="small"
+                        color={CRAYON.purple.base}
+                      />
+                    )}
                   </LinearGradient>
-                  <View style={styles.magicBadge} pointerEvents="none">
-                    <FontAwesomeIcon
-                      icon={faSparkles}
-                      size={11}
-                      color={active ? "#FFFFFF" : CRAYON.purple.base}
-                      secondaryColor={CRAYON.pink.base}
-                      secondaryOpacity={1}
-                    />
-                  </View>
+                  {magicReady && (
+                    <View style={styles.magicBadge} pointerEvents="none">
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        size={11}
+                        color={active ? "#FFFFFF" : CRAYON.purple.base}
+                        secondaryColor={CRAYON.pink.base}
+                        secondaryOpacity={1}
+                      />
+                    </View>
+                  )}
                 </Pressable>
               );
             }
@@ -505,6 +530,9 @@ const styles = StyleSheet.create({
   magicWrap: {
     width: 48,
     height: 48,
+  },
+  magicDisabled: {
+    opacity: 0.6,
   },
   magicButton: {
     width: 48,

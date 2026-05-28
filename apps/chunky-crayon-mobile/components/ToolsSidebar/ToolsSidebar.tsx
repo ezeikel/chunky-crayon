@@ -1,5 +1,12 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -134,6 +141,7 @@ const ToolsSidebar = ({
     brushType,
     brushSize,
     magicMode,
+    magicReady,
     selectedColor,
     setTool,
     setBrushType,
@@ -147,6 +155,8 @@ const ToolsSidebar = ({
 
   const handleToolSelect = useCallback(
     (config: ToolConfig) => {
+      // Magic tools need the region store; ignore taps until ready.
+      if (config.isMagic && !magicReady) return;
       tapLight();
       setTool(config.tool);
       if (config.brushType) {
@@ -156,7 +166,7 @@ const ToolsSidebar = ({
         setMagicMode(config.magicMode);
       }
     },
-    [setTool, setBrushType, setMagicMode],
+    [setTool, setBrushType, setMagicMode, magicReady],
   );
 
   const isToolActive = useCallback(
@@ -267,7 +277,14 @@ const ToolsSidebar = ({
                 <Pressable
                   key={config.id}
                   onPress={() => handleToolSelect(config)}
-                  accessibilityLabel={config.label}
+                  disabled={!magicReady}
+                  accessibilityLabel={
+                    magicReady
+                      ? config.label
+                      : `${config.label} (getting ready)`
+                  }
+                  accessibilityState={{ disabled: !magicReady }}
+                  style={!magicReady && styles.magicToolDisabled}
                 >
                   <LinearGradient
                     colors={
@@ -279,30 +296,39 @@ const ToolsSidebar = ({
                     end={{ x: 1, y: 1 }}
                     style={styles.magicToolButton}
                   >
-                    <FontAwesomeIcon
-                      icon={config.icon}
-                      size={16}
-                      color={isActive ? "#FFFFFF" : CRAYON.purple.base}
-                      secondaryColor={
-                        isActive ? "rgba(255,255,255,0.85)" : CRAYON.pink.base
-                      }
-                      secondaryOpacity={1}
-                    />
+                    {magicReady ? (
+                      <FontAwesomeIcon
+                        icon={config.icon}
+                        size={16}
+                        color={isActive ? "#FFFFFF" : CRAYON.purple.base}
+                        secondaryColor={
+                          isActive ? "rgba(255,255,255,0.85)" : CRAYON.pink.base
+                        }
+                        secondaryOpacity={1}
+                      />
+                    ) : (
+                      <ActivityIndicator
+                        size="small"
+                        color={CRAYON.purple.base}
+                      />
+                    )}
                     <Text
                       style={[
                         styles.magicToolLabel,
                         isActive && styles.magicToolLabelActive,
                       ]}
                     >
-                      {config.label}
+                      {magicReady ? config.label : "Getting ready…"}
                     </Text>
-                    <FontAwesomeIcon
-                      icon={faSparkles}
-                      size={13}
-                      color={isActive ? "#FFFFFF" : CRAYON.purple.base}
-                      secondaryColor={CRAYON.pink.base}
-                      secondaryOpacity={1}
-                    />
+                    {magicReady && (
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        size={13}
+                        color={isActive ? "#FFFFFF" : CRAYON.purple.base}
+                        secondaryColor={CRAYON.pink.base}
+                        secondaryOpacity={1}
+                      />
+                    )}
                   </LinearGradient>
                 </Pressable>
               );
@@ -561,6 +587,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 16,
+  },
+  magicToolDisabled: {
+    opacity: 0.6,
   },
   magicToolLabel: {
     flex: 1,
