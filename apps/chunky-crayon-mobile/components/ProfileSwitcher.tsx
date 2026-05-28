@@ -22,7 +22,7 @@ import {
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import ProfileAvatar from "@/components/ProfileAvatar";
-import AvatarPicker from "@/components/AvatarPicker";
+import CreateProfileCard from "@/components/CreateProfileCard";
 import {
   useProfiles,
   useActiveProfile,
@@ -32,7 +32,6 @@ import {
   useDeleteProfile,
 } from "@/hooks/api/useProfiles";
 import type { Profile } from "@/api";
-import { DEFAULT_AVATAR_ID } from "@/lib/avatars";
 
 type ProfileSwitcherProps = {
   isOpen: boolean;
@@ -55,13 +54,12 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
   const profiles = profilesData?.profiles || [];
   const activeProfile = activeProfileData?.activeProfile;
 
-  // UI state
+  // UI state. Create-card name + avatarId state now lives inside
+  // CreateProfileCard; this component only tracks whether the create
+  // card is mounted at all.
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
-  const [newProfileName, setNewProfileName] = useState("");
-  const [newProfileAvatarId, setNewProfileAvatarId] =
-    useState<string>(DEFAULT_AVATAR_ID);
   const [editProfileName, setEditProfileName] = useState("");
 
   // Delete-profile confirm sheet
@@ -72,12 +70,10 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
     (index: number) => {
       if (index === -1) {
         onClose();
-        // Reset state when closing
+        // Reset state when closing.
         setIsEditing(false);
         setIsCreating(false);
         setEditingProfileId(null);
-        setNewProfileName("");
-        setNewProfileAvatarId(DEFAULT_AVATAR_ID);
         setEditProfileName("");
       }
     },
@@ -107,19 +103,12 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
     }
   };
 
-  const handleCreateProfile = async () => {
-    if (!newProfileName.trim()) {
-      toast.error("Please enter a profile name.");
-      return;
-    }
-
+  const handleCreateProfile = async (input: {
+    name: string;
+    avatarId: string;
+  }) => {
     try {
-      await createProfile.mutateAsync({
-        name: newProfileName.trim(),
-        avatarId: newProfileAvatarId,
-      });
-      setNewProfileName("");
-      setNewProfileAvatarId(DEFAULT_AVATAR_ID);
+      await createProfile.mutateAsync(input);
       setIsCreating(false);
     } catch {
       toast.error("Couldn't create profile. Please try again.");
@@ -327,68 +316,11 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
 
               {/* Add Profile Section */}
               {isCreating ? (
-                <View style={styles.createCard}>
-                  {/* Live avatar preview */}
-                  <View style={styles.createPreview}>
-                    <ProfileAvatar
-                      avatarId={newProfileAvatarId}
-                      name={newProfileName || "?"}
-                      size="xl"
-                      showBorder
-                    />
-                    <Text style={styles.createPreviewLabel}>
-                      Pick your character
-                    </Text>
-                  </View>
-
-                  {/* Avatar picker grid */}
-                  <AvatarPicker
-                    selectedAvatarId={newProfileAvatarId}
-                    onSelect={setNewProfileAvatarId}
-                  />
-
-                  {/* Name input */}
-                  <TextInput
-                    style={styles.createInputLarge}
-                    value={newProfileName}
-                    onChangeText={setNewProfileName}
-                    placeholder="What's your name?"
-                    placeholderTextColor="#9CA3AF"
-                    autoFocus
-                    maxLength={20}
-                  />
-
-                  {/* Actions row */}
-                  <View style={styles.createActions}>
-                    <Pressable
-                      style={styles.createCancelButton}
-                      onPress={() => {
-                        setIsCreating(false);
-                        setNewProfileName("");
-                        setNewProfileAvatarId(DEFAULT_AVATAR_ID);
-                      }}
-                    >
-                      <Text style={styles.createCancelText}>Cancel</Text>
-                    </Pressable>
-                    <Pressable
-                      style={[
-                        styles.createButtonLarge,
-                        (!newProfileName.trim() || createProfile.isPending) &&
-                          styles.createButtonDisabled,
-                      ]}
-                      onPress={handleCreateProfile}
-                      disabled={
-                        !newProfileName.trim() || createProfile.isPending
-                      }
-                    >
-                      {createProfile.isPending ? (
-                        <ActivityIndicator size="small" color="#FFFFFF" />
-                      ) : (
-                        <Text style={styles.createButtonText}>Create</Text>
-                      )}
-                    </Pressable>
-                  </View>
-                </View>
+                <CreateProfileCard
+                  isSubmitting={createProfile.isPending}
+                  onCancel={() => setIsCreating(false)}
+                  onSubmit={handleCreateProfile}
+                />
               ) : canAddProfile ? (
                 <Pressable
                   style={styles.addProfileButton}
@@ -575,14 +507,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#9CA3AF",
   },
-  createButtonDisabled: {
-    opacity: 0.5,
-  },
-  createButtonText: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 16,
-    color: "#FFFFFF",
-  },
   maxProfilesNote: {
     padding: 16,
     alignItems: "center",
@@ -591,62 +515,6 @@ const styles = StyleSheet.create({
     fontFamily: "TondoTrial-Regular",
     fontSize: 14,
     color: "#9CA3AF",
-  },
-
-  // ─── Create-profile card (avatar picker + name + actions) ───
-  createCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 16,
-    marginTop: 8,
-    borderWidth: 2,
-    borderColor: "#E46444",
-    gap: 16,
-  },
-  createPreview: {
-    alignItems: "center",
-    gap: 8,
-  },
-  createPreviewLabel: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 16,
-    color: "#3D2C1E",
-  },
-  createInputLarge: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 18,
-    color: "#374151",
-    backgroundColor: "#FAF7F1",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderWidth: 1,
-    borderColor: "#E8DFD6",
-  },
-  createActions: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  createCancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F3EBE0",
-  },
-  createCancelText: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 16,
-    color: "#7A6F66",
-  },
-  createButtonLarge: {
-    flex: 2,
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#E46444",
   },
 });
 
