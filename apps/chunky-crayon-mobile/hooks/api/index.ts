@@ -12,3 +12,4 @@ export {
 export { useSavedArtworks, useSaveArtwork } from "./useSavedArtworks";
 export { useColoState, useCheckColoEvolution } from "./useColoState";
 export { useStickers, useMarkStickersAsViewed } from "./useStickers";
+export { useUnlockedModes } from "./useUnlockedModes";

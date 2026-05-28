@@ -758,3 +758,45 @@ export const getEntitlements = async (): Promise<EntitlementsResponse> => {
   const response = await api.get("/entitlements");
   return response.data;
 };
+
+// ============================================================================
+// Scene Builder — mode gating
+// ============================================================================
+
+import type { GateableMode } from "./lib/scene/modes";
+
+export type UnlockedModesResponse = {
+  unlockedModes: GateableMode[];
+  error?: string;
+};
+
+/**
+ * Gateable modes (text/voice/image) unlocked for the active profile.
+ * Scene Builder is always available and never appears here.
+ */
+export const getUnlockedModes = async (): Promise<UnlockedModesResponse> => {
+  const response = await api.get("/mobile/scene/unlocked-modes");
+  return response.data;
+};
+
+export type SetModeUnlockedResponse = {
+  success?: boolean;
+  unlockedModes?: GateableMode[];
+  error?: string;
+};
+
+/**
+ * Toggle one gateable mode for the active profile. Unlocking is gated by
+ * the client-side parent check before this is called; the authenticated
+ * session is the real boundary on the server.
+ */
+export const setModeUnlocked = async (
+  mode: GateableMode,
+  unlocked: boolean,
+): Promise<SetModeUnlockedResponse> => {
+  const response = await api.post("/mobile/scene/unlocked-modes", {
+    mode,
+    unlocked,
+  });
+  return response.data;
+};

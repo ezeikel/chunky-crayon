@@ -7,66 +7,81 @@ import {
   type ReactNode,
 } from "react";
 
-// =============================================================================
-// Types
-// =============================================================================
+/**
+ * Create-form input-mode state for mobile.
+ *
+ * Shape-matched 1:1 to coloring-ui's InputMode context (web's source of
+ * truth) so the form behaves identically across platforms. We keep a
+ * STANDALONE copy here rather than importing coloring-ui's barrel —
+ * that barrel re-exports web-DOM components (SceneBuilder, ImageCanvas)
+ * which would break the Metro bundle. Only the context contract is
+ * shared in spirit; the implementation lives here.
+ *
+ * "scene" is the privacy-first Scene Builder — the DEFAULT create mode
+ * (tap-only, no free-text / mic / camera). text / voice / image are
+ * gateable and locked per child profile until a parent unlocks them
+ * (see feedback_cc_create_mode_parent_gating).
+ */
 
-export type InputMode = "text" | "voice" | "image";
+export type InputMode = "scene" | "text" | "voice" | "image";
 
 export type InputModeState = {
   mode: InputMode;
-  /** The processed text from voice/image (or the direct text input) */
+  /** Processed text from voice/scene, or the direct text input. */
   description: string;
-  /** Whether voice/image is currently being processed */
+  /**
+   * Base64 data URL of the user's photo in image mode. Drives the
+   * photo-to-coloring pipeline at submit time.
+   */
+  imageBase64: string | null;
+  /** Whether voice/image is currently being processed. */
   isProcessing: boolean;
-  /** Error message from processing */
+  /** Error message from processing. */
   error: string | null;
-  /** Whether the input is ready for form submission */
+  /** Whether the input is ready for form submission. */
   isReady: boolean;
+  /**
+   * True while the input owns a transient inner UX (recording,
+   * capturing, previewing, error). The shared FormCTA hides while busy
+   * so the input's own in-flow controls take over.
+   */
+  isBusy: boolean;
 };
 
 export type InputModeActions = {
-  /** Change the current input mode */
   setMode: (mode: InputMode) => void;
-  /** Set the description text */
   setDescription: (description: string) => void;
-  /** Set processing state */
+  /** Set the base64 photo payload (image mode only). */
+  setImageBase64: (imageBase64: string | null) => void;
   setIsProcessing: (isProcessing: boolean) => void;
-  /** Set error message */
   setError: (error: string | null) => void;
-  /** Reset the input state */
+  setIsBusy: (isBusy: boolean) => void;
   reset: () => void;
 };
 
 export type InputModeContextValue = InputModeState & InputModeActions;
 
-// =============================================================================
-// Context
-// =============================================================================
-
 const InputModeContext = createContext<InputModeContextValue | null>(null);
 
-// =============================================================================
-// Provider
-// =============================================================================
-
 const initialState: InputModeState = {
-  mode: "text",
+  mode: "scene",
   description: "",
+  imageBase64: null,
   isProcessing: false,
   error: null,
   isReady: false,
+  isBusy: false,
 };
 
 type InputModeProviderProps = {
   children: ReactNode;
-  /** Initial mode (defaults to 'text') */
+  /** Initial mode. Defaults to "scene" (the privacy-first default). */
   initialMode?: InputMode;
 };
 
 export function InputModeProvider({
   children,
-  initialMode = "text",
+  initialMode = "scene",
 }: InputModeProviderProps) {
   const [state, setState] = useState<InputModeState>({
     ...initialState,
@@ -77,12 +92,14 @@ export function InputModeProvider({
     setState((prev) => ({
       ...prev,
       mode,
-      // Reset processing state when switching modes
       isProcessing: false,
+      isBusy: false,
       error: null,
-      // Clear description when switching to non-text modes
-      // Keep it if switching back to text
+      // Description survives only when staying in/returning to text;
+      // scene mirrors its own built description in via setDescription.
       description: mode === "text" ? prev.description : "",
+      // Image payload only belongs to image mode.
+      imageBase64: mode === "image" ? prev.imageBase64 : null,
       isReady: mode === "text" ? prev.description.trim().length > 0 : false,
     }));
   }, []);
@@ -91,8 +108,19 @@ export function InputModeProvider({
     setState((prev) => ({
       ...prev,
       description,
-      isReady: description.trim().length > 0,
+      isReady:
+        prev.mode === "image"
+          ? prev.imageBase64 !== null
+          : description.trim().length > 0,
       error: null,
+    }));
+  }, []);
+
+  const setImageBase64 = useCallback((imageBase64: string | null) => {
+    setState((prev) => ({
+      ...prev,
+      imageBase64,
+      isReady: prev.mode === "image" ? imageBase64 !== null : prev.isReady,
     }));
   }, []);
 
@@ -100,7 +128,6 @@ export function InputModeProvider({
     setState((prev) => ({
       ...prev,
       isProcessing,
-      // Clear error when starting processing
       error: isProcessing ? null : prev.error,
     }));
   }, []);
@@ -114,10 +141,14 @@ export function InputModeProvider({
     }));
   }, []);
 
+  const setIsBusy = useCallback((isBusy: boolean) => {
+    setState((prev) => ({ ...prev, isBusy }));
+  }, []);
+
   const reset = useCallback(() => {
     setState((prev) => ({
       ...initialState,
-      mode: prev.mode, // Keep the current mode
+      mode: prev.mode, // Keep the current mode.
     }));
   }, []);
 
@@ -126,11 +157,22 @@ export function InputModeProvider({
       ...state,
       setMode,
       setDescription,
+      setImageBase64,
       setIsProcessing,
       setError,
+      setIsBusy,
       reset,
     }),
-    [state, setMode, setDescription, setIsProcessing, setError, reset],
+    [
+      state,
+      setMode,
+      setDescription,
+      setImageBase64,
+      setIsProcessing,
+      setError,
+      setIsBusy,
+      reset,
+    ],
   );
 
   return (
@@ -140,17 +182,11 @@ export function InputModeProvider({
   );
 }
 
-// =============================================================================
-// Hook
-// =============================================================================
-
 export function useInputMode(): InputModeContextValue {
   const context = useContext(InputModeContext);
-
   if (!context) {
     throw new Error("useInputMode must be used within an InputModeProvider");
   }
-
   return context;
 }
 

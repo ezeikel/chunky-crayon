@@ -23,38 +23,27 @@
  */
 
 import { revalidatePath } from 'next/cache';
-import { db } from '@one-colored-pixel/db';
 import { getUserId } from '@/app/actions/user';
-import { getActiveProfile } from '@/app/actions/profiles';
 import { verifyParentGateToken } from '@/app/actions/parent-gate';
 import { ACTIONS } from '@/constants';
+import { isGateableMode, type GateableMode } from '@/lib/scene/modes';
 import {
-  GATEABLE_MODES,
-  isGateableMode,
-  type GateableMode,
-} from '@/lib/scene/modes';
+  getUnlockedModesForUser,
+  setModeUnlockedForUser,
+} from '@/lib/scene/unlock-service';
 
 /**
  * Unlocked modes for the current user's active profile.
  *
  * Returns `[]` for guests, no-profile, or any error — the safe default is
  * "Scene Builder only", never accidentally exposing a locked input mode.
- * The DB column is `String[]`; we narrow + filter to the known set so a
- * stray value can't widen access.
+ * Delegates the DB read to the userId-explicit service so web + mobile
+ * share one implementation.
  */
 export const getUnlockedModes = async (): Promise<GateableMode[]> => {
   const userId = await getUserId(ACTIONS.GET_ACTIVE_PROFILE);
   if (!userId) return [];
-
-  const profile = await getActiveProfile();
-  if (!profile) return [];
-
-  const row = await db.profile.findFirst({
-    where: { id: profile.id, userId },
-    select: { unlockedModes: true },
-  });
-
-  return (row?.unlockedModes ?? []).filter(isGateableMode);
+  return getUnlockedModesForUser(userId);
 };
 
 export type SetModeUnlockedResult =
@@ -73,7 +62,8 @@ export type SetModeUnlockedResult =
  *
  * Unlocking (`unlocked: true`) requires a valid `modes:unlock` parent-gate
  * token — minted client-side after the parent passes the subtraction
- * check. Locking needs no token.
+ * check. Locking needs no token. The DB write delegates to the
+ * userId-explicit service.
  */
 export const setModeUnlocked = async (args: {
   mode: GateableMode;
@@ -88,9 +78,6 @@ export const setModeUnlocked = async (args: {
     return { ok: false, error: 'invalid_mode' };
   }
 
-  const profile = await getActiveProfile();
-  if (!profile) return { ok: false, error: 'no_profile' };
-
   // Unlocking is privileged — verify the scoped parent gate before
   // widening a child's access. Locking is always allowed.
   if (args.unlocked) {
@@ -102,33 +89,17 @@ export const setModeUnlocked = async (args: {
     }
   }
 
-  // Re-read inside the mutation so concurrent toggles compose instead of
-  // clobbering. Profile is scoped to userId so a stale active-profile id
-  // can't write someone else's row.
-  const row = await db.profile.findFirst({
-    where: { id: profile.id, userId },
-    select: { unlockedModes: true },
+  const result = await setModeUnlockedForUser({
+    userId,
+    mode: args.mode,
+    unlocked: args.unlocked,
   });
-  if (!row) return { ok: false, error: 'no_profile' };
-
-  const current = new Set(row.unlockedModes.filter(isGateableMode));
-  if (args.unlocked) {
-    current.add(args.mode);
-  } else {
-    current.delete(args.mode);
-  }
-  // Stable order so the column reads predictably.
-  const next = GATEABLE_MODES.filter((m) => current.has(m));
-
-  await db.profile.update({
-    where: { id: profile.id },
-    data: { unlockedModes: next },
-  });
+  if (!result.ok) return result;
 
   // The create form's mode selector and the settings page both render
   // from this; revalidate the surfaces that show lock state.
   revalidatePath('/');
   revalidatePath('/account/settings');
 
-  return { ok: true, unlockedModes: next };
+  return result;
 };

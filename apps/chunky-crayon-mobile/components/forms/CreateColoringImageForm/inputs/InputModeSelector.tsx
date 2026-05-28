@@ -1,30 +1,24 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { useState } from "react";
+import { View, Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
+  faShapes,
   faPencil,
   faMicrophoneLines,
   faCameraRetro,
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import * as Haptics from "expo-haptics";
+import Animated, {
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
+import { toast } from "sonner-native";
+import { COLORS } from "@/lib/design";
+import { tapLight } from "@/utils/haptics";
+import ParentalGate from "@/components/ParentalGate";
+import { useUnlockedModes } from "@/hooks/api";
+import { isGateableMode, type GateableMode } from "@/lib/scene/modes";
 import { useInputMode, type InputMode } from "./InputModeContext";
-
-// =============================================================================
-// Design Tokens (matching web tailwind config)
-// =============================================================================
-
-const COLORS = {
-  // Primary - Coral: hsl(12, 75%, 58%)
-  crayonOrange: "#E46444",
-  // Secondary - Peach: hsl(25, 80%, 72%) - web calls this "teal"
-  crayonPeach: "#F1AE7E",
-  // Background cream dark: hsl(35, 40%, 93%)
-  bgCreamDark: "#F0E9E0",
-  // Text primary: hsl(20, 20%, 22%)
-  textPrimary: "#443832",
-  // White
-  white: "#FFFFFF",
-};
 
 // =============================================================================
 // Types
@@ -34,32 +28,79 @@ type InputOption = {
   mode: InputMode;
   label: string;
   icon: IconDefinition;
+  /** Scene Builder is never gateable; the other three are. */
+  gateable: boolean;
 };
 
 // =============================================================================
 // Constants
 // =============================================================================
 
+// Scene first — the privacy-first default. The other three let a kid feed
+// arbitrary input into the AI, so they sit behind a one-time parent gate.
+// Once passed, the unlock persists (DB + AsyncStorage) and we never re-ask.
+// NO lock badge on gated tiles: every tile looks identical and ready. The
+// gate fires on TAP — a visible lock reads as a paywall and kills the adult
+// trial tap (matches web; feedback_cc_create_mode_parent_gating).
 const INPUT_OPTIONS: InputOption[] = [
-  {
-    mode: "text",
-    label: "Type",
-    icon: faPencil,
-  },
-  {
-    mode: "voice",
-    label: "Talk",
-    icon: faMicrophoneLines,
-  },
-  {
-    mode: "image",
-    label: "Photo",
-    icon: faCameraRetro,
-  },
+  { mode: "scene", label: "Build", icon: faShapes, gateable: false },
+  { mode: "text", label: "Type", icon: faPencil, gateable: true },
+  { mode: "voice", label: "Talk", icon: faMicrophoneLines, gateable: true },
+  { mode: "image", label: "Photo", icon: faCameraRetro, gateable: true },
 ];
 
 // =============================================================================
-// Component
+// Tile
+// =============================================================================
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+type TileProps = {
+  option: InputOption;
+  isActive: boolean;
+  isDisabled: boolean;
+  onPress: () => void;
+};
+
+const InputModeTile = ({
+  option,
+  isActive,
+  isDisabled,
+  onPress,
+}: TileProps) => {
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: withSpring(isActive ? 1.05 : 1) }],
+  }));
+
+  return (
+    <AnimatedPressable
+      onPress={onPress}
+      disabled={isDisabled}
+      style={[
+        styles.tile,
+        isActive ? styles.tileActive : styles.tileInactive,
+        isDisabled && styles.tileDisabled,
+        animatedStyle,
+      ]}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: isActive }}
+      accessibilityLabel={`${option.label} input mode`}
+    >
+      <FontAwesomeIcon
+        icon={option.icon}
+        size={28}
+        color={isActive ? COLORS.white : COLORS.crayonOrange}
+        secondaryColor={
+          isActive ? "rgba(255, 255, 255, 0.85)" : COLORS.crayonPeach
+        }
+        secondaryOpacity={1}
+      />
+    </AnimatedPressable>
+  );
+};
+
+// =============================================================================
+// Selector
 // =============================================================================
 
 type InputModeSelectorProps = {
@@ -69,51 +110,76 @@ type InputModeSelectorProps = {
 
 const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
   const { mode: currentMode, setMode, isProcessing } = useInputMode();
+  const { isUnlocked, unlockMode } = useUnlockedModes();
 
-  const handleModeChange = async (mode: InputMode) => {
+  // The mode awaiting a parent-gate pass. Null = gate closed.
+  const [pendingMode, setPendingMode] = useState<GateableMode | null>(null);
+
+  const handleModeChange = async (option: InputOption) => {
     if (disabled || isProcessing) return;
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Never gated, or already unlocked — just switch.
+    if (
+      !option.gateable ||
+      (isGateableMode(option.mode) && isUnlocked(option.mode))
+    ) {
+      await tapLight();
+      setMode(option.mode);
+      return;
+    }
+
+    // Gated + locked — open the parent gate; the success handler persists
+    // the unlock and flips the mode.
+    if (isGateableMode(option.mode)) {
+      await tapLight();
+      setPendingMode(option.mode);
+    }
+  };
+
+  const handleGateSuccess = async () => {
+    const mode = pendingMode;
+    setPendingMode(null);
+    if (!mode) return;
+    const ok = await unlockMode(mode);
+    if (!ok) {
+      // Local cache still flipped (best-effort), but warn the parent the
+      // server didn't confirm so they know it may not stick across devices.
+      toast.error("Couldn't save that unlock. It may not stick — try again.");
+    }
     setMode(mode);
   };
 
-  return (
-    <View style={styles.container}>
-      {INPUT_OPTIONS.map((option) => {
-        const isActive = option.mode === currentMode;
-        const isDisabled = disabled || isProcessing;
+  const handleGateClose = () => setPendingMode(null);
 
-        return (
-          <Pressable
+  return (
+    <>
+      <View style={styles.container} accessibilityRole="tablist">
+        {INPUT_OPTIONS.map((option) => (
+          <InputModeTile
             key={option.mode}
-            onPress={() => handleModeChange(option.mode)}
-            disabled={isDisabled}
-            style={[
-              styles.button,
-              isActive && styles.buttonActive,
-              isDisabled && styles.buttonDisabled,
-            ]}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isActive }}
-            accessibilityLabel={`${option.label} input mode`}
-          >
-            <FontAwesomeIcon
-              icon={option.icon}
-              size={24}
-              color={isActive ? COLORS.white : COLORS.crayonOrange}
-              secondaryColor={
-                isActive ? "rgba(255, 255, 255, 0.8)" : COLORS.crayonPeach
-              }
-              secondaryOpacity={1}
-            />
-            <Text style={[styles.label, isActive && styles.labelActive]}>
-              {option.label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
+            option={option}
+            isActive={option.mode === currentMode}
+            isDisabled={!!disabled || isProcessing}
+            onPress={() => handleModeChange(option)}
+          />
+        ))}
+      </View>
+
+      <ParentalGate
+        visible={pendingMode !== null}
+        onClose={handleGateClose}
+        onSuccess={handleGateSuccess}
+      />
+    </>
   );
 };
+
+// =============================================================================
+// Styles — mirror web's tile: 64pt rounded square, active orange fill,
+// inactive white face with cream border. No lock styling anywhere.
+// =============================================================================
+
+const TILE_SIZE = 64;
 
 const styles = StyleSheet.create({
   container: {
@@ -123,40 +189,30 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 24,
   },
-  button: {
-    flexDirection: "column",
+  tile: {
+    width: TILE_SIZE,
+    height: TILE_SIZE,
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    minWidth: 80,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 32,
-    backgroundColor: COLORS.white,
+    borderRadius: 20,
     borderWidth: 2,
-    borderColor: COLORS.bgCreamDark,
   },
-  buttonActive: {
+  tileActive: {
     backgroundColor: COLORS.crayonOrange,
     borderColor: COLORS.crayonOrange,
-    // shadow-btn-primary: 0 4px 14px 0 hsl(var(--crayon-orange) / 0.4)
+    // shadow-coloring-button: soft accent glow under the active tile.
     shadowColor: COLORS.crayonOrange,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 14,
     elevation: 6,
-    transform: [{ scale: 1.05 }],
   },
-  buttonDisabled: {
+  tileInactive: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.bgCreamDark,
+  },
+  tileDisabled: {
     opacity: 0.5,
-  },
-  label: {
-    fontSize: 12,
-    fontFamily: "TondoTrial-Bold",
-    color: COLORS.textPrimary,
-  },
-  labelActive: {
-    color: COLORS.white,
   },
 });
 
