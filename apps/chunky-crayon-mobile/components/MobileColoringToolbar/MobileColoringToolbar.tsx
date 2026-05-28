@@ -11,8 +11,6 @@ import {
   faSparkles,
   faStar,
   faRainbow,
-  faSun,
-  faBoltLightning,
   faBrush,
   faArrowRotateLeft,
   faArrowRotateRight,
@@ -22,7 +20,9 @@ import {
   faBorderAll,
   faGripVertical,
   faEraser,
-} from "@fortawesome/pro-solid-svg-icons";
+} from "@fortawesome/pro-duotone-svg-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { COLORS, CRAYON } from "@/lib/design";
 import {
   useCanvasStore,
   Tool,
@@ -52,9 +52,12 @@ type ToolConfig = {
   isMagic?: boolean;
 };
 
-// All tools in a single row (matching web's ToolSelector pattern)
+// Kids tool set, matching web's ToolSelector KIDS_TOOL_IDS:
+// fill, crayon, marker, rainbow, eraser, sticker, magic-auto. Web removed
+// glow/neon/sparkle/glitter (confusing UX) and gates magic-reveal +
+// pencil out of the kids set — so we drop them here too. The brush-type
+// rendering for the removed tools still exists in the canvas if needed.
 const tools: ToolConfig[] = [
-  // Brush-based tools
   {
     id: "crayon",
     tool: "brush",
@@ -70,61 +73,22 @@ const tools: ToolConfig[] = [
     icon: faPaintbrush,
   },
   {
-    id: "pencil",
-    tool: "brush",
-    brushType: "pencil",
-    label: "Pencil",
-    icon: faPencil,
-  },
-  {
-    id: "glitter",
-    tool: "brush",
-    brushType: "glitter",
-    label: "Glitter",
-    icon: faSparkles,
-  },
-  {
     id: "rainbow",
     tool: "brush",
     brushType: "rainbow",
     label: "Rainbow",
     icon: faRainbow,
   },
-  {
-    id: "glow",
-    tool: "brush",
-    brushType: "glow",
-    label: "Glow",
-    icon: faSun,
-  },
-  {
-    id: "neon",
-    tool: "brush",
-    brushType: "neon",
-    label: "Neon",
-    icon: faBoltLightning,
-  },
-  // Non-brush tools
   { id: "fill", tool: "fill", label: "Fill", icon: faFillDrip },
   { id: "eraser", tool: "eraser", label: "Eraser", icon: faEraser },
   { id: "sticker", tool: "sticker", label: "Sticker", icon: faStar },
-  // Magic tools
-  {
-    id: "magic-suggest",
-    tool: "magic",
-    magicMode: "suggest",
-    label: "Magic",
-    shortLabel: "Magic",
-    icon: faBrush,
-    isMagic: true,
-  },
   {
     id: "magic-auto",
     tool: "magic",
     magicMode: "auto",
     label: "Auto Color",
     shortLabel: "Auto",
-    icon: faFillDrip,
+    icon: faBrush,
     isMagic: true,
   },
 ];
@@ -175,7 +139,11 @@ const ToolButton = ({
     <FontAwesomeIcon
       icon={icon}
       size={small ? 16 : 18}
-      color={isActive ? "#FFFFFF" : disabled ? "#9CA3AF" : "#4B5563"}
+      color={
+        isActive ? "#FFFFFF" : disabled ? COLORS.textMuted : COLORS.textPrimary
+      }
+      secondaryColor={isActive ? "rgba(255,255,255,0.85)" : COLORS.crayonPeach}
+      secondaryOpacity={1}
     />
     {label && (
       <Text
@@ -274,33 +242,76 @@ const MobileColoringToolbar = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalScroll}
           >
-            {tools.map((config) => (
-              <Pressable
-                key={config.id}
-                onPress={() => handleToolSelect(config)}
-                style={[
-                  styles.mainToolButton,
-                  config.isMagic && styles.mainToolButtonMagic,
-                  isToolActive(config) && styles.mainToolButtonActive,
-                ]}
-              >
-                <FontAwesomeIcon
-                  icon={config.icon}
-                  size={config.isMagic ? 16 : 20}
-                  color={isToolActive(config) ? "#FFFFFF" : "#4B5563"}
-                />
-                {config.isMagic && config.shortLabel && (
-                  <Text
-                    style={[
-                      styles.magicLabel,
-                      isToolActive(config) && styles.magicLabelActive,
-                    ]}
+            {tools.map((config) => {
+              const active = isToolActive(config);
+
+              // Magic tools: purple→pink gradient face + a sparkles badge
+              // poking out the corner (web ToolSelector). Active = full
+              // gradient + white icon; inactive = soft 12%-tint gradient +
+              // magic-from icon.
+              if (config.isMagic) {
+                return (
+                  <Pressable
+                    key={config.id}
+                    onPress={() => handleToolSelect(config)}
+                    style={styles.magicWrap}
                   >
-                    {config.shortLabel}
-                  </Text>
-                )}
-              </Pressable>
-            ))}
+                    <LinearGradient
+                      colors={
+                        active
+                          ? [CRAYON.purple.base, CRAYON.pink.base]
+                          : [`${CRAYON.purple.base}1F`, `${CRAYON.pink.base}1F`]
+                      }
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={styles.magicButton}
+                    >
+                      <FontAwesomeIcon
+                        icon={config.icon}
+                        size={20}
+                        color={active ? "#FFFFFF" : CRAYON.purple.base}
+                        secondaryColor={
+                          active ? "rgba(255,255,255,0.85)" : CRAYON.pink.base
+                        }
+                        secondaryOpacity={1}
+                      />
+                    </LinearGradient>
+                    <View style={styles.magicBadge} pointerEvents="none">
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        size={11}
+                        color={active ? "#FFFFFF" : CRAYON.purple.base}
+                        secondaryColor={CRAYON.pink.base}
+                        secondaryOpacity={1}
+                      />
+                    </View>
+                  </Pressable>
+                );
+              }
+
+              return (
+                <Pressable
+                  key={config.id}
+                  onPress={() => handleToolSelect(config)}
+                  style={[
+                    styles.mainToolButton,
+                    active
+                      ? styles.mainToolButtonActive
+                      : styles.mainToolButtonIdle,
+                  ]}
+                >
+                  <FontAwesomeIcon
+                    icon={config.icon}
+                    size={22}
+                    color={active ? "#FFFFFF" : COLORS.textPrimary}
+                    secondaryColor={
+                      active ? "rgba(255,255,255,0.85)" : COLORS.crayonPeach
+                    }
+                    secondaryOpacity={1}
+                  />
+                </Pressable>
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -312,23 +323,31 @@ const MobileColoringToolbar = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalScroll}
           >
-            {PALETTE_COLORS.map((color) => (
-              <Pressable
-                key={color}
-                onPress={() => {
-                  selectionChanged();
-                  setColor(color);
-                }}
-              >
-                <View
+            {PALETTE_COLORS.map((color) => {
+              const isSelected = selectedColor === color;
+              return (
+                <Pressable
+                  key={color}
+                  onPress={() => {
+                    selectionChanged();
+                    setColor(color);
+                  }}
                   style={[
-                    styles.colorSwatch,
-                    { backgroundColor: color },
-                    selectedColor === color && styles.colorSwatchActive,
+                    styles.swatchWrap,
+                    isSelected && styles.swatchWrapSelected,
                   ]}
-                />
-              </Pressable>
-            ))}
+                >
+                  <View
+                    style={[
+                      { backgroundColor: color },
+                      isSelected
+                        ? styles.colorSwatchSelected
+                        : styles.colorSwatch,
+                    ]}
+                  />
+                </Pressable>
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -457,24 +476,29 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 12,
-    fontWeight: "600",
     textTransform: "uppercase",
     letterSpacing: 0.5,
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
     marginBottom: 8,
     fontFamily: "RooneySans-Bold",
   },
   horizontalScroll: {
     flexDirection: "row",
     gap: 8,
+    alignItems: "center",
   },
+  // Small labelled tool tile (fill-type / pattern / undo-redo rows). White
+  // cream-bordered tile, orange when active — matches web's tool tiles.
   toolButton: {
     alignItems: "center",
     justifyContent: "center",
+    gap: 2,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 10,
-    backgroundColor: "#F3F4F6",
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
     minWidth: 56,
   },
   toolButtonSmall: {
@@ -483,56 +507,94 @@ const styles = StyleSheet.create({
     minWidth: 48,
   },
   toolButtonActive: {
-    backgroundColor: "#E46444",
+    backgroundColor: COLORS.crayonOrange,
+    borderColor: COLORS.crayonOrange,
   },
   toolButtonDisabled: {
-    backgroundColor: "#E5E7EB",
     opacity: 0.5,
   },
   toolButtonLabel: {
     fontSize: 10,
     fontFamily: "RooneySans-Regular",
-    color: "#4B5563",
+    color: COLORS.textPrimary,
     marginTop: 2,
   },
   toolButtonLabelActive: {
     color: "#FFFFFF",
-    fontWeight: "bold",
+    fontFamily: "RooneySans-Bold",
   },
+  // Main tool tile (the Tools row). 48² rounded-coloring-card, white face
+  // + cream border; orange fill + soft accent glow when active.
   mainToolButton: {
     width: 48,
     height: 48,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 12,
-    backgroundColor: "#F3F4F6",
+    borderRadius: 20,
+    borderWidth: 2,
   },
-  mainToolButtonMagic: {
-    width: 56,
-    gap: 2,
+  mainToolButtonIdle: {
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.bgCreamDark,
   },
   mainToolButtonActive: {
-    backgroundColor: "#E46444",
+    backgroundColor: COLORS.crayonOrange,
+    borderColor: COLORS.crayonOrange,
+    shadowColor: COLORS.crayonOrange,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 14,
+    elevation: 6,
   },
-  magicLabel: {
-    fontSize: 8,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    color: "#4B5563",
+  // Magic tool — gradient face + corner sparkles badge.
+  magicWrap: {
+    width: 48,
+    height: 48,
   },
-  magicLabelActive: {
-    color: "#FFFFFF",
+  magicButton: {
+    width: 48,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
   },
-  colorSwatch: {
+  magicBadge: {
+    position: "absolute",
+    top: -6,
+    right: -6,
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  // Swatch + selected-halo, mirroring ColorPalette: the orange ring +
+  // offset live on the wrapper; the selected swatch keeps a white inner
+  // border so the colour reads as lifted inside the ring.
+  swatchWrap: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  colorSwatchActive: {
-    borderWidth: 3,
-    borderColor: "#374151",
+  swatchWrapSelected: {
+    borderWidth: 2,
+    borderColor: COLORS.crayonOrange,
+    padding: 2,
+  },
+  colorSwatch: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+  },
+  colorSwatchSelected: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: COLORS.white,
   },
   undoRedoRow: {
     flexDirection: "row",
