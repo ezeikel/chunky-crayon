@@ -1,10 +1,28 @@
 /**
- * MagicColorHint - Displays AI color suggestions to the user
- * Shows when the magic tool is used in "suggest" mode
+ * MagicColorHint — displays an AI colour suggestion bubble near the
+ * tap point when the magic tool is used in "suggest" mode.
+ *
+ * Animations are Reanimated (worklets / UI thread); never RN's
+ * built-in Animated. See feedback_use_reanimated_not_animated.
+ *
+ * Lifecycle:
+ *   - colorCell + position truthy → fade-in + spring-up to 1, auto-
+ *     dismiss after 4s.
+ *   - colorCell or position null → fade back to 0 and call onDismiss
+ *     when the fade settles.
  */
 
-import { useEffect, useRef } from "react";
-import { View, Text, Pressable, Animated, StyleSheet } from "react-native";
+import { useEffect, useCallback } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  runOnJS,
+} from "react-native-reanimated";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faLightbulb } from "@fortawesome/pro-duotone-svg-icons";
 import type { GridColorCell } from "@/types";
 import { tapLight, notifySuccess } from "@/utils/haptics";
 import { useCanvasStore } from "@/stores/canvasStore";
@@ -22,49 +40,44 @@ const MagicColorHint = ({
   onDismiss,
   onUseColor,
 }: MagicColorHintProps) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0.8);
   const { setColor, setTool } = useCanvasStore();
+
+  // Fade out + scale back, then call onDismiss when the fade settles.
+  // Reanimated's withTiming completion callback runs on the UI thread,
+  // so jump back to JS via runOnJS before invoking the React prop.
+  const handleDismiss = useCallback(() => {
+    opacity.value = withTiming(0, { duration: 150 }, (finished) => {
+      if (finished) runOnJS(onDismiss)();
+    });
+    scale.value = withTiming(0.8, { duration: 150 });
+  }, [onDismiss, opacity, scale]);
 
   useEffect(() => {
     if (colorCell && position) {
-      // Animate in
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          friction: 8,
-          tension: 100,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      opacity.value = withTiming(1, { duration: 200 });
+      scale.value = withSpring(1, { damping: 14, stiffness: 180 });
 
-      // Auto-dismiss after 4 seconds
+      // Auto-dismiss after 4 seconds. Timer cleanup happens on
+      // colorCell/position change or on unmount.
       const timer = setTimeout(() => {
         handleDismiss();
       }, 4000);
 
       return () => clearTimeout(timer);
     } else {
-      // Reset animations when hidden
-      fadeAnim.setValue(0);
-      scaleAnim.setValue(0.8);
+      // Hidden: snap to off-state immediately so the next open
+      // animates from the correct start.
+      opacity.value = 0;
+      scale.value = 0.8;
     }
-  }, [colorCell, position]);
+  }, [colorCell, position, opacity, scale, handleDismiss]);
 
-  const handleDismiss = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 150,
-      useNativeDriver: true,
-    }).start(() => {
-      onDismiss();
-    });
-  };
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }],
+  }));
 
   const handleUseColor = () => {
     if (colorCell) {
@@ -82,13 +95,14 @@ const MagicColorHint = ({
   return (
     <Animated.View
       className="absolute z-50"
-      style={{
-        // Position the hint near the tap point but ensure it stays in view
-        left: Math.min(position.x - 80, 200),
-        top: Math.max(position.y - 120, 20),
-        opacity: fadeAnim,
-        transform: [{ scale: scaleAnim }],
-      }}
+      style={[
+        {
+          // Position near the tap point but ensure it stays in view.
+          left: Math.min(position.x - 80, 200),
+          top: Math.max(position.y - 120, 20),
+        },
+        animatedStyle,
+      ]}
     >
       <View
         className="bg-white rounded-2xl p-4 shadow-lg border-2 border-gray-100"
@@ -106,8 +120,18 @@ const MagicColorHint = ({
           </View>
         </View>
 
-        {/* Reasoning */}
-        <Text style={styles.reasoningText}>💡 {colorCell.reasoning}</Text>
+        {/* Reasoning. Lightbulb duotone in brand orange/yellow (was an
+            emoji; memory feedback_fontawesome_over_emojis). */}
+        <View style={styles.reasoningRow}>
+          <FontAwesomeIcon
+            icon={faLightbulb}
+            size={16}
+            color="#E46444"
+            secondaryColor="#FFD93D"
+            secondaryOpacity={1}
+          />
+          <Text style={styles.reasoningText}>{colorCell.reasoning}</Text>
+        </View>
 
         {/* Action buttons */}
         <View className="flex-row gap-2">
@@ -146,11 +170,17 @@ const styles = StyleSheet.create({
     fontFamily: "TondoTrial-Regular",
     color: "#6B7280",
   },
+  reasoningRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    marginBottom: 12,
+  },
   reasoningText: {
+    flex: 1,
     fontSize: 14,
     fontFamily: "TondoTrial-Regular",
     color: "#4B5563",
-    marginBottom: 12,
   },
   useColorText: {
     color: "#FFF",
