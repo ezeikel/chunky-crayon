@@ -37,11 +37,11 @@ import TopUpPackModal from "./TopUpPackModal";
 // packs at £3 / £12 / £20. See ~/.claude/plans/mobile-paywall-scaffold.md
 // for the full Stripe → mobile mapping.
 //
-// The component reads `availablePackages[].identifier` +
-// `product.identifier` + `product.priceString`, plus uses
-// `CREDIT_AMOUNTS` keyed by `product.identifier` to compute the credit
-// amount per card. The product IDs below (credits_*_v1) match the
-// identifiers already hardcoded in TopUpPackModal.tsx.
+// `product.metadata.credits` is the canonical source of credit grants
+// (set in the RevenueCat dashboard). The story sets it here so we can
+// see the metadata-driven flow working without touching the dashboard.
+// In production, App Store / Play Store + RevenueCat hand back
+// `priceString` per locale — no hardcoded prices in app code.
 const makeOffering = () =>
   ({
     identifier: "credits",
@@ -53,6 +53,7 @@ const makeOffering = () =>
           priceString: "£3.00",
           price: 3.0,
           title: "100 Credits",
+          metadata: { credits: "100" },
         },
       },
       {
@@ -62,6 +63,7 @@ const makeOffering = () =>
           priceString: "£12.00",
           price: 12.0,
           title: "500 Credits",
+          metadata: { credits: "500" },
         },
       },
       {
@@ -71,6 +73,7 @@ const makeOffering = () =>
           priceString: "£20.00",
           price: 20.0,
           title: "1000 Credits",
+          metadata: { credits: "1000" },
         },
       },
     ],

@@ -24,8 +24,14 @@ type TopUpPackModalProps = {
   skipParentalGate?: boolean;
 };
 
-// Credit amounts per product
-const CREDIT_AMOUNTS: Record<string, number> = {
+// Fallback credit amounts per product. The source of truth is the
+// RevenueCat product's `metadata.credits` field — set
+// `{ "credits": "100" }` etc. on each product in the RevenueCat
+// dashboard, and `getCreditAmount()` below will read it at runtime.
+// Lets us change credit grants without a binary release. This map is
+// only consulted if the metadata field is missing / malformed, so dev
+// builds keep working before the dashboard is configured.
+const CREDIT_AMOUNT_FALLBACK: Record<string, number> = {
   credits_100_v1: 100,
   credits_500_v1: 500,
   credits_1000_v1: 1000,
@@ -66,10 +72,24 @@ function formatPrice(pkg: PurchasesPackage): string {
   return pkg.product.priceString;
 }
 
-// Get credit amount from package
+// Get credit amount from package. Prefers `product.metadata.credits`
+// from the RevenueCat dashboard (canonical source); falls back to the
+// hardcoded map for products without metadata configured.
 function getCreditAmount(pkg: PurchasesPackage): number {
-  const identifier = pkg.product.identifier;
-  return CREDIT_AMOUNTS[identifier] ?? 0;
+  // RevenueCat surfaces product metadata as a Record<string, unknown>
+  // on `pkg.product.metadata`. Coerce to string before parsing so we
+  // tolerate both number-typed and string-typed metadata values.
+  const meta = (
+    pkg.product as PurchasesPackage["product"] & {
+      metadata?: Record<string, unknown>;
+    }
+  ).metadata;
+  const fromMetadata = meta?.credits;
+  if (fromMetadata != null) {
+    const parsed = Number(fromMetadata);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  return CREDIT_AMOUNT_FALLBACK[pkg.product.identifier] ?? 0;
 }
 
 const TopUpPackModal = ({
