@@ -30,7 +30,7 @@ import {
 } from "@/hooks/useEntitlements";
 import { useRestorePurchases } from "@/hooks/usePaywall";
 import Paywall from "../Paywall";
-import CreditPackModal from "../CreditPackModal";
+import TopUpPackModal from "../TopUpPackModal";
 import Spinner from "../Spinner/Spinner";
 
 type SubscriptionManagerProps = {
@@ -358,7 +358,7 @@ const SubscriptionManager = ({
         onClose={handlePaywallClose}
         skipParentalGate
       />
-      <CreditPackModal
+      <TopUpPackModal
         visible={creditPackVisible}
         onClose={handleCreditPackClose}
         skipParentalGate

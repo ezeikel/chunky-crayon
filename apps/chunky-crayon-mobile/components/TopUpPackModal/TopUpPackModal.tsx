@@ -16,7 +16,7 @@ import Purchases from "react-native-purchases";
 import ParentalGate from "../ParentalGate";
 import { useRefreshEntitlements } from "@/hooks/useEntitlements";
 
-type CreditPackModalProps = {
+type TopUpPackModalProps = {
   visible: boolean;
   onClose: () => void;
   onSuccess?: () => void;
@@ -72,12 +72,12 @@ function getCreditAmount(pkg: PurchasesPackage): number {
   return CREDIT_AMOUNTS[identifier] ?? 0;
 }
 
-const CreditPackModal = ({
+const TopUpPackModal = ({
   visible,
   onClose,
   onSuccess,
   skipParentalGate = false,
-}: CreditPackModalProps) => {
+}: TopUpPackModalProps) => {
   const insets = useSafeAreaInsets();
   const { data: offering, isLoading } = useCreditPacksOffering();
   const purchaseMutation = usePurchaseCreditPack();
@@ -148,10 +148,10 @@ const CreditPackModal = ({
             </Pressable>
             <View style={styles.titleContainer}>
               <FontAwesomeIcon icon={faCoins} size={28} color="#FCD34D" />
-              <Text style={styles.title}>Get More Credits</Text>
+              <Text style={styles.title}>Top up your credits</Text>
             </View>
             <Text style={styles.subtitle}>
-              Top up your credits to keep creating amazing coloring pages!
+              Add more credits to keep creating without changing your plan
             </Text>
           </View>
 
@@ -400,4 +400,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreditPackModal;
+export default TopUpPackModal;

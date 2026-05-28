@@ -3,7 +3,7 @@ import { View, Pressable, Text } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { action } from "storybook/actions";
 import type { Meta, StoryObj } from "@storybook/react-native";
-import CreditPackModal from "./CreditPackModal";
+import TopUpPackModal from "./TopUpPackModal";
 
 /**
  * Mobile mirror of web's `Chunky Crayon/05 Modals → Paywall — …` stories.
@@ -11,7 +11,7 @@ import CreditPackModal from "./CreditPackModal";
  * On iOS, App Store rules force all paywall UI into RevenueCat's IAP
  * flow, so we don't have web's three discrete paywall states
  * (`guest_limit` / `no_subscription` / `subscriber_no_credits`).
- * What we have is a single CreditPackModal that fetches a credits
+ * What we have is a single TopUpPackModal that fetches a credits
  * offering from RevenueCat and renders three pack tiers. The useful
  * states to lock down here are the visual shapes that surface:
  *
@@ -32,10 +32,16 @@ import CreditPackModal from "./CreditPackModal";
  * loading spinner, empty state — are what we're locking down.
  */
 
-// Minimal RevenueCat-shaped offering. The component reads
-// `availablePackages[].identifier` + `product.identifier` +
-// `product.priceString`, plus uses `CREDIT_AMOUNTS` keyed by
-// `product.identifier` to compute the credit amount per card.
+// Minimal RevenueCat-shaped offering, prices matched to the SUBSCRIBER
+// top-up tier in Stripe (acct_1RN7XNK6qKjkWA8M, CC web): 100/500/1000
+// packs at £3 / £12 / £20. See ~/.claude/plans/mobile-paywall-scaffold.md
+// for the full Stripe → mobile mapping.
+//
+// The component reads `availablePackages[].identifier` +
+// `product.identifier` + `product.priceString`, plus uses
+// `CREDIT_AMOUNTS` keyed by `product.identifier` to compute the credit
+// amount per card. The product IDs below (credits_*_v1) match the
+// identifiers already hardcoded in TopUpPackModal.tsx.
 const makeOffering = () =>
   ({
     identifier: "credits",
@@ -44,8 +50,8 @@ const makeOffering = () =>
         identifier: "credits_100",
         product: {
           identifier: "credits_100_v1",
-          priceString: "£0.99",
-          price: 0.99,
+          priceString: "£3.00",
+          price: 3.0,
           title: "100 Credits",
         },
       },
@@ -53,8 +59,8 @@ const makeOffering = () =>
         identifier: "credits_500",
         product: {
           identifier: "credits_500_v1",
-          priceString: "£3.99",
-          price: 3.99,
+          priceString: "£12.00",
+          price: 12.0,
           title: "500 Credits",
         },
       },
@@ -62,8 +68,8 @@ const makeOffering = () =>
         identifier: "credits_1000",
         product: {
           identifier: "credits_1000_v1",
-          priceString: "£6.99",
-          price: 6.99,
+          priceString: "£20.00",
+          price: 20.0,
           title: "1000 Credits",
         },
       },
@@ -100,7 +106,7 @@ const SeededOpen = ({ state }: { state: SeededState }) => {
   // X and wants to see the modal again without switching stories.
   return (
     <View style={{ flex: 1 }}>
-      <CreditPackModal
+      <TopUpPackModal
         visible={open}
         onClose={() => {
           action("close")();
@@ -144,13 +150,13 @@ const SeededOpen = ({ state }: { state: SeededState }) => {
   );
 };
 
-const meta: Meta<typeof CreditPackModal> = {
-  title: "Modals/CreditPackModal",
-  component: CreditPackModal,
+const meta: Meta<typeof TopUpPackModal> = {
+  title: "Modals/TopUpPackModal",
+  component: TopUpPackModal,
 };
 
 export default meta;
-type Story = StoryObj<typeof CreditPackModal>;
+type Story = StoryObj<typeof TopUpPackModal>;
 
 export const Default: Story = {
   name: "Paywall — packs loaded",

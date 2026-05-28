@@ -28,7 +28,7 @@ import { FONTS, COLORS } from "@/lib/design";
  *   - Friendly waving-hand icon (faHandWave duotone, orange/yellow)
  *     with a Reanimated wiggle on open. Replaces the old lock.
  *
- * API parity (so settings.tsx / ActionModal / CreditPackModal don't
+ * API parity (so settings.tsx / ActionModal / TopUpPackModal don't
  * change): visible, onClose, onSuccess, title?, subtitle?
  *
  * Apple guideline 1.3 only requires a meaningful adult action; this

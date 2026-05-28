@@ -17,7 +17,7 @@ import {
   useRefreshEntitlements,
 } from "@/hooks/useEntitlements";
 import Paywall from "@/components/Paywall";
-import CreditPackModal from "@/components/CreditPackModal";
+import TopUpPackModal from "@/components/TopUpPackModal";
 
 type ColoringImage = {
   id: string;
@@ -162,7 +162,7 @@ const CreateColoringImageFormContent = () => {
       />
 
       {/* Credit pack modal (for subscribers out of credits) */}
-      <CreditPackModal
+      <TopUpPackModal
         visible={showCreditPacks}
         onClose={handleCreditPacksClose}
         onSuccess={handleCreditPacksSuccess}
