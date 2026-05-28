@@ -1,4 +1,5 @@
 import "../global.css";
+import "@/lib/i18n"; // side-effect: initialises react-i18next before first render
 import { useState, useEffect } from "react";
 import { Redirect, Stack } from "expo-router";
 import { useFonts } from "expo-font";

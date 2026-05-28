@@ -1,0 +1,19 @@
+{
+  "mobile": {
+    "tabs": {
+      "home": "Home",
+      "create": "Create",
+      "gallery": "Gallery",
+      "stickers": "Stickers",
+      "myArt": "My Art",
+      "challenges": "Challenges",
+      "settings": "Settings"
+    },
+    "button": {
+      "createColoringPage": "Create coloring page",
+      "creating": "Creating...",
+      "tryAgain": "Try again",
+      "cancel": "Cancel"
+    }
+  }
+}

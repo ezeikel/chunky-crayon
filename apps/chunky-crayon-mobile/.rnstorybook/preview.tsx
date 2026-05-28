@@ -1,4 +1,5 @@
 import "../global.css";
+import "../lib/i18n"; // side-effect: init i18n so stories can call t()
 import React from "react";
 import { View, Text } from "react-native";
 import type { Preview } from "@storybook/react-native";
