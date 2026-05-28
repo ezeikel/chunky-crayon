@@ -1,39 +1,22 @@
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faWandMagicSparkles } from "@fortawesome/pro-duotone-svg-icons";
 import { useInputMode } from "./InputModeContext";
+import Button from "@/components/Button";
 import Spinner from "@/components/Spinner/Spinner";
-
-// =============================================================================
-// Design Tokens (matching web tailwind config)
-// =============================================================================
-
-const COLORS = {
-  // Primary - Coral: hsl(12, 75%, 58%)
-  crayonOrange: "#E46444",
-  // Background cream dark: hsl(35, 40%, 93%)
-  bgCreamDark: "#F0E9E0",
-  // Text primary: hsl(20, 20%, 22%)
-  textPrimary: "#443832",
-  // Text muted: hsl(20, 10%, 50%)
-  textMuted: "#8B7E78",
-  // White
-  white: "#FFFFFF",
-};
-
-// =============================================================================
-// Types
-// =============================================================================
+import { useT } from "@/lib/i18n/useT";
+import { COLORS, FONTS } from "@/lib/design";
 
 type TextInputPanelProps = {
   onSubmit: () => void;
   isSubmitting: boolean;
 };
 
-// =============================================================================
-// Component
-// =============================================================================
-
 const TextInputPanel = ({ onSubmit, isSubmitting }: TextInputPanelProps) => {
   const { description, setDescription } = useInputMode();
+  const t = useT("mobile.button");
+
+  const disabled = isSubmitting || !description.trim();
 
   return (
     <View style={styles.container}>
@@ -48,26 +31,33 @@ const TextInputPanel = ({ onSubmit, isSubmitting }: TextInputPanelProps) => {
         editable={!isSubmitting}
       />
 
-      <Pressable
-        style={[
-          styles.submitButton,
-          isSubmitting && styles.submitButtonDisabled,
-        ]}
+      {/* Shared chunky Button — the canonical create CTA (web uses the
+          shared Button with a wand icon for this exact action). */}
+      <Button
+        variant="default"
+        size="lg"
+        fullWidth
+        disabled={disabled}
         onPress={onSubmit}
-        disabled={isSubmitting || !description.trim()}
-      >
-        <Text style={styles.buttonText}>
-          {isSubmitting ? "Creating..." : "Create coloring page"}
-        </Text>
-        {isSubmitting && <Spinner color={COLORS.white} size={18} />}
-      </Pressable>
+        accessibilityLabel={t("createColoringPage")}
+        leading={
+          isSubmitting ? (
+            <Spinner color="#FFFFFF" size={18} />
+          ) : (
+            <FontAwesomeIcon
+              icon={faWandMagicSparkles}
+              size={18}
+              color="#FFFFFF"
+              secondaryColor="rgba(255,255,255,0.85)"
+              secondaryOpacity={1}
+            />
+          )
+        }
+        label={isSubmitting ? t("creating") : t("createColoringPage")}
+      />
     </View>
   );
 };
-
-// =============================================================================
-// Styles
-// =============================================================================
 
 const styles = StyleSheet.create({
   container: {
@@ -81,33 +71,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     minHeight: 144,
     padding: 16,
-    fontFamily: "TondoTrial-Regular",
+    fontFamily: FONTS.regular,
     fontSize: 16,
     textAlignVertical: "top",
-  },
-  submitButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    backgroundColor: COLORS.crayonOrange,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    // shadow-btn-primary: 0 4px 14px 0 hsl(var(--crayon-orange) / 0.4)
-    shadowColor: COLORS.crayonOrange,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 14,
-    elevation: 6,
-  },
-  submitButtonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontFamily: "TondoTrial-Bold",
   },
 });
 

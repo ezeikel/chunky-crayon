@@ -66,6 +66,8 @@ type ButtonProps = {
   onPress?: () => void;
   /** Mute the press sound for this button (haptic still fires). */
   silent?: boolean;
+  /** Stretch the button face to fill its container's width. */
+  fullWidth?: boolean;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   accessibilityLabel?: string;
@@ -143,6 +145,7 @@ const Button = ({
   disabled = false,
   onPress,
   silent = false,
+  fullWidth = false,
   style,
   textStyle,
   accessibilityLabel,
@@ -195,7 +198,7 @@ const Button = ({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled }}
-      style={style}
+      style={[fullWidth && styles.fullWidth, style]}
     >
       {/* Outer wrapper holds the chunky bottom shadow (shadowColor =
           the variant's dark shade), so the shadow stays put while the
@@ -203,6 +206,7 @@ const Button = ({
       <Animated.View
         style={[
           spec.lift && { shadowColor: spec.bottom, borderRadius: 24 },
+          fullWidth && styles.fullWidth,
           shadowStyle,
         ]}
       >
@@ -213,7 +217,8 @@ const Button = ({
               backgroundColor: spec.bg,
               height: dims.height,
               paddingHorizontal: dims.paddingHorizontal,
-              width: size === "icon" ? dims.height : undefined,
+              width:
+                size === "icon" ? dims.height : fullWidth ? "100%" : undefined,
               borderColor: spec.borderColor,
               borderWidth: spec.borderWidth ?? 0,
               opacity: disabled ? 0.5 : 1,
@@ -270,6 +275,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.14,
     shadowRadius: 14,
     elevation: 3,
+  },
+  fullWidth: {
+    width: "100%",
   },
 });
 
