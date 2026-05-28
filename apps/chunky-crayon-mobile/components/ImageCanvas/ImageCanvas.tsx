@@ -201,11 +201,23 @@ const ImageCanvas = ({
     setDirty,
     advanceRainbowHue,
     setCaptureCanvas,
+    setMagicReady,
     reset,
   } = useCanvasStore();
 
   // Feature flags
   const { texturedBrushes, pathSimplification } = useFeatureStore();
+
+  // Magic tools (auto-color / magic brush) need pre-computed colour data —
+  // fill points (preferred) or the legacy grid colour map. The backend
+  // writes these async after image creation, so until one is present the
+  // toolbars disable + spin the magic buttons. Same condition the magic
+  // tap handler guards on (hasFillPoints || hasColorMap).
+  useEffect(() => {
+    const hasFillPoints = !!fillPoints && fillPoints.points.length > 0;
+    const hasColorMap = !!colorMap && isValidColorMap(colorMap);
+    setMagicReady(hasFillPoints || hasColorMap);
+  }, [fillPoints, colorMap, setMagicReady]);
 
   // Sync haptics enabled state with mute setting
   useEffect(() => {
