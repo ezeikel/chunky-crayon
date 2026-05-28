@@ -193,6 +193,9 @@ importers:
       '@gorhom/bottom-sheet':
         specifier: ^5.2.8
         version: 5.2.8(a644a691af90fa8d444f550b0b49674c)
+      '@one-colored-pixel/coloring-core':
+        specifier: workspace:^
+        version: link:../../packages/coloring-core
       '@one-colored-pixel/translations':
         specifier: workspace:^
         version: link:../../packages/translations

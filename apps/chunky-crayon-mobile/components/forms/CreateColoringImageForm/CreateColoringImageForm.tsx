@@ -7,7 +7,7 @@ import {
   InputModeProvider,
   useInputMode,
   InputModeSelector,
-  SceneInputPanel,
+  SceneInput,
   TextInputPanel,
   VoiceInputPanel,
   ImageInputPanel,
@@ -130,12 +130,7 @@ const CreateColoringImageFormContent = () => {
 
         {/* Active input panel */}
         <View style={styles.panelContainer}>
-          {mode === "scene" && (
-            <SceneInputPanel
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-            />
-          )}
+          {mode === "scene" && <SceneInput onCreate={handleSubmit} />}
           {mode === "text" && (
             <TextInputPanel
               onSubmit={handleSubmit}

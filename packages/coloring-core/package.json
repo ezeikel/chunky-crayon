@@ -13,6 +13,11 @@
       "import": "./dist/image-quality.js",
       "require": "./dist/image-quality.js",
       "types": "./dist/image-quality.d.ts"
+    },
+    "./scene": {
+      "import": "./dist/scene/index.js",
+      "require": "./dist/scene/index.js",
+      "types": "./dist/scene/index.d.ts"
     }
   },
   "scripts": {
