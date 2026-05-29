@@ -15,6 +15,10 @@ import {
   generateContentReelCaption,
   type ContentReelCaptionInput,
 } from '@/lib/content-reel/captions';
+import {
+  generateOrganicCaption,
+  type OrganicCaptionInput,
+} from '@/lib/organic/captions';
 import { sendSocialDigest, sendAdminAlert } from '@/app/actions/email';
 import type { SocialDigestEntry } from '@/app/actions/email';
 import { buildComicStripCaption } from '@/lib/comic-strip/captions';
@@ -92,12 +96,12 @@ const POST_SCHEDULE: Record<string, ScheduledSlot> = {
   // Organic content engine (news + dataset reels). Ships behind
   // ORGANIC_CONTENT_ENGINE_ENABLED — these slots only fire once that env
   // flag is on. Times mirror vercel.json's /api/social/organic-post crons.
-  facebookOrganic: { utc: '16:00', days: 'weekday' },
-  instagramOrganic: { utc: '17:30', days: 'weekday' },
-  tiktokOrganic: { utc: '18:30', days: 'weekday' }, // via Buffer bridge
-  linkedinOrganic: { utc: '21:00', days: 'weekday' }, // via Buffer bridge
-  threadsOrganic: { utc: '21:30', days: 'weekday' }, // via Buffer bridge
-  pinterestOrganic: { utc: '22:30', days: 'weekday' },
+  facebookOrganic: { utc: '12:00', days: 'weekday' },
+  instagramOrganic: { utc: '12:30', days: 'weekday' },
+  tiktokOrganic: { utc: '13:00', days: 'weekday' }, // via Buffer bridge
+  linkedinOrganic: { utc: '13:30', days: 'weekday' }, // via Buffer bridge
+  threadsOrganic: { utc: '14:00', days: 'weekday' }, // via Buffer bridge
+  pinterestOrganic: { utc: '14:30', days: 'weekday' },
 };
 
 const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
@@ -120,12 +124,12 @@ const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
   pinterestContentReel: { utc: '22:00', days: 'weekend' },
   // Organic content engine — 7d/wk, same slots as weekday. Behind
   // ORGANIC_CONTENT_ENGINE_ENABLED.
-  facebookOrganic: { utc: '16:00', days: 'weekend' },
-  instagramOrganic: { utc: '17:30', days: 'weekend' },
-  tiktokOrganic: { utc: '18:30', days: 'weekend' },
-  linkedinOrganic: { utc: '21:00', days: 'weekend' },
-  threadsOrganic: { utc: '21:30', days: 'weekend' },
-  pinterestOrganic: { utc: '22:30', days: 'weekend' },
+  facebookOrganic: { utc: '12:00', days: 'weekend' },
+  instagramOrganic: { utc: '12:30', days: 'weekend' },
+  tiktokOrganic: { utc: '13:00', days: 'weekend' },
+  linkedinOrganic: { utc: '13:30', days: 'weekend' },
+  threadsOrganic: { utc: '14:00', days: 'weekend' },
+  pinterestOrganic: { utc: '14:30', days: 'weekend' },
   // Comic strip — Sunday only. Generation 06:00 UTC, posts that evening.
   // Separated from content-reel times (17:00/18:30/22:00) so two
   // different posts don't land on the same platform within minutes.
@@ -214,6 +218,20 @@ export const GET = async (request: Request) => {
     // By 08:30 UTC (digest time) it should be ready. If it isn't (cron
     // failed, no candidates available) the brief omits the section.
     const contentReel = await db.contentReel.findFirst({
+      where: {
+        brand: BRAND,
+        postedAt: { gte: todayStart },
+        reelUrl: { not: null },
+      },
+      orderBy: { postedAt: 'desc' },
+    });
+
+    // Today's organic reel (news + dataset engine). Render cron fires
+    // 07:00 UTC, brief fires 08:30 UTC, posts start 12:00 UTC — so by
+    // brief time it's rendered and the brief can show the asset + status.
+    // If the render failed / had no candidates, reelUrl is null and the
+    // section is omitted.
+    const organicPost = await db.organicPost.findFirst({
       where: {
         brand: BRAND,
         postedAt: { gte: todayStart },
@@ -354,6 +372,21 @@ export const GET = async (request: Request) => {
         : { willAutoPost: false };
     };
 
+    // Organic-reel Buffer status — same flip logic, reads the organicPost row.
+    const organicBufferResults =
+      (organicPost?.socialPostResults as Record<
+        string,
+        { success?: boolean; via?: string } | undefined
+      > | null) ?? {};
+    const organicBufferOverride = (
+      key: 'tiktok' | 'linkedin' | 'threads',
+    ): { postedVia: 'buffer' } | { willAutoPost: false } => {
+      const r = organicBufferResults[key];
+      return r?.success && r.via === 'buffer'
+        ? { postedVia: 'buffer' as const }
+        : { willAutoPost: false };
+    };
+
     const dailyImageCaptionPromises = coloringImage
       ? ([
           generateInstagramCaption(coloringImage, 'carousel'),
@@ -439,6 +472,44 @@ export const GET = async (request: Request) => {
         generateContentReelCaption('threads', reelCaptionInput),
       ]);
       contentReelCaptions = {
+        instagram: ig,
+        facebook: fb,
+        pinterest: pin,
+        tiktok: tt,
+        linkedin: li,
+        threads: th,
+      };
+    }
+
+    // Organic-reel captions — same idea as content-reel: pre-generated so
+    // the brief shows what's going out and lets you copy-paste for manual
+    // platforms. The auto-post route regenerates at fire time.
+    let organicCaptions: Record<
+      | 'instagram'
+      | 'facebook'
+      | 'pinterest'
+      | 'tiktok'
+      | 'linkedin'
+      | 'threads',
+      string
+    > | null = null;
+    if (organicPost) {
+      const organicCaptionInput: OrganicCaptionInput = {
+        engine: organicPost.engine,
+        hook: organicPost.hook,
+        payoff: organicPost.payoff,
+        sourceTitle: organicPost.sourceTitle ?? undefined,
+        sourceUrl: organicPost.sourceUrl ?? undefined,
+      };
+      const [ig, fb, pin, tt, li, th] = await Promise.all([
+        generateOrganicCaption('instagram', organicCaptionInput),
+        generateOrganicCaption('facebook', organicCaptionInput),
+        generateOrganicCaption('pinterest', organicCaptionInput),
+        generateOrganicCaption('tiktok', organicCaptionInput),
+        generateOrganicCaption('linkedin', organicCaptionInput),
+        generateOrganicCaption('threads', organicCaptionInput),
+      ]);
+      organicCaptions = {
         instagram: ig,
         facebook: fb,
         pinterest: pin,
@@ -683,6 +754,53 @@ export const GET = async (request: Request) => {
         ]
       : [];
 
+    // Organic-reel platform entries — IG/FB/Pinterest auto-post via
+    // /api/social/organic-post crons; TikTok/LinkedIn/Threads via Buffer
+    // when the bridge is enabled. Slots are the 12:00-14:30 organic band.
+    const organicEntries: SocialDigestEntry[] = organicCaptions
+      ? [
+          {
+            platform: 'Instagram Reel',
+            caption: organicCaptions.instagram,
+            ...slotFor('instagramOrganic'),
+            assetType: 'video',
+          },
+          {
+            platform: 'Facebook Reel',
+            caption: organicCaptions.facebook,
+            ...slotFor('facebookOrganic'),
+            assetType: 'video',
+          },
+          {
+            platform: 'Pinterest Video',
+            caption: organicCaptions.pinterest,
+            ...slotFor('pinterestOrganic'),
+            assetType: 'video',
+          },
+          {
+            platform: 'TikTok',
+            caption: organicCaptions.tiktok,
+            ...slotFor('tiktokOrganic'),
+            ...organicBufferOverride('tiktok'),
+            assetType: 'video',
+          },
+          {
+            platform: 'LinkedIn',
+            caption: organicCaptions.linkedin,
+            ...slotFor('linkedinOrganic'),
+            ...organicBufferOverride('linkedin'),
+            assetType: 'video',
+          },
+          {
+            platform: 'Threads',
+            caption: organicCaptions.threads,
+            ...slotFor('threadsOrganic'),
+            ...organicBufferOverride('threads'),
+            assetType: 'video',
+          },
+        ]
+      : [];
+
     // Build the pipeline status panel — one entry per content section.
     // Replaces per-cron admin-alert emails: if a generation cron failed,
     // the brief flags it inline at the top instead of sending a 1am
@@ -714,6 +832,21 @@ export const GET = async (request: Request) => {
         note: contentReel
           ? undefined
           : 'check /api/cron/content-reel/publish at 05:00 UTC',
+      },
+      {
+        // Organic reel only runs when the engine flag is on; when off it's
+        // intentionally absent, not a failure.
+        label: 'Organic reel',
+        status: organicPost
+          ? 'ok'
+          : process.env.ORGANIC_CONTENT_ENGINE_ENABLED === 'true'
+            ? 'missing'
+            : 'skipped',
+        note: organicPost
+          ? undefined
+          : process.env.ORGANIC_CONTENT_ENGINE_ENABLED === 'true'
+            ? 'check /api/cron/organic/publish at 07:00 UTC'
+            : 'engine disabled (ORGANIC_CONTENT_ENGINE_ENABLED)',
       },
       {
         label: 'Blog post',
@@ -788,6 +921,18 @@ export const GET = async (request: Request) => {
             reelUrl: contentReel.reelUrl ?? undefined,
             coverUrl: contentReel.coverUrl ?? undefined,
             entries: contentReelEntries,
+          }
+        : undefined,
+      organicPost: organicPost
+        ? {
+            id: organicPost.id,
+            engine: organicPost.engine,
+            hook: organicPost.hook,
+            sourceTitle: organicPost.sourceTitle ?? undefined,
+            sourceUrl: organicPost.sourceUrl ?? undefined,
+            reelUrl: organicPost.reelUrl ?? undefined,
+            coverUrl: organicPost.coverUrl ?? undefined,
+            entries: organicEntries,
           }
         : undefined,
       comicStrip: comicStrip

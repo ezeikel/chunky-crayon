@@ -61,6 +61,18 @@ type SocialDigestEmailProps = {
      */
     entries?: SocialDigestEntry[];
   };
+  // Organic reel — news + dataset growth engine. Optional; section omitted
+  // if the 07:00 render produced nothing or the engine flag is off.
+  organicPost?: {
+    id: string;
+    engine: 'NEWS' | 'DATASET';
+    hook: string;
+    sourceTitle?: string;
+    sourceUrl?: string;
+    reelUrl?: string;
+    coverUrl?: string;
+    entries?: SocialDigestEntry[];
+  };
   // Weekly 4-panel comic strip — Sunday-only. Optional; section omitted
   // if no strip exists in the past 7 days.
   comicStrip?: {
@@ -131,6 +143,7 @@ const SocialDigestEmail = ({
   demoReelCoverUrl,
   demoReelEntries = [],
   contentReel,
+  organicPost,
   comicStrip,
   pipelineStatus,
   timestamp = new Date().toLocaleDateString('en-GB', {
@@ -386,6 +399,69 @@ const SocialDigestEmail = ({
                 listed. */}
             {contentReel.entries?.map((entry, index) => (
               <Section key={`content-reel-${index}`} style={platformCard}>
+                <Text style={platformHeader}>
+                  <span style={platformName}>{entry.platform}</span>
+                  <StatusBadge entry={entry} />
+                </Text>
+                <Text style={assetTypeText}>
+                  Asset: {entry.assetType}
+                  {entry.willAutoPost && entry.scheduledTimeUtc
+                    ? ` · scheduled ${entry.scheduledTimeUtc} UTC`
+                    : ''}
+                </Text>
+                <Text style={captionBlock}>{entry.caption}</Text>
+              </Section>
+            ))}
+          </>
+        )}
+
+        {/* ── Organic reel — news + dataset growth engine ── */}
+        {organicPost && (
+          <>
+            <Hr style={hr} />
+            <Section style={infoSection}>
+              <Heading as="h2" style={sectionTitle}>
+                {organicPost.engine === 'NEWS'
+                  ? "📰 Today's News Reel"
+                  : "🔎 Today's Data Reel"}
+              </Heading>
+              <Text style={paragraph}>
+                <strong>{organicPost.hook}</strong>
+              </Text>
+              {organicPost.sourceTitle && (
+                <Text style={paragraph}>
+                  Source:{' '}
+                  {organicPost.sourceUrl ? (
+                    <Link href={organicPost.sourceUrl} style={inlineLink}>
+                      {organicPost.sourceTitle}
+                    </Link>
+                  ) : (
+                    organicPost.sourceTitle
+                  )}
+                </Text>
+              )}
+              <Section style={assetSection}>
+                {organicPost.reelUrl && (
+                  <Text style={paragraph}>
+                    🎬 Video (mp4):{' '}
+                    <Link href={organicPost.reelUrl} style={inlineLink}>
+                      Download Reel (1080×1920)
+                    </Link>
+                  </Text>
+                )}
+                {organicPost.coverUrl && (
+                  <Text style={paragraph}>
+                    📸 Cover (jpg):{' '}
+                    <Link href={organicPost.coverUrl} style={inlineLink}>
+                      Download Cover Image
+                    </Link>
+                  </Text>
+                )}
+              </Section>
+            </Section>
+
+            {organicPost.entries?.map((entry, index) => (
+              <Section key={`organic-${index}`} style={platformCard}>
                 <Text style={platformHeader}>
                   <span style={platformName}>{entry.platform}</span>
                   <StatusBadge entry={entry} />

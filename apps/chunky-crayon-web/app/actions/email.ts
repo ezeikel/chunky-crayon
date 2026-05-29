@@ -706,6 +706,7 @@ export const sendSocialDigest = async ({
   demoReelCoverUrl,
   demoReelEntries,
   contentReel,
+  organicPost,
   comicStrip,
   pipelineStatus,
 }: {
@@ -735,6 +736,21 @@ export const sendSocialDigest = async ({
      * TikTok manually via this brief; the rest auto-fire from the
      * /api/social/content-reel-post crons.
      */
+    entries?: SocialDigestEntry[];
+  };
+  /**
+   * Organic reel — the news + dataset growth engine (content-first, not
+   * product promo). Optional: brief omits the section if the render cron
+   * (07:00 UTC) produced nothing or the engine flag is off.
+   */
+  organicPost?: {
+    id: string;
+    engine: 'NEWS' | 'DATASET';
+    hook: string;
+    sourceTitle?: string;
+    sourceUrl?: string;
+    reelUrl?: string;
+    coverUrl?: string;
     entries?: SocialDigestEntry[];
   };
   /**
@@ -800,6 +816,7 @@ export const sendSocialDigest = async ({
         demoReelCoverUrl,
         demoReelEntries,
         contentReel,
+        organicPost,
         comicStrip,
         pipelineStatus,
         timestamp,

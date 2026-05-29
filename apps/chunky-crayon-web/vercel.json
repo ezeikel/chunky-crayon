@@ -89,31 +89,31 @@
     },
     {
       "path": "/api/cron/organic/publish",
-      "schedule": "0 6 * * *"
+      "schedule": "0 7 * * *"
     },
     {
       "path": "/api/social/organic-post?platform=facebook",
-      "schedule": "0 16 * * *"
+      "schedule": "0 12 * * *"
     },
     {
       "path": "/api/social/organic-post?platform=instagram",
-      "schedule": "30 17 * * *"
+      "schedule": "30 12 * * *"
     },
     {
       "path": "/api/social/organic-post?platform=tiktok",
-      "schedule": "30 18 * * *"
+      "schedule": "0 13 * * *"
     },
     {
       "path": "/api/social/organic-post?platform=linkedin",
-      "schedule": "0 21 * * *"
+      "schedule": "30 13 * * *"
     },
     {
       "path": "/api/social/organic-post?platform=threads",
-      "schedule": "30 21 * * *"
+      "schedule": "0 14 * * *"
     },
     {
       "path": "/api/social/organic-post?platform=pinterest",
-      "schedule": "30 22 * * *"
+      "schedule": "30 14 * * *"
     },
     {
       "path": "/api/cron/cleanup-stuck-generations",
