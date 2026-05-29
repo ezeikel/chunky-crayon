@@ -18,6 +18,11 @@
       "import": "./dist/scene/index.js",
       "require": "./dist/scene/index.js",
       "types": "./dist/scene/index.d.ts"
+    },
+    "./characters": {
+      "import": "./dist/characters/index.js",
+      "require": "./dist/characters/index.js",
+      "types": "./dist/characters/index.d.ts"
     }
   },
   "scripts": {
