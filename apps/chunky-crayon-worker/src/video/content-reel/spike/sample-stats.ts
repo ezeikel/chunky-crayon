@@ -77,6 +77,26 @@ export const QUIET_STAT_SAMPLE: ContentReel = {
 };
 
 /**
+ * News-engine fixture — previews Template 4 (News Beat). `centerBlock` here
+ * is the readable KEY-DETAIL line (a full phrase), not a 1-3 word hero word.
+ * This is the shape the organic NEWS script prompt produces.
+ */
+export const NEWS_SAMPLE: ContentReel = {
+  id: "news-screens-under-5-govuk",
+  kind: "fact",
+  hook: "The UK just published official advice on screens for kids under five.",
+  payoff:
+    "It weighs the benefits and the risks, plus what parents and early educators see day to day. What is working in your house right now?",
+  centerBlock:
+    "A study of 1,800 schools found strict phone bans barely moved test scores.",
+  coverTeaser: "What does the research say about screens and little kids?",
+  sourceTitle: "Screen use by children aged under 5, GOV.UK",
+  sourceUrl:
+    "https://www.gov.uk/government/publications/screen-use-by-children-aged-under-5",
+  category: "screen-time",
+};
+
+/**
  * Phase A2 myth fixture — used to preview the kind-aware reveal beat
  * (VerdictStamp) in Studio. Sourced from one of the high-confidence
  * candidates the C-myth research run promoted into the DB.

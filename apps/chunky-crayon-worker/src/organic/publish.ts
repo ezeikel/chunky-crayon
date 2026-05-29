@@ -91,18 +91,27 @@ function probeAudioDurationSecs(filePath: string): Promise<number> {
   });
 }
 
+/** The render template — content-reel trio plus the organic news template. */
+type OrganicRenderTemplate = ContentReelTemplate | "news";
+
 /** Map an OrganicPost row to the in-memory ContentReel the renderer wants. */
 function toReelShape(row: PrismaOrganicPost): {
   reel: ContentReel;
-  template: ContentReelTemplate;
+  template: OrganicRenderTemplate;
 } {
-  const template = row.templateOverride
-    ? TEMPLATE_FROM_DB[row.templateOverride]
-    : "warm";
+  // NEWS posts use the dedicated news template (readable key-detail card,
+  // no giant hero word). DATASET posts behave like a stat/fact reel and
+  // use a content-reel template (warm by default, or an explicit override).
+  const template: OrganicRenderTemplate =
+    row.engine === "NEWS"
+      ? "news"
+      : row.templateOverride
+        ? TEMPLATE_FROM_DB[row.templateOverride]
+        : "warm";
   const reel: ContentReel = {
     id: row.id,
     // Organic posts aren't stat/fact/tip/myth; "fact" gives the calmest
-    // reveal treatment, which fits a news/data card best.
+    // reveal treatment for the DATASET path. News ignores kind entirely.
     kind: "fact",
     hook: row.hook,
     payoff: row.payoff,
@@ -111,7 +120,11 @@ function toReelShape(row: PrismaOrganicPost): {
     sourceTitle: row.sourceTitle ?? undefined,
     sourceUrl: row.sourceUrl ?? undefined,
     category: ORGANIC_TO_REEL_CATEGORY[row.category] ?? "creativity",
-    templateOverride: template,
+    // Cover/template treatment for the content-reel path. For news, the
+    // cover still uses a content-reel template under the hood (it doesn't
+    // render the hero word), so map to a real ContentReelTemplate.
+    templateOverride:
+      template === "news" ? "warm" : (template as ContentReelTemplate),
   };
   return { reel, template };
 }
@@ -189,7 +202,12 @@ export async function publishOrganicPost(
     outputPath,
   });
 
-  const coverBuf = await buildContentReelCover({ reel, template });
+  // News posts get the dedicated news cover (no hero-number block, "Tap to
+  // watch" pill); dataset posts use their content-reel template's cover.
+  const coverBuf = await buildContentReelCover({
+    reel,
+    template: template === "news" ? "news" : (reel.templateOverride ?? "warm"),
+  });
 
   const reelKey = `organic-posts/${row.engine.toLowerCase()}/${id}-${stamp}.mp4`;
   const coverKey = `organic-posts/${row.engine.toLowerCase()}/${id}-${stamp}-cover.jpg`;

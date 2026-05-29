@@ -78,8 +78,15 @@ async function loadFonts(): Promise<{
  *
  * Hex (not HSL) because Satori's CSS subset is happiest with hex / rgb().
  */
+/**
+ * Cover template variants. The content-reel trio (shock/warm/quiet) render
+ * the pixelated hero-number teaser; "news" renders a hook-forward cover with
+ * NO number block (news has no single hero number) and a "watch" pill.
+ */
+export type CoverTemplate = ContentReelTemplate | "news";
+
 const TEMPLATE_PALETTES: Record<
-  ContentReelTemplate,
+  CoverTemplate,
   {
     bgFrom: string;
     bgTo: string;
@@ -133,6 +140,21 @@ const TEMPLATE_PALETTES: Record<
     teaserPill: "#7E5AA8",
     teaserPillText: "#FFFFFF",
   },
+  // News — green anchor over cream→soft-green, matches the news reel
+  // template's calm "informative" palette. No hero number, so the
+  // aberration colours are unused but kept for the shared shape.
+  news: {
+    bgFrom: "#FFF8EC",
+    bgTo: "#E4EFD6",
+    numberPrimary: "#4F8A3D",
+    numberAberrationLeft: "#4F8A3D",
+    numberAberrationRight: "#4F8A3D",
+    text: "#3A3533",
+    textMuted: "#6B6662",
+    sourceBg: "rgba(255, 255, 255, 0.72)",
+    teaserPill: "#4F8A3D",
+    teaserPillText: "#FFFFFF",
+  },
 };
 
 const COVER_WIDTH = 1080;
@@ -155,7 +177,7 @@ const PIXELATE_TARGET_WIDTH = 18;
 
 type BuildContentReelCoverOptions = {
   reel: ContentReel;
-  template: ContentReelTemplate;
+  template: CoverTemplate;
   /** Output JPEG quality 0-100. Default 88 mirrors demo-reel cover. */
   quality?: number;
 };
@@ -172,6 +194,12 @@ export async function buildContentReelCover(
   const quality = opts.quality ?? 88;
   const palette = TEMPLATE_PALETTES[template];
   const fonts = await loadFonts();
+
+  // News covers have no single hero number to obscure (the reel shows a
+  // readable key-detail card, not a giant word). So we skip the pixelated
+  // number layer entirely and use a "watch" pill instead of "tap to see
+  // the number/fact". The teaser question + source pill carry the cover.
+  const isNews = template === "news";
 
   // Auto-size the centre block — same logic as the reel's reveal frame,
   // sized so 4-char ("-15%") through 6-char ("7+ hrs") strings all fit
@@ -200,7 +228,8 @@ export async function buildContentReelCover(
     tip: "Tap to see the tip",
     myth: "Tap to see the answer",
   };
-  const pillText = pillByKind[reel.kind];
+  // News has no obscured reveal, so the pill is a plain watch affordance.
+  const pillText = isNews ? "Tap to watch" : pillByKind[reel.kind];
 
   const fontConfig = [
     {
@@ -372,6 +401,12 @@ export async function buildContentReelCover(
     </div>,
     { width: COVER_WIDTH, height: COVER_HEIGHT, fonts: fontConfig },
   );
+
+  // News covers have no hero number — composite nothing onto the base and
+  // return it directly as JPEG.
+  if (isNews) {
+    return await sharp(Buffer.from(baseSvg)).jpeg({ quality }).toBuffer();
+  }
 
   // ── Number layer (transparent) ──────────────────────────────────────
   // Just the chromatic-aberration number block on a transparent canvas.

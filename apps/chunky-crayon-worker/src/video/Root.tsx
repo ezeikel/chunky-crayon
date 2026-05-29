@@ -70,10 +70,18 @@ import {
   type Template3QuietTruthProps,
 } from "./content-reel/spike/Template3QuietTruth";
 import {
+  Template4NewsBeat,
+  NEWS_REEL_FPS,
+  NEWS_REEL_DEFAULT_DURATION_FRAMES,
+  computeNewsReelDuration,
+  type Template4NewsBeatProps,
+} from "./content-reel/spike/Template4NewsBeat";
+import {
   SHOCK_STAT_SAMPLE,
   WARM_STAT_SAMPLE,
   QUIET_STAT_SAMPLE,
   WARM_MYTH_SAMPLE,
+  NEWS_SAMPLE,
 } from "./content-reel/spike/sample-stats";
 
 const FPS = 30;
@@ -459,6 +467,36 @@ export const RemotionRoot: React.FC = () => {
         }
         calculateMetadata={({ props }) => ({
           durationInFrames: computeWarmReelDuration(
+            props.hookVoiceSeconds,
+            props.payoffVoiceSeconds,
+          ),
+        })}
+      />
+
+      {/* Organic NEWS engine — News Beat template. Same voice-aware beat
+          skeleton as the content-reel templates, but the middle beat shows
+          the striking fact as a READABLE key-detail card instead of a giant
+          hero word (news rarely has one clean number). Blue+green plasma
+          reads as "informative". reel.centerBlock holds the key-detail line. */}
+      <Composition
+        id="OrganicNewsBeat"
+        component={Template4NewsBeat}
+        durationInFrames={NEWS_REEL_DEFAULT_DURATION_FRAMES}
+        fps={NEWS_REEL_FPS}
+        width={1080}
+        height={1920}
+        defaultProps={
+          {
+            reel: NEWS_SAMPLE,
+            hookVoiceUrl: staticFile("spike/koala-kid-voice.mp3"),
+            hookVoiceSeconds: 4.99,
+            payoffVoiceUrl: staticFile("spike/koala-adult-voice.mp3"),
+            payoffVoiceSeconds: 3.55,
+            backgroundMusicUrl: staticFile("spike/koala-ambient.mp3"),
+          } satisfies Template4NewsBeatProps
+        }
+        calculateMetadata={({ props }) => ({
+          durationInFrames: computeNewsReelDuration(
             props.hookVoiceSeconds,
             props.payoffVoiceSeconds,
           ),

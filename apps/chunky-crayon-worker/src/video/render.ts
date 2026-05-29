@@ -285,7 +285,10 @@ export async function renderImageDemoReel(
 // daily cron only fires once.
 
 export type RenderContentReelOptions = {
-  template: "shock" | "warm" | "quiet";
+  // shock/warm/quiet are the ContentReel stat/fact/tip/myth templates;
+  // "news" is the organic NEWS-engine template (readable key-detail card
+  // instead of a giant hero word). Same render machinery, different comp.
+  template: "shock" | "warm" | "quiet" | "news";
   reel: Record<string, unknown>;
   hookVoiceUrl: string;
   hookVoiceSeconds: number;
@@ -299,6 +302,7 @@ const CONTENT_REEL_COMPOSITION_ID = {
   shock: "ContentReelShockSpike",
   warm: "ContentReelWarmSpike",
   quiet: "ContentReelQuietSpike",
+  news: "OrganicNewsBeat",
 } as const;
 
 export async function renderContentReel(

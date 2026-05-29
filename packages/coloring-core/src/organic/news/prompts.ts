@@ -116,7 +116,7 @@ export const buildNewsScriptPrompt = (story: {
     "",
     "Return JSON with exactly these fields:",
     '  "hook": a problem/curiosity-first opening line (max ~16 words),',
-    '  "centerBlock": a 1 to 3 word reveal phrase that lands big on screen,',
+    '  "centerBlock": the single most striking fact from the story, as ONE readable sentence (roughly 8 to 16 words). It is shown as a highlighted detail card, NOT a giant single word. If the story has a concrete number or finding, lead with it (e.g. "A study of 1,800 schools found phone bans barely changed test scores"). NEVER a vague 1 to 3 word phrase like "Both sides" or "Mixed results".',
     '  "payoff": one or two sentences that end on a genuine, open, practical question,',
     '  "coverTeaser": a question-shaped line for the cover image.',
     "JSON only.",
