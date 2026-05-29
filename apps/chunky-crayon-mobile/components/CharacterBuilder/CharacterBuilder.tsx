@@ -6,7 +6,9 @@ import {
   ScrollView,
   TextInput,
   StyleSheet,
+  type ImageSourcePropType,
 } from "react-native";
+import { Image } from "expo-image";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faArrowLeft,
@@ -83,6 +85,8 @@ type TileProps = {
   label: string;
   icon: IconDefinition;
   duotone: DuotoneStyle;
+  /** Bundled illustration PNG; falls back to the FA icon when null. */
+  thumbnail: ImageSourcePropType | null;
   selected: boolean;
   disabled: boolean;
   onPress: () => void;
@@ -92,6 +96,7 @@ const Tile = ({
   label,
   icon,
   duotone,
+  thumbnail,
   selected,
   disabled,
   onPress,
@@ -117,13 +122,22 @@ const Tile = ({
             animatedStyle,
           ]}
         >
-          <FontAwesomeIcon
-            icon={icon}
-            size={48}
-            color={duotone.primary}
-            secondaryColor={duotone.secondary}
-            secondaryOpacity={1}
-          />
+          {thumbnail ? (
+            <Image
+              source={thumbnail}
+              style={styles.tileThumbnail}
+              contentFit="cover"
+              transition={150}
+            />
+          ) : (
+            <FontAwesomeIcon
+              icon={icon}
+              size={48}
+              color={duotone.primary}
+              secondaryColor={duotone.secondary}
+              secondaryOpacity={1}
+            />
+          )}
         </Animated.View>
         {selected && (
           <Animated.View
@@ -302,6 +316,7 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
               label={o.label}
               icon={o.icon}
               duotone={o.duotone}
+              thumbnail={o.thumbnail}
               selected={species === o.key}
               disabled={submitting}
               onPress={() => setSpecies(o.key)}
@@ -353,6 +368,7 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
                 label={o.label}
                 icon={o.icon}
                 duotone={o.duotone}
+                thumbnail={o.thumbnail}
                 selected={traits.includes(o.key)}
                 disabled={submitting}
                 onPress={() => toggleTrait(o.key)}
@@ -366,7 +382,14 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
       {step === "name" && (
         <View style={styles.nameStep}>
           <View style={styles.nameHero}>
-            {speciesIcon && (
+            {speciesIcon?.thumbnail ? (
+              <Image
+                source={speciesIcon.thumbnail}
+                style={styles.nameHeroThumbnail}
+                contentFit="cover"
+                transition={150}
+              />
+            ) : speciesIcon ? (
               <FontAwesomeIcon
                 icon={speciesIcon.icon}
                 size={72}
@@ -374,7 +397,7 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
                 secondaryColor={speciesIcon.duotone.secondary}
                 secondaryOpacity={1}
               />
-            )}
+            ) : null}
           </View>
           <TextInput
             value={name}
@@ -421,6 +444,7 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
               label={o.label}
               icon={o.icon}
               duotone={o.duotone}
+              thumbnail={o.thumbnail}
               selected={voicePersona === o.key}
               disabled={submitting}
               onPress={() =>
@@ -524,6 +548,15 @@ const styles = StyleSheet.create({
   },
   tileFaceDefault: {
     borderColor: COLORS.bgCreamDark,
+  },
+  tileThumbnail: {
+    width: "100%",
+    height: "100%",
+  },
+  nameHeroThumbnail: {
+    width: 132,
+    height: 132,
+    borderRadius: 22,
   },
   tileFaceSelected: {
     borderColor: "transparent",
