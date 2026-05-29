@@ -2684,6 +2684,40 @@ app.post("/jobs/organic/news-discover", async (c) => {
 });
 
 /**
+ * POST /jobs/organic/tips-discover
+ *
+ * Dynamic Parent Tips discovery (the grounded replacement for the old
+ * hardcoded dataset ingest). Surfaces one fresh save-worthy tip via
+ * Perplexity, grounds + verifies it against the real source, brand-safety
+ * gates it, and upserts an OrganicPost (engine=DATASET). Runs synchronously.
+ *
+ * Body (optional): { brand?: "CHUNKY_CRAYON" | "COLORING_HABITAT" }
+ */
+app.post("/jobs/organic/tips-discover", async (c) => {
+  const body = (await c.req
+    .json<{ brand?: unknown }>()
+    .catch(() => ({}) as { brand?: unknown })) as { brand?: unknown };
+  const brand =
+    body.brand === "COLORING_HABITAT" ? "COLORING_HABITAT" : "CHUNKY_CRAYON";
+
+  const { runTipsDiscover } = await import("./organic/tips-discover.js");
+  try {
+    const result = await runTipsDiscover(brand);
+    return c.json(result, 200);
+  } catch (err) {
+    console.error(`[/jobs/organic/tips-discover] failed:`, err);
+    return c.json(
+      {
+        ok: false,
+        error: "discover_failed",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      500,
+    );
+  }
+});
+
+/**
  * POST /jobs/coloring-image/start
  *
  * Canvas-as-loader entrypoint. Vercel side has already:

@@ -1,21 +1,17 @@
 /**
- * News discovery job — the recurring Perplexity half of the engine.
+ * Tips discovery job — the dynamic, recurring replacement for the old
+ * hardcoded dataset ingest. Mirrors news-discover.ts: pull recent posted
+ * tips for dedup, run coloring-core discoverTip (Perplexity → fetch →
+ * ground → verify → quality), brand-safety gate, upsert an OrganicPost.
  *
- * Per run:
- *   1. Pull recently-seen news URLs from the DB (last 60 days) so
- *      discovery doesn't re-surface a story we already posted.
- *   2. coloring-core discoverNewsStory() → best scored, scripted story.
- *   3. Brand-safety jury gate (kids-app strict). Blocked → discard, log.
- *   4. Upsert an OrganicPost (engine=NEWS) with the safety verdict +
- *      engagement score. APPROVED rows become publishable by the picker.
- *
- * Discovery + scoring + safety all degrade gracefully — a bad run logs
- * and no-ops rather than throwing, so the cron stays quiet on empty days.
+ * Tips are stored as engine=DATASET so the publish picker's NEWS<->DATASET
+ * rotation keeps the feed varied (a news reel then a tips reel). Confidence
+ * is HIGH because the claim is grounded in + verified against a real source.
  */
 
 import { db } from "@one-colored-pixel/db";
 import {
-  discoverNewsStory,
+  discoverTip,
   vetOrganicPost,
   type OrganicCategory,
 } from "@one-colored-pixel/coloring-core/organic";
@@ -36,16 +32,16 @@ const CATEGORY_TO_DB: Record<OrganicCategory, string> = {
   nostalgia: "NOSTALGIA",
 };
 
-export type NewsDiscoverResult =
-  | { ok: true; id: string; approved: boolean; score: number }
+export type TipsDiscoverResult =
+  | { ok: true; id: string; approved: boolean }
   | { ok: false; reason: string };
 
-export async function runNewsDiscover(
+export async function runTipsDiscover(
   brand: "CHUNKY_CRAYON" | "COLORING_HABITAT" = "CHUNKY_CRAYON",
-): Promise<NewsDiscoverResult> {
+): Promise<TipsDiscoverResult> {
   const since = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
   const recentRows = await db.organicPost.findMany({
-    where: { brand, engine: "NEWS", createdAt: { gte: since } },
+    where: { brand, engine: "DATASET", createdAt: { gte: since } },
     select: { sourceUrl: true, sourceTitle: true, hook: true },
     orderBy: { createdAt: "desc" },
     take: 30,
@@ -53,17 +49,16 @@ export async function runNewsDiscover(
   const excludeUrls = recentRows
     .map((r) => r.sourceUrl)
     .filter((u): u is string => !!u);
-  // Semantic-dedup context: recognise the same event from a different outlet.
   const recent = recentRows.map((r) => ({
     title: r.sourceTitle ?? r.hook,
     detail: r.hook,
   }));
 
-  const discovered = await discoverNewsStory({ excludeUrls, recent });
+  const discovered = await discoverTip({ excludeUrls, recent });
   if (!discovered) {
-    return { ok: false, reason: "no_publishable_story" };
+    return { ok: false, reason: "no_publishable_tip" };
   }
-  const { content, score } = discovered;
+  const { content } = discovered;
 
   const safety = await vetOrganicPost({
     hook: content.hook,
@@ -71,13 +66,9 @@ export async function runNewsDiscover(
     sourceTitle: content.sourceTitle,
   });
 
-  // News carries real-world claims, so a story that cleared the engagement
-  // floor + safety jury is treated as MEDIUM confidence by default (the
-  // source URL was reachable + Perplexity-grounded). HIGH is reserved for
-  // dataset posts backed by an official statistic.
   const created = await db.organicPost.create({
     data: {
-      engine: "NEWS",
+      engine: "DATASET",
       hook: content.hook,
       payoff: content.payoff,
       centerBlock: content.centerBlock,
@@ -85,18 +76,18 @@ export async function runNewsDiscover(
       sourceTitle: content.sourceTitle ?? null,
       sourceUrl: content.sourceUrl ?? null,
       category: CATEGORY_TO_DB[content.category] as never,
-      engagementScore: score,
       safetyVerdict: (safety.approved ? "APPROVED" : "BLOCKED") as never,
       safetyNotes: safety.reason,
+      // Grounded + verified against a real source -> HIGH confidence.
       factCheckedAt: new Date(),
-      factCheckConfidence: "MEDIUM" as never,
-      factCheckNotes: `discovered via ${safety.via}`,
+      factCheckConfidence: "HIGH" as never,
+      factCheckNotes: `tip grounded via ${safety.via}`,
       brand,
     },
   });
 
   console.log(
-    `[news-discover] created ${created.id} approved=${safety.approved} score=${score.toFixed(2)} (${safety.reason})`,
+    `[tips-discover] created ${created.id} approved=${safety.approved} (${safety.reason})`,
   );
-  return { ok: true, id: created.id, approved: safety.approved, score };
+  return { ok: true, id: created.id, approved: safety.approved };
 }

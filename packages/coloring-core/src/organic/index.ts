@@ -23,6 +23,19 @@ export {
   type SafetyResult,
 } from "./brand-safety";
 
+// Shared grounding / fact-check / dedup machinery (news + tips engines).
+export {
+  fetchArticleText,
+  extractReadableText,
+  type FetchedArticle,
+} from "./shared/article";
+export {
+  groundedScript,
+  verifyGrounding,
+  type GroundedScript,
+} from "./shared/grounding";
+export { isDuplicateOfRecent, type RecentItem } from "./shared/dedup";
+
 // News engine
 export {
   scoreEngagement,
@@ -32,37 +45,20 @@ export {
 export {
   NEWS_VEINS,
   NEWS_DISCOVERY_SYSTEM,
-  buildNewsScriptPrompt,
   type NewsVein,
 } from "./news/prompts";
 export {
   discoverNewsStory,
   type DiscoveredNews,
+  type DiscoverNewsOptions,
   type NewsCandidate,
 } from "./news/discovery";
 
-// Dataset engine
+// Tips engine (dynamic, grounded) — replaces the old hardcoded dataset.
+export { TIP_VEINS, TIP_DISCOVERY_SYSTEM, type TipVein } from "./tips/veins";
 export {
-  buildBabyNameContent,
-  babyNameExternalId,
-  countDeltaPct,
-  isPostWorthyPair,
-  BABY_NAMES_SOURCE_UK,
-  BABY_NAMES_SOURCE_US,
-  type BabyNameRow,
-  type BabyNameRegion,
-  type BabyNameSex,
-} from "./dataset/babynames";
-export {
-  buildMilestoneContent,
-  MILESTONE_SEED,
-  MILESTONE_SOURCE,
-  type MilestoneRow,
-  type MilestoneDomain,
-} from "./dataset/milestones";
-export {
-  buildScreenTimeContent,
-  SCREEN_TIME_SEED,
-  SCREEN_TIME_SOURCE,
-  type ScreenTimeRow,
-} from "./dataset/screentime";
+  discoverTip,
+  type DiscoveredTip,
+  type DiscoverTipOptions,
+  type TipCandidate,
+} from "./tips/discovery";

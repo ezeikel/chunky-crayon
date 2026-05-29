@@ -11,8 +11,6 @@
  * in those waters.
  */
 
-import { NO_EM_DASHES_RULE } from "../../utils/copy";
-
 export type NewsVein = {
   id: string;
   /** Maps to OrganicCategory. */
@@ -83,41 +81,8 @@ export const NEWS_VEINS: NewsVein[] = [
 /** System prompt for the live-search discovery pass. */
 export const NEWS_DISCOVERY_SYSTEM = `You are a news scout for Chunky Crayon, a brand whose social audience is parents and teachers. You find real, recent, link-able news stories that this audience would react to, comment on, or share. You return only stories from the last 14 days from credible UK or US outlets. You never invent URLs. You return articles, not opinion.`;
 
-/**
- * Script prompt for turning a chosen story into a reel. Built at call time
- * with the story facts. Enforces the brand voice + the kids-app framing:
- * curious and pro-child, empathetic to both parents and teachers, calm,
- * never partisan, never shaming, no product mention.
- */
-export const buildNewsScriptPrompt = (story: {
-  headline: string;
-  summary: string;
-  sourceUrl: string;
-}): string =>
-  [
-    "Turn this news story into a short reel script for parents and teachers.",
-    "",
-    `Headline: ${story.headline}`,
-    `Summary: ${story.summary}`,
-    `Source URL: ${story.sourceUrl}`,
-    "",
-    "Voice + rules:",
-    "- Curious, calm, pro-child. Empathetic to BOTH parents and teachers.",
-    "- Frame as 'here is what is happening, what do you think', never 'pick a side and fight'.",
-    "- Punch up at systems and policies, never down at individual parents, teachers, or children.",
-    "- No party-political framing. No product mention. No 'AI' framing.",
-    "- US-friendly spelling.",
-    `- ${NO_EM_DASHES_RULE}`,
-    "",
-    "CRITICAL — the closing question:",
-    "- Ask a genuine, open, practical question (e.g. 'what works in your house?', 'teachers, what are you seeing?', 'where do you land?').",
-    "- NEVER use loaded, insinuating, or conspiratorial closers like 'or is it about something else?', 'what aren't they telling us?', 'who really benefits?'. Those invite a political pile-on and will be rejected.",
-    "- If the topic is a known flashpoint (phone bans, curriculum, gender, books, religion), keep the framing strictly factual and the question strictly practical, or it will be blocked.",
-    "",
-    "Return JSON with exactly these fields:",
-    '  "hook": a problem/curiosity-first opening line (max ~16 words),',
-    '  "centerBlock": the single most striking fact from the story, as ONE readable sentence (roughly 8 to 16 words). It is shown as a highlighted detail card, NOT a giant single word. If the story has a concrete number or finding, lead with it (e.g. "A study of 1,800 schools found phone bans barely changed test scores"). NEVER a vague 1 to 3 word phrase like "Both sides" or "Mixed results".',
-    '  "payoff": one or two sentences that end on a genuine, open, practical question,',
-    '  "coverTeaser": a question-shaped line for the cover image.',
-    "JSON only.",
-  ].join("\n");
+// Note: the reel SCRIPT is now produced by the shared grounded-script path
+// (organic/shared/grounding.ts), which writes hook/centerBlock/payoff from
+// the real fetched article text (not a summary) and runs a verification
+// pass. The old summary-only buildNewsScriptPrompt was removed when news
+// switched to grounded scripting.

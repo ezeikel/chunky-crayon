@@ -21,17 +21,15 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 
 import { models } from "../../models";
-import {
-  NEWS_DISCOVERY_SYSTEM,
-  NEWS_VEINS,
-  buildNewsScriptPrompt,
-  type NewsVein,
-} from "./prompts";
+import { NEWS_DISCOVERY_SYSTEM, NEWS_VEINS, type NewsVein } from "./prompts";
 import {
   MIN_PUBLISHABLE_SCORE,
   scoreEngagement,
   type EngagementSignals,
 } from "./scoring";
+import { fetchArticleText } from "../shared/article";
+import { groundedScript, verifyGrounding } from "../shared/grounding";
+import { isDuplicateOfRecent, type RecentItem } from "../shared/dedup";
 import type { OrganicContent, OrganicCategory } from "../types";
 
 const candidateListSchema = z.object({
@@ -145,33 +143,32 @@ async function scoreCandidate(c: NewsCandidate): Promise<number> {
   }
 }
 
-async function urlReachable(url: string): Promise<boolean> {
-  try {
-    const res = await fetch(url, {
-      method: "HEAD",
-      signal: AbortSignal.timeout(8000),
-      redirect: "follow",
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
 export type DiscoveredNews = {
   content: OrganicContent;
   score: number;
 };
 
+export type DiscoverNewsOptions = {
+  /** Recently-posted URLs — hard-excluded (exact match). */
+  excludeUrls?: string[];
+  /** Recently-posted stories — semantic dedup drops same-event candidates. */
+  recent?: RecentItem[];
+};
+
 /**
- * Full discovery: search → dedup → score → verify → script. Returns the
- * single best publishable story, or null if nothing cleared the floor.
- * `excludeUrls` lets the caller pass recently-posted URLs so we don't
- * re-surface the same story (DB-driven, kept out of here).
+ * Full discovery, faithful + deduped:
+ *   search → URL-exclude → score → (per winner) semantic-dedup → fetch
+ *   real article text → grounded script → verify claims → return.
+ *
+ * The winner loop tries candidates in score order; any that fails dedup,
+ * fetch, grounding, or verification is skipped for the next. Returns the
+ * first that clears every gate, or null.
  */
 export async function discoverNewsStory(
-  excludeUrls: string[] = [],
+  opts: DiscoverNewsOptions = {},
 ): Promise<DiscoveredNews | null> {
+  const excludeUrls = opts.excludeUrls ?? [];
+  const recent = opts.recent ?? [];
   const veinResults = await Promise.all(NEWS_VEINS.map(searchVein));
   const seen = new Set(excludeUrls.map((u) => u.toLowerCase()));
   const flat: NewsCandidate[] = [];
@@ -197,55 +194,62 @@ export async function discoverNewsStory(
   for (const winner of scored) {
     if (winner.score < MIN_PUBLISHABLE_SCORE) {
       console.log(
-        `[news-discovery] best score ${winner.score.toFixed(2)} below floor ${MIN_PUBLISHABLE_SCORE}; skipping`,
+        `[news-discovery] best remaining score ${winner.score.toFixed(2)} below floor ${MIN_PUBLISHABLE_SCORE}; stopping`,
       );
       return null;
     }
-    if (!(await urlReachable(winner.url))) {
-      console.warn(
-        `[news-discovery] winner URL unreachable, trying next: ${winner.url}`,
+
+    // Semantic dedup — same event from a different outlet as something we
+    // already posted? Skip it (URL-exclude alone misses this).
+    const dup = await isDuplicateOfRecent({
+      candidate: { title: winner.headline, detail: winner.summary },
+      recent,
+    });
+    if (dup.duplicate) {
+      console.log(
+        `[news-discovery] skipping duplicate: ${winner.headline} (${dup.reason})`,
       );
       continue;
     }
-    const content = await scriptStory(winner);
-    if (content) return { content, score: winner.score };
+
+    // Fetch the real article text and GROUND the script on it (not the
+    // 2-sentence Perplexity summary) so we never publish an invented stat.
+    const article = await fetchArticleText(winner.url);
+    if (!article) {
+      console.warn(
+        `[news-discovery] could not fetch/extract article, trying next: ${winner.url}`,
+      );
+      continue;
+    }
+    const script = await groundedScript({
+      kind: "news",
+      title: winner.headline,
+      sourceText: article.text,
+    });
+    if (!script) {
+      console.warn(
+        `[news-discovery] grounded script failed, trying next: ${winner.url}`,
+      );
+      continue;
+    }
+    const verdict = await verifyGrounding({ script, sourceText: article.text });
+    if (!verdict.supported) {
+      console.warn(
+        `[news-discovery] claims unsupported by source, discarding: ${winner.headline} (${verdict.reason})`,
+      );
+      continue;
+    }
+
+    const content: OrganicContent = {
+      hook: script.hook,
+      payoff: script.payoff,
+      centerBlock: script.centerBlock,
+      coverTeaser: script.coverTeaser,
+      category: winner.category,
+      sourceTitle: winner.headline,
+      sourceUrl: winner.url,
+    };
+    return { content, score: winner.score };
   }
   return null;
-}
-
-async function scriptStory(c: NewsCandidate): Promise<OrganicContent | null> {
-  const scriptSchema = z.object({
-    hook: z.string(),
-    centerBlock: z.string(),
-    payoff: z.string(),
-    coverTeaser: z.string(),
-  });
-  try {
-    const { output } = await generateText({
-      model: models.creative,
-      prompt: buildNewsScriptPrompt({
-        headline: c.headline,
-        summary: c.summary,
-        sourceUrl: c.url,
-      }),
-      output: Output.object({ schema: scriptSchema }),
-      temperature: 0.5,
-    });
-    if (!output?.hook) return null;
-    return {
-      hook: output.hook,
-      payoff: output.payoff,
-      centerBlock: output.centerBlock,
-      coverTeaser: output.coverTeaser,
-      category: c.category,
-      sourceTitle: c.headline,
-      sourceUrl: c.url,
-    };
-  } catch (err) {
-    console.warn(
-      "[news-discovery] scripting failed:",
-      err instanceof Error ? err.message : err,
-    );
-    return null;
-  }
 }

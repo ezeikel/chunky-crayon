@@ -88,6 +88,10 @@
       "schedule": "0 9,13,17 * * *"
     },
     {
+      "path": "/api/cron/organic/tips-discover",
+      "schedule": "0 8,16 * * *"
+    },
+    {
       "path": "/api/cron/organic/publish",
       "schedule": "0 7 * * *"
     },
