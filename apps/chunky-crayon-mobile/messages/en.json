@@ -18,6 +18,24 @@
     "header": {
       "forGrownUps": "For Grown-ups"
     },
+    "characterBuilder": {
+      "step": {
+        "species": "Pick your friend",
+        "color": "Pick a color",
+        "traits": "What are they like?",
+        "name": "Give them a name",
+        "voice": "Pick a voice"
+      },
+      "pickUpTo": "Pick up to {{count}}",
+      "namePlaceholder": "Type a name",
+      "nameLabel": "Character name",
+      "redo": "Redo",
+      "back": "Back",
+      "next": "Next",
+      "makeFriend": "Make my friend",
+      "creating": "Drawing...",
+      "createError": "Something went wrong. Please try again."
+    },
     "gallery": {
       "title": "Explore",
       "subtitle": "Pick something fun to color"
