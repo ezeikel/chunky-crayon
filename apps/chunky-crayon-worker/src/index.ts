@@ -2609,6 +2609,81 @@ app.post("/jobs/content-reel/publish", async (c) => {
 });
 
 /**
+ * POST /jobs/organic/pick-and-publish
+ *
+ * Daily entrypoint for the organic content engine (PTP-style flywheel).
+ * Picks today's approved OrganicPost via engine rotation + 30d dedup +
+ * category cooldown, then runs the reel publish pipeline (reusing the
+ * content-reel renderer). Detached render, 202 ack — same pattern as
+ * content-reel/pick-and-publish.
+ *
+ * Body (optional): { brand?: "CHUNKY_CRAYON" | "COLORING_HABITAT" }
+ */
+app.post("/jobs/organic/pick-and-publish", async (c) => {
+  const body = (await c.req
+    .json<{ brand?: unknown }>()
+    .catch(() => ({}) as { brand?: unknown })) as { brand?: unknown };
+  const brand =
+    body.brand === "COLORING_HABITAT" ? "COLORING_HABITAT" : "CHUNKY_CRAYON";
+
+  const { pickTodaysOrganicPost } = await import("./organic/pick.js");
+  const { publishOrganicPost } = await import("./organic/publish.js");
+  const port = parseInt(process.env.PORT ?? "3030", 10);
+
+  const post = await pickTodaysOrganicPost({ brand });
+  if (!post) {
+    console.warn(`[/jobs/organic/pick-and-publish] no candidates for ${brand}`);
+    return c.json({ ok: false, error: "no_candidates" }, 200);
+  }
+
+  publishOrganicPost({ id: post.id, port }).catch((err) => {
+    console.error(
+      `[/jobs/organic/pick-and-publish] detached publish failed for ${post.id}:`,
+      err,
+    );
+  });
+
+  return c.json(
+    { ok: true, accepted: true, id: post.id, engine: post.engine },
+    202,
+  );
+});
+
+/**
+ * POST /jobs/organic/news-discover
+ *
+ * Recurring Perplexity discovery for the news engine. Surfaces one fresh
+ * parenting/education news story, brand-safety-gates it, and upserts an
+ * OrganicPost (engine=NEWS). Runs synchronously (no render here) and
+ * returns the result — fast enough for the cron's ack window.
+ *
+ * Body (optional): { brand?: "CHUNKY_CRAYON" | "COLORING_HABITAT" }
+ */
+app.post("/jobs/organic/news-discover", async (c) => {
+  const body = (await c.req
+    .json<{ brand?: unknown }>()
+    .catch(() => ({}) as { brand?: unknown })) as { brand?: unknown };
+  const brand =
+    body.brand === "COLORING_HABITAT" ? "COLORING_HABITAT" : "CHUNKY_CRAYON";
+
+  const { runNewsDiscover } = await import("./organic/news-discover.js");
+  try {
+    const result = await runNewsDiscover(brand);
+    return c.json(result, result.ok ? 200 : 200);
+  } catch (err) {
+    console.error(`[/jobs/organic/news-discover] failed:`, err);
+    return c.json(
+      {
+        ok: false,
+        error: "discover_failed",
+        details: err instanceof Error ? err.message : String(err),
+      },
+      500,
+    );
+  }
+});
+
+/**
  * POST /jobs/coloring-image/start
  *
  * Canvas-as-loader entrypoint. Vercel side has already:

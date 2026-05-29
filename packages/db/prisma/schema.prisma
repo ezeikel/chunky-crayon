@@ -888,6 +888,174 @@ enum FactCheckConfidence {
   LOW
 }
 
+// ── Organic content engine ──────────────────────────────────────────
+//
+// Replicates the sister project's (Parking Ticket Pal) organic-social
+// flywheel for a parent/teacher audience: content-first, product implicit.
+// Two engines produce OrganicPost rows that REUSE the ContentReel reel
+// renderer / voice / cover / posting layer (they map onto the same
+// hook/centerBlock/payoff content shape).
+//
+//   NEWS    — scheduled Perplexity discovery on parenting/education news
+//             flashpoints, outrage-scored + brand-safety gated.
+//   DATASET — recyclable structured public data (baby names, milestones,
+//             screen-time stats); one DatasetRow becomes one post.
+//
+// Plan: ~/.claude/plans/cc-organic-content-engine.md
+
+// A recyclable structured public dataset (e.g. ONS/SSA baby names).
+// Ingest scripts load rows here; the dataset engine turns unused rows
+// into OrganicPost rows. Kept generic (payload Json) so adding a new
+// dataset is "new ingest script + new row→content builder", no migration.
+model DatasetSource {
+  id String @id @default(cuid())
+
+  // Stable key used by ingest scripts + builders, e.g. "babynames-ons",
+  // "babynames-ssa", "milestones-cdc", "screentime-ofcom".
+  key  String @unique
+  name String
+
+  // Licence note for attribution audit (OGL / public-domain / etc.).
+  license String?
+
+  lastIngestedAt DateTime?
+
+  rows DatasetRow[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("dataset_sources")
+}
+
+// One record of a dataset (e.g. one name-year-count row). `payload` holds
+// the source-specific fields; the per-source builder reads it to compose
+// post content. `externalId` is the natural key within a source for dedup.
+model DatasetRow {
+  id String @id @default(cuid())
+
+  source    DatasetSource @relation(fields: [sourceKey], references: [key], onDelete: Cascade)
+  sourceKey String
+
+  // Natural key within the source (e.g. "ons-2023-Aria-F"). Unique per
+  // source so re-ingest upserts rather than duplicates.
+  externalId String
+
+  // Source-specific structured fields (name/year/count/rank, milestone
+  // text/age/domain, stat metric/value/group, etc.).
+  payload Json
+
+  // Set when this row has been turned into an OrganicPost, so the dataset
+  // engine cycles through unused rows first before recycling old ones.
+  usedAt DateTime?
+
+  posts OrganicPost[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Picker: "give me an unused row for this source" + re-ingest dedup.
+  @@unique([sourceKey, externalId])
+  @@index([sourceKey, usedAt])
+  @@map("dataset_rows")
+}
+
+model OrganicPost {
+  id String @id @default(cuid())
+
+  // Which engine produced this row. Drives the picker's round-robin and
+  // the per-engine source/safety rules.
+  engine OrganicEngine
+
+  // Reel content shape — mirrors ContentReel so the existing renderer,
+  // voice cast, and cover pipeline serve these unchanged.
+  hook        String  @db.Text
+  payoff      String  @db.Text
+  centerBlock String
+  coverTeaser String? @db.Text
+
+  // Source attribution. Required for NEWS + most DATASET posts at publish.
+  sourceTitle String?
+  sourceUrl   String?
+
+  // Topic — drives reel template default + the picker's 7-day cooldown so
+  // the audience doesn't see three screen-time posts in a week.
+  category         OrganicCategory
+  templateOverride ContentReelTemplate?
+
+  // Per-word caption tracks for ElevenLabs-timed voice clips (Json, same
+  // shape as ContentReel.hookTokens/payoffTokens).
+  hookTokens   Json?
+  payoffTokens Json?
+
+  // NEWS only — outrage/engagement score 0..1 from the discovery scorer.
+  // Picker prefers higher scores. Null for dataset posts.
+  engagementScore Float?
+
+  // Brand-safety jury verdict. Only APPROVED rows are publishable. Kids
+  // app — the gate is stricter than the sister project's.
+  safetyVerdict SafetyVerdict @default(PENDING)
+  safetyNotes   String?       @db.Text
+
+  // Fact-check state (NEWS + data-claim DATASET posts). Reuses the
+  // ContentReel confidence enum.
+  factCheckedAt       DateTime?
+  factCheckConfidence FactCheckConfidence?
+  factCheckNotes      String?              @db.Text
+
+  // DATASET only — the row this post was built from (dedup + provenance).
+  datasetRow   DatasetRow? @relation(fields: [datasetRowId], references: [id], onDelete: SetNull)
+  datasetRowId String?
+
+  // Scheduling + results (same semantics as ContentReel).
+  postedAt          DateTime?
+  socialPostResults Json?
+
+  brand Brand @default(CHUNKY_CRAYON)
+
+  // R2 artefacts — worker writes on publish.
+  reelUrl  String?
+  coverUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Hot pick query: "approved, this engine, this brand, not posted in 30d".
+  @@index([engine, brand, safetyVerdict, postedAt])
+  // News-discover dedup: find recent rows to compare new candidates against.
+  @@index([brand, engine, createdAt])
+  @@map("organic_posts")
+}
+
+enum OrganicEngine {
+  NEWS
+  DATASET
+}
+
+enum SafetyVerdict {
+  PENDING
+  APPROVED
+  BLOCKED
+}
+
+enum OrganicCategory {
+  // News flashpoints (research-ranked)
+  SCHOOL_POLICY
+  SCREEN_TIME
+  READING_LITERACY
+  CHILDCARE_COST
+  SCHOOL_FOOD
+  HOMEWORK
+  TEACHER_SUPPORT
+  CHILDHOOD_PLAY
+  // Dataset families
+  BABY_NAMES
+  MILESTONES
+  // Shared / fallback
+  CREATIVITY
+  NOSTALGIA
+}
+
 model ComicStrip {
   id String @id @default(cuid())
 

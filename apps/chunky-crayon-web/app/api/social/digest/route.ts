@@ -89,6 +89,15 @@ const POST_SCHEDULE: Record<string, ScheduledSlot> = {
   tiktokDemoReel: { utc: '22:00', days: 'weekday' },
   linkedinDemoReel: { utc: '22:30', days: 'weekday' },
   threadsDemoReel: { utc: '22:45', days: 'weekday' },
+  // Organic content engine (news + dataset reels). Ships behind
+  // ORGANIC_CONTENT_ENGINE_ENABLED — these slots only fire once that env
+  // flag is on. Times mirror vercel.json's /api/social/organic-post crons.
+  facebookOrganic: { utc: '16:00', days: 'weekday' },
+  instagramOrganic: { utc: '17:30', days: 'weekday' },
+  tiktokOrganic: { utc: '18:30', days: 'weekday' }, // via Buffer bridge
+  linkedinOrganic: { utc: '21:00', days: 'weekday' }, // via Buffer bridge
+  threadsOrganic: { utc: '21:30', days: 'weekday' }, // via Buffer bridge
+  pinterestOrganic: { utc: '22:30', days: 'weekday' },
 };
 
 const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
@@ -109,6 +118,14 @@ const POST_SCHEDULE_WEEKEND: Record<string, ScheduledSlot> = {
   linkedinContentReel: { utc: '19:30', days: 'weekend' },
   threadsContentReel: { utc: '20:00', days: 'weekend' },
   pinterestContentReel: { utc: '22:00', days: 'weekend' },
+  // Organic content engine — 7d/wk, same slots as weekday. Behind
+  // ORGANIC_CONTENT_ENGINE_ENABLED.
+  facebookOrganic: { utc: '16:00', days: 'weekend' },
+  instagramOrganic: { utc: '17:30', days: 'weekend' },
+  tiktokOrganic: { utc: '18:30', days: 'weekend' },
+  linkedinOrganic: { utc: '21:00', days: 'weekend' },
+  threadsOrganic: { utc: '21:30', days: 'weekend' },
+  pinterestOrganic: { utc: '22:30', days: 'weekend' },
   // Comic strip — Sunday only. Generation 06:00 UTC, posts that evening.
   // Separated from content-reel times (17:00/18:30/22:00) so two
   // different posts don't land on the same platform within minutes.

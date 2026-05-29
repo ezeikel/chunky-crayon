@@ -23,6 +23,11 @@
       "import": "./dist/characters/index.js",
       "require": "./dist/characters/index.js",
       "types": "./dist/characters/index.d.ts"
+    },
+    "./organic": {
+      "import": "./dist/organic/index.js",
+      "require": "./dist/organic/index.js",
+      "types": "./dist/organic/index.d.ts"
     }
   },
   "scripts": {
