@@ -5,7 +5,7 @@ import { View, Text } from "react-native";
 import type { Preview } from "@storybook/react-native";
 import { useFonts } from "expo-font";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { BottomSheetProvider } from "@swmansion/react-native-bottom-sheet";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -62,7 +62,7 @@ const preview: Preview = {
     (Story) => (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
-          <BottomSheetModalProvider>
+          <BottomSheetProvider>
             <QueryClientProvider client={queryClient}>
               <StorybookFontGate>
                 <View style={{ flex: 1, padding: 16, backgroundColor: "#fff" }}>
@@ -70,7 +70,7 @@ const preview: Preview = {
                 </View>
               </StorybookFontGate>
             </QueryClientProvider>
-          </BottomSheetModalProvider>
+          </BottomSheetProvider>
         </SafeAreaProvider>
       </GestureHandlerRootView>
     ),

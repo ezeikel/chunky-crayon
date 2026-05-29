@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import { useCallback } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faTriangleExclamation } from "@fortawesome/pro-solid-svg-icons";
 import { tapMedium } from "@/utils/haptics";
@@ -57,36 +58,16 @@ const ConfirmSheet = ({
   onConfirm,
   tone = "destructive",
 }: ConfirmSheetProps) => {
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  // Short content; one snap is enough.
-  const snapPoints = useMemo(() => ["40%"], []);
+  const insets = useSafeAreaInsets();
 
-  const handleSheetChanges = useCallback(
+  // Controlled modal sheet: index 0 = closed, index 1 = open at content
+  // height. Collapsing (scrim tap / swipe-down) reports index 0.
+  const handleIndexChange = useCallback(
     (index: number) => {
-      if (index === -1) onClose();
+      if (index === 0) onClose();
     },
     [onClose],
   );
-
-  const renderBackdrop = useCallback(
-    (props: React.ComponentProps<typeof BottomSheetBackdrop>) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
-    ),
-    [],
-  );
-
-  React.useEffect(() => {
-    if (isOpen) {
-      bottomSheetRef.current?.expand();
-    } else {
-      bottomSheetRef.current?.close();
-    }
-  }, [isOpen]);
 
   const handleConfirm = () => {
     tapMedium();
@@ -98,77 +79,78 @@ const ConfirmSheet = ({
   const primaryBg = isDestructive ? COLORS.error : COLORS.crayonOrange;
 
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={-1}
-      snapPoints={snapPoints}
-      onChange={handleSheetChanges}
-      backdropComponent={renderBackdrop}
-      enablePanDownToClose
-      backgroundStyle={styles.sheetBackground}
-      handleIndicatorStyle={styles.handleIndicator}
+    <ModalBottomSheet
+      index={isOpen ? 1 : 0}
+      onIndexChange={handleIndexChange}
+      scrimColor="rgba(0, 0, 0, 0.5)"
     >
-      <View style={styles.content}>
-        {isDestructive && (
-          <View style={styles.iconCircle}>
-            <FontAwesomeIcon
-              icon={faTriangleExclamation}
-              size={28}
-              color={COLORS.error}
-            />
+      <View style={styles.surface}>
+        <View style={styles.handleIndicator} />
+        <View style={[styles.content, { paddingBottom: insets.bottom + 32 }]}>
+          {isDestructive && (
+            <View style={styles.iconCircle}>
+              <FontAwesomeIcon
+                icon={faTriangleExclamation}
+                size={28}
+                color={COLORS.error}
+              />
+            </View>
+          )}
+
+          <Text style={styles.title}>{title}</Text>
+          {description ? (
+            <Text style={styles.description}>{description}</Text>
+          ) : null}
+
+          <View style={styles.actions}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.cancelButton,
+                pressed && styles.pressed,
+              ]}
+              onPress={() => {
+                onClose();
+              }}
+              accessibilityLabel={cancelLabel}
+            >
+              <Text style={styles.cancelText}>{cancelLabel}</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.confirmButton,
+                { backgroundColor: primaryBg },
+                pressed && styles.pressed,
+              ]}
+              onPress={handleConfirm}
+              accessibilityLabel={confirmLabel}
+            >
+              <Text style={styles.confirmText}>{confirmLabel}</Text>
+            </Pressable>
           </View>
-        )}
-
-        <Text style={styles.title}>{title}</Text>
-        {description ? (
-          <Text style={styles.description}>{description}</Text>
-        ) : null}
-
-        <View style={styles.actions}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.cancelButton,
-              pressed && styles.pressed,
-            ]}
-            onPress={() => {
-              onClose();
-            }}
-            accessibilityLabel={cancelLabel}
-          >
-            <Text style={styles.cancelText}>{cancelLabel}</Text>
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [
-              styles.confirmButton,
-              { backgroundColor: primaryBg },
-              pressed && styles.pressed,
-            ]}
-            onPress={handleConfirm}
-            accessibilityLabel={confirmLabel}
-          >
-            <Text style={styles.confirmText}>{confirmLabel}</Text>
-          </Pressable>
         </View>
       </View>
-    </BottomSheet>
+    </ModalBottomSheet>
   );
 };
 
 const styles = StyleSheet.create({
-  sheetBackground: {
+  surface: {
     backgroundColor: "#FDFAF5",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    paddingTop: 12,
   },
   handleIndicator: {
+    alignSelf: "center",
     backgroundColor: COLORS.borderLight,
     width: 40,
     height: 4,
+    borderRadius: 2,
+    marginBottom: 4,
   },
   content: {
     paddingHorizontal: 24,
     paddingTop: 16,
-    paddingBottom: 32,
     alignItems: "center",
     gap: 16,
   },

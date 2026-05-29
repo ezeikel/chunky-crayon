@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -6,13 +6,12 @@ import {
   Pressable,
   TextInput,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { toast } from "@/components/Toaster";
 import ConfirmSheet from "@/components/ConfirmSheet";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
+import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faPlus,
@@ -41,8 +40,7 @@ type ProfileSwitcherProps = {
 const MAX_PROFILES = 5;
 
 const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["50%", "75%"], []);
+  const insets = useSafeAreaInsets();
 
   const { data: profilesData, isLoading: profilesLoading } = useProfiles();
   const { data: activeProfileData } = useActiveProfile();
@@ -66,9 +64,9 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
   const [deleteTargetProfile, setDeleteTargetProfile] =
     useState<Profile | null>(null);
 
-  const handleSheetChanges = useCallback(
+  const handleIndexChange = useCallback(
     (index: number) => {
-      if (index === -1) {
+      if (index === 0) {
         onClose();
         // Reset state when closing.
         setIsEditing(false);
@@ -78,18 +76,6 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
       }
     },
     [onClose],
-  );
-
-  const renderBackdrop = useCallback(
-    (props: React.ComponentProps<typeof BottomSheetBackdrop>) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
-    ),
-    [],
   );
 
   const handleSelectProfile = async (profile: Profile) => {
@@ -159,189 +145,190 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
     }
   };
 
-  // Control bottom sheet visibility
-  React.useEffect(() => {
-    if (isOpen) {
-      bottomSheetRef.current?.expand();
-    } else {
-      bottomSheetRef.current?.close();
-    }
-  }, [isOpen]);
-
   const canAddProfile = profiles.length < MAX_PROFILES;
 
   return (
     <>
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        onChange={handleSheetChanges}
-        backdropComponent={renderBackdrop}
-        enablePanDownToClose
-        backgroundStyle={styles.sheetBackground}
-        handleIndicatorStyle={styles.handleIndicator}
+      <ModalBottomSheet
+        index={isOpen ? 1 : 0}
+        onIndexChange={handleIndexChange}
+        detents={[0, "content"]}
+        scrimColor="rgba(0, 0, 0, 0.5)"
       >
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profiles</Text>
-          <Pressable
-            style={styles.editButton}
-            onPress={() => setIsEditing(!isEditing)}
-          >
-            <Text style={styles.editButtonText}>
-              {isEditing ? "Done" : "Edit"}
-            </Text>
-          </Pressable>
-        </View>
+        <View style={styles.surface}>
+          <View style={styles.handleIndicator} />
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Profiles</Text>
+            <Pressable
+              style={styles.editButton}
+              onPress={() => setIsEditing(!isEditing)}
+            >
+              <Text style={styles.editButtonText}>
+                {isEditing ? "Done" : "Edit"}
+              </Text>
+            </Pressable>
+          </View>
 
-        <BottomSheetScrollView contentContainerStyle={styles.content}>
-          {profilesLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#E46444" />
-            </View>
-          ) : (
-            <>
-              {/* Profile List */}
-              {profiles.map((profile) => (
-                <View key={profile.id} style={styles.profileRow}>
-                  {editingProfileId === profile.id ? (
-                    // Edit mode for this profile
-                    <View style={styles.editRow}>
-                      <TextInput
-                        style={styles.editInput}
-                        value={editProfileName}
-                        onChangeText={setEditProfileName}
-                        placeholder="Profile name"
-                        placeholderTextColor="#9CA3AF"
-                        autoFocus
-                        maxLength={20}
-                      />
-                      <Pressable
-                        style={styles.editActionButton}
-                        onPress={handleSaveEdit}
-                        disabled={updateProfileMutation.isPending}
-                      >
-                        {updateProfileMutation.isPending ? (
-                          <ActivityIndicator size="small" color="#22C55E" />
-                        ) : (
-                          <FontAwesomeIcon
-                            icon={faCheck}
-                            size={18}
-                            color="#22C55E"
-                          />
-                        )}
-                      </Pressable>
-                      <Pressable
-                        style={styles.editActionButton}
-                        onPress={handleCancelEdit}
-                      >
-                        <FontAwesomeIcon
-                          icon={faXmark}
-                          size={18}
-                          color="#9CA3AF"
+          <ScrollView
+            contentContainerStyle={[
+              styles.content,
+              { paddingBottom: insets.bottom + 40 },
+            ]}
+          >
+            {profilesLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#E46444" />
+              </View>
+            ) : (
+              <>
+                {/* Profile List */}
+                {profiles.map((profile) => (
+                  <View key={profile.id} style={styles.profileRow}>
+                    {editingProfileId === profile.id ? (
+                      // Edit mode for this profile
+                      <View style={styles.editRow}>
+                        <TextInput
+                          style={styles.editInput}
+                          value={editProfileName}
+                          onChangeText={setEditProfileName}
+                          placeholder="Profile name"
+                          placeholderTextColor="#9CA3AF"
+                          autoFocus
+                          maxLength={20}
                         />
-                      </Pressable>
-                    </View>
-                  ) : (
-                    // Normal profile row
-                    <Pressable
-                      style={[
-                        styles.profileItem,
-                        profile.id === activeProfile?.id &&
-                          styles.profileItemActive,
-                      ]}
-                      onPress={() => !isEditing && handleSelectProfile(profile)}
-                      disabled={isEditing}
-                    >
-                      <ProfileAvatar
-                        avatarId={profile.avatarId}
-                        name={profile.name}
-                        size="md"
-                        showBorder={profile.id === activeProfile?.id}
-                      />
-                      <View style={styles.profileInfo}>
-                        <Text style={styles.profileName}>{profile.name}</Text>
-                        <Text style={styles.profileMeta}>
-                          {profile.artworkCount} artwork
-                          {profile.artworkCount !== 1 ? "s" : ""}
-                        </Text>
-                      </View>
-                      {profile.id === activeProfile?.id && !isEditing && (
-                        <View style={styles.activeIndicator}>
-                          <FontAwesomeIcon
-                            icon={faCheck}
-                            size={16}
-                            color="#22C55E"
-                          />
-                        </View>
-                      )}
-                      {isEditing && (
-                        <View style={styles.editActions}>
-                          <Pressable
-                            style={styles.editActionButton}
-                            onPress={() => handleStartEdit(profile)}
-                          >
+                        <Pressable
+                          style={styles.editActionButton}
+                          onPress={handleSaveEdit}
+                          disabled={updateProfileMutation.isPending}
+                        >
+                          {updateProfileMutation.isPending ? (
+                            <ActivityIndicator size="small" color="#22C55E" />
+                          ) : (
                             <FontAwesomeIcon
-                              icon={faPencil}
-                              size={16}
-                              color="#6B7280"
+                              icon={faCheck}
+                              size={18}
+                              color="#22C55E"
                             />
-                          </Pressable>
-                          {!profile.isDefault && (
+                          )}
+                        </Pressable>
+                        <Pressable
+                          style={styles.editActionButton}
+                          onPress={handleCancelEdit}
+                        >
+                          <FontAwesomeIcon
+                            icon={faXmark}
+                            size={18}
+                            color="#9CA3AF"
+                          />
+                        </Pressable>
+                      </View>
+                    ) : (
+                      // Normal profile row
+                      <Pressable
+                        style={[
+                          styles.profileItem,
+                          profile.id === activeProfile?.id &&
+                            styles.profileItemActive,
+                        ]}
+                        onPress={() =>
+                          !isEditing && handleSelectProfile(profile)
+                        }
+                        disabled={isEditing}
+                      >
+                        <ProfileAvatar
+                          avatarId={profile.avatarId}
+                          name={profile.name}
+                          size="md"
+                          showBorder={profile.id === activeProfile?.id}
+                        />
+                        <View style={styles.profileInfo}>
+                          <Text style={styles.profileName}>{profile.name}</Text>
+                          <Text style={styles.profileMeta}>
+                            {profile.artworkCount} artwork
+                            {profile.artworkCount !== 1 ? "s" : ""}
+                          </Text>
+                        </View>
+                        {profile.id === activeProfile?.id && !isEditing && (
+                          <View style={styles.activeIndicator}>
+                            <FontAwesomeIcon
+                              icon={faCheck}
+                              size={16}
+                              color="#22C55E"
+                            />
+                          </View>
+                        )}
+                        {isEditing && (
+                          <View style={styles.editActions}>
                             <Pressable
                               style={styles.editActionButton}
-                              onPress={() => handleDeleteProfile(profile)}
-                              disabled={deleteProfileMutation.isPending}
+                              onPress={() => handleStartEdit(profile)}
                             >
-                              {deleteProfileMutation.isPending ? (
-                                <ActivityIndicator
-                                  size="small"
-                                  color="#EF4444"
-                                />
-                              ) : (
-                                <FontAwesomeIcon
-                                  icon={faTrash}
-                                  size={16}
-                                  color="#EF4444"
-                                />
-                              )}
+                              <FontAwesomeIcon
+                                icon={faPencil}
+                                size={16}
+                                color="#6B7280"
+                              />
                             </Pressable>
-                          )}
-                        </View>
-                      )}
-                    </Pressable>
-                  )}
-                </View>
-              ))}
-
-              {/* Add Profile Section */}
-              {isCreating ? (
-                <CreateProfileCard
-                  isSubmitting={createProfile.isPending}
-                  onCancel={() => setIsCreating(false)}
-                  onSubmit={handleCreateProfile}
-                />
-              ) : canAddProfile ? (
-                <Pressable
-                  style={styles.addProfileButton}
-                  onPress={() => setIsCreating(true)}
-                >
-                  <View style={styles.avatarContainerNew}>
-                    <FontAwesomeIcon icon={faPlus} size={20} color="#9CA3AF" />
+                            {!profile.isDefault && (
+                              <Pressable
+                                style={styles.editActionButton}
+                                onPress={() => handleDeleteProfile(profile)}
+                                disabled={deleteProfileMutation.isPending}
+                              >
+                                {deleteProfileMutation.isPending ? (
+                                  <ActivityIndicator
+                                    size="small"
+                                    color="#EF4444"
+                                  />
+                                ) : (
+                                  <FontAwesomeIcon
+                                    icon={faTrash}
+                                    size={16}
+                                    color="#EF4444"
+                                  />
+                                )}
+                              </Pressable>
+                            )}
+                          </View>
+                        )}
+                      </Pressable>
+                    )}
                   </View>
-                  <Text style={styles.addProfileText}>Add Profile</Text>
-                </Pressable>
-              ) : (
-                <View style={styles.maxProfilesNote}>
-                  <Text style={styles.maxProfilesText}>
-                    Maximum of {MAX_PROFILES} profiles reached
-                  </Text>
-                </View>
-              )}
-            </>
-          )}
-        </BottomSheetScrollView>
-      </BottomSheet>
+                ))}
+
+                {/* Add Profile Section */}
+                {isCreating ? (
+                  <CreateProfileCard
+                    isSubmitting={createProfile.isPending}
+                    onCancel={() => setIsCreating(false)}
+                    onSubmit={handleCreateProfile}
+                  />
+                ) : canAddProfile ? (
+                  <Pressable
+                    style={styles.addProfileButton}
+                    onPress={() => setIsCreating(true)}
+                  >
+                    <View style={styles.avatarContainerNew}>
+                      <FontAwesomeIcon
+                        icon={faPlus}
+                        size={20}
+                        color="#9CA3AF"
+                      />
+                    </View>
+                    <Text style={styles.addProfileText}>Add Profile</Text>
+                  </Pressable>
+                ) : (
+                  <View style={styles.maxProfilesNote}>
+                    <Text style={styles.maxProfilesText}>
+                      Maximum of {MAX_PROFILES} profiles reached
+                    </Text>
+                  </View>
+                )}
+              </>
+            )}
+          </ScrollView>
+        </View>
+      </ModalBottomSheet>
 
       <ConfirmSheet
         isOpen={deleteTargetProfile !== null}
@@ -361,14 +348,19 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
 };
 
 const styles = StyleSheet.create({
-  sheetBackground: {
+  surface: {
     backgroundColor: "#FDFAF5",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    paddingTop: 12,
   },
   handleIndicator: {
+    alignSelf: "center",
     backgroundColor: "#D1D5DB",
     width: 40,
+    height: 4,
+    borderRadius: 2,
+    marginBottom: 4,
   },
   header: {
     flexDirection: "row",
@@ -395,7 +387,6 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: 40,
   },
   loadingContainer: {
     paddingVertical: 40,

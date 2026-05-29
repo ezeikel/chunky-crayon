@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar, faLock, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import AppHeader from "@/components/AppHeader";
+import StickerDetailSheet, {
+  type StickerDetail,
+} from "@/components/StickerDetailSheet";
 import useHeaderData from "@/hooks/useHeaderData";
 import { useStickers, useMarkStickersAsViewed } from "@/hooks/api";
 
@@ -27,6 +30,8 @@ type Sticker = {
   isUnlocked: boolean;
   isNew?: boolean;
   category: string;
+  rarity: string;
+  unlockedAt: string | null;
 };
 
 type StickerItemProps = {
@@ -71,7 +76,6 @@ const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
         pressed && styles.stickerItemPressed,
       ]}
       onPress={onPress}
-      disabled={!sticker.isUnlocked}
     >
       <View style={styles.stickerEmoji}>
         <Text style={styles.stickerEmojiText}>{emoji}</Text>
@@ -94,6 +98,10 @@ const StickersScreen = () => {
   const headerData = useHeaderData();
   const { data, isLoading } = useStickers();
   const markAsViewed = useMarkStickersAsViewed();
+  const [selectedSticker, setSelectedSticker] = useState<StickerDetail | null>(
+    null,
+  );
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   // Group stickers by category
   const stickerCategories = useMemo(() => {
@@ -113,6 +121,8 @@ const StickersScreen = () => {
         isUnlocked: sticker.isUnlocked,
         isNew: sticker.isNew,
         category: sticker.category,
+        rarity: sticker.rarity,
+        unlockedAt: sticker.unlockedAt,
       });
     });
 
@@ -132,7 +142,17 @@ const StickersScreen = () => {
     if (sticker.isNew) {
       markAsViewed.mutate([sticker.id]);
     }
-    console.log("Sticker pressed:", sticker.name);
+    // Open the detail sheet (works for locked + unlocked — locked shows
+    // the how-to-unlock hint, like web's StickerDetailModal).
+    setSelectedSticker({
+      id: sticker.id,
+      name: sticker.name,
+      emoji: STICKER_EMOJIS[sticker.id] ?? "⭐",
+      rarity: sticker.rarity,
+      isUnlocked: sticker.isUnlocked,
+      unlockedAt: sticker.unlockedAt,
+    });
+    setSheetOpen(true);
   };
 
   return (
@@ -195,6 +215,12 @@ const StickersScreen = () => {
           )}
         </ScrollView>
       </LinearGradient>
+
+      <StickerDetailSheet
+        sticker={selectedSticker}
+        isOpen={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+      />
     </View>
   );
 };
