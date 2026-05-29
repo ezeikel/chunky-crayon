@@ -75,7 +75,7 @@ import {
   type WeatherOption as SharedWeatherOption,
   type ActivityOption as SharedActivityOption,
   type AccentOption as SharedAccentOption,
-} from '@one-colored-pixel/coloring-core';
+} from '@one-colored-pixel/coloring-core/scene';
 
 // Re-export the shared bits consumers expect from this module.
 export {

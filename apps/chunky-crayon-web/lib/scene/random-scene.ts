@@ -6,4 +6,4 @@
 export {
   rollRandomScene,
   type RandomSceneResult,
-} from '@one-colored-pixel/coloring-core';
+} from '@one-colored-pixel/coloring-core/scene';

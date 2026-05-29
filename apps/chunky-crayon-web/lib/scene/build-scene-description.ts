@@ -7,4 +7,4 @@
 export {
   buildSceneDescription,
   type ScenePicks,
-} from '@one-colored-pixel/coloring-core';
+} from '@one-colored-pixel/coloring-core/scene';

@@ -89,7 +89,9 @@ export async function generateAnimationFromImage(
       throw new Error(`Veo API error: ${response.status} - ${errorText}`);
     }
 
-    const result = await response.json();
+    // TS6 types `response.json()` as `unknown`; this API response is an
+    // untyped Veo operation object we navigate defensively below.
+    const result = (await response.json()) as { name?: string };
 
     // Check if we got an operation (async) or direct result
     if (result.name) {
@@ -157,7 +159,17 @@ export async function pollForVideoCompletion(
       throw new Error(`Failed to check operation status: ${response.status}`);
     }
 
-    const operation = await response.json();
+    // TS6 types `response.json()` as `unknown`; this is an untyped Veo
+    // operation object navigated defensively below.
+    const operation = (await response.json()) as {
+      done?: boolean;
+      error?: { message?: string };
+      response?: {
+        generateVideoResponse?: {
+          generatedSamples?: Array<{ video?: { uri?: string } }>;
+        };
+      };
+    };
 
     if (operation.done) {
       if (operation.error) {

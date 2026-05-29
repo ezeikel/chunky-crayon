@@ -129,7 +129,7 @@ async function getStyleReferenceFiles(
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
       const ext = url.endsWith(".webp") ? "webp" : "png";
-      return new File([arrayBuffer], `style-ref-${i}.${ext}`, {
+      return new File([new Uint8Array(arrayBuffer)], `style-ref-${i}.${ext}`, {
         type: `image/${ext}`,
       });
     }),
