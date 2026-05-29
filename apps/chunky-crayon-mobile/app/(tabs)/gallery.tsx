@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import AppHeader from "@/components/AppHeader";
 import Feed from "@/components/Feed/Feed";
 import useHeaderData from "@/hooks/useHeaderData";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 
 /**
@@ -15,6 +16,7 @@ import { COLORS, FONTS } from "@/lib/design";
  */
 const GalleryScreen = () => {
   const headerData = useHeaderData();
+  const t = useT("mobile.gallery");
 
   return (
     <View style={styles.root}>
@@ -32,10 +34,8 @@ const GalleryScreen = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Explore</Text>
-            <Text style={styles.headerSubtitle}>
-              Pick something fun to color
-            </Text>
+            <Text style={styles.headerTitle}>{t("title")}</Text>
+            <Text style={styles.headerSubtitle}>{t("subtitle")}</Text>
           </View>
           <Feed />
         </ScrollView>

@@ -14,6 +14,31 @@
       "creating": "Creating...",
       "tryAgain": "Try again",
       "cancel": "Cancel"
+    },
+    "gallery": {
+      "title": "Explore",
+      "subtitle": "Pick something fun to color"
+    },
+    "stickers": {
+      "title": "Sticker Collection",
+      "collected": "{{unlocked}} / {{total}} collected",
+      "loading": "Loading stickers...",
+      "new": "NEW",
+      "hint": "Complete challenges to unlock more stickers!",
+      "lockedTitle": "Locked sticker",
+      "unlockedDefault": "You unlocked this!",
+      "unlockHintDefault": "Keep coloring to unlock this sticker!",
+      "unlockedOn": "Unlocked {{date}}"
+    },
+    "myArtwork": {
+      "loading": "Loading your artwork...",
+      "keepColoring": "Keep Coloring",
+      "inProgress": "In progress",
+      "savedCount": "{{count}} Saved Artwork",
+      "savedCount_other": "{{count}} Saved Artworks",
+      "emptyTitle": "Your Saved Artwork",
+      "emptySubtitle": "Your favorite creations will appear here. Start coloring and save your masterpieces!",
+      "emptyTip": "Tap the heart icon while coloring to save"
     }
   },
   "createForm": {

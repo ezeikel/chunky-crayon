@@ -8,6 +8,7 @@ import {
   faLock,
   faPartyHorn,
 } from "@fortawesome/pro-duotone-svg-icons";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS, CRAYON, FONTS } from "@/lib/design";
 
 /**
@@ -55,6 +56,7 @@ const StickerDetailSheet = ({
   onClose,
 }: StickerDetailSheetProps) => {
   const insets = useSafeAreaInsets();
+  const t = useT("mobile.stickers");
 
   // Controlled modal sheet: index 0 = closed, index 1 = open at content
   // height. Collapsing (scrim tap / swipe-down) reports index 0.
@@ -80,7 +82,7 @@ const StickerDetailSheet = ({
           {!sticker ? null : (
             <>
               <Text style={styles.title}>
-                {isUnlocked ? sticker.name : "Locked sticker"}
+                {isUnlocked ? sticker.name : t("lockedTitle")}
               </Text>
 
               {/* Big sticker — full emoji unlocked, dimmed + lock badge locked */}
@@ -141,19 +143,22 @@ const StickerDetailSheet = ({
                       {sticker.unlockMessage}
                     </Text>
                   ) : (
-                    <Text style={styles.unlockMessage}>You unlocked this!</Text>
+                    <Text style={styles.unlockMessage}>
+                      {t("unlockedDefault")}
+                    </Text>
                   )}
                   {sticker.unlockedAt && (
                     <Text style={styles.unlockedDate}>
-                      Unlocked{" "}
-                      {new Date(sticker.unlockedAt).toLocaleDateString(
-                        undefined,
-                        {
-                          month: "long",
-                          day: "numeric",
-                          year: "numeric",
-                        },
-                      )}
+                      {t("unlockedOn", {
+                        date: new Date(sticker.unlockedAt).toLocaleDateString(
+                          undefined,
+                          {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          },
+                        ),
+                      })}
                     </Text>
                   )}
                 </View>
@@ -169,8 +174,7 @@ const StickerDetailSheet = ({
                     />
                   </View>
                   <Text style={styles.lockHint}>
-                    {sticker.unlockHint ??
-                      "Keep coloring to unlock this sticker!"}
+                    {sticker.unlockHint ?? t("unlockHintDefault")}
                   </Text>
                 </View>
               )}

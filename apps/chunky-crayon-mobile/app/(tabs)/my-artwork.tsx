@@ -17,6 +17,7 @@ import { useRouter } from "expo-router";
 import AppHeader from "@/components/AppHeader";
 import useHeaderData from "@/hooks/useHeaderData";
 import { useSavedArtworks, useFeed } from "@/hooks/api";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -27,6 +28,7 @@ const ITEM_WIDTH =
   (screenWidth - GRID_PADDING * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS;
 
 const MyArtworkScreen = () => {
+  const t = useT("mobile.myArtwork");
   const headerData = useHeaderData();
   const { data, isLoading } = useSavedArtworks();
   const { data: feed } = useFeed();
@@ -48,16 +50,11 @@ const MyArtworkScreen = () => {
         <View style={styles.iconContainer}>
           <FontAwesomeIcon icon={faHeart} size={48} color="#E46444" />
         </View>
-        <Text style={styles.title}>Your Saved Artwork</Text>
-        <Text style={styles.subtitle}>
-          Your favorite creations will appear here. Start coloring and save your
-          masterpieces!
-        </Text>
+        <Text style={styles.title}>{t("emptyTitle")}</Text>
+        <Text style={styles.subtitle}>{t("emptySubtitle")}</Text>
         <View style={styles.tipContainer}>
           <FontAwesomeIcon icon={faPalette} size={16} color="#9CA3AF" />
-          <Text style={styles.tipText}>
-            Tap the heart icon while coloring to save
-          </Text>
+          <Text style={styles.tipText}>{t("emptyTip")}</Text>
         </View>
       </View>
     </View>
@@ -66,7 +63,7 @@ const MyArtworkScreen = () => {
   const renderLoading = () => (
     <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" color="#E46444" />
-      <Text style={styles.loadingText}>Loading your artwork...</Text>
+      <Text style={styles.loadingText}>{t("loading")}</Text>
     </View>
   );
 
@@ -83,7 +80,7 @@ const MyArtworkScreen = () => {
             secondaryColor={COLORS.crayonPeach}
             secondaryOpacity={1}
           />
-          <Text style={styles.sectionTitle}>Keep Coloring</Text>
+          <Text style={styles.sectionTitle}>{t("keepColoring")}</Text>
         </View>
         <View style={styles.grid}>
           {inProgress.map((item) => (
@@ -117,7 +114,7 @@ const MyArtworkScreen = () => {
                 <Text style={styles.artworkTitle} numberOfLines={1}>
                   {item.coloringImage.title}
                 </Text>
-                <Text style={styles.artworkDate}>In progress</Text>
+                <Text style={styles.artworkDate}>{t("inProgress")}</Text>
               </View>
             </Pressable>
           ))}
@@ -131,7 +128,7 @@ const MyArtworkScreen = () => {
       <View style={styles.sectionHeaderRow}>
         <FontAwesomeIcon icon={faHeart} size={16} color={COLORS.crayonOrange} />
         <Text style={styles.sectionTitle}>
-          {artworks.length} Saved Artwork{artworks.length !== 1 ? "s" : ""}
+          {t("savedCount", { count: artworks.length })}
         </Text>
       </View>
       <View style={styles.grid}>

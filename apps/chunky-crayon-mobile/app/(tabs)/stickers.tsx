@@ -16,6 +16,7 @@ import StickerDetailSheet, {
 } from "@/components/StickerDetailSheet";
 import useHeaderData from "@/hooks/useHeaderData";
 import { useStickers, useMarkStickersAsViewed } from "@/hooks/api";
+import { useT } from "@/lib/i18n/useT";
 
 type StickerCategory = {
   id: string;
@@ -66,6 +67,7 @@ const STICKER_EMOJIS: Record<string, string> = {
 };
 
 const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
+  const t = useT("mobile.stickers");
   const emoji = STICKER_EMOJIS[sticker.id] || "⭐";
 
   return (
@@ -87,7 +89,7 @@ const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
       </View>
       {sticker.isNew && sticker.isUnlocked && (
         <View style={styles.newBadge}>
-          <Text style={styles.newBadgeText}>NEW</Text>
+          <Text style={styles.newBadgeText}>{t("new")}</Text>
         </View>
       )}
     </Pressable>
@@ -95,6 +97,7 @@ const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
 };
 
 const StickersScreen = () => {
+  const t = useT("mobile.stickers");
   const headerData = useHeaderData();
   const { data, isLoading } = useStickers();
   const markAsViewed = useMarkStickersAsViewed();
@@ -172,11 +175,14 @@ const StickersScreen = () => {
         >
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Sticker Collection</Text>
+            <Text style={styles.headerTitle}>{t("title")}</Text>
             <View style={styles.collectionProgress}>
               <FontAwesomeIcon icon={faStar} size={16} color="#F59E0B" />
               <Text style={styles.collectionText}>
-                {unlockedStickers} / {totalStickers} collected
+                {t("collected", {
+                  unlocked: unlockedStickers,
+                  total: totalStickers,
+                })}
               </Text>
             </View>
           </View>
@@ -184,7 +190,7 @@ const StickersScreen = () => {
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#E46444" />
-              <Text style={styles.loadingText}>Loading stickers...</Text>
+              <Text style={styles.loadingText}>{t("loading")}</Text>
             </View>
           ) : (
             <>
@@ -207,9 +213,7 @@ const StickersScreen = () => {
               {/* Unlock Hint */}
               <View style={styles.hintContainer}>
                 <FontAwesomeIcon icon={faCheck} size={14} color="#10B981" />
-                <Text style={styles.hintText}>
-                  Complete challenges to unlock more stickers!
-                </Text>
+                <Text style={styles.hintText}>{t("hint")}</Text>
               </View>
             </>
           )}
