@@ -24,11 +24,20 @@ appId: com.chewybytes.chunkycrayon.app
       - tapOn:
           text: ".*:8081"
 
-# Wait for the JS bundle to mount, then assert the create card's heading
-# (always present on the home tab).
+# Fresh install starts on the onboarding carousel ("Endless Creativity,
+# Zero Mess"). Wait for it (bundle download), then Skip through to Home.
+- extendedWaitUntil:
+    visible: "Skip"
+    timeout: 90000
+    optional: true
+- tapOn:
+    text: "Skip"
+    optional: true
+
+# Wait for the home tab, then assert the create card's heading.
 - extendedWaitUntil:
     visible: "What do you want to color today?"
-    timeout: 60000
+    timeout: 30000
 
 # Scene is the default create mode → its first wizard step ("Who?") shows.
 - assertVisible: "Who?"

@@ -50,7 +50,7 @@ import ParentalGate from "@/components/ParentalGate";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
 import SubscriptionManager from "@/components/SubscriptionManager";
 import useHeaderData from "@/hooks/useHeaderData";
-import { usePlanName } from "@/hooks/useEntitlements";
+import { usePlanName, useCredits } from "@/hooks/useEntitlements";
 import { useAuth } from "@/contexts";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 
@@ -145,6 +145,7 @@ const SettingsScreen = () => {
   const appVersion = Constants.expoConfig?.version || "1.0.0";
   const headerData = useHeaderData();
   const planName = usePlanName();
+  const credits = useCredits();
   const {
     isLoading: authLoading,
     isAuthenticated,
@@ -426,7 +427,7 @@ const SettingsScreen = () => {
                 icon={faCreditCard}
                 iconColor="#F1AE7E"
                 title="Subscription & Credits"
-                subtitle={PLAN_DISPLAY_NAMES[planName] || "Manage your plan"}
+                subtitle={`${PLAN_DISPLAY_NAMES[planName] || "Free Plan"} · ${credits.toLocaleString()} credit${credits === 1 ? "" : "s"}`}
                 onPress={handleSubscription}
               />
             </View>
