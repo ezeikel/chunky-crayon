@@ -83,6 +83,59 @@ const RootLayout = () => {
             },
           }}
         />
+        {/* Create form — full-screen modal launched by the center
+            tab-bar FAB. Modal presentation so it slides up over the
+            current tab and dismisses back to it. */}
+        <Stack.Screen
+          name="create"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+            animation: "slide_from_bottom",
+          }}
+        />
+        {/* Browse / account routes — reached from Home cards + links and
+            the gated Settings corner, not the tab bar. Native-stack push
+            with a back-button header (no home chrome on a detail route). */}
+        <Stack.Screen
+          name="my-artwork"
+          options={{
+            headerShown: true,
+            headerTitle: "My Art",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#FDFAF5" },
+            headerShadowVisible: false,
+            headerTintColor: "#E46444",
+            headerTitleStyle: { fontFamily: "TondoTrial-Bold" },
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="challenges"
+          options={{
+            headerShown: true,
+            headerTitle: "Challenges",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#FDFAF5" },
+            headerShadowVisible: false,
+            headerTintColor: "#E46444",
+            headerTitleStyle: { fontFamily: "TondoTrial-Bold" },
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="settings"
+          options={{
+            headerShown: true,
+            headerTitle: "Settings",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#FDFAF5" },
+            headerShadowVisible: false,
+            headerTintColor: "#E46444",
+            headerTitleStyle: { fontFamily: "TondoTrial-Bold" },
+            animation: "slide_from_right",
+          }}
+        />
       </Stack>
       {!hasCompleted && <Redirect href="/onboarding" />}
     </Providers>

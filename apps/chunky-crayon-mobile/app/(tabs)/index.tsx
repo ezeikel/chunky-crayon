@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
-import { View, Text, Dimensions, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Dimensions,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+} from "react-native";
+import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faWandMagicSparkles,
   faClock,
   faSparkles,
+  faTrophy,
+  faChevronRight,
 } from "@fortawesome/pro-duotone-svg-icons";
 import Animated, {
   useSharedValue,
@@ -20,6 +30,7 @@ import ColoAvatar from "@/components/ColoAvatar";
 import AppHeader from "@/components/AppHeader";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
 import ColoBottomSheet from "@/components/ColoBottomSheet";
+import ParentalGate from "@/components/ParentalGate";
 import { useColoContext } from "@/contexts";
 import useHeaderData from "@/hooks/useHeaderData";
 
@@ -29,6 +40,9 @@ const HomeScreen = () => {
   const [screenWidth] = useState(Dimensions.get("window").width);
   const [isProfileSwitcherOpen, setIsProfileSwitcherOpen] = useState(false);
   const [isColoSheetOpen, setIsColoSheetOpen] = useState(false);
+  // Settings lives behind a parent-gated corner (not a tab). Tapping the
+  // gear opens the gate; passing it routes to the settings stack.
+  const [isSettingsGateOpen, setIsSettingsGateOpen] = useState(false);
   const { coloState, isLoading: coloLoading } = useColoContext();
   const headerData = useHeaderData();
 
@@ -58,6 +72,9 @@ const HomeScreen = () => {
           coloStage={headerData.coloStage}
           onColoPress={() => setIsColoSheetOpen(true)}
           onProfilePress={() => setIsProfileSwitcherOpen(true)}
+          onChallengePress={() => router.push("/challenges")}
+          onStickersPress={() => router.push("/stickers")}
+          onSettingsPress={() => setIsSettingsGateOpen(true)}
         />
         <ScrollView
           style={{ flex: 1 }}
@@ -174,6 +191,37 @@ const HomeScreen = () => {
               on the Gallery tab, not here — same split as web, where the
               feed-like content sits on browse routes, not the dashboard. */}
           <MyRecentCreations />
+
+          {/* Challenges card — Challenges folds into Home (no longer a
+              tab). Taps through to the challenges route. */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.challengeCard,
+              {
+                width: screenWidth - padding * 2,
+                alignSelf: "center",
+              },
+              pressed && styles.challengeCardPressed,
+            ]}
+            onPress={() => router.push("/challenges")}
+          >
+            <View style={styles.challengeIcon}>
+              <FontAwesomeIcon
+                icon={faTrophy}
+                size={22}
+                color="#E46444"
+                secondaryColor="#FDD835"
+                secondaryOpacity={1}
+              />
+            </View>
+            <View style={styles.challengeText}>
+              <Text style={styles.challengeTitle}>Challenges</Text>
+              <Text style={styles.challengeSubtitle}>
+                Color to earn stickers and grow Colo!
+              </Text>
+            </View>
+            <FontAwesomeIcon icon={faChevronRight} size={16} color="#9CA3AF" />
+          </Pressable>
         </ScrollView>
       </LinearGradient>
 
@@ -187,6 +235,18 @@ const HomeScreen = () => {
         onClose={() => setIsColoSheetOpen(false)}
         coloState={coloState}
       />
+
+      {/* Settings is parent-gated: the gear opens this gate, passing it
+          routes to the settings stack. Keeps kids out of the account /
+          subscription surface. */}
+      <ParentalGate
+        visible={isSettingsGateOpen}
+        onClose={() => setIsSettingsGateOpen(false)}
+        onSuccess={() => {
+          setIsSettingsGateOpen(false);
+          router.push("/settings");
+        }}
+      />
     </View>
   );
 };
@@ -197,6 +257,47 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 8,
     fontFamily: "TondoTrial-Bold",
+  },
+  challengeCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    marginTop: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    shadowColor: "#E46444",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  challengeCardPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.99 }],
+  },
+  challengeIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(228, 100, 68, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  challengeText: {
+    flex: 1,
+  },
+  challengeTitle: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 17,
+    color: "#374151",
+  },
+  challengeSubtitle: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 13,
+    color: "#9CA3AF",
+    marginTop: 2,
   },
   greetingRow: {
     flexDirection: "row",

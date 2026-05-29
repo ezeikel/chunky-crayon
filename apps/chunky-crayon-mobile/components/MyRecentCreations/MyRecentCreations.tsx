@@ -55,7 +55,7 @@ const MyRecentCreations = () => {
       items={items}
       isLoading={isLoading}
       onItemPress={(item) => router.push(`/coloring-image/${item.id}`)}
-      onSeeAllPress={() => router.push("/(tabs)/my-artwork")}
+      onSeeAllPress={() => router.push("/my-artwork")}
     />
   );
 };

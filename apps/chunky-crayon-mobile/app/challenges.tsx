@@ -17,8 +17,6 @@ import {
   faClock,
   faStar,
 } from "@fortawesome/pro-solid-svg-icons";
-import AppHeader from "@/components/AppHeader";
-import useHeaderData from "@/hooks/useHeaderData";
 import { useUserContext } from "@/contexts";
 import {
   useChallenges,
@@ -201,7 +199,6 @@ const AchievementCard = ({
 );
 
 const ChallengesScreen = () => {
-  const headerData = useHeaderData();
   const { activeProfile } = useUserContext();
   const { data: challengesData, isLoading } = useChallenges();
   const claimReward = useClaimChallengeReward();
@@ -268,13 +265,6 @@ const ChallengesScreen = () => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={styles.gradient}>
-        <AppHeader
-          credits={headerData.credits}
-          challengeProgress={headerData.challengeProgress}
-          stickerCount={headerData.stickerCount}
-          profileName={headerData.profileName}
-          coloStage={headerData.coloStage}
-        />
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}

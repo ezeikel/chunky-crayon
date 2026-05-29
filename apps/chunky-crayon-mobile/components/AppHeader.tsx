@@ -6,6 +6,7 @@ import {
   faTrophy,
   faNoteSticky,
   faChevronDown,
+  faGear,
 } from "@fortawesome/pro-solid-svg-icons";
 import ColoAvatar from "./ColoAvatar/ColoAvatar";
 import type { ColoStage } from "@/lib/colo/types";
@@ -128,6 +129,12 @@ type AppHeaderProps = {
    * on mobile — see ColoBottomSheet.
    */
   onColoPress?: () => void;
+  /**
+   * Optional. When given, renders a parent-gated settings gear after
+   * the profile pill (Settings lives behind this corner, not a tab).
+   * The handler is responsible for the parental gate before opening.
+   */
+  onSettingsPress?: () => void;
 };
 
 const AppHeader = ({
@@ -141,6 +148,7 @@ const AppHeader = ({
   onStickersPress,
   onProfilePress,
   onColoPress,
+  onSettingsPress,
 }: AppHeaderProps) => {
   const insets = useSafeAreaInsets();
 
@@ -188,17 +196,34 @@ const AppHeader = ({
         />
       </View>
 
-      {/* Right side - Profile Switcher. Split tap zones when callers
-          give onColoPress (Colo avatar opens Colo detail sheet, rest
-          opens profile switcher). Falls back to single onPress
-          otherwise — keeps existing tab-screen callsites working. */}
-      <ProfileSwitcher
-        name={profileName}
-        coloStage={coloStage}
-        onPress={onColoPress == null ? onProfilePress : undefined}
-        onColoPress={onColoPress}
-        onProfilePress={onColoPress == null ? undefined : onProfilePress}
-      />
+      {/* Right side - Profile Switcher + parent-gated Settings gear.
+          Split tap zones when callers give onColoPress (Colo avatar
+          opens Colo detail sheet, rest opens profile switcher). Falls
+          back to single onPress otherwise. The gear only renders when
+          onSettingsPress is given (Settings lives behind this corner,
+          not a tab); the handler gates entry. */}
+      <View style={styles.rightSide}>
+        <ProfileSwitcher
+          name={profileName}
+          coloStage={coloStage}
+          onPress={onColoPress == null ? onProfilePress : undefined}
+          onColoPress={onColoPress}
+          onProfilePress={onColoPress == null ? undefined : onProfilePress}
+        />
+        {onSettingsPress && (
+          <Pressable
+            style={({ pressed }) => [
+              styles.gearButton,
+              pressed && styles.indicatorPressed,
+            ]}
+            onPress={onSettingsPress}
+            accessibilityLabel="Settings"
+            hitSlop={8}
+          >
+            <FontAwesomeIcon icon={faGear} size={18} color="#9CA3AF" />
+          </Pressable>
+        )}
+      </View>
     </View>
   );
 };
@@ -273,6 +298,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
+  },
+  rightSide: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  gearButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   profileSwitcher: {
     flexDirection: "row",

@@ -45,11 +45,8 @@ import {
 import * as Application from "expo-application";
 import Constants from "expo-constants";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import AppHeader from "@/components/AppHeader";
-import ParentalGate from "@/components/ParentalGate";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
 import SubscriptionManager from "@/components/SubscriptionManager";
-import useHeaderData from "@/hooks/useHeaderData";
 import { usePlanName, useCredits } from "@/hooks/useEntitlements";
 import { useAuth } from "@/contexts";
 import { useOnboardingStore } from "@/stores/onboardingStore";
@@ -143,7 +140,6 @@ const PLAN_DISPLAY_NAMES: Record<string, string> = {
 
 const SettingsScreen = () => {
   const appVersion = Constants.expoConfig?.version || "1.0.0";
-  const headerData = useHeaderData();
   const planName = usePlanName();
   const credits = useCredits();
   const {
@@ -161,10 +157,6 @@ const SettingsScreen = () => {
   // Audio preference states
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
   const [backgroundMusicEnabled, setBackgroundMusicEnabled] = useState(true);
-
-  // Parental gate state - entire screen is gated
-  const [isParentVerified, setIsParentVerified] = useState(false);
-  const [parentalGateVisible, setParentalGateVisible] = useState(true);
 
   // Sign-in modal state
   const [signInModalVisible, setSignInModalVisible] = useState(false);
@@ -190,16 +182,6 @@ const SettingsScreen = () => {
     setSubscriptionModalVisible(true);
   };
 
-  const handleParentalGateSuccess = useCallback(() => {
-    setParentalGateVisible(false);
-    setIsParentVerified(true);
-  }, []);
-
-  const handleParentalGateClose = useCallback(() => {
-    setParentalGateVisible(false);
-    // Don't set verified - they cancelled
-  }, []);
-
   const handleLanguage = () => {
     toast.info("Language settings coming soon!");
   };
@@ -224,10 +206,6 @@ const SettingsScreen = () => {
 
   const handleTerms = () => {
     Linking.openURL("https://chunkycrayon.com/terms");
-  };
-
-  const handleRetryVerification = () => {
-    setParentalGateVisible(true);
   };
 
   const handleSignIn = () => {
@@ -323,51 +301,12 @@ const SettingsScreen = () => {
     }
   };
 
-  // Show locked state if parent hasn't verified
-  if (!isParentVerified && !parentalGateVisible) {
-    return (
-      <View className="flex-1">
-        <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={{ flex: 1 }}>
-          <AppHeader
-            credits={headerData.credits}
-            challengeProgress={headerData.challengeProgress}
-            stickerCount={headerData.stickerCount}
-            profileName={headerData.profileName}
-            coloStage={headerData.coloStage}
-          />
-          <View style={styles.lockedContainer}>
-            <View style={styles.lockedIconContainer}>
-              <FontAwesomeIcon icon={faLock} size={48} color="#E46444" />
-            </View>
-            <Text style={styles.lockedTitle}>Parent Area</Text>
-            <Text style={styles.lockedSubtitle}>
-              Settings require parent verification to access
-            </Text>
-            <Pressable
-              style={({ pressed }) => [
-                styles.verifyButton,
-                pressed && styles.verifyButtonPressed,
-              ]}
-              onPress={handleRetryVerification}
-            >
-              <Text style={styles.verifyButtonText}>Verify to Continue</Text>
-            </Pressable>
-          </View>
-        </LinearGradient>
-      </View>
-    );
-  }
-
+  // Settings entry is parent-gated upstream at the Home gear corner, so
+  // the screen opens directly here (no in-screen gate). The native stack
+  // header provides the back button.
   return (
     <View className="flex-1">
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={{ flex: 1 }}>
-        <AppHeader
-          credits={headerData.credits}
-          challengeProgress={headerData.challengeProgress}
-          stickerCount={headerData.stickerCount}
-          profileName={headerData.profileName}
-          coloStage={headerData.coloStage}
-        />
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{ paddingBottom: 100, paddingTop: 16 }}
@@ -561,13 +500,6 @@ const SettingsScreen = () => {
           </View>
         </ScrollView>
       </LinearGradient>
-
-      {/* Parental Gate Modal */}
-      <ParentalGate
-        visible={parentalGateVisible}
-        onClose={handleParentalGateClose}
-        onSuccess={handleParentalGateSuccess}
-      />
 
       {/* Sign In Modal */}
       <Modal
