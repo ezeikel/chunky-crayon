@@ -1,5 +1,11 @@
 import axios, { AxiosInstance } from "axios";
 import { Platform } from "react-native";
+import type {
+  SpeciesKey,
+  ColorKey,
+  TraitKey,
+  VoicePersonaKey,
+} from "@one-colored-pixel/coloring-core/characters";
 import type { AgeGroup, Difficulty } from "./types";
 import {
   getAuthHeader,
@@ -798,5 +804,93 @@ export const setModeUnlocked = async (
     mode,
     unlocked,
   });
+  return response.data;
+};
+
+// ============================================================================
+// Characters
+// ============================================================================
+
+export type CharacterStatus = "GENERATING" | "READY" | "FAILED";
+
+/**
+ * A kid-created reusable character. Mirrors the web list select shape
+ * (listCharactersForActiveProfile). Portrait generation is async: the row
+ * starts GENERATING and the worker flips it to READY (portrait URLs filled)
+ * or FAILED. `portraitLineArtUrl` is the line-art used as a scene subject.
+ */
+export type Character = {
+  id: string;
+  name: string;
+  species: SpeciesKey;
+  traits: TraitKey[];
+  signatureDetails: string[];
+  portraitUrl: string | null;
+  portraitLineArtUrl: string | null;
+  status: CharacterStatus;
+  failureReason: string | null;
+  voicePersona: string | null;
+  equippedOutfitId: string | null;
+  createdAt: string;
+};
+
+export type CharactersResponse = {
+  characters: Character[];
+  error?: string;
+};
+
+export const getCharacters = async (): Promise<CharactersResponse> => {
+  const response = await api.get("/mobile/characters");
+  return response.data;
+};
+
+export const getCharacter = async (
+  id: string,
+): Promise<{ character: Character } | { error: string }> => {
+  const response = await api.get(`/mobile/characters/${id}`);
+  return response.data;
+};
+
+export type CreateCharacterInput = {
+  name: string;
+  species: SpeciesKey;
+  color: ColorKey;
+  traits: TraitKey[];
+  voicePersona?: VoicePersonaKey;
+};
+
+export type CreateCharacterResult =
+  | { ok: true; characterId: string }
+  | {
+      ok: false;
+      error:
+        | "unauthorized"
+        | "no_active_profile"
+        | "invalid_input"
+        | "moderation_blocked"
+        | "limit_reached"
+        | "worker_unavailable"
+        | "unknown";
+      message?: string;
+    };
+
+export const createCharacter = async (
+  input: CreateCharacterInput,
+): Promise<CreateCharacterResult> => {
+  const response = await api.post("/mobile/characters", input);
+  return response.data;
+};
+
+export const deleteCharacter = async (
+  id: string,
+): Promise<{ ok: true } | { ok: false; error: string }> => {
+  const response = await api.delete(`/mobile/characters/${id}`);
+  return response.data;
+};
+
+export const retryCharacterPortrait = async (
+  id: string,
+): Promise<{ ok: true } | { ok: false; error: string }> => {
+  const response = await api.post(`/mobile/characters/${id}/retry`);
   return response.data;
 };
