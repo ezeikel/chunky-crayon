@@ -6,22 +6,26 @@ import {
   faHouseChimney,
   faImages,
   faNoteSticky,
+  faHeart,
   faWandMagicSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   faHouseChimney as faHouseChimneyLight,
   faImages as faImagesLight,
   faNoteSticky as faNoteStickyLight,
+  faHeart as faHeartLight,
 } from "@fortawesome/pro-light-svg-icons";
 import { useT } from "@/lib/i18n/useT";
 import { tapMedium } from "@/utils/haptics";
 import { COLORS, FONTS } from "@/lib/design";
 
-// The three real tabs, in display order around the center Create FAB:
-// [Home] [Gallery] · (Create FAB) · [Stickers]. Create is the app's
-// primary action — an elevated center button that opens the create
-// modal, not a tab screen — so it sits above the flat row.
-const TAB_ITEMS = [
+// Tab bar reads as: [Home] [Gallery] · (Create FAB) · [Stickers] [My Art].
+// Two flat tabs on each side of a centered, elevated Create FAB — the
+// app's primary action. The FAB opens the create modal (not a tab
+// screen), so it sits raised above the row in a fixed center slot while
+// the two flanking pairs share the remaining width equally, keeping the
+// FAB dead-centre.
+const LEFT_TABS = [
   {
     name: "index",
     labelKey: "home",
@@ -34,11 +38,20 @@ const TAB_ITEMS = [
     icon: faImages,
     iconLight: faImagesLight,
   },
+] as const;
+
+const RIGHT_TABS = [
   {
     name: "stickers",
     labelKey: "stickers",
     icon: faNoteSticky,
     iconLight: faNoteStickyLight,
+  },
+  {
+    name: "my-artwork",
+    labelKey: "myArt",
+    icon: faHeart,
+    iconLight: faHeartLight,
   },
 ] as const;
 
@@ -46,6 +59,12 @@ const TAB_ITEMS = [
 // tabBar. We only read the focused route + navigate; typing it locally
 // avoids depending on @react-navigation/bottom-tabs (not a direct dep
 // under pnpm's strict isolation).
+type TabItem = {
+  name: string;
+  labelKey: string;
+  icon: typeof faHouseChimney;
+  iconLight: typeof faHouseChimney;
+};
 type TabBarProps = {
   state: { index: number; routes: { name: string }[] };
   navigation: { navigate: (name: string) => void };
@@ -56,10 +75,9 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
   const t = useT("mobile.tabs");
   const tButton = useT("mobile.button");
 
-  // Map route name → whether it's the focused tab.
   const focusedRouteName = state.routes[state.index]?.name;
 
-  const renderTab = (item: (typeof TAB_ITEMS)[number]) => {
+  const renderTab = (item: TabItem) => {
     const focused = focusedRouteName === item.name;
     const color = focused ? COLORS.crayonOrange : "#9CA3AF";
     return (
@@ -78,39 +96,43 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
       >
         <FontAwesomeIcon
           icon={focused ? item.icon : item.iconLight}
-          size={24}
+          size={22}
           color={color}
         />
-        <Text style={[styles.tabLabel, { color }]}>{t(item.labelKey)}</Text>
+        <Text style={[styles.tabLabel, { color }]} numberOfLines={1}>
+          {t(item.labelKey)}
+        </Text>
       </Pressable>
     );
   };
 
   return (
-    <View style={[styles.bar, { paddingBottom: insets.bottom || 8 }]}>
-      {renderTab(TAB_ITEMS[0])}
-      {renderTab(TAB_ITEMS[1])}
+    <View style={[styles.bar, { paddingBottom: insets.bottom || 10 }]}>
+      <View style={styles.side}>{LEFT_TABS.map(renderTab)}</View>
 
-      {/* Elevated center Create FAB — opens the create modal. */}
+      {/* Centered Create FAB — raised above the bar in a white cradle
+          ring so it reads as attached, not floating. Opens the modal. */}
       <View style={styles.fabSlot}>
-        <Pressable
-          style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
-          onPress={() => {
-            tapMedium();
-            router.push("/create");
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={tButton("createColoringPage")}
-        >
-          <FontAwesomeIcon
-            icon={faWandMagicSparkles}
-            size={26}
-            color="#FFFFFF"
-          />
-        </Pressable>
+        <View style={styles.fabCradle}>
+          <Pressable
+            style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+            onPress={() => {
+              tapMedium();
+              router.push("/create");
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={tButton("createColoringPage")}
+          >
+            <FontAwesomeIcon
+              icon={faWandMagicSparkles}
+              size={26}
+              color="#FFFFFF"
+            />
+          </Pressable>
+        </View>
       </View>
 
-      {renderTab(TAB_ITEMS[2])}
+      <View style={styles.side}>{RIGHT_TABS.map(renderTab)}</View>
     </View>
   );
 };
@@ -124,53 +146,68 @@ export default function TabLayout() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="gallery" />
       <Tabs.Screen name="stickers" />
+      <Tabs.Screen name="my-artwork" />
     </Tabs>
   );
 }
+
+const FAB_SIZE = 58;
+const CRADLE = FAB_SIZE + 12;
 
 const styles = StyleSheet.create({
   bar: {
     flexDirection: "row",
     alignItems: "flex-start",
-    justifyContent: "space-around",
     backgroundColor: "#FFFFFF",
-    borderTopColor: "#E5E7EB",
+    borderTopColor: "#F0E9DF",
     borderTopWidth: 1,
     paddingTop: 8,
-    paddingHorizontal: 8,
+  },
+  // Each flanking group takes equal width and splits its two tabs
+  // evenly, so the fixed-width center FAB slot lands dead-centre.
+  side: {
+    flex: 1,
+    flexDirection: "row",
   },
   tabItem: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-    paddingTop: 4,
+    justifyContent: "flex-start",
+    gap: 3,
+    paddingTop: 2,
   },
   tabLabel: {
     fontFamily: FONTS.regular,
     fontSize: 11,
   },
-  // Reserve a column for the FAB so the flat tabs stay evenly spaced.
+  // Fixed center column the FAB cradle sits in.
   fabSlot: {
-    flex: 1,
+    width: CRADLE,
     alignItems: "center",
   },
+  // White ring that "cradles" the FAB and breaks the bar's top edge,
+  // so the button reads as docked to the bar rather than hovering.
+  fabCradle: {
+    width: CRADLE,
+    height: CRADLE,
+    borderRadius: CRADLE / 2,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: -(CRADLE / 2),
+  },
   fab: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: FAB_SIZE,
+    height: FAB_SIZE,
+    borderRadius: FAB_SIZE / 2,
     backgroundColor: COLORS.crayonOrange,
     alignItems: "center",
     justifyContent: "center",
-    // Lift the FAB above the bar.
-    marginTop: -22,
     shadowColor: COLORS.crayonOrange,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.35,
     shadowRadius: 8,
     elevation: 8,
-    borderWidth: 4,
-    borderColor: "#FFFFFF",
   },
   fabPressed: {
     opacity: 0.9,

@@ -14,6 +14,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHeart, faPalette } from "@fortawesome/pro-solid-svg-icons";
 import { faPaintbrush } from "@fortawesome/pro-duotone-svg-icons";
 import { useRouter } from "expo-router";
+import AppHeader from "@/components/AppHeader";
+import useHeaderData from "@/hooks/useHeaderData";
 import { useSavedArtworks, useFeed } from "@/hooks/api";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
@@ -27,6 +29,7 @@ const ITEM_WIDTH =
 
 const MyArtworkScreen = () => {
   const t = useT("mobile.myArtwork");
+  const headerData = useHeaderData();
   const { data, isLoading } = useSavedArtworks();
   const { data: feed } = useFeed();
   const router = useRouter();
@@ -161,6 +164,13 @@ const MyArtworkScreen = () => {
   return (
     <View className="flex-1">
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={{ flex: 1 }}>
+        <AppHeader
+          credits={headerData.credits}
+          challengeProgress={headerData.challengeProgress}
+          stickerCount={headerData.stickerCount}
+          profileName={headerData.profileName}
+          coloStage={headerData.coloStage}
+        />
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={

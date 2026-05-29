@@ -170,55 +170,63 @@ const ParentalGate = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
+      {/* Tap the dimmed backdrop to dismiss (parents expect this).
+          The card itself stops propagation so inner taps don't close. */}
+      <Pressable
+        style={styles.overlay}
+        onPress={onClose}
+        accessibilityLabel="Close"
+      >
         <Animated.View style={[styles.container, containerStyle]}>
-          {/* faHandWave duotone — primary orange, secondary yellow.
+          <Pressable onPress={(e) => e.stopPropagation()}>
+            {/* faHandWave duotone — primary orange, secondary yellow.
               Wiggles on mount via waveRotation. Replaces the lock. */}
-          <Animated.View style={waveStyle}>
-            <FontAwesomeIcon
-              icon={faHandWave}
-              size={56}
-              color={COLORS.crayonOrange}
-              secondaryColor={COLORS.yellow}
-              secondaryOpacity={1}
-            />
-          </Animated.View>
+            <Animated.View style={waveStyle}>
+              <FontAwesomeIcon
+                icon={faHandWave}
+                size={56}
+                color={COLORS.crayonOrange}
+                secondaryColor={COLORS.yellow}
+                secondaryOpacity={1}
+              />
+            </Animated.View>
 
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
 
-          {/* The sum. Soft cream pill matches web's bg-paper-cream. */}
-          <View style={styles.sumPill} accessibilityLiveRegion="polite">
-            <Text style={styles.sumText}>
-              {problem.a} + {problem.b} = ?
+            {/* The sum. Soft cream pill matches web's bg-paper-cream. */}
+            <View style={styles.sumPill} accessibilityLiveRegion="polite">
+              <Text style={styles.sumText}>
+                {problem.a} + {problem.b} = ?
+              </Text>
+            </View>
+
+            {/* Three chunky circular answer buttons. */}
+            <View style={styles.answersRow} accessibilityRole="radiogroup">
+              {choices.map((n, idx) => (
+                <Pressable
+                  key={`${n}-${idx}`}
+                  onPress={() =>
+                    n === problem.answer ? handleCorrect() : handleWrong()
+                  }
+                  style={({ pressed }) => [
+                    styles.answerButton,
+                    pressed && styles.answerButtonPressed,
+                  ]}
+                  accessibilityLabel={String(n)}
+                  accessibilityRole="button"
+                >
+                  <Text style={styles.answerText}>{n}</Text>
+                </Pressable>
+              ))}
+            </View>
+
+            <Text style={styles.hint}>
+              Adults: tap the right answer to continue.
             </Text>
-          </View>
-
-          {/* Three chunky circular answer buttons. */}
-          <View style={styles.answersRow} accessibilityRole="radiogroup">
-            {choices.map((n, idx) => (
-              <Pressable
-                key={`${n}-${idx}`}
-                onPress={() =>
-                  n === problem.answer ? handleCorrect() : handleWrong()
-                }
-                style={({ pressed }) => [
-                  styles.answerButton,
-                  pressed && styles.answerButtonPressed,
-                ]}
-                accessibilityLabel={String(n)}
-                accessibilityRole="button"
-              >
-                <Text style={styles.answerText}>{n}</Text>
-              </Pressable>
-            ))}
-          </View>
-
-          <Text style={styles.hint}>
-            Adults: tap the right answer to continue.
-          </Text>
+          </Pressable>
         </Animated.View>
-      </View>
+      </Pressable>
     </Modal>
   );
 };

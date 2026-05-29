@@ -94,22 +94,10 @@ const RootLayout = () => {
             animation: "slide_from_bottom",
           }}
         />
-        {/* Browse / account routes — reached from Home cards + links and
-            the gated Settings corner, not the tab bar. Native-stack push
-            with a back-button header (no home chrome on a detail route). */}
-        <Stack.Screen
-          name="my-artwork"
-          options={{
-            headerShown: true,
-            headerTitle: "My Art",
-            headerBackTitle: "Back",
-            headerStyle: { backgroundColor: "#FDFAF5" },
-            headerShadowVisible: false,
-            headerTintColor: "#E46444",
-            headerTitleStyle: { fontFamily: "TondoTrial-Bold" },
-            animation: "slide_from_right",
-          }}
-        />
+        {/* Account / browse routes reached from Home cards + the gated
+            grown-ups corner, not the tab bar. Native-stack push with a
+            back-button header (no home chrome on a detail route).
+            (My Art is a tab, so it's not here.) */}
         <Stack.Screen
           name="challenges"
           options={{
