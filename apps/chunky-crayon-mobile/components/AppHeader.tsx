@@ -6,9 +6,10 @@ import {
   faTrophy,
   faNoteSticky,
   faChevronDown,
-  faGear,
+  faUserShield,
 } from "@fortawesome/pro-solid-svg-icons";
 import ColoAvatar from "./ColoAvatar/ColoAvatar";
+import { useT } from "@/lib/i18n/useT";
 import type { ColoStage } from "@/lib/colo/types";
 
 type HeaderIndicatorProps = {
@@ -130,8 +131,10 @@ type AppHeaderProps = {
    */
   onColoPress?: () => void;
   /**
-   * Optional. When given, renders a parent-gated settings gear after
-   * the profile pill (Settings lives behind this corner, not a tab).
+   * Optional. When given, renders a low-key "For Grown-ups" corner
+   * (shield-person icon) after the profile pill — the parent door for
+   * settings/account, deliberately not a gear and not a tab so kids
+   * aren't drawn to it (matches Spotify Kids' "For grown-ups" pattern).
    * The handler is responsible for the parental gate before opening.
    */
   onSettingsPress?: () => void;
@@ -151,6 +154,7 @@ const AppHeader = ({
   onSettingsPress,
 }: AppHeaderProps) => {
   const insets = useSafeAreaInsets();
+  const t = useT("mobile.header");
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
@@ -196,12 +200,12 @@ const AppHeader = ({
         />
       </View>
 
-      {/* Right side - Profile Switcher + parent-gated Settings gear.
+      {/* Right side - Profile Switcher + low-key "For Grown-ups" corner.
           Split tap zones when callers give onColoPress (Colo avatar
           opens Colo detail sheet, rest opens profile switcher). Falls
-          back to single onPress otherwise. The gear only renders when
-          onSettingsPress is given (Settings lives behind this corner,
-          not a tab); the handler gates entry. */}
+          back to single onPress otherwise. The grown-ups door only
+          renders when onSettingsPress is given (settings/account live
+          behind this corner, not a tab); the handler gates entry. */}
       <View style={styles.rightSide}>
         <ProfileSwitcher
           name={profileName}
@@ -213,14 +217,14 @@ const AppHeader = ({
         {onSettingsPress && (
           <Pressable
             style={({ pressed }) => [
-              styles.gearButton,
+              styles.grownUpsButton,
               pressed && styles.indicatorPressed,
             ]}
             onPress={onSettingsPress}
-            accessibilityLabel="Settings"
+            accessibilityLabel={t("forGrownUps")}
             hitSlop={8}
           >
-            <FontAwesomeIcon icon={faGear} size={18} color="#9CA3AF" />
+            <FontAwesomeIcon icon={faUserShield} size={16} color="#B6A99A" />
           </Pressable>
         )}
       </View>
@@ -304,18 +308,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  gearButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+  // Deliberately low-key — no white pill or shadow like the other
+  // header chips. A muted shield-person in a faint circle reads as a
+  // "for grown-ups" door kids skip past, not a fun tappable.
+  grownUpsButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(0, 0, 0, 0.04)",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
   },
   profileSwitcher: {
     flexDirection: "row",
