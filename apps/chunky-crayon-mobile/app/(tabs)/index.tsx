@@ -16,6 +16,7 @@ import {
   faSparkles,
   faTrophy,
   faChevronRight,
+  faUserAstronaut,
 } from "@fortawesome/pro-duotone-svg-icons";
 import Animated, {
   useSharedValue,
@@ -218,6 +219,38 @@ const HomeScreen = () => {
               <Text style={styles.challengeTitle}>Challenges</Text>
               <Text style={styles.challengeSubtitle}>
                 Color to earn stickers and grow Colo!
+              </Text>
+            </View>
+            <FontAwesomeIcon icon={faChevronRight} size={16} color="#9CA3AF" />
+          </Pressable>
+
+          {/* My Characters card — Characters surface lives off Home (not a
+              tab). Taps through to the characters route. */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.challengeCard,
+              {
+                width: screenWidth - padding * 2,
+                alignSelf: "center",
+                marginTop: 12,
+              },
+              pressed && styles.challengeCardPressed,
+            ]}
+            onPress={() => router.push("/characters")}
+          >
+            <View style={styles.challengeIcon}>
+              <FontAwesomeIcon
+                icon={faUserAstronaut}
+                size={22}
+                color="#E46444"
+                secondaryColor="#C18B9D"
+                secondaryOpacity={1}
+              />
+            </View>
+            <View style={styles.challengeText}>
+              <Text style={styles.challengeTitle}>My Characters</Text>
+              <Text style={styles.challengeSubtitle}>
+                Make friends to star in your coloring pages!
               </Text>
             </View>
             <FontAwesomeIcon icon={faChevronRight} size={16} color="#9CA3AF" />

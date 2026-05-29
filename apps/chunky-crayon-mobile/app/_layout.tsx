@@ -112,6 +112,19 @@ const RootLayout = () => {
           }}
         />
         <Stack.Screen
+          name="characters"
+          options={{
+            headerShown: true,
+            headerTitle: "My Characters",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#FDFAF5" },
+            headerShadowVisible: false,
+            headerTintColor: "#E46444",
+            headerTitleStyle: { fontFamily: "TondoTrial-Bold" },
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
           name="settings"
           options={{
             headerShown: true,

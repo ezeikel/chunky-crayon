@@ -36,6 +36,34 @@
       "creating": "Drawing...",
       "createError": "Something went wrong. Please try again."
     },
+    "characters": {
+      "loading": "Loading your friends...",
+      "emptyTitle": "Let's make your first friend!",
+      "emptySubtitle": "Pick a name and what they look like, and we'll draw them for you. They'll show up in your coloring pages.",
+      "makeFriend": "Make a Friend",
+      "newCharacter": "Make a Friend",
+      "addCharacter": "Add",
+      "drawing": "Drawing {{name}}...",
+      "drawingBadge": "Drawing",
+      "tryAgain": "Tap to try again",
+      "retryBadge": "Retry",
+      "gettingReady": "Getting ready",
+      "fullHouse": "You've got a full house (8 friends). Remove one to make room for someone new.",
+      "homeCardTitle": "My Characters",
+      "homeCardSubtitle": "Make friends to star in your coloring pages!",
+      "close": "Close",
+      "deleteTitle": "Remove this friend?",
+      "deleteSubtitle": "Grown-up check to remove a character.",
+      "err": {
+        "unauthorized": "Please sign in first.",
+        "noProfile": "Pick a profile before making a friend.",
+        "moderation": "We can't use that name. Try a different one.",
+        "limit": "You've got a full house. Remove one first.",
+        "worker": "Something went wrong drawing your friend.",
+        "deleteFailed": "Couldn't remove that friend. Please try again.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
     "gallery": {
       "title": "Explore",
       "subtitle": "Pick something fun to color"
