@@ -55,6 +55,33 @@ export type NewsCandidate = {
 
 const today = (): string => new Date().toISOString().slice(0, 10);
 
+// Hosts that aren't credible news articles. Perplexity sometimes returns a
+// YouTube/Reddit/social link even though the prompt asks for articles, and
+// those pass a HEAD 200 check, so we hard-filter by host. A reel built off a
+// YouTube video link is off-brand and the source card looks broken.
+const BLOCKED_HOSTS = [
+  "youtube.com",
+  "youtu.be",
+  "reddit.com",
+  "twitter.com",
+  "x.com",
+  "facebook.com",
+  "instagram.com",
+  "tiktok.com",
+  "pinterest.com",
+  "threads.net",
+];
+
+export const isCredibleArticleUrl = (url: string): boolean => {
+  if (!/^https?:\/\//i.test(url)) return false;
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+    return !BLOCKED_HOSTS.some((b) => host === b || host.endsWith(`.${b}`));
+  } catch {
+    return false;
+  }
+};
+
 async function searchVein(vein: NewsVein): Promise<NewsCandidate[]> {
   try {
     const { output } = await generateText({
@@ -66,7 +93,7 @@ async function searchVein(vein: NewsVein): Promise<NewsCandidate[]> {
     });
     if (!output?.articles?.length) return [];
     return output.articles
-      .filter((a) => a.publishedWithin14Days && /^https?:\/\//i.test(a.url))
+      .filter((a) => a.publishedWithin14Days && isCredibleArticleUrl(a.url))
       .map((a) => ({
         headline: a.headline,
         summary: a.summary,

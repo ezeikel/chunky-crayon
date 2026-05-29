@@ -109,15 +109,18 @@ export const buildBabyNameContent = (
     hook = `In ${earlier.year}, ${earlier.count.toLocaleString()} ${noun} in ${region} were named ${later.name}.`;
   }
 
+  // Frame around the trend itself, never the individual parent's choice.
+  // "How do YOU feel" reads as needling a personal decision (punching
+  // down); we ask about the cultural shift instead.
   const payoff = rose
-    ? `By ${later.year} it was ${later.count.toLocaleString()}. If you picked ${later.name} to be unusual, how do you feel now?`
-    : `By ${later.year} it was down to ${later.count.toLocaleString()}. Classic names making a comeback, or gone for good?`;
+    ? `By ${later.year} it was ${later.count.toLocaleString()}. Funny how a name can go from rare to everywhere in a few years. Which names are having a moment where you are?`
+    : `By ${later.year} it was down to ${later.count.toLocaleString()}. Names really do come and go in waves. Which classics do you hope make a comeback?`;
 
   return {
     hook,
     payoff,
     centerBlock,
-    coverTeaser: `Is ${later.name} the most popular name you didn't expect?`,
+    coverTeaser: `How did ${later.name} go from rare to everywhere?`,
     category: "baby-names",
     sourceTitle:
       later.region === "uk"
