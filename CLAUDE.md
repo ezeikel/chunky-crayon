@@ -203,6 +203,19 @@ pnpm android           # Build and run on Android emulator
 
 Note: prebuild regenerates the native `ios/` and `android/` folders; only run it when native deps changed (or to recover a stale build per above).
 
+### Mobile Storybook (on-device)
+
+CC mobile uses Storybook React Native v10. To run it, start the dev build **with the flag** (still the `pnpm ios` path — never `expo start`):
+
+```bash
+cd apps/chunky-crayon-mobile && EXPO_PUBLIC_STORYBOOK_ENABLED=true pnpm ios
+# or: pnpm storybook:ipad   (wraps expo run:ios with the flag + iPad target)
+```
+
+Then navigate to the `/storybook` route in the running app (`chunkycrayon://storybook`). Storybook runs **alongside** the app (no entry swap).
+
+**The flag is mandatory.** `metro.config.js` wraps Metro with `@storybook/react-native/metro/withStorybook({ enabled: EXPO_PUBLIC_STORYBOOK_ENABLED === 'true' })`. With the flag OFF, the wrapper redirects every `.rnstorybook` import to a stub ("Storybook is disabled in the withStorybook metro wrapper"), so the route shows that stub and `view.getStorybookUI` throws "of undefined". The flag exists so prod builds ship zero Storybook code. The route file `app/storybook.tsx` is just `export { default } from "../.rnstorybook"` — the re-export is what forces `storybook.requires` to evaluate; a side-effect-only import gets bundler-dropped. Web Storybook (for parity comparison) runs on `:6006`.
+
 ## GitHub CLI
 
 Use `gh` CLI when referencing GitHub repos that I own or public repos (e.g., `gh repo view`, `gh issue list`, `gh pr list`).
