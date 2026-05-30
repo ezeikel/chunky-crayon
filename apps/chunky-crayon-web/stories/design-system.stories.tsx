@@ -463,15 +463,8 @@ export const Buttons: Story = {
             <Button>Default create</Button>
             <Button size="sm">Small size</Button>
             <Button size="lg">Large size</Button>
-            <Button className="h-auto rounded-full px-10 py-4 text-base md:text-lg">
-              Create
-            </Button>
-            <Button
-              disabled
-              className="h-auto rounded-full py-4 text-base md:text-lg"
-            >
-              Create disabled
-            </Button>
+            <Button>Create</Button>
+            <Button disabled>Create disabled</Button>
           </div>
         </section>
         <section className="flex flex-col gap-4 border-t-2 border-paper-cream-dark pt-6">

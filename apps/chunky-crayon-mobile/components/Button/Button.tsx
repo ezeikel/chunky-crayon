@@ -153,18 +153,24 @@ const Button = ({
   const spec = VARIANTS[variant];
   const dims = SIZES[size];
 
+  // Disabled buttons KEEP their chunky bottom lift — web only fades them via
+  // `disabled:opacity-50`, the `[--lift:6px]` bottom-drop stays. So a disabled
+  // chunky button still shows its dark bottom border at 50% opacity. (The face
+  // `opacity: 0.5` below fades the whole stack, lift included, to match.)
+  const hasLift = spec.lift;
+
   // pressed: 0 (rest) → 1 (down). Drives translateY + lift collapse.
   const pressed = useSharedValue(0);
 
-  const liftRest = spec.lift ? 6 : 0;
-  const liftActive = spec.lift ? 3 : 0;
+  const liftRest = hasLift ? 6 : 0;
+  const liftActive = hasLift ? 3 : 0;
 
   const faceStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: pressed.value * 2 }],
   }));
 
   const shadowStyle = useAnimatedStyle(() => {
-    if (!spec.lift) return {};
+    if (!hasLift) return {};
     // Interpolate the chunky bottom-drop from liftRest → liftActive.
     const offset = liftRest - pressed.value * (liftRest - liftActive);
     return {
@@ -205,8 +211,12 @@ const Button = ({
           inner face translates down on press. */}
       <Animated.View
         style={[
-          spec.lift && { shadowColor: spec.bottom, borderRadius: 24 },
+          hasLift && { shadowColor: spec.bottom, borderRadius: 24 },
           fullWidth && styles.fullWidth,
+          // Fade the whole button (face + chunky bottom lift) when disabled,
+          // matching web's `disabled:opacity-50`. Opacity on the OUTER wrapper
+          // so the lift shadow dims with the face, not just the face alone.
+          disabled && { opacity: 0.5 },
           shadowStyle,
         ]}
       >
@@ -221,7 +231,6 @@ const Button = ({
                 size === "icon" ? dims.height : fullWidth ? "100%" : undefined,
               borderColor: spec.borderColor,
               borderWidth: spec.borderWidth ?? 0,
-              opacity: disabled ? 0.5 : 1,
             },
             // Flat variants get a soft drop instead of the chunky lift.
             !spec.lift && variant !== "ghost" && variant !== "link"
@@ -231,22 +240,30 @@ const Button = ({
           ]}
         >
           {leading ? <View style={styles.slot}>{leading}</View> : null}
-          {children ?? (
-            <Text
-              style={[
-                styles.label,
-                {
-                  color: spec.fg,
-                  fontSize: dims.fontSize,
-                  textDecorationLine: variant === "link" ? "underline" : "none",
-                },
-                textStyle,
-              ]}
-              numberOfLines={1}
-            >
-              {label}
-            </Text>
-          )}
+          {/* Only render the label Text when there's actually a label. An
+              icon-only button (size="icon", leading only, no label/children)
+              must NOT emit an empty <Text> — with the face's `gap: 8` that
+              phantom node pushes the icon off-center. */}
+          {children ??
+            (label != null ? (
+              <Text
+                style={[
+                  styles.label,
+                  {
+                    color: spec.fg,
+                    fontSize: dims.fontSize,
+                    // Match web: the link variant underlines only on hover
+                    // (`hover:underline`), so at rest it has NO underline. Touch
+                    // has no hover, so mobile mirrors web's rest state — plain.
+                    textDecorationLine: "none",
+                  },
+                  textStyle,
+                ]}
+                numberOfLines={1}
+              >
+                {label}
+              </Text>
+            ) : null)}
           {trailing ? <View style={styles.slot}>{trailing}</View> : null}
         </Animated.View>
       </Animated.View>
