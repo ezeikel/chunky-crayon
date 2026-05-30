@@ -47,11 +47,25 @@ import { useInputMode } from "./InputModeContext";
 type SceneInputProps = {
   /** The wizard owns its own "Create!" button; this fires the form submit. */
   onCreate: () => void;
+  /**
+   * When true, the wizard's Create button stays inviting but tap fires
+   * `onCreateBlockedTap` (opens the paywall) instead of `onCreate` —
+   * surfaces the paywall at the moment of Create rather than letting the
+   * kid build the whole scene then bounce off it on submit. Mirrors web.
+   */
+  createBlocked?: boolean;
+  /** Fired when the kid taps the blocked Create button. */
+  onCreateBlockedTap?: () => void;
   /** Restore an interrupted selection (e.g. after a paywall). */
   initialSelection?: SceneSelection;
 };
 
-const SceneInput = ({ onCreate, initialSelection }: SceneInputProps) => {
+const SceneInput = ({
+  onCreate,
+  createBlocked = false,
+  onCreateBlockedTap,
+  initialSelection,
+}: SceneInputProps) => {
   const t = useT("createForm.scene");
   const { setDescription } = useInputMode();
   const { data: charactersData } = useCharacters();
@@ -199,11 +213,14 @@ const SceneInput = ({ onCreate, initialSelection }: SceneInputProps) => {
         onSelectionChange={setSelection}
         onSurpriseMe={handleSurpriseMe}
         onCreate={onCreate}
+        createBlocked={createBlocked}
+        onCreateBlockedTap={onCreateBlockedTap}
         lockedKeys={lockedKeys}
         onLockedTap={handleLockedTap}
         labels={{
           ariaLabel: t("ariaLabel"),
           surpriseMe: t("surpriseMe"),
+          lockedSuffix: t("lockedMakeCharacter"),
           back: t("back"),
           next: t("next"),
           create: t("create"),

@@ -130,7 +130,16 @@ const CreateColoringImageFormContent = () => {
 
         {/* Active input panel */}
         <View style={styles.panelContainer}>
-          {mode === "scene" && <SceneInput onCreate={handleSubmit} />}
+          {mode === "scene" && (
+            <SceneInput
+              onCreate={handleSubmit}
+              // Mirror web: when the kid can't generate (out of credits / no
+              // sub), the Scene Create button stays inviting but opens the
+              // paywall on tap — surfaced at Create, not after a built scene.
+              createBlocked={credits < CREDITS_PER_GENERATION}
+              onCreateBlockedTap={handleShowPaywall}
+            />
+          )}
           {mode === "text" && (
             <TextInputPanel
               onSubmit={handleSubmit}

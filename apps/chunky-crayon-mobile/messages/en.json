@@ -105,6 +105,7 @@
       "skip": "Skip",
       "subjectTitle": "Who?",
       "subjectAddCharacter": "Add character",
+      "lockedMakeCharacter": "(make a character first)",
       "locationTitle": "Where?",
       "weatherTitle": "Weather",
       "activityTitle": "Doing what?",
