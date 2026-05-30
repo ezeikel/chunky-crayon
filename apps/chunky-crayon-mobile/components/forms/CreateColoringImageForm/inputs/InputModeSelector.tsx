@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faShapes,
@@ -8,13 +8,10 @@ import {
   faCameraRetro,
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-} from "react-native-reanimated";
 import { toast } from "sonner-native";
 import { COLORS } from "@/lib/design";
 import { tapLight } from "@/utils/haptics";
+import Button from "@/components/Button/Button";
 import ParentalGate from "@/components/ParentalGate";
 import { useUnlockedModes } from "@/hooks/api";
 import { isGateableMode, type GateableMode } from "@/lib/scene/modes";
@@ -53,8 +50,6 @@ const INPUT_OPTIONS: InputOption[] = [
 // Tile
 // =============================================================================
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 type TileProps = {
   option: InputOption;
   isActive: boolean;
@@ -62,42 +57,36 @@ type TileProps = {
   onPress: () => void;
 };
 
+// Use the shared chunky <Button> so the mode tiles match web 1:1: active =
+// `default` (orange face + chunky bottom lift), inactive = `outline-muted`
+// (white face, cream border, flat). Web's InputModeSelector does exactly this
+// — variant default/outline-muted on the same shared Button. A `size-16` (64pt)
+// square holding the duotone icon, no label.
 const InputModeTile = ({
   option,
   isActive,
   isDisabled,
   onPress,
-}: TileProps) => {
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: withSpring(isActive ? 1.05 : 1) }],
-  }));
-
-  return (
-    <AnimatedPressable
-      onPress={onPress}
-      disabled={isDisabled}
-      style={[
-        styles.tile,
-        isActive ? styles.tileActive : styles.tileInactive,
-        isDisabled && styles.tileDisabled,
-        animatedStyle,
-      ]}
-      accessibilityRole="tab"
-      accessibilityState={{ selected: isActive }}
-      accessibilityLabel={`${option.label} input mode`}
-    >
-      <FontAwesomeIcon
-        icon={option.icon}
-        size={28}
-        color={isActive ? COLORS.white : COLORS.crayonOrange}
-        secondaryColor={
-          isActive ? "rgba(255, 255, 255, 0.85)" : COLORS.crayonPeach
-        }
-        secondaryOpacity={1}
-      />
-    </AnimatedPressable>
-  );
-};
+}: TileProps) => (
+  <Button
+    variant={isActive ? "default" : "outline-muted"}
+    size="icon"
+    disabled={isDisabled}
+    onPress={onPress}
+    accessibilityLabel={`${option.label} input mode`}
+    faceStyle={styles.tile}
+  >
+    <FontAwesomeIcon
+      icon={option.icon}
+      size={28}
+      color={isActive ? COLORS.white : COLORS.crayonOrange}
+      secondaryColor={
+        isActive ? "rgba(255, 255, 255, 0.85)" : COLORS.crayonPeach
+      }
+      secondaryOpacity={1}
+    />
+  </Button>
+);
 
 // =============================================================================
 // Selector
@@ -175,8 +164,9 @@ const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
 };
 
 // =============================================================================
-// Styles — mirror web's tile: 64pt rounded square, active orange fill,
-// inactive white face with cream border. No lock styling anywhere.
+// Styles — the tile is a shared <Button size="icon">, overridden to a 64pt
+// square (web's `size-16`). Face colours, border, and chunky lift all come
+// from the Button variant (default / outline-muted); nothing styled here.
 // =============================================================================
 
 const TILE_SIZE = 64;
@@ -192,27 +182,6 @@ const styles = StyleSheet.create({
   tile: {
     width: TILE_SIZE,
     height: TILE_SIZE,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 20,
-    borderWidth: 2,
-  },
-  tileActive: {
-    backgroundColor: COLORS.crayonOrange,
-    borderColor: COLORS.crayonOrange,
-    // shadow-coloring-button: soft accent glow under the active tile.
-    shadowColor: COLORS.crayonOrange,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 14,
-    elevation: 6,
-  },
-  tileInactive: {
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.bgCreamDark,
-  },
-  tileDisabled: {
-    opacity: 0.5,
   },
 });
 

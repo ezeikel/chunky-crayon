@@ -69,6 +69,9 @@ type ButtonProps = {
   /** Stretch the button face to fill its container's width. */
   fullWidth?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** Style merged onto the inner face View — e.g. to override icon-button
+   *  size (the face owns width/height, the outer Pressable does not). */
+  faceStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   accessibilityLabel?: string;
 };
@@ -147,6 +150,7 @@ const Button = ({
   silent = false,
   fullWidth = false,
   style,
+  faceStyle,
   textStyle,
   accessibilityLabel,
 }: ButtonProps) => {
@@ -165,7 +169,7 @@ const Button = ({
   const liftRest = hasLift ? 6 : 0;
   const liftActive = hasLift ? 3 : 0;
 
-  const faceStyle = useAnimatedStyle(() => ({
+  const pressTransform = useAnimatedStyle(() => ({
     transform: [{ translateY: pressed.value * 2 }],
   }));
 
@@ -236,6 +240,8 @@ const Button = ({
             !spec.lift && variant !== "ghost" && variant !== "link"
               ? styles.softShadow
               : null,
+            pressTransform,
+            // Caller face overrides (e.g. icon-button size) win last.
             faceStyle,
           ]}
         >
