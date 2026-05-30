@@ -177,31 +177,31 @@ For detailed plans, see `docs/plans/active/MOBILE_APP_PLAN.md` (only read when n
 
 ### Running the Mobile App
 
-From `apps/chunky-crayon-mobile`:
+**The ONLY supported way to run/test CC mobile is the prebuild + run scripts below. NEVER use `expo start`, `npx react-native start`, or curl the Metro bundle endpoint to "test" the app.** This is a dev build (`expo run:ios`), not Expo Go — `expo start` + reloading runs JS against a _stale native binary_, which produces phantom errors (unresolved `@/...` imports, red screens, "Welcome to Expo / create a file in the app directory"). Those are NOT real code/Metro/Sentry/Storybook bugs — they mean the app was launched the wrong way. If you see them, stop and rebuild with the scripts below; do not debug Metro internals, the `@/` alias, the Sentry resolver, or `node_modules`.
+
+Run from `apps/chunky-crayon-mobile`:
 
 **iOS:**
 
 ```bash
-pnpm prebuild:ios  # Only when native dependencies change (non-JS packages installed)
-pnpm ios           # Build and run on iOS simulator
+pnpm prebuild:ios  # REQUIRED after any native-dep change (see below)
+pnpm ios           # Build and run on iOS simulator (expo run:ios)
 ```
 
 **Android:**
 
 ```bash
-pnpm prebuild:android  # Only when native dependencies change
+pnpm prebuild:android  # REQUIRED after any native-dep change
 pnpm android           # Build and run on Android emulator
 ```
 
-**Development server only:**
+**After ANY dependency change** — `pnpm add`/`remove`, a `node_modules` reinstall (`rm -rf node_modules && pnpm install`), or lockfile changes — a **prebuild + rebuild is REQUIRED** before the app will run. The installed native binary is stale until you do. This is the #1 cause of "it suddenly won't run": a dependency churned, but only the JS was reloaded against the old binary.
 
-```bash
-pnpm start         # Start Metro bundler
-pnpm dev:ios       # Start with iOS simulator
-pnpm dev:android   # Start with Android emulator
-```
+**If `pnpm ios` fails at `pod install` with `react-native-skia: Skia prebuilt binaries not found`:** run `npx install-skia`, then re-run `pnpm prebuild:ios`. A `node_modules` reinstall wipes Skia's prebuilt native binaries; `install-skia` restores them. (Don't interpret this as a broken Skia install — it's expected after a reinstall.)
 
-Note: Prebuild regenerates native `ios/` and `android/` folders. Only run when adding native dependencies.
+**Debugging a running app:** inspect via Argent (`screenshot` / `describe` / `launch-app`) against the build that `pnpm ios` started. Do NOT spin up a separate Metro to inspect — it won't match the installed binary and will mislead you.
+
+Note: prebuild regenerates the native `ios/` and `android/` folders; only run it when native deps changed (or to recover a stale build per above).
 
 ## GitHub CLI
 
