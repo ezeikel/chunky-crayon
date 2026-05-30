@@ -1,4 +1,4 @@
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { action } from "storybook/actions";
 import type { Meta, StoryObj } from "@storybook/react-native";
 import {
@@ -38,6 +38,10 @@ import {
  * offline and falls back to "Scene only", the correct locked default).
  */
 
+// Render the form inside the same white card the real home screen wraps it
+// in (app/(tabs)/index.tsx `styles.card`) on the cream page background — so
+// the story shows the form in its true context and matches web's story
+// (which also wraps the form in a white card), instead of bare on cream.
 const Stage = ({ children }: { children: React.ReactNode }) => (
   <ScrollView
     contentContainerStyle={{
@@ -47,10 +51,26 @@ const Stage = ({ children }: { children: React.ReactNode }) => (
     }}
   >
     <InputModeProvider>
-      <View style={{ alignSelf: "stretch" }}>{children}</View>
+      <View style={stageStyles.card}>{children}</View>
     </InputModeProvider>
   </ScrollView>
 );
+
+const stageStyles = StyleSheet.create({
+  card: {
+    alignSelf: "stretch",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 2,
+    borderColor: "#FFF5EB",
+    shadowColor: "#E46444",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+});
 
 const meta: Meta = {
   title: "Forms & Actions/CreateColoringImageForm",
