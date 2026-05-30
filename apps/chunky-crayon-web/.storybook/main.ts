@@ -102,6 +102,19 @@ const config: StorybookConfig = {
           replacement: resolve(root, '.storybook/mocks/coloring-core.ts'),
         },
         {
+          // The `/scene` subpath is Node-free by design (no sharp/resvg/AI
+          // SDK) — alias it to the real source so GATEABLE_MODES /
+          // isGateableMode / rollRandomScene resolve. The bare
+          // `@one-colored-pixel/coloring-core` alias below is a prefix match,
+          // so without this it rewrites `…/scene` to the mock path + `/scene`
+          // (a file that doesn't exist) and crashes the Forms stories.
+          find: '@one-colored-pixel/coloring-core/scene',
+          replacement: resolve(
+            repoRoot,
+            'packages/coloring-core/src/scene/index.ts',
+          ),
+        },
+        {
           find: '@one-colored-pixel/coloring-core',
           replacement: resolve(root, '.storybook/mocks/coloring-core.ts'),
         },
