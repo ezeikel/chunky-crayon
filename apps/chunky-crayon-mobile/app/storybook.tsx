@@ -16,6 +16,12 @@
  * With the flag OFF, the wrapper redirects `.rnstorybook` to a stub that
  * renders "Storybook is disabled in the withStorybook metro wrapper."
  *
+ * App ↔ Storybook is a BUILD-TIME toggle, per the @storybook/react-native
+ * docs (`isStorybook ? <StorybookUI/> : <App/>`); there is no documented
+ * runtime switch, and the on-device Storybook owns the full window (a sibling
+ * overlay close button does not reliably layer above it — tried, reverted).
+ * To leave Storybook, reload Metro / relaunch without the flag.
+ *
  * So: to review stories on device, start Metro with the flag set, e.g.
  *   EXPO_PUBLIC_STORYBOOK_ENABLED=true pnpm ios
  * then navigate to `/storybook`.
