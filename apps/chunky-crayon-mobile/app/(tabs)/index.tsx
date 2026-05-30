@@ -34,10 +34,12 @@ import ColoBottomSheet from "@/components/ColoBottomSheet";
 import ParentalGate from "@/components/ParentalGate";
 import { useColoContext } from "@/contexts";
 import useHeaderData from "@/hooks/useHeaderData";
+import { useT } from "@/lib/i18n/useT";
 
 const padding = 20;
 
 const HomeScreen = () => {
+  const t = useT("mobile");
   const [screenWidth] = useState(Dimensions.get("window").width);
   const [isProfileSwitcherOpen, setIsProfileSwitcherOpen] = useState(false);
   const [isColoSheetOpen, setIsColoSheetOpen] = useState(false);
@@ -216,9 +218,11 @@ const HomeScreen = () => {
               />
             </View>
             <View style={styles.challengeText}>
-              <Text style={styles.challengeTitle}>Challenges</Text>
+              <Text style={styles.challengeTitle}>
+                {t("challenges.homeCardTitle")}
+              </Text>
               <Text style={styles.challengeSubtitle}>
-                Color to earn stickers and grow Colo!
+                {t("challenges.homeCardSubtitle")}
               </Text>
             </View>
             <FontAwesomeIcon icon={faChevronRight} size={16} color="#9CA3AF" />
@@ -248,9 +252,11 @@ const HomeScreen = () => {
               />
             </View>
             <View style={styles.challengeText}>
-              <Text style={styles.challengeTitle}>My Characters</Text>
+              <Text style={styles.challengeTitle}>
+                {t("characters.homeCardTitle")}
+              </Text>
               <Text style={styles.challengeSubtitle}>
-                Make friends to star in your coloring pages!
+                {t("characters.homeCardSubtitle")}
               </Text>
             </View>
             <FontAwesomeIcon icon={faChevronRight} size={16} color="#9CA3AF" />

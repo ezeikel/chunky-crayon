@@ -36,6 +36,10 @@
       "creating": "Drawing...",
       "createError": "Something went wrong. Please try again."
     },
+    "challenges": {
+      "homeCardTitle": "Challenges",
+      "homeCardSubtitle": "Color to earn stickers and grow Colo!"
+    },
     "characters": {
       "loading": "Loading your friends...",
       "emptyTitle": "Let's make your first friend!",
