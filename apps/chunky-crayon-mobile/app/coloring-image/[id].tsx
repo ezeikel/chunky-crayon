@@ -38,7 +38,7 @@ const ColoringImage = () => {
   // Responsive layout hook
   const {
     layoutMode,
-    useSideToolbar,
+    coloringTier,
     useCompactHeader,
     canvasArea,
     landscapeLayout,
@@ -86,8 +86,12 @@ const ColoringImage = () => {
 
   const { coloringImage } = data;
 
-  // Determine if we're in a landscape layout
-  const isLandscapeLayout = useSideToolbar;
+  // Layout is width-driven now (coloringTier), not orientation. Until the
+  // dedicated middle-tier UI lands (toolbar-above-canvas), the middle tier
+  // reuses the sidebar layout — so an iPad in portrait (≥700dp) finally
+  // gets sidebars instead of the phone bottom-sheet. Only the phone tier
+  // uses the bottom drawer.
+  const isLandscapeLayout = coloringTier !== "phone";
 
   return (
     <View style={styles.container}>
@@ -246,8 +250,8 @@ const ColoringImage = () => {
           onClose={() => setShowActionModal(false)}
         />
 
-        {/* Bottom Toolbar for portrait modes only. Hidden in focus mode. */}
-        {!useSideToolbar && !isFocusMode && <MobileColoringToolbar />}
+        {/* Bottom drawer only in the phone tier. Hidden in focus mode. */}
+        {!isLandscapeLayout && !isFocusMode && <MobileColoringToolbar />}
 
         {/* Floating exit X — only renders while focus mode is active. */}
         <FocusModeFloatingExit />

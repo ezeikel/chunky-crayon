@@ -4,7 +4,9 @@ import {
   shouldUseSideToolbar,
   shouldUseCompactHeader,
   isToolbarCollapsible,
+  getColoringTier,
   type LayoutMode,
+  type ColoringTier,
   type DeviceInfo,
 } from "../utils/deviceUtils";
 import {
@@ -23,6 +25,14 @@ export type ResponsiveLayout = {
   // Device info
   deviceInfo: DeviceInfo;
   layoutMode: LayoutMode;
+
+  /**
+   * Width-driven coloring layout tier (the new, web-matching layout
+   * decision — prefer this over `useSideToolbar` on the coloring screen).
+   * phone → bottom-sheet; middle → toolbar-above-canvas; three-column →
+   * palette | canvas | tools sidebars.
+   */
+  coloringTier: ColoringTier;
 
   // Layout decisions
   useSideToolbar: boolean;
@@ -76,6 +86,13 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
     ? deviceInfo.layoutMode
     : "phone-portrait";
 
+  // Width-driven coloring tier (web-matching). Feature flag off → force
+  // the phone tier (the legacy single layout), same kill-switch behavior
+  // as effectiveLayoutMode.
+  const coloringTier: ColoringTier = responsiveLayoutEnabled
+    ? getColoringTier(deviceInfo.screenWidth)
+    : "phone";
+
   // Compute layout decisions
   const useSideToolbar = shouldUseSideToolbar(effectiveLayoutMode);
   const useCompactHeader = shouldUseCompactHeader(effectiveLayoutMode);
@@ -115,10 +132,13 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
     ],
   );
 
-  // Three-panel landscape layout dimensions
-  // Uses dynamic sidebar widths based on remaining space after canvas
+  // Sidebar/canvas widths for the three-column layout. Computed whenever
+  // the coloring tier wants sidebars (three-column tier — and, until the
+  // dedicated middle-tier UI lands, the middle tier reuses it too), not
+  // gated on orientation any more.
+  const wantsSidebars = coloringTier !== "phone";
   const landscapeLayout = useMemo(() => {
-    if (!useSideToolbar) return null;
+    if (!wantsSidebars) return null;
 
     const { leftWidth, rightWidth, canvasSize } = getLandscapeSidebarWidths(
       deviceInfo.screenWidth,
@@ -132,11 +152,13 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
       rightSidebarWidth: rightWidth,
       canvasSize,
     };
-  }, [deviceInfo.screenWidth, deviceInfo.screenHeight, useSideToolbar]);
+  }, [deviceInfo.screenWidth, deviceInfo.screenHeight, wantsSidebars]);
 
   return {
     deviceInfo,
     layoutMode: effectiveLayoutMode,
+
+    coloringTier,
 
     useSideToolbar,
     useCompactHeader,
