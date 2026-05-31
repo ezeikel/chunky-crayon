@@ -32,6 +32,18 @@ export const PLAN_DISPLAY_ORDER: readonly PlanKey[] = [
 /** The plan that gets the "Most Popular" badge (matches CC web). */
 export const RECOMMENDED_PLAN: PlanKey = "RAINBOW";
 
+/**
+ * Trust signals shown on paywall surfaces. Kept in sync with CC web's
+ * `SOCIAL_PROOF_STATS` so the rating / review count we claim is identical
+ * across web and mobile (a mismatch reads as fabricated). Update both
+ * together.
+ */
+export const PAYWALL_TRUST = {
+  averageRating: 4.6,
+  reviewCount: 47,
+  guarantee: "30-day money-back guarantee",
+} as const;
+
 export const PLAN_DISPLAY_NAMES: Record<PlanKey, string> = {
   SPLASH: "Splash",
   RAINBOW: "Rainbow",
@@ -49,9 +61,23 @@ export const PLAN_DISPLAY_NAMES_WITH_FREE: Record<"FREE" | PlanKey, string> = {
 };
 
 export const PLAN_TAGLINES: Record<PlanKey, string> = {
-  SPLASH: "Great for occasional creators",
-  RAINBOW: "Perfect for creative families",
-  SPARKLE: "For serious creators",
+  SPLASH: "Best for up to 2 kids.",
+  RAINBOW: "Best for up to 4 kids.",
+  SPARKLE: "Best for up to 10 kids.",
+};
+
+/**
+ * One-line "who it's for" reassurance under each tagline. Answers the
+ * parent's real question ("which one for my family?") in concrete terms
+ * rather than feature-speak. Mirrors CC web's pricing page `audience`
+ * copy (web is the reference).
+ */
+export const PLAN_AUDIENCE: Record<PlanKey, string> = {
+  SPLASH: "About two pages a week. Less than one box of crayons a month.",
+  RAINBOW:
+    "Enough for siblings to each pick their own. Most families land here.",
+  SPARKLE:
+    "Up to 10 separate profiles. Never run out, share with the whole house.",
 };
 
 /**

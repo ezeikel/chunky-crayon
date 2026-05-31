@@ -11,7 +11,12 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faXmark, faStar, faCheck } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faXmark,
+  faStar,
+  faCheck,
+  faShieldCheck,
+} from "@fortawesome/pro-solid-svg-icons";
 import { PurchasesPackage } from "react-native-purchases";
 import {
   useOfferings,
@@ -26,8 +31,10 @@ import {
   PLAN_DISPLAY_ORDER,
   PLAN_DISPLAY_NAMES,
   PLAN_TAGLINES,
+  PLAN_AUDIENCE,
   PLAN_FEATURES,
   RECOMMENDED_PLAN,
+  PAYWALL_TRUST,
 } from "@/lib/paywall/plans";
 
 /**
@@ -167,7 +174,7 @@ const SubscriptionPaywallModal = ({
                 Yearly
               </Text>
               <View style={styles.saveBadge}>
-                <Text style={styles.saveBadgeText}>Save 17%</Text>
+                <Text style={styles.saveBadgeText}>2 months free</Text>
               </View>
             </Pressable>
           </View>
@@ -177,7 +184,27 @@ const SubscriptionPaywallModal = ({
               isn't lost). */}
           <View style={styles.trialBanner}>
             <Text style={styles.trialBannerText}>
-              7-day free trial on all plans — cancel anytime
+              7-day free trial on all plans. Cancel any time.
+            </Text>
+          </View>
+
+          {/* Trust strip — rating + review count up front. The single
+              biggest reassurance for a parent deciding whether to trust
+              the app with their card. Stats kept in sync with web. */}
+          <View style={styles.trustStrip}>
+            <View style={styles.trustStars}>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <FontAwesomeIcon
+                  key={i}
+                  icon={faStar}
+                  size={12}
+                  color="#FBBF24"
+                />
+              ))}
+            </View>
+            <Text style={styles.trustText}>
+              {PAYWALL_TRUST.averageRating} from {PAYWALL_TRUST.reviewCount}{" "}
+              reviews · Cancel any time
             </Text>
           </View>
         </View>
@@ -225,6 +252,9 @@ const SubscriptionPaywallModal = ({
                     <Text style={styles.planTagline}>
                       {PLAN_TAGLINES[planName]}
                     </Text>
+                    <Text style={styles.planAudience}>
+                      {PLAN_AUDIENCE[planName]}
+                    </Text>
 
                     <View style={styles.planPriceRow}>
                       <Text style={styles.planPrice}>
@@ -254,11 +284,44 @@ const SubscriptionPaywallModal = ({
                         </View>
                       ))}
                     </View>
+
+                    {/* Trial-framed CTA + de-risking microcopy. The whole
+                        card is the tap target (a nested button would be a
+                        press-within-press on RN); this styled label reads
+                        as the action and the line below removes the
+                        "will I be charged now?" fear that stalls parents. */}
+                    <View
+                      style={[
+                        styles.planCta,
+                        isBestValue && styles.planCtaBestValue,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.planCtaText,
+                          isBestValue && styles.planCtaTextBestValue,
+                        ]}
+                      >
+                        Start 7-day free trial
+                      </Text>
+                    </View>
+                    <Text style={styles.planTrialMicrocopy}>
+                      Then {formatPackagePrice(pkg)}/
+                      {cycle === "annual" ? "year" : "month"}. Cancel any time
+                      before then.
+                    </Text>
                   </Pressable>
                 );
               })}
             </View>
           )}
+
+          {/* Money-back guarantee — de-risks the decision right after the
+              plans, before the restore/legal footer. */}
+          <View style={styles.guaranteeRow}>
+            <FontAwesomeIcon icon={faShieldCheck} size={14} color="#7C3AED" />
+            <Text style={styles.guaranteeText}>{PAYWALL_TRUST.guarantee}</Text>
+          </View>
 
           <Pressable
             onPress={handleRestore}
@@ -273,7 +336,7 @@ const SubscriptionPaywallModal = ({
           </Pressable>
 
           <Text style={styles.legalText}>
-            Subscriptions renew automatically. Cancel anytime in{" "}
+            Subscriptions renew automatically. Cancel any time in{" "}
             <Text style={styles.legalBold}>Settings</Text>.
           </Text>
 
@@ -397,6 +460,23 @@ const styles = StyleSheet.create({
     color: "#7C3AED",
     textAlign: "center",
   },
+  trustStrip: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 10,
+  },
+  trustStars: {
+    flexDirection: "row",
+    gap: 1,
+  },
+  trustText: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 12,
+    color: "#6B5344",
+  },
   scroll: {
     paddingHorizontal: 24,
     paddingBottom: 32,
@@ -444,9 +524,16 @@ const styles = StyleSheet.create({
     color: "#3D2C1E",
   },
   planTagline: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 14,
+    color: "#3D2C1E",
+  },
+  planAudience: {
     fontFamily: "TondoTrial-Regular",
-    fontSize: 13,
+    fontSize: 12,
     color: "#6B5344",
+    lineHeight: 17,
+    marginTop: 2,
   },
   planPriceRow: {
     flexDirection: "row",
@@ -483,6 +570,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#3D2C1E",
   },
+  planCta: {
+    marginTop: 14,
+    paddingVertical: 12,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F3EBE0",
+  },
+  planCtaBestValue: {
+    backgroundColor: "#7C3AED",
+  },
+  planCtaText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 15,
+    color: "#3D2C1E",
+  },
+  planCtaTextBestValue: {
+    color: "#FFFFFF",
+  },
+  planTrialMicrocopy: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 11,
+    color: "#7A6F66",
+    textAlign: "center",
+    marginTop: 6,
+  },
   loadingContainer: {
     alignItems: "center",
     justifyContent: "center",
@@ -505,6 +618,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#7A6F66",
     textDecorationLine: "underline",
+  },
+  guaranteeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    marginTop: 4,
+  },
+  guaranteeText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 13,
+    color: "#6B5344",
   },
   legalText: {
     fontFamily: "TondoTrial-Regular",
