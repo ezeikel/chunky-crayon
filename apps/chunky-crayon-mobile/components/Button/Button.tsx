@@ -174,7 +174,20 @@ const Button = ({
   }));
 
   const shadowStyle = useAnimatedStyle(() => {
-    if (!hasLift) return {};
+    // When NOT lifted, EXPLICITLY zero the shadow props rather than returning
+    // {}. The same Button instance re-renders with a new variant when a tile
+    // toggles default→outline-muted (the create-form mode selector reuses 4
+    // persistent Buttons), and returning {} leaves the previously-applied
+    // shadowOpacity:1 / shadowOffset on the native view — which, once the
+    // wrapper's coloured shadowColor is gone, renders as a stale BLACK drop
+    // (the "previously-selected" ghost shadow). Zeroing clears it.
+    if (!hasLift) {
+      return {
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
+      };
+    }
     // Interpolate the chunky bottom-drop from liftRest → liftActive.
     const offset = liftRest - pressed.value * (liftRest - liftActive);
     return {
