@@ -7,9 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChevronLeft, faStar } from "@fortawesome/pro-solid-svg-icons";
 import ImageCanvas from "@/components/ImageCanvas/ImageCanvas";
 import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColoringToolbar";
-import ColorPaletteSidebar from "@/components/ColorPaletteSidebar/ColorPaletteSidebar";
-import ToolsSidebar from "@/components/ToolsSidebar/ToolsSidebar";
-import ColoringToolbar from "@/components/ColoringToolbar/ColoringToolbar";
+import ColoringLayout from "@/components/ColoringLayout/ColoringLayout";
 import ActionModal from "@/components/ActionModal/ActionModal";
 import ZoomControls from "@/components/ZoomControls/ZoomControls";
 import MuteToggle from "@/components/MuteToggle/MuteToggle";
@@ -37,13 +35,8 @@ const ColoringImage = () => {
   const { isFocusMode } = useFocusMode();
 
   // Responsive layout hook
-  const {
-    layoutMode,
-    coloringTier,
-    useCompactHeader,
-    canvasArea,
-    landscapeLayout,
-  } = useResponsiveLayout();
+  const { layoutMode, coloringTier, useCompactHeader, canvasArea, deviceInfo } =
+    useResponsiveLayout();
 
   // Get zoom state and actions from canvas store
   const { scale, setScale, resetTransform } = useCanvasStore();
@@ -87,15 +80,13 @@ const ColoringImage = () => {
 
   const { coloringImage } = data;
 
-  // Layout is width-driven now (coloringTier), not orientation:
-  //   - three-column (≥1024dp): Colors | Canvas | Tools sidebars
-  //   - middle (≥700dp): a single toolbar-above-canvas panel (web's
-  //     ColoringToolbar), canvas under it, action row below
-  //   - phone (<700dp): canvas with the bottom-sheet drawer
-  // `isLandscapeLayout` = "not phone" — the compact header + in-header
-  // controls apply to both the three-column and middle tiers.
-  const isThreeColumn = coloringTier === "three-column";
-  const isMiddle = coloringTier === "middle";
+  // Layout is fit-based (coloringTier), not orientation. The non-phone
+  // tiers (three-column rails / middle toolbar-on-top) are rendered by the
+  // shared ColoringLayout component, which decides between them by what
+  // fits — so the screen and the Storybook layout story stay identical.
+  // The phone tier keeps its bottom-sheet drawer here.
+  // `isLandscapeLayout` = "not phone": the compact header + in-header
+  // controls apply to both non-phone tiers.
   const isLandscapeLayout = coloringTier !== "phone";
 
   return (
@@ -193,16 +184,12 @@ const ColoringImage = () => {
 
         {/* Main Content Area */}
         <View style={styles.mainContent}>
-          {isThreeColumn && landscapeLayout ? (
-            /* Three-column layout: Colors | Canvas | Tools.
-               Sidebars hidden in focus mode. */
-            <>
-              {/* Left Sidebar - Color Palette */}
-              {!isFocusMode && (
-                <ColorPaletteSidebar width={landscapeLayout.leftSidebarWidth} />
-              )}
-
-              {/* Center - Canvas */}
+          {isLandscapeLayout ? (
+            /* Non-phone tiers (three-column rails / middle toolbar-on-top)
+               are laid out by the shared ColoringLayout, which decides
+               between them by what fits. Hidden chrome in focus mode →
+               render just the canvas full-bleed. */
+            isFocusMode ? (
               <View style={styles.canvasCenter}>
                 <View style={styles.canvasCardLandscape}>
                   <ImageCanvas
@@ -213,50 +200,26 @@ const ColoringImage = () => {
                   />
                 </View>
               </View>
-
-              {/* Right Sidebar - Tools */}
-              {!isFocusMode && (
-                <ToolsSidebar
-                  width={landscapeLayout.rightSidebarWidth}
-                  onZoomIn={handleZoomIn}
-                  onZoomOut={handleZoomOut}
-                  onResetZoom={handleResetZoom}
-                  zoom={scale}
-                />
-              )}
-            </>
-          ) : isMiddle ? (
-            /* Middle layout: toolbar-above-canvas (web's ColoringToolbar),
-               canvas under it. Toolbar hidden in focus mode. */
-            <View style={styles.middleColumn}>
-              {!isFocusMode && (
-                <ColoringToolbar
-                  onZoomIn={handleZoomIn}
-                  onZoomOut={handleZoomOut}
-                  onResetZoom={handleResetZoom}
-                  zoom={scale}
-                />
-              )}
-              <View style={styles.middleCanvasWrapper}>
-                <ScrollView
-                  style={styles.scrollView}
-                  contentContainerStyle={styles.scrollContent}
-                  scrollEnabled={scroll}
-                  showsVerticalScrollIndicator={false}
-                >
-                  <View style={styles.canvasContainer}>
-                    <View style={styles.canvasCard}>
-                      <ImageCanvas
-                        coloringImage={coloringImage}
-                        setScroll={setScroll}
-                        canvasArea={canvasArea}
-                        layoutMode={layoutMode}
-                      />
-                    </View>
+            ) : (
+              <ColoringLayout
+                width={deviceInfo.screenWidth}
+                height={deviceInfo.screenHeight}
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onResetZoom={handleResetZoom}
+                zoom={scale}
+                renderCanvas={(area) => (
+                  <View style={styles.canvasCardLandscape}>
+                    <ImageCanvas
+                      coloringImage={coloringImage}
+                      setScroll={setScroll}
+                      canvasArea={area}
+                      layoutMode={layoutMode}
+                    />
                   </View>
-                </ScrollView>
-              </View>
-            </View>
+                )}
+              />
+            )
           ) : (
             /* Phone layout - Canvas with bottom toolbar */
             <View style={styles.canvasWrapper}>
