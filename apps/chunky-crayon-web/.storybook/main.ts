@@ -72,6 +72,19 @@ const config: StorybookConfig = {
     };
     viteConfig.resolve = {
       ...viteConfig.resolve,
+      // Force a SINGLE React copy. Radix primitives (DismissableLayer, used by
+      // the shadcn Tooltip/Select/Dropdown that FormCTA pulls in text mode)
+      // otherwise resolve their own React in the Storybook Vite graph →
+      // "Invalid hook call / more than one copy of React" → useEffect-of-null
+      // crash when switching the create form to a non-Scene mode. Deduping
+      // react/react-dom (+ jsx-runtime) collapses them to one instance.
+      dedupe: [
+        ...((viteConfig.resolve as { dedupe?: string[] })?.dedupe ?? []),
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+      ],
       alias: [
         {
           find: 'next/navigation',
