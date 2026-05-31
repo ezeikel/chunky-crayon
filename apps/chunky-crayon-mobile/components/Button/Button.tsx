@@ -293,11 +293,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   softShadow: {
+    // Web's flat variants use `shadow-[0_4px_14px_-10px_rgb(0_0_0/0.16)]` — the
+    // -10px SPREAD nearly cancels the 14px blur, so on small elements (the
+    // create-form mode tiles) it renders as essentially NO shadow, just a hint
+    // of separation. RN has no shadow-spread, and any non-trivial radius pools
+    // darkly at the tile's hard corners — which read as the black halo. So keep
+    // it to a 1px hairline at very low opacity: a whisper of lift, no halo.
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.14,
-    shadowRadius: 14,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 1,
+    elevation: 1,
   },
   fullWidth: {
     width: "100%",
