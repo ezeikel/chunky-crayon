@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import { View, Pressable, Text } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { action } from "storybook/actions";
@@ -71,21 +71,24 @@ const SeededOpen = ({ state }: { state: SeededState }) => {
   const qc = useQueryClient();
   const [open, setOpen] = useState(true);
 
-  // Seed the offering cache before first paint so the component
-  // skips its real network call. The cache persists across story
-  // switches (single QueryClient at the Storybook preview level),
-  // so we MUST clear any prior seed before applying this story's
-  // shape — otherwise switching from Default → Loading shows the
-  // packs from the previous render.
-  useEffect(() => {
+  // Seed the offering cache SYNCHRONOUSLY during render, BEFORE the
+  // modal mounts and fires its real queryFn. That queryFn calls the
+  // native RevenueCat SDK, which never resolves inside Storybook — so a
+  // post-mount useEffect seed races a hanging fetch and the UI stays
+  // stuck on "Loading credit packs…". Seeding here (once per state,
+  // guarded by a ref) means the query reads cached data on its very
+  // first render and never shows the loader. The state-keyed guard lets
+  // a story switch re-seed for the new state.
+  const seededFor = useRef<SeededState | null>(null);
+  if (seededFor.current !== state) {
     const key = ["revenuecat", "colorAsYouGoPacks"];
-    qc.removeQueries({ queryKey: key, exact: true });
     if (state === "default") qc.setQueryData(key, makeOffering());
     else if (state === "empty") qc.setQueryData(key, null);
-    // 'loading' intentionally seeds nothing — query stays pending
-    // because the real fetcher (Purchases.getOfferings) never
-    // resolves inside Storybook.
-  }, [qc, state]);
+    // 'loading' seeds nothing — the query stays pending (the real
+    // fetcher never resolves in Storybook), which is the intended state.
+    else qc.removeQueries({ queryKey: key, exact: true });
+    seededFor.current = state;
+  }
 
   // Storybook-RN's Pressable taps don't reliably hit onPress through
   // story-wrapping triggers (we've hit this on the Toaster and Magic

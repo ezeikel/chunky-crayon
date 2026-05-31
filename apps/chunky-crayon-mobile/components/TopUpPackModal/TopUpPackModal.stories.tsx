@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import { View, Pressable, Text } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { action } from "storybook/actions";
@@ -85,21 +85,23 @@ const SeededOpen = ({ state }: { state: SeededState }) => {
   const qc = useQueryClient();
   const [open, setOpen] = useState(true);
 
-  // Seed the offering cache before first paint so the component
-  // skips its real network call. The cache persists across story
-  // switches (single QueryClient at the Storybook preview level),
-  // so we MUST clear any prior seed before applying this story's
-  // shape — otherwise switching from Default → Loading shows the
-  // packs from the previous render.
-  useEffect(() => {
+  // Seed the offering cache SYNCHRONOUSLY during render, BEFORE the
+  // modal mounts and fires its real queryFn (which calls the native
+  // RevenueCat SDK and never resolves in Storybook). A post-mount
+  // useEffect seed races that hanging fetch and leaves the UI stuck on
+  // the loader; seeding here (once per state, ref-guarded) means the
+  // query reads cached data on its first render. The state-keyed guard
+  // re-seeds on story switch.
+  const seededFor = useRef<SeededState | null>(null);
+  if (seededFor.current !== state) {
     const key = ["revenuecat", "creditPacks"];
-    qc.removeQueries({ queryKey: key, exact: true });
     if (state === "default") qc.setQueryData(key, makeOffering());
     else if (state === "empty") qc.setQueryData(key, null);
-    // 'loading' intentionally seeds nothing — query stays pending
-    // because the real fetcher (Purchases.getOfferings) never
-    // resolves inside Storybook.
-  }, [qc, state]);
+    // 'loading' seeds nothing — query stays pending (real fetcher never
+    // resolves in Storybook), which is the intended state.
+    else qc.removeQueries({ queryKey: key, exact: true });
+    seededFor.current = state;
+  }
 
   // Storybook-RN's Pressable taps don't reliably hit onPress through
   // story-wrapping triggers (we've hit this on the Toaster and Magic

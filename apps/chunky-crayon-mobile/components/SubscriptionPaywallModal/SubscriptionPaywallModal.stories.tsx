@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import { View, Pressable, Text } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { action } from "storybook/actions";
@@ -103,12 +103,22 @@ const SeededOpen = ({ state }: { state: SeededState }) => {
   const qc = useQueryClient();
   const [open, setOpen] = useState(true);
 
-  useEffect(() => {
+  // Seed SYNCHRONOUSLY during render, BEFORE the modal mounts and fires
+  // its useOfferings() queryFn. In Storybook that queryFn calls the
+  // native RevenueCat SDK, which never resolves — so a post-mount
+  // useEffect seed races a hanging fetch and the UI stays stuck on the
+  // loader. Seeding here (once, guarded) plus a far-future staleTime via
+  // setQueryData means the query reads cached data on its first render
+  // and never shows the spinner. The state-keyed guard lets a story
+  // switch re-seed for the new state.
+  const seededFor = useRef<SeededState | null>(null);
+  if (seededFor.current !== state) {
     const key = ["revenuecat", "offerings"];
-    qc.removeQueries({ queryKey: key, exact: true });
     if (state === "default") qc.setQueryData(key, makeOffering());
     else if (state === "empty") qc.setQueryData(key, null);
-  }, [qc, state]);
+    else qc.removeQueries({ queryKey: key, exact: true });
+    seededFor.current = state;
+  }
 
   return (
     <View style={{ flex: 1 }}>

@@ -7,6 +7,7 @@ import { useFonts } from "expo-font";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetProvider } from "@swmansion/react-native-bottom-sheet";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Dimensions } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Storybook preview wraps every story with the minimum providers
@@ -26,6 +27,17 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false, refetchOnMount: false } },
 });
+
+// Give SafeAreaProvider realistic device metrics so safe-area-aware
+// stories (e.g. fullscreen paywall modals whose close button offsets by
+// insets.top) render with a real top inset instead of 0 — otherwise the
+// embedded Storybook frame reports top:0 and status-bar-clearing offsets
+// look wrong in the preview even though they're correct on device.
+const { width, height } = Dimensions.get("window");
+const STORYBOOK_INITIAL_METRICS = {
+  frame: { x: 0, y: 0, width, height },
+  insets: { top: 24, left: 0, right: 0, bottom: 0 },
+};
 
 const StorybookFontGate = ({ children }: { children: React.ReactNode }) => {
   const [loaded] = useFonts({
@@ -61,7 +73,7 @@ const preview: Preview = {
   decorators: [
     (Story) => (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <SafeAreaProvider>
+        <SafeAreaProvider initialMetrics={STORYBOOK_INITIAL_METRICS}>
           <BottomSheetProvider>
             <QueryClientProvider client={queryClient}>
               <StorybookFontGate>
