@@ -12,9 +12,7 @@ import {
 } from '@fortawesome/pro-duotone-svg-icons';
 import ScrollHeader from '@/components/Header/ScrollHeader';
 import MobileMenu from '@/components/Header/MobileMenu';
-import HeaderStickerIndicator from '@/components/Header/HeaderStickerIndicator';
 import HeaderChallengeIndicator from '@/components/Header/HeaderChallengeIndicator';
-import HeaderColoIndicator from '@/components/Header/HeaderColoIndicator';
 import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
 import MobileLanguageSelector from '@/components/LanguageSwitcher/MobileLanguageSelector';
 import {
@@ -135,10 +133,12 @@ export const MobileMenuTrigger: Story = {
   ),
 };
 
+// The header's only kid-progress pill now is the weekly Challenge nudge.
+// The Colo + sticker indicators were removed from the header (kept their
+// own dedicated pages), so this story showcases just the Challenge pill.
 export const HeaderIndicators: Story = {
   render: () => (
     <main className="flex flex-wrap items-center gap-4 p-8">
-      <HeaderStickerIndicator totalUnlocked={24} newCount={3} />
       <HeaderChallengeIndicator
         challengeData={{
           challenge: {
@@ -164,27 +164,6 @@ export const HeaderIndicators: Story = {
           startDate: new Date('2026-05-18'),
           endDate: new Date('2026-05-25'),
           rewardClaimed: false,
-        }}
-      />
-      <HeaderColoIndicator
-        coloState={{
-          stage: 1,
-          stageName: 'Baby Colo',
-          stageDescription: 'Colo is just getting started.',
-          imagePath: '/images/colo.svg',
-          accessories: [],
-          nextStage: {
-            stage: 2,
-            name: 'Little Colo',
-            description: 'Colo grows with each saved artwork.',
-            requiredArtworks: 8,
-            imagePath: '/images/colo.svg',
-          },
-          progressToNext: {
-            current: 5,
-            required: 8,
-            percentage: 62,
-          },
         }}
       />
     </main>

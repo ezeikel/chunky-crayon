@@ -25,15 +25,11 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { getCurrentUser } from '@/app/actions/user';
 import { getProfiles, getActiveProfile } from '@/app/actions/profiles';
 import { checkFeatureFlag, charactersFeatureEnabled } from '@/flags';
-import { getMyStickerStats } from '@/app/actions/stickers';
-import { getMyColoState } from '@/app/actions/colo';
 import { getMyCurrentChallenge } from '@/app/actions/challenges';
 import { signOut } from '@/auth';
 import formatNumber from '@/utils/formatNumber';
 import HeaderDropdown from './HeaderDropdown';
-import HeaderStickerIndicator from './HeaderStickerIndicator';
 import HeaderChallengeIndicator from './HeaderChallengeIndicator';
-import HeaderColoIndicator from './HeaderColoIndicator';
 import MobileMenu from './MobileMenu';
 import ScrollHeader from './ScrollHeader';
 import LanguageSwitcher from '@/components/LanguageSwitcher/LanguageSwitcher';
@@ -330,11 +326,12 @@ const Header = async () => {
   const tCommon = await getTranslations('common');
   const user = await getCurrentUser();
 
-  // Fetch profiles, sticker stats, challenge, and Colo state for authenticated users
+  // Fetch profiles, active profile, and current challenge for authenticated
+  // users. Colo + sticker progress were removed from the header (kept their
+  // own dedicated pages); the header is now just nav + profile/credits +
+  // the weekly Challenge pill.
   const profiles = user ? (await getProfiles()) || [] : [];
   const activeProfile = user ? await getActiveProfile() : null;
-  const stickerStats = user ? await getMyStickerStats() : null;
-  const coloState = user ? await getMyColoState() : null;
   const currentChallenge = user ? await getMyCurrentChallenge() : null;
 
   // Bundles shop flag — gates the Products entry in both desktop nav
@@ -390,55 +387,14 @@ const Header = async () => {
             />
           </nav>
 
-          {/* Kid-facing progress items.
-              - Challenge keeps its own small pill (always visible).
-              - Colo + Sticker are now ONE shared pill so they read as
-                a single "your progress" widget instead of two competing
-                chunky pills (each was min-w-32–48). The pill is sized
-                snug around the sticker icon's height; the Colo avatar
-                drops its own pill chrome (variant='bare') and sits on
-                the left, sticker icon+count on the right.
-              - Two distinct tap targets inside one visual pill: Colo
-                opens its dropdown, sticker links to the stickers page.
-              - Hides below xl (same as before) to prevent header wrap
-                on the cluttered logged-in nav. */}
+          {/* Kid-facing progress: just the weekly Challenge pill now.
+              The Colo + sticker progress pill was removed from the header
+              — they weren't pulling their weight in the top bar (the
+              header read like a dashboard), and both still have dedicated
+              destinations (Sticker Book + Colo's own page). The header is
+              now nav + profile/credits + this single Challenge nudge. */}
           <div className="flex items-center gap-2">
-            {/* Challenge indicator */}
             <HeaderChallengeIndicator challengeData={currentChallenge} />
-
-            {/* Combined Colo + Sticker progress pill — only render when
-                both data sources are present (the bare variants assume
-                they're composed inside this shared chrome). */}
-            {coloState && stickerStats && (
-              <div className="hidden xl:flex h-12 items-center gap-2 rounded-full border-2 border-paper-cream-dark bg-white/80 px-3 shadow-sm">
-                <HeaderColoIndicator coloState={coloState} variant="bare" />
-                {/* Subtle vertical divider so the two tap targets read
-                    as distinct without an extra border. */}
-                <span aria-hidden className="h-6 w-px bg-paper-cream-dark/60" />
-                <HeaderStickerIndicator
-                  totalUnlocked={stickerStats.totalUnlocked}
-                  newCount={stickerStats.newCount}
-                  variant="bare"
-                />
-              </div>
-            )}
-
-            {/* Fallback: if only one of the two is present, render it
-                standalone in its original pill shape (avoids a
-                lopsided shared pill with one empty side). */}
-            {coloState && !stickerStats && (
-              <div className="hidden xl:flex">
-                <HeaderColoIndicator coloState={coloState} />
-              </div>
-            )}
-            {!coloState && stickerStats && (
-              <div className="hidden xl:flex">
-                <HeaderStickerIndicator
-                  totalUnlocked={stickerStats.totalUnlocked}
-                  newCount={stickerStats.newCount}
-                />
-              </div>
-            )}
           </div>
 
           <MobileMenu
