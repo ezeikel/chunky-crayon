@@ -8,24 +8,30 @@ const meta: Meta<typeof AppHeader> = {
   component: AppHeader,
   argTypes: {
     credits: { control: { type: "number" } },
-    challengeProgress: { control: { type: "range", min: 0, max: 100 } },
-    stickerCount: { control: { type: "number" } },
     profileName: { control: "text" },
-    coloStage: {
+    avatarId: {
       control: { type: "select" },
-      options: [1, 2, 3, 4, 5, 6],
+      options: [
+        "dragon",
+        "unicorn",
+        "mermaid",
+        "astronaut",
+        "wizard",
+        "superhero",
+        "alien",
+        "rocket",
+        "ice-cream",
+      ],
     },
   },
   args: {
     credits: 12,
-    challengeProgress: 30,
-    stickerCount: 8,
     profileName: "Ezra",
-    coloStage: 2,
+    avatarId: "dragon",
     onCreditsPress: action("credits-press"),
-    onChallengePress: action("challenge-press"),
-    onStickersPress: action("stickers-press"),
+    onColoPress: action("colo-press"),
     onProfilePress: action("profile-press"),
+    onSettingsPress: action("settings-press"),
   },
   decorators: [
     (Story) => (
@@ -44,19 +50,15 @@ export const Default: Story = {};
 export const NewArtist: Story = {
   args: {
     credits: 0,
-    challengeProgress: 0,
-    stickerCount: 0,
     profileName: "Artist",
-    coloStage: 1,
+    avatarId: "ice-cream",
   },
 };
 
 export const PowerUser: Story = {
   args: {
     credits: 999,
-    challengeProgress: 95,
-    stickerCount: 42,
     profileName: "Maya",
-    coloStage: 6,
+    avatarId: "unicorn",
   },
 };

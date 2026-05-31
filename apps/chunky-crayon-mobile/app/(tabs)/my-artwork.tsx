@@ -166,10 +166,8 @@ const MyArtworkScreen = () => {
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={{ flex: 1 }}>
         <AppHeader
           credits={headerData.credits}
-          challengeProgress={headerData.challengeProgress}
-          stickerCount={headerData.stickerCount}
           profileName={headerData.profileName}
-          coloStage={headerData.coloStage}
+          avatarId={headerData.avatarId}
         />
         <ScrollView
           style={{ flex: 1 }}

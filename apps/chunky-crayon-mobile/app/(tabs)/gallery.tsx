@@ -23,10 +23,8 @@ const GalleryScreen = () => {
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={styles.gradient}>
         <AppHeader
           credits={headerData.credits}
-          challengeProgress={headerData.challengeProgress}
-          stickerCount={headerData.stickerCount}
           profileName={headerData.profileName}
-          coloStage={headerData.coloStage}
+          avatarId={headerData.avatarId}
         />
         <ScrollView
           style={styles.scrollView}

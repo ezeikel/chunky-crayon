@@ -16,7 +16,8 @@
       "cancel": "Cancel"
     },
     "header": {
-      "forGrownUps": "For Grown-ups"
+      "forGrownUps": "For Grown-ups",
+      "grownUps": "Grown-ups"
     },
     "characterBuilder": {
       "step": {

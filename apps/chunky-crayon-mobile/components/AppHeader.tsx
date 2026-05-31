@@ -1,113 +1,113 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faCoins,
-  faTrophy,
-  faNoteSticky,
-  faChevronDown,
-  faUserShield,
-} from "@fortawesome/pro-solid-svg-icons";
-import ColoAvatar from "./ColoAvatar/ColoAvatar";
+import { faCoins, faUserShield } from "@fortawesome/pro-duotone-svg-icons";
+import ProfileAvatar from "./ProfileAvatar/ProfileAvatar";
 import { useT } from "@/lib/i18n/useT";
+import { COLORS, FONTS } from "@/lib/design";
 import type { ColoStage } from "@/lib/colo/types";
 
-type HeaderIndicatorProps = {
-  icon: typeof faCoins;
-  iconColor: string;
-  value: string | number;
+/**
+ * Minimal kids (ages 3-8) status strip.
+ *
+ * Just two things, nothing else: a vivid credit-coin chip on the left
+ * and a chunky profile pill on the right (the kid's chosen profile
+ * avatar + their name in bold, no chevron). Stickers and the
+ * challenge/trophy ring were removed from the header by product
+ * decision — the icon carries the meaning, the number is secondary,
+ * and every tap target clears 44pt. A clear-but-calm "Grown-ups" door
+ * sits in the corner only when a settings handler is given.
+ */
+
+type CreditsChipProps = {
+  value: number;
   onPress?: () => void;
 };
 
-const HeaderIndicator = ({
-  icon,
-  iconColor,
-  value,
-  onPress,
-}: HeaderIndicatorProps) => (
+// Vivid crayon-coin chip. Reads as intentional even at 0 — the coin is
+// the hero, the number rides shotgun. Whole chip is a ≥44pt tap target.
+const CreditsChip = ({ value, onPress }: CreditsChipProps) => (
   <Pressable
-    style={({ pressed }) => [
-      styles.indicator,
-      pressed && styles.indicatorPressed,
-    ]}
+    style={({ pressed }) => [styles.creditsChip, pressed && styles.pressed]}
     onPress={onPress}
     disabled={!onPress}
+    hitSlop={8}
+    accessibilityRole="button"
+    accessibilityLabel={`${value} crayon coins`}
   >
-    <FontAwesomeIcon icon={icon} size={14} color={iconColor} />
-    <Text style={styles.indicatorValue}>{value}</Text>
+    <View style={styles.coinBadge}>
+      <FontAwesomeIcon
+        icon={faCoins}
+        size={24}
+        color={COLORS.white}
+        secondaryColor="rgba(255,255,255,0.55)"
+      />
+    </View>
+    <Text style={styles.creditsValue}>{value}</Text>
   </Pressable>
 );
 
-type ProfileSwitcherProps = {
+type ProfilePillProps = {
   name: string;
-  coloStage: ColoStage;
+  avatarId: string;
   /**
    * Backwards-compat — when only `onPress` is given, the whole pill
    * triggers it. Newer call sites pass `onColoPress` + `onProfilePress`
-   * separately so the Colo avatar opens the Colo detail sheet while
-   * the name+chevron half opens the profile switcher.
+   * separately so the avatar half opens the Colo detail sheet while the
+   * name half opens the profile switcher. No chevron — the avatar +
+   * name read as a tappable identity on their own.
    */
   onPress?: () => void;
   onColoPress?: () => void;
   onProfilePress?: () => void;
 };
 
-const ProfileSwitcher = ({
+const ProfilePill = ({
   name,
-  coloStage,
+  avatarId,
   onPress,
   onColoPress,
   onProfilePress,
-}: ProfileSwitcherProps) => {
-  // If callers pass split handlers, render two distinct tap zones
-  // inside the shared pill chrome. Otherwise fall back to the old
-  // single-Pressable shape.
+}: ProfilePillProps) => {
+  // Split-tap when callers give separate handlers; otherwise the whole
+  // chunky pill is one big target (the old single-Pressable shape).
   const hasSplit = onColoPress != null || onProfilePress != null;
 
   if (!hasSplit) {
     return (
       <Pressable
-        style={({ pressed }) => [
-          styles.profileSwitcher,
-          pressed && styles.profileSwitcherPressed,
-        ]}
+        style={({ pressed }) => [styles.profilePill, pressed && styles.pressed]}
         onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`Profile: ${name}`}
       >
-        <View style={styles.avatarContainer}>
-          <ColoAvatar stage={coloStage} size="xs" enableTapReactions={false} />
-        </View>
+        <ProfileAvatar avatarId={avatarId} name={name} size="sm" />
         <Text style={styles.profileName} numberOfLines={1}>
           {name}
         </Text>
-        <FontAwesomeIcon icon={faChevronDown} size={10} color="#9CA3AF" />
       </Pressable>
     );
   }
 
   return (
-    <View style={styles.profileSwitcher}>
+    <View style={styles.profilePill}>
       <Pressable
-        style={({ pressed }) => [
-          styles.coloTap,
-          pressed && styles.profileSwitcherPressed,
-        ]}
+        style={({ pressed }) => [styles.coloTap, pressed && styles.pressed]}
         onPress={onColoPress}
-        accessibilityLabel="Open Colo details"
+        accessibilityRole="button"
+        accessibilityLabel="Open Colo"
       >
-        <ColoAvatar stage={coloStage} size="xs" enableTapReactions={false} />
+        <ProfileAvatar avatarId={avatarId} name={name} size="sm" />
       </Pressable>
       <Pressable
-        style={({ pressed }) => [
-          styles.profileTap,
-          pressed && styles.profileSwitcherPressed,
-        ]}
+        style={({ pressed }) => [styles.nameTap, pressed && styles.pressed]}
         onPress={onProfilePress}
+        accessibilityRole="button"
         accessibilityLabel={`Switch profile, current: ${name}`}
       >
         <Text style={styles.profileName} numberOfLines={1}>
           {name}
         </Text>
-        <FontAwesomeIcon icon={faChevronDown} size={10} color="#9CA3AF" />
       </Pressable>
     </View>
   );
@@ -115,19 +115,16 @@ const ProfileSwitcher = ({
 
 type AppHeaderProps = {
   credits?: number;
-  challengeProgress?: number; // 0-100 percentage
-  stickerCount?: number;
   profileName?: string;
-  coloStage?: ColoStage;
+  /** The active profile's avatar id (dragon / unicorn / … — see lib/avatars). */
+  avatarId?: string;
   onCreditsPress?: () => void;
-  onChallengePress?: () => void;
-  onStickersPress?: () => void;
   onProfilePress?: () => void;
   /**
    * Optional. When given, tapping the Colo avatar inside the profile
    * pill opens the Colo detail sheet (instead of falling through to
-   * onProfilePress). Web's kid-friendly Colo dropdown maps to this
-   * on mobile — see ColoBottomSheet.
+   * onProfilePress). Web's kid-friendly Colo dropdown maps to this on
+   * mobile — see ColoBottomSheet.
    */
   onColoPress?: () => void;
   /**
@@ -138,17 +135,30 @@ type AppHeaderProps = {
    * The handler is responsible for the parental gate before opening.
    */
   onSettingsPress?: () => void;
+
+  // ─── Deprecated / ignored (kept for backward compat with call sites) ───
+  // The header is now a minimal status strip (credits + profile only).
+  // The challenge/trophy ring + sticker chip were removed, and the
+  // profile pill shows the profile AVATAR (not Colo). These remain
+  // optional + ignored so the existing call sites don't churn; remove
+  // once every call site stops passing them.
+  /** @deprecated Header shows the profile avatar now, not Colo stage. */
+  coloStage?: ColoStage;
+  /** @deprecated Removed from the header. Accepted but ignored. */
+  challengeProgress?: number;
+  /** @deprecated Removed from the header. Accepted but ignored. */
+  stickerCount?: number;
+  /** @deprecated Removed from the header. Accepted but ignored. */
+  onChallengePress?: () => void;
+  /** @deprecated Removed from the header. Accepted but ignored. */
+  onStickersPress?: () => void;
 };
 
 const AppHeader = ({
   credits = 0,
-  challengeProgress = 0,
-  stickerCount = 0,
   profileName = "Artist",
-  coloStage = 1,
+  avatarId = "ice-cream",
   onCreditsPress,
-  onChallengePress,
-  onStickersPress,
   onProfilePress,
   onColoPress,
   onSettingsPress,
@@ -158,58 +168,18 @@ const AppHeader = ({
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
-      {/* Left side - Indicators */}
-      <View style={styles.indicatorsContainer}>
-        <HeaderIndicator
-          icon={faCoins}
-          iconColor="#F59E0B"
-          value={credits}
-          onPress={onCreditsPress}
-        />
+      {/* LEFT — single vivid credits chip */}
+      <CreditsChip value={credits} onPress={onCreditsPress} />
 
-        {/* Challenge Progress Ring */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.challengeRing,
-            pressed && styles.indicatorPressed,
-          ]}
-          onPress={onChallengePress}
-        >
-          <View style={styles.challengeRingOuter}>
-            <View
-              style={[
-                styles.challengeRingProgress,
-                {
-                  transform: [
-                    { rotate: `${(challengeProgress / 100) * 360}deg` },
-                  ],
-                },
-              ]}
-            />
-            <View style={styles.challengeRingInner}>
-              <FontAwesomeIcon icon={faTrophy} size={12} color="#E46444" />
-            </View>
-          </View>
-        </Pressable>
-
-        <HeaderIndicator
-          icon={faNoteSticky}
-          iconColor="#8B5CF6"
-          value={stickerCount}
-          onPress={onStickersPress}
-        />
-      </View>
-
-      {/* Right side - Profile Switcher + low-key "For Grown-ups" corner.
+      {/* RIGHT — profile pill + low-key "For Grown-ups" corner.
           Split tap zones when callers give onColoPress (Colo avatar
-          opens Colo detail sheet, rest opens profile switcher). Falls
-          back to single onPress otherwise. The grown-ups door only
-          renders when onSettingsPress is given (settings/account live
-          behind this corner, not a tab); the handler gates entry. */}
+          opens Colo detail sheet, name opens profile switcher). Falls
+          back to a single onPress otherwise. The grown-ups door only
+          renders when onSettingsPress is given; the handler gates it. */}
       <View style={styles.rightSide}>
-        <ProfileSwitcher
+        <ProfilePill
           name={profileName}
-          coloStage={coloStage}
+          avatarId={avatarId}
           onPress={onColoPress == null ? onProfilePress : undefined}
           onColoPress={onColoPress}
           onProfilePress={onColoPress == null ? undefined : onProfilePress}
@@ -218,13 +188,19 @@ const AppHeader = ({
           <Pressable
             style={({ pressed }) => [
               styles.grownUpsButton,
-              pressed && styles.indicatorPressed,
+              pressed && styles.pressed,
             ]}
             onPress={onSettingsPress}
+            accessibilityRole="button"
             accessibilityLabel={t("forGrownUps")}
             hitSlop={8}
           >
-            <FontAwesomeIcon icon={faUserShield} size={16} color="#B6A99A" />
+            <FontAwesomeIcon
+              icon={faUserShield}
+              size={20}
+              color={COLORS.textSecondary}
+            />
+            <Text style={styles.grownUpsLabel}>{t("grownUps")}</Text>
           </Pressable>
         )}
       </View>
@@ -239,135 +215,121 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingBottom: 8,
-    backgroundColor: "#FDFAF5",
+    backgroundColor: COLORS.bgCream,
     borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    borderBottomColor: COLORS.borderLight,
   },
-  indicatorsContainer: {
+
+  // Shared press feedback — gentle squish, kid-satisfying.
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.96 }],
+  },
+
+  // ─── Credits chip (left) ───
+  // Chunky rounded pill on white, vivid orange coin badge leading the
+  // number. The coin badge keeps the icon "alive" even at 0.
+  creditsChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 8,
+    minHeight: 44,
+    paddingLeft: 5,
+    paddingRight: 16,
+    paddingVertical: 5,
+    borderRadius: 24,
+    backgroundColor: COLORS.white,
+    shadowColor: COLORS.crayonOrangeDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  indicator: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  indicatorPressed: {
-    opacity: 0.7,
-    transform: [{ scale: 0.98 }],
-  },
-  indicatorValue: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 14,
-    color: "#374151",
-  },
-  challengeRing: {
-    padding: 4,
-  },
-  challengeRingOuter: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#FEE2E2",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-  challengeRingProgress: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 16,
-    borderWidth: 3,
-    borderColor: "#E46444",
-    borderLeftColor: "transparent",
-    borderBottomColor: "transparent",
-  },
-  challengeRingInner: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#FFFFFF",
+  coinBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: COLORS.crayonOrange,
     alignItems: "center",
     justifyContent: "center",
   },
+  creditsValue: {
+    fontFamily: FONTS.bold,
+    fontSize: 20,
+    color: COLORS.textPrimary,
+    includeFontPadding: false,
+  },
+
+  // ─── Right cluster ───
   rightSide: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  // Deliberately low-key — no white pill or shadow like the other
-  // header chips. A muted shield-person in a faint circle reads as a
-  // "for grown-ups" door kids skip past, not a fun tappable.
-  grownUpsButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(0, 0, 0, 0.04)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  profileSwitcher: {
+
+  // ─── Profile pill (right) ───
+  // Chunky rounded pill, avatar (40pt wrapper) + bold name, no chevron.
+  // Whole pill clears 44pt; the avatar evolves by stage as the progress
+  // indicator.
+  profilePill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    minHeight: 48,
     paddingLeft: 4,
-    paddingRight: 10,
+    paddingRight: 14,
     paddingVertical: 4,
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    borderRadius: 28,
+    backgroundColor: COLORS.white,
+    shadowColor: COLORS.textPrimary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  profileSwitcherPressed: {
-    opacity: 0.7,
-    transform: [{ scale: 0.98 }],
-  },
-  avatarContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  // Split-mode tap zones — sit inside the profile pill chrome so the
-  // pill still looks like one element while reading as two tap targets.
+  // Split-mode tap zones — sit inside the pill chrome so it still reads
+  // as one element while exposing two targets. ColoAvatar's own 40pt
+  // wrapper keeps the avatar half a comfortable kid target.
   coloTap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 20,
   },
-  profileTap: {
+  nameTap: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 4,
-    paddingVertical: 4,
+    minHeight: 44,
+    paddingHorizontal: 6,
+    justifyContent: "center",
   },
   profileName: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 14,
-    color: "#374151",
-    maxWidth: 80,
+    fontFamily: FONTS.bold,
+    fontSize: 17,
+    color: COLORS.textPrimary,
+    maxWidth: 96,
+    includeFontPadding: false,
+  },
+
+  // ─── "For Grown-ups" door ───
+  // A clear, labelled pill — shield + "For Grown-ups" — so an adult can
+  // actually find it (the bare lone icon read like an accident). Still
+  // calm vs the kid chips: muted neutral fill + secondary text, no playful
+  // colour, so it reads as a deliberate parent door, not a fun tappable.
+  grownUpsButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 12,
+    borderRadius: 22,
+    backgroundColor: "rgba(67, 52, 45, 0.06)",
+    justifyContent: "center",
+  },
+  grownUpsLabel: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    includeFontPadding: false,
   },
 });
 

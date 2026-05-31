@@ -18,6 +18,7 @@ const useHeaderData = () => {
     credits: user?.credits ?? 0,
     stickerCount: stickerStats.totalUnlocked,
     profileName: activeProfile?.name ?? "Artist",
+    avatarId: activeProfile?.avatarId ?? "ice-cream",
     coloStage: coloState.stage,
     // Challenge progress would need a separate API - for now show artwork-based progress
     challengeProgress: activeProfile
