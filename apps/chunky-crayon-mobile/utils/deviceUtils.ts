@@ -23,10 +23,10 @@ export type DeviceType = "phone" | "tablet";
  *   phone:        canvas + bottom-sheet drawer — narrow widths.
  *
  * Three-column chrome budget (matches getLandscapeSidebarWidths +
- * CANVAS_COLUMN_GAP in constants/Sizes.ts): left rail 150 + gap 16 +
- * right rail 100 + gap 16 = 282px. We require the canvas column to be at
+ * CANVAS_COLUMN_GAP in constants/Sizes.ts): left rail 160 + gap 16 +
+ * right rail 80 + gap 16 = 272px. We require the canvas column to be at
  * least THREE_COLUMN_MIN_CANVAS wide on top of that, so three-column needs
- * 282 + 480 = 762dp. Below that, anything wider than a phone gets the
+ * 272 + 480 = 752dp. Below that, anything wider than a phone gets the
  * toolbar-on-top middle layout. Recompute on every Dimensions change so
  * rotation + iPad split-view resizes re-tier live.
  */
@@ -35,8 +35,9 @@ export type ColoringTier = "phone" | "middle" | "three-column";
 // Phone → middle cutover (clears every iPhone portrait).
 const COLORING_TIER_MIDDLE_MIN = 700;
 // Chrome the two rails + their canvas gaps consume in three-column.
-// Keep in sync with getLandscapeSidebarWidths (150 + 100) + 2× CANVAS_COLUMN_GAP (16).
-const THREE_COLUMN_RAIL_CHROME = 150 + 16 + 100 + 16; // 282
+// Keep in sync with LEFT_RAIL_CARD_WIDTH (160) + RIGHT_RAIL_CARD_WIDTH (80)
+// + 2× CANVAS_COLUMN_GAP (16) in constants/Sizes.ts.
+const THREE_COLUMN_RAIL_CHROME = 160 + 16 + 80 + 16; // 272
 // Minimum canvas column width before three-column is worth it.
 const THREE_COLUMN_MIN_CANVAS = 480;
 const COLORING_TIER_THREE_COLUMN_MIN =
