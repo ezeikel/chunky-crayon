@@ -123,198 +123,203 @@ const ToolsSidebar = ({
   const zoomButtonSize = Math.max(40, tileSize - 8);
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          width,
-          paddingRight: insets.right + paddingHorizontal,
-          paddingLeft: paddingHorizontal,
-          paddingTop: insets.top + 12,
-          paddingBottom: insets.bottom + 12,
-        },
-      ]}
-    >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Regular tools — 3-column grid */}
-        <View style={[styles.toolGrid, { gap }]}>
-          {COLORING_REGULAR_TOOLS.map((config) => (
-            <ToolTile
-              key={config.id}
-              icon={config.icon}
-              label={config.label}
-              selected={isToolActive(config)}
-              size={tileSize}
-              onPress={() => handleToolSelect(config)}
-            />
-          ))}
-        </View>
+    <View style={[styles.outer, { width, paddingRight: insets.right + 8 }]}>
+      {/* Slim floating rail (web's DesktopToolsSidebar): a rounded card
+          vertically centered next to the canvas, single-column tool stack. */}
+      <View style={styles.rail}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Regular tools — single-column vertical stack (web slim rail) */}
+          <View style={[styles.toolColumn, { gap }]}>
+            {COLORING_REGULAR_TOOLS.map((config) => (
+              <ToolTile
+                key={config.id}
+                icon={config.icon}
+                label={config.label}
+                selected={isToolActive(config)}
+                size={tileSize}
+                onPress={() => handleToolSelect(config)}
+              />
+            ))}
+          </View>
 
-        {/* Magic tools — 2-up, gradient + sparkle */}
-        <View style={[styles.magicRow, { gap }]}>
-          {COLORING_MAGIC_TOOLS.map((config) => (
-            <ToolTile
-              key={config.id}
-              icon={config.icon}
-              label={config.label}
-              isMagic
-              selected={isToolActive(config)}
-              loading={!magicReady}
-              size={tileSize}
-              onPress={() => handleToolSelect(config)}
-            />
-          ))}
-        </View>
+          {/* Magic tools — stacked, gradient + sparkle */}
+          <View style={[styles.toolColumn, { gap }]}>
+            {COLORING_MAGIC_TOOLS.map((config) => (
+              <ToolTile
+                key={config.id}
+                icon={config.icon}
+                label={config.label}
+                isMagic
+                selected={isToolActive(config)}
+                loading={!magicReady}
+                size={tileSize}
+                onPress={() => handleToolSelect(config)}
+              />
+            ))}
+          </View>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        {/* Brush sizes */}
-        <BrushSizeRow
-          selectedRadius={brushSize}
-          onSelect={(radius) => {
-            tapLight();
-            setBrushSize(radius);
-          }}
-          color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
-          tileSize={tileSize}
-        />
-
-        <View style={styles.divider} />
-
-        {/* Undo / Redo */}
-        <View style={[styles.row, { gap }]}>
-          <Pressable
-            onPress={handleUndo}
-            disabled={!canUndo()}
-            style={[
-              styles.iconButton,
-              { width: tileSize, height: tileSize },
-              !canUndo() && styles.disabled,
-            ]}
-            accessibilityLabel="Undo"
-          >
-            <FontAwesomeIcon
-              icon={faArrowRotateLeft}
-              size={18}
-              color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
-            />
-          </Pressable>
-          <Pressable
-            onPress={handleRedo}
-            disabled={!canRedo()}
-            style={[
-              styles.iconButton,
-              { width: tileSize, height: tileSize },
-              !canRedo() && styles.disabled,
-            ]}
-            accessibilityLabel="Redo"
-          >
-            <FontAwesomeIcon
-              icon={faArrowRotateRight}
-              size={18}
-              color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
-            />
-          </Pressable>
-        </View>
-
-        <View style={styles.divider} />
-
-        {/* Zoom — ±, reset, and NN% readout (web's sidebar zoom). */}
-        <View style={[styles.row, { gap }]}>
-          <Pressable
-            onPress={() => {
+          {/* Brush sizes */}
+          <BrushSizeRow
+            selectedRadius={brushSize}
+            onSelect={(radius) => {
               tapLight();
-              onZoomOut?.();
+              setBrushSize(radius);
             }}
-            disabled={zoom <= minZoom}
-            style={[
-              styles.iconButton,
-              { width: zoomButtonSize, height: zoomButtonSize },
-              zoom <= minZoom && styles.disabled,
-            ]}
-            accessibilityLabel="Zoom out"
-          >
-            <FontAwesomeIcon
-              icon={faMagnifyingGlassMinus}
-              size={16}
-              color={zoom <= minZoom ? COLORS.textMuted : COLORS.textPrimary}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onZoomIn?.();
-            }}
-            disabled={zoom >= maxZoom}
-            style={[
-              styles.iconButton,
-              { width: zoomButtonSize, height: zoomButtonSize },
-              zoom >= maxZoom && styles.disabled,
-            ]}
-            accessibilityLabel="Zoom in"
-          >
-            <FontAwesomeIcon
-              icon={faMagnifyingGlassPlus}
-              size={16}
-              color={zoom >= maxZoom ? COLORS.textMuted : COLORS.textPrimary}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onResetZoom?.();
-            }}
-            style={[
-              styles.iconButton,
-              { width: zoomButtonSize, height: zoomButtonSize },
-            ]}
-            accessibilityLabel="Reset zoom"
-          >
-            <FontAwesomeIcon
-              icon={faExpand}
-              size={16}
-              color={COLORS.textPrimary}
-            />
-          </Pressable>
-        </View>
-        <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
-      </ScrollView>
+            color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
+            tileSize={tileSize}
+          />
+
+          <View style={styles.divider} />
+
+          {/* Undo / Redo */}
+          <View style={[styles.row, { gap }]}>
+            <Pressable
+              onPress={handleUndo}
+              disabled={!canUndo()}
+              style={[
+                styles.iconButton,
+                { width: tileSize, height: tileSize },
+                !canUndo() && styles.disabled,
+              ]}
+              accessibilityLabel="Undo"
+            >
+              <FontAwesomeIcon
+                icon={faArrowRotateLeft}
+                size={18}
+                color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
+              />
+            </Pressable>
+            <Pressable
+              onPress={handleRedo}
+              disabled={!canRedo()}
+              style={[
+                styles.iconButton,
+                { width: tileSize, height: tileSize },
+                !canRedo() && styles.disabled,
+              ]}
+              accessibilityLabel="Redo"
+            >
+              <FontAwesomeIcon
+                icon={faArrowRotateRight}
+                size={18}
+                color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
+              />
+            </Pressable>
+          </View>
+
+          <View style={styles.divider} />
+
+          {/* Zoom — ±, reset, and NN% readout (web's sidebar zoom). */}
+          <View style={[styles.row, { gap }]}>
+            <Pressable
+              onPress={() => {
+                tapLight();
+                onZoomOut?.();
+              }}
+              disabled={zoom <= minZoom}
+              style={[
+                styles.iconButton,
+                { width: zoomButtonSize, height: zoomButtonSize },
+                zoom <= minZoom && styles.disabled,
+              ]}
+              accessibilityLabel="Zoom out"
+            >
+              <FontAwesomeIcon
+                icon={faMagnifyingGlassMinus}
+                size={16}
+                color={zoom <= minZoom ? COLORS.textMuted : COLORS.textPrimary}
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                tapLight();
+                onZoomIn?.();
+              }}
+              disabled={zoom >= maxZoom}
+              style={[
+                styles.iconButton,
+                { width: zoomButtonSize, height: zoomButtonSize },
+                zoom >= maxZoom && styles.disabled,
+              ]}
+              accessibilityLabel="Zoom in"
+            >
+              <FontAwesomeIcon
+                icon={faMagnifyingGlassPlus}
+                size={16}
+                color={zoom >= maxZoom ? COLORS.textMuted : COLORS.textPrimary}
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                tapLight();
+                onResetZoom?.();
+              }}
+              style={[
+                styles.iconButton,
+                { width: zoomButtonSize, height: zoomButtonSize },
+              ]}
+              accessibilityLabel="Reset zoom"
+            >
+              <FontAwesomeIcon
+                icon={faExpand}
+                size={16}
+                color={COLORS.textPrimary}
+              />
+            </Pressable>
+          </View>
+          <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
+        </ScrollView>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  // Outer column: fixed width (from prop), never squeezed by the flex row,
+  // vertically centers the rail next to the canvas.
+  outer: {
+    flexShrink: 0,
+    justifyContent: "center",
+    alignItems: "stretch",
+    paddingVertical: 12,
+  },
+  // Slim floating rail card.
+  rail: {
+    flexShrink: 1,
     backgroundColor: COLORS.white,
-    borderLeftWidth: 2,
-    borderLeftColor: COLORS.bgCreamDark,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     shadowColor: "#000",
-    shadowOffset: { width: -2, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
   },
   scrollContent: {
     gap: 12,
+    alignItems: "center",
   },
-  toolGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  magicRow: {
-    flexDirection: "row",
+  toolColumn: {
+    flexDirection: "column",
+    alignItems: "center",
   },
   divider: {
     height: 1,
+    alignSelf: "stretch",
     backgroundColor: COLORS.bgCreamDark,
     marginVertical: 2,
   },
   row: {
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: "column",
+    alignItems: "center",
   },
   iconButton: {
     alignItems: "center",

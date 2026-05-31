@@ -77,21 +77,17 @@ export const getLandscapeSidebarWidths = (
 ): { leftWidth: number; rightWidth: number; canvasSize: number } => {
   const availableWidth = screenWidth - leftInset - rightInset;
 
-  // Size each side panel to ~22% of the available width, clamped to the
-  // min/max sidebar widths. Reads well on both wide-portrait and landscape
-  // tablets and always leaves a generous center column.
-  const sidebarWidth = Math.round(
-    Math.max(
-      TOOLBAR.minSidebarWidth,
-      Math.min(TOOLBAR.maxSidebarWidth, availableWidth * 0.22),
-    ),
-  );
+  // Slim floating rails (web's DesktopColorPalette / DesktopToolsSidebar):
+  // each rail holds a single-column stack of ~56px controls, so the rail
+  // only needs room for one tile + its padding. A fixed ~92px keeps the
+  // rails thin and lets the canvas dominate the center, matching web.
+  const railWidth = 92;
 
-  const leftWidth = sidebarWidth + leftInset;
-  const rightWidth = sidebarWidth + rightInset;
+  const leftWidth = railWidth + leftInset;
+  const rightWidth = railWidth + rightInset;
 
-  // Canvas column is the remaining horizontal space between the two panels.
-  const canvasSize = Math.max(0, availableWidth - sidebarWidth * 2);
+  // Canvas column is the remaining horizontal space between the two rails.
+  const canvasSize = Math.max(0, availableWidth - railWidth * 2);
 
   return { leftWidth, rightWidth, canvasSize };
 };

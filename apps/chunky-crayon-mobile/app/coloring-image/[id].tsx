@@ -413,8 +413,9 @@ const styles = StyleSheet.create({
   },
   canvasCenter: {
     flex: 1,
+    minWidth: 0,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "stretch",
     paddingVertical: 8,
   },
   canvasCardLandscape: {
