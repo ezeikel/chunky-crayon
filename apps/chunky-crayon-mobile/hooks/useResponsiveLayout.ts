@@ -115,28 +115,11 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
     [effectiveLayoutMode],
   );
 
-  // Available canvas area
-  const canvasArea = useMemo(
-    () =>
-      getAvailableCanvasArea(
-        deviceInfo.screenWidth,
-        deviceInfo.screenHeight,
-        effectiveLayoutMode,
-        sideToolbarExpanded,
-      ),
-    [
-      deviceInfo.screenWidth,
-      deviceInfo.screenHeight,
-      effectiveLayoutMode,
-      sideToolbarExpanded,
-    ],
-  );
-
-  // Sidebar/canvas widths for the three-column layout. Computed whenever
-  // the coloring tier wants sidebars (three-column tier — and, until the
-  // dedicated middle-tier UI lands, the middle tier reuses it too), not
-  // gated on orientation any more.
-  const wantsSidebars = coloringTier !== "phone";
+  // Sidebar/canvas widths for the three-column tier ONLY. The middle tier
+  // has its own toolbar-above-canvas (no sidebars) and the phone tier uses
+  // the bottom sheet, so sidebars are exclusively a three-column concern.
+  // (Declared before canvasArea — canvasArea reads landscapeLayout.)
+  const wantsSidebars = coloringTier === "three-column";
   const landscapeLayout = useMemo(() => {
     if (!wantsSidebars) return null;
 
@@ -153,6 +136,32 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
       canvasSize,
     };
   }, [deviceInfo.screenWidth, deviceInfo.screenHeight, wantsSidebars]);
+
+  // Available canvas area. In the three-column tier the canvas lives in the
+  // center column between the two sidebars, so its width is the column width
+  // (NOT the full screen width — the old orientation helper returned full
+  // width in portrait, letting the canvas spill under the sidebars). For the
+  // middle / phone tiers the canvas spans full width via the existing helper.
+  const canvasArea = useMemo(() => {
+    if (landscapeLayout) {
+      return {
+        width: landscapeLayout.canvasSize,
+        height: deviceInfo.screenHeight,
+      };
+    }
+    return getAvailableCanvasArea(
+      deviceInfo.screenWidth,
+      deviceInfo.screenHeight,
+      effectiveLayoutMode,
+      sideToolbarExpanded,
+    );
+  }, [
+    landscapeLayout,
+    deviceInfo.screenWidth,
+    deviceInfo.screenHeight,
+    effectiveLayoutMode,
+    sideToolbarExpanded,
+  ]);
 
   return {
     deviceInfo,

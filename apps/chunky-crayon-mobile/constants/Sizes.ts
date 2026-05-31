@@ -51,10 +51,23 @@ export const TOOLBAR = {
 } as const;
 
 /**
- * Calculate dynamic sidebar widths for landscape three-panel layout.
- * Canvas is always square, sidebars split remaining horizontal space equally.
+ * Calculate sidebar + canvas widths for the three-column coloring layout.
  *
  * Layout: [Left Sidebar] [Canvas] [Right Sidebar]
+ *
+ * The side panels are sized FIRST (a clamped fraction of the available
+ * width), and the canvas column takes whatever horizontal space is left
+ * between them. ImageCanvas keeps the SVG square within that column, so the
+ * canvas never needs to drive the sidebar width.
+ *
+ * The previous implementation sized the canvas as a square fit to HEIGHT,
+ * then gave the sidebars `(screenWidth - canvasSize) / 2`. That only works
+ * in landscape (width > height). In a wide PORTRAIT three-column tier (e.g.
+ * iPad Pro 13" portrait, 1032×1376) the height-fit canvas (~1290) exceeded
+ * the screen width, so `remainingWidth` went negative and both sidebars
+ * clamped to the 80px minimum — they collapsed to thin strips and the
+ * square canvas spilled past both screen edges. Sizing the panels first
+ * (off width, not height) fixes both orientations.
  */
 export const getLandscapeSidebarWidths = (
   screenWidth: number,
@@ -62,39 +75,23 @@ export const getLandscapeSidebarWidths = (
   leftInset: number = 0,
   rightInset: number = 0,
 ): { leftWidth: number; rightWidth: number; canvasSize: number } => {
-  // Canvas is square, sized to fit available height (minus header and bottom padding)
-  const headerHeight = HEADER.compact;
-  const bottomPadding = 16; // Minimal bottom margin
-  const topPadding = 8;
-  const canvasVerticalPadding = 16; // Padding around canvas card
+  const availableWidth = screenWidth - leftInset - rightInset;
 
-  const availableHeight =
-    screenHeight -
-    headerHeight -
-    bottomPadding -
-    topPadding -
-    canvasVerticalPadding * 2;
-  const canvasSize = Math.floor(availableHeight);
-
-  // Remaining horizontal space split between sidebars
-  const horizontalPadding = 8; // Small padding between canvas and sidebars
-  const remainingWidth = screenWidth - canvasSize - horizontalPadding * 2;
-
-  // Each sidebar gets half, accounting for safe area insets
-  const leftWidth = Math.max(
-    TOOLBAR.minSidebarWidth,
-    Math.min(
-      TOOLBAR.maxSidebarWidth,
-      Math.floor(remainingWidth / 2) + leftInset,
+  // Size each side panel to ~22% of the available width, clamped to the
+  // min/max sidebar widths. Reads well on both wide-portrait and landscape
+  // tablets and always leaves a generous center column.
+  const sidebarWidth = Math.round(
+    Math.max(
+      TOOLBAR.minSidebarWidth,
+      Math.min(TOOLBAR.maxSidebarWidth, availableWidth * 0.22),
     ),
   );
-  const rightWidth = Math.max(
-    TOOLBAR.minSidebarWidth,
-    Math.min(
-      TOOLBAR.maxSidebarWidth,
-      Math.floor(remainingWidth / 2) + rightInset,
-    ),
-  );
+
+  const leftWidth = sidebarWidth + leftInset;
+  const rightWidth = sidebarWidth + rightInset;
+
+  // Canvas column is the remaining horizontal space between the two panels.
+  const canvasSize = Math.max(0, availableWidth - sidebarWidth * 2);
 
   return { leftWidth, rightWidth, canvasSize };
 };
