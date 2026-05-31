@@ -7,6 +7,7 @@ import {
   Pressable,
   ActivityIndicator,
   ScrollView,
+  Linking,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -21,6 +22,13 @@ import {
   formatAnnualMonthlyPrice,
   getPackagePlanName,
 } from "@/hooks/usePaywall";
+import {
+  PLAN_DISPLAY_ORDER,
+  PLAN_DISPLAY_NAMES,
+  PLAN_TAGLINES,
+  PLAN_FEATURES,
+  RECOMMENDED_PLAN,
+} from "@/lib/paywall/plans";
 
 /**
  * SubscriptionPaywallModal — the primary mobile paywall.
@@ -38,10 +46,12 @@ import {
  * two — see ~/.claude/plans/mobile-paywall-scaffold.md).
  *
  * Prices come from the store (App Store / Play Store via RevenueCat).
- * The only thing hardcoded is which plan gets the "Most Popular" badge
- * (Rainbow — matches CC web). Credit grants per plan come from
- * `product.metadata.credits` first, fall back to a built-in map.
- * Same pattern as TopUpPackModal / ColorAsYouGoModal.
+ * Plan copy (names, taglines, feature bullets, the "Most Popular" plan)
+ * and the credits-from-metadata helper all live in the shared
+ * `lib/paywall/plans.ts` so there's a single source of truth — there
+ * used to be two diverged copies (this modal vs the now-retired
+ * `Paywall`). Credit grants per plan come from `product.metadata.credits`
+ * first, falling back to the per-plan default in that module.
  */
 
 type SubscriptionPaywallModalProps = {
@@ -58,49 +68,6 @@ type SubscriptionPaywallModalProps = {
 };
 
 type BillingCycle = "monthly" | "annual";
-
-const CREDITS_PER_PLAN_FALLBACK: Record<string, number> = {
-  SPLASH: 250,
-  RAINBOW: 500,
-  SPARKLE: 1000,
-};
-
-function getCreditsForPlan(pkg: PurchasesPackage): number {
-  const meta = (
-    pkg.product as PurchasesPackage["product"] & {
-      metadata?: Record<string, unknown>;
-    }
-  ).metadata;
-  const fromMetadata = meta?.credits;
-  if (fromMetadata != null) {
-    const parsed = Number(fromMetadata);
-    if (Number.isFinite(parsed) && parsed > 0) return parsed;
-  }
-  return CREDITS_PER_PLAN_FALLBACK[getPackagePlanName(pkg)] ?? 0;
-}
-
-const PLAN_DISPLAY_ORDER = ["SPLASH", "RAINBOW", "SPARKLE"] as const;
-
-const PLAN_COPY: Record<
-  string,
-  { title: string; tagline: string; isBestValue: boolean }
-> = {
-  SPLASH: {
-    title: "Splash",
-    tagline: "For casual colorers and young artists",
-    isBestValue: false,
-  },
-  RAINBOW: {
-    title: "Rainbow",
-    tagline: "Fun for the whole family",
-    isBestValue: true,
-  },
-  SPARKLE: {
-    title: "Sparkle",
-    tagline: "For color enthusiasts",
-    isBestValue: false,
-  },
-};
 
 const SubscriptionPaywallModal = ({
   visible,
@@ -204,6 +171,15 @@ const SubscriptionPaywallModal = ({
               </View>
             </Pressable>
           </View>
+
+          {/* Free-trial banner — every plan starts with a 7-day trial
+              (ported from the retired Paywall so the trial messaging
+              isn't lost). */}
+          <View style={styles.trialBanner}>
+            <Text style={styles.trialBannerText}>
+              7-day free trial on all plans — cancel anytime
+            </Text>
+          </View>
         </View>
 
         <ScrollView contentContainerStyle={styles.scroll}>
@@ -219,8 +195,7 @@ const SubscriptionPaywallModal = ({
                 const pkg = cycle === "annual" ? plans?.annual : plans?.monthly;
                 if (!pkg) return null;
 
-                const copy = PLAN_COPY[planName];
-                const credits = getCreditsForPlan(pkg);
+                const isBestValue = planName === RECOMMENDED_PLAN;
                 const annualMonthlyPrice = formatAnnualMonthlyPrice(pkg);
 
                 return (
@@ -228,12 +203,12 @@ const SubscriptionPaywallModal = ({
                     key={planName}
                     style={[
                       styles.planCard,
-                      copy.isBestValue && styles.bestValuePlanCard,
+                      isBestValue && styles.bestValuePlanCard,
                     ]}
                     onPress={() => handlePurchase(pkg)}
                     disabled={isPurchasing}
                   >
-                    {copy.isBestValue && (
+                    {isBestValue && (
                       <View style={styles.bestValueBadge}>
                         <FontAwesomeIcon
                           icon={faStar}
@@ -244,8 +219,12 @@ const SubscriptionPaywallModal = ({
                       </View>
                     )}
 
-                    <Text style={styles.planTitle}>{copy.title}</Text>
-                    <Text style={styles.planTagline}>{copy.tagline}</Text>
+                    <Text style={styles.planTitle}>
+                      {PLAN_DISPLAY_NAMES[planName]}
+                    </Text>
+                    <Text style={styles.planTagline}>
+                      {PLAN_TAGLINES[planName]}
+                    </Text>
 
                     <View style={styles.planPriceRow}>
                       <Text style={styles.planPrice}>
@@ -261,15 +240,19 @@ const SubscriptionPaywallModal = ({
                       </Text>
                     )}
 
-                    <View style={styles.planFeatureRow}>
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        size={14}
-                        color="#22C55E"
-                      />
-                      <Text style={styles.planFeatureText}>
-                        {credits} credits / month
-                      </Text>
+                    {/* Full per-plan feature list (ported from the
+                        retired Paywall — was a single credits line). */}
+                    <View style={styles.planFeatures}>
+                      {PLAN_FEATURES[planName].map((feature) => (
+                        <View key={feature} style={styles.planFeatureRow}>
+                          <FontAwesomeIcon
+                            icon={faCheck}
+                            size={14}
+                            color="#22C55E"
+                          />
+                          <Text style={styles.planFeatureText}>{feature}</Text>
+                        </View>
+                      ))}
                     </View>
                   </Pressable>
                 );
@@ -293,6 +276,23 @@ const SubscriptionPaywallModal = ({
             Subscriptions renew automatically. Cancel anytime in{" "}
             <Text style={styles.legalBold}>Settings</Text>.
           </Text>
+
+          {/* Terms / Privacy links (ported from the retired Paywall). */}
+          <View style={styles.legalLinks}>
+            <Pressable
+              onPress={() => Linking.openURL("https://chunkycrayon.com/terms")}
+            >
+              <Text style={styles.legalLink}>Terms of Service</Text>
+            </Pressable>
+            <Text style={styles.legalDot}>&middot;</Text>
+            <Pressable
+              onPress={() =>
+                Linking.openURL("https://chunkycrayon.com/privacy")
+              }
+            >
+              <Text style={styles.legalLink}>Privacy Policy</Text>
+            </Pressable>
+          </View>
         </ScrollView>
 
         {isPurchasing && (
@@ -383,6 +383,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#FFFFFF",
   },
+  trialBanner: {
+    backgroundColor: "#F0EBFF",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 12,
+    alignSelf: "center",
+  },
+  trialBannerText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 14,
+    color: "#7C3AED",
+    textAlign: "center",
+  },
   scroll: {
     paddingHorizontal: 24,
     paddingBottom: 32,
@@ -455,11 +469,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#7A6F66",
   },
+  planFeatures: {
+    marginTop: 8,
+    gap: 6,
+  },
   planFeatureRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    marginTop: 6,
   },
   planFeatureText: {
     fontFamily: "TondoTrial-Regular",
@@ -499,6 +516,22 @@ const styles = StyleSheet.create({
   legalBold: {
     fontFamily: "TondoTrial-Bold",
     color: "#7A6F66",
+  },
+  legalLinks: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 4,
+  },
+  legalLink: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 13,
+    color: "#7C3AED",
+  },
+  legalDot: {
+    fontSize: 13,
+    color: "#9CA3AF",
   },
   loadingOverlay: {
     position: "absolute",
