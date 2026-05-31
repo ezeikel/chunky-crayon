@@ -14,6 +14,7 @@ import Svg, { Circle } from "react-native-svg";
 import * as Haptics from "expo-haptics";
 import type { ColoStage, ColoState } from "@/lib/colo";
 import { COLO_STAGES } from "@/lib/colo";
+import { COLO_STAGE_IMAGES } from "@/lib/colo/colo-images";
 import {
   COLORS,
   COLO_STAGE_COLORS,
@@ -112,8 +113,11 @@ const ColoAvatar = ({
   const stageInfo = COLO_STAGES[stage];
   const stageColors = COLO_STAGE_COLORS[stage];
 
-  // Check if SVG exists - for now use placeholder
-  const showPlaceholder = true; // Will be false when we have actual images
+  // Real bundled Colo illustration for this stage (same art as web). Falls
+  // back to the gradient+number placeholder only if a stage somehow has no
+  // mapped image.
+  const stageImage = COLO_STAGE_IMAGES[stage];
+  const showPlaceholder = stageImage == null;
 
   // Determine if we need the larger wrapper for progress ring
   const hasProgress = showProgress && coloState?.progressToNext;
@@ -265,9 +269,9 @@ const ColoAvatar = ({
               </Text>
             </LinearGradient>
           ) : (
-            /* Actual Colo image - will be used when we have images */
+            /* Real bundled Colo illustration for this stage. */
             <Image
-              source={{ uri: stageInfo.imagePath }}
+              source={stageImage}
               style={styles.coloImage}
               contentFit="cover"
               transition={200}
