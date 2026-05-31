@@ -1,107 +1,24 @@
 import { useCallback } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
-  faPencil,
-  faPaintbrush,
-  faFillDrip,
-  faSparkles,
-  faStar,
-  faRainbow,
-  faBrush,
   faArrowRotateLeft,
   faArrowRotateRight,
-  faEraser,
-  faToolbox,
-  faRuler,
-  faClockRotateLeft,
   faMagnifyingGlassPlus,
   faMagnifyingGlassMinus,
   faExpand,
 } from "@fortawesome/pro-duotone-svg-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import {
-  useCanvasStore,
-  Tool,
-  BrushType,
-  MagicMode,
-} from "@/stores/canvasStore";
+import { useCanvasStore } from "@/stores/canvasStore";
 import { tapLight, tapMedium, notifyWarning } from "@/utils/haptics";
-import { BRUSH_SIZES } from "@/constants/Colors";
-import { COLORS, CRAYON } from "@/lib/design";
-
-type ToolConfig = {
-  id: string;
-  tool: Tool;
-  brushType?: BrushType;
-  magicMode?: MagicMode;
-  label: string;
-  icon: IconDefinition;
-  isMagic?: boolean;
-};
-
-// Kids regular tools (matching web's ToolSelector KIDS_TOOL_IDS — minus
-// the magic-auto which lives in the featured magic row below). Web removed
-// glow/neon/glitter (confusing UX), so they're dropped here too.
-const regularTools: ToolConfig[] = [
-  {
-    id: "crayon",
-    tool: "brush",
-    brushType: "crayon",
-    label: "Crayon",
-    icon: faPencil,
-  },
-  {
-    id: "marker",
-    tool: "brush",
-    brushType: "marker",
-    label: "Marker",
-    icon: faPaintbrush,
-  },
-  {
-    id: "rainbow",
-    tool: "brush",
-    brushType: "rainbow",
-    label: "Rainbow",
-    icon: faRainbow,
-  },
-  { id: "fill", tool: "fill", label: "Fill", icon: faFillDrip },
-  { id: "eraser", tool: "eraser", label: "Eraser", icon: faEraser },
-  { id: "sticker", tool: "sticker", label: "Sticker", icon: faStar },
-];
-
-// Featured magic tools (web shows these with labels + the magic gradient).
-const magicTools: ToolConfig[] = [
-  {
-    id: "magic-auto",
-    tool: "magic",
-    magicMode: "auto",
-    label: "Auto Color",
-    icon: faBrush,
-    isMagic: true,
-  },
-];
-
-// Brush sizes (matching web)
-const brushSizes: { label: string; value: number; radius: number }[] = [
-  { label: "S", value: BRUSH_SIZES.small, radius: BRUSH_SIZES.small },
-  { label: "M", value: BRUSH_SIZES.medium, radius: BRUSH_SIZES.medium },
-  { label: "L", value: BRUSH_SIZES.large, radius: BRUSH_SIZES.large },
-  {
-    label: "XL",
-    value: BRUSH_SIZES.extraLarge,
-    radius: BRUSH_SIZES.extraLarge,
-  },
-];
+import { COLORS } from "@/lib/design";
+import ToolTile from "@/components/coloring/ToolTile";
+import BrushSizeRow from "@/components/coloring/BrushSizeRow";
+import {
+  COLORING_REGULAR_TOOLS,
+  COLORING_MAGIC_TOOLS,
+  type ColoringToolConfig,
+} from "@/lib/coloring/tools";
 
 type ToolsSidebarProps = {
   /** Width of the sidebar */
@@ -117,13 +34,11 @@ type ToolsSidebarProps = {
 };
 
 /**
- * Right sidebar tools panel for landscape layouts.
- * Matches web's DesktopToolsSidebar with sections:
- * - Tools (4-column grid)
- * - Magic Tools (featured with labels)
- * - Brush Size
- * - Undo/Redo
- * - Zoom Controls
+ * Right tools sidebar for the three-column coloring layout — mirrors CC
+ * web's DesktopToolsSidebar: a 3-column grid of regular tools, a 2-up row
+ * of magic tiles (purple→pink gradient + sparkle), brush sizes, undo/redo,
+ * and zoom (±, reset, and a NN% readout). Built on the shared ToolTile /
+ * BrushSizeRow primitives so the look matches web exactly.
  */
 const ToolsSidebar = ({
   width,
@@ -154,23 +69,19 @@ const ToolsSidebar = ({
   } = useCanvasStore();
 
   const handleToolSelect = useCallback(
-    (config: ToolConfig) => {
+    (config: ColoringToolConfig) => {
       // Magic tools need the region store; ignore taps until ready.
       if (config.isMagic && !magicReady) return;
       tapLight();
       setTool(config.tool);
-      if (config.brushType) {
-        setBrushType(config.brushType);
-      }
-      if (config.magicMode) {
-        setMagicMode(config.magicMode);
-      }
+      if (config.brushType) setBrushType(config.brushType);
+      if (config.magicMode) setMagicMode(config.magicMode);
     },
     [setTool, setBrushType, setMagicMode, magicReady],
   );
 
   const isToolActive = useCallback(
-    (config: ToolConfig) => {
+    (config: ColoringToolConfig) => {
       if (config.tool === "magic") {
         return selectedTool === "magic" && magicMode === config.magicMode;
       }
@@ -200,12 +111,16 @@ const ToolsSidebar = ({
     }
   };
 
-  // Calculate button size based on width (4-column grid with gaps)
+  // 3-column tool grid (web's DesktopToolsSidebar). Tile size from the
+  // available width; clamp so tiles stay chunky but fit.
   const paddingHorizontal = 12;
-  const gap = 6;
+  const gap = 8;
   const availableWidth = width - paddingHorizontal * 2 - insets.right;
-  const buttonSize = Math.floor((availableWidth - gap * 3) / 4);
-  const clampedButtonSize = Math.max(32, Math.min(buttonSize, 48));
+  const tileSize = Math.max(
+    44,
+    Math.min(Math.floor((availableWidth - gap * 2) / 3), 64),
+  );
+  const zoomButtonSize = Math.max(40, tileSize - 8);
 
   return (
     <View
@@ -224,304 +139,148 @@ const ToolsSidebar = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Tools Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
+        {/* Regular tools — 3-column grid */}
+        <View style={[styles.toolGrid, { gap }]}>
+          {COLORING_REGULAR_TOOLS.map((config) => (
+            <ToolTile
+              key={config.id}
+              icon={config.icon}
+              label={config.label}
+              selected={isToolActive(config)}
+              size={tileSize}
+              onPress={() => handleToolSelect(config)}
+            />
+          ))}
+        </View>
+
+        {/* Magic tools — 2-up, gradient + sparkle */}
+        <View style={[styles.magicRow, { gap }]}>
+          {COLORING_MAGIC_TOOLS.map((config) => (
+            <ToolTile
+              key={config.id}
+              icon={config.icon}
+              label={config.label}
+              isMagic
+              selected={isToolActive(config)}
+              loading={!magicReady}
+              size={tileSize}
+              onPress={() => handleToolSelect(config)}
+            />
+          ))}
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Brush sizes */}
+        <BrushSizeRow
+          selectedRadius={brushSize}
+          onSelect={(radius) => {
+            tapLight();
+            setBrushSize(radius);
+          }}
+          color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
+          tileSize={tileSize}
+        />
+
+        <View style={styles.divider} />
+
+        {/* Undo / Redo */}
+        <View style={[styles.row, { gap }]}>
+          <Pressable
+            onPress={handleUndo}
+            disabled={!canUndo()}
+            style={[
+              styles.iconButton,
+              { width: tileSize, height: tileSize },
+              !canUndo() && styles.disabled,
+            ]}
+            accessibilityLabel="Undo"
+          >
             <FontAwesomeIcon
-              icon={faToolbox}
+              icon={faArrowRotateLeft}
+              size={18}
+              color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
+            />
+          </Pressable>
+          <Pressable
+            onPress={handleRedo}
+            disabled={!canRedo()}
+            style={[
+              styles.iconButton,
+              { width: tileSize, height: tileSize },
+              !canRedo() && styles.disabled,
+            ]}
+            accessibilityLabel="Redo"
+          >
+            <FontAwesomeIcon
+              icon={faArrowRotateRight}
+              size={18}
+              color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
+            />
+          </Pressable>
+        </View>
+
+        <View style={styles.divider} />
+
+        {/* Zoom — ±, reset, and NN% readout (web's sidebar zoom). */}
+        <View style={[styles.row, { gap }]}>
+          <Pressable
+            onPress={() => {
+              tapLight();
+              onZoomOut?.();
+            }}
+            disabled={zoom <= minZoom}
+            style={[
+              styles.iconButton,
+              { width: zoomButtonSize, height: zoomButtonSize },
+              zoom <= minZoom && styles.disabled,
+            ]}
+            accessibilityLabel="Zoom out"
+          >
+            <FontAwesomeIcon
+              icon={faMagnifyingGlassMinus}
               size={16}
-              color={COLORS.crayonOrange}
-              secondaryColor={COLORS.crayonPeach}
-              secondaryOpacity={1}
+              color={zoom <= minZoom ? COLORS.textMuted : COLORS.textPrimary}
             />
-            <Text style={styles.sectionTitle}>Tools</Text>
-          </View>
-
-          {/* Regular Tool Grid - 4 columns */}
-          <View style={[styles.toolGrid, { gap }]}>
-            {regularTools.map((config) => {
-              const isActive = isToolActive(config);
-              return (
-                <Pressable
-                  key={config.id}
-                  onPress={() => handleToolSelect(config)}
-                  style={[
-                    styles.toolButton,
-                    {
-                      width: clampedButtonSize,
-                      height: clampedButtonSize,
-                    },
-                    isActive ? styles.toolButtonActive : styles.toolButtonIdle,
-                  ]}
-                  accessibilityLabel={config.label}
-                >
-                  <FontAwesomeIcon
-                    icon={config.icon}
-                    size={clampedButtonSize * 0.45}
-                    color={isActive ? "#FFFFFF" : COLORS.textPrimary}
-                    secondaryColor={
-                      isActive ? "rgba(255,255,255,0.85)" : COLORS.crayonPeach
-                    }
-                    secondaryOpacity={1}
-                  />
-                </Pressable>
-              );
-            })}
-          </View>
-
-          {/* Magic Tools - Full width with labels */}
-          <View style={[styles.magicToolsContainer, { gap: 6 }]}>
-            {magicTools.map((config) => {
-              const isActive = isToolActive(config);
-              return (
-                <Pressable
-                  key={config.id}
-                  onPress={() => handleToolSelect(config)}
-                  disabled={!magicReady}
-                  accessibilityLabel={
-                    magicReady
-                      ? config.label
-                      : `${config.label} (getting ready)`
-                  }
-                  accessibilityState={{ disabled: !magicReady }}
-                  style={!magicReady && styles.magicToolDisabled}
-                >
-                  <LinearGradient
-                    colors={
-                      isActive
-                        ? [CRAYON.purple.base, CRAYON.pink.base]
-                        : [`${CRAYON.purple.base}1F`, `${CRAYON.pink.base}1F`]
-                    }
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.magicToolButton}
-                  >
-                    {magicReady ? (
-                      <FontAwesomeIcon
-                        icon={config.icon}
-                        size={16}
-                        color={isActive ? "#FFFFFF" : CRAYON.purple.base}
-                        secondaryColor={
-                          isActive ? "rgba(255,255,255,0.85)" : CRAYON.pink.base
-                        }
-                        secondaryOpacity={1}
-                      />
-                    ) : (
-                      <ActivityIndicator
-                        size="small"
-                        color={CRAYON.purple.base}
-                      />
-                    )}
-                    <Text
-                      style={[
-                        styles.magicToolLabel,
-                        isActive && styles.magicToolLabelActive,
-                      ]}
-                    >
-                      {magicReady ? config.label : "Getting ready…"}
-                    </Text>
-                    {magicReady && (
-                      <FontAwesomeIcon
-                        icon={faSparkles}
-                        size={13}
-                        color={isActive ? "#FFFFFF" : CRAYON.purple.base}
-                        secondaryColor={CRAYON.pink.base}
-                        secondaryOpacity={1}
-                      />
-                    )}
-                  </LinearGradient>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Brush Size Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <FontAwesomeIcon
-              icon={faRuler}
-              size={14}
-              color={COLORS.crayonOrange}
-              secondaryColor={COLORS.crayonPeach}
-              secondaryOpacity={1}
-            />
-            <Text style={styles.sectionTitle}>Size</Text>
-          </View>
-
-          <View style={[styles.sizeRow, { gap }]}>
-            {brushSizes.map((size) => {
-              const isSelected = brushSize === size.value;
-              const displayColor =
-                selectedTool === "eraser" ? "#9E9E9E" : selectedColor;
-              const dotSize = Math.min(size.radius * 1.5, 24);
-
-              return (
-                <Pressable
-                  key={size.label}
-                  onPress={() => {
-                    tapLight();
-                    setBrushSize(size.value);
-                  }}
-                  style={[
-                    styles.sizeButton,
-                    {
-                      width: clampedButtonSize,
-                      height: clampedButtonSize,
-                    },
-                    isSelected && styles.sizeButtonActive,
-                  ]}
-                  accessibilityLabel={size.label}
-                >
-                  <View
-                    style={[
-                      styles.sizeDot,
-                      {
-                        width: dotSize,
-                        height: dotSize,
-                        borderRadius: dotSize / 2,
-                        backgroundColor: displayColor,
-                      },
-                    ]}
-                  />
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Undo/Redo Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <FontAwesomeIcon
-              icon={faClockRotateLeft}
-              size={14}
-              color={COLORS.crayonOrange}
-              secondaryColor={COLORS.crayonPeach}
-              secondaryOpacity={1}
-            />
-            <Text style={styles.sectionTitle}>History</Text>
-          </View>
-
-          <View style={[styles.historyRow, { gap }]}>
-            <Pressable
-              onPress={handleUndo}
-              disabled={!canUndo()}
-              style={[
-                styles.historyButton,
-                { width: clampedButtonSize, height: clampedButtonSize },
-                !canUndo() && styles.historyButtonDisabled,
-              ]}
-              accessibilityLabel="Undo"
-            >
-              <FontAwesomeIcon
-                icon={faArrowRotateLeft}
-                size={16}
-                color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
-              />
-            </Pressable>
-            <Pressable
-              onPress={handleRedo}
-              disabled={!canRedo()}
-              style={[
-                styles.historyButton,
-                { width: clampedButtonSize, height: clampedButtonSize },
-                !canRedo() && styles.historyButtonDisabled,
-              ]}
-              accessibilityLabel="Redo"
-            >
-              <FontAwesomeIcon
-                icon={faArrowRotateRight}
-                size={16}
-                color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
-              />
-            </Pressable>
-          </View>
-        </View>
-
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Zoom Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              tapLight();
+              onZoomIn?.();
+            }}
+            disabled={zoom >= maxZoom}
+            style={[
+              styles.iconButton,
+              { width: zoomButtonSize, height: zoomButtonSize },
+              zoom >= maxZoom && styles.disabled,
+            ]}
+            accessibilityLabel="Zoom in"
+          >
             <FontAwesomeIcon
               icon={faMagnifyingGlassPlus}
-              size={14}
-              color={COLORS.crayonOrange}
-              secondaryColor={COLORS.crayonPeach}
-              secondaryOpacity={1}
+              size={16}
+              color={zoom >= maxZoom ? COLORS.textMuted : COLORS.textPrimary}
             />
-            <Text style={styles.sectionTitle}>Zoom</Text>
-          </View>
-
-          <View style={[styles.zoomRow, { gap }]}>
-            <Pressable
-              onPress={() => {
-                tapLight();
-                onZoomOut?.();
-              }}
-              disabled={zoom <= minZoom}
-              style={[
-                styles.zoomButton,
-                { width: clampedButtonSize - 4, height: clampedButtonSize - 4 },
-                zoom <= minZoom && styles.zoomButtonDisabled,
-              ]}
-              accessibilityLabel="Zoom Out"
-            >
-              <FontAwesomeIcon
-                icon={faMagnifyingGlassMinus}
-                size={14}
-                color={zoom <= minZoom ? COLORS.textMuted : COLORS.textPrimary}
-              />
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                tapLight();
-                onZoomIn?.();
-              }}
-              disabled={zoom >= maxZoom}
-              style={[
-                styles.zoomButton,
-                { width: clampedButtonSize - 4, height: clampedButtonSize - 4 },
-                zoom >= maxZoom && styles.zoomButtonDisabled,
-              ]}
-              accessibilityLabel="Zoom In"
-            >
-              <FontAwesomeIcon
-                icon={faMagnifyingGlassPlus}
-                size={14}
-                color={zoom >= maxZoom ? COLORS.textMuted : COLORS.textPrimary}
-              />
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                tapLight();
-                onResetZoom?.();
-              }}
-              style={[
-                styles.zoomButton,
-                { width: clampedButtonSize - 4, height: clampedButtonSize - 4 },
-              ]}
-              accessibilityLabel="Reset Zoom"
-            >
-              <FontAwesomeIcon
-                icon={faExpand}
-                size={14}
-                color={COLORS.textPrimary}
-              />
-            </Pressable>
-          </View>
-
-          {/* Zoom percentage */}
-          <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              tapLight();
+              onResetZoom?.();
+            }}
+            style={[
+              styles.iconButton,
+              { width: zoomButtonSize, height: zoomButtonSize },
+            ]}
+            accessibilityLabel="Reset zoom"
+          >
+            <FontAwesomeIcon
+              icon={faExpand}
+              size={16}
+              color={COLORS.textPrimary}
+            />
+          </Pressable>
         </View>
+        <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
       </ScrollView>
     </View>
   );
@@ -541,121 +300,39 @@ const styles = StyleSheet.create({
   scrollContent: {
     gap: 12,
   },
-  section: {
-    gap: 8,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    fontFamily: "TondoTrial-Bold",
-    color: COLORS.textPrimary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: COLORS.bgCreamDark,
-    marginVertical: 4,
-  },
   toolGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
   },
-  toolButton: {
+  magicRow: {
+    flexDirection: "row",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.bgCreamDark,
+    marginVertical: 2,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  iconButton: {
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 16,
-    borderWidth: 2,
-  },
-  toolButtonIdle: {
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.bgCreamDark,
-  },
-  toolButtonActive: {
-    backgroundColor: COLORS.crayonOrange,
-    borderColor: COLORS.crayonOrange,
-  },
-  magicToolsContainer: {
-    marginTop: 6,
-  },
-  magicToolButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-  },
-  magicToolDisabled: {
-    opacity: 0.6,
-  },
-  magicToolLabel: {
-    flex: 1,
-    fontSize: 12,
-    fontFamily: "TondoTrial-Bold",
-    color: CRAYON.purple.dark,
-  },
-  magicToolLabelActive: {
-    color: "#FFFFFF",
-  },
-  sizeRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  sizeButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 16,
+    borderRadius: 24,
     borderWidth: 2,
     borderColor: COLORS.bgCreamDark,
     backgroundColor: COLORS.white,
   },
-  sizeButtonActive: {
-    backgroundColor: COLORS.crayonOrange,
-    borderColor: COLORS.crayonOrange,
-  },
-  sizeDot: {
-    // Dynamic size set inline
-  },
-  historyRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-  },
-  historyButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: COLORS.bgCreamDark,
-    backgroundColor: COLORS.white,
-  },
-  historyButtonDisabled: {
-    opacity: 0.5,
-  },
-  zoomRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    gap: 6,
-  },
-  zoomButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: COLORS.bgCreamDark,
-    backgroundColor: COLORS.white,
-  },
-  zoomButtonDisabled: {
+  disabled: {
     opacity: 0.5,
   },
   zoomPercentage: {
     textAlign: "center",
-    fontSize: 11,
-    color: COLORS.textMuted,
-    marginTop: 4,
+    fontSize: 14,
+    fontFamily: "TondoTrial-Bold",
+    color: COLORS.textPrimary,
+    marginTop: 2,
   },
 });
 

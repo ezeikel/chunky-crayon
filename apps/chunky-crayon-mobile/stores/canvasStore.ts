@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { SkPath } from "@shopify/react-native-skia";
+import type { PaletteVariant } from "@/lib/coloring/palette";
 
 export type Tool = "brush" | "fill" | "eraser" | "sticker" | "magic" | "pan";
 export type BrushType =
@@ -171,6 +172,14 @@ export type CanvasState = {
   brushType: BrushType;
   brushSize: number;
 
+  /**
+   * Active colour palette "mood" variant (realistic / pastel / cute /
+   * surprise), mirroring web. Drives the swatch grid shown in the
+   * palette, and is the single knob that will also pick the magic
+   * auto-color palette. See lib/coloring/palette.
+   */
+  paletteVariant: PaletteVariant;
+
   // Fill settings
   fillType: FillType;
   selectedPattern: PatternType;
@@ -223,6 +232,7 @@ type CanvasActions = {
   setColor: (color: string) => void;
   setBrushType: (type: BrushType) => void;
   setBrushSize: (size: number) => void;
+  setPaletteVariant: (variant: PaletteVariant) => void;
   setFillType: (type: FillType) => void;
   setPattern: (pattern: PatternType) => void;
   setSticker: (sticker: string) => void;
@@ -264,6 +274,7 @@ type CanvasActions = {
 const initialState: CanvasState = {
   selectedTool: "brush",
   selectedColor: "#000000",
+  paletteVariant: "realistic",
   brushType: "crayon",
   brushSize: 10,
   fillType: "solid",
@@ -299,6 +310,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     setTool: (tool) => set({ selectedTool: tool }),
     setColor: (color) => set({ selectedColor: color }),
     setBrushType: (type) => set({ brushType: type }),
+    setPaletteVariant: (variant) => set({ paletteVariant: variant }),
     setBrushSize: (size) => set({ brushSize: Math.max(1, Math.min(50, size)) }),
     setFillType: (type) => set({ fillType: type }),
     setPattern: (pattern) => set({ selectedPattern: pattern }),
