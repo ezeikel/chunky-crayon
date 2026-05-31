@@ -1,197 +1,160 @@
-import { useEffect, useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  runOnJS,
-  type SharedValue,
-} from "react-native-reanimated";
 import { PAYWALL_TRUST } from "@/lib/paywall/plans";
 
 /**
- * Social proof: a quantified stat line up top, plus one rotating
- * parent testimonial that fades + slides through a few quotes. This is
- * the single biggest trust lever for an AI-skeptical parent deciding
- * whether to pay — so it sits right under the hero, above the plans.
+ * Social proof, mirroring CC web's homepage/pricing Testimonials header
+ * (Testimonials.tsx → SocialProofHeader): the "Loved by families
+ * everywhere" line, an overlapping cluster of initials avatars, and a
+ * star rating + review count. This replaces the earlier single-rotating
+ * testimonial (lifted from PTP) with CC's own pattern.
  *
- * Rotating-testimonial motion is the PTP pattern (cross-fade + slide
- * every few seconds) adapted to CC's warmer palette. Copy is parent-
- * voiced and deliberately AI-free per brand rules — it's about the
- * outcome (a calm, happy kid), not the technology.
+ * The paywall is height-constrained, so we render web's compact HEADER
+ * block (cluster + rating) rather than the full 8-card grid — it's the
+ * trust-dense piece. Names mirror web's testimonial set; when the
+ * whole-app i18n pass lands these move into messages alongside the rest.
  */
 
-const ROTATION_MS = 4500;
-const FADE_MS = 260;
-
-type Testimonial = {
-  quote: string;
-  name: string;
-  tint: string;
-  tintDark: string;
-};
-
-// Warm crayon-palette tints (no purple, per brand). `tint` backs the
-// avatar bubble; `tintDark` is the legible initial on top of it.
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      "“My daughter asks for a new page every morning. Worth every penny.”",
-    name: "Sarah, mom of 2",
-    tint: "#E68991", // crayon pink
-    tintDark: "#B85763",
-  },
-  {
-    quote: "“Twenty minutes of happy quiet while I make dinner. Worth it.”",
-    name: "James, dad of 3",
-    tint: "#5A9EE2", // crayon blue
-    tintDark: "#2E6DA8",
-  },
-  {
-    quote: "“They each have their own profile and never run out of pages.”",
-    name: "Priya, mom of 3",
-    tint: "#FAC342", // crayon yellow
-    tintDark: "#B5832A",
-  },
+// First 5 reviewer names (matches web's testimonials.items 1-5) for the
+// overlapping cluster. Full set + quotes live on web; the paywall only
+// needs the cluster.
+const CLUSTER_NAMES = [
+  "Sophie Bennett",
+  "Marcus Reed",
+  "Hannah Whitfield",
+  "Rachel Doyle",
+  "Brian Coletti",
 ];
 
-const ROW_HEIGHT = 56;
+// Crayon-palette circle backgrounds (NO purple, per brand). Cycled by a
+// stable hash of the name so a given person always gets the same colour.
+const INITIALS_BG = [
+  "#E46444", // crayon orange
+  "#F1AE7E", // crayon peach
+  "#E68991", // crayon pink
+  "#FAC342", // crayon yellow
+  "#8CAF5A", // crayon green
+  "#5A9EE2", // crayon blue
+];
 
-type RowProps = {
-  item: Testimonial;
-  index: number;
-  current: SharedValue<number>;
+const getInitials = (name: string): string => {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 };
 
-const TestimonialRow = ({ item, index, current }: RowProps) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    const isActive = current.value === index;
-    return {
-      opacity: withTiming(isActive ? 1 : 0, { duration: FADE_MS }),
-      zIndex: isActive ? 2 : 1,
-    };
-  });
-
-  // First letter of the name as the avatar initial (e.g. "Sarah, mom of
-  // 2" → "S") so the bubble reads as a real person, not a placeholder dot.
-  const initial = item.name.trim().charAt(0).toUpperCase();
-
-  return (
-    <Animated.View style={[styles.row, animatedStyle]}>
-      <View style={[styles.avatar, { backgroundColor: `${item.tint}33` }]}>
-        <Text style={[styles.avatarInitial, { color: item.tintDark }]}>
-          {initial}
-        </Text>
-      </View>
-      <View style={styles.rowText}>
-        <Text style={styles.quote} numberOfLines={2}>
-          {item.quote}
-        </Text>
-        <Text style={styles.name}>{item.name}</Text>
-      </View>
-    </Animated.View>
-  );
+const getInitialsBg = (name: string): string => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i += 1) hash += name.charCodeAt(i);
+  return INITIALS_BG[hash % INITIALS_BG.length];
 };
 
-const PaywallSocialProof = () => {
-  const current = useSharedValue(0);
+const PaywallSocialProof = () => (
+  <View style={styles.container}>
+    <Text style={styles.title}>Loved by families everywhere</Text>
 
-  const advance = useCallback(() => {
-    current.value = (current.value + 1) % TESTIMONIALS.length;
-  }, [current]);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      // tiny fade choreography handled per-row by opacity; just advance
-      // the active index on the JS thread.
-      runOnJS(advance)();
-    }, ROTATION_MS);
-    return () => clearInterval(id);
-  }, [advance]);
-
-  return (
-    <View style={styles.container}>
-      {/* Rating + review count — kept in sync with web. */}
-      <View style={styles.ratingRow}>
-        <View style={styles.stars}>
-          {[0, 1, 2, 3, 4].map((i) => (
-            <FontAwesomeIcon key={i} icon={faStar} size={13} color="#FBBF24" />
-          ))}
-        </View>
-        <Text style={styles.ratingText}>
-          {PAYWALL_TRUST.averageRating} from {PAYWALL_TRUST.reviewCount} reviews
-        </Text>
-      </View>
-
-      <View style={styles.carousel}>
-        {TESTIMONIALS.map((t, i) => (
-          <TestimonialRow key={i} item={t} index={i} current={current} />
+    <View style={styles.statsRow}>
+      {/* Overlapping initials cluster — reads as "real people who didn't
+          upload a photo", matching web's SocialProofHeader. */}
+      <View style={styles.cluster}>
+        {CLUSTER_NAMES.map((name, i) => (
+          <View
+            key={name}
+            style={[
+              styles.avatar,
+              {
+                backgroundColor: getInitialsBg(name),
+                zIndex: CLUSTER_NAMES.length - i,
+              },
+              i > 0 && styles.avatarOverlap,
+            ]}
+          >
+            <Text style={styles.avatarInitials}>{getInitials(name)}</Text>
+          </View>
         ))}
       </View>
+
+      <View style={styles.rating}>
+        <View style={styles.stars}>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <FontAwesomeIcon
+              key={i}
+              icon={faStar}
+              size={13}
+              color={
+                i < Math.floor(PAYWALL_TRUST.averageRating)
+                  ? "#FBBF24"
+                  : "#E5E0D8"
+              }
+            />
+          ))}
+        </View>
+        <Text style={styles.ratingValue}>{PAYWALL_TRUST.averageRating}</Text>
+        <Text style={styles.ratingCount}>
+          from {PAYWALL_TRUST.reviewCount} reviews
+        </Text>
+      </View>
     </View>
-  );
-};
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: "center",
     gap: 10,
   },
-  ratingRow: {
+  title: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 17,
+    color: "#43342D",
+    textAlign: "center",
+  },
+  statsRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  cluster: {
+    flexDirection: "row",
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+  },
+  avatarOverlap: {
+    marginLeft: -10,
+  },
+  avatarInitials: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 11,
+    color: "#FFFFFF",
+  },
+  rating: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   stars: {
     flexDirection: "row",
     gap: 1,
   },
-  ratingText: {
+  ratingValue: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 14,
+    color: "#43342D",
+  },
+  ratingCount: {
     fontFamily: "TondoTrial-Regular",
     fontSize: 13,
-    color: "#6B5344",
-  },
-  carousel: {
-    height: ROW_HEIGHT,
-  },
-  row: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: ROW_HEIGHT,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 8,
-  },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarInitial: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 16,
-  },
-  rowText: {
-    flex: 1,
-    gap: 2,
-  },
-  quote: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 13,
-    lineHeight: 17,
-    color: "#3D2C1E",
-  },
-  name: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 12,
-    color: "#7A6F66",
+    color: "#72625A",
   },
 });
 
