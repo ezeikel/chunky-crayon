@@ -73,6 +73,10 @@ const BRUSH_HAPTIC_CONFIG: Record<BrushType, BrushHapticConfig> = {
     interval: 80, // Light scratchy feeling
     style: Haptics.ImpactFeedbackStyle.Light,
   },
+  paintbrush: {
+    interval: 150, // Smooth broad stroke — like marker
+    style: Haptics.ImpactFeedbackStyle.Medium,
+  },
   rainbow: {
     interval: 100, // Playful, moderate
     style: Haptics.ImpactFeedbackStyle.Medium,

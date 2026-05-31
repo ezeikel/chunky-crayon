@@ -6,6 +6,7 @@ export type BrushType =
   | "crayon"
   | "marker"
   | "pencil"
+  | "paintbrush"
   | "rainbow"
   | "glow"
   | "neon"
