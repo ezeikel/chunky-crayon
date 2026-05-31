@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  ActivityIndicator,
   useWindowDimensions,
 } from "react-native";
 import Animated, {
@@ -27,6 +26,7 @@ import {
 } from "@/hooks/usePaywall";
 import type { PurchasesPackage } from "react-native-purchases";
 import ParentalGate from "../ParentalGate";
+import Spinner from "../Spinner/Spinner";
 import SubscriptionPaywallModal from "../SubscriptionPaywallModal";
 
 type OnboardingPaywallSlideProps = {
@@ -182,7 +182,7 @@ const OnboardingPaywallSlide = ({
         <View style={styles.ctaContainer}>
           {isLoadingOfferings ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="small" color="#E46444" />
+              <Spinner size={24} color="#E46444" />
             </View>
           ) : (
             <>
@@ -198,7 +198,7 @@ const OnboardingPaywallSlide = ({
                   disabled={isLoading || !targetPackage}
                 >
                   {isLoading ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <Spinner size={20} color="#FFFFFF" />
                   ) : (
                     <Text style={styles.trialButtonText}>Start Free Trial</Text>
                   )}

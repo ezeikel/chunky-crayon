@@ -1,19 +1,16 @@
 import { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  Modal,
-  StyleSheet,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, Modal, StyleSheet, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faXmark, faCoins, faStar } from "@fortawesome/pro-solid-svg-icons";
+import { faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { PurchasesPackage } from "react-native-purchases";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Purchases from "react-native-purchases";
 import ParentalGate from "../ParentalGate";
+import Spinner from "../Spinner/Spinner";
+import SquishyPressable from "@/components/SquishyPressable";
+import CreditPackRow from "@/components/CreditPackRow";
+import PaywallHero from "@/components/SubscriptionPaywallModal/PaywallHero";
 import { useRefreshEntitlements } from "@/hooks/useEntitlements";
 
 type ColorAsYouGoModalProps = {
@@ -161,26 +158,38 @@ const ColorAsYouGoModal = ({
         onRequestClose={onClose}
       >
         <View style={[styles.container, { paddingTop: insets.top }]}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Pressable onPress={onClose} style={styles.closeButton}>
-              <FontAwesomeIcon icon={faXmark} size={24} color="#64748B" />
-            </Pressable>
-            <View style={styles.titleContainer}>
-              <FontAwesomeIcon icon={faCoins} size={28} color="#FCD34D" />
-              <Text style={styles.title}>Color as you go</Text>
+          {/* Floating close button over the hero. */}
+          <SquishyPressable
+            onPress={onClose}
+            scaleTo={0.9}
+            accessibilityRole="button"
+            accessibilityLabel="Close"
+            hitSlop={8}
+            style={[styles.closeButton, { top: insets.top + 8 }]}
+          >
+            <View style={styles.closeCircle}>
+              <FontAwesomeIcon icon={faXmark} size={20} color="#6B5344" />
             </View>
-            <Text style={styles.subtitle}>
-              No subscription? No problem. Buy credits as you need them.
-            </Text>
-          </View>
+          </SquishyPressable>
 
-          {/* Content */}
-          <View style={styles.content}>
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Hero — same fanned coloring pages as the subscription
+                paywall, so the credit-pack surface feels like one family
+                and leads with what the credits MAKE. */}
+            <PaywallHero play={visible} />
+
+            <Text style={styles.title}>Color as you go</Text>
+            <Text style={styles.subtitle}>
+              No subscription needed. Buy credits as you go and color away.
+            </Text>
+
             {isLoading ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#7C3AED" />
-                <Text style={styles.loadingText}>Loading credit packs...</Text>
+                <Spinner size={36} color="#E46444" />
+                <Text style={styles.loadingText}>Loading credit packs…</Text>
               </View>
             ) : packages.length === 0 ? (
               <View style={styles.emptyContainer}>
@@ -189,69 +198,31 @@ const ColorAsYouGoModal = ({
                 </Text>
               </View>
             ) : (
-              <View style={styles.packagesContainer}>
-                {packages.map((pkg) => {
-                  const credits = getCreditAmount(pkg);
-                  const isBestValue = pkg.identifier === "cayg_credits_200";
-
-                  return (
-                    <Pressable
-                      key={pkg.identifier}
-                      style={[
-                        styles.packageCard,
-                        isBestValue && styles.bestValueCard,
-                      ]}
-                      onPress={() => handlePurchasePress(pkg)}
-                      disabled={isPurchasing}
-                    >
-                      {isBestValue && (
-                        <View style={styles.bestValueBadge}>
-                          <FontAwesomeIcon
-                            icon={faStar}
-                            size={10}
-                            color="#FFFFFF"
-                          />
-                          <Text style={styles.bestValueText}>Best Value</Text>
-                        </View>
-                      )}
-
-                      <View style={styles.packageContent}>
-                        <View style={styles.creditsContainer}>
-                          <FontAwesomeIcon
-                            icon={faCoins}
-                            size={24}
-                            color="#FCD34D"
-                          />
-                          <Text style={styles.creditsAmount}>{credits}</Text>
-                          <Text style={styles.creditsLabel}>credits</Text>
-                        </View>
-
-                        <View style={styles.priceContainer}>
-                          <Text style={styles.priceText}>
-                            {formatPrice(pkg)}
-                          </Text>
-                        </View>
-                      </View>
-                    </Pressable>
-                  );
-                })}
+              <View style={styles.packs}>
+                {packages.map((pkg) => (
+                  <CreditPackRow
+                    key={pkg.identifier}
+                    credits={getCreditAmount(pkg)}
+                    price={formatPrice(pkg)}
+                    isBestValue={pkg.identifier === "cayg_credits_200"}
+                    disabled={isPurchasing}
+                    onPress={() => handlePurchasePress(pkg)}
+                  />
+                ))}
               </View>
             )}
-          </View>
 
-          {/* Footer */}
-          <View style={styles.footer}>
             <Text style={styles.legalText}>
               Credits are added to your account immediately after purchase.
               Credits do not expire.
             </Text>
-          </View>
+          </ScrollView>
 
           {/* Loading overlay */}
           {isPurchasing && (
             <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color="#FFFFFF" />
-              <Text style={styles.loadingOverlayText}>Processing...</Text>
+              <Spinner size={36} color="#FFFFFF" />
+              <Text style={styles.loadingOverlayText}>Processing…</Text>
             </View>
           )}
         </View>
@@ -274,149 +245,91 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FDFAF5",
   },
-  header: {
-    paddingTop: 48,
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-    alignItems: "center",
-  },
   closeButton: {
+    // `top` set inline as insets.top + 8 so the X clears the status bar.
     position: "absolute",
-    top: 12,
-    right: 16,
-    padding: 8,
+    right: 12,
     zIndex: 10,
   },
-  titleContainer: {
-    flexDirection: "row",
+  closeCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(67,52,45,0.06)",
     alignItems: "center",
-    gap: 12,
-    marginBottom: 8,
+    justifyContent: "center",
+  },
+  scroll: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 40,
+    gap: 14,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1E293B",
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 26,
+    color: "#43342D",
+    textAlign: "center",
+    marginTop: 8,
   },
   subtitle: {
-    fontSize: 16,
-    color: "#64748B",
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 15,
+    color: "#6B5344",
     textAlign: "center",
-    lineHeight: 24,
-  },
-  content: {
-    flex: 1,
     paddingHorizontal: 16,
+    marginTop: -6,
+  },
+  packs: {
+    gap: 14,
+    marginTop: 6,
   },
   loadingContainer: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingVertical: 48,
+    gap: 12,
   },
   loadingText: {
-    marginTop: 12,
-    color: "#64748B",
-    fontSize: 16,
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 14,
+    color: "#7A6F66",
   },
   emptyContainer: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingVertical: 48,
   },
   emptyText: {
-    color: "#64748B",
-    fontSize: 16,
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 15,
+    color: "#7A6F66",
     textAlign: "center",
-  },
-  packagesContainer: {
-    gap: 16,
-    paddingTop: 16,
-  },
-  packageCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  bestValueCard: {
-    borderWidth: 2,
-    borderColor: "#7C3AED",
-  },
-  bestValueBadge: {
-    position: "absolute",
-    top: -12,
-    left: "50%",
-    marginLeft: -45,
-    backgroundColor: "#7C3AED",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  bestValueText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  packageContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  creditsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  creditsAmount: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1E293B",
-  },
-  creditsLabel: {
-    fontSize: 16,
-    color: "#64748B",
-  },
-  priceContainer: {
-    backgroundColor: "#7C3AED",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  priceText: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#FFFFFF",
-  },
-  footer: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#E2E8F0",
   },
   legalText: {
+    fontFamily: "TondoTrial-Regular",
     fontSize: 12,
-    color: "#94A3B8",
+    color: "#9CA3AF",
     textAlign: "center",
     lineHeight: 18,
+    marginTop: 4,
+    paddingHorizontal: 8,
   },
   loadingOverlay: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
     alignItems: "center",
     justifyContent: "center",
+    gap: 12,
   },
   loadingOverlayText: {
-    color: "#FFFFFF",
-    marginTop: 12,
+    fontFamily: "TondoTrial-Bold",
     fontSize: 16,
+    color: "#FFFFFF",
   },
 });
 

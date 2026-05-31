@@ -1,64 +1,62 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
   Modal,
   StyleSheet,
-  Pressable,
-  ActivityIndicator,
   ScrollView,
   Linking,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faXmark,
-  faStar,
-  faCheck,
-  faShieldCheck,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faXmark, faShieldCheck } from "@fortawesome/pro-solid-svg-icons";
 import { PurchasesPackage } from "react-native-purchases";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+  Easing,
+} from "react-native-reanimated";
+import SquishyPressable from "@/components/SquishyPressable";
+import Spinner from "@/components/Spinner/Spinner";
 import {
   useOfferings,
   usePurchase,
   useRestorePurchases,
   isAnnualPackage,
-  formatPackagePrice,
-  formatAnnualMonthlyPrice,
   getPackagePlanName,
 } from "@/hooks/usePaywall";
 import {
   PLAN_DISPLAY_ORDER,
   PLAN_DISPLAY_NAMES,
-  PLAN_TAGLINES,
-  PLAN_AUDIENCE,
-  PLAN_FEATURES,
   RECOMMENDED_PLAN,
   PAYWALL_TRUST,
+  getCreditsForPlan,
+  type PlanKey,
 } from "@/lib/paywall/plans";
+import { formatPackagePrice } from "@/hooks/usePaywall";
+import PaywallHero from "./PaywallHero";
+import PaywallSocialProof from "./PaywallSocialProof";
+import PlanRow from "./PlanRow";
 
 /**
  * SubscriptionPaywallModal — the primary mobile paywall.
  *
- * Renders the Splash / Rainbow / Sparkle plan grid with a monthly /
- * yearly toggle. Tap a plan → RevenueCat IAP via the existing
- * `usePurchase()` mutation. Restore-purchases link at the footer for
- * users coming back on a new device.
+ * Composition (top → bottom, Duolingo-style — no dead space): a fanned
+ * coloring-page hero so the parent sees the product first; the headline;
+ * quantified social proof + rotating parent testimonials; a
+ * monthly/yearly toggle; three compact selectable PlanRows (Splash /
+ * Rainbow / Sparkle, Rainbow pre-selected + flagged Most Popular); then
+ * ONE big "Start 7-day free trial" CTA that buys the selected plan, with
+ * trial microcopy + a money-back guarantee; and a restore + legal footer.
+ * The body fades + rises in on open behind the hero fan.
  *
- * Plans are pulled from RevenueCat's current offering (which the
- * existing `useOfferings()` hook fetches). Each plan needs both a
- * monthly + annual package configured against the same product family
- * (RevenueCat aliases `$rc_monthly` / `$rc_annual` for the default
- * tier; explicit `splash_monthly` / `splash_annual` etc. for the other
- * two — see ~/.claude/plans/mobile-paywall-scaffold.md).
- *
- * Prices come from the store (App Store / Play Store via RevenueCat).
- * Plan copy (names, taglines, feature bullets, the "Most Popular" plan)
- * and the credits-from-metadata helper all live in the shared
- * `lib/paywall/plans.ts` so there's a single source of truth — there
- * used to be two diverged copies (this modal vs the now-retired
- * `Paywall`). Credit grants per plan come from `product.metadata.credits`
- * first, falling back to the per-plan default in that module.
+ * Plans come from RevenueCat's current offering (`useOfferings`); tapping
+ * a card runs the IAP via `usePurchase`. ALL plan copy + trust stats live
+ * in the shared `lib/paywall/plans` single source of truth — this file is
+ * orchestration only. The hero art is bundled locally (paywall-assets),
+ * never fetched at runtime.
  */
 
 type SubscriptionPaywallModalProps = {
@@ -66,10 +64,9 @@ type SubscriptionPaywallModalProps = {
   onClose: () => void;
   onSuccess?: () => void;
   /**
-   * Subscriptions don't require the parental gate today — Apple's
-   * native purchase sheet already requires Face ID / passcode. Prop is
-   * accepted for parity with the other paywall modals and may be wired
-   * up later if we want a kid-friendly soft gate.
+   * Subscriptions don't require the parental gate today — Apple's native
+   * purchase sheet already requires Face ID / passcode. Accepted for
+   * parity with the other paywall modals; may wire a soft gate later.
    */
   skipParentalGate?: boolean;
 };
@@ -82,11 +79,33 @@ const SubscriptionPaywallModal = ({
   onSuccess,
 }: SubscriptionPaywallModalProps) => {
   const insets = useSafeAreaInsets();
-  const { data: offering, isLoading } = useOfferings();
+  const { data: offering } = useOfferings();
   const purchaseMutation = usePurchase();
   const restoreMutation = useRestorePurchases();
 
   const [cycle, setCycle] = useState<BillingCycle>("annual");
+  // Which plan the rows have selected — the single bottom CTA buys this
+  // one. Defaults to the recommended plan (Rainbow) so the highest-LTV
+  // option is pre-selected, matching the Duolingo / Universe pattern.
+  const [selectedPlan, setSelectedPlan] = useState<PlanKey>(RECOMMENDED_PLAN);
+
+  // Staggered body entrance — fades + rises in just after the hero fan
+  // springs open, so the eye lands hero → copy → plans.
+  const bodyProgress = useSharedValue(0);
+  useEffect(() => {
+    if (visible) {
+      bodyProgress.value = 0;
+      bodyProgress.value = withDelay(
+        220,
+        withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) }),
+      );
+    }
+  }, [visible, bodyProgress]);
+
+  const bodyStyle = useAnimatedStyle(() => ({
+    opacity: bodyProgress.value,
+    transform: [{ translateY: (1 - bodyProgress.value) * 18 }],
+  }));
 
   const plansByName: Record<
     string,
@@ -99,6 +118,20 @@ const SubscriptionPaywallModal = ({
     else plansByName[plan].monthly = pkg;
   }
 
+  // The package the single bottom CTA will buy: the selected plan at the
+  // current billing cycle.
+  const selectedPlans = plansByName[selectedPlan];
+  const selectedPkg =
+    cycle === "annual" ? selectedPlans?.annual : selectedPlans?.monthly;
+
+  // Whether any plan has a package for the current cycle — drives the
+  // loader-vs-rows branch so an errored/empty offering shows the loader,
+  // never a blank gap.
+  const hasPlans = PLAN_DISPLAY_ORDER.some((planKey) => {
+    const plans = plansByName[planKey];
+    return cycle === "annual" ? plans?.annual : plans?.monthly;
+  });
+
   const handlePurchase = useCallback(
     async (pkg: PurchasesPackage) => {
       try {
@@ -106,8 +139,7 @@ const SubscriptionPaywallModal = ({
         onSuccess?.();
         onClose();
       } catch {
-        // usePurchase shows the toast on its own; modal stays open so
-        // the user can try a different plan.
+        // usePurchase shows the toast; modal stays open to retry.
       }
     },
     [purchaseMutation, onSuccess, onClose],
@@ -132,235 +164,189 @@ const SubscriptionPaywallModal = ({
       onRequestClose={onClose}
     >
       <View style={[styles.container, { paddingTop: insets.top }]}>
-        <View style={styles.header}>
-          <Pressable onPress={onClose} style={styles.closeButton}>
-            <FontAwesomeIcon icon={faXmark} size={24} color="#64748B" />
-          </Pressable>
-          <Text style={styles.title}>Unlock unlimited creativity</Text>
-          <Text style={styles.subtitle}>
-            Choose a plan and create as many coloring pages as you like.
-          </Text>
-
-          <View style={styles.toggleRow}>
-            <Pressable
-              onPress={() => setCycle("monthly")}
-              style={[
-                styles.toggleButton,
-                cycle === "monthly" && styles.toggleButtonActive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.toggleText,
-                  cycle === "monthly" && styles.toggleTextActive,
-                ]}
-              >
-                Monthly
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setCycle("annual")}
-              style={[
-                styles.toggleButton,
-                cycle === "annual" && styles.toggleButtonActive,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.toggleText,
-                  cycle === "annual" && styles.toggleTextActive,
-                ]}
-              >
-                Yearly
-              </Text>
-              <View style={styles.saveBadge}>
-                <Text style={styles.saveBadgeText}>2 months free</Text>
-              </View>
-            </Pressable>
+        {/* Close button floats over the hero so the hero owns the top. */}
+        <SquishyPressable
+          onPress={onClose}
+          scaleTo={0.9}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          hitSlop={8}
+          style={[styles.closeButton, { top: insets.top + 8 }]}
+        >
+          <View style={styles.closeCircle}>
+            <FontAwesomeIcon icon={faXmark} size={20} color="#6B5344" />
           </View>
+        </SquishyPressable>
 
-          {/* Free-trial banner — every plan starts with a 7-day trial
-              (ported from the retired Paywall so the trial messaging
-              isn't lost). */}
-          <View style={styles.trialBanner}>
-            <Text style={styles.trialBannerText}>
-              7-day free trial on all plans. Cancel any time.
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Hero — fanned coloring pages, springs in on each open. */}
+          <PaywallHero play={visible} />
+
+          <Animated.View style={[styles.body, bodyStyle]}>
+            <Text style={styles.title}>Unlock unlimited coloring</Text>
+            <Text style={styles.subtitle}>
+              Make as many pages as they like. Print them or color on screen.
             </Text>
-          </View>
 
-          {/* Trust strip — rating + review count up front. The single
-              biggest reassurance for a parent deciding whether to trust
-              the app with their card. Stats kept in sync with web. */}
-          <View style={styles.trustStrip}>
-            <View style={styles.trustStars}>
-              {[0, 1, 2, 3, 4].map((i) => (
-                <FontAwesomeIcon
-                  key={i}
-                  icon={faStar}
-                  size={12}
-                  color="#FBBF24"
-                />
-              ))}
-            </View>
-            <Text style={styles.trustText}>
-              {PAYWALL_TRUST.averageRating} from {PAYWALL_TRUST.reviewCount}{" "}
-              reviews · Cancel any time
-            </Text>
-          </View>
-        </View>
+            <PaywallSocialProof />
 
-        <ScrollView contentContainerStyle={styles.scroll}>
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#7C3AED" />
-              <Text style={styles.loadingText}>Loading plans…</Text>
-            </View>
-          ) : (
-            <View style={styles.plansContainer}>
-              {PLAN_DISPLAY_ORDER.map((planName) => {
-                const plans = plansByName[planName];
-                const pkg = cycle === "annual" ? plans?.annual : plans?.monthly;
-                if (!pkg) return null;
-
-                const isBestValue = planName === RECOMMENDED_PLAN;
-                const annualMonthlyPrice = formatAnnualMonthlyPrice(pkg);
-
+            {/* Monthly / yearly toggle + trial banner. */}
+            <View style={styles.toggleRow}>
+              {(["monthly", "annual"] as BillingCycle[]).map((key) => {
+                const active = cycle === key;
                 return (
-                  <Pressable
-                    key={planName}
-                    style={[
-                      styles.planCard,
-                      isBestValue && styles.bestValuePlanCard,
-                    ]}
-                    onPress={() => handlePurchase(pkg)}
-                    disabled={isPurchasing}
+                  <SquishyPressable
+                    key={key}
+                    onPress={() => setCycle(key)}
+                    scaleTo={0.96}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    style={styles.toggleItem}
                   >
-                    {isBestValue && (
-                      <View style={styles.bestValueBadge}>
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          size={10}
-                          color="#FFFFFF"
-                        />
-                        <Text style={styles.bestValueText}>Most Popular</Text>
-                      </View>
-                    )}
-
-                    <Text style={styles.planTitle}>
-                      {PLAN_DISPLAY_NAMES[planName]}
-                    </Text>
-                    <Text style={styles.planTagline}>
-                      {PLAN_TAGLINES[planName]}
-                    </Text>
-                    <Text style={styles.planAudience}>
-                      {PLAN_AUDIENCE[planName]}
-                    </Text>
-
-                    <View style={styles.planPriceRow}>
-                      <Text style={styles.planPrice}>
-                        {formatPackagePrice(pkg)}
-                      </Text>
-                      <Text style={styles.planCycle}>
-                        /{cycle === "annual" ? "year" : "month"}
-                      </Text>
-                    </View>
-                    {annualMonthlyPrice && (
-                      <Text style={styles.planEffectivePrice}>
-                        {annualMonthlyPrice}
-                      </Text>
-                    )}
-
-                    {/* Full per-plan feature list (ported from the
-                        retired Paywall — was a single credits line). */}
-                    <View style={styles.planFeatures}>
-                      {PLAN_FEATURES[planName].map((feature) => (
-                        <View key={feature} style={styles.planFeatureRow}>
-                          <FontAwesomeIcon
-                            icon={faCheck}
-                            size={14}
-                            color="#22C55E"
-                          />
-                          <Text style={styles.planFeatureText}>{feature}</Text>
-                        </View>
-                      ))}
-                    </View>
-
-                    {/* Trial-framed CTA + de-risking microcopy. The whole
-                        card is the tap target (a nested button would be a
-                        press-within-press on RN); this styled label reads
-                        as the action and the line below removes the
-                        "will I be charged now?" fear that stalls parents. */}
                     <View
                       style={[
-                        styles.planCta,
-                        isBestValue && styles.planCtaBestValue,
+                        styles.toggleButton,
+                        active && styles.toggleButtonActive,
                       ]}
                     >
                       <Text
                         style={[
-                          styles.planCtaText,
-                          isBestValue && styles.planCtaTextBestValue,
+                          styles.toggleText,
+                          active && styles.toggleTextActive,
                         ]}
                       >
-                        Start 7-day free trial
+                        {key === "monthly" ? "Monthly" : "Yearly"}
                       </Text>
+                      {key === "annual" && (
+                        <View style={styles.saveBadge}>
+                          <Text style={styles.saveBadgeText}>
+                            2 months free
+                          </Text>
+                        </View>
+                      )}
                     </View>
-                    <Text style={styles.planTrialMicrocopy}>
-                      Then {formatPackagePrice(pkg)}/
-                      {cycle === "annual" ? "year" : "month"}. Cancel any time
-                      before then.
-                    </Text>
-                  </Pressable>
+                  </SquishyPressable>
                 );
               })}
             </View>
-          )}
 
-          {/* Money-back guarantee — de-risks the decision right after the
-              plans, before the restore/legal footer. */}
-          <View style={styles.guaranteeRow}>
-            <FontAwesomeIcon icon={faShieldCheck} size={14} color="#7C3AED" />
-            <Text style={styles.guaranteeText}>{PAYWALL_TRUST.guarantee}</Text>
-          </View>
-
-          <Pressable
-            onPress={handleRestore}
-            style={styles.restoreButton}
-            disabled={isRestoring}
-          >
-            {isRestoring ? (
-              <ActivityIndicator size="small" color="#7A6F66" />
+            {/* Compact selectable plan rows. Show the loader whenever
+                there are no plans to render yet — loading OR an
+                errored/empty offering — so we never leave a blank gap
+                (RevenueCat can resolve to error with no data). */}
+            {hasPlans ? (
+              <View style={styles.plans}>
+                {PLAN_DISPLAY_ORDER.map((planKey: PlanKey) => {
+                  const plans = plansByName[planKey];
+                  const pkg =
+                    cycle === "annual" ? plans?.annual : plans?.monthly;
+                  if (!pkg) return null;
+                  return (
+                    <PlanRow
+                      key={planKey}
+                      planKey={planKey}
+                      pkg={pkg}
+                      cycle={cycle}
+                      credits={getCreditsForPlan(pkg)}
+                      isBestValue={planKey === RECOMMENDED_PLAN}
+                      isSelected={selectedPlan === planKey}
+                      onPress={() => setSelectedPlan(planKey)}
+                    />
+                  );
+                })}
+              </View>
             ) : (
-              <Text style={styles.restoreText}>Restore purchases</Text>
+              <View style={styles.loadingContainer}>
+                <Spinner size={36} color="#E46444" />
+                <Text style={styles.loadingText}>Loading plans…</Text>
+              </View>
             )}
-          </Pressable>
 
-          <Text style={styles.legalText}>
-            Subscriptions renew automatically. Cancel any time in{" "}
-            <Text style={styles.legalBold}>Settings</Text>.
-          </Text>
+            {/* ONE big trial-framed CTA — buys the selected plan. */}
+            {hasPlans && selectedPkg && (
+              <View style={styles.ctaBlock}>
+                <SquishyPressable
+                  onPress={() => handlePurchase(selectedPkg)}
+                  disabled={isPurchasing}
+                  scaleTo={0.97}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Start 7-day free trial of ${PLAN_DISPLAY_NAMES[selectedPlan]}`}
+                  style={styles.ctaPressable}
+                >
+                  <View style={styles.cta}>
+                    <Text style={styles.ctaText}>Start 7-day free trial</Text>
+                  </View>
+                </SquishyPressable>
+                <Text style={styles.ctaMicrocopy}>
+                  Then {formatPackagePrice(selectedPkg)}/
+                  {cycle === "annual" ? "year" : "month"}. Cancel any time
+                  before then.
+                </Text>
+                <View style={styles.guaranteeRow}>
+                  <FontAwesomeIcon
+                    icon={faShieldCheck}
+                    size={14}
+                    color="#E46444"
+                  />
+                  <Text style={styles.guaranteeText}>
+                    {PAYWALL_TRUST.guarantee}
+                  </Text>
+                </View>
+              </View>
+            )}
 
-          {/* Terms / Privacy links (ported from the retired Paywall). */}
-          <View style={styles.legalLinks}>
-            <Pressable
-              onPress={() => Linking.openURL("https://chunkycrayon.com/terms")}
+            <SquishyPressable
+              onPress={handleRestore}
+              disabled={isRestoring}
+              scaleTo={0.96}
+              accessibilityRole="button"
+              accessibilityLabel="Restore purchases"
+              style={styles.restoreButton}
             >
-              <Text style={styles.legalLink}>Terms of Service</Text>
-            </Pressable>
-            <Text style={styles.legalDot}>&middot;</Text>
-            <Pressable
-              onPress={() =>
-                Linking.openURL("https://chunkycrayon.com/privacy")
-              }
-            >
-              <Text style={styles.legalLink}>Privacy Policy</Text>
-            </Pressable>
-          </View>
+              {isRestoring ? (
+                <Spinner size={18} color="#7A6F66" />
+              ) : (
+                <Text style={styles.restoreText}>Restore purchases</Text>
+              )}
+            </SquishyPressable>
+
+            <Text style={styles.legalText}>
+              Subscriptions renew automatically. Cancel any time in{" "}
+              <Text style={styles.legalBold}>Settings</Text>.
+            </Text>
+
+            <View style={styles.legalLinks}>
+              <SquishyPressable
+                onPress={() =>
+                  Linking.openURL("https://chunkycrayon.com/terms")
+                }
+                scaleTo={0.94}
+                accessibilityRole="link"
+                accessibilityLabel="Terms of Service"
+              >
+                <Text style={styles.legalLink}>Terms of Service</Text>
+              </SquishyPressable>
+              <Text style={styles.legalDot}>·</Text>
+              <SquishyPressable
+                onPress={() =>
+                  Linking.openURL("https://chunkycrayon.com/privacy")
+                }
+                scaleTo={0.94}
+                accessibilityRole="link"
+                accessibilityLabel="Privacy Policy"
+              >
+                <Text style={styles.legalLink}>Privacy Policy</Text>
+              </SquishyPressable>
+            </View>
+          </Animated.View>
         </ScrollView>
 
         {isPurchasing && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#FFFFFF" />
+            <Spinner size={36} color="#FFFFFF" />
             <Text style={styles.loadingOverlayText}>Processing…</Text>
           </View>
         )}
@@ -374,26 +360,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FDFAF5",
   },
-  header: {
-    paddingHorizontal: 24,
-    paddingBottom: 16,
-    gap: 12,
-  },
   closeButton: {
+    // `top` is set inline as insets.top + 8 so the X clears the status
+    // bar (absolute children sit in the border box, above the container's
+    // safe-area paddingTop, so a fixed top would collide with the clock /
+    // battery).
     position: "absolute",
-    top: 8,
     right: 12,
-    width: 44,
-    height: 44,
+    zIndex: 10,
+  },
+  closeCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(67,52,45,0.06)",
     alignItems: "center",
     justifyContent: "center",
+  },
+  scroll: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 40,
+  },
+  body: {
+    gap: 16,
+    marginTop: 12,
   },
   title: {
     fontFamily: "TondoTrial-Bold",
     fontSize: 26,
     color: "#3D2C1E",
     textAlign: "center",
-    marginTop: 8,
   },
   subtitle: {
     fontFamily: "TondoTrial-Regular",
@@ -401,6 +398,7 @@ const styles = StyleSheet.create({
     color: "#6B5344",
     textAlign: "center",
     paddingHorizontal: 16,
+    marginTop: -8,
   },
   toggleRow: {
     flexDirection: "row",
@@ -409,7 +407,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     padding: 4,
     gap: 4,
-    marginTop: 8,
+  },
+  toggleItem: {
+    borderRadius: 999,
   },
   toggleButton: {
     paddingVertical: 10,
@@ -446,155 +446,38 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#FFFFFF",
   },
-  trialBanner: {
-    backgroundColor: "#F0EBFF",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    marginTop: 12,
-    alignSelf: "center",
+  plans: {
+    gap: 14,
+    marginTop: 4,
   },
-  trialBannerText: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 14,
-    color: "#7C3AED",
-    textAlign: "center",
+  ctaBlock: {
+    gap: 10,
+    marginTop: 4,
   },
-  trustStrip: {
-    flexDirection: "row",
+  ctaPressable: {
+    width: "100%",
+  },
+  cta: {
+    backgroundColor: "#E46444",
+    borderRadius: 999,
+    paddingVertical: 18,
     alignItems: "center",
     justifyContent: "center",
-    flexWrap: "wrap",
-    gap: 6,
-    marginTop: 10,
-  },
-  trustStars: {
-    flexDirection: "row",
-    gap: 1,
-  },
-  trustText: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 12,
-    color: "#6B5344",
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    gap: 16,
-  },
-  plansContainer: {
-    gap: 12,
-  },
-  planCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 2,
-    borderColor: "#F5EDE6",
-    gap: 6,
-  },
-  bestValuePlanCard: {
-    borderColor: "#7C3AED",
-    shadowColor: "#7C3AED",
+    shadowColor: "#D04725",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.35,
+    shadowRadius: 0,
   },
-  bestValueBadge: {
-    position: "absolute",
-    top: -10,
-    alignSelf: "center",
-    backgroundColor: "#7C3AED",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-  },
-  bestValueText: {
+  ctaText: {
     fontFamily: "TondoTrial-Bold",
-    fontSize: 11,
+    fontSize: 18,
     color: "#FFFFFF",
   },
-  planTitle: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 20,
-    color: "#3D2C1E",
-  },
-  planTagline: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 14,
-    color: "#3D2C1E",
-  },
-  planAudience: {
+  ctaMicrocopy: {
     fontFamily: "TondoTrial-Regular",
     fontSize: 12,
-    color: "#6B5344",
-    lineHeight: 17,
-    marginTop: 2,
-  },
-  planPriceRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 4,
-    marginTop: 6,
-  },
-  planPrice: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 26,
-    color: "#3D2C1E",
-  },
-  planCycle: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 14,
-    color: "#6B5344",
-  },
-  planEffectivePrice: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 12,
-    color: "#7A6F66",
-  },
-  planFeatures: {
-    marginTop: 8,
-    gap: 6,
-  },
-  planFeatureRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  planFeatureText: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 14,
-    color: "#3D2C1E",
-  },
-  planCta: {
-    marginTop: 14,
-    paddingVertical: 12,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F3EBE0",
-  },
-  planCtaBestValue: {
-    backgroundColor: "#7C3AED",
-  },
-  planCtaText: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 15,
-    color: "#3D2C1E",
-  },
-  planCtaTextBestValue: {
-    color: "#FFFFFF",
-  },
-  planTrialMicrocopy: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 11,
     color: "#7A6F66",
     textAlign: "center",
-    marginTop: 6,
   },
   loadingContainer: {
     alignItems: "center",
@@ -607,29 +490,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#7A6F66",
   },
+  guaranteeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  guaranteeText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 13,
+    color: "#6B5344",
+  },
   restoreButton: {
     alignSelf: "center",
     paddingVertical: 12,
     paddingHorizontal: 16,
     minHeight: 44,
+    justifyContent: "center",
   },
   restoreText: {
     fontFamily: "TondoTrial-Bold",
     fontSize: 14,
     color: "#7A6F66",
     textDecorationLine: "underline",
-  },
-  guaranteeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    marginTop: 4,
-  },
-  guaranteeText: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 13,
-    color: "#6B5344",
   },
   legalText: {
     fontFamily: "TondoTrial-Regular",
@@ -647,12 +530,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    marginTop: 4,
   },
   legalLink: {
     fontFamily: "TondoTrial-Bold",
     fontSize: 13,
-    color: "#7C3AED",
+    color: "#72625A",
   },
   legalDot: {
     fontSize: 13,
