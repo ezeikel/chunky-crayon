@@ -51,6 +51,13 @@ export const TOOLBAR = {
 } as const;
 
 /**
+ * Horizontal gap between each floating rail and the canvas card in the
+ * three-column coloring layout. Folded into each side column's width so the
+ * rails never butt against the canvas.
+ */
+export const CANVAS_COLUMN_GAP = 16;
+
+/**
  * Calculate sidebar + canvas widths for the three-column coloring layout.
  *
  * Layout: [Left Sidebar] [Canvas] [Right Sidebar]
@@ -77,17 +84,20 @@ export const getLandscapeSidebarWidths = (
 ): { leftWidth: number; rightWidth: number; canvasSize: number } => {
   const availableWidth = screenWidth - leftInset - rightInset;
 
-  // Slim floating rails (web's DesktopColorPalette / DesktopToolsSidebar):
-  // each rail holds a single-column stack of ~56px controls, so the rail
-  // only needs room for one tile + its padding. A fixed ~92px keeps the
-  // rails thin and lets the canvas dominate the center, matching web.
-  const railWidth = 92;
+  // Floating rails next to the canvas. The left palette rail holds a
+  // 2-column swatch grid, so it needs real width or the swatches collapse
+  // to invisible dots — ~150px fits two ~56px swatches + rail padding. The
+  // right tools rail is a single column (~92px). A horizontal GAP separates
+  // each rail from the canvas card so they don't butt together.
+  const leftRailWidth = 150;
+  const rightRailWidth = 100;
+  const gap = CANVAS_COLUMN_GAP;
 
-  const leftWidth = railWidth + leftInset;
-  const rightWidth = railWidth + rightInset;
+  const leftWidth = leftRailWidth + gap + leftInset;
+  const rightWidth = rightRailWidth + gap + rightInset;
 
   // Canvas column is the remaining horizontal space between the two rails.
-  const canvasSize = Math.max(0, availableWidth - railWidth * 2);
+  const canvasSize = Math.max(0, availableWidth - leftWidth - rightWidth);
 
   return { leftWidth, rightWidth, canvasSize };
 };

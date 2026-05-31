@@ -7,15 +7,20 @@ import ColorSwatchGrid from "@/components/coloring/ColorSwatchGrid";
 import { selectionChanged } from "@/utils/haptics";
 
 type ColorPaletteSidebarProps = {
-  /** Width of the sidebar */
+  /** Full width of the left column (rail + canvas gap), from the layout. */
   width: number;
 };
 
 /**
- * Left palette sidebar for the three-column coloring layout — mirrors CC
- * web's DesktopColorPalette: a 2×2 grid of mood-variant pills on top,
- * then a 3-column grid of round swatches for the active variant. Dims
- * when a magic tool is active (web's opacity + pointer-events-none).
+ * Left palette rail for the three-column coloring layout — a rounded
+ * floating card (web's DesktopColorPalette) vertically centered next to the
+ * canvas: mood-variant pills (2-up) on top, then a 2-column grid of round
+ * swatches for the active variant. Dims when a magic tool is active (web's
+ * opacity + pointer-events-none).
+ *
+ * The column `width` from the layout already includes the canvas gap; the
+ * rail itself sits flush-left and the gap falls on its right via the outer
+ * padding, so the rail never butts against the canvas.
  */
 const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
   const insets = useSafeAreaInsets();
@@ -38,63 +43,67 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
     setColor(color);
   };
 
-  const paddingHorizontal = 12;
-
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          width,
-          paddingLeft: insets.left + paddingHorizontal,
-          paddingRight: paddingHorizontal,
-          paddingTop: insets.top + 12,
-          paddingBottom: insets.bottom + 12,
-        },
-      ]}
-    >
-      {/* Mood-variant pills (2×2, web's DesktopColorPalette top). */}
-      <PaletteVariantPills
-        selected={paletteVariant}
-        onSelect={setPaletteVariant}
-        columns={2}
-      />
-
-      {/* Swatch grid for the active variant — dims for magic tools. */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.gridScroll,
-          { opacity: isMagicToolActive ? 0.4 : 1 },
-        ]}
-        pointerEvents={isMagicToolActive ? "none" : "auto"}
-      >
-        <ColorSwatchGrid
-          variant={paletteVariant}
-          selectedColor={isMagicToolActive ? "" : selectedColor}
-          onSelect={handleColorSelect}
-          columns={3}
+    <View style={[styles.outer, { width, paddingLeft: insets.left + 8 }]}>
+      <View style={styles.rail}>
+        {/* Mood-variant pills (2-up). */}
+        <PaletteVariantPills
+          selected={paletteVariant}
+          onSelect={setPaletteVariant}
+          columns={2}
         />
-      </ScrollView>
+
+        {/* Swatch grid for the active variant — dims for magic tools. */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.gridScroll,
+            { opacity: isMagicToolActive ? 0.4 : 1 },
+          ]}
+          pointerEvents={isMagicToolActive ? "none" : "auto"}
+        >
+          <ColorSwatchGrid
+            variant={paletteVariant}
+            selectedColor={isMagicToolActive ? "" : selectedColor}
+            onSelect={handleColorSelect}
+            columns={2}
+          />
+        </ScrollView>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  // Outer column: fixed width (from prop), never squeezed by the flex row,
+  // vertically centers the rail next to the canvas. The right padding is
+  // the canvas gap so the rail floats clear of the canvas card.
+  outer: {
+    flexShrink: 0,
+    justifyContent: "center",
+    alignItems: "stretch",
+    paddingVertical: 12,
+    paddingRight: 16,
+  },
+  // The floating rail card.
+  rail: {
+    flexShrink: 1,
     backgroundColor: COLORS.white,
-    borderRightWidth: 2,
-    borderRightColor: COLORS.bgCreamDark,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     gap: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
   },
   gridScroll: {
     flexGrow: 1,
-    paddingTop: 4,
+    paddingTop: 2,
   },
 });
 

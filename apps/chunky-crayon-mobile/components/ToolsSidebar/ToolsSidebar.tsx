@@ -111,16 +111,11 @@ const ToolsSidebar = ({
     }
   };
 
-  // 3-column tool grid (web's DesktopToolsSidebar). Tile size from the
-  // available width; clamp so tiles stay chunky but fit.
-  const paddingHorizontal = 12;
+  // Single-column slim rail: one ~56px tile per row, fixed comfortable
+  // tablet size. The rail width is set by the layout to fit exactly that.
   const gap = 8;
-  const availableWidth = width - paddingHorizontal * 2 - insets.right;
-  const tileSize = Math.max(
-    44,
-    Math.min(Math.floor((availableWidth - gap * 2) / 3), 64),
-  );
-  const zoomButtonSize = Math.max(40, tileSize - 8);
+  const tileSize = 56;
+  const zoomButtonSize = 48;
 
   return (
     <View style={[styles.outer, { width, paddingRight: insets.right + 8 }]}>
@@ -281,12 +276,14 @@ const ToolsSidebar = ({
 
 const styles = StyleSheet.create({
   // Outer column: fixed width (from prop), never squeezed by the flex row,
-  // vertically centers the rail next to the canvas.
+  // vertically centers the rail next to the canvas. The left padding is the
+  // canvas gap so the rail floats clear of the canvas card.
   outer: {
     flexShrink: 0,
     justifyContent: "center",
     alignItems: "stretch",
     paddingVertical: 12,
+    paddingLeft: 16,
   },
   // Slim floating rail card.
   rail: {
