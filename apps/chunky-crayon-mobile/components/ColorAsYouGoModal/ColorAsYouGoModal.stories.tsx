@@ -140,7 +140,7 @@ const SeededOpen = ({ state }: { state: SeededState }) => {
 };
 
 const meta: Meta<typeof ColorAsYouGoModal> = {
-  title: "Modals/ColorAsYouGoModal",
+  title: "Paywalls/ColorAsYouGoModal",
   component: ColorAsYouGoModal,
 };
 

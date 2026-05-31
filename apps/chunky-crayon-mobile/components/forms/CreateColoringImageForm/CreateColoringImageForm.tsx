@@ -12,13 +12,8 @@ import {
   VoiceInputPanel,
   ImageInputPanel,
 } from "./inputs";
-import {
-  useCredits,
-  useShouldShowPaywall,
-  useRefreshEntitlements,
-} from "@/hooks/useEntitlements";
-import Paywall from "@/components/Paywall";
-import TopUpPackModal from "@/components/TopUpPackModal";
+import { useCredits, useRefreshEntitlements } from "@/hooks/useEntitlements";
+import PaywallRouter from "@/components/PaywallRouter";
 
 type ColoringImage = {
   id: string;
@@ -36,26 +31,25 @@ const VOICE_CREDIT_COST = 10;
 const CreateColoringImageFormContent = () => {
   const { mode, description, isProcessing, reset } = useInputMode();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Single flag — PaywallRouter picks the right surface (top-up for
+  // subscribers out of credits, subscription plans for non-subscribers)
+  // from the entitlement state itself, so the call site no longer
+  // branches on `reason` to choose a modal.
   const [showPaywall, setShowPaywall] = useState(false);
-  const [showCreditPacks, setShowCreditPacks] = useState(false);
 
-  // Entitlements
+  // Entitlements. `credits` drives the threshold check below (whether to
+  // open the paywall at all); the routing decision lives in PaywallRouter.
   const credits = useCredits();
-  const { shouldShow, reason } = useShouldShowPaywall();
   const refreshEntitlements = useRefreshEntitlements();
 
   const handleSubmit = useCallback(async () => {
     if (!description.trim()) return;
 
-    // Check if user has enough credits (using CREDITS_PER_GENERATION threshold)
+    // Not enough credits — open the paywall. PaywallRouter decides
+    // whether that's the subscription plans (non-subscriber) or a
+    // credit top-up (subscriber out of credits).
     if (credits < CREDITS_PER_GENERATION) {
-      if (reason === "no_credits") {
-        // Subscriber out of credits - show credit pack purchase modal
-        setShowCreditPacks(true);
-      } else {
-        // No subscription - show paywall to subscribe
-        setShowPaywall(true);
-      }
+      setShowPaywall(true);
       return;
     }
 
@@ -79,7 +73,7 @@ const CreateColoringImageFormContent = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [description, reset, credits, reason, refreshEntitlements]);
+  }, [description, reset, credits, refreshEntitlements]);
 
   const handleColoringImageCreated = useCallback(
     async (coloringImage: ColoringImage) => {
@@ -128,26 +122,11 @@ const CreateColoringImageFormContent = () => {
     refreshEntitlements();
   }, [refreshEntitlements]);
 
-  const handleCreditPacksClose = useCallback(() => {
-    setShowCreditPacks(false);
-  }, []);
-
-  const handleCreditPacksSuccess = useCallback(() => {
-    setShowCreditPacks(false);
-    // Refresh entitlements after successful credit purchase
-    refreshEntitlements();
-  }, [refreshEntitlements]);
-
-  // Callback for child components to show paywall/credit packs
+  // Callback for child input panels to open the paywall. PaywallRouter
+  // resolves which surface (subscription vs top-up) from entitlements.
   const handleShowPaywall = useCallback(() => {
-    if (reason === "no_credits") {
-      // Subscriber out of credits - show credit pack purchase modal
-      setShowCreditPacks(true);
-    } else {
-      // No subscription - show paywall to subscribe
-      setShowPaywall(true);
-    }
-  }, [reason]);
+    setShowPaywall(true);
+  }, []);
 
   const busy = isSubmitting || isProcessing;
 
@@ -195,18 +174,13 @@ const CreateColoringImageFormContent = () => {
         </View>
       </View>
 
-      {/* Paywall modal */}
-      <Paywall
+      {/* PaywallRouter shows the right surface for the user's state:
+          subscription plans for non-subscribers, a credit top-up for
+          subscribers who've run out. */}
+      <PaywallRouter
         visible={showPaywall}
         onClose={handlePaywallClose}
         onSuccess={handlePaywallSuccess}
-      />
-
-      {/* Credit pack modal (for subscribers out of credits) */}
-      <TopUpPackModal
-        visible={showCreditPacks}
-        onClose={handleCreditPacksClose}
-        onSuccess={handleCreditPacksSuccess}
       />
     </>
   );

@@ -154,7 +154,7 @@ const SeededOpen = ({ state }: { state: SeededState }) => {
 };
 
 const meta: Meta<typeof TopUpPackModal> = {
-  title: "Modals/TopUpPackModal",
+  title: "Paywalls/TopUpPackModal",
   component: TopUpPackModal,
 };
 

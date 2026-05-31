@@ -72,7 +72,7 @@ const Forced = ({
 };
 
 const meta: Meta<typeof PaywallRouter> = {
-  title: "Modals/PaywallRouter",
+  title: "Paywalls/PaywallRouter",
   component: PaywallRouter,
 };
 

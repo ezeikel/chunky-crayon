@@ -27,7 +27,7 @@ import {
 } from "@/hooks/usePaywall";
 import type { PurchasesPackage } from "react-native-purchases";
 import ParentalGate from "../ParentalGate";
-import Paywall from "../Paywall";
+import SubscriptionPaywallModal from "../SubscriptionPaywallModal";
 
 type OnboardingPaywallSlideProps = {
   onComplete: () => void;
@@ -246,12 +246,13 @@ const OnboardingPaywallSlide = ({
         subtitle="Please verify you are a parent to start a subscription"
       />
 
-      {/* Full Paywall modal */}
-      <Paywall
+      {/* "See All Plans" → full subscription plan grid. The user is a
+          non-subscriber mid-onboarding, so this is always the
+          subscription modal (never a top-up surface). */}
+      <SubscriptionPaywallModal
         visible={showFullPaywall}
         onClose={handlePaywallClose}
         onSuccess={handlePaywallSuccess}
-        skipParentalGate={false}
       />
     </View>
   );

@@ -154,7 +154,7 @@ const SeededOpen = ({ state }: { state: SeededState }) => {
 };
 
 const meta: Meta<typeof SubscriptionPaywallModal> = {
-  title: "Modals/SubscriptionPaywallModal",
+  title: "Paywalls/SubscriptionPaywallModal",
   component: SubscriptionPaywallModal,
 };
 

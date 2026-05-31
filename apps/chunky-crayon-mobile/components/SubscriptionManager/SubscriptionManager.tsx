@@ -13,9 +13,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faXmark,
   faCheck,
-  faSparkles,
-  faDroplet,
-  faRainbow,
   faCoins,
   faArrowUpRight,
   faRotate,
@@ -26,59 +23,21 @@ import {
   useEntitlements,
   useRefreshEntitlements,
   getFormattedExpirationDate,
-  type PlanName,
 } from "@/hooks/useEntitlements";
 import { useRestorePurchases } from "@/hooks/usePaywall";
-import Paywall from "../Paywall";
+import {
+  PLAN_ICONS,
+  PLAN_COLORS,
+  PLAN_DISPLAY_NAMES_WITH_FREE,
+  PLAN_FEATURES_DETAILED,
+} from "@/lib/paywall/plans";
+import SubscriptionPaywallModal from "../SubscriptionPaywallModal";
 import TopUpPackModal from "../TopUpPackModal";
 import Spinner from "../Spinner/Spinner";
 
 type SubscriptionManagerProps = {
   visible: boolean;
   onClose: () => void;
-};
-
-const PLAN_ICONS = {
-  SPLASH: faDroplet,
-  RAINBOW: faRainbow,
-  SPARKLE: faSparkles,
-};
-
-const PLAN_COLORS = {
-  SPLASH: "#7DD3FC",
-  RAINBOW: "#F9A8D4",
-  SPARKLE: "#FCD34D",
-};
-
-const PLAN_DISPLAY_NAMES: Record<PlanName, string> = {
-  FREE: "Free",
-  SPLASH: "Splash",
-  RAINBOW: "Rainbow",
-  SPARKLE: "Sparkle",
-};
-
-const PLAN_FEATURES_LIST: Record<"SPLASH" | "RAINBOW" | "SPARKLE", string[]> = {
-  SPLASH: [
-    "250 credits/month",
-    "3 profiles",
-    "Magic Brush",
-    "Voice input",
-    "Camera input",
-  ],
-  RAINBOW: [
-    "500 credits/month",
-    "5 profiles",
-    "Everything in Splash",
-    "Priority support",
-    "Credit rollover",
-  ],
-  SPARKLE: [
-    "1,000 credits/month",
-    "10 profiles",
-    "Everything in Rainbow",
-    "Commercial use",
-    "2x credit rollover",
-  ],
 };
 
 const MANAGE_SUBSCRIPTION_URLS = {
@@ -186,7 +145,7 @@ const SubscriptionManager = ({
           <View style={styles.planInfo}>
             <View style={styles.planNameRow}>
               <Text style={styles.planName}>
-                {PLAN_DISPLAY_NAMES[plan]} Plan
+                {PLAN_DISPLAY_NAMES_WITH_FREE[plan]} Plan
               </Text>
               {renderStatusBadge()}
             </View>
@@ -217,7 +176,7 @@ const SubscriptionManager = ({
   const renderFeaturesList = () => {
     if (!hasSubscription || plan === "FREE") return null;
     const features =
-      PLAN_FEATURES_LIST[plan as keyof typeof PLAN_FEATURES_LIST];
+      PLAN_FEATURES_DETAILED[plan as keyof typeof PLAN_FEATURES_DETAILED];
     if (!features) return null;
 
     return (
@@ -352,8 +311,11 @@ const SubscriptionManager = ({
         )}
       </View>
 
-      {/* Sub-modals rendered inside parent Modal so they layer correctly on iOS */}
-      <Paywall
+      {/* Sub-modals rendered inside parent Modal so they layer correctly on iOS.
+          Subscribe/Upgrade opens the subscription plans; Buy Credits opens
+          the top-up packs. These are explicit user choices, so each is
+          rendered directly (no entitlement routing). */}
+      <SubscriptionPaywallModal
         visible={paywallVisible}
         onClose={handlePaywallClose}
         skipParentalGate
