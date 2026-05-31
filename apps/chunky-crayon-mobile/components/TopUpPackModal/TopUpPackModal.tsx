@@ -1,5 +1,12 @@
 import { useState, useCallback } from "react";
-import { View, Text, Modal, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  ScrollView,
+  Linking,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/pro-solid-svg-icons";
@@ -214,6 +221,31 @@ const TopUpPackModal = ({
               Credits are added to your account immediately after purchase.
               Credits do not expire.
             </Text>
+
+            {/* Terms / Privacy — required on any IAP screen. */}
+            <View style={styles.legalLinks}>
+              <SquishyPressable
+                onPress={() =>
+                  Linking.openURL("https://chunkycrayon.com/terms")
+                }
+                scaleTo={0.94}
+                accessibilityRole="link"
+                accessibilityLabel="Terms of Service"
+              >
+                <Text style={styles.legalLink}>Terms of Service</Text>
+              </SquishyPressable>
+              <Text style={styles.legalDot}>·</Text>
+              <SquishyPressable
+                onPress={() =>
+                  Linking.openURL("https://chunkycrayon.com/privacy")
+                }
+                scaleTo={0.94}
+                accessibilityRole="link"
+                accessibilityLabel="Privacy Policy"
+              >
+                <Text style={styles.legalLink}>Privacy Policy</Text>
+              </SquishyPressable>
+            </View>
           </ScrollView>
 
           {/* Loading overlay */}
@@ -312,6 +344,22 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 4,
     paddingHorizontal: 8,
+  },
+  legalLinks: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 4,
+  },
+  legalLink: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 13,
+    color: "#72625A",
+  },
+  legalDot: {
+    fontSize: 13,
+    color: "#9CA3AF",
   },
   loadingOverlay: {
     position: "absolute",
