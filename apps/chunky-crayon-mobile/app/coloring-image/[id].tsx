@@ -9,6 +9,7 @@ import ImageCanvas from "@/components/ImageCanvas/ImageCanvas";
 import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColoringToolbar";
 import ColorPaletteSidebar from "@/components/ColorPaletteSidebar/ColorPaletteSidebar";
 import ToolsSidebar from "@/components/ToolsSidebar/ToolsSidebar";
+import ColoringToolbar from "@/components/ColoringToolbar/ColoringToolbar";
 import ActionModal from "@/components/ActionModal/ActionModal";
 import ZoomControls from "@/components/ZoomControls/ZoomControls";
 import MuteToggle from "@/components/MuteToggle/MuteToggle";
@@ -86,11 +87,15 @@ const ColoringImage = () => {
 
   const { coloringImage } = data;
 
-  // Layout is width-driven now (coloringTier), not orientation. Until the
-  // dedicated middle-tier UI lands (toolbar-above-canvas), the middle tier
-  // reuses the sidebar layout — so an iPad in portrait (≥700dp) finally
-  // gets sidebars instead of the phone bottom-sheet. Only the phone tier
-  // uses the bottom drawer.
+  // Layout is width-driven now (coloringTier), not orientation:
+  //   - three-column (≥1024dp): Colors | Canvas | Tools sidebars
+  //   - middle (≥700dp): a single toolbar-above-canvas panel (web's
+  //     ColoringToolbar), canvas under it, action row below
+  //   - phone (<700dp): canvas with the bottom-sheet drawer
+  // `isLandscapeLayout` = "not phone" — the compact header + in-header
+  // controls apply to both the three-column and middle tiers.
+  const isThreeColumn = coloringTier === "three-column";
+  const isMiddle = coloringTier === "middle";
   const isLandscapeLayout = coloringTier !== "phone";
 
   return (
@@ -188,9 +193,9 @@ const ColoringImage = () => {
 
         {/* Main Content Area */}
         <View style={styles.mainContent}>
-          {/* Three-panel landscape layout: Colors | Canvas | Tools.
-              Sidebars hidden in focus mode. */}
-          {isLandscapeLayout && landscapeLayout ? (
+          {isThreeColumn && landscapeLayout ? (
+            /* Three-column layout: Colors | Canvas | Tools.
+               Sidebars hidden in focus mode. */
             <>
               {/* Left Sidebar - Color Palette */}
               {!isFocusMode && (
@@ -220,8 +225,40 @@ const ColoringImage = () => {
                 />
               )}
             </>
+          ) : isMiddle ? (
+            /* Middle layout: toolbar-above-canvas (web's ColoringToolbar),
+               canvas under it. Toolbar hidden in focus mode. */
+            <View style={styles.middleColumn}>
+              {!isFocusMode && (
+                <ColoringToolbar
+                  onZoomIn={handleZoomIn}
+                  onZoomOut={handleZoomOut}
+                  onResetZoom={handleResetZoom}
+                  zoom={scale}
+                />
+              )}
+              <View style={styles.middleCanvasWrapper}>
+                <ScrollView
+                  style={styles.scrollView}
+                  contentContainerStyle={styles.scrollContent}
+                  scrollEnabled={scroll}
+                  showsVerticalScrollIndicator={false}
+                >
+                  <View style={styles.canvasContainer}>
+                    <View style={styles.canvasCard}>
+                      <ImageCanvas
+                        coloringImage={coloringImage}
+                        setScroll={setScroll}
+                        canvasArea={canvasArea}
+                        layoutMode={layoutMode}
+                      />
+                    </View>
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
           ) : (
-            /* Portrait layout - Canvas with bottom toolbar */
+            /* Phone layout - Canvas with bottom toolbar */
             <View style={styles.canvasWrapper}>
               <ScrollView
                 style={styles.scrollView}
@@ -331,6 +368,15 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     flexDirection: "row",
+  },
+  middleColumn: {
+    flex: 1,
+    flexDirection: "column",
+    paddingTop: 8,
+    gap: 8,
+  },
+  middleCanvasWrapper: {
+    flex: 1,
   },
   canvasWrapper: {
     flex: 1,

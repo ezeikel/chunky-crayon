@@ -31,7 +31,7 @@ const Stage = ({ children }: { children: React.ReactNode }) => (
 );
 
 const meta: Meta = {
-  title: "Coloring Experience/Coloring Toolbar",
+  title: "Coloring Experience/Coloring Toolbar (Bottom Sheet)",
   parameters: { layout: "fullscreen" },
 };
 
