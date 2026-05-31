@@ -30,9 +30,10 @@ import { COLORS, FONTS } from "@/lib/design";
  * Drives `useVoiceConversation` (the state machine) and renders a branch per
  * state with copy mirroring web. Shared <Button>, design-token COLORS, i18n.
  *
- * Props unchanged so the create form doesn't change: on `ready_to_submit`
- * the combined transcript is already mirrored into InputModeContext, and we
- * hand off to the parent `onSubmit` (credit-gated via onShowPaywall).
+ * On `ready_to_submit` the combined transcript is mirrored into
+ * InputModeContext and we hand the two transcripts to the parent via
+ * `onVoiceSubmit` — which routes through the voice-specific create path
+ * (10 credits, anon-blocked). Credit-gated up front (onShowPaywall).
  */
 
 const RECORDING_STATES = ["recording_a1", "recording_a2"] as const;
