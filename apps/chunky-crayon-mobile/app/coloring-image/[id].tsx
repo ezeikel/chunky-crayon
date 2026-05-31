@@ -418,6 +418,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   canvasCardLandscape: {
+    width: "100%",
+    maxWidth: "100%",
+    overflow: "hidden",
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderRadius: 20,
     padding: 12,
