@@ -1,6 +1,7 @@
 import { View, ScrollView, StyleSheet } from "react-native";
 import { action } from "storybook/actions";
 import type { Meta, StoryObj } from "@storybook/react-native";
+import CreateColoringImageForm from "./CreateColoringImageForm";
 import {
   InputModeProvider,
   InputModeSelector,
@@ -79,6 +80,38 @@ const meta: Meta = {
 
 export default meta;
 type Story = StoryObj;
+
+// Page wrapper WITHOUT its own InputModeProvider — the full form self-wraps
+// one, so this just provides the cream page + white card the home screen uses.
+const Page = ({ children }: { children: React.ReactNode }) => (
+  <ScrollView
+    contentContainerStyle={{
+      flexGrow: 1,
+      backgroundColor: "#FDFAF5",
+      padding: 16,
+    }}
+  >
+    <View style={stageStyles.card}>{children}</View>
+  </ScrollView>
+);
+
+/**
+ * The WHOLE create form — mode selector + the active input panel, with mode
+ * switching live (tap a tile, the panel below swaps). Mirrors web's
+ * `CreateColoringPageFormDefault`. The other stories below render a single
+ * panel in isolation; this one is the integrated form. Scene is the default
+ * mode; Text/Voice/Image are parent-gated (tapping a locked tile opens the
+ * parental gate). The form self-wraps InputModeProvider + drives the real
+ * create/entitlement hooks.
+ */
+export const Default: Story = {
+  name: "Whole Form (mode switching)",
+  render: () => (
+    <Page>
+      <CreateColoringImageForm />
+    </Page>
+  ),
+};
 
 export const ModeSelector: Story = {
   name: "Input Modes — Selector",
