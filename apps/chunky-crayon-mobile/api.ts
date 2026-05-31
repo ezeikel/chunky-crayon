@@ -894,3 +894,75 @@ export const retryCharacterPortrait = async (
   const response = await api.post(`/mobile/characters/${id}/retry`);
   return response.data;
 };
+
+// ============================================================================
+// Voice mode (2-turn conversation)
+// ============================================================================
+
+/**
+ * Transcribe a recorded audio turn. Mobile records with expo-audio (m4a/AAC
+ * on iOS) and POSTs the file as multipart — Deepgram nova-3 accepts the
+ * native container directly, no client-side transcoding (verified). Mirrors
+ * web's `POST /api/voice/transcribe`, which web hits with a webm blob.
+ */
+export type TranscribeResponse = {
+  transcript: string;
+  fullTranscript?: string;
+  confidence?: number;
+  durationMs?: number;
+};
+
+export const transcribeVoice = async (
+  audioUri: string,
+): Promise<TranscribeResponse> => {
+  const form = new FormData();
+  // RN multipart file part — { uri, name, type }. expo-audio iOS recordings
+  // are m4a/AAC; the endpoint forwards the reported MIME to Deepgram.
+  form.append("audio", {
+    uri: audioUri,
+    name: "turn.m4a",
+    type: "audio/m4a",
+  } as unknown as Blob);
+
+  const response = await api.post("/voice/transcribe", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+/**
+ * Generate the dynamic follow-up question (Q2) from the kid's first answer.
+ * Server runs moderation → Claude → moderation → ElevenLabs TTS and returns
+ * the question text plus a playable R2 audio URL. Mirrors web's
+ * `POST /api/voice/follow-up`. On a moderation block the server returns a 4xx
+ * with an `error` code (too_long / blocklisted / moderation_flagged / etc.).
+ */
+export type FollowUpResponse = {
+  followUpText: string;
+  followUpAudioUrl: string;
+};
+
+export const getVoiceFollowUp = async (
+  firstAnswer: string,
+): Promise<FollowUpResponse> => {
+  const response = await api.post("/voice/follow-up", { firstAnswer });
+  return response.data;
+};
+
+/**
+ * Create a coloring page from a completed voice conversation. Hits the
+ * voice-specific endpoint that charges VOICE_CREDIT_COST (10) credits,
+ * blocks anon users, and tags the row purposeKey:'voice' — mirroring web's
+ * `createColoringImageFromVoiceConversation` action (NOT the flat-5 text
+ * path). Send the raw transcripts; the server combines them.
+ */
+export const createColoringImageFromVoice = async (
+  firstAnswer: string,
+  secondAnswer: string,
+) => {
+  const response = await api.post("/voice/create", {
+    firstAnswer,
+    secondAnswer,
+  });
+  return response.data;
+};

@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { queryClient } from "@/providers";
-import { createColoringImage } from "@/api";
+import { createColoringImage, createColoringImageFromVoice } from "@/api";
 import {
   InputModeProvider,
   useInputMode,
@@ -27,7 +27,11 @@ type ColoringImage = {
   title: string;
 };
 
+// Text / image / scene generations cost 5 credits; voice costs 10 (TTS
+// dominates the unit cost — mirrors web's VOICE_CREDIT_COST). The voice path
+// gates + charges 10 separately via handleVoiceSubmit + /voice/create.
 const CREDITS_PER_GENERATION = 5;
+const VOICE_CREDIT_COST = 10;
 
 const CreateColoringImageFormContent = () => {
   const { mode, description, isProcessing, reset } = useInputMode();
@@ -85,6 +89,31 @@ const CreateColoringImageFormContent = () => {
       reset();
       await queryClient.refetchQueries();
       router.push(`/coloring-image/${coloringImage.id}`);
+    },
+    [reset, refreshEntitlements],
+  );
+
+  // Voice submit goes through the VOICE-specific create path — charges
+  // VOICE_CREDIT_COST (10), anon-blocked + tagged purposeKey:'voice'
+  // server-side — NOT the flat-5 text path. The panel has already gated on
+  // 10 credits before calling this.
+  const handleVoiceSubmit = useCallback(
+    async (firstAnswer: string, secondAnswer: string) => {
+      setIsSubmitting(true);
+      try {
+        const { coloringImage } = await createColoringImageFromVoice(
+          firstAnswer,
+          secondAnswer,
+        );
+        refreshEntitlements();
+        reset();
+        await queryClient.refetchQueries();
+        router.push(`/coloring-image/${coloringImage.id}`);
+      } catch (error) {
+        console.error("Failed to create voice coloring image:", error);
+      } finally {
+        setIsSubmitting(false);
+      }
     },
     [reset, refreshEntitlements],
   );
@@ -148,9 +177,10 @@ const CreateColoringImageFormContent = () => {
           )}
           {mode === "voice" && (
             <VoiceInputPanel
-              onSubmit={handleSubmit}
+              onVoiceSubmit={handleVoiceSubmit}
               isSubmitting={isSubmitting}
               credits={credits}
+              voiceCreditCost={VOICE_CREDIT_COST}
               onShowPaywall={handleShowPaywall}
             />
           )}

@@ -161,6 +161,28 @@
         "space-stars": "Stars",
         "balloons": "Balloons"
       }
+    },
+    "voice": {
+      "tapToChat": "Tap to chat",
+      "listen": "Listen…",
+      "listening": "Listening…",
+      "anythingElse": "Anything else?",
+      "thinking": "Hmm, let me think…",
+      "painting": "Painting your page…",
+      "doneTalking": "Done talking",
+      "imDone": "I'm done",
+      "cancel": "Cancel",
+      "tryAgain": "Try again",
+      "startLabel": "Start voice conversation",
+      "stopLabel": "Stop recording",
+      "errorPermissionDenied": "I need permission to use your microphone.",
+      "errorQ1AudioFailed": "Couldn't play the question. Try again?",
+      "errorSttFailed": "I couldn't hear you clearly. Let's try again.",
+      "errorFollowUpFailed": "Something went wrong. Try again?",
+      "errorFollowUpBlocked": "Let's try a different idea!",
+      "errorQ2AudioFailed": "Couldn't play the question. Try again?",
+      "errorTimeout": "Took too long! Let's start over.",
+      "errorRequiresSignin": "Sign in to use voice mode."
     }
   }
 }

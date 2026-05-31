@@ -132,9 +132,10 @@ export const VoiceInput: Story = {
       <InputModeSelector disabled={false} />
       <View style={{ marginTop: 16 }}>
         <VoiceInputPanel
-          onSubmit={action("submit")}
+          onVoiceSubmit={action("voice-submit")}
           isSubmitting={false}
           credits={250}
+          voiceCreditCost={10}
           onShowPaywall={action("show-paywall")}
         />
       </View>
@@ -149,9 +150,10 @@ export const VoiceInputNoCredits: Story = {
       <InputModeSelector disabled={false} />
       <View style={{ marginTop: 16 }}>
         <VoiceInputPanel
-          onSubmit={action("submit")}
+          onVoiceSubmit={action("voice-submit")}
           isSubmitting={false}
           credits={0}
+          voiceCreditCost={10}
           onShowPaywall={action("show-paywall")}
         />
       </View>

@@ -1,314 +1,312 @@
-import { useState, useCallback, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faMicrophoneLines, faStop } from "@fortawesome/pro-duotone-svg-icons";
+import {
+  faMicrophoneLines,
+  faStop,
+  faRotateRight,
+  faFaceDizzy,
+} from "@fortawesome/pro-duotone-svg-icons";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withRepeat,
-  withTiming,
   withSequence,
+  withTiming,
   cancelAnimation,
 } from "react-native-reanimated";
-import * as Haptics from "expo-haptics";
-import {
-  ExpoSpeechRecognitionModule,
-  useSpeechRecognitionEvent,
-} from "expo-speech-recognition";
 import { useInputMode } from "./InputModeContext";
+import {
+  useVoiceConversation,
+  type VoiceConversationError,
+} from "../hooks/useVoiceConversation";
+import Button from "@/components/Button";
 import Spinner from "@/components/Spinner/Spinner";
+import { useT } from "@/lib/i18n/useT";
+import { COLORS, FONTS } from "@/lib/design";
 
-// =============================================================================
-// Design Tokens (matching web tailwind config)
-// =============================================================================
+/**
+ * Mobile 2-turn conversational voice input — RN port of web's VoiceInput.tsx.
+ * Drives `useVoiceConversation` (the state machine) and renders a branch per
+ * state with copy mirroring web. Shared <Button>, design-token COLORS, i18n.
+ *
+ * Props unchanged so the create form doesn't change: on `ready_to_submit`
+ * the combined transcript is already mirrored into InputModeContext, and we
+ * hand off to the parent `onSubmit` (credit-gated via onShowPaywall).
+ */
 
-const COLORS = {
-  // Primary - Coral: hsl(12, 75%, 58%)
-  crayonOrange: "#E46444",
-  // Secondary - Peach: hsl(25, 80%, 72%) - web calls this "teal"
-  crayonPeach: "#F1AE7E",
-  // Peach light: for transcript bubble background
-  crayonPeachLight: "rgba(241, 174, 126, 0.3)",
-  // Background cream dark: hsl(35, 40%, 93%)
-  bgCreamDark: "#F0E9E0",
-  // Text primary: hsl(20, 20%, 22%)
-  textPrimary: "#443832",
-  // Text muted: hsl(20, 10%, 50%)
-  textMuted: "#8B7E78",
-  // Red for recording
-  recordingRed: "#EF4444",
-  // White
-  white: "#FFFFFF",
-};
-
-// =============================================================================
-// Types
-// =============================================================================
-
-const CREDITS_PER_GENERATION = 5;
+const RECORDING_STATES = ["recording_a1", "recording_a2"] as const;
 
 type VoiceInputPanelProps = {
-  onSubmit: () => void;
+  /**
+   * Called with the two captured transcripts once the conversation completes.
+   * The parent routes this through the VOICE-specific create path (charges
+   * the voice credit cost, anon-blocked, purposeKey:'voice') — NOT the flat
+   * text path. The panel has already credit-gated before calling this.
+   */
+  onVoiceSubmit: (firstAnswer: string, secondAnswer: string) => void;
   isSubmitting: boolean;
   credits: number;
+  /** Credit cost of a voice generation (10) — used for the pre-submit gate. */
+  voiceCreditCost: number;
   onShowPaywall: () => void;
 };
 
-// =============================================================================
-// Component
-// =============================================================================
+// 5-bar audio level indicator — mirrors web's AudioLevelIndicator.
+const AudioBars = ({ level }: { level: number }) => (
+  <View style={styles.barsRow}>
+    {[0, 1, 2, 3, 4].map((i) => {
+      const threshold = ((i + 1) / 5) * 0.7;
+      const active = level >= threshold;
+      return (
+        <View
+          key={i}
+          style={[
+            styles.bar,
+            { height: 16 + i * 8 },
+            active ? styles.barActive : styles.barIdle,
+          ]}
+        />
+      );
+    })}
+  </View>
+);
 
 const VoiceInputPanel = ({
-  onSubmit,
+  onVoiceSubmit,
   isSubmitting,
   credits,
+  voiceCreditCost,
   onShowPaywall,
 }: VoiceInputPanelProps) => {
-  const { description, setDescription, setIsProcessing, setError } =
-    useInputMode();
+  const t = useT("createForm.voice");
+  const { setDescription, setIsProcessing, setIsBusy } = useInputMode();
+  const {
+    state,
+    error,
+    firstAnswer,
+    secondAnswer,
+    audioLevel,
+    silenceDetected,
+    start,
+    stopRecording,
+    reset,
+  } = useVoiceConversation();
 
-  // Check if user has enough credits to generate
-  const hasEnoughCredits = credits >= CREDITS_PER_GENERATION;
+  const hasEnoughCredits = credits >= voiceCreditCost;
+  const handedOffRef = useRef(false);
 
-  // Wrap onSubmit with credit check
-  const handleSubmit = useCallback(() => {
-    if (!hasEnoughCredits) {
-      onShowPaywall();
-      return;
+  // Idle-mic gentle pulse (matches web's animate-pulse on the big mic).
+  const pulse = useSharedValue(1);
+  useEffect(() => {
+    if (state === "idle") {
+      pulse.value = withRepeat(
+        withSequence(
+          withTiming(1.06, { duration: 700 }),
+          withTiming(1, { duration: 700 }),
+        ),
+        -1,
+        true,
+      );
+    } else {
+      cancelAnimation(pulse);
+      pulse.value = withTiming(1);
     }
-    onSubmit();
-  }, [hasEnoughCredits, onShowPaywall, onSubmit]);
-  const [isListening, setIsListening] = useState(false);
-  const [partialResult, setPartialResult] = useState("");
-
-  // Animation for pulsing effect when listening
-  const pulseScale = useSharedValue(1);
-  const pulseOpacity = useSharedValue(0.5);
-
+  }, [state, pulse]);
   const pulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseScale.value }],
-    opacity: pulseOpacity.value,
+    transform: [{ scale: pulse.value }],
   }));
 
-  // Start/stop pulse animation based on listening state
+  // Mirror combined transcript into context (drives loading overlay + isReady)
+  // and tell the form we're busy so its CTA hides during the conversation.
   useEffect(() => {
-    if (isListening) {
-      pulseScale.value = withRepeat(
-        withSequence(
-          withTiming(1.5, { duration: 800 }),
-          withTiming(1, { duration: 800 }),
-        ),
-        -1,
-        true,
-      );
-      pulseOpacity.value = withRepeat(
-        withSequence(
-          withTiming(0.8, { duration: 800 }),
-          withTiming(0.3, { duration: 800 }),
-        ),
-        -1,
-        true,
-      );
-    } else {
-      cancelAnimation(pulseScale);
-      cancelAnimation(pulseOpacity);
-      pulseScale.value = withTiming(1);
-      pulseOpacity.value = withTiming(0.5);
+    if (firstAnswer && secondAnswer) {
+      setDescription(`${firstAnswer} ${secondAnswer}`.trim());
+    } else if (firstAnswer) {
+      setDescription(firstAnswer);
     }
-  }, [isListening, pulseScale, pulseOpacity]);
+  }, [firstAnswer, secondAnswer, setDescription]);
 
-  // Handle speech recognition results
-  useSpeechRecognitionEvent("result", (event) => {
-    if (event.results && event.results.length > 0) {
-      const lastResult = event.results[event.results.length - 1];
-      if (lastResult) {
-        const transcript = lastResult.transcript || "";
-
-        if (event.isFinal) {
-          // Final result - update context
-          const newDescription = description
-            ? `${description} ${transcript}`
-            : transcript;
-          setDescription(newDescription);
-          setPartialResult("");
-        } else {
-          // Partial result - show in UI
-          setPartialResult(transcript);
-        }
-      }
-    }
-  });
-
-  // Handle speech recognition end
-  useSpeechRecognitionEvent("end", () => {
-    setIsListening(false);
-    setIsProcessing(false);
-    setPartialResult("");
-  });
-
-  // Handle speech recognition errors
-  useSpeechRecognitionEvent("error", (event) => {
-    console.warn("Speech recognition error:", event.error, event.message);
-    setIsListening(false);
-    setIsProcessing(false);
-    setError("Voice recognition failed. Please try again.");
-    setPartialResult("");
-  });
-
-  const startListening = useCallback(async () => {
-    try {
-      const result =
-        await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-      if (!result.granted) {
-        setError("Microphone permission is required for voice input.");
-        return;
-      }
-
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
-      setIsListening(true);
-      setIsProcessing(true);
-      setPartialResult("");
-
-      ExpoSpeechRecognitionModule.start({
-        lang: "en-US",
-        interimResults: true,
-        maxAlternatives: 1,
-        continuous: false,
-      });
-    } catch (error) {
-      console.error("Failed to start speech recognition:", error);
-      setIsListening(false);
+  useEffect(() => {
+    const busy = state !== "idle" && state !== "error";
+    setIsBusy(busy);
+    setIsProcessing(state === "processing_q2");
+    return () => {
+      setIsBusy(false);
       setIsProcessing(false);
-      setError("Failed to start voice recognition.");
+    };
+  }, [state, setIsBusy, setIsProcessing]);
+
+  // Hand off to the parent once both turns are captured. Credit-gate first —
+  // out of credits opens the paywall instead of submitting.
+  useEffect(() => {
+    if (state !== "ready_to_submit") {
+      handedOffRef.current = false;
+      return;
     }
-  }, [setIsProcessing, setError]);
-
-  const stopListening = useCallback(async () => {
-    try {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      ExpoSpeechRecognitionModule.stop();
-      setIsListening(false);
-    } catch (error) {
-      console.error("Failed to stop speech recognition:", error);
+    if (handedOffRef.current) return;
+    handedOffRef.current = true;
+    if (!hasEnoughCredits) {
+      onShowPaywall();
+      reset();
+      return;
     }
-  }, []);
+    // Submit the two transcripts through the voice-specific create path.
+    onVoiceSubmit(firstAnswer, secondAnswer);
+  }, [
+    state,
+    hasEnoughCredits,
+    onVoiceSubmit,
+    firstAnswer,
+    secondAnswer,
+    onShowPaywall,
+    reset,
+  ]);
 
-  const handleMicPress = useCallback(() => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
-  }, [isListening, startListening, stopListening]);
+  const errorCopy = (code: VoiceConversationError): string => {
+    const map: Record<VoiceConversationError, string> = {
+      permission_denied: t("errorPermissionDenied"),
+      q1_audio_failed: t("errorQ1AudioFailed"),
+      stt_failed: t("errorSttFailed"),
+      follow_up_failed: t("errorFollowUpFailed"),
+      follow_up_blocked: t("errorFollowUpBlocked"),
+      q2_audio_failed: t("errorQ2AudioFailed"),
+      timeout: t("errorTimeout"),
+      requires_signin: t("errorRequiresSignin"),
+    };
+    return map[code];
+  };
 
-  return (
-    <View style={styles.container}>
-      {/* Instructions */}
-      <Text style={styles.instructions}>
-        {description
-          ? "All done? Tap the button to create!"
-          : "Tap the microphone and tell me what you want to color!"}
-      </Text>
+  const isRecording = (RECORDING_STATES as readonly string[]).includes(state);
+  const isThinking =
+    state === "processing_q2" || state === "ready_to_submit" || isSubmitting;
 
-      {/* Microphone button */}
-      <View style={styles.micContainer}>
-        <Pressable
-          onPress={handleMicPress}
-          disabled={isSubmitting}
-          accessibilityLabel={
-            isListening ? "Stop recording" : "Start voice input"
+  // ── error ──
+  if (state === "error" && error) {
+    return (
+      <View style={styles.centered}>
+        <FontAwesomeIcon
+          icon={faFaceDizzy}
+          size={56}
+          color={COLORS.crayonOrange}
+          secondaryColor={COLORS.crayonPeach}
+          secondaryOpacity={1}
+        />
+        <Text style={styles.bigText}>{errorCopy(error)}</Text>
+        <Button
+          variant="default"
+          size="lg"
+          label={t("tryAgain")}
+          onPress={reset}
+          leading={
+            <FontAwesomeIcon icon={faRotateRight} size={16} color="#FFFFFF" />
           }
-          accessibilityRole="button"
-        >
-          {/* Pulse effect behind the button */}
-          {isListening && <Animated.View style={[styles.pulse, pulseStyle]} />}
+        />
+      </View>
+    );
+  }
 
-          {/* Main button */}
-          <View
-            style={[
-              styles.micButton,
-              isListening && styles.micButtonActive,
-              isSubmitting && styles.micButtonDisabled,
-            ]}
-          >
-            <FontAwesomeIcon
-              icon={isListening ? faStop : faMicrophoneLines}
-              size={40}
-              color={COLORS.white}
-              secondaryColor={
-                isListening ? COLORS.white : "rgba(255, 255, 255, 0.8)"
-              }
-              secondaryOpacity={1}
-            />
-          </View>
-        </Pressable>
+  // ── q1/q2 playing — passive ──
+  if (state === "q1_playing" || state === "q2_playing") {
+    return (
+      <View style={styles.centered}>
+        <FontAwesomeIcon
+          icon={faMicrophoneLines}
+          size={56}
+          color={COLORS.crayonOrange}
+          secondaryColor={COLORS.crayonOrange}
+          secondaryOpacity={0.6}
+        />
+        <Text style={styles.bigText}>{t("listen")}</Text>
+      </View>
+    );
+  }
 
-        {/* Status text */}
-        <Text style={styles.statusText}>
-          {isListening
-            ? partialResult || "I'm listening! Tell me what you want to color!"
-            : description
-              ? ""
-              : "Tap to speak"}
+  // ── thinking (processing Q2 / handing off) ──
+  if (isThinking) {
+    return (
+      <View style={styles.centered}>
+        <Spinner color={COLORS.crayonOrange} size={44} />
+        <Text style={styles.bigText}>
+          {t(isSubmitting ? "painting" : "thinking")}
         </Text>
       </View>
+    );
+  }
 
-      {/* Show transcribed text in speech bubble */}
-      {description && !isListening && (
-        <View style={styles.transcriptContainer}>
-          <Text style={styles.transcriptText}>"{description}"</Text>
-        </View>
-      )}
-
-      {/* Submit button - only show when we have text */}
-      {description.trim() && !isListening && (
-        <Pressable
+  // ── recording ──
+  if (isRecording) {
+    return (
+      <View style={styles.centered}>
+        <Text
           style={[
-            styles.submitButton,
-            isSubmitting && styles.submitButtonDisabled,
+            styles.bigText,
+            silenceDetected && { color: COLORS.crayonPeach },
           ]}
-          onPress={handleSubmit}
-          disabled={isSubmitting}
         >
-          <Text style={styles.buttonText}>
-            {isSubmitting ? "Creating..." : "Create coloring page"}
-          </Text>
-          {isSubmitting && <Spinner color={COLORS.white} size={18} />}
+          {silenceDetected ? t("anythingElse") : t("listening")}
+        </Text>
+        <AudioBars level={audioLevel} />
+        <View style={styles.recRow}>
+          <Button
+            variant="outline-muted"
+            size="lg"
+            label={t("cancel")}
+            onPress={reset}
+            style={styles.recCancel}
+          />
+          <Button
+            variant={silenceDetected ? "secondary" : "default"}
+            size="lg"
+            label={silenceDetected ? t("imDone") : t("doneTalking")}
+            onPress={stopRecording}
+            style={styles.recDone}
+            leading={
+              <FontAwesomeIcon icon={faStop} size={16} color="#FFFFFF" />
+            }
+          />
+        </View>
+      </View>
+    );
+  }
+
+  // ── idle — big bouncy mic, tap to start ──
+  return (
+    <View style={styles.centered}>
+      <Text style={styles.bigText}>{t("tapToChat")}</Text>
+      <Animated.View style={pulseStyle}>
+        <Pressable
+          onPress={start}
+          accessibilityRole="button"
+          accessibilityLabel={t("startLabel")}
+          style={styles.micButton}
+        >
+          <FontAwesomeIcon
+            icon={faMicrophoneLines}
+            size={44}
+            color={COLORS.white}
+            secondaryColor="rgba(255,255,255,0.8)"
+            secondaryOpacity={1}
+          />
         </Pressable>
-      )}
+      </Animated.View>
     </View>
   );
 };
 
-// =============================================================================
-// Styles
-// =============================================================================
-
 const styles = StyleSheet.create({
-  container: {
+  centered: {
     alignItems: "center",
+    justifyContent: "center",
+    gap: 20,
+    paddingVertical: 16,
   },
-  instructions: {
+  bigText: {
     textAlign: "center",
     color: COLORS.textPrimary,
-    fontSize: 18,
-    fontFamily: "TondoTrial-Bold",
-    marginBottom: 24,
+    fontSize: 22,
+    fontFamily: FONTS.bold,
     paddingHorizontal: 16,
-  },
-  micContainer: {
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  pulse: {
-    position: "absolute",
-    width: 116,
-    height: 116,
-    borderRadius: 58,
-    backgroundColor: COLORS.crayonOrange,
-    left: -10,
-    top: -10,
   },
   micButton: {
     width: 96,
@@ -317,69 +315,38 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.crayonOrange,
     alignItems: "center",
     justifyContent: "center",
-    // shadow-btn-primary: 0 4px 14px 0 hsl(var(--crayon-orange) / 0.4)
     shadowColor: COLORS.crayonOrange,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 14,
     elevation: 6,
   },
-  micButtonActive: {
-    backgroundColor: COLORS.recordingRed,
-    shadowColor: COLORS.recordingRed,
-  },
-  micButtonDisabled: {
-    backgroundColor: COLORS.bgCreamDark,
-    shadowOpacity: 0,
-  },
-  statusText: {
-    marginTop: 12,
-    color: COLORS.crayonOrange,
-    fontSize: 14,
-    fontFamily: "TondoTrial-Regular",
-    textAlign: "center",
-    minHeight: 20,
-  },
-  transcriptContainer: {
-    backgroundColor: COLORS.crayonPeachLight,
-    borderWidth: 2,
-    borderColor: COLORS.crayonPeach,
-    borderRadius: 16,
-    padding: 20,
-    width: "100%",
-    marginBottom: 16,
-  },
-  transcriptText: {
-    color: COLORS.textPrimary,
-    fontSize: 18,
-    fontFamily: "TondoTrial-Regular",
-    textAlign: "center",
-    lineHeight: 26,
-  },
-  submitButton: {
+  barsRow: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
+    alignItems: "flex-end",
+    gap: 6,
+    height: 48,
+  },
+  bar: {
+    width: 8,
+    borderRadius: 4,
+  },
+  barActive: {
     backgroundColor: COLORS.crayonOrange,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+  },
+  barIdle: {
+    backgroundColor: COLORS.bgCreamDark,
+  },
+  recRow: {
+    flexDirection: "row",
+    gap: 12,
     width: "100%",
-    // shadow-btn-primary: 0 4px 14px 0 hsl(var(--crayon-orange) / 0.4)
-    shadowColor: COLORS.crayonOrange,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 14,
-    elevation: 6,
   },
-  submitButtonDisabled: {
-    opacity: 0.7,
+  recCancel: {
+    flex: 1,
   },
-  buttonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    fontFamily: "TondoTrial-Bold",
+  recDone: {
+    flex: 2,
   },
 });
 
