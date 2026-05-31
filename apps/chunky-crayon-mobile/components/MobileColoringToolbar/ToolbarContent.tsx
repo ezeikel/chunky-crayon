@@ -7,6 +7,7 @@ import {
 } from "@fortawesome/pro-duotone-svg-icons";
 import { COLORS } from "@/lib/design";
 import { useCanvasStore } from "@/stores/canvasStore";
+import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import {
   tapLight,
   tapMedium,
@@ -41,11 +42,13 @@ import {
  * render it inline in the story frame (a docked sheet renders off-canvas in
  * SB's split layout). Same component, two hosts — visuals identical.
  *
- * Tile size is a fixed chunky 56 (matches web mobile / the other toolbars).
+ * Tile size comes from the responsive layout's medium touch target so it
+ * scales with device size and stays above the iOS minimum (matches the
+ * other toolbars).
  */
-const TILE = 56;
-
 const ToolbarContent = () => {
+  const { touchTargetSize } = useResponsiveLayout();
+  const tile = touchTargetSize.medium;
   const {
     selectedTool,
     selectedColor,
@@ -153,7 +156,7 @@ const ToolbarContent = () => {
               icon={config.icon}
               label={config.label}
               selected={isToolActive(config)}
-              size={TILE}
+              size={tile}
               onPress={() => handleToolSelect(config)}
             />
           ))}
@@ -165,7 +168,7 @@ const ToolbarContent = () => {
               isMagic
               selected={isToolActive(config)}
               loading={!magicReady}
-              size={TILE}
+              size={tile}
               onPress={() => handleToolSelect(config)}
             />
           ))}
@@ -181,7 +184,7 @@ const ToolbarContent = () => {
             setBrushSize(radius);
           }}
           color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
-          tileSize={TILE}
+          tileSize={tile}
         />
 
         <View style={styles.spacer} />
@@ -189,7 +192,11 @@ const ToolbarContent = () => {
         <Pressable
           onPress={handleUndo}
           disabled={!canUndo()}
-          style={[styles.iconButton, !canUndo() && styles.disabled]}
+          style={[
+            styles.iconButton,
+            { width: tile, height: tile },
+            !canUndo() && styles.disabled,
+          ]}
           accessibilityLabel="Undo"
         >
           <FontAwesomeIcon
@@ -201,7 +208,11 @@ const ToolbarContent = () => {
         <Pressable
           onPress={handleRedo}
           disabled={!canRedo()}
-          style={[styles.iconButton, !canRedo() && styles.disabled]}
+          style={[
+            styles.iconButton,
+            { width: tile, height: tile },
+            !canRedo() && styles.disabled,
+          ]}
           accessibilityLabel="Redo"
         >
           <FontAwesomeIcon
@@ -234,8 +245,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   iconButton: {
-    width: TILE,
-    height: TILE,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 24,

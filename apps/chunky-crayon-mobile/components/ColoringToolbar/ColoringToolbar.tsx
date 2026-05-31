@@ -10,6 +10,7 @@ import {
   faExpand,
 } from "@fortawesome/pro-duotone-svg-icons";
 import { useCanvasStore } from "@/stores/canvasStore";
+import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { tapLight, tapMedium, notifyWarning } from "@/utils/haptics";
 import { COLORS } from "@/lib/design";
 import ToolTile from "@/components/coloring/ToolTile";
@@ -38,10 +39,10 @@ type ColoringToolbarProps = {
  * as the sidebars but laid out horizontally — palette-variant pills, a
  * wide swatch grid, the tool row + magic tiles, brush sizes, and an
  * undo/redo + zoom row. Built on the shared primitives so the look
- * matches web exactly. Tile size is a fixed chunky 56 (web tablet sizing).
+ * matches web exactly. Tile size comes from the responsive layout's
+ * medium touch target so tiles scale with device size (phone 48 / tablet
+ * 64) and stay above the iOS minimum.
  */
-const TILE = 56;
-
 const ColoringToolbar = ({
   onZoomIn,
   onZoomOut,
@@ -51,6 +52,8 @@ const ColoringToolbar = ({
   maxZoom = 3,
 }: ColoringToolbarProps) => {
   const insets = useSafeAreaInsets();
+  const { touchTargetSize } = useResponsiveLayout();
+  const tile = touchTargetSize.medium;
 
   const {
     selectedTool,
@@ -160,7 +163,7 @@ const ColoringToolbar = ({
             icon={config.icon}
             label={config.label}
             selected={isToolActive(config)}
-            size={TILE}
+            size={tile}
             onPress={() => handleToolSelect(config)}
           />
         ))}
@@ -172,7 +175,7 @@ const ColoringToolbar = ({
             isMagic
             selected={isToolActive(config)}
             loading={!magicReady}
-            size={TILE}
+            size={tile}
             onPress={() => handleToolSelect(config)}
           />
         ))}
@@ -187,7 +190,7 @@ const ColoringToolbar = ({
             setBrushSize(radius);
           }}
           color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
-          tileSize={TILE}
+          tileSize={tile}
         />
 
         <View style={styles.spacer} />
@@ -195,7 +198,11 @@ const ColoringToolbar = ({
         <Pressable
           onPress={handleUndo}
           disabled={!canUndo()}
-          style={[styles.iconButton, !canUndo() && styles.disabled]}
+          style={[
+            styles.iconButton,
+            { width: tile, height: tile },
+            !canUndo() && styles.disabled,
+          ]}
           accessibilityLabel="Undo"
         >
           <FontAwesomeIcon
@@ -207,7 +214,11 @@ const ColoringToolbar = ({
         <Pressable
           onPress={handleRedo}
           disabled={!canRedo()}
-          style={[styles.iconButton, !canRedo() && styles.disabled]}
+          style={[
+            styles.iconButton,
+            { width: tile, height: tile },
+            !canRedo() && styles.disabled,
+          ]}
           accessibilityLabel="Redo"
         >
           <FontAwesomeIcon
@@ -224,7 +235,11 @@ const ColoringToolbar = ({
               onZoomOut?.();
             }}
             disabled={zoom <= minZoom}
-            style={[styles.iconButton, zoom <= minZoom && styles.disabled]}
+            style={[
+              styles.iconButton,
+              { width: tile, height: tile },
+              zoom <= minZoom && styles.disabled,
+            ]}
             accessibilityLabel="Zoom out"
           >
             <FontAwesomeIcon
@@ -239,7 +254,11 @@ const ColoringToolbar = ({
               onZoomIn?.();
             }}
             disabled={zoom >= maxZoom}
-            style={[styles.iconButton, zoom >= maxZoom && styles.disabled]}
+            style={[
+              styles.iconButton,
+              { width: tile, height: tile },
+              zoom >= maxZoom && styles.disabled,
+            ]}
             accessibilityLabel="Zoom in"
           >
             <FontAwesomeIcon
@@ -253,7 +272,7 @@ const ColoringToolbar = ({
               tapLight();
               onResetZoom?.();
             }}
-            style={styles.iconButton}
+            style={[styles.iconButton, { width: tile, height: tile }]}
             accessibilityLabel="Reset zoom"
           >
             <FontAwesomeIcon
@@ -302,8 +321,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   iconButton: {
-    width: TILE,
-    height: TILE,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 24,
