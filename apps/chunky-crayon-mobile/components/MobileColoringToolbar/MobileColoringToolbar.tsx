@@ -20,8 +20,10 @@ const MobileColoringToolbar = () => {
   const insets = useSafeAreaInsets();
   const [index, setIndex] = useState(0);
 
-  const collapsedHeight = 140 + insets.bottom;
-  const expandedHeight = 380 + insets.bottom;
+  // Collapsed shows the variant pills + the first rows of the swatch grid;
+  // expanded reveals the full grid, the tool row, and the brush/undo row.
+  const collapsedHeight = 150 + insets.bottom;
+  const expandedHeight = 420 + insets.bottom;
 
   return (
     <BottomSheet

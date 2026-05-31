@@ -13,17 +13,19 @@ import { useCanvasStore } from "@/stores/canvasStore";
  * screen bottom, which renders off-canvas in Storybook's split layout.
  * The body is the reviewable part and renders identically here.
  *
- * Mirrors web's coloring-ui ToolSelector: white cream-bordered rounded
- * tool tiles (orange-fill + glow when active), duotone icons, the magic
- * tool's purple→pink gradient + sparkles badge, and the orange-halo
- * selected swatch. Kids tool set only (crayon / marker / rainbow / fill
- * / eraser / sticker / auto).
+ * Rebuilt on the shared coloring primitives (PaletteVariantPills /
+ * ColorSwatchGrid / ToolTile / BrushSizeRow) so it matches web exactly —
+ * same variant pills, the full web swatch palette per variant, the 10-tool
+ * web set as ToolTiles, the magic tiles (gradient + sparkle badge, Spinner
+ * while the region store loads), and brush sizes + undo/redo.
  *
  * ToolbarContent reads everything from `useCanvasStore` (zustand), so
  * each story seeds the store to show a different facet:
- *   - Default       → brush (crayon) selected, brush-size row visible
- *   - FillSelected  → fill tool selected, fill-type row visible
- *   - MagicSelected → Auto-color magic tool active (gradient + badge)
+ *   - Default       → crayon brush selected, realistic palette
+ *   - FillSelected  → fill tool tile selected
+ *   - MagicSelected → Auto-color magic tile active (gradient + badge),
+ *                     swatch grid dimmed
+ *   - MagicNotReady → magic tiles disabled + spinning (region store loading)
  */
 
 const Stage = ({ children }: { children: React.ReactNode }) => (

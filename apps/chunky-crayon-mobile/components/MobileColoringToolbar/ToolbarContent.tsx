@@ -1,455 +1,215 @@
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { useCallback } from "react";
+import { View, Pressable, ScrollView, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
-  faPencil,
-  faPaintbrush,
-  faFillDrip,
-  faSparkles,
-  faStar,
-  faRainbow,
-  faBrush,
   faArrowRotateLeft,
   faArrowRotateRight,
-  faCircle,
-  faHeart,
-  faTableCellsLarge,
-  faBorderAll,
-  faGripVertical,
-  faEraser,
 } from "@fortawesome/pro-duotone-svg-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { COLORS, CRAYON } from "@/lib/design";
-import {
-  useCanvasStore,
-  Tool,
-  BrushType,
-  FillType,
-  PatternType,
-  MagicMode,
-} from "@/stores/canvasStore";
-import { PALETTE_COLORS } from "@/constants/Colors";
-import { PATTERN_INFO } from "@/utils/patternUtils";
-import BrushSizeSelector from "@/components/BrushSizeSelector/BrushSizeSelector";
+import { COLORS } from "@/lib/design";
+import { useCanvasStore } from "@/stores/canvasStore";
 import {
   tapLight,
   tapMedium,
   notifyWarning,
   selectionChanged,
 } from "@/utils/haptics";
+import ToolTile from "@/components/coloring/ToolTile";
+import BrushSizeRow from "@/components/coloring/BrushSizeRow";
+import PaletteVariantPills from "@/components/coloring/PaletteVariantPills";
+import ColorSwatchGrid from "@/components/coloring/ColorSwatchGrid";
+import {
+  COLORING_REGULAR_TOOLS,
+  COLORING_MAGIC_TOOLS,
+  type ColoringToolConfig,
+} from "@/lib/coloring/tools";
 
 /**
- * The scrollable body of the coloring toolbar — Tools / Colors / Brush
- * Size / Fill Type / Pattern / History sections. Reads everything from
- * `useCanvasStore` (zustand), takes no props.
+ * The scrollable body of the phone-tier coloring toolbar — the content of
+ * the docked bottom sheet (`MobileColoringToolbar`). Rebuilt on the shared
+ * coloring primitives so the phone tier matches web exactly, same as the
+ * three-column sidebars and the middle-tier ColoringToolbar:
+ *   - palette-variant pills (Realistic / Pastel / Cute / Surprise)
+ *   - a swatch grid for the active variant (dims for magic tools)
+ *   - the 10-tool web set as horizontal ToolTiles + the magic tiles
+ *   - brush sizes (Fine / Regular / Chunky)
+ *   - undo / redo
  *
- * Extracted from MobileColoringToolbar so the production component can
- * wrap it in a gorhom BottomSheet (which docks to the screen bottom)
- * while Storybook can render it inline in the story frame (a docked
- * sheet renders off-canvas in SB's split layout). Same component, two
- * hosts — the visuals are identical.
+ * Reads everything from `useCanvasStore` (zustand), takes no props.
  *
- * Visual spec mirrors web's coloring-ui ToolSelector: white cream-
- * bordered rounded tool tiles (orange-fill + glow when active), duotone
- * icons, the magic tool's purple→pink gradient + sparkles badge, and the
- * orange-halo selected swatch (matching ColorPalette).
+ * Extracted from MobileColoringToolbar so the production component can wrap
+ * it in a BottomSheet (which docks to the screen bottom) while Storybook can
+ * render it inline in the story frame (a docked sheet renders off-canvas in
+ * SB's split layout). Same component, two hosts — visuals identical.
+ *
+ * Tile size is a fixed chunky 56 (matches web mobile / the other toolbars).
  */
-
-type ToolConfig = {
-  id: string;
-  tool: Tool;
-  brushType?: BrushType;
-  magicMode?: MagicMode;
-  label: string;
-  shortLabel?: string;
-  icon: IconDefinition;
-  isMagic?: boolean;
-};
-
-// Kids tool set, matching web's ToolSelector KIDS_TOOL_IDS:
-// fill, crayon, marker, rainbow, eraser, sticker, magic-auto. Web removed
-// glow/neon/sparkle/glitter (confusing UX) and gates magic-reveal +
-// pencil out of the kids set — so we drop them here too.
-const tools: ToolConfig[] = [
-  {
-    id: "crayon",
-    tool: "brush",
-    brushType: "crayon",
-    label: "Crayon",
-    icon: faPencil,
-  },
-  {
-    id: "marker",
-    tool: "brush",
-    brushType: "marker",
-    label: "Marker",
-    icon: faPaintbrush,
-  },
-  {
-    id: "rainbow",
-    tool: "brush",
-    brushType: "rainbow",
-    label: "Rainbow",
-    icon: faRainbow,
-  },
-  { id: "fill", tool: "fill", label: "Fill", icon: faFillDrip },
-  { id: "eraser", tool: "eraser", label: "Eraser", icon: faEraser },
-  { id: "sticker", tool: "sticker", label: "Sticker", icon: faStar },
-  {
-    id: "magic-auto",
-    tool: "magic",
-    magicMode: "auto",
-    label: "Auto Color",
-    shortLabel: "Auto",
-    icon: faBrush,
-    isMagic: true,
-  },
-];
-
-const fillTypes: { type: FillType; label: string; icon: IconDefinition }[] = [
-  { type: "solid", label: "Solid", icon: faCircle },
-  { type: "pattern", label: "Pattern", icon: faTableCellsLarge },
-];
-
-const patternTypes: {
-  type: PatternType;
-  label: string;
-  icon: IconDefinition;
-}[] = [
-  { type: "dots", label: PATTERN_INFO.dots.label, icon: faCircle },
-  { type: "stripes", label: PATTERN_INFO.stripes.label, icon: faGripVertical },
-  { type: "hearts", label: PATTERN_INFO.hearts.label, icon: faHeart },
-  { type: "stars", label: PATTERN_INFO.stars.label, icon: faStar },
-  { type: "zigzag", label: PATTERN_INFO.zigzag.label, icon: faBorderAll },
-  { type: "confetti", label: PATTERN_INFO.confetti.label, icon: faSparkles },
-];
-
-const ToolButton = ({
-  icon,
-  label,
-  isActive,
-  onPress,
-  disabled,
-  small,
-}: {
-  icon: IconDefinition;
-  label?: string;
-  isActive?: boolean;
-  onPress: () => void;
-  disabled?: boolean;
-  small?: boolean;
-}) => (
-  <Pressable
-    onPress={onPress}
-    disabled={disabled}
-    style={[
-      styles.toolButton,
-      small && styles.toolButtonSmall,
-      isActive && styles.toolButtonActive,
-      disabled && styles.toolButtonDisabled,
-    ]}
-  >
-    <FontAwesomeIcon
-      icon={icon}
-      size={small ? 16 : 18}
-      color={
-        isActive ? "#FFFFFF" : disabled ? COLORS.textMuted : COLORS.textPrimary
-      }
-      secondaryColor={isActive ? "rgba(255,255,255,0.85)" : COLORS.crayonPeach}
-      secondaryOpacity={1}
-    />
-    {label && (
-      <Text
-        style={[
-          styles.toolButtonLabel,
-          isActive && styles.toolButtonLabelActive,
-        ]}
-        numberOfLines={1}
-      >
-        {label}
-      </Text>
-    )}
-  </Pressable>
-);
-
-const SectionTitle = ({ title }: { title: string }) => (
-  <Text style={styles.sectionTitle}>{title}</Text>
-);
+const TILE = 56;
 
 const ToolbarContent = () => {
   const {
     selectedTool,
     selectedColor,
     brushType,
-    fillType,
-    selectedPattern,
+    brushSize,
     magicMode,
     magicReady,
+    paletteVariant,
     setTool,
     setColor,
     setBrushType,
-    setFillType,
-    setPattern,
+    setBrushSize,
     setMagicMode,
+    setPaletteVariant,
     undo,
     redo,
     canUndo,
     canRedo,
   } = useCanvasStore();
 
-  const handleToolSelect = (config: ToolConfig) => {
-    // Magic tools need the region store; ignore taps until ready.
-    if (config.isMagic && !magicReady) return;
-    tapLight();
-    setTool(config.tool);
-    if (config.brushType) setBrushType(config.brushType);
-    if (config.magicMode) setMagicMode(config.magicMode);
+  const isMagicToolActive =
+    selectedTool === "magic" &&
+    (magicMode === "suggest" || magicMode === "auto");
+
+  const handleToolSelect = useCallback(
+    (config: ColoringToolConfig) => {
+      // Magic tools need the region store; ignore taps until ready.
+      if (config.isMagic && !magicReady) return;
+      tapLight();
+      setTool(config.tool);
+      if (config.brushType) setBrushType(config.brushType);
+      if (config.magicMode) setMagicMode(config.magicMode);
+    },
+    [setTool, setBrushType, setMagicMode, magicReady],
+  );
+
+  const isToolActive = useCallback(
+    (config: ColoringToolConfig) => {
+      if (config.tool === "magic") {
+        return selectedTool === "magic" && magicMode === config.magicMode;
+      }
+      if (config.tool === "brush" && config.brushType) {
+        return selectedTool === "brush" && brushType === config.brushType;
+      }
+      return selectedTool === config.tool;
+    },
+    [selectedTool, brushType, magicMode],
+  );
+
+  const handleUndo = () => {
+    if (canUndo()) {
+      tapMedium();
+      undo();
+    } else {
+      notifyWarning();
+    }
   };
 
-  const isToolActive = (config: ToolConfig) => {
-    if (config.tool === "magic") {
-      return selectedTool === "magic" && magicMode === config.magicMode;
+  const handleRedo = () => {
+    if (canRedo()) {
+      tapMedium();
+      redo();
+    } else {
+      notifyWarning();
     }
-    if (config.tool === "brush" && config.brushType) {
-      return selectedTool === "brush" && brushType === config.brushType;
-    }
-    return selectedTool === config.tool;
   };
 
   return (
     <>
-      {/* Main Tools Row */}
+      {/* Palette-variant pills (4 across) */}
       <View style={styles.section}>
-        <SectionTitle title="Tools" />
+        <PaletteVariantPills
+          selected={paletteVariant}
+          onSelect={setPaletteVariant}
+          columns={4}
+        />
+      </View>
+
+      {/* Swatch grid for the active variant — dims for magic tools. */}
+      <View
+        style={[styles.section, { opacity: isMagicToolActive ? 0.4 : 1 }]}
+        pointerEvents={isMagicToolActive ? "none" : "auto"}
+      >
+        <ColorSwatchGrid
+          variant={paletteVariant}
+          selectedColor={isMagicToolActive ? "" : selectedColor}
+          onSelect={(color) => {
+            selectionChanged();
+            setColor(color);
+          }}
+          columns={9}
+        />
+      </View>
+
+      {/* Tools — horizontal scroll row (regular + magic). */}
+      <View style={styles.section}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalScroll}
+          contentContainerStyle={styles.toolRow}
         >
-          {tools.map((config) => {
-            const active = isToolActive(config);
-
-            // Magic tools: purple→pink gradient face + corner sparkles
-            // badge (web ToolSelector). Active = full gradient + white;
-            // inactive = soft 12%-tint gradient + magic-from icon.
-            if (config.isMagic) {
-              // Disabled + spinner until the region store is ready.
-              return (
-                <Pressable
-                  key={config.id}
-                  onPress={() => handleToolSelect(config)}
-                  disabled={!magicReady}
-                  style={[
-                    styles.magicWrap,
-                    !magicReady && styles.magicDisabled,
-                  ]}
-                  accessibilityState={{ disabled: !magicReady }}
-                >
-                  <LinearGradient
-                    colors={
-                      active
-                        ? [CRAYON.purple.base, CRAYON.pink.base]
-                        : [`${CRAYON.purple.base}1F`, `${CRAYON.pink.base}1F`]
-                    }
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.magicButton}
-                  >
-                    {magicReady ? (
-                      <FontAwesomeIcon
-                        icon={config.icon}
-                        size={20}
-                        color={active ? "#FFFFFF" : CRAYON.purple.base}
-                        secondaryColor={
-                          active ? "rgba(255,255,255,0.85)" : CRAYON.pink.base
-                        }
-                        secondaryOpacity={1}
-                      />
-                    ) : (
-                      <ActivityIndicator
-                        size="small"
-                        color={CRAYON.purple.base}
-                      />
-                    )}
-                  </LinearGradient>
-                  {magicReady && (
-                    <View style={styles.magicBadge} pointerEvents="none">
-                      <FontAwesomeIcon
-                        icon={faSparkles}
-                        size={11}
-                        color={active ? "#FFFFFF" : CRAYON.purple.base}
-                        secondaryColor={CRAYON.pink.base}
-                        secondaryOpacity={1}
-                      />
-                    </View>
-                  )}
-                </Pressable>
-              );
-            }
-
-            return (
-              <Pressable
-                key={config.id}
-                onPress={() => handleToolSelect(config)}
-                style={[
-                  styles.mainToolButton,
-                  active
-                    ? styles.mainToolButtonActive
-                    : styles.mainToolButtonIdle,
-                ]}
-              >
-                <FontAwesomeIcon
-                  icon={config.icon}
-                  size={22}
-                  color={active ? "#FFFFFF" : COLORS.textPrimary}
-                  secondaryColor={
-                    active ? "rgba(255,255,255,0.85)" : COLORS.crayonPeach
-                  }
-                  secondaryOpacity={1}
-                />
-              </Pressable>
-            );
-          })}
+          {COLORING_REGULAR_TOOLS.map((config) => (
+            <ToolTile
+              key={config.id}
+              icon={config.icon}
+              label={config.label}
+              selected={isToolActive(config)}
+              size={TILE}
+              onPress={() => handleToolSelect(config)}
+            />
+          ))}
+          {COLORING_MAGIC_TOOLS.map((config) => (
+            <ToolTile
+              key={config.id}
+              icon={config.icon}
+              label={config.label}
+              isMagic
+              selected={isToolActive(config)}
+              loading={!magicReady}
+              size={TILE}
+              onPress={() => handleToolSelect(config)}
+            />
+          ))}
         </ScrollView>
       </View>
 
-      {/* Colors Row */}
-      <View style={styles.section}>
-        <SectionTitle title="Colors" />
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalScroll}
+      {/* Brush sizes + undo / redo on one row. */}
+      <View style={[styles.section, styles.bottomRow]}>
+        <BrushSizeRow
+          selectedRadius={brushSize}
+          onSelect={(radius) => {
+            tapLight();
+            setBrushSize(radius);
+          }}
+          color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
+          tileSize={TILE}
+        />
+
+        <View style={styles.spacer} />
+
+        <Pressable
+          onPress={handleUndo}
+          disabled={!canUndo()}
+          style={[styles.iconButton, !canUndo() && styles.disabled]}
+          accessibilityLabel="Undo"
         >
-          {PALETTE_COLORS.map((color) => {
-            const isSelected = selectedColor === color;
-            return (
-              <Pressable
-                key={color}
-                onPress={() => {
-                  selectionChanged();
-                  setColor(color);
-                }}
-                style={[
-                  styles.swatchWrap,
-                  isSelected && styles.swatchWrapSelected,
-                ]}
-              >
-                <View
-                  style={[
-                    { backgroundColor: color },
-                    isSelected
-                      ? styles.colorSwatchSelected
-                      : styles.colorSwatch,
-                  ]}
-                />
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* Brush Size (brush tool) */}
-      {selectedTool === "brush" && (
-        <View style={styles.section}>
-          <SectionTitle title="Brush Size" />
-          <BrushSizeSelector />
-        </View>
-      )}
-
-      {/* Fill Types (fill tool) */}
-      {selectedTool === "fill" && (
-        <>
-          <View style={styles.section}>
-            <SectionTitle title="Fill Type" />
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.horizontalScroll}
-            >
-              {fillTypes.map(({ type, label, icon }) => (
-                <ToolButton
-                  key={type}
-                  icon={icon}
-                  label={label}
-                  isActive={fillType === type}
-                  onPress={() => {
-                    tapLight();
-                    setFillType(type);
-                  }}
-                  small
-                />
-              ))}
-            </ScrollView>
-          </View>
-
-          {fillType === "pattern" && (
-            <View style={styles.section}>
-              <SectionTitle title="Pattern" />
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.horizontalScroll}
-              >
-                {patternTypes.map(({ type, label, icon }) => (
-                  <ToolButton
-                    key={type}
-                    icon={icon}
-                    label={label}
-                    isActive={selectedPattern === type}
-                    onPress={() => {
-                      tapLight();
-                      setPattern(type);
-                    }}
-                    small
-                  />
-                ))}
-              </ScrollView>
-            </View>
-          )}
-        </>
-      )}
-
-      {/* Undo/Redo */}
-      <View style={styles.section}>
-        <SectionTitle title="History" />
-        <View style={styles.undoRedoRow}>
-          <ToolButton
+          <FontAwesomeIcon
             icon={faArrowRotateLeft}
-            label="Undo"
-            disabled={!canUndo()}
-            onPress={() => {
-              if (canUndo()) {
-                tapMedium();
-                undo();
-              } else {
-                notifyWarning();
-              }
-            }}
-            small
+            size={18}
+            color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
           />
-          <ToolButton
+        </Pressable>
+        <Pressable
+          onPress={handleRedo}
+          disabled={!canRedo()}
+          style={[styles.iconButton, !canRedo() && styles.disabled]}
+          accessibilityLabel="Redo"
+        >
+          <FontAwesomeIcon
             icon={faArrowRotateRight}
-            label="Redo"
-            disabled={!canRedo()}
-            onPress={() => {
-              if (canRedo()) {
-                tapMedium();
-                redo();
-              } else {
-                notifyWarning();
-              }
-            }}
-            small
+            size={18}
+            color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
           />
-        </View>
+        </Pressable>
       </View>
     </>
   );
@@ -457,128 +217,34 @@ const ToolbarContent = () => {
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
-  sectionTitle: {
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    color: COLORS.textMuted,
-    marginBottom: 8,
-    fontFamily: "RooneySans-Bold",
-  },
-  horizontalScroll: {
+  toolRow: {
     flexDirection: "row",
     gap: 8,
-    alignItems: "center",
+    paddingVertical: 2,
+    paddingRight: 8,
   },
-  toolButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: COLORS.bgCreamDark,
-    backgroundColor: COLORS.white,
-    minWidth: 56,
-  },
-  toolButtonSmall: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    minWidth: 48,
-  },
-  toolButtonActive: {
-    backgroundColor: COLORS.crayonOrange,
-    borderColor: COLORS.crayonOrange,
-  },
-  toolButtonDisabled: {
-    opacity: 0.5,
-  },
-  toolButtonLabel: {
-    fontSize: 10,
-    fontFamily: "RooneySans-Regular",
-    color: COLORS.textPrimary,
-    marginTop: 2,
-  },
-  toolButtonLabelActive: {
-    color: "#FFFFFF",
-    fontFamily: "RooneySans-Bold",
-  },
-  mainToolButton: {
-    width: 48,
-    height: 48,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 20,
-    borderWidth: 2,
-  },
-  mainToolButtonIdle: {
-    backgroundColor: COLORS.white,
-    borderColor: COLORS.bgCreamDark,
-  },
-  mainToolButtonActive: {
-    backgroundColor: COLORS.crayonOrange,
-    borderColor: COLORS.crayonOrange,
-    shadowColor: COLORS.crayonOrange,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 14,
-    elevation: 6,
-  },
-  magicWrap: {
-    width: 48,
-    height: 48,
-  },
-  magicDisabled: {
-    opacity: 0.6,
-  },
-  magicButton: {
-    width: 48,
-    height: 48,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 20,
-  },
-  magicBadge: {
-    position: "absolute",
-    top: -6,
-    right: -6,
-    width: 20,
-    height: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  swatchWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  swatchWrapSelected: {
-    borderWidth: 2,
-    borderColor: COLORS.crayonOrange,
-    padding: 2,
-  },
-  colorSwatch: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    borderWidth: 2,
-    borderColor: COLORS.bgCreamDark,
-  },
-  colorSwatchSelected: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: COLORS.white,
-  },
-  undoRedoRow: {
+  bottomRow: {
     flexDirection: "row",
-    gap: 12,
+    alignItems: "center",
+    gap: 8,
+  },
+  spacer: {
+    flex: 1,
+  },
+  iconButton: {
+    width: TILE,
+    height: TILE,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });
 
