@@ -281,21 +281,19 @@ const styles = StyleSheet.create({
   outer: {
     flexShrink: 0,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "stretch",
     paddingVertical: 12,
     paddingLeft: 16,
   },
-  // Slim floating rail card. maxHeight caps it so the inner ScrollView
-  // scrolls within the rail rather than the rail overflowing the column
-  // (which was clipping the top tools, leaving only zoom visible).
+  // Slim floating rail card.
   rail: {
+    flexShrink: 1,
     backgroundColor: COLORS.white,
     borderRadius: 24,
     borderWidth: 2,
     borderColor: COLORS.bgCreamDark,
     paddingVertical: 12,
     paddingHorizontal: 10,
-    maxHeight: "100%",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
