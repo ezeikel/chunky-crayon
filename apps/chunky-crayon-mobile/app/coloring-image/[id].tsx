@@ -9,8 +9,17 @@ import {
   faFloppyDisk,
   faPrint,
   faHeart,
-  faArrowsRotate,
 } from "@fortawesome/pro-solid-svg-icons";
+// The under-canvas action tiles use DUOTONE icons to match web exactly
+// (web's ActionButton renders pro-duotone) and the middle/three-column
+// ColoringToolbar tiles. The solid variants above stay for the ActionSheet
+// headers + the back chevron.
+import {
+  faArrowsRotate as faArrowsRotateDuotone,
+  faPrint as faPrintDuotone,
+  faFloppyDisk as faFloppyDiskDuotone,
+  faHeart as faHeartDuotone,
+} from "@fortawesome/pro-duotone-svg-icons";
 // SDK 56: the root expo-media-library save/permission methods throw a
 // deprecation error at call time — the working API is the legacy subpath
 // (same pattern as expo-file-system/legacy below).
@@ -471,8 +480,8 @@ const ColoringImage = () => {
                       accessibilityLabel="Start Over"
                     >
                       <FontAwesomeIcon
-                        icon={faArrowsRotate}
-                        size={22}
+                        icon={faArrowsRotateDuotone}
+                        size={24}
                         color={COLORS.textPrimary}
                       />
                     </Pressable>
@@ -485,8 +494,8 @@ const ColoringImage = () => {
                       accessibilityLabel="Print"
                     >
                       <FontAwesomeIcon
-                        icon={faPrint}
-                        size={22}
+                        icon={faPrintDuotone}
+                        size={24}
                         color={COLORS.textPrimary}
                       />
                     </Pressable>
@@ -499,8 +508,8 @@ const ColoringImage = () => {
                       accessibilityLabel="Save"
                     >
                       <FontAwesomeIcon
-                        icon={faFloppyDisk}
-                        size={20}
+                        icon={faFloppyDiskDuotone}
+                        size={24}
                         color={COLORS.textPrimary}
                       />
                     </Pressable>
@@ -513,8 +522,8 @@ const ColoringImage = () => {
                       accessibilityLabel="My Artwork"
                     >
                       <FontAwesomeIcon
-                        icon={faHeart}
-                        size={20}
+                        icon={faHeartDuotone}
+                        size={24}
                         color={COLORS.textPrimary}
                       />
                     </Pressable>
@@ -746,20 +755,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
-  // Actions under the canvas (web parity): Start Over / Print / Save / Heart,
-  // centered, round white tiles with a soft border.
+  // Actions under the canvas (web parity): Start Over / Print / Save / Heart.
+  // Web renders these as ActionButton size="tile" tone="tool": a ROUNDED-CARD
+  // (not circular) white tile, 1px surface-dark border, neutral icon — same as
+  // the middle/three-column ColoringToolbar action tiles. Centered row, py-2.
   canvasActionRow: {
     flexDirection: "row",
     justifyContent: "center",
     gap: 12,
-    marginTop: 16,
+    marginTop: 12,
   },
   canvasActionTile: {
-    width: 52,
-    height: 52,
+    width: 56,
+    height: 56,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 26,
+    // Rounded card, NOT a circle (web: rounded-coloring-button ≈ 24).
+    borderRadius: 24,
     borderWidth: 1,
     borderColor: COLORS.bgCreamDark,
     backgroundColor: COLORS.white,

@@ -82,10 +82,6 @@ const ZoomControls = ({ style }: ZoomControlsProps) => {
     }
   };
 
-  // Calculate which zoom dots are filled (1x = 0, 4x = 6 dots)
-  const zoomLevel = Math.round((scale - MIN_ZOOM) / ZOOM_STEP);
-  const totalDots = Math.round((MAX_ZOOM - MIN_ZOOM) / ZOOM_STEP);
-
   return (
     <View style={[styles.container, isZoomed && styles.containerZoomed, style]}>
       {/* Zoom out button */}
@@ -101,20 +97,9 @@ const ZoomControls = ({ style }: ZoomControlsProps) => {
         />
       </Pressable>
 
-      {/* Zoom indicator dots */}
-      <View style={styles.dotsContainer}>
-        {Array.from({ length: totalDots }).map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              index < zoomLevel && styles.dotActive,
-              // Extra scale for the most recently filled dot
-              index === zoomLevel - 1 && styles.dotPop,
-            ]}
-          />
-        ))}
-      </View>
+      {/* No zoom-indicator dots on phone: web hides them below `sm`
+          (ZoomIndicator is `hidden sm:flex`), so the phone pill is just
+          zoom-out / zoom-in (+ pan + reset when zoomed). */}
 
       {/* Zoom in button */}
       <Pressable
@@ -204,25 +189,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ACCENT_BORDER,
     backgroundColor: ACCENT_TINT,
-  },
-  dotsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 4,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#E5E7EB",
-  },
-  dotActive: {
-    backgroundColor: ACCENT,
-    transform: [{ scale: 1.25 }],
-  },
-  dotPop: {
-    transform: [{ scale: 1.4 }],
   },
 });
 
