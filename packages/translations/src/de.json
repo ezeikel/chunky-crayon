@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "Malvorlage",
     "relatedPages": "Weitere Malvorlagen",
-    "defaultDescription": "Kostenlose druckbare Malvorlage von Chunky Crayon",
+    "defaultDescription": "Kostenlose druckbare Malvorlage",
     "progress": {
       "colored": "ausgemalt",
       "percentage": "{percent}%",
@@ -52,7 +52,7 @@
         "25": "Guter Start!",
         "50": "Hälfte geschafft!",
         "75": "Fast fertig!",
-        "100": "Geschafft!"
+        "100": "Fantastisch!"
       }
     },
     "sidebar": {
@@ -82,9 +82,9 @@
       "paintbrush": "Pinsel",
       "eraser": "Radiergummi",
       "glitter": "Glitzer",
-      "sparkle": "Funkeln",
+      "sparkle": "Glitzern",
       "rainbow": "Regenbogen",
-      "glow": "Leuchten",
+      "glow": "Glühen",
       "neon": "Neon"
     },
     "brushSizes": {
@@ -94,7 +94,7 @@
     },
     "fillPatterns": {
       "solid": "Einfarbig",
-      "dots": "Punkte",
+      "dots": "Polkapunkte",
       "stripes": "Streifen",
       "diagonal": "Diagonal",
       "checkerboard": "Schachbrett",
@@ -218,7 +218,7 @@
       "mint": "Mint",
       "lavender": "Lavendel",
       "peach": "Pfirsich",
-      "navy": "Marineblau",
+      "navy": "Dunkelblau",
       "forest": "Waldgrün",
       "gold": "Gold",
       "rose": "Rosa"
@@ -377,7 +377,7 @@
     "emailPlaceholder": "name@beispiel.de",
     "termsAgreement": "Wenn du fortfährst, stimmst du unseren <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzerklärung</privacy> zu.",
     "verifyRequest": {
-      "title": "Deine E-Mail prüfen!",
+      "title": "Prüfe deine E-Mail!",
       "description": "Wir haben dir einen Anmeldelink gesendet. Klicke auf den Link in deiner E-Mail, um fortzufahren.",
       "checkSpam": "Nicht zu sehen? Prüfe deinen Spam-Ordner.",
       "linkExpiry": "Der Link läuft in 24 Stunden ab.",
