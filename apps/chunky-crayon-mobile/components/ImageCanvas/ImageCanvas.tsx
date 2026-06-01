@@ -1434,25 +1434,35 @@ const ImageCanvas = ({
                   INSIDE the transform group so it shares the strokes'
                   coordinate space and the eraser affects both. */}
               <Group layer={<Paint />} transform={transform}>
-                {/* Fill layer image (baked fills/magic-fills), fit to the
-                    same box as the base SVG below. */}
-                {fillLayerImage && (
+                {/* Fill layer image (baked fills/magic-fills). This group is
+                    in SVG (viewBox) coordinate space — `transform` does the
+                    SVG→canvas fitbox scale — so children must be sized in SVG
+                    units, NOT canvas pixels. The fill image is rasterized in
+                    useFillLayer at exactly svgDimensions, so drawing it at
+                    svgDimensions is 1:1 and the parent transform places/scales
+                    it to fill the canvas. (Sizing it at canvasWidth here drew
+                    it in SVG space then let the transform scale it AGAIN, which
+                    shrank the whole image into a tiny duplicate in the
+                    top-left corner — the regression from the eraser-layer
+                    refactor that moved this image inside the transform group.) */}
+                {fillLayerImage && svgDimensions && (
                   <SkiaImage
                     image={fillLayerImage}
                     x={0}
                     y={0}
-                    width={canvasWidth}
-                    height={canvasHeight}
-                    fit="contain"
+                    width={svgDimensions.width}
+                    height={svgDimensions.height}
+                    fit="fill"
                   />
                 )}
-                {/* SVG base layer (below drawings) — hidden when fill layer is active */}
-                {!fillLayerImage && (
+                {/* SVG base layer (below drawings) — hidden when fill layer is
+                    active. Same coordinate space as above: size in SVG units. */}
+                {!fillLayerImage && svgDimensions && (
                   <ImageSVG
                     x={0}
                     y={0}
-                    width={canvasWidth}
-                    height={canvasHeight}
+                    width={svgDimensions.width}
+                    height={svgDimensions.height}
                     svg={svg}
                   />
                 )}
