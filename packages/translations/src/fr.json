@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "Page à colorier",
     "relatedPages": "Plus de pages à colorier",
-    "defaultDescription": "Page à colorier gratuite de Chunky Crayon à imprimer",
+    "defaultDescription": "Page à colorier gratuite à imprimer de Chunky Crayon",
     "progress": {
       "colored": "colorié",
       "percentage": "{percent}%",
@@ -78,7 +78,7 @@
     "brushTypes": {
       "crayon": "Crayon",
       "marker": "Feutre",
-      "pencil": "Crayon de papier",
+      "pencil": "Crayon",
       "paintbrush": "Pinceau",
       "eraser": "Gomme",
       "glitter": "Paillettes",
@@ -359,10 +359,10 @@
     "perMonth": "/mois",
     "noSubscriptionForCredits": "Abonnement actif requis pour acheter des crédits",
     "noSubscriptionFound": "Aucun abonnement actif trouvé",
-    "failedToChangeSubscription": "Échec du changement d’abonnement",
-    "failedToCheckout": "Échec de la redirection vers le paiement",
-    "failedToPurchaseCredits": "Échec de l’achat de crédits",
-    "failedToOpenPortal": "Échec de l’ouverture du portail client"
+    "failedToChangeSubscription": "Impossible de modifier l'abonnement",
+    "failedToCheckout": "Impossible de rediriger vers le paiement",
+    "failedToPurchaseCredits": "Impossible d'acheter des crédits",
+    "failedToOpenPortal": "Impossible d'ouvrir le portail client"
   },
   "auth": {
     "signIn": "Se connecter",
@@ -371,7 +371,7 @@
     "continueWithGoogle": "Continuer avec Google",
     "continueWithApple": "Continuer avec Apple",
     "signInWithEmail": "Se connecter par e-mail",
-    "sendingLink": "Envoi en cours…",
+    "sendingLink": "Envoi du lien…",
     "chooseMethod": "Choisissez votre méthode de connexion",
     "orContinueWith": "Ou continuer avec",
     "emailPlaceholder": "nom@exemple.com",
