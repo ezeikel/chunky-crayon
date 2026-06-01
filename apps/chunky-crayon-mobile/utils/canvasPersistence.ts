@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { canvasStorage } from "@/lib/storage/mmkv";
 import { SkPath, Skia } from "@shopify/react-native-skia";
 import { Platform } from "react-native";
 import { getAuthHeader } from "@/lib/auth";
@@ -189,11 +189,11 @@ export const syncCanvasToServer = async (
         // Update local storage with server version and retry once
         const key = `${STORAGE_PREFIX}${imageId}`;
         try {
-          const stored = await AsyncStorage.getItem(key);
+          const stored = canvasStorage.getString(key);
           if (stored) {
             const data = JSON.parse(stored);
             data.version = errorData.currentVersion;
-            await AsyncStorage.setItem(key, JSON.stringify(data));
+            canvasStorage.set(key, JSON.stringify(data));
             console.log(
               `[CANVAS_SYNC] Updated local version to ${errorData.currentVersion}`,
             );
@@ -344,7 +344,7 @@ export const loadCanvasFromServer = async (
 const markPendingSync = async (imageId: string): Promise<void> => {
   try {
     const key = `${SYNC_PENDING_PREFIX}${imageId}`;
-    await AsyncStorage.setItem(key, JSON.stringify({ markedAt: Date.now() }));
+    canvasStorage.set(key, JSON.stringify({ markedAt: Date.now() }));
     console.log(`[CANVAS_SYNC] Marked ${imageId} for pending sync`);
   } catch (error) {
     console.error(`[CANVAS_SYNC] Failed to mark pending sync:`, error);
@@ -357,7 +357,7 @@ const markPendingSync = async (imageId: string): Promise<void> => {
 const clearPendingSync = async (imageId: string): Promise<void> => {
   try {
     const key = `${SYNC_PENDING_PREFIX}${imageId}`;
-    await AsyncStorage.removeItem(key);
+    canvasStorage.remove(key);
   } catch (error) {
     console.error(`[CANVAS_SYNC] Failed to clear pending sync:`, error);
   }
@@ -368,7 +368,7 @@ const clearPendingSync = async (imageId: string): Promise<void> => {
  */
 export const getPendingSyncs = async (): Promise<string[]> => {
   try {
-    const allKeys = await AsyncStorage.getAllKeys();
+    const allKeys = canvasStorage.getAllKeys();
     return allKeys
       .filter((key) => key.startsWith(SYNC_PENDING_PREFIX))
       .map((key) => key.replace(SYNC_PENDING_PREFIX, ""));
@@ -395,7 +395,7 @@ export const syncPendingCanvases = async (): Promise<void> => {
   for (const imageId of pendingIds) {
     try {
       const key = `${STORAGE_PREFIX}${imageId}`;
-      const stored = await AsyncStorage.getItem(key);
+      const stored = canvasStorage.getString(key);
 
       if (stored) {
         const data: SavedCanvasData = JSON.parse(stored);
@@ -556,7 +556,7 @@ export const saveCanvasState = async (
     // Read existing version from local storage (may have been set by server sync)
     let currentVersion = CURRENT_VERSION;
     try {
-      const existingData = await AsyncStorage.getItem(key);
+      const existingData = canvasStorage.getString(key);
       if (existingData) {
         const parsed = JSON.parse(existingData) as SavedCanvasData;
         // Use the stored version (which reflects server version after sync)
@@ -579,13 +579,13 @@ export const saveCanvasState = async (
     console.log(
       `[CANVAS_PERSIST] Serialized data size: ${JSON.stringify(data).length} bytes`,
     );
-    console.log(`[CANVAS_PERSIST] Saving to AsyncStorage with key: ${key}`);
+    console.log(`[CANVAS_PERSIST] Saving to MMKV with key: ${key}`);
 
-    // Try to save to AsyncStorage
-    await AsyncStorage.setItem(key, JSON.stringify(data));
+    // Try to save to MMKV (synchronous)
+    canvasStorage.set(key, JSON.stringify(data));
 
     // Verify the save worked by reading it back
-    const verification = await AsyncStorage.getItem(key);
+    const verification = canvasStorage.getString(key);
     if (!verification) {
       throw new Error("Save verification failed - data not found after save");
     }
@@ -599,7 +599,7 @@ export const saveCanvasState = async (
 
     // Run debug check to confirm data is persisted
     console.log(`[CANVAS_PERSIST] Running post-save verification...`);
-    const allKeys = await AsyncStorage.getAllKeys();
+    const allKeys = canvasStorage.getAllKeys();
     const canvasKeys = allKeys.filter((k) => k.startsWith(STORAGE_PREFIX));
     console.log(
       `[CANVAS_PERSIST] Post-save canvas keys found: ${canvasKeys.length}`,
@@ -623,7 +623,7 @@ export const saveCanvasState = async (
           // Update local storage with new server version
           try {
             data.version = result.version;
-            await AsyncStorage.setItem(key, JSON.stringify(data));
+            canvasStorage.set(key, JSON.stringify(data));
             console.log(
               `[CANVAS_PERSIST] Updated local version to: ${result.version}`,
             );
@@ -681,7 +681,7 @@ export const loadCanvasState = async (
         `[CANVAS_PERSIST] Server has no data (404) - clearing local storage to sync`,
       );
       const key = `${STORAGE_PREFIX}${imageId}`;
-      await AsyncStorage.removeItem(key);
+      canvasStorage.remove(key);
       return null;
     }
 
@@ -702,7 +702,7 @@ export const loadCanvasState = async (
         savedAt: Date.now(),
         version: serverData.version,
       };
-      await AsyncStorage.setItem(key, JSON.stringify(data));
+      canvasStorage.set(key, JSON.stringify(data));
       console.log(`[CANVAS_PERSIST] Updated local storage with server data`);
 
       if (actions.length > 0) {
@@ -728,8 +728,8 @@ export const loadCanvasState = async (
   // Fall back to local storage
   try {
     const key = `${STORAGE_PREFIX}${imageId}`;
-    console.log(`[CANVAS_PERSIST] Loading from AsyncStorage with key: ${key}`);
-    const stored = await AsyncStorage.getItem(key);
+    console.log(`[CANVAS_PERSIST] Loading from MMKV with key: ${key}`);
+    const stored = canvasStorage.getString(key);
 
     if (!stored) {
       console.log(
@@ -779,7 +779,7 @@ export const loadCanvasState = async (
 export const deleteCanvasState = async (imageId: string): Promise<boolean> => {
   try {
     const key = `${STORAGE_PREFIX}${imageId}`;
-    await AsyncStorage.removeItem(key);
+    canvasStorage.remove(key);
 
     // Update metadata
     const metadata = await getMetadata();
@@ -787,7 +787,7 @@ export const deleteCanvasState = async (imageId: string): Promise<boolean> => {
       metadata.savedCanvases = metadata.savedCanvases.filter(
         (c) => c.imageId !== imageId,
       );
-      await AsyncStorage.setItem(METADATA_KEY, JSON.stringify(metadata));
+      canvasStorage.set(METADATA_KEY, JSON.stringify(metadata));
     }
 
     return true;
@@ -802,7 +802,7 @@ export const deleteCanvasState = async (imageId: string): Promise<boolean> => {
  */
 const getMetadata = async (): Promise<CanvasMetadata | null> => {
   try {
-    const stored = await AsyncStorage.getItem(METADATA_KEY);
+    const stored = canvasStorage.getString(METADATA_KEY);
     if (!stored) return { savedCanvases: [] };
     return JSON.parse(stored);
   } catch (error) {
@@ -840,11 +840,11 @@ const updateMetadata = async (imageId: string): Promise<void> => {
       // Delete old canvases
       for (const canvas of toDelete) {
         const key = `${STORAGE_PREFIX}${canvas.imageId}`;
-        await AsyncStorage.removeItem(key);
+        canvasStorage.remove(key);
       }
     }
 
-    await AsyncStorage.setItem(METADATA_KEY, JSON.stringify(metadata));
+    canvasStorage.set(METADATA_KEY, JSON.stringify(metadata));
   } catch (error) {
     console.error("Failed to update canvas metadata:", error);
   }
@@ -870,8 +870,7 @@ export const getSavedCanvasIds = async (): Promise<string[]> => {
 export const hasCanvasState = async (imageId: string): Promise<boolean> => {
   try {
     const key = `${STORAGE_PREFIX}${imageId}`;
-    const stored = await AsyncStorage.getItem(key);
-    return stored !== null;
+    return canvasStorage.contains(key);
   } catch (error) {
     return false;
   }
@@ -882,9 +881,11 @@ export const hasCanvasState = async (imageId: string): Promise<boolean> => {
  */
 export const clearAllCanvasData = async (): Promise<boolean> => {
   try {
-    const keys = await AsyncStorage.getAllKeys();
+    const keys = canvasStorage.getAllKeys();
     const canvasKeys = keys.filter((key) => key.startsWith(STORAGE_PREFIX));
-    await AsyncStorage.multiRemove(canvasKeys);
+    for (const key of canvasKeys) {
+      canvasStorage.remove(key);
+    }
     return true;
   } catch (error) {
     console.error("Failed to clear all canvas data:", error);
@@ -900,7 +901,7 @@ export const debugCanvasStorage = async (): Promise<void> => {
 
   try {
     // Get all keys
-    const allKeys = await AsyncStorage.getAllKeys();
+    const allKeys = canvasStorage.getAllKeys();
     const canvasKeys = allKeys.filter((key) => key.startsWith(STORAGE_PREFIX));
 
     console.log(`[CANVAS_DEBUG] Total canvas keys found: ${canvasKeys.length}`);
@@ -924,7 +925,7 @@ export const debugCanvasStorage = async (): Promise<void> => {
     for (const key of canvasKeys) {
       if (key === METADATA_KEY) continue;
 
-      const stored = await AsyncStorage.getItem(key);
+      const stored = canvasStorage.getString(key);
       if (stored) {
         try {
           const data = JSON.parse(stored) as SavedCanvasData;

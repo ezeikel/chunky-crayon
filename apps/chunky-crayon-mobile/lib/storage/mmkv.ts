@@ -12,10 +12,12 @@ import type { StateStorage } from "zustand/middleware";
  * local-first / no-PII posture. Secrets (device id, JWT) stay in secure-store
  * directly; this is only for the MMKV-backed stores.
  *
- * Canvas in-progress autosave (`utils/canvasPersistence`) and the existing
- * onboarding/feature stores deliberately stay on AsyncStorage — this MMKV
- * instance is scoped to the NEW artwork store only (separate `id`, separate
- * key namespace), so there's zero overlap with existing persistence.
+ * Two MMKV instances share the one read-once encryption key (via
+ * `createEncryptedMMKV`): `storage` (the artwork store) and `canvasStorage`
+ * (in-progress canvas autosave — migrated off AsyncStorage in #36). Each has its
+ * own `id` so their key namespaces are fully isolated. The existing
+ * onboarding/feature stores + lib/auth + unlock-storage still use AsyncStorage;
+ * those are out of scope here.
  */
 
 const ENC_KEY_NAME = "chunky_crayon_mmkv_key";
@@ -47,11 +49,26 @@ const getOrCreateKey = (): string => {
 
 // react-native-mmkv v4 (Nitro): instances are created via the `createMMKV`
 // factory (the v3 `new MMKV(...)` constructor was removed). Config shape
-// (id + encryptionKey) and the .set/.getString/.delete methods are unchanged.
-export const storage = createMMKV({
-  id: "chunky-crayon-mmkv",
-  encryptionKey: getOrCreateKey(),
-});
+// (id + encryptionKey) and the .set/.getString/.remove methods are unchanged.
+//
+// Resolve the encryption key ONCE at module load and reuse it for every
+// instance — calling getOrCreateKey() per instance would do redundant keychain
+// reads, and (worse) any transient failure on a later read could mint a second
+// key and orphan that instance's data. One key, read once, shared.
+const ENC_KEY = getOrCreateKey();
+
+const createEncryptedMMKV = (id: string) =>
+  createMMKV({ id, encryptionKey: ENC_KEY });
+
+/** Backs the local-first artwork store (zustand persist). */
+export const storage = createEncryptedMMKV("chunky-crayon-mmkv");
+
+/**
+ * Backs in-progress canvas autosave (`utils/canvasPersistence`, #36 — migrated
+ * off AsyncStorage). Separate `id` from `storage` so the per-canvas action blobs
+ * and the artwork metadata never share a key namespace.
+ */
+export const canvasStorage = createEncryptedMMKV("chunky-crayon-canvas");
 
 /** zustand `persist` adapter over the encrypted MMKV instance.
  *  (v4 renamed `.delete()` → `.remove()`.) */
