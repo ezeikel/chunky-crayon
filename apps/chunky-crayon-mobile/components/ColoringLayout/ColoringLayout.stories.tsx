@@ -156,18 +156,22 @@ const PhoneFrame = ({
             },
           ]}
         >
-          {/* Chrome row above the canvas — progress + sound/music. */}
+          {/* Chrome row + canvas fill the WHOLE frame; the sheet floats OVER
+              the bottom of the canvas (absolute), so the canvas peeks above it
+              — reading as a real bottom sheet sitting on top of the canvas,
+              not a panel stacked below it. */}
           <View style={styles.phoneTopRow}>
             <CanvasTopBar />
           </View>
-          {/* Canvas fills the space between chrome and the docked sheet. */}
           <View style={styles.phoneCanvas}>
             <PlaceholderCanvas area={{ width, height }} />
           </View>
-          {/* Docked bottom sheet — the real phone toolbar. ToolbarContent is
-              the sheet's scrollable body (MobileColoringToolbar wraps it in a
-              gorhom BottomSheet on-device, which docks off-canvas in SB). */}
-          <View style={styles.phoneSheet}>
+          {/* Docked bottom sheet — overlays the lower portion of the canvas.
+              ToolbarContent is the sheet's scrollable body (MobileColoringToolbar
+              wraps it in a gorhom BottomSheet on-device, which docks to the
+              SCREEN bottom and so can't live inside a scaled frame — this is the
+              faithful faux: same body, sheet chrome, overlaying the canvas). */}
+          <View style={styles.phoneSheetOverlay}>
             <View style={styles.phoneSheetHandle} />
             <ToolbarContent
               onZoomIn={noop}
@@ -413,11 +417,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingTop: 8,
   },
+  // Canvas fills the whole frame below the chrome row; the sheet overlays its
+  // lower half. Extra bottom padding keeps the placeholder label clear of the
+  // sheet so the canvas reads as "peeking above" it.
   phoneCanvas: {
     flex: 1,
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
-  phoneSheet: {
+  // Bottom sheet — absolutely positioned over the lower portion of the canvas.
+  phoneSheetOverlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
