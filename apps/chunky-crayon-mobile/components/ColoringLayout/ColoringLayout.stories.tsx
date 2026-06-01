@@ -178,16 +178,10 @@ const PhoneFrame = ({
           <View style={[styles.phoneSheetOverlay, { maxHeight: height * 0.6 }]}>
             <View style={styles.phoneSheetHandle} />
             <ScrollView showsVerticalScrollIndicator={false}>
-              <ToolbarContent
-                onZoomIn={noop}
-                onZoomOut={noop}
-                onResetZoom={noop}
-                zoom={1}
-                onStartOver={noop}
-                onPrint={noop}
-                onSave={noop}
-                onMyArtwork={noop}
-              />
+              {/* Sheet body reads everything from the store — tools / colors /
+                  brush / undo-redo only (web parity). Zoom lives in the top
+                  chrome, actions under the canvas (not shown in this faux). */}
+              <ToolbarContent />
             </ScrollView>
           </View>
         </View>

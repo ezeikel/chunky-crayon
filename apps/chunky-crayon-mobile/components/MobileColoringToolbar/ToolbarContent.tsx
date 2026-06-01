@@ -1,12 +1,5 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faArrowsRotate,
-  faPrint,
-  faFloppyDisk,
-  faHeart,
-} from "@fortawesome/pro-duotone-svg-icons";
+import { View, Pressable, ScrollView, StyleSheet } from "react-native";
 import { COLORS } from "@/lib/design";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
@@ -20,13 +13,7 @@ import ToolTile from "@/components/coloring/ToolTile";
 import BrushSizeRow from "@/components/coloring/BrushSizeRow";
 import PaletteVariantPills from "@/components/coloring/PaletteVariantPills";
 import ColorSwatchGrid from "@/components/coloring/ColorSwatchGrid";
-import {
-  UndoIcon,
-  RedoIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
-  ExpandIcon,
-} from "@/components/coloring/StrokeIcons";
+import { UndoIcon, RedoIcon } from "@/components/coloring/StrokeIcons";
 import {
   COLORING_REGULAR_TOOLS,
   COLORING_MAGIC_TOOLS,
@@ -34,13 +21,8 @@ import {
 } from "@/lib/coloring/tools";
 
 type ToolbarContentProps = {
-  onZoomIn?: () => void;
-  onZoomOut?: () => void;
-  onResetZoom?: () => void;
-  zoom?: number;
-  minZoom?: number;
-  maxZoom?: number;
-  /** Action handlers — each opens its OWN sheet (web/rail parity). */
+  /** Action handlers — each opens its OWN sheet (web/rail parity). Zoom is NOT
+   *  here: on phone, zoom lives in the top chrome above the canvas (web). */
   onStartOver?: () => void;
   onPrint?: () => void;
   onSave?: () => void;
@@ -70,12 +52,6 @@ type ToolbarContentProps = {
  * other toolbars).
  */
 const ToolbarContent = ({
-  onZoomIn,
-  onZoomOut,
-  onResetZoom,
-  zoom = 1,
-  minZoom = 0.5,
-  maxZoom = 4,
   onStartOver,
   onPrint,
   onSave,
@@ -152,32 +128,11 @@ const ToolbarContent = ({
 
   return (
     <>
-      {/* Palette-variant pills (4 across) */}
-      <View style={styles.section}>
-        <PaletteVariantPills
-          selected={paletteVariant}
-          onSelect={setPaletteVariant}
-          columns={4}
-        />
-      </View>
+      {/* Order mirrors web's MobileColoringDrawer exactly:
+          1. TOOLS  2. palette-variant pills  3. colour swatches  4. brush + undo/redo.
+          (No zoom — top chrome; no actions — under the canvas.) */}
 
-      {/* Swatch grid for the active variant — dims for magic tools. */}
-      <View
-        style={[styles.section, { opacity: isMagicToolActive ? 0.4 : 1 }]}
-        pointerEvents={isMagicToolActive ? "none" : "auto"}
-      >
-        <ColorSwatchGrid
-          variant={paletteVariant}
-          selectedColor={isMagicToolActive ? "" : selectedColor}
-          onSelect={(color) => {
-            selectionChanged();
-            setColor(color);
-          }}
-          columns={9}
-        />
-      </View>
-
-      {/* Tools — horizontal scroll row (regular + magic). */}
+      {/* Tools — horizontal scroll row (regular + magic). FIRST, like web. */}
       <View style={styles.section}>
         <ScrollView
           horizontal
@@ -209,8 +164,32 @@ const ToolbarContent = ({
         </ScrollView>
       </View>
 
-      {/* Brush sizes + undo / redo + zoom on one row (borderless stroke
-          glyphs, web/rail parity). */}
+      {/* Palette-variant pills (4 across) */}
+      <View style={styles.section}>
+        <PaletteVariantPills
+          selected={paletteVariant}
+          onSelect={setPaletteVariant}
+          columns={4}
+        />
+      </View>
+
+      {/* Swatch grid for the active variant — dims for magic tools. */}
+      <View
+        style={[styles.section, { opacity: isMagicToolActive ? 0.4 : 1 }]}
+        pointerEvents={isMagicToolActive ? "none" : "auto"}
+      >
+        <ColorSwatchGrid
+          variant={paletteVariant}
+          selectedColor={isMagicToolActive ? "" : selectedColor}
+          onSelect={(color) => {
+            selectionChanged();
+            setColor(color);
+          }}
+          columns={9}
+        />
+      </View>
+
+      {/* Brush sizes + undo / redo on one row (borderless stroke glyphs). */}
       <View style={[styles.section, styles.bottomRow]}>
         <BrushSizeRow
           selectedRadius={brushSize}
@@ -254,124 +233,7 @@ const ToolbarContent = ({
             color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
           />
         </Pressable>
-
-        <View style={styles.zoomGroup}>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onZoomOut?.();
-            }}
-            disabled={zoom <= minZoom}
-            style={[
-              styles.controlButtonBorderless,
-              { width: tile, height: tile },
-              zoom <= minZoom && styles.disabled,
-            ]}
-            accessibilityLabel="Zoom out"
-          >
-            <ZoomOutIcon
-              size={22}
-              color={zoom <= minZoom ? COLORS.textMuted : COLORS.textSecondary}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onZoomIn?.();
-            }}
-            disabled={zoom >= maxZoom}
-            style={[
-              styles.controlButtonBorderless,
-              { width: tile, height: tile },
-              zoom >= maxZoom && styles.disabled,
-            ]}
-            accessibilityLabel="Zoom in"
-          >
-            <ZoomInIcon
-              size={22}
-              color={zoom >= maxZoom ? COLORS.textMuted : COLORS.textSecondary}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onResetZoom?.();
-            }}
-            style={[
-              styles.controlButtonBorderless,
-              { width: tile, height: tile },
-            ]}
-            accessibilityLabel="Fit to screen"
-          >
-            <ExpandIcon size={22} color={COLORS.textSecondary} />
-          </Pressable>
-        </View>
-
-        <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
       </View>
-
-      {/* Actions — Start Over / Print / Save / My Artwork (web's actions slot,
-          same as the rail + middle toolbar). Only when handlers are wired. */}
-      {(onStartOver || onPrint || onSave || onMyArtwork) && (
-        <View style={[styles.section, styles.actionRow]}>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onStartOver?.();
-            }}
-            style={[styles.actionTile, { width: tile, height: tile }]}
-            accessibilityLabel="Start Over"
-          >
-            <FontAwesomeIcon
-              icon={faArrowsRotate}
-              size={24}
-              color={COLORS.textPrimary}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onPrint?.();
-            }}
-            style={[styles.actionTile, { width: tile, height: tile }]}
-            accessibilityLabel="Print"
-          >
-            <FontAwesomeIcon
-              icon={faPrint}
-              size={24}
-              color={COLORS.textPrimary}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onSave?.();
-            }}
-            style={[styles.actionTile, { width: tile, height: tile }]}
-            accessibilityLabel="Save"
-          >
-            <FontAwesomeIcon
-              icon={faFloppyDisk}
-              size={22}
-              color={COLORS.textPrimary}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              tapLight();
-              onMyArtwork?.();
-            }}
-            style={[styles.actionTile, { width: tile, height: tile }]}
-            accessibilityLabel="My Artwork"
-          >
-            <FontAwesomeIcon
-              icon={faHeart}
-              size={22}
-              color={COLORS.textPrimary}
-            />
-          </Pressable>
-        </View>
-      )}
     </>
   );
 };
@@ -395,34 +257,11 @@ const styles = StyleSheet.create({
   spacer: {
     flex: 1,
   },
-  zoomGroup: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  // Borderless control button (web/rail parity — undo/redo/zoom have no circle).
+  // Borderless control button (web/rail parity — undo/redo have no circle).
   controlButtonBorderless: {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 24,
-  },
-  zoomPercentage: {
-    fontSize: 18,
-    fontFamily: "TondoTrial-Bold",
-    color: COLORS.textPrimary,
-    marginLeft: 4,
-  },
-  actionRow: {
-    flexDirection: "row",
-    gap: 8,
-    flexWrap: "wrap",
-  },
-  actionTile: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: COLORS.bgCreamDark,
-    backgroundColor: COLORS.white,
   },
   disabled: {
     opacity: 0.5,

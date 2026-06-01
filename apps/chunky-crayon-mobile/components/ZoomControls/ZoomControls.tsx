@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { useCanvasStore, Tool } from "@/stores/canvasStore";
 import { tapLight, tapMedium } from "@/utils/haptics";
+import { COLORS } from "@/lib/design";
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;
@@ -95,8 +96,8 @@ const ZoomControls = ({ style }: ZoomControlsProps) => {
       >
         <FontAwesomeIcon
           icon={faMagnifyingGlassMinus}
-          size={18}
-          color={canZoomOut ? "#E46444" : "#D1D5DB"}
+          size={20}
+          color={canZoomOut ? COLORS.textMuted : "#D1D5DB"}
         />
       </Pressable>
 
@@ -123,8 +124,8 @@ const ZoomControls = ({ style }: ZoomControlsProps) => {
       >
         <FontAwesomeIcon
           icon={faMagnifyingGlassPlus}
-          size={18}
-          color={canZoomIn ? "#E46444" : "#D1D5DB"}
+          size={20}
+          color={canZoomIn ? COLORS.textMuted : "#D1D5DB"}
         />
       </Pressable>
 
@@ -137,63 +138,72 @@ const ZoomControls = ({ style }: ZoomControlsProps) => {
           <FontAwesomeIcon
             icon={faHand}
             size={18}
-            color={isPanActive ? "#FFFFFF" : "#E46444"}
+            color={isPanActive ? "#FFFFFF" : COLORS.textMuted}
           />
         </Pressable>
       )}
 
-      {/* Reset view button - only shown when zoomed */}
+      {/* Reset view button - only shown when zoomed (accent-tinted, web parity) */}
       {isZoomed && (
         <Pressable onPress={handleResetView} style={styles.resetButton}>
-          <FontAwesomeIcon icon={faHouse} size={16} color="#E46444" />
+          <FontAwesomeIcon icon={faHouse} size={18} color={ACCENT} />
         </Pressable>
       )}
     </View>
   );
 };
 
+// Styled to match web's ZoomControls (packages/coloring-ui/src/ZoomControls.tsx):
+//  - pill: white, 2px bgCreamDark border, rounded-coloring-card (24), gap 8;
+//    accent ring when zoomed.
+//  - zoom out/in buttons: white, 2px bgCreamDark border, muted-gray icon.
+//  - reset: accent-tinted (accent/10 bg, accent/40 border, accent icon).
+//  - pan: accent when active, else white/muted.
+const ACCENT = "#E46444";
+const ACCENT_TINT = "rgba(228, 100, 68, 0.1)";
+const ACCENT_BORDER = "rgba(228, 100, 68, 0.4)";
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    height: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    paddingHorizontal: 8,
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    gap: 8,
+    padding: 8,
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
   },
   containerZoomed: {
-    // Subtle orange ring when zoomed to indicate active state
-    borderWidth: 2,
-    borderColor: "rgba(228, 100, 68, 0.3)",
+    // Accent ring when zoomed (web: ring-2 ring-coloring-accent/30).
+    borderColor: ACCENT_BORDER,
   },
   button: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 18,
-    backgroundColor: "#FFF5F3",
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
   },
   buttonDisabled: {
-    backgroundColor: "#F3F4F6",
-    opacity: 0.6,
+    opacity: 0.5,
   },
   buttonActive: {
-    backgroundColor: "#E46444",
+    backgroundColor: ACCENT,
+    borderColor: "transparent",
   },
   resetButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 18,
-    backgroundColor: "rgba(228, 100, 68, 0.1)",
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: ACCENT_BORDER,
+    backgroundColor: ACCENT_TINT,
   },
   dotsContainer: {
     flexDirection: "row",
@@ -208,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E5E7EB",
   },
   dotActive: {
-    backgroundColor: "#E46444",
+    backgroundColor: ACCENT,
     transform: [{ scale: 1.25 }],
   },
   dotPop: {

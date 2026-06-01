@@ -9,6 +9,7 @@ import {
   faFloppyDisk,
   faPrint,
   faHeart,
+  faArrowsRotate,
 } from "@fortawesome/pro-solid-svg-icons";
 // SDK 56: the root expo-media-library save/permission methods throw a
 // deprecation error at call time — the working API is the legacy subpath
@@ -24,6 +25,7 @@ import ImageCanvas from "@/components/ImageCanvas/ImageCanvas";
 import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColoringToolbar";
 import ColoringLayout from "@/components/ColoringLayout/ColoringLayout";
 import CanvasTopBar from "@/components/CanvasTopBar/CanvasTopBar";
+import ZoomControls from "@/components/ZoomControls/ZoomControls";
 import MoreColoringPages from "@/components/MoreColoringPages";
 import ActionSheet from "@/components/ActionSheet";
 import ConfirmSheet from "@/components/ConfirmSheet";
@@ -338,18 +340,20 @@ const ColoringImage = () => {
           </View>
         )}
 
-        {/* Canvas chrome row (phone tier). Web/tier parity: the progress bar +
-            sound/music live in the shared CanvasTopBar (same component the
-            three-column + middle tiers render above their canvas). Zoom now
-            lives in the bottom-sheet toolbar (parity with the rails), so the
-            old standalone ZoomControls is gone from this row. The focus toggle
-            stays here. */}
+        {/* Canvas chrome (phone tier). Web parity (ColoringArea md:hidden top
+            bar, two rows ABOVE the canvas):
+              Row 1 — progress bar + sound/music (shared CanvasTopBar).
+              Row 2 — the zoom pill + focus toggle, centered.
+            Zoom lives HERE in the top chrome, NOT in the bottom sheet (the
+            sheet is tools/colors/brush/undo-redo only, matching web's
+            MobileColoringDrawer). */}
         {!isLandscapeLayout && !isFocusMode && (
           <View style={styles.canvasControls}>
-            <View style={styles.canvasControlsBar}>
-              <CanvasTopBar />
+            <CanvasTopBar />
+            <View style={styles.canvasZoomRow}>
+              <ZoomControls />
+              <FocusModeToggleButton />
             </View>
-            <FocusModeToggleButton />
           </View>
         )}
 
@@ -454,6 +458,55 @@ const ColoringImage = () => {
                       layoutMode={layoutMode}
                     />
                   </View>
+                  {/* Actions UNDER the canvas (web parity: Start Over / Print /
+                      Save / My Artwork sit below the canvas, NOT in the bottom
+                      sheet). Each opens its own sheet. */}
+                  <View style={styles.canvasActionRow}>
+                    <Pressable
+                      onPress={handleStartOver}
+                      style={styles.canvasActionTile}
+                      accessibilityLabel="Start Over"
+                    >
+                      <FontAwesomeIcon
+                        icon={faArrowsRotate}
+                        size={22}
+                        color={COLORS.textPrimary}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => setShowPrintSheet(true)}
+                      style={styles.canvasActionTile}
+                      accessibilityLabel="Print"
+                    >
+                      <FontAwesomeIcon
+                        icon={faPrint}
+                        size={22}
+                        color={COLORS.textPrimary}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => setShowSaveSheet(true)}
+                      style={styles.canvasActionTile}
+                      accessibilityLabel="Save"
+                    >
+                      <FontAwesomeIcon
+                        icon={faFloppyDisk}
+                        size={20}
+                        color={COLORS.textPrimary}
+                      />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => setShowMyArtworkSheet(true)}
+                      style={styles.canvasActionTile}
+                      accessibilityLabel="My Artwork"
+                    >
+                      <FontAwesomeIcon
+                        icon={faHeart}
+                        size={20}
+                        color={COLORS.textPrimary}
+                      />
+                    </Pressable>
+                  </View>
                 </View>
               </ScrollView>
             </View>
@@ -511,23 +564,12 @@ const ColoringImage = () => {
           tone="destructive"
         />
 
-        {/* Bottom drawer only in the phone tier. Hidden in focus mode. Carries
-            the same zoom + action handlers as the rail/middle toolbar so the
-            phone tier reaches full parity (zoom + Start Over/Print/Save/My
-            Artwork live in the sheet; progress + sound/music sit above the
-            canvas via CanvasTopBar). */}
-        {!isLandscapeLayout && !isFocusMode && (
-          <MobileColoringToolbar
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onResetZoom={handleResetZoom}
-            zoom={scale}
-            onStartOver={handleStartOver}
-            onPrint={() => setShowPrintSheet(true)}
-            onSave={() => setShowSaveSheet(true)}
-            onMyArtwork={() => setShowMyArtworkSheet(true)}
-          />
-        )}
+        {/* Bottom drawer only in the phone tier. Hidden in focus mode. Web
+            parity: the sheet is tools / colors / brush / undo-redo ONLY.
+            Zoom lives in the top chrome (canvasControls Row 2) and the actions
+            (Start Over / Print / Save / My Artwork) live UNDER the canvas — so
+            the sheet takes no zoom or action props. */}
+        {!isLandscapeLayout && !isFocusMode && <MobileColoringToolbar />}
 
         {/* Floating exit X — only renders while focus mode is active. */}
         <FocusModeFloatingExit />
@@ -678,18 +720,37 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 4,
   },
+  // Two-row top chrome (web ColoringArea md:hidden): Row 1 = CanvasTopBar
+  // (progress + sound/music), Row 2 = the centered zoom pill + focus toggle.
   canvasControls: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: "column",
     gap: 8,
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
-  // The CanvasTopBar takes the remaining width (its progress pill flexes); the
-  // focus toggle sits to its right.
-  canvasControlsBar: {
-    flex: 1,
+  canvasZoomRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  // Actions under the canvas (web parity): Start Over / Print / Save / Heart,
+  // centered, round white tiles with a soft border.
+  canvasActionRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12,
+    marginTop: 16,
+  },
+  canvasActionTile: {
+    width: 52,
+    height: 52,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 26,
+    borderWidth: 1,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
   },
 });
 
