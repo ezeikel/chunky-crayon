@@ -67,8 +67,16 @@ const Frame = ({
         {scale < 1 ? `  (shown @ ${Math.round(scale * 100)}%)` : ""}
       </Text>
       {/* Reserve the SCALED footprint so siblings don't overlap the shrunk
-          mockup (transform doesn't affect layout box). */}
-      <View style={{ width: width * scale, height: height * scale }}>
+          mockup (transform doesn't affect layout box), AND clip here on the
+          UNSCALED outer box — clipping on the transformed child itself is
+          unreliable in RN, which let the toolbar's horizontal tool row spill
+          past the frame edge. */}
+      <View
+        style={[
+          styles.frameClip,
+          { width: width * scale, height: height * scale },
+        ]}
+      >
         <View
           style={[
             styles.frame,
@@ -305,11 +313,16 @@ const styles = StyleSheet.create({
     fontFamily: "TondoTrial-Bold",
     color: COLORS.textPrimary,
   },
-  frame: {
+  // The visible device frame edge + the clip boundary live on the UNSCALED
+  // outer box (clipping a transform-scaled child directly is unreliable in RN).
+  frameClip: {
     borderWidth: 1,
     borderColor: COLORS.textMuted,
     borderRadius: 8,
     overflow: "hidden",
+    backgroundColor: COLORS.bgCream,
+  },
+  frame: {
     backgroundColor: COLORS.bgCream,
   },
   canvas: {
