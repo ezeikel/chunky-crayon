@@ -100,7 +100,10 @@ const ToolTile = ({
             // spinner must be WHITE to read against it — a MAGIC_FROM (pink)
             // spinner on the pink gradient was invisible, making the tile look
             // like a blank pink box. Web's loading spinner is white too.
-            <Spinner size={Math.round(iconSize * 0.9)} color="#FFFFFF" />
+            // Sized to the full tool-glyph size (faSpinnerThird read too thin
+            // at 0.9× a value that's already small) so it matches the weight
+            // of web's size-xl spinner.
+            <Spinner size={iconSize} color="#FFFFFF" />
           ) : (
             <FontAwesomeIcon
               icon={icon}
