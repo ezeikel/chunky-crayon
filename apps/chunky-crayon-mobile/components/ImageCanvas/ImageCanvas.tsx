@@ -744,6 +744,21 @@ const ImageCanvas = ({
       brushHaptics.stop();
       setScroll(true);
 
+      // Read the tool state FRESH from the store at commit time, not from this
+      // callback's closure. The gesture worklet calls commitStroke via runOnJS,
+      // and the gesture object doesn't always rebind to a freshly-created
+      // callback after a brushSize/brushType/color change — so a closure read
+      // could commit the stroke at the PREVIOUS size ("brush size not always
+      // respected when changed"). A stroke can't change tools mid-draw (single
+      // touch), so the current store value is the correct one for this stroke.
+      const {
+        brushSize: liveBrushSize,
+        brushType: liveBrushType,
+        selectedTool: liveSelectedTool,
+        selectedColor: liveSelectedColor,
+        rainbowHue: liveRainbowHue,
+      } = useCanvasStore.getState();
+
       if (!svgDimensions || xs.length === 0) {
         // Zero-length stroke (a brush/eraser tap with no drag). No action is
         // committed, so the identity-based deferred clear below would never
@@ -764,14 +779,16 @@ const ImageCanvas = ({
         rebuilt.lineTo(xs[i], ys[i]);
       }
 
-      const isErasing = selectedTool === "eraser";
-      const effectiveBrushType: BrushType = isErasing ? "eraser" : brushType;
+      const isErasing = liveSelectedTool === "eraser";
+      const effectiveBrushType: BrushType = isErasing
+        ? "eraser"
+        : liveBrushType;
 
       const strokeColor = isErasing
         ? "#000000"
-        : brushType === "rainbow"
-          ? getRainbowColor(rainbowHue)
-          : selectedColor;
+        : liveBrushType === "rainbow"
+          ? getRainbowColor(liveRainbowHue)
+          : liveSelectedColor;
 
       // Smooth the raw forces the same way the old per-move path did.
       const smoother = pressureSmootherRef.current;
@@ -792,8 +809,12 @@ const ImageCanvas = ({
           pressurePoints.reduce((a, b) => a + b, 0) / pressurePoints.length;
       }
       const strokeWidth = isErasing
-        ? brushSize * 2
-        : getPressureAdjustedWidth(brushSize, brushType, averagePressure);
+        ? liveBrushSize * 2
+        : getPressureAdjustedWidth(
+            liveBrushSize,
+            liveBrushType,
+            averagePressure,
+          );
 
       const textureSeed = Math.random() * 1000;
 
@@ -812,7 +833,7 @@ const ImageCanvas = ({
         color: strokeColor,
         brushType: effectiveBrushType,
         strokeWidth,
-        startHue: effectiveBrushType === "rainbow" ? rainbowHue : undefined,
+        startHue: effectiveBrushType === "rainbow" ? liveRainbowHue : undefined,
         sourceWidth: svgDimensions.width,
         sourceHeight: svgDimensions.height,
         pressurePoints,
@@ -823,16 +844,11 @@ const ImageCanvas = ({
       addAction(action);
       pendingLiveStrokeIdRef.current = liveStrokeId;
 
-      if (brushType === "rainbow") {
+      if (liveBrushType === "rainbow") {
         advanceRainbowHue(30);
       }
     },
     [
-      brushSize,
-      brushType,
-      selectedTool,
-      selectedColor,
-      rainbowHue,
       addAction,
       setScroll,
       advanceRainbowHue,
