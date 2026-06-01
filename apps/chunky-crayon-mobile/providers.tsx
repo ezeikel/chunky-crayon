@@ -9,8 +9,18 @@ import {
   SubscriptionProvider,
 } from "@/contexts";
 import { FocusModeProvider } from "@/components/FocusMode";
+import { useArtworkSync } from "@/hooks/useArtworkSync";
 
 export const queryClient = new QueryClient();
+
+/**
+ * Renders nothing — just mounts the local→DB artwork sync worker app-wide.
+ * Sits under AuthProvider (needs useAuth) so it can gate on the current user.
+ */
+const ArtworkSyncMount = () => {
+  useArtworkSync();
+  return null;
+};
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -20,6 +30,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
           <AuthProvider>
             <SubscriptionProvider>
               <UserProvider>
+                <ArtworkSyncMount />
                 <ColoProvider>
                   <FocusModeProvider>{children}</FocusModeProvider>
                 </ColoProvider>
