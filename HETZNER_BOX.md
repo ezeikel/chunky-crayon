@@ -5,34 +5,37 @@
 This file lives at the repo root of every project that deploys to this box, and is kept byte-identical across all of them. If you edit it, edit it in all places (or better, edit in one and copy).
 
 Projects currently sharing this file:
+
 - [`ezeikel/auntie-marlenes`](https://github.com/ezeikel/auntie-marlenes)
 - [`ezeikel/parking-ticket-pal-worker`](https://github.com/ezeikel/parking-ticket-pal-worker)
 - [`ezeikel/chunky-crayon`](https://github.com/ezeikel/chunky-crayon) → this repo
+- [`ezeikel/ezeikel`](https://github.com/ezeikel/ezeikel)
 
 ---
 
 ## TL;DR
 
-| | |
-|---|---|
-| **Host** | `157.90.168.197` |
-| **SSH** | `ssh root@157.90.168.197` (key: `~/.ssh/id_ed25519`) |
-| **OS** | Ubuntu 24.04.3 LTS |
-| **Hardware** | Hetzner Cloud CX23: 2 vCPU, 4 GB RAM, 75 GB disk |
-| **Hostname on box** | `parking-ticket-pal-scraper-01` (historical — the box was originally provisioned for PTP, kept as-is to avoid breaking anything) |
-| **Runtime** | Bun 1.3.1 at `/root/.bun/bin/bun` |
-| **Service manager** | systemd (all workers run as root via unit files in `/etc/systemd/system/`) |
+|                         |                                                                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| **Host**                | `157.90.168.197`                                                                                                                 |
+| **SSH**                 | `ssh root@157.90.168.197` (key: `~/.ssh/id_ed25519`)                                                                             |
+| **OS**                  | Ubuntu 24.04.3 LTS                                                                                                               |
+| **Hardware**            | Hetzner Cloud CX23: 2 vCPU, 4 GB RAM, 75 GB disk                                                                                 |
+| **Hostname on box**     | `parking-ticket-pal-scraper-01` (historical — the box was originally provisioned for PTP, kept as-is to avoid breaking anything) |
+| **Runtime**             | Bun 1.3.1 at `/root/.bun/bin/bun`                                                                                                |
+| **Service manager**     | systemd (all workers run as root via unit files in `/etc/systemd/system/`)                                                       |
 | **Reverse proxy / TLS** | None. Services bind directly to localhost ports. Cron triggers from Vercel hit the box's public IP on the project-specific port. |
 
 ---
 
 ## Current inhabitants
 
-| Project | Repo | Box directory | Commit | Systemd unit(s) | Port | Role |
-|---|---|---|---|---|---|---|
-| **Parking Ticket Pal worker + API** | `ezeikel/parking-ticket-pal-worker` | `/opt/worker` | (live) | `worker-api.service`, `worker-watchdog.service` | **3002** | Dual-role Hono server: **(1) Scraper** — London Tribunals + Trafficase + TPT + council-data scrapers via Playwright + Xvfb, controlled by `/start`, `/stop`, `/scrapers/*` endpoints. **(2) AI automation API** — challenge generation and file automation for PTP's main app, exposed via `/automation/generate`, `/automation/challenge`, `/automation/verify`, `/automation/status/:jobId`. Both roles share the same process, same port, same env file, same systemd unit. Watchdog unit restarts scraper sub-processes on crashes. |
-| **Auntie Marlene's content worker** | `ezeikel/auntie-marlenes` | `/opt/auntie-marlenes` | (live) | `content-worker.service` | **3020** | Hono HTTP server for daily social posts, blog auto-generation, product image updates. Also hosts one-off CLI scripts for hero asset regeneration (`pnpm gen:hero`, `pnpm gen:hero-videos-*`) that run on-demand via SSH, not via HTTP. |
-| **Chunky Crayon social demo worker** | `ezeikel/chunky-crayon` | `/opt/chunky-crayon` | (pending deploy) | `chunky-crayon-worker.service` | **3030** | Hono HTTP server that drives the live CC web app via Playwright + `xvfb-run` to record a Magic Brush reveal video, composites it with Remotion + ElevenLabs voiceover/music, and posts to IG Reels / FB Reels / TikTok / Pinterest on a Vercel-cron-triggered schedule. |
+| Project                              | Repo                                | Box directory          | Commit           | Systemd unit(s)                                 | Port     | Role                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------ | ----------------------------------- | ---------------------- | ---------------- | ----------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Parking Ticket Pal worker + API**  | `ezeikel/parking-ticket-pal-worker` | `/opt/worker`          | (live)           | `worker-api.service`, `worker-watchdog.service` | **3002** | Dual-role Hono server: **(1) Scraper** — London Tribunals + Trafficase + TPT + council-data scrapers via Playwright + Xvfb, controlled by `/start`, `/stop`, `/scrapers/*` endpoints. **(2) AI automation API** — challenge generation and file automation for PTP's main app, exposed via `/automation/generate`, `/automation/challenge`, `/automation/verify`, `/automation/status/:jobId`. Both roles share the same process, same port, same env file, same systemd unit. Watchdog unit restarts scraper sub-processes on crashes. |
+| **Auntie Marlene's content worker**  | `ezeikel/auntie-marlenes`           | `/opt/auntie-marlenes` | (live)           | `content-worker.service`                        | **3020** | Hono HTTP server for daily social posts, blog auto-generation, product image updates. Also hosts one-off CLI scripts for hero asset regeneration (`pnpm gen:hero`, `pnpm gen:hero-videos-*`) that run on-demand via SSH, not via HTTP.                                                                                                                                                                                                                                                                                                  |
+| **Chunky Crayon social demo worker** | `ezeikel/chunky-crayon`             | `/opt/chunky-crayon`   | (pending deploy) | `chunky-crayon-worker.service`                  | **3030** | Hono HTTP server that drives the live CC web app via Playwright + `xvfb-run` to record a Magic Brush reveal video, composites it with Remotion + ElevenLabs voiceover/music, and posts to IG Reels / FB Reels / TikTok / Pinterest on a Vercel-cron-triggered schedule.                                                                                                                                                                                                                                                                 |
+| **Ezeikel dev-content reel worker**  | `ezeikel/ezeikel`                   | `/opt/ezeikel`         | (pending deploy) | `ezeikel-worker.service`                        | 3040     | Hono HTTP server that posts dev-content Reels (JS/TS/AI/tooling tips) to Ezeikel's personal IG Business + FB Page on a Vercel-cron-triggered schedule. Pipeline: Perplexity research → LLM script compression → ElevenLabs voice (cloned) → Remotion render with Shiki-highlighted code → R2 upload → Graph API publish. Mirrors the chunky-crayon-worker shape, minus Playwright.                                                                                                                                                      |
 
 **Disk usage as of last audit (April 2026):** ~9 GB total across both projects, 52 GB free on `/dev/sda1`.
 
@@ -42,7 +45,7 @@ Projects currently sharing this file:
 
 These exist on the box but are **not serving any live traffic or processes**. Confirmed via audit (April 2026): no systemd unit references them, no running process comes from them, no port is bound by them.
 
-- **`/opt/parking-ticket-pal/`** (295 MB) — a clone of the PTP *monorepo* (`ezeikel/parking-ticket-pal`, the web + mobile app repo), last pulled Jan 25 2026. Contains `apps/web/`, `apps/mobile/`, no `node_modules/`. **Do not confuse this with PTP's actual worker** — the worker lives at `/opt/worker/` and is a different repo entirely (`parking-ticket-pal-worker`). **History:** this was an early attempt (Jan 2026) to run PTP on the box directly from the monorepo, before the team extracted the worker code into its own `parking-ticket-pal-worker` repo and migrated to `/opt/worker/`. The monorepo clone was left behind rather than cleaned up. Not referenced by any running systemd unit. Safe to `rm -rf` when cleaning up; can be re-cloned in seconds if ever needed.
+- **`/opt/parking-ticket-pal/`** (295 MB) — a clone of the PTP _monorepo_ (`ezeikel/parking-ticket-pal`, the web + mobile app repo), last pulled Jan 25 2026. Contains `apps/web/`, `apps/mobile/`, no `node_modules/`. **Do not confuse this with PTP's actual worker** — the worker lives at `/opt/worker/` and is a different repo entirely (`parking-ticket-pal-worker`). **History:** this was an early attempt (Jan 2026) to run PTP on the box directly from the monorepo, before the team extracted the worker code into its own `parking-ticket-pal-worker` repo and migrated to `/opt/worker/`. The monorepo clone was left behind rather than cleaned up. Not referenced by any running systemd unit. Safe to `rm -rf` when cleaning up; can be re-cloned in seconds if ever needed.
 - **`/opt/scraper/`** (12 KB, empty dir) — zombie from PTP's original setup guide when the project was still called "scraper" before being renamed to "worker". Safe to `rmdir` when cleaning up.
 
 ---
@@ -67,11 +70,11 @@ Both projects' GitHub Actions deploy workflows use this same private key, set as
 
 Each deploying repo needs exactly three secrets:
 
-| Secret | Value | Notes |
-|---|---|---|
-| `HETZNER_HOST` | `157.90.168.197` | Public IP; not sensitive but set as a secret for consistency |
-| `HETZNER_USER` | `root` | All services run as root currently |
-| `HETZNER_SSH_KEY` | Contents of `~/.ssh/id_ed25519` (private key, full PEM) | Must match box's `authorized_keys` |
+| Secret            | Value                                                   | Notes                                                        |
+| ----------------- | ------------------------------------------------------- | ------------------------------------------------------------ |
+| `HETZNER_HOST`    | `157.90.168.197`                                        | Public IP; not sensitive but set as a secret for consistency |
+| `HETZNER_USER`    | `root`                                                  | All services run as root currently                           |
+| `HETZNER_SSH_KEY` | Contents of `~/.ssh/id_ed25519` (private key, full PEM) | Must match box's `authorized_keys`                           |
 
 Set via `gh secret set <NAME> --repo <owner>/<repo>`. For the key specifically: `gh secret set HETZNER_SSH_KEY --repo <owner>/<repo> < ~/.ssh/id_ed25519`.
 
@@ -92,13 +95,14 @@ These conventions are what keep projects from stepping on each other. **Follow t
 
 Each project gets a unique port on `127.0.0.1` (or `*` if it needs to be externally reachable for Vercel cron POSTs). Allocated so far:
 
-| Port | Owner |
-|---|---|
-| 22 | sshd |
-| 53 | systemd-resolved |
-| 3002 | PTP `worker-api` |
-| 3020 | AM `content-worker` |
-| **3030** | **CC `chunky-crayon-worker`** |
+| Port        | Owner                                                                         |
+| ----------- | ----------------------------------------------------------------------------- |
+| 22          | sshd                                                                          |
+| 53          | systemd-resolved                                                              |
+| 3002        | PTP `worker-api`                                                              |
+| 3020        | AM `content-worker`                                                           |
+| **3030**    | **CC `chunky-crayon-worker`**                                                 |
+| 3040        | EZ `ezeikel-worker`                                                           |
 | 30000–50000 | Chrome debug ports spawned by PTP's Playwright workers (do not allocate here) |
 
 **When adding a new project: pick the next available 10-slot in the 30xx range** (3030, 3040, 3050, ...). Leave gaps between projects for future sub-services.
@@ -175,14 +179,14 @@ on:
   push:
     branches: [main]
     paths:
-      - '<path-to-worker-code>/**'
-      - '.github/workflows/deploy-<worker-name>.yml'
+      - "<path-to-worker-code>/**"
+      - ".github/workflows/deploy-<worker-name>.yml"
   workflow_dispatch:
     inputs:
       action:
-        description: 'What to do'
+        description: "What to do"
         required: true
-        default: 'deploy-and-restart'
+        default: "deploy-and-restart"
         type: choice
         options:
           - deploy-and-restart
@@ -381,7 +385,7 @@ gh workflow run deploy-content-worker.yml --repo ezeikel/auntie-marlenes --field
 7. Verify health
 8. **When ready to forward again**, push a new commit to main OR `git checkout main && git pull` on the box manually, then run the deploy workflow
 
-No rollback scripting is automated because rollbacks are rare and context-dependent — don't want to make them *easier* than they should be.
+No rollback scripting is automated because rollbacks are rare and context-dependent — don't want to make them _easier_ than they should be.
 
 ### Check disk and memory
 
@@ -396,11 +400,13 @@ ssh root@157.90.168.197 'df -h /; free -h; du -sh /opt/*'
 The box is a Hetzner CX23 (2 vCPU, 4 GB RAM, 75 GB disk, €3.49/month).
 
 **Current headroom:**
+
 - **Disk**: 52 GB free of 75 GB (69% free) — comfortable, could host 5+ more projects if they each match AM's ~800 MB footprint
 - **Memory**: ~1.2 GB free of 4 GB at idle — **tight**. PTP worker spikes Chrome/Playwright memory aggressively under scrape load. A third project with >500 MB steady-state footprint would push into swap.
 - **CPU**: Usually idle. Scrapes + video generation are bursty.
 
 **When to upgrade the box:**
+
 - Memory pressure causing OOM kills in journald
 - Adding a project that needs Playwright/Chrome and will run concurrently with PTP's scrape
 - Hosting any ML model or LLM serving workload
