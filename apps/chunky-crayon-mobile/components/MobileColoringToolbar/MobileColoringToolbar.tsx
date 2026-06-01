@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomSheet } from "@swmansion/react-native-bottom-sheet";
 import ToolbarContent from "./ToolbarContent";
@@ -20,16 +20,30 @@ import ToolbarContent from "./ToolbarContent";
  */
 const MobileColoringToolbar = () => {
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const [index, setIndex] = useState(0);
 
-  // Collapsed shows the tools row; expanded reveals the full grid + colors +
-  // brush + undo/redo. (No zoom/actions in the sheet — see ToolbarContent.)
-  const collapsedHeight = 150 + insets.bottom;
-  const expandedHeight = 460 + insets.bottom;
+  // Two detents: a small fixed "peek" (tools row visible) and an expanded one
+  // that reveals the full grid + colors + brush + undo/redo.
+  //
+  // The expanded detent uses 'content' (size-to-measured-content) rather than
+  // a hardcoded pixel height: the native sheet treats a FIXED detent taller
+  // than its measured content as fatal ("fixed detent exceeds measured content
+  // height"), which crashed a short landscape phone (~390pt window) where a
+  // 460pt detent didn't fit. 'content' lets the sheet size itself to whatever
+  // ToolbarContent measures on any device/orientation; the body scrolls if the
+  // content is taller than the window.
+  //
+  // The collapsed peek stays fixed but is clamped to the window so it can't
+  // exceed it on a very short viewport (which would also be fatal).
+  const collapsedHeight = Math.min(
+    150 + insets.bottom,
+    Math.max(120, windowHeight - insets.top - 24),
+  );
 
   return (
     <BottomSheet
-      detents={[collapsedHeight, expandedHeight]}
+      detents={[collapsedHeight, "content"]}
       index={index}
       onIndexChange={setIndex}
     >
