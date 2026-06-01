@@ -23,12 +23,10 @@ import * as Print from "expo-print";
 import ImageCanvas from "@/components/ImageCanvas/ImageCanvas";
 import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColoringToolbar";
 import ColoringLayout from "@/components/ColoringLayout/ColoringLayout";
+import CanvasTopBar from "@/components/CanvasTopBar/CanvasTopBar";
 import MoreColoringPages from "@/components/MoreColoringPages";
 import ActionSheet from "@/components/ActionSheet";
 import ConfirmSheet from "@/components/ConfirmSheet";
-import ZoomControls from "@/components/ZoomControls/ZoomControls";
-import MuteToggle from "@/components/MuteToggle/MuteToggle";
-import ProgressIndicator from "@/components/ProgressIndicator/ProgressIndicator";
 import useColoringImage from "@/hooks/api/useColoringImage";
 import Loading from "@/components/Loading/Loading";
 import { toast } from "@/components/Toaster";
@@ -340,13 +338,17 @@ const ColoringImage = () => {
           </View>
         )}
 
-        {/* Canvas Controls - separate row in portrait mode. Hidden in
-            focus mode; the focus toggle moves into the row when shown. */}
+        {/* Canvas chrome row (phone tier). Web/tier parity: the progress bar +
+            sound/music live in the shared CanvasTopBar (same component the
+            three-column + middle tiers render above their canvas). Zoom now
+            lives in the bottom-sheet toolbar (parity with the rails), so the
+            old standalone ZoomControls is gone from this row. The focus toggle
+            stays here. */}
         {!isLandscapeLayout && !isFocusMode && (
           <View style={styles.canvasControls}>
-            <ProgressIndicator />
-            <MuteToggle />
-            <ZoomControls />
+            <View style={styles.canvasControlsBar}>
+              <CanvasTopBar />
+            </View>
             <FocusModeToggleButton />
           </View>
         )}
@@ -509,8 +511,23 @@ const ColoringImage = () => {
           tone="destructive"
         />
 
-        {/* Bottom drawer only in the phone tier. Hidden in focus mode. */}
-        {!isLandscapeLayout && !isFocusMode && <MobileColoringToolbar />}
+        {/* Bottom drawer only in the phone tier. Hidden in focus mode. Carries
+            the same zoom + action handlers as the rail/middle toolbar so the
+            phone tier reaches full parity (zoom + Start Over/Print/Save/My
+            Artwork live in the sheet; progress + sound/music sit above the
+            canvas via CanvasTopBar). */}
+        {!isLandscapeLayout && !isFocusMode && (
+          <MobileColoringToolbar
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onResetZoom={handleResetZoom}
+            zoom={scale}
+            onStartOver={handleStartOver}
+            onPrint={() => setShowPrintSheet(true)}
+            onSave={() => setShowSaveSheet(true)}
+            onMyArtwork={() => setShowMyArtworkSheet(true)}
+          />
+        )}
 
         {/* Floating exit X — only renders while focus mode is active. */}
         <FocusModeFloatingExit />
@@ -668,6 +685,11 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 16,
     paddingBottom: 12,
+  },
+  // The CanvasTopBar takes the remaining width (its progress pill flexes); the
+  // focus toggle sits to its right.
+  canvasControlsBar: {
+    flex: 1,
   },
 });
 

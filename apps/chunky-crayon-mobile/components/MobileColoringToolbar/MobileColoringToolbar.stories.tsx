@@ -32,6 +32,21 @@ const Stage = ({ children }: { children: React.ReactNode }) => (
   <ScrollView contentContainerStyle={styles.stage}>{children}</ScrollView>
 );
 
+// No-op handlers so the zoom row + the action tiles (Start Over / Print /
+// Save / My Artwork) render in the story — they're gated on having handlers,
+// mirroring the production wiring from the coloring screen.
+const noop = () => {};
+const actionProps = {
+  onZoomIn: noop,
+  onZoomOut: noop,
+  onResetZoom: noop,
+  zoom: 1,
+  onStartOver: noop,
+  onPrint: noop,
+  onSave: noop,
+  onMyArtwork: noop,
+};
+
 const meta: Meta = {
   title: "Coloring Experience/Coloring Toolbar (Bottom Sheet)",
   parameters: { layout: "fullscreen" },
@@ -52,7 +67,7 @@ export const Default: Story = {
     }, []);
     return (
       <Stage>
-        <ToolbarContent />
+        <ToolbarContent {...actionProps} />
       </Stage>
     );
   },

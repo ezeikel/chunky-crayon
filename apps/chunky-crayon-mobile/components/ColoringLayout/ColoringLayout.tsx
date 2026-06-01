@@ -138,6 +138,10 @@ const ColoringLayout = ({
         onZoomOut={onZoomOut}
         onResetZoom={onResetZoom}
         zoom={zoom}
+        onStartOver={onStartOver}
+        onPrint={onPrint}
+        onSave={onSave}
+        onMyArtwork={onMyArtwork}
       />
       <View
         style={styles.middleCanvas}
