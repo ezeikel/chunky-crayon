@@ -96,7 +96,11 @@ const ToolTile = ({
             />
           )}
           {loading ? (
-            <Spinner size={Math.round(iconSize * 0.9)} color={MAGIC_FROM} />
+            // Loading shows the full-strength gradient (showGradient), so the
+            // spinner must be WHITE to read against it — a MAGIC_FROM (pink)
+            // spinner on the pink gradient was invisible, making the tile look
+            // like a blank pink box. Web's loading spinner is white too.
+            <Spinner size={Math.round(iconSize * 0.9)} color="#FFFFFF" />
           ) : (
             <FontAwesomeIcon
               icon={icon}
