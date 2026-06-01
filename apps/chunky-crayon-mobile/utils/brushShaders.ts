@@ -214,6 +214,8 @@ export const getBrushMultiplier = (brushType: BrushType): number => {
       return 1.2; // Neon is moderately thick
     case "glitter":
       return 1.0; // Glitter is normal width with particles
+    case "eraser":
+      return 2.0; // Eraser is wide (web uses radius*2)
     default:
       return 1.0;
   }

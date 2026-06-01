@@ -11,7 +11,10 @@ export type BrushType =
   | "rainbow"
   | "glow"
   | "neon"
-  | "glitter";
+  | "glitter"
+  // The eraser is a stroke with brushType "eraser" (matches web's schema so
+  // it persists + replays cross-platform); rendered with a dstOut blend.
+  | "eraser";
 export type FillType = "solid" | "pattern";
 export type PatternType =
   | "dots"

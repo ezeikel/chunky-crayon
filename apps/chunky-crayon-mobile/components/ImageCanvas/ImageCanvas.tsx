@@ -21,10 +21,12 @@ import {
   SkPath,
   Skia,
   Path,
+  Paint,
   BlurMask,
   Text as SkiaText,
   Fill,
   ImageFormat,
+  BlendMode,
 } from "@shopify/react-native-skia";
 import {
   Gesture,
@@ -48,6 +50,7 @@ import {
   useCanvasStore,
   DrawingAction,
   getVisibleActions,
+  type BrushType,
 } from "@/stores/canvasStore";
 import {
   createBrushPaint,
@@ -658,7 +661,7 @@ const ImageCanvas = ({
   // Handle drawing stroke
   const handleDrawingStart = useCallback(
     (x: number, y: number, force?: number, pointerType?: PointerType) => {
-      if (selectedTool !== "brush") return;
+      if (selectedTool !== "brush" && selectedTool !== "eraser") return;
 
       const coords = touchToSvgCoords(x, y);
       if (!coords) return;
@@ -686,7 +689,11 @@ const ImageCanvas = ({
 
   const handleDrawingMove = useCallback(
     (x: number, y: number, force?: number, pointerType?: PointerType) => {
-      if (selectedTool !== "brush" || !currentPath) return;
+      if (
+        (selectedTool !== "brush" && selectedTool !== "eraser") ||
+        !currentPath
+      )
+        return;
 
       const coords = touchToSvgCoords(x, y);
       if (!coords) return;
@@ -707,9 +714,19 @@ const ImageCanvas = ({
     brushHaptics.stop();
 
     if (currentPath && svgDimensions) {
+      // The eraser commits a stroke with brushType "eraser" (web-parity
+      // schema → persists + replays cross-platform). It renders with a dstOut
+      // blend inside the erasable layer group; its colour is irrelevant
+      // (only the stroke's alpha coverage matters under dstOut).
+      const isErasing = selectedTool === "eraser";
+      const effectiveBrushType: BrushType = isErasing ? "eraser" : brushType;
+
       // Use rainbow color if rainbow brush is selected
-      const strokeColor =
-        brushType === "rainbow" ? getRainbowColor(rainbowHue) : selectedColor;
+      const strokeColor = isErasing
+        ? "#000000"
+        : brushType === "rainbow"
+          ? getRainbowColor(rainbowHue)
+          : selectedColor;
 
       // Capture pressure data from this stroke
       const pressurePoints =
@@ -725,11 +742,11 @@ const ImageCanvas = ({
         averagePressure =
           pressurePoints.reduce((a, b) => a + b, 0) / pressurePoints.length;
       }
-      const strokeWidth = getPressureAdjustedWidth(
-        brushSize,
-        brushType,
-        averagePressure,
-      );
+      // Eraser ignores pressure (web uses a flat radius*2); brushes use the
+      // pressure-adjusted width.
+      const strokeWidth = isErasing
+        ? brushSize * 2
+        : getPressureAdjustedWidth(brushSize, brushType, averagePressure);
 
       // Generate a unique texture seed for this stroke
       const textureSeed = Math.random() * 1000;
@@ -744,9 +761,9 @@ const ImageCanvas = ({
         type: "stroke",
         path: finalPath,
         color: strokeColor,
-        brushType,
+        brushType: effectiveBrushType,
         strokeWidth,
-        startHue: brushType === "rainbow" ? rainbowHue : undefined,
+        startHue: effectiveBrushType === "rainbow" ? rainbowHue : undefined,
         // Store source dimensions for cross-platform sync
         sourceWidth: svgDimensions.width,
         sourceHeight: svgDimensions.height,
@@ -774,6 +791,7 @@ const ImageCanvas = ({
     currentPath,
     brushSize,
     brushType,
+    selectedTool,
     selectedColor,
     rainbowHue,
     addAction,
@@ -961,9 +979,12 @@ const ImageCanvas = ({
 
   // Pan gesture for drawing or panning
   // Note: event.force and event.pointerType provide Apple Pencil pressure data
+  // brush AND eraser both draw a path (the eraser commits a stroke with
+  // brushType "eraser", rendered with a dstOut blend). Anything else pans.
+  const isDrawingTool = selectedTool === "brush" || selectedTool === "eraser";
   const panGesture = Gesture.Pan()
     .onStart((event) => {
-      if (selectedTool === "brush") {
+      if (isDrawingTool) {
         // Pass force (pressure) and pointerType for Apple Pencil detection
         // force is available on iOS for stylus input
         runOnJS(handleDrawingStart)(
@@ -975,7 +996,7 @@ const ImageCanvas = ({
       }
     })
     .onUpdate((event) => {
-      if (selectedTool === "brush") {
+      if (isDrawingTool) {
         // Pass force (pressure) and pointerType for Apple Pencil detection
         runOnJS(handleDrawingMove)(
           event.x,
@@ -990,7 +1011,7 @@ const ImageCanvas = ({
       }
     })
     .onEnd(() => {
-      if (selectedTool === "brush") {
+      if (isDrawingTool) {
         runOnJS(handleDrawingEnd)();
       } else {
         savedTranslateX.value = gestureTranslateX.value;
@@ -1094,13 +1115,15 @@ const ImageCanvas = ({
   // Calculate current stroke width with pressure (for live preview while drawing)
   // This recalculates when currentPath changes (which happens on each move)
   const currentStrokeWidth = useMemo(() => {
+    // Eraser uses a flat radius*2 (web parity), ignoring pressure.
+    if (selectedTool === "eraser") return brushSize * 2;
     const points = pressurePointsRef.current;
     let avgPressure = DEFAULT_PRESSURE;
     if (points.length > 0) {
       avgPressure = points.reduce((a, b) => a + b, 0) / points.length;
     }
     return getPressureAdjustedWidth(brushSize, brushType, avgPressure);
-  }, [currentPath, brushSize, brushType]); // currentPath triggers recalculation
+  }, [currentPath, brushSize, brushType, selectedTool]); // currentPath triggers recalculation
 
   // Render stickers
   const renderStickers = useMemo(() => {
@@ -1198,6 +1221,26 @@ const ImageCanvas = ({
               style="stroke"
               strokeCap="round"
               strokeJoin="round"
+            />
+          );
+        }
+
+        // Eraser: dstOut blend punches the stroke's coverage out of whatever
+        // was painted earlier in the enclosing erasable layer group (fills +
+        // brush strokes), revealing the white background. Colour is irrelevant
+        // under dstOut — only the stroke's alpha coverage matters. The SVG
+        // outline + white Fill sit OUTSIDE the layer, so they're never erased.
+        if (action.brushType === "eraser") {
+          return (
+            <Path
+              key={`path-${index}`}
+              path={action.path!}
+              color="black"
+              style="stroke"
+              strokeWidth={strokeWidth}
+              strokeCap="round"
+              strokeJoin="round"
+              blendMode="dstOut"
             />
           );
         }
@@ -1324,19 +1367,30 @@ const ImageCanvas = ({
             >
               {/* White background for snapshot capture (JPEG doesn't support transparency) */}
               <Fill color="white" />
-              {/* Fill layer image — rendered outside fitbox at canvas dimensions */}
-              {fillLayerImage && (
-                <SkiaImage
-                  image={fillLayerImage}
-                  x={0}
-                  y={0}
-                  width={canvasWidth}
-                  height={canvasHeight}
-                  fit="contain"
-                />
-              )}
-              {/* SVG base layer (below drawings) — hidden when fill layer is active */}
-              <Group transform={transform}>
+              {/* Erasable content group. Everything the eraser can remove —
+                  the baked fill image, brush strokes, stickers, and the live
+                  stroke — lives inside ONE offscreen layer (layer={<Paint/>}
+                  forces a saveLayer). Eraser strokes use blendMode "dstOut",
+                  which only composites against siblings painted earlier IN
+                  this layer, so they punch holes in the fills/strokes back to
+                  the white Fill below — without touching the SVG outline
+                  (drawn in a separate group on top). The fill image is now
+                  INSIDE the transform group so it shares the strokes'
+                  coordinate space and the eraser affects both. */}
+              <Group layer={<Paint />} transform={transform}>
+                {/* Fill layer image (baked fills/magic-fills), fit to the
+                    same box as the base SVG below. */}
+                {fillLayerImage && (
+                  <SkiaImage
+                    image={fillLayerImage}
+                    x={0}
+                    y={0}
+                    width={canvasWidth}
+                    height={canvasHeight}
+                    fit="contain"
+                  />
+                )}
+                {/* SVG base layer (below drawings) — hidden when fill layer is active */}
                 {!fillLayerImage && (
                   <ImageSVG
                     x={0}
@@ -1351,7 +1405,18 @@ const ImageCanvas = ({
                 {/* Rendered stickers */}
                 {renderStickers}
                 {/* Current drawing path (with pressure-adjusted stroke width) */}
-                {currentPath && brushType === "glow" ? (
+                {currentPath && selectedTool === "eraser" ? (
+                  // Live eraser preview — dstOut so it erases as you drag.
+                  <Path
+                    path={currentPath}
+                    color="black"
+                    style="stroke"
+                    strokeWidth={currentStrokeWidth}
+                    strokeCap="round"
+                    strokeJoin="round"
+                    blendMode="dstOut"
+                  />
+                ) : currentPath && brushType === "glow" ? (
                   <Group>
                     <Path
                       path={currentPath}
@@ -1401,7 +1466,8 @@ const ImageCanvas = ({
                   />
                 ) : null}
               </Group>
-              {/* SVG outline layer (on top) */}
+              {/* SVG outline layer (on top) — OUTSIDE the erasable layer so
+                  the eraser never removes the line art. */}
               <Group transform={transform}>
                 <ImageSVG
                   x={0}

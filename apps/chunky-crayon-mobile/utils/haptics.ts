@@ -93,6 +93,10 @@ const BRUSH_HAPTIC_CONFIG: Record<BrushType, BrushHapticConfig> = {
     interval: 60, // Sparkly, frequent small pulses
     style: Haptics.ImpactFeedbackStyle.Light,
   },
+  eraser: {
+    interval: 100, // Soft, steady rubbing feel
+    style: Haptics.ImpactFeedbackStyle.Light,
+  },
 };
 
 /**
