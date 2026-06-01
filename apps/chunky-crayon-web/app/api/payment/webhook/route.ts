@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { db } from '@one-colored-pixel/db';
 import {
   SubscriptionStatus,
+  SubscriptionEventType,
   CreditTransactionType,
   BillingPeriod,
   Subscription,
@@ -214,8 +215,18 @@ export const POST = async (req: Request) => {
       // get the credit amount for this plan
       const creditAmount = getCreditAmountFromPlanName(planName);
 
-      // create subscription and add credits in a transaction
-      await db.$transaction([
+      const status = mapStripeStatusToSubscriptionStatus(subscription.status);
+      const trialStart = subscription.trial_start
+        ? new Date(subscription.trial_start * 1000)
+        : null;
+      const trialEnd = subscription.trial_end
+        ? new Date(subscription.trial_end * 1000)
+        : null;
+
+      // create subscription and add credits in a transaction. The event
+      // row writes alongside so we always have an audit trail for "this
+      // is when the trial / subscription started".
+      const [createdSubscription] = await db.$transaction([
         db.subscription.create({
           data: {
             userId: user.id,
@@ -224,9 +235,11 @@ export const POST = async (req: Request) => {
             stripeSubscriptionId: subscription.id, // Keep for backwards compatibility
             planName,
             billingPeriod,
-            status: mapStripeStatusToSubscriptionStatus(subscription.status),
+            status,
             currentPeriodStart: new Date(firstItem.current_period_start * 1000),
             currentPeriodEnd,
+            trialStart,
+            trialEnd,
           },
         }),
         db.creditTransaction.create({
@@ -242,6 +255,22 @@ export const POST = async (req: Request) => {
           data: { credits: { increment: creditAmount } },
         }),
       ]);
+
+      await db.subscriptionEvent.create({
+        data: {
+          subscriptionId: createdSubscription.id,
+          eventType:
+            status === SubscriptionStatus.TRIALING
+              ? SubscriptionEventType.TRIAL_STARTED
+              : SubscriptionEventType.SUBSCRIPTION_STARTED,
+          platform: 'STRIPE',
+          externalEventId: stripeEvent.id,
+          newStatus: status,
+          newPlan: planName,
+          creditsAdded: creditAmount,
+          rawPayload: subscription as unknown as object,
+        },
+      });
 
       // Track subscription started event
       const priceAmount = subscription.items.data[0].price.unit_amount || 0;
@@ -530,14 +559,25 @@ export const POST = async (req: Request) => {
     });
 
     const previousPlanName = existingSubscription?.planName;
+    const previousStatus = existingSubscription?.status;
+    const newStatus = mapStripeStatusToSubscriptionStatus(subscription.status);
+    const trialStart = subscription.trial_start
+      ? new Date(subscription.trial_start * 1000)
+      : null;
+    const trialEnd = subscription.trial_end
+      ? new Date(subscription.trial_end * 1000)
+      : null;
 
     await db.subscription.updateMany({
       where: { stripeSubscriptionId: subscription.id },
       data: {
-        status: mapStripeStatusToSubscriptionStatus(subscription.status),
+        status: newStatus,
+        currentPeriodStart: new Date(firstItem.current_period_start * 1000),
         currentPeriodEnd,
         planName,
         billingPeriod,
+        trialStart,
+        trialEnd,
       },
     });
 
@@ -552,6 +592,23 @@ export const POST = async (req: Request) => {
       const newCredits = getCreditAmountFromPlanName(planName);
       const changeType = newCredits > previousCredits ? 'upgrade' : 'downgrade';
 
+      await db.subscriptionEvent.create({
+        data: {
+          subscriptionId: existingSubscription.id,
+          eventType:
+            changeType === 'upgrade'
+              ? SubscriptionEventType.PLAN_UPGRADED
+              : SubscriptionEventType.PLAN_DOWNGRADED,
+          platform: 'STRIPE',
+          externalEventId: stripeEvent.id,
+          previousStatus,
+          newStatus,
+          previousPlan: previousPlanName,
+          newPlan: planName,
+          rawPayload: subscription as unknown as object,
+        },
+      });
+
       await trackWithUser(
         existingSubscription.userId,
         TRACKING_EVENTS.SUBSCRIPTION_CHANGED,
@@ -561,6 +618,32 @@ export const POST = async (req: Request) => {
           changeType,
         },
       );
+    } else if (
+      existingSubscription &&
+      previousStatus &&
+      previousStatus !== newStatus
+    ) {
+      // Status transitioned without a plan change — e.g. TRIALING → ACTIVE
+      // when the trial converts. Worth its own audit row so the trial→paid
+      // moment is queryable later.
+      const isTrialConversion =
+        previousStatus === SubscriptionStatus.TRIALING &&
+        newStatus === SubscriptionStatus.ACTIVE;
+
+      await db.subscriptionEvent.create({
+        data: {
+          subscriptionId: existingSubscription.id,
+          eventType: isTrialConversion
+            ? SubscriptionEventType.SUBSCRIPTION_STARTED
+            : SubscriptionEventType.RENEWAL_SUCCESS,
+          platform: 'STRIPE',
+          externalEventId: stripeEvent.id,
+          previousStatus,
+          newStatus,
+          newPlan: planName,
+          rawPayload: subscription as unknown as object,
+        },
+      });
     }
   } else if (stripeEvent.type === 'customer.subscription.deleted') {
     const subscription = stripeEvent.data.object;
@@ -575,8 +658,23 @@ export const POST = async (req: Request) => {
       where: { stripeSubscriptionId: subscription.id },
       data: {
         status: SubscriptionStatus.CANCELLED,
+        cancelledAt: new Date(),
       },
     });
+
+    if (existingSubscription) {
+      await db.subscriptionEvent.create({
+        data: {
+          subscriptionId: existingSubscription.id,
+          eventType: SubscriptionEventType.CANCELLED,
+          platform: 'STRIPE',
+          externalEventId: stripeEvent.id,
+          previousStatus: existingSubscription.status,
+          newStatus: SubscriptionStatus.CANCELLED,
+          rawPayload: subscription as unknown as object,
+        },
+      });
+    }
 
     // Reclaim unspent plan credits when a trial cancels/lapses WITHOUT ever
     // paying. Closes the second half of the trial loophole: an account that
@@ -699,6 +797,18 @@ export const POST = async (req: Request) => {
               where: { id: subscription.userId },
               data: { credits: newBalance },
             }),
+            db.subscriptionEvent.create({
+              data: {
+                subscriptionId: subscription.id,
+                eventType: SubscriptionEventType.RENEWAL_SUCCESS,
+                platform: 'STRIPE',
+                externalEventId: stripeEvent.id,
+                newStatus: SubscriptionStatus.ACTIVE,
+                newPlan: subscription.planName,
+                creditsAdded: creditAmount,
+                rawPayload: invoiceData as unknown as object,
+              },
+            }),
           ]);
 
           // Count renewals to track renewal count
@@ -754,6 +864,19 @@ export const POST = async (req: Request) => {
           `Payment failed for user ${subscription.user.email} (subscription ${subscriptionId}). ` +
             `Attempt ${invoiceData.attempt_count}. Invoice: ${invoiceData.id}`,
         );
+
+        await db.subscriptionEvent.create({
+          data: {
+            subscriptionId: subscription.id,
+            eventType: SubscriptionEventType.RENEWAL_FAILED,
+            platform: 'STRIPE',
+            externalEventId: stripeEvent.id,
+            previousStatus: subscription.status,
+            newStatus: subscription.status,
+            newPlan: subscription.planName,
+            rawPayload: invoiceData as unknown as object,
+          },
+        });
 
         // Send email notification to user about failed payment
         await sendPaymentFailedEmail({
