@@ -44,7 +44,9 @@ const PaletteVariantPills = ({
   columns = 4,
   pillHeight = 48,
 }: PaletteVariantPillsProps) => {
-  const iconSize = Math.round(pillHeight * 0.4);
+  // Icon sized to match the tools-rail icons (24px) so the left-panel
+  // variant icons read at the same scale as the right-panel tool icons.
+  const iconSize = Math.round(pillHeight * 0.5);
   // Each pill is exactly 1/columns of the row, with the gap applied as
   // per-pill padding INSIDE the slot (not row `gap`) — so `columns` × the
   // %-basis sums to exactly 100% and never wraps. (Row `gap` + a 50% basis

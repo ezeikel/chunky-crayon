@@ -17,7 +17,7 @@ import {
   RedoIcon,
   ZoomInIcon,
   ZoomOutIcon,
-  HomeIcon,
+  ExpandIcon,
 } from "@/components/coloring/StrokeIcons";
 import {
   COLORING_REGULAR_TOOLS,
@@ -137,8 +137,6 @@ const ToolsSidebar = ({
   // actions) aligned to the same left edge and content width.
   const gridWidth = tileSize * 3 + gap * 2;
 
-  const isZoomed = zoom > 1;
-
   return (
     <View style={[styles.outer, { width, paddingRight: insets.right + 8 }]}>
       {/* Floating tools rail (web's DesktopToolsSidebar) — content-height
@@ -196,14 +194,13 @@ const ToolsSidebar = ({
 
           <View style={styles.divider} />
 
-          {/* Undo / Redo — stroke glyphs, no-circle look matches web (white
-              tile + cream border). */}
-          <View style={[styles.controlRow, { gap, width: gridWidth }]}>
+          {/* Undo / Redo — stroke glyphs, CENTERED, borderless (no circle). */}
+          <View style={[styles.controlRowCentered, { gap, width: gridWidth }]}>
             <Pressable
               onPress={handleUndo}
               disabled={!canUndo()}
               style={[
-                styles.controlButton,
+                styles.controlButtonBorderless,
                 { width: controlSize, height: controlSize },
                 !canUndo() && styles.disabled,
               ]}
@@ -218,7 +215,7 @@ const ToolsSidebar = ({
               onPress={handleRedo}
               disabled={!canRedo()}
               style={[
-                styles.controlButton,
+                styles.controlButtonBorderless,
                 { width: controlSize, height: controlSize },
                 !canRedo() && styles.disabled,
               ]}
@@ -233,9 +230,9 @@ const ToolsSidebar = ({
 
           <View style={styles.divider} />
 
-          {/* Zoom — stroke magnifier glyphs (not duotone). Pan/reset show
-              only when zoomed (web isZoomed branch). */}
-          <View style={[styles.controlRow, { gap, width: gridWidth }]}>
+          {/* Zoom — stroke magnifier glyphs, borderless. Zoom out / in /
+              fullscreen (faExpand, persistent — web's third zoom button). */}
+          <View style={[styles.controlRowCentered, { gap, width: gridWidth }]}>
             <Pressable
               onPress={() => {
                 tapLight();
@@ -243,7 +240,7 @@ const ToolsSidebar = ({
               }}
               disabled={zoom <= minZoom}
               style={[
-                styles.controlButton,
+                styles.controlButtonBorderless,
                 { width: controlSize, height: controlSize },
                 zoom <= minZoom && styles.disabled,
               ]}
@@ -263,7 +260,7 @@ const ToolsSidebar = ({
               }}
               disabled={zoom >= maxZoom}
               style={[
-                styles.controlButton,
+                styles.controlButtonBorderless,
                 { width: controlSize, height: controlSize },
                 zoom >= maxZoom && styles.disabled,
               ]}
@@ -276,21 +273,21 @@ const ToolsSidebar = ({
                 }
               />
             </Pressable>
-            {isZoomed && (
-              <Pressable
-                onPress={() => {
-                  tapLight();
-                  onResetZoom?.();
-                }}
-                style={[
-                  styles.controlButton,
-                  { width: controlSize, height: controlSize },
-                ]}
-                accessibilityLabel="Reset view"
-              >
-                <HomeIcon size={22} color={COLORS.crayonOrange} />
-              </Pressable>
-            )}
+            {/* Fullscreen / fit-view — persistent third zoom button (web's
+                expand button). Resets the canvas to fit. */}
+            <Pressable
+              onPress={() => {
+                tapLight();
+                onResetZoom?.();
+              }}
+              style={[
+                styles.controlButtonBorderless,
+                { width: controlSize, height: controlSize },
+              ]}
+              accessibilityLabel="Fit to screen"
+            >
+              <ExpandIcon size={22} color={COLORS.textSecondary} />
+            </Pressable>
           </View>
           <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
 
@@ -400,10 +397,18 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "flex-start",
   },
+  // Brush-size row — left-aligned (sits under the left-aligned tool grid).
   controlRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  // Undo/redo + zoom rows — CENTERED (web centers these control clusters).
+  controlRowCentered: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
     alignItems: "center",
   },
   divider: {
@@ -412,14 +417,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgCreamDark,
     marginVertical: 2,
   },
-  // Undo/redo/zoom control buttons: white tile + 2px cream border (web).
-  controlButton: {
+  // Undo/redo/zoom buttons: BORDERLESS (no circle) — icon-only on the rail's
+  // white card, matching web's perceived borderless treatment.
+  controlButtonBorderless: {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 24,
-    borderWidth: 2,
-    borderColor: COLORS.bgCreamDark,
-    backgroundColor: COLORS.white,
   },
   // Action tiles: white + 1px cream border, duotone icon (web actions slot).
   actionTile: {

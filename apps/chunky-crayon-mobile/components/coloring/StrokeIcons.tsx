@@ -131,3 +131,38 @@ export const HomeIcon = ({ size = 24, color }: IconProps) => (
     />
   </Svg>
 );
+
+// Fullscreen / fit-to-screen — the four-corner expand brackets (web's
+// "Enter focus mode" / maximize button next to zoom).
+export const ExpandIcon = ({ size = 24, color }: IconProps) => (
+  <Svg {...base(size)}>
+    <Path
+      d="M8 3H5a2 2 0 0 0-2 2v3"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 3h3a2 2 0 0 1 2 2v3"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M21 16v3a2 2 0 0 1-2 2h-3"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M8 21H5a2 2 0 0 1-2-2v-3"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
