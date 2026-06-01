@@ -4,6 +4,7 @@ import { useCanvasStore } from "@/stores/canvasStore";
 import { COLORS } from "@/lib/design";
 import PaletteVariantPills from "@/components/coloring/PaletteVariantPills";
 import ColorSwatchGrid from "@/components/coloring/ColorSwatchGrid";
+import StickerPickerGrid from "@/components/coloring/StickerPickerGrid";
 import { selectionChanged } from "@/utils/haptics";
 
 type ColorPaletteSidebarProps = {
@@ -39,6 +40,11 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
     selectedTool === "magic" &&
     (magicMode === "suggest" || magicMode === "auto");
 
+  // With the Sticker tool active the left rail picks the STICKER (what you
+  // place), not a colour — swap the swatch grid for the emoji picker, matching
+  // web. Without this the kid was stuck on the default sticker forever.
+  const isStickerToolActive = selectedTool === "sticker";
+
   const handleColorSelect = (color: string) => {
     if (isMagicToolActive) return;
     selectionChanged();
@@ -48,27 +54,37 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
   return (
     <View style={[styles.outer, { width, paddingLeft: insets.left + 8 }]}>
       <View style={styles.rail}>
-        {/* Mood-variant pills (2-up) — fixed at the top of the card. */}
-        <PaletteVariantPills
-          selected={paletteVariant}
-          onSelect={setPaletteVariant}
-          columns={2}
-        />
+        {isStickerToolActive ? (
+          <StickerPickerGrid cellSize={51} columns={3} />
+        ) : (
+          <>
+            {/* Mood-variant pills (2-up) — fixed at the top of the card. */}
+            <PaletteVariantPills
+              selected={paletteVariant}
+              onSelect={setPaletteVariant}
+              columns={2}
+            />
 
-        {/* Swatch grid for the active variant — a plain block (no scroll) so
-            the card grows to fit all 18 swatches; dims for magic tools. */}
-        <View
-          style={[styles.gridScroll, { opacity: isMagicToolActive ? 0.4 : 1 }]}
-          pointerEvents={isMagicToolActive ? "none" : "auto"}
-        >
-          <ColorSwatchGrid
-            variant={paletteVariant}
-            selectedColor={isMagicToolActive ? "" : selectedColor}
-            onSelect={handleColorSelect}
-            columns={3}
-            swatchSize={51}
-          />
-        </View>
+            {/* Swatch grid for the active variant — a plain block (no scroll)
+                so the card grows to fit all 18 swatches; dims for magic
+                tools. */}
+            <View
+              style={[
+                styles.gridScroll,
+                { opacity: isMagicToolActive ? 0.4 : 1 },
+              ]}
+              pointerEvents={isMagicToolActive ? "none" : "auto"}
+            >
+              <ColorSwatchGrid
+                variant={paletteVariant}
+                selectedColor={isMagicToolActive ? "" : selectedColor}
+                onSelect={handleColorSelect}
+                columns={3}
+                swatchSize={51}
+              />
+            </View>
+          </>
+        )}
       </View>
     </View>
   );

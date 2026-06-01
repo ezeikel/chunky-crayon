@@ -23,7 +23,8 @@ import {
   Path,
   Paint,
   BlurMask,
-  Text as SkiaText,
+  Paragraph,
+  TextAlign,
   Fill,
   ImageFormat,
   BlendMode,
@@ -1149,26 +1150,36 @@ const ImageCanvas = ({
     return getPressureAdjustedWidth(brushSize, brushType, avgPressure);
   }, [currentPath, brushSize, brushType, selectedTool]); // currentPath triggers recalculation
 
-  // Render stickers
+  // Render stickers via the Skia Paragraph API. The low-level Skia <Text>
+  // primitive uses a single default typeface with NO color-emoji fallback, so
+  // emoji rendered as little tofu/□ (or nothing) — that was the bug. The
+  // Paragraph API does platform emoji-font fallback (Apple Color Emoji on
+  // iOS) by default, so the sticker renders in full colour. Building a
+  // paragraph is imperative, so we do it per-sticker inside the memo.
   const renderStickers = useMemo(() => {
     return visibleActions
       .filter((action) => action.type === "sticker" && action.sticker)
       .map((action, index) => {
         const size = action.stickerSize || 40;
-        // Center the sticker on the tap point
+        // Lay the emoji out in a box `size` wide, centred on the tap point.
+        const para = Skia.ParagraphBuilder.Make({
+          textAlign: TextAlign.Center,
+        })
+          .pushStyle({ fontSize: size })
+          .addText(action.sticker || "")
+          .pop()
+          .build();
+        para.layout(size);
         const x = (action.stickerX || 0) - size / 2;
-        const y = (action.stickerY || 0) + size / 3; // Adjust for text baseline
-
-        // Use Skia's default font for emoji rendering
-        const font = Skia.Font(undefined, size);
+        const y = (action.stickerY || 0) - size / 2;
 
         return (
-          <SkiaText
+          <Paragraph
             key={`sticker-${index}`}
+            paragraph={para}
             x={x}
             y={y}
-            text={action.sticker || ""}
-            font={font}
+            width={size}
           />
         );
       });
