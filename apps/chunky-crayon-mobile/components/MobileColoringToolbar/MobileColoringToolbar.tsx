@@ -11,8 +11,12 @@ import ToolbarContent from "./ToolbarContent";
  * sheet renders off-canvas in Storybook's split layout).
  *
  * Inline (not modal) sheet: it's always on-screen and never fully
- * dismisses. Two pixel detents — collapsed (tools + colors visible) and
- * expanded (all options). Starts collapsed (index 0).
+ * dismisses. Four detents matching web's MobileColoringDrawer so users can
+ * push it nearly out of view for max canvas space:
+ *   - MIN  (handle only) — drag the sheet nearly out of view; full canvas.
+ *   - PEEK (handle + tools row) — DEFAULT mount state (index 1).
+ *   - HALF (adds palette + colour swatches).
+ *   - FULL ('content', adds brush + undo/redo) — sized to the content.
  *
  * Web parity (MobileColoringDrawer): the sheet holds tools / colors / brush /
  * undo-redo ONLY — no zoom (top chrome) and no actions (under the canvas), so
@@ -21,32 +25,37 @@ import ToolbarContent from "./ToolbarContent";
 const MobileColoringToolbar = () => {
   const insets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
-  const [index, setIndex] = useState(0);
+  // Default to PEEK (index 1), like web — MIN is a drag-down destination, not
+  // the first thing a new user sees.
+  const [index, setIndex] = useState(1);
 
-  // Two detents: a small fixed "peek" (tools row visible) and an expanded one
-  // that reveals the full grid + colors + brush + undo/redo.
+  // Four detents mirroring web's snapPoints [64, 140, 360, 580], offset by the
+  // bottom inset. The top (FULL) detent uses 'content' (size-to-measured-
+  // content) rather than a hardcoded pixel height: the native sheet treats a
+  // FIXED detent taller than its measured content/window as fatal ("fixed
+  // detent exceeds measured content height") — that crashed a short landscape
+  // phone. 'content' lets the sheet size itself to whatever ToolbarContent
+  // measures on any device/orientation; the body scrolls if it's taller.
   //
-  // The expanded detent uses 'content' (size-to-measured-content) rather than
-  // a hardcoded pixel height: the native sheet treats a FIXED detent taller
-  // than its measured content as fatal ("fixed detent exceeds measured content
-  // height"), which crashed a short landscape phone (~390pt window) where a
-  // 460pt detent didn't fit. 'content' lets the sheet size itself to whatever
-  // ToolbarContent measures on any device/orientation; the body scrolls if the
-  // content is taller than the window.
-  //
-  // The collapsed peek stays fixed but is clamped to the window so it can't
-  // exceed it on a very short viewport (which would also be fatal).
-  const collapsedHeight = Math.min(
-    150 + insets.bottom,
-    Math.max(120, windowHeight - insets.top - 24),
+  // The fixed detents are clamped to the window so they can't exceed it on a
+  // short viewport (also fatal), and kept strictly ascending. On a very short
+  // window the lower detents collapse toward MIN — still valid, just denser.
+  const maxFixed = Math.max(120, windowHeight - insets.top - 24);
+  const minHeight = Math.min(64 + insets.bottom, maxFixed);
+  const peekHeight = Math.min(140 + insets.bottom, maxFixed);
+  const halfHeight = Math.min(360 + insets.bottom, maxFixed);
+  // Strictly ascending, de-duped — the native sheet rejects equal/descending
+  // detents. On a short window where clamping collapses several to maxFixed,
+  // drop the duplicates so only distinct heights (plus 'content') remain.
+  const fixedAscending = [minHeight, peekHeight, halfHeight].filter(
+    (h, i, arr) => i === 0 || h > arr[i - 1],
   );
+  const detents: (number | "content")[] = [...fixedAscending, "content"];
+  // Keep the index in range if the detent count collapsed on a short window.
+  const safeIndex = Math.min(index, detents.length - 1);
 
   return (
-    <BottomSheet
-      detents={[collapsedHeight, "content"]}
-      index={index}
-      onIndexChange={setIndex}
-    >
+    <BottomSheet detents={detents} index={safeIndex} onIndexChange={setIndex}>
       <View style={[styles.surface, { paddingBottom: insets.bottom + 8 }]}>
         <View style={styles.handleIndicator} />
         <ToolbarContent />
