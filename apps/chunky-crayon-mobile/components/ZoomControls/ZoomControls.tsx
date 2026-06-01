@@ -1,12 +1,15 @@
 import { useRef, type ReactNode } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+// Web's ZoomControls uses thin OUTLINE magnifiers + an outline house (custom
+// stroke SVGs, strokeWidth 2) — match that weight with pro-REGULAR, not solid.
+// Pan uses the duotone hand (web: faHand from pro-duotone).
 import {
   faMagnifyingGlassPlus,
   faMagnifyingGlassMinus,
-  faHand,
   faHouse,
-} from "@fortawesome/pro-solid-svg-icons";
+} from "@fortawesome/pro-regular-svg-icons";
+import { faHand } from "@fortawesome/pro-duotone-svg-icons";
 import { useCanvasStore, Tool } from "@/stores/canvasStore";
 import { tapLight, tapMedium } from "@/utils/haptics";
 import { COLORS } from "@/lib/design";

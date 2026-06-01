@@ -587,12 +587,14 @@ const ColoringImage = () => {
           tone="destructive"
         />
 
-        {/* Bottom drawer only in the phone tier. Hidden in focus mode. Web
-            parity: the sheet is tools / colors / brush / undo-redo ONLY.
-            Zoom lives in the top chrome (canvasControls Row 2) and the actions
-            (Start Over / Print / Save / My Artwork) live UNDER the canvas — so
-            the sheet takes no zoom or action props. */}
-        {!isLandscapeLayout && !isFocusMode && <MobileColoringToolbar />}
+        {/* Bottom drawer in the phone tier. STAYS in focus mode — web only
+            gates its MobileColoringDrawer on canvas-in-viewport, NOT focus
+            mode, so users can keep colouring with the tools while the top
+            chrome is hidden (the floating X is the exit). Web parity: the sheet
+            is tools / colors / brush / undo-redo ONLY — zoom lives in the top
+            chrome and the actions live under the canvas, so no zoom/action
+            props. */}
+        {!isLandscapeLayout && <MobileColoringToolbar />}
 
         {/* Floating exit X — only renders while focus mode is active. */}
         <FocusModeFloatingExit />
