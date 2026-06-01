@@ -25,11 +25,18 @@ export type DeviceType = "phone" | "tablet";
  * Three-column chrome budget (matches getLandscapeSidebarWidths +
  * CANVAS_COLUMN_GAP in constants/Sizes.ts): left rail 198 + gap 16 +
  * right rail 232 + gap 16 = 462px. We require the canvas column to be at
- * least THREE_COLUMN_MIN_CANVAS (400) wide on top of that, so three-column
- * needs 462 + 400 = 862dp (iPad Pro 13" portrait at 1032 clears it). Below
- * that, anything wider than a phone gets the toolbar-on-top middle layout.
- * Recompute on every Dimensions change so rotation + iPad split-view
- * resizes re-tier live.
+ * least THREE_COLUMN_MIN_CANVAS wide on top of that.
+ *
+ * We lowered MIN_CANVAS 400 → 360 (cutover 862 → 822) so the cluster of
+ * widths sitting JUST below the old line gets the rich three-column layout
+ * too — iPad Pro 11"/Air portrait (~820-834) and large-phone landscape
+ * (~852), all of which comfortably fit two slim rails + a real canvas
+ * (360-470px). The narrowest tablets (iPad mini portrait 744) and every
+ * phone portrait stay on the toolbar/bottom-sheet tiers where two rails
+ * genuinely don't fit. Short phone-landscape three-column is height-bound,
+ * not width-bound — the canvas height-clamp in ColoringLayout keeps it
+ * contained. Recompute on every Dimensions change so rotation + iPad
+ * split-view resizes re-tier live.
  */
 export type ColoringTier = "phone" | "middle" | "three-column";
 
@@ -40,9 +47,9 @@ const COLORING_TIER_MIDDLE_MIN = 700;
 // + 2× CANVAS_COLUMN_GAP (16) in constants/Sizes.ts.
 const THREE_COLUMN_RAIL_CHROME = 198 + 16 + 232 + 16; // 462
 // Minimum canvas column width before three-column is worth it.
-const THREE_COLUMN_MIN_CANVAS = 400;
+const THREE_COLUMN_MIN_CANVAS = 360;
 const COLORING_TIER_THREE_COLUMN_MIN =
-  THREE_COLUMN_RAIL_CHROME + THREE_COLUMN_MIN_CANVAS; // 862
+  THREE_COLUMN_RAIL_CHROME + THREE_COLUMN_MIN_CANVAS; // 822
 
 export const getColoringTier = (width: number): ColoringTier => {
   // Three-column only if both rails + gaps + a comfortable canvas fit.
