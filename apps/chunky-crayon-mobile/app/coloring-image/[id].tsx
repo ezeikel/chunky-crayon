@@ -37,6 +37,9 @@ import { COLORS } from "@/lib/design";
 import { debugCanvasStorage } from "@/utils/canvasPersistence";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useCanvasStore } from "@/stores/canvasStore";
+import { useArtworkStore, genArtworkId } from "@/stores/artworkStore";
+import { writeArtworkPng } from "@/lib/artwork/files";
+import { useUserContext } from "@/contexts/UserContext";
 import {
   useFocusMode,
   FocusModeStatusBar,
@@ -74,6 +77,9 @@ const ColoringImage = () => {
     setBrushType,
     captureCanvas,
   } = useCanvasStore();
+
+  // Active profile to stamp on locally-saved artwork (null = logged-out bucket).
+  const { activeProfile } = useUserContext();
 
   const handleZoomIn = useCallback(() => {
     setScale(scale * 1.2);
@@ -150,7 +156,11 @@ const ColoringImage = () => {
     }
   }, [captureCanvas, id]);
 
-  // Add to My Artwork — same capture+save, framed as the kid's collection.
+  // Add to My Artwork — save into the kid's LOCAL-FIRST collection (MMKV store
+  // + PNG on disk), NOT the photo library. Works offline / logged-out / with no
+  // permission prompt; a later phase syncs these to the DB. "Save to Photos"
+  // (handleSaveToPhotos) stays the explicit photo-library export — the two
+  // buttons now do genuinely different jobs (collection vs. camera-roll export).
   const handleMyArtwork = useCallback(async () => {
     if (!captureCanvas) {
       toast.error(SAVE_FAIL_MSG);
@@ -159,35 +169,32 @@ const ColoringImage = () => {
     tapLight();
     setIsSaving(true);
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        toast.error(
-          "Please allow access to your photo library to save your artwork.",
-        );
-        return;
-      }
       const dataUrl = captureCanvas();
       if (!dataUrl) {
         toast.error(CAPTURE_FAIL_MSG);
         return;
       }
-      const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, "");
-      const filePath = `${cacheDirectory}chunky-crayon-${id}.png`;
-      await writeAsStringAsync(filePath, base64Data, {
-        encoding: EncodingType.Base64,
+      const artworkId = genArtworkId();
+      const fileUri = await writeArtworkPng(artworkId, dataUrl);
+      useArtworkStore.getState().addArtwork({
+        id: artworkId,
+        coloringImageId: id as string,
+        profileId: activeProfile?.id ?? null,
+        title: data?.coloringImage?.title ?? "My artwork",
+        fileUri,
+        createdAt: Date.now(),
       });
-      await MediaLibrary.saveToLibraryAsync(filePath);
       tapHeavy();
       notifySuccess();
       toast.success("Added to your collection!");
       setShowMyArtworkSheet(false);
     } catch (error) {
-      console.error("Save error:", error);
+      console.error("My Artwork save error:", error);
       toast.error(SAVE_FAIL_MSG);
     } finally {
       setIsSaving(false);
     }
-  }, [captureCanvas, id]);
+  }, [captureCanvas, id, activeProfile?.id, data?.coloringImage?.title]);
 
   // Print — build a PDF (line art + QR) and open the system print/share sheet.
   const handlePrint = useCallback(async () => {

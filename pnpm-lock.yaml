@@ -349,6 +349,12 @@ importers:
       react-native-html-to-pdf:
         specifier: ^0.12.0
         version: 0.12.0
+      react-native-mmkv:
+        specifier: ^4.3.1
+        version: 4.3.1(react-native-nitro-modules@0.35.9(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3))(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3)
+      react-native-nitro-modules:
+        specifier: ^0.35.9
+        version: 0.35.9(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3)
       react-native-purchases:
         specifier: ^9.6.12
         version: 9.6.12(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3)
@@ -15591,11 +15597,24 @@ packages:
       react: '*'
       react-native: '*'
 
+  react-native-mmkv@4.3.1:
+    resolution: {integrity: sha512-APyGGaaHtayVgT18dBM8QGGZKr9pGfSTiBwbbPNzhGGfJQSU7awLGRGq879OqYl31HmVks9hOBLCs+qfgacRZg==}
+    peerDependencies:
+      react: '*'
+      react-native: '*'
+      react-native-nitro-modules: '*'
+
   react-native-modal-datetime-picker@18.0.0:
     resolution: {integrity: sha512-0jdvhhraZQlRACwr7pM6vmZ2kxgzJ4CpnmV6J3TVA6MrXMXK6Zo/upRBKkRp0+fTOiKuNblzesA2U59rYo6SGA==}
     peerDependencies:
       '@react-native-community/datetimepicker': '>=6.7.0'
       react-native: '>=0.65.0'
+
+  react-native-nitro-modules@0.35.9:
+    resolution: {integrity: sha512-yCO6eJ85SPPUo4a4an7H5oj6wPCSIT72fbjr5WZ/20n6zswaJ2gNNpnWtg2We0AZwkAOjSqkOJ0Vjc05p6kGiA==}
+    peerDependencies:
+      react: '*'
+      react-native: '*'
 
   react-native-purchases@9.6.12:
     resolution: {integrity: sha512-cPjTB8ONNqDe6vMEEDM5m7k/OY02glW3ZnLIN8VgQ76Q+HiaVphWG5K2zrI4ZsQ23CxXsNDKhzK1Zk6O3Dwp8g==}
@@ -35045,10 +35064,21 @@ snapshots:
       react: 19.2.3
       react-native: 0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3)
 
+  react-native-mmkv@4.3.1(react-native-nitro-modules@0.35.9(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3))(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3):
+    dependencies:
+      react: 19.2.3
+      react-native: 0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3)
+      react-native-nitro-modules: 0.35.9(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3)
+
   react-native-modal-datetime-picker@18.0.0(@react-native-community/datetimepicker@9.1.0(expo@56.0.5)(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3))(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3)):
     dependencies:
       '@react-native-community/datetimepicker': 9.1.0(expo@56.0.5)(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3)
       prop-types: 15.8.1
+      react-native: 0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3)
+
+  react-native-nitro-modules@0.35.9(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3):
+    dependencies:
+      react: 19.2.3
       react-native: 0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3)
 
   react-native-purchases@9.6.12(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native@0.85.3(@babel/core@7.29.0)(@react-native/jest-preset@0.85.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0)(bufferutil@4.0.9))(@types/react@19.2.14)(bufferutil@4.0.9)(react@19.2.3))(react@19.2.3):
