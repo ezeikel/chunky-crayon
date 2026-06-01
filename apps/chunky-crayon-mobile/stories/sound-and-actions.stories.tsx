@@ -24,7 +24,8 @@ import {
   notifyWarning,
   selectionChanged,
 } from "@/utils/haptics";
-import ActionModal from "@/components/ActionModal/ActionModal";
+import { faFloppyDisk, faShareNodes } from "@fortawesome/pro-solid-svg-icons";
+import ActionSheet from "@/components/ActionSheet";
 
 /**
  * Mobile mirror of web's "Sound / SfxPlayground" and "Celebrations &
@@ -37,8 +38,9 @@ import ActionModal from "@/components/ActionModal/ActionModal";
  * physical device).
  *
  * ActionRow: the mobile equivalent of web's ActionRow — the post-coloring
- * ActionModal (Save / Share / My Art / Start Over) shown open. Its side
- * effects are inert without a real artwork, so it's safe to drive here.
+ * Save ActionSheet (icon-led bottom sheet, Share secondary, green ✓) shown
+ * open. Its side effects are inert without a real artwork, so it's safe to
+ * drive here. Print / My Artwork use the same ActionSheet with other icons.
  */
 
 type Trigger = { label: string; fire: () => void };
@@ -123,7 +125,22 @@ const ActionRow = () => {
       >
         <Text style={styles.reopenText}>Open action sheet</Text>
       </Pressable>
-      <ActionModal visible={open} onClose={() => setOpen(false)} />
+      {/* The Save ActionSheet — the richest of the per-action sheets (header
+          icon, Share secondary, green ✓). Side effects are inert here. */}
+      <ActionSheet
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        icon={faFloppyDisk}
+        title="Save your picture?"
+        confirmLabel="Save to photos"
+        onConfirm={() => setOpen(false)}
+        extraAction={{
+          icon: faShareNodes,
+          label: "Share artwork",
+          tone: "primary",
+          onPress: () => setOpen(false),
+        }}
+      />
     </View>
   );
 };

@@ -6,6 +6,7 @@ import {
   faArrowsRotate,
   faPrint,
   faFloppyDisk,
+  faHeart,
 } from "@fortawesome/pro-duotone-svg-icons";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { tapLight, tapMedium, notifyWarning } from "@/utils/haptics";
@@ -36,15 +37,15 @@ type ToolsSidebarProps = {
   zoom?: number;
   minZoom?: number;
   maxZoom?: number;
-  /** Opens the action sheet (Save / Share / My Artwork) — Print & Save tiles. */
-  onOpenActions?: () => void;
   /**
-   * Opens the Start Over confirm DIRECTLY (web parity: the refresh tile is its
-   * own button that goes straight to one confirm, not through the actions
-   * menu). Kept separate from `onOpenActions` so Start Over never routes
-   * through the "What would you like to do?" menu.
+   * Each action tile opens its OWN bottom sheet (web parity: Start Over /
+   * Print / Save / My Artwork are separate buttons, not one menu). Start Over
+   * is the existing destructive ConfirmSheet; the other three are ActionSheets.
    */
   onStartOver?: () => void;
+  onPrint?: () => void;
+  onSave?: () => void;
+  onMyArtwork?: () => void;
   /**
    * When the whole screen already scrolls (portrait three-column, with a
    * More-pages strip below), the rail must NOT scroll/height-cap internally —
@@ -79,8 +80,10 @@ const ToolsSidebar = ({
   // disable early at 3 while the canvas can still zoom to 4.
   minZoom = 0.5,
   maxZoom = 4,
-  onOpenActions,
   onStartOver,
+  onPrint,
+  onSave,
+  onMyArtwork,
   scrollable = false,
 }: ToolsSidebarProps) => {
   const insets = useSafeAreaInsets();
@@ -320,10 +323,11 @@ const ToolsSidebar = ({
           </View>
           <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
 
-          {/* Actions — Start Over / Print / Save (web's actions slot). Each is
-              its own button (web parity): Start Over goes STRAIGHT to one
-              confirm; Print & Save open the actions sheet. */}
-          {(onOpenActions || onStartOver) && (
+          {/* Actions — Start Over / Print / Save / My Artwork (web's actions
+              slot). Each tile is its own button that opens its OWN sheet:
+              Start Over → destructive confirm; Print / Save / My Artwork →
+              their ActionSheets. The 4th (heart) wraps to a second row. */}
+          {(onStartOver || onPrint || onSave || onMyArtwork) && (
             <>
               <View style={styles.divider} />
               <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
@@ -347,7 +351,7 @@ const ToolsSidebar = ({
                 <Pressable
                   onPress={() => {
                     tapLight();
-                    onOpenActions?.();
+                    onPrint?.();
                   }}
                   style={[
                     styles.actionTile,
@@ -364,7 +368,7 @@ const ToolsSidebar = ({
                 <Pressable
                   onPress={() => {
                     tapLight();
-                    onOpenActions?.();
+                    onSave?.();
                   }}
                   style={[
                     styles.actionTile,
@@ -374,6 +378,23 @@ const ToolsSidebar = ({
                 >
                   <FontAwesomeIcon
                     icon={faFloppyDisk}
+                    size={22}
+                    color={COLORS.textPrimary}
+                  />
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    tapLight();
+                    onMyArtwork?.();
+                  }}
+                  style={[
+                    styles.actionTile,
+                    { width: actionSize, height: actionSize },
+                  ]}
+                  accessibilityLabel="My Artwork"
+                >
+                  <FontAwesomeIcon
+                    icon={faHeart}
                     size={22}
                     color={COLORS.textPrimary}
                   />

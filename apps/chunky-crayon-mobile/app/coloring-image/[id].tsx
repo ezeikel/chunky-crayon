@@ -4,19 +4,36 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faChevronLeft,
+  faFloppyDisk,
+  faPrint,
+  faHeart,
+  faShareNodes,
+} from "@fortawesome/pro-solid-svg-icons";
+import * as Sharing from "expo-sharing";
+import * as MediaLibrary from "expo-media-library";
+import {
+  cacheDirectory,
+  writeAsStringAsync,
+  EncodingType,
+} from "expo-file-system/legacy";
+import * as Print from "expo-print";
 import ImageCanvas from "@/components/ImageCanvas/ImageCanvas";
 import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColoringToolbar";
 import ColoringLayout from "@/components/ColoringLayout/ColoringLayout";
 import MoreColoringPages from "@/components/MoreColoringPages";
-import ActionModal from "@/components/ActionModal/ActionModal";
+import ActionSheet from "@/components/ActionSheet";
 import ConfirmSheet from "@/components/ConfirmSheet";
+import ParentalGate from "@/components/ParentalGate";
 import ZoomControls from "@/components/ZoomControls/ZoomControls";
 import MuteToggle from "@/components/MuteToggle/MuteToggle";
 import ProgressIndicator from "@/components/ProgressIndicator/ProgressIndicator";
 import useColoringImage from "@/hooks/api/useColoringImage";
 import Loading from "@/components/Loading/Loading";
-import { tapHeavy, notifySuccess } from "@/utils/haptics";
+import { toast } from "@/components/Toaster";
+import { tapLight, tapMedium, tapHeavy, notifySuccess } from "@/utils/haptics";
+import { COLORS } from "@/lib/design";
 import { debugCanvasStorage } from "@/utils/canvasPersistence";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useCanvasStore } from "@/stores/canvasStore";
@@ -32,8 +49,16 @@ const ColoringImage = () => {
   const router = useRouter();
   const { data, isLoading } = useColoringImage(id as string);
   const [scroll, setScroll] = useState(true);
-  const [showActionModal, setShowActionModal] = useState(false);
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
+  // One sheet per rail action (web parity: Save / Print / My Artwork are
+  // separate buttons, each its own bottom sheet — no combined menu).
+  const [showSaveSheet, setShowSaveSheet] = useState(false);
+  const [showPrintSheet, setShowPrintSheet] = useState(false);
+  const [showMyArtworkSheet, setShowMyArtworkSheet] = useState(false);
+  const [showShareGate, setShowShareGate] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   const insets = useSafeAreaInsets();
   const { isFocusMode } = useFocusMode();
 
@@ -42,8 +67,15 @@ const ColoringImage = () => {
     useResponsiveLayout();
 
   // Get zoom state and actions from canvas store
-  const { scale, setScale, resetTransform, reset, setTool, setBrushType } =
-    useCanvasStore();
+  const {
+    scale,
+    setScale,
+    resetTransform,
+    reset,
+    setTool,
+    setBrushType,
+    captureCanvas,
+  } = useCanvasStore();
 
   const handleZoomIn = useCallback(() => {
     setScale(scale * 1.2);
@@ -71,6 +103,181 @@ const ColoringImage = () => {
     setBrushType("crayon");
     notifySuccess();
   }, [reset, setTool, setBrushType]);
+
+  // ── Per-action sheet handlers ──────────────────────────────────────────
+  // Each rail tile opens its own ActionSheet; the sheet's green ✓ fires the
+  // handler, which does its async work and closes its own sheet on success.
+  // Transient feedback goes to sonner toasts (never inline blocks). Ported
+  // from the retired combined ActionModal + the legacy SaveButton PDF flow.
+  const SAVE_FAIL_MSG = "Couldn't save your artwork. Please try again.";
+  const SHARE_FAIL_MSG = "Couldn't share your artwork. Please try again.";
+  const PRINT_FAIL_MSG = "Couldn't make a PDF to print. Please try again.";
+  const CAPTURE_FAIL_MSG = "Couldn't capture your artwork.";
+
+  // Save to Photos — capture the canvas, write a PNG, save to the library.
+  const handleSaveToPhotos = useCallback(async () => {
+    if (!captureCanvas) {
+      toast.error(SAVE_FAIL_MSG);
+      return;
+    }
+    tapLight();
+    setIsSaving(true);
+    try {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        toast.error(
+          "Please allow access to your photo library to save your artwork.",
+        );
+        return;
+      }
+      const dataUrl = captureCanvas();
+      if (!dataUrl) {
+        toast.error(CAPTURE_FAIL_MSG);
+        return;
+      }
+      const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, "");
+      const filePath = `${cacheDirectory}chunky-crayon-${id}.png`;
+      await writeAsStringAsync(filePath, base64Data, {
+        encoding: EncodingType.Base64,
+      });
+      await MediaLibrary.saveToLibraryAsync(filePath);
+      tapHeavy();
+      notifySuccess();
+      toast.success("Saved to your photo library!");
+      setShowSaveSheet(false);
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error(SAVE_FAIL_MSG);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [captureCanvas, id]);
+
+  // Add to My Artwork — same capture+save, framed as the kid's collection.
+  const handleMyArtwork = useCallback(async () => {
+    if (!captureCanvas) {
+      toast.error(SAVE_FAIL_MSG);
+      return;
+    }
+    tapLight();
+    setIsSaving(true);
+    try {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        toast.error(
+          "Please allow access to your photo library to save your artwork.",
+        );
+        return;
+      }
+      const dataUrl = captureCanvas();
+      if (!dataUrl) {
+        toast.error(CAPTURE_FAIL_MSG);
+        return;
+      }
+      const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, "");
+      const filePath = `${cacheDirectory}chunky-crayon-${id}.png`;
+      await writeAsStringAsync(filePath, base64Data, {
+        encoding: EncodingType.Base64,
+      });
+      await MediaLibrary.saveToLibraryAsync(filePath);
+      tapHeavy();
+      notifySuccess();
+      toast.success("Added to your collection!");
+      setShowMyArtworkSheet(false);
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error(SAVE_FAIL_MSG);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [captureCanvas, id]);
+
+  // Share — gated behind a ParentalGate (parent-gate-on-share rule).
+  const handleSharePress = useCallback(() => {
+    if (isSharing) return;
+    if (!captureCanvas) {
+      toast.error(SHARE_FAIL_MSG);
+      return;
+    }
+    tapLight();
+    setShowShareGate(true);
+  }, [captureCanvas, isSharing]);
+
+  const handleShareConfirmed = useCallback(async () => {
+    setShowShareGate(false);
+    if (!captureCanvas) {
+      toast.error(SHARE_FAIL_MSG);
+      return;
+    }
+    setIsSharing(true);
+    try {
+      const dataUrl = captureCanvas();
+      if (!dataUrl) {
+        toast.error(CAPTURE_FAIL_MSG);
+        return;
+      }
+      const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, "");
+      const filePath = `${cacheDirectory}chunky-crayon-${id}.png`;
+      await writeAsStringAsync(filePath, base64Data, {
+        encoding: EncodingType.Base64,
+      });
+      if (await Sharing.isAvailableAsync()) {
+        tapMedium();
+        await Sharing.shareAsync(filePath, {
+          mimeType: "image/png",
+          dialogTitle: "Share your artwork",
+        });
+        setShowSaveSheet(false);
+      } else {
+        toast.error("Sharing isn't available on this device.");
+      }
+    } catch (error) {
+      console.error("Share error:", error);
+      toast.error(SHARE_FAIL_MSG);
+    } finally {
+      setIsSharing(false);
+    }
+  }, [captureCanvas, id]);
+
+  // Print — build a PDF (line art + QR) and open the system print/share sheet.
+  const handlePrint = useCallback(async () => {
+    const image = data?.coloringImage;
+    if (!image?.svgUrl) {
+      toast.error(PRINT_FAIL_MSG);
+      return;
+    }
+    tapLight();
+    setIsPrinting(true);
+    try {
+      const html = `
+        <html>
+          <head><meta charset="utf-8" /></head>
+          <body style="margin:0;padding:24px;">
+            <img src="${image.svgUrl}" style="width:100%;height:auto;" />
+            ${
+              image.qrCodeUrl
+                ? `<div style="margin-top:16px;text-align:center;"><img src="${image.qrCodeUrl}" width="120" height="120" /></div>`
+                : ""
+            }
+          </body>
+        </html>`;
+      const { uri } = await Print.printToFileAsync({ html });
+      if (await Sharing.isAvailableAsync()) {
+        tapMedium();
+        await Sharing.shareAsync(uri, {
+          mimeType: "application/pdf",
+          dialogTitle: "Print your coloring page",
+        });
+      }
+      notifySuccess();
+      setShowPrintSheet(false);
+    } catch (error) {
+      console.error("Print error:", error);
+      toast.error(PRINT_FAIL_MSG);
+    } finally {
+      setIsPrinting(false);
+    }
+  }, [data?.coloringImage]);
 
   // Debug storage on mount
   useEffect(() => {
@@ -229,8 +436,10 @@ const ColoringImage = () => {
                   onZoomOut={handleZoomOut}
                   onResetZoom={handleResetZoom}
                   zoom={scale}
-                  onOpenActions={() => setShowActionModal(true)}
                   onStartOver={handleStartOver}
+                  onPrint={() => setShowPrintSheet(true)}
+                  onSave={() => setShowSaveSheet(true)}
+                  onMyArtwork={() => setShowMyArtworkSheet(true)}
                   renderCanvas={(area) => (
                     <View style={styles.canvasCardLandscape}>
                       <ImageCanvas
@@ -255,8 +464,10 @@ const ColoringImage = () => {
                 onZoomOut={handleZoomOut}
                 onResetZoom={handleResetZoom}
                 zoom={scale}
-                onOpenActions={() => setShowActionModal(true)}
                 onStartOver={handleStartOver}
+                onPrint={() => setShowPrintSheet(true)}
+                onSave={() => setShowSaveSheet(true)}
+                onMyArtwork={() => setShowMyArtworkSheet(true)}
                 renderCanvas={(area) => (
                   <View style={styles.canvasCardLandscape}>
                     <ImageCanvas
@@ -293,10 +504,58 @@ const ColoringImage = () => {
           )}
         </View>
 
-        {/* Action Modal — Save / Share / My Artwork (Print & Save tiles). */}
-        <ActionModal
-          visible={showActionModal}
-          onClose={() => setShowActionModal(false)}
+        {/* Per-action bottom sheets — one per rail tile, all matching the
+            Start Over confirm style (icon-led, round ✕/✓ on SquishyPressable). */}
+
+        {/* Save to device — capture the canvas, save a PNG to Photos. Also
+            offers Share (gated) as the secondary green button. */}
+        <ActionSheet
+          isOpen={showSaveSheet}
+          onClose={() => setShowSaveSheet(false)}
+          icon={faFloppyDisk}
+          title="Save your picture?"
+          confirmLabel="Save to photos"
+          onConfirm={handleSaveToPhotos}
+          loading={isSaving}
+          extraAction={{
+            icon: faShareNodes,
+            label: "Share artwork",
+            tone: "primary",
+            onPress: handleSharePress,
+          }}
+        />
+
+        {/* Print — build a PDF (line art + QR) and open the print/share sheet. */}
+        <ActionSheet
+          isOpen={showPrintSheet}
+          onClose={() => setShowPrintSheet(false)}
+          icon={faPrint}
+          title="Print this page?"
+          confirmLabel="Make a PDF to print"
+          onConfirm={handlePrint}
+          loading={isPrinting}
+        />
+
+        {/* My Artwork — save a copy into the kid's collection (heart). */}
+        <ActionSheet
+          isOpen={showMyArtworkSheet}
+          onClose={() => setShowMyArtworkSheet(false)}
+          icon={faHeart}
+          iconTint={COLORS.coral}
+          iconCircleColor="rgba(230, 137, 145, 0.12)"
+          title="Add to My Artwork?"
+          confirmLabel="Add to my collection"
+          onConfirm={handleMyArtwork}
+          loading={isSaving}
+        />
+
+        {/* Parental gate for Share (parent-gate-on-share rule). */}
+        <ParentalGate
+          visible={showShareGate}
+          onClose={() => setShowShareGate(false)}
+          onSuccess={handleShareConfirmed}
+          title="Share Artwork"
+          subtitle="A parent or guardian needs to verify before sharing"
         />
 
         {/* Start Over confirm — opened DIRECTLY by the rail's refresh tile
