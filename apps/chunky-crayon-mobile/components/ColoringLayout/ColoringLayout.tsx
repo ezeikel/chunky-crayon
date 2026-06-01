@@ -4,6 +4,7 @@ import { COLORS } from "@/lib/design";
 import ColorPaletteSidebar from "@/components/ColorPaletteSidebar/ColorPaletteSidebar";
 import ToolsSidebar from "@/components/ToolsSidebar/ToolsSidebar";
 import ColoringToolbar from "@/components/ColoringToolbar/ColoringToolbar";
+import CanvasTopBar from "@/components/CanvasTopBar/CanvasTopBar";
 import { getColoringTier } from "@/utils/deviceUtils";
 import { getLandscapeSidebarWidths } from "@/constants/Sizes";
 
@@ -20,6 +21,8 @@ type ColoringLayoutProps = {
   onZoomOut?: () => void;
   onResetZoom?: () => void;
   zoom?: number;
+  /** Opens the action sheet (Save / Share / Start Over) from the tools rail. */
+  onOpenActions?: () => void;
 };
 
 /**
@@ -43,6 +46,7 @@ const ColoringLayout = ({
   onZoomOut,
   onResetZoom,
   zoom = 1,
+  onOpenActions,
 }: ColoringLayoutProps) => {
   const tier = getColoringTier(width);
 
@@ -56,8 +60,13 @@ const ColoringLayout = ({
     return (
       <View style={styles.row}>
         <ColorPaletteSidebar width={leftWidth} />
+        {/* Center column: progress bar + sound/music ABOVE the canvas
+            (web's per-column placement), then the dominant canvas. */}
         <View style={styles.canvasCenter}>
-          {renderCanvas({ width: canvasSize, height })}
+          <CanvasTopBar />
+          <View style={styles.canvasFill}>
+            {renderCanvas({ width: canvasSize, height })}
+          </View>
         </View>
         <ToolsSidebar
           width={rightWidth}
@@ -65,14 +74,16 @@ const ColoringLayout = ({
           onZoomOut={onZoomOut}
           onResetZoom={onResetZoom}
           zoom={zoom}
+          onOpenActions={onOpenActions}
         />
       </View>
     );
   }
 
-  // middle (and phone fallback for the story): toolbar above the canvas.
+  // middle (and phone fallback for the story): top bar + toolbar above canvas.
   return (
     <View style={styles.column}>
+      <CanvasTopBar />
       <ColoringToolbar
         onZoomIn={onZoomIn}
         onZoomOut={onZoomOut}
@@ -97,12 +108,21 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     gap: 8,
   },
+  // Center column: the top bar + canvas are grouped and the GROUP is
+  // vertically centered (justifyContent: center), so the bar always sits
+  // directly above the canvas card rather than floating at the top of a
+  // tall column with the canvas stranded far below.
   canvasCenter: {
     flex: 1,
     minWidth: 0,
+    flexDirection: "column",
     justifyContent: "center",
-    alignItems: "stretch",
     paddingVertical: 12,
+  },
+  // Canvas hugs its content height (the square card) so it sits snug under
+  // the top bar; the pair is centered by canvasCenter.
+  canvasFill: {
+    alignItems: "stretch",
   },
   middleCanvas: {
     flex: 1,

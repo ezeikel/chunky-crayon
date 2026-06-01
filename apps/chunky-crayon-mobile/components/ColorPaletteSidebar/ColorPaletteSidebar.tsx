@@ -71,7 +71,7 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
             selectedColor={isMagicToolActive ? "" : selectedColor}
             onSelect={handleColorSelect}
             columns={3}
-            swatchSize={40}
+            swatchSize={51}
           />
         </ScrollView>
       </View>
@@ -80,29 +80,27 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
 };
 
 const styles = StyleSheet.create({
-  // Outer column: fixed width (from prop), never squeezed by the flex row.
-  // The card FILLS the column height (paddingVertical = top/bottom breathing
-  // room) so the inner swatch ScrollView is height-bounded and scrolls
-  // INSIDE the card — the card never grows past the screen, and short
-  // content just leaves the card shorter (alignSelf:center keeps it tidy).
-  // The right padding is the canvas gap so the rail floats clear of the
-  // canvas card.
+  // Outer column: fixed width (from prop), never squeezed by the flex row,
+  // vertically centers the rail. The card HUGS its content (web's card is
+  // content-height, floating beside the canvas — NOT full column height),
+  // capped to the column height so an unusually tall variant still scrolls
+  // inside the card rather than overflowing. Right padding = canvas gap.
   outer: {
     flexShrink: 0,
     justifyContent: "center",
     paddingVertical: 12,
     paddingRight: 16,
   },
-  // The floating rail card — fills the column height; its swatch grid
-  // scrolls within it. flexShrink lets it shrink when content is short.
+  // The floating rail card — content-height (no flex:1), web radius 32 +
+  // uniform 16 padding + 2px cream border. maxHeight caps it so a tall
+  // variant scrolls within instead of overflowing the column.
   rail: {
-    flex: 1,
+    maxHeight: "100%",
     backgroundColor: COLORS.white,
-    borderRadius: 24,
+    borderRadius: 32,
     borderWidth: 2,
     borderColor: COLORS.bgCreamDark,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    padding: 16,
     gap: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -110,9 +108,10 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 4,
   },
-  // ScrollView fills the remaining card height below the pills and scrolls.
+  // ScrollView only shrinks/scrolls if the grid would overflow the capped
+  // card; otherwise the card hugs the grid's natural height.
   gridScrollView: {
-    flex: 1,
+    flexShrink: 1,
   },
   gridScroll: {
     paddingTop: 2,

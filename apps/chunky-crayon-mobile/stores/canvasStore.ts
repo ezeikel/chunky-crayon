@@ -217,7 +217,14 @@ export type CanvasState = {
   isDirty: boolean;
 
   // Audio settings
+  // `isMuted` is the legacy single flag that gates brush HAPTICS (kept for
+  // back-compat with ImageCanvas). The web-parity canvas chrome exposes two
+  // independent toggles instead: sound-effects and ambient music.
   isMuted: boolean;
+  /** Sound-effects muted (web's speaker tile). Default off = SFX on. */
+  isSfxMuted: boolean;
+  /** Ambient/background music muted (web's music tile). Default off = on. */
+  isAmbientMuted: boolean;
 
   // Progress tracking (0-100)
   progress: number;
@@ -263,6 +270,8 @@ type CanvasActions = {
   // Audio actions
   setMuted: (muted: boolean) => void;
   toggleMuted: () => void;
+  toggleSfxMuted: () => void;
+  toggleAmbientMuted: () => void;
 
   // Progress actions
   setProgress: (progress: number) => void;
@@ -296,6 +305,8 @@ const initialState: CanvasState = {
   imageId: null,
   isDirty: false,
   isMuted: false,
+  isSfxMuted: false,
+  isAmbientMuted: false,
   progress: 0,
   captureCanvas: null,
 };
@@ -414,6 +425,9 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     // Audio actions
     setMuted: (muted) => set({ isMuted: muted }),
     toggleMuted: () => set((state) => ({ isMuted: !state.isMuted })),
+    toggleSfxMuted: () => set((state) => ({ isSfxMuted: !state.isSfxMuted })),
+    toggleAmbientMuted: () =>
+      set((state) => ({ isAmbientMuted: !state.isAmbientMuted })),
 
     // Progress actions
     setProgress: (progress) =>

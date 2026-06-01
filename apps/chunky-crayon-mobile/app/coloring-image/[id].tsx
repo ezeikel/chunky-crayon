@@ -130,7 +130,10 @@ const ColoringImage = () => {
               />
             </Pressable>
 
-            {/* Title - Hidden in compact mode */}
+            {/* Title — centered across the header (web centers the title).
+                flex:1 between the equal-width back + done buttons keeps it
+                centered. Progress + sound/music no longer live here; they
+                sit on the CanvasTopBar above the canvas (web parity). */}
             {!useCompactHeader && (
               <View style={styles.titleContainer}>
                 <Text style={styles.title} numberOfLines={2}>
@@ -138,19 +141,7 @@ const ColoringImage = () => {
                 </Text>
               </View>
             )}
-
-            {/* Spacer for landscape - controls go in middle, done button at end */}
-            {isLandscapeLayout && (
-              <>
-                <View style={{ flex: 1 }} />
-                {/* Controls in header for landscape */}
-                <View style={styles.landscapeHeaderControls}>
-                  <ProgressIndicator />
-                  <MuteToggle />
-                </View>
-                <View style={{ flex: 1 }} />
-              </>
-            )}
+            {useCompactHeader && <View style={{ flex: 1 }} />}
 
             {/* Done button */}
             <Pressable
@@ -208,6 +199,7 @@ const ColoringImage = () => {
                 onZoomOut={handleZoomOut}
                 onResetZoom={handleResetZoom}
                 zoom={scale}
+                onOpenActions={() => setShowActionModal(true)}
                 renderCanvas={(area) => (
                   <View style={styles.canvasCardLandscape}>
                     <ImageCanvas

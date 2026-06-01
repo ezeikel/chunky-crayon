@@ -3,17 +3,22 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faArrowRotateLeft,
-  faArrowRotateRight,
-  faMagnifyingGlassPlus,
-  faMagnifyingGlassMinus,
-  faExpand,
+  faArrowsRotate,
+  faPrint,
+  faFloppyDisk,
 } from "@fortawesome/pro-duotone-svg-icons";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { tapLight, tapMedium, notifyWarning } from "@/utils/haptics";
 import { COLORS } from "@/lib/design";
 import ToolTile from "@/components/coloring/ToolTile";
 import BrushSizeRow from "@/components/coloring/BrushSizeRow";
+import {
+  UndoIcon,
+  RedoIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+  HomeIcon,
+} from "@/components/coloring/StrokeIcons";
 import {
   COLORING_REGULAR_TOOLS,
   COLORING_MAGIC_TOOLS,
@@ -31,14 +36,22 @@ type ToolsSidebarProps = {
   zoom?: number;
   minZoom?: number;
   maxZoom?: number;
+  /** Opens the action sheet (Save / Share / Start Over). */
+  onOpenActions?: () => void;
 };
 
 /**
  * Right tools sidebar for the three-column coloring layout — mirrors CC
- * web's DesktopToolsSidebar: a 3-column grid of regular tools, a 2-up row
- * of magic tiles (purple→pink gradient + sparkle), brush sizes, undo/redo,
- * and zoom (±, reset, and a NN% readout). Built on the shared ToolTile /
- * BrushSizeRow primitives so the look matches web exactly.
+ * web's DesktopToolsSidebar exactly: a 3-column LEFT-ALIGNED grid of regular
+ * tools, a 2-up row of magic tiles (purple→pink gradient + sparkle), brush
+ * sizes, undo/redo, zoom, and the actions row (Start Over / Print / Save).
+ *
+ * Web fidelity notes (measured from the live DOM at iPad width):
+ *  - tool tiles 61px, grid left-aligned (justifyContent: flex-start), 8px gap
+ *  - undo/redo + zoom use hand-drawn STROKE glyphs (not FA duotone), 48px,
+ *    white + 2px cream border
+ *  - actions are 64px duotone tiles with a 1px cream border
+ *  - the card hugs its content height (not full column).
  */
 const ToolsSidebar = ({
   width,
@@ -48,6 +61,7 @@ const ToolsSidebar = ({
   zoom = 1,
   minZoom = 0.5,
   maxZoom = 3,
+  onOpenActions,
 }: ToolsSidebarProps) => {
   const insets = useSafeAreaInsets();
 
@@ -111,27 +125,28 @@ const ToolsSidebar = ({
     }
   };
 
-  // 3-column tools grid (web's DesktopToolsSidebar): regular tools 3-up,
-  // magic tiles 2-up, then brush/undo-redo/zoom rows. The rail width is set
-  // by the layout to fit exactly 3 tiles + gaps + padding.
+  // Web (measured): tool tiles 61px, controls 48px, action tiles 64px, 8px gap.
   const gap = 8;
-  const tileSize = 56;
-  const zoomButtonSize = 48;
-  // Width of the 3-tile grid — keeps the rows (brush/undo/zoom) aligned to
-  // the same content width as the tool grid.
+  const tileSize = 61;
+  const controlSize = 48;
+  const actionSize = 64;
+  // The 3-tile grid width keeps every row (tools, magic, brush, undo/zoom,
+  // actions) aligned to the same left edge and content width.
   const gridWidth = tileSize * 3 + gap * 2;
+
+  const isZoomed = zoom > 1;
 
   return (
     <View style={[styles.outer, { width, paddingRight: insets.right + 8 }]}>
-      {/* Floating tools rail (web's DesktopToolsSidebar): a rounded card
-          filling the column height, 3-column tool grid + control rows. */}
+      {/* Floating tools rail (web's DesktopToolsSidebar) — content-height
+          rounded card, 3-column LEFT-ALIGNED grid + control rows. */}
       <View style={styles.rail}>
         <ScrollView
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[styles.scrollContent, { width: gridWidth }]}
         >
-          {/* Regular tools — 3-column grid (web slim rail) */}
+          {/* Regular tools — 3-column LEFT-ALIGNED grid (web). */}
           <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
             {COLORING_REGULAR_TOOLS.map((config) => (
               <ToolTile
@@ -145,7 +160,7 @@ const ToolsSidebar = ({
             ))}
           </View>
 
-          {/* Magic tools — 2-up, gradient + sparkle */}
+          {/* Magic tools — 2-up, gradient + sparkle. */}
           <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
             {COLORING_MAGIC_TOOLS.map((config) => (
               <ToolTile
@@ -163,34 +178,36 @@ const ToolsSidebar = ({
 
           <View style={styles.divider} />
 
-          {/* Brush sizes */}
-          <BrushSizeRow
-            selectedRadius={brushSize}
-            onSelect={(radius) => {
-              tapLight();
-              setBrushSize(radius);
-            }}
-            color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
-            tileSize={tileSize}
-          />
+          {/* Brush sizes (left-aligned row). */}
+          <View style={[styles.controlRow, { gap, width: gridWidth }]}>
+            <BrushSizeRow
+              selectedRadius={brushSize}
+              onSelect={(radius) => {
+                tapLight();
+                setBrushSize(radius);
+              }}
+              color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
+              tileSize={controlSize}
+            />
+          </View>
 
           <View style={styles.divider} />
 
-          {/* Undo / Redo */}
-          <View style={[styles.row, { gap }]}>
+          {/* Undo / Redo — stroke glyphs, no-circle look matches web (white
+              tile + cream border). */}
+          <View style={[styles.controlRow, { gap, width: gridWidth }]}>
             <Pressable
               onPress={handleUndo}
               disabled={!canUndo()}
               style={[
-                styles.iconButton,
-                { width: tileSize, height: tileSize },
+                styles.controlButton,
+                { width: controlSize, height: controlSize },
                 !canUndo() && styles.disabled,
               ]}
               accessibilityLabel="Undo"
             >
-              <FontAwesomeIcon
-                icon={faArrowRotateLeft}
-                size={18}
+              <UndoIcon
+                size={24}
                 color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
               />
             </Pressable>
@@ -198,15 +215,14 @@ const ToolsSidebar = ({
               onPress={handleRedo}
               disabled={!canRedo()}
               style={[
-                styles.iconButton,
-                { width: tileSize, height: tileSize },
+                styles.controlButton,
+                { width: controlSize, height: controlSize },
                 !canRedo() && styles.disabled,
               ]}
               accessibilityLabel="Redo"
             >
-              <FontAwesomeIcon
-                icon={faArrowRotateRight}
-                size={18}
+              <RedoIcon
+                size={24}
                 color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
               />
             </Pressable>
@@ -214,8 +230,9 @@ const ToolsSidebar = ({
 
           <View style={styles.divider} />
 
-          {/* Zoom — ±, reset, and NN% readout (web's sidebar zoom). */}
-          <View style={[styles.row, { gap }]}>
+          {/* Zoom — stroke magnifier glyphs (not duotone). Pan/reset show
+              only when zoomed (web isZoomed branch). */}
+          <View style={[styles.controlRow, { gap, width: gridWidth }]}>
             <Pressable
               onPress={() => {
                 tapLight();
@@ -223,16 +240,17 @@ const ToolsSidebar = ({
               }}
               disabled={zoom <= minZoom}
               style={[
-                styles.iconButton,
-                { width: zoomButtonSize, height: zoomButtonSize },
+                styles.controlButton,
+                { width: controlSize, height: controlSize },
                 zoom <= minZoom && styles.disabled,
               ]}
               accessibilityLabel="Zoom out"
             >
-              <FontAwesomeIcon
-                icon={faMagnifyingGlassMinus}
-                size={16}
-                color={zoom <= minZoom ? COLORS.textMuted : COLORS.textPrimary}
+              <ZoomOutIcon
+                size={22}
+                color={
+                  zoom <= minZoom ? COLORS.textMuted : COLORS.textSecondary
+                }
               />
             </Pressable>
             <Pressable
@@ -242,37 +260,97 @@ const ToolsSidebar = ({
               }}
               disabled={zoom >= maxZoom}
               style={[
-                styles.iconButton,
-                { width: zoomButtonSize, height: zoomButtonSize },
+                styles.controlButton,
+                { width: controlSize, height: controlSize },
                 zoom >= maxZoom && styles.disabled,
               ]}
               accessibilityLabel="Zoom in"
             >
-              <FontAwesomeIcon
-                icon={faMagnifyingGlassPlus}
-                size={16}
-                color={zoom >= maxZoom ? COLORS.textMuted : COLORS.textPrimary}
+              <ZoomInIcon
+                size={22}
+                color={
+                  zoom >= maxZoom ? COLORS.textMuted : COLORS.textSecondary
+                }
               />
             </Pressable>
-            <Pressable
-              onPress={() => {
-                tapLight();
-                onResetZoom?.();
-              }}
-              style={[
-                styles.iconButton,
-                { width: zoomButtonSize, height: zoomButtonSize },
-              ]}
-              accessibilityLabel="Reset zoom"
-            >
-              <FontAwesomeIcon
-                icon={faExpand}
-                size={16}
-                color={COLORS.textPrimary}
-              />
-            </Pressable>
+            {isZoomed && (
+              <Pressable
+                onPress={() => {
+                  tapLight();
+                  onResetZoom?.();
+                }}
+                style={[
+                  styles.controlButton,
+                  { width: controlSize, height: controlSize },
+                ]}
+                accessibilityLabel="Reset view"
+              >
+                <HomeIcon size={22} color={COLORS.crayonOrange} />
+              </Pressable>
+            )}
           </View>
           <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
+
+          {/* Actions — Start Over / Print / Save (web's actions slot). All
+              open the action sheet which performs save/share/start-over. */}
+          {onOpenActions && (
+            <>
+              <View style={styles.divider} />
+              <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
+                <Pressable
+                  onPress={() => {
+                    tapLight();
+                    onOpenActions();
+                  }}
+                  style={[
+                    styles.actionTile,
+                    { width: actionSize, height: actionSize },
+                  ]}
+                  accessibilityLabel="Start Over"
+                >
+                  <FontAwesomeIcon
+                    icon={faArrowsRotate}
+                    size={24}
+                    color={COLORS.textPrimary}
+                  />
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    tapLight();
+                    onOpenActions();
+                  }}
+                  style={[
+                    styles.actionTile,
+                    { width: actionSize, height: actionSize },
+                  ]}
+                  accessibilityLabel="Print"
+                >
+                  <FontAwesomeIcon
+                    icon={faPrint}
+                    size={24}
+                    color={COLORS.textPrimary}
+                  />
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    tapLight();
+                    onOpenActions();
+                  }}
+                  style={[
+                    styles.actionTile,
+                    { width: actionSize, height: actionSize },
+                  ]}
+                  accessibilityLabel="Save"
+                >
+                  <FontAwesomeIcon
+                    icon={faFloppyDisk}
+                    size={22}
+                    color={COLORS.textPrimary}
+                  />
+                </Pressable>
+              </View>
+            </>
+          )}
         </ScrollView>
       </View>
     </View>
@@ -280,28 +358,24 @@ const ToolsSidebar = ({
 };
 
 const styles = StyleSheet.create({
-  // Outer column: fixed width (from prop), never squeezed by the flex row.
-  // The card is capped to the column height (paddingVertical = breathing
-  // room) so its inner ScrollView is height-bounded and the tool stack
-  // scrolls INSIDE the card — controls never spill past the card bottom.
-  // The left padding is the canvas gap so the rail floats clear of the
-  // canvas card.
+  // Outer column: fixed width (from prop), never squeezed by the flex row,
+  // vertically centers the rail. Left padding = canvas gap.
   outer: {
     flexShrink: 0,
     justifyContent: "center",
     paddingVertical: 12,
     paddingLeft: 16,
   },
-  // Floating tools rail card — fills the column height; its content scrolls
-  // within it (flexShrink lets it shrink when content is short).
+  // Floating tools rail card — content-height (web radius 24, uniform 16
+  // padding). maxHeight caps it so the tool stack scrolls within the card
+  // rather than the card overflowing the column.
   rail: {
-    flex: 1,
+    maxHeight: "100%",
     backgroundColor: COLORS.white,
     borderRadius: 24,
     borderWidth: 2,
     borderColor: COLORS.bgCreamDark,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    padding: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -309,17 +383,22 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   scrollView: {
-    flex: 1,
+    flexShrink: 1,
   },
   scrollContent: {
-    gap: 12,
-    alignItems: "center",
+    gap: 14,
   },
-  // 3-column tool grid (wraps within the fixed gridWidth set inline).
+  // 3-column tool grid — LEFT-ALIGNED (web justifyContent: normal/start).
   toolGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+  },
+  controlRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
   divider: {
     height: 1,
@@ -327,18 +406,21 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgCreamDark,
     marginVertical: 2,
   },
-  // Control rows (brush sizes / undo-redo / zoom) lay out horizontally,
-  // centered, matching the 3-up tool grid above.
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  iconButton: {
+  // Undo/redo/zoom control buttons: white tile + 2px cream border (web).
+  controlButton: {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 24,
     borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
+  },
+  // Action tiles: white + 1px cream border, duotone icon (web actions slot).
+  actionTile: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 24,
+    borderWidth: 1,
     borderColor: COLORS.bgCreamDark,
     backgroundColor: COLORS.white,
   },
@@ -347,10 +429,11 @@ const styles = StyleSheet.create({
   },
   zoomPercentage: {
     textAlign: "center",
-    fontSize: 14,
+    width: "100%",
+    fontSize: 18,
     fontFamily: "TondoTrial-Bold",
     color: COLORS.textPrimary,
-    marginTop: 2,
+    marginTop: 4,
   },
 });
 
