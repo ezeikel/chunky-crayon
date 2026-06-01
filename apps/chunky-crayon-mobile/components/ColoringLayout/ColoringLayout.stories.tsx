@@ -438,8 +438,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 20,
-    // Match production sheet (web parity ~28px edge→tools).
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingBottom: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },
@@ -448,14 +447,15 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   phoneSheetHandle: {
-    // Match the production handle (web parity): 56x5 cream pill, 20px gap.
+    // Match the production handle (web parity): 56x5 cream pill, 20px above,
+    // 36px below (web's py-5 bottom + pt-4 content gap).
     alignSelf: "center",
     backgroundColor: COLORS.bgCreamDark,
     width: 56,
     height: 5,
     borderRadius: 2.5,
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 36,
   },
   canvas: {
     flex: 1,

@@ -74,11 +74,7 @@ const styles = StyleSheet.create({
     // Web parity: the drag handle lives in a roomy py-5 (20px) hit area — 20px
     // above the pill (here) + 20px below it (handle marginBottom).
     paddingTop: 20,
-    // Web parity: the drawer floats mx-2 (8px) off each edge AND insets its
-    // content px-5 (20px) → ~28px from the screen edge to the tools. Our sheet
-    // docks full-width, so fold both into the horizontal padding (24px) to give
-    // the tools the same breathing room from the edges instead of crowding them.
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,
@@ -97,8 +93,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 2,
-    // 20px gap below the handle before the content (the other half of py-5).
-    marginBottom: 20,
+    // Gap from the handle to the first tools row. Web = the bottom half of the
+    // handle's py-5 (20px) + the scroll content's pt-4 (16px) = 36px.
+    marginBottom: 36,
   },
 });
 
