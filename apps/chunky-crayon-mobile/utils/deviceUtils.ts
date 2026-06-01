@@ -27,16 +27,20 @@ export type DeviceType = "phone" | "tablet";
  * right rail 232 + gap 16 = 462px. We require the canvas column to be at
  * least THREE_COLUMN_MIN_CANVAS wide on top of that.
  *
- * We lowered MIN_CANVAS 400 → 360 (cutover 862 → 822) so the cluster of
- * widths sitting JUST below the old line gets the rich three-column layout
- * too — iPad Pro 11"/Air portrait (~820-834) and large-phone landscape
- * (~852), all of which comfortably fit two slim rails + a real canvas
- * (360-470px). The narrowest tablets (iPad mini portrait 744) and every
- * phone portrait stay on the toolbar/bottom-sheet tiers where two rails
- * genuinely don't fit. Short phone-landscape three-column is height-bound,
- * not width-bound — the canvas height-clamp in ColoringLayout keeps it
- * contained. Recompute on every Dimensions change so rotation + iPad
- * split-view resizes re-tier live.
+ * THE CANVAS MUST STAY DOMINANT. Three-column is only worth it when the canvas
+ * column is at least as wide as the two rails combined (462px) — otherwise the
+ * canvas is squeezed to a skinny strip between two fat rails, which is worse
+ * than tools-on-top (where the canvas gets the full width). So MIN_CANVAS is
+ * set to ~the rail chrome (538), giving a cutover of 1000:
+ *   - ≥1000 (iPad Pro 13 portrait 1032 → canvas 570; ALL iPad landscapes;
+ *     iPad mini landscape 1024 → canvas 562) → three-column, canvas dominant.
+ *   - 700-999 (iPad Pro 11/Air portrait ~820-834, iPad mini portrait 744,
+ *     large-phone landscape ~852) → MIDDLE tools-on-top, canvas full width.
+ *   - <700 (every phone portrait) → phone bottom sheet.
+ * (Earlier this was 822, which dropped iPad-11/Air portrait into three-column
+ * with only a ~372px canvas — a skinny-canvas regression. Raised to 1000.)
+ * Recompute on every Dimensions change so rotation + iPad split-view resizes
+ * re-tier live.
  */
 export type ColoringTier = "phone" | "middle" | "three-column";
 
@@ -46,10 +50,12 @@ const COLORING_TIER_MIDDLE_MIN = 700;
 // Keep in sync with LEFT_RAIL_CARD_WIDTH (198) + RIGHT_RAIL_CARD_WIDTH (232)
 // + 2× CANVAS_COLUMN_GAP (16) in constants/Sizes.ts.
 const THREE_COLUMN_RAIL_CHROME = 198 + 16 + 232 + 16; // 462
-// Minimum canvas column width before three-column is worth it.
-const THREE_COLUMN_MIN_CANVAS = 360;
+// Minimum canvas column width before three-column is worth it. Set ≈ the rail
+// chrome so the canvas is never narrower than the two rails combined (stays
+// dominant). Below this, tools-on-top gives the canvas the full width instead.
+const THREE_COLUMN_MIN_CANVAS = 538;
 const COLORING_TIER_THREE_COLUMN_MIN =
-  THREE_COLUMN_RAIL_CHROME + THREE_COLUMN_MIN_CANVAS; // 822
+  THREE_COLUMN_RAIL_CHROME + THREE_COLUMN_MIN_CANVAS; // 1000
 
 export const getColoringTier = (width: number): ColoringTier => {
   // Three-column only if both rails + gaps + a comfortable canvas fit.

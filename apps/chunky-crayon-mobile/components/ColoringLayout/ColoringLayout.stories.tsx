@@ -2,6 +2,8 @@ import { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import type { Meta, StoryObj } from "@storybook/react-native";
 import ColoringLayout from "./ColoringLayout";
+import CanvasTopBar from "@/components/CanvasTopBar/CanvasTopBar";
+import ToolbarContent from "@/components/MobileColoringToolbar/ToolbarContent";
 import { COLORS } from "@/lib/design";
 import { getColoringTier } from "@/utils/deviceUtils";
 
@@ -109,6 +111,82 @@ const Frame = ({
 };
 
 /**
+ * The PHONE tier is NOT rendered by ColoringLayout (that only knows the
+ * three-column + middle/toolbar-on-top branches). On a real phone the coloring
+ * screen is: a CanvasTopBar chrome row (progress + sound/music) above the
+ * canvas, with the MobileColoringToolbar BOTTOM SHEET docked at the base. So
+ * this frame composes that real structure — CanvasTopBar, canvas, then the
+ * sheet body (ToolbarContent) in a sheet-styled container at the bottom —
+ * instead of letting ColoringLayout fall back to its (never-shown-on-phone)
+ * toolbar-on-top branch. Scaled to fit the pane exactly like Frame.
+ */
+const PhoneFrame = ({
+  label,
+  width,
+  height,
+  availableWidth,
+}: {
+  label?: string;
+  width: number;
+  height: number;
+  availableWidth: number;
+}) => {
+  const scale = availableWidth > 0 ? Math.min(1, availableWidth / width) : 1;
+  return (
+    <View style={styles.frameWrap}>
+      <Text style={styles.frameTitle}>
+        {label ? `${label}  ` : ""}
+        {width}×{height} → phone (bottom sheet)
+        {scale < 1 ? `  (shown @ ${Math.round(scale * 100)}%)` : ""}
+      </Text>
+      <View
+        style={[
+          styles.frameClip,
+          { width: width * scale, height: height * scale },
+        ]}
+      >
+        <View
+          style={[
+            styles.phoneFrame,
+            {
+              width,
+              height,
+              transform: [{ scale }],
+              transformOrigin: "top left",
+            },
+          ]}
+        >
+          {/* Chrome row above the canvas — progress + sound/music. */}
+          <View style={styles.phoneTopRow}>
+            <CanvasTopBar />
+          </View>
+          {/* Canvas fills the space between chrome and the docked sheet. */}
+          <View style={styles.phoneCanvas}>
+            <PlaceholderCanvas area={{ width, height }} />
+          </View>
+          {/* Docked bottom sheet — the real phone toolbar. ToolbarContent is
+              the sheet's scrollable body (MobileColoringToolbar wraps it in a
+              gorhom BottomSheet on-device, which docks off-canvas in SB). */}
+          <View style={styles.phoneSheet}>
+            <View style={styles.phoneSheetHandle} />
+            <ToolbarContent
+              onZoomIn={noop}
+              onZoomOut={noop}
+              onResetZoom={noop}
+              zoom={1}
+              onStartOver={noop}
+              onPrint={noop}
+              onSave={noop}
+              onMyArtwork={noop}
+            />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+/**
  * Measures the available pane width once, then renders its children with that
  * width so each Frame can scale to fit. Children is a render-prop taking the
  * measured width.
@@ -150,7 +228,7 @@ export const AllDevices: Story = {
     <FittedStage>
       {(w) => (
         <>
-          <Frame
+          <PhoneFrame
             label="iPhone portrait"
             width={393}
             height={852}
@@ -194,15 +272,14 @@ export const AllDevices: Story = {
 
 // ── Per-device stories (each in isolation for close review) ──────────────
 
-// iPhone portrait (393) — narrowest. NOTE: on the real screen the phone tier is
-// the separate MobileColoringToolbar BOTTOM SHEET, not ColoringLayout; here
-// ColoringLayout falls back to its middle/toolbar-on-top branch so the frame
-// isn't empty. See MobileColoringToolbar.stories for the real phone surface.
+// iPhone portrait (393) — the phone tier. Rendered via PhoneFrame (CanvasTopBar
+// + canvas + docked bottom sheet), mirroring the REAL phone screen — NOT
+// ColoringLayout, which the phone never uses.
 export const PhonePortrait: Story = {
   render: () => (
     <FittedStage>
       {(w) => (
-        <Frame
+        <PhoneFrame
           label="iPhone portrait"
           width={393}
           height={852}
@@ -247,9 +324,11 @@ export const MiddleTier: Story = {
   ),
 };
 
-// iPad Pro 11" / Air portrait (834) — newly THREE-COLUMN after the 822 cutover.
+// iPad Pro 11" / Air portrait (834) — MIDDLE tools-on-top. Three-column here
+// would squeeze the canvas to ~372px (skinny); tools-on-top gives it the full
+// width. Three-column kicks in at 1000 (iPad-13 portrait + all landscapes).
 export const IPadProgressivePortrait: Story = {
-  name: "iPad Progressive Portrait",
+  name: "iPad Pro 11 Portrait",
   render: () => (
     <FittedStage>
       {(w) => (
@@ -324,6 +403,40 @@ const styles = StyleSheet.create({
   },
   frame: {
     backgroundColor: COLORS.bgCream,
+  },
+  // Phone-tier mockup: chrome row, canvas, docked bottom sheet.
+  phoneFrame: {
+    backgroundColor: COLORS.bgCream,
+    flexDirection: "column",
+  },
+  phoneTopRow: {
+    paddingHorizontal: 8,
+    paddingTop: 8,
+  },
+  phoneCanvas: {
+    flex: 1,
+    padding: 12,
+  },
+  phoneSheet: {
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  phoneSheetHandle: {
+    alignSelf: "center",
+    backgroundColor: "#D1D5DB",
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    marginBottom: 8,
   },
   canvas: {
     flex: 1,
