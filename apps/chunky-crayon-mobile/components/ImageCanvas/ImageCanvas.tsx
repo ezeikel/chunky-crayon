@@ -28,6 +28,7 @@ import {
   Fill,
   ImageFormat,
   BlendMode,
+  notifyChange,
 } from "@shopify/react-native-skia";
 import {
   Gesture,
@@ -149,12 +150,10 @@ const ImageCanvas = ({
     return { canvasWidth: legacyCanvasSize, canvasHeight: legacyCanvasSize };
   }, [canvasArea, svgDimensions, legacyCanvasSize]);
 
-  const [currentPath, setCurrentPath] = useState<SkPath | null>(null);
   const isInitializedRef = useRef(false);
 
-  // Apple Pencil pressure tracking
-  const pressurePointsRef = useRef<number[]>([]);
-  const isStylusRef = useRef(false);
+  // Apple Pencil pressure smoothing — applied at commit time over the per-point
+  // forces captured on the UI thread during the stroke.
   const pressureSmootherRef = useRef(new PressureSmoother(3));
 
   // Magic color hint state
@@ -235,6 +234,31 @@ const ImageCanvas = ({
   const savedScale = useSharedValue(1);
   const savedTranslateX = useSharedValue(0);
   const savedTranslateY = useSharedValue(0);
+
+  // Live-stroke shared values. The in-progress path is built on the UI THREAD
+  // inside the pan-gesture worklet (no runOnJS / React re-render per touch
+  // point — that was the source of drawing lag and dropped points). Only on
+  // release do we hop to JS once to commit the finished stroke to the store.
+  // Starts as (and resets to) an empty path, which draws nothing — Skia's
+  // <Path> requires a non-null path, and an empty one is the "no live stroke"
+  // state.
+  const livePath = useSharedValue<SkPath>(Skia.Path.Make());
+  // Touch→SVG transform constants captured at stroke start (stable mid-stroke,
+  // since you can't pan/zoom while drawing): svgScale + centering offsets +
+  // committed zoom/pan. Read inside the worklet to map screen → SVG coords.
+  const drawXform = useSharedValue({
+    svgScale: 1,
+    offsetX: 0,
+    offsetY: 0,
+    scale: 1,
+    tx: 0,
+    ty: 0,
+  });
+  // Per-stroke point + pressure buffers, filled on the UI thread, handed to the
+  // JS commit on release.
+  const liveXs = useSharedValue<number[]>([]);
+  const liveYs = useSharedValue<number[]>([]);
+  const liveForces = useSharedValue<number[]>([]);
 
   // Auto-save timer
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -659,104 +683,99 @@ const ImageCanvas = ({
     [svgDimensions, canvasWidth, canvasHeight, scale, translateX, translateY],
   );
 
-  // Handle drawing stroke
-  const handleDrawingStart = useCallback(
-    (x: number, y: number, force?: number, pointerType?: PointerType) => {
-      if (selectedTool !== "brush" && selectedTool !== "eraser") return;
+  // Mirror the touch→SVG transform constants into a shared value so the drawing
+  // worklet (UI thread) can map screen coords to SVG space without hopping to
+  // JS. These are stable during a stroke (you can't pan/zoom while drawing), so
+  // capturing the committed scale/translate here is correct.
+  useEffect(() => {
+    if (!svgDimensions) return;
+    const sx = canvasWidth / svgDimensions.width;
+    const sy = canvasHeight / svgDimensions.height;
+    const svgScale = Math.min(sx, sy);
+    const offsetX = (canvasWidth - svgDimensions.width * svgScale) / 2;
+    const offsetY = (canvasHeight - svgDimensions.height * svgScale) / 2;
+    drawXform.value = {
+      svgScale,
+      offsetX,
+      offsetY,
+      scale,
+      tx: translateX,
+      ty: translateY,
+    };
+  }, [
+    svgDimensions,
+    canvasWidth,
+    canvasHeight,
+    scale,
+    translateX,
+    translateY,
+    drawXform,
+  ]);
 
-      const coords = touchToSvgCoords(x, y);
-      if (!coords) return;
+  // Start/stop the continuous brush haptic — called once per stroke (from the
+  // gesture worklet via runOnJS), never per touch point.
+  const startStrokeHaptics = useCallback(() => {
+    brushHaptics.start(brushType);
+    setScroll(false);
+  }, [brushType, setScroll]);
 
-      // Initialize pressure tracking for this stroke
-      pressureSmootherRef.current.reset();
-      pressurePointsRef.current = [];
-      isStylusRef.current = isApplePencil(pointerType);
+  // Commit a finished stroke to the store. Receives the raw SVG-space points +
+  // per-point pressure captured on the UI thread, rebuilds the SkPath here, and
+  // runs the (unchanged) pressure-width / simplify / rainbow / addAction logic.
+  // Runs ONCE on release — not per touch point.
+  const commitStroke = useCallback(
+    (xs: number[], ys: number[], forces: number[], isStylus: boolean) => {
+      brushHaptics.stop();
+      setScroll(true);
 
-      // Start continuous haptic feedback for this brush type
-      brushHaptics.start(brushType);
-
-      // Get smoothed pressure for first point
-      const pressure = getPressureFromEvent({ force, pointerType });
-      const smoothedPressure = pressureSmootherRef.current.add(pressure);
-      pressurePointsRef.current.push(smoothedPressure);
-
-      const newPath = Skia.Path.Make();
-      newPath.moveTo(coords.x, coords.y);
-      setCurrentPath(newPath);
-      setScroll(false);
-    },
-    [selectedTool, touchToSvgCoords, setScroll, brushType],
-  );
-
-  const handleDrawingMove = useCallback(
-    (x: number, y: number, force?: number, pointerType?: PointerType) => {
-      if (
-        (selectedTool !== "brush" && selectedTool !== "eraser") ||
-        !currentPath
-      )
+      if (!svgDimensions || xs.length === 0) {
         return;
+      }
 
-      const coords = touchToSvgCoords(x, y);
-      if (!coords) return;
+      // Rebuild the path from the captured points.
+      const rebuilt = Skia.Path.Make();
+      rebuilt.moveTo(xs[0], ys[0]);
+      for (let i = 1; i < xs.length; i++) {
+        rebuilt.lineTo(xs[i], ys[i]);
+      }
 
-      // Capture pressure for this point
-      const pressure = getPressureFromEvent({ force, pointerType });
-      const smoothedPressure = pressureSmootherRef.current.add(pressure);
-      pressurePointsRef.current.push(smoothedPressure);
-
-      currentPath.lineTo(coords.x, coords.y);
-      setCurrentPath(currentPath.copy());
-    },
-    [selectedTool, currentPath, touchToSvgCoords],
-  );
-
-  const handleDrawingEnd = useCallback(() => {
-    // Stop continuous haptic feedback
-    brushHaptics.stop();
-
-    if (currentPath && svgDimensions) {
-      // The eraser commits a stroke with brushType "eraser" (web-parity
-      // schema → persists + replays cross-platform). It renders with a dstOut
-      // blend inside the erasable layer group; its colour is irrelevant
-      // (only the stroke's alpha coverage matters under dstOut).
       const isErasing = selectedTool === "eraser";
       const effectiveBrushType: BrushType = isErasing ? "eraser" : brushType;
 
-      // Use rainbow color if rainbow brush is selected
       const strokeColor = isErasing
         ? "#000000"
         : brushType === "rainbow"
           ? getRainbowColor(rainbowHue)
           : selectedColor;
 
-      // Capture pressure data from this stroke
-      const pressurePoints =
-        pressurePointsRef.current.length > 0
-          ? [...pressurePointsRef.current]
-          : undefined;
-      const isStylus = isStylusRef.current;
+      // Smooth the raw forces the same way the old per-move path did.
+      const smoother = pressureSmootherRef.current;
+      smoother.reset();
+      const pressureArr = forces.map((f) =>
+        smoother.add(
+          getPressureFromEvent({
+            force: f,
+            pointerType: isStylus ? "stylus" : "touch",
+          }),
+        ),
+      );
+      const pressurePoints = pressureArr.length > 0 ? pressureArr : undefined;
 
-      // Calculate pressure-adjusted stroke width
-      // For stylus input, use average pressure; for finger, use default pressure
       let averagePressure = DEFAULT_PRESSURE;
       if (pressurePoints && pressurePoints.length > 0) {
         averagePressure =
           pressurePoints.reduce((a, b) => a + b, 0) / pressurePoints.length;
       }
-      // Eraser ignores pressure (web uses a flat radius*2); brushes use the
-      // pressure-adjusted width.
       const strokeWidth = isErasing
         ? brushSize * 2
         : getPressureAdjustedWidth(brushSize, brushType, averagePressure);
 
-      // Generate a unique texture seed for this stroke
       const textureSeed = Math.random() * 1000;
 
-      // Apply path simplification if enabled (reduces points by 70-90% without visible quality loss)
       const finalPath =
-        pathSimplification && shouldSimplify(currentPath)
-          ? simplifyPath(currentPath, DEFAULT_SIMPLIFICATION_TOLERANCE)
-          : currentPath;
+        pathSimplification && shouldSimplify(rebuilt)
+          ? simplifyPath(rebuilt, DEFAULT_SIMPLIFICATION_TOLERANCE)
+          : rebuilt;
 
       const action: DrawingAction = {
         type: "stroke",
@@ -765,42 +784,31 @@ const ImageCanvas = ({
         brushType: effectiveBrushType,
         strokeWidth,
         startHue: effectiveBrushType === "rainbow" ? rainbowHue : undefined,
-        // Store source dimensions for cross-platform sync
         sourceWidth: svgDimensions.width,
         sourceHeight: svgDimensions.height,
-        // Apple Pencil pressure sensitivity data
         pressurePoints,
         isStylus,
-        // Texture seed for deterministic texture rendering
         textureSeed,
       };
       addAction(action);
 
-      setCurrentPath(null);
-
-      // Reset pressure tracking
-      pressurePointsRef.current = [];
-      isStylusRef.current = false;
-
-      // Advance rainbow hue for next stroke
       if (brushType === "rainbow") {
         advanceRainbowHue(30);
       }
-    }
-    setScroll(true);
-  }, [
-    currentPath,
-    brushSize,
-    brushType,
-    selectedTool,
-    selectedColor,
-    rainbowHue,
-    addAction,
-    setScroll,
-    advanceRainbowHue,
-    svgDimensions,
-    pathSimplification,
-  ]);
+    },
+    [
+      brushSize,
+      brushType,
+      selectedTool,
+      selectedColor,
+      rainbowHue,
+      addAction,
+      setScroll,
+      advanceRainbowHue,
+      svgDimensions,
+      pathSimplification,
+    ],
+  );
 
   // Handle fill tool tap
   const handleFillTap = useCallback(
@@ -985,35 +993,69 @@ const ImageCanvas = ({
   const isDrawingTool = selectedTool === "brush" || selectedTool === "eraser";
   const panGesture = Gesture.Pan()
     .onStart((event) => {
+      "worklet";
       if (isDrawingTool) {
-        // Pass force (pressure) and pointerType for Apple Pencil detection
-        // force is available on iOS for stylus input
-        runOnJS(handleDrawingStart)(
-          event.x,
-          event.y,
-          (event as unknown as { force?: number }).force,
-          event.pointerType,
-        );
+        // Map screen → SVG coords on the UI thread (no JS hop).
+        const xf = drawXform.value;
+        const ax = (event.x - xf.tx) / xf.scale;
+        const ay = (event.y - xf.ty) / xf.scale;
+        const sx = (ax - xf.offsetX) / xf.svgScale;
+        const sy = (ay - xf.offsetY) / xf.svgScale;
+
+        const p = Skia.Path.Make();
+        p.moveTo(sx, sy);
+        livePath.value = p;
+        liveXs.value = [sx];
+        liveYs.value = [sy];
+        const force = (event as unknown as { force?: number }).force ?? 0;
+        liveForces.value = [force];
+        notifyChange(livePath);
+        runOnJS(startStrokeHaptics)();
       }
     })
     .onUpdate((event) => {
+      "worklet";
       if (isDrawingTool) {
-        // Pass force (pressure) and pointerType for Apple Pencil detection
-        runOnJS(handleDrawingMove)(
-          event.x,
-          event.y,
-          (event as unknown as { force?: number }).force,
-          event.pointerType,
-        );
+        const p = livePath.value;
+        if (p == null) return;
+        const xf = drawXform.value;
+        const ax = (event.x - xf.tx) / xf.scale;
+        const ay = (event.y - xf.ty) / xf.scale;
+        const sx = (ax - xf.offsetX) / xf.svgScale;
+        const sy = (ay - xf.offsetY) / xf.svgScale;
+
+        p.lineTo(sx, sy);
+        // Buffer points + force on the UI thread for the single commit on end.
+        liveXs.value = [...liveXs.value, sx];
+        liveYs.value = [...liveYs.value, sy];
+        const force = (event as unknown as { force?: number }).force ?? 0;
+        liveForces.value = [...liveForces.value, force];
+        notifyChange(livePath);
       } else {
         // Pan mode
         gestureTranslateX.value = savedTranslateX.value + event.translationX;
         gestureTranslateY.value = savedTranslateY.value + event.translationY;
       }
     })
-    .onEnd(() => {
+    .onEnd((event) => {
+      "worklet";
       if (isDrawingTool) {
-        runOnJS(handleDrawingEnd)();
+        const isStylus =
+          (event as unknown as { pointerType?: string }).pointerType ===
+          "stylus";
+        runOnJS(commitStroke)(
+          liveXs.value,
+          liveYs.value,
+          liveForces.value,
+          isStylus,
+        );
+        // Clear the live preview (empty path = draws nothing); the committed
+        // stroke now renders from history.
+        livePath.value = Skia.Path.Make();
+        liveXs.value = [];
+        liveYs.value = [];
+        liveForces.value = [];
+        notifyChange(livePath);
       } else {
         savedTranslateX.value = gestureTranslateX.value;
         savedTranslateY.value = gestureTranslateY.value;
@@ -1137,18 +1179,15 @@ const ImageCanvas = ({
   // Compute fill layer image (SVG + all fill/magic-fill actions baked in)
   const { fillLayerImage } = useFillLayer(svg, svgDimensions, visibleActions);
 
-  // Calculate current stroke width with pressure (for live preview while drawing)
-  // This recalculates when currentPath changes (which happens on each move)
+  // Live-preview stroke width. The live path is drawn on the UI thread, so the
+  // preview uses a stable default-pressure width (the exact pressure-adjusted
+  // width is applied when the stroke is committed in commitStroke). Recomputes
+  // only when the tool/size/brush changes, not per touch point.
   const currentStrokeWidth = useMemo(() => {
     // Eraser uses a flat radius*2 (web parity), ignoring pressure.
     if (selectedTool === "eraser") return brushSize * 2;
-    const points = pressurePointsRef.current;
-    let avgPressure = DEFAULT_PRESSURE;
-    if (points.length > 0) {
-      avgPressure = points.reduce((a, b) => a + b, 0) / points.length;
-    }
-    return getPressureAdjustedWidth(brushSize, brushType, avgPressure);
-  }, [currentPath, brushSize, brushType, selectedTool]); // currentPath triggers recalculation
+    return getPressureAdjustedWidth(brushSize, brushType, DEFAULT_PRESSURE);
+  }, [brushSize, brushType, selectedTool]);
 
   // Render stickers via the Skia Paragraph API. The low-level Skia <Text>
   // primitive uses a single default typeface with NO color-emoji fallback, so
@@ -1470,11 +1509,16 @@ const ImageCanvas = ({
                 {renderPaths}
                 {/* Rendered stickers */}
                 {renderStickers}
-                {/* Current drawing path (with pressure-adjusted stroke width) */}
-                {currentPath && selectedTool === "eraser" ? (
+                {/* Live drawing path — built on the UI thread (livePath shared
+                    value), styled by the active tool/brush (stable mid-stroke).
+                    Draws nothing while livePath is null. The version key forces
+                    React to re-evaluate the style branch when the tool changes;
+                    the path geometry updates on the UI thread via the shared
+                    value without any per-point re-render. */}
+                {selectedTool === "eraser" ? (
                   // Live eraser preview — dstOut so it erases as you drag.
                   <Path
-                    path={currentPath}
+                    path={livePath}
                     color="black"
                     style="stroke"
                     strokeWidth={currentStrokeWidth}
@@ -1482,39 +1526,35 @@ const ImageCanvas = ({
                     strokeJoin="round"
                     blendMode="dstOut"
                   />
-                ) : currentPath && brushType === "glow" ? (
-                  <Group>
-                    <Path
-                      path={currentPath}
-                      color={selectedColor}
-                      style="stroke"
-                      strokeWidth={currentStrokeWidth}
-                      strokeCap="round"
-                      strokeJoin="round"
-                      opacity={0.7}
-                    >
-                      <BlurMask blur={8} style="normal" />
-                    </Path>
-                  </Group>
-                ) : currentPath && brushType === "neon" ? (
-                  <Group>
-                    <Path
-                      path={currentPath}
-                      color={selectedColor}
-                      style="stroke"
-                      strokeWidth={currentStrokeWidth}
-                      strokeCap="round"
-                      strokeJoin="round"
-                      opacity={1}
-                    >
-                      <BlurMask blur={12} style="outer" />
-                    </Path>
-                  </Group>
-                ) : currentPath && brushType === "paintbrush" ? (
+                ) : brushType === "glow" ? (
+                  <Path
+                    path={livePath}
+                    color={selectedColor}
+                    style="stroke"
+                    strokeWidth={currentStrokeWidth}
+                    strokeCap="round"
+                    strokeJoin="round"
+                    opacity={0.7}
+                  >
+                    <BlurMask blur={8} style="normal" />
+                  </Path>
+                ) : brushType === "neon" ? (
+                  <Path
+                    path={livePath}
+                    color={selectedColor}
+                    style="stroke"
+                    strokeWidth={currentStrokeWidth}
+                    strokeCap="round"
+                    strokeJoin="round"
+                    opacity={1}
+                  >
+                    <BlurMask blur={12} style="outer" />
+                  </Path>
+                ) : brushType === "paintbrush" ? (
                   // Live Paint preview — translucent + soft edge (matches the
                   // committed paintbrush render).
                   <Path
-                    path={currentPath}
+                    path={livePath}
                     color={selectedColor}
                     style="stroke"
                     strokeWidth={currentStrokeWidth}
@@ -1524,9 +1564,9 @@ const ImageCanvas = ({
                   >
                     <BlurMask blur={3} style="normal" />
                   </Path>
-                ) : currentPath ? (
+                ) : (
                   <Path
-                    path={currentPath}
+                    path={livePath}
                     color={
                       brushType === "rainbow"
                         ? getRainbowColor(rainbowHue)
@@ -1544,7 +1584,7 @@ const ImageCanvas = ({
                           : 1
                     }
                   />
-                ) : null}
+                )}
               </Group>
               {/* SVG outline layer (on top) — OUTSIDE the erasable layer so
                   the eraser never removes the line art. */}
