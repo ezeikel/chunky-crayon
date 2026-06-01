@@ -309,7 +309,9 @@ const initialState: CanvasState = {
   isDirty: false,
   isMuted: false,
   isSfxMuted: false,
-  isAmbientMuted: false,
+  // Music (ambient) OFF by default — matches web (coloring-ui context
+  // isAmbientMuted defaults true). Sound effects stay on.
+  isAmbientMuted: true,
   progress: 0,
   captureCanvas: null,
 };
