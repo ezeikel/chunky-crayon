@@ -82,8 +82,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
   },
+  // Fill the fixed-size pressable parent (see ToolTile — flex:1 collapses
+  // to a sliver inside the Animated.View pressable).
   tileBase: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",

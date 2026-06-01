@@ -111,23 +111,28 @@ const ToolsSidebar = ({
     }
   };
 
-  // Single-column slim rail: one ~56px tile per row, fixed comfortable
-  // tablet size. The rail width is set by the layout to fit exactly that.
+  // 3-column tools grid (web's DesktopToolsSidebar): regular tools 3-up,
+  // magic tiles 2-up, then brush/undo-redo/zoom rows. The rail width is set
+  // by the layout to fit exactly 3 tiles + gaps + padding.
   const gap = 8;
   const tileSize = 56;
   const zoomButtonSize = 48;
+  // Width of the 3-tile grid — keeps the rows (brush/undo/zoom) aligned to
+  // the same content width as the tool grid.
+  const gridWidth = tileSize * 3 + gap * 2;
 
   return (
     <View style={[styles.outer, { width, paddingRight: insets.right + 8 }]}>
-      {/* Slim floating rail (web's DesktopToolsSidebar): a rounded card
-          vertically centered next to the canvas, single-column tool stack. */}
+      {/* Floating tools rail (web's DesktopToolsSidebar): a rounded card
+          filling the column height, 3-column tool grid + control rows. */}
       <View style={styles.rail}>
         <ScrollView
+          style={styles.scrollView}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { width: gridWidth }]}
         >
-          {/* Regular tools — single-column vertical stack (web slim rail) */}
-          <View style={[styles.toolColumn, { gap }]}>
+          {/* Regular tools — 3-column grid (web slim rail) */}
+          <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
             {COLORING_REGULAR_TOOLS.map((config) => (
               <ToolTile
                 key={config.id}
@@ -140,8 +145,8 @@ const ToolsSidebar = ({
             ))}
           </View>
 
-          {/* Magic tools — stacked, gradient + sparkle */}
-          <View style={[styles.toolColumn, { gap }]}>
+          {/* Magic tools — 2-up, gradient + sparkle */}
+          <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
             {COLORING_MAGIC_TOOLS.map((config) => (
               <ToolTile
                 key={config.id}
@@ -275,19 +280,22 @@ const ToolsSidebar = ({
 };
 
 const styles = StyleSheet.create({
-  // Outer column: fixed width (from prop), never squeezed by the flex row,
-  // vertically centers the rail next to the canvas. The left padding is the
-  // canvas gap so the rail floats clear of the canvas card.
+  // Outer column: fixed width (from prop), never squeezed by the flex row.
+  // The card is capped to the column height (paddingVertical = breathing
+  // room) so its inner ScrollView is height-bounded and the tool stack
+  // scrolls INSIDE the card — controls never spill past the card bottom.
+  // The left padding is the canvas gap so the rail floats clear of the
+  // canvas card.
   outer: {
     flexShrink: 0,
     justifyContent: "center",
-    alignItems: "stretch",
     paddingVertical: 12,
     paddingLeft: 16,
   },
-  // Slim floating rail card.
+  // Floating tools rail card — fills the column height; its content scrolls
+  // within it (flexShrink lets it shrink when content is short).
   rail: {
-    flexShrink: 1,
+    flex: 1,
     backgroundColor: COLORS.white,
     borderRadius: 24,
     borderWidth: 2,
@@ -300,13 +308,18 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 4,
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     gap: 12,
     alignItems: "center",
   },
-  toolColumn: {
-    flexDirection: "column",
-    alignItems: "center",
+  // 3-column tool grid (wraps within the fixed gridWidth set inline).
+  toolGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
   },
   divider: {
     height: 1,
@@ -314,9 +327,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgCreamDark,
     marginVertical: 2,
   },
+  // Control rows (brush sizes / undo-redo / zoom) lay out horizontally,
+  // centered, matching the 3-up tool grid above.
   row: {
-    flexDirection: "column",
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
   },
   iconButton: {
     alignItems: "center",

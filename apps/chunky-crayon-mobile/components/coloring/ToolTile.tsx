@@ -138,8 +138,12 @@ const ToolTile = ({
 };
 
 const styles = StyleSheet.create({
+  // Fill the fixed-size pressable parent. `flex: 1` collapsed to a ~4px
+  // sliver here because the Animated.View pressable isn't a definite-height
+  // flex container — fill both axes explicitly instead.
   tileBase: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",

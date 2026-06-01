@@ -84,13 +84,17 @@ export const getLandscapeSidebarWidths = (
 ): { leftWidth: number; rightWidth: number; canvasSize: number } => {
   const availableWidth = screenWidth - leftInset - rightInset;
 
-  // Floating rails next to the canvas. The left palette rail holds a
-  // 2-column swatch grid, so it needs real width or the swatches collapse
-  // to invisible dots — ~150px fits two ~56px swatches + rail padding. The
-  // right tools rail is a single column (~92px). A horizontal GAP separates
-  // each rail from the canvas card so they don't butt together.
-  const leftRailWidth = 150;
-  const rightRailWidth = 100;
+  // Floating rail CARD widths, sized to fit their content (web's
+  // DesktopColorPalette / DesktopToolsSidebar):
+  //   - left palette rail: a 3-column grid of 40px swatch chips. Each cell
+  //     is 40 + 6 gap = 46; 3 cols = 138, + 10px card padding each side =
+  //     158. Round to 160.
+  //   - right tools rail: a 3-column grid of 56px tool tiles. 3 × 56 + 2 × 8
+  //     gap = 184, + 10px card padding each side = 204. Round to 200.
+  // Keep LEFT/RIGHT_RAIL_CARD_WIDTH + THREE_COLUMN_RAIL_CHROME (deviceUtils)
+  // in sync with these numbers.
+  const leftRailWidth = LEFT_RAIL_CARD_WIDTH;
+  const rightRailWidth = RIGHT_RAIL_CARD_WIDTH;
   const gap = CANVAS_COLUMN_GAP;
 
   const leftWidth = leftRailWidth + gap + leftInset;
@@ -101,6 +105,10 @@ export const getLandscapeSidebarWidths = (
 
   return { leftWidth, rightWidth, canvasSize };
 };
+
+/** Floating rail card widths — see getLandscapeSidebarWidths for derivation. */
+export const LEFT_RAIL_CARD_WIDTH = 160;
+export const RIGHT_RAIL_CARD_WIDTH = 200;
 
 // Canvas padding and margins
 export const CANVAS = {
