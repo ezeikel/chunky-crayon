@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faCheck, faXmark } from '@fortawesome/pro-solid-svg-icons';
+import { faTrash, faCheck, faXmark } from '@fortawesome/pro-solid-svg-icons';
 import { faArrowsRotate } from '@fortawesome/pro-duotone-svg-icons';
 import { ActionButton } from '@one-colored-pixel/coloring-ui';
 import {
@@ -68,7 +68,7 @@ const StartOverButton = ({
           <DialogHeader className="items-center text-center">
             <div className="flex items-center justify-center size-16 rounded-full bg-red-100 mb-3">
               <FontAwesomeIcon
-                icon={faTrashCan}
+                icon={faTrash}
                 className="text-red-600 text-2xl"
               />
             </div>

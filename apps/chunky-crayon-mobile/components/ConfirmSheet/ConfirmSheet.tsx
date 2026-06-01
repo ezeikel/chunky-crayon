@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faTrashCan, faCheck, faXmark } from "@fortawesome/pro-solid-svg-icons";
+import { faTrash, faCheck, faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { tapMedium } from "@/utils/haptics";
 import { FONTS, COLORS } from "@/lib/design";
 import SquishyPressable from "@/components/SquishyPressable/SquishyPressable";
@@ -47,8 +47,8 @@ type ConfirmSheetProps = {
   description?: string;
   /**
    * "What happens" header icon, shown in a tinted circle. Defaults to a
-   * trash can (erase/delete). Pass a different glyph for non-erase confirms
-   * (e.g. sign-out).
+   * plain trash bin (erase/delete). Pass a different glyph for non-erase
+   * confirms (e.g. sign-out).
    */
   icon?: IconDefinition;
   /**
@@ -75,7 +75,7 @@ const ConfirmSheet = ({
   onClose,
   title,
   description,
-  icon = faTrashCan,
+  icon = faTrash,
   confirmLabel,
   cancelLabel = "Cancel",
   onConfirm,
