@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Dimensions,
+  useWindowDimensions,
   StyleSheet,
   ScrollView,
   Pressable,
@@ -40,7 +40,9 @@ const padding = 20;
 
 const HomeScreen = () => {
   const t = useT("mobile");
-  const [screenWidth] = useState(Dimensions.get("window").width);
+  // useWindowDimensions (not a one-time Dimensions.get) so the grid re-flows
+  // when the iPad rotates — Dimensions.get captured at mount goes stale.
+  const { width: screenWidth } = useWindowDimensions();
   const [isProfileSwitcherOpen, setIsProfileSwitcherOpen] = useState(false);
   const [isColoSheetOpen, setIsColoSheetOpen] = useState(false);
   // Settings lives behind a parent-gated corner (not a tab). Tapping the

@@ -1,8 +1,8 @@
-import { useState, memo, useCallback } from "react";
+import { memo, useCallback } from "react";
 import {
   Text,
   View,
-  Dimensions,
+  useWindowDimensions,
   Pressable,
   StyleSheet,
   FlatList,
@@ -365,7 +365,8 @@ const ChallengeSection = ({
 };
 
 const Feed = () => {
-  const [screenWidth] = useState(Dimensions.get("window").width);
+  // useWindowDimensions so the card grid re-flows on iPad rotation.
+  const { width: screenWidth } = useWindowDimensions();
   const cardSize = getCardSize(screenWidth);
 
   const { data, isLoading, isError, refetch } = useFeed();

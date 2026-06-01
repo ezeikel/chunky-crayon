@@ -5,7 +5,7 @@ import {
   Pressable,
   StyleSheet,
   Modal,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -33,8 +33,6 @@ const SAVE_FAIL_MSG = "Couldn't save your artwork. Please try again.";
 const SHARE_FAIL_MSG = "Couldn't share your artwork. Please try again.";
 const CAPTURE_FAIL_MSG = "Couldn't capture your artwork.";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 type ActionModalProps = {
   visible: boolean;
   onClose: () => void;
@@ -55,6 +53,10 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [showShareGate, setShowShareGate] = useState(false);
+
+  // useWindowDimensions so the centred modal re-sizes/re-centres on rotation
+  // (capped by maxWidth 360); a one-time Dimensions.get goes stale.
+  const { width: screenWidth } = useWindowDimensions();
 
   const { captureCanvas } = useCanvasStore();
 
@@ -223,7 +225,7 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
           <View />
         </Pressable>
 
-        <View style={styles.modalContainer}>
+        <View style={[styles.modalContainer, { width: screenWidth - 48 }]}>
           {/* Close button */}
           <Pressable
             style={({ pressed }) => [
@@ -307,7 +309,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
   },
   modalContainer: {
-    width: SCREEN_WIDTH - 48,
+    // width applied inline (dynamic, from useWindowDimensions); capped here.
     maxWidth: 360,
     backgroundColor: "#FFFFFF",
     borderRadius: 28,

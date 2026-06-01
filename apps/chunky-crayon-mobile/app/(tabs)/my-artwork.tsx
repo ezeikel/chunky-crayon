@@ -5,7 +5,7 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
 import { SvgUri } from "react-native-svg";
@@ -20,15 +20,17 @@ import { useSavedArtworks, useFeed } from "@/hooks/api";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 
-const { width: screenWidth } = Dimensions.get("window");
 const GRID_PADDING = 16;
 const GRID_GAP = 12;
 const COLUMNS = 2;
-const ITEM_WIDTH =
-  (screenWidth - GRID_PADDING * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS;
 
 const MyArtworkScreen = () => {
   const t = useT("mobile.myArtwork");
+  // useWindowDimensions so the 2-up grid re-flows on iPad rotation; the card
+  // width is applied inline (over styles.artworkCard) since it's now dynamic.
+  const { width: screenWidth } = useWindowDimensions();
+  const itemWidth =
+    (screenWidth - GRID_PADDING * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS;
   const headerData = useHeaderData();
   const { data, isLoading } = useSavedArtworks();
   const { data: feed } = useFeed();
@@ -88,6 +90,7 @@ const MyArtworkScreen = () => {
               key={item.id}
               style={({ pressed }) => [
                 styles.artworkCard,
+                { width: itemWidth },
                 pressed && styles.artworkCardPressed,
               ]}
               onPress={() => handleArtworkPress(item.coloringImageId)}
@@ -137,6 +140,7 @@ const MyArtworkScreen = () => {
             key={artwork.id}
             style={({ pressed }) => [
               styles.artworkCard,
+              { width: itemWidth },
               pressed && styles.artworkCardPressed,
             ]}
             onPress={() => handleArtworkPress(artwork.coloringImageId)}
@@ -293,7 +297,7 @@ const styles = StyleSheet.create({
     gap: GRID_GAP,
   },
   artworkCard: {
-    width: ITEM_WIDTH,
+    // width is applied inline (dynamic, from useWindowDimensions).
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     overflow: "hidden",

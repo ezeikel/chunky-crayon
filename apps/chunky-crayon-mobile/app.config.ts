@@ -21,6 +21,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     userInterfaceStyle: "light",
     ios: {
       supportsTablet: true,
+      // Full-screen only (no iPad split-view / Slide-Over). This is what makes
+      // a physical iPad ROTATION deliver a real window-size change to RN
+      // (firing Dimensions "change"), so the responsive layout re-flows
+      // portrait↔landscape. Without it (UIRequiresFullScreen=false, the Expo
+      // default), iOS rotates the rendered surface as a bitmap and the layout
+      // never recomputes — the portrait UI just appears tipped sideways.
+      // Desirable anyway for an immersive ages-3-8 coloring app: no accidental
+      // drag-out, no mid-session window resizes.
+      requireFullScreen: true,
       bundleIdentifier: "com.chewybytes.chunkycrayon.app",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
