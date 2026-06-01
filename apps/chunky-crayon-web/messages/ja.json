@@ -386,7 +386,7 @@
       "communityPages": "コミュニティ",
       "dailyPages": "デイリー",
       "pagesSuffix": "ページ",
-      "ourPages": "Our Pages"
+      "ourPages": "公式ページ"
     },
     "ageGroups": {
       "toddlers": {
@@ -461,10 +461,10 @@
       "about": "紹介"
     },
     "difficultyFilter": {
-      "all": "All",
-      "beginner": "Easy",
-      "intermediate": "Medium",
-      "advanced": "Tricky",
+      "all": "すべて",
+      "beginner": "入門",
+      "intermediate": "ふつう",
+      "advanced": "むずかしい",
       "empty": "No pages in this tier yet. Try a different difficulty.",
       "expert": "上級",
       "easy": "かんたん",
@@ -588,23 +588,23 @@
         "popularDescription": "人気の大人向けカテゴリ：瞑想向けマンダラ、繊細な自然・ボタニカル、幾何学模様、アール・デコ＆アール・ヌーヴォー、ゼンタングル風、静かな風景。自分に合うリラックス方法が見つかります。"
       }
     },
-    "ourLatestTitle": "Our Latest Coloring Pages",
-    "ourLatestSubtitle": "Fresh pages from us, with new ones added daily. Pick a tile to color online, print at home, or save for later.",
+    "ourLatestTitle": "最新のぬりえページ",
+    "ourLatestSubtitle": "毎日新しいページを追加中。タイルを選んでオンラインで塗ったり、おうちで印刷したり、後で保存したり。",
     "coloringHabitatCallout": {
-      "eyebrow": "From our sister site",
+      "eyebrow": "姉妹サイトから",
       "title": {
-        "teens": "Looking for older-kid coloring? Try Coloring Habitat",
-        "adults": "Coloring for grown-ups? Coloring Habitat is built for you"
+        "teens": "年上向けぬりえをお探しなら？Coloring Habitatをお試しください",
+        "adults": "大人向けぬりえなら？Coloring Habitatがぴったりです"
       },
       "body": {
-        "teens": "Chunky Crayon focuses on younger kids (ages 3-8). Coloring Habitat has detailed designs, mandalas, and intricate scenes for older kids, teens, and adults — same printable-free model, just tuned for older audiences.",
-        "adults": "Chunky Crayon is built for kids ages 3-8. Coloring Habitat is our sister site for adult coloring — mandalas, intricate patterns, mindful designs, and stress-relief printables for grown-ups."
+        "teens": "Chunky Crayonは小さなお子さま（3〜8歳）向けです。Coloring Habitatには、年上のお子さまやティーン・大人向けの細かいデザイン・マンダラ・複雑な場面があります。同じ無料印刷モデルで、年上の方向けです。",
+        "adults": "Chunky Crayonは3〜8歳向けです。Coloring Habitatは大人向けの姉妹サイトで、マンダラ・繊細な模様・マインドフル・ストレス解消の印刷用ぬりえを提供しています。"
       },
-      "cta": "Visit Coloring Habitat"
+      "cta": "Coloring Habitatを見る"
     },
-    "ourLatestCount": "{count, plural, =1 {1 page} other {# pages}}",
+    "ourLatestCount": "{count, plural, =1 {1ページ} other {#ページ}}",
     "communitySubtitle": "Pages our community of parents and kids created. Browse hundreds more on the dedicated community gallery — it's where the imaginative stuff lives.",
-    "browseAllCommunity": "Browse community gallery"
+    "browseAllCommunity": "コミュニティギャラリーを見る"
   },
   "pricing": {
     "pageTitle": "料金 - Chunky Crayon",
