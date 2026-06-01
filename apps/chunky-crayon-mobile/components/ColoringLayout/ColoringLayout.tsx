@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { COLORS } from "@/lib/design";
 import ColorPaletteSidebar from "@/components/ColorPaletteSidebar/ColorPaletteSidebar";
@@ -66,6 +66,14 @@ const ColoringLayout = ({
 }: ColoringLayoutProps) => {
   const tier = getColoringTier(width);
 
+  // Measured height of the FIXED-tier canvas column (the View below the
+  // CanvasTopBar). Used to CONTAIN the canvas within the real visible area so
+  // a square/tall image can't spill off the bottom — flexbox has already
+  // subtracted the header + TopBar + paddings + safe-area for us, so we just
+  // read the resolved height back rather than re-summing brittle chrome
+  // constants. 0 until the first layout pass; scrollable tiers never set it.
+  const [fillHeight, setFillHeight] = useState(0);
+
   if (tier === "three-column") {
     const { leftWidth, rightWidth, canvasSize } = getLandscapeSidebarWidths(
       width,
@@ -73,6 +81,15 @@ const ColoringLayout = ({
       0,
       0,
     );
+    // Landscape three-column is FIXED (row flex:1): the canvas must CONTAIN
+    // within the height left under the header + CanvasTopBar + card padding +
+    // safe-area, or a square/tall image spills off the bottom. We measure the
+    // canvasFill View (which sits below the TopBar, so flexbox has already
+    // subtracted it) and feed that real height to the canvas area. Portrait
+    // three-column (scrollable) intentionally lets the block exceed the
+    // viewport — there we DON'T clamp: pass the full height through.
+    const canvasAreaHeight =
+      !scrollable && fillHeight > 0 ? fillHeight : height;
     return (
       <View style={[styles.row, scrollable && styles.rowScrollable]}>
         <ColorPaletteSidebar width={leftWidth} />
@@ -80,8 +97,15 @@ const ColoringLayout = ({
             (web's per-column placement), then the dominant canvas. */}
         <View style={styles.canvasCenter}>
           <CanvasTopBar />
-          <View style={styles.canvasFill}>
-            {renderCanvas({ width: canvasSize, height })}
+          <View
+            style={[styles.canvasFill, !scrollable && styles.canvasFillFixed]}
+            onLayout={
+              scrollable
+                ? undefined
+                : (e) => setFillHeight(e.nativeEvent.layout.height)
+            }
+          >
+            {renderCanvas({ width: canvasSize, height: canvasAreaHeight })}
           </View>
         </View>
         <ToolsSidebar
@@ -101,6 +125,11 @@ const ColoringLayout = ({
   }
 
   // middle (and phone fallback for the story): top bar + toolbar above canvas.
+  // Same containment fix as three-column — the canvas sits below the TopBar +
+  // toolbar, so measure the leftover column height and clamp to it (FIXED tier;
+  // scrollable middle, if ever used, falls through to full height like portrait).
+  const middleCanvasHeight =
+    !scrollable && fillHeight > 0 ? fillHeight : height;
   return (
     <View style={styles.column}>
       <CanvasTopBar />
@@ -110,7 +139,16 @@ const ColoringLayout = ({
         onResetZoom={onResetZoom}
         zoom={zoom}
       />
-      <View style={styles.middleCanvas}>{renderCanvas({ width, height })}</View>
+      <View
+        style={styles.middleCanvas}
+        onLayout={
+          scrollable
+            ? undefined
+            : (e) => setFillHeight(e.nativeEvent.layout.height)
+        }
+      >
+        {renderCanvas({ width, height: middleCanvasHeight })}
+      </View>
     </View>
   );
 };
@@ -150,8 +188,16 @@ const styles = StyleSheet.create({
   canvasFill: {
     alignItems: "stretch",
   },
+  // Fixed (landscape) tier: claim the leftover column height so onLayout
+  // measures the real visible area, and clip a too-tall canvas rather than let
+  // it spill past the bottom edge. (Scrollable/portrait keeps plain canvasFill.)
+  canvasFillFixed: {
+    flex: 1,
+    overflow: "hidden",
+  },
   middleCanvas: {
     flex: 1,
+    overflow: "hidden",
   },
 });
 
