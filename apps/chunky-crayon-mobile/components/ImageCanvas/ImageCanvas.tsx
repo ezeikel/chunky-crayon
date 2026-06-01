@@ -270,13 +270,6 @@ const ImageCanvas = ({
   const liveXs = useSharedValue<number[]>([]);
   const liveYs = useSharedValue<number[]>([]);
   const liveForces = useSharedValue<number[]>([]);
-  // True while a stroke is in progress — set synchronously in the onStart
-  // worklet (UI thread) and cleared in commitStroke. The deferred-clear effect
-  // reads it to make absolutely sure it never wipes a NEWER in-flight stroke if
-  // the previous stroke's clear effect is still pending when the next stroke
-  // begins (lift + re-press within a frame). Reading the shared value (set
-  // synchronously by onStart) closes that race deterministically.
-  const liveActive = useSharedValue(false);
 
   // Auto-save timer
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -750,8 +743,6 @@ const ImageCanvas = ({
     (xs: number[], ys: number[], forces: number[], isStylus: boolean) => {
       brushHaptics.stop();
       setScroll(true);
-      // This stroke is no longer in progress (it's committing now).
-      liveActive.value = false;
 
       if (!svgDimensions || xs.length === 0) {
         // Zero-length stroke (a brush/eraser tap with no drag). No action is
@@ -1049,9 +1040,6 @@ const ImageCanvas = ({
         liveYs.value = [sy];
         const force = (event as unknown as { force?: number }).force ?? 0;
         liveForces.value = [force];
-        // Mark a stroke active synchronously (UI thread) so a still-pending
-        // deferred clear from the previous stroke can't wipe this fresh path.
-        liveActive.value = true;
         notifyChange(livePath);
         runOnJS(startStrokeHaptics)();
       }
@@ -1227,20 +1215,22 @@ const ImageCanvas = ({
   // the length unchanged) and MAX_HISTORY's shift() pins the length once full,
   // so a length-keyed clear would silently stop firing and leave the live path
   // permanently double-drawn over the committed one (visible darkening for
-  // translucent crayon/marker/paintbrush). useLayoutEffect runs synchronously
-  // after React commits the tree containing the new <Path> (so it's already
-  // mounted) and before paint, bounding the overlap to one frame of identical
-  // geometry. Reloaded/persisted actions never carry a liveStrokeId (it isn't
-  // serialized), so they can't trigger a spurious clear.
+  // translucent crayon/marker/paintbrush). Reloaded/persisted actions never
+  // carry a liveStrokeId (it isn't serialized), so they can't trigger a
+  // spurious clear.
+  //
+  // CRUCIAL: this clear does NOT call notifyChange(livePath). This effect runs
+  // inside the SAME React commit that adds the committed <Path> to renderPaths;
+  // the <Canvas> subtree re-reads livePath as a prop during that commit, so
+  // emptying it here coalesces into the committed render's own repaint — the
+  // committed stroke appears and the live preview empties in ONE Skia frame.
+  // Calling notifyChange would instead force a SEPARATE, earlier repaint of the
+  // emptied live path (before renderPaths has painted), leaving the stroke blank
+  // for the frames until the committed paint lands — the draw→vanish→reappear
+  // flash. So: empty the shared values, let the committed render carry the paint.
   useLayoutEffect(() => {
     const pending = pendingLiveStrokeIdRef.current;
     if (pending == null) return;
-    // A newer stroke is already in progress (lift + re-press within a frame):
-    // never wipe its live path. That stroke parks its own id on commit.
-    if (liveActive.value) {
-      pendingLiveStrokeIdRef.current = null;
-      return;
-    }
     const committed = visibleActions.some(
       (a) => a.type === "stroke" && a.liveStrokeId === pending,
     );
@@ -1250,8 +1240,7 @@ const ImageCanvas = ({
     liveXs.value = [];
     liveYs.value = [];
     liveForces.value = [];
-    notifyChange(livePath);
-  }, [visibleActions, livePath, liveXs, liveYs, liveForces, liveActive]);
+  }, [visibleActions, livePath, liveXs, liveYs, liveForces]);
 
   // Compute fill layer image (SVG + all fill/magic-fill actions baked in)
   const { fillLayerImage } = useFillLayer(svg, svgDimensions, visibleActions);
