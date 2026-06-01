@@ -437,8 +437,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    paddingTop: 12,
-    paddingHorizontal: 16,
+    paddingTop: 20,
+    // Match production sheet (web parity ~28px edge→tools).
+    paddingHorizontal: 24,
     paddingBottom: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },

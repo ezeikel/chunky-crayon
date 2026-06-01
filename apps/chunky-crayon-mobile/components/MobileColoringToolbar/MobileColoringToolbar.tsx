@@ -74,7 +74,11 @@ const styles = StyleSheet.create({
     // Web parity: the drag handle lives in a roomy py-5 (20px) hit area — 20px
     // above the pill (here) + 20px below it (handle marginBottom).
     paddingTop: 20,
-    paddingHorizontal: 16,
+    // Web parity: the drawer floats mx-2 (8px) off each edge AND insets its
+    // content px-5 (20px) → ~28px from the screen edge to the tools. Our sheet
+    // docks full-width, so fold both into the horizontal padding (24px) to give
+    // the tools the same breathing room from the edges instead of crowding them.
+    paddingHorizontal: 24,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.15,
