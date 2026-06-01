@@ -1023,6 +1023,12 @@ const ImageCanvas = ({
   // brushType "eraser", rendered with a dstOut blend). Anything else pans.
   const isDrawingTool = selectedTool === "brush" || selectedTool === "eraser";
   const panGesture = Gesture.Pan()
+    // Keep tracking when the finger strays outside the canvas mid-stroke. The
+    // default cancels the gesture the moment the touch leaves the view bounds,
+    // which fired no onEnd → the stroke was left drawn-but-uncommitted and
+    // blinked. With this off, the gesture keeps delivering updates and ends
+    // (or finalizes) normally when the finger lifts.
+    .shouldCancelWhenOutside(false)
     .onStart((event) => {
       "worklet";
       if (isDrawingTool) {
@@ -1070,7 +1076,25 @@ const ImageCanvas = ({
     })
     .onEnd((event) => {
       "worklet";
-      if (isDrawingTool) {
+      // Pan/transform end (non-drawing tool). The DRAWING commit is handled in
+      // onFinalize, not here, so it runs whether the gesture ends normally OR is
+      // cancelled (finger off-canvas, pinch steals it). Committing only in onEnd
+      // left a cancelled stroke drawn-but-uncommitted → it blinked.
+      if (!isDrawingTool) {
+        savedTranslateX.value = gestureTranslateX.value;
+        savedTranslateY.value = gestureTranslateY.value;
+        runOnJS(setTranslate)(gestureTranslateX.value, gestureTranslateY.value);
+      }
+    })
+    .onFinalize((event) => {
+      "worklet";
+      // Commit the drawing stroke on ANY termination — normal end OR cancel.
+      // onFinalize always fires (unlike onEnd, which is skipped on cancel), so a
+      // stroke is never left as a lingering uncommitted live path. commitStroke
+      // early-returns for an empty buffer (tap / never-activated), so this is a
+      // no-op when there's nothing to commit. The identity-keyed useLayoutEffect
+      // then clears the live preview once the committed <Path> has rendered.
+      if (isDrawingTool && liveXs.value.length > 0) {
         const isStylus =
           (event as unknown as { pointerType?: string }).pointerType ===
           "stylus";
@@ -1080,18 +1104,6 @@ const ImageCanvas = ({
           liveForces.value,
           isStylus,
         );
-        // Do NOT clear the live preview here. Clearing it now (UI thread, this
-        // frame) races the committed stroke, which only appears several frames
-        // later via runOnJS(commitStroke) → addAction → React re-render. The
-        // gap between them is the draw→vanish→reappear flash. The live path is
-        // instead cleared by the identity-keyed useLayoutEffect below, once the
-        // committed <Path> for this exact stroke has rendered — leaving the
-        // stroke continuously on screen (at most one frame of identical-geometry
-        // overlap, never a blank frame).
-      } else {
-        savedTranslateX.value = gestureTranslateX.value;
-        savedTranslateY.value = gestureTranslateY.value;
-        runOnJS(setTranslate)(gestureTranslateX.value, gestureTranslateY.value);
       }
     });
 
