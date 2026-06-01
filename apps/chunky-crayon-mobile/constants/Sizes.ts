@@ -58,16 +58,6 @@ export const TOOLBAR = {
 export const CANVAS_COLUMN_GAP = 16;
 
 /**
- * Top offset for the side rails so their top edge lines up with the CANVAS
- * card (web aligns left rail / canvas / right rail to the same top). The
- * canvas sits below the CanvasTopBar (progress + sound/music) inside the
- * center column, so the rails — which have no bar above them — get pushed
- * down by the bar's height. Center column paddingTop (12) + CanvasTopBar
- * (knob 36 + paddingBottom 8 = 44) = 56.
- */
-export const RAIL_TOP_OFFSET = 56;
-
-/**
  * Calculate sidebar + canvas widths for the three-column coloring layout.
  *
  * Layout: [Left Sidebar] [Canvas] [Right Sidebar]

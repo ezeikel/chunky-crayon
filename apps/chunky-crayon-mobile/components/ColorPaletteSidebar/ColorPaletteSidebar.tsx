@@ -4,7 +4,6 @@ import { useCanvasStore } from "@/stores/canvasStore";
 import { COLORS } from "@/lib/design";
 import PaletteVariantPills from "@/components/coloring/PaletteVariantPills";
 import ColorSwatchGrid from "@/components/coloring/ColorSwatchGrid";
-import { RAIL_TOP_OFFSET } from "@/constants/Sizes";
 import { selectionChanged } from "@/utils/haptics";
 
 type ColorPaletteSidebarProps = {
@@ -22,8 +21,8 @@ type ColorPaletteSidebarProps = {
  *
  * The column `width` from the layout already includes the canvas gap; the
  * rail sits flush-left and the gap falls on its right via the outer padding.
- * RAIL_TOP_OFFSET pushes the card down so its top lines up with the canvas
- * card (which sits below the progress-bar row).
+ * Its top lines up with the progress-bar row (CanvasTopBar), matching web,
+ * where the bar spans between the rails and shares their top edge.
  */
 const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
   const insets = useSafeAreaInsets();
@@ -77,12 +76,14 @@ const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
 
 const styles = StyleSheet.create({
   // Outer column: fixed width (from prop), never squeezed by the flex row.
-  // The row top-aligns all columns; this rail's top is pushed down by
-  // RAIL_TOP_OFFSET so its top edge lines up with the CANVAS card (which
-  // sits below the progress-bar row), matching web. Right padding = gap.
+  // The row top-aligns all columns, and this rail's top lines up with the
+  // PROGRESS-BAR row (CanvasTopBar) — exactly as web, where the bar spans
+  // between the two rails and their tops share the bar's top edge. So the
+  // rail uses the same top padding as the canvas column (12), NOT a bar-
+  // height offset. Right padding = canvas gap.
   outer: {
     flexShrink: 0,
-    paddingTop: RAIL_TOP_OFFSET,
+    paddingTop: 12,
     paddingBottom: 12,
     paddingRight: 16,
   },

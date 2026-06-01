@@ -24,7 +24,6 @@ import {
   COLORING_MAGIC_TOOLS,
   type ColoringToolConfig,
 } from "@/lib/coloring/tools";
-import { RAIL_TOP_OFFSET } from "@/constants/Sizes";
 
 type ToolsSidebarProps = {
   /** Width of the sidebar */
@@ -363,12 +362,13 @@ const ToolsSidebar = ({
 
 const styles = StyleSheet.create({
   // Outer column: fixed width (from prop), never squeezed by the flex row.
-  // The row top-aligns all columns; RAIL_TOP_OFFSET pushes this rail down so
-  // its top lines up with the canvas card (below the progress-bar row),
-  // matching web. Left padding = canvas gap.
+  // The row top-aligns all columns, and this rail's top lines up with the
+  // PROGRESS-BAR row (CanvasTopBar) — web spans the bar between the two
+  // rails with their tops sharing the bar's top edge. Same top padding as
+  // the canvas column (12), NOT a bar-height offset. Left padding = gap.
   outer: {
     flexShrink: 0,
-    paddingTop: RAIL_TOP_OFFSET,
+    paddingTop: 12,
     paddingBottom: 12,
     paddingLeft: 16,
   },
