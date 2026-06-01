@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faChevronLeft, faStar } from "@fortawesome/pro-solid-svg-icons";
+import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 import ImageCanvas from "@/components/ImageCanvas/ImageCanvas";
 import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColoringToolbar";
 import ColoringLayout from "@/components/ColoringLayout/ColoringLayout";
@@ -64,11 +64,6 @@ const ColoringImage = () => {
   const handleBack = () => {
     router.back();
   };
-
-  const handleDone = useCallback(() => {
-    tapLight();
-    setShowActionModal(true);
-  }, []);
 
   if (isLoading) {
     return <Loading />;
@@ -131,8 +126,8 @@ const ColoringImage = () => {
             </Pressable>
 
             {/* Title — centered across the header (web centers the title).
-                flex:1 between the equal-width back + done buttons keeps it
-                centered. Progress + sound/music no longer live here; they
+                flex:1 between the back button and an equal-width spacer keeps
+                it centered. Progress + sound/music no longer live here; they
                 sit on the CanvasTopBar above the canvas (web parity). */}
             {!useCompactHeader && (
               <View style={styles.titleContainer}>
@@ -143,22 +138,16 @@ const ColoringImage = () => {
             )}
             {useCompactHeader && <View style={{ flex: 1 }} />}
 
-            {/* Done button */}
-            <Pressable
-              style={({ pressed }) => [
+            {/* Right spacer = back-button width, so the centered title stays
+                centered. Web has no Done/star button here — the terminal
+                actions (Start Over / Print / Save) live in the tools rail. */}
+            <View
+              style={[
                 styles.headerButton,
-                styles.doneButton,
                 useCompactHeader && styles.headerButtonCompact,
-                pressed && styles.headerButtonPressed,
+                styles.headerSpacer,
               ]}
-              onPress={handleDone}
-            >
-              <FontAwesomeIcon
-                icon={faStar}
-                size={useCompactHeader ? 16 : 18}
-                color="#FFFFFF"
-              />
-            </Pressable>
+            />
           </View>
         )}
 
@@ -291,10 +280,12 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     transform: [{ scale: 0.95 }],
   },
-  doneButton: {
-    backgroundColor: "#E46444", // Coral - brand color
-    shadowColor: "#E46444",
-    shadowOpacity: 0.25,
+  // Invisible right-side spacer (matches back-button width) so the centered
+  // title stays optically centered now that the Done/star button is gone.
+  headerSpacer: {
+    backgroundColor: "transparent",
+    shadowOpacity: 0,
+    elevation: 0,
   },
   titleContainer: {
     flex: 1,

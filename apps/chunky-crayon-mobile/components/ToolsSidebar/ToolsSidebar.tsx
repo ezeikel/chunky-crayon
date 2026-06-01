@@ -125,11 +125,14 @@ const ToolsSidebar = ({
     }
   };
 
-  // Web (measured): tool tiles 61px, controls 48px, action tiles 64px, 8px gap.
+  // Web (measured): tool tiles 61px, controls 48px, actions 64px, 8px gap.
+  // We render the action tiles at the tool-tile size (61) so all three fit
+  // the shared 3-column grid width (a 64px action tile would overflow it and
+  // wrap Save onto its own row).
   const gap = 8;
   const tileSize = 61;
   const controlSize = 48;
-  const actionSize = 64;
+  const actionSize = 61;
   // The 3-tile grid width keeps every row (tools, magic, brush, undo/zoom,
   // actions) aligned to the same left edge and content width.
   const gridWidth = tileSize * 3 + gap * 2;

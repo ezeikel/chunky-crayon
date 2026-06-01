@@ -137,14 +137,15 @@ const styles = StyleSheet.create({
     height: KNOB,
     justifyContent: "center",
   },
-  // Cream track with a faint inset edge so the EMPTY (0%) bar still reads as
-  // a pill on the cream page background (web uses an inset shadow; RN can't
-  // do inset box-shadow, so a hairline darker-cream border stands in).
+  // Track: web uses bg-paper-cream + an INSET shadow for depth. RN has no
+  // inset box-shadow, and a cream track on the cream page is invisible — so
+  // the empty (0%) bar uses a darker fill (#EBE3D6) + a 2px darker-cream
+  // border so it always reads as a defined pill against the page.
   track: {
     height: BAR_HEIGHT,
     borderRadius: BAR_HEIGHT / 2,
-    backgroundColor: COLORS.bgCream,
-    borderWidth: 1,
+    backgroundColor: "#EBE3D6",
+    borderWidth: 2,
     borderColor: COLORS.bgCreamDark,
     overflow: "hidden",
   },
@@ -168,7 +169,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   knobIdle: {
-    backgroundColor: COLORS.bgCream,
+    backgroundColor: COLORS.white,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
   },
   knobDone: {
     backgroundColor: COLORS.yellow,

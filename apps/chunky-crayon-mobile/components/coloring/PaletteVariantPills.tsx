@@ -45,14 +45,17 @@ const PaletteVariantPills = ({
   pillHeight = 48,
 }: PaletteVariantPillsProps) => {
   const iconSize = Math.round(pillHeight * 0.4);
-  // Each row distributes its pills evenly; with wrapping, a fractional
-  // basis keeps `columns` per row regardless of how many pills there are.
+  // Each pill is exactly 1/columns of the row, with the gap applied as
+  // per-pill padding INSIDE the slot (not row `gap`) — so `columns` × the
+  // %-basis sums to exactly 100% and never wraps. (Row `gap` + a 50% basis
+  // overflowed 100% and made the 2-up grid stack 1-per-row.)
   const basis = `${100 / columns}%` as DimensionValue;
 
   return (
     <View style={styles.row}>
-      {PALETTE_VARIANTS.map((variant) => {
+      {PALETTE_VARIANTS.map((variant, i) => {
         const isSelected = variant === selected;
+        const col = i % columns;
         return (
           <SquishyPressable
             key={variant}
@@ -61,7 +64,16 @@ const PaletteVariantPills = ({
             accessibilityRole="button"
             accessibilityLabel={PALETTE_VARIANT_LABELS[variant]}
             accessibilityState={{ selected: isSelected }}
-            style={[styles.pillSlot, { flexBasis: basis, maxWidth: basis }]}
+            style={[
+              styles.pillSlot,
+              {
+                flexBasis: basis,
+                maxWidth: basis,
+                paddingLeft: col === 0 ? 0 : GAP / 2,
+                paddingRight: col === columns - 1 ? 0 : GAP / 2,
+                marginBottom: GAP,
+              },
+            ]}
           >
             <View
               style={[
@@ -88,11 +100,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     width: "100%",
-    gap: GAP,
   },
   pillSlot: {
-    flexGrow: 1,
-    flexShrink: 1,
+    flexGrow: 0,
+    flexShrink: 0,
   },
   pillBase: {
     width: "100%",
