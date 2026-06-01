@@ -77,14 +77,27 @@ const ColorSwatchGrid = ({
 
   return (
     <View style={[styles.grid, fixed && { width: gridWidth }]}>
-      {swatches.map((swatch) => {
+      {swatches.map((swatch, i) => {
         const selected = swatch.hex.trim().toUpperCase() === selectedHex;
+        const col = i % columns;
         return (
           <View
             key={swatch.hex}
             style={[
               styles.cell,
-              fixed ? { width: cellSide, height: cellSide } : { flexBasis },
+              fixed
+                ? { width: cellSide, height: cellSide, padding: GAP / 2 }
+                : {
+                    // Flex mode: keep a clean 1/columns basis (sums to exactly
+                    // 100%, never wraps) but put the gap as half-gap padding on
+                    // INNER edges only — no outer inset, so the swatches grow
+                    // to fill the full row width like web's `gap-1.5 w-full`.
+                    flexBasis,
+                    maxWidth: flexBasis,
+                    paddingLeft: col === 0 ? 0 : GAP / 2,
+                    paddingRight: col === columns - 1 ? 0 : GAP / 2,
+                    paddingBottom: GAP,
+                  },
             ]}
           >
             <SquishyPressable
@@ -125,9 +138,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
-  cell: {
-    padding: GAP / 2,
-  },
+  // Per-cell spacing is set inline (directional for flex mode so swatches
+  // fill the full row; symmetric for fixed mode).
+  cell: {},
   // Flex mode: width fills the %-basis cell, aspectRatio keeps it square.
   pressable: {
     width: "100%",

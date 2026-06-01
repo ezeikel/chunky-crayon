@@ -3,23 +3,23 @@ import SquishyPressable from "@/components/SquishyPressable";
 import { COLORING_BRUSH_SIZES } from "@/lib/coloring/palette";
 
 /**
- * A row of 3 brush-size tiles, matching CC web's DesktopToolsSidebar
- * brush-size picker exactly (the desktop rail treatment — distinct from the
- * old chunky orange tiles):
- *  - each tile is a rounded-24 square with NO border. The web tile is a
- *    plain hover target; SELECTED = light-gray fill (#E5E7EB / gray-200) +
- *    a gray ring (gray-400). Unselected = transparent.
+ * A row of 3 brush-size tiles, matching CC web's MobileColoringDrawer +
+ * tablet ColoringToolbar brush picker exactly (both web surfaces use the
+ * SAME treatment — `size-14 rounded-coloring-card border-2`):
+ *  - each tile is a rounded-24 square with a 2px border. Unselected = white
+ *    + #F0E9DC border; SELECTED = solid orange (#E46444) fill + transparent
+ *    border + soft orange glow (web's bg-coloring-accent shadow-btn-primary).
  *  - the centered dot is the current paint `color` (web: width/height =
- *    min(radius * 2, 32)), and stays the paint colour even when selected
- *    (web does not whiten it in the desktop sidebar).
+ *    min(radius * 2, 32)); WHITE when the tile is selected so it reads on the
+ *    orange fill (web whitens it on the accent background).
  *
  * Springy press (SquishyPressable, scaleTo 0.95). The size name
  * ("Fine"/"Regular"/"Chunky") is the accessibility label.
  */
 
-// Web tokens.
-const SELECTED_BG = "#E5E7EB"; // gray-200
-const SELECTED_RING = "#9CA3AF"; // gray-400
+// Web tokens (match ToolTile.tsx).
+const ACCENT = "#E46444";
+const SURFACE_DARK = "#F0E9DC";
 const TEXT_PRIMARY = "#433A33";
 
 type BrushSizeRowProps = {
@@ -54,13 +54,18 @@ const BrushSizeRow = ({
           accessibilityState={{ selected }}
           style={{ width: tileSize, height: tileSize }}
         >
-          <View style={[styles.tileBase, selected && styles.selected]}>
+          <View
+            style={[
+              styles.tileBase,
+              selected ? styles.selected : styles.unselected,
+            ]}
+          >
             <View
               style={{
                 width: dotSize,
                 height: dotSize,
                 borderRadius: dotSize / 2,
-                backgroundColor: color,
+                backgroundColor: selected ? "#FFFFFF" : color,
               }}
             />
           </View>
@@ -76,22 +81,30 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   // Fill the fixed-size pressable parent (see ToolTile — flex:1 collapses
-  // to a sliver inside the Animated.View pressable). No border (web's
-  // desktop brush tile is borderless).
+  // to a sliver inside the Animated.View pressable).
   tileBase: {
     width: "100%",
     height: "100%",
     borderRadius: 24,
+    borderWidth: 2,
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
   },
-  // Selected = light-gray fill + gray ring (web's bg-gray-200 ring-2
-  // ring-gray-400).
+  unselected: {
+    backgroundColor: "#FFFFFF",
+    borderColor: SURFACE_DARK,
+  },
+  // Selected = solid orange fill + soft glow (web's bg-coloring-accent
+  // border-transparent shadow-btn-primary), matching the tool tiles.
   selected: {
-    backgroundColor: SELECTED_BG,
-    borderWidth: 2,
-    borderColor: SELECTED_RING,
+    backgroundColor: ACCENT,
+    borderColor: "transparent",
+    shadowColor: ACCENT,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 3,
   },
 });
 

@@ -201,8 +201,8 @@ const ToolbarContent = () => {
         />
       </View>
 
-      {/* Brush sizes + undo / redo on one row (borderless stroke glyphs). */}
-      <View style={[styles.section, styles.bottomRow]}>
+      {/* Brush sizes — own row, left-aligned (web: flex gap-2, size-14 cards). */}
+      <View style={styles.section}>
         <BrushSizeRow
           selectedRadius={brushSize}
           onSelect={(radius) => {
@@ -212,14 +212,16 @@ const ToolbarContent = () => {
           color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
           tileSize={tile}
         />
+      </View>
 
-        <View style={styles.spacer} />
-
+      {/* Undo / redo — own row below, left-aligned (web's history row:
+          flex gap-3, size-14 rounded-card bordered tiles). */}
+      <View style={[styles.section, styles.historyRow]}>
         <Pressable
           onPress={handleUndo}
           disabled={!canUndo()}
           style={[
-            styles.controlButtonBorderless,
+            styles.historyTile,
             { width: tile, height: tile },
             !canUndo() && styles.disabled,
           ]}
@@ -234,7 +236,7 @@ const ToolbarContent = () => {
           onPress={handleRedo}
           disabled={!canRedo()}
           style={[
-            styles.controlButtonBorderless,
+            styles.historyTile,
             { width: tile, height: tile },
             !canRedo() && styles.disabled,
           ]}
@@ -266,20 +268,21 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     flexShrink: 0,
   },
-  bottomRow: {
+  // Undo/redo history row — left-aligned, web's `flex gap-3`.
+  historyRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    flexWrap: "wrap",
+    gap: 12,
   },
-  spacer: {
-    flex: 1,
-  },
-  // Borderless control button (web/rail parity — undo/redo have no circle).
-  controlButtonBorderless: {
+  // Bordered rounded-card history tile (web: size-14 rounded-coloring-card
+  // border-2 border-coloring-surface-dark bg-white).
+  historyTile: {
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 24,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    backgroundColor: COLORS.white,
   },
   disabled: {
     opacity: 0.5,
