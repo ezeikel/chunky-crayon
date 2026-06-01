@@ -78,9 +78,16 @@ const ConfirmSheet = ({
   const isDestructive = tone === "destructive";
   const primaryBg = isDestructive ? COLORS.error : COLORS.crayonOrange;
 
+  // Only mount the sheet while open. `ModalBottomSheet` at index 0 is
+  // "mounted but collapsed", not unmounted — its surface peeks above the
+  // bottom edge even when closed, which read as a phantom second dialog
+  // stacked under other modals. Gating on `isOpen` removes the peek entirely;
+  // when open it sits at index 1 (content height).
+  if (!isOpen) return null;
+
   return (
     <ModalBottomSheet
-      index={isOpen ? 1 : 0}
+      index={1}
       onIndexChange={handleIndexChange}
       scrimColor="rgba(0, 0, 0, 0.5)"
     >

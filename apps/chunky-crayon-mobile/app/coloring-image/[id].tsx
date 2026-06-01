@@ -10,12 +10,13 @@ import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColo
 import ColoringLayout from "@/components/ColoringLayout/ColoringLayout";
 import MoreColoringPages from "@/components/MoreColoringPages";
 import ActionModal from "@/components/ActionModal/ActionModal";
+import ConfirmSheet from "@/components/ConfirmSheet";
 import ZoomControls from "@/components/ZoomControls/ZoomControls";
 import MuteToggle from "@/components/MuteToggle/MuteToggle";
 import ProgressIndicator from "@/components/ProgressIndicator/ProgressIndicator";
 import useColoringImage from "@/hooks/api/useColoringImage";
 import Loading from "@/components/Loading/Loading";
-import { tapLight } from "@/utils/haptics";
+import { tapHeavy, notifySuccess } from "@/utils/haptics";
 import { debugCanvasStorage } from "@/utils/canvasPersistence";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useCanvasStore } from "@/stores/canvasStore";
@@ -32,6 +33,7 @@ const ColoringImage = () => {
   const { data, isLoading } = useColoringImage(id as string);
   const [scroll, setScroll] = useState(true);
   const [showActionModal, setShowActionModal] = useState(false);
+  const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   const insets = useSafeAreaInsets();
   const { isFocusMode } = useFocusMode();
 
@@ -40,7 +42,8 @@ const ColoringImage = () => {
     useResponsiveLayout();
 
   // Get zoom state and actions from canvas store
-  const { scale, setScale, resetTransform } = useCanvasStore();
+  const { scale, setScale, resetTransform, reset, setTool, setBrushType } =
+    useCanvasStore();
 
   const handleZoomIn = useCallback(() => {
     setScale(scale * 1.2);
@@ -53,6 +56,21 @@ const ColoringImage = () => {
   const handleResetZoom = useCallback(() => {
     resetTransform();
   }, [resetTransform]);
+
+  // Start Over — the rail's refresh tile opens this confirm directly (web
+  // parity: one confirm, no "what would you like to do?" menu). Confirming
+  // clears the canvas and snaps back to the default crayon brush.
+  const handleStartOver = useCallback(() => {
+    setShowStartOverConfirm(true);
+  }, []);
+
+  const confirmStartOver = useCallback(() => {
+    tapHeavy();
+    reset();
+    setTool("brush");
+    setBrushType("crayon");
+    notifySuccess();
+  }, [reset, setTool, setBrushType]);
 
   // Debug storage on mount
   useEffect(() => {
@@ -212,6 +230,7 @@ const ColoringImage = () => {
                   onResetZoom={handleResetZoom}
                   zoom={scale}
                   onOpenActions={() => setShowActionModal(true)}
+                  onStartOver={handleStartOver}
                   renderCanvas={(area) => (
                     <View style={styles.canvasCardLandscape}>
                       <ImageCanvas
@@ -237,6 +256,7 @@ const ColoringImage = () => {
                 onResetZoom={handleResetZoom}
                 zoom={scale}
                 onOpenActions={() => setShowActionModal(true)}
+                onStartOver={handleStartOver}
                 renderCanvas={(area) => (
                   <View style={styles.canvasCardLandscape}>
                     <ImageCanvas
@@ -273,10 +293,23 @@ const ColoringImage = () => {
           )}
         </View>
 
-        {/* Action Modal */}
+        {/* Action Modal — Save / Share / My Artwork (Print & Save tiles). */}
         <ActionModal
           visible={showActionModal}
           onClose={() => setShowActionModal(false)}
+        />
+
+        {/* Start Over confirm — opened DIRECTLY by the rail's refresh tile
+            (web parity: one confirm, no actions menu in the restart path). */}
+        <ConfirmSheet
+          isOpen={showStartOverConfirm}
+          onClose={() => setShowStartOverConfirm(false)}
+          title="Start over?"
+          description="Are you sure? This will erase all your coloring!"
+          confirmLabel="Yes, Start Over"
+          cancelLabel="No, Keep It"
+          onConfirm={confirmStartOver}
+          tone="destructive"
         />
 
         {/* Bottom drawer only in the phone tier. Hidden in focus mode. */}

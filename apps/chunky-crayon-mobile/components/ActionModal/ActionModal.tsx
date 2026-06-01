@@ -13,7 +13,6 @@ import {
   faImage,
   faShare,
   faHeart,
-  faBroomWide,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import * as Sharing from "expo-sharing";
@@ -26,7 +25,6 @@ import {
 import { toast } from "@/components/Toaster";
 import { useCanvasStore } from "@/stores/canvasStore";
 import ParentalGate from "@/components/ParentalGate";
-import ConfirmSheet from "@/components/ConfirmSheet";
 import { tapLight, tapMedium, tapHeavy, notifySuccess } from "@/utils/haptics";
 
 // Transient error message kept consistent across the modal so the kid
@@ -57,9 +55,8 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
   const [showShareGate, setShowShareGate] = useState(false);
-  const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
 
-  const { captureCanvas, reset, setTool, setBrushType } = useCanvasStore();
+  const { captureCanvas } = useCanvasStore();
 
   // Save to Photos handler
   const handleSaveToPhotos = useCallback(async () => {
@@ -214,21 +211,6 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
     }
   }, [captureCanvas, onClose]);
 
-  // Start Over handler
-  const handleStartOver = useCallback(() => {
-    tapLight();
-    setShowStartOverConfirm(true);
-  }, []);
-
-  const confirmStartOver = useCallback(() => {
-    tapHeavy();
-    reset();
-    setTool("brush");
-    setBrushType("crayon");
-    notifySuccess();
-    onClose();
-  }, [reset, setTool, setBrushType, onClose]);
-
   return (
     <Modal
       visible={visible}
@@ -299,19 +281,6 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
               <FontAwesomeIcon icon={faHeart} size={32} color="#E46444" />
               <Text style={styles.actionButtonText}>My Artwork</Text>
             </Pressable>
-
-            {/* Start Over */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.actionButton,
-                styles.startOverButton,
-                pressed && styles.buttonPressed,
-              ]}
-              onPress={handleStartOver}
-            >
-              <FontAwesomeIcon icon={faBroomWide} size={32} color="#9CA3AF" />
-              <Text style={styles.startOverText}>Start Over</Text>
-            </Pressable>
           </View>
         </View>
       </BlurView>
@@ -323,18 +292,6 @@ const ActionModal = ({ visible, onClose }: ActionModalProps) => {
         onSuccess={handleShareConfirmed}
         title="Share Artwork"
         subtitle="A parent or guardian needs to verify before sharing"
-      />
-
-      {/* Start Over confirmation */}
-      <ConfirmSheet
-        isOpen={showStartOverConfirm}
-        onClose={() => setShowStartOverConfirm(false)}
-        title="Start over?"
-        description="Are you sure? This will erase all your coloring!"
-        confirmLabel="Yes, Start Over"
-        cancelLabel="No, Keep It"
-        onConfirm={confirmStartOver}
-        tone="destructive"
       />
     </Modal>
   );
@@ -404,16 +361,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#E46444",
-    fontFamily: "TondoTrial-Bold",
-  },
-  startOverButton: {
-    backgroundColor: "#F9FAFB", // Light gray
-    borderColor: "#D1D5DB",
-  },
-  startOverText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#9CA3AF",
     fontFamily: "TondoTrial-Bold",
   },
   buttonPressed: {

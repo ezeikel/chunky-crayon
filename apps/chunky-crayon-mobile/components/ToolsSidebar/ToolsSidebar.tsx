@@ -36,8 +36,15 @@ type ToolsSidebarProps = {
   zoom?: number;
   minZoom?: number;
   maxZoom?: number;
-  /** Opens the action sheet (Save / Share / Start Over). */
+  /** Opens the action sheet (Save / Share / My Artwork) — Print & Save tiles. */
   onOpenActions?: () => void;
+  /**
+   * Opens the Start Over confirm DIRECTLY (web parity: the refresh tile is its
+   * own button that goes straight to one confirm, not through the actions
+   * menu). Kept separate from `onOpenActions` so Start Over never routes
+   * through the "What would you like to do?" menu.
+   */
+  onStartOver?: () => void;
   /**
    * When the whole screen already scrolls (portrait three-column, with a
    * More-pages strip below), the rail must NOT scroll/height-cap internally —
@@ -73,6 +80,7 @@ const ToolsSidebar = ({
   minZoom = 0.5,
   maxZoom = 4,
   onOpenActions,
+  onStartOver,
   scrollable = false,
 }: ToolsSidebarProps) => {
   const insets = useSafeAreaInsets();
@@ -312,16 +320,17 @@ const ToolsSidebar = ({
           </View>
           <Text style={styles.zoomPercentage}>{Math.round(zoom * 100)}%</Text>
 
-          {/* Actions — Start Over / Print / Save (web's actions slot). All
-              open the action sheet which performs save/share/start-over. */}
-          {onOpenActions && (
+          {/* Actions — Start Over / Print / Save (web's actions slot). Each is
+              its own button (web parity): Start Over goes STRAIGHT to one
+              confirm; Print & Save open the actions sheet. */}
+          {(onOpenActions || onStartOver) && (
             <>
               <View style={styles.divider} />
               <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
                 <Pressable
                   onPress={() => {
                     tapLight();
-                    onOpenActions();
+                    onStartOver?.();
                   }}
                   style={[
                     styles.actionTile,
@@ -338,7 +347,7 @@ const ToolsSidebar = ({
                 <Pressable
                   onPress={() => {
                     tapLight();
-                    onOpenActions();
+                    onOpenActions?.();
                   }}
                   style={[
                     styles.actionTile,
@@ -355,7 +364,7 @@ const ToolsSidebar = ({
                 <Pressable
                   onPress={() => {
                     tapLight();
-                    onOpenActions();
+                    onOpenActions?.();
                   }}
                   style={[
                     styles.actionTile,

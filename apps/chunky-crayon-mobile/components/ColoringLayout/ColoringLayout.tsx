@@ -21,8 +21,10 @@ type ColoringLayoutProps = {
   onZoomOut?: () => void;
   onResetZoom?: () => void;
   zoom?: number;
-  /** Opens the action sheet (Save / Share / Start Over) from the tools rail. */
+  /** Opens the action sheet (Save / Share / My Artwork) from the tools rail. */
   onOpenActions?: () => void;
+  /** Opens the Start Over confirm directly from the rail's refresh tile. */
+  onStartOver?: () => void;
   /**
    * When the layout is rendered inside a vertical ScrollView (portrait
    * three-column, where a "More Coloring Pages" strip sits below), the
@@ -56,6 +58,7 @@ const ColoringLayout = ({
   onResetZoom,
   zoom = 1,
   onOpenActions,
+  onStartOver,
   scrollable = false,
 }: ColoringLayoutProps) => {
   const tier = getColoringTier(width);
@@ -86,6 +89,7 @@ const ColoringLayout = ({
           onResetZoom={onResetZoom}
           zoom={zoom}
           onOpenActions={onOpenActions}
+          onStartOver={onStartOver}
         />
       </View>
     );
