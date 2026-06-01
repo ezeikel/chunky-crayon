@@ -24,7 +24,7 @@ import {
   notifyWarning,
   selectionChanged,
 } from "@/utils/haptics";
-import { faFloppyDisk, faShareNodes } from "@fortawesome/pro-solid-svg-icons";
+import { faFloppyDisk } from "@fortawesome/pro-solid-svg-icons";
 import ActionSheet from "@/components/ActionSheet";
 
 /**
@@ -125,8 +125,8 @@ const ActionRow = () => {
       >
         <Text style={styles.reopenText}>Open action sheet</Text>
       </Pressable>
-      {/* The Save ActionSheet — the richest of the per-action sheets (header
-          icon, Share secondary, green ✓). Side effects are inert here. */}
+      {/* The Save ActionSheet (icon-led bottom sheet, green ✓). Print / My
+          Artwork use the same component with other icons. Inert here. */}
       <ActionSheet
         isOpen={open}
         onClose={() => setOpen(false)}
@@ -134,12 +134,6 @@ const ActionRow = () => {
         title="Save your picture?"
         confirmLabel="Save to photos"
         onConfirm={() => setOpen(false)}
-        extraAction={{
-          icon: faShareNodes,
-          label: "Share artwork",
-          tone: "primary",
-          onPress: () => setOpen(false),
-        }}
       />
     </View>
   );

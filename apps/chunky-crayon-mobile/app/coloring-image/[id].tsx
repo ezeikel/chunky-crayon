@@ -9,10 +9,12 @@ import {
   faFloppyDisk,
   faPrint,
   faHeart,
-  faShareNodes,
 } from "@fortawesome/pro-solid-svg-icons";
 import * as Sharing from "expo-sharing";
-import * as MediaLibrary from "expo-media-library";
+// SDK 56: the root expo-media-library save/permission methods throw a
+// deprecation error at call time — the working API is the legacy subpath
+// (same pattern as expo-file-system/legacy below).
+import * as MediaLibrary from "expo-media-library/legacy";
 import {
   cacheDirectory,
   writeAsStringAsync,
@@ -25,7 +27,6 @@ import ColoringLayout from "@/components/ColoringLayout/ColoringLayout";
 import MoreColoringPages from "@/components/MoreColoringPages";
 import ActionSheet from "@/components/ActionSheet";
 import ConfirmSheet from "@/components/ConfirmSheet";
-import ParentalGate from "@/components/ParentalGate";
 import ZoomControls from "@/components/ZoomControls/ZoomControls";
 import MuteToggle from "@/components/MuteToggle/MuteToggle";
 import ProgressIndicator from "@/components/ProgressIndicator/ProgressIndicator";
@@ -55,9 +56,7 @@ const ColoringImage = () => {
   const [showSaveSheet, setShowSaveSheet] = useState(false);
   const [showPrintSheet, setShowPrintSheet] = useState(false);
   const [showMyArtworkSheet, setShowMyArtworkSheet] = useState(false);
-  const [showShareGate, setShowShareGate] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const insets = useSafeAreaInsets();
   const { isFocusMode } = useFocusMode();
@@ -110,7 +109,6 @@ const ColoringImage = () => {
   // Transient feedback goes to sonner toasts (never inline blocks). Ported
   // from the retired combined ActionModal + the legacy SaveButton PDF flow.
   const SAVE_FAIL_MSG = "Couldn't save your artwork. Please try again.";
-  const SHARE_FAIL_MSG = "Couldn't share your artwork. Please try again.";
   const PRINT_FAIL_MSG = "Couldn't make a PDF to print. Please try again.";
   const CAPTURE_FAIL_MSG = "Couldn't capture your artwork.";
 
@@ -189,53 +187,6 @@ const ColoringImage = () => {
       toast.error(SAVE_FAIL_MSG);
     } finally {
       setIsSaving(false);
-    }
-  }, [captureCanvas, id]);
-
-  // Share — gated behind a ParentalGate (parent-gate-on-share rule).
-  const handleSharePress = useCallback(() => {
-    if (isSharing) return;
-    if (!captureCanvas) {
-      toast.error(SHARE_FAIL_MSG);
-      return;
-    }
-    tapLight();
-    setShowShareGate(true);
-  }, [captureCanvas, isSharing]);
-
-  const handleShareConfirmed = useCallback(async () => {
-    setShowShareGate(false);
-    if (!captureCanvas) {
-      toast.error(SHARE_FAIL_MSG);
-      return;
-    }
-    setIsSharing(true);
-    try {
-      const dataUrl = captureCanvas();
-      if (!dataUrl) {
-        toast.error(CAPTURE_FAIL_MSG);
-        return;
-      }
-      const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, "");
-      const filePath = `${cacheDirectory}chunky-crayon-${id}.png`;
-      await writeAsStringAsync(filePath, base64Data, {
-        encoding: EncodingType.Base64,
-      });
-      if (await Sharing.isAvailableAsync()) {
-        tapMedium();
-        await Sharing.shareAsync(filePath, {
-          mimeType: "image/png",
-          dialogTitle: "Share your artwork",
-        });
-        setShowSaveSheet(false);
-      } else {
-        toast.error("Sharing isn't available on this device.");
-      }
-    } catch (error) {
-      console.error("Share error:", error);
-      toast.error(SHARE_FAIL_MSG);
-    } finally {
-      setIsSharing(false);
     }
   }, [captureCanvas, id]);
 
@@ -517,12 +468,6 @@ const ColoringImage = () => {
           confirmLabel="Save to photos"
           onConfirm={handleSaveToPhotos}
           loading={isSaving}
-          extraAction={{
-            icon: faShareNodes,
-            label: "Share artwork",
-            tone: "primary",
-            onPress: handleSharePress,
-          }}
         />
 
         {/* Print — build a PDF (line art + QR) and open the print/share sheet. */}
@@ -547,15 +492,6 @@ const ColoringImage = () => {
           confirmLabel="Add to my collection"
           onConfirm={handleMyArtwork}
           loading={isSaving}
-        />
-
-        {/* Parental gate for Share (parent-gate-on-share rule). */}
-        <ParentalGate
-          visible={showShareGate}
-          onClose={() => setShowShareGate(false)}
-          onSuccess={handleShareConfirmed}
-          title="Share Artwork"
-          subtitle="A parent or guardian needs to verify before sharing"
         />
 
         {/* Start Over confirm — opened DIRECTLY by the rail's refresh tile
