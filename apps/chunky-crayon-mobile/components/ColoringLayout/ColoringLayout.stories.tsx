@@ -447,12 +447,14 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   phoneSheetHandle: {
+    // Match the production handle (web parity): 56x5 cream pill, 20px gap.
     alignSelf: "center",
-    backgroundColor: "#D1D5DB",
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    marginBottom: 8,
+    backgroundColor: COLORS.bgCreamDark,
+    width: 56,
+    height: 5,
+    borderRadius: 2.5,
+    marginTop: 20,
+    marginBottom: 20,
   },
   canvas: {
     flex: 1,

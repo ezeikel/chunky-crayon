@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomSheet } from "@swmansion/react-native-bottom-sheet";
+import { COLORS } from "@/lib/design";
 import ToolbarContent from "./ToolbarContent";
 
 /**
@@ -70,9 +71,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    // Generous gap above the handle (web parity — the drag handle has a roomy
-    // py-5 hit area before any content).
-    paddingTop: 16,
+    // Web parity: the drag handle lives in a roomy py-5 (20px) hit area — 20px
+    // above the pill (here) + 20px below it (handle marginBottom).
+    paddingTop: 20,
     paddingHorizontal: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },
@@ -82,12 +83,18 @@ const styles = StyleSheet.create({
   },
   handleIndicator: {
     alignSelf: "center",
-    backgroundColor: "#D1D5DB",
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    // Roomy gap between the handle and the content below it (web parity).
-    marginBottom: 16,
+    // Web: w-14 h-[5px] rounded-full bg-coloring-surface-dark/80 + a soft
+    // shadow that gives the faint cream pill just enough definition.
+    backgroundColor: COLORS.bgCreamDark,
+    width: 56,
+    height: 5,
+    borderRadius: 2.5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    // 20px gap below the handle before the content (the other half of py-5).
+    marginBottom: 20,
   },
 });
 
