@@ -9,12 +9,6 @@ import {
   forwardRef,
   useImperativeHandle,
 } from 'react';
-import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faWandMagicSparkles,
-  faSpinnerThird,
-} from '@fortawesome/pro-duotone-svg-icons';
 import { ColoringImage } from '@one-colored-pixel/db/types';
 import { ImageCanvas, ImageCanvasHandle } from '@one-colored-pixel/coloring-ui';
 import TapPromptOverlay from '@/components/TapPromptOverlay';
@@ -155,15 +149,21 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       paletteVariant,
       pushToHistory,
       setMagicReady,
+      setMagicStatus,
+      setOnMagicRetry,
     } = useColoringContext();
     const { playSound, loadAmbient, playAmbient, stopAmbient } = useSound();
 
     // Surface region-store readiness to the toolbars so the magic-brush /
     // auto-color buttons disable + spin until the pre-computed region store
-    // is available. 'ready' = usable; 'waiting'/'retrying'/'timeout' = not.
+    // is available. magicReady = usable boolean (disable/tap guard);
+    // magicStatus = the finer state the tiles render (spinner while
+    // waiting/retrying, a tap-to-retry arrow on timeout — this replaces the
+    // old floating "Wake me up!" card).
     useEffect(() => {
       setMagicReady(regionStoreStatus === 'ready');
-    }, [regionStoreStatus, setMagicReady]);
+      setMagicStatus(regionStoreStatus);
+    }, [regionStoreStatus, setMagicReady, setMagicStatus]);
 
     // Parse region-aware fill points (preferred) and grid color map (fallback)
     const parsedFillPoints = useMemo<FillPointsData | null>(() => {
@@ -401,6 +401,15 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         setRegionStoreStatus('timeout');
       }
     }, [coloringImage.id, router]);
+
+    // Expose the retry to the magic tiles via context — tapping a magic tile
+    // in the 'timeout' state fires this (replacing the old "Wake me up!" card).
+    // Functional-update form so the state setter stores the callback rather
+    // than treating it as an updater.
+    useEffect(() => {
+      setOnMagicRetry(() => handleRegionStoreRetry);
+      return () => setOnMagicRetry(undefined);
+    }, [handleRegionStoreRetry, setOnMagicRetry]);
 
     // Handle first canvas interaction - load and play ambient sound
     // NOTE: Browser autoplay policy requires user interaction before audio can play - we cannot auto-play on page load
@@ -1378,81 +1387,10 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             </div>
           )}
 
-          {/* Region-store wait banner. Surfaces after ~4.5 min of
-           * polling for the worker's region store. Matches the
-           * on-canvas sidebars (white/95 backdrop-blur surface,
-           * paper-cream-dark border, FA duotone, font-tondo) but
-           * scaled up to a clear tap target — 80px Colo, gentle pulse
-           * + halo to draw the eye, big magic-wand button. Almost no
-           * copy for 3-8 year olds. */}
-          {regionStoreStatus === 'timeout' && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-              <div className="relative pointer-events-auto">
-                {/* Soft pulsing halo so the card draws attention without
-                 * shouting — same idea as the bouncy mic on the create
-                 * form's idle state. */}
-                <div className="absolute inset-0 rounded-3xl bg-crayon-orange/20 animate-ping" />
-                <button
-                  type="button"
-                  onClick={handleRegionStoreRetry}
-                  className="relative flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-3xl border-2 border-paper-cream-dark pl-3 pr-4 py-2.5 shadow-lg hover:shadow-btn-primary hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
-                >
-                  <Image
-                    src="/images/colo.svg"
-                    alt=""
-                    width={56}
-                    height={56}
-                    className="size-14 animate-bounce"
-                  />
-                  <div className="flex flex-col items-start gap-0.5">
-                    <span className="font-tondo font-bold text-base text-text-primary leading-tight">
-                      Wake me up!
-                    </span>
-                    <div className="flex items-center gap-1.5 rounded-full bg-btn-orange px-3 py-1 shadow-btn-primary">
-                      <FontAwesomeIcon
-                        icon={faWandMagicSparkles}
-                        className="text-sm"
-                        style={
-                          {
-                            '--fa-primary-color': 'white',
-                            '--fa-secondary-color': 'white',
-                            '--fa-secondary-opacity': '0.7',
-                          } as React.CSSProperties
-                        }
-                      />
-                      <span className="font-tondo font-bold text-xs text-white">
-                        Tap
-                      </span>
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          )}
-          {regionStoreStatus === 'retrying' && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20">
-              <div className="flex items-center gap-3 bg-white/95 backdrop-blur-sm rounded-3xl border-2 border-paper-cream-dark pl-3 pr-4 py-2.5 shadow-lg">
-                <Image
-                  src="/images/colo.svg"
-                  alt=""
-                  width={56}
-                  height={56}
-                  className="size-14"
-                />
-                <FontAwesomeIcon
-                  icon={faSpinnerThird}
-                  className="text-2xl animate-spin"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                      '--fa-secondary-color': 'hsl(var(--crayon-pink))',
-                      '--fa-secondary-opacity': '0.6',
-                    } as React.CSSProperties
-                  }
-                />
-              </div>
-            </div>
-          )}
+          {/* (The region-store timeout/retrying state is now surfaced ON the
+              magic tiles themselves — spinner while loading, a tap-to-retry
+              arrow on timeout — via magicStatus/onMagicRetry in context. The
+              old floating "Wake me up!" + retrying cards were removed.) */}
 
           {/* Magic overlay — only shown on the LEGACY warm-up path
            * (on-demand fill-points gen / 5×5 colour-map generation for

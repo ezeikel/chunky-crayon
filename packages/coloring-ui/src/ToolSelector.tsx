@@ -17,6 +17,8 @@ import {
   faBoltLightning,
   faStar,
   faEyeDropper,
+  faRotateRight,
+  faSpinnerThird,
 } from "@fortawesome/pro-duotone-svg-icons";
 
 type ToolSelectorProps = {
@@ -152,6 +154,8 @@ const ToolSelector = ({
     setBrushType,
     variant,
     magicReady,
+    magicStatus,
+    onMagicRetry,
   } = useColoringContext();
   const { playSound } = useSound();
 
@@ -251,32 +255,62 @@ const ToolSelector = ({
         const isActive = isToolActive(id);
 
         if (isMagic) {
-          // Magic tools depend on the pre-computed region store. While
-          // it's still being written (`!magicReady`) the button is
-          // disabled and shows a spinner in place of the icon — it reads
-          // as "getting ready" rather than broken.
+          // Magic tools depend on the pre-computed region store. Region-store
+          // states drive the tile: loading → spinner ("getting ready");
+          // timeout → tap-to-retry arrow (re-kicks the worker, replacing the
+          // old "Wake me up!" card); ready → the tool icon + sparkle.
+          const isRegionLoading =
+            magicStatus === "waiting" || magicStatus === "retrying";
+          const isRegionTimeout = magicStatus === "timeout";
           return (
             <button
               type="button"
               key={id}
-              onClick={() => handleToolSelect(id)}
-              disabled={!magicReady}
+              onClick={
+                isRegionTimeout
+                  ? () => onMagicRetry?.()
+                  : () => handleToolSelect(id)
+              }
+              disabled={isRegionLoading}
               className={cn(
                 "relative flex items-center justify-center rounded-coloring-card size-10 sm:size-12 transition-all duration-coloring-base ease-coloring",
                 "focus:outline-none focus:ring-2 focus:ring-coloring-magic-from",
-                magicReady && "active:scale-95",
-                isActive
+                !isRegionLoading && "active:scale-95",
+                isActive || isRegionLoading
                   ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
                   : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
-                !magicReady && "cursor-not-allowed opacity-60",
+                isRegionLoading && "cursor-not-allowed opacity-60",
               )}
-              aria-label={magicReady ? label : `${label} (getting ready)`}
-              title={magicReady ? label : `${label} — getting ready…`}
+              aria-label={
+                isRegionTimeout
+                  ? `${label} (tap to try again)`
+                  : isRegionLoading
+                    ? `${label} (getting ready)`
+                    : label
+              }
+              title={
+                isRegionTimeout
+                  ? `${label} — tap to try again`
+                  : isRegionLoading
+                    ? `${label} — getting ready…`
+                    : label
+              }
               aria-pressed={isActive}
-              aria-busy={!magicReady}
+              aria-busy={isRegionLoading}
               data-testid={`tool-${id}`}
             >
-              {magicReady ? (
+              {isRegionLoading ? (
+                <FontAwesomeIcon
+                  icon={faSpinnerThird}
+                  className="size-5 sm:size-6 animate-spin"
+                  aria-hidden
+                />
+              ) : isRegionTimeout ? (
+                <FontAwesomeIcon
+                  icon={faRotateRight}
+                  className="size-5 sm:size-6"
+                />
+              ) : (
                 <>
                   <Icon className="size-5 sm:size-6" />
                   <FontAwesomeIcon
@@ -288,14 +322,6 @@ const ToolSelector = ({
                     aria-hidden
                   />
                 </>
-              ) : (
-                <span
-                  className={cn(
-                    "size-5 sm:size-6 rounded-full border-2 animate-spin",
-                    "border-coloring-magic-from/30 border-t-coloring-magic-from",
-                  )}
-                  aria-hidden
-                />
               )}
             </button>
           );

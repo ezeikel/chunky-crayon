@@ -18,6 +18,8 @@ import {
   faPaintRoller,
   faFillDrip,
   faSparkles,
+  faRotateRight,
+  faSpinnerThird,
   faEraser,
   faStar,
   faBrush,
@@ -237,6 +239,8 @@ const MobileColoringDrawer = ({
     selectedPattern,
     paletteVariant,
     magicReady,
+    magicStatus,
+    onMagicRetry,
     setActiveTool,
     setBrushType,
     setSelectedColor,
@@ -654,34 +658,56 @@ const MobileColoringDrawer = ({
                     {visibleTools.map((tool) => {
                       const isActive = isToolActive(tool.id);
                       if (tool.isMagic) {
-                        // Magic tools — purple→pink gradient background +
-                        // sparkle decoration, mirroring desktop. Disabled
-                        // with a spinner until the region store is ready.
+                        // Magic tools — purple→pink gradient + sparkle, mirroring
+                        // desktop. Region-store states drive the tile: loading →
+                        // spinner; timeout → tap-to-retry arrow (re-kicks the
+                        // worker, replacing the old "Wake me up!" card); ready →
+                        // the tool icon.
+                        const isRegionLoading =
+                          magicStatus === "waiting" ||
+                          magicStatus === "retrying";
+                        const isRegionTimeout = magicStatus === "timeout";
                         return (
                           <button
                             key={tool.id}
                             type="button"
-                            onClick={() => handleToolSelect(tool.id)}
-                            disabled={!magicReady}
+                            onClick={
+                              isRegionTimeout
+                                ? () => onMagicRetry?.()
+                                : () => handleToolSelect(tool.id)
+                            }
+                            disabled={isRegionLoading}
                             className={cn(
                               "relative aspect-square w-full rounded-coloring-card",
                               "flex items-center justify-center",
                               "transition-all duration-coloring-base ease-coloring",
-                              magicReady && "active:scale-95",
-                              isActive
+                              !isRegionLoading && "active:scale-95",
+                              isActive || isRegionLoading
                                 ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white"
                                 : "bg-gradient-to-br from-coloring-magic-from/10 to-coloring-magic-to/10 text-coloring-magic-from",
-                              !magicReady && "cursor-not-allowed opacity-60",
+                              isRegionLoading &&
+                                "cursor-not-allowed opacity-60",
                             )}
                             aria-label={
-                              magicReady
-                                ? tool.label
-                                : `${tool.label} (getting ready)`
+                              isRegionTimeout
+                                ? `${tool.label} (tap to try again)`
+                                : isRegionLoading
+                                  ? `${tool.label} (getting ready)`
+                                  : tool.label
                             }
                             aria-pressed={isActive}
-                            aria-busy={!magicReady}
+                            aria-busy={isRegionLoading}
                           >
-                            {magicReady ? (
+                            {isRegionLoading ? (
+                              <FontAwesomeIcon
+                                icon={faSpinnerThird}
+                                size="xl"
+                                className="animate-spin"
+                                aria-hidden
+                              />
+                            ) : isRegionTimeout ? (
+                              <FontAwesomeIcon icon={faRotateRight} size="xl" />
+                            ) : (
                               <>
                                 <FontAwesomeIcon icon={tool.icon} size="xl" />
                                 <FontAwesomeIcon
@@ -696,14 +722,6 @@ const MobileColoringDrawer = ({
                                   )}
                                 />
                               </>
-                            ) : (
-                              <span
-                                className={cn(
-                                  "size-6 rounded-full border-2 animate-spin",
-                                  "border-coloring-magic-from/30 border-t-coloring-magic-from",
-                                )}
-                                aria-hidden
-                              />
                             )}
                           </button>
                         );

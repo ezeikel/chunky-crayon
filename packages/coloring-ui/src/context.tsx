@@ -23,6 +23,11 @@ import type { PaletteVariant } from "./types";
 /** Controls which feature set is exposed in the UI */
 export type ColoringVariant = "kids" | "adult";
 
+// Magic-tool region-store status. 'ready' = usable; 'waiting'/'retrying' =
+// loading (spinner on the tile); 'timeout' = worker stalled, show a retry
+// affordance on the tile.
+export type MagicStatus = "ready" | "waiting" | "timeout" | "retrying";
+
 // Zoom/Pan constants
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 4;
@@ -126,6 +131,21 @@ type ColoringContextArgs = {
   magicReady: boolean;
   setMagicReady: Dispatch<SetStateAction<boolean>>;
 
+  // Finer-grained magic-tool status (additive to magicReady, which stays the
+  // disable/tap-guard boolean). The region store is fetched/regenerated
+  // asynchronously; the host pushes the live status so the magic tiles can
+  // show: 'ready' = usable; 'waiting'/'retrying' = spinner; 'timeout' = the
+  // worker stalled, show a retry affordance ON the tile (tap → onMagicRetry).
+  // This replaces the old floating "Wake me up!" timeout card.
+  magicStatus: MagicStatus;
+  setMagicStatus: Dispatch<SetStateAction<MagicStatus>>;
+  // Retry callback the host wires up (re-kicks the worker + resumes polling).
+  // Invoked when a magic tile is tapped in the 'timeout' state.
+  onMagicRetry?: () => void | Promise<void>;
+  setOnMagicRetry: Dispatch<
+    SetStateAction<(() => void | Promise<void>) | undefined>
+  >;
+
   // Variant — controls which feature set is exposed
   variant: ColoringVariant;
 };
@@ -194,6 +214,10 @@ export const ColoringContext = createContext<ColoringContextArgs>({
   setPaletteVariant: () => {},
   magicReady: true,
   setMagicReady: () => {},
+  magicStatus: "ready",
+  setMagicStatus: () => {},
+  onMagicRetry: undefined,
+  setOnMagicRetry: () => {},
   variant: "adult",
 });
 
@@ -279,6 +303,10 @@ export const ColoringContextProvider = ({
   // shouldn't have their magic tools blocked. The host flips this false
   // while the region store is still being written.
   const [magicReady, setMagicReady] = useState(true);
+  const [magicStatus, setMagicStatus] = useState<MagicStatus>("ready");
+  const [onMagicRetry, setOnMagicRetry] = useState<
+    (() => void | Promise<void>) | undefined
+  >(undefined);
 
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
@@ -405,6 +433,10 @@ export const ColoringContextProvider = ({
       setPaletteVariant,
       magicReady,
       setMagicReady,
+      magicStatus,
+      setMagicStatus,
+      onMagicRetry,
+      setOnMagicRetry,
       variant,
     }),
     [
@@ -441,6 +473,8 @@ export const ColoringContextProvider = ({
       hasAutoColored,
       paletteVariant,
       magicReady,
+      magicStatus,
+      onMagicRetry,
       variant,
     ],
   );

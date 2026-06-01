@@ -13,6 +13,8 @@ import {
   faStar,
   faBrush,
   faHand,
+  faRotateRight,
+  faSpinnerThird,
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CanvasAction, useColoringContext } from "./context";
@@ -50,6 +52,10 @@ type ToolConfig = {
 export type DesktopToolsSidebarLabels = Partial<Record<ToolId, string>> & {
   magicColoring?: string;
   autoColorDone?: string;
+  /** Magic tile while the region store is still loading (spinner). */
+  magicLoading?: string;
+  /** Magic tile after the region store timed out (tap-to-retry arrow). */
+  magicRetry?: string;
   brushSize?: Partial<Record<BrushSize, string>>;
   undo?: string;
   redo?: string;
@@ -239,6 +245,8 @@ const DesktopToolsSidebar = ({
     maxZoom,
     isAutoColoring,
     hasAutoColored,
+    magicStatus,
+    onMagicRetry,
   } = useColoringContext();
   const { playSound } = useSound();
 
@@ -391,59 +399,80 @@ const DesktopToolsSidebar = ({
             const isAutoColorBtn = id === "magic-auto";
             const showSpinner = isAutoColorBtn && isAutoColoring;
             const isAutoColorDone = isAutoColorBtn && hasAutoColored;
+            // Region-store states (worker writing the magic-color data). While
+            // it's loading the magic tools can't work; on timeout the tile
+            // becomes a tap-to-retry that re-kicks the worker (replaces the
+            // old floating "Wake me up!" card).
+            const isRegionLoading =
+              magicStatus === "waiting" || magicStatus === "retrying";
+            const isRegionTimeout = magicStatus === "timeout";
             const label = labels[id] ?? defaultLabel;
             const spinnerLabel = labels.magicColoring ?? "Coloring…";
             const doneLabel = labels.autoColorDone ?? "Auto colored";
+            const loadingLabel = labels.magicLoading ?? "Getting ready…";
+            const retryLabel = labels.magicRetry ?? "Tap to try again";
+            const tileLabel = isRegionTimeout
+              ? retryLabel
+              : isRegionLoading
+                ? loadingLabel
+                : showSpinner
+                  ? spinnerLabel
+                  : isAutoColorDone
+                    ? doneLabel
+                    : label;
             return (
               <button
                 type="button"
                 key={id}
-                onClick={() => handleToolSelect(id)}
-                disabled={showSpinner || isAutoColorDone}
+                onClick={
+                  isRegionTimeout
+                    ? () => onMagicRetry?.()
+                    : () => handleToolSelect(id)
+                }
+                disabled={showSpinner || isAutoColorDone || isRegionLoading}
                 className={cn(
                   "relative flex items-center justify-center rounded-coloring-card border transition-all duration-coloring-base ease-coloring",
                   tileSize,
                   "active:scale-95 focus:outline-none focus:ring-2 focus:ring-coloring-magic-from",
                   "disabled:cursor-not-allowed disabled:opacity-50",
-                  isActive || showSpinner
+                  isActive || showSpinner || isRegionLoading
                     ? "bg-gradient-to-br from-coloring-magic-from to-coloring-magic-to text-white border-transparent"
                     : isAutoColorDone
                       ? "bg-gray-100 text-gray-400 border-gray-200"
                       : "bg-gradient-to-br from-coloring-magic-from/20 to-coloring-magic-to/20 text-coloring-magic-from border-coloring-magic-from/30 hover:from-coloring-magic-from/30 hover:to-coloring-magic-to/30",
                 )}
-                aria-label={
-                  showSpinner
-                    ? spinnerLabel
-                    : isAutoColorDone
-                      ? doneLabel
-                      : label
-                }
-                title={
-                  showSpinner
-                    ? spinnerLabel
-                    : isAutoColorDone
-                      ? doneLabel
-                      : label
-                }
+                aria-label={tileLabel}
+                title={tileLabel}
                 aria-pressed={isActive}
+                aria-busy={isRegionLoading || showSpinner}
                 data-testid={`tool-${id}`}
               >
-                {showSpinner ? (
-                  <div className="size-10 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                {showSpinner || isRegionLoading ? (
+                  <FontAwesomeIcon
+                    icon={faSpinnerThird}
+                    size="xl"
+                    className="animate-spin"
+                    aria-hidden
+                  />
+                ) : isRegionTimeout ? (
+                  <FontAwesomeIcon icon={faRotateRight} size="xl" />
                 ) : (
                   <FontAwesomeIcon icon={icon} size="xl" />
                 )}
-                {!showSpinner && !isAutoColorDone && (
-                  <FontAwesomeIcon
-                    icon={faSparkles}
-                    size="lg"
-                    aria-hidden
-                    className={cn(
-                      "absolute -top-2 -right-2 drop-shadow-sm",
-                      isActive ? "text-white" : "text-coloring-magic-from",
-                    )}
-                  />
-                )}
+                {!showSpinner &&
+                  !isRegionLoading &&
+                  !isRegionTimeout &&
+                  !isAutoColorDone && (
+                    <FontAwesomeIcon
+                      icon={faSparkles}
+                      size="lg"
+                      aria-hidden
+                      className={cn(
+                        "absolute -top-2 -right-2 drop-shadow-sm",
+                        isActive ? "text-white" : "text-coloring-magic-from",
+                      )}
+                    />
+                  )}
               </button>
             );
           })}
