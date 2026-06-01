@@ -157,16 +157,19 @@ const styles = StyleSheet.create({
   // sliver inside the Animated.View pressable (which isn't a definite-height
   // flex container) — fill both axes explicitly so the swatch is a full
   // round chip.
+  // Unselected: no ring overhead — the swatch fills the whole cell so the
+  // colour circle is as large as web's (web draws the selection ring OUTSIDE
+  // via box-shadow, so it never shrinks the swatch). Selected: a 2px accent
+  // ring sitting 1px off the swatch.
   ring: {
     width: "100%",
     height: "100%",
     borderRadius: 999,
-    borderWidth: 2,
-    borderColor: "transparent",
-    padding: RING_OFFSET,
   },
   ringSelected: {
+    borderWidth: 2,
     borderColor: ACCENT,
+    padding: RING_OFFSET,
   },
   swatch: {
     width: "100%",

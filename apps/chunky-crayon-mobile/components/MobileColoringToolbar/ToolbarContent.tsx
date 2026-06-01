@@ -201,7 +201,9 @@ const ToolbarContent = () => {
         />
       </View>
 
-      {/* Brush sizes — own row, left-aligned (web: flex gap-2, size-14 cards). */}
+      {/* Brush sizes — own row, left-aligned. Tiles are the SAME size as the
+          tool-grid cards (web: brush tiles match the tool tiles), so they read
+          as one consistent control language, not shrunken pills. */}
       <View style={styles.section}>
         <BrushSizeRow
           selectedRadius={brushSize}
@@ -210,25 +212,25 @@ const ToolbarContent = () => {
             setBrushSize(radius);
           }}
           color={selectedTool === "eraser" ? "#9E9E9E" : selectedColor}
-          tileSize={tile}
+          tileSize={toolTileSize}
         />
       </View>
 
       {/* Undo / redo — own row below, left-aligned (web's history row:
-          flex gap-3, size-14 rounded-card bordered tiles). */}
+          flex gap-3). Tiles match the tool-grid card size too. */}
       <View style={[styles.section, styles.historyRow]}>
         <Pressable
           onPress={handleUndo}
           disabled={!canUndo()}
           style={[
             styles.historyTile,
-            { width: tile, height: tile },
+            { width: toolTileSize, height: toolTileSize },
             !canUndo() && styles.disabled,
           ]}
           accessibilityLabel="Undo"
         >
           <UndoIcon
-            size={24}
+            size={28}
             color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
           />
         </Pressable>
@@ -237,13 +239,13 @@ const ToolbarContent = () => {
           disabled={!canRedo()}
           style={[
             styles.historyTile,
-            { width: tile, height: tile },
+            { width: toolTileSize, height: toolTileSize },
             !canRedo() && styles.disabled,
           ]}
           accessibilityLabel="Redo"
         >
           <RedoIcon
-            size={24}
+            size={28}
             color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
           />
         </Pressable>
