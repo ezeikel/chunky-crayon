@@ -58,7 +58,7 @@ const Frame = ({
   height: number;
   availableWidth: number;
 }) => {
-  const tier = getColoringTier(width);
+  const tier = getColoringTier(width, height);
   // Fit the device width into the pane (never scale UP past 1:1).
   const scale = availableWidth > 0 ? Math.min(1, availableWidth / width) : 1;
   return (
@@ -238,7 +238,7 @@ export const AllDevices: Story = {
             height={852}
             availableWidth={w}
           />
-          <Frame
+          <PhoneFrame
             label="iPhone Max landscape"
             width={852}
             height={393}
@@ -294,13 +294,15 @@ export const PhonePortrait: Story = {
   ),
 };
 
-// iPhone Max landscape (852) — now THREE-COLUMN (was middle pre-822 cutover).
-// Height-bound: the canvas clamps to the short landscape height.
+// iPhone Max landscape (852×393) — still the PHONE tier (bottom sheet), NOT
+// middle: at 393px tall, a tools-on-top toolbar would starve the canvas, so the
+// height-aware tier (height < 600) keeps the bottom sheet. Rendered via
+// PhoneFrame to mirror the real screen.
 export const PhoneLandscape: Story = {
   render: () => (
     <FittedStage>
       {(w) => (
-        <Frame
+        <PhoneFrame
           label="iPhone Max landscape"
           width={852}
           height={393}

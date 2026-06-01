@@ -86,11 +86,12 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
     ? deviceInfo.layoutMode
     : "phone-portrait";
 
-  // Width-driven coloring tier (web-matching). Feature flag off → force
-  // the phone tier (the legacy single layout), same kill-switch behavior
-  // as effectiveLayoutMode.
+  // Width-driven coloring tier (web-matching), but height-aware so a short
+  // viewport (phone landscape) drops to the bottom sheet instead of a
+  // canvas-starving toolbar-on-top. Feature flag off → force the phone tier
+  // (the legacy single layout), same kill-switch behavior as effectiveLayoutMode.
   const coloringTier: ColoringTier = responsiveLayoutEnabled
-    ? getColoringTier(deviceInfo.screenWidth)
+    ? getColoringTier(deviceInfo.screenWidth, deviceInfo.screenHeight)
     : "phone";
 
   // Compute layout decisions

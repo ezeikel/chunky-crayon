@@ -64,7 +64,7 @@ const ColoringLayout = ({
   onMyArtwork,
   scrollable = false,
 }: ColoringLayoutProps) => {
-  const tier = getColoringTier(width);
+  const tier = getColoringTier(width, height);
 
   // Measured height of the FIXED-tier canvas column (the View below the
   // CanvasTopBar). Used to CONTAIN the canvas within the real visible area so
