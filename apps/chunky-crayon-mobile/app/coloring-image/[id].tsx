@@ -10,7 +10,6 @@ import {
   faPrint,
   faHeart,
 } from "@fortawesome/pro-solid-svg-icons";
-import * as Sharing from "expo-sharing";
 // SDK 56: the root expo-media-library save/permission methods throw a
 // deprecation error at call time — the working API is the legacy subpath
 // (same pattern as expo-file-system/legacy below).
@@ -212,14 +211,11 @@ const ColoringImage = () => {
             }
           </body>
         </html>`;
-      const { uri } = await Print.printToFileAsync({ html });
-      if (await Sharing.isAvailableAsync()) {
-        tapMedium();
-        await Sharing.shareAsync(uri, {
-          mimeType: "application/pdf",
-          dialogTitle: "Print your coloring page",
-        });
-      }
+      // Open iOS's native AirPrint dialog directly (printAsync) — NOT the
+      // share sheet. A kids app shouldn't route to "share to other apps";
+      // printing to paper is fine, sharing the file out is not.
+      tapMedium();
+      await Print.printAsync({ html });
       notifySuccess();
       setShowPrintSheet(false);
     } catch (error) {
