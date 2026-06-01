@@ -142,6 +142,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Invalidate profile queries so ProfileSwitcher loads fresh data
         queryClient.invalidateQueries({ queryKey: ["profiles"] });
         queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
+        // Re-pull saved artworks: the server merge (handleMobileOAuthSignIn) just
+        // re-pointed the anon user's artworks onto this email account, so the
+        // My Art tab must refetch to show the reconciled DB rows. (Phase 3's
+        // login trigger also flushes any still-local drawings to DB right now.)
+        queryClient.invalidateQueries({ queryKey: ["savedArtworks"] });
 
         return response;
       } catch (error: unknown) {
@@ -191,6 +196,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Invalidate profile queries so ProfileSwitcher loads fresh data
         queryClient.invalidateQueries({ queryKey: ["profiles"] });
         queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
+        // Re-pull saved artworks: the server merge (handleMobileOAuthSignIn) just
+        // re-pointed the anon user's artworks onto this email account, so the
+        // My Art tab must refetch to show the reconciled DB rows. (Phase 3's
+        // login trigger also flushes any still-local drawings to DB right now.)
+        queryClient.invalidateQueries({ queryKey: ["savedArtworks"] });
 
         return response;
       } catch (error: unknown) {
@@ -248,6 +258,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Invalidate profile queries so ProfileSwitcher loads fresh data
         queryClient.invalidateQueries({ queryKey: ["profiles"] });
         queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
+        // Re-pull saved artworks: the server merge (handleMobileOAuthSignIn) just
+        // re-pointed the anon user's artworks onto this email account, so the
+        // My Art tab must refetch to show the reconciled DB rows. (Phase 3's
+        // login trigger also flushes any still-local drawings to DB right now.)
+        queryClient.invalidateQueries({ queryKey: ["savedArtworks"] });
 
         return response;
       } catch (error: unknown) {
@@ -308,6 +323,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Invalidate profile queries so ProfileSwitcher loads fresh data
         queryClient.invalidateQueries({ queryKey: ["profiles"] });
         queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
+        // Re-pull saved artworks: the server merge (handleMobileOAuthSignIn) just
+        // re-pointed the anon user's artworks onto this email account, so the
+        // My Art tab must refetch to show the reconciled DB rows. (Phase 3's
+        // login trigger also flushes any still-local drawings to DB right now.)
+        queryClient.invalidateQueries({ queryKey: ["savedArtworks"] });
 
         return response;
       } catch (error: unknown) {
@@ -336,6 +356,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Clear local tokens
       await clearAuthTokens();
 
+      // Drop the email-user's DB-backed caches so the app reverts to the
+      // anonymous "ghost" state (PTP model): the My Art tab falls back to the
+      // on-device collection, profile/user chrome resets. The local MMKV
+      // artwork store is deliberately NOT cleared — it's the device's
+      // collection and survives sign-out; the next sign-in re-pulls + dedups it.
+      queryClient.removeQueries({ queryKey: ["savedArtworks"] });
+      queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.removeQueries({ queryKey: ["profiles"] });
+      queryClient.removeQueries({ queryKey: ["activeProfile"] });
+
       // Reset state
       setIsAuthenticated(false);
       setIsLinked(false);
@@ -345,7 +375,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [queryClient]);
 
   // Periodic token validity check (every 10 minutes)
   React.useEffect(() => {

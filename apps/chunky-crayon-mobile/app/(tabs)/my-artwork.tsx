@@ -16,7 +16,8 @@ import { faPaintbrush } from "@fortawesome/pro-duotone-svg-icons";
 import { useRouter } from "expo-router";
 import AppHeader from "@/components/AppHeader";
 import useHeaderData from "@/hooks/useHeaderData";
-import { useSavedArtworks, useFeed } from "@/hooks/api";
+import { useFeed } from "@/hooks/api";
+import { useMergedArtworks } from "@/hooks/useMergedArtworks";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 
@@ -32,11 +33,12 @@ const MyArtworkScreen = () => {
   const itemWidth =
     (screenWidth - GRID_PADDING * 2 - GRID_GAP * (COLUMNS - 1)) / COLUMNS;
   const headerData = useHeaderData();
-  const { data, isLoading } = useSavedArtworks();
+  // Local-first + DB merge (Phase 4): a just-saved drawing shows instantly from
+  // the on-device store; once the background sync pushes it, the DB row dedups
+  // it back to one. Logged-out, the DB cache is empty so it's all local (ghost).
+  const { artworks, isLoading } = useMergedArtworks();
   const { data: feed } = useFeed();
   const router = useRouter();
-
-  const artworks = data?.artworks ?? [];
   // In-progress "workbench" — coloring pages the kid has started but not
   // saved. Web splits my-stuff into this workbench + the saved archive;
   // mobile mirrors that with an "In Progress" section above "Saved".
@@ -137,7 +139,7 @@ const MyArtworkScreen = () => {
       <View style={styles.grid}>
         {artworks.map((artwork) => (
           <Pressable
-            key={artwork.id}
+            key={artwork.key}
             style={({ pressed }) => [
               styles.artworkCard,
               { width: itemWidth },
@@ -146,7 +148,7 @@ const MyArtworkScreen = () => {
             onPress={() => handleArtworkPress(artwork.coloringImageId)}
           >
             <Image
-              source={{ uri: artwork.imageUrl }}
+              source={{ uri: artwork.imageUri }}
               style={styles.artworkImage}
               contentFit="cover"
               transition={200}
