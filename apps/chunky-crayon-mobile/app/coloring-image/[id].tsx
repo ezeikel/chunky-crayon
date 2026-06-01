@@ -463,7 +463,10 @@ const ColoringImage = () => {
                       sheet). Each opens its own sheet. */}
                   <View style={styles.canvasActionRow}>
                     <Pressable
-                      onPress={handleStartOver}
+                      onPress={() => {
+                        tapLight();
+                        handleStartOver();
+                      }}
                       style={styles.canvasActionTile}
                       accessibilityLabel="Start Over"
                     >
@@ -474,7 +477,10 @@ const ColoringImage = () => {
                       />
                     </Pressable>
                     <Pressable
-                      onPress={() => setShowPrintSheet(true)}
+                      onPress={() => {
+                        tapLight();
+                        setShowPrintSheet(true);
+                      }}
                       style={styles.canvasActionTile}
                       accessibilityLabel="Print"
                     >
@@ -485,7 +491,10 @@ const ColoringImage = () => {
                       />
                     </Pressable>
                     <Pressable
-                      onPress={() => setShowSaveSheet(true)}
+                      onPress={() => {
+                        tapLight();
+                        setShowSaveSheet(true);
+                      }}
                       style={styles.canvasActionTile}
                       accessibilityLabel="Save"
                     >
@@ -496,7 +505,10 @@ const ColoringImage = () => {
                       />
                     </Pressable>
                     <Pressable
-                      onPress={() => setShowMyArtworkSheet(true)}
+                      onPress={() => {
+                        tapLight();
+                        setShowMyArtworkSheet(true);
+                      }}
                       style={styles.canvasActionTile}
                       accessibilityLabel="My Artwork"
                     >

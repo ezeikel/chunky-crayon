@@ -20,15 +20,6 @@ import {
   type ColoringToolConfig,
 } from "@/lib/coloring/tools";
 
-type ToolbarContentProps = {
-  /** Action handlers — each opens its OWN sheet (web/rail parity). Zoom is NOT
-   *  here: on phone, zoom lives in the top chrome above the canvas (web). */
-  onStartOver?: () => void;
-  onPrint?: () => void;
-  onSave?: () => void;
-  onMyArtwork?: () => void;
-};
-
 /**
  * The scrollable body of the phone-tier coloring toolbar — the content of
  * the docked bottom sheet (`MobileColoringToolbar`). Rebuilt on the shared
@@ -51,12 +42,7 @@ type ToolbarContentProps = {
  * scales with device size and stays above the iOS minimum (matches the
  * other toolbars).
  */
-const ToolbarContent = ({
-  onStartOver,
-  onPrint,
-  onSave,
-  onMyArtwork,
-}: ToolbarContentProps) => {
+const ToolbarContent = () => {
   const { touchTargetSize } = useResponsiveLayout();
   const tile = touchTargetSize.medium;
   const {
