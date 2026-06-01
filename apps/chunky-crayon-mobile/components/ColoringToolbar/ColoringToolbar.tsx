@@ -48,8 +48,9 @@ const ColoringToolbar = ({
   onZoomOut,
   onResetZoom,
   zoom = 1,
+  // Match the canvas store / pinch clamp (0.5–4).
   minZoom = 0.5,
-  maxZoom = 3,
+  maxZoom = 4,
 }: ColoringToolbarProps) => {
   const insets = useSafeAreaInsets();
   const { touchTargetSize } = useResponsiveLayout();

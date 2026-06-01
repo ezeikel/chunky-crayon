@@ -1095,6 +1095,30 @@ const ImageCanvas = ({
     Gesture.Simultaneous(panGesture, pinchGesture),
   );
 
+  // Sync the store transform → Reanimated shared values that the canvas
+  // transform actually reads. The zoom/fit BUTTONS (in the tools rail) only
+  // mutate the store (setScale / resetTransform), while the on-screen
+  // transform is driven by the shared values — so without this the buttons
+  // moved the % label but never the canvas. Gestures already write BOTH the
+  // shared value and the store to the same number, so the equality guards
+  // make this a no-op after a pinch/double-tap (no feedback loop); it only
+  // fires when the store diverges from the shared value, i.e. a button press.
+  useEffect(() => {
+    if (gestureScale.value !== scale) {
+      gestureScale.value = withSpring(scale);
+      savedScale.value = scale;
+    }
+    if (gestureTranslateX.value !== translateX) {
+      gestureTranslateX.value = withSpring(translateX);
+      savedTranslateX.value = translateX;
+    }
+    if (gestureTranslateY.value !== translateY) {
+      gestureTranslateY.value = withSpring(translateY);
+      savedTranslateY.value = translateY;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scale, translateX, translateY]);
+
   // Animated style for zoom/pan
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [

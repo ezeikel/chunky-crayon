@@ -68,8 +68,10 @@ const ToolsSidebar = ({
   onZoomOut,
   onResetZoom,
   zoom = 1,
+  // Match the canvas store / pinch clamp (0.5–4) so the zoom-in button doesn't
+  // disable early at 3 while the canvas can still zoom to 4.
   minZoom = 0.5,
-  maxZoom = 3,
+  maxZoom = 4,
   onOpenActions,
   scrollable = false,
 }: ToolsSidebarProps) => {
