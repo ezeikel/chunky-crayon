@@ -46,6 +46,7 @@ export default defineConfig({
         'lib/scene/random-scene.ts',
         'lib/scene/thumbnail-url.ts',
         'lib/create/pending-creation.ts',
+        'lib/mobile-auth-credits.ts',
       ],
     },
   },

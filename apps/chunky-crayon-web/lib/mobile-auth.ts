@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { db, AgeGroup, Difficulty } from '@one-colored-pixel/db';
+import { computeMergedCredits } from './mobile-auth-credits';
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.MOBILE_AUTH_SECRET ||
@@ -147,8 +148,10 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<{
 }
 
 /**
- * Merge an anonymous user's data into a target user
- * Transfers: profiles, saved artworks, stickers, Colo progress
+ * Merge an anonymous user's data into a target user.
+ * Transfers: profiles, saved artworks, stickers, characters, canvas progress,
+ * coloring images, AND subscription + credits + credit ledger (see the
+ * transaction at the end for the revenue-critical reasoning).
  */
 async function mergeAnonymousUserIntoTarget(
   anonymousUserId: string,
@@ -214,14 +217,96 @@ async function mergeAnonymousUserIntoTarget(
     }
   }
 
-  // Delete anonymous user's stickers (already transferred)
-  await db.userSticker.deleteMany({
-    where: { userId: anonymousUserId },
-  });
+  // Carry the anon user's SUBSCRIPTION, CREDITS, ledger, and remaining
+  // anon-owned content into the target, then delete the anon user — all in ONE
+  // transaction so a partial merge can never leave credits and the
+  // subscription/ledger inconsistent.
+  //
+  // Why each move (verified against schema.prisma):
+  // - Subscription.user is `onDelete: Cascade` — WITHOUT re-pointing it, the
+  //   `user.delete` below would DESTROY the anon's paid subscription. Re-point.
+  // - CreditTransaction.user has NO onDelete (Postgres default RESTRICT) — it
+  //   BLOCKS `user.delete` with a FK error unless every row is re-pointed first.
+  //   (So the merge is actually BROKEN today for any anon who ever subscribed.)
+  // - `credits` is the live balance scalar; fold anon → target.
+  // - Character / CanvasProgress / ColoringImage are anon-owned and would be
+  //   cascade-deleted / null-orphaned on delete; re-point them.
+  //
+  // Double-grant safety: on login the client's `Purchases.logIn(emailId)` also
+  // fires a RevenueCat TRANSFER webhook. That webhook's `case 'TRANSFER'` ONLY
+  // re-points the subscription row — it grants ZERO credits (see
+  // app/api/revenuecat/webhook/route.ts). So THIS merge is the only actor that
+  // moves credits; adding anon.credits here cannot double-count. The
+  // subscription re-point is idempotent across the race: whichever of {merge,
+  // webhook} runs second matches zero rows (updateMany where userId:anon →
+  // empty once moved; the webhook's fromUser lookup → null once anon is
+  // deleted).
+  await db.$transaction(async (tx) => {
+    const [anon, target] = await Promise.all([
+      tx.user.findUniqueOrThrow({
+        where: { id: anonymousUserId },
+        select: { credits: true },
+      }),
+      tx.user.findUniqueOrThrow({
+        where: { id: targetUserId },
+        select: { credits: true },
+      }),
+    ]);
 
-  // Delete the anonymous user
-  await db.user.delete({
-    where: { id: anonymousUserId },
+    // Re-point the subscription (NOT cascade-delete it).
+    await tx.subscription.updateMany({
+      where: { userId: anonymousUserId },
+      data: { userId: targetUserId },
+    });
+
+    // Move the credit ledger (also clears the RESTRICT FK that blocks delete).
+    await tx.creditTransaction.updateMany({
+      where: { userId: anonymousUserId },
+      data: { userId: targetUserId },
+    });
+
+    // CanvasProgress has @@unique([userId, coloringImageId]); if the target
+    // already has progress for an image the anon also coloured, re-pointing
+    // would violate the unique. Target's progress wins — drop anon's colliding
+    // rows first, then re-point the rest.
+    const targetProgress = await tx.canvasProgress.findMany({
+      where: { userId: targetUserId },
+      select: { coloringImageId: true },
+    });
+    const targetImageIds = targetProgress.map((p) => p.coloringImageId);
+    if (targetImageIds.length > 0) {
+      await tx.canvasProgress.deleteMany({
+        where: {
+          userId: anonymousUserId,
+          coloringImageId: { in: targetImageIds },
+        },
+      });
+    }
+    await tx.canvasProgress.updateMany({
+      where: { userId: anonymousUserId },
+      data: { userId: targetUserId },
+    });
+
+    // Re-point other anon-owned content that would otherwise be lost on delete.
+    await tx.character.updateMany({
+      where: { userId: anonymousUserId },
+      data: { userId: targetUserId },
+    });
+    await tx.coloringImage.updateMany({
+      where: { userId: anonymousUserId },
+      data: { userId: targetUserId },
+    });
+
+    // Carry the live credit balance.
+    await tx.user.update({
+      where: { id: targetUserId },
+      data: { credits: computeMergedCredits(anon.credits, target.credits) },
+    });
+
+    // Clean up anon's stickers (already copied into target above) then delete
+    // the now FK-clean anon user (no Subscription, no CreditTransaction left).
+    await tx.userSticker.deleteMany({ where: { userId: anonymousUserId } });
+    await tx.user.delete({ where: { id: anonymousUserId } });
   });
 }
 
