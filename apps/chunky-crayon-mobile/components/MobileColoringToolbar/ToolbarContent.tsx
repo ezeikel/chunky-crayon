@@ -1,5 +1,10 @@
-import { useCallback } from "react";
-import { View, Pressable, ScrollView, StyleSheet } from "react-native";
+import { useCallback, useState } from "react";
+import {
+  View,
+  Pressable,
+  StyleSheet,
+  type LayoutChangeEvent,
+} from "react-native";
 import { COLORS } from "@/lib/design";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
@@ -42,9 +47,27 @@ import {
  * scales with device size and stays above the iOS minimum (matches the
  * other toolbars).
  */
+const TOOL_COLUMNS = 5;
+const TOOL_GAP = 8;
+
 const ToolbarContent = () => {
   const { touchTargetSize } = useResponsiveLayout();
   const tile = touchTargetSize.medium;
+
+  // Tools render as a 5-column grid (web: `grid grid-cols-5 gap-2`), tiles
+  // stretching to fill each column. Measure the row width and derive a square
+  // tile size from it so the grid fills the sheet edge-to-edge like web,
+  // rather than a fixed-size horizontal scroll row.
+  const [toolRowWidth, setToolRowWidth] = useState(0);
+  const onToolRowLayout = useCallback((e: LayoutChangeEvent) => {
+    setToolRowWidth(e.nativeEvent.layout.width);
+  }, []);
+  const toolTileSize =
+    toolRowWidth > 0
+      ? Math.floor(
+          (toolRowWidth - TOOL_GAP * (TOOL_COLUMNS - 1)) / TOOL_COLUMNS,
+        )
+      : tile;
   const {
     selectedTool,
     selectedColor,
@@ -118,36 +141,39 @@ const ToolbarContent = () => {
           1. TOOLS  2. palette-variant pills  3. colour swatches  4. brush + undo/redo.
           (No zoom — top chrome; no actions — under the canvas.) */}
 
-      {/* Tools — horizontal scroll row (regular + magic). FIRST, like web. */}
-      <View style={styles.section}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.toolRow}
-        >
-          {COLORING_REGULAR_TOOLS.map((config) => (
-            <ToolTile
-              key={config.id}
-              icon={config.icon}
-              label={config.label}
-              selected={isToolActive(config)}
-              size={tile}
-              onPress={() => handleToolSelect(config)}
-            />
-          ))}
-          {COLORING_MAGIC_TOOLS.map((config) => (
-            <ToolTile
-              key={config.id}
-              icon={config.icon}
-              label={config.label}
-              isMagic
-              selected={isToolActive(config)}
-              loading={!magicReady}
-              size={tile}
-              onPress={() => handleToolSelect(config)}
-            />
-          ))}
-        </ScrollView>
+      {/* Tools — 5-column grid (web: `grid grid-cols-5 gap-2`), 2 rows of 5
+          (8 regular + 2 magic). Tiles stretch to fill each column. FIRST,
+          like web. */}
+      <View style={styles.section} onLayout={onToolRowLayout}>
+        <View style={styles.toolGrid}>
+          {[...COLORING_REGULAR_TOOLS, ...COLORING_MAGIC_TOOLS].map(
+            (config, i) => {
+              const col = i % TOOL_COLUMNS;
+              return (
+                <View
+                  key={config.id}
+                  style={[
+                    styles.toolCell,
+                    {
+                      marginLeft: col === 0 ? 0 : TOOL_GAP,
+                      marginBottom: TOOL_GAP,
+                    },
+                  ]}
+                >
+                  <ToolTile
+                    icon={config.icon}
+                    label={config.label}
+                    isMagic={config.isMagic}
+                    selected={isToolActive(config)}
+                    loading={config.isMagic ? !magicReady : false}
+                    size={toolTileSize}
+                    onPress={() => handleToolSelect(config)}
+                  />
+                </View>
+              );
+            },
+          )}
+        </View>
       </View>
 
       {/* Palette-variant pills (4 across) */}
@@ -171,7 +197,7 @@ const ToolbarContent = () => {
             selectionChanged();
             setColor(color);
           }}
-          columns={9}
+          columns={8}
         />
       </View>
 
@@ -228,11 +254,17 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 14,
   },
-  toolRow: {
+  // 5-column tool grid (web `grid grid-cols-5`). Wraps to 2 rows of 5.
+  // Per-cell marginLeft (not row `gap`) supplies the column gap so the row
+  // sums to exactly the measured width and never wraps mid-row.
+  toolGrid: {
     flexDirection: "row",
-    gap: 8,
-    paddingVertical: 2,
-    paddingRight: 8,
+    flexWrap: "wrap",
+    width: "100%",
+  },
+  toolCell: {
+    flexGrow: 0,
+    flexShrink: 0,
   },
   bottomRow: {
     flexDirection: "row",
