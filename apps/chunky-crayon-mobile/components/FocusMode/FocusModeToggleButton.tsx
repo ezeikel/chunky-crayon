@@ -48,7 +48,7 @@ const FocusModeToggleButton = ({
       <FontAwesomeIcon
         icon={isFocusMode ? faXmark : faExpand}
         size={20}
-        color={COLORS.crayonOrange}
+        color={COLORS.textMuted}
       />
     </Pressable>
   );
@@ -61,7 +61,9 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: COLORS.borderLight,
+    // Match the zoom buttons exactly (web: border-coloring-surface-dark +
+    // text-coloring-muted) so all three controls in the pill are identical.
+    borderColor: COLORS.bgCreamDark,
     alignItems: "center",
     justifyContent: "center",
   },
