@@ -1,0 +1,25 @@
+{
+  "name": "flood-fill",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Local Nitro module: off-thread scanline flood fill over an owning RGBA buffer.",
+  "main": "src/index.ts",
+  "files": [
+    "src",
+    "cpp",
+    "android",
+    "nitrogen/generated",
+    "nitro.json",
+    "FloodFill.podspec"
+  ],
+  "peerDependencies": {
+    "react-native": "*",
+    "react-native-nitro-modules": "*"
+  },
+  "nitro": {
+    "platforms": {
+      "ios": "c++",
+      "android": "c++"
+    }
+  }
+}
