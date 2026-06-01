@@ -8,6 +8,7 @@ import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 import ImageCanvas from "@/components/ImageCanvas/ImageCanvas";
 import MobileColoringToolbar from "@/components/MobileColoringToolbar/MobileColoringToolbar";
 import ColoringLayout from "@/components/ColoringLayout/ColoringLayout";
+import MoreColoringPages from "@/components/MoreColoringPages";
 import ActionModal from "@/components/ActionModal/ActionModal";
 import ZoomControls from "@/components/ZoomControls/ZoomControls";
 import MuteToggle from "@/components/MuteToggle/MuteToggle";
@@ -83,6 +84,15 @@ const ColoringImage = () => {
   // `isLandscapeLayout` = "not phone": the compact header + in-header
   // controls apply to both non-phone tiers.
   const isLandscapeLayout = coloringTier !== "phone";
+
+  // Portrait three-column (iPad held upright): the canvas is width-bound, so
+  // ~half the screen height below it is empty. Make this tier scroll and hang
+  // a "More Coloring Pages" grid in that dead space (web parity). Landscape
+  // three-column is height-bound with no dead space — left fixed/untouched.
+  const isThreeColumnPortrait =
+    coloringTier === "three-column" &&
+    layoutMode === "tablet-portrait" &&
+    !isFocusMode;
 
   return (
     <View style={styles.container}>
@@ -180,6 +190,44 @@ const ColoringImage = () => {
                   />
                 </View>
               </View>
+            ) : isThreeColumnPortrait ? (
+              /* Portrait three-column: scroll the rails+canvas as one block,
+                 then a "More Coloring Pages" grid fills the dead space below.
+                 scrollEnabled={scroll} mirrors the phone tier — the canvas
+                 toggles it off mid-stroke so drawing doesn't scroll the page.
+                 `scrollable` drops ColoringLayout's row flex:1 so it takes its
+                 intrinsic height inside the (unbounded) scroll content. */
+              <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.threeColScrollContent}
+                scrollEnabled={scroll}
+                showsVerticalScrollIndicator={false}
+              >
+                <ColoringLayout
+                  width={deviceInfo.screenWidth}
+                  height={deviceInfo.screenHeight}
+                  scrollable
+                  onZoomIn={handleZoomIn}
+                  onZoomOut={handleZoomOut}
+                  onResetZoom={handleResetZoom}
+                  zoom={scale}
+                  onOpenActions={() => setShowActionModal(true)}
+                  renderCanvas={(area) => (
+                    <View style={styles.canvasCardLandscape}>
+                      <ImageCanvas
+                        coloringImage={coloringImage}
+                        setScroll={setScroll}
+                        canvasArea={area}
+                        layoutMode={layoutMode}
+                      />
+                    </View>
+                  )}
+                />
+                <MoreColoringPages
+                  currentId={coloringImage.id}
+                  containerWidth={deviceInfo.screenWidth}
+                />
+              </ScrollView>
             ) : (
               <ColoringLayout
                 width={deviceInfo.screenWidth}
@@ -334,6 +382,12 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 16,
     paddingBottom: 180,
+  },
+  // Portrait three-column scroll content. NO flexGrow:1 — let the content
+  // (rails+canvas block, then the More-pages grid) take its natural height so
+  // it can exceed the viewport and scroll. Bottom pad clears the home bar.
+  threeColScrollContent: {
+    paddingBottom: 32,
   },
   scrollContentLandscape: {
     flexGrow: 1,

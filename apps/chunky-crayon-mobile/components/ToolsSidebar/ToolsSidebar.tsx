@@ -38,6 +38,15 @@ type ToolsSidebarProps = {
   maxZoom?: number;
   /** Opens the action sheet (Save / Share / Start Over). */
   onOpenActions?: () => void;
+  /**
+   * When the whole screen already scrolls (portrait three-column, with a
+   * More-pages strip below), the rail must NOT scroll/height-cap internally —
+   * it renders at full content height so every row (incl. the Start Over /
+   * Print / Save actions) shows. The inner ScrollView + `maxHeight:"100%"`
+   * are only for the landscape tier, which is height-bound with no outer
+   * scroll. Default false keeps the landscape behaviour.
+   */
+  scrollable?: boolean;
 };
 
 /**
@@ -62,6 +71,7 @@ const ToolsSidebar = ({
   minZoom = 0.5,
   maxZoom = 3,
   onOpenActions,
+  scrollable = false,
 }: ToolsSidebarProps) => {
   const insets = useSafeAreaInsets();
 
@@ -137,16 +147,25 @@ const ToolsSidebar = ({
   // actions) aligned to the same left edge and content width.
   const gridWidth = tileSize * 3 + gap * 2;
 
+  // In scrollable (portrait) mode the rail is full content height with NO
+  // inner scroll — a plain View — so every row renders and the outer page
+  // scroll handles overflow. In landscape it keeps the height-capped inner
+  // ScrollView. Same children either way.
+  const RailBody = scrollable ? View : ScrollView;
+  const railBodyProps = scrollable
+    ? { style: [styles.scrollContent, { width: gridWidth }] }
+    : {
+        style: styles.scrollView,
+        showsVerticalScrollIndicator: false,
+        contentContainerStyle: [styles.scrollContent, { width: gridWidth }],
+      };
+
   return (
     <View style={[styles.outer, { width, paddingRight: insets.right + 8 }]}>
       {/* Floating tools rail (web's DesktopToolsSidebar) — content-height
           rounded card, 3-column LEFT-ALIGNED grid + control rows. */}
-      <View style={styles.rail}>
-        <ScrollView
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.scrollContent, { width: gridWidth }]}
-        >
+      <View style={[styles.rail, scrollable && styles.railScrollable]}>
+        <RailBody {...railBodyProps}>
           {/* Regular tools — 3-column LEFT-ALIGNED grid (web). */}
           <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
             {COLORING_REGULAR_TOOLS.map((config) => (
@@ -351,7 +370,7 @@ const ToolsSidebar = ({
               </View>
             </>
           )}
-        </ScrollView>
+        </RailBody>
       </View>
     </View>
   );
@@ -385,11 +404,21 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 4,
   },
+  // Portrait (outer page scrolls): drop the height cap so the rail is full
+  // content height and nothing gets clipped by an inner scroll viewport.
+  railScrollable: {
+    maxHeight: undefined,
+  },
   scrollView: {
     flexShrink: 1,
   },
   scrollContent: {
     gap: 14,
+    // Trailing space so the last row (the Start Over / Print / Save action
+    // tiles) clears the rail card's rounded bottom corner (radius 24) — without
+    // it the corner clipped the bottom of the action icons when the content
+    // filled the height-capped rail.
+    paddingBottom: 8,
   },
   // 3-column tool grid — LEFT-ALIGNED (web justifyContent: normal/start).
   toolGrid: {

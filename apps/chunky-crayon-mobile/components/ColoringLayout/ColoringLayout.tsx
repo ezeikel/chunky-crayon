@@ -23,6 +23,15 @@ type ColoringLayoutProps = {
   zoom?: number;
   /** Opens the action sheet (Save / Share / Start Over) from the tools rail. */
   onOpenActions?: () => void;
+  /**
+   * When the layout is rendered inside a vertical ScrollView (portrait
+   * three-column, where a "More Coloring Pages" strip sits below), the
+   * three-column `row` must NOT be `flex:1` — there's no bounded height to
+   * fill inside scroll content, so it takes its intrinsic height instead
+   * (max of the rails / the definite-size canvas). Default false keeps the
+   * fixed-screen `flex:1` behaviour for landscape / middle / phone / stories.
+   */
+  scrollable?: boolean;
 };
 
 /**
@@ -47,6 +56,7 @@ const ColoringLayout = ({
   onResetZoom,
   zoom = 1,
   onOpenActions,
+  scrollable = false,
 }: ColoringLayoutProps) => {
   const tier = getColoringTier(width);
 
@@ -58,7 +68,7 @@ const ColoringLayout = ({
       0,
     );
     return (
-      <View style={styles.row}>
+      <View style={[styles.row, scrollable && styles.rowScrollable]}>
         <ColorPaletteSidebar width={leftWidth} />
         {/* Center column: progress bar + sound/music ABOVE the canvas
             (web's per-column placement), then the dominant canvas. */}
@@ -70,6 +80,7 @@ const ColoringLayout = ({
         </View>
         <ToolsSidebar
           width={rightWidth}
+          scrollable={scrollable}
           onZoomIn={onZoomIn}
           onZoomOut={onZoomOut}
           onResetZoom={onResetZoom}
@@ -104,6 +115,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     backgroundColor: COLORS.bgCream,
+  },
+  // Inside a ScrollView (portrait, with a More-pages strip below) the row
+  // can't be flex:1 — drop it so the row sizes to its content height.
+  rowScrollable: {
+    flex: undefined,
   },
   column: {
     flex: 1,
