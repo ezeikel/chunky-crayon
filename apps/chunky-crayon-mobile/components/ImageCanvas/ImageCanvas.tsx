@@ -1061,6 +1061,33 @@ const ImageCanvas = ({
         const sx = (ax - xf.offsetX) / xf.svgScale;
         const sy = (ay - xf.offsetY) / xf.svgScale;
 
+        // If the buffer is empty the live path has no starting point — either
+        // onStart didn't run, or the deferred clear already emptied it after a
+        // (possibly premature) commit. A bare lineTo on an empty SkPath implies
+        // a segment FROM the origin (0,0) → a stray line shooting to the
+        // top-left corner (the "random line flash"). Re-seed with moveTo
+        // instead so we never draw that phantom segment.
+        if (liveXs.value.length === 0) {
+          p.moveTo(sx, sy);
+          liveXs.value = [sx];
+          liveYs.value = [sy];
+          const force0 = (event as unknown as { force?: number }).force ?? 0;
+          liveForces.value = [force0];
+          notifyChange(livePath);
+          return;
+        }
+
+        // Skip points that haven't moved (a stationary hold sends ~60 identical
+        // touch events/sec). Without this the buffer grows unbounded during a
+        // hold — copied in full every frame (jank) — and commitStroke would
+        // simplify a degenerate path of thousands of coincident points, which
+        // can emit a stray segment (the "random line" flash on a long hold).
+        const lastX = liveXs.value[liveXs.value.length - 1];
+        const lastY = liveYs.value[liveYs.value.length - 1];
+        if (Math.abs(sx - lastX) < 0.5 && Math.abs(sy - lastY) < 0.5) {
+          return;
+        }
+
         p.lineTo(sx, sy);
         // Buffer points + force on the UI thread for the single commit on end.
         liveXs.value = [...liveXs.value, sx];
