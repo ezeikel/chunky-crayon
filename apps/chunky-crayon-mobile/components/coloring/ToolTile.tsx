@@ -55,11 +55,13 @@ const ToolTile = ({
   style,
 }: ToolTileProps) => {
   const iconSize = Math.round(size * 0.42);
-  // The magic glyphs (faBrush / faFillDrip) have a narrower glyph + more
-  // internal whitespace than the regular tool glyphs (faPencil etc), so at
-  // the same point size they render visibly smaller. Bump the magic icon so
-  // it reads at the same scale as the regular tiles (matches web).
-  const magicIconSize = Math.round(size * 0.5);
+  // The magic tiles carry a sparkle badge in the top-right corner. Web sizes
+  // the main glyph at FA `xl` (24px) and the sparkle at FA `lg` (~21px) — i.e.
+  // the badge is ~0.89x the main glyph, and it overflows the corner
+  // (`-top-2 -right-2`, 8px outside) with a drop shadow. Match that ratio +
+  // overflow here (the badge sits on the wrapper, outside tileBase's clip).
+  const sparkleSize = Math.round(iconSize * 0.89);
+  const sparkleOffset = -Math.round(size * 0.13);
 
   // ─── Magic tile ───
   if (isMagic) {
@@ -94,26 +96,28 @@ const ToolTile = ({
             />
           )}
           {loading ? (
-            <Spinner
-              size={Math.round(magicIconSize * 0.9)}
-              color={MAGIC_FROM}
-            />
+            <Spinner size={Math.round(iconSize * 0.9)} color={MAGIC_FROM} />
           ) : (
-            <>
-              <FontAwesomeIcon
-                icon={icon}
-                size={magicIconSize}
-                color={selected ? "#FFFFFF" : MAGIC_FROM}
-              />
-              <FontAwesomeIcon
-                icon={faSparkles}
-                size={Math.round(iconSize * 0.5)}
-                color={selected ? "#FFFFFF" : MAGIC_FROM}
-                style={styles.sparkle}
-              />
-            </>
+            <FontAwesomeIcon
+              icon={icon}
+              size={iconSize}
+              color={selected ? "#FFFFFF" : MAGIC_FROM}
+            />
           )}
         </View>
+        {/* Sparkle badge — rendered OUTSIDE tileBase (which clips) so it can
+            overflow the corner like web's `-top-2 -right-2`. */}
+        {!loading && (
+          <FontAwesomeIcon
+            icon={faSparkles}
+            size={sparkleSize}
+            color={selected ? "#FFFFFF" : MAGIC_FROM}
+            style={[
+              styles.sparkle,
+              { top: sparkleOffset, right: sparkleOffset },
+            ]}
+          />
+        )}
       </SquishyPressable>
     );
   }
@@ -185,8 +189,11 @@ const styles = StyleSheet.create({
   },
   sparkle: {
     position: "absolute",
-    top: 4,
-    right: 4,
+    // web's drop-shadow-sm on the sparkle marker
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 1,
   },
 });
 
