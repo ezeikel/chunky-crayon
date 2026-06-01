@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import type { Meta, StoryObj } from "@storybook/react-native";
 import ColoringLayout from "./ColoringLayout";
@@ -35,38 +36,92 @@ const PlaceholderCanvas = ({
 // review would be incomplete.
 const noop = () => {};
 
+/**
+ * A device mockup at its true logical width/height, SCALED DOWN to fit the
+ * Storybook preview pane. The frame must render the layout at the real device
+ * width (so getColoringTier + the rail/canvas widths match the device), but the
+ * pane is far narrower than an iPad — so we transform-scale the whole mockup to
+ * fit `availableWidth`. Without this the layout renders at full device width and
+ * the right rail spills out of the pane (RN doesn't auto-shrink a fixed-size
+ * child). `availableWidth` is measured from the scroll stage via onLayout.
+ */
 const Frame = ({
   label,
   width,
   height,
+  availableWidth,
 }: {
   label?: string;
   width: number;
   height: number;
+  availableWidth: number;
 }) => {
   const tier = getColoringTier(width);
+  // Fit the device width into the pane (never scale UP past 1:1).
+  const scale = availableWidth > 0 ? Math.min(1, availableWidth / width) : 1;
   return (
     <View style={styles.frameWrap}>
       <Text style={styles.frameTitle}>
         {label ? `${label}  ` : ""}
         {width}×{height} → {tier}
+        {scale < 1 ? `  (shown @ ${Math.round(scale * 100)}%)` : ""}
       </Text>
-      <View style={[styles.frame, { width, height }]}>
-        <ColoringLayout
-          width={width}
-          height={height}
-          zoom={1}
-          onZoomIn={noop}
-          onZoomOut={noop}
-          onResetZoom={noop}
-          onStartOver={noop}
-          onPrint={noop}
-          onSave={noop}
-          onMyArtwork={noop}
-          renderCanvas={(area) => <PlaceholderCanvas area={area} />}
-        />
+      {/* Reserve the SCALED footprint so siblings don't overlap the shrunk
+          mockup (transform doesn't affect layout box). */}
+      <View style={{ width: width * scale, height: height * scale }}>
+        <View
+          style={[
+            styles.frame,
+            {
+              width,
+              height,
+              transform: [{ scale }],
+              // Anchor the scale to the top-left so the box sits in its slot.
+              transformOrigin: "top left",
+            },
+          ]}
+        >
+          <ColoringLayout
+            width={width}
+            height={height}
+            zoom={1}
+            onZoomIn={noop}
+            onZoomOut={noop}
+            onResetZoom={noop}
+            onStartOver={noop}
+            onPrint={noop}
+            onSave={noop}
+            onMyArtwork={noop}
+            renderCanvas={(area) => <PlaceholderCanvas area={area} />}
+          />
+        </View>
       </View>
     </View>
+  );
+};
+
+/**
+ * Measures the available pane width once, then renders its children with that
+ * width so each Frame can scale to fit. Children is a render-prop taking the
+ * measured width.
+ */
+const FittedStage = ({
+  children,
+}: {
+  children: (availableWidth: number) => React.ReactNode;
+}) => {
+  const [paneWidth, setPaneWidth] = useState(0);
+  // Subtract the stage's horizontal padding (16 each side) so frames scale to
+  // the real content width, not the raw pane width.
+  const STAGE_PAD = 16;
+  const usable = paneWidth - STAGE_PAD * 2;
+  return (
+    <ScrollView
+      contentContainerStyle={styles.stage}
+      onLayout={(e) => setPaneWidth(e.nativeEvent.layout.width)}
+    >
+      {usable > 0 ? children(usable) : null}
+    </ScrollView>
   );
 };
 
@@ -78,21 +133,54 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-// Every key device width stacked so the fit-based tier switch is visible at a
-// glance. Widths are real logical-point window widths; the title prints the
-// resolved tier so the threshold (three-column ≥ 822) is self-documenting.
+// Every key device, scaled to fit the pane and stacked vertically so the
+// fit-based tier switch is visible at a glance. Widths are real logical-point
+// window widths; the title prints the resolved tier so the threshold
+// (three-column ≥ 822) is self-documenting.
 export const AllDevices: Story = {
   render: () => (
-    <ScrollView contentContainerStyle={styles.stage} horizontal>
-      <View style={styles.col}>
-        <Frame label="iPhone portrait" width={393} height={852} />
-        <Frame label="iPad mini / split portrait" width={744} height={1133} />
-      </View>
-      <Frame label="iPhone Max landscape" width={852} height={393} />
-      <Frame label="iPad Pro 11 portrait" width={834} height={1194} />
-      <Frame label="iPad Pro 13 portrait" width={1032} height={1376} />
-      <Frame label="iPad Pro 13 landscape" width={1376} height={1032} />
-    </ScrollView>
+    <FittedStage>
+      {(w) => (
+        <>
+          <Frame
+            label="iPhone portrait"
+            width={393}
+            height={852}
+            availableWidth={w}
+          />
+          <Frame
+            label="iPhone Max landscape"
+            width={852}
+            height={393}
+            availableWidth={w}
+          />
+          <Frame
+            label="iPad mini / split portrait"
+            width={744}
+            height={1133}
+            availableWidth={w}
+          />
+          <Frame
+            label="iPad Pro 11 portrait"
+            width={834}
+            height={1194}
+            availableWidth={w}
+          />
+          <Frame
+            label="iPad Pro 13 portrait"
+            width={1032}
+            height={1376}
+            availableWidth={w}
+          />
+          <Frame
+            label="iPad Pro 13 landscape"
+            width={1376}
+            height={1032}
+            availableWidth={w}
+          />
+        </>
+      )}
+    </FittedStage>
   ),
 };
 
@@ -104,9 +192,16 @@ export const AllDevices: Story = {
 // isn't empty. See MobileColoringToolbar.stories for the real phone surface.
 export const PhonePortrait: Story = {
   render: () => (
-    <ScrollView contentContainerStyle={styles.stage}>
-      <Frame label="iPhone portrait" width={393} height={852} />
-    </ScrollView>
+    <FittedStage>
+      {(w) => (
+        <Frame
+          label="iPhone portrait"
+          width={393}
+          height={852}
+          availableWidth={w}
+        />
+      )}
+    </FittedStage>
   ),
 };
 
@@ -114,9 +209,16 @@ export const PhonePortrait: Story = {
 // Height-bound: the canvas clamps to the short landscape height.
 export const PhoneLandscape: Story = {
   render: () => (
-    <ScrollView contentContainerStyle={styles.stage}>
-      <Frame label="iPhone Max landscape" width={852} height={393} />
-    </ScrollView>
+    <FittedStage>
+      {(w) => (
+        <Frame
+          label="iPhone Max landscape"
+          width={852}
+          height={393}
+          availableWidth={w}
+        />
+      )}
+    </FittedStage>
   ),
 };
 
@@ -124,36 +226,67 @@ export const PhoneLandscape: Story = {
 // don't fit a comfortable canvas here).
 export const MiddleTier: Story = {
   render: () => (
-    <ScrollView contentContainerStyle={styles.stage}>
-      <Frame label="iPad mini / split portrait" width={744} height={1133} />
-    </ScrollView>
+    <FittedStage>
+      {(w) => (
+        <Frame
+          label="iPad mini / split portrait"
+          width={744}
+          height={1133}
+          availableWidth={w}
+        />
+      )}
+    </FittedStage>
   ),
 };
 
 // iPad Pro 11" / Air portrait (834) — newly THREE-COLUMN after the 822 cutover.
 export const IPadProgressivePortrait: Story = {
+  name: "iPad Progressive Portrait",
   render: () => (
-    <ScrollView contentContainerStyle={styles.stage}>
-      <Frame label="iPad Pro 11 portrait" width={834} height={1194} />
-    </ScrollView>
+    <FittedStage>
+      {(w) => (
+        <Frame
+          label="iPad Pro 11 portrait"
+          width={834}
+          height={1194}
+          availableWidth={w}
+        />
+      )}
+    </FittedStage>
   ),
 };
 
 // iPad Pro 13" portrait (1032) — the primary three-column case.
 export const IPadPortrait: Story = {
+  name: "iPad Portrait",
   render: () => (
-    <ScrollView contentContainerStyle={styles.stage}>
-      <Frame label="iPad Pro 13 portrait" width={1032} height={1376} />
-    </ScrollView>
+    <FittedStage>
+      {(w) => (
+        <Frame
+          label="iPad Pro 13 portrait"
+          width={1032}
+          height={1376}
+          availableWidth={w}
+        />
+      )}
+    </FittedStage>
   ),
 };
 
 // iPad Pro 13" landscape (1376) — wide three-column.
 export const IPadLandscape: Story = {
+  name: "iPad Landscape",
   render: () => (
-    <ScrollView contentContainerStyle={styles.stage}>
-      <Frame label="iPad Pro 13 landscape" width={1376} height={1032} />
-    </ScrollView>
+    <FittedStage>
+      {(w) => (
+        <Frame
+          label="iPad Pro 13 landscape"
+          width={1376}
+          height={1032}
+          availableWidth={w}
+        />
+      )}
+    </FittedStage>
   ),
 };
 
@@ -162,9 +295,6 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 24,
     backgroundColor: COLORS.bgCreamDark,
-  },
-  col: {
-    gap: 24,
   },
   frameWrap: {
     gap: 6,
