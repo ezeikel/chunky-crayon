@@ -360,8 +360,10 @@ const ColoringImage = () => {
           <View style={styles.canvasControls}>
             <CanvasTopBar />
             <View style={styles.canvasZoomRow}>
-              <ZoomControls />
-              <FocusModeToggleButton />
+              {/* Focus toggle is grouped INSIDE the zoom pill (web's `trailing`
+                  slot) so the whole control reads as one unit, not a separate
+                  floating button beside the pill. */}
+              <ZoomControls trailing={<FocusModeToggleButton />} />
             </View>
           </View>
         )}
@@ -712,6 +714,10 @@ const styles = StyleSheet.create({
   },
   canvasCard: {
     width: "100%",
+    // Clip the canvas to the card's rounded bounds — without this the image
+    // (esp. when zoomed/panned) breaks out the top/edges of the card. Matches
+    // canvasCardLandscape + web's `overflow-hidden` on the canvas wrapper.
+    overflow: "hidden",
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderRadius: 20,
     padding: 12,

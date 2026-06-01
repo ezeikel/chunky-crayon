@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -17,6 +17,12 @@ const ZOOM_STEP = 0.5;
 
 type ZoomControlsProps = {
   style?: Record<string, unknown>;
+  /**
+   * Rendered inside the same pill, after the reset-view button (web's
+   * `trailing` slot). Used to group the focus-mode toggle into the zoom
+   * pill's chrome so it reads as one unit, not a separate floating control.
+   */
+  trailing?: ReactNode;
 };
 
 /**
@@ -30,7 +36,7 @@ type ZoomControlsProps = {
  * - Visual zoom level indicator
  * - Coral color scheme (#E46444)
  */
-const ZoomControls = ({ style }: ZoomControlsProps) => {
+const ZoomControls = ({ style, trailing }: ZoomControlsProps) => {
   const { scale, setScale, resetTransform, selectedTool, setTool } =
     useCanvasStore();
 
@@ -134,6 +140,10 @@ const ZoomControls = ({ style }: ZoomControlsProps) => {
           <FontAwesomeIcon icon={faHouse} size={18} color={ACCENT} />
         </Pressable>
       )}
+
+      {/* Consumer slot — grouped INSIDE the pill after the reset button (web's
+          `trailing`), e.g. the focus-mode toggle, so it reads as one unit. */}
+      {trailing}
     </View>
   );
 };
