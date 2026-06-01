@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "ぬりえ",
     "relatedPages": "他のぬりえページ",
-    "defaultDescription": "Chunky Crayonの無料印刷可能ぬりえ",
+    "defaultDescription": "無料で印刷できるぬりえページ - Chunky Crayon",
     "progress": {
       "colored": "塗り済み",
       "percentage": "{percent}%",
@@ -78,7 +78,7 @@
     "brushTypes": {
       "crayon": "クレヨン",
       "marker": "マーカー",
-      "pencil": "えんぴつ",
+      "pencil": "ペンシル",
       "paintbrush": "絵筆",
       "eraser": "消しゴム",
       "glitter": "ラメ",
@@ -134,7 +134,7 @@
     "zoomControls": {
       "zoomLevel": "ズーム: {level}%",
       "zoomOut": "縮小",
-      "zoomOutAria": "縮小 (全体を見る)",
+      "zoomOutAria": "縮小 (広く見る)",
       "zoomIn": "拡大",
       "zoomInAria": "拡大 (近くを見る)",
       "pan": "移動",
