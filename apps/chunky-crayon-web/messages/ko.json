@@ -603,7 +603,7 @@
       "cta": "Coloring Habitat 방문하기"
     },
     "ourLatestCount": "{count, plural, =1 {도안 1개} other {도안 #개}}",
-    "communitySubtitle": "Pages our community of parents and kids created. Browse hundreds more on the dedicated community gallery — it's where the imaginative stuff lives.",
+    "communitySubtitle": "우리 커뮤니티가 만든 색칠 도안. 매일 새로운 아이디어가 찾아와요.",
     "browseAllCommunity": "커뮤니티 갤러리 둘러보기"
   },
   "pricing": {
@@ -684,7 +684,7 @@
         "answer": "Splash는 매달 초기화돼요. Rainbow는 1개월분, Sparkle은 2개월분까지 적립돼요. 이번 달에 안 쓰면 다음 달에도 남아 있어요."
       },
       "creditsPerPage": {
-        "question": "실제로 몇 장을 만들 수 있나요?",
+        "question": "페이지당 크레딧이 얼마나 드나요?",
         "answer": "문장을 입력하거나 사진을 찍으면 5크레딧. Chunky Crayon에게 말로 부탁하면 10크레딧이에요(듣고, 글로 옮기고, 그려주니까요). Splash는 월 약 50장, Rainbow는 약 100장, Sparkle은 약 200장. 원하는 대로 섞어 쓰세요."
       },
       "audience": {
