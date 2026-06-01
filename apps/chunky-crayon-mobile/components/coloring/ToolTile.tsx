@@ -55,6 +55,11 @@ const ToolTile = ({
   style,
 }: ToolTileProps) => {
   const iconSize = Math.round(size * 0.42);
+  // The magic glyphs (faBrush / faFillDrip) have a narrower glyph + more
+  // internal whitespace than the regular tool glyphs (faPencil etc), so at
+  // the same point size they render visibly smaller. Bump the magic icon so
+  // it reads at the same scale as the regular tiles (matches web).
+  const magicIconSize = Math.round(size * 0.5);
 
   // ─── Magic tile ───
   if (isMagic) {
@@ -89,12 +94,15 @@ const ToolTile = ({
             />
           )}
           {loading ? (
-            <Spinner size={Math.round(iconSize * 0.9)} color={MAGIC_FROM} />
+            <Spinner
+              size={Math.round(magicIconSize * 0.9)}
+              color={MAGIC_FROM}
+            />
           ) : (
             <>
               <FontAwesomeIcon
                 icon={icon}
-                size={iconSize}
+                size={magicIconSize}
                 color={selected ? "#FFFFFF" : MAGIC_FROM}
               />
               <FontAwesomeIcon
