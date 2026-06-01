@@ -206,6 +206,8 @@ export const getBrushMultiplier = (brushType: BrushType): number => {
       return 1.5; // Markers are bold
     case "pencil":
       return 0.5; // Pencils are thin
+    case "paintbrush":
+      return 1.6; // Paint is broad (web: radius * 1.3 + soft translucent dabs)
     case "rainbow":
       return 1.3; // Rainbow is bold and vibrant
     case "glow":

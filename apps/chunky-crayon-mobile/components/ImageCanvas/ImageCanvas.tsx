@@ -1269,6 +1269,27 @@ const ImageCanvas = ({
           );
         }
 
+        // Paintbrush ("Paint"): broad, translucent, soft-edged — web draws
+        // semi-transparent (~0.5 alpha) strokes with soft radial dabs. A
+        // subtle blur mask gives the watery soft edge in Skia without
+        // per-dab gradients; the broad width comes from the 1.6 multiplier.
+        if (action.brushType === "paintbrush") {
+          return (
+            <Path
+              key={`path-${index}`}
+              path={action.path!}
+              color={action.color}
+              style="stroke"
+              strokeWidth={strokeWidth}
+              strokeCap="round"
+              strokeJoin="round"
+              opacity={0.5}
+            >
+              <BlurMask blur={3} style="normal" />
+            </Path>
+          );
+        }
+
         // Glow and neon effects need blur
         if (action.brushType === "glow") {
           return (
@@ -1468,6 +1489,20 @@ const ImageCanvas = ({
                       <BlurMask blur={12} style="outer" />
                     </Path>
                   </Group>
+                ) : currentPath && brushType === "paintbrush" ? (
+                  // Live Paint preview — translucent + soft edge (matches the
+                  // committed paintbrush render).
+                  <Path
+                    path={currentPath}
+                    color={selectedColor}
+                    style="stroke"
+                    strokeWidth={currentStrokeWidth}
+                    strokeCap="round"
+                    strokeJoin="round"
+                    opacity={0.5}
+                  >
+                    <BlurMask blur={3} style="normal" />
+                  </Path>
                 ) : currentPath ? (
                   <Path
                     path={currentPath}
