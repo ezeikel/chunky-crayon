@@ -87,37 +87,61 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<{
     };
   }
 
-  // Create new anonymous user and default profile
-  const user = await db.user.create({
-    data: {
-      // Anonymous user - no email
-      name: 'Mobile User',
-      profiles: {
+  // No session yet → create the anonymous user + default "Artist" profile
+  // ONLY inside the upsert's `create` branch, gated by `deviceId @unique`.
+  //
+  // Why upsert (not user.create + separate session.create): the old flow ran
+  // those as two non-transactional writes, so two concurrent /register calls
+  // (cold-start race / token-loss re-register) both passed the findUnique
+  // guard above and both created a user+profile — only the 2nd session insert
+  // hit the unique constraint, leaving the 1st user+profile orphaned. That
+  // produced the duplicate "Artist" profiles. Nesting the user/profile create
+  // inside `mobileDeviceSession.upsert({ create })` makes `deviceId @unique`
+  // gate the whole creation atomically: first writer wins, the loser resolves
+  // to the no-op `update` branch and re-reads the winner's row. No orphan is
+  // ever committed; no schema migration needed.
+  const session = await db.mobileDeviceSession.upsert({
+    where: { deviceId },
+    update: {},
+    create: {
+      deviceId,
+      user: {
         create: {
-          name: 'Artist',
-          avatarId: 'default',
-          ageGroup: AgeGroup.CHILD,
-          difficulty: Difficulty.BEGINNER,
-          isDefault: true,
+          // Anonymous user - no email
+          name: 'Mobile User',
+          profiles: {
+            create: {
+              name: 'Artist',
+              avatarId: 'default',
+              ageGroup: AgeGroup.CHILD,
+              difficulty: Difficulty.BEGINNER,
+              isDefault: true,
+            },
+          },
         },
       },
     },
     include: {
-      profiles: true,
+      user: {
+        include: {
+          profiles: {
+            orderBy: { createdAt: 'asc' },
+            take: 1,
+          },
+        },
+      },
     },
   });
 
-  // Create device session
-  await db.mobileDeviceSession.create({
-    data: {
-      deviceId,
-      userId: user.id,
-    },
-  });
-
+  const profile = session.user.profiles[0];
   return {
-    userId: user.id,
-    profileId: user.profiles[0]?.id || '',
+    userId: session.userId,
+    profileId: profile?.id || '',
+    // We only reach here when the initial findUnique found no session, so this
+    // path is "first registration for this device". In the rare concurrent
+    // race the losing caller also reports isNew:true, but both return the SAME
+    // userId (the upsert is idempotent), so no duplicate is created — isNew is
+    // informational only (the client doesn't gate on it).
     isNew: true,
   };
 }
