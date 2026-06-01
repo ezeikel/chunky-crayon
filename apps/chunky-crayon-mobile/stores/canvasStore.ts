@@ -153,6 +153,12 @@ export type DrawingAction = {
   isStylus?: boolean;
   // Texture seed for deterministic texture rendering
   textureSeed?: number;
+  // Render-only: monotonic id stamped by the live-stroke commit so the
+  // UI-thread live preview can be cleared exactly when ITS committed <Path>
+  // has rendered (fixes the draw→vanish→reappear flash). Never serialized
+  // (see serializeActions), so reloaded actions never carry one and can't
+  // spuriously match an in-flight live stroke.
+  liveStrokeId?: number;
 };
 
 /**

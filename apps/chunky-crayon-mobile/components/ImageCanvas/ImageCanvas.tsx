@@ -3,6 +3,7 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -156,6 +157,16 @@ const ImageCanvas = ({
   // forces captured on the UI thread during the stroke.
   const pressureSmootherRef = useRef(new PressureSmoother(3));
 
+  // Live-stroke commit handoff (fixes the draw→vanish→reappear flash). Each
+  // brush/eraser stroke gets a monotonic id when it commits; the live preview
+  // is cleared only once the committed <Path> carrying that exact id appears in
+  // the render (see the useLayoutEffect below). Identity — not history.length —
+  // because addAction truncates the redo tail and MAX_HISTORY shift() pins the
+  // length, so a length-keyed clear would silently stop firing and leave the
+  // live path permanently double-drawn over the committed one.
+  const liveStrokeIdRef = useRef(0);
+  const pendingLiveStrokeIdRef = useRef<number | null>(null);
+
   // Magic color hint state
   const [magicHintCell, setMagicHintCell] = useState<GridColorCell | null>(
     null,
@@ -259,6 +270,13 @@ const ImageCanvas = ({
   const liveXs = useSharedValue<number[]>([]);
   const liveYs = useSharedValue<number[]>([]);
   const liveForces = useSharedValue<number[]>([]);
+  // True while a stroke is in progress — set synchronously in the onStart
+  // worklet (UI thread) and cleared in commitStroke. The deferred-clear effect
+  // reads it to make absolutely sure it never wipes a NEWER in-flight stroke if
+  // the previous stroke's clear effect is still pending when the next stroke
+  // begins (lift + re-press within a frame). Reading the shared value (set
+  // synchronously by onStart) closes that race deterministically.
+  const liveActive = useSharedValue(false);
 
   // Auto-save timer
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -713,10 +731,15 @@ const ImageCanvas = ({
   ]);
 
   // Start/stop the continuous brush haptic — called once per stroke (from the
-  // gesture worklet via runOnJS), never per touch point.
+  // gesture worklet via runOnJS in onStart), never per touch point.
   const startStrokeHaptics = useCallback(() => {
     brushHaptics.start(brushType);
     setScroll(false);
+    // Re-arm: a fresh stroke just took over livePath, so any not-yet-fired
+    // deferred clear from the PREVIOUS stroke must not run against it (that
+    // would wipe this in-progress stroke). Dropping the pending id makes the
+    // stale clear a no-op; this stroke parks its own id when it commits.
+    pendingLiveStrokeIdRef.current = null;
   }, [brushType, setScroll]);
 
   // Commit a finished stroke to the store. Receives the raw SVG-space points +
@@ -727,8 +750,19 @@ const ImageCanvas = ({
     (xs: number[], ys: number[], forces: number[], isStylus: boolean) => {
       brushHaptics.stop();
       setScroll(true);
+      // This stroke is no longer in progress (it's committing now).
+      liveActive.value = false;
 
       if (!svgDimensions || xs.length === 0) {
+        // Zero-length stroke (a brush/eraser tap with no drag). No action is
+        // committed, so the identity-based deferred clear below would never
+        // fire — clear the stray live dot here, directly, instead.
+        livePath.value = Skia.Path.Make();
+        liveXs.value = [];
+        liveYs.value = [];
+        liveForces.value = [];
+        pendingLiveStrokeIdRef.current = null;
+        notifyChange(livePath);
         return;
       }
 
@@ -777,6 +811,10 @@ const ImageCanvas = ({
           ? simplifyPath(rebuilt, DEFAULT_SIMPLIFICATION_TOLERANCE)
           : rebuilt;
 
+      // Stamp a monotonic id so the deferred clear (useLayoutEffect below) can
+      // wipe the live preview exactly when THIS committed stroke renders — not
+      // before (vanish gap) and not never (permanent double-draw).
+      const liveStrokeId = ++liveStrokeIdRef.current;
       const action: DrawingAction = {
         type: "stroke",
         path: finalPath,
@@ -789,8 +827,10 @@ const ImageCanvas = ({
         pressurePoints,
         isStylus,
         textureSeed,
+        liveStrokeId,
       };
       addAction(action);
+      pendingLiveStrokeIdRef.current = liveStrokeId;
 
       if (brushType === "rainbow") {
         advanceRainbowHue(30);
@@ -1009,6 +1049,9 @@ const ImageCanvas = ({
         liveYs.value = [sy];
         const force = (event as unknown as { force?: number }).force ?? 0;
         liveForces.value = [force];
+        // Mark a stroke active synchronously (UI thread) so a still-pending
+        // deferred clear from the previous stroke can't wipe this fresh path.
+        liveActive.value = true;
         notifyChange(livePath);
         runOnJS(startStrokeHaptics)();
       }
@@ -1049,13 +1092,14 @@ const ImageCanvas = ({
           liveForces.value,
           isStylus,
         );
-        // Clear the live preview (empty path = draws nothing); the committed
-        // stroke now renders from history.
-        livePath.value = Skia.Path.Make();
-        liveXs.value = [];
-        liveYs.value = [];
-        liveForces.value = [];
-        notifyChange(livePath);
+        // Do NOT clear the live preview here. Clearing it now (UI thread, this
+        // frame) races the committed stroke, which only appears several frames
+        // later via runOnJS(commitStroke) → addAction → React re-render. The
+        // gap between them is the draw→vanish→reappear flash. The live path is
+        // instead cleared by the identity-keyed useLayoutEffect below, once the
+        // committed <Path> for this exact stroke has rendered — leaving the
+        // stroke continuously on screen (at most one frame of identical-geometry
+        // overlap, never a blank frame).
       } else {
         savedTranslateX.value = gestureTranslateX.value;
         savedTranslateY.value = gestureTranslateY.value;
@@ -1175,6 +1219,39 @@ const ImageCanvas = ({
   const visibleActions = useMemo(() => {
     return getVisibleActions(history, historyIndex);
   }, [history, historyIndex]);
+
+  // Clear the UI-thread live preview exactly once the committed stroke it stood
+  // in for has rendered — closing the draw→vanish→reappear flash. We gate on the
+  // stroke's IDENTITY (the liveStrokeId stamped in commitStroke), NOT on
+  // history.length: addAction truncates the redo tail (undo-then-draw can leave
+  // the length unchanged) and MAX_HISTORY's shift() pins the length once full,
+  // so a length-keyed clear would silently stop firing and leave the live path
+  // permanently double-drawn over the committed one (visible darkening for
+  // translucent crayon/marker/paintbrush). useLayoutEffect runs synchronously
+  // after React commits the tree containing the new <Path> (so it's already
+  // mounted) and before paint, bounding the overlap to one frame of identical
+  // geometry. Reloaded/persisted actions never carry a liveStrokeId (it isn't
+  // serialized), so they can't trigger a spurious clear.
+  useLayoutEffect(() => {
+    const pending = pendingLiveStrokeIdRef.current;
+    if (pending == null) return;
+    // A newer stroke is already in progress (lift + re-press within a frame):
+    // never wipe its live path. That stroke parks its own id on commit.
+    if (liveActive.value) {
+      pendingLiveStrokeIdRef.current = null;
+      return;
+    }
+    const committed = visibleActions.some(
+      (a) => a.type === "stroke" && a.liveStrokeId === pending,
+    );
+    if (!committed) return;
+    pendingLiveStrokeIdRef.current = null;
+    livePath.value = Skia.Path.Make();
+    liveXs.value = [];
+    liveYs.value = [];
+    liveForces.value = [];
+    notifyChange(livePath);
+  }, [visibleActions, livePath, liveXs, liveYs, liveForces, liveActive]);
 
   // Compute fill layer image (SVG + all fill/magic-fill actions baked in)
   const { fillLayerImage } = useFillLayer(svg, svgDimensions, visibleActions);
@@ -1511,10 +1588,13 @@ const ImageCanvas = ({
                 {renderStickers}
                 {/* Live drawing path — built on the UI thread (livePath shared
                     value), styled by the active tool/brush (stable mid-stroke).
-                    Draws nothing while livePath is null. The version key forces
-                    React to re-evaluate the style branch when the tool changes;
-                    the path geometry updates on the UI thread via the shared
-                    value without any per-point re-render. */}
+                    Always mounted; an empty Skia path draws nothing (the "no
+                    live stroke" state). It stays drawn from finger-up until the
+                    committed <Path> for the stroke has rendered, then the
+                    deferred-clear effect resets it to empty — so the stroke is
+                    never blank for a frame (no flash). The path geometry updates
+                    on the UI thread via the shared value with no per-point
+                    re-render. */}
                 {selectedTool === "eraser" ? (
                   // Live eraser preview — dstOut so it erases as you drag.
                   <Path
