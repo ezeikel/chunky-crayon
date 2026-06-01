@@ -24,6 +24,7 @@ import {
   COLORING_MAGIC_TOOLS,
   type ColoringToolConfig,
 } from "@/lib/coloring/tools";
+import { RAIL_TOP_OFFSET } from "@/constants/Sizes";
 
 type ToolsSidebarProps = {
   /** Width of the sidebar */
@@ -361,17 +362,19 @@ const ToolsSidebar = ({
 };
 
 const styles = StyleSheet.create({
-  // Outer column: fixed width (from prop), never squeezed by the flex row,
-  // vertically centers the rail. Left padding = canvas gap.
+  // Outer column: fixed width (from prop), never squeezed by the flex row.
+  // The row top-aligns all columns; RAIL_TOP_OFFSET pushes this rail down so
+  // its top lines up with the canvas card (below the progress-bar row),
+  // matching web. Left padding = canvas gap.
   outer: {
     flexShrink: 0,
-    justifyContent: "center",
-    paddingVertical: 12,
+    paddingTop: RAIL_TOP_OFFSET,
+    paddingBottom: 12,
     paddingLeft: 16,
   },
-  // Floating tools rail card — content-height (web radius 24, uniform 16
-  // padding). maxHeight caps it so the tool stack scrolls within the card
-  // rather than the card overflowing the column.
+  // Floating tools rail card — pure content height (web radius 24, uniform
+  // 16 padding); grows to fit all controls. maxHeight caps it to the column
+  // height so an unusually tall stack scrolls inside rather than overflowing.
   rail: {
     maxHeight: "100%",
     backgroundColor: COLORS.white,

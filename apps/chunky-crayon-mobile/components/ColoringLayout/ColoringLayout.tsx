@@ -96,9 +96,13 @@ const ColoringLayout = ({
 };
 
 const styles = StyleSheet.create({
+  // All three columns TOP-align their content (web aligns the left rail,
+  // canvas card and right rail to the same top edge). alignItems: flex-start
+  // stops the columns from stretching their rails full-height.
   row: {
     flex: 1,
     flexDirection: "row",
+    alignItems: "flex-start",
     backgroundColor: COLORS.bgCream,
   },
   column: {
@@ -108,19 +112,16 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     gap: 8,
   },
-  // Center column: the top bar + canvas are grouped and the GROUP is
-  // vertically centered (justifyContent: center), so the bar always sits
-  // directly above the canvas card rather than floating at the top of a
-  // tall column with the canvas stranded far below.
+  // Center column: top bar then canvas, both TOP-aligned (no vertical
+  // centering) so the canvas card top lines up with the rails' tops.
   canvasCenter: {
     flex: 1,
     minWidth: 0,
     flexDirection: "column",
-    justifyContent: "center",
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingHorizontal: 0,
   },
-  // Canvas hugs its content height (the square card) so it sits snug under
-  // the top bar; the pair is centered by canvasCenter.
+  // Canvas hugs its content height (the square card) directly under the bar.
   canvasFill: {
     alignItems: "stretch",
   },
