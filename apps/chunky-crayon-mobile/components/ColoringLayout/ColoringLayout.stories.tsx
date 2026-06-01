@@ -170,19 +170,25 @@ const PhoneFrame = ({
               ToolbarContent is the sheet's scrollable body (MobileColoringToolbar
               wraps it in a gorhom BottomSheet on-device, which docks to the
               SCREEN bottom and so can't live inside a scaled frame — this is the
-              faithful faux: same body, sheet chrome, overlaying the canvas). */}
-          <View style={styles.phoneSheetOverlay}>
+              faithful faux: same body, sheet chrome, overlaying the canvas).
+              CAPPED to ~60% of the frame height and the body SCROLLS within it —
+              mirroring the real collapsed detent — so the canvas + top bar stay
+              visible above it even on a SHORT landscape frame (852×393), where an
+              uncapped sheet (its content is ~400px tall) would cover everything. */}
+          <View style={[styles.phoneSheetOverlay, { maxHeight: height * 0.6 }]}>
             <View style={styles.phoneSheetHandle} />
-            <ToolbarContent
-              onZoomIn={noop}
-              onZoomOut={noop}
-              onResetZoom={noop}
-              zoom={1}
-              onStartOver={noop}
-              onPrint={noop}
-              onSave={noop}
-              onMyArtwork={noop}
-            />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <ToolbarContent
+                onZoomIn={noop}
+                onZoomOut={noop}
+                onResetZoom={noop}
+                zoom={1}
+                onStartOver={noop}
+                onPrint={noop}
+                onSave={noop}
+                onMyArtwork={noop}
+              />
+            </ScrollView>
           </View>
         </View>
       </View>
