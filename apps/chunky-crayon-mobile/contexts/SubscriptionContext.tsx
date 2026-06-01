@@ -5,6 +5,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  useRef,
   ReactNode,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -50,61 +51,73 @@ export const SubscriptionProvider = ({
   children,
 }: SubscriptionProviderProps) => {
   const queryClient = useQueryClient();
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
+  // The DB userId RevenueCat is currently configured with — lets us tell
+  // "first configure" from "id changed (anon→email after login merge)" from
+  // "signed out". null until the first configure.
+  const rcUserIdRef = useRef<string | null>(null);
 
-  // Initialize RevenueCat on mount
+  // Configure RevenueCat with the device's DB userId — anonymous (device) OR
+  // email user — so RC's app_user_id == our DB user.id. This makes an
+  // anonymous purchase's webhook event key directly on the device's anon user
+  // (the webhook matches OR:[{id},{revenuecatUserId}]) instead of minting an
+  // orphan $RCAnonymousID user nothing reconciles. We deliberately do NOT
+  // configure RC anonymously first — we wait for user.id to exist (AuthContext
+  // registers the device at cold start so user.id is populated up front).
   useEffect(() => {
-    const init = async () => {
-      try {
-        // Initialize without user ID first (anonymous)
-        await initializeRevenueCat();
-        setIsInitialized(true);
+    const sync = async () => {
+      const userId = user?.id;
 
-        // Get initial customer info
-        const info = await getCustomerInfo();
-        setCustomerInfo(info);
-      } catch (error) {
-        console.error("[SubscriptionContext] Failed to initialize:", error);
-      } finally {
-        setIsLoading(false);
+      // Sign-out: we previously identified a user and now have none → reset RC
+      // back to a fresh anonymous customer. (Distinct from the initial
+      // pre-register window, where rcUserIdRef is still null and we no-op.)
+      if (!userId) {
+        if (rcUserIdRef.current && isInitialized) {
+          try {
+            setIsLoading(true);
+            const info = await logoutUser();
+            setCustomerInfo(info);
+            rcUserIdRef.current = null;
+            queryClient.invalidateQueries({ queryKey: ["entitlements"] });
+          } catch (error) {
+            console.error("[SubscriptionContext] Failed to log out RC:", error);
+          } finally {
+            setIsLoading(false);
+          }
+        }
+        return;
       }
-    };
-
-    init();
-  }, []);
-
-  // Identify user with RevenueCat when they sign in
-  useEffect(() => {
-    const syncUser = async () => {
-      if (!isInitialized) return;
 
       try {
         setIsLoading(true);
 
-        if (isAuthenticated && user?.id) {
-          // User is signed in - identify them with RevenueCat
-          const info = await identifyUser(user.id);
+        if (!isInitialized) {
+          // First configure — anchor RC on the DB userId directly.
+          await initializeRevenueCat(userId);
+          setIsInitialized(true);
+          rcUserIdRef.current = userId;
+          setCustomerInfo(await getCustomerInfo());
+        } else if (rcUserIdRef.current !== userId) {
+          // userId changed (anon → email after the login merge). logIn aliases
+          // the RC customer so a purchase made under the anon id transfers.
+          const info = await identifyUser(userId);
           setCustomerInfo(info);
-        } else {
-          // User signed out - reset to anonymous
-          const info = await logoutUser();
-          setCustomerInfo(info);
+          rcUserIdRef.current = userId;
         }
 
-        // Invalidate entitlements query to refresh from our backend
         queryClient.invalidateQueries({ queryKey: ["entitlements"] });
       } catch (error) {
-        console.error("[SubscriptionContext] Failed to sync user:", error);
+        console.error("[SubscriptionContext] Failed to sync RC user:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    syncUser();
-  }, [isInitialized, isAuthenticated, user?.id, queryClient]);
+    sync();
+  }, [user?.id, isInitialized, queryClient]);
 
   // Refresh subscription status
   const refreshSubscription = useCallback(async () => {

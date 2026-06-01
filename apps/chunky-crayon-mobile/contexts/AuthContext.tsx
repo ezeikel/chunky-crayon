@@ -19,6 +19,7 @@ import {
   sendMagicLink,
   verifyMagicLink,
   getAuthMe,
+  registerDevice,
   type OAuthSignInResponse,
   type AuthMeResponse,
 } from "@/api";
@@ -84,11 +85,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsLoading(true);
       const hasToken = await checkIsAuthenticated();
 
+      // Fresh install with no token yet: register the device NOW so the
+      // anonymous DB user exists and `user.id` is populated at the end of this
+      // first refresh — deterministically, rather than waiting for an
+      // incidental API call to trigger ensureRegistered later. This is what
+      // lets SubscriptionContext anchor RevenueCat on the DB userId at cold
+      // start (no throwaway $RCAnonymousID).
       if (!hasToken) {
-        setIsAuthenticated(false);
-        setIsLinked(false);
-        setUser(null);
-        return;
+        await registerDevice();
       }
 
       const authData = await getAuthMe();
