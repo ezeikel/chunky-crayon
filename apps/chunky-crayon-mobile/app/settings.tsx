@@ -651,12 +651,14 @@ const SettingsScreen = () => {
         onClose={() => setSubscriptionModalVisible(false)}
       />
 
-      {/* Sign-out confirmation */}
+      {/* Sign-out confirmation — door icon, not a trash can (nothing is
+          erased; artwork stays on the device, hence the one clarifying line). */}
       <ConfirmSheet
         isOpen={signOutConfirmOpen}
         onClose={() => setSignOutConfirmOpen(false)}
         title="Sign out?"
         description="Your artwork will stay on this device."
+        icon={faRightFromBracket}
         confirmLabel="Sign Out"
         onConfirm={confirmSignOut}
         tone="destructive"

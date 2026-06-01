@@ -305,9 +305,8 @@ const ColoringImage = () => {
           isOpen={showStartOverConfirm}
           onClose={() => setShowStartOverConfirm(false)}
           title="Start over?"
-          description="Are you sure? This will erase all your coloring!"
-          confirmLabel="Yes, Start Over"
-          cancelLabel="No, Keep It"
+          confirmLabel="Yes, start over"
+          cancelLabel="No, keep my coloring"
           onConfirm={confirmStartOver}
           tone="destructive"
         />

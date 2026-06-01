@@ -3,9 +3,11 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faTriangleExclamation } from "@fortawesome/pro-solid-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faTrashCan, faCheck, faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { tapMedium } from "@/utils/haptics";
 import { FONTS, COLORS } from "@/lib/design";
+import SquishyPressable from "@/components/SquishyPressable/SquishyPressable";
 
 /**
  * Kid-friendly destructive-confirm replacement for Alert.alert(...
@@ -15,16 +17,21 @@ import { FONTS, COLORS } from "@/lib/design";
  * mobile are being moved off — transient feedback to sonner-native
  * toasts, destructive confirms here.
  *
- * Shape:
- *   ⚠ icon (red triangle)
- *   Bold title (e.g. "Start over?")
- *   Description (e.g. "Are you sure? This will erase all your coloring!")
- *   [Cancel] [Destructive primary]
+ * Icon-led for the 3-8 audience (mirrors CC web's StartOverButton dialog
+ * exactly): a big "what happens" icon in a tinted circle (trash for
+ * erase/delete), a short bold title, and TWO ROUND ICON BUTTONS — a white
+ * ✕ to back out, a green ✓ to confirm. No paragraph of body text and no
+ * word labels on the buttons; pre-readers parse the icons, the labels live
+ * on as accessibility hints for screen readers / parents.
  *
- * Use `tone="destructive"` (default) for delete/erase/sign-out flows
- * — the primary button renders coral-red. Use `tone="confirm"` for
- * neutral confirmations (no destructive copy) — primary renders the
- * brand orange.
+ * Shape:
+ *   🗑 icon (red circle)         ← configurable via `icon`
+ *   Bold title (e.g. "Start over?")
+ *   ( ✕ )            ( ✓ )       ← round icon buttons
+ *
+ * `tone` only tints the confirm ✓ button: 'destructive' (default) keeps the
+ * brand crayon-green affirmative (matches web — green = "yes, do it");
+ * 'confirm' is identical here but kept for call-site intent.
  */
 
 type ConfirmSheetProps = {
@@ -32,18 +39,33 @@ type ConfirmSheetProps = {
   onClose: () => void;
   /** Bold headline at the top. */
   title: string;
-  /** Body copy below the title. */
+  /**
+   * Optional body copy below the title. Omit for the kid-facing icon-led
+   * shape (the icon + title carry the meaning); pass it only where a
+   * parent-facing nuance genuinely needs words.
+   */
   description?: string;
-  /** Label on the primary action button. */
+  /**
+   * "What happens" header icon, shown in a tinted circle. Defaults to a
+   * trash can (erase/delete). Pass a different glyph for non-erase confirms
+   * (e.g. sign-out).
+   */
+  icon?: IconDefinition;
+  /**
+   * Accessibility label for the confirm ✓ button (screen readers / parents).
+   * Not rendered as visible text.
+   */
   confirmLabel: string;
-  /** Label on the secondary (dismiss) button. Defaults to "Cancel". */
+  /**
+   * Accessibility label for the cancel ✕ button. Defaults to "Cancel".
+   * Not rendered as visible text.
+   */
   cancelLabel?: string;
   /** Fired when the primary button is tapped. Sheet closes after. */
   onConfirm: () => void;
   /**
-   * 'destructive' (default) = red primary button + ⚠ icon for
-   * erase / delete / sign-out flows. 'confirm' = brand orange primary
-   * for neutral yes/no.
+   * Reserved for call-site intent; both values render the same green
+   * affirmative ✓ (matches web). 'destructive' is the default.
    */
   tone?: "destructive" | "confirm";
 };
@@ -53,6 +75,7 @@ const ConfirmSheet = ({
   onClose,
   title,
   description,
+  icon = faTrashCan,
   confirmLabel,
   cancelLabel = "Cancel",
   onConfirm,
@@ -75,9 +98,6 @@ const ConfirmSheet = ({
     onClose();
   };
 
-  const isDestructive = tone === "destructive";
-  const primaryBg = isDestructive ? COLORS.error : COLORS.crayonOrange;
-
   // Only mount the sheet while open. `ModalBottomSheet` at index 0 is
   // "mounted but collapsed", not unmounted — its surface peeks above the
   // bottom edge even when closed, which read as a phantom second dialog
@@ -94,45 +114,47 @@ const ConfirmSheet = ({
       <View style={styles.surface}>
         <View style={styles.handleIndicator} />
         <View style={[styles.content, { paddingBottom: insets.bottom + 32 }]}>
-          {isDestructive && (
-            <View style={styles.iconCircle}>
-              <FontAwesomeIcon
-                icon={faTriangleExclamation}
-                size={28}
-                color={COLORS.error}
-              />
-            </View>
-          )}
+          {/* "What happens" icon in a tinted circle (web parity). */}
+          <View style={styles.iconCircle}>
+            <FontAwesomeIcon icon={icon} size={28} color={COLORS.error} />
+          </View>
 
           <Text style={styles.title}>{title}</Text>
           {description ? (
             <Text style={styles.description}>{description}</Text>
           ) : null}
 
+          {/* Two round icon buttons — ✕ to back out (white), ✓ to confirm
+              (green). No word labels: pre-readers parse the glyphs; the
+              labels live on as accessibility hints. Built on SquishyPressable
+              so the press feel + haptic match every other tappable. */}
           <View style={styles.actions}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.cancelButton,
-                pressed && styles.pressed,
-              ]}
-              onPress={() => {
-                onClose();
-              }}
+            <SquishyPressable
+              onPress={onClose}
+              scaleTo={0.9}
               accessibilityLabel={cancelLabel}
             >
-              <Text style={styles.cancelText}>{cancelLabel}</Text>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                styles.confirmButton,
-                { backgroundColor: primaryBg },
-                pressed && styles.pressed,
-              ]}
+              <View style={[styles.iconButton, styles.cancelButton]}>
+                <FontAwesomeIcon
+                  icon={faXmark}
+                  size={30}
+                  color={COLORS.textPrimary}
+                />
+              </View>
+            </SquishyPressable>
+            <SquishyPressable
               onPress={handleConfirm}
+              scaleTo={0.9}
               accessibilityLabel={confirmLabel}
             >
-              <Text style={styles.confirmText}>{confirmLabel}</Text>
-            </Pressable>
+              <View style={[styles.iconButton, styles.confirmButton]}>
+                <FontAwesomeIcon
+                  icon={faCheck}
+                  size={30}
+                  color={COLORS.white}
+                />
+              </View>
+            </SquishyPressable>
           </View>
         </View>
       </View>
@@ -183,40 +205,36 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     paddingHorizontal: 8,
   },
+  // Two round icon buttons, centred with a comfortable gap (web spacing).
   actions: {
     flexDirection: "row",
-    gap: 12,
-    width: "100%",
+    gap: 24,
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 8,
   },
+  // 64pt circle — comfortably past the 44pt min touch target for small hands.
+  iconButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  // ✕ — white with a 2px cream border (web's "back out" affordance).
   cancelButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F3EBE0",
+    backgroundColor: COLORS.white,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
   },
-  cancelText: {
-    fontFamily: FONTS.bold,
-    fontSize: 16,
-    color: COLORS.textWarmMuted,
-  },
+  // ✓ — crayon-green "yes, do it" (web parity; green reads as the safe go).
   confirmButton: {
-    flex: 2,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  confirmText: {
-    fontFamily: FONTS.bold,
-    fontSize: 16,
-    color: "#FFFFFF",
-  },
-  pressed: {
-    transform: [{ scale: 0.97 }],
-    opacity: 0.92,
+    backgroundColor: COLORS.mint,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
   },
 });
 
