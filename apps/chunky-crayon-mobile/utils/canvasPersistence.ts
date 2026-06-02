@@ -20,6 +20,17 @@ import {
 // result locally + mark pending — never blind-clobber.
 const MAX_MERGE_RETRIES = 2;
 
+// Per-image in-flight sync coalescing. Autosave fires 1s after each stroke; on
+// a fast device a burst of strokes (or a rotation / auto-color) can fire
+// several autosaves whose POSTs overlap. Each carries the same version, so all
+// but the first 409 → merge → retry — self-healing but noisy (the version
+// climbs fast and the LogBox fills with conflict logs). Serialize syncs per
+// image: if one is already running, don't start a second — flag that a re-sync
+// is wanted; the running sync triggers exactly one follow-up when it finishes,
+// using the latest MMKV state. This removes the races at the source.
+const _syncInFlight = new Set<string>();
+const _syncWanted = new Set<string>();
+
 // After a 409 append-merge, the merged action set must be pushed back into the
 // live in-memory canvas store so the next autosave serializes the union (not
 // this device's set). The canvas screen registers a handler that replaces the
@@ -188,7 +199,73 @@ const apiToSerialized = (action: CanvasAction): SerializedAction => ({
  * @param canvasHeight - Canvas height for aspect ratio scaling
  * @param previewDataUrl - Optional base64 data URL of preview thumbnail
  */
+/**
+ * Public sync entry — coalesces concurrent syncs per image so overlapping
+ * autosaves don't race into 409 conflicts. If a sync for this image is already
+ * running, flags that another is wanted (the running one will fire one
+ * follow-up from the latest MMKV state) and returns without POSTing. The actual
+ * work is `doSyncCanvasToServer`, which the 409 retry path also calls directly.
+ */
 export const syncCanvasToServer = async (
+  imageId: string,
+  actions: SerializedAction[],
+  version: number = 0,
+  canvasWidth?: number,
+  canvasHeight?: number,
+  previewDataUrl?: string,
+  snapshotDataUrl?: string,
+): Promise<{ success: boolean; version?: number; error?: string }> => {
+  if (_syncInFlight.has(imageId)) {
+    // Another sync is running for this image — don't race it. Mark that the
+    // latest state still needs flushing; the in-flight sync re-fires once.
+    _syncWanted.add(imageId);
+    console.log(
+      `[CANVAS_SYNC] Sync already in flight for ${imageId}; coalescing.`,
+    );
+    return { success: true, version };
+  }
+
+  _syncInFlight.add(imageId);
+  try {
+    const result = await doSyncCanvasToServer(
+      imageId,
+      actions,
+      version,
+      canvasWidth,
+      canvasHeight,
+      previewDataUrl,
+      snapshotDataUrl,
+    );
+    return result;
+  } finally {
+    _syncInFlight.delete(imageId);
+    // If strokes landed while we were syncing, flush ONCE more from the latest
+    // MMKV state (newest actions + the version our sync just wrote back).
+    if (_syncWanted.has(imageId)) {
+      _syncWanted.delete(imageId);
+      const key = `${STORAGE_PREFIX}${imageId}`;
+      try {
+        const stored = canvasStorage.getString(key);
+        if (stored) {
+          const data = JSON.parse(stored);
+          void syncCanvasToServer(
+            imageId,
+            data.actions ?? [],
+            data.version ?? 0,
+            canvasWidth,
+            canvasHeight,
+            previewDataUrl,
+            snapshotDataUrl,
+          );
+        }
+      } catch {
+        // best-effort follow-up; a later autosave will retry
+      }
+    }
+  }
+};
+
+const doSyncCanvasToServer = async (
   imageId: string,
   actions: SerializedAction[],
   version: number = 0,
@@ -250,16 +327,16 @@ export const syncCanvasToServer = async (
       } catch {
         errorData = { raw: errorText };
       }
-      console.error(
-        `[CANVAS_SYNC] Server error (${response.status}):`,
-        errorData,
-      );
-      console.error(
-        `[CANVAS_SYNC] Error message:`,
-        errorData.error ||
-          errorData.details ||
-          errorData.raw ||
-          "No error message",
+      // A 409 version conflict is EXPECTED and self-healing (append-merge
+      // below) — log it as info, not error, so a normal merge doesn't surface
+      // as a red failure in the LogBox. Only genuinely unexpected statuses are
+      // errors.
+      const isRecoverableConflict =
+        response.status === 409 && errorData.currentVersion !== undefined;
+      const logFn = isRecoverableConflict ? console.log : console.error;
+      logFn(
+        `[CANVAS_SYNC] Server responded ${response.status}:`,
+        errorData.error || errorData.details || errorData.raw || errorData,
       );
 
       // Version conflict → APPEND-MERGE (not blind last-write-wins). The 409
@@ -306,8 +383,9 @@ export const syncCanvasToServer = async (
 
         // Re-POST the MERGED actions at the server version. Drop the local
         // snapshot — the server's snapshot matches the server action set the
-        // merge built on; shipping a pre-merge raster would diverge.
-        return syncCanvasToServer(
+        // merge built on; shipping a pre-merge raster would diverge. Call the
+        // internal worker directly (we're already inside the in-flight guard).
+        return doSyncCanvasToServer(
           imageId,
           mergedSerialized,
           errorData.currentVersion,
