@@ -3,6 +3,7 @@ import "@/lib/i18n"; // side-effect: initialises react-i18next before first rend
 import { useState, useEffect } from "react";
 import { Redirect, Stack } from "expo-router";
 import { useFonts } from "expo-font";
+import * as ScreenOrientation from "expo-screen-orientation";
 import * as Sentry from "@sentry/react-native";
 import Providers from "@/providers";
 import { useOnboardingStore } from "@/stores/onboardingStore";
@@ -45,6 +46,24 @@ const RootLayout = () => {
       setHydrated(true);
     }
     return unsub;
+  }, []);
+
+  // Allow + DRIVE all orientations. The plist already whitelists all four, but
+  // Expo SDK 56 runs a scene-LESS UIWindow lifecycle (AppDelegate attaches the
+  // RN root via startReactNative(...in: window), no UIWindowScene). On iPad
+  // (iOS 16+) passive device rotation resizes the RN root logically —
+  // useWindowDimensions DOES report the swapped dims (verified: 1376x1032 in
+  // landscape) — but the actual UIWindow geometry never follows, so the
+  // portrait window just paints sideways. expo-screen-orientation's native
+  // module issues the orientation update the scene-less window can't do on its
+  // own. unlockAsync (allow-all) is the safe direction; we are NOT locking.
+  // (A UIApplicationSceneManifest would also fix the window but black-screens
+  // this app — see app.config.ts; this is the scene-compatible alternative.)
+  useEffect(() => {
+    ScreenOrientation.unlockAsync().catch(() => {
+      // Non-fatal: if the native module is unavailable the app still runs
+      // portrait-first (the iPad-first default). Don't crash startup over it.
+    });
   }, []);
 
   if (!loaded || !hydrated) {

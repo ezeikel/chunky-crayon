@@ -9,6 +9,7 @@ import {
   type ColoringTier,
   type DeviceInfo,
 } from "../utils/deviceUtils";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   getTouchTargetSize,
   getHeaderHeight,
@@ -74,6 +75,7 @@ export type ResponsiveLayout = {
  */
 export const useResponsiveLayout = (): ResponsiveLayout => {
   const deviceInfo = useDeviceInfo();
+  const insets = useSafeAreaInsets();
   const {
     responsiveLayout: responsiveLayoutEnabled,
     sideToolbarExpanded,
@@ -145,9 +147,20 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
   // middle / phone tiers the canvas spans full width via the existing helper.
   const canvasArea = useMemo(() => {
     if (landscapeLayout) {
+      // Three-column canvas height must exclude the chrome above/below it or a
+      // tall/square image spills off the bottom (the landscape cut-off bug:
+      // the coin stack + the toolbar's bottom row ran past the screen edge).
+      // Subtract the header + top/bottom safe-area insets from the raw screen
+      // height. clamp to >=1 so it never feeds a 0-dim Skia snapshot.
+      // (ColoringLayout still measures the real fill height via onLayout for
+      // the FIXED tier; this gives a correct UPPER bound so the initial /
+      // pre-measure render already fits.)
       return {
         width: landscapeLayout.canvasSize,
-        height: deviceInfo.screenHeight,
+        height: Math.max(
+          1,
+          deviceInfo.screenHeight - headerHeight - insets.top - insets.bottom,
+        ),
       };
     }
     return getAvailableCanvasArea(
@@ -160,6 +173,9 @@ export const useResponsiveLayout = (): ResponsiveLayout => {
     landscapeLayout,
     deviceInfo.screenWidth,
     deviceInfo.screenHeight,
+    headerHeight,
+    insets.top,
+    insets.bottom,
     effectiveLayoutMode,
     sideToolbarExpanded,
   ]);

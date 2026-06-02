@@ -21,10 +21,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     userInterfaceStyle: "light",
     ios: {
       supportsTablet: true,
-      // Full-screen only (no iPad split-view / Slide-Over). This disables iPad
-      // MULTITASKING so iPadOS honors the orientation whitelist instead of
-      // treating the app as freely resizable. Also desirable for an immersive
-      // ages-3-8 app: no accidental drag-out.
+      // requireFullScreen must be FALSE for the iPad to actually rotate.
+      // With requireFullScreen=true (multitasking disabled) AND no
+      // UIApplicationSceneManifest, the scene-less Expo SDK 56 window resizes
+      // its RN root to the landscape size (useWindowDimensions reports
+      // 1376x1032) but the WINDOW's display surface never completes the
+      // rotation — so the correct landscape layout is painted into a portrait
+      // surface and shown sideways. Allowing multitasking (requireFullScreen
+      // false) lets iPadOS treat the app as a normal resizable window that
+      // rotates natively with the device. Verified on iPad Pro 13.
       //
       // DO NOT add a UIApplicationSceneManifest here. The Expo SDK 56
       // AppDelegate.swift uses the classic non-scene UIWindow lifecycle
@@ -33,7 +38,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // without a matching UISceneDelegate switches iOS to scene-based window
       // management, orphaning the AppDelegate's window — the RN root never gets
       // a visible window and the app boots to a BLACK SCREEN on every device.
-      requireFullScreen: true,
+      requireFullScreen: false,
       bundleIdentifier: "com.chewybytes.chunkycrayon.app",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
@@ -61,6 +66,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     plugins: [
       "expo-router",
+      // Wires the ScreenOrientation AppDelegate subscriber + react-delegate
+      // handler so the scene-less Expo SDK 56 window can be told to follow
+      // device rotation (unlockAsync at the app root drives it). This is the
+      // scene-compatible way to get real iPad landscape WITHOUT a
+      // UIApplicationSceneManifest (which black-screens this app — see the ios
+      // block above).
+      "expo-screen-orientation",
       [
         "expo-splash-screen",
         {
