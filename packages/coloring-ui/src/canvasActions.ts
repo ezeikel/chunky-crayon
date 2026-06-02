@@ -82,6 +82,12 @@ export type ActionIdentity = {
   id?: string;
   seq?: number;
   originDeviceId?: string;
+  // Durable UNDO tombstone. undo() flags the last live action undone=true with a
+  // fresh undoneSeq; redo() clears it with a higher seq. Carried through
+  // serialize → sync → the merge (which resolves it monotonically), so an undo
+  // survives reload + cross-device instead of resurrecting via the union.
+  undone?: boolean;
+  undoneSeq?: number;
 };
 
 /**
@@ -216,6 +222,8 @@ export function apiActionToSerializable(apiAction: {
     id,
     seq: data?.seq as number | undefined,
     originDeviceId: data?.originDeviceId as string | undefined,
+    undone: data?.undone as boolean | undefined,
+    undoneSeq: data?.undoneSeq as number | undefined,
   };
 
   switch (type) {
@@ -314,6 +322,14 @@ export function serializableToApiAction(action: SerializableCanvasAction): {
   if ("seq" in action && action.seq !== undefined) identity.seq = action.seq;
   if ("originDeviceId" in action && action.originDeviceId) {
     identity.originDeviceId = action.originDeviceId;
+  }
+  // Undo tombstone into data.* — rides inside the opaque payload (no wire/route
+  // change); the merge resolves it monotonically by undoneSeq.
+  if ("undone" in action && action.undone !== undefined) {
+    identity.undone = action.undone;
+  }
+  if ("undoneSeq" in action && action.undoneSeq !== undefined) {
+    identity.undoneSeq = action.undoneSeq;
   }
 
   // Extract source dimensions for cross-platform scaling (if available)

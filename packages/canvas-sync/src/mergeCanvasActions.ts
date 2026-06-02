@@ -147,6 +147,36 @@ function isTerminal(a: CanvasAction): boolean {
   return (a.type === "region" && a.data?.mode === "auto") || a.type === "clear";
 }
 
+/**
+ * Merge the UNDO TOMBSTONE of two same-id copies of an action monotonically by
+ * undoneSeq (last-writer-wins). undo() stamps undone=true with a higher
+ * undoneSeq; redo() stamps undone=false with a yet-higher seq. The copy with the
+ * greatest undoneSeq wins, so a stale device re-syncing the live (un-undone)
+ * copy can NEVER resurrect a more-recent undo — and a redo strictly after an
+ * undo wins. `base` is the winner of the field-level overlay (local); `other` is
+ * the copy it overlaid (remote). Returns `base` with the resolved tombstone.
+ */
+function mergeTombstone(base: CanvasAction, other: CanvasAction): CanvasAction {
+  const bSeq = base.data?.undoneSeq ?? 0;
+  const oSeq = other.data?.undoneSeq ?? 0;
+  // Neither copy carries a tombstone (both unstamped) → leave base untouched so
+  // an action that was never undone gains no fields (keeps the merge output
+  // identical to a fresh merge → idempotent, and old rows stay byte-clean).
+  if (bSeq === 0 && oSeq === 0) return base;
+  // The copy with the higher undoneSeq dictates the undone state (last-writer-
+  // wins). On a tie, base wins.
+  const winner = oSeq > bSeq ? other : base;
+  const undone = winner.data?.undone ?? false;
+  const undoneSeq = Math.max(bSeq, oSeq);
+  if (
+    base.data?.undone === undone &&
+    (base.data?.undoneSeq ?? 0) === undoneSeq
+  ) {
+    return base; // no change
+  }
+  return { ...base, data: { ...base.data, undone, undoneSeq } };
+}
+
 /** Total order: timestamp asc, then per-device seq asc, then id asc. */
 function cmp(x: CanvasAction, y: CanvasAction): number {
   if (x.timestamp !== y.timestamp) return x.timestamp - y.timestamp;
@@ -182,8 +212,20 @@ export function mergeCanvasActions(
 ): CanvasAction[] {
   const byId = new Map<string, CanvasAction>();
   for (const a of sanitizeWireActions(remote).map(ensureId)) byId.set(a.id, a);
-  for (const a of sanitizeWireActions(local).map(ensureId)) byId.set(a.id, a); // local overlays → local wins
+  for (const a of sanitizeWireActions(local).map(ensureId)) {
+    // Local overlays remote → local wins on field-level divergence, EXCEPT the
+    // undo tombstone, which is resolved monotonically by undoneSeq so a stale
+    // remote undo isn't lost just because local re-shipped the live copy.
+    const remoteCopy = byId.get(a.id);
+    byId.set(a.id, remoteCopy ? mergeTombstone(a, remoteCopy) : a);
+  }
 
+  // NOTE: tombstoned (undone) actions are KEPT in the merged array — this array
+  // is both PERSISTED and replayed, and the tombstone must survive the round
+  // trip (a) so the id stays present for the server's id-set divergence guard
+  // (incoming ⊇ stored) and (b) so the undo is durable across reloads/devices.
+  // Clients drop undone actions at RENDER time via getRenderableActions(),
+  // never from the persisted set.
   const sorted = [...byId.values()].sort(cmp);
 
   // index of the LAST terminal in sorted order
@@ -215,4 +257,15 @@ export function mergeCanvasActions(
   // terminal + everything sorted at/after it, then the kept-ambiguous strokes
   // on top. (keptAmbiguous retains its sorted order; the at/after block too.)
   return [...sorted.slice(lastTerminal), ...keptAmbiguous];
+}
+
+/**
+ * The subset of a (merged/persisted) action array that should actually be
+ * RENDERED — i.e. with undo tombstones removed. The persisted array keeps
+ * undone actions (so the tombstone is durable and the id stays present for the
+ * server divergence guard); this strips them at replay/render time. Order is
+ * preserved. Call this when reconstructing the canvas, NOT when saving.
+ */
+export function getRenderableActions(actions: CanvasAction[]): CanvasAction[] {
+  return actions.filter((a) => a.data?.undone !== true);
 }

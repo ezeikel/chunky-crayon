@@ -67,6 +67,9 @@ type SerializedAction = {
   createdAt?: number;
   seq?: number;
   originDeviceId?: string;
+  // Durable undo tombstone (see DrawingAction). Carried through MMKV + the wire.
+  undone?: boolean;
+  undoneSeq?: number;
   pathSvg?: string; // Serialized path as SVG
   color: string;
   brushType?: BrushType;
@@ -153,6 +156,10 @@ const convertToApiAction = (
     // Cross-device identity tiebreak + skew-guard fields.
     seq: action.seq,
     originDeviceId: action.originDeviceId,
+    // Durable undo tombstone — rides inside data so the wire schema/route are
+    // unchanged and the merge resolves it monotonically.
+    undone: action.undone,
+    undoneSeq: action.undoneSeq,
     // CRITICAL: Use per-action source dimensions if available (preserves original coordinate space)
     // Only fall back to default dimensions for new actions that don't have their own
     // This ensures web-originated actions keep their CSS pixel dimensions,
@@ -173,6 +180,8 @@ const apiToSerialized = (action: CanvasAction): SerializedAction => ({
   createdAt: action.timestamp,
   seq: action.data?.seq,
   originDeviceId: action.data?.originDeviceId,
+  undone: action.data?.undone,
+  undoneSeq: action.data?.undoneSeq,
   type: action.type as SerializedAction["type"],
   pathSvg: action.data?.path,
   color: action.data?.color || action.data?.fillColor || "",
@@ -608,12 +617,15 @@ const deserializePath = (svgString: string): SkPath | null => {
  */
 const serializeActions = (actions: DrawingAction[]): SerializedAction[] => {
   return actions.map((action): SerializedAction => {
-    // Stable identity, carried verbatim onto every SerializedAction.
+    // Stable identity + undo tombstone, carried verbatim onto every
+    // SerializedAction (spread into each branch below).
     const identity = {
       id: action.id,
       createdAt: action.createdAt,
       seq: action.seq,
       originDeviceId: action.originDeviceId,
+      undone: action.undone,
+      undoneSeq: action.undoneSeq,
     };
 
     // Magic Brush / Auto Color → the cross-platform `region` action (web
@@ -687,6 +699,8 @@ export const deserializeActions = (
         createdAt: action.createdAt,
         seq: action.seq,
         originDeviceId: action.originDeviceId,
+        undone: action.undone,
+        undoneSeq: action.undoneSeq,
       };
 
       // Skip actions with invalid paths

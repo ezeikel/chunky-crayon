@@ -102,6 +102,21 @@ export interface CanvasAction {
     // a correct-clock device's legitimately-later cross-device stroke.
     originDeviceId?: string;
 
+    // UNDO as a durable TOMBSTONE (not array removal). undo() sets undone=true;
+    // redo() sets it back to false — each bump stamps a strictly-higher
+    // undoneSeq so the merge resolves concurrent undo/redo by last-writer-wins.
+    // The flag rides INSIDE this opaque `data` JSON, so: (a) no DB migration /
+    // route change, (b) the action's id stays present in the array so the
+    // server's id-set divergence guard (incoming ⊇ stored) keeps passing — a
+    // true deletion would drop the id and wedge the guard into a 409 loop, and
+    // (c) old clients ignore `undone` and just render the stroke (graceful
+    // degradation = today's behaviour). The merge merges `undone` MONOTONICALLY
+    // (a tombstone, once the latest by undoneSeq, can't be un-set by an older
+    // copy re-synced from a stale device) and filters undone actions out of the
+    // replay set before terminal-collapse.
+    undone?: boolean;
+    undoneSeq?: number;
+
     // LEGACY (read-only back-compat for old saved rows)
     erasePath?: string;
     magicFills?: Array<{ x: number; y: number; color: string }>;

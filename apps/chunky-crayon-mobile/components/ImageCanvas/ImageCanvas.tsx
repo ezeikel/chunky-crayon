@@ -642,12 +642,10 @@ const ImageCanvas = ({
           console.log(`[CANVAS_FOCUS] Cleared pending auto-save timer`);
         }
 
-        // Get the latest state from the store directly
+        // Get the latest state from the store directly. Full history (not the
+        // visible prefix) so undo tombstones persist — see the autosave path.
         const currentState = useCanvasStore.getState();
-        const actionsToSave = currentState.history.slice(
-          0,
-          currentState.historyIndex + 1,
-        );
+        const actionsToSave = currentState.history;
         console.log(
           `[CANVAS_FOCUS] Actions to save: ${actionsToSave.length}, isInitialized: ${isInitializedRef.current}`,
         );
@@ -718,12 +716,12 @@ const ImageCanvas = ({
     }
 
     autoSaveTimerRef.current = setTimeout(() => {
-      // Get the latest state from the store directly
+      // Get the latest state from the store directly. Save the FULL history (not
+      // the visible prefix) so UNDO TOMBSTONES — which live at/after the cursor
+      // — reach the server and make the undo durable across reload/devices. The
+      // merge + render filter out `undone` actions; persistence keeps them.
       const currentState = useCanvasStore.getState();
-      const actionsToSave = currentState.history.slice(
-        0,
-        currentState.historyIndex + 1,
-      );
+      const actionsToSave = currentState.history;
       if (actionsToSave.length > 0) {
         // Pass SVG dimensions (coordinate space) for cross-platform sync
         // Mobile strokes are in SVG viewBox space (typically 1024x1024), not CSS layout space

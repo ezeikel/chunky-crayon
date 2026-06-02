@@ -163,6 +163,13 @@ export type DrawingAction = {
   createdAt?: number;
   seq?: number;
   originDeviceId?: string;
+  // Durable UNDO tombstone. undo() sets undone=true with a fresh undoneSeq;
+  // redo() clears it with a higher seq. Carried through serialize → MMKV → sync
+  // so an undo survives reload + cross-device merge (the merge resolves it
+  // monotonically by undoneSeq). Local render still uses the history prefix, so
+  // these are for persistence, not the in-session visible state.
+  undone?: boolean;
+  undoneSeq?: number;
   // "magic-reveal" = region-store Magic Brush stroke (a path; the colour is
   // re-derived per region from the pre-coloured layer at render time).
   // "magic-auto" = region-store Auto Color (whole pre-coloured layer in one
@@ -222,13 +229,18 @@ export type DrawingAction = {
 };
 
 /**
- * Helper function to get visible actions from history.
+ * Helper function to get visible actions from history — the prefix up to the
+ * cursor, with UNDO-TOMBSTONED actions removed. Tombstones can sit in the middle
+ * of the prefix after an undo-then-draw (addAction keeps the redo tail flagged
+ * `undone` rather than slicing it, so the undo stays durable), so filtering by
+ * `undone` here is what keeps them off the canvas while preserving them for
+ * persistence. Mirrors getRenderableActions in canvas-sync.
  */
 export const getVisibleActions = (
   history: DrawingAction[],
   historyIndex: number,
 ): DrawingAction[] => {
-  return history.slice(0, historyIndex + 1);
+  return history.slice(0, historyIndex + 1).filter((a) => a.undone !== true);
 };
 
 // Capture function type for getting canvas image data
@@ -429,9 +441,20 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
         `[CANVAS_STORE] ADD_ACTION - Current history: ${history.length} items, Index: ${historyIndex}, Image: ${imageId}`,
       );
 
-      // Remove any redo history when new action is added
-      const newHistory = history.slice(0, historyIndex + 1);
-      newHistory.push(stamped);
+      // Drawing after an undo discards the redo tail. We DON'T slice it away —
+      // a sliced-away action that was already synced would resurrect on reload
+      // (the server still has its live copy and nothing tells it the action is
+      // gone). Instead, TOMBSTONE the tail (mark each undone with a fresh seq)
+      // and keep it, so the durable-undo flag reaches the server on the next
+      // sync. The kept prefix is history[0..historyIndex]; the tail is
+      // history[historyIndex+1..].
+      const prefix = history.slice(0, historyIndex + 1);
+      const tombstonedTail = history.slice(historyIndex + 1).map((a) => ({
+        ...a,
+        undone: true as const,
+        undoneSeq: nextActionSeq(),
+      }));
+      const newHistory = [...prefix, ...tombstonedTail, stamped];
 
       // Trim history if too long
       if (newHistory.length > MAX_HISTORY) {
@@ -452,16 +475,33 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     },
 
     undo: () => {
-      const { historyIndex } = get();
+      const { history, historyIndex } = get();
       if (historyIndex >= 0) {
-        set({ historyIndex: historyIndex - 1 });
+        // Stamp a durable UNDO TOMBSTONE on the action we're stepping past so
+        // the undo survives sync/merge/reload (it's no longer just a local
+        // index move — see canvas-sync mergeTombstone). The local render still
+        // uses the prefix (history.slice(0, historyIndex+1)), so the canvas
+        // updates instantly; the flag is for persistence + cross-device.
+        const next = history.map((a, i) =>
+          i === historyIndex
+            ? { ...a, undone: true, undoneSeq: nextActionSeq() }
+            : a,
+        );
+        set({ history: next, historyIndex: historyIndex - 1, isDirty: true });
       }
     },
 
     redo: () => {
       const { history, historyIndex } = get();
       if (historyIndex < history.length - 1) {
-        set({ historyIndex: historyIndex + 1 });
+        const target = historyIndex + 1;
+        // Clear the tombstone (redo wins via a strictly-higher undoneSeq).
+        const next = history.map((a, i) =>
+          i === target
+            ? { ...a, undone: false, undoneSeq: nextActionSeq() }
+            : a,
+        );
+        set({ history: next, historyIndex: target, isDirty: true });
       }
     },
 

@@ -332,6 +332,21 @@ export const ColoringContextProvider = ({
     const lastAction = undoStack[undoStack.length - 1];
     setUndoStack((prev) => prev.slice(0, -1));
     setRedoStack((prev) => [...prev, lastAction]);
+    // Durable UNDO: undo is LIFO, so tombstone the LAST live (non-undone) synced
+    // action. Previously undo only popped the raster undoStack and never touched
+    // `drawingActions`, so the undone stroke stayed in the synced set and
+    // resurrected on reload/cross-device. The flag rides inside the action and
+    // the merge resolves it monotonically (a stale device can't un-undo it).
+    setDrawingActions((prev) => {
+      for (let i = prev.length - 1; i >= 0; i -= 1) {
+        if (!prev[i].undone) {
+          const next = prev.slice();
+          next[i] = { ...next[i], undone: true, undoneSeq: nextActionSeq() };
+          return next;
+        }
+      }
+      return prev;
+    });
     setHasUnsavedChanges(true);
 
     return lastAction;
@@ -343,6 +358,18 @@ export const ColoringContextProvider = ({
     const lastRedo = redoStack[redoStack.length - 1];
     setRedoStack((prev) => prev.slice(0, -1));
     setUndoStack((prev) => [...prev, lastRedo]);
+    // Mirror of undo: clear the tombstone on the LAST undone synced action
+    // (redo wins via a strictly-higher undoneSeq).
+    setDrawingActions((prev) => {
+      for (let i = prev.length - 1; i >= 0; i -= 1) {
+        if (prev[i].undone) {
+          const next = prev.slice();
+          next[i] = { ...next[i], undone: false, undoneSeq: nextActionSeq() };
+          return next;
+        }
+      }
+      return prev;
+    });
     setHasUnsavedChanges(true);
 
     return lastRedo;

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   mergeCanvasActions,
+  getRenderableActions,
   makeActionId,
   canonicalLegacyId,
   sanitizeWireActions,
@@ -340,5 +341,97 @@ describe("mergeCanvasActions — empties & idempotence", () => {
     } as CanvasAction;
     const out = sanitizeWireActions([snap, s, f]);
     expect(ids(out)).toEqual(["s", "f"]);
+  });
+});
+
+describe("mergeCanvasActions — undo tombstone", () => {
+  // A tombstoned stroke (undone=true) the local device carries.
+  const undoneStroke = (
+    ts: number,
+    opts: { id: string; device?: string; undoneSeq?: number },
+  ): CanvasAction => {
+    const s = stroke(ts, { id: opts.id, device: opts.device });
+    s.data.undone = true;
+    s.data.undoneSeq = opts.undoneSeq ?? 1;
+    return s;
+  };
+
+  it("keeps the tombstoned action in the PERSISTED array (id stays present)", () => {
+    const live = stroke(10, { id: "s10", device: DEV_A });
+    const tomb = undoneStroke(20, { id: "s20", device: DEV_A });
+    const merged = mergeCanvasActions([live, tomb], []);
+    // both ids survive — the tombstone must persist (durable undo + the
+    // server's id-set divergence guard needs the id present).
+    expect(ids(merged).sort()).toEqual(["s10", "s20"]);
+    expect(merged.find((a) => a.id === "s20")?.data.undone).toBe(true);
+  });
+
+  it("getRenderableActions drops the tombstoned action", () => {
+    const live = stroke(10, { id: "s10", device: DEV_A });
+    const tomb = undoneStroke(20, { id: "s20", device: DEV_A });
+    const merged = mergeCanvasActions([live, tomb], []);
+    expect(ids(getRenderableActions(merged))).toEqual(["s10"]);
+  });
+
+  it("an undo survives the union with a STALE live copy from the server", () => {
+    // Server still holds the pre-undo (live) copy; local has undone it.
+    const serverLive = stroke(20, { id: "s20", device: DEV_A });
+    const localUndone = undoneStroke(20, {
+      id: "s20",
+      device: DEV_A,
+      undoneSeq: 1,
+    });
+    const merged = mergeCanvasActions([localUndone], [serverLive]);
+    // The undo wins (higher undoneSeq than the server's unstamped 0) and the
+    // action does not render.
+    expect(merged.find((a) => a.id === "s20")?.data.undone).toBe(true);
+    expect(getRenderableActions(merged)).toHaveLength(0);
+  });
+
+  it("an undo survives even when LOCAL has the stale live copy (remote undone)", () => {
+    // Reverse: the OTHER device undid it (on the server), local re-shipped live.
+    const localLive = stroke(20, { id: "s20", device: DEV_A });
+    const serverUndone = undoneStroke(20, {
+      id: "s20",
+      device: DEV_A,
+      undoneSeq: 1,
+    });
+    const merged = mergeCanvasActions([localLive], [serverUndone]);
+    expect(merged.find((a) => a.id === "s20")?.data.undone).toBe(true);
+    expect(getRenderableActions(merged)).toHaveLength(0);
+  });
+
+  it("redo AFTER undo wins via higher undoneSeq (action renders again)", () => {
+    const undone = undoneStroke(20, { id: "s20", device: DEV_A, undoneSeq: 1 });
+    // redo: undone=false with a strictly-higher seq.
+    const redone = stroke(20, { id: "s20", device: DEV_A });
+    redone.data.undone = false;
+    redone.data.undoneSeq = 2;
+    const merged = mergeCanvasActions([redone], [undone]);
+    expect(merged.find((a) => a.id === "s20")?.data.undone).toBe(false);
+    expect(getRenderableActions(merged)).toHaveLength(1);
+  });
+
+  it("undo→Start Over→redo does NOT resurrect the stroke across the terminal", () => {
+    const undone = undoneStroke(10, { id: "s10", device: DEV_A, undoneSeq: 1 });
+    const cl = clear(20, { id: "c20", device: DEV_A });
+    // a redo of the pre-clear stroke (higher seq) — but it sorts before the
+    // terminal, so terminal-collapse must still drop it.
+    const redone = stroke(10, { id: "s10", device: DEV_A });
+    redone.data.undone = false;
+    redone.data.undoneSeq = 2;
+    const merged = mergeCanvasActions([redone, cl], [undone]);
+    // clear is the terminal; the (redone) stroke sorts before it and is dropped.
+    expect(types(getRenderableActions(merged))).toEqual(["clear"]);
+  });
+
+  it("is idempotent with tombstones", () => {
+    const live = stroke(10, { id: "s10", device: DEV_A });
+    const tomb = undoneStroke(20, { id: "s20", device: DEV_A, undoneSeq: 1 });
+    const local = [live, tomb];
+    const remote = [stroke(20, { id: "s20", device: DEV_A })]; // stale live copy
+    const once = mergeCanvasActions(local, remote);
+    const twice = mergeCanvasActions(local, once);
+    expect(twice).toEqual(once);
   });
 });

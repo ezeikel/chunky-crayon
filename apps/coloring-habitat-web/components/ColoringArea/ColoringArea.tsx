@@ -911,7 +911,12 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
             `[ColoringArea] Replaying ${savedProgress.actions.length} actions from server (source dimensions: ${savedProgress.sourceWidth}x${savedProgress.sourceHeight})`,
           );
           let replayedCount = 0;
+          // Skip UNDO-TOMBSTONED actions when painting — they stay in the
+          // editable record (setDrawingActions keeps the full set so the
+          // tombstone persists + the id stays for the server divergence guard),
+          // but must NOT render.
           for (const action of savedProgress.actions) {
+            if (action.undone === true) continue;
             const success = canvasRef.current.replayAction(
               action,
               savedProgress.sourceWidth,
