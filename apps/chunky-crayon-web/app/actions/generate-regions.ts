@@ -16,6 +16,7 @@ import {
 import { ALL_COLORING_COLORS_EXTENDED } from '@/constants';
 import { db } from '@one-colored-pixel/db';
 import { BRAND } from '@/lib/db';
+import { revalidateTag } from 'next/cache';
 
 /**
  * Region store config for Chunky Crayon. Uses the existing CC region fill
@@ -99,6 +100,18 @@ export async function generateRegionStore(
     `${result.regionsJson.regions.length} regions,`,
     `${result.regionMapGzipped.byteLength} gz bytes`,
   );
+
+  // Bust the `'use cache'` snapshot for this image (getColoringImageBase uses
+  // cacheLife('max') = 1 week). Without this the freshly-written region fields
+  // stay invisible to every consumer — the web page AND the mobile API
+  // (/api/coloring-images/[id]) — so Magic Brush / Auto Color silently no-op
+  // on a just-backfilled image until the week-long cache expires. The worker's
+  // region-store path already revalidates (revalidate.ts → coloring-image-{id});
+  // this is the in-process equivalent for the dev regenerate route + viewer.
+  revalidateTag(`coloring-image-${coloringImageId}`, { expire: 0 });
+  revalidateTag('all-coloring-images', { expire: 0 });
+  revalidateTag('coloring-images-paginated', { expire: 0 });
+  revalidateTag('coloring-images-by-ids', { expire: 0 });
 
   return result;
 }
