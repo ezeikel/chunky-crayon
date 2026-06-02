@@ -290,23 +290,37 @@ model ColoringImage {
 
 // Canvas progress model for cross-platform synchronization
 model CanvasProgress {
-  id               String    @id @default(cuid())
-  userId           String
-  coloringImageId  String
-  actions          Json // Serialized drawing actions
-  canvasWidth      Int? // Canvas width for aspect ratio (optional for backward compatibility)
-  canvasHeight     Int? // Canvas height for aspect ratio (optional for backward compatibility)
-  previewUrl       String? // URL to progress thumbnail for feed display
-  previewUpdatedAt DateTime? // Track when preview was last updated (throttle updates)
-  version          Int       @default(1) // For conflict resolution
-  updatedAt        DateTime  @updatedAt
-  createdAt        DateTime  @default(now())
+  id                String    @id @default(cuid())
+  userId            String
+  // Per-profile scoping: sibling child profiles get independent progress per
+  // image. Nullable for back-compat with rows written before profile scoping
+  // (Postgres treats NULLs as distinct in the unique key, so old rows don't
+  // collide). New writes always carry the active profile.
+  profileId         String?
+  coloringImageId   String
+  actions           Json // Serialized drawing actions
+  canvasWidth       Int? // Canvas width for aspect ratio (optional for backward compatibility)
+  canvasHeight      Int? // Canvas height for aspect ratio (optional for backward compatibility)
+  previewUrl        String? // URL to progress thumbnail for feed display
+  previewUpdatedAt  DateTime? // Track when preview was last updated (throttle updates)
+  // Flattened visual fallback raster (R2). Used to restore magic/legacy pages
+  // cross-device when an action list can't reconstruct them. Distinct from
+  // previewUrl (which is the feed thumbnail).
+  snapshotUrl       String?
+  snapshotWidth     Int?
+  snapshotHeight    Int?
+  snapshotUpdatedAt DateTime?
+  version           Int       @default(1) // For conflict resolution
+  updatedAt         DateTime  @updatedAt
+  createdAt         DateTime  @default(now())
 
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile       Profile?      @relation(fields: [profileId], references: [id], onDelete: Cascade)
   coloringImage ColoringImage @relation(fields: [coloringImageId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, coloringImageId])
+  @@unique([userId, profileId, coloringImageId])
   @@index([userId])
+  @@index([profileId])
   @@index([coloringImageId])
   @@map("canvas_progress")
 }
@@ -406,6 +420,7 @@ model Profile {
 
   coloringImages    ColoringImage[]
   savedArtworks     SavedArtwork[] // Saved colored artwork for this profile
+  canvasProgress    CanvasProgress[] // In-progress canvas sync, per profile
   userStickers      UserSticker[] // Stickers earned by this profile
   challengeProgress ProfileChallengeProgress[] // Weekly challenge progress
   characters        Character[] // Persistent characters owned by this profile
