@@ -729,6 +729,9 @@ export type LoadCanvasResult = {
   actions: DrawingAction[];
   sourceCanvasWidth?: number; // Original canvas width (from web)
   sourceCanvasHeight?: number; // Original canvas height (from web)
+  // Server restore raster (R2 url) — painted as a base layer when actions can't
+  // reconstruct the page (legacy/reference page synced from another device).
+  snapshotUrl?: string;
 };
 
 /**
@@ -755,10 +758,13 @@ export const loadCanvasState = async (
       return null;
     }
 
-    // If server returned data (not null, not notFound)
-    if (serverData && serverData.actions.length > 0) {
+    // If server returned data (actions OR a snapshot)
+    if (
+      serverData &&
+      (serverData.actions.length > 0 || serverData.snapshotUrl)
+    ) {
       console.log(
-        `[CANVAS_PERSIST] Found server data - Actions: ${serverData.actions.length}, Source dimensions: ${serverData.canvasWidth}x${serverData.canvasHeight}`,
+        `[CANVAS_PERSIST] Found server data - Actions: ${serverData.actions.length}, snapshot: ${!!serverData.snapshotUrl}, Source dimensions: ${serverData.canvasWidth}x${serverData.canvasHeight}`,
       );
 
       // Deserialize actions for rendering
@@ -775,16 +781,12 @@ export const loadCanvasState = async (
       canvasStorage.set(key, JSON.stringify(data));
       console.log(`[CANVAS_PERSIST] Updated local storage with server data`);
 
-      if (actions.length > 0) {
-        console.log(
-          `[CANVAS_PERSIST] Returning ${actions.length} drawing actions`,
-        );
-        return {
-          actions,
-          sourceCanvasWidth: serverData.canvasWidth,
-          sourceCanvasHeight: serverData.canvasHeight,
-        };
-      }
+      return {
+        actions,
+        sourceCanvasWidth: serverData.canvasWidth,
+        sourceCanvasHeight: serverData.canvasHeight,
+        snapshotUrl: serverData.snapshotUrl,
+      };
     }
 
     // If server returned null (network/auth error), fall through to local storage
@@ -858,6 +860,21 @@ export const deleteCanvasState = async (imageId: string): Promise<boolean> => {
         (c) => c.imageId !== imageId,
       );
       canvasStorage.set(METADATA_KEY, JSON.stringify(metadata));
+    }
+
+    // Also delete the SERVER progress row so Start Over doesn't resurrect it on
+    // the next load (and doesn't sync back to the other device). Fire-and-
+    // forget; the route is idempotent. profileId resolved server-side from the
+    // mobile token.
+    try {
+      const apiUrl = getApiUrl();
+      const authHeader = await getAuthHeader();
+      await fetch(
+        `${apiUrl}/canvas/progress?imageId=${encodeURIComponent(imageId)}`,
+        { method: "DELETE", headers: { ...authHeader } },
+      );
+    } catch (err) {
+      console.warn("[CANVAS_PERSIST] Failed to delete server progress:", err);
     }
 
     return true;

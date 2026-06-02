@@ -29,6 +29,7 @@ import {
   Fill,
   ImageFormat,
   notifyChange,
+  type SkImage,
 } from "@shopify/react-native-skia";
 import {
   Gesture,
@@ -177,6 +178,14 @@ const ImageCanvas = ({
     x: number;
     y: number;
   } | null>(null);
+
+  // Server restore snapshot (cross-device fallback for legacy/reference pages
+  // whose actions can't be reconstructed here). Painted as a base layer under
+  // strokes/reveals/stickers so new edits compose on top + the eraser cuts
+  // through it. Cleared when the page changes or Start Over runs.
+  const [restoredSnapshot, setRestoredSnapshot] = useState<SkImage | null>(
+    null,
+  );
 
   // Region store (modern Magic Brush / Auto Color). Loads + decodes the
   // pixel→region map; usePreColoredImage builds the per-variant SkImage that
@@ -397,16 +406,23 @@ const ImageCanvas = ({
               `[CANVAS_INIT] Scaling action (${action.type}) from ${actionSourceWidth}x${actionSourceHeight} to ${targetWidth}x${targetHeight} (scale: ${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`,
             );
 
-            if (action.type === "stroke" && action.path) {
-              // Transform the path using Skia's matrix transformation
+            if (
+              (action.type === "stroke" || action.type === "magic-reveal") &&
+              action.path
+            ) {
+              // Transform the path using Skia's matrix transformation. Covers
+              // brush strokes AND Magic Brush reveals (both store an SVG path);
+              // a web-authored reveal scales into mobile space here too.
               const scaledPath = action.path.copy();
               scaledPath.transform(Skia.Matrix().scale(scaleX, scaleY));
               return {
                 ...action,
                 path: scaledPath,
-                // Also scale stroke width proportionally
+                // Scale stroke width by the GEOMETRIC MEAN of scaleX/scaleY so
+                // the rule matches web (which uses the same) — min vs max on the
+                // two platforms made width drift on every round-trip.
                 strokeWidth: action.strokeWidth
-                  ? action.strokeWidth * Math.min(scaleX, scaleY)
+                  ? action.strokeWidth * Math.sqrt(scaleX * scaleY)
                   : action.strokeWidth,
                 // Update source dimensions to target - coordinates are now in mobile space
                 // This prevents double-scaling on next load
@@ -441,7 +457,7 @@ const ImageCanvas = ({
                     ? action.stickerY * scaleY
                     : undefined,
                 stickerSize: action.stickerSize
-                  ? action.stickerSize * Math.min(scaleX, scaleY)
+                  ? action.stickerSize * Math.sqrt(scaleX * scaleY)
                   : action.stickerSize,
                 sourceWidth: targetWidth,
                 sourceHeight: targetHeight,
@@ -496,6 +512,26 @@ const ImageCanvas = ({
           console.log(`[CANVAS_INIT] All actions restored`);
         } else {
           console.log(`[CANVAS_INIT] No saved actions to restore`);
+        }
+
+        // Snapshot fallback: when the page has NO replayable actions but the
+        // server kept a restore raster (a legacy/reference page coloured on
+        // another device), decode + paint it as a base layer. When actions DO
+        // reconstruct the page we skip this (double-draw guard) and clear any
+        // stale snapshot.
+        if (savedActions.length === 0 && savedData?.snapshotUrl) {
+          try {
+            const data = await Skia.Data.fromURI(savedData.snapshotUrl);
+            if (!isCancelled) {
+              const img = Skia.Image.MakeImageFromEncoded(data);
+              setRestoredSnapshot(img?.makeNonTextureImage() ?? img ?? null);
+            }
+          } catch (err) {
+            console.warn("[CANVAS_INIT] Failed to decode server snapshot", err);
+            if (!isCancelled) setRestoredSnapshot(null);
+          }
+        } else if (!isCancelled) {
+          setRestoredSnapshot(null);
         }
       } else {
         // Same image - just update the ID without resetting
@@ -563,24 +599,24 @@ const ImageCanvas = ({
             `[CANVAS_FOCUS] Saving with SVG dimensions: ${saveWidth}x${saveHeight}`,
           );
 
-          // Generate preview thumbnail for server storage
-          // Note: Canvas may be unmounted during cleanup, so wrap in try-catch
-          // Use JPEG with 80% quality for smaller file size (PNG is too large)
+          // Feed preview (JPEG) + cross-device restore snapshot (PNG) from one
+          // snapshot. Canvas may be unmounted during cleanup → try-catch.
           let previewDataUrl: string | undefined;
+          let snapshotDataUrl: string | undefined;
           try {
             if (canvasRef.current) {
               const image = canvasRef.current.makeImageSnapshot();
               if (image) {
-                const base64 = image.encodeToBase64(ImageFormat.JPEG, 80);
-                previewDataUrl = `data:image/jpeg;base64,${base64}`;
+                previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
+                snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
                 console.log(
-                  `[CANVAS_FOCUS] Generated preview, size: ${previewDataUrl.length} chars`,
+                  `[CANVAS_FOCUS] preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
                 );
               }
             }
           } catch (e) {
             console.log(
-              `[CANVAS_FOCUS] Could not capture preview (canvas likely unmounted)`,
+              `[CANVAS_FOCUS] Could not capture preview/snapshot (canvas likely unmounted)`,
             );
           }
 
@@ -590,6 +626,7 @@ const ImageCanvas = ({
             saveWidth,
             saveHeight,
             previewDataUrl,
+            snapshotDataUrl,
           )
             .then((success) => {
               console.log(
@@ -632,23 +669,25 @@ const ImageCanvas = ({
           `[AUTO_SAVE] Saving ${actionsToSave.length} actions with SVG dimensions: ${saveWidth}x${saveHeight}`,
         );
 
-        // Generate preview thumbnail for server storage
-        // Use JPEG with 80% quality for smaller file size (PNG is too large)
+        // Generate the feed preview (JPEG, small) AND the cross-device restore
+        // snapshot (PNG, full-fidelity — carries magic/legacy results the
+        // action list can't replay on another device) from one snapshot.
         let previewDataUrl: string | undefined;
+        let snapshotDataUrl: string | undefined;
         try {
           if (canvasRef.current) {
             const image = canvasRef.current.makeImageSnapshot();
             if (image) {
-              const base64 = image.encodeToBase64(ImageFormat.JPEG, 80);
-              previewDataUrl = `data:image/jpeg;base64,${base64}`;
+              previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
+              snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
               console.log(
-                `[AUTO_SAVE] Generated preview, size: ${previewDataUrl.length} chars`,
+                `[AUTO_SAVE] preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
               );
             }
           }
         } catch (e) {
           console.log(
-            `[AUTO_SAVE] Could not capture preview (canvas not ready)`,
+            `[AUTO_SAVE] Could not capture preview/snapshot (canvas not ready)`,
           );
         }
 
@@ -658,6 +697,7 @@ const ImageCanvas = ({
           saveWidth,
           saveHeight,
           previewDataUrl,
+          snapshotDataUrl,
         )
           .then((success) => {
             console.log(`[AUTO_SAVE] Save completed with result: ${success}`);
@@ -1770,6 +1810,21 @@ const ImageCanvas = ({
                     width={svgDimensions.width}
                     height={svgDimensions.height}
                     svg={svg}
+                  />
+                )}
+                {/* Server restore snapshot (cross-device fallback for legacy/
+                    reference pages). Base layer above the fill/SVG, below magic
+                    + strokes + stickers so new work composes on top and the
+                    eraser (same erasable group, dstOut) cuts through it. fit
+                    "fill" maps the 1024² raster into the SVG viewBox. */}
+                {restoredSnapshot && svgDimensions && (
+                  <SkiaImage
+                    image={restoredSnapshot}
+                    x={0}
+                    y={0}
+                    width={svgDimensions.width}
+                    height={svgDimensions.height}
+                    fit="fill"
                   />
                 )}
                 {/* Region-store magic (Auto Color + Magic Brush reveals) —

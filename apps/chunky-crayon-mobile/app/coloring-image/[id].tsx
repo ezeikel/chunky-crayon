@@ -43,7 +43,10 @@ import Loading from "@/components/Loading/Loading";
 import { toast } from "@/components/Toaster";
 import { tapLight, tapMedium, tapHeavy, notifySuccess } from "@/utils/haptics";
 import { COLORS } from "@/lib/design";
-import { debugCanvasStorage } from "@/utils/canvasPersistence";
+import {
+  debugCanvasStorage,
+  deleteCanvasState,
+} from "@/utils/canvasPersistence";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { useArtworkStore, genArtworkId } from "@/stores/artworkStore";
@@ -114,8 +117,11 @@ const ColoringImage = () => {
     reset();
     setTool("brush");
     setBrushType("crayon");
+    // Clear local MMKV + delete the server progress row so Start Over doesn't
+    // resurrect on next load or sync back to the web/other device.
+    void deleteCanvasState(id as string);
     notifySuccess();
-  }, [reset, setTool, setBrushType]);
+  }, [reset, setTool, setBrushType, id]);
 
   // ── Per-action sheet handlers ──────────────────────────────────────────
   // Each rail tile opens its own ActionSheet; the sheet's green ✓ fires the
