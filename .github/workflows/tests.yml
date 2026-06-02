@@ -163,19 +163,33 @@ jobs:
       - name: Build workspace packages (deps of the web app)
         run: pnpm exec turbo run build --filter=@one-colored-pixel/chunky-crayon-web^...
 
-      # Bring the Playwright Neon branch up to the current schema BEFORE seeding.
-      # Without this the branch drifts behind main as migrations land (it was
-      # forked from dev at some past point), and the seed fails with a Prisma
-      # P2022 ColumnNotFound for any column added since the fork (e.g. the
-      # profiles avatarId / colo-evolution columns). `migrate deploy` applies
-      # the committed migration history, so the e2e DB self-heals every run and
-      # tracks main automatically. Uses the job-level DATABASE_URL
-      # (= PLAYWRIGHT_DATABASE_URL).
+      # Bring the ci-e2e Neon branch up to the current schema BEFORE seeding.
+      # The branch is forked from dev once and persists; this step applies the
+      # committed migration history every run so its schema tracks main and the
+      # seed never hits a missing column (Prisma P2022). `migrate deploy` is
+      # idempotent. Uses the job-level DATABASE_URL (= PLAYWRIGHT_DATABASE_URL).
+      #
+      # Retry migrate deploy: the ci-e2e Neon compute auto-suspends after 300s
+      # idle, so the first connection of a run can race its cold-start wake
+      # (Prisma errors P1001 "can't reach database" and does NOT retry the
+      # initial connect). A few attempts with backoff cover the ~5-10s wake and
+      # any brief Neon blip. `migrate deploy` is idempotent — re-running after a
+      # partial/failed connect is safe.
       - name: Apply migrations to the Playwright DB
         env:
           DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
         working-directory: ./packages/db
-        run: pnpm exec prisma migrate deploy
+        run: |
+          for attempt in 1 2 3 4 5; do
+            echo "migrate deploy attempt $attempt…"
+            if pnpm exec prisma migrate deploy; then
+              echo "migrate deploy succeeded"; exit 0
+            fi
+            echo "attempt $attempt failed (likely cold Neon compute); waiting before retry…"
+            sleep 10
+          done
+          echo "::error::prisma migrate deploy failed after 5 attempts"
+          exit 1
 
       - name: Seed Playwright test user
         working-directory: ./apps/chunky-crayon-web
