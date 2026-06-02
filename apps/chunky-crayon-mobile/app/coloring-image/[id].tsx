@@ -429,7 +429,20 @@ const ColoringImage = () => {
                       <ImageCanvas
                         coloringImage={coloringImage}
                         setScroll={setScroll}
-                        canvasArea={area}
+                        // Fit inside the card content box (deflate by the card
+                        // padding). Portrait three-column is scrollable so the
+                        // height passed here is the full screen height — the
+                        // canvas fits to WIDTH and the column scrolls.
+                        canvasArea={{
+                          width: Math.max(
+                            1,
+                            area.width - CANVAS_CARD_PADDING * 2,
+                          ),
+                          height: Math.max(
+                            1,
+                            area.height - CANVAS_CARD_PADDING * 2,
+                          ),
+                        }}
                         layoutMode={layoutMode}
                       />
                     </View>
@@ -457,7 +470,21 @@ const ColoringImage = () => {
                     <ImageCanvas
                       coloringImage={coloringImage}
                       setScroll={setScroll}
-                      canvasArea={area}
+                      // The card adds CANVAS_CARD_PADDING all round; the canvas
+                      // must fit inside the card's CONTENT box, not the slot, or
+                      // it overflows the card by 2×padding. Deflate the measured
+                      // area accordingly (clamped >=1 so it never feeds a 0-dim
+                      // Skia snapshot).
+                      canvasArea={{
+                        width: Math.max(
+                          1,
+                          area.width - CANVAS_CARD_PADDING * 2,
+                        ),
+                        height: Math.max(
+                          1,
+                          area.height - CANVAS_CARD_PADDING * 2,
+                        ),
+                      }}
                       layoutMode={layoutMode}
                     />
                   </View>
@@ -616,6 +643,11 @@ const ColoringImage = () => {
   );
 };
 
+// Inner padding of canvasCardLandscape. The canvas must fit inside the card's
+// CONTENT box, so the renderCanvas call sites deflate the measured slot by
+// 2× this. Keep tied to the style below so they never drift.
+const CANVAS_CARD_PADDING = 12;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -755,7 +787,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderRadius: 20,
-    padding: 12,
+    padding: CANVAS_CARD_PADDING,
     shadowColor: "#E46444",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
