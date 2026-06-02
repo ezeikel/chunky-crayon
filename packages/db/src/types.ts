@@ -16,3 +16,9 @@ export type {
   Profile as DbProfileType,
   SavedArtwork as DbSavedArtworkType,
 } from "./generated/prisma/browser";
+
+// Cross-platform canvas wire types + the append-merge, from the Prisma-free
+// leaf package. Exposing them on this /types subpath means any future web
+// import of CanvasAction (or mergeCanvasActions) uses @one-colored-pixel/db/types,
+// NEVER the barrel (which pulls in the Prisma client).
+export * from "@one-colored-pixel/canvas-sync";

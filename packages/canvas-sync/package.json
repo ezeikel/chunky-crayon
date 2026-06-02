@@ -1,0 +1,28 @@
+{
+  "name": "@one-colored-pixel/canvas-sync",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf .turbo node_modules dist",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:related": "vitest related --run"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@vitest/coverage-v8": "^4.1.2",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.2"
+  }
+}
