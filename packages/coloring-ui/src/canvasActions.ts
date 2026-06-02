@@ -3,7 +3,7 @@
  * This format is compatible with mobile's SerializedAction format.
  */
 
-import type { BrushType, FillPattern } from "./types";
+import type { BrushType, FillPattern, PaletteVariant } from "./types";
 
 /**
  * A single point in a stroke path
@@ -82,6 +82,22 @@ export type SerializableSnapshotAction = {
 };
 
 /**
+ * Serializable region action — Magic Brush ("reveal") / Auto Color ("auto").
+ * The colour is re-derived per region from the shared region store at replay
+ * time on each platform, so we carry only what's needed to reconstruct it:
+ * the palette variant, and (reveal only) the brush path + width. "auto" needs
+ * no geometry → no coordinate scaling; "reveal" reuses the stroke scaler.
+ */
+export type SerializableRegionAction = {
+  type: "region";
+  mode: "reveal" | "auto";
+  variant: PaletteVariant;
+  pathSvg?: string; // reveal only — the brush stroke
+  brushSize?: number; // reveal only
+  timestamp: number;
+} & ActionSourceDimensions;
+
+/**
  * Union of all serializable action types
  */
 export type SerializableCanvasAction =
@@ -89,7 +105,8 @@ export type SerializableCanvasAction =
   | SerializableFillAction
   | SerializableStickerAction
   | SerializableClearAction
-  | SerializableSnapshotAction;
+  | SerializableSnapshotAction
+  | SerializableRegionAction;
 
 /**
  * Convert an array of points to an SVG path string
@@ -182,6 +199,18 @@ export function apiActionToSerializable(apiAction: {
         timestamp,
       };
 
+    case "region":
+      return {
+        type: "region",
+        mode: (data?.mode as "reveal" | "auto") || "auto",
+        variant: (data?.variant as PaletteVariant) || "realistic",
+        pathSvg: data?.path as string | undefined,
+        brushSize: data?.brushSize as number | undefined,
+        timestamp,
+        sourceWidth,
+        sourceHeight,
+      };
+
     default:
       console.warn(`Unknown action type: ${type}`);
       return null;
@@ -270,6 +299,20 @@ export function serializableToApiAction(
         timestamp: action.timestamp,
         data: {
           imageDataUrl: action.imageDataUrl,
+        },
+      };
+
+    case "region":
+      return {
+        id,
+        type: "region",
+        timestamp: action.timestamp,
+        data: {
+          mode: action.mode,
+          variant: action.variant,
+          ...(action.pathSvg && { path: action.pathSvg }),
+          ...(action.brushSize && { brushSize: action.brushSize }),
+          ...sourceDimensions,
         },
       };
   }
